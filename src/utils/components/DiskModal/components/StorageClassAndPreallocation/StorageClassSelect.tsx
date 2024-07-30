@@ -10,11 +10,11 @@ import { convertResourceArrayToMap, getName } from '@kubevirt-utils/resources/sh
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { FormGroup } from '@patternfly/react-core';
 
-import { DiskFormState } from '../../utils/types';
+import { V1DiskFormState } from '../../utils/types';
 import {
-  storageClassField,
-  storageClassProvisionerField,
-  storageClassSelectFieldID,
+  STORAGE_CLASS_FIELD,
+  STORAGE_CLASS_PROVIDER_FIELD,
+  STORAGECLASS_SELECT_FIELDID,
 } from '../utils/constants';
 
 import { getSCSelectOptions } from './utils/helpers';
@@ -26,9 +26,9 @@ type StorageClassSelectProps = {
 
 const StorageClassSelect: FC<StorageClassSelectProps> = ({ checkSC, setShowSCAlert }) => {
   const { t } = useKubevirtTranslation();
-  const { control, setValue, watch } = useFormContext<DiskFormState>();
+  const { control, setValue, watch } = useFormContext<V1DiskFormState>();
 
-  const storageClass = watch(storageClassField);
+  const storageClass = watch(STORAGE_CLASS_FIELD);
 
   const [{ clusterDefaultStorageClass, storageClasses }, loaded] = useDefaultStorageClass();
 
@@ -38,24 +38,25 @@ const StorageClassSelect: FC<StorageClassSelectProps> = ({ checkSC, setShowSCAle
   const onSelect = useCallback(
     (selection: string) => {
       setShowSCAlert(checkSC ? checkSC(selection) : false);
-      setValue(storageClassField, selection);
-      setValue(storageClassProvisionerField, scMapper[selection]?.provisioner);
+      setValue(STORAGE_CLASS_FIELD, selection);
+
+      setValue(STORAGE_CLASS_PROVIDER_FIELD, scMapper[selection]?.provisioner);
     },
     [checkSC, scMapper, setShowSCAlert, setValue],
   );
 
   useEffect(() => {
     if (isEmpty(storageClass) && loaded && !isEmpty(defaultSC)) {
-      setValue(storageClassField, getName(defaultSC));
-      setValue(storageClassProvisionerField, defaultSC?.provisioner);
+      setValue(STORAGE_CLASS_FIELD, getName(defaultSC));
+      setValue(STORAGE_CLASS_PROVIDER_FIELD, defaultSC?.provisioner);
     }
   }, [defaultSC, storageClass, loaded, setValue]);
 
   if (!loaded) return <Loading />;
 
   return (
-    <FormGroup fieldId={storageClassSelectFieldID} label={t('StorageClass')}>
-      <div data-test-id={storageClassSelectFieldID}>
+    <FormGroup fieldId={STORAGECLASS_SELECT_FIELDID} label={t('StorageClass')}>
+      <div data-test-id={STORAGECLASS_SELECT_FIELDID}>
         <Controller
           render={({ field: { value } }) => (
             <InlineFilterSelect
@@ -70,7 +71,7 @@ const StorageClassSelect: FC<StorageClassSelectProps> = ({ checkSC, setShowSCAle
             />
           )}
           control={control}
-          name={storageClassField}
+          name={STORAGE_CLASS_FIELD}
         />
       </div>
     </FormGroup>

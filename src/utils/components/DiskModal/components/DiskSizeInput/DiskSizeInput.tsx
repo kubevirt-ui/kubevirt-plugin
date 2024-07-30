@@ -1,46 +1,38 @@
 import React, { FC } from 'react';
-import { Controller, useFormContext } from 'react-hook-form';
+import { useFormContext } from 'react-hook-form';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { convertToBaseValue, humanizeBinaryBytes } from '@kubevirt-utils/utils/humanize.js';
 
 import CapacityInput from '../../../CapacityInput/CapacityInput';
-import { DiskFormState, SourceTypes } from '../../utils/types';
-import { diskSizeField, diskSourceField } from '../utils/constants';
+import { V1DiskFormState } from '../../utils/types';
+import { DISK_SIZE_FIELD } from '../utils/constants';
+import { getDataVolumeTemplateSize, getPVCClaimName, getSourceRef } from '../utils/selectors';
 
-import DynamicSize from './DynamicSize';
+import usePVCSourceSize from './usePVCSourceSize';
 
-type DiskSizeInputProps = { isEditingCreatedDisk: boolean };
+type DiskSizeInputProps = { isCreated: boolean; namespace: string };
 
-const DiskSizeInput: FC<DiskSizeInputProps> = ({ isEditingCreatedDisk }) => {
+const DiskSizeInput: FC<DiskSizeInputProps> = ({ isCreated, namespace }) => {
   const { t } = useKubevirtTranslation();
-  const { control, watch } = useFormContext<DiskFormState>();
-  const diskSource = watch(diskSourceField);
-  const diskSize = watch(diskSizeField);
+  const { setValue, watch } = useFormContext<V1DiskFormState>();
+  const diskState = watch();
 
-  const emptyDiskSize = isEmpty(diskSize) || diskSize === NO_DATA_DASH;
-
-  if (SourceTypes.PVC === diskSource || (emptyDiskSize && SourceTypes.OTHER === diskSource)) {
-    return null;
-  }
-
-  if (SourceTypes.EPHEMERAL === diskSource) return <DynamicSize />;
+  const [pvcSize] = usePVCSourceSize(
+    getSourceRef(diskState),
+    getPVCClaimName(diskState),
+    namespace,
+  );
 
   return (
-    <Controller
-      render={({ field: { onChange, value } }) => (
-        <CapacityInput
-          label={
-            SourceTypes.OTHER === diskSource ? t('Disk size') : t('PersistentVolumeClaim size')
-          }
-          isEditingCreatedDisk={isEditingCreatedDisk}
-          onChange={onChange}
-          size={value}
-        />
-      )}
-      control={control}
-      name={diskSizeField}
+    <CapacityInput
+      size={
+        getDataVolumeTemplateSize(diskState) ||
+        humanizeBinaryBytes(convertToBaseValue(pvcSize)).string
+      }
+      isEditingCreatedDisk={isCreated}
+      label={t('Disk size')}
+      onChange={(quantity) => setValue(DISK_SIZE_FIELD, quantity)}
     />
   );
 };

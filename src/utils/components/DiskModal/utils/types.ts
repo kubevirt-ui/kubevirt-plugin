@@ -1,9 +1,15 @@
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1DataVolumeTemplateSpec,
+  V1Disk,
+  V1VirtualMachine,
+  V1Volume,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 
 export enum SourceTypes {
   BLANK = 'blank',
   CLONE_PVC = 'pvc',
+  DATA_SOURCE = 'dataSource',
   EPHEMERAL = 'containerDisk',
   HTTP = 'http',
   OTHER = 'Other',
@@ -78,4 +84,25 @@ export type DiskModalProps = {
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
   onUploadedDataVolume?: (dataVolume: V1beta1DataVolume) => void;
   vm: V1VirtualMachine;
+};
+
+export type V1DiskModalProps = {
+  createDiskSource?: SourceTypes;
+  editDiskName?: string;
+  isCreated?: boolean;
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
+  onUploadedDataVolume?: (dataVolume: V1beta1DataVolume) => void;
+  vm: V1VirtualMachine;
+};
+
+export type V1DiskFormState = {
+  dataVolumeTemplate?: V1DataVolumeTemplateSpec;
+  disk: V1Disk;
+  isBootSource: boolean;
+  storageClassProvisioner?: string;
+  storageProfileSettingsApplied?: boolean;
+  uploadFile?: { file: File; filename: string };
+  volume: V1Volume;
 };

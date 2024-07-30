@@ -6,7 +6,6 @@ import {
   getRunningVMMissingDisksFromVMI,
   getRunningVMMissingVolumesFromVMI,
 } from '@kubevirt-utils/components/DiskModal/utils/helpers';
-import { ROOTDISK } from '@kubevirt-utils/constants/constants';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { DiskRawData, DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 
@@ -59,10 +58,9 @@ const useDisksTableData: UseDisksTableDisks = (vm, vmi) => {
     const isInstanceTypeVM = Boolean(getInstanceTypeMatcher(vm));
 
     const diskDevices: DiskRawData[] = (vmVolumes || []).map((volume) => {
-      const disk =
-        isInstanceTypeVM && Boolean(volume.name === ROOTDISK)
-          ? { name: ROOTDISK }
-          : vmDisks?.find(({ name }) => name === volume?.name);
+      let disk = vmDisks?.find(({ name }) => name === volume?.name);
+
+      if (!disk && isInstanceTypeVM) disk = { name: volume?.name };
 
       const dataVolumeTemplate = volume?.dataVolume?.name
         ? getDataVolumeTemplates(vm)?.find((dv) => getName(dv) === volume.dataVolume.name)

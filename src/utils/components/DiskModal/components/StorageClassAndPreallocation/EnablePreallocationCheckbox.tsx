@@ -7,25 +7,25 @@ import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Checkbox, Flex, FlexItem, FormGroup, PopoverPosition } from '@patternfly/react-core';
 
-import { DiskFormState } from '../../utils/types';
-import { enablePreallocationField, enablePreallocationFieldID } from '../utils/constants';
+import { V1DiskFormState } from '../../utils/types';
+import { ENABLE_PREALLOCATION_FIELDID, ENALBE_PREACCLOCATION_FIELD } from '../utils/constants';
 
 type EnablePreallocationCheckboxProps = {
-  isDisabled: boolean;
+  isDisabled?: boolean;
 };
 
 const EnablePreallocationCheckbox: FC<EnablePreallocationCheckboxProps> = ({ isDisabled }) => {
   const { t } = useKubevirtTranslation();
-  const { control } = useFormContext<DiskFormState>();
+  const { control } = useFormContext<V1DiskFormState>();
 
   return (
-    <FormGroup fieldId={enablePreallocationFieldID}>
+    <FormGroup fieldId={ENABLE_PREALLOCATION_FIELDID}>
       <Flex>
         <FlexItem>
           <Controller
             render={({ field: { onChange, value } }) => (
               <Checkbox
-                id={enablePreallocationFieldID}
+                id={ENABLE_PREALLOCATION_FIELDID}
                 isChecked={value}
                 isDisabled={isDisabled}
                 label={t('Enable preallocation')}
@@ -33,7 +33,7 @@ const EnablePreallocationCheckbox: FC<EnablePreallocationCheckboxProps> = ({ isD
               />
             )}
             control={control}
-            name={enablePreallocationField}
+            name={ENALBE_PREACCLOCATION_FIELD}
           />
         </FlexItem>
         <FlexItem>

@@ -1,40 +1,32 @@
-import React, { FC, useMemo, useState } from 'react';
-import { useFormContext } from 'react-hook-form';
+import React, { FC, useState } from 'react';
 
-import { requiresDataVolume } from '../../utils/helpers';
-import { DiskFormState, SourceTypes } from '../../utils/types';
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+
+import { checkDifferentStorageClassFromBootPVC } from '../../utils/helpers';
 import ApplyStorageProfileSettings from '../StorageProfileSettings/ApplyStorageProfileSettings';
-import { diskSourceField } from '../utils/constants';
 
 import DefaultStorageClassAlert from './DefaultStorageClassAlert';
 import EnablePreallocationCheckbox from './EnablePreallocationCheckbox';
 import StorageClassSelect from './StorageClassSelect';
 
 type StorageClassAndPreallocationProps = {
-  checkSC?: (selectedStorageClass: string) => boolean;
-  isEditingCreatedDisk?: boolean;
+  vm: V1VirtualMachine;
 };
 
-const StorageClassAndPreallocation: FC<StorageClassAndPreallocationProps> = ({
-  checkSC,
-  isEditingCreatedDisk,
-}) => {
+const StorageClassAndPreallocation: FC<StorageClassAndPreallocationProps> = ({ vm }) => {
   const [showSCAlert, setShowSCAlert] = useState(false);
-  const { watch } = useFormContext<DiskFormState>();
-
-  const diskSource = watch(diskSourceField);
-
-  const sourceRequiresDataVolume = useMemo(() => requiresDataVolume(diskSource), [diskSource]);
-
-  if ((!sourceRequiresDataVolume && diskSource !== SourceTypes.UPLOAD) || isEditingCreatedDisk)
-    return null;
 
   return (
     <>
-      <StorageClassSelect checkSC={checkSC} setShowSCAlert={setShowSCAlert} />
+      <StorageClassSelect
+        checkSC={(selectedStorageClass) =>
+          checkDifferentStorageClassFromBootPVC(vm, selectedStorageClass)
+        }
+        setShowSCAlert={setShowSCAlert}
+      />
       {showSCAlert && <DefaultStorageClassAlert />}
       <ApplyStorageProfileSettings />
-      <EnablePreallocationCheckbox isDisabled={!sourceRequiresDataVolume} />
+      <EnablePreallocationCheckbox />
     </>
   );
 };

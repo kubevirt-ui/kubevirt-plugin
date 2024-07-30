@@ -1,17 +1,14 @@
 import React, { FC, useState } from 'react';
 import { Controller, FieldPath, useFormContext } from 'react-hook-form';
 
-import { DiskFormState } from '@kubevirt-utils/components/DiskModal/utils/types';
+import { V1DiskFormState } from '@kubevirt-utils/components/DiskModal/utils/types';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { DropEvent, FileUpload, FormGroup, ValidatedOptions } from '@patternfly/react-core';
 
-import {
-  diskSourceUploadFieldID,
-  uploadFileField,
-  uploadFilenameField,
-} from '../../utils/constants';
+import { UPLOAD_FILE_FIELD, UPLOAD_FILENAME_FIELD } from '../../../utils/constants';
+import { diskSourceUploadFieldID } from '../../utils/constants';
 
 import { DiskSourceUploadPVCProgress } from './DiskSourceUploadPVCProgress';
 
@@ -27,12 +24,12 @@ const DiskSourceUploadPVC: FC<DiskSourceUploadPVCProps> = ({ label, relevantUplo
     formState: { errors },
     setValue,
     watch,
-  } = useFormContext<DiskFormState>();
+  } = useFormContext<V1DiskFormState>();
   const [isLoading, setIsLoading] = useState(false);
 
-  const uploadFilename = watch(uploadFilenameField);
+  const uploadFilename = watch(UPLOAD_FILENAME_FIELD);
 
-  const error = errors?.upload?.uploadFile;
+  const error = errors?.uploadFile;
 
   return (
     <Controller
@@ -42,11 +39,11 @@ const DiskSourceUploadPVC: FC<DiskSourceUploadPVCProps> = ({ label, relevantUplo
             <FileUpload
               onClearClick={() => {
                 onChange('');
-                setValue<FieldPath<DiskFormState>>(uploadFilenameField, '');
+                setValue<FieldPath<V1DiskFormState>>(UPLOAD_FILENAME_FIELD, '');
               }}
               onFileInputChange={(_, file: File) => {
                 onChange(file);
-                setValue<FieldPath<DiskFormState>>(uploadFilenameField, file.name);
+                setValue<FieldPath<V1DiskFormState>>(UPLOAD_FILENAME_FIELD, file.name);
               }}
               allowEditingUploadedText={false}
               browseButtonText={t('Upload')}
@@ -70,7 +67,7 @@ const DiskSourceUploadPVC: FC<DiskSourceUploadPVCProps> = ({ label, relevantUplo
         </>
       )}
       control={control}
-      name={uploadFileField}
+      name={UPLOAD_FILE_FIELD}
       rules={{ required: t('File is required.') }}
     />
   );

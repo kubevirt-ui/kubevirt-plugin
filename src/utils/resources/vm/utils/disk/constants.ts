@@ -22,7 +22,9 @@ export type DiskRowDataLayout = {
   storageClass: string;
 };
 
-export const diskTypes = {
+export type DiskType = 'cdrom' | 'disk' | 'lun';
+
+export const diskTypes: Record<string, DiskType> = {
   cdrom: 'cdrom',
   disk: 'disk',
   lun: 'lun',

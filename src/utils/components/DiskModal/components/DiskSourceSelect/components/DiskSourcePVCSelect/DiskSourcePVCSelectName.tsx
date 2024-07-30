@@ -5,7 +5,7 @@ import {
   modelToGroupVersionKind,
   PersistentVolumeClaimModel,
 } from '@kubevirt-ui/kubevirt-api/console';
-import { DiskFormState } from '@kubevirt-utils/components/DiskModal/utils/types';
+import { V1DiskFormState } from '@kubevirt-utils/components/DiskModal/utils/types';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -15,7 +15,8 @@ import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { FormGroup, ValidatedOptions } from '@patternfly/react-core';
 
-import { diskSourcePVCNameFieldID, pvcNameField } from '../../utils/constants';
+import { PVC_CLAIMNAME_FIELD } from '../../../utils/constants';
+import { diskSourcePVCNameFieldID } from '../../utils/constants';
 
 type DiskSourcePVCSelectNameProps = {
   vmNamespace?: string;
@@ -26,7 +27,7 @@ const DiskSourcePVCSelectName: FC<DiskSourcePVCSelectNameProps> = ({ vmNamespace
   const {
     control,
     formState: { errors },
-  } = useFormContext<DiskFormState>();
+  } = useFormContext<V1DiskFormState>();
 
   const [pvcs, pvcsLoaded] = usePVCs(vmNamespace);
 
@@ -34,7 +35,7 @@ const DiskSourcePVCSelectName: FC<DiskSourcePVCSelectNameProps> = ({ vmNamespace
 
   if (!pvcsLoaded) return <Loading />;
 
-  const error = errors?.persistentVolumeClaim?.pvcName;
+  const error = errors?.volume?.persistentVolumeClaim?.claimName;
 
   return (
     <Controller
@@ -67,7 +68,7 @@ const DiskSourcePVCSelectName: FC<DiskSourcePVCSelectNameProps> = ({ vmNamespace
         </FormGroup>
       )}
       control={control}
-      name={pvcNameField}
+      name={PVC_CLAIMNAME_FIELD}
       rules={{ required: t('PersistentVolumeClaim is required.') }}
     />
   );

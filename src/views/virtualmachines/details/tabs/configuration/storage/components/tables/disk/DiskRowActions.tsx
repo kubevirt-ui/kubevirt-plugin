@@ -18,7 +18,6 @@ import DeleteDiskModal from '../../modal/DeleteDiskModal';
 import DetachModal from '../../modal/DetachModal';
 import MakePersistentModal from '../../modal/MakePersistentModal';
 
-import { getEditDiskStates } from './utils/getEditDiskStates';
 import { isHotplugVolume, isPVCSource, isPVCStatusBound } from './utils/helpers';
 
 type DiskRowActionsProps = {
@@ -48,7 +47,6 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
   const isHotplug = isHotplugVolume(vm, diskName, vmi);
   const isEditDisabled = isVMRunning;
 
-  const initialFormState = !isEditDisabled && getEditDiskStates(vm, obj, vmi);
   const volumes = isVMRunning ? vmi?.spec?.volumes : getVolumes(vm);
   const volume = volumes?.find(({ name }) => name === diskName);
 
@@ -83,11 +81,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
   const createEditDiskModal = () =>
     createModal(({ isOpen, onClose }) => (
       <DiskModal
-        customize={customize}
-        headerText={t('Edit disk')}
-        initialFormData={initialFormState}
-        isEditDisk
-        isEditingCreatedDisk={!customize && pvcResourceExists}
+        editDiskName={diskName}
         isOpen={isOpen}
         onClose={onClose}
         onSubmit={onDiskUpdate || updateDisks}

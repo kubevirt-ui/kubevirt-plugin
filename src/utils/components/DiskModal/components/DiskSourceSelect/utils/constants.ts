@@ -11,18 +11,10 @@ export const ephemeralDiskSizeFieldID = 'ephemeral-disk-size';
 export const diskSourceFieldID = 'disk-source';
 export const diskSourceEphemeralFieldID = 'disk-source-container';
 
-export const clonePVCNameField = 'pvc.pvcName';
-export const clonePVCNamespaceField = 'pvc.pvcNamespace';
-export const ephemeralField = 'containerDisk.url';
-export const registeryField = 'registry.url';
-export const pvcNameField = 'persistentVolumeClaim.pvcName';
-export const uploadFilenameField = 'upload.uploadFilename';
-export const uploadFileField = 'upload.uploadFile';
-export const urlField = 'http.url';
-
 export const optionLabelMapper: { [key in SourceTypes]: string } = {
   [SourceTypes.BLANK]: t('Empty disk (blank)'),
   [SourceTypes.CLONE_PVC]: t('Clone existing PVC'),
+  [SourceTypes.DATA_SOURCE]: t('Use DataSource'),
   [SourceTypes.EPHEMERAL]: t('Ephemeral disk (Container image)'),
   [SourceTypes.HTTP]: t('From URL'),
   [SourceTypes.OTHER]: t('Other'),

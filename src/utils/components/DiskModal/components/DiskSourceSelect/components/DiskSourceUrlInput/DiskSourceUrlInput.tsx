@@ -1,12 +1,13 @@
 import React, { FC } from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import { DiskFormState } from '@kubevirt-utils/components/DiskModal/utils/types';
+import { V1DiskFormState } from '@kubevirt-utils/components/DiskModal/utils/types';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, TextInput, ValidatedOptions } from '@patternfly/react-core';
 
-import { diskSourceURLFieldID, urlField } from '../../utils/constants';
+import { DATAVOLUME_HTTPURL_FIELD } from '../../../utils/constants';
+import { diskSourceURLFieldID } from '../../utils/constants';
 
 import { HTTP_URL_PREFIX, HTTPS_URL_PREFIX } from './utils/constants';
 import { DiskSourceUrlInputProps } from './utils/types';
@@ -17,9 +18,9 @@ const DiskSourceUrlInput: FC<DiskSourceUrlInputProps> = ({ os }) => {
   const {
     formState: { errors },
     register,
-  } = useFormContext<DiskFormState>();
+  } = useFormContext<V1DiskFormState>();
 
-  const error = errors?.http?.url;
+  const error = errors?.dataVolumeTemplate?.spec?.source?.http?.url;
 
   return (
     <FormGroup
@@ -31,7 +32,7 @@ const DiskSourceUrlInput: FC<DiskSourceUrlInputProps> = ({ os }) => {
       <TextInput
         data-test-id={diskSourceURLFieldID}
         id={diskSourceURLFieldID}
-        {...register(urlField, {
+        {...register(DATAVOLUME_HTTPURL_FIELD, {
           required: t('URL is required'),
           shouldUnregister: true,
           validate: (value: string) =>

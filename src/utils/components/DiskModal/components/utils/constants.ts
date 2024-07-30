@@ -4,23 +4,35 @@ export const OTHER = t('Other');
 export const CONTAINER_EPHERMAL = t('Container (Ephemeral)');
 export const DYNAMIC = t('Dynamic');
 
-export const diskTypeSelectFieldID = 'disk-type-select';
-export const storageClassSelectFieldID = 'storage-class-select';
-export const accessModeFieldID = 'access-mode';
-export const volumeModeFieldID = 'volume-mode';
-export const enablePreallocationFieldID = 'enable-preallocation';
+export const DISKTYPE_SELECT_FIELDID = 'disk-type-select';
+export const STORAGECLASS_SELECT_FIELDID = 'storage-class-select';
+export const ACCESS_MODE_FIELDID = 'access-mode';
+export const VOLUMEMODE_FIELDID = 'volume-mode';
+export const ENABLE_PREALLOCATION_FIELDID = 'enable-preallocation';
 
-export const sharableField = 'sharable';
-export const lunReservationField = 'lunReservation';
-export const isBootSourceField = 'isBootSource';
-export const diskInterfaceField = 'diskInterface';
-export const diskTypeField = 'diskType';
-export const diskNameField = 'diskName';
-export const diskSourceField = 'diskSource';
-export const diskSizeField = 'diskSize';
-export const storageClassField = 'storageClass';
-export const storageClassProvisionerField = 'storageClassProvisioner';
-export const enablePreallocationField = 'enablePreallocation';
-export const accessModeField = 'accessMode';
-export const storageProfileSettingsAppliedField = 'storageProfileSettingsApplied';
-export const volumeModeField = 'volumeMode';
+export const SHARABLE_FIELD = 'disk.shareable';
+export const LUN_RESERVATION_FIELD = 'disk.lun.reservation';
+export const DATAVOLUME_PVC_NAME = 'dataVolumeTemplate.spec.source.pvc.name';
+export const DATAVOLUME_PVC_NAMESPACE = 'dataVolumeTemplate.spec.source.pvc.namespace';
+export const DATAVOLUME_HTTPURL_FIELD = 'dataVolumeTemplate.spec.source.http.url';
+
+export const IS_BOOT_SOURCE_FIELD = 'isBootSource';
+export const DISK_TYPE_FIELD = 'diskType';
+export const DISK_NAME_FIELD = 'disk.name';
+export const VOLUME_NAME_FIELD = 'volume.name';
+export const DISK_SIZE_FIELD = 'dataVolumeTemplate.spec.storage.resources.requests.storage';
+export const UPLOAD_FILENAME_FIELD = 'uploadFile.filename';
+export const UPLOAD_FILE_FIELD = 'uploadFile.file';
+export const STORAGE_CLASS_FIELD = 'dataVolumeTemplate.spec.storage.storageClassName';
+export const STORAGE_CLASS_PROVIDER_FIELD = 'storageClassProvisioner';
+export const ENALBE_PREACCLOCATION_FIELD = 'dataVolumeTemplate.spec.preallocation';
+export const ACCESS_MODE_FIELD = 'dataVolumeTemplate.spec.storage.accessModes';
+export const STORAGE_PROFILE_SETTINGS_APPLIED_FIELD = 'storageProfileSettingsApplied';
+export const VOLUME_MODE_FIELD = 'dataVolumeTemplate.spec.storage.volumeMode';
+export const DATAVOLUME_TEMPLATE_STORAGE = 'dataVolumeTemplate.spec.storage';
+
+export const CONTAINERDISK_IMAGE_FIELD = 'volume.containerDisk.image';
+
+export const PVC_CLAIMNAME_FIELD = 'volume.persistentVolumeClaim.claimName';
+
+export const REGISTRYURL_DATAVOLUME_FIELD = 'dataVolumeTemplate.spec.source.registry.url';

@@ -4,7 +4,6 @@ import { produceVMDisks } from '@catalog/utils/WizardVMContext';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
-import { getEditDiskState } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
@@ -24,8 +23,6 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({ diskName, isDisabled, onUpdat
   const { createModal } = useModal();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const deleteBtnText = t('Detach');
-
-  const initialFormState = getEditDiskState(vm, diskName);
 
   const onDelete = useCallback(() => {
     const vmWithDeletedDisk = produceVMDisks(vm, (draftVM) => {
@@ -68,10 +65,8 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({ diskName, isDisabled, onUpdat
   const onEditModalToggle = () => {
     createModal(({ isOpen, onClose }) => (
       <DiskModal
-        createOwnerReference={false}
-        headerText={t('Edit disk')}
-        initialFormData={initialFormState}
-        isEditDisk
+        editDiskName={diskName}
+        isCreated={false}
         isOpen={isOpen}
         onClose={onClose}
         onSubmit={onUpdate}

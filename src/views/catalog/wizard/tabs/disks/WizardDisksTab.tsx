@@ -2,15 +2,13 @@ import React from 'react';
 
 import { WizardTab } from '@catalog/wizard/tabs';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
-import { getInitialStateDiskForm } from '@kubevirt-utils/components/DiskModal/utils/constants';
-import { DiskFormState, SourceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
+import { SourceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import DiskSourceFlyoutMenu from '@kubevirt-utils/components/DiskSourceFlyoutMenu/DiskSourceFlyoutMenu';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import WindowsDrivers from '@kubevirt-utils/components/WindowsDrivers/WindowsDrivers';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
-import { ensurePath, generatePrettyName } from '@kubevirt-utils/utils/utils';
+import { ensurePath } from '@kubevirt-utils/utils/utils';
 import {
   ListPageBody,
   ListPageFilter,
@@ -27,7 +25,6 @@ import useWizardDisksTableData from './hooks/useWizardDisksTableData';
 import './wizard-disk-tab.scss';
 
 const WizardDisksTab: WizardTab = ({ tabsData, updateTabsData, updateVM, vm }) => {
-  const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const columns = useDiskColumns();
   const [disks, disksLoaded] = useWizardDisksTableData(vm);
@@ -44,12 +41,6 @@ const WizardDisksTab: WizardTab = ({ tabsData, updateTabsData, updateVM, vm }) =
         >
           <DiskSourceFlyoutMenu
             onSelect={(diskSource: SourceTypes) => {
-              const diskState: DiskFormState = {
-                ...getInitialStateDiskForm(),
-                diskName: generatePrettyName('disk'),
-                diskSource: diskSource,
-              };
-
               return createModal(({ isOpen, onClose }) => (
                 <DiskModal
                   onUploadedDataVolume={(dataVolume) =>
@@ -63,9 +54,8 @@ const WizardDisksTab: WizardTab = ({ tabsData, updateTabsData, updateVM, vm }) =
                       }
                     })
                   }
-                  createOwnerReference={false}
-                  headerText={t('Add disk')}
-                  initialFormData={diskState}
+                  createDiskSource={diskSource}
+                  isCreated={false}
                   isOpen={isOpen}
                   onClose={onClose}
                   onSubmit={updateVM}
