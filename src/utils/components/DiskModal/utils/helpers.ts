@@ -6,6 +6,7 @@ import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-
 import {
   V1AddVolumeOptions,
   V1beta1DataVolumeSpec,
+  V1beta1StorageSpecVolumeModeEnum,
   V1DataVolumeTemplateSpec,
   V1Disk,
   V1RemoveVolumeOptions,
@@ -160,7 +161,7 @@ const buildDataVolume = ({
 
   if (!diskState.storageProfileSettingsApplied) {
     dataVolume.spec.storage.accessModes = [diskState.accessMode];
-    dataVolume.spec.storage.volumeMode = diskState.volumeMode;
+    dataVolume.spec.storage.volumeMode = diskState.volumeMode as V1beta1StorageSpecVolumeModeEnum;
   }
 
   dataVolume.spec.preallocation = diskState.enablePreallocation;
@@ -184,7 +185,7 @@ const buildDataVolume = ({
 const getDataVolumeTemplate = (dataVolume: V1beta1DataVolume): V1DataVolumeTemplateSpec => {
   const dataVolumeTemplate: V1DataVolumeTemplateSpec = { metadata: {}, spec: {} };
   dataVolumeTemplate.metadata = { name: dataVolume.metadata.name };
-  dataVolumeTemplate.spec = dataVolume.spec as V1beta1DataVolumeSpec;
+  dataVolumeTemplate.spec = dataVolume.spec as unknown as V1beta1DataVolumeSpec;
   return dataVolumeTemplate;
 };
 

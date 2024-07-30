@@ -2,7 +2,7 @@ import React, { FC, useCallback, useState } from 'react';
 
 import VirtualMachineCloneModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineCloneModel';
 import VirtualMachineSnapshotModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineSnapshotModel';
-import { V1alpha1VirtualMachineSnapshot } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1VirtualMachineSnapshot } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import CloneVMModal from '@kubevirt-utils/components/CloneVMModal/CloneVMModal';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -15,7 +15,7 @@ import { ButtonVariant, Dropdown, DropdownItem, DropdownList } from '@patternfly
 
 type SnapshotActionsMenuProps = {
   isRestoreDisabled: boolean;
-  snapshot: V1alpha1VirtualMachineSnapshot;
+  snapshot: V1beta1VirtualMachineSnapshot;
 };
 
 const SnapshotActionsMenu: FC<SnapshotActionsMenuProps> = ({ isRestoreDisabled, snapshot }) => {
@@ -53,7 +53,7 @@ const SnapshotActionsMenu: FC<SnapshotActionsMenuProps> = ({ isRestoreDisabled, 
 
   const onDeleteModalToggle = useCallback(() => {
     createModal(({ isOpen, onClose }) => (
-      <TabModal<V1alpha1VirtualMachineSnapshot>
+      <TabModal<V1beta1VirtualMachineSnapshot>
         onSubmit={(obj) =>
           k8sDelete({
             model: VirtualMachineSnapshotModel,

@@ -6,11 +6,9 @@ import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolume
 import {
   V1beta1DataSource,
   V1beta1DataVolume,
-} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
-import {
   V1beta1DataVolumeSpec,
-  V1DataVolumeTemplateSpec,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { V1DataVolumeTemplateSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { DEFAULT_NAMESPACE, ROOTDISK } from '@kubevirt-utils/constants/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {

@@ -2,8 +2,8 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import VirtualMachineRestoreModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineRestoreModel';
 import VirtualMachineSnapshotModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineSnapshotModel';
 import {
-  V1alpha1VirtualMachineRestore,
-  V1alpha1VirtualMachineSnapshot,
+  V1beta1VirtualMachineRestore,
+  V1beta1VirtualMachineSnapshot,
   V1VirtualMachine,
   V1VolumeSnapshotStatus,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -33,10 +33,8 @@ export const validateSnapshotDeadline = (deadline: string): string => {
   return undefined;
 };
 
-export const getEmptyVMSnapshotResource = (
-  vm: V1VirtualMachine,
-): V1alpha1VirtualMachineSnapshot => {
-  const snapshotResource: V1alpha1VirtualMachineSnapshot = {
+export const getEmptyVMSnapshotResource = (vm: V1VirtualMachine): V1beta1VirtualMachineSnapshot => {
+  const snapshotResource: V1beta1VirtualMachineSnapshot = {
     apiVersion: `${VirtualMachineSnapshotModel.apiGroup}/${VirtualMachineSnapshotModel.apiVersion}`,
     kind: VirtualMachineSnapshotModel.kind,
     metadata: {
@@ -55,9 +53,9 @@ export const getEmptyVMSnapshotResource = (
 };
 
 export const getVMRestoreSnapshotResource = (
-  snapshot: V1alpha1VirtualMachineSnapshot,
-): V1alpha1VirtualMachineRestore => {
-  const restoreResource: V1alpha1VirtualMachineRestore = {
+  snapshot: V1beta1VirtualMachineSnapshot,
+): V1beta1VirtualMachineRestore => {
+  const restoreResource: V1beta1VirtualMachineRestore = {
     apiVersion: `${VirtualMachineRestoreModel.apiGroup}/${VirtualMachineRestoreModel.apiVersion}`,
     kind: VirtualMachineRestoreModel.kind,
     metadata: {

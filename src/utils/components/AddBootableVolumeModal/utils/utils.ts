@@ -8,7 +8,10 @@ import {
   V1beta1DataImportCron,
   V1beta1DataSource,
 } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
-import { V1beta1DataVolumeSource } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1beta1DataVolumeSource,
+  V1beta1StorageSpecVolumeModeEnum,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
@@ -105,7 +108,8 @@ const getDataVolumeWithSource = (
 
     if (!applyStorageProfileSettings) {
       draftBootableVolume.spec.storage.accessModes = claimPropertySets?.[0]?.accessModes;
-      draftBootableVolume.spec.storage.volumeMode = claimPropertySets?.[0]?.volumeMode;
+      draftBootableVolume.spec.storage.volumeMode = claimPropertySets?.[0]
+        ?.volumeMode as V1beta1StorageSpecVolumeModeEnum;
     }
 
     draftBootableVolume.spec.source = dataVolumeSource;

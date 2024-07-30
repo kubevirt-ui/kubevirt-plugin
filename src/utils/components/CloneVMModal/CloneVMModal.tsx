@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom-v5-compat';
 import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import {
   V1alpha1VirtualMachineClone,
-  V1alpha1VirtualMachineSnapshot,
+  V1beta1VirtualMachineSnapshot,
   V1VirtualMachine,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
@@ -26,7 +26,7 @@ type CloneVMModalProps = {
   headerText?: string;
   isOpen: boolean;
   onClose: () => void;
-  source: V1alpha1VirtualMachineSnapshot | V1VirtualMachine;
+  source: V1beta1VirtualMachineSnapshot | V1VirtualMachine;
 };
 
 const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, source }) => {

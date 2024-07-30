@@ -6,7 +6,7 @@ import {
   TemplateModel,
   V1Template,
 } from '@kubevirt-ui/kubevirt-api/console';
-import { V1alpha1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   TEMPLATE_TYPE_BASE,
@@ -28,7 +28,7 @@ const templatesResource: WatchK8sResource = {
   },
 };
 
-const PVCDeleteAlertExtension: React.FC<{ pvc: V1alpha1PersistentVolumeClaim }> = ({ pvc }) => {
+const PVCDeleteAlertExtension: React.FC<{ pvc: V1beta1PersistentVolumeClaim }> = ({ pvc }) => {
   const [commonTemplates, loadedTemplates, errorTemplates] =
     useK8sWatchResource<V1Template[]>(templatesResource);
   const { t } = useKubevirtTranslation();
