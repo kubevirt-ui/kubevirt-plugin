@@ -102,8 +102,7 @@ const useDrawer = (template: V1Template) => {
     const templateWithRunning = produce(templateWithGeneratedParams, (draftTemplate) => {
       const draftVM = getTemplateVirtualMachineObject(draftTemplate);
 
-      if (isEmpty(draftVM?.spec?.runStrategy) && draftVM?.spec?.running === undefined)
-        draftVM.spec.running = true;
+      if (isEmpty(draftVM?.spec?.runStrategy)) draftVM.spec.running = true;
     });
 
     setCustomizedTemplate(templateWithRunning);
