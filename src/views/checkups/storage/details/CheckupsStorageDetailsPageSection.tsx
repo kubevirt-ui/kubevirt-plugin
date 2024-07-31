@@ -24,8 +24,10 @@ import {
   STORAGE_CHECKUP_LIVE_MIGRATION,
   STORAGE_CHECKUP_TIMEOUT,
   STORAGE_CHECKUPS_BOOT_GOLDEN_IMAGE,
+  STORAGE_CHECKUPS_GOLDEN_IMAGE_NO_DATA_SOURCE,
   STORAGE_CHECKUPS_GOLDEN_IMAGE_NOT_UP_TO_DATE,
   STORAGE_CHECKUPS_MISSING_VOLUME_SNAP_SHOT,
+  STORAGE_CHECKUPS_PVC_BOUND,
   STORAGE_CHECKUPS_STORAGE_WITH_RWX,
   STORAGE_CHECKUPS_UNSET_EFS_STORAGE_CLASS,
   STORAGE_CHECKUPS_VM_HOT_PLUG_VOLUME,
@@ -33,6 +35,7 @@ import {
   STORAGE_CHECKUPS_WITH_CLAIM_PROPERTY_SETS,
   STORAGE_CHECKUPS_WITH_EMPTY_CLAIM_PROPERTY_SETS,
   STORAGE_CHECKUPS_WITH_NON_RBD_STORAGE_CLASS,
+  STORAGE_CHECKUPS_WITH_SMART_CLONE,
 } from '../utils/utils';
 
 type CheckupsStorageDetailsPageSectionProps = {
@@ -45,6 +48,7 @@ const CheckupsStorageDetailsPageSection: FC<CheckupsStorageDetailsPageSectionPro
   job,
 }) => {
   const { t } = useKubevirtTranslation();
+  const none = t('None');
 
   return (
     <>
@@ -76,35 +80,39 @@ const CheckupsStorageDetailsPageSection: FC<CheckupsStorageDetailsPageSectionPro
                     name={configMap?.data?.[STORAGE_CHECKUP_DEFAULT_STORAGE_CLASS]}
                   />
                 ) : (
-                  t('None')
+                  none
                 )
               }
               descriptionHeader={t('Default storage class')}
             />
             <VirtualMachineDescriptionItem
-              descriptionData={
-                configMap?.data?.[STORAGE_CHECKUPS_WITH_CLAIM_PROPERTY_SETS] || t('None')
-              }
+              descriptionData={configMap?.data?.[STORAGE_CHECKUPS_PVC_BOUND] || none}
+              descriptionHeader={t('PVC bound')}
+            />
+            <VirtualMachineDescriptionItem
+              descriptionData={configMap?.data?.[STORAGE_CHECKUPS_WITH_SMART_CLONE] || none}
+              descriptionHeader={t('StorageProfiles with smart clone support (CSI/snapshot)')}
+            />
+            <VirtualMachineDescriptionItem
+              descriptionData={configMap?.data?.[STORAGE_CHECKUPS_WITH_CLAIM_PROPERTY_SETS] || none}
               descriptionHeader={t('StorageProfiles with spec claimPropertySets')}
             />
             <VirtualMachineDescriptionItem
-              descriptionData={
-                configMap?.data?.[STORAGE_CHECKUPS_MISSING_VOLUME_SNAP_SHOT] || t('None')
-              }
+              descriptionData={configMap?.data?.[STORAGE_CHECKUPS_MISSING_VOLUME_SNAP_SHOT] || none}
               descriptionHeader={t('Storage missing VolumeSnapshotClass')}
             />
             <VirtualMachineDescriptionItem
               descriptionData={
-                configMap?.data?.[STORAGE_CHECKUPS_WITH_NON_RBD_STORAGE_CLASS] || t('None')
+                configMap?.data?.[STORAGE_CHECKUPS_WITH_NON_RBD_STORAGE_CLASS] || none
               }
               descriptionHeader={t('VirtualMachine with non-virt RBD StorageClass')}
             />
             <VirtualMachineDescriptionItem
-              descriptionData={configMap?.data?.[STORAGE_CHECKUPS_BOOT_GOLDEN_IMAGE] || t('None')}
+              descriptionData={configMap?.data?.[STORAGE_CHECKUPS_BOOT_GOLDEN_IMAGE] || none}
               descriptionHeader={t('VirtualMachine boot from golden image')}
             />
             <VirtualMachineDescriptionItem
-              descriptionData={configMap?.data?.[STORAGE_CHECKUP_LIVE_MIGRATION] || t('None')}
+              descriptionData={configMap?.data?.[STORAGE_CHECKUP_LIVE_MIGRATION] || none}
               descriptionHeader={t('VirtualMachine live migration')}
             />
             <VirtualMachineDescriptionItem
@@ -125,7 +133,7 @@ const CheckupsStorageDetailsPageSection: FC<CheckupsStorageDetailsPageSectionPro
               descriptionHeader={t('Namespace')}
             />
             <VirtualMachineDescriptionItem
-              descriptionData={configMap?.data?.[STATUS_FAILURE_REASON] || t('None')}
+              descriptionData={configMap?.data?.[STATUS_FAILURE_REASON] || none}
               descriptionHeader={t('Failure reason')}
             />
             <VirtualMachineDescriptionItem
@@ -138,32 +146,36 @@ const CheckupsStorageDetailsPageSection: FC<CheckupsStorageDetailsPageSectionPro
             />
             <VirtualMachineDescriptionItem
               descriptionData={
-                configMap?.data?.[STORAGE_CHECKUPS_WITH_EMPTY_CLAIM_PROPERTY_SETS] || t('None')
+                configMap?.data?.[STORAGE_CHECKUPS_WITH_EMPTY_CLAIM_PROPERTY_SETS] || none
               }
               descriptionHeader={t('Storage class with empty claimPropertySets')}
             />
             <VirtualMachineDescriptionItem
-              descriptionData={configMap?.data?.[STORAGE_CHECKUPS_STORAGE_WITH_RWX] || t('None')}
+              descriptionData={configMap?.data?.[STORAGE_CHECKUPS_STORAGE_WITH_RWX] || none}
               descriptionHeader={t('Storage with ReadWriteMany')}
             />
             <VirtualMachineDescriptionItem
               descriptionData={
-                configMap?.data?.[STORAGE_CHECKUPS_GOLDEN_IMAGE_NOT_UP_TO_DATE] || t('None')
+                configMap?.data?.[STORAGE_CHECKUPS_GOLDEN_IMAGE_NOT_UP_TO_DATE] || none
               }
               descriptionHeader={t('Golden image not up to date')}
             />
             <VirtualMachineDescriptionItem
               descriptionData={
-                configMap?.data?.[STORAGE_CHECKUPS_UNSET_EFS_STORAGE_CLASS] || t('None')
+                configMap?.data?.[STORAGE_CHECKUPS_GOLDEN_IMAGE_NO_DATA_SOURCE] || none
               }
+              descriptionHeader={t('Golden image no DataSource')}
+            />
+            <VirtualMachineDescriptionItem
+              descriptionData={configMap?.data?.[STORAGE_CHECKUPS_UNSET_EFS_STORAGE_CLASS] || none}
               descriptionHeader={t('VirtualMachine with unset EFS StorageClass')}
             />
             <VirtualMachineDescriptionItem
-              descriptionData={configMap?.data?.[STORAGE_CHECKUPS_VM_VOLUME_CLONE] || t('None')}
+              descriptionData={configMap?.data?.[STORAGE_CHECKUPS_VM_VOLUME_CLONE] || none}
               descriptionHeader={t('VirtualMachine volume clone')}
             />
             <VirtualMachineDescriptionItem
-              descriptionData={configMap?.data?.[STORAGE_CHECKUPS_VM_HOT_PLUG_VOLUME] || t('None')}
+              descriptionData={configMap?.data?.[STORAGE_CHECKUPS_VM_HOT_PLUG_VOLUME] || none}
               descriptionHeader={t('VirtualMachine hotplug volume')}
             />
             <VirtualMachineDescriptionItem
