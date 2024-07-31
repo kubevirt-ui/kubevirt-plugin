@@ -1,6 +1,8 @@
 import React, { FC } from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { logTemplateFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
+import { CANCEL_CREATE_VM_BUTTON_CLICKED } from '@kubevirt-utils/extensions/telemetry/utils/constants';
 import { getTemplateName } from '@kubevirt-utils/resources/template/utils/selectors';
 import { CatalogItemHeader } from '@patternfly/react-catalog-view-extension';
 import { Modal } from '@patternfly/react-core';
@@ -31,11 +33,16 @@ export const TemplatesCatalogDrawer: FC<TemplatesCatalogDrawerProps> = ({
 
   if (!isOpen) return null;
 
+  const handleCancel = () => {
+    logTemplateFlowEvent(CANCEL_CREATE_VM_BUTTON_CLICKED, template);
+    onClose();
+  };
+
   return (
     <DrawerContextProvider template={template}>
       <Modal
         footer={
-          template && <TemplatesCatalogDrawerFooter namespace={namespace} onCancel={onClose} />
+          template && <TemplatesCatalogDrawerFooter namespace={namespace} onCancel={handleCancel} />
         }
         header={
           <CatalogItemHeader

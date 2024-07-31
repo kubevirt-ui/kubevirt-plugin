@@ -2,8 +2,14 @@ import { useState } from 'react';
 import produce from 'immer';
 
 import { V1Devices, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { logTemplateFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
+import {
+  CUSTOMIZE_VM_FAILED,
+  CUSTOMIZE_VM_SUCCEEDED,
+} from '@kubevirt-utils/extensions/telemetry/utils/constants';
 import { addUploadDataVolumeOwnerReference } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
+import { getName } from '@kubevirt-utils/resources/shared';
 import {
   HEADLESS_SERVICE_LABEL,
   HEADLESS_SERVICE_NAME,
@@ -39,7 +45,7 @@ export const useWizardVmCreate = (): UseWizardVmCreateValues => {
       setLoaded(false);
       setError(undefined);
 
-      const vmToCrete = produce(vm, (vmDraft) => {
+      const vmToCreate = produce(vm, (vmDraft) => {
         if (isDisableGuestSystemAccessLog) {
           const devices = (<unknown>vmDraft.spec.template.spec.domain.devices) as V1Devices & {
             logSerialConsole: boolean;
@@ -53,9 +59,9 @@ export const useWizardVmCreate = (): UseWizardVmCreateValues => {
       });
 
       const createdObjects = await createMultipleResources(
-        [vmToCrete, ...(tabsData?.additionalObjects as [] | K8sResourceCommon[])],
+        [vmToCreate, ...(tabsData?.additionalObjects as [] | K8sResourceCommon[])],
         models,
-        vmToCrete.metadata.namespace,
+        vmToCreate.metadata.namespace,
       );
 
       const newVM = createdObjects[0] as V1VirtualMachine;
@@ -78,9 +84,16 @@ export const useWizardVmCreate = (): UseWizardVmCreateValues => {
 
       setLoaded(true);
       onFullfilled(newVM);
+
+      logTemplateFlowEvent(CUSTOMIZE_VM_SUCCEEDED, null, {
+        vmName: getName(vm),
+      });
     } catch (e) {
       setLoaded(true);
       setError(e);
+      logTemplateFlowEvent(CUSTOMIZE_VM_FAILED, null, {
+        vmName: getName(vm),
+      });
     }
   };
 

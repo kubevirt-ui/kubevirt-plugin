@@ -42,6 +42,7 @@ const metadata: ConsolePluginBuildMetadata = {
     pvcSelectors: 'src/views/cdi-upload-provider/utils/selectors.ts',
     pvcUploadStatus: 'src/views/cdi-upload-provider/popover/UploadPVCPopover.tsx',
     pvcUploadUtils: 'src/views/cdi-upload-provider/utils/utils.tsx',
+    telemetry: 'src/utils/extensions/telemetry/telemetry.ts',
     TemplateNavPage: './views/templates/details/TemplateNavPage.tsx',
     UploadPVC: 'src/views/cdi-upload-provider/upload-pvc-form/UploadPVC.tsx',
     useCDIUpload: 'src/views/cdi-upload-provider/hooks/useCDIUpload.tsx',
