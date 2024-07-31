@@ -2,8 +2,10 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Updater } from 'use-immer';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { InterfaceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
+import { isWindows } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { ensurePath, getRandomChars } from '@kubevirt-utils/utils/utils';
 
 import { EnvironmentKind, EnvironmentVariable } from '../constants';
@@ -35,6 +37,7 @@ const useEnvironments = (
   updateVM: Updater<V1VirtualMachine>,
   onEditChange?: (edited: boolean) => void,
 ): UseEnvironmentsType => {
+  const isWindowsVM = useMemo(() => isWindows(originalVM), [originalVM]);
   const { t } = useKubevirtTranslation();
   const [error, setError] = useState<Error>();
   const [edited, setEdited] = useState(false);
@@ -64,7 +67,9 @@ const useEnvironments = (
 
       const diskName = `environment-disk-${getRandomChars()}`;
       getDisks(draftVM).push({
-        disk: {},
+        disk: {
+          bus: isWindowsVM ? InterfaceTypes.SATA : InterfaceTypes.VIRTIO,
+        },
         name: diskName,
         serial: getRandomSerial().toUpperCase(),
       });
@@ -72,7 +77,7 @@ const useEnvironments = (
         name: diskName,
       });
     });
-  }, [updateVM]);
+  }, [updateVM, isWindowsVM]);
 
   const onEnvironmentChange = (
     diskName: string,
