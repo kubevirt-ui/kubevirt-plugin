@@ -53,6 +53,7 @@ const InlineFilterSelect: FC<InlineFilterSelectProps> = ({
     }
     setIsOpen(false);
     setFocusedItemIndex(null);
+    setSelected(value);
   };
 
   const getOptionComponent = (opt: EnhancedSelectOptionProps) =>
@@ -123,7 +124,6 @@ const InlineFilterSelect: FC<InlineFilterSelectProps> = ({
                 id={`select-inline-filter-${option.value?.replace(' ', '-')}`}
                 isFocused={focusedItemIndex === index}
                 key={option.value}
-                onClick={() => setSelected(option.value)}
                 value={option.value}
                 {...option}
               >
