@@ -31,13 +31,17 @@ export const STORAGE_CHECKUP_TIMEOUT = 'spec.timeout';
 export const STORAGE_CHECKUP_DEFAULT_STORAGE_CLASS = 'status.result.defaultStorageClass';
 export const STORAGE_CHECKUP_LIVE_MIGRATION = 'status.result.vmLiveMigration';
 export const STORAGE_CHECKUPS_GOLDEN_IMAGE_NOT_UP_TO_DATE = 'status.result.goldenImagesNotUpToDate';
+export const STORAGE_CHECKUPS_GOLDEN_IMAGE_NO_DATA_SOURCE =
+  'status.result.goldenImagesNoDataSource';
+export const STORAGE_CHECKUPS_WITH_SMART_CLONE = 'status.result.storageProfilesWithSmartClone';
+export const STORAGE_CHECKUPS_PVC_BOUND = 'status.result.pvcBound';
 export const STORAGE_CHECKUPS_MISSING_VOLUME_SNAP_SHOT =
-  'status.result.storageMissingVolumeSnapshotClass';
+  'status.result.storageProfileMissingVolumeSnapshotClass';
 export const STORAGE_CHECKUPS_WITH_CLAIM_PROPERTY_SETS =
   'status.result.storageProfilesWithSpecClaimPropertySets';
 export const STORAGE_CHECKUPS_WITH_EMPTY_CLAIM_PROPERTY_SETS =
-  'storageProfilesWithEmptyClaimPropertySets';
-export const STORAGE_CHECKUPS_STORAGE_WITH_RWX = 'status.result.storageWithRWX';
+  'status.result.storageProfilesWithEmptyClaimPropertySets';
+export const STORAGE_CHECKUPS_STORAGE_WITH_RWX = 'status.result.storageProfilesWithRWX';
 export const STORAGE_CHECKUPS_BOOT_GOLDEN_IMAGE = 'status.result.vmBootFromGoldenImage';
 export const STORAGE_CHECKUPS_VM_HOT_PLUG_VOLUME = 'status.result.vmHotplugVolume';
 export const STORAGE_CHECKUPS_VM_VOLUME_CLONE = 'status.result.vmVolumeClone';
