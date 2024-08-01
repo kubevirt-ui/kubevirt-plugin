@@ -5,6 +5,7 @@ import HyperConvergedModel from '@kubevirt-ui/kubevirt-api/console/models/HyperC
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
 import { Skeleton, StackItem } from '@patternfly/react-core';
 
@@ -31,7 +32,7 @@ const Conditions: FC = () => {
       </StackItem>
     );
 
-  if (!condition) return null;
+  if (isEmpty(condition)) return null;
 
   return (
     <>
