@@ -16,11 +16,11 @@ import { getInnerTabFromPath, includesConfigurationPath, tabs } from './utils/ut
 
 import './virtual-machine-configuration-tab.scss';
 
-const VirtualMachineConfigurationTab: FC<NavPageComponentProps> = ({ vm }) => {
+const VirtualMachineConfigurationTab: FC<NavPageComponentProps> = ({ obj }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { vmi } = useVMI(getName(vm), getNamespace(vm));
-  const [instanceTypeVM] = useInstanceTypeExpandSpec(vm);
+  const { vmi } = useVMI(getName(obj), getNamespace(obj));
+  const [instanceTypeVM] = useInstanceTypeExpandSpec(obj);
   const [activeTabKey, setActiveTabKey] = useState<number | string>(
     VirtualMachineDetailsTab.Details,
   );
@@ -44,7 +44,7 @@ const VirtualMachineConfigurationTab: FC<NavPageComponentProps> = ({ vm }) => {
 
   return (
     <div className="co-dashboard-body VirtualMachineConfigurationTab">
-      <VirtualMachineConfigurationTabSearch vm={vm} />
+      <VirtualMachineConfigurationTabSearch vm={obj} />
       <div className="VirtualMachineConfigurationTab--body">
         <Tabs activeKey={activeTabKey} className="VirtualMachineConfigurationTab--main" isVertical>
           {tabs.map(({ Component, name, title }) => (
@@ -56,7 +56,7 @@ const VirtualMachineConfigurationTab: FC<NavPageComponentProps> = ({ vm }) => {
               title={<TabTitleText>{title}</TabTitleText>}
             >
               {activeTabKey === name && (
-                <Component instanceTypeVM={instanceTypeVM} vm={vm} vmi={vmi} />
+                <Component instanceTypeVM={instanceTypeVM} vm={obj} vmi={vmi} />
               )}
             </Tab>
           ))}
