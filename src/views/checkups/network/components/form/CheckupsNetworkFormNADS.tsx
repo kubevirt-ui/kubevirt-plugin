@@ -29,10 +29,13 @@ const CheckupsNetworkFormNADS: FC<CheckupsNetworkFormNADSProps> = ({
   return (
     <FormGroup fieldId="nad" isRequired label={t('NetworkAttachmentDefinition')}>
       <FormPFSelect
-        className="placeholder"
+        toggleProps={{
+          className: 'placeholder',
+          isFullWidth: true,
+          placeholder: t('Select NetwrokAttachmentDefinition'),
+        }}
         onSelect={(_: MouseEvent, value: string) => setSelectedNAD(value)}
         selected={selectedNAD}
-        toggleProps={{ isFullWidth: true, placeholder: t('Select NetwrokAttachmentDefinition') }}
       >
         {nadsItems}
       </FormPFSelect>

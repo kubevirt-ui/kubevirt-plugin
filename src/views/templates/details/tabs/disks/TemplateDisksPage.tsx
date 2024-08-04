@@ -3,9 +3,9 @@ import React, { FC, useCallback } from 'react';
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import DiskListTitle from '@kubevirt-utils/components/DiskListTitle/DiskListTitle';
+import DiskSourceSelect from '@kubevirt-utils/components/DiskModal/components/DiskSourceSelect/DiskSourceSelect';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
 import { SourceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
-import DiskSourceFlyoutMenu from '@kubevirt-utils/components/DiskSourceFlyoutMenu/DiskSourceFlyoutMenu';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import { replaceTemplateVM } from '@kubevirt-utils/resources/template';
@@ -65,7 +65,7 @@ const TemplateDisksPage: FC<TemplateDisksPageProps> = ({ obj: template }) => {
         <SidebarEditor<V1Template> onResourceUpdate={onSubmitTemplate} resource={template}>
           <DiskListTitle />
           {isTemplateEditable && (
-            <DiskSourceFlyoutMenu
+            <DiskSourceSelect
               onSelect={(diskSource: SourceTypes) => {
                 return createModal(({ isOpen, onClose }) => (
                   <DiskModal
@@ -79,7 +79,6 @@ const TemplateDisksPage: FC<TemplateDisksPageProps> = ({ obj: template }) => {
                 ));
               }}
               className="list-page-create-button-margin"
-              isTemplate
             />
           )}
           <ListPageFilter

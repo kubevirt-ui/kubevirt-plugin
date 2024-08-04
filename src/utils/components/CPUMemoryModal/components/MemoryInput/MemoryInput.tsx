@@ -36,9 +36,9 @@ const MemoryInput: FC<MemoryInputProps> = ({ memory, memoryUnit, setMemory, setM
       />
 
       <FormPFSelect
-        className="input-memory--dropdown"
         selected={memoryUnit}
         selectedLabel={toIECUnit(memoryUnit)}
+        toggleProps={{ className: 'input-memory--dropdown' }}
       >
         <SelectList>
           {memorySizesTypes.map((value: string) => (

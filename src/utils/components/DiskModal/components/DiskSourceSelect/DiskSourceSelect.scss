@@ -1,0 +1,10 @@
+.disk-source-select {
+  .pf-v5-c-menu__content {
+    max-height: fit-content;
+  }
+
+  .pf-v5-c-menu__group-title {
+    padding-block-start: 0;
+    padding-block-end: var(--pf-v5-global--spacer--xs);
+  }
+}

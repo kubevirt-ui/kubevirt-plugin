@@ -16,6 +16,7 @@ export enum SourceTypes {
   PVC = 'persistentVolumeClaim', // Existing PVC
   REGISTRY = 'registry',
   UPLOAD = 'upload',
+  VOLUME_SNAPSHOT = 'snapshot',
 }
 
 export enum InterfaceTypes {
@@ -34,57 +35,6 @@ export enum VolumeTypes {
   SECRET = 'secret',
   SERVICE_ACCOUNT = 'serviceAccount',
 }
-
-export type DiskFormState = {
-  [SourceTypes.CLONE_PVC]?: {
-    pvcName: string;
-    pvcNamespace: string;
-  };
-  [SourceTypes.EPHEMERAL]?: {
-    url: string;
-  };
-  [SourceTypes.HTTP]?: {
-    url: string;
-  };
-  [SourceTypes.PVC]?: {
-    pvcName: string;
-  };
-  [SourceTypes.REGISTRY]?: {
-    url: string;
-  };
-  [SourceTypes.UPLOAD]?: {
-    uploadFile: File | string;
-    uploadFilename?: string;
-  };
-  accessMode: string;
-  diskInterface: string;
-  diskName: string;
-  diskSize: string;
-  diskSource: SourceTypes;
-  diskType: string;
-  enablePreallocation: boolean;
-  isBootSource: boolean;
-  lunReservation?: boolean;
-  sharable?: boolean;
-  storageClass: string;
-  storageClassProvisioner: string;
-  storageProfileSettingsApplied: boolean;
-  volumeMode: string;
-};
-
-export type DiskModalProps = {
-  createOwnerReference?: boolean;
-  customize?: boolean;
-  headerText: string;
-  initialFormData?: DiskFormState;
-  isEditDisk?: boolean;
-  isEditingCreatedDisk?: boolean;
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
-  onUploadedDataVolume?: (dataVolume: V1beta1DataVolume) => void;
-  vm: V1VirtualMachine;
-};
 
 export type V1DiskModalProps = {
   createDiskSource?: SourceTypes;

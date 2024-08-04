@@ -179,6 +179,7 @@ export const doesSourceRequireDataVolume = (diskSource: SourceTypes): boolean =>
     SourceTypes.HTTP,
     SourceTypes.REGISTRY,
     SourceTypes.UPLOAD,
+    SourceTypes.VOLUME_SNAPSHOT,
   ].includes(diskSource);
 };
 
@@ -195,6 +196,8 @@ export const getSourceFromVolume = (
   if (dataVolumeTemplate?.spec?.source?.blank) return SourceTypes.BLANK;
 
   if (dataVolumeTemplate?.spec?.source?.upload) return SourceTypes.UPLOAD;
+
+  if (dataVolumeTemplate?.spec?.source?.snapshot) return SourceTypes.VOLUME_SNAPSHOT;
 
   if (dataVolumeTemplate?.spec?.sourceRef) return SourceTypes.DATA_SOURCE;
 

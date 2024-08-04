@@ -16,5 +16,11 @@ export const getDiskSharable = (disk: V1Disk): boolean => disk?.shareable;
 export const getErrorPVCName = (errors: FieldErrorsImpl<V1DiskFormState>): FieldError =>
   errors?.dataVolumeTemplate?.spec?.source?.pvc?.name;
 
+export const getErrorSnapshotName = (errors: FieldErrorsImpl<V1DiskFormState>): FieldError =>
+  errors?.dataVolumeTemplate?.spec?.source?.snapshot?.name;
+
+export const getErrorSnapshotNamespace = (errors: FieldErrorsImpl<V1DiskFormState>): FieldError =>
+  errors?.dataVolumeTemplate?.spec?.source?.snapshot?.namespace;
+
 export const getDataVolumeTemplateSize = (diskState: V1DiskFormState): string =>
   diskState.dataVolumeTemplate?.spec?.storage?.resources?.requests?.storage;

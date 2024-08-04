@@ -102,10 +102,10 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({ isOpen, onClose, onSubmit, te
             value={memory}
           />
           <FormPFSelect
-            className="input-memory--dropdown"
             onSelect={(e: MouseEvent<HTMLInputElement>, value: string) => setMemoryUnit(value)}
             selected={memoryUnit}
             selectedLabel={toIECUnit(memoryUnit)}
+            toggleProps={{ className: 'input-memory--dropdown' }}
           >
             {memorySizesTypes.map((value) => {
               const iecUnit = toIECUnit(value);

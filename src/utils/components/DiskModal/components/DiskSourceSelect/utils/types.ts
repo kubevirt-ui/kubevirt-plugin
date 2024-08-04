@@ -9,7 +9,6 @@ export type DiskSourceOptionGroupItem = {
 };
 
 export type DiskSourceOptionGroup = {
-  description?: string;
   groupLabel?: string;
   items: DiskSourceOptionGroupItem[];
 };

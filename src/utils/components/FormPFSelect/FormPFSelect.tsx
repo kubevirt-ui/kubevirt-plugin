@@ -31,12 +31,12 @@ const FormPFSelect: FC<FormPFSelectProps> = ({
         closeOnSelect && setIsOpen(false);
       }}
       toggle={SelectToggle({
-        className,
         isExpanded: isOpen,
         onClick: onToggle,
         selected: selectedLabel || selected || toggleProps?.placeholder,
         ...toggleProps,
       })}
+      className={className}
       isOpen={isOpen}
       isScrollable
       onOpenChange={(open: boolean) => setIsOpen(open)}

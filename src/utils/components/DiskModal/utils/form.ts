@@ -42,6 +42,8 @@ const createInitialStateFromSource: Record<
     (dataVolumeTemplate.spec.source.registry = { url: '' }),
   [SourceTypes.UPLOAD]: (volume: V1Volume, dataVolumeTemplate: V1DataVolumeTemplateSpec) =>
     (dataVolumeTemplate.spec.source.upload = {}),
+  [SourceTypes.VOLUME_SNAPSHOT]: (volume: V1Volume, dataVolumeTemplate: V1DataVolumeTemplateSpec) =>
+    (dataVolumeTemplate.spec.source.snapshot = { name: '', namespace: '' }),
 };
 
 export const getDefaultEditValues = (vm: V1VirtualMachine, editDiskName?: string) => {
