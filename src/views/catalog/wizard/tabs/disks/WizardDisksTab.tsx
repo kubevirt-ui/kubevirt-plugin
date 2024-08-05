@@ -1,9 +1,9 @@
 import React from 'react';
 
 import { WizardTab } from '@catalog/wizard/tabs';
+import DiskSourceSelect from '@kubevirt-utils/components/DiskModal/components/DiskSourceSelect/DiskSourceSelect';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
 import { SourceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
-import DiskSourceFlyoutMenu from '@kubevirt-utils/components/DiskSourceFlyoutMenu/DiskSourceFlyoutMenu';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import WindowsDrivers from '@kubevirt-utils/components/WindowsDrivers/WindowsDrivers';
@@ -39,7 +39,7 @@ const WizardDisksTab: WizardTab = ({ tabsData, updateTabsData, updateVM, vm }) =
           pathsToHighlight={PATHS_TO_HIGHLIGHT.DISKS_TAB}
           resource={vm}
         >
-          <DiskSourceFlyoutMenu
+          <DiskSourceSelect
             onSelect={(diskSource: SourceTypes) => {
               return createModal(({ isOpen, onClose }) => (
                 <DiskModal

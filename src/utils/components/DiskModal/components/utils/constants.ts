@@ -14,6 +14,8 @@ export const SHARABLE_FIELD = 'disk.shareable';
 export const LUN_RESERVATION_FIELD = 'disk.lun.reservation';
 export const DATAVOLUME_PVC_NAME = 'dataVolumeTemplate.spec.source.pvc.name';
 export const DATAVOLUME_PVC_NAMESPACE = 'dataVolumeTemplate.spec.source.pvc.namespace';
+export const DATAVOLUME_SNAPSHOT_NAME = 'dataVolumeTemplate.spec.source.snapshot.name';
+export const DATAVOLUME_SNAPSHOT_NAMESPACE = 'dataVolumeTemplate.spec.source.snapshot.namespace';
 export const DATAVOLUME_HTTPURL_FIELD = 'dataVolumeTemplate.spec.source.http.url';
 
 export const IS_BOOT_SOURCE_FIELD = 'isBootSource';

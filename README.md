@@ -14,7 +14,7 @@ Please follow the steps below to open an issue for this repository.
 
 ### Ensure the issue doesn't already exist
 
-Navigate to the [OpenShift Virtualization issues page](https://issues.redhat.com/projects/CNV/issues) and search for the issue using the search bar in the upper right-hand corner. If your issue doesn't exist you'll need to open a new one. 
+Navigate to the [OpenShift Virtualization issues page](https://issues.redhat.com/projects/CNV/issues) and search for the issue using the search bar in the upper right-hand corner. If your issue doesn't exist you'll need to open a new one.
 
 ### Log into Jira
 
@@ -26,7 +26,7 @@ Once you're logged in, navigate back to the [OpenShift Virtualization issues pag
 
 Enter a concise, but descriptive summary of the problem in the Summary field, provide the requested information in the Description field, and select 'CNV User Interface' from the Component/s dropdown menu. The information in the Description field is critical to ensuring a prompt fix, so please be thorough.
 
-Click the Create button at the bottom then click on the link in the alert that pops up on the right side of the screen to open the issue. Do this quickly as it won't be displayed for very long. Write down the issue ID (Ex: CNV-12345) so you can easily locate the issue later.  
+Click the Create button at the bottom then click on the link in the alert that pops up on the right side of the screen to open the issue. Do this quickly as it won't be displayed for very long. Write down the issue ID (Ex: CNV-12345) so you can easily locate the issue later.
 
 ## Local development
 
