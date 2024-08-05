@@ -20,4 +20,13 @@
   &__empty-state--no-alerts {
     padding-top: 16px;
   }
+
+  &__divider {
+    margin-bottom: var(--pf-global--spacer--lg);
+  }
+
+  &__chart {
+    height: 150px;
+    width: 150px;
+  }
 }
