@@ -140,7 +140,7 @@
       "model": {
         "group": "instancetype.kubevirt.io",
         "kind": "VirtualMachineClusterInstancetype",
-        "version": "v1alpha2"
+        "version": "v1beta1"
       },
       "name": "%plugin__kubevirt-plugin~InstanceTypes%",
       "section": "virtualization"
@@ -153,7 +153,7 @@
       "model": {
         "group": "instancetype.kubevirt.io",
         "kind": "VirtualMachineClusterInstancetype",
-        "version": "v1alpha2"
+        "version": "v1beta1"
       }
     },
     "type": "console.page/resource/list"
@@ -165,8 +165,8 @@
       },
       "exact": true,
       "path": [
-        "/k8s/ns/:ns/instancetype.kubevirt.io~v1alpha2~VirtualMachineInstancetype",
-        "/k8s/all-namespaces/instancetype.kubevirt.io~v1alpha2~VirtualMachineInstancetype"
+        "/k8s/ns/:ns/instancetype.kubevirt.io~v1beta1~VirtualMachineInstancetype",
+        "/k8s/all-namespaces/instancetype.kubevirt.io~v1beta1~VirtualMachineInstancetype"
       ],
       "prefixNamespaced": true
     },
@@ -185,7 +185,7 @@
       "model": {
         "group": "instancetype.kubevirt.io",
         "kind": "VirtualMachineClusterPreference",
-        "version": "v1alpha2"
+        "version": "v1beta1"
       },
       "name": "%plugin__kubevirt-plugin~Preferences%",
       "section": "virtualization"
@@ -200,7 +200,7 @@
       "model": {
         "group": "instancetype.kubevirt.io",
         "kind": "VirtualMachineClusterPreference",
-        "version": "v1alpha2"
+        "version": "v1beta1"
       }
     },
     "type": "console.page/resource/list"
@@ -213,7 +213,7 @@
       "model": {
         "group": "instancetype.kubevirt.io",
         "kind": "VirtualMachinePreference",
-        "version": "v1alpha2"
+        "version": "v1beta1"
       },
       "prefixNamespaced": true
     },
@@ -430,7 +430,7 @@
       "model": {
         "group": "instancetype.kubevirt.io",
         "kind": "VirtualMachineClusterInstancetype",
-        "version": "v1alpha2"
+        "version": "v1beta1"
       },
       "name": "default",
       "template": {
@@ -447,7 +447,7 @@
       "model": {
         "group": "instancetype.kubevirt.io",
         "kind": "VirtualMachineInstancetype",
-        "version": "v1alpha2"
+        "version": "v1beta1"
       },
       "name": "default",
       "template": {
@@ -464,7 +464,7 @@
       "model": {
         "group": "instancetype.kubevirt.io",
         "kind": "VirtualMachineClusterPreference",
-        "version": "v1alpha2"
+        "version": "v1beta1"
       },
       "name": "default",
       "template": {
