@@ -17,7 +17,7 @@ import { MetricsTabExpendedSections } from './utils/utils';
 
 import './virtual-machine-metrics-tab.scss';
 
-const VirtualMachineMetricsTab: FC<NavPageComponentProps> = ({ vm }) => {
+const VirtualMachineMetricsTab: FC<NavPageComponentProps> = ({ obj: vm }) => {
   const { t } = useKubevirtTranslation();
   const location = useLocation();
   const { loaded, pods, vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
