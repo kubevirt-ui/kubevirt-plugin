@@ -14,6 +14,7 @@ const metadata: ConsolePluginBuildMetadata = {
     CheckupsStorageDetailsPage: './views/checkups/storage/details/CheckupsStorageDetailsPage.tsx',
     CheckupsStorageForm: './views/checkups/storage/components/form/CheckupsStorageForm.tsx',
     ClusterOverviewPage: './views/clusteroverview/ClusterOverviewPage.tsx',
+    clusterUtilization: './views/dashboard-extensions/cluster-utilization.tsx',
     ConsoleStandAlone: './utils/components/Consoles/ConsoleStandAlone.tsx',
     contextProvider: 'src/views/cdi-upload-provider/utils/context.tsx',
     dashboardActivity: 'src/views/dashboard-extensions/Activity.tsx',

@@ -810,5 +810,17 @@
       }
     },
     "type": "console.dashboards/overview/activity/resource"
+  },
+  {
+    "flags": {
+      "required": ["KUBEVIRT"]
+    },
+    "properties": {
+      "getUtilizationQuery": { "$codeRef": "clusterUtilization.getUtilizationQuery" },
+      "humanize": { "$codeRef": "clusterUtilization.humanize" },
+      "title": "%plugin__kubevirt-plugin~Nodes memory overcommit%",
+      "TopConsumerPopover": { "$codeRef": "clusterUtilization.PopoverNodeOvercommit" }
+    },
+    "type": "console.cluster-overview/utilization-item"
   }
 ]
