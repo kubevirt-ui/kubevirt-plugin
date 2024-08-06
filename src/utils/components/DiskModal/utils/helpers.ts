@@ -13,7 +13,12 @@ import {
   V1Volume,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { buildOwnerReference, getAnnotation, getName } from '@kubevirt-utils/resources/shared';
+import {
+  buildOwnerReference,
+  getAnnotation,
+  getName,
+  getNamespace,
+} from '@kubevirt-utils/resources/shared';
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
 import { getBootDisk, getDataVolumeTemplates, getVolumes } from '@kubevirt-utils/resources/vm';
 import { getOperatingSystem } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
@@ -105,9 +110,11 @@ const getDataVolumeHotplugPromise = (
     },
   };
 
-  return k8sCreate({ data: resultDataVolume, model: DataVolumeModel }).then(() =>
-    addPersistentVolume(vm, bodyRequestAddVolume),
-  ) as Promise<void>;
+  return k8sCreate({
+    data: resultDataVolume,
+    model: DataVolumeModel,
+    ns: getNamespace(resultDataVolume),
+  }).then(() => addPersistentVolume(vm, bodyRequestAddVolume)) as Promise<void>;
 };
 
 const getPersistentVolumeClaimHotplugPromise = (
@@ -143,11 +150,17 @@ export const hotplugPromise = (vmObj: V1VirtualMachine, diskState: V1DiskFormSta
     return getPersistentVolumeClaimHotplugPromise(vmObj, pvcName, diskState.disk);
   }
 
-  diskState.dataVolumeTemplate.metadata.ownerReferences = [
-    buildOwnerReference(vmObj, { blockOwnerDeletion: false }),
-  ];
+  const dataVolume = produce(diskState.dataVolumeTemplate, (draftDataVolumeTemplate) => {
+    draftDataVolumeTemplate.metadata.ownerReferences = [
+      buildOwnerReference(vmObj, { blockOwnerDeletion: false }),
+    ];
 
-  return getDataVolumeHotplugPromise(vmObj, diskState.dataVolumeTemplate, diskState.disk);
+    draftDataVolumeTemplate.metadata.namespace = getNamespace(vmObj);
+    draftDataVolumeTemplate.kind = DataVolumeModel.kind;
+    draftDataVolumeTemplate.apiVersion = `${DataVolumeModel.apiGroup}/${DataVolumeModel.apiVersion}`;
+  });
+
+  return getDataVolumeHotplugPromise(vmObj, dataVolume, diskState.disk);
 };
 
 export const produceVMDisks = (
