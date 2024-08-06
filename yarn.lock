@@ -819,10 +819,10 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
-"@kubevirt-ui/kubevirt-api@^1.3.1":
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/@kubevirt-ui/kubevirt-api/-/kubevirt-api-1.3.1.tgz#7a0d53747a3b3f7b06b0bfcb10525c23fe387095"
-  integrity sha512-Hj+I2xufisVdFvak9SdQUBU9sQQxJgCHXwBLLk9TdDKWt7pfzKOahcwQzsDZRhygctLNI/nwglytzT9f0TMjkA==
+"@kubevirt-ui/kubevirt-api@^1.3.2":
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/@kubevirt-ui/kubevirt-api/-/kubevirt-api-1.3.2.tgz#234f0dcb358a633081254c0585816cac204dd30e"
+  integrity sha512-Or9qtB3spBJ5zl/xedojUQoIQ7zK6isZgbc0lcU9JWV2uwPeJ2yC69hSUrLZP4VqbI3pH6I6EG80Qrnk59JwQQ==
 
 "@leichtgewicht/ip-codec@^2.0.1":
   version "2.0.4"
