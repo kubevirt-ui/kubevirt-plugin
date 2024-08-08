@@ -14,7 +14,7 @@ import { ROOTDISK } from '@kubevirt-utils/constants/constants';
 import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
 import { isBootableVolumePVCKind } from '@kubevirt-utils/resources/bootableresources/helpers';
 import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
+import { OS_NAME_TYPES, OS_NAME_TYPES_NOT_SUPPORTED } from '@kubevirt-utils/resources/template';
 import { OS_WINDOWS_PREFIX } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import {
   HEADLESS_SERVICE_LABEL,
@@ -30,20 +30,25 @@ import {
   DEFAULT_INSTANCETYPE_LABEL,
   DEFAULT_PREFERENCE_KIND_LABEL,
   DEFAULT_PREFERENCE_LABEL,
+  KUBEVIRT_OS,
 } from './constants';
 
 const generateCloudInitPassword = () =>
   `${getRandomChars(4)}-${getRandomChars(4)}-${getRandomChars(4)}`;
 
-const getCloudInitUserNameByOS = (selectedPreferenceName: string): string => {
-  const [osPrefix] = selectedPreferenceName.split('.');
-  if (osPrefix.startsWith(OS_NAME_TYPES.rhel)) return 'cloud-user';
-  if (osPrefix.startsWith(OS_NAME_TYPES.centos)) return 'centos';
-  return 'fedora';
+const getCloudInitUserNameByOS = (selectedPreferenceName: string, osLabel: string): string => {
+  for (const name in [
+    ...Object.values(OS_NAME_TYPES),
+    ...Object.values(OS_NAME_TYPES_NOT_SUPPORTED),
+  ]) {
+    if (selectedPreferenceName?.includes(name) || osLabel?.includes(name)) return name;
+  }
+  return 'cloud-user';
 };
 
 export const createPopulatedCloudInitYAML = (
   selectedPreference: string,
+  osLabel: string,
   subscriptionData: RHELAutomaticSubscriptionData,
   autoUpdateEnabled?: boolean,
 ) => {
@@ -52,7 +57,7 @@ export const createPopulatedCloudInitYAML = (
   const cloudInitConfig: CloudInitUserData = {
     chpasswd: { expire: false },
     password: generateCloudInitPassword(),
-    user: getCloudInitUserNameByOS(selectedPreference),
+    user: getCloudInitUserNameByOS(selectedPreference, osLabel),
   };
 
   const isRHELVM = selectedPreference.includes(OS_NAME_TYPES.rhel);
@@ -92,6 +97,7 @@ export const generateVM = (
   };
 
   const selectedPreference = getLabel(selectedBootableVolume, DEFAULT_PREFERENCE_LABEL);
+  const osLabel = getLabel(selectedBootableVolume, KUBEVIRT_OS);
   const selectPreferenceKind = getLabel(
     selectedBootableVolume,
     DEFAULT_PREFERENCE_KIND_LABEL,
@@ -171,6 +177,7 @@ export const generateVM = (
                   cloudInitNoCloud: {
                     userData: createPopulatedCloudInitYAML(
                       selectedPreference,
+                      osLabel,
                       subscriptionData,
                       autoUpdateEnabled,
                     ),

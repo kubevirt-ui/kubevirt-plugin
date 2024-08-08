@@ -210,14 +210,14 @@
       "component": {
         "$codeRef": "PreferencePage"
       },
-      "exact": true,
-      "path": [
-        "/k8s/ns/:ns/instancetype.kubevirt.io~v1alpha2~VirtualMachinePreference",
-        "/k8s/all-namespaces/instancetype.kubevirt.io~v1alpha2~VirtualMachinePreference"
-      ],
+      "model": {
+        "group": "instancetype.kubevirt.io",
+        "kind": "VirtualMachinePreference",
+        "version": "v1alpha2"
+      },
       "prefixNamespaced": true
     },
-    "type": "console.page/route"
+    "type": "console.page/resource/list"
   },
   {
     "properties": {

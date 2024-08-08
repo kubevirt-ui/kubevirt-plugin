@@ -21,6 +21,11 @@ export const DATA_SOURCE_CRONJOB_LABEL = 'cdi.kubevirt.io/dataImportCron';
 
 export const LINUX = 'linux';
 
+export enum OS_NAME_TYPES_NOT_SUPPORTED {
+  debian = 'debian',
+  ubuntu = 'ubuntu',
+}
+
 export enum OS_NAME_TYPES {
   centos = 'centos',
   fedora = 'fedora',

@@ -7,7 +7,7 @@ import {
   VirtualMachineClusterPreferenceModelRef,
   VirtualMachinePreferenceModelRef,
 } from '@kubevirt-ui/kubevirt-api/console';
-import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
+import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import useIsSearchPage from '@kubevirt-utils/hooks/useIsSearchPage';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useUserPreferences from '@kubevirt-utils/hooks/useUserPreferences';
@@ -26,7 +26,7 @@ const PreferencePage: FC<ListPageProps> = (props) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const activeNamespace = props?.namespace ?? ALL_NAMESPACES;
+  const activeNamespace = props?.namespace ?? ALL_NAMESPACES_SESSION_KEY;
 
   const isSearchPage = useIsSearchPage();
 
@@ -41,7 +41,7 @@ const PreferencePage: FC<ListPageProps> = (props) => {
 
   const urlUserPreference = useMemo(
     () =>
-      activeNamespace === ALL_NAMESPACES
+      activeNamespace === ALL_NAMESPACES_SESSION_KEY
         ? `/k8s/all-namespaces/${VirtualMachinePreferenceModelRef}`
         : `/k8s/ns/${activeNamespace}/${VirtualMachinePreferenceModelRef}`,
     [activeNamespace],
