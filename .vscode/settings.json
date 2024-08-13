@@ -1,13 +1,4 @@
 {
-  "files.associations": {
-    "console-extensions.json": "jsonc"
-  },
-  "json.schemas": [
-    {
-      "fileMatch": ["console-extensions.json"],
-      "url": "/node_modules/@openshift-console/dynamic-plugin-sdk-webpack/schema/console-extensions.json"
-    }
-  ],
   "search.exclude": {
     "**/node_modules": true,
     "**/.yarn": true,

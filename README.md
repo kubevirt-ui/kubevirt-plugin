@@ -91,7 +91,7 @@ conster Header: React.FC = () => {
 };
 ```
 
-For labels in `console-extensions.json`, you should use the format
+For labels in console extensions files, you should use the format
 `%plugin__kubevirt-plugin~My Label%`. Console will replace the value with
 the message for the current language from the `plugin__kubevirt-plugin`
 namespace. For example:
@@ -109,7 +109,7 @@ namespace. For example:
 
 Note that you will need to include a comment in `utils/i18n.ts` like the
 following for [i18next-parser](https://github.com/i18next/i18next-parser) to
-add the message from `console-extensions.json` to your message catalog as follows:
+add the message from console extensions files to your message catalog as follows:
 
 ```ts
 // t('plugin__kubevirt-plugin~VirtualMachines')
