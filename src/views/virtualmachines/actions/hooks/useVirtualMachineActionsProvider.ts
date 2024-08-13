@@ -38,6 +38,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
         default: VirtualMachineActionFactory.stop(vm),
         Stopped: VirtualMachineActionFactory.start(vm),
         Stopping: VirtualMachineActionFactory.forceStop(vm),
+        Terminating: VirtualMachineActionFactory.forceStop(vm),
       };
       return map[printableStatusMachine] || map.default;
     })(printableStatus);
