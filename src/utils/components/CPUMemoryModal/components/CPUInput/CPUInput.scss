@@ -1,12 +1,19 @@
 .cpu-input {
   margin-right: var(--pf-global--spacer--xl);
 
-  &__help-text-button {
-    padding-top: 0;
-    padding-left: var(--pf-global--spacer--xs);
+  &__edit-topology-manually {
+    margin-top: var(--pf-global--spacer--xl);
   }
 
   &__number-input {
     padding-bottom: var(--pf-global--spacer--xs);
+  }
+
+  &__title {
+    margin-bottom: var(--pf-global--spacer--md);
+  }
+
+  &__title--help-text-button {
+    padding: 0 var(--pf-global--spacer--xs);
   }
 }

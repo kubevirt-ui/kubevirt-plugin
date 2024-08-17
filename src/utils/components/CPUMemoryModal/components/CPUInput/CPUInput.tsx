@@ -1,39 +1,97 @@
-import React, { ChangeEvent, Dispatch, FC, SetStateAction } from 'react';
+import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import CPUHelperText from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/CPUHelperText';
+import { V1CPU, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import VCPUInput from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/components/vCPUInput/VCPUInput';
+import {
+  convertTopologyToVCPUs,
+  CPUInputType,
+  formatVCPUsAsSockets,
+} from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getCPU } from '@kubevirt-utils/resources/vm';
-import { NumberInput, Title, TitleSizes } from '@patternfly/react-core';
+import { Button, ButtonVariant, Popover, Radio, Title, TitleSizes } from '@patternfly/react-core';
+import { HelpIcon } from '@patternfly/react-icons';
+
+import CPUTopologyInput from './components/CPUTopologyInput/CPUTopologyInput';
+import CPUHelperText from './components/vCPUInput/components/CPUHelperText/CPUHelperText';
 
 import './CPUInput.scss';
 
 type CPUInputProps = {
-  cpuSockets: number;
-  setCPUSockets: Dispatch<SetStateAction<number>>;
+  setCPU: Dispatch<SetStateAction<V1CPU>>;
   vm: V1VirtualMachine;
 };
 
-const CPUInput: FC<CPUInputProps> = ({ cpuSockets, setCPUSockets, vm }) => {
+const CPUInput: FC<CPUInputProps> = ({ setCPU, vm }) => {
   const { t } = useKubevirtTranslation();
+  const [selectedRadioOption, setSelectedRadioOption] = useState<CPUInputType>(
+    CPUInputType.editVCPU,
+  );
+
+  const [socketsEditedVCPU, setSocketsEditedVCPU] = useState<V1CPU>(
+    formatVCPUsAsSockets(getCPU(vm)),
+  );
+  const [topologyEditedVCPU, setTopologyEditedVCPU] = useState<V1CPU>(getCPU(vm));
+
+  const radioInputName = 'cpu-input-type';
 
   return (
-    <div className="input-cpu">
-      <Title headingLevel="h6" size={TitleSizes.md}>
-        {t('CPU sockets')}
+    <div className="cpu-input">
+      <Title className="cpu-input__title" headingLevel="h6" size={TitleSizes.md}>
+        {t('CPU')}
+        <Popover
+          bodyContent={t(
+            'As a default, the VirtualMachine CPU uses sockets to enable hotplug. You can also define the topology manually',
+          )}
+        >
+          <Button
+            aria-label="Action"
+            className="cpu-input__title--help-text-button"
+            variant={ButtonVariant.plain}
+          >
+            <HelpIcon />
+          </Button>
+        </Popover>
       </Title>
-      <NumberInput
-        onChange={(e: ChangeEvent<HTMLInputElement>) => {
-          const newNumber = +e?.target?.value;
-          setCPUSockets((cpus) => (newNumber > 0 ? newNumber : cpus));
+      <Radio
+        body={
+          <VCPUInput
+            cpu={socketsEditedVCPU}
+            setCPU={setSocketsEditedVCPU}
+            setSelectedRadioOption={setSelectedRadioOption}
+          />
+        }
+        onClick={() => {
+          setSelectedRadioOption(CPUInputType.editVCPU);
+          setCPU(socketsEditedVCPU);
         }}
-        inputName="cpu-input"
-        min={1}
-        onMinus={() => setCPUSockets((cpus) => +cpus - 1)}
-        onPlus={() => setCPUSockets((cpus) => +cpus + 1)}
-        value={cpuSockets}
+        id={CPUInputType.editVCPU}
+        isChecked={selectedRadioOption === CPUInputType.editVCPU}
+        isLabelWrapped
+        name={radioInputName}
       />
-      <CPUHelperText cpu={getCPU(vm)} sockets={cpuSockets} />
+      <CPUHelperText
+        hide={socketsEditedVCPU?.sockets === convertTopologyToVCPUs(getCPU(vm))}
+        sockets={socketsEditedVCPU?.sockets}
+      />
+      <Radio
+        body={
+          <CPUTopologyInput
+            cpu={topologyEditedVCPU}
+            hide={selectedRadioOption !== CPUInputType.editTopologyManually}
+            setCPU={setTopologyEditedVCPU}
+          />
+        }
+        onClick={() => {
+          setSelectedRadioOption(CPUInputType.editTopologyManually);
+          setCPU(topologyEditedVCPU);
+        }}
+        className="cpu-input__edit-topology-manually"
+        id={CPUInputType.editTopologyManually}
+        isChecked={selectedRadioOption === CPUInputType.editTopologyManually}
+        label={<>{t('Set CPU topology manually')}</>}
+        name={radioInputName}
+      />
     </div>
   );
 };

@@ -1,16 +1,22 @@
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { FC, useState } from 'react';
 import produce from 'immer';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1CPU, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import CPUInput from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/CPUInput';
-import CPUMemoryModalHeader from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/CPUMemoryModalHeader';
 import MemoryInput from '@kubevirt-utils/components/CPUMemoryModal/components/MemoryInput/MemoryInput';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getLabel } from '@kubevirt-utils/resources/shared';
-import { getCPUSockets, getMemory, VM_TEMPLATE_ANNOTATION } from '@kubevirt-utils/resources/vm';
+import { getCPU, getMemory, VM_TEMPLATE_ANNOTATION } from '@kubevirt-utils/resources/vm';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
-import { Alert, Button, ButtonVariant, Modal, ModalVariant } from '@patternfly/react-core';
+import {
+  Alert,
+  AlertVariant,
+  Button,
+  ButtonVariant,
+  Modal,
+  ModalVariant,
+} from '@patternfly/react-core';
 
 import useTemplateDefaultCpuMemory from './hooks/useTemplateDefaultCpuMemory';
 import { getMemorySize } from './utils/CpuMemoryUtils';
@@ -46,41 +52,29 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
   const [updateInProcess, setUpdateInProcess] = useState<boolean>(false);
   const [updateError, setUpdateError] = useState<string>();
 
-  const [memory, setMemory] = useState<number>();
-  const [cpuSockets, setCPUSockets] = useState<number>();
-  const [memoryUnit, setMemoryUnit] = useState<string>();
+  const { size, unit } = getMemorySize(getMemory(vm));
+  const [memory, setMemory] = useState<number>(size || undefined);
+  const [memoryUnit, setMemoryUnit] = useState<string>(unit || undefined);
+  const [cpu, setCPU] = useState<V1CPU>(getCPU(vm));
 
   const templateName = getLabel(vm, VM_TEMPLATE_ANNOTATION);
 
-  const updatedVirtualMachine = useMemo(() => {
+  const handleSubmit = async () => {
+    setUpdateInProcess(true);
+    setUpdateError(null);
+
     const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
       ensurePath(vmDraft, [
         'spec.template.spec.domain.cpu',
         'spec.template.spec.domain.memory.guest',
       ]);
 
-      vmDraft.spec.template.spec.domain.cpu.sockets = cpuSockets;
+      vmDraft.spec.template.spec.domain.cpu = cpu;
       vmDraft.spec.template.spec.domain.memory.guest = `${memory}${memoryUnit}`;
     });
 
-    return updatedVM;
-  }, [vm, memory, cpuSockets, memoryUnit]);
-
-  useEffect(() => {
-    if (vm?.metadata) {
-      const { size, unit } = getMemorySize(getMemory(vm));
-      setMemoryUnit(unit);
-      setMemory(size);
-      setCPUSockets(getCPUSockets(vm));
-    }
-  }, [vm]);
-
-  const handleSubmit = async () => {
-    setUpdateInProcess(true);
-    setUpdateError(null);
-
     try {
-      await onSubmit(updatedVirtualMachine);
+      await onSubmit(updatedVM);
 
       setUpdateInProcess(false);
       onClose();
@@ -111,7 +105,7 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
             defaultLoadError
           }
           onClick={() => {
-            setCPUSockets(templateDefaultsData?.defaultCpu);
+            setCPU(templateDefaultsData?.defaultCpu);
             setMemory(templateDefaultsData?.defaultMemory?.size);
             setMemoryUnit(templateDefaultsData?.defaultMemory?.unit);
           }}
@@ -126,13 +120,20 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
         </Button>,
       ]}
       className="cpu-memory-modal"
-      header={<CPUMemoryModalHeader />}
       isOpen={isOpen}
       onClose={onClose}
+      title={t('Edit CPU | Memory')}
       variant={ModalVariant.small}
+      width="650px"
     >
+      <Alert
+        title={t(
+          'Hot-plug is only possible with Sockets. Cores/Threads editing requires restarting the VirtualMachine',
+        )}
+        variant={AlertVariant.info}
+      />
       <div className="inputs">
-        <CPUInput cpuSockets={cpuSockets} setCPUSockets={setCPUSockets} vm={vm} />
+        <CPUInput setCPU={setCPU} vm={vm} />
         <MemoryInput
           memory={memory}
           memoryUnit={memoryUnit}
