@@ -4,11 +4,14 @@ import DataSourceActions from 'src/views/datasources/actions/DataSourceActions';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import DeprecatedBadge from '@kubevirt-utils/components/DeprecatedBadge/DeprecatedBadge';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   getBootableVolumeGroupVersionKind,
   isBootableVolumePVCKind,
+  isDeprecated,
 } from '@kubevirt-utils/resources/bootableresources/helpers';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
 import { isDataSourceCloning } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -20,6 +23,8 @@ import BootableVolumesActions from '../../actions/BootableVolumesActions';
 import { BootableResource } from '../../utils/types';
 import { getPreferenceReadableOS, getSourcePreferenceLabelValue } from '../../utils/utils';
 
+import './BootableVolumesRow.scss';
+
 const BootableVolumesRow: FC<
   RowProps<
     BootableResource,
@@ -30,21 +35,26 @@ const BootableVolumesRow: FC<
 > = ({ activeColumnIDs, obj, rowData: { preferences } }) => {
   const { t } = useKubevirtTranslation();
 
+  const bootableVolumeName = getName(obj);
+  const bootableVolumeNamespace = getNamespace(obj);
+
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-20" id="name">
         <ResourceLink
+          className="bootable-volume-row__name-link"
           groupVersionKind={getBootableVolumeGroupVersionKind(obj)}
           inline
-          name={obj?.metadata?.name}
-          namespace={obj?.metadata?.namespace}
+          name={bootableVolumeName}
+          namespace={bootableVolumeNamespace}
         />
+        {isDeprecated(bootableVolumeName) && <DeprecatedBadge />}
         {obj.kind === DataSourceModel.kind && isDataSourceCloning(obj as V1beta1DataSource) && (
           <Label>{t('Clone in progress')}</Label>
         )}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-20" id="namespace">
-        <ResourceLink kind="Namespace" name={obj?.metadata?.namespace} />
+        <ResourceLink kind="Namespace" name={bootableVolumeNamespace} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-15" id="os">
         {getPreferenceReadableOS(obj, preferences)}

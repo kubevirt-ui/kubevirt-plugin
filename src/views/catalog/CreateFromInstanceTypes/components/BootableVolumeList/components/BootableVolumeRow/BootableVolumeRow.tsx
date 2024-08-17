@@ -5,10 +5,12 @@ import { getTemplateOSIcon, getVolumeNameOSIcon } from '@catalog/templatescatalo
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import DeprecatedBadge from '@kubevirt-utils/components/DeprecatedBadge/DeprecatedBadge';
 import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
 import { logITFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
 import { BOOTABLE_VOLUME_SELECTED } from '@kubevirt-utils/extensions/telemetry/utils/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isDeprecated } from '@kubevirt-utils/resources/bootableresources/helpers';
 import {
   getVolumeSnapshotSize,
   getVolumeSnapshotStorageClass,
@@ -26,6 +28,8 @@ import { Label, Text, TextVariants } from '@patternfly/react-core';
 import { TableText, Tr, WrapModifier } from '@patternfly/react-table';
 
 import TableData from './TableData';
+
+import './BootableVolumeRow.scss';
 
 type BootableVolumeRowProps = {
   activeColumnIDs: string[];
@@ -68,6 +72,7 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
 
   return (
     <Tr
+      className="bootable-volume-row"
       isClickable
       isRowSelected={getName(selectedBootableVolume) === bootVolumeName}
       isSelectable
@@ -86,7 +91,10 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
       />
       <TableData activeColumnIDs={activeColumnIDs} id="name" width={20}>
         <img alt="os-icon" className="vm-catalog-row-icon" src={icon} />
-        <Text component={TextVariants.small}>{bootVolumeName}</Text>
+        <Text className="bootable-volume-row__name--text" component={TextVariants.small}>
+          {bootVolumeName}
+        </Text>
+        {isDeprecated(bootVolumeName) && <DeprecatedBadge />}
         {isDataSourceCloning(bootableVolume as V1beta1DataSource) && (
           <Label className="vm-catalog-row-label">{t('Clone in progress')}</Label>
         )}

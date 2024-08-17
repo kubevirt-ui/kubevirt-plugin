@@ -16,7 +16,7 @@ import { k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
 
 import { getLabel } from '../shared';
 
-import { KUBEVIRT_ISO_LABEL } from './constants';
+import { deprecatedOSNames, KUBEVIRT_ISO_LABEL } from './constants';
 import { BootableVolume } from './types';
 
 export const isBootableVolumePVCKind = (bootableVolume: BootableVolume): boolean =>
@@ -71,3 +71,5 @@ export const deleteDVAndRelatedResources = async (
 
 export const isBootableVolumeISO = (bootableVolume: BootableVolume): boolean =>
   getLabel(bootableVolume, KUBEVIRT_ISO_LABEL) === 'true';
+
+export const isDeprecated = (bootVolumeName: string) => deprecatedOSNames.includes(bootVolumeName);

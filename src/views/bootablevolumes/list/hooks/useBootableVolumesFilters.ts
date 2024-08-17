@@ -2,7 +2,11 @@ import { PersistentVolumeClaimModel } from '@kubevirt-ui/kubevirt-api/console';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ISO } from '@kubevirt-utils/resources/bootableresources/constants';
-import { isBootableVolumeISO } from '@kubevirt-utils/resources/bootableresources/helpers';
+import {
+  isBootableVolumeISO,
+  isDeprecated,
+} from '@kubevirt-utils/resources/bootableresources/helpers';
+import { getName } from '@kubevirt-utils/resources/shared';
 import { OS_NAMES } from '@kubevirt-utils/resources/template';
 import { getItemNameWithOther, includeFilter } from '@kubevirt-utils/utils/utils';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
@@ -14,6 +18,19 @@ const useBootableVolumesFilters = (): RowFilter<BootableResource>[] => {
   const { t } = useKubevirtTranslation();
 
   return [
+    {
+      filter: (availableResourceNames, obj) =>
+        availableResourceNames?.selected?.length === 0 || !isDeprecated(getName(obj)),
+      filterGroupName: ' ',
+      items: [
+        {
+          id: t('Hide deprecated bootable volumes'),
+          title: t('Hide deprecated bootable volumes'),
+        },
+      ],
+      reducer: (obj) => isDeprecated(getName(obj)) && 'Hide deprecated bootable volumes',
+      type: 'hide-deprecated-bootable volumes',
+    },
     {
       filter: (availableOsNames, obj) =>
         includeFilter(availableOsNames, OS_NAMES, getPreferenceOSType(obj)),
