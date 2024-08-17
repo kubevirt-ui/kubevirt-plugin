@@ -1,10 +1,10 @@
 import React, { FC, ReactNode } from 'react';
 
+import NewBadge from '@kubevirt-utils/components/badges/NewBadge/NewBadge';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { PopoverPosition, Split, SplitItem, Switch } from '@patternfly/react-core';
 
 import ExpandSection from '../../../views/clusteroverview/SettingsTab/ExpandSection/ExpandSection';
-import NewBadge from '../NewBadge/NewBadge';
 
 import './ExpandSectionWithSwitch.scss';
 

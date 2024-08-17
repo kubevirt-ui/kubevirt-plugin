@@ -1,6 +1,6 @@
 import React, { FC, useState } from 'react';
 
-import NewBadge from '@kubevirt-utils/components/NewBadge/NewBadge';
+import NewBadge from '@kubevirt-utils/components/badges/NewBadge/NewBadge';
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Alert, AlertVariant, Split, SplitItem, Switch } from '@patternfly/react-core';

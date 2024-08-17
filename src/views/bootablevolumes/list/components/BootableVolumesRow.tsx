@@ -4,7 +4,7 @@ import DataSourceActions from 'src/views/datasources/actions/DataSourceActions';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import DeprecatedBadge from '@kubevirt-utils/components/DeprecatedBadge/DeprecatedBadge';
+import DeprecatedBadge from '@kubevirt-utils/components/badges/DeprecatedBadge/DeprecatedBadge';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   getBootableVolumeGroupVersionKind,

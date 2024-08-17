@@ -1,8 +1,8 @@
 import React, { FC, useEffect, useState } from 'react';
 
 import HyperConvergedModel from '@kubevirt-ui/kubevirt-api/console/models/HyperConvergedModel';
+import NewBadge from '@kubevirt-utils/components/badges/NewBadge/NewBadge';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
-import NewBadge from '@kubevirt-utils/components/NewBadge/NewBadge';
 import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
