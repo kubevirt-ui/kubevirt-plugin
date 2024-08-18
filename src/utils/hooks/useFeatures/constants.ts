@@ -9,6 +9,8 @@ import { K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
 
 export const AUTOMATIC_SUBSCRIPTION_ACTIVATION_KEY = 'automaticSubscriptionActivationKey';
 export const AUTOMATIC_SUBSCRIPTION_ORGANIZATION_ID = 'automaticSubscriptionOrganizationId';
+export const AUTOMATIC_SUBSCRIPTION_CUSTOM_URL = 'automaticSubscriptionCustomUrl';
+export const AUTOMATIC_SUBSCRIPTION_TYPE_KEY = 'automaticSubscriptionType';
 
 export const INSTANCE_TYPE_ENABLED = 'instanceTypesEnabled';
 export const KUBEVIRT_APISERVER_PROXY = 'kubevirtApiserverProxy';

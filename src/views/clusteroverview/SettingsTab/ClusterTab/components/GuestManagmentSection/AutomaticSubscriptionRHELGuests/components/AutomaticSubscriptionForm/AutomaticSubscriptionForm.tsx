@@ -45,7 +45,7 @@ const AutomaticSubscriptionForm: FC<RHELAutomaticSubscriptionFormProps> = ({
   const isDisabled = !canEdit || isEqualObject(subscriptionData, { activationKey, organizationID });
 
   const handleSubmit = () => {
-    !isDisabled && updateSubscription(activationKey, organizationID);
+    !isDisabled && updateSubscription({ activationKey, organizationID });
   };
 
   return (

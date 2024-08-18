@@ -10,12 +10,9 @@ import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAuto
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
-import {
-  ACTIVATION_KEY,
-  AUTO_UPDATE_OS_CMD,
-  CLOUD_CONFIG_HEADER,
-  DNF_AUTOMATIC_PACKAGE,
-} from './constants';
+import { AutomaticSubscriptionTypeEnum } from '../../../../views/clusteroverview/SettingsTab/ClusterTab/components/GuestManagmentSection/AutomaticSubscriptionRHELGuests/components/AutomaticSubscriptionType/utils/utils';
+
+import { AUTO_UPDATE_OS_CMD, CLOUD_CONFIG_HEADER, DNF_AUTOMATIC_PACKAGE } from './constants';
 
 export const deleteObjBlankValues = (obj: object = {}) =>
   Object.fromEntries(Object.entries(obj)?.filter(([, v]) => !!v));
@@ -107,12 +104,39 @@ export const createDefaultCloudInitYAML = () => ({
   userData: '',
 });
 
-export const addCloudInitUpdateCMD = (userData: CloudInitUserData) => {
-  userData.packages ??= [];
-  userData.packages.push(DNF_AUTOMATIC_PACKAGE);
+export const addDNFUpdateToRunCMD = (userData: CloudInitUserData, autoUpdateEnabled: boolean) => {
+  if (autoUpdateEnabled) {
+    userData.packages ??= [];
+    userData.packages.push(DNF_AUTOMATIC_PACKAGE);
+
+    userData.runcmd ??= [];
+    userData.runcmd.push(AUTO_UPDATE_OS_CMD);
+  }
+};
+
+export const addSubscriptionManagerToRunCMD = (
+  userData: CloudInitUserData,
+  subscriptionData: RHELAutomaticSubscriptionData,
+) => {
+  const subscriptionManagerCMD = [
+    `subscription-manager register --org=${subscriptionData.organizationID} --activationkey=${subscriptionData.activationKey}`,
+  ];
+
+  if (
+    subscriptionData.customUrl &&
+    subscriptionData.type !== AutomaticSubscriptionTypeEnum.ENABLE_PREDICTIVE_ANALYTICS
+  ) {
+    subscriptionManagerCMD.push(` --serverurl=${subscriptionData.customUrl}`);
+  }
+
+  if (subscriptionData.type === AutomaticSubscriptionTypeEnum.ENABLE_PREDICTIVE_ANALYTICS) {
+    subscriptionManagerCMD.push(' && insights-client --register');
+  }
+
+  const command = subscriptionManagerCMD.join(' ');
 
   userData.runcmd ??= [];
-  userData.runcmd.push(AUTO_UPDATE_OS_CMD);
+  userData?.runcmd.push(command);
 };
 
 export const updateCloudInitRHELSubscription = (
@@ -139,12 +163,8 @@ export const updateCloudInitRHELSubscription = (
   const userDataObject = convertYAMLUserDataObject(cloudInitVolData?.userData);
 
   const updatedUserDataObject = produce(userDataObject, (draftUserDataObject) => {
-    draftUserDataObject.rh_subscription = {
-      [ACTIVATION_KEY]: activationKey,
-      org: organizationID,
-    };
-
-    autoUpdateEnabled && addCloudInitUpdateCMD(draftUserDataObject);
+    addSubscriptionManagerToRunCMD(draftUserDataObject, subscriptionData);
+    addDNFUpdateToRunCMD(draftUserDataObject, autoUpdateEnabled);
   });
 
   const updatedCloudInitVolumeData = produce(cloudInitVolData, (draftCloudInitVolumeData) => {
@@ -163,10 +183,6 @@ export type CloudInitUserData = {
   hostname?: string;
   packages?: string[];
   password: string;
-  rh_subscription?: {
-    [ACTIVATION_KEY]: string;
-    org: string;
-  };
   runcmd?: string[];
   user: string;
 };

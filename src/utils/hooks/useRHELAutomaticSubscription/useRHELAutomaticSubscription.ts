@@ -4,7 +4,9 @@ import produce from 'immer';
 import { ConfigMapModel } from '@kubevirt-ui/kubevirt-api/console';
 import {
   AUTOMATIC_SUBSCRIPTION_ACTIVATION_KEY,
+  AUTOMATIC_SUBSCRIPTION_CUSTOM_URL,
   AUTOMATIC_SUBSCRIPTION_ORGANIZATION_ID,
+  AUTOMATIC_SUBSCRIPTION_TYPE_KEY,
 } from '@kubevirt-utils/hooks/useFeatures/constants';
 import useFeaturesConfigMap from '@kubevirt-utils/hooks/useFeatures/useFeaturesConfigMap';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -22,18 +24,31 @@ const useRHELAutomaticSubscription: UseRHELAutomaticSubscription = () => {
 
   const [loading, setLoading] = useState(false);
 
-  const updateSubscription = async (activationKey: string, organizationID: string) => {
+  const updateSubscription = async ({ activationKey, customUrl, organizationID, type }) => {
     setLoading(true);
     const updatedConfigMap = produce(featureConfigMap, (draftCM) => {
       if (isEmpty(draftCM?.data)) draftCM.data = {};
-      draftCM.data[AUTOMATIC_SUBSCRIPTION_ACTIVATION_KEY] = activationKey;
-      draftCM.data[AUTOMATIC_SUBSCRIPTION_ORGANIZATION_ID] = organizationID;
+      draftCM.data[AUTOMATIC_SUBSCRIPTION_ACTIVATION_KEY] =
+        activationKey !== undefined
+          ? activationKey
+          : draftCM.data[AUTOMATIC_SUBSCRIPTION_ACTIVATION_KEY];
+
+      draftCM.data[AUTOMATIC_SUBSCRIPTION_ORGANIZATION_ID] =
+        organizationID !== undefined
+          ? organizationID
+          : draftCM.data[AUTOMATIC_SUBSCRIPTION_ORGANIZATION_ID];
+
+      draftCM.data[AUTOMATIC_SUBSCRIPTION_CUSTOM_URL] =
+        customUrl !== undefined ? customUrl : draftCM.data[AUTOMATIC_SUBSCRIPTION_CUSTOM_URL];
+
+      draftCM.data[AUTOMATIC_SUBSCRIPTION_TYPE_KEY] =
+        type !== undefined ? type : draftCM.data[AUTOMATIC_SUBSCRIPTION_TYPE_KEY];
     });
 
     k8sUpdate({
       data: updatedConfigMap,
       model: ConfigMapModel,
-    }).then(() => setLoading(false));
+    }).finally(() => setLoading(false));
   };
 
   return {
@@ -43,7 +58,9 @@ const useRHELAutomaticSubscription: UseRHELAutomaticSubscription = () => {
     loading,
     subscriptionData: {
       activationKey: featureConfigMap?.data?.[AUTOMATIC_SUBSCRIPTION_ACTIVATION_KEY],
+      customUrl: featureConfigMap?.data?.[AUTOMATIC_SUBSCRIPTION_CUSTOM_URL],
       organizationID: featureConfigMap?.data?.[AUTOMATIC_SUBSCRIPTION_ORGANIZATION_ID],
+      type: featureConfigMap?.data?.[AUTOMATIC_SUBSCRIPTION_TYPE_KEY],
     },
     updateSubscription,
   };
