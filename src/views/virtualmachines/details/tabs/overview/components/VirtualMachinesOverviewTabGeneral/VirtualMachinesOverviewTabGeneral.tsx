@@ -86,6 +86,7 @@ const VirtualMachinesOverviewTabGeneral: FC<VirtualMachinesOverviewTabGeneralPro
                   <ResourceLink
                     groupVersionKind={VirtualMachineInstanceModelGroupVersionKind}
                     name={vmi?.metadata?.name}
+                    namespace={vmi?.metadata?.namespace}
                   />
                 ) : (
                   NO_DATA_DASH
