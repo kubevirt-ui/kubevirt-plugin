@@ -322,7 +322,6 @@ export const usePendingChanges = (
             onClose={onClose}
             onSubmit={onSubmit}
             vm={vm}
-            vmi={vmi}
           />
         ));
       },
@@ -371,7 +370,6 @@ export const usePendingChanges = (
             onClose={onClose}
             onSubmit={onSubmit}
             vm={vm}
-            vmi={vmi}
           />
         ));
       },
