@@ -124,7 +124,7 @@ export const logITFlowEvent = (
   key: string,
   vm?: V1VirtualMachine,
   properties?: Record<string, any>,
-) => logEventWithName(key, vm, { ...properties, flow: createVMFlowTypes.IT });
+) => logEventWithName(key, vm, { ...properties, flow: createVMFlowTypes.InstanceTypes });
 
 export const logTemplateFlowEvent = (
   key: string,
