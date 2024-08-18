@@ -1,6 +1,8 @@
 export type RHELAutomaticSubscriptionData = {
   activationKey: string;
+  customUrl: string;
   organizationID: string;
+  type: string;
 };
 
 export type RHELAutomaticSubscriptionFormProps = {
@@ -9,5 +11,5 @@ export type RHELAutomaticSubscriptionFormProps = {
   loadError: Error;
   loading: boolean;
   subscriptionData: RHELAutomaticSubscriptionData;
-  updateSubscription: (activationKey: string, organizationID: string) => void;
+  updateSubscription: (data: Partial<RHELAutomaticSubscriptionData>) => void;
 };

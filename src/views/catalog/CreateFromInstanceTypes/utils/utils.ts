@@ -3,11 +3,11 @@ import VirtualMachineInstancetypeModel from '@kubevirt-ui/kubevirt-api/console/m
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
-  addCloudInitUpdateCMD,
+  addDNFUpdateToRunCMD,
+  addSubscriptionManagerToRunCMD,
   CloudInitUserData,
   convertUserDataObjectToYAML,
 } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
-import { ACTIVATION_KEY } from '@kubevirt-utils/components/CloudinitModal/utils/constants';
 import { addSecretToVM } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import { sysprepDisk, sysprepVolume } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
 import { ROOTDISK } from '@kubevirt-utils/constants/constants';
@@ -27,6 +27,7 @@ import {
 import { generatePrettyName, getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
 import { K8sGroupVersionKind, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
+import { AutomaticSubscriptionTypeEnum } from '../../../../views/clusteroverview/SettingsTab/ClusterTab/components/GuestManagmentSection/AutomaticSubscriptionRHELGuests/components/AutomaticSubscriptionType/utils/utils';
 import { useInstanceTypeVMStore } from '../state/useInstanceTypeVMStore';
 import { InstanceTypeVMState } from '../state/utils/types';
 
@@ -56,7 +57,7 @@ export const createPopulatedCloudInitYAML = (
   subscriptionData: RHELAutomaticSubscriptionData,
   autoUpdateEnabled?: boolean,
 ) => {
-  const { activationKey, organizationID } = subscriptionData;
+  const { activationKey, organizationID, type } = subscriptionData;
 
   const cloudInitConfig: CloudInitUserData = {
     chpasswd: { expire: false },
@@ -66,12 +67,14 @@ export const createPopulatedCloudInitYAML = (
 
   const isRHELVM = selectedPreference.includes(OS_NAME_TYPES.rhel);
 
-  if (isRHELVM && !isEmpty(activationKey) && !isEmpty(organizationID)) {
-    cloudInitConfig.rh_subscription = { [ACTIVATION_KEY]: activationKey, org: organizationID };
-
-    if (autoUpdateEnabled) {
-      addCloudInitUpdateCMD(cloudInitConfig);
-    }
+  if (
+    isRHELVM &&
+    !isEmpty(activationKey) &&
+    !isEmpty(organizationID) &&
+    type !== AutomaticSubscriptionTypeEnum.NO_SUBSCRIPTION
+  ) {
+    addSubscriptionManagerToRunCMD(cloudInitConfig, subscriptionData);
+    addDNFUpdateToRunCMD(cloudInitConfig, autoUpdateEnabled);
   }
 
   return convertUserDataObjectToYAML(cloudInitConfig, true);
