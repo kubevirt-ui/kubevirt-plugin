@@ -4,11 +4,14 @@ import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { DropEvent, FileUpload, FormGroup } from '@patternfly/react-core';
 
+import DiskSourceUploadISO from './DiskSourceUploadISO';
 import { DiskSourceUploadPVCProgress } from './DiskSourceUploadPVCProgress';
 
 type DiskSourceUploadPVCProps = {
+  isIso: boolean;
   label?: string;
   relevantUpload: DataUpload;
+  setIsIso: (value: boolean) => void;
   setUploadFile: (file: File | string) => void;
   setUploadFileName: (name: string) => void;
   uploadFile: File | string;
@@ -16,8 +19,10 @@ type DiskSourceUploadPVCProps = {
 };
 
 const DiskSourceUploadPVC: FC<DiskSourceUploadPVCProps> = ({
+  isIso,
   label,
   relevantUpload,
+  setIsIso,
   setUploadFile,
   setUploadFileName,
   uploadFile,
@@ -54,6 +59,7 @@ const DiskSourceUploadPVC: FC<DiskSourceUploadPVCProps> = ({
           value={uploadFile}
         />
       </FormGroup>
+      <DiskSourceUploadISO isIso={isIso} setIsIso={setIsIso} />
       {relevantUpload && <DiskSourceUploadPVCProgress upload={relevantUpload} />}
     </>
   );

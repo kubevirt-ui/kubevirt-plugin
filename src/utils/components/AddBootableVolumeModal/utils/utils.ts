@@ -25,6 +25,7 @@ import {
   DROPDOWN_FORM_SELECTION,
   emptySourceDataVolume,
   initialDataImportCron,
+  KUBEVIRT_ISO_LABEL,
 } from './constants';
 
 type createBootableVolumeType = (input: {
@@ -54,7 +55,7 @@ export const createBootableVolume: createBootableVolumeType =
     );
 
     const actionBySourceType: Record<string, () => Promise<V1beta1DataSource>> = {
-      [DROPDOWN_FORM_SELECTION.UPLOAD_IMAGE]: () =>
+      [DROPDOWN_FORM_SELECTION.UPLOAD_VOLUME]: () =>
         createBootableVolumeFromUpload(
           bootableVolume,
           bootableVolumeNamespace,
@@ -144,7 +145,7 @@ const createBootableVolumeFromUpload = async (
   draftDataSource: V1beta1DataSource,
   uploadData: ({ dataVolume, file }: UploadDataProps) => Promise<void>,
 ) => {
-  const { uploadFile } = bootableVolume || {};
+  const { isIso, uploadFile } = bootableVolume || {};
 
   const bootableVolumeToCreate = getDataVolumeWithSource(
     bootableVolume,
@@ -155,6 +156,12 @@ const createBootableVolumeFromUpload = async (
   );
 
   const dataSourceToCreate = produce(draftDataSource, (draftDS) => {
+    if (isIso) {
+      draftDS.metadata.labels = {
+        ...(draftDS.metadata.labels || {}),
+        [KUBEVIRT_ISO_LABEL]: 'true',
+      };
+    }
     draftDS.spec.source = {
       pvc: {
         name: bootableVolumeToCreate.metadata.name,

@@ -12,17 +12,17 @@ import { CDI_BIND_REQUESTED_ANNOTATION } from '@kubevirt-utils/hooks/useCDIUploa
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 export enum DROPDOWN_FORM_SELECTION {
-  UPLOAD_IMAGE = 'upload',
+  UPLOAD_VOLUME = 'volume',
   USE_EXISTING_PVC = 'pvc',
   USE_REGISTRY = 'registry',
   USE_SNAPSHOT = 'snapshot',
 }
 
 export const optionsValueLabelMapper = {
-  [DROPDOWN_FORM_SELECTION.UPLOAD_IMAGE]: t('Upload volume'),
-  [DROPDOWN_FORM_SELECTION.USE_EXISTING_PVC]: t('Use existing volume'),
-  [DROPDOWN_FORM_SELECTION.USE_REGISTRY]: t('Download from registry'),
-  [DROPDOWN_FORM_SELECTION.USE_SNAPSHOT]: t('Use existing volume snapshot'),
+  [DROPDOWN_FORM_SELECTION.UPLOAD_VOLUME]: t('Volume'),
+  [DROPDOWN_FORM_SELECTION.USE_EXISTING_PVC]: t('Volume'),
+  [DROPDOWN_FORM_SELECTION.USE_REGISTRY]: t('Registry'),
+  [DROPDOWN_FORM_SELECTION.USE_SNAPSHOT]: t('Volume snapshot'),
 };
 
 export type AddBootableVolumeState = {
@@ -30,6 +30,7 @@ export type AddBootableVolumeState = {
   bootableVolumeName: string;
   bootableVolumeNamespace: string;
   cronExpression: string;
+  isIso: boolean;
   labels: { [key: string]: string };
   pvcName: string;
   pvcNamespace: string;
@@ -47,13 +48,14 @@ export type AddBootableVolumeState = {
 export type SetBootableVolumeFieldType = (
   key: keyof AddBootableVolumeState,
   fieldKey?: string,
-) => (value: number | string) => void;
+) => (value: boolean | number | string) => void;
 
 export const initialBootableVolumeState: AddBootableVolumeState = {
   annotations: {},
   bootableVolumeName: null,
   bootableVolumeNamespace: null,
   cronExpression: null,
+  isIso: false,
   labels: {},
   pvcName: null,
   pvcNamespace: null,
@@ -117,3 +119,5 @@ export const emptyDataSource: V1beta1DataSource = {
   },
   spec: { source: {} },
 };
+
+export const KUBEVIRT_ISO_LABEL = 'kubevirt.io/iso';
