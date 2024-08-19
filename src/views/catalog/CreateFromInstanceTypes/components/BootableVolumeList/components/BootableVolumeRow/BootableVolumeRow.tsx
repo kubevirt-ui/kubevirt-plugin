@@ -6,6 +6,8 @@ import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
+import { logITFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
+import { BOOTABLE_VOLUME_SELECTED } from '@kubevirt-utils/extensions/telemetry/utils/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   getVolumeSnapshotSize,
@@ -57,12 +59,19 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
 
   const [isFavorite, addOrRemoveFavorite] = favorites;
 
+  const handleOnClick = () => {
+    setSelectedBootableVolume(bootableVolume, pvcSource, volumeSnapshotSource);
+    logITFlowEvent(BOOTABLE_VOLUME_SELECTED, null, {
+      selectedBootableVolume: getName(bootableVolume),
+    });
+  };
+
   return (
     <Tr
       isClickable
       isRowSelected={getName(selectedBootableVolume) === bootVolumeName}
       isSelectable
-      onClick={() => setSelectedBootableVolume(bootableVolume, pvcSource, volumeSnapshotSource)}
+      onClick={() => handleOnClick()}
     >
       <TableData
         favorites={{

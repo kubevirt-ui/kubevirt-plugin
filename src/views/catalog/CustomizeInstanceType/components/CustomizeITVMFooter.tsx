@@ -6,6 +6,12 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { SecretSelectionOption } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import { createSSHSecret } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
+import { logITFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
+import {
+  CANCEL_CUSTOMIZE_VM_BUTTON_CLICKED,
+  CUSTOMIZE_VM_FAILED,
+  CUSTOMIZE_VM_SUCCEEDED,
+} from '@kubevirt-utils/extensions/telemetry/utils/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
@@ -75,6 +81,7 @@ const CustomizeITVMFooter: FC = () => {
                       data: vmSignal.value || vm,
                       model: VirtualMachineModel,
                     });
+                    logITFlowEvent(CUSTOMIZE_VM_SUCCEEDED, createdVM);
                     if (secretOption === SecretSelectionOption.addNew) {
                       createSSHSecret(sshPubKey, sshSecretName, vmNamespaceTarget);
                     }
@@ -83,6 +90,7 @@ const CustomizeITVMFooter: FC = () => {
                     navigate(getResourceUrl({ model: VirtualMachineModel, resource: createdVM }));
                   } catch (err) {
                     setError(err);
+                    logITFlowEvent(CUSTOMIZE_VM_FAILED, vm);
                   } finally {
                     setIsSubmitting(false);
                   }
@@ -96,6 +104,7 @@ const CustomizeITVMFooter: FC = () => {
             <SplitItem>
               <Button
                 onClick={() => {
+                  logITFlowEvent(CANCEL_CUSTOMIZE_VM_BUTTON_CLICKED, vm);
                   clearCustomizeInstanceType();
                   navigate(`/k8s/ns/${activeNamespace}/catalog`);
                 }}

@@ -17,6 +17,14 @@ import {
   addSecretToVM,
   applyCloudDriveCloudInitVolume,
 } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
+import { logTemplateFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
+import {
+  CREATE_VM_BUTTON_CLICKED,
+  CREATE_VM_FAILED,
+  CREATE_VM_SUCCEEDED,
+  CUSTOMIZE_VM_BUTTON_CLICKED,
+  CUSTOMIZE_VM_FAILED,
+} from '@kubevirt-utils/extensions/telemetry/utils/constants';
 import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
@@ -122,6 +130,8 @@ const useCreateDrawerForm = (
       }
     });
 
+    logTemplateFlowEvent(CREATE_VM_BUTTON_CLICKED, template);
+
     try {
       const quickCreatedVM = await quickCreateVM({
         models,
@@ -146,8 +156,10 @@ const useCreateDrawerForm = (
       });
       setIsQuickCreating(false);
       navigate(getResourceUrl({ model: VirtualMachineModel, resource: quickCreatedVM }));
+      logTemplateFlowEvent(CREATE_VM_SUCCEEDED, templateToProcess);
     } catch (error) {
       setCreateError(error);
+      logTemplateFlowEvent(CREATE_VM_FAILED, templateToProcess);
     } finally {
       setIsQuickCreating(false);
     }
@@ -157,6 +169,8 @@ const useCreateDrawerForm = (
     e.preventDefault();
     setIsCustomizing(true);
     setCreateError(undefined);
+
+    logTemplateFlowEvent(CUSTOMIZE_VM_BUTTON_CLICKED, template);
 
     try {
       const processedTemplate = await k8sCreate<V1Template>({
@@ -225,10 +239,10 @@ const useCreateDrawerForm = (
       await updateVM(
         !isEmpty(authorizedSSHKey) ? addSecretToVM(updatedVM, authorizedSSHKey) : updatedVM,
       );
-
       navigate(`/k8s/ns/${namespace}/catalog/template/review`);
     } catch (error) {
       setCreateError(error);
+      logTemplateFlowEvent(CUSTOMIZE_VM_FAILED, template);
     }
     setIsCustomizing(false);
   };

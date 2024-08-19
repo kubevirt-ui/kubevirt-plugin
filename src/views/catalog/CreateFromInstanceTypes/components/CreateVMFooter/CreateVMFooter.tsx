@@ -19,6 +19,15 @@ import {
   UNATTEND,
 } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
+import { logITFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
+import {
+  CANCEL_CREATE_VM_BUTTON_CLICKED,
+  CREATE_VM_BUTTON_CLICKED,
+  CREATE_VM_FAILED,
+  CREATE_VM_SUCCEEDED,
+  CUSTOMIZE_VM_BUTTON_CLICKED,
+  VIEW_YAML_AND_CLI_CLICKED,
+} from '@kubevirt-utils/extensions/telemetry/utils/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
@@ -71,10 +80,10 @@ const CreateVMFooter: FC = () => {
   const { applyKeyToProject, secretOption, sshPubKey, sshSecretName } = sshSecretCredentials || {};
   const isWindowsOSVolume = useIsWindowsBootableVolume();
 
-  const onCancel = useCallback(
-    () => navigate(getResourceUrl({ activeNamespace, model: VirtualMachineModel })),
-    [activeNamespace, navigate],
-  );
+  const onCancel = useCallback(() => {
+    logITFlowEvent(CANCEL_CREATE_VM_BUTTON_CLICKED, null, { vmName: vmName });
+    navigate(getResourceUrl({ activeNamespace, model: VirtualMachineModel }));
+  }, [activeNamespace, navigate, vmName]);
 
   const [canCreateVM] = useAccessReview({
     group: VirtualMachineModel.apiGroup,
@@ -99,6 +108,8 @@ const CreateVMFooter: FC = () => {
       subscriptionData,
       autoUpdateEnabled,
     );
+
+    logITFlowEvent(CREATE_VM_BUTTON_CLICKED, vmToCreate);
 
     if (
       applyKeyToProject &&
@@ -137,14 +148,20 @@ const CreateVMFooter: FC = () => {
 
         createHeadlessService(createdVM);
         navigate(getResourceUrl({ model: VirtualMachineModel, resource: createdVM }));
+
+        logITFlowEvent(CREATE_VM_SUCCEEDED, createdVM);
       })
-      .catch(setError)
+      .catch((err) => {
+        setError(err);
+        logITFlowEvent(CREATE_VM_FAILED, null, { vmName: vmName });
+      })
       .finally(() => setIsSubmitting(false));
   };
 
   const handleCustomize = async () => {
     setIsSubmitting(true);
     setError(null);
+
     try {
       await setVM(
         generateVM(
@@ -162,6 +179,8 @@ const CreateVMFooter: FC = () => {
         subscriptionData,
         autoUpdateEnabled,
       );
+
+      logITFlowEvent(CUSTOMIZE_VM_BUTTON_CLICKED, vmSignal.value);
 
       navigate(
         `/k8s/ns/${vmNamespaceTarget}/catalog/review/${VirtualMachineDetailsTab.Configurations}`,
@@ -237,7 +256,8 @@ const CreateVMFooter: FC = () => {
             <SplitItem isFilled />
             <SplitItem>
               <Button
-                onClick={() =>
+                onClick={() => {
+                  logITFlowEvent(VIEW_YAML_AND_CLI_CLICKED, null, { vmName: vmName });
                   createModal((props) => (
                     <YamlAndCLIViewerModal
                       vm={generateVM(
@@ -249,8 +269,8 @@ const CreateVMFooter: FC = () => {
                       )}
                       {...props}
                     />
-                  ))
-                }
+                  ));
+                }}
                 isDisabled={isEmpty(selectedBootableVolume) || !hasNameAndInstanceType}
                 variant={ButtonVariant.secondary}
               >

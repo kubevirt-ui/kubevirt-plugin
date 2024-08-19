@@ -4,10 +4,15 @@ import { useNavigate } from 'react-router-dom-v5-compat';
 import { useWizardSourceAvailable } from '@catalog/utils/useWizardSourceAvailable';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import { logTemplateFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
+import {
+  CANCEL_CUSTOMIZE_VM_BUTTON_CLICKED,
+  CUSTOMIZE_PAGE_CREATE_VM_BUTTON_CLICKED,
+} from '@kubevirt-utils/extensions/telemetry/utils/constants';
 import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getResourceUrl } from '@kubevirt-utils/resources/shared';
+import { getName, getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { createHeadlessService } from '@kubevirt-utils/utils/headless-service';
 import {
   Alert,
@@ -46,6 +51,8 @@ export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
     });
 
   const onSubmit = () => {
+    logTemplateFlowEvent(CUSTOMIZE_PAGE_CREATE_VM_BUTTON_CLICKED, null, { vmName: getName(vm) });
+
     if (isBootSourceAvailable) {
       return onCreate();
     }
@@ -117,6 +124,9 @@ export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
             <SplitItem>
               <Button
                 onClick={() => {
+                  logTemplateFlowEvent(CANCEL_CUSTOMIZE_VM_BUTTON_CLICKED, null, {
+                    vmName: getName(vm),
+                  });
                   if (confirm(t('Are you sure you want to cancel?'))) {
                     clearSessionStorageVM();
                     navigate(`/k8s/ns/${namespace}/catalog/template`);
