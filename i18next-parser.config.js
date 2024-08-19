@@ -4,7 +4,7 @@ const { CustomJSONLexer } = require('./i18n-scripts/lexers');
 module.exports = {
   createOldCatalogs: false,
   defaultNamespace: 'plugin__kubevirt-plugin',
-  input: ['src/**/*.{js,jsx,ts,tsx,json}', './console-extensions.json'],
+  input: ['src/**/*.{js,jsx,ts,tsx,json}'],
   keySeparator: false,
   // see below for more details
   lexers: {

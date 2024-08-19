@@ -9,6 +9,7 @@ import { Configuration as WebpackDevServerConfiguration } from 'webpack-dev-serv
 
 import { ConsoleRemotePlugin } from '@openshift-console/dynamic-plugin-sdk-webpack';
 
+import extensions from './plugin-extensions';
 import pluginMetadata from './plugin-metadata';
 
 interface Configuration extends WebpackConfiguration {
@@ -138,6 +139,7 @@ const config: Configuration = {
       patterns: [{ from: '../locales', to: '../dist/locales' }],
     }),
     new ConsoleRemotePlugin({
+      extensions,
       pluginMetadata,
     }),
     new ForkTsCheckerWebpackPlugin({
