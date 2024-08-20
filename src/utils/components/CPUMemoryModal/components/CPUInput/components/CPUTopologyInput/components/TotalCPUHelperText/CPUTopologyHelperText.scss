@@ -1,0 +1,15 @@
+.cpu-topology-helper-text {
+  margin-top: var(--pf-v5-global--spacer--xs);
+  margin-left: 65px;
+  color: #6a6e73;
+  font-size: var(--pf-v5-c-helper-text--FontSize);
+
+  &__body-content {
+    font-size: var(--pf-v5-global--FontSize--md);
+  }
+
+  &__button {
+    padding-top: 0;
+    padding-left: var(--pf-global--spacer--xs);
+  }
+}

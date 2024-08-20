@@ -208,18 +208,25 @@ export const getMemoryCPU = <T>(obj: T): { cpu: V1CPU; memory: string } => ({
 });
 
 /**
- * A selector that returns number of CPU cores of the resource
- * @param {T} obj resource such as vm or vmi
+ * A selector that returns the amount of CPU cores of the resource
+ * @param {T} obj resource such as VM or VMI
  * @returns {number} the number of CPU cores
  */
-export const getCPUcores = <T>(obj: T): number => getCPU(obj)?.cores || 1;
+export const getCPUCores = <T>(obj: T): number => getCPU(obj)?.cores || 1;
 
 /**
- * A selector that returns number of CPU sockets of the resource
- * @param {T} obj resource such as VMI or VMI
+ * A selector that returns  the amount of CPU sockets of the resource
+ * @param {T} obj resource such as VM or VMI
  * @returns {number} the number of CPU sockets
  */
 export const getCPUSockets = <T>(obj: T): number => getCPU(obj)?.sockets || 1;
+
+/**
+ * A selector that returns the amount of CPU threads of the resource
+ * @param {T} obj resource such as VM or VMI
+ * @returns {number} the number of CPU threads
+ */
+export const getCPUThreads = <T>(obj: T): number => getCPU(obj)?.threads || 1;
 
 /**
  * A selector that returns virtual machine evictionStrategy

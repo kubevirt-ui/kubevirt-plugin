@@ -10,7 +10,7 @@ import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
-import { getCPUcores, getMemory } from '@kubevirt-utils/resources/vm';
+import { getCPUCores, getMemory } from '@kubevirt-utils/resources/vm';
 import { toIECUnit } from '@kubevirt-utils/utils/units';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { NumberInput, SelectOption, Title, TitleSizes } from '@patternfly/react-core';
@@ -55,7 +55,7 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({ isOpen, onClose, onSubmit, te
       const { size, unit } = getMemorySize(getMemory(vm));
       setMemoryUnit(unit);
       setMemory(size);
-      setCpuCores(getCPUcores(vm));
+      setCpuCores(getCPUCores(vm));
     }
   }, [vm]);
 

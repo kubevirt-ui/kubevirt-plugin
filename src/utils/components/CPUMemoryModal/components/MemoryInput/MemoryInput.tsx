@@ -20,7 +20,7 @@ const MemoryInput: FC<MemoryInputProps> = ({ memory, memoryUnit, setMemory, setM
 
   return (
     <div className="input-memory">
-      <Title headingLevel="h6" size={TitleSizes.md}>
+      <Title className="input-memory__title" headingLevel="h6" size={TitleSizes.md}>
         {t('Memory')}
       </Title>
       <NumberInput
