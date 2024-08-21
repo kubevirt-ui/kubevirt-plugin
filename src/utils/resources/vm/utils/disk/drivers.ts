@@ -2,6 +2,7 @@ import produce from 'immer';
 
 import { ConfigMapModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { InterfaceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import { ensurePath, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { k8sGet } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -63,7 +64,7 @@ export const mountWinDriversToVM = async (vm: V1VirtualMachine): Promise<V1Virtu
 
     draftVM.spec.template.spec.domain.devices.disks.push({
       cdrom: {
-        bus: 'sata',
+        bus: InterfaceTypes.SATA,
       },
       name: WINDOWS_DRIVERS_DISK,
     });

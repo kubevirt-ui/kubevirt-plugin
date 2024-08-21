@@ -16,7 +16,7 @@ type VolumeSourceProps = {
   setBootableVolumeField: (
     key: keyof AddBootableVolumeState,
     fieldKey?: string,
-  ) => (value: string) => void;
+  ) => (value: boolean | File | number | string) => void;
   sourceType: DROPDOWN_FORM_SELECTION;
   upload: DataUpload;
 };
@@ -31,10 +31,12 @@ const VolumeSource: FC<VolumeSourceProps> = ({
   const { registryURL, uploadFile, uploadFilename } = bootableVolume || {};
 
   const sourceComponentByType = {
-    [DROPDOWN_FORM_SELECTION.UPLOAD_IMAGE]: (
+    [DROPDOWN_FORM_SELECTION.UPLOAD_VOLUME]: (
       <DiskSourceUploadPVC
+        isIso={bootableVolume.isIso}
         label={t('Upload PVC image')}
         relevantUpload={upload}
+        setIsIso={setBootableVolumeField('isIso')}
         setUploadFile={setBootableVolumeField('uploadFile')}
         setUploadFileName={setBootableVolumeField('uploadFilename')}
         uploadFile={uploadFile}

@@ -56,7 +56,7 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
   });
 
   const [sourceType, setSourceType] = useState<DROPDOWN_FORM_SELECTION>(
-    DROPDOWN_FORM_SELECTION.UPLOAD_IMAGE,
+    DROPDOWN_FORM_SELECTION.UPLOAD_VOLUME,
   );
 
   const applyStorageProfileState = useState<boolean>(true);
@@ -110,9 +110,7 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
       obj={emptyDataSource}
       submitBtnText={t('Save')}
     >
-      {t(
-        'Upload a new volume, or use an existing PersistentVolumeClaim (PVC), VolumeSnapshot or DataSource.',
-      )}
+      {t('Add a new bootable volume to the cluster.')}
       <Form className="pf-u-mt-md">
         <SourceTypeSelection
           formSelection={sourceType}

@@ -1,5 +1,7 @@
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { ISO } from '@kubevirt-utils/resources/bootableresources/constants';
+import { isBootableVolumeISO } from '@kubevirt-utils/resources/bootableresources/helpers';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { OS_NAMES } from '@kubevirt-utils/resources/template';
 import { getItemNameWithOther } from '@kubevirt-utils/utils/utils';
@@ -33,6 +35,18 @@ const useBootVolumeFilters = (isModal: boolean): RowFilter<BootableVolume>[] => 
       ],
       reducer: (obj) => obj?.kind,
       type: `resourceKind${isModal && '-modal'}`,
+    },
+    {
+      filter: (filters, obj) => filters?.selected?.length === 0 || isBootableVolumeISO(obj),
+      filterGroupName: t('Type'),
+      items: [
+        {
+          id: ISO,
+          title: ISO,
+        },
+      ],
+      reducer: (obj) => isBootableVolumeISO(obj) && ISO,
+      type: ISO,
     },
   ];
 };

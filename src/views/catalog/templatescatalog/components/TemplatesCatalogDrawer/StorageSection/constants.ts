@@ -1,4 +1,5 @@
 import { V1Disk } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { InterfaceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 export const PVC_SOURCE_NAME = 'pvc-clone';
@@ -41,7 +42,7 @@ export const INSTALLATION_CDROM_NAME = 'installation-cdrom';
 export const INSTALLATION_CDROM_DISK: V1Disk = {
   bootOrder: 1,
   cdrom: {
-    bus: 'sata',
+    bus: InterfaceTypes.SATA,
   },
   name: INSTALLATION_CDROM_NAME,
 };

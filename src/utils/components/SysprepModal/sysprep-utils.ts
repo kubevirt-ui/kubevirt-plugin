@@ -4,6 +4,8 @@ import { V1Disk, V1VirtualMachine, V1Volume } from '@kubevirt-ui/kubevirt-api/ku
 import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 
+import { InterfaceTypes } from '../DiskModal/utils/types';
+
 import { SYSPREP } from './consts';
 
 export const AUTOUNATTEND = 'autounattend.xml';
@@ -12,7 +14,7 @@ export const WINDOWS = 'windows';
 
 export type SysprepData = { autounattend?: string; unattended?: string };
 
-export const sysprepDisk = (): V1Disk => ({ cdrom: { bus: 'sata' }, name: SYSPREP });
+export const sysprepDisk = (): V1Disk => ({ cdrom: { bus: InterfaceTypes.VIRTIO }, name: SYSPREP });
 
 export const sysprepVolume = (sysprepName: string): V1Volume => ({
   name: SYSPREP,
