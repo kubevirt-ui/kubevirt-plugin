@@ -46,19 +46,13 @@ export const getDiskRowDataLayout = (
     const pvcSize = device?.pvc?.spec?.resources?.requests?.storage;
     const dataVolumeCustomSize =
       device?.dataVolumeTemplate?.spec?.storage?.resources?.requests?.storage;
+    const size = humanizeBinaryBytes(convertToBaseValue(dataVolumeCustomSize || pvcSize));
 
-    if (device?.dataVolumeTemplate && (dataVolumeCustomSize || pvcSize)) {
-      diskRowDataObject.size = humanizeBinaryBytes(
-        convertToBaseValue(dataVolumeCustomSize || pvcSize),
-      ).string;
-
-      return diskRowDataObject;
-    }
+    diskRowDataObject.size = size.value === 0 ? NO_DATA_DASH : size.string;
 
     if (device?.pvc) {
       diskRowDataObject.source = device?.pvc?.metadata?.name;
       diskRowDataObject.sourceStatus = device?.pvc?.status?.phase;
-      diskRowDataObject.size = humanizeBinaryBytes(convertToBaseValue(pvcSize)).string;
       diskRowDataObject.storageClass = device?.pvc?.spec?.storageClassName;
     }
 
