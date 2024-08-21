@@ -922,16 +922,6 @@
     semver "^7.3.7"
     yup "^0.32.11"
 
-"@openshift/dynamic-plugin-sdk@^5.0.1":
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/@openshift/dynamic-plugin-sdk/-/dynamic-plugin-sdk-5.0.1.tgz#3487afe57d07a28b9aba393e643d86ca13a3735c"
-  integrity sha512-+azUBN6FgcDmlcWMzG0bthcRUJC1u12wf9xa2aJGFbC/uTiOXwjrkcQ7LW/PyK5Em7wDhwaUdapaeOgh8I6Kjg==
-  dependencies:
-    lodash "^4.17.21"
-    semver "^7.3.7"
-    uuid "^8.3.2"
-    yup "^0.32.11"
-
 "@patternfly/quickstarts@5.1.0":
   version "5.1.0"
   resolved "https://registry.yarnpkg.com/@patternfly/quickstarts/-/quickstarts-5.1.0.tgz#c60c782ca8e7019b82b6aa2a533deeed68da922b"

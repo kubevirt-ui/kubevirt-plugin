@@ -17,7 +17,7 @@ export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
 export const extensions: EncodedExtension[] = [
   {
     flags: {
-      required: ['KUBEVIRT'],
+      required: ['KUBEVIRT_DYNAMIC'],
     },
     properties: {
       mapper: { $codeRef: 'dashboardInventory.getVMStatusGroups' },
@@ -27,7 +27,7 @@ export const extensions: EncodedExtension[] = [
   } as EncodedExtension<DashboardsOverviewInventoryItem>,
   {
     flags: {
-      required: ['KUBEVIRT'],
+      required: ['KUBEVIRT_DYNAMIC'],
     },
     properties: {
       mapper: { $codeRef: 'dashboardInventory.getVMStatusGroups' },
@@ -37,7 +37,7 @@ export const extensions: EncodedExtension[] = [
   } as EncodedExtension<DashboardsProjectOverviewInventoryItem>,
   {
     flags: {
-      required: ['KUBEVIRT'],
+      required: ['KUBEVIRT_DYNAMIC'],
     },
     properties: {
       icon: { $codeRef: 'dashboardInventory.VMOffGroupIcon' },
@@ -47,7 +47,7 @@ export const extensions: EncodedExtension[] = [
   } as EncodedExtension<DashboardsInventoryItemGroup>,
   {
     flags: {
-      required: ['KUBEVIRT'],
+      required: ['KUBEVIRT_DYNAMIC'],
     },
     properties: {
       component: { $codeRef: 'dashboardActivity.DiskImportActivity' },

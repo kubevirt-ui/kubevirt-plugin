@@ -13,7 +13,7 @@ export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
 export const extensions: EncodedExtension[] = [
   {
     flags: {
-      required: ['KUBEVIRT'],
+      required: ['KUBEVIRT_DYNAMIC'],
     },
     properties: {
       dataAttributes: {
@@ -31,7 +31,7 @@ export const extensions: EncodedExtension[] = [
   } as EncodedExtension<HrefNavItem>,
   {
     flags: {
-      required: ['KUBEVIRT'],
+      required: ['KUBEVIRT_DYNAMIC'],
     },
     properties: {
       component: {
@@ -43,7 +43,7 @@ export const extensions: EncodedExtension[] = [
   } as EncodedExtension<RoutePage>,
   {
     flags: {
-      required: ['KUBEVIRT'],
+      required: ['KUBEVIRT_DYNAMIC'],
     },
     properties: {
       component: {
@@ -55,7 +55,7 @@ export const extensions: EncodedExtension[] = [
   } as EncodedExtension<RoutePage>,
   {
     flags: {
-      required: ['KUBEVIRT'],
+      required: ['KUBEVIRT_DYNAMIC'],
     },
     properties: {
       component: {
@@ -67,7 +67,7 @@ export const extensions: EncodedExtension[] = [
   } as EncodedExtension<RoutePage>,
   {
     flags: {
-      required: ['KUBEVIRT'],
+      required: ['KUBEVIRT_DYNAMIC'],
     },
     properties: {
       component: {
