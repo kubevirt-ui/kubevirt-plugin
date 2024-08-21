@@ -123,6 +123,12 @@ const config: Configuration = {
           },
         ],
       },
+      {
+        resolve: {
+          fullySpecified: false,
+        },
+        test: /\.m?js/,
+      },
     ],
   },
   optimization: {
