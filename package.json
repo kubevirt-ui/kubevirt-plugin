@@ -58,7 +58,7 @@
     "@patternfly/react-icons": "^4.82.8",
     "@patternfly/react-table": "^4.100.8",
     "@types/byte-size": "^8.1.0",
-    "axios": "^1.6.8",
+    "axios": "^1.7.4",
     "buffer": "^6.0.3",
     "byte-size": "^8.1.0",
     "classnames": "^2.3.1",
