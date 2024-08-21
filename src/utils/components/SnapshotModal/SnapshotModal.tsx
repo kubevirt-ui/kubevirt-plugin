@@ -5,20 +5,19 @@ import {
   V1beta1VirtualMachineSnapshot,
   V1VirtualMachine,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { generateSnapshotName } from '@kubevirt-utils/components/SnapshotModal/utils/utils';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
 import { getVolumeSnapshotStatuses } from '@kubevirt-utils/resources/vm';
-import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 import { Form, FormGroup, TextArea, TextInput } from '@patternfly/react-core';
-
-import { deadlineUnits } from '../../../views/virtualmachines/details/tabs/snapshots/utils/consts';
+import { deadlineUnits } from '@virtualmachines/details/tabs/snapshots/utils/consts';
 import {
   getEmptyVMSnapshotResource,
   getVolumeSnapshotStatusesPartition,
-} from '../../../views/virtualmachines/details/tabs/snapshots/utils/helpers';
-import { printableVMStatus } from '../../../views/virtualmachines/utils';
+} from '@virtualmachines/details/tabs/snapshots/utils/helpers';
+import { printableVMStatus } from '@virtualmachines/utils';
 
 import SupportedVolumesAlert from './alerts/SupportedVolumesAlert';
 import UnsupportedVolumesAlert from './alerts/UnsupportedVolumesAlert';
@@ -33,7 +32,7 @@ type SnapshotModalProps = {
 
 const SnapshotModal: FC<SnapshotModalProps> = ({ isOpen, onClose, vm }) => {
   const { t } = useKubevirtTranslation();
-  const [snapshotName, setSnapshotName] = useState<string>(generatePrettyName('snapshot'));
+  const [snapshotName, setSnapshotName] = useState<string>(generateSnapshotName(vm));
   const [description, setDescription] = useState<string>(undefined);
   const [deadline, setDeadline] = useState<string>(undefined);
   const [deadlineUnit, setDeadlineUnit] = useState<deadlineUnits>(deadlineUnits.Seconds);
