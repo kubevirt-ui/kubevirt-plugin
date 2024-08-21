@@ -119,5 +119,3 @@ export const emptyDataSource: V1beta1DataSource = {
   },
   spec: { source: {} },
 };
-
-export const KUBEVIRT_ISO_LABEL = 'kubevirt.io/iso';

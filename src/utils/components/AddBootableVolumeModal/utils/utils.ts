@@ -13,6 +13,7 @@ import {
   V1beta1StorageSpecVolumeModeEnum,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
+import { KUBEVIRT_ISO_LABEL } from '@kubevirt-utils/resources/bootableresources/constants';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
 import { DATA_SOURCE_CRONJOB_LABEL } from '@kubevirt-utils/resources/template';
@@ -25,7 +26,6 @@ import {
   DROPDOWN_FORM_SELECTION,
   emptySourceDataVolume,
   initialDataImportCron,
-  KUBEVIRT_ISO_LABEL,
 } from './constants';
 
 type createBootableVolumeType = (input: {

@@ -25,7 +25,9 @@ const CreateFromInstanceTypeTitle: FC<CreateFromInstanceTypeTitleProps> = ({
         bodyContent={(hide) => (
           <>
             <Trans ns="plugin__kubevirt-plugin" t={t}>
-              <div>From the Volume table, select DataSources to boot your VirtualMachine.</div>
+              <div>
+                From the Volume table, select a bootable volume to boot your VirtualMachine.
+              </div>
               <div>
                 To add a bootable volume that is not listed, click{' '}
                 <AddBootableVolumeLink

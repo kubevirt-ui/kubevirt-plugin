@@ -7,6 +7,7 @@ import {
   V1VirtualMachine,
   V1Volume,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { InterfaceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 
 import {
@@ -112,7 +113,7 @@ export const useCloudInit = (vm: V1VirtualMachine): UseCloudInitValues => {
         if (!cloudInitDisk) {
           vmDraft.spec.template.spec.domain.devices.disks.push({
             disk: {
-              bus: 'virtio',
+              bus: InterfaceTypes.VIRTIO,
             },
             name: cloudInitDiskName,
           });

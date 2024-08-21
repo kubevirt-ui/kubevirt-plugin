@@ -1,3 +1,5 @@
+import produce from 'immer';
+
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import VirtualMachineInstancetypeModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstancetypeModel';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
@@ -8,11 +10,16 @@ import {
   CloudInitUserData,
   convertUserDataObjectToYAML,
 } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
+import { InterfaceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import { addSecretToVM } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import { sysprepDisk, sysprepVolume } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
 import { ROOTDISK } from '@kubevirt-utils/constants/constants';
 import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
-import { isBootableVolumePVCKind } from '@kubevirt-utils/resources/bootableresources/helpers';
+import {
+  isBootableVolumeISO,
+  isBootableVolumePVCKind,
+} from '@kubevirt-utils/resources/bootableresources/helpers';
+import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { OS_NAME_TYPES, OS_NAME_TYPES_NOT_SUPPORTED } from '@kubevirt-utils/resources/template';
 import {
@@ -98,11 +105,6 @@ export const generateVM = (
   const { sshSecretName } = sshSecretCredentials;
   const virtualmachineName = vmName ?? generatePrettyName();
 
-  const sourcePVC = {
-    name: getName(selectedBootableVolume),
-    namespace: getNamespace(selectedBootableVolume),
-  };
-
   const selectedPreference = getLabel(selectedBootableVolume, DEFAULT_PREFERENCE_LABEL);
   const osLabel = getLabel(selectedBootableVolume, KUBEVIRT_OS);
   const selectPreferenceKind = getLabel(
@@ -112,8 +114,11 @@ export const generateVM = (
   );
   const isDynamic = instanceTypeState?.isDynamicSSHInjection;
   const isSysprep = !isEmpty(sysprepConfigMapData?.name);
+  const isIso = isBootableVolumeISO(selectedBootableVolume);
+  const storageClassName =
+    instanceTypeState.selectedStorageClass || pvcSource?.spec?.storageClassName;
 
-  const emptyVM: V1VirtualMachine = {
+  let emptyVM: V1VirtualMachine = {
     apiVersion: `${VirtualMachineModel.apiGroup}/${VirtualMachineModel.apiVersion}`,
     kind: VirtualMachineModel.kind,
     metadata: {
@@ -127,22 +132,14 @@ export const generateVM = (
             name: `${virtualmachineName}-volume`,
           },
           spec: {
-            ...(isBootableVolumePVCKind(selectedBootableVolume)
-              ? {
-                  source: {
-                    pvc: { ...sourcePVC },
-                  },
-                }
-              : {
-                  sourceRef: {
-                    kind: DataSourceModel.kind,
-                    ...sourcePVC,
-                  },
-                }),
+            sourceRef: {
+              kind: DataSourceModel.kind,
+              name: getName(selectedBootableVolume),
+              namespace: getNamespace(selectedBootableVolume),
+            },
             storage: {
               resources: {},
-              storageClassName:
-                instanceTypeState.selectedStorageClass || pvcSource?.spec?.storageClassName,
+              storageClassName,
             },
           },
         },
@@ -170,8 +167,8 @@ export const generateVM = (
           domain: {
             devices: {
               autoattachPodInterface: false,
+              disks: [],
               interfaces: [DEFAULT_NETWORK_INTERFACE],
-              ...(isSysprep ? { disks: [sysprepDisk()] } : {}),
             },
           },
           networks: [DEFAULT_NETWORK],
@@ -181,34 +178,141 @@ export const generateVM = (
               dataVolume: { name: `${virtualmachineName}-volume` },
               name: ROOTDISK,
             },
-            isSysprep
-              ? sysprepVolume(sysprepConfigMapData?.name)
-              : {
-                  cloudInitNoCloud: {
-                    userData: createPopulatedCloudInitYAML(
-                      selectedPreference,
-                      osLabel,
-                      subscriptionData,
-                      autoUpdateEnabled,
-                    ),
-                  },
-                  name: 'cloudinitdisk',
-                },
+            {
+              cloudInitNoCloud: {
+                userData: createPopulatedCloudInitYAML(
+                  selectedPreference,
+                  osLabel,
+                  subscriptionData,
+                  autoUpdateEnabled,
+                ),
+              },
+              name: 'cloudinitdisk',
+            },
           ],
         },
       },
     },
   };
 
-  if (instanceTypeState.customDiskSize) {
-    emptyVM.spec.dataVolumeTemplates[0].spec.storage.resources = {
-      requests: {
-        storage: instanceTypeState.customDiskSize,
-      },
-    };
+  if (isBootableVolumePVCKind(selectedBootableVolume)) {
+    emptyVM = addPVCAsSourceDiskToVM(emptyVM, selectedBootableVolume);
+  }
+  if (isIso) {
+    emptyVM = addISOFlowToVM(emptyVM, storageClassName);
   }
 
-  return sshSecretName ? addSecretToVM(emptyVM, sshSecretName, isDynamic) : emptyVM;
+  if (isSysprep) {
+    emptyVM = addSysprepOrCloudInitToVM(emptyVM, sysprepConfigMapData.name);
+  }
+
+  if (instanceTypeState.customDiskSize) {
+    emptyVM = addSizeToROOTDISKVM(emptyVM, instanceTypeState.customDiskSize);
+  }
+
+  if (sshSecretName) {
+    emptyVM = addSecretToVM(emptyVM, sshSecretName, isDynamic);
+  }
+
+  return emptyVM;
+};
+
+export const addISOFlowToVM = (vm: V1VirtualMachine, storageClassName: string) => {
+  return produce(vm, (vmDraft) => {
+    vmDraft.spec.dataVolumeTemplates.push({
+      metadata: {
+        name: `${vmDraft.metadata.name}-volume-blank`,
+      },
+      spec: {
+        source: {
+          blank: {},
+        },
+        storage: {
+          resources: { requests: { storage: '30Gi' } },
+          storageClassName,
+        },
+      },
+    });
+
+    const disks = vmDraft.spec.template.spec.domain.devices.disks;
+
+    if (!disks) vmDraft.spec.template.spec.domain.devices.disks = [];
+
+    vmDraft.spec.template.spec.domain.devices.disks = disks.concat([
+      {
+        bootOrder: 2,
+        cdrom: {
+          bus: InterfaceTypes.SATA,
+        },
+        name: `${vmDraft.metadata.name}-cdrom-iso`,
+      },
+      {
+        bootOrder: 1,
+        disk: {
+          bus: InterfaceTypes.SATA,
+        },
+        name: ROOTDISK,
+      },
+    ]);
+
+    const volumes = vmDraft.spec.template.spec.volumes;
+    const volumeRootDisk = volumes.find((volume) => volume.name === ROOTDISK);
+    volumeRootDisk.name = `${vmDraft.metadata.name}-cdrom-iso`;
+
+    vmDraft.spec.template.spec.volumes.push({
+      dataVolume: { name: `${vmDraft.metadata.name}-volume-blank` },
+      name: ROOTDISK,
+    });
+
+    vmDraft.spec.template.spec.domain.firmware = {
+      bootloader: { bios: {} },
+    };
+  });
+};
+
+export const addSizeToROOTDISKVM = (vm: V1VirtualMachine, storage: string) => {
+  return produce(vm, (vmDraft) => {
+    const rootDisk = vmDraft.spec.dataVolumeTemplates.find((dv) => dv.metadata.name === ROOTDISK);
+    rootDisk.spec.storage.resources = {
+      requests: {
+        storage,
+      },
+    };
+  });
+};
+
+export const addSysprepOrCloudInitToVM = (vm: V1VirtualMachine, sysprepName: string) => {
+  return produce(vm, (vmDraft) => {
+    vmDraft.spec.template.spec.domain.devices.disks.push(sysprepDisk());
+    const volumesWithoutCloudInit = vmDraft.spec.template.spec.volumes.filter(
+      (volume) => volume.name !== 'cloudinitdisk',
+    );
+    vmDraft.spec.template.spec.volumes = volumesWithoutCloudInit.concat([
+      sysprepVolume(sysprepName),
+    ]);
+  });
+};
+
+export const addPVCAsSourceDiskToVM = (
+  vm: V1VirtualMachine,
+  selectedBootableVolume: BootableVolume,
+) => {
+  return produce(vm, (vmDraft) => {
+    const rootDiskIndex = vmDraft.spec.dataVolumeTemplates.findIndex(
+      (dv) => dv.metadata.name === ROOTDISK,
+    );
+    const sourcePVC = {
+      name: getName(selectedBootableVolume),
+      namespace: getNamespace(selectedBootableVolume),
+    };
+
+    vmDraft.spec.dataVolumeTemplates[rootDiskIndex].spec = {
+      source: {
+        pvc: { ...sourcePVC },
+      },
+      ...vmDraft.spec.dataVolumeTemplates[rootDiskIndex].spec.storage,
+    };
+  });
 };
 
 export const groupVersionKindFromCommonResource = (
