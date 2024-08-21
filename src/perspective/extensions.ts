@@ -183,7 +183,7 @@ const virtualizationSection = [
   } as EncodedExtension<ResourceClusterNavItem>,
   {
     flags: {
-      required: ['KUBEVIRT'],
+      required: ['KUBEVIRT_DYNAMIC'],
     },
     properties: {
       dataAttributes: {

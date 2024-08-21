@@ -295,7 +295,7 @@ const extensions: EncodedExtension[] = [
   },
   {
     flags: {
-      required: ['KUBEVIRT'],
+      required: ['KUBEVIRT_DYNAMIC'],
     },
     properties: {
       model: {
@@ -312,7 +312,7 @@ const extensions: EncodedExtension[] = [
   },
   {
     flags: {
-      required: ['KUBEVIRT'],
+      required: ['KUBEVIRT_DYNAMIC'],
     },
     properties: {
       model: {
@@ -329,7 +329,7 @@ const extensions: EncodedExtension[] = [
   },
   {
     flags: {
-      required: ['KUBEVIRT'],
+      required: ['KUBEVIRT_DYNAMIC'],
     },
     properties: {
       model: {
@@ -346,7 +346,7 @@ const extensions: EncodedExtension[] = [
   },
   {
     flags: {
-      required: ['KUBEVIRT'],
+      required: ['KUBEVIRT_DYNAMIC'],
     },
     properties: {
       model: {
@@ -363,7 +363,7 @@ const extensions: EncodedExtension[] = [
   },
   {
     flags: {
-      required: ['KUBEVIRT'],
+      required: ['KUBEVIRT_DYNAMIC'],
     },
     properties: {
       model: {
@@ -380,7 +380,7 @@ const extensions: EncodedExtension[] = [
   },
   {
     flags: {
-      required: ['KUBEVIRT'],
+      required: ['KUBEVIRT_DYNAMIC'],
     },
     properties: {
       model: {
@@ -397,7 +397,7 @@ const extensions: EncodedExtension[] = [
   },
   {
     flags: {
-      required: ['KUBEVIRT'],
+      required: ['KUBEVIRT_DYNAMIC'],
     },
     properties: {
       model: {

@@ -19,7 +19,7 @@ export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
 export const extensions: EncodedExtension[] = [
   {
     flags: {
-      required: ['KUBEVIRT'],
+      required: ['KUBEVIRT_DYNAMIC'],
     },
     properties: {
       component: { $codeRef: 'LogsStandAlone' },

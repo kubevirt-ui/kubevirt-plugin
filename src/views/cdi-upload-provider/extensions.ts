@@ -24,7 +24,7 @@ export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
 export const extensions: EncodedExtension[] = [
   {
     flags: {
-      required: ['KUBEVIRT'],
+      required: ['KUBEVIRT_DYNAMIC'],
     },
     properties: {
       component: {
@@ -37,7 +37,7 @@ export const extensions: EncodedExtension[] = [
   } as EncodedExtension<RoutePage>,
   {
     flags: {
-      required: ['KUBEVIRT'],
+      required: ['KUBEVIRT_DYNAMIC'],
     },
     properties: {
       provider: { $codeRef: 'contextProvider.CDIUploadProvider' },
@@ -48,7 +48,7 @@ export const extensions: EncodedExtension[] = [
 
   {
     flags: {
-      required: ['KUBEVIRT'],
+      required: ['KUBEVIRT_DYNAMIC'],
     },
     properties: {
       label: '%plugin__kubevirt-plugin~With Data upload form%',
@@ -58,7 +58,7 @@ export const extensions: EncodedExtension[] = [
   } as EncodedExtension<PVCCreateProp>,
   {
     flags: {
-      required: ['KUBEVIRT'],
+      required: ['KUBEVIRT_DYNAMIC'],
     },
     properties: {
       alert: { $codeRef: 'pvcAlert' },
@@ -67,7 +67,7 @@ export const extensions: EncodedExtension[] = [
   } as EncodedExtension<PVCAlert>,
   {
     flags: {
-      required: ['KUBEVIRT'],
+      required: ['KUBEVIRT_DYNAMIC'],
     },
     properties: {
       predicate: { $codeRef: 'pvcSelectors.isPvcUploading' },
@@ -78,7 +78,7 @@ export const extensions: EncodedExtension[] = [
   } as EncodedExtension<PVCStatus>,
   {
     flags: {
-      required: ['KUBEVIRT'],
+      required: ['KUBEVIRT_DYNAMIC'],
     },
     properties: {
       predicate: { $codeRef: 'pvcSelectors.isPvcCloning' },
