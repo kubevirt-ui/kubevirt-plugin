@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
@@ -36,6 +36,9 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
+  const [distance, setDistance] = useState(0);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const toggleRef = useRef<HTMLDivElement>(null);
   const {
     instanceTypeVMState: { selectedInstanceType },
   } = useInstanceTypeVMStore();
@@ -64,6 +67,23 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({
     });
   }, [selectedInstanceType, seriesName, sizes, t]);
 
+  useEffect(() => {
+    const calculateDistance = () => {
+      if (cardRef.current && toggleRef.current) {
+        const cardRect = cardRef.current.getBoundingClientRect();
+        const toggleRect = toggleRef.current.getBoundingClientRect();
+        setDistance(toggleRect.bottom - cardRect.bottom + 4);
+      }
+    };
+
+    calculateDistance();
+    window.addEventListener('resize', calculateDistance);
+
+    return () => {
+      window.removeEventListener('resize', calculateDistance);
+    };
+  }, [cardRef.current, toggleRef.current]);
+
   const card = (
     <Card className="instance-type-series-menu-card__toggle-card">
       <div className="instance-type-series-menu-card__card-icon">{Icon && <Icon />}</div>
@@ -71,7 +91,7 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({
         <div className="instance-type-series-menu-card__card-title">
           {classDisplayNameAnnotation}
         </div>
-        <div className="instance-type-series-menu-card__card-toggle-text">
+        <div className="instance-type-series-menu-card__card-toggle-text" ref={toggleRef}>
           {seriesLabel || classAnnotation} <AngleDownIcon />
         </div>
         <div className="instance-type-series-menu-card__card-footer">
@@ -104,12 +124,14 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({
           )}
           isExpanded={isMenuExpanded}
           onClick={(event) => onMenuToggle(event, seriesName)}
+          ref={cardRef}
           variant="plain"
         >
           {!isMenuExpanded ? <Tooltip content={descriptionAnnotation}>{card}</Tooltip> : card}
         </MenuToggle>
       }
       direction="down"
+      distance={distance}
       isVisible={isMenuExpanded}
     />
   );

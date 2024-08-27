@@ -47,4 +47,14 @@
   &__page-loader {
     height: 50vh;
   }
+
+  .pf-v5-c-table__tr.pf-m-clickable.pf-m-selected > td {
+    font-weight: var(--pf-v5-global--FontWeight--bold);
+  }
+
+  .pf-v5-c-table__tr.pf-m-clickable.pf-m-selected
+    .pf-v5-c-table__td.pf-v5-c-table__favorite::after {
+    border-inline-start: calc(var(--pf-global--BorderWidth--xl) * 2) solid
+      var(--pf-v5-c-table__expandable-row--after--BorderColor);
+  }
 }
