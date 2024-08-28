@@ -1,8 +1,8 @@
-import React, { MouseEvent, ReactEventHandler, useState } from 'react';
+import React, { MouseEvent, ReactEventHandler } from 'react';
 
-import DropdownToggle from '@kubevirt-utils/components/toggles/DropdownToggle';
+import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Dropdown, DropdownItem, DropdownList, NumberInput } from '@patternfly/react-core';
+import { NumberInput, SelectOption, Split } from '@patternfly/react-core';
 
 import { dropdownUnits } from '../utils/consts';
 
@@ -13,7 +13,6 @@ const UploadPVCFormSize = ({
   setRequestSizeValue,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const handleRequestSizeInputChange = (obj: { unit: string; value: number }) => {
     setRequestSizeValue(obj?.value);
@@ -34,7 +33,6 @@ const UploadPVCFormSize = ({
   };
 
   const onUnitChange = (event: MouseEvent<HTMLInputElement>, value: string) => {
-    setIsOpen((open) => !open);
     handleRequestSizeInputChange({
       unit: value,
       value: requestSizeValue,
@@ -46,13 +44,13 @@ const UploadPVCFormSize = ({
       <label className="control-label co-required" htmlFor="request-size-input">
         {t('Size')}
       </label>
-      <div className="pf-c-input-group">
+      <Split hasGutter>
         <div className="co-m-number-spinner">
           <NumberInput
-            id={'request-size-input'}
+            id="request-size-input"
             min={1}
             minusBtnAriaLabel={t('Decrement')}
-            name={`requestSizeValue`}
+            name="requestSizeValue"
             onChange={onValueChange}
             onMinus={() => changeValueBy(-1)}
             onPlus={() => changeValueBy(1)}
@@ -61,24 +59,18 @@ const UploadPVCFormSize = ({
             value={requestSizeValue}
           />
         </div>
-        <Dropdown
-          toggle={DropdownToggle({
-            id: 'pf-c-console__actions-vnc-toggle-id',
-            onClick: () => setIsOpen((prevIsOpen) => !prevIsOpen),
-          })}
-          className="request-size-input__unit"
-          isOpen={isOpen}
-          onOpenChange={(open: boolean) => setIsOpen(open)}
+        <FormPFSelect
           onSelect={onUnitChange}
+          selected={requestSizeUnit}
+          selectedLabel={dropdownUnits[requestSizeUnit]}
         >
-          <DropdownList>
-            {Object.values(dropdownUnits)?.map((unit) => (
-              <DropdownItem key={unit}>{unit}</DropdownItem>
-            ))}
-          </DropdownList>
-        </Dropdown>
-      </div>
-
+          {Object.entries(dropdownUnits)?.map(([value, label]) => (
+            <SelectOption key={value} value={value}>
+              {label}
+            </SelectOption>
+          ))}
+        </FormPFSelect>
+      </Split>
       <p className="help-block" id="request-size-help">
         {t(
           'Ensure your PVC size covers the requirements of the uncompressed image and any other space requirements.',
