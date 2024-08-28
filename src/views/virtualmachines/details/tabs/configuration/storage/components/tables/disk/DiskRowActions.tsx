@@ -18,7 +18,7 @@ import DeleteDiskModal from '../../modal/DeleteDiskModal';
 import DetachModal from '../../modal/DetachModal';
 import MakePersistentModal from '../../modal/MakePersistentModal';
 
-import { isHotplugVolume, isPVCSource, isPVCStatusBound } from './utils/helpers';
+import { isHotplugVolume } from './utils/helpers';
 
 type DiskRowActionsProps = {
   customize?: boolean;
@@ -40,8 +40,6 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const diskName = obj?.name;
-  const pvcResourceExists = isPVCSource(obj);
-  const isPVCBound = isPVCStatusBound(obj);
 
   const isVMRunning = isRunning(vm);
   const isHotplug = isHotplugVolume(vm, diskName, vmi);
@@ -103,7 +101,13 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
           submitBtnVariant={ButtonVariant.danger}
         />
       ) : (
-        <DeleteDiskModal isOpen={isOpen} onClose={onClose} vm={vm} volume={volume} />
+        <DeleteDiskModal
+          isHotPluginVolume={isHotplug}
+          isOpen={isOpen}
+          onClose={onClose}
+          vm={vm}
+          volume={volume}
+        />
       ),
     );
   const makePersistent = () =>
@@ -135,16 +139,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
         >
           {editBtnText}
         </DropdownItem>
-        <DropdownItem
-          description={
-            !isHotplug && isVMRunning
-              ? t('Can detach only hotplug volumes while VirtualMachine is Running')
-              : null
-          }
-          isDisabled={(!isHotplug && isVMRunning) || (pvcResourceExists && !isPVCBound)}
-          key="disk-delete"
-          onClick={() => onModalOpen(createDeleteDiskModal)}
-        >
+        <DropdownItem key="disk-delete" onClick={() => onModalOpen(createDeleteDiskModal)}>
           {deleteBtnText}
         </DropdownItem>
         {isHotplug && (
