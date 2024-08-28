@@ -11,14 +11,20 @@ import { GridItem, NumberInput, Text } from '@patternfly/react-core';
 type CPUComponentInputProps = {
   cpu: V1CPU;
   cpuComponent: CPUComponent;
+  isDisabled: boolean;
   setCPU: Dispatch<SetStateAction<V1CPU>>;
 };
 
-const CPUComponentInput: FC<CPUComponentInputProps> = ({ cpu, cpuComponent, setCPU }) => {
+const CPUComponentInput: FC<CPUComponentInputProps> = ({
+  cpu,
+  cpuComponent,
+  isDisabled,
+  setCPU,
+}) => {
   return (
     <>
       <GridItem span={3}>
-        <Text>{getCPUComponentTitle(cpuComponent)}</Text>
+        <Text disabled={isDisabled}>{getCPUComponentTitle(cpuComponent)}</Text>
       </GridItem>
       <GridItem span={9}>
         <NumberInput
@@ -27,6 +33,7 @@ const CPUComponentInput: FC<CPUComponentInputProps> = ({ cpu, cpuComponent, setC
             setCPU(getUpdatedCPU(cpu, newNumber, cpuComponent));
           }}
           inputName="cpu-sockets-input"
+          isDisabled={isDisabled}
           min={1}
           onMinus={() => setCPU(getUpdatedCPU(cpu, +cpu?.[cpuComponent] - 1, cpuComponent))}
           onPlus={() => setCPU(getUpdatedCPU(cpu, +cpu?.[cpuComponent] + 1, cpuComponent))}
