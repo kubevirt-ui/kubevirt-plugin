@@ -40,8 +40,9 @@
 }
 
 .selected {
-  border-bottom-color: var(--pf-global--link--Color);
-  border-bottom-width: var(--pf-global--BorderWidth--lg);
+  font-weight: var(--pf-v5-global--FontWeight--bold);
+  box-shadow: var(--pf-global--BoxShadow--md);
+  border-bottom: calc(var(--pf-global--BorderWidth--xl) * 2) solid var(--pf-global--link--Color);
 }
 
 @media screen and (min-width: 1200px) and (max-width: 1440px) {
