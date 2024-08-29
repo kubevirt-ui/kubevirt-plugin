@@ -15,18 +15,8 @@ const virtualizationSection = [
   {
     properties: {
       dataAttributes: {
-        'data-quickstart-id': 'qs-nav-sec-virtualization',
-        'data-test-id': 'virtualization-nav-item',
-      },
-      id: 'virtualization-virt-perspective',
-      name: '%plugin__kubevirt-plugin~Virtualization%',
-      perspective: 'virtualization-perspective',
-    },
-    type: 'console.navigation/section',
-  } as EncodedExtension<NavSection>,
-  {
-    properties: {
-      dataAttributes: {
+        'data-border': 'no-border',
+        'data-class': 'kv-plugin-virt-perspective-element',
         'data-quickstart-id': 'qs-nav-virtualization-catalog',
         'data-test-id': 'virtualization-catalog-nav-item',
       },
@@ -36,13 +26,14 @@ const virtualizationSection = [
       name: '%plugin__kubevirt-plugin~Catalog%',
       perspective: 'virtualization-perspective',
       prefixNamespaced: true,
-      section: 'virtualization-virt-perspective',
     },
     type: 'console.navigation/href',
   } as EncodedExtension<HrefNavItem>,
   {
     properties: {
       dataAttributes: {
+        'data-border': 'no-border',
+        'data-class': 'kv-plugin-virt-perspective-element',
         'data-quickstart-id': 'qs-nav-virtualmachines',
         'data-test-id': 'virtualmachines-nav-item',
       },
@@ -54,13 +45,14 @@ const virtualizationSection = [
       },
       name: '%plugin__kubevirt-plugin~VirtualMachines%',
       perspective: 'virtualization-perspective',
-      section: 'virtualization-virt-perspective',
     },
     type: 'console.navigation/resource-ns',
   },
   {
     properties: {
       dataAttributes: {
+        'data-border': 'no-border',
+        'data-class': 'kv-plugin-virt-perspective-element',
         'data-quickstart-id': 'qs-nav-templates',
         'data-test-id': 'templates-nav-item',
       },
@@ -72,7 +64,6 @@ const virtualizationSection = [
       },
       name: '%plugin__kubevirt-plugin~Templates%',
       perspective: 'virtualization-perspective',
-      section: 'virtualization-virt-perspective',
     },
     type: 'console.navigation/resource-ns',
   },
@@ -82,6 +73,8 @@ const virtualizationSection = [
     },
     properties: {
       dataAttributes: {
+        'data-border': 'no-border',
+        'data-class': 'kv-plugin-virt-perspective-element',
         'data-quickstart-id': 'qs-nav-virtualmachineclusterinstancetypes',
         'data-test-id': 'virtualmachineclusterinstancetypes-nav-item',
       },
@@ -93,7 +86,6 @@ const virtualizationSection = [
       },
       name: '%plugin__kubevirt-plugin~InstanceTypes%',
       perspective: 'virtualization-perspective',
-      section: 'virtualization-virt-perspective',
     },
     type: 'console.navigation/resource-cluster',
   } as EncodedExtension<ResourceClusterNavItem>,
@@ -103,6 +95,8 @@ const virtualizationSection = [
     },
     properties: {
       dataAttributes: {
+        'data-border': 'no-border',
+        'data-class': 'kv-plugin-virt-perspective-element',
         'data-quickstart-id': 'qs-nav-virtualmachineclusterpreferences',
         'data-test-id': 'virtualmachineclusterpreferences-nav-item',
       },
@@ -114,7 +108,6 @@ const virtualizationSection = [
       },
       name: '%plugin__kubevirt-plugin~Preferences%',
       perspective: 'virtualization-perspective',
-      section: 'virtualization-virt-perspective',
     },
     type: 'console.navigation/resource-cluster',
   } as EncodedExtension<ResourceClusterNavItem>,
@@ -124,6 +117,8 @@ const virtualizationSection = [
     },
     properties: {
       dataAttributes: {
+        'data-border': 'no-border',
+        'data-class': 'kv-plugin-virt-perspective-element',
         'data-quickstart-id': 'qs-nav-virtualization-overview',
         'data-test-id': 'virtualization-overview-nav-item',
       },
@@ -133,39 +128,40 @@ const virtualizationSection = [
       name: '%plugin__kubevirt-plugin~Overview%',
       perspective: 'virtualization-perspective',
       prefixNamespaced: true,
-      section: 'virtualization-virt-perspective',
     },
     type: 'console.navigation/href',
   } as EncodedExtension<HrefNavItem>,
   {
     properties: {
       id: 'VirtualizationSeparator-virt-perspective',
-      insertAfter: 'virtualmachineclusterpreferences-virt-perspective',
-      insertBefore: 'virtualization-bootablevolumes-virt-perspective',
+      insertAfter: 'virtualization-bootablevolumes-virt-perspective',
       perspective: 'virtualization-perspective',
-      section: 'virtualization-virt-perspective',
       testID: 'VirtualizationSeparator',
     },
     type: 'console.navigation/separator',
-  },
+  } as EncodedExtension<Separator>,
   {
     properties: {
       dataAttributes: {
+        'data-border': 'no-border',
+        'data-class': 'kv-plugin-virt-perspective-element',
         'data-quickstart-id': 'qs-nav-bootablevolumes',
         'data-test-id': '-bootablevolumes-nav-item',
       },
       href: 'bootablevolumes',
       id: 'virtualization-bootablevolumes-virt-perspective',
+      insertAfter: 'virtualmachines-virt-perspective',
       name: '%plugin__kubevirt-plugin~Bootable volumes%',
       perspective: 'virtualization-perspective',
       prefixNamespaced: true,
-      section: 'virtualization-virt-perspective',
     },
     type: 'console.navigation/href',
   } as EncodedExtension<HrefNavItem>,
   {
     properties: {
       dataAttributes: {
+        'data-border': 'no-border',
+        'data-class': 'kv-plugin-virt-perspective-element',
         'data-quickstart-id': 'qs-nav-migrationpolicies',
         'data-test-id': 'migrationpolicies-nav-item',
       },
@@ -177,7 +173,6 @@ const virtualizationSection = [
       },
       name: '%plugin__kubevirt-plugin~MigrationPolicies%',
       perspective: 'virtualization-perspective',
-      section: 'virtualization-virt-perspective',
     },
     type: 'console.navigation/resource-cluster',
   } as EncodedExtension<ResourceClusterNavItem>,
@@ -187,6 +182,7 @@ const virtualizationSection = [
     },
     properties: {
       dataAttributes: {
+        'data-class': 'kv-plugin-virt-perspective-element',
         'data-quickstart-id': 'qs-nav-virtualization-checkups',
         'data-test-id': 'virtualization-checkups-nav-item',
       },
@@ -196,7 +192,6 @@ const virtualizationSection = [
       name: '%plugin__kubevirt-plugin~Checkups%',
       perspective: 'virtualization-perspective',
       prefixNamespaced: true,
-      section: 'virtualization-virt-perspective',
     },
     type: 'console.navigation/href',
   } as EncodedExtension<HrefNavItem>,
@@ -624,6 +619,19 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.perspective',
   },
+  {
+    properties: {
+      dataAttributes: {
+        'data-quickstart-id': 'qs-nav-cluster-overview',
+        'data-test-id': 'cluster-overview-nav-item',
+      },
+      href: 'dashboards',
+      id: 'overview-virt-perspective',
+      name: '%plugin__kubevirt-plugin~Cluster Overview%',
+      perspective: 'virtualization-perspective',
+    },
+    type: 'console.navigation/href',
+  } as EncodedExtension<HrefNavItem>,
   ...virtualizationSection,
   ...networkingSection,
   ...storageSection,

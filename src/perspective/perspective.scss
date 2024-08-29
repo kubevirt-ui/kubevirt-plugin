@@ -1,0 +1,17 @@
+.pf-v5-c-page__sidebar .pf-v5-c-nav {
+  // navbar items with no border
+  a.pf-v5-c-nav__link[data-class='kv-plugin-virt-perspective-element'] {
+    padding-top: var(--pf-global--spacer--sm);
+    padding-bottom: var(--pf-global--spacer--sm);
+
+    &[data-border='no-border']::before {
+      border: none;
+    }
+  }
+
+  // first level divider with some padding
+  .oc-perspective-nav > li.pf-v5-c-nav__item + .pf-v5-c-divider {
+    padding-inline-start: var(--pf-global--spacer--md);
+    padding-inline-end: var(--pf-global--spacer--3xl);
+  }
+}
