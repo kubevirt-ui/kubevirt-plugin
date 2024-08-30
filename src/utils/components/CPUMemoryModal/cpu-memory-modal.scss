@@ -4,6 +4,7 @@
   }
   .inputs {
     display: flex;
+    justify-content: space-between;
     margin-top: var(--pf-v5-global--spacer--xl);
     margin-bottom: var(--pf-v5-global--spacer--lg);
     .input-memory {

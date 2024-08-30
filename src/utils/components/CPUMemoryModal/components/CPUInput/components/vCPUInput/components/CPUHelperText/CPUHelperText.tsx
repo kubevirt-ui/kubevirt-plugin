@@ -16,7 +16,7 @@ const CPUHelperText: FC<CPUHelperTextProps> = ({ hide, sockets }) => {
 
   return (
     <div id="cpu-helper-text">
-      {t('Final topology is {{sockets}} socket, 1 core, 1 thread', { sockets: sockets })}
+      {t('Topology will be set to {{sockets}} socket, 1 core, 1 thread', { sockets: sockets })}
     </div>
   );
 };

@@ -19,7 +19,7 @@ const CPUTopologyHelperText: FC<CPUTopologyHelperTextProps> = ({ cpu }) => {
 
   return (
     <div className="cpu-topology-helper-text">
-      {t('Total CPU is {{totalCPU}}', { totalCPU: totalCPU })}
+      {t('Total vCPU is {{totalCPU}}', { totalCPU: totalCPU })}
       <Popover
         bodyContent={<>{t('CPUs = sockets x threads x cores.')}</>}
         hasAutoWidth
