@@ -1,5 +1,4 @@
 import React, { FC, useMemo, useState } from 'react';
-import { printableVMStatus } from 'src/views/virtualmachines/utils';
 
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import { V1VirtualMachine, V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -21,13 +20,20 @@ import { updateDisks } from '../../../details/utils/utils';
 import useVolumeOwnedResource from './hooks/useVolumeOwnedResource';
 
 type DeleteDiskModalProps = {
+  isHotPluginVolume: boolean;
   isOpen: boolean;
   onClose: () => void;
   vm: V1VirtualMachine;
   volume: V1Volume;
 };
 
-const DeleteDiskModal: FC<DeleteDiskModalProps> = ({ isOpen, onClose, vm, volume }) => {
+const DeleteDiskModal: FC<DeleteDiskModalProps> = ({
+  isHotPluginVolume,
+  isOpen,
+  onClose,
+  vm,
+  volume,
+}) => {
   const { t } = useKubevirtTranslation();
   const [deleteOwnedResource, setDeleteOwnedResource] = useState(false);
 
@@ -57,10 +63,9 @@ const DeleteDiskModal: FC<DeleteDiskModalProps> = ({ isOpen, onClose, vm, volume
   }, [vm, diskName, volumeResourceName]);
 
   const onSubmit = (updatedVM: V1VirtualMachine) => {
-    const deletePromise =
-      vm?.status?.printableStatus === printableVMStatus.Running
-        ? getRemoveHotplugPromise(vm, diskName)
-        : updateDisks(updatedVM);
+    const deletePromise = isHotPluginVolume
+      ? getRemoveHotplugPromise(vm, diskName)
+      : updateDisks(updatedVM);
 
     return deletePromise.then(() => {
       if (volumeResource) {
