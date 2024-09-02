@@ -1,6 +1,10 @@
 import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1beta1VirtualMachineClusterInstancetype,
+  V1beta1VirtualMachineInstancetype,
+  V1VirtualMachine,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { WORKLOADS } from '@kubevirt-utils/resources/template';
 import {
@@ -182,6 +186,22 @@ export const updatedVirtualMachine = (updatedVM: V1VirtualMachine) =>
         op: 'replace',
         path: `/spec/template/spec/domain/memory/guest`,
         value: getMemory(updatedVM),
+      },
+    ],
+    model: VirtualMachineModel,
+    resource: updatedVM,
+  });
+
+export const updatedInstanceType = (
+  updatedVM: V1VirtualMachine,
+  instanceType: V1beta1VirtualMachineClusterInstancetype | V1beta1VirtualMachineInstancetype,
+) =>
+  k8sPatch({
+    data: [
+      {
+        op: 'replace',
+        path: `/spec/instancetype`,
+        value: { kind: instanceType.kind, name: instanceType.metadata.name },
       },
     ],
     model: VirtualMachineModel,

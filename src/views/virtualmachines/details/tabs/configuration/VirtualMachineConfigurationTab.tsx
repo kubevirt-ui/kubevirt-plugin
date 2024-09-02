@@ -2,6 +2,7 @@ import React, { FC, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 import { useLocation } from 'react-router-dom-v5-compat';
 
+import useInstanceTypesAndPreferences from '@catalog/CreateFromInstanceTypes/state/hooks/useInstanceTypesAndPreferences';
 import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
 import {
   runningTourSignal,
@@ -27,6 +28,7 @@ const VirtualMachineConfigurationTab: FC<NavPageComponentProps> = ({ obj }) => {
 
   const vm = runningTourSignal.value ? tourGuideVM : obj;
   const { vmi } = useVMI(getName(vm), getNamespace(vm));
+  const { allInstanceTypes } = useInstanceTypesAndPreferences();
   const [instanceTypeVM] = useInstanceTypeExpandSpec(vm);
   const [activeTabKey, setActiveTabKey] = useState<number | string>(
     VirtualMachineDetailsTab.Details,
@@ -63,7 +65,12 @@ const VirtualMachineConfigurationTab: FC<NavPageComponentProps> = ({ obj }) => {
               title={<TabTitleText>{title}</TabTitleText>}
             >
               {activeTabKey === name && (
-                <Component instanceTypeVM={instanceTypeVM} vm={vm} vmi={vmi} />
+                <Component
+                  allInstanceTypes={allInstanceTypes}
+                  instanceTypeVM={instanceTypeVM}
+                  vm={vm}
+                  vmi={vmi}
+                />
               )}
             </Tab>
           ))}

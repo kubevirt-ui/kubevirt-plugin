@@ -1,17 +1,15 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import {
-  V1Devices,
-  V1VirtualMachine,
-  V1VirtualMachineInstance,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { INSTANCETYPE_CLASS_DISPLAY_NAME } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/constants';
 import CPUDescription from '@kubevirt-utils/components/CPUDescription/CPUDescription';
 import CPUMemory from '@kubevirt-utils/components/CPUMemory/CPUMemory';
 import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CPUMemoryModal';
 import { DescriptionModal } from '@kubevirt-utils/components/DescriptionModal/DescriptionModal';
 import HeadlessMode from '@kubevirt-utils/components/HeadlessMode/HeadlessMode';
 import HostnameModal from '@kubevirt-utils/components/HostnameModal/HostnameModal';
+import InstanceTypeModal from '@kubevirt-utils/components/InstanceTypeModal/InstanceTypeModal';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
@@ -29,14 +27,18 @@ import {
   getInstanceTypeMatcher,
   getWorkload,
 } from '@kubevirt-utils/resources/vm';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, Grid, GridItem, Switch, Title } from '@patternfly/react-core';
+
+import { InstanceTypeUnion } from '../utils/types';
 
 import DetailsSectionBoot from './components/DetailsSectionBoot';
 import DetailsSectionHardware from './components/DetailsSectionHardware';
 import {
   updateDescription,
   updatedHostname,
+  updatedInstanceType,
   updatedVirtualMachine,
   updateGuestSystemAccessLog,
   updateHeadlessMode,
@@ -46,12 +48,13 @@ import {
 import './details-section.scss';
 
 type DetailsSectionProps = {
+  allInstanceTypes: InstanceTypeUnion[];
   instanceTypeVM: V1VirtualMachine;
   vm: V1VirtualMachine;
   vmi: V1VirtualMachineInstance;
 };
 
-const DetailsSection: FC<DetailsSectionProps> = ({ instanceTypeVM, vm, vmi }) => {
+const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTypeVM, vm, vmi }) => {
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
   const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
@@ -60,11 +63,12 @@ const DetailsSection: FC<DetailsSectionProps> = ({ instanceTypeVM, vm, vmi }) =>
     DISABLED_GUEST_SYSTEM_LOGS_ACCESS,
   );
 
-  const logSerialConsole = (
-    vm?.spec?.template?.spec?.domain?.devices as V1Devices & { logSerialConsole: boolean }
-  )?.logSerialConsole;
+  const logSerialConsole = vm?.spec?.template?.spec?.domain?.devices?.logSerialConsole;
   const [isCheckedGuestSystemAccessLog, setIsCheckedGuestSystemAccessLog] = useState<boolean>();
-
+  const instanceType = useMemo(
+    () => allInstanceTypes.find((it) => it.metadata.name === vm?.spec?.instancetype?.name),
+    [allInstanceTypes, vm?.spec?.instancetype?.name],
+  );
   useEffect(
     () =>
       setIsCheckedGuestSystemAccessLog(
@@ -75,6 +79,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ instanceTypeVM, vm, vmi }) =>
 
   const vmWorkload = getWorkload(vm);
   const vmName = getName(vm);
+  const isInstanceType = !isEmpty(vm?.spec?.instancetype);
 
   if (!vm) {
     return <Loading />;
@@ -133,24 +138,38 @@ const DetailsSection: FC<DetailsSectionProps> = ({ instanceTypeVM, vm, vmi }) =>
               />
             )}
             <VirtualMachineDescriptionItem
-              messageOnDisabled={t(
-                'CPU and Memory can not be edited if the VirtualMachine is created from InstanceType',
-              )}
-              onEditClick={() =>
-                createModal(({ isOpen, onClose }) => (
-                  <CPUMemoryModal
-                    isOpen={isOpen}
-                    onClose={onClose}
-                    onSubmit={updatedVirtualMachine}
-                    vm={vm}
-                  />
-                ))
+              descriptionHeader={
+                <SearchItem id="cpu-memory">
+                  {isInstanceType ? t('InstanceType') : t('CPU | Memory')}
+                </SearchItem>
               }
-              bodyContent={vm?.spec?.instancetype ? null : <CPUDescription cpu={getCPU(vm)} />}
+              onEditClick={() =>
+                createModal(({ isOpen, onClose }) => {
+                  return isInstanceType ? (
+                    <InstanceTypeModal
+                      allInstanceTypes={allInstanceTypes}
+                      instanceType={instanceType}
+                      instanceTypeVM={instanceTypeVM}
+                      isOpen={isOpen}
+                      onClose={onClose}
+                      onSubmit={updatedInstanceType}
+                    />
+                  ) : (
+                    <CPUMemoryModal
+                      isOpen={isOpen}
+                      onClose={onClose}
+                      onSubmit={updatedVirtualMachine}
+                      vm={vm}
+                    />
+                  );
+                })
+              }
+              subTitle={
+                instanceType && getAnnotation(instanceType, INSTANCETYPE_CLASS_DISPLAY_NAME)
+              }
+              bodyContent={isInstanceType ? null : <CPUDescription cpu={getCPU(vm)} />}
               data-test-id={`${vmName}-cpu-memory`}
               descriptionData={<CPUMemory vm={instanceTypeVM || vm} vmi={vmi} />}
-              descriptionHeader={<SearchItem id="cpu-memory">{t('CPU | Memory')}</SearchItem>}
-              isDisabled={!!vm?.spec?.instancetype}
               isEdit={canUpdateVM}
               isPopover
             />

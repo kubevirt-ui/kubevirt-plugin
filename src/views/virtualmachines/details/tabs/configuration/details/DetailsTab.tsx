@@ -9,7 +9,12 @@ import { ConfigurationInnerTabProps } from '../utils/types';
 import { onSubmitYAML } from './utils/utils';
 import DetailsSection from './DetailsSection';
 
-const DetailsTab: FC<ConfigurationInnerTabProps> = ({ instanceTypeVM, vm, vmi }) => (
+const DetailsTab: FC<ConfigurationInnerTabProps> = ({
+  allInstanceTypes,
+  instanceTypeVM,
+  vm,
+  vmi,
+}) => (
   <SidebarEditor
     onResourceUpdate={onSubmitYAML}
     pathsToHighlight={PATHS_TO_HIGHLIGHT.DETAILS_TAB}
@@ -17,7 +22,12 @@ const DetailsTab: FC<ConfigurationInnerTabProps> = ({ instanceTypeVM, vm, vmi })
   >
     {(resource) => (
       <PageSection variant={PageSectionVariants.light}>
-        <DetailsSection instanceTypeVM={instanceTypeVM} vm={resource} vmi={vmi} />
+        <DetailsSection
+          allInstanceTypes={allInstanceTypes}
+          instanceTypeVM={instanceTypeVM}
+          vm={resource}
+          vmi={vmi}
+        />
       </PageSection>
     )}
   </SidebarEditor>

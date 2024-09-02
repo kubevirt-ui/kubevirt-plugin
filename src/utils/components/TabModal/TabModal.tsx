@@ -1,5 +1,6 @@
 import React, { ComponentType, memo, MouseEventHandler, ReactNode, useState } from 'react';
 
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
@@ -29,7 +30,7 @@ export type TabModalProps<T extends K8sResourceCommon = K8sResourceCommon> = {
   modalVariant?: ModalVariant;
   obj?: T;
   onClose: () => Promise<void> | void;
-  onSubmit: (obj: T) => Promise<string | T | T[] | void>;
+  onSubmit: (obj: T) => Promise<string | T | T[] | V1VirtualMachine | void>;
   positionTop?: boolean;
   submitBtnText?: string;
   submitBtnVariant?: ButtonVariant;

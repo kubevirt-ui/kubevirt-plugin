@@ -19,8 +19,12 @@ for arg in $@; do
     else
         cd ../$arg
     fi
-
     git pull
+
+    if [ $arg = "monitoring-plugin" ]; then
+        cd web
+    fi
+
     yarn
 
     if [ "$(lsof -t -i:$INITIAL_PORT)" != "" ]; then
