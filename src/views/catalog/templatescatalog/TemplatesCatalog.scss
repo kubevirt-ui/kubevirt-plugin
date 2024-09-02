@@ -50,6 +50,11 @@
     box-shadow: var(--pf-v5-c-card--m-selectable--hover--BoxShadow);
     cursor: pointer;
   }
+
+  .badge-stack {
+    gap: var(--pf-global--spacer--xs);
+  }
+
   .badgeload {
     border-radius: var(--pf-global--BorderRadius--lg);
   }

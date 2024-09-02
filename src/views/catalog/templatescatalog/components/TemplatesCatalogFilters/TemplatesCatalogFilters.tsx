@@ -55,6 +55,19 @@ export const TemplatesCatalogFilters: FC<{
       <FilterSidePanel className="co-catalog-page__tabs" id="vm-catalog-filter-panel">
         <TemplatesCatalogFiltersGroup
           onFilterClick={() =>
+            onFilterChange(
+              CATALOG_FILTERS.HIDE_DEPRECATED_TEMPLATES,
+              !filters?.hideDeprecatedTemplates,
+            )
+          }
+          pickedFilters={
+            new Set(filters?.hideDeprecatedTemplates ? ['hide-deprecated-templates'] : [])
+          }
+          filters={[{ label: t('Hide deprecated templates'), value: 'hide-deprecated-templates' }]}
+          groupKey={'hideDeprecatedTemplates'}
+        />
+        <TemplatesCatalogFiltersGroup
+          onFilterClick={() =>
             onFilterChange(CATALOG_FILTERS.ONLY_AVAILABLE, !filters?.onlyAvailable)
           }
           filters={[{ label: t('Boot source available'), value: 'only-available' }]}

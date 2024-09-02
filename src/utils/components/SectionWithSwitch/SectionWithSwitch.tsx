@@ -1,11 +1,11 @@
 import React, { FC, ReactNode } from 'react';
 import classNames from 'classnames';
 
+import NewBadge from '@kubevirt-utils/components/badges/NewBadge/NewBadge';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { PopoverPosition, Split, SplitItem, Switch } from '@patternfly/react-core';
 
 import ExternalLink from '../ExternalLink/ExternalLink';
-import NewBadge from '../NewBadge/NewBadge';
 
 import './section-with-switch.scss';
 

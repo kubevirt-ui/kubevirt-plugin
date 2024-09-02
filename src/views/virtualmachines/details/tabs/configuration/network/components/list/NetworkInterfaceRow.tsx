@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
 import { V1Network, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import PendingBadge from '@kubevirt-utils/components/PendingBadge/PendingBadge';
+import PendingBadge from '@kubevirt-utils/components/badges/PendingBadge/PendingBadge';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';

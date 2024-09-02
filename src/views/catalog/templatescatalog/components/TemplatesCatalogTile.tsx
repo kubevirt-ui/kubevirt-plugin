@@ -2,8 +2,13 @@ import * as React from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import DeprecatedBadge from '@kubevirt-utils/components/badges/DeprecatedBadge/DeprecatedBadge';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getTemplateFlavorData, WORKLOADS_LABELS } from '@kubevirt-utils/resources/template';
+import {
+  getTemplateFlavorData,
+  isDeprecatedTemplate,
+  WORKLOADS_LABELS,
+} from '@kubevirt-utils/resources/template';
 import { getTemplateBootSourceType } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import {
   getTemplateName,
@@ -29,6 +34,7 @@ export const TemplateTile: React.FC<TemplateTileProps> = React.memo(
   ({ availableDatasources, availableTemplatesUID, bootSourcesLoaded, onClick, template }) => {
     const { t } = useKubevirtTranslation();
 
+    const isDeprecated = isDeprecatedTemplate(template);
     const workload = getTemplateWorkload(template);
     const displayName = getTemplateName(template);
     const bootSource = getTemplateBootSourceType(template);
@@ -47,20 +53,23 @@ export const TemplateTile: React.FC<TemplateTileProps> = React.memo(
     return (
       <div onClick={() => onClick(template)}>
         <CatalogTile
-          badges={
-            bootSourcesLoaded
-              ? isBootSourceAvailable && [
-                  <Badge key="available-boot">{t('Source available')}</Badge>,
-                ]
-              : [
-                  <Skeleton
-                    className="badgeload"
-                    height="18px"
-                    key="loading-sources"
-                    width="105px"
-                  />,
-                ]
-          }
+          badges={[
+            <Stack className="badge-stack" key="badge-stack">
+              {bootSourcesLoaded
+                ? isBootSourceAvailable && [
+                    <Badge key="available-boot">{t('Source available')}</Badge>,
+                  ]
+                : [
+                    <Skeleton
+                      className="badgeload"
+                      height="18px"
+                      key="loading-sources"
+                      width="105px"
+                    />,
+                  ]}
+              {isDeprecated ? <DeprecatedBadge className="deprecated-template" /> : null}
+            </Stack>,
+          ]}
           title={
             <Stack>
               <StackItem>

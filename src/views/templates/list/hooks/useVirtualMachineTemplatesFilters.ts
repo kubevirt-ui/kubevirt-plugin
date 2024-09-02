@@ -3,6 +3,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import {
   getTemplateOS,
   isDefaultVariantTemplate,
+  isDeprecatedTemplate,
   OS_NAMES,
 } from '@kubevirt-utils/resources/template';
 import { ItemsToFilterProps } from '@kubevirt-utils/utils/types';
@@ -37,6 +38,19 @@ const useVirtualMachineTemplatesFilters = (
   const providers = useTemplateProviders();
 
   return [
+    {
+      filter: (availableResourceNames, obj) =>
+        availableResourceNames?.selected?.length === 0 || !isDeprecatedTemplate(obj),
+      filterGroupName: ' ',
+      items: [
+        {
+          id: t('Hide deprecated templates'),
+          title: t('Hide deprecated templates'),
+        },
+      ],
+      reducer: (obj) => isDeprecatedTemplate(obj) && 'Hide deprecated templates',
+      type: `hide-deprecated-templates`,
+    },
     {
       filter: ({ selected }, obj) => selected?.length === 0 || isDefaultVariantTemplate(obj),
       filterGroupName: t('Type'),

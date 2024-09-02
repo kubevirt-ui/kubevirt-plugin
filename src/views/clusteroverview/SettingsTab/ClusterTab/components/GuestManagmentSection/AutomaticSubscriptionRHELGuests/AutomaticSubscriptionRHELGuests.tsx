@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useState } from 'react';
 
+import NewBadge from '@kubevirt-utils/components/badges/NewBadge/NewBadge';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
-import NewBadge from '@kubevirt-utils/components/NewBadge/NewBadge';
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

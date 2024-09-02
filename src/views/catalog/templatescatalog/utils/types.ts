@@ -2,6 +2,7 @@ import { CATALOG_FILTERS } from './consts';
 
 export type TemplateFilters = {
   [CATALOG_FILTERS.ALL_ITEMS]: boolean;
+  [CATALOG_FILTERS.HIDE_DEPRECATED_TEMPLATES]: boolean;
   [CATALOG_FILTERS.IS_LIST]: boolean;
   [CATALOG_FILTERS.NAMESPACE]: string;
   [CATALOG_FILTERS.ONLY_AVAILABLE]: boolean;

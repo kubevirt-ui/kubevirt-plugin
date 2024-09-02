@@ -1,10 +1,15 @@
+import { SetStateAction } from 'react';
 import produce from 'immer';
 
 import { UpdateValidatedVM } from '@catalog/utils/WizardVMContext';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
-import { isCommonTemplate, OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
+import {
+  isCommonTemplate,
+  isDeprecatedTemplate,
+  OS_NAME_TYPES,
+} from '@kubevirt-utils/resources/template';
 import {
   getTemplateName,
   getTemplateOS,
@@ -19,48 +24,64 @@ import { TemplateFilters } from './types';
 const isUserTemplate = (template: V1Template): boolean =>
   !isDefaultVariantTemplate(template) && !isCommonTemplate(template);
 
-export const filterTemplates = (templates: V1Template[], filters: TemplateFilters): V1Template[] =>
-  templates
-    .filter((tmp) => {
-      const textFilterLowerCase = filters?.query.toLowerCase();
-      const workload = getTemplateWorkload(tmp);
+export const filterTemplates = (
+  templates: V1Template[],
+  filters: TemplateFilters,
+): V1Template[] => {
+  return (
+    templates
+      .filter((tmp) => {
+        const textFilterLowerCase = filters?.query.toLowerCase();
+        const workload = getTemplateWorkload(tmp);
 
-      const textFilter =
-        !textFilterLowerCase ||
-        getTemplateName(tmp).toLowerCase().includes(textFilterLowerCase) ||
-        tmp?.metadata?.name?.includes(textFilterLowerCase);
+        const textFilter =
+          !textFilterLowerCase ||
+          getTemplateName(tmp).toLowerCase().includes(textFilterLowerCase) ||
+          tmp?.metadata?.name?.includes(textFilterLowerCase);
 
-      const defaultVariantFilter =
-        (!filters?.onlyDefault && !hasNoDefaultUserAllFilters(filters)) ||
-        isDefaultVariantTemplate(tmp);
+        const defaultVariantFilter =
+          (!filters?.onlyDefault && !hasNoDefaultUserAllFilters(filters)) ||
+          isDefaultVariantTemplate(tmp);
 
-      const userFilter = !filters.onlyUser || isUserTemplate(tmp);
+        const userFilter = !filters.onlyUser || isUserTemplate(tmp);
 
-      const workloadFilter = filters?.workload?.size <= 0 || filters.workload.has(workload);
+        const workloadFilter = filters?.workload?.size <= 0 || filters.workload.has(workload);
 
-      const osNameFilter = filters?.osName?.size <= 0 || filters?.osName?.has(getTemplateOS(tmp));
+        const osNameFilter = filters?.osName?.size <= 0 || filters?.osName?.has(getTemplateOS(tmp));
 
-      return defaultVariantFilter && userFilter && textFilter && workloadFilter && osNameFilter;
-    })
-    // show RHEL templates first, then alphabetically
-    .sort((a, b) => {
-      if (getTemplateOS(a) === OS_NAME_TYPES.rhel) {
-        return -1;
-      }
-      if (getTemplateOS(b) === OS_NAME_TYPES.rhel) {
-        return 1;
-      }
+        const hideDeprecatedTemplatesFilter =
+          !filters?.hideDeprecatedTemplates || !isDeprecatedTemplate(tmp);
 
-      const aName = getTemplateName(a) || a?.metadata?.name;
-      const bName = getTemplateName(b) || b?.metadata?.name;
+        return (
+          defaultVariantFilter &&
+          userFilter &&
+          textFilter &&
+          workloadFilter &&
+          osNameFilter &&
+          hideDeprecatedTemplatesFilter
+        );
+      })
+      // show RHEL templates first, then alphabetically
+      .sort((a, b) => {
+        if (getTemplateOS(a) === OS_NAME_TYPES.rhel) {
+          return -1;
+        }
+        if (getTemplateOS(b) === OS_NAME_TYPES.rhel) {
+          return 1;
+        }
 
-      return aName?.localeCompare(bName);
-    });
+        const aName = getTemplateName(a) || a?.metadata?.name;
+        const bName = getTemplateName(b) || b?.metadata?.name;
+
+        return aName?.localeCompare(bName);
+      })
+  );
+};
 
 export const updateVMCPUMemory = (
   ns: string,
   updateVM: ((vmDraft: V1VirtualMachine) => void) | UpdateValidatedVM,
-  setUpdatedVM?: (value: React.SetStateAction<V1VirtualMachine>) => void,
+  setUpdatedVM?: (value: SetStateAction<V1VirtualMachine>) => void,
 ) => {
   return (vm: V1VirtualMachine) => {
     const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
