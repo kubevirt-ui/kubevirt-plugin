@@ -33,6 +33,7 @@ type VirtualMachineDescriptionItemProps = {
   moreInfoURL?: string;
   onEditClick?: () => void;
   showEditOnTitle?: boolean;
+  subTitle?: string;
 };
 
 const VirtualMachineDescriptionItem: FC<VirtualMachineDescriptionItemProps> = ({
@@ -51,6 +52,7 @@ const VirtualMachineDescriptionItem: FC<VirtualMachineDescriptionItemProps> = ({
   moreInfoURL,
   onEditClick,
   showEditOnTitle,
+  subTitle,
 }) => {
   const { t } = useKubevirtTranslation();
   const NotAvailable = <MutedTextSpan text={t('Not available')} />;
@@ -108,6 +110,7 @@ const VirtualMachineDescriptionItem: FC<VirtualMachineDescriptionItemProps> = ({
         className="pf-c-description-list__description"
         data-test-id={testId}
       >
+        {subTitle && <div className="pf-c-description-list__text pf-v5-u-my-sm">{subTitle}</div>}
         {isEdit && !showEditOnTitle ? description : descriptionData}
       </DescriptionListDescription>
     </DescriptionListGroup>

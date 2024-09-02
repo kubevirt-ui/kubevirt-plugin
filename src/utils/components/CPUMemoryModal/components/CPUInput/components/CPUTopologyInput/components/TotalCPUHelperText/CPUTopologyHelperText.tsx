@@ -13,7 +13,7 @@ type CPUTopologyHelperTextProps = {
 
 const CPUTopologyHelperText: FC<CPUTopologyHelperTextProps> = ({ cpu }) => {
   const { t } = useKubevirtTranslation();
-  const { cores, sockets, threads } = cpu;
+  const { cores, sockets, threads } = cpu || {};
 
   const totalCPU = cores * sockets * threads;
 
