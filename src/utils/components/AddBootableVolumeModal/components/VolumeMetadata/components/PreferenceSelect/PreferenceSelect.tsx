@@ -44,6 +44,7 @@ const PreferenceSelect: FC<PreferenceSelectProps> = ({
       preferences,
       VirtualMachineClusterPreferenceModelGroupVersionKind,
       () => deleteLabel(DEFAULT_PREFERENCE_KIND_LABEL),
+      t('Cluster preferences'),
     );
 
     const userPreferenceOptions: EnhancedSelectOptionProps[] = getResourceDropdownOptions(
@@ -54,9 +55,10 @@ const PreferenceSelect: FC<PreferenceSelectProps> = ({
           'labels',
           DEFAULT_PREFERENCE_KIND_LABEL,
         )(VirtualMachinePreferenceModelGroupVersionKind.kind),
+      t('User preferences'),
     );
     return [...userPreferenceOptions, ...preferenceOptions];
-  }, [preferences, userPreferences, deleteLabel, setBootableVolumeField]);
+  }, [preferences, userPreferences, deleteLabel, setBootableVolumeField, t]);
 
   if (!preferencesLoaded || !userPreferencesLoaded) return <Loading />;
 
