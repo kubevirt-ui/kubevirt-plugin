@@ -11,7 +11,7 @@ metadata:
     app: example
     os.template.kubevirt.io/fedora: 'true'
 spec:
-  running: false
+  runStrategy: Halted
   template:
     metadata:
       annotations:
