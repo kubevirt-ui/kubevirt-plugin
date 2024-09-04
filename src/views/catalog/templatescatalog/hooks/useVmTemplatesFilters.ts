@@ -15,12 +15,12 @@ export const useTemplatesFilters = (): [
   const hasNoDefaultUserAllParams =
     !!params.get(CATALOG_FILTERS.ONLY_DEFAULT) &&
     !!params.get(CATALOG_FILTERS.ONLY_USER) &&
-    !!params.get(CATALOG_FILTERS.ALL_ITEMS); // has no any of those params when accessing catalog first time
+    !!params.get(CATALOG_FILTERS.ALL_ITEMS); // has none of these params when accessing catalog for the first time
 
   const [filters, setFilters] = useState<TemplateFilters>({
     [CATALOG_FILTERS.ALL_ITEMS]: params.get(CATALOG_FILTERS.ONLY_DEFAULT) === 'false',
     [CATALOG_FILTERS.HIDE_DEPRECATED_TEMPLATES]:
-      params.get(CATALOG_FILTERS.HIDE_DEPRECATED_TEMPLATES) === 'false',
+      params.get(CATALOG_FILTERS.HIDE_DEPRECATED_TEMPLATES) === 'true',
     [CATALOG_FILTERS.IS_LIST]: params.get(CATALOG_FILTERS.IS_LIST) === 'true',
     [CATALOG_FILTERS.NAMESPACE]: params.get(CATALOG_FILTERS.NAMESPACE) || '',
     [CATALOG_FILTERS.ONLY_AVAILABLE]: params.get(CATALOG_FILTERS.ONLY_AVAILABLE) === 'true',

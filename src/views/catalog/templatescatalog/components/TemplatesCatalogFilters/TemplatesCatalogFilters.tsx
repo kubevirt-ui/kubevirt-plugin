@@ -5,6 +5,7 @@ import { hasNoDefaultUserAllFilters } from '@catalog/templatescatalog/utils/help
 import { TemplateFilters } from '@catalog/templatescatalog/utils/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
+  HIDE_DEPRECATED_TEMPLATES_KEY,
   OS_NAME_LABELS,
   OS_NAME_TYPES,
   WORKLOADS,
@@ -54,6 +55,9 @@ export const TemplatesCatalogFilters: FC<{
       </VerticalTabs>
       <FilterSidePanel className="co-catalog-page__tabs" id="vm-catalog-filter-panel">
         <TemplatesCatalogFiltersGroup
+          filters={[
+            { label: t('Hide deprecated templates'), value: HIDE_DEPRECATED_TEMPLATES_KEY },
+          ]}
           onFilterClick={() =>
             onFilterChange(
               CATALOG_FILTERS.HIDE_DEPRECATED_TEMPLATES,
@@ -61,10 +65,9 @@ export const TemplatesCatalogFilters: FC<{
             )
           }
           pickedFilters={
-            new Set(filters?.hideDeprecatedTemplates ? ['hide-deprecated-templates'] : [])
+            new Set(filters?.hideDeprecatedTemplates ? [HIDE_DEPRECATED_TEMPLATES_KEY] : [])
           }
-          filters={[{ label: t('Hide deprecated templates'), value: 'hide-deprecated-templates' }]}
-          groupKey={'hideDeprecatedTemplates'}
+          groupKey={CATALOG_FILTERS.HIDE_DEPRECATED_TEMPLATES}
         />
         <TemplatesCatalogFiltersGroup
           onFilterClick={() =>

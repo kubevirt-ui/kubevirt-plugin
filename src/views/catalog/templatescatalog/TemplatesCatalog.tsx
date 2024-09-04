@@ -1,6 +1,8 @@
 import React, { FC, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom-v5-compat';
 
+import { CREATE_VM_TAB } from '@catalog/CreateVMHorizontalNav/constants';
+import useHideDeprecatedTemplateTiles from '@catalog/templatescatalog/hooks/useHideDeprecatedTemplateTiles';
 import { clearSessionStorageVM } from '@catalog/utils/WizardVMContext';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
@@ -20,7 +22,9 @@ import { filterTemplates } from './utils/helpers';
 
 import './TemplatesCatalog.scss';
 
-const TemplatesCatalog: FC = () => {
+type TemplatesCatalogProps = { currentTab: CREATE_VM_TAB };
+
+const TemplatesCatalog: FC<TemplatesCatalogProps> = ({ currentTab }) => {
   const { ns: namespace } = useParams<{ ns: string }>();
   const [selectedTemplate, setSelectedTemplate] = useState<undefined | V1Template>(undefined);
 
@@ -36,6 +40,8 @@ const TemplatesCatalog: FC = () => {
     () => filterTemplates(templates, filters),
     [templates, filters],
   );
+
+  useHideDeprecatedTemplateTiles(currentTab, onFilterChange);
 
   return (
     <Stack className="vm-catalog" hasGutter>

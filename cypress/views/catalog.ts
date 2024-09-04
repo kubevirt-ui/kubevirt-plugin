@@ -3,6 +3,9 @@ export const vmCatalog = '.vm-catalog-grid-tile';
 export const filterText = '#filter-text-input';
 export const checkbox = '[type="checkbox"]';
 
+export const HIDE_DEPRECATED_TEMPLATES =
+  '[data-test-id="hideDeprecatedTemplates-Hide deprecated templates"]';
+
 // filter by OS Name
 export const RHEL = '[data-test-id="osName-RHEL"]';
 export const FEDORA = '[data-test-id="osName-Fedora"]';

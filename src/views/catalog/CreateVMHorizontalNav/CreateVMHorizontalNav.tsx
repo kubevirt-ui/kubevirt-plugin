@@ -49,14 +49,14 @@ const CreateVMHorizontalNav: FC = () => {
           eventKey={CREATE_VM_TAB.INSTANCE_TYPES}
           title={<CreateVMTabTitle Icon={ImageIcon} titleText={t('InstanceTypes')} />}
         >
-          <CreateFromInstanceType />
+          <CreateFromInstanceType currentTab={currentTab} />
         </Tab>
         <Tab
           data-test="templates-tab"
           eventKey={CREATE_VM_TAB.TEMPLATE}
           title={<CreateVMTabTitle Icon={CatalogIcon} titleText={t('Template catalog')} />}
         >
-          <TemplatesCatalog />
+          <TemplatesCatalog currentTab={currentTab} />
         </Tab>
       </Tabs>
     </div>

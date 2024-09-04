@@ -2,6 +2,7 @@ import React, { FC, useEffect, useState } from 'react';
 
 import SelectInstanceTypeSection from '@catalog/CreateFromInstanceTypes/components/SelectInstanceTypeSection/SelectInstanceTypeSection';
 import VMDetailsSection from '@catalog/CreateFromInstanceTypes/components/VMDetailsSection/VMDetailsSection';
+import { CREATE_VM_TAB } from '@catalog/CreateVMHorizontalNav/constants';
 import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
@@ -23,7 +24,9 @@ import { INSTANCE_TYPES_SECTIONS } from './utils/constants';
 
 import './CreateFromInstanceType.scss';
 
-const CreateFromInstanceType: FC = () => {
+type CreateFromInstanceTypeProps = { currentTab: CREATE_VM_TAB };
+
+const CreateFromInstanceType: FC<CreateFromInstanceTypeProps> = ({ currentTab }) => {
   const { t } = useKubevirtTranslation();
   const sectionState = useState<INSTANCE_TYPES_SECTIONS>(INSTANCE_TYPES_SECTIONS.SELECT_VOLUME);
 
@@ -81,6 +84,7 @@ const CreateFromInstanceType: FC = () => {
               >
                 <BootableVolumeList
                   bootableVolumesData={bootableVolumesData}
+                  currentTab={currentTab}
                   displayShowAllButton
                   favorites={[favorites as [], updaterFavorites]}
                   preferencesData={instanceTypesAndPreferencesData.preferences}

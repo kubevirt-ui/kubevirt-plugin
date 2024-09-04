@@ -2,11 +2,13 @@ import React, { FC, useMemo, useState } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { UseBootableVolumesValues } from '@catalog/CreateFromInstanceTypes/state/utils/types';
+import { CREATE_VM_TAB } from '@catalog/CreateVMHorizontalNav/constants';
 import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import ProjectDropdown from '@kubevirt-utils/components/ProjectDropdown/ProjectDropdown';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { UserSettingFavorites } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/types';
+import useHideDeprecatedBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useHideDeprecatedBootableVolumes';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { convertResourceArrayToMap, getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -29,6 +31,7 @@ import './BootableVolumeList.scss';
 
 type BootableVolumeListProps = {
   bootableVolumesData: UseBootableVolumesValues;
+  currentTab?: CREATE_VM_TAB;
   displayShowAllButton?: boolean;
   favorites: UserSettingFavorites;
   preferencesData: V1beta1VirtualMachineClusterPreference[];
@@ -37,12 +40,14 @@ type BootableVolumeListProps = {
 
 const BootableVolumeList: FC<BootableVolumeListProps> = ({
   bootableVolumesData,
+  currentTab,
   displayShowAllButton = false,
   favorites,
   preferencesData,
   selectedBootableVolumeState,
 }) => {
   const { t } = useKubevirtTranslation();
+
   const {
     instanceTypeVMState,
     onSelectCreatedVolume,
@@ -70,6 +75,8 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
   const [pagination, setPagination] = useState(
     displayShowAllButton ? paginationInitialStateForm : paginationInitialStateModal,
   );
+
+  useHideDeprecatedBootableVolumes(onFilterChange, currentTab);
 
   const [volumeFavorites] = favorites;
 
