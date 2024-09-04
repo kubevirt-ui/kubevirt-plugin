@@ -1,8 +1,6 @@
 import React, { FC, ReactNode, SyntheticEvent, useMemo, useState } from 'react';
 
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Divider,
   MenuSearch,
@@ -11,14 +9,16 @@ import {
   SearchInput,
   Select,
   SelectList,
-  SelectOption,
   SelectPopperProps,
 } from '@patternfly/react-core';
 
 import SelectToggle from '../toggles/SelectToggle';
 
+import InlineFilterSelectOptionContent from './components/InlineFilterSelectOptionContent';
+import InlineFilterSelectOptions from './components/InlineFilterSelectOptions';
 import { NO_RESULTS } from './utils/constants';
 import { EnhancedSelectOptionProps } from './utils/types';
+import { getGroupedOptions } from './utils/utils';
 
 type InlineFilterSelectProps = {
   className?: string;
@@ -40,7 +40,6 @@ const InlineFilterSelect: FC<InlineFilterSelectProps> = ({
   setSelected,
   toggleProps,
 }) => {
-  const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [filterValue, setFilterValue] = useState<string>('');
   const [focusedItemIndex, setFocusedItemIndex] = useState<null | number>(null);
@@ -56,24 +55,22 @@ const InlineFilterSelect: FC<InlineFilterSelectProps> = ({
     setSelected(value);
   };
 
-  const getOptionComponent = (opt: EnhancedSelectOptionProps) =>
-    !isEmpty(opt?.groupVersionKind) ? (
-      <ResourceLink groupVersionKind={opt.groupVersionKind} linkTo={false} name={opt.value} />
-    ) : (
-      opt?.children
-    );
-
   const selectedComponent = useMemo(() => {
     if (isEmpty(selected)) return toggleProps?.placeholder;
 
     const selectOption = options?.find((opt) => opt?.value === selected);
-    return getOptionComponent(selectOption);
+    return <InlineFilterSelectOptionContent option={selectOption} />;
   }, [selected, toggleProps?.placeholder, options]);
 
   const filterOptions = useMemo(
     () =>
       options.filter((option) => option.value.toLowerCase().includes(filterValue.toLowerCase())),
     [options, filterValue],
+  );
+
+  const groupedOptions = useMemo(
+    () => getGroupedOptions(filterOptions, options),
+    [filterOptions, options],
   );
 
   const toggle = SelectToggle({
@@ -116,28 +113,12 @@ const InlineFilterSelect: FC<InlineFilterSelectProps> = ({
       </MenuSearch>
       <Divider />
       <SelectList id="select-inline-filter-listbox">
-        {!isEmpty(filterOptions) ? (
-          filterOptions.map((option, index) => {
-            return (
-              <SelectOption
-                data-test-id={`select-option-${option.value}`}
-                id={`select-inline-filter-${option.value?.replace(' ', '-')}`}
-                isFocused={focusedItemIndex === index}
-                key={option.value}
-                value={option.value}
-                {...option}
-              >
-                {getOptionComponent(option)}
-              </SelectOption>
-            );
-          })
-        ) : (
-          <SelectOption isDisabled value={NO_RESULTS}>
-            {t('No results found for "{{value}}"', {
-              value: filterValue,
-            })}
-          </SelectOption>
-        )}
+        <InlineFilterSelectOptions
+          filterOptions={filterOptions}
+          filterValue={filterValue}
+          focusedItemIndex={focusedItemIndex}
+          groupedOptions={groupedOptions}
+        />
       </SelectList>
       {menuFooter && menuFooter}
     </Select>
