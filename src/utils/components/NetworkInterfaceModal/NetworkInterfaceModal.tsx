@@ -20,7 +20,7 @@ import NetworkInterfaceMACAddressInput from './components/NetworkInterfaceMacAdd
 import NetworkInterfaceModelSelect from './components/NetworkInterfaceModelSelect';
 import NetworkInterfaceNetworkSelect from './components/NetworkInterfaceNetworkSelect/NetworkInterfaceNetworkSelect';
 import { interfaceModelType } from './utils/constants';
-import { getNetworkName, networkNameStartWithPod, podNetworkExists } from './utils/helpers';
+import { getNetworkName, podNetworkExists } from './utils/helpers';
 
 import './NetworkInterfaceModal.scss';
 
@@ -104,6 +104,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
           setInterfaceModel={setInterfaceModel}
         />
         <NetworkInterfaceNetworkSelect
+          iface={iface}
           interfaceType={interfaceType}
           isEditing={Boolean(network) && Boolean(iface)}
           namespace={namespace}
@@ -121,7 +122,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
         >
           <NetworkInterfaceMACAddressInput
             interfaceMACAddress={interfaceMACAddress}
-            isDisabled={!networkName || networkNameStartWithPod(networkName)}
+            isDisabled={!networkName}
             setInterfaceMACAddress={setInterfaceMACAddress}
             setIsError={setSubmitDisabled}
           />

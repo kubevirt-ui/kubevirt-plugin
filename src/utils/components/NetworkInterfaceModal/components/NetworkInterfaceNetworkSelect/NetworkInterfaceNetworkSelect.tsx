@@ -1,11 +1,12 @@
 import React, { Dispatch, FC, MouseEvent, SetStateAction, useEffect, useMemo } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1Interface, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { interfacesTypes } from '@kubevirt-utils/resources/vm/utils/network/constants';
+import { getNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import {
   FormGroup,
   Label,
@@ -21,6 +22,7 @@ import NetworkSelectHelperPopover from './components/NetworkSelectHelperPopover/
 
 type NetworkInterfaceNetworkSelectProps = {
   editInitValueNetworkName?: string | undefined;
+  iface: V1Interface;
   interfaceType: string;
   isEditing?: boolean | undefined;
   namespace?: string;
@@ -33,6 +35,7 @@ type NetworkInterfaceNetworkSelectProps = {
 
 const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
   editInitValueNetworkName,
+  iface,
   interfaceType,
   isEditing,
   namespace,
@@ -80,12 +83,12 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
   useEffect(() => {
     if (!loaded) return;
 
-    const initialInterfaceType = getNadType(nads?.[0]);
+    const initialInterfaceType = interfacesTypes[getNetworkInterfaceType(iface)];
 
     if (!initialInterfaceType) return;
 
     setInterfaceType(initialInterfaceType);
-  }, [loaded, nads, setInterfaceType]);
+  }, [loaded, nads, setInterfaceType, iface]);
 
   const validated =
     canCreateNetworkInterface || isEditing ? ValidatedOptions.default : ValidatedOptions.error;
