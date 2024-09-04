@@ -179,19 +179,23 @@ const installPermissions = async (
     });
   } catch (e) {
     const subjectsExist = clusterRoleBinding?.subjects;
-    await k8sPatch({
-      data: [
-        {
-          op: 'add',
-          path: `/subjects${subjectsExist ? '/-' : ''}`,
-          value: subjectsExist
-            ? { kind: 'ServiceAccount', name: STORAGE_CHECKUP_SA, namespace }
-            : [{ kind: 'ServiceAccount', name: STORAGE_CHECKUP_SA, namespace }],
-        },
-      ],
-      model: ClusterRoleBindingModel,
-      resource: storageClusterRoleBinding(namespace),
-    });
+    try {
+      await k8sPatch({
+        data: [
+          {
+            op: 'add',
+            path: `/subjects${subjectsExist ? '/-' : ''}`,
+            value: subjectsExist
+              ? { kind: 'ServiceAccount', name: STORAGE_CHECKUP_SA, namespace }
+              : [{ kind: 'ServiceAccount', name: STORAGE_CHECKUP_SA, namespace }],
+          },
+        ],
+        model: ClusterRoleBindingModel,
+        resource: storageClusterRoleBinding(namespace),
+      });
+    } catch (err) {
+      kubevirtConsole.log('Failed to patch ClusterRoleBinding: ', err?.message);
+    }
   }
 };
 
@@ -199,22 +203,28 @@ const removePermissions = async (
   namespace: string,
   clusterRoleBinding: IoK8sApiRbacV1ClusterRoleBinding,
 ): Promise<void> => {
-  await Promise.allSettled([
-    k8sDelete({ model: ServiceAccountModel, resource: serviceAccountResource(namespace) }),
-    k8sDelete({ model: RoleModel, resource: storageCheckupRole(namespace) }),
-  ]);
-  await k8sDelete({ model: RoleBindingModel, resource: storageCheckupRoleBinding(namespace) });
-  await k8sPatch({
-    data: [
-      {
-        op: 'replace',
-        path: '/subjects',
-        value: clusterRoleBinding?.subjects?.filter((subject) => subject?.namespace !== namespace),
-      },
-    ],
-    model: ClusterRoleBindingModel,
-    resource: storageClusterRoleBinding(namespace),
-  });
+  try {
+    await Promise.allSettled([
+      k8sDelete({ model: ServiceAccountModel, resource: serviceAccountResource(namespace) }),
+      k8sDelete({ model: RoleModel, resource: storageCheckupRole(namespace) }),
+    ]);
+    await k8sDelete({ model: RoleBindingModel, resource: storageCheckupRoleBinding(namespace) });
+    await k8sPatch({
+      data: [
+        {
+          op: 'replace',
+          path: '/subjects',
+          value: clusterRoleBinding?.subjects?.filter(
+            (subject) => subject?.namespace !== namespace,
+          ),
+        },
+      ],
+      model: ClusterRoleBindingModel,
+      resource: storageClusterRoleBinding(namespace),
+    });
+  } catch (err) {
+    kubevirtConsole.log('Failed to remove permissions: ', err?.message);
+  }
 };
 
 export const installOrRemoveCheckupsStoragePermissions = (
