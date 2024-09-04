@@ -6,7 +6,6 @@ import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/Sect
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useRHELAutomaticSubscription from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/useRHELAutomaticSubscription';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Stack, Title } from '@patternfly/react-core';
 
 import ExpandSection from '../../../../ExpandSection/ExpandSection';
@@ -35,12 +34,7 @@ const AutomaticSubscriptionRHELGuests: FC<AutomaticSubscriptionRHELGuestsProps> 
   );
 
   const isDisabled =
-    isEmpty(formProps?.subscriptionData?.activationKey) ||
-    isEmpty(formProps?.subscriptionData?.organizationID);
-
-  useEffect(() => {
-    if (isDisabled) toggleFeature(false);
-  }, [isDisabled, toggleFeature]);
+    formProps?.subscriptionData?.type === AutomaticSubscriptionTypeEnum.NO_SUBSCRIPTION;
 
   useEffect(() => {
     if (!selected) {
@@ -63,18 +57,15 @@ const AutomaticSubscriptionRHELGuests: FC<AutomaticSubscriptionRHELGuestsProps> 
         <MutedTextSpan
           text={t('Enable automatic subscription for Red Hat Enterprise Linux VirtualMachines.\n')}
         />
-        <MutedTextSpan
-          text={t('Cluster administrator permissions are required to enable this feature.')}
+        <Title headingLevel="h5">{t('Subscription type')}</Title>
+        <AutomaticSubscriptionType
+          selected={selected}
+          setSelected={setSelected}
+          updateSubscriptionType={formProps.updateSubscription}
         />
-        <AutomaticSubscriptionForm {...formProps} />
         {!isDisabled && (
           <>
-            <Title headingLevel="h5">{t('Subscription type')}</Title>
-            <AutomaticSubscriptionType
-              selected={selected}
-              setSelected={setSelected}
-              updateSubscriptionType={formProps.updateSubscription}
-            />
+            <AutomaticSubscriptionForm {...formProps} />
             {selected?.value !== AutomaticSubscriptionTypeEnum.NO_SUBSCRIPTION && (
               <>
                 <SectionWithSwitch

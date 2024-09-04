@@ -1,9 +1,9 @@
-import React, { FC, useState } from 'react';
+import React, { FC } from 'react';
 
-import DropdownToggle from '@kubevirt-utils/components/toggles/DropdownToggle';
-import { Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
+import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
+import { SelectList, SelectOption } from '@patternfly/react-core';
 
-import { dropDownItems } from './utils/utils';
+import { getSubscriptionItem, selectItems } from './utils/utils';
 
 import './automatic-subscription-type.scss';
 
@@ -14,37 +14,28 @@ type AutomaticSubscriptionTypeProps = {
 };
 
 const AutomaticSubscriptionType: FC<AutomaticSubscriptionTypeProps> = ({
-  selected = dropDownItems[0],
+  selected = selectItems[0],
   setSelected,
   updateSubscriptionType,
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
   return (
     <div className="AutomaticSubscriptionType--main">
-      <Dropdown
+      <FormPFSelect
         onSelect={(_e, value: string) => {
-          setSelected(dropDownItems.find((item) => item.value === value));
+          setSelected(getSubscriptionItem(value));
           updateSubscriptionType({ type: value });
-          setIsOpen(false);
         }}
-        toggle={DropdownToggle({
-          children: <>{selected.title}</>,
-          className: 'AutomaticSubscriptionType--toggle',
-          id: 'toggle-auto-register-rhel',
-          onClick: () => setIsOpen((prevIsOpen) => !prevIsOpen),
-        })}
-        isOpen={isOpen}
         selected={selected.value}
+        selectedLabel={selected.title}
       >
-        <DropdownList>
-          {dropDownItems.map((item) => (
-            <DropdownItem key={item.value} value={item.value}>
+        <SelectList>
+          {selectItems.map((item) => (
+            <SelectOption key={item.value} value={item.value}>
               {item.title}
-            </DropdownItem>
+            </SelectOption>
           ))}
-        </DropdownList>
-      </Dropdown>
+        </SelectList>
+      </FormPFSelect>
     </div>
   );
 };

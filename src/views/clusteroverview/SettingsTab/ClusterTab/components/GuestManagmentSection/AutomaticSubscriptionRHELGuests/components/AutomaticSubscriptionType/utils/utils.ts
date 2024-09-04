@@ -6,7 +6,7 @@ export enum AutomaticSubscriptionTypeEnum {
   NO_SUBSCRIPTION = 'noSubscription',
 }
 
-export const dropDownItems = [
+export const selectItems = [
   {
     title: t('No subscription'),
     value: AutomaticSubscriptionTypeEnum.NO_SUBSCRIPTION,
@@ -22,4 +22,4 @@ export const dropDownItems = [
 ];
 
 export const getSubscriptionItem = (value: string) =>
-  dropDownItems.find((item) => item.value === value);
+  selectItems.find((item) => item.value === value);

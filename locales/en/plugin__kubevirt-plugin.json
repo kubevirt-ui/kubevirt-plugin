@@ -269,7 +269,6 @@
   "Cloud-init": "Cloud-init",
   "Cloud-init and SSH key configurations will be applied to the VirtualMachine only at the first boot.": "Cloud-init and SSH key configurations will be applied to the VirtualMachine only at the first boot.",
   "Cluster": "Cluster",
-  "Cluster administrator permissions are required to enable this feature.": "Cluster administrator permissions are required to enable this feature.",
   "Cluster preferences": "Cluster preferences",
   "Cluster provided": "Cluster provided",
   "Cluster scope migrations": "Cluster scope migrations",

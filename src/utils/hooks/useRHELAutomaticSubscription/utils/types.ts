@@ -9,7 +9,6 @@ export type RHELAutomaticSubscriptionFormProps = {
   canEdit: boolean;
   loaded: boolean;
   loadError: Error;
-  loading: boolean;
   subscriptionData: RHELAutomaticSubscriptionData;
   updateSubscription: (data: Partial<RHELAutomaticSubscriptionData>) => void;
 };
