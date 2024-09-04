@@ -2,13 +2,15 @@ import { ServiceModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
+import { kubevirtConsole } from './utils';
+
 export const HEADLESS_SERVICE_LABEL = 'network.kubevirt.io/headlessService';
 export const HEADLESS_SERVICE_NAME = 'headless';
 export const HEADLESS_SERVICE_PORT = 5434;
 
-export const createHeadlessService = (createdVM: V1VirtualMachine) => {
+export const createHeadlessService = async (createdVM: V1VirtualMachine) => {
   try {
-    k8sCreate({
+    await k8sCreate({
       data: {
         apiVersion: ServiceModel.apiVersion,
         kind: ServiceModel.kind,
@@ -27,5 +29,7 @@ export const createHeadlessService = (createdVM: V1VirtualMachine) => {
       },
       model: ServiceModel,
     });
-  } catch {}
+  } catch (e) {
+    kubevirtConsole.log('Failed to create headless service', e);
+  }
 };
