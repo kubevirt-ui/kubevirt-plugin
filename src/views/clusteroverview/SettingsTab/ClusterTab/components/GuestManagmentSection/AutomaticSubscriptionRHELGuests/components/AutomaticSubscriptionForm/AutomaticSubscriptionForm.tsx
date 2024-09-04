@@ -1,10 +1,9 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 
-import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { RHELAutomaticSubscriptionFormProps } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
+import { debounce } from '@kubevirt-utils/utils/debounce';
 import {
-  ActionGroup,
   Button,
   ButtonVariant,
   Form,
@@ -24,7 +23,6 @@ import './AutomaticSubscriptionForm.scss';
 const AutomaticSubscriptionForm: FC<RHELAutomaticSubscriptionFormProps> = ({
   canEdit,
   loaded,
-  loading,
   subscriptionData,
   updateSubscription,
 }) => {
@@ -40,13 +38,15 @@ const AutomaticSubscriptionForm: FC<RHELAutomaticSubscriptionFormProps> = ({
     }
   }, [activationKey, loaded, organizationID, subscriptionData]);
 
+  const update = useMemo(
+    () =>
+      debounce((val) => {
+        updateSubscription(val);
+      }, 400),
+    [updateSubscription],
+  );
+
   if (!loaded) return <Skeleton />;
-
-  const isDisabled = !canEdit || isEqualObject(subscriptionData, { activationKey, organizationID });
-
-  const handleSubmit = () => {
-    !isDisabled && updateSubscription({ activationKey, organizationID });
-  };
 
   return (
     <>
@@ -58,7 +58,14 @@ const AutomaticSubscriptionForm: FC<RHELAutomaticSubscriptionFormProps> = ({
         >
           <Grid hasGutter>
             <GridItem span={7}>
-              <TextInput onChange={(_event, val) => setActivationKey(val)} value={activationKey} />
+              <TextInput
+                onChange={(_event, val) => {
+                  setActivationKey(val);
+                  update({ activationKey: val });
+                }}
+                isDisabled={!canEdit}
+                value={activationKey}
+              />
             </GridItem>
             <GridItem span={5}>
               <Button
@@ -80,23 +87,17 @@ const AutomaticSubscriptionForm: FC<RHELAutomaticSubscriptionFormProps> = ({
           <Grid hasGutter>
             <GridItem span={7}>
               <TextInput
-                onChange={(_event, val) => setOrganizationID(val)}
+                onChange={(_event, val) => {
+                  setOrganizationID(val);
+                  update({ organizationID: val });
+                }}
+                isDisabled={!canEdit}
                 value={organizationID}
               />
             </GridItem>
           </Grid>
         </FormGroup>
       </Form>
-      <ActionGroup className="pf-u-mt-md">
-        <Button
-          isDisabled={isDisabled}
-          isLoading={loading}
-          onClick={handleSubmit}
-          variant={ButtonVariant.primary}
-        >
-          {t('Apply')}
-        </Button>
-      </ActionGroup>
     </>
   );
 };
