@@ -61,7 +61,7 @@ export const getVMRestoreSnapshotResource = (
     apiVersion: `${VirtualMachineRestoreModel.apiGroup}/${VirtualMachineRestoreModel.apiVersion}`,
     kind: VirtualMachineRestoreModel.kind,
     metadata: {
-      name: `resotre-${snapshot.metadata.name}-${new Date().getTime()}`,
+      name: `restore-${snapshot.metadata.name}-${new Date().getTime()}`,
       namespace: snapshot.metadata.namespace,
       ownerReferences: [...(snapshot.metadata.ownerReferences || [])],
     },
