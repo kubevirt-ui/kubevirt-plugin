@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 import { useFormContext } from 'react-hook-form';
 
+import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { convertToBaseValue, humanizeBinaryBytes } from '@kubevirt-utils/utils/humanize.js';
 
@@ -18,11 +19,13 @@ const DiskSizeInput: FC<DiskSizeInputProps> = ({ isCreated, namespace }) => {
   const { setValue, watch } = useFormContext<V1DiskFormState>();
   const diskState = watch();
 
-  const [pvcSize] = usePVCSourceSize(
+  const [pvcSize, loaded] = usePVCSourceSize(
     getSourceRef(diskState),
     getPVCClaimName(diskState),
     namespace,
   );
+
+  if (!loaded) return <Loading />;
 
   return (
     <CapacityInput

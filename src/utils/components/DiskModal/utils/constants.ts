@@ -3,6 +3,7 @@
 import BlankDiskModal from '../BlankDiskModal';
 import ClonePVCDiskModal from '../ClonePVCDiskModal';
 import ContainerDiskModal from '../ContainerDiskModal';
+import DataSourceDiskModal from '../DataSourceDiskModal';
 import HTTPDiskModal from '../HTTPDiskModal';
 import OtherDiskModal from '../OtherDiskModal';
 import PVCDiskModal from '../PVCDiskModal';
@@ -17,6 +18,7 @@ export const DEFAULT_CDROM_DISK_SIZE = '10Gi';
 export const DiskModalBySource = {
   [SourceTypes.BLANK]: BlankDiskModal,
   [SourceTypes.CLONE_PVC]: ClonePVCDiskModal,
+  [SourceTypes.DATA_SOURCE]: DataSourceDiskModal,
   [SourceTypes.EPHEMERAL]: ContainerDiskModal,
   [SourceTypes.HTTP]: HTTPDiskModal,
   [SourceTypes.PVC]: PVCDiskModal,
