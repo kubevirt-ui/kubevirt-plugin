@@ -163,8 +163,10 @@ export const generateVM = (
           domain: {
             devices: {
               ...(isSysprep ? { disks: [sysprepDisk()] } : {}),
+              interfaces: [{ masquerade: {}, name: 'default' }],
             },
           },
+          networks: [{ name: 'default', pod: {} }],
           subdomain: HEADLESS_SERVICE_NAME,
           volumes: [
             {
