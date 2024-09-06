@@ -124,6 +124,12 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
           sourceType={sourceType}
           upload={upload}
         />
+        {sourceType === DROPDOWN_FORM_SELECTION.USE_REGISTRY && (
+          <SchedulingSettings
+            bootableVolume={bootableVolume}
+            setBootableVolumeField={setBootableVolumeField}
+          />
+        )}
         <Title className="pf-u-mt-md" headingLevel="h5">
           {t('Destination details')}
         </Title>
@@ -133,13 +139,6 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
           claimPropertySetsData={claimPropertySetsData}
           setBootableVolumeField={setBootableVolumeField}
         />
-
-        {sourceType === DROPDOWN_FORM_SELECTION.USE_REGISTRY && (
-          <SchedulingSettings
-            bootableVolume={bootableVolume}
-            setBootableVolumeField={setBootableVolumeField}
-          />
-        )}
         <Title className="pf-u-mt-md" headingLevel="h5">
           {t('Volume metadata')}{' '}
           <HelpTextIcon
