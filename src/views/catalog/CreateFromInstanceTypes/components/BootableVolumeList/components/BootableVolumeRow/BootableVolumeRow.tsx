@@ -3,7 +3,10 @@ import React, { FC, MouseEvent } from 'react';
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { InstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/utils/types';
 import { getTemplateOSIcon, getVolumeNameOSIcon } from '@catalog/templatescatalog/utils/os-icons';
-import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import {
+  V1beta1DataImportCron,
+  V1beta1DataSource,
+} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import DeprecatedBadge from '@kubevirt-utils/components/badges/DeprecatedBadge/DeprecatedBadge';
@@ -18,7 +21,11 @@ import {
   getVolumeSnapshotStorageClass,
 } from '@kubevirt-utils/resources/bootableresources/selectors';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import {
+  getName,
+  getNamespace,
+  isDataImportCronProgressing,
+} from '@kubevirt-utils/resources/shared';
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
 import {
   isDataSourceCloning,
@@ -38,6 +45,7 @@ type BootableVolumeRowProps = {
   bootableVolume: BootableVolume;
   rowData: {
     bootableVolumeSelectedState: [BootableVolume, InstanceTypeVMStore['onSelectCreatedVolume']];
+    dataImportCron: V1beta1DataImportCron;
     favorites: [isFavorite: boolean, updaterFavorites: (val: boolean) => void];
     preference: V1beta1VirtualMachineClusterPreference;
     pvcSource: IoK8sApiCoreV1PersistentVolumeClaim;
@@ -50,6 +58,7 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
   bootableVolume,
   rowData: {
     bootableVolumeSelectedState: [selectedBootableVolume, setSelectedBootableVolume],
+    dataImportCron,
     favorites,
     preference,
     pvcSource,
@@ -74,6 +83,9 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
   };
 
   const { volumeListNamespace } = useInstanceTypeVMStore();
+  const isCloning =
+    isDataImportCronProgressing(dataImportCron) ||
+    isDataSourceCloning(bootableVolume as V1beta1DataSource);
 
   return (
     <Tr
@@ -103,9 +115,7 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
           {bootVolumeName}
         </Text>
         {isDeprecated(bootVolumeName) && <DeprecatedBadge />}
-        {isDataSourceCloning(bootableVolume as V1beta1DataSource) && (
-          <Label className="vm-catalog-row-label">{t('Clone in progress')}</Label>
-        )}
+        {isCloning && <Label className="vm-catalog-row-label">{t('Clone in progress')}</Label>}
         {isDataSourceUploading(bootableVolume as V1beta1DataSource) && (
           <Label className="vm-catalog-row-label">{t('Upload in progress')}</Label>
         )}

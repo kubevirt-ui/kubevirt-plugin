@@ -1,5 +1,6 @@
 import { Dispatch } from 'react';
 
+import { V1beta1DataImportCron } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import {
   V1beta1VirtualMachineClusterInstancetype,
@@ -27,6 +28,7 @@ export type UseInstanceTypeAndPreferencesValues = {
 
 export type UseBootableVolumesValues = {
   bootableVolumes: BootableVolume[];
+  dataImportCrons: V1beta1DataImportCron[];
   error: Error;
   loaded: boolean;
   pvcSources: {

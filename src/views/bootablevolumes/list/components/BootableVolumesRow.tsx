@@ -2,16 +2,24 @@ import React, { FC } from 'react';
 import DataSourceActions from 'src/views/datasources/actions/DataSourceActions';
 
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
-import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import {
+  V1beta1DataImportCron,
+  V1beta1DataSource,
+} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import DeprecatedBadge from '@kubevirt-utils/components/badges/DeprecatedBadge/DeprecatedBadge';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   getBootableVolumeGroupVersionKind,
+  getDataImportCronFromDataSource,
   isBootableVolumePVCKind,
   isDeprecated,
 } from '@kubevirt-utils/resources/bootableresources/helpers';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import {
+  getName,
+  getNamespace,
+  isDataImportCronProgressing,
+} from '@kubevirt-utils/resources/shared';
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
 import { isDataSourceCloning } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -29,14 +37,20 @@ const BootableVolumesRow: FC<
   RowProps<
     BootableResource,
     {
+      dataImportCrons: V1beta1DataImportCron[];
       preferences: V1beta1VirtualMachineClusterPreference[];
     }
   >
-> = ({ activeColumnIDs, obj, rowData: { preferences } }) => {
+> = ({ activeColumnIDs, obj, rowData: { dataImportCrons, preferences } }) => {
   const { t } = useKubevirtTranslation();
 
   const bootableVolumeName = getName(obj);
   const bootableVolumeNamespace = getNamespace(obj);
+
+  const dataImportCron = getDataImportCronFromDataSource(dataImportCrons, obj as V1beta1DataSource);
+
+  const isCloning =
+    isDataSourceCloning(obj as V1beta1DataSource) || isDataImportCronProgressing(dataImportCron);
 
   return (
     <>
@@ -49,9 +63,7 @@ const BootableVolumesRow: FC<
           namespace={bootableVolumeNamespace}
         />
         {isDeprecated(bootableVolumeName) && <DeprecatedBadge />}
-        {obj.kind === DataSourceModel.kind && isDataSourceCloning(obj as V1beta1DataSource) && (
-          <Label>{t('Clone in progress')}</Label>
-        )}
+        {obj.kind === DataSourceModel.kind && isCloning && <Label>{t('Clone in progress')}</Label>}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-20" id="namespace">
         <ResourceLink kind="Namespace" name={bootableVolumeNamespace} />

@@ -1,5 +1,8 @@
 import { modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
-import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import {
+  V1beta1DataImportCron,
+  V1beta1DataSource,
+} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1alpha1Condition, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { TemplateModel } from '@kubevirt-utils/models';
@@ -16,6 +19,7 @@ import {
 import { isDataSourceReady } from '../../views/datasources/utils';
 
 import { isEmpty } from './../utils/utils';
+import { getDataImportCronFromDataSource } from './bootableresources/helpers';
 import {
   isDataSourceCloning,
   isDataSourceUploading,
@@ -327,25 +331,28 @@ export const convertResourceArrayToMap = <A extends K8sResourceCommon = K8sResou
 export const getAvailableDataSources = (dataSources: V1beta1DataSource[]): V1beta1DataSource[] =>
   dataSources?.filter((dataSource) => isDataSourceReady(dataSource));
 
+export const isDataImportCronProgressing = (dataImportCron: V1beta1DataImportCron): boolean =>
+  dataImportCron?.status?.conditions?.find((condition) => condition.type === 'UpToDate')?.reason ===
+  'ImportProgressing';
+
 /**
  * function to get all V1beta1DataSource objects with condition type 'Ready'and status 'True'
  * and/or also those with 'False' status but only 'CloneScheduled' or 'CloneInProgress' reason (cloning of the DS in progress)
  * @param {V1beta1DataSource[]} dataSources list of DataSources to be filtered
+ * @param {V1beta1DataImportCron[]} dataImportCrons list of DataImportCrons related to DataSources
  * @returns list of available/ready/cloning DataSources
  */
-export const getAvailableOrCloningDataSources = (
-  dataSources: V1beta1DataSource[],
-): V1beta1DataSource[] =>
-  dataSources?.filter(
-    (dataSource) => isDataSourceReady(dataSource) || isDataSourceCloning(dataSource),
-  );
-
 export const getReadyOrCloningOrUploadingDataSources = (
   dataSources: V1beta1DataSource[],
+  dataImportCrons: V1beta1DataImportCron[],
 ): V1beta1DataSource[] =>
-  dataSources?.filter(
-    (dataSource) =>
+  dataSources?.filter((dataSource) => {
+    const dataImportCron = getDataImportCronFromDataSource(dataImportCrons, dataSource);
+
+    return (
       isDataSourceReady(dataSource) ||
       isDataSourceCloning(dataSource) ||
-      isDataSourceUploading(dataSource),
-  );
+      isDataSourceUploading(dataSource) ||
+      isDataImportCronProgressing(dataImportCron)
+    );
+  });

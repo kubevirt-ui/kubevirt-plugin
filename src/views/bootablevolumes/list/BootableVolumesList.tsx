@@ -32,7 +32,7 @@ const BootableVolumesList: FC = () => {
   const { ns: namespace } = useParams<{ ns: string }>();
   const { t } = useKubevirtTranslation();
 
-  const { bootableVolumes, error, loaded } = useBootableVolumes(namespace);
+  const { bootableVolumes, dataImportCrons, error, loaded } = useBootableVolumes(namespace);
   const [preferences] = useClusterPreferences();
 
   const rowFilters = useBootableVolumesFilters();
@@ -117,6 +117,7 @@ const BootableVolumesList: FC = () => {
               </div>
             )}
             rowData={{
+              dataImportCrons,
               preferences,
             }}
             columns={activeColumns}
