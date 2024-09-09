@@ -619,6 +619,20 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.perspective',
   },
+  ...virtualizationSection,
+  {
+    properties: {
+      dataAttributes: {
+        'data-quickstart-id': 'qs-nav-sec-virtualization',
+        'data-test-id': 'virtualization-nav-item',
+      },
+      id: 'cluster-virt-perspective',
+      insertBefore: 'networking',
+      name: '%plugin__kubevirt-plugin~Cluster%',
+      perspective: 'virtualization-perspective',
+    },
+    type: 'console.navigation/section',
+  },
   {
     properties: {
       dataAttributes: {
@@ -627,12 +641,12 @@ export const extensions: EncodedExtension[] = [
       },
       href: 'dashboards',
       id: 'overview-virt-perspective',
-      name: '%plugin__kubevirt-plugin~Cluster Overview%',
+      name: '%plugin__kubevirt-plugin~Overview%',
       perspective: 'virtualization-perspective',
+      section: 'cluster-virt-perspective',
     },
     type: 'console.navigation/href',
   } as EncodedExtension<HrefNavItem>,
-  ...virtualizationSection,
   ...networkingSection,
   ...storageSection,
   ...monitoringSection,
