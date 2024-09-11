@@ -300,6 +300,48 @@ const networkingSection = [
     },
     type: 'console.navigation/resource-ns',
   },
+  {
+    flags: {
+      required: ['NMSTATE_DYNAMIC'],
+    },
+    properties: {
+      dataAttributes: {
+        'data-quickstart-id': 'qs-nav-policy-list',
+        'data-test-id': 'policy-nav-list',
+      },
+      id: 'policy-virt-perspective',
+      model: {
+        group: 'nmstate.io',
+        kind: 'NodeNetworkConfigurationPolicy',
+        version: 'v1',
+      },
+      name: '%plugin__nmstate-console-plugin~NodeNetworkConfigurationPolicy%',
+      perspective: 'virtualization-perspective',
+      section: 'networking-virt-perspective',
+    },
+    type: 'console.navigation/resource-cluster',
+  } as EncodedExtension<ResourceClusterNavItem>,
+  {
+    flags: {
+      required: ['NMSTATE_DYNAMIC'],
+    },
+    properties: {
+      dataAttributes: {
+        'data-quickstart-id': 'qs-nav-state-list',
+        'data-test-id': 'state-nav-list',
+      },
+      id: 'state',
+      model: {
+        group: 'nmstate.io',
+        kind: 'NodeNetworkState',
+        version: 'v1beta1',
+      },
+      name: '%plugin__nmstate-console-plugin~NodeNetworkState%',
+      perspective: 'virtualization-perspective',
+      section: 'networking-virt-perspective',
+    },
+    type: 'console.navigation/resource-cluster',
+  } as EncodedExtension<ResourceClusterNavItem>,
 ];
 
 const storageSection = [
