@@ -1,12 +1,9 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { VirtualMachineInstanceMigrationModelRef } from '@kubevirt-ui/kubevirt-api/console';
+import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  ListPageBody,
-  ListPageFilter,
-  VirtualizedTable,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { ListPageBody, VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
 import { Bullseye } from '@patternfly/react-core';
 
 import { UseMigrationCardDataAndFiltersValues } from '../../hooks/useMigrationCardData';
@@ -19,7 +16,7 @@ type MigrationTableProps = {
   tableData: UseMigrationCardDataAndFiltersValues;
 };
 
-const MigrationTable: React.FC<MigrationTableProps> = ({ tableData }) => {
+const MigrationTable: FC<MigrationTableProps> = ({ tableData }) => {
   const { t } = useKubevirtTranslation();
 
   const {

@@ -1,12 +1,14 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import {
   modelToGroupVersionKind,
+  NamespaceModel,
   NodeModel,
   VirtualMachineInstanceMigrationModelGroupVersionKind,
   VirtualMachineModelGroupVersionKind,
 } from '@kubevirt-ui/kubevirt-api/console';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
 import {
@@ -22,7 +24,7 @@ import { iconMapper } from './utils/statuses';
 import { MigrationTableDataLayout } from './utils/utils';
 import MigrationActionsDropdown from './MigrationActionsDropdown';
 
-const MigrationsRow: React.FC<RowProps<MigrationTableDataLayout>> = ({ activeColumnIDs, obj }) => {
+const MigrationsRow: FC<RowProps<MigrationTableDataLayout>> = ({ activeColumnIDs, obj }) => {
   const StatusIcon = iconMapper?.[obj?.vmim?.status?.phase];
 
   return (
@@ -30,8 +32,18 @@ const MigrationsRow: React.FC<RowProps<MigrationTableDataLayout>> = ({ activeCol
       <TableData activeColumnIDs={activeColumnIDs} id="vm-name">
         <ResourceLink
           groupVersionKind={VirtualMachineModelGroupVersionKind}
-          name={obj?.vmiObj?.metadata?.name}
-          namespace={obj?.vmiObj?.metadata?.namespace}
+          name={getName(obj.vmiObj)}
+          namespace={getNamespace(obj.vmiObj)}
+        />
+      </TableData>
+      <TableData
+        activeColumnIDs={activeColumnIDs}
+        className="pf-m-width-10 vm-column"
+        id="namespace"
+      >
+        <ResourceLink
+          groupVersionKind={modelToGroupVersionKind(NamespaceModel)}
+          name={getNamespace(obj.vmiObj)}
         />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="status">
