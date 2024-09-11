@@ -300,6 +300,48 @@ const networkingSection = [
     },
     type: 'console.navigation/resource-ns',
   },
+  {
+    flags: {
+      required: ['NMSTATE_DYNAMIC'],
+    },
+    properties: {
+      dataAttributes: {
+        'data-quickstart-id': 'qs-nav-policy-list',
+        'data-test-id': 'policy-nav-list',
+      },
+      id: 'policy-virt-perspective',
+      model: {
+        group: 'nmstate.io',
+        kind: 'NodeNetworkConfigurationPolicy',
+        version: 'v1',
+      },
+      name: '%plugin__nmstate-console-plugin~NodeNetworkConfigurationPolicy%',
+      perspective: 'virtualization-perspective',
+      section: 'networking-virt-perspective',
+    },
+    type: 'console.navigation/resource-cluster',
+  } as EncodedExtension<ResourceClusterNavItem>,
+  {
+    flags: {
+      required: ['NMSTATE_DYNAMIC'],
+    },
+    properties: {
+      dataAttributes: {
+        'data-quickstart-id': 'qs-nav-state-list',
+        'data-test-id': 'state-nav-list',
+      },
+      id: 'state',
+      model: {
+        group: 'nmstate.io',
+        kind: 'NodeNetworkState',
+        version: 'v1beta1',
+      },
+      name: '%plugin__nmstate-console-plugin~NodeNetworkState%',
+      perspective: 'virtualization-perspective',
+      section: 'networking-virt-perspective',
+    },
+    type: 'console.navigation/resource-cluster',
+  } as EncodedExtension<ResourceClusterNavItem>,
 ];
 
 const storageSection = [
@@ -619,6 +661,20 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.perspective',
   },
+  ...virtualizationSection,
+  {
+    properties: {
+      dataAttributes: {
+        'data-quickstart-id': 'qs-nav-sec-virtualization',
+        'data-test-id': 'virtualization-nav-item',
+      },
+      id: 'cluster-virt-perspective',
+      insertBefore: 'networking',
+      name: '%plugin__kubevirt-plugin~Cluster%',
+      perspective: 'virtualization-perspective',
+    },
+    type: 'console.navigation/section',
+  },
   {
     properties: {
       dataAttributes: {
@@ -627,12 +683,12 @@ export const extensions: EncodedExtension[] = [
       },
       href: 'dashboards',
       id: 'overview-virt-perspective',
-      name: '%plugin__kubevirt-plugin~Cluster Overview%',
+      name: '%plugin__kubevirt-plugin~Overview%',
       perspective: 'virtualization-perspective',
+      section: 'cluster-virt-perspective',
     },
     type: 'console.navigation/href',
   } as EncodedExtension<HrefNavItem>,
-  ...virtualizationSection,
   ...networkingSection,
   ...storageSection,
   ...monitoringSection,
