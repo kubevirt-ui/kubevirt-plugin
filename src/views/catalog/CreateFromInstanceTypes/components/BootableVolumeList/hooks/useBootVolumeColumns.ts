@@ -1,17 +1,21 @@
+import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 import { ColumnLayout } from '@openshift-console/dynamic-plugin-sdk-internal/lib/extensions/console-types';
 
-type UseBootVolumesColumns = (isModal: boolean) => {
+type UseBootVolumesColumns = (
+  volumeListNamespace: string,
+  isModal: boolean,
+) => {
   activeColumns: TableColumn<BootableVolume>[];
   columnLayout: ColumnLayout | null;
   columns: TableColumn<BootableVolume>[];
   loadedColumns: boolean;
 };
 
-const useBootVolumeColumns: UseBootVolumesColumns = (isModal) => {
+const useBootVolumeColumns: UseBootVolumesColumns = (volumeListNamespace, isModal) => {
   const { t } = useKubevirtTranslation();
 
   const columns: TableColumn<BootableVolume>[] = [
@@ -23,6 +27,14 @@ const useBootVolumeColumns: UseBootVolumesColumns = (isModal) => {
       id: 'name',
       title: t('Volume name'),
     },
+    ...(volumeListNamespace === ALL_PROJECTS
+      ? [
+          {
+            id: 'namespace',
+            title: t('Namespace'),
+          },
+        ]
+      : []),
     {
       id: 'operating-system',
       title: t('Operating system'),
