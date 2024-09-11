@@ -59,6 +59,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
   );
 
   const { activeColumns, columnLayout, loadedColumns } = useBootVolumeColumns(
+    volumeListNamespace,
     !displayShowAllButton,
   );
 
