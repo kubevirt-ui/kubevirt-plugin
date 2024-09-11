@@ -5,15 +5,12 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { k8sUpdate, ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
-import { Button, Title } from '@patternfly/react-core';
+import { Button, PageSection, PageSectionVariants, Title } from '@patternfly/react-core';
 
 import useEditTemplateAccessReview from '../../hooks/useIsTemplateEditable';
 
 import NetworkInterfaceList from './components/list/NetworkInterfaceList';
 import TemplatesNetworkInterfaceModal from './components/modal/TemplatesNetworkInterfaceModal';
-
-import 'src/utils/styles/ListPageCreateButton.scss';
-import './template-network-tab.scss';
 
 type TemplateNetworkProps = {
   obj: V1Template;
@@ -37,7 +34,7 @@ const TemplateNetwork: FC<TemplateNetworkProps> = ({ obj: template }) => {
   );
 
   return (
-    <div className="template-network-tab">
+    <PageSection variant={PageSectionVariants.light}>
       <ListPageBody>
         <SidebarEditor<V1Template> onResourceUpdate={onSubmitTemplate} resource={template}>
           <Title className="list-page-create-button-margin" headingLevel="h2">
@@ -64,7 +61,7 @@ const TemplateNetwork: FC<TemplateNetworkProps> = ({ obj: template }) => {
           <NetworkInterfaceList template={template} />
         </SidebarEditor>
       </ListPageBody>
-    </div>
+    </PageSection>
   );
 };
 
