@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { PageSection, PageSectionVariants } from '@patternfly/react-core';
 
 import DisksTable from './table/disks/DisksTable';
 import FileSystemTable from './table/file-system/FileSystemTable';
@@ -14,10 +15,10 @@ type VirtualMachinesInstancePageDisksTabProps = {
 const VirtualMachinesInstancePageDisksTab: FC<VirtualMachinesInstancePageDisksTabProps> = ({
   obj: vmi,
 }) => (
-  <div className="VirtualMachinesInstancePageDisksTab">
+  <PageSection variant={PageSectionVariants.light}>
     <DisksTable vmi={vmi} />
     <FileSystemTable vmi={vmi} />
-  </div>
+  </PageSection>
 );
 
 export default VirtualMachinesInstancePageDisksTab;
