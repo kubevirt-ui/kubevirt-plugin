@@ -15,14 +15,12 @@ import {
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { Flex, FlexItem } from '@patternfly/react-core';
+import { Flex, FlexItem, PageSection, PageSectionVariants } from '@patternfly/react-core';
 
 import DiskRow from './components/DiskRow';
 import useDiskColumns from './hooks/useDiskColumns';
 import useDisksFilters from './hooks/useDisksFilters';
 import useWizardDisksTableData from './hooks/useWizardDisksTableData';
-
-import './wizard-disk-tab.scss';
 
 const WizardDisksTab: WizardTab = ({ tabsData, updateTabsData, updateVM, vm }) => {
   const { createModal } = useModal();
@@ -32,7 +30,7 @@ const WizardDisksTab: WizardTab = ({ tabsData, updateTabsData, updateVM, vm }) =
   const [data, filteredData, onFilterChange] = useListPageFilter(disks, filters);
 
   return (
-    <div className="wizard-disk-tab">
+    <PageSection variant={PageSectionVariants.light}>
       <ListPageBody>
         <SidebarEditor
           onResourceUpdate={(newVM) => updateVM(newVM)}
@@ -89,7 +87,7 @@ const WizardDisksTab: WizardTab = ({ tabsData, updateTabsData, updateVM, vm }) =
           />
         </SidebarEditor>
       </ListPageBody>
-    </div>
+    </PageSection>
   );
 };
 

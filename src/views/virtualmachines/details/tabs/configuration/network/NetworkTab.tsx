@@ -12,7 +12,6 @@ import { ConfigurationInnerTabProps } from '../utils/types';
 import AddNetworkInterfaceButton from './components/AddNetworkInterfaceButton';
 import NetworkInterfaceList from './components/list/NetworkInterfaceList';
 
-import 'src/utils/styles/ListPageCreateButton.scss';
 import './network-tab.scss';
 
 const NetworkTab: FC<ConfigurationInnerTabProps> = ({ vm, vmi }) => {

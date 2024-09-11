@@ -6,12 +6,10 @@ import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEdito
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
 import { ListPageBody, ListPageCreateButton } from '@openshift-console/dynamic-plugin-sdk';
+import { PageSection, PageSectionVariants } from '@patternfly/react-core';
 
 import NetworkInterfaceList from './components/list/NetworkInterfaceList';
 import WizardNetworkInterfaceModal from './components/modal/WizardNetworkInterfaceModal';
-
-import 'src/utils/styles/ListPageCreateButton.scss';
-import './wizard-network-tab.scss';
 
 const WizardNetworkTab: WizardTab = ({ updateVM, vm }) => {
   const { t } = useKubevirtTranslation();
@@ -20,7 +18,7 @@ const WizardNetworkTab: WizardTab = ({ updateVM, vm }) => {
   const actionText = t('Add network interface');
 
   return (
-    <div className="wizard-network-tab">
+    <PageSection variant={PageSectionVariants.light}>
       <ListPageBody>
         <SidebarEditor
           onResourceUpdate={(newVM) => updateVM(newVM)}
@@ -47,7 +45,7 @@ const WizardNetworkTab: WizardTab = ({ updateVM, vm }) => {
           <NetworkInterfaceList vm={vm} />
         </SidebarEditor>
       </ListPageBody>
-    </div>
+    </PageSection>
   );
 };
 
