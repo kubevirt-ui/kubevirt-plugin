@@ -7,6 +7,7 @@ import DataSourceModel, {
 } from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import {
+  V1beta1DataImportCron,
   V1beta1DataSource,
   V1beta1DataVolume,
 } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
@@ -14,7 +15,7 @@ import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/k
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
 
-import { getLabel } from '../shared';
+import { getLabel, getName, getNamespace } from '../shared';
 
 import { deprecatedOSNames, KUBEVIRT_ISO_LABEL } from './constants';
 import { BootableVolume } from './types';
@@ -73,3 +74,13 @@ export const isBootableVolumeISO = (bootableVolume: BootableVolume): boolean =>
   getLabel(bootableVolume, KUBEVIRT_ISO_LABEL) === 'true';
 
 export const isDeprecated = (bootVolumeName: string) => deprecatedOSNames.includes(bootVolumeName);
+
+export const getDataImportCronFromDataSource = (
+  dataImportCrons: V1beta1DataImportCron[],
+  dataSource: V1beta1DataSource,
+): V1beta1DataImportCron =>
+  dataImportCrons?.find(
+    (cron) =>
+      cron?.spec?.managedDataSource === getName(dataSource) &&
+      getNamespace(dataSource) === getNamespace(cron),
+  );

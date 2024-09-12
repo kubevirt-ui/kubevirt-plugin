@@ -8,7 +8,11 @@ import {
   PersistentVolumeClaimModel,
   VolumeSnapshotModel,
 } from '@kubevirt-ui/kubevirt-api/console';
-import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import DataImportCronModel from '@kubevirt-ui/kubevirt-api/console/models/DataImportCronModel';
+import {
+  V1beta1DataImportCron,
+  V1beta1DataSource,
+} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
 import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
@@ -36,6 +40,14 @@ const useBootableVolumes: UseBootableVolumes = (namespace) => {
     },
   });
 
+  const [dataImportCrons, loadedDataImportCrons, dataImportCronsError] = useK8sWatchResource<
+    V1beta1DataImportCron[]
+  >({
+    groupVersionKind: modelToGroupVersionKind(DataImportCronModel),
+    isList: true,
+    namespace: projectsNamespace,
+  });
+
   // getting all pvcs since there could be a case where a DS has the label and it's underlying PVC does not
   const [pvcs, loadedPVCs, loadErrorPVCs] = useK8sWatchResource<
     IoK8sApiCoreV1PersistentVolumeClaim[]
@@ -52,16 +64,19 @@ const useBootableVolumes: UseBootableVolumes = (namespace) => {
     namespace: projectsNamespace,
   });
 
-  const error = useMemo(() => dataSourcesError || loadErrorPVCs, [dataSourcesError, loadErrorPVCs]);
+  const error = useMemo(
+    () => dataSourcesError || loadErrorPVCs || dataImportCronsError,
+    [dataSourcesError, loadErrorPVCs, dataImportCronsError],
+  );
 
   const loaded = useMemo(
-    () => (error ? true : loadedDataSources && loadedPVCs),
-    [error, loadedDataSources, loadedPVCs],
+    () => (error ? true : loadedDataSources && loadedPVCs && loadedDataImportCrons),
+    [error, loadedDataSources, loadedPVCs, loadedDataImportCrons],
   );
 
   const readyOrCloningDataSources = useMemo(
-    () => getReadyOrCloningOrUploadingDataSources(dataSources),
-    [dataSources],
+    () => getReadyOrCloningOrUploadingDataSources(dataSources, dataImportCrons),
+    [dataSources, dataImportCrons],
   );
   const pvcSources = useMemo(() => convertResourceArrayToMap(pvcs, true), [pvcs]);
 
@@ -89,6 +104,7 @@ const useBootableVolumes: UseBootableVolumes = (namespace) => {
 
   return {
     bootableVolumes,
+    dataImportCrons,
     error,
     loaded,
     pvcSources,

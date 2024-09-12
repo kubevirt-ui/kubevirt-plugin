@@ -5,9 +5,13 @@ import {
   UseBootableVolumesValues,
 } from '@catalog/CreateFromInstanceTypes/state/utils/types';
 import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
+import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { UserSettingFavorites } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/types';
-import { getBootableVolumePVCSource } from '@kubevirt-utils/resources/bootableresources/helpers';
+import {
+  getBootableVolumePVCSource,
+  getDataImportCronFromDataSource,
+} from '@kubevirt-utils/resources/bootableresources/helpers';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getLabel, getName } from '@kubevirt-utils/resources/shared';
 import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
@@ -38,7 +42,7 @@ const BootableVolumeTable: FC<BootableVolumeTableProps> = ({
   sortedPaginatedData,
 }) => {
   const [volumeFavorites, updateFavorites] = favorites;
-  const { pvcSources, volumeSnapshotSources } = bootableVolumesData;
+  const { dataImportCrons, pvcSources, volumeSnapshotSources } = bootableVolumesData;
   return (
     <Table className="BootableVolumeList-table" variant={TableVariant.compact}>
       <Thead>
@@ -63,6 +67,10 @@ const BootableVolumeTable: FC<BootableVolumeTableProps> = ({
           <BootableVolumeRow
             rowData={{
               bootableVolumeSelectedState: selectedBootableVolumeState,
+              dataImportCron: getDataImportCronFromDataSource(
+                dataImportCrons,
+                bs as V1beta1DataSource,
+              ),
               favorites: [
                 volumeFavorites?.includes(bs?.metadata?.name),
                 (addTofavorites: boolean) =>
