@@ -9,16 +9,13 @@ import React, {
   useState,
 } from 'react';
 
-import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
+import useDefaultStorageClass from '@kubevirt-utils/hooks/useDefaultStorage/useDefaultStorageClass';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { modelToGroupVersionKind, StorageClassModel } from '@kubevirt-utils/models';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { FormGroup, Select, SelectVariant } from '@patternfly/react-core';
 
 import { FilterSCSelect, getSCSelectOptions } from '../utils/Filters';
-import { getDefaultStorageClass } from '../utils/helpers';
 
 import { AlertedStorageClassSelectProps } from './AlertedStorageClassSelect';
 
@@ -36,12 +33,14 @@ const StorageClassSelect: FC<StorageClassSelectProps> = ({
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const [storageClasses, loaded] = useK8sWatchResource<IoK8sApiStorageV1StorageClass[]>({
-    groupVersionKind: modelToGroupVersionKind(StorageClassModel),
-    isList: true,
-  });
+  const [{ clusterDefaultStorageClass, storageClasses, virtDefaultStorageClass }, loaded] =
+    useDefaultStorageClass();
 
-  const defaultSC = useMemo(() => getDefaultStorageClass(storageClasses), [storageClasses]);
+  const defaultSC = useMemo(() => {
+    if (!isEmpty(virtDefaultStorageClass)) return virtDefaultStorageClass;
+    if (!isEmpty(clusterDefaultStorageClass)) return clusterDefaultStorageClass;
+    return null;
+  }, [virtDefaultStorageClass, clusterDefaultStorageClass]);
 
   const onSelect = useCallback(
     (event: ChangeEvent<Element>, selection: string) => {
