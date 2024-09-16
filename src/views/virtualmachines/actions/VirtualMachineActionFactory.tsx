@@ -20,7 +20,7 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Action, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { CopyIcon } from '@patternfly/react-icons';
 
-import { isLiveMigratable, printableVMStatus } from '../utils';
+import { isLiveMigratable, isRestoring, isSnapshotting, printableVMStatus } from '../utils';
 
 import DeleteVMModal from './components/DeleteVMModal/DeleteVMModal';
 import {
@@ -189,7 +189,7 @@ export const VirtualMachineActionFactory = {
     return {
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
       cta: () => pauseVM(vm),
-      disabled: vm?.status?.printableStatus !== Running,
+      disabled: vm?.status?.printableStatus !== Running || isSnapshotting(vm) || isRestoring(vm),
       id: 'vm-action-pause',
       label: t('Pause'),
     };
@@ -198,25 +198,16 @@ export const VirtualMachineActionFactory = {
     return {
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
       cta: () => restartVM(vm),
-      disabled: [Migrating, Provisioning, Stopped, Stopping, Terminating, Unknown].includes(
-        vm?.status?.printableStatus,
-      ),
+      disabled:
+        [Migrating, Provisioning, Stopped, Stopping, Terminating, Unknown].includes(
+          vm?.status?.printableStatus,
+        ) ||
+        isSnapshotting(vm) ||
+        isRestoring(vm),
       id: 'vm-action-restart',
       label: t('Restart'),
     };
   },
-  // console component is needed to allow openConsole action
-  // openConsole: (vm: V1VirtualMachine): Action => {
-  //   return {
-  //     id: 'vm-action-open-console',
-  //     disabled: false,
-  //     label: 'Open console',
-  //     cta: () =>
-  //       window.open(
-  //         `/k8s/ns/${vm?.metadata?.namespace}/virtualmachineinstances/${vm?.metadata?.name}/standaloneconsole`,
-  //         `${vm?.metadata?.name}-console}`,
-  //         'modal=yes,alwaysRaised=yes,location=yes,width=1024,height=768',
-  //       ),
   snapshot: (vm: V1VirtualMachine, createModal: (modal: ModalComponent) => void): Action => {
     return {
       accessReview: asAccessReview(VirtualMachineSnapshotModel, vm, 'create'),
@@ -229,15 +220,12 @@ export const VirtualMachineActionFactory = {
     return {
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
       cta: () => startVM(vm),
-      disabled: [
-        Migrating,
-        Provisioning,
-        Running,
-        Starting,
-        Stopping,
-        Terminating,
-        Unknown,
-      ].includes(vm?.status?.printableStatus),
+      disabled:
+        [Migrating, Provisioning, Running, Starting, Stopping, Terminating, Unknown].includes(
+          vm?.status?.printableStatus,
+        ) ||
+        isSnapshotting(vm) ||
+        isRestoring(vm),
       id: 'vm-action-start',
       label: t('Start'),
     };
@@ -246,9 +234,12 @@ export const VirtualMachineActionFactory = {
     return {
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
       cta: () => stopVM(vm),
-      disabled: [Provisioning, Stopped, Stopping, Terminating, Unknown].includes(
-        vm?.status?.printableStatus,
-      ),
+      disabled:
+        [Provisioning, Stopped, Stopping, Terminating, Unknown].includes(
+          vm?.status?.printableStatus,
+        ) ||
+        isSnapshotting(vm) ||
+        isRestoring(vm),
       id: 'vm-action-stop',
       label: t('Stop'),
     };

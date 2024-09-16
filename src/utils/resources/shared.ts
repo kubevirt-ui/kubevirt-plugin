@@ -195,6 +195,10 @@ export const getAPIVersionForModel = (model: K8sModel): string =>
  */
 export const getVMStatus = (vm: V1VirtualMachine) => vm?.status?.printableStatus;
 
+export const getVMSnapshottingStatus = (vm: V1VirtualMachine) => vm?.status?.snapshotInProgress;
+
+export const getVMRestoringStatus = (vm: V1VirtualMachine) => vm?.status?.restoreInProgress;
+
 /**
  * Get allowed resource for project
  * @date 7/6/2022 - 11:23:32 AM
