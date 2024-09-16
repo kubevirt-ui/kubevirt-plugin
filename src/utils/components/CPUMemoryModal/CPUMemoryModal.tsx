@@ -42,6 +42,15 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
   vm,
 }) => {
   const { t } = useKubevirtTranslation();
+
+  const [updateInProcess, setUpdateInProcess] = useState<boolean>(false);
+  const [updateError, setUpdateError] = useState<string>();
+
+  const { size, unit } = getMemorySize(getMemory(vm));
+  const [memory, setMemory] = useState<number>(size || undefined);
+  const [memoryUnit, setMemoryUnit] = useState<string>(unit || undefined);
+  const [cpu, setCPU] = useState<V1CPU>(getCPU(vm));
+
   const {
     data: templateDefaultsData,
     error: defaultLoadError,
@@ -50,13 +59,8 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
     vm?.metadata?.labels?.['vm.kubevirt.io/template'],
     vm?.metadata?.labels?.['vm.kubevirt.io/template.namespace'] || templateNamespace,
   );
-  const [updateInProcess, setUpdateInProcess] = useState<boolean>(false);
-  const [updateError, setUpdateError] = useState<string>();
-
-  const { size, unit } = getMemorySize(getMemory(vm));
-  const [memory, setMemory] = useState<number>(size || undefined);
-  const [memoryUnit, setMemoryUnit] = useState<string>(unit || undefined);
-  const [cpu, setCPU] = useState<V1CPU>(getCPU(vm));
+  const { defaultCpu, defaultMemory } = templateDefaultsData || {};
+  const { size: defaultMemorySize, unit: defaultMemoryUnit } = defaultMemory || {};
 
   const templateName = getLabel(vm, VM_TEMPLATE_ANNOTATION);
 
@@ -99,16 +103,12 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
         </Button>,
         <Button
           isDisabled={
-            !templateName ||
-            !defaultsLoaded ||
-            !templateDefaultsData?.defaultCpu ||
-            !templateDefaultsData?.defaultMemory ||
-            defaultLoadError
+            !templateName || !defaultsLoaded || !defaultCpu || !defaultMemory || defaultLoadError
           }
           onClick={() => {
-            setCPU(templateDefaultsData?.defaultCpu);
-            setMemory(templateDefaultsData?.defaultMemory?.size);
-            setMemoryUnit(templateDefaultsData?.defaultMemory?.unit);
+            setCPU(defaultCpu);
+            setMemory(defaultMemorySize);
+            setMemoryUnit(defaultMemoryUnit);
           }}
           isLoading={templateName && !defaultsLoaded}
           key="default"
@@ -138,7 +138,7 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
         variant={AlertVariant.info}
       />
       <div className="inputs">
-        <CPUInput cpu={cpu} setCPU={setCPU} />
+        <CPUInput currentCPU={getCPU(vm)} setUserEnteredCPU={setCPU} userEnteredCPU={cpu} />
         <MemoryInput
           memory={memory}
           memoryUnit={memoryUnit}
