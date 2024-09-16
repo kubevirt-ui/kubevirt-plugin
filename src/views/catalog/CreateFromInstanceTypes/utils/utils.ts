@@ -248,9 +248,6 @@ export const addISOFlowToVM = (vm: V1VirtualMachine, storageClassName: string) =
       },
       {
         bootOrder: 1,
-        disk: {
-          bus: InterfaceTypes.SATA,
-        },
         name: ROOTDISK,
       },
     ]);
