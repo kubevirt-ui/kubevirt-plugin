@@ -13,9 +13,11 @@ import {
 } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { updateCloudInitRHELSubscription } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
+import { SecretSelectionOption } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import {
   addSecretToVM,
   applyCloudDriveCloudInitVolume,
+  createSSHSecret,
 } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
@@ -144,6 +146,11 @@ const useCreateDrawerForm = (
             vm: getTemplateVirtualMachineObject(processedTemplate),
           }),
       });
+
+      if (sshDetails?.secretOption === SecretSelectionOption.addNew) {
+        await createSSHSecret(sshDetails?.sshPubKey, sshDetails?.sshSecretName, namespace);
+      }
+
       setIsQuickCreating(false);
       navigate(getResourceUrl({ model: VirtualMachineModel, resource: quickCreatedVM }));
     } catch (error) {
