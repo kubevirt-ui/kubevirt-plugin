@@ -14,7 +14,7 @@ export const WINDOWS = 'windows';
 
 export type SysprepData = { autounattend?: string; unattended?: string };
 
-export const sysprepDisk = (): V1Disk => ({ cdrom: { bus: InterfaceTypes.VIRTIO }, name: SYSPREP });
+export const sysprepDisk = (): V1Disk => ({ cdrom: { bus: InterfaceTypes.SATA }, name: SYSPREP });
 
 export const sysprepVolume = (sysprepName: string): V1Volume => ({
   name: SYSPREP,
