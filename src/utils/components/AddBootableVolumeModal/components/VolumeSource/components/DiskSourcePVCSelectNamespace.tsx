@@ -32,7 +32,7 @@ const DiskSourcePVCSelectNamespace: FC<DiskSourcePVCSelectNamespaceProps> = ({
       fieldId={fieldId}
       id={fieldId}
       isRequired
-      label={t('PVC project')}
+      label={t('Volume project')}
     >
       {projectsLoaded ? (
         <>
@@ -45,12 +45,12 @@ const DiskSourcePVCSelectNamespace: FC<DiskSourcePVCSelectNamespaceProps> = ({
             toggleProps={{
               isDisabled,
               isFullWidth: true,
-              placeholder: t('--- Select PVC project ---'),
+              placeholder: t('--- Select Volume project ---'),
             }}
             selected={selectedProject}
             setSelected={onChange}
           />
-          <FormGroupHelperText>{t('Location of the existing PVC')}</FormGroupHelperText>
+          <FormGroupHelperText>{t('Location of the existing Volume')}</FormGroupHelperText>
         </>
       ) : (
         <Loading />

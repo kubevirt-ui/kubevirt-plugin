@@ -39,11 +39,18 @@ const PVCSource: FC<PVCSourceProps> = ({ bootableVolume, setBootableVolumeField 
       />
       <Split hasGutter>
         <SplitItem>
-          <Checkbox id="clone-pvc-checkbox" isChecked isDisabled label={t('Clone existing PVC')} />
+          <Checkbox
+            id="clone-pvc-checkbox"
+            isChecked
+            isDisabled
+            label={t('Clone existing Volume')}
+          />
         </SplitItem>
         <SplitItem>
           <HelpTextIcon
-            bodyContent={t('This will create a cloned copy of the PVC in the destination project.')}
+            bodyContent={t(
+              'This will create a cloned copy of the Volume in the destination project.',
+            )}
             position={PopoverPosition.right}
           />
         </SplitItem>
