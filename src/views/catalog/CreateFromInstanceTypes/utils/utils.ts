@@ -138,7 +138,13 @@ export const generateVM = (
               namespace: getNamespace(selectedBootableVolume),
             },
             storage: {
-              resources: {},
+              resources: pvcSource
+                ? {
+                    requests: {
+                      storage: pvcSource?.spec?.resources?.requests?.storage,
+                    },
+                  }
+                : {},
               storageClassName,
             },
           },
