@@ -2,7 +2,12 @@ import { ComponentClass, FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { ErrorIcon } from '@kubevirt-utils/components/ErrorIcon/ErrorIcon';
-import { getVMStatus } from '@kubevirt-utils/resources/shared';
+import {
+  getVMRestoringStatus,
+  getVMSnapshottingStatus,
+  getVMStatus,
+} from '@kubevirt-utils/resources/shared';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   HourglassHalfIcon,
   InProgressIcon,
@@ -69,3 +74,8 @@ export const isStopped = (vm: V1VirtualMachine): boolean =>
 
 export const isPaused = (vm: V1VirtualMachine): boolean =>
   getVMStatus(vm) === printableVMStatus.Paused;
+
+export const isRestoring = (vm: V1VirtualMachine): boolean => !isEmpty(getVMRestoringStatus(vm));
+
+export const isSnapshotting = (vm: V1VirtualMachine): boolean =>
+  !isEmpty(getVMSnapshottingStatus(vm));
