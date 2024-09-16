@@ -70,7 +70,6 @@ const TemplateDisksPage: FC<TemplateDisksPageProps> = ({ obj: template }) => {
                 return createModal(({ isOpen, onClose }) => (
                   <DiskModal
                     createDiskSource={diskSource}
-                    isCreated={false}
                     isOpen={isOpen}
                     onClose={onClose}
                     onSubmit={onUpdate}

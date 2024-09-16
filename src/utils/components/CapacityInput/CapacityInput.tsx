@@ -18,12 +18,19 @@ import { CAPACITY_UNITS, removeByteSuffix } from './utils';
 
 type CapacityInputProps = {
   isEditingCreatedDisk?: boolean;
+  isMinusDisabled?: boolean;
   label?: string;
   onChange: (quantity: string) => void;
   size: string;
 };
 
-const CapacityInput: FC<CapacityInputProps> = ({ isEditingCreatedDisk, label, onChange, size }) => {
+const CapacityInput: FC<CapacityInputProps> = ({
+  isEditingCreatedDisk,
+  isMinusDisabled,
+  label,
+  onChange,
+  size,
+}) => {
   const { t } = useKubevirtTranslation();
   const [unitValue = ''] = size?.match(/[a-zA-Z]+/g) || [];
   const [sizeValue = 0] = size?.match(/[0-9]+/g) || [];
@@ -61,6 +68,7 @@ const CapacityInput: FC<CapacityInputProps> = ({ isEditingCreatedDisk, label, on
             max={Number.MAX_SAFE_INTEGER}
             min={1}
             minusBtnAriaLabel={t('Decrement')}
+            minusBtnProps={{ isDisabled: isMinusDisabled }}
             onMinus={() => onChange(`${Number(value) - 1}${removeByteSuffix(unit)}`)}
             plusBtnAriaLabel={t('Increment')}
             value={value}

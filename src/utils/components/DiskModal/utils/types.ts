@@ -1,4 +1,5 @@
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import {
   V1DataVolumeTemplateSpec,
   V1Disk,
@@ -38,8 +39,8 @@ export enum VolumeTypes {
 
 export type V1DiskModalProps = {
   createDiskSource?: SourceTypes;
+  createdPVCName?: string;
   editDiskName?: string;
-  isCreated?: boolean;
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
@@ -47,9 +48,15 @@ export type V1DiskModalProps = {
   vm: V1VirtualMachine;
 };
 
+export type V1SubDiskModalProps = V1DiskModalProps & {
+  isCreated: boolean;
+  pvc: IoK8sApiCoreV1PersistentVolumeClaim;
+};
+
 export type V1DiskFormState = {
   dataVolumeTemplate?: V1DataVolumeTemplateSpec;
   disk: V1Disk;
+  expandPVCSize?: string;
   isBootSource: boolean;
   storageClassProvisioner?: string;
   storageProfileSettingsApplied?: boolean;
