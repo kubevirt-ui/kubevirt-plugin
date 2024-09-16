@@ -1,29 +1,14 @@
 import { useMemo } from 'react';
 
-import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolume } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
 
-import { getDataSourceWatch, getPVCWatch } from './utils';
+import { getPVCWatch } from './utils';
 
 const useDisksSources = (vm: V1VirtualMachine) => {
-  const dataSourcesWatch = useMemo(() => getDataSourceWatch(vm), [vm]);
-
-  const dataSourcesWatchResult = useK8sWatchResources<{ [key: string]: V1beta1DataSource }>(
-    dataSourcesWatch,
-  );
-
-  const dataSources = useMemo(
-    () =>
-      Object.values(dataSourcesWatchResult || [])
-        .map((watch) => watch.data)
-        .filter((data) => !isEmpty(data)),
-    [dataSourcesWatchResult],
-  );
-
-  const pvcWatches = useMemo(() => getPVCWatch(vm, dataSources), [vm, dataSources]);
+  const pvcWatches = useMemo(() => getPVCWatch(vm), [vm]);
 
   const pvcWatchesResult = useK8sWatchResources<{ [key: string]: IoK8sApiCoreV1PersistentVolume }>(
     pvcWatches,
@@ -37,17 +22,15 @@ const useDisksSources = (vm: V1VirtualMachine) => {
     [pvcWatchesResult],
   );
 
-  const loaded = [
-    ...Object.values(dataSourcesWatchResult),
-    ...Object.values(pvcWatchesResult),
-  ].every((watch) => watch.loaded);
+  const loaded = Object.values(pvcWatchesResult).every(
+    (watch) => watch.loaded || !isEmpty(watch.loadError),
+  );
 
-  const loadingError = [
-    ...Object.values(dataSourcesWatchResult),
-    ...Object.values(pvcWatchesResult),
-  ].find((watch) => watch.loadError);
+  const loadingError = Object.values(pvcWatchesResult).find((watch) => {
+    return !isEmpty(watch.loadError) && watch.loadError?.code !== 404;
+  });
 
-  return { dataSources, loaded, loadingError, pvcs };
+  return { loaded, loadingError, pvcs };
 };
 
 export default useDisksSources;

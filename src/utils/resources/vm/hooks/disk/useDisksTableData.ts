@@ -6,7 +6,7 @@ import {
   getRunningVMMissingDisksFromVMI,
   getRunningVMMissingVolumesFromVMI,
 } from '@kubevirt-utils/components/DiskModal/utils/helpers';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getName } from '@kubevirt-utils/resources/shared';
 import { DiskRawData, DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 
 import {
@@ -52,7 +52,7 @@ const useDisksTableData: UseDisksTableDisks = (vm, vmi) => {
     [vm, vmi, isVMRunning],
   );
 
-  const { dataSources, loaded, loadingError, pvcs } = useDisksSources(vm);
+  const { loaded, loadingError, pvcs } = useDisksSources(vm);
 
   const disks = useMemo(() => {
     const isInstanceTypeVM = Boolean(getInstanceTypeMatcher(vm));
@@ -66,25 +66,17 @@ const useDisksTableData: UseDisksTableDisks = (vm, vmi) => {
         ? getDataVolumeTemplates(vm)?.find((dv) => getName(dv) === volume.dataVolume.name)
         : null;
 
-      const sourceRef = dataVolumeTemplate?.spec?.sourceRef;
-
-      const dataSource = dataSources.find(
-        (ds) => getName(ds) === sourceRef?.name && getNamespace(ds) === sourceRef?.namespace,
-      );
-
       const pvc = pvcs?.find(
         ({ metadata }) =>
           metadata?.name === volume?.persistentVolumeClaim?.claimName ||
-          metadata?.name === volume?.dataVolume?.name ||
-          (dataSource?.spec?.source?.pvc?.name === metadata?.name &&
-            dataSource?.spec?.source?.pvc?.namespace === metadata?.namespace),
+          metadata?.name === volume?.dataVolume?.name,
       );
 
       return { dataVolumeTemplate, disk, pvc, volume };
     });
 
     return getDiskRowDataLayout(diskDevices, getBootDisk(vm));
-  }, [vm, vmVolumes, vmDisks, pvcs, dataSources]);
+  }, [vm, vmVolumes, vmDisks, pvcs]);
 
   return [disks || [], loaded, loadingError, isVMRunning ? vmi : null];
 };
