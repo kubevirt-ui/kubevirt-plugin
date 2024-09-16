@@ -278,7 +278,12 @@ export const addISOFlowToVM = (vm: V1VirtualMachine, storageClassName: string) =
 
 export const addSizeToROOTDISKVM = (vm: V1VirtualMachine, storage: string) => {
   return produce(vm, (vmDraft) => {
-    const rootDisk = vmDraft.spec.dataVolumeTemplates.find((dv) => dv.metadata.name === ROOTDISK);
+    const rootDisk = vmDraft.spec.dataVolumeTemplates.find(
+      (dv) =>
+        dv.metadata.name === ROOTDISK ||
+        // In case of ISO flow
+        dv.metadata.name === `${vmDraft.metadata.name}-volume-blank`,
+    );
     rootDisk.spec.storage.resources = {
       requests: {
         storage,
