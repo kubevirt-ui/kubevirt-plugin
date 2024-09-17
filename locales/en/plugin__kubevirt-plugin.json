@@ -310,7 +310,6 @@
   "CPU and Memory can not be edited if the VirtualMachine is created from InstanceType": "CPU and Memory can not be edited if the VirtualMachine is created from InstanceType",
   "CPU sockets": "CPU sockets",
   "CPU used": "CPU used",
-  "CPUs": "CPUs",
   "CPUs = sockets x threads x cores": "CPUs = sockets x threads x cores",
   "CPUs = sockets x threads x cores.": "CPUs = sockets x threads x cores.",
   "Create": "Create",
