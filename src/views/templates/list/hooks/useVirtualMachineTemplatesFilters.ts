@@ -2,6 +2,8 @@ import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   getTemplateOS,
+  HIDE_DEPRECATED_TEMPLATES,
+  HIDE_DEPRECATED_TEMPLATES_KEY,
   isDefaultVariantTemplate,
   isDeprecatedTemplate,
   OS_NAMES,
@@ -44,12 +46,12 @@ const useVirtualMachineTemplatesFilters = (
       filterGroupName: ' ',
       items: [
         {
-          id: t('Hide deprecated templates'),
+          id: HIDE_DEPRECATED_TEMPLATES_KEY,
           title: t('Hide deprecated templates'),
         },
       ],
-      reducer: (obj) => isDeprecatedTemplate(obj) && 'Hide deprecated templates',
-      type: `hide-deprecated-templates`,
+      reducer: (obj) => isDeprecatedTemplate(obj) && HIDE_DEPRECATED_TEMPLATES_KEY,
+      type: HIDE_DEPRECATED_TEMPLATES,
     },
     {
       filter: ({ selected }, obj) => selected?.length === 0 || isDefaultVariantTemplate(obj),

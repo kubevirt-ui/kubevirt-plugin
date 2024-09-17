@@ -6,6 +6,7 @@ describe('Test VM catalog filter', () => {
     cy.login();
     cy.visitCatalog();
     cy.byTestID('templates-tab').click();
+    cy.get(catalogView.HIDE_DEPRECATED_TEMPLATES).find(catalogView.checkbox).uncheck();
   });
 
   it('ID(CNV-8464) Filter VM catalog by OS name', () => {

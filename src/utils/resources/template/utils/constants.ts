@@ -132,3 +132,6 @@ export const OS_IMAGE_LINKS = {
 
 export const GENERATE_VM_PRETTY_NAME_ANNOTATION =
   'openshift.kubevirt.io/pronounceable-suffix-for-name-expression';
+
+export const HIDE_DEPRECATED_TEMPLATES = 'hideDeprecatedTemplates';
+export const HIDE_DEPRECATED_TEMPLATES_KEY = 'hide-deprecated-templates';

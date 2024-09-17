@@ -19,6 +19,7 @@ import VirtualMachineTemplatesCreateButton from './components/VirtualMachineTemp
 import VirtualMachineTemplatesEmptyState from './components/VirtualMachineTemplatesEmptyState/VirtualMachineTemplatesEmptyState';
 import VirtualMachineTemplatesRow from './components/VirtualMachineTemplatesRow';
 import VirtualMachineTemplateSupport from './components/VirtualMachineTemplateSupport/VirtualMachineTemplateSupport';
+import useHideDeprecatedTemplates from './hooks/useHideDeprecatedTemplates';
 import { useTemplatesWithAvailableSource } from './hooks/useTemplatesWithAvailableSource';
 import useVirtualMachineTemplatesColumns from './hooks/useVirtualMachineTemplatesColumns';
 import useVirtualMachineTemplatesFilters from './hooks/useVirtualMachineTemplatesFilters';
@@ -57,6 +58,8 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
   const [columns, activeColumns, loadedColumns] = useVirtualMachineTemplatesColumns(namespace);
 
   const templatesLoaded = loaded && bootSourcesLoaded;
+
+  useHideDeprecatedTemplates(onFilterChange);
 
   if (templatesLoaded && isEmpty(data)) {
     return <VirtualMachineTemplatesEmptyState namespace={namespace} />;

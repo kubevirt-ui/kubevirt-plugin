@@ -10,6 +10,7 @@ import {
 } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import { DataSourceModelRef } from '@kubevirt-utils/models';
 import useBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useBootableVolumes';
+import useHideDeprecatedBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useHideDeprecatedBootableVolumes';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   K8sResourceCommon,
@@ -43,6 +44,8 @@ const BootableVolumesList: FC = () => {
     filteredData,
     preferences,
   );
+
+  useHideDeprecatedBootableVolumes(onFilterChange);
 
   const onPageChange = ({ endIndex, page, perPage, startIndex }) => {
     setPagination(() => ({

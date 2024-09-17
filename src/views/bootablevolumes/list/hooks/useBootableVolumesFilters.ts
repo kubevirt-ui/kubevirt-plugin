@@ -1,7 +1,11 @@
 import { PersistentVolumeClaimModel } from '@kubevirt-ui/kubevirt-api/console';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { ISO } from '@kubevirt-utils/resources/bootableresources/constants';
+import {
+  HIDE_DEPRECATED_BOOTABLE_VOLUMES,
+  HIDE_DEPRECATED_BOOTABLE_VOLUMES_LABEL,
+  ISO,
+} from '@kubevirt-utils/resources/bootableresources/constants';
 import {
   isBootableVolumeISO,
   isDeprecated,
@@ -28,8 +32,8 @@ const useBootableVolumesFilters = (): RowFilter<BootableResource>[] => {
           title: t('Hide deprecated bootable volumes'),
         },
       ],
-      reducer: (obj) => isDeprecated(getName(obj)) && 'Hide deprecated bootable volumes',
-      type: 'hide-deprecated-bootable volumes',
+      reducer: (obj) => isDeprecated(getName(obj)) && HIDE_DEPRECATED_BOOTABLE_VOLUMES_LABEL,
+      type: HIDE_DEPRECATED_BOOTABLE_VOLUMES,
     },
     {
       filter: (availableOsNames, obj) =>

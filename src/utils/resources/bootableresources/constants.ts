@@ -7,3 +7,6 @@ export const KUBEVIRT_ISO_LABEL = 'kubevirt.io/iso';
 export const ISO = 'ISO';
 
 export const deprecatedOSNames = ['centos-stream8', 'centos7'];
+
+export const HIDE_DEPRECATED_BOOTABLE_VOLUMES = 'hideDeprecatedBootableVolumes';
+export const HIDE_DEPRECATED_BOOTABLE_VOLUMES_LABEL = 'Hide deprecated bootable volumes';
