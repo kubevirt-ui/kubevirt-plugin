@@ -40,7 +40,7 @@ export const getDiskRowDataLayout = (
       namespace: device?.pvc?.metadata?.namespace,
       size: NO_DATA_DASH,
       source: OTHER,
-      storageClass: NO_DATA_DASH,
+      storageClass: device?.dataVolumeTemplate?.spec?.storage?.storageClassName || NO_DATA_DASH,
     };
 
     const pvcSize = device?.pvc?.spec?.resources?.requests?.storage;
