@@ -17,11 +17,12 @@ import CPUHelperText from './components/vCPUInput/components/CPUHelperText/CPUHe
 import './CPUInput.scss';
 
 type CPUInputProps = {
-  cpu: V1CPU;
-  setCPU: Dispatch<SetStateAction<V1CPU>>;
+  currentCPU: V1CPU;
+  setUserEnteredCPU: Dispatch<SetStateAction<V1CPU>>;
+  userEnteredCPU: V1CPU;
 };
 
-const CPUInput: FC<CPUInputProps> = ({ cpu, setCPU }) => {
+const CPUInput: FC<CPUInputProps> = ({ currentCPU, setUserEnteredCPU, userEnteredCPU }) => {
   const { t } = useKubevirtTranslation();
   const [selectedRadioOption, setSelectedRadioOption] = useState<CPUInputType>(
     CPUInputType.editVCPU,
@@ -50,9 +51,9 @@ const CPUInput: FC<CPUInputProps> = ({ cpu, setCPU }) => {
       <Radio
         body={
           <VCPUInput
-            cpu={formatVCPUsAsSockets(cpu)}
+            cpu={formatVCPUsAsSockets(userEnteredCPU)}
             isDisabled={selectedRadioOption !== CPUInputType.editVCPU}
-            setCPU={setCPU}
+            setCPU={setUserEnteredCPU}
           />
         }
         onClick={() => {
@@ -63,14 +64,17 @@ const CPUInput: FC<CPUInputProps> = ({ cpu, setCPU }) => {
         isLabelWrapped
         name={radioInputName}
       />
-      <CPUHelperText hide={cpu?.sockets === convertTopologyToVCPUs(cpu)} sockets={cpu?.sockets} />
+      <CPUHelperText
+        cpu={userEnteredCPU}
+        hide={userEnteredCPU?.sockets === convertTopologyToVCPUs(currentCPU)}
+      />
       <Radio
         body={
           <CPUTopologyInput
-            cpu={cpu}
+            cpu={userEnteredCPU}
             hide={selectedRadioOption !== CPUInputType.editTopologyManually}
             isDisabled={selectedRadioOption !== CPUInputType.editTopologyManually}
-            setCPU={setCPU}
+            setCPU={setUserEnteredCPU}
           />
         }
         onClick={() => {
