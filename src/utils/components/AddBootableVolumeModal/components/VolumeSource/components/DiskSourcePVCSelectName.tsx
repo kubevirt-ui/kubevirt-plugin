@@ -29,7 +29,7 @@ const DiskSourcePVCSelectName: FC<DiskSourcePVCSelectNameProps> = ({
   const fieldId = 'pvc-name-select';
 
   return (
-    <FormGroup fieldId={fieldId} id={fieldId} isRequired label={t('PVC name')}>
+    <FormGroup fieldId={fieldId} id={fieldId} isRequired label={t('Volume name')}>
       {pvcsLoaded ? (
         <InlineFilterSelect
           options={pvcNames?.map((name) => ({
@@ -37,9 +37,13 @@ const DiskSourcePVCSelectName: FC<DiskSourcePVCSelectNameProps> = ({
             groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
             value: name,
           }))}
+          toggleProps={{
+            isDisabled,
+            isFullWidth: true,
+            placeholder: t('--- Select Volume name ---'),
+          }}
           selected={pvcNameSelected}
           setSelected={onChange}
-          toggleProps={{ isDisabled, isFullWidth: true, placeholder: t('--- Select PVC name ---') }}
         />
       ) : (
         <Loading />
