@@ -1,5 +1,6 @@
 import { ConfigMapModel, modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResource, WatchK8sResult } from '@openshift-console/dynamic-plugin-sdk';
 
 import { AUTOUNATTEND, UNATTEND } from '../sysprep-utils';
@@ -16,7 +17,10 @@ const useSysprepConfigMaps = (namespace: string): WatchK8sResult<IoK8sApiCoreV1C
     namespace,
     namespaced: true,
   });
+
   const sysprepConfigMaps = configmaps?.filter((configmap) => {
+    if (isEmpty(configmap?.data)) return false;
+
     const dataKeys = Object.keys(configmap?.data);
     const hasSysprepXMLData = dataKeys.some((key) => {
       return (
