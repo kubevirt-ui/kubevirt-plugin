@@ -10,7 +10,7 @@ import { TemplateModel, V1Template } from '@kubevirt-utils/models';
 import { getTemplateVirtualMachineCPU } from '@kubevirt-utils/resources/template';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 
-import CPUMemoryModal from './CPUMemoryModal';
+import CPUMemoryModal from './CPUMemoryModal/CPUMemoryModal';
 
 type CPUMemoryProps = {
   editable: boolean;
