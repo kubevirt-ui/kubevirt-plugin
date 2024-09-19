@@ -17,9 +17,9 @@ import {
 import { SysprepModal } from '@kubevirt-utils/components/SysprepModal/SysprepModal';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { ConfigMapModel, modelToGroupVersionKind } from '@kubevirt-utils/models';
+import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import { Loading } from '@patternfly/quickstarts';
-
-import SimplifiedSysprepDescription from './SimplifiedSysprepDescription';
 
 const SysprepDescriptionItem: FC = () => {
   const { t } = useKubevirtTranslation();
@@ -90,11 +90,10 @@ const SysprepDescriptionItem: FC = () => {
 
   const sysprepDescription =
     autounattend || unattended ? (
-      <SimplifiedSysprepDescription
-        hasAutoUnattend={!!autounattend}
-        hasUnattend={!!unattended}
-        selectedSysprepName={currentSysprepName}
-        shouldCreateNewConfigMap={shouldCreateNewConfigMap}
+      <ResourceLink
+        groupVersionKind={modelToGroupVersionKind(ConfigMapModel)}
+        linkTo={false}
+        name={currentSysprepName}
       />
     ) : (
       t('Not configured')
@@ -110,6 +109,7 @@ const SysprepDescriptionItem: FC = () => {
             namespace={vmNamespaceTarget}
             onSysprepCreation={onSysprepCreation}
             onSysprepSelected={onSysprepSelected}
+            shouldCreateConfigMap={shouldCreateNewConfigMap}
             sysprepSelected={currentSysprepName}
             unattend={unattended}
           />

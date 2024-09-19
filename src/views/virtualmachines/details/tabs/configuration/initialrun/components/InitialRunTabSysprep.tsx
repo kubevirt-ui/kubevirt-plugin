@@ -57,8 +57,6 @@ const InitialRunTabSysprep: FC<InitialRunTabSysprepProps> = ({ canUpdateVM, onSu
       descriptionData={
         <SysprepDescription
           error={sysprepLoadError}
-          hasAutoUnattend={!!autoUnattend}
-          hasUnattend={!!unattend}
           loaded={sysprepLoaded}
           selectedSysprepName={currentVMSysprepName}
         />

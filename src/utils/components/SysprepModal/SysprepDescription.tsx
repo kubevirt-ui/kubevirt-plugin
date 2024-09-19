@@ -3,6 +3,7 @@ import React, { FC } from 'react';
 import { ConfigMapModel, modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import SysprepInfo from '@kubevirt-utils/components/SysprepModal/SysprepInfo';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, AlertVariant, DescriptionList, Stack, StackItem } from '@patternfly/react-core';
 
@@ -11,11 +12,9 @@ import VirtualMachineDescriptionItem from '../VirtualMachineDescriptionItem/Virt
 
 export const SysprepDescription: FC<{
   error?: Error;
-  hasAutoUnattend: boolean;
-  hasUnattend: boolean;
   loaded?: boolean;
   selectedSysprepName?: string;
-}> = ({ error, hasAutoUnattend, hasUnattend, loaded, selectedSysprepName }) => {
+}> = ({ error, loaded, selectedSysprepName }) => {
   const { t } = useKubevirtTranslation();
 
   if (error) {
@@ -29,6 +28,7 @@ export const SysprepDescription: FC<{
   if (!loaded) {
     return <Loading />;
   }
+
   return (
     <Stack hasGutter>
       <StackItem>
@@ -40,29 +40,19 @@ export const SysprepDescription: FC<{
           columnModifier={{ lg: '1Col', xl: '2Col' }}
           isCompact
         >
-          {selectedSysprepName ? (
-            <VirtualMachineDescriptionItem
-              descriptionData={
+          <VirtualMachineDescriptionItem
+            descriptionData={
+              isEmpty(selectedSysprepName) ? (
+                t('Not available')
+              ) : (
                 <ResourceLink
                   groupVersionKind={modelToGroupVersionKind(ConfigMapModel)}
                   linkTo={false}
                   name={selectedSysprepName}
                 />
-              }
-              descriptionHeader={t('Selected sysprep')}
-            />
-          ) : (
-            <>
-              <VirtualMachineDescriptionItem
-                descriptionData={hasAutoUnattend ? t('Available') : t('Not available')}
-                descriptionHeader={t('Autounattend.xml answer file')}
-              />
-              <VirtualMachineDescriptionItem
-                descriptionData={hasUnattend ? t('Available') : t('Not available')}
-                descriptionHeader={t('Unattend.xml answer file')}
-              />
-            </>
-          )}
+              )
+            }
+          />
         </DescriptionList>
       </StackItem>
     </Stack>

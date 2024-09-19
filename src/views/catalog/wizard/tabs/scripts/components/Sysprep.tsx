@@ -84,14 +84,6 @@ const Sysprep: FC = () => {
 
   return (
     <WizardDescriptionItem
-      description={
-        <SysprepDescription
-          hasAutoUnattend={!!autoUnattend}
-          hasUnattend={!!unattend}
-          loaded
-          selectedSysprepName={selectedSysprep}
-        />
-      }
       onEditClick={() =>
         createModal((modalProps) => (
           <SysprepModal
@@ -105,6 +97,7 @@ const Sysprep: FC = () => {
           />
         ))
       }
+      description={<SysprepDescription loaded selectedSysprepName={currentVMSysprepName} />}
       isDisabled={tabsData?.overview?.templateMetadata?.osType !== WINDOWS}
       isEdit
       label={<WindowsLabel />}
