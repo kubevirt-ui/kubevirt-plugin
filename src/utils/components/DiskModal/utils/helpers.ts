@@ -22,7 +22,7 @@ import {
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
 import { getBootDisk, getDataVolumeTemplates, getVolumes } from '@kubevirt-utils/resources/vm';
 import { getOperatingSystem } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
-import { ensurePath } from '@kubevirt-utils/utils/utils';
+import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 import { addPersistentVolume, removeVolume } from '@virtualmachines/actions/actions';
 
@@ -229,3 +229,12 @@ export const diskModalTitle = (isEditDisk: boolean, isVMRunning: boolean) => {
 
 export const getOS = (vm: V1VirtualMachine) =>
   getAnnotation(vm?.spec?.template, ANNOTATIONS.os) || getOperatingSystem(vm);
+
+export const doesDataVolumeTemplateHaveDisk = (vm: V1VirtualMachine, diskName: string) => {
+  const diskVolume = getVolumes(vm)?.find((volume) => volume.name === diskName);
+  const dataVolumeTemplate = getDataVolumeTemplates(vm)?.find(
+    (dv) => getName(dv) === diskVolume?.dataVolume?.name,
+  );
+
+  return !isEmpty(dataVolumeTemplate);
+};

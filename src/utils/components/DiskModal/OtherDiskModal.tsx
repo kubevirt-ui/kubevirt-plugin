@@ -13,8 +13,9 @@ import DiskInterfaceSelect from './components/DiskInterfaceSelect/DiskInterfaceS
 import DiskNameInput from './components/DiskNameInput/DiskNameInput';
 import DiskTypeSelect from './components/DiskTypeSelect/DiskTypeSelect';
 import PendingChanges from './components/PendingChanges';
+import StorageClassAndPreallocation from './components/StorageClassAndPreallocation/StorageClassAndPreallocation';
 import { getDefaultCreateValues, getDefaultEditValues } from './utils/form';
-import { diskModalTitle } from './utils/helpers';
+import { diskModalTitle, doesDataVolumeTemplateHaveDisk } from './utils/helpers';
 import { submit } from './utils/submit';
 import { SourceTypes, V1DiskFormState, V1DiskModalProps } from './utils/types';
 
@@ -50,6 +51,9 @@ const OtherDiskModal: FC<V1DiskModalProps> = ({ editDiskName, isOpen, onClose, o
           <DiskNameInput />
           <DiskTypeSelect isVMRunning={isVMRunning} />
           <DiskInterfaceSelect isVMRunning={isVMRunning} />
+          {doesDataVolumeTemplateHaveDisk(vm, editDiskName) && (
+            <StorageClassAndPreallocation vm={vm} />
+          )}
           <AdvancedSettings />
         </Form>
       </TabModal>
