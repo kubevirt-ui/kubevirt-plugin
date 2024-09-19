@@ -89,7 +89,6 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({ diskName }) => {
           })
         }
         editDiskName={diskName}
-        isCreated={false}
         isOpen={isOpen}
         onClose={onClose}
         onSubmit={updateVM}

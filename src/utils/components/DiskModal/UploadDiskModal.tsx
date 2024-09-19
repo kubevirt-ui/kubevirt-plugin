@@ -22,9 +22,9 @@ import StorageClassAndPreallocation from './components/StorageClassAndPreallocat
 import { getDefaultCreateValues } from './utils/form';
 import { diskModalTitle, hotplugPromise } from './utils/helpers';
 import { addDisk, reorderBootDisk, uploadDataVolume } from './utils/submit';
-import { SourceTypes, V1DiskFormState, V1DiskModalProps } from './utils/types';
+import { SourceTypes, V1DiskFormState, V1SubDiskModalProps } from './utils/types';
 
-const UploadDiskModal: FC<V1DiskModalProps> = ({
+const UploadDiskModal: FC<V1SubDiskModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
@@ -86,7 +86,7 @@ const UploadDiskModal: FC<V1DiskModalProps> = ({
           <BootSourceCheckbox isDisabled={isVMRunning} vm={vm} />
           <DiskNameInput />
           <DiskSourceUploadPVC relevantUpload={upload} />
-          <DiskSizeInput isCreated={false} namespace={vmNamespace} />
+          <DiskSizeInput namespace={vmNamespace} />
           <DiskTypeSelect isVMRunning={isVMRunning} />
           <DiskInterfaceSelect isVMRunning={isVMRunning} />
           <StorageClassAndPreallocation vm={vm} />

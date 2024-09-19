@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { FC, useState } from 'react';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
@@ -18,7 +18,7 @@ import DeleteDiskModal from '../../modal/DeleteDiskModal';
 import DetachModal from '../../modal/DetachModal';
 import MakePersistentModal from '../../modal/MakePersistentModal';
 
-import { isHotplugVolume } from './utils/helpers';
+import { isHotplugVolume, isPVCSource } from './utils/helpers';
 
 type DiskRowActionsProps = {
   customize?: boolean;
@@ -43,7 +43,6 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
 
   const isVMRunning = isRunning(vm);
   const isHotplug = isHotplugVolume(vm, diskName, vmi);
-  const isEditDisabled = isVMRunning;
 
   const volumes = isVMRunning ? vmi?.spec?.volumes : getVolumes(vm);
   const volume = volumes?.find(({ name }) => name === diskName);
@@ -51,13 +50,6 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
   const editBtnText = t('Edit');
   const deleteBtnText = t('Detach');
   const removeHotplugBtnText = t('Make persistent');
-
-  const disabledEditText = useMemo(() => {
-    if (isVMRunning) {
-      return t('Can edit only when VirtualMachine is stopped');
-    }
-    return null;
-  }, [isVMRunning, t]);
 
   const onCustomizeDeleteDisk = () => {
     const newVM = produceVMDisks(vm, (draftVM) => {
@@ -79,6 +71,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
   const createEditDiskModal = () =>
     createModal(({ isOpen, onClose }) => (
       <DiskModal
+        createdPVCName={isPVCSource(obj) ? obj?.source : null}
         editDiskName={diskName}
         isOpen={isOpen}
         onClose={onClose}
@@ -131,12 +124,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
       toggle={KebabToggle({ id: 'toggle-id-6', isExpanded: isDropdownOpen, onClick: onToggle })}
     >
       <DropdownList>
-        <DropdownItem
-          description={disabledEditText}
-          isDisabled={isEditDisabled}
-          key="disk-edit"
-          onClick={() => onModalOpen(createEditDiskModal)}
-        >
+        <DropdownItem key="disk-edit" onClick={() => onModalOpen(createEditDiskModal)}>
           {editBtnText}
         </DropdownItem>
         <DropdownItem key="disk-delete" onClick={() => onModalOpen(createDeleteDiskModal)}>

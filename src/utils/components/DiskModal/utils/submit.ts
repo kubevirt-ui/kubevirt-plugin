@@ -1,8 +1,10 @@
 import produce from 'immer';
 
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
+import { PersistentVolumeClaimModel } from '@kubevirt-utils/models';
 import { getName } from '@kubevirt-utils/resources/shared';
 import {
   getBootDisk,
@@ -11,6 +13,7 @@ import {
   getVolumes,
 } from '@kubevirt-utils/resources/vm';
 import { generatePrettyName, isEmpty } from '@kubevirt-utils/utils/utils';
+import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { isRunning } from '@virtualmachines/utils';
 
 import { getDataVolumeTemplateSize } from '../components/utils/selectors';
@@ -108,12 +111,15 @@ export const addDisk = (data: V1DiskFormState, vm: V1VirtualMachine) => {
   });
 };
 
-export const submit = (
-  data: V1DiskFormState,
-  vm: V1VirtualMachine,
-  editDiskName: string,
-  onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>,
-) => {
+type SubmitInput = {
+  data: V1DiskFormState;
+  editDiskName: string;
+  onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
+  pvc?: IoK8sApiCoreV1PersistentVolumeClaim;
+  vm: V1VirtualMachine;
+};
+
+export const submit = async ({ data, editDiskName, onSubmit, pvc, vm }: SubmitInput) => {
   const isVMRunning = isRunning(vm);
 
   const isEditDisk = !isEmpty(editDiskName);
@@ -122,6 +128,20 @@ export const submit = (
   const vmWithDisk = isEditDisk ? editDisk(data, editDiskName, vm) : addDisk(data, vm);
 
   const newVM = reorderBootDisk(vmWithDisk, data.disk.name, data.isBootSource, isInitialBootDisk);
+
+  if (data.expandPVCSize && pvc) {
+    await k8sPatch({
+      data: [
+        {
+          op: 'replace',
+          path: '/spec/resources/requests',
+          value: { storage: data.expandPVCSize },
+        },
+      ],
+      model: PersistentVolumeClaimModel,
+      resource: pvc,
+    });
+  }
 
   return !isVMRunning ? onSubmit(newVM) : (hotplugPromise(newVM, data) as Promise<any>);
 };

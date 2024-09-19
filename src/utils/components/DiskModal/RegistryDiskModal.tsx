@@ -21,20 +21,22 @@ import { REGISTRYURL_DATAVOLUME_FIELD } from './components/utils/constants';
 import { getDefaultCreateValues, getDefaultEditValues } from './utils/form';
 import { diskModalTitle, getOS } from './utils/helpers';
 import { submit } from './utils/submit';
-import { SourceTypes, V1DiskFormState, V1DiskModalProps } from './utils/types';
+import { SourceTypes, V1DiskFormState, V1SubDiskModalProps } from './utils/types';
 
-const RegistryDiskModal: FC<V1DiskModalProps> = ({
+const RegistryDiskModal: FC<V1SubDiskModalProps> = ({
   editDiskName,
   isCreated,
   isOpen,
   onClose,
   onSubmit,
+  pvc,
   vm,
 }) => {
   const os = getOS(vm);
   const isVMRunning = isRunning(vm);
 
   const isEditDisk = !isEmpty(editDiskName);
+  const namespace = getNamespace(vm);
 
   const methods = useForm<V1DiskFormState>({
     defaultValues: isEditDisk
@@ -51,19 +53,21 @@ const RegistryDiskModal: FC<V1DiskModalProps> = ({
   return (
     <FormProvider {...methods}>
       <TabModal
+        onSubmit={() =>
+          handleSubmit(async (data) => submit({ data, editDiskName, onSubmit, pvc, vm }))()
+        }
         closeOnSubmit={isValid}
         headerText={diskModalTitle(isEditDisk, isVMRunning)}
         isLoading={isSubmitting}
         isOpen={isOpen}
         onClose={onClose}
-        onSubmit={() => handleSubmit(async (data) => submit(data, vm, editDiskName, onSubmit))()}
       >
         <PendingChanges isVMRunning={isVMRunning} />
         <Form>
           <BootSourceCheckbox editDiskName={editDiskName} isDisabled={isVMRunning} vm={vm} />
           <DiskNameInput />{' '}
           {!isCreated && <DiskSourceContainer fieldName={REGISTRYURL_DATAVOLUME_FIELD} os={os} />}
-          <DiskSizeInput isCreated={isCreated} namespace={getNamespace(vm)} />
+          <DiskSizeInput isCreated={isCreated} namespace={namespace} pvc={pvc} />
           <DiskTypeSelect isVMRunning={isVMRunning} />
           <DiskInterfaceSelect isVMRunning={isVMRunning} />
           {!isCreated && <StorageClassAndPreallocation vm={vm} />}

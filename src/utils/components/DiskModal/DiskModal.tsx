@@ -1,16 +1,18 @@
 import React, { FC } from 'react';
 
-import { getName } from '@kubevirt-utils/resources/shared';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getDataVolumeTemplates, getVolumes } from '@kubevirt-utils/resources/vm';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 
+import usePVCDiskSource from './hooks/usePVCDiskSource';
 import { modalsBySource } from './utils/constants';
 import { getSourceFromVolume } from './utils/helpers';
 import { V1DiskModalProps } from './utils/types';
 
 const DiskModal: FC<V1DiskModalProps> = ({
   createDiskSource,
+  createdPVCName,
   editDiskName,
-  isCreated,
   isOpen,
   onClose,
   onSubmit,
@@ -22,6 +24,9 @@ const DiskModal: FC<V1DiskModalProps> = ({
     (dv) => getName(dv) === diskVolume?.dataVolume?.name,
   );
 
+  const namespace = getNamespace(vm);
+  const [pvc] = usePVCDiskSource(createdPVCName, namespace);
+
   const editDiskSource = getSourceFromVolume(diskVolume, dataVolumeTemplate);
 
   const Modal = modalsBySource[createDiskSource || editDiskSource];
@@ -30,11 +35,12 @@ const DiskModal: FC<V1DiskModalProps> = ({
     <Modal
       createDiskSource={createDiskSource}
       editDiskName={editDiskName}
-      isCreated={isCreated}
+      isCreated={!isEmpty(createdPVCName)}
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={onSubmit}
       onUploadedDataVolume={onUploadedDataVolume}
+      pvc={pvc}
       vm={vm}
     />
   );

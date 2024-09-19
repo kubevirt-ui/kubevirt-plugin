@@ -66,7 +66,6 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({ diskName, isDisabled, onUpdat
     createModal(({ isOpen, onClose }) => (
       <DiskModal
         editDiskName={diskName}
-        isCreated={false}
         isOpen={isOpen}
         onClose={onClose}
         onSubmit={onUpdate}

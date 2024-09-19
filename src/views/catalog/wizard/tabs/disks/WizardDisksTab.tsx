@@ -53,7 +53,6 @@ const WizardDisksTab: WizardTab = ({ tabsData, updateTabsData, updateVM, vm }) =
                     })
                   }
                   createDiskSource={diskSource}
-                  isCreated={false}
                   isOpen={isOpen}
                   onClose={onClose}
                   onSubmit={updateVM}
