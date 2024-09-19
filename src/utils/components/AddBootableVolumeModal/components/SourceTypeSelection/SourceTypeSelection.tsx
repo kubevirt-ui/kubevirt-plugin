@@ -51,6 +51,7 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
     <FormGroup fieldId="source-type" label={t('Source type')}>
       <Select
         toggle={SelectToggle({
+          'data-test-id': 'source-type-select',
           isExpanded: isOpen,
           isFullWidth: true,
           onClick: onToggle,
@@ -68,6 +69,7 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
             {...(!canUploadImage && {
               description: t("You don't have permission to perform this action"),
             })}
+            data-test-id="upload-volume"
           >
             {optionsValueLabelMapper[DROPDOWN_FORM_SELECTION.UPLOAD_VOLUME]}
           </SelectOption>
@@ -75,6 +77,7 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
         <Divider />
         <SelectGroup label={t('Use existing')}>
           <SelectOption
+            data-test-id="use-existing-volume"
             description={t('Use volume already available on the cluster')}
             isDisabled={!canCreatePVC}
             value={DROPDOWN_FORM_SELECTION.USE_EXISTING_PVC}
@@ -82,6 +85,7 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
             {optionsValueLabelMapper[DROPDOWN_FORM_SELECTION.USE_EXISTING_PVC]}
           </SelectOption>
           <SelectOption
+            data-test-id="use-snapshot"
             isDisabled={!canCreateSnapshots}
             value={DROPDOWN_FORM_SELECTION.USE_SNAPSHOT}
           >
@@ -91,6 +95,7 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
         <Divider />
         <SelectGroup label={t('Import from')}>
           <SelectOption
+            data-test-id="use-registry"
             description={t('Content from container registry')}
             isDisabled={!canCreateDS}
             value={DROPDOWN_FORM_SELECTION.USE_REGISTRY}
