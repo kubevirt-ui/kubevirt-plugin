@@ -60,7 +60,7 @@ const DetailsRightGrid: FC = () => {
       />
       <VirtualMachineDescriptionItem
         descriptionData={<DiskSize />}
-        descriptionHeader={t('Boot disk size')}
+        descriptionHeader={t('Disk size')}
       />
       <VirtualMachineDescriptionItem
         descriptionData={
