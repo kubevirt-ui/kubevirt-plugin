@@ -3,12 +3,17 @@ import React, { Ref } from 'react';
 import { MenuToggle, MenuToggleElement, MenuToggleProps } from '@patternfly/react-core';
 
 type SelectToggleProps = MenuToggleProps & {
+  'data-test-id'?: string;
   selected: any;
 };
 
-const SelectToggle = ({ selected, ...menuProps }: SelectToggleProps) => {
+const SelectToggle = ({
+  'data-test-id': dataTestID,
+  selected,
+  ...menuProps
+}: SelectToggleProps) => {
   return (toggleRef: Ref<MenuToggleElement>) => (
-    <MenuToggle ref={toggleRef} {...menuProps}>
+    <MenuToggle data-test-id={dataTestID} ref={toggleRef} {...menuProps}>
       {selected}
     </MenuToggle>
   );
