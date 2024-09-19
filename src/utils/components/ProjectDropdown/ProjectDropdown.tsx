@@ -23,16 +23,12 @@ const ProjectDropdown: FC<ProjectDropdownProps> = ({
     namespaced: false,
   });
 
-  const onSelect = (value: string) => {
-    onChange(value === ALL_PROJECTS ? '' : value);
-  };
-
   return (
     <div className="project-dropdown">
       <InlineFilterSelect
         options={getProjectOptions(includeAllProjects, projects)}
         selected={selectedProject || ALL_PROJECTS}
-        setSelected={onSelect}
+        setSelected={onChange}
         toggleProps={{ isFullWidth: true }}
       />
     </div>
