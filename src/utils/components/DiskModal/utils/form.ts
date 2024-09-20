@@ -90,6 +90,7 @@ export const getDefaultCreateValues = (
       name: newDiskName,
     },
     isBootSource: false,
+    storageProfileSettingsApplied: true,
     volume,
   };
 };
