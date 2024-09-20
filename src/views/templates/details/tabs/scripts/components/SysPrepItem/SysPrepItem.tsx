@@ -84,14 +84,6 @@ const SysPrepItem: FC<SysPrepItemProps> = ({ template }) => {
 
   return (
     <VirtualMachineDescriptionItem
-      descriptionData={
-        <SysprepDescription
-          error={sysprepLoadError}
-          hasAutoUnattend={!!autoUnattend}
-          hasUnattend={!!unattend}
-          loaded={sysprepLoaded}
-        />
-      }
       descriptionHeader={
         <Flex className="vm-description-item__title">
           <FlexItem>
@@ -125,6 +117,7 @@ const SysPrepItem: FC<SysPrepItemProps> = ({ template }) => {
           </FlexItem>
         </Flex>
       }
+      descriptionData={<SysprepDescription error={sysprepLoadError} loaded={sysprepLoaded} />}
     />
   );
 };

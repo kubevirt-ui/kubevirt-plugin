@@ -16,6 +16,7 @@ export const SysprepModal: FC<{
   onClose: () => void;
   onSysprepCreation?: (unattended: string, autoUnattend: string) => Promise<void> | void;
   onSysprepSelected?: (sysprepName: string) => Promise<void> | void;
+  shouldCreateConfigMap?: boolean;
   sysprepSelected?: string;
   unattend: string;
 }> = ({
@@ -26,13 +27,14 @@ export const SysprepModal: FC<{
   onClose,
   onSysprepCreation,
   onSysprepSelected,
+  shouldCreateConfigMap = true,
   sysprepSelected,
   unattend: initialUnattend,
 }) => {
   const { t } = useKubevirtTranslation();
   const [autoUnattend, setAutoUnattend] = useState(initialAutoUnattend);
   const [unattend, setUnattend] = useState(initialUnattend);
-  const [creationSectionOpen, setCreationSection] = useState(!sysprepSelected);
+  const [creationSectionOpen, setCreationSection] = useState(shouldCreateConfigMap);
   const [selectedSysprepName, setSelectedSysprepName] = useState(sysprepSelected);
 
   const submitHandler = async () => {
