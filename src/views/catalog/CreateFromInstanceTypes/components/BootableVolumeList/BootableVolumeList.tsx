@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { UseBootableVolumesValues } from '@catalog/CreateFromInstanceTypes/state/utils/types';
@@ -6,6 +6,9 @@ import { CREATE_VM_TAB } from '@catalog/CreateVMHorizontalNav/constants';
 import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import ProjectDropdown from '@kubevirt-utils/components/ProjectDropdown/ProjectDropdown';
+import { OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
+import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
+import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { UserSettingFavorites } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/types';
 import useHideDeprecatedBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useHideDeprecatedBootableVolumes';
@@ -47,6 +50,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
   selectedBootableVolumeState,
 }) => {
   const { t } = useKubevirtTranslation();
+  const isAdmin = useIsAdmin();
 
   const {
     instanceTypeVMState,
@@ -89,6 +93,12 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
     pagination,
   );
 
+  useEffect(() => {
+    if (!isAdmin && volumeListNamespace === ALL_PROJECTS) {
+      setVolumeListNamespace(OPENSHIFT_OS_IMAGES_NS);
+    }
+  }, [isAdmin, volumeListNamespace, setVolumeListNamespace]);
+
   const displayVolumes = !isEmpty(bootableVolumes) && loaded && loadedColumns;
 
   const onModalBootableVolumeSelect = (modalSelectedVolume: BootableVolume) => {
@@ -110,6 +120,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
             label={t('Volumes project')}
           >
             <ProjectDropdown
+              includeAllProjects={isAdmin}
               onChange={setVolumeListNamespace}
               selectedProject={volumeListNamespace}
             />
