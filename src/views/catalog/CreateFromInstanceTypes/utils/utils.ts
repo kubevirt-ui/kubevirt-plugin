@@ -213,7 +213,7 @@ export const generateVM = (
   }
 
   if (instanceTypeState.customDiskSize) {
-    emptyVM = addSizeToROOTDISKVM(emptyVM, instanceTypeState.customDiskSize);
+    emptyVM = addSizeToROOTDISKVM(emptyVM, instanceTypeState.customDiskSize, isIso);
   }
 
   if (sshSecretName) {
@@ -273,14 +273,11 @@ export const addISOFlowToVM = (vm: V1VirtualMachine, storageClassName: string) =
   });
 };
 
-export const addSizeToROOTDISKVM = (vm: V1VirtualMachine, storage: string) => {
+export const addSizeToROOTDISKVM = (vm: V1VirtualMachine, storage: string, isIso: boolean) => {
   return produce(vm, (vmDraft) => {
-    const rootDisk = vmDraft.spec.dataVolumeTemplates.find(
-      (dv) =>
-        dv.metadata.name === ROOTDISK ||
-        // In case of ISO flow
-        dv.metadata.name === `${vmDraft.metadata.name}-volume-blank`,
-    );
+    const dvName = `${vmDraft.metadata.name}-volume${isIso ? '-blank' : ''}`;
+
+    const rootDisk = vmDraft.spec.dataVolumeTemplates.find((dv) => dv.metadata.name === dvName);
     rootDisk.spec.storage.resources = {
       requests: {
         storage,
