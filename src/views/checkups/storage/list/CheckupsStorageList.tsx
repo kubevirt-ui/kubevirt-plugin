@@ -25,6 +25,7 @@ const CheckupsStorageList = () => {
   const {
     clusterRoleBinding,
     isPermitted,
+    isPermittedToInstall,
     loading: loadingPermissions,
   } = useCheckupsStoragePermissions();
   const { configMaps, error, jobs, loading } = useCheckupsStorageData();
@@ -38,6 +39,7 @@ const CheckupsStorageList = () => {
       <CheckupsStorageListEmptyState
         clusterRoleBinding={clusterRoleBinding}
         isPermitted={isPermitted}
+        isPermittedToInstall={isPermittedToInstall}
         loadingPermissions={loadingPermissions}
       />
     );

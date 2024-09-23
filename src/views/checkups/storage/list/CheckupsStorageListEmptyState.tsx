@@ -27,12 +27,14 @@ import './CheckupsStorageListEmptyState.scss';
 type CheckupsStorageListEmptyStateProps = {
   clusterRoleBinding: IoK8sApiRbacV1ClusterRoleBinding;
   isPermitted: boolean;
+  isPermittedToInstall: boolean;
   loadingPermissions: boolean;
 };
 
 const CheckupsStorageListEmptyState: FC<CheckupsStorageListEmptyStateProps> = ({
   clusterRoleBinding,
   isPermitted,
+  isPermittedToInstall,
   loadingPermissions,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -64,6 +66,12 @@ const CheckupsStorageListEmptyState: FC<CheckupsStorageListEmptyStateProps> = ({
         </EmptyStateActions>
         <EmptyStateActions>
           <Button
+            isDisabled={
+              isLoading ||
+              loadingPermissions ||
+              namespace === ALL_NAMESPACES_SESSION_KEY ||
+              !isPermittedToInstall
+            }
             onClick={async () => {
               setIsLoading(true);
               try {
@@ -76,7 +84,6 @@ const CheckupsStorageListEmptyState: FC<CheckupsStorageListEmptyStateProps> = ({
                 setIsLoading(false);
               }
             }}
-            isDisabled={isLoading || loadingPermissions || namespace === ALL_NAMESPACES_SESSION_KEY}
             isLoading={isLoading || loadingPermissions}
             variant={isLoading ? ButtonVariant.plain : ButtonVariant.secondary}
           >
@@ -84,7 +91,12 @@ const CheckupsStorageListEmptyState: FC<CheckupsStorageListEmptyStateProps> = ({
           </Button>
         </EmptyStateActions>
         <EmptyStateActions className="empty-state-secondary-action">
-          <ExternalLink href={'#'} text={t('Learn more about storage checkups')} />
+          <ExternalLink
+            href={
+              'https://docs.openshift.com/container-platform/4.16/virt/monitoring/virt-running-cluster-checkups.html'
+            }
+            text={t('Learn more about storage checkups')}
+          />
         </EmptyStateActions>
       </EmptyStateFooter>
     </EmptyState>

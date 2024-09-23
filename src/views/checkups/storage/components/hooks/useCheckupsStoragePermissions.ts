@@ -14,6 +14,7 @@ import {
   IoK8sApiRbacV1ClusterRoleBinding,
 } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useActiveNamespace, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 import {
@@ -44,7 +45,9 @@ export const useCheckupsStoragePermissions = () => {
     },
   );
 
-  const [clusterRoleBinding] = useK8sWatchResource<IoK8sApiRbacV1ClusterRoleBinding[]>(
+  const [clusterRoleBinding, loadedClusterRoleBinding] = useK8sWatchResource<
+    IoK8sApiRbacV1ClusterRoleBinding[]
+  >(
     !isAllNamespace && {
       groupVersionKind: modelToGroupVersionKind(ClusterRoleBindingModel),
       isList: true,
@@ -81,7 +84,11 @@ export const useCheckupsStoragePermissions = () => {
 
   return {
     clusterRoleBinding: isClusterRoleBinding,
-    isPermitted: Boolean(isServiceAccount && isConfigMapRole && isConfigMapRoleBinding),
-    loading: !loadingServiceAccounts && !loadingRoles && !loadingRolesBinding,
+    isPermitted: Boolean(
+      isServiceAccount && isConfigMapRole && isConfigMapRoleBinding && isClusterRoleBinding,
+    ),
+    isPermittedToInstall: !isEmpty(clusterRoleBinding),
+    loading:
+      !loadingServiceAccounts && !loadingRoles && !loadingRolesBinding && !loadedClusterRoleBinding,
   };
 };
