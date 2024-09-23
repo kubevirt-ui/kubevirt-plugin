@@ -11,11 +11,13 @@ import {
   V1Volume,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
+  convertUserDataObjectToYAML,
   convertYAMLUserDataObject,
   getCloudInitData,
   getCloudInitVolume,
 } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
 import {
+  DYNAMIC_SSH_INJECTION_CMD,
   MAX_NAME_LENGTH,
   MIN_NAME_LENGTH_FOR_GENERATED_SUFFIX,
 } from '@kubevirt-utils/components/SSHSecretModal/utils/constants';
@@ -87,14 +89,17 @@ export const detachVMSecret = async (vm: V1VirtualMachine) => {
 
 export const applyCloudDriveCloudInitVolume = (
   vm: V1VirtualMachine,
-  isDynamic?: boolean,
+  isDynamic?: boolean | undefined,
 ): V1Volume[] => {
   const cloudInitVolume = getCloudInitVolume(vm);
 
   if (isEmpty(cloudInitVolume)) return getVolumes(vm);
 
   const cloudDriveVolume: V1Volume = {
-    cloudInitNoCloud: getCloudInitConfigDrive(isDynamic, getCloudInitData(cloudInitVolume)),
+    cloudInitNoCloud:
+      isDynamic === undefined
+        ? getCloudInitData(cloudInitVolume)
+        : getCloudInitConfigDrive(isDynamic, getCloudInitData(cloudInitVolume)),
     name: cloudInitVolume.name,
   };
 
@@ -135,23 +140,29 @@ export const getCloudInitPropagationMethod = (
       }
     : ({ noCloud: {} } as V1SSHPublicKeyAccessCredentialPropagationMethod);
 };
+
+export const cmdIsSSHInjection = (cmd: string | string[]) => {
+  const extendedCommand = Array.isArray(cmd) ? cmd?.join(' ') : cmd;
+  return extendedCommand?.includes(DYNAMIC_SSH_INJECTION_CMD);
+};
+
 export const getCloudInitConfigDrive = (
   isDynamic: boolean,
   cloudInitVolumeData: V1CloudInitConfigDriveSource | V1CloudInitNoCloudSource,
-  isTemplate = false,
 ): V1CloudInitConfigDriveSource => {
-  const runCmd = `${
-    isTemplate ? '\n' : ''
-  }runcmd:\n- [ setsebool, -P, virt_qemu_ga_manage_ssh, on ]`;
-  const userData = cloudInitVolumeData?.userData?.concat(runCmd);
-  const userDataClean = cloudInitVolumeData?.userData?.replace(runCmd, '');
+  const userData = convertYAMLUserDataObject(cloudInitVolumeData?.userData);
 
-  return isDynamic
-    ? {
-        ...cloudInitVolumeData,
-        userData,
-      }
-    : { ...cloudInitVolumeData, userData: userDataClean };
+  userData.runcmd ??= [];
+
+  if (isDynamic && !userData.runcmd.find(cmdIsSSHInjection))
+    userData.runcmd.push(DYNAMIC_SSH_INJECTION_CMD);
+
+  if (!isDynamic) userData.runcmd = userData.runcmd.filter((cmd) => !cmdIsSSHInjection(cmd));
+
+  return {
+    ...cloudInitVolumeData,
+    userData: convertUserDataObjectToYAML(userData, true),
+  };
 };
 
 export const createSSHSecret = (
