@@ -82,7 +82,7 @@ const virtualizationSection = [
       model: {
         group: 'instancetype.kubevirt.io',
         kind: 'VirtualMachineClusterInstancetype',
-        version: 'v1alpha2',
+        version: 'v1beta1',
       },
       name: '%plugin__kubevirt-plugin~InstanceTypes%',
       perspective: 'virtualization-perspective',
@@ -104,7 +104,7 @@ const virtualizationSection = [
       model: {
         group: 'instancetype.kubevirt.io',
         kind: 'VirtualMachineClusterPreference',
-        version: 'v1alpha2',
+        version: 'v1beta1',
       },
       name: '%plugin__kubevirt-plugin~Preferences%',
       perspective: 'virtualization-perspective',
