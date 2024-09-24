@@ -886,10 +886,10 @@
     semver "6.x"
     webpack "5.75.0"
 
-"@openshift-console/dynamic-plugin-sdk@1.4.0":
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/@openshift-console/dynamic-plugin-sdk/-/dynamic-plugin-sdk-1.4.0.tgz#802c1225f22a6d59b16b5b47f0ff81f176f2db72"
-  integrity sha512-LcwNqG2ZzMKLiSQNpHBwAtzALQghUngILhdijndpIklSH0Dsqi05nhwAJPyuFrpwywZIj6BxE1tmaBzR5gUfcA==
+"@openshift-console/dynamic-plugin-sdk@1.6.0":
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/@openshift-console/dynamic-plugin-sdk/-/dynamic-plugin-sdk-1.6.0.tgz#edd89aa289230e77cc53bdd2e30a77dc9a270169"
+  integrity sha512-we35a98M5g+ABPpX9OT0QTcxSx9SOmwoXt73a9NNO9wW4KchvSRWj6oB8uoX6F3rv1Wa+ndzYKvbYivxWNNqXA==
   dependencies:
     classnames "2.x"
     immutable "3.x"
