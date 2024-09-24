@@ -18,7 +18,7 @@ const EndTourContent: FC = () => {
       or continue to learn more in our{' '}
       <Link
         target="_blank"
-        to="https://docs.openshift.com/container-platform/4.16/virt/about_virt/about-virt.html"
+        to="https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/virtualization/about#virt-what-you-can-do-with-virt_about-virt"
       >
         documentation
       </Link>
