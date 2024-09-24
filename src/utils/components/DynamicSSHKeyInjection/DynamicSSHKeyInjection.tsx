@@ -4,6 +4,8 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getIsDynamicSSHInjectionEnabled } from '@kubevirt-utils/resources/vm';
 import { Switch } from '@patternfly/react-core';
 
+import { hasDynamicSSHInjectionCommand } from './utils';
+
 type DynamicSSHKeyInjectionProps = {
   hasDynamicSSHLabel?: boolean;
   isDisabled: boolean;
@@ -16,7 +18,9 @@ export const DynamicSSHKeyInjection: FC<DynamicSSHKeyInjectionProps> = ({
   onSubmit,
   vm,
 }) => {
-  const [isChecked, setIsChecked] = useState<boolean>(getIsDynamicSSHInjectionEnabled(vm));
+  const [isChecked, setIsChecked] = useState<boolean>(
+    getIsDynamicSSHInjectionEnabled(vm) || hasDynamicSSHInjectionCommand(vm),
+  );
 
   useEffect(() => {
     if (!vm && !hasDynamicSSHLabel) setIsChecked(false);

@@ -33,11 +33,7 @@ const DynamicSSHKeyInjectionWizard = () => {
         vmDraft.spec.template.spec.volumes = [
           ...getVolumes(vm).filter((volume) => !getCloudInitData(volume)),
           {
-            cloudInitNoCloud: getCloudInitConfigDrive(
-              checked,
-              getCloudInitData(cloudInitVolume),
-              true,
-            ),
+            cloudInitNoCloud: getCloudInitConfigDrive(checked, getCloudInitData(cloudInitVolume)),
             name: cloudInitVolume.name,
           },
         ];

@@ -183,7 +183,7 @@ export type CloudInitUserData = {
   hostname?: string;
   packages?: string[];
   password: string;
-  runcmd?: string[];
+  runcmd?: Array<string | string[]>;
   user: string;
 };
 
