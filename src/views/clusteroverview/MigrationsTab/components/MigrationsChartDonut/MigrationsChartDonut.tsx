@@ -3,8 +3,9 @@ import React, { FC } from 'react';
 import { V1VirtualMachineInstanceMigration } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
-import { ChartDonut, ChartThemeColor } from '@patternfly/react-charts';
+import { ChartDonut } from '@patternfly/react-charts';
 
+import { colorScale } from './constants';
 import MigrationChartLegend from './MigrationChartLegend';
 
 type MigrationsChartDonutProps = {
@@ -42,6 +43,7 @@ const MigrationsChartDonut: FC<MigrationsChartDonutProps> = ({ onFilterChange, v
       <ChartDonut
         ariaDesc={t('Cluster scope migrations')}
         ariaTitle={t('Migrations')}
+        colorScale={colorScale}
         constrainToVisibleArea
         data={chartData}
         height={220}
@@ -49,7 +51,6 @@ const MigrationsChartDonut: FC<MigrationsChartDonutProps> = ({ onFilterChange, v
         legendPosition="bottom"
         padding={20}
         subTitle={t('Migrations')}
-        themeColor={ChartThemeColor.multiOrdered}
         title={vmims?.length.toString()}
         width={600}
       />
