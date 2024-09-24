@@ -6,20 +6,23 @@ import { V1beta1VirtualMachineSnapshot } from '@kubevirt-ui/kubevirt-api/kubevir
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Bullseye, StackItem } from '@patternfly/react-core';
 
 import { findPVCOwner } from '../utils/helpers';
 
-import DeleteVolumeCheckbox from './DeleteVolumeCheckbox';
+import DeleteResourceCheckbox from './DeleteResourceCheckbox';
 
 type DeleteOwnedResourcesMessageProps = {
   dataVolumes: V1beta1DataVolume[];
   loaded: boolean;
   pvcs: IoK8sApiCoreV1PersistentVolumeClaim[];
+  setSnapshotsToSave: Dispatch<SetStateAction<V1beta1VirtualMachineSnapshot[]>>;
   setVolumesToSave: Dispatch<
     SetStateAction<(IoK8sApiCoreV1PersistentVolumeClaim | V1beta1DataVolume)[]>
   >;
   snapshots: V1beta1VirtualMachineSnapshot[];
+  snapshotsToSave: V1beta1VirtualMachineSnapshot[];
   volumesToSave: (IoK8sApiCoreV1PersistentVolumeClaim | V1beta1DataVolume)[];
 };
 
@@ -27,8 +30,10 @@ const DeleteOwnedResourcesMessage: FC<DeleteOwnedResourcesMessageProps> = ({
   dataVolumes,
   loaded,
   pvcs,
+  setSnapshotsToSave,
   setVolumesToSave,
   snapshots,
+  snapshotsToSave,
   volumesToSave,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -44,7 +49,6 @@ const DeleteOwnedResourcesMessage: FC<DeleteOwnedResourcesMessageProps> = ({
   const pvcsWithNoDataVolumes = pvcs?.filter((pvc) => !findPVCOwner(pvc, dataVolumes)) || [];
 
   const diskCount = dataVolumes?.length + pvcsWithNoDataVolumes?.length || 0;
-  const hasSnapshots = snapshots?.length > 0;
 
   return (
     <>
@@ -57,20 +61,23 @@ const DeleteOwnedResourcesMessage: FC<DeleteOwnedResourcesMessageProps> = ({
       )}
 
       {[...(dataVolumes || []), ...pvcsWithNoDataVolumes].map((resource) => (
-        <DeleteVolumeCheckbox
+        <DeleteResourceCheckbox
           key={`${resource.kind}-${getName(resource)}`}
           resource={resource}
-          setVolumesToSave={setVolumesToSave}
-          volumesToSave={volumesToSave}
+          resourcesToSave={volumesToSave}
+          setResourcesToSave={setVolumesToSave}
         />
       ))}
 
-      {hasSnapshots && (
-        <StackItem>
-          <strong>{t('Warning')}: </strong>
-          {t('All snapshots of this VirtualMachine will be deleted as well.')}
-        </StackItem>
-      )}
+      {!isEmpty(snapshots) &&
+        snapshots.map((snapshot) => (
+          <DeleteResourceCheckbox
+            key={`${snapshot.kind}-${getName(snapshot)}`}
+            resource={snapshot}
+            resourcesToSave={snapshotsToSave}
+            setResourcesToSave={setSnapshotsToSave}
+          />
+        ))}
     </>
   );
 };
