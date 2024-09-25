@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { load } from 'js-yaml';
 
 import { produceVMDisks } from '@catalog/utils/WizardVMContext';
@@ -9,6 +9,7 @@ import {
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { InterfaceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import {
   CloudInitNetworkData,
@@ -31,11 +32,19 @@ export const useCloudInit = (vm: V1VirtualMachine): UseCloudInitValues => {
 
   const [yamlJSObject, setYamlJSObject] = useState<V1CloudInitNoCloudSource>(cloudInit);
 
-  const [userData, setUserData] = useState<CloudInitUserData>();
+  const [userData, setUserData] = useState<CloudInitUserData>(
+    !isEmpty(cloudInit?.userData) ? convertYAMLUserDataObject(cloudInit?.userData) : undefined,
+  );
 
-  const [networkData, setNetworkData] = useState<CloudInitNetworkData>();
+  const [networkData, setNetworkData] = useState<CloudInitNetworkData>(
+    !isEmpty(cloudInit?.networkData)
+      ? convertYAMLToNetworkDataObject(cloudInit?.networkData)
+      : undefined,
+  );
   const [latestNetworkData, setLatestNetworkData] = useState<CloudInitNetworkData>();
-  const [enableNetworkData, setEnableNetworkData] = useState<boolean>();
+  const [enableNetworkData, setEnableNetworkData] = useState<boolean>(
+    !isEmpty(cloudInit?.networkData),
+  );
 
   const wrappedSetEnableNetworkData = (checked: boolean): void => {
     setLatestNetworkData(networkData);
@@ -54,43 +63,46 @@ export const useCloudInit = (vm: V1VirtualMachine): UseCloudInitValues => {
   };
 
   const updateUserField = (key: keyof CloudInitUserData, value: string): void => {
-    setYamlJSObject((yamlObj) => {
-      return {
-        ...yamlObj,
-        userData: convertUserDataObjectToYAML({ ...userData, [key]: value }, true),
-      };
+    setUserData((prevUserData) => {
+      setYamlJSObject((yamlObj) => {
+        return {
+          ...yamlObj,
+          userData: convertUserDataObjectToYAML({ ...prevUserData, [key]: value }, true),
+        };
+      });
+      return { ...prevUserData, [key]: value };
     });
   };
   const updateNetworkField = (key: keyof CloudInitNetworkData, value: string): void => {
-    setYamlJSObject((yamlObj) => {
-      const ntData = convertNetworkDataObjectToYAML({
-        ...convertYAMLToNetworkDataObject(yamlObj?.networkData),
-        [key]: value,
+    setNetworkData((prevNetworkData) => {
+      setYamlJSObject((yamlObj) => {
+        const ntData = convertNetworkDataObjectToYAML({
+          ...prevNetworkData,
+          [key]: value,
+        });
+        const { networkData: _, ...restYaml } = yamlObj || {};
+        return {
+          ...restYaml,
+          ...(ntData && { networkData: ntData }),
+        };
       });
-      const { networkData: _, ...restYaml } = yamlObj || {};
-      return {
-        ...restYaml,
-        ...(ntData && { networkData: ntData }),
-      };
+      return { ...prevNetworkData, [key]: value };
     });
   };
 
   const updateFromYAML = (yaml: string) => {
     const cloudData = <V1CloudInitNoCloudSource>load(yaml);
     setYamlJSObject(cloudData);
-  };
-
-  useEffect(() => {
     const networkDataObj =
-      yamlJSObject?.networkData && convertYAMLToNetworkDataObject(yamlJSObject?.networkData);
+      cloudData?.networkData && convertYAMLToNetworkDataObject(cloudData?.networkData);
 
     networkDataObj && setEnableNetworkData(true);
     setNetworkData(networkDataObj);
 
-    const userDataObj = yamlJSObject?.userData && convertYAMLUserDataObject(yamlJSObject?.userData);
+    const userDataObj = cloudData?.userData && convertYAMLUserDataObject(cloudData?.userData);
 
     setUserData(userDataObj);
-  }, [yamlJSObject]);
+  };
 
   const cloudInitVolume: V1Volume = useMemo(
     () => ({
