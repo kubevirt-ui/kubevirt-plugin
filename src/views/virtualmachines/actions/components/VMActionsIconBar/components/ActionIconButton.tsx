@@ -7,7 +7,13 @@ import { VMActionIconDetails } from '@virtualmachines/actions/components/VMActio
 
 import '../VMActionsIconBar.scss';
 
-const ActionIconButton: FC<VMActionIconDetails> = ({ action, Icon, iconClassname, isHidden }) => {
+const ActionIconButton: FC<VMActionIconDetails> = ({
+  action,
+  Icon,
+  iconClassname,
+  isDisabled,
+  isHidden,
+}) => {
   const [actionAllowed] = useAccessReview(action?.accessReview);
 
   const handleClick = () => {
@@ -23,7 +29,7 @@ const ActionIconButton: FC<VMActionIconDetails> = ({ action, Icon, iconClassname
           <Button
             className="vm-actions-icon-bar__button"
             data-test-id={`${action?.id}-button`}
-            isDisabled={!actionAllowed}
+            isDisabled={!actionAllowed || isDisabled}
             onClick={handleClick}
             variant={ButtonVariant.link}
           >
