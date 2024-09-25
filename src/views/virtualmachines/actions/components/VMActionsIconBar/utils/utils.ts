@@ -17,17 +17,18 @@ export const getVMActionIconsDetails = (vm: V1VirtualMachine): VMActionIconDetai
     {
       action: VirtualMachineActionFactory.stop(vm),
       Icon: SquareIcon,
-      isHidden: !isRunning(vm) && !isPaused(vm),
+      isDisabled: !isRunning(vm) && !isPaused(vm),
     },
     {
       action: VirtualMachineActionFactory.restart(vm),
       Icon: RedoIcon,
-      isHidden: !isRunning(vm) && !isPaused(vm),
+      isDisabled: !isRunning(vm) && !isPaused(vm),
     },
     {
       action: VirtualMachineActionFactory.pause(vm),
       Icon: PauseIcon,
-      isHidden: !isRunning(vm),
+      isDisabled: !isRunning(vm),
+      isHidden: isPaused(vm),
     },
     {
       action: VirtualMachineActionFactory.unpause(vm),
@@ -38,7 +39,7 @@ export const getVMActionIconsDetails = (vm: V1VirtualMachine): VMActionIconDetai
     {
       action: VirtualMachineActionFactory.start(vm),
       Icon: PlayIcon,
-      isHidden: !isStopped(vm),
+      isDisabled: !isStopped(vm),
     },
   ];
 };

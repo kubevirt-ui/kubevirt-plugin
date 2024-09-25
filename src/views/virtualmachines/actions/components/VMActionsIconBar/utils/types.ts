@@ -7,5 +7,6 @@ export type VMActionIconDetails = {
   action: Action;
   Icon: ComponentClass<SVGIconProps, any>;
   iconClassname?: string;
-  isHidden: boolean;
+  isDisabled?: boolean;
+  isHidden?: boolean;
 };
