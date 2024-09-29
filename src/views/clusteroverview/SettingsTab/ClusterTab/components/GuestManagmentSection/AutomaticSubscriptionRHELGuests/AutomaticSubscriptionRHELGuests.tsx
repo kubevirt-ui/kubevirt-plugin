@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 
 import NewBadge from '@kubevirt-utils/components/badges/NewBadge/NewBadge';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
@@ -29,18 +29,23 @@ const AutomaticSubscriptionRHELGuests: FC<AutomaticSubscriptionRHELGuestsProps> 
   const { t } = useKubevirtTranslation();
   const { featureEnabled, loading, toggleFeature } = useFeatures(AUTOMATIC_UPDATE_FEATURE_NAME);
   const formProps = useRHELAutomaticSubscription();
-  const [selected, setSelected] = useState<{ title: string; value: string }>(
-    getSubscriptionItem(formProps?.subscriptionData?.type),
+
+  const type = useMemo(
+    () => formProps?.subscriptionData?.type,
+    [formProps?.subscriptionData?.type],
   );
 
-  const isDisabled =
-    formProps?.subscriptionData?.type === AutomaticSubscriptionTypeEnum.NO_SUBSCRIPTION;
+  const [selected, setSelected] = useState<{ title: string; value: string }>(
+    getSubscriptionItem(type),
+  );
+
+  const isDisabled = !type || type === AutomaticSubscriptionTypeEnum.NO_SUBSCRIPTION;
 
   useEffect(() => {
     if (!selected) {
-      setSelected(getSubscriptionItem(formProps?.subscriptionData?.type));
+      setSelected(getSubscriptionItem(type));
     }
-  }, [formProps?.subscriptionData?.type, selected]);
+  }, [type, selected]);
 
   if (loading) return null;
 
