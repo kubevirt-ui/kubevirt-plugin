@@ -16,7 +16,7 @@ const RelatedOperatorsSection: React.FC = () => {
 
   const moreLink: GettingStartedLink = {
     external: true,
-    href: 'https://access.redhat.com/documentation/en-us/openshift_container_platform/4.14/html/operators/',
+    href: 'https://docs.openshift.com/container-platform/4.16/operators/index.html',
     id: 'openshift-virtualization-related-operators',
     title: t('Learn more about Operators'),
   };
