@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useRef } from 'react';
+import React, { forwardRef, useEffect, useMemo, useRef } from 'react';
 import classNames from 'classnames';
 
 import { TextInput, TextInputProps } from '@patternfly/react-core';
@@ -13,7 +13,7 @@ const SearchFilter = forwardRef<HTMLInputElement, SearchFilterProps>((props, ref
 
   const defaultRef = useRef<HTMLInputElement>();
 
-  const inputRef = ref || defaultRef;
+  const inputRef = useMemo(() => ref ?? defaultRef, [ref]);
 
   useEffect(() => {
     if (!inputRef || !('current' in inputRef) || !inputRef.current) return;
@@ -28,6 +28,8 @@ const SearchFilter = forwardRef<HTMLInputElement, SearchFilterProps>((props, ref
     inputRef.current.addEventListener('keydown', onKeyDown);
 
     return () => {
+      if (!inputRef || !('current' in inputRef) || !inputRef.current) return;
+
       inputRef.current.removeEventListener('keydown', onKeyDown);
     };
   }, [inputRef]);
