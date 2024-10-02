@@ -33,12 +33,12 @@ const FeatureHighlightsSection: React.FC = () => {
     },
     {
       external: true,
-      href: 'https://docs.openshift.com/container-platform/4.16/virt/release_notes/virt-4-16-release-notes.html#virt-4-16-new',
+      href: 'https://docs.openshift.com/container-platform/4.17/virt/release_notes/virt-4-17-release-notes.html#virt-4-17-new',
       id: 'item2',
       title: (
         <FeatureHighlightsTitle
           readTime={t('5 min')}
-          title={t('OpenShift Virtualization 4.16 Highlights')}
+          title={t('OpenShift Virtualization 4.17 Highlights')}
         />
       ),
     },
