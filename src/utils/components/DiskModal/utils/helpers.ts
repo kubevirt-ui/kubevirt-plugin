@@ -371,16 +371,14 @@ const updateVolume = (
   }
   const oldVolumeSourceKey = Object.keys(oldVolume).find((key) => key !== 'name');
   const oldVolumeSource = mapSourceTypeToVolumeType[oldVolumeSourceKey];
-  const newVolumeSource = mapSourceTypeToVolumeType[diskState.diskSource];
-  if (oldVolumeSource !== newVolumeSource) {
-    delete updatedVolume[oldVolumeSource];
-  }
 
   if (diskState.diskSource === SourceTypes.EPHEMERAL) {
+    delete updatedVolume[oldVolumeSource];
     updatedVolume.containerDisk = {
       image: diskState.containerDisk.url,
     };
   } else if (diskState.diskSource === SourceTypes.PVC) {
+    delete updatedVolume[oldVolumeSource];
     updatedVolume.persistentVolumeClaim = {
       claimName: diskState.persistentVolumeClaim.pvcName,
     };
