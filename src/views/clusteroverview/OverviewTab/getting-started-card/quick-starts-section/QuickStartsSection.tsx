@@ -1,14 +1,10 @@
 import * as React from 'react';
-import { FC, useContext } from 'react';
+import { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useQuickStartContext } from '@openshift-console/dynamic-plugin-sdk';
 import { QuickStartsLoader } from '@openshift-console/dynamic-plugin-sdk-internal';
-import {
-  AllQuickStartStates,
-  QuickStart,
-  QuickStartContext,
-  QuickStartContextValues,
-} from '@patternfly/quickstarts';
+import { AllQuickStartStates, QuickStart } from '@patternfly/quickstarts';
 import { RouteIcon } from '@patternfly/react-icons';
 
 import GettingStartedSectionContents from '../utils/getting-started-content/GettingStartedSectionContents';
@@ -32,8 +28,7 @@ const QuickStartsSection: FC<QuickStartsSectionProps> = ({
   title,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { allQuickStartStates, setActiveQuickStart } =
-    useContext<QuickStartContextValues>(QuickStartContext);
+  const { allQuickStartStates, setActiveQuickStart } = useQuickStartContext();
 
   return (
     <QuickStartsLoader>
