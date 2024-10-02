@@ -263,10 +263,6 @@ export const addISOFlowToVM = (vm: V1VirtualMachine, storageClassName: string) =
       dataVolume: { name: `${vmDraft.metadata.name}-volume-blank` },
       name: ROOTDISK,
     });
-
-    vmDraft.spec.template.spec.domain.firmware = {
-      bootloader: { bios: {} },
-    };
   });
 };
 
