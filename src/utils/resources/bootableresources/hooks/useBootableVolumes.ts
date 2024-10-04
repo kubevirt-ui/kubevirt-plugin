@@ -16,20 +16,21 @@ import {
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
 import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
+import useWatchNamespacedResources from '@kubevirt-utils/hooks/useWatchNamespacedResources/useWatchNamespacedResources';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import {
   convertResourceArrayToMap,
   getReadyOrCloningOrUploadingDataSources,
 } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { Operator, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { Operator } from '@openshift-console/dynamic-plugin-sdk';
 
 type UseBootableVolumes = (namespace?: string) => UseBootableVolumesValues;
 
 const useBootableVolumes: UseBootableVolumes = (namespace) => {
   const projectsNamespace = namespace === ALL_PROJECTS ? null : namespace;
 
-  const [dataSources, loadedDataSources, dataSourcesError] = useK8sWatchResource<
+  const [dataSources, loadedDataSources, dataSourcesError] = useWatchNamespacedResources<
     V1beta1DataSource[]
   >({
     groupVersionKind: DataSourceModelGroupVersionKind,
@@ -40,16 +41,15 @@ const useBootableVolumes: UseBootableVolumes = (namespace) => {
     },
   });
 
-  const [dataImportCrons, loadedDataImportCrons, dataImportCronsError] = useK8sWatchResource<
-    V1beta1DataImportCron[]
-  >({
-    groupVersionKind: modelToGroupVersionKind(DataImportCronModel),
-    isList: true,
-    namespace: projectsNamespace,
-  });
+  const [dataImportCrons, loadedDataImportCrons, dataImportCronsError] =
+    useWatchNamespacedResources<V1beta1DataImportCron[]>({
+      groupVersionKind: modelToGroupVersionKind(DataImportCronModel),
+      isList: true,
+      namespace: projectsNamespace,
+    });
 
   // getting all pvcs since there could be a case where a DS has the label and it's underlying PVC does not
-  const [pvcs, loadedPVCs, loadErrorPVCs] = useK8sWatchResource<
+  const [pvcs, loadedPVCs, loadErrorPVCs] = useWatchNamespacedResources<
     IoK8sApiCoreV1PersistentVolumeClaim[]
   >({
     groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
@@ -58,7 +58,7 @@ const useBootableVolumes: UseBootableVolumes = (namespace) => {
   });
 
   // getting volumesnapshot as this can also be a source of DS
-  const [volumeSnapshots] = useK8sWatchResource<VolumeSnapshotKind[]>({
+  const [volumeSnapshots] = useWatchNamespacedResources<VolumeSnapshotKind[]>({
     groupVersionKind: modelToGroupVersionKind(VolumeSnapshotModel),
     isList: true,
     namespace: projectsNamespace,
