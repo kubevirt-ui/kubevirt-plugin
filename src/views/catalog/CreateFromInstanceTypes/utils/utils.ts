@@ -132,8 +132,11 @@ export const generateVM = (
       template: {
         spec: {
           domain: {
-            devices: {},
+            devices: {
+              interfaces: [{ masquerade: {}, name: 'default' }],
+            },
           },
+          networks: [{ name: 'default', pod: {} }],
           volumes: [
             {
               dataVolume: { name: `${virtualmachineName}-volume` },
