@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { FC, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 import classNames from 'classnames';
 
@@ -30,8 +30,12 @@ const PreferencePage: FC<ListPageProps> = (props) => {
 
   const isSearchPage = useIsSearchPage();
 
-  const [activeTabKey, setActiveTabKey] = useState<number | string>(
-    location?.pathname.includes(VirtualMachineClusterPreferenceModelGroupVersionKind.kind) ? 0 : 1,
+  const activeTabKey = useMemo(
+    () =>
+      location?.pathname.includes(VirtualMachineClusterPreferenceModelGroupVersionKind.kind)
+        ? 0
+        : 1,
+    [location?.pathname],
   );
   const [userPreferences, loaded, loadError] = useUserPreferences(
     activeNamespace,
@@ -46,16 +50,6 @@ const PreferencePage: FC<ListPageProps> = (props) => {
         : `/k8s/ns/${activeNamespace}/${VirtualMachinePreferenceModelRef}`,
     [activeNamespace],
   );
-
-  useEffect(() => {
-    if (isSearchPage) return;
-
-    navigate(
-      activeTabKey === 0
-        ? `/k8s/cluster/${VirtualMachineClusterPreferenceModelRef}`
-        : urlUserPreference,
-    );
-  }, [activeTabKey, navigate, urlUserPreference, isSearchPage]);
 
   if (isSearchPage) {
     const searchParams = new URLSearchParams(location?.search);
@@ -85,7 +79,11 @@ const PreferencePage: FC<ListPageProps> = (props) => {
       </div>
       <Tabs
         onSelect={(_, tabIndex: number | string) => {
-          setActiveTabKey(tabIndex);
+          navigate(
+            tabIndex === 0
+              ? `/k8s/cluster/${VirtualMachineClusterPreferenceModelRef}`
+              : urlUserPreference,
+          );
         }}
         activeKey={activeTabKey}
         style={{ flexShrink: 0 }}
