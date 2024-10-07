@@ -64,14 +64,20 @@ export const cloneVM = (
   });
 };
 
-export const runVM = (vmName: string, vmNamespace: string) =>
+export const runVM = (vmName: string, vmNamespace: string, useRunning = false) =>
   k8sPatch({
     data: [
-      {
-        op: 'replace',
-        path: '/spec/running',
-        value: true,
-      },
+      useRunning
+        ? {
+            op: 'replace',
+            path: '/spec/running',
+            value: true,
+          }
+        : {
+            op: 'replace',
+            path: '/spec/runStrategy',
+            value: 'Always',
+          },
     ],
     model: VirtualMachineModel,
     resource: {
