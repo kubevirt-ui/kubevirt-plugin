@@ -49,7 +49,7 @@ const NodeSelectorModal: FC<NodeSelectorModalProps> = ({
 
   const updatedVirtualMachine = useMemo(() => {
     const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
-      ensurePath(vmDraft, ['spec.template.template.spec.nodeSelector']);
+      ensurePath(vmDraft, ['spec.template.spec.nodeSelector']);
       if (!vmDraft.spec.template.spec.nodeSelector) {
         vmDraft.spec.template.spec.nodeSelector = {};
       }
