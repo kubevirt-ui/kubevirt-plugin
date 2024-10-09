@@ -22,13 +22,19 @@ const useDisksSources = (vm: V1VirtualMachine) => {
     [pvcWatchesResult],
   );
 
-  const loaded = Object.values(pvcWatchesResult).every(
-    (watch) => watch.loaded || !isEmpty(watch.loadError),
+  const loaded = useMemo(
+    () =>
+      Object.values(pvcWatchesResult).every((watch) => watch.loaded || !isEmpty(watch.loadError)),
+    [pvcWatchesResult],
   );
 
-  const loadingError = Object.values(pvcWatchesResult).find((watch) => {
-    return !isEmpty(watch.loadError) && watch.loadError?.code !== 404;
-  });
+  const loadingError = useMemo(
+    () =>
+      Object.values(pvcWatchesResult).find((watch) => {
+        return !isEmpty(watch.loadError) && watch.loadError?.code !== 404;
+      }),
+    [pvcWatchesResult],
+  );
 
   return { loaded, loadingError, pvcs };
 };
