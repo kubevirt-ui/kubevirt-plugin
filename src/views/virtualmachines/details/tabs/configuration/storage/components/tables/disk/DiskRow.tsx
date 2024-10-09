@@ -7,7 +7,14 @@ import { NameWithPercentages } from '@kubevirt-utils/resources/vm/hooks/types';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
-import { Label, Popover, PopoverPosition, Stack, StackItem } from '@patternfly/react-core';
+import {
+  Label,
+  Popover,
+  PopoverPosition,
+  Skeleton,
+  Stack,
+  StackItem,
+} from '@patternfly/react-core';
 
 import { isPVCSource } from './utils/helpers';
 import DiskRowActions from './DiskRowActions';
@@ -20,6 +27,7 @@ const DiskRow: FC<
       customize?: boolean;
       onSubmit?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
       provisioningPercentages: NameWithPercentages;
+      sourcesLoaded?: boolean;
       vm: V1VirtualMachine;
       vmi?: V1VirtualMachineInstance;
     }
@@ -27,11 +35,13 @@ const DiskRow: FC<
 > = ({
   activeColumnIDs,
   obj,
-  rowData: { customize = false, onSubmit, provisioningPercentages, vm, vmi },
+  rowData: { customize = false, onSubmit, provisioningPercentages, sourcesLoaded, vm, vmi },
 }) => {
   const { t } = useKubevirtTranslation();
 
   const provisioningPercentage = provisioningPercentages?.[obj?.source];
+
+  const hasPVC = isPVCSource(obj);
 
   return (
     <>
@@ -72,15 +82,17 @@ const DiskRow: FC<
       </TableData>
 
       <TableData activeColumnIDs={activeColumnIDs} id="source">
-        {isPVCSource(obj) ? (
+        {sourcesLoaded && hasPVC && (
           <ResourceLink
             groupVersionKind={modelToGroupVersionKind(PersistentVolumeClaimModel)}
             name={obj?.source}
             namespace={obj?.namespace}
           />
-        ) : (
-          obj?.source
         )}
+
+        {!sourcesLoaded && hasPVC && <Skeleton width="200px" />}
+
+        {!hasPVC && obj?.source}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="size">
         {readableSizeUnit(obj?.size)}

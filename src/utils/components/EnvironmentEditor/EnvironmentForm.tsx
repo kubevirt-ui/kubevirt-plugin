@@ -3,6 +3,8 @@ import { useImmer } from 'use-immer';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Button, Form } from '@patternfly/react-core';
 import { PlusCircleIcon } from '@patternfly/react-icons';
 
@@ -11,7 +13,6 @@ import EnvironmentFormActions from './components/EnvironmentFormActions';
 import EnvironmentFormSkeleton from './components/EnvironmentFormSkeleton';
 import EnvironmentFormTitle from './components/EnvironmentFormTitle';
 import useEnvironments from './hooks/useEnvironments';
-import useEnvironmentsResources from './hooks/useEnvironmentsResources';
 
 import './EnvironmentForm.scss';
 
@@ -25,15 +26,6 @@ const EnvironmentForm: FC<EnvironmentFormProps> = ({ onEditChange, updateVM, vm 
   const [temporaryVM, setTemporaryVM] = useImmer(vm);
 
   const { t } = useKubevirtTranslation();
-  const ns = vm?.metadata?.namespace;
-
-  const {
-    configMaps,
-    error: loadError,
-    loaded,
-    secrets,
-    serviceAccounts,
-  } = useEnvironmentsResources(ns);
 
   const {
     edited,
@@ -55,7 +47,7 @@ const EnvironmentForm: FC<EnvironmentFormProps> = ({ onEditChange, updateVM, vm 
     [environments],
   );
 
-  if (!loaded) return <EnvironmentFormSkeleton />;
+  if (isEmpty(vm)) return <EnvironmentFormSkeleton />;
 
   return (
     <>
@@ -75,18 +67,16 @@ const EnvironmentForm: FC<EnvironmentFormProps> = ({ onEditChange, updateVM, vm 
 
         {environments.map((environment, index) => (
           <EnvironmentEditor
-            configMaps={configMaps}
             diskName={environment.diskName}
             environmentName={environment.name}
             environmentNamesSelected={environmentNamesSelected}
             id={index}
             key={environment.name}
             kind={environment.kind}
+            namespace={getNamespace(vm)}
             onChange={onEnvironmentChange}
             onRemove={onEnvironmentRemove}
-            secrets={secrets}
             serial={environment?.serial}
-            serviceAccounts={serviceAccounts}
           />
         ))}
 
@@ -110,7 +100,7 @@ const EnvironmentForm: FC<EnvironmentFormProps> = ({ onEditChange, updateVM, vm 
             })
           }
           closeError={() => setFormError(null)}
-          error={loadError || formError}
+          error={formError}
           isSaveDisabled={!edited || !environments.every((env) => env.name)}
           onSave={() => updateVM(temporaryVM)}
         />
