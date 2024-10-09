@@ -34,7 +34,7 @@ type DiskListProps = {
 const DiskList: FC<DiskListProps> = ({ customize = false, onDiskUpdate, vm, vmi }) => {
   const { createModal } = useModal();
   const columns = useDiskColumns();
-  const [disks, loaded, loadError] = useDisksTableData(vm, vmi);
+  const [disks, sourcesLoaded, loadError] = useDisksTableData(vm, vmi);
   const filters = useDisksFilters();
   const [data, filteredData, onFilterChange] = useListPageFilter(disks, filters);
 
@@ -63,7 +63,7 @@ const DiskList: FC<DiskListProps> = ({ customize = false, onDiskUpdate, vm, vmi 
           <ListPageFilter
             data={data}
             hideLabelFilter
-            loaded={loaded}
+            loaded
             onFilterChange={onFilterChange}
             rowFilters={filters}
           />
@@ -76,10 +76,10 @@ const DiskList: FC<DiskListProps> = ({ customize = false, onDiskUpdate, vm, vmi 
       <VirtualizedTable
         columns={columns}
         data={filteredData}
-        loaded={loaded}
+        loaded
         loadError={loadError}
         Row={DiskRow}
-        rowData={{ customize, onSubmit, provisioningPercentages, vm, vmi }}
+        rowData={{ customize, onSubmit, provisioningPercentages, sourcesLoaded, vm, vmi }}
         unfilteredData={data}
       />
     </div>
