@@ -23,6 +23,7 @@ import {
   paginationInitialState,
 } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import useSingleNodeCluster from '@kubevirt-utils/hooks/useSingleNodeCluster';
+import { ListPageProps } from '@kubevirt-utils/utils/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   K8sResourceCommon,
@@ -46,24 +47,32 @@ import useVirtualMachineColumns from './hooks/useVirtualMachineColumns';
 import '@kubevirt-utils/styles/list-managment-group.scss';
 import './VirtualMachinesList.scss';
 
-type VirtualMachinesListProps = {
-  kind: string;
-  namespace: string;
-};
-
-const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) => {
+const VirtualMachinesList: FC<ListPageProps> = ({
+  fieldSelector,
+  hideColumnManagement,
+  hideNameLabelFilters,
+  hideTextFilter,
+  kind,
+  nameFilter,
+  namespace,
+  selector,
+  showTitle,
+}) => {
   const { t } = useKubevirtTranslation();
   const catalogURL = `/k8s/ns/${namespace || DEFAULT_NAMESPACE}/catalog`;
   const { featureEnabled, loading: loadingFeatureProxy } = useFeatures(KUBEVIRT_APISERVER_PROXY);
   const isProxyPodAlive = useKubevirtDataPodHealth();
   const query = useQuery();
+
   const [vms, vmLoaded, loadError] = useKubevirtWatchResource<V1VirtualMachine[]>(
     {
+      fieldSelector,
       groupVersionKind: VirtualMachineModelGroupVersionKind,
       isList: true,
       limit: OBJECTS_FETCHING_LIMIT,
       namespace,
       namespaced: true,
+      selector,
     },
     {
       labels: 'metadata.labels',
@@ -107,7 +116,9 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
   const [unfilterData, dataFilters, onFilterChange] = useListPageFilter<
     V1VirtualMachine,
     V1VirtualMachine
-  >(vms, [...filters, ...searchFilters]);
+  >(vms, [...filters, ...searchFilters], {
+    name: { selected: [nameFilter] },
+  });
 
   const selectedFilters = useSelectedFilters(filters, searchFilters);
 
@@ -159,7 +170,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
   return (
     <>
       {/* All of this table and components should be replaced to our own fitted components */}
-      <ListPageHeader title={t('VirtualMachines')}>
+      <ListPageHeader title={showTitle && t('VirtualMachines')}>
         <VirtualMachinesCreateButton namespace={namespace} />
       </ListPageHeader>
       <ListPageBody>
@@ -185,6 +196,9 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
               }));
             }}
             data={unfilteredData}
+            hideColumnManagement={hideColumnManagement}
+            hideLabelFilter={hideTextFilter}
+            hideNameLabelFilters={hideNameLabelFilters}
             loaded={loaded}
             rowFilters={filters}
             searchFilters={searchFilters}
