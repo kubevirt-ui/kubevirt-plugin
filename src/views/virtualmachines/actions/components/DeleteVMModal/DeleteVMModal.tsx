@@ -7,7 +7,10 @@ import VirtualMachineModel, {
 } from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1beta1VirtualMachineSnapshot,
+  V1VirtualMachine,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import { GracePeriodInput } from '@kubevirt-utils/components/GracePeriodInput/GracePeriodInput';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
@@ -19,7 +22,11 @@ import { ButtonVariant, Stack, StackItem } from '@patternfly/react-core';
 
 import DeleteOwnedResourcesMessage from './components/DeleteOwnedResourcesMessage';
 import useDeleteVMResources from './hooks/useDeleteVMResources';
-import { removeDataVolumeTemplatesToVM, updateVolumeResources } from './utils/helpers';
+import {
+  removeDataVolumeTemplatesToVM,
+  updateSnapshotResources,
+  updateVolumeResources,
+} from './utils/helpers';
 import { DEFAULT_GRACE_PERIOD } from './constants';
 
 type DeleteVMModalProps = {
@@ -40,6 +47,8 @@ const DeleteVMModal: FC<DeleteVMModalProps> = ({ isOpen, onClose, vm }) => {
     (IoK8sApiCoreV1PersistentVolumeClaim | V1beta1DataVolume)[]
   >([]);
 
+  const [snapshotsToSave, setSnapshotsToSave] = useState<V1beta1VirtualMachineSnapshot[]>([]);
+
   const { dataVolumes, loaded, pvcs, snapshots } = useDeleteVMResources(vm);
   const lastNamespacePath = useLastNamespacePath();
 
@@ -52,6 +61,8 @@ const DeleteVMModal: FC<DeleteVMModalProps> = ({ isOpen, onClose, vm }) => {
     );
 
     await Promise.allSettled(updateVolumeResources(volumesToSave, vmOwnerRef));
+
+    await Promise.allSettled(updateSnapshotResources(snapshotsToSave, vmOwnerRef));
 
     await k8sDelete({
       json: gracePeriodCheckbox
@@ -87,8 +98,10 @@ const DeleteVMModal: FC<DeleteVMModalProps> = ({ isOpen, onClose, vm }) => {
           dataVolumes={dataVolumes}
           loaded={loaded}
           pvcs={pvcs}
+          setSnapshotsToSave={setSnapshotsToSave}
           setVolumesToSave={setVolumesToSave}
           snapshots={snapshots}
+          snapshotsToSave={snapshotsToSave}
           volumesToSave={volumesToSave}
         />
       </Stack>

@@ -1,9 +1,13 @@
 import { PersistentVolumeClaimModel } from '@kubevirt-ui/kubevirt-api/console';
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
+import VirtualMachineSnapshotModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineSnapshotModel';
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1beta1VirtualMachineSnapshot,
+  V1VirtualMachine,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { compareOwnerReferences, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getDataVolumeTemplates } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -29,6 +33,28 @@ export const updateVolumeResources = (
         resource.kind === PersistentVolumeClaimModel.kind
           ? PersistentVolumeClaimModel
           : DataVolumeModel,
+      resource,
+    });
+  });
+};
+
+export const updateSnapshotResources = (
+  resources: V1beta1VirtualMachineSnapshot[],
+  vmOwnerRef: OwnerReference,
+) => {
+  return (resources || []).map((resource) => {
+    const resourceFilteredOwnerReference = resource?.metadata?.ownerReferences?.filter(
+      (resourceRef) => !compareOwnerReferences(resourceRef, vmOwnerRef),
+    );
+    return k8sPatch({
+      data: [
+        {
+          op: 'replace',
+          path: '/metadata/ownerReferences',
+          value: resourceFilteredOwnerReference,
+        },
+      ],
+      model: VirtualMachineSnapshotModel,
       resource,
     });
   });
@@ -66,10 +92,7 @@ export const removeDataVolumeTemplatesToVM = (
   });
 };
 
-export const sameVolume = (
-  volumeA: IoK8sApiCoreV1PersistentVolumeClaim | V1beta1DataVolume,
-  volumeB: IoK8sApiCoreV1PersistentVolumeClaim | V1beta1DataVolume,
-) =>
+export const sameResource = (volumeA: K8sResourceCommon, volumeB: K8sResourceCommon) =>
   volumeA.kind === volumeB.kind &&
   getName(volumeA) === getName(volumeB) &&
   getNamespace(volumeA) === getNamespace(volumeB);
