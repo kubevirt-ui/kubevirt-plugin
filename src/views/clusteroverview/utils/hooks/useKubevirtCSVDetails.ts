@@ -5,15 +5,11 @@ import ClusterServiceVersionModel, {
   ClusterServiceVersionModelGroupVersionKind,
 } from '@kubevirt-ui/kubevirt-api/console/models/ClusterServiceVersionModel';
 import { SubscriptionModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console/models/SubscriptionModel';
-import { isUpstream } from '@kubevirt-utils/utils/utils';
+import { KUBEVIRT_HYPERCONVERGED } from '@kubevirt-utils/constants/constants';
+import { DEFAULT_OPERATOR_NAMESPACE } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
-import {
-  KUBEVIRT_HYPERCONVERGED,
-  OPENSHIFT_CNV,
-  OPENSHIFT_OPERATOR_LIFECYCLE_MANAGER_NAMESPACE,
-  PACKAGESERVER,
-} from '../constants';
+import { OPENSHIFT_OPERATOR_LIFECYCLE_MANAGER_NAMESPACE, PACKAGESERVER } from '../constants';
 import { CatalogSourceKind, ClusterServiceVersionKind, SubscriptionKind } from '../types';
 
 import { buildUrlForCSVSubscription } from './../utils';
@@ -37,7 +33,7 @@ export const useKubevirtCSVDetails = (): UseKubevirtCSVDetails => {
   >({
     groupVersionKind: SubscriptionModelGroupVersionKind,
     isList: true,
-    namespace: isUpstream ? KUBEVIRT_HYPERCONVERGED : OPENSHIFT_CNV,
+    namespace: DEFAULT_OPERATOR_NAMESPACE,
   });
 
   const subscription = useMemo(

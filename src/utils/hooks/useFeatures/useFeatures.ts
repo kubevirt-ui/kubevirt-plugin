@@ -54,7 +54,7 @@ export const useFeatures: UseFeatures = (featureName) => {
       return;
     }
 
-    if (!loaded && loadError && loadError?.code !== 404) {
+    if (!loaded && loadError) {
       setFeatureEnabled(false);
       setLoading(false);
     }
@@ -102,7 +102,7 @@ export const useFeatures: UseFeatures = (featureName) => {
     canEdit: isAdmin,
     error,
     featureEnabled,
-    loading,
+    loading: loading && !loadError,
     toggleFeature,
   };
 };

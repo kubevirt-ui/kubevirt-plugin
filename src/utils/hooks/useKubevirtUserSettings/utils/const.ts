@@ -3,7 +3,7 @@ import {
   IoK8sApiRbacV1Role,
   IoK8sApiRbacV1RoleBinding,
 } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { OPENSHIFT_CNV } from '@kubevirt-utils/constants/constants';
+import { DEFAULT_OPERATOR_NAMESPACE } from '@kubevirt-utils/utils/utils';
 
 export const TOP_CONSUMERS_CARD = 'topConsumersCard';
 
@@ -16,7 +16,7 @@ const KUBEVIRT_USER_SETTINGS_ROLE_BINDING_NAME = 'kubevirt-user-settings-reader-
 export const userSettingsRole: IoK8sApiRbacV1Role = {
   metadata: {
     name: KUBEVIRT_USER_SETTINGS_ROLE_NAME,
-    namespace: OPENSHIFT_CNV,
+    namespace: DEFAULT_OPERATOR_NAMESPACE,
   },
   rules: [
     {
@@ -31,7 +31,7 @@ export const userSettingsRole: IoK8sApiRbacV1Role = {
 export const userSettingsRoleBinding: IoK8sApiRbacV1RoleBinding = {
   metadata: {
     name: KUBEVIRT_USER_SETTINGS_ROLE_BINDING_NAME,
-    namespace: OPENSHIFT_CNV,
+    namespace: DEFAULT_OPERATOR_NAMESPACE,
   },
   roleRef: {
     apiGroup: RoleModel.apiGroup,
