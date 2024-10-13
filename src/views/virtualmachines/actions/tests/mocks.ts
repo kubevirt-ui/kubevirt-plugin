@@ -1,4 +1,5 @@
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { RUNSTRATEGY_HALTED } from '@kubevirt-utils/constants/constants';
 
 export const exampleRunningVirtualMachine: V1VirtualMachine = {
   apiVersion: 'kubevirt.io/v1',
@@ -24,7 +25,7 @@ export const exampleRunningVirtualMachine: V1VirtualMachine = {
     namespace: 'default',
   },
   spec: {
-    running: false,
+    runStrategy: RUNSTRATEGY_HALTED,
     template: {
       metadata: {
         annotations: {

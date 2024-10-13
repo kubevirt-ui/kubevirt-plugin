@@ -4,6 +4,11 @@ import { useNavigate } from 'react-router-dom-v5-compat';
 import { useWizardSourceAvailable } from '@catalog/utils/useWizardSourceAvailable';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import {
+  RUNSTRATEGY_ALWAYS,
+  RUNSTRATEGY_HALTED,
+  RUNSTRATEGY_RERUNONFAILURE,
+} from '@kubevirt-utils/constants/constants';
 import { logTemplateFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
 import {
   CANCEL_CUSTOMIZE_VM_BUTTON_CLICKED,
@@ -72,8 +77,8 @@ export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
   const onChangeStartVM = useCallback(
     (checked: boolean) => {
       updateVM((draftVM) => {
-        delete draftVM.spec.runStrategy;
-        draftVM.spec.running = checked;
+        delete draftVM.spec.running;
+        draftVM.spec.runStrategy = checked ? RUNSTRATEGY_ALWAYS : RUNSTRATEGY_HALTED;
       });
     },
     [updateVM],
@@ -87,7 +92,9 @@ export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
         <StackItem>
           <Checkbox
             isChecked={
-              vm?.spec?.running || runStrategy === 'Always' || runStrategy === 'RerunOnFailure'
+              vm?.spec?.running ||
+              runStrategy === RUNSTRATEGY_ALWAYS ||
+              runStrategy === RUNSTRATEGY_RERUNONFAILURE
             }
             label={
               runStrategy

@@ -14,6 +14,10 @@ export const ROOTDISK = 'rootdisk';
 export const KUBEVIRT_HYPERCONVERGED = 'kubevirt-hyperconverged';
 export const OPENSHIFT_CNV = 'openshift-cnv';
 
+export const RUNSTRATEGY_ALWAYS = 'Always';
+export const RUNSTRATEGY_HALTED = 'Halted';
+export const RUNSTRATEGY_RERUNONFAILURE = 'RerunOnFailure';
+
 export enum K8S_OPS {
   ADD = 'add',
   REMOVE = 'remove',

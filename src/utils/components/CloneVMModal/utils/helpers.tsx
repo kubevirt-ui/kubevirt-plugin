@@ -8,6 +8,7 @@ import {
   V1beta1VirtualMachineSnapshot,
   V1VirtualMachine,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { RUNSTRATEGY_ALWAYS } from '@kubevirt-utils/constants/constants';
 import { MAX_K8S_NAME_LENGTH } from '@kubevirt-utils/utils/constants';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, k8sGet, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
@@ -69,8 +70,8 @@ export const runVM = (vmName: string, vmNamespace: string) =>
     data: [
       {
         op: 'replace',
-        path: '/spec/running',
-        value: true,
+        path: '/spec/runStrategy',
+        value: RUNSTRATEGY_ALWAYS,
       },
     ],
     model: VirtualMachineModel,

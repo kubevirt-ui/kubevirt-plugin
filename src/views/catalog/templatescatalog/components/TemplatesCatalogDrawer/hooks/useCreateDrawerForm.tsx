@@ -19,6 +19,11 @@ import {
   applyCloudDriveCloudInitVolume,
   createSSHSecret,
 } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
+import {
+  RUNSTRATEGY_ALWAYS,
+  RUNSTRATEGY_HALTED,
+  RUNSTRATEGY_RERUNONFAILURE,
+} from '@kubevirt-utils/constants/constants';
 import { logTemplateFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
 import {
   CREATE_VM_BUTTON_CLICKED,
@@ -121,6 +126,13 @@ const useCreateDrawerForm = (
           obj.kind === VirtualMachineModel.kind ? vmObject : obj,
         );
 
+        if ('running' in vmObject?.spec) {
+          vmObject.spec.runStrategy = vmObject.spec.running
+            ? RUNSTRATEGY_ALWAYS
+            : RUNSTRATEGY_HALTED;
+          delete vmObject.spec.running;
+        }
+
         draftTemplate.objects = modifiedTemplateObjects;
 
         if (sshDetails?.sshSecretName && sshDetails?.applyKeyToProject) {
@@ -212,6 +224,11 @@ const useCreateDrawerForm = (
         vmDraft.spec.template.spec.domain.cpu.cores = cpu?.cores;
         vmDraft.spec.template.spec.domain.memory.guest = memory;
 
+        if ('running' in vmDraft?.spec) {
+          vmDraft.spec.runStrategy = vmDraft.spec.running ? RUNSTRATEGY_ALWAYS : RUNSTRATEGY_HALTED;
+          delete vmDraft.spec.running;
+        }
+
         const updatedVolumes = applyCloudDriveCloudInitVolume(vmObject);
         vmDraft.spec.template.spec.volumes = isRHELTemplate(processedTemplate)
           ? updateCloudInitRHELSubscription(updatedVolumes, subscriptionData, autoUpdateEnabled)
@@ -257,8 +274,8 @@ const useCreateDrawerForm = (
   const onChangeStartVM = (checked: boolean) => {
     setVM(
       produce(vm, (draftVM) => {
-        delete draftVM.spec.runStrategy;
-        draftVM.spec.running = checked;
+        delete draftVM.spec.running;
+        draftVM.spec.runStrategy = checked ? RUNSTRATEGY_ALWAYS : RUNSTRATEGY_HALTED;
       }),
     );
   };
@@ -282,7 +299,9 @@ const useCreateDrawerForm = (
     onQuickCreate,
     onVMNameChange,
     runStrategy: vm?.spec?.runStrategy,
-    startVM: vm?.spec?.running,
+    startVM:
+      vm?.spec?.runStrategy === RUNSTRATEGY_ALWAYS ||
+      vm?.spec?.runStrategy === RUNSTRATEGY_RERUNONFAILURE,
   };
 };
 
