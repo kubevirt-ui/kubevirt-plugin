@@ -4,7 +4,7 @@ import {
   IoK8sApiRbacV1Role,
   IoK8sApiRbacV1RoleBinding,
 } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { OPENSHIFT_CNV } from '@kubevirt-utils/constants/constants';
+import { DEFAULT_OPERATOR_NAMESPACE } from '@kubevirt-utils/utils/utils';
 import { K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
 
 export const AUTOMATIC_SUBSCRIPTION_ACTIVATION_KEY = 'automaticSubscriptionActivationKey';
@@ -37,14 +37,14 @@ export const featuresConfigMapInitialState: IoK8sApiCoreV1ConfigMap = {
   },
   metadata: {
     name: FEATURES_CONFIG_MAP_NAME,
-    namespace: OPENSHIFT_CNV,
+    namespace: DEFAULT_OPERATOR_NAMESPACE,
   },
 };
 
 export const featuresRole: IoK8sApiRbacV1Role = {
   metadata: {
     name: FEATURES_ROLE_NAME,
-    namespace: OPENSHIFT_CNV,
+    namespace: DEFAULT_OPERATOR_NAMESPACE,
   },
   rules: [
     {
@@ -59,7 +59,7 @@ export const featuresRole: IoK8sApiRbacV1Role = {
 export const featuresRoleBinding: IoK8sApiRbacV1RoleBinding = {
   metadata: {
     name: FEATURES_ROLE_BINDING_NAME,
-    namespace: OPENSHIFT_CNV,
+    namespace: DEFAULT_OPERATOR_NAMESPACE,
   },
   roleRef: {
     apiGroup: RoleModel.apiGroup,

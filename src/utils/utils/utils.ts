@@ -1,7 +1,11 @@
 import { animals, colors, NumberDictionary, uniqueNamesGenerator } from 'unique-names-generator';
 
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
+import {
+  DEFAULT_NAMESPACE,
+  KUBEVIRT_HYPERCONVERGED,
+  OPENSHIFT_CNV,
+} from '@kubevirt-utils/constants/constants';
 import { ALL_NAMESPACES, ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { FilterValue, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { k8sBasePath } from '@openshift-console/dynamic-plugin-sdk/lib/utils/k8s/k8s';
@@ -31,6 +35,8 @@ export const get = (obj: unknown, path: string | string[], defaultValue = undefi
 };
 
 export const isUpstream = (window as any).SERVER_FLAGS?.branding === 'okd';
+
+export const DEFAULT_OPERATOR_NAMESPACE = isUpstream ? KUBEVIRT_HYPERCONVERGED : OPENSHIFT_CNV;
 
 export const isString = (val: unknown) => val !== null && typeof val === 'string';
 

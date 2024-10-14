@@ -12,8 +12,7 @@ import {
   IoK8sApiRbacV1Role,
   IoK8sApiRbacV1RoleBinding,
 } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { OPENSHIFT_CNV } from '@kubevirt-utils/constants/constants';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { DEFAULT_OPERATOR_NAMESPACE, isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 import {
@@ -42,46 +41,51 @@ const useKubevirtUserSettings: UseKubevirtUserSettings = (key) => {
       userName && {
         groupVersionKind: modelToGroupVersionKind(ConfigMapModel),
         name: KUBEVIRT_USER_SETTINGS_CONFIG_MAP_NAME,
-        namespace: OPENSHIFT_CNV,
+        namespace: DEFAULT_OPERATOR_NAMESPACE,
       },
     );
 
   useEffect(() => {
-    if (userName) {
-      if (configMapError?.code === 404) {
-        const createResources = async () => {
-          await k8sCreate<IoK8sApiCoreV1ConfigMap>({
-            data: {
-              data: { [userName]: JSON.stringify(userSettingsInitialState) },
-              metadata: {
-                name: KUBEVIRT_USER_SETTINGS_CONFIG_MAP_NAME,
-                namespace: OPENSHIFT_CNV,
-              },
+    if (!userName && errorUser) {
+      setLoading(false);
+      return;
+    }
+
+    if (!userName) return;
+
+    if (configMapError?.code === 404) {
+      const createResources = async () => {
+        await k8sCreate<IoK8sApiCoreV1ConfigMap>({
+          data: {
+            data: { [userName]: JSON.stringify(userSettingsInitialState) },
+            metadata: {
+              name: KUBEVIRT_USER_SETTINGS_CONFIG_MAP_NAME,
+              namespace: DEFAULT_OPERATOR_NAMESPACE,
             },
-            model: ConfigMapModel,
-          });
+          },
+          model: ConfigMapModel,
+        });
 
-          await k8sCreate<IoK8sApiRbacV1Role>({
-            data: userSettingsRole,
-            model: RoleModel,
-          });
+        await k8sCreate<IoK8sApiRbacV1Role>({
+          data: userSettingsRole,
+          model: RoleModel,
+        });
 
-          await k8sCreate<IoK8sApiRbacV1RoleBinding>({
-            data: userSettingsRoleBinding,
-            model: RoleBindingModel,
-          });
-        };
+        await k8sCreate<IoK8sApiRbacV1RoleBinding>({
+          data: userSettingsRoleBinding,
+          model: RoleBindingModel,
+        });
+      };
 
-        try {
-          createResources();
-          setError(null);
-        } catch (e) {
-          setError(e);
-        }
+      try {
+        createResources();
+        setError(null);
+      } catch (e) {
+        setError(e);
       }
       setLoading(false);
     }
-  }, [configMapError?.code, userName, loadedConfigMap]);
+  }, [configMapError?.code, userName, loadedConfigMap, errorUser]);
 
   useEffect(() => {
     if (!isEmpty(userConfigMap) && userName) {
@@ -118,11 +122,12 @@ const useKubevirtUserSettings: UseKubevirtUserSettings = (key) => {
   };
 
   const loadedCM = loadedConfigMap || !isEmpty(configMapError);
+  const loadedUsr = loadedUser || !isEmpty(errorUser);
 
   return [
     key ? userSettings?.[key] : userSettings,
     userSettings && updateUserSetting,
-    !loading && loadedUser && loadedCM,
+    !loading && loadedUsr && loadedCM,
     error || errorUser || configMapError,
   ];
 };
