@@ -105,7 +105,6 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
         />
         <NetworkInterfaceNetworkSelect
           iface={iface}
-          interfaceType={interfaceType}
           isEditing={Boolean(network) && Boolean(iface)}
           namespace={namespace}
           networkName={networkName}
