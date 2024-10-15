@@ -2,6 +2,10 @@ import React, { FC, memo } from 'react';
 
 import { DRAWER_FORM_ID } from '@catalog/templatescatalog/utils/consts';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
+import {
+  RUNSTRATEGY_ALWAYS,
+  RUNSTRATEGY_RERUNONFAILURE,
+} from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
 import {
@@ -87,6 +91,11 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
             <StackItem />
             <StackItem>
               <Checkbox
+                isChecked={
+                  startVM ||
+                  runStrategy === RUNSTRATEGY_ALWAYS ||
+                  runStrategy === RUNSTRATEGY_RERUNONFAILURE
+                }
                 label={
                   runStrategy
                     ? t('Start this VirtualMachine after creation ({{runStrategy}})', {
@@ -95,7 +104,6 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
                     : t('Start this VirtualMachine after creation')
                 }
                 id="start-after-create-checkbox"
-                isChecked={startVM || runStrategy === 'Always' || runStrategy === 'RerunOnFailure'}
                 onChange={(_, checked: boolean) => onChangeStartVM(checked)}
               />
             </StackItem>
