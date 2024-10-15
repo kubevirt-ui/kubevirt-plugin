@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
@@ -41,6 +41,13 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
     ),
   );
 
+  const vmUseRunning = useMemo(
+    () =>
+      (source as V1VirtualMachine)?.spec?.running !== undefined &&
+      (source as V1VirtualMachine)?.spec?.running !== null,
+    [source],
+  );
+
   const [startCloneVM, setStartCloneVM] = useState(false);
 
   const [initialCloneRequest, setInitialCloneRequest] = useState<V1alpha1VirtualMachineClone>();
@@ -64,13 +71,13 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
 
   useEffect(() => {
     if (cloneRequest?.status?.phase === CLONING_STATUSES.SUCCEEDED) {
-      startCloneVM && runVM(cloneName, namespace);
+      startCloneVM && runVM(cloneName, namespace, vmUseRunning);
 
       navigate(`/k8s/ns/${namespace}/${VirtualMachineModelRef}/${cloneName}`);
 
       onClose();
     }
-  }, [cloneRequest, startCloneVM, cloneName, namespace, onClose, navigate]);
+  }, [cloneRequest, startCloneVM, cloneName, namespace, onClose, navigate, vmUseRunning]);
 
   return (
     <TabModal
