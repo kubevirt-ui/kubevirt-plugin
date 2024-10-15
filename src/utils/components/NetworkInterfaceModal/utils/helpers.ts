@@ -126,7 +126,7 @@ export const createInterface = (
   nicName: string,
   interfaceModel: string,
   interfaceMACAddress: string,
-  interfaceType: string,
+  interfaceType = interfacesTypes.bridge,
 ): V1Interface => {
   return {
     [interfaceType?.replace('-', '')?.toLowerCase()]: {},
