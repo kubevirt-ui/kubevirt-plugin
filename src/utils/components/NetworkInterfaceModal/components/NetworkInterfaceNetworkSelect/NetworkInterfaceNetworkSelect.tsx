@@ -1,19 +1,13 @@
-import React, { Dispatch, FC, MouseEvent, SetStateAction, useEffect, useMemo } from 'react';
+import React, { Dispatch, FC, SetStateAction, useEffect, useMemo, useRef } from 'react';
 
 import { V1Interface, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
-import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
+import SelectTypeahead from '@kubevirt-utils/components/SelectTypeahead/SelectTypeahead';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { interfacesTypes } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { getNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
-import {
-  FormGroup,
-  Label,
-  SelectList,
-  SelectOption,
-  ValidatedOptions,
-} from '@patternfly/react-core';
+import { FormGroup, Label, ValidatedOptions } from '@patternfly/react-core';
 
 import { getNadType, networkNameStartWithPod, podNetworkExists } from '../../utils/helpers';
 import useNADsData from '../hooks/useNADsData';
@@ -23,7 +17,6 @@ import NetworkSelectHelperPopover from './components/NetworkSelectHelperPopover/
 type NetworkInterfaceNetworkSelectProps = {
   editInitValueNetworkName?: string | undefined;
   iface: V1Interface;
-  interfaceType: string;
   isEditing?: boolean | undefined;
   namespace?: string;
   networkName: string;
@@ -36,7 +29,6 @@ type NetworkInterfaceNetworkSelectProps = {
 const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
   editInitValueNetworkName,
   iface,
-  interfaceType,
   isEditing,
   namespace,
   networkName,
@@ -47,6 +39,8 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const { loaded, loadError, nads } = useNADsData(vm?.metadata?.namespace || namespace);
+
+  const selectedFirstOnLoad = useRef(false);
 
   const hasPodNetwork = useMemo(() => podNetworkExists(vm), [vm]);
   const hasNads = useMemo(() => nads?.length > 0, [nads]);
@@ -63,15 +57,27 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
   const networkOptions = useMemo(() => {
     const options = nads?.map((nad) => {
       const { name, namespace: nadNamespace, uid } = nad?.metadata;
+      const type = getNadType(nad);
+      const value = `${nadNamespace}/${name}`;
       return {
+        children: (
+          <>
+            {value} <Label isCompact>{getNadType(nad)} Binding</Label>
+          </>
+        ),
         key: uid,
-        type: getNadType(nad),
-        value: `${nadNamespace}/${name}`,
+        type,
+        value,
       };
     });
 
     if (isPodNetworkingOptionExists) {
       options.unshift({
+        children: (
+          <>
+            {podNetworkingText} <Label isCompact>{interfacesTypes.bridge} Binding</Label>
+          </>
+        ),
         key: 'pod-networking',
         type: interfacesTypes.bridge,
         value: podNetworkingText,
@@ -93,8 +99,7 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
   const validated =
     canCreateNetworkInterface || isEditing ? ValidatedOptions.default : ValidatedOptions.error;
 
-  const handleChange = (event: MouseEvent<HTMLSelectElement>, value: string) => {
-    event.preventDefault();
+  const handleChange = (value: string) => {
     setNetworkName(value);
     setInterfaceType(
       value === podNetworkingText
@@ -108,14 +113,21 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
     // if networkName exists, we have the option to create a NIC either with pod networking or by existing NAD
     if (networkName) {
       setSubmitDisabled(false);
+      return;
     }
+
     // if networkName is empty, and pod network exists we can create a NIC with existing NAD if there is one
-    else if (loaded && !loadError) {
+    if (loaded && !loadError && !selectedFirstOnLoad.current) {
       setNetworkName(networkOptions?.[0]?.value);
+      selectedFirstOnLoad.current = true;
+
+      return;
     }
+
     // if no nads and pod network already exists, we can't create a NIC
-    else if (loaded && (loadError || !canCreateNetworkInterface)) {
+    if (loaded && (loadError || !canCreateNetworkInterface)) {
       setSubmitDisabled(true);
+      return;
     }
   }, [
     loadError,
@@ -138,28 +150,19 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
         {hasPodNetwork && !loaded ? (
           <Loading />
         ) : (
-          <FormPFSelect
-            selectedLabel={
+          <SelectTypeahead
+            newOptionComponent={(inputValue) => (
               <>
-                {networkName} <Label isCompact>{interfaceType} Binding</Label>
+                {t(`Use "{{inputValue}}"`, { inputValue })}{' '}
+                <Label isCompact>{interfacesTypes.bridge} Binding</Label>
               </>
-            }
-            onSelect={handleChange}
+            )}
+            id="select-nad"
+            options={networkOptions}
+            placeholder={t('Select a NetworkAttachmentDefinitions')}
             selected={networkName}
-            toggleProps={{ isDisabled: !canCreateNetworkInterface, isFullWidth: true }}
-          >
-            <SelectList>
-              {networkOptions?.map(({ key, type, value }) => (
-                <SelectOption
-                  data-test-id={`network-attachment-definition-select-${key}`}
-                  key={key}
-                  value={value}
-                >
-                  {value} <Label isCompact>{type} Binding</Label>
-                </SelectOption>
-              ))}
-            </SelectList>
-          </FormPFSelect>
+            setSelected={handleChange}
+          />
         )}
       </div>
       {loaded && validated === ValidatedOptions.error && (
