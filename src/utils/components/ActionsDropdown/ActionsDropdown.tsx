@@ -1,14 +1,16 @@
-import React, { FC, memo, useState } from 'react';
+import React, { FC, memo, useRef, useState } from 'react';
 
-import ActionDropdownItem from '@kubevirt-utils/components/ActionDropdownItem/ActionDropdownItem';
 import DropdownToggle from '@kubevirt-utils/components/toggles/DropdownToggle';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Action } from '@openshift-console/dynamic-plugin-sdk';
-import { Dropdown, DropdownList } from '@patternfly/react-core';
+import { Menu, MenuContent, MenuList, Popper } from '@patternfly/react-core';
+
+import ActionDropdownItem from '../ActionDropdownItem/ActionDropdownItem';
+
+import { ActionDropdownItemType } from './constants';
 
 type ActionsDropdownProps = {
-  actions: Action[];
+  actions: ActionDropdownItemType[];
   className?: string;
   id?: string;
   isKebabToggle?: boolean;
@@ -17,13 +19,14 @@ type ActionsDropdownProps = {
 
 const ActionsDropdown: FC<ActionsDropdownProps> = ({
   actions = [],
-  className,
-  id,
   isKebabToggle,
   onLazyClick,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const onToggle = () => {
     setIsOpen((prevIsOpen) => {
@@ -41,21 +44,29 @@ const ActionsDropdown: FC<ActionsDropdownProps> = ({
         onClick: onToggle,
       });
 
+  const menu = (
+    <Menu containsFlyout ref={menuRef}>
+      <MenuContent>
+        <MenuList>
+          {actions?.map((action) => (
+            <ActionDropdownItem action={action} key={action?.id} setIsOpen={setIsOpen} />
+          ))}
+        </MenuList>
+      </MenuContent>
+    </Menu>
+  );
+
   return (
-    <Dropdown
-      className={className}
-      data-test-id={id}
-      isOpen={isOpen}
-      onOpenChange={(open: boolean) => setIsOpen(open)}
-      popperProps={{ enableFlip: true, position: 'right' }}
-      toggle={Toggle}
-    >
-      <DropdownList>
-        {actions?.map((action) => (
-          <ActionDropdownItem action={action} key={action?.id} setIsOpen={setIsOpen} />
-        ))}
-      </DropdownList>
-    </Dropdown>
+    <div className="kv-actions-dropdown" ref={containerRef}>
+      {Toggle(toggleRef)}
+      <Popper
+        appendTo={containerRef.current}
+        isVisible={isOpen}
+        placement="bottom-end"
+        popper={menu}
+        triggerRef={toggleRef}
+      />
+    </div>
   );
 };
 

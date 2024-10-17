@@ -1,12 +1,12 @@
 import React, { FC, memo } from 'react';
 
 import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
-import { Action } from '@openshift-console/dynamic-plugin-sdk';
+import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 
 import './VirtualMachineActions.scss';
 
 type VirtualMachinesInstanceActionsProps = {
-  actions: Action[];
+  actions: ActionDropdownItemType[];
   isKebabToggle?: boolean;
 };
 

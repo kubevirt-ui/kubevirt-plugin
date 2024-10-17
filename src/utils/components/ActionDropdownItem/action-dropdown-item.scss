@@ -3,4 +3,8 @@
     cursor: unset;
     color: var(--pf-global--disabled-color--100);
   }
+
+  .pf-v5-c-menu.pf-m-flyout {
+    --pf-v5-c-menu--Width: 200px;
+  }
 }
