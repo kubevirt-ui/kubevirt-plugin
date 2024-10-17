@@ -29,7 +29,7 @@ describe('useVirtualMachineActionsProvider tests', () => {
       'vm-action-pause',
       'vm-action-clone',
       'vm-action-snapshot',
-      'vm-action-migrate',
+      'migration-menu',
       'vm-action-copy-ssh',
       'vm-action-edit-labels',
       'vm-action-edit-annotations',
@@ -54,7 +54,7 @@ describe('useVirtualMachineActionsProvider tests', () => {
       'vm-action-pause',
       'vm-action-clone',
       'vm-action-snapshot',
-      'vm-action-migrate',
+      'migration-menu',
       'vm-action-copy-ssh',
       'vm-action-edit-labels',
       'vm-action-edit-annotations',
@@ -79,7 +79,7 @@ describe('useVirtualMachineActionsProvider tests', () => {
       'vm-action-unpause',
       'vm-action-clone',
       'vm-action-snapshot',
-      'vm-action-migrate',
+      'migration-menu',
       'vm-action-copy-ssh',
       'vm-action-edit-labels',
       'vm-action-edit-annotations',
@@ -97,6 +97,9 @@ describe('useVirtualMachineActionsProvider tests', () => {
     const [actions] = result.current;
     const migratingVMActions = actions.map((action) => action.id);
 
+    const migratingSubmenu = actions.find((action) => action.id === 'migration-menu');
+    const migratingSubmenuIds = migratingSubmenu.options.map((action) => action.id);
+
     // Migrating vm should have stop, restart, pause, migrate and delete actions
     expect(migratingVMActions).toEqual([
       'vm-action-stop',
@@ -104,11 +107,13 @@ describe('useVirtualMachineActionsProvider tests', () => {
       'vm-action-pause',
       'vm-action-clone',
       'vm-action-snapshot',
-      'vm-action-cancel-migrate',
+      'migration-menu',
       'vm-action-copy-ssh',
       'vm-action-edit-labels',
       'vm-action-edit-annotations',
       'vm-action-delete',
     ]);
+
+    expect(migratingSubmenuIds).toEqual(['vm-action-cancel-migrate', 'vm-migrate-storage']);
   });
 });

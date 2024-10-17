@@ -1,4 +1,5 @@
 import React from 'react';
+import { NavigateFunction } from 'react-router-dom-v5-compat';
 
 import VirtualMachineCloneModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineCloneModel';
 import VirtualMachineInstanceMigrationModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstanceMigrationModel';
@@ -14,7 +15,7 @@ import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal'
 import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SnapshotModal from '@kubevirt-utils/components/SnapshotModal/SnapshotModal';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { asAccessReview } from '@kubevirt-utils/resources/shared';
+import { asAccessReview, getNamespace, getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Action, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
@@ -46,7 +47,7 @@ const {
 } = printableVMStatus;
 
 export const VirtualMachineActionFactory = {
-  cancelMigration: (
+  cancelMigrationCompute: (
     vm: V1VirtualMachine,
     vmim: V1VirtualMachineInstanceMigration,
     isSingleNodeCluster: boolean,
@@ -99,7 +100,6 @@ export const VirtualMachineActionFactory = {
       label: t('Delete'),
     };
   },
-
   editAnnotations: (vm: V1VirtualMachine, createModal: (modal: ModalComponent) => void): Action => {
     return {
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
@@ -129,6 +129,7 @@ export const VirtualMachineActionFactory = {
       label: t('Edit annotations'),
     };
   },
+
   editLabels: (vm: V1VirtualMachine, createModal: (modal: ModalComponent) => void): Action => {
     return {
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
@@ -170,7 +171,7 @@ export const VirtualMachineActionFactory = {
       label: t('Force stop'),
     };
   },
-  migrate: (vm: V1VirtualMachine, isSingleNodeCluster: boolean): Action => {
+  migrateCompute: (vm: V1VirtualMachine, isSingleNodeCluster: boolean): Action => {
     return {
       accessReview: {
         group: VirtualMachineInstanceMigrationModel.apiGroup,
@@ -182,7 +183,22 @@ export const VirtualMachineActionFactory = {
       description: t('Migrate to a different Node'),
       disabled: !isLiveMigratable(vm, isSingleNodeCluster),
       id: 'vm-action-migrate',
-      label: t('Migrate'),
+      label: t('Compute'),
+    };
+  },
+  migrateStorage: (vm: V1VirtualMachine, navigate: NavigateFunction): Action => {
+    return {
+      accessReview: {
+        group: VirtualMachineModel.apiGroup,
+        namespace: getNamespace(vm),
+        resource: VirtualMachineModel.plural,
+        verb: 'patch',
+      },
+      cta: () =>
+        navigate(`${getResourceUrl({ model: VirtualMachineModel, resource: vm })}/migrateStorage`),
+      description: t('Migrate VirtualMachine storage to a different StorageClass'),
+      id: 'vm-migrate-storage',
+      label: t('Storage'),
     };
   },
   pause: (vm: V1VirtualMachine): Action => {
