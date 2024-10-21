@@ -1,11 +1,3 @@
-const userSettingsInitialState: UserSettingsState = {
-  cards: {},
-  columns: {},
-  favoriteBootableVolumes: [],
-  quickStart: {},
-  ssh: {},
-};
-
 export type UserSettingsState = {
   cards: CardsUserSettings;
   columns: ColumnsUserSettings;
@@ -29,5 +21,3 @@ type QuickStartUserSettings = {
 type CardsUserSettings = {
   [cardPage: string]: { cardName: string; value: boolean };
 };
-
-export default userSettingsInitialState;
