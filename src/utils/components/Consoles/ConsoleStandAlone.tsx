@@ -9,7 +9,7 @@ const ConsoleStandAlone: FC = () => {
   const { name, ns } = useParams<{ name: string; ns: string }>();
   const { vmi } = useVMIAndPodsForVM(name, ns);
 
-  return <Consoles vmi={vmi} />;
+  return <Consoles isStandAlone vmi={vmi} />;
 };
 
 export default ConsoleStandAlone;

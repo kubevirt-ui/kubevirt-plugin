@@ -1,13 +1,8 @@
 import React, { FC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { VNC_CONSOLE_TYPE } from '@kubevirt-utils/components/Consoles/components/utils/ConsoleConsts';
 import VncConsole from '@kubevirt-utils/components/Consoles/components/vnc-console/VncConsole';
-import { INSECURE, SECURE } from '@kubevirt-utils/components/Consoles/utils/constants';
-import {
-  isConnectionEncrypted,
-  isHeadlessModeVMI,
-} from '@kubevirt-utils/components/Consoles/utils/utils';
+import { isHeadlessModeVMI } from '@kubevirt-utils/components/Consoles/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { vmiStatuses } from '@kubevirt-utils/resources/vmi';
 import { useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
@@ -25,7 +20,6 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
 > = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
 
-  const isEncrypted = isConnectionEncrypted();
   const isHeadlessMode = isHeadlessModeVMI(vmi);
   const isVMRunning = vmi?.status?.phase === vmiStatuses.Running;
   const [canConnectConsole] = useAccessReview({
@@ -41,13 +35,9 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
         <>
           <VncConsole
             CustomConnectComponent={VirtualMachinesOverviewTabDetailsConsoleConnect}
-            encrypt={isEncrypted}
-            host={window.location.hostname}
-            path={`api/kubernetes/apis/subresources.kubevirt.io/v1/namespaces/${vmi?.metadata?.namespace}/virtualmachineinstances/${vmi?.metadata?.name}/vnc`}
-            port={window.location.port || (isEncrypted ? SECURE : INSECURE)}
             scaleViewport
             showAccessControls={false}
-            type={VNC_CONSOLE_TYPE}
+            vmi={vmi}
           />
         </>
       ) : (

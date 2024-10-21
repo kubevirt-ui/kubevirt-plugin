@@ -1,17 +1,9 @@
-import React, {
-  FC,
-  MouseEvent,
-  ReactNode,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { FC, MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import cn from 'classnames';
 
 import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import KeyTable from '@novnc/novnc/core/input/keysym';
 import RFBCreate from '@novnc/novnc/core/rfb';
 import { initLogging } from '@novnc/novnc/core/util/logging';
@@ -25,7 +17,8 @@ import {
   TabTitleText,
 } from '@patternfly/react-core';
 
-import { sleep } from '../../utils/utils';
+import { INSECURE, SECURE } from '../../utils/constants';
+import { isConnectionEncrypted, sleep } from '../../utils/utils';
 import { ConsoleState, WS, WSS } from '../utils/ConsoleConsts';
 import useCopyPasteConsole from '../utils/hooks/useCopyPasteConsole';
 
@@ -39,80 +32,46 @@ import './vnc-console.scss';
 const { connected, connecting, disconnected } = ConsoleState;
 
 export const VncConsole: FC<VncConsoleProps> = ({
-  additionalButtons = [] as ReactNode[],
-  autoConnect = true,
-  children,
-  consoleContainerId,
-  credentials,
   CustomConnectComponent,
   CustomDisabledComponent,
   disabled,
-  encrypt = false,
   hasGPU,
-  host,
-  onDisconnected,
-  onInitFailed,
-  onSecurityFailure,
-  path = '',
-  port = '80',
-  repeaterID = '',
-  resizeSession = true,
   scaleViewport = false,
-  shared = false,
   showAccessControls = true,
-  textConnect,
-  textConnecting,
-  textCtrlAltDel,
-  textDisconnect,
-  textDisconnected,
-  textSendShortcut,
   viewOnly = false,
-  vncLogging = 'warn',
+  vmi,
 }) => {
   const { t } = useKubevirtTranslation();
   const [rfb, setRfb] = useState<any>();
   const [status, setStatus] = useState<ConsoleState>(disconnected);
   const [activeTabKey, setActiveTabKey] = useState<number | string>(0);
   const pasteText = useCopyPasteConsole();
-  const staticRenderLocaitonRef = useRef(null);
-  const StaticRenderLocaiton = useMemo(
+  const staticRenderLocationRef = useRef(null);
+  const StaticRenderLocation = useMemo(
     () => (
       <div
         className={cn('vnc-container', { hide: status !== connected })}
-        id={consoleContainerId}
-        ref={staticRenderLocaitonRef}
+        ref={staticRenderLocationRef}
       ></div>
     ),
-    [staticRenderLocaitonRef, consoleContainerId, status],
-  );
-
-  const url = useMemo(
-    () => `${encrypt ? WSS : WS}://${host}:${port}/${path}`,
-    [encrypt, host, path, port],
-  );
-
-  const options = useMemo(
-    () => ({
-      credentials,
-      repeaterID,
-      shared,
-    }),
-    [repeaterID, shared, credentials],
+    [staticRenderLocationRef, status],
   );
 
   const connect = useCallback(() => {
     if (!disabled) {
       setStatus(connecting);
       setRfb(() => {
-        const rfbInstnce = new RFBCreate(staticRenderLocaitonRef.current, url, options);
+        const isEncrypted = isConnectionEncrypted();
+        const path = `api/kubernetes/apis/subresources.kubevirt.io/v1/namespaces/${vmi?.metadata?.namespace}/virtualmachineinstances/${vmi?.metadata?.name}/vnc`;
+        const port = window.location.port || (isEncrypted ? SECURE : INSECURE);
+        const url = `${isEncrypted ? WSS : WS}://${window.location.hostname}:${port}/${path}`;
+        const rfbInstnce = new RFBCreate(staticRenderLocationRef.current, url);
         rfbInstnce?.addEventListener('connect', () => setStatus(connected));
-        rfbInstnce?.addEventListener('disconnect', (e: any) => {
+        rfbInstnce?.addEventListener('disconnect', () => {
           setStatus(disconnected);
-          onDisconnected?.(e);
         });
-        rfbInstnce?.addEventListener('securityfailure', (e: any) => {
+        rfbInstnce?.addEventListener('securityfailure', () => {
           setStatus(disconnected);
-          onSecurityFailure?.(e);
         });
         rfbInstnce.sendCtrlAlt1 = function sendCtrlAlt1() {
           if (this._rfbConnectionState !== connected || this._viewOnly) {
@@ -157,29 +116,18 @@ export const VncConsole: FC<VncConsoleProps> = ({
         };
         rfbInstnce.viewOnly = viewOnly;
         rfbInstnce.scaleViewport = scaleViewport;
-        rfbInstnce.resizeSession = resizeSession;
         return rfbInstnce;
       });
     }
-  }, [
-    disabled,
-    url,
-    options,
-    viewOnly,
-    scaleViewport,
-    resizeSession,
-    onDisconnected,
-    onSecurityFailure,
-    pasteText,
-  ]);
+  }, [disabled, vmi?.metadata?.namespace, vmi?.metadata?.name, viewOnly, scaleViewport, pasteText]);
 
   useEffect(() => {
     if (!rfb && status === disconnected) {
       try {
-        initLogging(vncLogging);
-        autoConnect && connect();
+        initLogging('debug');
+        connect();
       } catch (e) {
-        onInitFailed?.(e);
+        kubevirtConsole.error(e);
       }
     }
 
@@ -188,7 +136,7 @@ export const VncConsole: FC<VncConsoleProps> = ({
         rfb?.disconnect();
       }
     };
-  }, [connect, onInitFailed, vncLogging, rfb, status, autoConnect]);
+  }, [connect, rfb, status]);
 
   if (disabled) {
     return (
@@ -205,7 +153,7 @@ export const VncConsole: FC<VncConsoleProps> = ({
           customButtons={[
             {
               onClick: () => rfb?.sendCtrlAltDel(),
-              text: textCtrlAltDel || 'Ctrl + Alt + Delete',
+              text: 'Ctrl + Alt + Delete',
             },
             {
               onClick: () => rfb?.sendCtrlAlt1(),
@@ -221,38 +169,30 @@ export const VncConsole: FC<VncConsoleProps> = ({
             e.preventDefault();
             rfb?.sendPasteCMD();
           }}
-          additionalButtons={additionalButtons}
           onDisconnect={() => rfb?.disconnect()}
-          textDisconnect={textDisconnect}
-          textSendShortcut={textSendShortcut}
         />
       )}
       <div className="pf-c-console__vnc">
-        {children}
         {status === disconnected &&
           (CustomConnectComponent ? (
             <CustomConnectComponent connect={connect} />
           ) : (
             <EmptyState>
-              <EmptyStateBody>
-                {textDisconnected || t('Click Connect to open the VNC console.')}
-              </EmptyStateBody>
+              <EmptyStateBody>{t('Click Connect to open the VNC console.')}</EmptyStateBody>
               <EmptyStateFooter>
                 <Button onClick={connect} variant="primary">
-                  {textConnect || t('Connect')}
+                  {t('Connect')}
                 </Button>
               </EmptyStateFooter>
             </EmptyState>
           ))}
-        {status === connecting && (
-          <LoadingEmptyState bodyContents={textConnecting || t('Connecting')} />
-        )}
+        {status === connecting && <LoadingEmptyState bodyContents={t('Connecting')} />}
 
         {hasGPU && status === connected && (
           <div className="vnc-screen-tabs">
             <Tabs
               style={{
-                width: staticRenderLocaitonRef?.current?.lastElementChild?.lastElementChild?.width,
+                width: staticRenderLocationRef?.current?.lastElementChild?.lastElementChild?.width,
               }}
               activeKey={activeTabKey}
             >
@@ -275,7 +215,7 @@ export const VncConsole: FC<VncConsoleProps> = ({
             </Tabs>
           </div>
         )}
-        {StaticRenderLocaiton}
+        {StaticRenderLocation}
       </div>
     </>
   );
