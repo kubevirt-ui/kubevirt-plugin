@@ -1,14 +1,16 @@
-import * as React from 'react';
+import { useMemo } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
 import {
   V1VirtualMachine,
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { getConsoleVirtctlCommand } from '@kubevirt-utils/components/SSHAccess/utils';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
-import { Action, useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
+import { useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 import { printableVMStatus } from '../../utils';
 import { VirtualMachineActionFactory } from '../VirtualMachineActionFactory';
@@ -17,7 +19,7 @@ type UseVirtualMachineActionsProvider = (
   vm: V1VirtualMachine,
   vmim?: V1VirtualMachineInstanceMigration,
   isSingleNodeCluster?: boolean,
-) => [Action[], boolean, any];
+) => [ActionDropdownItemType[], boolean, any];
 
 const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
   vm,
@@ -25,11 +27,13 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
   isSingleNodeCluster,
 ) => {
   const { createModal } = useModal();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const virtctlCommand = getConsoleVirtctlCommand(vm);
 
   const [, inFlight] = useK8sModel(VirtualMachineModelRef);
-  const actions: Action[] = React.useMemo(() => {
+  const actions: ActionDropdownItemType[] = useMemo(() => {
     const printableStatus = vm?.status?.printableStatus;
     const { Migrating, Paused } = printableVMStatus;
 
@@ -43,11 +47,13 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
       return map[printableStatusMachine] || map.default;
     })(printableStatus);
 
-    const migrateOrCancelMigration =
+    const migrateOrCancelMigrationCompute =
       printableStatus === Migrating ||
       (vmim && ![vmimStatuses.Failed, vmimStatuses.Succeeded].includes(vmim?.status?.phase))
-        ? VirtualMachineActionFactory.cancelMigration(vm, vmim, isSingleNodeCluster)
-        : VirtualMachineActionFactory.migrate(vm, isSingleNodeCluster);
+        ? VirtualMachineActionFactory.cancelMigrationCompute(vm, vmim, isSingleNodeCluster)
+        : VirtualMachineActionFactory.migrateCompute(vm, isSingleNodeCluster);
+
+    const migrateStorage = VirtualMachineActionFactory.migrateStorage(vm, navigate, location);
 
     const pauseOrUnpause =
       printableStatus === Paused
@@ -60,16 +66,16 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
       pauseOrUnpause,
       VirtualMachineActionFactory.clone(vm, createModal),
       VirtualMachineActionFactory.snapshot(vm, createModal),
-      migrateOrCancelMigration,
+      VirtualMachineActionFactory.migrationActions(migrateOrCancelMigrationCompute, migrateStorage),
       // VirtualMachineActionFactory.openConsole(vm),
       VirtualMachineActionFactory.copySSHCommand(vm, virtctlCommand),
       VirtualMachineActionFactory.editLabels(vm, createModal),
       VirtualMachineActionFactory.editAnnotations(vm, createModal),
       VirtualMachineActionFactory.delete(vm, createModal),
     ];
-  }, [vm, vmim, isSingleNodeCluster, createModal, virtctlCommand]);
+  }, [vm, vmim, isSingleNodeCluster, navigate, location, createModal, virtctlCommand]);
 
-  return React.useMemo(() => [actions, !inFlight, undefined], [actions, inFlight]);
+  return useMemo(() => [actions, !inFlight, undefined], [actions, inFlight]);
 };
 
 export default useVirtualMachineActionsProvider;

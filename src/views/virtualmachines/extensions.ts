@@ -3,6 +3,7 @@ import {
   ResourceActionProvider,
   ResourceDetailsPage,
   ResourceListPage,
+  RoutePage,
   StandaloneRoutePage,
 } from '@openshift-console/dynamic-plugin-sdk';
 import type { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plugin-sdk-webpack';
@@ -12,6 +13,7 @@ export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
     './views/virtualmachines/details/tabs/diagnostic/VirtualMachineLogViewer/VirtualMachineLogViewerStandAlone/VirtualMachineLogViewerStandAlone.tsx',
   useVirtualMachineActionsProvider:
     './views/virtualmachines/actions/hooks/useVirtualMachineActionsProvider.ts',
+  VirtualMachineMigration: './views/virtualmachines/migrate/VirtualMachineMigration.tsx',
   VirtualMachineNavPage: './views/virtualmachines/details/VirtualMachineNavPage.tsx',
   VirtualMachinesList: './views/virtualmachines/list/VirtualMachinesList.tsx',
 };
@@ -67,4 +69,13 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.page/resource/list',
   } as EncodedExtension<ResourceListPage>,
+  {
+    properties: {
+      component: {
+        $codeRef: 'VirtualMachineMigration',
+      },
+      path: ['/k8s/ns/:namespace/:kind/:name/migratestorage'],
+    },
+    type: 'console.page/route',
+  } as EncodedExtension<RoutePage>,
 ];
