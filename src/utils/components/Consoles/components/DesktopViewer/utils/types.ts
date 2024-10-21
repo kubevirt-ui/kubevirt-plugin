@@ -153,7 +153,6 @@ export type MoreInformationDefaultProps = {
 };
 
 export type DesktopViewerProps = {
-  type: string;
   vm: V1VirtualMachine;
   vmi: V1VirtualMachineInstance;
 };

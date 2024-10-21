@@ -6,6 +6,9 @@
     // vnc console use element as ref and inline styling on element to control auto resizing, we need to use important in this case.
     background-color: transparent !important;
   }
+  canvas {
+    width: 98% !important;
+  }
 }
 .hide {
   display: none;
@@ -24,4 +27,8 @@
 .vnc-paste-button {
   margin-left: var(--pf-v5-global--spacer--sm);
   margin-right: var(--pf-v5-global--spacer--sm);
+}
+
+.pf-c-console__vnc {
+  width: 100%;
 }

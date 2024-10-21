@@ -16,28 +16,22 @@ import styles from '@patternfly/react-styles/css/components/Consoles/VncConsole'
 import { VncConsoleActionsProps } from './utils/VncConsoleTypes';
 
 export const VncConsoleActions: FC<VncConsoleActionsProps> = ({
-  additionalButtons = [],
   customButtons,
   onDisconnect,
   onInjectTextFromClipboard,
-  textDisconnect,
-  textSendShortcut,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
-  const onToggle = () => setIsOpen((prevIsOpen) => !prevIsOpen);
-
   return (
-    <>
+    <div style={{ display: 'flex' }}>
       <div className={css(styles.consoleActionsVnc)}>
-        {additionalButtons}
         <Dropdown
           toggle={DropdownToggle({
-            children: <>{textSendShortcut || t('Send key')}</>,
+            children: <>{t('Send key')}</>,
             id: 'pf-c-console__actions-vnc-toggle-id',
             isExpanded: isOpen,
-            onClick: onToggle,
+            onClick: () => setIsOpen((prevIsOpen) => !prevIsOpen),
           })}
           isOpen={isOpen}
           onOpenChange={(open: boolean) => setIsOpen(open)}
@@ -67,9 +61,9 @@ export const VncConsoleActions: FC<VncConsoleActionsProps> = ({
         onClick={onDisconnect}
         variant={ButtonVariant.secondary}
       >
-        {textDisconnect || t('Disconnect')}
+        {t('Disconnect')}
       </Button>
-    </>
+    </div>
   );
 };
 

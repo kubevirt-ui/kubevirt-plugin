@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC, useState } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -14,12 +14,14 @@ import CloudInitCredentialsContent from './CloudInitCredentialsContent';
 import './cloud-init-credentials.scss';
 
 type CloudInitCredentialsProps = {
+  isStandAlone?: boolean;
   vm: V1VirtualMachine;
 };
 
-const CloudInitCredentials: React.FC<CloudInitCredentialsProps> = ({ vm }) => {
+const CloudInitCredentials: FC<CloudInitCredentialsProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
-  const [showCredentials, setShowCredentials] = React.useState<boolean>(false);
+
+  const [showCredentials, setShowCredentials] = useState<boolean>(false);
 
   return (
     <Accordion className="cloud-init-credentials">
