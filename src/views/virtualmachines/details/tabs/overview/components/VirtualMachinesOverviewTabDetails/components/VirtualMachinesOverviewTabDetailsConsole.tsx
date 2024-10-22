@@ -36,7 +36,6 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
           <VncConsole
             CustomConnectComponent={VirtualMachinesOverviewTabDetailsConsoleConnect}
             scaleViewport
-            showAccessControls={false}
             vmi={vmi}
           />
         </>

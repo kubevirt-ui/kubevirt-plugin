@@ -7,8 +7,9 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getGPUDevices } from '@kubevirt-utils/resources/vm';
 import { isWindows } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { RFBCreate } from '@novnc/novnc/core/rfb';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
-import { Bullseye, Stack, StackItem } from '@patternfly/react-core';
+import { Bullseye, Flex, FlexItem, Stack, StackItem } from '@patternfly/react-core';
 
 import { AccessConsoles } from './components/AccessConsoles/AccessConsoles';
 import CloudInitCredentials from './components/CloudInitCredentials/CloudInitCredentials';
@@ -22,14 +23,18 @@ import {
 import VncConsole from './components/vnc-console/VncConsole';
 import { isHeadlessModeVMI } from './utils/utils';
 
+import './consoles.scss';
+
 type ConsolesProps = {
+  consoleContainerClass?: string;
   isStandAlone?: boolean;
   vmi: V1VirtualMachineInstance;
 };
 
-const Consoles: FC<ConsolesProps> = ({ isStandAlone, vmi }) => {
+const Consoles: FC<ConsolesProps> = ({ consoleContainerClass, isStandAlone, vmi }) => {
   const { t } = useKubevirtTranslation();
-  const [type, setType] = useState<null | string>(VNC_CONSOLE_TYPE);
+  const [type, setType] = useState<string>(VNC_CONSOLE_TYPE);
+  const [rfb, setRFB] = useState<RFBCreate>(null);
   const [vm] = useK8sWatchResource<V1VirtualMachine>({
     groupVersionKind: VirtualMachineModelGroupVersionKind,
     name: vmi?.metadata?.name,
@@ -47,22 +52,25 @@ const Consoles: FC<ConsolesProps> = ({ isStandAlone, vmi }) => {
     );
   }
 
+  if (isHeadlessMode) {
+    return <div>{t('Console is disabled in headless mode')}</div>;
+  }
+
   return (
-    <Stack hasGutter>
-      <StackItem>
-        {!isWindowsVM && <CloudInitCredentials isStandAlone={isStandAlone} vm={vm} />}
+    <Stack>
+      <StackItem className="consoles-actions">
+        <Flex className="consoles-actions-inner-flex">
+          <FlexItem>
+            {!isWindowsVM && <CloudInitCredentials isStandAlone={isStandAlone} vm={vm} />}
+          </FlexItem>
+          <FlexItem>
+            <AccessConsoles isWindowsVM={isWindowsVM} rfb={rfb} setType={setType} type={type} />
+          </FlexItem>
+        </Flex>
       </StackItem>
-      <StackItem>
-        <AccessConsoles isWindowsVM={isWindowsVM} setType={setType} type={type} />
-      </StackItem>
-      <StackItem>
+      <StackItem className={consoleContainerClass}>
         {type === VNC_CONSOLE_TYPE && (
-          <VncConsole
-            CustomDisabledComponent={t('Console is disabled in headless mode')}
-            disabled={isHeadlessMode}
-            hasGPU={!isEmpty(gpus)}
-            vmi={vmi}
-          />
+          <VncConsole hasGPU={!isEmpty(gpus)} onConnect={setRFB} vmi={vmi} />
         )}
         {type === SERIAL_CONSOLE_TYPE && <SerialConsoleConnector vmi={vmi} />}
         {type === DESKTOP_VIEWER_CONSOLE_TYPE && <DesktopViewer vm={vm} vmi={vmi} />}

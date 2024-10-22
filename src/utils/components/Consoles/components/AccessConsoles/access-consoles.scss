@@ -1,35 +1,5 @@
 .access-consoles {
-  min-width: 250px;
-}
-.kv-console {
-  .pf-v5-c-console {
-    display: grid;
-    grid-template-areas:
-      'actions-main actions-extra'
-      'main main';
-    row-gap: var(--pf-v5-global--spacer--md);
-  }
-
-  .pf-v5-c-console__actions {
-    grid-area: actions-main;
-  }
-
-  .pf-v5-c-console__actions-vnc {
-    grid-area: actions-main;
-    margin-left: calc(250px + var(--pf-v5-global--spacer--sm));
-    justify-content: unset;
-  }
-
-  .pf-c-console__vnc {
-    grid-area: main;
-  }
-  .pf-v5-c-console__serial {
-    grid-area: main;
-  }
-
-  .pf-v5-c-console__actions-serial {
-    grid-area: actions-extra;
-    display: flex;
-    justify-content: flex-end;
+  &-selector {
+    margin-right: 10px;
   }
 }
