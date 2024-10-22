@@ -11,5 +11,6 @@ RUN yarn install --frozen-lockfile && yarn build
 FROM registry.access.redhat.com/ubi8/nginx-120
 
 COPY --from=builder /opt/app-root/src/dist /usr/share/nginx/html
+COPY --from=builder /opt/app-root/src/default.conf /opt/app-root/etc/nginx.d/default.conf
 USER 1001
 CMD /usr/libexec/s2i/run
