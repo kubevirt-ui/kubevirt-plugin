@@ -4,7 +4,7 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getCloudInitCredentials } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { Stack, StackItem } from '@patternfly/react-core';
+import { Flex, FlexItem } from '@patternfly/react-core';
 
 import InlineCodeClipboardCopy from './InlineCodeClipboardCopy';
 
@@ -40,24 +40,14 @@ const CloudInitCredentialsContent: FC<CloudInitCredentialsContentProps> = ({ vm 
     { passwords: <></>, usernames: <></> },
   );
   return (
-    <Stack>
-      <Stack hasGutter>
-        <Stack>
-          <StackItem>
-            {t(
-              'The following credentials for this operating system were created via cloud-init. If unsuccessful, cloud-init could be improperly configured.',
-            )}
-          </StackItem>
-          <StackItem>{t('Contact the image provider for more information.')}</StackItem>
-        </Stack>
-        <StackItem>
-          <strong>{t('User name')}</strong> {usernames}
-        </StackItem>
-        <StackItem>
-          <strong>{t('Password')}</strong> {passwords}
-        </StackItem>
-      </Stack>
-    </Stack>
+    <Flex className="cloud-init-credentials-user-pass">
+      <FlexItem>
+        {t('User name')} {usernames}
+      </FlexItem>
+      <FlexItem>
+        {t('Password')} {passwords}
+      </FlexItem>
+    </Flex>
   );
 };
 

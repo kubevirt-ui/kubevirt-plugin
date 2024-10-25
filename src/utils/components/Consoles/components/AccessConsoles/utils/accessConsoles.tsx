@@ -1,6 +1,7 @@
 import { Dispatch, SetStateAction } from 'react';
 
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { RFBCreate } from '@novnc/novnc/core/rfb';
 
 import {
   DESKTOP_VIEWER_CONSOLE_TYPE,
@@ -10,6 +11,7 @@ import {
 
 export type AccessConsolesProps = {
   isWindowsVM: boolean;
+  rfb?: RFBCreate;
   setType: Dispatch<SetStateAction<string>>;
   type: string;
 };

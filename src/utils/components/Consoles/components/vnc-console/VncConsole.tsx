@@ -1,4 +1,4 @@
-import React, { FC, MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import cn from 'classnames';
 
 import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';
@@ -24,7 +24,6 @@ import useCopyPasteConsole from '../utils/hooks/useCopyPasteConsole';
 
 import { isShiftKeyRequired } from './utils/util';
 import { VncConsoleProps } from './utils/VncConsoleTypes';
-import VncConsoleActions from './VncConsoleActions';
 
 import '@patternfly/react-styles/css/components/Consoles/VncConsole.css';
 import './vnc-console.scss';
@@ -33,16 +32,14 @@ const { connected, connecting, disconnected } = ConsoleState;
 
 export const VncConsole: FC<VncConsoleProps> = ({
   CustomConnectComponent,
-  CustomDisabledComponent,
-  disabled,
   hasGPU,
+  onConnect,
   scaleViewport = false,
-  showAccessControls = true,
   viewOnly = false,
   vmi,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [rfb, setRfb] = useState<any>();
+  const [rfb, setRfb] = useState<RFBCreate>();
   const [status, setStatus] = useState<ConsoleState>(disconnected);
   const [activeTabKey, setActiveTabKey] = useState<number | string>(0);
   const pasteText = useCopyPasteConsole();
@@ -58,68 +55,74 @@ export const VncConsole: FC<VncConsoleProps> = ({
   );
 
   const connect = useCallback(() => {
-    if (!disabled) {
-      setStatus(connecting);
-      setRfb(() => {
-        const isEncrypted = isConnectionEncrypted();
-        const path = `api/kubernetes/apis/subresources.kubevirt.io/v1/namespaces/${vmi?.metadata?.namespace}/virtualmachineinstances/${vmi?.metadata?.name}/vnc`;
-        const port = window.location.port || (isEncrypted ? SECURE : INSECURE);
-        const url = `${isEncrypted ? WSS : WS}://${window.location.hostname}:${port}/${path}`;
-        const rfbInstnce = new RFBCreate(staticRenderLocationRef.current, url);
-        rfbInstnce?.addEventListener('connect', () => setStatus(connected));
-        rfbInstnce?.addEventListener('disconnect', () => {
-          setStatus(disconnected);
-        });
-        rfbInstnce?.addEventListener('securityfailure', () => {
-          setStatus(disconnected);
-        });
-        rfbInstnce.sendCtrlAlt1 = function sendCtrlAlt1() {
-          if (this._rfbConnectionState !== connected || this._viewOnly) {
-            return;
-          }
-          this.sendKey(KeyTable.XK_Control_L, 'ControlLeft', true);
-          this.sendKey(KeyTable.XK_Alt_L, 'AltLeft', true);
-          this.sendKey(KeyTable.XK_1, 'One', true);
-          this.sendKey(KeyTable.XK_1, 'One', false);
-          this.sendKey(KeyTable.XK_Alt_L, 'AltLeft', false);
-          this.sendKey(KeyTable.XK_Control_L, 'ControlLeft', false);
-        };
-        rfbInstnce.sendCtrlAlt2 = function sendCtrlAlt2() {
-          if (this._rfbConnectionState !== connected || this._viewOnly) {
-            return;
-          }
-          this.sendKey(KeyTable.XK_Control_L, 'ControlLeft', true);
-          this.sendKey(KeyTable.XK_Alt_L, 'AltLeft', true);
-          this.sendKey(KeyTable.XK_2, 'Two', true);
-          this.sendKey(KeyTable.XK_2, 'Two', false);
-          this.sendKey(KeyTable.XK_Alt_L, 'AltLeft', false);
-          this.sendKey(KeyTable.XK_Control_L, 'ControlLeft', false);
-        };
-        rfbInstnce.sendPasteCMD = async function sendPasteCMD() {
-          if (this._rfbConnectionState !== connected || this._viewOnly) {
-            return;
-          }
-          const clipboardText = await navigator?.clipboard?.readText?.();
-          const text = clipboardText || pasteText.current;
-          const lastItem = text.length - 1;
-          for (let i = 0; i < text.length; i++) {
-            const char = text[i];
-            const shiftRequired = isShiftKeyRequired(char);
-            await sleep(50);
-            shiftRequired && this.sendKey(KeyTable.XK_Shift_L, 'ShiftLeft', true);
-            this.sendKey(char.charCodeAt(0));
-            shiftRequired && this.sendKey(KeyTable.XK_Shift_L, 'ShiftLeft', false);
-            i === lastItem &&
-              clipboardText?.charCodeAt(lastItem) === 13 &&
-              this.sendKey(KeyTable.XK_KP_Enter);
-          }
-        };
-        rfbInstnce.viewOnly = viewOnly;
-        rfbInstnce.scaleViewport = scaleViewport;
-        return rfbInstnce;
+    setStatus(connecting);
+    setRfb(() => {
+      const isEncrypted = isConnectionEncrypted();
+      const path = `api/kubernetes/apis/subresources.kubevirt.io/v1/namespaces/${vmi?.metadata?.namespace}/virtualmachineinstances/${vmi?.metadata?.name}/vnc`;
+      const port = window.location.port || (isEncrypted ? SECURE : INSECURE);
+      const url = `${isEncrypted ? WSS : WS}://${window.location.hostname}:${port}/${path}`;
+      const rfbInstnce = new RFBCreate(staticRenderLocationRef.current, url);
+      rfbInstnce?.addEventListener('connect', () => setStatus(connected));
+      rfbInstnce?.addEventListener('disconnect', () => {
+        setStatus(disconnected);
       });
-    }
-  }, [disabled, vmi?.metadata?.namespace, vmi?.metadata?.name, viewOnly, scaleViewport, pasteText]);
+      rfbInstnce?.addEventListener('securityfailure', () => {
+        setStatus(disconnected);
+      });
+      rfbInstnce.sendCtrlAlt1 = function sendCtrlAlt1() {
+        if (this._rfbConnectionState !== connected || this._viewOnly) {
+          return;
+        }
+        this.sendKey(KeyTable.XK_Control_L, 'ControlLeft', true);
+        this.sendKey(KeyTable.XK_Alt_L, 'AltLeft', true);
+        this.sendKey(KeyTable.XK_1, 'One', true);
+        this.sendKey(KeyTable.XK_1, 'One', false);
+        this.sendKey(KeyTable.XK_Alt_L, 'AltLeft', false);
+        this.sendKey(KeyTable.XK_Control_L, 'ControlLeft', false);
+      };
+      rfbInstnce.sendCtrlAlt2 = function sendCtrlAlt2() {
+        if (this._rfbConnectionState !== connected || this._viewOnly) {
+          return;
+        }
+        this.sendKey(KeyTable.XK_Control_L, 'ControlLeft', true);
+        this.sendKey(KeyTable.XK_Alt_L, 'AltLeft', true);
+        this.sendKey(KeyTable.XK_2, 'Two', true);
+        this.sendKey(KeyTable.XK_2, 'Two', false);
+        this.sendKey(KeyTable.XK_Alt_L, 'AltLeft', false);
+        this.sendKey(KeyTable.XK_Control_L, 'ControlLeft', false);
+      };
+      rfbInstnce.sendPasteCMD = async function sendPasteCMD() {
+        if (this._rfbConnectionState !== connected || this._viewOnly) {
+          return;
+        }
+        const clipboardText = await navigator?.clipboard?.readText?.();
+        const text = clipboardText || pasteText.current;
+        const lastItem = text.length - 1;
+        for (let i = 0; i < text.length; i++) {
+          const char = text[i];
+          const shiftRequired = isShiftKeyRequired(char);
+          await sleep(50);
+          shiftRequired && this.sendKey(KeyTable.XK_Shift_L, 'ShiftLeft', true);
+          this.sendKey(char.charCodeAt(0));
+          shiftRequired && this.sendKey(KeyTable.XK_Shift_L, 'ShiftLeft', false);
+          i === lastItem &&
+            clipboardText?.charCodeAt(lastItem) === 13 &&
+            this.sendKey(KeyTable.XK_KP_Enter);
+        }
+      };
+      rfbInstnce.viewOnly = viewOnly;
+      rfbInstnce.scaleViewport = scaleViewport;
+      onConnect?.(rfbInstnce);
+      return rfbInstnce;
+    });
+  }, [
+    vmi?.metadata?.namespace,
+    vmi?.metadata?.name,
+    viewOnly,
+    scaleViewport,
+    onConnect,
+    pasteText,
+  ]);
 
   useEffect(() => {
     if (!rfb && status === disconnected) {
@@ -138,86 +141,52 @@ export const VncConsole: FC<VncConsoleProps> = ({
     };
   }, [connect, rfb, status]);
 
-  if (disabled) {
-    return (
-      <EmptyState className="pf-c-console__vnc">
-        <EmptyStateBody>{CustomDisabledComponent || t('Console is disabled')}</EmptyStateBody>
-      </EmptyState>
-    );
-  }
-
   return (
-    <>
-      {status === connected && showAccessControls && (
-        <VncConsoleActions
-          customButtons={[
-            {
-              onClick: () => rfb?.sendCtrlAltDel(),
-              text: 'Ctrl + Alt + Delete',
-            },
-            {
-              onClick: () => rfb?.sendCtrlAlt1(),
-              text: 'Ctrl + Alt + 1',
-            },
-            {
-              onClick: () => rfb?.sendCtrlAlt2(),
-              text: 'Ctrl + Alt + 2',
-            },
-          ]}
-          onInjectTextFromClipboard={(e: MouseEvent<HTMLButtonElement>) => {
-            e.currentTarget.blur();
-            e.preventDefault();
-            rfb?.sendPasteCMD();
-          }}
-          onDisconnect={() => rfb?.disconnect()}
-        />
-      )}
-      <div className="pf-c-console__vnc">
-        {status === disconnected &&
-          (CustomConnectComponent ? (
-            <CustomConnectComponent connect={connect} />
-          ) : (
-            <EmptyState>
-              <EmptyStateBody>{t('Click Connect to open the VNC console.')}</EmptyStateBody>
-              <EmptyStateFooter>
-                <Button onClick={connect} variant="primary">
-                  {t('Connect')}
-                </Button>
-              </EmptyStateFooter>
-            </EmptyState>
-          ))}
-        {status === connecting && <LoadingEmptyState bodyContents={t('Connecting')} />}
+    <div className="pf-c-console__vnc">
+      {status === disconnected &&
+        (CustomConnectComponent ? (
+          <CustomConnectComponent connect={connect} />
+        ) : (
+          <EmptyState>
+            <EmptyStateBody>{t('Click Connect to open the VNC console.')}</EmptyStateBody>
+            <EmptyStateFooter>
+              <Button onClick={connect} variant="primary">
+                {t('Connect')}
+              </Button>
+            </EmptyStateFooter>
+          </EmptyState>
+        ))}
+      {status === connecting && <LoadingEmptyState bodyContents={t('Connecting')} />}
 
-        {hasGPU && status === connected && (
-          <div className="vnc-screen-tabs">
-            <Tabs
-              style={{
-                width: staticRenderLocationRef?.current?.lastElementChild?.lastElementChild?.width,
+      {hasGPU && status === connected && (
+        <div className="vnc-screen-tabs">
+          <Tabs
+            style={{
+              width: staticRenderLocationRef?.current?.lastElementChild?.lastElementChild?.width,
+            }}
+            activeKey={activeTabKey}
+          >
+            <Tab
+              onClick={() => {
+                rfb?.sendCtrlAlt1();
+                setActiveTabKey(0);
               }}
-              activeKey={activeTabKey}
-            >
-              <Tab
-                onClick={() => {
-                  rfb?.sendCtrlAlt1();
-                  setActiveTabKey(0);
-                }}
-                eventKey={0}
-                title={<TabTitleText>{t('Screen 1')}</TabTitleText>}
-              />
-              <Tab
-                onClick={() => {
-                  rfb?.sendCtrlAlt2();
-                  setActiveTabKey(1);
-                }}
-                eventKey={1}
-                title={<TabTitleText>{t('Screen 2')}</TabTitleText>}
-              />
-            </Tabs>
-          </div>
-        )}
-        {StaticRenderLocation}
-      </div>
-    </>
+              eventKey={0}
+              title={<TabTitleText>{t('Screen 1')}</TabTitleText>}
+            />
+            <Tab
+              onClick={() => {
+                rfb?.sendCtrlAlt2();
+                setActiveTabKey(1);
+              }}
+              eventKey={1}
+              title={<TabTitleText>{t('Screen 2')}</TabTitleText>}
+            />
+          </Tabs>
+        </div>
+      )}
+      {StaticRenderLocation}
+    </div>
   );
 };
 

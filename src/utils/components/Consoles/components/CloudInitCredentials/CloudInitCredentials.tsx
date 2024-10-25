@@ -1,13 +1,9 @@
-import React, { FC, useState } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionToggle,
-} from '@patternfly/react-core';
+import { Flex, Text } from '@patternfly/react-core';
 
 import CloudInitCredentialsContent from './CloudInitCredentialsContent';
 
@@ -21,23 +17,18 @@ type CloudInitCredentialsProps = {
 const CloudInitCredentials: FC<CloudInitCredentialsProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
 
-  const [showCredentials, setShowCredentials] = useState<boolean>(false);
-
   return (
-    <Accordion className="cloud-init-credentials">
-      <AccordionItem>
-        <AccordionToggle
-          id="consoles-accordion-toggle"
-          isExpanded={showCredentials}
-          onClick={() => setShowCredentials(!showCredentials)}
-        >
-          {t('Guest login credentials')}
-        </AccordionToggle>
-        <AccordionContent isHidden={!showCredentials}>
-          <CloudInitCredentialsContent vm={vm} />
-        </AccordionContent>
-      </AccordionItem>
-    </Accordion>
+    <Flex className="cloud-init-credentials">
+      <Text className="cloud-init-credentials-title" component="h6">
+        {t('Guest login credentials')}
+      </Text>
+      <HelpTextIcon
+        bodyContent={t(
+          'The following credentials for this operating system were created via cloud-init. If unsuccessful, cloud-init could be improperly configured. Contact the image provider for more information.',
+        )}
+      />
+      <CloudInitCredentialsContent vm={vm} />
+    </Flex>
   );
 };
 

@@ -1,6 +1,7 @@
-import { FC, HTMLProps, MouseEventHandler, ReactNode } from 'react';
+import { FC, HTMLProps, MouseEventHandler } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { RFBCreate } from '@novnc/novnc/core/rfb';
 
 export type VncConsoleActionsProps = {
   /** VNC console additional send keys elements */
@@ -13,12 +14,10 @@ export type VncConsoleActionsProps = {
 export type VncConsoleProps = HTMLProps<HTMLDivElement> & {
   /** A custom component to replace th default connect button screen */
   CustomConnectComponent?: FC<{ connect: () => void }>;
-  /** A custom component to replace th default disabled component */
-  CustomDisabledComponent?: ReactNode;
   /** Should console render alt tabs */
   hasGPU?: boolean;
+  onConnect?: (rfb: RFBCreate) => void;
   scaleViewport?: boolean;
-  showAccessControls?: boolean;
   viewOnly?: boolean;
   vmi: V1VirtualMachineInstance;
 };

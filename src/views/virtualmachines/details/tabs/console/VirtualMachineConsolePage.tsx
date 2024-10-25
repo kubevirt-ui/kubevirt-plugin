@@ -19,6 +19,8 @@ import { printableVMStatus } from '../../../utils';
 
 import VirtualMachineConsolePageTitle from './components/VirtualMachineConsolePageTitle';
 
+import './VirtualMachineConsolePage.scss';
+
 const VirtualMachineConsolePage: FC<NavPageComponentProps> = ({ obj: vm }) => {
   const { t } = useKubevirtTranslation();
   const [vmi, vmiLoaded] = useK8sWatchResource<V1VirtualMachineInstance>({
@@ -55,8 +57,11 @@ const VirtualMachineConsolePage: FC<NavPageComponentProps> = ({ obj: vm }) => {
   return (
     <>
       <VirtualMachineConsolePageTitle />
-      <PageSection variant={PageSectionVariants.light}>
-        <Consoles vmi={vmi} />
+      <PageSection
+        className="VirtualMachineConsolePage-page-section"
+        variant={PageSectionVariants.light}
+      >
+        <Consoles consoleContainerClass="virtual-machine-console-page" vmi={vmi} />
       </PageSection>
     </>
   );
