@@ -38,6 +38,6 @@ jobs:
         env:
           GITHUB_TOKEN: '${{ secrets.BOT_PAT }}'
         with:
-          platforms: linux/x86_64,linux/s390x
+          platforms: linux/x86_64,linux/s390x,linux/arm64
           push: true
           tags: quay.io/kubevirt-ui/kubevirt-plugin:${{env.VERSION_TAG}}
