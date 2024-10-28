@@ -8,9 +8,14 @@
 }
 
 .virtual-machine-console-page {
-  height: 54vh;
+  height: 100%;
 }
 
 .console-container-stand-alone {
   height: calc(100% - 75px);
+}
+
+.pf-c-console__xterm {
+  height: 100%;
+  margin: 10px;
 }

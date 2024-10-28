@@ -1,59 +1,47 @@
-import * as React from 'react';
+import React, {
+  Dispatch,
+  FC,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { WSFactory } from '@openshift-console/dynamic-plugin-sdk/lib/utils/k8s/ws-factory';
+import { Button, EmptyState, EmptyStateBody, EmptyStateFooter } from '@patternfly/react-core';
 
 import { INSECURE, SECURE } from '../../utils/constants';
 import { isConnectionEncrypted } from '../../utils/utils';
-import { ConsoleState, WS, WSS } from '../utils/ConsoleConsts';
+import { ConsoleState, WS, WSFactoryExtends, WSS } from '../utils/ConsoleConsts';
+import useCopyPasteConsole from '../utils/hooks/useCopyPasteConsole';
 
 import { WebSocket } from './utils/serialConsole';
-import SerialConsole from './SerialConsole';
+import { XTerm } from './Xterm/Xterm';
 
-const { connected, disconnected, loading } = ConsoleState;
+const { destroyed, init, open } = ConsoleState;
 
-type SerialConsoleConnectorProps = React.HTMLProps<HTMLDivElement> & {
+type SerialConsoleConnectorProps = {
+  onConnect?: Dispatch<SetStateAction<WebSocket>>;
   vmi: V1VirtualMachineInstance;
 };
 
-const SerialConsoleConnector: React.FC<SerialConsoleConnectorProps> = ({ vmi }) => {
+const SerialConsoleConnector: FC<SerialConsoleConnectorProps> = ({ onConnect, vmi }) => {
   const { t } = useKubevirtTranslation();
-  const [status, setStatus] = React.useState(loading);
-  const terminalRef = React.useRef(null);
-  const socket = React.useRef<WebSocket>(null);
+  const [status, setStatus] = useState(init);
+  const pasteText = useCopyPasteConsole();
 
-  const onBackendDisconnected = React.useCallback(() => {
-    if (terminalRef.current) {
-      terminalRef.current.onConnectionClosed('Reason for disconnect provided by backend.');
-    }
+  const terminalRef = useRef(null);
+  const [socket, setSocket] = useState<WebSocket>(null);
 
-    socket?.current?.destroy();
-    setStatus(disconnected); // will close the terminal window
-  }, []);
-
-  const setConnected = React.useCallback(() => {
-    setStatus(connected);
-  }, [setStatus]);
-
-  const onDataFromBackend = React.useCallback((data) => {
-    if (terminalRef.current) {
-      const reader = new FileReader();
-      reader.addEventListener('loadend', (e) => {
-        // Blob to text transformation ...
-        const target = (e.target || e.srcElement) as any;
-        const text = target.result;
-        terminalRef.current.onDataReceived(text);
-      });
-      reader.readAsText(data);
-    }
-  }, []);
-
-  const onConnect = React.useCallback(() => {
-    if (socket.current) {
-      socket.current.destroy();
-      setStatus(loading);
+  const connect = useCallback(() => {
+    if (socket) {
+      socket.destroy();
+      setStatus(init);
     }
 
     const websocketOptions = {
@@ -66,35 +54,61 @@ const SerialConsoleConnector: React.FC<SerialConsoleConnectorProps> = ({ vmi }) 
       subprotocols: ['plain.kubevirt.io'],
     };
 
-    socket.current = new WSFactory(`${vmi?.metadata?.name}-serial`, websocketOptions)
-      .onmessage(onDataFromBackend)
-      .onopen(setConnected)
-      .onclose(onBackendDisconnected)
+    const createdSocket = new WSFactory(`${vmi?.metadata?.name}-serial`, websocketOptions)
+      .onmessage((data: Blob) => {
+        data.text().then((text) => {
+          terminalRef.current.onDataReceived(text);
+        });
+      })
+      .onopen(() => {
+        setStatus(open);
+      })
+      .onclose(function () {
+        this?.destroy();
+        setStatus(destroyed);
+      })
+      .ondestroy(() => setStatus(destroyed))
       .onerror((event) => {
         kubevirtConsole.log('WebSocket error received: ', event);
-      });
-  }, [onDataFromBackend, setConnected, vmi, onBackendDisconnected]);
+      }) as WSFactoryExtends;
+    createdSocket.onPaste = async function () {
+      try {
+        const text = await navigator.clipboard.readText();
+        this?.send(new Blob([text]));
+      } catch {
+        this?.send(new Blob([pasteText?.current]));
+      }
+    };
+    setSocket(createdSocket);
+    onConnect?.(createdSocket);
+  }, [socket, vmi?.metadata?.namespace, vmi?.metadata?.name, onConnect, pasteText]);
 
-  const onData = React.useCallback((data) => {
-    // data is resent back from backend so _will_ pass through onDataFromBackend
-    socket?.current?.send(new Blob([data]));
-  }, []);
+  useEffect(() => {
+    !socket && connect();
+  }, [connect, socket]);
 
   return (
-    <SerialConsole
-      fontFamily="monospace"
-      fontSize={12}
-      onConnect={onConnect}
-      onData={onData}
-      onDisconnect={onBackendDisconnected}
-      ref={terminalRef}
-      status={status}
-      textConnect={t('Connect')}
-      textDisconnect={t('Disconnect')}
-      textDisconnected={t('Click Connect to open serial console.')}
-      textLoading={t('Loading ...')}
-      textReset={t('Reset')}
-    />
+    <>
+      {status === open && (
+        <XTerm
+          onData={(data) => {
+            socket?.send(new Blob([data]));
+          }}
+          fontFamily={'monospace'}
+          fontSize={12}
+          innerRef={terminalRef}
+        />
+      )}
+      {status === destroyed && (
+        <EmptyState>
+          <EmptyStateBody>{t('Click Connect to open serial console.')}</EmptyStateBody>
+          <EmptyStateFooter>
+            <Button onClick={connect}>{t('Connect')}</Button>
+          </EmptyStateFooter>
+        </EmptyState>
+      )}
+      {status === init && <LoadingEmptyState bodyContents={t('Loading ...')} />}
+    </>
   );
 };
 

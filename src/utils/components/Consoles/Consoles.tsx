@@ -19,6 +19,7 @@ import {
   DESKTOP_VIEWER_CONSOLE_TYPE,
   SERIAL_CONSOLE_TYPE,
   VNC_CONSOLE_TYPE,
+  WSFactoryExtends,
 } from './components/utils/ConsoleConsts';
 import VncConsole from './components/vnc-console/VncConsole';
 import { isHeadlessModeVMI } from './utils/utils';
@@ -35,6 +36,7 @@ const Consoles: FC<ConsolesProps> = ({ consoleContainerClass, isStandAlone, vmi 
   const { t } = useKubevirtTranslation();
   const [type, setType] = useState<string>(VNC_CONSOLE_TYPE);
   const [rfb, setRFB] = useState<RFBCreate>(null);
+  const [serialSocket, setSerialSocket] = useState<WSFactoryExtends>(null);
   const [vm] = useK8sWatchResource<V1VirtualMachine>({
     groupVersionKind: VirtualMachineModelGroupVersionKind,
     name: vmi?.metadata?.name,
@@ -64,7 +66,13 @@ const Consoles: FC<ConsolesProps> = ({ consoleContainerClass, isStandAlone, vmi 
             {!isWindowsVM && <CloudInitCredentials isStandAlone={isStandAlone} vm={vm} />}
           </FlexItem>
           <FlexItem>
-            <AccessConsoles isWindowsVM={isWindowsVM} rfb={rfb} setType={setType} type={type} />
+            <AccessConsoles
+              isWindowsVM={isWindowsVM}
+              rfb={rfb}
+              serialSocket={serialSocket}
+              setType={setType}
+              type={type}
+            />
           </FlexItem>
         </Flex>
       </StackItem>
@@ -72,7 +80,9 @@ const Consoles: FC<ConsolesProps> = ({ consoleContainerClass, isStandAlone, vmi 
         {type === VNC_CONSOLE_TYPE && (
           <VncConsole hasGPU={!isEmpty(gpus)} onConnect={setRFB} vmi={vmi} />
         )}
-        {type === SERIAL_CONSOLE_TYPE && <SerialConsoleConnector vmi={vmi} />}
+        {type === SERIAL_CONSOLE_TYPE && (
+          <SerialConsoleConnector onConnect={setSerialSocket} vmi={vmi} />
+        )}
         {type === DESKTOP_VIEWER_CONSOLE_TYPE && <DesktopViewer vm={vm} vmi={vmi} />}
       </StackItem>
     </Stack>
