@@ -49,7 +49,7 @@ export const VncConsole: FC<VncConsoleProps> = ({
       <div
         className={cn('vnc-container', { hide: status !== connected })}
         ref={staticRenderLocationRef}
-      ></div>
+      />
     ),
     [staticRenderLocationRef, status],
   );
@@ -137,9 +137,10 @@ export const VncConsole: FC<VncConsoleProps> = ({
     return () => {
       if (rfb && status === connected) {
         rfb?.disconnect();
+        onConnect?.(null);
       }
     };
-  }, [connect, rfb, status]);
+  }, [onConnect, connect, rfb, status]);
 
   return (
     <div className="pf-c-console__vnc">

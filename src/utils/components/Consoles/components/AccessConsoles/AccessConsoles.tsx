@@ -1,4 +1,4 @@
-import React, { FC, MouseEvent, useState } from 'react';
+import React, { FC, MouseEvent, useEffect, useState } from 'react';
 
 import DropdownToggle from '@kubevirt-utils/components/toggles/DropdownToggle';
 import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';
@@ -16,13 +16,31 @@ import { SelectList } from '@patternfly/react-core';
 import {} from '@patternfly/react-core';
 import { PasteIcon } from '@patternfly/react-icons';
 
+import { ConsoleState } from '../utils/ConsoleConsts';
+
 import { AccessConsolesProps, typeMap } from './utils/accessConsoles';
 
 import './access-consoles.scss';
 
-export const AccessConsoles: FC<AccessConsolesProps> = ({ isWindowsVM, rfb, setType, type }) => {
+const { connected } = ConsoleState;
+
+export const AccessConsoles: FC<AccessConsolesProps> = ({
+  isWindowsVM,
+  rfb,
+  serialSocket,
+  setType,
+  type,
+}) => {
   const [isOpenSelectType, setIsOpenSelectType] = useState<boolean>(false);
   const [isOpenSendKey, setIsOpenSendKey] = useState<boolean>(false);
+  const [status, setStatus] = useState<string>();
+
+  useEffect(() => {
+    const statusCallback = () => setStatus(connected);
+    rfb?.addEventListener('connect', statusCallback);
+
+    () => rfb?.removeEventListener('connect', statusCallback);
+  }, [rfb]);
 
   const customButtons = [
     {
@@ -43,9 +61,13 @@ export const AccessConsoles: FC<AccessConsolesProps> = ({ isWindowsVM, rfb, setT
     e.currentTarget.blur();
     e.preventDefault();
     rfb?.sendPasteCMD();
+    serialSocket?.onPaste();
   };
 
-  const onDisconnect = () => rfb?.disconnect();
+  const onDisconnect = () => {
+    rfb?.disconnect();
+    serialSocket?.destroy();
+  };
 
   return (
     <>
@@ -92,6 +114,7 @@ export const AccessConsoles: FC<AccessConsolesProps> = ({ isWindowsVM, rfb, setT
           children: <>{t('Send key')}</>,
           className: 'access-consoles-selector',
           id: 'pf-c-console__actions-vnc-toggle-id',
+          isDisabled: !rfb,
           isExpanded: isOpenSendKey,
           onClick: () => setIsOpenSendKey((prevIsOpen) => !prevIsOpen),
         })}
@@ -109,6 +132,7 @@ export const AccessConsoles: FC<AccessConsolesProps> = ({ isWindowsVM, rfb, setT
       </Dropdown>
       <Button
         className="vnc-actions-disconnect-button"
+        isDisabled={status !== connected}
         onClick={onDisconnect}
         variant={ButtonVariant.secondary}
       >
