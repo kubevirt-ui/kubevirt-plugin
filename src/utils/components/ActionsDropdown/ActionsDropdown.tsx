@@ -1,9 +1,9 @@
-import React, { FC, memo, useRef, useState } from 'react';
+import React, { FC, memo, ReactNode, useRef, useState } from 'react';
 
 import DropdownToggle from '@kubevirt-utils/components/toggles/DropdownToggle';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Menu, MenuContent, MenuList, Popper } from '@patternfly/react-core';
+import { Menu, MenuContent, MenuList, Popper, Tooltip } from '@patternfly/react-core';
 
 import ActionDropdownItem from '../ActionDropdownItem/ActionDropdownItem';
 
@@ -12,15 +12,21 @@ import { ActionDropdownItemType } from './constants';
 type ActionsDropdownProps = {
   actions: ActionDropdownItemType[];
   className?: string;
+  disabledTooltip?: ReactNode;
   id?: string;
+  isDisabled?: boolean;
   isKebabToggle?: boolean;
   onLazyClick?: () => void;
+  variant?: 'default' | 'plain' | 'plainText' | 'primary' | 'secondary' | 'typeahead';
 };
 
 const ActionsDropdown: FC<ActionsDropdownProps> = ({
   actions = [],
+  disabledTooltip,
+  isDisabled,
   isKebabToggle,
   onLazyClick,
+  variant,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState(false);
@@ -37,11 +43,13 @@ const ActionsDropdown: FC<ActionsDropdownProps> = ({
   };
 
   const Toggle = isKebabToggle
-    ? KebabToggle({ isExpanded: isOpen, onClick: onToggle })
+    ? KebabToggle({ isDisabled, isExpanded: isOpen, onClick: onToggle })
     : DropdownToggle({
         children: t('Actions'),
+        isDisabled,
         isExpanded: isOpen,
         onClick: onToggle,
+        variant,
       });
 
   const menu = (
@@ -55,6 +63,15 @@ const ActionsDropdown: FC<ActionsDropdownProps> = ({
       </MenuContent>
     </Menu>
   );
+
+  if (isDisabled)
+    return (
+      <div className="kv-actions-dropdown" ref={containerRef}>
+        <Tooltip content={disabledTooltip}>
+          <span> {Toggle(toggleRef)}</span>
+        </Tooltip>
+      </div>
+    );
 
   return (
     <div className="kv-actions-dropdown" ref={containerRef}>

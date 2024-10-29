@@ -31,17 +31,20 @@ import {
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { Pagination } from '@patternfly/react-core';
+import { Flex, FlexItem, Pagination } from '@patternfly/react-core';
+import { useComputed, useSignals } from '@preact/signals-react/runtime';
 import useQuery from '@virtualmachines/details/tabs/metrics/NetworkCharts/hook/useQuery';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 
 import { useVMListFilters } from '../utils';
 
+import VirtualMachineActionButton from './components/VirtualMachineActionButton';
 import VirtualMachineEmptyState from './components/VirtualMachineEmptyState/VirtualMachineEmptyState';
 import VirtualMachineRow from './components/VirtualMachineRow/VirtualMachineRow';
 import VirtualMachinesCreateButton from './components/VirtualMachinesCreateButton/VirtualMachinesCreateButton';
 import useSelectedFilters from './hooks/useSelectedFilters';
 import useVirtualMachineColumns from './hooks/useVirtualMachineColumns';
+import { deselectAll, selectAll, selectedVMs } from './selectedVMs';
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
 import './VirtualMachinesList.scss';
@@ -56,7 +59,11 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
   const catalogURL = `/k8s/ns/${namespace || DEFAULT_NAMESPACE}/catalog`;
   const { featureEnabled, loading: loadingFeatureProxy } = useFeatures(KUBEVIRT_APISERVER_PROXY);
   const isProxyPodAlive = useKubevirtDataPodHealth();
+
+  useSignals();
+
   const query = useQuery();
+
   const [vms, vmLoaded, loadError] = useKubevirtWatchResource<V1VirtualMachine[]>(
     {
       groupVersionKind: VirtualMachineModelGroupVersionKind,
@@ -152,6 +159,8 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
 
   const noVMs = isEmpty(unfilteredData) && !vmsFilteredWithProxy;
 
+  const allVMsSelected = useComputed(() => data?.length === selectedVMs.value.length);
+
   if (loaded && noVMs) {
     return <VirtualMachineEmptyState catalogURL={catalogURL} namespace={namespace} />;
   }
@@ -160,69 +169,82 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
     <>
       {/* All of this table and components should be replaced to our own fitted components */}
       <ListPageHeader title={t('VirtualMachines')}>
-        <VirtualMachinesCreateButton namespace={namespace} />
+        <Flex>
+          <FlexItem>
+            <VirtualMachineActionButton />
+          </FlexItem>
+          <FlexItem>
+            <VirtualMachinesCreateButton namespace={namespace} />
+          </FlexItem>
+        </Flex>
       </ListPageHeader>
       <ListPageBody>
-        <div className="list-managment-group">
-          <ListPageFilter
-            columnLayout={{
-              columns: columns?.map(({ additional, id, title }) => ({
-                additional,
-                id,
-                title,
-              })),
-              id: VirtualMachineModelRef,
-              selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
-              type: t('VirtualMachine'),
-            }}
-            onFilterChange={(...args) => {
-              onFilterChange(...args);
-              setPagination((prevPagination) => ({
-                ...prevPagination,
-                endIndex: prevPagination?.perPage,
-                page: 1,
-                startIndex: 0,
-              }));
-            }}
-            data={unfilteredData}
-            loaded={loaded}
-            rowFilters={filters}
-            searchFilters={searchFilters}
-          />
-          {!isEmpty(dataFilters) && (
-            <Pagination
-              onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
-                onPageChange({ endIndex, page, perPage, startIndex })
-              }
-              onSetPage={(_e, page, perPage, startIndex, endIndex) =>
-                onPageChange({ endIndex, page, perPage, startIndex })
-              }
-              className="list-managment-group__pagination"
-              isLastFullPageShown
-              itemCount={data?.length}
-              page={pagination?.page}
-              perPage={pagination?.perPage}
-              perPageOptions={paginationDefaultValues}
+        <div className="vm-listpagebody">
+          <div className="list-managment-group">
+            <ListPageFilter
+              columnLayout={{
+                columns: columns?.map(({ additional, id, title }) => ({
+                  additional,
+                  id,
+                  title,
+                })),
+                id: VirtualMachineModelRef,
+                selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
+                type: t('VirtualMachine'),
+              }}
+              onFilterChange={(...args) => {
+                onFilterChange(...args);
+                setPagination((prevPagination) => ({
+                  ...prevPagination,
+                  endIndex: prevPagination?.perPage,
+                  page: 1,
+                  startIndex: 0,
+                }));
+              }}
+              data={unfilteredData}
+              loaded={loaded}
+              rowFilters={filters}
+              searchFilters={searchFilters}
             />
-          )}
+            {!isEmpty(dataFilters) && (
+              <Pagination
+                onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
+                  onPageChange({ endIndex, page, perPage, startIndex })
+                }
+                onSetPage={(_e, page, perPage, startIndex, endIndex) =>
+                  onPageChange({ endIndex, page, perPage, startIndex })
+                }
+                className="list-managment-group__pagination"
+                isLastFullPageShown
+                itemCount={data?.length}
+                page={pagination?.page}
+                perPage={pagination?.perPage}
+                perPageOptions={paginationDefaultValues}
+              />
+            )}
+          </div>
+          <VirtualizedTable<K8sResourceCommon>
+            EmptyMsg={() => (
+              <div className="pf-u-text-align-center">{t('No VirtualMachines found')}</div>
+            )}
+            onSelect={(_, selected, index) => {
+              if (index === -1) allVMsSelected.value ? deselectAll() : selectAll(data);
+            }}
+            rowData={{
+              getVmi: (ns: string, name: string) => vmiMapper?.mapper?.[ns]?.[name],
+              getVmim: (ns: string, name: string) => vmimMapper?.[ns]?.[name],
+              isSingleNodeCluster,
+              kind,
+            }}
+            allRowsSelected={allVMsSelected.value}
+            columns={activeColumns}
+            data={data}
+            loaded={loaded}
+            loadError={loadError}
+            Row={VirtualMachineRow}
+            unfilteredData={unfilteredData}
+          />
         </div>
-        <VirtualizedTable<K8sResourceCommon>
-          EmptyMsg={() => (
-            <div className="pf-u-text-align-center">{t('No VirtualMachines found')}</div>
-          )}
-          rowData={{
-            getVmi: (ns: string, name: string) => vmiMapper?.mapper?.[ns]?.[name],
-            getVmim: (ns: string, name: string) => vmimMapper?.[ns]?.[name],
-            isSingleNodeCluster,
-            kind,
-          }}
-          columns={activeColumns}
-          data={data}
-          loaded={loaded}
-          loadError={loadError}
-          Row={VirtualMachineRow}
-          unfilteredData={unfilteredData}
-        />
       </ListPageBody>
     </>
   );

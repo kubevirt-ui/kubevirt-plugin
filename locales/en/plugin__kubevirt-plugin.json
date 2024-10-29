@@ -1064,6 +1064,7 @@
   "Select boot source": "Select boot source",
   "Select console type": "Select console type",
   "Select InstanceType": "Select InstanceType",
+  "Select multiple VirtualMachines to perform an action for all of them": "Select multiple VirtualMachines to perform an action for all of them",
   "Select NetwrokAttachmentDefinition": "Select NetwrokAttachmentDefinition",
   "Select nodes": "Select nodes",
   "Select Nodes that must have all the following expressions.": "Select Nodes that must have all the following expressions.",
