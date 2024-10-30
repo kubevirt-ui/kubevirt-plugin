@@ -2,10 +2,15 @@ import { useCallback, useMemo } from 'react';
 
 import { DataSourceModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
 import { columnSorting } from '@kubevirt-utils/utils/utils';
-import { K8sResourceCommon, TableColumn } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  K8sResourceCommon,
+  TableColumn,
+  useActiveNamespace,
+} from '@openshift-console/dynamic-plugin-sdk';
 import { sortable } from '@patternfly/react-table';
 
 import { BootableResource } from '../../utils/types';
@@ -17,6 +22,7 @@ const useBootableVolumesColumns = (
   preferences: V1beta1VirtualMachineClusterPreference[],
 ): [TableColumn<K8sResourceCommon>[], TableColumn<K8sResourceCommon>[], boolean] => {
   const { t } = useKubevirtTranslation();
+  const [namespace] = useActiveNamespace();
   const { endIndex, startIndex } = pagination;
 
   const sorting = useCallback(
@@ -33,13 +39,17 @@ const useBootableVolumesColumns = (
         title: t('Name'),
         transforms: [sortable],
       },
-      {
-        id: 'namespace',
-        props: { className: 'pf-m-width-20' },
-        sort: (_, direction) => sorting(direction, 'metadata.namespace'),
-        title: t('Namespace'),
-        transforms: [sortable],
-      },
+      ...(namespace === ALL_NAMESPACES_SESSION_KEY
+        ? [
+            {
+              id: 'namespace',
+              props: { className: 'pf-m-width-20' },
+              sort: (_, direction) => sorting(direction, 'metadata.namespace'),
+              title: t('Namespace'),
+              transforms: [sortable],
+            },
+          ]
+        : []),
       {
         id: 'os',
         props: { className: 'pf-m-width-15' },
