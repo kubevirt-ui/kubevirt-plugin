@@ -1023,6 +1023,7 @@
   "SATA": "SATA",
   "Save": "Save",
   "Save affinity rule": "Save affinity rule",
+  "Save as bootable volume": "Save as bootable volume",
   "Save memory with OpenShift Virtualization using Free Page Reporting": "Save memory with OpenShift Virtualization using Free Page Reporting",
   "Saved": "Saved",
   "Schedule specifies in cron format when and how often to look for new imports.": "Schedule specifies in cron format when and how often to look for new imports.",

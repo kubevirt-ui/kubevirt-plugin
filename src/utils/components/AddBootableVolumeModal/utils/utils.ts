@@ -19,7 +19,7 @@ import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
 import { DATA_SOURCE_CRONJOB_LABEL } from '@kubevirt-utils/resources/template';
 import { ClaimPropertySets } from '@kubevirt-utils/types/storage';
 import { appendDockerPrefix, getRandomChars } from '@kubevirt-utils/utils/utils';
-import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
+import { k8sCreate, k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
 
 import {
   AddBootableVolumeState,
@@ -193,7 +193,7 @@ const createSnapshotDataSource = async (
   return await k8sCreate({ data: dataSourceToCreate, model: DataSourceModel });
 };
 
-const createPVCBootableVolume = async (
+export const createPVCBootableVolume = async (
   bootableVolume: AddBootableVolumeState,
   namespace: string,
   applyStorageProfileSettings: boolean,
@@ -220,7 +220,13 @@ const createPVCBootableVolume = async (
   });
 
   const createdDS = await k8sCreate({ data: dataSourceToCreate, model: DataSourceModel });
-  await k8sCreate({ data: bootableVolumeToCreate, model: DataVolumeModel });
+
+  try {
+    await k8sCreate({ data: bootableVolumeToCreate, model: DataVolumeModel });
+  } catch (error) {
+    k8sDelete({ model: DataSourceModel, resource: createdDS });
+    throw error;
+  }
   return createdDS;
 };
 
