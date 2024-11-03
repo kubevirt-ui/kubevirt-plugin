@@ -1,11 +1,10 @@
-import React, { FC, useContext } from 'react';
+import React, { FC } from 'react';
 
 import { getName } from '@kubevirt-utils/resources/shared';
+import { useQuickStartContext } from '@openshift-console/dynamic-plugin-sdk';
 import {
   QuickStart,
-  QuickStartContext,
   QuickStartContextProvider,
-  QuickStartContextValues,
   useValuesForQuickStartContext,
 } from '@patternfly/quickstarts';
 import { Button, ButtonVariant } from '@patternfly/react-core';
@@ -26,7 +25,7 @@ const QuickStartLauncherLink: FC<QuickStartLauncherLinkProps> = ({
   text,
 }) => {
   const quickStartValues = useValuesForQuickStartContext();
-  const { setActiveQuickStart } = useContext<QuickStartContextValues>(QuickStartContext);
+  const { setActiveQuickStart } = useQuickStartContext();
 
   const quickStartLink: GettingStartedLink = quickStartLoaded && {
     id: getName(quickStart),
