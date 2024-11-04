@@ -8,6 +8,7 @@ import {
 } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import DeprecatedBadge from '@kubevirt-utils/components/badges/DeprecatedBadge/DeprecatedBadge';
+import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   getBootableVolumeGroupVersionKind,
@@ -23,7 +24,12 @@ import {
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
 import { isDataSourceCloning } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  ResourceLink,
+  RowProps,
+  TableData,
+  useActiveNamespace,
+} from '@openshift-console/dynamic-plugin-sdk';
 import { Label } from '@patternfly/react-core';
 import { TableText, WrapModifier } from '@patternfly/react-table';
 
@@ -43,6 +49,7 @@ const BootableVolumesRow: FC<
   >
 > = ({ activeColumnIDs, obj, rowData: { dataImportCrons, preferences } }) => {
   const { t } = useKubevirtTranslation();
+  const [namespace] = useActiveNamespace();
 
   const bootableVolumeName = getName(obj);
   const bootableVolumeNamespace = getNamespace(obj);
@@ -65,9 +72,11 @@ const BootableVolumesRow: FC<
         {isDeprecated(bootableVolumeName) && <DeprecatedBadge />}
         {obj.kind === DataSourceModel.kind && isCloning && <Label>{t('Clone in progress')}</Label>}
       </TableData>
-      <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-20" id="namespace">
-        <ResourceLink kind="Namespace" name={bootableVolumeNamespace} />
-      </TableData>
+      {namespace === ALL_NAMESPACES_SESSION_KEY && (
+        <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-20" id="namespace">
+          <ResourceLink kind="Namespace" name={bootableVolumeNamespace} />
+        </TableData>
+      )}
       <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-15" id="os">
         {getPreferenceReadableOS(obj, preferences)}
       </TableData>
