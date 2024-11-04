@@ -2,6 +2,7 @@ import React, { FC, useCallback, useMemo, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom-v5-compat';
 import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
+import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import useDefaultStorageClass from '@kubevirt-utils/hooks/useDefaultStorage/useDefaultStorageClass';
@@ -21,8 +22,9 @@ import {
 } from '@patternfly/react-core';
 
 import VirtualMachineMigrationDestinationTab from './tabs/VirtualMachineMigrationDestinationTab';
+import VirtualMachineMigrationDetails from './tabs/VirtualMachineMigrationDetails';
 import VirtualMachineMigrationReviewTab from './tabs/VirtualMachineMigrationReviewTab';
-import { migrateVM } from './utils';
+import { entireVMSelected, migrateVM } from './utils';
 
 const VirtualMachineMigrate: FC = () => {
   const { t } = useKubevirtTranslation();
@@ -31,6 +33,9 @@ const VirtualMachineMigrate: FC = () => {
   const [selectedStorageClass, setSelectedStorageClass] = useState('');
   const [migrationError, setMigrationError] = useState<Error | null>(null);
   const [migrationLoading, setMigrationLoading] = useState(false);
+  const [selectedPVCs, setSelectedPVCs] = useState<IoK8sApiCoreV1PersistentVolumeClaim[] | null>(
+    null,
+  );
 
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -73,7 +78,11 @@ const VirtualMachineMigrate: FC = () => {
     setMigrationLoading(true);
     setMigrationError(null);
     try {
-      await migrateVM(vm, pvcs, destinationStorageClass);
+      await migrateVM(
+        vm,
+        entireVMSelected(selectedPVCs) ? pvcs : selectedPVCs,
+        destinationStorageClass,
+      );
 
       goBack();
     } catch (apiError) {
@@ -110,6 +119,18 @@ const VirtualMachineMigrate: FC = () => {
       onSave={onSubmit}
       title={t('Migrate VirtualMachine storage')}
     >
+      <WizardStep
+        footer={{ isNextDisabled: selectedPVCs?.length === 0 }}
+        id="wizard-migration-details"
+        name={t('Migration details')}
+      >
+        <VirtualMachineMigrationDetails
+          pvcs={pvcs}
+          selectedPVCs={selectedPVCs}
+          setSelectedPVCs={setSelectedPVCs}
+          vm={vm}
+        />
+      </WizardStep>
       <WizardStep id="wizard-migrate-destination" name={t('Destination StorageClass')}>
         <VirtualMachineMigrationDestinationTab
           defaultStorageClassName={defaultStorageClassName}

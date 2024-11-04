@@ -48,11 +48,11 @@ const getBlankDataVolume = (
 };
 
 const createBlankDataVolumes = async (
-  originPVCs: IoK8sApiCoreV1PersistentVolumeClaim[],
+  selectedPVCs: IoK8sApiCoreV1PersistentVolumeClaim[],
   destinationStorageClass: string,
 ): Promise<Map<string, V1beta1DataVolume>> => {
   const dataVolumesCreationResults = await Promise.allSettled(
-    originPVCs
+    selectedPVCs
       .map((pvc) => {
         return getBlankDataVolume(
           getName(pvc),
@@ -93,7 +93,7 @@ const createBlankDataVolumes = async (
 
   const dataVolumesCreated = fulfilledRequests.map((result) => result.value);
 
-  return originPVCs.reduce((createdDataVolumeByPVCName, pvc, index) => {
+  return selectedPVCs.reduce((createdDataVolumeByPVCName, pvc, index) => {
     createdDataVolumeByPVCName.set(getName(pvc), dataVolumesCreated[index]);
     return createdDataVolumeByPVCName;
   }, new Map<string, V1beta1DataVolume>());
@@ -101,9 +101,15 @@ const createBlankDataVolumes = async (
 
 const createPatchData = (
   vm: V1VirtualMachine,
+  selectedPVCs: IoK8sApiCoreV1PersistentVolumeClaim[],
   createdDataVolumeByPVCName: Map<string, V1beta1DataVolume>,
 ) =>
   getVolumes(vm).reduce((patchArray, volume, volumeIndex) => {
+    const pvcName = volume?.persistentVolumeClaim?.claimName || volume?.dataVolume?.name;
+    const pvc = selectedPVCs.find((selectedPVC) => getName(selectedPVC) === pvcName);
+
+    if (isEmpty(pvc)) return patchArray;
+
     if (volume?.persistentVolumeClaim?.claimName) {
       patchArray.push({
         op: 'replace',
@@ -138,15 +144,15 @@ const createPatchData = (
 
 export const migrateVM = async (
   vm: V1VirtualMachine,
-  originPVCs: IoK8sApiCoreV1PersistentVolumeClaim[],
+  selectedPVCs: IoK8sApiCoreV1PersistentVolumeClaim[],
   destinationStorageClass: string,
 ) => {
   const createdDataVolumeByPVCName = await createBlankDataVolumes(
-    originPVCs,
+    selectedPVCs,
     destinationStorageClass,
   );
 
-  const patchData = createPatchData(vm, createdDataVolumeByPVCName);
+  const patchData = createPatchData(vm, selectedPVCs, createdDataVolumeByPVCName);
 
   patchData.push({
     op: 'add',
@@ -171,3 +177,6 @@ export const migrateVM = async (
     throw error;
   }
 };
+
+export const entireVMSelected = (selectedPVCs: IoK8sApiCoreV1PersistentVolumeClaim[]) =>
+  selectedPVCs === null;
