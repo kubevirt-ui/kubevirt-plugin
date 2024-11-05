@@ -6,6 +6,8 @@ import { SidebarEditorProvider } from '@kubevirt-utils/components/SidebarEditor/
 import useInstanceTypeExpandSpec from '@kubevirt-utils/resources/vm/hooks/useInstanceTypeExpandSpec';
 import { isInstanceTypeVM } from '@kubevirt-utils/resources/vm/utils/instanceTypes';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { useSignals } from '@preact/signals-react/runtime';
+import VirtualMachineTreeView from '@virtualmachines/tree/VirtualMachineTreeView';
 
 import { useVirtualMachineTabs } from './hooks/useVirtualMachineTabs';
 import VirtualMachineNavPageTitle from './VirtualMachineNavPageTitle';
@@ -32,21 +34,24 @@ const VirtualMachineNavPage: React.FC<VirtualMachineDetailsPageProps> = ({
   const [instanceTypeExpandedSpec] = useInstanceTypeExpandSpec(vm);
 
   const pages = useVirtualMachineTabs();
+  useSignals();
 
   return (
-    <SidebarEditorProvider>
-      <VirtualMachineNavPageTitle
-        name={name}
-        vm={isInstanceTypeVM(vm) ? instanceTypeExpandedSpec : vm}
-      />
-      <div className="VirtualMachineNavPage--tabs__main">
-        <HorizontalNavbar
-          instanceTypeExpandedSpec={instanceTypeExpandedSpec}
-          pages={pages}
-          vm={vm}
+    <VirtualMachineTreeView>
+      <SidebarEditorProvider>
+        <VirtualMachineNavPageTitle
+          name={name}
+          vm={isInstanceTypeVM(vm) ? instanceTypeExpandedSpec : vm}
         />
-      </div>
-    </SidebarEditorProvider>
+        <div className="VirtualMachineNavPage--tabs__main">
+          <HorizontalNavbar
+            instanceTypeExpandedSpec={instanceTypeExpandedSpec}
+            pages={pages}
+            vm={vm}
+          />
+        </div>
+      </SidebarEditorProvider>
+    </VirtualMachineTreeView>
   );
 };
 

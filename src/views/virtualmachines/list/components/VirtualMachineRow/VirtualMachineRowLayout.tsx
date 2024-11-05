@@ -12,6 +12,7 @@ import { Checkbox } from '@patternfly/react-core';
 import VirtualMachineActions from '@virtualmachines/actions/components/VirtualMachineActions/VirtualMachineActions';
 import useVirtualMachineActionsProvider from '@virtualmachines/actions/hooks/useVirtualMachineActionsProvider';
 import { deselectVM, isVMSelected, selectVM } from '@virtualmachines/list/selectedVMs';
+import { setSelectedTreeItem, treeDataMap } from '@virtualmachines/tree/utils/utils';
 
 import VirtualMachineStatus from '../VirtualMachineStatus/VirtualMachineStatus';
 import { VMStatusConditionLabelList } from '../VMStatusConditionLabel';
@@ -43,6 +44,9 @@ const VirtualMachineRowLayout: React.FC<
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-15 vm-column" id="name">
         <ResourceLink
+          onClick={() => {
+            setSelectedTreeItem(treeDataMap.value[`${getNamespace(obj)}/${getName(obj)}`]);
+          }}
           groupVersionKind={VirtualMachineModelGroupVersionKind}
           name={getName(obj)}
           namespace={getNamespace(obj)}

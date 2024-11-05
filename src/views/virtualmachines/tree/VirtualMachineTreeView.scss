@@ -1,0 +1,25 @@
+.vms-tree-view {
+  overflow-x: hidden;
+}
+
+.vms-tree-view-body,
+.vms-tree-view-toolbar,
+.vms-tree-view-toolbar-content {
+  padding: 0;
+}
+
+.pf-v5-c-tree-view__node .pf-v5-c-tree-view__node-count,
+.vms-tree-view-toolbar-buttons {
+  display: flex;
+  flex-grow: 1;
+  flex-direction: row-reverse;
+}
+
+.vms-tree-view-toolbar-buttons {
+  align-self: center;
+  margin-right: var(--pf-global--spacer--sm);
+
+  &__padding {
+    padding: var(--pf-global--spacer--sm);
+  }
+}
