@@ -17,8 +17,6 @@ import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
 
 import { printableVMStatus } from '../../../utils';
 
-import VirtualMachineConsolePageTitle from './components/VirtualMachineConsolePageTitle';
-
 import './VirtualMachineConsolePage.scss';
 
 const VirtualMachineConsolePage: FC<NavPageComponentProps> = ({ obj: vm }) => {
@@ -32,38 +30,29 @@ const VirtualMachineConsolePage: FC<NavPageComponentProps> = ({ obj: vm }) => {
 
   if (!vmi || vm?.status?.printableStatus === printableVMStatus.Stopped) {
     return (
-      <>
-        <VirtualMachineConsolePageTitle />
-        <EmptyState>
-          <EmptyStateBody>
-            {t('This VirtualMachine is down. Please start it to access its console.')}
-          </EmptyStateBody>
-        </EmptyState>
-      </>
+      <EmptyState>
+        <EmptyStateBody>
+          {t('This VirtualMachine is down. Please start it to access its console.')}
+        </EmptyStateBody>
+      </EmptyState>
     );
   }
 
   if (!vmiLoaded) {
     return (
-      <>
-        <VirtualMachineConsolePageTitle />
-        <Bullseye>
-          <Loading />
-        </Bullseye>
-      </>
+      <Bullseye>
+        <Loading />
+      </Bullseye>
     );
   }
 
   return (
-    <>
-      <VirtualMachineConsolePageTitle />
-      <PageSection
-        className="VirtualMachineConsolePage-page-section"
-        variant={PageSectionVariants.light}
-      >
-        <Consoles consoleContainerClass="virtual-machine-console-page" vmi={vmi} />
-      </PageSection>
-    </>
+    <PageSection
+      className="VirtualMachineConsolePage-page-section"
+      variant={PageSectionVariants.light}
+    >
+      <Consoles consoleContainerClass="virtual-machine-console-page" vmi={vmi} />
+    </PageSection>
   );
 };
 
