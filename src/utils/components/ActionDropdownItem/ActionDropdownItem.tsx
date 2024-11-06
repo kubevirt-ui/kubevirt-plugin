@@ -16,7 +16,9 @@ type ActionDropdownItemProps = {
 
 const ActionDropdownItem: FC<ActionDropdownItemProps> = ({ action, setIsOpen }) => {
   const { t } = useKubevirtTranslation();
-  const [actionAllowed] = useAccessReview(action?.accessReview || {});
+  const [accessReview] = useAccessReview(action?.accessReview || {});
+
+  const actionAllowed = accessReview || action?.accessReview === undefined;
   const isCloneDisabled = !actionAllowed && action?.id === 'vm-action-clone';
 
   const handleClick = () => {
