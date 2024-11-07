@@ -2,32 +2,31 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { EjectIcon, PauseIcon, PlayIcon, RedoIcon, SquareIcon } from '@patternfly/react-icons';
 import { VMActionIconDetails } from '@virtualmachines/actions/components/VMActionsIconBar/utils/types';
 import { VirtualMachineActionFactory } from '@virtualmachines/actions/VirtualMachineActionFactory';
-import {
-  isPaused,
-  isRestoring,
-  isRunning,
-  isSnapshotting,
-  isStopped,
-} from '@virtualmachines/utils';
+import { isPaused, isRestoring, isSnapshotting } from '@virtualmachines/utils';
 
 export const getVMActionIconsDetails = (vm: V1VirtualMachine): VMActionIconDetails[] => {
   if (isSnapshotting(vm) || isRestoring(vm)) return [];
 
+  const startAction = VirtualMachineActionFactory.start(vm);
+  const stopAction = VirtualMachineActionFactory.stop(vm);
+  const restartAction = VirtualMachineActionFactory.restart(vm);
+  const pauseAction = VirtualMachineActionFactory.pause(vm);
+
   return [
     {
-      action: VirtualMachineActionFactory.stop(vm),
+      action: stopAction,
       Icon: SquareIcon,
-      isDisabled: !isRunning(vm) && !isPaused(vm),
+      isDisabled: stopAction?.disabled,
     },
     {
-      action: VirtualMachineActionFactory.restart(vm),
+      action: restartAction,
       Icon: RedoIcon,
-      isDisabled: !isRunning(vm) && !isPaused(vm),
+      isDisabled: restartAction?.disabled,
     },
     {
-      action: VirtualMachineActionFactory.pause(vm),
+      action: pauseAction,
       Icon: PauseIcon,
-      isDisabled: !isRunning(vm),
+      isDisabled: pauseAction?.disabled,
       isHidden: isPaused(vm),
     },
     {
@@ -37,9 +36,9 @@ export const getVMActionIconsDetails = (vm: V1VirtualMachine): VMActionIconDetai
       isHidden: !isPaused(vm),
     },
     {
-      action: VirtualMachineActionFactory.start(vm),
+      action: startAction,
       Icon: PlayIcon,
-      isDisabled: !isStopped(vm),
+      isDisabled: startAction?.disabled,
     },
   ];
 };
