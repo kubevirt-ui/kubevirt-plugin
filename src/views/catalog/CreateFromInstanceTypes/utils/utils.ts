@@ -10,6 +10,7 @@ import {
   CloudInitUserData,
   convertUserDataObjectToYAML,
 } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
+import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/utils/constants';
 import { InterfaceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import { addSecretToVM } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import { sysprepDisk, sysprepVolume } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
@@ -145,7 +146,11 @@ export const generateVM = (
                       storage: pvcSource?.spec?.resources?.requests?.storage,
                     },
                   }
-                : {},
+                : {
+                    requests: {
+                      storage: DEFAULT_DISK_SIZE,
+                    },
+                  },
               storageClassName,
             },
           },
