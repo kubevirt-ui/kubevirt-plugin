@@ -122,6 +122,8 @@ type SubmitInput = {
 export const submit = async ({ data, editDiskName, onSubmit, pvc, vm }: SubmitInput) => {
   const isVMRunning = isRunning(vm);
 
+  const shouldHotplug = isVMRunning && isEmpty(data.volume.containerDisk);
+
   const isEditDisk = !isEmpty(editDiskName);
   const isInitialBootDisk = getBootDisk(vm)?.name === editDiskName;
 
@@ -143,5 +145,5 @@ export const submit = async ({ data, editDiskName, onSubmit, pvc, vm }: SubmitIn
     });
   }
 
-  return !isVMRunning ? onSubmit(newVM) : (hotplugPromise(newVM, data) as Promise<any>);
+  return shouldHotplug ? (hotplugPromise(newVM, data) as Promise<any>) : onSubmit(newVM);
 };
