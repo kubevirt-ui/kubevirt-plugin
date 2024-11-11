@@ -3,3 +3,15 @@
     height: fit-content;
   }
 }
+
+.vm-listpagebody .pf-v5-c-table {
+  .pf-v5-c-table__th.pf-v5-c-table__check {
+    width: 50px !important;
+    max-width: 50px;
+  }
+
+  .selection-column {
+    width: 50px;
+    max-width: 50px;
+  }
+}

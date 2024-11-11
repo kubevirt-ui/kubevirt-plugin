@@ -8,8 +8,10 @@ import {
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
+import { Checkbox } from '@patternfly/react-core';
 import VirtualMachineActions from '@virtualmachines/actions/components/VirtualMachineActions/VirtualMachineActions';
 import useVirtualMachineActionsProvider from '@virtualmachines/actions/hooks/useVirtualMachineActionsProvider';
+import { deselectVM, isVMSelected, selectVM } from '@virtualmachines/list/selectedVMs';
 
 import VirtualMachineStatus from '../VirtualMachineStatus/VirtualMachineStatus';
 import { VMStatusConditionLabelList } from '../VMStatusConditionLabel';
@@ -27,9 +29,18 @@ const VirtualMachineRowLayout: React.FC<
     }
   >
 > = ({ activeColumnIDs, obj, rowData: { ips, isSingleNodeCluster, node, vmim } }) => {
+  const selected = isVMSelected(obj);
+
   const [actions] = useVirtualMachineActionsProvider(obj, vmim, isSingleNodeCluster);
   return (
     <>
+      <TableData activeColumnIDs={activeColumnIDs} className="selection-column vm-column" id="">
+        <Checkbox
+          id={`select-${obj?.metadata?.uid}`}
+          isChecked={selected}
+          onChange={() => (selected ? deselectVM(obj) : selectVM(obj))}
+        />
+      </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-15 vm-column" id="name">
         <ResourceLink
           groupVersionKind={VirtualMachineModelGroupVersionKind}

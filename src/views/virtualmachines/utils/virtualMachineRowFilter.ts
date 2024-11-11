@@ -29,7 +29,7 @@ type VmiMapper = {
   nodeNames: { [key: string]: { id: string; title: string } };
 };
 
-type VmimMapper = { [key: string]: { [key: string]: V1VirtualMachineInstance } };
+type VmimMapper = { [key: string]: { [key: string]: V1VirtualMachineInstanceMigration } };
 
 const ErrorStatus = { id: 'Error', title: 'Error' };
 
