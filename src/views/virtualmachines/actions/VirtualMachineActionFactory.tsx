@@ -181,7 +181,7 @@ export const VirtualMachineActionFactory = {
         verb: 'create',
       },
       cta: () => migrateVM(vm),
-      description: t('Migrate to a different Node'),
+      description: t('Migrate VirtualMachine to a different Node'),
       disabled: !isLiveMigratable(vm, isSingleNodeCluster),
       id: 'vm-action-migrate',
       label: t('Compute'),
