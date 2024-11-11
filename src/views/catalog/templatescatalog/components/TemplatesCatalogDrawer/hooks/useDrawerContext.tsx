@@ -13,8 +13,12 @@ import { Updater, useImmer } from 'use-immer';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataVolumeSpec, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { SSHSecretDetails } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
-import { ROOTDISK } from '@kubevirt-utils/constants/constants';
-import { RUNSTRATEGY_ALWAYS } from '@kubevirt-utils/constants/constants';
+import {
+  ROOTDISK,
+  RUNSTRATEGY_HALTED,
+  RUNSTRATEGY_MANUAL,
+  RUNSTRATEGY_RERUNONFAILURE,
+} from '@kubevirt-utils/constants/constants';
 import {
   DataUpload,
   UploadDataProps,
@@ -103,7 +107,11 @@ const useDrawer = (template: V1Template) => {
     const templateWithRunning = produce(templateWithGeneratedParams, (draftTemplate) => {
       const draftVM = getTemplateVirtualMachineObject(draftTemplate);
 
-      if (isEmpty(draftVM?.spec?.running)) draftVM.spec.runStrategy = RUNSTRATEGY_ALWAYS;
+      if (
+        isEmpty(draftVM?.spec?.running) &&
+        [RUNSTRATEGY_HALTED, RUNSTRATEGY_MANUAL].includes(draftVM?.spec?.runStrategy)
+      )
+        draftVM.spec.runStrategy = RUNSTRATEGY_RERUNONFAILURE;
     });
 
     setCustomizedTemplate(templateWithRunning);
