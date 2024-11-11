@@ -15,6 +15,7 @@ import { ButtonVariant, Dropdown, DropdownItem, DropdownList } from '@patternfly
 import { updateDisks } from '@virtualmachines/details/tabs/configuration/details/utils/utils';
 import { isRunning } from '@virtualmachines/utils';
 
+import CreateBootableVolumeModal from '../../modal/CreateBootableVolumeModal';
 import DeleteDiskModal from '../../modal/DeleteDiskModal';
 import DetachModal from '../../modal/DetachModal';
 import MakePersistentModal from '../../modal/MakePersistentModal';
@@ -38,6 +39,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const diskName = obj?.name;
@@ -109,6 +111,13 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
         />
       ),
     );
+
+  const createBootableVolume = () => {
+    createModal(({ isOpen, onClose }) => (
+      <CreateBootableVolumeModal diskObj={obj} isOpen={isOpen} onClose={onClose} vm={vm} />
+    ));
+  };
+
   const makePersistent = () =>
     createModal(({ isOpen, onClose }) => (
       <MakePersistentModal isOpen={isOpen} onClose={onClose} vm={vm} volume={volume} />
@@ -136,6 +145,13 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
           onClick={() => onModalOpen(createExportModal)}
         >
           {t('Upload to registry')}
+        </DropdownItem>
+        <DropdownItem
+          isDisabled={!isPVCSource(obj)}
+          key="disk-bootable-volume"
+          onClick={() => createBootableVolume()}
+        >
+          {t('Save as bootable volume')}
         </DropdownItem>
         <DropdownItem key="disk-edit" onClick={() => onModalOpen(createEditDiskModal)}>
           {editBtnText}

@@ -26,23 +26,23 @@ export const optionsValueLabelMapper = {
 };
 
 export type AddBootableVolumeState = {
-  annotations: { [key: string]: string };
+  annotations?: { [key: string]: string };
   bootableVolumeName: string;
   bootableVolumeNamespace: string;
-  cronExpression: string;
-  isIso: boolean;
-  labels: { [key: string]: string };
+  cronExpression?: string;
+  isIso?: boolean;
+  labels?: { [key: string]: string };
   pvcName: string;
   pvcNamespace: string;
-  registryURL: string;
-  retainRevisions: number;
-  size: string;
-  snapshotName: string;
-  snapshotNamespace: string;
-  storageClassName: string;
-  storageClassProvisioner: string;
-  uploadFile: File | string;
-  uploadFilename: string;
+  registryURL?: string;
+  retainRevisions?: number;
+  size?: string;
+  snapshotName?: string;
+  snapshotNamespace?: string;
+  storageClassName?: string;
+  storageClassProvisioner?: string;
+  uploadFile?: File | string;
+  uploadFilename?: string;
 };
 
 export type SetBootableVolumeFieldType = (
