@@ -27,7 +27,7 @@ wait_mcp_for_updated()
     fi
 }
 
-download_vritctl()
+download_virtctl()
 {
   VIRTCTL_DOWNLOAD_URL="https://github.com/kubevirt/kubevirt/releases/download/${VIRTCTL_VERSION}/virtctl-${VIRTCTL_VERSION}"
   VIRTCTL_X86_64="${VIRTCTL_DOWNLOAD_URL}-linux-x86_64"
