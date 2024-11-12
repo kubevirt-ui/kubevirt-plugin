@@ -164,4 +164,4 @@ oc annotate storageclass hostpath-provisioner storageclass.kubernetes.io/is-defa
 
 # ----------------------------------------------------------------------------------------------------
 # Download virtctl tool if needed
-command -v virtctl1 &> /dev/null || download_virtctl
+command -v virtctl &> /dev/null || download_virtctl
