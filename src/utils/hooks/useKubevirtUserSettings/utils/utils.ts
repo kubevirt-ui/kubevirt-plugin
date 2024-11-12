@@ -1,5 +1,6 @@
 import { ConfigMapModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 
 export const parseNestedJSON = <T>(str: string): T => {
@@ -20,6 +21,7 @@ export const patchUserConfigMap = async (
 ) =>
   k8sPatch<IoK8sApiCoreV1ConfigMap>({
     data: [
+      ...(isEmpty(userConfigMap.data) ? [{ op: 'add', path: '/data', value: {} }] : []),
       {
         op: 'replace',
         path: `/data/${userName}`,
