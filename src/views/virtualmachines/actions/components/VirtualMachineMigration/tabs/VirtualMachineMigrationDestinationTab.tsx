@@ -46,6 +46,9 @@ const VirtualMachineMigrationDestinationTab: FC<VirtualMachineMigrationDestinati
             ),
             value: storageClass,
           }))}
+          popperProps={{
+            appendTo: () => document.getElementById('virtual-machine-migration-modal'),
+          }}
           selected={destinationStorageClass}
           setSelected={setSelectedStorageClass}
           toggleProps={{ isFullWidth: true, placeholder: t('Select StorageClass') }}

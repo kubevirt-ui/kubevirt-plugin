@@ -1,12 +1,11 @@
-import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
-
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
+import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import {
   V1beta1DataVolume,
   V1beta1StorageSpecVolumeModeEnum,
 } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine, V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { MAX_NAME_LENGTH } from '@kubevirt-utils/components/SSHSecretModal/utils/constants';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getDataVolumeTemplates, getVolumes } from '@kubevirt-utils/resources/vm';
@@ -180,3 +179,16 @@ export const migrateVM = async (
 
 export const entireVMSelected = (selectedPVCs: IoK8sApiCoreV1PersistentVolumeClaim[]) =>
   selectedPVCs === null;
+
+export const getVolumeFromPVC = (
+  volumes: V1Volume[],
+  pvcs: IoK8sApiCoreV1PersistentVolumeClaim[],
+): V1Volume[] => {
+  const pvcNames = pvcs.map((pvc) => getName(pvc));
+
+  return volumes.filter(
+    (volume) =>
+      pvcNames.includes(volume?.persistentVolumeClaim?.claimName) ||
+      pvcNames.includes(volume?.dataVolume?.name),
+  );
+};

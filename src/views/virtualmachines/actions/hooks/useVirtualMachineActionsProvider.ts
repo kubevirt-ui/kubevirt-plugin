@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
 import {
   V1VirtualMachine,
@@ -27,8 +26,6 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
   isSingleNodeCluster,
 ) => {
   const { createModal } = useModal();
-  const navigate = useNavigate();
-  const location = useLocation();
 
   const virtctlCommand = getConsoleVirtctlCommand(vm);
 
@@ -53,7 +50,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
         ? VirtualMachineActionFactory.cancelMigrationCompute(vm, vmim, isSingleNodeCluster)
         : VirtualMachineActionFactory.migrateCompute(vm, isSingleNodeCluster);
 
-    const migrateStorage = VirtualMachineActionFactory.migrateStorage(vm, navigate, location);
+    const migrateStorage = VirtualMachineActionFactory.migrateStorage(vm, createModal);
 
     const pauseOrUnpause =
       printableStatus === Paused
@@ -73,7 +70,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
       VirtualMachineActionFactory.editAnnotations(vm, createModal),
       VirtualMachineActionFactory.delete(vm, createModal),
     ];
-  }, [vm, vmim, isSingleNodeCluster, navigate, location, createModal, virtctlCommand]);
+  }, [vm, vmim, isSingleNodeCluster, createModal, virtctlCommand]);
 
   return useMemo(() => [actions, !inFlight, undefined], [actions, inFlight]);
 };

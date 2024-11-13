@@ -1,5 +1,4 @@
 import React from 'react';
-import { Location, NavigateFunction } from 'react-router-dom-v5-compat';
 
 import VirtualMachineCloneModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineCloneModel';
 import VirtualMachineInstanceMigrationModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstanceMigrationModel';
@@ -16,11 +15,12 @@ import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal'
 import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SnapshotModal from '@kubevirt-utils/components/SnapshotModal/SnapshotModal';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { asAccessReview, getNamespace, getResourceUrl } from '@kubevirt-utils/resources/shared';
+import { asAccessReview, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Action, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { CopyIcon } from '@patternfly/react-icons';
+import VirtualMachineMigrateModal from '@virtualmachines/actions/components/VirtualMachineMigration/VirtualMachineMigrationModal';
 
 import { isLiveMigratable, isRestoring, isSnapshotting, printableVMStatus } from '../utils';
 
@@ -187,11 +187,7 @@ export const VirtualMachineActionFactory = {
       label: t('Compute'),
     };
   },
-  migrateStorage: (
-    vm: V1VirtualMachine,
-    navigate: NavigateFunction,
-    location: Location,
-  ): Action => {
+  migrateStorage: (vm: V1VirtualMachine, createModal: (modal: ModalComponent) => void): Action => {
     return {
       accessReview: {
         group: VirtualMachineModel.apiGroup,
@@ -199,15 +195,7 @@ export const VirtualMachineActionFactory = {
         resource: VirtualMachineModel.plural,
         verb: 'patch',
       },
-      cta: () =>
-        navigate(
-          `${getResourceUrl({
-            model: VirtualMachineModel,
-            resource: vm,
-          })}/migratestorage?fromURL=${encodeURIComponent(
-            `${location.pathname}${location.search}`,
-          )}`,
-        ),
+      cta: () => createModal((props) => <VirtualMachineMigrateModal vm={vm} {...props} />),
       description: t('Migrate VirtualMachine storage to a different StorageClass'),
       id: 'vm-migrate-storage',
       label: t('Storage'),
