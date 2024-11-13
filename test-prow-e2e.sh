@@ -48,6 +48,16 @@ function generateLogsAndCopyArtifacts {
 trap generateLogsAndCopyArtifacts EXIT
 trap generateLogsAndCopyArtifacts ERR
 
+# Unset KUBERNETES_* vars which might conflict with OpenShift-CI
+unset KUBERNETES_SERVICE_PORT_HTTPS
+unset KUBERNETES_SERVICE_PORT
+unset KUBERNETES_PORT_443_TCP
+unset KUBERNETES_PORT_443_TCP_PROTO
+unset KUBERNETES_PORT_443_TCP_ADDR
+unset KUBERNETES_SERVICE_HOST
+unset KUBERNETES_PORT
+unset KUBERNETES_PORT_443_TCP_PORT
+
 PULL_SECRET_PATH="/var/run/operator-secret/dockerconfig" 
 NAMESPACE="openshift-marketplace"
 SECRET_NAME="ocs-secret"
