@@ -7,7 +7,7 @@ import ExportModal from '@kubevirt-utils/components/ExportModal/ExportModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getName } from '@kubevirt-utils/resources/shared';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getDataVolumeTemplates, getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
@@ -73,7 +73,13 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
 
   const createExportModal = () =>
     createModal(({ isOpen, onClose }) => (
-      <ExportModal isOpen={isOpen} onClose={onClose} vm={vm} volumeName={obj?.source} />
+      <ExportModal
+        isOpen={isOpen}
+        namespace={getNamespace(vm)}
+        onClose={onClose}
+        pvcName={obj?.source}
+        vmName={getName(vm)}
+      />
     ));
 
   const createEditDiskModal = () =>

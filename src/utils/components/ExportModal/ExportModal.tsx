@@ -1,8 +1,6 @@
 import React, { FC, useState } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
 import { FormGroup, Stack, StackItem, TextInput } from '@patternfly/react-core';
 
@@ -13,15 +11,15 @@ import { createSecret, createServiceAccount, createUploaderPod } from './utils';
 
 type ExportModalProps = {
   isOpen: boolean;
+  namespace: string;
   onClose: () => void;
-  vm: V1VirtualMachine;
-  volumeName: string;
+  pvcName: string;
+  vmName?: string;
 };
 
-const ExportModal: FC<ExportModalProps> = ({ isOpen, onClose, vm, volumeName }) => {
+const ExportModal: FC<ExportModalProps> = ({ isOpen, namespace, onClose, pvcName, vmName }) => {
   const { t } = useKubevirtTranslation();
 
-  const namespace = getNamespace(vm);
   const [registryName, setRegistryName] = useState(() => `registry-${getRandomChars()}`);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -43,8 +41,8 @@ const ExportModal: FC<ExportModalProps> = ({ isOpen, onClose, vm, volumeName }) 
           destination,
           namespace,
           secretName,
-          vmName: getName(vm),
-          volumeName,
+          vmName,
+          volumeName: pvcName,
         });
       }}
       headerText={t('Upload to registry')}
