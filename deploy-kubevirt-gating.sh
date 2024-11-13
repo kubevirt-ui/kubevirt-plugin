@@ -27,6 +27,23 @@ wait_mcp_for_updated()
     fi
 }
 
+download_virtctl()
+{
+  VIRTCTL_DOWNLOAD_URL="https://github.com/kubevirt/kubevirt/releases/download/${VIRTCTL_VERSION}/virtctl-${VIRTCTL_VERSION}"
+  VIRTCTL_X86_64="${VIRTCTL_DOWNLOAD_URL}-linux-x86_64"
+  VIRTCTL_AMD64="${VIRTCTL_DOWNLOAD_URL}-linux-amd64"
+
+  # Install virtctl binary and add to PATH
+  mkdir virtctl
+
+  # --quiet as wget logs an URL that should not be logged since it provides access to download a file (it is a presigned URL)
+  wget ${VIRTCTL_AMD64} -O virtctl/virtctl --quiet || wget ${VIRTCTL_X86_64} -O virtctl/virtctl --quiet
+  [[ ! -f "virtctl/virtctl" ]] && echo "ERROR: virtctl binary is unavailable for download" && exit 1
+
+  chmod +x virtctl/virtctl
+
+  export PATH="${PATH}:$(pwd)/virtctl"
+}
 # ----------------------------------------------------------------------------------------------------
 # Install HCO (kubevirt and helper operators)
 
@@ -147,20 +164,4 @@ oc annotate storageclass hostpath-provisioner storageclass.kubernetes.io/is-defa
 
 # ----------------------------------------------------------------------------------------------------
 # Download virtctl tool if needed
-
-if ! type virtctl; then
-  VIRTCTL_DOWNLOAD_URL="https://github.com/kubevirt/kubevirt/releases/download/${VIRTCTL_VERSION}/virtctl-${VIRTCTL_VERSION}"
-  VIRTCTL_X86_64="${VIRTCTL_DOWNLOAD_URL}-linux-x86_64"
-  VIRTCTL_AMD64="${VIRTCTL_DOWNLOAD_URL}-linux-amd64"
-
-  # Install virtctl binary and add to PATH
-  mkdir virtctl
-
-  # --quiet as wget logs an URL that should not be logged since it provides access to download a file (it is a presigned URL)
-  wget ${VIRTCTL_AMD64} -O virtctl/virtctl --quiet || wget ${VIRTCTL_X86_64} -O virtctl/virtctl --quiet
-  [[ ! -f "virtctl/virtctl" ]] && echo "ERROR: virtctl binary is unavailable for download" && exit 1
-
-  chmod +x virtctl/virtctl
-
-  export PATH="${PATH}:$(pwd)/virtctl"
-fi
+command -v virtctl &> /dev/null || download_virtctl
