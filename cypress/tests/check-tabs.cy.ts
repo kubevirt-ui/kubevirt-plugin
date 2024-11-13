@@ -21,6 +21,15 @@ describe('Check all virtualization pages can be loaded', () => {
       cy.contains('Hostname').should('be.visible');
     });
 
+    it('start example vm', () => {
+      cy.exec(
+        `oc patch -n default virtualmachine example --type merge -p '{"spec":{"runStrategy": "Always"}}'`,
+      );
+      cy.exec('oc get -n default vm example -o yaml').then((res) => {
+        cy.task('log', res);
+      });
+    });
+
     it('vm tabs are loaded', () => {
       tab.navigateToMetrics();
       cy.contains('Utilization').should('be.visible');
