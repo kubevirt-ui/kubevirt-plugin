@@ -146,9 +146,9 @@
     "start-console-with-monitoring": "./start-console.sh monitoring-plugin",
     "test": "jest",
     "test-cov": "jest --coverage",
-    "test-cypress": "cd cypress && ../node_modules/cypress/bin/cypress open --config-file ./cypress.json --env openshift=true",
-    "test-cypress-docker": "echo 'visit http://localhost:10000' && cd cypress && DISPLAY=:14 LIBGL_ALWAYS_INDIRECT=0 cypress open --config-file ./cypress.json --env openshift=true",
-    "test-cypress-headless": "cd cypress && node --max-old-space-size=4096 ../node_modules/cypress/bin/cypress run --config-file ./cypress.json --env openshift=true --headless",
+    "test-cypress": "cd cypress && ../node_modules/cypress/bin/cypress open --config-file ./cypress.config.js --env openshift=true",
+    "test-cypress-docker": "echo 'visit http://localhost:10000' && cd cypress && DISPLAY=:14 LIBGL_ALWAYS_INDIRECT=0 cypress open --config-file ./cypress.config.js --env openshift=true",
+    "test-cypress-headless": "cd cypress && node --max-old-space-size=4096 ../node_modules/cypress/bin/cypress run --config-file ./cypress.config.js --env openshift=true --headless",
     "ts-node": "ts-node -O '{\"module\":\"commonjs\"}'"
   },
   "version": "0.0.1"
