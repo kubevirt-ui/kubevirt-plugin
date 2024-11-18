@@ -54,7 +54,8 @@ describe('Test VM catalog filter', () => {
     cy.contains(TEMPLATE.RHEL8.name).should('exist');
     cy.get(catalogView.GRID).find('div').should('have.length', 1);
 
-    cy.get(catalogView.filterText).clear().type(TEMPLATE.WIN10.metadataName);
+    cy.get(catalogView.filterText).clear();
+    cy.get(catalogView.filterText).type(TEMPLATE.WIN10.metadataName);
     cy.contains(TEMPLATE.WIN10.name).should('exist');
     cy.get(catalogView.GRID).find('div').should('have.length', 1);
   });
