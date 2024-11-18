@@ -20,6 +20,6 @@ Cypress.on('uncaught:exception', () => {
 
 Cypress.Cookies.debug(true);
 
-Cypress.Cookies.defaults({
-  preserve: ['openshift-session-token', 'csrf-token'],
-});
+// Cypress.Cookies.defaults({
+//   preserve: ['openshift-session-token', 'csrf-token'],
+// });
