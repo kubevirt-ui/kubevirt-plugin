@@ -3,11 +3,10 @@ import React, { FC, useState } from 'react';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
 import { produceVMDisks } from '@kubevirt-utils/components/DiskModal/utils/helpers';
-import ExportModal from '@kubevirt-utils/components/ExportModal/ExportModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getName } from '@kubevirt-utils/resources/shared';
 import { getDataVolumeTemplates, getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
@@ -70,17 +69,6 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
 
     return onDiskUpdate(newVM);
   };
-
-  const createExportModal = () =>
-    createModal(({ isOpen, onClose }) => (
-      <ExportModal
-        isOpen={isOpen}
-        namespace={getNamespace(vm)}
-        onClose={onClose}
-        pvcName={obj?.source}
-        vmName={getName(vm)}
-      />
-    ));
 
   const createEditDiskModal = () =>
     createModal(({ isOpen, onClose }) => (
@@ -145,13 +133,6 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
       toggle={KebabToggle({ id: 'toggle-id-6', isExpanded: isDropdownOpen, onClick: onToggle })}
     >
       <DropdownList>
-        <DropdownItem
-          isDisabled={!isPVCSource(obj)}
-          key="disk-export"
-          onClick={() => onModalOpen(createExportModal)}
-        >
-          {t('Upload to registry')}
-        </DropdownItem>
         <DropdownItem
           isDisabled={!isPVCSource(obj)}
           key="disk-bootable-volume"
