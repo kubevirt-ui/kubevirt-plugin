@@ -7,12 +7,15 @@ import {
   V1beta1DataSource,
 } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
+import ExportModal from '@kubevirt-utils/components/ExportModal/ExportModal';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { VolumeSnapshotModel } from '@kubevirt-utils/models';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
-import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
+import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { Action, k8sGet, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { Split, SplitItem } from '@patternfly/react-core';
 
@@ -101,6 +104,39 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataS
         disabled: false,
         id: 'datasource-action-edit-annotations',
         label: t('Edit annotations'),
+      },
+      {
+        cta: async () => {
+          if (isEmpty(dataSource?.spec?.source?.snapshot?.name)) {
+            createModal(({ isOpen, onClose }) => (
+              <ExportModal
+                isOpen={isOpen}
+                namespace={dataSource?.spec?.source?.pvc?.namespace}
+                onClose={onClose}
+                pvcName={dataSource?.spec?.source?.pvc?.name}
+              />
+            ));
+
+            return;
+          }
+
+          const volumeSnapshot = await k8sGet<VolumeSnapshotKind>({
+            model: VolumeSnapshotModel,
+            name: dataSource?.spec?.source?.snapshot?.name,
+            ns: dataSource?.spec?.source?.snapshot?.namespace,
+          });
+
+          createModal(({ isOpen, onClose }) => (
+            <ExportModal
+              isOpen={isOpen}
+              namespace={dataSource?.spec?.source?.snapshot?.namespace}
+              onClose={onClose}
+              pvcName={volumeSnapshot?.spec?.source?.persistentVolumeClaimName}
+            />
+          ));
+        },
+        id: 'datasource-action-upload-to-registry',
+        label: t('Upload to registry'),
       },
       {
         accessReview: asAccessReview(DataSourceModel, dataSource, 'delete'),

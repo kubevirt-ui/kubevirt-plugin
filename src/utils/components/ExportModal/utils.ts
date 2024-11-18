@@ -81,13 +81,13 @@ export const createUploaderPod: CreateUploaderPodType = ({
           {
             args: [
               '--export-source-name',
-              vmName,
+              vmName ?? volumeName,
               '--volumename',
               volumeName,
               '--imagedestination',
               destination,
               '--export-source-kind',
-              'vm',
+              vmName ? 'vm' : 'pvc',
             ],
 
             command: ['/usr/local/bin/disk-uploader'],

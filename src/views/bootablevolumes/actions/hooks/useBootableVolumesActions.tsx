@@ -3,10 +3,11 @@ import React from 'react';
 import { PersistentVolumeClaimModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
+import ExportModal from '@kubevirt-utils/components/ExportModal/ExportModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { deleteDVAndRelatedResources } from '@kubevirt-utils/resources/bootableresources/helpers';
-import { asAccessReview } from '@kubevirt-utils/resources/shared';
+import { asAccessReview, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { Action, K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 
 import { BootableResource } from '../../utils/types';
@@ -46,6 +47,19 @@ const useBootableVolumesActions: BootableVolumesActionsProps = (source, preferen
       disabled: !canUpdatePVC,
       id: 'edit-bootablevolume',
       label: t('Edit'),
+    },
+    {
+      cta: () =>
+        createModal(({ isOpen, onClose }) => (
+          <ExportModal
+            isOpen={isOpen}
+            namespace={getNamespace(source)}
+            onClose={onClose}
+            pvcName={getName(source)}
+          />
+        )),
+      id: 'bootablevolume-action-upload-to-registry',
+      label: t('Upload to registry'),
     },
     {
       accessReview: updateAccessReview,
