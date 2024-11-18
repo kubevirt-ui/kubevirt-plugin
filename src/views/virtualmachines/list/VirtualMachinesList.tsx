@@ -32,7 +32,7 @@ import {
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Flex, FlexItem, Pagination } from '@patternfly/react-core';
-import { useComputed, useSignals } from '@preact/signals-react/runtime';
+import { useSignals } from '@preact/signals-react/runtime';
 import useQuery from '@virtualmachines/details/tabs/metrics/NetworkCharts/hook/useQuery';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 
@@ -159,7 +159,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
 
   const noVMs = isEmpty(unfilteredData) && !vmsFilteredWithProxy;
 
-  const allVMsSelected = useComputed(() => data?.length === selectedVMs.value.length);
+  const allVMsSelected = data?.length === selectedVMs.value.length;
 
   if (loaded && noVMs) {
     return <VirtualMachineEmptyState catalogURL={catalogURL} namespace={namespace} />;
@@ -228,7 +228,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
               <div className="pf-u-text-align-center">{t('No VirtualMachines found')}</div>
             )}
             onSelect={(_, selected, index) => {
-              if (index === -1) allVMsSelected.value ? deselectAll() : selectAll(data);
+              if (index === -1) allVMsSelected ? deselectAll() : selectAll(data);
             }}
             rowData={{
               getVmi: (ns: string, name: string) => vmiMapper?.mapper?.[ns]?.[name],
@@ -236,7 +236,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
               isSingleNodeCluster,
               kind,
             }}
-            allRowsSelected={allVMsSelected.value}
+            allRowsSelected={allVMsSelected}
             columns={activeColumns}
             data={data}
             loaded={loaded}
