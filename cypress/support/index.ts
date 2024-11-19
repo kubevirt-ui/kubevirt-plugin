@@ -17,3 +17,5 @@ Cypress.on('uncaught:exception', () => {
   // don't fail on Cypress' internal errors.
   return false;
 });
+
+Cypress.Cookies.debug(true);
