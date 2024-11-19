@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-namespace */
 import './login.ts';
 import './nav.ts';
 import './project.ts';
