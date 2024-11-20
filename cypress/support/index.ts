@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-namespace */
-import './support/selectors';
-import './support/login';
-import './support/nav';
-import './support/project';
-import './support/resource';
+import './login.ts';
+import './nav.ts';
+import './project.ts';
+import './resource.ts';
+import './selectors.ts';
+import './views.ts';
 
 declare global {
   namespace Cypress {
@@ -19,7 +20,3 @@ Cypress.on('uncaught:exception', () => {
 });
 
 Cypress.Cookies.debug(true);
-
-Cypress.Cookies.defaults({
-  preserve: ['openshift-session-token', 'csrf-token'],
-});

@@ -47,7 +47,8 @@ export const waitForStatus = (status: string) => {
 };
 
 export const fillReviewAndCreate = (vmData: VirtualMachineData) => {
-  cy.get(catalogView.vmName).clear().type(vmData.name);
+  cy.get(catalogView.vmName).clear();
+  cy.get(catalogView.vmName).type(vmData.name);
   switch (vmData.diskSource.name) {
     case 'URL': {
       cy.get(catalogView.diskSourceSelect).click();
