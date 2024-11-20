@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { IoK8sApiCoreV1PersistentVolume } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
@@ -10,9 +10,9 @@ import { getPVCWatch } from './utils';
 const useDisksSources = (vm: V1VirtualMachine) => {
   const pvcWatches = useMemo(() => getPVCWatch(vm), [vm]);
 
-  const pvcWatchesResult = useK8sWatchResources<{ [key: string]: IoK8sApiCoreV1PersistentVolume }>(
-    pvcWatches,
-  );
+  const pvcWatchesResult = useK8sWatchResources<{
+    [key: string]: IoK8sApiCoreV1PersistentVolumeClaim;
+  }>(pvcWatches);
 
   const pvcs = useMemo(
     () =>
@@ -32,7 +32,7 @@ const useDisksSources = (vm: V1VirtualMachine) => {
     () =>
       Object.values(pvcWatchesResult).find((watch) => {
         return !isEmpty(watch.loadError) && watch.loadError?.code !== 404;
-      }),
+      })?.loadError,
     [pvcWatchesResult],
   );
 
