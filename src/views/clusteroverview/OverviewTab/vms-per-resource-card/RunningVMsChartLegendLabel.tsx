@@ -7,7 +7,7 @@ import { getInstanceTypePrefix } from '@kubevirt-utils/resources/bootableresourc
 import { isAllNamespaces } from '@kubevirt-utils/utils/utils';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 
-import { getInstanceTypeSeriesLabel } from './utils/utils';
+import { getFilterKey, getInstanceTypeSeriesLabel } from './utils/utils';
 
 import './RunningVMsChartLegendLabel.scss';
 
@@ -18,6 +18,7 @@ export type RunningVMsChartLegendLabelItem = {
   namespace: string;
   percentage: number;
   templateNamespace?: string;
+  type: string;
   vmCount: number;
 };
 
@@ -29,7 +30,7 @@ const RunningVMsChartLegendLabel: React.FC<RunningVMsChartLegendLabelProps> = ({
   const [activeNamespace] = useActiveNamespace();
   const namespace = isAllNamespaces(activeNamespace) ? ALL_NAMESPACES : `ns/${activeNamespace}`;
   const iconStyle = { color: item.color };
-  const filterKey = item.isInstanceType ? 'instanceType' : 'template';
+  const filterKey = getFilterKey(item);
   const linkPath = `/k8s/${namespace}/${VirtualMachineModelRef}?rowFilter-${filterKey}=${getInstanceTypePrefix(
     item.name,
   )}`;
@@ -38,7 +39,7 @@ const RunningVMsChartLegendLabel: React.FC<RunningVMsChartLegendLabelProps> = ({
     <>
       <i className="fas fa-square kv-running-vms-card__legend-label--color" style={iconStyle} />
       <span className="kv-running-vms-card__legend-label--count">{item.vmCount}</span>{' '}
-      <Link to={linkPath}>{getInstanceTypeSeriesLabel(item.name)}</Link>
+      {filterKey ? <Link to={linkPath}>{getInstanceTypeSeriesLabel(item.name)}</Link> : item.name}
     </>
   );
 };
