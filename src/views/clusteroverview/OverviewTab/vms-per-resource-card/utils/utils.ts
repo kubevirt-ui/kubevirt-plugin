@@ -1,4 +1,5 @@
 import { TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
+import VirtualMachineClusterInstancetypeModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineClusterInstancetypeModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { instanceTypeSeriesNameMapper } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/constants';
 import { getInstanceTypePrefix } from '@kubevirt-utils/resources/bootableresources/helpers';
@@ -9,7 +10,13 @@ import {
 
 import { RunningVMsChartLegendLabelItem } from '../RunningVMsChartLegendLabel';
 
-import { ChartDataObject } from './constants';
+import {
+  ChartDataObject,
+  INSTANCETYPE_FILTER_KEY,
+  TEMPLATE_FILTER_KEY,
+  UNCATEGORIZED_LABEL,
+  UNCATEGORIZED_VM,
+} from './constants';
 
 export const getInstanceTypeSeriesLabel = (instanceTypeName: string): string => {
   const seriesName = getInstanceTypePrefix(instanceTypeName);
@@ -44,6 +51,14 @@ export const getResourceLegendItems = (
   return legendItems;
 };
 
+export const getResourceType = (templateName: string, instanceTypeName: string): string => {
+  const isTemplate = Boolean(templateName);
+  const isInstanceType = Boolean(instanceTypeName);
+
+  if (!isTemplate && !isInstanceType) return UNCATEGORIZED_VM;
+  return isTemplate ? TemplateModel.kind : VirtualMachineClusterInstancetypeModel.kind;
+};
+
 export const getResourcesToVMCountMap = (
   loaded: boolean,
   vms: V1VirtualMachine[],
@@ -54,19 +69,21 @@ export const getResourcesToVMCountMap = (
 
   if (loaded) {
     vms.forEach((vm) => {
-      const template = vm?.metadata?.labels?.[LABEL_USED_TEMPLATE_NAME];
+      const templateName = vm?.metadata?.labels?.[LABEL_USED_TEMPLATE_NAME];
       const templateNamespace = vm?.metadata?.labels?.[LABEL_USED_TEMPLATE_NAMESPACE];
       const instanceType = vm?.spec?.instancetype?.name;
-      const resource = isTemplate ? template : instanceType;
+      const resourceName = isTemplate ? templateName : getInstanceTypePrefix(instanceType);
+      const resourceType = getResourceType(templateName, instanceType);
 
-      if (resource) {
-        const newResourceName = isTemplate ? resource : getInstanceTypePrefix(resource);
+      if (resourceType === type) {
+        const newResourceName = Boolean(resourceName) ? resourceName : UNCATEGORIZED_LABEL;
         const value = resourcesToVMCountMap.has(newResourceName)
           ? resourcesToVMCountMap.get(newResourceName).vmCount + 1
           : 1;
         resourcesToVMCountMap.set(newResourceName, {
           isInstanceType: Boolean(vm?.spec?.instancetype),
           templateNamespace,
+          type,
           vmCount: value,
         });
       }
@@ -87,3 +104,8 @@ export const getResourcesToVMCountMap = (
 
 export const vmsPerResourceCount = (resourceToVMCountMap): number =>
   [...resourceToVMCountMap?.values()]?.reduce((total, { vmCount }) => total + vmCount, 0);
+
+export const getFilterKey = (resourceItem: RunningVMsChartLegendLabelItem) => {
+  if (resourceItem.type === UNCATEGORIZED_VM) return null;
+  return resourceItem.isInstanceType ? INSTANCETYPE_FILTER_KEY : TEMPLATE_FILTER_KEY;
+};
