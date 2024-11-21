@@ -201,7 +201,7 @@ export const updatedInstanceType = (
       {
         op: 'replace',
         path: `/spec/instancetype`,
-        value: { kind: instanceType.kind, name: instanceType.metadata.name },
+        value: { kind: instanceType.kind, name: instanceType.metadata.name, revisionName: '' },
       },
     ],
     model: VirtualMachineModel,
