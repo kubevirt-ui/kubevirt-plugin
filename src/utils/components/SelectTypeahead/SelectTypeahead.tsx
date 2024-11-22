@@ -40,10 +40,7 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
 
   const onSelect = (value: string) => {
     if (value) {
-      setSelected(selected === value ? null : value);
-
-      if (selected === value) setInputValue('');
-
+      setInputValue(value);
       setIsOpen(true);
     }
 
