@@ -1245,6 +1245,7 @@
   "The SCSI reservation for disk makes the disk attached to the VirtualMachine as a SCSI LUN. This option should only be used for cluster-aware applications": "The SCSI reservation for disk makes the disk attached to the VirtualMachine as a SCSI LUN. This option should only be used for cluster-aware applications",
   "The template has": "The template has",
   "The virtctl client is a supplemental command-line utility for managing virtualization resources from the command line.": "The virtctl client is a supplemental command-line utility for managing virtualization resources from the command line.",
+  "The VirtualMachine is running": "The VirtualMachine is running",
   "The VirtualMachine will be bridged to the selected network, ideal for L2 devices": "The VirtualMachine will be bridged to the selected network, ideal for L2 devices",
   "The VirtualMachine will have": "The VirtualMachine will have",
   "The VirtualMachine you are creating does not have an available boot source. We recommended that you select a boot source to create the VirtualMachine.": "The VirtualMachine you are creating does not have an available boot source. We recommended that you select a boot source to create the VirtualMachine.",

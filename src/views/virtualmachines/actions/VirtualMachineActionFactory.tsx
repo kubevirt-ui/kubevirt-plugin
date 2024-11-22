@@ -22,7 +22,13 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Action, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { CopyIcon } from '@patternfly/react-icons';
 
-import { isLiveMigratable, isRestoring, isSnapshotting, printableVMStatus } from '../utils';
+import {
+  isLiveMigratable,
+  isRestoring,
+  isRunning,
+  isSnapshotting,
+  printableVMStatus,
+} from '../utils';
 
 import DeleteVMModal from './components/DeleteVMModal/DeleteVMModal';
 import {
@@ -96,7 +102,8 @@ export const VirtualMachineActionFactory = {
         createModal(({ isOpen, onClose }) => (
           <DeleteVMModal isOpen={isOpen} onClose={onClose} vm={vm} />
         )),
-      disabled: false,
+      description: isRunning(vm) && t('The VirtualMachine is running'),
+      disabled: isRunning(vm),
       id: 'vm-action-delete',
       label: t('Delete'),
     };
