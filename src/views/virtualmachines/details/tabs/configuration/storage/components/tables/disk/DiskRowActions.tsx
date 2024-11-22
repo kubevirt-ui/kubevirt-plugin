@@ -126,7 +126,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
 
   const makePersistent = () =>
     createModal(({ isOpen, onClose }) => (
-      <MakePersistentModal isOpen={isOpen} onClose={onClose} vm={vm} volume={volume} />
+      <MakePersistentModal isOpen={isOpen} onClose={onClose} vm={vm} vmi={vmi} volume={volume} />
     ));
 
   const onModalOpen = (createModalCallback: () => void) => {
