@@ -1,0 +1,14 @@
+.vm-list-summary {
+  &__expand-section {
+    margin: var(--pf-global--spacer--lg);
+
+    &-toggle {
+      color: var(--pf-v5-global--Color--100);
+      margin: 0;
+
+      &-icon {
+        margin-right: var(--pf-global--spacer--sm);
+      }
+    }
+  }
+}

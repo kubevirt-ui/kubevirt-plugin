@@ -58,14 +58,14 @@ const VMStatusesCard: React.FC = () => {
             status={VM_STATUS.Running}
           />
           <VMStatusItem
+            count={primaryStatuses.Stopped}
+            namespace={activeNamespace}
+            status={VM_STATUS.Stopped}
+          />
+          <VMStatusItem
             count={primaryStatuses.Paused}
             namespace={activeNamespace}
             status={VM_STATUS.Paused}
-          />
-          <VMStatusItem
-            count={primaryStatuses.Migrating}
-            namespace={activeNamespace}
-            status={VM_STATUS.Migrating}
           />
         </Grid>
       </div>

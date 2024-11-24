@@ -4,11 +4,11 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getVMStatus } from '@kubevirt-utils/resources/shared';
 import { VM_STATUS } from '@kubevirt-utils/resources/vm/utils/vmStatus';
 import { RedExclamationCircleIcon } from '@openshift-console/dynamic-plugin-sdk';
-import { InProgressIcon, PausedIcon, SyncAltIcon } from '@patternfly/react-icons';
+import { InProgressIcon, OffIcon, PausedIcon, SyncAltIcon } from '@patternfly/react-icons';
 
 import { ERROR } from './constants';
 
-const PRIMARY_STATUSES = [VM_STATUS.Running, VM_STATUS.Paused, VM_STATUS.Migrating, ERROR];
+const PRIMARY_STATUSES = [VM_STATUS.Running, VM_STATUS.Stopped, VM_STATUS.Paused, ERROR];
 
 const ERROR_STATUSES = [
   VM_STATUS.CrashLoopBackOff,
@@ -30,7 +30,7 @@ export const vmStatusIcon = {
   Provisioning: Fragment,
   Running: SyncAltIcon,
   Starting: Fragment,
-  Stopped: Fragment,
+  Stopped: OffIcon,
   Stopping: Fragment,
   Terminating: Fragment,
 };
