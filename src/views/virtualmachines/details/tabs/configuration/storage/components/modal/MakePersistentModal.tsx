@@ -1,51 +1,56 @@
-import React, { FC, useMemo } from 'react';
-import produce from 'immer';
+import React, { FC } from 'react';
 
-import { V1VirtualMachine, V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1VirtualMachine,
+  V1VirtualMachineInstance,
+  V1Volume,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
+import { getVMIVolumes } from '@kubevirt-utils/resources/vmi';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Stack, StackItem } from '@patternfly/react-core';
 
-import { updateVolumes } from '../../../details/utils/utils';
+import { updateDisks } from '../../../details/utils/utils';
+
+import { persistVolume } from './utils';
 
 type MakePersistentModalProps = {
   isOpen: boolean;
   onClose: () => void;
   vm: V1VirtualMachine;
+  vmi: V1VirtualMachineInstance;
   volume: V1Volume;
 };
 
-const MakePersistentModal: FC<MakePersistentModalProps> = ({ isOpen, onClose, vm, volume }) => {
+const MakePersistentModal: FC<MakePersistentModalProps> = ({
+  isOpen,
+  onClose,
+  vm,
+  vmi,
+  volume,
+}) => {
   const { t } = useKubevirtTranslation();
 
-  const updatedVirtualMachine = useMemo(() => {
-    return produce(vm, (draftVM) => {
-      const volumes = [...getVolumes(draftVM)].map((machineVolume) => {
-        if (machineVolume?.name === volume?.name) {
-          if (machineVolume?.dataVolume?.hotpluggable)
-            delete machineVolume?.dataVolume?.hotpluggable;
-          if (volume?.persistentVolumeClaim?.hotpluggable)
-            delete machineVolume?.dataVolume?.hotpluggable;
-        }
+  const makePersistent = () => {
+    const volumeToPersist = getVMIVolumes(vmi).find((vmiVolume) => vmiVolume.name === volume?.name);
+    const vmHasVolume = getVolumes(vm).find((vmVolume) => vmVolume.name === volume?.name);
 
-        return machineVolume;
-      });
+    if (vmHasVolume || isEmpty(volumeToPersist)) return Promise.resolve();
 
-      draftVM.spec.template.spec.volumes = volumes;
+    const vmPersistent = persistVolume(vm, vmi, volumeToPersist);
 
-      return draftVM;
-    });
-  }, [vm, volume]);
+    return updateDisks(vmPersistent);
+  };
 
   return (
     <TabModal<V1VirtualMachine>
       headerText={t('Make persistent?')}
       isOpen={isOpen}
-      obj={updatedVirtualMachine}
       onClose={onClose}
-      onSubmit={updateVolumes}
+      onSubmit={makePersistent}
     >
       <Stack hasGutter>
         <StackItem>
