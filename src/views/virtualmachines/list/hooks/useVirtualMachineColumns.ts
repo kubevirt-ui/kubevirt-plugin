@@ -35,7 +35,6 @@ const useVirtualMachineColumns = (
     () => [
       {
         id: 'name',
-        props: { className: 'pf-m-width-15' },
         sort: (_, direction) => sorting(direction, 'metadata.name'),
         title: t('Name'),
         transforms: [sortable],
@@ -67,7 +66,6 @@ const useVirtualMachineColumns = (
         ? [
             {
               id: 'node',
-              props: { className: 'pf-m-width-15' },
               title: t('Node'),
             },
           ]
@@ -75,7 +73,6 @@ const useVirtualMachineColumns = (
       {
         additional: true,
         id: 'created',
-        props: { className: 'pf-m-width-15' },
         sort: (_, direction) => sorting(direction, 'metadata.creationTimestamp'),
         title: t('Created'),
         transforms: [sortable],

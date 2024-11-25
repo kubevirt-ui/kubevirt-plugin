@@ -42,7 +42,7 @@ const VirtualMachineRowLayout: React.FC<
           onChange={() => (selected ? deselectVM(obj) : selectVM(obj))}
         />
       </TableData>
-      <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-15 vm-column" id="name">
+      <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="name">
         <ResourceLink
           onClick={() => {
             setSelectedTreeItem(treeDataMap.value[`${getNamespace(obj)}/${getName(obj)}`]);
@@ -69,10 +69,10 @@ const VirtualMachineRowLayout: React.FC<
       >
         <VMStatusConditionLabelList conditions={obj?.status?.conditions?.filter((c) => c.reason)} />
       </TableData>
-      <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-15 vm-column" id="node">
+      <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="node">
         {node}
       </TableData>
-      <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-15 vm-column" id="created">
+      <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="created">
         <Timestamp timestamp={obj?.metadata?.creationTimestamp} />
       </TableData>
       <TableData
