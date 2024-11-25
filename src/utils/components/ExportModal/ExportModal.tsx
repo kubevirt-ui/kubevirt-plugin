@@ -1,13 +1,28 @@
 import React, { FC, useState } from 'react';
 
+import { IoK8sApiCoreV1Pod } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { modelToGroupVersionKind, PodModel } from '@kubevirt-utils/models';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
-import { FormGroup, Stack, StackItem, TextInput } from '@patternfly/react-core';
+import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  Alert,
+  AlertVariant,
+  FormGroup,
+  Stack,
+  StackItem,
+  TextInput,
+} from '@patternfly/react-core';
 
 import TabModal from '../TabModal/TabModal';
 
 import { ALREADY_CREATED_ERROR_CODE } from './constants';
-import { createSecret, createServiceAccount, createUploaderPod } from './utils';
+import ShowProgress from './ShowProgress';
+import { createSecret, createServiceAccount, createUploaderPod, exportInProgress } from './utils';
+import ViewPodLogLink from './ViewPodLogLink';
+
+import './export-modal.scss';
 
 type ExportModalProps = {
   isOpen: boolean;
@@ -25,6 +40,20 @@ const ExportModal: FC<ExportModalProps> = ({ isOpen, namespace, onClose, pvcName
   const [password, setPassword] = useState('');
   const [destination, setDestination] = useState('');
 
+  const [createdPod, setCreatedPod] = useState<IoK8sApiCoreV1Pod>();
+
+  const [uploadPod] = useK8sWatchResource<IoK8sApiCoreV1Pod>(
+    createdPod
+      ? {
+          groupVersionKind: modelToGroupVersionKind(PodModel),
+          name: getName(createdPod),
+          namespace: getNamespace(createdPod),
+        }
+      : null,
+  );
+
+  const uploadInProgress = exportInProgress(uploadPod || createdPod);
+
   return (
     <TabModal
       onSubmit={async () => {
@@ -37,20 +66,33 @@ const ExportModal: FC<ExportModalProps> = ({ isOpen, namespace, onClose, pvcName
         }
 
         await createSecret({ namespace, password, secretName, username });
-        await createUploaderPod({
+        const pod = await createUploaderPod({
           destination,
           namespace,
           secretName,
           vmName,
           volumeName: pvcName,
         });
+
+        setCreatedPod(pod);
       }}
+      actionItemLink={<ViewPodLogLink pod={uploadPod} />}
+      closeOnSubmit={false}
       headerText={t('Upload to registry')}
+      isDisabled={uploadInProgress}
+      isLoading={uploadInProgress}
       isOpen={isOpen}
       onClose={onClose}
       submitBtnText={t('Upload')}
     >
-      <Stack hasGutter>
+      <Stack className="kv-exportmodal" hasGutter>
+        <Alert
+          title={t(
+            'Before uploading to a registry, it is recommended to remove any private information from the image',
+          )}
+          isInline
+          variant={AlertVariant.warning}
+        ></Alert>
         <StackItem>
           <FormGroup fieldId="registryName" isRequired label={t('Name')}>
             <TextInput
@@ -90,6 +132,9 @@ const ExportModal: FC<ExportModalProps> = ({ isOpen, namespace, onClose, pvcName
               value={password}
             />
           </FormGroup>
+        </StackItem>
+        <StackItem>
+          <ShowProgress uploadPod={uploadPod} />
         </StackItem>
       </Stack>
     </TabModal>

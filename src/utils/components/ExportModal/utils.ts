@@ -7,7 +7,7 @@ import {
   ServiceAccountModel,
 } from '@kubevirt-utils/models';
 import { encodeSecretKey } from '@kubevirt-utils/resources/secret/utils';
-import { getRandomChars, isUpstream } from '@kubevirt-utils/utils/utils';
+import { getRandomChars, isEmpty, isUpstream } from '@kubevirt-utils/utils/utils';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
 import {
@@ -15,6 +15,7 @@ import {
   role,
   roleBinding,
   serviceAccount,
+  UPLOAD_STATUSES,
   UPSTREAM_UPLOADER_IMAGE,
 } from './constants';
 
@@ -158,3 +159,8 @@ export const createUploaderPod: CreateUploaderPodType = ({
     } as IoK8sApiCoreV1Pod,
     model: PodModel,
   });
+
+export const exportFailed = (pod: IoK8sApiCoreV1Pod) =>
+  [UPLOAD_STATUSES.FAILED, UPLOAD_STATUSES.UNKNOWN].includes(pod?.status?.phase as UPLOAD_STATUSES);
+
+export const exportInProgress = (pod: IoK8sApiCoreV1Pod) => !isEmpty(pod) && !exportFailed(pod);
