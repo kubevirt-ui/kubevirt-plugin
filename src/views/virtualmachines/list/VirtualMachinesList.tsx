@@ -34,6 +34,7 @@ import {
 import { Flex, FlexItem, Pagination } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
 import useQuery from '@virtualmachines/details/tabs/metrics/NetworkCharts/hook/useQuery';
+import VirtualMachineTreeView from '@virtualmachines/tree/VirtualMachineTreeView';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 
 import { useVMListFilters } from '../utils';
@@ -162,12 +163,16 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
   const allVMsSelected = data?.length === selectedVMs.value.length;
 
   if (loaded && noVMs) {
-    return <VirtualMachineEmptyState catalogURL={catalogURL} namespace={namespace} />;
+    return (
+      <VirtualMachineTreeView>
+        <VirtualMachineEmptyState catalogURL={catalogURL} namespace={namespace} />
+      </VirtualMachineTreeView>
+    );
   }
 
   return (
-    <>
-      {/* All of this table and components should be replaced to our own fitted components */}
+    /* All of this table and components should be replaced to our own fitted components */
+    <VirtualMachineTreeView onFilterChange={onFilterChange}>
       <ListPageHeader title={t('VirtualMachines')}>
         <Flex>
           <FlexItem>
@@ -246,7 +251,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
           />
         </div>
       </ListPageBody>
-    </>
+    </VirtualMachineTreeView>
   );
 };
 
