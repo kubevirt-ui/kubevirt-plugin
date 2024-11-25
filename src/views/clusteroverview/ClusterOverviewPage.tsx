@@ -17,6 +17,7 @@ import TopConsumersTab from './TopConsumersTab/TopConsumersTab';
 const ClusterOverviewPage: FC = () => {
   const { t } = useKubevirtTranslation();
   const isAdmin = useIsAdmin();
+  // useSetDefaultNonAdminUserProject();
 
   const overviewTabs: NavPage[] = useMemo(() => {
     const adminPages: NavPage[] = [

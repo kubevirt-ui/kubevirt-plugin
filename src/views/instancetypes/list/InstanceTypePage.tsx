@@ -8,11 +8,13 @@ import VirtualMachineClusterInstancetypeModel, {
   VirtualMachineClusterInstancetypeModelRef,
 } from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineClusterInstancetypeModel';
 import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
+import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import useIsSearchPage from '@kubevirt-utils/hooks/useIsSearchPage';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useSetDefaultNonAdminUserProject from '@kubevirt-utils/hooks/useSetDefaultNonAdminUserProject/useSetDefaultNonAdminUserProject';
 import { ListPageProps } from '@kubevirt-utils/utils/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
+import { ListPageHeader, useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 
 import InstancetypeCreateButton from './components/InstancetypeCreateButton/InstancetypeCreateButton';
@@ -23,16 +25,21 @@ import '@kubevirt-utils/styles/list-managment-group.scss';
 
 const InstanceTypePage: FC<ListPageProps> = (props) => {
   const { t } = useKubevirtTranslation();
+  const isAdmin = useIsAdmin();
   const navigate = useNavigate();
   const location = useLocation();
-  const activeNamespace = props?.namespace ?? ALL_NAMESPACES;
+  const [activeNamespace] = useActiveNamespace();
+  const currentNamespace = props?.namespace ?? activeNamespace ?? ALL_NAMESPACES;
 
   const isSearchPage = useIsSearchPage();
 
   const activeTabKey = useMemo(
-    () => (location?.pathname.includes(VirtualMachineClusterInstancetypeModel.kind) ? 0 : 1),
+    () =>
+      location?.pathname.includes(VirtualMachineClusterInstancetypeModel.kind) && isAdmin ? 0 : 1,
     [location?.pathname],
   );
+
+  useSetDefaultNonAdminUserProject();
   const [instanceTypes, loaded, loadError] = useVirtualMachineInstanceTypes(
     props?.fieldSelector,
     props?.selector,
@@ -41,10 +48,10 @@ const InstanceTypePage: FC<ListPageProps> = (props) => {
 
   const urlUserInstancetypes = useMemo(
     () =>
-      activeNamespace === ALL_NAMESPACES
+      currentNamespace === ALL_NAMESPACES
         ? `/k8s/all-namespaces/${VirtualMachineInstancetypeModelRef}`
-        : `/k8s/ns/${activeNamespace}/${VirtualMachineInstancetypeModelRef}`,
-    [activeNamespace],
+        : `/k8s/ns/${currentNamespace}/${VirtualMachineInstancetypeModelRef}`,
+    [currentNamespace],
   );
 
   if (isSearchPage) {
@@ -69,7 +76,7 @@ const InstanceTypePage: FC<ListPageProps> = (props) => {
           }
         >
           {(activeTabKey === 0 || (!isEmpty(instanceTypes) && loaded && !loadError)) && (
-            <InstancetypeCreateButton namespace={activeNamespace} />
+            <InstancetypeCreateButton namespace={currentNamespace} />
           )}
         </ListPageHeader>
       </div>
