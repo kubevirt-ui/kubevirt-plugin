@@ -4,6 +4,7 @@ import {
   IoK8sApiRbacV1RoleBinding,
 } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { RoleBindingModel, RoleModel, ServiceAccountModel } from '@kubevirt-utils/models';
+import { ProgressStepVariant } from '@patternfly/react-core';
 
 const UPLOADER_SERVICE_ACCOUNT_NAME = 'kubevirt-disk-uploader';
 const UPLOADER_ROLE_NAME = 'kubevirt-disk-uploader';
@@ -59,6 +60,22 @@ export const role: IoK8sApiRbacV1Role = {
       verbs: ['get'],
     },
   ],
+};
+
+export enum UPLOAD_STATUSES {
+  FAILED = 'Failed',
+  Pending = 'Pending',
+  Running = 'Running',
+  SUCCEEDED = 'Succeeded',
+  UNKNOWN = 'Unknown',
+}
+
+export const STATUS_TO_PROGRESS_VARIANT = {
+  Failed: ProgressStepVariant.danger,
+  Pending: ProgressStepVariant.info,
+  Running: ProgressStepVariant.info,
+  Succeeded: ProgressStepVariant.success,
+  Unknown: ProgressStepVariant.danger,
 };
 
 export const ALREADY_CREATED_ERROR_CODE = 409;

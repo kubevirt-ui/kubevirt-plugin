@@ -1,3 +1,7 @@
 .kv-tabmodal-footer {
   flex: 1;
+
+  &__action-item-link {
+    margin-left: auto;
+  }
 }

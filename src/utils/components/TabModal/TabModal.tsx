@@ -20,6 +20,7 @@ import {
 import './TabModal.scss';
 
 export type TabModalProps<T extends K8sResourceCommon = K8sResourceCommon> = {
+  actionItemLink?: ReactNode;
   children: ReactNode;
   closeOnSubmit?: boolean;
   headerText: string;
@@ -43,6 +44,7 @@ export type TabModalFC = <T extends K8sResourceCommon = K8sResourceCommon>(
 
 const TabModal: TabModalFC = memo(
   ({
+    actionItemLink,
     children,
     closeOnSubmit = true,
     headerText,
@@ -126,6 +128,11 @@ const TabModal: TabModalFC = memo(
                     {t('Cancel')}
                   </Button>
                 </ActionListItem>
+                {actionItemLink && (
+                  <ActionListItem className="kv-tabmodal-footer__action-item-link">
+                    {actionItemLink}
+                  </ActionListItem>
+                )}
               </ActionList>
             </StackItem>
           </Stack>
