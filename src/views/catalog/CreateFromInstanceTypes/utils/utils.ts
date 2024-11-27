@@ -49,7 +49,7 @@ const generateCloudInitPassword = () =>
   `${getRandomChars(4)}-${getRandomChars(4)}-${getRandomChars(4)}`;
 
 const getCloudInitUserNameByOS = (selectedPreferenceName: string, osLabel: string): string => {
-  for (const name in [
+  for (const name of [
     ...Object.values(OS_NAME_TYPES),
     ...Object.values(OS_NAME_TYPES_NOT_SUPPORTED),
   ]) {
