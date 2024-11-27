@@ -507,6 +507,7 @@
   "Enter value": "Enter value",
   "Environment": "Environment",
   "environment disk": "environment disk",
+  "Ephemeral": "Ephemeral",
   "Ephemeral disk (Container image)": "Ephemeral disk (Container image)",
   "Error": "Error",
   "Error checking for usages of this PVC.": "Error checking for usages of this PVC.",

@@ -20,13 +20,13 @@ const NetworkInterfaceRow: FC<
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} id="name">
-        {network.name}
+        {network?.name || NO_DATA_DASH}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="model">
         {iface.model || NO_DATA_DASH}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="network">
-        {network.pod ? t('Pod networking') : network.multus?.networkName || NO_DATA_DASH}
+        {network?.pod ? t('Pod networking') : network?.multus?.networkName || NO_DATA_DASH}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="type">
         {getPrintableNetworkInterfaceType(iface)}
@@ -40,7 +40,7 @@ const NetworkInterfaceRow: FC<
         id=""
       >
         <NetworkInterfaceActions
-          nicName={network.name}
+          nicName={network?.name}
           nicPresentation={{ iface, network }}
           onUpdateVM={onUpdateVM}
         />
