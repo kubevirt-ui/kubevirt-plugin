@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -6,7 +6,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { mountWinDriversToVM } from '@kubevirt-utils/resources/vm/utils/disk/drivers';
 import { Alert, AlertVariant, Checkbox, Flex, FlexItem } from '@patternfly/react-core';
 
-import { removeWindowsDrivers, useDriversImage } from './utils';
+import { useDriversImage } from './drivers';
+import { removeWindowsDrivers } from './utils';
 
 type WindowsDriversProps = {
   isWindows?: boolean;
@@ -14,7 +15,7 @@ type WindowsDriversProps = {
   vm: V1VirtualMachine;
 };
 
-const WindowsDrivers: FC<WindowsDriversProps> = ({ isWindows, updateVM, vm }) => {
+const WindowsDrivers: FC<WindowsDriversProps> = memo(({ isWindows, updateVM, vm }) => {
   const { t } = useKubevirtTranslation();
   const [isChecked, setIsChecked] = useState<boolean>(null);
   const [error, setError] = useState<Error>(undefined);
@@ -82,5 +83,6 @@ const WindowsDrivers: FC<WindowsDriversProps> = ({ isWindows, updateVM, vm }) =>
       )}
     </Flex>
   );
-};
+});
+
 export default WindowsDrivers;
