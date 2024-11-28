@@ -8,19 +8,21 @@ import HeadlessMode from '@kubevirt-utils/components/HeadlessMode/HeadlessMode';
 import HostnameModal from '@kubevirt-utils/components/HostnameModal/HostnameModal';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import MoveVMToFolderModal from '@kubevirt-utils/components/MoveVMToFolderModal/MoveVMToFolderModal';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { asAccessReview, getAnnotation, getName } from '@kubevirt-utils/resources/shared';
+import { asAccessReview, getAnnotation, getLabel, getName } from '@kubevirt-utils/resources/shared';
 import { DESCRIPTION_ANNOTATION, getDevices, getHostname } from '@kubevirt-utils/resources/vm';
 import { updateCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, Grid, GridItem, Switch, Title } from '@patternfly/react-core';
 import DetailsSectionBoot from '@virtualmachines/details/tabs/configuration/details/components/DetailsSectionBoot';
 import DetailsSectionHardware from '@virtualmachines/details/tabs/configuration/details/components/DetailsSectionHardware';
+import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
 const CustomizeInstanceTypeDetailsTab = () => {
   const vm = vmSignal.value;
@@ -82,6 +84,31 @@ const CustomizeInstanceTypeDetailsTab = () => {
               }
               data-test-id={`${vmName}-description`}
               descriptionHeader={<SearchItem id="description">{t('Description')}</SearchItem>}
+              isEdit
+            />
+            <VirtualMachineDescriptionItem
+              onEditClick={() =>
+                createModal(({ isOpen, onClose }) => (
+                  <MoveVMToFolderModal
+                    onSubmit={(folderName) =>
+                      Promise.resolve(
+                        updateCustomizeInstanceType([
+                          {
+                            data: folderName,
+                            path: ['metadata', 'labels', VM_FOLDER_LABEL],
+                          },
+                        ]),
+                      )
+                    }
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    vm={vm}
+                  />
+                ))
+              }
+              data-test-id={`${vmName}-folder`}
+              descriptionData={getLabel(vm, VM_FOLDER_LABEL)}
+              descriptionHeader={<SearchItem id="folder">{t('Folder')}</SearchItem>}
               isEdit
             />
             <VirtualMachineDescriptionItem

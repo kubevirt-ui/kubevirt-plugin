@@ -31,8 +31,7 @@ describe('useVirtualMachineActionsProvider tests', () => {
       'vm-action-snapshot',
       'migration-menu',
       'vm-action-copy-ssh',
-      'vm-action-edit-labels',
-      'vm-action-edit-annotations',
+      'vm-action-move-to-folder',
       'vm-action-delete',
     ]);
   });
@@ -56,8 +55,7 @@ describe('useVirtualMachineActionsProvider tests', () => {
       'vm-action-snapshot',
       'migration-menu',
       'vm-action-copy-ssh',
-      'vm-action-edit-labels',
-      'vm-action-edit-annotations',
+      'vm-action-move-to-folder',
       'vm-action-delete',
     ]);
   });
@@ -81,8 +79,7 @@ describe('useVirtualMachineActionsProvider tests', () => {
       'vm-action-snapshot',
       'migration-menu',
       'vm-action-copy-ssh',
-      'vm-action-edit-labels',
-      'vm-action-edit-annotations',
+      'vm-action-move-to-folder',
       'vm-action-delete',
     ]);
   });
@@ -109,8 +106,7 @@ describe('useVirtualMachineActionsProvider tests', () => {
       'vm-action-snapshot',
       'migration-menu',
       'vm-action-copy-ssh',
-      'vm-action-edit-labels',
-      'vm-action-edit-annotations',
+      'vm-action-move-to-folder',
       'vm-action-delete',
     ]);
 

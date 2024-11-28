@@ -64,10 +64,8 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
       VirtualMachineActionFactory.clone(vm, createModal),
       VirtualMachineActionFactory.snapshot(vm, createModal),
       VirtualMachineActionFactory.migrationActions(migrateOrCancelMigrationCompute, migrateStorage),
-      // VirtualMachineActionFactory.openConsole(vm),
       VirtualMachineActionFactory.copySSHCommand(vm, virtctlCommand),
-      VirtualMachineActionFactory.editLabels(vm, createModal),
-      VirtualMachineActionFactory.editAnnotations(vm, createModal),
+      VirtualMachineActionFactory.moveToFolder(vm, createModal),
       VirtualMachineActionFactory.delete(vm, createModal),
     ];
   }, [vm, vmim, isSingleNodeCluster, createModal, virtctlCommand]);

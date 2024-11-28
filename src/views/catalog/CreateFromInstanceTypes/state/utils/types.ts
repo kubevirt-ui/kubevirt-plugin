@@ -45,6 +45,7 @@ export type SysprepConfigMapData = {
 
 export type InstanceTypeVMState = {
   customDiskSize: string;
+  folder: string;
   isDynamicSSHInjection: boolean;
   pvcSource: IoK8sApiCoreV1PersistentVolumeClaim;
   selectedBootableVolume: BootableVolume;
@@ -57,6 +58,7 @@ export type InstanceTypeVMState = {
 };
 
 export enum instanceTypeActionType {
+  setFolder = 'folder',
   setIsDynamicSSHInjection = 'isDynamicSSHInjection',
   setPVCSource = 'pvcSource',
   setSelectedBootableVolume = 'selectedBootableVolume',

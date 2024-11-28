@@ -5,6 +5,7 @@ import {
   instanceTypeActionType,
   UseInstanceTypeAndPreferencesValues,
 } from '@catalog/CreateFromInstanceTypes/state/utils/types';
+import FolderSelect from '@kubevirt-utils/components/FolderSelect/FolderSelect';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { convertResourceArrayToMap } from '@kubevirt-utils/resources/shared';
@@ -19,8 +20,9 @@ type DetailsLeftGridProps = {
 
 const DetailsLeftGrid: FC<DetailsLeftGridProps> = ({ instanceTypesAndPreferencesData }) => {
   const { t } = useKubevirtTranslation();
-  const { instanceTypeVMState, setInstanceTypeVMState } = useInstanceTypeVMStore();
-  const { selectedBootableVolume, selectedInstanceType, vmName } = instanceTypeVMState;
+  const { instanceTypeVMState, setInstanceTypeVMState, vmNamespaceTarget } =
+    useInstanceTypeVMStore();
+  const { folder, selectedBootableVolume, selectedInstanceType, vmName } = instanceTypeVMState;
   const { clusterInstanceTypes, preferences } = instanceTypesAndPreferencesData;
 
   const preferencesMap = useMemo(() => convertResourceArrayToMap(preferences), [preferences]);
@@ -51,6 +53,22 @@ const DetailsLeftGrid: FC<DetailsLeftGridProps> = ({ instanceTypesAndPreferences
           />
         }
         descriptionHeader={t('Name')}
+      />
+      <VirtualMachineDescriptionItem
+        descriptionData={
+          <FolderSelect
+            setSelectedFolder={(newFolder) => {
+              setInstanceTypeVMState({
+                payload: newFolder,
+                type: instanceTypeActionType.setFolder,
+              });
+            }}
+            isFullWidth
+            namespace={vmNamespaceTarget}
+            selectedFolder={folder}
+          />
+        }
+        descriptionHeader={t('Folder')}
       />
       <VirtualMachineDescriptionItem
         descriptionData={operatingSystem}

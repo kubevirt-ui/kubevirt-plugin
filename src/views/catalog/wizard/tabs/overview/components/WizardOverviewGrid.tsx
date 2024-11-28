@@ -13,11 +13,12 @@ import { getBootloaderTitleFromVM } from '@kubevirt-utils/components/FirmwareBoo
 import HardwareDevices from '@kubevirt-utils/components/HardwareDevices/HardwareDevices';
 import HostnameModal from '@kubevirt-utils/components/HostnameModal/HostnameModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import MoveVMToFolderModal from '@kubevirt-utils/components/MoveVMToFolderModal/MoveVMToFolderModal';
 import WorkloadProfileModal from '@kubevirt-utils/components/WorkloadProfileModal/WorkloadProfileModal';
 import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getAnnotation } from '@kubevirt-utils/resources/shared';
+import { getAnnotation, getLabel } from '@kubevirt-utils/resources/shared';
 import { getVmCPUMemory, WORKLOADS_LABELS } from '@kubevirt-utils/resources/template';
 import {
   getCPU,
@@ -29,6 +30,7 @@ import {
 } from '@kubevirt-utils/resources/vm';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { DescriptionList, Grid, GridItem, Switch } from '@patternfly/react-core';
+import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 import { printableVMStatus } from '@virtualmachines/utils';
 
 import { WizardDescriptionItem } from '../../../components/WizardDescriptionItem';
@@ -119,6 +121,34 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
             description={vm?.metadata?.namespace}
             testId="wizard-overview-namespace"
             title={t('Namespace')}
+          />
+
+          <WizardDescriptionItem
+            onEditClick={() =>
+              createModal(({ isOpen, onClose }) => (
+                <MoveVMToFolderModal
+                  onSubmit={(folderName) =>
+                    updateVM((draftVM) => {
+                      if (!folderName) {
+                        delete draftVM?.metadata?.labels?.[VM_FOLDER_LABEL];
+                        return;
+                      }
+                      draftVM.metadata.labels = {
+                        ...draftVM?.metadata?.labels,
+                        [VM_FOLDER_LABEL]: folderName,
+                      };
+                    })
+                  }
+                  isOpen={isOpen}
+                  onClose={onClose}
+                  vm={vm}
+                />
+              ))
+            }
+            description={getLabel(vm, VM_FOLDER_LABEL)}
+            isEdit
+            testId="wizard-overview-folder"
+            title={t('Folder')}
           />
 
           <WizardDescriptionItem

@@ -1,6 +1,7 @@
 import React, { FC, memo } from 'react';
 
 import { DRAWER_FORM_ID } from '@catalog/templatescatalog/utils/consts';
+import FolderSelect from '@kubevirt-utils/components/FolderSelect/FolderSelect';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import {
   RUNSTRATEGY_ALWAYS,
@@ -43,11 +44,13 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
 
     const {
       createError,
+      folder,
       isCustomizeDisabled,
       isCustomizeLoading,
       isQuickCreateDisabled,
       isQuickCreateLoading,
       nameField,
+      onChangeFolder,
       onChangeStartVM,
       onCustomize,
       onQuickCreate,
@@ -74,6 +77,17 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
                       onChange={(_, value: string) => onVMNameChange(value)}
                       type="text"
                       value={nameField}
+                    />
+                  </FormGroup>
+                </SplitItem>
+                <SplitItem>
+                  <FormGroup fieldId="vm-folder-field" isRequired label={t('Folder')}>
+                    <FolderSelect
+                      setSelectedFolder={(newFolder) => {
+                        onChangeFolder(newFolder);
+                      }}
+                      namespace={namespace}
+                      selectedFolder={folder}
                     />
                   </FormGroup>
                 </SplitItem>
