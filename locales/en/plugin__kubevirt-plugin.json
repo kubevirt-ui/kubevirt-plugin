@@ -1393,6 +1393,8 @@
   "VirtIO": "VirtIO",
   "Virtual machine is not running": "Virtual machine is not running",
   "Virtual Machines": "Virtual Machines",
+  "Virtual Machines ({{count}})_one": "Virtual Machines ({{count}})",
+  "Virtual Machines ({{count}})_other": "Virtual Machines ({{count}})",
   "Virtualization": "Virtualization",
   "Virtualization Alerts": "Virtualization Alerts",
   "Virtualization Alerts donut chart": "Virtualization Alerts donut chart",

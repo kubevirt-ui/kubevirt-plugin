@@ -13,10 +13,16 @@ import './VMStatusesCard.scss';
 type VMStatusItemProps = {
   count: number;
   namespace?: string;
+  onFilterChange?: () => void;
   status: string;
 };
 
-const VMStatusItem: React.FC<VMStatusItemProps> = ({ count, namespace, status }) => {
+const VMStatusItem: React.FC<VMStatusItemProps> = ({
+  count,
+  namespace,
+  onFilterChange,
+  status,
+}) => {
   const Icon = vmStatusIcon[status];
   const path = `/k8s/${
     isAllNamespaces(namespace) ? ALL_NAMESPACES : `ns/${namespace}`
@@ -28,7 +34,14 @@ const VMStatusItem: React.FC<VMStatusItemProps> = ({ count, namespace, status })
         <div className="vm-statuses-card__status-item--count">
           <span className="vm-statuses-card__status-item--icon">{Icon && <Icon />}</span>
           <span className="vm-statuses-card__status-item--value">
-            <Link to={path}>{count.toString()}</Link>
+            <Link
+              onClick={() => {
+                onFilterChange?.();
+              }}
+              to={path}
+            >
+              {count.toString()}
+            </Link>
           </span>
         </div>
         <div className="vm-statuses-card__status-item--status">{status}</div>

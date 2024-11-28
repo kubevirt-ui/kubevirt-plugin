@@ -41,6 +41,7 @@ import { useVMListFilters } from '../utils';
 
 import VirtualMachineActionButton from './components/VirtualMachineActionButton';
 import VirtualMachineEmptyState from './components/VirtualMachineEmptyState/VirtualMachineEmptyState';
+import VirtualMachineListSummary from './components/VirtualMachineListSummary/VirtualMachineListSummary';
 import VirtualMachineRow from './components/VirtualMachineRow/VirtualMachineRow';
 import VirtualMachinesCreateButton from './components/VirtualMachinesCreateButton/VirtualMachinesCreateButton';
 import useSelectedFilters from './hooks/useSelectedFilters';
@@ -165,6 +166,11 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
   if (loaded && noVMs) {
     return (
       <VirtualMachineTreeView>
+        <VirtualMachineListSummary
+          namespace={namespace}
+          onFilterChange={onFilterChange}
+          vms={data}
+        />
         <VirtualMachineEmptyState catalogURL={catalogURL} namespace={namespace} />
       </VirtualMachineTreeView>
     );
@@ -173,16 +179,19 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
   return (
     /* All of this table and components should be replaced to our own fitted components */
     <VirtualMachineTreeView onFilterChange={onFilterChange}>
-      <ListPageHeader title={t('VirtualMachines')}>
-        <Flex>
-          <FlexItem>
-            <VirtualMachineActionButton />
-          </FlexItem>
-          <FlexItem>
-            <VirtualMachinesCreateButton namespace={namespace} />
-          </FlexItem>
-        </Flex>
-      </ListPageHeader>
+      <VirtualMachineListSummary namespace={namespace} onFilterChange={onFilterChange} vms={data} />
+      <div className="vm-list-page-header">
+        <ListPageHeader title={t('VirtualMachines')}>
+          <Flex>
+            <FlexItem>
+              <VirtualMachineActionButton />
+            </FlexItem>
+            <FlexItem>
+              <VirtualMachinesCreateButton namespace={namespace} />
+            </FlexItem>
+          </Flex>
+        </ListPageHeader>
+      </div>
       <ListPageBody>
         <div className="vm-listpagebody">
           <div className="list-managment-group">

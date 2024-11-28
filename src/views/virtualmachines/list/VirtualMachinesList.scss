@@ -15,3 +15,9 @@
     max-width: 50px;
   }
 }
+
+.vm-list-page-header {
+  h1.co-m-pane__heading {
+    font-size: var(--pf-v5-global--FontSize--lg);
+  }
+}
