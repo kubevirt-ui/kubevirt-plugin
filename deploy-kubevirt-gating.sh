@@ -88,6 +88,13 @@ spec:
     sourceNamespace: openshift-marketplace
     name: community-kubevirt-hyperconverged
     channel: ${HCO_SUBSCRIPTION_CHANNEL}
+    config:
+        selector:
+          matchLabels:
+            name: hyperconverged-cluster-operator
+        env:
+        - name: KVM_EMULATION
+          value: "true"
 EOF
 
 
