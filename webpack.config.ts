@@ -23,7 +23,7 @@ const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 const isProd = process.env.NODE_ENV === 'production';
 
-const KUBEVIRT_PLUGIN_PORT = process.env.KUBEVIRT_PLUGIN_PORT || 9001;
+const KUBEVIRT_PLUGIN_PORT = process.env.PORT || process.env.KUBEVIRT_PLUGIN_PORT || 9001;
 
 const config: Configuration = {
   context: path.resolve(__dirname, 'src'),

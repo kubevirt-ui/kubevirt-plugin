@@ -4,7 +4,7 @@ set -euo pipefail
 
 #Cloning, pulling and running other plugins starting from port 9002
 # to add more plugin simply add more properites to dic. [name-of-plugin]={git-repo-url}
-declare -A plugins=(["monitoring-plugin"]="https://github.com/openshift/monitoring-plugin.git")
+declare -A plugins=(["monitoring-plugin"]="https://github.com/openshift/monitoring-plugin.git", ["networking-console-plugin"]="https://github.com/openshift/networking-console-plugin.git")
 declare -A runningPlugins=(["podman-linux"]="kubevirt-plugin=http://localhost:9001", ["podman"]="kubevirt-plugin=http://host.containers.internal:9001", ["docker"]="kubevirt-plugin=http://host.docker.internal:9001")
 
 INITIAL_PORT=9002
@@ -31,7 +31,7 @@ for arg in $@; do
         kill -9 $(lsof -t -i:$INITIAL_PORT)
     fi
 
-    yarn start --port=$INITIAL_PORT &
+    PORT=$INITIAL_PORT yarn start --port=$INITIAL_PORT &
 
     runningPlugins["podman-linux"]+=",${arg}=http://localhost:${INITIAL_PORT}"
     runningPlugins["podman"]+=",${arg}=http://host.containers.internal:${INITIAL_PORT}"
@@ -67,7 +67,7 @@ if [ -x "$(command -v podman)" ]; then
         podman run --pull=always --rm --network=host --env-file <(set | grep BRIDGE) $CONSOLE_IMAGE
     else
         BRIDGE_PLUGINS="${runningPlugins["podman"]}"
-        podman run --pull=always --rm -p "$CONSOLE_PORT":9000 --env-file <(set | grep BRIDGE) $CONSOLE_IMAGE
+        podman run --platform=linux/x86_64 --pull=always --rm -p "$CONSOLE_PORT":9000 --env-file <(set | grep BRIDGE) $CONSOLE_IMAGE
     fi
 else
     BRIDGE_PLUGINS="${runningPlugins["docker"]}"
