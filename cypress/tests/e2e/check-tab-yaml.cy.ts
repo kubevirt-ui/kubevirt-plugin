@@ -1,6 +1,13 @@
 import { Example, WithYAML } from '../../utils/const/string';
 import { TEMPLATE } from '../../utils/const/template';
-import { breadcrumb, itemCreateBtn, nameFilter, saveBtn } from '../../views/selector';
+import {
+  breadcrumb,
+  iconStartBtn,
+  itemCreateBtn,
+  nameFilter,
+  saveBtn,
+  vmStatusOnOverview,
+} from '../../views/selector';
 import { tab } from '../../views/tab';
 
 describe('Check all virtualization pages can be loaded', () => {
@@ -19,6 +26,24 @@ describe('Check all virtualization pages can be loaded', () => {
       cy.get(saveBtn).click();
     });
 
+    it('start example vm', () => {
+      cy.get(iconStartBtn).click();
+      cy.wait(15000);
+    });
+
+    it(
+      'check the status of example vm',
+      {
+        retries: {
+          runMode: 8,
+        },
+      },
+      () => {
+        cy.contains(vmStatusOnOverview, 'Running').should('be.visible');
+        cy.wait(10000);
+      },
+    );
+
     it('vm tabs are loaded', () => {
       cy.contains('Machine type').should('be.visible');
 
@@ -32,7 +57,7 @@ describe('Check all virtualization pages can be loaded', () => {
       cy.contains('event').should('be.visible');
 
       tab.navigateToConsole();
-      cy.contains('This VirtualMachine is down').should('be.visible');
+      cy.contains('Guest login credentials').should('be.visible');
 
       // skip the test due to error happens on this page
       // tab.navigateToSnapshots();
