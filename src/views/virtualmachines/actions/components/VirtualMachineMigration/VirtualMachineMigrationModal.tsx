@@ -68,6 +68,8 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
     setMigrationLoading(false);
   };
 
+  const nothingSelected = !entireVMSelected(selectedPVCs) && isEmpty(selectedPVCs);
+
   return (
     <Modal
       className="virtual-machine-migration-modal"
@@ -90,7 +92,7 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
           title={t('Migrate VirtualMachine storage')}
         >
           <WizardStep
-            footer={{ isNextDisabled: entireVMSelected(selectedPVCs) || !isEmpty(selectedPVCs) }}
+            footer={{ isNextDisabled: nothingSelected }}
             id="wizard-migration-details"
             name={t('Migration details')}
           >
