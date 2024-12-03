@@ -23,6 +23,7 @@ Cypress.Commands.add('login', (provider: string, username: string, password: str
     // Make sure we clear the cookie in case a previous test failed to logout.
     cy.clearCookie('openshift-session-token');
 
+    cy.get('[data-test-id=login]', { timeout: 30000 }).should('be.visible');
     const idp = provider || KUBEADMIN_IDP;
     cy.task('log', `  Logging in as ${username || KUBEADMIN_USERNAME}`);
     cy.byLegacyTestID('login').should('be.visible');

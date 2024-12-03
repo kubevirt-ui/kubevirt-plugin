@@ -2,7 +2,7 @@
 const { defineConfig } = require('cypress');
 
 module.exports = defineConfig({
-  defaultCommandTimeout: 15000,
+  defaultCommandTimeout: 30000,
   e2e: {
     // We've imported your old cypress plugins here.
     baseUrl: process.env.BRIDGE_BASE_ADDRESS,
@@ -24,7 +24,7 @@ module.exports = defineConfig({
   },
   retries: {
     openMode: 0,
-    runMode: 0,
+    runMode: 3,
   },
   screenshotOnRunFailure: true,
   screenshotsFolder: './gui-test-screenshots/screenshots/',

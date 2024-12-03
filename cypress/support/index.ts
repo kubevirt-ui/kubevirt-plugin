@@ -20,3 +20,12 @@ Cypress.on('uncaught:exception', () => {
 });
 
 Cypress.Cookies.debug(true);
+
+// ignore fetch in command log
+const origLog = Cypress.log;
+Cypress.log = function (opts, ...other) {
+  if (opts.displayName === 'fetch') {
+    return;
+  }
+  return origLog(opts, ...other);
+};

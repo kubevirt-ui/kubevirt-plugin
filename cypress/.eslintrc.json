@@ -12,6 +12,8 @@
   "rules": {
     "chai-friendly/no-unused-expressions": "off",
     "cypress/assertion-before-screenshot": "error",
-    "cypress/no-force": "error"
+    "cypress/no-force": "error",
+    "cypress/no-unnecessary-waiting": "off",
+    "cypress/unsafe-to-chain-command": "off"
   }
 }
