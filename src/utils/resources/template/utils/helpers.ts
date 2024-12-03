@@ -2,8 +2,9 @@ import produce from 'immer';
 
 import { TemplateParameter, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1DataVolumeTemplateSpec, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
+import { getDataVolumeTemplates } from '@kubevirt-utils/resources/vm';
 import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 
 import { ANNOTATIONS } from './annotations';
@@ -12,7 +13,7 @@ import {
   TEMPLATE_TYPE_BASE,
   TEMPLATE_TYPE_LABEL,
 } from './constants';
-import { getTemplatePVCName } from './selectors';
+import { getTemplatePVCName, getTemplateVirtualMachineObject } from './selectors';
 
 // Only used for replacing parameters in the template, do not use for anything else
 // eslint-disable-next-line require-jsdoc
@@ -69,4 +70,11 @@ export const generateParamsWithPrettyName = (template: V1Template) => {
     return [...restParams, generateVMNamePrettyParam(template) ?? nameParam];
   }
   return [];
+};
+
+export const bootDiskSourceIsRegistry = (template: V1Template) => {
+  const vmObject: V1VirtualMachine = getTemplateVirtualMachineObject(template);
+  const dvTemplates: V1DataVolumeTemplateSpec[] = getDataVolumeTemplates(vmObject);
+  const dvTemplate = dvTemplates[0];
+  return Boolean(dvTemplate?.spec?.source?.registry);
 };

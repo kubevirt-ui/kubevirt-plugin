@@ -7,6 +7,7 @@ import React, {
   useRef,
 } from 'react';
 
+import { useDrawerContext } from '@catalog/templatescatalog/components/TemplatesCatalogDrawer/hooks/useDrawerContext';
 import { V1beta1DataVolumeSpec, V1ContainerDiskSource } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
 import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
@@ -66,6 +67,7 @@ export const SelectSource: FC<SelectSourceProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const initialDiskSource = useRef(selectedSource);
+  const { registryCredentials, setRegistryCredentials } = useDrawerContext();
 
   const volumeQuantity = getQuantityFromSource(selectedSource as V1beta1DataVolumeSpec);
 
@@ -182,8 +184,10 @@ export const SelectSource: FC<SelectSourceProps> = ({
       {[CONTAINER_DISK_SOURCE_NAME, REGISTRY_SOURCE_NAME].includes(selectedSourceType) && (
         <ContainerSource
           onInputValueChange={onInputValueChange}
+          registryCredentials={registryCredentials}
           registrySourceHelperText={registrySourceHelperText}
           selectedSourceType={selectedSourceType}
+          setRegistryCredentials={setRegistryCredentials}
           testId={testId}
         />
       )}
