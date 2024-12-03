@@ -2,6 +2,7 @@ import {
   V1AccessCredential,
   V1Bootloader,
   V1CPU,
+  V1DataVolumeTemplateSpec,
   V1Devices,
   V1Disk,
   V1DomainSpec,
@@ -78,6 +79,17 @@ export const getVolumeSnapshotStatuses = (vm: V1VirtualMachine) =>
  * @returns the virtual machine host devices
  */
 export const getDataVolumeTemplates = (vm: V1VirtualMachine) => vm?.spec?.dataVolumeTemplates || [];
+
+/**
+ * A selector for the virtual machine's root data volume
+ * @param {V1VirtualMachine} vm the virtual machine
+ * @returns the virtual machine's root data volume
+ */
+export const getRootDataVolumeTemplateSpec = (vm: V1VirtualMachine): V1DataVolumeTemplateSpec => {
+  const volume = getVolumes(vm)?.find((v) => v.name === ROOTDISK);
+
+  return vm.spec.dataVolumeTemplates?.find((dv) => dv.metadata.name === volume?.dataVolume?.name);
+};
 
 /**
  * A selector for the virtual machine's config maps

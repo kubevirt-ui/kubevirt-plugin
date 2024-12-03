@@ -11,13 +11,12 @@ import {
   DEFAULT_CDROM_DISK_SIZE,
   DEFAULT_DISK_SIZE,
 } from '@kubevirt-utils/components/DiskModal/utils/constants';
-import { ROOTDISK } from '@kubevirt-utils/constants/constants';
 import { UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import {
   getTemplateParameterValue,
   getTemplateVirtualMachineObject,
 } from '@kubevirt-utils/resources/template';
-import { getVolumes } from '@kubevirt-utils/resources/vm';
+import { getRootDataVolumeTemplateSpec, getVolumes } from '@kubevirt-utils/resources/vm';
 import { ensurePath, isEmpty, removeDockerPrefix } from '@kubevirt-utils/utils/utils';
 
 import { INSTALLATION_CDROM_NAME } from './StorageSection/constants';
@@ -79,12 +78,6 @@ export const changeTemplateParameterValue = (
   });
 
   return template;
-};
-
-export const getRootDataVolume = (vm: V1VirtualMachine) => {
-  const volume = getVolumes(vm)?.find((v) => v.name === ROOTDISK);
-
-  return vm.spec.dataVolumeTemplates?.find((dv) => dv.metadata.name === volume?.dataVolume?.name);
 };
 
 export const getUploadDataVolume = (
@@ -175,7 +168,7 @@ export const uploadFiles: UploadFiles = ({
   uploadDiskData,
   vm,
 }) => {
-  const dataVolumeTemplate = getRootDataVolume(vm);
+  const dataVolumeTemplate = getRootDataVolumeTemplateSpec(vm);
 
   const diskDVName = dataVolumeTemplate?.metadata?.name;
   const cdDVName = `${vm?.metadata?.name}-${INSTALLATION_CDROM_NAME}`;

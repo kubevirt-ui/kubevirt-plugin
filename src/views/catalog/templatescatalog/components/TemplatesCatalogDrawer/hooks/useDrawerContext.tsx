@@ -46,8 +46,10 @@ export type DrawerContext = {
   diskFile: File | string;
   diskUpload: DataUpload;
   isBootSourceAvailable: boolean;
+  registryCredentials: { password: string; username: string };
   setCDFile: (file: File | string) => void;
   setDiskFile: (file: File | string) => void;
+  setRegistryCredentials: (credentials: { password: string; username: string }) => void;
   setSSHDetails: (details: SSHSecretDetails) => void;
   setStorageClassName: (scName: string) => void;
   setTemplate: Updater<V1Template>;
@@ -74,6 +76,8 @@ const useDrawer = (template: V1Template) => {
   const [diskFile, setDiskFile] = useState<File | string>();
   const [cdFile, setCDFile] = useState<File | string>();
   const [storageClassName, setStorageClassName] = useState<string>(null);
+
+  const [registryCredentials, setRegistryCredentials] = useState({ password: '', username: '' });
 
   const [templateWithGeneratedParams, loading, error] = useVMTemplateGeneratedParams(template);
   const [{ clusterDefaultStorageClass, virtDefaultStorageClass }] = useDefaultStorageClass();
@@ -124,8 +128,10 @@ const useDrawer = (template: V1Template) => {
     diskFile,
     diskUpload,
     isBootSourceAvailable: isDefaultDiskSource ? isBootSourceAvailable : true,
+    registryCredentials,
     setCDFile,
     setDiskFile,
+    setRegistryCredentials,
     setSSHDetails,
     setStorageClassName,
     setTemplate: setCustomizedTemplate,

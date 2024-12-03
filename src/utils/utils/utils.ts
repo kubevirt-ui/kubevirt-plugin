@@ -53,6 +53,8 @@ export const getRandomChars = (len = 6): string => {
     .substr(1, len);
 };
 
+export const addRandomSuffix = (str: string) => str.concat(`-${getRandomChars()}`);
+
 export const SSH_PUBLIC_KEY_VALIDATION_REGEX =
   /^(sk-)?(ssh-rsa AAAAB3NzaC1yc2|ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNT|ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzOD|ecdsa-sha2-nistp521 AAAAE2VjZHNhLXNoYTItbmlzdHA1MjEAAAAIbmlzdHA1Mj|ssh-ed25519 AAAAC3NzaC1lZDI1NTE5|ssh-dss AAAAB3NzaC1kc3)[0-9A-Za-z+/]+[=]{0,3}( .*)?$/;
 
@@ -152,5 +154,6 @@ export const appendDockerPrefix = (image: string) => {
   return image?.startsWith(DOCKER_PREFIX) ? image : DOCKER_PREFIX.concat(image);
 };
 export const removeDockerPrefix = (image: string) => image?.replace(DOCKER_PREFIX, '');
+
 export const isAllNamespaces = (namespace: string) =>
   !namespace || namespace === ALL_NAMESPACES || namespace === ALL_NAMESPACES_SESSION_KEY;

@@ -1,13 +1,14 @@
 import { Buffer } from 'buffer';
 
-import { SecretModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   SecretSelectionOption,
   SSHSecretDetails,
 } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
+import { SecretModel } from '@kubevirt-utils/models';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
 import { getName } from '../shared';
 
@@ -67,3 +68,29 @@ export const getInitialSSHDetails = ({
         sshSecretName: sshSecretName || '',
         sshSecretNamespace: '',
       };
+
+type CreateSecretType = (input: {
+  namespace: string;
+  password: string;
+  secretName: string;
+  username: string;
+}) => Promise<IoK8sApiCoreV1Secret>;
+
+export const createSecret: CreateSecretType = ({ namespace, password, secretName, username }) =>
+  k8sCreate({
+    data: {
+      apiVersion: 'v1',
+      data: {
+        accessKeyId: encodeSecretKey(username),
+        secretKey: encodeSecretKey(password),
+      },
+      kind: 'Secret',
+      metadata: {
+        name: secretName,
+        namespace,
+      },
+      type: 'Opaque',
+    },
+    model: SecretModel,
+    ns: namespace,
+  });

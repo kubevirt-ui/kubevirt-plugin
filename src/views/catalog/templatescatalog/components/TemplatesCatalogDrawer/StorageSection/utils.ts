@@ -11,10 +11,8 @@ import { ROOTDISK } from '@kubevirt-utils/constants/constants';
 import { CDI_BIND_REQUESTED_ANNOTATION } from '@kubevirt-utils/hooks/useCDIUpload/consts';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateContainerDisks } from '@kubevirt-utils/resources/template';
-import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
+import { getDisks, getRootDataVolumeTemplateSpec, getVolumes } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-
-import { getRootDataVolume } from '../utils';
 
 export const getRegistryHelperText = (template: V1Template) => {
   const containerDisks = getTemplateContainerDisks(template);
@@ -68,7 +66,7 @@ export const overrideVirtualMachineDataVolumeSpec = (
   customSource?: V1beta1DataVolumeSpec,
 ): V1VirtualMachine => {
   return produceVMDisks(virtualMachine, (draftVM) => {
-    const rootDataVolume = getRootDataVolume(draftVM);
+    const rootDataVolume = getRootDataVolumeTemplateSpec(draftVM);
 
     if (isEmpty(customSource)) return;
 
