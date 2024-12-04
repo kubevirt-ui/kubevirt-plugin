@@ -44,6 +44,7 @@ const VirtualMachineDiagnosticTab: FC<NavPageComponentProps> = ({ obj: vm }) => 
       >
         <Tab
           className="VirtualMachineDiagnosticTab--main__content"
+          data-test-id="vm-diagnostics-status-conditions"
           eventKey={VirtualMachineDetailsTab.Tables}
           title={<TabTitleText>{t('Status & Conditions')}</TabTitleText>}
         >
@@ -55,6 +56,7 @@ const VirtualMachineDiagnosticTab: FC<NavPageComponentProps> = ({ obj: vm }) => 
         </Tab>
         <Tab
           className="VirtualMachineDiagnosticTab--main__content"
+          data-test-id="vm-diagnostics-guest-system-log"
           eventKey={VirtualMachineDetailsTab.Logs}
           title={<TabTitleText>{t('Guest system log')}</TabTitleText>}
         >
