@@ -46,6 +46,7 @@ import VirtualMachineRow from './components/VirtualMachineRow/VirtualMachineRow'
 import VirtualMachinesCreateButton from './components/VirtualMachinesCreateButton/VirtualMachinesCreateButton';
 import useSelectedFilters from './hooks/useSelectedFilters';
 import useVirtualMachineColumns from './hooks/useVirtualMachineColumns';
+import useVMMetrics from './hooks/useVMMetrics';
 import { deselectAll, selectAll, selectedVMs } from './selectedVMs';
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
@@ -63,6 +64,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
   const isProxyPodAlive = useKubevirtDataPodHealth();
 
   useSignals();
+  useVMMetrics();
 
   const query = useQuery();
 
