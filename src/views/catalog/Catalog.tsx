@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 import { Route, Routes } from 'react-router-dom-v5-compat';
 
+import useSetDefaultNonAdminUserProject from '@kubevirt-utils/hooks/useSetDefaultNonAdminUserProject/useSetDefaultNonAdminUserProject';
 import { useSignals } from '@preact/signals-react/runtime';
 
 import CreateVMHorizontalNav from './CreateVMHorizontalNav/CreateVMHorizontalNav';
@@ -10,6 +11,7 @@ import Wizard from './wizard/Wizard';
 
 const Catalog: FC = () => {
   useSignals();
+  useSetDefaultNonAdminUserProject();
   return (
     <WizardVMContextProvider>
       <Routes>
