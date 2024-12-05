@@ -4,6 +4,7 @@ export const vmStatusOnOverview = '[data-test-id="virtual-machine-overview-detai
 export const itemCreateBtn = '[data-test="item-create"]';
 export const saveBtn = '[data-test="save-changes"]';
 export const vmActionStart = '[data-test-id="vm-action-start"]';
+export const iconStartBtn = '[data-test-id="vm-action-start-button"]';
 export const virtualizationNav = '[data-test-id="virtualization-nav-item"]';
 export const overviewNav = '[data-test-id="virtualization-overview-nav-item"]';
 export const catalogNav = '[data-test-id="virtualization-catalog-nav-item"]';
