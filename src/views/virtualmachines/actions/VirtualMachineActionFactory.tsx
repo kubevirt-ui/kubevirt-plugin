@@ -9,9 +9,7 @@ import {
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
-import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import CloneVMModal from '@kubevirt-utils/components/CloneVMModal/CloneVMModal';
-import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
 import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SnapshotModal from '@kubevirt-utils/components/SnapshotModal/SnapshotModal';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -21,7 +19,9 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Action, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { CopyIcon } from '@patternfly/react-icons';
 import VirtualMachineMigrateModal from '@virtualmachines/actions/components/VirtualMachineMigration/VirtualMachineMigrationModal';
+import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
+import MoveVMToFolderModal from '../../../utils/components/MoveVMToFolderModal/MoveVMToFolderModal';
 import {
   isLiveMigratable,
   isRestoring,
@@ -108,65 +108,6 @@ export const VirtualMachineActionFactory = {
       label: t('Delete'),
     };
   },
-  editAnnotations: (vm: V1VirtualMachine, createModal: (modal: ModalComponent) => void): Action => {
-    return {
-      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
-      cta: () =>
-        createModal(({ isOpen, onClose }) => (
-          <AnnotationsModal
-            onSubmit={(updatedAnnotations) =>
-              k8sPatch({
-                data: [
-                  {
-                    op: 'replace',
-                    path: '/metadata/annotations',
-                    value: updatedAnnotations,
-                  },
-                ],
-                model: VirtualMachineModel,
-                resource: vm,
-              })
-            }
-            isOpen={isOpen}
-            obj={vm}
-            onClose={onClose}
-          />
-        )),
-      disabled: false,
-      id: 'vm-action-edit-annotations',
-      label: t('Edit annotations'),
-    };
-  },
-
-  editLabels: (vm: V1VirtualMachine, createModal: (modal: ModalComponent) => void): Action => {
-    return {
-      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
-      cta: () =>
-        createModal(({ isOpen, onClose }) => (
-          <LabelsModal
-            onLabelsSubmit={(labels) =>
-              k8sPatch({
-                data: [
-                  {
-                    op: 'replace',
-                    path: '/metadata/labels',
-                    value: labels,
-                  },
-                ],
-                model: VirtualMachineModel,
-                resource: vm,
-              })
-            }
-            isOpen={isOpen}
-            obj={vm}
-            onClose={onClose}
-          />
-        )),
-      disabled: false,
-      id: 'vm-action-edit-labels',
-      label: t('Edit labels'),
-    };
-  },
   forceStop: (vm: V1VirtualMachine): Action => {
     return {
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
@@ -213,6 +154,40 @@ export const VirtualMachineActionFactory = {
     label: 'Migration',
     options: migrationActions,
   }),
+  moveToFolder: (vm: V1VirtualMachine, createModal: (modal: ModalComponent) => void): Action => {
+    return {
+      accessReview: {
+        group: VirtualMachineModel.apiGroup,
+        namespace: getNamespace(vm),
+        resource: VirtualMachineModel.plural,
+        verb: 'patch',
+      },
+      cta: () =>
+        createModal((props) => (
+          <MoveVMToFolderModal
+            onSubmit={(folderName) => {
+              const labels = vm?.metadata?.labels || {};
+              labels[VM_FOLDER_LABEL] = folderName;
+              return k8sPatch({
+                data: [
+                  {
+                    op: 'replace',
+                    path: '/metadata/labels',
+                    value: labels,
+                  },
+                ],
+                model: VirtualMachineModel,
+                resource: vm,
+              });
+            }}
+            vm={vm}
+            {...props}
+          />
+        )),
+      id: 'vm-action-move-to-folder',
+      label: t('Move to folder'),
+    };
+  },
   pause: (vm: V1VirtualMachine): Action => {
     return {
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),

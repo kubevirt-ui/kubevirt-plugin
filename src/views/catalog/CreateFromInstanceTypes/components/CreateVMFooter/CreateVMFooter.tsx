@@ -101,13 +101,13 @@ const CreateVMFooter: FC = () => {
     setIsSubmitting(true);
     setError(null);
 
-    const vmToCreate = generateVM(
-      instanceTypeVMState,
-      vmNamespaceTarget,
+    const vmToCreate = generateVM({
+      autoUpdateEnabled,
+      instanceTypeState: instanceTypeVMState,
       startVM,
       subscriptionData,
-      autoUpdateEnabled,
-    );
+      targetNamespace: vmNamespaceTarget,
+    });
 
     logITFlowEvent(CREATE_VM_BUTTON_CLICKED, vmToCreate);
 
@@ -164,21 +164,21 @@ const CreateVMFooter: FC = () => {
 
     try {
       await setVM(
-        generateVM(
-          instanceTypeVMState,
-          vmNamespaceTarget,
+        generateVM({
+          autoUpdateEnabled,
+          instanceTypeState: instanceTypeVMState,
           startVM,
           subscriptionData,
-          autoUpdateEnabled,
-        ),
+          targetNamespace: vmNamespaceTarget,
+        }),
       );
-      vmSignal.value = generateVM(
-        instanceTypeVMState,
-        vmNamespaceTarget,
+      vmSignal.value = generateVM({
+        autoUpdateEnabled,
+        instanceTypeState: instanceTypeVMState,
         startVM,
         subscriptionData,
-        autoUpdateEnabled,
-      );
+        targetNamespace: vmNamespaceTarget,
+      });
 
       logITFlowEvent(CUSTOMIZE_VM_BUTTON_CLICKED, vmSignal.value);
 
@@ -260,13 +260,13 @@ const CreateVMFooter: FC = () => {
                   logITFlowEvent(VIEW_YAML_AND_CLI_CLICKED, null, { vmName: vmName });
                   createModal((props) => (
                     <YamlAndCLIViewerModal
-                      vm={generateVM(
-                        instanceTypeVMState,
-                        vmNamespaceTarget,
+                      vm={generateVM({
+                        autoUpdateEnabled,
+                        instanceTypeState: instanceTypeVMState,
                         startVM,
                         subscriptionData,
-                        autoUpdateEnabled,
-                      )}
+                        targetNamespace: vmNamespaceTarget,
+                      })}
                       {...props}
                     />
                   ));

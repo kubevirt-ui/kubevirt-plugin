@@ -35,6 +35,7 @@ import {
 } from '@kubevirt-utils/utils/headless-service';
 import { generatePrettyName, getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
 import { K8sGroupVersionKind, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
 import { AutomaticSubscriptionTypeEnum } from '../../../../views/clusteroverview/SettingsTab/ClusterTab/components/GuestManagmentSection/AutomaticSubscriptionRHELGuests/components/AutomaticSubscriptionType/utils/utils';
 import { useInstanceTypeVMStore } from '../state/useInstanceTypeVMStore';
@@ -88,15 +89,24 @@ export const createPopulatedCloudInitYAML = (
 
   return convertUserDataObjectToYAML(cloudInitConfig, true);
 };
+type GenerateVMArgs = {
+  autoUpdateEnabled?: boolean;
+  instanceTypeState: InstanceTypeVMState;
+  startVM: boolean;
+  subscriptionData: RHELAutomaticSubscriptionData;
+  targetNamespace: string;
+};
+type GenerateVMCallback = (props: GenerateVMArgs) => V1VirtualMachine;
 
-export const generateVM = (
-  instanceTypeState: InstanceTypeVMState,
-  targetNamespace: string,
-  startVM: boolean,
-  subscriptionData: RHELAutomaticSubscriptionData,
-  autoUpdateEnabled?: boolean,
-) => {
+export const generateVM: GenerateVMCallback = ({
+  autoUpdateEnabled,
+  instanceTypeState,
+  startVM,
+  subscriptionData,
+  targetNamespace,
+}) => {
   const {
+    folder,
     pvcSource,
     selectedBootableVolume,
     selectedInstanceType,
@@ -126,6 +136,7 @@ export const generateVM = (
     metadata: {
       name: virtualmachineName,
       namespace: targetNamespace,
+      ...(folder && { labels: { [VM_FOLDER_LABEL]: folder } }),
     },
     spec: {
       dataVolumeTemplates: [

@@ -36,7 +36,7 @@ import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeat
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
-import { getAnnotation, getResourceUrl } from '@kubevirt-utils/resources/shared';
+import { getAnnotation, getLabel, getResourceUrl } from '@kubevirt-utils/resources/shared';
 import {
   ANNOTATIONS,
   getTemplateOS,
@@ -51,6 +51,7 @@ import {
 } from '@kubevirt-utils/utils/headless-service';
 import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, useAccessReview, useK8sModels } from '@openshift-console/dynamic-plugin-sdk';
+import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
 import { getLabels } from '../../../../../clusteroverview/OverviewTab/inventory-card/utils/flattenTemplates';
 import { allRequiredParametersAreFulfilled, hasValidSource, uploadFiles } from '../utils';
@@ -280,8 +281,18 @@ const useCreateDrawerForm = (
     );
   };
 
+  const onChangeFolder = (folderName: string) => {
+    setVM(
+      produce(vm, (draftVM) => {
+        if (folderName && folderName !== getLabel(vm, VM_FOLDER_LABEL))
+          draftVM.metadata.labels = { ...vm?.metadata?.labels, [VM_FOLDER_LABEL]: folderName };
+      }),
+    );
+  };
+
   return {
     createError,
+    folder: getLabel(vm, VM_FOLDER_LABEL),
     isCustomizeDisabled: !processedTemplateAccessReview || isCustomizing,
     isCustomizeLoading: isCustomizing || modelsLoading,
     isQuickCreateDisabled:
@@ -294,6 +305,7 @@ const useCreateDrawerForm = (
       storageClassRequiredMissing,
     isQuickCreateLoading: isQuickCreating || modelsLoading,
     nameField,
+    onChangeFolder,
     onChangeStartVM,
     onCustomize,
     onQuickCreate,

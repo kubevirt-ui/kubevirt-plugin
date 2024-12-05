@@ -24,7 +24,7 @@ effect(() => {
 type UpdateCustomizeInstanceTypeArgs = {
   data: any;
   merge?: boolean;
-  path?: string;
+  path?: string | string[];
 }[];
 
 export type UpdateCustomizeInstanceType = (
@@ -49,7 +49,7 @@ export const updateCustomizeInstanceType: UpdateCustomizeInstanceType = (
     }
 
     vm = produce(vm, (vmDraft) => {
-      const pathParts = path.split('.');
+      const pathParts = typeof path === 'string' ? path.split('.') : path;
       let obj = vmDraft;
 
       pathParts.forEach((part: string, index: number) => {

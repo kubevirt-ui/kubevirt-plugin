@@ -16,6 +16,7 @@ export const treeDataMap = signal<Record<string, TreeViewDataItem>>(null);
 export const selectedTreeItem = signal<TreeViewDataItem[]>(null);
 export const setSelectedTreeItem = (selected: TreeViewDataItem) =>
   (selectedTreeItem.value = [selected]);
+
 const buildProjectMap = (
   vms: V1VirtualMachine[],
   currentPageVMName: string,

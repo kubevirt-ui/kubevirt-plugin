@@ -12,7 +12,7 @@ import { timestampFor } from '@kubevirt-utils/components/Timestamp/utils/datetim
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getName, getVMStatus } from '@kubevirt-utils/resources/shared';
+import { getLabel, getName, getVMStatus } from '@kubevirt-utils/resources/shared';
 import { getInstanceTypeMatcher, getMachineType } from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getOsNameFromGuestAgent } from '@kubevirt-utils/resources/vmi';
@@ -33,6 +33,7 @@ import {
 } from '@patternfly/react-core';
 import { createURL } from '@virtualmachines/details/tabs/overview/utils/utils';
 import VMNotMigratableLabel from '@virtualmachines/list/components/VMNotMigratableLabel/VMNotMigratableLabel';
+import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 import { printableVMStatus } from '@virtualmachines/utils';
 
 import InstanceTypeDescription from './components/InstanceTypeDescription';
@@ -112,6 +113,11 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
                   data-test-id="virtual-machine-overview-details-name"
                   descriptionData={getName(vm)}
                   descriptionHeader={t('Name')}
+                />
+                <VirtualMachineDescriptionItem
+                  data-test-id="virtual-machine-overview-details-folder"
+                  descriptionData={getLabel(vm, VM_FOLDER_LABEL) || NO_DATA_DASH}
+                  descriptionHeader={t('Folder')}
                 />
                 <VirtualMachineDescriptionItem
                   descriptionData={

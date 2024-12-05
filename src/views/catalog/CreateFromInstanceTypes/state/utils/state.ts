@@ -8,6 +8,7 @@ import { InstanceTypeVMState, InstanceTypeVMStoreState } from './types';
 
 export const instanceTypeVMInitialState: InstanceTypeVMState = {
   customDiskSize: '',
+  folder: '',
   isDynamicSSHInjection: false,
   pvcSource: null,
   selectedBootableVolume: null,
