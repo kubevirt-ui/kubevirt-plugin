@@ -59,6 +59,7 @@ const VirtualMachineConfigurationTab: FC<NavPageComponentProps> = ({ obj }) => {
           {tabs.map(({ Component, name, title }) => (
             <Tab
               className="VirtualMachineConfigurationTab--content"
+              data-test-id={`vm-configuration-${name}`}
               eventKey={name}
               key={name}
               onClick={() => redirectTab(name)}
