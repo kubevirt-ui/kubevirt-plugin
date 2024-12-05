@@ -19,7 +19,7 @@ export const useTreeViewSearch: UseTreeViewSearch = (treeData) => {
     (event: ChangeEvent<HTMLInputElement>) => {
       const input = event.target.value;
       if (input === '') {
-        return setFilteredItems(treeData);
+        return setFilteredItems(null);
       }
 
       const filtered = treeData
