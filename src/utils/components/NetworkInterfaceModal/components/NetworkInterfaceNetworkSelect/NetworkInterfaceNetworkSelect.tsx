@@ -151,14 +151,15 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
           <Loading />
         ) : (
           <SelectTypeahead
-            newOptionComponent={(inputValue) => (
+            getCreateOption={(inputValue) => (
               <>
                 {t(`Use "{{inputValue}}"`, { inputValue })}{' '}
                 <Label isCompact>{interfacesTypes.bridge} Binding</Label>
               </>
             )}
-            id="select-nad"
-            options={networkOptions}
+            dataTestId="select-nad"
+            initialOptions={networkOptions}
+            isFullWidth
             placeholder={t('Select a NetworkAttachmentDefinitions')}
             selected={networkName}
             setSelected={handleChange}
