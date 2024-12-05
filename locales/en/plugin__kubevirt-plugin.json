@@ -246,7 +246,6 @@
   "Checking this option will create a new PVC of the bootsource for the new template": "Checking this option will create a new PVC of the bootsource for the new template",
   "Checkups": "Checkups",
   "Clear all filters": "Clear all filters",
-  "Clear input value": "Clear input value",
   "CLI": "CLI",
   "Click <1>Add bootable volume</1> to add your first bootable volume": "Click <1>Add bootable volume</1> to add your first bootable volume",
   "Click <1>Create MigrationPolicy</1> to create your first policy": "Click <1>Create MigrationPolicy</1> to create your first policy",
