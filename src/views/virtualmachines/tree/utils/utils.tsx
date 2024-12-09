@@ -9,9 +9,14 @@ import { signal } from '@preact/signals-react';
 
 import { statusIcon } from '../icons/utils';
 
-import { FOLDER_SELECTOR_PREFIX, PROJECT_SELECTOR_PREFIX, VM_FOLDER_LABEL } from './constants';
+import {
+  FOLDER_SELECTOR_PREFIX,
+  PROJECT_SELECTOR_PREFIX,
+  SYSTEM_NAMESPACES,
+  SYSTEM_NAMESPACES_PREFIX,
+  VM_FOLDER_LABEL,
+} from './constants';
 
-export const treeViewOpen = signal<boolean>(true);
 export const treeDataMap = signal<Record<string, TreeViewDataItem>>(null);
 export const selectedTreeItem = signal<TreeViewDataItem[]>(null);
 export const setSelectedTreeItem = (selected: TreeViewDataItem) =>
@@ -174,4 +179,24 @@ export const filterItems = (item: TreeViewDataItem, input: string) => {
         .filter((child) => filterItems(child, input))).length > 0
     );
   }
+};
+
+export const filterDefaultNamespaceItems = (item: TreeViewDataItem) => {
+  if (item.id.startsWith(PROJECT_SELECTOR_PREFIX) && !isSystemNamespace(item.name as string)) {
+    return true;
+  }
+  if (item.children) {
+    return (
+      (item.children = item.children
+        .map((opt) => Object.assign({}, opt))
+        .filter((child) => filterDefaultNamespaceItems(child))).length > 0
+    );
+  }
+};
+
+export const isSystemNamespace = (projectName: string) => {
+  const startsWithNamespace = SYSTEM_NAMESPACES_PREFIX.some((ns) => projectName.startsWith(ns));
+  const isNamespace = SYSTEM_NAMESPACES.includes(projectName);
+
+  return startsWithNamespace || isNamespace;
 };
