@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import {
@@ -17,9 +17,13 @@ import { setSelectedTreeItem, treeDataMap } from '@virtualmachines/tree/utils/ut
 import VirtualMachineStatus from '../VirtualMachineStatus/VirtualMachineStatus';
 import { VMStatusConditionLabelList } from '../VMStatusConditionLabel';
 
+import CPUPercentage from './components/CPUPercentage';
+import MemoryPercentage from './components/MemoryPercentage';
+import NetworkUsage from './components/NetworkUsage';
+
 import './virtual-machine-row-layout.scss';
 
-const VirtualMachineRowLayout: React.FC<
+const VirtualMachineRowLayout: FC<
   RowProps<
     V1VirtualMachine,
     {
@@ -31,6 +35,9 @@ const VirtualMachineRowLayout: React.FC<
   >
 > = ({ activeColumnIDs, obj, rowData: { ips, isSingleNodeCluster, node, vmim } }) => {
   const selected = isVMSelected(obj);
+
+  const vmName = useMemo(() => getName(obj), [obj]);
+  const vmNamespace = useMemo(() => getNamespace(obj), [obj]);
 
   const [actions] = useVirtualMachineActionsProvider(obj, vmim, isSingleNodeCluster);
   return (
@@ -45,11 +52,11 @@ const VirtualMachineRowLayout: React.FC<
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="name">
         <ResourceLink
           onClick={() => {
-            setSelectedTreeItem(treeDataMap.value[`${getNamespace(obj)}/${getName(obj)}`]);
+            setSelectedTreeItem(treeDataMap.value[`${vmNamespace}/${vmName}`]);
           }}
           groupVersionKind={VirtualMachineModelGroupVersionKind}
-          name={getName(obj)}
-          namespace={getNamespace(obj)}
+          name={vmName}
+          namespace={vmNamespace}
         />
       </TableData>
       <TableData
@@ -57,7 +64,7 @@ const VirtualMachineRowLayout: React.FC<
         className="pf-m-width-10 vm-column"
         id="namespace"
       >
-        <ResourceLink kind="Namespace" name={getNamespace(obj)} />
+        <ResourceLink kind="Namespace" name={vmNamespace} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-15 vm-column" id="status">
         <VirtualMachineStatus vm={obj} />
@@ -81,6 +88,15 @@ const VirtualMachineRowLayout: React.FC<
         id="ip-address"
       >
         {ips}
+      </TableData>
+      <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="memory-usage">
+        <MemoryPercentage vmName={vmName} vmNamespace={vmNamespace} />
+      </TableData>
+      <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="cpu-usage">
+        <CPUPercentage vmName={vmName} vmNamespace={vmNamespace} />
+      </TableData>
+      <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="network-usage">
+        <NetworkUsage vmName={vmName} vmNamespace={vmNamespace} />
       </TableData>
       <TableData
         activeColumnIDs={activeColumnIDs}

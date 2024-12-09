@@ -83,6 +83,21 @@ const useVirtualMachineColumns = (
         title: t('IP address'),
       },
       {
+        additional: true,
+        id: 'memory-usage',
+        title: t('Memory'),
+      },
+      {
+        additional: true,
+        id: 'cpu-usage',
+        title: t('CPU'),
+      },
+      {
+        additional: true,
+        id: 'network-usage',
+        title: t('Network'),
+      },
+      {
         id: '',
         props: { className: 'dropdown-kebab-pf pf-v5-c-table__action' },
         title: '',
