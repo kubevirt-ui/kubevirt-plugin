@@ -206,7 +206,6 @@ describe('Check all virtualization pages can be loaded', () => {
       cy.contains('fedora').should('exist');
     });
 
-    // TODO: revert after https://issues.redhat.com/browse/CNV-51198
     xit('create bootable volume from yaml', () => {
       cy.get(itemCreateBtn).click();
       cy.byButtonText(WithYAML).click();

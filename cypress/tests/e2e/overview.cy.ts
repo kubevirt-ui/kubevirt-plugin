@@ -9,8 +9,7 @@ const tickWelcomeModal = () => {
   });
 };
 
-// skip the test due to it cannot close the welcome modal
-xdescribe('Close the welcome modal', () => {
+describe('Close the welcome modal', () => {
   before(() => {
     cy.visit('');
     cy.wait(20000);
