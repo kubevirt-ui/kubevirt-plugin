@@ -5,6 +5,7 @@ import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal'
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
+import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
 import {
@@ -53,7 +54,7 @@ const MetadataTab: FC<ConfigurationInnerTabProps> = ({ vm }) => {
             editOnTitleJustify
             isEdit
             isPopover
-            moreInfoURL="http://kubernetes.io/docs/user-guide/labels"
+            moreInfoURL={documentationURL.LABELS}
             showEditOnTitle
           />
           <VirtualMachineDescriptionItem
@@ -75,7 +76,7 @@ const MetadataTab: FC<ConfigurationInnerTabProps> = ({ vm }) => {
             descriptionHeader={<SearchItem id="metadata">{t('Annotations')}</SearchItem>}
             isEdit
             isPopover
-            moreInfoURL="http://kubernetes.io/docs/user-guide/annotations"
+            moreInfoURL={documentationURL.ANNOTATIONS}
           />
         </DescriptionList>
       </Grid>

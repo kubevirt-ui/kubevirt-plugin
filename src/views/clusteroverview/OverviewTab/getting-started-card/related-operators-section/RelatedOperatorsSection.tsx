@@ -1,5 +1,6 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
+import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
@@ -9,14 +10,14 @@ import { GettingStartedLink } from '../utils/types';
 
 import './RelatedOperatorsSection.scss';
 
-const RelatedOperatorsSection: React.FC = () => {
+const RelatedOperatorsSection: FC = () => {
   const { t } = useKubevirtTranslation();
   const { mtvLink, mtvLoaded } = useMTVResources();
   const isAdmin = useIsAdmin();
 
   const moreLink: GettingStartedLink = {
     external: true,
-    href: 'https://docs.openshift.com/container-platform/4.16/operators/index.html',
+    href: documentationURL.OPERATIONS,
     id: 'openshift-virtualization-related-operators',
     title: t('Learn more about Operators'),
   };
@@ -26,7 +27,7 @@ const RelatedOperatorsSection: React.FC = () => {
       external: !isAdmin,
       href: isAdmin
         ? '/operatorhub/all-namespaces?keyword=nmstate'
-        : 'https://docs.openshift.com/container-platform/4.14/networking/k8s_nmstate/k8s-nmstate-about-the-k8s-nmstate-operator.html',
+        : documentationURL.NMSTATE_OPERATOR,
       id: 'kubernetes-nmstate',
       title: t('Kubernetes NMState Operator'),
     },
@@ -34,16 +35,14 @@ const RelatedOperatorsSection: React.FC = () => {
       external: !isAdmin,
       href: isAdmin
         ? '/operatorhub/all-namespaces?keyword=ODF'
-        : 'https://access.redhat.com/documentation/en-us/red_hat_openshift_data_foundation/4.14/html-single/red_hat_openshift_data_foundation_architecture/index',
+        : documentationURL.DATA_FOUNDATION_OPERATOR,
       id: 'openshift-data-foundation',
       title: t('OpenShift Data Foundation'),
     },
     {
       description: t('Migrate multiple virtual machine workloads to OpenShift Virtualization. '),
       external: !isAdmin,
-      href: isAdmin
-        ? '/operatorhub/all-namespaces?keyword=MTV'
-        : 'https://access.redhat.com/documentation/en-us/migration_toolkit_for_virtualization/2.5/html/installing_and_using_the_migration_toolkit_for_virtualization/index',
+      href: isAdmin ? '/operatorhub/all-namespaces?keyword=MTV' : documentationURL.MTV_OPERATOR,
       id: 'openshift-virtualization-mtv',
       secondaryLinkExternal: true,
       secondaryLinkHref: mtvLink,

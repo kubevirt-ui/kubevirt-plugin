@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import GettingStartedSectionContents from '../utils/getting-started-content/GettingStartedSectionContents';
@@ -14,7 +15,7 @@ const FeatureHighlightsSection: React.FC = () => {
 
   const moreLink: GettingStartedLink = {
     external: true,
-    href: 'https://cloud.redhat.com/learn/topics/virtualization/',
+    href: documentationURL.VIRTUALIZATION_BLOG,
     id: 'openshift-virtualization-feature-highlights',
     title: t('Visit the blog'),
   };
@@ -22,7 +23,7 @@ const FeatureHighlightsSection: React.FC = () => {
   const links: GettingStartedLink[] = [
     {
       external: true,
-      href: 'https://developers.redhat.com/articles/2024/03/13/save-memory-openshift-virtualization-using-free-page-reporting',
+      href: documentationURL.FREE_PAGE_REPORTING,
       id: 'item1',
       title: (
         <FeatureHighlightsTitle
@@ -33,7 +34,7 @@ const FeatureHighlightsSection: React.FC = () => {
     },
     {
       external: true,
-      href: 'https://docs.openshift.com/container-platform/4.17/virt/release_notes/virt-4-17-release-notes.html#virt-4-17-new',
+      href: documentationURL.HIGHLIGHTS_417,
       id: 'item2',
       title: (
         <FeatureHighlightsTitle

@@ -1,10 +1,9 @@
 import React, { FC } from 'react';
 
+import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, Stack, StackItem, Text, TextVariants } from '@patternfly/react-core';
 import { ExternalLinkSquareAltIcon } from '@patternfly/react-icons';
-
-import { SYSPREP_DOC_URL } from './consts';
 
 const SysprepInfo: FC = () => {
   const { t } = useKubevirtTranslation();
@@ -30,7 +29,7 @@ const SysprepInfo: FC = () => {
             size="sm"
             variant="link"
           >
-            <a href={SYSPREP_DOC_URL} rel="noopener noreferrer" target="_blank">
+            <a href={documentationURL.SYSPREP} rel="noopener noreferrer" target="_blank">
               {t('Learn more')}
             </a>
           </Button>

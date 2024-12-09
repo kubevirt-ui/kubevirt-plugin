@@ -4,6 +4,7 @@ import { Trans } from 'react-i18next';
 import { Link } from 'react-router-dom-v5-compat';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
+import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Checkbox, Flex, FlexItem, FormGroup, PopoverPosition } from '@patternfly/react-core';
 
@@ -44,8 +45,7 @@ const EnablePreallocationCheckbox: FC<EnablePreallocationCheckboxProps> = ({ isD
                   Refer to the
                   <Link
                     to={{
-                      pathname:
-                        'https://docs.openshift.com/container-platform/4.15/virt/storage/virt-using-preallocation-for-datavolumes.html',
+                      pathname: documentationURL.DATAVOLUME_PREALLOCATIONS,
                     }}
                     target="_blank"
                   >

@@ -10,8 +10,6 @@ import { DATA_SOURCE_CRONJOB_LABEL } from '@kubevirt-utils/resources/template';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, k8sDelete, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 
-export const CRON_DOC_URL = 'https://www.redhat.com/sysadmin/automate-linux-tasks-cron';
-
 export const onDataImportCronManageSubmit = async ({
   data: { allowAutoUpdate, importsToKeep, schedule, url },
   resources: { dataImportCron, dataSource },

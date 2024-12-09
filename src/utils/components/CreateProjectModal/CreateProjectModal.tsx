@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Trans } from 'react-i18next';
 
 import { ProjectRequestModel } from '@kubevirt-ui/kubevirt-api/console';
+import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
@@ -54,7 +55,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
         {t('An OpenShift project is an alternative representation of a Kubernetes namespace.')}
       </Text>
       <br />
-      <ExternalLink href="https://docs.okd.io/latest/applications/projects/working-with-projects.html">
+      <ExternalLink href={documentationURL.PROJECTS}>
         {t('Learn more about working with projects')}
       </ExternalLink>
       <br />

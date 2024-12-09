@@ -1,13 +1,14 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
+import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 type NameProps = {
   name: string;
 };
 
-const Name: React.FC<NameProps> = ({ name }) => {
+const Name: FC<NameProps> = ({ name }) => {
   const { t } = useKubevirtTranslation();
   return (
     <VirtualMachineDescriptionItem
@@ -20,7 +21,7 @@ const Name: React.FC<NameProps> = ({ name }) => {
       descriptionData={name}
       descriptionHeader={t('Name')}
       isPopover
-      moreInfoURL="http://kubernetes.io/docs/user-guide/identifiers#names"
+      moreInfoURL={documentationURL.NAME}
     />
   );
 };

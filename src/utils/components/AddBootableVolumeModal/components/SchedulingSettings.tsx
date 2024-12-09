@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
+import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, NumberInput, Text, TextInput, Title } from '@patternfly/react-core';
 
@@ -51,10 +52,7 @@ const SchedulingSettings: FC<SchedulingSettingsProps> = ({
         </Title>
         <Text>
           {t('Use cron formatting to set when and how often to look for new imports.')}{' '}
-          <ExternalLink
-            href={'https://www.redhat.com/sysadmin/automate-linux-tasks-cron'}
-            text={t('Learn more')}
-          />
+          <ExternalLink href={documentationURL.CRON_INFO} text={t('Learn more')} />
         </Text>
       </div>
       <FormGroup

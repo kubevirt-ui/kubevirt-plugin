@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
-import { DEV_PREVIEW_LINK, TECH_PREVIEW_LINK } from '@kubevirt-utils/constants/url-constants';
+import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Popover, PopoverPosition, Stack } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
@@ -13,10 +13,10 @@ const PreviewFeaturesPopover: FC = () => {
       bodyContent={
         <Stack hasGutter>
           <p>
-            <ExternalLink href={DEV_PREVIEW_LINK} text={t('Developer Preview')} />
+            <ExternalLink href={documentationURL.DEV_PREVIEW} text={t('Developer Preview')} />
           </p>
           <p>
-            <ExternalLink href={TECH_PREVIEW_LINK} text={t('Technology Preview')} />
+            <ExternalLink href={documentationURL.TECH_PREVIEW} text={t('Technology Preview')} />
           </p>
         </Stack>
       }

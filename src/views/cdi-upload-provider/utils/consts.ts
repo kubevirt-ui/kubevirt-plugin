@@ -30,8 +30,6 @@ export const LABEL_CDROM_SOURCE = 'kubevirt.ui/cdrom';
 export const TEMPLATE_OS_LABEL = 'os.template.kubevirt.io';
 export const TEMPLATE_OS_NAME_ANNOTATION = 'name.os.template.kubevirt.io';
 export const VM_TEMPLATE_NAME_PARAMETER = '${NAME}'; // eslint-disable-line no-template-curly-in-string
-export const CDI_UPLOAD_SUPPORTED_TYPES_URL =
-  'https://access.redhat.com/documentation/en-us/openshift_container_platform/4.9/html/virtualization/virtual-machines#virt-cdi-supported-operations-matrix_virt-importing-virtual-machine-images-datavolumes';
 
 export enum uploadErrorType {
   ALLOCATE = 'allocate',

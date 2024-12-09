@@ -1,15 +1,16 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
+import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 
 import { LabelsAnnotationsType, TemplateDetailsGridProps } from '../TemplateDetailsPage';
 
-const Annotations: React.FC<TemplateDetailsGridProps> = ({ editable, template }) => {
+const Annotations: FC<TemplateDetailsGridProps> = ({ editable, template }) => {
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
   const annotationsCount = Object.keys(template?.metadata?.annotations || {}).length;
@@ -51,7 +52,7 @@ const Annotations: React.FC<TemplateDetailsGridProps> = ({ editable, template })
       descriptionHeader={t('Annotations')}
       isEdit={editable}
       isPopover
-      moreInfoURL="http://kubernetes.io/docs/user-guide/annotations"
+      moreInfoURL={documentationURL.ANNOTATIONS}
       onEditClick={onEditClick}
     />
   );
