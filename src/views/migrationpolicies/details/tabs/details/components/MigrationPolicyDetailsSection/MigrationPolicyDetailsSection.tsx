@@ -4,6 +4,7 @@ import { Trans } from 'react-i18next';
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
+import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import {
@@ -70,7 +71,7 @@ const MigrationPolicyDetailsSection: FC<MigrationPolicyDetailsSectionProps> = ({
               descriptionData={mp?.metadata?.name}
               descriptionHeader={t('Name')}
               isPopover
-              moreInfoURL="http://kubernetes.io/docs/user-guide/identifiers#names"
+              moreInfoURL={documentationURL.NAME}
             />
             <VirtualMachineDescriptionItem
               descriptionData={mp?.metadata?.annotations?.description}
@@ -107,7 +108,7 @@ const MigrationPolicyDetailsSection: FC<MigrationPolicyDetailsSectionProps> = ({
                     }
                     descriptionHeader={t('Bandwidth per migration')}
                     isPopover
-                    moreInfoURL="http://kubevirt.io/api-reference/main/definitions.html#_v1_migrationconfiguration"
+                    moreInfoURL={documentationURL.MIGRATION_CONFIGURATION}
                   />
                   <VirtualMachineDescriptionItem
                     bodyContent={t(
@@ -120,7 +121,7 @@ const MigrationPolicyDetailsSection: FC<MigrationPolicyDetailsSectionProps> = ({
                     }
                     descriptionHeader={t('Auto converge')}
                     isPopover
-                    moreInfoURL="http://kubevirt.io/api-reference/main/definitions.html#_v1_migrationconfiguration"
+                    moreInfoURL={documentationURL.MIGRATION_CONFIGURATION}
                   />
                   <VirtualMachineDescriptionItem
                     bodyContent={t(
@@ -133,7 +134,7 @@ const MigrationPolicyDetailsSection: FC<MigrationPolicyDetailsSectionProps> = ({
                     }
                     descriptionHeader={t('Post-copy')}
                     isPopover
-                    moreInfoURL="http://kubevirt.io/api-reference/main/definitions.html#_v1_migrationconfiguration"
+                    moreInfoURL={documentationURL.MIGRATION_CONFIGURATION}
                   />
                   <VirtualMachineDescriptionItem
                     bodyContent={t(
@@ -146,7 +147,7 @@ const MigrationPolicyDetailsSection: FC<MigrationPolicyDetailsSectionProps> = ({
                     }
                     descriptionHeader={t('Completion timeout')}
                     isPopover
-                    moreInfoURL="http://kubevirt.io/api-reference/main/definitions.html#_v1_migrationconfiguration"
+                    moreInfoURL={documentationURL.MIGRATION_CONFIGURATION}
                   />
                 </DescriptionList>
               </DescriptionListDescription>
@@ -155,14 +156,14 @@ const MigrationPolicyDetailsSection: FC<MigrationPolicyDetailsSectionProps> = ({
             <Title headingLevel="h2">
               <Popover
                 bodyContent={
-                  <Trans ns="plugin__kubevirt-plugin">
-                    Map of string keys and values that can be used to organize and categorize (scope
-                    and select) objects. May match selectors of replication controllers and
-                    services. More info:{' '}
-                    <a href="http://kubernetes.io/docs/user-guide/labels">
-                      http://kubernetes.io/docs/user-guide/labels
-                    </a>
-                  </Trans>
+                  <>
+                    <Trans ns="plugin__kubevirt-plugin">
+                      Map of string keys and values that can be used to organize and categorize
+                      (scope and select) objects. May match selectors of replication controllers and
+                      services. More info:
+                    </Trans>{' '}
+                    <a href={documentationURL.LABELS}>{documentationURL.LABELS}</a>
+                  </>
                 }
                 headerContent={t('Labels')}
               >

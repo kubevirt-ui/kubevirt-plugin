@@ -1,9 +1,9 @@
 import React, { FC, useState } from 'react';
 import produce from 'immer';
-import { DESCHEDULER_URL } from 'src/views/templates/utils/constants';
 import { isDeschedulerOn } from 'src/views/templates/utils/utils';
 
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
+import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useDeschedulerInstalled } from '@kubevirt-utils/hooks/useDeschedulerInstalled';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -52,7 +52,7 @@ const Descheduler: FC<DeschedulerProps> = ({ onSubmit, template }) => {
               <Button
                 className="no-left-padding"
                 component="a"
-                href={DESCHEDULER_URL}
+                href={documentationURL.DESCHEDULER}
                 icon={<ExternalLinkAltIcon />}
                 iconPosition="right"
                 target="_blank"

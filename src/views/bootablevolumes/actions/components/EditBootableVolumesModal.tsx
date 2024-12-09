@@ -12,7 +12,7 @@ import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFi
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
-import { INSTANCE_TYPES_USER_GUIDE_LINK } from '@kubevirt-utils/constants/url-constants';
+import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   DEFAULT_INSTANCETYPE_LABEL,
@@ -139,7 +139,7 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
                       'The preferred VirtualMachine attribute values required to run a given workload.',
                     )}{' '}
                     <ExternalLink
-                      href={`${INSTANCE_TYPES_USER_GUIDE_LINK}#virtualmachinepreference`}
+                      href={documentationURL.INSTANCE_TYPES_USER_GUIDE}
                       text={t('Read more')}
                     />
                   </>

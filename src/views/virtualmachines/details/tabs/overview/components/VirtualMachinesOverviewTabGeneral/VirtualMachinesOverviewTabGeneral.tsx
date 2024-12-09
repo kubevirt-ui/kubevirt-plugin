@@ -10,6 +10,7 @@ import {
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import OwnerDetailsItem from '@kubevirt-utils/components/OwnerDetailsItem/OwnerDetailsItem';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
+import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -63,7 +64,7 @@ const VirtualMachinesOverviewTabGeneral: FC<VirtualMachinesOverviewTabGeneralPro
               breadcrumb="VirtualMachine.metadata.namespace"
               descriptionHeader={t('Namespace')}
               isPopover
-              moreInfoURL="http://kubernetes.io/docs/user-guide/namespaces"
+              moreInfoURL={documentationURL.NAMESPACE_DOC}
             />
             {canGetNode && (
               <VirtualMachineDescriptionItem

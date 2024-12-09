@@ -1,10 +1,11 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import VirtualMachineInstanceModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstanceModel';
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
+import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -12,7 +13,7 @@ type AnnotationsProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const Annotations: React.FC<AnnotationsProps> = ({ vmi }) => {
+const Annotations: FC<AnnotationsProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   return (
@@ -49,7 +50,7 @@ const Annotations: React.FC<AnnotationsProps> = ({ vmi }) => {
       descriptionHeader={t('Annotations')}
       isEdit
       isPopover
-      moreInfoURL="http://kubernetes.io/docs/user-guide/annotations"
+      moreInfoURL={documentationURL.ANNOTATIONS}
     />
   );
 };

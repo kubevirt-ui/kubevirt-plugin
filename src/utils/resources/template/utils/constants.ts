@@ -1,3 +1,4 @@
+import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 export const TEMPLATE_TYPE_LABEL = 'template.kubevirt.io/type';
@@ -123,11 +124,11 @@ export const BOOT_SOURCE_LABELS = {
 };
 
 export const OS_IMAGE_LINKS = {
-  [OS_NAME_TYPES.centos]: 'https://cloud.centos.org/centos/',
-  [OS_NAME_TYPES.fedora]: 'https://alt.fedoraproject.org/cloud/',
-  [OS_NAME_TYPES.other]: 'https://alt.fedoraproject.org/cloud/',
-  [OS_NAME_TYPES.rhel]: 'https://access.redhat.com/downloads/content/479/ver=/rhel---8/',
-  [OS_NAME_TYPES.windows]: 'https://www.microsoft.com/en-us/software-download/windows10ISO',
+  [OS_NAME_TYPES.centos]: documentationURL.OS_IMAGE_CENTOS,
+  [OS_NAME_TYPES.fedora]: documentationURL.OS_IMAGE_FEDORA,
+  [OS_NAME_TYPES.other]: documentationURL.OS_IMAGE_OTHER,
+  [OS_NAME_TYPES.rhel]: documentationURL.OS_IMAGE_RHEL,
+  [OS_NAME_TYPES.windows]: documentationURL.OS_IMAGE_WINDOWS,
 };
 
 export const GENERATE_VM_PRETTY_NAME_ANNOTATION =

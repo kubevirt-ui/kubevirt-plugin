@@ -11,6 +11,7 @@ import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/
 import { FormTextInput } from '@kubevirt-utils/components/FormTextInput/FormTextInput';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
+import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Checkbox,
@@ -26,7 +27,7 @@ import {
 } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
 
-import { CRON_DOC_URL, onDataImportCronManageSubmit } from './utils';
+import { onDataImportCronManageSubmit } from './utils';
 
 export type DataImportCronManageFormType = {
   importsToKeep: number;
@@ -185,7 +186,7 @@ export const DataImportCronManageModal: FC<DataImportCronManageModalProps> = ({
                       {t(
                         'Schedule specifies in cron format when and how often to look for new imports.',
                       )}
-                      <ExternalLink href={CRON_DOC_URL} text={t('Learn more')} />
+                      <ExternalLink href={documentationURL.CRON_INFO} text={t('Learn more')} />
                     </>
                   </FormGroupHelperText>
                 </FormGroup>

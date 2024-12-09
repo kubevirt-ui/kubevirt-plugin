@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
+import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { V1Template } from '@kubevirt-utils/models';
 
@@ -20,7 +21,7 @@ const CreatedAt: React.FC<CreatedAtProps> = ({ template }) => {
       descriptionData={<Timestamp timestamp={template?.metadata?.creationTimestamp} />}
       descriptionHeader={t('Created at')}
       isPopover
-      moreInfoURL="https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata"
+      moreInfoURL={documentationURL.METADATA}
     />
   );
 };

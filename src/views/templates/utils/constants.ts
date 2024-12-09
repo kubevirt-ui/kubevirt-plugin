@@ -4,9 +4,6 @@ export const ANNOTATIONS = {
   providerName: 'template.kubevirt.io/provider',
 };
 
-export const DESCHEDULER_URL =
-  'https://kubevirt.io/user-guide/operations/node_assignment/#node-balancing-with-descheduler';
-
 export const LABELS = {
   name: 'vm.kubevirt.io/template',
   namespace: 'vm.kubevirt.io/template.namespace',

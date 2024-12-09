@@ -6,6 +6,7 @@ import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { FormTextInput } from '@kubevirt-utils/components/FormTextInput/FormTextInput';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
+import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Form,
@@ -18,8 +19,6 @@ import {
   ValidatedOptions,
 } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
-
-import { CRON_DOC_URL } from '../../dataimportcron/details/DataImportCronManageModal/utils';
 
 import { CreateDataSourceModalFormType } from './CreateDataSourceModal';
 
@@ -136,7 +135,7 @@ export const CreateDataSourceForm: FC<CreateDataSourceFormProps> = ({
         <FormGroupHelperText>
           <>
             {t('Schedule specifies in cron format when and how often to look for new imports.')}
-            <ExternalLink href={CRON_DOC_URL} text={t('Learn more')} />
+            <ExternalLink href={documentationURL.CRON_INFO} text={t('Learn more')} />
           </>
         </FormGroupHelperText>
       </FormGroup>

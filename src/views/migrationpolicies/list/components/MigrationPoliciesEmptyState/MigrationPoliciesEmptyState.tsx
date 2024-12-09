@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
+import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ListPageBody, ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -45,7 +46,7 @@ const MigrationPoliciesEmptyState: FC = () => {
             <br />
             <EmptyStateActions>
               <ExternalLink
-                href="https://access.redhat.com/documentation/en-us/openshift_container_platform/4.15/html/virtualization/live-migration#live-migration-policies"
+                href={documentationURL.MIGRATION_POLICIES}
                 text={t('Learn more about MigrationPolicies')}
               />
             </EmptyStateActions>

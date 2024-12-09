@@ -16,6 +16,7 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import OwnerDetailsItem from '@kubevirt-utils/components/OwnerDetailsItem/OwnerDetailsItem';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
+import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   DEFAULT_INSTANCETYPE_LABEL,
@@ -53,7 +54,7 @@ export const DataSourceDetailsGrid: React.FC<DataSourceDetailsGridProps> = ({ da
             descriptionData={dataSource?.metadata?.name}
             descriptionHeader={t('Name')}
             isPopover
-            moreInfoURL="http://kubernetes.io/docs/user-guide/identifiers#names"
+            moreInfoURL={documentationURL.NAME}
           />
           <VirtualMachineDescriptionItem
             // body-content text copied from: https://github.com/kubevirt-ui/kubevirt-api/blob/main/containerized-data-importer/models/V1ObjectMeta.ts#L102-L104
@@ -66,7 +67,7 @@ export const DataSourceDetailsGrid: React.FC<DataSourceDetailsGridProps> = ({ da
             breadcrumb="DataSource.metadata.namespace"
             descriptionHeader={t('Namespace')}
             isPopover
-            moreInfoURL="http://kubernetes.io/docs/user-guide/namespaces"
+            moreInfoURL={documentationURL.NAMESPACE_DOC}
           />
           <VirtualMachineDescriptionItem
             // body-content text copied from: https://github.com/kubevirt-ui/kubevirt-api/blob/main/containerized-data-importer/models/V1ObjectMeta.ts#L84
@@ -103,7 +104,7 @@ export const DataSourceDetailsGrid: React.FC<DataSourceDetailsGridProps> = ({ da
             descriptionHeader={t('Labels')}
             isEdit
             isPopover
-            moreInfoURL="http://kubernetes.io/docs/user-guide/labels"
+            moreInfoURL={documentationURL.LABELS}
             showEditOnTitle
           />
           <VirtualMachineDescriptionItem
@@ -140,7 +141,7 @@ export const DataSourceDetailsGrid: React.FC<DataSourceDetailsGridProps> = ({ da
             descriptionHeader={t('Annotations')}
             isEdit
             isPopover
-            moreInfoURL="http://kubernetes.io/docs/user-guide/annotations"
+            moreInfoURL={documentationURL.ANNOTATIONS}
           />
           <VirtualMachineDescriptionItem
             // body-content text copied from: https://github.com/kubevirt-ui/kubevirt-api/blob/main/containerized-data-importer/models/V1ObjectMeta.ts#L84

@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
 import { IoK8sApiRbacV1ClusterRoleBinding } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
+import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
@@ -92,9 +93,7 @@ const CheckupsStorageListEmptyState: FC<CheckupsStorageListEmptyStateProps> = ({
         </EmptyStateActions>
         <EmptyStateActions className="empty-state-secondary-action">
           <ExternalLink
-            href={
-              'https://docs.openshift.com/container-platform/4.16/virt/monitoring/virt-running-cluster-checkups.html'
-            }
+            href={documentationURL.CHECKUPS}
             text={t('Learn more about storage checkups')}
           />
         </EmptyStateActions>

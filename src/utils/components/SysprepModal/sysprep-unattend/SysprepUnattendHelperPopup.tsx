@@ -1,11 +1,10 @@
 import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 
+import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, Popover, Text, TextVariants } from '@patternfly/react-core';
 import { ExternalLinkSquareAltIcon, OutlinedQuestionCircleIcon } from '@patternfly/react-icons';
-
-import { SYSPREP_DOC_URL } from '../consts';
 
 const SysprepUnattendHelperPopup: FC = () => {
   const { t } = useKubevirtTranslation();
@@ -26,7 +25,7 @@ const SysprepUnattendHelperPopup: FC = () => {
               size="sm"
               variant="link"
             >
-              <a href={SYSPREP_DOC_URL} rel="noopener noreferrer" target="_blank">
+              <a href={documentationURL.SYSPREP} rel="noopener noreferrer" target="_blank">
                 {t('Learn more')}
               </a>
             </Button>

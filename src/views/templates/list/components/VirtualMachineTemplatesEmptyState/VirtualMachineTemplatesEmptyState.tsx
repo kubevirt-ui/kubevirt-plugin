@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
-import { CREATING_VMS_FROM_TEMPLATES_LINK } from '@kubevirt-utils/constants/url-constants';
+import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ListPageBody, ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -49,7 +49,7 @@ const VirtualMachineTemplatesEmptyState: FC<VirtualMachineTemplatesEmptyStatePro
             <br />
             <EmptyStateActions>
               <ExternalLink
-                href={CREATING_VMS_FROM_TEMPLATES_LINK}
+                href={documentationURL.CREATING_VMS_FROM_TEMPLATES}
                 text={t('Learn more about templates')}
               />
             </EmptyStateActions>

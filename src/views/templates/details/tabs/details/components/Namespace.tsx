@@ -1,6 +1,7 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
+import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -8,7 +9,7 @@ type NamespaceProps = {
   namespace: string;
 };
 
-const Namespace: React.FC<NamespaceProps> = ({ namespace }) => {
+const Namespace: FC<NamespaceProps> = ({ namespace }) => {
   const { t } = useKubevirtTranslation();
 
   return (
@@ -21,7 +22,7 @@ const Namespace: React.FC<NamespaceProps> = ({ namespace }) => {
       descriptionData={<ResourceLink kind="Namespace" name={namespace} />}
       descriptionHeader={t('Namespace')}
       isPopover
-      moreInfoURL="http://kubernetes.io/docs/user-guide/namespaces"
+      moreInfoURL={documentationURL.NAMESPACE_DOC}
     />
   );
 };

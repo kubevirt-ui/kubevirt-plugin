@@ -5,6 +5,7 @@ import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal'
 import MetadataLabels from '@kubevirt-utils/components/MetadataLabels/MetadataLabels';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
+import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -49,7 +50,7 @@ const Labels: FC<TemplateDetailsGridProps> = ({ editable, template }) => {
       descriptionHeader={t('Labels')}
       isEdit={editable}
       isPopover
-      moreInfoURL="http://kubernetes.io/docs/user-guide/labels"
+      moreInfoURL={documentationURL.LABELS}
       onEditClick={onEditClick}
       showEditOnTitle
     />

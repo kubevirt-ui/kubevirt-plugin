@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
-import { INSTANCE_TYPES_USER_GUIDE_LINK } from '@kubevirt-utils/constants/url-constants';
+import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 const PreferencePopoverContent: FC = () => {
@@ -9,10 +9,7 @@ const PreferencePopoverContent: FC = () => {
   return (
     <>
       {t('The preferred VirtualMachine attribute values required to run a given workload.')}{' '}
-      <ExternalLink
-        href={`${INSTANCE_TYPES_USER_GUIDE_LINK}#virtualmachinepreference`}
-        text={t('Read more')}
-      />
+      <ExternalLink href={documentationURL.INSTANCE_TYPES_USER_GUIDE} text={t('Read more')} />
     </>
   );
 };

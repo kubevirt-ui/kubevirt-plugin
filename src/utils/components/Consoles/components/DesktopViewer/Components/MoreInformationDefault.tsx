@@ -2,6 +2,7 @@ import React from 'react';
 import { Trans } from 'react-i18next';
 
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
+import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { DescriptionList } from '@patternfly/react-core';
 
@@ -34,7 +35,7 @@ const MoreInformationDefault: React.FC<MoreInformationDefaultProps> = ({ textMor
             <div>
               {t('Download the MSI from ')}
               <a
-                href="https://virt-manager.org/download/"
+                href={documentationURL.VIRT_MANAGER_DOWNLOAD}
                 rel="noopener noreferrer"
                 target="_blank"
               >

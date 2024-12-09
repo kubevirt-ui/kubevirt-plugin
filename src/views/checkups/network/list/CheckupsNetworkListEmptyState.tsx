@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
+import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
@@ -76,7 +77,7 @@ const CheckupsNetworkListEmptyState = ({ isPermitted, nadsInNamespace }) => {
         )}
         <EmptyStateActions>
           <ExternalLink
-            href="https://docs.openshift.com/container-platform/4.15/virt/monitoring/virt-running-cluster-checkups.html#virt-measuring-latency-vm-secondary-network_virt-running-cluster-checkups"
+            href={documentationURL.CHECKUPS_LATENCY}
             text={t('Learn more about network latency checkups')}
           />
         </EmptyStateActions>

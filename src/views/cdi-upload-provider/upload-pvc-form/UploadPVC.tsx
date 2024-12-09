@@ -15,6 +15,7 @@ import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolume
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
+import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { createUploadPVC } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -33,12 +34,7 @@ import { ActionGroup, Alert, Button, ButtonVariant } from '@patternfly/react-cor
 
 import useBaseImages from '../hooks/useBaseImages';
 import useMultipleAccessReviews from '../hooks/useMultipleAccessReviews';
-import {
-  CDI_UPLOAD_OS_URL_PARAM,
-  CDI_UPLOAD_SUPPORTED_TYPES_URL,
-  CDI_UPLOAD_URL_BUILDER,
-  uploadErrorType,
-} from '../utils/consts';
+import { CDI_UPLOAD_OS_URL_PARAM, CDI_UPLOAD_URL_BUILDER, uploadErrorType } from '../utils/consts';
 import { CDIUploadContext } from '../utils/context';
 import { getName, getNamespace, getPVCNamespace } from '../utils/selectors';
 import { resourcePath } from '../utils/utils';
@@ -230,7 +226,7 @@ const UploadPVCPage: FC = () => {
                 </p>
                 <p>
                   <ExternalLink
-                    href={CDI_UPLOAD_SUPPORTED_TYPES_URL}
+                    href={documentationURL.CDI_UPLOAD_SUPPORTED_TYPES}
                     text={t('Learn more about supported formats')}
                   />
                 </p>

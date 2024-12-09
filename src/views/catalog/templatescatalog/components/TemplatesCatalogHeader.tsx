@@ -2,7 +2,7 @@ import React, { FC, memo, useEffect, useState } from 'react';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
-import { CREATING_VMS_FROM_TEMPLATES_LINK } from '@kubevirt-utils/constants/url-constants';
+import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   pluralize,
@@ -51,7 +51,10 @@ export const TemplatesCatalogHeader: FC<{
               bodyContent={
                 <>
                   {t('Red Hat recommended configuration for each OS.')}{' '}
-                  <ExternalLink href={CREATING_VMS_FROM_TEMPLATES_LINK} text={t('Learn more')} />
+                  <ExternalLink
+                    href={documentationURL.CREATING_VMS_FROM_TEMPLATES}
+                    text={t('Learn more')}
+                  />
                 </>
               }
             />

@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom-v5-compat';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getConsoleVirtctlCommand } from '@kubevirt-utils/components/SSHAccess/utils';
+import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   DescriptionListDescription,
@@ -41,14 +42,8 @@ const ConsoleOverVirtctl: FC<ConsoleOverVirtctlProps> = ({ vm }) => {
                 <br />
                 <div>
                   For more details, see{' '}
-                  <Link
-                    to={
-                      'https://docs.openshift.com/container-platform/4.15/virt/getting_started/virt-using-the-cli-tools.html'
-                    }
-                  >
-                    Installing virtctl
-                  </Link>{' '}
-                  in Getting started with OpenShift Virtualization.
+                  <Link to={documentationURL.VIRT_CTL}>Installing virtctl</Link> in Getting started
+                  with OpenShift Virtualization.
                 </div>
               </Trans>
               <br />
