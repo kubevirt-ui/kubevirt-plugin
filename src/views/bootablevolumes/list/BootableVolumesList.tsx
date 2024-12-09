@@ -8,6 +8,7 @@ import {
   paginationDefaultValues,
   paginationInitialState,
 } from '@kubevirt-utils/hooks/usePagination/utils/constants';
+import useSetDefaultNonAdminUserProject from '@kubevirt-utils/hooks/useSetDefaultNonAdminUserProject/useSetDefaultNonAdminUserProject';
 import { DataSourceModelRef } from '@kubevirt-utils/models';
 import useBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useBootableVolumes';
 import useHideDeprecatedBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useHideDeprecatedBootableVolumes';
@@ -30,8 +31,9 @@ import useBootableVolumesFilters from './hooks/useBootableVolumesFilters';
 import '@kubevirt-utils/styles/list-managment-group.scss';
 
 const BootableVolumesList: FC = () => {
-  const { ns: namespace } = useParams<{ ns: string }>();
   const { t } = useKubevirtTranslation();
+  const { ns: namespace } = useParams<{ ns: string }>();
+  useSetDefaultNonAdminUserProject();
 
   const { bootableVolumes, dataImportCrons, error, loaded } = useBootableVolumes(namespace);
   const [preferences] = useClusterPreferences();

@@ -4,6 +4,7 @@ import { modelToRef, TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useSetDefaultNonAdminUserProject from '@kubevirt-utils/hooks/useSetDefaultNonAdminUserProject/useSetDefaultNonAdminUserProject';
 import { ListPageProps } from '@kubevirt-utils/utils/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
@@ -35,6 +36,8 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
   showTitle,
 }) => {
   const { t } = useKubevirtTranslation();
+  useSetDefaultNonAdminUserProject();
+
   const {
     availableDatasources,
     availableTemplatesUID,
