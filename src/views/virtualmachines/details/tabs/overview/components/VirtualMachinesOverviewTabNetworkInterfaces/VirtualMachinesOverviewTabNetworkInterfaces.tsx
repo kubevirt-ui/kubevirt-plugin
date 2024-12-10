@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom-v5-compat';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
+import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
 import { VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
 import { Card, CardBody, CardTitle, Divider } from '@patternfly/react-core';
 
@@ -28,6 +30,8 @@ const VirtualMachinesOverviewTabInterfaces: FC<VirtualMachinesOverviewTabInterfa
   const { t } = useKubevirtTranslation();
   const data = useVirtualMachinesOverviewTabInterfacesData(vm, vmi);
   const columns = useVirtualMachinesOverviewTabInterfacesColumns();
+
+  const [isNamespaceManagedByUDN] = useNamespaceUDN(getNamespace(vm));
 
   return (
     <div className="VirtualMachinesOverviewTabInterfaces--main">
@@ -57,7 +61,7 @@ const VirtualMachinesOverviewTabInterfaces: FC<VirtualMachinesOverviewTabInterfa
             Row={VirtualMachinesOverviewTabNetworkInterfacesRow}
             unfilteredData={data}
           />
-          <VirtualMachinesOverviewTabNetworkFQDN vm={vm} />
+          {isNamespaceManagedByUDN && <VirtualMachinesOverviewTabNetworkFQDN vm={vm} />}
         </CardBody>
       </Card>
     </div>

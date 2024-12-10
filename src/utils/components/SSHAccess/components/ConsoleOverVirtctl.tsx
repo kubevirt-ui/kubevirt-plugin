@@ -1,11 +1,19 @@
 import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
-import { Link } from 'react-router-dom-v5-compat';
 
+import UserDefinedNetworkModel from '@kubevirt-ui/kubevirt-api/console/models/UserDefinedNetworkModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { getConsoleVirtctlCommand } from '@kubevirt-utils/components/SSHAccess/utils';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import {
+  ClusterUserDefinedNetworkModelGroupVersionKind,
+  UserDefinedNetworkModelGroupVersionKind,
+} from '@kubevirt-utils/models';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
+import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import {
   DescriptionListDescription,
   DescriptionListGroup,
@@ -13,6 +21,7 @@ import {
   Grid,
   GridItem,
   Popover,
+  Text,
 } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
 
@@ -27,43 +36,65 @@ type ConsoleOverVirtctlProps = {
 const ConsoleOverVirtctl: FC<ConsoleOverVirtctlProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
 
+  const [isNamespaceManagedByUDN, udn] = useNamespaceUDN(getNamespace(vm));
+
   return (
     <DescriptionListGroup className="pf-c-description-list__group">
       <DescriptionListTerm className="pf-u-font-size-xs">
-        {t('SSH using virtctl')}{' '}
-        <Popover
-          bodyContent={
-            <>
-              <Trans t={t}>
-                <div>
-                  Open an SSH connection with the VM using the cluster API server. You must be able
-                  to access the API server and have virtctl command line tool installed.
-                </div>
+        <Text className="pf-v5-u-disabled-color-100">
+          {t('SSH using virtctl')}{' '}
+          <Popover
+            bodyContent={
+              <>
+                <Trans t={t}>
+                  <div>
+                    Open an SSH connection with the VM using the cluster API server. You must be
+                    able to access the API server and have virtctl command line tool installed.
+                  </div>
+                  <br />
+                  <div>
+                    For more details, see{' '}
+                    <ExternalLink href={documentationURL.VIRTCTL_CLI}>
+                      Installing virtctl
+                    </ExternalLink>{' '}
+                    in Getting started with OpenShift Virtualization.
+                  </div>
+                </Trans>
                 <br />
-                <div>
-                  For more details, see{' '}
-                  <Link to={documentationURL.VIRT_CTL}>Installing virtctl</Link> in Getting started
-                  with OpenShift Virtualization.
-                </div>
-              </Trans>
-              <br />
-              <Grid>
-                <GridItem span={2}>{t('Example: ')}</GridItem>
-                <GridItem id="ssh-using-virtctl--example" span={10}>
-                  {getConsoleVirtctlCommand(vm)}
-                </GridItem>
-              </Grid>
-            </>
-          }
-          aria-label="Help"
-          className="virtctl-popover"
-          position="right"
-        >
-          <HelpIcon />
-        </Popover>
+                <Grid>
+                  <GridItem span={2}>{t('Example: ')}</GridItem>
+                  <GridItem id="ssh-using-virtctl--example" span={10}>
+                    {getConsoleVirtctlCommand(vm)}
+                  </GridItem>
+                </Grid>
+              </>
+            }
+            aria-label="Help"
+            className="virtctl-popover"
+            position="right"
+          >
+            <HelpIcon />
+          </Popover>
+        </Text>
       </DescriptionListTerm>
       <DescriptionListDescription className="pf-c-description-list__description">
-        <VirtctlSSHCommandClipboardCopy vm={vm} />
+        {isNamespaceManagedByUDN ? (
+          <>
+            {t("Virtctl is disabled for this namespace as it's managed by")}{' '}
+            <ResourceLink
+              groupVersionKind={
+                udn.kind === UserDefinedNetworkModel.kind
+                  ? UserDefinedNetworkModelGroupVersionKind
+                  : ClusterUserDefinedNetworkModelGroupVersionKind
+              }
+              inline
+              name={getName(udn)}
+              namespace={getNamespace(udn)}
+            />{' '}
+          </>
+        ) : (
+          <VirtctlSSHCommandClipboardCopy vm={vm} />
+        )}
       </DescriptionListDescription>
     </DescriptionListGroup>
   );
