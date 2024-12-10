@@ -9,8 +9,8 @@ export const documentationURL = {
   CDI_UPLOAD_SUPPORTED_TYPES: `${REDHAT_DOC_URL}/openshift_container_platform/4.9/html/virtualization/virtual-machines#virt-cdi-supported-operations-matrix_virt-importing-virtual-machine-images-datavolumes`,
   CHECKUPS: `${OPENSHIFT_DOC_URL}/4.16/virt/monitoring/virt-running-cluster-checkups.html`,
   CHECKUPS_LATENCY: `${OPENSHIFT_DOC_URL}/4.15/virt/monitoring/virt-running-cluster-checkups.html#virt-measuring-latency-vm-secondary-network_virt-running-cluster-checkups`,
-
   CLOUDINIT_INFO: 'https://cloudinit.readthedocs.io/en/latest/index.html',
+
   CREATING_VMS_FROM_TEMPLATES: `${OPENSHIFT_DOC_URL}/4.15/virt/virtual_machines/creating_vms_rh/virt-creating-vms-from-templates.html`,
   CRON_INFO: `${REDHAT_BASE_URL}/sysadmin/automate-linux-tasks-cron`,
   DATA_FOUNDATION_OPERATOR:
@@ -55,6 +55,8 @@ export const documentationURL = {
   VIRT_CTL: `${OPENSHIFT_DOC_URL}/4.15/virt/getting_started/virt-using-the-cli-tools.html`,
   VIRT_MANAGER_DOWNLOAD: 'https://virt-manager.org/download.html',
   VIRT_SECONDARY_NETWORK: `${OPENSHIFT_DOC_URL}/4.15/virt/vm_networking/virt-networking-overview.html#secondary-network-config`,
+  VIRTCTL_CLI:
+    'https://docs.openshift.com/container-platform/4.15/virt/getting_started/virt-using-the-cli-tools.html',
   VIRTUALIZATION_BLOG: `https://cloud.redhat.com/learn/topics/virtualization/`,
   VIRTUALIZATION_WHAT_YOU_CAN_DO:
     'https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/virtualization/about#virt-what-you-can-do-with-virt_about-virt',
