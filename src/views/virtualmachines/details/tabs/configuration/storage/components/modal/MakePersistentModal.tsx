@@ -8,9 +8,7 @@ import {
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { getVMIVolumes } from '@kubevirt-utils/resources/vmi';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Stack, StackItem } from '@patternfly/react-core';
 
 import { updateDisks } from '../../../details/utils/utils';
@@ -36,9 +34,6 @@ const MakePersistentModal: FC<MakePersistentModalProps> = ({
 
   const makePersistent = () => {
     const volumeToPersist = getVMIVolumes(vmi).find((vmiVolume) => vmiVolume.name === volume?.name);
-    const vmHasVolume = getVolumes(vm).find((vmVolume) => vmVolume.name === volume?.name);
-
-    if (vmHasVolume || isEmpty(volumeToPersist)) return Promise.resolve();
 
     const vmPersistent = persistVolume(vm, vmi, volumeToPersist);
 
