@@ -66,27 +66,56 @@ describe('Check all virtualization pages can be loaded', () => {
       tab.navigateToDiagnostics();
       cy.contains('Status conditions').should('be.visible');
 
+      tab.navigateToDiagnosticsGuestSystemLog();
+      cy.contains('Guest system logs').should('be.visible');
+
       // sub-tabs in configuration tab
       tab.navigateToConfiguration();
       cy.contains('Headless mode').should('be.visible');
 
-      tab.navigateToStorage();
+      tab.navigateToConfigurationStorage();
       cy.contains('rootdisk').should('be.visible');
 
-      tab.navigateToNetwork();
+      tab.navigateToConfigurationNetwork();
       cy.contains('Pod networking').should('be.visible');
 
-      tab.navigateToScheduling();
+      tab.navigateToConfigurationScheduling();
       cy.contains('Scheduling and resource requirements').should('be.visible');
 
-      tab.navigateToSSH();
+      tab.navigateToConfigurationSSH();
       cy.contains('SSH access').should('be.visible');
 
-      tab.navigateToInitialRun();
+      tab.navigateToConfigurationInitialRun();
       cy.contains('Cloud-init').should('be.visible');
 
-      tab.navigateToMetadata();
+      tab.navigateToConfigurationMetadata();
       cy.contains('Annotations').should('be.visible');
+    });
+
+    it('vmi tabs are loaded', () => {
+      tab.navigateToOverview();
+      cy.contains('VirtualMachineInstance').should('be.visible');
+      cy.byLegacyTestID(Example).click();
+
+      cy.contains('Annotations').should('be.visible');
+
+      tab.navigateToYAML();
+      cy.contains('Download').should('be.visible');
+
+      tab.navigateToScheduling();
+      cy.contains('Tolerations').should('be.visible');
+
+      tab.navigateToEvents();
+      cy.contains('event').should('be.visible');
+
+      tab.navigateToConsole();
+      cy.contains('Guest login credentials').should('be.visible');
+
+      tab.navigateToNetworks();
+      cy.contains('Pod networking').should('be.visible');
+
+      tab.navigateToDisks();
+      cy.contains('rootdisk').should('be.visible');
     });
   });
 
@@ -106,19 +135,19 @@ describe('Check all virtualization pages can be loaded', () => {
       tab.navigateToYAML();
       cy.contains('Download').should('be.visible');
 
-      tab.navigateToTScheduling();
+      tab.navigateToScheduling();
       cy.contains('Tolerations').should('be.visible');
 
-      tab.navigateToTNetworks();
+      tab.navigateToNetworks();
       cy.contains('Pod networking').should('be.visible');
 
-      tab.navigateToTDisks();
+      tab.navigateToDisks();
       cy.contains('rootdisk').should('be.visible');
 
-      tab.navigateToTScripts();
+      tab.navigateToScripts();
       cy.contains('Cloud-init').should('be.visible');
 
-      tab.navigateToTParameters();
+      tab.navigateToParameters();
       cy.contains('DATA_SOURCE_NAME').should('be.visible');
     });
 
@@ -134,19 +163,19 @@ describe('Check all virtualization pages can be loaded', () => {
       tab.navigateToYAML();
       cy.contains('Download').should('be.visible');
 
-      tab.navigateToTScheduling();
+      tab.navigateToScheduling();
       cy.contains('Tolerations').should('be.visible');
 
-      tab.navigateToTNetworks();
+      tab.navigateToNetworks();
       cy.contains('Pod networking').should('be.visible');
 
-      tab.navigateToTDisks();
+      tab.navigateToDisks();
       cy.contains('rootdisk').should('be.visible');
 
-      tab.navigateToTScripts();
+      tab.navigateToScripts();
       cy.contains('Cloud-init').should('be.visible');
 
-      tab.navigateToTParameters();
+      tab.navigateToParameters();
       cy.contains('CLOUD_USER_PASSWORD').should('be.visible');
     });
   });

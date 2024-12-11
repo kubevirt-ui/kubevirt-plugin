@@ -1,118 +1,140 @@
-export enum vmTabs {
-  Configuration = 'horizontal-link-Configuration',
-  Console = 'horizontal-link-Console',
-  Diagnostics = 'horizontal-link-Diagnostics',
-  Disks = 'horizontal-link-Disks',
-  Environment = 'horizontal-link-Environment',
-  Events = 'horizontal-link-Events',
-  Metadata = 'horizontal-link-Metadata',
-  Metrics = 'horizontal-link-Metrics',
-  NetworkInterfaces = 'horizontal-link-Network interfaces',
-  Overview = 'horizontal-link-Overview',
-  Parameters = 'horizontal-link-Parameters',
-  Scheduling = 'horizontal-link-Scheduling',
-  Scripts = 'horizontal-link-Scripts',
-  Snapshots = 'horizontal-link-Snapshots',
-  YAML = 'horizontal-link-YAML',
+export const configurationSubTab = (tabName: string) =>
+  `[data-test-id="vm-configuration-${tabName}"]`;
+export const diagnosticsSubTab = (tabName: string) => `[data-test-id="vm-diagnostics-${tabName}"]`;
+export const horizontalLink = (tabName: string) => `[data-test-id="horizontal-link-${tabName}"]`;
+
+export enum tabName {
+  Configuration = 'Configuration',
+  Console = 'Console',
+  Diagnostics = 'Diagnostics',
+  Disks = 'Disks',
+  Environment = 'Environment',
+  Events = 'Events',
+  Metadata = 'Metadata',
+  Metrics = 'Metrics',
+  Migrations = 'Migrations',
+  NetworkInterfaces = 'Network interfaces',
+  Overview = 'Overview',
+  Parameters = 'Parameters',
+  Scheduling = 'Scheduling',
+  Scripts = 'Scripts',
+  Settings = 'Settings',
+  Snapshots = 'Snapshots',
+  TopConsumers = 'Top consumers',
+  YAML = 'YAML',
 }
 
-export enum overviewTabs {
-  Migrations = 'horizontal-link-Migrations',
-  Settings = 'horizontal-link-Settings',
-  // virt overview tabs
-  TopConsumers = 'horizontal-link-Top consumers',
+export enum subTabName {
+  Details = 'details',
+  GuestSystemLog = 'guest-system-log',
+  InitialRun = 'initial',
+  Metadata = 'metadata',
+  Network = 'network',
+  Scheduling = 'scheduling',
+  SSH = 'ssh',
+  StatusConditions = 'status-conditions',
+  Storage = 'storage',
 }
 
-export const navigateToTab = (tab: string) => {
-  cy.byLegacyTestID(tab).should('be.visible');
-  cy.byLegacyTestID(tab).click();
+export const navigateToTab = (name: string) => {
+  cy.get(horizontalLink(name)).should('be.visible');
+  cy.get(horizontalLink(name)).click();
+};
+
+export const navigateToConfigurationSubTab = (name: string) => {
+  navigateToTab(tabName.Configuration);
+  cy.get(configurationSubTab(name)).should('be.visible');
+  cy.get(configurationSubTab(name)).click();
+};
+
+export const navigateToDiagnosticsSubTab = (name: string) => {
+  navigateToTab(tabName.Diagnostics);
+  cy.get(diagnosticsSubTab(name)).should('be.visible');
+  cy.get(diagnosticsSubTab(name)).click();
 };
 
 export const tab = {
   navigateToConfiguration: () => {
-    navigateToTab(vmTabs.Configuration);
-  },
-  navigateToConsole: () => {
-    navigateToTab(vmTabs.Console);
+    navigateToTab(tabName.Configuration);
   },
   // VM configuration sub-tabs
-  navigateToDetails: () => {
-    navigateToTab(vmTabs.Configuration);
-    cy.byButtonText('Details').click();
+  navigateToConfigurationDetails: () => {
+    navigateToConfigurationSubTab(subTabName.Details);
+  },
+  navigateToConfigurationInitialRun: () => {
+    navigateToConfigurationSubTab(subTabName.InitialRun);
+  },
+  navigateToConfigurationMetadata: () => {
+    navigateToConfigurationSubTab(subTabName.Metadata);
+  },
+  navigateToConfigurationNetwork: () => {
+    navigateToConfigurationSubTab(subTabName.Network);
+  },
+  navigateToConfigurationScheduling: () => {
+    navigateToConfigurationSubTab(subTabName.Scheduling);
+  },
+  navigateToConfigurationSSH: () => {
+    navigateToConfigurationSubTab(subTabName.SSH);
+  },
+  navigateToConfigurationStorage: () => {
+    navigateToConfigurationSubTab(subTabName.Storage);
+  },
+  navigateToConsole: () => {
+    navigateToTab(tabName.Console);
   },
   navigateToDiagnostics: () => {
-    navigateToTab(vmTabs.Diagnostics);
+    navigateToTab(tabName.Diagnostics);
+  },
+  // VM diagnostics sub-tabs
+  navigateToDiagnosticsGuestSystemLog: () => {
+    navigateToDiagnosticsSubTab(subTabName.GuestSystemLog);
+  },
+  navigateToDiagnosticsStatusConditions: () => {
+    navigateToDiagnosticsSubTab(subTabName.StatusConditions);
+  },
+  navigateToDisks: () => {
+    navigateToTab(tabName.Disks);
+  },
+  navigateToEnvironment: () => {
+    navigateToTab(tabName.Environment);
   },
   navigateToEvents: () => {
-    navigateToTab(vmTabs.Events);
-  },
-  navigateToInitialRun: () => {
-    navigateToTab(vmTabs.Configuration);
-    cy.byButtonText('Initial run').click();
+    navigateToTab(tabName.Events);
   },
   navigateToMetadata: () => {
-    navigateToTab(vmTabs.Configuration);
-    cy.byButtonText('Metadata').click();
+    navigateToTab(tabName.Metadata);
   },
   navigateToMetrics: () => {
-    navigateToTab(vmTabs.Metrics);
+    navigateToTab(tabName.Metrics);
   },
   navigateToMigrations: () => {
-    navigateToTab(overviewTabs.Migrations);
+    navigateToTab(tabName.Migrations);
   },
-  navigateToNetwork: () => {
-    navigateToTab(vmTabs.Configuration);
-    cy.contains('.pf-v5-c-tabs__item-text', 'Network').click();
+  navigateToNetworks: () => {
+    navigateToTab(tabName.NetworkInterfaces);
   },
-  // VM tabs
   navigateToOverview: () => {
-    navigateToTab(vmTabs.Overview);
+    navigateToTab(tabName.Overview);
+  },
+  navigateToParameters: () => {
+    navigateToTab(tabName.Parameters);
   },
   navigateToScheduling: () => {
-    navigateToTab(vmTabs.Configuration);
-    cy.byButtonText('Scheduling').click();
+    navigateToTab(tabName.Scheduling);
+  },
+  navigateToScripts: () => {
+    navigateToTab(tabName.Scripts);
   },
   navigateToSettings: () => {
-    navigateToTab(overviewTabs.Settings);
+    navigateToTab(tabName.Settings);
   },
   navigateToSnapshots: () => {
-    navigateToTab(vmTabs.Snapshots);
+    navigateToTab(tabName.Snapshots);
   },
-  navigateToSSH: () => {
-    navigateToTab(vmTabs.Configuration);
-    cy.byButtonText('SSH').click();
-  },
-  navigateToStorage: () => {
-    navigateToTab(vmTabs.Configuration);
-    cy.contains('.pf-v5-c-tabs__item-text', 'Storage').click();
-  },
-  // template's tabs and vm creation tabs
-  navigateToTDisks: () => {
-    navigateToTab(vmTabs.Disks);
-  },
-  navigateToTEnvironment: () => {
-    navigateToTab(vmTabs.Environment);
-  },
-  navigateToTMetadata: () => {
-    navigateToTab(vmTabs.Metadata);
-  },
-  navigateToTNetworks: () => {
-    navigateToTab(vmTabs.NetworkInterfaces);
-  },
-  // virt overview tabs
   navigateToTopConsumers: () => {
-    navigateToTab(overviewTabs.TopConsumers);
-  },
-  navigateToTParameters: () => {
-    navigateToTab(vmTabs.Parameters);
-  },
-  navigateToTScheduling: () => {
-    navigateToTab(vmTabs.Scheduling);
-  },
-  navigateToTScripts: () => {
-    navigateToTab(vmTabs.Scripts);
+    navigateToTab(tabName.TopConsumers);
   },
   navigateToYAML: () => {
-    navigateToTab(vmTabs.YAML);
+    navigateToTab(tabName.YAML);
   },
 };
