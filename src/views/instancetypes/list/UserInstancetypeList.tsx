@@ -7,6 +7,7 @@ import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFi
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
+import useSetDefaultNonAdminUserProject from '@kubevirt-utils/hooks/useSetDefaultNonAdminUserProject/useSetDefaultNonAdminUserProject';
 import { ListPageProps } from '@kubevirt-utils/utils/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
@@ -32,6 +33,7 @@ const UserInstancetypeList: FC<ListPageProps> = ({
   selector,
 }) => {
   const { t } = useKubevirtTranslation();
+  useSetDefaultNonAdminUserProject();
   const [instanceTypes, loaded, loadError] = useVirtualMachineInstanceTypes(
     fieldSelector,
     selector,

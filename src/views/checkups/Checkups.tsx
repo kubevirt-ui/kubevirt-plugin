@@ -2,6 +2,7 @@ import React, { FC, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useSetDefaultNonAdminUserProject from '@kubevirt-utils/hooks/useSetDefaultNonAdminUserProject/useSetDefaultNonAdminUserProject';
 import { ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
 import { Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 import { createURL } from '@virtualmachines/details/tabs/overview/utils/utils';
@@ -15,6 +16,7 @@ import './checkups.scss';
 
 const CheckupsList: FC = () => {
   const { t } = useKubevirtTranslation();
+  useSetDefaultNonAdminUserProject();
   const navigate = useNavigate();
   const location = useLocation();
   const [activeTabKey, setActiveTabKey] = useState<number | string>(
