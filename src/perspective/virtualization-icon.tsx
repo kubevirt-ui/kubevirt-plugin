@@ -5,10 +5,10 @@ export default () => (
     <svg
       aria-hidden="true"
       fill="currentColor"
-      height="2em"
+      height="1em"
       role="img"
       viewBox="0 0 38 38"
-      width="2em"
+      width="1em"
       xmlns="http://www.w3.org/2000/svg"
     >
       <title>Red Hat OpenShift Virtualization icon</title>
