@@ -53,6 +53,7 @@ const CustomizeInstanceTypeConfigurationTab: FC = () => {
           {tabs.map(({ Component, name, title }) => (
             <Tab
               className="ConfigurationTab--content"
+              data-test-id={`vm-configuration-${name}`}
               eventKey={name}
               key={name}
               onClick={() => redirectTab(name)}
