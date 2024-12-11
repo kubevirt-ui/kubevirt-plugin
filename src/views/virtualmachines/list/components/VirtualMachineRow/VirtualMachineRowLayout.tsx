@@ -31,9 +31,10 @@ const VirtualMachineRowLayout: FC<
       isSingleNodeCluster: boolean;
       node: React.ReactNode | string;
       vmim: V1VirtualMachineInstanceMigration;
+      vmiMemory?: string;
     }
   >
-> = ({ activeColumnIDs, obj, rowData: { ips, isSingleNodeCluster, node, vmim } }) => {
+> = ({ activeColumnIDs, obj, rowData: { ips, isSingleNodeCluster, node, vmim, vmiMemory } }) => {
   const selected = isVMSelected(obj);
 
   const vmName = useMemo(() => getName(obj), [obj]);
@@ -90,7 +91,7 @@ const VirtualMachineRowLayout: FC<
         {ips}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="memory-usage">
-        <MemoryPercentage vmName={vmName} vmNamespace={vmNamespace} />
+        <MemoryPercentage vmiMemory={vmiMemory} vmName={vmName} vmNamespace={vmNamespace} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="cpu-usage">
         <CPUPercentage vmName={vmName} vmNamespace={vmNamespace} />

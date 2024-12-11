@@ -6,6 +6,7 @@ import {
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getMemory } from '@kubevirt-utils/resources/vm';
 import { getVMIIPAddressesWithName } from '@kubevirt-utils/resources/vmi';
 import { ResourceLink, RowProps } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -33,6 +34,7 @@ const VirtualMachineRunningRow: React.FC<
         isSingleNodeCluster,
         node: <ResourceLink kind="Node" name={vmi?.status?.nodeName} />,
         vmim,
+        vmiMemory: getMemory(vmi),
       }}
       activeColumnIDs={activeColumnIDs}
       obj={obj}

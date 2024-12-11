@@ -32,15 +32,6 @@ export const setVMNetworkUsage = (vmName: string, vmNamespace: string, networkUs
   vmMetrics.networkUsage = networkUsage;
 };
 
-export const setVMMemoryRequested = (
-  vmName: string,
-  vmNamespace: string,
-  memoryRequested: number,
-) => {
-  const vmMetrics = getVMMetrics(vmName, vmNamespace);
-  vmMetrics.memoryRequested = memoryRequested;
-};
-
 export const setVMCPUUsage = (vmName: string, vmNamespace: string, cpuUsage: number) => {
   const vmMetrics = getVMMetrics(vmName, vmNamespace);
   vmMetrics.cpuUsage = cpuUsage;

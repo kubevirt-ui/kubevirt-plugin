@@ -14,8 +14,8 @@ const CPUPercentage: FC<CPUPercentageProps> = ({ vmName, vmNamespace }) => {
 
   if (isEmpty(cpuRequested) || isEmpty(cpuUsage)) return <span>{NO_DATA_DASH}</span>;
 
-  const percentage = Math.round((cpuUsage * 10000) / cpuRequested) / 100;
-  return <span>{percentage}%</span>;
+  const percentage = (cpuUsage * 100) / cpuRequested;
+  return <span>{percentage.toFixed(2)}%</span>;
 };
 
 export default memo(CPUPercentage);
