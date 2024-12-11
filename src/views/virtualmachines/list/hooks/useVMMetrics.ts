@@ -11,13 +11,7 @@ import {
   usePrometheusPoll,
 } from '@openshift-console/dynamic-plugin-sdk';
 
-import {
-  setVMCPURequested,
-  setVMCPUUsage,
-  setVMMemoryRequested,
-  setVMMemoryUsage,
-  setVMNetworkUsage,
-} from '../metrics';
+import { setVMCPURequested, setVMCPUUsage, setVMMemoryUsage, setVMNetworkUsage } from '../metrics';
 
 import { getVMListQueries, VMListQueries } from './constants';
 import { getVMNamesFromPodsNames } from './utils';
@@ -54,13 +48,6 @@ const useVMMetrics = () => {
     query: queries?.NETWORK_TOTAL_USAGE,
   });
 
-  const [memoryRequestedResponse] = usePrometheusPoll({
-    endpoint: PrometheusEndpoint?.QUERY,
-    endTime: currentTime,
-    namespace: allNamespace ? undefined : activeNamespace,
-    query: queries?.[VMListQueries.MEMORY_REQUESTED],
-  });
-
   const [cpuUsageResponse] = usePrometheusPoll({
     endpoint: PrometheusEndpoint?.QUERY,
     endTime: currentTime,
@@ -94,19 +81,6 @@ const useVMMetrics = () => {
       setVMMemoryUsage(vmName, vmNamespace, memoryUsage);
     });
   }, [memoryUsageResponse]);
-
-  useEffect(() => {
-    memoryRequestedResponse?.data?.result?.forEach((result) => {
-      const vmName = launcherNameToVMName?.[`${result?.metric?.namespace}-${result?.metric?.pod}`];
-
-      if (isEmpty(vmName)) return;
-      const vmNamespace = result?.metric?.namespace;
-
-      const memoryRequested = parseFloat(result?.value?.[1]);
-
-      setVMMemoryRequested(vmName, vmNamespace, memoryRequested);
-    });
-  }, [memoryRequestedResponse, launcherNameToVMName]);
 
   useEffect(() => {
     cpuUsageResponse?.data?.result?.forEach((result) => {
