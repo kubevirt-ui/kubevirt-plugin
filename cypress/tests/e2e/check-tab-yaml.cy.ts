@@ -59,9 +59,8 @@ describe('Check all virtualization pages can be loaded', () => {
       tab.navigateToConsole();
       cy.contains('Guest login credentials').should('be.visible');
 
-      // skip the test due to error happens on this page
-      // tab.navigateToSnapshots();
-      // cy.contains('No snapshots found').should('be.visible');
+      tab.navigateToSnapshots();
+      cy.contains('No snapshots found').should('be.visible');
 
       tab.navigateToDiagnostics();
       cy.contains('Status conditions').should('be.visible');
