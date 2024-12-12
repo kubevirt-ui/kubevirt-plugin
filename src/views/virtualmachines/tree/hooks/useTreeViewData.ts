@@ -2,30 +2,27 @@ import { useMemo } from 'react';
 
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
+import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
-import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
 import { useK8sWatchResource, useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
+import { TreeViewDataItem } from '@patternfly/react-core';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 
-import { HIDE, SHOW_DEFAULT_PROJECTS_KEY } from '../utils/constants';
+import { createTreeViewData } from '../utils/utils';
 
 type UseTreeViewData = {
   isAdmin: boolean;
   loaded: boolean;
   loadError: any;
-  projectNames: string[];
-  setShowDefaultProjects: (newValue: string) => void;
-  showDefaultProjects: string;
+  treeData: TreeViewDataItem[];
   vms: V1VirtualMachine[];
 };
 
-export const useTreeViewData = (): UseTreeViewData => {
+export const useTreeViewData = (activeNamespace: string): UseTreeViewData => {
   const isAdmin = useIsAdmin();
-  const [showDefaultProjects, setShowDefaultProjects] = useLocalStorage(
-    SHOW_DEFAULT_PROJECTS_KEY,
-    HIDE,
-  );
+  const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
 
   const [projectNames, projectNamesLoaded, projectNamesError] = useProjects();
 
@@ -56,6 +53,19 @@ export const useTreeViewData = (): UseTreeViewData => {
     [allVMs, allowedResources, isAdmin],
   );
 
+  const treeData = useMemo(
+    () =>
+      createTreeViewData(
+        projectNames,
+        memoizedVMs,
+        activeNamespace,
+        isAdmin,
+        location.pathname,
+        treeViewFoldersEnabled,
+      ),
+    [projectNames, memoizedVMs, activeNamespace, isAdmin, treeViewFoldersEnabled],
+  );
+
   return {
     isAdmin,
     loaded:
@@ -64,9 +74,7 @@ export const useTreeViewData = (): UseTreeViewData => {
         ? allVMsLoaded
         : Object.values(allowedResources).some((resource) => resource.loaded)),
     loadError: projectNamesError,
-    projectNames,
-    setShowDefaultProjects,
-    showDefaultProjects,
+    treeData,
     vms: memoizedVMs,
   };
 };

@@ -7,6 +7,8 @@ import {
 import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { getConsoleVirtctlCommand } from '@kubevirt-utils/components/SSHAccess/utils';
+import { TREE_VIEW, TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
+import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
 import { useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
@@ -30,6 +32,10 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
   const virtctlCommand = getConsoleVirtctlCommand(vm);
 
   const [, inFlight] = useK8sModel(VirtualMachineModelRef);
+
+  const { featureEnabled: treeViewEnabled } = useFeatures(TREE_VIEW);
+  const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
+
   const actions: ActionDropdownItemType[] = useMemo(() => {
     const printableStatus = vm?.status?.printableStatus;
     const { Migrating, Paused } = printableVMStatus;
@@ -65,10 +71,20 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
       VirtualMachineActionFactory.snapshot(vm, createModal),
       VirtualMachineActionFactory.migrationActions(migrateOrCancelMigrationCompute, migrateStorage),
       VirtualMachineActionFactory.copySSHCommand(vm, virtctlCommand),
-      VirtualMachineActionFactory.moveToFolder(vm, createModal),
+      treeViewEnabled &&
+        treeViewFoldersEnabled &&
+        VirtualMachineActionFactory.moveToFolder(vm, createModal),
       VirtualMachineActionFactory.delete(vm, createModal),
-    ];
-  }, [vm, vmim, isSingleNodeCluster, createModal, virtctlCommand]);
+    ].filter(Boolean);
+  }, [
+    vm,
+    vmim,
+    isSingleNodeCluster,
+    createModal,
+    virtctlCommand,
+    treeViewEnabled,
+    treeViewFoldersEnabled,
+  ]);
 
   return useMemo(() => [actions, !inFlight, undefined], [actions, inFlight]);
 };

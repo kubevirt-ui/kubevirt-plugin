@@ -68,6 +68,31 @@ export const useFeatures: UseFeatures = (featureName) => {
           setFeatureEnabled(false);
           break;
         }
+        // In case of features config-map exists but there is a new feature to enter that is missing
+        case undefined:
+        case null: {
+          const applyMissingFeatures = async () => {
+            await k8sPatch({
+              data: [
+                {
+                  op: 'replace',
+                  path: `/data/${featureName}`,
+                  value: featuresConfigMapInitialState.data[featureName],
+                },
+              ],
+              model: ConfigMapModel,
+              resource: featureConfigMap,
+            });
+          };
+
+          try {
+            applyMissingFeatures();
+            setFeatureEnabled(featuresConfigMapInitialState.data[featureName] === 'true');
+          } catch (updateError) {
+            setError(updateError);
+          }
+          break;
+        }
         default:
           setFeatureEnabled(featureConfigMap?.data?.[featureName]);
       }

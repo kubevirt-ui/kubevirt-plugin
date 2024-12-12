@@ -7,6 +7,8 @@ import {
   RUNSTRATEGY_ALWAYS,
   RUNSTRATEGY_RERUNONFAILURE,
 } from '@kubevirt-utils/constants/constants';
+import { TREE_VIEW, TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
+import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
 import {
@@ -41,6 +43,9 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
     const { t } = useKubevirtTranslation();
 
     const { isBootSourceAvailable, templateLoadingError } = useDrawerContext();
+
+    const { featureEnabled: treeViewEnabled } = useFeatures(TREE_VIEW);
+    const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
 
     const {
       createError,
@@ -80,17 +85,19 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
                     />
                   </FormGroup>
                 </SplitItem>
-                <SplitItem>
-                  <FormGroup fieldId="vm-folder-field" isRequired label={t('Folder')}>
-                    <FolderSelect
-                      setSelectedFolder={(newFolder) => {
-                        onChangeFolder(newFolder);
-                      }}
-                      namespace={namespace}
-                      selectedFolder={folder}
-                    />
-                  </FormGroup>
-                </SplitItem>
+                {treeViewEnabled && treeViewFoldersEnabled && (
+                  <SplitItem>
+                    <FormGroup fieldId="vm-folder-field" isRequired label={t('Folder')}>
+                      <FolderSelect
+                        setSelectedFolder={(newFolder) => {
+                          onChangeFolder(newFolder);
+                        }}
+                        namespace={namespace}
+                        selectedFolder={folder}
+                      />
+                    </FormGroup>
+                  </SplitItem>
+                )}
                 <SplitItem>
                   <DescriptionList className="pf-c-description-list">
                     <VirtualMachineDescriptionItem

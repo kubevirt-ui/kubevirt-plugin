@@ -8,15 +8,7 @@ import { FilterValue } from '@openshift-console/dynamic-plugin-sdk';
 import { ERROR } from '@overview/OverviewTab/vm-statuses-card/utils/constants';
 import { getVMStatuses } from '@overview/OverviewTab/vm-statuses-card/utils/utils';
 import VMStatusItem from '@overview/OverviewTab/vm-statuses-card/VMStatusItem';
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  Divider,
-  ExpandableSection,
-  Grid,
-  Text,
-} from '@patternfly/react-core';
+import { Card, CardTitle, ExpandableSection, Grid, Text } from '@patternfly/react-core';
 import { ProjectDiagramIcon } from '@patternfly/react-icons';
 
 import './VirtualMachineListSummary.scss';
@@ -49,41 +41,36 @@ const VirtualMachineListSummary: FC<VirtualMachineListSummaryProps> = ({
       isExpanded={isExpanded}
       onToggle={() => setIsExpanded((prev) => !prev)}
     >
-      <Card className="vm-list-summary__card" data-test-id="vm-list-summary">
-        <CardHeader className="vm-statuses-card__header">
-          <CardTitle component="h5">
-            {t('Virtual Machines ({{count}})', { count: vms?.length })}
-          </CardTitle>
-        </CardHeader>
-        <div className="vm-statuses-card__body">
-          <Grid hasGutter>
-            <VMStatusItem
-              count={primaryStatuses.Error}
-              namespace={namespace}
-              onFilterChange={() => onFilterChange('status', { selected: [ERROR] })}
-              status={ERROR}
-            />
-            <VMStatusItem
-              count={primaryStatuses.Running}
-              namespace={namespace}
-              onFilterChange={() => onFilterChange('status', { selected: [VM_STATUS.Running] })}
-              status={VM_STATUS.Running}
-            />
-            <VMStatusItem
-              count={primaryStatuses.Stopped}
-              namespace={namespace}
-              onFilterChange={() => onFilterChange('status', { selected: [VM_STATUS.Stopped] })}
-              status={VM_STATUS.Stopped}
-            />
-            <VMStatusItem
-              count={primaryStatuses.Paused}
-              namespace={namespace}
-              onFilterChange={() => onFilterChange('status', { selected: [VM_STATUS.Paused] })}
-              status={VM_STATUS.Paused}
-            />
-          </Grid>
-        </div>
-        <Divider />
+      <Card className="vm-list-summary" data-test-id="vm-list-summary">
+        <CardTitle component="h5">
+          {t('Virtual Machines ({{count}})', { count: vms?.length })}
+        </CardTitle>
+        <Grid hasGutter>
+          <VMStatusItem
+            count={primaryStatuses.Error}
+            namespace={namespace}
+            onFilterChange={() => onFilterChange('status', { selected: [ERROR] })}
+            status={ERROR}
+          />
+          <VMStatusItem
+            count={primaryStatuses.Running}
+            namespace={namespace}
+            onFilterChange={() => onFilterChange('status', { selected: [VM_STATUS.Running] })}
+            status={VM_STATUS.Running}
+          />
+          <VMStatusItem
+            count={primaryStatuses.Stopped}
+            namespace={namespace}
+            onFilterChange={() => onFilterChange('status', { selected: [VM_STATUS.Stopped] })}
+            status={VM_STATUS.Stopped}
+          />
+          <VMStatusItem
+            count={primaryStatuses.Paused}
+            namespace={namespace}
+            onFilterChange={() => onFilterChange('status', { selected: [VM_STATUS.Paused] })}
+            status={VM_STATUS.Paused}
+          />
+        </Grid>
       </Card>
     </ExpandableSection>
   );

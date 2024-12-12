@@ -10,7 +10,7 @@ export const PANEL_WIDTH_PROPERTY = '--pf-v5-c-drawer__panel--md--FlexBasis';
 
 export const SYSTEM_NAMESPACES_PREFIX = ['kube-', 'openshift-', 'kubernetes-'];
 export const SYSTEM_NAMESPACES = ['default', 'openshift'];
-export const SHOW_DEFAULT_PROJECTS_KEY = 'showDefaultProjects';
+export const SHOW_EMPTY_PROJECTS_KEY = 'showEmptyProjects';
 export const TREE_VIEW_LAST_WIDTH = 'treeViewLastWidth';
 export const SHOW_TREE_VIEW = 'showTreeView';
 export const SHOW = 'show';

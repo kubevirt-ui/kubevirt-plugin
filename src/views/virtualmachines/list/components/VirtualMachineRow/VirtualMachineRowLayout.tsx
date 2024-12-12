@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FC, ReactNode, useMemo } from 'react';
 
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import {
@@ -27,9 +27,9 @@ const VirtualMachineRowLayout: FC<
   RowProps<
     V1VirtualMachine,
     {
-      ips: React.ReactNode | string;
+      ips: ReactNode | string;
       isSingleNodeCluster: boolean;
-      node: React.ReactNode | string;
+      node: ReactNode | string;
       vmim: V1VirtualMachineInstanceMigration;
       vmiMemory?: string;
     }
@@ -50,7 +50,7 @@ const VirtualMachineRowLayout: FC<
           onChange={() => (selected ? deselectVM(obj) : selectVM(obj))}
         />
       </TableData>
-      <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="name">
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-20 vm-column" id="name">
         <ResourceLink
           onClick={() => {
             setSelectedTreeItem(treeDataMap.value[`${vmNamespace}/${vmName}`]);
@@ -60,21 +60,13 @@ const VirtualMachineRowLayout: FC<
           namespace={vmNamespace}
         />
       </TableData>
-      <TableData
-        activeColumnIDs={activeColumnIDs}
-        className="pf-m-width-10 vm-column"
-        id="namespace"
-      >
-        <ResourceLink kind="Namespace" name={vmNamespace} />
+      <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="namespace">
+        <ResourceLink kind="Namespace" name={vmNamespace} truncate />
       </TableData>
-      <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-15 vm-column" id="status">
+      <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="status">
         <VirtualMachineStatus vm={obj} />
       </TableData>
-      <TableData
-        activeColumnIDs={activeColumnIDs}
-        className="pf-m-width-20 vm-column"
-        id="conditions"
-      >
+      <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="conditions">
         <VMStatusConditionLabelList conditions={obj?.status?.conditions?.filter((c) => c.reason)} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="node">
@@ -83,11 +75,7 @@ const VirtualMachineRowLayout: FC<
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="created">
         <Timestamp timestamp={obj?.metadata?.creationTimestamp} />
       </TableData>
-      <TableData
-        activeColumnIDs={activeColumnIDs}
-        className="pf-m-width-10 vm-column"
-        id="ip-address"
-      >
+      <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="ip-address">
         {ips}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="memory-usage">

@@ -1,61 +1,62 @@
-import React, { ChangeEvent, FC } from 'react';
+import React, { ChangeEvent, FC, ReactNode } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 import {
   Divider,
+  Split,
+  SplitItem,
   Stack,
   StackItem,
   Switch,
+  Text,
   Toolbar,
   ToolbarContent,
-  ToolbarItem,
   TreeViewSearch,
 } from '@patternfly/react-core';
 
-import { HIDE, SHOW, TREE_VIEW_SEARCH_ID } from '../utils/constants';
+import { HIDE, SHOW, SHOW_EMPTY_PROJECTS_KEY, TREE_VIEW_SEARCH_ID } from '../utils/constants';
 
 type TreeViewToolbarProps = {
-  isOpen: boolean;
+  closeComponent: ReactNode;
   onSearch: (event: ChangeEvent<HTMLInputElement>) => void;
-  setShowDefaultProjects: (show: string) => void;
-  showDefaultProjects: string;
 };
 
-const TreeViewToolbar: FC<TreeViewToolbarProps> = ({
-  isOpen,
-  onSearch,
-  setShowDefaultProjects,
-  showDefaultProjects,
-}) => {
+const TreeViewToolbar: FC<TreeViewToolbarProps> = ({ closeComponent, onSearch }) => {
   const { t } = useKubevirtTranslation();
+  const [showEmptyProjects, setShowEmptyProjects] = useLocalStorage(SHOW_EMPTY_PROJECTS_KEY, HIDE);
 
   return (
     <Toolbar className="vms-tree-view-toolbar" isSticky>
       <ToolbarContent className="vms-tree-view-toolbar-content">
-        <Stack className="vms-tree-view-toolbar-section" hasGutter>
+        <Stack className="vms-tree-view__toolbar-section" hasGutter>
           <StackItem>
-            <ToolbarItem>
-              {isOpen && (
+            <Split>
+              <SplitItem className="vms-tree-view__search-input" isFilled>
                 <TreeViewSearch
-                  className="vms-tree-view-search-input"
                   id={TREE_VIEW_SEARCH_ID}
                   name={TREE_VIEW_SEARCH_ID}
                   onSearch={onSearch}
                   placeholder={t('Search')}
                 />
-              )}
-            </ToolbarItem>
+              </SplitItem>
+              <SplitItem className="vms-tree-view__close-container">{closeComponent}</SplitItem>
+            </Split>
           </StackItem>
           <Divider />
           <StackItem>
-            {isOpen && (
+            <Split>
+              <SplitItem className="pf-u-ml-md">
+                <Text>{t('Show projects with VirtualMachines')}</Text>
+              </SplitItem>
+              <SplitItem isFilled />
               <Switch
-                checked={showDefaultProjects === SHOW}
-                className="vms-tree-view-toolbar-default-project-switch"
-                label={t('Show OCP default projects')}
-                onChange={(_, checked) => setShowDefaultProjects(checked ? SHOW : HIDE)}
+                checked={showEmptyProjects === SHOW}
+                className="vms-tree-view__toolbar-switch"
+                isReversed
+                onChange={(_, checked) => setShowEmptyProjects(checked ? SHOW : HIDE)}
               />
-            )}
+            </Split>
           </StackItem>
           <Divider />
         </Stack>
