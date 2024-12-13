@@ -13,13 +13,15 @@ import { getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, k8sDelete, k8sPatch, Patch } from '@openshift-console/dynamic-plugin-sdk';
 
 const getBlankDataVolume = (
-  originName: string,
+  dataVolumeName: string,
   namespace: string,
   storageClassName: string,
   storage: string,
 ): V1beta1DataVolume => {
   const randomChars = getRandomChars();
-  const namePrefix = `clone-${originName}`.substring(0, MAX_NAME_LENGTH - 6 - randomChars.length);
+
+  const originName = dataVolumeName.replace(/-mig-\d+$/, '');
+  const namePrefix = `${originName}-mig`.substring(0, MAX_NAME_LENGTH - 5 - randomChars.length);
 
   return {
     apiVersion: `${DataVolumeModel.apiGroup}/${DataVolumeModel.apiVersion}`,
@@ -156,7 +158,7 @@ export const migrateVM = async (
   patchData.push({
     op: 'add',
     path: '/spec/updateVolumesStrategy',
-    value: 'migration',
+    value: 'Migration',
   });
 
   try {

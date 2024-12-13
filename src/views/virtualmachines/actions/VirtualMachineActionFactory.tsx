@@ -149,7 +149,7 @@ export const VirtualMachineActionFactory = {
       label: t('Storage'),
     };
   },
-  migrationActions: (...migrationActions): ActionDropdownItemType => ({
+  migrationActions: (migrationActions): ActionDropdownItemType => ({
     id: 'migration-menu',
     label: 'Migration',
     options: migrationActions,

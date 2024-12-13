@@ -34,6 +34,10 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
     const printableStatus = vm?.status?.printableStatus;
     const { Migrating, Paused } = printableVMStatus;
 
+    const isMigrating =
+      printableStatus === Migrating ||
+      (vmim && ![vmimStatuses.Failed, vmimStatuses.Succeeded].includes(vmim?.status?.phase));
+
     const startOrStop = ((printableStatusMachine) => {
       const map = {
         default: VirtualMachineActionFactory.stop(vm),
@@ -44,13 +48,13 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
       return map[printableStatusMachine] || map.default;
     })(printableStatus);
 
-    const migrateOrCancelMigrationCompute =
-      printableStatus === Migrating ||
-      (vmim && ![vmimStatuses.Failed, vmimStatuses.Succeeded].includes(vmim?.status?.phase))
-        ? VirtualMachineActionFactory.cancelMigrationCompute(vm, vmim, isSingleNodeCluster)
-        : VirtualMachineActionFactory.migrateCompute(vm, isSingleNodeCluster);
+    const migrateCompute = VirtualMachineActionFactory.migrateCompute(vm, isSingleNodeCluster);
 
     const migrateStorage = VirtualMachineActionFactory.migrateStorage(vm, createModal);
+
+    const migrationActions = isMigrating
+      ? [VirtualMachineActionFactory.cancelMigrationCompute(vm, vmim, isSingleNodeCluster)]
+      : [migrateCompute, migrateStorage];
 
     const pauseOrUnpause =
       printableStatus === Paused
@@ -63,7 +67,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
       pauseOrUnpause,
       VirtualMachineActionFactory.clone(vm, createModal),
       VirtualMachineActionFactory.snapshot(vm, createModal),
-      VirtualMachineActionFactory.migrationActions(migrateOrCancelMigrationCompute, migrateStorage),
+      VirtualMachineActionFactory.migrationActions(migrationActions),
       VirtualMachineActionFactory.copySSHCommand(vm, virtctlCommand),
       VirtualMachineActionFactory.moveToFolder(vm, createModal),
       VirtualMachineActionFactory.delete(vm, createModal),
