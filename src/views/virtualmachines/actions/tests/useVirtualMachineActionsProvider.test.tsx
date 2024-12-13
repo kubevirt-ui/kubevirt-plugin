@@ -111,6 +111,6 @@ describe('useVirtualMachineActionsProvider tests', () => {
       'vm-action-delete',
     ]);
 
-    expect(migratingSubmenuIds).toEqual(['vm-action-cancel-migrate', 'vm-migrate-storage']);
+    expect(migratingSubmenuIds).toEqual(['vm-action-cancel-migrate']);
   });
 });
