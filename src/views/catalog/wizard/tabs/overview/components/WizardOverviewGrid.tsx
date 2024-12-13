@@ -15,7 +15,11 @@ import HostnameModal from '@kubevirt-utils/components/HostnameModal/HostnameModa
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import MoveVMToFolderModal from '@kubevirt-utils/components/MoveVMToFolderModal/MoveVMToFolderModal';
 import WorkloadProfileModal from '@kubevirt-utils/components/WorkloadProfileModal/WorkloadProfileModal';
-import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeatures/constants';
+import {
+  DISABLED_GUEST_SYSTEM_LOGS_ACCESS,
+  TREE_VIEW,
+  TREE_VIEW_FOLDERS,
+} from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotation, getLabel } from '@kubevirt-utils/resources/shared';
@@ -50,6 +54,8 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
   const { ns } = useParams<{ ns: string }>();
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+  const { featureEnabled: treeViewEnabled } = useFeatures(TREE_VIEW);
+  const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
   const { cpuCount, memory } = getVmCPUMemory(vm);
   const { featureEnabled: isDisabledGuestSystemLogs } = useFeatures(
     DISABLED_GUEST_SYSTEM_LOGS_ACCESS,
@@ -123,33 +129,35 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
             title={t('Namespace')}
           />
 
-          <WizardDescriptionItem
-            onEditClick={() =>
-              createModal(({ isOpen, onClose }) => (
-                <MoveVMToFolderModal
-                  onSubmit={(folderName) =>
-                    updateVM((draftVM) => {
-                      if (!folderName) {
-                        delete draftVM?.metadata?.labels?.[VM_FOLDER_LABEL];
-                        return;
-                      }
-                      draftVM.metadata.labels = {
-                        ...draftVM?.metadata?.labels,
-                        [VM_FOLDER_LABEL]: folderName,
-                      };
-                    })
-                  }
-                  isOpen={isOpen}
-                  onClose={onClose}
-                  vm={vm}
-                />
-              ))
-            }
-            description={getLabel(vm, VM_FOLDER_LABEL)}
-            isEdit
-            testId="wizard-overview-folder"
-            title={t('Folder')}
-          />
+          {treeViewEnabled && treeViewFoldersEnabled && (
+            <WizardDescriptionItem
+              onEditClick={() =>
+                createModal(({ isOpen, onClose }) => (
+                  <MoveVMToFolderModal
+                    onSubmit={(folderName) =>
+                      updateVM((draftVM) => {
+                        if (!folderName) {
+                          delete draftVM?.metadata?.labels?.[VM_FOLDER_LABEL];
+                          return;
+                        }
+                        draftVM.metadata.labels = {
+                          ...draftVM?.metadata?.labels,
+                          [VM_FOLDER_LABEL]: folderName,
+                        };
+                      })
+                    }
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    vm={vm}
+                  />
+                ))
+              }
+              description={getLabel(vm, VM_FOLDER_LABEL)}
+              isEdit
+              testId="wizard-overview-folder"
+              title={t('Folder')}
+            />
+          )}
 
           <WizardDescriptionItem
             helperPopover={{

@@ -1,11 +1,51 @@
 .vms-tree-view {
   overflow-x: hidden;
+
+  &__toolbar-section {
+    width: 100%;
+  }
+
+  &__search-input {
+    width: 100%;
+    margin: var(--pf-global--spacer--md) var(--pf-global--spacer--sm) 0 var(--pf-global--spacer--sm);
+  }
+
+  &__action {
+    padding: var(--pf-global--spacer--sm);
+  }
+
+  &__header-section {
+    margin: var(--pf-global--spacer--sm) 0;
+  }
+
+  &__title {
+    align-self: baseline;
+  }
+
+  &__expand {
+    padding: 0 var(--pf-global--spacer--xs) 0 var(--pf-global--spacer--xs);
+    margin-right: calc(var(--pf-global--spacer--xs) * 2.5);
+  }
+
+  &__close-container {
+    display: flex;
+    align-self: flex-end;
+  }
+
+  &__close-button {
+    padding-top: 0;
+    padding-left: 0;
+    padding-right: var(--pf-global--spacer--xs);
+    padding-bottom: calc(var(--pf-global--spacer--xs) * 1.5);
+  }
+
+  &__toolbar-switch {
+    margin-right: var(--pf-global--spacer--sm);
+    margin-bottom: 0;
+  }
 }
 
-.pf-v5-c-drawer__body.vms-tree-view-body,
-.pf-v5-c-toolbar.vms-tree-view-toolbar,
-.pf-v5-c-toolbar__content.vms-tree-view-toolbar-content,
-.pf-v5-c-drawer__body.vms-tree-view-actions {
+.pf-v5-c-drawer__body.vms-tree-view-body {
   padding: 0;
 }
 
@@ -15,16 +55,14 @@
     height: fit-content;
   }
 }
-.pf-v5-c-toolbar__content.vms-tree-view-toolbar-content,
-.vms-tree-view-toolbar-section,
-.vms-tree-view-search-input {
+.pf-v5-c-toolbar__content.vms-tree-view-toolbar-content {
   width: 100%;
+  padding: 0;
 }
-.vms-tree-view-search-input {
-  margin: var(--pf-global--spacer--sm) var(--pf-global--spacer--sm) 0 var(--pf-global--spacer--sm);
-}
+
 .pf-v5-c-toolbar.vms-tree-view-toolbar {
   margin-bottom: var(--pf-global--spacer--sm);
+  padding: 0;
 }
 .pf-v5-c-tree-view__node .pf-v5-c-tree-view__node-count {
   display: flex;
@@ -34,14 +72,9 @@
 
 .pf-v5-c-tree-view {
   padding: 0;
-}
-
-.vms-tree-view-toolbar-action {
-  padding: var(--pf-global--spacer--sm);
-}
-
-.vms-tree-view-toolbar-default-project-switch {
-  margin-left: var(--pf-global--spacer--sm);
-  margin-bottom: 0;
-  font-weight: var(--pf-global--FontWeight--light);
+  --pf-v5-c-tree-view__node--indent--base: 2rem;
+  --pf-v5-c-tree-view__node--nested-indent--base: 0.75rem;
+  --pf-v5-c-tree-view__node--PaddingTop--base: 0.25rem;
+  --pf-v5-c-tree-view__node-icon--PaddingRight: 0.25rem;
+  --pf-v5-c-tree-view__node--PaddingBottom: 0.25rem;
 }

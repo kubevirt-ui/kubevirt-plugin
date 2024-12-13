@@ -7,6 +7,11 @@ import useVirtualMachineActionsProvider from '../hooks/useVirtualMachineActionsP
 import { exampleRunningVirtualMachine } from './mocks';
 
 jest.mock('@openshift-console/dynamic-plugin-sdk', () => ({
+  getGroupVersionKindForModel: jest.fn(() => ({})),
+  k8sPatch: jest.fn(() => ({})),
+  // useFeatures: jest.fn(() => ({ featureEnabled: true })),
+  // useFeaturesConfigMap: jest.fn(() => ({ featuresConfigMapData: [[], true, null], isAdmin: true })),
+  useFlag: jest.fn(() => true),
   useK8sModel: jest.fn(() => [[], true]),
   useK8sWatchResource: jest.fn(() => [[], true]),
 }));
@@ -31,7 +36,6 @@ describe('useVirtualMachineActionsProvider tests', () => {
       'vm-action-snapshot',
       'migration-menu',
       'vm-action-copy-ssh',
-      'vm-action-move-to-folder',
       'vm-action-delete',
     ]);
   });
@@ -55,7 +59,6 @@ describe('useVirtualMachineActionsProvider tests', () => {
       'vm-action-snapshot',
       'migration-menu',
       'vm-action-copy-ssh',
-      'vm-action-move-to-folder',
       'vm-action-delete',
     ]);
   });
@@ -79,7 +82,6 @@ describe('useVirtualMachineActionsProvider tests', () => {
       'vm-action-snapshot',
       'migration-menu',
       'vm-action-copy-ssh',
-      'vm-action-move-to-folder',
       'vm-action-delete',
     ]);
   });
@@ -106,7 +108,6 @@ describe('useVirtualMachineActionsProvider tests', () => {
       'vm-action-snapshot',
       'migration-menu',
       'vm-action-copy-ssh',
-      'vm-action-move-to-folder',
       'vm-action-delete',
     ]);
 

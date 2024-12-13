@@ -1,16 +1,14 @@
 import { useEffect } from 'react';
-import { Location } from 'react-router-dom-v5-compat';
+import { useLocation } from 'react-router-dom-v5-compat';
 
 import { ALL_NAMESPACES, ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 
 import { FOLDER_SELECTOR_PREFIX, PROJECT_SELECTOR_PREFIX } from '../utils/constants';
 import { setSelectedTreeItem, treeDataMap } from '../utils/utils';
 
-export const useSyncClicksEffects = (
-  activeNamespace: string,
-  loaded: boolean,
-  location: Location<any>,
-) => {
+export const useSyncClicksEffects = (activeNamespace: string, loaded: boolean) => {
+  const location = useLocation();
+
   useEffect(() => {
     const pathname = location.pathname;
     if (loaded) {

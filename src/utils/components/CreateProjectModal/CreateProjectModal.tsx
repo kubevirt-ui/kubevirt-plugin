@@ -42,7 +42,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
         k8sCreate({
           data,
           model: ProjectRequestModel,
-        }).then((value) => createdProject(value))
+        }).then((value) => createdProject?.(value))
       }
       headerText={t('Create project')}
       isDisabled={isEmpty(name)}

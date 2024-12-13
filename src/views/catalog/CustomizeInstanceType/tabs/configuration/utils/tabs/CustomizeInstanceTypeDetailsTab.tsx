@@ -12,7 +12,11 @@ import MoveVMToFolderModal from '@kubevirt-utils/components/MoveVMToFolderModal/
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
-import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeatures/constants';
+import {
+  DISABLED_GUEST_SYSTEM_LOGS_ACCESS,
+  TREE_VIEW,
+  TREE_VIEW_FOLDERS,
+} from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview, getAnnotation, getLabel, getName } from '@kubevirt-utils/resources/shared';
@@ -30,9 +34,12 @@ const CustomizeInstanceTypeDetailsTab = () => {
   const { t } = useKubevirtTranslation();
   const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
   const [canUpdateVM] = useAccessReview(accessReview || {});
+
   const { featureEnabled: isGuestSystemLogsDisabled } = useFeatures(
     DISABLED_GUEST_SYSTEM_LOGS_ACCESS,
   );
+  const { featureEnabled: treeViewEnabled } = useFeatures(TREE_VIEW);
+  const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
 
   const logSerialConsole = vm?.spec?.template?.spec?.domain?.devices?.logSerialConsole;
   const [isCheckedGuestSystemAccessLog, setIsCheckedGuestSystemAccessLog] = useState<boolean>();
@@ -86,31 +93,33 @@ const CustomizeInstanceTypeDetailsTab = () => {
               descriptionHeader={<SearchItem id="description">{t('Description')}</SearchItem>}
               isEdit
             />
-            <VirtualMachineDescriptionItem
-              onEditClick={() =>
-                createModal(({ isOpen, onClose }) => (
-                  <MoveVMToFolderModal
-                    onSubmit={(folderName) =>
-                      Promise.resolve(
-                        updateCustomizeInstanceType([
-                          {
-                            data: folderName,
-                            path: ['metadata', 'labels', VM_FOLDER_LABEL],
-                          },
-                        ]),
-                      )
-                    }
-                    isOpen={isOpen}
-                    onClose={onClose}
-                    vm={vm}
-                  />
-                ))
-              }
-              data-test-id={`${vmName}-folder`}
-              descriptionData={getLabel(vm, VM_FOLDER_LABEL)}
-              descriptionHeader={<SearchItem id="folder">{t('Folder')}</SearchItem>}
-              isEdit
-            />
+            {treeViewEnabled && treeViewFoldersEnabled && (
+              <VirtualMachineDescriptionItem
+                onEditClick={() =>
+                  createModal(({ isOpen, onClose }) => (
+                    <MoveVMToFolderModal
+                      onSubmit={(folderName) =>
+                        Promise.resolve(
+                          updateCustomizeInstanceType([
+                            {
+                              data: folderName,
+                              path: ['metadata', 'labels', VM_FOLDER_LABEL],
+                            },
+                          ]),
+                        )
+                      }
+                      isOpen={isOpen}
+                      onClose={onClose}
+                      vm={vm}
+                    />
+                  ))
+                }
+                data-test-id={`${vmName}-folder`}
+                descriptionData={getLabel(vm, VM_FOLDER_LABEL)}
+                descriptionHeader={<SearchItem id="folder">{t('Folder')}</SearchItem>}
+                isEdit
+              />
+            )}
             <VirtualMachineDescriptionItem
               onEditClick={() =>
                 createModal(({ isOpen, onClose }) => (

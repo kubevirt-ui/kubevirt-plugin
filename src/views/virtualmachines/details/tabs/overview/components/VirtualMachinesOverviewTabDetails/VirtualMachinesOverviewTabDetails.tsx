@@ -11,6 +11,8 @@ import GuestAgentIsRequiredText from '@kubevirt-utils/components/GuestAgentIsReq
 import { timestampFor } from '@kubevirt-utils/components/Timestamp/utils/datetime';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
+import { TREE_VIEW, TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
+import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getLabel, getName, getVMStatus } from '@kubevirt-utils/resources/shared';
 import { getInstanceTypeMatcher, getMachineType } from '@kubevirt-utils/resources/vm';
@@ -64,6 +66,8 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
   vmi,
 }) => {
   const { t } = useKubevirtTranslation();
+  const { featureEnabled: treeViewEnabled } = useFeatures(TREE_VIEW);
+  const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
 
   const timestamp = timestampFor(
     new Date(vm?.metadata?.creationTimestamp),
@@ -114,11 +118,13 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
                   descriptionData={getName(vm)}
                   descriptionHeader={t('Name')}
                 />
-                <VirtualMachineDescriptionItem
-                  data-test-id="virtual-machine-overview-details-folder"
-                  descriptionData={getLabel(vm, VM_FOLDER_LABEL) || NO_DATA_DASH}
-                  descriptionHeader={t('Folder')}
-                />
+                {treeViewEnabled && treeViewFoldersEnabled && (
+                  <VirtualMachineDescriptionItem
+                    data-test-id="virtual-machine-overview-details-folder"
+                    descriptionData={getLabel(vm, VM_FOLDER_LABEL) || NO_DATA_DASH}
+                    descriptionHeader={t('Folder')}
+                  />
+                )}
                 <VirtualMachineDescriptionItem
                   descriptionData={
                     <Split hasGutter isWrappable>

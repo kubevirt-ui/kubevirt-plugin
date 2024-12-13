@@ -17,6 +17,7 @@ import {
   VM_FOLDER_LABEL,
 } from './constants';
 
+export const vmsPerNamespaceMap = signal<{ [ns: string]: number }>(null);
 export const treeDataMap = signal<Record<string, TreeViewDataItem>>(null);
 export const selectedTreeItem = signal<TreeViewDataItem[]>(null);
 export const setSelectedTreeItem = (selected: TreeViewDataItem) =>
@@ -26,16 +27,17 @@ const buildProjectMap = (
   vms: V1VirtualMachine[],
   currentPageVMName: string,
   treeViewDataMap: Record<string, TreeViewDataItem>,
+  foldersEnabled: boolean,
 ) => {
   const projectMap: Record<
     string,
-    { folders: Record<string, TreeViewDataItem[]>; ungrouped: TreeViewDataItem[] }
+    { count: number; folders: Record<string, TreeViewDataItem[]>; ungrouped: TreeViewDataItem[] }
   > = {};
 
   vms.forEach((vm) => {
     const vmNamespace = getNamespace(vm);
     const vmName = getName(vm);
-    const folder = getLabel(vm, VM_FOLDER_LABEL);
+    const folder = foldersEnabled ? getLabel(vm, VM_FOLDER_LABEL) : null;
     const vmTreeItemID = `${vmNamespace}/${vmName}`;
     const VMStatusIcon = statusIcon[vm?.status?.printableStatus];
 
@@ -51,9 +53,10 @@ const buildProjectMap = (
     }
 
     if (!projectMap[vmNamespace]) {
-      projectMap[vmNamespace] = { folders: {}, ungrouped: [] };
+      projectMap[vmNamespace] = { count: 0, folders: {}, ungrouped: [] };
     }
 
+    projectMap[vmNamespace].count++;
     if (folder) {
       if (!projectMap[vmNamespace].folders[folder]) {
         projectMap[vmNamespace].folders[folder] = [];
@@ -113,6 +116,7 @@ const createProjectTreeItem = (
   const projectTreeItemID = `${PROJECT_SELECTOR_PREFIX}/${project}`;
   const projectTreeItem: TreeViewDataItem = {
     children: projectChildren,
+    customBadgeContent: projectMap[project]?.count || 0,
     defaultExpanded: project === activeNamespace,
     icon: <ProjectDiagramIcon />,
     id: projectTreeItemID,
@@ -129,9 +133,16 @@ const createProjectTreeItem = (
 const createAllNamespacesTreeItem = (
   treeViewData: TreeViewDataItem[],
   treeViewDataMap: Record<string, TreeViewDataItem>,
+  projectMap: Record<string, any>,
 ): TreeViewDataItem => {
+  const allVMsCount = Object.keys(projectMap).reduce((acc, ns) => {
+    acc += projectMap[ns]?.count;
+    return acc;
+  }, 0);
+
   const allNamespacesTreeItem: TreeViewDataItem = {
     children: treeViewData,
+    customBadgeContent: allVMsCount || 0,
     defaultExpanded: true,
     icon: <ProjectDiagramIcon />,
     id: ALL_NAMESPACES_SESSION_KEY,
@@ -150,17 +161,22 @@ export const createTreeViewData = (
   activeNamespace: string,
   isAdmin: boolean,
   pathname: string,
+  foldersEnabled: boolean,
 ): TreeViewDataItem[] => {
   const currentPageVMName = pathname.split('/')[5];
   const treeViewDataMap: Record<string, TreeViewDataItem> = {};
-  const projectMap = buildProjectMap(vms, currentPageVMName, treeViewDataMap);
+  const projectMap = buildProjectMap(vms, currentPageVMName, treeViewDataMap, foldersEnabled);
 
   const treeViewData = projectNames.map((project) =>
     createProjectTreeItem(project, projectMap, activeNamespace, currentPageVMName, treeViewDataMap),
   );
 
   if (isAdmin) {
-    const allNamespacesTreeItem = createAllNamespacesTreeItem(treeViewData, treeViewDataMap);
+    const allNamespacesTreeItem = createAllNamespacesTreeItem(
+      treeViewData,
+      treeViewDataMap,
+      projectMap,
+    );
     return [allNamespacesTreeItem];
   }
 
@@ -181,15 +197,22 @@ export const filterItems = (item: TreeViewDataItem, input: string) => {
   }
 };
 
-export const filterDefaultNamespaceItems = (item: TreeViewDataItem) => {
-  if (item.id.startsWith(PROJECT_SELECTOR_PREFIX) && !isSystemNamespace(item.name as string)) {
-    return true;
+// Show projects that has VMs all the time.
+// Show / hide projects that has no VMs depending on a flag
+// hide system namespaces unless they contain VMs
+export const filterNamespaceItems = (item: TreeViewDataItem, showEmptyProjects: boolean) => {
+  const hasVMs = item.id !== ALL_NAMESPACES_SESSION_KEY && item.children.length > 0;
+  const projectName = item.name as string;
+
+  if (item.id.startsWith(PROJECT_SELECTOR_PREFIX)) {
+    // if (hasVMs) return true;
+    if ((showEmptyProjects && !isSystemNamespace(projectName)) || hasVMs) return true;
   }
   if (item.children) {
     return (
       (item.children = item.children
         .map((opt) => Object.assign({}, opt))
-        .filter((child) => filterDefaultNamespaceItems(child))).length > 0
+        .filter((child) => filterNamespaceItems(child, showEmptyProjects))).length > 0
     );
   }
 };

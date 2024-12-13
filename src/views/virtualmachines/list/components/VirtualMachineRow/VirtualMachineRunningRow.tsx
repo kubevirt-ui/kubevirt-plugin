@@ -6,6 +6,7 @@ import {
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { modelToGroupVersionKind, NodeModel } from '@kubevirt-utils/models';
 import { getMemory } from '@kubevirt-utils/resources/vm';
 import { getVMIIPAddressesWithName } from '@kubevirt-utils/resources/vmi';
 import { ResourceLink, RowProps } from '@openshift-console/dynamic-plugin-sdk';
@@ -32,7 +33,13 @@ const VirtualMachineRunningRow: React.FC<
       rowData={{
         ips: <FirstItemListPopover headerContent={t('IP addresses')} items={ipAddressess} />,
         isSingleNodeCluster,
-        node: <ResourceLink kind="Node" name={vmi?.status?.nodeName} />,
+        node: (
+          <ResourceLink
+            groupVersionKind={modelToGroupVersionKind(NodeModel)}
+            name={vmi?.status?.nodeName}
+            truncate
+          />
+        ),
         vmim,
         vmiMemory: getMemory(vmi),
       }}

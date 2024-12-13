@@ -35,6 +35,7 @@ const useVirtualMachineColumns = (
     () => [
       {
         id: 'name',
+        props: { className: 'pf-m-width-20' },
         sort: (_, direction) => sorting(direction, 'metadata.name'),
         title: t('Name'),
         transforms: [sortable],
@@ -43,7 +44,6 @@ const useVirtualMachineColumns = (
         ? [
             {
               id: 'namespace',
-              props: { className: 'pf-m-width-10' },
               sort: (_, direction) => sorting(direction, 'metadata.namespace'),
               title: t('Namespace'),
               transforms: [sortable],
@@ -52,14 +52,12 @@ const useVirtualMachineColumns = (
         : []),
       {
         id: 'status',
-        props: { className: 'pf-m-width-15' },
         sort: (_, direction) => sorting(direction, 'status.printableStatus'),
         title: t('Status'),
         transforms: [sortable],
       },
       {
         id: 'conditions',
-        props: { className: 'pf-m-width-20' },
         title: t('Conditions'),
       },
       ...(canGetNode
@@ -79,7 +77,6 @@ const useVirtualMachineColumns = (
       },
       {
         id: 'ip-address',
-        props: { className: 'pf-m-width-10' },
         title: t('IP address'),
       },
       {
