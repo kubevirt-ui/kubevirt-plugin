@@ -36,9 +36,11 @@ import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeat
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
-import { getAnnotation, getLabel, getResourceUrl } from '@kubevirt-utils/resources/shared';
+import { createSecret } from '@kubevirt-utils/resources/secret/utils';
+import { getAnnotation, getLabel, getName, getResourceUrl } from '@kubevirt-utils/resources/shared';
 import {
   ANNOTATIONS,
+  bootDiskSourceIsRegistry,
   getTemplateOS,
   getTemplateVirtualMachineObject,
   LABEL_USED_TEMPLATE_NAME,
@@ -49,7 +51,7 @@ import {
   HEADLESS_SERVICE_LABEL,
   HEADLESS_SERVICE_NAME,
 } from '@kubevirt-utils/utils/headless-service';
-import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
+import { addRandomSuffix, ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, useAccessReview, useK8sModels } from '@openshift-console/dynamic-plugin-sdk';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
@@ -76,6 +78,7 @@ const useCreateDrawerForm = (
     cdFile,
     diskFile,
     isBootSourceAvailable,
+    registryCredentials,
     setVM,
     sshDetails,
     storageClassName,
@@ -85,6 +88,7 @@ const useCreateDrawerForm = (
     uploadDiskData,
     vm,
   } = useDrawerContext();
+  const { password, username } = registryCredentials;
 
   const { nameField, onVMNameChange } = useCreateVMName();
 
@@ -107,6 +111,18 @@ const useCreateDrawerForm = (
     setIsQuickCreating(true);
     setCreateError(undefined);
 
+    const addSecret = username && password && bootDiskSourceIsRegistry(template);
+    const imageSecretName = addRandomSuffix(getName(template));
+
+    if (addSecret) {
+      await createSecret({
+        namespace,
+        password,
+        secretName: imageSecretName,
+        username,
+      });
+    }
+
     const templateToProcess = produce(template, (draftTemplate) => {
       const vmObject = getTemplateVirtualMachineObject(draftTemplate);
 
@@ -119,6 +135,9 @@ const useCreateDrawerForm = (
         const { cpu, memory } = getMemoryCPU(vm);
         vmObject.spec.template.spec.domain.cpu.cores = cpu?.cores;
         vmObject.spec.template.spec.domain.memory.guest = memory;
+
+        if (addSecret)
+          vmObject.spec.dataVolumeTemplates[0].spec.source.registry.secretRef = imageSecretName;
 
         if (!getLabels(vmObject.spec.template)) vmObject.spec.template.metadata.labels = {};
         vmObject.spec.template.metadata.labels[HEADLESS_SERVICE_LABEL] = HEADLESS_SERVICE_NAME;

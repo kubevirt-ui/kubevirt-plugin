@@ -1,12 +1,5 @@
-import { IoK8sApiCoreV1Pod, IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import {
-  PodModel,
-  RoleBindingModel,
-  RoleModel,
-  SecretModel,
-  ServiceAccountModel,
-} from '@kubevirt-utils/models';
-import { encodeSecretKey } from '@kubevirt-utils/resources/secret/utils';
+import { IoK8sApiCoreV1Pod } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { PodModel, RoleBindingModel, RoleModel, ServiceAccountModel } from '@kubevirt-utils/models';
 import { getRandomChars, isEmpty, isUpstream } from '@kubevirt-utils/utils/utils';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -18,32 +11,6 @@ import {
   UPLOAD_STATUSES,
   UPSTREAM_UPLOADER_IMAGE,
 } from './constants';
-
-type CreateSecretType = (input: {
-  namespace: string;
-  password: string;
-  secretName: string;
-  username: string;
-}) => Promise<IoK8sApiCoreV1Secret>;
-
-export const createSecret: CreateSecretType = ({ namespace, password, secretName, username }) =>
-  k8sCreate({
-    data: {
-      apiVersion: 'v1',
-      data: {
-        accessKeyId: encodeSecretKey(username),
-        secretKey: encodeSecretKey(password),
-      },
-      kind: 'Secret',
-      metadata: {
-        name: secretName,
-        namespace,
-      },
-      type: 'Opaque',
-    },
-    model: SecretModel,
-    ns: namespace,
-  });
 
 export const createServiceAccount = async (namespace: string) => {
   await Promise.all([
