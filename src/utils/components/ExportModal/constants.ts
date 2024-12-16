@@ -59,6 +59,16 @@ export const role: IoK8sApiRbacV1Role = {
       resources: ['pods'],
       verbs: ['get'],
     },
+    {
+      apiGroups: [''],
+      resources: ['persistentvolumeclaims'],
+      verbs: ['get'],
+    },
+    {
+      apiGroups: ['cdi.kubevirt.io'],
+      resources: ['datavolumes'],
+      verbs: ['get'],
+    },
   ],
 };
 
@@ -82,4 +92,4 @@ export const ALREADY_CREATED_ERROR_CODE = 409;
 
 export const UPSTREAM_UPLOADER_IMAGE = 'quay.io/kubevirt/tekton-tasks:v0.23.0';
 export const DOWNSTREAM_UPLOADER_IMAGE =
-  'registry-proxy.engineering.redhat.com/rh-osbs/container-native-virtualization-kubevirt-tekton-tasks-create-datavolume-rhel9:v4.99.0-50';
+  'registry-proxy.engineering.redhat.com/rh-osbs/kubevirt-tekton-tasks-create-datavolume-rhel9-container-v4.18.0-16';
