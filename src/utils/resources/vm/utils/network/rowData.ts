@@ -20,7 +20,7 @@ export const getNetworkInterfaceRowData = (
     const network = networks?.find((net) => net.name === iface.name);
     return {
       iface,
-      metadata: { name: network.name },
+      metadata: { name: network?.name },
       network,
     };
   });

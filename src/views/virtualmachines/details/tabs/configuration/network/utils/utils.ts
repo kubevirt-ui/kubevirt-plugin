@@ -1,4 +1,10 @@
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1Interface,
+  V1Network,
+  V1VirtualMachine,
+  V1VirtualMachineInstance,
+  V1VirtualMachineInstanceNetworkInterface,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getAutoAttachPodInterface, getInterfaces } from '@kubevirt-utils/resources/vm';
 import { DEFAULT_NETWORK_INTERFACE } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getVMIInterfaces, getVMIStatusInterfaces } from '@kubevirt-utils/resources/vmi';
@@ -30,6 +36,14 @@ export const isPendingHotPlugNIC = (
 
 export const interfaceNotFound = (vm: V1VirtualMachine, nicName: string) =>
   !Boolean(getInterfaces(vm)?.find((iface) => iface?.name === nicName));
+
+//special case - when u add ephemeral nic from vm console terminal
+export const isInterfaceEphemeral = (network: V1Network, iface: V1Interface) => {
+  const ifaceVMIStatus = iface as V1VirtualMachineInstanceNetworkInterface;
+  const ifaceVMI = !network && ifaceVMIStatus.infoSource === 'guest-agent' && ifaceVMIStatus;
+
+  return ifaceVMI;
+};
 
 export const isPendingRemoval = (
   vm: V1VirtualMachine,

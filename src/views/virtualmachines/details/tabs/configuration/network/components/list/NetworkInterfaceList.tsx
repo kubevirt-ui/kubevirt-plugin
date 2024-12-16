@@ -17,7 +17,7 @@ import {
 
 import useNetworkColumns from '../../hooks/useNetworkColumns';
 import useNetworkRowFilters from '../../hooks/useNetworkRowFilters';
-import { isPendingHotPlugNIC, isPendingRemoval } from '../../utils/utils';
+import { isInterfaceEphemeral, isPendingHotPlugNIC, isPendingRemoval } from '../../utils/utils';
 
 import AutoAttachedNetworkEmptyState from './AutoAttachedNetworkEmptyState';
 import NetworkInterfaceRow from './NetworkInterfaceRow';
@@ -54,7 +54,7 @@ const NetworkInterfaceList: FC<NetworkInterfaceTableProps> = ({ vm, vmi }) => {
         loaded={!isEmpty(vm)}
         loadError={false}
         Row={NetworkInterfaceRow}
-        rowData={{ isPending, vm }}
+        rowData={{ isInterfaceEphemeral, isPending, vm }}
         unfilteredData={data}
       />
     </>
