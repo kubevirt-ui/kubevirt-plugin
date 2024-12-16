@@ -60,8 +60,8 @@ const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({ name,
                   {vm?.status?.printableStatus}
                 </Label>
               )}
+              <VMNotMigratableLabel vm={vm} />
             </SplitItem>
-            <VMNotMigratableLabel vm={vm} />
           </Split>
         </h1>
         <Split hasGutter>

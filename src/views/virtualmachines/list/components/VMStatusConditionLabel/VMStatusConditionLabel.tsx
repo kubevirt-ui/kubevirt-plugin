@@ -15,6 +15,7 @@ export const VMStatusConditionLabel: FC<V1VirtualMachineCondition> = memo((condi
           e.preventDefault();
         }}
         color="grey"
+        textMaxWidth="6ch"
       >
         {condition?.type}={condition?.status}
       </Label>

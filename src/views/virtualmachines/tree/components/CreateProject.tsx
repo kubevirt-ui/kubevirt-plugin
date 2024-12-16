@@ -8,9 +8,6 @@ import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { Button, ButtonVariant } from '@patternfly/react-core';
 import { PlusCircleIcon } from '@patternfly/react-icons';
 
-import { PROJECT_SELECTOR_PREFIX } from '../utils/constants';
-import { setSelectedTreeItem } from '../utils/utils';
-
 const CreateProject: FC = () => {
   const { t } = useKubevirtTranslation();
   const [_, setActiveNamespace] = useActiveNamespace();
@@ -23,12 +20,6 @@ const CreateProject: FC = () => {
             {...props}
             createdProject={(namespace) => {
               const nsName = getName(namespace);
-              setSelectedTreeItem({
-                customBadgeContent: 0,
-                defaultExpanded: true,
-                id: `${PROJECT_SELECTOR_PREFIX}/${nsName}`,
-                name: nsName,
-              });
               setActiveNamespace(nsName);
             }}
           />

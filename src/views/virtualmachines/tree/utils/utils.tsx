@@ -17,7 +17,6 @@ import {
   VM_FOLDER_LABEL,
 } from './constants';
 
-export const vmsPerNamespaceMap = signal<{ [ns: string]: number }>(null);
 export const treeDataMap = signal<Record<string, TreeViewDataItem>>(null);
 export const selectedTreeItem = signal<TreeViewDataItem[]>(null);
 export const setSelectedTreeItem = (selected: TreeViewDataItem) =>

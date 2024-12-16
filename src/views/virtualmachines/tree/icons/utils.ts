@@ -1,9 +1,9 @@
-import { VirtualMachineIcon } from '@patternfly/react-icons';
 import { printableVMStatus } from '@virtualmachines/utils';
 
 import PausedVirtualMachineIcon from './PausedVirtualMachineIcon';
 import RunningVirtualMachineIcon from './RunningVirtualMachineIcon';
 import StoppedVirtualMachineIcon from './StoppedVirtualMachineIcon';
+import TreeViewVirtualMachineIcon from './TreeViewVirtualMachineIcon';
 
 const statusIconMapper = {
   [printableVMStatus.Paused]: PausedVirtualMachineIcon,
@@ -13,6 +13,6 @@ const statusIconMapper = {
 
 export const statusIcon = new Proxy(statusIconMapper, {
   get(target, prop: string) {
-    return target[prop] ?? VirtualMachineIcon;
+    return target[prop] ?? TreeViewVirtualMachineIcon;
   },
 });
