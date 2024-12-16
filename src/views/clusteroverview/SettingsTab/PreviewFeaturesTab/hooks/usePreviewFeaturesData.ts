@@ -31,14 +31,14 @@ const usePreviewFeaturesData: UsePreviewFeaturesData = () => {
   const features = [
     {
       externalLink: null,
-      id: TREE_VIEW_FOLDERS,
-      label: t('Enable VirtualMachine tree-view'),
+      id: TREE_VIEW,
+      label: t('Enable Virtual Machines tree view'),
       ...treeViewFeature,
     },
     {
       externalLink: null,
       id: TREE_VIEW_FOLDERS,
-      label: t('Enable folders to VirtualMachine tree-view'),
+      label: t('Enable folders in Virtual Machines tree view'),
       ...treeViewFoldersFeature,
     },
   ];

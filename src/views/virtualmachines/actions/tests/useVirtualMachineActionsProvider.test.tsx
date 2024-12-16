@@ -9,8 +9,6 @@ import { exampleRunningVirtualMachine } from './mocks';
 jest.mock('@openshift-console/dynamic-plugin-sdk', () => ({
   getGroupVersionKindForModel: jest.fn(() => ({})),
   k8sPatch: jest.fn(() => ({})),
-  // useFeatures: jest.fn(() => ({ featureEnabled: true })),
-  // useFeaturesConfigMap: jest.fn(() => ({ featuresConfigMapData: [[], true, null], isAdmin: true })),
   useFlag: jest.fn(() => true),
   useK8sModel: jest.fn(() => [[], true]),
   useK8sWatchResource: jest.fn(() => [[], true]),

@@ -47,14 +47,14 @@ const TreeViewToolbar: FC<TreeViewToolbarProps> = ({ closeComponent, onSearch })
           <StackItem>
             <Split>
               <SplitItem className="pf-u-ml-md">
-                <Text>{t('Show projects with VirtualMachines')}</Text>
+                <Text>{t('Show only projects with VirtualMachines')}</Text>
               </SplitItem>
               <SplitItem isFilled />
               <Switch
-                checked={showEmptyProjects === SHOW}
+                checked={showEmptyProjects === HIDE}
                 className="vms-tree-view__toolbar-switch"
                 isReversed
-                onChange={(_, checked) => setShowEmptyProjects(checked ? SHOW : HIDE)}
+                onChange={(_, checked) => setShowEmptyProjects(checked ? HIDE : SHOW)}
               />
             </Split>
           </StackItem>

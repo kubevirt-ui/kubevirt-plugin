@@ -12,15 +12,15 @@ export const useSyncClicksEffects = (activeNamespace: string, loaded: boolean) =
   useEffect(() => {
     const pathname = location.pathname;
     if (loaded) {
-      const dataMap = treeDataMap.value;
+      const treeData = treeDataMap.value;
       if (pathname.startsWith(`/k8s/${ALL_NAMESPACES}`)) {
-        setSelectedTreeItem(dataMap[ALL_NAMESPACES_SESSION_KEY]);
+        setSelectedTreeItem(treeData[ALL_NAMESPACES_SESSION_KEY]);
         return;
       }
 
       const vmName = pathname.split('/')[5];
       if (vmName) {
-        setSelectedTreeItem(dataMap[`${activeNamespace}/${vmName}`]);
+        setSelectedTreeItem(treeData[`${activeNamespace}/${vmName}`]);
         return;
       }
 
@@ -28,12 +28,12 @@ export const useSyncClicksEffects = (activeNamespace: string, loaded: boolean) =
       const folderFilterName = queryParams.get('labels')?.split('=')?.[1];
       if (folderFilterName) {
         setSelectedTreeItem(
-          dataMap[`${FOLDER_SELECTOR_PREFIX}/${activeNamespace}/${folderFilterName}`],
+          treeData[`${FOLDER_SELECTOR_PREFIX}/${activeNamespace}/${folderFilterName}`],
         );
         return;
       }
 
-      setSelectedTreeItem(dataMap[`${PROJECT_SELECTOR_PREFIX}/${activeNamespace}`]);
+      setSelectedTreeItem(treeData[`${PROJECT_SELECTOR_PREFIX}/${activeNamespace}`]);
     }
   }, [activeNamespace, loaded, location.search, location.pathname]);
 };

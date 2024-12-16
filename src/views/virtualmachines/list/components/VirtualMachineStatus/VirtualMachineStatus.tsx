@@ -1,7 +1,7 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { HelperText, HelperTextItem, Split, SplitItem, Truncate } from '@patternfly/react-core';
+import { HelperText, HelperTextItem, Stack, StackItem } from '@patternfly/react-core';
 
 import { getVMStatusIcon } from '../../../utils';
 import VMNotMigratableLabel from '../VMNotMigratableLabel/VMNotMigratableLabel';
@@ -10,21 +10,19 @@ type VirtualMachinesPageStatusProps = {
   vm: V1VirtualMachine;
 };
 
-const VirtualMachineStatus: React.FC<VirtualMachinesPageStatusProps> = ({ vm }) => {
+const VirtualMachineStatus: FC<VirtualMachinesPageStatusProps> = ({ vm }) => {
   const printableStatus = vm?.status?.printableStatus;
   const Icon = getVMStatusIcon(printableStatus);
 
   return (
-    <Split hasGutter>
-      <SplitItem>
+    <Stack>
+      <StackItem className="pf-u-mb-xs">
         <HelperText>
-          <HelperTextItem icon={<Icon />}>
-            <Truncate content={printableStatus} />
-          </HelperTextItem>
+          <HelperTextItem icon={<Icon />}>{printableStatus}</HelperTextItem>
         </HelperText>
-      </SplitItem>
+      </StackItem>
       <VMNotMigratableLabel vm={vm} />
-    </Split>
+    </Stack>
   );
 };
 
