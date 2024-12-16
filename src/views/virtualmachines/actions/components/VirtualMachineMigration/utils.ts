@@ -20,7 +20,7 @@ const getBlankDataVolume = (
 ): V1beta1DataVolume => {
   const randomChars = getRandomChars();
 
-  const originName = dataVolumeName.replace(/-mig-\d+$/, '');
+  const originName = dataVolumeName.replace(/-mig-[\d\w]+$/, '');
   const namePrefix = `${originName}-mig`.substring(0, MAX_NAME_LENGTH - 5 - randomChars.length);
 
   return {
