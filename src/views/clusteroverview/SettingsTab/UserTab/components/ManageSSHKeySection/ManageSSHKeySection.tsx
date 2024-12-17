@@ -12,7 +12,7 @@ const ManageSSHKeySection: FC = () => {
   const { t } = useKubevirtTranslation();
 
   return (
-    <ExpandSection toggleText={t('Manage SSH keys')}>
+    <ExpandSection dataTestID="settings-user-ssh-key" toggleText={t('Manage SSH keys')}>
       <Stack hasGutter>
         <MutedTextSpan
           text={t(

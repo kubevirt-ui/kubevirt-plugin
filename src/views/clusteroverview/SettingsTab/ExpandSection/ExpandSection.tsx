@@ -7,6 +7,7 @@ import './ExpandSection.scss';
 
 type ExpandSectionProps = {
   className?: string;
+  dataTestID?: string;
   isDisabled?: boolean;
   isIndented?: boolean;
   toggleContent?: ReactNode;
@@ -16,6 +17,7 @@ type ExpandSectionProps = {
 const ExpandSection: FC<ExpandSectionProps> = ({
   children,
   className,
+  dataTestID,
   isDisabled = false,
   isIndented = true,
   toggleContent = null,
@@ -32,6 +34,7 @@ const ExpandSection: FC<ExpandSectionProps> = ({
   return (
     <ExpandableSection
       className={classNames(className, { 'expand-section__disabled': isDisabled }, 'ExpandSection')}
+      data-test-id={dataTestID}
       isExpanded={isExpanded}
       isIndented={isIndented}
       onToggle={(_event, expanded: boolean) => handleToggle(expanded)}
