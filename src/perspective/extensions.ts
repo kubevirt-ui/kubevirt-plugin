@@ -3,6 +3,7 @@ import {
   HrefNavItem,
   NavSection,
   ResourceClusterNavItem,
+  ResourceNSNavItem,
   Separator,
 } from '@openshift-console/dynamic-plugin-sdk';
 import type { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plugin-sdk-webpack';
@@ -288,7 +289,7 @@ const networkingSection = [
       required: ['NET_ATTACH_DEF', 'KUBEVIRT_DYNAMIC'],
     },
     properties: {
-      id: 'networkattachmentdefinitions',
+      id: 'networkattachmentdefinitions-virt-perspective',
       model: {
         group: 'k8s.cni.cncf.io',
         kind: 'NetworkAttachmentDefinition',
@@ -330,7 +331,7 @@ const networkingSection = [
         'data-quickstart-id': 'qs-nav-state-list',
         'data-test-id': 'state-nav-list',
       },
-      id: 'state',
+      id: 'state-virt-perspective',
       model: {
         group: 'nmstate.io',
         kind: 'NodeNetworkState',
@@ -342,6 +343,24 @@ const networkingSection = [
     },
     type: 'console.navigation/resource-cluster',
   } as EncodedExtension<ResourceClusterNavItem>,
+  {
+    properties: {
+      dataAttributes: {
+        'data-quickstart-id': 'qs-nav-udns',
+        'data-test-id': 'udns-nav-item',
+      },
+      id: 'udns-virt-perspective',
+      model: {
+        group: 'k8s.ovn.org',
+        kind: 'UserDefinedNetwork',
+        version: 'v1',
+      },
+      name: '%plugin__networking-console-plugin~UserDefinedNetworks%',
+      perspective: 'virtualization-perspective',
+      section: 'networking-virt-perspective',
+    },
+    type: 'console.navigation/resource-ns',
+  } as EncodedExtension<ResourceNSNavItem>,
 ];
 
 const storageSection = [
