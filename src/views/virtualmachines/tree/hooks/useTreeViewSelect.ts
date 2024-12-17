@@ -14,7 +14,6 @@ import {
   PROJECT_SELECTOR_PREFIX,
   VM_FOLDER_LABEL,
 } from '../utils/constants';
-import { setSelectedTreeItem } from '../utils/utils';
 
 const useTreeViewSelect = (
   onFilterChange: (type: string, value: FilterValue) => void,
@@ -22,15 +21,15 @@ const useTreeViewSelect = (
 ) => {
   const navigate = useNavigate();
   const { setOrRemoveQueryArgument } = useQueryParamsMethods();
+
   const vmsMapper = useMemo(() => convertResourceArrayToMap(vms, true), [vms]);
 
   const onSelect = (_event: MouseEvent, treeViewItem: TreeViewDataItem) => {
-    setSelectedTreeItem(treeViewItem);
     onFilterChange?.(TEXT_FILTER_LABELS_ID, null);
 
     const treeItemName = treeViewItem.name as string;
     if (treeViewItem.id.startsWith(FOLDER_SELECTOR_PREFIX)) {
-      const [_, folderNamespace] = treeViewItem.id.split('/');
+      const [__, folderNamespace] = treeViewItem.id.split('/');
       navigate(
         getResourceUrl({
           activeNamespace: folderNamespace,

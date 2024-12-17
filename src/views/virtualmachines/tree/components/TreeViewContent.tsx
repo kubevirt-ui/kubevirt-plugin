@@ -11,7 +11,6 @@ import {
 } from '@patternfly/react-core';
 
 import UseFilteredTreeView from '../hooks/UseFilteredTreeView';
-import { selectedTreeItem } from '../utils/utils';
 
 import CreateProject from './CreateProject';
 import PanelToggleButton from './PanelToggleButton';
@@ -22,6 +21,7 @@ type TreeViewContentProps = {
   isOpen: boolean;
   loaded: boolean;
   onSelect: (_event: React.MouseEvent, treeViewItem: TreeViewDataItem) => void;
+  selectedTreeItem: TreeViewDataItem;
   toggleDrawer: () => void;
   treeData: TreeViewDataItem[];
 };
@@ -30,12 +30,12 @@ const TreeViewContent: FC<TreeViewContentProps> = ({
   isOpen,
   loaded,
   onSelect,
+  selectedTreeItem,
   toggleDrawer,
   treeData,
 }) => {
   const { t } = useKubevirtTranslation();
   const [showAll, setShowAll] = useState<boolean>();
-
   const { filteredTreeData, onSearch } = UseFilteredTreeView(treeData, setShowAll);
   if (!isOpen) {
     return (
@@ -69,7 +69,7 @@ const TreeViewContent: FC<TreeViewContentProps> = ({
       </DrawerHead>
       <DrawerPanelBody className="vms-tree-view-body">
         <TreeView
-          activeItems={selectedTreeItem.value}
+          activeItems={[selectedTreeItem]}
           allExpanded={showAll}
           data={filteredTreeData}
           hasBadges={loaded}

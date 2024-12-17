@@ -16,6 +16,7 @@ type UseTreeViewData = {
   isAdmin: boolean;
   loaded: boolean;
   loadError: any;
+  selectedTreeItem: TreeViewDataItem;
   treeData: TreeViewDataItem[];
   vms: V1VirtualMachine[];
 };
@@ -23,7 +24,6 @@ type UseTreeViewData = {
 export const useTreeViewData = (activeNamespace: string): UseTreeViewData => {
   const isAdmin = useIsAdmin();
   const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
-
   const [projectNames, projectNamesLoaded, projectNamesError] = useProjects();
 
   const [allVMs, allVMsLoaded] = useK8sWatchResource<V1VirtualMachine[]>({
@@ -53,7 +53,7 @@ export const useTreeViewData = (activeNamespace: string): UseTreeViewData => {
     [allVMs, allowedResources, isAdmin],
   );
 
-  const treeData = useMemo(
+  const [treeData, selectedTreeItem] = useMemo(
     () =>
       createTreeViewData(
         projectNames,
@@ -74,6 +74,7 @@ export const useTreeViewData = (activeNamespace: string): UseTreeViewData => {
         ? allVMsLoaded
         : Object.values(allowedResources).some((resource) => resource.loaded)),
     loadError: projectNamesError,
+    selectedTreeItem,
     treeData,
     vms: memoizedVMs,
   };

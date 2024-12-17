@@ -12,7 +12,6 @@ import { Checkbox } from '@patternfly/react-core';
 import VirtualMachineActions from '@virtualmachines/actions/components/VirtualMachineActions/VirtualMachineActions';
 import useVirtualMachineActionsProvider from '@virtualmachines/actions/hooks/useVirtualMachineActionsProvider';
 import { deselectVM, isVMSelected, selectVM } from '@virtualmachines/list/selectedVMs';
-import { setSelectedTreeItem, treeDataMap } from '@virtualmachines/tree/utils/utils';
 
 import VirtualMachineStatus from '../VirtualMachineStatus/VirtualMachineStatus';
 import { VMStatusConditionLabelList } from '../VMStatusConditionLabel';
@@ -39,7 +38,6 @@ const VirtualMachineRowLayout: FC<
 
   const vmName = useMemo(() => getName(obj), [obj]);
   const vmNamespace = useMemo(() => getNamespace(obj), [obj]);
-
   const [actions] = useVirtualMachineActionsProvider(obj, vmim, isSingleNodeCluster);
   return (
     <>
@@ -52,9 +50,6 @@ const VirtualMachineRowLayout: FC<
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-20 vm-column" id="name">
         <ResourceLink
-          onClick={() => {
-            setSelectedTreeItem(treeDataMap.value[`${vmNamespace}/${vmName}`]);
-          }}
           groupVersionKind={VirtualMachineModelGroupVersionKind}
           name={vmName}
           namespace={vmNamespace}
