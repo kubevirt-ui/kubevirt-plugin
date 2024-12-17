@@ -17,18 +17,23 @@ const GettingStartedSection: FC = () => {
   const [quickStarts, setQuickStarts] = useKubevirtUserSettings('quickStart');
   const run = runningTourSignal.value;
   return (
-    <ExpandSection toggleText={t('Getting started resources')}>
+    <ExpandSection
+      dataTestID="settings-user-getting-started"
+      toggleText={t('Getting started resources')}
+    >
       <Stack hasGutter>
         <Switch
           onChange={(_event, value) =>
             setQuickStarts({ ...quickStarts, dontShowWelcomeModal: !value })
           }
           className="GettingStartedSection__switch-text"
+          data-test-id="welcome-information"
           isChecked={!quickStarts?.dontShowWelcomeModal}
           label={t('Welcome information')}
         />
         <Switch
           className="GettingStartedSection__switch-text"
+          data-test-id="guided-tour"
           isChecked={run}
           label={t('Guided tour')}
           onChange={!run && startTour}
