@@ -14,7 +14,6 @@ import {
 
 import TreeViewContent from './components/TreeViewContent';
 import { useHideNamespaceBar } from './hooks/useHideNamespaceBar';
-import { useSyncClicksEffects } from './hooks/useSyncClicksEffects';
 import { useTreeViewData } from './hooks/useTreeViewData';
 import useTreeViewSelect from './hooks/useTreeViewSelect';
 import {
@@ -42,13 +41,12 @@ const VirtualMachineTreeView: FC<VirtualMachineTreeViewProps> = ({ children, onF
 
   const { featureEnabled: treeViewEnabled, loading } = useFeatures(TREE_VIEW);
 
-  const { loaded, loadError, treeData, vms } = useTreeViewData(activeNamespace);
+  const { loaded, loadError, selectedTreeItem, treeData, vms } = useTreeViewData(activeNamespace);
 
   const onSelect = useTreeViewSelect(onFilterChange, vms);
 
   const isOpen = useMemo(() => drawerOpen === SHOW, [drawerOpen]);
 
-  useSyncClicksEffects(activeNamespace, loaded);
   useHideNamespaceBar();
   useEffect(() => {
     const drawerPanel = document.getElementById(TREE_VIEW_PANEL_ID);
@@ -87,6 +85,7 @@ const VirtualMachineTreeView: FC<VirtualMachineTreeViewProps> = ({ children, onF
               isOpen={isOpen}
               loaded={loaded}
               onSelect={onSelect}
+              selectedTreeItem={selectedTreeItem}
               toggleDrawer={toggleDrawer}
               treeData={treeData}
             />

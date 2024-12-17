@@ -18,9 +18,6 @@ import {
 } from './constants';
 
 export const treeDataMap = signal<Record<string, TreeViewDataItem>>(null);
-export const selectedTreeItem = signal<TreeViewDataItem[]>(null);
-export const setSelectedTreeItem = (selected: TreeViewDataItem) =>
-  (selectedTreeItem.value = [selected]);
 
 const buildProjectMap = (
   vms: V1VirtualMachine[],
@@ -161,7 +158,7 @@ export const createTreeViewData = (
   isAdmin: boolean,
   pathname: string,
   foldersEnabled: boolean,
-): TreeViewDataItem[] => {
+): [TreeViewDataItem[], TreeViewDataItem] => {
   const currentPageVMName = pathname.split('/')[5];
   const treeViewDataMap: Record<string, TreeViewDataItem> = {};
   const projectMap = buildProjectMap(vms, currentPageVMName, treeViewDataMap, foldersEnabled);
@@ -170,17 +167,29 @@ export const createTreeViewData = (
     createProjectTreeItem(project, projectMap, activeNamespace, currentPageVMName, treeViewDataMap),
   );
 
-  if (isAdmin) {
-    const allNamespacesTreeItem = createAllNamespacesTreeItem(
-      treeViewData,
-      treeViewDataMap,
-      projectMap,
-    );
-    return [allNamespacesTreeItem];
-  }
+  const allNamespacesTreeItem = isAdmin
+    ? createAllNamespacesTreeItem(treeViewData, treeViewDataMap, projectMap)
+    : null;
+
+  const getSelectedTreeItem = (): TreeViewDataItem => {
+    if (activeNamespace === ALL_NAMESPACES_SESSION_KEY) return allNamespacesTreeItem;
+
+    if (currentPageVMName) return treeViewDataMap[`${activeNamespace}/${currentPageVMName}`];
+
+    const params = new URLSearchParams(window.location.search);
+
+    if (!params?.has('labels'))
+      return treeViewDataMap[`${PROJECT_SELECTOR_PREFIX}/${activeNamespace}`];
+
+    const folderLabel: string = params.values().next().value;
+    const folder = folderLabel.split('=')?.[1];
+
+    return treeViewDataMap[`${FOLDER_SELECTOR_PREFIX}/${activeNamespace}/${folder}`];
+  };
 
   treeDataMap.value = treeViewDataMap;
-  return treeViewData;
+
+  return [[allNamespacesTreeItem] ?? treeViewData, getSelectedTreeItem()];
 };
 
 export const filterItems = (item: TreeViewDataItem, input: string) => {

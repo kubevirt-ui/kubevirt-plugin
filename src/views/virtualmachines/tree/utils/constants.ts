@@ -13,5 +13,6 @@ export const SYSTEM_NAMESPACES = ['default', 'openshift'];
 export const SHOW_EMPTY_PROJECTS_KEY = 'showEmptyProjects';
 export const TREE_VIEW_LAST_WIDTH = 'treeViewLastWidth';
 export const SHOW_TREE_VIEW = 'showTreeView';
+export const SELECTED_ITEM = 'selectedItem';
 export const SHOW = 'show';
 export const HIDE = 'hide';
