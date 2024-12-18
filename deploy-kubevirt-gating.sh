@@ -2,6 +2,14 @@
 
 export ON_CI="ON_CI"
 
+pause_for_debug()
+{
+    if [[ ${OPENSHIFT_CI} == 'true' ]]; then
+        echo " 🐛 Pause and give time to debug the issue"
+        sleep 7000
+    fi
+}
+
 # Wait until master and worker MCP are updated
 # or timeout after 90min.
 wait_mcp_for_updated()
@@ -29,6 +37,7 @@ wait_mcp_for_updated()
 
 download_virtctl()
 {
+  #VIRTCTL_LATEST=$(curl -fsSL -H 'Accept: application/json' https://github.com/kubevirt/kubevirt/releases/latest | jq -r '.tag_name' | tr -d 'v')
   VIRTCTL_DOWNLOAD_URL="https://github.com/kubevirt/kubevirt/releases/download/${VIRTCTL_VERSION}/virtctl-${VIRTCTL_VERSION}"
   VIRTCTL_X86_64="${VIRTCTL_DOWNLOAD_URL}-linux-x86_64"
   VIRTCTL_AMD64="${VIRTCTL_DOWNLOAD_URL}-linux-amd64"
@@ -53,7 +62,7 @@ export HCO_SUBSCRIPTION_CHANNEL=${HCO_SUBSCRIPTION_CHANNEL:-"candidate-v1.14"}
 export VIRTCTL_VERSION="v1.4.0"
 export HPP_VERSION="release-v0.21"
 
-cat <<EOF | oc apply -f -
+tee <<EOF | oc apply -f -
 apiVersion: operators.coreos.com/v1alpha1
 kind: CatalogSource
 metadata:
@@ -66,7 +75,7 @@ spec:
   publisher: Kubevirt Project
 EOF
 
-cat <<EOF | oc apply -f -
+tee <<EOF | oc apply -f -
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -116,6 +125,7 @@ done
 
 if [[ "$hco_cr_is_created" == "false" ]]; then
   echo "Error: HCO cr didn't get created!!"
+  pause_for_debug
   exit 1
 fi
 
@@ -137,6 +147,7 @@ done
 
 if [[ "$virt_operator_is_available" == "false" ]]; then
   echo "Error: virt-operator is not available!!"
+  pause_for_debug
   exit 1
 fi
 
@@ -153,7 +164,7 @@ wait_mcp_for_updated
 oc create -f \
   https://raw.githubusercontent.com/kubevirt/hostpath-provisioner-operator/${HPP_VERSION}/deploy/hostpathprovisioner_cr.yaml
 
-cat <<EOF | oc apply -f -
+tee <<EOF | oc apply -f -
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
