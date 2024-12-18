@@ -47,11 +47,11 @@ download_virtctl()
 # ----------------------------------------------------------------------------------------------------
 # Install HCO (kubevirt and helper operators)
 
-export HCO_IMAGE_VER=${HCO_IMAGE_VER:-"1.11.0-unstable"}
+export HCO_IMAGE_VER=${HCO_IMAGE_VER:-"1.14.0-unstable"}
 export HCO_GIT_TAG=${HCO_GIT_TAG:-"main"}
-export HCO_SUBSCRIPTION_CHANNEL=${HCO_SUBSCRIPTION_CHANNEL:-"candidate-v1.11"}
-export VIRTCTL_VERSION="v1.0.1"
-export HPP_VERSION="release-v0.18"
+export HCO_SUBSCRIPTION_CHANNEL=${HCO_SUBSCRIPTION_CHANNEL:-"candidate-v1.14"}
+export VIRTCTL_VERSION="v1.4.0"
+export HPP_VERSION="release-v0.21"
 
 cat <<EOF | oc apply -f -
 apiVersion: operators.coreos.com/v1alpha1
