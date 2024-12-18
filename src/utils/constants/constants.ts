@@ -24,3 +24,5 @@ export enum K8S_OPS {
   REMOVE = 'remove',
   REPLACE = 'replace',
 }
+
+export const S390X_ARCH = 's390x';
