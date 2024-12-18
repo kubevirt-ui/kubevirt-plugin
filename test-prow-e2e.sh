@@ -13,6 +13,7 @@ function generateLogsAndCopyArtifacts {
   oc cluster-info dump > ${ARTIFACT_DIR}/cluster_info.json
   oc get catalogsource -A -o wide > ${ARTIFACT_DIR}/catalogsource.yaml
   oc get catalogsource -A -o yaml >> ${ARTIFACT_DIR}/catalogsource.yaml
+  oc get CustomResourceDefinition -o yaml > ${ARTIFACT_DIR}/CustomResourceDefinition.yaml
   oc get subscriptions -n ${NS} -o wide > ${ARTIFACT_DIR}/subscription_details.yaml
   oc get subscriptions -n ${NS} -o yaml >> ${ARTIFACT_DIR}/subscription_details.yaml
   oc get csvs -n ${NS} -o wide > ${ARTIFACT_DIR}/csvs.yaml
