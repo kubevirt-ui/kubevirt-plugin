@@ -1399,6 +1399,7 @@
   "View pod logs": "View pod logs",
   "View virtualization dashboard": "View virtualization dashboard",
   "View YAML & CLI": "View YAML & CLI",
+  "Virtctl is disabled for this namespace as it's managed by": "Virtctl is disabled for this namespace as it's managed by",
   "virtio": "virtio",
   "VirtIO": "VirtIO",
   "Virtual machine is not running": "Virtual machine is not running",
