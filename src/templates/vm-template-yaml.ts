@@ -56,15 +56,6 @@ objects:
                   name: default
               networkInterfaceMultiqueue: true
               rng: {}
-            features:
-              acpi: {}
-              smm:
-                enabled: true
-            firmware:
-              bootloader:
-                efi: {}
-            machine:
-              type: q35
             memory:
               guest: 2Gi
           hostname: '\${NAME}'
