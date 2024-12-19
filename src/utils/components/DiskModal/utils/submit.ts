@@ -114,7 +114,10 @@ export const addDisk = (data: V1DiskFormState, vm: V1VirtualMachine) => {
 type SubmitInput = {
   data: V1DiskFormState;
   editDiskName: string;
-  onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
+  onSubmit: (
+    updatedVM: V1VirtualMachine,
+    diskFormState?: V1DiskFormState,
+  ) => Promise<V1VirtualMachine | void>;
   pvc?: IoK8sApiCoreV1PersistentVolumeClaim;
   vm: V1VirtualMachine;
 };
@@ -145,5 +148,5 @@ export const submit = async ({ data, editDiskName, onSubmit, pvc, vm }: SubmitIn
     });
   }
 
-  return shouldHotplug ? (hotplugPromise(newVM, data) as Promise<any>) : onSubmit(newVM);
+  return shouldHotplug ? (hotplugPromise(newVM, data) as Promise<any>) : onSubmit(newVM, data);
 };

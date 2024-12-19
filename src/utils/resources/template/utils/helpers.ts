@@ -4,7 +4,7 @@ import { TemplateParameter, V1Template } from '@kubevirt-ui/kubevirt-api/console
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
-import { getRootDataVolumeTemplateSpec } from '@kubevirt-utils/resources/vm';
+import { vmBootDiskSourceIsRegistry } from '@kubevirt-utils/resources/vm/utils/source';
 import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 
 import { ANNOTATIONS } from './annotations';
@@ -74,6 +74,5 @@ export const generateParamsWithPrettyName = (template: V1Template) => {
 
 export const bootDiskSourceIsRegistry = (template: V1Template) => {
   const vmObject: V1VirtualMachine = getTemplateVirtualMachineObject(template);
-  const rootDataVolumeTemplateSpec = getRootDataVolumeTemplateSpec(vmObject);
-  return Boolean(rootDataVolumeTemplateSpec?.spec?.source?.registry);
+  return vmBootDiskSourceIsRegistry(vmObject);
 };

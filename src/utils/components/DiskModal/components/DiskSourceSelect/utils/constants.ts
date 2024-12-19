@@ -12,6 +12,8 @@ export const diskSourceURLFieldID = 'disk-source-url';
 export const ephemeralDiskSizeFieldID = 'ephemeral-disk-size';
 export const diskSourceFieldID = 'disk-source';
 export const diskSourceEphemeralFieldID = 'disk-source-container';
+export const diskSourceUsernameFieldID = 'disk-source-username';
+export const diskSourcePasswordFieldID = 'disk-source-password';
 
 export const optionLabelMapper: { [key in SourceTypes]: string } = {
   [SourceTypes.BLANK]: t('Empty disk (blank)'),

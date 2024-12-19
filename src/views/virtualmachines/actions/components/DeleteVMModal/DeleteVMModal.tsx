@@ -23,6 +23,7 @@ import { ButtonVariant, Stack, StackItem } from '@patternfly/react-core';
 import DeleteOwnedResourcesMessage from './components/DeleteOwnedResourcesMessage';
 import useDeleteVMResources from './hooks/useDeleteVMResources';
 import {
+  deleteSecrets,
   removeDataVolumeTemplatesToVM,
   updateSnapshotResources,
   updateVolumeResources,
@@ -49,7 +50,7 @@ const DeleteVMModal: FC<DeleteVMModalProps> = ({ isOpen, onClose, vm }) => {
 
   const [snapshotsToSave, setSnapshotsToSave] = useState<V1beta1VirtualMachineSnapshot[]>([]);
 
-  const { dataVolumes, loaded, pvcs, snapshots } = useDeleteVMResources(vm);
+  const { dataVolumes, loaded, pvcs, secrets, snapshots } = useDeleteVMResources(vm);
   const lastNamespacePath = useLastNamespacePath();
 
   const onDelete = async (updatedVM: V1VirtualMachine) => {
@@ -63,6 +64,8 @@ const DeleteVMModal: FC<DeleteVMModalProps> = ({ isOpen, onClose, vm }) => {
     await Promise.allSettled(updateVolumeResources(volumesToSave, vmOwnerRef));
 
     await Promise.allSettled(updateSnapshotResources(snapshotsToSave, vmOwnerRef));
+
+    await Promise.allSettled(deleteSecrets(secrets));
 
     await k8sDelete({
       json: gracePeriodCheckbox

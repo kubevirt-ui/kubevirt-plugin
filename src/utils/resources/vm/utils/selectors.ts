@@ -11,6 +11,7 @@ import {
   V1PreferenceMatcher,
   V1VirtualMachine,
   V1VirtualMachineCondition,
+  V1Volume,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { DYNAMIC_CREDENTIALS_SUPPORT } from '@kubevirt-utils/components/DynamicSSHKeyInjection/constants/constants';
 import { ROOTDISK } from '@kubevirt-utils/constants/constants';
@@ -86,10 +87,28 @@ export const getDataVolumeTemplates = (vm: V1VirtualMachine) => vm?.spec?.dataVo
  * @param {V1VirtualMachine} vm the virtual machine
  * @returns the virtual machine's root data volume
  */
+export const getRootDataVolume = (vm: V1VirtualMachine): V1Volume =>
+  getVolumes(vm)?.find((v) => v.name === ROOTDISK);
+
+/**
+ * A selector for the virtual machine's root data volume template spec
+ * @param {V1VirtualMachine} vm the virtual machine
+ * @returns the virtual machine's root data volume template spec
+ */
 export const getRootDataVolumeTemplateSpec = (vm: V1VirtualMachine): V1DataVolumeTemplateSpec => {
   const volume = getVolumes(vm)?.find((v) => v.name === ROOTDISK);
 
   return vm.spec.dataVolumeTemplates?.find((dv) => dv.metadata.name === volume?.dataVolume?.name);
+};
+
+/**
+ * A selector for the virtual machine's root data volume secretRef
+ * @param {V1VirtualMachine} vm
+ * @returns the virtual machine's root data volume secretRef
+ */
+export const getRootDiskSecretRef = (vm: V1VirtualMachine): string => {
+  const dataVolumeTemplateSpec = getRootDataVolumeTemplateSpec(vm);
+  return dataVolumeTemplateSpec?.spec?.source?.registry?.secretRef;
 };
 
 /**

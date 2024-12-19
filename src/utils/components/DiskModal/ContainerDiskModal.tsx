@@ -61,7 +61,11 @@ const ContainerDiskModal: FC<V1SubDiskModalProps> = ({
         <Form>
           <BootSourceCheckbox editDiskName={editDiskName} isDisabled={isVMRunning} vm={vm} />
           <DiskNameInput />
-          <DiskSourceContainer fieldName={CONTAINERDISK_IMAGE_FIELD} os={os} />
+          <DiskSourceContainer
+            fieldName={CONTAINERDISK_IMAGE_FIELD}
+            isEphemeralDiskSource
+            os={os}
+          />
           <DynamicSize />
           <DiskTypeSelect isVMRunning={isVMRunning} />
           <DiskInterfaceSelect isVMRunning={isVMRunning} />

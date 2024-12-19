@@ -1,3 +1,4 @@
+import { RegistryCredentials } from '@catalog/utils/useRegistryCredentials/utils/types';
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import {
@@ -37,29 +38,37 @@ export enum VolumeTypes {
   SERVICE_ACCOUNT = 'serviceAccount',
 }
 
-export type V1DiskModalProps = {
-  createDiskSource?: SourceTypes;
-  createdPVCName?: string;
-  editDiskName?: string;
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
-  onUploadedDataVolume?: (dataVolume: V1beta1DataVolume) => void;
-  vm: V1VirtualMachine;
-};
-
-export type V1SubDiskModalProps = V1DiskModalProps & {
-  isCreated: boolean;
-  pvc: IoK8sApiCoreV1PersistentVolumeClaim;
-};
-
 export type V1DiskFormState = {
   dataVolumeTemplate?: V1DataVolumeTemplateSpec;
   disk: V1Disk;
   expandPVCSize?: string;
   isBootSource: boolean;
+  registryCredentials?: RegistryCredentials;
   storageClassProvisioner?: string;
   storageProfileSettingsApplied?: boolean;
   uploadFile?: { file: File; filename: string };
   volume: V1Volume;
+};
+
+export type DefaultFormValues = Partial<V1DiskFormState>;
+
+export type V1DiskModalProps = {
+  createDiskSource?: SourceTypes;
+  createdPVCName?: string;
+  defaultFormValues?: DefaultFormValues;
+  editDiskName?: string;
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (
+    updatedVM: V1VirtualMachine,
+    diskFormState?: V1DiskFormState,
+  ) => Promise<V1VirtualMachine | void>;
+  onUploadedDataVolume?: (dataVolume: V1beta1DataVolume) => void;
+  vm: V1VirtualMachine;
+};
+
+export type V1SubDiskModalProps = V1DiskModalProps & {
+  defaultFormValues?: DefaultFormValues;
+  isCreated: boolean;
+  pvc: IoK8sApiCoreV1PersistentVolumeClaim;
 };
