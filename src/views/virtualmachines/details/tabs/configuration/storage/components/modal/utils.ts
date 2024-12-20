@@ -2,7 +2,10 @@ import produce from 'immer';
 import { WritableDraft } from 'immer/dist/internal';
 
 import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
+import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
+import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import {
+  V1beta1StorageSpec,
   V1Disk,
   V1VirtualMachine,
   V1VirtualMachineInstance,
@@ -24,6 +27,7 @@ import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/const
 import { getVMIDevices } from '@kubevirt-utils/resources/vmi';
 import { ClaimPropertySets } from '@kubevirt-utils/types/storage';
 import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
+import { k8sGet } from '@openshift-console/dynamic-plugin-sdk';
 
 export const createBootableVolumeFromDisk = async (
   diskObj: DiskRowDataLayout,
@@ -61,10 +65,19 @@ const addDiskToVM = (draftVM: WritableDraft<V1VirtualMachine>, diskToPersist: V1
   draftVM.spec.template.spec.domain.devices.disks = disks;
 };
 
-const addDataVolumeToVM = (draftVM: WritableDraft<V1VirtualMachine>, dataVolumeName: string) => {
+const addDataVolumeToVM = async (
+  draftVM: WritableDraft<V1VirtualMachine>,
+  dataVolumeName: string,
+) => {
   const dataVolumeTemplates = getDataVolumeTemplates(draftVM);
 
   if (dataVolumeTemplates.find((dataVolume) => dataVolume.metadata.name === dataVolumeName)) return;
+
+  const originDataVolume = await k8sGet<V1beta1DataVolume>({
+    model: DataVolumeModel,
+    name: dataVolumeName,
+    ns: getNamespace(draftVM),
+  });
 
   dataVolumeTemplates.push({
     metadata: {
@@ -77,6 +90,7 @@ const addDataVolumeToVM = (draftVM: WritableDraft<V1VirtualMachine>, dataVolumeN
           namespace: getNamespace(draftVM),
         },
       },
+      storage: originDataVolume?.spec?.storage as V1beta1StorageSpec,
     },
   });
 };
@@ -94,7 +108,7 @@ export const persistVolume = (
   vmi: V1VirtualMachineInstance,
   volumeToPersist: V1Volume,
 ) =>
-  produce(vm, (draftVM) => {
+  produce(vm, async (draftVM) => {
     ensurePath(draftVM, 'spec.template.spec.domain.devices');
 
     const vmVolumes = getVolumes(draftVM);
@@ -119,7 +133,7 @@ export const persistVolume = (
     addDiskToVM(draftVM, diskToPersist);
 
     if (!isEmpty(volumeToPersist?.dataVolume?.name))
-      addDataVolumeToVM(draftVM, volumeToPersist?.dataVolume?.name);
+      await addDataVolumeToVM(draftVM, volumeToPersist?.dataVolume?.name);
 
     return draftVM;
   });
