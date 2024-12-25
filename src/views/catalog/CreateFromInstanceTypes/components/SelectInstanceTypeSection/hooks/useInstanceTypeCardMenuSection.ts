@@ -32,7 +32,7 @@ const useInstanceTypeCardMenuSection = (): UseInstanceTypeCardMenuSectionValues 
     });
   };
 
-  useClickOutside(menuRef, onMenuToggle);
+  useClickOutside([menuRef], onMenuToggle);
   return { activeMenu, menuRef, onMenuSelect, onMenuToggle };
 };
 

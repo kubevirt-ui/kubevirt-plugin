@@ -2,6 +2,7 @@ import React, { FC, memo, ReactNode, useRef, useState } from 'react';
 
 import DropdownToggle from '@kubevirt-utils/components/toggles/DropdownToggle';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
+import { useClickOutside } from '@kubevirt-utils/hooks/useClickOutside/useClickOutside';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Menu, MenuContent, MenuList, Popper, Tooltip } from '@patternfly/react-core';
 
@@ -34,6 +35,8 @@ const ActionsDropdown: FC<ActionsDropdownProps> = ({
   const toggleRef = useRef<HTMLButtonElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  useClickOutside([menuRef, toggleRef], () => setIsOpen(false));
+
   const onToggle = () => {
     setIsOpen((prevIsOpen) => {
       if (onLazyClick && !prevIsOpen) onLazyClick();
@@ -52,18 +55,6 @@ const ActionsDropdown: FC<ActionsDropdownProps> = ({
         variant,
       });
 
-  const menu = (
-    <Menu containsFlyout ref={menuRef}>
-      <MenuContent>
-        <MenuList>
-          {actions?.map((action) => (
-            <ActionDropdownItem action={action} key={action?.id} setIsOpen={setIsOpen} />
-          ))}
-        </MenuList>
-      </MenuContent>
-    </Menu>
-  );
-
   if (isDisabled)
     return (
       <div className="kv-actions-dropdown" ref={containerRef}>
@@ -77,10 +68,20 @@ const ActionsDropdown: FC<ActionsDropdownProps> = ({
     <div className="kv-actions-dropdown" ref={containerRef}>
       {Toggle(toggleRef)}
       <Popper
+        popper={
+          <Menu containsFlyout ref={menuRef}>
+            <MenuContent>
+              <MenuList>
+                {actions?.map((action) => (
+                  <ActionDropdownItem action={action} key={action?.id} setIsOpen={setIsOpen} />
+                ))}
+              </MenuList>
+            </MenuContent>
+          </Menu>
+        }
         appendTo={containerRef.current}
         isVisible={isOpen}
         placement="bottom-end"
-        popper={menu}
         triggerRef={toggleRef}
       />
     </div>
