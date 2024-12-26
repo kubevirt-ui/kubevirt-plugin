@@ -39,7 +39,7 @@ import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 
 import { useVMListFilters } from '../utils';
 
-import VirtualMachineActionButton from './components/VirtualMachineActionButton';
+import VirtualMachineBulkActionButton from './components/VirtualMachineBulkActionButton';
 import VirtualMachineEmptyState from './components/VirtualMachineEmptyState/VirtualMachineEmptyState';
 import VirtualMachineListSummary from './components/VirtualMachineListSummary/VirtualMachineListSummary';
 import VirtualMachineRow from './components/VirtualMachineRow/VirtualMachineRow';
@@ -186,7 +186,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
         <ListPageHeader title={t('VirtualMachines')}>
           <Flex>
             <FlexItem>
-              <VirtualMachineActionButton />
+              <VirtualMachineBulkActionButton vms={data} />
             </FlexItem>
             <FlexItem>
               <VirtualMachinesCreateButton namespace={namespace} />

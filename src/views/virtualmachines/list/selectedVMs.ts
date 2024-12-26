@@ -3,29 +3,38 @@ import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { signal } from '@preact/signals-core';
 
-export const selectedVMs = signal<V1VirtualMachine[]>([]);
+export const selectedVMs = signal<{ name: string; namespace: string }[]>([]);
 
 export const selectVM = (vm: V1VirtualMachine) => {
-  if (isEmpty(findVM(vm))) selectedVMs.value = [...selectedVMs.value, vm];
+  const vmIdentifier = { name: getName(vm), namespace: getNamespace(vm) };
+  if (isEmpty(findVM(vm))) {
+    selectedVMs.value = [...selectedVMs.value, vmIdentifier];
+  }
 };
 
 export const deselectVM = (vm: V1VirtualMachine) => {
+  const vmIdentifier = { name: getName(vm), namespace: getNamespace(vm) };
   selectedVMs.value = selectedVMs.value.filter(
     (selectedVM) =>
-      getName(selectedVM) !== getName(vm) || getNamespace(selectedVM) !== getNamespace(vm),
+      selectedVM.name !== vmIdentifier.name || selectedVM.namespace !== vmIdentifier.namespace,
   );
 };
 
 export const selectAll = (vms: V1VirtualMachine[]) => {
-  selectedVMs.value = Array.from(new Set([...selectedVMs.value, ...vms]));
+  const vmIdentifiers = vms.map((vm) => ({ name: getName(vm), namespace: getNamespace(vm) }));
+  selectedVMs.value = [...vmIdentifiers];
 };
 
-export const deselectAll = () => (selectedVMs.value = []);
+export const deselectAll = () => {
+  selectedVMs.value = [];
+};
 
-export const findVM = (vm: V1VirtualMachine) =>
-  selectedVMs.value.find(
+export const findVM = (vm: V1VirtualMachine) => {
+  const vmIdentifier = { name: getName(vm), namespace: getNamespace(vm) };
+  return selectedVMs.value.find(
     (selectedVM) =>
-      getName(selectedVM) === getName(vm) && getNamespace(selectedVM) === getNamespace(vm),
+      selectedVM.name === vmIdentifier.name && selectedVM.namespace === vmIdentifier.namespace,
   );
+};
 
 export const isVMSelected = (vm: V1VirtualMachine): boolean => !isEmpty(findVM(vm));
