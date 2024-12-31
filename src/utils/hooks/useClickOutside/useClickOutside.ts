@@ -1,24 +1,24 @@
-import { RefObject, useEffect } from 'react';
+import { MutableRefObject, useEffect } from 'react';
 
 import { CLICK, ESCAPE, KEYDOWN, TAB } from './constants';
 
-export const useClickOutside = <T extends HTMLElement>(
-  ref: RefObject<T>,
+export const useClickOutside = (
+  refs: MutableRefObject<HTMLElement | null>[],
   onClickOutside: () => void,
 ) => {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (ref?.current && !ref?.current.contains(event.target as Node)) {
+      if (refs?.every((ref) => ref?.current && !ref?.current.contains(event.target as Node))) {
         onClickOutside();
       }
     };
 
-    const handleMenuKeys = (event) => {
-      if (ref?.current) {
-        if (event?.key === ESCAPE) {
-          onClickOutside();
-        }
-        if (!ref?.current?.contains(event?.target) && event?.key === TAB) {
+    const handleMenuKeys = (event: KeyboardEvent) => {
+      if (event?.key === ESCAPE) {
+        onClickOutside();
+      } else if (event.key === TAB) {
+        // Check if the focus is outside all provided refs
+        if (refs.every((ref) => ref.current && !ref.current.contains(event.target as Node))) {
           onClickOutside();
         }
       }
@@ -31,5 +31,5 @@ export const useClickOutside = <T extends HTMLElement>(
       window?.removeEventListener(KEYDOWN, handleMenuKeys);
       document.removeEventListener(CLICK, handleClickOutside);
     };
-  }, [ref, onClickOutside]);
+  }, [refs, onClickOutside]);
 };

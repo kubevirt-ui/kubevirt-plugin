@@ -37,7 +37,8 @@ const ComposableDrilldownSelect: FC<ComposableDrilldownMenuProps> = ({
   const [menuDrilledIn, setMenuDrilledIn] = useState<string[]>([]);
   const [drilldownPath, setDrilldownPath] = useState<string[]>([]);
   const [menuHeights, setMenuHeights] = useState<MenuHeightsType>({});
-  const ref = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const toggleRef = useRef<HTMLDivElement>(null);
 
   const onToggleClick = (ev?: React.MouseEvent) => {
     ev?.stopPropagation(); // Stop handleClickOutside from handling
@@ -73,7 +74,7 @@ const ComposableDrilldownSelect: FC<ComposableDrilldownMenuProps> = ({
     }
   };
 
-  useClickOutside(ref, onToggleClick);
+  useClickOutside([menuRef], onToggleClick);
 
   return (
     <Popper
@@ -88,7 +89,7 @@ const ComposableDrilldownSelect: FC<ComposableDrilldownMenuProps> = ({
           onDrillIn={drillIn}
           onDrillOut={drillOut}
           onGetMenuHeight={setHeight}
-          ref={ref}
+          ref={menuRef}
         >
           <MenuContent menuHeight={`${menuHeights[activeMenu]}px`}>
             <MenuList>{children}</MenuList>
@@ -96,7 +97,7 @@ const ComposableDrilldownSelect: FC<ComposableDrilldownMenuProps> = ({
         </Menu>
       }
       trigger={
-        <MenuToggle isExpanded={isOpen} isFullWidth onClick={onToggleClick}>
+        <MenuToggle isExpanded={isOpen} isFullWidth onClick={onToggleClick} ref={toggleRef}>
           {toggleLabel}
         </MenuToggle>
       }
