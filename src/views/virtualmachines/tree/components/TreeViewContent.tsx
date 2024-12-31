@@ -1,7 +1,9 @@
 import React, { FC, useState } from 'react';
 
+import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
+  Bullseye,
   DrawerActions,
   DrawerHead,
   DrawerPanelBody,
@@ -39,6 +41,14 @@ const TreeViewContent: FC<TreeViewContentProps> = ({
   const { t } = useKubevirtTranslation();
   const [showAll, setShowAll] = useState<boolean>();
   const { filteredTreeData, onSearch } = UseFilteredTreeView(treeData, setShowAll);
+
+  if (!loaded) {
+    return (
+      <Bullseye>
+        <Loading />
+      </Bullseye>
+    );
+  }
 
   if (!isOpen) {
     return (
