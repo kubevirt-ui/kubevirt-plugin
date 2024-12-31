@@ -1,4 +1,11 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, {
+  FC,
+  forwardRef,
+  RefAttributes,
+  useImperativeHandle,
+  useMemo,
+  useState,
+} from 'react';
 
 import {
   VirtualMachineInstanceMigrationModelGroupVersionKind,
@@ -28,13 +35,13 @@ import {
   K8sResourceCommon,
   ListPageBody,
   ListPageHeader,
+  OnFilterChange,
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Flex, FlexItem, Pagination } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
 import useQuery from '@virtualmachines/details/tabs/metrics/NetworkCharts/hook/useQuery';
-import VirtualMachineTreeView from '@virtualmachines/tree/VirtualMachineTreeView';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 
 import { useVMListFilters } from '../utils';
@@ -55,9 +62,9 @@ import './VirtualMachinesList.scss';
 type VirtualMachinesListProps = {
   kind: string;
   namespace: string;
-};
+} & RefAttributes<{ onFilterChange: OnFilterChange } | null>;
 
-const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) => {
+const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, namespace }, ref) => {
   const { t } = useKubevirtTranslation();
   const catalogURL = `/k8s/ns/${namespace || DEFAULT_NAMESPACE}/catalog`;
   const { featureEnabled, loading: loadingFeatureProxy } = useFeatures(KUBEVIRT_APISERVER_PROXY);
@@ -120,6 +127,15 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
     V1VirtualMachine
   >(vms, [...filters, ...searchFilters]);
 
+  // Allow using folder filters from the tree view
+  useImperativeHandle(
+    ref,
+    () => ({
+      onFilterChange,
+    }),
+    [onFilterChange],
+  );
+
   const selectedFilters = useSelectedFilters(filters, searchFilters);
 
   const [unfilteredData, data] = useMemo(() => {
@@ -167,20 +183,20 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
 
   if (loaded && noVMs) {
     return (
-      <VirtualMachineTreeView>
+      <>
         <VirtualMachineListSummary
           namespace={namespace}
           onFilterChange={onFilterChange}
           vms={data}
         />
         <VirtualMachineEmptyState catalogURL={catalogURL} namespace={namespace} />
-      </VirtualMachineTreeView>
+      </>
     );
   }
 
   return (
     /* All of this table and components should be replaced to our own fitted components */
-    <VirtualMachineTreeView onFilterChange={onFilterChange}>
+    <>
       <VirtualMachineListSummary namespace={namespace} onFilterChange={onFilterChange} vms={data} />
       <div className="vm-list-page-header">
         <ListPageHeader title={t('VirtualMachines')}>
@@ -262,8 +278,8 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ kind, namespace }) 
           />
         </div>
       </ListPageBody>
-    </VirtualMachineTreeView>
+    </>
   );
-};
+});
 
 export default VirtualMachinesList;

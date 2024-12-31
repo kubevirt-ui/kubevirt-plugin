@@ -4,7 +4,7 @@ import { TREE_VIEW } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
-import { FilterValue, useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
+import { FilterValue } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Drawer,
   DrawerContent,
@@ -14,7 +14,7 @@ import {
 
 import TreeViewContent from './components/TreeViewContent';
 import { useHideNamespaceBar } from './hooks/useHideNamespaceBar';
-import { useTreeViewData } from './hooks/useTreeViewData';
+import { UseTreeViewData } from './hooks/useTreeViewData';
 import useTreeViewSelect from './hooks/useTreeViewSelect';
 import {
   CLOSED_DRAWER_SIZE,
@@ -31,23 +31,24 @@ import './VirtualMachineTreeView.scss';
 
 type VirtualMachineTreeViewProps = {
   onFilterChange?: (type: string, value: FilterValue) => void;
-};
+} & UseTreeViewData;
 
-const VirtualMachineTreeView: FC<VirtualMachineTreeViewProps> = ({ children, onFilterChange }) => {
-  const [activeNamespace] = useActiveNamespace();
-
+const VirtualMachineTreeView: FC<VirtualMachineTreeViewProps> = ({
+  children,
+  isSwitchDisabled,
+  loaded,
+  loadError,
+  onFilterChange,
+  treeData,
+}) => {
   const [drawerWidth, setDrawerWidth] = useLocalStorage(TREE_VIEW_LAST_WIDTH, OPEN_DRAWER_SIZE);
   const [drawerOpen, setDrawerOpen] = useLocalStorage(SHOW_TREE_VIEW, SHOW);
 
   const { featureEnabled: treeViewEnabled, loading } = useFeatures(TREE_VIEW);
 
-  const { isSwitchDisabled, loaded, loadError, selectedTreeItem, treeData, vms } =
-    useTreeViewData(activeNamespace);
-
-  const onSelect = useTreeViewSelect(onFilterChange, vms);
+  const [selected, onSelect] = useTreeViewSelect(onFilterChange);
 
   const isOpen = useMemo(() => drawerOpen === SHOW, [drawerOpen]);
-
   useHideNamespaceBar();
   useEffect(() => {
     const drawerPanel = document.getElementById(TREE_VIEW_PANEL_ID);
@@ -87,7 +88,7 @@ const VirtualMachineTreeView: FC<VirtualMachineTreeViewProps> = ({ children, onF
               isSwitchDisabled={isSwitchDisabled}
               loaded={loaded}
               onSelect={onSelect}
-              selectedTreeItem={selectedTreeItem}
+              selectedTreeItem={selected}
               toggleDrawer={toggleDrawer}
               treeData={treeData}
             />

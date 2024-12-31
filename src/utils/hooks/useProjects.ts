@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui/kubevirt-api/console';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
@@ -10,7 +12,12 @@ const useProjects: UseProjects = () => {
     isList: true,
   });
 
-  return [projectsData?.map(getName)?.sort((a, b) => a?.localeCompare(b)), loaded, error];
+  const projectsNames = useMemo(
+    () => projectsData?.map(getName).sort((a, b) => a.localeCompare(b)),
+    [projectsData],
+  );
+
+  return [projectsNames, loaded, error];
 };
 
 export default useProjects;

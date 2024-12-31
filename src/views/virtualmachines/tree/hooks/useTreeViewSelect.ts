@@ -1,14 +1,11 @@
-import { MouseEvent, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import { MouseEvent, useCallback, useEffect, useState } from 'react';
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom-v5-compat';
 
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useQueryParamsMethods } from '@kubevirt-utils/components/ListPageFilter/hooks/useQueryParamsMethods';
 import { ALL_NAMESPACES, ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
-import { convertResourceArrayToMap, getResourceUrl } from '@kubevirt-utils/resources/shared';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { FilterValue } from '@openshift-console/dynamic-plugin-sdk';
 import { useLastNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
-import { TreeViewDataItem } from '@patternfly/react-core';
 import { TEXT_FILTER_LABELS_ID } from '@virtualmachines/list/hooks/constants';
 
 import {
@@ -16,66 +13,70 @@ import {
   PROJECT_SELECTOR_PREFIX,
   VM_FOLDER_LABEL,
 } from '../utils/constants';
+import { treeDataMap, TreeViewDataItemWithHref } from '../utils/utils';
 
 const useTreeViewSelect = (
   onFilterChange: (type: string, value: FilterValue) => void,
-  vms: V1VirtualMachine[],
-) => {
+): [
+  selected: TreeViewDataItemWithHref,
+  onSelect: (_event: MouseEvent, treeViewItem: TreeViewDataItemWithHref) => void,
+] => {
+  const location = useLocation();
+  const { ns } = useParams<{ ns: string }>();
+  const [searchParams] = useSearchParams();
+  const dataMap = treeDataMap.value;
+
+  const [selected, setSelected] = useState<TreeViewDataItemWithHref>(null);
+
   const navigate = useNavigate();
   const { setOrRemoveQueryArgument } = useQueryParamsMethods();
   const [_, setLastNamespace] = useLastNamespace();
 
-  const vmsMapper = useMemo(() => convertResourceArrayToMap(vms, true), [vms]);
+  const onSelect = useCallback(
+    (_event: MouseEvent, treeViewItem: TreeViewDataItemWithHref) => {
+      setSelected(treeViewItem);
+      navigate(treeViewItem.href);
 
-  const onSelect = (_event: MouseEvent, treeViewItem: TreeViewDataItem) => {
-    onFilterChange?.(TEXT_FILTER_LABELS_ID, null);
+      if (treeViewItem.id.startsWith(FOLDER_SELECTOR_PREFIX)) {
+        const treeItemName = treeViewItem.name as string;
+        setOrRemoveQueryArgument(TEXT_FILTER_LABELS_ID, `${VM_FOLDER_LABEL}=${treeItemName}`);
+        return onFilterChange?.(TEXT_FILTER_LABELS_ID, {
+          all: [`${VM_FOLDER_LABEL}=${treeItemName}`],
+        });
+      }
+    },
+    [navigate, onFilterChange, setOrRemoveQueryArgument],
+  );
 
-    const treeItemName = treeViewItem.name as string;
-    if (treeViewItem.id.startsWith(FOLDER_SELECTOR_PREFIX)) {
-      const [__, folderNamespace] = treeViewItem.id.split('/');
-      setLastNamespace(folderNamespace);
-      navigate(
-        getResourceUrl({
-          activeNamespace: folderNamespace,
-          model: VirtualMachineModel,
-        }),
-      );
-      setOrRemoveQueryArgument(TEXT_FILTER_LABELS_ID, `${VM_FOLDER_LABEL}=${treeItemName}`);
-      return onFilterChange?.(TEXT_FILTER_LABELS_ID, {
-        all: [`${VM_FOLDER_LABEL}=${treeItemName}`],
-      });
+  // Apply the selected item when reloading the page / creating project / creating VM / deleting VM
+  useEffect(() => {
+    if (isEmpty(selected) || location.pathname !== selected.href) {
+      if (!ns) {
+        setSelected(dataMap?.[ALL_NAMESPACES_SESSION_KEY]);
+        setLastNamespace(ALL_NAMESPACES);
+        return;
+      }
+
+      setLastNamespace(ns);
+      const labelsParam = searchParams?.get('labels');
+      if (labelsParam?.startsWith(VM_FOLDER_LABEL)) {
+        const [__, folder] = labelsParam.split('=');
+        setSelected(dataMap?.[`${FOLDER_SELECTOR_PREFIX}/${ns}/${folder}`]);
+
+        return;
+      }
+
+      const currentPageVMName = location.pathname.split('/')[5];
+
+      if (currentPageVMName) {
+        setSelected(dataMap?.[`${ns}/${currentPageVMName}`]);
+        return;
+      }
+      return setSelected(dataMap?.[`${PROJECT_SELECTOR_PREFIX}/${ns}`]);
     }
+  }, [dataMap, location.pathname, ns, searchParams, selected, setLastNamespace]);
 
-    if (treeViewItem.id.startsWith(PROJECT_SELECTOR_PREFIX)) {
-      setLastNamespace(treeItemName);
-      return navigate(
-        getResourceUrl({
-          activeNamespace: treeItemName,
-          model: VirtualMachineModel,
-        }),
-      );
-    }
-
-    if (treeViewItem.id.startsWith(ALL_NAMESPACES_SESSION_KEY)) {
-      setLastNamespace(ALL_NAMESPACES);
-      return navigate(
-        getResourceUrl({
-          model: VirtualMachineModel,
-        }),
-      );
-    }
-
-    const [vmNamespace, vmName] = treeViewItem.id.split('/');
-    return navigate(
-      getResourceUrl({
-        activeNamespace: vmNamespace,
-        model: VirtualMachineModel,
-        resource: vmsMapper?.[vmNamespace]?.[vmName],
-      }),
-    );
-  };
-
-  return onSelect;
+  return [selected, onSelect];
 };
 
 export default useTreeViewSelect;

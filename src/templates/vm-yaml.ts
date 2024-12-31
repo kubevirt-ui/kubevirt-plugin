@@ -1,7 +1,6 @@
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 
-export const defaultVMYamlTemplate = `
-apiVersion: ${VirtualMachineModel.apiGroup}/${VirtualMachineModel.apiVersion}
+export const defaultVMYamlTemplate = `apiVersion: ${VirtualMachineModel.apiGroup}/${VirtualMachineModel.apiVersion}
 kind: ${VirtualMachineModel.kind}
 metadata:
   name: example
