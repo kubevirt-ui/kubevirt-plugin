@@ -19,6 +19,7 @@ import TreeViewToolbar from './TreeViewToolbar';
 
 type TreeViewContentProps = {
   isOpen: boolean;
+  isSwitchDisabled: boolean;
   loaded: boolean;
   onSelect: (_event: React.MouseEvent, treeViewItem: TreeViewDataItem) => void;
   selectedTreeItem: TreeViewDataItem;
@@ -28,6 +29,7 @@ type TreeViewContentProps = {
 
 const TreeViewContent: FC<TreeViewContentProps> = ({
   isOpen,
+  isSwitchDisabled,
   loaded,
   onSelect,
   selectedTreeItem,
@@ -37,6 +39,7 @@ const TreeViewContent: FC<TreeViewContentProps> = ({
   const { t } = useKubevirtTranslation();
   const [showAll, setShowAll] = useState<boolean>();
   const { filteredTreeData, onSearch } = UseFilteredTreeView(treeData, setShowAll);
+
   if (!isOpen) {
     return (
       <PanelToggleButton
@@ -46,6 +49,7 @@ const TreeViewContent: FC<TreeViewContentProps> = ({
       />
     );
   }
+
   return (
     <>
       <TreeViewToolbar
@@ -56,6 +60,7 @@ const TreeViewContent: FC<TreeViewContentProps> = ({
             toggleDrawer={toggleDrawer}
           />
         }
+        isSwitchDisabled={isSwitchDisabled}
         onSearch={onSearch}
       />
       <DrawerHead className="vms-tree-view__header-section">

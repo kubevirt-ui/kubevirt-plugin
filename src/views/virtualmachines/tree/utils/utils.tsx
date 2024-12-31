@@ -189,7 +189,9 @@ export const createTreeViewData = (
 
   treeDataMap.value = treeViewDataMap;
 
-  return [[allNamespacesTreeItem] ?? treeViewData, getSelectedTreeItem()];
+  const tree = allNamespacesTreeItem ? [allNamespacesTreeItem] : treeViewData;
+
+  return [tree, getSelectedTreeItem()];
 };
 
 export const filterItems = (item: TreeViewDataItem, input: string) => {

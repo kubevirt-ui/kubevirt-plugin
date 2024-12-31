@@ -10,10 +10,10 @@ import { useK8sWatchResource, useK8sWatchResources } from '@openshift-console/dy
 import { TreeViewDataItem } from '@patternfly/react-core';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 
-import { createTreeViewData } from '../utils/utils';
+import { createTreeViewData, isSystemNamespace } from '../utils/utils';
 
 type UseTreeViewData = {
-  isAdmin: boolean;
+  isSwitchDisabled: boolean;
   loaded: boolean;
   loadError: any;
   selectedTreeItem: TreeViewDataItem;
@@ -66,8 +66,10 @@ export const useTreeViewData = (activeNamespace: string): UseTreeViewData => {
     [projectNames, memoizedVMs, activeNamespace, isAdmin, treeViewFoldersEnabled],
   );
 
+  const isSwitchDisabled = useMemo(() => projectNames.every(isSystemNamespace), [projectNames]);
+
   return {
-    isAdmin,
+    isSwitchDisabled,
     loaded:
       projectNamesLoaded &&
       (isAdmin

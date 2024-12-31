@@ -19,10 +19,15 @@ import { HIDE, SHOW, SHOW_EMPTY_PROJECTS_KEY, TREE_VIEW_SEARCH_ID } from '../uti
 
 type TreeViewToolbarProps = {
   closeComponent: ReactNode;
+  isSwitchDisabled: boolean;
   onSearch: (event: ChangeEvent<HTMLInputElement>) => void;
 };
 
-const TreeViewToolbar: FC<TreeViewToolbarProps> = ({ closeComponent, onSearch }) => {
+const TreeViewToolbar: FC<TreeViewToolbarProps> = ({
+  closeComponent,
+  isSwitchDisabled,
+  onSearch,
+}) => {
   const { t } = useKubevirtTranslation();
   const [showEmptyProjects, setShowEmptyProjects] = useLocalStorage(SHOW_EMPTY_PROJECTS_KEY, HIDE);
 
@@ -51,8 +56,9 @@ const TreeViewToolbar: FC<TreeViewToolbarProps> = ({ closeComponent, onSearch })
               </SplitItem>
               <SplitItem isFilled />
               <Switch
-                checked={showEmptyProjects === HIDE}
+                checked={!isSwitchDisabled && showEmptyProjects === HIDE}
                 className="vms-tree-view__toolbar-switch"
+                isDisabled={isSwitchDisabled}
                 isReversed
                 onChange={(_, checked) => setShowEmptyProjects(checked ? HIDE : SHOW)}
               />

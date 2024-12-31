@@ -41,7 +41,8 @@ const VirtualMachineTreeView: FC<VirtualMachineTreeViewProps> = ({ children, onF
 
   const { featureEnabled: treeViewEnabled, loading } = useFeatures(TREE_VIEW);
 
-  const { loaded, loadError, selectedTreeItem, treeData, vms } = useTreeViewData(activeNamespace);
+  const { isSwitchDisabled, loaded, loadError, selectedTreeItem, treeData, vms } =
+    useTreeViewData(activeNamespace);
 
   const onSelect = useTreeViewSelect(onFilterChange, vms);
 
@@ -83,6 +84,7 @@ const VirtualMachineTreeView: FC<VirtualMachineTreeViewProps> = ({ children, onF
           >
             <TreeViewContent
               isOpen={isOpen}
+              isSwitchDisabled={isSwitchDisabled}
               loaded={loaded}
               onSelect={onSelect}
               selectedTreeItem={selectedTreeItem}
