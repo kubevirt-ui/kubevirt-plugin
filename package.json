@@ -95,6 +95,7 @@
     "mocha-junit-reporter": "^2.0.2",
     "mochawesome": "^7.0.1",
     "mochawesome-merge": "^4.2.1",
+    "playwright": "^1.49.1",
     "pluralize": "^8.0.0",
     "prettier": "^2.5.1",
     "process": "^0.11.10",
@@ -114,7 +115,7 @@
   },
   "lint-staged": {
     "*.{js,ts,tsx,jsx,json}": [
-      "eslint . --fix",
+      "eslint --fix",
       "prettier --write .",
       "yarn i18n"
     ]
@@ -152,7 +153,8 @@
     "test-cypress": "cd cypress && ../node_modules/cypress/bin/cypress open --config-file ./cypress.config.js --env openshift=true",
     "test-cypress-docker": "echo 'visit http://localhost:10000' && cd cypress && DISPLAY=:14 LIBGL_ALWAYS_INDIRECT=0 cypress open --config-file ./cypress.config.js --env openshift=true",
     "test-cypress-headless": "cd cypress && node --max-old-space-size=4096 ../node_modules/cypress/bin/cypress run --config-file ./cypress.config.js --env openshift=true --headless",
-    "test-playwright-headless": "cd playwright && node --max-old-space-size=4096 ../node_modules/.bin/playwright test -c ./playwright.config.ts tests",
+    "test-playwright": "cd playwright && playwright test --ui",
+    "test-playwright-headless": "cd playwright && playwright test",
     "ts-node": "ts-node -O '{\"module\":\"commonjs\"}'"
   },
   "version": "0.0.1"

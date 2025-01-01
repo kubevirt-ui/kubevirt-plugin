@@ -6,8 +6,8 @@ const volName = 'rhel10-beta';
 const vmName = 'test-vm';
 
 test('create VM from InstanceType', async ({ page }) => {
-  test.setTimeout(120_000);
   await page.goto('/');
+  await page.waitForLoadState('networkidle');
 
   await page.getByTestId(cView.virtNavItemID).click();
   await page.getByTestId(cView.catalogNavItemID).click();
@@ -18,5 +18,10 @@ test('create VM from InstanceType', async ({ page }) => {
   });
   await page.getByRole('button', { name: cView.createBtnText }).click();
 
-  expect(page.getByTestId(cView.vmDetailsNameID)).toHaveText(vmName, { timeout: 20 * 1000 });
+  const createVM = await page.waitForSelector(
+    cView.waitForSelectorDataTestId(cView.vmDetailsNameID),
+  );
+  const createVMName = await createVM.textContent();
+
+  expect(createVMName).toContain(vmName);
 });

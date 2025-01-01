@@ -25,7 +25,8 @@ export default defineConfig({
       name: 'setup',
       testMatch: /.*\.setup\.ts/,
       use: {
-        ignoreHTTPSErrors: true,
+        ...devices['Desktop Chrome'],
+        viewport: { height: 1440, width: 2560 },
       },
     },
     {
@@ -33,9 +34,8 @@ export default defineConfig({
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
-        ignoreHTTPSErrors: true,
-        storageState: '.auth/user.json',
-        viewport: { height: 1200, width: 1920 },
+        ...(process.env.BRIDGE_BASE_ADDRESS && { storageState: '.auth/user.json' }),
+        viewport: { height: 1440, width: 2560 },
       },
     },
   ],
@@ -44,11 +44,12 @@ export default defineConfig({
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
   testDir: './tests',
-  timeout: 30000,
+  timeout: 120000,
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: process.env.BRIDGE_BASE_ADDRESS,
+    baseURL: process.env.BRIDGE_BASE_ADDRESS ?? 'http://localhost:9000/',
+    ignoreHTTPSErrors: true,
 
     screenshot: 'only-on-failure',
     //video: 'retain-on-failure',
@@ -56,7 +57,6 @@ export default defineConfig({
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
     video: 'on',
-    viewport: { height: 1600, width: 1920 },
   },
 
   /* Opt out of parallel tests on CI. */

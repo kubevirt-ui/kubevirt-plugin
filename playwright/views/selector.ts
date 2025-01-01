@@ -7,3 +7,5 @@ export const itVmNameID = 'instancetypes-vm-name-input';
 export const createBtnText = 'Create VirtualMachine';
 
 export const vmDetailsNameID = 'virtual-machine-overview-details-name';
+
+export const waitForSelectorDataTestId = (dataTestId: string) => `[data-test-id="${dataTestId}"]`;

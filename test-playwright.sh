@@ -5,7 +5,7 @@ set -eExuo pipefail
 
 # Install dependencies.
 yarn install --ignore-engines
-
+yarn playwright install
 # Add mochawesome-report-generator
 yarn add global mochawesome-report-generator --ignore-engines
 
