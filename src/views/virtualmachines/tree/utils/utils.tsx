@@ -96,8 +96,8 @@ const createFolderTreeItems = (
 const createProjectTreeItem = (
   project: string,
   projectMap: Record<string, any>,
-  activeNamespace: string,
   currentPageVMName: string,
+  currentPageNamespace: string,
   treeViewDataMap: Record<string, TreeViewDataItem>,
 ): TreeViewDataItem => {
   const projectFolders = createFolderTreeItems(
@@ -113,7 +113,7 @@ const createProjectTreeItem = (
   const projectTreeItem: TreeViewDataItem = {
     children: projectChildren,
     customBadgeContent: projectMap[project]?.count || 0,
-    defaultExpanded: project === activeNamespace,
+    defaultExpanded: currentPageNamespace === project,
     icon: <ProjectDiagramIcon />,
     id: projectTreeItemID,
     name: project,
@@ -154,44 +154,34 @@ const createAllNamespacesTreeItem = (
 export const createTreeViewData = (
   projectNames: string[],
   vms: V1VirtualMachine[],
-  activeNamespace: string,
   isAdmin: boolean,
   pathname: string,
   foldersEnabled: boolean,
-): [TreeViewDataItem[], TreeViewDataItem] => {
+): TreeViewDataItem[] => {
   const currentPageVMName = pathname.split('/')[5];
+  const currentPageNamespace = pathname.split('/')[3];
   const treeViewDataMap: Record<string, TreeViewDataItem> = {};
   const projectMap = buildProjectMap(vms, currentPageVMName, treeViewDataMap, foldersEnabled);
 
   const treeViewData = projectNames.map((project) =>
-    createProjectTreeItem(project, projectMap, activeNamespace, currentPageVMName, treeViewDataMap),
+    createProjectTreeItem(
+      project,
+      projectMap,
+      currentPageVMName,
+      currentPageNamespace,
+      treeViewDataMap,
+    ),
   );
 
   const allNamespacesTreeItem = isAdmin
     ? createAllNamespacesTreeItem(treeViewData, treeViewDataMap, projectMap)
     : null;
 
-  const getSelectedTreeItem = (): TreeViewDataItem => {
-    if (activeNamespace === ALL_NAMESPACES_SESSION_KEY) return allNamespacesTreeItem;
-
-    if (currentPageVMName) return treeViewDataMap[`${activeNamespace}/${currentPageVMName}`];
-
-    const params = new URLSearchParams(window.location.search);
-
-    if (!params?.has('labels'))
-      return treeViewDataMap[`${PROJECT_SELECTOR_PREFIX}/${activeNamespace}`];
-
-    const folderLabel: string = params.values().next().value;
-    const folder = folderLabel.split('=')?.[1];
-
-    return treeViewDataMap[`${FOLDER_SELECTOR_PREFIX}/${activeNamespace}/${folder}`];
-  };
-
   treeDataMap.value = treeViewDataMap;
 
   const tree = allNamespacesTreeItem ? [allNamespacesTreeItem] : treeViewData;
 
-  return [tree, getSelectedTreeItem()];
+  return tree;
 };
 
 export const filterItems = (item: TreeViewDataItem, input: string) => {

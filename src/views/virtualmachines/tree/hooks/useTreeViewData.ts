@@ -6,22 +6,21 @@ import { TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResource, useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
 import { TreeViewDataItem } from '@patternfly/react-core';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 
 import { createTreeViewData, isSystemNamespace } from '../utils/utils';
 
-type UseTreeViewData = {
+export type UseTreeViewData = {
   isSwitchDisabled: boolean;
   loaded: boolean;
   loadError: any;
-  selectedTreeItem: TreeViewDataItem;
   treeData: TreeViewDataItem[];
-  vms: V1VirtualMachine[];
 };
 
-export const useTreeViewData = (activeNamespace: string): UseTreeViewData => {
+export const useTreeViewData = (): UseTreeViewData => {
   const isAdmin = useIsAdmin();
   const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
   const [projectNames, projectNamesLoaded, projectNamesError] = useProjects();
@@ -53,17 +52,18 @@ export const useTreeViewData = (activeNamespace: string): UseTreeViewData => {
     [allVMs, allowedResources, isAdmin],
   );
 
-  const [treeData, selectedTreeItem] = useMemo(
+  const treeData = useMemo(
     () =>
-      createTreeViewData(
-        projectNames,
-        memoizedVMs,
-        activeNamespace,
-        isAdmin,
-        location.pathname,
-        treeViewFoldersEnabled,
-      ),
-    [projectNames, memoizedVMs, activeNamespace, isAdmin, treeViewFoldersEnabled],
+      !isEmpty(memoizedVMs)
+        ? createTreeViewData(
+            projectNames,
+            memoizedVMs,
+            isAdmin,
+            location.pathname,
+            treeViewFoldersEnabled,
+          )
+        : [],
+    [projectNames, memoizedVMs, isAdmin, treeViewFoldersEnabled],
   );
 
   const isSwitchDisabled = useMemo(() => projectNames.every(isSystemNamespace), [projectNames]);
@@ -76,8 +76,6 @@ export const useTreeViewData = (activeNamespace: string): UseTreeViewData => {
         ? allVMsLoaded
         : Object.values(allowedResources).some((resource) => resource.loaded)),
     loadError: projectNamesError,
-    selectedTreeItem,
     treeData,
-    vms: memoizedVMs,
   };
 };

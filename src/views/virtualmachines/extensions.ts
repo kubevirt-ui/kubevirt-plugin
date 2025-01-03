@@ -1,8 +1,7 @@
 import { EncodedExtension } from '@openshift/dynamic-plugin-sdk-webpack';
 import {
   ResourceActionProvider,
-  ResourceDetailsPage,
-  ResourceListPage,
+  RoutePage,
   StandaloneRoutePage,
 } from '@openshift-console/dynamic-plugin-sdk';
 import type { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plugin-sdk-webpack';
@@ -10,10 +9,9 @@ import type { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plug
 export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
   LogsStandAlone:
     './views/virtualmachines/details/tabs/diagnostic/VirtualMachineLogViewer/VirtualMachineLogViewerStandAlone/VirtualMachineLogViewerStandAlone.tsx',
+  Navigator: './views/virtualmachines/navigator/VirtualMachineNavigator.tsx',
   useVirtualMachineActionsProvider:
     './views/virtualmachines/actions/hooks/useVirtualMachineActionsProvider.ts',
-  VirtualMachineNavPage: './views/virtualmachines/details/VirtualMachineNavPage.tsx',
-  VirtualMachinesList: './views/virtualmachines/list/VirtualMachinesList.tsx',
 };
 
 export const extensions: EncodedExtension[] = [
@@ -45,26 +43,15 @@ export const extensions: EncodedExtension[] = [
 
   {
     properties: {
-      component: { $codeRef: 'VirtualMachineNavPage' },
-      model: {
-        group: 'kubevirt.io',
-        kind: 'VirtualMachine',
-        version: 'v1',
-      },
-    },
-    type: 'console.page/resource/details',
-  } as EncodedExtension<ResourceDetailsPage>,
-  {
-    properties: {
       component: {
-        $codeRef: 'VirtualMachinesList',
+        $codeRef: 'Navigator',
       },
-      model: {
-        group: 'kubevirt.io',
-        kind: 'VirtualMachine',
-        version: 'v1',
-      },
+      path: [
+        '/k8s/ns/:ns/kubevirt.io~v1~VirtualMachine/:name',
+        '/k8s/ns/:ns/kubevirt.io~v1~VirtualMachine',
+        '/k8s/all-namespaces/kubevirt.io~v1~VirtualMachine',
+      ],
     },
-    type: 'console.page/resource/list',
-  } as EncodedExtension<ResourceListPage>,
+    type: 'console.page/route',
+  } as EncodedExtension<RoutePage>,
 ];
