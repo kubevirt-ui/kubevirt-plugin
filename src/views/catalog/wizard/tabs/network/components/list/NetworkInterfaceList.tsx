@@ -45,7 +45,7 @@ const NetworkInterfaceList: React.FC<NetworkInterfaceListProps> = ({ onUpdateVM,
         loaded
         loadError={false}
         Row={NetworkInterfaceRow}
-        rowData={{ onUpdateVM }}
+        rowData={{ onUpdateVM, vm }}
         unfilteredData={data}
       />
     </>
