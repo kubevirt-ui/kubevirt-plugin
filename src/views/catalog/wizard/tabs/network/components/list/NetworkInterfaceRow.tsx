@@ -14,8 +14,11 @@ export type NetworkInterfaceRowProps = {
 };
 
 const NetworkInterfaceRow: FC<
-  RowProps<NetworkPresentation, { onUpdateVM?: (updateVM: V1VirtualMachine) => Promise<void> }>
-> = ({ activeColumnIDs, obj: { iface, network }, rowData: { onUpdateVM } }) => {
+  RowProps<
+    NetworkPresentation,
+    { onUpdateVM?: (updateVM: V1VirtualMachine) => Promise<void>; vm: V1VirtualMachine }
+  >
+> = ({ activeColumnIDs, obj: { iface, network }, rowData: { onUpdateVM, vm } }) => {
   const { t } = useKubevirtTranslation();
   return (
     <>
@@ -43,6 +46,7 @@ const NetworkInterfaceRow: FC<
           nicName={network?.name}
           nicPresentation={{ iface, network }}
           onUpdateVM={onUpdateVM}
+          vm={vm}
         />
       </TableData>
     </>

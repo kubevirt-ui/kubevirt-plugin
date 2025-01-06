@@ -9,7 +9,6 @@ import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
-import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ButtonVariant, Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
 
@@ -19,17 +18,18 @@ type NetworkInterfaceActionsProps = {
   nicName: string;
   nicPresentation: NetworkPresentation;
   onUpdateVM?: (updateVM: V1VirtualMachine) => Promise<void>;
+  vm: V1VirtualMachine;
 };
 
 const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
   nicName,
   nicPresentation,
   onUpdateVM,
+  vm,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { updateVM, vm: vmContext } = useWizardVMContext();
+  const { updateVM } = useWizardVMContext();
   const { createModal } = useModal();
-  const vm = vmSignal.value || vmContext;
   const onUpdate = onUpdateVM || updateVM;
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const label = t('Delete NIC?');
