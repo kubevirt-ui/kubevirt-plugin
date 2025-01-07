@@ -18,6 +18,7 @@ import {
   generateNewSysprepConfig,
   UNATTEND,
 } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
+import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { logITFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
 import {
@@ -28,11 +29,13 @@ import {
   CUSTOMIZE_VM_BUTTON_CLICKED,
   VIEW_YAML_AND_CLI_CLICKED,
 } from '@kubevirt-utils/extensions/telemetry/utils/constants';
+import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import useRHELAutomaticSubscription from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/useRHELAutomaticSubscription';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
+import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
 import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { createHeadlessService } from '@kubevirt-utils/utils/headless-service';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -68,6 +71,10 @@ const CreateVMFooter: FC = () => {
   const { subscriptionData } = useRHELAutomaticSubscription();
 
   const [activeNamespace] = useActiveNamespace();
+  const [isNamespaceManagedByUDN] = useNamespaceUDN(
+    activeNamespace === ALL_NAMESPACES_SESSION_KEY ? DEFAULT_NAMESPACE : activeNamespace,
+  );
+
   const { instanceTypeVMState, setStartVM, setVM, startVM, vmNamespaceTarget } =
     useInstanceTypeVMStore();
   const {
@@ -107,6 +114,7 @@ const CreateVMFooter: FC = () => {
       startVM,
       subscriptionData,
       targetNamespace: vmNamespaceTarget,
+      withUDN: isNamespaceManagedByUDN,
     });
 
     logITFlowEvent(CREATE_VM_BUTTON_CLICKED, vmToCreate);
@@ -170,6 +178,7 @@ const CreateVMFooter: FC = () => {
           startVM,
           subscriptionData,
           targetNamespace: vmNamespaceTarget,
+          withUDN: isNamespaceManagedByUDN,
         }),
       );
       vmSignal.value = generateVM({
@@ -178,6 +187,7 @@ const CreateVMFooter: FC = () => {
         startVM,
         subscriptionData,
         targetNamespace: vmNamespaceTarget,
+        withUDN: isNamespaceManagedByUDN,
       });
 
       logITFlowEvent(CUSTOMIZE_VM_BUTTON_CLICKED, vmSignal.value);
@@ -266,6 +276,7 @@ const CreateVMFooter: FC = () => {
                         startVM,
                         subscriptionData,
                         targetNamespace: vmNamespaceTarget,
+                        withUDN: isNamespaceManagedByUDN,
                       })}
                       {...props}
                     />
