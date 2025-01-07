@@ -31,3 +31,5 @@ export const MIGRATION__PROMETHEUS_DELAY = 15 * MILLISECONDS_TO_SECONDS_MULTIPLI
 export const DEFAULT_NETWORK_INTERFACE: V1Interface = { masquerade: {}, name: 'default' };
 
 export const DEFAULT_NETWORK: V1Network = { name: 'default', pod: {} };
+
+export const UDN_BINDING_NAME = 'l2bridge';

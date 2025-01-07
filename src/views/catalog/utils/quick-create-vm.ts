@@ -12,6 +12,11 @@ import {
   LABEL_USED_TEMPLATE_NAMESPACE,
   replaceTemplateVM,
 } from '@kubevirt-utils/resources/template';
+import { getInterfaces } from '@kubevirt-utils/resources/vm';
+import {
+  DEFAULT_NETWORK_INTERFACE,
+  UDN_BINDING_NAME,
+} from '@kubevirt-utils/resources/vm/utils/constants';
 import { createHeadlessService } from '@kubevirt-utils/utils/headless-service';
 import { k8sCreate, K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -25,6 +30,7 @@ type QuickCreateVMType = (inputs: {
     name: string;
     namespace: string;
     subscriptionData: RHELAutomaticSubscriptionData;
+    useUDN?: boolean;
   };
   template: V1Template;
   uploadData: (processedTemplate: V1Template) => Promise<V1VirtualMachine>;
@@ -38,6 +44,7 @@ export const quickCreateVM: QuickCreateVMType = async ({
     name,
     namespace = DEFAULT_NAMESPACE,
     subscriptionData,
+    useUDN,
   },
   template,
   uploadData,
@@ -72,6 +79,15 @@ export const quickCreateVM: QuickCreateVMType = async ({
     draftVM.spec.template.spec.volumes = isRHELTemplate(processedTemplate)
       ? updateCloudInitRHELSubscription(updatedVolumes, subscriptionData, autoUpdateEnabled)
       : updatedVolumes;
+
+    const defaultInterface = getInterfaces(draftVM)?.find(
+      (iface) => iface.name === DEFAULT_NETWORK_INTERFACE.name,
+    );
+
+    if (useUDN && defaultInterface) {
+      delete defaultInterface.masquerade;
+      defaultInterface.binding = { name: UDN_BINDING_NAME };
+    }
   });
 
   const { objects } = replaceTemplateVM(processedTemplate, overridedVM);

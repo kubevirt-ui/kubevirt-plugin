@@ -3,7 +3,7 @@ import produce from 'immer';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import VirtualMachineInstancetypeModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstancetypeModel';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1Interface, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   addDNFUpdateToRunCMD,
   addSubscriptionManagerToRunCMD,
@@ -27,6 +27,7 @@ import { OS_NAME_TYPES, OS_NAME_TYPES_NOT_SUPPORTED } from '@kubevirt-utils/reso
 import {
   DEFAULT_NETWORK,
   DEFAULT_NETWORK_INTERFACE,
+  UDN_BINDING_NAME,
 } from '@kubevirt-utils/resources/vm/utils/constants';
 import { OS_WINDOWS_PREFIX } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import {
@@ -95,6 +96,7 @@ type GenerateVMArgs = {
   startVM: boolean;
   subscriptionData: RHELAutomaticSubscriptionData;
   targetNamespace: string;
+  withUDN: boolean;
 };
 type GenerateVMCallback = (props: GenerateVMArgs) => V1VirtualMachine;
 
@@ -104,6 +106,7 @@ export const generateVM: GenerateVMCallback = ({
   startVM,
   subscriptionData,
   targetNamespace,
+  withUDN,
 }) => {
   const {
     folder,
@@ -129,6 +132,10 @@ export const generateVM: GenerateVMCallback = ({
   const isIso = isBootableVolumeISO(selectedBootableVolume);
   const storageClassName =
     instanceTypeState.selectedStorageClass || pvcSource?.spec?.storageClassName;
+
+  const defaultInterface = withUDN
+    ? ({ binding: { name: UDN_BINDING_NAME }, name: DEFAULT_NETWORK_INTERFACE.name } as V1Interface)
+    : DEFAULT_NETWORK_INTERFACE;
 
   let emptyVM: V1VirtualMachine = {
     apiVersion: `${VirtualMachineModel.apiGroup}/${VirtualMachineModel.apiVersion}`,
@@ -191,7 +198,7 @@ export const generateVM: GenerateVMCallback = ({
             devices: {
               autoattachPodInterface: false,
               disks: [],
-              interfaces: [DEFAULT_NETWORK_INTERFACE],
+              interfaces: [defaultInterface],
             },
           },
           networks: [DEFAULT_NETWORK],

@@ -46,7 +46,12 @@ import {
   LABEL_USED_TEMPLATE_NAME,
   LABEL_USED_TEMPLATE_NAMESPACE,
 } from '@kubevirt-utils/resources/template';
-import { getMemoryCPU } from '@kubevirt-utils/resources/vm';
+import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
+import { getInterfaces, getMemoryCPU } from '@kubevirt-utils/resources/vm';
+import {
+  DEFAULT_NETWORK_INTERFACE,
+  UDN_BINDING_NAME,
+} from '@kubevirt-utils/resources/vm/utils/constants';
 import {
   HEADLESS_SERVICE_LABEL,
   HEADLESS_SERVICE_NAME,
@@ -67,6 +72,8 @@ const useCreateDrawerForm = (
   authorizedSSHKey: string,
 ) => {
   const { updateTabsData, updateVM } = useWizardVMContext();
+
+  const [useUDN] = useNamespaceUDN(namespace);
   const [authorizedSSHKeys, updateAuthorizedSSHKeys] = useKubevirtUserSettings('ssh');
   const { featureEnabled: autoUpdateEnabled } = useFeatures(AUTOMATIC_UPDATE_FEATURE_NAME);
   const { featureEnabled: isDisabledGuestSystemLogs } = useFeatures(
@@ -175,6 +182,7 @@ const useCreateDrawerForm = (
           name: nameField,
           namespace,
           subscriptionData,
+          useUDN,
         },
         template: templateToProcess,
         uploadData: (processedTemplate) =>
@@ -253,6 +261,15 @@ const useCreateDrawerForm = (
         vmDraft.spec.template.spec.volumes = isRHELTemplate(processedTemplate)
           ? updateCloudInitRHELSubscription(updatedVolumes, subscriptionData, autoUpdateEnabled)
           : updatedVolumes;
+
+        const defaultInterface = getInterfaces(vmDraft)?.find(
+          (iface) => iface.name === DEFAULT_NETWORK_INTERFACE.name,
+        );
+
+        if (useUDN && defaultInterface) {
+          delete defaultInterface.masquerade;
+          defaultInterface.binding = { name: UDN_BINDING_NAME };
+        }
       });
 
       updateTabsData((tabsDataDraft) => {
