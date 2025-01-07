@@ -61,7 +61,7 @@ const VirtualMachinesOverviewTabInterfaces: FC<VirtualMachinesOverviewTabInterfa
             Row={VirtualMachinesOverviewTabNetworkInterfacesRow}
             unfilteredData={data}
           />
-          {isNamespaceManagedByUDN && <VirtualMachinesOverviewTabNetworkFQDN vm={vm} />}
+          {!isNamespaceManagedByUDN && <VirtualMachinesOverviewTabNetworkFQDN vm={vm} />}
         </CardBody>
       </Card>
     </div>
