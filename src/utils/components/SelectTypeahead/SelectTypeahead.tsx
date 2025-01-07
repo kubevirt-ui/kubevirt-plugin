@@ -101,22 +101,26 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
     _event: React.MouseEvent<Element, MouseEvent> | undefined,
     value: number | string | undefined,
   ) => {
-    if (value) {
-      if (value === CREATE_NEW) {
-        if (!initialOptions?.some((item) => item.children === filterValue)) {
-          setInitialOptions?.((prevFolders) => [
-            ...(prevFolders || []),
-            { children: filterValue, icon: <FolderIcon />, value: filterValue },
-          ]);
-        }
-        setSelected(filterValue);
-        setFilterValue('');
-        closeMenu();
-      } else {
-        const optionText = selectOptions.find((option) => option.value === value)?.children;
-        selectOption(value, optionText as string);
+    if (!value) return;
+
+    if (value === CREATE_NEW) {
+      if (!initialOptions?.some((item) => item.children === filterValue)) {
+        setInitialOptions?.((prevFolders) => [
+          ...(prevFolders || []),
+          { children: filterValue, icon: <FolderIcon />, value: filterValue },
+        ]);
       }
+      setSelected(filterValue);
+      setFilterValue('');
+      closeMenu();
+      return;
     }
+
+    const optionChildren = selectOptions.find((option) => option.value === value)?.children;
+
+    if (typeof optionChildren === 'object') return selectOption(value, value);
+
+    selectOption(value, optionChildren as string);
   };
 
   const onTextInputChange = (_event: React.FormEvent<HTMLInputElement>, value: string) => {
