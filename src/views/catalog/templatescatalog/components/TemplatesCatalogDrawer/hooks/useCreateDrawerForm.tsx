@@ -37,7 +37,7 @@ import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
 import { createSecret } from '@kubevirt-utils/resources/secret/utils';
-import { getAnnotation, getLabel, getName, getResourceUrl } from '@kubevirt-utils/resources/shared';
+import { getAnnotation, getLabel, getResourceUrl } from '@kubevirt-utils/resources/shared';
 import {
   ANNOTATIONS,
   bootDiskSourceIsRegistry,
@@ -58,9 +58,9 @@ import {
 } from '@kubevirt-utils/utils/headless-service';
 import { addRandomSuffix, ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, useAccessReview, useK8sModels } from '@openshift-console/dynamic-plugin-sdk';
+import { getLabels } from '@overview/OverviewTab/inventory-card/utils/flattenTemplates';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
-import { getLabels } from '../../../../../clusteroverview/OverviewTab/inventory-card/utils/flattenTemplates';
 import { allRequiredParametersAreFulfilled, hasValidSource, uploadFiles } from '../utils';
 
 import useCreateVMName from './useCreateVMName';
@@ -119,7 +119,7 @@ const useCreateDrawerForm = (
     setCreateError(undefined);
 
     const addSecret = username && password && bootDiskSourceIsRegistry(template);
-    const imageSecretName = addRandomSuffix(getName(template));
+    const imageSecretName = addRandomSuffix(nameField);
 
     if (addSecret) {
       await createSecret({
