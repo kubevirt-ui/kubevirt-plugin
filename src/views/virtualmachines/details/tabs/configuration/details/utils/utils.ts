@@ -55,6 +55,11 @@ export const updateBootLoader = (updatedVM: V1VirtualMachine, vm: V1VirtualMachi
       ...(isEfiSecure
         ? [
             {
+              op: 'add',
+              path: `/spec/template/spec/domain/features`,
+              value: {},
+            },
+            {
               op: hasSMMFeatureDefined ? 'replace' : 'add',
               path: `/spec/template/spec/domain/features/smm`,
               value: { enabled: true },
