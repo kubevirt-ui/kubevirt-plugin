@@ -9,7 +9,7 @@ import TabModal from '../TabModal/TabModal';
 import SSHSecretModalBody from './components/SSHSecretModalBody/SSHSecretModalBody';
 import useSecretsData from './hooks/useSecretsData';
 import { SecretSelectionOption, SSHSecretDetails } from './utils/types';
-import { createSSHSecret, validateSecretNameLength, validateSecretNameUnique } from './utils/utils';
+import { createSSHSecret, validateSecretName, validateSecretNameUnique } from './utils/utils';
 
 type SSHSecretModalProps = {
   initialSSHSecretDetails: SSHSecretDetails;
@@ -47,8 +47,8 @@ const SSHSecretModal: FC<SSHSecretModalProps> = ({
         (isEmpty(sshPubKey) ||
           isEmpty(sshSecretName) ||
           !validateSSHPublicKey(sshPubKey) ||
-          !validateSecretNameUnique(sshSecretName, localNSProject, allSecrets) ||
-          !validateSecretNameLength(sshSecretName)))
+          !validateSecretName(sshSecretName) ||
+          !validateSecretNameUnique(sshSecretName, localNSProject, allSecrets)))
     );
   }, [localNSProject, secretsData, sshDetails]);
 

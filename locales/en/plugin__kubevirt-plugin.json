@@ -1067,6 +1067,7 @@
   "seconds": "seconds",
   "Secret name": "Secret name",
   "Secret name must be unique in this namespace.": "Secret name must be unique in this namespace.",
+  "Secret name must not contain periods": "Secret name must not contain periods",
   "Secret name too long, maximum of 253 characters.": "Secret name too long, maximum of 253 characters.",
   "Secrets": "Secrets",
   "See alerts for virtualization health and VMs": "See alerts for virtualization health and VMs",
