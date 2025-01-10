@@ -8,5 +8,5 @@ export const ISO = 'ISO';
 
 export const deprecatedOSNames = ['centos-stream8', 'centos7'];
 
-export const HIDE_DEPRECATED_BOOTABLE_VOLUMES = 'hideDeprecatedBootableVolumes';
-export const HIDE_DEPRECATED_BOOTABLE_VOLUMES_LABEL = 'Hide deprecated bootable volumes';
+export const SHOW_DEPRECATED_BOOTABLE_VOLUMES = 'showDeprecatedBootableVolumes';
+export const SHOW_DEPRECATED_BOOTABLE_VOLUMES_LABEL = 'Show deprecated bootable volumes';
