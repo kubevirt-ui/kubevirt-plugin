@@ -22,3 +22,8 @@ console-extensions.md
 scripts/ca.crt
 scripts/console-client-secret
 *.json-*
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+.auth
