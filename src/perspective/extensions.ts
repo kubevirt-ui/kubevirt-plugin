@@ -467,80 +467,6 @@ const storageSection = [
   } as EncodedExtension<ResourceClusterNavItem>,
 ];
 
-const monitoringSection = [
-  {
-    flags: {
-      required: ['PROMETHEUS', 'MONITORING', 'CAN_GET_NS'],
-    },
-    properties: {
-      dataAttributes: {
-        'data-quickstart-id': 'qs-nav-monitoring',
-      },
-      id: 'observe-virt-perspective',
-      insertBefore: ['compute-virt-perspective', 'usermanagement-virt-perspective'],
-      name: '%console-app~Observe%',
-      perspective: 'virtualization-perspective',
-    },
-    type: 'console.navigation/section',
-  } as EncodedExtension<NavSection>,
-  {
-    flags: {
-      required: ['PROMETHEUS', 'MONITORING', 'CAN_GET_NS'],
-    },
-    properties: {
-      href: '/monitoring/alerts',
-      id: 'alerting-virt-perspective',
-      name: '%public~Alerting%',
-      perspective: 'virtualization-perspective',
-      section: 'observe-virt-perspective',
-      startsWith: ['monitoring/alertrules', 'monitoring/silences'],
-    },
-    type: 'console.navigation/href',
-  } as EncodedExtension<HrefNavItem>,
-  {
-    flags: {
-      required: ['PROMETHEUS', 'MONITORING', 'CAN_GET_NS'],
-    },
-    properties: {
-      href: '/monitoring/query-browser',
-      id: 'metrics-virt-perspective',
-      insertAfter: 'alerts-virt-perspective',
-      name: '%public~Metrics%',
-      perspective: 'virtualization-perspective',
-      section: 'observe-virt-perspective',
-    },
-    type: 'console.navigation/href',
-  } as EncodedExtension<HrefNavItem>,
-  {
-    flags: {
-      required: ['PROMETHEUS', 'MONITORING', 'CAN_GET_NS'],
-    },
-    properties: {
-      href: '/monitoring/dashboards',
-      id: 'dashboards-virt-perspective',
-      insertAfter: 'metrics-virt-perspective',
-      name: '%public~Dashboards%',
-      perspective: 'virtualization-perspective',
-      section: 'observe-virt-perspective',
-    },
-    type: 'console.navigation/href',
-  } as EncodedExtension<HrefNavItem>,
-  {
-    flags: {
-      required: ['PROMETHEUS', 'MONITORING', 'CAN_GET_NS'],
-    },
-    properties: {
-      href: '/monitoring/targets',
-      id: 'targets-virt-perspective',
-      insertAfter: 'dashboards-virt-perspective',
-      name: '%public~Targets%',
-      perspective: 'virtualization-perspective',
-      section: 'observe-virt-perspective',
-    },
-    type: 'console.navigation/href',
-  } as EncodedExtension<HrefNavItem>,
-];
-
 const computeSection = [
   {
     flags: { required: ['CAN_LIST_NODE'] },
@@ -710,6 +636,5 @@ export const extensions: EncodedExtension[] = [
   } as EncodedExtension<HrefNavItem>,
   ...networkingSection,
   ...storageSection,
-  ...monitoringSection,
   ...computeSection,
 ];
