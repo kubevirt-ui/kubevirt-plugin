@@ -26,7 +26,7 @@ const FolderSelect: FC<FoldersSelectProps> = ({
     <SelectTypeahead
       canCreate
       dataTestId="vm-folder-select"
-      getCreateOption={(inputValue, canCreate) => getCreateNewFolderOption(inputValue, canCreate)}
+      getCreateOption={getCreateNewFolderOption}
       initialOptions={folderOptions}
       isFullWidth={isFullWidth}
       placeholder={t('Search folder')}

@@ -1,5 +1,6 @@
 import React, { Dispatch, FC, SetStateAction, useEffect, useRef, useState } from 'react';
 
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   Button,
@@ -17,7 +18,7 @@ import {
 import { FolderIcon, SearchIcon } from '@patternfly/react-icons';
 import TimesIcon from '@patternfly/react-icons/dist/esm/icons/times-icon';
 
-import { CREATE_NEW } from './utils/constants';
+import { CREATE_NEW, NOT_FOUND } from './utils/constants';
 import { createItemId } from './utils/utils';
 
 type SelectTypeaheadProps = {
@@ -43,35 +44,35 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
   setInitialOptions,
   setSelected,
 }) => {
+  const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState<string>(selected);
   const [filterValue, setFilterValue] = useState<string>('');
-  const [selectOptions, setSelectOptions] = useState<SelectOptionProps[]>(initialOptions);
+  const [selectOptions, setSelectOptions] = useState<SelectOptionProps[]>();
   const [focusedItemIndex, setFocusedItemIndex] = useState<null | number>(null);
   const [activeItemId, setActiveItemId] = useState<null | string>(null);
   const textInputRef = useRef<HTMLInputElement>();
 
   useEffect(() => {
-    if (isEmpty(initialOptions)) {
-      setSelectOptions([getCreateOption(filterValue, canCreate)]);
-      return;
-    }
-    let newSelectOptions: SelectOptionProps[] = initialOptions || [];
+    const newSelectOptions: SelectOptionProps[] = filterValue
+      ? (initialOptions || [])?.filter((menuItem) =>
+          String(menuItem.children).toLowerCase().includes(filterValue.toLowerCase()),
+        )
+      : initialOptions || [];
 
-    // Filter menu items based on the text input value when one exists
-    if (filterValue) {
-      newSelectOptions = initialOptions?.filter((menuItem) =>
-        String(menuItem.children).toLowerCase().includes(filterValue.toLowerCase()),
-      );
-
-      // If no option matches the filter exactly, display creation option
-      if (!initialOptions?.some((option) => option.value === filterValue) && canCreate) {
-        newSelectOptions = [...newSelectOptions, getCreateOption(filterValue, canCreate)];
+    if (canCreate) {
+      const createOption = getCreateOption?.(filterValue, canCreate);
+      if (createOption && !newSelectOptions.some((option) => option.value === CREATE_NEW)) {
+        newSelectOptions.push(createOption);
       }
     }
 
+    if (!canCreate && newSelectOptions.length === 0 && filterValue) {
+      newSelectOptions.push({ children: t('Not found'), isDisabled: true, value: NOT_FOUND });
+    }
+
     setSelectOptions(newSelectOptions);
-  }, [canCreate, filterValue, getCreateOption, initialOptions]);
+  }, [canCreate, filterValue, getCreateOption, initialOptions, t]);
 
   const setActiveAndFocusedItem = (itemIndex: number) => {
     setFocusedItemIndex(itemIndex);
