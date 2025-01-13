@@ -53,17 +53,17 @@ const RemoteViewer: React.FC<RemoteViewerProps> = ({
   };
 
   return (
-    <div className="pf-c-console__remote-viewer">
-      <div className="pf-c-console__remote-viewer-launch">
+    <div className="pf-v5-c-console__remote-viewer">
+      <div className="pf-v5-c-console__remote-viewer-launch">
         <Button
-          className="pf-c-console__remote-viewer-launch-vv"
+          className="pf-v5-c-console__remote-viewer-launch-vv"
           isDisabled={!console}
           onClick={onClickVV}
         >
           {textConnectWithRemoteViewer || t('Launch Remote Viewer')}
         </Button>
         {!!rdp && (
-          <Button className="pf-c-console__remote-viewer-launch-rdp" onClick={onClickRDP}>
+          <Button className="pf-v5-c-console__remote-viewer-launch-rdp" onClick={onClickRDP}>
             {textConnectWithRDP || t('Launch Remote Desktop')}
           </Button>
         )}

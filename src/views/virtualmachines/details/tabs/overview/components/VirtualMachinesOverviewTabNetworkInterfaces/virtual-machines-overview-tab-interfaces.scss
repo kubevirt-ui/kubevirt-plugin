@@ -4,15 +4,15 @@
       border: none;
     }
   }
-  .pf-c-card {
-    .pf-c-card__body {
+  .pf-v5-c-card {
+    .pf-v5-c-card__body {
       padding: 0;
     }
   }
-  .pf-c-description-list__text.pf-m-help-text.help {
+  .pf-v5-c-description-list__text.pf-m-help-text.help {
     text-underline-offset: 0.25rem;
   }
   .no-data-empty-message {
-    margin: var(--pf-global--spacer--2xl);
+    margin: var(--pf-v5-global--spacer--2xl);
   }
 }

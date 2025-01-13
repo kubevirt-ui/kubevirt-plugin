@@ -92,7 +92,7 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
       onSubmit={sendCloneRequest}
       submitBtnText={isVM(source) ? t('Clone') : t('Create')}
     >
-      <Form className="pf-u-w-75-on-md pf-u-w-66-on-lg pf-u-m-auto" isHorizontal>
+      <Form className="pf-v5-u-w-75-on-md pf-v5-u-w-66-on-lg pf-v5-u-m-auto" isHorizontal>
         <NameInput name={cloneName} setName={setCloneName} />
         <StartClonedVMCheckbox setStartCloneVM={setStartCloneVM} startCloneVM={startCloneVM} />
         {isVM(source) ? (

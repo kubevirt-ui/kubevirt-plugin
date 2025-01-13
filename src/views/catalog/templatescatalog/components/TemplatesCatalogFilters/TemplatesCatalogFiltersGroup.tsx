@@ -46,9 +46,9 @@ export const TemplatesCatalogFiltersGroup: FC<{
           <Split className="vm-filter-group-header" onClick={() => setIsExpanded(!isExpanded)}>
             <SplitItem>
               {isExpanded ? (
-                <AngleDownIcon className="pf-c-dropdown__toggle-icon" />
+                <AngleDownIcon className="pf-v5-c-dropdown__toggle-icon" />
               ) : (
-                <AngleRightIcon className="pf-c-dropdown__toggle-icon" />
+                <AngleRightIcon className="pf-v5-c-dropdown__toggle-icon" />
               )}
             </SplitItem>
             <SplitItem className="vm-filter-group-title" isFilled>

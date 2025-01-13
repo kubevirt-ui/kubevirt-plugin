@@ -1,13 +1,13 @@
 .dev-preview-label {
-  background-color: var(--pf-c-label--m-orange--BackgroundColor);
+  background-color: var(--pf-v5-c-label--m-orange--BackgroundColor);
 
-  .pf-c-label__content {
-    color: var(--pf-global--palette--gold-700);
+  .pf-v5-c-label__content {
+    color: var(--pf-v5-global--palette--gold-700);
   }
 
-  .pf-c-label__icon {
-    color: var(--pf-global--palette--orange-300);
+  .pf-v5-c-label__icon {
+    color: var(--pf-v5-global--palette--orange-300);
   }
 
-  --pf-c-label__content--before--BorderColor: var(--pf-global--palette--orange-100);
+  --pf-v5-c-label__content--before--BorderColor: var(--pf-v5-global--palette--orange-100);
 }

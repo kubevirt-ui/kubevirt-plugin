@@ -57,10 +57,10 @@ const VirtualMachinesOverviewTabSnapshotsRow: FC<VirtualMachinesOverviewTabSnaps
     <div className="VirtualMachinesOverviewTabSnapshotsRow--main">
       <div className="name">
         <Icon />
-        <DescriptionListTermHelpText className="pf-c-description-list__term">
+        <DescriptionListTermHelpText className="pf-v5-c-description-list__term">
           <Popover
             bodyContent={
-              <DescriptionList className="pf-c-description-list" isHorizontal>
+              <DescriptionList className="pf-v5-c-description-list" isHorizontal>
                 <VirtualMachineDescriptionItem
                   descriptionData={
                     <>
@@ -84,7 +84,7 @@ const VirtualMachinesOverviewTabSnapshotsRow: FC<VirtualMachinesOverviewTabSnaps
             position={PopoverPosition.left}
           >
             <DescriptionListTermHelpTextButton
-              className={classnames('pf-c-description-list__text', 'icon-spacer__offset')}
+              className={classnames('pf-v5-c-description-list__text', 'icon-spacer__offset')}
             >
               {snapshot?.metadata?.name}
             </DescriptionListTermHelpTextButton>

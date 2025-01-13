@@ -1,16 +1,16 @@
 .section-with-switch {
-  margin-bottom: var(--pf-global--spacer--md);
+  margin-bottom: var(--pf-v5-global--spacer--md);
   justify-content: space-between;
   display: inline-flex;
   width: 100%;
   &__help-text-popover {
-    margin-left: var(--pf-global--spacer--xs);
+    margin-left: var(--pf-v5-global--spacer--xs);
   }
   &__text {
     display: inline-flex;
     width: 100%;
     a {
-      margin-left: var(--pf-global--spacer--sm);
+      margin-left: var(--pf-v5-global--spacer--sm);
     }
   }
   &__inline {

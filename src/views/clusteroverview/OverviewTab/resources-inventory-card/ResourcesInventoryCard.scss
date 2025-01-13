@@ -1,5 +1,5 @@
 .resources-inventory-card {
-  margin-bottom: var(--pf-global--spacer--md);
+  margin-bottom: var(--pf-v5-global--spacer--md);
 
   &__grid {
     grid-auto-flow: column;
@@ -14,17 +14,17 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: var(--pf-global--spacer--lg);
+    padding: var(--pf-v5-global--spacer--lg);
   }
 
   &__quantity {
     color: var(--co-global--palette--blue-400);
-    font-size: var(--pf-global--FontSize--4xl);
+    font-size: var(--pf-v5-global--FontSize--4xl);
     text-align: center;
-    margin-bottom: calc(var(--pf-global--spacer--xs) * -1);
+    margin-bottom: calc(var(--pf-v5-global--spacer--xs) * -1);
   }
 
   &__quantity-label {
-    font-size: var(--pf-global--FontSize--xl);
+    font-size: var(--pf-v5-global--FontSize--xl);
   }
 }

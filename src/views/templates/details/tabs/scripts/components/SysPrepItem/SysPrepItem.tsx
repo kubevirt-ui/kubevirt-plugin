@@ -112,7 +112,7 @@ const SysPrepItem: FC<SysPrepItemProps> = ({ template }) => {
               variant="link"
             >
               {t('Edit')}
-              <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
+              <PencilAltIcon className="co-icon-space-l pf-v5-c-button-icon--plain" />
             </Button>
           </FlexItem>
         </Flex>

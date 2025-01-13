@@ -111,7 +111,7 @@ export const BootOrderModalBody: React.FC<{
                                 <SplitItem isFilled>
                                   <span id={value.name}>{value.name}</span>
 
-                                  <span className="pf-u-ml-sm">
+                                  <span className="pf-v5-u-ml-sm">
                                     <DeviceTypeIcon type={type as DeviceType} />
                                   </span>
                                 </SplitItem>

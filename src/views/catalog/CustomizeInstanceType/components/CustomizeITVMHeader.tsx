@@ -12,7 +12,7 @@ const CutomizeITVMHeader: FC = () => {
   } = useInstanceTypeVMStore();
 
   return (
-    <div className="pf-c-page__main-breadcrumb wizard-header">
+    <div className="pf-v5-c-page__main-breadcrumb wizard-header">
       <Title headingLevel="h1">{t('Customize and create VirtualMachine')}</Title>
       <Text component={TextVariants.small} data-test="wizard title help">
         {t('Bootable volume: {{bootableVolumeName}}', {

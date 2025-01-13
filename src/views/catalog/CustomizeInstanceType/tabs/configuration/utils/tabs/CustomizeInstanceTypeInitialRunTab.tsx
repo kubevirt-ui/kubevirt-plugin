@@ -31,7 +31,7 @@ const CustomizeInstanceTypeInitialRunTab = () => {
       <Title headingLevel="h2">
         <SearchItem id="initial-run">{t('Initial run')}</SearchItem>
       </Title>
-      <DescriptionList className="pf-c-description-list">
+      <DescriptionList className="pf-v5-c-description-list">
         <InitialRunTabCloudinit canUpdateVM onSubmit={updateVMCustomizeIT} vm={vm} />
         <Divider />
         <InitialRunTabSysprep canUpdateVM onSubmit={updateCustomizeInstanceType} vm={vm} />

@@ -1,15 +1,15 @@
 .PreviewFeaturesTab--control_checkbox {
-  .pf-c-dropdown__toggle.pf-m-split-button {
+  .pf-v5-c-dropdown__toggle.pf-m-split-button {
     &::before {
       border: none;
     }
-    label.pf-c-dropdown__toggle-check {
+    label.pf-v5-c-dropdown__toggle-check {
       padding: 0;
     }
   }
 }
 .preview-features-popover {
   &__icon {
-    margin-left: var(--pf-global--spacer--xs);
+    margin-left: var(--pf-v5-global--spacer--xs);
   }
 }

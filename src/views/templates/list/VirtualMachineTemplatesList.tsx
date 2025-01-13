@@ -104,7 +104,7 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
               }
             >
               EmptyMsg={() => (
-                <div className="pf-u-text-align-center" id="no-templates-msg">
+                <div className="pf-v5-u-text-align-center" id="no-templates-msg">
                   {t('No templates found')}
                 </div>
               )}

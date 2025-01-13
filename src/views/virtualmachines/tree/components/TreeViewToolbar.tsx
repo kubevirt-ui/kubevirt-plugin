@@ -51,7 +51,7 @@ const TreeViewToolbar: FC<TreeViewToolbarProps> = ({
           <Divider />
           <StackItem>
             <Split>
-              <SplitItem className="pf-u-ml-md">
+              <SplitItem className="pf-v5-u-ml-md">
                 <Text>{t('Show only projects with VirtualMachines')}</Text>
               </SplitItem>
               <SplitItem isFilled />
