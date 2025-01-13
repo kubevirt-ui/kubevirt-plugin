@@ -37,7 +37,7 @@ export const featuresConfigMapInitialState: IoK8sApiCoreV1ConfigMap = {
     [LOAD_BALANCER_ENABLED]: 'false',
     [NODE_PORT_ADDRESS]: '',
     [NODE_PORT_ENABLED]: 'false',
-    [TREE_VIEW]: 'true',
+    [TREE_VIEW]: 'false',
     [TREE_VIEW_FOLDERS]: 'false',
   },
   metadata: {
