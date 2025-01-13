@@ -91,6 +91,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
     pvcSources,
     volumeSnapshotSources,
     pagination,
+    volumeListNamespace === ALL_PROJECTS,
   );
 
   useEffect(() => {

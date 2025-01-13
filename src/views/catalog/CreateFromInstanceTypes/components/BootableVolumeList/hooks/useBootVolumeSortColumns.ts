@@ -11,7 +11,7 @@ import {
   getVolumeSnapshotStorageClass,
 } from '@kubevirt-utils/resources/bootableresources/selectors';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
-import { getName } from '@kubevirt-utils/resources/shared';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { DESCRIPTION_ANNOTATION } from '@kubevirt-utils/resources/vm';
 import { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
 
@@ -28,6 +28,7 @@ type UseBootVolumeSortColumns = (
     [datSourceName: string]: VolumeSnapshotKind;
   },
   pagination: PaginationState,
+  includeNamespaceColumn: boolean,
 ) => {
   getSortType: (columnIndex: number) => ThSortType;
   sortedData: BootableVolume[];
@@ -41,6 +42,7 @@ const useBootVolumeSortColumns: UseBootVolumeSortColumns = (
   pvcSources,
   volumeSnapshotSources,
   pagination,
+  includeNamespaceColumn,
 ) => {
   const [activeSortIndex, setActiveSortIndex] = useState<null | number>(0);
   const [activeSortDirection, setActiveSortDirection] = useState<'asc' | 'desc' | null>('asc');
@@ -51,6 +53,7 @@ const useBootVolumeSortColumns: UseBootVolumeSortColumns = (
 
     return [
       getName(bootableVolume),
+      ...(includeNamespaceColumn ? [getNamespace(bootableVolume)] : []),
       getName(preferences[bootableVolume?.metadata?.labels?.[DEFAULT_PREFERENCE_LABEL]]),
       pvcSource?.spec?.storageClassName || getVolumeSnapshotStorageClass(volumeSnapshotSource),
       pvcSource?.spec?.resources?.requests?.storage || getVolumeSnapshotSize(volumeSnapshotSource),
