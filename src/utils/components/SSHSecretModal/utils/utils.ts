@@ -50,6 +50,11 @@ export const getSecretsLoaded = (
 export const validateSecretNameLength = (secretName: string): boolean =>
   secretName.length <= MAX_NAME_LENGTH;
 
+export const validateSecretNameNoDots = (secretName: string): boolean => !secretName.includes('.');
+
+export const validateSecretName = (secretName: string): boolean =>
+  validateSecretNameNoDots(secretName) && validateSecretNameLength(secretName);
+
 export const validateSecretNameUnique = (
   secretName: string,
   vmNamespaceTarget: string,
@@ -71,6 +76,8 @@ export const getSecretNameErrorMessage = (
 
   if (!validateSecretNameLength(secretName))
     return t('Secret name too long, maximum of 253 characters.');
+
+  if (!validateSecretNameNoDots(secretName)) return t('Secret name must not contain periods');
 
   return null;
 };
