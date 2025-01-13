@@ -43,6 +43,7 @@ const BootableVolumeTable: FC<BootableVolumeTableProps> = ({
 }) => {
   const [volumeFavorites, updateFavorites] = favorites;
   const { dataImportCrons, pvcSources, volumeSnapshotSources } = bootableVolumesData;
+
   return (
     <Table className="BootableVolumeList-table" variant={TableVariant.compact}>
       <Thead>
