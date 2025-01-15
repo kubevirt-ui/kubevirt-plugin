@@ -18,6 +18,7 @@ import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeat
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getResourceUrl } from '@kubevirt-utils/resources/shared';
+import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
 import { createHeadlessService } from '@kubevirt-utils/utils/headless-service';
 import {
   Alert,
@@ -37,6 +38,7 @@ import { WizardNoBootModal } from './WizardNoBootModal';
 export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
   const navigate = useNavigate();
   const { t } = useKubevirtTranslation();
+  const [isUDNManagedNamespace] = useNamespaceUDN(namespace);
   const { disableVmCreate, loaded: vmContextLoaded, updateVM, vm } = useWizardVMContext();
   const { isBootSourceAvailable, loaded: bootSourceLoaded } = useWizardSourceAvailable();
   const { createVM, error, loaded: vmCreateLoaded } = useWizardVmCreate();
@@ -49,7 +51,8 @@ export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
     createVM({
       isDisableGuestSystemAccessLog,
       onFullfilled: (createdVM) => {
-        createHeadlessService(createdVM);
+        if (!isUDNManagedNamespace) createHeadlessService(createdVM);
+
         clearSessionStorageVM();
         navigate(getResourceUrl({ model: VirtualMachineModel, resource: createdVM }));
       },

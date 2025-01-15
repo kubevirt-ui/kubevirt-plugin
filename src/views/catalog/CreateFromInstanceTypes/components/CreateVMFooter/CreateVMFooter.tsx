@@ -71,7 +71,7 @@ const CreateVMFooter: FC = () => {
   const { subscriptionData } = useRHELAutomaticSubscription();
 
   const [activeNamespace] = useActiveNamespace();
-  const [isNamespaceManagedByUDN] = useNamespaceUDN(
+  const [isUDNManagedNamespace] = useNamespaceUDN(
     activeNamespace === ALL_NAMESPACES_SESSION_KEY ? DEFAULT_NAMESPACE : activeNamespace,
   );
 
@@ -111,10 +111,10 @@ const CreateVMFooter: FC = () => {
     const vmToCreate = generateVM({
       autoUpdateEnabled,
       instanceTypeState: instanceTypeVMState,
+      isUDNManagedNamespace,
       startVM,
       subscriptionData,
       targetNamespace: vmNamespaceTarget,
-      withUDN: isNamespaceManagedByUDN,
     });
 
     logITFlowEvent(CREATE_VM_BUTTON_CLICKED, vmToCreate);
@@ -154,7 +154,8 @@ const CreateVMFooter: FC = () => {
           }
         }
 
-        createHeadlessService(createdVM);
+        if (!isUDNManagedNamespace) createHeadlessService(createdVM);
+
         navigate(getResourceUrl({ model: VirtualMachineModel, resource: createdVM }));
 
         logITFlowEvent(CREATE_VM_SUCCEEDED, createdVM);
@@ -175,19 +176,19 @@ const CreateVMFooter: FC = () => {
         generateVM({
           autoUpdateEnabled,
           instanceTypeState: instanceTypeVMState,
+          isUDNManagedNamespace,
           startVM,
           subscriptionData,
           targetNamespace: vmNamespaceTarget,
-          withUDN: isNamespaceManagedByUDN,
         }),
       );
       vmSignal.value = generateVM({
         autoUpdateEnabled,
         instanceTypeState: instanceTypeVMState,
+        isUDNManagedNamespace,
         startVM,
         subscriptionData,
         targetNamespace: vmNamespaceTarget,
-        withUDN: isNamespaceManagedByUDN,
       });
 
       logITFlowEvent(CUSTOMIZE_VM_BUTTON_CLICKED, vmSignal.value);
@@ -273,10 +274,10 @@ const CreateVMFooter: FC = () => {
                       vm={generateVM({
                         autoUpdateEnabled,
                         instanceTypeState: instanceTypeVMState,
+                        isUDNManagedNamespace,
                         startVM,
                         subscriptionData,
                         targetNamespace: vmNamespaceTarget,
-                        withUDN: isNamespaceManagedByUDN,
                       })}
                       {...props}
                     />

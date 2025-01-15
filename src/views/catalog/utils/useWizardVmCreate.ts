@@ -9,7 +9,8 @@ import {
 } from '@kubevirt-utils/extensions/telemetry/utils/constants';
 import { addUploadDataVolumeOwnerReference } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
-import { getName } from '@kubevirt-utils/resources/shared';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
 import {
   HEADLESS_SERVICE_LABEL,
   HEADLESS_SERVICE_NAME,
@@ -35,6 +36,7 @@ type UseWizardVmCreateValues = {
 export const useWizardVmCreate = (): UseWizardVmCreateValues => {
   const { tabsData, vm } = useWizardVMContext();
   const [models] = useK8sModels();
+  const [isUDNManagedNamespace] = useNamespaceUDN(getNamespace(vm));
   const [authorizedSSHKeys, updateAuthorizedSSHKeys] = useKubevirtUserSettings('ssh');
 
   const [loaded, setLoaded] = useState<boolean>(true);
@@ -55,7 +57,9 @@ export const useWizardVmCreate = (): UseWizardVmCreateValues => {
         }
 
         if (!getLabels(vmDraft.spec.template)) vmDraft.spec.template.metadata.labels = {};
-        vmDraft.spec.template.metadata.labels[HEADLESS_SERVICE_LABEL] = HEADLESS_SERVICE_NAME;
+
+        if (!isUDNManagedNamespace)
+          vmDraft.spec.template.metadata.labels[HEADLESS_SERVICE_LABEL] = HEADLESS_SERVICE_NAME;
       });
 
       const createdObjects = await createMultipleResources(

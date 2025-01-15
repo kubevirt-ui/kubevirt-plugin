@@ -73,7 +73,7 @@ const useCreateDrawerForm = (
 ) => {
   const { updateTabsData, updateVM } = useWizardVMContext();
 
-  const [useUDN] = useNamespaceUDN(namespace);
+  const [isUDNManagedNamespace] = useNamespaceUDN(namespace);
   const [authorizedSSHKeys, updateAuthorizedSSHKeys] = useKubevirtUserSettings('ssh');
   const { featureEnabled: autoUpdateEnabled } = useFeatures(AUTOMATIC_UPDATE_FEATURE_NAME);
   const { featureEnabled: isDisabledGuestSystemLogs } = useFeatures(
@@ -147,7 +147,9 @@ const useCreateDrawerForm = (
           vmObject.spec.dataVolumeTemplates[0].spec.source.registry.secretRef = imageSecretName;
 
         if (!getLabels(vmObject.spec.template)) vmObject.spec.template.metadata.labels = {};
-        vmObject.spec.template.metadata.labels[HEADLESS_SERVICE_LABEL] = HEADLESS_SERVICE_NAME;
+
+        if (!isUDNManagedNamespace)
+          vmObject.spec.template.metadata.labels[HEADLESS_SERVICE_LABEL] = HEADLESS_SERVICE_NAME;
 
         const modifiedTemplateObjects = template?.objects?.map((obj) =>
           obj.kind === VirtualMachineModel.kind ? vmObject : obj,
@@ -179,10 +181,10 @@ const useCreateDrawerForm = (
         overrides: {
           autoUpdateEnabled,
           isDisabledGuestSystemLogs,
+          isUDNManagedNamespace,
           name: nameField,
           namespace,
           subscriptionData,
-          useUDN,
         },
         template: templateToProcess,
         uploadData: (processedTemplate) =>
@@ -266,7 +268,7 @@ const useCreateDrawerForm = (
           (iface) => iface.name === DEFAULT_NETWORK_INTERFACE.name,
         );
 
-        if (useUDN && defaultInterface) {
+        if (isUDNManagedNamespace && defaultInterface) {
           delete defaultInterface.masquerade;
           defaultInterface.binding = { name: UDN_BINDING_NAME };
         }
