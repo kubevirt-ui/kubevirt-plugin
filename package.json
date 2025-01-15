@@ -90,7 +90,7 @@
     "jest": "^27.4.5",
     "lint-staged": "^13.2.2",
     "mini-svg-data-uri": "^1.4.4",
-    "mocha": "^9.2.0",
+    "mocha": "^10.x",
     "mocha-junit-reporter": "^2.0.2",
     "mochawesome": "^7.0.1",
     "mochawesome-merge": "^4.2.1",
