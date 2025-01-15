@@ -12,9 +12,19 @@ export type DiskSource = {
 };
 
 export type VirtualMachineData = {
+  applyKey?: boolean;
+  bootMode?: string;
+  description?: string;
   diskSource?: DiskSource;
-  name?: string;
-  namespace?: string;
+  headless?: boolean;
+  hostname?: string;
+  iType?: string;
+  name: string;
+  namespace: string;
+  newSecret?: string;
+  password?: string;
   startOnCreation?: boolean;
   template?: Template;
+  username?: string;
+  volume?: string;
 };

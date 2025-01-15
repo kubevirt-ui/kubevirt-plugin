@@ -1,12 +1,14 @@
 import './selectors';
 
+import { MINUTE } from '../utils/const/index';
 import * as nav from '../views/selector';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Cypress {
     interface Chainable {
-      visitCatalog(): void;
+      visitCatalogAdm(): void;
+      visitCatalogVirt(): void;
       visitCheckups(): void;
       visitITs(): void;
       visitMPs(): void;
@@ -24,9 +26,14 @@ Cypress.Commands.add('visitOverview', () => {
   cy.contains(nav.resourceTitle, 'Virtualization').should('be.visible');
 });
 
-Cypress.Commands.add('visitCatalog', () => {
+Cypress.Commands.add('visitCatalogAdm', () => {
   cy.clickVirtLink(nav.catalogNav);
   cy.contains('Create new VirtualMachine').should('be.visible');
+});
+
+Cypress.Commands.add('visitCatalogVirt', () => {
+  cy.get('[data-test-id="virtualization-catalog-nav-item"]').click();
+  cy.contains('Select volume to boot from', { timeout: MINUTE * 3 }).should('be.visible');
 });
 
 Cypress.Commands.add('visitVMs', () => {
