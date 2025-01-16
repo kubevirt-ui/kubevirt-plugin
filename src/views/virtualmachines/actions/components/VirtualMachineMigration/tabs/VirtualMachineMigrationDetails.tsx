@@ -56,7 +56,7 @@ const VirtualMachineMigrationDetails: FC<VirtualMachineMigrationDetailsProps> = 
           isChecked={!allVolumes}
           label={t('Selected volumes')}
           name="volumes"
-          onChange={() => setSelectedPVCs(pvcs)}
+          onChange={() => setSelectedPVCs([])}
         />
       </StackItem>
       {!allVolumes && (

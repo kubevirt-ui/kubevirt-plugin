@@ -10,6 +10,8 @@ import { getConsoleVirtctlCommand } from '@kubevirt-utils/components/SSHAccess/u
 import { TREE_VIEW, TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
+import { getUpdateStrategy } from '@kubevirt-utils/resources/vm';
+import { UPDATE_STRATEGIES } from '@kubevirt-utils/resources/vm/utils/constants';
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
 import { useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -40,9 +42,12 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
     const printableStatus = vm?.status?.printableStatus;
     const { Migrating, Paused } = printableVMStatus;
 
-    const isMigrating =
-      printableStatus === Migrating ||
-      (vmim && ![vmimStatuses.Failed, vmimStatuses.Succeeded].includes(vmim?.status?.phase));
+    const currentMigrationExist =
+      vmim && ![vmimStatuses.Failed, vmimStatuses.Succeeded].includes(vmim?.status?.phase);
+
+    const isStorageMigration =
+      currentMigrationExist && getUpdateStrategy(vm) === UPDATE_STRATEGIES.Migration;
+    const isComputeMigration = printableStatus === Migrating || currentMigrationExist;
 
     const startOrStop = ((printableStatusMachine) => {
       const map = {
@@ -58,9 +63,14 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
 
     const migrateStorage = VirtualMachineActionFactory.migrateStorage(vm, createModal);
 
-    const migrationActions = isMigrating
-      ? [VirtualMachineActionFactory.cancelMigrationCompute(vm, vmim, isSingleNodeCluster)]
-      : [migrateCompute, migrateStorage];
+    const cancelMigration = isStorageMigration
+      ? VirtualMachineActionFactory.cancelStorageMigration(vm, vmim, isSingleNodeCluster)
+      : VirtualMachineActionFactory.cancelComputeMigration(vm, vmim, isSingleNodeCluster);
+
+    const migrationActions =
+      isComputeMigration || isStorageMigration
+        ? [cancelMigration]
+        : [migrateCompute, migrateStorage];
 
     const pauseOrUnpause =
       printableStatus === Paused

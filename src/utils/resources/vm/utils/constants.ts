@@ -33,3 +33,7 @@ export const DEFAULT_NETWORK_INTERFACE: V1Interface = { masquerade: {}, name: 'd
 export const DEFAULT_NETWORK: V1Network = { name: 'default', pod: {} };
 
 export const UDN_BINDING_NAME = 'l2bridge';
+
+export enum UPDATE_STRATEGIES {
+  Migration = 'Migration',
+}
