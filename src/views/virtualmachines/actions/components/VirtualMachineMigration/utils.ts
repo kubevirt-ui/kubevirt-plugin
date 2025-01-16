@@ -1,9 +1,6 @@
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import {
-  V1beta1DataVolume,
-  V1beta1StorageSpecVolumeModeEnum,
-} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine, V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { MAX_NAME_LENGTH } from '@kubevirt-utils/components/SSHSecretModal/utils/constants';
@@ -35,14 +32,12 @@ const getBlankDataVolume = (
         blank: {},
       },
       storage: {
-        accessModes: ['ReadWriteMany'],
         resources: {
           requests: {
             storage,
           },
         },
         storageClassName,
-        volumeMode: V1beta1StorageSpecVolumeModeEnum.Block,
       },
     },
   };
