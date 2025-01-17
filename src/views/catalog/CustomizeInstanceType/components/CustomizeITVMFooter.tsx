@@ -15,6 +15,7 @@ import {
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
+import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
 import { clearCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { createHeadlessService } from '@kubevirt-utils/utils/headless-service';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -39,6 +40,8 @@ const CustomizeITVMFooter: FC = () => {
   const [error, setError] = useState<any | Error>(null);
   const { instanceTypeVMState, setStartVM, startVM, vm, vmNamespaceTarget } =
     useInstanceTypeVMStore();
+
+  const [isUDNManagedNamespace] = useNamespaceUDN(activeNamespace);
   const [authorizedSSHKeys, setAuthorizedSSHKeys] = useKubevirtUserSettings('ssh');
   const { sshSecretCredentials } = instanceTypeVMState;
   const { applyKeyToProject, secretOption, sshPubKey, sshSecretName } = sshSecretCredentials || {};
@@ -86,7 +89,9 @@ const CustomizeITVMFooter: FC = () => {
                       createSSHSecret(sshPubKey, sshSecretName, vmNamespaceTarget);
                     }
                     clearCustomizeInstanceType();
-                    createHeadlessService(createdVM);
+
+                    if (!isUDNManagedNamespace) createHeadlessService(createdVM);
+
                     navigate(getResourceUrl({ model: VirtualMachineModel, resource: createdVM }));
                   } catch (err) {
                     setError(err);

@@ -93,20 +93,20 @@ export const createPopulatedCloudInitYAML = (
 type GenerateVMArgs = {
   autoUpdateEnabled?: boolean;
   instanceTypeState: InstanceTypeVMState;
+  isUDNManagedNamespace: boolean;
   startVM: boolean;
   subscriptionData: RHELAutomaticSubscriptionData;
   targetNamespace: string;
-  withUDN: boolean;
 };
 type GenerateVMCallback = (props: GenerateVMArgs) => V1VirtualMachine;
 
 export const generateVM: GenerateVMCallback = ({
   autoUpdateEnabled,
   instanceTypeState,
+  isUDNManagedNamespace,
   startVM,
   subscriptionData,
   targetNamespace,
-  withUDN,
 }) => {
   const {
     folder,
@@ -133,7 +133,7 @@ export const generateVM: GenerateVMCallback = ({
   const storageClassName =
     instanceTypeState.selectedStorageClass || pvcSource?.spec?.storageClassName;
 
-  const defaultInterface = withUDN
+  const defaultInterface = isUDNManagedNamespace
     ? ({ binding: { name: UDN_BINDING_NAME }, name: DEFAULT_NETWORK_INTERFACE.name } as V1Interface)
     : DEFAULT_NETWORK_INTERFACE;
 
@@ -189,9 +189,7 @@ export const generateVM: GenerateVMCallback = ({
       runStrategy: startVM ? RUNSTRATEGY_ALWAYS : RUNSTRATEGY_HALTED,
       template: {
         metadata: {
-          labels: {
-            [HEADLESS_SERVICE_LABEL]: HEADLESS_SERVICE_NAME,
-          },
+          labels: {},
         },
         spec: {
           domain: {
@@ -224,6 +222,10 @@ export const generateVM: GenerateVMCallback = ({
       },
     },
   };
+
+  if (!isUDNManagedNamespace) {
+    emptyVM.spec.template.metadata.labels[HEADLESS_SERVICE_LABEL] = HEADLESS_SERVICE_NAME;
+  }
 
   if (isBootableVolumePVCKind(selectedBootableVolume)) {
     emptyVM = addPVCAsSourceDiskToVM(emptyVM, selectedBootableVolume);

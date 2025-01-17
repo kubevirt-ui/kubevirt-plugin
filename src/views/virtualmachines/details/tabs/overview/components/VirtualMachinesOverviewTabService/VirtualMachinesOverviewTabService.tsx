@@ -20,6 +20,7 @@ const VirtualMachinesOverviewTabService: FC<VirtualMachinesOverviewTabServicePro
     isList: true,
     namespace: vm?.metadata?.namespace,
   });
+
   const { vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
 
   const data = getServicesForVmi(

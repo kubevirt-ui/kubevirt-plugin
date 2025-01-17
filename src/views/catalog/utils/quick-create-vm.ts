@@ -27,10 +27,10 @@ type QuickCreateVMType = (inputs: {
   overrides: {
     autoUpdateEnabled: boolean;
     isDisabledGuestSystemLogs: boolean;
+    isUDNManagedNamespace?: boolean;
     name: string;
     namespace: string;
     subscriptionData: RHELAutomaticSubscriptionData;
-    useUDN?: boolean;
   };
   template: V1Template;
   uploadData: (processedTemplate: V1Template) => Promise<V1VirtualMachine>;
@@ -41,10 +41,10 @@ export const quickCreateVM: QuickCreateVMType = async ({
   overrides: {
     autoUpdateEnabled,
     isDisabledGuestSystemLogs,
+    isUDNManagedNamespace,
     name,
     namespace = DEFAULT_NAMESPACE,
     subscriptionData,
-    useUDN,
   },
   template,
   uploadData,
@@ -84,7 +84,7 @@ export const quickCreateVM: QuickCreateVMType = async ({
       (iface) => iface.name === DEFAULT_NETWORK_INTERFACE.name,
     );
 
-    if (useUDN && defaultInterface) {
+    if (isUDNManagedNamespace && defaultInterface) {
       delete defaultInterface.masquerade;
       defaultInterface.binding = { name: UDN_BINDING_NAME };
     }
@@ -98,7 +98,7 @@ export const quickCreateVM: QuickCreateVMType = async ({
     (object) => object.kind === VirtualMachineModel.kind,
   ) as V1VirtualMachine;
 
-  createHeadlessService(createdVM);
+  if (!isUDNManagedNamespace) createHeadlessService(createdVM);
 
   return createdVM;
 };
