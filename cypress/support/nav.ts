@@ -12,7 +12,8 @@ declare global {
       visitCheckups(): void;
       visitITs(): void;
       visitMPs(): void;
-      visitOverview(): void;
+      visitOverviewAdm(): void;
+      visitOverviewVirt(): void;
       visitPreferences(): void;
       visitTemplates(): void;
       visitVMs(): void;
@@ -21,29 +22,36 @@ declare global {
   }
 }
 
-Cypress.Commands.add('visitOverview', () => {
+Cypress.Commands.add('visitOverviewAdm', () => {
   cy.clickVirtLink(nav.overviewNav);
-  cy.contains(nav.resourceTitle, 'Virtualization').should('be.visible');
+  cy.contains(nav.resourceTitle, 'Virtualization', { timeout: 3 * MINUTE }).should('be.visible');
+});
+
+Cypress.Commands.add('visitOverviewVirt', () => {
+  cy.get(nav.overviewNav, { timeout: 3 * MINUTE }).click();
+  cy.contains(nav.resourceTitle, 'Virtualization', { timeout: 3 * MINUTE }).should('be.visible');
 });
 
 Cypress.Commands.add('visitCatalogAdm', () => {
   cy.clickVirtLink(nav.catalogNav);
-  cy.contains('Create new VirtualMachine').should('be.visible');
+  cy.contains('Create new VirtualMachine', { timeout: 3 * MINUTE }).should('be.visible');
 });
 
 Cypress.Commands.add('visitCatalogVirt', () => {
-  cy.get('[data-test-id="virtualization-catalog-nav-item"]').click();
-  cy.contains('Select volume to boot from', { timeout: MINUTE * 3 }).should('be.visible');
+  cy.get(nav.catalogNav, { timeout: 3 * MINUTE }).click();
+  cy.contains('Select volume to boot from', { timeout: 3 * MINUTE }).should('be.visible');
 });
 
 Cypress.Commands.add('visitVMs', () => {
   cy.clickVirtLink(nav.vmNav);
-  cy.contains(nav.resourceTitle, 'VirtualMachines').should('be.visible');
+  cy.contains(nav.resourceTitle, 'VirtualMachines', { timeout: 3 * MINUTE }).should('be.visible');
 });
 
 Cypress.Commands.add('visitTemplates', () => {
   cy.clickVirtLink(nav.templateNav);
-  cy.contains(nav.resourceTitle, 'VirtualMachine Templates').should('be.visible');
+  cy.contains(nav.resourceTitle, 'VirtualMachine Templates', { timeout: 3 * MINUTE }).should(
+    'be.visible',
+  );
 });
 
 Cypress.Commands.add('visitITs', () => {
@@ -58,15 +66,15 @@ Cypress.Commands.add('visitPreferences', () => {
 
 Cypress.Commands.add('visitVolumes', () => {
   cy.clickVirtLink(nav.volumeNav);
-  cy.contains(nav.resourceTitle, 'Bootable volumes').should('be.visible');
+  cy.contains(nav.resourceTitle, 'Bootable volumes', { timeout: 3 * MINUTE }).should('be.visible');
 });
 
 Cypress.Commands.add('visitMPs', () => {
   cy.clickVirtLink(nav.mpNav);
-  cy.contains(nav.resourceTitle, 'MigrationPolicies').should('be.visible');
+  cy.contains(nav.resourceTitle, 'MigrationPolicies', { timeout: 3 * MINUTE }).should('be.visible');
 });
 
 Cypress.Commands.add('visitCheckups', () => {
   cy.clickVirtLink(nav.checkupNav);
-  cy.contains(nav.resourceTitle, 'Checkups').should('be.visible');
+  cy.contains(nav.resourceTitle, 'Checkups', { timeout: 3 * MINUTE }).should('be.visible');
 });

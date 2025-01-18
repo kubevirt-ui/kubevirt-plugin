@@ -116,6 +116,7 @@ export const tab = {
   navigateToOverview: () => {
     navigateToTab(tabName.Overview);
   },
+  // navigate template's tabs and vm creation tabs
   navigateToParameters: () => {
     navigateToTab(tabName.Parameters);
   },
@@ -131,8 +132,26 @@ export const tab = {
   navigateToSnapshots: () => {
     navigateToTab(tabName.Snapshots);
   },
+  navigateToTDisks: () => {
+    navigateToTab(tabName.Disks);
+  },
+  navigateToTEnvironment: () => {
+    navigateToTab(tabName.Environment);
+  },
+  navigateToTMetadata: () => {
+    navigateToTab(tabName.Metadata);
+  },
+  navigateToTNetworks: () => {
+    navigateToTab(tabName.NetworkInterfaces);
+  },
   navigateToTopConsumers: () => {
     navigateToTab(tabName.TopConsumers);
+  },
+  navigateToTScheduling: () => {
+    navigateToTab(tabName.Scheduling);
+  },
+  navigateToTScripts: () => {
+    navigateToTab(tabName.Scripts);
   },
   navigateToYAML: () => {
     navigateToTab(tabName.YAML);

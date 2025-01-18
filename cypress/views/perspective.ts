@@ -10,7 +10,7 @@ export const tour = '[data-test="tour-step-footer-secondary"]';
 export const topology = '[data-test-id="topology-header"]';
 
 const header = '[data-quickstart-id="qs-perspective-switcher"]';
-const option = 'button.pf-v5-c-menu__item';
+const option = '[data-test-id="perspective-switcher-menu-option"]';
 const toggle = '[data-test-id="perspective-switcher-toggle"]';
 const menu = '[data-test-id="perspective-switcher-menu"]';
 

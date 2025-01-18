@@ -1,0 +1,51 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: rhel-10-vm
+  namespace: default
+spec:
+  dataVolumeTemplates:
+    - metadata:
+        name: rhel-10-vm-volume
+      spec:
+        sourceRef:
+          kind: DataSource
+          name: rhel10-beta
+          namespace: openshift-virtualization-os-images
+        storage:
+          resources:
+            requests:
+              storage: 30Gi
+  instancetype:
+    name: u1.medium
+  preference:
+    name: rhel.10
+  runStrategy: Always
+  template:
+    metadata:
+      labels:
+        network.kubevirt.io/headlessService: headless
+    spec:
+      domain:
+        devices:
+          autoattachPodInterface: false
+          disks: []
+          interfaces:
+            - masquerade: {}
+              name: default
+      networks:
+        - name: default
+          pod: {}
+      subdomain: headless
+      volumes:
+        - dataVolume:
+            name: rhel-10-vm-volume
+          name: rootdisk
+        - cloudInitNoCloud:
+            userData: |
+              #cloud-config
+              chpasswd:
+                expire: false
+              password: 89z0-98ml-5kwf
+              user: rhel
+          name: cloudinitdisk

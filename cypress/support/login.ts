@@ -1,5 +1,3 @@
-import { KUBEADMIN_IDP, KUBEADMIN_USERNAME } from '../utils/const/index';
-
 import { masthead, submitButton } from './views';
 
 declare global {
@@ -11,6 +9,9 @@ declare global {
     }
   }
 }
+
+const KUBEADMIN_USERNAME = 'kubeadmin';
+const KUBEADMIN_IDP = 'kube:admin';
 
 Cypress.Commands.add('login', (provider: string, username: string, password: string) => {
   // Check if auth is disabled (for a local development environment).
@@ -53,7 +54,7 @@ Cypress.Commands.add('logout', () => {
     cy.byTestID('user-dropdown').click();
     cy.byTestID('log-out').should('be.visible');
     // eslint-disable-next-line cypress/no-force
-    cy.byTestID('log-out').click({ force: true });
+    cy.byTestID('log-out').click();
     cy.byLegacyTestID('login').should('be.visible');
   });
 });
