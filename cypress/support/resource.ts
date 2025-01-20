@@ -5,6 +5,7 @@ declare global {
   namespace Cypress {
     interface Chainable {
       deleteResource(kind: string, name: string, namespace?: string): void;
+      dropFile(filePath: string, fileName: string, inputSelector: string): void;
     }
   }
 }
@@ -29,4 +30,18 @@ Cypress.Commands.add('deleteResource', (kind: string, name: string, namespace?: 
       { failOnNonZeroExit: false, timeout: 1800000 },
     );
   }
+});
+
+Cypress.Commands.add('dropFile', (filePath, fileName, inputSelector) => {
+  cy.get(inputSelector).trigger('dragenter');
+  cy.readFile(filePath, 'binary').then((f) => {
+    const blob = Cypress.Blob.binaryStringToBlob(f);
+    cy.window().then((win) => {
+      const file = new win.File([blob], fileName);
+      Cypress.log({ name: `${file.size}` });
+      const dataTransfer = new win.DataTransfer();
+      dataTransfer.items.add(file);
+      cy.get(inputSelector).trigger('drop', { dataTransfer });
+    });
+  });
 });

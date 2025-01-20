@@ -1,20 +1,52 @@
-export const KUBEADMIN_USERNAME = 'kubeadmin';
-export const KUBEADMIN_IDP = 'kube:admin';
-export const SECOND = 1000;
-export const MINUTE = 60 * SECOND;
-
-export enum CLUSTER_STATUS {
-  HEALTH_ERROR = 'HEALTH_ERR',
-  PROGRESSING = 'Progressing',
-  READY = 'Ready',
-}
-
 export const adminOnlyDescribe = Cypress.env('NON_PRIV') ? xdescribe : describe;
+export const adminOnlyIT = Cypress.env('NON_PRIV') ? xit : it;
+export const metalLBIT = Cypress.env('METALLB') ? it : xit;
+export const DeschedulerIT = Cypress.env('DESCHEDULER') ? it : xit;
+export const nncpIT = !Cypress.env('NON_PRIV') && Cypress.env('NNCP_NIC') ? it : xit;
+export const nncpDescribe =
+  !Cypress.env('NON_PRIV') && Cypress.env('NNCP_NIC') ? describe : xdescribe;
+export const gpuDescribe = Cypress.env('GPU') ? describe : xdescribe;
+export const upgradeDescribe = Cypress.env('UPGRADE') ? describe : xdescribe;
+export const snoDescribe = Cypress.env('SNO') ? describe : xdescribe;
+export const sriovDescribe = Cypress.env('SRIOV') ? describe : xdescribe;
+export const nnsDescribe =
+  !Cypress.env('NON_PRIV') && Cypress.env('NNCP_NIC') && Cypress.env('NNCP_NIC') == 'ens10'
+    ? describe
+    : xdescribe;
 
-export const TEST_NS = 'auto-test-ns';
 export const QUICK_VM_IT_NAME = 'vm-it-quick';
 export const CUST_VM_IT_NAME = 'vm-it-cust';
+export const TEST_NS = 'auto-test-ns';
+export const OCP_NS = 'openshift'; // use default can reduce flaky
+export const TEST_VM_NAME = 'auto-test-vm';
+export const TEST_IT_NAME = 'auto-it-vm';
+export const TEST_PVC_NAME = 'auto-test-pvc';
+export const DEFAULT_VM_NAME = 'example';
+export const DEFAULT_TEMPLATE_NAME = 'example';
+export const OS_IMAGES_NS = 'openshift-virtualization-os-images';
+export const POLICY_NAME = 'policy-auto-test';
+export const DATASOURCE_NAME = 'datasource-auto-test';
+export const YAML_DS_NAME = 'example';
+export const YAML_MP_NAME = 'example';
+export const EXAMPLE = 'example';
+export const LOCAL_IMAGE = Cypress.env('LOCAL_IMAGE');
+export const ARTIFACTORY_SERVER = Cypress.env('ARTIFACTORY_SERVER');
+export const ARTIFACTORY_PATH = Cypress.env('ARTIFACTORY_PATH');
+export const CIRROS_IMAGE = Cypress.env('CIRROS_IMAGE');
+export const URL_IMAGE = `https://${ARTIFACTORY_SERVER}/${ARTIFACTORY_PATH}/cnv-tests/rhel-images/rhel-92.qcow2`;
+export const CONTAINER_IMAGE = 'quay.io/containerdisks/fedora:latest';
+export const QUAY_CONTAINER_IMAGE = 'quay.io/openshift-cnv/qe-cnv-tests-fedora:40';
+export const DATASOURCE_IMAGE = 'quay.io/containerdisks/centos:7-2009';
+export const DATASOURCE_CRON = '0 0 * * 2';
+export const ALL_PROJ_NS = 'All Projects';
+export const CLEANUP_SCRIPT = './utils/cleanup.sh';
+export const DUMP_SCRIPT = './utils/dump.sh';
+export const TEST_SECRET_NAME = 'auto-test-secret';
+export const RSA_SECRET_NAME = 'auto-rsa-secret';
+export const QUAY_USER = 'openshift-cnv+cnv_qe_internal_read_only';
+export const QUAY_USER_PASSWD = '9T8B4VWWRPTEZFFB6GOQ79C64VMTYFCKUM35B640AY71X379IFX8VR6GQX8DX94I';
 
+// VM Status
 export enum VM_STATUS {
   DataVolumeError = 'DataVolumeError',
   Migrating = 'Migrating',
@@ -26,18 +58,39 @@ export enum VM_STATUS {
   Stopping = 'Stopping',
 }
 
+export enum VM_ACTION {
+  Cancel = 'Cancel Virtual Machine Migration',
+  Clone = 'Clone',
+  Delete = 'Delete',
+  Migrate = 'Migrate',
+  Pause = 'Pause',
+  Restart = 'Restart',
+  Start = 'Start',
+  Stop = 'Stop',
+  Unpause = 'Unpause',
+}
+
 export enum ACTION_TIMEOUT {
   IMPORT = 900000,
-  MIGRATE = 180000,
+  Migrating = 180000,
   START = 60000,
   STOP = 600000,
 }
 
 export enum K8S_KIND {
+  DS = 'DataSource',
   DV = 'DataVolume',
+  MP = 'MigrationPolicy',
   NAD = 'net-attach-def',
+  NNCP = 'NodeNetworkConfigurationPolicy',
+  Project = 'project',
   PVC = 'PersistentVolumeClaim',
-  TEMPLATE = 'Template',
+  Secret = 'Secret',
+  Template = 'Template',
   VM = 'VirtualMachine',
+  VMCI = 'VirtualMachineClusterInstancetype',
+  VMCP = 'VirtualMachineClusterPreference',
   VMI = 'VirtualMachineInstance',
 }
+export const SECOND = 1000;
+export const MINUTE = 60 * SECOND;

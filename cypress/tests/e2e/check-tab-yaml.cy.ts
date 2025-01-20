@@ -1,4 +1,4 @@
-import { Example, WithYAML } from '../../utils/const/string';
+import { Example, YAML } from '../../utils/const/string';
 import { TEMPLATE } from '../../utils/const/template';
 import {
   breadcrumb,
@@ -22,7 +22,7 @@ describe('Check all virtualization pages can be loaded', () => {
 
     it('create example VM', () => {
       cy.get(itemCreateBtn).click();
-      cy.byButtonText(WithYAML).click();
+      cy.byButtonText(YAML).click();
       cy.get(saveBtn).click();
     });
 
@@ -118,7 +118,7 @@ describe('Check all virtualization pages can be loaded', () => {
     });
   });
 
-  describe('Check templates tabs', () => {
+  describe('Check Templates tabs', () => {
     it('visit template page', () => {
       cy.visitTemplates();
     });
@@ -179,7 +179,7 @@ describe('Check all virtualization pages can be loaded', () => {
     });
   });
 
-  describe('Check instanceTypes pages', () => {
+  describe('Check InstanceTypes pages', () => {
     it('instanceTypes is loaded', () => {
       cy.visitITs();
       cy.contains('cx1.2xlarge').should('exist');
@@ -203,7 +203,7 @@ describe('Check all virtualization pages can be loaded', () => {
     });
   });
 
-  describe('Check preferences pages', () => {
+  describe('Check Preferences pages', () => {
     it('preferences is loaded', () => {
       cy.visitPreferences();
       cy.contains('fedora').should('exist');
@@ -227,7 +227,7 @@ describe('Check all virtualization pages can be loaded', () => {
     });
   });
 
-  describe('Check bootable volume pages', () => {
+  describe('Check BootVolume pages', () => {
     it('bootable volume page is loaded', () => {
       cy.visitVolumes();
       cy.switchProject('All Projects');
@@ -236,14 +236,14 @@ describe('Check all virtualization pages can be loaded', () => {
 
     xit('create bootable volume from yaml', () => {
       cy.get(itemCreateBtn).click();
-      cy.byButtonText(WithYAML).click();
+      cy.byButtonText(YAML).click();
       cy.get(saveBtn).click();
       cy.get(breadcrumb).click();
       cy.byLegacyTestID(Example).should('exist');
     });
   });
 
-  describe('Check Migration policy pages', () => {
+  describe('Check MigrationPolicies pages', () => {
     it('the migration policy page is loaded', () => {
       cy.visitMPs();
       cy.contains('No MigrationPolicies found').should('exist');
@@ -251,7 +251,7 @@ describe('Check all virtualization pages can be loaded', () => {
 
     it('create migration policy from yaml', () => {
       cy.get(itemCreateBtn).click();
-      cy.byButtonText(WithYAML).click();
+      cy.byButtonText(YAML).click();
       cy.get(saveBtn).click();
       cy.get('.pf-v5-c-breadcrumb__item').eq(0).click();
       cy.byLegacyTestID(Example).should('exist');

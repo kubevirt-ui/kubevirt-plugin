@@ -20,14 +20,14 @@ describe('Close the welcome modal', () => {
     tickWelcomeModal();
 
     cy.wait(5000);
-    cy.visitOverview();
+    cy.visitOverviewVirt();
     cy.wait(10000);
     tickWelcomeModal();
     cy.contains('Do not show this again').should('not.exist');
   });
 
   it('overview page is loaded', () => {
-    cy.visitOverview();
+    cy.visitOverviewVirt();
     cy.contains('VirtualMachine statuses').should('exist');
   });
 
