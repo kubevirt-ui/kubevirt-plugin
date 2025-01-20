@@ -22,3 +22,5 @@ const types = {
 };
 
 export const interfacesTypes = new Proxy(types, typeHandler);
+
+export const PRIMARY_UDN_BINDING = 'primary-udn-kubevirt-binding';
