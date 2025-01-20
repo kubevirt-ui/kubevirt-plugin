@@ -15,7 +15,7 @@ export const getPVCWatch = (vm: V1VirtualMachine) => {
 
   pvcSources.push(
     ...(getVolumes(vm) || [])
-      .map((volume) => volume?.persistentVolumeClaim?.claimName)
+      .map((volume) => volume?.persistentVolumeClaim?.claimName || volume?.dataVolume?.name)
       .filter((claimName) => Boolean(claimName))
       .map(
         (claimName) =>
