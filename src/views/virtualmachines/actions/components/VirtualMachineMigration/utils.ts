@@ -2,12 +2,18 @@ import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolume
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { V1VirtualMachine, V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1VirtualMachine,
+  V1VirtualMachineInstanceMigration,
+  V1Volume,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { MAX_NAME_LENGTH } from '@kubevirt-utils/components/SSHSecretModal/utils/constants';
+import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getDataVolumeTemplates, getVolumes } from '@kubevirt-utils/resources/vm';
 import { UPDATE_STRATEGIES } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getStorageClassName } from '@kubevirt-utils/resources/vm/utils/dataVolumeTemplate/selectors';
+import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
 import { getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, k8sDelete, k8sPatch, Patch } from '@openshift-console/dynamic-plugin-sdk';
 import { getMigrationClaimNameAnnotation } from '@virtualmachines/actions/utils';
@@ -208,4 +214,16 @@ export const getVolumeFromPVC = (
       pvcNames.includes(volume?.persistentVolumeClaim?.claimName) ||
       pvcNames.includes(volume?.dataVolume?.name),
   );
+};
+
+export const getMigrationSuccessTimestamp = (vmim: V1VirtualMachineInstanceMigration): string =>
+  vmim?.status?.phaseTransitionTimestamps?.find(
+    (phaseTransition) => phaseTransition.phase === vmimStatuses.Succeeded,
+  )?.phaseTransitionTimestamp;
+
+export const getMigrationStatusLabel = (vmim: V1VirtualMachineInstanceMigration): string => {
+  if (vmim?.status?.phase === vmimStatuses.Failed) return t('Failed');
+  if (vmimStatuses.Succeeded === vmim?.status?.phase) return t('Migration completed successfully');
+
+  return t('In progress');
 };
