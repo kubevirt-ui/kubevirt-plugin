@@ -42,11 +42,10 @@ const useSSHAuthKeys: UseSSHAuthKeys = () => {
     useKubevirtUserSettings('ssh');
 
   const [authKeyRows, setAuthKeyRows] = useState<AuthKeyRow[]>([initialAuthKeyRow]);
-  const [isInitEffect, setIsInitEffect] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    if (loadedSettings && isInitEffect) {
+    if (loadedSettings) {
       if (!isEmpty(authorizedSSHKeys)) {
         const authRows: AuthKeyRow[] = Object.entries(authorizedSSHKeys).map(
           ([projectName, secretName], id) => ({
@@ -64,10 +63,8 @@ const useSSHAuthKeys: UseSSHAuthKeys = () => {
       } else {
         setLoading(false);
       }
-
-      setIsInitEffect(false);
     }
-  }, [loadedSettings, authorizedSSHKeys, isInitEffect]);
+  }, [loadedSettings, authorizedSSHKeys]);
 
   const { loaded, selectableProjects } = useSSHAuthProjects(authKeyRows);
 
