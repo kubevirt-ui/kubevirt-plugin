@@ -22,8 +22,8 @@ export const documentationURL = {
   DYNAMIC_SSH_KEY_INJECTION: `${OPENSHIFT_DOC_URL}/4.15/virt/virtual_machines/virt-accessing-vm-ssh.html`,
   FREE_PAGE_REPORTING:
     'https://developers.redhat.com/articles/2024/03/13/save-memory-openshift-virtualization-using-free-page-reporting',
-  HIGHLIGHTS_417:
-    'https://docs.openshift.com/container-platform/4.17/virt/release_notes/virt-4-17-release-notes.html#virt-4-17-new',
+  HIGHLIGHTS_418:
+    'https://docs.openshift.com/container-platform/4.18/virt/release_notes/virt-4-18-release-notes.html#virt-4-18-new',
   INSTANCE_TYPES_USER_GUIDE:
     'https://kubevirt.io/user-guide/virtual_machines/instancetypes#virtualmachinepreference',
   LABELS: 'https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/',
