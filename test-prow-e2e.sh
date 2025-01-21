@@ -62,7 +62,7 @@ unset KUBERNETES_PORT_443_TCP_PORT
 PULL_SECRET_PATH="/var/run/operator-secret/dockerconfig" 
 NAMESPACE="openshift-marketplace"
 SECRET_NAME="ocs-secret"
-NS="kubevirt-hyperconverged"
+NS="openshift-cnv"
 ARTIFACT_DIR=${ARTIFACT_DIR:=/tmp/artifacts}
 SCREENSHOTS_DIR="cypress/gui-test-screenshots"
 

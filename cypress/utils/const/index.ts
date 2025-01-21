@@ -1,25 +1,9 @@
-export const adminOnlyDescribe = Cypress.env('NON_PRIV') ? xdescribe : describe;
-export const adminOnlyIT = Cypress.env('NON_PRIV') ? xit : it;
-export const metalLBIT = Cypress.env('METALLB') ? it : xit;
-export const DeschedulerIT = Cypress.env('DESCHEDULER') ? it : xit;
-export const nncpIT = !Cypress.env('NON_PRIV') && Cypress.env('NNCP_NIC') ? it : xit;
-export const nncpDescribe =
-  !Cypress.env('NON_PRIV') && Cypress.env('NNCP_NIC') ? describe : xdescribe;
-export const gpuDescribe = Cypress.env('GPU') ? describe : xdescribe;
-export const upgradeDescribe = Cypress.env('UPGRADE') ? describe : xdescribe;
-export const snoDescribe = Cypress.env('SNO') ? describe : xdescribe;
-export const sriovDescribe = Cypress.env('SRIOV') ? describe : xdescribe;
-export const nnsDescribe =
-  !Cypress.env('NON_PRIV') && Cypress.env('NNCP_NIC') && Cypress.env('NNCP_NIC') == 'ens10'
-    ? describe
-    : xdescribe;
-
 export const QUICK_VM_IT_NAME = 'vm-it-quick';
-export const CUST_VM_IT_NAME = 'vm-it-cust';
-export const TEST_NS = 'auto-test-ns';
+export const CUST_VM_IT_NAME = 'vm-it-custom';
+export const QUICK_VM_TMPL_NAME = 'vm-template-quick';
+export const CUST_VM_TMPL_NAME = 'vm-template-custom';
+export const TEST_NS = 'default';
 export const OCP_NS = 'openshift'; // use default can reduce flaky
-export const TEST_VM_NAME = 'auto-test-vm';
-export const TEST_IT_NAME = 'auto-it-vm';
 export const TEST_PVC_NAME = 'auto-test-pvc';
 export const DEFAULT_VM_NAME = 'example';
 export const DEFAULT_TEMPLATE_NAME = 'example';
@@ -28,7 +12,6 @@ export const POLICY_NAME = 'policy-auto-test';
 export const DATASOURCE_NAME = 'datasource-auto-test';
 export const YAML_DS_NAME = 'example';
 export const YAML_MP_NAME = 'example';
-export const EXAMPLE = 'example';
 export const LOCAL_IMAGE = Cypress.env('LOCAL_IMAGE');
 export const ARTIFACTORY_SERVER = Cypress.env('ARTIFACTORY_SERVER');
 export const ARTIFACTORY_PATH = Cypress.env('ARTIFACTORY_PATH');
@@ -39,7 +22,7 @@ export const QUAY_CONTAINER_IMAGE = 'quay.io/openshift-cnv/qe-cnv-tests-fedora:4
 export const DATASOURCE_IMAGE = 'quay.io/containerdisks/centos:7-2009';
 export const DATASOURCE_CRON = '0 0 * * 2';
 export const ALL_PROJ_NS = 'All Projects';
-export const CLEANUP_SCRIPT = './utils/cleanup.sh';
+export const CLEANUP_SCRIPT = '../cleanup.sh';
 export const DUMP_SCRIPT = './utils/dump.sh';
 export const TEST_SECRET_NAME = 'auto-test-secret';
 export const RSA_SECRET_NAME = 'auto-rsa-secret';
