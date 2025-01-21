@@ -13,6 +13,10 @@ cleanup () {
   oc delete pvc --all -n openshift-virtualization-os-images --wait=false
   oc delete secret -n default --all --ignore-not-found --wait=false
   oc delete net-attach-def --all -n default --wait=false
-  oc delete vmcp example --ignore-not-found --wait=false
+  oc delete VirtualMachinePreference example -n default --ignore-not-found --wait=false
+  oc delete VirtualMachineClusterPreference example --ignore-not-found --wait=false
+  oc delete VirtualMachineInstancetype example -n default --ignore-not-found --wait=false
+  oc delete VirtualMachineClusterInstancetype example --ignore-not-found --wait=false
   oc delete MigrationPolicy example --ignore-not-found --wait=false
 }
+cleanup

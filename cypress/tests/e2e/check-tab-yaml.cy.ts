@@ -1,34 +1,33 @@
+import { ALL_PROJ_NS, MINUTE, SECOND, TEST_NS, VM_STATUS } from '../../utils/const/index';
 import { Example, YAML } from '../../utils/const/string';
 import { TEMPLATE } from '../../utils/const/template';
+import * as sel from '../../views/selector';
 import {
-  breadcrumb,
-  iconStartBtn,
-  itemCreateBtn,
-  nameFilter,
-  saveBtn,
-  vmStatusOnOverview,
-} from '../../views/selector';
-import { tab } from '../../views/tab';
+  navigateToConfigurationSubTab,
+  navigateToDiagnosticsSubTab,
+  subTabName,
+  tab,
+} from '../../views/tab';
 
 describe('Check all virtualization pages can be loaded', () => {
   before(() => {
     cy.visit('');
   });
 
-  describe('Check VM tabs', () => {
+  describe('Check VirtualMachines page', () => {
     it('visit VM list page', () => {
       cy.visitVMs();
     });
 
     it('create example VM', () => {
-      cy.get(itemCreateBtn).click();
+      cy.get(sel.itemCreateBtn).click();
       cy.byButtonText(YAML).click();
-      cy.get(saveBtn).click();
+      cy.get(sel.saveBtn).click();
     });
 
     it('start example vm', () => {
-      cy.get(iconStartBtn).click();
-      cy.wait(15000);
+      cy.get(sel.iconStartBtn, { timeout: MINUTE }).click();
+      cy.wait(15 * SECOND);
     });
 
     it(
@@ -39,8 +38,8 @@ describe('Check all virtualization pages can be loaded', () => {
         },
       },
       () => {
-        cy.contains(vmStatusOnOverview, 'Running').should('be.visible');
-        cy.wait(10000);
+        cy.contains(sel.vmStatusOnOverview, VM_STATUS.Running).should('be.visible');
+        cy.wait(10 * SECOND);
       },
     );
 
@@ -65,29 +64,28 @@ describe('Check all virtualization pages can be loaded', () => {
       tab.navigateToDiagnostics();
       cy.contains('Status conditions').should('be.visible');
 
-      tab.navigateToDiagnosticsGuestSystemLog();
+      navigateToDiagnosticsSubTab(subTabName.GuestSystemLog);
       cy.contains('Guest system logs').should('be.visible');
 
-      // sub-tabs in configuration tab
       tab.navigateToConfiguration();
       cy.contains('Headless mode').should('be.visible');
 
-      tab.navigateToConfigurationStorage();
+      navigateToConfigurationSubTab(subTabName.Storage);
       cy.contains('rootdisk').should('be.visible');
 
-      tab.navigateToConfigurationNetwork();
+      navigateToConfigurationSubTab(subTabName.Network);
       cy.contains('Pod networking').should('be.visible');
 
-      tab.navigateToConfigurationScheduling();
+      navigateToConfigurationSubTab(subTabName.Scheduling);
       cy.contains('Scheduling and resource requirements').should('be.visible');
 
-      tab.navigateToConfigurationSSH();
+      navigateToConfigurationSubTab(subTabName.SSH);
       cy.contains('SSH access').should('be.visible');
 
-      tab.navigateToConfigurationInitialRun();
+      navigateToConfigurationSubTab(subTabName.InitialRun);
       cy.contains('Cloud-init').should('be.visible');
 
-      tab.navigateToConfigurationMetadata();
+      navigateToConfigurationSubTab(subTabName.Metadata);
       cy.contains('Annotations').should('be.visible');
     });
 
@@ -118,14 +116,14 @@ describe('Check all virtualization pages can be loaded', () => {
     });
   });
 
-  describe('Check Templates tabs', () => {
+  describe('Check Templates page', () => {
     it('visit template page', () => {
       cy.visitTemplates();
     });
 
     it('common template tabs are loaded', () => {
-      cy.switchProject('All Projects');
-      cy.get(nameFilter).type(TEMPLATE.RHEL9.metadataName);
+      cy.switchProject(ALL_PROJ_NS);
+      cy.get(sel.nameFilter).type(TEMPLATE.RHEL9.metadataName);
       cy.byLegacyTestID(TEMPLATE.RHEL9.metadataName).click();
 
       cy.contains('Display name').should('be.visible');
@@ -151,9 +149,9 @@ describe('Check all virtualization pages can be loaded', () => {
     });
 
     it('create example template', () => {
-      cy.switchProject('default');
-      cy.get(itemCreateBtn).click();
-      cy.get(saveBtn).click();
+      cy.switchProject(TEST_NS);
+      cy.get(sel.itemCreateBtn).click();
+      cy.get(sel.saveBtn).click();
     });
 
     it('custom template tabs are loaded', () => {
@@ -179,93 +177,93 @@ describe('Check all virtualization pages can be loaded', () => {
     });
   });
 
-  describe('Check InstanceTypes pages', () => {
-    it('instanceTypes is loaded', () => {
+  describe('Check InstanceTypes tabs', () => {
+    it('instanceTypes page is loaded', () => {
       cy.visitITs();
       cy.contains('cx1.2xlarge').should('exist');
     });
 
-    it('create instanceType from yaml on the first tab', () => {
-      cy.get('div.co-operator-details__actions').find(itemCreateBtn).click();
-      cy.get(saveBtn).click();
-      cy.get(breadcrumb).click();
-      cy.get(nameFilter).type(Example);
+    it('create VirtualMachineClusterInstanceType from YAML', () => {
+      cy.get('div.co-operator-details__actions').find(sel.itemCreateBtn).click();
+      cy.get(sel.saveBtn).click();
+      cy.get(sel.breadcrumb).click();
+      cy.get(sel.nameFilter).type(Example);
       cy.byLegacyTestID(Example).should('exist');
       cy.byLegacyTestID('cx1.2xlarge').should('not.exist');
     });
 
-    it('create instanceType from yaml on the second tab', () => {
+    it('create VirtualMachineInstanceType from YAML', () => {
       cy.contains('span.pf-v5-c-tabs__item-text', 'User provided').click();
-      cy.get(itemCreateBtn).click();
-      cy.get(saveBtn).click();
-      cy.get(breadcrumb).click();
+      cy.get(sel.itemCreateBtn).click();
+      cy.get(sel.saveBtn).click();
+      cy.get(sel.breadcrumb).click();
       cy.byLegacyTestID(Example).should('exist');
     });
   });
 
-  describe('Check Preferences pages', () => {
-    it('preferences is loaded', () => {
+  describe('Check Preferences tabs', () => {
+    it('preferences page is loaded', () => {
       cy.visitPreferences();
       cy.contains('fedora').should('exist');
     });
 
-    it('create preference from yaml on the first tab', () => {
-      cy.get('div.co-operator-details__actions').find(itemCreateBtn).click();
-      cy.get(saveBtn).click();
-      cy.get(breadcrumb).click();
-      cy.get(nameFilter).type(Example);
+    it('create VirtualMachineClusterPreference from YAML', () => {
+      cy.get('div.co-operator-details__actions').find(sel.itemCreateBtn).click();
+      cy.get(sel.saveBtn).click();
+      cy.get(sel.breadcrumb).click();
+      cy.get(sel.nameFilter).type(Example);
       cy.byLegacyTestID(Example).should('exist');
       cy.byLegacyTestID('fedora').should('not.exist');
     });
 
-    it('create preference from yaml on the second tab', () => {
+    it('create VirtualMachinePreference from YAML', () => {
       cy.contains('span.pf-v5-c-tabs__item-text', 'User preferences').click();
-      cy.get(itemCreateBtn).click();
-      cy.get(saveBtn).click();
-      cy.get(breadcrumb).click();
+      cy.get(sel.itemCreateBtn).click();
+      cy.get(sel.saveBtn).click();
+      cy.get(sel.breadcrumb).click();
       cy.byLegacyTestID(Example).should('exist');
     });
   });
 
-  describe('Check BootVolume pages', () => {
+  describe('Check Bootable volumes page', () => {
     it('bootable volume page is loaded', () => {
       cy.visitVolumes();
-      cy.switchProject('All Projects');
+      cy.switchProject(ALL_PROJ_NS);
       cy.contains('fedora').should('exist');
     });
 
-    xit('create bootable volume from yaml', () => {
-      cy.get(itemCreateBtn).click();
+    xit('create bootable volume from YAML', () => {
+      cy.get(sel.itemCreateBtn).click();
       cy.byButtonText(YAML).click();
-      cy.get(saveBtn).click();
-      cy.get(breadcrumb).click();
+      cy.get(sel.saveBtn).click();
+      cy.get(sel.breadcrumb).click();
       cy.byLegacyTestID(Example).should('exist');
     });
   });
 
-  describe('Check MigrationPolicies pages', () => {
-    it('the migration policy page is loaded', () => {
+  describe('Check MigrationPolicies page', () => {
+    it('migration policy page is loaded', () => {
       cy.visitMPs();
       cy.contains('No MigrationPolicies found').should('exist');
     });
 
-    it('create migration policy from yaml', () => {
-      cy.get(itemCreateBtn).click();
+    it('create migration policy from YAML', () => {
+      cy.get(sel.itemCreateBtn).click();
       cy.byButtonText(YAML).click();
-      cy.get(saveBtn).click();
+      cy.get(sel.saveBtn).click();
       cy.get('.pf-v5-c-breadcrumb__item').eq(0).click();
       cy.byLegacyTestID(Example).should('exist');
     });
   });
 
-  describe('Check Checkups', () => {
-    it('the network checkup pages is loaded', () => {
+  describe('Check Checkups tabs', () => {
+    it('network checkup pages is loaded', () => {
       cy.visitCheckups();
       cy.contains('No network latency checkups found').should('exist');
     });
 
-    it('the storage checkup pages is loaded', () => {
-      cy.contains('span.pf-v5-c-tabs__item-text', 'Storage').click();
+    it('storage checkup pages is loaded', () => {
+      cy.contains('.pf-v5-c-tabs__item-text', 'Storage').click();
       cy.contains('No storage checkups found').should('exist');
     });
   });

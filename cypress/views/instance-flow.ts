@@ -131,11 +131,11 @@ export const fillInstanceType = (vmData: VirtualMachineData) => {
       cy.get('button[placeholder="Select project"]').click();
       cy.get(`[data-test-id="select-option-${secretProject}"]`).click();
       cy.get('button[placeholder="Select secret"]').click();
-      cy.contains('.pf-v5-c-menu__item-text', existSecret).click();
+      cy.contains(iView.menuItemText, existSecret).click();
       cy.get('input[id="new-secret-name"]').clear().type(newSecretName);
     } else {
       cy.get('button[placeholder="Select secret"]').click();
-      cy.contains('.pf-v5-c-menu__item-text', existSecret).click();
+      cy.contains(iView.menuItemText, existSecret).click();
     }
     if (applyKey) {
       cy.get('input[id="apply-key-to-project-per-user"]').check();
@@ -171,14 +171,22 @@ export const fillDetails = (vmData: VirtualMachineData) => {
     cy.clickSaveBtn();
   }
   if (bootMode) {
-    cy.contains('Boot management').click();
+    cy.byButtonText('Boot management').then(($el) => {
+      if ($el.attr('aria-expanded') == 'false') {
+        $el.click();
+      }
+    });
     cy.get(`[data-test-id="${vmData.name}-boot-method"]`).find('svg').click();
     cy.get('div.pf-v5-c-modal-box__body').find('span.pf-v5-c-menu-toggle__toggle-icon').click();
-    cy.contains('.pf-v5-c-menu__item-text', bootMode).click();
+    cy.contains(iView.menuItemText, bootMode).click();
     cy.clickSaveBtn();
   }
   if (startInPause) {
-    cy.contains('Boot management').click();
+    cy.byButtonText('Boot management').then(($el) => {
+      if ($el.attr('aria-expanded') == 'false') {
+        $el.click();
+      }
+    });
     cy.get('[data-test-id="start-pause-mode"]').find('input[type="checkbox"]').check();
   }
   if (headless) {
@@ -320,15 +328,16 @@ export const fillSSH = (vmData: VirtualMachineData) => {
 };
 
 export const fillInitialRun = (vmData: VirtualMachineData) => {
-  const { ethName, gateway, ipAddr, password, sysprepFile, sysprepName, username } = vmData;
-  if (username || password || ethName) {
+  const { cloudInitPwd, cloudInitUname, ethName, gateway, ipAddr, sysprepFile, sysprepName } =
+    vmData;
+  if (cloudInitUname || cloudInitPwd || ethName) {
     cy.contains('.pf-v5-c-tabs__item-text', 'Initial run').click();
     cy.get('[data-test-id="undefined-edit"]').click();
-    if (username) {
-      cy.get(cView.cloudInitUser).clear().type(username);
+    if (cloudInitUname) {
+      cy.get(cView.cloudInitUser).clear().type(cloudInitUname);
     }
-    if (password) {
-      cy.get(cView.cloudInitPwd).clear().type(password);
+    if (cloudInitPwd) {
+      cy.get(cView.cloudInitPwd).clear().type(cloudInitPwd);
     }
     if (ethName) {
       // cy.contains(descrGroup, cloudInit).find('button').eq(0).click();

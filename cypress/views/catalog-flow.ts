@@ -10,7 +10,7 @@ import * as iView from './selector-instance';
 import { tab } from './tab';
 
 export const fillReviewAndCreate = (vmData: VirtualMachineData) => {
-  const { bootFromCD, cdSource, diskSource, mountWinDriver, name, rpasswd, rusername } = vmData;
+  const { bootFromCD, cdSource, diskSource, mountWinDriver, name, tRegPwd, tRegUname } = vmData;
   if (bootFromCD) {
     cy.get(cView.bootFromCD).check();
     switch (cdSource.name) {
@@ -56,9 +56,9 @@ export const fillReviewAndCreate = (vmData: VirtualMachineData) => {
         cy.get(diskSource.catalogSelector).click();
         cy.wait(3000);
         cy.get(diskSource.catalogInput).wait(2000).focus().type(diskSource.value, { delay: 500 });
-        if (rusername) {
-          cy.get(diskSource.rusername).type(rusername);
-          cy.get(diskSource.rpasswd).type(rpasswd);
+        if (tRegUname) {
+          cy.get(diskSource.dsRegUname).type(tRegUname);
+          cy.get(diskSource.dsRegPwd).type(tRegPwd);
         }
         break;
       }
@@ -238,25 +238,25 @@ export const fillMetadata = (vmData: VirtualMachineData) => {
 
 export const fillScripts = (vmData: VirtualMachineData) => {
   const {
+    cloudInitPwd,
+    cloudInitUname,
     ethName,
     existSecret,
     gateway,
     ipAddr,
     newSecret,
-    password,
     sysprepFile,
     sysprepName,
-    username,
   } = vmData;
   tab.navigateToTScripts();
-  if (username || password || ethName) {
+  if (cloudInitUname || cloudInitPwd || ethName) {
     cy.contains(descrGroup, cloudInit).find('button').eq(0).click();
     // cy.get(cView.cloudInitEditBtn).click();
-    if (username) {
-      cy.get(cView.cloudInitUser).clear().type(username);
+    if (cloudInitUname) {
+      cy.get(cView.cloudInitUser).clear().type(cloudInitUname);
     }
-    if (password) {
-      cy.get(cView.cloudInitPwd).clear().type(password);
+    if (cloudInitPwd) {
+      cy.get(cView.cloudInitPwd).clear().type(cloudInitPwd);
     }
     if (ethName) {
       // cy.contains(descrGroup, cloudInit).find('button').eq(0).click();

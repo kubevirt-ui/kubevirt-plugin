@@ -73,7 +73,7 @@ export const waitForStatus = (vmName: string, status: string, onList = true) => 
 
 export const vm = {
   create: (vmData: VirtualMachineData, waitForRunning = true) => {
-    cy.visitCatalogVirt();
+    cy.visitCatalog();
     cy.get(cView.templateTab).click();
     //cy.switchProject(vmData.namespace);
     if (vmData.userTemplate) {
@@ -82,7 +82,6 @@ export const vm = {
     cy.get(`div[data-test-id="${vmData.template.metadataName}"]`).click();
     // wait for page is loaded completely
     cy.wait(5000);
-    cy.get(cView.vmName).clear().type(vmData.name);
     if (vmData.folder) {
       cy.get(cView.quickForm).within(() => {
         cy.get(iView.vmFolder).type(vmData.folder);
@@ -100,12 +99,14 @@ export const vm = {
     cy.get('[data-test="global-notifications"]').scrollIntoView();
     if (waitForRunning && vmData.startOnCreation !== false) {
       // wait here for other state showing before running
-      cy.wait(90000);
-      waitForStatus(vmData.name, index.VM_STATUS.Running, false);
+      // cy.wait(90000);
+      checkStatus(vmData.name, index.VM_STATUS.Running, 3 * index.MINUTE, false);
+      // wait for vmi appear
+      cy.wait(3000);
     }
   },
   customizeCreate: (vmData: VirtualMachineData, waitForRunning = true) => {
-    cy.visitCatalogVirt();
+    cy.visitCatalog();
     cy.get(cView.templateTab).click();
     //cy.switchProject(vmData.namespace);
     if (vmData.userTemplate) {
@@ -134,38 +135,44 @@ export const vm = {
     cy.get('[data-test="global-notifications"]').scrollIntoView();
     if (waitForRunning && vmData.startOnCreation !== false) {
       // wait here for other state showing before running
-      cy.wait(90000);
-      waitForStatus(vmData.name, index.VM_STATUS.Running, false);
+      // cy.wait(90000);
+      checkStatus(vmData.name, index.VM_STATUS.Running, 3 * index.MINUTE, false);
+      // wait for vmi appear
+      cy.wait(3000);
     }
   },
   customizeIT: (vmData: VirtualMachineData, waitForRunning = true) => {
-    cy.visitCatalogVirt(); // navigate back
+    cy.visitCatalog(); // navigate back
     //cy.switchProject(vmData.namespace);
     instance.customizeIT(vmData);
     if (!vmData.startOnCreation && vmData.startOnCreation !== undefined) {
       cy.get(iView.startBtn).uncheck();
     }
-    cy.byButtonText(iView.createBtnText).click();
+    cy.byButtonText(iView.createBtnText).click({ force: true });
     cy.get('[data-test="global-notifications"]').scrollIntoView();
     if (waitForRunning && vmData.startOnCreation !== false) {
       // wait here for other state showing before running
-      cy.wait(90000);
-      waitForStatus(vmData.name, index.VM_STATUS.Running, false);
+      // cy.wait(90000);
+      checkStatus(vmData.name, index.VM_STATUS.Running, 3 * index.MINUTE, false);
+      // wait for vmi appear
+      cy.wait(3000);
     }
   },
   instanceCreate: (vmData: VirtualMachineData, waitForRunning = true) => {
-    cy.visitCatalogVirt(); // navigate back
+    cy.visitCatalog(); // navigate back
     //cy.switchProject(vmData.namespace);
     instance.fillInstanceType(vmData);
     if (!vmData.startOnCreation && vmData.startOnCreation !== undefined) {
       cy.get(iView.startBtn).uncheck();
     }
-    cy.byButtonText(iView.createBtnText).click();
+    cy.byButtonText(iView.createBtnText).focus().click({ force: true });
     cy.get('[data-test="global-notifications"]').scrollIntoView();
     if (waitForRunning && vmData.startOnCreation !== false) {
       // wait here for other state showing before running
-      cy.wait(90000);
-      waitForStatus(vmData.name, index.VM_STATUS.Running, false);
+      // cy.wait(90000);
+      checkStatus(vmData.name, index.VM_STATUS.Running, 3 * index.MINUTE, false);
+      // wait for vmi appear
+      cy.wait(3000);
     }
   },
 };
