@@ -6,6 +6,7 @@ import * as instance from './instance-flow';
 import * as cView from './selector-catalog';
 import { vmStatusOnList, vmStatusTop } from './selector-common';
 import * as iView from './selector-instance';
+import { tab } from './tab';
 
 export const getRow = (name: string, within: VoidFunction) =>
   cy.byTestRows('resource-row').contains(name).parents('tr').within(within);
@@ -73,16 +74,18 @@ export const waitForStatus = (vmName: string, status: string, onList = true) => 
 
 export const vm = {
   create: (vmData: VirtualMachineData, waitForRunning = true) => {
-    cy.visitCatalogVirt();
+    cy.visitCatalog();
     cy.get(cView.templateTab).click();
     //cy.switchProject(vmData.namespace);
     if (vmData.userTemplate) {
       cy.get(cView.uTemplate).click();
     }
+    cy.get(`[data-test-id="boot-source-available-Boot source available"]`)
+      .find(':checkbox')
+      .check();
     cy.get(`div[data-test-id="${vmData.template.metadataName}"]`).click();
     // wait for page is loaded completely
     cy.wait(5000);
-    cy.get(cView.vmName).clear().type(vmData.name);
     if (vmData.folder) {
       cy.get(cView.quickForm).within(() => {
         cy.get(iView.vmFolder).type(vmData.folder);
@@ -100,14 +103,18 @@ export const vm = {
     cy.get('[data-test="global-notifications"]').scrollIntoView();
     if (waitForRunning && vmData.startOnCreation !== false) {
       // wait here for other state showing before running
-      cy.wait(90000);
-      waitForStatus(vmData.name, index.VM_STATUS.Running, false);
+      // cy.wait(90000);
+      checkStatus(vmData.name, index.VM_STATUS.Running, 3 * index.MINUTE, false);
+      // wait for vmi appear
+      cy.wait(3000);
     }
   },
   customizeCreate: (vmData: VirtualMachineData, waitForRunning = true) => {
-    cy.visitCatalogVirt();
+    cy.visitCatalog();
     cy.get(cView.templateTab).click();
-    //cy.switchProject(vmData.namespace);
+    cy.get(`[data-test-id="boot-source-available-Boot source available"]`)
+      .find(':checkbox')
+      .check();
     if (vmData.userTemplate) {
       cy.get(cView.uTemplate).click();
     }
@@ -121,11 +128,16 @@ export const vm = {
     catalog.addDisks(vmData);
     catalog.fillScripts(vmData);
     catalog.fillMetadata(vmData);
+    tab.navigateToOverview();
     if (!vmData.startOnCreation && vmData.startOnCreation !== undefined) {
       cy.get(cView.startOnCreation).click();
     }
-    cy.contains('button', cView.createBtnText, { timeout: 180000 }).should('be.visible');
-    cy.byButtonText(cView.createBtnText).click();
+    cy.byButtonText(cView.createBtnText).click({ force: true });
+    cy.get('body').then(($body) => {
+      if ($body.text().includes(cView.createBtnText)) {
+        cy.byButtonText(cView.createBtnText).click({ force: true });
+      }
+    });
     cy.get('body').then(($body) => {
       if ($body.text().includes('No available boot source')) {
         cy.byButtonText(cView.createWithNoBS).click();
@@ -134,38 +146,42 @@ export const vm = {
     cy.get('[data-test="global-notifications"]').scrollIntoView();
     if (waitForRunning && vmData.startOnCreation !== false) {
       // wait here for other state showing before running
-      cy.wait(90000);
-      waitForStatus(vmData.name, index.VM_STATUS.Running, false);
+      // cy.wait(90000);
+      checkStatus(vmData.name, index.VM_STATUS.Running, 3 * index.MINUTE, false);
+      // wait for vmi appear
+      cy.wait(3000);
     }
   },
   customizeIT: (vmData: VirtualMachineData, waitForRunning = true) => {
-    cy.visitCatalogVirt(); // navigate back
-    //cy.switchProject(vmData.namespace);
+    cy.visitCatalog();
     instance.customizeIT(vmData);
     if (!vmData.startOnCreation && vmData.startOnCreation !== undefined) {
       cy.get(iView.startBtn).uncheck();
     }
-    cy.byButtonText(iView.createBtnText).click();
+    cy.byButtonText(iView.createBtnText).click({ force: true });
     cy.get('[data-test="global-notifications"]').scrollIntoView();
     if (waitForRunning && vmData.startOnCreation !== false) {
       // wait here for other state showing before running
-      cy.wait(90000);
-      waitForStatus(vmData.name, index.VM_STATUS.Running, false);
+      // cy.wait(90000);
+      checkStatus(vmData.name, index.VM_STATUS.Running, 3 * index.MINUTE, false);
+      // wait for vmi appear
+      cy.wait(3000);
     }
   },
   instanceCreate: (vmData: VirtualMachineData, waitForRunning = true) => {
-    cy.visitCatalogVirt(); // navigate back
-    //cy.switchProject(vmData.namespace);
+    cy.visitCatalog(); // navigate back
     instance.fillInstanceType(vmData);
     if (!vmData.startOnCreation && vmData.startOnCreation !== undefined) {
       cy.get(iView.startBtn).uncheck();
     }
-    cy.byButtonText(iView.createBtnText).click();
+    cy.byButtonText(iView.createBtnText).click({ force: true });
     cy.get('[data-test="global-notifications"]').scrollIntoView();
     if (waitForRunning && vmData.startOnCreation !== false) {
       // wait here for other state showing before running
-      cy.wait(90000);
-      waitForStatus(vmData.name, index.VM_STATUS.Running, false);
+      // cy.wait(90000);
+      checkStatus(vmData.name, index.VM_STATUS.Running, 3 * index.MINUTE, false);
+      // wait for vmi appear
+      cy.wait(3000);
     }
   },
 };

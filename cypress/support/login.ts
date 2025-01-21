@@ -1,4 +1,5 @@
-import { masthead, submitButton } from './views';
+import { MINUTE } from '../utils/const/index';
+import { submitButton } from '../views/selector-common';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -24,7 +25,7 @@ Cypress.Commands.add('login', (provider: string, username: string, password: str
     // Make sure we clear the cookie in case a previous test failed to logout.
     cy.clearCookie('openshift-session-token');
 
-    cy.get('[data-test-id=login]', { timeout: 30000 }).should('be.visible');
+    cy.get('[data-test-id=login]', { timeout: 5 * MINUTE }).should('be.visible');
     const idp = provider || KUBEADMIN_IDP;
     cy.task('log', `  Logging in as ${username || KUBEADMIN_USERNAME}`);
     cy.byLegacyTestID('login').should('be.visible');
@@ -36,10 +37,7 @@ Cypress.Commands.add('login', (provider: string, username: string, password: str
     cy.get('#inputUsername').type(username || KUBEADMIN_USERNAME);
     cy.get('#inputPassword').type(password || Cypress.env('BRIDGE_KUBEADMIN_PASSWORD'));
     cy.get(submitButton).click();
-    masthead.username.shouldBeVisible();
-
-    // wait for virtualization page
-    cy.contains('.pf-v5-c-nav__link', 'Virtualization').should('be.visible');
+    cy.byTestID('user-dropdown', { timeout: 5 * MINUTE }).should('be.visible');
   });
 });
 

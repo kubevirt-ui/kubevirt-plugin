@@ -1,10 +1,10 @@
 import { DEFAULT_TEMPLATE_NAME, YAML_DS_NAME } from './index';
 
 export const TEMPLATE = {
-  CENTOS7: {
-    dvName: 'centos7',
-    metadataName: 'centos7-server-small',
-    name: 'CentOS 7 VM',
+  CENTOSSTREAM10: {
+    dvName: 'centos-stream10',
+    metadataName: 'centos-stream10-server-small',
+    name: 'CentOS Stream 10 VM',
   },
   CENTOSSTREAM8: {
     dvName: 'centos-stream8',

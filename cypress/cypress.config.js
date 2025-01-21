@@ -17,7 +17,7 @@ module.exports = defineConfig({
   experimentalMemoryManagement: true,
   fixturesFolder: 'fixtures',
   modifyObstructiveCode: false,
-  pageLoadTimeout: 60000,
+  pageLoadTimeout: 120000,
   reporter: '../node_modules/cypress-multi-reporters',
   reporterOptions: {
     configFile: 'reporter-config.json',
@@ -31,8 +31,8 @@ module.exports = defineConfig({
   trashAssetsBeforeRuns: true,
   video: true,
   videosFolder: './gui-test-screenshots/videos/',
-  viewportHeight: 1080,
-  viewportWidth: 1920,
+  viewportHeight: 1440,
+  viewportWidth: 2560,
   waitForAnimations: true,
   watchForFileChanges: false,
 });

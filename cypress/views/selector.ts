@@ -26,3 +26,4 @@ export const quickCreateVMBtn = '[data-test-id="quick-create-vm-btn"]';
 export const vmName = '[data-test-id="template-catalog-vm-name-input"]';
 export const uTemplate = '#user-templates';
 export const quickForm = '#quick-create-form';
+export const brandImage = '[data-test="brand-image"]';
