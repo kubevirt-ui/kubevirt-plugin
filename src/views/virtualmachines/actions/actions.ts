@@ -8,13 +8,19 @@ import {
   V1VirtualMachine,
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
+import { getUpdateStrategy } from '@kubevirt-utils/resources/vm';
+import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import {
   consoleFetch,
   k8sCreate,
   k8sDelete,
   K8sModel,
+  k8sPatch,
+  Patch,
 } from '@openshift-console/dynamic-plugin-sdk';
+
+import { createRollbackPatchData, deleteUnusedDataVolumes } from './utils';
 
 const generateRandomString = () => Math.random().toString(36).substring(2, 7);
 
@@ -109,4 +115,23 @@ export const deleteVM = async (vm: V1VirtualMachine) => {
     model: VirtualMachineModel,
     resource: vm,
   });
+};
+
+export const rollbackStorageMigration = async (vm: V1VirtualMachine) => {
+  if (isEmpty(getUpdateStrategy(vm))) return;
+
+  const patchData: Patch[] = createRollbackPatchData(vm);
+
+  patchData.push({
+    op: 'remove',
+    path: '/spec/updateVolumesStrategy',
+  });
+
+  await k8sPatch<V1VirtualMachine>({
+    data: patchData,
+    model: VirtualMachineModel,
+    resource: vm,
+  });
+
+  deleteUnusedDataVolumes(vm, getNamespace(vm));
 };

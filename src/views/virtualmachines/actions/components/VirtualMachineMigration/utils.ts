@@ -6,8 +6,11 @@ import { V1VirtualMachine, V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { MAX_NAME_LENGTH } from '@kubevirt-utils/components/SSHSecretModal/utils/constants';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getDataVolumeTemplates, getVolumes } from '@kubevirt-utils/resources/vm';
+import { UPDATE_STRATEGIES } from '@kubevirt-utils/resources/vm/utils/constants';
+import { getStorageClassName } from '@kubevirt-utils/resources/vm/utils/dataVolumeTemplate/selectors';
 import { getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, k8sDelete, k8sPatch, Patch } from '@openshift-console/dynamic-plugin-sdk';
+import { getMigrationClaimNameAnnotation } from '@virtualmachines/actions/utils';
 
 const getBlankDataVolume = (
   dataVolumeName: string,
@@ -106,19 +109,27 @@ const createPatchData = (
 
     if (isEmpty(pvc)) return patchArray;
 
+    const destination = createdDataVolumeByPVCName.get(pvcName);
+
+    const destinationName = getName(destination);
+
+    const migrationClaimNameAnnotation = getMigrationClaimNameAnnotation(destinationName);
+
+    patchArray.push({
+      op: 'add',
+      path: `/metadata/annotations/${migrationClaimNameAnnotation.replace('/', '~1')}`,
+      value: pvcName,
+    });
+
     if (volume?.persistentVolumeClaim?.claimName) {
       patchArray.push({
         op: 'replace',
         path: `/spec/template/spec/volumes/${volumeIndex}/persistentVolumeClaim/claimName`,
-        value: getName(createdDataVolumeByPVCName.get(volume?.persistentVolumeClaim?.claimName)),
+        value: destinationName,
       });
     }
 
     if (volume?.dataVolume?.name) {
-      const destinationDataVolumeName = getName(
-        createdDataVolumeByPVCName.get(volume?.dataVolume?.name),
-      );
-
       const dataVolumeIndex = getDataVolumeTemplates(vm)?.findIndex(
         (dataVolumeTemplate) => getName(dataVolumeTemplate) === volume?.dataVolume?.name,
       );
@@ -126,14 +137,23 @@ const createPatchData = (
       patchArray.push({
         op: 'replace',
         path: `/spec/template/spec/volumes/${volumeIndex}/dataVolume/name`,
-        value: destinationDataVolumeName,
+        value: destinationName,
       });
 
       patchArray.push({
         op: 'replace',
         path: `/spec/dataVolumeTemplates/${dataVolumeIndex}/metadata/name`,
-        value: destinationDataVolumeName,
+        value: destinationName,
       });
+
+      const storageClassname = getStorageClassName(destination);
+
+      if (storageClassname)
+        patchArray.push({
+          op: 'replace',
+          path: `/spec/dataVolumeTemplates/${dataVolumeIndex}/spec/storage/storageClassName`,
+          value: storageClassname,
+        });
     }
     return patchArray;
   }, [] as Patch[]);
@@ -153,7 +173,7 @@ export const migrateVM = async (
   patchData.push({
     op: 'add',
     path: '/spec/updateVolumesStrategy',
-    value: 'Migration',
+    value: UPDATE_STRATEGIES.Migration,
   });
 
   try {

@@ -36,6 +36,7 @@ import {
   migrateVM,
   pauseVM,
   restartVM,
+  rollbackStorageMigration,
   startVM,
   stopVM,
   unpauseVM,
@@ -54,7 +55,7 @@ const {
 } = printableVMStatus;
 
 export const VirtualMachineActionFactory = {
-  cancelMigrationCompute: (
+  cancelComputeMigration: (
     vm: V1VirtualMachine,
     vmim: V1VirtualMachineInstanceMigration,
     isSingleNodeCluster: boolean,
@@ -70,7 +71,28 @@ export const VirtualMachineActionFactory = {
       description: !!vmim?.metadata?.deletionTimestamp && t('Canceling ongoing migration'),
       disabled: isSingleNodeCluster || !vmim || !!vmim?.metadata?.deletionTimestamp,
       id: 'vm-action-cancel-migrate',
-      label: t('Cancel migration'),
+      label: t('Cancel compute migration'),
+    };
+  },
+  cancelStorageMigration: (
+    vm: V1VirtualMachine,
+    vmim: V1VirtualMachineInstanceMigration,
+    isSingleNodeCluster: boolean,
+  ): Action => {
+    return {
+      accessReview: {
+        group: VirtualMachineModel.apiGroup,
+        namespace: vm?.metadata?.namespace,
+        resource: VirtualMachineModel.plural,
+        verb: 'patch',
+      },
+      cta: () => {
+        cancelMigration(vmim);
+        return rollbackStorageMigration(vm);
+      },
+      disabled: isSingleNodeCluster,
+      id: 'vm-action-cancel-storage-migrate',
+      label: t('Cancel storage migration'),
     };
   },
   clone: (vm: V1VirtualMachine, createModal: (modal: ModalComponent) => void): Action => {
