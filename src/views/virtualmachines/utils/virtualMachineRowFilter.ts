@@ -21,7 +21,7 @@ import {
 import { getVMIIPAddresses } from '@kubevirt-utils/resources/vmi';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
-import { compareCIDR, isLiveMigratable } from './utils';
+import { compareCIDR, getLatestMigrationForEachVM, isLiveMigratable } from './utils';
 import { isErrorPrintableStatus, printableVMStatus } from './virtualMachineStatuses';
 
 type VmiMapper = {
@@ -247,19 +247,7 @@ export const useVMListFilters = (
     );
   }, [vmis]);
 
-  const vmimMapper: VmimMapper = useMemo(() => {
-    return (Array.isArray(vmims) ? vmims : [])?.reduce((acc, vmim) => {
-      const name = vmim?.spec?.vmiName;
-      const namespace = vmim?.metadata?.namespace;
-      if (!acc[namespace]) {
-        acc[namespace] = {};
-      }
-
-      acc[namespace][name] = vmim;
-
-      return acc;
-    }, {});
-  }, [vmims]);
+  const vmimMapper: VmimMapper = useMemo(() => getLatestMigrationForEachVM(vmims), [vmims]);
 
   const statusFilter = useStatusFilter();
   const templatesFilter = useTemplatesFilter(vms);

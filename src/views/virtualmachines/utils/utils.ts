@@ -1,4 +1,7 @@
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1VirtualMachine,
+  V1VirtualMachineInstanceMigration,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 
 import { printableVMStatus } from './virtualMachineStatuses';
 
@@ -34,3 +37,23 @@ export const compareCIDR = (ipSearch: string, ip: string) => {
 
   return baseIpBinarySlice === ipBinarySlice;
 };
+
+export const sortVMIMByTimestampCreation = (
+  a: V1VirtualMachineInstanceMigration,
+  b: V1VirtualMachineInstanceMigration,
+) => {
+  return a.metadata.creationTimestamp.localeCompare(b.metadata.creationTimestamp);
+};
+
+export const getLatestMigrationForEachVM = (vmims: V1VirtualMachineInstanceMigration[]) =>
+  (Array.isArray(vmims) ? vmims : [])?.sort(sortVMIMByTimestampCreation)?.reduce((acc, vmim) => {
+    const name = vmim?.spec?.vmiName;
+    const namespace = vmim?.metadata?.namespace;
+    if (!acc[namespace]) {
+      acc[namespace] = {};
+    }
+
+    acc[namespace][name] = vmim;
+
+    return acc;
+  }, {});
