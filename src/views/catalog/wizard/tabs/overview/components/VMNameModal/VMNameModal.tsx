@@ -2,11 +2,14 @@ import React, { useMemo, useState } from 'react';
 import produce from 'immer';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
+import {
+  isValidVMName,
+  validateVMName,
+} from '@kubevirt-utils/components/VMNameValidationHelperText/utils/utils';
+import VMNameValidationHelperText from '@kubevirt-utils/components/VMNameValidationHelperText/VMNameValidationHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { Form, FormGroup, TextInput, ValidatedOptions } from '@patternfly/react-core';
+import { Form, FormGroup, TextInput } from '@patternfly/react-core';
 
 type HostnameModalProps = {
   isOpen: boolean;
@@ -26,11 +29,12 @@ const VMNameModal: React.FC<HostnameModalProps> = ({ isOpen, onClose, onSubmit, 
     return updatedVM;
   }, [vm, vmName]);
 
-  const validated = !isEmpty(vmName) ? ValidatedOptions.default : ValidatedOptions.error;
+  const vmNameValidated = validateVMName(vmName);
 
   return (
     <TabModal
       headerText={t('Edit VirtualMachine name')}
+      isDisabled={!isValidVMName(vmName)}
       isOpen={isOpen}
       obj={updatedVirtualMachine}
       onClose={onClose}
@@ -42,13 +46,10 @@ const VMNameModal: React.FC<HostnameModalProps> = ({ isOpen, onClose, onSubmit, 
             id="vm-name"
             onChange={(_event, val) => setVMName(val)}
             type="text"
+            validated={vmNameValidated}
             value={vmName}
           />
-          <FormGroupHelperText validated={validated}>
-            {validated === ValidatedOptions.error
-              ? t('VirtualMachine name can not be empty.')
-              : t('Please provide name to VirtualMachine.')}
-          </FormGroupHelperText>
+          <VMNameValidationHelperText showDefaultHelperText vmName={vmName} />
         </FormGroup>
       </Form>
     </TabModal>

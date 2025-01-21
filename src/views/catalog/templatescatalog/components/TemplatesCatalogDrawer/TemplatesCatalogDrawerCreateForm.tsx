@@ -3,6 +3,8 @@ import React, { FC, memo } from 'react';
 import { DRAWER_FORM_ID } from '@catalog/templatescatalog/utils/consts';
 import FolderSelect from '@kubevirt-utils/components/FolderSelect/FolderSelect';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
+import { validateVMName } from '@kubevirt-utils/components/VMNameValidationHelperText/utils/utils';
+import VMNameValidationHelperText from '@kubevirt-utils/components/VMNameValidationHelperText/VMNameValidationHelperText';
 import {
   RUNSTRATEGY_ALWAYS,
   RUNSTRATEGY_RERUNONFAILURE,
@@ -64,6 +66,8 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
       startVM,
     } = useCreateDrawerForm(namespace, subscriptionData, authorizedSSHKey);
 
+    const vmNameValidated = validateVMName(nameField);
+
     const error = templateLoadingError || createError;
     return (
       <form className="template-catalog-drawer-form" id="quick-create-form">
@@ -81,9 +85,11 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
                       name="vmname"
                       onChange={(_, value: string) => onVMNameChange(value)}
                       type="text"
+                      validated={vmNameValidated}
                       value={nameField}
                     />
                   </FormGroup>
+                  <VMNameValidationHelperText vmName={nameField} />
                 </SplitItem>
                 {treeViewEnabled && treeViewFoldersEnabled && (
                   <SplitItem>

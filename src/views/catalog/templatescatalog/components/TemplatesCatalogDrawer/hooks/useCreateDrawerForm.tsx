@@ -19,6 +19,7 @@ import {
   applyCloudDriveCloudInitVolume,
   createSSHSecret,
 } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
+import { isValidVMName } from '@kubevirt-utils/components/VMNameValidationHelperText/utils/utils';
 import {
   RUNSTRATEGY_ALWAYS,
   RUNSTRATEGY_HALTED,
@@ -98,6 +99,7 @@ const useCreateDrawerForm = (
   const { password, username } = registryCredentials;
 
   const { nameField, onVMNameChange } = useCreateVMName();
+  const isValidVmName = isValidVMName(nameField);
 
   const [isQuickCreating, setIsQuickCreating] = useState(false);
   const [isCustomizing, setIsCustomizing] = useState(false);
@@ -331,7 +333,7 @@ const useCreateDrawerForm = (
   return {
     createError,
     folder: getLabel(vm, VM_FOLDER_LABEL),
-    isCustomizeDisabled: !processedTemplateAccessReview || isCustomizing,
+    isCustomizeDisabled: !processedTemplateAccessReview || isCustomizing || !isValidVmName,
     isCustomizeLoading: isCustomizing || modelsLoading,
     isQuickCreateDisabled:
       !isBootSourceAvailable ||
@@ -340,7 +342,8 @@ const useCreateDrawerForm = (
       isEmpty(models) ||
       !allRequiredParametersAreFulfilled(template) ||
       !hasValidSource(template) ||
-      storageClassRequiredMissing,
+      storageClassRequiredMissing ||
+      !isValidVmName,
     isQuickCreateLoading: isQuickCreating || modelsLoading,
     nameField,
     onChangeFolder,
