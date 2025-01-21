@@ -2,11 +2,11 @@
 
 set -eExuo pipefail
 
-source cleanup.sh
+#source cleanup.sh
 source setup.sh
 
 # cleanup, setup and health check
-cleanup
+#cleanup
 health_check
 
 # Install dependencies.

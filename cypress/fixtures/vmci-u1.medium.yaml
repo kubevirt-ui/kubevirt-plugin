@@ -1,0 +1,40 @@
+﻿apiVersion: instancetype.kubevirt.io/v1beta1
+kind: VirtualMachineClusterInstancetype
+metadata:
+  annotations:
+    instancetype.kubevirt.io/description: |-
+      The U Series is quite neutral and provides resources for
+      general purpose applications.
+
+      *U* is the abbreviation for "Universal", hinting at the universal
+      attitude towards workloads.
+
+      VMs of instance types will share physical CPU cores on a
+      time-slice basis with other VMs.
+    kubevirt.io/install-strategy-registry: ''
+    openshift.io/documentation-url: 'https://access.redhat.com'
+    kubevirt.io/install-strategy-version: 'sha256:fe398409de125bedd2d143df35eacf740fdaeedca18564f821a74e715e32c1bf'
+    instancetype.kubevirt.io/displayName: General Purpose
+    kubevirt.io/install-strategy-identifier: 15c91882442b5d5ebb34398207a6a879d14d2f3a
+    kubevirt.io/generation: '20'
+    openshift.io/support-url: 'https://access.redhat.com'
+    openshift.io/provider-display-name: Red Hat
+  labels:
+    app.kubernetes.io/part-of: hyperconverged-cluster
+    instancetype.kubevirt.io/vendor: redhat.com
+    instancetype.kubevirt.io/common-instancetypes-version: 1.2.1-9-g9624a67
+    app.kubernetes.io/version: 4.18.0
+    instancetype.kubevirt.io/cpu: '1'
+    instancetype.kubevirt.io/icon-pf: pficon-server-group
+    app.kubernetes.io/component: compute
+    app.kubernetes.io/managed-by: virt-operator
+    instancetype.kubevirt.io/version: '1'
+    instancetype.kubevirt.io/class: general.purpose
+    instancetype.kubevirt.io/size: medium
+    instancetype.kubevirt.io/memory: 4Gi
+  name: u1.medium
+spec:
+  cpu:
+    guest: 1
+  memory:
+    guest: 4Gi
