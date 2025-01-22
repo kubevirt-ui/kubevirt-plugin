@@ -3,8 +3,11 @@ import React, { FC } from 'react';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SnapshotModal from '@kubevirt-utils/components/SnapshotModal/SnapshotModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { ListPageBody, ListPageCreateButton } from '@openshift-console/dynamic-plugin-sdk';
-import { Title } from '@patternfly/react-core';
+import {
+  ListPageBody,
+  ListPageCreateButton,
+  ListPageHeader,
+} from '@openshift-console/dynamic-plugin-sdk';
 import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
 
 import { printableVMStatus } from '../../../utils';
@@ -24,10 +27,7 @@ const SnapshotListPage: FC<NavPageComponentProps> = ({ obj: vm }) => {
 
   return (
     <>
-      <ListPageBody>
-        <Title className="snapshot-list-page__title" headingLevel="h2">
-          {t('Snapshots')}
-        </Title>
+      <ListPageHeader title={t('Snapshots')}>
         <ListPageCreateButton
           onClick={() =>
             createModal(({ isOpen, onClose }) => (
@@ -38,6 +38,8 @@ const SnapshotListPage: FC<NavPageComponentProps> = ({ obj: vm }) => {
         >
           {t('Take snapshot')}
         </ListPageCreateButton>
+      </ListPageHeader>
+      <ListPageBody>
         <SnapshotList
           error={error}
           isVMRunning={vm?.status?.printableStatus !== printableVMStatus.Stopped}
