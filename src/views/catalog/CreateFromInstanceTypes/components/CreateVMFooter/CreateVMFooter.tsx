@@ -18,6 +18,7 @@ import {
   generateNewSysprepConfig,
   UNATTEND,
 } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
+import { isValidVMName } from '@kubevirt-utils/components/VMNameValidationHelperText/utils/utils';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { logITFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
@@ -203,8 +204,14 @@ const CreateVMFooter: FC = () => {
     }
   };
 
+  const isValidVmName = isValidVMName(vmName);
+
   const isDisabled =
-    isSubmitting || isEmpty(selectedBootableVolume) || !canCreateVM || !hasNameAndInstanceType;
+    isSubmitting ||
+    isEmpty(selectedBootableVolume) ||
+    !canCreateVM ||
+    !hasNameAndInstanceType ||
+    !isValidVmName;
 
   return (
     <footer className="create-vm-instance-type-footer">
@@ -249,7 +256,8 @@ const CreateVMFooter: FC = () => {
                   isSubmitting ||
                   isEmpty(selectedBootableVolume) ||
                   !canCreateVM ||
-                  !hasNameAndInstanceType
+                  !hasNameAndInstanceType ||
+                  !isValidVmName
                 }
                 isLoading={isSubmitting}
                 onClick={handleCustomize}

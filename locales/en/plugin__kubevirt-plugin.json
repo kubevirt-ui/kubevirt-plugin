@@ -721,6 +721,7 @@
   "Max. running migrations per cluster": "Max. running migrations per cluster",
   "Max. running migrations per node": "Max. running migrations per node",
   "Maximum latency": "Maximum latency",
+  "Maximum name length is {{ maxNameLength }} characters": "Maximum name length is {{ maxNameLength }} characters",
   "Measurement duration": "Measurement duration",
   "Mediated devices": "Mediated devices",
   "medium": "medium",

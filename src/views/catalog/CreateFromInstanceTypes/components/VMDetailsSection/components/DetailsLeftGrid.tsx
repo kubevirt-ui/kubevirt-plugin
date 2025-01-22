@@ -7,6 +7,8 @@ import {
 } from '@catalog/CreateFromInstanceTypes/state/utils/types';
 import FolderSelect from '@kubevirt-utils/components/FolderSelect/FolderSelect';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
+import { validateVMName } from '@kubevirt-utils/components/VMNameValidationHelperText/utils/utils';
+import VMNameValidationHelperText from '@kubevirt-utils/components/VMNameValidationHelperText/VMNameValidationHelperText';
 import { TREE_VIEW, TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -24,6 +26,7 @@ const DetailsLeftGrid: FC<DetailsLeftGridProps> = ({ instanceTypesAndPreferences
   const { t } = useKubevirtTranslation();
   const { featureEnabled: treeViewEnabled } = useFeatures(TREE_VIEW);
   const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
+
   const { instanceTypeVMState, setInstanceTypeVMState, vmNamespaceTarget } =
     useInstanceTypeVMStore();
   const { folder, selectedBootableVolume, selectedInstanceType, vmName } = instanceTypeVMState;
@@ -35,6 +38,8 @@ const DetailsLeftGrid: FC<DetailsLeftGridProps> = ({ instanceTypesAndPreferences
     [clusterInstanceTypes],
   );
 
+  const vmNameValidated = validateVMName(vmName);
+
   const operatingSystem = getOSFromDefaultPreference(selectedBootableVolume, preferencesMap);
   const cpuMemoryString = !isEmpty(instanceTypesMap?.[selectedInstanceType?.name])
     ? getCPUAndMemoryFromDefaultInstanceType(instanceTypesMap[selectedInstanceType?.name])
@@ -44,17 +49,24 @@ const DetailsLeftGrid: FC<DetailsLeftGridProps> = ({ instanceTypesAndPreferences
     <DescriptionList className="pf-c-description-list" isHorizontal>
       <VirtualMachineDescriptionItem
         descriptionData={
-          <TextInput
-            onChange={(_event, newVMName) =>
-              setInstanceTypeVMState({ payload: newVMName, type: instanceTypeActionType.setVMName })
-            }
-            aria-label="instancetypes virtualmachine name"
-            data-test-id="instancetypes-vm-name-input"
-            isRequired
-            name="vmname"
-            type="text"
-            value={vmName}
-          />
+          <>
+            <TextInput
+              onChange={(_event, newVMName) =>
+                setInstanceTypeVMState({
+                  payload: newVMName,
+                  type: instanceTypeActionType.setVMName,
+                })
+              }
+              aria-label="instancetypes virtualmachine name"
+              data-test-id="instancetypes-vm-name-input"
+              isRequired
+              name="vmname"
+              type="text"
+              validated={vmNameValidated}
+              value={vmName}
+            />
+            <VMNameValidationHelperText vmName={vmName} />
+          </>
         }
         descriptionHeader={t('Name')}
       />
