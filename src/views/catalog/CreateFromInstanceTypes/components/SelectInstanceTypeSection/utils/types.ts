@@ -2,6 +2,7 @@ import { MutableRefObject } from 'react';
 
 export type InstanceTypeSize =
   | '2xlarge'
+  | '2xmedium'
   | '4xlarge'
   | '8xlarge'
   | 'large'

@@ -100,6 +100,7 @@ export const instanceTypeSeriesNameMapper: {
       'micro',
       'small',
       'medium',
+      '2xmedium',
       'large',
       'xlarge',
       '2xlarge',
