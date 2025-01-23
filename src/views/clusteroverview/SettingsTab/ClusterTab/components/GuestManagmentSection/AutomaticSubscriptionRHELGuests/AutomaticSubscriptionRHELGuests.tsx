@@ -47,7 +47,7 @@ const AutomaticSubscriptionRHELGuests: FC<AutomaticSubscriptionRHELGuestsProps> 
     }
   }, [type, selected]);
 
-  if (loading) return null;
+  const isInitialLoad = loading && featureEnabled === null;
 
   return (
     <ExpandSection
@@ -78,9 +78,12 @@ const AutomaticSubscriptionRHELGuests: FC<AutomaticSubscriptionRHELGuestsProps> 
                     'Automatically pull updates from the RHEL repository. Activation key and Organization ID are mandatory to enable this.',
                   )}
                   turnOnSwitch={(val) => {
-                    toggleFeature(val);
+                    if (!loading) {
+                      toggleFeature(val);
+                    }
                   }}
                   id={AUTOMATIC_UPDATE_FEATURE_NAME}
+                  isDisabled={isInitialLoad}
                   switchIsOn={featureEnabled}
                   title={t('Enable auto updates for RHEL VirtualMachines')}
                 />
