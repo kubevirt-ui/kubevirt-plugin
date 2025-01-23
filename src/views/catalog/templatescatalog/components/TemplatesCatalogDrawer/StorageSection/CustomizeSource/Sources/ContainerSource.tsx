@@ -68,12 +68,14 @@ const ContainerSource: FC<ContainerSourceProps> = ({
       >
         <FormTextInput
           {...register(`${testId}-username`)}
+          validated={
+            errors?.[`${testId}-username`] ? ValidatedOptions.error : ValidatedOptions.default
+          }
           aria-label={t('Username')}
           data-test-id={`${testId}-container-source-username`}
           id={`${testId}-${selectedSourceType}-username`}
           onChange={(e) => handleCredentialsChange(e, 'username')}
           type="text"
-          validated={validated}
         />
       </FormGroup>
       <FormGroup
@@ -82,13 +84,15 @@ const ContainerSource: FC<ContainerSourceProps> = ({
         label={t('Password')}
       >
         <FormPasswordInput
-          {...register(`${testId}-containerImage-password`)}
+          {...register(`${testId}-password`)}
+          validated={
+            errors?.[`${testId}-password`] ? ValidatedOptions.error : ValidatedOptions.default
+          }
           aria-label={t('Password')}
           data-test-id={`${testId}-container-source-password`}
           id={`${testId}-${selectedSourceType}`}
           onChange={(e) => handleCredentialsChange(e, 'password')}
           type="text"
-          validated={validated}
         />
       </FormGroup>
     </>

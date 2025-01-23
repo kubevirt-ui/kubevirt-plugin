@@ -3,11 +3,13 @@ import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolume
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import VirtualMachineSnapshotModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineSnapshotModel';
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import {
   V1beta1VirtualMachineSnapshot,
   V1VirtualMachine,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { deleteSecret } from '@kubevirt-utils/resources/secret/utils';
 import { compareOwnerReferences, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getDataVolumeTemplates } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -57,6 +59,12 @@ export const updateSnapshotResources = (
       model: VirtualMachineSnapshotModel,
       resource,
     });
+  });
+};
+
+export const deleteSecrets = (secrets: IoK8sApiCoreV1Secret[]) => {
+  return (secrets || []).map((secret) => {
+    return deleteSecret(secret);
   });
 };
 

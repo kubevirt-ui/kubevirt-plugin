@@ -1,10 +1,15 @@
 import React, { FC, useCallback, useState } from 'react';
 
+import useRegistryCredentials from '@catalog/utils/useRegistryCredentials/useRegistryCredentials';
 import { produceVMDisks, useWizardVMContext } from '@catalog/utils/WizardVMContext';
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
+import {
+  DefaultFormValues,
+  V1DiskFormState,
+} from '@kubevirt-utils/components/DiskModal/utils/types';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
@@ -22,6 +27,10 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({ diskName }) => {
   const { tabsData, updateTabsData, updateVM, vm } = useWizardVMContext();
   const { createModal } = useModal();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const { decodedRegistryCredentials, updateRegistryCredentials } = useRegistryCredentials();
+  const defaultFormValues: DefaultFormValues = { registryCredentials: decodedRegistryCredentials };
+
   const deleteBtnText = t('Detach');
 
   const onDelete = useCallback(() => {
@@ -74,6 +83,12 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({ diskName }) => {
     ));
   };
 
+  const handleEditSubmit = (newVM: V1VirtualMachine, diskFormState: V1DiskFormState) => {
+    const { registryCredentials } = diskFormState;
+    updateRegistryCredentials(registryCredentials);
+    return updateVM(newVM);
+  };
+
   const onEditModalToggle = () => {
     createModal(({ isOpen, onClose }) => (
       <DiskModal
@@ -88,10 +103,11 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({ diskName }) => {
             }
           })
         }
+        defaultFormValues={defaultFormValues}
         editDiskName={diskName}
         isOpen={isOpen}
         onClose={onClose}
-        onSubmit={updateVM}
+        onSubmit={handleEditSubmit}
         vm={vm}
       />
     ));

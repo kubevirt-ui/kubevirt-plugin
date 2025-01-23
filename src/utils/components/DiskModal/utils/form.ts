@@ -17,7 +17,7 @@ import { isRunning } from '@virtualmachines/utils';
 
 import { DEFAULT_DISK_SIZE } from './constants';
 import { doesSourceRequireDataVolume, getDefaultDiskType } from './helpers';
-import { SourceTypes, V1DiskFormState } from './types';
+import { DefaultFormValues, SourceTypes, V1DiskFormState } from './types';
 
 const getDefaultDataVolumeTemplate = (name: string): V1DataVolumeTemplateSpec => ({
   metadata: { name },
@@ -46,7 +46,11 @@ const createInitialStateFromSource: Record<
     (dataVolumeTemplate.spec.source.snapshot = { name: '', namespace: '' }),
 };
 
-export const getDefaultEditValues = (vm: V1VirtualMachine, editDiskName?: string) => {
+export const getDefaultEditValues = (
+  vm: V1VirtualMachine,
+  editDiskName?: string,
+  defaultValues?: DefaultFormValues,
+) => {
   const isBootSource = getBootDisk(vm)?.name === editDiskName;
   let diskToEdit = getDisks(vm)?.find((disk) => disk.name === editDiskName);
   const volumeToEdit = getVolumes(vm)?.find((volume) => volume.name === editDiskName);
@@ -61,6 +65,7 @@ export const getDefaultEditValues = (vm: V1VirtualMachine, editDiskName?: string
     disk: diskToEdit,
     isBootSource,
     volume: volumeToEdit,
+    ...(defaultValues ? defaultValues : {}),
   };
 };
 

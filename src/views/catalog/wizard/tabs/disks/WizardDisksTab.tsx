@@ -1,9 +1,15 @@
 import React from 'react';
 
+import useRegistryCredentials from '@catalog/utils/useRegistryCredentials/useRegistryCredentials';
 import { WizardTab } from '@catalog/wizard/tabs';
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import DiskSourceSelect from '@kubevirt-utils/components/DiskModal/components/DiskSourceSelect/DiskSourceSelect';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
-import { SourceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
+import {
+  DefaultFormValues,
+  SourceTypes,
+  V1DiskFormState,
+} from '@kubevirt-utils/components/DiskModal/utils/types';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import WindowsDrivers from '@kubevirt-utils/components/WindowsDrivers/WindowsDrivers';
@@ -28,6 +34,15 @@ const WizardDisksTab: WizardTab = ({ tabsData, updateTabsData, updateVM, vm }) =
   const [disks, disksLoaded] = useWizardDisksTableData(vm);
   const filters = useDisksFilters();
   const [data, filteredData, onFilterChange] = useListPageFilter(disks, filters);
+  const { decodedRegistryCredentials, updateRegistryCredentials } = useRegistryCredentials();
+
+  const handleSubmit = (newVM: V1VirtualMachine, diskFormState: V1DiskFormState) => {
+    const { registryCredentials } = diskFormState;
+    updateRegistryCredentials(registryCredentials);
+    return updateVM(newVM);
+  };
+
+  const defaultFormValues: DefaultFormValues = { registryCredentials: decodedRegistryCredentials };
 
   return (
     <PageSection variant={PageSectionVariants.light}>
@@ -53,9 +68,10 @@ const WizardDisksTab: WizardTab = ({ tabsData, updateTabsData, updateVM, vm }) =
                     })
                   }
                   createDiskSource={diskSource}
+                  defaultFormValues={defaultFormValues}
                   isOpen={isOpen}
                   onClose={onClose}
-                  onSubmit={updateVM}
+                  onSubmit={handleSubmit}
                   vm={vm}
                 />
               ));

@@ -47,7 +47,7 @@ export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
     DISABLED_GUEST_SYSTEM_LOGS_ACCESS,
   );
 
-  const onCreate = () =>
+  const onCreate = async () =>
     createVM({
       isDisableGuestSystemAccessLog,
       onFullfilled: (createdVM) => {

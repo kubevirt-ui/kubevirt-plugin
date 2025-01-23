@@ -8,7 +8,7 @@ import {
 } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import { SecretModel } from '@kubevirt-utils/models';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
+import { k8sCreate, k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
 
 import { getName } from '../shared';
 
@@ -93,4 +93,11 @@ export const createSecret: CreateSecretType = ({ namespace, password, secretName
     },
     model: SecretModel,
     ns: namespace,
+  });
+
+export const deleteSecret = (secret: IoK8sApiCoreV1Secret) =>
+  secret &&
+  k8sDelete({
+    model: SecretModel,
+    resource: secret,
   });

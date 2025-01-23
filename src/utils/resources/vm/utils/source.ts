@@ -14,7 +14,10 @@ import {
   DATA_SOURCE_CRONJOB_LABEL,
 } from '@kubevirt-utils/resources/template';
 import { TemplateBootSource } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
-import { getDataVolumeTemplates } from '@kubevirt-utils/resources/vm';
+import {
+  getDataVolumeTemplates,
+  getRootDataVolumeTemplateSpec,
+} from '@kubevirt-utils/resources/vm';
 
 import { getBootDisk, getVolumes } from './selectors';
 
@@ -132,4 +135,9 @@ export const getVMBootSourceLabel = (
     return BOOT_SOURCE_LABELS[BOOT_SOURCE.DATA_SOURCE_AUTO_IMPORT] || 'N/A';
 
   return BOOT_SOURCE_LABELS[bootSourceType] || 'N/A';
+};
+
+export const vmBootDiskSourceIsRegistry = (vm: V1VirtualMachine) => {
+  const rootDataVolumeTemplateSpec = getRootDataVolumeTemplateSpec(vm);
+  return Boolean(rootDataVolumeTemplateSpec?.spec?.source?.registry);
 };

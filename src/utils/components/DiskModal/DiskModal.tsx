@@ -12,6 +12,7 @@ import { V1DiskModalProps } from './utils/types';
 const DiskModal: FC<V1DiskModalProps> = ({
   createDiskSource,
   createdPVCName,
+  defaultFormValues,
   editDiskName,
   isOpen,
   onClose,
@@ -34,6 +35,7 @@ const DiskModal: FC<V1DiskModalProps> = ({
   return (
     <Modal
       createDiskSource={createDiskSource}
+      defaultFormValues={defaultFormValues}
       editDiskName={editDiskName}
       isCreated={!isEmpty(createdPVCName)}
       isOpen={isOpen}

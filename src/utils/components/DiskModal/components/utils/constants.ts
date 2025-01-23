@@ -39,3 +39,7 @@ export const CONTAINERDISK_IMAGE_FIELD = 'volume.containerDisk.image';
 export const PVC_CLAIMNAME_FIELD = 'volume.persistentVolumeClaim.claimName';
 
 export const REGISTRYURL_DATAVOLUME_FIELD = 'dataVolumeTemplate.spec.source.registry.url';
+
+export const REGISTRY_CREDENTIALS_FIELD = 'registryCredentials';
+export const REGISTRY_USERNAME_FIELD = 'registryCredentials.username';
+export const REGISTRY_PASSWORD_FIELD = 'registryCredentials.password';

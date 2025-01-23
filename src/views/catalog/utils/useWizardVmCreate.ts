@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import produce from 'immer';
 
+import useRegistryCredentials from '@catalog/utils/useRegistryCredentials/useRegistryCredentials';
 import { V1Devices, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { logTemplateFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
 import {
@@ -9,12 +10,15 @@ import {
 } from '@kubevirt-utils/extensions/telemetry/utils/constants';
 import { addUploadDataVolumeOwnerReference } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
+import { createSecret } from '@kubevirt-utils/resources/secret/utils';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
+import { vmBootDiskSourceIsRegistry } from '@kubevirt-utils/resources/vm/utils/source';
 import {
   HEADLESS_SERVICE_LABEL,
   HEADLESS_SERVICE_NAME,
 } from '@kubevirt-utils/utils/headless-service';
+import { addRandomSuffix } from '@kubevirt-utils/utils/utils';
 import { K8sResourceCommon, useK8sModels } from '@openshift-console/dynamic-plugin-sdk';
 
 import { getLabels } from '../../clusteroverview/OverviewTab/inventory-card/utils/flattenTemplates';
@@ -35,6 +39,7 @@ type UseWizardVmCreateValues = {
 
 export const useWizardVmCreate = (): UseWizardVmCreateValues => {
   const { tabsData, vm } = useWizardVMContext();
+  const { decodedRegistryCredentials } = useRegistryCredentials();
   const [models] = useK8sModels();
   const [isUDNManagedNamespace] = useNamespaceUDN(getNamespace(vm));
   const [authorizedSSHKeys, updateAuthorizedSSHKeys] = useKubevirtUserSettings('ssh');
@@ -46,6 +51,18 @@ export const useWizardVmCreate = (): UseWizardVmCreateValues => {
     try {
       setLoaded(false);
       setError(undefined);
+
+      const { password, username } = decodedRegistryCredentials;
+      const addSecret = username && password && vmBootDiskSourceIsRegistry(vm);
+      const imageSecretName = addRandomSuffix(getName(vm));
+      if (addSecret) {
+        await createSecret({
+          namespace: getNamespace(vm),
+          password,
+          secretName: imageSecretName,
+          username,
+        });
+      }
 
       const vmToCreate = produce(vm, (vmDraft) => {
         if (isDisableGuestSystemAccessLog) {
@@ -60,6 +77,9 @@ export const useWizardVmCreate = (): UseWizardVmCreateValues => {
 
         if (!isUDNManagedNamespace)
           vmDraft.spec.template.metadata.labels[HEADLESS_SERVICE_LABEL] = HEADLESS_SERVICE_NAME;
+
+        if (addSecret)
+          vmDraft.spec.dataVolumeTemplates[0].spec.source.registry.secretRef = imageSecretName;
       });
 
       const createdObjects = await createMultipleResources(
