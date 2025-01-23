@@ -5,7 +5,15 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getPrintableNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { TableData } from '@openshift-console/dynamic-plugin-sdk';
-import { Popover, PopoverPosition } from '@patternfly/react-core';
+import {
+  DescriptionList,
+  DescriptionListDescription,
+  DescriptionListGroup,
+  DescriptionListTerm,
+  DescriptionListTermHelpTextButton,
+  Popover,
+  PopoverPosition,
+} from '@patternfly/react-core';
 
 import { InterfacesData } from './utils/types';
 
@@ -28,20 +36,28 @@ const VirtualMachinesOverviewTabInterfacesRow: FC<
     <>
       <TableData activeColumnIDs={activeColumnIDs} id="name">
         <div data-test-id={`network-interface-${obj?.network?.name}`}>
-          <Popover
-            bodyContent={Object.entries(popoverFields).map(([key, value]) => (
-              <>
-                <div className="interface-row--title">{key}</div>
-                <div className="interface-row--value">{value || NO_DATA_DASH}</div>
-              </>
-            ))}
-            hasAutoWidth
-            position={PopoverPosition.left}
-          >
-            <div className="pf-c-description-list__text pf-m-help-text help">
-              {obj?.iface?.name}
-            </div>
-          </Popover>
+          <DescriptionList>
+            <Popover
+              bodyContent={
+                <DescriptionList isHorizontal>
+                  {Object.entries(popoverFields).map(([key, value]) => (
+                    <DescriptionListGroup key={key}>
+                      <DescriptionListTerm>{key}</DescriptionListTerm>
+                      <DescriptionListDescription>
+                        {value || NO_DATA_DASH}
+                      </DescriptionListDescription>
+                    </DescriptionListGroup>
+                  ))}
+                </DescriptionList>
+              }
+              hasAutoWidth
+              position={PopoverPosition.left}
+            >
+              <DescriptionListTermHelpTextButton>
+                {obj?.iface?.name}
+              </DescriptionListTermHelpTextButton>
+            </Popover>
+          </DescriptionList>
         </div>
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="ip">
