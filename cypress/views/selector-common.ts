@@ -89,7 +89,6 @@ export const unpauseIcon = 'button[data-test-id="vm-action-unpause-button"]';
 export const vmStatusOnDetails = (name: string) => `[data-test-id="${name}-status"]`;
 export const detailsKebab = '#toggle-id-disk';
 export const activeTab = '.co-m-horizontal-nav-item--active';
-export const hintRow = '.interface-row--title';
 export const nicDefault = '[data-test-id="network-interface-default"]';
 export const bootMode = (name: string) => `button[data-test-id="${name}-boot-method"]`;
 export const os = '[data-test-id="virtual-machine-overview-details-os"]';
