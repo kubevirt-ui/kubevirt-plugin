@@ -75,11 +75,11 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
       options.unshift({
         children: (
           <>
-            {podNetworkingText} <Label isCompact>{interfacesTypes.bridge} Binding</Label>
+            {podNetworkingText} <Label isCompact>{interfacesTypes.masquerade} Binding</Label>
           </>
         ),
         key: 'pod-networking',
-        type: interfacesTypes.bridge,
+        type: interfacesTypes.masquerade,
         value: podNetworkingText,
       });
     }
