@@ -68,8 +68,15 @@ const HardwareDevicesModal: FC<HardwareDevicesModalProps> = ({
 
   const disableSubmit = devices.some((device) => isEmpty(device?.deviceName));
 
+  const toK8sDevice = ({ deviceName, name }: HardwareDeviceModalRow): V1GPU | V1HostDevice => ({
+    deviceName,
+    name,
+  });
+
   const updatedVM = produceVMDevices(vm, (vmDraft: V1VirtualMachine) => {
-    vmDraft.spec.template.spec.domain.devices[type] = !isEmpty(devices) ? devices : null;
+    vmDraft.spec.template.spec.domain.devices[type] = isEmpty(devices)
+      ? null
+      : devices.map(toK8sDevice);
   });
 
   return (
