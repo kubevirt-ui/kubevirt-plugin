@@ -9,7 +9,9 @@ import {
   getInterfaces,
   getNetworks,
 } from '@kubevirt-utils/resources/vm';
+import { UDN_BINDING_NAME } from '@kubevirt-utils/resources/vm/utils/constants';
 import {
+  interfaceLabels,
   interfacesTypes,
   NetworkPresentation,
 } from '@kubevirt-utils/resources/vm/utils/network/constants';
@@ -128,11 +130,15 @@ export const createInterface = (
   interfaceMACAddress: string,
   interfaceType = interfacesTypes.bridge,
 ): V1Interface => {
+  const resolvedInterfaceProp = interfaceLabels[interfaceType];
+  const validInterfaceProp: keyof V1Interface =
+    resolvedInterfaceProp === UDN_BINDING_NAME ? 'bridge' : resolvedInterfaceProp;
+
   return {
-    [interfaceType?.replace('-', '')?.toLowerCase()]: {},
     macAddress: interfaceMACAddress,
     model: interfaceModel,
     name: nicName,
+    [validInterfaceProp]: {},
   };
 };
 
