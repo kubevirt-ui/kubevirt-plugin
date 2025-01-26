@@ -103,6 +103,7 @@ const VirtualMachineDiagnosticTabDataVolumeStatus: FC<
         {sortedData.map((row, index) => (
           <VirtualMachineDiagnosticTabRow
             activeColumns={columns}
+            dataVolumeResourceLink
             expend={expend}
             index={index}
             key={row?.name}

@@ -5,6 +5,7 @@ import { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/ba
 
 import { DiagnosticSort } from '../utils/types';
 
+import { NAME_COLUMN_ID } from './constants';
 import useDiagnosticSort from './useDiagnosticSort';
 
 type DiagnosticColumn = {
@@ -24,8 +25,8 @@ const useDiagnosticDataVolumeStatusTableColumns: UseDiagnosticDataVolumeStatusTa
 
   const columns: TableColumn<DiagnosticColumn>[] = [
     {
-      cell: { sort: (columnIndex) => getSorting('name', columnIndex) },
-      id: 'name',
+      cell: { sort: (columnIndex) => getSorting(NAME_COLUMN_ID, columnIndex) },
+      id: NAME_COLUMN_ID,
       title: t('Name'),
     },
     {
