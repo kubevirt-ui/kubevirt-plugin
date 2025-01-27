@@ -15,6 +15,7 @@ import VirtualMachineMigrationDestinationTab from './tabs/VirtualMachineMigratio
 import VirtualMachineMigrationDetails from './tabs/VirtualMachineMigrationDetails';
 import VirtualMachineMigrationReviewTab from './tabs/VirtualMachineMigrationReviewTab';
 import { entireVMSelected, migrateVM } from './utils';
+import VirtualMachineMigrationStatus from './VirtualMachineMigrationStatus';
 
 import './virtual-machine-migration-modal.scss';
 
@@ -34,6 +35,8 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
   const [selectedStorageClass, setSelectedStorageClass] = useState('');
   const [migrationError, setMigrationError] = useState<Error | null>(null);
   const [migrationLoading, setMigrationLoading] = useState(false);
+  const [migrationStarted, setMigrationStarted] = useState(false);
+
   const [selectedPVCs, setSelectedPVCs] = useState<IoK8sApiCoreV1PersistentVolumeClaim[] | null>(
     null,
   );
@@ -60,7 +63,7 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
     try {
       await migrateVM(vm, pvcsToMigrate, destinationStorageClass);
 
-      onClose();
+      setMigrationStarted(true);
     } catch (apiError) {
       setMigrationError(apiError);
     }
@@ -79,60 +82,64 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
       variant="large"
     >
       <StateHandler error={loadingError} loaded>
-        <Wizard
-          header={
-            <WizardHeader
-              closeButtonAriaLabel={t('Close header')}
-              description={t('Migrate VirtualMachine storage to a different StorageClass.')}
-              onClose={onClose}
-              title={t('Migrate VirtualMachine storage')}
-            />
-          }
-          onClose={onClose}
-          onSave={onSubmit}
-          title={t('Migrate VirtualMachine storage')}
-        >
-          <WizardStep
-            footer={{ isNextDisabled: nothingSelected }}
-            id="wizard-migration-details"
-            name={t('Migration details')}
+        {migrationStarted ? (
+          <VirtualMachineMigrationStatus onClose={onClose} vm={vm} />
+        ) : (
+          <Wizard
+            header={
+              <WizardHeader
+                closeButtonAriaLabel={t('Close header')}
+                description={t('Migrate VirtualMachine storage to a different StorageClass.')}
+                onClose={onClose}
+                title={t('Migrate VirtualMachine storage')}
+              />
+            }
+            onClose={onClose}
+            onSave={onSubmit}
+            title={t('Migrate VirtualMachine storage')}
           >
-            {loaded && scLoaded ? (
-              <VirtualMachineMigrationDetails
-                pvcs={pvcs}
-                selectedPVCs={selectedPVCs}
-                setSelectedPVCs={setSelectedPVCs}
+            <WizardStep
+              footer={{ isNextDisabled: nothingSelected }}
+              id="wizard-migration-details"
+              name={t('Migration details')}
+            >
+              {loaded && scLoaded ? (
+                <VirtualMachineMigrationDetails
+                  pvcs={pvcs}
+                  selectedPVCs={selectedPVCs}
+                  setSelectedPVCs={setSelectedPVCs}
+                  vm={vm}
+                />
+              ) : (
+                <Loading />
+              )}
+            </WizardStep>
+            <WizardStep id="wizard-migrate-destination" name={t('Destination StorageClass')}>
+              <VirtualMachineMigrationDestinationTab
+                defaultStorageClassName={defaultStorageClassName}
+                destinationStorageClass={destinationStorageClass}
+                setSelectedStorageClass={setSelectedStorageClass}
+                sortedStorageClasses={sortedStorageClasses}
+              />
+            </WizardStep>
+            <WizardStep
+              footer={{
+                isNextDisabled: migrationLoading,
+                nextButtonText: t('Migrate VirtualMachine storage'),
+              }}
+              id="wizard-migrate-review"
+              name={t('Review')}
+            >
+              <VirtualMachineMigrationReviewTab
+                defaultStorageClassName={defaultStorageClassName}
+                destinationStorageClass={destinationStorageClass}
+                migrationError={migrationError}
+                pvcs={pvcsToMigrate}
                 vm={vm}
               />
-            ) : (
-              <Loading />
-            )}
-          </WizardStep>
-          <WizardStep id="wizard-migrate-destination" name={t('Destination StorageClass')}>
-            <VirtualMachineMigrationDestinationTab
-              defaultStorageClassName={defaultStorageClassName}
-              destinationStorageClass={destinationStorageClass}
-              setSelectedStorageClass={setSelectedStorageClass}
-              sortedStorageClasses={sortedStorageClasses}
-            />
-          </WizardStep>
-          <WizardStep
-            footer={{
-              isNextDisabled: migrationLoading,
-              nextButtonText: t('Migrate VirtualMachine storage'),
-            }}
-            id="wizard-migrate-review"
-            name={t('Review')}
-          >
-            <VirtualMachineMigrationReviewTab
-              defaultStorageClassName={defaultStorageClassName}
-              destinationStorageClass={destinationStorageClass}
-              migrationError={migrationError}
-              pvcs={pvcsToMigrate}
-              vm={vm}
-            />
-          </WizardStep>
-        </Wizard>
+            </WizardStep>
+          </Wizard>
+        )}
       </StateHandler>
     </Modal>
   );
