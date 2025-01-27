@@ -1,7 +1,7 @@
 /* eslint-disable require-jsdoc */
 import { V1Interface, V1Network } from '@kubevirt-ui/kubevirt-api/kubevirt';
 
-import { UDN_BINDING_NAME } from '../constants';
+import { BRIDGE, MASQUERADE, SRIOV, UDN_BINDING_NAME } from '../constants';
 
 export type NetworkPresentation = {
   iface: V1Interface;
@@ -16,19 +16,23 @@ const typeHandler = {
 
 const labelHandler = {
   get(target: LabelMap, prop: string) {
-    return target[prop] ?? 'bridge';
+    return target[prop] ?? BRIDGE;
   },
 };
 
-export type InterfaceTypes = 'bridge' | 'masquerade' | 'sriov' | typeof UDN_BINDING_NAME;
+export type InterfaceTypes =
+  | typeof BRIDGE
+  | typeof MASQUERADE
+  | typeof SRIOV
+  | typeof UDN_BINDING_NAME;
 type LabelMap = { [key: string]: InterfaceTypes };
 type TypeMap = { [key in InterfaceTypes]: string };
 
 const types2labels: TypeMap = {
   bridge: 'Bridge',
+  l2bridge: 'L2 bridge',
   masquerade: 'Masquerade',
   sriov: 'SR-IOV',
-  [UDN_BINDING_NAME]: 'L2 bridge',
 };
 
 const labels2types: LabelMap = Object.fromEntries(

@@ -9,7 +9,7 @@ import {
   getInterfaces,
   getNetworks,
 } from '@kubevirt-utils/resources/vm';
-import { UDN_BINDING_NAME } from '@kubevirt-utils/resources/vm/utils/constants';
+import { BRIDGE, UDN_BINDING_NAME } from '@kubevirt-utils/resources/vm/utils/constants';
 import {
   interfaceLabels,
   interfacesTypes,
@@ -132,7 +132,7 @@ export const createInterface = (
 ): V1Interface => {
   const resolvedInterfaceProp = interfaceLabels[interfaceType];
   const validInterfaceProp: keyof V1Interface =
-    resolvedInterfaceProp === UDN_BINDING_NAME ? 'bridge' : resolvedInterfaceProp;
+    resolvedInterfaceProp === UDN_BINDING_NAME ? BRIDGE : resolvedInterfaceProp;
 
   return {
     macAddress: interfaceMACAddress,
