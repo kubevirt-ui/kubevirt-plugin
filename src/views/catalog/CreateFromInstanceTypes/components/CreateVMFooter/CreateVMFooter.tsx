@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useMemo, useState } from 'react';
+import React, { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
@@ -18,12 +18,10 @@ import {
   generateNewSysprepConfig,
   UNATTEND,
 } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
-import { isValidVMName } from '@kubevirt-utils/components/VMNameValidationHelperText/utils/utils';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { logITFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
 import {
-  CANCEL_CREATE_VM_BUTTON_CLICKED,
   CREATE_VM_BUTTON_CLICKED,
   CREATE_VM_FAILED,
   CREATE_VM_SUCCEEDED,
@@ -40,21 +38,13 @@ import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN
 import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { createHeadlessService } from '@kubevirt-utils/utils/headless-service';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { k8sCreate, K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
+import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
-import {
-  Button,
-  ButtonVariant,
-  Checkbox,
-  Split,
-  SplitItem,
-  Stack,
-  StackItem,
-  Tooltip,
-} from '@patternfly/react-core';
+import { Checkbox, Stack, StackItem } from '@patternfly/react-core';
 
 import { AUTOMATIC_UPDATE_FEATURE_NAME } from '../../../../clusteroverview/SettingsTab/ClusterTab/components/GuestManagmentSection/AutomaticSubscriptionRHELGuests/utils/constants';
 
+import ActionButtons from './components/ActionButtons/ActionButtons';
 import YamlAndCLIViewerModal from './components/YamlAndCLIViewerModal/YamlAndCLIViewerModal';
 
 import './CreateVMFooter.scss';
@@ -78,32 +68,9 @@ const CreateVMFooter: FC = () => {
 
   const { instanceTypeVMState, setStartVM, setVM, startVM, vmNamespaceTarget } =
     useInstanceTypeVMStore();
-  const {
-    selectedBootableVolume,
-    selectedInstanceType,
-    sshSecretCredentials,
-    sysprepConfigMapData,
-    vmName,
-  } = instanceTypeVMState;
+  const { sshSecretCredentials, sysprepConfigMapData, vmName } = instanceTypeVMState;
   const { applyKeyToProject, secretOption, sshPubKey, sshSecretName } = sshSecretCredentials || {};
   const isWindowsOSVolume = useIsWindowsBootableVolume();
-
-  const onCancel = useCallback(() => {
-    logITFlowEvent(CANCEL_CREATE_VM_BUTTON_CLICKED, null, { vmName: vmName });
-    navigate(getResourceUrl({ activeNamespace, model: VirtualMachineModel }));
-  }, [activeNamespace, navigate, vmName]);
-
-  const [canCreateVM] = useAccessReview({
-    group: VirtualMachineModel.apiGroup,
-    namespace: vmNamespaceTarget,
-    resource: VirtualMachineModel.plural,
-    verb: 'create' as K8sVerb,
-  });
-
-  const hasNameAndInstanceType = useMemo(
-    () => !isEmpty(vmName) && !isEmpty(selectedInstanceType),
-    [vmName, selectedInstanceType],
-  );
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
@@ -204,15 +171,6 @@ const CreateVMFooter: FC = () => {
     }
   };
 
-  const isValidVmName = isValidVMName(vmName);
-
-  const isDisabled =
-    isSubmitting ||
-    isEmpty(selectedBootableVolume) ||
-    !canCreateVM ||
-    !hasNameAndInstanceType ||
-    !isValidVmName;
-
   return (
     <footer className="create-vm-instance-type-footer">
       <Stack hasGutter>
@@ -230,74 +188,27 @@ const CreateVMFooter: FC = () => {
           />
         </StackItem>
         <StackItem>
-          <Split hasGutter>
-            <SplitItem>
-              <Tooltip
-                content={
-                  <Stack className="cpu-helper-text__body-content">
-                    {t('Ask your cluster administrator for access permissions.')}
-                  </Stack>
-                }
-                hidden={!isDisabled}
-              >
-                <Button
-                  isAriaDisabled={isDisabled}
-                  isLoading={isSubmitting}
-                  onClick={handleSubmit}
-                  variant={ButtonVariant.primary}
-                >
-                  {t('Create VirtualMachine')}
-                </Button>
-              </Tooltip>
-            </SplitItem>
-            <SplitItem>
-              <Button
-                isDisabled={
-                  isSubmitting ||
-                  isEmpty(selectedBootableVolume) ||
-                  !canCreateVM ||
-                  !hasNameAndInstanceType ||
-                  !isValidVmName
-                }
-                isLoading={isSubmitting}
-                onClick={handleCustomize}
-                variant={ButtonVariant.secondary}
-              >
-                {t('Customize VirtualMachine')}
-              </Button>
-            </SplitItem>
-
-            <SplitItem>
-              <Button onClick={onCancel} variant={ButtonVariant.link}>
-                {t('Cancel')}
-              </Button>
-            </SplitItem>
-            <SplitItem isFilled />
-            <SplitItem>
-              <Button
-                onClick={() => {
-                  logITFlowEvent(VIEW_YAML_AND_CLI_CLICKED, null, { vmName: vmName });
-                  createModal((props) => (
-                    <YamlAndCLIViewerModal
-                      vm={generateVM({
-                        autoUpdateEnabled,
-                        instanceTypeState: instanceTypeVMState,
-                        isUDNManagedNamespace,
-                        startVM,
-                        subscriptionData,
-                        targetNamespace: vmNamespaceTarget,
-                      })}
-                      {...props}
-                    />
-                  ));
-                }}
-                isDisabled={isEmpty(selectedBootableVolume) || !hasNameAndInstanceType}
-                variant={ButtonVariant.secondary}
-              >
-                {t('View YAML & CLI')}
-              </Button>
-            </SplitItem>
-          </Split>
+          <ActionButtons
+            onViewYAML={() => {
+              logITFlowEvent(VIEW_YAML_AND_CLI_CLICKED, null, { vmName: vmName });
+              createModal((props) => (
+                <YamlAndCLIViewerModal
+                  vm={generateVM({
+                    autoUpdateEnabled,
+                    instanceTypeState: instanceTypeVMState,
+                    isUDNManagedNamespace,
+                    startVM,
+                    subscriptionData,
+                    targetNamespace: vmNamespaceTarget,
+                  })}
+                  {...props}
+                />
+              ));
+            }}
+            isSubmitting={isSubmitting}
+            onCreate={handleSubmit}
+            onCustomize={handleCustomize}
+          />
         </StackItem>
       </Stack>
     </footer>
