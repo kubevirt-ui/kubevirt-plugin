@@ -1,7 +1,10 @@
 import React, { FC, useEffect, useMemo } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
-import { V1beta1StorageSpecVolumeModeEnum } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1beta1StorageSpecAccessModesEnum,
+  V1beta1StorageSpecVolumeModeEnum,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, Radio } from '@patternfly/react-core';
 
@@ -12,11 +15,7 @@ import {
   VOLUME_MODE_FIELD,
   VOLUMEMODE_FIELDID,
 } from '../utils/constants';
-import {
-  ACCESS_MODES,
-  getVolumeModeForProvisioner,
-  VOLUME_MODE_RADIO_OPTIONS,
-} from '../utils/modesMapping';
+import { getVolumeModeForProvisioner, VOLUME_MODE_RADIO_OPTIONS } from '../utils/modesMapping';
 
 const VolumeMode: FC = () => {
   const { t } = useKubevirtTranslation();
@@ -24,7 +23,7 @@ const VolumeMode: FC = () => {
   const { control, setValue, watch } = useFormContext<V1DiskFormState>();
 
   const volumeMode = watch(VOLUME_MODE_FIELD);
-  const accessModes = watch(ACCESS_MODE_FIELD) as ACCESS_MODES[];
+  const accessModes = watch(ACCESS_MODE_FIELD) as V1beta1StorageSpecAccessModesEnum[];
   const storageClassProvisioner = watch(STORAGE_CLASS_PROVIDER_FIELD);
 
   const allowedVolumeModes = useMemo(

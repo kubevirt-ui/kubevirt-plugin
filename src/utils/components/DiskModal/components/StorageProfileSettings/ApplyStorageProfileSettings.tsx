@@ -45,7 +45,7 @@ const ApplyStorageProfileSettings: FC = () => {
     const propertySet = claimPropertySets?.[0];
 
     if (isEmpty(accessModes) && !isEmpty(propertySet?.accessModes[0])) {
-      setValue(ACCESS_MODE_FIELD, [propertySet?.accessModes[0]]);
+      setValue(ACCESS_MODE_FIELD, [propertySet?.accessModes?.[0]]);
     }
     if (isEmpty(volumeMode) && !isEmpty(propertySet?.volumeMode)) {
       setValue(VOLUME_MODE_FIELD, propertySet?.volumeMode as V1beta1StorageSpecVolumeModeEnum);
