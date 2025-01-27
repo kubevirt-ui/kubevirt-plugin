@@ -102,13 +102,13 @@ const UploadPVCForm: FC<UploadPVCFormProps> = ({
     const isIso = (fileValue as File)?.name?.toLowerCase().endsWith('.iso');
     setMountAsCDROM(isIso);
     setPvcSizeFromTemplate(!isIso);
-    setRequestSizeValue(isIso ? value?.toString() : os?.baseImageRecomendedSize[0] || '');
+    setRequestSizeValue(isIso ? value?.toString() : os?.baseImageRecomendedSize?.[0] || '');
     setRequestSizeUnit(os?.baseImageRecomendedSize[1] || BinaryUnit.Gi);
   }, [fileValue, os]);
 
   useEffect(() => {
     if (storageClassName && spLoaded && applySP) {
-      spAccessMode[0] !== accessMode && setAccessMode(spAccessMode[0]);
+      spAccessMode?.[0] !== accessMode && setAccessMode(spAccessMode?.[0]);
       spVolumeMode !== volumeMode && setVolumeMode(spVolumeMode);
     }
   }, [spLoaded, spAccessMode, spVolumeMode, accessMode, volumeMode, storageClassName, applySP]);
