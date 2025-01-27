@@ -5,6 +5,8 @@ import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import SelectTypeahead from '@kubevirt-utils/components/SelectTypeahead/SelectTypeahead';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getNetworks } from '@kubevirt-utils/resources/vm';
 import { interfacesTypes } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { getNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { FormGroup, Label, ValidatedOptions } from '@patternfly/react-core';
@@ -38,12 +40,22 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
   vm,
 }) => {
   const { t } = useKubevirtTranslation();
+
   const { loaded, loadError, nads } = useNADsData(vm?.metadata?.namespace || namespace);
+
+  const currentlyUsedNADsNames = useMemo(
+    () => getNetworks(vm)?.map((network) => network?.multus?.networkName),
+    [vm],
+  );
+
+  const filteredNADs = nads?.filter(
+    (nad) => !currentlyUsedNADsNames.includes(`${getNamespace(nad)}/${getName(nad)}`),
+  );
 
   const selectedFirstOnLoad = useRef(false);
 
   const hasPodNetwork = useMemo(() => podNetworkExists(vm), [vm]);
-  const hasNads = useMemo(() => nads?.length > 0, [nads]);
+  const hasNads = useMemo(() => filteredNADs?.length > 0, [filteredNADs]);
   const isPodNetworkingOptionExists =
     !hasPodNetwork || (isEditing && networkNameStartWithPod(editInitValueNetworkName));
 
@@ -55,7 +67,7 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
   const podNetworkingText = useMemo(() => t('Pod Networking'), [t]);
 
   const networkOptions = useMemo(() => {
-    const options = nads?.map((nad) => {
+    const options = filteredNADs?.map((nad) => {
       const { name, namespace: nadNamespace, uid } = nad?.metadata;
       const type = getNadType(nad);
       const value = `${nadNamespace}/${name}`;
@@ -84,7 +96,7 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
       });
     }
     return options;
-  }, [isPodNetworkingOptionExists, nads, podNetworkingText]);
+  }, [isPodNetworkingOptionExists, filteredNADs, podNetworkingText]);
 
   useEffect(() => {
     if (!loaded) return;
@@ -94,7 +106,7 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
     if (!initialInterfaceType) return;
 
     setInterfaceType(initialInterfaceType);
-  }, [loaded, nads, setInterfaceType, iface]);
+  }, [loaded, filteredNADs, setInterfaceType, iface]);
 
   const validated =
     canCreateNetworkInterface || isEditing ? ValidatedOptions.default : ValidatedOptions.error;
