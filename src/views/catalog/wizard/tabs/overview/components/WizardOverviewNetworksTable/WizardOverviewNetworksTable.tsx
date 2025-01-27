@@ -3,14 +3,15 @@ import * as React from 'react';
 import { WizardDescriptionItem } from '@catalog/wizard/components/WizardDescriptionItem';
 import { V1Interface, V1Network } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { BRIDGE, MASQUERADE, SRIOV } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getNetworkInterfaceRowData } from '@kubevirt-utils/resources/vm/utils/network/rowData';
 import { getPrintableNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { DescriptionList, Stack, StackItem } from '@patternfly/react-core';
 
 export const interfacesTypes = {
-  bridge: 'Bridge',
-  masquerade: 'Masquerade',
-  sriov: 'SR-IOV',
+  [BRIDGE]: 'Bridge',
+  [MASQUERADE]: 'Masquerade',
+  [SRIOV]: 'SR-IOV',
 };
 
 export const WizardOverviewNetworksTable: React.FC<{

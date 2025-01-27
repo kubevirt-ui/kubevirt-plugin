@@ -1,7 +1,7 @@
 /* eslint-disable require-jsdoc */
 import { V1Interface, V1Network } from '@kubevirt-ui/kubevirt-api/kubevirt';
 
-import { UDN_BINDING_NAME } from '../constants';
+import { BRIDGE, MASQUERADE, SRIOV, UDN_BINDING_NAME } from '../constants';
 
 export type NetworkPresentation = {
   iface: V1Interface;
@@ -9,18 +9,39 @@ export type NetworkPresentation = {
 };
 
 const typeHandler = {
-  get(target, prop) {
+  get(target: TypeMap, prop: string) {
     return target[prop] ?? target.bridge;
   },
 };
 
-const types = {
-  bridge: 'Bridge',
-  masquerade: 'Masquerade',
-  sriov: 'SR-IOV',
-  [UDN_BINDING_NAME]: 'L2 bridge',
+const labelHandler = {
+  get(target: LabelMap, prop: string) {
+    return target[prop] ?? BRIDGE;
+  },
 };
 
-export const interfacesTypes = new Proxy(types, typeHandler);
+export type InterfaceTypes =
+  | typeof BRIDGE
+  | typeof MASQUERADE
+  | typeof SRIOV
+  | typeof UDN_BINDING_NAME;
+type LabelMap = { [key: string]: InterfaceTypes };
+type TypeMap = { [key in InterfaceTypes]: string };
+
+const types2labels: TypeMap = {
+  bridge: 'Bridge',
+  l2bridge: 'L2 bridge',
+  masquerade: 'Masquerade',
+  sriov: 'SR-IOV',
+};
+
+const labels2types: LabelMap = Object.fromEntries(
+  Object.entries(types2labels).map(
+    ([type, label]: [InterfaceTypes, string]): [string, InterfaceTypes] => [label, type],
+  ),
+);
+
+export const interfacesTypes = new Proxy<TypeMap>(types2labels, typeHandler);
+export const interfaceLabels = new Proxy<LabelMap>(labels2types, labelHandler);
 
 export const PRIMARY_UDN_BINDING = 'primary-udn-kubevirt-binding';
