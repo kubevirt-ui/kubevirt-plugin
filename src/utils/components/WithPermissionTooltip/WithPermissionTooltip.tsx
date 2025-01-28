@@ -1,7 +1,9 @@
 import React, { FC, ReactElement, ReactNode } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Tooltip, TooltipPosition } from '@patternfly/react-core';
+import { TooltipPosition } from '@patternfly/react-core';
+
+import HidableTooltip from '../HidableTooltip/HidableTooltip';
 
 type WithPermissionTooltipProps = {
   allowed: boolean;
@@ -16,15 +18,14 @@ const WithPermissionTooltip: FC<WithPermissionTooltipProps> = ({
 }): ReactElement => {
   const { t } = useKubevirtTranslation();
 
-  return allowed ? (
-    <>{children}</>
-  ) : (
-    <Tooltip
+  return (
+    <HidableTooltip
       content={title || t(`You don't have permission to perform this action`)}
+      hidden={allowed}
       position={TooltipPosition.right}
     >
       <>{children}</>
-    </Tooltip>
+    </HidableTooltip>
   );
 };
 
