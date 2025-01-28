@@ -19,6 +19,7 @@ import {
 } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getPreferredBootmode } from '@kubevirt-utils/resources/preference/helper';
 import { asAccessReview, getAnnotation, getLabel, getName } from '@kubevirt-utils/resources/shared';
 import { DESCRIPTION_ANNOTATION, getDevices, getHostname } from '@kubevirt-utils/resources/vm';
 import { updateCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
@@ -28,8 +29,13 @@ import DetailsSectionBoot from '@virtualmachines/details/tabs/configuration/deta
 import DetailsSectionHardware from '@virtualmachines/details/tabs/configuration/details/components/DetailsSectionHardware';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
+import usePreference from '../../hooks/usePreference';
+
 const CustomizeInstanceTypeDetailsTab = () => {
   const vm = vmSignal.value;
+
+  const [preference, preferenceLoading] = usePreference(vm);
+
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
   const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
@@ -54,7 +60,7 @@ const CustomizeInstanceTypeDetailsTab = () => {
 
   const vmName = getName(vm);
 
-  if (!vm) {
+  if (!vm || preferenceLoading) {
     return <Loading />;
   }
 
@@ -212,7 +218,12 @@ const CustomizeInstanceTypeDetailsTab = () => {
               }
               vm={vm}
             />
-            <DetailsSectionBoot canUpdateVM={canUpdateVM} isCustomizeInstanceType vm={vm} />
+            <DetailsSectionBoot
+              canUpdateVM={canUpdateVM}
+              isCustomizeInstanceType
+              preferredBootmode={getPreferredBootmode(preference)}
+              vm={vm}
+            />
           </DescriptionList>
         </GridItem>
       </Grid>

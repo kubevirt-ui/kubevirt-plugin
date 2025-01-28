@@ -6,6 +6,7 @@ import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevir
 import BootOrderSummary from '@kubevirt-utils/components/BootOrder/BootOrderSummary';
 import BootOrderModal from '@kubevirt-utils/components/BootOrderModal/BootOrderModal';
 import FirmwareBootloaderModal from '@kubevirt-utils/components/FirmwareBootloaderModal/FirmwareBootloaderModal';
+import { BootMode } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/constants';
 import { getBootloaderTitleFromVM } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/utils';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
@@ -26,6 +27,7 @@ type DetailsSectionBootProps = {
   canUpdateVM: boolean;
   instanceTypeVM?: V1VirtualMachine;
   isCustomizeInstanceType?: boolean;
+  preferredBootmode?: BootMode;
   vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
@@ -34,6 +36,7 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
   canUpdateVM,
   instanceTypeVM,
   isCustomizeInstanceType,
+  preferredBootmode,
   vm,
   vmi,
 }) => {
@@ -58,7 +61,7 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
       <VirtualMachineDescriptionItem
         descriptionData={
           <div className={classNames({ 'text-muted': !canUpdateVM })}>
-            {getBootloaderTitleFromVM(instanceTypeVM || vm)}
+            {getBootloaderTitleFromVM(instanceTypeVM || vm, preferredBootmode)}
           </div>
         }
         onEditClick={() =>
