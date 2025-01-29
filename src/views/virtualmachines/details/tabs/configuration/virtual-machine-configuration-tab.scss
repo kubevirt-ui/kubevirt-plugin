@@ -1,10 +1,11 @@
 .VirtualMachineConfigurationTab {
   height: 100%;
-  &--main {
+  &--body > &--main {
     margin: var(--pf-global--spacer--sm);
     width: fit-content;
     min-width: max-content;
     max-width: 100px;
+    padding-right: var(--pf-global--spacer--3xl);
   }
   &--content {
     width: 100%;
