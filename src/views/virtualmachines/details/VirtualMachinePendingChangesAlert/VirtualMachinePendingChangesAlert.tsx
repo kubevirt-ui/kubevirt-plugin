@@ -3,6 +3,8 @@ import React, { FC } from 'react';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { usePendingChanges } from '@kubevirt-utils/components/PendingChanges/hooks/usePendingChanges';
 import { PendingChangesAlert } from '@kubevirt-utils/components/PendingChanges/PendingChangesAlert/PendingChangesAlert';
+import { getStatusConditionByType } from '@kubevirt-utils/resources/vm';
+import { VirtualMachineStatusConditionTypes } from '@kubevirt-utils/resources/vm/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Stack, StackItem } from '@patternfly/react-core';
 import LiveMigratePendingChanges from '@virtualmachines/details/VirtualMachinePendingChangesAlert/LiveMigratePendingChanges';
@@ -29,6 +31,10 @@ const VirtualMachinePendingChangesAlert: FC<VirtualMachinePendingChangesAlertPro
   }
 
   const { liveMigrationChanges, restartChanges } = splitPendingChanges(pendingChanges);
+  const restartRequiredCondition = getStatusConditionByType(
+    vm,
+    VirtualMachineStatusConditionTypes.RestartRequired,
+  );
 
   return (
     <PendingChangesAlert isExpandable isWarning>
@@ -40,7 +46,10 @@ const VirtualMachinePendingChangesAlert: FC<VirtualMachinePendingChangesAlertPro
         )}
         {!isEmpty(restartChanges) && (
           <StackItem>
-            <RestartPendingChanges pendingChanges={restartChanges} />
+            <RestartPendingChanges
+              pendingChanges={restartChanges}
+              restartRequiredCondition={restartRequiredCondition}
+            />
           </StackItem>
         )}
       </Stack>
