@@ -89,20 +89,11 @@ export const findNetworkMaxYValue = (
   return isNaN(roundedMax) ? 0 : roundedMax;
 };
 
-export const getNetworkTickValues = (Ymax: number) => {
-  const tickValues = Array.from({ length: Ymax + 1 }, (_, index) => {
-    if (index === 0) return '1 Bps';
-    if (index === Math.round(Ymax)) return `${Math.round(Ymax + 1)} Bps`;
-    return index.toString() + ' Bps';
-  });
-  return tickValues;
-};
-
 export const formatNetworkYTick = (tick: any, index: number, ticks: any[]) => {
   const isFirst = index === 0;
   const isLast = index === ticks.length - 1;
   if (isLast || isFirst) {
-    return tick;
+    return xbytes(tick, { fixed: 1, iec: true });
   }
   return;
 };
