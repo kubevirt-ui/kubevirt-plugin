@@ -39,7 +39,11 @@ const AlertStatusItem: React.FC<AlertStatusItemProps> = ({ alertDetails, alertTy
           <span className="alert-item__text co-break-word">{description}</span>
         </div>
         <div className="alert-item__more">
-          <Link to={link}>{t('View alert')}</Link>
+          <Link to={link}>
+            {alertType === AlertType.critical
+              ? t('View alert')
+              : t('View {{alertType}}', { alertType })}
+          </Link>
         </div>
       </div>
     </div>

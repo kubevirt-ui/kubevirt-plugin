@@ -1399,6 +1399,7 @@
   "vCPU wait": "vCPU wait",
   "Vendor": "Vendor",
   "Verify the details and click <1>Migrate VirtualMachine storage</1> to start the migration": "Verify the details and click <1>Migrate VirtualMachine storage</1> to start the migration",
+  "View {{alertType}}": "View {{alertType}}",
   "view {{qualifiedNodesCount}} matching nodes": "view {{qualifiedNodesCount}} matching nodes",
   "View alert": "View alert",
   "View alerts": "View alerts",
