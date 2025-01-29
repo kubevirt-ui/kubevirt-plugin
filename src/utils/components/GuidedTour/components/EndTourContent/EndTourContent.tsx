@@ -12,7 +12,7 @@ const EndTourContent: FC = () => {
     <Trans t={t}>
       Thank you for taking the tour.
       <br />
-      Stay up-to-date with Openshift Virtualization on our{' '}
+      Stay up-to-date with OpenShift Virtualization on our{' '}
       <Link target="_blank" to={documentationURL.REDHAT_BLOG}>
         Blog
       </Link>{' '}

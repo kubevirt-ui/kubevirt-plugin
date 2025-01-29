@@ -1263,7 +1263,7 @@
   "Templates": "Templates",
   "Templates provided by {{providerName}} are not editable.": "Templates provided by {{providerName}} are not editable.",
   "Terms": "Terms",
-  "Thank you for taking the tour.<br/>Stay up-to-date with Openshift Virtualization on our <4>Blog</4> or continue to learn more in our <8>documentation</8>.": "Thank you for taking the tour.<br/>Stay up-to-date with Openshift Virtualization on our <4>Blog</4> or continue to learn more in our <8>documentation</8>.",
+  "Thank you for taking the tour.<br/>Stay up-to-date with OpenShift Virtualization on our <4>Blog</4> or continue to learn more in our <8>documentation</8>.": "Thank you for taking the tour.<br/>Stay up-to-date with OpenShift Virtualization on our <4>Blog</4> or continue to learn more in our <8>documentation</8>.",
   "The channel to track and receive the updates from.": "The channel to track and receive the updates from.",
   "The cloud-init service is enabled by default in Fedora and RHEL images.": "The cloud-init service is enabled by default in Fedora and RHEL images.",
   "The DataImportCron polls disk images and imports them as PersistentVolumeClaims. You can configure the image source and other settings on the DataImportCron details page.": "The DataImportCron polls disk images and imports them as PersistentVolumeClaims. You can configure the image source and other settings on the DataImportCron details page.",
