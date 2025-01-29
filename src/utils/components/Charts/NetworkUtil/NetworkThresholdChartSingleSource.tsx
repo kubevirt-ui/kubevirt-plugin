@@ -21,7 +21,6 @@ import useResponsiveCharts from '../hooks/useResponsiveCharts';
 import {
   findNetworkMaxYValue,
   formatNetworkYTick,
-  getNetworkTickValues,
   MILLISECONDS_MULTIPLIER,
   tickFormat,
   TICKS_COUNT,
@@ -88,7 +87,7 @@ const NetworkThresholdSingleSourceChart: FC<NetworkThresholdSingleSourceChartPro
             }
             domain={{
               x: [currentTime - timespan, currentTime],
-              y: [0, getNetworkTickValues(Ymax + 1)?.length],
+              y: [0, Ymax + 1],
             }}
             height={height}
             padding={{ bottom: 60, left: 70, right: 60, top: 30 }}
@@ -104,7 +103,7 @@ const NetworkThresholdSingleSourceChart: FC<NetworkThresholdSingleSourceChartPro
               }}
               dependentAxis
               tickFormat={formatNetworkYTick}
-              tickValues={getNetworkTickValues(Ymax)}
+              tickValues={[0, Ymax]}
             />
             <ChartAxis
               style={{
