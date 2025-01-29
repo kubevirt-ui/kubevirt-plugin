@@ -10,6 +10,8 @@ import { columnSorting } from '@kubevirt-utils/utils/utils';
 import { TableColumn, useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { sortable } from '@patternfly/react-table';
 
+import { sortInstanceTypeByMemory } from './utils';
+
 type UseUserInstancetypeListColumnsValues = [
   TableColumn<V1beta1VirtualMachineInstancetype>[],
   TableColumn<V1beta1VirtualMachineInstancetype>[],
@@ -27,6 +29,11 @@ const useUserInstancetypeListColumns: UseUserInstancetypeListColumns = (paginati
 
   const sorting = useCallback(
     (direction, path) => columnSorting(data, direction, pagination, path),
+    [data, pagination],
+  );
+
+  const sortingMemory = useCallback(
+    (direction) => sortInstanceTypeByMemory(data, direction, pagination),
     [data, pagination],
   );
 
@@ -55,7 +62,7 @@ const useUserInstancetypeListColumns: UseUserInstancetypeListColumns = (paginati
     },
     {
       id: 'memory',
-      sort: (_, direction) => sorting(direction, 'spec.memory.guest'),
+      sort: (_, direction) => sortingMemory(direction),
       title: t('Memory'),
       transforms: [sortable],
     },
