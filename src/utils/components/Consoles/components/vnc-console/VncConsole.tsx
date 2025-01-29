@@ -34,7 +34,7 @@ export const VncConsole: FC<VncConsoleProps> = ({
   CustomConnectComponent,
   hasGPU,
   onConnect,
-  scaleViewport = false,
+  scaleViewport = true,
   viewOnly = false,
   vmi,
 }) => {
@@ -143,7 +143,7 @@ export const VncConsole: FC<VncConsoleProps> = ({
   }, [onConnect, connect, rfb, status]);
 
   return (
-    <div className="pf-c-console__vnc">
+    <>
       {status === disconnected &&
         (CustomConnectComponent ? (
           <CustomConnectComponent connect={connect} />
@@ -187,7 +187,7 @@ export const VncConsole: FC<VncConsoleProps> = ({
         </div>
       )}
       {StaticRenderLocation}
-    </div>
+    </>
   );
 };
 
