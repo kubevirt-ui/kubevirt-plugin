@@ -40,3 +40,12 @@ export const SRIOV = 'sriov';
 export enum UPDATE_STRATEGIES {
   Migration = 'Migration',
 }
+
+export enum VirtualMachineStatusConditionTypes {
+  AgentConnected = 'AgentConnected',
+  DataVolumesReady = 'DataVolumesReady',
+  LiveMigratable = 'LiveMigratable',
+  Ready = 'Ready',
+  RestartRequired = 'RestartRequired',
+  StorageLiveMigratable = 'StorageLiveMigratable',
+}

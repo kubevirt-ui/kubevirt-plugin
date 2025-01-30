@@ -20,7 +20,7 @@ import { getAnnotation, getLabel } from '@kubevirt-utils/resources/shared';
 import { WORKLOADS } from '@kubevirt-utils/resources/template';
 
 import { VM_WORKLOAD_ANNOTATION } from './annotations';
-import { UPDATE_STRATEGIES } from './constants';
+import { UPDATE_STRATEGIES, VirtualMachineStatusConditionTypes } from './constants';
 
 /**
  * A selector for the virtual machine's networks
@@ -292,6 +292,12 @@ export const getPreferenceMatcher = (vm: V1VirtualMachine): V1PreferenceMatcher 
  */
 export const getStatusConditions = (vm: V1VirtualMachine): V1VirtualMachineCondition[] =>
   vm?.status?.conditions;
+
+export const getStatusConditionByType = (
+  vm: V1VirtualMachine,
+  conditionType: VirtualMachineStatusConditionTypes,
+): V1VirtualMachineCondition =>
+  vm?.status?.conditions?.find((condition) => condition.type === conditionType);
 
 export const getUpdateStrategy = (vm: V1VirtualMachine): UPDATE_STRATEGIES =>
   vm?.spec?.updateVolumesStrategy as UPDATE_STRATEGIES;
