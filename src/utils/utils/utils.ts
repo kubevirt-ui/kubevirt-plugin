@@ -112,22 +112,34 @@ const getValueByPath = (obj: K8sResourceCommon, path: string) => {
   return pathArray?.reduce((acc, field) => acc?.[field], obj);
 };
 
-export const columnSorting = <T>(
-  data: T[],
-  direction: string,
-  pagination: { [key: string]: any },
-  path: string,
-) => {
-  const { endIndex, startIndex } = pagination;
-  const predicate = (a: T, b: T) => {
-    const { first, second } =
-      direction === 'asc' ? { first: a, second: b } : { first: b, second: a };
-    return getValueByPath(first, path)
+export const comparePathsValues =
+  <T>(path: string) =>
+  (first: T, second: T): number =>
+    getValueByPath(first, path)
       ?.toString()
       ?.localeCompare(getValueByPath(second, path)?.toString(), undefined, {
         numeric: true,
         sensitivity: 'base',
       });
+
+export const columnSorting = <T>(
+  data: T[],
+  direction: string,
+  pagination: { [key: string]: any },
+  path: string,
+) => columnSortingCompare(data, direction, pagination, comparePathsValues(path));
+
+export const columnSortingCompare = <T>(
+  data: T[],
+  direction: string,
+  pagination: { [key: string]: any },
+  compareFunction: (a: T, b: T) => number,
+) => {
+  const { endIndex, startIndex } = pagination;
+  const predicate = (a: T, b: T) => {
+    const { first, second } =
+      direction === 'asc' ? { first: a, second: b } : { first: b, second: a };
+    return compareFunction(first, second);
   };
   return data?.sort(predicate)?.slice(startIndex, endIndex);
 };
