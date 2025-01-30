@@ -31,6 +31,20 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
   });
   return (
     <Bullseye className="bullseye">
+      <div className="link">
+        <Button
+          onClick={() =>
+            window.open(
+              `/k8s/ns/${vmi?.metadata?.namespace}/kubevirt.io~v1~VirtualMachine/${vmi?.metadata?.name}/console/standalone`,
+            )
+          }
+          isDisabled={!isVMRunning || isHeadlessMode || !canConnectConsole}
+          variant="link"
+        >
+          {t('Open web console')}
+          <ExternalLinkAltIcon className="icon" />
+        </Button>
+      </div>
       {isVMRunning && !isHeadlessMode && canConnectConsole ? (
         <>
           <VncConsole
@@ -47,20 +61,6 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
           />
         </div>
       )}
-      <div className="link">
-        <Button
-          onClick={() =>
-            window.open(
-              `/k8s/ns/${vmi?.metadata?.namespace}/kubevirt.io~v1~VirtualMachine/${vmi?.metadata?.name}/console/standalone`,
-            )
-          }
-          isDisabled={!isVMRunning || isHeadlessMode || !canConnectConsole}
-          variant="link"
-        >
-          {t('Open web console')}
-          <ExternalLinkAltIcon className="icon" />
-        </Button>
-      </div>
     </Bullseye>
   );
 };
