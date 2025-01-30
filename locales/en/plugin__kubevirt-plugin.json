@@ -717,7 +717,6 @@
   "Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services.": "Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services.",
   "Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. ": "Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. ",
   "Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. More info:": "Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. More info:",
-  "masquerade": "masquerade",
   "Masquerade": "Masquerade",
   "Match label": "Match label",
   "Max. migrations per cluster": "Max. migrations per cluster",
