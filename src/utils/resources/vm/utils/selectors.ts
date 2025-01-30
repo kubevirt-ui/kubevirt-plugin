@@ -180,7 +180,7 @@ export const getBootDisk = (vm: V1VirtualMachine): V1Disk => {
 };
 
 /**
- * A selector for the QEMU machine's type
+ * A selector for the QEMU machine type
  * @param {V1VirtualMachine} vm the virtual machine
  * @returns {string} the machine type
  */

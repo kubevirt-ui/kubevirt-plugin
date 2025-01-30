@@ -45,7 +45,7 @@ describe('Check all virtualization pages can be loaded', () => {
     );
 
     it('vm tabs are loaded', () => {
-      cy.contains('Machine type').should('be.visible');
+      cy.contains('Hostname').should('be.visible');
 
       tab.navigateToMetrics();
       cy.contains('Utilization').should('be.visible');
@@ -70,6 +70,7 @@ describe('Check all virtualization pages can be loaded', () => {
 
       // sub-tabs in configuration tab
       tab.navigateToConfiguration();
+      cy.contains('Machine type').should('be.visible');
       cy.contains('Headless mode').should('be.visible');
 
       tab.navigateToConfigurationStorage();

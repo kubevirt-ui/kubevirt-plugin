@@ -15,7 +15,7 @@ import { TREE_VIEW, TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getLabel, getName, getVMStatus } from '@kubevirt-utils/resources/shared';
-import { getInstanceTypeMatcher, getMachineType } from '@kubevirt-utils/resources/vm';
+import { getInstanceTypeMatcher } from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getOsNameFromGuestAgent } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -177,15 +177,6 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
                   data-test-id="virtual-machine-overview-details-host"
                   descriptionData={hostname ?? fallback}
                   descriptionHeader={t('Hostname')}
-                />
-                <VirtualMachineDescriptionItem
-                  bodyContent={t(
-                    'The machine type defines the virtual hardware configuration while the operating system name and version refer to the hypervisor.',
-                  )}
-                  data-test-id="virtual-machine-overview-details-machine-type"
-                  descriptionData={getMachineType(vm) || NO_DATA_DASH}
-                  descriptionHeader={t('Machine type')}
-                  isPopover
                 />
               </DescriptionList>
             </GridItem>

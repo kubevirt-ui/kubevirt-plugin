@@ -30,9 +30,6 @@ const VirtualMachinesOverviewTabNetworkFQDN: FC<VirtualMachinesOverviewTabNetwor
       <Divider />
       <DescriptionList className="pf-c-description-list" isHorizontal>
         <VirtualMachineDescriptionItem
-          bodyContent={t(
-            'The machine type defines the virtual hardware configuration while the operating system name and version refer to the hypervisor.',
-          )}
           descriptionData={
             <ClipboardCopy
               clickTip={t('Copied')}

@@ -45,9 +45,7 @@ const TemplateDetailsLeftGrid: FC<TemplateDetailsGridProps> = ({ template }) => 
       <WorkloadProfile editable={isTemplateEditable} template={template} />
       <CPUMemory editable={isTemplateEditable} template={template} />
       <VirtualMachineDescriptionItem
-        bodyContent={t(
-          'The machine type defines the virtual hardware configuration while the operating system name and version refer to the hypervisor.',
-        )}
+        bodyContent={t('The QEMU machine type.')}
         descriptionData={machineType}
         descriptionHeader={t('Machine type')}
         isPopover
