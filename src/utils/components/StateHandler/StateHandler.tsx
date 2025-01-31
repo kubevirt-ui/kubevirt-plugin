@@ -1,8 +1,17 @@
 import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Alert, AlertVariant, Bullseye } from '@patternfly/react-core';
+import {
+  Alert,
+  AlertVariant,
+  Bullseye,
+  Panel,
+  PanelMain,
+  PanelMainBody,
+  Title,
+} from '@patternfly/react-core';
 
+import AccessDenied from '../AccessDenied/AccessDenied';
 import Loading from '../Loading/Loading';
 
 type StateHandlerProps = {
@@ -15,6 +24,25 @@ const StateHandler: FC<StateHandlerProps> = ({ children, error, loaded, withBull
   const { t } = useKubevirtTranslation();
 
   if (error) {
+    const status = error?.response?.status;
+
+    if (status === 403) {
+      return <AccessDenied>{error.message}</AccessDenied>;
+    }
+
+    if (status === 404) {
+      return (
+        <Panel>
+          <PanelMain>
+            <PanelMainBody>
+              <Title className="pf-v5-u-text-align-center" headingLevel="h2">
+                {t('404: Not Found')}
+              </Title>
+            </PanelMainBody>
+          </PanelMain>
+        </Panel>
+      );
+    }
     return (
       <Alert isInline title={t('Error')} variant={AlertVariant.danger}>
         {error?.message}
