@@ -84,10 +84,22 @@ const InstanceTypePage: FC<ListPageProps> = (props) => {
         activeKey={activeTabKey}
         style={{ flexShrink: 0 }}
       >
-        <Tab eventKey={0} title={<TabTitleText>{t('Cluster provided')}</TabTitleText>}>
+        <Tab
+          title={
+            <TabTitleText data-test="cluster-instancetype-tab">
+              {t('Cluster InstanceTypes')}
+            </TabTitleText>
+          }
+          eventKey={0}
+        >
           <ClusterInstancetypeList {...props} />
         </Tab>
-        <Tab eventKey={1} title={<TabTitleText>{t('User provided')}</TabTitleText>}>
+        <Tab
+          title={
+            <TabTitleText data-test="user-instancetype-tab">{t('User InstanceTypes')}</TabTitleText>
+          }
+          eventKey={1}
+        >
           <UserInstancetypeList {...props} />
         </Tab>
       </Tabs>
