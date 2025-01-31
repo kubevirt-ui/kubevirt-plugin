@@ -220,7 +220,7 @@
   "By memory swap traffic": "By memory swap traffic",
   "By throughput": "By throughput",
   "By vCPU wait": "By vCPU wait",
-  "Can not configure dedicated resources if the VirtualMachine is created from InstanceType": "Can not configure dedicated resources if the VirtualMachine is created from InstanceType",
+  "Can not configure dedicated resources if the VirtualMachine is created from Instance Type": "Can not configure dedicated resources if the VirtualMachine is created from Instance Type",
   "Can not delete in view-only mode": "Can not delete in view-only mode",
   "Can not edit in view-only mode": "Can not edit in view-only mode",
   "Cancel": "Cancel",
