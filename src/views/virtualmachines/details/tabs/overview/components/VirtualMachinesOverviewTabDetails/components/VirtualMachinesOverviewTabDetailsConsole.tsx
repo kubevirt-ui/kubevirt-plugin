@@ -30,7 +30,7 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
     verb: 'get',
   });
   return (
-    <Bullseye className="bullseye">
+    <Bullseye className="console-overview">
       <div className="link">
         <Button
           onClick={() =>
@@ -49,7 +49,7 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
         <>
           <VncConsole
             CustomConnectComponent={VirtualMachinesOverviewTabDetailsConsoleConnect}
-            scaleViewport
+            viewOnly
             vmi={vmi}
           />
         </>
