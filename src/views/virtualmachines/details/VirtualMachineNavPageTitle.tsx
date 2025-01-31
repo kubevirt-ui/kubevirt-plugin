@@ -23,11 +23,16 @@ import { getVMStatusIcon } from '../utils';
 import { vmTabsWithYAML } from './utils/constants';
 
 type VirtualMachineNavPageTitleProps = {
+  isLoaded?: boolean;
   name: string;
   vm: V1VirtualMachine;
 };
 
-const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({ name, vm }) => {
+const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({
+  isLoaded,
+  name,
+  vm,
+}) => {
   const { t } = useKubevirtTranslation();
   const location = useLocation();
 
@@ -70,9 +75,8 @@ const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({ name,
               <SidebarEditorSwitch />
             </SplitItem>
           )}
-          {isEmpty(vm) ? (
-            <Loading />
-          ) : (
+          {!isLoaded && <Loading />}
+          {vm && isLoaded && (
             <>
               <VMActionsIconBar vm={vm} />
               <SplitItem>
