@@ -1,4 +1,4 @@
-import React, { FC, memo } from 'react';
+import React, { FC } from 'react';
 import xbytes from 'xbytes';
 
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -22,4 +22,4 @@ const NetworkUsage: FC<NetworkUsageProps> = ({ vmName, vmNamespace }) => {
   return <div>{totalTransferred}ps</div>;
 };
 
-export default memo(NetworkUsage);
+export default NetworkUsage;

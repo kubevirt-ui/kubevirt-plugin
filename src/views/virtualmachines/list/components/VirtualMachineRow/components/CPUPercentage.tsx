@@ -1,4 +1,4 @@
-import React, { FC, memo } from 'react';
+import React, { FC } from 'react';
 
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -18,4 +18,4 @@ const CPUPercentage: FC<CPUPercentageProps> = ({ vmName, vmNamespace }) => {
   return <span>{percentage.toFixed(2)}%</span>;
 };
 
-export default memo(CPUPercentage);
+export default CPUPercentage;
