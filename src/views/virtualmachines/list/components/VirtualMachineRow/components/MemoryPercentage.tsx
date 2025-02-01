@@ -1,4 +1,4 @@
-import React, { FC, memo } from 'react';
+import React, { FC } from 'react';
 import xbytes from 'xbytes';
 
 import { getMemorySize } from '@kubevirt-utils/components/CPUMemoryModal/utils/CpuMemoryUtils';
@@ -27,4 +27,4 @@ const MemoryPercentage: FC<MemoryPercentageProps> = ({ vmiMemory, vmName, vmName
   return <span>{percentage.toFixed(2)}%</span>;
 };
 
-export default memo(MemoryPercentage);
+export default MemoryPercentage;
