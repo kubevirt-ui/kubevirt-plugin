@@ -73,9 +73,7 @@ const Details: React.FC<DetailsProps> = ({ pathname, vmi }) => {
             />
             <CPUMemory vmi={vmi} />
             <VirtualMachineDescriptionItem
-              bodyContent={t(
-                'The machine type defines the virtual hardware configuration while the operating system name and version refer to the hypervisor.',
-              )}
+              bodyContent={t('The QEMU machine type.')}
               descriptionData={getMachineType(vm) || NO_DATA_DASH}
               descriptionHeader={t('Machine type')}
               isPopover

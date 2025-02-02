@@ -221,9 +221,7 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
 
           <WizardDescriptionItem
             helperPopover={{
-              content: t(
-                'The machine type defines the virtual hardware configuration while the operating system name and version refer to the hypervisor.',
-              ),
+              content: t('The QEMU machine type.'),
               header: t('Machine type'),
             }}
             className="wizard-overview-description-left-column"

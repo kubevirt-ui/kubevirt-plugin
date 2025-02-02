@@ -25,8 +25,10 @@ import {
   DESCRIPTION_ANNOTATION,
   getCPU,
   getInstanceTypeMatcher,
+  getMachineType,
   getWorkload,
 } from '@kubevirt-utils/resources/vm';
+import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, Grid, GridItem, Switch, Title } from '@patternfly/react-core';
@@ -173,6 +175,12 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
               data-test-id={`${vmName}-cpu-memory`}
               descriptionData={<CPUMemory vm={instanceTypeVM || vm} vmi={vmi} />}
               isEdit={canUpdateVM}
+              isPopover
+            />
+            <VirtualMachineDescriptionItem
+              bodyContent={t('The QEMU machine type.')}
+              descriptionData={getMachineType(vm) || NO_DATA_DASH}
+              descriptionHeader={t('Machine type')}
               isPopover
             />
             <VirtualMachineDescriptionItem
