@@ -1,16 +1,17 @@
 import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Alert, AlertVariant } from '@patternfly/react-core';
+import { Alert, AlertVariant, Bullseye } from '@patternfly/react-core';
 
 import Loading from '../Loading/Loading';
 
 type StateHandlerProps = {
   error?: any;
   loaded: boolean;
+  withBullseye?: boolean;
 };
 
-const StateHandler: FC<StateHandlerProps> = ({ children, error, loaded }) => {
+const StateHandler: FC<StateHandlerProps> = ({ children, error, loaded, withBullseye = false }) => {
   const { t } = useKubevirtTranslation();
 
   if (error) {
@@ -22,7 +23,13 @@ const StateHandler: FC<StateHandlerProps> = ({ children, error, loaded }) => {
   }
 
   if (!loaded) {
-    return <Loading />;
+    return withBullseye ? (
+      <Bullseye>
+        <Loading />
+      </Bullseye>
+    ) : (
+      <Loading />
+    );
   }
 
   return <>{children}</>;

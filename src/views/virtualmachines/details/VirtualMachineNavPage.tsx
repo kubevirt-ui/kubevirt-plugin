@@ -32,7 +32,7 @@ const VirtualMachineNavPage: React.FC<VirtualMachineDetailsPageProps> = ({
     namespace,
   });
 
-  const [instanceTypeExpandedSpec] = useInstanceTypeExpandSpec(vm);
+  const [instanceTypeExpandedSpec, expandedSpecLoading] = useInstanceTypeExpandSpec(vm);
 
   const pages = useVirtualMachineTabs();
 
@@ -43,6 +43,7 @@ const VirtualMachineNavPage: React.FC<VirtualMachineDetailsPageProps> = ({
       </Bullseye>
     );
   }
+
   return (
     <SidebarEditorProvider>
       <VirtualMachineNavPageTitle
@@ -51,6 +52,7 @@ const VirtualMachineNavPage: React.FC<VirtualMachineDetailsPageProps> = ({
       />
       <div className="VirtualMachineNavPage--tabs__main">
         <HorizontalNavbar
+          expandedSpecLoading={expandedSpecLoading}
           instanceTypeExpandedSpec={instanceTypeExpandedSpec}
           pages={pages}
           vm={vm}
