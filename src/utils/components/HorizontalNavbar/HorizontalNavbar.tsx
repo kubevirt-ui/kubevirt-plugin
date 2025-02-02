@@ -7,18 +7,26 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Nav, NavList } from '@patternfly/react-core';
 
+import StateHandler from '../StateHandler/StateHandler';
+
 import useDynamicPages from './utils/useDynamicPages';
 import { NavPageKubevirt, trimLastHistoryPath } from './utils/utils';
 
 import './horizontal-nav-bar.scss';
 
 type HorizontalNavbarProps = {
+  expandedSpecLoading?: boolean;
   instanceTypeExpandedSpec?: V1VirtualMachine;
   pages: NavPageKubevirt[];
   vm?: V1VirtualMachine;
 };
 
-const HorizontalNavbar: FC<HorizontalNavbarProps> = ({ instanceTypeExpandedSpec, pages, vm }) => {
+const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
+  expandedSpecLoading,
+  instanceTypeExpandedSpec,
+  pages,
+  vm,
+}) => {
   const location = useLocation();
 
   const params = useParams();
@@ -73,12 +81,14 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({ instanceTypeExpandedSpec,
           return (
             <Route
               Component={(props) => (
-                <Component
-                  instanceTypeExpandedSpec={instanceTypeExpandedSpec}
-                  obj={vm}
-                  params={params}
-                  {...props}
-                />
+                <StateHandler loaded={!expandedSpecLoading} withBullseye>
+                  <Component
+                    instanceTypeExpandedSpec={instanceTypeExpandedSpec}
+                    obj={vm}
+                    params={params}
+                    {...props}
+                  />
+                </StateHandler>
               )}
               key={page.href}
               path={page.href}
