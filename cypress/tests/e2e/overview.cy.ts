@@ -1,33 +1,12 @@
-import { welcomeCheckbox } from '../../views/selector';
 import { tab } from '../../views/tab';
 
-const tickWelcomeModal = () => {
-  cy.get('body').then(($body) => {
-    if ($body.text().includes('Do not show this again')) {
-      cy.get(welcomeCheckbox).check();
-    }
-  });
-};
-
-describe('Close the welcome modal', () => {
+describe('Test Virtualization Overview', () => {
   before(() => {
     cy.visit('');
-    cy.wait(20000);
-  });
-
-  it('close the welcome modal', () => {
-    // sometimes the welcome is presenting before move to Overview
-    tickWelcomeModal();
-
-    cy.wait(5000);
-    cy.visitOverviewVirt();
-    cy.wait(10000);
-    tickWelcomeModal();
-    cy.contains('Do not show this again').should('not.exist');
   });
 
   it('overview page is loaded', () => {
-    cy.visitOverviewVirt();
+    cy.visitOverview();
     cy.contains('VirtualMachine statuses').should('exist');
   });
 
