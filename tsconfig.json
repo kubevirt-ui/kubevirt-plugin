@@ -12,6 +12,7 @@
     "outDir": "dist",
     "paths": {
       "@catalog/*": ["src/views/catalog/*"],
+      "@images/*": ["./images/*"],
       "@kubevirt-utils": ["src/utils"],
       "@kubevirt-utils/*": ["src/utils/*"],
       "@overview/*": ["src/views/clusteroverview/*"],
