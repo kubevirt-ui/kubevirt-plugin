@@ -344,6 +344,9 @@ const networkingSection = [
     type: 'console.navigation/resource-cluster',
   } as EncodedExtension<ResourceClusterNavItem>,
   {
+    flags: {
+      required: ['FLAG_UDN_ENABLED'],
+    },
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-udns',
