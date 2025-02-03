@@ -1,4 +1,4 @@
-import React, { CSSProperties, FC, useEffect, useMemo } from 'react';
+import React, { CSSProperties, FC, useMemo } from 'react';
 
 import { TREE_VIEW } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
@@ -50,12 +50,8 @@ const VirtualMachineTreeView: FC<VirtualMachineTreeViewProps> = ({
 
   const isOpen = useMemo(() => drawerOpen === SHOW, [drawerOpen]);
   useHideNamespaceBar();
-  useEffect(() => {
-    const drawerPanel = document.getElementById(TREE_VIEW_PANEL_ID);
-    drawerPanel?.style?.setProperty(PANEL_WIDTH_PROPERTY, drawerWidth);
-  }, [drawerWidth]);
 
-  if (loadError || (!loading && !treeViewEnabled)) return <>{children}</>;
+  if (loadError || loading || !treeViewEnabled) return <>{children}</>;
 
   const toggleDrawer = () => {
     const toggleOpen = !isOpen;
@@ -71,17 +67,21 @@ const VirtualMachineTreeView: FC<VirtualMachineTreeViewProps> = ({
     height: getContentScrollableElement().offsetHeight || 0,
   };
 
+  const widthStyles: any = {
+    [PANEL_WIDTH_PROPERTY]: drawerWidth,
+  };
+
+  const styles = { ...widthStyles, ...heightStyles } as CSSProperties;
   return (
     <Drawer isExpanded isInline position="start">
       <DrawerContent
         panelContent={
           <DrawerPanelContent
             className="vms-tree-view"
-            defaultSize={drawerWidth}
             id={TREE_VIEW_PANEL_ID}
             isResizable={isOpen}
             onResize={(_, width: number) => setDrawerWidth(`${String(width)}px`)}
-            style={heightStyles}
+            style={styles}
           >
             <TreeViewContent
               isOpen={isOpen}
