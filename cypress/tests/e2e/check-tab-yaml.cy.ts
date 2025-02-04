@@ -196,7 +196,7 @@ describe('Check all virtualization pages can be loaded', () => {
     });
 
     it('create instanceType from yaml on the second tab', () => {
-      cy.contains('span.pf-v5-c-tabs__item-text', 'User provided').click();
+      cy.byTestID('user-instancetype-tab').click();
       cy.get(itemCreateBtn).click();
       cy.get(saveBtn).click();
       cy.get(breadcrumb).click();
@@ -220,7 +220,7 @@ describe('Check all virtualization pages can be loaded', () => {
     });
 
     it('create preference from yaml on the second tab', () => {
-      cy.contains('span.pf-v5-c-tabs__item-text', 'User preferences').click();
+      cy.byTestID('user-preferences-tab').click();
       cy.get(itemCreateBtn).click();
       cy.get(saveBtn).click();
       cy.get(breadcrumb).click();
