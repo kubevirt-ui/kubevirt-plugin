@@ -17,6 +17,7 @@ import chart_color_black_200 from '@patternfly/react-tokens/dist/esm/chart_color
 import chart_color_blue_300 from '@patternfly/react-tokens/dist/esm/chart_color_blue_300';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
+import { tickLabels } from '../ChartLabels/styleOverrides';
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
 import { getUtilizationQueries } from '../utils/queries';
@@ -85,6 +86,7 @@ const MigrationThresholdChartDiskRate: React.FC<MigrationThresholdChartDiskRateP
                 grid: {
                   stroke: chart_color_black_200.value,
                 },
+                tickLabels,
               }}
               dependentAxis
               tickFormat={formatMemoryYTick(yMax, 2)}
@@ -92,7 +94,7 @@ const MigrationThresholdChartDiskRate: React.FC<MigrationThresholdChartDiskRateP
             />
             <ChartAxis
               style={{
-                tickLabels: { padding: 2 },
+                tickLabels: { padding: 2, ...tickLabels },
                 ticks: { stroke: 'transparent' },
               }}
               axisComponent={<></>}
