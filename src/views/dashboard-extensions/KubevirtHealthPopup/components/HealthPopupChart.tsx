@@ -1,5 +1,7 @@
 import React, { FC, useMemo } from 'react';
 
+import SubTitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/SubTitleChartLabel';
+import TitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/TitleChartLabel';
 import { AlertsByHealthImpact } from '@kubevirt-utils/hooks/useInfrastructureAlerts/useInfrastructureAlerts';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -52,7 +54,9 @@ const HealthPopupChart: FC<HealthPopupChartProps> = ({ alerts, numberOfAlerts })
         height={150}
         labels={({ datum }) => `${datum?.x}: ${datum?.y}%`}
         subTitle={t('Alerts')}
+        subTitleComponent={<SubTitleChartLabel />}
         title={totalNumberAlerts?.toString()}
+        titleComponent={<TitleChartLabel />}
         width={150}
       />
     </div>

@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { tickLabels } from '@kubevirt-utils/components/Charts/ChartLabels/styleOverrides';
 import useResponsiveCharts from '@kubevirt-utils/components/Charts/hooks/useResponsiveCharts';
 import {
   Chart,
@@ -42,6 +43,7 @@ const MetricChart: React.FC<MetricChartProps> = ({ metric, metricChartData }) =>
             grid: {
               stroke: chart_color_black_200.value,
             },
+            tickLabels,
           }}
           axisComponent={<></>}
           dependentAxis
@@ -53,6 +55,7 @@ const MetricChart: React.FC<MetricChartProps> = ({ metric, metricChartData }) =>
             axis: {
               stroke: chart_color_black_200.value,
             },
+            tickLabels,
           }}
           fixLabelOverlap
           tickFormat={xAxisTickFormat}

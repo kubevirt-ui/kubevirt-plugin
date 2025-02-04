@@ -1,6 +1,8 @@
 import React, { FC, useMemo } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import SubTitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/SubTitleChartLabel';
+import TitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/TitleChartLabel';
 import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/ComponentReady';
 import { getUtilizationQueries } from '@kubevirt-utils/components/Charts/utils/queries';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -10,7 +12,7 @@ import {
   PrometheusEndpoint,
   usePrometheusPoll,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { ChartDonutUtilization, ChartLabel } from '@patternfly/react-charts';
+import { ChartDonutUtilization } from '@patternfly/react-charts';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
 type CPUUtilProps = {
@@ -70,8 +72,9 @@ const CPUUtil: FC<CPUUtilProps> = ({ pods, vmi }) => {
             labels={({ datum }) => (datum.x ? `${datum.x}: ${(cpuUsage || 0)?.toFixed(2)}m` : null)}
             style={{ labels: { fontSize: 20 } }}
             subTitle={t('Used')}
-            subTitleComponent={<ChartLabel y={135} />}
+            subTitleComponent={<SubTitleChartLabel y={135} />}
             title={`${averageCPUUsage.toFixed(2) || 0}%`}
+            titleComponent={<TitleChartLabel />}
           />
         </ComponentReady>
       </div>
