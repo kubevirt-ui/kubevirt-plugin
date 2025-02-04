@@ -125,9 +125,10 @@ type SubmitInput = {
 export const submit = async ({ data, editDiskName, onSubmit, pvc, vm }: SubmitInput) => {
   const isVMRunning = isRunning(vm);
 
-  const shouldHotplug = isVMRunning && isEmpty(data.volume.containerDisk);
-
   const isEditDisk = !isEmpty(editDiskName);
+  const isCreatingDisk = isEmpty(editDiskName);
+  const shouldHotplug = isVMRunning && isCreatingDisk && isEmpty(data.volume.containerDisk);
+
   const isInitialBootDisk = getBootDisk(vm)?.name === editDiskName;
 
   const vmWithDisk = isEditDisk ? editDisk(data, editDiskName, vm) : addDisk(data, vm);
