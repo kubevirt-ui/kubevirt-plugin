@@ -397,6 +397,7 @@
   "Delete {{kind}}": "Delete {{kind}}",
   "Delete {{kind}} source <3>{{name}}</3> in namespace <6>{{namespace}}</6>": "Delete {{kind}} source <3>{{name}}</3> in namespace <6>{{namespace}}</6>",
   "Delete {{volumeResourceName}} {{modelLabel}}": "Delete {{volumeResourceName}} {{modelLabel}}",
+  "Delete checkup": "Delete checkup",
   "Delete Data Volume: {{pvcName}}": "Delete Data Volume: {{pvcName}}",
   "Delete DataImportCron?": "Delete DataImportCron?",
   "Delete DataSource?": "Delete DataSource?",
