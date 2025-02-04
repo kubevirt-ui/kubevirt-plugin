@@ -16,19 +16,18 @@ import DiskSizeInput from './components/DiskSizeInput/DiskSizeInput';
 import DiskTypeSelect from './components/DiskTypeSelect/DiskTypeSelect';
 import PendingChanges from './components/PendingChanges';
 import StorageClassAndPreallocation from './components/StorageClassAndPreallocation/StorageClassAndPreallocation';
-import usePVCDiskSource from './hooks/usePVCDiskSource';
 import { getDefaultCreateValues, getDefaultEditValues } from './utils/form';
 import { diskModalTitle, doesDataVolumeTemplateHaveDisk } from './utils/helpers';
 import { submit } from './utils/submit';
 import { SourceTypes, V1DiskFormState, V1SubDiskModalProps } from './utils/types';
 
 const OtherDiskModal: FC<V1SubDiskModalProps> = ({
-  createdPVCName,
   editDiskName,
   isCreated,
   isOpen,
   onClose,
   onSubmit,
+  pvc,
   vm,
 }) => {
   const isVMRunning = isRunning(vm);
@@ -41,8 +40,6 @@ const OtherDiskModal: FC<V1SubDiskModalProps> = ({
       : getDefaultCreateValues(vm, SourceTypes.OTHER),
     mode: 'all',
   });
-
-  const [pvc] = usePVCDiskSource(createdPVCName, namespace);
 
   const {
     formState: { isSubmitting, isValid },
