@@ -14,7 +14,7 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { ensurePath, kubevirtConsole } from '@kubevirt-utils/utils/utils';
+import { ensurePath, isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
 import { ButtonVariant, Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
 
@@ -85,7 +85,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({ diskName }) => {
 
   const handleEditSubmit = (newVM: V1VirtualMachine, diskFormState: V1DiskFormState) => {
     const { registryCredentials } = diskFormState;
-    updateRegistryCredentials(registryCredentials);
+    !isEmpty(registryCredentials) && updateRegistryCredentials(registryCredentials);
     return updateVM(newVM);
   };
 
