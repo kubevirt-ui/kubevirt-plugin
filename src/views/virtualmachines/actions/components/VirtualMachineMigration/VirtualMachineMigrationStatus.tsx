@@ -96,11 +96,6 @@ const VirtualMachineMigrationStatus: FC<VirtualMachineMigrationStatusProps> = ({
             {t('Stop')}
           </Button>
         </ActionListItem>
-        <ActionListItem>
-          <Button onClick={onClose} variant={ButtonVariant.link}>
-            {t('Cancel')}
-          </Button>
-        </ActionListItem>
         {migrationLogURL && (
           <ActionListItem className="migration-status__view-report">
             <ExternalLink href={migrationLogURL}>{t('View report')}</ExternalLink>
