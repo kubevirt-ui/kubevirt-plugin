@@ -10,10 +10,10 @@ import CheckupsNetworkStatusIcon from '../../CheckupsNetworkStatusIcon';
 import { STATUS_COMPILATION_TIME_STAMP, STATUS_START_TIME_STAMP } from '../../utils/utils';
 import CheckupsNetworkActions from '../components/CheckupsNetworkActions';
 import {
+  CONFIG_PARAM_NAD_NAME,
+  CONFIG_PARAM_SAMPLE_DURATION,
   STATUS_MAX_LATENCY_NANO,
   STATUS_MIN_LATENCY_NANO,
-  STATUS_NAD_NAME,
-  STATUS_SAMPLE_DURATION,
   STATUS_SOURCE_NODE,
   STATUS_TARGET_NODE,
 } from '../utils/utils';
@@ -38,7 +38,7 @@ const CheckupsNetworkListRow = ({ activeColumnIDs, obj: configMap, rowData: { ge
         />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="nad">
-        {configMap?.data?.[STATUS_NAD_NAME] || NO_DATA_DASH}
+        {configMap?.data?.[CONFIG_PARAM_NAD_NAME] || NO_DATA_DASH}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="status">
         <CheckupsNetworkStatusIcon
@@ -50,7 +50,7 @@ const CheckupsNetworkListRow = ({ activeColumnIDs, obj: configMap, rowData: { ge
         {configMap?.data?.[STATUS_MAX_LATENCY_NANO] || NO_DATA_DASH}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="duration">
-        {configMap?.data?.[STATUS_SAMPLE_DURATION] || NO_DATA_DASH}
+        {configMap?.data?.[CONFIG_PARAM_SAMPLE_DURATION] || NO_DATA_DASH}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="min-latency">
         {configMap?.data?.[STATUS_MIN_LATENCY_NANO]}

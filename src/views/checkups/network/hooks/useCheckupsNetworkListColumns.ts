@@ -12,9 +12,9 @@ import {
   STATUS_SUCCEEDED,
 } from '../../utils/utils';
 import {
+  CONFIG_PARAM_NAD_NAME,
+  CONFIG_PARAM_SAMPLE_DURATION,
   STATUS_MAX_LATENCY_NANO,
-  STATUS_NAD_NAME,
-  STATUS_SAMPLE_DURATION,
   STATUS_SOURCE_NODE,
   STATUS_TARGET_NODE,
 } from '../utils/utils';
@@ -47,7 +47,7 @@ const useCheckupsNetworkCheckupsListColumns = (): [
     {
       id: 'nad',
       sort: (data: IoK8sApiCoreV1ConfigMap[], sortDirection: SortByDirection) =>
-        columnsSorting(data, sortDirection, STATUS_NAD_NAME),
+        columnsSorting(data, sortDirection, CONFIG_PARAM_NAD_NAME),
       title: t('NetworkAttachmentDefinition'),
       transforms: [sortable],
     },
@@ -69,7 +69,7 @@ const useCheckupsNetworkCheckupsListColumns = (): [
       additional: true,
       id: 'duration',
       sort: (data: IoK8sApiCoreV1ConfigMap[], sortDirection: SortByDirection) =>
-        columnsSorting(data, sortDirection, STATUS_SAMPLE_DURATION, true),
+        columnsSorting(data, sortDirection, CONFIG_PARAM_SAMPLE_DURATION, true),
       title: t('Duration'),
       transforms: [sortable],
     },
