@@ -1,3 +1,5 @@
+import { parseSize } from 'xbytes';
+
 import { InstanceTypeSize } from '@catalog/CreateFromInstanceTypes/components/SelectInstanceTypeSection/utils/types';
 import {
   INSTANCETYPE_CLASS_DISPLAY_NAME,
@@ -9,7 +11,12 @@ import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotation, getLabel } from '@kubevirt-utils/resources/shared';
 import { InstanceTypeUnion } from '@virtualmachines/details/tabs/configuration/utils/types';
 
-import { InstanceTypesSeries, InstanceTypesSizes, MappedInstanceTypes } from './types';
+import {
+  InstanceTypeRecord,
+  InstanceTypesSeries,
+  InstanceTypesSizes,
+  MappedInstanceTypes,
+} from './types';
 
 export const getInstanceTypeItemSizePrettyDisplay = (it: InstanceTypeUnion): string =>
   `${it?.metadata.name.split('.').pop()}: ${it?.spec?.cpu?.guest} ${t('CPUs')}, ${
@@ -56,6 +63,21 @@ export const mappedInstanceTypesToSelectOptions = (
     return acc;
   }, {} as MappedInstanceTypes);
 
+const sortInstanceTypeSizes = (a: InstanceTypeRecord, b: InstanceTypeRecord) => {
+  const aCPU = a.instanceType?.spec?.cpu?.guest;
+  const bCPU = b.instanceType?.spec?.cpu?.guest;
+
+  if (aCPU !== bCPU) return aCPU - bCPU;
+
+  const aMemory = a.instanceType?.spec?.memory?.guest;
+  const bMemory = b.instanceType?.spec?.memory?.guest;
+
+  const bytesA = parseSize(`${aMemory}B`);
+  const bytesB = parseSize(`${bMemory}B`);
+
+  return bytesA - bytesB;
+};
+
 export const getInstanceTypesPrettyDisplaySize = (
   mappedInstanceTypes: MappedInstanceTypes,
   instanceTypeSeries: InstanceTypesSeries,
@@ -66,7 +88,7 @@ export const getInstanceTypesSizes = (mappedInstanceTypes: MappedInstanceTypes, 
   const matchedSeries = Object.values(mappedInstanceTypes).find(
     (it) => it.displayNameSeries === series,
   );
-  return Object.values(matchedSeries?.sizes);
+  return Object.values(matchedSeries?.sizes).sort(sortInstanceTypeSizes);
 };
 
 export const getInstanceTypeSeriesDisplayName = (
