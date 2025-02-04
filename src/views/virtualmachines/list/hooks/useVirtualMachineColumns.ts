@@ -12,11 +12,15 @@ import {
   useAccessReview,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { sortable } from '@patternfly/react-table';
+import { VmiMapper } from '@virtualmachines/utils/mappers';
+
+import { sortByCPUUsage, sortByMemoryUsage, sortByNetworkUsage, sortByNode } from './sortColumns';
 
 const useVirtualMachineColumns = (
   namespace: string,
   pagination: { [key: string]: any },
   data: V1VirtualMachine[],
+  vmiMapper: VmiMapper,
 ): [TableColumn<K8sResourceCommon>[], TableColumn<K8sResourceCommon>[], boolean] => {
   const { t } = useKubevirtTranslation();
 
@@ -29,6 +33,16 @@ const useVirtualMachineColumns = (
   const sorting = useCallback(
     (direction, path) => columnSorting(data, direction, pagination, path),
     [data, pagination],
+  );
+
+  const sortingUsingFunction = useCallback(
+    (direction, compareFunction) => compareFunction(data, direction, pagination),
+    [data, pagination],
+  );
+
+  const sortingUsingFunctionWithMapper = useCallback(
+    (direction, compareFunction) => compareFunction(data, direction, pagination, vmiMapper),
+    [data, pagination, vmiMapper],
   );
 
   const columns: TableColumn<K8sResourceCommon>[] = useMemo(
@@ -64,7 +78,9 @@ const useVirtualMachineColumns = (
         ? [
             {
               id: 'node',
+              sort: (_, direction) => sortingUsingFunctionWithMapper(direction, sortByNode),
               title: t('Node'),
+              transforms: [sortable],
             },
           ]
         : []),
@@ -82,17 +98,23 @@ const useVirtualMachineColumns = (
       {
         additional: true,
         id: 'memory-usage',
+        sort: (_, direction) => sortingUsingFunctionWithMapper(direction, sortByMemoryUsage),
         title: t('Memory'),
+        transforms: [sortable],
       },
       {
         additional: true,
         id: 'cpu-usage',
+        sort: (_, direction) => sortingUsingFunction(direction, sortByCPUUsage),
         title: t('CPU'),
+        transforms: [sortable],
       },
       {
         additional: true,
         id: 'network-usage',
+        sort: (_, direction) => sortingUsingFunction(direction, sortByNetworkUsage),
         title: t('Network'),
+        transforms: [sortable],
       },
       {
         id: '',
@@ -100,7 +122,7 @@ const useVirtualMachineColumns = (
         title: '',
       },
     ],
-    [canGetNode, namespace, sorting, t],
+    [canGetNode, namespace, sorting, sortingUsingFunction, sortingUsingFunctionWithMapper, t],
   );
 
   const [activeColumns, , loaded] = useKubevirtUserSettingsTableColumns<K8sResourceCommon>({

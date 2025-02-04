@@ -165,6 +165,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
     namespace,
     pagination,
     data,
+    vmiMapper,
   );
 
   const loaded =
