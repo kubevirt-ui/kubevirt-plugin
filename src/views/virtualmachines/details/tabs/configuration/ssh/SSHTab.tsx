@@ -21,7 +21,7 @@ import { ConfigurationInnerTabProps } from '../utils/types';
 import SSHTabAuthorizedSSHKey from './components/SSHTabAuthorizedSSHKey';
 import SSHTabSSHAccess from './components/SSHTabSSHAccess';
 
-const SSHTab: FC<ConfigurationInnerTabProps> = ({ vm, vmi }) => {
+const SSHTab: FC<ConfigurationInnerTabProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
 
   return (
@@ -40,7 +40,7 @@ const SSHTab: FC<ConfigurationInnerTabProps> = ({ vm, vmi }) => {
           <GridItem>
             <Stack hasGutter>
               <DescriptionList className="pf-v5-c-description-list">
-                <SSHTabSSHAccess vm={vm} vmi={vmi} />
+                <SSHTabSSHAccess vm={vm} />
                 <SSHTabAuthorizedSSHKey vm={vm} />
               </DescriptionList>
             </Stack>

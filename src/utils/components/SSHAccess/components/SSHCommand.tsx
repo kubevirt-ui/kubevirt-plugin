@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -28,14 +28,12 @@ type SSHCommandProps = {
   sshService: IoK8sApiCoreV1Service;
   sshServiceLoaded?: boolean;
   vm: V1VirtualMachine;
-  vmi?: V1VirtualMachineInstance;
 };
 
 const SSHCommand: React.FC<SSHCommandProps> = ({
   sshService: initialSSHService,
   sshServiceLoaded,
   vm,
-  vmi,
 }) => {
   const { t } = useKubevirtTranslation();
   const [sshService, setSSHService] = useState<IoK8sApiCoreV1Service | null>();
@@ -53,7 +51,7 @@ const SSHCommand: React.FC<SSHCommandProps> = ({
       }
 
       if (newServiceType && newServiceType !== SERVICE_TYPES.NONE) {
-        const newService = await createSSHService(vm, newServiceType, vmi);
+        const newService = await createSSHService(vm, newServiceType);
         setSSHService(newService);
       }
     } catch (apiError) {
