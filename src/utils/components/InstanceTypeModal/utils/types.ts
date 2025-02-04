@@ -21,17 +21,19 @@ export type InstanceTypesSizes =
   | 'small'
   | 'xlarge';
 
+export type InstanceTypeRecord = {
+  instanceType: InstanceTypeUnion;
+  prettyDisplaySize: string;
+  series: string;
+  seriesDisplayName: string;
+  size: string;
+};
+
 export type MappedInstanceTypes = Record<
   InstanceTypesSeries,
   {
     sizes: {
-      [key in InstanceTypesSizes]?: {
-        instanceType: InstanceTypeUnion;
-        prettyDisplaySize: string;
-        series: string;
-        seriesDisplayName: string;
-        size: string;
-      };
+      [key in InstanceTypesSizes]?: InstanceTypeRecord;
     };
   } & { descriptionSeries?: string; displayNameSeries?: string }
 >;
