@@ -1,13 +1,18 @@
 import * as React from 'react';
 
+import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Popover, Stack, StackItem, Title } from '@patternfly/react-core';
 
-import useHCMigrations from './hooks/useHCMigrations';
+import useHyperConvergedMigrations from './hooks/useHyperConvergedMigrations';
 
 const MigrationsLimitionsPopover: React.FC = () => {
   const { t } = useKubevirtTranslation();
-  const migrations = useHCMigrations();
+  const migrations = useHyperConvergedMigrations();
+  const isAdmin = useIsAdmin();
+
+  if (!isAdmin) return null;
+
   return (
     <Popover
       bodyContent={
