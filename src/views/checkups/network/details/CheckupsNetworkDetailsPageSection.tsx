@@ -21,12 +21,12 @@ import {
   STATUS_START_TIME_STAMP,
 } from '../../utils/utils';
 import {
+  CONFIG_PARAM_NAD_NAME,
+  CONFIG_PARAM_NAD_NAMESPACE,
+  CONFIG_PARAM_SAMPLE_DURATION,
   STATUS_AVG_LATENCY_NANO,
   STATUS_MAX_LATENCY_NANO,
   STATUS_MIN_LATENCY_NANO,
-  STATUS_NAD_NAME,
-  STATUS_NAD_NAMESPACE,
-  STATUS_SAMPLE_DURATION,
   STATUS_SOURCE_NODE,
   STATUS_TARGET_NODE,
 } from '../utils/utils';
@@ -102,8 +102,8 @@ const CheckupsNetworkDetailsPageSection: FC<CheckupsNetworkDetailsPageSectionPro
               descriptionData={
                 <ResourceLink
                   groupVersionKind={NetworkAttachmentDefinitionModelGroupVersionKind}
-                  name={configMap?.data?.[STATUS_NAD_NAME]}
-                  namespace={configMap?.data?.[STATUS_NAD_NAMESPACE]}
+                  name={configMap?.data?.[CONFIG_PARAM_NAD_NAME]}
+                  namespace={configMap?.data?.[CONFIG_PARAM_NAD_NAMESPACE]}
                 />
               }
               descriptionHeader={t('NetworkAttachmentDefinition')}
@@ -114,7 +114,7 @@ const CheckupsNetworkDetailsPageSection: FC<CheckupsNetworkDetailsPageSectionPro
             />
             <VirtualMachineDescriptionItem
               descriptionData={t('{{time}} seconds', {
-                time: configMap?.data?.[STATUS_SAMPLE_DURATION],
+                time: configMap?.data?.[CONFIG_PARAM_SAMPLE_DURATION],
               })}
               descriptionHeader={t('Measurement duration')}
             />

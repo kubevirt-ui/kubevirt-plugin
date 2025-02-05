@@ -44,10 +44,12 @@ export const STATUS_MIN_LATENCY_NANO = 'status.result.minLatencyNanoSec';
 export const STATUS_TARGET_NODE = 'status.result.targetNode';
 export const STATUS_SOURCE_NODE = 'status.result.sourceNode';
 
-export const STATUS_SAMPLE_DURATION = 'spec.param.sampleDurationSeconds';
-export const STATUS_NAD_NAMESPACE = 'spec.param.networkAttachmentDefinitionNamespace';
-export const STATUS_NAD_NAME = 'spec.param.networkAttachmentDefinitionName';
-export const STATUS_MAX_DESIRED_LATENCY = 'spec.param.maxDesiredLatencyMilliseconds';
+export const CONFIG_PARAM_TARGET_NODE = 'spec.param.targetNode';
+export const CONFIG_PARAM_SOURCE_NODE = 'spec.param.sourceNode';
+export const CONFIG_PARAM_SAMPLE_DURATION = 'spec.param.sampleDurationSeconds';
+export const CONFIG_PARAM_NAD_NAMESPACE = 'spec.param.networkAttachmentDefinitionNamespace';
+export const CONFIG_PARAM_NAD_NAME = 'spec.param.networkAttachmentDefinitionName';
+export const CONFIG_PARAM_MAX_DESIRED_LATENCY = 'spec.param.maxDesiredLatencyMilliseconds';
 
 const serviceAccountResource = (namespace: string) => ({
   metadata: { name: VM_LATENCY_CHECKUP_SA, namespace },
@@ -248,12 +250,12 @@ export const createNetworkCheckup: CreateNetworkCheckupType = async ({
   await k8sCreate<IoK8sApiCoreV1ConfigMap>({
     data: {
       data: {
-        [STATUS_MAX_DESIRED_LATENCY]: desiredLatency,
-        [STATUS_NAD_NAME]: selectedNAD,
-        [STATUS_NAD_NAMESPACE]: namespace,
-        [STATUS_SAMPLE_DURATION]: sampleDuration,
-        [STATUS_SOURCE_NODE]: nodeSource,
-        [STATUS_TARGET_NODE]: nodeTarget,
+        [CONFIG_PARAM_MAX_DESIRED_LATENCY]: desiredLatency,
+        [CONFIG_PARAM_NAD_NAME]: selectedNAD,
+        [CONFIG_PARAM_NAD_NAMESPACE]: namespace,
+        [CONFIG_PARAM_SAMPLE_DURATION]: sampleDuration,
+        [CONFIG_PARAM_SOURCE_NODE]: nodeSource,
+        [CONFIG_PARAM_TARGET_NODE]: nodeTarget,
         [STATUS_TIMEOUT]: '5m',
       },
       metadata: {
