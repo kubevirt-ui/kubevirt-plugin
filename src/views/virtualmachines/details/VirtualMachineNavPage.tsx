@@ -3,7 +3,6 @@ import React from 'react';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import HorizontalNavbar from '@kubevirt-utils/components/HorizontalNavbar/HorizontalNavbar';
 import { SidebarEditorProvider } from '@kubevirt-utils/components/SidebarEditor/SidebarEditorContext';
-import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
 import useInstanceTypeExpandSpec from '@kubevirt-utils/resources/vm/hooks/useInstanceTypeExpandSpec';
 import { isInstanceTypeVM } from '@kubevirt-utils/resources/vm/utils/instanceTypes';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -42,16 +41,15 @@ const VirtualMachineNavPage: React.FC<VirtualMachineDetailsPageProps> = ({
         name={name}
         vm={isInstanceTypeVM(vm) ? instanceTypeExpandedSpec : vm}
       />
-      <StateHandler error={loadError} loaded={isLoaded} withBullseye>
-        <div className="VirtualMachineNavPage--tabs__main">
-          <HorizontalNavbar
-            expandedSpecLoading={expandedSpecLoading}
-            instanceTypeExpandedSpec={instanceTypeExpandedSpec}
-            pages={pages}
-            vm={vm}
-          />
-        </div>
-      </StateHandler>
+      <div className="VirtualMachineNavPage--tabs__main">
+        <HorizontalNavbar
+          error={loadError}
+          instanceTypeExpandedSpec={instanceTypeExpandedSpec}
+          loaded={isLoaded && !expandedSpecLoading}
+          pages={pages}
+          vm={vm}
+        />
+      </div>
     </SidebarEditorProvider>
   );
 };
