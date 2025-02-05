@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 
+import { tickLabels } from '@kubevirt-utils/components/Charts/ChartLabels/styleOverrides';
 import useResponsiveCharts from '@kubevirt-utils/components/Charts/hooks/useResponsiveCharts';
 import { Chart, ChartAxis, ChartLine, createContainer } from '@patternfly/react-charts';
 import { GridItem } from '@patternfly/react-core';
@@ -56,6 +57,7 @@ const MigrationsUtilizationChart: FC<MigrationsUtilizationChartProps> = ({
             axisComponent={<></>}
             dependentAxis
             showGrid
+            style={{ tickLabels }}
             tickFormat={tickFormat}
             tickValues={tickValues}
           />

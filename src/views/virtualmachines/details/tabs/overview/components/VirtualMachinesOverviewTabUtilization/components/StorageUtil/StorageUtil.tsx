@@ -2,11 +2,13 @@ import React, { FC } from 'react';
 import xbytes from 'xbytes';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import SubTitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/SubTitleChartLabel';
+import TitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/TitleChartLabel';
 import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/ComponentReady';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useGuestOS } from '@kubevirt-utils/resources/vmi';
 import { removeDuplicatesByName } from '@kubevirt-utils/utils/utils';
-import { ChartDonutUtilization, ChartLabel } from '@patternfly/react-charts';
+import { ChartDonutUtilization } from '@patternfly/react-charts';
 
 type StorageUtilProps = {
   vmi: V1VirtualMachineInstance;
@@ -59,8 +61,9 @@ const StorageUtil: FC<StorageUtilProps> = ({ vmi }) => {
             constrainToVisibleArea
             style={{ labels: { fontSize: 20 } }}
             subTitle={t('Used')}
-            subTitleComponent={<ChartLabel y={135} />}
+            subTitleComponent={<SubTitleChartLabel y={135} />}
             title={`${usedPercentage.toFixed(2) || 0}%`}
+            titleComponent={<TitleChartLabel />}
           />
         </ComponentReady>
       </div>

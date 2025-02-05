@@ -16,6 +16,7 @@ import {
 import chart_color_black_200 from '@patternfly/react-tokens/dist/esm/chart_color_black_200';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
+import { tickLabels } from '../ChartLabels/styleOverrides';
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
 import {
@@ -100,6 +101,7 @@ const NetworkThresholdSingleSourceChart: FC<NetworkThresholdSingleSourceChartPro
                 grid: {
                   stroke: chart_color_black_200.value,
                 },
+                tickLabels,
               }}
               dependentAxis
               tickFormat={formatNetworkYTick}
@@ -107,7 +109,7 @@ const NetworkThresholdSingleSourceChart: FC<NetworkThresholdSingleSourceChartPro
             />
             <ChartAxis
               style={{
-                tickLabels: { padding: 2 },
+                tickLabels: { padding: 2, ...tickLabels },
                 ticks: { stroke: 'transparent' },
               }}
               axisComponent={<></>}

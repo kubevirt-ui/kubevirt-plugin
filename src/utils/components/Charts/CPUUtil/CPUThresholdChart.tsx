@@ -22,6 +22,7 @@ import chart_color_blue_300 from '@patternfly/react-tokens/dist/esm/chart_color_
 import chart_color_orange_300 from '@patternfly/react-tokens/dist/esm/chart_color_orange_300';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
+import { tickLabels } from '../ChartLabels/styleOverrides';
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
 import { getUtilizationQueries } from '../utils/queries';
@@ -103,6 +104,7 @@ const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ pods, vmi }) => {
                 grid: {
                   stroke: chart_color_black_200.value,
                 },
+                tickLabels,
               }}
               dependentAxis
               tickFormat={(tick: number) => tick?.toFixed(2)}
@@ -110,7 +112,7 @@ const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ pods, vmi }) => {
             />
             <ChartAxis
               style={{
-                tickLabels: { padding: 2 },
+                tickLabels: { padding: 2, ...tickLabels },
                 ticks: { stroke: 'transparent' },
               }}
               axisComponent={<></>}

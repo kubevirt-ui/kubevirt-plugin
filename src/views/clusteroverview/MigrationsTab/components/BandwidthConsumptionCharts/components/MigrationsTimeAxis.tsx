@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 
+import { tickLabels } from '@kubevirt-utils/components/Charts/ChartLabels/styleOverrides';
 import useResponsiveCharts from '@kubevirt-utils/components/Charts/hooks/useResponsiveCharts';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ChartAxis, ChartContainer } from '@patternfly/react-charts';
@@ -31,6 +32,7 @@ const MigrationsTimeAxis: FC<MigrationsTimeAxisProps> = ({ domainX, timespan }) 
           orientation="top"
           padding={{ bottom: 0, left: 70, right: 0, top: 30 }}
           scale={{ x: 'time' }}
+          style={{ tickLabels }}
           tickFormat={(time) => formatTimestamp(timespan, time, true)}
           tickValues={getTimeTickValues(domainX)}
           width={width}
