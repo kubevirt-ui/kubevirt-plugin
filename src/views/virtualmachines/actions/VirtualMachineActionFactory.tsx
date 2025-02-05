@@ -246,9 +246,16 @@ export const VirtualMachineActionFactory = {
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
       cta: () => startVM(vm),
       disabled:
-        [Migrating, Provisioning, Running, Starting, Stopping, Terminating, Unknown].includes(
-          vm?.status?.printableStatus,
-        ) ||
+        [
+          Migrating,
+          Paused,
+          Provisioning,
+          Running,
+          Starting,
+          Stopping,
+          Terminating,
+          Unknown,
+        ].includes(vm?.status?.printableStatus) ||
         isSnapshotting(vm) ||
         isRestoring(vm),
       id: 'vm-action-start',
