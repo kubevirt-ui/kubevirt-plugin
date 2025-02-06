@@ -17,7 +17,7 @@ import './horizontal-nav-bar.scss';
 type HorizontalNavbarProps = {
   error?: any;
   instanceTypeExpandedSpec?: V1VirtualMachine;
-  loaded?: boolean;
+  loaded: boolean;
   pages: NavPageKubevirt[];
   vm?: V1VirtualMachine;
 };
