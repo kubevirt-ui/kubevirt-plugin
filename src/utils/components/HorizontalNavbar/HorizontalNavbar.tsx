@@ -15,15 +15,17 @@ import { NavPageKubevirt, trimLastHistoryPath } from './utils/utils';
 import './horizontal-nav-bar.scss';
 
 type HorizontalNavbarProps = {
-  expandedSpecLoading?: boolean;
+  error?: any;
   instanceTypeExpandedSpec?: V1VirtualMachine;
+  loaded?: boolean;
   pages: NavPageKubevirt[];
   vm?: V1VirtualMachine;
 };
 
 const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
-  expandedSpecLoading,
+  error,
   instanceTypeExpandedSpec,
+  loaded,
   pages,
   vm,
 }) => {
@@ -81,7 +83,7 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
           return (
             <Route
               Component={(props) => (
-                <StateHandler loaded={!expandedSpecLoading} withBullseye>
+                <StateHandler error={error} loaded={loaded} withBullseye>
                   <Component
                     instanceTypeExpandedSpec={instanceTypeExpandedSpec}
                     obj={vm}
