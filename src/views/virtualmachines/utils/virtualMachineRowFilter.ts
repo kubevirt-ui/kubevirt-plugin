@@ -21,15 +21,9 @@ import {
 import { getVMIIPAddresses } from '@kubevirt-utils/resources/vmi';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
+import { VmiMapper, VmimMapper } from './mappers';
 import { compareCIDR, getLatestMigrationForEachVM, isLiveMigratable } from './utils';
 import { isErrorPrintableStatus, printableVMStatus } from './virtualMachineStatuses';
-
-type VmiMapper = {
-  mapper: { [key: string]: { [key: string]: V1VirtualMachineInstance } };
-  nodeNames: { [key: string]: { id: string; title: string } };
-};
-
-type VmimMapper = { [key: string]: { [key: string]: V1VirtualMachineInstanceMigration } };
 
 const ErrorStatus = { id: 'Error', title: 'Error' };
 
