@@ -49,7 +49,7 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
   );
 
   const filteredNADs = nads?.filter(
-    (nad) => !currentlyUsedNADsNames.includes(`${getNamespace(nad)}/${getName(nad)}`),
+    (nad) => !currentlyUsedNADsNames?.includes(`${getNamespace(nad)}/${getName(nad)}`),
   );
 
   const selectedFirstOnLoad = useRef(false);
