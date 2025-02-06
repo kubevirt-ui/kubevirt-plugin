@@ -9,6 +9,9 @@ import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { RowProps } from '@openshift-console/dynamic-plugin-sdk';
+import VirtualMachineMigrationPercentage from '@virtualmachines/details/tabs/overview/components/VirtualMachinesOverviewTabDetails/components/VirtualMachineMigrationPercentage';
+import StatusWithPopover from '@virtualmachines/details/tabs/overview/components/VirtualMachinesOverviewTabDetails/components/VirtualMachineStatusWithPopover/VirtualMachineStatusWithPopover';
+import { printableVMStatus } from '@virtualmachines/utils';
 
 import VirtualMachineRowLayout from './VirtualMachineRowLayout';
 import VirtualMachineRunningRow from './VirtualMachineRunningRow';
@@ -26,10 +29,19 @@ const VirtualMachineRow: FC<
   const vmName = getName(vm);
   const vmNamespace = getNamespace(vm);
   const vmi = getVmi(vmNamespace, vmName);
+  const status = (
+    <>
+      <StatusWithPopover vm={vm} vmi={vmi} />
+      {vm?.status?.printableStatus === printableVMStatus.Migrating && (
+        <VirtualMachineMigrationPercentage vm={vm} />
+      )}
+    </>
+  );
   return !isEmpty(vmi) ? (
     <VirtualMachineRunningRow
       rowData={{
         isSingleNodeCluster,
+        status,
         vmi,
         vmim: getVmim(vmNamespace, vmName),
       }}
@@ -40,7 +52,7 @@ const VirtualMachineRow: FC<
     <VirtualMachineRowLayout
       activeColumnIDs={activeColumnIDs}
       obj={vm}
-      rowData={{ ips: NO_DATA_DASH, isSingleNodeCluster, node: NO_DATA_DASH, vmim: null }}
+      rowData={{ ips: NO_DATA_DASH, isSingleNodeCluster, node: NO_DATA_DASH, status, vmim: null }}
     />
   );
 };
