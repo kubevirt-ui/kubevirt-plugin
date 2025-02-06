@@ -3,8 +3,8 @@ import React, { FC } from 'react';
 import { modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineSnapshotContentModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineSnapshotContentModel';
 import {
-  V1alpha1VirtualMachineSnapshot,
-  V1alpha1VirtualMachineSnapshotContent,
+  V1beta1VirtualMachineSnapshot,
+  V1beta1VirtualMachineSnapshotContent,
   V1VirtualMachine,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -16,7 +16,7 @@ import { Alert, AlertVariant } from '@patternfly/react-core';
 import ConfigurationSummary from './ConfigurationSummary';
 
 type SnapshotContentConfigurationSummaryProps = {
-  snapshot: V1alpha1VirtualMachineSnapshot;
+  snapshot: V1beta1VirtualMachineSnapshot;
 };
 
 const SnapshotContentConfigurationSummary: FC<SnapshotContentConfigurationSummaryProps> = ({
@@ -25,7 +25,7 @@ const SnapshotContentConfigurationSummary: FC<SnapshotContentConfigurationSummar
   const { t } = useKubevirtTranslation();
 
   const [snapshotContent, loaded, error] =
-    useK8sWatchResource<V1alpha1VirtualMachineSnapshotContent>(
+    useK8sWatchResource<V1beta1VirtualMachineSnapshotContent>(
       snapshot && {
         groupVersionKind: modelToGroupVersionKind(VirtualMachineSnapshotContentModel),
         name: snapshot.status.virtualMachineSnapshotContentName,

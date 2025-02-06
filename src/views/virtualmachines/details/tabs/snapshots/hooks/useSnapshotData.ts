@@ -5,8 +5,8 @@ import {
   VirtualMachineSnapshotModelGroupVersionKind,
 } from '@kubevirt-ui/kubevirt-api/console';
 import {
-  V1alpha1VirtualMachineRestore,
-  V1alpha1VirtualMachineSnapshot,
+  V1beta1VirtualMachineRestore,
+  V1beta1VirtualMachineSnapshot,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -16,12 +16,12 @@ export type UseSnapshotData = {
   error: any;
   loaded: boolean;
   restoresMap: any;
-  snapshots: V1alpha1VirtualMachineSnapshot[];
+  snapshots: V1beta1VirtualMachineSnapshot[];
 };
 
 const useSnapshotData = (vmName: string, namespace: string): UseSnapshotData => {
   const [snapshots, snapshotsLoaded, snapshotsError] = useK8sWatchResource<
-    V1alpha1VirtualMachineSnapshot[]
+    V1beta1VirtualMachineSnapshot[]
   >({
     groupVersionKind: VirtualMachineSnapshotModelGroupVersionKind,
     isList: true,
@@ -30,7 +30,7 @@ const useSnapshotData = (vmName: string, namespace: string): UseSnapshotData => 
   });
 
   const [restores, restoresLoaded, restoresError] = useK8sWatchResource<
-    V1alpha1VirtualMachineRestore[]
+    V1beta1VirtualMachineRestore[]
   >({
     groupVersionKind: VirtualMachineRestoreModelGroupVersionKind,
     isList: true,

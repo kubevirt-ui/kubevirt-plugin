@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
 import { PersistentVolumeClaimModel } from '@kubevirt-ui/kubevirt-api/console';
-import { V1alpha1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, Checkbox, FormSelect, FormSelectOption } from '@patternfly/react-core';
@@ -12,7 +12,7 @@ import { OperatingSystemRecord } from '../utils/types';
 import UploadPVCFormPVCNamespace from './UploadPVCFormPVCNamespace';
 
 type UploadPVCFormGoldenImageProps = {
-  goldenPvcs: V1alpha1PersistentVolumeClaim[];
+  goldenPvcs: V1beta1PersistentVolumeClaim[];
   handleCDROMChange: (checked: boolean) => void;
   handleOs: (newOs: string) => void;
   handlePvcSizeTemplate: (checked: boolean) => void;

@@ -1,5 +1,7 @@
-import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
-import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1beta1DataSource,
+  V1beta1DataVolumeSpec,
+} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/utils/constants';
 
 import { SOURCE_OPTIONS_IDS, SOURCE_TYPES } from '../../utils/constants';

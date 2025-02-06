@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import VirtualMachineSnapshotModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineSnapshotModel';
-import { V1alpha1VirtualMachineSnapshot } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1VirtualMachineSnapshot } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -11,7 +11,7 @@ import { ButtonVariant } from '@patternfly/react-core';
 const SnapshotDeleteModal = ({ isOpen, onClose, snapshot }) => {
   const { t } = useKubevirtTranslation();
   return (
-    <TabModal<V1alpha1VirtualMachineSnapshot>
+    <TabModal<V1beta1VirtualMachineSnapshot>
       onSubmit={(obj) =>
         k8sDelete({
           json: undefined,

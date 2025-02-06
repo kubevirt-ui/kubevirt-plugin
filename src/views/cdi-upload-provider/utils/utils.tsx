@@ -2,7 +2,7 @@ import { Children, cloneElement } from 'react';
 
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
-import { V1alpha1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   getGroupVersionKindForModel,
   k8sDelete,
@@ -14,7 +14,7 @@ import { LABEL_CDROM_SOURCE, UPLOAD_STATUS } from './consts';
 import { getKubevirtModelAvailableAPIVersion } from './selectors';
 import { OperatingSystemRecord } from './types';
 
-export const killCDIBoundPVC = (pvc: V1alpha1PersistentVolumeClaim) =>
+export const killCDIBoundPVC = (pvc: V1beta1PersistentVolumeClaim) =>
   k8sDelete({
     model: DataVolumeModel,
     resource: pvc,

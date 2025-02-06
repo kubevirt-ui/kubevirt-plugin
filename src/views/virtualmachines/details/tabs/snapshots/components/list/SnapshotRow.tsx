@@ -2,8 +2,8 @@ import * as React from 'react';
 
 import { VirtualMachineSnapshotModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import {
-  V1alpha1VirtualMachineRestore,
-  V1alpha1VirtualMachineSnapshot,
+  V1beta1VirtualMachineRestore,
+  V1beta1VirtualMachineSnapshot,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
@@ -16,11 +16,11 @@ import SnapshotActionsMenu from './SnapshotActionsMenu';
 
 const SnapshotRow: React.FC<
   RowProps<
-    V1alpha1VirtualMachineSnapshot,
-    { isVMRunning: boolean; restores: Map<string, V1alpha1VirtualMachineRestore> }
+    V1beta1VirtualMachineSnapshot,
+    { isVMRunning: boolean; restores: Map<string, V1beta1VirtualMachineRestore> }
   >
 > = ({ activeColumnIDs, obj: snapshot, rowData: { isVMRunning, restores } }) => {
-  const relevantRestore: V1alpha1VirtualMachineRestore = restores?.[snapshot?.metadata?.name];
+  const relevantRestore: V1beta1VirtualMachineRestore = restores?.[snapshot?.metadata?.name];
   const isRestoreDisabled = isVMRunning || snapshot?.status?.phase !== snapshotStatuses.Succeeded;
   const readyCondition = snapshot?.status?.conditions?.find(({ type }) => type === 'Ready');
   return (
