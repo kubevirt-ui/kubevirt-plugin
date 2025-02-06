@@ -16,7 +16,7 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 
-import useHCMigrations from '../components/MigrationsLimitionsPopover/hooks/useHCMigrations';
+import useHyperConvergedMigrations from '../components/MigrationsLimitionsPopover/hooks/useHyperConvergedMigrations';
 import {
   getSourceNodeFilter,
   getStatusFilter,
@@ -40,7 +40,7 @@ export type UseMigrationCardDataAndFiltersValues = {
 type UseMigrationCardDataAndFilters = (duration: string) => UseMigrationCardDataAndFiltersValues;
 
 const useMigrationCardDataAndFilters: UseMigrationCardDataAndFilters = (duration: string) => {
-  const migrationsDefaultConfigurations = useHCMigrations();
+  const migrationsDefaultConfigurations = useHyperConvergedMigrations();
   const [activeNamespace] = useActiveNamespace();
   const namespace = activeNamespace !== ALL_NAMESPACES_SESSION_KEY ? activeNamespace : null;
 
