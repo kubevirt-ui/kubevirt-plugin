@@ -3,8 +3,8 @@ import { Trans } from 'react-i18next';
 
 import VirtualMachineRestoreModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineRestoreModel';
 import {
-  V1alpha1VirtualMachineRestore,
-  V1alpha1VirtualMachineSnapshot,
+  V1beta1VirtualMachineRestore,
+  V1beta1VirtualMachineSnapshot,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -17,19 +17,19 @@ import './restore-modal.scss';
 type DeleteResourceModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  snapshot: V1alpha1VirtualMachineSnapshot;
+  snapshot: V1beta1VirtualMachineSnapshot;
 };
 
 const RestoreModal: FC<DeleteResourceModalProps> = ({ isOpen, onClose, snapshot }) => {
   const { t } = useKubevirtTranslation();
 
   const resultRestore = useMemo(() => {
-    const restore: V1alpha1VirtualMachineRestore = getVMRestoreSnapshotResource(snapshot);
+    const restore: V1beta1VirtualMachineRestore = getVMRestoreSnapshotResource(snapshot);
     return restore;
   }, [snapshot]);
 
   return (
-    <TabModal<V1alpha1VirtualMachineRestore>
+    <TabModal<V1beta1VirtualMachineRestore>
       onSubmit={(obj) =>
         k8sCreate({
           data: obj,

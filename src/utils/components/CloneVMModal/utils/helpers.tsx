@@ -5,7 +5,7 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import VirtualMachineSnapshotModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineSnapshotModel';
 import {
   V1alpha1VirtualMachineClone,
-  V1alpha1VirtualMachineSnapshot,
+  V1beta1VirtualMachineSnapshot,
   V1VirtualMachine,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { MAX_K8S_NAME_LENGTH } from '@kubevirt-utils/utils/constants';
@@ -33,11 +33,11 @@ const cloneVMToVM: V1alpha1VirtualMachineClone = {
 };
 
 export const isVM = (
-  source: V1alpha1VirtualMachineSnapshot | V1VirtualMachine,
+  source: V1beta1VirtualMachineSnapshot | V1VirtualMachine,
 ): source is V1VirtualMachine => source.kind === VirtualMachineModel.kind;
 
 export const cloneVM = (
-  source: V1alpha1VirtualMachineSnapshot | V1VirtualMachine,
+  source: V1beta1VirtualMachineSnapshot | V1VirtualMachine,
   newVMName: string,
   namespace: string,
 ) => {

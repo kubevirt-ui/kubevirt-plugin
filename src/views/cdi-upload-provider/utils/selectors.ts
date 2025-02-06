@@ -3,7 +3,7 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import {
   K8sIoApiCoreV1ResourceRequirements,
-  V1alpha1PersistentVolumeClaim,
+  V1beta1PersistentVolumeClaim,
   V1VirtualMachine,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { V1Template } from '@kubevirt-utils/models';
@@ -45,7 +45,7 @@ export const getAnnotations = (
 ): { [key: string]: string } => vm?.metadata.annotations || defaultValue;
 
 const getAnnotation = (
-  pvc: V1alpha1PersistentVolumeClaim,
+  pvc: V1beta1PersistentVolumeClaim,
   annotationName: string,
   defaultValue?: string,
 ): string => pvc?.metadata?.annotations?.[annotationName] || defaultValue;
@@ -73,36 +73,36 @@ export const getPVCName = (obj: V1Template): string =>
   getParameterValue(obj, TEMPLATE_BASE_IMAGE_NAME_PARAMETER) ||
   getParameterValue(obj, TEMPLATE_DATA_SOURCE_NAME_PARAMETER);
 
-export const getPvcResources = (pvc: V1alpha1PersistentVolumeClaim) => pvc?.spec?.resources;
+export const getPvcResources = (pvc: V1beta1PersistentVolumeClaim) => pvc?.spec?.resources;
 
-export const getPvcStorageSize = (pvc: V1alpha1PersistentVolumeClaim): string =>
+export const getPvcStorageSize = (pvc: V1beta1PersistentVolumeClaim): string =>
   getStorageSize(getPvcResources(pvc));
 
-export const getPvcAccessModes = (pvc: V1alpha1PersistentVolumeClaim) => pvc?.spec?.accessModes;
-export const getPvcVolumeMode = (pvc: V1alpha1PersistentVolumeClaim) => pvc?.spec?.volumeMode;
-export const getPvcStorageClassName = (pvc: V1alpha1PersistentVolumeClaim): string =>
+export const getPvcAccessModes = (pvc: V1beta1PersistentVolumeClaim) => pvc?.spec?.accessModes;
+export const getPvcVolumeMode = (pvc: V1beta1PersistentVolumeClaim) => pvc?.spec?.volumeMode;
+export const getPvcStorageClassName = (pvc: V1beta1PersistentVolumeClaim): string =>
   pvc?.spec?.storageClassName;
 
-export const getPvcImportPodName = (pvc: V1alpha1PersistentVolumeClaim) =>
+export const getPvcImportPodName = (pvc: V1beta1PersistentVolumeClaim) =>
   getAnnotation(pvc, STORAGE_IMPORT_POD_LABEL);
 
 // upload pvc selectors
-export const getPvcUploadPodName = (pvc: V1alpha1PersistentVolumeClaim) =>
+export const getPvcUploadPodName = (pvc: V1beta1PersistentVolumeClaim) =>
   getAnnotation(pvc, CDI_UPLOAD_POD_NAME_ANNOTATION);
 
-export const getPvcPhase = (pvc: V1alpha1PersistentVolumeClaim) =>
+export const getPvcPhase = (pvc: V1beta1PersistentVolumeClaim) =>
   getAnnotation(pvc, CDI_UPLOAD_POD_ANNOTATION);
 
-export const getPvcCloneToken = (pvc: V1alpha1PersistentVolumeClaim) =>
+export const getPvcCloneToken = (pvc: V1beta1PersistentVolumeClaim) =>
   getAnnotation(pvc, CDI_CLONE_TOKEN_ANNOTAION);
 
-export const isPvcUploading = (pvc: V1alpha1PersistentVolumeClaim) =>
+export const isPvcUploading = (pvc: V1beta1PersistentVolumeClaim) =>
   !getPvcCloneToken(pvc) && getPvcUploadPodName(pvc) && getPvcPhase(pvc) === CDI_PVC_PHASE_RUNNING;
 
-export const isPvcCloning = (pvc: V1alpha1PersistentVolumeClaim) =>
+export const isPvcCloning = (pvc: V1beta1PersistentVolumeClaim) =>
   !!getPvcCloneToken(pvc) && getPvcPhase(pvc) === CDI_PVC_PHASE_RUNNING;
 
-export const isPvcBoundToCDI = (pvc: V1alpha1PersistentVolumeClaim) =>
+export const isPvcBoundToCDI = (pvc: V1beta1PersistentVolumeClaim) =>
   pvc?.metadata?.ownerReferences?.some(
     (or) =>
       or.apiVersion.startsWith(CDI_KUBEVIRT_IO) &&
@@ -169,7 +169,8 @@ export const getTemplateOperatingSystems = (templates: V1Template[]) => {
       return {
         baseImageName: getPVCName(template),
         baseImageNamespace: getPVCNamespace(template),
-        baseImageRecomendedSize: dv && stringValueUnitSplit(getDataVolumeStorageSize(dv)),
+        baseImageRecomendedSize:
+          dv && stringValueUnitSplit(getDataVolumeStorageSize(dv as unknown as V1beta1DataVolume)),
         id: osId,
         isSourceRef: !!dv?.spec?.sourceRef,
         name: getAnnotation(template, nameAnnotation),

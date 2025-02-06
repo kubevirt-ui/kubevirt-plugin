@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 
-import { V1alpha1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { killUploadPVC } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
@@ -10,7 +10,7 @@ import UploadPVCPopoverProgressStatus from './UploadPVCPopoverProgressStatus';
 import UploadPVCPopoverUploadStatus from './UploadPVCPopoverUploadStatus';
 
 type PVCUploadStatusProps = {
-  pvc: V1alpha1PersistentVolumeClaim;
+  pvc: V1beta1PersistentVolumeClaim;
   title?: string;
 };
 

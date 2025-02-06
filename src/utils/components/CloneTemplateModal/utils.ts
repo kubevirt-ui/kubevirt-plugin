@@ -1,10 +1,10 @@
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
-import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import {
-  V1beta1DataVolumeSourcePVC,
+  V1beta1DataVolume,
   V1beta1DataVolumeSpec,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { V1beta1DataVolumeSourcePVC } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { ROOTDISK } from '@kubevirt-utils/constants/constants';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { getDataVolumeTemplates, getVolumes } from '@kubevirt-utils/resources/vm';
@@ -41,7 +41,11 @@ const produceDataVolume = (
 
 export const cloneStorage = async (template: V1Template, pvcName: string, namespace: string) => {
   const rootDiskDataVolumeTemplate = getBootSourceDataVolumeTemplate(template);
-  const dataVolume = produceDataVolume(pvcName, namespace, rootDiskDataVolumeTemplate?.spec);
+  const dataVolume = produceDataVolume(
+    pvcName,
+    namespace,
+    rootDiskDataVolumeTemplate?.spec as unknown as V1beta1DataVolumeSpec,
+  );
   await k8sCreate({
     data: dataVolume,
     model: DataVolumeModel,

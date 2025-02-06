@@ -1,6 +1,6 @@
 import byteSize from 'byte-size';
 
-import { V1alpha1PersistentVolumeClaim, V1Disk } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1PersistentVolumeClaim, V1Disk } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
 export type DiskPresentation = {
@@ -22,7 +22,7 @@ export type FileSystemPresentation = {
   usedBytes: number;
 };
 
-export type DiskRaw = V1Disk & { pvc?: V1alpha1PersistentVolumeClaim };
+export type DiskRaw = V1Disk & { pvc?: V1beta1PersistentVolumeClaim };
 
 export const diskTypes = {
   cdrom: 'CD-ROM',

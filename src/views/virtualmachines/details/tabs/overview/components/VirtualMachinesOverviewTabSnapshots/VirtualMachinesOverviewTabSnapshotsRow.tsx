@@ -2,7 +2,7 @@ import React, { FC, useState } from 'react';
 import classnames from 'classnames';
 
 import {
-  V1alpha1VirtualMachineSnapshot,
+  V1beta1VirtualMachineSnapshot,
   V1VirtualMachine,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -31,7 +31,7 @@ import { icon } from './utils/snapshotStatus';
 import './virtual-machines-overview-tab-snapshots.scss';
 
 type VirtualMachinesOverviewTabSnapshotsRowProps = {
-  snapshot: V1alpha1VirtualMachineSnapshot;
+  snapshot: V1beta1VirtualMachineSnapshot;
   vm: V1VirtualMachine;
 };
 

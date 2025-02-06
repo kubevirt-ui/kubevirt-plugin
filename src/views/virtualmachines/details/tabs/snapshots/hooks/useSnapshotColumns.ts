@@ -1,4 +1,4 @@
-import { V1alpha1VirtualMachineSnapshot } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1VirtualMachineSnapshot } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 import { sortable } from '@patternfly/react-table';
@@ -6,7 +6,7 @@ import { sortable } from '@patternfly/react-table';
 const useSnapshotColumns = () => {
   const { t } = useKubevirtTranslation();
 
-  const columns: TableColumn<V1alpha1VirtualMachineSnapshot>[] = [
+  const columns: TableColumn<V1beta1VirtualMachineSnapshot>[] = [
     {
       id: 'name',
       sort: 'metadata.name',
