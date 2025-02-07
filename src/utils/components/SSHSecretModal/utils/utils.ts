@@ -1,6 +1,5 @@
 import produce from 'immer';
 
-import { SecretModel } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import {
@@ -22,17 +21,12 @@ import {
   MIN_NAME_LENGTH_FOR_GENERATED_SUFFIX,
 } from '@kubevirt-utils/components/SSHSecretModal/utils/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { decodeSecret, encodeSecretKey } from '@kubevirt-utils/resources/secret/utils';
+import { decodeSecret } from '@kubevirt-utils/resources/secret/utils';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { isWindows } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { generatePrettyName, isEmpty, validateSSHPublicKey } from '@kubevirt-utils/utils/utils';
-import {
-  k8sCreate,
-  K8sResourceCommon,
-  k8sUpdate,
-  WatchK8sResults,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { k8sUpdate, WatchK8sResults } from '@openshift-console/dynamic-plugin-sdk';
 
 export const getAllSecrets = (
   secretsData: WatchK8sResults<{ [p: string]: IoK8sApiCoreV1Secret[] }>,
@@ -82,14 +76,14 @@ export const getSecretNameErrorMessage = (
   return null;
 };
 
-export const removeSecretToVM = (vm: V1VirtualMachine) =>
+export const removeSecretFromVM = (vm: V1VirtualMachine) =>
   produce(vm, (vmDraft) => {
     delete vmDraft.spec.template.spec.accessCredentials;
   });
 
 export const detachVMSecret = async (vm: V1VirtualMachine) => {
   await k8sUpdate({
-    data: removeSecretToVM(vm),
+    data: removeSecretFromVM(vm),
     model: VirtualMachineModel,
   });
 };
@@ -171,26 +165,6 @@ export const getCloudInitConfigDrive = (
     userData: convertUserDataObjectToYAML(userData, true),
   };
 };
-
-export const createSSHSecret = (
-  sshKey: string,
-  secretName: string,
-  secretNamespace: string,
-  dryRun = false,
-) =>
-  k8sCreate<K8sResourceCommon & { data?: { [key: string]: string } }>({
-    data: {
-      apiVersion: SecretModel.apiVersion,
-      data: { key: encodeSecretKey(sshKey) },
-      kind: SecretModel.kind,
-      metadata: {
-        name: secretName,
-        namespace: secretNamespace,
-      },
-    },
-    model: SecretModel,
-    ...(dryRun && { queryParams: { dryRun: 'All' } }),
-  });
 
 export const getAllSecretsFromSecretData = (secretsResourceData: IoK8sApiCoreV1Secret[]) => {
   const sshKeySecrets = secretsResourceData

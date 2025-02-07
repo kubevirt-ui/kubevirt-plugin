@@ -6,12 +6,16 @@ import { TabsData } from '@catalog/utils/WizardVMContext/utils/tabs-data';
 import { TemplateParameter, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine, V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   DEFAULT_CDROM_DISK_SIZE,
   DEFAULT_DISK_SIZE,
 } from '@kubevirt-utils/components/DiskModal/utils/constants';
+import { SecretsData } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import { UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
+import { getSecretEncodedSSHKey } from '@kubevirt-utils/resources/secret/utils/selectors';
+import { getName } from '@kubevirt-utils/resources/shared';
 import {
   getTemplateParameterValue,
   getTemplateVirtualMachineObject,
@@ -221,3 +225,36 @@ export const getTemplateParametersSplit = (
     },
     [[], []],
   );
+
+export const getSecretByNameAndNS = (
+  secretName: string,
+  namespace: string,
+  projectsWithSecrets: { [p: string]: IoK8sApiCoreV1Secret[] },
+) => projectsWithSecrets?.[namespace]?.find((secret) => getName(secret) === secretName);
+
+export const sshSecretExistsInNamespace = (
+  secretsData: SecretsData,
+  templateNamespace: string,
+  targetNamespace: string,
+  secretName: string,
+): boolean => {
+  const { projectsWithSecrets, secretsLoaded } = secretsData;
+  const originalSecret = getSecretByNameAndNS(secretName, templateNamespace, projectsWithSecrets);
+  const targetSecret = getSecretByNameAndNS(secretName, targetNamespace, projectsWithSecrets);
+
+  return (
+    secretsLoaded &&
+    getName(originalSecret) === getName(targetSecret) &&
+    getSecretEncodedSSHKey(originalSecret) === getSecretEncodedSSHKey(targetSecret)
+  );
+};
+
+export const getSSHSecretCopy = (
+  secret: IoK8sApiCoreV1Secret,
+  targetNamespace: string,
+): IoK8sApiCoreV1Secret => {
+  if (!secret) return null;
+  return produce(secret, (draftSecret) => {
+    draftSecret.metadata.namespace = targetNamespace;
+  });
+};
