@@ -7,8 +7,8 @@ import {
   SecretSelectionOption,
   SSHSecretDetails,
 } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
-import { createSSHSecret } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { createSSHSecret } from '@kubevirt-utils/resources/secret/utils';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Button, ButtonVariant, Grid, GridItem, Truncate } from '@patternfly/react-core';
 import { MinusCircleIcon } from '@patternfly/react-icons';

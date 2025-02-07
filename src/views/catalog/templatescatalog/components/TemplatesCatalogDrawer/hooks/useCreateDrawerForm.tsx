@@ -17,7 +17,6 @@ import { SecretSelectionOption } from '@kubevirt-utils/components/SSHSecretModal
 import {
   addSecretToVM,
   applyCloudDriveCloudInitVolume,
-  createSSHSecret,
 } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import { isValidVMName } from '@kubevirt-utils/components/VMNameValidationHelperText/utils/utils';
 import {
@@ -37,7 +36,11 @@ import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeat
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
-import { createSecret, encodeSecretKey } from '@kubevirt-utils/resources/secret/utils';
+import {
+  createSSHSecret,
+  createUserPasswordSecret,
+  encodeSecretKey,
+} from '@kubevirt-utils/resources/secret/utils';
 import { getAnnotation, getLabel, getResourceUrl } from '@kubevirt-utils/resources/shared';
 import {
   ANNOTATIONS,
@@ -120,11 +123,11 @@ const useCreateDrawerForm = (
     setIsQuickCreating(true);
     setCreateError(undefined);
 
-    const addSecret = username && password && bootDiskSourceIsRegistry(template);
+    const addRegistrySecret = username && password && bootDiskSourceIsRegistry(template);
     const imageSecretName = addRandomSuffix(nameField);
 
-    if (addSecret) {
-      await createSecret({
+    if (addRegistrySecret) {
+      await createUserPasswordSecret({
         namespace,
         password,
         secretName: imageSecretName,
@@ -145,7 +148,7 @@ const useCreateDrawerForm = (
         vmObject.spec.template.spec.domain.cpu.cores = cpu?.cores;
         vmObject.spec.template.spec.domain.memory.guest = memory;
 
-        if (addSecret)
+        if (addRegistrySecret)
           vmObject.spec.dataVolumeTemplates[0].spec.source.registry.secretRef = imageSecretName;
 
         if (!getLabels(vmObject.spec.template)) vmObject.spec.template.metadata.labels = {};
@@ -302,8 +305,7 @@ const useCreateDrawerForm = (
       });
 
       updateTabsData((currentTabsData) => {
-        currentTabsData.authorizedSSHKey = sshDetails?.sshSecretName;
-        currentTabsData.applySSHToSettings = sshDetails?.applyKeyToProject;
+        currentTabsData.sshDetails = sshDetails;
       });
 
       // update context vm

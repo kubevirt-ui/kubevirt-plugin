@@ -3,6 +3,7 @@ import produce from 'immer';
 
 import useRegistryCredentials from '@catalog/utils/useRegistryCredentials/useRegistryCredentials';
 import { V1Devices, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { SecretSelectionOption } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import { logTemplateFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
 import {
   CUSTOMIZE_VM_FAILED,
@@ -10,7 +11,7 @@ import {
 } from '@kubevirt-utils/extensions/telemetry/utils/constants';
 import { addUploadDataVolumeOwnerReference } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
-import { createSecret } from '@kubevirt-utils/resources/secret/utils';
+import { createSSHSecret, createUserPasswordSecret } from '@kubevirt-utils/resources/secret/utils';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
 import { vmBootDiskSourceIsRegistry } from '@kubevirt-utils/resources/vm/utils/source';
@@ -31,17 +32,20 @@ type CreateVMArguments = {
   onFullfilled: (vm: V1VirtualMachine) => void;
 };
 
-type UseWizardVmCreateValues = {
+type UseWizardVMCreateValues = {
   createVM: ({ isDisableGuestSystemAccessLog, onFullfilled }: CreateVMArguments) => Promise<void>;
   error: any;
   loaded: boolean;
 };
 
-export const useWizardVmCreate = (): UseWizardVmCreateValues => {
+export const useWizardVMCreate = (): UseWizardVMCreateValues => {
   const { tabsData, vm } = useWizardVMContext();
+  const { applyKeyToProject, secretOption, sshPubKey, sshSecretName } = tabsData?.sshDetails;
+  const vmNamespace = getNamespace(vm);
+
   const { decodedRegistryCredentials } = useRegistryCredentials();
   const [models] = useK8sModels();
-  const [isUDNManagedNamespace] = useNamespaceUDN(getNamespace(vm));
+  const [isUDNManagedNamespace] = useNamespaceUDN(vmNamespace);
   const [authorizedSSHKeys, updateAuthorizedSSHKeys] = useKubevirtUserSettings('ssh');
 
   const [loaded, setLoaded] = useState<boolean>(true);
@@ -53,11 +57,11 @@ export const useWizardVmCreate = (): UseWizardVmCreateValues => {
       setError(undefined);
 
       const { password, username } = decodedRegistryCredentials;
-      const addSecret = username && password && vmBootDiskSourceIsRegistry(vm);
+      const addRegistrySecret = username && password && vmBootDiskSourceIsRegistry(vm);
       const imageSecretName = addRandomSuffix(getName(vm));
-      if (addSecret) {
-        await createSecret({
-          namespace: getNamespace(vm),
+      if (addRegistrySecret) {
+        await createUserPasswordSecret({
+          namespace: vmNamespace,
           password,
           secretName: imageSecretName,
           username,
@@ -78,7 +82,7 @@ export const useWizardVmCreate = (): UseWizardVmCreateValues => {
         if (!isUDNManagedNamespace)
           vmDraft.spec.template.metadata.labels[HEADLESS_SERVICE_LABEL] = HEADLESS_SERVICE_NAME;
 
-        if (addSecret)
+        if (addRegistrySecret)
           vmDraft.spec.dataVolumeTemplates[0].spec.source.registry.secretRef = imageSecretName;
       });
 
@@ -90,6 +94,10 @@ export const useWizardVmCreate = (): UseWizardVmCreateValues => {
 
       const newVM = createdObjects[0] as V1VirtualMachine;
 
+      if (secretOption === SecretSelectionOption.addNew) {
+        await createSSHSecret(sshPubKey, sshSecretName, vmNamespace);
+      }
+
       // add missing ownerReferences to upload data volumes
       if (tabsData?.disks?.dataVolumesToAddOwnerRef?.length > 0) {
         await Promise.all(
@@ -99,10 +107,10 @@ export const useWizardVmCreate = (): UseWizardVmCreateValues => {
         );
       }
 
-      if (tabsData.authorizedSSHKey && tabsData.applySSHToSettings) {
+      if (sshSecretName && applyKeyToProject) {
         updateAuthorizedSSHKeys({
           ...authorizedSSHKeys,
-          [newVM.metadata.namespace]: tabsData.authorizedSSHKey,
+          [newVM.metadata.namespace]: sshSecretName,
         });
       }
 

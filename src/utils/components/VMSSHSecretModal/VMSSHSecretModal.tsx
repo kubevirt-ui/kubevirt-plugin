@@ -1,7 +1,7 @@
 import React, { FC, useCallback, useMemo } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { getInitialSSHDetails } from '@kubevirt-utils/resources/secret/utils';
+import { createSSHSecret, getInitialSSHDetails } from '@kubevirt-utils/resources/secret/utils';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -9,7 +9,7 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { isEqualObject } from '../NodeSelectorModal/utils/helpers';
 import SSHSecretModal from '../SSHSecretModal/SSHSecretModal';
 import { SecretSelectionOption, SSHSecretDetails } from '../SSHSecretModal/utils/types';
-import { addSecretToVM, createSSHSecret, detachVMSecret } from '../SSHSecretModal/utils/utils';
+import { addSecretToVM, detachVMSecret } from '../SSHSecretModal/utils/utils';
 
 type VMSSHSecretModalProps = {
   authorizedSSHKeys: { [namespace: string]: string };

@@ -3,7 +3,7 @@ import React, { FC, useState } from 'react';
 import { IoK8sApiCoreV1Pod } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, PodModel } from '@kubevirt-utils/models';
-import { createSecret } from '@kubevirt-utils/resources/secret/utils';
+import { createUserPasswordSecret } from '@kubevirt-utils/resources/secret/utils';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
@@ -66,7 +66,7 @@ const ExportModal: FC<ExportModalProps> = ({ isOpen, namespace, onClose, pvcName
           if (error.code !== ALREADY_CREATED_ERROR_CODE) throw error;
         }
 
-        await createSecret({ namespace, password, secretName, username });
+        await createUserPasswordSecret({ namespace, password, secretName, username });
         const pod = await createUploaderPod({
           destination,
           namespace,

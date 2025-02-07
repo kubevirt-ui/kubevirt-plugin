@@ -9,7 +9,6 @@ import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { SecretSelectionOption } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
-import { createSSHSecret } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import {
   AUTOUNATTEND,
   generateNewSysprepConfig,
@@ -28,6 +27,7 @@ import {
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
+import { createSSHSecret } from '@kubevirt-utils/resources/secret/utils';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
 import { useDriversImage } from '@kubevirt-utils/resources/vm/utils/disk/useDriversImage';
