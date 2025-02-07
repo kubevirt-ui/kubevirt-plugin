@@ -1,47 +1,32 @@
-import { welcomeCheckbox } from '../../views/selector';
 import { tab } from '../../views/tab';
 
-const tickWelcomeModal = () => {
-  cy.get('body').then(($body) => {
-    if ($body.text().includes('Do not show this again')) {
-      cy.get(welcomeCheckbox).check();
-    }
-  });
-};
+import { tickWelcomeModal } from './setup.cy';
 
-describe('Close the welcome modal', () => {
+describe('Test Virtualization Overview', () => {
   before(() => {
     cy.visit('');
-    cy.wait(20000);
-  });
-
-  it('close the welcome modal', () => {
-    // sometimes the welcome is presenting before move to Overview
-    tickWelcomeModal();
-
-    cy.wait(5000);
-    cy.visitOverviewVirt();
-    cy.wait(10000);
-    tickWelcomeModal();
-    cy.contains('Do not show this again').should('not.exist');
   });
 
   it('overview page is loaded', () => {
-    cy.visitOverviewVirt();
+    tickWelcomeModal();
+    cy.visitOverview();
     cy.contains('VirtualMachine statuses').should('exist');
   });
 
   it('top consumer tab is loaded', () => {
+    tickWelcomeModal();
     tab.navigateToTopConsumers();
     cy.contains('View virtualization dashboard').should('be.visible');
   });
 
   it('migration tab is loaded', () => {
+    tickWelcomeModal();
     tab.navigateToMigrations();
     cy.contains('VirtualMachineInstanceMigrations information').should('be.visible');
   });
 
   it('settings tab is loaded', () => {
+    tickWelcomeModal();
     tab.navigateToSettings();
     cy.contains('General settings').should('be.visible');
   });
