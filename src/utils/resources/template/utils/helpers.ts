@@ -4,6 +4,7 @@ import { TemplateParameter, V1Template } from '@kubevirt-ui/kubevirt-api/console
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
+import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
 import { vmBootDiskSourceIsRegistry } from '@kubevirt-utils/resources/vm/utils/source';
 import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 
@@ -75,4 +76,9 @@ export const generateParamsWithPrettyName = (template: V1Template) => {
 export const bootDiskSourceIsRegistry = (template: V1Template) => {
   const vmObject: V1VirtualMachine = getTemplateVirtualMachineObject(template);
   return vmBootDiskSourceIsRegistry(vmObject);
+};
+
+export const getTemplateSSHSecret = (template: V1Template): null | string => {
+  const templateVM = getTemplateVirtualMachineObject(template);
+  return getVMSSHSecretName(templateVM) || null;
 };
