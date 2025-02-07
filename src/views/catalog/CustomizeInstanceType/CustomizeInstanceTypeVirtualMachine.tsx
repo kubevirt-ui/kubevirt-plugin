@@ -15,7 +15,7 @@ const CustomizeInstanceTypeVirtualMachine: FC = () => {
     <Stack hasGutter>
       <CustomizeITVMHeader />
       <StackItem isFilled>
-        <HorizontalNavbar pages={pages} vm={vm} />
+        <HorizontalNavbar loaded pages={pages} vm={vm} />
       </StackItem>
       <CustomizeITVMFooter />
     </Stack>
