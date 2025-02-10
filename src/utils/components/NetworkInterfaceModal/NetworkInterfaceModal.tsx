@@ -20,7 +20,7 @@ import NetworkInterfaceMACAddressInput from './components/NetworkInterfaceMacAdd
 import NetworkInterfaceModelSelect from './components/NetworkInterfaceModelSelect';
 import NetworkInterfaceNetworkSelect from './components/NetworkInterfaceNetworkSelect/NetworkInterfaceNetworkSelect';
 import { interfaceModelType } from './utils/constants';
-import { getNetworkName, podNetworkExists } from './utils/helpers';
+import { getNetworkName } from './utils/helpers';
 
 import './NetworkInterfaceModal.scss';
 
@@ -66,8 +66,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
   const [interfaceModel, setInterfaceModel] = useState(iface?.model || interfaceModelType.VIRTIO);
   const [networkName, setNetworkName] = useState(getNetworkName(network));
   const [interfaceType, setInterfaceType] = useState(
-    interfacesTypes[getNetworkInterfaceType(iface)] ||
-      (podNetworkExists(vm) ? null : interfacesTypes.masquerade),
+    interfacesTypes[getNetworkInterfaceType(iface)],
   );
   const [interfaceMACAddress, setInterfaceMACAddress] = useState(iface?.macAddress);
   const [submitDisabled, setSubmitDisabled] = useState(true);
@@ -104,7 +103,6 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
           setInterfaceModel={setInterfaceModel}
         />
         <NetworkInterfaceNetworkSelect
-          iface={iface}
           isEditing={Boolean(network) && Boolean(iface)}
           namespace={namespace}
           networkName={networkName}
