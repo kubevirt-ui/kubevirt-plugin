@@ -7,7 +7,6 @@ import { TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResource, useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
 import { TreeViewDataItem } from '@patternfly/react-core';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
@@ -55,9 +54,13 @@ export const useTreeViewData = (): UseTreeViewData => {
     [allVMs, allowedResources, isAdmin],
   );
 
+  const loaded =
+    projectNamesLoaded &&
+    (isAdmin ? allVMsLoaded : Object.values(allowedResources).some((resource) => resource.loaded));
+
   const treeData = useMemo(
     () =>
-      !isEmpty(memoizedVMs)
+      loaded
         ? createTreeViewData(
             projectNames,
             memoizedVMs,
@@ -66,18 +69,14 @@ export const useTreeViewData = (): UseTreeViewData => {
             treeViewFoldersEnabled,
           )
         : [],
-    [projectNames, memoizedVMs, isAdmin, treeViewFoldersEnabled, location.pathname],
+    [projectNames, memoizedVMs, loaded, isAdmin, treeViewFoldersEnabled, location.pathname],
   );
 
   const isSwitchDisabled = useMemo(() => projectNames.every(isSystemNamespace), [projectNames]);
 
   return {
     isSwitchDisabled,
-    loaded:
-      projectNamesLoaded &&
-      (isAdmin
-        ? allVMsLoaded
-        : Object.values(allowedResources).some((resource) => resource.loaded)),
+    loaded,
     loadError: projectNamesError,
     treeData,
   };
