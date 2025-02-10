@@ -21,14 +21,14 @@ import {
 import useStatusActionButtons from './useStatusActionButtons';
 
 type ActionButtonsProps = {
-  isSubmitting?: boolean;
+  isLoading?: boolean;
   onCreate: () => void;
   onCustomize: () => void;
   onViewYAML: () => void;
 };
 
 const ActionButtons: FC<ActionButtonsProps> = ({
-  isSubmitting = false,
+  isLoading = false,
   onCreate,
   onCustomize,
   onViewYAML,
@@ -49,7 +49,7 @@ const ActionButtons: FC<ActionButtonsProps> = ({
   }, [activeNamespace, navigate, vmName]);
 
   const { disableButtonTooltipContent, isCreationDisabled, isViewYAMLDisabled } =
-    useStatusActionButtons(isSubmitting);
+    useStatusActionButtons(isLoading);
 
   return (
     <Split hasGutter>
@@ -61,7 +61,7 @@ const ActionButtons: FC<ActionButtonsProps> = ({
         >
           <Button
             isAriaDisabled={isCreationDisabled}
-            isLoading={isSubmitting}
+            isLoading={isLoading}
             onClick={onCreate}
             variant={ButtonVariant.primary}
           >
@@ -77,7 +77,7 @@ const ActionButtons: FC<ActionButtonsProps> = ({
         >
           <Button
             isDisabled={isCreationDisabled}
-            isLoading={isSubmitting}
+            isLoading={isLoading}
             onClick={onCustomize}
             variant={ButtonVariant.secondary}
           >

@@ -2,10 +2,7 @@ import React, { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
-import {
-  generateVM,
-  useIsWindowsBootableVolume,
-} from '@catalog/CreateFromInstanceTypes/utils/utils';
+import { useIsWindowsBootableVolume } from '@catalog/CreateFromInstanceTypes/utils/utils';
 import { ConfigMapModel } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
@@ -29,12 +26,11 @@ import {
   VIEW_YAML_AND_CLI_CLICKED,
 } from '@kubevirt-utils/extensions/telemetry/utils/constants';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
-import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
-import useRHELAutomaticSubscription from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/useRHELAutomaticSubscription';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
+import { useDriversImage } from '@kubevirt-utils/resources/vm/utils/disk/useDriversImage';
 import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { createHeadlessService } from '@kubevirt-utils/utils/headless-service';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -42,10 +38,9 @@ import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { Checkbox, Stack, StackItem } from '@patternfly/react-core';
 
-import { AUTOMATIC_UPDATE_FEATURE_NAME } from '../../../../clusteroverview/SettingsTab/ClusterTab/components/GuestManagmentSection/AutomaticSubscriptionRHELGuests/utils/constants';
-
 import ActionButtons from './components/ActionButtons/ActionButtons';
 import YamlAndCLIViewerModal from './components/YamlAndCLIViewerModal/YamlAndCLIViewerModal';
+import useGeneratedVM from './hooks/useGeneratedVM';
 
 import './CreateVMFooter.scss';
 
@@ -55,11 +50,9 @@ const CreateVMFooter: FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<any | Error>(null);
   const { createModal } = useModal();
-
-  const { featureEnabled: autoUpdateEnabled } = useFeatures(AUTOMATIC_UPDATE_FEATURE_NAME);
+  const [_, driversImageLoading] = useDriversImage();
 
   const [authorizedSSHKeys, setAuthorizedSSHKeys] = useKubevirtUserSettings('ssh');
-  const { subscriptionData } = useRHELAutomaticSubscription();
 
   const [activeNamespace] = useActiveNamespace();
   const [isUDNManagedNamespace] = useNamespaceUDN(
@@ -72,20 +65,13 @@ const CreateVMFooter: FC = () => {
   const { applyKeyToProject, secretOption, sshPubKey, sshSecretName } = sshSecretCredentials || {};
   const isWindowsOSVolume = useIsWindowsBootableVolume();
 
+  const generatedVM = useGeneratedVM();
+
   const handleSubmit = async () => {
     setIsSubmitting(true);
     setError(null);
 
-    const vmToCreate = generateVM({
-      autoUpdateEnabled,
-      instanceTypeState: instanceTypeVMState,
-      isUDNManagedNamespace,
-      startVM,
-      subscriptionData,
-      targetNamespace: vmNamespaceTarget,
-    });
-
-    logITFlowEvent(CREATE_VM_BUTTON_CLICKED, vmToCreate);
+    logITFlowEvent(CREATE_VM_BUTTON_CLICKED, generatedVM);
 
     if (
       applyKeyToProject &&
@@ -96,7 +82,7 @@ const CreateVMFooter: FC = () => {
     }
 
     return k8sCreate({
-      data: vmToCreate,
+      data: generatedVM,
       model: VirtualMachineModel,
     })
       .then(async (createdVM) => {
@@ -140,24 +126,8 @@ const CreateVMFooter: FC = () => {
     setError(null);
 
     try {
-      await setVM(
-        generateVM({
-          autoUpdateEnabled,
-          instanceTypeState: instanceTypeVMState,
-          isUDNManagedNamespace,
-          startVM,
-          subscriptionData,
-          targetNamespace: vmNamespaceTarget,
-        }),
-      );
-      vmSignal.value = generateVM({
-        autoUpdateEnabled,
-        instanceTypeState: instanceTypeVMState,
-        isUDNManagedNamespace,
-        startVM,
-        subscriptionData,
-        targetNamespace: vmNamespaceTarget,
-      });
+      await setVM(generatedVM);
+      vmSignal.value = generatedVM;
 
       logITFlowEvent(CUSTOMIZE_VM_BUTTON_CLICKED, vmSignal.value);
 
@@ -191,21 +161,9 @@ const CreateVMFooter: FC = () => {
           <ActionButtons
             onViewYAML={() => {
               logITFlowEvent(VIEW_YAML_AND_CLI_CLICKED, null, { vmName: vmName });
-              createModal((props) => (
-                <YamlAndCLIViewerModal
-                  vm={generateVM({
-                    autoUpdateEnabled,
-                    instanceTypeState: instanceTypeVMState,
-                    isUDNManagedNamespace,
-                    startVM,
-                    subscriptionData,
-                    targetNamespace: vmNamespaceTarget,
-                  })}
-                  {...props}
-                />
-              ));
+              createModal((props) => <YamlAndCLIViewerModal vm={generatedVM} {...props} />);
             }}
-            isSubmitting={isSubmitting}
+            isLoading={isSubmitting || driversImageLoading}
             onCreate={handleSubmit}
             onCustomize={handleCustomize}
           />

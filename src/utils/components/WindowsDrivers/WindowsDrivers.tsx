@@ -6,7 +6,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { mountWinDriversToVM } from '@kubevirt-utils/resources/vm/utils/disk/drivers';
 import { Alert, AlertVariant, Checkbox, Flex, FlexItem } from '@patternfly/react-core';
 
-import { useDriversImage } from './drivers';
+import { useDriversImage } from '../../resources/vm/utils/disk/useDriversImage';
+
 import { removeWindowsDrivers } from './utils';
 
 type WindowsDriversProps = {
