@@ -1,3 +1,4 @@
+import VirtualMachinePreferenceModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachinePreferenceModel';
 import {
   V1beta1VirtualMachinePreference,
   V1VirtualMachine,
@@ -18,7 +19,7 @@ const usePreference = (
     useK8sWatchResource<V1beta1VirtualMachinePreference>({
       groupVersionKind: modelToGroupVersionKind(getPreferenceModelFromMatcher(vmPreference)),
       name: vmPreference?.name,
-      namespace: getNamespace(vm),
+      namespace: vmPreference.kind === VirtualMachinePreferenceModel.kind ? getNamespace(vm) : null,
     });
 
   const preferenceLoading = !preferenceLoaded && isEmpty(preferenceError);
