@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useLocation } from 'react-router-dom-v5-compat';
 
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -22,6 +23,8 @@ export type UseTreeViewData = {
 
 export const useTreeViewData = (): UseTreeViewData => {
   const isAdmin = useIsAdmin();
+  const location = useLocation();
+
   const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
   const [projectNames, projectNamesLoaded, projectNamesError] = useProjects();
 
@@ -63,7 +66,7 @@ export const useTreeViewData = (): UseTreeViewData => {
             treeViewFoldersEnabled,
           )
         : [],
-    [projectNames, memoizedVMs, isAdmin, treeViewFoldersEnabled],
+    [projectNames, memoizedVMs, isAdmin, treeViewFoldersEnabled, location.pathname],
   );
 
   const isSwitchDisabled = useMemo(() => projectNames.every(isSystemNamespace), [projectNames]);

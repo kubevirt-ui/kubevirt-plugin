@@ -26,6 +26,7 @@ export interface TreeViewDataItemWithHref extends TreeViewDataItem {
 const buildProjectMap = (
   vms: V1VirtualMachine[],
   currentPageVMName: string,
+  currentVMTab: string,
   treeViewDataMap: Record<string, TreeViewDataItemWithHref>,
   foldersEnabled: boolean,
 ) => {
@@ -47,11 +48,11 @@ const buildProjectMap = (
 
     const vmTreeItem: TreeViewDataItemWithHref = {
       defaultExpanded: currentPageVMName && currentPageVMName === vmName,
-      href: getResourceUrl({
+      href: `${getResourceUrl({
         activeNamespace: vmNamespace,
         model: VirtualMachineModel,
         resource: { metadata: { name: vmName, namespace: vmNamespace } },
-      }),
+      })}/${currentVMTab}`,
       icon: <VMStatusIcon />,
       id: vmTreeItemID,
       name: vmName,
@@ -175,6 +176,15 @@ const createAllNamespacesTreeItem = (
   return allNamespacesTreeItem;
 };
 
+const getVMInfoFromPathname = (pathname: string) => {
+  const splitPathname = pathname.split('/');
+  const currentVMTab = splitPathname?.[6] || '';
+  const vmName = splitPathname?.[5];
+  const vmNamespace = splitPathname?.[3];
+
+  return { currentVMTab, vmName, vmNamespace };
+};
+
 export const createTreeViewData = (
   projectNames: string[],
   vms: V1VirtualMachine[],
@@ -182,19 +192,13 @@ export const createTreeViewData = (
   pathname: string,
   foldersEnabled: boolean,
 ): TreeViewDataItem[] => {
-  const currentPageVMName = pathname.split('/')[5];
-  const currentPageNamespace = pathname.split('/')[3];
+  const { currentVMTab, vmName, vmNamespace } = getVMInfoFromPathname(pathname);
+
   const treeViewDataMap: Record<string, TreeViewDataItem> = {};
-  const projectMap = buildProjectMap(vms, currentPageVMName, treeViewDataMap, foldersEnabled);
+  const projectMap = buildProjectMap(vms, vmName, currentVMTab, treeViewDataMap, foldersEnabled);
 
   const treeViewData = projectNames.map((project) =>
-    createProjectTreeItem(
-      project,
-      projectMap,
-      currentPageVMName,
-      currentPageNamespace,
-      treeViewDataMap,
-    ),
+    createProjectTreeItem(project, projectMap, vmName, vmNamespace, treeViewDataMap),
   );
 
   const allNamespacesTreeItem = isAdmin
