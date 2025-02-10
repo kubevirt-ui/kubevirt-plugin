@@ -1,9 +1,7 @@
 import * as React from 'react';
 
-import {
-  VirtualMachineRestoreModelGroupVersionKind,
-  VirtualMachineSnapshotModelGroupVersionKind,
-} from '@kubevirt-ui/kubevirt-api/console';
+import VirtualMachineRestoreModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineRestoreModel';
+import VirtualMachineSnapshotModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineSnapshotModel';
 import {
   V1beta1VirtualMachineRestore,
   V1beta1VirtualMachineSnapshot,
@@ -23,7 +21,11 @@ const useSnapshotData = (vmName: string, namespace: string): UseSnapshotData => 
   const [snapshots, snapshotsLoaded, snapshotsError] = useK8sWatchResource<
     V1beta1VirtualMachineSnapshot[]
   >({
-    groupVersionKind: VirtualMachineSnapshotModelGroupVersionKind,
+    groupVersionKind: {
+      group: VirtualMachineSnapshotModel.apiGroup,
+      kind: VirtualMachineSnapshotModel.kind,
+      version: 'v1alpha1',
+    },
     isList: true,
     namespace,
     namespaced: true,
@@ -32,7 +34,11 @@ const useSnapshotData = (vmName: string, namespace: string): UseSnapshotData => 
   const [restores, restoresLoaded, restoresError] = useK8sWatchResource<
     V1beta1VirtualMachineRestore[]
   >({
-    groupVersionKind: VirtualMachineRestoreModelGroupVersionKind,
+    groupVersionKind: {
+      group: VirtualMachineRestoreModel.apiGroup,
+      kind: VirtualMachineRestoreModel.kind,
+      version: 'v1alpha1',
+    },
     isList: true,
     namespace,
     namespaced: true,
