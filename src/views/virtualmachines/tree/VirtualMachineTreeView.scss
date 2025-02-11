@@ -1,21 +1,39 @@
 .vms-tree-view {
   overflow-x: hidden;
 
+  .pf-v5-c-tree-view__list-item {
+    position: relative;
+  }
+
+  .right-click-action-menu-background {
+    bottom: 0;
+    left: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+    z-index: 100;
+  }
+
+  .right-click-action-menu {
+    transform: translateY(30px) translateX(50px);
+  }
+
   &__toolbar-section {
     width: 100%;
   }
 
   &__search-input {
     width: 100%;
-    margin: var(--pf-global--spacer--md) var(--pf-global--spacer--sm) 0 var(--pf-global--spacer--sm);
+    margin: var(--pf-v5-global--spacer--md) var(--pf-v5-global--spacer--sm) 0
+      var(--pf-v5-global--spacer--sm);
   }
 
   &__action {
-    padding: var(--pf-global--spacer--sm);
+    padding: var(--pf-v5-global--spacer--sm);
   }
 
   &__header-section {
-    margin: var(--pf-global--spacer--sm) 0;
+    margin: var(--pf-v5-global--spacer--sm) 0;
   }
 
   &__title {
@@ -23,8 +41,8 @@
   }
 
   &__expand {
-    padding: 0 var(--pf-global--spacer--xs) 0 var(--pf-global--spacer--xs);
-    margin-right: calc(var(--pf-global--spacer--xs) * 2.5);
+    padding: 0 var(--pf-v5-global--spacer--xs) 0 var(--pf-v5-global--spacer--xs);
+    margin-right: calc(var(--pf-v5-global--spacer--xs) * 2.5);
   }
 
   &__close-container {
@@ -35,12 +53,12 @@
   &__close-button {
     padding-top: 0;
     padding-left: 0;
-    padding-right: var(--pf-global--spacer--xs);
-    padding-bottom: calc(var(--pf-global--spacer--xs) * 1.5);
+    padding-right: var(--pf-v5-global--spacer--xs);
+    padding-bottom: calc(var(--pf-v5-global--spacer--xs) * 1.5);
   }
 
   &__toolbar-switch {
-    margin-right: var(--pf-global--spacer--sm);
+    margin-right: var(--pf-v5-global--spacer--sm);
     margin-bottom: 0;
   }
 }
@@ -51,7 +69,7 @@
 
 .pf-v5-c-drawer__panel-main {
   .pf-v5-c-drawer__body {
-    padding: 0 var(--pf-global--spacer--sm);
+    padding: 0 var(--pf-v5-global--spacer--sm);
     height: fit-content;
   }
 }
@@ -61,7 +79,7 @@
 }
 
 .pf-v5-c-toolbar.vms-tree-view-toolbar {
-  margin-bottom: var(--pf-global--spacer--sm);
+  margin-bottom: var(--pf-v5-global--spacer--sm);
   padding: 0;
 }
 .pf-v5-c-tree-view__node .pf-v5-c-tree-view__node-count {

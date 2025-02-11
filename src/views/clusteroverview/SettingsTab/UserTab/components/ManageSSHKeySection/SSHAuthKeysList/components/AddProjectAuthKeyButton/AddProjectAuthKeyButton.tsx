@@ -55,7 +55,7 @@ const AddProjectAuthKeyButton: FC<AddProjectAuthKeyButtonProps> = ({
       variant="link"
     >
       {isEmpty(secretName) ? t('Not configured') : secretName}{' '}
-      <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
+      <PencilAltIcon className="co-icon-space-l pf-v5-c-button-icon--plain" />
     </Button>
   );
 };

@@ -66,7 +66,10 @@ const TemplateScriptsPage: FC<TemplateScriptsPageProps> = ({ obj: template }) =>
     <PageSection variant={PageSectionVariants.light}>
       <SidebarEditor<V1Template> onResourceUpdate={onSubmitTemplate} resource={template}>
         <DescriptionList
-          className={classnames('pf-c-description-list', 'template-scripts-tab__description-list')}
+          className={classnames(
+            'pf-v5-c-description-list',
+            'template-scripts-tab__description-list',
+          )}
         >
           <VirtualMachineDescriptionItem
             descriptionHeader={
@@ -92,7 +95,7 @@ const TemplateScriptsPage: FC<TemplateScriptsPageProps> = ({ obj: template }) =>
                     variant="link"
                   >
                     {t('Edit')}
-                    <PencilAltIcon className="co-icon-space-l pf-c-button-icon--plain" />
+                    <PencilAltIcon className="co-icon-space-l pf-v5-c-button-icon--plain" />
                   </Button>
                 </FlexItem>
               </Flex>

@@ -3,7 +3,7 @@
     display: flex;
     justify-content: space-between;
   }
-  .pf-c-card__body {
+  .pf-v5-c-card__body {
     padding-right: 0;
   }
 
@@ -15,17 +15,17 @@
       display: inline-flex;
       align-items: center;
       .timestamp {
-        margin-left: var(--pf-global--spacer--xs);
+        margin-left: var(--pf-v5-global--spacer--xs);
       }
       .icon-spacer__offset {
-        margin-left: var(--pf-global--spacer--sm);
+        margin-left: var(--pf-v5-global--spacer--sm);
         text-underline-offset: 0.25rem;
       }
     }
   }
 }
-.pf-c-description-list__text {
+.pf-v5-c-description-list__text {
   .icon-spacer {
-    margin-left: var(--pf-global--spacer--sm);
+    margin-left: var(--pf-v5-global--spacer--sm);
   }
 }

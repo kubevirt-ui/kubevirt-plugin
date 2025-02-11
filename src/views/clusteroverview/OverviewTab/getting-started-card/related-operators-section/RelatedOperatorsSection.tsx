@@ -58,7 +58,7 @@ const RelatedOperatorsSection: FC = () => {
         <i
           aria-hidden="true"
           className="fas fa-cubes"
-          color="var(--pf-global--primary-color--100)"
+          color="var(--pf-v5-global--primary-color--100)"
           id="kv-getting-started--related-operators-icon"
         />
       }

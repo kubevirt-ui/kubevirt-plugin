@@ -107,7 +107,7 @@ const TemplateParametersPage: FC<TemplateParametersPageProps> = ({ obj: template
               {t('Parameters successfully edited')}
             </Alert>
           )}
-          <ActionGroup className="pf-c-form">
+          <ActionGroup className="pf-v5-c-form">
             <Button
               isDisabled={isSaveDisabled}
               isLoading={loading}

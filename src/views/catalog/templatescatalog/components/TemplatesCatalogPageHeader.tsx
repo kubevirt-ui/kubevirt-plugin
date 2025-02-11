@@ -7,7 +7,7 @@ export const TemplatesCatalogPageHeader: React.FC = () => {
   const { t } = useKubevirtTranslation();
 
   return (
-    <div className="pf-c-page__main-breadcrumb">
+    <div className="pf-v5-c-page__main-breadcrumb">
       <Stack hasGutter>
         <StackItem className="co-m-pane__heading">
           <Title headingLevel="h1">{t('Create VirtualMachine from catalog')}</Title>

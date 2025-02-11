@@ -12,25 +12,25 @@
   }
 
   &-row-icon {
-    width: var(--pf-global--spacer--xl);
-    padding-right: var(--pf-global--spacer--sm);
+    width: var(--pf-v5-global--spacer--xl);
+    padding-right: var(--pf-v5-global--spacer--sm);
     vertical-align: bottom;
   }
 
   &-row-label {
-    margin-left: var(--pf-global--spacer--sm);
+    margin-left: var(--pf-v5-global--spacer--sm);
   }
 
   &-grid {
-    padding: var(--pf-global--spacer--lg);
+    padding: var(--pf-v5-global--spacer--lg);
 
     &-tile {
-      color: var(--pf-global--Color--100);
+      color: var(--pf-v5-global--Color--100);
     }
 
     :where(.pf-theme-dark) & {
       .vm-catalog-grid-tile:hover {
-        outline: 1px solid var(--pf-global--BorderColor--300);
+        outline: 1px solid var(--pf-v5-global--BorderColor--300);
       }
     }
   }
@@ -42,8 +42,8 @@
     position: relative;
     height: 100%;
     overflow-y: auto;
-    border-top: 1px solid var(--pf-global--BorderColor--300);
-    border-left: 1px solid var(--pf-global--BorderColor--300);
+    border-top: 1px solid var(--pf-v5-global--BorderColor--300);
+    border-left: 1px solid var(--pf-v5-global--BorderColor--300);
   }
 
   .vm-catalog-grid-tile:hover {
@@ -52,10 +52,10 @@
   }
 
   .badge-stack {
-    gap: var(--pf-global--spacer--xs);
+    gap: var(--pf-v5-global--spacer--xs);
   }
 
   .badgeload {
-    border-radius: var(--pf-global--BorderRadius--lg);
+    border-radius: var(--pf-v5-global--BorderRadius--lg);
   }
 }

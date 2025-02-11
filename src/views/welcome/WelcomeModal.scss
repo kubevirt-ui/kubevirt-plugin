@@ -1,6 +1,7 @@
 .WelcomeModal {
   &__grid {
-    margin: var(--pf-global--spacer--2xl) var(--pf-global--spacer--xl) var(--pf-global--spacer--md);
+    margin: var(--pf-v5-global--spacer--2xl) var(--pf-v5-global--spacer--xl)
+      var(--pf-v5-global--spacer--md);
   }
 
   &__image {
@@ -9,17 +10,17 @@
   }
 
   &__text {
-    margin-top: var(--pf-global--spacer--lg);
-    margin-bottom: var(--pf-global--spacer--lg);
+    margin-top: var(--pf-v5-global--spacer--lg);
+    margin-bottom: var(--pf-v5-global--spacer--lg);
   }
 
   &__button,
   &__checkbox {
-    margin-top: var(--pf-global--spacer--lg);
-    margin-bottom: var(--pf-global--spacer--xs);
+    margin-top: var(--pf-v5-global--spacer--lg);
+    margin-bottom: var(--pf-v5-global--spacer--xs);
   }
 
   &__button-link {
-    --pf-c-button--PaddingLeft: 0;
+    --pf-v5-c-button--PaddingLeft: 0;
   }
 }

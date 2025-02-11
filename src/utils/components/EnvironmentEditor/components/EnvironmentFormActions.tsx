@@ -78,7 +78,7 @@ const EnvironmentFormActions: React.FC<EnvironmentFormActionsProps> = ({
         )}
       </StackItem>
       <StackItem>
-        <ActionGroup className="pf-c-form">
+        <ActionGroup className="pf-v5-c-form">
           <Button
             isDisabled={isSaveDisabled || loading}
             isLoading={loading}
