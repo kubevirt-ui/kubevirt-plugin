@@ -1,5 +1,5 @@
 export const vmStatusOnList = '#status';
-export const vmStatusOnDetails = '.pf-c-helper-text__item-text';
+export const vmStatusOnDetails = '.pf-v5-c-helper-text__item-text';
 export const vmStatusOnOverview = '[data-test-id="virtual-machine-overview-details-status"]';
 export const itemCreateBtn = '[data-test="item-create"]';
 export const saveBtn = '[data-test="save-changes"]';

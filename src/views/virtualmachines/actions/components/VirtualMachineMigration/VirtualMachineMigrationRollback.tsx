@@ -62,7 +62,8 @@ const VirtualMachineMigrationRollback: FC<VirtualMachineMigrationRollbackProps> 
 
       <div className="migration-status__body">
         <Title headingLevel="h2">
-          <WarningTriangleIcon color="var(--pf-global--warning-color--100)" /> {t('Stop migration')}
+          <WarningTriangleIcon color="var(--pf-v5-global--warning-color--100)" />{' '}
+          {t('Stop migration')}
         </Title>
 
         <Text>{t('Are you sure you want to stop the VirtualMachine workloads?')}</Text>

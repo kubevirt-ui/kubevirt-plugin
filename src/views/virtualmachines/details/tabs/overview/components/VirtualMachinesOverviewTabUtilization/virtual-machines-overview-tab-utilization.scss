@@ -9,23 +9,23 @@
     flex-direction: column;
     height: 100%;
     .util-upper {
-      padding-left: var(--pf-global--spacer--2xl);
+      padding-left: var(--pf-v5-global--spacer--2xl);
       .util-title {
-        font-weight: var(--pf-global--FontWeight--semi-bold);
-        height: var(--pf-global--spacer--2xl);
+        font-weight: var(--pf-v5-global--FontWeight--semi-bold);
+        height: var(--pf-v5-global--spacer--2xl);
         &__subtitle {
-          font-size: var(--pf-global--FontSize--md);
+          font-size: var(--pf-v5-global--FontSize--md);
         }
       }
       .util-summary {
         width: 100%;
-        height: var(--pf-global--spacer--2xl);
+        height: var(--pf-v5-global--spacer--2xl);
         display: flex;
         align-items: flex-end;
         .util-summary-value {
           width: 50%;
-          font-weight: var(--pf-global--FontWeight--normal);
-          font-size: var(--pf-global--FontSize--xl);
+          font-weight: var(--pf-v5-global--FontWeight--normal);
+          font-size: var(--pf-v5-global--FontSize--xl);
           line-height: normal;
         }
         .util-summary-text {
@@ -35,7 +35,7 @@
     }
     .util-chart {
       max-height: 8vw;
-      .pf-c-chart {
+      .pf-v5-c-chart {
         height: auto;
       }
     }
@@ -45,7 +45,7 @@
       height: 100%;
     }
     .network-metrics {
-      padding-left: var(--pf-global--spacer--2xl);
+      padding-left: var(--pf-v5-global--spacer--2xl);
       display: flex;
       flex-direction: column;
       flex-grow: 1;
@@ -57,10 +57,10 @@
           width: 50%;
         }
         &__title {
-          margin-left: var(--pf-global--spacer--sm);
+          margin-left: var(--pf-v5-global--spacer--sm);
         }
         &__sum {
-          font-weight: var(--pf-global--FontWeight--semi-bold);
+          font-weight: var(--pf-v5-global--FontWeight--semi-bold);
         }
       }
     }
@@ -71,11 +71,11 @@
   }
   .duration-select {
     display: flex;
-    .pf-c-select {
+    .pf-v5-c-select {
       flex-basis: content;
     }
   }
-  .pf-c-description-list__text.pf-m-help-text {
+  .pf-v5-c-description-list__text.pf-m-help-text {
     text-underline-offset: 0.25rem;
   }
 }

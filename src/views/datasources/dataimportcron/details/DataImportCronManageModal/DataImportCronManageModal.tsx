@@ -140,7 +140,7 @@ export const DataImportCronManageModal: FC<DataImportCronManageModalProps> = ({
                       <button
                         aria-describedby="retain-revision-info"
                         aria-label="More info for retain revisions field"
-                        className="pf-c-form__group-label-help"
+                        className="pf-v5-c-form__group-label-help"
                         onClick={(e) => e.preventDefault()}
                         type="button"
                       >

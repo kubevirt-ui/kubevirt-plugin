@@ -46,7 +46,7 @@ const DetailsLeftGrid: FC<DetailsLeftGridProps> = ({ instanceTypesAndPreferences
     : null;
 
   return (
-    <DescriptionList className="pf-c-description-list" isHorizontal>
+    <DescriptionList className="pf-v5-c-description-list" isHorizontal>
       <VirtualMachineDescriptionItem
         descriptionData={
           <>

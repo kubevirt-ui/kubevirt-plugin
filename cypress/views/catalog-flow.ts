@@ -32,13 +32,13 @@ export const fillReviewAndCreate = (vmData: VirtualMachineData) => {
         ).click();
         cy.wait(3000);
         cy.contains(cdSource.selectPVCName).click();
-        cy.contains('.pf-c-select__menu-wrapper', cdSource.pvcName).click();
+        cy.contains('.pf-v5-c-select__menu-wrapper', cdSource.pvcName).click();
         break;
       }
       case 'Upload': {
         cy.get(cView.cdSourceDropDown).click();
         cy.contains(cView.cdSource.UploadBtnMenu, cView.cdSource.UploadBtnText).click();
-        cy.dropFile(cdSource.value, cdSource.value.split('/').pop(), '.pf-c-file-upload');
+        cy.dropFile(cdSource.value, cdSource.value.split('/').pop(), '.pf-v5-c-file-upload');
         break;
       }
       default: {

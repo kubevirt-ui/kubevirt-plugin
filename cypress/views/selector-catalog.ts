@@ -8,7 +8,7 @@ export const instanceTab = '[data-test="instancetypes-tab"]';
 
 // project
 export const projectDropdown = '.templates-catalog-project-dropdown';
-export const projectItem = '.pf-c-context-selector__menu-list-item';
+export const projectItem = '.pf-v5-c-context-selector__menu-list-item';
 export const allItems = '[data-test-id="catalog-template-filter-all-items"]';
 export const listBtn = '#template-list-btn';
 export const gridBtn = '#template-grid-btn';
@@ -65,7 +65,7 @@ export enum cdSource {
   Registry = '[data-test-id="container-disk"]',
   RegistryH = '#cd-boot-source-registry-helper',
   RegistryV = '[data-test-id="cd-boot-source-container-source-input"]',
-  UploadBtnMenu = '.pf-c-select__menu-item-main',
+  UploadBtnMenu = '.pf-v5-c-select__menu-item-main',
   UploadBtnText = 'Upload (Upload a new file to a PVC)',
   URL = '[data-test-id="http"]',
   URLH = '#cd-boot-source-http',

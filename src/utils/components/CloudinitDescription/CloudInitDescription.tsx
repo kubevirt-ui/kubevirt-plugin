@@ -26,7 +26,7 @@ export const CloudInitDescription: FC<{ vm: V1VirtualMachine }> = ({ vm }) => {
       </StackItem>
       <StackItem>
         <DescriptionList
-          className="pf-c-description-list"
+          className="pf-v5-c-description-list"
           columnModifier={{ lg: '1Col', xl: '3Col' }}
           isCompact
         >

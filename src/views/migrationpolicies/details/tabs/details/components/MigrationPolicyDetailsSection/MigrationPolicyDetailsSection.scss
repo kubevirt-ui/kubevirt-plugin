@@ -11,16 +11,16 @@
   justify-content: space-between;
   &--action-button {
     text-decoration: none;
-    color: var(--pf-global--link--Color);
-    font-weight: var(--pf-global--FontWeight--light);
+    color: var(--pf-v5-global--link--Color);
+    font-weight: var(--pf-v5-global--FontWeight--light);
   }
 }
 
 .migration-policy-selectors-group {
-  padding-top: var(--pf-c-label-group--m-category--PaddingTop);
-  padding-right: var(--pf-c-label-group--m-category--PaddingRight);
-  padding-bottom: var(--pf-c-label-group--m-category--PaddingBottom);
-  padding-left: var(--pf-c-label-group--m-category--PaddingLeft);
-  border: var(--pf-c-label-group--m-category--BorderWidth) solid
-    var(--pf-c-label-group--m-category--BorderColor);
+  padding-top: var(--pf-v5-c-label-group--m-category--PaddingTop);
+  padding-right: var(--pf-v5-c-label-group--m-category--PaddingRight);
+  padding-bottom: var(--pf-v5-c-label-group--m-category--PaddingBottom);
+  padding-left: var(--pf-v5-c-label-group--m-category--PaddingLeft);
+  border: var(--pf-v5-c-label-group--m-category--BorderWidth) solid
+    var(--pf-v5-c-label-group--m-category--BorderColor);
 }

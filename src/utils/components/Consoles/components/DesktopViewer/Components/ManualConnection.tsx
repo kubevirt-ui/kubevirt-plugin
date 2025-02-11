@@ -33,12 +33,12 @@ const ManualConnection: React.FunctionComponent<ManualConnectionProps> = ({
   const rdpAddress = rdp && rdp?.address !== address ? rdp?.address : null;
 
   return (
-    <div className="pf-c-console__manual-connection">
+    <div className="pf-v5-c-console__manual-connection">
       <Title headingLevel="h2" size="3xl">
         {textManualConnection || t('Manual Connection')}
       </Title>
       <p>{msg}</p>
-      <DescriptionList className="pf-c-description-list">
+      <DescriptionList className="pf-v5-c-description-list">
         {address && <Detail title={textAddress || t('Address')} value={address} />}
         {!address && spice && (
           <Detail title={textSpiceAddress || t('SPICE Address')} value={spice?.address} />
