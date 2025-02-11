@@ -17,7 +17,7 @@ import {
 import { buildOwnerReference, getName, getNamespace } from './../../resources/shared';
 import { PORT, SERVICE_TYPES, SSH_PORT, VMI_LABEL_AS_SSH_SERVICE_SELECTOR } from './constants';
 
-const buildSSHServiceFromVM = (vm: V1VirtualMachine, type: SERVICE_TYPES, sshLabel: string) => ({
+const buildSSHServiceFromVM = (vm: V1VirtualMachine, type: SERVICE_TYPES) => ({
   apiVersion: ServiceModel.apiVersion,
   kind: ServiceModel.kind,
   metadata: {
@@ -36,7 +36,7 @@ const buildSSHServiceFromVM = (vm: V1VirtualMachine, type: SERVICE_TYPES, sshLab
       },
     ],
     selector: {
-      [VMI_LABEL_AS_SSH_SERVICE_SELECTOR]: sshLabel,
+      [VMI_LABEL_AS_SSH_SERVICE_SELECTOR]: vm?.metadata?.name,
     },
     type,
   },
@@ -87,23 +87,13 @@ export const addSSHSelectorLabelToVM = async (
 export const createSSHService = async (
   vm: V1VirtualMachine,
   type: SERVICE_TYPES,
-  vmi?: V1VirtualMachineInstance,
 ): Promise<K8sResourceCommon> => {
-  const { name, namespace } = vm?.metadata || {};
-  const vmiLabels = vm?.spec?.template?.metadata?.labels;
-  const labelSelector =
-    vmiLabels?.[VMI_LABEL_AS_SSH_SERVICE_SELECTOR] || `${name}-${getRandomChars()}`;
-
-  if (!vmiLabels?.[VMI_LABEL_AS_SSH_SERVICE_SELECTOR]) {
-    await addSSHSelectorLabelToVM(vm, vmi, labelSelector);
-  }
-
-  const serviceResource = buildSSHServiceFromVM(vm, type, labelSelector);
+  const serviceResource = buildSSHServiceFromVM(vm, type);
 
   return k8sCreate({
     data: serviceResource,
     model: ServiceModel,
-    ns: namespace,
+    ns: getNamespace(vm),
   });
 };
 
