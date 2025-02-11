@@ -66,7 +66,7 @@ describe('Check all virtualization pages can be loaded', () => {
       cy.contains('Status conditions').should('be.visible');
 
       tab.navigateToDiagnosticsGuestSystemLog();
-      cy.contains('Guest system logs').should('be.visible');
+      cy.contains('Guest system log').should('be.visible');
 
       // sub-tabs in configuration tab
       tab.navigateToConfiguration();
