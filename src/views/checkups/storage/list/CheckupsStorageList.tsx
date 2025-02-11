@@ -91,7 +91,7 @@ const CheckupsStorageList = () => {
       </div>
       <VirtualizedTable<IoK8sApiCoreV1ConfigMap>
         EmptyMsg={() => (
-          <div className="pf-u-text-align-center">{t('No storage checkups found')}</div>
+          <div className="pf-v5-u-text-align-center">{t('No storage checkups found')}</div>
         )}
         rowData={{
           getJobByName: (configMapName: string): IoK8sApiBatchV1Job[] =>

@@ -23,7 +23,7 @@ const SSHAccess: FC<SSHAccessProps> = ({
   vmi,
 }) => {
   return (
-    <DescriptionList className="pf-c-description-list">
+    <DescriptionList className="pf-v5-c-description-list">
       {!isCustomizeInstanceType && (
         <SSHCommand sshService={sshService} sshServiceLoaded={sshServiceLoaded} vm={vm} vmi={vmi} />
       )}

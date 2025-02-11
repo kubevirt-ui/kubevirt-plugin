@@ -1,7 +1,7 @@
 .ActionDropdownItem {
   &__disabled {
     cursor: unset;
-    color: var(--pf-global--disabled-color--100);
+    color: var(--pf-v5-global--disabled-color--100);
   }
 
   .pf-v5-c-menu.pf-m-flyout {

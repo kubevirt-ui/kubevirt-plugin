@@ -39,7 +39,7 @@ const TemplatePageTitle: FC<TemplatePageTitleTitleProps> = ({ template }) => {
   );
 
   return (
-    <div className="pf-c-page__main-breadcrumb TemplatePageTitle">
+    <div className="pf-v5-c-page__main-breadcrumb TemplatePageTitle">
       <Breadcrumb>
         <BreadcrumbItem>
           <Button

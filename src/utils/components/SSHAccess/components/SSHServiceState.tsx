@@ -25,12 +25,13 @@ const SSHServiceStateIcon: FC<SSHServiceStateIconProps> = ({ sshService, sshServ
       {!isLoadBalancerBonded(sshService) ? (
         <Tooltip content={t('This process can take 1-2 minutes to complete.')}>
           <div>
-            <WarningTriangleIcon color="var(--pf-global--warning-color--100)" /> {t('In progress')}{' '}
+            <WarningTriangleIcon color="var(--pf-v5-global--warning-color--100)" />{' '}
+            {t('In progress')}{' '}
           </div>
         </Tooltip>
       ) : (
         <div>
-          <CheckCircleIcon color="var(--pf-global--success-color--100)" /> {t('Ready')}{' '}
+          <CheckCircleIcon color="var(--pf-v5-global--success-color--100)" /> {t('Ready')}{' '}
         </div>
       )}
     </FlexItem>

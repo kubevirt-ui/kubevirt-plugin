@@ -1,19 +1,19 @@
 .cpu-input {
-  margin-right: var(--pf-global--spacer--xl);
+  margin-right: var(--pf-v5-global--spacer--xl);
 
   &__edit-topology-manually {
-    margin-top: var(--pf-global--spacer--xl);
+    margin-top: var(--pf-v5-global--spacer--xl);
   }
 
   &__number-input {
-    padding-bottom: var(--pf-global--spacer--xs);
+    padding-bottom: var(--pf-v5-global--spacer--xs);
   }
 
   &__title {
-    margin-bottom: var(--pf-global--spacer--md);
+    margin-bottom: var(--pf-v5-global--spacer--md);
   }
 
   &__title--help-text-button {
-    padding: 0 var(--pf-global--spacer--xs);
+    padding: 0 var(--pf-v5-global--spacer--xs);
   }
 }

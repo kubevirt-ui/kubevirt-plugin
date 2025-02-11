@@ -1,8 +1,8 @@
 .instancetypes-vm-details-section {
-  margin-top: var(--pf-global--spacer--lg);
+  margin-top: var(--pf-v5-global--spacer--lg);
 
-  .pf-c-expandable-section__content {
-    --pf-c-expandable-section__content--MarginTop: var(--pf-global--spacer--xs);
+  .pf-v5-c-expandable-section__content {
+    --pf-v5-c-expandable-section__content--MarginTop: var(--pf-v5-global--spacer--xs);
   }
   .pf-v5-c-description-list__group {
     grid-template-columns: 200px calc(100% - 200px);
@@ -10,5 +10,5 @@
 }
 
 .instancetypes-vm-details-body {
-  margin-top: var(--pf-global--spacer--lg);
+  margin-top: var(--pf-v5-global--spacer--lg);
 }

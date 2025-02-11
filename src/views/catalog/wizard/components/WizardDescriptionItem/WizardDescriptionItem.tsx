@@ -75,7 +75,7 @@ export const WizardDescriptionItem: FC<WizardDescriptionItemProps> = React.memo(
       if (helperPopover) {
         return (
           <Popover bodyContent={helperPopover?.content} headerContent={helperPopover?.header}>
-            <DescriptionListTermHelpTextButton className="pf-c-description-list__text">
+            <DescriptionListTermHelpTextButton className="pf-v5-c-description-list__text">
               {' '}
               {title}{' '}
             </DescriptionListTermHelpTextButton>
@@ -91,8 +91,8 @@ export const WizardDescriptionItem: FC<WizardDescriptionItemProps> = React.memo(
     };
 
     return (
-      <DescriptionListGroup className={classnames('pf-c-description-list__group', className)}>
-        <DescriptionListTermHelpText className="pf-c-description-list__term">
+      <DescriptionListGroup className={classnames('pf-v5-c-description-list__group', className)}>
+        <DescriptionListTermHelpText className="pf-v5-c-description-list__term">
           <Flex
             className="wizard-description-item__title"
             justifyContent={{ default: 'justifyContentFlexStart' }}
@@ -118,7 +118,7 @@ export const WizardDescriptionItem: FC<WizardDescriptionItemProps> = React.memo(
         {isEdit && !showEditOnTitle ? (
           <DescriptionListDescription>
             <Button
-              className="pf-c-description-list__description"
+              className="pf-v5-c-description-list__description"
               data-test-id={`${testId}-edit`}
               isDisabled={isDisabled}
               isInline
@@ -132,7 +132,7 @@ export const WizardDescriptionItem: FC<WizardDescriptionItemProps> = React.memo(
           </DescriptionListDescription>
         ) : (
           <div data-test-id={testId}>
-            <DescriptionListDescription className="pf-c-description-list__description">
+            <DescriptionListDescription className="pf-v5-c-description-list__description">
               {description ?? <span className="text-muted">{t('Not available')}</span>}
             </DescriptionListDescription>
           </div>

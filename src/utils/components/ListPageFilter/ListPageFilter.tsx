@@ -184,7 +184,7 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
                   categoryName={t('Name')}
                   chips={textFilters.name ? [textFilters.name] : []}
                 >
-                  <div className="pf-c-input-group co-filter-group">
+                  <div className="pf-v5-c-input-group co-filter-group">
                     {filterDropdownKeys.length > 1 && (
                       <FormPFSelect
                         onSelect={onSelect}

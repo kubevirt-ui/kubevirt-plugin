@@ -50,7 +50,7 @@ const VirtualMachinesOverviewTabInterfaces: FC<VirtualMachinesOverviewTabInterfa
         <CardBody isFilled>
           <VirtualizedTable<InterfacesData>
             NoDataEmptyMsg={() => (
-              <div className="pf-u-text-align-center no-data-empty-message">
+              <div className="pf-v5-u-text-align-center no-data-empty-message">
                 {t('No network interfaces found')}
               </div>
             )}

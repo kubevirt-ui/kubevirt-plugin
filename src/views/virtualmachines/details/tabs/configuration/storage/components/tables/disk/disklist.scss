@@ -4,9 +4,9 @@
     cursor: pointer;
     text-decoration-style: dashed;
     text-decoration-thickness: var(
-      --pf-c-description-list__text--m-help-text--TextDecorationThickness
+      --pf-v5-c-description-list__text--m-help-text--TextDecorationThickness
     );
-    text-underline-offset: var(--pf-c-description-list__text--m-help-text--TextDecorationOffset);
-    text-decoration-color: var(--pf-c-description-list__text--m-hel);
+    text-underline-offset: var(--pf-v5-c-description-list__text--m-help-text--TextDecorationOffset);
+    text-decoration-color: var(--pf-v5-c-description-list__text--m-hel);
   }
 }

@@ -1,14 +1,14 @@
 .VirtualMachineConfigurationTabSearch {
   &--main {
-    margin-bottom: var(--pf-global--spacer--md);
-    margin-top: calc(-1 * var(--pf-global--spacer--sm));
+    margin-bottom: var(--pf-v5-global--spacer--md);
+    margin-top: calc(-1 * var(--pf-v5-global--spacer--sm));
     &__no-results {
       flex-direction: column;
       > * {
-        margin-top: var(--pf-global--spacer--md);
+        margin-top: var(--pf-v5-global--spacer--md);
       }
       > :last-child {
-        margin-bottom: var(--pf-global--spacer--md);
+        margin-bottom: var(--pf-v5-global--spacer--md);
       }
     }
   }

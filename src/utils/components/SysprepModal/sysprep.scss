@@ -1,15 +1,15 @@
-form.kv-sysprep--main.pf-c-form {
+form.kv-sysprep--main.pf-v5-c-form {
   grid-gap: 0;
 }
 
 .kv-sysprep--title {
   display: inline-flex;
   align-items: baseline;
-  margin-top: var(--pf-global--spacer--md);
+  margin-top: var(--pf-v5-global--spacer--md);
 }
 
 .kv-sysprep--error {
-  color: var(--pf-global--danger-color--200);
+  color: var(--pf-v5-global--danger-color--200);
 }
 
 .kv-sysprep-info {
@@ -18,6 +18,6 @@ form.kv-sysprep--main.pf-c-form {
 
 .kv-sysprep-modal button.pf-m-danger {
   padding-left: 0;
-  margin-bottom: var(--pf-global-spacer-md);
-  margin-top: var(--pf-global-spacer-sm);
+  margin-bottom: var(--pf-v5-global-spacer-md);
+  margin-top: var(--pf-v5-global-spacer-sm);
 }

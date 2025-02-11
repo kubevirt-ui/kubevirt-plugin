@@ -67,7 +67,7 @@ const MigrationPoliciesList: FC<ListPageProps> = ({
         />
         <VirtualizedTable<V1alpha1MigrationPolicy>
           EmptyMsg={() => (
-            <div className="pf-u-text-align-center">{t('No MigrationPolicies found')}</div>
+            <div className="pf-v5-u-text-align-center">{t('No MigrationPolicies found')}</div>
           )}
           columns={activeColumns}
           data={data}

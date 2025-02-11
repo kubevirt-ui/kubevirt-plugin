@@ -54,7 +54,7 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
           />
         </>
       ) : (
-        <div className="pf-c-console__vnc">
+        <div className="pf-v5-c-console__vnc">
           <VirtualMachinesOverviewTabDetailsConsoleConnect
             isDisabled
             isHeadlessMode={isHeadlessMode}

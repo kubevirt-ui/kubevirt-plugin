@@ -10,7 +10,7 @@ import { getRow } from './vm-flow';
 export const uploadPVC = (name: string, image: string, size: string) => {
   cy.byTestID('item-create').click();
   cy.byLegacyTestID('dropdown-menu').contains('With Data upload form').click();
-  cy.dropFile(image, image.split('/').pop(), '.pf-c-file-upload');
+  cy.dropFile(image, image.split('/').pop(), '.pf-v5-c-file-upload');
   // cy.wait(5000);
   cy.get('#pvc-name', { timeout: MINUTE }).clear().type(name);
   cy.get('#request-size-input').clear().type(size);
@@ -25,7 +25,7 @@ export const uploadPVC = (name: string, image: string, size: string) => {
     if (!$body.text().includes(`"${name}" already exists`)) {
       cy.contains('Allocating Resources').should('exist');
       cy.contains('Uploading data', { timeout: MINUTE * 3 }).should('exist');
-      cy.contains('.pf-c-progress__measure', '100%', { timeout: MINUTE * 5 }).should('exist');
+      cy.contains('.pf-v5-c-progress__measure', '100%', { timeout: MINUTE * 5 }).should('exist');
       // cy.wait(5000);
     }
   });
@@ -127,6 +127,6 @@ export const addNic = (nic: NIC) => {
 export const deleteRow = (name: string) => {
   getRow(name, () => cy.get('button[aria-label="Actions"]').click());
   cy.get('[data-ouia-component-type="PF4/DropdownItem"]').eq(1).click();
-  cy.get('.pf-c-button.pf-m-danger.pf-m-progress').click();
+  cy.get('.pf-v5-c-button.pf-m-danger.pf-m-progress').click();
   cy.wait(1000);
 };

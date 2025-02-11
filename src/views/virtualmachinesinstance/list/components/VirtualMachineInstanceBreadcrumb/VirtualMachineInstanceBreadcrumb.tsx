@@ -13,7 +13,7 @@ const VirtualMachineInstanceBreadcrumb: FC = memo(() => {
 
   return (
     <div>
-      <Breadcrumb className="pf-c-breadcrumb co-breadcrumb">
+      <Breadcrumb className="pf-v5-c-breadcrumb co-breadcrumb">
         <BreadcrumbItem>
           <Button
             isInline

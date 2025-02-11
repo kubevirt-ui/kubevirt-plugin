@@ -258,7 +258,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
           </div>
           <VirtualizedTable<K8sResourceCommon>
             EmptyMsg={() => (
-              <div className="pf-u-text-align-center">{t('No VirtualMachines found')}</div>
+              <div className="pf-v5-u-text-align-center">{t('No VirtualMachines found')}</div>
             )}
             onSelect={(_, selected, index) => {
               if (index === -1) allVMsSelected ? deselectAll() : selectAll(data);

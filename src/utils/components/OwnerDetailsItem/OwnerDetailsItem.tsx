@@ -22,8 +22,8 @@ const OwnerDetailsItem: React.FC<OwnerDetailsItemProps> = ({ obj }) => {
   const { t } = useKubevirtTranslation();
 
   return (
-    <DescriptionListGroup className="pf-c-description-list__group">
-      <DescriptionListTermHelpText className="pf-c-description-list__term">
+    <DescriptionListGroup className="pf-v5-c-description-list__group">
+      <DescriptionListTermHelpText className="pf-v5-c-description-list__term">
         <Popover
           bodyContent={
             <Trans ns="plugin__kubevirt-plugin">
@@ -44,12 +44,12 @@ const OwnerDetailsItem: React.FC<OwnerDetailsItemProps> = ({ obj }) => {
           headerContent={t('Owner')}
           maxWidth="30rem"
         >
-          <DescriptionListTermHelpTextButton className="pf-c-description-list__text">
+          <DescriptionListTermHelpTextButton className="pf-v5-c-description-list__text">
             {t('Owner')}
           </DescriptionListTermHelpTextButton>
         </Popover>
       </DescriptionListTermHelpText>
-      <DescriptionListDescription className="pf-c-description-list__description">
+      <DescriptionListDescription className="pf-v5-c-description-list__description">
         <OwnerReferences obj={obj} />
       </DescriptionListDescription>
     </DescriptionListGroup>

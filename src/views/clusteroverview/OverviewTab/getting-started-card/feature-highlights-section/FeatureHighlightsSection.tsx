@@ -54,7 +54,7 @@ const FeatureHighlightsSection: React.FC = () => {
         <i
           aria-hidden="true"
           className="fas fa-blog"
-          color="var(--pf-global--primary-color--100)"
+          color="var(--pf-v5-global--primary-color--100)"
         />
       }
       id="feature-highlights"

@@ -25,8 +25,8 @@ const DataSourcePageTitle: React.FC<DataSourcePageTitleProps> = ({
 
   return (
     <>
-      <div className="pf-c-page__main-breadcrumb">
-        <Breadcrumb className="pf-c-breadcrumb co-breadcrumb">
+      <div className="pf-v5-c-page__main-breadcrumb">
+        <Breadcrumb className="pf-v5-c-breadcrumb co-breadcrumb">
           <BreadcrumbItem>
             <Link to={`/k8s/ns/${namespace || DEFAULT_NAMESPACE}/${DataSourceModelRef}`}>
               {t('DataSources')}

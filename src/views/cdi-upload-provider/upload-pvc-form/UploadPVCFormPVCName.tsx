@@ -24,7 +24,7 @@ const UploadPVCFormPVCName: React.FC<UploadPVCFormPVCNameProps> = ({
       <div className="form-group">
         <input
           aria-describedby="pvc-name-help"
-          className="pf-c-form-control"
+          className="pf-v5-c-form-control"
           disabled={isGolden || isLoading}
           id="pvc-name"
           onChange={handlePvcName}

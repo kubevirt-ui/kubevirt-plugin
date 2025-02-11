@@ -14,7 +14,7 @@ const RDP: React.FunctionComponent<RDPProps> = ({
   vnc = null,
   ...props
 }) => (
-  <div className="pf-c-console__desktop-viewer">
+  <div className="pf-v5-c-console__desktop-viewer">
     <RemoteViewer
       onDownload={props?.onDownload}
       onGenerate={props?.onGenerate}

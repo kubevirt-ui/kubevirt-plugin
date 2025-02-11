@@ -12,7 +12,7 @@ export const MigrationPolicyBreadcrumb: React.FC = () => {
 
   return (
     <div>
-      <Breadcrumb className="pf-c-breadcrumb kv-breadcrumb">
+      <Breadcrumb className="pf-v5-c-breadcrumb kv-breadcrumb">
         <BreadcrumbItem>
           <Link to={migrationPoliciesPageBaseURL}>{t('MigrationPolicies')}</Link>
         </BreadcrumbItem>

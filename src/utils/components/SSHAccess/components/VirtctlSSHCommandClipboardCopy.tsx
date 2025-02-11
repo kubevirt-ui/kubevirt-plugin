@@ -18,7 +18,7 @@ const VirtctlSSHCommandClipboardCopy: FC<VirtctlSSHCommandClipboardCopyProps> = 
   const sshSecretNotConfigured = isEmpty(getVMSSHSecretName(vm));
 
   if (sshSecretNotConfigured) {
-    return <div className="pf-u-font-size-xs">{t('SSH secret not configured')}</div>;
+    return <div className="pf-v5-u-font-size-xs">{t('SSH secret not configured')}</div>;
   }
 
   return (

@@ -33,7 +33,7 @@ const NoDataAvailableMessage: React.FC<NoDataAvailableMessageProps> = ({ isVCPU 
   );
 
   return (
-    <div className="kv-top-consumers-card__chart-list-no-data-msg pf-u-text-align-center">
+    <div className="kv-top-consumers-card__chart-list-no-data-msg pf-v5-u-text-align-center">
       {t('No data available')}
       <HelpTextIcon
         bodyContent={bodyContent}

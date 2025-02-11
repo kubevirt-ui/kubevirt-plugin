@@ -1,17 +1,17 @@
 .template-header-alert {
   margin-bottom: 0;
 
-  button.pf-c-button.pf-m-link {
+  button.pf-v5-c-button.pf-m-link {
     padding-left: 0;
   }
 }
 
 .TemplatePageTitle {
-  .pf-c-title {
+  .pf-v5-c-title {
     align-items: center;
   }
 
-  .pf-c-switch {
-    padding-top: var(--pf-global--spacer--xs);
+  .pf-v5-c-switch {
+    padding-top: var(--pf-v5-global--spacer--xs);
   }
 }
