@@ -1,6 +1,6 @@
 import React, { Dispatch, FC, SetStateAction, useEffect, useMemo, useRef } from 'react';
 
-import { V1Interface, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import SelectTypeahead from '@kubevirt-utils/components/SelectTypeahead/SelectTypeahead';
@@ -8,7 +8,6 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getNetworks } from '@kubevirt-utils/resources/vm';
 import { interfacesTypes } from '@kubevirt-utils/resources/vm/utils/network/constants';
-import { getNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { FormGroup, Label, ValidatedOptions } from '@patternfly/react-core';
 
 import { getNadType, networkNameStartWithPod, podNetworkExists } from '../../utils/helpers';
@@ -18,7 +17,6 @@ import NetworkSelectHelperPopover from './components/NetworkSelectHelperPopover/
 
 type NetworkInterfaceNetworkSelectProps = {
   editInitValueNetworkName?: string | undefined;
-  iface: V1Interface;
   isEditing?: boolean | undefined;
   namespace?: string;
   networkName: string;
@@ -30,7 +28,6 @@ type NetworkInterfaceNetworkSelectProps = {
 
 const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
   editInitValueNetworkName,
-  iface,
   isEditing,
   namespace,
   networkName,
@@ -97,16 +94,6 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
     }
     return options;
   }, [isPodNetworkingOptionExists, filteredNADs, podNetworkingText]);
-
-  useEffect(() => {
-    if (!loaded) return;
-
-    const initialInterfaceType = interfacesTypes[getNetworkInterfaceType(iface)];
-
-    if (!initialInterfaceType) return;
-
-    setInterfaceType(initialInterfaceType);
-  }, [loaded, filteredNADs, setInterfaceType, iface]);
 
   const validated =
     canCreateNetworkInterface || isEditing ? ValidatedOptions.default : ValidatedOptions.error;
