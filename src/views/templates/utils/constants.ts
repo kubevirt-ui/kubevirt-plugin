@@ -25,8 +25,6 @@ export type SOURCE_OPTIONS_IDS =
   | typeof SOURCE_TYPES.registrySource
   | typeof SOURCE_TYPES.uploadSource;
 
-export const SUPPORT_URL = 'https://access.redhat.com/articles/4234591';
-
 // t('Can not edit in view-only mode')
 export const NO_EDIT_TEMPLATE_PERMISSIONS = 'Can not edit in view-only mode';
 
