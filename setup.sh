@@ -16,6 +16,7 @@ health_check () {
   # virtctl image-upload -n default pvc auto-test-pvc --size=1Gi --image-path=${CYPRESS_LOCAL_IMAGE} --insecure --force-bind
 
   #3 - create VM from CLI to verify the webhook
+  oc delete -f cypress/fixtures/vm.yaml --ignore-not-found=true
   oc create -f cypress/fixtures/vm.yaml
   oc wait --for=condition=ready vm/rhel-10-vm --timeout=360s
   oc delete -f cypress/fixtures/vm.yaml

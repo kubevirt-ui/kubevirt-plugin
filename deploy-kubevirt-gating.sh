@@ -79,23 +79,23 @@ tee <<EOF | oc apply -f -
 apiVersion: v1
 kind: Namespace
 metadata:
-    name: kubevirt-hyperconverged
+    name: openshift-cnv
 ---
 apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
 metadata:
-    name: kubevirt-hyperconverged-group
-    namespace: kubevirt-hyperconverged
+    name: openshift-cnv-group
+    namespace: openshift-cnv
 ---
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
     name: hco-operatorhub
-    namespace: kubevirt-hyperconverged
+    namespace: openshift-cnv
 spec:
     source: hco-unstable-catalog-source
     sourceNamespace: openshift-marketplace
-    name: community-kubevirt-hyperconverged
+    name: community-openshift-cnv
     channel: ${HCO_SUBSCRIPTION_CHANNEL}
     config:
         selector:
@@ -115,7 +115,7 @@ export hco_cr_is_created="false"
 for i in {1..20}
 do
   echo "Attempt ${i}/20"
-  if oc create -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/${HCO_GIT_TAG}/deploy/hco.cr.yaml -n kubevirt-hyperconverged; then
+  if oc create -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/${HCO_GIT_TAG}/deploy/hco.cr.yaml -n openshift-cnv; then
     echo "HCO cr is created"
     export hco_cr_is_created="true"
     break
@@ -137,7 +137,7 @@ export virt_operator_is_available="false"
 for i in {1..20}
 do
   echo "Attempt ${i}/20"
-  if oc -n kubevirt-hyperconverged wait deployment/virt-operator --for=condition=Available --timeout="10m"; then
+  if oc -n openshift-cnv wait deployment/virt-operator --for=condition=Available --timeout="10m"; then
     echo "virt-operator is Available"
     export virt_operator_is_available="true"
     break
