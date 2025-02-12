@@ -43,6 +43,7 @@ const SSHKeyUpload: FC<SSHKeyUploadProps> = ({ secrets, setSSHDetails, sshDetail
       ...sshDetails,
       secretOption: SecretSelectionOption.addNew,
       sshPubKey: sshPublicKey?.trim(),
+      sshSecretNamespace: activeNamespace,
     });
   };
 

@@ -10,7 +10,7 @@ import {
 } from '@kubevirt-utils/extensions/telemetry/utils/constants';
 import { addUploadDataVolumeOwnerReference } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
-import { createSecret } from '@kubevirt-utils/resources/secret/utils';
+import { createUserPasswordSecret } from '@kubevirt-utils/resources/secret/utils';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
 import { vmBootDiskSourceIsRegistry } from '@kubevirt-utils/resources/vm/utils/source';
@@ -53,10 +53,10 @@ export const useWizardVmCreate = (): UseWizardVmCreateValues => {
       setError(undefined);
 
       const { password, username } = decodedRegistryCredentials;
-      const addSecret = username && password && vmBootDiskSourceIsRegistry(vm);
+      const addRegistrySecret = username && password && vmBootDiskSourceIsRegistry(vm);
       const imageSecretName = addRandomSuffix(getName(vm));
-      if (addSecret) {
-        await createSecret({
+      if (addRegistrySecret) {
+        await createUserPasswordSecret({
           namespace: getNamespace(vm),
           password,
           secretName: imageSecretName,
@@ -78,7 +78,7 @@ export const useWizardVmCreate = (): UseWizardVmCreateValues => {
         if (!isUDNManagedNamespace)
           vmDraft.spec.template.metadata.labels[HEADLESS_SERVICE_LABEL] = HEADLESS_SERVICE_NAME;
 
-        if (addSecret)
+        if (addRegistrySecret)
           vmDraft.spec.dataVolumeTemplates[0].spec.source.registry.secretRef = imageSecretName;
       });
 
