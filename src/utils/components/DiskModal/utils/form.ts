@@ -12,7 +12,7 @@ import {
   getVolumes,
 } from '@kubevirt-utils/resources/vm';
 import { isInstanceTypeVM } from '@kubevirt-utils/resources/vm/utils/instanceTypes';
-import { generatePrettyName, isEmpty } from '@kubevirt-utils/utils/utils';
+import { generatePrettyName, getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
 import { isRunning } from '@virtualmachines/utils';
 
 import { DEFAULT_DISK_SIZE } from './constants';
@@ -74,7 +74,7 @@ export const getDefaultCreateValues = (
   createDiskSource: SourceTypes,
 ): V1DiskFormState => {
   const newDiskName = generatePrettyName('disk');
-  const newDataVolumeName = generatePrettyName(`dv-${getName(vm)}`);
+  const newDataVolumeName = `dv-${getName(vm)}-${getRandomChars()}`;
 
   const withDataVolume = doesSourceRequireDataVolume(createDiskSource);
 
