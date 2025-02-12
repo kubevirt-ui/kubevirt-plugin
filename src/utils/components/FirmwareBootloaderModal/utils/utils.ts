@@ -20,6 +20,9 @@ export const getBootloaderFromVM = (
   if (secureBoot?.secureBoot === false) {
     return BootMode.uefi;
   }
+
+  if (vm?.spec?.template?.spec?.domain?.firmware?.bootloader?.bios) return BootMode.bios;
+
   return defaultBootmode;
 };
 
