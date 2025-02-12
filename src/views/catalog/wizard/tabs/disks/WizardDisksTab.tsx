@@ -14,7 +14,7 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import WindowsDrivers from '@kubevirt-utils/components/WindowsDrivers/WindowsDrivers';
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
-import { ensurePath } from '@kubevirt-utils/utils/utils';
+import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   ListPageBody,
   ListPageFilter,
@@ -38,7 +38,7 @@ const WizardDisksTab: WizardTab = ({ tabsData, updateTabsData, updateVM, vm }) =
 
   const handleSubmit = (newVM: V1VirtualMachine, diskFormState: V1DiskFormState) => {
     const { registryCredentials } = diskFormState;
-    updateRegistryCredentials(registryCredentials);
+    !isEmpty(registryCredentials) && updateRegistryCredentials(registryCredentials);
     return updateVM(newVM);
   };
 
