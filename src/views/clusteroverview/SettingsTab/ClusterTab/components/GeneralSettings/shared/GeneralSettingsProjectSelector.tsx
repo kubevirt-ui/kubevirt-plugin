@@ -14,14 +14,12 @@ type GeneralSettingsProjectSelectorProps = {
   onSelect: (value: string) => void;
   projects: K8sResourceCommon[];
   selectedProject: string;
-  setSelectedProject: (value: string) => void;
 };
 const GeneralSettingsProjectSelector: FC<GeneralSettingsProjectSelectorProps> = ({
   loaded,
   onSelect,
   projects,
   selectedProject,
-  setSelectedProject,
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
@@ -36,7 +34,7 @@ const GeneralSettingsProjectSelector: FC<GeneralSettingsProjectSelectorProps> = 
                 <CreateProjectModal
                   {...props}
                   createdProject={(value) =>
-                    value?.metadata?.name && setSelectedProject(value?.metadata?.name)
+                    value?.metadata?.name && onSelect(value?.metadata?.name)
                   }
                 />
               ))
