@@ -35,6 +35,8 @@ const VirtualMachineMigrationStatus: FC<VirtualMachineMigrationStatusProps> = ({
   const migrationPod = getMigrationPod(vmim);
   const migrationLogURL = migrationPod && `/k8s/ns/default/pods/${migrationPod}/logs`;
 
+  const migrationCompleted = vmimStatuses.Succeeded === vmim?.status?.phase;
+
   if (rollbacking)
     return (
       <VirtualMachineMigrationRollback
@@ -81,7 +83,7 @@ const VirtualMachineMigrationStatus: FC<VirtualMachineMigrationStatusProps> = ({
           <DescriptionListDescription>
             {vmim?.status?.phase || t('Requested')}
 
-            {vmimStatuses.Succeeded === vmim?.status?.phase && (
+            {migrationCompleted && (
               <>
                 {t('Migrated at')} <Timestamp timestamp={getMigrationSuccessTimestamp(vmim)} />{' '}
               </>
@@ -92,9 +94,11 @@ const VirtualMachineMigrationStatus: FC<VirtualMachineMigrationStatusProps> = ({
 
       <ActionList>
         <ActionListItem>
-          <Button onClick={() => setRollbacking(true)} variant={ButtonVariant.secondary}>
-            {t('Stop')}
-          </Button>
+          {!migrationCompleted && (
+            <Button onClick={() => setRollbacking(true)} variant={ButtonVariant.secondary}>
+              {t('Stop')}
+            </Button>
+          )}
         </ActionListItem>
         {migrationLogURL && (
           <ActionListItem className="migration-status__view-report">
