@@ -1,4 +1,4 @@
-import React, { FC, useCallback } from 'react';
+import React, { FC, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
@@ -24,7 +24,7 @@ type ActionButtonsProps = {
   isSubmitting?: boolean;
   onCreate: () => void;
   onCustomize: () => void;
-  onViewYAML: () => void;
+  onViewYAML: () => Promise<void>;
 };
 
 const ActionButtons: FC<ActionButtonsProps> = ({
@@ -34,6 +34,7 @@ const ActionButtons: FC<ActionButtonsProps> = ({
   onViewYAML,
 }) => {
   const navigate = useNavigate();
+  const [loadingYAML, setLoadingYAML] = useState(false);
 
   const [activeNamespace] = useActiveNamespace();
 
@@ -50,6 +51,15 @@ const ActionButtons: FC<ActionButtonsProps> = ({
 
   const { disableButtonTooltipContent, isCreationDisabled, isViewYAMLDisabled } =
     useStatusActionButtons(isSubmitting);
+
+  const onView = () => {
+    setLoadingYAML(true);
+    try {
+      onViewYAML();
+    } finally {
+      setLoadingYAML(false);
+    }
+  };
 
   return (
     <Split hasGutter>
@@ -94,8 +104,9 @@ const ActionButtons: FC<ActionButtonsProps> = ({
       <SplitItem isFilled />
       <SplitItem>
         <Button
-          isDisabled={isViewYAMLDisabled}
-          onClick={onViewYAML}
+          isDisabled={isViewYAMLDisabled || loadingYAML}
+          isLoading={loadingYAML}
+          onClick={onView}
           variant={ButtonVariant.secondary}
         >
           {t('View YAML & CLI')}

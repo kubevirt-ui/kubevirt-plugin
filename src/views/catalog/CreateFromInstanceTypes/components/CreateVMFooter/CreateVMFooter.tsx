@@ -35,6 +35,7 @@ import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettin
 import useRHELAutomaticSubscription from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/useRHELAutomaticSubscription';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
+import { mountWinDriversToVM } from '@kubevirt-utils/resources/vm/utils/disk/drivers';
 import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { createHeadlessService } from '@kubevirt-utils/utils/headless-service';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -76,7 +77,7 @@ const CreateVMFooter: FC = () => {
     setIsSubmitting(true);
     setError(null);
 
-    const vmToCreate = generateVM({
+    const generatedVM = generateVM({
       autoUpdateEnabled,
       instanceTypeState: instanceTypeVMState,
       isUDNManagedNamespace,
@@ -84,6 +85,8 @@ const CreateVMFooter: FC = () => {
       subscriptionData,
       targetNamespace: vmNamespaceTarget,
     });
+
+    const vmToCreate = isWindowsOSVolume ? await mountWinDriversToVM(generatedVM) : generatedVM;
 
     logITFlowEvent(CREATE_VM_BUTTON_CLICKED, vmToCreate);
 
@@ -140,17 +143,7 @@ const CreateVMFooter: FC = () => {
     setError(null);
 
     try {
-      await setVM(
-        generateVM({
-          autoUpdateEnabled,
-          instanceTypeState: instanceTypeVMState,
-          isUDNManagedNamespace,
-          startVM,
-          subscriptionData,
-          targetNamespace: vmNamespaceTarget,
-        }),
-      );
-      vmSignal.value = generateVM({
+      const generatedVM = generateVM({
         autoUpdateEnabled,
         instanceTypeState: instanceTypeVMState,
         isUDNManagedNamespace,
@@ -158,6 +151,13 @@ const CreateVMFooter: FC = () => {
         subscriptionData,
         targetNamespace: vmNamespaceTarget,
       });
+
+      const vmToCustomize = isWindowsOSVolume
+        ? await mountWinDriversToVM(generatedVM)
+        : generatedVM;
+
+      await setVM(vmToCustomize);
+      vmSignal.value = vmToCustomize;
 
       logITFlowEvent(CUSTOMIZE_VM_BUTTON_CLICKED, vmSignal.value);
 
@@ -189,21 +189,20 @@ const CreateVMFooter: FC = () => {
         </StackItem>
         <StackItem>
           <ActionButtons
-            onViewYAML={() => {
+            onViewYAML={async () => {
+              const vm = generateVM({
+                autoUpdateEnabled,
+                instanceTypeState: instanceTypeVMState,
+                isUDNManagedNamespace,
+                startVM,
+                subscriptionData,
+                targetNamespace: vmNamespaceTarget,
+              });
+
+              const vmToView = isWindowsOSVolume ? await mountWinDriversToVM(vm) : vm;
+
               logITFlowEvent(VIEW_YAML_AND_CLI_CLICKED, null, { vmName: vmName });
-              createModal((props) => (
-                <YamlAndCLIViewerModal
-                  vm={generateVM({
-                    autoUpdateEnabled,
-                    instanceTypeState: instanceTypeVMState,
-                    isUDNManagedNamespace,
-                    startVM,
-                    subscriptionData,
-                    targetNamespace: vmNamespaceTarget,
-                  })}
-                  {...props}
-                />
-              ));
+              createModal((props) => <YamlAndCLIViewerModal vm={vmToView} {...props} />);
             }}
             isSubmitting={isSubmitting}
             onCreate={handleSubmit}
