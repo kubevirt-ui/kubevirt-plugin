@@ -68,7 +68,6 @@ const GeneralSettingsProject: FC<GeneralSettingsProjectProps> = ({
         onSelect={onSelect}
         projects={projects}
         selectedProject={selectedProject}
-        setSelectedProject={setSelectedProject}
       />
       <GeneralSettingsError error={error} loading={projectsLoadingError} />
     </ExpandSection>
