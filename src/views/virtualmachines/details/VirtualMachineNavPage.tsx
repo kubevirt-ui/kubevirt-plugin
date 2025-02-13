@@ -39,6 +39,7 @@ const VirtualMachineNavPage: React.FC<VirtualMachineDetailsPageProps> = ({
       <VirtualMachineNavPageTitle
         isLoaded={isLoaded || !isEmpty(loadError)}
         name={name}
+        nonExpandedVM={vm}
         vm={isInstanceTypeVM(vm) ? instanceTypeExpandedSpec : vm}
       />
       <div className="VirtualMachineNavPage--tabs__main">
