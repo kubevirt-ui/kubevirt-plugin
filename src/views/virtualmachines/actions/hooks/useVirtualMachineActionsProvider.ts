@@ -7,7 +7,11 @@ import {
 import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { getConsoleVirtctlCommand } from '@kubevirt-utils/components/SSHAccess/utils';
-import { TREE_VIEW, TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
+import {
+  CONFIRM_VM_ACTIONS,
+  TREE_VIEW,
+  TREE_VIEW_FOLDERS,
+} from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
 import { getUpdateStrategy } from '@kubevirt-utils/resources/vm';
@@ -30,6 +34,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
   isSingleNodeCluster,
 ) => {
   const { createModal } = useModal();
+  const { featureEnabled: confirmVMActionsEnabled } = useFeatures(CONFIRM_VM_ACTIONS);
 
   const virtctlCommand = getConsoleVirtctlCommand(vm);
 
@@ -51,7 +56,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
 
     const startOrStop = ((printableStatusMachine) => {
       const map = {
-        default: VirtualMachineActionFactory.stop(vm),
+        default: VirtualMachineActionFactory.stop(vm, createModal, confirmVMActionsEnabled),
         Stopped: VirtualMachineActionFactory.start(vm),
         Stopping: VirtualMachineActionFactory.forceStop(vm),
         Terminating: VirtualMachineActionFactory.forceStop(vm),
@@ -75,11 +80,11 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
     const pauseOrUnpause =
       printableStatus === Paused
         ? VirtualMachineActionFactory.unpause(vm)
-        : VirtualMachineActionFactory.pause(vm);
+        : VirtualMachineActionFactory.pause(vm, createModal, confirmVMActionsEnabled);
 
     return [
       startOrStop,
-      VirtualMachineActionFactory.restart(vm),
+      VirtualMachineActionFactory.restart(vm, createModal, confirmVMActionsEnabled),
       pauseOrUnpause,
       VirtualMachineActionFactory.clone(vm, createModal),
       VirtualMachineActionFactory.snapshot(vm, createModal),

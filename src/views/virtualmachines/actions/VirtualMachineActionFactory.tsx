@@ -30,6 +30,7 @@ import {
   printableVMStatus,
 } from '../utils';
 
+import ConfirmVMActionModal from './components/ConfirmVMActionModal/ConfirmVMActionModal';
 import DeleteVMModal from './components/DeleteVMModal/DeleteVMModal';
 import {
   cancelMigration,
@@ -210,19 +211,49 @@ export const VirtualMachineActionFactory = {
       label: t('Move to folder'),
     };
   },
-  pause: (vm: V1VirtualMachine): Action => {
+  pause: (
+    vm: V1VirtualMachine,
+    createModal: (modal: ModalComponent) => void,
+    confirmVMActions: boolean,
+  ): Action => {
     return {
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
-      cta: () => pauseVM(vm),
+      cta: () =>
+        confirmVMActions
+          ? createModal(({ isOpen, onClose }) => (
+              <ConfirmVMActionModal
+                action={pauseVM}
+                actionType="Pause"
+                isOpen={isOpen}
+                onClose={onClose}
+                vm={vm}
+              />
+            ))
+          : pauseVM(vm),
       disabled: vm?.status?.printableStatus !== Running || isSnapshotting(vm) || isRestoring(vm),
       id: 'vm-action-pause',
       label: t('Pause'),
     };
   },
-  restart: (vm: V1VirtualMachine): Action => {
+  restart: (
+    vm: V1VirtualMachine,
+    createModal: (modal: ModalComponent) => void,
+    confirmVMActions: boolean,
+  ): Action => {
     return {
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
-      cta: () => restartVM(vm),
+      cta: () =>
+        confirmVMActions
+          ? createModal(({ isOpen, onClose }) => (
+              <ConfirmVMActionModal
+                action={restartVM}
+                actionType="Restart"
+                isOpen={isOpen}
+                onClose={onClose}
+                vm={vm}
+              />
+            ))
+          : restartVM(vm),
       disabled:
         [Migrating, Provisioning, Stopped, Stopping, Terminating, Unknown].includes(
           vm?.status?.printableStatus,
@@ -262,10 +293,25 @@ export const VirtualMachineActionFactory = {
       label: t('Start'),
     };
   },
-  stop: (vm: V1VirtualMachine): Action => {
+  stop: (
+    vm: V1VirtualMachine,
+    createModal: (modal: ModalComponent) => void,
+    confirmVMActions: boolean,
+  ): Action => {
     return {
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
-      cta: () => stopVM(vm),
+      cta: () =>
+        confirmVMActions
+          ? createModal(({ isOpen, onClose }) => (
+              <ConfirmVMActionModal
+                action={stopVM}
+                actionType="Stop"
+                isOpen={isOpen}
+                onClose={onClose}
+                vm={vm}
+              />
+            ))
+          : stopVM(vm),
       disabled:
         [Provisioning, Stopped, Stopping, Terminating, Unknown].includes(
           vm?.status?.printableStatus,
