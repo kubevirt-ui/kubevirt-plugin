@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction } from 'react';
 
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { RFBCreate } from '@novnc/novnc/core/rfb';
+import { RFBCreate } from '@novnc/novnc/lib/rfb';
 
 import {
   DESKTOP_VIEWER_CONSOLE_TYPE,

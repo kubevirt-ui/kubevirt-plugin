@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@novnc/novnc": "1.3.0",
+    "@novnc/novnc": "^1.5.0",
     "@patternfly/quickstarts": "5.4.1",
     "@patternfly/react-catalog-view-extension": "5.0.0",
     "@patternfly/react-charts": "7.1.1",

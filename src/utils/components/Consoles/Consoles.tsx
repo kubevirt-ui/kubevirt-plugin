@@ -7,7 +7,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getGPUDevices } from '@kubevirt-utils/resources/vm';
 import { isWindows } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { RFBCreate } from '@novnc/novnc/core/rfb';
+import { RFBCreate } from '@novnc/novnc/lib/rfb';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Bullseye, Flex, FlexItem, Stack, StackItem } from '@patternfly/react-core';
 
