@@ -51,10 +51,11 @@ import VirtualMachineEmptyState from './components/VirtualMachineEmptyState/Virt
 import VirtualMachineListSummary from './components/VirtualMachineListSummary/VirtualMachineListSummary';
 import VirtualMachineRow from './components/VirtualMachineRow/VirtualMachineRow';
 import VirtualMachinesCreateButton from './components/VirtualMachinesCreateButton/VirtualMachinesCreateButton';
+import VirtualMachineSelection from './components/VirtualMachineSelection/VirtualMachineSelection';
 import useSelectedFilters from './hooks/useSelectedFilters';
 import useVirtualMachineColumns from './hooks/useVirtualMachineColumns';
 import useVMMetrics from './hooks/useVMMetrics';
-import { deselectAll, selectAll, selectedVMs } from './selectedVMs';
+import { selectedVMs } from './selectedVMs';
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
 import './VirtualMachinesList.scss';
@@ -138,10 +139,15 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
 
   const selectedFilters = useSelectedFilters(filters, searchFilters);
 
-  const [unfilteredData, data] = useMemo(() => {
-    if (!featureEnabled || isProxyPodAlive === false) return [unfilterData, dataFilters];
+  const [unfilteredData, data, paginatedVMs] = useMemo(() => {
+    if (!featureEnabled || isProxyPodAlive === false)
+      return [
+        unfilterData,
+        dataFilters,
+        dataFilters?.slice(pagination.startIndex, pagination.endIndex),
+      ];
 
-    const matchedVMS = vms?.filter(
+    const matchedVMs = vms?.filter(
       ({ metadata: { name, namespace: ns }, status: { printableStatus = '' } = {} }) => {
         return (
           vmiMapper?.mapper?.[ns]?.[name] ||
@@ -149,8 +155,18 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
         );
       },
     );
-    return [matchedVMS, matchedVMS];
-  }, [featureEnabled, isProxyPodAlive, unfilterData, dataFilters, vms, vmiMapper?.mapper, query]);
+    return [vms, matchedVMs, matchedVMs];
+  }, [
+    featureEnabled,
+    isProxyPodAlive,
+    unfilterData,
+    dataFilters,
+    pagination.startIndex,
+    pagination.endIndex,
+    vms,
+    vmiMapper?.mapper,
+    query,
+  ]);
 
   const onPageChange = ({ endIndex, page, perPage, startIndex }) => {
     setPagination(() => ({
@@ -198,7 +214,11 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
   return (
     /* All of this table and components should be replaced to our own fitted components */
     <>
-      <VirtualMachineListSummary namespace={namespace} onFilterChange={onFilterChange} vms={data} />
+      <VirtualMachineListSummary
+        namespace={namespace}
+        onFilterChange={onFilterChange}
+        vms={unfilterData}
+      />
       <div className="vm-list-page-header">
         <ListPageHeader title={t('VirtualMachines')}>
           <Flex>
@@ -214,6 +234,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
       <ListPageBody>
         <div className="vm-listpagebody">
           <div className="list-managment-group">
+            <VirtualMachineSelection loaded={loaded} pagination={pagination} vms={data} />
             <ListPageFilter
               columnLayout={{
                 columns: columns?.map(({ additional, id, title }) => ({
@@ -260,9 +281,6 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
             EmptyMsg={() => (
               <div className="pf-v5-u-text-align-center">{t('No VirtualMachines found')}</div>
             )}
-            onSelect={(_, selected, index) => {
-              if (index === -1) allVMsSelected ? deselectAll() : selectAll(data);
-            }}
             rowData={{
               getVmi: (ns: string, name: string) => vmiMapper?.mapper?.[ns]?.[name],
               getVmim: (ns: string, name: string) => vmimMapper?.[ns]?.[name],
@@ -271,7 +289,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
             }}
             allRowsSelected={allVMsSelected}
             columns={activeColumns}
-            data={data}
+            data={paginatedVMs}
             loaded={loaded}
             loadError={loadError}
             Row={VirtualMachineRow}
