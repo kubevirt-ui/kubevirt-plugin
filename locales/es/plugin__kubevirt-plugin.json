@@ -981,6 +981,7 @@
   "Open": "Open",
   "Open Console": "Open Console",
   "Open logs in a new window": "Open logs in a new window",
+  "Open novnc 1.6beta console": "Open novnc 1.6beta console",
   "Open web console": "Open web console",
   "Opens a specific port on all Nodes in the cluster. If the Node is publicly accessible, any traffic sent to this port is forwarded to the Service.": "Opens a specific port on all Nodes in the cluster. If the Node is publicly accessible, any traffic sent to this port is forwarded to the Service.",
   "OpenShift Data Foundation": "OpenShift Data Foundation",
