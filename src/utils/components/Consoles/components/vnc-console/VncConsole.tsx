@@ -4,9 +4,9 @@ import cn from 'classnames';
 import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import KeyTable from '@novnc/novnc/core/input/keysym';
-import RFBCreate from '@novnc/novnc/core/rfb';
-import { initLogging } from '@novnc/novnc/core/util/logging';
+import KeyTable from '@novnc/novnc/lib/input/keysym';
+import RFBCreate from '@novnc/novnc/lib/rfb';
+import { initLogging } from '@novnc/novnc/lib/util/logging';
 import {
   Button,
   EmptyState,
