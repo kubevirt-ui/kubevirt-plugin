@@ -46,11 +46,11 @@ import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 
 import { useVMListFilters } from '../utils';
 
-import VirtualMachineBulkActionButton from './components/VirtualMachineBulkActionButton';
 import VirtualMachineEmptyState from './components/VirtualMachineEmptyState/VirtualMachineEmptyState';
 import VirtualMachineListSummary from './components/VirtualMachineListSummary/VirtualMachineListSummary';
 import VirtualMachineRow from './components/VirtualMachineRow/VirtualMachineRow';
 import VirtualMachinesCreateButton from './components/VirtualMachinesCreateButton/VirtualMachinesCreateButton';
+import VirtualMachineBulkActionButton from './components/VirtualMachineSelectedVMActionButton';
 import useSelectedFilters from './hooks/useSelectedFilters';
 import useVirtualMachineColumns from './hooks/useVirtualMachineColumns';
 import useVMMetrics from './hooks/useVMMetrics';

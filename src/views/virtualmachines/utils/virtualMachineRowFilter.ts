@@ -20,6 +20,7 @@ import {
 } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { getVMIIPAddresses } from '@kubevirt-utils/resources/vmi';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
+import { signal } from '@preact/signals-react';
 
 import { VmiMapper, VmimMapper } from './mappers';
 import { compareCIDR, getLatestMigrationForEachVM, isLiveMigratable } from './utils';
@@ -209,6 +210,7 @@ const useIPSearchFilter = (vmiMapper: VmiMapper): RowFilter => ({
   type: 'ip',
 });
 
+export const vmimMapperSignal = signal<VmimMapper>({});
 export const useVMListFilters = (
   vmis: V1VirtualMachineInstance[],
   vms: V1VirtualMachine[],
@@ -242,6 +244,8 @@ export const useVMListFilters = (
   }, [vmis]);
 
   const vmimMapper: VmimMapper = useMemo(() => getLatestMigrationForEachVM(vmims), [vmims]);
+
+  vmimMapperSignal.value = vmimMapper;
 
   const statusFilter = useStatusFilter();
   const templatesFilter = useTemplatesFilter(vms);

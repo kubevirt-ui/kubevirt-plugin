@@ -873,6 +873,7 @@
   "No username set, see operating system documentation for the default username.": "No username set, see operating system documentation for the default username.",
   "No VirtualMachineClusterInstanceType found": "No VirtualMachineClusterInstanceType found",
   "No VirtualMachineInstanceTypes found": "No VirtualMachineInstanceTypes found",
+  "No VirtualMachines": "No VirtualMachines",
   "No VirtualMachines found": "No VirtualMachines found",
   "No VirtualMachinesInstances found": "No VirtualMachinesInstances found",
   "Node": "Node",
