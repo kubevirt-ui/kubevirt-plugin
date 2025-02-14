@@ -4,15 +4,9 @@
   }
 }
 
-.vm-listpagebody .pf-v6-c-table {
-  .pf-v6-c-table__th.pf-v6-c-table__check {
-    width: 50px !important;
-    max-width: 50px;
-  }
-
+.vm-listpagebody .pf-v5-c-table {
   .selection-column {
-    width: 50px;
-    max-width: 50px;
+    --pf-v5-c-table--cell--Width: 5%;
   }
 }
 
