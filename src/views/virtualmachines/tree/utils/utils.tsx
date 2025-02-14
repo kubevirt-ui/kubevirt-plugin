@@ -7,6 +7,8 @@ import { getLabel, getName, getNamespace, getResourceUrl } from '@kubevirt-utils
 import { TreeViewDataItem } from '@patternfly/react-core';
 import { FolderIcon, FolderOpenIcon, ProjectDiagramIcon } from '@patternfly/react-icons';
 import { signal } from '@preact/signals-react';
+import VirtualMachineActionButton from '@virtualmachines/list/components/VirtualMachineActionButton';
+import VirtualMachineBulkActionButton from '@virtualmachines/list/components/VirtualMachineBulkActionButton';
 
 import { statusIcon } from '../icons/utils';
 
@@ -21,6 +23,7 @@ import {
 export const treeDataMap = signal<Record<string, TreeViewDataItemWithHref>>(null);
 export interface TreeViewDataItemWithHref extends TreeViewDataItem {
   href?: string;
+  vms?: V1VirtualMachine[];
 }
 
 const buildProjectMap = (
@@ -36,6 +39,7 @@ const buildProjectMap = (
       count: number;
       folders: Record<string, TreeViewDataItemWithHref[]>;
       ungrouped: TreeViewDataItemWithHref[];
+      vms: V1VirtualMachine[];
     }
   > = {};
 
@@ -47,6 +51,7 @@ const buildProjectMap = (
     const VMStatusIcon = statusIcon[vm?.status?.printableStatus];
 
     const vmTreeItem: TreeViewDataItemWithHref = {
+      action: <VirtualMachineActionButton obj={vm} />,
       defaultExpanded: currentPageVMName && currentPageVMName === vmName,
       href: `${getResourceUrl({
         activeNamespace: vmNamespace,
@@ -56,6 +61,7 @@ const buildProjectMap = (
       icon: <VMStatusIcon />,
       id: vmTreeItemID,
       name: vmName,
+      vms: [vm],
     };
 
     if (!treeViewDataMap[vmTreeItemID]) {
@@ -63,7 +69,7 @@ const buildProjectMap = (
     }
 
     if (!projectMap[vmNamespace]) {
-      projectMap[vmNamespace] = { count: 0, folders: {}, ungrouped: [] };
+      projectMap[vmNamespace] = { count: 0, folders: {}, ungrouped: [], vms: [] };
     }
 
     projectMap[vmNamespace].count++;
@@ -73,7 +79,7 @@ const buildProjectMap = (
       }
       return projectMap[vmNamespace].folders[folder].push(vmTreeItem);
     }
-
+    projectMap[vmNamespace].vms.push(vm);
     projectMap[vmNamespace].ungrouped.push(vmTreeItem);
   });
 
@@ -91,7 +97,10 @@ const createFolderTreeItems = (
     const folderExpanded =
       currentPageVMName && vmItems.some((item) => (item.name as string) === currentPageVMName);
 
+    const foldersVMs = vmItems.map((item) => item.vms).flat();
+
     const folderTreeItem: TreeViewDataItemWithHref = {
+      action: <VirtualMachineBulkActionButton vms={foldersVMs} />,
       children: vmItems,
       defaultExpanded: folderExpanded,
       expandedIcon: <FolderOpenIcon />,
@@ -102,6 +111,7 @@ const createFolderTreeItems = (
       icon: <FolderIcon />,
       id: folderTreeItemID,
       name: folder,
+      vms: foldersVMs || [],
     };
 
     if (!treeViewDataMap[folderTreeItemID]) {
@@ -127,8 +137,14 @@ const createProjectTreeItem = (
 
   const projectChildren = [...projectFolders, ...(projectMap[project]?.ungrouped || [])];
 
+  const vmsInFolders = projectFolders.map((folder) => folder.vms).flat();
+
+  const vmsNotInFolders = projectMap[project]?.vms || [];
+  const projectVMs = [...vmsNotInFolders, ...vmsInFolders];
+
   const projectTreeItemID = `${PROJECT_SELECTOR_PREFIX}/${project}`;
   const projectTreeItem: TreeViewDataItemWithHref = {
+    action: <VirtualMachineBulkActionButton vms={projectVMs} />,
     children: projectChildren,
     customBadgeContent: projectMap[project]?.count || 0,
     defaultExpanded: currentPageNamespace === project,
