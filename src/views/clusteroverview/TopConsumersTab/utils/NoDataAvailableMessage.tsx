@@ -2,9 +2,8 @@ import * as React from 'react';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
+import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-
-import { NON_VCPU_LINK, vCPU_LINK } from './constants';
 
 import './NoDataAvailableMessage.scss';
 
@@ -26,7 +25,10 @@ const NoDataAvailableMessage: React.FC<NoDataAvailableMessageProps> = ({ isVCPU 
       <div>
         {' '}
         <div className="kv-top-consumers-card__chart-list-no-data-msg--link">
-          <ExternalLink href={isVCPU ? vCPU_LINK : NON_VCPU_LINK} text={t('Learn more')} />
+          <ExternalLink
+            href={isVCPU ? documentationURL.vCPU_LINK : documentationURL.NON_VCPU_LINK}
+            text={t('Learn more')}
+          />
         </div>
       </div>
     </div>

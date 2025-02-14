@@ -1,25 +1,25 @@
 export const REDHAT_BASE_URL = 'https://www.redhat.com';
-export const REDHAT_DOC_URL = 'https://access.redhat.com/documentation/en-us';
-export const OPENSHIFT_DOC_URL = 'https://docs.openshift.com/container-platform';
+
+export const REDHAT_DOC_URL =
+  'https://docs.redhat.com/documentation/openshift_container_platform/latest';
 
 export const documentationURL = {
   ANNOTATIONS: 'https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/',
   AUTOCOMPUTE_CPU_LIMITS:
     'https://kubevirt.io/user-guide/virtual_machines/resources_requests_and_limits/',
-  CDI_UPLOAD_SUPPORTED_TYPES: `${REDHAT_DOC_URL}/openshift_container_platform/4.9/html/virtualization/virtual-machines#virt-cdi-supported-operations-matrix_virt-importing-virtual-machine-images-datavolumes`,
-  CHECKUPS: `${OPENSHIFT_DOC_URL}/4.16/virt/monitoring/virt-running-cluster-checkups.html`,
-  CHECKUPS_LATENCY: `${OPENSHIFT_DOC_URL}/4.15/virt/monitoring/virt-running-cluster-checkups.html#virt-measuring-latency-vm-secondary-network_virt-running-cluster-checkups`,
+  CDI_UPLOAD_SUPPORTED_TYPES: `${REDHAT_DOC_URL}/html/virtualization/storage#virt-cdi-supported-operations-matrix_virt-preparing-cdi-scratch-space`,
+  CHECKUPS: `${REDHAT_DOC_URL}/html/virtualization/monitoring#virt-running-cluster-checkups`,
+  CHECKUPS_LATENCY: `${REDHAT_DOC_URL}/html/virtualization/monitoring#virt-measuring-latency-vm-secondary-network_virt-running-cluster-checkups`,
   CLOUDINIT_INFO: 'https://cloudinit.readthedocs.io/en/latest/index.html',
-
-  CREATING_VMS_FROM_TEMPLATES: `${OPENSHIFT_DOC_URL}/4.15/virt/virtual_machines/creating_vms_rh/virt-creating-vms-from-templates.html`,
+  CREATING_VMS_FROM_TEMPLATES: `${REDHAT_DOC_URL}/html/virtualization/virtual-machines#virt-creating-vms-from-templates`,
   CRON_INFO: `${REDHAT_BASE_URL}/sysadmin/automate-linux-tasks-cron`,
   DATA_FOUNDATION_OPERATOR:
-    'https://access.redhat.com/documentation/en-us/red_hat_openshift_data_foundation/4.14/html-single/red_hat_openshift_data_foundation_architecture/index',
-  DATAVOLUME_PREALLOCATIONS: `${OPENSHIFT_DOC_URL}/4.15/virt/storage/virt-using-preallocation-for-datavolumes.html`,
+    'https://docs.redhat.com/documentation/red_hat_openshift_data_foundation/latest/html-single/red_hat_openshift_data_foundation_architecture/index',
+  DATAVOLUME_PREALLOCATIONS: `${REDHAT_DOC_URL}/html/virtualization/storage#virt-using-preallocation-for-datavolumes`,
   DESCHEDULER:
     'https://kubevirt.io/user-guide/operations/node_assignment/#node-balancing-with-descheduler',
   DEV_PREVIEW: 'https://access.redhat.com/support/offerings/devpreview',
-  DYNAMIC_SSH_KEY_INJECTION: `${OPENSHIFT_DOC_URL}/4.15/virt/virtual_machines/virt-accessing-vm-ssh.html`,
+  DYNAMIC_SSH_KEY_INJECTION: `${REDHAT_DOC_URL}/html/virtualization/virtual-machines#virt-accessing-vm-ssh`,
   FREE_PAGE_REPORTING:
     'https://developers.redhat.com/articles/2024/03/13/save-memory-openshift-virtualization-using-free-page-reporting',
   HIGHLIGHTS_418:
@@ -31,33 +31,31 @@ export const documentationURL = {
     'https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata',
   MIGRATION_CONFIGURATION:
     'http://kubevirt.io/api-reference/main/definitions.html#_v1_migrationconfiguration',
-  MIGRATION_POLICIES:
-    'https://access.redhat.com/documentation/en-us/openshift_container_platform/4.15/html/virtualization/live-migration#live-migration-policies',
+  MIGRATION_POLICIES: `${REDHAT_DOC_URL}/html/virtualization/live-migration#live-migration-policies`,
   MTV_OPERATOR:
-    'https://access.redhat.com/documentation/en-us/migration_toolkit_for_virtualization/2.5/html/installing_and_using_the_migration_toolkit_for_virtualization/index',
-  NAME: 'https://kubernetes.io/docs/concepts/overview/working-with-objects/name',
+    'https://docs.redhat.com/documentation/migration_toolkit_for_virtualization/latest/html/installing_and_using_the_migration_toolkit_for_virtualization/index',
+  NAME: 'https://kubernetes.io/docs/concepts/overview/working-with-objects/names',
   NAMESPACE_DOC: 'https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/',
-  NMSTATE_OPERATOR:
-    'https://docs.openshift.com/container-platform/4.14/networking/k8s_nmstate/k8s-nmstate-about-the-k8s-nmstate-operator.html',
-  NODEPORTS: `${REDHAT_DOC_URL}/openshift_container_platform/4.14/html/networking/configuring-ingress-cluster-traffic#nw-using-nodeport_configuring-ingress-cluster-traffic-nodeport`,
-  OPERATIONS: 'https://docs.openshift.com/container-platform/4.16/operators/index.html',
+  NMSTATE_OPERATOR: `${REDHAT_DOC_URL}/html-single/networking/index#k8s-nmstate-about-the-k8s-nmstate-operator`,
+  NODEPORTS: `${REDHAT_DOC_URL}/html/networking/configuring-ingress-cluster-traffic#nw-using-nodeport_configuring-ingress-cluster-traffic-nodeport`,
+  NON_VCPU_LINK: `${REDHAT_DOC_URL}/html/virtualization/monitoring#virt-querying-metrics_virt-prometheus-queries`,
+  OPERATIONS: `${REDHAT_DOC_URL}/html/operators/index`,
   OS_IMAGE_CENTOS: 'https://cloud.centos.org/centos/',
   OS_IMAGE_FEDORA: 'https://alt.fedoraproject.org/cloud/',
   OS_IMAGE_OTHER: 'https://alt.fedoraproject.org/cloud/',
   OS_IMAGE_RHEL: 'https://access.redhat.com/downloads/content/479/ver=/rhel---8/',
   OS_IMAGE_WINDOWS: 'https://www.microsoft.com/en-us/software-download/windows10ISO',
   PROJECTS: 'https://docs.okd.io/latest/applications/projects/working-with-projects.html',
-  REDHAT_BLOG: `${REDHAT_BASE_URL}/en/blog/channel/red-hat-openshift`,
-  SNAPSHOT: `${REDHAT_DOC_URL}/openshift_container_platform/4.10/html/storage/using-container-storage-interface-csi#persistent-storage-csi-snapshots`,
-  SYSPREP: `${OPENSHIFT_DOC_URL}/4.10/virt/virtual_machines/virt-automating-windows-sysprep.html`,
-  TAINTS_TOLERATION: `${OPENSHIFT_DOC_URL}/4.10/virt/virtual_machines/advanced_vm_management/virt-specifying-nodes-for-vms.html#virt-about-node-placement-vms_virt-specifying-nodes-for-vms`,
+  REDHAT_BLOG: `${REDHAT_BASE_URL}/blog/channel/red-hat-openshift`,
+  SNAPSHOT: `${REDHAT_DOC_URL}/html/storage/using-container-storage-interface-csi#persistent-storage-csi-snapshots`,
+  SUPPORT_URL: 'https://access.redhat.com/articles/4234591',
+  SYSPREP: `${REDHAT_DOC_URL}/html/virtualization/virtual-machines#virt-creating-windows-vm_virt-creating-vms-uploading-images`,
+  TAINTS_TOLERATION: `${REDHAT_DOC_URL}/html/virtualization/virtual-machines#virt-about-node-placement-vms_virt-specifying-nodes-for-vms`,
   TECH_PREVIEW: 'https://access.redhat.com/support/offerings/techpreview',
-  VIRT_CTL: `${OPENSHIFT_DOC_URL}/4.15/virt/getting_started/virt-using-the-cli-tools.html`,
+  vCPU_LINK: `${REDHAT_DOC_URL}/html/virtualization/monitoring#virt-promql-vcpu-metrics_virt-prometheus-queries`,
   VIRT_MANAGER_DOWNLOAD: 'https://virt-manager.org/download.html',
-  VIRT_SECONDARY_NETWORK: `${OPENSHIFT_DOC_URL}/4.15/virt/vm_networking/virt-networking-overview.html#secondary-network-config`,
-  VIRTCTL_CLI:
-    'https://docs.openshift.com/container-platform/4.15/virt/getting_started/virt-using-the-cli-tools.html',
+  VIRT_SECONDARY_NETWORK: `${REDHAT_DOC_URL}/html/virtualization/networking#secondary-network-config`,
+  VIRTCTL_CLI: `${REDHAT_DOC_URL}/html/virtualization/getting-started#virt-using-the-cli-tools`,
   VIRTUALIZATION_BLOG: `https://cloud.redhat.com/learn/topics/virtualization/`,
-  VIRTUALIZATION_WHAT_YOU_CAN_DO:
-    'https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/virtualization/about#virt-what-you-can-do-with-virt_about-virt',
+  VIRTUALIZATION_WHAT_YOU_CAN_DO: `${REDHAT_DOC_URL}/html/virtualization/about#virt-what-you-can-do-with-virt_about-virt`,
 };

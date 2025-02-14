@@ -1,10 +1,9 @@
 import React, { FC } from 'react';
 
+import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button } from '@patternfly/react-core';
 import { ExternalLinkAltIcon } from '@patternfly/react-icons';
-
-import { SUPPORT_URL } from '../../../utils/constants';
 
 import './VirtualMachineTemplateSupport.scss';
 
@@ -17,7 +16,7 @@ const VirtualMachineTemplateSupport: FC = () => {
       <Button
         className="no-left-padding"
         component="a"
-        href={SUPPORT_URL}
+        href={documentationURL.SUPPORT_URL}
         icon={<ExternalLinkAltIcon />}
         iconPosition="right"
         target="_blank"
