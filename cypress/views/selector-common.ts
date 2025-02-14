@@ -61,7 +61,8 @@ export const bootsourceTH = 'th[data-label="Boot source"]';
 export const cpuTH = 'th[data-label="CPU | Memory"]';
 export const vmCount = '.pf-v5-c-menu-toggle__text > b';
 export const kebabBtn = '.pf-v5-c-table__td.dropdown-kebab-pf.pf-v5-c-table__action';
-export const selectAllBtn = 'input[name="check-all"]';
+export const selectDropdown = 'button#select-action-dropdown';
+export const selectAllDropdownOption = '*[data-test-id="select-all"]';
 
 // VM overview tab
 export const vmStatusOnOverview = '[data-test-id="virtual-machine-overview-details-status"]';
