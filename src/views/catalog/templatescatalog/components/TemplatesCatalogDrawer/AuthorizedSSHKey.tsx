@@ -1,7 +1,5 @@
-import React, { FC, useCallback, useEffect, useMemo } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 
-import { SecretModel } from '@kubevirt-ui/kubevirt-api/console';
-import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import SSHSecretModal from '@kubevirt-utils/components/SSHSecretModal/SSHSecretModal';
@@ -16,7 +14,7 @@ import {
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getInitialSSHDetails } from '@kubevirt-utils/resources/secret/utils';
-import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
+import { getTemplateSSHSecret } from '@kubevirt-utils/resources/template';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { DescriptionList, HelperText, HelperTextItem, SplitItem } from '@patternfly/react-core';
 
@@ -30,13 +28,11 @@ const AuthorizedSSHKey: FC<AuthorizedSSHKeyProps> = ({ authorizedSSHKey, namespa
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const { setSSHDetails, setVM, sshDetails, template, vm } = useDrawerContext();
+  const [templateVMSSHSecretName] = useState<null | string>(getTemplateSSHSecret(template));
 
-  const vmAttachedSecretName = useMemo(() => getVMSSHSecretName(vm), [vm]);
-  const secretName = authorizedSSHKey || vmAttachedSecretName;
+  const secretName = authorizedSSHKey || templateVMSSHSecretName;
 
-  const additionalSecretResource: IoK8sApiCoreV1Secret = template?.objects?.find(
-    (object) => object?.kind === SecretModel.kind,
-  );
+  const overwriteTemplateSSHKey = !isEmpty(authorizedSSHKey) && !isEmpty(templateVMSSHSecretName);
 
   const onSSHChange = useCallback(
     (details: SSHSecretDetails) => {
@@ -79,16 +75,12 @@ const AuthorizedSSHKey: FC<AuthorizedSSHKeyProps> = ({ authorizedSSHKey, namespa
     if (isEmpty(sshDetails)) {
       const initialSSHDetails = getInitialSSHDetails({
         applyKeyToProject: !isEmpty(authorizedSSHKey),
-        secretToCreate:
-          isEmpty(authorizedSSHKey) && !isEmpty(additionalSecretResource)
-            ? additionalSecretResource
-            : null,
         sshSecretName: secretName,
       });
 
       onSSHChange(initialSSHDetails);
     }
-  }, [additionalSecretResource, authorizedSSHKey, onSSHChange, secretName, sshDetails]);
+  }, [authorizedSSHKey, onSSHChange, secretName, sshDetails]);
 
   return (
     <SplitItem>
@@ -108,7 +100,7 @@ const AuthorizedSSHKey: FC<AuthorizedSSHKeyProps> = ({ authorizedSSHKey, namespa
           descriptionHeader={t('Public SSH key')}
           isEdit
         />
-        {!isEmpty(additionalSecretResource) && (
+        {overwriteTemplateSSHKey && (
           <HelperText>
             <HelperTextItem hasIcon variant="warning">
               {t('This key will override the SSH key secret set on the template')}
