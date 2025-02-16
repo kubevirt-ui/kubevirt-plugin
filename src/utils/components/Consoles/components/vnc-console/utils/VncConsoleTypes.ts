@@ -1,7 +1,7 @@
 import { FC, HTMLProps, MouseEventHandler } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { RFBCreate } from '@novnc/novnc/core/rfb';
+import { RFBCreate } from '@novnc/novnc/lib/rfb';
 
 export type VncConsoleActionsProps = {
   /** VNC console additional send keys elements */
