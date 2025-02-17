@@ -1,0 +1,37 @@
+﻿apiVersion: instancetype.kubevirt.io/v1beta1
+kind: VirtualMachineClusterInstancetype
+metadata:
+  annotations:
+    instancetype.kubevirt.io/description: |-
+      The O Series is based on the U Series, with the only difference
+      being that memory is overcommitted.
+
+      *O* is the abbreviation for "Overcommitted".
+    kubevirt.io/install-strategy-registry: ''
+    openshift.io/documentation-url: 'https://access.redhat.com'
+    kubevirt.io/install-strategy-version: 'sha256:fe398409de125bedd2d143df35eacf740fdaeedca18564f821a74e715e32c1bf'
+    instancetype.kubevirt.io/displayName: Overcommitted
+    kubevirt.io/install-strategy-identifier: 15c91882442b5d5ebb34398207a6a879d14d2f3a
+    kubevirt.io/generation: '20'
+    openshift.io/support-url: 'https://access.redhat.com'
+    openshift.io/provider-display-name: Red Hat
+  labels:
+    app.kubernetes.io/part-of: hyperconverged-cluster
+    instancetype.kubevirt.io/vendor: redhat.com
+    instancetype.kubevirt.io/common-instancetypes-version: 1.2.1-9-g9624a67
+    app.kubernetes.io/version: 4.18.0
+    instancetype.kubevirt.io/cpu: '1'
+    instancetype.kubevirt.io/icon-pf: pficon-virtual-machine
+    app.kubernetes.io/component: compute
+    app.kubernetes.io/managed-by: virt-operator
+    instancetype.kubevirt.io/version: '1'
+    instancetype.kubevirt.io/class: overcommitted
+    instancetype.kubevirt.io/size: small
+    instancetype.kubevirt.io/memory: 2Gi
+  name: o1.small
+spec:
+  cpu:
+    guest: 1
+  memory:
+    guest: 2Gi
+    overcommitPercent: 50

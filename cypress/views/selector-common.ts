@@ -21,7 +21,7 @@ export const labelText = '.pf-v5-c-label__text';
 export const labelContent = '.pf-v5-c-label__content';
 export const itemValue = '[data-test="detail-item-value"]';
 export const actionsBtn = 'button.pf-v5-c-menu-toggle.pf-m-plain';
-export const firstDelButton = '.pf-m-2-col:first .pf-v5-c-button';
+export const submitButton = 'button[type=submit]';
 export const resourceTitle = '[data-test-id="resource-title"]';
 export const itemCreateBtn = '[data-test="item-create"]';
 export const createBtn = '[data-test="save-changes"]';

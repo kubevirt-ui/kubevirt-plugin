@@ -115,7 +115,7 @@ export hco_cr_is_created="false"
 for i in {1..20}
 do
   echo "Attempt ${i}/20"
-  if oc create -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/${HCO_GIT_TAG}/deploy/hco.cr.yaml -n kubevirt-hyperconverged; then
+  if oc apply -f ./cypress/fixtures/hco.yaml; then
     echo "HCO cr is created"
     export hco_cr_is_created="true"
     break
@@ -183,3 +183,20 @@ oc annotate storageclass hostpath-provisioner storageclass.kubernetes.io/is-defa
 # ----------------------------------------------------------------------------------------------------
 # Download virtctl tool if needed
 command -v virtctl &> /dev/null || download_virtctl
+
+# ----------------------------------------------------------------------------------------------------
+# Check namespace
+oc get csv -n kubevirt-hyperconverged
+
+# ----------------------------------------------------------------------------------------------------
+# Change console branding
+oc patch Console.operator.openshift.io cluster --patch '{ "spec": { "customization": {"brand": "okd" } } }' --type=merge
+
+# ----------------------------------------------------------------------------------------------------
+# Create InstanceTypes
+if oc apply -f ./cypress/fixtures/vmci-u1.medium.yaml; then
+  echo "VMCI u1.medium is created"
+fi
+if oc apply -f ./cypress/fixtures/vmci-o1.small.yaml; then
+  echo "VMCI o1.small is created"
+fi
