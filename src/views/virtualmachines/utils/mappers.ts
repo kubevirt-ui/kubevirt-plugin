@@ -14,3 +14,6 @@ export type VmimMapper = { [key: string]: { [key: string]: V1VirtualMachineInsta
 
 export const getVMIFromMapper = (vmiMapper: VmiMapper, vm: V1VirtualMachine) =>
   vmiMapper?.mapper?.[getNamespace(vm)]?.[getName(vm)];
+
+export const getVMIMFromMapper = (vmimMapper: VmimMapper, name: string, namespace: string) =>
+  vmimMapper?.mapper?.[namespace]?.[name];

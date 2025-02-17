@@ -1,6 +1,10 @@
 .vms-tree-view {
   overflow-x: hidden;
 
+  .pf-v5-c-tree-view__list-item {
+    position: relative;
+  }
+
   &__toolbar-section {
     width: 100%;
   }
