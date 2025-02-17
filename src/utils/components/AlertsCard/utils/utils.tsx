@@ -47,7 +47,8 @@ export const removeVMAlerts = (sortedAlerts: SimplifiedAlerts) =>
 
       return acc;
     },
-    { critical: [], info: [], warning: [] },
+    // eslint-disable-next-line perfectionist/sort-objects
+    { critical: [], warning: [], info: [] },
   );
 
 export const createAlertKey = (activeAt: string, labels: PrometheusLabels) =>
