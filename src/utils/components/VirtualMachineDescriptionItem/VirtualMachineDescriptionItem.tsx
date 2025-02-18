@@ -92,6 +92,8 @@ const VirtualMachineDescriptionItem: FC<VirtualMachineDescriptionItemProps> = ({
             <FlexItem>
               <Button
                 data-test-id={`${testId}-edit`}
+                icon={<PencilAltIcon className="co-icon-space-l pf-v5-c-button-icon--plain" />}
+                iconPosition="end"
                 isDisabled={isDisabled}
                 isInline
                 onClick={onEditClick}
@@ -99,7 +101,6 @@ const VirtualMachineDescriptionItem: FC<VirtualMachineDescriptionItemProps> = ({
                 variant="link"
               >
                 {t('Edit')}
-                <PencilAltIcon className="co-icon-space-l pf-v5-c-button-icon--plain" />
               </Button>
             </FlexItem>
           )}

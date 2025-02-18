@@ -8,7 +8,7 @@ import { FilterValue } from '@openshift-console/dynamic-plugin-sdk';
 import { ERROR } from '@overview/OverviewTab/vm-statuses-card/utils/constants';
 import { getVMStatuses } from '@overview/OverviewTab/vm-statuses-card/utils/utils';
 import VMStatusItem from '@overview/OverviewTab/vm-statuses-card/VMStatusItem';
-import { Card, CardTitle, ExpandableSection, Grid, Text } from '@patternfly/react-core';
+import { Card, CardTitle, Content, ExpandableSection, Grid } from '@patternfly/react-core';
 import { ProjectDiagramIcon } from '@patternfly/react-icons';
 
 import './VirtualMachineListSummary.scss';
@@ -32,10 +32,10 @@ const VirtualMachineListSummary: FC<VirtualMachineListSummaryProps> = ({
   return (
     <ExpandableSection
       toggleContent={
-        <Text className="vm-list-summary__expand-section-toggle" component="h3">
+        <Content className="vm-list-summary__expand-section-toggle" component="h3">
           <ProjectDiagramIcon className="vm-list-summary__expand-section-toggle-icon" />{' '}
           {namespace ?? ALL_PROJECTS}
-        </Text>
+        </Content>
       }
       className="vm-list-summary__expand-section"
       isExpanded={isExpanded}

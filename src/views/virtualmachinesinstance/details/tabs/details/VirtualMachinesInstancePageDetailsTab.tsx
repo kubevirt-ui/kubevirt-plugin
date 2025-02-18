@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 import { useLocation } from 'react-router-dom-v5-compat';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { Divider, PageSection, PageSectionVariants } from '@patternfly/react-core';
+import { Divider, PageSection } from '@patternfly/react-core';
 
 import Details from './components/Details/Details';
 import Services from './components/Services/Services';
@@ -20,15 +20,15 @@ const VirtualMachinesInstancePageDetailsTab: FC<VirtualMachinesInstancePageDetai
 
   return (
     <div className="VirtualMachinesInstanceDetailsTab">
-      <PageSection variant={PageSectionVariants.light}>
+      <PageSection>
         <Details pathname={location?.pathname} vmi={vmi} />
       </PageSection>
       <Divider />
-      <PageSection variant={PageSectionVariants.light}>
+      <PageSection>
         <Services pathname={location?.pathname} vmi={vmi} />
       </PageSection>
       <Divider />
-      <PageSection variant={PageSectionVariants.light}>
+      <PageSection>
         <ActiveUserList pathname={location?.pathname} vmi={vmi} />
       </PageSection>
     </div>

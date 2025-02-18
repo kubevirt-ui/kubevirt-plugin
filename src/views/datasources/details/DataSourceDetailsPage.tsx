@@ -6,7 +6,7 @@ import {
   K8sResourceCondition,
 } from '@kubevirt-utils/components/ConditionsTable/ConditionsTable';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Divider, PageSection, PageSectionVariants, Title } from '@patternfly/react-core';
+import { Divider, PageSection, Title } from '@patternfly/react-core';
 
 import { DataSourceDetailsGrid } from './components/DataSourceDetailsGrid.tsx/DataSourceDetailsGrid';
 
@@ -19,14 +19,14 @@ const DataSourceDetailsPage: FC<DataSourceDetailsPageProps> = ({ obj: dataSource
 
   return (
     <div>
-      <PageSection variant={PageSectionVariants.light}>
+      <PageSection>
         <Title className="co-section-heading" headingLevel="h2">
           {t('DataSource details')}
         </Title>
         <DataSourceDetailsGrid dataSource={dataSource} />
       </PageSection>
       <Divider />
-      <PageSection variant={PageSectionVariants.light}>
+      <PageSection>
         <Title className="co-section-heading" headingLevel="h2">
           {t('Conditions')}
         </Title>

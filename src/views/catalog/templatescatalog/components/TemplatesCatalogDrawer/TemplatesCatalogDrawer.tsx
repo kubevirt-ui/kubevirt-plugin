@@ -5,7 +5,7 @@ import { logTemplateFlowEvent } from '@kubevirt-utils/extensions/telemetry/telem
 import { CANCEL_CREATE_VM_BUTTON_CLICKED } from '@kubevirt-utils/extensions/telemetry/utils/constants';
 import { getTemplateName } from '@kubevirt-utils/resources/template/utils/selectors';
 import { CatalogItemHeader } from '@patternfly/react-catalog-view-extension';
-import { Modal } from '@patternfly/react-core';
+import { Modal } from '@patternfly/react-core/deprecated';
 
 import { getTemplateOSIcon } from '../../utils/os-icons';
 

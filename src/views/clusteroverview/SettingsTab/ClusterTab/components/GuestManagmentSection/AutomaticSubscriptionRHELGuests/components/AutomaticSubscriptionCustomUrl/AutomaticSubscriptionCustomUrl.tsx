@@ -3,7 +3,14 @@ import React, { FC, useEffect, useMemo, useState } from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
 import { debounce } from '@kubevirt-utils/utils/debounce';
-import { Checkbox, Flex, Popover, PopoverPosition, Text, TextInput } from '@patternfly/react-core';
+import {
+  Checkbox,
+  Content,
+  Flex,
+  Popover,
+  PopoverPosition,
+  TextInput,
+} from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
 
 import './automatic-subscription-custom-url.scss';
@@ -54,7 +61,7 @@ const AutomaticSubscriptionCustomUrl: FC<AutomaticSubscriptionCustomUrlProps> = 
       </Flex>
       {isChecked && !isDisabled && (
         <Flex>
-          <Text>URL</Text>
+          <Content component="p">URL</Content>
           <TextInput
             onChange={(_, value: string) => {
               setInputValue(value);

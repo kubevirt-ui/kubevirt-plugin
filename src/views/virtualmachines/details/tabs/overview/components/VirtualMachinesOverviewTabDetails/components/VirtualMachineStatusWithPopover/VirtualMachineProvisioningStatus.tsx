@@ -5,7 +5,7 @@ import { useLocation } from 'react-router-dom-v5-compat';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVMStatus } from '@kubevirt-utils/resources/shared';
-import { Popover, PopoverPosition, Progress, ProgressSize, Text } from '@patternfly/react-core';
+import { Content, Popover, PopoverPosition, Progress, ProgressSize } from '@patternfly/react-core';
 import { createURL } from '@virtualmachines/details/tabs/overview/utils/utils';
 
 import useProvisioningPercentage from '../../../../../../../../../utils/resources/vm/hooks/useProvisioningPercentage';
@@ -33,7 +33,7 @@ const VirtualMachineProvisioningStatus: FC<VirtualMachineProvisioningStatusProps
     <Popover
       bodyContent={
         <>
-          <Text>{t('VirtualMachine is currently provisioning')}</Text>
+          <Content component="p">{t('VirtualMachine is currently provisioning')}</Content>
           <br />
 
           {Object.keys(percentages).map((diskName) => (
@@ -46,9 +46,9 @@ const VirtualMachineProvisioningStatus: FC<VirtualMachineProvisioningStatusProps
             />
           ))}
           <br />
-          <Text>
+          <Content component="p">
             <Link to={createURL('diagnostics', location?.pathname)}>{t('View diagnostic')}</Link>
-          </Text>
+          </Content>
         </>
       }
       className="virtualmachine-privisioning-status"

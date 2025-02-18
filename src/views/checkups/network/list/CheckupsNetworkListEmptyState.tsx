@@ -13,8 +13,6 @@ import {
   EmptyStateActions,
   EmptyStateBody,
   EmptyStateFooter,
-  EmptyStateHeader,
-  EmptyStateIcon,
   EmptyStateVariant,
 } from '@patternfly/react-core';
 import { NetworkIcon } from '@patternfly/react-icons';
@@ -31,13 +29,12 @@ const CheckupsNetworkListEmptyState = ({ isPermitted, nadsInNamespace }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   return (
-    <EmptyState variant={EmptyStateVariant.lg}>
-      <EmptyStateHeader
-        headingLevel="h4"
-        icon={<EmptyStateIcon icon={NetworkIcon} />}
-        titleText={<>{t('No network latency checkups found')}</>}
-      />
-
+    <EmptyState
+      headingLevel="h4"
+      icon={NetworkIcon}
+      titleText={<>{t('No network latency checkups found')}</>}
+      variant={EmptyStateVariant.lg}
+    >
       <EmptyStateBody>
         {t('To get started, install permissions and then run a checkup')}
       </EmptyStateBody>
