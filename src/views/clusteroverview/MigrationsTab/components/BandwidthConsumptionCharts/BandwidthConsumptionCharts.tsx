@@ -58,9 +58,7 @@ const BandwidthConsumptionCharts: React.FC<BandwidthConsumptionChartsProps> = ({
       ) : (
         <Bullseye>
           <HelperText>
-            <HelperTextItem isDynamic variant="warning">
-              {t('No Datapoints found')}
-            </HelperTextItem>
+            <HelperTextItem variant="warning">{t('No Datapoints found')}</HelperTextItem>
           </HelperText>
         </Bullseye>
       )}

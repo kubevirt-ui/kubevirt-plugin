@@ -41,9 +41,7 @@ const CheckupsNetworkFormLatency: FC<CheckupsNetworkFormLatencyProps> = ({
           bodyContent={t('If the measured latency exceeds this value, the checkup fails.')}
           position={PopoverPosition.right}
         >
-          <Button variant={ButtonVariant.plain}>
-            <HelpIcon />
-          </Button>
+          <Button icon={<HelpIcon />} variant={ButtonVariant.plain} />
         </Popover>
       </Flex>
 

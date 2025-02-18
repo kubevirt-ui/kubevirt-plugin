@@ -8,10 +8,10 @@ import { getVolumes } from '@kubevirt-utils/resources/vm';
 import {
   Alert,
   AlertVariant,
+  Content,
+  ContentVariants,
   Stack,
   StackItem,
-  Text,
-  TextVariants,
   Title,
 } from '@patternfly/react-core';
 import { Table, Tbody, Td, Tr } from '@patternfly/react-table';
@@ -43,12 +43,12 @@ const VirtualMachineMigrationReviewTab: FC<VirtualMachineMigrationReviewTabProps
     <Stack hasGutter>
       <StackItem>
         <Title headingLevel="h2">{t('Review')}</Title>
-        <Text component={TextVariants.p}>
+        <Content component={ContentVariants.p}>
           <Trans t={t}>
             Verify the details and click <strong>Migrate VirtualMachine storage</strong> to start
             the migration
           </Trans>
-        </Text>
+        </Content>
       </StackItem>
       <StackItem>
         <Table aria-label={t('Review')} borders={false} variant="compact">

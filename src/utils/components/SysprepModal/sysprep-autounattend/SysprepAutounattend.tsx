@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Text, TextVariants } from '@patternfly/react-core';
+import { Content, ContentVariants } from '@patternfly/react-core';
 
 import { AUTOUNATTEND } from '../sysprep-utils';
 import SysprepFileField from '../SysprepFileField';
@@ -17,7 +17,7 @@ const SysprepAutounattend: React.FC<{
   return (
     <>
       <div className="kv-sysprep--title">
-        <Text component={TextVariants.h6}>{t('Autounattend.xml answer file')}</Text>
+        <Content component={ContentVariants.h6}>{t('Autounattend.xml answer file')}</Content>
         <SysprepAutounattendHelperPopup />
       </div>
       <SysprepFileField id={AUTOUNATTEND} onChange={onChange} value={value} />

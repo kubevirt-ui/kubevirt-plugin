@@ -10,7 +10,7 @@ import {
   AlertVariant,
   Button,
   ButtonVariant,
-  Text,
+  Content,
   Title,
 } from '@patternfly/react-core';
 import { CloseIcon, WarningTriangleIcon } from '@patternfly/react-icons';
@@ -48,9 +48,12 @@ const VirtualMachineMigrationRollback: FC<VirtualMachineMigrationRollbackProps> 
     <div className="pf-v5-c-wizard migration-status">
       <div className="pf-v5-c-wizard__header">
         <div className="pf-v5-c-wizard__close">
-          <Button aria-label={t('Close')} onClick={onClose} variant={ButtonVariant.plain}>
-            <CloseIcon />
-          </Button>
+          <Button
+            aria-label={t('Close')}
+            icon={<CloseIcon />}
+            onClick={onClose}
+            variant={ButtonVariant.plain}
+          />
         </div>
         <div className="pf-v5-c-wizard__title">
           <h2 className="pf-v5-c-wizard__title-text">{t('Migrate VirtualMachine storage')}</h2>
@@ -66,19 +69,21 @@ const VirtualMachineMigrationRollback: FC<VirtualMachineMigrationRollbackProps> 
           {t('Stop migration')}
         </Title>
 
-        <Text>{t('Are you sure you want to stop the VirtualMachine workloads?')}</Text>
-        <Text>
+        <Content component="p">
+          {t('Are you sure you want to stop the VirtualMachine workloads?')}
+        </Content>
+        <Content component="p">
           {t(
             'Stopping the migration will cancel any remaining migrations that are scheduled or currently in progress',
           )}
-        </Text>
+        </Content>
 
-        <Text>
+        <Content component="p">
           <Trans t={t}>
             Select <strong>Rollback</strong> to return any completed migration to the original
             StorageClass.
           </Trans>
-        </Text>
+        </Content>
 
         {errorRollback && (
           <Alert isInline title={t('Error')} variant={AlertVariant.danger}>

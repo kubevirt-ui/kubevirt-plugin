@@ -5,13 +5,12 @@ import {
   Alert,
   AlertVariant,
   Button,
+  EmptyState,
   EmptyStateActions,
   EmptyStateBody,
-  EmptyStateIcon,
   Progress,
   Stack,
   StackItem,
-  Title,
 } from '@patternfly/react-core';
 import { InProgressIcon } from '@patternfly/react-icons';
 
@@ -22,11 +21,11 @@ import { getProgressVariant } from '../../utils/utils';
 const UploadingStatus: FC<UploadingStatusProps> = ({ onCancelClick, onSuccessClick, upload }) => {
   const { t } = useKubevirtTranslation();
   return (
-    <>
-      <EmptyStateIcon icon={InProgressIcon} />
-      <Title headingLevel="h4" size="lg">
-        {t('Uploading data to Persistent Volume Claim')}
-      </Title>
+    <EmptyState
+      headingLevel="h4"
+      icon={InProgressIcon}
+      titleText={t('Uploading data to Persistent Volume Claim')}
+    >
       <EmptyStateBody>
         <Stack hasGutter>
           {upload?.uploadStatus === UPLOAD_STATUS.UPLOADING && (
@@ -63,7 +62,7 @@ const UploadingStatus: FC<UploadingStatusProps> = ({ onCancelClick, onSuccessCli
           </Button>
         </EmptyStateActions>
       )}
-    </>
+    </EmptyState>
   );
 };
 

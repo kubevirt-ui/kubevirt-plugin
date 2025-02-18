@@ -11,11 +11,10 @@ import {
   AlertVariant,
   Button,
   ButtonVariant,
-  Modal,
-  ModalVariant,
   Stack,
   StackItem,
 } from '@patternfly/react-core';
+import { Modal, ModalVariant } from '@patternfly/react-core/deprecated';
 
 import './TabModal.scss';
 

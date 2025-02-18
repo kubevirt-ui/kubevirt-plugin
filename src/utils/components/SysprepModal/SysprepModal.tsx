@@ -1,7 +1,8 @@
 import React, { FC, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { ExpandableSection, FormGroup, ModalVariant } from '@patternfly/react-core';
+import { ExpandableSection, FormGroup } from '@patternfly/react-core';
+import { ModalVariant } from '@patternfly/react-core/deprecated';
 
 import TabModal from '../TabModal/TabModal';
 

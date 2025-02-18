@@ -4,9 +4,10 @@
     display: flex;
     align-items: center;
   }
-  .pf-v5-c-console__vnc {
+  .console-vnc {
     height: 70%;
     width: 100%;
+    grid-area: 'main';
   }
   .console-overview {
     flex-direction: column;

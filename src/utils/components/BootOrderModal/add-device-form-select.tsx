@@ -29,11 +29,10 @@ export const AddDeviceFormSelect: FC<AddDeviceFormSelectProps> = ({
     </FormSelect>
     <Button
       className="kubevirt-boot-order__add-device-delete-btn"
+      icon={<MinusCircleIcon />}
       onClick={onDelete}
       variant="link"
-    >
-      <MinusCircleIcon />
-    </Button>
+    />
   </>
 );
 

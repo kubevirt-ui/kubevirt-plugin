@@ -246,9 +246,11 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
 
         {!isEmpty(inputValue) && (
           <TextInputGroupUtilities>
-            <Button onClick={onClearButtonClick} variant={ButtonVariant.plain}>
-              <TimesIcon />
-            </Button>
+            <Button
+              icon={<TimesIcon />}
+              onClick={onClearButtonClick}
+              variant={ButtonVariant.plain}
+            />
           </TextInputGroupUtilities>
         )}
       </TextInputGroup>

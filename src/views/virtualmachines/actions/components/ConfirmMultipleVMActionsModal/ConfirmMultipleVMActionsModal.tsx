@@ -2,7 +2,8 @@ import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Button, ButtonVariant, Modal, Popover, PopoverPosition } from '@patternfly/react-core';
+import { Button, ButtonVariant, Popover, PopoverPosition } from '@patternfly/react-core';
+import { Modal } from '@patternfly/react-core/deprecated';
 import VMsByNamespacePopover from '@virtualmachines/actions/components/ConfirmMultipleVMActionsModal/components/VMsByNamespacePopover';
 import { getVMNamesByNamespace } from '@virtualmachines/actions/components/ConfirmMultipleVMActionsModal/utils/utils';
 

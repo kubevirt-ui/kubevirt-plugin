@@ -5,7 +5,7 @@ import SubTitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/Su
 import TitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/TitleChartLabel';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
-import { ChartDonut } from '@patternfly/react-charts';
+import { ChartDonut } from '@patternfly/react-charts/victory';
 
 import { colorScale } from './constants';
 import MigrationChartLegend from './MigrationChartLegend';

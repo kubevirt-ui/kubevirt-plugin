@@ -3,7 +3,8 @@ import React, { Dispatch, FC, SetStateAction } from 'react';
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { useIDEntities } from '@kubevirt-utils/components/NodeSelectorModal/hooks/useIDEntities';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { ActionGroup, Button, ButtonVariant, Modal, ModalVariant } from '@patternfly/react-core';
+import { ActionGroup, Button, ButtonVariant } from '@patternfly/react-core';
+import { Modal, ModalVariant } from '@patternfly/react-core/deprecated';
 
 import { getIntersectedQualifiedNodes } from '../../utils/helpers';
 import { AffinityLabel, AffinityRowData } from '../../utils/types';

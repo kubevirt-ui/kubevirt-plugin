@@ -75,12 +75,11 @@ const AffinityExpressionRow: FC<AffinityExpressionRowProps> = ({
       </GridItem>
       <GridItem span={1}>
         <Button
+          icon={<MinusCircleIcon />}
           id={`${rowID}-${id}-delete-btn`}
           onClick={() => onDelete(id)}
           variant={ButtonVariant.plain}
-        >
-          <MinusCircleIcon />
-        </Button>
+        />
       </GridItem>
     </>
   );

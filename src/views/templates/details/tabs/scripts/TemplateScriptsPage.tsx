@@ -21,7 +21,6 @@ import {
   Flex,
   FlexItem,
   PageSection,
-  PageSectionVariants,
   Title,
 } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
@@ -63,7 +62,7 @@ const TemplateScriptsPage: FC<TemplateScriptsPageProps> = ({ obj: template }) =>
   );
 
   return (
-    <PageSection variant={PageSectionVariants.light}>
+    <PageSection>
       <SidebarEditor<V1Template> onResourceUpdate={onSubmitTemplate} resource={template}>
         <DescriptionList
           className={classnames(

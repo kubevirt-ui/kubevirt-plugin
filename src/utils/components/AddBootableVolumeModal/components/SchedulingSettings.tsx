@@ -4,7 +4,7 @@ import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { FormGroup, NumberInput, Text, TextInput, Title } from '@patternfly/react-core';
+import { Content, FormGroup, NumberInput, TextInput, Title } from '@patternfly/react-core';
 
 import { AddBootableVolumeState, SetBootableVolumeFieldType } from '../utils/constants';
 
@@ -50,10 +50,10 @@ const SchedulingSettings: FC<SchedulingSettingsProps> = ({
         <Title headingLevel="h2" size="md">
           {t('Scheduling settings')}
         </Title>
-        <Text>
+        <Content component="p">
           {t('Use cron formatting to set when and how often to look for new imports.')}{' '}
           <ExternalLink href={documentationURL.CRON_INFO} text={t('Learn more')} />
-        </Text>
+        </Content>
       </div>
       <FormGroup
         fieldId="volume-registry-retain-cron-expression"

@@ -21,9 +21,11 @@ const HardwareDeviceRow: React.FC<
         {device.deviceName}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-v5-c-table__action" id="">
-        <Button onClick={() => handleRemoveDevice(device)} variant="plain">
-          <MinusCircleIcon />
-        </Button>
+        <Button
+          icon={<MinusCircleIcon />}
+          onClick={() => handleRemoveDevice(device)}
+          variant="plain"
+        />
       </TableData>
     </>
   );

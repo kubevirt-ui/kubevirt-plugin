@@ -34,10 +34,9 @@ const ColumnManagement: FC<ColumnManagementProps> = ({ columnLayout, hideColumnM
             }
             aria-label={t('Column management')}
             data-test="manage-columns"
+            icon={<ColumnsIcon />}
             variant="plain"
-          >
-            <ColumnsIcon />
-          </Button>
+          />
         </Tooltip>
       </ToolbarItem>
     </ToolbarGroup>

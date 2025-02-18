@@ -1,14 +1,7 @@
 import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  Bullseye,
-  EmptyState,
-  EmptyStateBody,
-  EmptyStateHeader,
-  EmptyStateIcon,
-  EmptyStateVariant,
-} from '@patternfly/react-core';
+import { Bullseye, EmptyState, EmptyStateBody, EmptyStateVariant } from '@patternfly/react-core';
 import { NetworkIcon } from '@patternfly/react-icons';
 
 type AutoAttachedNetworkEmptyStateProps = {
@@ -22,8 +15,7 @@ const AutoAttachedNetworkEmptyState: FC<AutoAttachedNetworkEmptyStateProps> = ({
 
   return (
     <Bullseye>
-      <EmptyState variant={EmptyStateVariant.sm}>
-        <EmptyStateHeader icon={<EmptyStateIcon icon={NetworkIcon} />} />
+      <EmptyState icon={NetworkIcon} variant={EmptyStateVariant.sm}>
         <EmptyStateBody>
           {isAutoAttached
             ? t(

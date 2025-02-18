@@ -4,7 +4,7 @@ import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
-import { PageSection, PageSectionVariants, Title } from '@patternfly/react-core';
+import { PageSection, Title } from '@patternfly/react-core';
 
 import { onSubmitYAML } from '../details/utils/utils';
 import { ConfigurationInnerTabProps } from '../utils/types';
@@ -23,7 +23,7 @@ const NetworkTab: FC<ConfigurationInnerTabProps> = ({ vm, vmi }) => {
       pathsToHighlight={PATHS_TO_HIGHLIGHT.NETWORK_TAB}
       resource={vm}
     >
-      <PageSection variant={PageSectionVariants.light}>
+      <PageSection>
         <Title headingLevel="h2">
           <SearchItem id="network">{t('Network interfaces')}</SearchItem>
         </Title>

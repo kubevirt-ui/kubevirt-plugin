@@ -14,12 +14,10 @@ import {
   DataListItem,
   DataListItemCells,
   DataListItemRow,
-  DragDrop,
-  Draggable,
-  Droppable,
   Split,
   SplitItem,
 } from '@patternfly/react-core';
+import { DragDrop, Draggable, Droppable } from '@patternfly/react-core/deprecated';
 import { MinusCircleIcon } from '@patternfly/react-icons';
 
 import { BootOrderEmptyState } from './BootOrderEmptyState';
@@ -119,12 +117,11 @@ export const BootOrderModalBody: React.FC<{
                                   {index !== devices.length - 1 && (
                                     <Button
                                       className="kubevirt-boot-order__delete-btn"
+                                      icon={<MinusCircleIcon />}
                                       id={`${value.name}-delete-btn`}
                                       onClick={() => onDelete(value.name)}
                                       variant="link"
-                                    >
-                                      <MinusCircleIcon />
-                                    </Button>
+                                    />
                                   )}
                                 </SplitItem>
                               </Split>

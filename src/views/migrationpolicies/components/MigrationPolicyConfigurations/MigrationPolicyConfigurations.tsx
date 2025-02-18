@@ -65,11 +65,10 @@ const MigrationPolicyConfigurations: React.FC<MigrationPolicyConfigurationsProps
                             return newState;
                           })
                         }
+                        icon={<MinusCircleIcon />}
                         isInline
                         variant={ButtonVariant.plain}
-                      >
-                        <MinusCircleIcon />
-                      </Button>
+                      />
                     </SplitItem>
                   </Split>
                 </FormGroup>
