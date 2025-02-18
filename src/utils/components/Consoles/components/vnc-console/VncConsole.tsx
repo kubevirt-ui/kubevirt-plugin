@@ -22,7 +22,13 @@ import { isConnectionEncrypted, sleep } from '../../utils/utils';
 import { ConsoleState, WS, WSS } from '../utils/ConsoleConsts';
 import useCopyPasteConsole from '../utils/hooks/useCopyPasteConsole';
 
-import { isShiftKeyRequired } from './utils/util';
+import {
+  HORIZONTAL_TAB,
+  isShiftKeyRequired,
+  LATIN_1_FIRST_CHAR,
+  LATIN_1_LAST_CHAR,
+  LINE_FEED,
+} from './utils/util';
 import { VncConsoleProps } from './utils/VncConsoleTypes';
 
 import '@patternfly/react-styles/css/components/Consoles/VncConsole.css';
@@ -97,17 +103,24 @@ export const VncConsole: FC<VncConsoleProps> = ({
         }
         const clipboardText = await navigator?.clipboard?.readText?.();
         const text = clipboardText || pasteText.current;
-        const lastItem = text.length - 1;
-        for (let i = 0; i < text.length; i++) {
-          const char = text[i];
-          const shiftRequired = isShiftKeyRequired(char);
-          await sleep(50);
-          shiftRequired && this.sendKey(KeyTable.XK_Shift_L, 'ShiftLeft', true);
-          this.sendKey(char.charCodeAt(0));
-          shiftRequired && this.sendKey(KeyTable.XK_Shift_L, 'ShiftLeft', false);
-          i === lastItem &&
-            clipboardText?.charCodeAt(lastItem) === 13 &&
-            this.sendKey(KeyTable.XK_KP_Enter);
+        for (const codePoint of text) {
+          const codePointIndex = codePoint.codePointAt(0);
+          if (codePointIndex === LINE_FEED) {
+            this.sendKey(KeyTable.XK_Return);
+          } else if (codePointIndex === HORIZONTAL_TAB) {
+            this.sendKey(KeyTable.XK_Tab);
+          } else if (codePointIndex >= LATIN_1_FIRST_CHAR && codePointIndex <= LATIN_1_LAST_CHAR) {
+            // qemu maintains virtual keyboard state (caps lock, shift, etc)
+            // keysyms are checked against that state and lower case version will be picked
+            // if there is no shift/caps lock turn on
+            const shiftRequired = isShiftKeyRequired(codePoint);
+            shiftRequired && this.sendKey(KeyTable.XK_Shift_L, 'ShiftLeft', true);
+            // long text is getting truncated without a delay
+            await sleep(50);
+            // Latin-1 set that maps directly to keysym
+            this.sendKey(codePointIndex);
+            shiftRequired && this.sendKey(KeyTable.XK_Shift_L, 'ShiftLeft', false);
+          }
         }
       };
       rfbInstnce.viewOnly = viewOnly;
