@@ -9,10 +9,10 @@ import { k8sCreate, K8sResourceCommon } from '@openshift-console/dynamic-plugin-
 import {
   Button,
   ButtonVariant,
+  Content,
   Form,
   FormGroup,
   Popover,
-  Text,
   TextInput,
 } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
@@ -51,9 +51,9 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
       onClose={onClose}
       submitBtnText={t('Create')}
     >
-      <Text>
+      <Content component="p">
         {t('An OpenShift project is an alternative representation of a Kubernetes namespace.')}
-      </Text>
+      </Content>
       <br />
       <ExternalLink href={documentationURL.PROJECTS}>
         {t('Learn more about working with projects')}
