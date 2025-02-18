@@ -13,6 +13,7 @@ import VirtualMachineActions from '@virtualmachines/actions/components/VirtualMa
 import useVirtualMachineActionsProvider from '@virtualmachines/actions/hooks/useVirtualMachineActionsProvider';
 import { deselectVM, isVMSelected, selectVM } from '@virtualmachines/list/selectedVMs';
 
+import VirtualMachineStatus from '../VirtualMachineStatus/VirtualMachineStatus';
 import { VMStatusConditionLabelList } from '../VMStatusConditionLabel';
 
 import CPUPercentage from './components/CPUPercentage';
@@ -28,16 +29,11 @@ const VirtualMachineRowLayout: FC<
       ips: ReactNode | string;
       isSingleNodeCluster: boolean;
       node: ReactNode | string;
-      status: ReactNode;
       vmim: V1VirtualMachineInstanceMigration;
       vmiMemory?: string;
     }
   >
-> = ({
-  activeColumnIDs,
-  obj,
-  rowData: { ips, isSingleNodeCluster, node, status, vmim, vmiMemory },
-}) => {
+> = ({ activeColumnIDs, obj, rowData: { ips, isSingleNodeCluster, node, vmim, vmiMemory } }) => {
   const selected = isVMSelected(obj);
 
   const vmName = useMemo(() => getName(obj), [obj]);
@@ -63,7 +59,7 @@ const VirtualMachineRowLayout: FC<
         <ResourceLink kind="Namespace" name={vmNamespace} truncate />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="status">
-        {status}
+        <VirtualMachineStatus vm={obj} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="conditions">
         <VMStatusConditionLabelList conditions={obj?.status?.conditions?.filter((c) => c.reason)} />

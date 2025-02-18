@@ -1,4 +1,4 @@
-import React, { FC, ReactNode } from 'react';
+import * as React from 'react';
 
 import {
   V1VirtualMachine,
@@ -15,17 +15,16 @@ import FirstItemListPopover from '../FirstItemListPopover/FirstItemListPopover';
 
 import VirtualMachineRowLayout from './VirtualMachineRowLayout';
 
-const VirtualMachineRunningRow: FC<
+const VirtualMachineRunningRow: React.FC<
   RowProps<
     V1VirtualMachine,
     {
       isSingleNodeCluster: boolean;
-      status: ReactNode;
       vmi: V1VirtualMachineInstance;
       vmim: V1VirtualMachineInstanceMigration;
     }
   >
-> = ({ activeColumnIDs, obj, rowData: { isSingleNodeCluster, status, vmi, vmim } }) => {
+> = ({ activeColumnIDs, obj, rowData: { isSingleNodeCluster, vmi, vmim } }) => {
   const { t } = useKubevirtTranslation();
 
   const ipAddressess = vmi && getVMIIPAddressesWithName(vmi);
@@ -41,7 +40,6 @@ const VirtualMachineRunningRow: FC<
             truncate
           />
         ),
-        status,
         vmim,
         vmiMemory: getMemory(vmi),
       }}
