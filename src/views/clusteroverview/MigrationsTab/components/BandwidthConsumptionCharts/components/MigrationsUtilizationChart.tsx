@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 
 import { tickLabels } from '@kubevirt-utils/components/Charts/ChartLabels/styleOverrides';
 import useResponsiveCharts from '@kubevirt-utils/components/Charts/hooks/useResponsiveCharts';
-import { Chart, ChartAxis, ChartLine, createContainer } from '@patternfly/react-charts';
+import { Chart, ChartAxis, ChartLine, createContainer } from '@patternfly/react-charts/victory';
 import { GridItem } from '@patternfly/react-core';
 
 import { ChartDataObject } from '../constants';

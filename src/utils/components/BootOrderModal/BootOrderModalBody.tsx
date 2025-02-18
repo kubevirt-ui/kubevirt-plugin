@@ -14,12 +14,10 @@ import {
   DataListItem,
   DataListItemCells,
   DataListItemRow,
-  DragDrop,
-  Draggable,
-  Droppable,
   Split,
   SplitItem,
 } from '@patternfly/react-core';
+import { DragDrop, Draggable, Droppable } from '@patternfly/react-core/deprecated';
 import { MinusCircleIcon } from '@patternfly/react-icons';
 
 import { BootOrderEmptyState } from './BootOrderEmptyState';

@@ -11,11 +11,10 @@ import {
   ContentVariants,
   Grid,
   GridItem,
-  Modal,
-  ModalVariant,
   Stack,
   Title,
 } from '@patternfly/react-core';
+import { Modal, ModalVariant } from '@patternfly/react-core/deprecated';
 
 import WelcomeButtons from './components/WelcomeButtons';
 
