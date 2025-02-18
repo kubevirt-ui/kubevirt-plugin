@@ -10,8 +10,6 @@ import {
   EmptyStateActions,
   EmptyStateBody,
   EmptyStateFooter,
-  EmptyStateHeader,
-  EmptyStateIcon,
   EmptyStateVariant,
 } from '@patternfly/react-core';
 import { MigrationIcon } from '@patternfly/react-icons';
@@ -26,13 +24,12 @@ const MigrationPoliciesEmptyState: FC = () => {
       <ListPageHeader title={t('MigrationPolicies')} />
 
       <ListPageBody>
-        <EmptyState variant={EmptyStateVariant.lg}>
-          <EmptyStateHeader
-            headingLevel="h4"
-            icon={<EmptyStateIcon icon={MigrationIcon} />}
-            titleText={<>{t('No MigrationPolicies found')}</>}
-          />
-
+        <EmptyState
+          headingLevel="h4"
+          icon={MigrationIcon}
+          titleText={<>{t('No MigrationPolicies found')}</>}
+          variant={EmptyStateVariant.lg}
+        >
           <EmptyStateBody>
             <Trans ns="plugin__kubevirt-plugin" t={t}>
               Click <b>Create MigrationPolicy</b> to create your first policy

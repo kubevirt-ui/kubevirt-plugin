@@ -48,7 +48,7 @@ const AlertsDrawer: React.FC<AlertsDrawerProps> = ({ sortedAlerts }) => {
     <div className="alerts-card__drawer">
       {alertsQuantity > 0 ? (
         <Accordion asDefinitionList isBordered>
-          <AccordionItem>
+          <AccordionItem isExpanded={titleOpen}>
             <AccordionToggle
               onClick={() => {
                 setTitleOpen((title) => {
@@ -58,7 +58,6 @@ const AlertsDrawer: React.FC<AlertsDrawerProps> = ({ sortedAlerts }) => {
               }}
               className="alerts-card__toggle--main"
               id="toggle-main"
-              isExpanded={titleOpen}
             >
               <Flex>
                 {Object.keys(sortedAlerts)?.map((alertType) => {
@@ -98,7 +97,7 @@ const AlertsDrawer: React.FC<AlertsDrawerProps> = ({ sortedAlerts }) => {
                 })}
               </Flex>
             </AccordionToggle>
-            <AccordionContent id="toggle-main" isHidden={!titleOpen}>
+            <AccordionContent id="toggle-main">
               {Object.entries(sortedAlerts)?.map(([alertType, alerts]) => (
                 <AlertsCardAccordionItem
                   alertOpen={alertTypeOpen}

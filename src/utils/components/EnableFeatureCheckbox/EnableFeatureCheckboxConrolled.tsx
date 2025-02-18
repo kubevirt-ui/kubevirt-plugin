@@ -47,9 +47,7 @@ const EnableFeatureCheckboxControlled: FC<EnableFeatureCheckboxControlledProps> 
           />
           {helpText && (
             <Popover bodyContent={helpText}>
-              <Button variant={ButtonVariant.plain}>
-                <HelpIcon />
-              </Button>
+              <Button icon={<HelpIcon />} variant={ButtonVariant.plain} />
             </Popover>
           )}
         </Flex>

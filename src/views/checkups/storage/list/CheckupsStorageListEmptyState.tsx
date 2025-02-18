@@ -14,8 +14,6 @@ import {
   EmptyStateActions,
   EmptyStateBody,
   EmptyStateFooter,
-  EmptyStateHeader,
-  EmptyStateIcon,
   EmptyStateVariant,
 } from '@patternfly/react-core';
 import { StorageDomainIcon } from '@patternfly/react-icons';
@@ -45,13 +43,12 @@ const CheckupsStorageListEmptyState: FC<CheckupsStorageListEmptyStateProps> = ({
   const [isLoading, setIsLoading] = useState<boolean>();
 
   return (
-    <EmptyState variant={EmptyStateVariant.lg}>
-      <EmptyStateHeader
-        headingLevel="h4"
-        icon={<EmptyStateIcon icon={StorageDomainIcon} />}
-        titleText={<>{t('No storage checkups found')}</>}
-      />
-
+    <EmptyState
+      headingLevel="h4"
+      icon={StorageDomainIcon}
+      titleText={<>{t('No storage checkups found')}</>}
+      variant={EmptyStateVariant.lg}
+    >
       <EmptyStateBody>
         {t('To get started, install permissions and then run a checkup')}
       </EmptyStateBody>

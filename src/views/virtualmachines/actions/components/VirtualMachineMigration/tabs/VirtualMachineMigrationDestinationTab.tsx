@@ -4,7 +4,7 @@ import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFi
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, StorageClassModel } from '@kubevirt-utils/models';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
-import { Stack, StackItem, Text, TextVariants, Title } from '@patternfly/react-core';
+import { Content, ContentVariants, Stack, StackItem, Title } from '@patternfly/react-core';
 
 type VirtualMachineMigrationDestinationTabProps = {
   defaultStorageClassName: string;
@@ -26,9 +26,9 @@ const VirtualMachineMigrationDestinationTab: FC<VirtualMachineMigrationDestinati
     <Stack hasGutter>
       <StackItem>
         <Title headingLevel="h2">{t('Destination StorageClass')}</Title>
-        <Text component={TextVariants.p}>
+        <Content component={ContentVariants.p}>
           {t('Select the destination storage for the VirtualMachine storage migration.')}
-        </Text>
+        </Content>
       </StackItem>
       <StackItem>
         <InlineFilterSelect

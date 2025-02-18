@@ -6,7 +6,7 @@ import Loading from '@kubevirt-utils/components/Loading/Loading';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { updateCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
-import { PageSection, PageSectionVariants, Title } from '@patternfly/react-core';
+import { PageSection, Title } from '@patternfly/react-core';
 import AddNetworkInterfaceButton from '@virtualmachines/details/tabs/configuration/network/components/AddNetworkInterfaceButton';
 
 const CustomizeInstanceTypeNetworkTab = () => {
@@ -37,7 +37,7 @@ const CustomizeInstanceTypeNetworkTab = () => {
   };
 
   return (
-    <PageSection variant={PageSectionVariants.light}>
+    <PageSection>
       <Title headingLevel="h2">
         <SearchItem id="network">{t('Network interfaces')}</SearchItem>
       </Title>

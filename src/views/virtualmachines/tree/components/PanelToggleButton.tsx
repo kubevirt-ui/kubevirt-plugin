@@ -14,9 +14,12 @@ const PanelToggleButton: FC<PanelToggleButtonProps> = ({ className, isOpen, togg
   const { t } = useKubevirtTranslation();
   return (
     <Tooltip content={isOpen ? t('Close') : t('Open')}>
-      <Button className={className} onClick={toggleDrawer} variant={ButtonVariant.plain}>
-        {isOpen ? <PanelCloseIcon /> : <PanelOpenIcon />}
-      </Button>
+      <Button
+        className={className}
+        icon={isOpen ? <PanelCloseIcon /> : <PanelOpenIcon />}
+        onClick={toggleDrawer}
+        variant={ButtonVariant.plain}
+      />
     </Tooltip>
   );
 };

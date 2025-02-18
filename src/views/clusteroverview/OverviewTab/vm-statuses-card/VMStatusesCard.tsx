@@ -72,11 +72,10 @@ const VMStatusesCard: React.FC = () => {
       <Divider />
       <div className="vm-statuses-card__accordion">
         <Accordion>
-          <AccordionItem>
+          <AccordionItem isExpanded={showExtraStatuses}>
             <AccordionToggle
               className="vm-statuses-card__accordion-toggle"
               id="status-accordion-toggle"
-              isExpanded={showExtraStatuses}
               onClick={() => setShowExtraStatuses(!showExtraStatuses)}
             >
               <span className="vm-statuses-card__accordion-toggle--text">
@@ -94,7 +93,6 @@ const VMStatusesCard: React.FC = () => {
             <AccordionContent
               className="vm-statuses-card__accordion-content"
               id="status-accordion-content"
-              isHidden={!showExtraStatuses}
             >
               <Grid hasGutter>
                 {Object.keys(additionalStatuses)?.map((state) => {

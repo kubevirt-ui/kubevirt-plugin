@@ -11,7 +11,7 @@ import {
   ChartAxis,
   ChartGroup,
   ChartVoronoiContainer,
-} from '@patternfly/react-charts';
+} from '@patternfly/react-charts/victory';
 import chart_color_blue_300 from '@patternfly/react-tokens/dist/esm/chart_color_blue_300';
 import chart_color_blue_400 from '@patternfly/react-tokens/dist/esm/chart_color_blue_400';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';

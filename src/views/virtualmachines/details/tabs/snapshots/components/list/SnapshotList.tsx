@@ -6,13 +6,7 @@ import {
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
-import {
-  EmptyState,
-  EmptyStateBody,
-  EmptyStateHeader,
-  EmptyStateIcon,
-  EmptyStateVariant,
-} from '@patternfly/react-core';
+import { EmptyState, EmptyStateBody, EmptyStateVariant } from '@patternfly/react-core';
 import { SearchIcon } from '@patternfly/react-icons';
 
 import useSnapshotColumns from '../../hooks/useSnapshotColumns';
@@ -45,12 +39,7 @@ const SnapshotsList: FC<SnapshotsListProps> = ({
       <VirtualizedTable
         NoDataEmptyMsg={() => (
           <>
-            <EmptyState variant={EmptyStateVariant.xs}>
-              <EmptyStateHeader
-                icon={
-                  <EmptyStateIcon className="snapshots-list__empty-state-icon" icon={SearchIcon} />
-                }
-              />
+            <EmptyState icon={SearchIcon} variant={EmptyStateVariant.xs}>
               <EmptyStateBody>{t('No snapshots found')}</EmptyStateBody>
             </EmptyState>
           </>

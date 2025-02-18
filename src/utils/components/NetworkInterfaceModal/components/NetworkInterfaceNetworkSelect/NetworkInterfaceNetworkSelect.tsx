@@ -143,7 +143,7 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
       fieldId="network-attachment-definition"
       isRequired
       label={t('Network')}
-      labelIcon={<NetworkSelectHelperPopover />}
+      labelHelp={<NetworkSelectHelperPopover />}
     >
       <div data-test-id="network-attachment-definition-select">
         {hasPodNetwork && !loaded ? (

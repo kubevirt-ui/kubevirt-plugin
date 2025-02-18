@@ -124,9 +124,11 @@ const HardwareDevicesModal: FC<HardwareDevicesModalProps> = ({
               />
             </GridItem>
             <GridItem className="hardware-devices-form-button" span={2}>
-              <Button onClick={() => onDelete(deviceIndex)} variant={ButtonVariant.plain}>
-                <MinusCircleIcon />
-              </Button>
+              <Button
+                icon={<MinusCircleIcon />}
+                onClick={() => onDelete(deviceIndex)}
+                variant={ButtonVariant.plain}
+              />
             </GridItem>
           </Grid>
         ))}

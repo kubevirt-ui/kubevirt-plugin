@@ -6,7 +6,7 @@ import {
   K8sResourceCondition,
 } from '@kubevirt-utils/components/ConditionsTable/ConditionsTable';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Divider, PageSection, PageSectionVariants, Title } from '@patternfly/react-core';
+import { Divider, PageSection, Title } from '@patternfly/react-core';
 
 import { DataImportCronDetailsGrid } from './DataImportCronDetailsGrid';
 
@@ -19,14 +19,14 @@ const DataImportCronDetailsPage: FC<DataImportCronDetailsPageProps> = ({ obj: da
 
   return (
     <div>
-      <PageSection variant={PageSectionVariants.light}>
+      <PageSection>
         <Title className="co-section-heading" headingLevel="h2">
           {t('DataImportCron details')}
         </Title>
         <DataImportCronDetailsGrid dataImportCron={dataImportCron} />
       </PageSection>
       <Divider />
-      <PageSection variant={PageSectionVariants.light}>
+      <PageSection>
         <Title className="co-section-heading" headingLevel="h2">
           {t('Conditions')}
         </Title>

@@ -61,12 +61,11 @@ const TolerationEditRow: React.FC<TolerationEditRowProps> = ({ label, onChange, 
       </GridItem>
       <GridItem span={1}>
         <Button
+          icon={<MinusCircleIcon />}
           id={`toleration-${id}-delete-btn`}
           onClick={() => onDelete(id)}
           variant={ButtonVariant.plain}
-        >
-          <MinusCircleIcon />
-        </Button>
+        />
       </GridItem>
     </>
   );

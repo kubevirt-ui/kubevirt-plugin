@@ -5,7 +5,8 @@ import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/u
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Modal, ModalVariant, Tab, Tabs } from '@patternfly/react-core';
+import { Tab, Tabs } from '@patternfly/react-core';
+import { Modal, ModalVariant } from '@patternfly/react-core/deprecated';
 
 import YamlAndCLIEditor from '../YamlAndCLIEditor/YamlAndCLIEditor';
 

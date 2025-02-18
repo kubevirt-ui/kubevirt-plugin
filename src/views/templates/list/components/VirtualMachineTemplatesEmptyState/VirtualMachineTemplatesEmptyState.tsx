@@ -10,8 +10,6 @@ import {
   EmptyStateActions,
   EmptyStateBody,
   EmptyStateFooter,
-  EmptyStateHeader,
-  EmptyStateIcon,
   EmptyStateVariant,
 } from '@patternfly/react-core';
 import { PficonTemplateIcon } from '@patternfly/react-icons';
@@ -31,12 +29,12 @@ const VirtualMachineTemplatesEmptyState: FC<VirtualMachineTemplatesEmptyStatePro
     <>
       <ListPageHeader title={t('VirtualMachine Templates')} />
       <ListPageBody>
-        <EmptyState variant={EmptyStateVariant.lg}>
-          <EmptyStateHeader
-            headingLevel="h4"
-            icon={<EmptyStateIcon icon={PficonTemplateIcon} />}
-            titleText={<>{t('No Templates found')}</>}
-          />
+        <EmptyState
+          headingLevel="h4"
+          icon={PficonTemplateIcon}
+          titleText={<>{t('No Templates found')}</>}
+          variant={EmptyStateVariant.lg}
+        >
           <EmptyStateBody>
             <Trans ns="plugin__kubevirt-plugin" t={t}>
               Click <b>Create Template</b> to create your first template

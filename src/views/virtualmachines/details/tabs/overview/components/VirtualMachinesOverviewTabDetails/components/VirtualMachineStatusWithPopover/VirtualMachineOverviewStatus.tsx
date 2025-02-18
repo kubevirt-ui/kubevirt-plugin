@@ -6,7 +6,7 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVMStatus } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { Popover, PopoverPosition, Text } from '@patternfly/react-core';
+import { Content, Popover, PopoverPosition } from '@patternfly/react-core';
 import { createURL } from '@virtualmachines/details/tabs/overview/utils/utils';
 
 type VirtualMachineOverviewStatusProps = {
@@ -25,15 +25,15 @@ const VirtualMachineOverviewStatus: FC<VirtualMachineOverviewStatusProps> = ({ c
       <Popover
         bodyContent={
           <>
-            <Text>
+            <Content component="p">
               {t('VirtualMachine is currently {{ status }}', {
                 status: vmPrintableStatus,
               })}
-            </Text>
+            </Content>
             <br />
-            <Text>
+            <Content component="p">
               <Link to={createURL('diagnostics', location?.pathname)}>{t('View diagnostic')}</Link>
-            </Text>
+            </Content>
           </>
         }
         headerContent={vmPrintableStatus}

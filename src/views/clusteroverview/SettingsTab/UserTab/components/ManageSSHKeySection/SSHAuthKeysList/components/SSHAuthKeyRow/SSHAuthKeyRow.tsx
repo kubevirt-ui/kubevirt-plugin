@@ -101,13 +101,12 @@ const SSHAuthKeyRow: FC<SSHAuthKeyRowProps> = ({
       </GridItem>
       <GridItem span={1}>
         <Button
+          icon={<MinusCircleIcon />}
           isDisabled={isRemoveDisabled}
           isInline
           onClick={() => onAuthKeyDelete(row)}
           variant="plain"
-        >
-          <MinusCircleIcon />
-        </Button>
+        />
       </GridItem>
     </Grid>
   );

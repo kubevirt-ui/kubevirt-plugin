@@ -7,15 +7,14 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import {
   Checkbox,
+  Content,
+  ContentVariants,
   Grid,
   GridItem,
-  Modal,
-  ModalVariant,
   Stack,
-  Text,
-  TextVariants,
   Title,
 } from '@patternfly/react-core';
+import { Modal, ModalVariant } from '@patternfly/react-core/deprecated';
 
 import WelcomeButtons from './components/WelcomeButtons';
 
@@ -48,10 +47,10 @@ const WelcomeModal: FC = () => {
               <Title headingLevel="h2">Welcome to</Title>
               <Title headingLevel="h1">OpenShift Virtualization</Title>
 
-              <Text className="text-muted WelcomeModal__text" component={TextVariants.p}>
+              <Content className="text-muted WelcomeModal__text" component={ContentVariants.p}>
                 Use OpenShift Virtualization to run and manage virtualized workloads alongside
                 container workloads. You can manage both Linux and Windows virtual machines.
-              </Text>
+              </Content>
 
               <Title headingLevel="h3">What do you want to do next?</Title>
 

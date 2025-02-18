@@ -1,13 +1,7 @@
 import React, { ComponentType, FC, ReactNode } from 'react';
 
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  EmptyState,
-  EmptyStateBody,
-  EmptyStateHeader,
-  EmptyStateIcon,
-  Spinner,
-} from '@patternfly/react-core';
+import { EmptyState, EmptyStateBody, Spinner } from '@patternfly/react-core';
 
 type LoadingEmptyStateProps = {
   bodyContents?: ReactNode | string;
@@ -19,8 +13,7 @@ const LoadingEmptyState: FC<LoadingEmptyStateProps> = ({
   iconComponent = Spinner,
 }) => {
   return (
-    <EmptyState>
-      <EmptyStateHeader icon={<EmptyStateIcon icon={iconComponent} />} />
+    <EmptyState icon={iconComponent}>
       <EmptyStateBody>{bodyContents}</EmptyStateBody>
     </EmptyState>
   );

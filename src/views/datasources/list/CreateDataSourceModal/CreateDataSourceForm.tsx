@@ -87,7 +87,7 @@ export const CreateDataSourceForm: FC<CreateDataSourceFormProps> = ({
         size={size}
       />
       <FormGroup
-        labelIcon={
+        labelHelp={
           <Popover
             bodyContent={t(
               'As new versions of a DataSource become available older versions will be replaced',

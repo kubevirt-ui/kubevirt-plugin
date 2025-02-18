@@ -50,9 +50,12 @@ const VirtualMachineMigrationStatus: FC<VirtualMachineMigrationStatusProps> = ({
     <div className="pf-v5-c-wizard migration-status">
       <div className="pf-v5-c-wizard__header">
         <div className="pf-v5-c-wizard__close">
-          <Button aria-label={t('Close')} onClick={onClose} variant={ButtonVariant.plain}>
-            <CloseIcon />
-          </Button>
+          <Button
+            aria-label={t('Close')}
+            icon={<CloseIcon />}
+            onClick={onClose}
+            variant={ButtonVariant.plain}
+          />
         </div>
         <div className="pf-v5-c-wizard__title">
           <h2 className="pf-v5-c-wizard__title-text">{t('Migrate VirtualMachine storage')}</h2>

@@ -42,10 +42,9 @@ const CPUInput: FC<CPUInputProps> = ({ currentCPU, setUserEnteredCPU, userEntere
           <Button
             aria-label="Action"
             className="cpu-input__title--help-text-button"
+            icon={<HelpIcon />}
             variant={ButtonVariant.plain}
-          >
-            <HelpIcon />
-          </Button>
+          />
         </Popover>
       </Title>
       <Radio

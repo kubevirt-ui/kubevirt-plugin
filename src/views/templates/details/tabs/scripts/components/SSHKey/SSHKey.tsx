@@ -23,11 +23,11 @@ import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Button,
   ButtonVariant,
+  Content,
+  ContentVariants,
   Flex,
   FlexItem,
   Stack,
-  Text,
-  TextVariants,
   Title,
 } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
@@ -115,7 +115,7 @@ const SSHKey: FC<SSHKeyProps> = ({ template }) => {
       descriptionData={
         <Stack hasGutter>
           <div data-test="ssh-popover">
-            <Text component={TextVariants.p}>{t('Select an available secret')}</Text>
+            <Content component={ContentVariants.p}>{t('Select an available secret')}</Content>
           </div>
           <SecretNameLabel secretName={vmAttachedSecretName} />
         </Stack>

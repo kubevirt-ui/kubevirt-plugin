@@ -18,7 +18,7 @@ import {
 } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { useGuestOS } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { FormGroup, TextListItem, TextListItemVariants } from '@patternfly/react-core';
+import { Content, ContentVariants, FormGroup } from '@patternfly/react-core';
 
 import InstanceTypeConfiguration from './InstanceTypeConfiguration';
 
@@ -41,51 +41,51 @@ const ConfigurationSummary: FC<ConfigurationSummaryProps> = ({ vm }) => {
 
   return (
     <FormGroup fieldId="configuration" hasNoPaddingTop label={t('Configuration')}>
-      <TextListItem className="text-muted" component={TextListItemVariants.dt}>
+      <Content className="text-muted" component={ContentVariants.dt}>
         {t('Operating system')}
-      </TextListItem>
+      </Content>
 
-      <TextListItem component={TextListItemVariants.dd}>
+      <Content component={ContentVariants.dd}>
         {getOperatingSystemName(vm) || getOperatingSystem(vm) || osName}
-      </TextListItem>
+      </Content>
 
       {itMatcher ? (
         <InstanceTypeConfiguration itMatcher={itMatcher} />
       ) : (
         <>
-          <TextListItem className="text-muted" component={TextListItemVariants.dt}>
+          <Content className="text-muted" component={ContentVariants.dt}>
             {t('Flavor')}
-          </TextListItem>
-          <TextListItem component={TextListItemVariants.dd}>
+          </Content>
+          <Content component={ContentVariants.dd}>
             <CPUMemory vm={vm} vmi={vmi} />
-          </TextListItem>
-          <TextListItem className="text-muted" component={TextListItemVariants.dt}>
+          </Content>
+          <Content className="text-muted" component={ContentVariants.dt}>
             {t('Workload profile')}
-          </TextListItem>
-          <TextListItem component={TextListItemVariants.dd}>
+          </Content>
+          <Content component={ContentVariants.dd}>
             {getAnnotation(vm?.spec?.template, VM_WORKLOAD_ANNOTATION) || (
               <MutedTextSpan text={t('Not available')} />
             )}
-          </TextListItem>
+          </Content>
         </>
       )}
-      <TextListItem className="text-muted" component={TextListItemVariants.dt}>
+      <Content className="text-muted" component={ContentVariants.dt}>
         {t('NICs')}
-      </TextListItem>
-      <TextListItem component={TextListItemVariants.dd}>
+      </Content>
+      <Content component={ContentVariants.dd}>
         {(interfaces || [])?.map(({ model, name }) => (
           <div key={name}>{model ? `${name} - ${model}` : name}</div>
         ))}
         {isEmpty(interfaces) && <span className="text-muted">None</span>}
-      </TextListItem>
-      <TextListItem className="text-muted" component={TextListItemVariants.dt}>
+      </Content>
+      <Content className="text-muted" component={ContentVariants.dt}>
         {t('Disks')}
-      </TextListItem>
-      <TextListItem component={TextListItemVariants.dd}>
+      </Content>
+      <Content component={ContentVariants.dd}>
         {(getDisks(vm) || [])?.map((disk) => (
           <div key={disk.name}>{disk.name}</div>
         ))}
-      </TextListItem>
+      </Content>
     </FormGroup>
   );
 };
