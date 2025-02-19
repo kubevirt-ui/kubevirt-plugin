@@ -14,7 +14,7 @@ import {
 } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getInitialSSHDetails } from '@kubevirt-utils/resources/secret/utils';
+import { createSSHSecret, getInitialSSHDetails } from '@kubevirt-utils/resources/secret/utils';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
@@ -34,12 +34,7 @@ import { PencilAltIcon } from '@patternfly/react-icons';
 
 import useEditTemplateAccessReview from '../../../../hooks/useIsTemplateEditable';
 
-import {
-  removeCredential,
-  removeSecretObject,
-  updateSecretName,
-  updateSSHKeyObject,
-} from './sshkey-utils';
+import { removeAccessCredential, updateAccessCredential } from './sshkey-utils';
 
 type SSHKeyProps = {
   template: V1Template;
@@ -63,42 +58,32 @@ const SSHKey: FC<SSHKeyProps> = ({ template }) => {
     [vmAttachedSecretName, secretToCreate],
   );
 
-  const onSubmit = (sshDetails: SSHSecretDetails) => {
-    const { secretOption, sshPubKey, sshSecretName } = sshDetails;
+  const onSubmit = async (sshDetails: SSHSecretDetails) => {
+    const { secretOption, sshPubKey, sshSecretName, sshSecretNamespace } = sshDetails;
 
     if (isEqualObject(sshDetails, initialSSHDetails)) {
       return Promise.resolve();
     }
 
-    const newTemplate = produce(template, (draftTemplate) => {
-      removeSecretObject(draftTemplate, initialSSHDetails.sshSecretName);
+    if (secretOption === SecretSelectionOption.addNew) {
+      await createSSHSecret(sshPubKey, sshSecretName, sshSecretNamespace);
+    }
 
+    const newTemplate = produce(template, (draftTemplate) => {
       if (
         secretOption === SecretSelectionOption.none &&
         initialSSHDetails.secretOption !== SecretSelectionOption.none
       ) {
-        removeCredential(draftTemplate, initialSSHDetails.sshSecretName);
+        removeAccessCredential(draftTemplate, initialSSHDetails.sshSecretName);
       }
 
       if (
-        secretOption === SecretSelectionOption.useExisting &&
+        (secretOption === SecretSelectionOption.useExisting ||
+          secretOption === SecretSelectionOption.addNew) &&
         initialSSHDetails.sshSecretName !== sshSecretName &&
         !isEmpty(sshSecretName)
       ) {
-        updateSecretName(draftTemplate, sshSecretName);
-      }
-
-      if (
-        secretOption === SecretSelectionOption.addNew &&
-        !isEmpty(sshPubKey) &&
-        !isEmpty(sshSecretName)
-      ) {
-        updateSSHKeyObject(
-          draftTemplate,
-          sshPubKey,
-          initialSSHDetails.sshSecretName,
-          sshSecretName,
-        );
+        updateAccessCredential(draftTemplate, sshSecretName);
       }
     });
 

@@ -1,6 +1,7 @@
 import React, { FC, useMemo, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { createSSHSecret } from '@kubevirt-utils/resources/secret/utils';
 import { isEmpty, validateSSHPublicKey } from '@kubevirt-utils/utils/utils';
 
 import MutedTextSpan from '../MutedTextSpan/MutedTextSpan';
@@ -9,7 +10,7 @@ import TabModal from '../TabModal/TabModal';
 import SSHSecretModalBody from './components/SSHSecretModalBody/SSHSecretModalBody';
 import useSecretsData from './hooks/useSecretsData';
 import { SecretSelectionOption, SSHSecretDetails } from './utils/types';
-import { createSSHSecret, validateSecretName, validateSecretNameUnique } from './utils/utils';
+import { validateSecretName, validateSecretNameUnique } from './utils/utils';
 
 type SSHSecretModalProps = {
   initialSSHSecretDetails: SSHSecretDetails;

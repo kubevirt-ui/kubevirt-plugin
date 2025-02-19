@@ -1,14 +1,14 @@
 import { Buffer } from 'buffer';
 
+import { SecretModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   SecretSelectionOption,
   SSHSecretDetails,
 } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
-import { SecretModel } from '@kubevirt-utils/models';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { k8sCreate, k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
+import { k8sCreate, k8sDelete, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 import { getName } from '../shared';
 
@@ -69,14 +69,19 @@ export const getInitialSSHDetails = ({
         sshSecretNamespace: '',
       };
 
-type CreateSecretType = (input: {
+type CreateUserPasswordSecretType = (input: {
   namespace: string;
   password: string;
   secretName: string;
   username: string;
 }) => Promise<IoK8sApiCoreV1Secret>;
 
-export const createSecret: CreateSecretType = ({ namespace, password, secretName, username }) =>
+export const createUserPasswordSecret: CreateUserPasswordSecretType = ({
+  namespace,
+  password,
+  secretName,
+  username,
+}) =>
   k8sCreate({
     data: {
       apiVersion: 'v1',
@@ -93,6 +98,26 @@ export const createSecret: CreateSecretType = ({ namespace, password, secretName
     },
     model: SecretModel,
     ns: namespace,
+  });
+
+export const createSSHSecret = (
+  sshKey: string,
+  secretName: string,
+  secretNamespace: string,
+  dryRun = false,
+) =>
+  k8sCreate<K8sResourceCommon & { data?: { [key: string]: string } }>({
+    data: {
+      apiVersion: SecretModel.apiVersion,
+      data: { key: encodeSecretKey(sshKey) },
+      kind: SecretModel.kind,
+      metadata: {
+        name: secretName,
+        namespace: secretNamespace,
+      },
+    },
+    model: SecretModel,
+    ...(dryRun && { queryParams: { dryRun: 'All' } }),
   });
 
 export const deleteSecret = (secret: IoK8sApiCoreV1Secret) =>
