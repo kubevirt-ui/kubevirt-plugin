@@ -3,6 +3,8 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import {
+  V1beta1StorageSpecAccessModesEnum,
+  V1Disk,
   V1VirtualMachine,
   V1VirtualMachineInstanceMigration,
   V1Volume,
@@ -10,7 +12,7 @@ import {
 import { MAX_NAME_LENGTH } from '@kubevirt-utils/components/SSHSecretModal/utils/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { getDataVolumeTemplates, getVolumes } from '@kubevirt-utils/resources/vm';
+import { getDataVolumeTemplates, getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { UPDATE_STRATEGIES } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getStorageClassName } from '@kubevirt-utils/resources/vm/utils/dataVolumeTemplate/selectors';
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
@@ -226,4 +228,31 @@ export const getMigrationStatusLabel = (vmim: V1VirtualMachineInstanceMigration)
   if (vmimStatuses.Succeeded === vmim?.status?.phase) return t('Migration completed successfully');
 
   return t('In progress');
+};
+
+export const isPVCMigratable = (pvc: IoK8sApiCoreV1PersistentVolumeClaim) =>
+  pvc?.spec?.accessModes?.includes(V1beta1StorageSpecAccessModesEnum.ReadWriteMany);
+
+export const isDiskMigratable = (disk: V1Disk) => !disk?.shareable;
+
+export const getVolumePVC = (volume: V1Volume, pvcs: IoK8sApiCoreV1PersistentVolumeClaim[]) =>
+  pvcs?.find(
+    (pvc) =>
+      getName(pvc) === volume.dataVolume?.name ||
+      getName(pvc) === volume.persistentVolumeClaim?.claimName,
+  );
+
+export const getMigratableVMPVCs = (
+  vm: V1VirtualMachine,
+  pvcs: IoK8sApiCoreV1PersistentVolumeClaim[],
+) => {
+  return getVolumes(vm)?.reduce((acc, volume) => {
+    const pvc = getVolumePVC(volume, pvcs);
+    const volumeDisk = getDisks(vm)?.find((disk) => disk.name === volume.name);
+    if (isPVCMigratable(pvc) && isDiskMigratable(volumeDisk)) {
+      acc.push(pvc);
+    }
+
+    return acc;
+  }, []);
 };

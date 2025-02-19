@@ -14,7 +14,7 @@ import { Modal, Wizard, WizardHeader, WizardStep } from '@patternfly/react-core'
 import VirtualMachineMigrationDestinationTab from './tabs/VirtualMachineMigrationDestinationTab';
 import VirtualMachineMigrationDetails from './tabs/VirtualMachineMigrationDetails';
 import VirtualMachineMigrationReviewTab from './tabs/VirtualMachineMigrationReviewTab';
-import { entireVMSelected, migrateVM } from './utils';
+import { entireVMSelected, getMigratableVMPVCs, migrateVM } from './utils';
 import VirtualMachineMigrationStatus from './VirtualMachineMigrationStatus';
 
 import './virtual-machine-migration-modal.scss';
@@ -45,7 +45,9 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
 
   const [{ clusterDefaultStorageClass, sortedStorageClasses }, scLoaded] = useDefaultStorageClass();
 
-  const pvcsToMigrate = entireVMSelected(selectedPVCs) ? pvcs : selectedPVCs;
+  const pvcsToMigrate = entireVMSelected(selectedPVCs)
+    ? getMigratableVMPVCs(vm, pvcs)
+    : selectedPVCs;
 
   const defaultStorageClassName = useMemo(
     () => getName(clusterDefaultStorageClass),
