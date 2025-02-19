@@ -89,7 +89,7 @@ export const tourSteps: Step[] = [
       'On the Configuration tab on the VirtualMachine page, you can search for and edit any configurable item using the search box.',
     ),
     data: {
-      route: '/k8s/all-namespaces/kubevirt.io~v1~VirtualMachine/rhel9-tour-guide/configuration',
+      route: '/k8s/ns/default/kubevirt.io~v1~VirtualMachine/rhel9-tour-guide/configuration',
     },
     disableBeacon: true,
     placement: 'bottom',

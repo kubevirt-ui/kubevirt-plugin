@@ -4,10 +4,6 @@ import { useLocation } from 'react-router-dom-v5-compat';
 
 import useInstanceTypesAndPreferences from '@catalog/CreateFromInstanceTypes/state/hooks/useInstanceTypesAndPreferences';
 import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
-import {
-  runningTourSignal,
-  tourGuideVM,
-} from '@kubevirt-utils/components/GuidedTour/utils/constants';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { getName } from '@kubevirt-utils/resources/shared';
 import useInstanceTypeExpandSpec from '@kubevirt-utils/resources/vm/hooks/useInstanceTypeExpandSpec';
@@ -26,10 +22,9 @@ const VirtualMachineConfigurationTab: FC<NavPageComponentProps> = ({ obj }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const vm = runningTourSignal.value ? tourGuideVM : obj;
-  const { vmi } = useVMI(getName(vm), getNamespace(vm));
+  const { vmi } = useVMI(getName(obj), getNamespace(obj));
   const { allInstanceTypes } = useInstanceTypesAndPreferences();
-  const [instanceTypeVM] = useInstanceTypeExpandSpec(vm);
+  const [instanceTypeVM] = useInstanceTypeExpandSpec(obj);
   const [activeTabKey, setActiveTabKey] = useState<number | string>(
     VirtualMachineDetailsTab.Details,
   );
@@ -53,7 +48,7 @@ const VirtualMachineConfigurationTab: FC<NavPageComponentProps> = ({ obj }) => {
 
   return (
     <div className="co-dashboard-body VirtualMachineConfigurationTab">
-      <VirtualMachineConfigurationTabSearch vm={vm} />
+      <VirtualMachineConfigurationTabSearch vm={obj} />
       <div className="VirtualMachineConfigurationTab--body">
         <Tabs activeKey={activeTabKey} className="VirtualMachineConfigurationTab--main" isVertical>
           {tabs.map(({ Component, name, title }) => (
@@ -69,7 +64,7 @@ const VirtualMachineConfigurationTab: FC<NavPageComponentProps> = ({ obj }) => {
                 <Component
                   allInstanceTypes={allInstanceTypes}
                   instanceTypeVM={instanceTypeVM}
-                  vm={vm}
+                  vm={obj}
                   vmi={vmi}
                 />
               )}
