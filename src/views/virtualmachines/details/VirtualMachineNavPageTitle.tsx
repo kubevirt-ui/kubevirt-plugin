@@ -25,12 +25,14 @@ import { vmTabsWithYAML } from './utils/constants';
 type VirtualMachineNavPageTitleProps = {
   isLoaded?: boolean;
   name: string;
+  nonExpandedVM: V1VirtualMachine;
   vm: V1VirtualMachine;
 };
 
 const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({
   isLoaded,
   name,
+  nonExpandedVM,
   vm,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -44,7 +46,7 @@ const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({
   });
   const vmim = useVirtualMachineInstanceMigration(vm);
   const [isSingleNodeCluster] = useSingleNodeCluster();
-  const [actions] = useVirtualMachineActionsProvider(vm, vmim, isSingleNodeCluster);
+  const [actions] = useVirtualMachineActionsProvider(nonExpandedVM, vmim, isSingleNodeCluster);
   const StatusIcon = getVMStatusIcon(vm?.status?.printableStatus);
 
   const isSidebarEditorDisplayed = vmTabsWithYAML.find((tab) =>
