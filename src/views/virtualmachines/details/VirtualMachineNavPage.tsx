@@ -1,6 +1,10 @@
 import React from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  runningTourSignal,
+  tourGuideVM,
+} from '@kubevirt-utils/components/GuidedTour/utils/constants';
 import HorizontalNavbar from '@kubevirt-utils/components/HorizontalNavbar/HorizontalNavbar';
 import { SidebarEditorProvider } from '@kubevirt-utils/components/SidebarEditor/SidebarEditorContext';
 import useInstanceTypeExpandSpec from '@kubevirt-utils/resources/vm/hooks/useInstanceTypeExpandSpec';
@@ -24,13 +28,19 @@ const VirtualMachineNavPage: React.FC<VirtualMachineDetailsPageProps> = ({
   name,
   namespace,
 }) => {
-  const [vm, isLoaded, loadError] = useK8sWatchResource<V1VirtualMachine>({
-    kind,
-    name,
-    namespace,
-  });
+  const [vm, isLoaded, loadError] = useK8sWatchResource<V1VirtualMachine>(
+    runningTourSignal.value
+      ? null
+      : {
+          kind,
+          name,
+          namespace,
+        },
+  );
 
-  const [instanceTypeExpandedSpec, expandedSpecLoading] = useInstanceTypeExpandSpec(vm);
+  const vmToShow = runningTourSignal.value ? tourGuideVM : vm;
+
+  const [instanceTypeExpandedSpec, expandedSpecLoading] = useInstanceTypeExpandSpec(vmToShow);
 
   const pages = useVirtualMachineTabs();
 
@@ -39,7 +49,7 @@ const VirtualMachineNavPage: React.FC<VirtualMachineDetailsPageProps> = ({
       <VirtualMachineNavPageTitle
         isLoaded={isLoaded || !isEmpty(loadError)}
         name={name}
-        vm={isInstanceTypeVM(vm) ? instanceTypeExpandedSpec : vm}
+        vm={isInstanceTypeVM(vmToShow) ? instanceTypeExpandedSpec : vmToShow}
       />
       <div className="VirtualMachineNavPage--tabs__main">
         <HorizontalNavbar
@@ -47,7 +57,7 @@ const VirtualMachineNavPage: React.FC<VirtualMachineDetailsPageProps> = ({
           instanceTypeExpandedSpec={instanceTypeExpandedSpec}
           loaded={isLoaded && !expandedSpecLoading}
           pages={pages}
-          vm={vm}
+          vm={vmToShow}
         />
       </div>
     </SidebarEditorProvider>
