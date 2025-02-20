@@ -12,7 +12,7 @@ import {
   useAccessReview,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { sortable } from '@patternfly/react-table';
-import { VmiMapper } from '@virtualmachines/utils/mappers';
+import { VMIMapper } from '@virtualmachines/utils/mappers';
 
 import { sortByCPUUsage, sortByMemoryUsage, sortByNetworkUsage, sortByNode } from './sortColumns';
 
@@ -20,7 +20,7 @@ const useVirtualMachineColumns = (
   namespace: string,
   pagination: { [key: string]: any },
   data: V1VirtualMachine[],
-  vmiMapper: VmiMapper,
+  vmiMapper: VMIMapper,
 ): [TableColumn<K8sResourceCommon>[], TableColumn<K8sResourceCommon>[], boolean] => {
   const { t } = useKubevirtTranslation();
 

@@ -21,7 +21,7 @@ import {
 import { getVMIIPAddresses } from '@kubevirt-utils/resources/vmi';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
-import { VmiMapper, VmimMapper } from './mappers';
+import { VMIMapper, VMIMMapper } from './mappers';
 import { compareCIDR, getLatestMigrationForEachVM, isLiveMigratable } from './utils';
 import { isErrorPrintableStatus, printableVMStatus } from './virtualMachineStatuses';
 
@@ -131,7 +131,7 @@ const useOSFilter = (): RowFilter => {
   };
 };
 
-const useNodesFilter = (vmiMapper: VmiMapper): RowFilter => {
+const useNodesFilter = (vmiMapper: VMIMapper): RowFilter => {
   const sortedNodeNamesItems = useMemo(() => {
     return Object.values(vmiMapper?.nodeNames).sort((a, b) =>
       a?.id?.localeCompare(b?.id, undefined, {
@@ -187,7 +187,7 @@ const useInstanceTypesFilter = (vms: V1VirtualMachine[]): RowFilter => {
   };
 };
 
-const useIPSearchFilter = (vmiMapper: VmiMapper): RowFilter => ({
+const useIPSearchFilter = (vmiMapper: VMIMapper): RowFilter => ({
   filter: (input, obj) => {
     const search = input.selected?.[0];
 
@@ -216,10 +216,10 @@ export const useVMListFilters = (
 ): {
   filters: RowFilter<V1VirtualMachine>[];
   searchFilters: RowFilter<V1VirtualMachine>[];
-  vmiMapper: VmiMapper;
-  vmimMapper: VmimMapper;
+  vmiMapper: VMIMapper;
+  vmimMapper: VMIMMapper;
 } => {
-  const vmiMapper: VmiMapper = useMemo(() => {
+  const vmiMapper: VMIMapper = useMemo(() => {
     return (Array.isArray(vmis) ? vmis : [])?.reduce(
       (acc, vmi) => {
         const name = vmi?.metadata?.name;
@@ -241,7 +241,7 @@ export const useVMListFilters = (
     );
   }, [vmis]);
 
-  const vmimMapper: VmimMapper = useMemo(() => getLatestMigrationForEachVM(vmims), [vmims]);
+  const vmimMapper: VMIMMapper = useMemo(() => getLatestMigrationForEachVM(vmims), [vmims]);
 
   const statusFilter = useStatusFilter();
   const templatesFilter = useTemplatesFilter(vms);

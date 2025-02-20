@@ -12,7 +12,7 @@ import {
   TreeViewDataItem,
 } from '@patternfly/react-core';
 
-import UseFilteredTreeView from '../hooks/UseFilteredTreeView';
+import useFilteredTreeView from '../hooks/useFilteredTreeView';
 
 import CreateProject from './CreateProject';
 import PanelToggleButton from './PanelToggleButton';
@@ -40,7 +40,7 @@ const TreeViewContent: FC<TreeViewContentProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const [showAll, setShowAll] = useState<boolean>();
-  const { filteredTreeData, onSearch } = UseFilteredTreeView(treeData, setShowAll);
+  const { filteredTreeData, onSearch } = useFilteredTreeView(treeData, setShowAll);
 
   if (!loaded) {
     return (

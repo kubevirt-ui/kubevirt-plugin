@@ -1,6 +1,23 @@
 .vms-tree-view {
   overflow-x: hidden;
 
+  .pf-v5-c-tree-view__list-item {
+    position: relative;
+  }
+
+  .right-click-action-menu-background {
+    bottom: 0;
+    left: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+    z-index: 100;
+  }
+
+  .right-click-action-menu {
+    transform: translateY(30px) translateX(50px);
+  }
+
   &__toolbar-section {
     width: 100%;
   }

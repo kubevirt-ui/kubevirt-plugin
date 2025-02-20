@@ -3,7 +3,7 @@ import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getMemory } from '@kubevirt-utils/resources/vm';
 import { columnSortingCompare, isEmpty } from '@kubevirt-utils/utils/utils';
 import { SortByDirection } from '@patternfly/react-table';
-import { getVMIFromMapper, VmiMapper } from '@virtualmachines/utils/mappers';
+import { getVMIFromMapper, VMIMapper } from '@virtualmachines/utils/mappers';
 
 import {
   getCPUUsagePercentage,
@@ -15,7 +15,7 @@ export const sortByNode = (
   data: V1VirtualMachine[],
   direction: SortByDirection,
   pagination: { [key: string]: any },
-  vmiMapper: VmiMapper,
+  vmiMapper: VMIMapper,
 ) => {
   const sortByVMINode = (a: V1VirtualMachine, b: V1VirtualMachine): number => {
     const aNode = getVMIFromMapper(vmiMapper, a)?.status?.nodeName;
@@ -67,7 +67,7 @@ export const sortByMemoryUsage = (
   data: V1VirtualMachine[],
   direction: SortByDirection,
   pagination: { [key: string]: any },
-  vmiMapper: VmiMapper,
+  vmiMapper: VMIMapper,
 ) => {
   const compareCPUUsage = (a: V1VirtualMachine, b: V1VirtualMachine): number => {
     const aVMI = getVMIFromMapper(vmiMapper, a);
