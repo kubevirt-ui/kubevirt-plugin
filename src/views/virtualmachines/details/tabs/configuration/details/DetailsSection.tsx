@@ -81,7 +81,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
 
   const vmWorkload = getWorkload(vm);
   const vmName = getName(vm);
-  const isInstanceType = !isEmpty(vm?.spec?.instancetype);
+  const isInstanceType = !isEmpty(vm?.spec?.instancetype?.name);
 
   const loadingInstanceType = isInstanceType && (isEmpty(instanceType) || isEmpty(instanceTypeVM));
 

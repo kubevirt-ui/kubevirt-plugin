@@ -2,6 +2,7 @@ import React, { FC, useMemo, useRef } from 'react';
 import { useLocation } from 'react-router-dom-v5-compat';
 
 import CreateResourceDefaultPage from '@kubevirt-utils/components/CreateResourceDefaultPage/CreateResourceDefaultPage';
+import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
@@ -50,7 +51,10 @@ const VirtualMachineNavigator: FC = () => {
   return (
     <VirtualMachineTreeView onFilterChange={onFilterChange} {...treeProps}>
       {isVirtualMachineListPage ? (
-        <VirtualMachinesList kind={VirtualMachineModelRef} namespace={namespace} ref={childRef} />
+        <>
+          <GuidedTour />
+          <VirtualMachinesList kind={VirtualMachineModelRef} namespace={namespace} ref={childRef} />
+        </>
       ) : (
         <VirtualMachineNavPage kind={VirtualMachineModelRef} name={vmName} namespace={namespace} />
       )}

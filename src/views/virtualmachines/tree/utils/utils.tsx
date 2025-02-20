@@ -2,6 +2,10 @@ import React from 'react';
 import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  runningTourSignal,
+  tourGuideVM,
+} from '@kubevirt-utils/components/GuidedTour/utils/constants';
 import { ALL_NAMESPACES_SESSION_KEY, ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import { getLabel, getName, getNamespace, getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { TreeViewDataItem } from '@patternfly/react-core';
@@ -194,10 +198,19 @@ export const createTreeViewData = (
 ): TreeViewDataItem[] => {
   const { currentVMTab, vmName, vmNamespace } = getVMInfoFromPathname(pathname);
 
-  const treeViewDataMap: Record<string, TreeViewDataItem> = {};
-  const projectMap = buildProjectMap(vms, vmName, currentVMTab, treeViewDataMap, foldersEnabled);
+  const projectsToShow = runningTourSignal.value ? [getNamespace(tourGuideVM)] : projectNames;
+  const vmsToShow = runningTourSignal.value ? [tourGuideVM] : vms;
 
-  const treeViewData = projectNames.map((project) =>
+  const treeViewDataMap: Record<string, TreeViewDataItem> = {};
+  const projectMap = buildProjectMap(
+    vmsToShow,
+    vmName,
+    currentVMTab,
+    treeViewDataMap,
+    foldersEnabled,
+  );
+
+  const treeViewData = projectsToShow.map((project) =>
     createProjectTreeItem(project, projectMap, vmName, vmNamespace, treeViewDataMap),
   );
 
