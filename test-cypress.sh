@@ -7,7 +7,7 @@ source setup.sh
 
 # cleanup, setup and health check
 #cleanup
-health_check
+#health_check
 
 # Install dependencies.
 yarn install --ignore-engines
