@@ -2,6 +2,7 @@
   &__disabled {
     cursor: unset;
     color: var(--pf-v5-global--disabled-color--100);
+    pointer-events: all;
   }
 
   .pf-v5-c-menu.pf-m-flyout {

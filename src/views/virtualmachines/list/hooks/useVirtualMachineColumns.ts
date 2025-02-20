@@ -14,7 +14,13 @@ import {
 import { sortable } from '@patternfly/react-table';
 import { VMIMapper } from '@virtualmachines/utils/mappers';
 
-import { sortByCPUUsage, sortByMemoryUsage, sortByNetworkUsage, sortByNode } from './sortColumns';
+import {
+  sortByCPUUsage,
+  sortByDeletionProtection,
+  sortByMemoryUsage,
+  sortByNetworkUsage,
+  sortByNode,
+} from './sortColumns';
 
 const useVirtualMachineColumns = (
   namespace: string,
@@ -114,6 +120,13 @@ const useVirtualMachineColumns = (
         id: 'network-usage',
         sort: (_, direction) => sortingUsingFunction(direction, sortByNetworkUsage),
         title: t('Network'),
+        transforms: [sortable],
+      },
+      {
+        additional: true,
+        id: 'deletion-protection',
+        sort: (_, direction) => sortingUsingFunction(direction, sortByDeletionProtection),
+        title: t('Deletion protection'),
         transforms: [sortable],
       },
       {
