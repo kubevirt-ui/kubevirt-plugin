@@ -5,7 +5,7 @@ import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfigurat
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
-import GeneralSettingsProject from '../shared/GeneralSettingsProject';
+import GeneralSettingsProject from '../../../shared/GeneralSettingsProject';
 
 import {
   getCurrentTemplatesNamespaceFromHCO,
@@ -13,7 +13,7 @@ import {
   updateHCOCommonTemplatesNamespace,
 } from './utils/utils';
 
-import '../shared/general-settings.scss';
+import '../../../shared/general-settings.scss';
 
 type TemplatesProjectSectionProps = {
   hyperConvergeConfiguration: [hyperConvergeConfig: HyperConverged, loaded: boolean, error: any];

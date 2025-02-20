@@ -9,7 +9,7 @@ import { getName } from '@kubevirt-utils/resources/shared';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { Divider } from '@patternfly/react-core';
 
-import ExpandSection from '../../../../ExpandSection/ExpandSection';
+import ExpandSection from '../../../../../../ExpandSection/ExpandSection';
 
 import { AUTOMATIC_IMAGE_DOWNLOAD_ANNOTATION } from './utils/consts';
 

@@ -18,6 +18,7 @@ export const LOAD_BALANCER_ENABLED = 'loadBalancerEnabled';
 export const NODE_PORT_ADDRESS = 'nodePortAddress';
 export const NODE_PORT_ENABLED = 'nodePortEnabled';
 export const DISABLED_GUEST_SYSTEM_LOGS_ACCESS = 'disabledGuestSystemLogsAccess';
+export const CONFIRM_VM_ACTIONS = 'confirmVMActions';
 
 export const TREE_VIEW = 'treeView';
 export const TREE_VIEW_FOLDERS = 'treeViewFolders';
@@ -32,6 +33,7 @@ export const featuresConfigMapInitialState: IoK8sApiCoreV1ConfigMap = {
   data: {
     [AUTOMATIC_SUBSCRIPTION_ACTIVATION_KEY]: '',
     [AUTOMATIC_SUBSCRIPTION_ORGANIZATION_ID]: '',
+    [CONFIRM_VM_ACTIONS]: 'false',
     [DISABLED_GUEST_SYSTEM_LOGS_ACCESS]: 'false',
     [KUBEVIRT_APISERVER_PROXY]: 'true',
     [LOAD_BALANCER_ENABLED]: 'false',

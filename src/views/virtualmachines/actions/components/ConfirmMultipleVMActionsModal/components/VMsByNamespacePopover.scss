@@ -1,0 +1,8 @@
+.vm-by-namespace-popover {
+  height: 200px;
+  overflow: auto;
+
+  &--namespace-group {
+    margin-bottom: var(--pf-v5-global--spacer--sm);
+  }
+}
