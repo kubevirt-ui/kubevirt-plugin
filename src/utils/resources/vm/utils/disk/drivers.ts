@@ -51,9 +51,7 @@ export const getDriversImage = async (): Promise<string> => {
   return driversImage;
 };
 
-export const mountWinDriversToVM = async (vm: V1VirtualMachine): Promise<V1VirtualMachine> => {
-  const driversImage = await getDriversImage();
-
+export const addWinDriverVolume = (vm: V1VirtualMachine, driverImage: string): V1VirtualMachine => {
   return produce(vm, (draftVM) => {
     ensurePath(draftVM, ['spec.template.spec.domain.devices']);
 
@@ -71,9 +69,15 @@ export const mountWinDriversToVM = async (vm: V1VirtualMachine): Promise<V1Virtu
 
     draftVM.spec.template.spec.volumes.push({
       containerDisk: {
-        image: driversImage,
+        image: driverImage,
       },
       name: WINDOWS_DRIVERS_DISK,
     });
   });
+};
+
+export const mountWinDriversToVM = async (vm: V1VirtualMachine): Promise<V1VirtualMachine> => {
+  const driversImage = await getDriversImage();
+
+  return addWinDriverVolume(vm, driversImage);
 };

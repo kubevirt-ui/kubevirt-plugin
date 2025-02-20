@@ -76,7 +76,7 @@ export const createPopulatedCloudInitYAML = (
     user: getCloudInitUserNameByOS(selectedPreference, osLabel),
   };
 
-  const isRHELVM = selectedPreference.includes(OS_NAME_TYPES.rhel);
+  const isRHELVM = selectedPreference?.includes(OS_NAME_TYPES.rhel);
 
   if (
     isRHELVM &&
