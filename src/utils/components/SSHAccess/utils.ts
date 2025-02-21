@@ -15,9 +15,9 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 
 import { buildOwnerReference, getName, getNamespace } from './../../resources/shared';
-import { PORT, SERVICE_TYPES, SSH_PORT, VMI_LABEL_AS_SSH_SERVICE_SELECTOR } from './constants';
+import { PORT, SERVICE_TYPES, SSH_PORT, VM_LABEL_AS_SSH_SERVICE_SELECTOR } from './constants';
 
-const buildSSHServiceFromVM = (vm: V1VirtualMachine, type: SERVICE_TYPES, sshLabel: string) => ({
+const buildSSHServiceFromVM = (vm: V1VirtualMachine, type: SERVICE_TYPES) => ({
   apiVersion: ServiceModel.apiVersion,
   kind: ServiceModel.kind,
   metadata: {
@@ -36,7 +36,7 @@ const buildSSHServiceFromVM = (vm: V1VirtualMachine, type: SERVICE_TYPES, sshLab
       },
     ],
     selector: {
-      [VMI_LABEL_AS_SSH_SERVICE_SELECTOR]: sshLabel,
+      [VM_LABEL_AS_SSH_SERVICE_SELECTOR]: vm?.metadata?.name,
     },
     type,
   },
@@ -58,14 +58,14 @@ export const addSSHSelectorLabelToVM = async (
   const vmWithLabel = produce(vm, (draftVM) => {
     ensurePath(draftVM, 'spec.template.metadata.labels');
 
-    draftVM.spec.template.metadata.labels[VMI_LABEL_AS_SSH_SERVICE_SELECTOR] = labelValue;
+    draftVM.spec.template.metadata.labels[VM_LABEL_AS_SSH_SERVICE_SELECTOR] = labelValue;
   });
 
   if (vmi) {
     const vmiWithLabel = produce(vmi, (draftVMI) => {
       ensurePath(draftVMI, 'metadata.labels');
 
-      draftVMI.metadata.labels[VMI_LABEL_AS_SSH_SERVICE_SELECTOR] = labelValue;
+      draftVMI.metadata.labels[VM_LABEL_AS_SSH_SERVICE_SELECTOR] = labelValue;
     });
 
     await k8sUpdate<V1VirtualMachineInstance>({
@@ -87,23 +87,13 @@ export const addSSHSelectorLabelToVM = async (
 export const createSSHService = async (
   vm: V1VirtualMachine,
   type: SERVICE_TYPES,
-  vmi?: V1VirtualMachineInstance,
 ): Promise<K8sResourceCommon> => {
-  const { name, namespace } = vm?.metadata || {};
-  const vmiLabels = vm?.spec?.template?.metadata?.labels;
-  const labelSelector =
-    vmiLabels?.[VMI_LABEL_AS_SSH_SERVICE_SELECTOR] || `${name}-${getRandomChars()}`;
-
-  if (!vmiLabels?.[VMI_LABEL_AS_SSH_SERVICE_SELECTOR]) {
-    await addSSHSelectorLabelToVM(vm, vmi, labelSelector);
-  }
-
-  const serviceResource = buildSSHServiceFromVM(vm, type, labelSelector);
+  const serviceResource = buildSSHServiceFromVM(vm, type);
 
   return k8sCreate({
     data: serviceResource,
     model: ServiceModel,
-    ns: namespace,
+    ns: getNamespace(vm),
   });
 };
 

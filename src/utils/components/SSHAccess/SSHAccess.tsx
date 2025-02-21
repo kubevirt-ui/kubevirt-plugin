@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { DescriptionList } from '@patternfly/react-core';
 
 import ConsoleOverVirtctl from './components/ConsoleOverVirtctl';
@@ -12,7 +12,6 @@ type SSHAccessProps = {
   sshService: IoK8sApiCoreV1Service;
   sshServiceLoaded?: boolean;
   vm: V1VirtualMachine;
-  vmi?: V1VirtualMachineInstance;
 };
 
 const SSHAccess: FC<SSHAccessProps> = ({
@@ -20,12 +19,11 @@ const SSHAccess: FC<SSHAccessProps> = ({
   sshService,
   sshServiceLoaded,
   vm,
-  vmi,
 }) => {
   return (
     <DescriptionList className="pf-v5-c-description-list">
       {!isCustomizeInstanceType && (
-        <SSHCommand sshService={sshService} sshServiceLoaded={sshServiceLoaded} vm={vm} vmi={vmi} />
+        <SSHCommand sshService={sshService} sshServiceLoaded={sshServiceLoaded} vm={vm} />
       )}
       <ConsoleOverVirtctl vm={vm} />
     </DescriptionList>

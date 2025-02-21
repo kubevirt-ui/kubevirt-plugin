@@ -124,12 +124,7 @@ const Details: React.FC<DetailsProps> = ({ pathname, vmi }) => {
             />
             <VirtualMachineDescriptionItem
               descriptionData={
-                <SSHAccess
-                  sshService={sshService}
-                  sshServiceLoaded={sshServiceLoaded}
-                  vm={vm}
-                  vmi={vmi}
-                />
+                <SSHAccess sshService={sshService} sshServiceLoaded={sshServiceLoaded} vm={vm} />
               }
               descriptionHeader={t('SSH access')}
             />

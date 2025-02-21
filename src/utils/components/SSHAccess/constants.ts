@@ -3,7 +3,7 @@ import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 export const PORT = 22000;
 export const SSH_PORT = 22;
 
-export const VMI_LABEL_AS_SSH_SERVICE_SELECTOR = 'kubevirt.io/domain';
+export const VM_LABEL_AS_SSH_SERVICE_SELECTOR = 'vm.kubevirt.io/name';
 
 export enum SERVICE_TYPES {
   LOAD_BALANCER = 'LoadBalancer',
