@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 export ON_CI="ON_CI"
 
 pause_for_debug()
@@ -7,31 +9,6 @@ pause_for_debug()
     if [[ ${OPENSHIFT_CI} == 'true' ]]; then
         echo " 🐛 Pause and give time to debug the issue"
         sleep 7000
-    fi
-}
-
-# Wait until master and worker MCP are updated
-# or timeout after 90min.
-wait_mcp_for_updated()
-{
-    local mcp_updated="false"
-
-    sleep 30
-
-    for i in {1..60}
-    do
-      echo "Attempt ${i}/60"
-      sleep 30
-      if oc wait mcp master worker --for condition=updated --timeout=1m; then
-        echo "MCP is updated"
-        mcp_updated="true"
-        break
-      fi
-    done
-
-    if [[ "$mcp_updated" == "false" ]]; then
-      echo "Error: MCP didn't get updated!!"
-      exit 1
     fi
 }
 
@@ -61,6 +38,8 @@ export HCO_GIT_TAG=${HCO_GIT_TAG:-"main"}
 export HCO_SUBSCRIPTION_CHANNEL=${HCO_SUBSCRIPTION_CHANNEL:-"candidate-v1.14"}
 export VIRTCTL_VERSION="v1.4.0"
 export HPP_VERSION="release-v0.21"
+
+trap pause_for_debug INT TERM ERR
 
 tee <<EOF | oc apply -f -
 apiVersion: operators.coreos.com/v1alpha1
@@ -106,10 +85,17 @@ spec:
           value: "true"
 EOF
 
+# wait for install plan and pods to be created
+sleep 90
 
-# Wait for HCO cr to be created
-sleep 60
+# Wait for hco deployments to be ready
+oc wait deployments \
+  --selector="operators.coreos.com/community-kubevirt-hyperconverged.kubevirt-hyperconverged" \
+  --namespace=kubevirt-hyperconverged \
+  --for=condition=Available \
+  --timeout=10m
 
+# Wait for HCO CR to be created
 export hco_cr_is_created="false"
 
 for i in {1..20}
@@ -124,61 +110,30 @@ do
 done
 
 if [[ "$hco_cr_is_created" == "false" ]]; then
-  echo "Error: HCO cr didn't get created!!"
-  pause_for_debug
+  echo "Error: HCO CR didn't get created!!"
   exit 1
 fi
 
-# Wait for kubevirt virt-operator to be available
-sleep 60
-
-export virt_operator_is_available="false"
-
-for i in {1..20}
-do
-  echo "Attempt ${i}/20"
-  if oc -n kubevirt-hyperconverged wait deployment/virt-operator --for=condition=Available --timeout="10m"; then
-    echo "virt-operator is Available"
-    export virt_operator_is_available="true"
-    break
-  fi
-  sleep 30
-done
-
-if [[ "$virt_operator_is_available" == "false" ]]; then
-  echo "Error: virt-operator is not available!!"
-  pause_for_debug
-  exit 1
-fi
+# Wait for HCO to report it is available
+oc wait -n kubevirt-hyperconverged hyperconverged kubevirt-hyperconverged  \
+  --for=condition=Available \
+  --timeout=15m
 
 # ----------------------------------------------------------------------------------------------------
 # Create storage class and storage namespace for testing
 # Install HPP
 
-# Configure SELinux when using OpenShift to allow HPP to create storage on workers
-oc create -f \
-  https://raw.githubusercontent.com/kubevirt/hostpath-provisioner-operator/${HPP_VERSION}/contrib/machineconfig-selinux-hpp.yaml
-
-wait_mcp_for_updated
-
+# Deploy HPP CR
 oc create -f \
   https://raw.githubusercontent.com/kubevirt/hostpath-provisioner-operator/${HPP_VERSION}/deploy/hostpathprovisioner_cr.yaml
 
-tee <<EOF | oc apply -f -
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: hostpath-provisioner
-provisioner: kubevirt.io.hostpath-provisioner
-reclaimPolicy: Delete
-volumeBindingMode: WaitForFirstConsumer
-parameters:
-  storagePool: local
-EOF
+# Create HPP StorageClass
+oc create -f \
+  https://raw.githubusercontent.com/kubevirt/hostpath-provisioner-operator/${HPP_VERSION}/deploy/storageclass-wffc-csi.yaml
 
 # Set HPP as default StorageClass for the cluster
 oc annotate storageclasses --all storageclass.kubernetes.io/is-default-class-
-oc annotate storageclass hostpath-provisioner storageclass.kubernetes.io/is-default-class='true'
+oc annotate storageclass hostpath-csi storageclass.kubernetes.io/is-default-class='true'
 
 # ----------------------------------------------------------------------------------------------------
 # Download virtctl tool if needed
