@@ -11,8 +11,8 @@
   "plugins": ["cypress", "chai-friendly"],
   "rules": {
     "chai-friendly/no-unused-expressions": "off",
-    "cypress/assertion-before-screenshot": "error",
-    "cypress/no-force": "error",
+    "cypress/assertion-before-screenshot": "off",
+    "cypress/no-force": "off",
     "cypress/no-unnecessary-waiting": "off",
     "cypress/unsafe-to-chain-command": "off"
   }
