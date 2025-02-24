@@ -26,3 +26,18 @@ export type VncConsoleProps = HTMLProps<HTMLDivElement> & {
   viewOnly?: boolean;
   vmi: V1VirtualMachineInstance;
 };
+
+// noVNC provides no type definitions
+// list properties used by our UI
+export type RFB = {
+  _rfbConnectionState: string;
+  _sock: { on: (name: string, callback: (args: { code?: number }) => void) => void };
+  _socketClose: () => void;
+  _viewOnly: boolean;
+  addEventListener: (name: string, callback: () => void) => void;
+  disconnect: () => void;
+  scaleViewport: boolean;
+  sendCtrlAltDel: () => void;
+  sendKey: (keysym: number, code: string, down: boolean) => void;
+  viewOnly: boolean;
+};
