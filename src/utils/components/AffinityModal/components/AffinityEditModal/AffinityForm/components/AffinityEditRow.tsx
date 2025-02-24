@@ -1,14 +1,14 @@
-import React, { FC, useState } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Operator } from '@openshift-console/dynamic-plugin-sdk-internal/lib/api/common-types';
 import { Button, ButtonVariant, GridItem, TextInput } from '@patternfly/react-core';
-import { Select, SelectOption, SelectVariant } from '@patternfly/react-core/deprecated';
 import { MinusCircleIcon } from '@patternfly/react-icons';
+import { SimpleSelect } from '@patternfly/react-templates';
 
 import { AffinityLabel } from '../../../../utils/types';
 
-import './affinity-edit-row.scss';
+import { AffinityEditRowValues } from './AffinityEditRowValues';
 
 type AffinityExpressionRowProps = {
   expression: AffinityLabel;
@@ -26,12 +26,9 @@ const AffinityExpressionRow: FC<AffinityExpressionRowProps> = ({
   const { t } = useKubevirtTranslation();
   const { id, key, operator, values = [] } = expression;
   const enableValueField = operator !== Operator.Exists && operator !== Operator.DoesNotExist;
-  const [isOperatorExpended, setIsOperatorExpended] = useState(false);
-  const [isValuesExpanded, setIsValuesExpanded] = useState(false);
 
   const onSelectOperator = (event, selection) => {
     onChange({ ...expression, operator: selection });
-    setIsOperatorExpended(false);
   };
 
   const onSelectValues = (event, selection) => {
@@ -42,6 +39,7 @@ const AffinityExpressionRow: FC<AffinityExpressionRowProps> = ({
       onChange({ ...expression, values: [...values, selection] });
     }
   };
+
   return (
     <>
       <GridItem span={4}>
@@ -55,41 +53,26 @@ const AffinityExpressionRow: FC<AffinityExpressionRowProps> = ({
         />
       </GridItem>
       <GridItem span={2}>
-        <Select
-          id={`${rowID}-${id}-effect-select`}
-          isOpen={isOperatorExpended}
-          menuAppendTo="parent"
-          onSelect={onSelectOperator}
-          onToggle={(_, isExpanded) => setIsOperatorExpended(isExpanded)}
-          selections={operator}
-          value={operator}
-        >
-          {[Operator.Exists, Operator.DoesNotExist, Operator.In, Operator.NotIn].map(
-            (operatorOption) => (
-              <SelectOption key={operatorOption} value={operatorOption} />
-            ),
+        <SimpleSelect
+          initialOptions={[Operator.Exists, Operator.DoesNotExist, Operator.In, Operator.NotIn].map(
+            (operatorOption) => ({
+              content: operatorOption,
+              selected: operatorOption === operator,
+              value: operatorOption,
+            }),
           )}
-        </Select>
+          id={`${rowID}-${id}-effect-select`}
+          onSelect={onSelectOperator}
+        />
       </GridItem>
       <GridItem span={5}>
-        <Select
-          className="affinity-edit-row__values-chips"
-          isCreatable
-          isDisabled={!enableValueField}
-          isOpen={isValuesExpanded}
-          menuAppendTo="parent"
-          onClear={() => onChange({ ...expression, values: [] })}
-          onSelect={onSelectValues}
-          onToggle={(_, isExpanded) => setIsValuesExpanded(isExpanded)}
-          placeholderText={enableValueField ? t('Enter value') : ''}
-          selections={enableValueField ? values : []}
-          typeAheadAriaLabel={t('Enter value')}
-          variant={SelectVariant.typeaheadMulti}
-        >
-          {values?.map((option) => (
-            <SelectOption isDisabled={false} key={option} value={option} />
-          ))}
-        </Select>
+        {enableValueField && (
+          <AffinityEditRowValues
+            onClear={() => onChange({ ...expression, values: [] })}
+            onSelect={onSelectValues}
+            values={values}
+          />
+        )}
       </GridItem>
       <GridItem span={1}>
         <Button
