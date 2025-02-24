@@ -16,10 +16,10 @@ import {
 } from './utils/constants';
 
 const GuidedTour: FC = () => {
+  useSignals();
   const location = useLocation();
   const navigate = useNavigate();
 
-  useSignals();
   return (
     <Joyride
       callback={(callbackProps: CallBackProps) => {
