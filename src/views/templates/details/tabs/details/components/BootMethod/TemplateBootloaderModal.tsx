@@ -2,7 +2,10 @@ import React, { FC, MouseEvent, useMemo, useState } from 'react';
 import produce from 'immer';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { bootloaderOptions } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/constants';
+import {
+  bootloaderOptions,
+  BootModeTitles,
+} from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/constants';
 import { BootloaderOptionValue } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/types';
 import {
   getBootloaderFromVM,
@@ -55,7 +58,12 @@ const TemplateBootloaderModal: FC<TemplateBootloaderModalProps> = ({
     >
       <Form>
         <FormGroup fieldId="template-firmware-bootloader" label={t('Boot mode')}>
-          <FormPFSelect onSelect={handleChange} selected={selectedFirmwareBootloader}>
+          <FormPFSelect
+            onSelect={handleChange}
+            selected={selectedFirmwareBootloader}
+            selectedLabel={BootModeTitles[selectedFirmwareBootloader]}
+            toggleProps={{ isFullWidth: true }}
+          >
             {bootloaderOptions.map(({ description, title, value }) => (
               <SelectOption description={description} key={value} value={value}>
                 {title}
