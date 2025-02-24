@@ -10,13 +10,12 @@ health_check () {
   echo "Health checklist before console test."
 
   #1 - download image from artifactory server
-  # curl ${CYPRESS_CIRROS_IMAGE} -u${CYPRESS_ARTIFACTORY_USER}:${CYPRESS_ARTIFACTORY_TOKEN} -kL -o ${CYPRESS_LOCAL_IMAGE}
+  curl ${CYPRESS_CIRROS_IMAGE} -u${CYPRESS_ARTIFACTORY_USER}:${CYPRESS_ARTIFACTORY_TOKEN} -kL -o ${CYPRESS_LOCAL_IMAGE}
 
   #2 - pvc upload is working
-  # virtctl image-upload -n default pvc auto-test-pvc --size=1Gi --image-path=${CYPRESS_LOCAL_IMAGE} --insecure --force-bind
+  virtctl image-upload -n default pvc auto-test-pvc --size=1Gi --image-path=${CYPRESS_LOCAL_IMAGE} --insecure --force-bind
 
   #3 - create VM from CLI to verify the webhook
-  oc delete -f cypress/fixtures/vm.yaml --ignore-not-found=true
   oc create -f cypress/fixtures/vm.yaml
   oc wait --for=condition=ready vm/rhel-10-vm --timeout=360s
   oc delete -f cypress/fixtures/vm.yaml
