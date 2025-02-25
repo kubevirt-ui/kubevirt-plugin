@@ -44,7 +44,7 @@ const CheckupsStorageForm = () => {
               />
             </FormGroup>
             <FormGroup
-              labelIcon={
+              labelHelp={
                 <Popover
                   bodyContent={t('How much time before the check will try to close itself')}
                   position={PopoverPosition.right}

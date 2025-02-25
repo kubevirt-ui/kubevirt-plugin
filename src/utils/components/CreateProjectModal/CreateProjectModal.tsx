@@ -62,7 +62,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
       <br />
       <Form>
         <FormGroup
-          labelIcon={
+          labelHelp={
             <Popover
               bodyContent={
                 <Trans ns="plugin__kubevirt-plugin" t={t}>
