@@ -8,13 +8,7 @@ import {
   updateVMCustomizeIT,
   vmSignal,
 } from '@kubevirt-utils/store/customizeInstanceType';
-import {
-  DescriptionList,
-  Divider,
-  PageSection,
-  PageSectionVariants,
-  Title,
-} from '@patternfly/react-core';
+import { DescriptionList, Divider, PageSection, Title } from '@patternfly/react-core';
 import InitialRunTabCloudinit from '@virtualmachines/details/tabs/configuration/initialrun/components/InitialRunTabCloudinit';
 import InitialRunTabSysprep from '@virtualmachines/details/tabs/configuration/initialrun/components/InitialRunTabSysprep';
 
@@ -27,7 +21,7 @@ const CustomizeInstanceTypeInitialRunTab = () => {
   }
 
   return (
-    <PageSection variant={PageSectionVariants.light}>
+    <PageSection>
       <Title headingLevel="h2">
         <SearchItem id="initial-run">{t('Initial run')}</SearchItem>
       </Title>
