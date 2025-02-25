@@ -39,9 +39,7 @@ export const AnnotationsModalRow: FC<{
         />
       </GridItem>
       <GridItem span={2}>
-        <Button onClick={() => onDelete()} variant="plain">
-          <MinusCircleIcon />
-        </Button>
+        <Button icon={<MinusCircleIcon />} onClick={() => onDelete()} variant="plain" />
       </GridItem>
     </>
   );

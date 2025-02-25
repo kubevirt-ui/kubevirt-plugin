@@ -74,9 +74,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
                 </Trans>
               }
             >
-              <Button variant={ButtonVariant.plain}>
-                <HelpIcon />
-              </Button>
+              <Button icon={<HelpIcon />} variant={ButtonVariant.plain} />
             </Popover>
           }
           fieldId="project-name"

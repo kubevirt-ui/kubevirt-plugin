@@ -84,11 +84,12 @@ const EnvironmentForm: FC<EnvironmentFormProps> = ({ onEditChange, updateVM, vm 
           <div className="col-xs-12">
             <Button
               className="pf-m-link--align-left"
+              icon={<PlusCircleIcon />}
               onClick={onEnvironmentAdd}
               type="button"
               variant="link"
             >
-              <PlusCircleIcon /> {t('Add Config Map, Secret or Service Account')}
+              {t('Add Config Map, Secret or Service Account')}
             </Button>
           </div>
         </div>

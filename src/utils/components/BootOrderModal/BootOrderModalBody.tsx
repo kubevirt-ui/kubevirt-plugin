@@ -117,12 +117,11 @@ export const BootOrderModalBody: React.FC<{
                                   {index !== devices.length - 1 && (
                                     <Button
                                       className="kubevirt-boot-order__delete-btn"
+                                      icon={<MinusCircleIcon />}
                                       id={`${value.name}-delete-btn`}
                                       onClick={() => onDelete(value.name)}
                                       variant="link"
-                                    >
-                                      <MinusCircleIcon />
-                                    </Button>
+                                    />
                                   )}
                                 </SplitItem>
                               </Split>

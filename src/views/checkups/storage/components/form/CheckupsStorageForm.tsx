@@ -49,9 +49,7 @@ const CheckupsStorageForm = () => {
                   bodyContent={t('How much time before the check will try to close itself')}
                   position={PopoverPosition.right}
                 >
-                  <Button variant={ButtonVariant.plain}>
-                    <HelpIcon />
-                  </Button>
+                  <Button icon={<HelpIcon />} variant={ButtonVariant.plain} />
                 </Popover>
               }
               fieldId="timeout"

@@ -39,11 +39,10 @@ const SysprepUnattendHelperPopup: FC = () => {
         aria-label={t('Help')}
         className="co-field-level-help"
         data-test-id="ssh-popover-button"
+        icon={<OutlinedQuestionCircleIcon className="co-field-level-help__icon" />}
         isInline
         variant="link"
-      >
-        <OutlinedQuestionCircleIcon className="co-field-level-help__icon" />
-      </Button>
+      />
     </Popover>
   );
 };
