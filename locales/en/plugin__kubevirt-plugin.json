@@ -80,6 +80,7 @@
   "Active users": "Active users",
   "Active users ({{users}})": "Active users ({{users}})",
   "Activity": "Activity",
+  "Add": "Add",
   "Add a NetworkAttachmentDefinition to this namespace in order to use checkups": "Add a NetworkAttachmentDefinition to this namespace in order to use checkups",
   "Add a new bootable volume to the cluster.": "Add a new bootable volume to the cluster.",
   "Add a snapshot available on the cluster to the VirtualMachine.": "Add a snapshot available on the cluster to the VirtualMachine.",
