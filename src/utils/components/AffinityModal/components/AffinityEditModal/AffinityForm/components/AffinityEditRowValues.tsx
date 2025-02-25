@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -12,18 +12,20 @@ import {
 } from '@patternfly/react-core';
 
 type AffinityEditRowValuesProps = {
+  isHidden?: boolean;
   onClear?: () => void;
   onSelect?: (event, selection) => void;
   values: string[];
 };
 
-export const AffinityEditRowValues: React.FC<AffinityEditRowValuesProps> = ({
+export const AffinityEditRowValues: FC<AffinityEditRowValuesProps> = ({
+  isHidden,
   onClear,
   onSelect,
   values,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [inputValue, setInputValue] = React.useState('');
+  const [inputValue, setInputValue] = useState('');
 
   const onClose = (value: string) => {
     onSelect(null, value);
@@ -37,9 +39,12 @@ export const AffinityEditRowValues: React.FC<AffinityEditRowValuesProps> = ({
   const addingIsDisabled =
     !inputValue || values.some((val) => val.toLowerCase() === inputValue.toLowerCase());
 
-  return (
+  const textInputPlaceholder = t('Enter value');
+  const labelsToShowCount = Number.MAX_VALUE; // always show all labels
+
+  return isHidden ? null : (
     <Stack hasGutter>
-      <LabelGroup isClosable numLabels={999} onClick={onClear}>
+      <LabelGroup isClosable numLabels={labelsToShowCount} onClick={onClear}>
         {values.map((value) => (
           <Label id={value} key={value} onClose={() => onClose(value)} variant="outline">
             {value}
@@ -55,16 +60,16 @@ export const AffinityEditRowValues: React.FC<AffinityEditRowValuesProps> = ({
                 onAdd();
               }
             }}
-            aria-label={t('Enter value')}
+            aria-label={textInputPlaceholder}
             onChange={(_event, value) => setInputValue(value)}
-            placeholder={t('Enter value')}
+            placeholder={textInputPlaceholder}
             type="text"
             value={inputValue}
           />
         </InputGroupItem>
         <InputGroupItem>
           <Button isDisabled={addingIsDisabled} onClick={onAdd} variant="control">
-            Add
+            {t('Add')}
           </Button>
         </InputGroupItem>
       </InputGroup>

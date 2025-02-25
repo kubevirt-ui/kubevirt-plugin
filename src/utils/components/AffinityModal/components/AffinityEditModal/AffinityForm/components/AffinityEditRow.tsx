@@ -66,13 +66,12 @@ const AffinityExpressionRow: FC<AffinityExpressionRowProps> = ({
         />
       </GridItem>
       <GridItem span={5}>
-        {enableValueField && (
-          <AffinityEditRowValues
-            onClear={() => onChange({ ...expression, values: [] })}
-            onSelect={onSelectValues}
-            values={values}
-          />
-        )}
+        <AffinityEditRowValues
+          isHidden={!enableValueField}
+          onClear={() => onChange({ ...expression, values: [] })}
+          onSelect={onSelectValues}
+          values={values}
+        />
       </GridItem>
       <GridItem span={1}>
         <Button
