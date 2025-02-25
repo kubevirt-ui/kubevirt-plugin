@@ -8,7 +8,6 @@ import {
   EmptyStateActions,
   EmptyStateBody,
   EmptyStateFooter,
-  EmptyStateHeader,
 } from '@patternfly/react-core';
 
 export const WizardEmptyState: React.FC<{ namespace: string }> = ({ namespace }) => {
@@ -16,8 +15,7 @@ export const WizardEmptyState: React.FC<{ namespace: string }> = ({ namespace })
   const navigate = useNavigate();
 
   return (
-    <EmptyState>
-      <EmptyStateHeader headingLevel="h4" titleText={<>{t('No Template found')}</>} />
+    <EmptyState headingLevel="h4" titleText={<>{t('No Template found')}</>}>
       <EmptyStateBody>
         {t('No Template was selected for review, please go to the catalog and select one.')}
       </EmptyStateBody>
