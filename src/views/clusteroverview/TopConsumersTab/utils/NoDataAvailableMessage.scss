@@ -1,13 +1,13 @@
 .kv-top-consumers-card__chart-list-no-data-msg {
-  padding: var(--pf-v5-global--spacer--md);
+  padding: var(--pf-t--global--spacer--md);
 }
 
 .kv-top-consumers-card__chart-list-no-data-msg--link {
-  margin-top: var(--pf-v5-global--spacer--sm);
+  margin-top: var(--pf-t--global--spacer--sm);
 }
 
 .kv-top-consumers-card__chart-list-no-data-msg--icon {
-  margin-left: var(--pf-v5-global--spacer--xs);
+  margin-left: var(--pf-t--global--spacer--xs);
   opacity: 0.5;
   cursor: pointer;
 }

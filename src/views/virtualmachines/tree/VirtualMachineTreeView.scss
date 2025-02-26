@@ -1,7 +1,7 @@
 .vms-tree-view {
   overflow-x: hidden;
 
-  .pf-v5-c-tree-view__list-item {
+  .pf-v6-c-tree-view__list-item {
     position: relative;
   }
 
@@ -24,16 +24,16 @@
 
   &__search-input {
     width: 100%;
-    margin: var(--pf-v5-global--spacer--md) var(--pf-v5-global--spacer--sm) 0
-      var(--pf-v5-global--spacer--sm);
+    margin: var(--pf-t--global--spacer--md) var(--pf-t--global--spacer--sm) 0
+      var(--pf-t--global--spacer--sm);
   }
 
   &__action {
-    padding: var(--pf-v5-global--spacer--sm);
+    padding: var(--pf-t--global--spacer--sm);
   }
 
   &__header-section {
-    margin: var(--pf-v5-global--spacer--sm) 0;
+    margin: var(--pf-t--global--spacer--sm) 0;
   }
 
   &__title {
@@ -41,8 +41,8 @@
   }
 
   &__expand {
-    padding: 0 var(--pf-v5-global--spacer--xs) 0 var(--pf-v5-global--spacer--xs);
-    margin-right: calc(var(--pf-v5-global--spacer--xs) * 2.5);
+    padding: 0 var(--pf-t--global--spacer--xs) 0 var(--pf-t--global--spacer--xs);
+    margin-right: calc(var(--pf-t--global--spacer--xs) * 2.5);
   }
 
   &__close-container {
@@ -53,46 +53,46 @@
   &__close-button {
     padding-top: 0;
     padding-left: 0;
-    padding-right: var(--pf-v5-global--spacer--xs);
-    padding-bottom: calc(var(--pf-v5-global--spacer--xs) * 1.5);
+    padding-right: var(--pf-t--global--spacer--xs);
+    padding-bottom: calc(var(--pf-t--global--spacer--xs) * 1.5);
   }
 
   &__toolbar-switch {
-    margin-right: var(--pf-v5-global--spacer--sm);
+    margin-right: var(--pf-t--global--spacer--sm);
     margin-bottom: 0;
   }
 }
 
-.pf-v5-c-drawer__body.vms-tree-view-body {
+.pf-v6-c-drawer__body.vms-tree-view-body {
   padding: 0;
 }
 
-.pf-v5-c-drawer__panel-main {
-  .pf-v5-c-drawer__body {
-    padding: 0 var(--pf-v5-global--spacer--sm);
+.pf-v6-c-drawer__panel-main {
+  .pf-v6-c-drawer__body {
+    padding: 0 var(--pf-t--global--spacer--sm);
     height: fit-content;
   }
 }
-.pf-v5-c-toolbar__content.vms-tree-view-toolbar-content {
+.pf-v6-c-toolbar__content.vms-tree-view-toolbar-content {
   width: 100%;
   padding: 0;
 }
 
-.pf-v5-c-toolbar.vms-tree-view-toolbar {
-  margin-bottom: var(--pf-v5-global--spacer--sm);
+.pf-v6-c-toolbar.vms-tree-view-toolbar {
+  margin-bottom: var(--pf-t--global--spacer--sm);
   padding: 0;
 }
-.pf-v5-c-tree-view__node .pf-v5-c-tree-view__node-count {
+.pf-v6-c-tree-view__node .pf-v6-c-tree-view__node-count {
   display: flex;
   flex-grow: 1;
   flex-direction: row-reverse;
 }
 
-.pf-v5-c-tree-view {
+.pf-v6-c-tree-view {
   padding: 0;
-  --pf-v5-c-tree-view__node--indent--base: 2rem;
-  --pf-v5-c-tree-view__node--nested-indent--base: 0.75rem;
-  --pf-v5-c-tree-view__node--PaddingTop--base: 0.25rem;
-  --pf-v5-c-tree-view__node-icon--PaddingRight: 0.25rem;
-  --pf-v5-c-tree-view__node--PaddingBottom: 0.25rem;
+  --pf-v6-c-tree-view__node--indent--base: 2rem;
+  --pf-v6-c-tree-view__node--nested-indent--base: 0.75rem;
+  --pf-v6-c-tree-view__node--PaddingBlockStart: 0.25rem;
+  --pf-v6-c-tree-view__node-icon--PaddingInlineEnd: 0.25rem;
+  --pf-v6-c-tree-view__node--PaddingBlockEnd: 0.25rem;
 }

@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { Title } from '@patternfly/react-core';
 
 import MigrationPoliciesActions from '../../../actions/components/MigrationPoliciesActions';
 import MigrationPolicyBreadcrumb from '../MigrationPolicyBreadcrumb/MigrationPolicyBreadcrumb';
@@ -18,10 +19,10 @@ const VirtualMachineNavPageTitle: React.FC<VirtualMachineNavPageTitleProps> = ({
     <div className="kv-resource-details-header-container">
       <MigrationPolicyBreadcrumb />
       <span className="kv-resource-details-header">
-        <h1>
+        <Title headingLevel="h1">
           <span className="kv-resource-icon">{t('MP')}</span>
           {mp?.metadata?.name}
-        </h1>
+        </Title>
         <MigrationPoliciesActions mp={mp} />
       </span>
     </div>

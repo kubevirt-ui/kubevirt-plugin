@@ -21,7 +21,7 @@ const VMsPerResourceCard = () => {
   };
 
   return (
-    <Card className="vms-per-resource-card__gradient" data-test-id="vms-per-template-card">
+    <Card data-test-id="vms-per-template-card">
       <CardHeader
         actions={{
           actions: (

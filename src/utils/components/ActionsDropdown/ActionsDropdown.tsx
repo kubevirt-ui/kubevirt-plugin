@@ -71,7 +71,7 @@ const ActionsDropdown: FC<ActionsDropdownProps> = ({
         popper={
           <Menu containsFlyout ref={menuRef}>
             <MenuContent>
-              <MenuList>
+              <MenuList style={{ minWidth: 'max-content' }}>
                 {actions?.map((action) => (
                   <ActionDropdownItem action={action} key={action?.id} setIsOpen={setIsOpen} />
                 ))}

@@ -57,7 +57,7 @@ const CheckupsStorageDetailsPageSection: FC<CheckupsStorageDetailsPageSectionPro
       </Title>
       <Grid>
         <GridItem span={6}>
-          <DescriptionList className="pf-v5-c-description-list">
+          <DescriptionList className="pf-v6-c-description-list">
             <VirtualMachineDescriptionItem
               descriptionData={configMap?.metadata?.name}
               descriptionHeader={t('Name')}
@@ -122,7 +122,7 @@ const CheckupsStorageDetailsPageSection: FC<CheckupsStorageDetailsPageSectionPro
           </DescriptionList>
         </GridItem>
         <GridItem span={6}>
-          <DescriptionList className="pf-v5-c-description-list">
+          <DescriptionList className="pf-v6-c-description-list">
             <VirtualMachineDescriptionItem
               descriptionData={
                 <ResourceLink

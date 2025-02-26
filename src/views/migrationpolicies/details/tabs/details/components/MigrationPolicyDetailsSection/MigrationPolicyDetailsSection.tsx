@@ -14,7 +14,6 @@ import {
   DescriptionListDescription,
   DescriptionListTerm,
   DescriptionListTermHelpTextButton,
-  Flex,
   Grid,
   GridItem,
   Icon,
@@ -62,7 +61,7 @@ const MigrationPolicyDetailsSection: FC<MigrationPolicyDetailsSectionProps> = ({
       </Title>
       <Grid hasGutter>
         <GridItem span={5}>
-          <DescriptionList className="pf-v5-c-description-list">
+          <DescriptionList className="pf-v6-c-description-list">
             <VirtualMachineDescriptionItem
               bodyContent={t(
                 'Name must be unique within a namespace. Is required when creating resources, although some resources may allow a client to request the generation of an appropriate name automatically. Name is primarily intended for creation idempotence and configuration definition. ',
@@ -85,18 +84,18 @@ const MigrationPolicyDetailsSection: FC<MigrationPolicyDetailsSectionProps> = ({
                       <MigrationPolicyEditModal isOpen={isOpen} mp={mp} onClose={onClose} />
                     ))
                   }
+                  icon={<PencilAltIcon />}
+                  iconPosition="end"
                   isInline
+                  size="lg"
                   variant={ButtonVariant.link}
                 >
-                  <Flex spaceItems={{ default: 'spaceItemsNone' }}>
-                    <Title headingLevel="h2">{t('Configurations')}</Title>
-                    <PencilAltIcon className="kv-icon-space-l pf-v5-c-button-icon--plain" />
-                  </Flex>
+                  <Title headingLevel="h2">{t('Configurations')}</Title>
                 </Button>
               </DescriptionListTerm>
 
               <DescriptionListDescription>
-                <DescriptionList className="pf-v5-c-description-list">
+                <DescriptionList className="pf-v6-c-description-list">
                   <VirtualMachineDescriptionItem
                     bodyContent={t(
                       'BandwidthPerMigration limits the amount of network bandwith live migrations are allowed to use. The value is in quantity per second. Defaults to 0 (no limit). ',

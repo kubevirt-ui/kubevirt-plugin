@@ -101,7 +101,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
       </Title>
       <Grid>
         <GridItem span={5}>
-          <DescriptionList className="pf-v5-c-description-list">
+          <DescriptionList className="pf-v6-c-description-list">
             <VirtualMachineDescriptionItem
               descriptionData={
                 getAnnotation(vm, DESCRIPTION_ANNOTATION) || <MutedTextSpan text={t('None')} />
@@ -279,7 +279,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
           </DescriptionList>
         </GridItem>
         <GridItem span={5}>
-          <DescriptionList className="pf-v5-c-description-list">
+          <DescriptionList className="pf-v6-c-description-list">
             <DetailsSectionHardware vm={vm} vmi={vmi} />
             <DetailsSectionBoot
               canUpdateVM={canUpdateVM}

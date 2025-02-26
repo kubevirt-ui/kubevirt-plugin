@@ -100,7 +100,7 @@ const UserPreferenceList: FC<ListPageProps> = ({
       </div>
       <VirtualizedTable<V1beta1VirtualMachinePreference>
         EmptyMsg={() => (
-          <div className="pf-v5-u-text-align-center" id="no-preference-msg">
+          <div className="pf-v6-u-text-align-center" id="no-preference-msg">
             {t('No preferences found')}
           </div>
         )}

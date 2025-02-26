@@ -36,7 +36,7 @@ const WizardScriptsTab: WizardTab = ({ tabsData, updateVM, vm }) => {
         resource={vm}
       >
         <DescriptionList
-          className={classnames('pf-v5-c-description-list', 'wizard-scripts-tab__description-list')}
+          className={classnames('pf-v6-c-description-list', 'wizard-scripts-tab__description-list')}
         >
           <DescriptionListDescription>
             <AlertScripts />

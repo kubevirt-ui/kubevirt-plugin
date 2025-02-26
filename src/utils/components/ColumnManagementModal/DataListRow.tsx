@@ -28,7 +28,7 @@ const DataListRow: FC<DataListRowProps> = ({
 }) => (
   <DataListItem
     aria-labelledby={`table-column-management-item-${column.id}`}
-    className="data-list-row-item pf-v5-c-data-list__item--transparent-bg"
+    className="data-list-row-item pf-v6-c-data-list__item--transparent-bg"
     key={column.id}
   >
     <DataListItemRow>

@@ -1,65 +1,63 @@
 .instance-type-series-menu-card {
-  &__toggle-container {
-    margin: var(--pf-v5-global--spacer--lg) 0 0;
-    border: 2px solid var(--pf-v5-global--BorderColor--300);
-    flex-basis: 15%;
-    padding: 0;
+  &__toggle-card {
+    flex: 1 1 0;
+    max-width: min(20%, 320px);
+    min-height: 200px;
+    min-width: 160px;
+    text-align: center;
+    margin-top: var(--pf-t--global--spacer--lg);
+
+    &:hover::before {
+      border-color: var(--pf-t--global--border--color--hover);
+    }
     &:hover {
-      box-shadow: var(--pf-v5-global--BoxShadow--md);
+      cursor: pointer;
     }
   }
 
-  &__toggle-card {
-    min-height: 200px;
-    box-shadow: none;
-    color: var(--pf-v5-global--Color--100);
-  }
-
   &__card-icon {
-    font-size: var(--pf-v5-global--FontSize--3xl);
-    margin-top: var(--pf-v5-global--spacer--sm);
+    font-size: var(--pf-t--global--font--size--3xl);
+    padding-top: var(--pf-t--global--spacer--md);
   }
 
   &__card-title,
   &__card-toggle-text,
   &__card-footer {
-    font-size: var(--pf-v5-global--FontSize--lg);
+    font-size: var(--pf-t--global--font--size--lg);
   }
 
   &__card-footer {
-    margin-top: var(--pf-v5-global--spacer--sm);
+    margin-top: var(--pf-t--global--spacer--sm);
   }
 
   &__card-title {
-    margin: var(--pf-v5-global--spacer--sm) 0;
+    margin: var(--pf-t--global--spacer--sm) 0;
   }
 
   &__card-toggle-text {
-    color: var(--pf-v5-global--link--Color);
+    color: var(--pf-t--global--text--color--link--default);
   }
 }
 
 .selected {
-  font-weight: var(--pf-v5-global--FontWeight--bold);
-  box-shadow: var(--pf-v5-global--BoxShadow--md);
-  border-bottom: calc(var(--pf-v5-global--BorderWidth--xl) * 2) solid
-    var(--pf-v5-global--link--Color);
+  font-weight: var(--pf-t--global--font--weight--heading--bold);
+
+  &::before {
+    border: var(--pf-t--global--border--width--box--clicked) solid
+      var(--pf-t--global--border--color--clicked);
+  }
 }
 
 @media screen and (min-width: 1200px) and (max-width: 1440px) {
   .instance-type-series-menu-card {
     &__card-icon {
-      font-size: var(--pf-v5-global--FontSize--xl);
+      font-size: var(--pf-t--global--font--size--xl);
     }
 
     &__card-title,
     &__card-toggle-text,
     &__card-footer {
-      font-size: var(--pf-v5-global--FontSize--md);
-    }
-
-    &__toggle-card {
-      min-height: 295px;
+      font-size: var(--pf-t--global--font--size--md);
     }
 
     &__card-title {
@@ -71,17 +69,13 @@
 @media screen and (max-width: 1200px) {
   .instance-type-series-menu-card {
     &__card-icon {
-      font-size: var(--pf-v5-global--FontSize--lg);
+      font-size: var(--pf-t--global--font--size--lg);
     }
 
     &__card-title,
     &__card-toggle-text,
     &__card-footer {
-      font-size: var(--pf-v5-global--FontSize--sm);
-    }
-
-    &__toggle-card {
-      min-height: 265px;
+      font-size: var(--pf-t--global--font--size--sm);
     }
 
     &__card-title {

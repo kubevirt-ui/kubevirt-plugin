@@ -38,14 +38,14 @@ const UploadPVCPopoverUploadStatus: React.FC<UploadPVCPopoverUploadStatusProps> 
       case UPLOAD_STATUS.ERROR:
         return {
           body: error?.message,
-          icon: <ErrorCircleOIcon className="co-icon-and-text__icon" color={dangerColor?.value} />,
+          icon: <ErrorCircleOIcon className="co-icon-and-text__icon" color={dangerColor?.var} />,
           title: t('Upload error'),
         };
       case UPLOAD_STATUS.CANCELED:
         return {
           body: error ? error?.message : t('Removing Resources'),
           icon: (
-            <BanIcon className="co-icon-and-text__icon" color={error ? dangerColor?.value : ''} />
+            <BanIcon className="co-icon-and-text__icon" color={error ? dangerColor?.var : ''} />
           ),
           title: error ? t('Cancel error') : t('Upload canceled'),
         };

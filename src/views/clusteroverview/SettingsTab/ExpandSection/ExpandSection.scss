@@ -1,9 +1,20 @@
-.expand-section__disabled .pf-v5-c-expandable-section__toggle-icon {
-  color: var(--pf-v5-global--disabled-color--100);
+.expand-section__disabled {
+  button {
+    cursor: unset;
+    background-color: inherit;
+  }
+
+  .pf-v6-c-expandable-section__toggle-icon {
+    color: var(--pf-t--global--icon--color--disabled);
+  }
+
+  .pf-v6-c-button__text {
+    color: var(--pf-t--global--text--color--disabled);
+  }
 }
 
 .ExpandSection {
-  .pf-v5-c-expandable-section__content {
-    padding-left: var(--pf-v5-c-expandable-section--m-display-lg__content--PaddingLeft) !important;
+  .pf-v6-c-expandable-section__content {
+    padding-left: var(--pf-v6-c-expandable-section--m-display-lg--PaddingInlineStart) !important;
   }
 }

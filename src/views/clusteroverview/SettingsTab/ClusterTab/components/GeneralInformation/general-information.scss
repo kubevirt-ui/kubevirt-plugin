@@ -1,10 +1,10 @@
 .general-tab {
-  border: 1px solid var(--pf-v5-global--BackgroundColor--200);
-  padding: var(--pf-v5-global--spacer--md) var(--pf-v5-global--spacer--2xl);
-  --pf-v5-l-stack--m-gutter--Gap: var(--pf-v5-global--spacer--2xl);
-  margin-bottom: var(--pf-v5-global--spacer--xl);
+  border: 1px solid var(--pf-t--global--border--color--default);
+  padding: var(--pf-t--global--spacer--md) var(--pf-t--global--spacer--2xl);
+  --pf-v6-l-stack--m-gutter--Gap: var(--pf-t--global--spacer--2xl);
+  margin-bottom: var(--pf-t--global--spacer--xl);
 
   &__upgrade {
-    margin-top: var(--pf-v5-global--spacer--sm);
+    margin-top: var(--pf-t--global--spacer--sm);
   }
 }

@@ -42,7 +42,7 @@ const NetworkCharts: FC<NetworkChartsProps> = ({ vmi }) => {
       <FormPFSelect
         onSelect={(_, network: string) => setSelectedNetwork(network)}
         selected={selectedNetwork}
-        toggleProps={{ className: 'network ul.pf-v5-c-dropdown__menu' }}
+        toggleProps={{ className: 'network ul.pf-v6-c-dropdown__menu' }}
       >
         {interfacesNames?.map((nic) => (
           <SelectOption

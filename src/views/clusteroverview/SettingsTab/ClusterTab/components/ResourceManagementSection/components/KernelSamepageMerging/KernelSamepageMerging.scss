@@ -1,12 +1,12 @@
 .KernelSamepageMerging {
   &__HelpTextIcon {
     min-width: 473px;
-    .pf-v5-c-popover__content {
+    .pf-v6-c-popover__content {
       min-width: 465px;
     }
   }
 
   &__Alert {
-    margin-top: var(--pf-v5-global--spacer--md);
+    margin-top: var(--pf-t--global--spacer--md);
   }
 }

@@ -41,13 +41,12 @@ export const AffinityEditRowValues: FC<AffinityEditRowValuesProps> = ({
     !inputValue || values.some((val) => val.toLowerCase() === inputValue.toLowerCase());
 
   const textInputPlaceholder = t('Enter value');
-  const labelsToShowCount = Number.MAX_VALUE; // always show all labels
 
   if (isHidden) return null;
 
   return (
     <Stack hasGutter>
-      <LabelGroup isClosable numLabels={labelsToShowCount} onClick={onClear}>
+      <LabelGroup isClosable onClick={onClear}>
         {values.map((value) => (
           <Label id={value} key={value} onClose={() => onClose(value)} variant="outline">
             {value}

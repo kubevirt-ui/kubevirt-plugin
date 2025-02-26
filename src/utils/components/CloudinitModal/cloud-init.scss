@@ -1,5 +1,5 @@
 .kubevirt-create-vm-modal__cloud-init-help-link {
-  padding-left: var(--pf-v5-global--spacer--xs);
+  padding-left: var(--pf-t--global--spacer--xs);
 }
 
 .kv-cloudinit-advanced-tab--form,
@@ -7,18 +7,14 @@
   width: 50vh;
 }
 
-.kv-cloudint-advanced-tab--validation-text .pf-v5-c-form {
-  --pf-v5-c-form__helper-text--m-success--Color: var(--pf-v5-c-form__group-label-help--Color);
-}
-
 .kv-cloudinit-info-helper--main {
-  margin-bottom: var(--pf-v5-global--spacer--md);
+  margin-bottom: var(--pf-t--global--spacer--md);
 }
 
 .kv-cloudinit--radio {
   align-items: center;
 
-  .pf-v5-c-radio {
+  .pf-v6-c-radio {
     align-items: center;
 
     input[type='radio'] {
@@ -28,5 +24,5 @@
 }
 
 .kv-cloudinit--ssh-form {
-  margin-top: var(--pf-v5-global--spacer--md);
+  margin-top: var(--pf-t--global--spacer--md);
 }

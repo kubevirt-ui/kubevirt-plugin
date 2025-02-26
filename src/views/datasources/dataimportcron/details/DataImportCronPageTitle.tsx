@@ -24,8 +24,8 @@ const DataImportCronPageTitle: React.FC<DataImportCronPageTitleProps> = ({
 
   return (
     <>
-      <div className="pf-v5-c-page__main-breadcrumb">
-        <Breadcrumb className="pf-v5-c-breadcrumb co-breadcrumb">
+      <div className="pf-v6-c-page__main-breadcrumb">
+        <Breadcrumb className="pf-v6-c-breadcrumb co-breadcrumb">
           <BreadcrumbItem>
             <Link to={`/k8s/ns/${namespace || DEFAULT_NAMESPACE}/${DataImportCronModelRef}`}>
               {t('DataImportCrons')}

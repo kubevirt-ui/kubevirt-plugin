@@ -16,6 +16,7 @@ const PanelToggleButton: FC<PanelToggleButtonProps> = ({ className, isOpen, togg
     <Tooltip content={isOpen ? t('Close') : t('Open')}>
       <Button
         className={className}
+        hasNoPadding
         icon={isOpen ? <PanelCloseIcon /> : <PanelOpenIcon />}
         onClick={toggleDrawer}
         variant={ButtonVariant.plain}

@@ -16,14 +16,17 @@ import FirstItemListPopover from '../FirstItemListPopover/FirstItemListPopover';
 import VirtualMachineRowLayout from './VirtualMachineRowLayout';
 
 const VirtualMachineRunningRow: FC<
-  RowProps<
-    V1VirtualMachine,
-    {
-      isSingleNodeCluster: boolean;
-      status: ReactNode;
-      vmi: V1VirtualMachineInstance;
-      vmim: V1VirtualMachineInstanceMigration;
-    }
+  Omit<
+    RowProps<
+      V1VirtualMachine,
+      {
+        isSingleNodeCluster: boolean;
+        status: ReactNode;
+        vmi: V1VirtualMachineInstance;
+        vmim: V1VirtualMachineInstanceMigration;
+      }
+    >,
+    'index'
   >
 > = ({ activeColumnIDs, obj, rowData: { isSingleNodeCluster, status, vmi, vmim } }) => {
   const { t } = useKubevirtTranslation();
