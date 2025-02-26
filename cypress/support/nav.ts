@@ -15,6 +15,7 @@ declare global {
       visitITsVirt(): void;
       visitMPs(): void;
       visitMPsVirt(): void;
+      visitNAD(): void;
       visitOverview(): void;
       visitOverviewVirt(): void;
       visitPreferences(): void;
@@ -60,6 +61,14 @@ Cypress.Commands.add('visitVMsVirt', () => {
   cy.get(nav.vmNav, { timeout: 5 * MINUTE }).click();
   cy.checkTitle('VirtualMachines', 5 * MINUTE);
   cy.contains(nav.resourceTitle, 'VirtualMachines', { timeout: 5 * MINUTE }).should('be.visible');
+});
+
+Cypress.Commands.add('visitNAD', () => {
+  cy.get('[data-quickstart-id="qs-nav-networking"]', { timeout: MINUTE }).scrollIntoView();
+  cy.contains('Networking').should('be.visible');
+  cy.clickNavLink(['Networking', 'NetworkAttachmentDefinitions']);
+  cy.checkTitle('NetworkAttachmentDefinitions', MINUTE);
+  cy.byButtonText('Create').should('be.visible');
 });
 
 Cypress.Commands.add('visitTemplates', () => {
