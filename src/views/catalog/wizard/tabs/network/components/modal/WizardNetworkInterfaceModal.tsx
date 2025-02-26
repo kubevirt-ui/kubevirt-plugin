@@ -24,15 +24,23 @@ const WizardNetworkInterfaceModal: FC<WizardNetworkInterfaceModalProps> = ({
   vm,
 }) => {
   const onSubmit = useCallback(
-    ({ interfaceMACAddress, interfaceModel, interfaceType, networkName, nicName }) =>
+    ({
+        interfaceLinkState,
+        interfaceMACAddress,
+        interfaceModel,
+        interfaceType,
+        networkName,
+        nicName,
+      }) =>
       (currentVM: V1VirtualMachine) => {
         const resultNetwork = createNetwork(nicName, networkName);
-        const resultInterface = createInterface(
-          nicName,
-          interfaceModel,
+        const resultInterface = createInterface({
+          interfaceLinkState,
           interfaceMACAddress,
+          interfaceModel,
           interfaceType,
-        );
+          nicName,
+        });
 
         const networkProducer = produceVMNetworks(currentVM, (draft) => {
           draft.spec.template.spec.domain.devices.interfaces.push(resultInterface);

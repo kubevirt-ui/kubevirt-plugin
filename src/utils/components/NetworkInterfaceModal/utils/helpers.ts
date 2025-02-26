@@ -2,10 +2,12 @@ import produce from 'immer';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1Interface, V1Network, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { NetworkInterfaceState } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/types';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   getAutoAttachPodInterface,
+  getInterface,
   getInterfaces,
   getNetworks,
 } from '@kubevirt-utils/resources/vm';
@@ -66,22 +68,20 @@ export const updateVMNetworkInterfaces = (
     resource: vm,
   });
 
-const getInterface = (interfaces: V1Interface[], nicName: string) =>
-  interfaces?.find((iface) => iface?.name === nicName);
-
 /**
  * To delete a hot plug NIC the state of the interface is set to 'absent'. The
  * NIC will then be removed when the VM is live migrated or restarted.
- * @param interfaces {V1Interface[]}
+ * @param vm {V1VirtualMachine} - the VirtualMachine from which to delete the NIC
  * @param nicName {string}
- * @return the virtual machine's interfaces with the hot plug NIC's state set to 'absent;
+ * @return the virtual machine's interfaces with the hot plug NIC's state set to 'absent';
  */
-export const markInterfaceAbsent = (interfaces: V1Interface[], nicName: string) => {
-  if (!getInterface(interfaces, nicName)) return null;
+export const markInterfaceAbsent = (vm: V1VirtualMachine, nicName: string) => {
+  if (!getInterface(vm, nicName)) return undefined;
+  const vmInterfaces = getInterfaces(vm);
 
-  return produce<V1Interface[]>(interfaces, (draftInterfaces: V1Interface[]) => {
-    const ifaceToDelete = getInterface(draftInterfaces, nicName);
-    ifaceToDelete.state = ABSENT;
+  return produce<V1Interface[]>(vmInterfaces, (draftInterfaces: V1Interface[]) => {
+    const ifaceToDelete = draftInterfaces?.find((iface) => iface?.name === nicName);
+    if (ifaceToDelete) ifaceToDelete.state = ABSENT;
   });
 };
 
@@ -94,7 +94,7 @@ export const updateInterfacesForDeletion = (
   canBeMarkedAbsent: boolean,
 ): V1Interface[] => {
   return canBeMarkedAbsent
-    ? markInterfaceAbsent(getInterfaces(vm), nicName)
+    ? markInterfaceAbsent(vm, nicName)
     : removeInterfaceToBeDeleted(nicName, vm);
 };
 
@@ -124,12 +124,21 @@ export const createNetwork = (nicName: string, networkName: string): V1Network =
   return network;
 };
 
-export const createInterface = (
-  nicName: string,
-  interfaceModel: string,
-  interfaceMACAddress: string,
+type CreateInterfaceOptions = {
+  interfaceLinkState?: NetworkInterfaceState;
+  interfaceMACAddress: string;
+  interfaceModel: string;
+  interfaceType: string;
+  nicName: string;
+};
+
+export const createInterface = ({
+  interfaceLinkState,
+  interfaceMACAddress,
+  interfaceModel,
   interfaceType = interfacesTypes.bridge,
-): V1Interface => {
+  nicName,
+}: CreateInterfaceOptions): V1Interface => {
   const resolvedInterfaceProp = interfaceLabels[interfaceType];
   const validInterfaceProp: keyof V1Interface =
     resolvedInterfaceProp === UDN_BINDING_NAME ? BRIDGE : resolvedInterfaceProp;
@@ -138,6 +147,7 @@ export const createInterface = (
     macAddress: interfaceMACAddress,
     model: interfaceModel,
     name: nicName,
+    state: interfaceLinkState,
     [validInterfaceProp]: {},
   };
 };
@@ -145,8 +155,9 @@ export const createInterface = (
 export const getNadType = (nad: NetworkAttachmentDefinition): string => {
   try {
     const config = JSON.parse(nad?.spec?.config);
-    //can be config.type or config.plugin first element only!'
-    return interfacesTypes?.[config?.type] || interfacesTypes?.[config?.plugins?.[0]?.type];
+    //can be config.type or config.plugin first element only!
+    const interfaceType = config?.type || config?.plugins?.[0]?.type;
+    return interfacesTypes?.[interfaceType];
   } catch (e) {
     kubevirtConsole.log('Cannot convert NAD config: ', e);
   }

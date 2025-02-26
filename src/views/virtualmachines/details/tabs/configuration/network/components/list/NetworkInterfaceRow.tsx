@@ -13,7 +13,7 @@ import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/
 import { getPrintableNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 
-import { isInterfaceEphemeral } from '../../utils/utils';
+import { getNetworkInterfaceStateIcon, isInterfaceEphemeral } from '../../utils/utils';
 
 import NetworkInterfaceActions from './NetworkInterfaceActions';
 
@@ -36,11 +36,13 @@ const NetworkInterfaceRow: FC<
 > = ({ activeColumnIDs, obj: { iface, network }, rowData: { isPending, vm } }) => {
   const { t } = useKubevirtTranslation();
   const ephemeralNic = isInterfaceEphemeral(network, iface);
+  const nicName = network?.name;
+  const InterfaceStateIcon = getNetworkInterfaceStateIcon(vm, nicName);
 
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} id="name">
-        {network?.name || ephemeralNic?.interfaceName || NO_DATA_DASH}
+        {nicName || ephemeralNic?.interfaceName || NO_DATA_DASH}
         {isPending(network) && !ephemeralNic && <PendingBadge />}
         {ephemeralNic && <EphemeralBadge />}
       </TableData>
@@ -49,6 +51,9 @@ const NetworkInterfaceRow: FC<
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="network">
         {network?.pod ? t('Pod networking') : network?.multus?.networkName || NO_DATA_DASH}
+      </TableData>
+      <TableData activeColumnIDs={activeColumnIDs} id="state">
+        <InterfaceStateIcon />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="type">
         {getPrintableNetworkInterfaceType(iface)}
@@ -61,11 +66,7 @@ const NetworkInterfaceRow: FC<
         className="dropdown-kebab-pf pf-v6-c-table__action"
         id=""
       >
-        <NetworkInterfaceActions
-          nicName={network?.name}
-          nicPresentation={{ iface, network }}
-          vm={vm}
-        />
+        <NetworkInterfaceActions nicName={nicName} nicPresentation={{ iface, network }} vm={vm} />
       </TableData>
     </>
   );

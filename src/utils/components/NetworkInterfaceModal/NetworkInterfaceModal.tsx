@@ -1,8 +1,10 @@
-import React, { FC, ReactNode, useCallback, useState } from 'react';
+import React, { FC, ReactNode, useCallback, useEffect, useState } from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import NICHotPlugModalAlert from '@kubevirt-utils/components/BridgedNICHotPlugModalAlert/NICHotPlugModalAlert';
+import NetworkInterfaceLinkState from '@kubevirt-utils/components/NetworkInterfaceModal/components/NetworkInterfaceLinkState/NetworkInterfaceLinkState';
+import { NetworkInterfaceState } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/types';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -13,6 +15,7 @@ import { getNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/netw
 import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { ExpandableSection, Form } from '@patternfly/react-core';
+import { getInterfaceState } from '@virtualmachines/details/tabs/configuration/network/utils/utils';
 import { isRunning } from '@virtualmachines/utils';
 
 import NameFormField from './components/NameFormField';
@@ -25,6 +28,7 @@ import { getNetworkName } from './utils/helpers';
 import './NetworkInterfaceModal.scss';
 
 type NetworkInterfaceModalOnSubmit = {
+  interfaceLinkState?: NetworkInterfaceState;
   interfaceMACAddress: string;
   interfaceModel: string;
   interfaceType: string;
@@ -69,15 +73,37 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
     interfacesTypes[getNetworkInterfaceType(iface)],
   );
   const [interfaceMACAddress, setInterfaceMACAddress] = useState(iface?.macAddress);
+  const [interfaceLinkState, setInterfaceLinkState] = useState<NetworkInterfaceState>(
+    getInterfaceState(vm, nicName),
+  );
   const [submitDisabled, setSubmitDisabled] = useState(true);
   const [isExpanded, setIsExpanded] = useState(false);
+
+  useEffect(() => {
+    if (interfaceType === interfacesTypes.sriov) setInterfaceLinkState(undefined);
+  }, [interfaceType]);
 
   const onSubmitModal = useCallback(() => {
     return (
       onSubmit &&
-      onSubmit({ interfaceMACAddress, interfaceModel, interfaceType, networkName, nicName })
+      onSubmit({
+        interfaceLinkState,
+        interfaceMACAddress,
+        interfaceModel,
+        interfaceType,
+        networkName,
+        nicName,
+      })
     );
-  }, [nicName, networkName, interfaceModel, interfaceMACAddress, interfaceType, onSubmit]);
+  }, [
+    nicName,
+    networkName,
+    interfaceModel,
+    interfaceMACAddress,
+    interfaceLinkState,
+    interfaceType,
+    onSubmit,
+  ]);
 
   const isHotPlugNIC =
     interfaceType === interfacesTypes.bridge || interfaceType === interfacesTypes.sriov;
@@ -122,6 +148,11 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
             isDisabled={!networkName}
             setInterfaceMACAddress={setInterfaceMACAddress}
             setIsError={setSubmitDisabled}
+          />
+          <NetworkInterfaceLinkState
+            isDisabled={interfaceType === interfacesTypes.sriov}
+            linkState={interfaceLinkState}
+            setLinkState={setInterfaceLinkState}
           />
         </ExpandableSection>
       </Form>

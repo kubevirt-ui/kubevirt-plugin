@@ -24,15 +24,23 @@ const VirtualMachinesEditNetworkInterfaceModal: FC<
   const { t } = useKubevirtTranslation();
 
   const onSubmit = useCallback(
-    ({ interfaceMACAddress, interfaceModel, interfaceType, networkName, nicName }) =>
+    ({
+        interfaceLinkState,
+        interfaceMACAddress,
+        interfaceModel,
+        interfaceType,
+        networkName,
+        nicName,
+      }) =>
       () => {
         const resultNetwork = createNetwork(nicName, networkName);
-        const resultInterface = createInterface(
-          nicName,
-          interfaceModel,
+        const resultInterface = createInterface({
+          interfaceLinkState,
           interfaceMACAddress,
+          interfaceModel,
           interfaceType,
-        );
+          nicName,
+        });
 
         const updatedNetworks: V1Network[] = [
           ...(getNetworks(vm)?.filter(({ name }) => name !== nicPresentation?.network?.name) || []),

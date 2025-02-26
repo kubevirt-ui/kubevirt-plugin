@@ -1,10 +1,10 @@
-import React from 'react';
-import { FC, useState } from 'react';
+import React, { FC, useState } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { deleteNetworkInterface } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
+import { NetworkInterfaceState } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/types';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -17,6 +17,11 @@ import {
   DropdownItem,
   DropdownList,
 } from '@patternfly/react-core';
+import {
+  getInterfaceState,
+  isSRIOVInterface,
+  setNetworkInterfaceState,
+} from '@virtualmachines/details/tabs/configuration/network/utils/utils';
 import { isRunning } from '@virtualmachines/utils';
 
 import VirtualMachinesEditNetworkInterfaceModal from '../modal/VirtualMachinesEditNetworkInterfaceModal';
@@ -35,11 +40,12 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const deleteModalHeader = t('Delete NIC?');
-  const editBtnText = t('Edit');
   const deleteBtnText = t('Delete');
 
   const isHotPlugNIC = Boolean(nicPresentation?.iface?.bridge);
+
+  const interfaceState = getInterfaceState(vm, nicName);
+  const isSRIOVIface = isSRIOVInterface(vm, nicName);
 
   const onEditModalOpen = () => {
     createModal(({ isOpen, onClose }) => (
@@ -56,7 +62,7 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
   const onDeleteModalOpen = () => {
     createModal(({ isOpen, onClose }) => (
       <TabModal<V1VirtualMachine>
-        headerText={deleteModalHeader}
+        headerText={t('Delete NIC?')}
         isOpen={isOpen}
         onClose={onClose}
         onSubmit={() => deleteNetworkInterface(vm, nicName, nicPresentation)}
@@ -89,6 +95,7 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
     <Dropdown
       toggle={KebabToggle({
         id: 'toggle-id-6',
+        isDisabled: interfaceState === NetworkInterfaceState.ABSENT,
         isExpanded: isDropdownOpen,
         onClick: onToggle,
       })}
@@ -98,8 +105,26 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
       popperProps={{ position: 'right' }}
     >
       <DropdownList>
+        {interfaceState === NetworkInterfaceState.DOWN ? (
+          <DropdownItem
+            isDisabled={isSRIOVIface}
+            key="network-interface-state-up"
+            onClick={() => setNetworkInterfaceState(vm, nicName, NetworkInterfaceState.UP)}
+          >
+            {t('Set link up')}
+          </DropdownItem>
+        ) : (
+          <DropdownItem
+            description={isSRIOVIface && t('Not available for SR-IOV interfaces')}
+            isDisabled={isSRIOVIface}
+            key="network-interface-state-down"
+            onClick={() => setNetworkInterfaceState(vm, nicName, NetworkInterfaceState.DOWN)}
+          >
+            {t('Set link down')}
+          </DropdownItem>
+        )}
         <DropdownItem key="network-interface-edit" onClick={onEditModalOpen}>
-          {editBtnText}
+          {t('Edit')}
         </DropdownItem>
         <DropdownItem key="network-interface-delete" onClick={onDeleteModalOpen}>
           {deleteBtnText}
