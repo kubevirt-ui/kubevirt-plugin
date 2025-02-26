@@ -6,6 +6,7 @@ module.exports = defineConfig({
   e2e: {
     // We've imported your old cypress plugins here.
     baseUrl: process.env.BRIDGE_BASE_ADDRESS,
+    injectDocumentDomain: true,
     // You may want to clean this up later by importing these.
     setupNodeEvents(on, config) {
       return require('./plugin.js')(on, config);
