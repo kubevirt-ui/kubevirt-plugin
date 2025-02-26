@@ -29,7 +29,7 @@ const TourPopover: FC<TooltipRenderProps> = ({
         <SplitItem>
           <Button
             {...closeProps}
-            className="pf-v5-c-popover__close"
+            className="pf-v6-c-popover__close"
             icon={<CloseIcon />}
             variant={ButtonVariant.plain}
           />

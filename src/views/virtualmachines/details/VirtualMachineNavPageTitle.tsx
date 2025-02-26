@@ -52,14 +52,14 @@ const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({
   );
 
   return (
-    <div className="co-m-nav-title co-m-nav-title--detail">
+    <div className="co-m-nav-title">
       <VirtualMachineBreadcrumb />
       <span className="co-m-pane__heading">
         <h1 className="co-resource-item__resource-name">
           <Split hasGutter>
             <SplitItem>
               <span className="co-m-resource-icon co-m-resource-icon--lg">{t('VM')}</span>
-              {name}{' '}
+              <span className="pf-v6-c-title pf-m-h1">{name} </span>
               {!isEmpty(vm) && (
                 <Label className="vm-resource-label" icon={<StatusIcon />} isCompact>
                   {vm?.status?.printableStatus}

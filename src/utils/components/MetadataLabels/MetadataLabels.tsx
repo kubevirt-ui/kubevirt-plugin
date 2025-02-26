@@ -23,7 +23,7 @@ const MetadataLabels: FC<MetadataLabelsProps> = ({ labels, model }) => {
         return (
           <Label className="co-label" key={key}>
             <Link
-              className="pf-v5-c-label__content"
+              className="pf-v6-c-label__content"
               to={`/search?kind=${modelRef}&q=${encodeURIComponent(labelText)}`}
             >
               {labelText}

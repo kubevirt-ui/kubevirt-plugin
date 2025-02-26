@@ -50,7 +50,7 @@ const AutomaticSubscriptionForm: FC<RHELAutomaticSubscriptionFormProps> = ({
 
   return (
     <>
-      <Form className="pf-v5-u-mt-sm" isHorizontal isWidthLimited>
+      <Form className="pf-v6-u-mt-sm" isHorizontal isWidthLimited>
         <FormGroup
           className="subscription-label"
           label={t('Activation key')}

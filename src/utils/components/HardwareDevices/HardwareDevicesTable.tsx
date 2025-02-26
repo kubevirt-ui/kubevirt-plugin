@@ -20,7 +20,7 @@ const HardwareDevicesTable: React.FC<HardwareDevicesTableProps> = ({ devices }) 
 
   return (
     <DescriptionList
-      className={classnames('pf-v5-c-description-list', 'hardware-devices-table')}
+      className={classnames('pf-v6-c-description-list', 'hardware-devices-table')}
       columnModifier={{ default: '2Col' }}
     >
       <VirtualMachineDescriptionItem

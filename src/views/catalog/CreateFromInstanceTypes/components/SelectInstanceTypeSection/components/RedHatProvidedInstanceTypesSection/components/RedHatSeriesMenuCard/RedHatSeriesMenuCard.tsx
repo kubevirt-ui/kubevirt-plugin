@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
+import React, { FC, useMemo, useRef } from 'react';
 import classNames from 'classnames';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
@@ -10,10 +10,11 @@ import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import {
   Card,
   CardBody,
+  CardHeader,
+  Flex,
   Menu,
   MenuContent,
   MenuList,
-  MenuToggle,
   Popper,
   Tooltip,
 } from '@patternfly/react-core';
@@ -36,7 +37,6 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const [distance, setDistance] = useState(0);
   const cardRef = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLDivElement>(null);
   const {
@@ -67,39 +67,32 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({
     });
   }, [selectedInstanceType, seriesName, sizes, t]);
 
-  useEffect(() => {
-    const calculateDistance = () => {
-      if (cardRef.current && toggleRef.current) {
-        const cardRect = cardRef.current.getBoundingClientRect();
-        const toggleRect = toggleRef.current.getBoundingClientRect();
-        setDistance(toggleRect.bottom - cardRect.bottom + 4);
-      }
-    };
-
-    calculateDistance();
-    window.addEventListener('resize', calculateDistance);
-
-    return () => {
-      window.removeEventListener('resize', calculateDistance);
-    };
-  }, [cardRef.current, toggleRef.current]);
-
   const card = (
-    <Card className="instance-type-series-menu-card__toggle-card">
-      <div className="instance-type-series-menu-card__card-icon">{Icon && <Icon />}</div>
-      <CardBody>
-        <div className="instance-type-series-menu-card__card-title">
+    <Card
+      className={classNames(
+        'instance-type-series-menu-card__toggle-card',
+        isSelectedMenu && 'selected',
+      )}
+      onClick={(event) => onMenuToggle(event, seriesName)}
+      ref={cardRef}
+    >
+      <Flex alignItems={{ default: 'alignItemsCenter' }} direction={{ default: 'column' }}>
+        <div className="instance-type-series-menu-card__card-icon">{Icon && <Icon />}</div>
+        <CardHeader className="instance-type-series-menu-card__card-title">
           {classDisplayNameAnnotation}
-        </div>
-        <div className="instance-type-series-menu-card__card-toggle-text" ref={toggleRef}>
-          {seriesLabel || classAnnotation} <AngleDownIcon />
-        </div>
-        <div className="instance-type-series-menu-card__card-footer">
-          {isSelectedMenu && selectedITLabel}
-        </div>
-      </CardBody>
+        </CardHeader>
+        <CardBody>
+          <div className="instance-type-series-menu-card__card-toggle-text" ref={toggleRef}>
+            {seriesLabel || classAnnotation} <AngleDownIcon />
+          </div>
+          <div className="instance-type-series-menu-card__card-footer">
+            {isSelectedMenu && selectedITLabel}
+          </div>
+        </CardBody>
+      </Flex>
     </Card>
   );
+
   return (
     <Popper
       popper={
@@ -116,23 +109,9 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({
           </MenuContent>
         </Menu>
       }
-      trigger={
-        <MenuToggle
-          className={classNames(
-            'instance-type-series-menu-card__toggle-container',
-            isSelectedMenu && 'selected',
-          )}
-          isExpanded={isMenuExpanded}
-          onClick={(event) => onMenuToggle(event, seriesName)}
-          ref={cardRef}
-          variant="plain"
-        >
-          {!isMenuExpanded ? <Tooltip content={descriptionAnnotation}>{card}</Tooltip> : card}
-        </MenuToggle>
-      }
-      direction="down"
-      distance={distance}
       isVisible={isMenuExpanded}
+      trigger={!isMenuExpanded ? <Tooltip content={descriptionAnnotation}>{card}</Tooltip> : card}
+      triggerRef={toggleRef}
     />
   );
 };

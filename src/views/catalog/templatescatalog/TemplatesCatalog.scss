@@ -9,29 +9,24 @@
 
   .co-catalog-page--with-sidebar {
     padding-bottom: 0;
+    margin-top: var(--pf-t--global--spacer--lg);
   }
 
   &-row-icon {
-    width: var(--pf-v5-global--spacer--xl);
-    padding-right: var(--pf-v5-global--spacer--sm);
+    width: var(--pf-t--global--spacer--xl);
+    padding-right: var(--pf-t--global--spacer--sm);
     vertical-align: bottom;
   }
 
   &-row-label {
-    margin-left: var(--pf-v5-global--spacer--sm);
+    margin-left: var(--pf-t--global--spacer--sm);
   }
 
   &-grid {
-    padding: var(--pf-v5-global--spacer--lg);
+    padding: var(--pf-t--global--spacer--lg);
 
     &-tile {
-      color: var(--pf-v5-global--Color--100);
-    }
-
-    :where(.pf-theme-dark) & {
-      .vm-catalog-grid-tile:hover {
-        outline: 1px solid var(--pf-v5-global--BorderColor--300);
-      }
+      color: var(--pf-t--global--text--color--regular);
     }
   }
 
@@ -42,20 +37,20 @@
     position: relative;
     height: 100%;
     overflow-y: auto;
-    border-top: 1px solid var(--pf-v5-global--BorderColor--300);
-    border-left: 1px solid var(--pf-v5-global--BorderColor--300);
+    border-top: 1px solid var(--pf-t--global--border--color--default);
+    border-left: 1px solid var(--pf-t--global--border--color--default);
   }
 
   .vm-catalog-grid-tile:hover {
-    box-shadow: var(--pf-v5-c-card--m-selectable--hover--BoxShadow);
+    --pf-v6-c-card--BorderColor: var(--pf-v6-c-card--m-selectable--hover--BorderColor);
     cursor: pointer;
   }
 
   .badge-stack {
-    gap: var(--pf-v5-global--spacer--xs);
+    gap: var(--pf-t--global--spacer--xs);
   }
 
   .badgeload {
-    border-radius: var(--pf-v5-global--BorderRadius--lg);
+    border-radius: var(--pf-t--global--border--radius--large);
   }
 }

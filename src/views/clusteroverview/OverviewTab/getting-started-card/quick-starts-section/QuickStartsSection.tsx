@@ -77,7 +77,7 @@ const QuickStartsSection: FC<QuickStartsSectionProps> = ({
             links={links}
             moreLink={moreLink}
             title={title || t('Build with guided documentation')}
-            titleColor={'var(--co-global--palette--purple-700)'}
+            titleColor={'var(--co-global--palette--purple-600)'}
           />
         );
       }}

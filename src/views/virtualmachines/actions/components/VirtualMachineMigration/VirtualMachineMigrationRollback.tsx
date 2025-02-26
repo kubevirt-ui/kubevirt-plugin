@@ -45,9 +45,9 @@ const VirtualMachineMigrationRollback: FC<VirtualMachineMigrationRollbackProps> 
   };
 
   return (
-    <div className="pf-v5-c-wizard migration-status">
-      <div className="pf-v5-c-wizard__header">
-        <div className="pf-v5-c-wizard__close">
+    <div className="pf-v6-c-wizard migration-status">
+      <header className="pf-v6-c-wizard__header">
+        <div className="pf-v6-c-wizard__close">
           <Button
             aria-label={t('Close')}
             icon={<CloseIcon />}
@@ -55,17 +55,17 @@ const VirtualMachineMigrationRollback: FC<VirtualMachineMigrationRollbackProps> 
             variant={ButtonVariant.plain}
           />
         </div>
-        <div className="pf-v5-c-wizard__title">
-          <h2 className="pf-v5-c-wizard__title-text">{t('Migrate VirtualMachine storage')}</h2>
+        <div className="pf-v6-c-wizard__title">
+          <h2 className="pf-v6-c-wizard__title-text">{t('Migrate VirtualMachine storage')}</h2>
         </div>
-        <div className="pf-v5-c-wizard__description">
+        <div className="pf-v6-c-wizard__description">
           {t('Migrate VirtualMachine storage to a different StorageClass.')}
         </div>
-      </div>
+      </header>
 
       <div className="migration-status__body">
         <Title headingLevel="h2">
-          <WarningTriangleIcon color="var(--pf-v5-global--warning-color--100)" />{' '}
+          <WarningTriangleIcon color="var(--pf-t--global--icon--color--status--warning--default)" />{' '}
           {t('Stop migration')}
         </Title>
 

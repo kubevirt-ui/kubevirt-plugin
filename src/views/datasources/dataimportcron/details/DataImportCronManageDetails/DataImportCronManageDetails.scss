@@ -1,7 +1,8 @@
 .kv-dataimportcron-managed-details {
-  padding-top: var(--pf-v5-global--spacer--xs);
-  padding-right: var(--pf-v5-global--spacer--xs);
-  padding-bottom: var(--pf-v5-global--spacer--xs);
-  padding-left: var(--pf-v5-global--spacer--sm);
-  border: var(--pf-v5-global--BorderWidth--sm) solid var(--pf-v5-global--BorderColor--300);
+  padding-top: var(--pf-t--global--spacer--xs);
+  padding-right: var(--pf-t--global--spacer--xs);
+  padding-bottom: var(--pf-t--global--spacer--xs);
+  padding-left: var(--pf-t--global--spacer--sm);
+  border: var(--pf-t--global--border--width--regular) solid
+    var(--pf-t--global--border--color--default);
 }

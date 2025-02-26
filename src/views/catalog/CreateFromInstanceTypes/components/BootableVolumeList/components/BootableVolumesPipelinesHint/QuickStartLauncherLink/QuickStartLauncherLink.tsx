@@ -41,6 +41,7 @@ const QuickStartLauncherLink: FC<QuickStartLauncherLinkProps> = ({
     <QuickStartContextProvider value={quickStartValues}>
       <Button
         className="quick-start-launcher-link"
+        isInline
         onClick={handleClick}
         variant={ButtonVariant.link}
       >

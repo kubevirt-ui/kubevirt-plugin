@@ -5,15 +5,15 @@
     height: 100%;
   }
 
-  .pf-v5-c-sidebar__panel {
-    padding-top: var(--pf-v5-global--spacer--lg);
+  .pf-v6-c-sidebar__panel {
+    //padding-top: var(--pf-t--global--spacer--lg);
   }
 
   &__button {
     margin: 0 0 0.5rem 0;
   }
 
-  .pf-v5-c-title {
-    margin: 1.5rem 0 1rem 0;
-  }
+  // .pf-v6-c-title {
+  //   margin: 1.5rem 0 1rem 0;
+  // }
 }

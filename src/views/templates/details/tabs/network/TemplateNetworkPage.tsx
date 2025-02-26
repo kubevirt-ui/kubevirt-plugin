@@ -4,8 +4,8 @@ import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { k8sUpdate, ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
-import { Button, PageSection, Title } from '@patternfly/react-core';
+import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
+import { Button, PageSection, Stack, StackItem, Title } from '@patternfly/react-core';
 
 import useEditTemplateAccessReview from '../../hooks/useIsTemplateEditable';
 
@@ -35,32 +35,34 @@ const TemplateNetwork: FC<TemplateNetworkProps> = ({ obj: template }) => {
 
   return (
     <PageSection>
-      <ListPageBody>
-        <SidebarEditor<V1Template> onResourceUpdate={onSubmitTemplate} resource={template}>
+      <SidebarEditor<V1Template> onResourceUpdate={onSubmitTemplate} resource={template}>
+        <Stack hasGutter>
           <Title className="list-page-create-button-margin" headingLevel="h2">
             {t('Network interfaces')}
           </Title>
-
-          <Button
-            onClick={() =>
-              createModal(({ isOpen, onClose }) => (
-                <TemplatesNetworkInterfaceModal
-                  headerText={actionText}
-                  isOpen={isOpen}
-                  onClose={onClose}
-                  template={template}
-                />
-              ))
-            }
-            className="template-network-tab__button"
-            isDisabled={!isTemplateEditable}
-          >
-            {actionText}
-          </Button>
-
-          <NetworkInterfaceList template={template} />
-        </SidebarEditor>
-      </ListPageBody>
+          <StackItem>
+            <Button
+              onClick={() =>
+                createModal(({ isOpen, onClose }) => (
+                  <TemplatesNetworkInterfaceModal
+                    headerText={actionText}
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    template={template}
+                  />
+                ))
+              }
+              className="template-network-tab__button"
+              isDisabled={!isTemplateEditable}
+            >
+              {actionText}
+            </Button>
+          </StackItem>
+          <StackItem>
+            <NetworkInterfaceList template={template} />
+          </StackItem>
+        </Stack>
+      </SidebarEditor>
     </PageSection>
   );
 };

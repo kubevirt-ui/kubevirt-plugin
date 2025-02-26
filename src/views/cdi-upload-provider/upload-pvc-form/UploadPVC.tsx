@@ -232,7 +232,7 @@ const UploadPVCPage: FC = () => {
                 </p>
               </Alert>
             )}
-            <ActionGroup className="pf-v5-c-form">
+            <ActionGroup className="pf-v6-c-form">
               <Button
                 id="save-changes"
                 isDisabled={disableFormSubmit || isCheckingCertificate}

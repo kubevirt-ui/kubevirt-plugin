@@ -33,8 +33,8 @@ export const WizardHeader: FC<{ namespace: string }> = memo(({ namespace }) => {
   );
 
   return (
-    <div className="pf-v5-c-page__main-breadcrumb wizard-header">
-      <Breadcrumb className="pf-v5-c-breadcrumb co-breadcrumb">
+    <div className="pf-v6-c-page__main-breadcrumb wizard-header">
+      <Breadcrumb className="pf-v6-c-breadcrumb co-breadcrumb">
         <BreadcrumbItem>
           <Button
             onClick={() =>

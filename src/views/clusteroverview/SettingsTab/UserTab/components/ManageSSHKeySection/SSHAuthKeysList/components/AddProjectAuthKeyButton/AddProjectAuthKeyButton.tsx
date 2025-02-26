@@ -50,12 +50,13 @@ const AddProjectAuthKeyButton: FC<AddProjectAuthKeyButtonProps> = ({
         ))
       }
       className="project-ssh-row__secret-name"
+      icon={<PencilAltIcon />}
+      iconPosition="end"
       isDisabled={isEmpty(selectedProject)}
       isInline
       variant="link"
     >
-      {isEmpty(secretName) ? t('Not configured') : secretName}{' '}
-      <PencilAltIcon className="co-icon-space-l pf-v5-c-button-icon--plain" />
+      {isEmpty(secretName) ? t('Not configured') : secretName}
     </Button>
   );
 };

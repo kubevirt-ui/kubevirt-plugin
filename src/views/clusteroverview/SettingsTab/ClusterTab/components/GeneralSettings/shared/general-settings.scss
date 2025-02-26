@@ -1,14 +1,14 @@
 .project-tab {
   &__main {
     &--help {
-      color: var(--pf-v5-global--Color--200);
+      color: var(--pf-t--global--text--color--subtle);
     }
     &--field-title {
-      margin-top: var(--pf-v5-global--spacer--lg);
+      margin-top: var(--pf-t--global--spacer--lg);
       margin-bottom: 0;
     }
     &--error {
-      margin-top: var(--pf-v5-global--spacer--lg);
+      margin-top: var(--pf-t--global--spacer--lg);
     }
   }
 }

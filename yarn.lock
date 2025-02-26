@@ -936,10 +936,10 @@
   resolved "https://registry.yarnpkg.com/@novnc/novnc/-/novnc-1.5.0.tgz#7df3e4aca48eaa7c0d6f690e7dee89480232e2f1"
   integrity sha512-4yGHOtUCnEJUCsgEt/L78eeJu00kthurLBWXFiaXfonNx0pzbs6R/3gJb1byZe6iAE8V9MF0syQb0xIL8MSOtQ==
 
-"@openshift-console/dynamic-plugin-sdk-internal@1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@openshift-console/dynamic-plugin-sdk-internal/-/dynamic-plugin-sdk-internal-1.0.0.tgz#16b3cc864f796dbcb1d2e0b502fe1f43b8b73e9d"
-  integrity sha512-e7Dxf8jj7OE+NrM1ksHs5l0lXoPtSwgw5G07C5zLJNDnFPNFQvEpLslstEjCej7rW1DmmwvZrWsv4yWHSS9/cA==
+"@openshift-console/dynamic-plugin-sdk-internal@4.19.0-prerelease.1":
+  version "4.19.0-prerelease.1"
+  resolved "https://registry.yarnpkg.com/@openshift-console/dynamic-plugin-sdk-internal/-/dynamic-plugin-sdk-internal-4.19.0-prerelease.1.tgz#b6c4c251e87f766209f5f3b08420459b59825876"
+  integrity sha512-VfUz1b56Vey4EeC2v9NvOvDzwaqRlG2//ZZXUUZKK79y2L8DmnCo0Iw0NOKAze/U1a4706SNKvaqGleU1d/8mQ==
   dependencies:
     immutable "3.x"
     react "^17.0.1"
@@ -967,10 +967,10 @@
     semver "6.x"
     webpack "^5.75.0"
 
-"@openshift-console/dynamic-plugin-sdk@1.8.0":
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/@openshift-console/dynamic-plugin-sdk/-/dynamic-plugin-sdk-1.8.0.tgz#d966e4b5fe43126261f6c4a50de87f0b8568ea35"
-  integrity sha512-QS1SDD0jhlpBX5SAqDn8DsM3qsWigs6Y1LtNz9vm1cjqvN/pL7ioJrETnB1Hx3aAHnNrWuyKqYFBe5Tuo998XQ==
+"@openshift-console/dynamic-plugin-sdk@4.19.0-prerelease.1":
+  version "4.19.0-prerelease.1"
+  resolved "https://registry.yarnpkg.com/@openshift-console/dynamic-plugin-sdk/-/dynamic-plugin-sdk-4.19.0-prerelease.1.tgz#1d9b28997b583b265ddea34bf917ebd3a3d57c97"
+  integrity sha512-2//K5B743tkj3ndoBljlTy6VSjtly6OFZrW9AQ5jCJGa3nI+OivT+XD4ZtZ4q4liVavBTxC+Y0I3z6gxvGLQtg==
   dependencies:
     classnames "2.x"
     immutable "3.x"
