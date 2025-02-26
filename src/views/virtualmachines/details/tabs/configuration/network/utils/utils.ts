@@ -1,3 +1,6 @@
+import produce from 'immer';
+
+import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import {
   V1Interface,
   V1Network,
@@ -5,9 +8,14 @@ import {
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceNetworkInterface,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { getInterface } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
+import { NetworkInterfaceState } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/types';
 import { getAutoAttachPodInterface, getInterfaces } from '@kubevirt-utils/resources/vm';
 import { DEFAULT_NETWORK_INTERFACE } from '@kubevirt-utils/resources/vm/utils/constants';
+import { getNetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { getVMIInterfaces, getVMIStatusInterfaces } from '@kubevirt-utils/resources/vmi';
+import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
+import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { isRunning, isStopped } from '@virtualmachines/utils';
 
 import { ABSENT } from './constants';
@@ -64,4 +72,28 @@ export const isPendingRemoval = (
     return false;
 
   return interfaceNotFound(vm, nicName) && isActiveOnGuest(vmi, nicName, isVMRunning);
+};
+
+export const getInterfaceState = (vm: V1VirtualMachine, nicName: string): NetworkInterfaceState => {
+  const simpleIfaceState = getNetworkInterfaceState(vm, nicName);
+  return isEmpty(simpleIfaceState)
+    ? NetworkInterfaceState.UP
+    : (simpleIfaceState as NetworkInterfaceState);
+};
+
+export const setNetworkInterfaceState = (
+  vm: V1VirtualMachine,
+  nicName: string,
+  desiredState: NetworkInterfaceState,
+) => {
+  const updatedVM = produce(vm, (draftVM) => {
+    ensurePath(draftVM, ['spec.template.spec.domain.devices.interfaces']);
+    const interfaces = getInterfaces(draftVM);
+    getInterface(interfaces, nicName).state = desiredState;
+  });
+
+  return k8sUpdate({
+    data: updatedVM,
+    model: VirtualMachineModel,
+  });
 };

@@ -2,6 +2,7 @@ import produce from 'immer';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1Interface, V1Network, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { NetworkInterfaceState } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/types';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -66,7 +67,7 @@ export const updateVMNetworkInterfaces = (
     resource: vm,
   });
 
-const getInterface = (interfaces: V1Interface[], nicName: string) =>
+export const getInterface = (interfaces: V1Interface[], nicName: string) =>
   interfaces?.find((iface) => iface?.name === nicName);
 
 /**
@@ -128,6 +129,7 @@ export const createInterface = (
   nicName: string,
   interfaceModel: string,
   interfaceMACAddress: string,
+  interfaceState?: NetworkInterfaceState,
   interfaceType = interfacesTypes.bridge,
 ): V1Interface => {
   const resolvedInterfaceProp = interfaceLabels[interfaceType];
@@ -138,6 +140,7 @@ export const createInterface = (
     macAddress: interfaceMACAddress,
     model: interfaceModel,
     name: nicName,
+    state: interfaceState,
     [validInterfaceProp]: {},
   };
 };
