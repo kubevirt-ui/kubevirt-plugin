@@ -66,7 +66,7 @@ const TemplateScriptsPage: FC<TemplateScriptsPageProps> = ({ obj: template }) =>
       <SidebarEditor<V1Template> onResourceUpdate={onSubmitTemplate} resource={template}>
         <DescriptionList
           className={classnames(
-            'pf-v5-c-description-list',
+            'pf-v6-c-description-list',
             'template-scripts-tab__description-list',
           )}
         >
@@ -88,13 +88,14 @@ const TemplateScriptsPage: FC<TemplateScriptsPageProps> = ({ obj: template }) =>
                         />
                       ))
                     }
+                    icon={<PencilAltIcon />}
+                    iconPosition="end"
                     isDisabled={!isTemplateEditable}
                     isInline
                     type="button"
                     variant="link"
                   >
                     {t('Edit')}
-                    <PencilAltIcon className="co-icon-space-l pf-v5-c-button-icon--plain" />
                   </Button>
                 </FlexItem>
               </Flex>

@@ -23,16 +23,19 @@ import NetworkUsage from './components/NetworkUsage';
 import './virtual-machine-row-layout.scss';
 
 const VirtualMachineRowLayout: FC<
-  RowProps<
-    V1VirtualMachine,
-    {
-      ips: ReactNode | string;
-      isSingleNodeCluster: boolean;
-      node: ReactNode | string;
-      status: ReactNode;
-      vmim: V1VirtualMachineInstanceMigration;
-      vmiMemory?: string;
-    }
+  Omit<
+    RowProps<
+      V1VirtualMachine,
+      {
+        ips: ReactNode | string;
+        isSingleNodeCluster: boolean;
+        node: ReactNode | string;
+        status: ReactNode;
+        vmim: V1VirtualMachineInstanceMigration;
+        vmiMemory?: string;
+      }
+    >,
+    'index'
   >
 > = ({
   activeColumnIDs,
@@ -92,7 +95,7 @@ const VirtualMachineRowLayout: FC<
       </TableData>
       <TableData
         activeColumnIDs={activeColumnIDs}
-        className="dropdown-kebab-pf pf-v5-c-table__action"
+        className="dropdown-kebab-pf pf-v6-c-table__action"
         id=""
       >
         <VirtualMachineActions actions={actions} isKebabToggle />

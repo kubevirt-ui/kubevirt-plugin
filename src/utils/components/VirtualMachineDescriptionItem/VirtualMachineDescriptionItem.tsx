@@ -69,8 +69,8 @@ const VirtualMachineDescriptionItem: FC<VirtualMachineDescriptionItemProps> = ({
   );
 
   return (
-    <DescriptionListGroup className={`pf-v5-c-description-list__group ${className && className}`}>
-      <DescriptionListTermHelpText className="pf-v5-c-description-list__term">
+    <DescriptionListGroup className={`pf-v6-c-description-list__group ${className && className}`}>
+      <DescriptionListTermHelpText className="pf-v6-c-description-list__term">
         <Flex
           justifyContent={{
             default: editOnTitleJustify ? 'justifyContentSpaceBetween' : 'justifyContentFlexStart',
@@ -92,7 +92,7 @@ const VirtualMachineDescriptionItem: FC<VirtualMachineDescriptionItemProps> = ({
             <FlexItem>
               <Button
                 data-test-id={`${testId}-edit`}
-                icon={<PencilAltIcon className="co-icon-space-l pf-v5-c-button-icon--plain" />}
+                icon={<PencilAltIcon />}
                 iconPosition="end"
                 isDisabled={isDisabled}
                 isInline
@@ -108,10 +108,10 @@ const VirtualMachineDescriptionItem: FC<VirtualMachineDescriptionItemProps> = ({
       </DescriptionListTermHelpText>
 
       <DescriptionListDescription
-        className="pf-v5-c-description-list__description"
+        className="pf-v6-c-description-list__description"
         data-test-id={testId}
       >
-        {subTitle && <div className="pf-v5-c-description-list__text pf-v5-u-my-sm">{subTitle}</div>}
+        {subTitle && <div className="pf-v6-c-description-list__text pf-v6-u-my-sm">{subTitle}</div>}
         {isEdit && !showEditOnTitle ? description : descriptionData}
       </DescriptionListDescription>
     </DescriptionListGroup>

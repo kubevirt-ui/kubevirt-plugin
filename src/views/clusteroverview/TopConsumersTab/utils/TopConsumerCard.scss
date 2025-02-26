@@ -9,24 +9,25 @@
   align-items: center;
   display: flex;
   justify-content: right;
-  padding-left: var(--pf-v5-c-card--child--PaddingLeft);
-  padding-right: var(--pf-v5-c-card--child--PaddingRight);
-  padding-top: var(--pf-v5-c-card--first-child--PaddingTop);
+  padding-left: var(--pf-v6-c-card--child--PaddingInlineStart);
+  padding-right: var(--pf-v6-c-card--child--PaddingInlineEnd);
+  padding-top: var(--pf-v6-c-card--first-child--PaddingBlockStart);
 }
 
 .kv-top-consumer-card__scope-select {
-  margin-left: var(--pf-v5-global--spacer--md);
+  margin-left: var(--pf-t--global--spacer--md);
 }
 
 .kv-top-consumer-card__chart-header {
   align-items: center;
   display: flex;
   justify-content: space-between;
-  color: var(--pf-v5-global--Color--200);
-  font-size: var(--pf-v5-global--FontSize--sm);
-  border-bottom: var(--pf-v5-global--BorderWidth--sm) solid var(--pf-v5-global--Color--light-300);
-  padding-left: var(--pf-v5-c-card--child--PaddingLeft);
-  padding-right: var(--pf-v5-c-card--child--PaddingRight);
-  padding-top: var(--pf-v5-global--spacer--md);
-  padding-bottom: var(--pf-v5-global--spacer--sm);
+  color: var(--pf-t--global--text--color--subtle);
+  font-size: var(--pf-t--global--font--size--sm);
+  border-bottom: var(--pf-t--global--border--width--regular) solid
+    var(--pf-t--global--border--color--default);
+  padding-left: var(--pf-v6-c-card--child--PaddingInlineStart);
+  padding-right: var(--pf-v6-c-card--child--PaddingInlineEnd);
+  padding-top: var(--pf-t--global--spacer--md);
+  padding-bottom: var(--pf-t--global--spacer--sm);
 }

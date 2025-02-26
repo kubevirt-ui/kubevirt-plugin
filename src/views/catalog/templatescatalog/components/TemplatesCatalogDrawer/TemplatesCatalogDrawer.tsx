@@ -53,7 +53,7 @@ export const TemplatesCatalogDrawer: FC<TemplatesCatalogDrawerProps> = ({
           />
         }
         aria-label="Template drawer"
-        className="pf-v5-c-modal-box ocs-modal co-catalog-page__overlay co-catalog-page__overlay--right template-catalog-drawer"
+        className="pf-v6-c-modal-box ocs-modal co-catalog-page__overlay co-catalog-page__overlay--right template-catalog-drawer"
         disableFocusTrap
         isOpen={isOpen}
         onClose={onClose}

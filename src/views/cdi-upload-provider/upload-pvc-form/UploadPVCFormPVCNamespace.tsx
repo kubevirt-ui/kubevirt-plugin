@@ -14,7 +14,7 @@ const UploadPVCFormPVCNamespace: React.FC<UploadPVCFormPVCNamespaceProps> = ({ n
       <div className="form-group">
         <input
           aria-describedby="pvc-namespace-help"
-          className="pf-v5-c-form-control"
+          className="pf-v6-c-form-control"
           disabled
           id="pvc-namespace"
           required

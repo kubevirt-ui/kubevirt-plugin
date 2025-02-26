@@ -2,11 +2,7 @@ import React from 'react';
 
 import AlertsCardAccordionItem from '@kubevirt-utils/components/AlertsCard/AlertsCardAccordionItem';
 import { AlertType, SimplifiedAlerts } from '@kubevirt-utils/components/AlertsCard/utils/types';
-import {
-  labelColor,
-  labelIcon,
-  labelText,
-} from '@kubevirt-utils/components/AlertsCard/utils/utils';
+import { labelStatus, labelText } from '@kubevirt-utils/components/AlertsCard/utils/utils';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   Accordion,
@@ -85,9 +81,8 @@ const AlertsDrawer: React.FC<AlertsDrawerProps> = ({ sortedAlerts }) => {
                     >
                       <Label
                         className="alerts-label"
-                        color={labelColor[alertType]}
-                        icon={labelIcon[alertType]}
                         key={alertType}
+                        status={labelStatus[alertType]}
                       >
                         {numAlerts || 0}
                       </Label>

@@ -115,7 +115,7 @@ const BootableVolumesList: FC = () => {
 
           <VirtualizedTable<K8sResourceCommon>
             EmptyMsg={() => (
-              <div className="pf-v5-u-text-align-center" id="no-bootable-volumes-msg">
+              <div className="pf-v6-u-text-align-center" id="no-bootable-volumes-msg">
                 {t('No bootable volumes found')}
               </div>
             )}

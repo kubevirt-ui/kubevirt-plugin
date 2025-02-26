@@ -39,9 +39,9 @@ const ConsoleOverVirtctl: FC<ConsoleOverVirtctlProps> = ({ vm }) => {
   const [isNamespaceManagedByUDN, udn] = useNamespaceUDN(getNamespace(vm));
 
   return (
-    <DescriptionListGroup className="pf-v5-c-description-list__group">
-      <DescriptionListTerm className="pf-v5-u-font-size-xs">
-        <Content className="pf-v5-u-disabled-color-100" component="p">
+    <DescriptionListGroup className="pf-v6-c-description-list__group">
+      <DescriptionListTerm className="pf-v6-u-font-size-xs">
+        <Content className="pf-v6-u-disabled-color-100" component="p">
           {t('SSH using virtctl')}{' '}
           <Popover
             bodyContent={
@@ -77,7 +77,7 @@ const ConsoleOverVirtctl: FC<ConsoleOverVirtctlProps> = ({ vm }) => {
           </Popover>
         </Content>
       </DescriptionListTerm>
-      <DescriptionListDescription className="pf-v5-c-description-list__description">
+      <DescriptionListDescription className="pf-v6-c-description-list__description">
         {isNamespaceManagedByUDN ? (
           <>
             {t("Virtctl is disabled for this namespace as it's managed by")}{' '}

@@ -6,7 +6,7 @@ export const TREE_VIEW_PANEL_ID = 'vms-tree-view-panel';
 export const TREE_VIEW_SEARCH_ID = 'vms-tree-view-search-input';
 export const OPEN_DRAWER_SIZE = '400px';
 export const CLOSED_DRAWER_SIZE = '30px';
-export const PANEL_WIDTH_PROPERTY = '--pf-v5-c-drawer__panel--md--FlexBasis';
+export const PANEL_WIDTH_PROPERTY = '--pf-v6-c-drawer__panel--md--FlexBasis';
 
 export const SYSTEM_NAMESPACES_PREFIX = ['kube-', 'openshift-', 'kubernetes-'];
 export const SYSTEM_NAMESPACES = ['default', 'openshift'];

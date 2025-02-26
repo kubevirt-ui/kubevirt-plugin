@@ -31,7 +31,7 @@ const WizardMetadataTab: WizardTab = ({ loaded, updateVM, vm }) => {
           <>
             <DescriptionList
               className={classnames(
-                'pf-v5-c-description-list',
+                'pf-v6-c-description-list',
                 'wizard-metadata-tab__description-list',
               )}
             >

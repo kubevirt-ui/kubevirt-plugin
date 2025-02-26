@@ -31,7 +31,7 @@ const SSHTab: FC<ConfigurationInnerTabProps> = ({ vm }) => {
         <Grid span={6}>
           <GridItem>
             <Stack hasGutter>
-              <DescriptionList className="pf-v5-c-description-list">
+              <DescriptionList className="pf-v6-c-description-list">
                 <SSHTabSSHAccess vm={vm} />
                 <SSHTabAuthorizedSSHKey vm={vm} />
               </DescriptionList>

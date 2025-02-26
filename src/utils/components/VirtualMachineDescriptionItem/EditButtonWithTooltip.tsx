@@ -1,6 +1,6 @@
 import React, { FC, PropsWithChildren, ReactNode, SyntheticEvent } from 'react';
 
-import { Button, Flex, Tooltip } from '@patternfly/react-core';
+import { Button, Tooltip } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
 
 type EditButtonWithTooltipProps = PropsWithChildren<{
@@ -24,14 +24,13 @@ const EditButtonWithTooltip: FC<EditButtonWithTooltipProps> = ({
         onEditClick?.();
       }}
       data-test-id={testId}
+      icon={<PencilAltIcon />}
+      iconPosition="end"
       isDisabled={!isEditable}
       isInline
       variant="link"
     >
-      <Flex>
-        {children}
-        <PencilAltIcon className="co-icon-space-l" />
-      </Flex>
+      {children}
     </Button>
   );
 

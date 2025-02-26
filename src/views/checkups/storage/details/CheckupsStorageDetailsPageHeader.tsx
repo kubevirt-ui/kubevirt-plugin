@@ -31,7 +31,7 @@ const CheckupsStorageDetailsPageHeader: FC<CheckupsStorageDetailsPageHeaderProps
 
   return (
     <>
-      <Breadcrumb className="pf-v5-c-breadcrumb co-breadcrumb">
+      <Breadcrumb className="pf-v6-c-breadcrumb co-breadcrumb">
         <BreadcrumbItem>
           <Button
             isInline

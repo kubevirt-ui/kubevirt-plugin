@@ -44,7 +44,7 @@ const NetworkInterfaceRow: FC<RowProps<NetworkPresentation, { template: V1Templa
       </TableData>
       <TableData
         activeColumnIDs={activeColumnIDs}
-        className="dropdown-kebab-pf pf-v5-c-table__action"
+        className="dropdown-kebab-pf pf-v6-c-table__action"
         id=""
       >
         <NetworkInterfaceActions

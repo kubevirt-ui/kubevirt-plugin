@@ -1,13 +1,11 @@
 .dev-preview-label {
-  background-color: var(--pf-v5-c-label--m-orange--BackgroundColor);
+  background-color: var(--pf-v6-c-label--m-orange--BackgroundColor);
 
-  .pf-v5-c-label__content {
-    color: var(--pf-v5-global--palette--gold-700);
+  .pf-v6-c-label__content {
+    color: var(--pf-t--color--yellow--70);
   }
 
-  .pf-v5-c-label__icon {
-    color: var(--pf-v5-global--palette--orange-300);
+  .pf-v6-c-label__icon {
+    color: var(--pf-t--color--orange--40);
   }
-
-  --pf-v5-c-label__content--before--BorderColor: var(--pf-v5-global--palette--orange-100);
 }

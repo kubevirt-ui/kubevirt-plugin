@@ -1,13 +1,11 @@
-$BORDER: var(--pf-v5-global--BorderWidth--sm) solid var(--pf-v5-global--Color--light-300);
+$BORDER: var(--pf-t--global--border--width--regular) solid
+  var(--pf-t--global--border--color--default);
 
 .kv-monitoring-card {
   &__body {
     padding: 0;
   }
   &__header {
-    .pf-v5-c-card__title-text {
-      font-weight: var(--pf-v5-global--FontWeight--bold);
-    }
     border-bottom: $BORDER;
   }
   &__graph-separator {

@@ -60,6 +60,7 @@ const CheckupsRunButton: FC = () => {
       className={classNames({
         'CheckupsRunButton--main': ALL_NAMESPACES_SESSION_KEY === namespace,
       })}
+      hasNoPadding
       isDisabled={ALL_NAMESPACES_SESSION_KEY === namespace}
       variant={ButtonVariant.plain}
     >

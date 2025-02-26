@@ -119,8 +119,8 @@ const MigrationThresholdChart: React.FC<MigrationThresholdChartProps> = ({ vmi }
             }}
             legendData={[
               { name: t('Data Processed') },
-              { name: t('Data Remaining'), symbol: { fill: chart_color_green_300.value } },
-              { name: t('Memory Dirty Rate'), symbol: { fill: chart_color_orange_300.value } },
+              { name: t('Data Remaining'), symbol: { fill: chart_color_green_300.var } },
+              { name: t('Memory Dirty Rate'), symbol: { fill: chart_color_orange_300.var } },
             ]}
             height={height}
             legendOrientation="horizontal"

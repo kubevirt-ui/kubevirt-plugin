@@ -1,9 +1,10 @@
 .kv-top-consumers-card__header {
-  border-bottom: var(--pf-v5-global--BorderWidth--sm) solid var(--pf-v5-global--Color--light-300);
+  border-bottom: var(--pf-t--global--border--width--regular) solid
+    var(--pf-t--global--border--color--default);
 }
 
 .kv-top-consumers-card__dropdown--duration {
-  margin-left: var(--pf-v5-global--spacer--lg);
+  margin-left: var(--pf-t--global--spacer--lg);
 }
 
 div.kv-top-consumers-card__body {

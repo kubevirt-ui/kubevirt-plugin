@@ -1,30 +1,17 @@
-@import '../../../utils/styles/secondary-editor.scss';
-
 .vm-wizard-body {
   .co-m-page__body {
     height: 100%;
   }
-
-  @include secondary-resource-yaml-editor;
-
-  .sidebar-editor__panel button {
-    &.save-button {
-      @include secondary-editor-save-button;
-    }
-
-    &.reload-button {
-      @include secondary-editor-reload-button;
-    }
-  }
 }
 
 .vm-wizard-footer {
-  padding: var(--pf-v5-global--spacer--lg);
-  border-top: var(--pf-v5-global--BorderWidth--sm) solid var(--pf-v5-global--BorderColor--100);
+  padding: var(--pf-t--global--spacer--lg);
+  border-top: var(--pf-t--global--border--width--regular) solid
+    var(--pf-t--global--border--color--default);
   position: sticky;
   bottom: 0;
   width: 100%;
-  background: var(--pf-v5-c-page__main-section--m-light--BackgroundColor);
+  background: var(--pf-v6-c-page__main-section--BackgroundColor);
   z-index: 1000;
 }
 

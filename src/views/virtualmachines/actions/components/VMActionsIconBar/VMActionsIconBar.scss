@@ -1,10 +1,10 @@
 .vm-actions-icon-bar {
   &__button {
-    padding: var(--pf-v5-global--spacer--sm) var(--pf-v5-global--spacer--md);
+    padding: var(--pf-t--global--spacer--sm) var(--pf-t--global--spacer--md);
   }
 
   &__icon {
-    font-size: var(--pf-v5-global--FontSize--xl);
+    font-size: var(--pf-t--global--font--size--xl);
     vertical-align: bottom;
   }
 
