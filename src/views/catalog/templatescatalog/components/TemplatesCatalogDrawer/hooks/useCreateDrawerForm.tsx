@@ -115,8 +115,7 @@ const useCreateDrawerForm = (
 
   const storageClassRequiredMissing = storageClassRequired && isEmpty(storageClassName);
 
-  const onQuickCreate = async (e: MouseEvent) => {
-    e.preventDefault();
+  const onQuickCreate = async () => {
     setIsQuickCreating(true);
     setCreateError(undefined);
 
