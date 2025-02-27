@@ -1,7 +1,7 @@
 import secretFixture from '../../fixtures/secret';
 import { TEST_NS, TEST_SECRET_NAME } from '../../utils/const/index';
-import { authSSHKey } from '../../utils/const/string';
-import { brandImage } from '../../views/selector';
+import { authSSHKey, YAML } from '../../utils/const/string';
+import { brandImage, itemCreateBtn, saveBtn } from '../../views/selector';
 import { manageKeysText, useExisting } from '../../views/selector-catalog';
 import { tab } from '../../views/tab';
 
@@ -52,5 +52,12 @@ describe('Prepare the cluster for test', () => {
       cy.clickSaveBtn();
     });
     cy.contains('button.project-ssh-row__secret-name', TEST_SECRET_NAME).should('exist');
+  });
+
+  it('create example VM', () => {
+    cy.visitVMsVirt();
+    cy.get(itemCreateBtn).click();
+    cy.byButtonText(YAML).click();
+    cy.get(saveBtn).click();
   });
 });

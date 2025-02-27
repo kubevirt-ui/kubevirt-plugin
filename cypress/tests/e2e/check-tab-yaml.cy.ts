@@ -15,13 +15,8 @@ describe('Check all virtualization pages can be loaded', () => {
       cy.visitVMs();
     });
 
-    it('create example VM', () => {
-      cy.get(sel.itemCreateBtn).click();
-      cy.byButtonText(YAML).click();
-      cy.get(sel.saveBtn).click();
-    });
-
     it('start example vm', () => {
+      cy.byLegacyTestID(Example).click();
       cy.get(sel.iconStartBtn, { timeout: MINUTE }).click();
       cy.wait(15 * SECOND);
     });
