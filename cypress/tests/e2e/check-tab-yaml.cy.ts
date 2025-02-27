@@ -228,7 +228,7 @@ describe('Check all virtualization pages can be loaded', () => {
       cy.contains('fedora').should('exist');
     });
 
-    xit('create bootable volume from YAML', () => {
+    it('create bootable volume from YAML', () => {
       cy.get(sel.itemCreateBtn).click();
       cy.byButtonText(YAML).click();
       cy.get(sel.saveBtn).click();
