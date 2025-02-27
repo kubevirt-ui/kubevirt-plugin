@@ -2,13 +2,6 @@
 
 set -eExuo pipefail
 
-#source cleanup.sh
-source setup.sh
-
-# cleanup, setup and health check
-#cleanup
-health_check
-
 # Install dependencies.
 yarn install --ignore-engines
 
