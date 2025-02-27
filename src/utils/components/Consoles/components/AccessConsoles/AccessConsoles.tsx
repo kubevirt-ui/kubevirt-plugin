@@ -1,14 +1,17 @@
-import React, { FC, MouseEvent, useEffect, useState } from 'react';
+import React, { FC, MouseEvent, Ref, useEffect, useState } from 'react';
 
 import DropdownToggle from '@kubevirt-utils/components/toggles/DropdownToggle';
 import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { keyMaps } from '@kubevirt-utils/keyboard/keymaps/keymaps';
 import {
   Button,
   ButtonVariant,
   Dropdown,
   DropdownItem,
   DropdownList,
+  MenuToggle,
+  MenuToggleElement,
   Select,
   SelectOption,
 } from '@patternfly/react-core';
@@ -34,6 +37,8 @@ export const AccessConsoles: FC<AccessConsolesProps> = ({
   const [isOpenSelectType, setIsOpenSelectType] = useState<boolean>(false);
   const [isOpenSendKey, setIsOpenSendKey] = useState<boolean>(false);
   const [status, setStatus] = useState<string>();
+  const [selectedKeyboard, setSelectedKeyboard] = useState<string>('en-us');
+  const [isKeyboardSelectOpen, setIsKeyboardSelectOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const statusCallback = () => setStatus(connected);
@@ -60,7 +65,7 @@ export const AccessConsoles: FC<AccessConsolesProps> = ({
   const onInjectTextFromClipboard = (e: MouseEvent<HTMLButtonElement>) => {
     e.currentTarget.blur();
     e.preventDefault();
-    rfb?.sendPasteCMD();
+    rfb?.sendPasteCMD(selectedKeyboard);
     serialSocket?.onPaste();
   };
 
@@ -74,13 +79,45 @@ export const AccessConsoles: FC<AccessConsolesProps> = ({
       <Button
         icon={
           <>
-            <PasteIcon /> {t('Paste to console')}
+            <PasteIcon /> {t('Type into console')}
           </>
         }
         className="vnc-paste-button"
         onClick={onInjectTextFromClipboard}
         variant={ButtonVariant.link}
       />
+      <Select
+        onSelect={(_event, value?: number | string) => {
+          setSelectedKeyboard(value as string);
+          setIsKeyboardSelectOpen(false);
+        }}
+        toggle={(toggleRef: Ref<MenuToggleElement>) => (
+          <MenuToggle
+            style={
+              {
+                width: '200px',
+              } as React.CSSProperties
+            }
+            isExpanded={isKeyboardSelectOpen}
+            onClick={() => setIsKeyboardSelectOpen(!isKeyboardSelectOpen)}
+            ref={toggleRef}
+          >
+            {selectedKeyboard}
+          </MenuToggle>
+        )}
+        isOpen={isKeyboardSelectOpen}
+        onOpenChange={(isOpen) => setIsKeyboardSelectOpen(isOpen)}
+        selected={selectedKeyboard}
+        shouldFocusToggleOnSelect
+      >
+        <SelectList>
+          {Object.keys(keyMaps).map((value) => (
+            <SelectOption key={value} value={value}>
+              {value}
+            </SelectOption>
+          ))}
+        </SelectList>
+      </Select>
       <Select
         onSelect={(_, selection: string) => {
           setType(selection);
