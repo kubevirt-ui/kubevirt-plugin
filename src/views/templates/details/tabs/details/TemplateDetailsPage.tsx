@@ -4,7 +4,7 @@ import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
-import { Grid, GridItem, PageSection, PageSectionVariants, Title } from '@patternfly/react-core';
+import { Grid, GridItem, PageSection, Title } from '@patternfly/react-core';
 
 import TemplateDetailsLeftGrid from './components/TemplateDetailsLeftGrid';
 import TemplateDetailsRightGrid from './components/TemplateDetailsRightGrid';
@@ -37,7 +37,7 @@ const TemplateDetailsPage: FC<TemplateDetailsPageProps> = ({ obj: template }) =>
   );
 
   return (
-    <PageSection variant={PageSectionVariants.light}>
+    <PageSection>
       <SidebarEditor<V1Template> onResourceUpdate={onSubmitTemplate} resource={template}>
         {(resource) => (
           <>

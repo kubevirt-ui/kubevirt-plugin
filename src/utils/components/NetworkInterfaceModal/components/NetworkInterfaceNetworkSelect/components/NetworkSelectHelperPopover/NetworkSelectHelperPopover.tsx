@@ -31,9 +31,11 @@ const NetworkSelectHelperPopover: FC = () => {
       }
       headerContent={t('Network binding types')}
     >
-      <Button className={styles.formGroupLabelHelp} variant={ButtonVariant.plain}>
-        <HelpIcon />
-      </Button>
+      <Button
+        className={styles.formGroupLabelHelp}
+        icon={<HelpIcon />}
+        variant={ButtonVariant.plain}
+      />
     </Popover>
   );
 };

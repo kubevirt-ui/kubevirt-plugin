@@ -17,11 +17,10 @@ const TreeViewCollapseExpand: FC<TreeViewCollapseExpandProps> = ({ setShowAll, s
     <Tooltip content={showAll ? t('Collapse all') : t('Expand all')}>
       <Button
         className="vms-tree-view__expand"
+        icon={showAll ? <CollapseAllIcon /> : <ExpandAllIcon />}
         onClick={() => setShowAll((prev) => !prev)}
         variant={ButtonVariant.plain}
-      >
-        {showAll ? <CollapseAllIcon /> : <ExpandAllIcon />}
-      </Button>
+      />
     </Tooltip>
   );
 };

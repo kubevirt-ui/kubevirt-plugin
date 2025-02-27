@@ -1,6 +1,5 @@
 import { V1VirtualMachine, V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
-import { SelectOptionObject } from '@patternfly/react-core/deprecated';
 
 import { EnvironmentKind, EnvironmentVariable } from './constants';
 
@@ -83,22 +82,8 @@ export const areEnvironmentsChanged = (
   return !allEnvsInInitial || environments.length !== initialEnvironments.length;
 };
 
-export class EnvironmentOption implements SelectOptionObject {
-  private kind: EnvironmentKind;
-  private name: string;
+export const getEnvironmentOptionValue = (name: string, kind: EnvironmentKind) =>
+  !name ? null : `${kind}:${name}`;
 
-  toString = (): string => this.name;
-
-  constructor(name: string, kind: EnvironmentKind) {
-    this.name = name;
-    this.kind = kind;
-  }
-
-  getKind() {
-    return this.kind;
-  }
-
-  getName() {
-    return this.name;
-  }
-}
+export const getEnvironmentOptionName = (value: string) => value.split(':').slice(1).join();
+export const getEnvironmentOptionKind = (value: string) => value.split(':')[0] as EnvironmentKind;

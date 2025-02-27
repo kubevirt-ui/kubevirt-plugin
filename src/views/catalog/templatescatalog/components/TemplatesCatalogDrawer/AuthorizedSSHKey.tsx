@@ -110,7 +110,7 @@ const AuthorizedSSHKey: FC<AuthorizedSSHKeyProps> = ({ authorizedSSHKey, namespa
         />
         {!isEmpty(additionalSecretResource) && (
           <HelperText>
-            <HelperTextItem hasIcon variant="warning">
+            <HelperTextItem variant="warning">
               {t('This key will override the SSH key secret set on the template')}
             </HelperTextItem>
           </HelperText>

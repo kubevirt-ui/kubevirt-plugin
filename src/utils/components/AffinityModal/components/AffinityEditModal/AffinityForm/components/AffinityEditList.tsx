@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import LabelsList from '@kubevirt-utils/components/NodeSelectorModal/components/LabelList';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { GridItem, Text, TextVariants } from '@patternfly/react-core';
+import { Content, ContentVariants, GridItem } from '@patternfly/react-core';
 
 import { AffinityLabel } from '../../../../utils/types';
 
@@ -37,13 +37,13 @@ const AffinityEditList: React.FC<AffinityExpressionListProps> = ({
       {expressions.length > 0 && (
         <>
           <GridItem span={4}>
-            <Text component={TextVariants.h6}>{t('Key')}</Text>
+            <Content component={ContentVariants.h6}>{t('Key')}</Content>
           </GridItem>
           <GridItem span={2}>
-            <Text component={TextVariants.h6}>{t('Operator')}</Text>
+            <Content component={ContentVariants.h6}>{t('Operator')}</Content>
           </GridItem>
           <GridItem span={6}>
-            <Text component={TextVariants.h6}>{t('Values')}</Text>
+            <Content component={ContentVariants.h6}>{t('Values')}</Content>
           </GridItem>
           {expressions.map((expression) => (
             <AffinityEditRow

@@ -8,7 +8,7 @@ import {
   ChartAxis,
   ChartGroup,
   ChartVoronoiContainer,
-} from '@patternfly/react-charts';
+} from '@patternfly/react-charts/victory';
 import chart_color_black_200 from '@patternfly/react-tokens/dist/esm/chart_color_black_200';
 import chart_color_blue_100 from '@patternfly/react-tokens/dist/esm/chart_color_blue_100';
 

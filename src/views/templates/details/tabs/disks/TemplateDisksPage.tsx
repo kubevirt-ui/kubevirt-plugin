@@ -15,7 +15,7 @@ import {
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { PageSection, PageSectionVariants } from '@patternfly/react-core';
+import { PageSection } from '@patternfly/react-core';
 
 import useEditTemplateAccessReview from '../../hooks/useIsTemplateEditable';
 
@@ -61,7 +61,7 @@ const TemplateDisksPage: FC<TemplateDisksPageProps> = ({ obj: template }) => {
 
   return (
     <div className="template-disks-page">
-      <PageSection variant={PageSectionVariants.light}>
+      <PageSection>
         <SidebarEditor<V1Template> onResourceUpdate={onSubmitTemplate} resource={template}>
           <DiskListTitle />
           {isTemplateEditable && (

@@ -56,7 +56,7 @@ const SelectSourceOption: FC<SelectSourceOptionProps> = ({
       fieldId={testId}
       isRequired
       label={label}
-      labelIcon={popOver}
+      labelHelp={popOver}
     >
       <div data-test-id={testId}>
         <FormPFSelect

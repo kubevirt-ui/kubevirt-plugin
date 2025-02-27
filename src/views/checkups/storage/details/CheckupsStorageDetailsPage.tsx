@@ -4,15 +4,7 @@ import { useParams } from 'react-router-dom-v5-compat';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
-import {
-  Bullseye,
-  Divider,
-  PageSection,
-  PageSectionVariants,
-  Tab,
-  Tabs,
-  TabTitleText,
-} from '@patternfly/react-core';
+import { Bullseye, Divider, PageSection, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 
 import CheckupsDetailsPageHistory from '../../CheckupsDetailsPageHistory';
 import { getJobByName } from '../../utils/utils';
@@ -40,7 +32,7 @@ const CheckupsStorageDetailsPage = () => {
     );
 
   return (
-    <PageSection variant={PageSectionVariants.light}>
+    <PageSection>
       <CheckupsStorageDetailsPageHeader configMap={configMap} jobs={jobMatches} />
       <Tabs
         onSelect={(_, tabIndex: number) => {
@@ -49,13 +41,13 @@ const CheckupsStorageDetailsPage = () => {
         activeKey={activeTabKey}
       >
         <Tab eventKey={0} title={<TabTitleText>{t('Details')}</TabTitleText>}>
-          <PageSection variant={PageSectionVariants.light}>
+          <PageSection>
             <CheckupsStorageDetailsPageSection configMap={configMap} job={jobMatches?.[0]} />
           </PageSection>
-          <PageSection variant={PageSectionVariants.light}>
+          <PageSection>
             <Divider />
           </PageSection>
-          <PageSection variant={PageSectionVariants.light}>
+          <PageSection>
             <CheckupsDetailsPageHistory error={error} jobs={jobMatches} loading={loading} />
           </PageSection>
         </Tab>

@@ -10,9 +10,9 @@ import {
   Breadcrumb,
   BreadcrumbItem,
   Button,
+  Content,
+  ContentVariants,
   Split,
-  Text,
-  TextVariants,
   Title,
 } from '@patternfly/react-core';
 
@@ -51,9 +51,9 @@ export const WizardHeader: FC<{ namespace: string }> = memo(({ namespace }) => {
         <Title headingLevel="h1">{t('Customize and create VirtualMachine')}</Title>
         {isSidebarEditorDisplayed && <SidebarEditorSwitch />}
       </Split>
-      <Text component={TextVariants.small} data-test="wizard title help">
+      <Content component={ContentVariants.small} data-test="wizard title help">
         {t('Template: {{templateDisplayName}}', { templateDisplayName })}
-      </Text>
+      </Content>
     </div>
   );
 });

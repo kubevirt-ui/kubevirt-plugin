@@ -1,11 +1,19 @@
 import React from 'react';
+import { createUseStyles } from 'react-jss';
 
 import { RDPProps } from '../utils/types';
 
 import ManualConnection from './ManualConnection';
 import RemoteViewer from './RemoteViewer';
 
-import '@patternfly/react-styles/css/components/Consoles/DesktopViewer.css';
+const useStyles = createUseStyles({
+  consoleDesktopViewer: {
+    display: 'grid',
+    gap: 'var(--pf-t-global--spacer--md)',
+    gridArea: 'main',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(20rem, 1fr))',
+  },
+});
 
 const RDP: React.FunctionComponent<RDPProps> = ({
   children = null,
@@ -14,7 +22,7 @@ const RDP: React.FunctionComponent<RDPProps> = ({
   vnc = null,
   ...props
 }) => (
-  <div className="pf-v5-c-console__desktop-viewer">
+  <div className={useStyles().consoleDesktopViewer}>
     <RemoteViewer
       onDownload={props?.onDownload}
       onGenerate={props?.onGenerate}

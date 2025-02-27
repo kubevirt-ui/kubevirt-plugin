@@ -14,7 +14,7 @@ const SelectToggle = ({
 }: SelectToggleProps) => {
   return (toggleRef: Ref<MenuToggleElement>) => (
     <MenuToggle data-test-id={dataTestID} ref={toggleRef} {...menuProps}>
-      {selected}
+      {menuProps.children ?? selected}
     </MenuToggle>
   );
 };

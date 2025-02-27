@@ -131,7 +131,7 @@ export const DataImportCronManageModal: FC<DataImportCronManageModalProps> = ({
             {allowAutoUpdate && (
               <>
                 <FormGroup
-                  labelIcon={
+                  labelHelp={
                     <Popover
                       bodyContent={t(
                         'As new versions of a DataSource become available older versions will be replaced',

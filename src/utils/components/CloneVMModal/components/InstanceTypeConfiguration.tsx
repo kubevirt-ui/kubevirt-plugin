@@ -6,7 +6,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getInstanceTypeModelFromMatcher } from '@kubevirt-utils/resources/instancetype/helper';
 import useInstanceType from '@kubevirt-utils/resources/vm/hooks/useInstanceType';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
-import { Skeleton, TextListItem, TextListItemVariants } from '@patternfly/react-core';
+import { Content, ContentVariants, Skeleton } from '@patternfly/react-core';
 
 type InstanceTypeConfigurationProps = {
   itMatcher: V1InstancetypeMatcher;
@@ -18,11 +18,11 @@ const InstanceTypeConfiguration: FC<InstanceTypeConfigurationProps> = ({ itMatch
 
   return (
     <>
-      <TextListItem className="text-muted" component={TextListItemVariants.dt}>
+      <Content className="text-muted" component={ContentVariants.dt}>
         {t('InstanceType')}
-      </TextListItem>
+      </Content>
 
-      <TextListItem component={TextListItemVariants.dd}>
+      <Content component={ContentVariants.dd}>
         {instanceTypeLoaded ? (
           <ResourceLink
             groupVersionKind={modelToGroupVersionKind(getInstanceTypeModelFromMatcher(itMatcher))}
@@ -33,7 +33,7 @@ const InstanceTypeConfiguration: FC<InstanceTypeConfigurationProps> = ({ itMatch
         ) : (
           <Skeleton className="pf-m-width-sm" />
         )}
-      </TextListItem>
+      </Content>
     </>
   );
 };

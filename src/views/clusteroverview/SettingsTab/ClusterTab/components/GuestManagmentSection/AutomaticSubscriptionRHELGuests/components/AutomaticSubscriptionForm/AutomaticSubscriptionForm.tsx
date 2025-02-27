@@ -54,7 +54,7 @@ const AutomaticSubscriptionForm: FC<RHELAutomaticSubscriptionFormProps> = ({
         <FormGroup
           className="subscription-label"
           label={t('Activation key')}
-          labelIcon={<ActivationKeyHelpIcon />}
+          labelHelp={<ActivationKeyHelpIcon />}
         >
           <Grid hasGutter>
             <GridItem span={7}>
@@ -82,7 +82,7 @@ const AutomaticSubscriptionForm: FC<RHELAutomaticSubscriptionFormProps> = ({
         <FormGroup
           className="subscription-label"
           label={t('Organization ID')}
-          labelIcon={<OrganizationIDHelpIcon />}
+          labelHelp={<OrganizationIDHelpIcon />}
         >
           <Grid hasGutter>
             <GridItem span={7}>
