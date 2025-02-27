@@ -30,6 +30,12 @@ describe('Prepare the cluster for test', () => {
     });
   });
 
+  it('create example VM', () => {
+    cy.get(sel.itemCreateBtn).click();
+    cy.byButtonText(YAML).click();
+    cy.get(sel.saveBtn).click();
+  });
+
   it('enable treeview and folders', () => {
     cy.exec(TREEVIEW_ON_CMD).then((result) => {
       cy.task('log', `TREEVIEW_ON_CMD: [${result.stdout}]`);
