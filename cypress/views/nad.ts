@@ -24,14 +24,6 @@ export const exclude = 'input[name="ovn-k8s-cni-overlay-localnet.excludeSubnets"
 export const createNAD = (nad: nadData) => {
   cy.visitNAD();
   cy.byButtonText('Create').click();
-
-  // sometimes page redirects back
-  // cy.wait(10000);
-  // cy.get('body').then(($body) => {
-  //   if (!$body.text().includes('Configure via')) {
-  //     cy.byButtonText('Create').click();
-  //   }
-  // });
   cy.get(name).clear().type(nad.name);
   cy.get(description).type(nad.description);
   cy.get(type).click();
