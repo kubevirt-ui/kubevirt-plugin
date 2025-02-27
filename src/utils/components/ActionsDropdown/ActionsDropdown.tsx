@@ -1,12 +1,12 @@
-import React, { FC, memo, ReactNode, useRef, useState } from 'react';
+import React, { FC, memo, ReactNode, Ref, useState } from 'react';
 
-import DropdownToggle from '@kubevirt-utils/components/toggles/DropdownToggle';
-import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
-import { useClickOutside } from '@kubevirt-utils/hooks/useClickOutside/useClickOutside';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Menu, MenuContent, MenuList, Popper, Tooltip } from '@patternfly/react-core';
+import { MenuToggleElement } from '@patternfly/react-core';
 
 import ActionDropdownItem from '../ActionDropdownItem/ActionDropdownItem';
+import Dropdown from '../Dropdown/Dropdown';
+import DropdownToggle from '../toggles/DropdownToggle';
+import KebabToggle from '../toggles/KebabToggle';
 
 import { ActionDropdownItemType } from './constants';
 
@@ -29,13 +29,8 @@ const ActionsDropdown: FC<ActionsDropdownProps> = ({
   onLazyClick,
   variant,
 }) => {
-  const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
-  const toggleRef = useRef<HTMLButtonElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useClickOutside([menuRef, toggleRef], () => setIsOpen(false));
+  const { t } = useKubevirtTranslation();
 
   const onToggle = () => {
     setIsOpen((prevIsOpen) => {
@@ -55,36 +50,20 @@ const ActionsDropdown: FC<ActionsDropdownProps> = ({
         variant,
       });
 
-  if (isDisabled)
-    return (
-      <div className="kv-actions-dropdown" ref={containerRef}>
-        <Tooltip content={disabledTooltip}>
-          <span> {Toggle(toggleRef)}</span>
-        </Tooltip>
-      </div>
-    );
-
   return (
-    <div className="kv-actions-dropdown" ref={containerRef}>
-      {Toggle(toggleRef)}
-      <Popper
-        popper={
-          <Menu containsFlyout ref={menuRef}>
-            <MenuContent>
-              <MenuList>
-                {actions?.map((action) => (
-                  <ActionDropdownItem action={action} key={action?.id} setIsOpen={setIsOpen} />
-                ))}
-              </MenuList>
-            </MenuContent>
-          </Menu>
-        }
-        appendTo={containerRef.current}
-        isVisible={isOpen}
-        placement="bottom-end"
-        triggerRef={toggleRef}
-      />
-    </div>
+    <Dropdown
+      className="kv-actions-dropdown"
+      disabledTooltip={disabledTooltip}
+      isDisabled={isDisabled}
+      isOpen={isOpen}
+      popoverPlacement="bottom-end"
+      setIsOpen={setIsOpen}
+      toggle={(toggleRef: Ref<MenuToggleElement>) => Toggle(toggleRef)}
+    >
+      {actions?.map((action) => (
+        <ActionDropdownItem action={action} key={action?.id} setIsOpen={setIsOpen} />
+      ))}
+    </Dropdown>
   );
 };
 
