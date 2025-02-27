@@ -1,5 +1,6 @@
 import React, { CSSProperties, FC, useMemo } from 'react';
 
+import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/constants';
 import { TREE_VIEW } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
@@ -45,14 +46,16 @@ const VirtualMachineTreeView: FC<VirtualMachineTreeViewProps> = ({
   const [drawerWidth, setDrawerWidth] = useLocalStorage(TREE_VIEW_LAST_WIDTH, OPEN_DRAWER_SIZE);
   const [drawerOpen, setDrawerOpen] = useLocalStorage(SHOW_TREE_VIEW, SHOW);
 
-  const { featureEnabled: treeViewEnabled, loading } = useFeatures(TREE_VIEW);
+  const { featureEnabled: treeViewFeatureEnabled, loading } = useFeatures(TREE_VIEW);
+
+  const showTreeview = treeViewFeatureEnabled || runningTourSignal.value;
 
   const [selected, onSelect] = useTreeViewSelect(onFilterChange);
 
   const isOpen = useMemo(() => drawerOpen === SHOW, [drawerOpen]);
   useHideNamespaceBar();
 
-  if (loadError || loading || !treeViewEnabled) return <>{children}</>;
+  if (loadError || loading || !showTreeview) return <>{children}</>;
 
   const toggleDrawer = () => {
     const toggleOpen = !isOpen;
