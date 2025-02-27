@@ -1,15 +1,18 @@
-import React, { ChangeEvent, FC, ReactElement, useCallback, useState } from 'react';
+import React, { FC } from 'react';
 
+import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
+import { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Alert, Divider } from '@patternfly/react-core';
-import { Select, SelectGroup, SelectVariant } from '@patternfly/react-core/deprecated';
+import { Alert } from '@patternfly/react-core';
 
 import { EnvironmentKind, MapKindToAbbr } from '../constants';
 import useEnvironmentsResources from '../hooks/useEnvironmentsResources';
-import { EnvironmentOption } from '../utils';
-
-import EnvironmentSelectOption from './EnvironmentSelectOption';
+import {
+  getEnvironmentOptionKind,
+  getEnvironmentOptionName,
+  getEnvironmentOptionValue,
+} from '../utils';
 
 type EnvironmentSelectResourceProps = {
   diskName: string;
@@ -32,8 +35,6 @@ const EnvironmentSelectResource: FC<EnvironmentSelectResourceProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const [isOpen, setOpen] = useState(false);
-
   const {
     configMaps,
     error: loadError,
@@ -41,46 +42,6 @@ const EnvironmentSelectResource: FC<EnvironmentSelectResourceProps> = ({
     secrets,
     serviceAccounts,
   } = useEnvironmentsResources(namespace);
-
-  const onFilter = useCallback(
-    (event: ChangeEvent<HTMLInputElement>, value: string): ReactElement[] => {
-      const filteredSecrets = secrets
-        ?.filter((secret) => secret.metadata.name.includes(value))
-        ?.map((secret) => (
-          <EnvironmentSelectOption
-            isDisabled={environmentNamesSelected?.includes(secret.metadata.name)}
-            key={secret.metadata.name}
-            kind={EnvironmentKind.secret}
-            name={secret.metadata.name}
-          />
-        ));
-
-      const filteredConfigMaps = configMaps
-        ?.filter((configMap) => configMap.metadata.name.includes(value))
-        ?.map((configMap) => (
-          <EnvironmentSelectOption
-            isDisabled={environmentNamesSelected?.includes(configMap.metadata.name)}
-            key={configMap.metadata.name}
-            kind={EnvironmentKind.configMap}
-            name={configMap.metadata.name}
-          />
-        ));
-
-      const filteredServiceAccounts = serviceAccounts
-        ?.filter((serviceAccount) => serviceAccount.metadata.name.includes(value))
-        ?.map((serviceAccount) => (
-          <EnvironmentSelectOption
-            isDisabled={environmentNamesSelected?.includes(serviceAccount.metadata.name)}
-            key={serviceAccount.metadata.name}
-            kind={EnvironmentKind.serviceAccount}
-            name={serviceAccount.metadata.name}
-          />
-        ));
-
-      return [...filteredSecrets, ...filteredConfigMaps, ...filteredServiceAccounts];
-    },
-    [configMaps, environmentNamesSelected, secrets, serviceAccounts],
-  );
 
   if (!loaded) return <Loading />;
 
@@ -96,61 +57,59 @@ const EnvironmentSelectResource: FC<EnvironmentSelectResourceProps> = ({
       </Alert>
     );
 
+  const onSelect = (value: string) => {
+    onChange(diskName, getEnvironmentOptionName(value), serial, getEnvironmentOptionKind(value));
+  };
+
+  const selectedValue = getEnvironmentOptionValue(environmentName, kind);
+
+  const getEnhancedSelectOptionProps = (
+    optionName: string,
+    optionKind: EnvironmentKind,
+  ): EnhancedSelectOptionProps => ({
+    children: (
+      <>
+        <span className="sr-only">{optionKind}</span>
+        <span className={`co-m-resource-icon co-m-resource-${optionKind}`}>
+          {MapKindToAbbr[optionKind]}
+        </span>
+        {optionName}
+      </>
+    ),
+    isDisabled: environmentNamesSelected?.includes(optionName),
+    key: optionName,
+    value: getEnvironmentOptionValue(optionName, optionKind),
+  });
+
   return (
-    <Select
-      onSelect={(event, selection: EnvironmentOption) => {
-        onChange(diskName, selection.getName(), serial, selection.getKind());
-        setOpen(false);
-      }}
-      toggleIcon={
-        kind ? (
+    <InlineFilterSelect
+      options={[
+        ...secrets.map((secret) => ({
+          group: t('Secrets'),
+          ...getEnhancedSelectOptionProps(secret.metadata.name, EnvironmentKind.secret),
+        })),
+        ...configMaps.map((configMap) => ({
+          group: t('Config Maps'),
+          ...getEnhancedSelectOptionProps(configMap.metadata.name, EnvironmentKind.configMap),
+        })),
+        ...serviceAccounts.map((serviceAccount) => ({
+          group: t('Service Accounts'),
+          ...getEnhancedSelectOptionProps(
+            serviceAccount.metadata.name,
+            EnvironmentKind.serviceAccount,
+          ),
+        })),
+      ]}
+      toggleProps={{
+        children: environmentName ?? t('Select a resource'),
+        icon: kind ? (
           <span className={`co-m-resource-icon co-m-resource-${kind}`}>{MapKindToAbbr[kind]}</span>
-        ) : null
-      }
-      aria-labelledby="environment-name-header"
-      hasInlineFilter
-      isOpen={isOpen}
-      maxHeight={400}
-      menuAppendTo="parent"
-      onFilter={onFilter}
-      onToggle={(_, isExpanded) => setOpen(isExpanded)}
-      placeholderText={t('Select a resource')}
-      selections={new EnvironmentOption(environmentName, kind)}
-      variant={SelectVariant.single}
-    >
-      <SelectGroup key="group1" label={t('Secrets')}>
-        {secrets.map((secret) => (
-          <EnvironmentSelectOption
-            isDisabled={environmentNamesSelected?.includes(secret.metadata.name)}
-            key={secret.metadata.name}
-            kind={EnvironmentKind.secret}
-            name={secret.metadata.name}
-          />
-        ))}
-      </SelectGroup>
-      <Divider key="divider1" />
-      <SelectGroup key="group2" label={t('Config Maps')}>
-        {configMaps.map((configMap) => (
-          <EnvironmentSelectOption
-            isDisabled={environmentNamesSelected?.includes(configMap.metadata.name)}
-            key={configMap.metadata.name}
-            kind={EnvironmentKind.configMap}
-            name={configMap.metadata.name}
-          />
-        ))}
-      </SelectGroup>
-      <Divider key="divider2" />
-      <SelectGroup key="group3" label={t('Service Accounts')}>
-        {serviceAccounts.map((serviceAccount) => (
-          <EnvironmentSelectOption
-            isDisabled={environmentNamesSelected?.includes(serviceAccount.metadata.name)}
-            key={serviceAccount.metadata.name}
-            kind={EnvironmentKind.serviceAccount}
-            name={serviceAccount.metadata.name}
-          />
-        ))}
-      </SelectGroup>
-    </Select>
+        ) : null,
+      }}
+      selected={selectedValue}
+      selectProps={{ 'aria-labelledby': 'environment-name-header' }}
+      setSelected={onSelect}
+    />
   );
 };
 

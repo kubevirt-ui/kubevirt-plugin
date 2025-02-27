@@ -10,6 +10,7 @@ import {
   Select,
   SelectList,
   SelectPopperProps,
+  SelectProps,
 } from '@patternfly/react-core';
 
 import SelectToggle from '../toggles/SelectToggle';
@@ -27,6 +28,7 @@ type InlineFilterSelectProps = {
   options: EnhancedSelectOptionProps[];
   popperProps?: SelectPopperProps;
   selected: string;
+  selectProps?: Omit<SelectProps, 'toggle'>;
   setSelected: (val: string) => void;
   toggleProps?: MenuToggleProps;
 };
@@ -37,6 +39,7 @@ const InlineFilterSelect: FC<InlineFilterSelectProps> = ({
   options = [],
   popperProps,
   selected,
+  selectProps,
   setSelected,
   toggleProps,
 }) => {
@@ -91,6 +94,7 @@ const InlineFilterSelect: FC<InlineFilterSelectProps> = ({
       popperProps={popperProps}
       selected={selected}
       toggle={toggle}
+      {...selectProps}
     >
       <MenuSearch>
         <MenuSearchInput>
