@@ -20,6 +20,7 @@ const ActionDropdownItem: FC<ActionDropdownItemProps> = ({ action, setIsOpen }) 
 
   const actionAllowed = accessReview || action?.accessReview === undefined;
   const isCloneDisabled = !actionAllowed && action?.id === 'vm-action-clone';
+  const displayDisabledTooltip = action?.disabledTooltip && action?.disabled;
 
   const handleClick = () => {
     if (typeof action?.cta === 'function') {
@@ -28,21 +29,21 @@ const ActionDropdownItem: FC<ActionDropdownItemProps> = ({ action, setIsOpen }) 
     }
   };
 
+  const tooltipProps =
+    isCloneDisabled || displayDisabledTooltip
+      ? {
+          position: TooltipPosition.left,
+          ...(isCloneDisabled && {
+            content: t(`You don't have permission to perform this action`),
+          }),
+          ...(displayDisabledTooltip && { content: action?.disabledTooltip }),
+        }
+      : null;
+
   return (
     <MenuItem
-      data-test-id={`${action?.id}`}
-      description={action?.description}
-      isDisabled={action?.disabled || !actionAllowed}
-      key={action?.id}
-      onClick={handleClick}
-      {...(isCloneDisabled && {
-        tooltipProps: {
-          content: t(`You don't have permission to perform this action`),
-          position: TooltipPosition.left,
-        },
-      })}
       className={classNames('ActionDropdownItem', {
-        ActionDropdownItem__disabled: isCloneDisabled,
+        ActionDropdownItem__disabled: isCloneDisabled || displayDisabledTooltip,
       })}
       flyoutMenu={
         action?.options && (
@@ -57,6 +58,12 @@ const ActionDropdownItem: FC<ActionDropdownItemProps> = ({ action, setIsOpen }) 
           </Menu>
         )
       }
+      data-test-id={`${action?.id}`}
+      description={action?.description}
+      isDisabled={action?.disabled || !actionAllowed}
+      key={action?.id}
+      onClick={handleClick}
+      tooltipProps={tooltipProps}
     >
       {action?.label}
       {action?.icon && (

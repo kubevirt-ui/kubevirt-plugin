@@ -7,7 +7,7 @@ import {
   V1VirtualMachine,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { V1Template } from '@kubevirt-utils/models';
-import { getLabel } from '@kubevirt-utils/resources/shared';
+import { getAnnotations, getLabel, getLabels } from '@kubevirt-utils/resources/shared';
 import {
   TEMPLATE_BASE_IMAGE_NAME_PARAMETER,
   TEMPLATE_BASE_IMAGE_NAMESPACE_PARAMETER,
@@ -35,14 +35,6 @@ import {
   VM_TEMPLATE_NAME_PARAMETER,
 } from './consts';
 import { compareVersions, removeOSDups, stringValueUnitSplit } from './utils';
-
-export const getLabels = (entity: K8sResourceCommon, defaultValue?: { [key: string]: string }) =>
-  entity?.metadata?.labels || defaultValue;
-
-export const getAnnotations = (
-  vm: K8sResourceCommon,
-  defaultValue?: { [key: string]: string },
-): { [key: string]: string } => vm?.metadata.annotations || defaultValue;
 
 const getAnnotation = (
   pvc: V1beta1PersistentVolumeClaim,

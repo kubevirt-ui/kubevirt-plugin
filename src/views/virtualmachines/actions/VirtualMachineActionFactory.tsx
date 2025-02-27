@@ -19,6 +19,7 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Action, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { CopyIcon } from '@patternfly/react-icons';
 import VirtualMachineMigrateModal from '@virtualmachines/actions/components/VirtualMachineMigration/VirtualMachineMigrationModal';
+import { isDeletionProtectionEnabled } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
 import MoveVMToFolderModal from '../../../utils/components/MoveVMToFolderModal/MoveVMToFolderModal';
@@ -126,7 +127,10 @@ export const VirtualMachineActionFactory = {
           <DeleteVMModal isOpen={isOpen} onClose={onClose} vm={vm} />
         )),
       description: isRunning(vm) && t('The VirtualMachine is running'),
-      disabled: isRunning(vm),
+      disabled: isRunning(vm) || isDeletionProtectionEnabled(vm),
+      disabledTooltip: t(
+        'VirtualMachine is delete protected and cannot be deleted. To enable deletion, go to VirtualMachine details and disable deletion protection.',
+      ),
       id: 'vm-action-delete',
       label: t('Delete'),
     };
