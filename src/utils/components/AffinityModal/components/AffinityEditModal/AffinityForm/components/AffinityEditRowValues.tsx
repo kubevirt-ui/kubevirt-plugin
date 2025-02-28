@@ -5,6 +5,7 @@ import {
   Button,
   InputGroup,
   InputGroupItem,
+  KeyTypes,
   Label,
   LabelGroup,
   Stack,
@@ -42,7 +43,9 @@ export const AffinityEditRowValues: FC<AffinityEditRowValuesProps> = ({
   const textInputPlaceholder = t('Enter value');
   const labelsToShowCount = Number.MAX_VALUE; // always show all labels
 
-  return isHidden ? null : (
+  if (isHidden) return null;
+
+  return (
     <Stack hasGutter>
       <LabelGroup isClosable numLabels={labelsToShowCount} onClick={onClear}>
         {values.map((value) => (
@@ -55,7 +58,7 @@ export const AffinityEditRowValues: FC<AffinityEditRowValuesProps> = ({
         <InputGroupItem isFill>
           <TextInput
             onKeyDown={(event) => {
-              if (event.key === 'Enter' && !addingIsDisabled) {
+              if (event.key === KeyTypes.Enter && !addingIsDisabled) {
                 event.preventDefault();
                 onAdd();
               }
