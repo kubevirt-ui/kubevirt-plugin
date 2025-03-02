@@ -5,6 +5,7 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   Button,
   ButtonVariant,
+  KeyTypes,
   MenuToggle,
   MenuToggleElement,
   Select,
@@ -148,7 +149,7 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
       return;
     }
 
-    if (key === 'ArrowUp') {
+    if (key === KeyTypes.ArrowUp) {
       // When no index is set or at the first index, focus to the last, otherwise decrement focus index
       if (focusedItemIndex === null || focusedItemIndex === 0) {
         indexToFocus = selectOptions.length - 1;
@@ -165,7 +166,7 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
       }
     }
 
-    if (key === 'ArrowDown') {
+    if (key === KeyTypes.ArrowDown) {
       // When no index is set or at the last index, focus to the first, otherwise increment focus index
       if (focusedItemIndex === null || focusedItemIndex === selectOptions.length - 1) {
         indexToFocus = 0;
