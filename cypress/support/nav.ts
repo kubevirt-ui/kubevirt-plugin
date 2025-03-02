@@ -64,8 +64,6 @@ Cypress.Commands.add('visitVMsVirt', () => {
 });
 
 Cypress.Commands.add('visitNAD', () => {
-  cy.get('[data-quickstart-id="qs-nav-networking"]', { timeout: MINUTE }).scrollIntoView();
-  cy.contains('Networking').should('be.visible');
   cy.clickNavLink(['Networking', 'NetworkAttachmentDefinitions']);
   cy.checkTitle('NetworkAttachmentDefinitions', MINUTE);
   cy.byButtonText('Create').should('be.visible');

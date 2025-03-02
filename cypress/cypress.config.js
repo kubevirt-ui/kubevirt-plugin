@@ -32,8 +32,8 @@ module.exports = defineConfig({
   trashAssetsBeforeRuns: true,
   video: true,
   videosFolder: './gui-test-screenshots/videos/',
-  viewportHeight: 1440,
-  viewportWidth: 2560,
+  viewportHeight: 1080,
+  viewportWidth: 1920,
   waitForAnimations: true,
   watchForFileChanges: false,
 });
