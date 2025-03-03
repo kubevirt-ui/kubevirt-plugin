@@ -1,21 +1,12 @@
 import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import cn from 'classnames';
 
-import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import KeyTable from '@novnc/novnc/lib/input/keysym';
 import RFBCreate from '@novnc/novnc/lib/rfb';
 import { initLogging } from '@novnc/novnc/lib/util/logging';
-import {
-  Button,
-  EmptyState,
-  EmptyStateBody,
-  EmptyStateFooter,
-  Tab,
-  Tabs,
-  TabTitleText,
-} from '@patternfly/react-core';
+import { Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 
 import { INSECURE, SECURE } from '../../utils/constants';
 import { isConnectionEncrypted, sleep } from '../../utils/utils';
@@ -24,6 +15,7 @@ import useCopyPasteConsole from '../utils/hooks/useCopyPasteConsole';
 
 import { isShiftKeyRequired } from './utils/util';
 import { VncConsoleProps } from './utils/VncConsoleTypes';
+import VncConnect from './VncConnect';
 
 import '@patternfly/react-styles/css/components/Consoles/VncConsole.css';
 import './vnc-console.scss';
@@ -31,7 +23,7 @@ import './vnc-console.scss';
 const { connected, connecting, disconnected } = ConsoleState;
 
 export const VncConsole: FC<VncConsoleProps> = ({
-  CustomConnectComponent,
+  CustomConnectComponent = VncConnect,
   hasGPU,
   onConnect,
   scaleViewport = true,
@@ -144,20 +136,9 @@ export const VncConsole: FC<VncConsoleProps> = ({
 
   return (
     <>
-      {status === disconnected &&
-        (CustomConnectComponent ? (
-          <CustomConnectComponent connect={connect} />
-        ) : (
-          <EmptyState>
-            <EmptyStateBody>{t('Click Connect to open the VNC console.')}</EmptyStateBody>
-            <EmptyStateFooter>
-              <Button onClick={connect} variant="primary">
-                {t('Connect')}
-              </Button>
-            </EmptyStateFooter>
-          </EmptyState>
-        ))}
-      {status === connecting && <LoadingEmptyState bodyContents={t('Connecting')} />}
+      {(status === disconnected || status === connecting) && (
+        <CustomConnectComponent connect={connect} isConnecting={status === connecting} />
+      )}
 
       {hasGPU && status === connected && (
         <div className="vnc-screen-tabs">

@@ -11,9 +11,14 @@ export type VncConsoleActionsProps = {
   onInjectTextFromClipboard?: MouseEventHandler<HTMLButtonElement>;
 };
 
+export type CustomConnectComponentProps = {
+  connect: () => void;
+  isConnecting: boolean;
+};
+
 export type VncConsoleProps = HTMLProps<HTMLDivElement> & {
   /** A custom component to replace th default connect button screen */
-  CustomConnectComponent?: FC<{ connect: () => void }>;
+  CustomConnectComponent?: FC<CustomConnectComponentProps>;
   /** Should console render alt tabs */
   hasGPU?: boolean;
   onConnect?: (rfb: RFBCreate) => void;
