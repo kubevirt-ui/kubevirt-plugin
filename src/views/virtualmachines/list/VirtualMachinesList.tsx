@@ -18,6 +18,10 @@ import {
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  runningTourSignal,
+  tourGuideVM,
+} from '@kubevirt-utils/components/GuidedTour/utils/constants';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { KUBEVIRT_APISERVER_PROXY } from '@kubevirt-utils/hooks/useFeatures/constants';
@@ -75,7 +79,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
 
   const query = useQuery();
 
-  const [vms, vmLoaded, loadError] = useKubevirtWatchResource<V1VirtualMachine[]>(
+  const [vm, vmLoaded, loadError] = useKubevirtWatchResource<V1VirtualMachine[]>(
     {
       groupVersionKind: VirtualMachineModelGroupVersionKind,
       isList: true,
@@ -93,6 +97,8 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
       'rowFilter-template': 'metadata.labels.vm\\.kubevirt\\.io/template',
     },
   );
+
+  const vmToShow = useMemo(() => (runningTourSignal.value ? [tourGuideVM] : vm), [vm]);
 
   const [vmis, vmiLoaded] = useKubevirtWatchResource<V1VirtualMachineInstance[]>(
     {
@@ -118,14 +124,14 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
     namespaced: true,
   });
 
-  const { filters, searchFilters, vmiMapper, vmimMapper } = useVMListFilters(vmis, vms, vmims);
+  const { filters, searchFilters, vmiMapper, vmimMapper } = useVMListFilters(vmis, vmToShow, vmims);
 
   const [pagination, setPagination] = useState(paginationInitialState);
 
   const [unfilterData, dataFilters, onFilterChange] = useListPageFilter<
     V1VirtualMachine,
     V1VirtualMachine
-  >(vms, [...filters, ...searchFilters]);
+  >(vmToShow, [...filters, ...searchFilters]);
 
   // Allow using folder filters from the tree view
   useImperativeHandle(
@@ -141,7 +147,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
   const [unfilteredData, data] = useMemo(() => {
     if (!featureEnabled || isProxyPodAlive === false) return [unfilterData, dataFilters];
 
-    const matchedVMS = vms?.filter(
+    const matchedVMS = vmToShow?.filter(
       ({ metadata: { name, namespace: ns }, status: { printableStatus = '' } = {} }) => {
         return (
           vmiMapper?.mapper?.[ns]?.[name] ||
@@ -150,7 +156,15 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
       },
     );
     return [matchedVMS, matchedVMS];
-  }, [featureEnabled, isProxyPodAlive, unfilterData, dataFilters, vms, vmiMapper?.mapper, query]);
+  }, [
+    featureEnabled,
+    isProxyPodAlive,
+    unfilterData,
+    dataFilters,
+    vmToShow,
+    vmiMapper?.mapper,
+    query,
+  ]);
 
   const onPageChange = ({ endIndex, page, perPage, startIndex }) => {
     setPagination(() => ({

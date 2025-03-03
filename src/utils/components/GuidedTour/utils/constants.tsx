@@ -5,9 +5,11 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { RUNSTRATEGY_ALWAYS } from '@kubevirt-utils/constants/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { signal } from '@preact/signals-react';
+import { TREE_VIEW_PANEL_ID } from '@virtualmachines/tree/utils/constants';
 
 import AddVolumeContent from '../components/AddVolumeContent/AddVolumeContent';
 import EndTourContent from '../components/EndTourContent/EndTourContent';
+import NewStepTitle from '../components/NewStepTitle/NewStepTitle';
 
 export const runningTourSignal = signal(false);
 export const stepIndexSignal = signal(0);
@@ -48,7 +50,7 @@ export const tourSteps: Step[] = [
   },
   {
     content: t(
-      'To create virtual machines in a project, you must first create a new project and become the administrator.',
+      'To create VirtualMachines in a project, you must first create a new project and become the administrator.',
     ),
     data: { route: '/k8s/all-namespaces/virtualization-overview' },
     disableBeacon: true,
@@ -65,6 +67,16 @@ export const tourSteps: Step[] = [
     placement: 'bottom',
     target: '[data-test-id="horizontal-link-Settings"]',
     title: t('Settings configurations'),
+  },
+  {
+    content: t(
+      'Visualize all your VirtualMachines and easily navigate between them using the tree view. You can also see their details with a status summary.',
+    ),
+    data: { route: '/k8s/all-namespaces/kubevirt.io~v1~VirtualMachine' },
+    disableBeacon: true,
+    placement: 'right',
+    target: `#${TREE_VIEW_PANEL_ID}`,
+    title: <NewStepTitle title={t('Tree view')} />,
   },
   {
     content: <AddVolumeContent />,
