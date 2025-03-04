@@ -41,18 +41,21 @@ describe('Prepare the cluster for test', () => {
     cy.contains('button[role="tab"]', 'User').click();
     cy.contains(manageKeysText).click();
     cy.contains(authSSHKey, { timeout: 20000 }).should('be.visible');
-    cy.wait(2000);
-    // configure new public ssh key
-    cy.get('.settings-tab__content').then(() => {
-      cy.contains('Select project').click();
-      cy.byLegacyTestID(TEST_NS).click({ force: true });
-      cy.get('button.project-ssh-row__secret-name').click();
-      cy.get(useExisting).click();
-      cy.contains('Select secret').click();
-      cy.byButtonText(TEST_SECRET_NAME).click();
-      cy.clickSaveBtn();
+    cy.wait(10000);
+    cy.get('.settings-tab__content').then(($body) => {
+      if ($body.text().includes(TEST_SECRET_NAME)) {
+        cy.task('log', 'secret is configured');
+      } else {
+        cy.contains('Select project').click();
+        cy.byLegacyTestID(TEST_NS).click({ force: true });
+        cy.get('button.project-ssh-row__secret-name').click();
+        cy.get(useExisting).click();
+        cy.contains('Select secret').click();
+        cy.byButtonText(TEST_SECRET_NAME).click();
+        cy.clickSaveBtn();
+      }
+      cy.contains('button.project-ssh-row__secret-name', TEST_SECRET_NAME).should('exist');
     });
-    cy.contains('button.project-ssh-row__secret-name', TEST_SECRET_NAME).should('exist');
   });
 
   it('create example VM', () => {

@@ -2,8 +2,8 @@ import { NAD_BRIDGE, NAD_LOCALNET, NAD_OVN } from '../../utils/const/nad';
 import { createNAD, deleteNAD } from '../../views/nad';
 
 describe('Test network attachments', () => {
-  before(() => {
-    cy.visit('');
+  beforeEach(() => {
+    cy.visitNAD();
   });
 
   it('create NAD with MAC Spoof checked', () => {
