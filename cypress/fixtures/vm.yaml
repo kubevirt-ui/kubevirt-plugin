@@ -11,7 +11,7 @@ spec:
         sourceRef:
           kind: DataSource
           name: rhel10-beta
-          namespace: openshift-virtualization-os-images
+          namespace: kubevirt-os-images
         storage:
           resources:
             requests:
