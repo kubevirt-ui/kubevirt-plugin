@@ -30,7 +30,7 @@ const ConfirmVMActionModal: FC<ConfirmVMActionModalProps> = ({
   return (
     <Modal
       actions={[
-        <Button key="confirm" onClick={() => action(vm)} variant={ButtonVariant.primary}>
+        <Button key="confirm" onClick={submitHandler} variant={ButtonVariant.primary}>
           {t(actionType)}
         </Button>,
         <Button key="cancel" onClick={onClose} variant="link">
@@ -40,7 +40,7 @@ const ConfirmVMActionModal: FC<ConfirmVMActionModalProps> = ({
       className="confirm-multiple-vm-actions-modal"
       isOpen={isOpen}
       onClose={onClose}
-      onSubmit={() => submitHandler()}
+      onSubmit={submitHandler}
       title={t('{{actionType}} VirtualMachine?', { actionType })}
       variant={'small'}
     >
