@@ -1,5 +1,5 @@
 // add volume modal
-export const modalTitle = '.pf-v5-c-modal-box__title-text';
+export const modalTitle = '.pf-v6-c-modal-box__title-text';
 export const modalTitleText = 'Add volume';
 export const addBtnText = 'Add volume';
 export const usePVC = 'input[id="pvc"]';
@@ -9,35 +9,35 @@ export const cronExp = 'input[data-test-id="volume-registry-retain-cron-expressi
 export const scSelect = '[data-test-id="storage-class-select"]';
 export const scValue = (name: string) => `[data-test-id="${name}"]`;
 export const volumeName = 'input[id="name"]';
-export const toggleText = '.pf-v5-c-menu-toggle__text';
-export const menuItemText = '.pf-v5-c-menu__item-text';
-export const progress = '.pf-v5-c-progress__measure';
+export const toggleText = '.pf-v6-c-menu-toggle__text';
+export const menuItemText = '.pf-v6-c-menu__item-text';
+export const progress = '.pf-v6-c-progress__measure';
 export const selectPreferenceText = 'Select preference';
 export const searchPreference = 'input[placeholder="Select preference"]';
 export const preferenceValue = (name: string) => `[data-test-id="${name}"]`;
 export const selectInstanceText = 'Select InstanceType';
-export const instanceValue = 'ul.pf-v5-c-select__menu.pf-m-static';
+export const instanceValue = 'ul.pf-v6-c-select__menu.pf-m-static';
 export const description = 'input[id="description"]';
 export const selectPVCNS = '--- Select PVC project ---';
 export const PVCNSValue = (name: string) => `[data-test-id="${name}"]`;
 export const selectPVCName = '--- Select PVC name ---';
 export const PVCNameValue = (name: string) => `[data-test-id="${name}"]`;
-export const delBtn = '.pf-v5-c-table__td.dropdown-kebab-pf.pf-v5-c-table__action';
+export const delBtn = '.pf-v6-c-table__td.dropdown-kebab-pf.pf-v6-c-table__action';
 export const searchBtn = 'input[type="search"]';
 export const qsDrawer = '[data-qs="qs-step-intro"]';
 
 // instanceType page
-export const tabList = '.pf-v5-c-tabs__list';
+export const tabList = '.pf-v6-c-tabs__list';
 export const volName = '#name';
 export const iTypeGrid = '.pf-l-grid__item.categories-card__grid-item';
 export const iTypeLabel = '.category-card__series-label';
-export const iTypeCPU = '.pf-v5-c-menu__list-item';
+export const iTypeCPU = '.pf-v6-c-menu__list-item';
 export const advSetting = '[data-test-id="expandable-advanced-section"]';
 export const useExisting = 'input[id="useExisting"]';
 export const addNew = 'input[id="addNew"]';
 export const secretName = 'input[id="new-secret-name"]';
-export const fileDrop = '.pf-v5-c-file-upload__file-details';
-export const selectSecret = '.pf-v5-c-select__toggle-text';
+export const fileDrop = '.pf-v6-c-file-upload__file-details';
+export const selectSecret = '.pf-v6-c-select__toggle-text';
 export const selectSecretText = 'Select secret';
 export const vmName = '[data-test-id="instancetypes-vm-name-input"]';
 export const vmFolder = '[placeholder="Search folder"]';

@@ -37,6 +37,7 @@ describe('Test Virtualization Overview', () => {
     cy.byButtonText(manageKeysText).click();
     cy.byButtonText(manageKeysText)
       .parent()
+      .parent()
       .within(() => {
         cy.contains(authSSHKey, { timeout: 20000 }).should('be.visible');
       });
