@@ -34,10 +34,10 @@ export const addVolume = (vol: volData) => {
       }
       case 'Volume': {
         cy.contains(iView.toggleText, 'Volume').click();
-        cy.get('.pf-v5-c-menu__list-item').eq(1).click();
-        cy.contains('.pf-v5-c-menu-toggle__text', '--- Select Volume project ---').click();
+        cy.get('.pf-v6-c-menu__list-item').eq(1).click();
+        cy.contains('.pf-v6-c-menu-toggle__text', '--- Select Volume project ---').click();
         cy.get(`[data-test-id="select-option-${project}"]`).click();
-        cy.contains('.pf-v5-c-menu-toggle__text', '--- Select Volume name ---').click();
+        cy.contains('.pf-v6-c-menu-toggle__text', '--- Select Volume name ---').click();
         cy.get(`[data-test-id="${pvcName}"]`).click();
         break;
       }
@@ -152,7 +152,7 @@ export const fillInstanceType = (vmData: VirtualMachineData) => {
     cy.get(iView.vmFolderMenu).find('button').eq(0).click();
   }
   if (bootDiskSize) {
-    cy.get('div.pf-v5-c-form__group.disk-source-form-group')
+    cy.get('div.pf-v6-c-form__group.disk-source-form-group')
       .find('input[aria-label="Input"]')
       .clear()
       .type(bootDiskSize);
@@ -178,7 +178,7 @@ export const fillDetails = (vmData: VirtualMachineData) => {
       }
     });
     cy.get(`[data-test-id="${vmData.name}-boot-method"]`).find('svg').click();
-    cy.get('div.pf-v5-c-modal-box__body').find('span.pf-v5-c-menu-toggle__toggle-icon').click();
+    cy.get('div.pf-v6-c-modal-box__body').find('span.pf-v6-c-menu-toggle__toggle-icon').click();
     cy.contains(iView.menuItemText, bootMode).click();
     cy.clickSaveBtn();
   }
@@ -201,16 +201,16 @@ export const fillDetails = (vmData: VirtualMachineData) => {
 export const fillEnvironment = (vmData: VirtualMachineData) => {
   const { addEnvDisk } = vmData;
   if (addEnvDisk) {
-    cy.contains('.pf-v5-c-tabs__item-text', 'Storage').click();
+    cy.contains('.pf-v6-c-tabs__item-text', 'Storage').click();
     cy.contains('Add Config Map, Secret or Service Account').click();
     cy.contains('Select a resource').click();
-    cy.get('.pf-v5-c-select__menu-group').eq(0).find('ul>li').first().click();
+    cy.get('.pf-v6-c-select__menu-group').eq(0).find('ul>li').first().click();
     cy.contains('Add Config Map, Secret or Service Account').click();
     cy.contains('Select a resource').click();
-    cy.get('.pf-v5-c-select__menu-group').eq(1).find('ul>li').first().click();
+    cy.get('.pf-v6-c-select__menu-group').eq(1).find('ul>li').first().click();
     cy.contains('Add Config Map, Secret or Service Account').click();
     cy.contains('Select a resource').click();
-    cy.get('.pf-v5-c-select__menu-group').eq(2).find('ul>li').first().click();
+    cy.get('.pf-v6-c-select__menu-group').eq(2).find('ul>li').first().click();
     cy.clickSubmitBtn();
   }
 };
@@ -218,7 +218,7 @@ export const fillEnvironment = (vmData: VirtualMachineData) => {
 export const fillScheduling = (vmData: VirtualMachineData) => {
   const { dedicatedResources, descheduler, evictionStrategy, nodeSelector } = vmData;
   if (nodeSelector || descheduler || dedicatedResources || evictionStrategy !== undefined) {
-    cy.contains('.pf-v5-c-tabs__item-text', 'Scheduling').click();
+    cy.contains('.pf-v6-c-tabs__item-text', 'Scheduling').click();
   }
   if (nodeSelector) {
     cy.get('button[data-test-id="node-selector"]').click();
@@ -248,7 +248,7 @@ export const fillScheduling = (vmData: VirtualMachineData) => {
 // add nic with nad created in setup
 export const addNics = (vmData: VirtualMachineData) => {
   if (vmData.nics) {
-    cy.contains('.pf-v5-c-tabs__item-text', 'Network').click();
+    cy.contains('.pf-v6-c-tabs__item-text', 'Network').click();
     cy.wait(3000);
     vmData.nics.forEach((nic) => {
       addNic(nic);
@@ -259,7 +259,7 @@ export const addNics = (vmData: VirtualMachineData) => {
 
 export const addDisks = (vmData: VirtualMachineData) => {
   if (vmData.disks) {
-    cy.contains('.pf-v5-c-tabs__item-text', 'Storage').click();
+    cy.contains('.pf-v6-c-tabs__item-text', 'Storage').click();
     cy.wait(5000); // wait for page loading
     vmData.disks.forEach((disk) => {
       addDisk(disk);
@@ -267,7 +267,7 @@ export const addDisks = (vmData: VirtualMachineData) => {
     });
   }
   if (vmData.storageClass) {
-    cy.contains('.pf-v5-c-tabs__item-text', 'Storage').click();
+    cy.contains('.pf-v6-c-tabs__item-text', 'Storage').click();
     getRow('rootdisk', () => cy.get('button[aria-label="Actions"]').click());
     cy.get('ul[aria-labelledby="toggle-id-disk"]').contains('Edit').click();
     cy.wait(3000);
@@ -280,7 +280,7 @@ export const addDisks = (vmData: VirtualMachineData) => {
 export const fillMetadata = (vmData: VirtualMachineData) => {
   const { annotations, labels } = vmData;
   if (labels) {
-    cy.contains('.pf-v5-c-tabs__item-text', 'Metadata').click();
+    cy.contains('.pf-v6-c-tabs__item-text', 'Metadata').click();
     cy.get(`[data-test-id="${vmData.name}-labels-edit"]`).click();
     labels.forEach((label) => {
       cy.get('input[data-test="tags-input"]').type(`${label}{enter}`);
@@ -288,8 +288,8 @@ export const fillMetadata = (vmData: VirtualMachineData) => {
     cy.clickSaveBtn();
   }
   if (annotations) {
-    cy.contains('.pf-v5-c-tabs__item-text', 'Metadata').click();
-    cy.get('svg.pf-v5-svg.co-icon-space-l').eq(1).click();
+    cy.contains('.pf-v6-c-tabs__item-text', 'Metadata').click();
+    cy.get('svg.pf-v6-svg.co-icon-space-l').eq(1).click();
     // there is no good selector for annotion, just type one and use eq(1).
     annotations.forEach((anno) => {
       cy.contains('Add more').click();
@@ -303,7 +303,7 @@ export const fillMetadata = (vmData: VirtualMachineData) => {
 export const fillSSH = (vmData: VirtualMachineData) => {
   const { existSecret, newSecret } = vmData;
   if (newSecret) {
-    cy.contains('.pf-v5-c-tabs__item-text', 'SSH').click();
+    cy.contains('.pf-v6-c-tabs__item-text', 'SSH').click();
     cy.get('button[data-test-id="public-ssh-key-edit"]').click();
     cy.get(cView.none).click();
     cy.get(cView.addNew).click();
@@ -316,7 +316,7 @@ export const fillSSH = (vmData: VirtualMachineData) => {
     cy.contains('.co-resource-item__resource-name', newSecret).should('exist');
   }
   if (existSecret) {
-    cy.contains('.pf-v5-c-tabs__item-text', 'SSH').click();
+    cy.contains('.pf-v6-c-tabs__item-text', 'SSH').click();
     cy.get('[data-test-id="ssh-tab-edit-authorized"]').click();
     cy.get(iView.useExisting).click();
     cy.get('button[placeholder="Select secret"]').click();
@@ -332,7 +332,7 @@ export const fillInitialRun = (vmData: VirtualMachineData) => {
   const { cloudInitPwd, cloudInitUname, ethName, gateway, ipAddr, sysprepFile, sysprepName } =
     vmData;
   if (cloudInitUname || cloudInitPwd || ethName) {
-    cy.contains('.pf-v5-c-tabs__item-text', 'Initial run').click();
+    cy.contains('.pf-v6-c-tabs__item-text', 'Initial run').click();
     cy.get('[data-test-id="undefined-edit"]').click();
     if (cloudInitUname) {
       cy.get(cView.cloudInitUser).clear().type(cloudInitUname);
@@ -351,7 +351,7 @@ export const fillInitialRun = (vmData: VirtualMachineData) => {
     cy.clickApplyBtn();
   }
   if (sysprepFile) {
-    cy.contains('.pf-v5-c-tabs__item-text', 'Initial run').click();
+    cy.contains('.pf-v6-c-tabs__item-text', 'Initial run').click();
     cy.get('[data-test-id="sysprep-button-edit"]').click();
     cy.dropFile(sysprepFile, sysprepFile.split('/').pop(), vmView.autoUnInput);
     cy.dropFile(sysprepFile, sysprepFile.split('/').pop(), vmView.unattendInput);
@@ -359,7 +359,7 @@ export const fillInitialRun = (vmData: VirtualMachineData) => {
     cy.get(vmView.vmSysprep).should('contain.text', 'Available');
   }
   if (sysprepName) {
-    cy.contains('.pf-v5-c-tabs__item-text', 'Initial run').click();
+    cy.contains('.pf-v6-c-tabs__item-text', 'Initial run').click();
     cy.get('[data-test-id="sysprep-button-edit"]').click();
     // cy.get(vmView.vmSysprepEdit).click();
     cy.byButtonText('Attach existing sysprep').click();

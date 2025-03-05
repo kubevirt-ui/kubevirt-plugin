@@ -6,10 +6,10 @@ export const windows = '#windows';
 export const rhel = '#rhel';
 export const redhat = '#Red Hat';
 export const otherProvider = '#Other';
-export const expandSection = '.pf-v5-c-expandable-section';
-export const listGroup = '.pf-v5-c-description-list__group';
-export const listTerm = '.pf-v5-c-description-list__term';
-export const listDesc = '.pf-v5-c-description-list__description';
+export const expandSection = '.pf-v6-c-expandable-section';
+export const listGroup = '.pf-v6-c-description-list__group';
+export const listTerm = '.pf-v6-c-description-list__term';
+export const listDesc = '.pf-v6-c-description-list__description';
 export const plusBtn = 'button[aria-label="Plus"]';
 export const cpuBtn = 'div.input-cpu';
 export const memBtn = 'div.input-memory';
@@ -44,4 +44,4 @@ export const diskURL = '[data-test-id="disk-source-url"]';
 
 // clone modal
 export const selectProjectStr = '--- Select PVC project ---';
-export const selectPVC = '.pf-v5-c-form-control.pf-v5-c-select__toggle-typeahead';
+export const selectPVC = '.pf-v6-c-form-control.pf-v6-c-select__toggle-typeahead';
