@@ -1,6 +1,5 @@
 import React, { FC, useMemo, useState } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Content, Flex, FlexItem, SelectList, SelectOption } from '@patternfly/react-core';
 import { InstanceTypeUnion } from '@virtualmachines/details/tabs/configuration/utils/types';
@@ -8,6 +7,7 @@ import { InstanceTypeUnion } from '@virtualmachines/details/tabs/configuration/u
 import FormPFSelect from '../FormPFSelect/FormPFSelect';
 import TabModal from '../TabModal/TabModal';
 
+import { InstanceTypeModalProps } from './utils/types';
 import {
   getInstanceTypeFromSeriesAndSize,
   getInstanceTypeSeriesAndSize,
@@ -17,25 +17,13 @@ import {
   mappedInstanceTypesToSelectOptions,
 } from './utils/util';
 
-type InstanceTypeModalProps = {
-  allInstanceTypes: InstanceTypeUnion[];
-  instanceType: InstanceTypeUnion;
-  instanceTypeVM: V1VirtualMachine;
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (
-    updatedVM: V1VirtualMachine,
-    instanceType: InstanceTypeUnion,
-  ) => Promise<V1VirtualMachine>;
-};
-
 const InstanceTypeModal: FC<InstanceTypeModalProps> = ({
   allInstanceTypes,
   instanceType,
-  instanceTypeVM,
   isOpen,
   onClose,
   onSubmit,
+  vm,
 }) => {
   const { t } = useKubevirtTranslation();
   const mappedInstanceTypes = useMemo(
@@ -47,20 +35,20 @@ const InstanceTypeModal: FC<InstanceTypeModalProps> = ({
     [instanceType],
   );
 
-  const [series, setSeries] = useState<string>(
+  const [series, setSeries] = useState<string | undefined>(
     getInstanceTypeSeriesDisplayName(mappedInstanceTypes, instanceTypeSeries),
   );
 
-  const [size, setSize] = useState<string>(
+  const [size, setSize] = useState<string | undefined>(
     getInstanceTypesPrettyDisplaySize(mappedInstanceTypes, instanceTypeSeries, instanceTypeSize),
   );
 
   const handleSubmit = (selectedInstanceType: InstanceTypeUnion) =>
-    onSubmit(instanceTypeVM, selectedInstanceType);
+    onSubmit(vm, selectedInstanceType);
 
   return (
     <TabModal
-      headerText={t('Edit Instancetype')}
+      headerText={t('Edit Instance Type')}
       isOpen={isOpen}
       obj={getInstanceTypeFromSeriesAndSize(mappedInstanceTypes, series, size)}
       onClose={onClose}

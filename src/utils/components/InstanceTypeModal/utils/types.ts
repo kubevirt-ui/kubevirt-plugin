@@ -1,3 +1,4 @@
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { InstanceTypeUnion } from '@virtualmachines/details/tabs/configuration/utils/types';
 
 export type InstanceTypesSeries =
@@ -37,3 +38,15 @@ export type MappedInstanceTypes = Record<
     };
   } & { descriptionSeries?: string; displayNameSeries?: string }
 >;
+
+export type InstanceTypeModalProps = {
+  allInstanceTypes: InstanceTypeUnion[];
+  instanceType: InstanceTypeUnion;
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (
+    vmToBeUpdated: V1VirtualMachine,
+    instanceType: InstanceTypeUnion,
+  ) => Promise<V1VirtualMachine>;
+  vm: V1VirtualMachine;
+};

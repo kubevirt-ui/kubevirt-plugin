@@ -4,7 +4,7 @@ import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/c
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getGPUDevices } from '@kubevirt-utils/resources/vm';
+import { getGPUDevices, isHeadlessMode } from '@kubevirt-utils/resources/vm';
 import { isWindows } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { RFBCreate } from '@novnc/novnc/lib/rfb';
@@ -22,7 +22,6 @@ import {
   WSFactoryExtends,
 } from './components/utils/ConsoleConsts';
 import VncConsole from './components/vnc-console/VncConsole';
-import { isHeadlessModeVMI } from './utils/utils';
 
 import './consoles.scss';
 
@@ -44,7 +43,6 @@ const Consoles: FC<ConsolesProps> = ({ consoleContainerClass, isStandAlone, vmi 
   });
   const isWindowsVM = isWindows(vmi);
   const gpus = getGPUDevices(vm);
-  const isHeadlessMode = isHeadlessModeVMI(vmi);
 
   if (!vmi?.metadata) {
     return (
@@ -54,7 +52,7 @@ const Consoles: FC<ConsolesProps> = ({ consoleContainerClass, isStandAlone, vmi 
     );
   }
 
-  if (isHeadlessMode) {
+  if (isHeadlessMode(vmi)) {
     return <div>{t('Console is disabled in headless mode')}</div>;
   }
 

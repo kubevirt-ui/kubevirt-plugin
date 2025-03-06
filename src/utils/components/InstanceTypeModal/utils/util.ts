@@ -33,8 +33,11 @@ export const getInstanceTypeDescriptionAnnotation = (instanceType: InstanceTypeU
 
 export const getInstanceTypeSeriesAndSize = (
   instanceType: InstanceTypeUnion,
-): { series: InstanceTypesSeries; size: InstanceTypesSizes } => {
-  const [series, size] = instanceType?.metadata?.name?.split('.');
+): { series?: InstanceTypesSeries; size?: InstanceTypesSizes } => {
+  const [series, size] = instanceType?.metadata?.name?.split('.') ?? [];
+  if (!series || !size) {
+    return {};
+  }
   return { series: series as InstanceTypesSeries, size: size as InstanceTypesSizes };
 };
 
@@ -80,34 +83,42 @@ const sortInstanceTypeSizes = (a: InstanceTypeRecord, b: InstanceTypeRecord) => 
 
 export const getInstanceTypesPrettyDisplaySize = (
   mappedInstanceTypes: MappedInstanceTypes,
-  instanceTypeSeries: InstanceTypesSeries,
-  instanceTypeSize: InstanceTypeSize,
+  instanceTypeSeries?: InstanceTypesSeries,
+  instanceTypeSize?: InstanceTypeSize,
 ) => mappedInstanceTypes?.[instanceTypeSeries]?.sizes[instanceTypeSize]?.prettyDisplaySize;
 
-export const getInstanceTypesSizes = (mappedInstanceTypes: MappedInstanceTypes, series: string) => {
+export const getInstanceTypesSizes = (
+  mappedInstanceTypes: MappedInstanceTypes,
+  series?: string,
+) => {
   const matchedSeries = Object.values(mappedInstanceTypes).find(
     (it) => it.displayNameSeries === series,
   );
-  return Object.values(matchedSeries?.sizes).sort(sortInstanceTypeSizes);
+  return Object.values(matchedSeries?.sizes ?? {}).sort(sortInstanceTypeSizes);
 };
 
 export const getInstanceTypeSeriesDisplayName = (
   mappedInstanceTypes: MappedInstanceTypes,
-  instanceTypeSeries: InstanceTypesSeries,
+  instanceTypeSeries?: InstanceTypesSeries,
 ) => mappedInstanceTypes?.[instanceTypeSeries]?.displayNameSeries;
 
 export const getInstanceTypeFromSeriesAndSize = (
   mappedInstanceTypes: MappedInstanceTypes,
-  instanceTypeSeries: string,
-  instanceTypeSize: string,
+  instanceTypeSeries?: string,
+  instanceTypeSize?: string,
 ): InstanceTypeUnion => {
   const instanceTypesSeries = Object.values(mappedInstanceTypes);
 
   const matchedSeries = instanceTypesSeries.find(
-    (series) => series.displayNameSeries === instanceTypeSeries,
+    (series) => series?.displayNameSeries === instanceTypeSeries,
   );
-  const matchedSize = Object.values(matchedSeries?.sizes).find(
-    (size) => size.prettyDisplaySize === instanceTypeSize,
+
+  if (!matchedSeries) {
+    return undefined;
+  }
+
+  const matchedSize = Object.values(matchedSeries?.sizes ?? {}).find(
+    (size) => size?.prettyDisplaySize === instanceTypeSize,
   );
 
   return matchedSize?.instanceType;
