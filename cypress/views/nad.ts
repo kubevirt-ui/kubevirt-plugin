@@ -55,7 +55,6 @@ export const createNAD = (nad: nadData) => {
     }
   }
   cy.get(createBtn).click();
-  cy.screenshot();
   cy.get(heading).should('exist');
 };
 

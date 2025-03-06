@@ -33,6 +33,6 @@ yarn run $yarn_script
 # Generate Cypress report.
 yarn run cypress-postreport
 
-echo sleep for an hour
-sleep 60m
-echo wake
+#echo sleep for an hour
+#sleep 60m
+#echo wake

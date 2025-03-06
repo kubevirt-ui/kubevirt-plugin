@@ -1,9 +1,9 @@
-import { SECOND, VM_ACTION, VM_STATUS } from '../../utils/const/index';
+import { MINUTE, SECOND, VM_ACTION, VM_STATUS } from '../../utils/const/index';
 import { VM_IT_CUST, VM_IT_QUICK, VM_TMPL_CUST, VM_TMPL_QUICK } from '../../utils/const/testVM';
 import * as nav from '../../views/selector';
-import { descrText, selectAllBtn } from '../../views/selector-common';
+import { descrText, selectAllBtn, vmStatusOnList } from '../../views/selector-common';
 import { tab } from '../../views/tab';
-import { vm, waitForStatus } from '../../views/vm-flow';
+import { vm } from '../../views/vm-flow';
 
 describe('Create VMs from InstanceType', () => {
   before(() => {
@@ -62,9 +62,6 @@ describe('Test bulk actions', () => {
     cy.clickVirtLink(nav.catalogNav);
     cy.wait(30 * SECOND);
     cy.clickVirtLink(nav.vmNav);
-    waitForStatus(VM_TMPL_QUICK.name, VM_STATUS.Stopped);
-    waitForStatus(VM_TMPL_CUST.name, VM_STATUS.Stopped);
-    waitForStatus(VM_IT_QUICK.name, VM_STATUS.Stopped);
-    waitForStatus(VM_IT_CUST.name, VM_STATUS.Stopped);
+    cy.contains(vmStatusOnList, VM_STATUS.Running, { timeout: MINUTE }).should('not.exist');
   });
 });

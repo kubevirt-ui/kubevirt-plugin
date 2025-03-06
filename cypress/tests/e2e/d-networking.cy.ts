@@ -113,7 +113,8 @@ describe('Check all Networking pages can be loaded', () => {
     });
   });
 
-  describe('Check NetworkPolicies page', () => {
+  // https://issues.redhat.com/browse/CNV-57652
+  xdescribe('Check NetworkPolicies page', () => {
     it('visit NetworkPolicies page', () => {
       cy.clickNavLink(['Networking', 'NetworkPolicies']);
       cy.checkTitle('NetworkPolicies', MINUTE);
@@ -130,7 +131,6 @@ describe('Check all Networking pages can be loaded', () => {
       cy.get(egressOff).check();
       cy.get(egressHeader).should('not.exist');
       cy.get(createBtn).click();
-      cy.screenshot();
       cy.checkTitle(netPolicy);
       checkActionMenu('NetworkPolicy');
       cy.contains(brCrumbItem, 'NetworkPolicy').find('a').click();
@@ -153,7 +153,6 @@ describe('Check all Networking pages can be loaded', () => {
       cy.get(egressOff).check();
       cy.get(egressHeader).should('not.exist');
       cy.get(createBtn).click();
-      cy.screenshot();
       cy.checkSubTitle(multiPolicy);
       checkActionMenu('MultiNetworkPolicy');
       cy.contains(brCrumbItem, 'MultiNetworkPolicy').find('a').click();

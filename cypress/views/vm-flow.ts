@@ -6,7 +6,6 @@ import * as instance from './instance-flow';
 import * as cView from './selector-catalog';
 import { vmStatusOnList, vmStatusTop } from './selector-common';
 import * as iView from './selector-instance';
-import { tab } from './tab';
 
 export const getRow = (name: string, within: VoidFunction) =>
   cy.byTestRows('resource-row').contains(name).parents('tr').within(within);
@@ -121,6 +120,9 @@ export const vm = {
     cy.get(`div[data-test-id="${vmData.template.metadataName}"]`).click();
     catalog.fillReviewAndCreate(vmData);
     cy.get(cView.customizeVMBtn).click();
+    if (!vmData.startOnCreation && vmData.startOnCreation !== undefined) {
+      cy.get(cView.startOnCreation).click();
+    }
     catalog.fillOverview(vmData);
     catalog.fillScheduling(vmData);
     catalog.fillEnvironment(vmData);
@@ -128,10 +130,6 @@ export const vm = {
     catalog.addDisks(vmData);
     catalog.fillScripts(vmData);
     catalog.fillMetadata(vmData);
-    tab.navigateToOverview();
-    if (!vmData.startOnCreation && vmData.startOnCreation !== undefined) {
-      cy.get(cView.startOnCreation).click();
-    }
     cy.byButtonText(cView.createBtnText).click({ force: true });
     cy.get('body').then(($body) => {
       if ($body.text().includes(cView.createBtnText)) {
