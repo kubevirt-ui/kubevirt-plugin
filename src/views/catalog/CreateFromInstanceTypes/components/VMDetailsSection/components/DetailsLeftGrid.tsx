@@ -9,7 +9,7 @@ import FolderSelect from '@kubevirt-utils/components/FolderSelect/FolderSelect';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { validateVMName } from '@kubevirt-utils/components/VMNameValidationHelperText/utils/utils';
 import VMNameValidationHelperText from '@kubevirt-utils/components/VMNameValidationHelperText/VMNameValidationHelperText';
-import { TREE_VIEW, TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
+import { TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { convertResourceArrayToMap } from '@kubevirt-utils/resources/shared';
@@ -24,7 +24,6 @@ type DetailsLeftGridProps = {
 
 const DetailsLeftGrid: FC<DetailsLeftGridProps> = ({ instanceTypesAndPreferencesData }) => {
   const { t } = useKubevirtTranslation();
-  const { featureEnabled: treeViewEnabled } = useFeatures(TREE_VIEW);
   const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
 
   const { instanceTypeVMState, setInstanceTypeVMState, vmNamespaceTarget } =
@@ -70,7 +69,7 @@ const DetailsLeftGrid: FC<DetailsLeftGridProps> = ({ instanceTypesAndPreferences
         }
         descriptionHeader={t('Name')}
       />
-      {treeViewEnabled && treeViewFoldersEnabled && (
+      {treeViewFoldersEnabled && (
         <VirtualMachineDescriptionItem
           descriptionData={
             <FolderSelect

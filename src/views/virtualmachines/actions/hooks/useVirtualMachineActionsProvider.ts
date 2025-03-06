@@ -7,11 +7,7 @@ import {
 import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { getConsoleVirtctlCommand } from '@kubevirt-utils/components/SSHAccess/utils';
-import {
-  CONFIRM_VM_ACTIONS,
-  TREE_VIEW,
-  TREE_VIEW_FOLDERS,
-} from '@kubevirt-utils/hooks/useFeatures/constants';
+import { CONFIRM_VM_ACTIONS, TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
 import { getUpdateStrategy } from '@kubevirt-utils/resources/vm';
@@ -40,7 +36,6 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
 
   const [, inFlight] = useK8sModel(VirtualMachineModelRef);
 
-  const { featureEnabled: treeViewEnabled } = useFeatures(TREE_VIEW);
   const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
 
   const actions: ActionDropdownItemType[] = useMemo(() => {
@@ -90,20 +85,10 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
       VirtualMachineActionFactory.snapshot(vm, createModal),
       VirtualMachineActionFactory.migrationActions(migrationActions),
       VirtualMachineActionFactory.copySSHCommand(vm, virtctlCommand),
-      treeViewEnabled &&
-        treeViewFoldersEnabled &&
-        VirtualMachineActionFactory.moveToFolder(vm, createModal),
+      treeViewFoldersEnabled && VirtualMachineActionFactory.moveToFolder(vm, createModal),
       VirtualMachineActionFactory.delete(vm, createModal),
     ].filter(Boolean);
-  }, [
-    vm,
-    vmim,
-    isSingleNodeCluster,
-    createModal,
-    virtctlCommand,
-    treeViewEnabled,
-    treeViewFoldersEnabled,
-  ]);
+  }, [vm, vmim, isSingleNodeCluster, createModal, virtctlCommand, treeViewFoldersEnabled]);
 
   return useMemo(() => [actions, !inFlight, undefined], [actions, inFlight]);
 };

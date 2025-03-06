@@ -512,7 +512,6 @@
   "Enable preallocation": "Enable preallocation",
   "Enable predictive analytics": "Enable predictive analytics",
   "Enable the creation of LoadBalancer services for SSH connections to VirtualMachines. A load balancer must be configured": "Enable the creation of LoadBalancer services for SSH connections to VirtualMachines. A load balancer must be configured",
-  "Enable Virtual Machines tree view": "Enable Virtual Machines tree view",
   "Enabled": "Enabled",
   "Enables access to the VirtualMachine guest system log. Wait a few seconds for logging to start before viewing the log.": "Enables access to the VirtualMachine guest system log. Wait a few seconds for logging to start before viewing the log.",
   "Enables access to the VirtualMachine's guest system log. Wait a few seconds for logging to start before viewing the log.": "Enables access to the VirtualMachine's guest system log. Wait a few seconds for logging to start before viewing the log.",
