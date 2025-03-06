@@ -94,7 +94,7 @@ const MigrationsRow: FC<RowProps<MigrationTableDataLayout>> = ({ activeColumnIDs
       </TableData>
       <TableData
         activeColumnIDs={activeColumnIDs}
-        className="dropdown-kebab-pf pf-v5-c-table__action"
+        className="dropdown-kebab-pf pf-v6-c-table__action"
         id=""
       >
         <MigrationActionsDropdown isKebabToggle vmim={obj?.vmim} />

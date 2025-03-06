@@ -10,7 +10,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
-import { Button, ButtonVariant, Popover, Text, TextVariants } from '@patternfly/react-core';
+import { Button, ButtonVariant, Content, ContentVariants, Popover } from '@patternfly/react-core';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
 type NetworkUtilProps = {
@@ -62,8 +62,8 @@ const NetworkUtil: React.FC<NetworkUtilProps> = ({ vmi }) => {
           <Popover
             bodyContent={
               <div>
-                <Text component={TextVariants.h3}>{t('Network transfer breakdown')}</Text>
-                <Text component={TextVariants.h6}>{t('Top consumer')}</Text>
+                <Content component={ContentVariants.h3}>{t('Network transfer breakdown')}</Content>
+                <Content component={ContentVariants.h6}>{t('Top consumer')}</Content>
                 {interfacesNames?.map((networkInterface) => (
                   <div className="network-popover" key={networkInterface?.name}>
                     <Link

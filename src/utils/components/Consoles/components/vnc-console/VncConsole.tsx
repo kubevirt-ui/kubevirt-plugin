@@ -25,7 +25,6 @@ import useCopyPasteConsole from '../utils/hooks/useCopyPasteConsole';
 import { isShiftKeyRequired } from './utils/util';
 import { VncConsoleProps } from './utils/VncConsoleTypes';
 
-import '@patternfly/react-styles/css/components/Consoles/VncConsole.css';
 import './vnc-console.scss';
 
 const { connected, connecting, disconnected } = ConsoleState;

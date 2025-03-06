@@ -3,10 +3,10 @@ import { XMLValidator } from 'fast-xml-parser';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
+  Content,
+  ContentVariants,
   DropEvent,
   FileUpload,
-  Text,
-  TextVariants,
   ValidatedOptions,
 } from '@patternfly/react-core';
 
@@ -80,9 +80,9 @@ const SysprepFileField: FC<SysprepFileFieldProps> = ({ id, onChange, value }) =>
         value={data.value}
       />
       {data.validated === ValidatedOptions.error && (
-        <Text className="kv-sysprep--error" component={TextVariants.p}>
+        <Content className="kv-sysprep--error" component={ContentVariants.p}>
           {t('XML structure is not valid')}
-        </Text>
+        </Content>
       )}
     </>
   );

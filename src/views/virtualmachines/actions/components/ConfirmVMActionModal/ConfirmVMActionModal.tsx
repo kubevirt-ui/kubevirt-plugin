@@ -3,7 +3,8 @@ import React, { FC } from 'react';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { Button, ButtonVariant, Modal } from '@patternfly/react-core';
+import { Button, ButtonVariant } from '@patternfly/react-core';
+import { Modal } from '@patternfly/react-core/deprecated';
 
 type ConfirmVMActionModalProps = {
   action: (vm: V1VirtualMachine) => Promise<string>;

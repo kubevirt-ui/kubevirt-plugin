@@ -6,7 +6,7 @@ import {
   CPUComponent,
   getUpdatedCPU,
 } from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/utils/utils';
-import { GridItem, NumberInput, Text } from '@patternfly/react-core';
+import { Content, GridItem, NumberInput } from '@patternfly/react-core';
 
 type CPUComponentInputProps = {
   cpu: V1CPU;
@@ -24,7 +24,9 @@ const CPUComponentInput: FC<CPUComponentInputProps> = ({
   return (
     <>
       <GridItem span={3}>
-        <Text disabled={isDisabled}>{getCPUComponentTitle(cpuComponent)}</Text>
+        <Content component="p" disabled={isDisabled}>
+          {getCPUComponentTitle(cpuComponent)}
+        </Content>
       </GridItem>
       <GridItem span={9}>
         <NumberInput

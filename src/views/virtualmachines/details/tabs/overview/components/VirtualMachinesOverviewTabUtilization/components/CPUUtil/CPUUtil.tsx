@@ -12,7 +12,7 @@ import {
   PrometheusEndpoint,
   usePrometheusPoll,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { ChartDonutUtilization } from '@patternfly/react-charts';
+import { ChartDonutUtilization } from '@patternfly/react-charts/victory';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
 type CPUUtilProps = {

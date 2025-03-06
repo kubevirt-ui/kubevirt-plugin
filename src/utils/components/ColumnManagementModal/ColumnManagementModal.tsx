@@ -11,11 +11,10 @@ import {
   Button,
   ButtonVariant,
   DataList,
-  Modal,
-  ModalVariant,
   Stack,
   StackItem,
 } from '@patternfly/react-core';
+import { Modal, ModalVariant } from '@patternfly/react-core/deprecated';
 
 import { MAX_VIEW_COLS } from './constants';
 import DataListRow from './DataListRow';

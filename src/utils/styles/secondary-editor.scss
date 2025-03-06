@@ -1,17 +1,17 @@
 @mixin secondary-editor-save-button {
   width: 90px;
   --pf-v5-c-button--after--BorderColor: var(--pf-v5-c-button--m-secondary--after--BorderColor);
-  color: var(--pf-v5-c-button--m-secondary--Color);
+  color: var(--pf-v6-c-button--m-secondary--Color);
   background-color: var(--pf-v5-c-button--m-secondary--BackgroundColor);
 }
 
 @mixin secondary-editor-reload-button {
   --pf-v5-c-button--after--BorderColor: var(--pf-v5-c-button--m-link--disabled--BackgroundColor);
-  --pf-v5-c-button--disabled--BackgroundColor: var(
+  --pf-v6-c-button--disabled--BackgroundColor: var(
     --pf-v5-c-button--m-link--disabled--BackgroundColor
   );
-  color: var(--pf-v5-c-button--m-link--Color);
-  background-color: var(--pf-v5-c-button--m-link--BackgroundColor);
+  color: var(--pf-v6-c-button--m-link--Color);
+  background-color: var(--pf-v6-c-button--m-link--BackgroundColor);
 }
 
 @mixin secondary-editor-cancel-button {
@@ -20,11 +20,11 @@
 
 @mixin secondary-editor-download-button {
   --pf-v5-c-button--after--BorderColor: var(--pf-v5-c-button--m-link--disabled--BackgroundColor);
-  --pf-v5-c-button--disabled--BackgroundColor: var(
+  --pf-v6-c-button--disabled--BackgroundColor: var(
     --pf-v5-c-button--m-link--disabled--BackgroundColor
   );
-  color: var(--pf-v5-c-button--m-link--Color);
-  background-color: var(--pf-v5-c-button--m-link--BackgroundColor);
+  color: var(--pf-v6-c-button--m-link--Color);
+  background-color: var(--pf-v6-c-button--m-link--BackgroundColor);
 }
 
 @mixin secondary-resource-yaml-editor {
@@ -42,7 +42,7 @@
     }
 
     // download button
-    .pf-v5-c-button--align-right {
+    .pf-v6-c-button--align-right {
       @include secondary-editor-download-button;
     }
   }

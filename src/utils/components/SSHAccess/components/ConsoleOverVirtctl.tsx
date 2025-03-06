@@ -15,13 +15,13 @@ import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import {
+  Content,
   DescriptionListDescription,
   DescriptionListGroup,
   DescriptionListTerm,
   Grid,
   GridItem,
   Popover,
-  Text,
 } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
 
@@ -39,9 +39,9 @@ const ConsoleOverVirtctl: FC<ConsoleOverVirtctlProps> = ({ vm }) => {
   const [isNamespaceManagedByUDN, udn] = useNamespaceUDN(getNamespace(vm));
 
   return (
-    <DescriptionListGroup className="pf-v5-c-description-list__group">
-      <DescriptionListTerm className="pf-v5-u-font-size-xs">
-        <Text className="pf-v5-u-disabled-color-100">
+    <DescriptionListGroup className="pf-v6-c-description-list__group">
+      <DescriptionListTerm className="pf-v6-u-font-size-xs">
+        <Content className="pf-v6-u-disabled-color-100" component="p">
           {t('SSH using virtctl')}{' '}
           <Popover
             bodyContent={
@@ -75,9 +75,9 @@ const ConsoleOverVirtctl: FC<ConsoleOverVirtctlProps> = ({ vm }) => {
           >
             <HelpIcon />
           </Popover>
-        </Text>
+        </Content>
       </DescriptionListTerm>
-      <DescriptionListDescription className="pf-v5-c-description-list__description">
+      <DescriptionListDescription className="pf-v6-c-description-list__description">
         {isNamespaceManagedByUDN ? (
           <>
             {t("Virtctl is disabled for this namespace as it's managed by")}{' '}

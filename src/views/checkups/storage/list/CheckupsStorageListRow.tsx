@@ -14,7 +14,15 @@ import {
 } from '../../utils/utils';
 import CheckupsStorageActions from '../components/CheckupsStorageActions';
 
-const CheckupsStorageListRow = ({ activeColumnIDs, obj: configMap, rowData: { getJobByName } }) => {
+const CheckupsStorageListRow = ({
+  activeColumnIDs,
+  obj: configMap,
+  rowData: { getJobByName },
+}: {
+  activeColumnIDs: any;
+  obj: any;
+  rowData: { getJobByName?: any };
+}) => {
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} id="name">
@@ -50,7 +58,7 @@ const CheckupsStorageListRow = ({ activeColumnIDs, obj: configMap, rowData: { ge
       </TableData>
       <TableData
         activeColumnIDs={activeColumnIDs}
-        className="dropdown-kebab-pf pf-v5-c-table__action"
+        className="dropdown-kebab-pf pf-v6-c-table__action"
         id=""
       >
         <CheckupsStorageActions

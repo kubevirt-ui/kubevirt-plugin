@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Button, Stack, StackItem, Text, TextVariants } from '@patternfly/react-core';
+import { Button, Content, ContentVariants, Stack, StackItem } from '@patternfly/react-core';
 import { ExternalLinkSquareAltIcon } from '@patternfly/react-icons';
 
 const SysprepInfo: FC = () => {
@@ -12,11 +12,11 @@ const SysprepInfo: FC = () => {
     <div data-test="sysprep-info">
       <Stack>
         <StackItem>
-          <Text className="kv-sysprep-info" component={TextVariants.p}>
+          <Content className="kv-sysprep-info" component={ContentVariants.p}>
             {t(
               'Sysprep is an automation tool for Windows that automates Windows setup, and custom software provisioning.',
             )}
-          </Text>
+          </Content>
         </StackItem>
         <StackItem className="text-muted">
           {t(

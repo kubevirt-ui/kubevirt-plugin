@@ -15,14 +15,14 @@ const AccessDenied: FC<AccessDeniedProps> = ({ message }) => {
     <Panel className="kv-access-denied">
       <PanelMain>
         <PanelMainBody>
-          <div className="pf-v5-u-text-align-center">
+          <div className="pf-v6-u-text-align-center">
             <img src={restrictedSignImg} />
           </div>
-          <Title className="pf-v5-u-text-align-center" headingLevel="h2">
+          <Title className="pf-v6-u-text-align-center" headingLevel="h2">
             {t('Restricted Access')}
           </Title>
 
-          <div className="pf-v5-u-text-align-center" data-test="msg-box-detail">
+          <div className="pf-v6-u-text-align-center" data-test="msg-box-detail">
             {t("You don't have access to this section due to cluster policy.")}
           </div>
           {!isEmpty(message) && (

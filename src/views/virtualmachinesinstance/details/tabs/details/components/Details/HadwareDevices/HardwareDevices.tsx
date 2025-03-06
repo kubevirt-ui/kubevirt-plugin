@@ -18,7 +18,7 @@ const HardwareDevices: React.FC<HardwareDevices> = ({ devices }) => {
   const { t } = useKubevirtTranslation();
 
   return (
-    <DescriptionList className="pf-v5-c-description-list">
+    <DescriptionList className="pf-v6-c-description-list">
       <DescriptionListGroup>
         <HardwareDeviceTitle canEdit={false} title={t('GPU devices')} />
         <DescriptionListDescription>

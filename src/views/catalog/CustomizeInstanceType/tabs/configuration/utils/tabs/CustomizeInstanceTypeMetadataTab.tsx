@@ -10,13 +10,7 @@ import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { updateCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
-import {
-  DescriptionList,
-  Grid,
-  PageSection,
-  PageSectionVariants,
-  Title,
-} from '@patternfly/react-core';
+import { DescriptionList, Grid, PageSection, Title } from '@patternfly/react-core';
 import MetadataTabAnnotations from '@virtualmachines/details/tabs/configuration/metadata/components/MetadataTabAnnotations/MetadataTabAnnotations';
 import MetadataTabLabels from '@virtualmachines/details/tabs/configuration/metadata/components/MetadataTabLabels/MetadataTabLabels';
 
@@ -40,12 +34,12 @@ const CustomizeInstanceTypeMetadataTab = () => {
     );
 
   return (
-    <PageSection variant={PageSectionVariants.light}>
+    <PageSection>
       <Title headingLevel="h2">
         <SearchItem id="metadata">{t('Metadata')}</SearchItem>
       </Title>
       <Grid span={6}>
-        <DescriptionList className="pf-v5-c-description-list">
+        <DescriptionList className="pf-v6-c-description-list">
           <VirtualMachineDescriptionItem
             bodyContent={t(
               'Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. ',

@@ -8,7 +8,6 @@ import {
   EmptyStateActions,
   EmptyStateBody,
   EmptyStateFooter,
-  EmptyStateHeader,
   EmptyStateVariant,
 } from '@patternfly/react-core';
 
@@ -21,8 +20,7 @@ export const BootOrderEmptyState: FC<BootOrderEmptyProps> = ({
   onClick,
   title,
 }) => (
-  <EmptyState variant={EmptyStateVariant.full}>
-    <EmptyStateHeader headingLevel="h5" titleText={<>{title}</>} />
+  <EmptyState headingLevel="h5" titleText={<>{title}</>} variant={EmptyStateVariant.full}>
     <EmptyStateBody>{message}</EmptyStateBody>
     <EmptyStateFooter>
       <EmptyStateActions>

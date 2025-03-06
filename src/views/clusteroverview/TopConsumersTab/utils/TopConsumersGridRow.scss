@@ -1,9 +1,11 @@
 .kv-top-consumers-card__top-grid {
-  border-bottom: var(--pf-v5-global--BorderWidth--sm) solid var(--pf-v5-global--Color--light-300);
+  border-bottom: var(--pf-t--global--border--width--regular) solid
+    var(--pf-t--global--border--color--default);
 }
 
 .kv-top-consumers-card__card-grid-item {
   &:not(:last-child) {
-    border-right: var(--pf-v5-global--BorderWidth--sm) solid var(--pf-v5-global--Color--light-300);
+    border-right: var(--pf-t--global--border--width--regular) solid
+      var(--pf-t--global--border--color--default);
   }
 }

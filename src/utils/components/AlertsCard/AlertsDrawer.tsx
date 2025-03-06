@@ -2,11 +2,7 @@ import React from 'react';
 
 import AlertsCardAccordionItem from '@kubevirt-utils/components/AlertsCard/AlertsCardAccordionItem';
 import { AlertType, SimplifiedAlerts } from '@kubevirt-utils/components/AlertsCard/utils/types';
-import {
-  labelColor,
-  labelIcon,
-  labelText,
-} from '@kubevirt-utils/components/AlertsCard/utils/utils';
+import { labelStatus, labelText } from '@kubevirt-utils/components/AlertsCard/utils/utils';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   Accordion,
@@ -48,7 +44,7 @@ const AlertsDrawer: React.FC<AlertsDrawerProps> = ({ sortedAlerts }) => {
     <div className="alerts-card__drawer">
       {alertsQuantity > 0 ? (
         <Accordion asDefinitionList isBordered>
-          <AccordionItem>
+          <AccordionItem isExpanded={titleOpen}>
             <AccordionToggle
               onClick={() => {
                 setTitleOpen((title) => {
@@ -58,7 +54,6 @@ const AlertsDrawer: React.FC<AlertsDrawerProps> = ({ sortedAlerts }) => {
               }}
               className="alerts-card__toggle--main"
               id="toggle-main"
-              isExpanded={titleOpen}
             >
               <Flex>
                 {Object.keys(sortedAlerts)?.map((alertType) => {
@@ -86,9 +81,8 @@ const AlertsDrawer: React.FC<AlertsDrawerProps> = ({ sortedAlerts }) => {
                     >
                       <Label
                         className="alerts-label"
-                        color={labelColor[alertType]}
-                        icon={labelIcon[alertType]}
                         key={alertType}
+                        status={labelStatus[alertType]}
                       >
                         {numAlerts || 0}
                       </Label>
@@ -98,7 +92,7 @@ const AlertsDrawer: React.FC<AlertsDrawerProps> = ({ sortedAlerts }) => {
                 })}
               </Flex>
             </AccordionToggle>
-            <AccordionContent id="toggle-main" isHidden={!titleOpen}>
+            <AccordionContent id="toggle-main">
               {Object.entries(sortedAlerts)?.map(([alertType, alerts]) => (
                 <AlertsCardAccordionItem
                   alertOpen={alertTypeOpen}

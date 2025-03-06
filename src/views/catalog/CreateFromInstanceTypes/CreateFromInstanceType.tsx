@@ -91,7 +91,7 @@ const CreateFromInstanceType: FC<CreateFromInstanceTypeProps> = ({ currentTab })
                 />
               </SectionListItem>
 
-              <Divider className="create-vm-instance-type-section__divider" />
+              <Divider />
 
               <SectionListItem
                 headerText={t('Select InstanceType')}
@@ -103,7 +103,7 @@ const CreateFromInstanceType: FC<CreateFromInstanceTypeProps> = ({ currentTab })
                 />
               </SectionListItem>
 
-              <Divider className="create-vm-instance-type-section__divider" />
+              <Divider />
 
               <SectionListItem
                 headerText={t('VirtualMachine details')}

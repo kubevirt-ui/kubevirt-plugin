@@ -5,7 +5,7 @@ import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMac
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, TemplateModel, V1Template } from '@kubevirt-utils/models';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
-import { Text } from '@patternfly/react-core';
+import { Content } from '@patternfly/react-core';
 
 type BaseTemplateProps = {
   template: V1Template;
@@ -24,7 +24,9 @@ const BaseTemplate: React.FC<BaseTemplateProps> = ({ template }) => {
             {...baseTemplate}
           />
         ) : (
-          <Text className="text-muted">{t('Not available')}</Text>
+          <Content className="text-muted" component="p">
+            {t('Not available')}
+          </Content>
         )
       }
       descriptionHeader={t('Base template')}

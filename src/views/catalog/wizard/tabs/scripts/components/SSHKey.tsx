@@ -22,7 +22,7 @@ import { getInitialSSHDetails } from '@kubevirt-utils/resources/secret/utils';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { Stack, Text, TextVariants } from '@patternfly/react-core';
+import { Content, ContentVariants, Stack } from '@patternfly/react-core';
 
 import { removeSSHKeyObject, updateSSHKeyObject } from './sshkey-utils';
 
@@ -91,10 +91,10 @@ const SSHKey: FC = () => {
         <Stack hasGutter>
           <div data-test="ssh-popover">
             <Trans ns="plugin__kubevirt-plugin" t={t}>
-              <Text component={TextVariants.p}>Store the key in a project secret.</Text>
-              <Text component={TextVariants.p}>
+              <Content component={ContentVariants.p}>Store the key in a project secret.</Content>
+              <Content component={ContentVariants.p}>
                 The key will be stored after the machine is created
-              </Text>
+              </Content>
             </Trans>
           </div>
           <SecretNameLabel secretName={vmAttachedSecretName} />

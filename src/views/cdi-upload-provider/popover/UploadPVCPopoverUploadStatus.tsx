@@ -12,7 +12,7 @@ import {
   StackItem,
 } from '@patternfly/react-core';
 import { BanIcon, ErrorCircleOIcon, InProgressIcon } from '@patternfly/react-icons';
-import { global_danger_color_100 as dangerColor } from '@patternfly/react-tokens/dist/js/global_danger_color_100';
+import dangerColor from '@patternfly/react-tokens/dist/js/t_global_icon_color_status_danger_default';
 
 import { UPLOAD_STATUS } from '../utils/consts';
 import { DataUpload } from '../utils/types';

@@ -53,7 +53,7 @@ const DetailsRightGrid: FC = () => {
   };
 
   return (
-    <DescriptionList className="pf-v5-c-description-list" isHorizontal>
+    <DescriptionList className="pf-v6-c-description-list" isHorizontal>
       <VirtualMachineDescriptionItem
         descriptionData={isChangingNamespace ? <Loading /> : vmNamespaceTarget}
         descriptionHeader={t('Project')}

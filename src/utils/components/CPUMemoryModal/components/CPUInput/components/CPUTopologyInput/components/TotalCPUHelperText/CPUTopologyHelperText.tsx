@@ -25,9 +25,11 @@ const CPUTopologyHelperText: FC<CPUTopologyHelperTextProps> = ({ cpu }) => {
         hasAutoWidth
         position={PopoverPosition.bottom}
       >
-        <Button className="cpu-topology-helper-text__button" variant={ButtonVariant.plain}>
-          <HelpIcon />
-        </Button>
+        <Button
+          className="cpu-topology-helper-text__button"
+          icon={<HelpIcon />}
+          variant={ButtonVariant.plain}
+        />
       </Popover>
     </div>
   );

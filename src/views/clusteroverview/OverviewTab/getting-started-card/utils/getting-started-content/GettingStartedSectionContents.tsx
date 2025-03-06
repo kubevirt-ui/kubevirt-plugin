@@ -1,13 +1,13 @@
 import * as React from 'react';
 
 import {
+  Content,
+  ContentVariants,
   Flex,
   FlexItem,
   SimpleList,
   SimpleListItem,
   Skeleton,
-  Text,
-  TextVariants,
   Title,
   TitleSizes,
 } from '@patternfly/react-core';
@@ -52,9 +52,9 @@ const GettingStartedSectionContents: React.FC<GettingStartedSectionContentsProps
       </Title>
 
       {description ? (
-        <Text component={TextVariants.small} data-test="description">
+        <Content component={ContentVariants.small} data-test="description">
           {description}
-        </Text>
+        </Content>
       ) : null}
 
       <Flex direction={{ default: 'column' }} grow={{ default: 'grow' }}>

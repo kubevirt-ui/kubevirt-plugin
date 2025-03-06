@@ -4,10 +4,10 @@ import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Bullseye,
+  Content,
   DrawerActions,
   DrawerHead,
   DrawerPanelBody,
-  Text,
   TreeView,
   TreeViewDataItem,
 } from '@patternfly/react-core';
@@ -74,10 +74,10 @@ const TreeViewContent: FC<TreeViewContentProps> = ({
         onSearch={onSearch}
       />
       <DrawerHead className="vms-tree-view__header-section">
-        <Text className="vms-tree-view__title">
+        <Content className="vms-tree-view__title" component="p">
           <TreeViewCollapseExpand setShowAll={setShowAll} showAll={showAll} />
           {t('Projects')}
-        </Text>
+        </Content>
         <DrawerActions>
           <CreateProject />
         </DrawerActions>

@@ -8,9 +8,9 @@ import {
   Icon,
   SelectGroup,
   SelectOption,
-  ToolbarChip,
   ToolbarFilter,
   ToolbarItem,
+  ToolbarLabel,
 } from '@patternfly/react-core';
 import { FilterIcon } from '@patternfly/react-icons';
 
@@ -51,20 +51,20 @@ const RowFilters: FC<RowFiltersProps> = ({
       {Object.keys(filters).reduce(
         (acc, key) => (
           <ToolbarFilter
-            chipGroupCollapsedText={t('{{numRemaining}} more', {
+            labelGroupCollapsedText={t('{{numRemaining}} more', {
               numRemaining: '${remaining}',
             })}
-            chips={intersection(selectedRowFilters, filters[key]).map((item) => {
+            labels={intersection(selectedRowFilters, filters[key]).map((item) => {
               return {
                 key: item,
                 node: filtersNameMap[item],
               };
             })}
             categoryName={key}
-            chipGroupExpandedText={t('Show less')}
-            deleteChip={(filter, chip: ToolbarChip) => updateRowFilterSelected([chip.key])}
-            deleteChipGroup={() => clearAllRowFilter(key)}
+            deleteLabel={(filter, label: ToolbarLabel) => updateRowFilterSelected([label.key])}
+            deleteLabelGroup={() => clearAllRowFilter(key)}
             key={key}
+            labelGroupExpandedText={t('Show less')}
           >
             {acc}
           </ToolbarFilter>

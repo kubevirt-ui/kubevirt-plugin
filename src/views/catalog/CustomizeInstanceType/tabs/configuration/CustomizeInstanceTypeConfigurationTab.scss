@@ -1,11 +1,11 @@
 .ConfigurationTab {
   height: 100%;
   &--body > &--main {
-    margin: var(--pf-v5-global--spacer--sm);
+    margin: var(--pf-t--global--spacer--sm);
     width: fit-content;
     min-width: max-content;
     max-width: 100px;
-    padding-right: var(--pf-v5-global--spacer--3xl);
+    padding-right: var(--pf-t--global--spacer--3xl);
   }
   &--content {
     width: 100%;
@@ -13,16 +13,16 @@
   &--body {
     display: flex;
     flex-direction: row;
-    background: var(--pf-v5-c-page__main-section--m-light--BackgroundColor);
-    .pf-v5-c-page__main-section {
+    background: var(--pf-v6-c-page__main-section--BackgroundColor);
+    .pf-v6-c-page__main-section {
       background: none;
     }
-    .pf-v5-c-expandable-section__toggle-icon {
+    .pf-v6-c-expandable-section__toggle-icon {
       display: flex;
       align-self: center;
     }
     h2 {
-      margin: var(--pf-v5-global--spacer--md) 0;
+      margin: var(--pf-t--global--spacer--md) 0;
     }
   }
 }
