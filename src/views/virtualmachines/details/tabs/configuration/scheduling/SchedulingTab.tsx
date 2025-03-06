@@ -9,7 +9,7 @@ import { ConfigurationInnerTabProps } from '../utils/types';
 
 import SchedulingSection from './components/SchedulingSection';
 
-const SchedulingTab: FC<ConfigurationInnerTabProps> = ({ instanceTypeVM, vm, vmi }) => (
+const SchedulingTab: FC<ConfigurationInnerTabProps> = ({ vm, vmi }) => (
   <SidebarEditor
     onResourceUpdate={onSubmitYAML}
     pathsToHighlight={PATHS_TO_HIGHLIGHT.SCHEDULING_TAB}
@@ -17,7 +17,7 @@ const SchedulingTab: FC<ConfigurationInnerTabProps> = ({ instanceTypeVM, vm, vmi
   >
     {(resource) => (
       <PageSection variant={PageSectionVariants.light}>
-        <SchedulingSection instanceTypeVM={instanceTypeVM} vm={resource} vmi={vmi} />
+        <SchedulingSection vm={resource} vmi={vmi} />
       </PageSection>
     )}
   </SidebarEditor>

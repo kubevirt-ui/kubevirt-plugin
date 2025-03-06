@@ -11,7 +11,6 @@ export type InstanceTypeUnion =
 
 export type ConfigurationInnerTabProps = {
   allInstanceTypes?: InstanceTypeUnion[];
-  instanceTypeVM?: V1VirtualMachine;
   vm?: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };

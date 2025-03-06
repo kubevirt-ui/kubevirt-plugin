@@ -18,7 +18,6 @@ import DedicatedResources from './DedicatedResources';
 
 type SchedulingSectionRightGridProps = {
   canUpdateVM: boolean;
-  instanceTypeVM?: V1VirtualMachine;
   onUpdateVM?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
   vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
@@ -26,7 +25,6 @@ type SchedulingSectionRightGridProps = {
 
 const SchedulingSectionRightGrid: FC<SchedulingSectionRightGridProps> = ({
   canUpdateVM,
-  instanceTypeVM,
   onUpdateVM,
   vm,
   vmi,
@@ -70,7 +68,7 @@ const SchedulingSectionRightGrid: FC<SchedulingSectionRightGridProps> = ({
             ))
           }
           data-test-id="dedicated-resources"
-          descriptionData={<DedicatedResources vm={isInstanceTypeVM(vm) ? instanceTypeVM : vm} />}
+          descriptionData={<DedicatedResources vm={vm} />}
           isDisabled={isInstanceTypeVM(vm)}
           isEdit={canUpdateVM}
         />

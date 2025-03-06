@@ -18,10 +18,7 @@ import VirtualMachinesOverviewTabSnapshots from './components/VirtualMachinesOve
 import VirtualMachinesOverviewTabUtilization from './components/VirtualMachinesOverviewTabUtilization/VirtualMachinesOverviewTabUtilization';
 import useVMAlerts from './utils/hook/useVMAlerts';
 
-const VirtualMachinesOverviewTab: FC<NavPageComponentProps> = ({
-  instanceTypeExpandedSpec,
-  obj: vm,
-}) => {
+const VirtualMachinesOverviewTab: FC<NavPageComponentProps> = ({ obj: vm }) => {
   const vmAlerts = useVMAlerts(vm);
   const { error, loaded, pods, vmi } = useVMIAndPodsForVM(
     vm?.metadata?.name,
@@ -38,7 +35,6 @@ const VirtualMachinesOverviewTab: FC<NavPageComponentProps> = ({
               error={error}
               guestAgentData={guestAgentData}
               guestAgentDataLoaded={guestAgentDataLoaded}
-              instanceTypeExpandedSpec={instanceTypeExpandedSpec}
               loaded={loaded}
               vm={vm}
               vmi={vmi}

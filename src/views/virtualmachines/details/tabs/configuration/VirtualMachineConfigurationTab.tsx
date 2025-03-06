@@ -6,7 +6,6 @@ import useInstanceTypesAndPreferences from '@catalog/CreateFromInstanceTypes/sta
 import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { getName } from '@kubevirt-utils/resources/shared';
-import useInstanceTypeExpandSpec from '@kubevirt-utils/resources/vm/hooks/useInstanceTypeExpandSpec';
 import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
 import { Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
@@ -18,13 +17,12 @@ import { getInnerTabFromPath, includesConfigurationPath, tabs } from './utils/ut
 
 import './virtual-machine-configuration-tab.scss';
 
-const VirtualMachineConfigurationTab: FC<NavPageComponentProps> = ({ obj }) => {
+const VirtualMachineConfigurationTab: FC<NavPageComponentProps> = ({ obj: vm }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { vmi } = useVMI(getName(obj), getNamespace(obj));
+  const { vmi } = useVMI(getName(vm), getNamespace(vm));
   const { allInstanceTypes } = useInstanceTypesAndPreferences();
-  const [instanceTypeVM] = useInstanceTypeExpandSpec(obj);
   const [activeTabKey, setActiveTabKey] = useState<number | string>(
     VirtualMachineDetailsTab.Details,
   );
@@ -48,7 +46,7 @@ const VirtualMachineConfigurationTab: FC<NavPageComponentProps> = ({ obj }) => {
 
   return (
     <div className="co-dashboard-body VirtualMachineConfigurationTab">
-      <VirtualMachineConfigurationTabSearch vm={obj} />
+      <VirtualMachineConfigurationTabSearch vm={vm} />
       <div className="VirtualMachineConfigurationTab--body">
         <Tabs activeKey={activeTabKey} className="VirtualMachineConfigurationTab--main" isVertical>
           {tabs.map(({ Component, name, title }) => (
@@ -61,12 +59,7 @@ const VirtualMachineConfigurationTab: FC<NavPageComponentProps> = ({ obj }) => {
               title={<TabTitleText>{title}</TabTitleText>}
             >
               {activeTabKey === name && (
-                <Component
-                  allInstanceTypes={allInstanceTypes}
-                  instanceTypeVM={instanceTypeVM}
-                  vm={obj}
-                  vmi={vmi}
-                />
+                <Component allInstanceTypes={allInstanceTypes} vm={vm} vmi={vmi} />
               )}
             </Tab>
           ))}

@@ -25,7 +25,6 @@ import { updateBootLoader, updatedBootOrder, updateStartStrategy } from '../util
 
 type DetailsSectionBootProps = {
   canUpdateVM: boolean;
-  instanceTypeVM?: V1VirtualMachine;
   isCustomizeInstanceType?: boolean;
   preferredBootmode?: BootMode;
   vm: V1VirtualMachine;
@@ -34,7 +33,6 @@ type DetailsSectionBootProps = {
 
 const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
   canUpdateVM,
-  instanceTypeVM,
   isCustomizeInstanceType,
   preferredBootmode,
   vm,
@@ -49,7 +47,7 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
 
   useEffect(() => {
     expandURLHash(getSearchItemsIds(getDetailsTabBootIds(vm)), location?.hash, setIsExpanded);
-  }, [vm, location?.hash]);
+  }, [vm, location?.hash, setIsExpanded]);
 
   return (
     <ExpandableSection
@@ -61,7 +59,7 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
       <VirtualMachineDescriptionItem
         descriptionData={
           <div className={classNames({ 'text-muted': !canUpdateVM })}>
-            {getBootloaderTitleFromVM(instanceTypeVM || vm, preferredBootmode)}
+            {getBootloaderTitleFromVM(vm, preferredBootmode)}
           </div>
         }
         onEditClick={() =>
@@ -74,7 +72,7 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
               }
               isOpen={isOpen}
               onClose={onClose}
-              vm={instanceTypeVM || vm}
+              vm={vm}
               vmi={vmi}
             />
           ))
