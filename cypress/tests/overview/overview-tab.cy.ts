@@ -5,7 +5,6 @@ describe('Test Virtualization Overview page', () => {
   before(() => {
     cy.login();
     cy.visit('');
-    cy.wait(10000);
     cy.switchToVirt();
   });
 

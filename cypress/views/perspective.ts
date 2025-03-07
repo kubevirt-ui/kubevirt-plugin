@@ -15,9 +15,8 @@ const toggle = '[data-test-id="perspective-switcher-toggle"]';
 const menu = '[data-test-id="perspective-switcher-menu"]';
 
 export const switchPerspective = (perspective: Perspective) => {
-  // save redundant switching
   cy.get(header, { timeout: 5 * MINUTE }).should('be.visible');
-  cy.wait(5 * SECOND);
+  cy.wait(10 * SECOND);
   cy.get(header).within(($title) => {
     if ($title.find('h2').text() == perspective) {
       cy.task('log', `Already at [${perspective}]`);
