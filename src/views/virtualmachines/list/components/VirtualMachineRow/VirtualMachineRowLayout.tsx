@@ -11,6 +11,7 @@ import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-pl
 import { Checkbox } from '@patternfly/react-core';
 import VirtualMachineActions from '@virtualmachines/actions/components/VirtualMachineActions/VirtualMachineActions';
 import useVirtualMachineActionsProvider from '@virtualmachines/actions/hooks/useVirtualMachineActionsProvider';
+import { getDeletionProtectionPrintableStatus } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
 import { deselectVM, isVMSelected, selectVM } from '@virtualmachines/list/selectedVMs';
 
 import { VMStatusConditionLabelList } from '../VMStatusConditionLabel';
@@ -85,6 +86,9 @@ const VirtualMachineRowLayout: FC<
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="network-usage">
         <NetworkUsage vmName={vmName} vmNamespace={vmNamespace} />
+      </TableData>
+      <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="deletion-protection">
+        {getDeletionProtectionPrintableStatus(obj)}
       </TableData>
       <TableData
         activeColumnIDs={activeColumnIDs}

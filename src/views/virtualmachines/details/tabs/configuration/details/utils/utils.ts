@@ -1,5 +1,4 @@
-import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
-
+import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import {
   V1beta1VirtualMachineClusterInstancetype,
   V1beta1VirtualMachineInstancetype,

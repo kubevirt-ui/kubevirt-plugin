@@ -1,7 +1,6 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
 import classNames from 'classnames';
 
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { Menu, MenuContent, MenuItem, MenuList, TooltipPosition } from '@patternfly/react-core';
 
@@ -15,11 +14,11 @@ type ActionDropdownItemProps = {
 };
 
 const ActionDropdownItem: FC<ActionDropdownItemProps> = ({ action, setIsOpen }) => {
-  const { t } = useKubevirtTranslation();
   const [accessReview] = useAccessReview(action?.accessReview || {});
 
   const actionAllowed = accessReview || action?.accessReview === undefined;
-  const isCloneDisabled = !actionAllowed && action?.id === 'vm-action-clone';
+  const isDisabled = !actionAllowed || action?.disabled;
+  const displayDisabledTooltip = isDisabled && action?.disabledTooltip;
 
   const handleClick = () => {
     if (typeof action?.cta === 'function') {
@@ -28,21 +27,17 @@ const ActionDropdownItem: FC<ActionDropdownItemProps> = ({ action, setIsOpen }) 
     }
   };
 
+  const tooltipProps = displayDisabledTooltip
+    ? {
+        content: action?.disabledTooltip,
+        position: TooltipPosition.left,
+      }
+    : null;
+
   return (
     <MenuItem
-      data-test-id={`${action?.id}`}
-      description={action?.description}
-      isDisabled={action?.disabled || !actionAllowed}
-      key={action?.id}
-      onClick={handleClick}
-      {...(isCloneDisabled && {
-        tooltipProps: {
-          content: t(`You don't have permission to perform this action`),
-          position: TooltipPosition.left,
-        },
-      })}
       className={classNames('ActionDropdownItem', {
-        ActionDropdownItem__disabled: isCloneDisabled,
+        ActionDropdownItem__disabled: isDisabled,
       })}
       flyoutMenu={
         action?.options && (
@@ -57,6 +52,12 @@ const ActionDropdownItem: FC<ActionDropdownItemProps> = ({ action, setIsOpen }) 
           </Menu>
         )
       }
+      data-test-id={`${action?.id}`}
+      description={action?.description}
+      isDisabled={isDisabled}
+      key={action?.id}
+      onClick={handleClick}
+      tooltipProps={tooltipProps}
     >
       {action?.label}
       {action?.icon && (

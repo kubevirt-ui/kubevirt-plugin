@@ -32,6 +32,9 @@ import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, Grid, GridItem, Switch, Title } from '@patternfly/react-core';
+import DeletionProtectionModal from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/DeletionProtectionModal';
+import { VMDeletionProtectionOptions } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/types';
+import { isDeletionProtectionEnabled } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
 
 import { InstanceTypeUnion } from '../utils/types';
 
@@ -81,7 +84,9 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
 
   const vmWorkload = getWorkload(vm);
   const vmName = getName(vm);
+
   const isInstanceType = !isEmpty(vm?.spec?.instancetype?.name);
+  const deletionProtectionEnabled = isDeletionProtectionEnabled(vm);
 
   const loadingInstanceType = isInstanceType && (isEmpty(instanceType) || isEmpty(instanceTypeVM));
 
@@ -234,6 +239,41 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
                 <SearchItem id="guest-system-log-access">{t('Guest system log access')}</SearchItem>
               }
               data-test-id="guest-system-log-access"
+              isPopover
+            />
+            <VirtualMachineDescriptionItem
+              bodyContent={t(
+                'Applying deletion protection to this VM will prevent deletion through the web console.',
+              )}
+              descriptionData={
+                <Switch
+                  onChange={(_event, checked) =>
+                    createModal(({ isOpen, onClose }) =>
+                      checked ? (
+                        <DeletionProtectionModal
+                          deletionProtectionOption={VMDeletionProtectionOptions.ENABLE}
+                          isOpen={isOpen}
+                          onClose={onClose}
+                          vm={vm}
+                        />
+                      ) : (
+                        <DeletionProtectionModal
+                          deletionProtectionOption={VMDeletionProtectionOptions.DISABLE}
+                          isOpen={isOpen}
+                          onClose={onClose}
+                          vm={vm}
+                        />
+                      ),
+                    )
+                  }
+                  id="deletion-protection"
+                  isChecked={deletionProtectionEnabled}
+                />
+              }
+              descriptionHeader={
+                <SearchItem id="deletion-protection">{t('Deletion protection')}</SearchItem>
+              }
+              data-test-id="deletion-protection"
               isPopover
             />
           </DescriptionList>

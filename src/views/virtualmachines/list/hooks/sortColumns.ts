@@ -3,6 +3,7 @@ import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getMemory } from '@kubevirt-utils/resources/vm';
 import { columnSortingCompare, isEmpty } from '@kubevirt-utils/utils/utils';
 import { SortByDirection } from '@patternfly/react-table';
+import { getDeletionProtectionPrintableStatus } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
 import { getVMIFromMapper, VMIMapper } from '@virtualmachines/utils/mappers';
 
 import {
@@ -81,4 +82,19 @@ export const sortByMemoryUsage = (
   };
 
   return columnSortingCompare(data, direction, pagination, compareCPUUsage);
+};
+
+export const sortByDeletionProtection = (
+  data: V1VirtualMachine[],
+  direction: SortByDirection,
+  pagination: { [key: string]: any },
+) => {
+  const compareDeletionProtection = (a: V1VirtualMachine, b: V1VirtualMachine): number => {
+    const deletionProtectionStatusA = getDeletionProtectionPrintableStatus(a);
+    const deletionProtectionStatusB = getDeletionProtectionPrintableStatus(b);
+
+    return deletionProtectionStatusA?.localeCompare(deletionProtectionStatusB);
+  };
+
+  return columnSortingCompare(data, direction, pagination, compareDeletionProtection);
 };
