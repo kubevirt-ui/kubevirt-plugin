@@ -36,13 +36,21 @@ const VirtualMachinesNetworkInterfaceModal: FC<VirtualMachinesNetworkInterfaceMo
   vmi,
 }) => {
   const onSubmit = useCallback(
-    ({ interfaceMACAddress, interfaceModel, interfaceType, networkName, nicName }) =>
+    ({
+        interfaceLinkState,
+        interfaceMACAddress,
+        interfaceModel,
+        interfaceType,
+        networkName,
+        nicName,
+      }) =>
       () => {
         const resultNetwork = createNetwork(nicName, networkName);
         const resultInterface = createInterface(
           nicName,
           interfaceModel,
           interfaceMACAddress,
+          interfaceLinkState,
           interfaceType,
         );
 
