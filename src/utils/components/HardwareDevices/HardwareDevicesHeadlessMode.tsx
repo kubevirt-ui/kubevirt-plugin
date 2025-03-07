@@ -16,9 +16,7 @@ const HardwareDevicesHeadlessMode: FC<HardwareDevicesHeadlessModeProps> = ({ onS
   const { t } = useKubevirtTranslation();
 
   const devices = vm?.spec?.template?.spec?.domain?.devices;
-  const [isChecked, setIsChecked] = useState<boolean>(
-    devices?.hasOwnProperty('autoattachGraphicsDevice') && !devices?.autoattachGraphicsDevice,
-  );
+  const [isChecked, setIsChecked] = useState<boolean>(devices?.autoattachGraphicsDevice === false);
 
   const updateHeadlessMode = (checked: boolean) => {
     const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {

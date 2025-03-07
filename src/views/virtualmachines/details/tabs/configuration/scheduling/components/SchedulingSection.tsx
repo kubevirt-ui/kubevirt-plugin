@@ -18,13 +18,12 @@ import SchedulingSectionLeftGrid from './SchedulingSectionLeftGrid';
 import SchedulingSectionRightGrid from './SchedulingSectionRightGrid';
 
 type SchedulingSectionProps = {
-  instanceTypeVM?: V1VirtualMachine;
   onSubmit?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
   vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
 
-const SchedulingSection: FC<SchedulingSectionProps> = ({ instanceTypeVM, onSubmit, vm, vmi }) => {
+const SchedulingSection: FC<SchedulingSectionProps> = ({ onSubmit, vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const [nodes, nodesLoaded] = useK8sWatchResource<IoK8sApiCoreV1Node[]>({
     groupVersionKind: modelToGroupVersionKind(NodeModel),
@@ -50,7 +49,6 @@ const SchedulingSection: FC<SchedulingSectionProps> = ({ instanceTypeVM, onSubmi
         <GridItem span={1}>{/* Spacer */}</GridItem>
         <SchedulingSectionRightGrid
           canUpdateVM={canUpdateVM}
-          instanceTypeVM={instanceTypeVM}
           onUpdateVM={onSubmit}
           vm={vm}
           vmi={vmi}

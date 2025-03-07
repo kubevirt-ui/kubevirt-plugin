@@ -38,6 +38,7 @@ import {
   getVolumes,
 } from '@kubevirt-utils/resources/vm';
 import { DEFAULT_NETWORK_INTERFACE } from '@kubevirt-utils/resources/vm/utils/constants';
+import { getInstanceTypeNameFromAnnotation } from '@kubevirt-utils/resources/vm/utils/instanceTypes';
 import {
   DESCHEDULER_EVICT_LABEL,
   getEvictionStrategy as getVMIEvictionStrategy,
@@ -58,6 +59,16 @@ import {
 } from '../../../resources/vm/utils/selectors';
 
 import { PendingChange } from './types';
+
+export const checkInstanceTypeChanged = (
+  vm: V1VirtualMachine,
+  vmi: V1VirtualMachineInstance,
+): boolean => {
+  if (isEmpty(vm) || isEmpty(vmi)) {
+    return false;
+  }
+  return vm.spec?.instancetype?.name !== getInstanceTypeNameFromAnnotation(vmi);
+};
 
 export const checkCPUMemoryChanged = (
   vm: V1VirtualMachine,
@@ -444,17 +455,12 @@ export const getChangedHeadlessMode = (
   if (isEmpty(vm) || isEmpty(vmi)) {
     return false;
   }
-  const vmDevices = vm?.spec?.template?.spec?.domain?.devices;
-  const vmiDevices = vmi?.spec?.domain?.devices;
 
-  const vmHeadless = !!vmDevices?.autoattachGraphicsDevice;
-  const vmiHeadless = !!vmiDevices?.autoattachGraphicsDevice;
+  // assume headless only if the property is explicitly false
+  const vmHasGraphic = vm?.spec?.template?.spec?.domain?.devices?.autoattachGraphicsDevice ?? true;
+  const vmiHasGraphic = vmi?.spec?.domain?.devices?.autoattachGraphicsDevice ?? true;
 
-  return (
-    vmHeadless !== vmiHeadless ||
-    vmDevices?.hasOwnProperty('autoattachGraphicsDevice') !==
-      vmiDevices?.hasOwnProperty('autoattachGraphicsDevice')
-  );
+  return vmHasGraphic !== vmiHasGraphic;
 };
 
 export const getTabURL = (vm: V1VirtualMachine, tab: string) => {

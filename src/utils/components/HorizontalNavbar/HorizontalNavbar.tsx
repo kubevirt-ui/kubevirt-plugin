@@ -16,19 +16,12 @@ import './horizontal-nav-bar.scss';
 
 type HorizontalNavbarProps = {
   error?: any;
-  instanceTypeExpandedSpec?: V1VirtualMachine;
   loaded: boolean;
   pages: NavPageKubevirt[];
   vm?: V1VirtualMachine;
 };
 
-const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
-  error,
-  instanceTypeExpandedSpec,
-  loaded,
-  pages,
-  vm,
-}) => {
+const HorizontalNavbar: FC<HorizontalNavbarProps> = ({ error, loaded, pages, vm }) => {
   const location = useLocation();
 
   const params = useParams();
@@ -84,12 +77,7 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
             <Route
               Component={(props) => (
                 <StateHandler error={error} loaded={loaded} withBullseye>
-                  <Component
-                    instanceTypeExpandedSpec={instanceTypeExpandedSpec}
-                    obj={vm}
-                    params={params}
-                    {...props}
-                  />
+                  <Component obj={vm} params={params} {...props} />
                 </StateHandler>
               )}
               key={page.href}

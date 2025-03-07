@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine, V1VirtualMachineFromJSON } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import useDeepCompareMemoize from '@kubevirt-utils/hooks/useDeepCompareMemoize/useDeepCompareMemoize';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
@@ -12,7 +12,7 @@ import { isInstanceTypeVM } from '../utils/instanceTypes';
 type UseInstanceTypeExpandSpec = (
   vm: V1VirtualMachine,
 ) => [
-  insstanceTypeExpandedSpec: V1VirtualMachine,
+  instanceTypeExpandedSpec: V1VirtualMachine,
   loadingExpandedSpec: boolean,
   errorExpandedSpec: Error,
 ];
@@ -35,7 +35,16 @@ const useInstanceTypeExpandSpec: UseInstanceTypeExpandSpec = (vm) => {
       try {
         const response = await consoleFetch(url);
         const json = await response.json();
-        setInstanceTypeExpandedSpec(json);
+        const expandedVm = V1VirtualMachineFromJSON(json);
+        expandedVm.spec = {
+          ...expandedVm.spec,
+          // re-establish the reference to the instance type
+          // expand-spec removes it as the output should allow creating an independent VM
+          instancetype: innerVM.spec.instancetype,
+          preference: innerVM.spec.preference,
+        };
+
+        setInstanceTypeExpandedSpec(expandedVm);
       } catch (err) {
         kubevirtConsole.log(err.message);
         setErrorExpandedSpec(err);

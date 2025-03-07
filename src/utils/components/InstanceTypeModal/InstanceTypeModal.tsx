@@ -1,11 +1,14 @@
 import React, { FC, useMemo, useState } from 'react';
 
+import useInstanceTypesAndPreferences from '@catalog/CreateFromInstanceTypes/state/hooks/useInstanceTypesAndPreferences';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Flex, FlexItem, SelectList, SelectOption, Text } from '@patternfly/react-core';
 import { InstanceTypeUnion } from '@virtualmachines/details/tabs/configuration/utils/types';
 
+import ErrorAlert from '../ErrorAlert/ErrorAlert';
 import FormPFSelect from '../FormPFSelect/FormPFSelect';
+import Loading from '../Loading/Loading';
 import TabModal from '../TabModal/TabModal';
 
 import {
@@ -116,6 +119,28 @@ const InstanceTypeModal: FC<InstanceTypeModalProps> = ({
         </FlexItem>
       </Flex>
     </TabModal>
+  );
+};
+
+export const ConnectedInstanceTypeModal: FC<
+  Pick<InstanceTypeModalProps, 'instanceTypeVM' | 'isOpen' | 'onClose' | 'onSubmit'>
+> = (props) => {
+  const { allInstanceTypes, loaded, loadError } = useInstanceTypesAndPreferences();
+  const instanceType = allInstanceTypes.find(
+    (it) => it.metadata.name === props.instanceTypeVM?.spec?.instancetype?.name,
+  );
+  return (
+    <>
+      {!loaded && <Loading />}
+      {loaded && loadError && <ErrorAlert error={loadError} />}
+      {loaded && !loadError && (
+        <InstanceTypeModal
+          {...props}
+          allInstanceTypes={allInstanceTypes}
+          instanceType={instanceType}
+        />
+      )}
+    </>
   );
 };
 

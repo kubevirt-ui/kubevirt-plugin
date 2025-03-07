@@ -29,6 +29,7 @@ import {
   getWorkload,
 } from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
+import { isInstanceTypeVM } from '@kubevirt-utils/resources/vm/utils/instanceTypes';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, Grid, GridItem, Switch, Title } from '@patternfly/react-core';
@@ -51,12 +52,11 @@ import './details-section.scss';
 
 type DetailsSectionProps = {
   allInstanceTypes: InstanceTypeUnion[];
-  instanceTypeVM: V1VirtualMachine;
   vm: V1VirtualMachine;
   vmi: V1VirtualMachineInstance;
 };
 
-const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTypeVM, vm, vmi }) => {
+const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, vm, vmi }) => {
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
   const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
@@ -81,9 +81,8 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
 
   const vmWorkload = getWorkload(vm);
   const vmName = getName(vm);
-  const isInstanceType = !isEmpty(vm?.spec?.instancetype?.name);
 
-  const loadingInstanceType = isInstanceType && (isEmpty(instanceType) || isEmpty(instanceTypeVM));
+  const loadingInstanceType = isInstanceTypeVM(vm) && isEmpty(instanceType);
 
   if (!vm || loadingInstanceType) {
     return <Loading />;
@@ -144,16 +143,16 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
             <VirtualMachineDescriptionItem
               descriptionHeader={
                 <SearchItem id="cpu-memory">
-                  {isInstanceType ? t('InstanceType') : t('CPU | Memory')}
+                  {isInstanceTypeVM(vm) ? t('InstanceType') : t('CPU | Memory')}
                 </SearchItem>
               }
               onEditClick={() =>
                 createModal(({ isOpen, onClose }) => {
-                  return isInstanceType ? (
+                  return isInstanceTypeVM(vm) ? (
                     <InstanceTypeModal
                       allInstanceTypes={allInstanceTypes}
                       instanceType={instanceType}
-                      instanceTypeVM={instanceTypeVM}
+                      instanceTypeVM={vm}
                       isOpen={isOpen}
                       onClose={onClose}
                       onSubmit={updatedInstanceType}
@@ -171,9 +170,9 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
               subTitle={
                 instanceType && getAnnotation(instanceType, INSTANCETYPE_CLASS_DISPLAY_NAME)
               }
-              bodyContent={isInstanceType ? null : <CPUDescription cpu={getCPU(vm)} />}
+              bodyContent={isInstanceTypeVM(vm) ? null : <CPUDescription cpu={getCPU(vm)} />}
               data-test-id={`${vmName}-cpu-memory`}
-              descriptionData={<CPUMemory vm={instanceTypeVM || vm} vmi={vmi} />}
+              descriptionData={<CPUMemory vm={vm} vmi={vmi} />}
               isEdit={canUpdateVM}
               isPopover
             />
@@ -241,12 +240,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
         <GridItem span={5}>
           <DescriptionList className="pf-v5-c-description-list">
             <DetailsSectionHardware vm={vm} vmi={vmi} />
-            <DetailsSectionBoot
-              canUpdateVM={canUpdateVM}
-              instanceTypeVM={instanceTypeVM}
-              vm={vm}
-              vmi={vmi}
-            />
+            <DetailsSectionBoot canUpdateVM={canUpdateVM} vm={vm} vmi={vmi} />
           </DescriptionList>
         </GridItem>
       </Grid>
