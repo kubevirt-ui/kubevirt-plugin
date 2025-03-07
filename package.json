@@ -159,6 +159,7 @@
   },
   "resolutions": {
     "webpack": "^5.68.0",
-    "@types/react": "17.0.40"
+    "@types/react": "17.0.40",
+    "dompurify": "^2.5.8"
   }
 }
