@@ -10,7 +10,7 @@
   }
   .console-overview {
     flex-direction: column;
-    justify-content: space-around;
+    justify-content: flex-start;
   }
   .right-column {
     height: 100%;
@@ -30,9 +30,15 @@
       margin-left: var(--pf-v5-global--spacer--xs);
     }
   }
+
+  .vnc-no-connection-placeholder {
+    height: 100%;
+    width: 100%;
+  }
+
   .vnc-grey-background {
     background: var(--pf-v5-global--palette--black-300);
-    height: 100%;
+    aspect-ratio: 4/3;
     width: 100%;
     display: flex;
     justify-content: center;
