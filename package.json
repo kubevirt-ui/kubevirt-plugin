@@ -154,5 +154,5 @@
     "test-cypress-headless": "cd cypress && node --max-old-space-size=4096 ../node_modules/cypress/bin/cypress run --config-file ./cypress.config.js --env openshift=true --headless",
     "ts-node": "ts-node -O '{\"module\":\"commonjs\"}'"
   },
-  "version": "0.0.1"
+  "version": "0.0.0"
 }
