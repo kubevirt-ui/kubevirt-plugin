@@ -16,8 +16,7 @@ import {
   TextInputGroupMain,
   TextInputGroupUtilities,
 } from '@patternfly/react-core';
-import { FolderIcon, SearchIcon } from '@patternfly/react-icons';
-import TimesIcon from '@patternfly/react-icons/dist/esm/icons/times-icon';
+import { FolderIcon, SearchIcon, TimesIcon } from '@patternfly/react-icons';
 
 import { CREATE_NEW, NOT_FOUND } from './utils/constants';
 import { createItemId } from './utils/utils';
