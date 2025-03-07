@@ -1,4 +1,4 @@
-import React, { FC, FormEventHandler, memo } from 'react';
+import React, { FC, FormEvent, memo, MouseEvent } from 'react';
 
 import { DRAWER_FORM_ID } from '@catalog/templatescatalog/utils/consts';
 import FolderSelect from '@kubevirt-utils/components/FolderSelect/FolderSelect';
@@ -70,7 +70,7 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
 
     const error = templateLoadingError || createError;
 
-    const onSubmitForm: FormEventHandler<HTMLFormElement> = (e) => {
+    const onSubmitForm = (e: FormEvent<HTMLFormElement> | MouseEvent) => {
       e.preventDefault();
       if (isQuickCreateDisabled) return;
       onQuickCreate();
@@ -179,6 +179,7 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
                       form={DRAWER_FORM_ID}
                       isDisabled={isQuickCreateDisabled}
                       isLoading={isQuickCreateLoading}
+                      onClick={onSubmitForm}
                       type="submit"
                     >
                       {t('Quick create VirtualMachine')}
