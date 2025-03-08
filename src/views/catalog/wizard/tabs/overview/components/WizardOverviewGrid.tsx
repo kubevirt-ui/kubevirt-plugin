@@ -17,7 +17,6 @@ import MoveVMToFolderModal from '@kubevirt-utils/components/MoveVMToFolderModal/
 import WorkloadProfileModal from '@kubevirt-utils/components/WorkloadProfileModal/WorkloadProfileModal';
 import {
   DISABLED_GUEST_SYSTEM_LOGS_ACCESS,
-  TREE_VIEW,
   TREE_VIEW_FOLDERS,
 } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
@@ -54,7 +53,6 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
   const { ns } = useParams<{ ns: string }>();
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const { featureEnabled: treeViewEnabled } = useFeatures(TREE_VIEW);
   const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
   const { cpuCount, memory } = getVmCPUMemory(vm);
   const { featureEnabled: isDisabledGuestSystemLogs } = useFeatures(
@@ -129,7 +127,7 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
             title={t('Namespace')}
           />
 
-          {treeViewEnabled && treeViewFoldersEnabled && (
+          {treeViewFoldersEnabled && (
             <WizardDescriptionItem
               onEditClick={() =>
                 createModal(({ isOpen, onClose }) => (

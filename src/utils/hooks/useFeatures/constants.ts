@@ -20,7 +20,6 @@ export const NODE_PORT_ENABLED = 'nodePortEnabled';
 export const DISABLED_GUEST_SYSTEM_LOGS_ACCESS = 'disabledGuestSystemLogsAccess';
 export const CONFIRM_VM_ACTIONS = 'confirmVMActions';
 
-export const TREE_VIEW = 'treeView';
 export const TREE_VIEW_FOLDERS = 'treeViewFolders';
 
 export const FEATURES_CONFIG_MAP_NAME = 'kubevirt-ui-features';
@@ -39,7 +38,6 @@ export const featuresConfigMapInitialState: IoK8sApiCoreV1ConfigMap = {
     [LOAD_BALANCER_ENABLED]: 'false',
     [NODE_PORT_ADDRESS]: '',
     [NODE_PORT_ENABLED]: 'false',
-    [TREE_VIEW]: 'false',
     [TREE_VIEW_FOLDERS]: 'false',
   },
   metadata: {

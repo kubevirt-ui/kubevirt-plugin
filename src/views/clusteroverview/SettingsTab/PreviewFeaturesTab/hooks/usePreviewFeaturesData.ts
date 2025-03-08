@@ -1,5 +1,5 @@
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { TREE_VIEW, TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
+import { TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
@@ -24,17 +24,9 @@ type UsePreviewFeaturesData = () => {
 
 const usePreviewFeaturesData: UsePreviewFeaturesData = () => {
   const { t } = useKubevirtTranslation();
-
-  const treeViewFeature = useFeatures(TREE_VIEW);
   const treeViewFoldersFeature = useFeatures(TREE_VIEW_FOLDERS);
 
   const features = [
-    {
-      externalLink: null,
-      id: TREE_VIEW,
-      label: t('Enable Virtual Machines tree view'),
-      ...treeViewFeature,
-    },
     {
       externalLink: null,
       id: TREE_VIEW_FOLDERS,

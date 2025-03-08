@@ -14,7 +14,6 @@ import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import {
   DISABLED_GUEST_SYSTEM_LOGS_ACCESS,
-  TREE_VIEW,
   TREE_VIEW_FOLDERS,
 } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
@@ -44,7 +43,6 @@ const CustomizeInstanceTypeDetailsTab = () => {
   const { featureEnabled: isGuestSystemLogsDisabled } = useFeatures(
     DISABLED_GUEST_SYSTEM_LOGS_ACCESS,
   );
-  const { featureEnabled: treeViewEnabled } = useFeatures(TREE_VIEW);
   const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
 
   const logSerialConsole = vm?.spec?.template?.spec?.domain?.devices?.logSerialConsole;
@@ -99,7 +97,7 @@ const CustomizeInstanceTypeDetailsTab = () => {
               descriptionHeader={<SearchItem id="description">{t('Description')}</SearchItem>}
               isEdit
             />
-            {treeViewEnabled && treeViewFoldersEnabled && (
+            {treeViewFoldersEnabled && (
               <VirtualMachineDescriptionItem
                 onEditClick={() =>
                   createModal(({ isOpen, onClose }) => (
