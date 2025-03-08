@@ -59,9 +59,9 @@ export const createNAD = (nad: nadData) => {
 };
 
 // delete nad on list page
-export const deleteNAD = (nadName: string) => {
-  cy.contains(row, nadName).find(actionsBtn).click();
+export const deleteNAD = (nad: nadData) => {
+  cy.contains(row, nad.name).find(actionsBtn).click();
   cy.byButtonText('Delete').click();
   cy.get(confirmBtn).click();
-  cy.contains(row, nadName).should('not.exist');
+  cy.contains(row, nad.name).should('not.exist');
 };

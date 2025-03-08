@@ -1,5 +1,4 @@
 export const dropdownFilter = '[data-test-id="filter-dropdown-toggle"]';
-export const itemFilter = '[data-test-id="item-filter"]';
 export const defaultTemplate = '#is-default';
 export const bsAvailable = '#available';
 export const windows = '#windows';
