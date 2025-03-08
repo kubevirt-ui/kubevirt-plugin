@@ -6,6 +6,8 @@ import { getCloudInitCredentials } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Flex, FlexItem } from '@patternfly/react-core';
 
+import { LINE_FEED } from '../vnc-console/utils/util';
+
 import InlineCodeClipboardCopy from './InlineCodeClipboardCopy';
 
 type CloudInitCredentialsContentProps = {
@@ -26,14 +28,16 @@ const CloudInitCredentialsContent: FC<CloudInitCredentialsContentProps> = ({ vm 
         <>
           {acc.passwords}
           <InlineCodeClipboardCopy
-            clipboardText={user?.password?.concat(String.fromCharCode(13))}
+            clipboardText={user?.password?.concat(String.fromCharCode(LINE_FEED))}
           />
         </>
       ),
       usernames: (
         <>
           {acc.usernames}
-          <InlineCodeClipboardCopy clipboardText={user?.name?.concat(String.fromCharCode(13))} />
+          <InlineCodeClipboardCopy
+            clipboardText={user?.name?.concat(String.fromCharCode(LINE_FEED))}
+          />
         </>
       ),
     }),
