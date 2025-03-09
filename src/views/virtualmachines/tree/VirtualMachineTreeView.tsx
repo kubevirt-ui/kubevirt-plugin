@@ -1,8 +1,5 @@
 import React, { CSSProperties, FC, useMemo } from 'react';
 
-import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/constants';
-import { TREE_VIEW } from '@kubevirt-utils/hooks/useFeatures/constants';
-import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
 import { FilterValue } from '@openshift-console/dynamic-plugin-sdk';
@@ -46,16 +43,12 @@ const VirtualMachineTreeView: FC<VirtualMachineTreeViewProps> = ({
   const [drawerWidth, setDrawerWidth] = useLocalStorage(TREE_VIEW_LAST_WIDTH, OPEN_DRAWER_SIZE);
   const [drawerOpen, setDrawerOpen] = useLocalStorage(SHOW_TREE_VIEW, SHOW);
 
-  const { featureEnabled: treeViewFeatureEnabled, loading } = useFeatures(TREE_VIEW);
-
-  const showTreeview = treeViewFeatureEnabled || runningTourSignal.value;
-
   const [selected, onSelect] = useTreeViewSelect(onFilterChange);
 
   const isOpen = useMemo(() => drawerOpen === SHOW, [drawerOpen]);
   useHideNamespaceBar();
 
-  if (loadError || loading || !showTreeview) return <>{children}</>;
+  if (loadError) return <>{children}</>;
 
   const toggleDrawer = () => {
     const toggleOpen = !isOpen;

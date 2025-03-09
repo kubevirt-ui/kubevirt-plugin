@@ -9,7 +9,7 @@ import {
   RUNSTRATEGY_ALWAYS,
   RUNSTRATEGY_RERUNONFAILURE,
 } from '@kubevirt-utils/constants/constants';
-import { TREE_VIEW, TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
+import { TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
@@ -46,7 +46,6 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
 
     const { isBootSourceAvailable, templateLoadingError } = useDrawerContext();
 
-    const { featureEnabled: treeViewEnabled } = useFeatures(TREE_VIEW);
     const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
 
     const {
@@ -91,7 +90,7 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
                   </FormGroup>
                   <VMNameValidationHelperText vmName={nameField} />
                 </SplitItem>
-                {treeViewEnabled && treeViewFoldersEnabled && (
+                {treeViewFoldersEnabled && (
                   <SplitItem>
                     <FormGroup fieldId="vm-folder-field" isRequired label={t('Folder')}>
                       <FolderSelect
