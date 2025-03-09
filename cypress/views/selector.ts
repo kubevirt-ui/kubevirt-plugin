@@ -27,3 +27,5 @@ export const vmName = '[data-test-id="template-catalog-vm-name-input"]';
 export const uTemplate = '#user-templates';
 export const quickForm = '#quick-create-form';
 export const brandImage = '[data-test="brand-image"]';
+export const brCrumbItem = '.pf-v5-c-breadcrumb__item';
+export const itemFilter = '[data-test-id="item-filter"]';
