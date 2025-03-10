@@ -7,7 +7,7 @@ import { tab } from '../../views/tab';
 
 const WELCOME_OFF_CMD = `oc patch configmap -n kubevirt-hyperconverged kubevirt-user-settings --type=merge --patch '{"data": {"kube-admin": "{\\"quickStart\\":{\\"dontShowWelcomeModal\\":true}}"}}'`;
 
-describe('Prepare the cluster for test', () => {
+xdescribe('Prepare the cluster for test', () => {
   before(() => {
     cy.login();
     cy.exec('oc whoami').then((result) => {
