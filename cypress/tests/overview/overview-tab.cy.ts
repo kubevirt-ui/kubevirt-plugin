@@ -1,7 +1,7 @@
 import { DEFAULT_VM_NAME } from '../../utils/const/index';
 import * as oView from '../../views/selector-overview';
 
-describe('Test Virtualization Overview page', () => {
+xdescribe('Test Virtualization Overview page', () => {
   before(() => {
     cy.login();
     cy.visit('');

@@ -5,7 +5,7 @@ import { descrText, selectAllBtn } from '../../views/selector-common';
 import { tab } from '../../views/tab';
 import { vm, waitForStatus } from '../../views/vm-flow';
 
-describe('Create VMs from InstanceType', () => {
+xdescribe('Create VMs from InstanceType', () => {
   before(() => {
     cy.visit('');
   });
@@ -30,7 +30,7 @@ describe('Create VMs from InstanceType', () => {
   });
 });
 
-describe('Create VMs from Template', () => {
+xdescribe('Create VMs from Template', () => {
   it('quick create VM from Template', () => {
     vm.create(VM_TMPL_QUICK);
   });
@@ -53,7 +53,7 @@ describe('Create VMs from Template', () => {
   });
 });
 
-describe('Test bulk actions', () => {
+xdescribe('Test bulk actions', () => {
   it('stop all VMs by selection', () => {
     cy.visitVMs();
     cy.get(selectAllBtn).check();

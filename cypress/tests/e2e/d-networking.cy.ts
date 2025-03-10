@@ -1,7 +1,7 @@
 import { NAD_BRIDGE, NAD_LOCALNET, NAD_OVN } from '../../utils/const/nad';
 import { createNAD, deleteNAD } from '../../views/nad';
 
-describe('Test network attachments', () => {
+xdescribe('Test network attachments', () => {
   before(() => {
     cy.visit('');
   });

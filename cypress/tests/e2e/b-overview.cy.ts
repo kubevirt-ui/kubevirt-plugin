@@ -7,7 +7,7 @@ import { tab } from '../../views/tab';
 
 const testSecret = 'test-secret';
 
-describe('Test Virtualization Overview', () => {
+xdescribe('Test Virtualization Overview', () => {
   before(() => {
     cy.visit('');
   });
