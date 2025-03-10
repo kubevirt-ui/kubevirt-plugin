@@ -6,7 +6,7 @@ import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
-import { Text, TextVariants } from '@patternfly/react-core';
+import { Content, ContentVariants } from '@patternfly/react-core';
 
 import './TemplatesCatalogProjectsDropdown.scss';
 
@@ -30,9 +30,12 @@ export const TemplatesCatalogProjectsDropdown: FC<TemplatesCatalogProjectsDropdo
 
     return (
       <div className="templates-catalog-project-dropdown">
-        <Text className="templates-catalog-project-dropdown-label" component={TextVariants.h6}>
+        <Content
+          className="templates-catalog-project-dropdown-label"
+          component={ContentVariants.h6}
+        >
           {t('Template project')}
-        </Text>
+        </Content>
         <InlineFilterSelect
           options={[
             { children: ALL_PROJECTS, value: ALL_PROJECTS },

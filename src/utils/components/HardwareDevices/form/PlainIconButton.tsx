@@ -12,9 +12,7 @@ const PlainIconButton: React.FC<PlainIconButtonProps> = ({ fieldId, icon, onClic
   return (
     <GridItem span={1}>
       <FormGroup fieldId={fieldId} label=" ">
-        <Button onClick={onClick} variant="plain">
-          {icon}
-        </Button>
+        <Button icon={icon} onClick={onClick} variant="plain" />
       </FormGroup>
     </GridItem>
   );

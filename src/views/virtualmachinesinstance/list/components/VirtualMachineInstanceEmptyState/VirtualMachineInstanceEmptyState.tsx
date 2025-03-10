@@ -10,8 +10,6 @@ import {
   EmptyStateActions,
   EmptyStateBody,
   EmptyStateFooter,
-  EmptyStateHeader,
-  EmptyStateIcon,
   EmptyStateVariant,
 } from '@patternfly/react-core';
 import { RocketIcon, VirtualMachineIcon } from '@patternfly/react-icons';
@@ -26,12 +24,12 @@ const VirtualMachineInstanceEmptyState: FC<VirtualMachineInstanceEmptyStateProps
   const navigate = useNavigate();
 
   return (
-    <EmptyState variant={EmptyStateVariant.lg}>
-      <EmptyStateHeader
-        headingLevel="h4"
-        icon={<EmptyStateIcon icon={VirtualMachineIcon} />}
-        titleText={<>{t('No VirtualMachinesInstances found')}</>}
-      />
+    <EmptyState
+      headingLevel="h4"
+      icon={VirtualMachineIcon}
+      titleText={<>{t('No VirtualMachinesInstances found')}</>}
+      variant={EmptyStateVariant.lg}
+    >
       <EmptyStateBody>
         <Trans ns="plugin__kubevirt-plugin" t={t}>
           See the{' '}

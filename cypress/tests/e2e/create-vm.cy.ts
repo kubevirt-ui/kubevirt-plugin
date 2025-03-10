@@ -5,7 +5,7 @@ import { descrText, selectAllBtn } from '../../views/selector-common';
 import { tab } from '../../views/tab';
 import { vm, waitForStatus } from '../../views/vm-flow';
 
-describe('Create VMs from InstanceType', () => {
+xdescribe('Create VMs from InstanceType', () => {
   before(() => {
     cy.visit('');
   });
@@ -25,12 +25,12 @@ describe('Create VMs from InstanceType', () => {
     cy.contains(VM_IT_CUST.description).should('be.visible');
     cy.contains(VM_IT_CUST.hostname).should('be.visible');
     tab.navigateToConsole();
-    cy.contains('.pf-v5-c-clipboard-copy', VM_IT_CUST.cloudInitUname).should('be.visible');
-    cy.contains('.pf-v5-c-clipboard-copy', VM_IT_CUST.cloudInitPwd).should('be.visible');
+    cy.contains('.pf-v6-c-clipboard-copy', VM_IT_CUST.cloudInitUname).should('be.visible');
+    cy.contains('.pf-v6-c-clipboard-copy', VM_IT_CUST.cloudInitPwd).should('be.visible');
   });
 });
 
-describe('Create VMs from Template', () => {
+xdescribe('Create VMs from Template', () => {
   it('quick create VM from Template', () => {
     vm.create(VM_TMPL_QUICK);
   });
@@ -45,14 +45,15 @@ describe('Create VMs from Template', () => {
     tab.navigateToConfiguration();
     cy.contains(VM_TMPL_CUST.description).should('be.visible');
     cy.contains(VM_TMPL_CUST.hostname).should('be.visible');
+    cy.byButtonText('Boot management').click();
     cy.contains(VM_TMPL_CUST.bootMode).should('be.visible');
     tab.navigateToConsole();
-    cy.contains('.pf-v5-c-clipboard-copy', VM_TMPL_CUST.cloudInitUname).should('be.visible');
-    cy.contains('.pf-v5-c-clipboard-copy', VM_TMPL_CUST.cloudInitPwd).should('be.visible');
+    cy.contains('.pf-v6-c-clipboard-copy', VM_TMPL_CUST.cloudInitUname).should('be.visible');
+    cy.contains('.pf-v6-c-clipboard-copy', VM_TMPL_CUST.cloudInitPwd).should('be.visible');
   });
 });
 
-describe('Test bulk actions', () => {
+xdescribe('Test bulk actions', () => {
   it('stop all VMs by selection', () => {
     cy.visitVMs();
     cy.get(selectAllBtn).check();

@@ -8,8 +8,6 @@ import {
   EmptyStateActions,
   EmptyStateBody,
   EmptyStateFooter,
-  EmptyStateHeader,
-  EmptyStateIcon,
   EmptyStateVariant,
 } from '@patternfly/react-core';
 import { AddCircleOIcon } from '@patternfly/react-icons';
@@ -28,13 +26,12 @@ const BootableVolumesEmptyState: FC<BootableVolumesEmptyStateProps> = ({ namespa
       <ListPageHeader title={t('Bootable volumes')} />
 
       <ListPageBody>
-        <EmptyState variant={EmptyStateVariant.lg}>
-          <EmptyStateHeader
-            headingLevel="h4"
-            icon={<EmptyStateIcon icon={AddCircleOIcon} />}
-            titleText={<>{t('No bootable volumes found')}</>}
-          />
-
+        <EmptyState
+          headingLevel="h4"
+          icon={AddCircleOIcon}
+          titleText={<>{t('No bootable volumes found')}</>}
+          variant={EmptyStateVariant.lg}
+        >
           <EmptyStateBody>
             <Trans ns="plugin__kubevirt-plugin" t={t}>
               Click <b>Add bootable volume</b> to add your first bootable volume

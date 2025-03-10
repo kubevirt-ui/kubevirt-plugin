@@ -11,8 +11,6 @@ import {
   EmptyStateActions,
   EmptyStateBody,
   EmptyStateFooter,
-  EmptyStateHeader,
-  EmptyStateIcon,
   EmptyStateVariant,
 } from '@patternfly/react-core';
 import { RouteIcon, VirtualMachineIcon } from '@patternfly/react-icons';
@@ -34,12 +32,13 @@ const VirtualMachineEmptyState: FC<VirtualMachineEmptyStateProps> = ({ catalogUR
     <>
       <ListPageHeader title={t('VirtualMachines')} />
       <ListPageBody>
-        <EmptyState className="VirtualMachineEmptyState" variant={EmptyStateVariant.lg}>
-          <EmptyStateHeader
-            headingLevel="h4"
-            icon={<EmptyStateIcon icon={VirtualMachineIcon} />}
-            titleText={<>{t('No VirtualMachines found')}</>}
-          />
+        <EmptyState
+          className="VirtualMachineEmptyState"
+          headingLevel="h4"
+          icon={VirtualMachineIcon}
+          titleText={<>{t('No VirtualMachines found')}</>}
+          variant={EmptyStateVariant.lg}
+        >
           <EmptyStateBody>
             <Trans ns="plugin__kubevirt-plugin" t={t}>
               Click <b>Create VirtualMachine</b> to create your first VirtualMachine or view the{' '}

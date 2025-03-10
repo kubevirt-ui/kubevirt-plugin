@@ -41,7 +41,7 @@ const VirtualMachineBasicLogViewer: FC<VirtualMachineBasicLogViewerProps> = ({
             <ToolbarItem>
               <LogViewerSearch minSearchChars={3} placeholder="Search..." />
             </ToolbarItem>
-            <ToolbarItem align={{ default: 'alignRight' }}>
+            <ToolbarItem align={{ default: 'alignEnd' }}>
               <Checkbox
                 id="wrap-text-checkbox"
                 isChecked={isTextWrapped}

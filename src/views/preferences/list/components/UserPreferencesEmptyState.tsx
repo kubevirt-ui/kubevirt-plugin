@@ -7,8 +7,6 @@ import {
   EmptyStateActions,
   EmptyStateBody,
   EmptyStateFooter,
-  EmptyStateHeader,
-  EmptyStateIcon,
   EmptyStateVariant,
 } from '@patternfly/react-core';
 import { AddCircleOIcon } from '@patternfly/react-icons';
@@ -23,13 +21,12 @@ const UserPreferencesEmptyState: FC<UserPreferencesEmptyStateProps> = ({ namespa
   const { t } = useKubevirtTranslation();
 
   return (
-    <EmptyState variant={EmptyStateVariant.lg}>
-      <EmptyStateHeader
-        headingLevel="h4"
-        icon={<EmptyStateIcon icon={AddCircleOIcon} />}
-        titleText={<>{t('No preferences found')}</>}
-      />
-
+    <EmptyState
+      headingLevel="h4"
+      icon={AddCircleOIcon}
+      titleText={<>{t('No preferences found')}</>}
+      variant={EmptyStateVariant.lg}
+    >
       <EmptyStateBody>
         <Trans ns="plugin__kubevirt-plugin" t={t}>
           Click <b>Create VirtualMachinePreference</b> to create your first VirtualMachinePreference

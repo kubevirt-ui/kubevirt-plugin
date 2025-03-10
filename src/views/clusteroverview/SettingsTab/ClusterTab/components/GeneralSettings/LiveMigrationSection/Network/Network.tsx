@@ -9,11 +9,11 @@ import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
   AlertVariant,
+  Content,
+  ContentVariants,
   SelectGroup,
   SelectOption,
   Skeleton,
-  Text,
-  TextVariants,
   Title,
 } from '@patternfly/react-core';
 
@@ -49,7 +49,7 @@ const Network = ({ hyperConverge }) => {
   };
   return (
     <>
-      <Text component={TextVariants.small}>{t('Set live migration network')}</Text>
+      <Content component={ContentVariants.small}>{t('Set live migration network')}</Content>
       <Title className="live-migration-tab__network--title" headingLevel="h6" size="md">
         {t('Live migration network')}
       </Title>

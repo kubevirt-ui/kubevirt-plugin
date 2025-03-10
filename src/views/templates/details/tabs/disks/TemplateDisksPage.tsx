@@ -15,7 +15,7 @@ import {
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { PageSection, PageSectionVariants } from '@patternfly/react-core';
+import { PageSection, Stack, StackItem } from '@patternfly/react-core';
 
 import useEditTemplateAccessReview from '../../hooks/useIsTemplateEditable';
 
@@ -61,41 +61,47 @@ const TemplateDisksPage: FC<TemplateDisksPageProps> = ({ obj: template }) => {
 
   return (
     <div className="template-disks-page">
-      <PageSection variant={PageSectionVariants.light}>
+      <PageSection>
         <SidebarEditor<V1Template> onResourceUpdate={onSubmitTemplate} resource={template}>
-          <DiskListTitle />
-          {isTemplateEditable && (
-            <DiskSourceSelect
-              onSelect={(diskSource: SourceTypes) => {
-                return createModal(({ isOpen, onClose }) => (
-                  <DiskModal
-                    createDiskSource={diskSource}
-                    isOpen={isOpen}
-                    onClose={onClose}
-                    onSubmit={onUpdate}
-                    vm={vm}
-                  />
-                ));
-              }}
-              className="list-page-create-button-margin"
-            />
-          )}
-          <ListPageFilter
-            data={data}
-            hideLabelFilter
-            loaded={disksLoaded}
-            onFilterChange={onFilterChange}
-            rowFilters={filters}
-          />
-          <VirtualizedTable
-            columns={columns}
-            data={filteredData}
-            loaded={disksLoaded}
-            loadError={undefined}
-            Row={DiskRow}
-            rowData={{ actionsDisabled: !isTemplateEditable, onUpdate, vm }}
-            unfilteredData={data}
-          />
+          <Stack hasGutter>
+            <DiskListTitle />
+            {isTemplateEditable && (
+              <StackItem>
+                <DiskSourceSelect
+                  onSelect={(diskSource: SourceTypes) => {
+                    return createModal(({ isOpen, onClose }) => (
+                      <DiskModal
+                        createDiskSource={diskSource}
+                        isOpen={isOpen}
+                        onClose={onClose}
+                        onSubmit={onUpdate}
+                        vm={vm}
+                      />
+                    ));
+                  }}
+                  className="list-page-create-button-margin"
+                />
+              </StackItem>
+            )}
+            <StackItem>
+              <ListPageFilter
+                data={data}
+                hideLabelFilter
+                loaded={disksLoaded}
+                onFilterChange={onFilterChange}
+                rowFilters={filters}
+              />
+              <VirtualizedTable
+                columns={columns}
+                data={filteredData}
+                loaded={disksLoaded}
+                loadError={undefined}
+                Row={DiskRow}
+                rowData={{ actionsDisabled: !isTemplateEditable, onUpdate, vm }}
+                unfilteredData={data}
+              />
+            </StackItem>
+          </Stack>
         </SidebarEditor>
       </PageSection>
     </div>

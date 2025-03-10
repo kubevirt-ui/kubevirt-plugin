@@ -1,20 +1,20 @@
 .bootable-volume-list-bar {
-  margin-top: var(--pf-v5-global--spacer--md);
+  margin-top: var(--pf-t--global--spacer--md);
   &__filter {
-    margin-top: var(--pf-v5-global--spacer--xs);
+    margin-top: 1.25rem;
   }
 
   &__pagination {
-    margin-top: var(--pf-v5-global--spacer--md);
+    margin-top: var(--pf-t--global--spacer--md);
   }
 
   &__show-all-btn {
-    margin-top: calc(var(--pf-v5-global--spacer--md) + var(--pf-v5-global--spacer--xs));
+    margin-top: calc(var(--pf-t--global--spacer--md) + var(--pf-t--global--spacer--xs));
   }
 
   &__volume-namespace {
     width: fit-content;
-    .pf-v5-c-form__label {
+    .pf-v6-c-form__label {
       margin-bottom: 0;
     }
   }
@@ -24,9 +24,9 @@
   &-table {
     th:first-child {
       padding-right: 0;
-      padding-left: var(--pf-v5-global--spacer--sm);
-      margin-right: var(--pf-v5-global--spacer--sm);
-      .pf-v5-c-table__sort-indicator {
+      padding-left: var(--pf-t--global--spacer--sm);
+      margin-right: var(--pf-t--global--spacer--sm);
+      .pf-v6-c-table__sort-indicator {
         margin: 0;
       }
     }

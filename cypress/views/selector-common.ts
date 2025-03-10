@@ -13,30 +13,30 @@ export const VMCPNav = '[data-test-id="virtualmachineclusterpreferences-nav-item
 export const VCheckupsNav = '[data-test-id="virtualization-checkups-nav-item"]';
 
 // general
-export const formGroup = '.pf-v5-c-form__group';
-export const descrGroup = '.pf-v5-c-description-list__group';
-export const descrText = '.pf-v5-c-description-list__text';
+export const formGroup = '.pf-v6-c-form__group';
+export const descrGroup = '.pf-v6-c-description-list__group';
+export const descrText = '.pf-v6-c-description-list__text';
 export const tagsInput = 'input#tags-input';
-export const labelText = '.pf-v5-c-label__text';
-export const labelContent = '.pf-v5-c-label__content';
+export const labelText = '.pf-v6-c-label__text';
+export const labelContent = '.pf-v6-c-label__content';
 export const itemValue = '[data-test="detail-item-value"]';
-export const actionsBtn = 'button.pf-v5-c-menu-toggle.pf-m-plain';
+export const actionsBtn = 'button.pf-v6-c-menu-toggle.pf-m-plain';
 export const submitButton = 'button[type=submit]';
 export const resourceTitle = '[data-test-id="resource-title"]';
 export const itemCreateBtn = '[data-test="item-create"]';
 export const createBtn = '[data-test="save-changes"]';
-export const modalHeader = '.pf-v5-c-modal-box__header';
+export const modalHeader = '.pf-v6-c-modal-box__header';
 export const emptyMsg = '#no-templates-msg';
 export const row = '[data-test-rows="resource-row"]';
-export const dropDownItem = '.pf-v5-c-dropdown__menu-item';
-export const menuToggleText = '.pf-v5-c-menu-toggle__text';
+export const dropDownItem = '.pf-v6-c-dropdown__menu-item';
+export const menuToggleText = '.pf-v6-c-menu-toggle__text';
 export const vmStatusTop = '.pf-m-compact.vm-resource-label';
-export const menuItemMain = '.pf-v5-c-menu__item-main';
-export const gridItem = '.pf-v5-l-grid';
-export const brandImage = '[data-test="brand-image"]';
+export const menuItemMain = '.pf-v6-c-menu__item-main';
+export const gridItem = '.pf-v6-l-grid';
+export const mastheadLogo = '[data-test="masthead-logo"]';
 
 // VM list
-export const vmStatusOnList = '#status';
+export const vmStatusOnList = 'td[data-label="status"]';
 export const vmNode = '#node';
 export const colManage = 'button[aria-label="Column management"]';
 export const resetBtn = '#reset-action';
@@ -59,8 +59,8 @@ export const nsTH = 'th[data-label="Namespace"]';
 export const workloadTH = 'th[data-label="Workload profile"]';
 export const bootsourceTH = 'th[data-label="Boot source"]';
 export const cpuTH = 'th[data-label="CPU | Memory"]';
-export const vmCount = '.pf-v5-c-menu-toggle__text > b';
-export const kebabBtn = '.pf-v5-c-table__td.dropdown-kebab-pf.pf-v5-c-table__action';
+export const vmCount = '.pf-v6-c-menu-toggle__text > b';
+export const kebabBtn = '.pf-v6-c-table__td.dropdown-kebab-pf.pf-v6-c-table__action';
 export const selectAllBtn = 'input[name="check-all"]';
 
 // VM overview tab
@@ -103,7 +103,7 @@ export const memField = '.input-memory';
 export const workload = (name: string) => `button[data-test-id="${name}-workload-profile"]`;
 export const hostname = (name: string) => `button[data-test-id="${name}-hostname"]`;
 export const hostnameInput = 'input[id="hostname"]';
-export const label = '.pf-v5-c-label-group__list-item';
+export const label = '.pf-v6-c-label-group__list-item';
 export const sshAccess = (name: string) => `[data-test-id="${name}-ssh-access"]`;
 export const sshTypeSelect = '#ssh-service-select';
 export const sshTypeNodeport = '#NodePort';
@@ -143,12 +143,12 @@ export const vmSysprep = '[data-test-id="wizard-sysprep"]';
 export const vmSysprepEdit = '[data-test-id="wizard-sysprep-edit"]';
 export const unattendInput = '[data-test="sysprep-unattend-xml-input"]';
 export const autoUnInput = '[data-test="sysprep-autounattend-xml-input"]';
-export const infoItem = '.pf-v5-l-stack__item';
+export const infoItem = '.pf-v6-l-stack__item';
 export const osLabel = '.os-label';
 
 // VM Diagnostic tab
 export const gridTable = 'table[role="grid"]';
-export const toggleButton = '.pf-v5-c-table__toggle > button';
+export const toggleButton = '.pf-v6-c-table__toggle > button';
 export const rowGroupBody = 'tbody[role="rowgroup"]';
 export const expandedRow = '.pf-m-expanded';
 export const statusCell = 'td#status';

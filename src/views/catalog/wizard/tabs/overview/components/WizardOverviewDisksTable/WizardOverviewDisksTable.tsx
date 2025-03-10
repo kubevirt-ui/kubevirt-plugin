@@ -16,7 +16,7 @@ export const WizardOverviewDisksTable: React.FC<{
   const { t } = useKubevirtTranslation();
   return (
     <DescriptionList
-      className="pf-v5-c-description-list"
+      className="pf-v6-c-description-list"
       columnModifier={{ default: '3Col' }}
       isInlineGrid={isInlineGrid}
     >

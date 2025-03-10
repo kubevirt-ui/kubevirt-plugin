@@ -3,7 +3,7 @@ import React, { FC, ReactNode, useEffect, useState } from 'react';
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
-import { Text, TextVariants } from '@patternfly/react-core';
+import { Content, ContentVariants } from '@patternfly/react-core';
 
 import ExpandSection from '../../../../ExpandSection/ExpandSection';
 import GeneralSettingsError from '../shared/GeneralSettingsError';
@@ -57,12 +57,12 @@ const GeneralSettingsProject: FC<GeneralSettingsProjectProps> = ({
 
   return (
     <ExpandSection className="project-tab__main" toggleText={toggleText}>
-      <Text className="project-tab__main--help" component={TextVariants.small}>
+      <Content className="project-tab__main--help" component={ContentVariants.small}>
         {description}
-      </Text>
-      <Text className="project-tab__main--field-title" component={TextVariants.h6}>
+      </Content>
+      <Content className="project-tab__main--field-title" component={ContentVariants.h6}>
         {t('Project')}
-      </Text>
+      </Content>
       <GeneralSettingsProjectSelector
         loaded={!loading && hyperLoaded && projectsLoaded}
         onSelect={onSelect}

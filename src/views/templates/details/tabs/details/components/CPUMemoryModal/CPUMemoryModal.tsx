@@ -10,7 +10,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { getCPU, getMemory } from '@kubevirt-utils/resources/vm';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
-import { Alert, Button, ButtonVariant, Modal, ModalVariant } from '@patternfly/react-core';
+import { Alert, Button, ButtonVariant } from '@patternfly/react-core';
+import { Modal, ModalVariant } from '@patternfly/react-core/deprecated';
 
 import useEditTemplateAccessReview from '../../../../hooks/useIsTemplateEditable';
 

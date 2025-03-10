@@ -66,9 +66,7 @@ const HardwareDevicesPage: FC<any> = (props) => {
               'Various types of hardware devices are assigned to virtual machines in the cluster',
             )}
           >
-            <Button aria-label="Action" variant="plain">
-              <HelpIcon />
-            </Button>
+            <Button aria-label="Action" icon={<HelpIcon />} variant="plain" />
           </Popover>
         </h1>
       </div>

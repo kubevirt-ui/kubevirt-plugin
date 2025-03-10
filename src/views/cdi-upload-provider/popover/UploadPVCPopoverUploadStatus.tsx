@@ -12,7 +12,7 @@ import {
   StackItem,
 } from '@patternfly/react-core';
 import { BanIcon, ErrorCircleOIcon, InProgressIcon } from '@patternfly/react-icons';
-import { global_danger_color_100 as dangerColor } from '@patternfly/react-tokens/dist/js/global_danger_color_100';
+import dangerColor from '@patternfly/react-tokens/dist/js/t_global_icon_color_status_danger_default';
 
 import { UPLOAD_STATUS } from '../utils/consts';
 import { DataUpload } from '../utils/types';
@@ -38,14 +38,14 @@ const UploadPVCPopoverUploadStatus: React.FC<UploadPVCPopoverUploadStatusProps> 
       case UPLOAD_STATUS.ERROR:
         return {
           body: error?.message,
-          icon: <ErrorCircleOIcon className="co-icon-and-text__icon" color={dangerColor?.value} />,
+          icon: <ErrorCircleOIcon className="co-icon-and-text__icon" color={dangerColor?.var} />,
           title: t('Upload error'),
         };
       case UPLOAD_STATUS.CANCELED:
         return {
           body: error ? error?.message : t('Removing Resources'),
           icon: (
-            <BanIcon className="co-icon-and-text__icon" color={error ? dangerColor?.value : ''} />
+            <BanIcon className="co-icon-and-text__icon" color={error ? dangerColor?.var : ''} />
           ),
           title: error ? t('Cancel error') : t('Upload canceled'),
         };

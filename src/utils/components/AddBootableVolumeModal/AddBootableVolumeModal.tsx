@@ -111,7 +111,7 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
       submitBtnText={t('Save')}
     >
       {t('Add a new bootable volume to the cluster.')}
-      <Form className="pf-v5-u-mt-md">
+      <Form className="pf-v6-u-mt-md">
         <SourceTypeSelection
           formSelection={sourceType}
           namespace={namespace}
@@ -130,7 +130,7 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
             setBootableVolumeField={setBootableVolumeField}
           />
         )}
-        <Title className="pf-v5-u-mt-md" headingLevel="h5">
+        <Title className="pf-v6-u-mt-md" headingLevel="h5">
           {t('Destination details')}
         </Title>
         <VolumeDestination
@@ -139,7 +139,7 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
           claimPropertySetsData={claimPropertySetsData}
           setBootableVolumeField={setBootableVolumeField}
         />
-        <Title className="pf-v5-u-mt-md" headingLevel="h5">
+        <Title className="pf-v6-u-mt-md" headingLevel="h5">
           {t('Volume metadata')}{' '}
           <HelpTextIcon
             bodyContent={t('Set the volume metadata to use the volume as a bootable image.')}

@@ -92,7 +92,7 @@ const AuthorizedSSHKey: FC<AuthorizedSSHKeyProps> = ({ authorizedSSHKey, namespa
 
   return (
     <SplitItem>
-      <DescriptionList className="pf-v5-c-description-list">
+      <DescriptionList className="pf-v6-c-description-list">
         <VirtualMachineDescriptionItem
           onEditClick={() =>
             createModal((modalProps) => (
@@ -110,7 +110,7 @@ const AuthorizedSSHKey: FC<AuthorizedSSHKeyProps> = ({ authorizedSSHKey, namespa
         />
         {!isEmpty(additionalSecretResource) && (
           <HelperText>
-            <HelperTextItem hasIcon variant="warning">
+            <HelperTextItem variant="warning">
               {t('This key will override the SSH key secret set on the template')}
             </HelperTextItem>
           </HelperText>

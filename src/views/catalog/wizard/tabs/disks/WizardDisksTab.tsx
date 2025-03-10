@@ -21,7 +21,7 @@ import {
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { Flex, FlexItem, PageSection, PageSectionVariants } from '@patternfly/react-core';
+import { Flex, FlexItem, PageSection } from '@patternfly/react-core';
 
 import DiskRow from './components/DiskRow';
 import useDiskColumns from './hooks/useDiskColumns';
@@ -45,7 +45,7 @@ const WizardDisksTab: WizardTab = ({ tabsData, updateTabsData, updateVM, vm }) =
   const defaultFormValues: DefaultFormValues = { registryCredentials: decodedRegistryCredentials };
 
   return (
-    <PageSection variant={PageSectionVariants.light}>
+    <PageSection>
       <ListPageBody>
         <SidebarEditor
           onResourceUpdate={(newVM) => updateVM(newVM)}

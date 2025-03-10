@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Text, TextVariants } from '@patternfly/react-core';
+import { Content, ContentVariants } from '@patternfly/react-core';
 
 import { UNATTEND } from '../sysprep-utils';
 import SysprepFileField from '../SysprepFileField';
@@ -16,7 +16,7 @@ const SysprepUnattend: React.FC<{
   return (
     <>
       <div className="kv-sysprep--title">
-        <Text component={TextVariants.h6}>{t('Unattend.xml answer file')}</Text>
+        <Content component={ContentVariants.h6}>{t('Unattend.xml answer file')}</Content>
         <SysprepUnattendHelperPopup />
       </div>
       <SysprepFileField id={UNATTEND} onChange={onChange} value={value} />

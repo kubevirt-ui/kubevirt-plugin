@@ -1,5 +1,5 @@
 import * as sel from './selector-common';
-export const vmActions = '.dropdown-kebab-pf.pf-v5-c-table__action';
+export const vmActions = '.dropdown-kebab-pf.pf-v6-c-table__action';
 export const START = 'vm-action-start';
 export const RESTART = 'vm-action-restart';
 export const STOP = 'vm-action-stop';

@@ -2,7 +2,8 @@ import React, { FC } from 'react';
 
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { ActionGroup, Button, ButtonVariant, Modal, ModalVariant } from '@patternfly/react-core';
+import { ActionGroup, Button, ButtonVariant } from '@patternfly/react-core';
+import { Modal, ModalVariant } from '@patternfly/react-core/deprecated';
 
 type DeleteCheckupModalProps = {
   isOpen: boolean;

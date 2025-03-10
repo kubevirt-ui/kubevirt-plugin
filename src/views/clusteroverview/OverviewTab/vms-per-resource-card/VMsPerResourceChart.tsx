@@ -5,7 +5,7 @@ import SubTitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/Su
 import TitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/TitleChartLabel';
 import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { ChartDonut } from '@patternfly/react-charts';
+import { ChartDonut } from '@patternfly/react-charts/victory';
 import { CardBody } from '@patternfly/react-core';
 
 import useVMsPerResource from './hooks/useVMsPerResource';

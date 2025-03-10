@@ -1,17 +1,17 @@
 .sidebar-editor {
   min-height: 100%;
 
-  .pf-v5-c-sidebar__panel,
-  .pf-v5-c-sidebar__main {
+  .pf-v6-c-sidebar__panel,
+  .pf-v6-c-sidebar__main {
     min-height: 100%;
   }
 
-  .pf-v5-c-sidebar__main {
+  .pf-v6-c-sidebar__main {
     align-items: stretch;
   }
 
-  .pf-v5-c-sidebar__panel {
-    padding: var(--pf-v5-global-spacer-sm);
+  .pf-v6-c-sidebar__panel {
+    padding: var(--pf-v6-global-spacer-sm);
   }
 
   .ocs-yaml-editor__root {

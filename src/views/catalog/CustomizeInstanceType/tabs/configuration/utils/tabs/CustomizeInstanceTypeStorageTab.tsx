@@ -9,7 +9,7 @@ import {
   updateVMCustomizeIT,
   vmSignal,
 } from '@kubevirt-utils/store/customizeInstanceType';
-import { Divider, Grid, GridItem, PageSection, PageSectionVariants } from '@patternfly/react-core';
+import { Divider, Grid, GridItem, PageSection } from '@patternfly/react-core';
 import DiskList from '@virtualmachines/details/tabs/configuration/storage/components/tables/disk/DiskList';
 
 const CustomizeInstanceTypeStorageTab = () => {
@@ -22,7 +22,7 @@ const CustomizeInstanceTypeStorageTab = () => {
   return (
     <Grid hasGutter>
       <GridItem>
-        <PageSection variant={PageSectionVariants.light}>
+        <PageSection>
           <DiskList
             onDiskUpdate={(updatedVM: V1VirtualMachine) => {
               const vmModified = updateCustomizeInstanceType([
@@ -51,7 +51,7 @@ const CustomizeInstanceTypeStorageTab = () => {
         <Divider />
       </GridItem>
       <GridItem>
-        <PageSection variant={PageSectionVariants.light}>
+        <PageSection>
           <EnvironmentForm updateVM={updateVMCustomizeIT} vm={vm} />
         </PageSection>
       </GridItem>

@@ -8,7 +8,7 @@ import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/Com
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useGuestOS } from '@kubevirt-utils/resources/vmi';
 import { removeDuplicatesByName } from '@kubevirt-utils/utils/utils';
-import { ChartDonutUtilization } from '@patternfly/react-charts';
+import { ChartDonutUtilization } from '@patternfly/react-charts/victory';
 
 type StorageUtilProps = {
   vmi: V1VirtualMachineInstance;

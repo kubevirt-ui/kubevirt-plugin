@@ -25,7 +25,7 @@ export const template = {
         cy.get(tView.displayName).clear().type(tData.name);
       }
       if (tData.namespace) {
-        cy.get('button.pf-v5-c-menu-toggle[placeholder="Select project"]').click();
+        cy.get('button.pf-v6-c-menu-toggle[placeholder="Select project"]').click();
         cy.contains(cView.menuItem, tData.namespace).click();
       }
       if (tData.provider) {

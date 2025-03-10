@@ -16,7 +16,10 @@ const RedHatProvidedInstanceTypesSection: FC<RedHatProvidedInstanceTypesSectionP
   const menuProps = useInstanceTypeCardMenuSection();
 
   return (
-    <Flex justifyContent={{ default: 'justifyContentSpaceBetween' }}>
+    <Flex
+      gap={{ default: 'gapMd', lg: 'gapXl' }}
+      justifyContent={{ default: 'justifyContentSpaceBetween' }}
+    >
       {redHatMenuItems.items.map((rhSeriesItem) => {
         const seriesName = rhSeriesItem?.seriesName;
         return (

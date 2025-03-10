@@ -1,5 +1,5 @@
 .kubevirt-boot-order {
-  &-order-summary__expandable.pf-v5-c-expandable .pf-v5-c-expandable__content {
+  &-order-summary__expandable.pf-v6-c-expandable .pf-v6-c-expandable__content {
     margin-top: 0;
   }
 
@@ -8,18 +8,18 @@
   }
 
   &__boot-order-empty-btn {
-    margin-top: var(--pf-v5-global--spacer--md);
+    margin-top: var(--pf-t--global--spacer--md);
   }
 
   &__data-list-item {
-    background: var(--pf-v5-global--BackgroundColor--100);
+    background: var(--pf-t--global--background--color--primary--default);
   }
 
-  &__delete-btn.pf-v5-c-button.pf-m-link {
-    --pf-v5-c-button--PaddingTop: 0;
-    --pf-v5-c-button--PaddingRight: 0;
-    --pf-v5-c-button--PaddingBottom: 0;
-    --pf-v5-c-button--PaddingLeft: 0;
-    --pf-v5-c-button--m-link--Color: var(--pf-v5-global--Color--100);
+  &__delete-btn.pf-v6-c-button.pf-m-link {
+    --pf-v6-c-button--PaddingBlockStart: 0;
+    --pf-v6-c-button--PaddingInlineEnd: 0;
+    --pf-v6-c-button--PaddingBlockEnd: 0;
+    --pf-v6-c-button--PaddingInlineStart: 0;
+    --pf-v6-c-button--m-link--Color: var(--pf-t--global--text--color--regular);
   }
 }

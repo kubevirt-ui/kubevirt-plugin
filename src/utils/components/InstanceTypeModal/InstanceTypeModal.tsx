@@ -2,7 +2,7 @@ import React, { FC, useMemo, useState } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Flex, FlexItem, SelectList, SelectOption, Text } from '@patternfly/react-core';
+import { Content, Flex, FlexItem, SelectList, SelectOption } from '@patternfly/react-core';
 import { InstanceTypeUnion } from '@virtualmachines/details/tabs/configuration/utils/types';
 
 import FormPFSelect from '../FormPFSelect/FormPFSelect';
@@ -74,7 +74,7 @@ const InstanceTypeModal: FC<InstanceTypeModalProps> = ({
         spacer={{ default: 'spacer4xl' }}
       >
         <FlexItem>
-          <Text component="h5">{t('Series')}</Text>
+          <Content component="h5">{t('Series')}</Content>
           <FormPFSelect
             onSelect={(_, value) => {
               if (value !== series) {
@@ -99,7 +99,7 @@ const InstanceTypeModal: FC<InstanceTypeModalProps> = ({
           </FormPFSelect>
         </FlexItem>
         <FlexItem>
-          <Text component="h5">{t('Size')}</Text>
+          <Content component="h5">{t('Size')}</Content>
           <FormPFSelect
             onSelect={(_, value) => {
               setSize(value as string);

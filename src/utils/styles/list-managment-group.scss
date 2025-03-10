@@ -4,6 +4,10 @@
   &__pagination {
     flex-grow: 1;
   }
+
+  .pf-v6-c-toolbar {
+    padding-block-start: var(--pf-t--global--spacer--md);
+  }
 }
 
 .list-header-spacer {

@@ -1,11 +1,11 @@
 .bootable-volume-empty-state {
   &__icon-bar {
-    margin-top: var(--pf-v5-global--spacer--xl);
+    margin-top: var(--pf-t--global--spacer--xl);
   }
 
   &__icon-bar :nth-child(2) {
-    margin-left: var(--pf-v5-global--spacer--2xl);
-    margin-right: var(--pf-v5-global--spacer--2xl);
+    margin-left: var(--pf-t--global--spacer--2xl);
+    margin-right: var(--pf-t--global--spacer--2xl);
   }
 
   &__icon {
@@ -13,6 +13,6 @@
   }
 
   &__title {
-    margin-bottom: var(--pf-v5-global--spacer--md);
+    margin-bottom: var(--pf-t--global--spacer--md);
   }
 }

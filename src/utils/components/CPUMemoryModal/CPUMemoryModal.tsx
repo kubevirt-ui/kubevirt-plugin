@@ -10,14 +10,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getLabel } from '@kubevirt-utils/resources/shared';
 import { getCPU, getMemory, VM_TEMPLATE_ANNOTATION } from '@kubevirt-utils/resources/vm';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
-import {
-  Alert,
-  AlertVariant,
-  Button,
-  ButtonVariant,
-  Modal,
-  ModalVariant,
-} from '@patternfly/react-core';
+import { Alert, AlertVariant, Button, ButtonVariant } from '@patternfly/react-core';
+import { Modal, ModalVariant } from '@patternfly/react-core/deprecated';
 
 import useTemplateDefaultCpuMemory from './hooks/useTemplateDefaultCpuMemory';
 import { getMemorySize } from './utils/CpuMemoryUtils';

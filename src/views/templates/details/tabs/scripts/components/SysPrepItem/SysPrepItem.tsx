@@ -106,13 +106,14 @@ const SysPrepItem: FC<SysPrepItemProps> = ({ template }) => {
                   />
                 ))
               }
+              icon={<PencilAltIcon />}
+              iconPosition="end"
               isDisabled={!isTemplateEditable}
               isInline
               type="button"
               variant="link"
             >
               {t('Edit')}
-              <PencilAltIcon className="co-icon-space-l pf-v5-c-button-icon--plain" />
             </Button>
           </FlexItem>
         </Flex>

@@ -7,13 +7,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
 import { K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
-import {
-  DescriptionList,
-  Divider,
-  PageSection,
-  PageSectionVariants,
-  Title,
-} from '@patternfly/react-core';
+import { DescriptionList, Divider, PageSection, Title } from '@patternfly/react-core';
 
 import { onSubmitYAML } from '../details/utils/utils';
 import { ConfigurationInnerTabProps } from '../utils/types';
@@ -33,11 +27,11 @@ const InitialRunTab: FC<ConfigurationInnerTabProps> = ({ vm, vmi }) => {
       resource={vm}
     >
       {(resource) => (
-        <PageSection variant={PageSectionVariants.light}>
+        <PageSection>
           <Title headingLevel="h2">
             <SearchItem id="initial-run">{t('Initial run')}</SearchItem>
           </Title>
-          <DescriptionList className="pf-v5-c-description-list">
+          <DescriptionList className="pf-v6-c-description-list">
             <InitialRunTabCloudinit
               canUpdateVM={canUpdateVM}
               onSubmit={onSubmitYAML}
