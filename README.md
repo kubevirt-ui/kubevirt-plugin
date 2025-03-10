@@ -57,6 +57,7 @@ cached containers will help you start developing in seconds.
 
 ```bash
 OC_PLUGIN_NAME=kubevirt-plugin
+OC_PLUGIN_I18N_NAMESPACES=plugin__kubevirt-plugin
 OC_URL=https://api.example.com:6443
 OC_USER=kubeadmin
 OC_PASS=<password>
