@@ -54,6 +54,11 @@ const useVirtualMachineColumns = (
   const columns: TableColumn<K8sResourceCommon>[] = useMemo(
     () => [
       {
+        id: '',
+        props: { className: 'dropdown-kebab-pf pf-v5-c-table__action' },
+        title: '',
+      },
+      {
         id: 'name',
         props: { className: 'pf-m-width-20' },
         sort: (_, direction) => sorting(direction, 'metadata.name'),
