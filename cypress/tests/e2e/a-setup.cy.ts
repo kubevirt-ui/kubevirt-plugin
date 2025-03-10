@@ -26,7 +26,6 @@ describe('Prepare the cluster for test', () => {
   });
 
   it('switch to Virtualization perspective and default project', () => {
-    cy.task('log', `  Switch to Virtualization perspective`);
     cy.get(brandImage).scrollIntoView();
     cy.switchToVirt();
 
