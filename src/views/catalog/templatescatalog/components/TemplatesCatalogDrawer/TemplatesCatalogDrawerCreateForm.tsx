@@ -70,7 +70,7 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
 
     const error = templateLoadingError || createError;
     return (
-      <form className="template-catalog-drawer-form" id="quick-create-form">
+      <div className="template-catalog-drawer-form" id="quick-create-form">
         <Stack hasGutter>
           <>
             <StackItem>
@@ -80,6 +80,7 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
                     <TextInput
                       aria-label="virtualmachine name"
                       data-test-id="template-catalog-vm-name-input"
+                      form={DRAWER_FORM_ID}
                       isDisabled={Boolean(templateLoadingError)}
                       isRequired
                       name="vmname"
@@ -198,7 +199,7 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
             </Split>
           </StackItem>
         </Stack>
-      </form>
+      </div>
     );
   },
 );
