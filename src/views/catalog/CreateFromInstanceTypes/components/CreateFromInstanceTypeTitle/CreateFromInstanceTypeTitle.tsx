@@ -33,7 +33,7 @@ const CreateFromInstanceTypeTitle: FC<CreateFromInstanceTypeTitleProps> = ({
                 <AddBootableVolumeLink
                   hidePopover={hide}
                   loadError={instanceTypesAndPreferencesData.loadError}
-                  text={t('Add Volume.')}
+                  text={t('Add volume.')}
                 />
               </div>
               <div>
