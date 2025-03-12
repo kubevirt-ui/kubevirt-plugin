@@ -1,7 +1,7 @@
 import { SECOND, VM_ACTION, VM_STATUS } from '../../utils/const/index';
 import { VM_IT_CUST, VM_IT_QUICK, VM_TMPL_CUST, VM_TMPL_QUICK } from '../../utils/const/testVM';
 import * as nav from '../../views/selector';
-import { descrText, selectAllBtn } from '../../views/selector-common';
+import { descrText, selectAllDropdownOption, selectDropdown } from '../../views/selector-common';
 import { tab } from '../../views/tab';
 import { vm, waitForStatus } from '../../views/vm-flow';
 
@@ -56,7 +56,8 @@ xdescribe('Create VMs from Template', () => {
 xdescribe('Test bulk actions', () => {
   it('stop all VMs by selection', () => {
     cy.visitVMs();
-    cy.get(selectAllBtn).check();
+    cy.get(selectDropdown).check();
+    cy.get(selectAllDropdownOption).check();
     cy.byButtonText('Actions').click();
     cy.byButtonText(VM_ACTION.Stop).click();
     cy.wait(30 * SECOND);
