@@ -51,7 +51,7 @@ const BootableVolumesPipelinesHint: FC<BootableVolumesPipelinesHintProps> = ({
           <QuickStartLauncherLink
             quickStart={windowsQS}
             quickStartLoaded={windowsQSLoaded}
-            text={t('Create a Windows boot source')}
+            text={t('Create a Windows bootable volume')}
           />{' '}
           quick start.
         </Trans>
