@@ -25,7 +25,7 @@ const VirtualMachineRow: FC<
       isSingleNodeCluster: boolean;
     }
   >
-> = ({ activeColumnIDs, obj: vm, rowData: { getVmi, getVmim, isSingleNodeCluster } }) => {
+> = ({ activeColumnIDs, index, obj: vm, rowData: { getVmi, getVmim, isSingleNodeCluster } }) => {
   const vmName = getName(vm);
   const vmNamespace = getNamespace(vm);
   const vmi = getVmi(vmNamespace, vmName);
@@ -46,11 +46,13 @@ const VirtualMachineRow: FC<
         vmim: getVmim(vmNamespace, vmName),
       }}
       activeColumnIDs={activeColumnIDs}
+      index={index}
       obj={vm}
     />
   ) : (
     <VirtualMachineRowLayout
       activeColumnIDs={activeColumnIDs}
+      index={index}
       obj={vm}
       rowData={{ ips: NO_DATA_DASH, isSingleNodeCluster, node: NO_DATA_DASH, status, vmim: null }}
     />

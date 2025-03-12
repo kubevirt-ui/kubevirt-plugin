@@ -23,25 +23,25 @@ import NetworkUsage from './components/NetworkUsage';
 import './virtual-machine-row-layout.scss';
 
 const VirtualMachineRowLayout: FC<
-  Omit<
-    RowProps<
-      V1VirtualMachine,
-      {
-        ips: ReactNode | string;
-        isSingleNodeCluster: boolean;
-        node: ReactNode | string;
-        status: ReactNode;
-        vmim: V1VirtualMachineInstanceMigration;
-        vmiMemory?: string;
-      }
-    >,
-    'index'
+  RowProps<
+    V1VirtualMachine,
+    {
+      ips: ReactNode | string;
+      isSingleNodeCluster: boolean;
+      node: ReactNode | string;
+      status: ReactNode;
+      vmim: V1VirtualMachineInstanceMigration;
+      vmiMemory?: string;
+    }
   >
 > = ({
   activeColumnIDs,
+  index,
   obj,
   rowData: { ips, isSingleNodeCluster, node, status, vmim, vmiMemory },
 }) => {
+  // TODO: investigate using the index prop
+  index;
   const selected = isVMSelected(obj);
 
   const vmName = useMemo(() => getName(obj), [obj]);
