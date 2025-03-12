@@ -5,7 +5,7 @@ import { descrText, selectAllBtn } from '../../views/selector-common';
 import { tab } from '../../views/tab';
 import { vm, waitForStatus } from '../../views/vm-flow';
 
-xdescribe('Create VMs from InstanceType', () => {
+describe('Create VMs from InstanceType', () => {
   before(() => {
     cy.visit('');
   });
