@@ -10,6 +10,8 @@ import {
   RowFilter,
 } from '@openshift-console/dynamic-plugin-sdk';
 import {
+  InputGroup,
+  InputGroupItem,
   SelectOption,
   Toolbar,
   ToolbarContent,
@@ -184,19 +186,21 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
                   categoryName={t('Name')}
                   labels={textFilters.name ? [textFilters.name] : []}
                 >
-                  <div className="pf-v6-c-input-group co-filter-group">
+                  <InputGroup className="co-filter-group">
                     {filterDropdownKeys.length > 1 && (
-                      <FormPFSelect
-                        onSelect={onSelect}
-                        selected={searchType}
-                        selectedLabel={filterDropdownItems?.[searchType]}
-                      >
-                        {filterDropdownKeys.map((key) => (
-                          <SelectOption key={key} value={key}>
-                            {filterDropdownItems?.[key]}
-                          </SelectOption>
-                        ))}
-                      </FormPFSelect>
+                      <InputGroupItem isFill>
+                        <FormPFSelect
+                          onSelect={onSelect}
+                          selected={searchType}
+                          selectedLabel={filterDropdownItems?.[searchType]}
+                        >
+                          {filterDropdownKeys.map((key) => (
+                            <SelectOption key={key} value={key}>
+                              {filterDropdownItems?.[key]}
+                            </SelectOption>
+                          ))}
+                        </FormPFSelect>
+                      </InputGroupItem>
                     )}
 
                     {searchType === STATIC_SEARCH_FILTERS.labels ? (
@@ -230,7 +234,7 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
                         value={searchInputText || ''}
                       />
                     )}
-                  </div>
+                  </InputGroup>
                 </ToolbarFilter>
               </ToolbarFilter>
             </ToolbarItem>
