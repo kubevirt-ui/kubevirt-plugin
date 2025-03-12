@@ -13,7 +13,7 @@ import {
 } from '@patternfly/react-core';
 
 import useFilteredTreeView from '../hooks/useFilteredTreeView';
-import useTreeViewItemRightClick from '../hooks/useTreeViewItemRightClick';
+import useTreeViewItemActions from '../hooks/useTreeViewItemActions';
 
 import CreateProject from './CreateProject';
 import PanelToggleButton from './PanelToggleButton';
@@ -44,7 +44,7 @@ const TreeViewContent: FC<TreeViewContentProps> = ({
   const [showAll, setShowAll] = useState<boolean>();
   const { filteredTreeData, onSearch } = useFilteredTreeView(treeData, setShowAll);
 
-  const { addListenerToRightClick, hideMenu, triggerElement } = useTreeViewItemRightClick(treeData);
+  const { addListeners, hideMenu, triggerElement } = useTreeViewItemActions(treeData);
 
   if (!loaded) {
     return (
@@ -93,7 +93,7 @@ const TreeViewContent: FC<TreeViewContentProps> = ({
           data={filteredTreeData}
           hasBadges={loaded}
           hasSelectableNodes
-          onExpand={addListenerToRightClick}
+          onExpand={addListeners}
           onSelect={onSelect}
         />
         <TreeViewRightClickActionMenu hideMenu={hideMenu} triggerElement={triggerElement} />
