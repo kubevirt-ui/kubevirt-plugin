@@ -1,11 +1,11 @@
 .bootable-volumes-pipelines-hint {
-  margin-top: var(--pf-v5-global--spacer--lg);
-  margin-left: var(--pf-v5-global--spacer--4xl);
-  padding-left: var(--pf-v5-global--spacer--sm);
+  margin-top: var(--pf-t--global--spacer--lg);
+  margin-left: var(--pf-t--global--spacer--4xl);
+  padding-left: var(--pf-t--global--spacer--sm);
 
   &__icon {
-    width: var(--pf-v5-global--spacer--xl);
-    padding-right: var(--pf-v5-global--spacer--sm);
+    width: var(--pf-t--global--spacer--xl);
+    padding-right: var(--pf-t--global--spacer--sm);
     vertical-align: middle;
   }
 }

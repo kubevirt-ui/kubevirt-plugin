@@ -74,7 +74,7 @@ const SSHAuthKeyRow: FC<SSHAuthKeyRowProps> = ({
   );
 
   return (
-    <Grid className="pf-v5-u-mb-sm">
+    <Grid className="pf-v6-u-mb-sm">
       <GridItem className="ssh-auth-row__project-name" span={5}>
         {isEmpty(secretName) ? (
           <InlineFilterSelect
@@ -101,13 +101,12 @@ const SSHAuthKeyRow: FC<SSHAuthKeyRowProps> = ({
       </GridItem>
       <GridItem span={1}>
         <Button
+          icon={<MinusCircleIcon />}
           isDisabled={isRemoveDisabled}
           isInline
           onClick={() => onAuthKeyDelete(row)}
           variant="plain"
-        >
-          <MinusCircleIcon />
-        </Button>
+        />
       </GridItem>
     </Grid>
   );

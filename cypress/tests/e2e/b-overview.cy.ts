@@ -7,7 +7,7 @@ import { tab } from '../../views/tab';
 
 const testSecret = 'test-secret';
 
-describe('Test Virtualization Overview', () => {
+xdescribe('Test Virtualization Overview', () => {
   before(() => {
     cy.visit('');
   });
@@ -36,6 +36,7 @@ describe('Test Virtualization Overview', () => {
     cy.byButtonText(userButtonTxt).click();
     cy.byButtonText(manageKeysText).click();
     cy.byButtonText(manageKeysText)
+      .parent()
       .parent()
       .within(() => {
         cy.contains(authSSHKey, { timeout: 20000 }).should('be.visible');

@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { Button, Text, TextVariants } from '@patternfly/react-core';
+import { Button, Content, ContentVariants } from '@patternfly/react-core';
 import { PlusCircleIcon } from '@patternfly/react-icons';
 
 export const AddDeviceButton: React.FC<AddDeviceButtonType> = ({
@@ -11,7 +11,7 @@ export const AddDeviceButton: React.FC<AddDeviceButtonType> = ({
   onClick,
 }) =>
   isDisabled ? (
-    <Text component={TextVariants.p}>{disabledMessage}</Text>
+    <Content component={ContentVariants.p}>{disabledMessage}</Content>
   ) : (
     <Button
       className="pf-m-link--align-left"

@@ -35,7 +35,7 @@ const StateHandler: FC<StateHandlerProps> = ({ children, error, loaded, withBull
         <Panel>
           <PanelMain>
             <PanelMainBody>
-              <Title className="pf-v5-u-text-align-center" headingLevel="h2">
+              <Title className="pf-v6-u-text-align-center" headingLevel="h2">
                 {t('404: Not Found')}
               </Title>
             </PanelMainBody>

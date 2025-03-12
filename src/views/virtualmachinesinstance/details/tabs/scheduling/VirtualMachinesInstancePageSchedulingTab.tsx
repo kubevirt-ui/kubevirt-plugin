@@ -4,13 +4,7 @@ import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import NodeSelectorDetailItem from '@kubevirt-utils/components/NodeSelectorDetailItem/NodeSelectorDetailItem';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  DescriptionList,
-  Grid,
-  GridItem,
-  PageSection,
-  PageSectionVariants,
-} from '@patternfly/react-core';
+import { DescriptionList, Grid, GridItem, PageSection } from '@patternfly/react-core';
 
 import Affinity from './Affinity/Affinity';
 import Descheduler from './Descheduler/Descheduler';
@@ -28,10 +22,10 @@ const VirtualMachinesInstancePageSchedulingTab: FC<
   const { t } = useKubevirtTranslation();
 
   return (
-    <PageSection variant={PageSectionVariants.light}>
+    <PageSection>
       <Grid hasGutter>
         <GridItem span={6}>
-          <DescriptionList className="pf-v5-c-description-list">
+          <DescriptionList className="pf-v6-c-description-list">
             <VirtualMachineDescriptionItem
               descriptionData={<NodeSelectorDetailItem nodeSelector={vmi?.spec?.nodeSelector} />}
               descriptionHeader={t('Node selector')}
@@ -51,7 +45,7 @@ const VirtualMachinesInstancePageSchedulingTab: FC<
           </DescriptionList>
         </GridItem>
         <GridItem span={6}>
-          <DescriptionList className="pf-v5-c-description-list">
+          <DescriptionList className="pf-v6-c-description-list">
             <VirtualMachineDescriptionItem
               descriptionData={<DedicatedResources vmi={vmi} />}
               descriptionHeader={t('Dedicated resources')}

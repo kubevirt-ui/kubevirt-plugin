@@ -9,14 +9,13 @@ import {
   Button,
   ButtonVariant,
   Checkbox,
+  EmptyState,
   EmptyStateActions,
   EmptyStateBody,
-  EmptyStateIcon,
   Split,
   SplitItem,
   Stack,
   StackItem,
-  Title,
 } from '@patternfly/react-core';
 import { ErrorCircleOIcon } from '@patternfly/react-icons';
 
@@ -45,11 +44,12 @@ const CDIInitErrorStatus: FC<CDIInitErrorStatus> = ({ namespace, onErrorClick, p
   };
 
   return (
-    <>
-      <EmptyStateIcon color="#cf1010" icon={ErrorCircleOIcon} />
-      <Title headingLevel="h4" size="lg">
-        {t('CDI Error: Could not initiate Data Volume')}
-      </Title>
+    <EmptyState
+      headingLevel="h4"
+      icon={ErrorCircleOIcon}
+      status="danger"
+      titleText={t('CDI Error: Could not initiate Data Volume')}
+    >
       <EmptyStateBody>
         <Stack hasGutter>
           <StackItem>
@@ -89,7 +89,7 @@ const CDIInitErrorStatus: FC<CDIInitErrorStatus> = ({ namespace, onErrorClick, p
           </Button>
         </EmptyStateActions>
       )}
-    </>
+    </EmptyState>
   );
 };
 

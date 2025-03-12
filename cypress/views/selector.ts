@@ -1,5 +1,5 @@
 export const vmStatusOnList = '#status';
-export const vmStatusOnDetails = '.pf-v5-c-helper-text__item-text';
+export const vmStatusOnDetails = '.pf-v6-c-helper-text__item-text';
 export const vmStatusOnOverview = '[data-test-id="virtual-machine-overview-details-status"]';
 export const itemCreateBtn = '[data-test="item-create"]';
 export const saveBtn = '[data-test="save-changes"]';
@@ -26,4 +26,4 @@ export const quickCreateVMBtn = '[data-test-id="quick-create-vm-btn"]';
 export const vmName = '[data-test-id="template-catalog-vm-name-input"]';
 export const uTemplate = '#user-templates';
 export const quickForm = '#quick-create-form';
-export const brandImage = '[data-test="brand-image"]';
+export const mastheadLogo = '[data-test="masthead-logo"]';

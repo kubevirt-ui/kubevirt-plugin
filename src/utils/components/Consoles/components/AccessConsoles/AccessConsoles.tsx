@@ -88,7 +88,7 @@ export const AccessConsoles: FC<AccessConsolesProps> = ({
         }}
         toggle={SelectToggle({
           className: 'access-consoles-selector',
-          id: 'pf-v5-c-console__type-selector',
+          id: 'pf-v6-c-console__type-selector',
           isExpanded: isOpenSelectType,
           onClick: () => setIsOpenSelectType((prevIsOpen) => !prevIsOpen),
           selected: type,
@@ -113,7 +113,7 @@ export const AccessConsoles: FC<AccessConsolesProps> = ({
         toggle={DropdownToggle({
           children: <>{t('Send key')}</>,
           className: 'access-consoles-selector',
-          id: 'pf-v5-c-console__actions-vnc-toggle-id',
+          id: 'pf-v6-c-console__actions-vnc-toggle-id',
           isDisabled: !rfb,
           isExpanded: isOpenSendKey,
           onClick: () => setIsOpenSendKey((prevIsOpen) => !prevIsOpen),

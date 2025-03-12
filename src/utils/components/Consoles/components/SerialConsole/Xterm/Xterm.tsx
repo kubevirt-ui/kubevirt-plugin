@@ -76,7 +76,7 @@ export const XTerm: React.FunctionComponent<XTermProps> = ({
 
   return (
     <div
-      className="pf-v5-c-console__xterm"
+      className="pf-v6-c-console__xterm"
       onBlur={onFocusOut}
       onFocus={onFocusIn}
       ref={ref}

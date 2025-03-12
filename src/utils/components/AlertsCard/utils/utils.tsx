@@ -6,26 +6,17 @@ import {
 } from '@kubevirt-utils/components/AlertsCard/utils/constants';
 import { AlertType, SimplifiedAlerts } from '@kubevirt-utils/components/AlertsCard/utils/types';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  PrometheusLabels,
-  YellowExclamationTriangleIcon,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { PrometheusLabels } from '@openshift-console/dynamic-plugin-sdk';
 import {
   BlueInfoCircleIcon,
   RedExclamationCircleIcon,
+  YellowExclamationTriangleIcon,
 } from '@openshift-console/dynamic-plugin-sdk/lib/app/components/status/icons';
-import { ExclamationCircleIcon, ExclamationTriangleIcon } from '@patternfly/react-icons';
 
-export const labelColor = {
-  [AlertType.critical]: 'red',
-  [AlertType.info]: 'blue',
-  [AlertType.warning]: 'orange',
-};
-
-export const labelIcon = {
-  [AlertType.critical]: <ExclamationCircleIcon />,
-  [AlertType.info]: <ExclamationCircleIcon />,
-  [AlertType.warning]: <ExclamationTriangleIcon />,
+export const labelStatus = {
+  [AlertType.critical]: 'danger',
+  [AlertType.info]: 'info',
+  [AlertType.warning]: 'warning',
 };
 
 export const labelText = {

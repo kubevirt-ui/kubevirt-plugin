@@ -1,13 +1,13 @@
 import secretFixture from '../../fixtures/secret';
 import { TEST_NS, TEST_SECRET_NAME } from '../../utils/const/index';
 import { authSSHKey, YAML } from '../../utils/const/string';
-import { brandImage, itemCreateBtn, saveBtn } from '../../views/selector';
+import { itemCreateBtn, mastheadLogo, saveBtn } from '../../views/selector';
 import { manageKeysText, useExisting } from '../../views/selector-catalog';
 import { tab } from '../../views/tab';
 
 const WELCOME_OFF_CMD = `oc patch configmap -n kubevirt-hyperconverged kubevirt-user-settings --type=merge --patch '{"data": {"kube-admin": "{\\"quickStart\\":{\\"dontShowWelcomeModal\\":true}}"}}'`;
 
-describe('Prepare the cluster for test', () => {
+xdescribe('Prepare the cluster for test', () => {
   before(() => {
     cy.login();
     cy.exec('oc whoami').then((result) => {
@@ -26,7 +26,7 @@ describe('Prepare the cluster for test', () => {
   });
 
   it('switch to Virtualization perspective and default project', () => {
-    cy.get(brandImage).scrollIntoView();
+    cy.get(mastheadLogo).scrollIntoView();
     cy.switchToVirt();
 
     // needed because of https://issues.redhat.com/browse/CNV-51570

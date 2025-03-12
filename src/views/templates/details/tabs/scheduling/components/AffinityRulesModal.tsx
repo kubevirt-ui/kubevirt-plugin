@@ -21,7 +21,7 @@ import { modelToGroupVersionKind, NodeModel, V1Template } from '@kubevirt-utils/
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
-import { ModalVariant } from '@patternfly/react-core';
+import { ModalVariant } from '@patternfly/react-core/deprecated';
 
 type AffinityModalProps = {
   isOpen: boolean;

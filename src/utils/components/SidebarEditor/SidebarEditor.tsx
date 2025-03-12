@@ -92,18 +92,16 @@ const SidebarEditor = <Resource extends K8sResourceCommon>({
           width={{ default: 'width_33', lg: 'width_50', xl: 'width_50' }}
         >
           <Stack hasGutter>
-            <StackItem isFilled>
-              <Suspense fallback={<Loading />}>
-                <YAMLEditor
-                  minHeight="300px"
-                  onChange={changeResource}
-                  onSave={() => onUpdate(editedResource)}
-                  options={{ readOnly: !isEditable }}
-                  ref={editorRef}
-                  value={editableYAML}
-                />
-              </Suspense>
-            </StackItem>
+            <Suspense fallback={<Loading />}>
+              <YAMLEditor
+                minHeight="300px"
+                onChange={changeResource}
+                onSave={() => onUpdate(editedResource)}
+                options={{ readOnly: !isEditable }}
+                ref={editorRef}
+                value={editableYAML}
+              />
+            </Suspense>
             {(success || error) && (
               <StackItem>
                 {success && (

@@ -6,7 +6,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-utils/models';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
-import { Radio, Stack, StackItem, Text, TextVariants, Title } from '@patternfly/react-core';
+import { Content, ContentVariants, Radio, Stack, StackItem, Title } from '@patternfly/react-core';
 
 import { entireVMSelected } from '../utils';
 
@@ -33,7 +33,7 @@ const VirtualMachineMigrationDetails: FC<VirtualMachineMigrationDetailsProps> = 
     <Stack hasGutter>
       <StackItem>
         <Title headingLevel="h2">{t('Migration details')}</Title>
-        <Text component={TextVariants.p}>
+        <Content component={ContentVariants.p}>
           {t('Select the storage to migrate for')}
           <ResourceLink
             groupVersionKind={VirtualMachineModelGroupVersionKind}
@@ -41,7 +41,7 @@ const VirtualMachineMigrationDetails: FC<VirtualMachineMigrationDetailsProps> = 
             name={getName(vm)}
             namespace={getNamespace(vm)}
           />
-        </Text>
+        </Content>
       </StackItem>
       <StackItem>
         <Radio

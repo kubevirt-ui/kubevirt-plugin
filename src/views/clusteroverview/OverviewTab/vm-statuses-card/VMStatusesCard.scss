@@ -19,13 +19,13 @@
     }
 
     &--icon {
-      margin-right: var(--pf-v5-global--spacer--xs);
-      font-size: var(--pf-v5-global--FontSize--md);
+      margin-right: var(--pf-t--global--spacer--xs);
+      font-size: var(--pf-t--global--font--size--md);
       vertical-align: middle;
     }
 
     &--value {
-      font-size: var(--pf-v5-global--FontSize--3xl);
+      font-size: var(--pf-t--global--font--size--3xl);
       vertical-align: middle;
     }
 
@@ -40,12 +40,12 @@
       padding-right: 24px;
 
       &--label {
-        margin-left: var(--pf-v5-global--spacer--sm);
+        margin-left: var(--pf-t--global--spacer--sm);
       }
     }
 
-    .pf-v5-c-accordion__toggle,
-    .pf-v5-c-accordion__expanded-content-body {
+    .pf-v6-c-accordion__toggle,
+    .pf-v6-c-accordion__expanded-content-body {
       &:after,
       &:hover,
       &:focus,

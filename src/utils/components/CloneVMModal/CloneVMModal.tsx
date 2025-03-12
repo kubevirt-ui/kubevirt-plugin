@@ -11,7 +11,8 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { MAX_K8S_NAME_LENGTH } from '@kubevirt-utils/utils/constants';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
-import { Form, ModalVariant } from '@patternfly/react-core';
+import { Form } from '@patternfly/react-core';
+import { ModalVariant } from '@patternfly/react-core/deprecated';
 
 import CloningStatus from './components/CloningStatus';
 import ConfigurationSummary from './components/ConfigurationSummary';
@@ -92,7 +93,7 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
       onSubmit={sendCloneRequest}
       submitBtnText={isVM(source) ? t('Clone') : t('Create')}
     >
-      <Form className="pf-v5-u-w-75-on-md pf-v5-u-w-66-on-lg pf-v5-u-m-auto" isHorizontal>
+      <Form className="pf-v6-u-w-75-on-md pf-v6-u-w-66-on-lg pf-v6-u-m-auto" isHorizontal>
         <NameInput name={cloneName} setName={setCloneName} />
         <StartClonedVMCheckbox setStartCloneVM={setStartCloneVM} startCloneVM={startCloneVM} />
         {isVM(source) ? (

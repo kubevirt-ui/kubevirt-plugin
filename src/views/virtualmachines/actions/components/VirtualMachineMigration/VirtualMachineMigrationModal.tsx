@@ -9,7 +9,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getName } from '@kubevirt-utils/resources/shared';
 import useDisksSources from '@kubevirt-utils/resources/vm/hooks/disk/useDisksSources';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { Modal, Wizard, WizardHeader, WizardStep } from '@patternfly/react-core';
+import { Wizard, WizardHeader, WizardStep } from '@patternfly/react-core';
+import { Modal } from '@patternfly/react-core/deprecated';
 
 import VirtualMachineMigrationDestinationTab from './tabs/VirtualMachineMigrationDestinationTab';
 import VirtualMachineMigrationDetails from './tabs/VirtualMachineMigrationDetails';

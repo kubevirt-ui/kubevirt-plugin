@@ -27,15 +27,14 @@ const HardwareDeviceTitle: FC<HardwareDeviceTitleProps> = ({
     <DescriptionListTerm>
       <Button
         className="pf-m-link--align-left"
+        icon={<PencilAltIcon alt={t('Edit')} />}
+        iconPosition="end"
         isDisabled={!canEdit}
         isInline
         onClick={onClick}
         variant="link"
       >
-        <SearchItem id={title.replace(' ', '-')}>
-          {title}{' '}
-          <PencilAltIcon alt={t('Edit')} className="co-icon-space-l pf-v5-c-button-icon--plain" />
-        </SearchItem>
+        <SearchItem id={title.replace(' ', '-')}>{title}</SearchItem>
       </Button>
     </DescriptionListTerm>
   );

@@ -60,7 +60,7 @@ const DesktopViewer: FC<DesktopViewerProps> = ({ vm, vmi }) => {
             id="network-dropdown"
             placeholder={t('--- Select network interface ---')}
             selected={selectedNetwork?.name}
-            toggleProps={{ id: 'pf-v5-c-console__actions-desktop-toggle-id' }}
+            toggleProps={{ id: 'pf-v6-c-console__actions-desktop-toggle-id' }}
           >
             <SelectList>{networkItems}</SelectList>
           </FormPFSelect>

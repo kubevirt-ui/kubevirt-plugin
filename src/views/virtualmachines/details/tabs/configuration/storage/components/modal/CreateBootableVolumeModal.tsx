@@ -127,7 +127,7 @@ const CreateBootableVolumeModal: FC<CreateBootableVolumeModalProps> = ({
       submitBtnText={t('Save')}
     >
       <Stack hasGutter>
-        <Title className="pf-v5-u-mt-md" headingLevel="h5">
+        <Title className="pf-v6-u-mt-md" headingLevel="h5">
           {t('Destination details')}
         </Title>
         <VolumeDestination
@@ -136,7 +136,7 @@ const CreateBootableVolumeModal: FC<CreateBootableVolumeModalProps> = ({
           claimPropertySetsData={claimPropertySetsData}
           setBootableVolumeField={setBootableVolumeField}
         />
-        <Title className="pf-v5-u-mt-md" headingLevel="h5">
+        <Title className="pf-v6-u-mt-md" headingLevel="h5">
           {t('Volume metadata')}{' '}
           <HelpTextIcon
             bodyContent={t('Set the volume metadata to use the volume as a bootable image.')}

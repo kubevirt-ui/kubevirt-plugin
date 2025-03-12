@@ -31,7 +31,7 @@ const TemplateDetailsLeftGrid: FC<TemplateDetailsGridProps> = ({ template }) => 
   const { isTemplateEditable } = useEditTemplateAccessReview(template);
 
   return (
-    <DescriptionList className="pf-v5-c-description-list">
+    <DescriptionList className="pf-v6-c-description-list">
       <Name name={getName(template)} />
       <Namespace namespace={getNamespace(template)} />
       <Labels editable={isTemplateEditable} template={template} />

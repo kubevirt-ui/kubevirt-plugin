@@ -38,6 +38,7 @@ const AddBootableVolumeLink: FC<AddBootableVolumeLinkProps> = ({
       className="add-bootable-volume-link__inline-text"
       data-test-id="add-volume-button-under-list"
       isDisabled={!!loadError || !canCreate}
+      isInline
       variant={ButtonVariant.link}
     >
       {text || t('Add volume')}

@@ -6,7 +6,7 @@ import {
   getUpdatedCPU,
 } from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Grid, GridItem, NumberInput, Text } from '@patternfly/react-core';
+import { Content, Grid, GridItem, NumberInput } from '@patternfly/react-core';
 
 import './VCPUInput.scss';
 
@@ -26,7 +26,9 @@ const VCPUInput: FC<vCPUInputProps> = ({ cpu, isDisabled, setCPU }) => {
   return (
     <Grid className="vcpu-input" hasGutter>
       <GridItem span={3}>
-        <Text disabled={isDisabled}>{t('vCPU')}</Text>
+        <Content component="p" disabled={isDisabled}>
+          {t('vCPU')}
+        </Content>
       </GridItem>
       <GridItem span={9}>
         <NumberInput

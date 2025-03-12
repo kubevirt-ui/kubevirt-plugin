@@ -3,13 +3,13 @@ import React, { ChangeEvent, FC, ReactNode } from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 import {
+  Content,
   Divider,
   Split,
   SplitItem,
   Stack,
   StackItem,
   Switch,
-  Text,
   Toolbar,
   ToolbarContent,
   TreeViewSearch,
@@ -51,8 +51,8 @@ const TreeViewToolbar: FC<TreeViewToolbarProps> = ({
           <Divider />
           <StackItem>
             <Split>
-              <SplitItem className="pf-v5-u-ml-md">
-                <Text>{t('Show only projects with VirtualMachines')}</Text>
+              <SplitItem className="pf-v6-u-ml-md">
+                <Content component="p">{t('Show only projects with VirtualMachines')}</Content>
               </SplitItem>
               <SplitItem isFilled />
               <Switch

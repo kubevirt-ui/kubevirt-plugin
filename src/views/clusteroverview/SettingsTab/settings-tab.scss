@@ -11,11 +11,11 @@
 
   &__content {
     width: 100%;
-    padding: var(--pf-v5-global--spacer--2xl);
-    padding-left: calc(var(--pf-v5-global--spacer--3xl) * 2);
+    padding: var(--pf-t--global--spacer--2xl);
+    padding-left: calc(var(--pf-t--global--spacer--3xl) * 2);
   }
 }
 
 .section-divider {
-  margin: var(--pf-v5-global--spacer--md) 0;
+  margin: var(--pf-t--global--spacer--md) 0;
 }

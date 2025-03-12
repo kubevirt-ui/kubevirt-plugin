@@ -33,7 +33,7 @@ import {
 } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { formatBytes } from '@kubevirt-utils/resources/vm/utils/disk/size';
-import { Label, Text, TextVariants } from '@patternfly/react-core';
+import { Content, ContentVariants, Label } from '@patternfly/react-core';
 import { TableText, Tr, WrapModifier } from '@patternfly/react-table';
 
 import TableData from './TableData';
@@ -111,9 +111,9 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
       />
       <TableData activeColumnIDs={activeColumnIDs} id="name" width={20}>
         <img alt="os-icon" className="vm-catalog-row-icon" src={icon} />
-        <Text className="bootable-volume-row__name--text" component={TextVariants.small}>
+        <Content className="bootable-volume-row__name--text" component={ContentVariants.small}>
           {bootVolumeName}
-        </Text>
+        </Content>
         {isDeprecated(bootVolumeName) && <DeprecatedBadge />}
         {isCloning && <Label className="vm-catalog-row-label">{t('Clone in progress')}</Label>}
         {isDataSourceUploading(bootableVolume as V1beta1DataSource) && (

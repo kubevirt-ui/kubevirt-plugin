@@ -10,6 +10,8 @@ import {
   RowFilter,
 } from '@openshift-console/dynamic-plugin-sdk';
 import {
+  InputGroup,
+  InputGroupItem,
   SelectOption,
   Toolbar,
   ToolbarContent,
@@ -152,51 +154,53 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
           {filterDropdownKeys.length !== 0 && (
             <ToolbarItem className="co-filter-search--full-width">
               <ToolbarFilter
-                deleteChip={(category, chip: string) => {
-                  const newLabels = textFilters?.labels?.filter((label) => label !== chip);
+                deleteLabel={(category, labelToDelete: string) => {
+                  const newLabels = textFilters?.labels?.filter((label) => label !== labelToDelete);
                   applyTextFilters(STATIC_SEARCH_FILTERS.labels, newLabels.join(','));
                 }}
-                deleteChipGroup={() => {
+                deleteLabelGroup={() => {
                   applyTextFilters(STATIC_SEARCH_FILTERS.labels);
                 }}
                 categoryName={STATIC_SEARCH_FILTERS_LABELS.labels}
-                chips={textFilters.labels ?? []}
+                labels={textFilters.labels ?? []}
               >
                 {searchFilters.map((filter) => (
                   <ToolbarFilter
-                    deleteChip={() => {
+                    deleteLabel={() => {
                       applyTextFilters(filter.type);
                       searchType === filter.type && setSearchInputText('');
                     }}
                     categoryName={filter.filterGroupName}
-                    chips={textFilters[filter.type] ? [textFilters[filter.type]] : []}
                     key={filter.type}
+                    labels={textFilters[filter.type] ? [textFilters[filter.type]] : []}
                   >
                     <></>
                   </ToolbarFilter>
                 ))}
 
                 <ToolbarFilter
-                  deleteChip={() => {
+                  deleteLabel={() => {
                     applyTextFilters('name');
                     searchType === STATIC_SEARCH_FILTERS.name && setSearchInputText('');
                   }}
                   categoryName={t('Name')}
-                  chips={textFilters.name ? [textFilters.name] : []}
+                  labels={textFilters.name ? [textFilters.name] : []}
                 >
-                  <div className="pf-v5-c-input-group co-filter-group">
+                  <InputGroup className="co-filter-group">
                     {filterDropdownKeys.length > 1 && (
-                      <FormPFSelect
-                        onSelect={onSelect}
-                        selected={searchType}
-                        selectedLabel={filterDropdownItems?.[searchType]}
-                      >
-                        {filterDropdownKeys.map((key) => (
-                          <SelectOption key={key} value={key}>
-                            {filterDropdownItems?.[key]}
-                          </SelectOption>
-                        ))}
-                      </FormPFSelect>
+                      <InputGroupItem isFill>
+                        <FormPFSelect
+                          onSelect={onSelect}
+                          selected={searchType}
+                          selectedLabel={filterDropdownItems?.[searchType]}
+                        >
+                          {filterDropdownKeys.map((key) => (
+                            <SelectOption key={key} value={key}>
+                              {filterDropdownItems?.[key]}
+                            </SelectOption>
+                          ))}
+                        </FormPFSelect>
+                      </InputGroupItem>
                     )}
 
                     {searchType === STATIC_SEARCH_FILTERS.labels ? (
@@ -230,7 +234,7 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
                         value={searchInputText || ''}
                       />
                     )}
-                  </div>
+                  </InputGroup>
                 </ToolbarFilter>
               </ToolbarFilter>
             </ToolbarItem>

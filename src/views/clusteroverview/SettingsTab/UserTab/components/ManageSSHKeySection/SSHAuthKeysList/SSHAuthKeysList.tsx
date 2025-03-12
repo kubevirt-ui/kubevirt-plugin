@@ -4,13 +4,13 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   Button,
+  Content,
+  ContentVariants,
   Grid,
   GridItem,
   Panel,
   PanelMain,
   Skeleton,
-  Text,
-  TextVariants,
 } from '@patternfly/react-core';
 import { PlusCircleIcon } from '@patternfly/react-icons';
 
@@ -38,11 +38,11 @@ const SSHAuthKeysList: FC = () => {
         <PanelMain maxHeight="12.25rem">
           <Grid>
             <GridItem span={5}>
-              <Text component={TextVariants.h6}>{t('Project')}</Text>
+              <Content component={ContentVariants.h6}>{t('Project')}</Content>
             </GridItem>
             <GridItem span={1} />
             <GridItem span={5}>
-              <Text component={TextVariants.h6}>{t('Public SSH key')}</Text>
+              <Content component={ContentVariants.h6}>{t('Public SSH key')}</Content>
             </GridItem>
           </Grid>
           {authKeyRows?.map((row) => (

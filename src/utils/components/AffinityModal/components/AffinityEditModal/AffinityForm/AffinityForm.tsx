@@ -3,7 +3,7 @@ import * as React from 'react';
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import NodeCheckerAlert from '@kubevirt-utils/components/NodeSelectorModal/components/NodeCheckerAlert';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Divider, Form, Text, TextVariants } from '@patternfly/react-core';
+import { Content, ContentVariants, Divider, Form } from '@patternfly/react-core';
 
 import { isTermsInvalid } from '../../../utils/helpers';
 import {
@@ -67,11 +67,11 @@ const AffinityForm: React.FC<AffinityFormProps> = ({
 
   return (
     <Form>
-      <Text className="text-muted" component={TextVariants.p}>
+      <Content className="text-muted" component={ContentVariants.p}>
         {t(
           'Define an affinity rule. This rule will be added to the list of affinity rules applied to this workload.',
         )}
-      </Text>
+      </Content>
       <AffinityTypeSelect
         focusedAffinity={focusedAffinity}
         setFocusedAffinity={setFocusedAffinity}

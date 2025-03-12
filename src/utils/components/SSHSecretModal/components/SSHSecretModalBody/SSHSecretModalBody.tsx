@@ -85,7 +85,7 @@ const SSHSecretModalBody: FC<SSHSecretModalBodyProps> = ({
           onClick={() =>
             setSSHDetails((prev) => ({ ...prev, applyKeyToProject: !prev.applyKeyToProject }))
           }
-          className="pf-v5-u-mt-md"
+          className="pf-v6-u-mt-md"
           id="apply-key-to-project-per-user"
           isChecked={sshDetails.applyKeyToProject || isUserTab}
           isDisabled={isUserTab}

@@ -87,7 +87,7 @@ export const CreateDataSourceForm: FC<CreateDataSourceFormProps> = ({
         size={size}
       />
       <FormGroup
-        labelIcon={
+        labelHelp={
           <Popover
             bodyContent={t(
               'As new versions of a DataSource become available older versions will be replaced',
@@ -96,7 +96,7 @@ export const CreateDataSourceForm: FC<CreateDataSourceFormProps> = ({
             <button
               aria-describedby="retain-revision-info"
               aria-label="More info for retain revisions field"
-              className="pf-v5-c-form__group-label-help"
+              className="pf-v6-c-form__group-label-help"
               onClick={(e) => e.preventDefault()}
               type="button"
             >

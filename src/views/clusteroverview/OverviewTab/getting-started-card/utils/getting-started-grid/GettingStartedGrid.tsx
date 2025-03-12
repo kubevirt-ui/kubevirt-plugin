@@ -4,8 +4,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import {
   Card,
   CardBody,
+  CardExpandableContent,
   CardHeader,
-  ExpandableSection,
   Title,
   TitleSizes,
   Tooltip,
@@ -27,30 +27,32 @@ export const GettingStartedGrid: FC<GettingStartedGridProps> = ({ children }) =>
     'Use our collection of resources to help you get started with virtualization.',
   );
 
+  const onExpand = () => setIsExpanded((expanded) => !expanded);
+
   return (
-    <Card className="kv-getting-started-grid" data-test="getting-started">
-      <ExpandableSection
-        toggleContent={
-          <Title data-test="title" headingLevel="h2" id="tour-step-resources" size={TitleSizes.lg}>
-            {title}{' '}
-            <Tooltip className="kv-getting-started-grid__tooltip" content={titleTooltip}>
-              <span
-                aria-label={t('More info')}
-                className="kv-getting-started-grid__tooltip-icon"
-                role="button"
-              >
-                <OutlinedQuestionCircleIcon />
-              </span>
-            </Tooltip>
-          </Title>
-        }
-        className="kv-getting-started-grid__expandable pf-m-display-lg"
-        isExpanded={isExpanded}
-        onToggle={(_, expand) => setIsExpanded(expand)}
-      >
-        <CardHeader className="kv-getting-started-grid__header" />
+    <Card
+      className="kv-getting-started-grid"
+      data-test="getting-started"
+      isExpanded={isExpanded}
+      variant="secondary"
+    >
+      <CardHeader onExpand={onExpand}>
+        <Title data-test="title" headingLevel="h2" id="tour-step-resources" size={TitleSizes.lg}>
+          {title}{' '}
+          <Tooltip content={titleTooltip}>
+            <span
+              aria-label={t('More info')}
+              className="kv-getting-started-grid__tooltip-icon"
+              role="button"
+            >
+              <OutlinedQuestionCircleIcon />
+            </span>
+          </Tooltip>
+        </Title>
+      </CardHeader>
+      <CardExpandableContent>
         <CardBody className="kv-getting-started-grid__content">{children}</CardBody>
-      </ExpandableSection>
+      </CardExpandableContent>
     </Card>
   );
 };

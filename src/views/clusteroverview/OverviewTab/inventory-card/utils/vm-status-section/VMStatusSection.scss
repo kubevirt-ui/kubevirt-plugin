@@ -1,9 +1,10 @@
 .kv-inventory-card__statuses-grid {
   height: 100%;
-  padding-top: var(--pf-v5-c-card--first-child--PaddingTop);
-  padding-bottom: var(--pf-v5-c-card--child--PaddingBottom);
+  padding-top: var(--pf-v6-c-card--first-child--PaddingBlockStart);
+  padding-bottom: var(--pf-v6-c-card--child--PaddingBlockEnd);
 }
 
 .kv-inventory-card__statuses-grid--left-col {
-  border-right: var(--pf-v5-global--BorderWidth--sm) solid var(--pf-v5-global--BorderColor--100);
+  border-right: var(--pf-t--global--border--width--regular) solid
+    var(--pf-t--global--border--color--default);
 }

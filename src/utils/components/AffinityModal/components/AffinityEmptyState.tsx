@@ -6,7 +6,6 @@ import {
   EmptyStateActions,
   EmptyStateBody,
   EmptyStateFooter,
-  EmptyStateHeader,
   EmptyStateVariant,
 } from '@patternfly/react-core';
 
@@ -20,8 +19,11 @@ type AffinityEmptyStateProps = {
 const AffinityEmptyState: FC<AffinityEmptyStateProps> = ({ onAffinityClickAdd }) => {
   const { t } = useKubevirtTranslation();
   return (
-    <EmptyState variant={EmptyStateVariant.full}>
-      <EmptyStateHeader headingLevel="h5" titleText={<>{t('No affinity rules found')}</>} />
+    <EmptyState
+      headingLevel="h5"
+      titleText={<>{t('No affinity rules found')}</>}
+      variant={EmptyStateVariant.full}
+    >
       <EmptyStateBody>
         <AffinityDescriptionText />
       </EmptyStateBody>

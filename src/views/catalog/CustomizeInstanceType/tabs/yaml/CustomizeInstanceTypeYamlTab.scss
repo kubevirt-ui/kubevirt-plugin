@@ -1,10 +1,10 @@
 .yaml {
   &-alert {
-    padding: 0 var(--pf-v5-global--spacer--lg);
+    padding: 0 var(--pf-t--global--spacer--lg);
   }
   &-body {
     display: flex;
-    padding-bottom: var(--pf-v5-global--spacer--lg);
+    padding-bottom: var(--pf-t--global--spacer--lg);
     height: 100%;
   }
 }

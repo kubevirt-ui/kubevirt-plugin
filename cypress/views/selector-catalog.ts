@@ -8,7 +8,7 @@ export const instanceTab = '[data-test="instancetypes-tab"]';
 
 // project
 export const projectDropdown = '.templates-catalog-project-dropdown';
-export const projectItem = '.pf-v5-c-context-selector__menu-list-item';
+export const projectItem = '.pf-v6-c-context-selector__menu-list-item';
 export const allItems = '[data-test-id="catalog-template-filter-all-items"]';
 export const listBtn = '#template-list-btn';
 export const gridBtn = '#template-grid-btn';
@@ -51,7 +51,7 @@ export enum diskSource {
   Registry = '[data-test-id="registry"]',
   RegistryH = '#disk-boot-source-registry-helper',
   RegistryV = '[data-test-id="disk-boot-source-container-source-input"]',
-  UploadBtnMenu = '.pf-v5-c-menu__item-main',
+  UploadBtnMenu = '.pf-v6-c-menu__item-main',
   UploadBtnText = 'Upload (Upload a new file to a PVC)',
   URL = '[data-test-id="http"]',
   URLH = '#disk-boot-source-http',
@@ -65,7 +65,7 @@ export enum cdSource {
   Registry = '[data-test-id="container-disk"]',
   RegistryH = '#cd-boot-source-registry-helper',
   RegistryV = '[data-test-id="cd-boot-source-container-source-input"]',
-  UploadBtnMenu = '.pf-v5-c-select__menu-item-main',
+  UploadBtnMenu = '.pf-v6-c-select__menu-item-main',
   UploadBtnText = 'Upload (Upload a new file to a PVC)',
   URL = '[data-test-id="http"]',
   URLH = '#cd-boot-source-http',
@@ -92,9 +92,9 @@ export const cpuField = '.input-cpu';
 export const memField = '.input-memory';
 export const restoreSetting = 'Restore template settings';
 export const bootModeEditBtn = '[data-test-id="wizard-overview-boot-method-edit"]';
-export const menuToggle = 'button.pf-v5-c-menu-toggle';
-export const menuItemMain = '.pf-v5-c-menu__item-main';
-export const menuItem = '.pf-v5-c-menu__item';
+export const menuToggle = 'button.pf-v6-c-menu-toggle';
+export const menuItemMain = '.pf-v6-c-menu__item-main';
+export const menuItem = '.pf-v6-c-menu__item';
 export const startInPause = '#start-in-pause-mode';
 export const hostnameEditBtn = '[data-test-id="wizard-overview-hostname-edit"]';
 export const hostnameInput = 'input#hostname';

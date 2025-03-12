@@ -50,13 +50,7 @@ const FeatureHighlightsSection: React.FC = () => {
       description={t(
         'Read about the latest information and key virtualization features on the Virtualization highlights.',
       )}
-      icon={
-        <i
-          aria-hidden="true"
-          className="fas fa-blog"
-          color="var(--pf-v5-global--primary-color--100)"
-        />
-      }
+      icon={<i aria-hidden="true" className="fas fa-blog" />}
       id="feature-highlights"
       links={links}
       moreLink={moreLink}

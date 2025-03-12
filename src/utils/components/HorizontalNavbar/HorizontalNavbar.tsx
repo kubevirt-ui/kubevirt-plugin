@@ -5,14 +5,11 @@ import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { Nav, NavList } from '@patternfly/react-core';
 
 import StateHandler from '../StateHandler/StateHandler';
 
 import useDynamicPages from './utils/useDynamicPages';
 import { NavPageKubevirt, trimLastHistoryPath } from './utils/utils';
-
-import './horizontal-nav-bar.scss';
 
 type HorizontalNavbarProps = {
   error?: any;
@@ -55,28 +52,32 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
   const [activeItem, setActiveItem] = useState<number | string>();
   return (
     <>
-      <Nav variant="horizontal">
-        <NavList className="co-m-horizontal-nav__menu horizontal-nav-bar__list">
+      <nav className="pf-v6-c-tabs">
+        <ul className="pf-v6-c-tabs__list">
           {allPages.map((item) => {
             if (item?.isHidden) return null;
 
             return (
-              <NavLink
-                className={classNames('horizontal-nav-bar__menu-item', {
-                  active: activeItem === item.name.toLowerCase(),
+              <li
+                className={classNames('pf-v6-c-tabs__item', {
+                  'pf-m-current': activeItem === item.name.toLowerCase(),
                 })}
-                data-test-id={`horizontal-link-${item.name}`}
-                id={`horizontal-pageHeader-${item.name}`}
                 key={item.name}
-                onClick={() => setActiveItem(item.name.toLowerCase())}
-                to={trimLastHistoryPath(location, paths) + item.href}
               >
-                {item.name}
-              </NavLink>
+                <NavLink
+                  className="pf-v6-c-tabs__link"
+                  data-test-id={`horizontal-link-${item.name}`}
+                  id={`horizontal-pageHeader-${item.name}`}
+                  onClick={() => setActiveItem(item.name.toLowerCase())}
+                  to={trimLastHistoryPath(location, paths) + item.href}
+                >
+                  {item.name}
+                </NavLink>
+              </li>
             );
           })}
-        </NavList>
-      </Nav>
+        </ul>
+      </nav>
       <Routes>
         {allPages.map((page) => {
           const Component = page.component;

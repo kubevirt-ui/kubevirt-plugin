@@ -5,7 +5,7 @@ import TitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/Title
 import { AlertsByHealthImpact } from '@kubevirt-utils/hooks/useInfrastructureAlerts/useInfrastructureAlerts';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { ChartDonut } from '@patternfly/react-charts';
+import { ChartDonut } from '@patternfly/react-charts/victory';
 
 import { alertTypeToColorMap } from '../utils/utils';
 

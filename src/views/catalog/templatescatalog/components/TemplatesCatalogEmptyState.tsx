@@ -8,7 +8,6 @@ import {
   EmptyStateActions,
   EmptyStateBody,
   EmptyStateFooter,
-  EmptyStateHeader,
   EmptyStateVariant,
 } from '@patternfly/react-core';
 
@@ -20,11 +19,11 @@ export const TemplatesCatalogEmptyState: React.FC<{
 
   if (!bootSourcesLoaded) {
     return (
-      <EmptyState variant={EmptyStateVariant.lg}>
-        <EmptyStateHeader
-          headingLevel="h4"
-          titleText={<>{t('Loading Templates with available boot source')}</>}
-        />
+      <EmptyState
+        headingLevel="h4"
+        titleText={<>{t('Loading Templates with available boot source')}</>}
+        variant={EmptyStateVariant.lg}
+      >
         <EmptyStateBody>
           <Loading />
         </EmptyStateBody>
@@ -33,11 +32,11 @@ export const TemplatesCatalogEmptyState: React.FC<{
   }
 
   return (
-    <EmptyState variant={EmptyStateVariant.sm}>
-      <EmptyStateHeader
-        headingLevel="h4"
-        titleText={<>{t('No Results Match the Filter Criteria')}</>}
-      />
+    <EmptyState
+      headingLevel="h4"
+      titleText={<>{t('No Results Match the Filter Criteria')}</>}
+      variant={EmptyStateVariant.sm}
+    >
       <EmptyStateBody>
         {t('No Template items are being shown due to the filters being applied.')}
       </EmptyStateBody>

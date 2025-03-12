@@ -131,7 +131,7 @@ export const DataImportCronManageModal: FC<DataImportCronManageModalProps> = ({
             {allowAutoUpdate && (
               <>
                 <FormGroup
-                  labelIcon={
+                  labelHelp={
                     <Popover
                       bodyContent={t(
                         'As new versions of a DataSource become available older versions will be replaced',
@@ -140,7 +140,7 @@ export const DataImportCronManageModal: FC<DataImportCronManageModalProps> = ({
                       <button
                         aria-describedby="retain-revision-info"
                         aria-label="More info for retain revisions field"
-                        className="pf-v5-c-form__group-label-help"
+                        className="pf-v6-c-form__group-label-help"
                         onClick={(e) => e.preventDefault()}
                         type="button"
                       >

@@ -12,7 +12,7 @@ import {
   ChartLine,
   ChartThemeColor,
   createContainer,
-} from '@patternfly/react-charts';
+} from '@patternfly/react-charts/victory';
 import chart_color_black_200 from '@patternfly/react-tokens/dist/esm/chart_color_black_200';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
@@ -69,7 +69,7 @@ const NetworkThresholdSingleSourceChart: FC<NetworkThresholdSingleSourceChartPro
               <CursorVoronoiContainer
                 labelComponent={
                   <ChartLegendTooltip
-                    title={(datum) =>
+                    title={(datum: any) =>
                       datum?.x?.getHours() + ':' + String(datum?.x?.getMinutes())?.padStart(2, '0')
                     }
                     legendData={legendData}

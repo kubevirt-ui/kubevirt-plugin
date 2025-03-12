@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { NumberInput, Skeleton, Text, TextVariants, Title } from '@patternfly/react-core';
+import { Content, ContentVariants, NumberInput, Skeleton, Title } from '@patternfly/react-core';
 
 import { useDebounceCallback } from '../../../../../../utils/hooks/useDebounceCallback';
 import {
@@ -31,7 +31,7 @@ const Limits = ({ hyperConverge }) => {
 
   return (
     <>
-      <Text component={TextVariants.small}>{t('Set live migration limits')}</Text>
+      <Content component={ContentVariants.small}>{t('Set live migration limits')}</Content>
       <div className="live-migration-tab__number--container">
         <div className="live-migration-tab__number--cluster">
           <Title headingLevel="h6" size="md">

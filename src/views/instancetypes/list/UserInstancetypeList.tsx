@@ -101,7 +101,7 @@ const UserInstancetypeList: FC<ListPageProps> = ({
       </div>
       <VirtualizedTable<V1beta1VirtualMachineInstancetype>
         EmptyMsg={() => (
-          <div className="pf-v5-u-text-align-center" id="no-instancetype-msg">
+          <div className="pf-v6-u-text-align-center" id="no-instancetype-msg">
             {t('No VirtualMachineInstanceTypes found')}
           </div>
         )}

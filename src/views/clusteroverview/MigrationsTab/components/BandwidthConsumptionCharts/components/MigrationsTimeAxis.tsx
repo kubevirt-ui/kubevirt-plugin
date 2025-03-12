@@ -3,7 +3,7 @@ import React, { FC } from 'react';
 import { tickLabels } from '@kubevirt-utils/components/Charts/ChartLabels/styleOverrides';
 import useResponsiveCharts from '@kubevirt-utils/components/Charts/hooks/useResponsiveCharts';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { ChartAxis, ChartContainer } from '@patternfly/react-charts';
+import { ChartAxis, ChartContainer } from '@patternfly/react-charts/victory';
 
 import { formatTimestamp, getTimeTickValues } from '../utils';
 

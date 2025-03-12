@@ -21,7 +21,10 @@ const ClusterOverviewPageHeader: React.FC<ClusterOverviewPageHeaderProps> = ({ c
     <div className="co-m-nav-title">
       <h1 className="co-m-pane__heading">
         <div className="co-m-pane__name co-resource-item">
-          <span className="co-resource-item__resource-name" data-test-id="resource-title">
+          <span
+            className="co-resource-item__resource-name pf-v6-c-title pf-m-h1"
+            data-test-id="resource-title"
+          >
             {t('Virtualization')}
           </span>
         </div>

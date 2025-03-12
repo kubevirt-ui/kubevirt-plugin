@@ -32,13 +32,13 @@ export const fillReviewAndCreate = (vmData: VirtualMachineData) => {
         ).click();
         cy.wait(3000);
         cy.contains(cdSource.selectPVCName).click();
-        cy.contains('.pf-v5-c-select__menu-wrapper', cdSource.pvcName).click();
+        cy.contains('.pf-v6-c-select__menu-wrapper', cdSource.pvcName).click();
         break;
       }
       case 'Upload': {
         cy.get(cView.cdSourceDropDown).click();
         cy.contains(cView.cdSource.UploadBtnMenu, cView.cdSource.UploadBtnText).click();
-        cy.dropFile(cdSource.value, cdSource.value.split('/').pop(), '.pf-v5-c-file-upload');
+        cy.dropFile(cdSource.value, cdSource.value.split('/').pop(), '.pf-v6-c-file-upload');
         break;
       }
       default: {
@@ -67,19 +67,19 @@ export const fillReviewAndCreate = (vmData: VirtualMachineData) => {
         cy.wait(3000);
         cy.get(diskSource.catalogSelector).click();
         //cy.contains(diskSource.selectPVCNS).click();
-        cy.contains('.pf-v5-c-menu-toggle__text', '--- Select PVC project ---').click();
+        cy.contains('.pf-v6-c-menu-toggle__text', '--- Select PVC project ---').click();
         cy.contains('#select-inline-filter-listbox li', diskSource.pvcNS).click();
         // cy.byButtonText(diskSource.pvcNS).click();
         cy.wait(3000);
         //cy.contains(diskSource.selectPVCName).click();
-        cy.contains('.pf-v5-c-menu-toggle__text', '--- Select PVC name ---').click();
-        cy.contains('.pf-v5-c-menu__list-item', diskSource.pvcName).click();
+        cy.contains('.pf-v6-c-menu-toggle__text', '--- Select PVC name ---').click();
+        cy.contains('.pf-v6-c-menu__list-item', diskSource.pvcName).click();
         break;
       }
       case 'Upload': {
         cy.get(cView.diskSourceDropDown).click();
         cy.contains(cView.diskSource.UploadBtnMenu, cView.diskSource.UploadBtnText).click();
-        cy.dropFile(diskSource.value, diskSource.value.split('/').pop(), '.pf-v5-c-file-upload');
+        cy.dropFile(diskSource.value, diskSource.value.split('/').pop(), '.pf-v6-c-file-upload');
         break;
       }
       default: {
@@ -161,13 +161,13 @@ export const fillEnvironment = (vmData: VirtualMachineData) => {
     tab.navigateToTEnvironment();
     cy.contains('Add Config Map, Secret or Service Account').click();
     cy.contains('Select a resource').click();
-    cy.get('.pf-v5-c-select__menu-group').eq(0).find('ul>li').first().click();
+    cy.get('.pf-v6-c-select__menu-group').eq(0).find('ul>li').first().click();
     cy.contains('Add Config Map, Secret or Service Account').click();
     cy.contains('Select a resource').click();
-    cy.get('.pf-v5-c-select__menu-group').eq(1).find('ul>li').first().click();
+    cy.get('.pf-v6-c-select__menu-group').eq(1).find('ul>li').first().click();
     cy.contains('Add Config Map, Secret or Service Account').click();
     cy.contains('Select a resource').click();
-    cy.get('.pf-v5-c-select__menu-group').eq(2).find('ul>li').first().click();
+    cy.get('.pf-v6-c-select__menu-group').eq(2).find('ul>li').first().click();
     cy.clickSubmitBtn();
   }
 };

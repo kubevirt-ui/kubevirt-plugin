@@ -36,9 +36,12 @@ const VirtualMachineRowLayout: FC<
   >
 > = ({
   activeColumnIDs,
+  index,
   obj,
   rowData: { ips, isSingleNodeCluster, node, status, vmim, vmiMemory },
 }) => {
+  // TODO: investigate using the index prop
+  index;
   const selected = isVMSelected(obj);
 
   const vmName = useMemo(() => getName(obj), [obj]);
@@ -92,7 +95,7 @@ const VirtualMachineRowLayout: FC<
       </TableData>
       <TableData
         activeColumnIDs={activeColumnIDs}
-        className="dropdown-kebab-pf pf-v5-c-table__action"
+        className="dropdown-kebab-pf pf-v6-c-table__action"
         id=""
       >
         <VirtualMachineActions actions={actions} isKebabToggle />

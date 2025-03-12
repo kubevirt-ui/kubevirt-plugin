@@ -35,7 +35,7 @@ const CreateVMHorizontalNav: FC = () => {
 
   return (
     <div className="create-vm-horizontal-nav">
-      <div className="pf-v5-c-page__main-breadcrumb">
+      <div className="pf-v6-c-page__main-breadcrumb">
         <Stack className="co-m-pane__heading" hasGutter>
           <StackItem>
             <Title headingLevel="h1">{t('Create new VirtualMachine')}</Title>

@@ -23,7 +23,6 @@ import {
 import { VncConsoleProps } from './utils/VncConsoleTypes';
 import VncConnect from './VncConnect';
 
-import '@patternfly/react-styles/css/components/Consoles/VncConsole.css';
 import './vnc-console.scss';
 
 const { connected, connecting, disconnected } = ConsoleState;

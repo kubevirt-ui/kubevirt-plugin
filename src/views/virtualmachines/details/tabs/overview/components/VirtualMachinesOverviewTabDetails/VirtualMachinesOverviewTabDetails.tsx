@@ -111,7 +111,7 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
         <CardBody isFilled>
           <Grid>
             <GridItem span={5}>
-              <DescriptionList className="pf-v5-c-description-list" isHorizontal>
+              <DescriptionList className="pf-v6-c-description-list" isHorizontal>
                 <VirtualMachineDescriptionItem
                   data-test-id="virtual-machine-overview-details-name"
                   descriptionData={getName(vm)}

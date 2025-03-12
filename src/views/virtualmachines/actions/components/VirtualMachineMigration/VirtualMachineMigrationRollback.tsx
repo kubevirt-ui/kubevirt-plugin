@@ -10,7 +10,7 @@ import {
   AlertVariant,
   Button,
   ButtonVariant,
-  Text,
+  Content,
   Title,
 } from '@patternfly/react-core';
 import { CloseIcon, WarningTriangleIcon } from '@patternfly/react-icons';
@@ -45,40 +45,45 @@ const VirtualMachineMigrationRollback: FC<VirtualMachineMigrationRollbackProps> 
   };
 
   return (
-    <div className="pf-v5-c-wizard migration-status">
-      <div className="pf-v5-c-wizard__header">
-        <div className="pf-v5-c-wizard__close">
-          <Button aria-label={t('Close')} onClick={onClose} variant={ButtonVariant.plain}>
-            <CloseIcon />
-          </Button>
+    <div className="pf-v6-c-wizard migration-status">
+      <header className="pf-v6-c-wizard__header">
+        <div className="pf-v6-c-wizard__close">
+          <Button
+            aria-label={t('Close')}
+            icon={<CloseIcon />}
+            onClick={onClose}
+            variant={ButtonVariant.plain}
+          />
         </div>
-        <div className="pf-v5-c-wizard__title">
-          <h2 className="pf-v5-c-wizard__title-text">{t('Migrate VirtualMachine storage')}</h2>
+        <div className="pf-v6-c-wizard__title">
+          <h2 className="pf-v6-c-wizard__title-text">{t('Migrate VirtualMachine storage')}</h2>
         </div>
-        <div className="pf-v5-c-wizard__description">
+        <div className="pf-v6-c-wizard__description">
           {t('Migrate VirtualMachine storage to a different StorageClass.')}
         </div>
-      </div>
+      </header>
 
       <div className="migration-status__body">
         <Title headingLevel="h2">
-          <WarningTriangleIcon color="var(--pf-v5-global--warning-color--100)" />{' '}
+          <WarningTriangleIcon color="var(--pf-t--global--icon--color--status--warning--default)" />{' '}
           {t('Stop migration')}
         </Title>
 
-        <Text>{t('Are you sure you want to stop the VirtualMachine workloads?')}</Text>
-        <Text>
+        <Content component="p">
+          {t('Are you sure you want to stop the VirtualMachine workloads?')}
+        </Content>
+        <Content component="p">
           {t(
             'Stopping the migration will cancel any remaining migrations that are scheduled or currently in progress',
           )}
-        </Text>
+        </Content>
 
-        <Text>
+        <Content component="p">
           <Trans t={t}>
             Select <strong>Rollback</strong> to return any completed migration to the original
             StorageClass.
           </Trans>
-        </Text>
+        </Content>
 
         {errorRollback && (
           <Alert isInline title={t('Error')} variant={AlertVariant.danger}>

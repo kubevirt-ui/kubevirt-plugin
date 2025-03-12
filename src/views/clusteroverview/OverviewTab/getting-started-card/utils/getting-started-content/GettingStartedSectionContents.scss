@@ -1,10 +1,10 @@
 .getting-started-section-contents {
   &__title-icon {
-    margin-right: var(--pf-v5-global--spacer--sm);
+    margin-right: var(--pf-t--global--spacer--sm);
   }
 
   small {
-    color: var(--pf-v5-global--Color--200);
+    color: var(--pf-t--global--text--color--subtle);
   }
 
   &__list {
@@ -17,11 +17,11 @@
 
       > li {
         // Add spacing to the skeleton similar to the SimpleListItem
-        .pf-v5-c-skeleton {
-          margin: var(--pf-v5-c-simple-list__item-link--PaddingTop)
-            var(--pf-v5-c-simple-list__item-link--PaddingRight)
-            var(--pf-v5-c-simple-list__item-link--PaddingBottom)
-            var(--pf-v5-c-simple-list__item-link--PaddingLeft);
+        .pf-v6-c-skeleton {
+          margin: var(--pf-v6-c-simple-list__item-link--PaddingBlockStart)
+            var(--pf-v6-c-simple-list__item-link--PaddingInlineEnd)
+            var(--pf-v6-c-simple-list__item-link--PaddingBlockEnd)
+            var(--pf-v6-c-simple-list__item-link--PaddingInlineStart);
         }
       }
     }
@@ -29,6 +29,6 @@
 
   a > svg,
   button > svg {
-    margin-left: var(--pf-v5-global--spacer--sm);
+    margin-left: var(--pf-t--global--spacer--sm);
   }
 }

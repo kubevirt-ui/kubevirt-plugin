@@ -16,7 +16,6 @@ import {
   DescriptionListDescription,
   Divider,
   PageSection,
-  PageSectionVariants,
 } from '@patternfly/react-core';
 
 import DynamicSSHKeyInjectionWizard from './components/DynamicSSHKeyInjectionWizard';
@@ -30,14 +29,14 @@ const WizardScriptsTab: WizardTab = ({ tabsData, updateVM, vm }) => {
   const { createModal } = useModal();
 
   return (
-    <PageSection className="wizard-scripts-tab" variant={PageSectionVariants.light}>
+    <PageSection className="wizard-scripts-tab">
       <SidebarEditor
         onResourceUpdate={(newVM) => updateVM(newVM)}
         pathsToHighlight={PATHS_TO_HIGHLIGHT.SCRIPTS_TAB}
         resource={vm}
       >
         <DescriptionList
-          className={classnames('pf-v5-c-description-list', 'wizard-scripts-tab__description-list')}
+          className={classnames('pf-v6-c-description-list', 'wizard-scripts-tab__description-list')}
         >
           <DescriptionListDescription>
             <AlertScripts />

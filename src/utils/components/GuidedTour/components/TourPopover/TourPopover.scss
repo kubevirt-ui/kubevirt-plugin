@@ -1,28 +1,28 @@
 .kv-tour-popover {
-  background-color: var(--pf-v5-c-popover__content--BackgroundColor);
+  background-color: var(--pf-v6-c-popover__content--BackgroundColor);
 
   &__header {
-    font-size: var(--pf-v5-c-popover__title-text--FontSize);
-    font-weight: var(--pf-v5-global--FontWeight--bold);
-    padding-top: var(--pf-v5-global--spacer--md);
-    padding-left: var(--pf-v5-global--spacer--md);
+    font-size: var(--pf-v6-c-popover__title-text--FontSize);
+    font-weight: var(--pf-t--global--font--weight--heading--bold);
+    padding-top: var(--pf-t--global--spacer--md);
+    padding-left: var(--pf-t--global--spacer--md);
   }
 
   &__buttons-footer {
-    margin: var(--pf-v5-global--spacer--md);
+    margin: var(--pf-t--global--spacer--md);
   }
 
   &__previous,
   &__next {
-    margin-bottom: var(--pf-v5-global--spacer--md);
+    margin-bottom: var(--pf-t--global--spacer--md);
   }
 
   &__step-counter {
-    padding: var(--pf-v5-global--spacer--xs);
+    padding: var(--pf-t--global--spacer--xs);
   }
 
   &__feedback-footer {
-    background-color: var(--pf-v5-global--BackgroundColor--200);
-    padding: var(--pf-v5-global--spacer--md);
+    background-color: var(--pf-t--global--background--color--secondary--default);
+    padding: var(--pf-t--global--spacer--md);
   }
 }

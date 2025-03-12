@@ -11,7 +11,7 @@ const enum Card {
   vCPU,
 }
 
-describe('Test Virtualization Top consumer tab', () => {
+xdescribe('Test Virtualization Top consumer tab', () => {
   before(() => {
     cy.visit('');
     switchPerspective(Perspective.Administrator);

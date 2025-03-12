@@ -15,7 +15,7 @@ import {
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { PageSection, PageSectionVariants } from '@patternfly/react-core';
+import { PageSection, Stack, StackItem } from '@patternfly/react-core';
 
 import useEditTemplateAccessReview from '../../hooks/useIsTemplateEditable';
 
@@ -24,8 +24,6 @@ import useDiskColumns from './hooks/useDiskColumns';
 import useDisksFilters from './hooks/useDisksFilters';
 import useTemplateDisksTableData from './hooks/useTemplateDisksTableData';
 import { getTemplateVMWithNamespace } from './utils';
-
-import './TemplateDisksPage.scss';
 
 type TemplateDisksPageProps = {
   obj: V1Template;
@@ -60,45 +58,49 @@ const TemplateDisksPage: FC<TemplateDisksPageProps> = ({ obj: template }) => {
   );
 
   return (
-    <div className="template-disks-page">
-      <PageSection variant={PageSectionVariants.light}>
-        <SidebarEditor<V1Template> onResourceUpdate={onSubmitTemplate} resource={template}>
+    <PageSection>
+      <SidebarEditor<V1Template> onResourceUpdate={onSubmitTemplate} resource={template}>
+        <Stack hasGutter>
           <DiskListTitle />
           {isTemplateEditable && (
-            <DiskSourceSelect
-              onSelect={(diskSource: SourceTypes) => {
-                return createModal(({ isOpen, onClose }) => (
-                  <DiskModal
-                    createDiskSource={diskSource}
-                    isOpen={isOpen}
-                    onClose={onClose}
-                    onSubmit={onUpdate}
-                    vm={vm}
-                  />
-                ));
-              }}
-              className="list-page-create-button-margin"
-            />
+            <StackItem>
+              <DiskSourceSelect
+                onSelect={(diskSource: SourceTypes) => {
+                  return createModal(({ isOpen, onClose }) => (
+                    <DiskModal
+                      createDiskSource={diskSource}
+                      isOpen={isOpen}
+                      onClose={onClose}
+                      onSubmit={onUpdate}
+                      vm={vm}
+                    />
+                  ));
+                }}
+                className="list-page-create-button-margin"
+              />
+            </StackItem>
           )}
-          <ListPageFilter
-            data={data}
-            hideLabelFilter
-            loaded={disksLoaded}
-            onFilterChange={onFilterChange}
-            rowFilters={filters}
-          />
-          <VirtualizedTable
-            columns={columns}
-            data={filteredData}
-            loaded={disksLoaded}
-            loadError={undefined}
-            Row={DiskRow}
-            rowData={{ actionsDisabled: !isTemplateEditable, onUpdate, vm }}
-            unfilteredData={data}
-          />
-        </SidebarEditor>
-      </PageSection>
-    </div>
+          <StackItem>
+            <ListPageFilter
+              data={data}
+              hideLabelFilter
+              loaded={disksLoaded}
+              onFilterChange={onFilterChange}
+              rowFilters={filters}
+            />
+            <VirtualizedTable
+              columns={columns}
+              data={filteredData}
+              loaded={disksLoaded}
+              loadError={undefined}
+              Row={DiskRow}
+              rowData={{ actionsDisabled: !isTemplateEditable, onUpdate, vm }}
+              unfilteredData={data}
+            />
+          </StackItem>
+        </Stack>
+      </SidebarEditor>
+    </PageSection>
   );
 };
 

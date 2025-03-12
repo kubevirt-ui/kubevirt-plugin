@@ -1,14 +1,14 @@
 .CheckupsRunButton {
   &--main {
     button {
-      color: var(--pf-v5-global--disabled-color--100);
-      background-color: var(--pf-v5-global--disabled-color--200);
+      color: var(--pf-t--global--text--color--on-disabled);
+      background-color: var(--pf-t--global--background--color--disabled--default);
     }
   }
   &--item {
     &__disabled {
       cursor: default;
-      color: var(--pf-v5-global--disabled-color--200);
+      color: var(--pf-t--global--text--color--disabled);
     }
   }
 }
@@ -16,7 +16,7 @@
 .CheckupsNetworkStatusIcon {
   &--main {
     svg {
-      margin-right: var(--pf-v5-global--spacer--xs);
+      margin-right: var(--pf-t--global--spacer--xs);
     }
   }
 }

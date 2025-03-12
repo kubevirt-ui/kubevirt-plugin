@@ -6,7 +6,7 @@ import {
   SetTopConsumerData,
   TopConsumersData,
 } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/types';
-import { Card, SelectOption } from '@patternfly/react-core';
+import { SelectOption } from '@patternfly/react-core';
 
 import { TopConsumerMetric } from './topConsumerMetric';
 import { TopConsumersChartList } from './TopConsumersChartList';
@@ -57,7 +57,7 @@ const TopConsumerCard: FC<TopConsumersMetricCard> = ({
   };
 
   return (
-    <Card className="co-overview-card--gradient kv-top-consumer-card__metric-card">
+    <div className="co-overview-card--gradient kv-top-consumer-card__metric-card">
       <div className="kv-top-consumer-card__header">
         <div>
           <FormPFSelect
@@ -95,7 +95,7 @@ const TopConsumerCard: FC<TopConsumersMetricCard> = ({
         metric={TopConsumerMetric.fromString(metricKey)}
         scope={TopConsumerScope.fromString(scopeKey)}
       />
-    </Card>
+    </div>
   );
 };
 
