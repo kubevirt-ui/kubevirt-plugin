@@ -67,7 +67,7 @@ const CheckupsNetworkFormNodes = ({
           bodyContent={t('If no nodes are specified, random nodes are selected.')}
           position={PopoverPosition.right}
         >
-          <Button icon={<HelpIcon />} style={{ paddingLeft: 0 }} variant={ButtonVariant.plain} />
+          <Button hasNoPadding icon={<HelpIcon />} variant={ButtonVariant.plain} />
         </Popover>
       </Flex>
       {isNodesChecked && (

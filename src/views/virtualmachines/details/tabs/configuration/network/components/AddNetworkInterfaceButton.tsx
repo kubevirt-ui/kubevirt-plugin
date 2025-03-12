@@ -38,6 +38,9 @@ const AddNetworkInterfaceButton: FC<AddNetworkInterfaceButtonProps> = ({
   return (
     <WithPermissionTooltip allowed={!isAddNetworkDisabled}>
       <ListPageCreateButton
+        className={classNames('add-network-interface-button pf-v6-u-mb-md', {
+          isDisabled: isAddNetworkDisabled,
+        })}
         onClick={() =>
           !isAddNetworkDisabled &&
           createModal(({ isOpen, onClose }) => (
@@ -51,7 +54,6 @@ const AddNetworkInterfaceButton: FC<AddNetworkInterfaceButtonProps> = ({
             />
           ))
         }
-        className={classNames('add-network-interface-button', { isDisabled: isAddNetworkDisabled })}
       >
         {actionText}
       </ListPageCreateButton>

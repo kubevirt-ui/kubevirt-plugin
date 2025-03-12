@@ -83,7 +83,7 @@ const DedicatedResourcesModal: FC<DedicatedResourcesModalProps> = ({
             description={
               <>
                 {t('Available only on Nodes with labels')}{' '}
-                <Label color="purple" variant="filled">
+                <Label className="pf-v6-u-ml-xs" color="purple" variant="outline">
                   {!isEmpty(nodes) ? (
                     <Link
                       target="_blank"
