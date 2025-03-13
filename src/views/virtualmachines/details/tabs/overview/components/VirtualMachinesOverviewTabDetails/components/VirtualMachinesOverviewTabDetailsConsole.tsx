@@ -1,8 +1,13 @@
 import React, { FC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { inlined16beta } from '@kubevirt-utils/components/Consoles/components/novnc/inlined';
 import VncConsole from '@kubevirt-utils/components/Consoles/components/vnc-console/VncConsole';
-import { isHeadlessModeVMI } from '@kubevirt-utils/components/Consoles/utils/utils';
+import { INSECURE, SECURE } from '@kubevirt-utils/components/Consoles/utils/constants';
+import {
+  isConnectionEncrypted,
+  isHeadlessModeVMI,
+} from '@kubevirt-utils/components/Consoles/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { vmiStatuses } from '@kubevirt-utils/resources/vmi';
 import { useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
@@ -29,6 +34,19 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
     resource: 'virtualmachineinstances/vnc',
     verb: 'get',
   });
+
+  const toObjectUrl = (
+    inlineHtml: (args: { host: string; path: string; port: string }) => string,
+  ) => {
+    const path = `api/kubernetes/apis/subresources.kubevirt.io/v1/namespaces/${vmi?.metadata?.namespace}/virtualmachineinstances/${vmi?.metadata?.name}/vnc`;
+    const host = window.location.hostname;
+    const port = window.location.port || (isConnectionEncrypted() ? SECURE : INSECURE);
+    const objectUrl = URL.createObjectURL(
+      new Blob([inlineHtml({ host, path, port })], { type: 'text/html' }),
+    );
+    return objectUrl;
+  };
+
   return (
     <Bullseye className="console-overview">
       <div className="link">
@@ -44,6 +62,16 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
           variant="link"
         >
           {t('Open web console')}
+        </Button>
+      </div>
+      <div className="link">
+        <Button
+          isDisabled={!isVMRunning || isHeadlessMode || !canConnectConsole}
+          onClick={() => window.open(toObjectUrl(inlined16beta))}
+          variant="link"
+        >
+          {t('Open novnc 1.6beta console')}
+          <ExternalLinkAltIcon className="icon" />
         </Button>
       </div>
       {isVMRunning && !isHeadlessMode && canConnectConsole ? (
