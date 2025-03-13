@@ -9,7 +9,7 @@ import { exposedModules as VirtualMachinesExposedModules } from './src/views/vir
 
 const metadata: ConsolePluginBuildMetadata = {
   dependencies: {
-    '@console/pluginAPI': '*',
+    '@console/pluginAPI': '~4.19.0',
   },
   displayName: 'Kubevirt Plugin',
   exposedModules: {
@@ -42,7 +42,7 @@ const metadata: ConsolePluginBuildMetadata = {
     yamlTemplates: 'src/templates/index.ts',
   },
   name: 'kubevirt-plugin',
-  version: '4.18.0',
+  version: '4.19.0',
 };
 
 export default metadata;
