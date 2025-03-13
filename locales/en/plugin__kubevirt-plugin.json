@@ -340,7 +340,7 @@
   "Create a new blank PVC": "Create a new blank PVC",
   "Create a new custom Template": "Create a new custom Template",
   "Create a Virtual Machine from a template": "Create a Virtual Machine from a template",
-  "Create a Windows boot source": "Create a Windows boot source",
+  "Create a Windows bootable volume": "Create a Windows bootable volume",
   "Create activation key": "Create activation key",
   "Create DataSource": "Create DataSource",
   "Create folder \"{{filterValue}}\"": "Create folder \"{{filterValue}}\"",
