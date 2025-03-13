@@ -18,6 +18,7 @@ import HardwareDevicesHeadlessModeModal from '@kubevirt-utils/components/Hardwar
 import HardwareDevicesModal from '@kubevirt-utils/components/HardwareDevices/modal/HardwareDevicesModal';
 import { HARDWARE_DEVICE_TYPE } from '@kubevirt-utils/components/HardwareDevices/utils/constants';
 import HostnameModal from '@kubevirt-utils/components/HostnameModal/HostnameModal';
+import ConnectedInstanceTypeModal from '@kubevirt-utils/components/InstanceTypeModal/ConnectedInstanceTypeModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import NodeSelectorModal from '@kubevirt-utils/components/NodeSelectorModal/NodeSelectorModal';
 import StartPauseModal from '@kubevirt-utils/components/StartPauseModal/StartPauseModal';
@@ -30,16 +31,18 @@ import {
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
+import { isInstanceTypeVM } from '@kubevirt-utils/resources/instancetype/helper';
 import { getCPU, getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
-import { isInstanceTypeVM } from '@kubevirt-utils/resources/vm/utils/instanceTypes';
 import { DESCHEDULER_EVICT_LABEL } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sUpdate, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { updatedInstanceType } from '@virtualmachines/details/tabs/configuration/details/utils/utils';
 
 import {
   checkBootModeChanged,
   checkBootOrderChanged,
   checkCPUMemoryChanged,
+  checkInstanceTypeChanged,
   getChangedAffinity,
   getChangedAuthorizedSSHKey,
   getChangedCloudInit,
@@ -66,6 +69,7 @@ import { PendingChange } from '../utils/types';
 export const usePendingChanges = (
   vm: V1VirtualMachine,
   vmi: V1VirtualMachineInstance,
+  instanceTypeExpandedSpec: V1VirtualMachine,
 ): PendingChange[] => {
   const { t } = useKubevirtTranslation();
 
@@ -80,6 +84,7 @@ export const usePendingChanges = (
     isList: true,
   });
 
+  const instanceTypeChanged = checkInstanceTypeChanged(vm, vmi);
   const cpuMemoryChanged = checkCPUMemoryChanged(vm, vmi);
   const bootOrderChanged = checkBootOrderChanged(vm, vmi);
   const bootModeChanged = checkBootModeChanged(vm, vmi);
@@ -119,7 +124,7 @@ export const usePendingChanges = (
   const modifiedHostDevices = getChangedHostDevices(vm, vmi);
 
   const modifiedVolumesHotplug = getChangedVolumesHotplug(vm, vmi);
-  const modifiedHedlessMode = getChangedHeadlessMode(vm, vmi);
+  const modifiedHeadlessMode = getChangedHeadlessMode(vm, vmi);
   const modifiedGuestSystemAccessLog = getChangedGuestSystemAccessLog(vm, vmi);
 
   const onSubmit = (updatedVM: V1VirtualMachine) =>
@@ -142,6 +147,23 @@ export const usePendingChanges = (
       label: t('CPU | Memory'),
       tabLabel: VirtualMachineDetailsTabLabel.Details,
     },
+    {
+      handleAction: () => {
+        navigate(getTabURL(vm, VirtualMachineDetailsTab.Details));
+        createModal(({ isOpen, onClose }) => (
+          <ConnectedInstanceTypeModal
+            instanceTypeVM={instanceTypeExpandedSpec}
+            isOpen={isOpen}
+            onClose={onClose}
+            onSubmit={updatedInstanceType}
+          />
+        ));
+      },
+      hasPendingChange: isInstanceTypeVM(vm) && instanceTypeChanged && restartRequired(vm),
+      label: t('InstanceType'),
+      tabLabel: VirtualMachineDetailsTabLabel.Details,
+    },
+
     {
       handleAction: () => {
         navigate(getTabURL(vm, VirtualMachineDetailsTab.Details));
@@ -435,7 +457,7 @@ export const usePendingChanges = (
           />
         ));
       },
-      hasPendingChange: modifiedHedlessMode,
+      hasPendingChange: modifiedHeadlessMode,
       label: t('Headless mode'),
       tabLabel: VirtualMachineDetailsTabLabel.Details,
     },

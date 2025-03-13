@@ -23,16 +23,16 @@ import { getVMStatusIcon } from '../utils';
 import { vmTabsWithYAML } from './utils/constants';
 
 type VirtualMachineNavPageTitleProps = {
+  instanceTypeExpandedSpec: V1VirtualMachine;
   isLoaded?: boolean;
   name: string;
-  nonExpandedVM: V1VirtualMachine;
   vm: V1VirtualMachine;
 };
 
 const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({
+  instanceTypeExpandedSpec,
   isLoaded,
   name,
-  nonExpandedVM,
   vm,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -46,7 +46,7 @@ const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({
   });
   const vmim = useVirtualMachineInstanceMigration(vm);
   const [isSingleNodeCluster] = useSingleNodeCluster();
-  const [actions] = useVirtualMachineActionsProvider(nonExpandedVM, vmim, isSingleNodeCluster);
+  const [actions] = useVirtualMachineActionsProvider(vm, vmim, isSingleNodeCluster);
   const StatusIcon = getVMStatusIcon(vm?.status?.printableStatus);
 
   const isSidebarEditorDisplayed = vmTabsWithYAML.find((tab) =>
@@ -88,7 +88,11 @@ const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({
           )}
         </Split>
       </span>
-      <VirtualMachinePendingChangesAlert vm={vm} vmi={vmi} />
+      <VirtualMachinePendingChangesAlert
+        instanceTypeExpandedSpec={instanceTypeExpandedSpec}
+        vm={vm}
+        vmi={vmi}
+      />
     </div>
   );
 };

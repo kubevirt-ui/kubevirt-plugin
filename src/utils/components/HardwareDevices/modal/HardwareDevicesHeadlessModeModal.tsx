@@ -6,6 +6,7 @@ import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/
 import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isHeadlessMode } from '@kubevirt-utils/resources/vm';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { Checkbox, Form, FormGroup } from '@patternfly/react-core';
 
@@ -24,11 +25,8 @@ const HardwareDevicesHeadlessModeModal: FC<HardwareDevicesHeadlessModeModalProps
   vm,
   vmi,
 }) => {
-  const devices = vm?.spec?.template?.spec?.domain?.devices;
   const { t } = useKubevirtTranslation();
-  const [checked, setChecked] = useState<boolean>(
-    devices?.hasOwnProperty('autoattachGraphicsDevice') && !devices?.autoattachGraphicsDevice,
-  );
+  const [checked, setChecked] = useState<boolean>(isHeadlessMode(vm));
 
   const updatedVirtualMachine = useMemo(() => {
     const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {

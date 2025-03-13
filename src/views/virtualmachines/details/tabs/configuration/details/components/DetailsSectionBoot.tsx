@@ -49,7 +49,7 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
 
   useEffect(() => {
     expandURLHash(getSearchItemsIds(getDetailsTabBootIds(vm)), location?.hash, setIsExpanded);
-  }, [vm, location?.hash]);
+  }, [vm, location?.hash, setIsExpanded]);
 
   return (
     <ExpandableSection

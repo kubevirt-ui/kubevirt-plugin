@@ -3,6 +3,7 @@ import produce from 'immer';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isHeadlessMode } from '@kubevirt-utils/resources/vm';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { Flex, FlexItem, Switch } from '@patternfly/react-core';
 
@@ -15,10 +16,7 @@ type HardwareDevicesHeadlessModeProps = {
 const HardwareDevicesHeadlessMode: FC<HardwareDevicesHeadlessModeProps> = ({ onSubmit, vm }) => {
   const { t } = useKubevirtTranslation();
 
-  const devices = vm?.spec?.template?.spec?.domain?.devices;
-  const [isChecked, setIsChecked] = useState<boolean>(
-    devices?.hasOwnProperty('autoattachGraphicsDevice') && !devices?.autoattachGraphicsDevice,
-  );
+  const [isChecked, setIsChecked] = useState<boolean>(isHeadlessMode(vm));
 
   const updateHeadlessMode = (checked: boolean) => {
     const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {

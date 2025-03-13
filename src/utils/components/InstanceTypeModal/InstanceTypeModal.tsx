@@ -17,7 +17,7 @@ import {
   mappedInstanceTypesToSelectOptions,
 } from './utils/util';
 
-type InstanceTypeModalProps = {
+export type InstanceTypeModalProps = {
   allInstanceTypes: InstanceTypeUnion[];
   instanceType: InstanceTypeUnion;
   instanceTypeVM: V1VirtualMachine;

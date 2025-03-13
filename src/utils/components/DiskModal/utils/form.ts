@@ -4,6 +4,7 @@ import {
   V1VirtualMachine,
   V1Volume,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { isInstanceTypeVM } from '@kubevirt-utils/resources/instancetype/helper';
 import { getName } from '@kubevirt-utils/resources/shared';
 import {
   getBootDisk,
@@ -11,7 +12,6 @@ import {
   getDisks,
   getVolumes,
 } from '@kubevirt-utils/resources/vm';
-import { isInstanceTypeVM } from '@kubevirt-utils/resources/vm/utils/instanceTypes';
 import { generatePrettyName, getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
 import { isRunning } from '@virtualmachines/utils';
 

@@ -8,7 +8,6 @@ import {
 import HorizontalNavbar from '@kubevirt-utils/components/HorizontalNavbar/HorizontalNavbar';
 import { SidebarEditorProvider } from '@kubevirt-utils/components/SidebarEditor/SidebarEditorContext';
 import useInstanceTypeExpandSpec from '@kubevirt-utils/resources/vm/hooks/useInstanceTypeExpandSpec';
-import { isInstanceTypeVM } from '@kubevirt-utils/resources/vm/utils/instanceTypes';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -47,10 +46,10 @@ const VirtualMachineNavPage: React.FC<VirtualMachineDetailsPageProps> = ({
   return (
     <SidebarEditorProvider>
       <VirtualMachineNavPageTitle
+        instanceTypeExpandedSpec={instanceTypeExpandedSpec}
         isLoaded={isLoaded || !isEmpty(loadError)}
         name={name}
-        nonExpandedVM={vmToShow}
-        vm={isInstanceTypeVM(vmToShow) ? instanceTypeExpandedSpec : vmToShow}
+        vm={vmToShow}
       />
       <div className="VirtualMachineNavPage--tabs__main">
         <HorizontalNavbar
