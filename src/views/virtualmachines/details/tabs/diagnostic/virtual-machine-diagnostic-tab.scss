@@ -8,11 +8,20 @@
     &__content {
       padding: var(--pf-t--global--spacer--sm);
       width: 100%;
+
+      .co-m-pane__body {
+        padding-bottom: 0;
+      }
+
+      .pf-v6-c-table {
+        margin-bottom: var(--pf-t--global--spacer--lg);
+      }
     }
   }
 
   &--header {
     margin-top: var(--pf-t--global--spacer--lg);
+    margin-bottom: var(--pf-t--global--spacer--md);
   }
 
   &--HelpTextIcon {

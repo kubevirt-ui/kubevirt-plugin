@@ -33,6 +33,7 @@ const MemoryInput: FC<MemoryInputProps> = ({ memory, memoryUnit, setMemory, setM
         onMinus={() => setMemory((mem) => +mem - 1)}
         onPlus={() => setMemory((mem) => +mem + 1)}
         value={memory}
+        widthChars={1}
       />
 
       <FormPFSelect

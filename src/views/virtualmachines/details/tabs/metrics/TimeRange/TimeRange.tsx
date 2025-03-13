@@ -17,7 +17,9 @@ const TimeRange: React.FC = () => {
     <div className="timerange--main">
       <span className="timerange--main__text">
         <span className="timerange--main__text--time-range">{t('Time range')}</span>
-        <DurationDropdown selectedDuration={duration} selectHandler={onDurationSelect} />
+        <div>
+          <DurationDropdown selectedDuration={duration} selectHandler={onDurationSelect} />
+        </div>
       </span>
 
       <Link to={'/monitoring/dashboards/grafana-dashboard-kubevirt-top-consumers'}>

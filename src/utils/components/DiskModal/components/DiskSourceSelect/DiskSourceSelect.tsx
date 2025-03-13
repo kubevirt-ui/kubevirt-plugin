@@ -24,7 +24,7 @@ const DiskSourceSelect: FC<DiskSourceSelectProps> = ({ className, onSelect }) =>
       className={classNames('disk-source-select', className)}
       onSelect={(_, val) => onSelect(val as SourceTypes)}
       selectedLabel={t('Add disk')}
-      toggleProps={{ variant: 'primary' }}
+      toggleProps={{ className: 'pf-v6-u-mb-sm', variant: 'primary' }}
     >
       <SelectList>
         <DiskSourceOption {...blankOption} onSelect={onSelect} />

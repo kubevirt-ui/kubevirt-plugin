@@ -37,7 +37,7 @@ const WizardNetworkTab: WizardTab = ({ updateVM, vm }) => {
                 />
               ))
             }
-            className="list-page-create-button-margin"
+            className="pf-v6-u-mb-md"
           >
             {actionText}
           </ListPageCreateButton>

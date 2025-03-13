@@ -19,7 +19,11 @@ const CloudInitCredentialsContent: FC<CloudInitCredentialsContentProps> = ({ vm 
   const { users } = getCloudInitCredentials(vm);
 
   if (isEmpty(users)) {
-    return <>{t('No credentials, see operating system documentation for the default username.')}</>;
+    return (
+      <div className="pf-v6-u-ml-md">
+        {t('No credentials, see operating system documentation for the default username.')}
+      </div>
+    );
   }
 
   const { passwords, usernames } = users.reduce(
