@@ -67,6 +67,7 @@ const Consoles: FC<ConsolesProps> = ({ consoleContainerClass, isStandAlone, vmi 
           </FlexItem>
           <FlexItem>
             <AccessConsoles
+              isVnc={type === VNC_CONSOLE_TYPE}
               isWindowsVM={isWindowsVM}
               rfb={rfb}
               serialSocket={serialSocket}
