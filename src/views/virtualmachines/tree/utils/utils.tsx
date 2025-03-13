@@ -264,3 +264,12 @@ export const isSystemNamespace = (projectName: string) => {
 
   return startsWithNamespace || isNamespace;
 };
+
+export const getAllTreeViewItems = (treeData: TreeViewDataItem[]) => {
+  return treeData
+    ?.map((treeItem) => [treeItem, ...getAllTreeViewItems(treeItem.children || [])])
+    ?.flat();
+};
+
+export const getAllTreeViewVMsItems = (treeData: TreeViewDataItem[]) =>
+  getAllTreeViewItems(treeData).filter((treeItem) => !treeItem.children);

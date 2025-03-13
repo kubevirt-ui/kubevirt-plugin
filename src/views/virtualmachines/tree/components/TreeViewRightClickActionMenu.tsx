@@ -3,24 +3,22 @@ import React, { FC } from 'react';
 import ActionDropdownItem from '@kubevirt-utils/components/ActionDropdownItem/ActionDropdownItem';
 import useSingleNodeCluster from '@kubevirt-utils/hooks/useSingleNodeCluster';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { Menu, MenuContent, MenuList, Popper, TreeViewDataItem } from '@patternfly/react-core';
+import { Menu, MenuContent, MenuList, Popper } from '@patternfly/react-core';
 import useVirtualMachineActionsProvider from '@virtualmachines/actions/hooks/useVirtualMachineActionsProvider';
 import { getVMIMFromMapper } from '@virtualmachines/utils/mappers';
 
-import useTreeViewItemRightClick from '../hooks/useTreeViewItemRightClick';
 import { vmimMapperSignal, vmsSignal } from '../utils/signals';
 
 type TreeViewRightClickActionMenuProps = {
-  treeData: TreeViewDataItem[];
+  hideMenu: () => void;
+  triggerElement: HTMLElement | null;
 };
 
-const TreeViewRightClickActionMenu: FC<TreeViewRightClickActionMenuProps> = ({ treeData }) => {
-  const {
-    hideMenu,
-    triggeredVMName: vmName,
-    triggeredVMNamespace: vmNamespace,
-    triggerElement: treeViewItemTrigger,
-  } = useTreeViewItemRightClick(treeData);
+const TreeViewRightClickActionMenu: FC<TreeViewRightClickActionMenuProps> = ({
+  hideMenu,
+  triggerElement,
+}) => {
+  const [vmNamespace, vmName] = triggerElement?.id?.split('/') || ['', ''];
 
   const [isSingleNodeCluster] = useSingleNodeCluster();
 
@@ -31,7 +29,7 @@ const TreeViewRightClickActionMenu: FC<TreeViewRightClickActionMenuProps> = ({ t
 
   const [actions] = useVirtualMachineActionsProvider(vm, vmim, isSingleNodeCluster);
 
-  if (!treeViewItemTrigger) return null;
+  if (!triggerElement) return null;
 
   return (
     <>
@@ -47,7 +45,7 @@ const TreeViewRightClickActionMenu: FC<TreeViewRightClickActionMenuProps> = ({ t
             </MenuContent>
           </Menu>
         }
-        appendTo={treeViewItemTrigger}
+        appendTo={triggerElement}
         isVisible
         position="end"
       />
