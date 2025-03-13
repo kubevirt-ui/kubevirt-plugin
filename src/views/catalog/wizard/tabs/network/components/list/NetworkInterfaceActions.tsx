@@ -91,7 +91,7 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
   return (
     <Dropdown
       isOpen={isDropdownOpen}
-      onOpenChange={(open: boolean) => setIsDropdownOpen(open)}
+      onOpenChange={setIsDropdownOpen}
       onSelect={() => setIsDropdownOpen(false)}
       toggle={KebabToggle({ id: 'toggle-id-network', onClick: onToggle })}
     >

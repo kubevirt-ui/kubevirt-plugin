@@ -89,7 +89,7 @@ const InlineFilterSelect: FC<InlineFilterSelectProps> = ({
       id="select-inline-filter"
       isOpen={isOpen}
       isScrollable
-      onOpenChange={(open: boolean) => setIsOpen(open)}
+      onOpenChange={setIsOpen}
       onSelect={onSelect}
       popperProps={popperProps}
       selected={selected}

@@ -28,7 +28,7 @@ const AffinityRowActionsDropdown: FC<AffinityRowActionsDropdownProps> = ({
   return (
     <Dropdown
       isOpen={isOpen}
-      onOpenChange={(open: boolean) => setIsOpen(open)}
+      onOpenChange={setIsOpen}
       toggle={KebabToggle({ isExpanded: isOpen, onClick: onToggle })}
     >
       <DropdownList>

@@ -55,7 +55,7 @@ const DataSourceActions: FC<DataSourceActionProps> = ({ dataSource, isKebabToggl
       className="kubevirt-data-source-actions"
       data-test-id="data-source-actions"
       isOpen={isOpen}
-      onOpenChange={(open: boolean) => setIsOpen(open)}
+      onOpenChange={setIsOpen}
       popperProps={{ appendTo: getContentScrollableElement, position: 'right' }}
       toggle={Toggle}
     >

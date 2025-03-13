@@ -95,7 +95,7 @@ export const AccessConsoles: FC<AccessConsolesProps> = ({
         })}
         aria-label={t('Select console type')}
         isOpen={isOpenSelectType}
-        onOpenChange={(open: boolean) => setIsOpenSelectType(open)}
+        onOpenChange={setIsOpenSelectType}
         placeholder={t('Select console type')}
         selected={type}
       >
@@ -119,7 +119,7 @@ export const AccessConsoles: FC<AccessConsolesProps> = ({
           onClick: () => setIsOpenSendKey((prevIsOpen) => !prevIsOpen),
         })}
         isOpen={isOpenSendKey}
-        onOpenChange={(open: boolean) => setIsOpenSendKey(open)}
+        onOpenChange={setIsOpenSendKey}
         onSelect={() => setIsOpenSendKey(false)}
       >
         <DropdownList>

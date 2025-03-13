@@ -37,7 +37,7 @@ const AffinityConditionSelect: FC<AffinityConditionSelectProps> = ({
           selected: AFFINITY_CONDITION_LABELS[focusedAffinity?.condition],
         })}
         isOpen={isOpen}
-        onOpenChange={(open: boolean) => setIsOpen(open)}
+        onOpenChange={setIsOpen}
         onSelect={handleChange}
         selected={focusedAffinity?.condition}
       >

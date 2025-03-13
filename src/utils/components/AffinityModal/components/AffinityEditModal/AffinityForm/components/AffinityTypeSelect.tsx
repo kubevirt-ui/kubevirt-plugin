@@ -36,6 +36,7 @@ const AffinityTypeSelect: FC<AffinityTypeSelectProps> = ({
           selected: AFFINITY_TYPE_LABLES[focusedAffinity?.type],
         })}
         isOpen={isOpen}
+        onOpenChange={setIsOpen}
         onSelect={handleChange}
         selected={focusedAffinity?.type}
       >

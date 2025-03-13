@@ -127,7 +127,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
   return (
     <Dropdown
       isOpen={isDropdownOpen}
-      onOpenChange={(open: boolean) => setIsDropdownOpen(open)}
+      onOpenChange={setIsDropdownOpen}
       onSelect={() => setIsDropdownOpen(false)}
       popperProps={{ appendTo: getContentScrollableElement, position: 'right' }}
       toggle={KebabToggle({ id: 'toggle-id-6', isExpanded: isDropdownOpen, onClick: onToggle })}

@@ -41,11 +41,7 @@ const CheckupsNetworkActions: FC<CheckupsNetworkActionsProps> = ({
   };
 
   return (
-    <Dropdown
-      isOpen={isActionsOpen}
-      onOpenChange={(open: boolean) => setIsActionsOpen(open)}
-      toggle={Toggle}
-    >
+    <Dropdown isOpen={isActionsOpen} onOpenChange={setIsActionsOpen} toggle={Toggle}>
       <DropdownList>
         <DropdownItem
           onClick={() =>
