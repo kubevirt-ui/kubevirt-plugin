@@ -13,6 +13,7 @@ import {
 } from '@patternfly/react-core';
 
 import useFilteredTreeView from '../hooks/useFilteredTreeView';
+import useTreeViewDragNDrop from '../hooks/useTreeViewDragNDrop/useTreeViewDragNDrop';
 
 import CreateProject from './CreateProject';
 import PanelToggleButton from './PanelToggleButton';
@@ -41,6 +42,8 @@ const TreeViewContent: FC<TreeViewContentProps> = ({
   const { t } = useKubevirtTranslation();
   const [showAll, setShowAll] = useState<boolean>();
   const { filteredTreeData, onSearch } = useFilteredTreeView(treeData, setShowAll);
+
+  const { onExpandTreeViewElement } = useTreeViewDragNDrop(treeData);
 
   if (!loaded) {
     return (
@@ -89,6 +92,7 @@ const TreeViewContent: FC<TreeViewContentProps> = ({
           data={filteredTreeData}
           hasBadges={loaded}
           hasSelectableNodes
+          onExpand={onExpandTreeViewElement}
           onSelect={onSelect}
         />
       </DrawerPanelBody>

@@ -129,7 +129,11 @@ const createProjectTreeItem = (
     treeViewDataMap,
   );
 
-  const projectChildren = [...projectFolders, ...(projectMap[project]?.ungrouped || [])];
+  const sortProjectFolders = projectFolders.sort((folderA, folderB) =>
+    folderA.id.localeCompare(folderB.id),
+  );
+
+  const projectChildren = [...sortProjectFolders, ...(projectMap[project]?.ungrouped || [])];
 
   const projectTreeItemID = `${PROJECT_SELECTOR_PREFIX}/${project}`;
   const projectTreeItem: TreeViewDataItemWithHref = {
