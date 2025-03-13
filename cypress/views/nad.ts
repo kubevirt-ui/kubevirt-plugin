@@ -14,7 +14,7 @@ export const bridgeMTU = 'input[name="ovn-k8s-cni-overlay-localnet.mtu"]';
 export const kebabBtn = '[data-test-id="kebab-button"]';
 export const deleteAction = '[data-test-action=" Network Attachment Definition"]';
 export const confirmBtn = '[data-test="confirm-action"]';
-export const heading = '[data-test-section-heading="NetworkAttachmentDefinition details"]';
+export const heading = '[data-test-section-heading="Network Attachment Definition details"]';
 export const createBtn = '#save-changes';
 export const macSpoofCHK = 'input[id="bridge.macspoofchk"]';
 export const ovnSubnet = 'input[name="ovn-k8s-cni-overlay.subnets"]';

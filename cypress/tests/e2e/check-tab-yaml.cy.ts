@@ -5,7 +5,7 @@ import * as sel from '../../views/selector';
 import { userButtonTxt } from '../../views/selector-instance';
 import { navigateToConfigurationSubTab, subTabName, tab } from '../../views/tab';
 
-xdescribe('Check all virtualization pages can be loaded', () => {
+describe('Check all virtualization pages can be loaded', () => {
   before(() => {
     cy.visit('');
   });

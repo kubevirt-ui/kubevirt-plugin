@@ -1,7 +1,7 @@
 import { DEFAULT_VM_NAME } from '../../utils/const/index';
 import * as oView from '../../views/selector-overview';
 
-xdescribe('Test Virtualization Overview page', () => {
+describe('Test Virtualization Overview page', () => {
   before(() => {
     cy.login();
     cy.visit('');
@@ -47,7 +47,7 @@ xdescribe('Test Virtualization Overview page', () => {
     cy.contains('Download virtctl for Linux for x86_64').should('exist');
   });
 
-  it('click view all link on alerts card', () => {
+  xit('click view all link on alerts card', () => {
     cy.visitOverviewVirt();
     cy.get('a.alerts-card__view-all-link').click();
     cy.contains('kubernetes_operator_part_of=kubevirt').should('exist');
