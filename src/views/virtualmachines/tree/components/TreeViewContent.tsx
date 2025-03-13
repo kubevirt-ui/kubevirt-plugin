@@ -13,10 +13,12 @@ import {
 } from '@patternfly/react-core';
 
 import useFilteredTreeView from '../hooks/useFilteredTreeView';
+import useTreeViewItemRightClick from '../hooks/useTreeViewItemRightClick';
 
 import CreateProject from './CreateProject';
 import PanelToggleButton from './PanelToggleButton';
 import TreeViewCollapseExpand from './TreeViewCollapseExpand';
+import TreeViewRightClickActionMenu from './TreeViewRightClickActionMenu';
 import TreeViewToolbar from './TreeViewToolbar';
 
 type TreeViewContentProps = {
@@ -41,6 +43,8 @@ const TreeViewContent: FC<TreeViewContentProps> = ({
   const { t } = useKubevirtTranslation();
   const [showAll, setShowAll] = useState<boolean>();
   const { filteredTreeData, onSearch } = useFilteredTreeView(treeData, setShowAll);
+
+  const { addListenerToRightClick, hideMenu, triggerElement } = useTreeViewItemRightClick(treeData);
 
   if (!loaded) {
     return (
@@ -89,8 +93,10 @@ const TreeViewContent: FC<TreeViewContentProps> = ({
           data={filteredTreeData}
           hasBadges={loaded}
           hasSelectableNodes
+          onExpand={addListenerToRightClick}
           onSelect={onSelect}
         />
+        <TreeViewRightClickActionMenu hideMenu={hideMenu} triggerElement={triggerElement} />
       </DrawerPanelBody>
     </>
   );

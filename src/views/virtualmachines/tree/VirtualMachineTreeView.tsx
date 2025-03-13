@@ -11,7 +11,6 @@ import {
 } from '@patternfly/react-core';
 
 import TreeViewContent from './components/TreeViewContent';
-import TreeViewRightClickActionMenu from './components/TreeViewRightClickActionMenu';
 import { useHideNamespaceBar } from './hooks/useHideNamespaceBar';
 import { UseTreeViewData } from './hooks/useTreeViewData';
 import useTreeViewSelect from './hooks/useTreeViewSelect';
@@ -89,7 +88,6 @@ const VirtualMachineTreeView: FC<VirtualMachineTreeViewProps> = ({
               toggleDrawer={toggleDrawer}
               treeData={treeData}
             />
-            <TreeViewRightClickActionMenu treeData={treeData} />
           </DrawerPanelContent>
         }
       >
