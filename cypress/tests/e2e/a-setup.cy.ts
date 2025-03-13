@@ -7,12 +7,16 @@ import { tab } from '../../views/tab';
 
 const WELCOME_OFF_CMD = `oc patch configmap -n kubevirt-hyperconverged kubevirt-user-settings --type=merge --patch '{"data": {"kube-admin": "{\\"quickStart\\":{\\"dontShowWelcomeModal\\":true}}"}}'`;
 
-xdescribe('Prepare the cluster for test', () => {
+describe('Prepare the cluster for test', () => {
   before(() => {
     cy.login();
     cy.exec('oc whoami').then((result) => {
       cy.task('log', `Running as: [${result.stdout}]`);
     });
+  });
+
+  it('create test namespace', () => {
+    cy.exec(`oc new-project ${TEST_NS}`);
   });
 
   it('create test secret', () => {
@@ -28,8 +32,6 @@ xdescribe('Prepare the cluster for test', () => {
   it('switch to Virtualization perspective and default project', () => {
     cy.get(mastheadLogo).scrollIntoView();
     cy.switchToVirt();
-
-    // needed because of https://issues.redhat.com/browse/CNV-51570
     cy.switchProject(TEST_NS);
   });
 

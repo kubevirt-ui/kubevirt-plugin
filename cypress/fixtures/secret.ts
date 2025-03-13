@@ -6,7 +6,7 @@ export default {
   kind: 'Secret',
   metadata: {
     name: 'auto-test-secret',
-    namespace: 'default',
+    namespace: 'auto-test-ns',
   },
   type: 'Opaque',
 };
