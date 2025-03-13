@@ -32,6 +32,12 @@ const useNetworkColumns = (data: NetworkPresentation[]) => {
         transforms: [sortable],
       },
       {
+        id: 'state',
+        sort: 'iface.state',
+        title: t('State'),
+        transforms: [sortable],
+      },
+      {
         id: 'type',
         sort: (_, direction) => sorting(direction),
         title: t('Type'),
