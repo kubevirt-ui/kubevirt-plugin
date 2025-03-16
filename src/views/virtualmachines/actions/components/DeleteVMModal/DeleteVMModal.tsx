@@ -19,6 +19,7 @@ import { useLastNamespacePath } from '@kubevirt-utils/hooks/useLastNamespacePath
 import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
 import { k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
 import { ButtonVariant, Stack, StackItem } from '@patternfly/react-core';
+import { deselectVM, isVMSelected } from '@virtualmachines/list/selectedVMs';
 
 import DeleteOwnedResourcesMessage from './components/DeleteOwnedResourcesMessage';
 import useDeleteVMResources from './hooks/useDeleteVMResources';
@@ -74,6 +75,11 @@ const DeleteVMModal: FC<DeleteVMModalProps> = ({ isOpen, onClose, vm }) => {
       model: VirtualMachineModel,
       resource: updatedVM,
     });
+
+    if (isVMSelected(updatedVM)) {
+      deselectVM(updatedVM);
+    }
+
     navigate(`/k8s/${lastNamespacePath}/${VirtualMachineModelRef}`);
   };
 
