@@ -58,7 +58,7 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
           selected: optionsValueLabelMapper[formSelection],
         })}
         isOpen={isOpen}
-        onOpenChange={(open: boolean) => setIsOpen(open)}
+        onOpenChange={setIsOpen}
         onSelect={onSelect}
         selected={formSelection}
       >

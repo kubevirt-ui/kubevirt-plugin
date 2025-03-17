@@ -78,6 +78,7 @@ const SnapshotActionsMenu: FC<SnapshotActionsMenuProps> = ({ isRestoreDisabled, 
   return (
     <Dropdown
       isOpen={isDropdownOpen}
+      onOpenChange={setIsDropdownOpen}
       onSelect={() => setIsDropdownOpen(false)}
       popperProps={{ position: 'right' }}
       toggle={KebabToggle({ id: 'toggle-id-6', isExpanded: isDropdownOpen, onClick: onToggle })}

@@ -94,7 +94,7 @@ const VirtualMachinesOverviewTabSnapshotsRow: FC<VirtualMachinesOverviewTabSnaps
       </div>
       <Dropdown
         isOpen={isKebabOpen}
-        onOpenChange={(open: boolean) => setIsKebabOpen(open)}
+        onOpenChange={setIsKebabOpen}
         onSelect={() => setIsKebabOpen(false)}
         popperProps={{ position: 'right' }}
         toggle={KebabToggle({ isExpanded: isKebabOpen, onClick: onToggle })}

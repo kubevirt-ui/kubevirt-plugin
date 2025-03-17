@@ -118,7 +118,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({ diskName }) => {
   return (
     <Dropdown
       isOpen={isDropdownOpen}
-      onOpenChange={(open: boolean) => setIsDropdownOpen(open)}
+      onOpenChange={setIsDropdownOpen}
       onSelect={() => setIsDropdownOpen(false)}
       toggle={KebabToggle({ id: 'toggle-id-disk', onClick: onToggle })}
     >

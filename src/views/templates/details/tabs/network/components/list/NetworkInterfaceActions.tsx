@@ -94,7 +94,7 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
         onClick: onToggle,
       })}
       isOpen={isDropdownOpen}
-      onOpenChange={(open: boolean) => setIsDropdownOpen(open)}
+      onOpenChange={setIsDropdownOpen}
       onSelect={() => setIsDropdownOpen(false)}
       popperProps={{ appendTo: getContentScrollableElement, position: 'right' }}
     >

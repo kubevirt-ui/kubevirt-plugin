@@ -44,7 +44,7 @@ const MigrationPolicyConfigurationDropdown: FC<MigrationPolicyConfigurationDropd
       className="migration-policy__form-config-dropdown"
       data-test-id="migration-policies-configurations"
       isOpen={isOpen}
-      onOpenChange={(open: boolean) => setIsOpen(open)}
+      onOpenChange={setIsOpen}
     >
       <DropdownList>
         {Object.entries(options).map(([key, { defaultValue, description, label }]) => (

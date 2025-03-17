@@ -40,7 +40,7 @@ const DeviceNameSelect: FC<DeviceNameSelectProps> = ({
           })}
           id="deviceName"
           isOpen={isOpen}
-          onOpenChange={(open: boolean) => setIsOpen(open)}
+          onOpenChange={setIsOpen}
           onSelect={onSelect}
           popperProps={{ appendTo: () => document.getElementById('tab-modal') }}
           selected={deviceName}
