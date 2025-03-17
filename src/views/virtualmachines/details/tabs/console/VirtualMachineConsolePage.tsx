@@ -41,7 +41,7 @@ const VirtualMachineConsolePage: FC<NavPageComponentProps> = ({ obj: vm }) => {
   }
 
   return (
-    <PageSection className="VirtualMachineConsolePage-page-section">
+    <PageSection className="VirtualMachineConsolePage-page-section" hasBodyWrapper={false}>
       <Consoles consoleContainerClass="virtual-machine-console-page" vmi={vmi} />
     </PageSection>
   );

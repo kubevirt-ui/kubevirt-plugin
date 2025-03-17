@@ -20,7 +20,7 @@ const VncConnect: FC<CustomConnectComponentProps> = ({ connect, isConnecting }) 
           </EmptyStateFooter>
         </EmptyState>
       )}
-      {isConnecting && <LoadingEmptyState bodyContents={t('Connecting')} />})
+      {isConnecting && <LoadingEmptyState bodyContents={t('Connecting')} />}
     </>
   );
 };

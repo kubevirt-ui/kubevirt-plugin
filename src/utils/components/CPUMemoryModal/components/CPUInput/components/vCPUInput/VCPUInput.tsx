@@ -46,6 +46,7 @@ const VCPUInput: FC<vCPUInputProps> = ({ cpu, isDisabled, setCPU }) => {
           isDisabled={isDisabled}
           min={1}
           value={cpu?.sockets}
+          widthChars={1}
         />
       </GridItem>
     </Grid>

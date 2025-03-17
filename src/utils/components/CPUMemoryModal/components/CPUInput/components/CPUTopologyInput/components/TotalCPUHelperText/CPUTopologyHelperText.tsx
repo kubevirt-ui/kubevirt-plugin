@@ -27,6 +27,7 @@ const CPUTopologyHelperText: FC<CPUTopologyHelperTextProps> = ({ cpu }) => {
       >
         <Button
           className="cpu-topology-helper-text__button"
+          hasNoPadding
           icon={<HelpIcon />}
           variant={ButtonVariant.plain}
         />

@@ -40,6 +40,7 @@ const CPUComponentInput: FC<CPUComponentInputProps> = ({
           onMinus={() => setCPU(getUpdatedCPU(cpu, +cpu?.[cpuComponent] - 1, cpuComponent))}
           onPlus={() => setCPU(getUpdatedCPU(cpu, +cpu?.[cpuComponent] + 1, cpuComponent))}
           value={cpu?.[cpuComponent]}
+          widthChars={1}
         />
       </GridItem>
     </>
