@@ -9,7 +9,7 @@ import { exposedModules as VirtualMachinesExposedModules } from './src/views/vir
 
 const metadata: ConsolePluginBuildMetadata = {
   dependencies: {
-    '@console/pluginAPI': '~4.19.0',
+    '@console/pluginAPI': '>=4.17.0-0',
   },
   displayName: 'Kubevirt Plugin',
   exposedModules: {
