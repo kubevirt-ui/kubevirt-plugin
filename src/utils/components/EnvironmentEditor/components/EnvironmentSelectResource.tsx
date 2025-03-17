@@ -79,6 +79,7 @@ const EnvironmentSelectResource: FC<EnvironmentSelectResourceProps> = ({
     isDisabled: environmentNamesSelected?.includes(optionName),
     key: optionName,
     value: getEnvironmentOptionValue(optionName, optionKind),
+    valueForFilter: optionName,
   });
 
   return (

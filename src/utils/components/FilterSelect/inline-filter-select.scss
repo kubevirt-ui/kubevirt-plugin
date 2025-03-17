@@ -1,0 +1,15 @@
+#select-inline-filter {
+  .pf-v6-c-menu__search {
+    padding-block: var(--pf-t--global--spacer--md);
+  }
+
+  .pf-v6-c-menu__content {
+    gap: 0;
+  }
+}
+
+#select-inline-filter-listbox {
+  .pf-v6-c-divider {
+    margin-block: var(--pf-t--global--spacer--sm);
+  }
+}
