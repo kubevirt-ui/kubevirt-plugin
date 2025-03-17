@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { SelectGroup, SelectOption } from '@patternfly/react-core';
+import { Divider, SelectGroup, SelectOption } from '@patternfly/react-core';
 
 import { NO_RESULTS } from '../utils/constants';
 import { EnhancedSelectOptionProps } from '../utils/types';
@@ -31,18 +31,22 @@ const InlineFilterSelectOptions: FC<InlineFilterSelectOptionsProps> = ({
   }
 
   if (groupedOptions) {
+    const lastGroupIndex = Object.keys(groupedOptions).length - 1;
     return (
       <>
-        {Object.entries(groupedOptions).map(([group, opts]) => (
-          <SelectGroup key={group} label={group}>
-            {opts.map((option, index) => (
-              <InlineFilterSelectOption
-                isFocused={focusedItemIndex === index}
-                key={option.value}
-                option={option}
-              />
-            ))}
-          </SelectGroup>
+        {Object.entries(groupedOptions).map(([group, opts], groupIndex) => (
+          <>
+            <SelectGroup key={group} label={group}>
+              {opts.map((option, index) => (
+                <InlineFilterSelectOption
+                  isFocused={focusedItemIndex === index}
+                  key={option.value}
+                  option={option}
+                />
+              ))}
+            </SelectGroup>
+            {groupIndex !== lastGroupIndex && <Divider />}
+          </>
         ))}
       </>
     );

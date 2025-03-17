@@ -21,6 +21,8 @@ import { NO_RESULTS } from './utils/constants';
 import { EnhancedSelectOptionProps } from './utils/types';
 import { getGroupedOptions } from './utils/utils';
 
+import './inline-filter-select.scss';
+
 type InlineFilterSelectProps = {
   className?: string;
   menuFooter?: ReactNode;
@@ -67,7 +69,9 @@ const InlineFilterSelect: FC<InlineFilterSelectProps> = ({
 
   const filterOptions = useMemo(
     () =>
-      options.filter((option) => option.value.toLowerCase().includes(filterValue.toLowerCase())),
+      options.filter((option) =>
+        (option.valueForFilter ?? option.value).toLowerCase().includes(filterValue.toLowerCase()),
+      ),
     [options, filterValue],
   );
 
