@@ -1500,6 +1500,11 @@
   resolved "https://registry.yarnpkg.com/@spice-project/spice-html5/-/spice-html5-0.2.1.tgz#9452fc7435a8b1c67937d86ea3b6d6d7e0616725"
   integrity sha512-NY86i+x/0ldKK89enXghsXCzWwfb5DQ91hQFu9hbyLcAfCVn+ZKoYsw7xUWX6/HQBRrdu/4F1id7SdOwNqpG9g==
 
+"@stolostron/multicluster-sdk@^0.1.0-alpha.5":
+  version "0.1.0-alpha.5"
+  resolved "https://registry.yarnpkg.com/@stolostron/multicluster-sdk/-/multicluster-sdk-0.1.0-alpha.5.tgz#6e47fdd3cdbd08b036385aede2d7dde57401b72e"
+  integrity sha512-4p6bn6CsIy6Ky+QSr9jJ8xjlp3pu5RcfpwUGllyg5yVEzPD6LsMx6vtQ+fToZF+wrM3Ii2Sp+GjTaf0v/pGgvw==
+
 "@testing-library/dom@^8.0.0":
   version "8.17.1"
   resolved "https://registry.yarnpkg.com/@testing-library/dom/-/dom-8.17.1.tgz#2d7af4ff6dad8d837630fecd08835aee08320ad7"
