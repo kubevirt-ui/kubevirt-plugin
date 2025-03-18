@@ -6,7 +6,7 @@ import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import AffinityEditModal from '@kubevirt-utils/components/AffinityModal/components/AffinityEditModal/AffinityEditModal';
 import AffinityEmptyState from '@kubevirt-utils/components/AffinityModal/components/AffinityEmptyState';
 import AffinityList from '@kubevirt-utils/components/AffinityModal/components/AffinityList/AffinityList';
-import { useRequiredAndPrefferedQualifiedNodes } from '@kubevirt-utils/components/AffinityModal/hooks/useRequiredAndPrefferedQualifiedNodes';
+import { useRequiredAndPreferredQualifiedNodes } from '@kubevirt-utils/components/AffinityModal/hooks/useRequiredAndPreferredQualifiedNodes';
 import { defaultNewAffinity } from '@kubevirt-utils/components/AffinityModal/utils/constants';
 import {
   getAffinityFromRowsData,
@@ -47,7 +47,7 @@ const AffinityRulesModal: React.FC<AffinityModalProps> = ({
     groupVersionKind: modelToGroupVersionKind(NodeModel),
     isList: true,
   });
-  const [qualifiedRequiredNodes, qualifiedPreferredNodes] = useRequiredAndPrefferedQualifiedNodes(
+  const [qualifiedRequiredNodes, qualifiedPreferredNodes] = useRequiredAndPreferredQualifiedNodes(
     nodes,
     nodesLoaded,
     affinities,
@@ -114,7 +114,7 @@ const AffinityRulesModal: React.FC<AffinityModalProps> = ({
       onAffinityClickAdd={onAffinityClickAdd}
       onDelete={onAffinityDelete}
       onEdit={onAffinityClickEdit}
-      prefferedQualifiedNodes={qualifiedPreferredNodes}
+      preferredQualifiedNodes={qualifiedPreferredNodes}
       qualifiedNodes={qualifiedRequiredNodes}
     />
   );

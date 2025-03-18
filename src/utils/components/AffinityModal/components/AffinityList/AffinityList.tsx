@@ -18,7 +18,7 @@ type AffinityListProps = {
   onAffinityClickAdd: () => void;
   onDelete: (affinity: AffinityRowData) => void;
   onEdit: (affinity: AffinityRowData) => void;
-  prefferedQualifiedNodes: IoK8sApiCoreV1Node[];
+  preferredQualifiedNodes: IoK8sApiCoreV1Node[];
   qualifiedNodes: IoK8sApiCoreV1Node[];
 };
 
@@ -28,7 +28,7 @@ const AffinityList: React.FC<AffinityListProps> = ({
   onAffinityClickAdd,
   onDelete,
   onEdit,
-  prefferedQualifiedNodes,
+  preferredQualifiedNodes,
   qualifiedNodes,
 }) => {
   const columns = useAffinityColumns();
@@ -55,7 +55,7 @@ const AffinityList: React.FC<AffinityListProps> = ({
         {affinities?.some((affinity) => affinity?.type === AffinityType.node) && nodesLoaded && (
           <NodeCheckerAlert
             nodesLoaded={nodesLoaded}
-            prefferedQualifiedNodes={prefferedQualifiedNodes}
+            preferredQualifiedNodes={preferredQualifiedNodes}
             qualifiedNodes={qualifiedNodes}
           />
         )}

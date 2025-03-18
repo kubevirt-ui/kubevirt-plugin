@@ -19,7 +19,7 @@ import ExpressionEditList from './components/ExpressionEditList';
 import FieldsEditList from './components/FieldsEditList';
 import NodeExpressionDescriptionText from './components/NodeExpressionDescriptionText';
 import NodeFieldsDescriptionText from './components/NodeFieldsDescriptionText';
-import PrefferedAffinityWeightInput from './components/PrefferedAffinityWeightInput';
+import PreferredAffinityWeightInput from './components/PreferredAffinityWeightInput';
 import TopologyKeyInput from './components/TopologyKeyInput';
 import WorkloadExpressionDescriptionText from './components/WorkloadExpressionDescriptionText';
 
@@ -81,7 +81,7 @@ const AffinityForm: React.FC<AffinityFormProps> = ({
         setFocusedAffinity={setFocusedAffinity}
       />
       {focusedAffinity?.condition === AffinityCondition.preferred && (
-        <PrefferedAffinityWeightInput
+        <PreferredAffinityWeightInput
           focusedAffinity={focusedAffinity}
           setFocusedAffinity={setFocusedAffinity}
           setSubmitDisabled={setSubmitDisabled}

@@ -13,7 +13,7 @@ import { ModalVariant } from '@patternfly/react-core/deprecated';
 import AffinityEditModal from './components/AffinityEditModal/AffinityEditModal';
 import AffinityEmptyState from './components/AffinityEmptyState';
 import AffinityList from './components/AffinityList/AffinityList';
-import { useRequiredAndPrefferedQualifiedNodes } from './hooks/useRequiredAndPrefferedQualifiedNodes';
+import { useRequiredAndPreferredQualifiedNodes } from './hooks/useRequiredAndPreferredQualifiedNodes';
 import { defaultNewAffinity } from './utils/constants';
 import {
   getAffinityFromRowsData,
@@ -49,7 +49,7 @@ const AffinityModal: React.FC<AffinityModalProps> = ({
   const [isEditing, setIsEditing] = React.useState(false);
   const [isCreating, setIsCreating] = React.useState(false);
 
-  const [qualifiedRequiredNodes, qualifiedPreferredNodes] = useRequiredAndPrefferedQualifiedNodes(
+  const [qualifiedRequiredNodes, qualifiedPreferredNodes] = useRequiredAndPreferredQualifiedNodes(
     nodes,
     nodesLoaded,
     affinities,
@@ -116,7 +116,7 @@ const AffinityModal: React.FC<AffinityModalProps> = ({
       onAffinityClickAdd={onAffinityClickAdd}
       onDelete={onAffinityDelete}
       onEdit={onAffinityClickEdit}
-      prefferedQualifiedNodes={qualifiedPreferredNodes}
+      preferredQualifiedNodes={qualifiedPreferredNodes}
       qualifiedNodes={qualifiedRequiredNodes}
     />
   );
