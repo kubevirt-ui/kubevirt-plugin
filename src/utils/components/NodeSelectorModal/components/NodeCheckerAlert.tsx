@@ -17,13 +17,13 @@ import {
 
 type NodeCheckerAlertProps = {
   nodesLoaded: boolean;
-  prefferedQualifiedNodes?: IoK8sApiCoreV1Node[];
+  preferredQualifiedNodes?: IoK8sApiCoreV1Node[];
   qualifiedNodes: IoK8sApiCoreV1Node[];
 };
 
 const NodeCheckerAlert: React.FC<NodeCheckerAlertProps> = ({
   nodesLoaded,
-  prefferedQualifiedNodes,
+  preferredQualifiedNodes,
   qualifiedNodes,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -32,38 +32,38 @@ const NodeCheckerAlert: React.FC<NodeCheckerAlertProps> = ({
   }
 
   const qualifiedNodesSize = qualifiedNodes?.length || 0;
-  const prefferedQualifiedNodesSize = prefferedQualifiedNodes?.length ?? 0;
+  const preferredQualifiedNodesSize = preferredQualifiedNodes?.length ?? 0;
 
-  const prefferedQualifiedNodesNames = prefferedQualifiedNodes?.map((node) => node?.metadata?.name);
+  const preferredQualifiedNodesNames = preferredQualifiedNodes?.map((node) => node?.metadata?.name);
 
   const matchingNodeText = pluralize(
-    qualifiedNodesSize ? qualifiedNodesSize : prefferedQualifiedNodesSize,
+    qualifiedNodesSize ? qualifiedNodesSize : preferredQualifiedNodesSize,
     'Node',
   );
 
   let nodes = [];
   if (qualifiedNodesSize) {
     nodes = qualifiedNodes;
-  } else if (prefferedQualifiedNodesSize) {
-    nodes = prefferedQualifiedNodes;
+  } else if (preferredQualifiedNodesSize) {
+    nodes = preferredQualifiedNodes;
   }
 
   return (
     <Alert
       title={
         <>
-          {!!qualifiedNodesSize || !!prefferedQualifiedNodesSize ? (
+          {!!qualifiedNodesSize || !!preferredQualifiedNodesSize ? (
             <>
               {t('{{matchingNodeText}} matching', {
                 matchingNodeText,
               })}
               {!!qualifiedNodesSize &&
-                !!prefferedQualifiedNodesSize &&
-                t(', {{prefferedQualifiedNodesSize}} matching preferred Nodes found', {
-                  prefferedQualifiedNodesSize:
-                    qualifiedNodesSize < prefferedQualifiedNodesSize
+                !!preferredQualifiedNodesSize &&
+                t(', {{preferredQualifiedNodesSize}} matching preferred Nodes found', {
+                  preferredQualifiedNodesSize:
+                    qualifiedNodesSize < preferredQualifiedNodesSize
                       ? qualifiedNodesSize
-                      : prefferedQualifiedNodesSize,
+                      : preferredQualifiedNodesSize,
                 })}
             </>
           ) : (
@@ -72,18 +72,18 @@ const NodeCheckerAlert: React.FC<NodeCheckerAlertProps> = ({
         </>
       }
       variant={
-        qualifiedNodesSize || prefferedQualifiedNodesSize
+        qualifiedNodesSize || preferredQualifiedNodesSize
           ? AlertVariant.success
           : AlertVariant.warning
       }
       isInline
     >
-      {qualifiedNodesSize || prefferedQualifiedNodesSize ? (
+      {qualifiedNodesSize || preferredQualifiedNodesSize ? (
         <Popover
           bodyContent={
             <>
               {nodes?.map((node) => {
-                const isPreffered = prefferedQualifiedNodesNames?.includes(node.metadata.name);
+                const isPreferred = preferredQualifiedNodesNames?.includes(node.metadata.name);
                 return (
                   <Flex key={node.metadata.uid}>
                     <FlexItem spacer={{ default: 'spacerXs' }}>
@@ -92,9 +92,9 @@ const NodeCheckerAlert: React.FC<NodeCheckerAlertProps> = ({
                         name={node.metadata.name}
                       />
                     </FlexItem>
-                    {isPreffered && (
+                    {isPreferred && (
                       <FlexItem spacer={{ default: 'spacerXs' }}>
-                        <GreenCheckCircleIcon /> {t('Preffered')}
+                        <GreenCheckCircleIcon /> {t('Preferred')}
                       </FlexItem>
                     )}
                   </Flex>
@@ -105,7 +105,7 @@ const NodeCheckerAlert: React.FC<NodeCheckerAlertProps> = ({
           headerContent={
             <>
               {t('{{qualifiedNodesCount}} matching Nodes found', {
-                qualifiedNodesCount: qualifiedNodesSize || prefferedQualifiedNodesSize,
+                qualifiedNodesCount: qualifiedNodesSize || preferredQualifiedNodesSize,
               })}
             </>
           }

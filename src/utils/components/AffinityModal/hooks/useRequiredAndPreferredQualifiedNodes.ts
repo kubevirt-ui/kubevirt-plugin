@@ -7,13 +7,13 @@ import { AffinityCondition, AffinityRowData, AffinityType } from '../utils/types
 
 import { useAffinitiesQualifiedNodes } from './useAffinitiesQualifiedNodes';
 
-type UseRequiredAndPrefferedQualifiedNodes = (
+type UseRequiredAndPreferredQualifiedNodes = (
   nodes: IoK8sApiCoreV1Node[],
   nodesLoaded: boolean,
   affinities: AffinityRowData[],
 ) => [IoK8sApiCoreV1Node[], IoK8sApiCoreV1Node[]];
 
-export const useRequiredAndPrefferedQualifiedNodes: UseRequiredAndPrefferedQualifiedNodes = (
+export const useRequiredAndPreferredQualifiedNodes: UseRequiredAndPreferredQualifiedNodes = (
   nodes,
   nodesLoaded,
   affinities,

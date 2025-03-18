@@ -155,7 +155,7 @@ export const getAffinityFromRowsData = (affinityRows: AffinityRowData[]) => {
     getRequiredNodeTermFromRowData,
   );
 
-  const nodeSelectorTermsPreffered = pickRows(
+  const nodeSelectorTermsPreferred = pickRows(
     AffinityType.node,
     AffinityCondition.preferred,
     getPreferredNodeTermFromRowData,
@@ -167,7 +167,7 @@ export const getAffinityFromRowsData = (affinityRows: AffinityRowData[]) => {
     getRequiredPodTermFromRowData,
   );
 
-  const podAffinityTermsPreffered = pickRows(
+  const podAffinityTermsPreferred = pickRows(
     AffinityType.pod,
     AffinityCondition.preferred,
     getPreferredPodTermFromRowData,
@@ -179,7 +179,7 @@ export const getAffinityFromRowsData = (affinityRows: AffinityRowData[]) => {
     getRequiredPodTermFromRowData,
   );
 
-  const antiPodAffinityTermsPreffered = pickRows(
+  const antiPodAffinityTermsPreferred = pickRows(
     AffinityType.podAnti,
     AffinityCondition.preferred,
     getPreferredPodTermFromRowData,
@@ -193,9 +193,9 @@ export const getAffinityFromRowsData = (affinityRows: AffinityRowData[]) => {
     };
   }
 
-  if (!isEmpty(nodeSelectorTermsPreffered)) {
+  if (!isEmpty(nodeSelectorTermsPreferred)) {
     affinity.nodeAffinity = {
-      preferredDuringSchedulingIgnoredDuringExecution: nodeSelectorTermsPreffered,
+      preferredDuringSchedulingIgnoredDuringExecution: nodeSelectorTermsPreferred,
     };
   }
 
@@ -205,9 +205,9 @@ export const getAffinityFromRowsData = (affinityRows: AffinityRowData[]) => {
     };
   }
 
-  if (!isEmpty(podAffinityTermsPreffered)) {
+  if (!isEmpty(podAffinityTermsPreferred)) {
     affinity.podAffinity = {
-      preferredDuringSchedulingIgnoredDuringExecution: podAffinityTermsPreffered,
+      preferredDuringSchedulingIgnoredDuringExecution: podAffinityTermsPreferred,
     };
   }
 
@@ -217,9 +217,9 @@ export const getAffinityFromRowsData = (affinityRows: AffinityRowData[]) => {
     };
   }
 
-  if (!isEmpty(antiPodAffinityTermsPreffered)) {
+  if (!isEmpty(antiPodAffinityTermsPreferred)) {
     affinity.podAntiAffinity = {
-      preferredDuringSchedulingIgnoredDuringExecution: antiPodAffinityTermsPreffered,
+      preferredDuringSchedulingIgnoredDuringExecution: antiPodAffinityTermsPreferred,
     };
   }
 

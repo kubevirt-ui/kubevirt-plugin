@@ -6,13 +6,13 @@ import { FormGroup, TextInput, ValidatedOptions } from '@patternfly/react-core';
 
 import { AffinityRowData } from '../../../../utils/types';
 
-type PrefferedAffinityWeightInputProps = {
+type PreferredAffinityWeightInputProps = {
   focusedAffinity: AffinityRowData;
   setFocusedAffinity: Dispatch<SetStateAction<AffinityRowData>>;
   setSubmitDisabled: Dispatch<SetStateAction<boolean>>;
 };
 
-const PrefferedAffinityWeightInput: FC<PrefferedAffinityWeightInputProps> = ({
+const PreferredAffinityWeightInput: FC<PreferredAffinityWeightInputProps> = ({
   focusedAffinity,
   setFocusedAffinity,
   setSubmitDisabled,
@@ -50,4 +50,4 @@ const PrefferedAffinityWeightInput: FC<PrefferedAffinityWeightInputProps> = ({
   );
 };
 
-export default PrefferedAffinityWeightInput;
+export default PreferredAffinityWeightInput;
