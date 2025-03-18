@@ -2,7 +2,7 @@ import React from 'react';
 
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Button, StackItem } from '@patternfly/react-core';
+import { Button, ButtonVariant, StackItem } from '@patternfly/react-core';
 import { ExternalLinkSquareAltIcon } from '@patternfly/react-icons';
 
 const DynamicSSHKeyInjectionDescription = ({ isDynamicSSHInjectionEnabled }) => {
@@ -22,7 +22,7 @@ const DynamicSSHKeyInjectionDescription = ({ isDynamicSSHInjectionEnabled }) => 
         rel="noopener noreferrer"
         size="sm"
         target="_blank"
-        variant="link"
+        variant={ButtonVariant.link}
       >
         {t('Learn more')}
       </Button>

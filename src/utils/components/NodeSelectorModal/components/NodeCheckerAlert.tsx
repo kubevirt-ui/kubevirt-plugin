@@ -9,6 +9,7 @@ import {
   Alert,
   AlertVariant,
   Button,
+  ButtonVariant,
   Flex,
   FlexItem,
   pluralize,
@@ -110,7 +111,7 @@ const NodeCheckerAlert: React.FC<NodeCheckerAlertProps> = ({
             </>
           }
         >
-          <Button isInline variant="link">
+          <Button isInline variant={ButtonVariant.link}>
             {t('View matching {{matchingNodeText}}', {
               matchingNodeText,
             })}

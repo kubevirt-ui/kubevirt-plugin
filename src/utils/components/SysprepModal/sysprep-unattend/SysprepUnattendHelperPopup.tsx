@@ -3,7 +3,7 @@ import { Trans } from 'react-i18next';
 
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Button, Content, ContentVariants, Popover } from '@patternfly/react-core';
+import { Button, ButtonVariant, Content, ContentVariants, Popover } from '@patternfly/react-core';
 import { ExternalLinkSquareAltIcon, OutlinedQuestionCircleIcon } from '@patternfly/react-icons';
 
 const SysprepUnattendHelperPopup: FC = () => {
@@ -23,7 +23,7 @@ const SysprepUnattendHelperPopup: FC = () => {
               iconPosition="right"
               isInline
               size="sm"
-              variant="link"
+              variant={ButtonVariant.link}
             >
               <a href={documentationURL.SYSPREP} rel="noopener noreferrer" target="_blank">
                 {t('Learn more')}
@@ -41,7 +41,7 @@ const SysprepUnattendHelperPopup: FC = () => {
         data-test-id="ssh-popover-button"
         icon={<OutlinedQuestionCircleIcon className="co-field-level-help__icon" />}
         isInline
-        variant="link"
+        variant={ButtonVariant.link}
       />
     </Popover>
   );

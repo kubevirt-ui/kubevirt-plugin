@@ -73,7 +73,7 @@ const CDIInitErrorStatus: FC<CDIInitErrorStatus> = ({ namespace, onErrorClick, p
           </StackItem>
         </Stack>
       </EmptyStateBody>
-      <Button id="cdi-upload-error-btn" onClick={onClick} variant="primary">
+      <Button id="cdi-upload-error-btn" onClick={onClick}>
         {shouldKillDv ? t('Back to form (Deletes DataVolume)') : t('Back to form')}
       </Button>
       {podLoaded && !podError && pod && (

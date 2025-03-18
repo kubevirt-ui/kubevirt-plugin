@@ -5,8 +5,14 @@ import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Alert, AlertVariant, Checkbox, Stack, StackItem } from '@patternfly/react-core';
-import { ModalVariant } from '@patternfly/react-core/deprecated';
+import {
+  Alert,
+  AlertVariant,
+  Checkbox,
+  ModalVariant,
+  Stack,
+  StackItem,
+} from '@patternfly/react-core';
 
 import { createRDPService } from '../utils/utils';
 

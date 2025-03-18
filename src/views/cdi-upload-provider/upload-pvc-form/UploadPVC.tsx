@@ -30,7 +30,7 @@ import {
   useK8sWatchResource,
   WatchK8sResource,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { ActionGroup, Alert, Button, ButtonVariant } from '@patternfly/react-core';
+import { ActionGroup, Alert, AlertVariant, Button, ButtonVariant } from '@patternfly/react-core';
 
 import useBaseImages from '../hooks/useBaseImages';
 import useMultipleAccessReviews from '../hooks/useMultipleAccessReviews';
@@ -217,7 +217,7 @@ const UploadPVCPage: FC = () => {
             uploadProxyURL={uploadProxyURL}
           >
             {isFileRejected && (
-              <Alert isInline title={t('File type extension')} variant="warning">
+              <Alert isInline title={t('File type extension')} variant={AlertVariant.warning}>
                 <p>
                   {t(
                     'Based on the file extension it seems like you are trying to upload a file which is not supported ({{fileNameExtText}}).',
@@ -237,11 +237,10 @@ const UploadPVCPage: FC = () => {
                 id="save-changes"
                 isDisabled={disableFormSubmit || isCheckingCertificate}
                 type="submit"
-                variant={ButtonVariant.primary}
               >
                 {t('Upload')}
               </Button>
-              <Button onClick={() => navigate(-1)} type="button" variant="secondary">
+              <Button onClick={() => navigate(-1)} type="button" variant={ButtonVariant.secondary}>
                 {t('Cancel')}
               </Button>
             </ActionGroup>

@@ -5,7 +5,7 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { Button, Form } from '@patternfly/react-core';
+import { Button, ButtonVariant, Form } from '@patternfly/react-core';
 import { PlusCircleIcon } from '@patternfly/react-icons';
 
 import EnvironmentEditor from './components/EnvironmentEditor';
@@ -87,7 +87,7 @@ const EnvironmentForm: FC<EnvironmentFormProps> = ({ onEditChange, updateVM, vm 
               icon={<PlusCircleIcon />}
               onClick={onEnvironmentAdd}
               type="button"
-              variant="link"
+              variant={ButtonVariant.link}
             >
               {t('Add Config Map, Secret or Service Account')}
             </Button>

@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Button } from '@patternfly/react-core';
+import { Button, ButtonVariant } from '@patternfly/react-core';
 import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 
 import './VirtualMachineTemplateSupport.scss';
@@ -20,7 +20,7 @@ const VirtualMachineTemplateSupport: FC = () => {
         icon={<ExternalLinkAltIcon />}
         iconPosition="right"
         target="_blank"
-        variant="link"
+        variant={ButtonVariant.link}
       >
         {t('Learn more about Red Hat support')}
       </Button>

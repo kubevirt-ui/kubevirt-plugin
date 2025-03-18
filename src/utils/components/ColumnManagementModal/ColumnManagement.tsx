@@ -3,7 +3,7 @@ import React, { FC } from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ColumnLayout } from '@openshift-console/dynamic-plugin-sdk';
-import { Button, ToolbarGroup, ToolbarItem, Tooltip } from '@patternfly/react-core';
+import { Button, ButtonVariant, ToolbarGroup, ToolbarItem, Tooltip } from '@patternfly/react-core';
 import { ColumnsIcon } from '@patternfly/react-icons';
 
 import { ColumnManagementModal } from '../ColumnManagementModal/ColumnManagementModal';
@@ -35,7 +35,7 @@ const ColumnManagement: FC<ColumnManagementProps> = ({ columnLayout, hideColumnM
             aria-label={t('Column management')}
             data-test="manage-columns"
             icon={<ColumnsIcon />}
-            variant="plain"
+            variant={ButtonVariant.plain}
           />
         </Tooltip>
       </ToolbarItem>

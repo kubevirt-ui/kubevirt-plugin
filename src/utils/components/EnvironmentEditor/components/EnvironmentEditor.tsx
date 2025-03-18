@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Button, TextInput, Tooltip } from '@patternfly/react-core';
+import { Button, ButtonVariant, TextInput, Tooltip } from '@patternfly/react-core';
 import { MinusCircleIcon } from '@patternfly/react-icons';
 
 import { EnvironmentKind } from '../constants';
@@ -64,8 +64,7 @@ const EnvironmentEditor: FC<EnvironmentEditorProps> = ({
             className="pairs-list__span-btns"
             data-test-id="pairs-list__delete-from-btn"
             onClick={() => onRemove(diskName)}
-            type="button"
-            variant="plain"
+            variant={ButtonVariant.plain}
           >
             <MinusCircleIcon className="pairs-list__side-btn pairs-list__delete-icon" />
             <span className="sr-only">{t('Delete')}</span>

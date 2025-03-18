@@ -5,13 +5,14 @@ import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/u
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Tab, Tabs } from '@patternfly/react-core';
-import { Modal, ModalVariant } from '@patternfly/react-core/deprecated';
+import { Modal, ModalBody, ModalHeader, ModalVariant, Tab, Tabs } from '@patternfly/react-core';
 
 import YamlAndCLIEditor from '../YamlAndCLIEditor/YamlAndCLIEditor';
 
 import { TAB } from './utils/constants';
 import { getCreateVMVirtctlCommand } from './utils/utils';
+
+import './YamlAndCLIViewerModal.scss';
 
 type YamlAndCLIViewerModalProps = {
   isOpen: boolean;
@@ -32,29 +33,27 @@ const YamlAndCLIViewerModal: FC<YamlAndCLIViewerModalProps> = ({ isOpen, onClose
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={`${activeTabKey} for ${vmName}`}
-      variant={ModalVariant.large}
-    >
-      <Suspense fallback={<Loading />}>
-        <Tabs activeKey={activeTabKey} onSelect={handleTabClick}>
-          <Tab eventKey={TAB.YAML} title={t('YAML')}>
-            <YamlAndCLIEditor code={dump(vm || '')} minHeight={350} />
-          </Tab>
-          <Tab eventKey={TAB.CLI} title={t('CLI')}>
-            <YamlAndCLIEditor
-              code={getCreateVMVirtctlCommand(
-                vm,
-                selectedBootableVolume,
-                sshSecretCredentials?.sshPubKey,
-              )}
-              minHeight={150}
-            />
-          </Tab>
-        </Tabs>
-      </Suspense>
+    <Modal isOpen={isOpen} onClose={onClose} variant={ModalVariant.large}>
+      <ModalHeader title={`${activeTabKey} for ${vmName}`} />
+      <ModalBody className="yaml-cli-viewer-modal-body">
+        <Suspense fallback={<Loading />}>
+          <Tabs activeKey={activeTabKey} onSelect={handleTabClick}>
+            <Tab eventKey={TAB.YAML} title={t('YAML')}>
+              <YamlAndCLIEditor code={dump(vm || '')} minHeight={350} />
+            </Tab>
+            <Tab eventKey={TAB.CLI} title={t('CLI')}>
+              <YamlAndCLIEditor
+                code={getCreateVMVirtctlCommand(
+                  vm,
+                  selectedBootableVolume,
+                  sshSecretCredentials?.sshPubKey,
+                )}
+                minHeight={150}
+              />
+            </Tab>
+          </Tabs>
+        </Suspense>
+      </ModalBody>
     </Modal>
   );
 };

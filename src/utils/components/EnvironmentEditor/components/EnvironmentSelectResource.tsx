@@ -4,7 +4,7 @@ import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFi
 import { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Alert } from '@patternfly/react-core';
+import { Alert, AlertVariant } from '@patternfly/react-core';
 
 import { EnvironmentKind, MapKindToAbbr } from '../constants';
 import useEnvironmentsResources from '../hooks/useEnvironmentsResources';
@@ -51,7 +51,7 @@ const EnvironmentSelectResource: FC<EnvironmentSelectResourceProps> = ({
         className="co-alert co-alert--scrollable"
         isInline
         title={t('An error occurred')}
-        variant="danger"
+        variant={AlertVariant.danger}
       >
         <div className="co-pre-line">{loadError?.message}</div>
       </Alert>

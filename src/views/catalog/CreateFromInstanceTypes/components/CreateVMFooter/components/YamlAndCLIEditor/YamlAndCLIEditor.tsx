@@ -3,7 +3,7 @@ import { saveAs } from 'file-saver';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { YAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
-import { Button, Tooltip } from '@patternfly/react-core';
+import { Button, ButtonVariant, Tooltip } from '@patternfly/react-core';
 import { CopyIcon, DownloadIcon } from '@patternfly/react-icons';
 
 type YamlAndCLIEditorProps = {
@@ -30,13 +30,17 @@ const YamlAndCLIEditor: FC<YamlAndCLIEditorProps> = ({ code, minHeight }) => {
     <YAMLEditor
       toolbarLinks={[
         <Tooltip content={t('Download')} key="download">
-          <Button icon={<DownloadIcon />} onClick={handleDownload} variant="secondary" />
+          <Button
+            icon={<DownloadIcon />}
+            onClick={handleDownload}
+            variant={ButtonVariant.secondary}
+          />
         </Tooltip>,
         <Tooltip
           content={copySuccess ? t('Successfully copied to clipboard!') : t('Copy to clipboard')}
           key="copy"
         >
-          <Button icon={<CopyIcon />} onClick={handleCopy} variant="secondary" />
+          <Button icon={<CopyIcon />} onClick={handleCopy} variant={ButtonVariant.secondary} />
         </Tooltip>,
       ]}
       minHeight={minHeight}

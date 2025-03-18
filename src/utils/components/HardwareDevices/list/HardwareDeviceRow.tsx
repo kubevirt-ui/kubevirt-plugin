@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { V1GPU, V1HostDevice } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
-import { Button } from '@patternfly/react-core';
+import { Button, ButtonVariant } from '@patternfly/react-core';
 import { MinusCircleIcon } from '@patternfly/react-icons';
 
 export type HardwareDeviceRowProps = {
@@ -24,7 +24,7 @@ const HardwareDeviceRow: React.FC<
         <Button
           icon={<MinusCircleIcon />}
           onClick={() => handleRemoveDevice(device)}
-          variant="plain"
+          variant={ButtonVariant.plain}
         />
       </TableData>
     </>

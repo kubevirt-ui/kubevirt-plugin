@@ -17,6 +17,7 @@ import {
   Alert,
   AlertVariant,
   Button,
+  ButtonVariant,
   Checkbox,
   Form,
   FormGroup,
@@ -135,7 +136,7 @@ const DedicatedResourcesModal: FC<DedicatedResourcesModalProps> = ({
                     qualifiedNodesCount: qualifiedNodes?.length,
                   })}
                 >
-                  <Button isInline onClick={() => setChecked(false)} variant="link">
+                  <Button isInline onClick={() => setChecked(false)} variant={ButtonVariant.link}>
                     {t('view {{qualifiedNodesCount}} matching nodes', {
                       qualifiedNodesCount: qualifiedNodes?.length,
                     })}

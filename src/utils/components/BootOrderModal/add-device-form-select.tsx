@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
 import { BootableDeviceType } from '@kubevirt-utils/resources/vm/utils/boot-order/bootOrder';
-import { Button, FormSelect, FormSelectOption } from '@patternfly/react-core';
+import { Button, ButtonVariant, FormSelect, FormSelectOption } from '@patternfly/react-core';
 import { MinusCircleIcon } from '@patternfly/react-icons';
 
 export const AddDeviceFormSelect: FC<AddDeviceFormSelectProps> = ({
@@ -31,7 +31,7 @@ export const AddDeviceFormSelect: FC<AddDeviceFormSelectProps> = ({
       className="kubevirt-boot-order__add-device-delete-btn"
       icon={<MinusCircleIcon />}
       onClick={onDelete}
-      variant="link"
+      variant={ButtonVariant.link}
     />
   </>
 );

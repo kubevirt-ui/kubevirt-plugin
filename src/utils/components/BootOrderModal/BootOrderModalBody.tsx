@@ -7,6 +7,7 @@ import {
 } from '@kubevirt-utils/resources/vm/utils/boot-order/bootOrder';
 import {
   Button,
+  ButtonVariant,
   DataList,
   DataListCell,
   DataListControl,
@@ -120,7 +121,7 @@ export const BootOrderModalBody: React.FC<{
                                       icon={<MinusCircleIcon />}
                                       id={`${value.name}-delete-btn`}
                                       onClick={() => onDelete(value.name)}
-                                      variant="link"
+                                      variant={ButtonVariant.link}
                                     />
                                   )}
                                 </SplitItem>

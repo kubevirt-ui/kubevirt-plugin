@@ -1,7 +1,7 @@
 import React, { FC, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Button, ExpandableSection, Stack, StackItem } from '@patternfly/react-core';
+import { Button, ButtonVariant, ExpandableSection, Stack, StackItem } from '@patternfly/react-core';
 
 const TemplateExpandableDescription: FC<{ description: string }> = ({ description }) => {
   const { t } = useKubevirtTranslation();
@@ -16,7 +16,7 @@ const TemplateExpandableDescription: FC<{ description: string }> = ({ descriptio
       </StackItem>
       {description.length > 120 && (
         <StackItem>
-          <Button isInline onClick={() => setIsExpanded(!isExpanded)} variant="link">
+          <Button isInline onClick={() => setIsExpanded(!isExpanded)} variant={ButtonVariant.link}>
             {isExpanded ? t('Collapse') : t('Read more')}
           </Button>
         </StackItem>

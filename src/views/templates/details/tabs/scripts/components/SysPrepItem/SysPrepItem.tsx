@@ -19,7 +19,7 @@ import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/templ
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
-import { Button, Flex, FlexItem, Title } from '@patternfly/react-core';
+import { Button, ButtonVariant, Flex, FlexItem, Title } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
 
 import useEditTemplateAccessReview from '../../../../hooks/useIsTemplateEditable';
@@ -111,7 +111,7 @@ const SysPrepItem: FC<SysPrepItemProps> = ({ template }) => {
               isDisabled={!isTemplateEditable}
               isInline
               type="button"
-              variant="link"
+              variant={ButtonVariant.link}
             >
               {t('Edit')}
             </Button>

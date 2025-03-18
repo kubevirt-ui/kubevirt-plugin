@@ -3,7 +3,7 @@ import React, { FC, useEffect, useState } from 'react';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
-import { Button, Grid } from '@patternfly/react-core';
+import { Button, ButtonVariant, Grid } from '@patternfly/react-core';
 import { PlusCircleIcon } from '@patternfly/react-icons';
 
 import { AnnotationsModalRow } from './AnnotationsModalRow';
@@ -99,7 +99,7 @@ export const AnnotationsModal: FC<{
             icon={<PlusCircleIcon />}
             onClick={() => onAnnotationAdd()}
             size="sm"
-            variant="link"
+            variant={ButtonVariant.link}
           >
             {t('Add more')}
           </Button>

@@ -13,6 +13,7 @@ import {
   Alert,
   AlertVariant,
   Button,
+  ButtonVariant,
   Divider,
   EmptyState,
   Form,
@@ -107,16 +108,10 @@ const TemplateParametersPage: FC<TemplateParametersPageProps> = ({ obj: template
             </Alert>
           )}
           <ActionGroup className="pf-v6-c-form">
-            <Button
-              isDisabled={isSaveDisabled}
-              isLoading={loading}
-              onClick={onSave}
-              type="submit"
-              variant="primary"
-            >
+            <Button isDisabled={isSaveDisabled} isLoading={loading} onClick={onSave} type="submit">
               {t('Save')}
             </Button>
-            <Button onClick={goBack} type="button" variant="secondary">
+            <Button onClick={goBack} type="button" variant={ButtonVariant.secondary}>
               {t('Cancel')}
             </Button>
           </ActionGroup>

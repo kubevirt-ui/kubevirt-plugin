@@ -2,7 +2,7 @@ import React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isGuestAgentConnected } from '@kubevirt-utils/resources/vmi/utils/guest-agent';
-import { Alert } from '@patternfly/react-core';
+import { Alert, AlertVariant } from '@patternfly/react-core';
 
 import { DEFAULT_RDP_PORT } from '../utils/constants';
 import { MultusNetworkProps } from '../utils/types';
@@ -15,7 +15,7 @@ const MultusNetwork: React.FC<MultusNetworkProps> = ({ selectedNetwork, vmi }) =
 
   if (!guestAgent) {
     return (
-      <Alert isInline title={t('Missing guest agent')} variant="warning">
+      <Alert isInline title={t('Missing guest agent')} variant={AlertVariant.warning}>
         {t('Guest agent is not installed on VirtualMachine')}
       </Alert>
     );
@@ -23,7 +23,7 @@ const MultusNetwork: React.FC<MultusNetworkProps> = ({ selectedNetwork, vmi }) =
 
   if (!selectedNetwork || !selectedNetwork?.ip) {
     return (
-      <Alert isInline title={t('Networks misconfigured')} variant="warning">{`${t(
+      <Alert isInline title={t('Networks misconfigured')} variant={AlertVariant.warning}>{`${t(
         'No IP address is reported for network interface',
       )} ${selectedNetwork?.name || ''}`}</Alert>
     );

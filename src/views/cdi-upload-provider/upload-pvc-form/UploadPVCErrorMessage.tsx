@@ -2,7 +2,7 @@ import React from 'react';
 import { Trans } from 'react-i18next';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Alert } from '@patternfly/react-core';
+import { Alert, AlertVariant } from '@patternfly/react-core';
 
 import { uploadErrorType } from '../utils/consts';
 
@@ -37,7 +37,7 @@ const UploadPVCErrorMessage: React.FC<UploadErrorMessageProps> = ({ message, upl
       className="co-alert co-alert--scrollable"
       isInline
       title={t('An error occurred')}
-      variant="danger"
+      variant={AlertVariant.danger}
     >
       <div className="co-pre-line">{Error?.[message] || message}</div>
     </Alert>

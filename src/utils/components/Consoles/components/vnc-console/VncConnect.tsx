@@ -14,9 +14,7 @@ const VncConnect: FC<CustomConnectComponentProps> = ({ connect, isConnecting }) 
         <EmptyState>
           <EmptyStateBody>{t('Click Connect to open the VNC console.')}</EmptyStateBody>
           <EmptyStateFooter>
-            <Button onClick={connect} variant="primary">
-              {t('Connect')}
-            </Button>
+            <Button onClick={connect}>{t('Connect')}</Button>
           </EmptyStateFooter>
         </EmptyState>
       )}

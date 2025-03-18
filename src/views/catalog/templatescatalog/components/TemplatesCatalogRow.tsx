@@ -16,7 +16,7 @@ import { getVMBootSourceLabel } from '@kubevirt-utils/resources/vm/utils/source'
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
-import { Button, Label } from '@patternfly/react-core';
+import { Button, ButtonVariant, Label } from '@patternfly/react-core';
 
 import { getTemplateOSIcon } from '../utils/os-icons';
 
@@ -50,7 +50,7 @@ export const TemplatesCatalogRow: React.FC<
       <>
         <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-40" id="name">
           <img alt="" className="vm-catalog-row-icon" src={getTemplateOSIcon(obj)} />
-          <Button isInline onClick={() => onTemplateClick(obj)} variant="link">
+          <Button isInline onClick={() => onTemplateClick(obj)} variant={ButtonVariant.link}>
             {getTemplateName(obj)}{' '}
             {!isEmpty(getAnnotation(obj, ANNOTATIONS.displayName)) && (
               <Label isCompact variant="outline">

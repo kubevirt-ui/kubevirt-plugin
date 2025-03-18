@@ -11,6 +11,7 @@ import {
   Breadcrumb,
   BreadcrumbItem,
   Button,
+  ButtonVariant,
   Label,
   Split,
   SplitItem,
@@ -45,7 +46,7 @@ const TemplatePageTitle: FC<TemplatePageTitleTitleProps> = ({ template }) => {
           <Button
             isInline
             onClick={() => navigate(`/k8s/${lastNamespacePath}/templates`)}
-            variant="link"
+            variant={ButtonVariant.link}
           >
             {t('Templates')}
           </Button>

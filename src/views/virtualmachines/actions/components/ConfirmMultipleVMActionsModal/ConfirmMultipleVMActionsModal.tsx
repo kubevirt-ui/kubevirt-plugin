@@ -2,8 +2,16 @@ import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Button, ButtonVariant, Popover, PopoverPosition } from '@patternfly/react-core';
-import { Modal } from '@patternfly/react-core/deprecated';
+import {
+  Button,
+  ButtonVariant,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  Popover,
+  PopoverPosition,
+} from '@patternfly/react-core';
 import VMsByNamespacePopover from '@virtualmachines/actions/components/ConfirmMultipleVMActionsModal/components/VMsByNamespacePopover';
 import { getVMNamesByNamespace } from '@virtualmachines/actions/components/ConfirmMultipleVMActionsModal/utils/utils';
 
@@ -38,34 +46,38 @@ const ConfirmMultipleVMActionsModal: FC<ConfirmMultipleVMActionsModalProps> = ({
 
   return (
     <Modal
-      actions={[
-        <Button key="confirm" onClick={submitHandler} variant={ButtonVariant.primary}>
-          {t(actionType)}
-        </Button>,
-        <Button key="cancel" onClick={onClose} variant="link">
-          {t('Cancel')}
-        </Button>,
-      ]}
       className="confirm-multiple-vm-actions-modal"
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={() => submitHandler()}
-      title={t(`${actionType} ${numVMs} VirtualMachines?`)}
       variant={'small'}
     >
-      {t('Are you sure you want to stop ')}
-      <Popover
-        bodyContent={<VMsByNamespacePopover vmsByNamespace={vmsByNamespace} />}
-        className="confirm-multiple-vm-actions-modal__popover"
-        position={PopoverPosition.right}
-      >
-        <a>
-          {t('{{numVMs}} VirtualMachines in {{numVMNamespaces}} namespaces?', {
-            numVMNamespaces,
-            numVMs,
-          })}
-        </a>
-      </Popover>
+      <ModalHeader
+        title={t('{{actionType}} {{numVMs}} VirtualMachines?', { actionType, numVMs })}
+      />
+      <ModalBody>
+        {t('Are you sure you want to stop ')}
+        <Popover
+          bodyContent={<VMsByNamespacePopover vmsByNamespace={vmsByNamespace} />}
+          className="confirm-multiple-vm-actions-modal__popover"
+          position={PopoverPosition.right}
+        >
+          <a>
+            {t('{{numVMs}} VirtualMachines in {{numVMNamespaces}} namespaces?', {
+              numVMNamespaces,
+              numVMs,
+            })}
+          </a>
+        </Popover>
+      </ModalBody>
+      <ModalFooter>
+        <Button key="confirm" onClick={submitHandler}>
+          {t(actionType)}
+        </Button>
+        <Button key="cancel" onClick={onClose} variant={ButtonVariant.link}>
+          {t('Cancel')}
+        </Button>
+      </ModalFooter>
     </Modal>
   );
 };

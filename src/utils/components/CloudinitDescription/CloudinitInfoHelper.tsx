@@ -2,7 +2,7 @@ import React from 'react';
 
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Button, Stack, StackItem } from '@patternfly/react-core';
+import { Button, ButtonVariant, Stack, StackItem } from '@patternfly/react-core';
 import { ExternalLinkSquareAltIcon } from '@patternfly/react-icons';
 
 const CloudInitInfoHelper = () => {
@@ -22,7 +22,7 @@ const CloudInitInfoHelper = () => {
             iconPosition="right"
             isInline
             size="sm"
-            variant="link"
+            variant={ButtonVariant.link}
           >
             <a href={documentationURL.CLOUDINIT_INFO} rel="noopener noreferrer" target="_blank">
               {t('Learn more')}

@@ -16,6 +16,7 @@ import {
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Button,
+  ButtonVariant,
   DescriptionList,
   Divider,
   Flex,
@@ -93,7 +94,7 @@ const TemplateScriptsPage: FC<TemplateScriptsPageProps> = ({ obj: template }) =>
                     isDisabled={!isTemplateEditable}
                     isInline
                     type="button"
-                    variant="link"
+                    variant={ButtonVariant.link}
                   >
                     {t('Edit')}
                   </Button>

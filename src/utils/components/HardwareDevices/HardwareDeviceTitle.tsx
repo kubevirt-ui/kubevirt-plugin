@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Button, DescriptionListTerm } from '@patternfly/react-core';
+import { Button, ButtonVariant, DescriptionListTerm } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
 
 import SearchItem from '../SearchItem/SearchItem';
@@ -32,7 +32,7 @@ const HardwareDeviceTitle: FC<HardwareDeviceTitleProps> = ({
         isDisabled={!canEdit}
         isInline
         onClick={onClick}
-        variant="link"
+        variant={ButtonVariant.link}
       >
         <SearchItem id={title.replace(' ', '-')}>{title}</SearchItem>
       </Button>

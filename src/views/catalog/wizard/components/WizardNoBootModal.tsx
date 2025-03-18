@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom-v5-compat';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Button, Stack, StackItem } from '@patternfly/react-core';
+import { Button, ButtonVariant, Stack, StackItem } from '@patternfly/react-core';
 
 export const WizardNoBootModal: React.VFC<{
   isOpen: boolean;
@@ -42,7 +42,7 @@ export const WizardNoBootModal: React.VFC<{
         <StackItem>
           <Trans ns="plugin__kubevirt-plugin">
             You can select the boot source in the{' '}
-            <Button isInline onClick={goToDisksTab} variant="link">
+            <Button isInline onClick={goToDisksTab} variant={ButtonVariant.link}>
               Disks
             </Button>{' '}
             tab.

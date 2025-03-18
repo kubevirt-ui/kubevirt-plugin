@@ -17,6 +17,7 @@
   "(In seconds)": "(In seconds)",
   "(requires login) and copy the download link URL of the KVM guest image (expires quickly)": "(requires login) and copy the download link URL of the KVM guest image (expires quickly)",
   "{{ osName }} VirtualMachine can not be edited because it is provided by OpenShift Virtualization Operator.": "{{ osName }} VirtualMachine can not be edited because it is provided by OpenShift Virtualization Operator.",
+  "{{actionType}} {{numVMs}} VirtualMachines?": "{{actionType}} {{numVMs}} VirtualMachines?",
   "{{actionType}} VirtualMachine?": "{{actionType}} VirtualMachine?",
   "{{annotations}} Annotations": "{{annotations}} Annotations",
   "{{annotationsCount}} Annotations": "{{annotationsCount}} Annotations",

@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { Button, Content, ContentVariants } from '@patternfly/react-core';
+import { Button, ButtonVariant, Content, ContentVariants } from '@patternfly/react-core';
 import { PlusCircleIcon } from '@patternfly/react-icons';
 
 export const AddDeviceButton: React.FC<AddDeviceButtonType> = ({
@@ -18,7 +18,7 @@ export const AddDeviceButton: React.FC<AddDeviceButtonType> = ({
       icon={<PlusCircleIcon />}
       id={id}
       onClick={onClick}
-      variant="link"
+      variant={ButtonVariant.link}
     >
       {message}
     </Button>

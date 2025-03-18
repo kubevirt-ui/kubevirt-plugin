@@ -1,6 +1,6 @@
 import React, { FC, PropsWithChildren, ReactNode, SyntheticEvent } from 'react';
 
-import { Button, Tooltip } from '@patternfly/react-core';
+import { Button, ButtonVariant, Tooltip } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
 
 type EditButtonWithTooltipProps = PropsWithChildren<{
@@ -28,7 +28,7 @@ const EditButtonWithTooltip: FC<EditButtonWithTooltipProps> = ({
       iconPosition="end"
       isDisabled={!isEditable}
       isInline
-      variant="link"
+      variant={ButtonVariant.link}
     >
       {children}
     </Button>

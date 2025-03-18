@@ -10,8 +10,17 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getLabel } from '@kubevirt-utils/resources/shared';
 import { getCPU, getMemory, VM_TEMPLATE_ANNOTATION } from '@kubevirt-utils/resources/vm';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
-import { Alert, AlertVariant, Button, ButtonVariant } from '@patternfly/react-core';
-import { Modal, ModalVariant } from '@patternfly/react-core/deprecated';
+import {
+  Alert,
+  AlertVariant,
+  Button,
+  ButtonVariant,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  ModalVariant,
+} from '@patternfly/react-core';
 
 import useTemplateDefaultCpuMemory from './hooks/useTemplateDefaultCpuMemory';
 import { getMemorySize } from './utils/CpuMemoryUtils';
@@ -85,7 +94,40 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
 
   return (
     <Modal
-      actions={[
+      className="cpu-memory-modal"
+      isOpen={isOpen}
+      onClose={onClose}
+      variant={ModalVariant.small}
+      width="650px"
+    >
+      <ModalHeader title={t('Edit CPU | Memory')} />
+      <ModalBody>
+        <Alert
+          title={
+            <Trans ns="plugin__kubevirt-plugin" t={t}>
+              Updates to the sockets value are applied immediately.{<br />}To apply changes to the
+              cores or threads values, you must restart the VirtualMachine.
+            </Trans>
+          }
+          isInline
+          variant={AlertVariant.info}
+        />
+        <div className="inputs">
+          <CPUInput currentCPU={getCPU(vm)} setUserEnteredCPU={setCPU} userEnteredCPU={cpu} />
+          <MemoryInput
+            memory={memory}
+            memoryUnit={memoryUnit}
+            setMemory={setMemory}
+            setMemoryUnit={setMemoryUnit}
+          />
+        </div>
+        {updateError && (
+          <Alert isInline title={t('Error')} variant={AlertVariant.danger}>
+            {updateError}
+          </Alert>
+        )}
+      </ModalBody>
+      <ModalFooter>
         <Button
           isDisabled={updateInProcess}
           isLoading={updateInProcess}
@@ -94,7 +136,7 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
           variant={ButtonVariant.primary}
         >
           {t('Save')}
-        </Button>,
+        </Button>
         <Button
           isDisabled={
             !templateName || !defaultsLoaded || !defaultCpu || !defaultMemory || defaultLoadError
@@ -109,42 +151,11 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
           variant={ButtonVariant.secondary}
         >
           {t('Restore template settings')}
-        </Button>,
-        <Button key="cancel" onClick={onClose} variant="link">
+        </Button>
+        <Button key="cancel" onClick={onClose} variant={ButtonVariant.link}>
           {t('Cancel')}
-        </Button>,
-      ]}
-      className="cpu-memory-modal"
-      isOpen={isOpen}
-      onClose={onClose}
-      title={t('Edit CPU | Memory')}
-      variant={ModalVariant.small}
-      width="650px"
-    >
-      <Alert
-        title={
-          <Trans ns="plugin__kubevirt-plugin" t={t}>
-            Updates to the sockets value are applied immediately.{<br />}To apply changes to the
-            cores or threads values, you must restart the VirtualMachine.
-          </Trans>
-        }
-        isInline
-        variant={AlertVariant.info}
-      />
-      <div className="inputs">
-        <CPUInput currentCPU={getCPU(vm)} setUserEnteredCPU={setCPU} userEnteredCPU={cpu} />
-        <MemoryInput
-          memory={memory}
-          memoryUnit={memoryUnit}
-          setMemory={setMemory}
-          setMemoryUnit={setMemoryUnit}
-        />
-      </div>
-      {updateError && (
-        <Alert isInline title={t('Error')} variant="danger">
-          {updateError}
-        </Alert>
-      )}
+        </Button>
+      </ModalFooter>
     </Modal>
   );
 };

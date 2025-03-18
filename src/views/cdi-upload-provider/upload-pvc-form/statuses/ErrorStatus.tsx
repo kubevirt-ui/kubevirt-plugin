@@ -19,7 +19,7 @@ const ErrorStatus: React.FC<ErrorStatusProps> = ({ error, onErrorClick }) => {
       titleText={t('Error uploading data')}
     >
       <EmptyStateBody>{error}</EmptyStateBody>
-      <Button id="cdi-upload-error-btn" onClick={onErrorClick} variant="primary">
+      <Button id="cdi-upload-error-btn" onClick={onErrorClick}>
         {error ? t('Back to form') : t('View PersistentVolumeClaim details')}
       </Button>
     </EmptyState>

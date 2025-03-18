@@ -10,8 +10,17 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { getCPU, getMemory } from '@kubevirt-utils/resources/vm';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
-import { Alert, Button, ButtonVariant } from '@patternfly/react-core';
-import { Modal, ModalVariant } from '@patternfly/react-core/deprecated';
+import {
+  Alert,
+  AlertVariant,
+  Button,
+  ButtonVariant,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  ModalVariant,
+} from '@patternfly/react-core';
 
 import useEditTemplateAccessReview from '../../../../hooks/useIsTemplateEditable';
 
@@ -80,16 +89,38 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({ isOpen, onClose, onSubmit, te
 
   return (
     <Modal
-      actions={[
+      className="cpu-memory-modal"
+      isOpen={isOpen}
+      onClose={onClose}
+      variant={ModalVariant.small}
+      width="650px"
+    >
+      <ModalHeader title={t('Edit CPU | Memory')} />
+      <ModalBody>
+        <div className="inputs">
+          <CPUInput currentCPU={defaultCPU} setUserEnteredCPU={setCPU} userEnteredCPU={cpu} />
+          <MemoryInput
+            memory={memory}
+            memoryUnit={memoryUnit}
+            setMemory={setMemory}
+            setMemoryUnit={setMemoryUnit}
+          />
+        </div>
+        {updateError && (
+          <Alert isInline title={t('Error')} variant={AlertVariant.danger}>
+            {updateError}
+          </Alert>
+        )}
+      </ModalBody>
+      <ModalFooter>
         <Button
           isDisabled={updateInProcess}
           isLoading={updateInProcess}
           key="confirm"
           onClick={handleSubmit}
-          variant={ButtonVariant.primary}
         >
           {t('Save')}
-        </Button>,
+        </Button>
         <Button
           onClick={() => {
             setCPU(defaultCPU);
@@ -101,32 +132,11 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({ isOpen, onClose, onSubmit, te
           variant={ButtonVariant.secondary}
         >
           {t('Restore template settings')}
-        </Button>,
-        <Button key="cancel" onClick={onClose} variant="link">
+        </Button>
+        <Button key="cancel" onClick={onClose} variant={ButtonVariant.link}>
           {t('Cancel')}
-        </Button>,
-      ]}
-      className="cpu-memory-modal"
-      isOpen={isOpen}
-      onClose={onClose}
-      title={t('Edit CPU | Memory')}
-      variant={ModalVariant.small}
-      width="650px"
-    >
-      <div className="inputs">
-        <CPUInput currentCPU={defaultCPU} setUserEnteredCPU={setCPU} userEnteredCPU={cpu} />
-        <MemoryInput
-          memory={memory}
-          memoryUnit={memoryUnit}
-          setMemory={setMemory}
-          setMemoryUnit={setMemoryUnit}
-        />
-      </div>
-      {updateError && (
-        <Alert isInline title={t('Error')} variant="danger">
-          {updateError}
-        </Alert>
-      )}
+        </Button>
+      </ModalFooter>
     </Modal>
   );
 };

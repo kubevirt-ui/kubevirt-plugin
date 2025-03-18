@@ -9,6 +9,7 @@ import {
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Button,
+  ButtonVariant,
   FormGroup,
   Progress,
   ProgressMeasureLocation,
@@ -38,7 +39,7 @@ export const DiskSourceUploadPVCProgress: React.FC<{ upload: DataUpload }> = ({ 
             }
             isInline
             onClick={() => upload?.cancelUpload()}
-            variant="link"
+            variant={ButtonVariant.link}
           >
             {t('Cancel upload')}
           </Button>

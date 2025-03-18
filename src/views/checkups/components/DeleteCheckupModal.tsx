@@ -2,8 +2,15 @@ import React, { FC } from 'react';
 
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { ActionGroup, Button, ButtonVariant } from '@patternfly/react-core';
-import { Modal, ModalVariant } from '@patternfly/react-core/deprecated';
+import {
+  Button,
+  ButtonVariant,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  ModalVariant,
+} from '@patternfly/react-core';
 
 type DeleteCheckupModalProps = {
   isOpen: boolean;
@@ -22,29 +29,25 @@ const DeleteCheckupModal: FC<DeleteCheckupModalProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   return (
-    <Modal
-      footer={
-        <ActionGroup>
-          <Button
-            onClick={() => {
-              onDelete();
-              onClose();
-            }}
-            variant={ButtonVariant.danger}
-          >
-            {t('Delete')}
-          </Button>
-          <Button onClick={onClose} variant={ButtonVariant.link}>
-            {t('Cancel')}
-          </Button>
-        </ActionGroup>
-      }
-      isOpen={isOpen}
-      onClose={onClose}
-      title={t('Delete checkup')}
-      variant={ModalVariant.medium}
-    >
-      <ConfirmActionMessage obj={{ metadata: { name, namespace } }} />
+    <Modal isOpen={isOpen} onClose={onClose} variant={ModalVariant.medium}>
+      <ModalHeader title={t('Delete checkup')} />
+      <ModalBody>
+        <ConfirmActionMessage obj={{ metadata: { name, namespace } }} />
+      </ModalBody>
+      <ModalFooter>
+        <Button
+          onClick={() => {
+            onDelete();
+            onClose();
+          }}
+          variant={ButtonVariant.danger}
+        >
+          {t('Delete')}
+        </Button>
+        <Button onClick={onClose} variant={ButtonVariant.link}>
+          {t('Cancel')}
+        </Button>
+      </ModalFooter>
     </Modal>
   );
 };

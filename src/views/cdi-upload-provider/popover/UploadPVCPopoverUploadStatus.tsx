@@ -89,7 +89,7 @@ const UploadPVCPopoverUploadStatus: React.FC<UploadPVCPopoverUploadStatusProps> 
                 className="pf-m-link--align-left"
                 id="cdi-upload-cancel-btn"
                 onMouseUp={onCancelClick}
-                variant="link"
+                variant={ButtonVariant.link}
               >
                 {t('Cancel upload')}
               </Button>
@@ -102,7 +102,7 @@ const UploadPVCPopoverUploadStatus: React.FC<UploadPVCPopoverUploadStatusProps> 
                 id="cdi-upload-delete-btn"
                 isDanger
                 onMouseUp={onErrorDeleteSource}
-                variant="link"
+                variant={ButtonVariant.link}
               >
                 {t('Delete source')}
               </Button>

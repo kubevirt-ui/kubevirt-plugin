@@ -4,6 +4,7 @@ import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Button,
+  ButtonVariant,
   EmptyState,
   EmptyStateActions,
   EmptyStateBody,
@@ -42,7 +43,7 @@ export const TemplatesCatalogEmptyState: React.FC<{
       </EmptyStateBody>
       <EmptyStateFooter>
         <EmptyStateActions>
-          <Button onClick={() => onClearFilters()} variant="link">
+          <Button onClick={() => onClearFilters()} variant={ButtonVariant.link}>
             {t('Clear all filters')}
           </Button>
         </EmptyStateActions>

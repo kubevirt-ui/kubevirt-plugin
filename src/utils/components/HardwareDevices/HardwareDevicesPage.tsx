@@ -3,7 +3,7 @@ import React, { FC } from 'react';
 import { V1PciHostDevice } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { HorizontalNav } from '@openshift-console/dynamic-plugin-sdk';
-import { Bullseye, Button, Popover } from '@patternfly/react-core';
+import { Bullseye, Button, ButtonVariant, Popover } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
 
 import useHCPermittedHostDevices from './hooks/useHCPermittedHostDevices';
@@ -66,7 +66,7 @@ const HardwareDevicesPage: FC<any> = (props) => {
               'Various types of hardware devices are assigned to virtual machines in the cluster',
             )}
           >
-            <Button aria-label="Action" icon={<HelpIcon />} variant="plain" />
+            <Button aria-label="Action" icon={<HelpIcon />} variant={ButtonVariant.plain} />
           </Popover>
         </h1>
       </div>

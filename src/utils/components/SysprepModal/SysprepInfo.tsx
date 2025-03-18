@@ -2,7 +2,14 @@ import React, { FC } from 'react';
 
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Button, Content, ContentVariants, Stack, StackItem } from '@patternfly/react-core';
+import {
+  Button,
+  ButtonVariant,
+  Content,
+  ContentVariants,
+  Stack,
+  StackItem,
+} from '@patternfly/react-core';
 import { ExternalLinkSquareAltIcon } from '@patternfly/react-icons';
 
 const SysprepInfo: FC = () => {
@@ -27,7 +34,7 @@ const SysprepInfo: FC = () => {
             iconPosition="right"
             isInline
             size="sm"
-            variant="link"
+            variant={ButtonVariant.link}
           >
             <a href={documentationURL.SYSPREP} rel="noopener noreferrer" target="_blank">
               {t('Learn more')}
