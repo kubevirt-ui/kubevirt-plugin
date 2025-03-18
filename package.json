@@ -15,6 +15,7 @@
     "@patternfly/react-tokens": "^6.2.2",
     "@patternfly/react-topology": "^6.2.0",
     "@preact/signals-react": "^2.0.1",
+    "@stolostron/multicluster-sdk": "^0.1.0-alpha.5",
     "axios": "^1.8.3",
     "buffer": "^6.0.3",
     "classnames": "^2.3.1",
