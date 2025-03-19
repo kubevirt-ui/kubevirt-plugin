@@ -9,8 +9,8 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isInstanceTypeVM } from '@kubevirt-utils/resources/instancetype/helper';
 import { getEvictionStrategy } from '@kubevirt-utils/resources/vm';
-import { isInstanceTypeVM } from '@kubevirt-utils/resources/vm/utils/instanceTypes';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
 

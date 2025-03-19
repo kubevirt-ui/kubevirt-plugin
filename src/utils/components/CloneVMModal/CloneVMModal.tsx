@@ -10,6 +10,7 @@ import {
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { MAX_K8S_NAME_LENGTH } from '@kubevirt-utils/utils/constants';
+import { isVM } from '@kubevirt-utils/utils/typeGuards';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
 import { Form, ModalVariant } from '@patternfly/react-core';
 
@@ -20,7 +21,7 @@ import SnapshotContentConfigurationSummary from './components/SnapshotContentCon
 import StartClonedVMCheckbox from './components/StartClonedVMCheckbox/StartClonedVMCheckbox';
 import useCloneVMModal from './hooks/useCloneVMModal';
 import { CLONING_STATUSES } from './utils/constants';
-import { cloneVM, isVM, runVM, vmExist } from './utils/helpers';
+import { cloneVM, runVM, vmExist } from './utils/helpers';
 
 type CloneVMModalProps = {
   headerText?: string;

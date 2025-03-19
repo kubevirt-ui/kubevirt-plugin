@@ -22,6 +22,7 @@ import {
   VirtualMachineDetailsTab,
   VirtualMachineDetailsTabLabel,
 } from '@kubevirt-utils/constants/tabs-constants';
+import { getInstanceTypeNameFromAnnotation } from '@kubevirt-utils/resources/instancetype/helper';
 import {
   getAffinity,
   getCPU,
@@ -55,9 +56,20 @@ import {
   getAutoAttachPodInterface,
   getBootloader,
   getDisks,
+  isHeadlessMode,
 } from '../../../resources/vm/utils/selectors';
 
 import { PendingChange } from './types';
+
+export const checkInstanceTypeChanged = (
+  vm: V1VirtualMachine,
+  vmi: V1VirtualMachineInstance,
+): boolean => {
+  if (isEmpty(vm) || isEmpty(vmi)) {
+    return false;
+  }
+  return vm.spec?.instancetype?.name !== getInstanceTypeNameFromAnnotation(vmi);
+};
 
 export const checkCPUMemoryChanged = (
   vm: V1VirtualMachine,
@@ -444,17 +456,8 @@ export const getChangedHeadlessMode = (
   if (isEmpty(vm) || isEmpty(vmi)) {
     return false;
   }
-  const vmDevices = vm?.spec?.template?.spec?.domain?.devices;
-  const vmiDevices = vmi?.spec?.domain?.devices;
 
-  const vmHeadless = !!vmDevices?.autoattachGraphicsDevice;
-  const vmiHeadless = !!vmiDevices?.autoattachGraphicsDevice;
-
-  return (
-    vmHeadless !== vmiHeadless ||
-    vmDevices?.hasOwnProperty('autoattachGraphicsDevice') !==
-      vmiDevices?.hasOwnProperty('autoattachGraphicsDevice')
-  );
+  return isHeadlessMode(vm) !== isHeadlessMode(vmi);
 };
 
 export const getTabURL = (vm: V1VirtualMachine, tab: string) => {

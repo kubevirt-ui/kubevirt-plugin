@@ -2,8 +2,8 @@ import React, { FC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import VncConsole from '@kubevirt-utils/components/Consoles/components/vnc-console/VncConsole';
-import { isHeadlessModeVMI } from '@kubevirt-utils/components/Consoles/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isHeadlessMode as isHeadlessModeVMI } from '@kubevirt-utils/resources/vm/utils/selectors';
 import { vmiStatuses } from '@kubevirt-utils/resources/vmi';
 import { useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { Bullseye, Button, ButtonVariant } from '@patternfly/react-core';

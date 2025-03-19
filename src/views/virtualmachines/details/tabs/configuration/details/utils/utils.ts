@@ -197,7 +197,7 @@ export const updatedVirtualMachine = (updatedVM: V1VirtualMachine) =>
   });
 
 export const updatedInstanceType = (
-  updatedVM: V1VirtualMachine,
+  vmToBeUpdated: V1VirtualMachine,
   instanceType: V1beta1VirtualMachineClusterInstancetype | V1beta1VirtualMachineInstancetype,
 ) =>
   k8sPatch({
@@ -209,7 +209,7 @@ export const updatedInstanceType = (
       },
     ],
     model: VirtualMachineModel,
-    resource: updatedVM,
+    resource: vmToBeUpdated,
   });
 
 export const updatedHostname = (updatedVM: V1VirtualMachine) =>

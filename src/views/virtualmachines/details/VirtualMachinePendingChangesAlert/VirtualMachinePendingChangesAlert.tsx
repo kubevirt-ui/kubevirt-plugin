@@ -14,6 +14,7 @@ import { isRunning } from '@virtualmachines/utils';
 import { splitPendingChanges } from '../utils/utils';
 
 type VirtualMachinePendingChangesAlertProps = {
+  instanceTypeExpandedSpec: V1VirtualMachine;
   vm: V1VirtualMachine;
   vmi: V1VirtualMachineInstance;
 };

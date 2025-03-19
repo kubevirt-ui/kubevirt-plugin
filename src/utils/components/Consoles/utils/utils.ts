@@ -1,13 +1,6 @@
-import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
-
 import { CONSOLE_PASTE_EVENT } from './constants';
 
 export const isConnectionEncrypted = () => window.location.protocol === 'https:';
-
-export const isHeadlessModeVMI = (vmi: V1VirtualMachineInstance) => {
-  const devices = vmi?.spec?.domain?.devices;
-  return devices?.hasOwnProperty('autoattachGraphicsDevice') && !devices?.autoattachGraphicsDevice;
-};
 
 export const clipboardCopyFunc = (
   _: React.ClipboardEvent<HTMLDivElement>,

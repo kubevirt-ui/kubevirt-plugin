@@ -19,6 +19,7 @@ import WorkloadProfileModal from '@kubevirt-utils/components/WorkloadProfileModa
 import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isInstanceTypeVM } from '@kubevirt-utils/resources/instancetype/helper';
 import { asAccessReview, getAnnotation, getName } from '@kubevirt-utils/resources/shared';
 import { WORKLOADS_LABELS } from '@kubevirt-utils/resources/template';
 import {
@@ -85,10 +86,10 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
   const vmWorkload = getWorkload(vm);
   const vmName = getName(vm);
 
-  const isInstanceType = !isEmpty(vm?.spec?.instancetype?.name);
+  const isInstanceType = isInstanceTypeVM(vm);
   const deletionProtectionEnabled = isDeletionProtectionEnabled(vm);
 
-  const loadingInstanceType = isInstanceType && (isEmpty(instanceType) || isEmpty(instanceTypeVM));
+  const loadingInstanceType = isInstanceType && isEmpty(instanceType);
 
   if (!vm || loadingInstanceType) {
     return <Loading />;
@@ -158,10 +159,10 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
                     <InstanceTypeModal
                       allInstanceTypes={allInstanceTypes}
                       instanceType={instanceType}
-                      instanceTypeVM={instanceTypeVM}
                       isOpen={isOpen}
                       onClose={onClose}
                       onSubmit={updatedInstanceType}
+                      vm={vm}
                     />
                   ) : (
                     <CPUMemoryModal
