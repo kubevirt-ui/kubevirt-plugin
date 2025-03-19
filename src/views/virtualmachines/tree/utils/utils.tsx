@@ -129,7 +129,11 @@ const createProjectTreeItem = (
     treeViewDataMap,
   );
 
-  const projectChildren = [...projectFolders, ...(projectMap[project]?.ungrouped || [])];
+  const sortProjectFolders = projectFolders.sort((folderA, folderB) =>
+    folderA.id.localeCompare(folderB.id),
+  );
+
+  const projectChildren = [...sortProjectFolders, ...(projectMap[project]?.ungrouped || [])];
 
   const projectTreeItemID = `${PROJECT_SELECTOR_PREFIX}/${project}`;
   const projectTreeItem: TreeViewDataItemWithHref = {
@@ -271,5 +275,15 @@ export const getAllTreeViewItems = (treeData: TreeViewDataItem[]) => {
     ?.flat();
 };
 
-export const getAllTreeViewVMsItems = (treeData: TreeViewDataItem[]) =>
+export const getAllTreeViewVMItems = (treeData: TreeViewDataItem[]): TreeViewDataItem[] =>
   getAllTreeViewItems(treeData).filter((treeItem) => !treeItem.children);
+
+export const getAllTreeViewFolderItems = (treeData: TreeViewDataItem[]): TreeViewDataItem[] =>
+  getAllTreeViewItems(treeData).filter((treeItem) =>
+    treeItem.id.startsWith(FOLDER_SELECTOR_PREFIX),
+  );
+
+export const getAllTreeViewProjectItems = (treeData: TreeViewDataItem[]): TreeViewDataItem[] =>
+  getAllTreeViewItems(treeData).filter((treeItem) =>
+    treeItem.id.startsWith(PROJECT_SELECTOR_PREFIX),
+  );
