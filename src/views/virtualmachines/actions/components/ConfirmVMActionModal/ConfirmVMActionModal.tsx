@@ -3,8 +3,14 @@ import React, { FC } from 'react';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { Button, ButtonVariant } from '@patternfly/react-core';
-import { Modal } from '@patternfly/react-core/deprecated';
+import {
+  Button,
+  ButtonVariant,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+} from '@patternfly/react-core';
 
 type ConfirmVMActionModalProps = {
   action: (vm: V1VirtualMachine) => Promise<string>;
@@ -30,26 +36,28 @@ const ConfirmVMActionModal: FC<ConfirmVMActionModalProps> = ({
 
   return (
     <Modal
-      actions={[
-        <Button key="confirm" onClick={submitHandler} variant={ButtonVariant.primary}>
-          {t(actionType)}
-        </Button>,
-        <Button key="cancel" onClick={onClose} variant="link">
-          {t('Cancel')}
-        </Button>,
-      ]}
       className="confirm-multiple-vm-actions-modal"
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={submitHandler}
-      title={t('{{actionType}} VirtualMachine?', { actionType })}
       variant={'small'}
     >
-      {t(
-        `Are you sure you want to ${actionType?.toLowerCase()} ${getName(
-          vm,
-        )} in namespace ${getNamespace(vm)}?`,
-      )}
+      <ModalHeader title={t('{{actionType}} VirtualMachine?', { actionType })} />
+      <ModalBody>
+        {t(
+          `Are you sure you want to ${actionType?.toLowerCase()} ${getName(
+            vm,
+          )} in namespace ${getNamespace(vm)}?`,
+        )}
+      </ModalBody>
+      <ModalFooter>
+        <Button key="confirm" onClick={submitHandler}>
+          {t(actionType)}
+        </Button>
+        <Button key="cancel" onClick={onClose} variant={ButtonVariant.link}>
+          {t('Cancel')}
+        </Button>
+      </ModalFooter>
     </Modal>
   );
 };

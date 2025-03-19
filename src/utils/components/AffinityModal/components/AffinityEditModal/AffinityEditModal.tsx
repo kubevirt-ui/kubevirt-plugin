@@ -3,8 +3,15 @@ import React, { Dispatch, FC, SetStateAction } from 'react';
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { useIDEntities } from '@kubevirt-utils/components/NodeSelectorModal/hooks/useIDEntities';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { ActionGroup, Button, ButtonVariant } from '@patternfly/react-core';
-import { Modal, ModalVariant } from '@patternfly/react-core/deprecated';
+import {
+  Button,
+  ButtonVariant,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  ModalVariant,
+} from '@patternfly/react-core';
 
 import { getIntersectedQualifiedNodes } from '../../utils/helpers';
 import { AffinityLabel, AffinityRowData } from '../../utils/types';
@@ -44,48 +51,47 @@ const AffinityEditModal: FC<AffinityEditModalProps> = ({
   const qualifiedFieldNodes = useNodeFieldQualifier(nodes, nodesLoaded, fields?.entities);
   return (
     <Modal
-      footer={
-        <ActionGroup>
-          <Button
-            onClick={() =>
-              onSubmit({
-                ...focusedAffinity,
-                expressions: expressions?.entities,
-                fields: fields?.entities,
-              })
-            }
-            isDisabled={isDisabled}
-            variant={ButtonVariant.primary}
-          >
-            {t('Save affinity rule')}
-          </Button>
-          <Button onClick={onCancel} size="sm" variant="link">
-            {t('Cancel')}
-          </Button>
-        </ActionGroup>
-      }
       className="ocs-modal co-catalog-page__overlay"
       isOpen={isOpen}
       onClose={onCancel}
       position="top"
-      title={title}
       variant={ModalVariant.medium}
     >
-      <AffinityForm
-        qualifiedNodes={getIntersectedQualifiedNodes({
-          expressionNodes: qualifiedExpressionNodes,
-          expressions: expressions?.entities,
-          fieldNodes: qualifiedFieldNodes,
-          fields: fields?.entities,
-        })}
-        expressions={expressions}
-        fields={fields}
-        focusedAffinity={focusedAffinity}
-        isSubmitDisabled={isDisabled}
-        nodesLoaded={nodesLoaded}
-        setFocusedAffinity={setFocusedAffinity}
-        setSubmitDisabled={setIsDisabled}
-      />
+      <ModalHeader title={title} />
+      <ModalBody>
+        <AffinityForm
+          qualifiedNodes={getIntersectedQualifiedNodes({
+            expressionNodes: qualifiedExpressionNodes,
+            expressions: expressions?.entities,
+            fieldNodes: qualifiedFieldNodes,
+            fields: fields?.entities,
+          })}
+          expressions={expressions}
+          fields={fields}
+          focusedAffinity={focusedAffinity}
+          isSubmitDisabled={isDisabled}
+          nodesLoaded={nodesLoaded}
+          setFocusedAffinity={setFocusedAffinity}
+          setSubmitDisabled={setIsDisabled}
+        />
+      </ModalBody>
+      <ModalFooter>
+        <Button
+          onClick={() =>
+            onSubmit({
+              ...focusedAffinity,
+              expressions: expressions?.entities,
+              fields: fields?.entities,
+            })
+          }
+          isDisabled={isDisabled}
+        >
+          {t('Save affinity rule')}
+        </Button>
+        <Button onClick={onCancel} size="sm" variant={ButtonVariant.link}>
+          {t('Cancel')}
+        </Button>
+      </ModalFooter>
     </Modal>
   );
 };

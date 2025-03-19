@@ -5,6 +5,7 @@ import {
   Alert,
   AlertVariant,
   Button,
+  ButtonVariant,
   EmptyState,
   EmptyStateActions,
   EmptyStateBody,
@@ -51,13 +52,13 @@ const UploadingStatus: FC<UploadingStatusProps> = ({ onCancelClick, onSuccessCli
         </Stack>
       </EmptyStateBody>
       {onSuccessClick && (
-        <Button id="cdi-upload-primary-pvc" onClick={onSuccessClick} variant="primary">
+        <Button id="cdi-upload-primary-pvc" onClick={onSuccessClick}>
           {t('View Persistent Volume Claim details')}
         </Button>
       )}
       {onCancelClick && upload?.uploadStatus === UPLOAD_STATUS.UPLOADING && (
         <EmptyStateActions>
-          <Button id="cdi-upload-cancel-btn" onClick={onCancelClick} variant="link">
+          <Button id="cdi-upload-cancel-btn" onClick={onCancelClick} variant={ButtonVariant.link}>
             {t('Cancel Upload')}
           </Button>
         </EmptyStateActions>

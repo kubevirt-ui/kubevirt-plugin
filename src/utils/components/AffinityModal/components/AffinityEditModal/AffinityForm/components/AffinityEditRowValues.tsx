@@ -3,6 +3,7 @@ import React, { FC, useState } from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Button,
+  ButtonVariant,
   InputGroup,
   InputGroupItem,
   KeyTypes,
@@ -70,7 +71,7 @@ export const AffinityEditRowValues: FC<AffinityEditRowValuesProps> = ({
           />
         </InputGroupItem>
         <InputGroupItem>
-          <Button isDisabled={addingIsDisabled} onClick={onAdd} variant="control">
+          <Button isDisabled={addingIsDisabled} onClick={onAdd} variant={ButtonVariant.control}>
             {t('Add')}
           </Button>
         </InputGroupItem>

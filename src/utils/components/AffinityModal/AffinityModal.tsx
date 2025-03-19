@@ -8,7 +8,7 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAffinity } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { ModalVariant } from '@patternfly/react-core/deprecated';
+import { ModalVariant } from '@patternfly/react-core';
 
 import AffinityEditModal from './components/AffinityEditModal/AffinityEditModal';
 import AffinityEmptyState from './components/AffinityEmptyState';

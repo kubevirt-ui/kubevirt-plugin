@@ -13,7 +13,15 @@ import {
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { K8sResourceCommon, ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
-import { Alert, Button, Form, FormGroup, Popover } from '@patternfly/react-core';
+import {
+  Alert,
+  AlertVariant,
+  Button,
+  ButtonVariant,
+  Form,
+  FormGroup,
+  Popover,
+} from '@patternfly/react-core';
 
 import { SOURCE_TYPES } from '../../utils/constants';
 import { editBootSource } from '../editBootSource';
@@ -66,10 +74,15 @@ const EditBootSourceModal: FC<EditBootSourceModalProps> = ({
         onClose={onClose}
         onSubmit={onSubmit}
       >
-        <Alert className="margin-bottom-md" isInline title={t('Warning')} variant="warning">
+        <Alert
+          className="margin-bottom-md"
+          isInline
+          title={t('Warning')}
+          variant={AlertVariant.warning}
+        >
           <Trans ns="plugin__kubevirt-plugin">
             Editing the DataSource will affect{' '}
-            <Button isInline ref={popoverRef} variant="link">
+            <Button isInline ref={popoverRef} variant={ButtonVariant.link}>
               all templates
             </Button>{' '}
             that are currently using this DataSource.

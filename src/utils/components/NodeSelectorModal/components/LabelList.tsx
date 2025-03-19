@@ -3,7 +3,7 @@ import { FC, ReactNode } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
-import { Button, Grid, Split, SplitItem } from '@patternfly/react-core';
+import { Button, ButtonVariant, Grid, Split, SplitItem } from '@patternfly/react-core';
 import { ExternalLinkAltIcon, PlusCircleIcon } from '@patternfly/react-icons';
 
 type LabelsListProps = {
@@ -36,7 +36,7 @@ const LabelsList: FC<LabelsListProps> = ({
             icon={<PlusCircleIcon />}
             id="vm-labels-list-add-btn"
             onClick={() => onLabelAdd()}
-            variant="link"
+            variant={ButtonVariant.link}
           >
             {isEmpty ? emptyStateAddRowTxt : addRowTxt}
           </Button>
@@ -52,7 +52,7 @@ const LabelsList: FC<LabelsListProps> = ({
               iconPosition="right"
               id="explore-nodes-btn"
               target="_blank"
-              variant="link"
+              variant={ButtonVariant.link}
             >
               {t('Explore {{kind}} list', { kind: model.kind })}
             </Button>

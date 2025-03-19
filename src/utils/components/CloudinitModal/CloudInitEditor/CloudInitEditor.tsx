@@ -4,7 +4,7 @@ import { dump } from 'js-yaml';
 import { V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
-import { Alert, AlertActionCloseButton, Divider } from '@patternfly/react-core';
+import { Alert, AlertActionCloseButton, AlertVariant, Divider } from '@patternfly/react-core';
 
 import { getCloudInitData } from '../utils/cloudinit-utils';
 
@@ -49,7 +49,7 @@ export const _CloudInitEditor: FC<CloudInitEditorProps> = ({ cloudInitVolume, on
           className="co-alert"
           isInline
           title={t('Saved')}
-          variant="success"
+          variant={AlertVariant.success}
         />
       )}
       <Divider />

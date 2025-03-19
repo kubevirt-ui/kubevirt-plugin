@@ -2,7 +2,7 @@ import React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ProgressStatus } from '@openshift-console/dynamic-plugin-sdk';
-import { Button } from '@patternfly/react-core';
+import { Button, ButtonVariant } from '@patternfly/react-core';
 
 type UploadPVCPopoverProgressStatusProps = {
   onCancelClick: () => void;
@@ -21,7 +21,7 @@ const UploadPVCPopoverProgressStatus: React.FC<UploadPVCPopoverProgressStatusPro
         className="pf-m-link--align-left"
         id="cdi-upload-cancel-btn"
         onMouseUp={onCancelClick}
-        variant="link"
+        variant={ButtonVariant.link}
       >
         {t('Cancel upload')}
       </Button>

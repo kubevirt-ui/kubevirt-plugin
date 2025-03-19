@@ -10,7 +10,7 @@ import {
 import { createSSHSecret } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { Button, Grid, GridItem, Truncate } from '@patternfly/react-core';
+import { Button, ButtonVariant, Grid, GridItem, Truncate } from '@patternfly/react-core';
 import { MinusCircleIcon } from '@patternfly/react-icons';
 
 import { AuthKeyRow } from '../../utils/types';
@@ -105,7 +105,7 @@ const SSHAuthKeyRow: FC<SSHAuthKeyRowProps> = ({
           isDisabled={isRemoveDisabled}
           isInline
           onClick={() => onAuthKeyDelete(row)}
-          variant="plain"
+          variant={ButtonVariant.plain}
         />
       </GridItem>
     </Grid>

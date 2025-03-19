@@ -4,7 +4,13 @@ import { PersistentVolumeClaimModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
-import { Alert, Checkbox, FormSelect, FormSelectOption } from '@patternfly/react-core';
+import {
+  Alert,
+  AlertVariant,
+  Checkbox,
+  FormSelect,
+  FormSelectOption,
+} from '@patternfly/react-core';
 
 import { getName, getNamespace } from '../utils/selectors';
 import { OperatingSystemRecord } from '../utils/types';
@@ -103,7 +109,11 @@ const UploadPVCFormGoldenImage: FC<UploadPVCFormGoldenImageProps> = ({
       </div>
       {osImageExists && (
         <div className="form-group">
-          <Alert isInline title={t('Operating system source already defined')} variant="danger">
+          <Alert
+            isInline
+            title={t('Operating system source already defined')}
+            variant={AlertVariant.danger}
+          >
             {t(
               'In order to add a new source for {{osName}} you will need to delete the following PVC:',
               { osName: os?.name },

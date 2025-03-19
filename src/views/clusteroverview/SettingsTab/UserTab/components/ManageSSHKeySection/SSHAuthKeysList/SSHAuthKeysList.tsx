@@ -4,6 +4,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   Button,
+  ButtonVariant,
   Content,
   ContentVariants,
   Grid,
@@ -63,7 +64,7 @@ const SSHAuthKeysList: FC = () => {
         isDisabled={isEmpty(selectableProjects)}
         isInline
         onClick={onAuthKeyAdd}
-        variant="link"
+        variant={ButtonVariant.link}
       >
         {t('Add public SSH key to project')}
       </Button>

@@ -11,7 +11,7 @@ import { V1Template } from '@kubevirt-utils/models';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { DESCHEDULER_EVICT_LABEL } from '@kubevirt-utils/resources/vmi';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
-import { Button, Switch } from '@patternfly/react-core';
+import { Button, ButtonVariant, Switch } from '@patternfly/react-core';
 import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 
 type DeschedulerProps = {
@@ -56,7 +56,7 @@ const Descheduler: FC<DeschedulerProps> = ({ onSubmit, template }) => {
                 icon={<ExternalLinkAltIcon />}
                 iconPosition="right"
                 target="_blank"
-                variant="link"
+                variant={ButtonVariant.link}
               >
                 {t('Learn more')}
               </Button>

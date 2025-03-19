@@ -11,10 +11,14 @@ import {
   AlertVariant,
   Button,
   ButtonVariant,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  ModalVariant,
   Stack,
   StackItem,
 } from '@patternfly/react-core';
-import { Modal, ModalVariant } from '@patternfly/react-core/deprecated';
 
 import './TabModal.scss';
 
@@ -92,7 +96,16 @@ const TabModal: TabModalFC = memo(
 
     return (
       <Modal
-        footer={
+        className="ocs-modal"
+        id="tab-modal"
+        isOpen={isOpen}
+        onClose={closeModal}
+        position={positionTop ? 'top' : undefined}
+        variant={modalVariant ?? ModalVariant.small}
+      >
+        <ModalHeader title={headerText} titleIconVariant={titleIconVariant} />
+        <ModalBody>{children}</ModalBody>
+        <ModalFooter>
           <Stack className="kv-tabmodal-footer" hasGutter>
             {error && (
               <StackItem>
@@ -117,13 +130,13 @@ const TabModal: TabModalFC = memo(
                     isDisabled={isDisabled || isSubmitting}
                     isLoading={isLoading || isSubmitting}
                     onClick={handleSubmit}
-                    variant={submitBtnVariant ?? 'primary'}
+                    variant={submitBtnVariant ?? ButtonVariant.primary}
                   >
                     {submitBtnText || t('Save')}
                   </Button>
                 </ActionListItem>
                 <ActionListItem>
-                  <Button onClick={closeModal} variant="link">
+                  <Button onClick={closeModal} variant={ButtonVariant.link}>
                     {t('Cancel')}
                   </Button>
                 </ActionListItem>
@@ -135,17 +148,7 @@ const TabModal: TabModalFC = memo(
               </ActionList>
             </StackItem>
           </Stack>
-        }
-        className="ocs-modal"
-        id="tab-modal"
-        isOpen={isOpen}
-        onClose={closeModal}
-        position={positionTop ? 'top' : undefined}
-        title={headerText}
-        titleIconVariant={titleIconVariant}
-        variant={modalVariant ?? 'small'}
-      >
-        {children}
+        </ModalFooter>
       </Modal>
     );
   },

@@ -9,7 +9,7 @@ import {
 } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { Button } from '@patternfly/react-core';
+import { Button, ButtonVariant } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
 
 type AddProjectAuthKeyButtonProps = {
@@ -54,7 +54,7 @@ const AddProjectAuthKeyButton: FC<AddProjectAuthKeyButtonProps> = ({
       iconPosition="end"
       isDisabled={isEmpty(selectedProject)}
       isInline
-      variant="link"
+      variant={ButtonVariant.link}
     >
       {isEmpty(secretName) ? t('Not configured') : secretName}
     </Button>

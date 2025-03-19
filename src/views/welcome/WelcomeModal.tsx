@@ -11,10 +11,12 @@ import {
   ContentVariants,
   Grid,
   GridItem,
+  Modal,
+  ModalBody,
+  ModalVariant,
   Stack,
   Title,
 } from '@patternfly/react-core';
-import { Modal, ModalVariant } from '@patternfly/react-core/deprecated';
 
 import WelcomeButtons from './components/WelcomeButtons';
 
@@ -36,39 +38,41 @@ const WelcomeModal: FC = () => {
       onClose={onClose}
       variant={ModalVariant.large}
     >
-      <Grid className="WelcomeModal__grid" hasGutter>
-        <GridItem span={4}>
-          <img className="WelcomeModal__image" src={openCulture} />
-        </GridItem>
+      <ModalBody>
+        <Grid className="WelcomeModal__grid" hasGutter>
+          <GridItem span={4}>
+            <img className="WelcomeModal__image" src={openCulture} />
+          </GridItem>
 
-        <GridItem span={8}>
-          <Stack>
-            <Trans ns="plugin__kubevirt-plugin" t={t}>
-              <Title headingLevel="h2">Welcome to</Title>
-              <Title headingLevel="h1">OpenShift Virtualization</Title>
+          <GridItem span={8}>
+            <Stack>
+              <Trans ns="plugin__kubevirt-plugin" t={t}>
+                <Title headingLevel="h2">Welcome to</Title>
+                <Title headingLevel="h1">OpenShift Virtualization</Title>
 
-              <Content className="text-muted WelcomeModal__text" component={ContentVariants.p}>
-                Use OpenShift Virtualization to run and manage virtualized workloads alongside
-                container workloads. You can manage both Linux and Windows virtual machines.
-              </Content>
+                <Content className="text-muted WelcomeModal__text" component={ContentVariants.p}>
+                  Use OpenShift Virtualization to run and manage virtualized workloads alongside
+                  container workloads. You can manage both Linux and Windows virtual machines.
+                </Content>
 
-              <Title headingLevel="h3">What do you want to do next?</Title>
+                <Title headingLevel="h3">What do you want to do next?</Title>
 
-              <WelcomeButtons onClose={onClose} />
+                <WelcomeButtons onClose={onClose} />
 
-              <Checkbox
-                onChange={(_event, value) =>
-                  setQuickStarts({ ...quickStarts, dontShowWelcomeModal: value })
-                }
-                className="WelcomeModal__checkbox"
-                id="welcome-modal-checkbox"
-                isChecked={quickStarts?.dontShowWelcomeModal}
-                label={t('Do not show this again')}
-              />
-            </Trans>
-          </Stack>
-        </GridItem>
-      </Grid>
+                <Checkbox
+                  onChange={(_event, value) =>
+                    setQuickStarts({ ...quickStarts, dontShowWelcomeModal: value })
+                  }
+                  className="WelcomeModal__checkbox"
+                  id="welcome-modal-checkbox"
+                  isChecked={quickStarts?.dontShowWelcomeModal}
+                  label={t('Do not show this again')}
+                />
+              </Trans>
+            </Stack>
+          </GridItem>
+        </Grid>
+      </ModalBody>
     </Modal>
   );
 };

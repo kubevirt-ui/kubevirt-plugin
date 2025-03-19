@@ -5,6 +5,7 @@ import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpa
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Button,
+  ButtonVariant,
   DescriptionListDescription,
   DescriptionListGroup,
   DescriptionListTermHelpText,
@@ -98,7 +99,7 @@ const VirtualMachineDescriptionItem: FC<VirtualMachineDescriptionItemProps> = ({
                 isInline
                 onClick={onEditClick}
                 type="button"
-                variant="link"
+                variant={ButtonVariant.link}
               >
                 {t('Edit')}
               </Button>

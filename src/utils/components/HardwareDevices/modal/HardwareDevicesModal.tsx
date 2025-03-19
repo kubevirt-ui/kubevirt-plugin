@@ -137,7 +137,7 @@ const HardwareDevicesModal: FC<HardwareDevicesModalProps> = ({
             className="pf-m-link--align-left"
             icon={<PlusCircleIcon />}
             onClick={onAddDevice}
-            variant="link"
+            variant={ButtonVariant.link}
           >
             {btnText}
           </Button>

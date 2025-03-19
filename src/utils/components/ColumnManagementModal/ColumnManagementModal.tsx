@@ -4,17 +4,19 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
 import { ColumnLayout } from '@openshift-console/dynamic-plugin-sdk';
 import {
-  ActionList,
-  ActionListItem,
   Alert,
   AlertVariant,
   Button,
   ButtonVariant,
   DataList,
+  Flex,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  ModalVariant,
   Stack,
-  StackItem,
 } from '@patternfly/react-core';
-import { Modal, ModalVariant } from '@patternfly/react-core/deprecated';
 
 import { MAX_VIEW_COLS } from './constants';
 import DataListRow from './DataListRow';
@@ -79,54 +81,9 @@ export const ColumnManagementModal: FC<ColumnManagementModalProps> = ({
   };
 
   return (
-    <Modal
-      footer={
-        <Stack className="kv-tabmodal-footer" hasGutter>
-          {error && (
-            <StackItem>
-              <Alert isInline title={t('An error occurred')} variant={AlertVariant.danger}>
-                <Stack hasGutter>
-                  <StackItem>{error.message}</StackItem>
-                </Stack>
-              </Alert>
-            </StackItem>
-          )}
-          <StackItem>
-            <ActionList className="column-management-modal__action-list">
-              <ActionListItem>
-                <Button key="reset" onClick={resetColumns} variant={ButtonVariant.link}>
-                  {t('Restore default columns')}
-                </Button>
-              </ActionListItem>
-
-              <ActionListItem>
-                <Button onClick={onClose} variant={ButtonVariant.secondary}>
-                  {t('Cancel')}
-                </Button>
-              </ActionListItem>
-              <ActionListItem>
-                <Button
-                  form="modal-with-form-form"
-                  isDisabled={!loaded}
-                  isLoading={!loaded}
-                  key="create"
-                  onClick={submit}
-                  variant={ButtonVariant.primary}
-                >
-                  {t('Save')}
-                </Button>
-              </ActionListItem>
-            </ActionList>
-          </StackItem>
-        </Stack>
-      }
-      isOpen={isOpen}
-      onClose={onClose}
-      position="top"
-      title={t('Manage columns')}
-      variant={ModalVariant.small}
-    >
-      <>
+    <Modal isOpen={isOpen} onClose={onClose} position="top" variant={ModalVariant.small}>
+      <ModalHeader title={t('Manage columns')} />
+      <ModalBody>
         <p className="co-m-form-row">{t('Selected columns will appear in the table.')}</p>
         <Alert
           className="co-alert"
@@ -180,7 +137,34 @@ export const ColumnManagementModal: FC<ColumnManagementModalProps> = ({
             </span>
           </div>
         </div>
-      </>
+      </ModalBody>
+      <ModalFooter>
+        <Stack className="kv-tabmodal-footer" hasGutter>
+          {error && (
+            <Alert isInline title={t('An error occurred')} variant={AlertVariant.danger}>
+              {error.message}
+            </Alert>
+          )}
+          <Flex className="column-management-modal__action-list">
+            <Button key="reset" onClick={resetColumns} variant={ButtonVariant.link}>
+              {t('Restore default columns')}
+            </Button>
+            <Button onClick={onClose} variant={ButtonVariant.secondary}>
+              {t('Cancel')}
+            </Button>
+            <Button
+              form="modal-with-form-form"
+              isDisabled={!loaded}
+              isLoading={!loaded}
+              key="create"
+              onClick={submit}
+              variant={ButtonVariant.primary}
+            >
+              {t('Save')}
+            </Button>
+          </Flex>
+        </Stack>
+      </ModalFooter>
     </Modal>
   );
 };

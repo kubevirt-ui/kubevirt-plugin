@@ -5,7 +5,9 @@ import {
   ActionGroup,
   Alert,
   AlertActionCloseButton,
+  AlertVariant,
   Button,
+  ButtonVariant,
   Stack,
   StackItem,
 } from '@patternfly/react-core';
@@ -62,7 +64,7 @@ const EnvironmentFormActions: React.FC<EnvironmentFormActionsProps> = ({
             className="co-alert co-alert--scrollable"
             isInline
             title={t('An error occurred')}
-            variant="danger"
+            variant={AlertVariant.danger}
           >
             <div className="co-pre-line">{error?.message || apiError?.message}</div>
           </Alert>
@@ -73,7 +75,7 @@ const EnvironmentFormActions: React.FC<EnvironmentFormActionsProps> = ({
             className="co-alert"
             isInline
             title={t('Success')}
-            variant="success"
+            variant={AlertVariant.success}
           />
         )}
       </StackItem>
@@ -84,11 +86,10 @@ const EnvironmentFormActions: React.FC<EnvironmentFormActionsProps> = ({
             isLoading={loading}
             onClick={onSubmit}
             type="submit"
-            variant="primary"
           >
             {t('Save')}
           </Button>
-          <Button onClick={onReload} type="button" variant="secondary">
+          <Button onClick={onReload} type="button" variant={ButtonVariant.secondary}>
             {t('Reload')}
           </Button>
         </ActionGroup>

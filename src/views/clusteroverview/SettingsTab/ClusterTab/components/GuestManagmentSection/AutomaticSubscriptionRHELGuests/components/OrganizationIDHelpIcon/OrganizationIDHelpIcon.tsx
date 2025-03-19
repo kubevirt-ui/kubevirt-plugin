@@ -3,7 +3,7 @@ import { Trans } from 'react-i18next';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Button } from '@patternfly/react-core';
+import { Button, ButtonVariant } from '@patternfly/react-core';
 
 import { REDHAT_CONSOLE_URL } from '../../utils/constants';
 
@@ -14,7 +14,13 @@ const OrganizationIDHelpIcon: FC = () => {
       bodyContent={
         <Trans ns="plugin__kubevirt-plugin" t={t}>
           Log into{' '}
-          <Button component="a" href={REDHAT_CONSOLE_URL} isInline target="_blank" variant="link">
+          <Button
+            component="a"
+            href={REDHAT_CONSOLE_URL}
+            isInline
+            target="_blank"
+            variant={ButtonVariant.link}
+          >
             Hybrid Cloud Console
           </Button>{' '}
           to track your Organization ID.

@@ -22,7 +22,9 @@ import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN
 import { createHeadlessService } from '@kubevirt-utils/utils/headless-service';
 import {
   Alert,
+  AlertVariant,
   Button,
+  ButtonVariant,
   Checkbox,
   Split,
   SplitItem,
@@ -114,7 +116,7 @@ export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
         <StackItem />
         {error && (
           <StackItem>
-            <Alert isInline title={t('Create VirtualMachine error')} variant="danger">
+            <Alert isInline title={t('Create VirtualMachine error')} variant={AlertVariant.danger}>
               {error.message}
             </Alert>
           </StackItem>
@@ -126,7 +128,6 @@ export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
                 isDisabled={!loaded || disableVmCreate}
                 isLoading={!vmCreateLoaded}
                 onClick={onSubmit}
-                variant="primary"
               >
                 {t('Create VirtualMachine')}
               </Button>
@@ -142,7 +143,7 @@ export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
                     navigate(`/k8s/ns/${namespace}/catalog/template`);
                   }
                 }}
-                variant="link"
+                variant={ButtonVariant.link}
               >
                 {t('Cancel')}
               </Button>

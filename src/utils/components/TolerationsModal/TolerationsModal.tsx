@@ -18,8 +18,7 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTolerations } from '@kubevirt-utils/resources/vm';
 import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
-import { Form, Stack, StackItem } from '@patternfly/react-core';
-import { ModalVariant } from '@patternfly/react-core/deprecated';
+import { Form, ModalVariant, Stack, StackItem } from '@patternfly/react-core';
 
 import { TolerationLabel } from './utils/constants';
 import { getNodeTaintQualifier } from './utils/helpers';

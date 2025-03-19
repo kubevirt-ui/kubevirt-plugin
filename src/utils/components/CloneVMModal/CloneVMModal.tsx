@@ -11,8 +11,7 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { MAX_K8S_NAME_LENGTH } from '@kubevirt-utils/utils/constants';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
-import { Form } from '@patternfly/react-core';
-import { ModalVariant } from '@patternfly/react-core/deprecated';
+import { Form, ModalVariant } from '@patternfly/react-core';
 
 import CloningStatus from './components/CloningStatus';
 import ConfigurationSummary from './components/ConfigurationSummary';

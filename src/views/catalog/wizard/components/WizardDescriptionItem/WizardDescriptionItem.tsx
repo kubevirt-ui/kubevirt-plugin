@@ -4,6 +4,7 @@ import classnames from 'classnames';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Button,
+  ButtonVariant,
   DescriptionListDescription,
   DescriptionListGroup,
   DescriptionListTerm,
@@ -67,7 +68,12 @@ export const WizardDescriptionItem: FC<WizardDescriptionItemProps> = React.memo(
     const getItemHeader = () => {
       if (onTitleClick)
         return (
-          <Button isDisabled={isDisabled} isInline onClick={onTitleClick} variant="link">
+          <Button
+            isDisabled={isDisabled}
+            isInline
+            onClick={onTitleClick}
+            variant={ButtonVariant.link}
+          >
             <DescriptionListTerm>{titleWithCount}</DescriptionListTerm>
           </Button>
         );
@@ -108,7 +114,7 @@ export const WizardDescriptionItem: FC<WizardDescriptionItemProps> = React.memo(
                   isInline
                   onClick={onEditClick}
                   type="button"
-                  variant="link"
+                  variant={ButtonVariant.link}
                 >
                   {t('Edit')}
                 </Button>
@@ -127,7 +133,7 @@ export const WizardDescriptionItem: FC<WizardDescriptionItemProps> = React.memo(
               isInline
               onClick={onEditClick}
               type="button"
-              variant="link"
+              variant={ButtonVariant.link}
             >
               {description ?? <span className="text-muted">{t('Not available')}</span>}
             </Button>

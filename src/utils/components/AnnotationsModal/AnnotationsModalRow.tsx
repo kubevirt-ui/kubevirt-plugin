@@ -1,7 +1,7 @@
 import React, { FC, memo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Button, GridItem, TextInput } from '@patternfly/react-core';
+import { Button, ButtonVariant, GridItem, TextInput } from '@patternfly/react-core';
 import { MinusCircleIcon } from '@patternfly/react-icons';
 
 export const AnnotationsModalRow: FC<{
@@ -39,7 +39,11 @@ export const AnnotationsModalRow: FC<{
         />
       </GridItem>
       <GridItem span={2}>
-        <Button icon={<MinusCircleIcon />} onClick={() => onDelete()} variant="plain" />
+        <Button
+          icon={<MinusCircleIcon />}
+          onClick={() => onDelete()}
+          variant={ButtonVariant.plain}
+        />
       </GridItem>
     </>
   );

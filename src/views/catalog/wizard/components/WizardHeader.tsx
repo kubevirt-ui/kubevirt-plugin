@@ -10,6 +10,7 @@ import {
   Breadcrumb,
   BreadcrumbItem,
   Button,
+  ButtonVariant,
   Content,
   ContentVariants,
   Split,
@@ -41,7 +42,7 @@ export const WizardHeader: FC<{ namespace: string }> = memo(({ namespace }) => {
               onBreadcrumbClick(`/k8s/ns/${namespace || DEFAULT_NAMESPACE}/catalog/template`)
             }
             isInline
-            variant="link"
+            variant={ButtonVariant.link}
           >
             {t('Catalog')}
           </Button>

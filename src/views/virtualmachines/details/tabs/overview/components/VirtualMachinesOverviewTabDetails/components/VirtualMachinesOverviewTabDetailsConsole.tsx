@@ -6,7 +6,7 @@ import { isHeadlessModeVMI } from '@kubevirt-utils/components/Consoles/utils/uti
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { vmiStatuses } from '@kubevirt-utils/resources/vmi';
 import { useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
-import { Bullseye, Button } from '@patternfly/react-core';
+import { Bullseye, Button, ButtonVariant } from '@patternfly/react-core';
 import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 
 import VirtualMachinesOverviewTabDetailsConsoleConnect from './VirtualMachinesOverviewTabDetailsConsoleConnect';
@@ -41,7 +41,7 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
           icon={<ExternalLinkAltIcon className="icon" />}
           iconPosition="end"
           isDisabled={!isVMRunning || isHeadlessMode || !canConnectConsole}
-          variant="link"
+          variant={ButtonVariant.link}
         >
           {t('Open web console')}
         </Button>

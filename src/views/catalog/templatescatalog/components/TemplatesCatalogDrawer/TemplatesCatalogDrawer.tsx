@@ -5,7 +5,7 @@ import { logTemplateFlowEvent } from '@kubevirt-utils/extensions/telemetry/telem
 import { CANCEL_CREATE_VM_BUTTON_CLICKED } from '@kubevirt-utils/extensions/telemetry/utils/constants';
 import { getTemplateName } from '@kubevirt-utils/resources/template/utils/selectors';
 import { CatalogItemHeader } from '@patternfly/react-catalog-view-extension';
-import { Modal } from '@patternfly/react-core/deprecated';
+import { Modal, ModalBody, ModalFooter, ModalHeader } from '@patternfly/react-core';
 
 import { getTemplateOSIcon } from '../../utils/os-icons';
 
@@ -41,24 +41,28 @@ export const TemplatesCatalogDrawer: FC<TemplatesCatalogDrawerProps> = ({
   return (
     <DrawerContextProvider template={template}>
       <Modal
-        footer={
-          template && <TemplatesCatalogDrawerFooter namespace={namespace} onCancel={handleCancel} />
-        }
-        header={
+        aria-label="Template drawer"
+        className="ocs-modal co-catalog-page__overlay co-catalog-page__overlay--right template-catalog-drawer"
+        disableFocusTrap
+        isOpen={isOpen}
+        onClose={onClose}
+      >
+        <ModalHeader>
           <CatalogItemHeader
             className="co-catalog-page__overlay-header"
             iconImg={osIcon}
             title={templateName}
             vendor={template?.metadata?.name}
           />
-        }
-        aria-label="Template drawer"
-        className="pf-v6-c-modal-box ocs-modal co-catalog-page__overlay co-catalog-page__overlay--right template-catalog-drawer"
-        disableFocusTrap
-        isOpen={isOpen}
-        onClose={onClose}
-      >
-        <TemplatesCatalogDrawerPanel />
+        </ModalHeader>
+        <ModalBody>
+          <TemplatesCatalogDrawerPanel />
+        </ModalBody>
+        {template && (
+          <ModalFooter>
+            <TemplatesCatalogDrawerFooter namespace={namespace} onCancel={handleCancel} />
+          </ModalFooter>
+        )}
       </Modal>
     </DrawerContextProvider>
   );

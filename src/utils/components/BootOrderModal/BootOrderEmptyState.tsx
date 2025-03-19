@@ -4,6 +4,7 @@ import {
   Alert,
   AlertVariant,
   Button,
+  ButtonVariant,
   EmptyState,
   EmptyStateActions,
   EmptyStateBody,
@@ -25,7 +26,7 @@ export const BootOrderEmptyState: FC<BootOrderEmptyProps> = ({
     <EmptyStateFooter>
       <EmptyStateActions>
         {!addItemIsDisabled ? (
-          <Button onClick={onClick} variant="secondary">
+          <Button onClick={onClick} variant={ButtonVariant.secondary}>
             {addItemMessage}
           </Button>
         ) : (

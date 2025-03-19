@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom-v5-compat';
 
-import { Button } from '@patternfly/react-core';
+import { Button, ButtonVariant } from '@patternfly/react-core';
 
 import { GettingStartedLink } from '../types';
 
@@ -19,7 +19,12 @@ const GettingStartedMoreLinkContent: React.FC<GettingStartedMoreLinkContentProps
   if (moreLink?.onClick) {
     const handleClick = moreLink.onClick;
     return (
-      <Button data-test={`item ${moreLink.id}`} isInline onClick={handleClick} variant="link">
+      <Button
+        data-test={`item ${moreLink.id}`}
+        isInline
+        onClick={handleClick}
+        variant={ButtonVariant.link}
+      >
         {moreLink.title}
       </Button>
     );
