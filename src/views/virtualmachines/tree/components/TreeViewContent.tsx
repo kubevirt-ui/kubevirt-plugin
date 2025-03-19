@@ -15,10 +15,10 @@ import {
 import useFilteredTreeView from '../hooks/useFilteredTreeView';
 import useTreeViewItemActions from '../hooks/useTreeViewItemActions';
 
+import TreeViewRightClickActionMenu from './TreeViewRightClickActionMenu/TreeViewRightClickActionMenu';
 import CreateProject from './CreateProject';
 import PanelToggleButton from './PanelToggleButton';
 import TreeViewCollapseExpand from './TreeViewCollapseExpand';
-import TreeViewRightClickActionMenu from './TreeViewRightClickActionMenu';
 import TreeViewToolbar from './TreeViewToolbar';
 
 type TreeViewContentProps = {

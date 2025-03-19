@@ -7,18 +7,17 @@ import { Menu, MenuContent, MenuList, Popper } from '@patternfly/react-core';
 import useVirtualMachineActionsProvider from '@virtualmachines/actions/hooks/useVirtualMachineActionsProvider';
 import { getVMIMFromMapper } from '@virtualmachines/utils/mappers';
 
-import { vmimMapperSignal, vmsSignal } from '../utils/signals';
+import { vmimMapperSignal, vmsSignal } from '../../utils/signals';
 
-type TreeViewRightClickActionMenuProps = {
+import { getVMComponentsFromID } from './utils';
+
+type VMRightClickActionMenuProps = {
   hideMenu: () => void;
   triggerElement: HTMLElement | null;
 };
 
-const TreeViewRightClickActionMenu: FC<TreeViewRightClickActionMenuProps> = ({
-  hideMenu,
-  triggerElement,
-}) => {
-  const [vmNamespace, vmName] = triggerElement?.id?.split('/') || ['', ''];
+const VMRightClickActionMenu: FC<VMRightClickActionMenuProps> = ({ hideMenu, triggerElement }) => {
+  const { vmName, vmNamespace } = getVMComponentsFromID(triggerElement);
 
   const [isSingleNodeCluster] = useSingleNodeCluster();
 
@@ -29,29 +28,24 @@ const TreeViewRightClickActionMenu: FC<TreeViewRightClickActionMenuProps> = ({
 
   const [actions] = useVirtualMachineActionsProvider(vm, vmim, isSingleNodeCluster);
 
-  if (!triggerElement) return null;
-
   return (
-    <>
-      <Popper
-        popper={
-          <Menu className="right-click-action-menu" containsFlyout>
-            <MenuContent>
-              <MenuList>
-                {actions?.map((action) => (
-                  <ActionDropdownItem action={action} key={action?.id} setIsOpen={hideMenu} />
-                ))}
-              </MenuList>
-            </MenuContent>
-          </Menu>
-        }
-        appendTo={triggerElement}
-        isVisible
-        position="end"
-      />
-      <div className="right-click-action-menu-background" onClick={hideMenu}></div>
-    </>
+    <Popper
+      popper={
+        <Menu className="right-click-action-menu" containsFlyout>
+          <MenuContent>
+            <MenuList>
+              {actions?.map((action) => (
+                <ActionDropdownItem action={action} key={action?.id} setIsOpen={hideMenu} />
+              ))}
+            </MenuList>
+          </MenuContent>
+        </Menu>
+      }
+      appendTo={triggerElement}
+      isVisible
+      position="end"
+    />
   );
 };
 
-export default TreeViewRightClickActionMenu;
+export default VMRightClickActionMenu;
