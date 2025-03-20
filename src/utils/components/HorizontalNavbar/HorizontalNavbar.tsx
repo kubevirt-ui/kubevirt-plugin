@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useMemo, useState } from 'react';
-import { NavLink, Route, Routes, useLocation, useParams } from 'react-router-dom-v5-compat';
+import { NavLink, Route, Routes, useLocation } from 'react-router-dom-v5-compat';
 import classNames from 'classnames';
 import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
@@ -27,16 +27,6 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
   vm,
 }) => {
   const location = useLocation();
-
-  const params = useParams();
-  const [memoParams, setMemoParams] = useState(params);
-
-  useEffect(() => {
-    setMemoParams((preParams) =>
-      JSON.stringify(params) !== JSON.stringify(preParams) ? params : preParams,
-    );
-  }, [params]);
-
   const dynamicPluginPages = useDynamicPages(VirtualMachineModel);
 
   const allPages = useMemo(
@@ -65,12 +55,7 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
         <Route
           Component={(props) => (
             <StateHandler error={error} loaded={loaded} withBullseye>
-              <Component
-                instanceTypeExpandedSpec={instanceTypeExpandedSpec}
-                obj={vm}
-                params={memoParams}
-                {...props}
-              />
+              <Component instanceTypeExpandedSpec={instanceTypeExpandedSpec} obj={vm} {...props} />
             </StateHandler>
           )}
           key={page.href}
@@ -78,7 +63,7 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
         />
       );
     });
-  }, [allPages, vm, error, loaded, instanceTypeExpandedSpec, memoParams]);
+  }, [allPages, vm, error, loaded, instanceTypeExpandedSpec]);
 
   return (
     <>

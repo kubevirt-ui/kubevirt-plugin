@@ -17,6 +17,7 @@ import {
   Divider,
   Label,
 } from '@patternfly/react-core';
+import { Fleet } from '@stolostron/multicluster-sdk';
 
 import useSnapshotData from '../../../snapshots/hooks/useSnapshotData';
 import { createURL } from '../../utils/utils';
@@ -26,14 +27,14 @@ import VirtualMachinesOverviewTabSnapshotsRow from './VirtualMachinesOverviewTab
 import './virtual-machines-overview-tab-snapshots.scss';
 
 type VirtualMachinesOverviewTabSnapshotsProps = {
-  vm: V1VirtualMachine;
+  vm: Fleet<V1VirtualMachine>;
 };
 
 const VirtualMachinesOverviewTabSnapshots: React.FC<VirtualMachinesOverviewTabSnapshotsProps> = ({
   vm,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { snapshots } = useSnapshotData(vm?.metadata?.name, vm?.metadata?.namespace);
+  const { snapshots } = useSnapshotData(vm?.metadata?.name, vm?.metadata?.namespace, vm.cluster);
   const { createModal } = useModal();
   const snapshotsTabLink = createURL('snapshots', location?.pathname);
 
