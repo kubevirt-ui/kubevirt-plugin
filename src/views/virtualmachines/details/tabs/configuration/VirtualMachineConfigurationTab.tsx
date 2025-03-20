@@ -5,7 +5,7 @@ import { useLocation } from 'react-router-dom-v5-compat';
 import useInstanceTypesAndPreferences from '@catalog/CreateFromInstanceTypes/state/hooks/useInstanceTypesAndPreferences';
 import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
-import { getName } from '@kubevirt-utils/resources/shared';
+import { getCluster, getName } from '@kubevirt-utils/resources/shared';
 import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
 import { PageSection, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
@@ -24,7 +24,7 @@ const VirtualMachineConfigurationTab: FC<NavPageComponentProps> = ({
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { vmi } = useVMI(getName(vm), getNamespace(vm));
+  const { vmi } = useVMI(getName(vm), getNamespace(vm), getCluster(vm));
   const { allInstanceTypes } = useInstanceTypesAndPreferences();
   const [activeTabKey, setActiveTabKey] = useState<number | string>(
     VirtualMachineDetailsTab.Details,

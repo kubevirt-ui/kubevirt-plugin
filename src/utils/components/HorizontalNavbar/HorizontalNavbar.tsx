@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useMemo, useState } from 'react';
-import { NavLink, Route, Routes, useLocation, useParams } from 'react-router-dom-v5-compat';
+import { NavLink, Route, Routes, useLocation } from 'react-router-dom-v5-compat';
 import classNames from 'classnames';
 import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
@@ -27,9 +27,6 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
   vm,
 }) => {
   const location = useLocation();
-
-  const params = useParams();
-
   const dynamicPluginPages = useDynamicPages(VirtualMachineModel);
 
   const allPages = useMemo(
@@ -88,7 +85,6 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
                   <Component
                     instanceTypeExpandedSpec={instanceTypeExpandedSpec}
                     obj={vm}
-                    params={params}
                     {...props}
                   />
                 </StateHandler>
