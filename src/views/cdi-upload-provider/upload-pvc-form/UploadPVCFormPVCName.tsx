@@ -1,6 +1,7 @@
 import React, { ReactEventHandler } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { FormGroup, FormHelperText, HelperText, TextInput } from '@patternfly/react-core';
 
 type UploadPVCFormPVCNameProps = {
   handlePvcName: ReactEventHandler<HTMLInputElement>;
@@ -17,27 +18,23 @@ const UploadPVCFormPVCName: React.FC<UploadPVCFormPVCNameProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   return (
-    <>
-      <label className="control-label co-required" htmlFor="pvc-name">
-        {t('Persistent Volume Claim Name')}
-      </label>
-      <div className="form-group">
-        <input
-          aria-describedby="pvc-name-help"
-          className="pf-v6-c-form-control"
-          disabled={isGolden || isLoading}
-          id="pvc-name"
-          onChange={handlePvcName}
-          placeholder={isGolden ? t('pick an operating system') : t('my-storage-claim')}
-          required
-          type="text"
-          value={pvcName || ''}
-        />
-        <p className="help-block" id="pvc-name-help">
+    <FormGroup fieldId="pvc-name" isRequired label={t('Persistent Volume Claim Name')}>
+      <TextInput
+        aria-describedby="pvc-name-help"
+        id="pvc-name"
+        isDisabled={isGolden || isLoading}
+        onChange={handlePvcName}
+        placeholder={isGolden ? t('pick an operating system') : t('my-storage-claim')}
+        required
+        type="text"
+        value={pvcName || ''}
+      />
+      <FormHelperText>
+        <HelperText id="pvc-name-help">
           {t('A unique name for the storage claim within the project')}
-        </p>
-      </div>
-    </>
+        </HelperText>
+      </FormHelperText>
+    </FormGroup>
   );
 };
 
