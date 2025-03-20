@@ -15,20 +15,16 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getVMIPod } from '@kubevirt-utils/resources/vmi';
-import {
-  K8sResourceCommon,
-  K8sVerb,
-  ResourceLink,
-  useAccessReview,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { K8sResourceCommon, K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { Card, CardBody, CardTitle, DescriptionList, Divider } from '@patternfly/react-core';
+import { Fleet, FleetResourceLink } from '@stolostron/multicluster-sdk';
 
 import './virtual-machines-overview-tab-general.scss';
 
 type VirtualMachinesOverviewTabGeneralProps = {
-  pods: K8sResourceCommon[];
-  vm: V1VirtualMachine;
-  vmi: V1VirtualMachineInstance;
+  pods: Fleet<K8sResourceCommon>[];
+  vm: Fleet<V1VirtualMachine>;
+  vmi: Fleet<V1VirtualMachineInstance>;
 };
 
 const VirtualMachinesOverviewTabGeneral: FC<VirtualMachinesOverviewTabGeneralProps> = ({
@@ -56,7 +52,8 @@ const VirtualMachinesOverviewTabGeneral: FC<VirtualMachinesOverviewTabGeneralPro
                 'Namespace defines the space within which each name must be unique. An empty namespace is equivalent to the "default" namespace, but "default" is the canonical representation. Not all objects are required to be scoped to a namespace - the value of this field for those objects will be empty. Must be a DNS_LABEL. Cannot be updated. ',
               )}
               descriptionData={
-                <ResourceLink
+                <FleetResourceLink
+                  cluster={vm.cluster}
                   groupVersionKind={modelToGroupVersionKind(NamespaceModel)}
                   name={vm?.metadata?.namespace}
                 />
@@ -70,7 +67,8 @@ const VirtualMachinesOverviewTabGeneral: FC<VirtualMachinesOverviewTabGeneralPro
               <VirtualMachineDescriptionItem
                 descriptionData={
                   vmi?.status?.nodeName ? (
-                    <ResourceLink
+                    <FleetResourceLink
+                      cluster={vmi.cluster}
                       groupVersionKind={modelToGroupVersionKind(NodeModel)}
                       name={vmi?.status?.nodeName}
                     />
@@ -84,7 +82,8 @@ const VirtualMachinesOverviewTabGeneral: FC<VirtualMachinesOverviewTabGeneralPro
             <VirtualMachineDescriptionItem
               descriptionData={
                 vmi?.metadata?.name ? (
-                  <ResourceLink
+                  <FleetResourceLink
+                    cluster={vmi.cluster}
                     groupVersionKind={VirtualMachineInstanceModelGroupVersionKind}
                     name={vmi?.metadata?.name}
                     namespace={vmi?.metadata?.namespace}
@@ -98,7 +97,8 @@ const VirtualMachinesOverviewTabGeneral: FC<VirtualMachinesOverviewTabGeneralPro
             <VirtualMachineDescriptionItem
               descriptionData={
                 pod?.metadata?.name ? (
-                  <ResourceLink
+                  <FleetResourceLink
+                    cluster={pod.cluster}
                     groupVersionKind={modelToGroupVersionKind(PodModel)}
                     name={getName(pod)}
                     namespace={getNamespace(pod)}

@@ -1,5 +1,6 @@
 import { EncodedExtension } from '@openshift/dynamic-plugin-sdk-webpack';
 
+import { extensions as MulticlusterExtensions } from './src/multicluster/extensions';
 import { extensions as VirtualizationPerspectiveExtensions } from './src/perspective/extensions';
 import { extensions as utilsExtensions } from './src/utils/extension';
 import { extensions as CDIUploadProviderExtensions } from './src/views/cdi-upload-provider/extensions';
@@ -18,6 +19,7 @@ const extensions: EncodedExtension[] = [
   ...CDIUploadProviderExtensions,
   ...StorageMigrationExtensions,
   ...TopologyExtensions,
+  ...MulticlusterExtensions,
   {
     properties: {
       flag: 'KUBEVIRT_CDI',

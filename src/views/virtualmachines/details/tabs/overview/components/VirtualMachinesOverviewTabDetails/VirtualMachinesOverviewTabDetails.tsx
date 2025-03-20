@@ -33,6 +33,7 @@ import {
   Split,
   SplitItem,
 } from '@patternfly/react-core';
+import { Fleet, FleetResourceLink } from '@stolostron/multicluster-sdk';
 import { createURL } from '@virtualmachines/details/tabs/overview/utils/utils';
 import VMNotMigratableLabel from '@virtualmachines/list/components/VMNotMigratableLabel/VMNotMigratableLabel';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
@@ -52,7 +53,7 @@ type VirtualMachinesOverviewTabDetailsProps = {
   guestAgentDataLoaded: boolean;
   instanceTypeExpandedSpec: V1VirtualMachine;
   loaded: boolean;
-  vm: V1VirtualMachine;
+  vm: Fleet<V1VirtualMachine>;
   vmi: V1VirtualMachineInstance;
 };
 
@@ -120,6 +121,23 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
                   descriptionData={getName(vm)}
                   descriptionHeader={t('Name')}
                 />
+                {vm.cluster && (
+                  <VirtualMachineDescriptionItem
+                    descriptionData={
+                      <FleetResourceLink
+                        groupVersionKind={{
+                          group: 'cluster.open-cluster-management.io',
+                          kind: 'ManagedCluster',
+                          version: 'v1',
+                        }}
+                        name={vm.cluster}
+                        truncate
+                      />
+                    }
+                    data-test-id="virtual-machine-overview-details-cluster"
+                    descriptionHeader={t('Cluster')}
+                  />
+                )}
                 {treeViewFoldersEnabled && (
                   <VirtualMachineDescriptionItem
                     data-test-id="virtual-machine-overview-details-folder"
