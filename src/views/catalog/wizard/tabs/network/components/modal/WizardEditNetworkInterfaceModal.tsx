@@ -28,15 +28,23 @@ const WizardEditNetworkInterfaceModal: FC<WizardEditNetworkInterfaceModalProps> 
   const { t } = useKubevirtTranslation();
 
   const onSubmit =
-    ({ interfaceMACAddress, interfaceModel, interfaceType, networkName, nicName }) =>
+    ({
+      interfaceLinkState,
+      interfaceMACAddress,
+      interfaceModel,
+      interfaceType,
+      networkName,
+      nicName,
+    }) =>
     (currentVM) => {
       const resultNetwork = createNetwork(nicName, networkName);
-      const resultInterface = createInterface(
-        nicName,
-        interfaceModel,
+      const resultInterface = createInterface({
+        interfaceLinkState,
         interfaceMACAddress,
+        interfaceModel,
         interfaceType,
-      );
+        nicName,
+      });
 
       const networkProducer = produceVMNetworks(currentVM, (draftVM) => {
         draftVM.spec.template.spec.domain.devices.interfaces = [

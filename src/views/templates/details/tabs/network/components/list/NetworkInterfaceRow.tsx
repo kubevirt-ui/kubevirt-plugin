@@ -4,10 +4,12 @@ import { FC } from 'react';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import TemplateValue from '@kubevirt-utils/components/TemplateValue/TemplateValue';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { getPrintableNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
+import { getNetworkInterfaceStateIcon } from '@virtualmachines/details/tabs/configuration/network/utils/utils';
 
 import NetworkInterfaceActions from './NetworkInterfaceActions';
 
@@ -21,6 +23,9 @@ const NetworkInterfaceRow: FC<RowProps<NetworkPresentation, { template: V1Templa
   rowData: { template },
 }) => {
   const { t } = useKubevirtTranslation();
+  const templateVM = getTemplateVirtualMachineObject(template);
+  const InterfaceStateIcon = getNetworkInterfaceStateIcon(templateVM, network?.name);
+
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} id="name">
@@ -35,6 +40,9 @@ const NetworkInterfaceRow: FC<RowProps<NetworkPresentation, { template: V1Templa
         ) : (
           <TemplateValue value={network.multus?.networkName || NO_DATA_DASH} />
         )}
+      </TableData>
+      <TableData activeColumnIDs={activeColumnIDs} id="state">
+        <InterfaceStateIcon />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="type">
         {getPrintableNetworkInterfaceType(iface)}

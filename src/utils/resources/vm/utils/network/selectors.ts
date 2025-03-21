@@ -1,4 +1,5 @@
-import { V1Interface } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1Interface, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { getInterfaces } from '@kubevirt-utils/resources/vm';
 
 import { NO_DATA_DASH, UDN_BINDING_NAME } from '../constants';
 
@@ -23,3 +24,25 @@ export const getNetworkInterfaceType = (iface: V1Interface): string => {
  */
 export const getPrintableNetworkInterfaceType = (iface: V1Interface): string =>
   interfacesTypes[getNetworkInterfaceType(iface)];
+
+/**
+ * function to get a specific network interface by name
+ * @param {V1VirtualMachine} vm the VirtualMachine whose interface is to be returned
+ * @param {string} interfaceName the name of the interface to be returned
+ * @returns {V1Interface} interface type
+ */
+export const getNetworkInterface = (
+  vm: V1VirtualMachine,
+  interfaceName: string,
+): undefined | V1Interface => getInterfaces(vm)?.find((iface) => iface?.name === interfaceName);
+
+/**
+ * function to get the state of a specific network interface
+ * @param {V1VirtualMachine} vm the VirtualMachine whose interface state is to be returned
+ * @param {string} interfaceName the name of the interface whose state is to be returned
+ * @returns {string} interface state
+ */
+export const getNetworkInterfaceState = (
+  vm: V1VirtualMachine,
+  interfaceName: string,
+): string | undefined => getNetworkInterface(vm, interfaceName)?.state;

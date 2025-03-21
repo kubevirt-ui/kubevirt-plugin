@@ -8,6 +8,7 @@ import {
   V1DomainSpec,
   V1Features,
   V1InstancetypeMatcher,
+  V1Interface,
   V1PreferenceMatcher,
   V1VirtualMachine,
   V1VirtualMachineCondition,
@@ -34,10 +35,19 @@ export const getNetworks = (vm: V1VirtualMachine) => vm?.spec?.template?.spec?.n
 /**
  * A selector for the virtual machine's interfaces
  * @param {V1VirtualMachine} vm the virtual machine
- * @returns the virtual machine interfaces
+ * @returns {V1Interface[]} the virtual machine interfaces
  */
-export const getInterfaces = (vm: V1VirtualMachine) =>
+export const getInterfaces = (vm: V1VirtualMachine): V1Interface[] =>
   vm?.spec?.template?.spec?.domain?.devices?.interfaces;
+
+/**
+ * A selector for a specific interface on the virtual machine
+ * @param {V1VirtualMachine} vm the virtual machine
+ * @param {string} ifaceName the name of the interface
+ * @returns {V1Interface} the requested interface
+ */
+export const getInterface = (vm: V1VirtualMachine, ifaceName: string): V1Interface =>
+  getInterfaces(vm)?.find((iface) => iface?.name === ifaceName);
 
 /**
  * A selector for the virtual machine's disks

@@ -6,6 +6,7 @@ import SelectToggle from '../toggles/SelectToggle';
 
 type FormPFSelectProps = Omit<SelectProps, 'isOpen' | 'toggle'> & {
   closeOnSelect?: boolean;
+  isDisabled?: boolean;
   selectedLabel?: any;
   toggleProps?: MenuToggleProps;
 };
@@ -14,6 +15,7 @@ const FormPFSelect: FC<FormPFSelectProps> = ({
   children,
   className,
   closeOnSelect = true,
+  isDisabled = false,
   onSelect,
   selected,
   selectedLabel,
@@ -31,6 +33,7 @@ const FormPFSelect: FC<FormPFSelectProps> = ({
         closeOnSelect && setIsOpen(false);
       }}
       toggle={SelectToggle({
+        isDisabled,
         isExpanded: isOpen,
         onClick: onToggle,
         selected: selectedLabel || selected || toggleProps?.placeholder,

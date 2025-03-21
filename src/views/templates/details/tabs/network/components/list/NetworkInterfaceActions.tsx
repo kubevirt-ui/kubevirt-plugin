@@ -4,6 +4,7 @@ import produce from 'immer';
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import { NetworkInterfaceState } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/types';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -12,8 +13,13 @@ import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/
 import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { ButtonVariant, Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
+import {
+  getInterfaceState,
+  isSRIOVInterface,
+} from '@virtualmachines/details/tabs/configuration/network/utils/utils';
 
 import useEditTemplateAccessReview from '../../../../hooks/useIsTemplateEditable';
+import { setTemplateNetworkInterfaceState } from '../../utils';
 import TemplatesEditNetworkInterfaceModal from '../modal/TemplatesEditNetworkInterfaceModal';
 
 type NetworkInterfaceActionsProps = {
@@ -30,6 +36,10 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const { isTemplateEditable } = useEditTemplateAccessReview(template);
+
+  const templateVM = getTemplateVirtualMachineObject(template);
+  const interfaceState = getInterfaceState(templateVM, nicName);
+  const isSRIOVIface = isSRIOVInterface(templateVM, nicName);
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const label = t('Delete NIC?');
@@ -99,6 +109,28 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
       popperProps={{ appendTo: getContentScrollableElement, position: 'right' }}
     >
       <DropdownList>
+        {interfaceState === NetworkInterfaceState.DOWN ? (
+          <DropdownItem
+            onClick={() =>
+              setTemplateNetworkInterfaceState(template, nicName, NetworkInterfaceState.UP)
+            }
+            isDisabled={isSRIOVIface}
+            key="network-interface-state-up"
+          >
+            {t('Set link up')}
+          </DropdownItem>
+        ) : (
+          <DropdownItem
+            onClick={() =>
+              setTemplateNetworkInterfaceState(template, nicName, NetworkInterfaceState.DOWN)
+            }
+            description={isSRIOVIface && t('Not available for SR-IOV interfaces')}
+            isDisabled={isSRIOVIface}
+            key="network-interface-state-down"
+          >
+            {t('Set link down')}
+          </DropdownItem>
+        )}
         <DropdownItem key="network-interface-edit" onClick={onEditModalOpen}>
           {editBtnText}
         </DropdownItem>

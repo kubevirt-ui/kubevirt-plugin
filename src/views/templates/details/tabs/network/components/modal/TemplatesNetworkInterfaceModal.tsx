@@ -27,15 +27,23 @@ const TemplatesNetworkInterfaceModal: FC<TemplatesNetworkInterfaceModalProps> = 
   const vm = getTemplateVirtualMachineObject(template);
 
   const onSubmit = useCallback(
-    ({ interfaceMACAddress, interfaceModel, interfaceType, networkName, nicName }) =>
+    ({
+        interfaceLinkState,
+        interfaceMACAddress,
+        interfaceModel,
+        interfaceType,
+        networkName,
+        nicName,
+      }) =>
       () => {
         const resultNetwork = createNetwork(nicName, networkName);
-        const resultInterface = createInterface(
-          nicName,
-          interfaceModel,
+        const resultInterface = createInterface({
+          interfaceLinkState,
           interfaceMACAddress,
+          interfaceModel,
           interfaceType,
-        );
+          nicName,
+        });
 
         const updatedTemplate = produceTemplateNetwork(template, (draftVM) => {
           draftVM.spec.template.spec.domain.devices.interfaces.push(resultInterface);

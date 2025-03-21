@@ -1,9 +1,11 @@
 import React, { FC, useCallback, useState } from 'react';
 
 import { produceVMNetworks, useWizardVMContext } from '@catalog/utils/WizardVMContext';
+import { setInterfaceLinkState } from '@catalog/wizard/tabs/network/utils/utils';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import { NetworkInterfaceState } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/types';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -11,6 +13,10 @@ import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ButtonVariant, Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
+import {
+  getInterfaceState,
+  isSRIOVInterface,
+} from '@virtualmachines/details/tabs/configuration/network/utils/utils';
 
 import WizardEditNetworkInterfaceModal from '../modal/WizardEditNetworkInterfaceModal';
 
@@ -35,6 +41,8 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
   const label = t('Delete NIC?');
   const editBtnText = t('Edit');
   const submitBtnText = t('Delete');
+  const interfaceState = getInterfaceState(vm, nicName);
+  const isSRIOVIface = isSRIOVInterface(vm, nicName);
 
   const onEditModalOpen = () => {
     createModal(({ isOpen, onClose }) => (
@@ -93,8 +101,27 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
       isOpen={isDropdownOpen}
       onOpenChange={setIsDropdownOpen}
       onSelect={() => setIsDropdownOpen(false)}
+      popperProps={{ position: 'right' }}
       toggle={KebabToggle({ id: 'toggle-id-network', onClick: onToggle })}
     >
+      {interfaceState === NetworkInterfaceState.DOWN ? (
+        <DropdownItem
+          isDisabled={isSRIOVIface}
+          key="network-interface-state-up"
+          onClick={() => onUpdate(setInterfaceLinkState(vm, nicName, NetworkInterfaceState.UP))}
+        >
+          {t('Set link up')}
+        </DropdownItem>
+      ) : (
+        <DropdownItem
+          description={isSRIOVIface && t('Not available for SR-IOV interfaces')}
+          isDisabled={isSRIOVIface}
+          key="network-interface-state-down"
+          onClick={() => onUpdate(setInterfaceLinkState(vm, nicName, NetworkInterfaceState.DOWN))}
+        >
+          {t('Set link down')}
+        </DropdownItem>
+      )}
       <DropdownList>
         <DropdownItem key="network-interface-edit" onClick={onEditModalOpen}>
           {editBtnText}
