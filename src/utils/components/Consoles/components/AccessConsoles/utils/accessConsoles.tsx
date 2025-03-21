@@ -11,6 +11,7 @@ import {
 } from '../../utils/ConsoleConsts';
 
 export type AccessConsolesProps = {
+  isVnc: boolean;
   isWindowsVM: boolean;
   rfb?: RFBCreate;
   serialSocket?: WSFactoryExtends;
