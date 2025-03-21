@@ -6,3 +6,5 @@ export const DRAG_N_DROP_LISTENERS = {
 };
 
 export const RIGHT_CLICK_LISTENER = 'contextmenu';
+
+export const VALID_DRAG_TARGET_BACKGROUND_COLOR = '#FFFEE6';

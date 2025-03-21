@@ -4,7 +4,9 @@ import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { TreeViewDataItem } from '@patternfly/react-core';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
-import { DRAG_N_DROP_LISTENERS } from './constants';
+import { DRAG_N_DROP_LISTENERS, VALID_DRAG_TARGET_BACKGROUND_COLOR } from './constants';
+
+let draggingVMNamespace: null | string = null;
 
 export const changeVMFolder = (vmName: string, vmNamespace: string, newFolder: string) =>
   k8sPatch({
@@ -24,10 +26,14 @@ export const changeVMFolder = (vmName: string, vmNamespace: string, newFolder: s
   });
 
 const dragStartHandler = (ev) => {
-  ev.dataTransfer.setData('application/treeViewElementID', ev.target.id);
+  const elementId = ev.target.id as string;
+  ev.dataTransfer.setData('application/treeViewElementID', elementId);
   ev.dataTransfer.effectAllowed = 'all';
 
   ev.target.style.backgroundColor = 'unset';
+
+  const [namespace, _] = elementId.split('/');
+  draggingVMNamespace = namespace;
 };
 
 type RemoveListenerFunction = () => void;
@@ -47,21 +53,16 @@ export const addDragEventListener = (treeViewItem: TreeViewDataItem): RemoveList
 export const dropEventListeners = (treeViewItem: TreeViewDataItem): RemoveListenerFunction => {
   const folderHTMLElement = document.getElementById(treeViewItem.id);
 
-  if (!folderHTMLElement) return null;
+  const [_, folderNamespace, folderName] = treeViewItem.id.split('/');
+
+  if (!folderHTMLElement || !folderName) return null;
 
   const dropHandler = (ev) => {
     ev.preventDefault();
     // Get the id of the target and add the moved element to the target's DOM
     const vmID = ev.dataTransfer.getData('application/treeViewElementID');
 
-    const [_, folderNamespace, folderName] = treeViewItem.id.split('/');
-
     const [namespace, name] = vmID.split('/');
-
-    if (folderNamespace !== namespace) {
-      document.body.style.cursor = 'no-drop';
-      return;
-    }
 
     changeVMFolder(name, namespace, folderName);
 
@@ -69,11 +70,13 @@ export const dropEventListeners = (treeViewItem: TreeViewDataItem): RemoveListen
   };
 
   const dragOverHandler = (ev) => {
+    const dragAllowed = draggingVMNamespace === folderNamespace;
     ev.preventDefault();
-    ev.dataTransfer.dropEffect = 'move';
+    ev.dataTransfer.dropEffect = dragAllowed ? 'move' : 'none';
 
-    folderHTMLElement.style.backgroundColor =
-      'var(--pf-v6-c-tree-view__node--hover--BackgroundColor)';
+    folderHTMLElement.style.backgroundColor = dragAllowed
+      ? VALID_DRAG_TARGET_BACKGROUND_COLOR
+      : 'var(--pf-t--global--color--nonstatus--red--hover)';
   };
 
   const dragLeaveHandler = (ev) => {
