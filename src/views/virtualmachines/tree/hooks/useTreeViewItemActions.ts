@@ -1,8 +1,13 @@
 import { MouseEvent, useCallback, useLayoutEffect, useMemo, useState } from 'react';
 
+import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { TreeViewDataItem, TreeViewProps } from '@patternfly/react-core';
 
-import { getAllTreeViewFolderItems, getAllTreeViewVMItems } from '../utils/utils';
+import {
+  getAllTreeViewFolderItems,
+  getAllTreeViewItems,
+  getAllTreeViewVMItems,
+} from '../utils/utils';
 
 import { RIGHT_CLICK_LISTENER } from './constants';
 import { addDragEventListener, dropEventListeners } from './dragndrop';
@@ -18,7 +23,7 @@ const useTreeViewItemActions: UseTreeViewItemActions = (treeData) => {
 
   const foldersItems = useMemo(() => getAllTreeViewFolderItems(treeData), [treeData]);
 
-  const addVMRightClickEvent = useCallback((treeItem: TreeViewDataItem): (() => void) => {
+  const addRightClickEvent = useCallback((treeItem: TreeViewDataItem): (() => void) => {
     const element = document.getElementById(treeItem.id);
 
     const handler = (event) => {
@@ -32,17 +37,22 @@ const useTreeViewItemActions: UseTreeViewItemActions = (treeData) => {
   }, []);
 
   useLayoutEffect(() => {
-    const vmItems = getAllTreeViewVMItems(treeData);
+    const allItems = getAllTreeViewItems(treeData)?.filter(
+      (treeItem) => treeItem.id !== ALL_NAMESPACES_SESSION_KEY,
+    );
 
-    const removeRightClickListeners = vmItems?.map(addVMRightClickEvent);
+    const removeRightClickListeners = allItems?.map(addRightClickEvent);
+
+    return () => removeRightClickListeners?.forEach((removeListener) => removeListener?.());
+  }, [treeData, addRightClickEvent]);
+
+  useLayoutEffect(() => {
+    const vmItems = getAllTreeViewVMItems(treeData);
 
     const removeDragListeners = vmItems?.map(addDragEventListener);
 
-    return () => {
-      removeRightClickListeners?.forEach((removeListener) => removeListener?.());
-      removeDragListeners?.forEach((removeListener) => removeListener?.());
-    };
-  }, [treeData, addVMRightClickEvent]);
+    return () => removeDragListeners?.forEach((removeListener) => removeListener?.());
+  }, [treeData, addRightClickEvent]);
 
   useLayoutEffect(() => {
     if (!foldersItems) return;
@@ -56,18 +66,21 @@ const useTreeViewItemActions: UseTreeViewItemActions = (treeData) => {
     (event: MouseEvent, item: TreeViewDataItem) => {
       // wait for children elements to show
       setTimeout(() => {
+        const allItems = getAllTreeViewItems([item])?.filter(
+          (treeItem) => treeItem.id !== ALL_NAMESPACES_SESSION_KEY,
+        );
+
         const vmItems = getAllTreeViewVMItems([item]);
         const folderItems = getAllTreeViewFolderItems([item]);
 
-        vmItems?.forEach((vmItem) => {
-          addVMRightClickEvent(vmItem);
-          addDragEventListener(vmItem);
-        });
+        vmItems?.forEach(addDragEventListener);
 
         folderItems.forEach(dropEventListeners);
+
+        allItems.forEach(addRightClickEvent);
       }, 200);
     },
-    [addVMRightClickEvent],
+    [addRightClickEvent],
   );
 
   const hideMenu = useCallback(() => setTriggerElement(null), []);
