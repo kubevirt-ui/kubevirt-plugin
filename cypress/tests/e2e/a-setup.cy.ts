@@ -3,11 +3,20 @@ import { TEST_NS, TEST_SECRET_NAME } from '../../utils/const/index';
 import { authSSHKey, YAML } from '../../utils/const/string';
 import { itemCreateBtn, mastheadLogo, saveBtn } from '../../views/selector';
 import { manageKeysText, useExisting } from '../../views/selector-catalog';
+import { welcomeCheckbox } from '../../views/selector-overview';
 import { tab } from '../../views/tab';
 
 const WELCOME_OFF_CMD = `oc patch configmap -n kubevirt-hyperconverged kubevirt-user-settings --type=merge --patch '{"data": {"kube-admin": "{\\"quickStart\\":{\\"dontShowWelcomeModal\\":true}}"}}'`;
 
-xdescribe('Prepare the cluster for test', () => {
+const tickWelcomeModal = () => {
+  cy.get('body').then(($body) => {
+    if ($body.text().includes('Do not show this again')) {
+      cy.get(welcomeCheckbox).check();
+    }
+  });
+};
+
+describe('Prepare the cluster for test', () => {
   before(() => {
     cy.login();
     cy.exec('oc whoami').then((result) => {
@@ -19,22 +28,30 @@ xdescribe('Prepare the cluster for test', () => {
     cy.exec(`echo '${JSON.stringify(secretFixture)}' | oc create -f -`);
   });
 
+  it('create test namespace', () => {
+    cy.exec(`oc new-project ${TEST_NS}`);
+  });
+
   it('close the welcome modal', () => {
     cy.exec(WELCOME_OFF_CMD).then((result) => {
       cy.task('log', `WELCOME_OFF_CMD: [${result.stdout}]`);
     });
   });
 
+  it('close welcome modal if it appears', () => {
+    cy.wait(15000);
+    tickWelcomeModal();
+  });
+
   it('switch to Virtualization perspective and default project', () => {
     cy.get(mastheadLogo).scrollIntoView();
     cy.switchToVirt();
-
-    // needed because of https://issues.redhat.com/browse/CNV-51570
     cy.switchProject(TEST_NS);
   });
 
   it('configure public ssh key', () => {
     cy.visitOverview();
+    tickWelcomeModal();
     tab.navigateToSettings();
     cy.contains('button[role="tab"]', 'User').click();
     cy.contains(manageKeysText).click();
