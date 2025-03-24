@@ -8,7 +8,7 @@ import { NetworkInterfaceState } from '@kubevirt-utils/components/NetworkInterfa
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
-  interfacesTypes,
+  interfaceTypesProxy,
   NetworkPresentation,
 } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { getNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
@@ -70,7 +70,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
   const [interfaceModel, setInterfaceModel] = useState(iface?.model || interfaceModelType.VIRTIO);
   const [networkName, setNetworkName] = useState(getNetworkName(network));
   const [interfaceType, setInterfaceType] = useState(
-    interfacesTypes[getNetworkInterfaceType(iface)],
+    interfaceTypesProxy[getNetworkInterfaceType(iface)],
   );
   const [interfaceMACAddress, setInterfaceMACAddress] = useState(iface?.macAddress);
   const [interfaceLinkState, setInterfaceLinkState] = useState<NetworkInterfaceState>(
@@ -80,7 +80,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
   const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
-    if (interfaceType === interfacesTypes.sriov) setInterfaceLinkState(undefined);
+    if (interfaceType === interfaceTypesProxy.sriov) setInterfaceLinkState(undefined);
   }, [interfaceType]);
 
   const onSubmitModal = useCallback(() => {
@@ -106,7 +106,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
   ]);
 
   const isHotPlugNIC =
-    interfaceType === interfacesTypes.bridge || interfaceType === interfacesTypes.sriov;
+    interfaceType === interfaceTypesProxy.bridge || interfaceType === interfaceTypesProxy.sriov;
   const vmIsRunning = isRunning(vm);
   const showRestartHeader = !isHotPlugNIC;
   const showRestartOrMigrateHeader = vmIsRunning && isHotPlugNIC;
@@ -150,7 +150,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
             setIsError={setSubmitDisabled}
           />
           <NetworkInterfaceLinkState
-            isDisabled={interfaceType === interfacesTypes.sriov}
+            isDisabled={interfaceType === interfaceTypesProxy.sriov}
             linkState={interfaceLinkState}
             setLinkState={setInterfaceLinkState}
           />
