@@ -4,7 +4,13 @@ import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { TreeViewDataItem } from '@patternfly/react-core';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
-import { DRAG_N_DROP_LISTENERS, VALID_DRAG_TARGET_BACKGROUND_COLOR } from './constants';
+import {
+  DRAG_N_DROP_LISTENERS,
+  DROP_EFFECTS,
+  NOT_ALLOWED_DRAG_TARGET_BACKGROUND_COLOR,
+  REMOVE_DRAG_BACKGROUND_COLOR,
+  VALID_DRAG_TARGET_BACKGROUND_COLOR,
+} from './constants';
 
 let draggingVMNamespace: null | string = null;
 
@@ -25,12 +31,12 @@ export const changeVMFolder = (vmName: string, vmNamespace: string, newFolder: s
     },
   });
 
-const dragStartHandler = (ev) => {
-  const elementId = ev.target.id as string;
-  ev.dataTransfer.setData('application/treeViewElementID', elementId);
-  ev.dataTransfer.effectAllowed = 'all';
+const dragStartHandler = (event) => {
+  const elementId = event.target.id as string;
+  event.dataTransfer.setData('application/treeViewElementID', elementId);
+  event.dataTransfer.effectAllowed = 'all';
 
-  ev.target.style.backgroundColor = 'unset';
+  event.target.style.backgroundColor = REMOVE_DRAG_BACKGROUND_COLOR;
 
   const [namespace, _] = elementId.split('/');
   draggingVMNamespace = namespace;
@@ -51,46 +57,49 @@ export const addDragEventListener = (treeViewItem: TreeViewDataItem): RemoveList
 };
 
 export const dropEventListeners = (treeViewItem: TreeViewDataItem): RemoveListenerFunction => {
-  const folderHTMLElement = document.getElementById(treeViewItem.id);
+  const dropHTMLElement = document.getElementById(treeViewItem.id);
 
-  const [_, folderNamespace, folderName] = treeViewItem.id.split('/');
+  const [_, dropNamespace, folderName] = treeViewItem.id.split('/');
 
-  if (!folderHTMLElement || !folderName) return null;
+  if (!dropHTMLElement) return null;
 
-  const dropHandler = (ev) => {
-    ev.preventDefault();
+  const dropHandler = (event) => {
+    event.stopPropagation();
+    event.preventDefault();
     // Get the id of the target and add the moved element to the target's DOM
-    const vmID = ev.dataTransfer.getData('application/treeViewElementID');
+    const vmID = event.dataTransfer.getData('application/treeViewElementID');
 
     const [namespace, name] = vmID.split('/');
 
     changeVMFolder(name, namespace, folderName);
 
-    folderHTMLElement.style.backgroundColor = 'unset';
+    dropHTMLElement.style.backgroundColor = REMOVE_DRAG_BACKGROUND_COLOR;
   };
 
-  const dragOverHandler = (ev) => {
-    const dragAllowed = draggingVMNamespace === folderNamespace;
-    ev.preventDefault();
-    ev.dataTransfer.dropEffect = dragAllowed ? 'move' : 'none';
+  const dragOverHandler = (event) => {
+    const dragAllowed = draggingVMNamespace === dropNamespace;
+    event.preventDefault();
+    event.stopPropagation();
+    event.dataTransfer.dropEffect = dragAllowed ? DROP_EFFECTS.MOVE : DROP_EFFECTS.NONE;
 
-    folderHTMLElement.style.backgroundColor = dragAllowed
+    dropHTMLElement.style.backgroundColor = dragAllowed
       ? VALID_DRAG_TARGET_BACKGROUND_COLOR
-      : 'var(--pf-t--global--color--nonstatus--red--hover)';
+      : NOT_ALLOWED_DRAG_TARGET_BACKGROUND_COLOR;
   };
 
-  const dragLeaveHandler = (ev) => {
-    ev.preventDefault();
-    folderHTMLElement.style.backgroundColor = 'unset';
+  const dragLeaveHandler = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    dropHTMLElement.style.backgroundColor = REMOVE_DRAG_BACKGROUND_COLOR;
   };
 
-  folderHTMLElement.addEventListener(DRAG_N_DROP_LISTENERS.DROP, dropHandler);
-  folderHTMLElement.addEventListener(DRAG_N_DROP_LISTENERS.DRAG_OVER, dragOverHandler);
-  folderHTMLElement.addEventListener(DRAG_N_DROP_LISTENERS.DRAG_LEAVE, dragLeaveHandler);
+  dropHTMLElement.addEventListener(DRAG_N_DROP_LISTENERS.DROP, dropHandler);
+  dropHTMLElement.addEventListener(DRAG_N_DROP_LISTENERS.DRAG_OVER, dragOverHandler);
+  dropHTMLElement.addEventListener(DRAG_N_DROP_LISTENERS.DRAG_LEAVE, dragLeaveHandler);
 
   return () => {
-    folderHTMLElement.removeEventListener(DRAG_N_DROP_LISTENERS.DROP, dropHandler);
-    folderHTMLElement.removeEventListener(DRAG_N_DROP_LISTENERS.DRAG_OVER, dragOverHandler);
-    folderHTMLElement.removeEventListener(DRAG_N_DROP_LISTENERS.DRAG_LEAVE, dragLeaveHandler);
+    dropHTMLElement.removeEventListener(DRAG_N_DROP_LISTENERS.DROP, dropHandler);
+    dropHTMLElement.removeEventListener(DRAG_N_DROP_LISTENERS.DRAG_OVER, dragOverHandler);
+    dropHTMLElement.removeEventListener(DRAG_N_DROP_LISTENERS.DRAG_LEAVE, dragLeaveHandler);
   };
 };
