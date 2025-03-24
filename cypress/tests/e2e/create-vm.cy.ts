@@ -1,4 +1,4 @@
-import { SECOND, VM_ACTION, VM_STATUS } from '../../utils/const/index';
+import { SECOND, TEST_NS, VM_ACTION, VM_STATUS } from '../../utils/const/index';
 import { VM_IT_CUST, VM_IT_QUICK, VM_TMPL_CUST, VM_TMPL_QUICK } from '../../utils/const/testVM';
 import * as nav from '../../views/selector';
 import {
@@ -12,6 +12,7 @@ import { vm, waitForStatus } from '../../views/vm-flow';
 describe('Create VMs from InstanceType', () => {
   before(() => {
     cy.visit('');
+    cy.switchProject(TEST_NS);
   });
 
   it('quick create VM from IT', () => {

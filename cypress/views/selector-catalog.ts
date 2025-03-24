@@ -1,6 +1,6 @@
 export const GRID = '#vm-catalog-grid';
 export const vmCatalog = '.vm-catalog-grid-tile';
-export const filterText = '#filter-text-input';
+export const filterText = '[aria-label="Filter by keyword..."]';
 export const checkbox = '[type="checkbox"]';
 export const quickForm = '#quick-create-form';
 export const templateTab = '[data-test="templates-tab"]';
