@@ -6,6 +6,7 @@ import { TreeViewDataItem, TreeViewProps } from '@patternfly/react-core';
 import {
   getAllTreeViewFolderItems,
   getAllTreeViewItems,
+  getAllTreeViewProjectItems,
   getAllTreeViewVMItems,
 } from '../utils/utils';
 
@@ -21,7 +22,10 @@ type UseTreeViewItemActions = (treeData: TreeViewDataItem[]) => {
 const useTreeViewItemActions: UseTreeViewItemActions = (treeData) => {
   const [triggerElement, setTriggerElement] = useState<HTMLElement>();
 
-  const foldersItems = useMemo(() => getAllTreeViewFolderItems(treeData), [treeData]);
+  const dropElements = useMemo(
+    () => [...getAllTreeViewFolderItems(treeData), ...getAllTreeViewProjectItems(treeData)],
+    [treeData],
+  );
 
   const addRightClickEvent = useCallback((treeItem: TreeViewDataItem): (() => void) => {
     const element = document.getElementById(treeItem.id);
@@ -55,12 +59,12 @@ const useTreeViewItemActions: UseTreeViewItemActions = (treeData) => {
   }, [treeData, addRightClickEvent]);
 
   useLayoutEffect(() => {
-    if (!foldersItems) return;
+    if (!dropElements) return;
 
-    const removeEventListeners = foldersItems.map(dropEventListeners);
+    const removeEventListeners = dropElements.map(dropEventListeners);
 
     return () => removeEventListeners?.forEach((removeEventListener) => removeEventListener?.());
-  }, [foldersItems]);
+  }, [dropElements]);
 
   const addListeners = useCallback(
     (event: MouseEvent, item: TreeViewDataItem) => {
@@ -71,11 +75,14 @@ const useTreeViewItemActions: UseTreeViewItemActions = (treeData) => {
         );
 
         const vmItems = getAllTreeViewVMItems([item]);
-        const folderItems = getAllTreeViewFolderItems([item]);
+        const dropInnerElements = [
+          ...getAllTreeViewFolderItems([item]),
+          ...getAllTreeViewProjectItems([item]),
+        ];
 
         vmItems?.forEach(addDragEventListener);
 
-        folderItems.forEach(dropEventListeners);
+        dropInnerElements.forEach(dropEventListeners);
 
         allItems.forEach(addRightClickEvent);
       }, 200);
