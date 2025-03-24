@@ -12,6 +12,11 @@ export const changeVMFolder = (vmName: string, vmNamespace: string, newFolder: s
   k8sPatch({
     data: [
       {
+        op: 'add',
+        path: `/metadata/labels`,
+        value: {},
+      },
+      {
         op: 'replace',
         path: `/metadata/labels/${VM_FOLDER_LABEL?.replace('/', '~1')}`,
         value: newFolder,
