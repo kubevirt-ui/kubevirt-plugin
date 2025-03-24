@@ -11,14 +11,12 @@ export const MigrationPolicyBreadcrumb: React.FC = () => {
   const { t } = useKubevirtTranslation();
 
   return (
-    <div>
-      <Breadcrumb className="pf-v6-c-breadcrumb kv-breadcrumb">
-        <BreadcrumbItem>
-          <Link to={migrationPoliciesPageBaseURL}>{t('MigrationPolicies')}</Link>
-        </BreadcrumbItem>
-        <BreadcrumbItem>{t('MigrationPolicy details')}</BreadcrumbItem>
-      </Breadcrumb>
-    </div>
+    <Breadcrumb>
+      <BreadcrumbItem>
+        <Link to={migrationPoliciesPageBaseURL}>{t('MigrationPolicies')}</Link>
+      </BreadcrumbItem>
+      <BreadcrumbItem>{t('MigrationPolicy details')}</BreadcrumbItem>
+    </Breadcrumb>
   );
 };
 export default MigrationPolicyBreadcrumb;

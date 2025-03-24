@@ -86,7 +86,6 @@ export const ColumnManagementModal: FC<ColumnManagementModalProps> = ({
       <ModalBody>
         <p className="co-m-form-row">{t('Selected columns will appear in the table.')}</p>
         <Alert
-          className="co-alert"
           isInline
           title={t('You can select up to {{MAX_VIEW_COLS}} columns', { MAX_VIEW_COLS })}
           variant={AlertVariant.info}

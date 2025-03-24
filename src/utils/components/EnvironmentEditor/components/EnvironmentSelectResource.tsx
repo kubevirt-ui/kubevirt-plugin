@@ -48,7 +48,7 @@ const EnvironmentSelectResource: FC<EnvironmentSelectResourceProps> = ({
   if (loadError)
     return (
       <Alert
-        className="co-alert co-alert--scrollable"
+        className="co-alert--scrollable"
         isInline
         title={t('An error occurred')}
         variant={AlertVariant.danger}

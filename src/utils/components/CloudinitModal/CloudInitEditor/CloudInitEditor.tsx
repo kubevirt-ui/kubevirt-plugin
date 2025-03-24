@@ -46,7 +46,6 @@ export const _CloudInitEditor: FC<CloudInitEditorProps> = ({ cloudInitVolume, on
       {saved && (
         <Alert
           actionClose={<AlertActionCloseButton onClose={() => setSaved(false)} />}
-          className="co-alert"
           isInline
           title={t('Saved')}
           variant={AlertVariant.success}

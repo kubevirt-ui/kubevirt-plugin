@@ -3,14 +3,16 @@ import { useLocation } from 'react-router-dom-v5-compat';
 
 import { VirtualMachineInstanceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import DetailsPageTitle from '@kubevirt-utils/components/DetailsPageTitle/DetailsPageTitle';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
+import PaneHeading from '@kubevirt-utils/components/PaneHeading/PaneHeading';
 import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useSingleNodeCluster from '@kubevirt-utils/hooks/useSingleNodeCluster';
 import useVirtualMachineInstanceMigration from '@kubevirt-utils/resources/vmi/hooks/useVirtualMachineInstanceMigration';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
-import { Label, Split, SplitItem } from '@patternfly/react-core';
+import { Label, Split, SplitItem, Title } from '@patternfly/react-core';
 import VirtualMachineActions from '@virtualmachines/actions/components/VirtualMachineActions/VirtualMachineActions';
 import VMActionsIconBar from '@virtualmachines/actions/components/VMActionsIconBar/VMActionsIconBar';
 import useVirtualMachineActionsProvider from '@virtualmachines/actions/hooks/useVirtualMachineActionsProvider';
@@ -54,14 +56,13 @@ const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({
   );
 
   return (
-    <div className="co-m-nav-title">
-      <VirtualMachineBreadcrumb />
-      <span className="co-m-pane__heading">
-        <h1 className="co-resource-item__resource-name">
+    <DetailsPageTitle breadcrumb={<VirtualMachineBreadcrumb />}>
+      <PaneHeading>
+        <Title headingLevel="h1">
           <Split hasGutter>
             <SplitItem>
               <span className="co-m-resource-icon co-m-resource-icon--lg">{t('VM')}</span>
-              <span className="pf-v6-c-title pf-m-h1">{name} </span>
+              <span>{name} </span>
               {!isEmpty(vm) && (
                 <Label className="vm-resource-label" icon={<StatusIcon />} isCompact>
                   {vm?.status?.printableStatus}
@@ -70,7 +71,7 @@ const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({
               <VMNotMigratableLabel vm={vm} />
             </SplitItem>
           </Split>
-        </h1>
+        </Title>
         <Split hasGutter>
           {isSidebarEditorDisplayed && (
             <SplitItem className="VirtualMachineNavPageTitle__SidebarEditorSwitch">
@@ -87,13 +88,13 @@ const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({
             </>
           )}
         </Split>
-      </span>
+      </PaneHeading>
       <VirtualMachinePendingChangesAlert
         instanceTypeExpandedSpec={instanceTypeExpandedSpec}
         vm={vm}
         vmi={vmi}
       />
-    </div>
+    </DetailsPageTitle>
   );
 };
 

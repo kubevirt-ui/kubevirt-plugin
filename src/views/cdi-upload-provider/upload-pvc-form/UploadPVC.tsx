@@ -52,6 +52,8 @@ import UploadPVCButtonBar from './UploadPVCButtonBar';
 import UploadPVCForm from './UploadPVCForm';
 import UploadPVCFormStatus from './UploadPVCFormStatus';
 
+import '@kubevirt-utils/styles/forms.scss';
+
 const templatesResource: WatchK8sResource = {
   groupVersionKind: modelToGroupVersionKind(TemplateModel),
   isList: true,
@@ -190,7 +192,7 @@ const UploadPVCPage: FC = () => {
         <title>{title}</title>
       </Helmet>
       <PageSection
-        className={classNames('co-m-pane__form', {
+        className={classNames('kv-m-pane__form', {
           'kv--create-upload__hide': isSubmitting,
         })}
         hasBodyWrapper={false}

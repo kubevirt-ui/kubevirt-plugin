@@ -2,10 +2,12 @@ import * as React from 'react';
 import { Link } from 'react-router-dom-v5-compat';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
+import PaneHeading from '@kubevirt-utils/components/PaneHeading/PaneHeading';
 import { FLAG_CONSOLE_CLI_DOWNLOAD } from '@kubevirt-utils/flags/consts';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { clusterBasePath } from '@kubevirt-utils/utils/utils';
 import { useFlag } from '@openshift-console/dynamic-plugin-sdk';
+import { PageSection, Title } from '@patternfly/react-core';
 
 import './ClusterOverviewPageHeader.scss';
 
@@ -18,16 +20,11 @@ const ClusterOverviewPageHeader: React.FC<ClusterOverviewPageHeaderProps> = ({ c
   const hasConsoleTools = useFlag(FLAG_CONSOLE_CLI_DOWNLOAD);
 
   return (
-    <div className="co-m-nav-title">
-      <h1 className="co-m-pane__heading">
-        <div className="co-m-pane__name co-resource-item">
-          <span
-            className="co-resource-item__resource-name pf-v6-c-title pf-m-h1"
-            data-test-id="resource-title"
-          >
-            {t('Virtualization')}
-          </span>
-        </div>
+    <PageSection>
+      <PaneHeading>
+        <Title data-test-id="resource-title" headingLevel="h1">
+          {t('Virtualization')}
+        </Title>
         <span>
           {hasConsoleTools && (
             <>
@@ -47,8 +44,8 @@ const ClusterOverviewPageHeader: React.FC<ClusterOverviewPageHeaderProps> = ({ c
           )}
           {children}
         </span>
-      </h1>
-    </div>
+      </PaneHeading>
+    </PageSection>
   );
 };
 

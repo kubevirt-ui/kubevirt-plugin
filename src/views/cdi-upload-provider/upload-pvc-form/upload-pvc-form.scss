@@ -9,3 +9,8 @@
 .kv--create-upload__golden-switch {
   margin-top: var(--pf-t--global--spacer--sm);
 }
+
+.upload-pvc-form__file-upload {
+  padding: 0;
+  row-gap: 0;
+}

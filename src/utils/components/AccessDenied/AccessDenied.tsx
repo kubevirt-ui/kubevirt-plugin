@@ -33,12 +33,7 @@ const AccessDenied: FC<AccessDeniedProps> = ({ message }) => {
             {t("You don't have access to this section due to cluster policy.")}
           </div>
           {!isEmpty(message) && (
-            <Alert
-              className="co-alert"
-              isInline
-              title={t('Error details')}
-              variant={AlertVariant.danger}
-            >
+            <Alert isInline title={t('Error details')} variant={AlertVariant.danger}>
               {message}
             </Alert>
           )}

@@ -211,11 +211,11 @@ const UploadPVCForm: FC<UploadPVCFormProps> = ({
             handleFileNameChange(event, file.name);
           }}
           browseButtonText="Upload"
+          className="upload-pvc-form__file-upload"
           filename={fileName}
           filenamePlaceholder="Drag and drop a file or upload one"
           hideDefaultPreview
           id="file-upload"
-          style={{ padding: 0, rowGap: 0 }}
           value={fileValue}
         />
         {operatingSystemHaveDV && (

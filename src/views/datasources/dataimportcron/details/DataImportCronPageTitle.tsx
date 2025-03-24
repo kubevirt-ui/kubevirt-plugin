@@ -3,9 +3,11 @@ import { Link } from 'react-router-dom-v5-compat';
 
 import { DataImportCronModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataImportCron } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import DetailsPageTitle from '@kubevirt-utils/components/DetailsPageTitle/DetailsPageTitle';
+import PaneHeading from '@kubevirt-utils/components/PaneHeading/PaneHeading';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Breadcrumb, BreadcrumbItem } from '@patternfly/react-core';
+import { Breadcrumb, BreadcrumbItem, Title } from '@patternfly/react-core';
 
 import DataImportCronActions from '../actions/DataImportCronActions';
 
@@ -23,9 +25,9 @@ const DataImportCronPageTitle: React.FC<DataImportCronPageTitleProps> = ({
   const { t } = useKubevirtTranslation();
 
   return (
-    <>
-      <div className="pf-v6-c-page__main-breadcrumb">
-        <Breadcrumb className="pf-v6-c-breadcrumb co-breadcrumb">
+    <DetailsPageTitle
+      breadcrumb={
+        <Breadcrumb>
           <BreadcrumbItem>
             <Link to={`/k8s/ns/${namespace || DEFAULT_NAMESPACE}/${DataImportCronModelRef}`}>
               {t('DataImportCrons')}
@@ -33,21 +35,16 @@ const DataImportCronPageTitle: React.FC<DataImportCronPageTitleProps> = ({
           </BreadcrumbItem>
           <BreadcrumbItem>{t('DataImportCron Details')}</BreadcrumbItem>
         </Breadcrumb>
-      </div>
-      <div className="co-m-nav-title co-m-nav-title--detail co-m-nav-title--breadcrumbs">
-        <span className="co-m-pane__heading">
-          <h1 className="co-m-pane__name co-resource-item">
-            <span className="co-m-resource-icon co-m-resource-icon--lg">{t('DIC')}</span>
-            <span className="co-resource-item__resource-name" data-test-id="resource-title">
-              {name ?? dataImportCron?.metadata?.name}{' '}
-            </span>
-          </h1>
-          <div className="co-actions">
-            <DataImportCronActions dataImportCron={dataImportCron} />
-          </div>
-        </span>
-      </div>
-    </>
+      }
+    >
+      <PaneHeading>
+        <Title className="co-resource-item" headingLevel="h1">
+          <span className="co-m-resource-icon co-m-resource-icon--lg">{t('DIC')}</span>
+          <span data-test-id="resource-title">{name ?? dataImportCron?.metadata?.name} </span>
+        </Title>
+        <DataImportCronActions dataImportCron={dataImportCron} />
+      </PaneHeading>
+    </DetailsPageTitle>
   );
 };
 

@@ -13,6 +13,7 @@ import SelectorLabelMatchGroup from './copmonents/SelectorLabelMatchGroup/Select
 import { initialMigrationPolicyState, produceMigrationPolicy } from './utils/utils';
 
 import './MigrationPolicyCreateForm.scss';
+import '@kubevirt-utils/styles/forms.scss';
 
 const MigrationPolicyCreateForm: FC = () => {
   const { t } = useKubevirtTranslation();
@@ -29,7 +30,7 @@ const MigrationPolicyCreateForm: FC = () => {
   const migrationPolicy = useMemo(() => produceMigrationPolicy(state), [state]);
 
   return (
-    <div className="migration-policy__form">
+    <div className="migration-policy__form kv-m-pane__form">
       <MigrationPolicyCreateFormHeader />
       <Form className="migration-policy__form-body">
         <FormGroup fieldId="create-description">

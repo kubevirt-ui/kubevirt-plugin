@@ -13,20 +13,18 @@ export const VirtualMachineBreadcrumb: React.FC = React.memo(() => {
   const navigate = useNavigate();
 
   return (
-    <div>
-      <Breadcrumb className="pf-v6-c-breadcrumb co-breadcrumb">
-        <BreadcrumbItem>
-          <Button
-            isInline
-            onClick={() => navigate(`/k8s/${namespacePath}/${VirtualMachineModelRef}`)}
-            variant={ButtonVariant.link}
-          >
-            {t('VirtualMachines')}
-          </Button>
-        </BreadcrumbItem>
-        <BreadcrumbItem>{t('VirtualMachine details')}</BreadcrumbItem>
-      </Breadcrumb>
-    </div>
+    <Breadcrumb>
+      <BreadcrumbItem>
+        <Button
+          isInline
+          onClick={() => navigate(`/k8s/${namespacePath}/${VirtualMachineModelRef}`)}
+          variant={ButtonVariant.link}
+        >
+          {t('VirtualMachines')}
+        </Button>
+      </BreadcrumbItem>
+      <BreadcrumbItem>{t('VirtualMachine details')}</BreadcrumbItem>
+    </Breadcrumb>
   );
 });
 export default VirtualMachineBreadcrumb;
