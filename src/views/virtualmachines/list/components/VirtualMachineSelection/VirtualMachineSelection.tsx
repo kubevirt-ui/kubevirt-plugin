@@ -11,8 +11,9 @@ import {
   MenuToggle,
   MenuToggleElement,
 } from '@patternfly/react-core';
+import useExistingSelectedVMs from '@virtualmachines/list/hooks/useExistingSelectedVMs';
 
-import { deselectAll, selectAll, selectedVMs } from '../../selectedVMs';
+import { deselectAll, selectAll } from '../../selectedVMs';
 
 import './virtual-machine-selection.scss';
 
@@ -25,6 +26,7 @@ type VirtualMachineSelectionProps = {
 const VirtualMachineSelection: FC<VirtualMachineSelectionProps> = ({ loaded, pagination, vms }) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState(false);
+  const existingSelectedVMs = useExistingSelectedVMs(vms);
 
   if (!loaded) return null;
 
@@ -42,8 +44,9 @@ const VirtualMachineSelection: FC<VirtualMachineSelectionProps> = ({ loaded, pag
 
   const numCurrentPageVMs = currentPageVMs.length;
 
-  const partiallyChecked = !isEmpty(selectedVMs.value) && selectedVMs.value.length !== vms.length;
-  const isChecked = selectedVMs.value.length === vms.length;
+  const selectionIsEmpty = isEmpty(existingSelectedVMs);
+  const isChecked = !selectionIsEmpty && existingSelectedVMs.length === vms.length;
+  const partiallyChecked = !selectionIsEmpty && !isChecked;
 
   return (
     <Dropdown
@@ -56,8 +59,8 @@ const VirtualMachineSelection: FC<VirtualMachineSelectionProps> = ({ loaded, pag
         >
           <Checkbox
             label={
-              !isEmpty(selectedVMs.value)
-                ? t('{{length}} selected', { length: selectedVMs.value.length })
+              !selectionIsEmpty
+                ? t('{{length}} selected', { length: existingSelectedVMs.length })
                 : null
             }
             onChange={(event, checked) => {

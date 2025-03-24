@@ -1,13 +1,12 @@
-import React, { FC, useMemo } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { convertResourceArrayToMap } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useMultipleVirtualMachineActions from '@virtualmachines/actions/hooks/useMultipleVirtualMachineActions';
 
-import { selectedVMs } from '../selectedVMs';
+import useExistingSelectedVMs from '../hooks/useExistingSelectedVMs';
 
 type VirtualMachineBulkActionButtonProps = {
   vms: V1VirtualMachine[];
@@ -15,12 +14,7 @@ type VirtualMachineBulkActionButtonProps = {
 const VirtualMachineBulkActionButton: FC<VirtualMachineBulkActionButtonProps> = ({ vms }) => {
   const { t } = useKubevirtTranslation();
 
-  const selectedVirtualMachines = useMemo(() => {
-    const vmsMapper = convertResourceArrayToMap(vms, true);
-    return selectedVMs.value.map(
-      (selectedVM) => vmsMapper?.[selectedVM.namespace]?.[selectedVM.name],
-    );
-  }, [vms]);
+  const selectedVirtualMachines = useExistingSelectedVMs(vms);
 
   const actions = useMultipleVirtualMachineActions(selectedVirtualMachines);
 
@@ -28,7 +22,7 @@ const VirtualMachineBulkActionButton: FC<VirtualMachineBulkActionButtonProps> = 
     <ActionsDropdown
       actions={actions}
       disabledTooltip={t('Select multiple VirtualMachines to perform an action for all of them')}
-      isDisabled={isEmpty(selectedVMs.value)}
+      isDisabled={isEmpty(selectedVirtualMachines)}
       variant="secondary"
     />
   );
