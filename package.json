@@ -14,7 +14,7 @@
     "@patternfly/react-tokens": "^6.1.0",
     "@preact/signals-react": "^2.0.1",
     "@types/byte-size": "^8.1.0",
-    "axios": "^1.8.2",
+    "axios": "^1.8.3",
     "buffer": "^6.0.3",
     "byte-size": "^8.1.0",
     "classnames": "^2.3.1",
