@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { interfacesTypes } from '@kubevirt-utils/resources/vm/utils/network/constants';
+import { interfaceTypesProxy } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { getNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -19,9 +19,9 @@ const useNetworkRowFilters = (): RowFilter[] => {
           );
         },
         filterGroupName: t('Interface Type'),
-        items: Object.keys(interfacesTypes).map((type) => ({
+        items: Object.keys(interfaceTypesProxy).map((type) => ({
           id: type,
-          title: interfacesTypes[type],
+          title: interfaceTypesProxy[type],
         })),
         reducer: (obj) => getNetworkInterfaceType(obj?.iface),
         type: 'interface-type',

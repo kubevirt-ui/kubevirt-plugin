@@ -8,7 +8,7 @@ import { NetworkInterfaceState } from '@kubevirt-utils/components/NetworkInterfa
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
-  interfacesTypes,
+  interfaceTypesProxy,
   NetworkPresentation,
 } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { getNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
@@ -71,7 +71,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
   const [networkName, setNetworkName] = useState(getNetworkName(network));
   const [networkSelectError, setNetworkSelectError] = useState<boolean>(false);
   const [interfaceType, setInterfaceType] = useState(
-    interfacesTypes[getNetworkInterfaceType(iface)],
+    interfaceTypesProxy[getNetworkInterfaceType(iface)],
   );
   const [interfaceMACAddress, setInterfaceMACAddress] = useState(iface?.macAddress);
   const [macError, setMacError] = useState<boolean>(false);
@@ -81,7 +81,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
   const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
-    if (interfaceType === interfacesTypes.sriov) setInterfaceLinkState(undefined);
+    if (interfaceType === interfaceTypesProxy.sriov) setInterfaceLinkState(undefined);
   }, [interfaceType]);
 
   const isValid = nicName && networkName && !networkSelectError && !macError;
@@ -109,7 +109,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
   ]);
 
   const isHotPlugNIC =
-    interfaceType === interfacesTypes.bridge || interfaceType === interfacesTypes.sriov;
+    interfaceType === interfaceTypesProxy.bridge || interfaceType === interfaceTypesProxy.sriov;
   const vmIsRunning = isRunning(vm);
   const showRestartHeader = !isHotPlugNIC;
   const showRestartOrMigrateHeader = vmIsRunning && isHotPlugNIC;
@@ -153,7 +153,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
             setIsError={setMacError}
           />
           <NetworkInterfaceLinkState
-            isDisabled={interfaceType === interfacesTypes.sriov}
+            isDisabled={interfaceType === interfaceTypesProxy.sriov}
             linkState={interfaceLinkState}
             setLinkState={setInterfaceLinkState}
           />
