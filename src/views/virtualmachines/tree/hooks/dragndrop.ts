@@ -4,7 +4,13 @@ import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { TreeViewDataItem } from '@patternfly/react-core';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
-import { DRAG_N_DROP_LISTENERS, VALID_DRAG_TARGET_BACKGROUND_COLOR } from './constants';
+import {
+  DRAG_N_DROP_LISTENERS,
+  DROP_EFFECTS,
+  NOT_ALLOWED_DRAG_TARGET_BACKGROUND_COLOR,
+  REMOVE_DRAG_BACKGROUND_COLOR,
+  VALID_DRAG_TARGET_BACKGROUND_COLOR,
+} from './constants';
 
 let draggingVMNamespace: null | string = null;
 
@@ -30,7 +36,7 @@ const dragStartHandler = (event) => {
   event.dataTransfer.setData('application/treeViewElementID', elementId);
   event.dataTransfer.effectAllowed = 'all';
 
-  event.target.style.backgroundColor = 'unset';
+  event.target.style.backgroundColor = REMOVE_DRAG_BACKGROUND_COLOR;
 
   const [namespace, _] = elementId.split('/');
   draggingVMNamespace = namespace;
@@ -67,24 +73,24 @@ export const dropEventListeners = (treeViewItem: TreeViewDataItem): RemoveListen
 
     changeVMFolder(name, namespace, folderName);
 
-    dropHTMLElement.style.backgroundColor = 'unset';
+    dropHTMLElement.style.backgroundColor = REMOVE_DRAG_BACKGROUND_COLOR;
   };
 
   const dragOverHandler = (event) => {
     const dragAllowed = draggingVMNamespace === dropNamespace;
     event.preventDefault();
     event.stopPropagation();
-    event.dataTransfer.dropEffect = dragAllowed ? 'move' : 'none';
+    event.dataTransfer.dropEffect = dragAllowed ? DROP_EFFECTS.MOVE : DROP_EFFECTS.NONE;
 
     dropHTMLElement.style.backgroundColor = dragAllowed
       ? VALID_DRAG_TARGET_BACKGROUND_COLOR
-      : 'var(--pf-t--global--color--nonstatus--red--hover)';
+      : NOT_ALLOWED_DRAG_TARGET_BACKGROUND_COLOR;
   };
 
   const dragLeaveHandler = (event) => {
     event.preventDefault();
     event.stopPropagation();
-    dropHTMLElement.style.backgroundColor = 'unset';
+    dropHTMLElement.style.backgroundColor = REMOVE_DRAG_BACKGROUND_COLOR;
   };
 
   dropHTMLElement.addEventListener(DRAG_N_DROP_LISTENERS.DROP, dropHandler);
