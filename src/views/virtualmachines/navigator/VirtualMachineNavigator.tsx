@@ -13,6 +13,7 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Divider } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
+import SearchBar from '@search/components/SearchBar';
 import VirtualMachineNavPage from '@virtualmachines/details/VirtualMachineNavPage';
 import VirtualMachinesCreateButton from '@virtualmachines/list/components/VirtualMachinesCreateButton/VirtualMachinesCreateButton';
 import VirtualMachinesList from '@virtualmachines/list/VirtualMachinesList';
@@ -57,6 +58,7 @@ const VirtualMachineNavigator: FC = () => {
   return (
     <>
       <ListPageHeader title={t('VirtualMachines')}>
+        <SearchBar />
         <VirtualMachinesCreateButton namespace={namespace} />
       </ListPageHeader>
       <Divider />

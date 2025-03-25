@@ -47,7 +47,7 @@ export const useModalValue = (): ModalContextType => {
 
   const createModal = (newModal: ModalComponent) => {
     setIsOpen(true);
-    setModal(() => newModal);
+    setModal(() => newModal); // TODO: possible bug? should be 'setModal(newModal)'
   };
 
   const onClose = () => {
