@@ -1,8 +1,8 @@
 import React, { FC, useMemo, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { InstanceTypeUnion } from '@kubevirt-utils/resources/instancetype/types';
 import { Content, Flex, FlexItem, SelectList, SelectOption } from '@patternfly/react-core';
-import { InstanceTypeUnion } from '@virtualmachines/details/tabs/configuration/utils/types';
 
 import FormPFSelect from '../FormPFSelect/FormPFSelect';
 import TabModal from '../TabModal/TabModal';
@@ -12,8 +12,8 @@ import {
   getInstanceTypeFromSeriesAndSize,
   getInstanceTypeSeriesAndSize,
   getInstanceTypeSeriesDisplayName,
+  getInstanceTypeSizes,
   getInstanceTypesPrettyDisplaySize,
-  getInstanceTypesSizes,
   mappedInstanceTypesToSelectOptions,
 } from './utils/util';
 
@@ -67,7 +67,7 @@ const InstanceTypeModal: FC<InstanceTypeModalProps> = ({
             onSelect={(_, value) => {
               if (value !== series) {
                 setSeries(value as string);
-                setSize(null);
+                setSize(undefined);
               }
             }}
             selected={series}
@@ -95,7 +95,7 @@ const InstanceTypeModal: FC<InstanceTypeModalProps> = ({
             selected={size}
             toggleProps={{ isFullWidth: true }}
           >
-            {getInstanceTypesSizes(mappedInstanceTypes, series)?.map((item) => (
+            {getInstanceTypeSizes(mappedInstanceTypes, series)?.map((item) => (
               <SelectOption key={item.prettyDisplaySize} value={item.prettyDisplaySize}>
                 {item?.prettyDisplaySize}
               </SelectOption>

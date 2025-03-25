@@ -1,7 +1,7 @@
 import { ComponentClass } from 'react';
 
-import { InstanceTypeSize } from '@catalog/CreateFromInstanceTypes/components/SelectInstanceTypeSection/utils/types';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { InstanceTypeSeries, InstanceTypeSize } from '@kubevirt-utils/resources/instancetype/types';
 import {
   MemoryIcon,
   MicrochipIcon,
@@ -41,7 +41,7 @@ export const initialMenuItems: InstanceTypesMenuItemsData = {
 };
 
 export const instanceTypeSeriesNameMapper: {
-  [key: string]: {
+  [key in 'server' | Exclude<InstanceTypeSeries, 'rt1'>]: {
     disabled?: boolean;
     Icon: ComponentClass;
     possibleSizes?: InstanceTypeSize[];

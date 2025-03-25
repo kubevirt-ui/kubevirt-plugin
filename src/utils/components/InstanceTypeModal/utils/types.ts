@@ -1,26 +1,9 @@
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { InstanceTypeUnion } from '@virtualmachines/details/tabs/configuration/utils/types';
-
-export type InstanceTypesSeries =
-  | 'cx1'
-  | 'gn1'
-  | 'highperformance'
-  | 'm1'
-  | 'n1'
-  | 'o1'
-  | 'rt1'
-  | 'u1';
-
-export type InstanceTypesSizes =
-  | '2xlarge'
-  | '4xlarge'
-  | '8xlarge'
-  | 'large'
-  | 'medium'
-  | 'micro'
-  | 'nano'
-  | 'small'
-  | 'xlarge';
+import {
+  InstanceTypeSeries,
+  InstanceTypeSize,
+  InstanceTypeUnion,
+} from '@kubevirt-utils/resources/instancetype/types';
 
 export type InstanceTypeRecord = {
   instanceType: InstanceTypeUnion;
@@ -31,10 +14,10 @@ export type InstanceTypeRecord = {
 };
 
 export type MappedInstanceTypes = Record<
-  InstanceTypesSeries,
+  InstanceTypeSeries,
   {
     sizes: {
-      [key in InstanceTypesSizes]?: InstanceTypeRecord;
+      [key in InstanceTypeSize]?: InstanceTypeRecord;
     };
   } & { descriptionSeries?: string; displayNameSeries?: string }
 >;

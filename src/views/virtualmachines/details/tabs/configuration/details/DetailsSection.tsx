@@ -20,6 +20,7 @@ import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeat
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isInstanceTypeVM } from '@kubevirt-utils/resources/instancetype/helper';
+import { InstanceTypeUnion } from '@kubevirt-utils/resources/instancetype/types';
 import { asAccessReview, getAnnotation, getName } from '@kubevirt-utils/resources/shared';
 import { WORKLOADS_LABELS } from '@kubevirt-utils/resources/template';
 import {
@@ -36,8 +37,6 @@ import { DescriptionList, Grid, GridItem, Switch, Title } from '@patternfly/reac
 import DeletionProtectionModal from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/DeletionProtectionModal';
 import { VMDeletionProtectionOptions } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/types';
 import { isDeletionProtectionEnabled } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
-
-import { InstanceTypeUnion } from '../utils/types';
 
 import DetailsSectionBoot from './components/DetailsSectionBoot';
 import DetailsSectionHardware from './components/DetailsSectionHardware';

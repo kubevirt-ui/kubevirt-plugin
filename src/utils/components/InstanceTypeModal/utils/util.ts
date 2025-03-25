@@ -1,6 +1,5 @@
 import { parseSize } from 'xbytes';
 
-import { InstanceTypeSize } from '@catalog/CreateFromInstanceTypes/components/SelectInstanceTypeSection/utils/types';
 import {
   INSTANCETYPE_CLASS_DISPLAY_NAME,
   INSTANCETYPE_DESCRIPTION_ANNOTATION,
@@ -8,21 +7,25 @@ import {
 } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/constants';
 import { VENDOR_LABEL } from '@kubevirt-utils/constants/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getAnnotation, getLabel } from '@kubevirt-utils/resources/shared';
-import { InstanceTypeUnion } from '@virtualmachines/details/tabs/configuration/utils/types';
-
 import {
-  InstanceTypeRecord,
-  InstanceTypesSeries,
-  InstanceTypesSizes,
-  MappedInstanceTypes,
-} from './types';
+  getInstanceTypeCPU,
+  getInstanceTypeMemory,
+} from '@kubevirt-utils/resources/instancetype/selectors';
+import {
+  InstanceTypeSeries,
+  InstanceTypeSize,
+  InstanceTypeUnion,
+} from '@kubevirt-utils/resources/instancetype/types';
+import { getAnnotation, getLabel, getName } from '@kubevirt-utils/resources/shared';
 
-export const getInstanceTypeItemSizePrettyDisplay = (it: InstanceTypeUnion): string =>
-  `${it?.metadata.name.split('.').pop()}: ${it?.spec?.cpu?.guest} ${t('CPUs')}, ${
-    it?.spec?.memory?.guest
-  } ${t('Memory')}`;
+import { InstanceTypeRecord, MappedInstanceTypes } from './types';
 
+export const getInstanceTypeSizePrettyDisplay = (it: InstanceTypeUnion): string => {
+  const name = getName(it)?.split('.').pop() ?? getName(it) ?? '';
+  return `${name}: ${getInstanceTypeCPU(it)} ${t('CPUs')}, ${getInstanceTypeMemory(it)} ${t(
+    'Memory',
+  )}`;
+};
 export const getInstanceTypeClassDisplayAnnotation = (instanceType: InstanceTypeUnion): string => {
   return getAnnotation(instanceType, INSTANCETYPE_CLASS_DISPLAY_NAME);
 };
@@ -33,12 +36,12 @@ export const getInstanceTypeDescriptionAnnotation = (instanceType: InstanceTypeU
 
 export const getInstanceTypeSeriesAndSize = (
   instanceType: InstanceTypeUnion,
-): { series?: InstanceTypesSeries; size?: InstanceTypesSizes } => {
-  const [series, size] = instanceType?.metadata?.name?.split('.') ?? [];
+): { series?: InstanceTypeSeries; size?: InstanceTypeSize } => {
+  const [series, size] = getName(instanceType)?.split('.') ?? [];
   if (!series || !size) {
     return {};
   }
-  return { series: series as InstanceTypesSeries, size: size as InstanceTypesSizes };
+  return { series: series as InstanceTypeSeries, size: size as InstanceTypeSize };
 };
 
 export const mappedInstanceTypesToSelectOptions = (
@@ -47,6 +50,9 @@ export const mappedInstanceTypesToSelectOptions = (
   instanceTypes.reduce((acc, it) => {
     if (getLabel(it, VENDOR_LABEL) === REDHAT_COM) {
       const { series, size } = getInstanceTypeSeriesAndSize(it);
+      if (!series || !size) {
+        return acc;
+      }
       acc[series] = {
         ...(acc[series] || {}),
         descriptionSeries: getInstanceTypeDescriptionAnnotation(it),
@@ -55,7 +61,7 @@ export const mappedInstanceTypesToSelectOptions = (
           ...(acc?.[series]?.sizes || {}),
           [size]: {
             instanceType: it,
-            prettyDisplaySize: getInstanceTypeItemSizePrettyDisplay(it),
+            prettyDisplaySize: getInstanceTypeSizePrettyDisplay(it),
             series,
             seriesDisplayName: getInstanceTypeClassDisplayAnnotation(it),
             size,
@@ -67,13 +73,13 @@ export const mappedInstanceTypesToSelectOptions = (
   }, {} as MappedInstanceTypes);
 
 const sortInstanceTypeSizes = (a: InstanceTypeRecord, b: InstanceTypeRecord) => {
-  const aCPU = a.instanceType?.spec?.cpu?.guest;
-  const bCPU = b.instanceType?.spec?.cpu?.guest;
+  const aCPU = getInstanceTypeCPU(a.instanceType);
+  const bCPU = getInstanceTypeCPU(b.instanceType);
 
   if (aCPU !== bCPU) return aCPU - bCPU;
 
-  const aMemory = a.instanceType?.spec?.memory?.guest;
-  const bMemory = b.instanceType?.spec?.memory?.guest;
+  const aMemory = getInstanceTypeMemory(a.instanceType);
+  const bMemory = getInstanceTypeMemory(b.instanceType);
 
   const bytesA = parseSize(`${aMemory}B`);
   const bytesB = parseSize(`${bMemory}B`);
@@ -83,14 +89,16 @@ const sortInstanceTypeSizes = (a: InstanceTypeRecord, b: InstanceTypeRecord) => 
 
 export const getInstanceTypesPrettyDisplaySize = (
   mappedInstanceTypes: MappedInstanceTypes,
-  instanceTypeSeries?: InstanceTypesSeries,
+  instanceTypeSeries?: InstanceTypeSeries,
   instanceTypeSize?: InstanceTypeSize,
-) => mappedInstanceTypes?.[instanceTypeSeries]?.sizes[instanceTypeSize]?.prettyDisplaySize;
-
-export const getInstanceTypesSizes = (
-  mappedInstanceTypes: MappedInstanceTypes,
-  series?: string,
 ) => {
+  if (!instanceTypeSeries || !instanceTypeSize) {
+    return undefined;
+  }
+  return mappedInstanceTypes?.[instanceTypeSeries]?.sizes[instanceTypeSize]?.prettyDisplaySize;
+};
+
+export const getInstanceTypeSizes = (mappedInstanceTypes: MappedInstanceTypes, series?: string) => {
   const matchedSeries = Object.values(mappedInstanceTypes).find(
     (it) => it.displayNameSeries === series,
   );
@@ -99,19 +107,22 @@ export const getInstanceTypesSizes = (
 
 export const getInstanceTypeSeriesDisplayName = (
   mappedInstanceTypes: MappedInstanceTypes,
-  instanceTypeSeries?: InstanceTypesSeries,
-) => mappedInstanceTypes?.[instanceTypeSeries]?.displayNameSeries;
+  instanceTypeSeries?: InstanceTypeSeries,
+) => {
+  if (!instanceTypeSeries) {
+    return undefined;
+  }
+  return mappedInstanceTypes?.[instanceTypeSeries]?.displayNameSeries;
+};
 
 export const getInstanceTypeFromSeriesAndSize = (
   mappedInstanceTypes: MappedInstanceTypes,
   instanceTypeSeries?: string,
   instanceTypeSize?: string,
-): InstanceTypeUnion => {
-  const instanceTypesSeries = Object.values(mappedInstanceTypes);
+): InstanceTypeUnion | undefined => {
+  const itSeries = Object.values(mappedInstanceTypes);
 
-  const matchedSeries = instanceTypesSeries.find(
-    (series) => series?.displayNameSeries === instanceTypeSeries,
-  );
+  const matchedSeries = itSeries.find((series) => series?.displayNameSeries === instanceTypeSeries);
 
   if (!matchedSeries) {
     return undefined;
