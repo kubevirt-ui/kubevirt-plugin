@@ -4,6 +4,8 @@ import { useLocation } from 'react-router-dom-v5-compat';
 import CreateResourceDefaultPage from '@kubevirt-utils/components/CreateResourceDefaultPage/CreateResourceDefaultPage';
 import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
+import { ADVANCED_SEARCH } from '@kubevirt-utils/hooks/useFeatures/constants';
+import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
 import {
@@ -13,6 +15,7 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Divider } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
+import SearchBar from '@search/components/SearchBar';
 import VirtualMachineNavPage from '@virtualmachines/details/VirtualMachineNavPage';
 import VirtualMachinesCreateButton from '@virtualmachines/list/components/VirtualMachinesCreateButton/VirtualMachinesCreateButton';
 import VirtualMachinesList from '@virtualmachines/list/VirtualMachinesList';
@@ -24,11 +27,13 @@ import { defaultVMYamlTemplate } from '../../../templates';
 const VirtualMachineNavigator: FC = () => {
   useSignals();
   const { t } = useKubevirtTranslation();
-  const childRef = useRef<{ onFilterChange: OnFilterChange } | null>(null);
+  const vmListRef = useRef<{ onFilterChange: OnFilterChange } | null>(null);
   const location = useLocation();
   const [activeNamespace] = useActiveNamespace();
   const namespace = activeNamespace === ALL_NAMESPACES_SESSION_KEY ? null : activeNamespace;
   const vmName = location.pathname.split('/')?.[5];
+
+  const { featureEnabled: advancedSearchEnabled } = useFeatures(ADVANCED_SEARCH);
 
   const isVirtualMachineListPage = useMemo(
     () =>
@@ -40,9 +45,7 @@ const VirtualMachineNavigator: FC = () => {
   const treeProps = useTreeViewData();
 
   const onFilterChange: OnFilterChange = (type, value) => {
-    if (childRef.current) {
-      childRef.current.onFilterChange(type, value);
-    }
+    vmListRef.current?.onFilterChange(type, value);
   };
 
   if (location.pathname.endsWith(`${VirtualMachineModelRef}/~new`)) {
@@ -57,7 +60,10 @@ const VirtualMachineNavigator: FC = () => {
   return (
     <>
       <ListPageHeader title={t('VirtualMachines')}>
-        <VirtualMachinesCreateButton namespace={namespace} />
+        {advancedSearchEnabled && <SearchBar />}
+        <div>
+          <VirtualMachinesCreateButton namespace={namespace} />
+        </div>
       </ListPageHeader>
       <Divider />
       <VirtualMachineTreeView onFilterChange={onFilterChange} {...treeProps}>
@@ -67,7 +73,7 @@ const VirtualMachineNavigator: FC = () => {
             <VirtualMachinesList
               kind={VirtualMachineModelRef}
               namespace={namespace}
-              ref={childRef}
+              ref={vmListRef}
             />
           </>
         ) : (

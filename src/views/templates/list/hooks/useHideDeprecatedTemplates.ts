@@ -5,11 +5,9 @@ import {
   HIDE_DEPRECATED_TEMPLATES,
   HIDE_DEPRECATED_TEMPLATES_KEY,
 } from '@kubevirt-utils/resources/template';
-import { FilterValue } from '@openshift-console/dynamic-plugin-sdk';
+import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 
-type UseHideDeprecatedTemplates = (
-  onFilterChange: (type: string, value: FilterValue) => void,
-) => void;
+type UseHideDeprecatedTemplates = (onFilterChange: OnFilterChange) => void;
 
 const useHideDeprecatedTemplates: UseHideDeprecatedTemplates = (onFilterChange) => {
   const { setParam } = useURLParams();

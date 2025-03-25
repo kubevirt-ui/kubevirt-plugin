@@ -12,6 +12,7 @@ export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
   Navigator: './views/virtualmachines/navigator/VirtualMachineNavigator.tsx',
   useVirtualMachineActionsProvider:
     './views/virtualmachines/actions/hooks/useVirtualMachineActionsProvider.ts',
+  VirtualMachineSearchResults: './views/virtualmachines/search/VirtualMachineSearchResults.tsx',
 };
 
 export const extensions: EncodedExtension[] = [
@@ -43,14 +44,20 @@ export const extensions: EncodedExtension[] = [
 
   {
     properties: {
-      component: {
-        $codeRef: 'Navigator',
-      },
+      component: { $codeRef: 'Navigator' },
       path: [
         '/k8s/ns/:ns/kubevirt.io~v1~VirtualMachine/:name',
         '/k8s/ns/:ns/kubevirt.io~v1~VirtualMachine',
         '/k8s/all-namespaces/kubevirt.io~v1~VirtualMachine',
       ],
+    },
+    type: 'console.page/route',
+  } as EncodedExtension<RoutePage>,
+
+  {
+    properties: {
+      component: { $codeRef: 'VirtualMachineSearchResults' },
+      path: ['/k8s/all-namespaces/kubevirt.io~v1~VirtualMachine/search'],
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,

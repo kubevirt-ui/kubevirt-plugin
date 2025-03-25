@@ -58,26 +58,24 @@ const StorageClassSelect: FC<StorageClassSelectProps> = ({
   }, [defaultSC, setStorageClassName, setStorageClassProvisioner, storageClass, loaded]);
 
   return (
-    <>
-      <FormGroup fieldId="storage-class" label={t('StorageClass')}>
-        <div data-test-id="storage-class-select">
-          {loaded ? (
-            <InlineFilterSelect
-              toggleProps={{
-                isFullWidth: true,
-                placeholder: t('Select {{label}}', { label: StorageClassModel.label }),
-              }}
-              options={getSCSelectOptions(storageClasses)}
-              popperProps={{ enableFlip: true }}
-              selected={storageClass || defaultSC?.metadata?.name}
-              setSelected={onSelect}
-            />
-          ) : (
-            <Loading />
-          )}
-        </div>
-      </FormGroup>
-    </>
+    <FormGroup fieldId="storage-class" label={t('StorageClass')}>
+      <div data-test-id="storage-class-select">
+        {loaded ? (
+          <InlineFilterSelect
+            toggleProps={{
+              isFullWidth: true,
+              placeholder: t('Select {{label}}', { label: StorageClassModel.label }),
+            }}
+            options={getSCSelectOptions(storageClasses)}
+            popperProps={{ enableFlip: true }}
+            selected={storageClass || defaultSC?.metadata?.name}
+            setSelected={onSelect}
+          />
+        ) : (
+          <Loading />
+        )}
+      </div>
+    </FormGroup>
   );
 };
 

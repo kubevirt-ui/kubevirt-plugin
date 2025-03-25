@@ -1,4 +1,4 @@
-import cloneDeepWith from 'lodash.clonedeepwith';
+import cloneDeepWith from 'lodash/cloneDeepWith';
 
 export abstract class ObjectEnum<T> {
   static getAll = () => Object.freeze([]);

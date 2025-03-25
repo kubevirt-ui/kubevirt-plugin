@@ -1,6 +1,6 @@
 import { useDebounceCallback } from 'src/views/clusteroverview/utils/hooks/useDebounceCallback';
 
-import { FilterValue, RowFilter } from '@openshift-console/dynamic-plugin-sdk';
+import { OnFilterChange, RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
 import { STATIC_SEARCH_FILTERS } from '../constants';
 import { generateRowFilters, intersection } from '../utils';
@@ -8,7 +8,7 @@ import { generateRowFilters, intersection } from '../utils';
 import { useQueryParamsMethods } from './useQueryParamsMethods';
 
 type ListPageFiltersMethodsInputs = {
-  applyFilters: (type: string, input: FilterValue) => void;
+  applyFilters: OnFilterChange;
   generatedRowFilters: ReturnType<typeof generateRowFilters>;
   onRowFilterSearchParamChange: (selected: string[]) => void;
   searchFilters: RowFilter[];
@@ -26,15 +26,19 @@ const useListPageFiltersMethods = ({
 }: ListPageFiltersMethodsInputs) => {
   const { setOrRemoveQueryArgument } = useQueryParamsMethods();
 
-  const applyTextFilters = (type: string, value?: string) => {
-    setOrRemoveQueryArgument(type, value);
+  const applyTextFilters = (type: string, value?: string | string[]) => {
+    const valueIsArray = Array.isArray(value);
 
-    if (type === STATIC_SEARCH_FILTERS.labels) {
+    setOrRemoveQueryArgument(type, valueIsArray ? value.join(',') : value);
+
+    if (type === STATIC_SEARCH_FILTERS.labels && !valueIsArray) {
       applyFilters(type, { all: value ? [value] : [] });
       return;
     }
 
-    applyFilters(type, { selected: value ? [value] : [] });
+    const selectedValues = valueIsArray ? value : [value];
+
+    applyFilters(type, { selected: value ? selectedValues : [] });
   };
 
   const applyTextFiltersWithDebounce = useDebounceCallback(applyTextFilters, 250);

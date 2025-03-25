@@ -1,5 +1,7 @@
 import React, { ChangeEvent, FC } from 'react';
 
+import { ADVANCED_SEARCH } from '@kubevirt-utils/hooks/useFeatures/constants';
+import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 import {
@@ -25,24 +27,33 @@ type TreeViewToolbarProps = {
 const TreeViewToolbar: FC<TreeViewToolbarProps> = ({ hideSwitch, onSearch }) => {
   const { t } = useKubevirtTranslation();
   const [showEmptyProjects, setShowEmptyProjects] = useLocalStorage(SHOW_EMPTY_PROJECTS_KEY, HIDE);
+  const { featureEnabled: advancedSearchEnabled } = useFeatures(ADVANCED_SEARCH);
+
+  if (advancedSearchEnabled && hideSwitch) {
+    return null;
+  }
 
   return (
     <Toolbar className="vms-tree-view-toolbar" isSticky>
       <ToolbarContent className="vms-tree-view-toolbar-content">
-        <Stack className="vms-tree-view__toolbar-section" hasGutter>
-          <StackItem>
-            <TreeViewSearch
-              className="vms-tree-view__search-input"
-              id={TREE_VIEW_SEARCH_ID}
-              name={TREE_VIEW_SEARCH_ID}
-              onSearch={onSearch}
-              placeholder={t('Search')}
-            />
-          </StackItem>
+        <Stack className="vms-tree-view__toolbar-section">
+          {!advancedSearchEnabled && (
+            <>
+              <StackItem>
+                <TreeViewSearch
+                  className="vms-tree-view__search-input"
+                  id={TREE_VIEW_SEARCH_ID}
+                  name={TREE_VIEW_SEARCH_ID}
+                  onSearch={onSearch}
+                  placeholder={t('Search')}
+                />
+              </StackItem>
+              <Divider />
+            </>
+          )}
           {!hideSwitch && (
             <>
-              <Divider />
-              <StackItem>
+              <StackItem className="pf-v6-u-my-md">
                 <Split>
                   <SplitItem className="pf-v6-u-ml-md">
                     <Content component="p">{t('Show only projects with VirtualMachines')}</Content>
@@ -56,9 +67,9 @@ const TreeViewToolbar: FC<TreeViewToolbarProps> = ({ hideSwitch, onSearch }) => 
                   />
                 </Split>
               </StackItem>
+              <Divider />
             </>
           )}
-          <Divider />
         </Stack>
       </ToolbarContent>
     </Toolbar>

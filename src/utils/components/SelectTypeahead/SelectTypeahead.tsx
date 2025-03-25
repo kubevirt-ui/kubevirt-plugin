@@ -104,7 +104,7 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
     }
 
     setSelectOptions(filteredOptions);
-  }, [canCreate, filterValue, getCreateOption, initialOptions, t]);
+  }, [canCreate, filterValue, getCreateOption, getCreationNotAllowedMessage, initialOptions, t]);
 
   const setActiveAndFocusedItem = (itemIndex: number) => {
     setFocusedItemIndex(itemIndex);

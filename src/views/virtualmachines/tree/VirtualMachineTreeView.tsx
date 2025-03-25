@@ -2,7 +2,7 @@ import React, { CSSProperties, FC, useMemo } from 'react';
 
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
-import { FilterValue } from '@openshift-console/dynamic-plugin-sdk';
+import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Drawer,
   DrawerContent,
@@ -10,8 +10,9 @@ import {
   DrawerPanelContent,
 } from '@patternfly/react-core';
 
+import { useHideNamespaceBar } from '../hooks/useHideNamespaceBar';
+
 import TreeViewContent from './components/TreeViewContent';
-import { useHideNamespaceBar } from './hooks/useHideNamespaceBar';
 import { UseTreeViewData } from './hooks/useTreeViewData';
 import useTreeViewSelect from './hooks/useTreeViewSelect';
 import {
@@ -28,7 +29,7 @@ import {
 import './VirtualMachineTreeView.scss';
 
 type VirtualMachineTreeViewProps = {
-  onFilterChange?: (type: string, value: FilterValue) => void;
+  onFilterChange?: OnFilterChange;
 } & UseTreeViewData;
 
 const VirtualMachineTreeView: FC<VirtualMachineTreeViewProps> = ({

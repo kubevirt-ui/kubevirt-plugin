@@ -4,7 +4,6 @@ import useDeepCompareMemoize from '@kubevirt-utils/hooks/useDeepCompareMemoize/u
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   ColumnLayout,
-  FilterValue,
   K8sResourceCommon,
   OnFilterChange,
   RowFilter,
@@ -25,6 +24,7 @@ import { ListManagementGroupSize } from '@virtualmachines/list/listManagementGro
 import ColumnManagement from '../ColumnManagementModal/ColumnManagement';
 import FormPFSelect from '../FormPFSelect/FormPFSelect';
 
+import ProjectFilter from './components/ProjectFilter';
 import useListPageFiltersMethods from './hooks/useListPageFiltersMethods';
 import { useRowFiltersParameters } from './hooks/useRowFiltersParametersType';
 import { useSearchFiltersParameters } from './hooks/useSearchFiltersParameters';
@@ -49,6 +49,7 @@ import {
 type ListPageFilterProps = {
   columnLayout?: ColumnLayout;
   data?: K8sResourceCommon[];
+  dropdownFilters?: RowFilter[];
   hideColumnManagement?: boolean;
   hideLabelFilter?: boolean;
   hideNameLabelFilters?: boolean;
@@ -58,11 +59,13 @@ type ListPageFilterProps = {
   onFilterChange?: OnFilterChange;
   rowFilters?: RowFilter[];
   searchFilters?: RowFilter[];
+  showProjectFilter?: boolean;
 };
 
 const ListPageFilter: FC<ListPageFilterProps> = ({
   columnLayout,
   data,
+  dropdownFilters = [],
   hideColumnManagement,
   hideLabelFilter,
   hideNameLabelFilters,
@@ -72,6 +75,7 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
   onFilterChange,
   rowFilters,
   searchFilters = [],
+  showProjectFilter = false,
 }) => {
   const { t } = useKubevirtTranslation();
 
@@ -118,14 +122,14 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
     setSearchType(value);
   };
 
-  const applyFilters = (type: string, input: FilterValue) => onFilterChange?.(type, input);
+  const applyFilters: OnFilterChange = (type, input) => onFilterChange?.(type, input);
 
   const { applyTextFilters, applyTextFiltersWithDebounce, clearAll, updateRowFilterSelected } =
     useListPageFiltersMethods({
       applyFilters,
       generatedRowFilters,
       onRowFilterSearchParamChange,
-      searchFilters,
+      searchFilters: [...searchFilters, ...dropdownFilters],
       selectedRowFilters,
       setSearchInputText,
     });
@@ -154,6 +158,7 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
             selectedRowFilters={selectedRowFilters}
             updateRowFilterSelected={updateRowFilterSelected}
           />
+          {showProjectFilter && <ProjectFilter applyTextFilters={applyTextFilters} />}
           {filterDropdownKeys.length !== 0 && (
             <ToolbarItem className="co-filter-search--full-width">
               <ToolbarFilter
