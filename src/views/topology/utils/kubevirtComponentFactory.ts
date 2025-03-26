@@ -1,0 +1,51 @@
+import { ComponentType } from 'react';
+
+import {
+  contextMenuActions,
+  createConnectorCallback,
+  withEditReviewAccess,
+} from '@openshift-console/dynamic-plugin-sdk-internal';
+import {
+  GraphElement,
+  NodeComponentProps,
+  nodeDragSourceSpec,
+  nodeDropTargetSpec,
+  withContextMenu, // TODO Remove this is not the correct version
+  withCreateConnector,
+  withDndDrop,
+  withDragNode,
+  withSelection,
+} from '@patternfly/react-topology';
+
+import CreateConnector from '../components/CreateConnector';
+import VMNode from '../components/nodes/VMNode/VMNode';
+
+import { TYPE_VIRTUAL_MACHINE } from './constants';
+
+export const getKubevirtComponentFactory = (
+  kind,
+  type,
+): ComponentType<{ element: GraphElement }> | undefined => {
+  switch (type) {
+    case TYPE_VIRTUAL_MACHINE:
+      return withCreateConnector(
+        createConnectorCallback(),
+        CreateConnector,
+      )(
+        withDndDrop<
+          any,
+          any,
+          { canDrop?: boolean; droppable?: boolean; hover?: boolean },
+          NodeComponentProps
+        >(nodeDropTargetSpec())(
+          withEditReviewAccess('patch')(
+            withDragNode(nodeDragSourceSpec(type))(
+              withSelection({ controlled: true })(withContextMenu(contextMenuActions)(VMNode)),
+            ),
+          ),
+        ),
+      );
+    default:
+      return undefined;
+  }
+};
