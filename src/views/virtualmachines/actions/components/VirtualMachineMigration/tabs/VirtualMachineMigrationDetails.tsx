@@ -5,6 +5,7 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-utils/models';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import { Content, ContentVariants, Radio, Stack, StackItem, Title } from '@patternfly/react-core';
 
@@ -16,31 +17,53 @@ type VirtualMachineMigrationDetailsProps = {
   pvcs: IoK8sApiCoreV1PersistentVolumeClaim[];
   selectedPVCs: IoK8sApiCoreV1PersistentVolumeClaim[];
   setSelectedPVCs: Dispatch<SetStateAction<IoK8sApiCoreV1PersistentVolumeClaim[]>>;
-  vm: V1VirtualMachine;
+  vms: V1VirtualMachine[];
 };
 
 const VirtualMachineMigrationDetails: FC<VirtualMachineMigrationDetailsProps> = ({
   pvcs,
   selectedPVCs,
   setSelectedPVCs,
-  vm,
+  vms,
 }) => {
   const { t } = useKubevirtTranslation();
 
   const allVolumes = entireVMSelected(selectedPVCs);
+
+  const volumesCount = vms.reduce((acc, vm) => {
+    acc = acc + getVolumes(vm).length;
+    return acc;
+  }, 0);
+
+  const storageClasses = Array.from(new Set(pvcs?.map((pvc) => pvc.spec.storageClassName)));
 
   return (
     <Stack hasGutter>
       <StackItem>
         <Title headingLevel="h2">{t('Migration details')}</Title>
         <Content component={ContentVariants.p}>
-          {t('Select the storage to migrate for')}
-          <ResourceLink
-            groupVersionKind={VirtualMachineModelGroupVersionKind}
-            inline
-            name={getName(vm)}
-            namespace={getNamespace(vm)}
-          />
+          {vms.length === 1 ? (
+            <>
+              {t('Select the storage to migrate for')}
+              <ResourceLink
+                groupVersionKind={VirtualMachineModelGroupVersionKind}
+                inline
+                name={getName(vms?.[0])}
+                namespace={getNamespace(vms?.[0])}
+              />
+            </>
+          ) : (
+            <>
+              {t(
+                'Select the storage to migrate for {{vmCount}} VirtualMachines with {{volumesCount}} Volumes from the source (current) storage class {{storageClass}}',
+                {
+                  storageClass: storageClasses?.join(', '),
+                  vmCount: vms?.length,
+                  volumesCount,
+                },
+              )}
+            </>
+          )}
         </Content>
       </StackItem>
       <StackItem>
@@ -65,7 +88,7 @@ const VirtualMachineMigrationDetails: FC<VirtualMachineMigrationDetailsProps> = 
             pvcs={pvcs}
             selectedPVCs={selectedPVCs}
             setSelectedPVCs={setSelectedPVCs}
-            vm={vm}
+            vms={vms}
           />
         </StackItem>
       )}

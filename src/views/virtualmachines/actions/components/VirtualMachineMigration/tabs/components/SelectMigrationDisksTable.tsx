@@ -4,33 +4,37 @@ import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/k
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
-import { readableSizeUnit } from '@kubevirt-utils/utils/units';
-import { Table, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
+import { Table, Th, Thead, Tr } from '@patternfly/react-table';
 
 import { columnNames } from './constants';
+import SelectMigrationDisksTableRow from './SelectMigrationDisksTableRow';
 import { getTableDiskData } from './utils';
 
 type SelectMigrationDisksTableProps = {
   pvcs: IoK8sApiCoreV1PersistentVolumeClaim[];
   selectedPVCs: IoK8sApiCoreV1PersistentVolumeClaim[];
   setSelectedPVCs: Dispatch<SetStateAction<IoK8sApiCoreV1PersistentVolumeClaim[]>>;
-  vm: V1VirtualMachine;
+  vms: V1VirtualMachine[];
 };
 
 const SelectMigrationDisksTable: FC<SelectMigrationDisksTableProps> = ({
   pvcs,
   selectedPVCs,
   setSelectedPVCs,
-  vm,
+  vms,
 }) => {
-  const tableData = getVolumes(vm)?.map((volume) => getTableDiskData(vm, volume, pvcs));
+  const tableData = vms
+    .map((vm) => getVolumes(vm)?.map((volume) => getTableDiskData(vm, volume, pvcs)))
+    .flat();
 
   const selectableData = tableData.filter((data) => data.isSelectable);
 
+  const singleVMView = vms.length === 1;
   return (
     <Table aria-label="Selectable table">
       <Thead>
         <Tr>
+          {!singleVMView && <Th aria-label="Expand" />}
           <Th
             select={{
               isSelected: selectedPVCs?.length === selectableData.length,
@@ -39,37 +43,23 @@ const SelectMigrationDisksTable: FC<SelectMigrationDisksTableProps> = ({
             }}
             aria-label="Row select"
           />
+          {!singleVMView && <Th>{columnNames.vmName}</Th>}
           <Th>{columnNames.name}</Th>
           <Th>{columnNames.drive}</Th>
           <Th>{columnNames.storageClass}</Th>
-          <Th>{columnNames.size}</Th>
+          {singleVMView && <Th>{columnNames.size}</Th>}
         </Tr>
       </Thead>
-      <Tbody>
-        {tableData.map((diskData, rowIndex) => (
-          <Tr key={diskData.name}>
-            <Td
-              select={{
-                isDisabled: !diskData.isSelectable,
-                isSelected: Boolean(
-                  selectedPVCs.find((pvc) => getName(pvc) === getName(diskData.pvc)),
-                ),
-                onSelect: (_event, isSelecting) =>
-                  setSelectedPVCs((selection) =>
-                    isSelecting
-                      ? [...selection, diskData.pvc]
-                      : selection.filter((pvc) => getName(pvc) !== getName(diskData.pvc)),
-                  ),
-                rowIndex,
-              }}
-            />
-            <Td dataLabel={columnNames.name}>{diskData.name}</Td>
-            <Td dataLabel={columnNames.drive}>{diskData.drive}</Td>
-            <Td dataLabel={columnNames.storageClass}>{diskData.storageClass}</Td>
-            <Td dataLabel={columnNames.size}>{readableSizeUnit(diskData?.size)}</Td>
-          </Tr>
-        ))}
-      </Tbody>
+      {tableData.map((diskData, rowIndex) => (
+        <SelectMigrationDisksTableRow
+          diskData={diskData}
+          key={getName(diskData.pvc)}
+          rowIndex={rowIndex}
+          selectedPVCs={selectedPVCs}
+          setSelectedPVCs={setSelectedPVCs}
+          singleVMView={singleVMView}
+        />
+      ))}
     </Table>
   );
 };
