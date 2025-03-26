@@ -8,7 +8,7 @@ import { CopyIcon, DownloadIcon } from '@patternfly/react-icons';
 
 type YamlAndCLIEditorProps = {
   code: string;
-  minHeight: number;
+  minHeight: string;
 };
 
 const YamlAndCLIEditor: FC<YamlAndCLIEditorProps> = ({ code, minHeight }) => {
@@ -43,7 +43,7 @@ const YamlAndCLIEditor: FC<YamlAndCLIEditorProps> = ({ code, minHeight }) => {
           <Button icon={<CopyIcon />} onClick={handleCopy} variant={ButtonVariant.secondary} />
         </Tooltip>,
       ]}
-      minHeight={minHeight}
+      minHeight={minHeight?.toString()}
       options={{ readOnly: true }}
       showShortcuts
       value={code}
