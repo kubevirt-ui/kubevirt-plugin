@@ -5,6 +5,7 @@ import { exposedModules as utilsExposedModules } from './src/utils/extension';
 import { exposedModules as CDIUploadProviderExposedModules } from './src/views/cdi-upload-provider/extensions';
 import { exposedModules as CheckupsExposedModules } from './src/views/checkups/extensions';
 import { exposedModules as dashboardExtensionsExposedModules } from './src/views/dashboard-extensions/extensions';
+import { exposedModules as TopologyExposedModules } from './src/views/topology/extensions';
 import { exposedModules as VirtualMachinesExposedModules } from './src/views/virtualmachines/extensions';
 
 const metadata: ConsolePluginBuildMetadata = {
@@ -19,6 +20,7 @@ const metadata: ConsolePluginBuildMetadata = {
     ...utilsExposedModules,
     ...VirtualMachinesExposedModules,
     ...CDIUploadProviderExposedModules,
+    ...TopologyExposedModules,
     BootableVolumesList: './views/bootablevolumes/list/BootableVolumesList.tsx',
     Catalog: './views/catalog/Catalog.tsx',
     ClusterOverviewPage: './views/clusteroverview/ClusterOverviewPage.tsx',
