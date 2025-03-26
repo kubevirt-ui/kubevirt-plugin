@@ -1330,6 +1330,7 @@
   "This key will override the SSH key secret set on the template": "This key will override the SSH key secret set on the template",
   "This Persistent Volume Claim will be created using a DataVolume through Containerized Data Importer (CDI)": "This Persistent Volume Claim will be created using a DataVolume through Containerized Data Importer (CDI)",
   "This process can take 1-2 minutes to complete.": "This process can take 1-2 minutes to complete.",
+  "This Secret will be copied to the destination project": "This Secret will be copied to the destination project",
   "This user is not allowed to edit this boot source": "This user is not allowed to edit this boot source",
   "This VirtualMachine has": "This VirtualMachine has",
   "This VirtualMachine is down. Please start it to access its console.": "This VirtualMachine is down. Please start it to access its console.",

@@ -32,7 +32,7 @@ import {
   StackItem,
 } from '@patternfly/react-core';
 
-import { useWizardVmCreate } from '../../utils/useWizardVmCreate';
+import { useWizardVMCreate } from '../../utils/useWizardVMCreate';
 import { clearSessionStorageVM, useWizardVMContext } from '../../utils/WizardVMContext';
 
 import { WizardNoBootModal } from './WizardNoBootModal';
@@ -43,7 +43,7 @@ export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
   const [isUDNManagedNamespace] = useNamespaceUDN(namespace);
   const { disableVmCreate, loaded: vmContextLoaded, updateVM, vm } = useWizardVMContext();
   const { isBootSourceAvailable, loaded: bootSourceLoaded } = useWizardSourceAvailable();
-  const { createVM, error, loaded: vmCreateLoaded } = useWizardVmCreate();
+  const { createVM, error, loaded: vmCreateLoaded } = useWizardVMCreate();
   const { createModal } = useModal();
   const { featureEnabled: isDisableGuestSystemAccessLog } = useFeatures(
     DISABLED_GUEST_SYSTEM_LOGS_ACCESS,

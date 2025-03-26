@@ -1,12 +1,11 @@
 import { RegistryCredentials } from '@catalog/utils/useRegistryCredentials/utils/types';
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { SSHSecretDetails } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
 import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
 
 export type TabsData = {
   additionalObjects?: any[];
-  applySSHToSettings?: boolean;
-  authorizedSSHKey?: string;
   disks?: {
     dataVolumesToAddOwnerRef?: V1beta1DataVolume[];
     rootDiskRegistryCredentials?: RegistryCredentials;
@@ -19,5 +18,6 @@ export type TabsData = {
       osType?: OS_NAME_TYPES;
     };
   };
+  sshDetails?: SSHSecretDetails;
   subscriptionData?: RHELAutomaticSubscriptionData;
 };

@@ -5,7 +5,6 @@ import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/u
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { SecretSelectionOption } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
-import { createSSHSecret } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import { logITFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
 import {
   CANCEL_CUSTOMIZE_VM_BUTTON_CLICKED,
@@ -14,6 +13,7 @@ import {
 } from '@kubevirt-utils/extensions/telemetry/utils/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
+import { createSSHSecret } from '@kubevirt-utils/resources/secret/utils';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
 import { clearCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
