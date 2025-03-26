@@ -5,6 +5,7 @@ import { extensions as utilsExtensions } from './src/utils/extension';
 import { extensions as CDIUploadProviderExtensions } from './src/views/cdi-upload-provider/extensions';
 import { extensions as CheckupsExtensions } from './src/views/checkups/extensions';
 import { extensions as dashboardExtensionsExtensions } from './src/views/dashboard-extensions/extensions';
+import { extensions as TopologyExtensions } from './src/views/topology/extensions';
 import { extensions as VirtualMachinesExtensions } from './src/views/virtualmachines/extensions';
 
 const extensions: EncodedExtension[] = [
@@ -14,6 +15,7 @@ const extensions: EncodedExtension[] = [
   ...utilsExtensions,
   ...VirtualMachinesExtensions,
   ...CDIUploadProviderExtensions,
+  ...TopologyExtensions,
   {
     properties: {
       flag: 'KUBEVIRT_CDI',
