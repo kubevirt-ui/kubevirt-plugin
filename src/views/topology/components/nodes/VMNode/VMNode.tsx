@@ -53,7 +53,6 @@ const ObservedVMNode: FC<VMNodeProps> = ({ canDrop, children, dropTarget, elemen
   const tipContent = `Create a visual connector`;
 
   const statusClass = getStatusClass(vmStatus);
-  const statusMessage = vmStatus; // TODO Figure out if there's an analog to this
   const imageProps = getImageProps(height, width, iconRadius);
 
   const statusRect = (
@@ -92,7 +91,7 @@ const ObservedVMNode: FC<VMNodeProps> = ({ canDrop, children, dropTarget, elemen
             kind={kind}
             {...rest}
           >
-            {statusMessage ? <Tooltip content={statusMessage}>{statusRect}</Tooltip> : statusRect}
+            {vmStatus ? <Tooltip content={vmStatus}>{statusRect}</Tooltip> : statusRect}
             <rect
               className="kubevirt-vm-node__bg"
               height={height - (VM_STATUS_GAP + VM_STATUS_WIDTH) * 2}

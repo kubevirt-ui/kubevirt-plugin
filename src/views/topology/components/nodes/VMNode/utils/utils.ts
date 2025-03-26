@@ -1,12 +1,9 @@
 import { errorPrintableVMStatus, printableVMStatus } from '@virtualmachines/utils';
 
 export const getStatusClass = (vmStatus: string) => {
-  let statusClass;
-
   switch (vmStatus) {
     case printableVMStatus.Provisioning:
-      statusClass = 'kubevirt-m-pending';
-      break;
+      return 'kubevirt-m-pending';
     case errorPrintableVMStatus.CrashLoopBackOff:
     case errorPrintableVMStatus.DataVolumeError:
     case errorPrintableVMStatus.ErrImagePull:
@@ -14,30 +11,23 @@ export const getStatusClass = (vmStatus: string) => {
     case errorPrintableVMStatus.ErrorPvcNotFound:
     case errorPrintableVMStatus.ErrorUnschedulable:
     case errorPrintableVMStatus.ImagePullBackOff:
+      return 'kubevirt-m-error';
     case printableVMStatus.Paused: // TODO Verify this is correct for this status
-      statusClass = 'kubevirt-m-error';
-      break;
     case printableVMStatus.WaitingForVolumeBinding:
     case printableVMStatus.Starting:
-      statusClass = 'kubevirt-m-not-ready';
-      break;
+      return 'kubevirt-m-not-ready';
     case printableVMStatus.Stopping:
     case printableVMStatus.Terminating:
-      statusClass = 'kubevirt-m-terminating';
-      break;
+      return 'kubevirt-m-terminating';
     case printableVMStatus.Migrating:
     case printableVMStatus.Running:
-      statusClass = 'kubevirt-m-running';
-      break;
+      return 'kubevirt-m-running';
     case printableVMStatus.Stopped:
-      statusClass = 'kubevirt-m-off';
-      break;
+      return 'kubevirt-m-off';
     case printableVMStatus.Unknown:
     default:
-      statusClass = 'kubevirt-m-unknown';
+      return 'kubevirt-m-unknown';
   }
-
-  return statusClass;
 };
 
 export const getImageProps = (height: number, width: number, iconRadius: number) => {
