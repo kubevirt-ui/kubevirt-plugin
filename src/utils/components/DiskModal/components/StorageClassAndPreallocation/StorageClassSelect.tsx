@@ -14,6 +14,7 @@ import { V1DiskFormState } from '../../utils/types';
 import {
   STORAGE_CLASS_FIELD,
   STORAGE_CLASS_PROVIDER_FIELD,
+  STORAGE_SOURCE_BLANK,
   STORAGECLASS_SELECT_FIELDID,
 } from '../utils/constants';
 
@@ -28,21 +29,26 @@ const StorageClassSelect: FC<StorageClassSelectProps> = ({ checkSC, setShowSCAle
   const { t } = useKubevirtTranslation();
   const { control, setValue, watch } = useFormContext<V1DiskFormState>();
 
-  const storageClass = watch(STORAGE_CLASS_FIELD);
+  const [storageClass, blankSource] = watch([STORAGE_CLASS_FIELD, STORAGE_SOURCE_BLANK]);
 
   const [{ clusterDefaultStorageClass, storageClasses }, loaded] = useDefaultStorageClass();
 
   const defaultSC = useMemo(() => clusterDefaultStorageClass, [clusterDefaultStorageClass]);
 
+  const checkAndShowAlerts = useCallback(
+    (selection: string) => !blankSource && setShowSCAlert(checkSC ? checkSC(selection) : false),
+    [blankSource, setShowSCAlert, checkSC],
+  );
+
   const scMapper = useMemo(() => convertResourceArrayToMap(storageClasses), [storageClasses]);
   const onSelect = useCallback(
     (selection: string) => {
-      setShowSCAlert(checkSC ? checkSC(selection) : false);
+      checkAndShowAlerts(selection);
       setValue(STORAGE_CLASS_FIELD, selection);
 
       setValue(STORAGE_CLASS_PROVIDER_FIELD, scMapper[selection]?.provisioner);
     },
-    [checkSC, scMapper, setShowSCAlert, setValue],
+    [scMapper, setValue, checkAndShowAlerts],
   );
 
   useEffect(() => {

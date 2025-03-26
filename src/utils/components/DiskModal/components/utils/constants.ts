@@ -27,6 +27,7 @@ export const DISK_SIZE_FIELD = 'dataVolumeTemplate.spec.storage.resources.reques
 export const UPLOAD_FILENAME_FIELD = 'uploadFile.filename';
 export const UPLOAD_FILE_FIELD = 'uploadFile.file';
 export const STORAGE_CLASS_FIELD = 'dataVolumeTemplate.spec.storage.storageClassName';
+export const STORAGE_SOURCE_BLANK = 'dataVolumeTemplate.spec.source.blank';
 export const STORAGE_CLASS_PROVIDER_FIELD = 'storageClassProvisioner';
 export const ENALBE_PREACCLOCATION_FIELD = 'dataVolumeTemplate.spec.preallocation';
 export const ACCESS_MODE_FIELD = 'dataVolumeTemplate.spec.storage.accessModes';
