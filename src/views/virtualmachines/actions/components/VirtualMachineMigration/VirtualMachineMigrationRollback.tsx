@@ -3,6 +3,7 @@ import { Trans } from 'react-i18next';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import {
   ActionList,
   ActionListItem,
@@ -16,13 +17,17 @@ import {
 import { CloseIcon, WarningTriangleIcon } from '@patternfly/react-icons';
 import { rollbackStorageMigration } from '@virtualmachines/actions/actions';
 
+import { MigMigration, MigMigrationModel } from './constants';
+
 type VirtualMachineMigrationRollbackProps = {
+  migMigration?: MigMigration;
   onClose: () => void;
   onContinue: () => void;
-  vm: V1VirtualMachine;
+  vm?: V1VirtualMachine;
 };
 
 const VirtualMachineMigrationRollback: FC<VirtualMachineMigrationRollbackProps> = ({
+  migMigration,
   onClose,
   onContinue,
   vm,
@@ -35,7 +40,13 @@ const VirtualMachineMigrationRollback: FC<VirtualMachineMigrationRollbackProps> 
     setLoadingRollback(true);
 
     try {
-      await rollbackStorageMigration(vm);
+      vm
+        ? await rollbackStorageMigration(vm)
+        : await k8sPatch({
+            data: [{ op: 'replace', path: '/spec/rollback', value: 'true' }],
+            model: MigMigrationModel,
+            resource: migMigration,
+          });
       onClose();
     } catch (apiError) {
       setErrorRollback(errorRollback);
