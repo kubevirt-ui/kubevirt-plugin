@@ -115,6 +115,7 @@
   "Add new": "Add new",
   "Add new values by referencing an existing config map, secret, or service account. Using these values requires mounting them manually to the VM.": "Add new values by referencing an existing config map, secret, or service account. Using these values requires mounting them manually to the VM.",
   "Add public SSH key to project": "Add public SSH key to project",
+  "Add resources": "Add resources",
   "Add source": "Add source",
   "Add toleration": "Add toleration",
   "Add toleration to specify qualifying Nodes": "Add toleration to specify qualifying Nodes",
