@@ -6,15 +6,18 @@ import Loading from '@kubevirt-utils/components/Loading/Loading';
 import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
 import useDefaultStorageClass from '@kubevirt-utils/hooks/useDefaultStorage/useDefaultStorageClass';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getName } from '@kubevirt-utils/resources/shared';
-import useDisksSources from '@kubevirt-utils/resources/vm/hooks/disk/useDisksSources';
+import { modelToGroupVersionKind, PersistentVolumeClaimModel } from '@kubevirt-utils/models';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Modal, ModalBody, Wizard, WizardHeader, WizardStep } from '@patternfly/react-core';
 
+import useMigrationState from './hooks/useMigrationState';
 import VirtualMachineMigrationDestinationTab from './tabs/VirtualMachineMigrationDestinationTab';
 import VirtualMachineMigrationDetails from './tabs/VirtualMachineMigrationDetails';
 import VirtualMachineMigrationReviewTab from './tabs/VirtualMachineMigrationReviewTab';
-import { entireVMSelected, getMigratableVMPVCs, migrateVM } from './utils';
+import { entireVMSelected, getMigratableVMPVCs } from './utils/utils';
+import BulkVirtualMachineMigrationStatus from './BulkVirtualMachineMigrationStatus';
 import VirtualMachineMigrationStatus from './VirtualMachineMigrationStatus';
 
 import './virtual-machine-migration-modal.scss';
@@ -22,32 +25,41 @@ import './virtual-machine-migration-modal.scss';
 export type VirtualMachineMigrateModalProps = {
   isOpen: boolean;
   onClose: () => Promise<void> | void;
-  vm: V1VirtualMachine;
+  vms: V1VirtualMachine[];
 };
 
 const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
   isOpen,
   onClose,
-  vm,
+  vms,
 }) => {
   const { t } = useKubevirtTranslation();
 
   const [selectedStorageClass, setSelectedStorageClass] = useState('');
-  const [migrationError, setMigrationError] = useState<Error | null>(null);
-  const [migrationLoading, setMigrationLoading] = useState(false);
-  const [migrationStarted, setMigrationStarted] = useState(false);
 
   const [selectedPVCs, setSelectedPVCs] = useState<IoK8sApiCoreV1PersistentVolumeClaim[] | null>(
     null,
   );
 
-  const { loaded, loadingError, pvcs } = useDisksSources(vm);
+  const [namespacePVCs, loaded, loadingError] = useK8sWatchResource<
+    IoK8sApiCoreV1PersistentVolumeClaim[]
+  >({
+    groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
+    isList: true,
+    namespace: getNamespace(vms[0]),
+  });
+
+  const vmsPVCs = useMemo(
+    () => vms.map((vm) => getMigratableVMPVCs(vm, namespacePVCs)).flat(),
+    [vms, namespacePVCs],
+  );
 
   const [{ clusterDefaultStorageClass, sortedStorageClasses }, scLoaded] = useDefaultStorageClass();
 
-  const pvcsToMigrate = entireVMSelected(selectedPVCs)
-    ? getMigratableVMPVCs(vm, pvcs)
-    : selectedPVCs;
+  const pvcsToMigrate = useMemo(
+    () => (entireVMSelected(selectedPVCs) ? vmsPVCs : selectedPVCs),
+    [selectedPVCs, vmsPVCs],
+  );
 
   const defaultStorageClassName = useMemo(
     () => getName(clusterDefaultStorageClass),
@@ -59,20 +71,8 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
     [defaultStorageClassName, selectedStorageClass],
   );
 
-  const onSubmit = async () => {
-    setMigrationLoading(true);
-    setMigrationError(null);
-    try {
-      await migrateVM(vm, pvcsToMigrate, destinationStorageClass);
-
-      setMigrationStarted(true);
-    } catch (apiError) {
-      setMigrationError(apiError);
-    }
-
-    setMigrationLoading(false);
-  };
-
+  const { migMigration, migrationError, migrationLoading, migrationStarted, onSubmit } =
+    useMigrationState(vms, namespacePVCs, pvcsToMigrate, destinationStorageClass);
   const nothingSelected = !entireVMSelected(selectedPVCs) && isEmpty(selectedPVCs);
 
   return (
@@ -84,9 +84,15 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
     >
       <ModalBody>
         <StateHandler error={loadingError} loaded>
-          {migrationStarted ? (
-            <VirtualMachineMigrationStatus onClose={onClose} vm={vm} />
-          ) : (
+          {migrationStarted && migMigration && (
+            <BulkVirtualMachineMigrationStatus migMigration={migMigration} onClose={onClose} />
+          )}
+
+          {migrationStarted && isEmpty(migMigration) && (
+            <VirtualMachineMigrationStatus onClose={onClose} vm={vms?.[0]} />
+          )}
+
+          {!migrationStarted && (
             <Wizard
               header={
                 <WizardHeader
@@ -107,10 +113,10 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
               >
                 {loaded && scLoaded ? (
                   <VirtualMachineMigrationDetails
-                    pvcs={pvcs}
+                    pvcs={vmsPVCs}
                     selectedPVCs={selectedPVCs}
                     setSelectedPVCs={setSelectedPVCs}
-                    vm={vm}
+                    vms={vms}
                   />
                 ) : (
                   <Loading />
@@ -127,6 +133,7 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
               <WizardStep
                 footer={{
                   isNextDisabled: migrationLoading,
+                  nextButtonProps: { isLoading: migrationLoading },
                   nextButtonText: t('Migrate VirtualMachine storage'),
                 }}
                 id="wizard-migrate-review"
@@ -137,7 +144,7 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
                   destinationStorageClass={destinationStorageClass}
                   migrationError={migrationError}
                   pvcs={pvcsToMigrate}
-                  vm={vm}
+                  vms={vms}
                 />
               </WizardStep>
             </Wizard>
