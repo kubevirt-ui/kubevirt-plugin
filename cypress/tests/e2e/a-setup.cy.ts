@@ -7,7 +7,7 @@ import { tab } from '../../views/tab';
 
 const WELCOME_OFF_CMD = `oc patch configmap -n kubevirt-hyperconverged kubevirt-user-settings --type=merge --patch '{"data": {"kube-admin": "{\\"quickStart\\":{\\"dontShowWelcomeModal\\":true}}"}}'`;
 
-xdescribe('Prepare the cluster for test', () => {
+describe('Prepare the cluster for test', () => {
   before(() => {
     cy.login();
     cy.exec('oc whoami').then((result) => {
@@ -19,7 +19,7 @@ xdescribe('Prepare the cluster for test', () => {
     cy.exec(`echo '${JSON.stringify(secretFixture)}' | oc create -f -`);
   });
 
-  it('close the welcome modal', () => {
+  it('close the welcome modal by CLI', () => {
     cy.exec(WELCOME_OFF_CMD).then((result) => {
       cy.task('log', `WELCOME_OFF_CMD: [${result.stdout}]`);
     });
