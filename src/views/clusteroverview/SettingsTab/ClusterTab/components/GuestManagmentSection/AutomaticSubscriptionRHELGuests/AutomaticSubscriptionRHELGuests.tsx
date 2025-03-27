@@ -92,7 +92,6 @@ const AutomaticSubscriptionRHELGuests: FC<AutomaticSubscriptionRHELGuestsProps> 
                     selected?.value === AutomaticSubscriptionTypeEnum.ENABLE_PREDICTIVE_ANALYTICS
                   }
                   customUrl={formProps.subscriptionData?.customUrl}
-                  updateCustomUrl={formProps.updateSubscription}
                 />
               </>
             )}
