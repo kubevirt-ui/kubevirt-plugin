@@ -2,7 +2,7 @@ import { EncodedExtension } from '@openshift/dynamic-plugin-sdk-webpack';
 import type { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plugin-sdk-webpack';
 
 export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
-  topology: 'src/views/topology/utils/kubevirtComponentFactory.ts',
+  topology: 'src/views/topology/utils/topology-plugin.ts',
 };
 
 export const extensions: EncodedExtension[] = [
@@ -12,7 +12,7 @@ export const extensions: EncodedExtension[] = [
     },
     properties: {
       getFactory: {
-        $codeRef: 'topology.getKubevirtComponentFactory',
+        $codeRef: 'topology.kubevirtComponentFactory',
       },
     },
     type: 'console.topology/component/factory',
@@ -23,7 +23,7 @@ export const extensions: EncodedExtension[] = [
     },
     properties: {
       getDataModel: {
-        $codeRef: 'topology.getDataModel',
+        $codeRef: 'topology.getKubevirtDataModel',
       },
       id: 'kubevirt-topology-model-factory',
       isResourceDepicted: {
