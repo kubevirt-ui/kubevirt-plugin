@@ -69,19 +69,22 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
   const [nicName, setNicName] = useState(network?.name || generatePrettyName('nic'));
   const [interfaceModel, setInterfaceModel] = useState(iface?.model || interfaceModelType.VIRTIO);
   const [networkName, setNetworkName] = useState(getNetworkName(network));
+  const [networkSelectError, setNetworkSelectError] = useState<boolean>(false);
   const [interfaceType, setInterfaceType] = useState(
     interfacesTypes[getNetworkInterfaceType(iface)],
   );
   const [interfaceMACAddress, setInterfaceMACAddress] = useState(iface?.macAddress);
+  const [macError, setMacError] = useState<boolean>(false);
   const [interfaceLinkState, setInterfaceLinkState] = useState<NetworkInterfaceState>(
     getInterfaceState(vm, nicName),
   );
-  const [submitDisabled, setSubmitDisabled] = useState(true);
   const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
     if (interfaceType === interfacesTypes.sriov) setInterfaceLinkState(undefined);
   }, [interfaceType]);
+
+  const isValid = nicName && networkName && !networkSelectError && !macError;
 
   const onSubmitModal = useCallback(() => {
     return (
@@ -114,7 +117,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
   return (
     <TabModal<K8sResourceCommon>
       headerText={headerText}
-      isDisabled={submitDisabled}
+      isDisabled={!isValid}
       isOpen={isOpen}
       obj={vm}
       onClose={onClose}
@@ -134,7 +137,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
           networkName={networkName}
           setInterfaceType={setInterfaceType}
           setNetworkName={setNetworkName}
-          setSubmitDisabled={setSubmitDisabled}
+          setSubmitDisabled={setNetworkSelectError}
           vm={vm}
         />
         <ExpandableSection
@@ -147,7 +150,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
             interfaceMACAddress={interfaceMACAddress}
             isDisabled={!networkName}
             setInterfaceMACAddress={setInterfaceMACAddress}
-            setIsError={setSubmitDisabled}
+            setIsError={setMacError}
           />
           <NetworkInterfaceLinkState
             isDisabled={interfaceType === interfacesTypes.sriov}
