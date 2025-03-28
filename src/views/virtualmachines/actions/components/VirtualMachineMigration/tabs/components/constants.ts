@@ -3,4 +3,5 @@ export const columnNames = {
   name: 'Name',
   size: 'Size',
   storageClass: 'Storage class',
+  vmName: 'VirtualMachine name',
 };
