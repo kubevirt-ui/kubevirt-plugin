@@ -6,9 +6,15 @@ import {
   IoK8sApiRbacV1Role,
   IoK8sApiRbacV1RoleBinding,
 } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { DEFAULT_OPERATOR_NAMESPACE } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 
-import { featuresConfigMapInitialState, featuresRole, featuresRoleBinding } from './constants';
+import {
+  FEATURES_CONFIG_MAP_NAME,
+  featuresConfigMapInitialState,
+  featuresRole,
+  featuresRoleBinding,
+} from './constants';
 import { UseFeaturesValues } from './types';
 import useFeaturesConfigMap from './useFeaturesConfigMap';
 
@@ -109,7 +115,13 @@ export const useFeatures: UseFeatures = (featureName) => {
         const promise = await k8sPatch({
           data: [{ op: 'replace', path: `/data/${featureName}`, value: value.toString() }],
           model: ConfigMapModel,
-          resource: featureConfigMap,
+          resource: {
+            data: {},
+            metadata: {
+              name: FEATURES_CONFIG_MAP_NAME,
+              namespace: DEFAULT_OPERATOR_NAMESPACE,
+            },
+          },
         });
         setError(null);
         setFeatureEnabled(promise?.data?.[featureName] === 'true');
@@ -120,7 +132,7 @@ export const useFeatures: UseFeatures = (featureName) => {
         setError(updateError);
       }
     },
-    [featureConfigMap, featureName],
+    [featureName],
   );
 
   return {
