@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 
 const ExpandAllIcon: FC = () => (
   <svg
-    className="pf-v5-svg"
+    className="pf-v6-svg"
     fill="none"
     height="18"
     viewBox="0 0 13 18"
