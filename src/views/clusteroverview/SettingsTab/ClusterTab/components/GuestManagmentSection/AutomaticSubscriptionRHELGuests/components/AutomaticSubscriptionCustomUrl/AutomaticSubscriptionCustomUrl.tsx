@@ -19,7 +19,7 @@ import './automatic-subscription-custom-url.scss';
 
 type AutomaticSubscriptionCustomUrlProps = {
   customUrl: string;
-  isDisabled: boolean;
+  isDisabled?: boolean;
 };
 
 const AutomaticSubscriptionCustomUrl: FC<AutomaticSubscriptionCustomUrlProps> = ({
