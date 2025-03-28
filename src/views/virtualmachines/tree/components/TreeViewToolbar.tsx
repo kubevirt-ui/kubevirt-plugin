@@ -36,7 +36,7 @@ const TreeViewToolbar: FC<TreeViewToolbarProps> = ({
       <ToolbarContent className="vms-tree-view-toolbar-content">
         <Stack className="vms-tree-view__toolbar-section" hasGutter>
           <StackItem>
-            <Split>
+            <Split className="vms-tree-view__toolbar-top-panel" hasGutter>
               <SplitItem className="vms-tree-view__search-input" isFilled>
                 <TreeViewSearch
                   id={TREE_VIEW_SEARCH_ID}
@@ -45,7 +45,7 @@ const TreeViewToolbar: FC<TreeViewToolbarProps> = ({
                   placeholder={t('Search')}
                 />
               </SplitItem>
-              <SplitItem className="vms-tree-view__close-container">{closeComponent}</SplitItem>
+              <SplitItem>{closeComponent}</SplitItem>
             </Split>
           </StackItem>
           <Divider />

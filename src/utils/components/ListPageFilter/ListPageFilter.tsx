@@ -135,7 +135,6 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
 
   return (
     <Toolbar
-      className="co-toolbar-no-padding pf-m-toggle-group-container"
       clearAllFilters={clearAll}
       clearFiltersButtonText={t('Clear all filters')}
       data-test="filter-toolbar"
