@@ -1,7 +1,9 @@
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { FC, useCallback, useState } from 'react';
 
+import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
+import { AUTOMATIC_SUBSCRIPTION_CUSTOM_URL } from '@kubevirt-utils/hooks/useFeatures/constants';
+import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
 import { debounce } from '@kubevirt-utils/utils/debounce';
 import {
   Checkbox,
@@ -18,22 +20,20 @@ import './automatic-subscription-custom-url.scss';
 type AutomaticSubscriptionCustomUrlProps = {
   customUrl: string;
   isDisabled: boolean;
-  updateCustomUrl: (data: Partial<RHELAutomaticSubscriptionData>) => void;
 };
 
 const AutomaticSubscriptionCustomUrl: FC<AutomaticSubscriptionCustomUrlProps> = ({
   customUrl,
   isDisabled,
-  updateCustomUrl,
 }) => {
   const { t } = useKubevirtTranslation();
+  const { error, toggleFeature: patchCustomUrl } = useFeatures(AUTOMATIC_SUBSCRIPTION_CUSTOM_URL);
   const [isChecked, setIsChecked] = useState<boolean>(!!customUrl);
-  const [inputValue, setInputValue] = useState<string>();
-  const debounceUpdateCustomUrl = useMemo(() => debounce(updateCustomUrl, 500), [updateCustomUrl]);
-
-  useEffect(() => {
-    setInputValue(customUrl);
-  }, [customUrl]);
+  const [inputValue, setInputValue] = useState<string>(customUrl);
+  const debounceUpdateCustomUrl = useCallback(
+    (url: string) => debounce(patchCustomUrl, 1000)(url),
+    [patchCustomUrl],
+  );
 
   return (
     <div className="AutomaticSubscriptionCustomUrl--main">
@@ -41,7 +41,7 @@ const AutomaticSubscriptionCustomUrl: FC<AutomaticSubscriptionCustomUrlProps> = 
         <Checkbox
           onChange={() =>
             setIsChecked((prevIsChecked) => {
-              if (prevIsChecked) debounceUpdateCustomUrl({ customUrl: '' });
+              if (prevIsChecked) debounceUpdateCustomUrl('');
               return !prevIsChecked;
             })
           }
@@ -60,17 +60,20 @@ const AutomaticSubscriptionCustomUrl: FC<AutomaticSubscriptionCustomUrlProps> = 
         </Popover>
       </Flex>
       {isChecked && !isDisabled && (
-        <Flex>
-          <Content component="p">URL</Content>
-          <TextInput
-            onChange={(_, value: string) => {
-              setInputValue(value);
-              debounceUpdateCustomUrl({ customUrl: value });
-            }}
-            className="AutomaticSubscriptionCustomUrl--input"
-            value={inputValue}
-          />
-        </Flex>
+        <>
+          <Flex>
+            <Content component="p">URL</Content>
+            <TextInput
+              onChange={(_, value: string) => {
+                setInputValue(value);
+                debounceUpdateCustomUrl(value);
+              }}
+              className="AutomaticSubscriptionCustomUrl--input"
+              value={inputValue}
+            />
+          </Flex>
+          <ErrorAlert error={error} />
+        </>
       )}
     </div>
   );
