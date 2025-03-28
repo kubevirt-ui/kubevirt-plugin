@@ -1,16 +1,14 @@
 .list-managment-group {
   display: flex;
-  justify-content: space-between;
+  align-items: end;
+  padding-block: var(--pf-t--global--spacer--md);
+
   &__pagination {
     flex-grow: 1;
   }
 
   .pf-v6-c-toolbar {
-    padding-block-start: var(--pf-t--global--spacer--md);
-  }
-
-  .pf-m-toggle-group-container {
-    width: 100%;
+    padding-block: 0;
   }
 }
 

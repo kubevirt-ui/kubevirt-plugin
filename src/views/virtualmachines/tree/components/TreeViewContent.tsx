@@ -67,13 +67,7 @@ const TreeViewContent: FC<TreeViewContentProps> = ({
   return (
     <>
       <TreeViewToolbar
-        closeComponent={
-          <PanelToggleButton
-            className="vms-tree-view__close-button"
-            isOpen={isOpen}
-            toggleDrawer={toggleDrawer}
-          />
-        }
+        closeComponent={<PanelToggleButton isOpen={isOpen} toggleDrawer={toggleDrawer} />}
         isSwitchDisabled={isSwitchDisabled}
         onSearch={onSearch}
       />

@@ -6,9 +6,15 @@ import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
-import { OnFilterChange, useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  ListPageHeader,
+  OnFilterChange,
+  useActiveNamespace,
+} from '@openshift-console/dynamic-plugin-sdk';
+import { Divider } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
 import VirtualMachineNavPage from '@virtualmachines/details/VirtualMachineNavPage';
+import VirtualMachinesCreateButton from '@virtualmachines/list/components/VirtualMachinesCreateButton/VirtualMachinesCreateButton';
 import VirtualMachinesList from '@virtualmachines/list/VirtualMachinesList';
 import { useTreeViewData } from '@virtualmachines/tree/hooks/useTreeViewData';
 import VirtualMachineTreeView from '@virtualmachines/tree/VirtualMachineTreeView';
@@ -49,16 +55,30 @@ const VirtualMachineNavigator: FC = () => {
   }
 
   return (
-    <VirtualMachineTreeView onFilterChange={onFilterChange} {...treeProps}>
-      {isVirtualMachineListPage ? (
-        <>
-          <GuidedTour />
-          <VirtualMachinesList kind={VirtualMachineModelRef} namespace={namespace} ref={childRef} />
-        </>
-      ) : (
-        <VirtualMachineNavPage kind={VirtualMachineModelRef} name={vmName} namespace={namespace} />
-      )}
-    </VirtualMachineTreeView>
+    <>
+      <ListPageHeader title={t('VirtualMachines')}>
+        <VirtualMachinesCreateButton namespace={namespace} />
+      </ListPageHeader>
+      <Divider />
+      <VirtualMachineTreeView onFilterChange={onFilterChange} {...treeProps}>
+        {isVirtualMachineListPage ? (
+          <>
+            <GuidedTour />
+            <VirtualMachinesList
+              kind={VirtualMachineModelRef}
+              namespace={namespace}
+              ref={childRef}
+            />
+          </>
+        ) : (
+          <VirtualMachineNavPage
+            kind={VirtualMachineModelRef}
+            name={vmName}
+            namespace={namespace}
+          />
+        )}
+      </VirtualMachineTreeView>
+    </>
   );
 };
 

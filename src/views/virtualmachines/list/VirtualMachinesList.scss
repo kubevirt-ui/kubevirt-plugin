@@ -4,18 +4,31 @@
   }
 }
 
-.vm-listpagebody .pf-v5-c-table {
-  .selection-column {
-    --pf-v5-c-table--cell--Width: 5%;
+.vm-listpagebody {
+  .pf-v6-c-table {
+    .selection-column {
+      --pf-v6-c-table--cell--Width: 5%;
+    }
+  }
+
+  .list-managment-group {
+    flex-wrap: wrap-reverse;
+
+    .pf-v6-c-toolbar__content-section {
+      flex-wrap: nowrap;
+    }
+
+    &__toolbar {
+      align-items: end;
+      flex-wrap: wrap-reverse;
+    }
   }
 }
 
-.vm-list-page-header {
-  h1.co-m-pane__heading {
-    font-size: var(--pf-t--global--font--size--lg);
-  }
-
+.vm-actions-toggle {
   .kv-actions-dropdown {
+    margin-right: var(--pf-t--global--spacer--md);
+
     .pf-v6-c-menu-toggle {
       z-index: 0;
     }
