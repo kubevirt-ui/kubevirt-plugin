@@ -61,7 +61,7 @@ const EnvironmentFormActions: React.FC<EnvironmentFormActionsProps> = ({
         {(error || apiError) && (
           <Alert
             actionClose={<AlertActionCloseButton onClose={closeAlert} />}
-            className="co-alert co-alert--scrollable"
+            className="co-alert--scrollable"
             isInline
             title={t('An error occurred')}
             variant={AlertVariant.danger}
@@ -72,7 +72,6 @@ const EnvironmentFormActions: React.FC<EnvironmentFormActionsProps> = ({
         {success && (
           <Alert
             actionClose={<AlertActionCloseButton onClose={() => setSuccess(false)} />}
-            className="co-alert"
             isInline
             title={t('Success')}
             variant={AlertVariant.success}

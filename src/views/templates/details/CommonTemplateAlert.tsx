@@ -34,7 +34,6 @@ const CommonTemplateAlert: FC<CommonTemplateAlertProps> = ({ template }) => {
       title={t('Templates provided by {{providerName}} are not editable.', {
         providerName,
       })}
-      className="alert-margin-top-bottom template-header-alert"
       data-test="common-template-alert"
       isInline
       variant={AlertVariant.info}
@@ -60,6 +59,7 @@ const CommonTemplateAlert: FC<CommonTemplateAlertProps> = ({ template }) => {
               />
             ))
           }
+          isInline
           variant={ButtonVariant.link}
         >
           {t('Create a new custom Template')}

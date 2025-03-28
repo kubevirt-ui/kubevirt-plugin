@@ -12,14 +12,14 @@ import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMac
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
-import { DescriptionList, Grid, GridItem, Title } from '@patternfly/react-core';
+import { DescriptionList, Grid, GridItem, PageSection, Title } from '@patternfly/react-core';
 
-import CheckupsNetworkStatusIcon from '../../CheckupsNetworkStatusIcon';
+import CheckupsNetworkStatusIcon from '../../../../CheckupsNetworkStatusIcon';
 import {
   STATUS_COMPILATION_TIME_STAMP,
   STATUS_FAILURE_REASON,
   STATUS_START_TIME_STAMP,
-} from '../../utils/utils';
+} from '../../../../utils/utils';
 import {
   CONFIG_PARAM_NAD_NAME,
   CONFIG_PARAM_NAD_NAMESPACE,
@@ -29,7 +29,7 @@ import {
   STATUS_MIN_LATENCY_NANO,
   STATUS_SOURCE_NODE,
   STATUS_TARGET_NODE,
-} from '../utils/utils';
+} from '../../../utils/utils';
 
 type CheckupsNetworkDetailsPageSectionProps = {
   configMap: IoK8sApiCoreV1ConfigMap;
@@ -42,7 +42,7 @@ const CheckupsNetworkDetailsPageSection: FC<CheckupsNetworkDetailsPageSectionPro
 }) => {
   const { t } = useKubevirtTranslation();
   return (
-    <>
+    <PageSection>
       <Title className="co-section-heading" headingLevel="h2">
         {t('Latency checkup details')}
       </Title>
@@ -167,7 +167,7 @@ const CheckupsNetworkDetailsPageSection: FC<CheckupsNetworkDetailsPageSectionPro
           </DescriptionList>
         </GridItem>
       </Grid>
-    </>
+    </PageSection>
   );
 };
 

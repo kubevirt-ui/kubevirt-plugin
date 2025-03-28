@@ -14,8 +14,6 @@ import useEditTemplateAccessReview from './hooks/useIsTemplateEditable';
 import { useVirtualMachineTabs } from './hooks/useTemplateTabs';
 import TemplatePageTitle from './TemplatePageTitle';
 
-import './TemplateNavPage.scss';
-
 type TemplateNavPageProps = {
   name: string;
   namespace: string;

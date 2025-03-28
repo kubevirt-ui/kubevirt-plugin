@@ -3,6 +3,7 @@ import React, { FC } from 'react';
 import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
+import { Icon as PFIcon } from '@patternfly/react-core';
 import { CheckCircleIcon, ExclamationCircleIcon, SyncAltIcon } from '@patternfly/react-icons';
 
 import { getConfigMapStatus, getJobStatus, NetworkCheckupsStatus } from './utils/utils';
@@ -27,18 +28,25 @@ const CheckupsNetworkStatusIcon: FC<CheckupsNetworkStatusIconProps> = ({
   const Icon = {
     [NetworkCheckupsStatus.Done]: (
       <>
-        <CheckCircleIcon color="green" />
+        <PFIcon status="success">
+          <CheckCircleIcon />
+        </PFIcon>
         {t('Succeeded')}
       </>
     ),
     [NetworkCheckupsStatus.Failed]: (
       <>
-        <ExclamationCircleIcon color="red" /> {t('Failed')}
+        <PFIcon status="danger">
+          <ExclamationCircleIcon />
+        </PFIcon>
+        {t('Failed')}
       </>
     ),
     [NetworkCheckupsStatus.Running]: (
       <>
-        <SyncAltIcon />
+        <PFIcon>
+          <SyncAltIcon />
+        </PFIcon>
         {t('Running')}
       </>
     ),

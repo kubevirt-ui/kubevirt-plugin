@@ -2,17 +2,11 @@ import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import DetailsPageTitle from '@kubevirt-utils/components/DetailsPageTitle/DetailsPageTitle';
+import PaneHeading from '@kubevirt-utils/components/PaneHeading/PaneHeading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  Button,
-  ButtonVariant,
-  Flex,
-  FlexItem,
-  Title,
-} from '@patternfly/react-core';
+import { Breadcrumb, BreadcrumbItem, Button, ButtonVariant, Title } from '@patternfly/react-core';
 
 import CheckupsNetworkActions from '../components/CheckupsNetworkActions';
 
@@ -30,28 +24,27 @@ const CheckupsNetworkDetailsPageHeader: FC<CheckupsNetworkDetailsPageHeaderProps
   const [namespace] = useActiveNamespace();
 
   return (
-    <>
-      <Breadcrumb className="pf-v6-c-breadcrumb co-breadcrumb">
-        <BreadcrumbItem>
-          <Button
-            isInline
-            onClick={() => navigate(`/k8s/ns/${namespace}/checkups`)}
-            variant={ButtonVariant.link}
-          >
-            {t('Network latency checkup')}
-          </Button>
-        </BreadcrumbItem>
-        <BreadcrumbItem>{t('Latency checkup details')}</BreadcrumbItem>
-      </Breadcrumb>
-      <Flex justifyContent={{ default: 'justifyContentSpaceBetween' }}>
-        <Title className="co-section-heading" headingLevel="h2">
-          {configMap?.metadata?.name}
-        </Title>
-        <FlexItem>
-          <CheckupsNetworkActions configMap={configMap} jobs={jobs} />
-        </FlexItem>
-      </Flex>
-    </>
+    <DetailsPageTitle
+      breadcrumb={
+        <Breadcrumb>
+          <BreadcrumbItem>
+            <Button
+              isInline
+              onClick={() => navigate(`/k8s/ns/${namespace}/checkups`)}
+              variant={ButtonVariant.link}
+            >
+              {t('Network latency checkup')}
+            </Button>
+          </BreadcrumbItem>
+          <BreadcrumbItem>{t('Latency checkup details')}</BreadcrumbItem>
+        </Breadcrumb>
+      }
+    >
+      <PaneHeading>
+        <Title headingLevel="h1">{configMap?.metadata?.name}</Title>
+        <CheckupsNetworkActions configMap={configMap} jobs={jobs} />
+      </PaneHeading>
+    </DetailsPageTitle>
   );
 };
 

@@ -13,6 +13,7 @@ import {
   AlertVariant,
   Checkbox,
   FileUpload,
+  FormGroup,
   Split,
   SplitItem,
 } from '@patternfly/react-core';
@@ -186,18 +187,15 @@ const UploadPVCForm: FC<UploadPVCFormProps> = ({
   }, [goldenPvcs, os]);
 
   return (
-    <div>
-      <div className="form-group">
+    <>
+      <FormGroup>
         <Alert isInline title={t('Persistent Volume Claim creation')} variant={AlertVariant.info}>
           {t(
             'This Persistent Volume Claim will be created using a DataVolume through Containerized Data Importer (CDI)',
           )}
         </Alert>
-      </div>
-      <label className="control-label co-required" htmlFor="file-upload">
-        {t('Upload data')}
-      </label>
-      <div className="form-group">
+      </FormGroup>
+      <FormGroup fieldId="file-upload" isRequired label={t('Upload data')}>
         <FileUpload
           dropzoneProps={{
             accept: { 'application/*': ['.iso,.img,.qcow2,.gz,.xz'] },
@@ -213,6 +211,7 @@ const UploadPVCForm: FC<UploadPVCFormProps> = ({
             handleFileNameChange(event, file.name);
           }}
           browseButtonText="Upload"
+          className="upload-pvc-form__file-upload"
           filename={fileName}
           filenamePlaceholder="Drag and drop a file or upload one"
           hideDefaultPreview
@@ -229,7 +228,7 @@ const UploadPVCForm: FC<UploadPVCFormProps> = ({
             onChange={(_event, checked: boolean) => handleGoldenCheckbox(checked)}
           />
         )}
-      </div>
+      </FormGroup>
       {isGolden && (
         <UploadPVCFormGoldenImage
           goldenPvcs={goldenPvcs}
@@ -251,27 +250,25 @@ const UploadPVCForm: FC<UploadPVCFormProps> = ({
         isLoading={isLoading}
         pvcName={pvcName}
       />
-      <div className="form-group">
-        <Split hasGutter>
-          <SplitItem className="kv--create-upload__flexitem">
-            <UploadPVCFormStorageClass
-              applySP={applySP}
-              setApplySP={setApplySP}
-              setStorageClassName={setStorageClassName}
-              storageClasses={storageClasses}
-              storageClassName={storageClassName}
-            />
-          </SplitItem>
-          <SplitItem className="kv--create-upload__flexitem">
-            <UploadPVCFormSize
-              requestSizeUnit={requestSizeUnit}
-              requestSizeValue={requestSizeValue}
-              setRequestSizeUnit={setRequestSizeUnit}
-              setRequestSizeValue={setRequestSizeValue}
-            />
-          </SplitItem>
-        </Split>
-      </div>
+      <Split hasGutter>
+        <SplitItem>
+          <UploadPVCFormStorageClass
+            applySP={applySP}
+            setApplySP={setApplySP}
+            setStorageClassName={setStorageClassName}
+            storageClasses={storageClasses}
+            storageClassName={storageClassName}
+          />
+        </SplitItem>
+        <SplitItem>
+          <UploadPVCFormSize
+            requestSizeUnit={requestSizeUnit}
+            requestSizeValue={requestSizeValue}
+            setRequestSizeUnit={setRequestSizeUnit}
+            setRequestSizeValue={setRequestSizeValue}
+          />
+        </SplitItem>
+      </Split>
       {!spLoaded && !loadError ? (
         <Loading />
       ) : (
@@ -285,7 +282,7 @@ const UploadPVCForm: FC<UploadPVCFormProps> = ({
           volumeMode={volumeMode ?? spVolumeMode}
         />
       )}
-    </div>
+    </>
   );
 };
 

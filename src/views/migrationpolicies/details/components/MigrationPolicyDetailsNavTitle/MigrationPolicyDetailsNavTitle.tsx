@@ -1,6 +1,8 @@
 import * as React from 'react';
 
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import DetailsPageTitle from '@kubevirt-utils/components/DetailsPageTitle/DetailsPageTitle';
+import PaneHeading from '@kubevirt-utils/components/PaneHeading/PaneHeading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Title } from '@patternfly/react-core';
 
@@ -9,24 +11,23 @@ import MigrationPolicyBreadcrumb from '../MigrationPolicyBreadcrumb/MigrationPol
 
 import './MigrationPolicyDetailsNavTitle.scss';
 
-type VirtualMachineNavPageTitleProps = {
+type MigrationPolicyDetailsNavTitleProps = {
   mp: V1alpha1MigrationPolicy;
 };
 
-const VirtualMachineNavPageTitle: React.FC<VirtualMachineNavPageTitleProps> = ({ mp }) => {
+const MigrationPolicyDetailsNavTitle: React.FC<MigrationPolicyDetailsNavTitleProps> = ({ mp }) => {
   const { t } = useKubevirtTranslation();
   return (
-    <div className="kv-resource-details-header-container">
-      <MigrationPolicyBreadcrumb />
-      <span className="kv-resource-details-header">
+    <DetailsPageTitle breadcrumb={<MigrationPolicyBreadcrumb />}>
+      <PaneHeading>
         <Title headingLevel="h1">
           <span className="kv-resource-icon">{t('MP')}</span>
           {mp?.metadata?.name}
         </Title>
         <MigrationPoliciesActions mp={mp} />
-      </span>
-    </div>
+      </PaneHeading>
+    </DetailsPageTitle>
   );
 };
 
-export default VirtualMachineNavPageTitle;
+export default MigrationPolicyDetailsNavTitle;

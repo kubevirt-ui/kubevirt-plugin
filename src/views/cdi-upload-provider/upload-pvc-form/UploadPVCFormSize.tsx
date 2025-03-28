@@ -2,7 +2,14 @@ import React, { MouseEvent, ReactEventHandler } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { NumberInput, SelectOption, Split } from '@patternfly/react-core';
+import {
+  FormGroup,
+  FormHelperText,
+  HelperText,
+  NumberInput,
+  SelectOption,
+  Split,
+} from '@patternfly/react-core';
 
 import { dropdownUnits } from '../utils/consts';
 
@@ -40,25 +47,21 @@ const UploadPVCFormSize = ({
   };
 
   return (
-    <>
-      <label className="control-label co-required" htmlFor="request-size-input">
-        {t('Size')}
-      </label>
+    <FormGroup fieldId="request-size-input" isRequired label={t('Size')}>
       <Split hasGutter>
-        <div className="co-m-number-spinner">
-          <NumberInput
-            id="request-size-input"
-            min={1}
-            minusBtnAriaLabel={t('Decrement')}
-            name="requestSizeValue"
-            onChange={onValueChange}
-            onMinus={() => changeValueBy(-1)}
-            onPlus={() => changeValueBy(1)}
-            plusBtnAriaLabel={t('Increment')}
-            required
-            value={requestSizeValue}
-          />
-        </div>
+        <NumberInput
+          aria-describedby="request-size-help"
+          id="request-size-input"
+          min={1}
+          minusBtnAriaLabel={t('Decrement')}
+          name="requestSizeValue"
+          onChange={onValueChange}
+          onMinus={() => changeValueBy(-1)}
+          onPlus={() => changeValueBy(1)}
+          plusBtnAriaLabel={t('Increment')}
+          required
+          value={requestSizeValue}
+        />
         <FormPFSelect
           onSelect={onUnitChange}
           selected={requestSizeUnit}
@@ -71,12 +74,14 @@ const UploadPVCFormSize = ({
           ))}
         </FormPFSelect>
       </Split>
-      <p className="help-block" id="request-size-help">
-        {t(
-          'Ensure your PVC size covers the requirements of the uncompressed image and any other space requirements.',
-        )}
-      </p>
-    </>
+      <FormHelperText>
+        <HelperText id="request-size-help">
+          {t(
+            'Ensure your PVC size covers the requirements of the uncompressed image and any other space requirements.',
+          )}
+        </HelperText>
+      </FormHelperText>
+    </FormGroup>
   );
 };
 

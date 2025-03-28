@@ -10,6 +10,7 @@
   margin-top: var(--pf-t--global--spacer--sm);
 }
 
-.kv--create-upload__flexitem {
-  flex: 1;
+.upload-pvc-form__file-upload {
+  padding: 0;
+  row-gap: 0;
 }

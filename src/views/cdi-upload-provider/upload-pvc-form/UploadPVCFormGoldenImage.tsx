@@ -8,6 +8,7 @@ import {
   Alert,
   AlertVariant,
   Checkbox,
+  FormGroup,
   FormSelect,
   FormSelectOption,
 } from '@patternfly/react-core';
@@ -47,10 +48,7 @@ const UploadPVCFormGoldenImage: FC<UploadPVCFormGoldenImageProps> = ({
   const { t } = useKubevirtTranslation();
   return (
     <>
-      <label className="control-label co-required" htmlFor="golden-os">
-        {t('Operating System')}
-      </label>
-      <div className="form-group">
+      <FormGroup fieldId="golden-os-select" isRequired label={t('Operating System')}>
         <FormSelect
           id="golden-os-select"
           isDisabled={isLoading}
@@ -106,9 +104,9 @@ const UploadPVCFormGoldenImage: FC<UploadPVCFormGoldenImageProps> = ({
             />
           </>
         )}
-      </div>
+      </FormGroup>
       {osImageExists && (
-        <div className="form-group">
+        <FormGroup>
           <Alert
             isInline
             title={t('Operating system source already defined')}
@@ -126,7 +124,7 @@ const UploadPVCFormGoldenImage: FC<UploadPVCFormGoldenImageProps> = ({
               namespace={os?.baseImageNamespace}
             />
           </Alert>
-        </div>
+        </FormGroup>
       )}
       <UploadPVCFormPVCNamespace namespace={namespace} />
     </>

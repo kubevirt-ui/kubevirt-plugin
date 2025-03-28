@@ -1,5 +1,4 @@
 import React, { ReactNode } from 'react';
-import classNames from 'classnames';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { Alert, AlertGroup, AlertVariant } from '@patternfly/react-core';
@@ -28,29 +27,20 @@ const UploadPVCButtonBar: React.FC<UploadPVCButtonBarProps> = ({
   uploadProxyURL,
 }) => {
   return (
-    <div className={classNames(className, 'co-m-btn-bar')}>
+    <div className={className}>
       <AlertGroup
         aria-atomic="false"
         aria-live="polite"
         aria-relevant="additions text"
         isLiveRegion
       >
-        {successMessage && (
-          <Alert
-            className="co-alert"
-            isInline
-            title={successMessage}
-            variant={AlertVariant.success}
-          />
-        )}
+        {successMessage && <Alert isInline title={successMessage} variant={AlertVariant.success} />}
         {errorMessage && (
           <UploadErrorMessage message={errorMessage} uploadProxyURL={uploadProxyURL} />
         )}
         {injectDisabled(children, inProgress)}
         {inProgress && <Loading />}
-        {infoMessage && (
-          <Alert className="co-alert" isInline title={infoMessage} variant={AlertVariant.info} />
-        )}
+        {infoMessage && <Alert isInline title={infoMessage} variant={AlertVariant.info} />}
       </AlertGroup>
     </div>
   );

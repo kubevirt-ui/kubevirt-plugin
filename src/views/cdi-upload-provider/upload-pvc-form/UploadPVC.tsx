@@ -2,7 +2,7 @@ import React, { FC, FormEvent, useContext, useEffect, useMemo, useState } from '
 import { Helmet } from 'react-helmet';
 import { useNavigate } from 'react-router-dom-v5-compat';
 import axios from 'axios';
-import cx from 'classnames';
+import classNames from 'classnames';
 
 import {
   modelToGroupVersionKind,
@@ -30,7 +30,16 @@ import {
   useK8sWatchResource,
   WatchK8sResource,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { ActionGroup, Alert, AlertVariant, Button, ButtonVariant } from '@patternfly/react-core';
+import {
+  ActionGroup,
+  Alert,
+  AlertVariant,
+  Button,
+  ButtonVariant,
+  Form,
+  PageSection,
+  Title,
+} from '@patternfly/react-core';
 
 import useBaseImages from '../hooks/useBaseImages';
 import useMultipleAccessReviews from '../hooks/useMultipleAccessReviews';
@@ -42,6 +51,8 @@ import { resourcePath } from '../utils/utils';
 import UploadPVCButtonBar from './UploadPVCButtonBar';
 import UploadPVCForm from './UploadPVCForm';
 import UploadPVCFormStatus from './UploadPVCFormStatus';
+
+import '@kubevirt-utils/styles/forms.scss';
 
 const templatesResource: WatchK8sResource = {
   groupVersionKind: modelToGroupVersionKind(TemplateModel),
@@ -180,15 +191,14 @@ const UploadPVCPage: FC = () => {
       <Helmet>
         <title>{title}</title>
       </Helmet>
-      <div
-        className={cx('co-m-pane__body co-m-pane__form', {
+      <PageSection
+        className={classNames('kv-m-pane__form', {
           'kv--create-upload__hide': isSubmitting,
         })}
+        hasBodyWrapper={false}
       >
-        <h1 className="co-m-pane__heading co-m-pane__heading--baseline">
-          <div className="co-m-pane__name">{title}</div>
-        </h1>
-        <form className="co-m-pane__body-group" onSubmit={save}>
+        <Title headingLevel="h1">{title}</Title>
+        <Form onSubmit={save}>
           <UploadPVCForm
             commonTemplates={allowedTemplates}
             fileName={fileName}
@@ -232,7 +242,7 @@ const UploadPVCPage: FC = () => {
                 </p>
               </Alert>
             )}
-            <ActionGroup className="pf-v6-c-form">
+            <ActionGroup>
               <Button
                 id="save-changes"
                 isDisabled={disableFormSubmit || isCheckingCertificate}
@@ -245,8 +255,8 @@ const UploadPVCPage: FC = () => {
               </Button>
             </ActionGroup>
           </UploadPVCButtonBar>
-        </form>
-      </div>
+        </Form>
+      </PageSection>
       <UploadPVCFormStatus
         onErrorClick={() => {
           setIsSubmitting(false);
