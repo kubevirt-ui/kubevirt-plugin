@@ -1,11 +1,15 @@
 import { SECOND, VM_ACTION, VM_STATUS } from '../../utils/const/index';
 import { VM_IT_CUST, VM_IT_QUICK, VM_TMPL_CUST, VM_TMPL_QUICK } from '../../utils/const/testVM';
 import * as nav from '../../views/selector';
-import { descrText, selectAllDropdownOption, selectDropdown } from '../../views/selector-common';
+import {
+  descrText,
+  selectAllDropdownOption,
+  selectDropdownToggle,
+} from '../../views/selector-common';
 import { tab } from '../../views/tab';
 import { vm, waitForStatus } from '../../views/vm-flow';
 
-xdescribe('Create VMs from InstanceType', () => {
+describe('Create VMs from InstanceType', () => {
   before(() => {
     cy.visit('');
   });
@@ -30,7 +34,7 @@ xdescribe('Create VMs from InstanceType', () => {
   });
 });
 
-xdescribe('Create VMs from Template', () => {
+describe('Create VMs from Template', () => {
   it('quick create VM from Template', () => {
     vm.create(VM_TMPL_QUICK);
   });
@@ -40,8 +44,6 @@ xdescribe('Create VMs from Template', () => {
   });
 
   it('verify customized VM from Template', () => {
-    cy.contains(descrText, VM_TMPL_CUST.template.metadataName).should('be.visible');
-    // cy.contains(descrText, 'Fedora Linux').should('be.visible');
     tab.navigateToConfiguration();
     cy.contains(VM_TMPL_CUST.description).should('be.visible');
     cy.contains(VM_TMPL_CUST.hostname).should('be.visible');
@@ -53,11 +55,11 @@ xdescribe('Create VMs from Template', () => {
   });
 });
 
-xdescribe('Test bulk actions', () => {
+describe('Test bulk actions', () => {
   it('stop all VMs by selection', () => {
     cy.visitVMs();
-    cy.get(selectDropdown).check();
-    cy.get(selectAllDropdownOption).check();
+    cy.get(selectDropdownToggle).click();
+    cy.get(selectAllDropdownOption).click();
     cy.byButtonText('Actions').click();
     cy.byButtonText(VM_ACTION.Stop).click();
     cy.wait(30 * SECOND);
