@@ -12,10 +12,12 @@ import { FormGroup } from '@patternfly/react-core';
 
 import { V1DiskFormState } from '../../utils/types';
 import {
+  ACCESS_MODE_FIELD,
   STORAGE_CLASS_FIELD,
   STORAGE_CLASS_PROVIDER_FIELD,
   STORAGE_SOURCE_BLANK,
   STORAGECLASS_SELECT_FIELDID,
+  VOLUME_MODE_FIELD,
 } from '../utils/constants';
 
 import { getSCSelectOptions } from './utils/helpers';
@@ -47,6 +49,8 @@ const StorageClassSelect: FC<StorageClassSelectProps> = ({ checkSC, setShowSCAle
       setValue(STORAGE_CLASS_FIELD, selection);
 
       setValue(STORAGE_CLASS_PROVIDER_FIELD, scMapper[selection]?.provisioner);
+      setValue(VOLUME_MODE_FIELD, undefined);
+      setValue(ACCESS_MODE_FIELD, undefined);
     },
     [scMapper, setValue, checkAndShowAlerts],
   );

@@ -4,3 +4,9 @@
     margin-top: var(--pf-t--global--spacer--sm);
   }
 }
+
+.labelWithGap {
+  display: flex;
+  gap: 5px;
+  align-items: anchor-center;
+}
