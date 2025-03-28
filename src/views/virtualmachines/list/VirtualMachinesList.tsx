@@ -56,10 +56,10 @@ import VirtualMachineListSummary from './components/VirtualMachineListSummary/Vi
 import VirtualMachineRow from './components/VirtualMachineRow/VirtualMachineRow';
 import VirtualMachinesCreateButton from './components/VirtualMachinesCreateButton/VirtualMachinesCreateButton';
 import VirtualMachineSelection from './components/VirtualMachineSelection/VirtualMachineSelection';
+import useExistingSelectedVMs from './hooks/useExistingSelectedVMs';
 import useSelectedFilters from './hooks/useSelectedFilters';
 import useVirtualMachineColumns from './hooks/useVirtualMachineColumns';
 import useVMMetrics from './hooks/useVMMetrics';
-import { selectedVMs } from './selectedVMs';
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
 import './VirtualMachinesList.scss';
@@ -202,7 +202,8 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
 
   const noVMs = isEmpty(unfilteredData) && !vmsFilteredWithProxy;
 
-  const allVMsSelected = data?.length === selectedVMs.value.length;
+  const existingSelectedVMs = useExistingSelectedVMs(data);
+  const allVMsSelected = data?.length === existingSelectedVMs.length;
 
   if (loaded && noVMs) {
     return (
