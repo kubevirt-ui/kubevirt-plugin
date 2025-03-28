@@ -7,7 +7,7 @@ import SelectTypeahead from '@kubevirt-utils/components/SelectTypeahead/SelectTy
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getNetworks } from '@kubevirt-utils/resources/vm';
-import { interfacesTypes } from '@kubevirt-utils/resources/vm/utils/network/constants';
+import { interfaceTypesProxy } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { FormGroup, Label, ValidatedOptions } from '@patternfly/react-core';
 
 import { getNadType, networkNameStartWithPod, podNetworkExists } from '../../utils/helpers';
@@ -84,11 +84,11 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
       options.unshift({
         children: (
           <>
-            {podNetworkingText} <Label isCompact>{interfacesTypes.masquerade} Binding</Label>
+            {podNetworkingText} <Label isCompact>{interfaceTypesProxy.masquerade} Binding</Label>
           </>
         ),
         key: 'pod-networking',
-        type: interfacesTypes.masquerade,
+        type: interfaceTypesProxy.masquerade,
         value: podNetworkingText,
       });
     }
@@ -102,7 +102,7 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
     setNetworkName(value);
     setInterfaceType(
       value === podNetworkingText
-        ? interfacesTypes.masquerade
+        ? interfaceTypesProxy.masquerade
         : networkOptions.find((netOption) => value === netOption?.value)?.type,
     );
   };
@@ -153,7 +153,7 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
             getCreateOption={(inputValue) => (
               <>
                 {t(`Use "{{inputValue}}"`, { inputValue })}{' '}
-                <Label isCompact>{interfacesTypes.bridge} Binding</Label>
+                <Label isCompact>{interfaceTypesProxy.bridge} Binding</Label>
               </>
             )}
             dataTestId="select-nad"
