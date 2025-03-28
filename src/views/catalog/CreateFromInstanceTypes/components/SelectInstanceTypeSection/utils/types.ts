@@ -1,16 +1,6 @@
 import { MutableRefObject } from 'react';
 
-export type InstanceTypeSize =
-  | '2xlarge'
-  | '2xmedium'
-  | '4xlarge'
-  | '8xlarge'
-  | 'large'
-  | 'medium'
-  | 'micro'
-  | 'nano'
-  | 'small'
-  | 'xlarge';
+import { InstanceTypeSize } from '@kubevirt-utils/resources/instancetype/types';
 
 export enum InstanceTypeCategory {
   ComputeIntensive = 'ComputeIntensive',
