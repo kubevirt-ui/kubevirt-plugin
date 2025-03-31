@@ -10,7 +10,7 @@ import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
 
 import DeleteCheckupModal from '../../components/DeleteCheckupModal';
-import { STATUS_SUCCEEDED } from '../../utils/utils';
+import { getCheckupImageFromNewestJob, STATUS_SUCCEEDED } from '../../utils/utils';
 import { deleteNetworkCheckup, rerunNetworkCheckup } from '../utils/utils';
 
 type CheckupsNetworkActionsProps = {
@@ -28,6 +28,8 @@ const CheckupsNetworkActions: FC<CheckupsNetworkActionsProps> = ({
   const navigate = useNavigate();
   const { createModal } = useModal();
   const [isActionsOpen, setIsActionsOpen] = useState<boolean>(false);
+
+  const checkupImage = getCheckupImageFromNewestJob(jobs);
 
   const onToggle = () => setIsActionsOpen((prevIsOpen) => !prevIsOpen);
   const Toggle = isKebab
@@ -61,9 +63,9 @@ const CheckupsNetworkActions: FC<CheckupsNetworkActionsProps> = ({
         <DropdownItem
           onClick={() => {
             setIsActionsOpen(false);
-            return rerunNetworkCheckup(configMap);
+            return rerunNetworkCheckup(configMap, checkupImage);
           }}
-          isDisabled={configMap?.data?.[STATUS_SUCCEEDED] === undefined}
+          isDisabled={configMap?.data?.[STATUS_SUCCEEDED] === undefined || !checkupImage}
           key="rerun"
         >
           {t('Rerun')}
