@@ -1,6 +1,6 @@
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { getMemory } from '@kubevirt-utils/resources/vm';
+import { getMemory, getVirtualMachineStorageClasses } from '@kubevirt-utils/resources/vm';
 import { columnSortingCompare, isEmpty } from '@kubevirt-utils/utils/utils';
 import { SortByDirection } from '@patternfly/react-table';
 import { getDeletionProtectionPrintableStatus } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
@@ -52,16 +52,16 @@ export const sortByNetworkUsage = (
   direction: SortByDirection,
   pagination: { [key: string]: any },
 ) => {
-  const compareCPUUsage = (a: V1VirtualMachine, b: V1VirtualMachine): number => {
-    const networkUsageA = getNetworkUsagePercentage(getName(a), getNamespace(a));
-    const networkUsageB = getNetworkUsagePercentage(getName(b), getNamespace(b));
+  const compareNetworkUsage = (a: V1VirtualMachine, b: V1VirtualMachine): number => {
+    const storageClassA = getVirtualMachineStorageClasses(a)?.[0];
+    const storageClassB = getVirtualMachineStorageClasses(b)?.[0];
 
-    if (isEmpty(networkUsageA)) return -1;
-    if (isEmpty(networkUsageB)) return 1;
-    return networkUsageA - networkUsageB;
+    if (isEmpty(storageClassA)) return -1;
+    if (isEmpty(storageClassB)) return 1;
+    return storageClassA.localeCompare(storageClassB);
   };
 
-  return columnSortingCompare(data, direction, pagination, compareCPUUsage);
+  return columnSortingCompare(data, direction, pagination, compareNetworkUsage);
 };
 
 export const sortByMemoryUsage = (
@@ -70,7 +70,7 @@ export const sortByMemoryUsage = (
   pagination: { [key: string]: any },
   vmiMapper: VMIMapper,
 ) => {
-  const compareCPUUsage = (a: V1VirtualMachine, b: V1VirtualMachine): number => {
+  const compareMemoryUsage = (a: V1VirtualMachine, b: V1VirtualMachine): number => {
     const aVMI = getVMIFromMapper(vmiMapper, a);
     const bVMI = getVMIFromMapper(vmiMapper, b);
     const memoryUsageA = getMemoryUsagePercentage(getName(a), getNamespace(a), getMemory(aVMI));
@@ -81,7 +81,7 @@ export const sortByMemoryUsage = (
     return memoryUsageA - memoryUsageB;
   };
 
-  return columnSortingCompare(data, direction, pagination, compareCPUUsage);
+  return columnSortingCompare(data, direction, pagination, compareMemoryUsage);
 };
 
 export const sortByDeletionProtection = (
@@ -97,4 +97,21 @@ export const sortByDeletionProtection = (
   };
 
   return columnSortingCompare(data, direction, pagination, compareDeletionProtection);
+};
+
+export const sortByStorageclassName = (
+  data: V1VirtualMachine[],
+  direction: SortByDirection,
+  pagination: { [key: string]: any },
+) => {
+  const compareStorageclasses = (a: V1VirtualMachine, b: V1VirtualMachine): number => {
+    const networkUsageA = getNetworkUsagePercentage(getName(a), getNamespace(a));
+    const networkUsageB = getNetworkUsagePercentage(getName(b), getNamespace(b));
+
+    if (isEmpty(networkUsageA)) return -1;
+    if (isEmpty(networkUsageB)) return 1;
+    return networkUsageA - networkUsageB;
+  };
+
+  return columnSortingCompare(data, direction, pagination, compareStorageclasses);
 };

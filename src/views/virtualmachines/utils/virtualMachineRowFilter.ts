@@ -14,11 +14,13 @@ import {
   LABEL_USED_TEMPLATE_NAME,
   OS_NAME_LABELS,
 } from '@kubevirt-utils/resources/template';
+import { getVirtualMachineStorageClasses } from '@kubevirt-utils/resources/vm';
 import {
   getOperatingSystem,
   getOperatingSystemName,
 } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { getVMIIPAddresses } from '@kubevirt-utils/resources/vmi';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
 import { VMIMapper, VMIMMapper } from './mappers';
@@ -209,6 +211,34 @@ const useIPSearchFilter = (vmiMapper: VMIMapper): RowFilter => ({
   type: 'ip',
 });
 
+const useStorageclassFilter = (vms: V1VirtualMachine[]): RowFilter => {
+  const storageClasses = useMemo(
+    () => Array.from(new Set(vms?.map((vm) => getVirtualMachineStorageClasses(vm)).flat())),
+    [vms],
+  );
+
+  return {
+    filter: (input, obj) => {
+      const selectedStorageClasses = input.selected;
+
+      if (isEmpty(selectedStorageClasses)) return true;
+
+      return getVirtualMachineStorageClasses(obj).some((storageClassName) =>
+        selectedStorageClasses.includes(storageClassName),
+      );
+    },
+    filterGroupName: t('Storage class'),
+    isMatch: (obj, id) =>
+      getVirtualMachineStorageClasses(obj).some((storageClassName) => storageClassName === id),
+    items:
+      storageClasses?.map((storageClassName) => ({
+        id: storageClassName,
+        title: storageClassName,
+      })) || [],
+    type: 'storageclassname',
+  };
+};
+
 export const useVMListFilters = (
   vmis: V1VirtualMachineInstance[],
   vms: V1VirtualMachine[],
@@ -250,6 +280,7 @@ export const useVMListFilters = (
   const liveMigratableFilter = useLiveMigratableFilter();
   const instanceTypesFilter = useInstanceTypesFilter(vms);
   const searchByIP = useIPSearchFilter(vmiMapper);
+  const storageClassFilters = useStorageclassFilter(vms);
 
   return {
     filters: [
@@ -259,6 +290,7 @@ export const useVMListFilters = (
       liveMigratableFilter,
       nodesFilter,
       instanceTypesFilter,
+      storageClassFilters,
     ],
     searchFilters: [searchByIP],
     vmiMapper,

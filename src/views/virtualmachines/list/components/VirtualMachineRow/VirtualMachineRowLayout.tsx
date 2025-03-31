@@ -7,6 +7,8 @@ import {
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getVirtualMachineStorageClasses } from '@kubevirt-utils/resources/vm';
+import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 import { Checkbox } from '@patternfly/react-core';
 import VirtualMachineActions from '@virtualmachines/actions/components/VirtualMachineActions/VirtualMachineActions';
@@ -46,6 +48,8 @@ const VirtualMachineRowLayout: FC<
 
   const vmName = useMemo(() => getName(obj), [obj]);
   const vmNamespace = useMemo(() => getNamespace(obj), [obj]);
+
+  const storageClasses = useMemo(() => getVirtualMachineStorageClasses(obj), [obj]);
   const [actions] = useVirtualMachineActionsProvider(obj, vmim, isSingleNodeCluster);
   return (
     <>
@@ -92,6 +96,9 @@ const VirtualMachineRowLayout: FC<
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="deletion-protection">
         {getDeletionProtectionPrintableStatus(obj)}
+      </TableData>
+      <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="storageclassname">
+        {storageClasses?.join(', ') || NO_DATA_DASH}
       </TableData>
       <TableData
         activeColumnIDs={activeColumnIDs}
