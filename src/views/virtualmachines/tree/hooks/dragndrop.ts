@@ -1,5 +1,8 @@
 import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { getLabels, getNamespace } from '@kubevirt-utils/resources/shared';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { TreeViewDataItem } from '@patternfly/react-core';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
@@ -11,12 +14,22 @@ import {
   REMOVE_DRAG_BACKGROUND_COLOR,
   VALID_DRAG_TARGET_BACKGROUND_COLOR,
 } from './constants';
+import { getVMFromElementID } from './utils';
 
-let draggingVMNamespace: null | string = null;
+let draggingVM: null | V1VirtualMachine = null;
 
-export const changeVMFolder = (vmName: string, vmNamespace: string, newFolder: string) =>
+export const changeVMFolder = (newFolder: string) =>
   k8sPatch({
     data: [
+      ...(isEmpty(getLabels(draggingVM))
+        ? [
+            {
+              op: 'add',
+              path: `/metadata/labels`,
+              value: {},
+            },
+          ]
+        : []),
       {
         op: 'replace',
         path: `/metadata/labels/${VM_FOLDER_LABEL?.replace('/', '~1')}`,
@@ -24,22 +37,16 @@ export const changeVMFolder = (vmName: string, vmNamespace: string, newFolder: s
       },
     ],
     model: VirtualMachineModel,
-    resource: {
-      apiVersion: VirtualMachineModel.apiVersion,
-      kind: VirtualMachineModel.kind,
-      metadata: { name: vmName, namespace: vmNamespace },
-    },
+    resource: draggingVM,
   });
 
 const dragStartHandler = (event) => {
   const elementId = event.target.id as string;
-  event.dataTransfer.setData('application/treeViewElementID', elementId);
   event.dataTransfer.effectAllowed = 'all';
 
   event.target.style.backgroundColor = REMOVE_DRAG_BACKGROUND_COLOR;
 
-  const [namespace, _] = elementId.split('/');
-  draggingVMNamespace = namespace;
+  draggingVM = getVMFromElementID(elementId);
 };
 
 type RemoveListenerFunction = () => void;
@@ -66,18 +73,14 @@ export const dropEventListeners = (treeViewItem: TreeViewDataItem): RemoveListen
   const dropHandler = (event) => {
     event.stopPropagation();
     event.preventDefault();
-    // Get the id of the target and add the moved element to the target's DOM
-    const vmID = event.dataTransfer.getData('application/treeViewElementID');
 
-    const [namespace, name] = vmID.split('/');
-
-    changeVMFolder(name, namespace, folderName);
+    changeVMFolder(folderName);
 
     dropHTMLElement.style.backgroundColor = REMOVE_DRAG_BACKGROUND_COLOR;
   };
 
   const dragOverHandler = (event) => {
-    const dragAllowed = draggingVMNamespace === dropNamespace;
+    const dragAllowed = getNamespace(draggingVM) === dropNamespace;
     event.preventDefault();
     event.stopPropagation();
     event.dataTransfer.dropEffect = dragAllowed ? DROP_EFFECTS.MOVE : DROP_EFFECTS.NONE;
