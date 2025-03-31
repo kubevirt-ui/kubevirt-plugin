@@ -20,6 +20,8 @@ export const ActionStop = '[data-test-id="selected-vms-action-stop"]';
 export const tabModal = '#tab-modal';
 export const startClone = '#start-clone';
 export const nameInput = 'input#name';
+export const colName = 'td#name';
+export const favName = 'td#favorites';
 export const providerInput = 'input#provider';
 
 export const getRow = (name: string, within: VoidFunction) =>

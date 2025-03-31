@@ -23,7 +23,7 @@ describe('Prepare the cluster for test', () => {
     cy.exec(`echo '${JSON.stringify(secretFixture)}' | oc create -f -`);
   });
 
-  it('close the welcome modal', () => {
+  it('close the welcome modal by CLI', () => {
     cy.exec(WELCOME_OFF_CMD).then((result) => {
       cy.task('log', `WELCOME_OFF_CMD: [${result.stdout}]`);
     });
