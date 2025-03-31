@@ -46,7 +46,7 @@ export const getDiskRowDataLayout = (
     const pvcSize = device?.pvc?.spec?.resources?.requests?.storage;
     const dataVolumeCustomSize =
       device?.dataVolumeTemplate?.spec?.storage?.resources?.requests?.storage;
-    const size = humanizeBinaryBytes(convertToBaseValue(dataVolumeCustomSize || pvcSize));
+    const size = humanizeBinaryBytes(convertToBaseValue(pvcSize || dataVolumeCustomSize));
 
     diskRowDataObject.size = size.value === 0 ? NO_DATA_DASH : size.string;
 
