@@ -1,6 +1,4 @@
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import VirtualMachineRestoreModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineRestoreModel';
-import VirtualMachineSnapshotModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineSnapshotModel';
 import {
   V1beta1VirtualMachineRestore,
   V1beta1VirtualMachineSnapshot,
@@ -8,6 +6,10 @@ import {
   V1VolumeSnapshotStatus,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import {
+  V1Alpha1VirtualMachineRestoreModel,
+  V1Alpha1VirtualMachineSnapshotModel,
+} from '@kubevirt-utils/models';
 
 export const getVolumeSnapshotStatusesPartition = (
   volumeSnaoshotStatuses: V1VolumeSnapshotStatus[],
@@ -35,8 +37,8 @@ export const validateSnapshotDeadline = (deadline: string): string => {
 
 export const getEmptyVMSnapshotResource = (vm: V1VirtualMachine): V1beta1VirtualMachineSnapshot => {
   const snapshotResource: V1beta1VirtualMachineSnapshot = {
-    apiVersion: `${VirtualMachineSnapshotModel.apiGroup}/${VirtualMachineSnapshotModel.apiVersion}`,
-    kind: VirtualMachineSnapshotModel.kind,
+    apiVersion: `${V1Alpha1VirtualMachineSnapshotModel.apiGroup}/${V1Alpha1VirtualMachineSnapshotModel.apiVersion}`,
+    kind: V1Alpha1VirtualMachineSnapshotModel.kind,
     metadata: {
       name: '',
       namespace: vm?.metadata?.namespace,
@@ -56,8 +58,8 @@ export const getVMRestoreSnapshotResource = (
   snapshot: V1beta1VirtualMachineSnapshot,
 ): V1beta1VirtualMachineRestore => {
   const restoreResource: V1beta1VirtualMachineRestore = {
-    apiVersion: `${VirtualMachineRestoreModel.apiGroup}/${VirtualMachineRestoreModel.apiVersion}`,
-    kind: VirtualMachineRestoreModel.kind,
+    apiVersion: `${V1Alpha1VirtualMachineRestoreModel.apiGroup}/${V1Alpha1VirtualMachineRestoreModel.apiVersion}`,
+    kind: V1Alpha1VirtualMachineRestoreModel.kind,
     metadata: {
       name: `restore-${snapshot.metadata.name}-${new Date().getTime()}`,
       namespace: snapshot.metadata.namespace,

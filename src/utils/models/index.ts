@@ -1,3 +1,5 @@
+import VirtualMachineRestoreModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineRestoreModel';
+import VirtualMachineSnapshotModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineSnapshotModel';
 import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 export * from '@kubevirt-ui/kubevirt-api/console';
@@ -26,4 +28,14 @@ export const QuickStartModel: K8sModel = {
   namespaced: false,
   plural: 'consolequickstarts',
   propagationPolicy: 'Background',
+};
+
+export const V1Alpha1VirtualMachineSnapshotModel = {
+  ...VirtualMachineSnapshotModel,
+  apiVersion: 'v1alpha1',
+};
+
+export const V1Alpha1VirtualMachineRestoreModel = {
+  ...VirtualMachineRestoreModel,
+  apiVersion: 'v1alpha1',
 };

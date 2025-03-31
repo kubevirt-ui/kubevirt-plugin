@@ -3,13 +3,13 @@ import {
   PersistentVolumeClaimModel,
 } from '@kubevirt-ui/kubevirt-api/console';
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
-import VirtualMachineSnapshotModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineSnapshotModel';
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import {
   V1beta1VirtualMachineSnapshot,
   V1VirtualMachine,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1Alpha1VirtualMachineSnapshotModel } from '@kubevirt-utils/models';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -57,7 +57,7 @@ const useDeleteVMResources: UseDeleteVMResources = (vm) => {
   const [snapshots, snapshotsLoaded, snapshotsLoadError] = useK8sWatchResource<
     V1beta1VirtualMachineSnapshot[]
   >({
-    groupVersionKind: modelToGroupVersionKind(VirtualMachineSnapshotModel),
+    groupVersionKind: modelToGroupVersionKind(V1Alpha1VirtualMachineSnapshotModel),
     isList: true,
     namespace,
     namespaced: true,

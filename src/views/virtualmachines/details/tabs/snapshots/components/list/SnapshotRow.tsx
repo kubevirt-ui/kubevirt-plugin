@@ -1,11 +1,12 @@
 import * as React from 'react';
 
-import { VirtualMachineSnapshotModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
+import { modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import {
   V1beta1VirtualMachineRestore,
   V1beta1VirtualMachineSnapshot,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
+import { V1Alpha1VirtualMachineSnapshotModel } from '@kubevirt-utils/models';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 
 import { snapshotStatuses } from '../../utils/consts';
@@ -27,7 +28,7 @@ const SnapshotRow: React.FC<
     <>
       <TableData activeColumnIDs={activeColumnIDs} id="name">
         <ResourceLink
-          groupVersionKind={VirtualMachineSnapshotModelGroupVersionKind}
+          groupVersionKind={modelToGroupVersionKind(V1Alpha1VirtualMachineSnapshotModel)}
           name={snapshot?.metadata?.name}
           namespace={snapshot?.metadata?.namespace}
         />

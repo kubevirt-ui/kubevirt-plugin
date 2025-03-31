@@ -1,11 +1,14 @@
 import * as React from 'react';
 
-import VirtualMachineRestoreModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineRestoreModel';
-import VirtualMachineSnapshotModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineSnapshotModel';
 import {
   V1beta1VirtualMachineRestore,
   V1beta1VirtualMachineSnapshot,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  modelToGroupVersionKind,
+  V1Alpha1VirtualMachineRestoreModel,
+  V1Alpha1VirtualMachineSnapshotModel,
+} from '@kubevirt-utils/models';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 import { getVmRestoreSnapshotName, getVmRestoreTime } from '../utils/selectors';
@@ -21,11 +24,7 @@ const useSnapshotData = (vmName: string, namespace: string): UseSnapshotData => 
   const [snapshots, snapshotsLoaded, snapshotsError] = useK8sWatchResource<
     V1beta1VirtualMachineSnapshot[]
   >({
-    groupVersionKind: {
-      group: VirtualMachineSnapshotModel.apiGroup,
-      kind: VirtualMachineSnapshotModel.kind,
-      version: 'v1alpha1',
-    },
+    groupVersionKind: modelToGroupVersionKind(V1Alpha1VirtualMachineSnapshotModel),
     isList: true,
     namespace,
     namespaced: true,
@@ -34,11 +33,7 @@ const useSnapshotData = (vmName: string, namespace: string): UseSnapshotData => 
   const [restores, restoresLoaded, restoresError] = useK8sWatchResource<
     V1beta1VirtualMachineRestore[]
   >({
-    groupVersionKind: {
-      group: VirtualMachineRestoreModel.apiGroup,
-      kind: VirtualMachineRestoreModel.kind,
-      version: 'v1alpha1',
-    },
+    groupVersionKind: modelToGroupVersionKind(V1Alpha1VirtualMachineRestoreModel),
     isList: true,
     namespace,
     namespaced: true,

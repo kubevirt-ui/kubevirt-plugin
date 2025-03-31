@@ -1,13 +1,13 @@
 import React, { FC, useMemo } from 'react';
 import { Trans } from 'react-i18next';
 
-import VirtualMachineRestoreModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineRestoreModel';
 import {
   V1beta1VirtualMachineRestore,
   V1beta1VirtualMachineSnapshot,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { V1Alpha1VirtualMachineRestoreModel } from '@kubevirt-utils/models';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
 import { getVMRestoreSnapshotResource } from '../../utils/helpers';
@@ -33,7 +33,7 @@ const RestoreModal: FC<DeleteResourceModalProps> = ({ isOpen, onClose, snapshot 
       onSubmit={(obj) =>
         k8sCreate({
           data: obj,
-          model: VirtualMachineRestoreModel,
+          model: V1Alpha1VirtualMachineRestoreModel,
         })
       }
       headerText={t('Restore snapshot')}
