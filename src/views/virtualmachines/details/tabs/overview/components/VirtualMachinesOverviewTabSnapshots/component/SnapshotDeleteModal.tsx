@@ -1,10 +1,10 @@
 import * as React from 'react';
 
-import VirtualMachineSnapshotModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineSnapshotModel';
 import { V1beta1VirtualMachineSnapshot } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { V1Alpha1VirtualMachineSnapshotModel } from '@kubevirt-utils/models';
 import { k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
 import { ButtonVariant } from '@patternfly/react-core';
 
@@ -15,7 +15,7 @@ const SnapshotDeleteModal = ({ isOpen, onClose, snapshot }) => {
       onSubmit={(obj) =>
         k8sDelete({
           json: undefined,
-          model: VirtualMachineSnapshotModel,
+          model: V1Alpha1VirtualMachineSnapshotModel,
           requestInit: undefined,
           resource: obj,
         })

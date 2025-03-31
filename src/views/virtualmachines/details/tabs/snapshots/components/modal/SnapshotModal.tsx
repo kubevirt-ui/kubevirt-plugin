@@ -1,12 +1,12 @@
 import React, { FC, useMemo, useState } from 'react';
 
-import VirtualMachineSnapshotModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineSnapshotModel';
 import {
   V1beta1VirtualMachineSnapshot,
   V1VirtualMachine,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { V1Alpha1VirtualMachineSnapshotModel } from '@kubevirt-utils/models';
 import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
 import { getVolumeSnapshotStatuses } from '@kubevirt-utils/resources/vm';
 import { generatePrettyName } from '@kubevirt-utils/utils/utils';
@@ -64,7 +64,7 @@ const SnapshotModal: FC<SnapshotModalProps> = ({ isOpen, onClose, vm }) => {
       onSubmit={(obj) =>
         k8sCreate<V1beta1VirtualMachineSnapshot>({
           data: obj,
-          model: VirtualMachineSnapshotModel,
+          model: V1Alpha1VirtualMachineSnapshotModel,
         })
       }
       headerText={t('Take snapshot')}

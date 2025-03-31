@@ -1,7 +1,6 @@
 import React, { FC, useCallback, useState } from 'react';
 
 import VirtualMachineCloneModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineCloneModel';
-import VirtualMachineSnapshotModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineSnapshotModel';
 import { V1beta1VirtualMachineSnapshot } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import CloneVMModal from '@kubevirt-utils/components/CloneVMModal/CloneVMModal';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
@@ -9,6 +8,7 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { V1Alpha1VirtualMachineSnapshotModel } from '@kubevirt-utils/models';
 import { k8sDelete, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { ButtonVariant, Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
 
@@ -57,7 +57,7 @@ const SnapshotActionsMenu: FC<SnapshotActionsMenuProps> = ({ isRestoreDisabled, 
       <TabModal<V1beta1VirtualMachineSnapshot>
         onSubmit={(obj) =>
           k8sDelete({
-            model: VirtualMachineSnapshotModel,
+            model: V1Alpha1VirtualMachineSnapshotModel,
             resource: obj,
           })
         }

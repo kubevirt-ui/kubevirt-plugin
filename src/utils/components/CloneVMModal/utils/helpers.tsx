@@ -2,12 +2,12 @@ import produce from 'immer';
 
 import VirtualMachineCloneModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineCloneModel';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import VirtualMachineSnapshotModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineSnapshotModel';
 import {
   V1alpha1VirtualMachineClone,
   V1beta1VirtualMachineSnapshot,
   V1VirtualMachine,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1Alpha1VirtualMachineSnapshotModel } from '@kubevirt-utils/models';
 import { MAX_K8S_NAME_LENGTH } from '@kubevirt-utils/utils/constants';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, k8sGet, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
@@ -43,7 +43,9 @@ export const cloneVM = (
 ) => {
   const cloningRequest = produce(cloneVMToVM, (draftCloneData) => {
     draftCloneData.spec.source = {
-      apiGroup: isVM(source) ? VirtualMachineModel.apiGroup : VirtualMachineSnapshotModel.apiGroup,
+      apiGroup: isVM(source)
+        ? VirtualMachineModel.apiGroup
+        : V1Alpha1VirtualMachineSnapshotModel.apiGroup,
       kind: source.kind,
       name: source.metadata.name,
     };
