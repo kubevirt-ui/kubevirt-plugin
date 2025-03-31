@@ -1,12 +1,11 @@
 import React, { FC } from 'react';
 import { Link } from 'react-router-dom-v5-compat';
-import { useLocation } from 'react-router-dom-v5-compat';
 
+import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getVMStatus } from '@kubevirt-utils/resources/shared';
+import { getResourceUrl, getVMStatus } from '@kubevirt-utils/resources/shared';
 import { Content, Popover, PopoverPosition, Progress, ProgressSize } from '@patternfly/react-core';
-import { createURL } from '@virtualmachines/details/tabs/overview/utils/utils';
 
 import useProvisioningPercentage from '../../../../../../../../../utils/resources/vm/hooks/useProvisioningPercentage';
 
@@ -27,8 +26,6 @@ const VirtualMachineProvisioningStatus: FC<VirtualMachineProvisioningStatusProps
 
   const numberOfProvisioningDisks = Object.keys(percentages).length;
 
-  const location = useLocation();
-
   return (
     <Popover
       bodyContent={
@@ -47,7 +44,11 @@ const VirtualMachineProvisioningStatus: FC<VirtualMachineProvisioningStatusProps
           ))}
           <br />
           <Content component="p">
-            <Link to={createURL('diagnostics', location?.pathname)}>{t('View diagnostic')}</Link>
+            <Link
+              to={`${getResourceUrl({ model: VirtualMachineModel, resource: vm })}/diagnostics`}
+            >
+              {t('View diagnostic')}
+            </Link>
           </Content>
         </>
       }
