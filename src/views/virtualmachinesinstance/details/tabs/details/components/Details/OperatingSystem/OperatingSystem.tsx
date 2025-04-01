@@ -7,7 +7,7 @@ import {
 import GuestAgentIsRequiredText from '@kubevirt-utils/components/GuestAgentIsRequiredText/GuestAgentIsRequiredText';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getOsNameFromGuestAgent } from '@kubevirt-utils/resources/vmi';
+import { getOSNameFromGuestAgent } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 type OperatingSystemProps = {
@@ -27,7 +27,7 @@ const OperatingSystem: React.FC<OperatingSystemProps> = ({
       descriptionData={
         (loadedGuestAgent &&
           !isEmpty(guestAgentData) &&
-          getOsNameFromGuestAgent(guestAgentData)) || <GuestAgentIsRequiredText vmi={vmi} />
+          getOSNameFromGuestAgent(guestAgentData)) || <GuestAgentIsRequiredText vmi={vmi} />
       }
       descriptionHeader={t('Operating system')}
     />
