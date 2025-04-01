@@ -135,6 +135,13 @@ const useVirtualMachineColumns = (
         transforms: [sortable],
       },
       {
+        additional: true,
+        id: 'storageclassname',
+        sort: (_, direction) => sortingUsingFunction(direction, sortByNetworkUsage),
+        title: t('Storage class'),
+        transforms: [sortable],
+      },
+      {
         id: '',
         props: { className: 'dropdown-kebab-pf pf-v6-c-table__action' },
         title: '',

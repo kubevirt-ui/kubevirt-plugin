@@ -22,6 +22,7 @@ import { getAnnotation, getLabel } from '@kubevirt-utils/resources/shared';
 import { WORKLOADS } from '@kubevirt-utils/resources/template';
 import { isVM } from '@kubevirt-utils/utils/typeGuards';
 
+import { getStorageClassName } from './dataVolumeTemplate/selectors';
 import { VM_WORKLOAD_ANNOTATION } from './annotations';
 import { UPDATE_STRATEGIES, VirtualMachineStatusConditionTypes } from './constants';
 
@@ -318,3 +319,6 @@ export const isHeadlessMode = (vm: V1VirtualMachine | V1VirtualMachineInstance) 
   const devices = isVM(vm) ? vm?.spec?.template?.spec?.domain?.devices : vm?.spec?.domain?.devices;
   return devices?.autoattachGraphicsDevice === false;
 };
+
+export const getVirtualMachineStorageClasses = (vm: V1VirtualMachine): string[] =>
+  getDataVolumeTemplates(vm)?.map((dataVolumeTemplate) => getStorageClassName(dataVolumeTemplate));
