@@ -3,6 +3,7 @@ import type { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plug
 
 export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
   topology: 'src/views/topology/utils/topology-plugin.ts',
+  topologySidebar: 'src/views/topology/topology-sidebar.ts',
 };
 
 export const extensions: EncodedExtension[] = [
@@ -81,5 +82,18 @@ export const extensions: EncodedExtension[] = [
       },
     },
     type: 'console.topology/data/factory',
+  },
+  {
+    flags: {
+      required: ['KUBEVIRT'],
+    },
+    properties: {
+      id: 'topology-tab-section-vm-details',
+      provider: {
+        $codeRef: 'topologySidebar.useVMSidePanelDetailsTabSection',
+      },
+      tab: 'topology-side-bar-tab-details',
+    },
+    type: 'console.topology/details/tab-section',
   },
 ];

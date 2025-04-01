@@ -22,6 +22,15 @@ export const getValidNamespace = (activeNamespace: string) =>
 export const isEmpty = (obj) =>
   [Array, Object].includes((obj || {}).constructor) && !Object.entries(obj || {}).length;
 
+export const isEqual = (x, y) => {
+  const ok = Object.keys,
+    tx = typeof x,
+    ty = typeof y;
+  return x && y && tx === 'object' && tx === ty
+    ? ok(x).length === ok(y).length && ok(x).every((key) => isEqual(x[key], y[key]))
+    : x === y;
+};
+
 export const get = (obj: unknown, path: string | string[], defaultValue = undefined) => {
   const travel = (regexp: RegExp) =>
     String.prototype.split

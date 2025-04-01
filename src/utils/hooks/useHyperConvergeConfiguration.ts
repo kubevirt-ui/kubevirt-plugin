@@ -6,6 +6,32 @@ import { V1MigrationConfiguration } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
+type PCIHostDevice = {
+  disabled?: boolean;
+  externalResourceProvider?: boolean;
+  pciDeviceSelector: string;
+  resourceName: string;
+};
+
+type USBSelector = {
+  product: string;
+  vendor: string;
+};
+
+type USBHostDevice = {
+  disabled?: boolean;
+  externalResourceProvider: boolean;
+  resourceName: string;
+  selectors: USBSelector[];
+};
+
+type MediatedHostDevice = {
+  disabled?: boolean;
+  externalResourceProvider?: boolean;
+  mdevNameSelector: string;
+  resourceName: string;
+};
+
 export type HyperConverged = K8sResourceCommon & {
   spec: {
     commonBootImageNamespace?: string;
@@ -26,6 +52,11 @@ export type HyperConverged = K8sResourceCommon & {
     higherWorkloadDensity: { memoryOvercommitPercentage: number };
     ksmConfiguration: { nodeLabelSelector?: Record<string, never> };
     liveMigrationConfig: V1MigrationConfiguration;
+    permittedHostDevices?: {
+      mediatedDevices: MediatedHostDevice[];
+      pciHostDevices: PCIHostDevice[];
+      usbHostDevices: USBHostDevice[];
+    };
     resourceRequirements: {
       autoCPULimitNamespaceLabelSelector: V1LabelSelector;
     };

@@ -71,7 +71,7 @@ export const updateBootLoader = (updatedVM: V1VirtualMachine, vm: V1VirtualMachi
   });
 };
 
-export const updatedBootOrder = (updatedVM: V1VirtualMachine) =>
+export const updateBootOrder = (updatedVM: V1VirtualMachine) =>
   k8sPatch({
     data: [
       {

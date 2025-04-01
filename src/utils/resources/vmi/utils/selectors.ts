@@ -1,6 +1,8 @@
 import {
   V1Bootloader,
   V1Devices,
+  V1GPU,
+  V1HostDevice,
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceNetworkInterface,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -50,3 +52,33 @@ export const getVMIDevices = (vmi: V1VirtualMachineInstance): V1Devices =>
 
 export const getVMIBootLoader = (vmi: V1VirtualMachineInstance): V1Bootloader =>
   vmi?.spec?.domain?.firmware.bootloader;
+
+/**
+ * A selector for the virtual machine instance's Node name
+ * @param {V1VirtualMachineInstance} vmi the virtual machine instance
+ * @returns {string} the virtual machine instance's node name
+ */
+export const getVMINodeName = (vmi: V1VirtualMachineInstance): string => vmi?.status?.nodeName;
+
+/**
+ * A selector for the virtual machine instance's GPU devices
+ * @param {V1VirtualMachineInstance} vmi the virtual machine instance
+ * @param {V1GPU[]} defaultValue the value to return if the virtual machine instance has no GPU devices
+ * @returns {V1GPU[]} the virtual machine instance's GPU devices or the default value
+ */
+export const getVMIGPUDevices = (
+  vmi: V1VirtualMachineInstance,
+  defaultValue: V1GPU[] = [],
+): V1GPU[] => vmi?.spec?.domain?.devices?.gpus || defaultValue;
+
+/**
+ * A selector for the virtual
+ * A selector for the virtual machine instance's host devices
+ * @param {V1VirtualMachineInstance} vmi the virtual machine instance
+ * @param {V1HostDevice[]} defaultValue the value to return if the virtual machine instance has no host devices
+ * @returns {V1HostDevice[]} the virtual machine instance's host devices or the default value
+ */
+export const getVMIHostDevices = (
+  vmi: V1VirtualMachineInstance,
+  defaultValue: V1HostDevice[] = [],
+): V1HostDevice[] => vmi?.spec?.domain?.devices?.hostDevices || defaultValue;
