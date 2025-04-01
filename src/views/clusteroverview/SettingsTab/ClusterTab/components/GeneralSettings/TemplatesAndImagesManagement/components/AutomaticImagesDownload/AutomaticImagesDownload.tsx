@@ -29,7 +29,10 @@ const AutomaticImagesDownload: FC<AutomaticImagesDownloadProps> = ({
 
   const [hyperConverged, loaded] = hyperConvergeConfiguration;
   const isEnabledAutomaticImagesDownload =
-    hyperConverged?.spec?.featureGates?.enableCommonBootImageImport;
+    hyperConverged?.spec?.enableCommonBootImageImport !== undefined
+      ? hyperConverged?.spec?.enableCommonBootImageImport
+      : true;
+
   const bootSources =
     hyperConverged?.spec?.dataImportCronTemplates ||
     hyperConverged?.status?.dataImportCronTemplates;
@@ -40,7 +43,7 @@ const AutomaticImagesDownload: FC<AutomaticImagesDownloadProps> = ({
         data: [
           {
             op: 'replace',
-            path: `/spec/featureGates/enableCommonBootImageImport`,
+            path: `/spec/enableCommonBootImageImport`,
             value: val,
           },
         ],
@@ -78,7 +81,7 @@ const AutomaticImagesDownload: FC<AutomaticImagesDownloadProps> = ({
       <SectionWithSwitch
         helpTextIconContent={t('Enable automatic images download and update')}
         id="auto-image-download"
-        isDisabled={!loaded || !isAdmin || isEnabledAutomaticImagesDownload === undefined}
+        isDisabled={!loaded || !isAdmin}
         newBadge={newBadge}
         switchIsOn={Boolean(isEnabledAutomaticImagesDownload)}
         title={t('Automatic images download')}

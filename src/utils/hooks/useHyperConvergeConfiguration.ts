@@ -11,6 +11,7 @@ export type HyperConverged = K8sResourceCommon & {
     commonBootImageNamespace?: string;
     commonTemplatesNamespace?: string;
     dataImportCronTemplates: K8sResourceCommon[];
+    enableCommonBootImageImport?: boolean;
     evictionStrategy?: string;
     featureGates: {
       deployKubeSecondaryDNS?: boolean;
