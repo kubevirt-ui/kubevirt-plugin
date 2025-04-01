@@ -9,7 +9,11 @@
 
   .co-catalog-page--with-sidebar {
     padding-bottom: 0;
-    margin-top: var(--pf-t--global--spacer--lg);
+    margin-top: var(--pf-t--global--spacer--md);
+  }
+
+  .co-catalog-page__tabs {
+    padding-bottom: var(--pf-t--global--spacer--sm);
   }
 
   &-row-icon {

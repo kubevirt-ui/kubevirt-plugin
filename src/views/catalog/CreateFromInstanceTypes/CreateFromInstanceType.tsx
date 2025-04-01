@@ -11,7 +11,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import useBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useBootableVolumes';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
-import { Bullseye, Card, Divider, Grid, GridItem, List } from '@patternfly/react-core';
+import { Bullseye, Card, Divider, Grid, GridItem, List, PageSection } from '@patternfly/react-core';
 
 import AddBootableVolumeButton from './components/AddBootableVolumeButton/AddBootableVolumeButton';
 import BootableVolumeList from './components/BootableVolumeList/BootableVolumeList';
@@ -66,59 +66,63 @@ const CreateFromInstanceType: FC<CreateFromInstanceTypeProps> = ({ currentTab })
   return (
     <>
       <GuidedTour />
-      <Grid className="co-dashboard-body">
-        <GridItem>
-          <Card>
-            <List className="create-vm-instance-type-section__list" isPlain>
-              <SectionListItem
-                headerAction={
-                  <AddBootableVolumeButton loadError={instanceTypesAndPreferencesData.loadError} />
-                }
-                headerText={
-                  <CreateFromInstanceTypeTitle
+      <PageSection>
+        <Grid>
+          <GridItem>
+            <Card>
+              <List className="create-vm-instance-type-section__list" isPlain>
+                <SectionListItem
+                  headerAction={
+                    <AddBootableVolumeButton
+                      loadError={instanceTypesAndPreferencesData.loadError}
+                    />
+                  }
+                  headerText={
+                    <CreateFromInstanceTypeTitle
+                      instanceTypesAndPreferencesData={instanceTypesAndPreferencesData}
+                    />
+                  }
+                  sectionKey={INSTANCE_TYPES_SECTIONS.SELECT_VOLUME}
+                  sectionState={sectionState}
+                >
+                  <BootableVolumeList
+                    bootableVolumesData={bootableVolumesData}
+                    currentTab={currentTab}
+                    displayShowAllButton
+                    favorites={[favorites as [], updaterFavorites]}
+                    preferencesData={instanceTypesAndPreferencesData.preferences}
+                  />
+                </SectionListItem>
+
+                <Divider />
+
+                <SectionListItem
+                  headerText={t('Select InstanceType')}
+                  sectionKey={INSTANCE_TYPES_SECTIONS.SELECT_INSTANCE_TYPE}
+                  sectionState={sectionState}
+                >
+                  <SelectInstanceTypeSection
                     instanceTypesAndPreferencesData={instanceTypesAndPreferencesData}
                   />
-                }
-                sectionKey={INSTANCE_TYPES_SECTIONS.SELECT_VOLUME}
-                sectionState={sectionState}
-              >
-                <BootableVolumeList
-                  bootableVolumesData={bootableVolumesData}
-                  currentTab={currentTab}
-                  displayShowAllButton
-                  favorites={[favorites as [], updaterFavorites]}
-                  preferencesData={instanceTypesAndPreferencesData.preferences}
-                />
-              </SectionListItem>
+                </SectionListItem>
 
-              <Divider />
+                <Divider />
 
-              <SectionListItem
-                headerText={t('Select InstanceType')}
-                sectionKey={INSTANCE_TYPES_SECTIONS.SELECT_INSTANCE_TYPE}
-                sectionState={sectionState}
-              >
-                <SelectInstanceTypeSection
-                  instanceTypesAndPreferencesData={instanceTypesAndPreferencesData}
-                />
-              </SectionListItem>
-
-              <Divider />
-
-              <SectionListItem
-                headerText={t('VirtualMachine details')}
-                sectionKey={INSTANCE_TYPES_SECTIONS.VM_DETAILS}
-                sectionState={sectionState}
-              >
-                <VMDetailsSection
-                  instanceTypesAndPreferencesData={instanceTypesAndPreferencesData}
-                />
-              </SectionListItem>
-            </List>
-          </Card>
-        </GridItem>
-      </Grid>
-      <CreateVMFooter />
+                <SectionListItem
+                  headerText={t('VirtualMachine details')}
+                  sectionKey={INSTANCE_TYPES_SECTIONS.VM_DETAILS}
+                  sectionState={sectionState}
+                >
+                  <VMDetailsSection
+                    instanceTypesAndPreferencesData={instanceTypesAndPreferencesData}
+                  />
+                </SectionListItem>
+              </List>
+            </Card>
+          </GridItem>
+        </Grid>
+        <CreateVMFooter />
+      </PageSection>
     </>
   );
 };

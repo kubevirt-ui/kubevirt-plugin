@@ -7,7 +7,7 @@ import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { getName } from '@kubevirt-utils/resources/shared';
 import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
-import { Tab, Tabs, TabTitleText } from '@patternfly/react-core';
+import { PageSection, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
 
 import { getNamespace } from '../../../../cdi-upload-provider/utils/selectors';
@@ -48,7 +48,7 @@ const VirtualMachineConfigurationTab: FC<NavPageComponentProps> = ({
   }, [location.pathname]);
 
   return (
-    <div className="co-dashboard-body VirtualMachineConfigurationTab">
+    <PageSection className="VirtualMachineConfigurationTab">
       <VirtualMachineConfigurationTabSearch vm={vm} />
       <div className="VirtualMachineConfigurationTab--body">
         <Tabs activeKey={activeTabKey} className="VirtualMachineConfigurationTab--main" isVertical>
@@ -74,7 +74,7 @@ const VirtualMachineConfigurationTab: FC<NavPageComponentProps> = ({
         </Tabs>
       </div>
       <GuidedTour />
-    </div>
+    </PageSection>
   );
 };
 

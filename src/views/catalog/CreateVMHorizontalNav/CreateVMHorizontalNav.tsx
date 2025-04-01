@@ -5,7 +5,7 @@ import CreateFromInstanceType from '@catalog/CreateFromInstanceTypes/CreateFromI
 import TemplatesCatalog from '@catalog/templatescatalog/TemplatesCatalog';
 import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Stack, StackItem, Tab, Tabs, Title } from '@patternfly/react-core';
+import { PageSection, Stack, StackItem, Tab, Tabs, Title } from '@patternfly/react-core';
 import { CatalogIcon, ImageIcon } from '@patternfly/react-icons';
 
 import CreateVMTabTitle from './components/CreateVMTabTitle/CreateVMTabTitle';
@@ -35,14 +35,14 @@ const CreateVMHorizontalNav: FC = () => {
 
   return (
     <div className="create-vm-horizontal-nav">
-      <div className="pf-v6-c-page__main-breadcrumb">
-        <Stack className="co-m-pane__heading" hasGutter>
+      <PageSection>
+        <Stack hasGutter>
           <StackItem>
             <Title headingLevel="h1">{t('Create new VirtualMachine')}</Title>
           </StackItem>
           <StackItem>{t('Select an option to create a VirtualMachine from.')}</StackItem>
         </Stack>
-      </div>
+      </PageSection>
       <Tabs activeKey={currentTab} onSelect={handleTabClick} usePageInsets>
         <Tab
           data-test="instancetypes-tab"

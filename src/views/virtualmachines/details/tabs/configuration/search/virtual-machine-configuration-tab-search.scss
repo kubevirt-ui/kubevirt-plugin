@@ -1,7 +1,6 @@
 .VirtualMachineConfigurationTabSearch {
   &--main {
     margin-bottom: var(--pf-t--global--spacer--md);
-    margin-top: calc(-1 * var(--pf-t--global--spacer--sm));
     &__no-results {
       flex-direction: column;
       > * {

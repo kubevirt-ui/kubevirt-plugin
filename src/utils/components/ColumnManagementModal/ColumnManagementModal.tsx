@@ -92,7 +92,7 @@ export const ColumnManagementModal: FC<ColumnManagementModalProps> = ({
         >
           {!showNamespaceOverride && t('The namespace column is only shown when in "All projects"')}
         </Alert>
-        <div className="row co-m-form-row">
+        <div className="row co-m-form-row pf-v6-u-mt-lg">
           <div className="col-sm-12">
             <span className="col-sm-6">
               <label className="control-label">

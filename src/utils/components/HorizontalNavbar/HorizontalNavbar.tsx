@@ -52,7 +52,7 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
   const [activeItem, setActiveItem] = useState<number | string>();
   return (
     <>
-      <nav className="pf-v6-c-tabs">
+      <nav className="pf-v6-c-tabs pf-m-page-insets">
         <ul className="pf-v6-c-tabs__list">
           {allPages.map((item) => {
             if (item?.isHidden) return null;
