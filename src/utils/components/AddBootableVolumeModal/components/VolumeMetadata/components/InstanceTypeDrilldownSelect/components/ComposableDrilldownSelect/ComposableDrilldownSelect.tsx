@@ -66,7 +66,7 @@ const ComposableDrilldownSelect: FC<ComposableDrilldownMenuProps> = ({
   };
 
   const setHeight = (menuId: string, height: number) => {
-    if (!menuHeights[menuId] || (menuId !== id && menuHeights[menuId] !== height)) {
+    if (menuHeights[menuId] === undefined || (menuId !== id && menuHeights[menuId] !== height)) {
       setMenuHeights((prev) => ({
         ...prev,
         [menuId]: height,
