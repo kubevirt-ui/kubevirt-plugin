@@ -210,6 +210,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
         <VirtualMachineListSummary
           namespace={namespace}
           onFilterChange={onFilterChange}
+          vmis={vmis}
           vms={data}
         />
         <VirtualMachineEmptyState catalogURL={catalogURL} namespace={namespace} />
@@ -223,6 +224,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
       <VirtualMachineListSummary
         namespace={namespace}
         onFilterChange={onFilterChange}
+        vmis={vmis}
         vms={unfilterData}
       />
       <div className="vm-list-page-header">
