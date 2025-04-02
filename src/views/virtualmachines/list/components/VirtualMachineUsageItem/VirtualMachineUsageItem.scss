@@ -1,0 +1,16 @@
+.vm-usage-item {
+  padding: var(--pf-t--global--spacer--lg);
+
+  &__metric {
+    font-weight: var(--pf-t--global--font--weight--300);
+    margin-bottom: var(--pf-t--global--spacer--sm);
+  }
+
+  &__current {
+    font-size: var(--pf-t--global--font--size--body--lg);
+  }
+
+  &__total {
+    color: var(--pf-t--global--text--color--subtle);
+  }
+}
