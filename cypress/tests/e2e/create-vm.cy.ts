@@ -12,6 +12,7 @@ import { vm, waitForStatus } from '../../views/vm-flow';
 describe('Create VMs from InstanceType', () => {
   before(() => {
     cy.visit('');
+    cy.switchToVirt();
     cy.switchProject(TEST_NS);
   });
 
