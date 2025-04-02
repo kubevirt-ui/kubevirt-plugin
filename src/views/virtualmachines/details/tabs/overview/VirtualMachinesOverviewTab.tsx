@@ -3,7 +3,7 @@ import React, { FC } from 'react';
 import AlertsCard from '@kubevirt-utils/components/AlertsCard/AlertsCard';
 import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm';
 import { useGuestOS } from '@kubevirt-utils/resources/vmi';
-import { Grid, GridItem } from '@patternfly/react-core';
+import { Grid, GridItem, PageSection } from '@patternfly/react-core';
 import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
 
 import VirtualMachinesOverviewTabActiveUser from './components/VirtualMachinesOverviewTabActiveUser/VirtualMachinesOverviewTabActiveUser';
@@ -30,58 +30,60 @@ const VirtualMachinesOverviewTab: FC<NavPageComponentProps> = ({
   const [guestAgentData, guestAgentDataLoaded, guestAgentDataLoadError] = useGuestOS(vmi);
 
   return (
-    <Grid className="co-dashboard-body" hasGutter>
-      <GridItem span={8}>
-        <Grid hasGutter>
-          <GridItem>
-            <VirtualMachinesOverviewTabDetails
-              error={error}
-              guestAgentData={guestAgentData}
-              guestAgentDataLoaded={guestAgentDataLoaded}
-              instanceTypeExpandedSpec={instanceTypeExpandedSpec}
-              loaded={loaded}
-              vm={vm}
-              vmi={vmi}
-            />
-          </GridItem>
-          <GridItem>
-            <VirtualMachinesOverviewTabUtilization pods={pods} vm={vm} vmi={vmi} />
-          </GridItem>
-        </Grid>
-      </GridItem>
-      <GridItem span={4}>
-        <Grid hasGutter>
-          <GridItem>
-            <AlertsCard sortedAlerts={vmAlerts} />
-          </GridItem>
-          <GridItem>
-            <VirtualMachinesOverviewTabGeneral pods={pods} vm={vm} vmi={vmi} />
-          </GridItem>
-          <GridItem>
-            <VirtualMachinesOverviewTabSnapshots vm={vm} />
-          </GridItem>
-          <GridItem>
-            <VirtualMachinesOverviewTabNetworkInterfaces vm={vm} vmi={vmi} />
-          </GridItem>
-          <GridItem>
-            <VirtualMachinesOverviewTabDisks vm={vm} vmi={vmi} />
-          </GridItem>
-        </Grid>
-      </GridItem>
-      <VirtualMachinesOverviewTabHardwareDevices vm={vm} />
-      <VirtualMachinesOverviewTabFilesystem
-        guestAgentData={guestAgentData}
-        guestAgentDataLoaded={guestAgentDataLoaded}
-        vm={vm}
-      />
-      <VirtualMachinesOverviewTabService vm={vm} />
-      <VirtualMachinesOverviewTabActiveUser
-        guestAgentData={guestAgentData}
-        guestAgentDataLoaded={guestAgentDataLoaded}
-        guestAgentDataLoadError={guestAgentDataLoadError}
-        vmi={vmi}
-      />
-    </Grid>
+    <PageSection>
+      <Grid hasGutter>
+        <GridItem span={8}>
+          <Grid hasGutter>
+            <GridItem>
+              <VirtualMachinesOverviewTabDetails
+                error={error}
+                guestAgentData={guestAgentData}
+                guestAgentDataLoaded={guestAgentDataLoaded}
+                instanceTypeExpandedSpec={instanceTypeExpandedSpec}
+                loaded={loaded}
+                vm={vm}
+                vmi={vmi}
+              />
+            </GridItem>
+            <GridItem>
+              <VirtualMachinesOverviewTabUtilization pods={pods} vm={vm} vmi={vmi} />
+            </GridItem>
+          </Grid>
+        </GridItem>
+        <GridItem span={4}>
+          <Grid hasGutter>
+            <GridItem>
+              <AlertsCard sortedAlerts={vmAlerts} />
+            </GridItem>
+            <GridItem>
+              <VirtualMachinesOverviewTabGeneral pods={pods} vm={vm} vmi={vmi} />
+            </GridItem>
+            <GridItem>
+              <VirtualMachinesOverviewTabSnapshots vm={vm} />
+            </GridItem>
+            <GridItem>
+              <VirtualMachinesOverviewTabNetworkInterfaces vm={vm} vmi={vmi} />
+            </GridItem>
+            <GridItem>
+              <VirtualMachinesOverviewTabDisks vm={vm} vmi={vmi} />
+            </GridItem>
+          </Grid>
+        </GridItem>
+        <VirtualMachinesOverviewTabHardwareDevices vm={vm} />
+        <VirtualMachinesOverviewTabFilesystem
+          guestAgentData={guestAgentData}
+          guestAgentDataLoaded={guestAgentDataLoaded}
+          vm={vm}
+        />
+        <VirtualMachinesOverviewTabService vm={vm} />
+        <VirtualMachinesOverviewTabActiveUser
+          guestAgentData={guestAgentData}
+          guestAgentDataLoaded={guestAgentDataLoaded}
+          guestAgentDataLoadError={guestAgentDataLoadError}
+          vmi={vmi}
+        />
+      </Grid>
+    </PageSection>
   );
 };
 

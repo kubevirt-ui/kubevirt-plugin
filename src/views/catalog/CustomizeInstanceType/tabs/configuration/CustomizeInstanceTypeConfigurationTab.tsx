@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
-import { Tab, Tabs, TabTitleText } from '@patternfly/react-core';
+import { PageSection, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 import VirtualMachineConfigurationTabSearch from '@virtualmachines/details/tabs/configuration/search/VirtualMachineConfigurationTabSearch';
 import {
   getInnerTabFromPath,
@@ -46,7 +46,7 @@ const CustomizeInstanceTypeConfigurationTab: FC = () => {
   }
 
   return (
-    <div className="co-dashboard-body ConfigurationTab">
+    <PageSection className="ConfigurationTab">
       <VirtualMachineConfigurationTabSearch vm={vm} />
       <div className="ConfigurationTab--body">
         <Tabs activeKey={activeTabKey} className="ConfigurationTab--main" isVertical>
@@ -64,7 +64,7 @@ const CustomizeInstanceTypeConfigurationTab: FC = () => {
           ))}
         </Tabs>
       </div>
-    </div>
+    </PageSection>
   );
 };
 

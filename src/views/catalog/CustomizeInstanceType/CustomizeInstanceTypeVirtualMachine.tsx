@@ -12,7 +12,7 @@ const CustomizeInstanceTypeVirtualMachine: FC = () => {
   const { vm } = useInstanceTypeVMStore();
 
   return (
-    <Stack hasGutter>
+    <Stack>
       <CustomizeITVMHeader />
       <StackItem isFilled>
         <HorizontalNavbar loaded pages={pages} vm={vm} />

@@ -42,7 +42,7 @@ const SelectInstanceTypeSection: FC<SelectInstanceTypeSectionProps> = ({
   };
 
   return (
-    <Tabs activeKey={activeTabKey} onSelect={handleTabClick}>
+    <Tabs activeKey={activeTabKey} className="pf-v6-u-mt-md" onSelect={handleTabClick}>
       <Tab eventKey={TabKey.RedHat} title={menuItems.redHatProvided.label}>
         <RedHatProvidedInstanceTypesSection redHatMenuItems={menuItems?.redHatProvided} />
       </Tab>
