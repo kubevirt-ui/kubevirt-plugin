@@ -107,4 +107,15 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.topology/adapter/pod',
   },
+  {
+    flags: {
+      required: ['KUBEVIRT'],
+    },
+    properties: {
+      adapt: {
+        $codeRef: 'topologySidebar.getVMSidePanelNetworkAdapter',
+      },
+    },
+    type: 'console.topology/adapter/network',
+  },
 ];
