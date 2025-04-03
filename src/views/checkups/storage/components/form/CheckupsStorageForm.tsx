@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 
+import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useRelatedImage from '@kubevirt-utils/hooks/useRelatedImage';
 import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 import {
   Button,
@@ -12,9 +14,13 @@ import {
   GridItem,
   Popover,
   PopoverPosition,
+  Skeleton,
   TextInput,
+  Truncate,
 } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
+
+import { storageCheckupImageSettings } from '../../utils/const';
 
 import CheckupsStorageFormActions from './CheckupsStorageFormActions';
 
@@ -24,6 +30,9 @@ const CheckupsStorageForm = () => {
   const { t } = useKubevirtTranslation();
   const [name, setName] = useState<string>(generatePrettyName('kubevirt-storage-checkup'));
   const [timeOut, setTimeOut] = useState<string>('10');
+  const [checkupImage, checkupImageLoaded, checkupImageLoadError] = useRelatedImage(
+    storageCheckupImageSettings,
+  );
 
   return (
     <Grid>
@@ -66,7 +75,22 @@ const CheckupsStorageForm = () => {
                 value={timeOut}
               />
             </FormGroup>
-            <CheckupsStorageFormActions name={name} timeOut={timeOut} />
+            <FormGroup
+              labelHelp={
+                <Popover
+                  bodyContent={t('The image used by the checkup job.')}
+                  position={PopoverPosition.right}
+                >
+                  <Button icon={<HelpIcon />} variant={ButtonVariant.plain} />
+                </Popover>
+              }
+              label={t('Checkup image')}
+            >
+              {!checkupImageLoaded && <Skeleton screenreaderText={t('Loading checkup image')} />}
+              {checkupImageLoaded && <Truncate content={checkupImage ?? ''} />}
+              {checkupImageLoadError && <ErrorAlert error={checkupImageLoadError} />}
+            </FormGroup>
+            <CheckupsStorageFormActions checkupImage={checkupImage} name={name} timeOut={timeOut} />
           </FormSection>
         </Form>
       </GridItem>

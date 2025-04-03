@@ -113,7 +113,11 @@ const storageCheckupConfigMap = (
   },
 });
 
-const storageCheckupJob = (name: string, namespace: string): IoK8sApiBatchV1Job => {
+const storageCheckupJob = (
+  name: string,
+  namespace: string,
+  checkupImage: string,
+): IoK8sApiBatchV1Job => {
   return {
     apiVersion: 'batch/v1',
     kind: 'Job',
@@ -134,7 +138,7 @@ const storageCheckupJob = (name: string, namespace: string): IoK8sApiBatchV1Job 
                 { name: 'CONFIGMAP_NAMESPACE', value: namespace },
                 { name: 'CONFIGMAP_NAME', value: name },
               ],
-              image: 'quay.io/kiagnose/kubevirt-storage-checkup:main',
+              image: checkupImage,
               imagePullPolicy: 'Always',
               name: generateWithNumbers(name),
             },
@@ -151,6 +155,7 @@ export const createStorageCheckup = async (
   namespace: string,
   timeOut: string,
   name: string,
+  checkupImage: string,
 ): Promise<IoK8sApiBatchV1Job> => {
   await k8sCreate({
     data: storageCheckupConfigMap(namespace, timeOut, name),
@@ -158,7 +163,7 @@ export const createStorageCheckup = async (
   });
 
   return k8sCreate({
-    data: storageCheckupJob(name, namespace),
+    data: storageCheckupJob(name, namespace, checkupImage),
     model: JobModel,
   });
 };
@@ -257,6 +262,7 @@ export const deleteStorageCheckup = async (
 
 export const rerunStorageCheckup = async (
   resource: IoK8sApiCoreV1ConfigMap,
+  checkupImage: string,
 ): Promise<IoK8sApiBatchV1Job> => {
   const isSucceeded = resource?.data?.[STATUS_SUCCEEDED] === 'true';
   await k8sPatch<IoK8sApiCoreV1ConfigMap>({
@@ -286,7 +292,7 @@ export const rerunStorageCheckup = async (
   });
 
   return k8sCreate({
-    data: storageCheckupJob(resource.metadata.name, resource.metadata.namespace),
+    data: storageCheckupJob(resource.metadata.name, resource.metadata.namespace, checkupImage),
     model: JobModel,
   });
 };

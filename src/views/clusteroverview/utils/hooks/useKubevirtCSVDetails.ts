@@ -1,12 +1,8 @@
 import { useMemo } from 'react';
 
 import { CatalogSourceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console/models/CatalogSourceModel';
-import ClusterServiceVersionModel, {
-  ClusterServiceVersionModelGroupVersionKind,
-} from '@kubevirt-ui/kubevirt-api/console/models/ClusterServiceVersionModel';
-import { SubscriptionModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console/models/SubscriptionModel';
-import { KUBEVIRT_HYPERCONVERGED } from '@kubevirt-utils/constants/constants';
-import { DEFAULT_OPERATOR_NAMESPACE } from '@kubevirt-utils/utils/utils';
+import ClusterServiceVersionModel from '@kubevirt-ui/kubevirt-api/console/models/ClusterServiceVersionModel';
+import { useKubevirtClusterServiceVersion } from '@kubevirt-utils/hooks/useKubevirtClusterServiceVersion';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 import { OPENSHIFT_OPERATOR_LIFECYCLE_MANAGER_NAMESPACE, PACKAGESERVER } from '../constants';
@@ -28,26 +24,12 @@ type UseKubevirtCSVDetails = {
 };
 
 export const useKubevirtCSVDetails = (): UseKubevirtCSVDetails => {
-  const [subscriptions, loadedSubscription, loadSubscriptionError] = useK8sWatchResource<
-    SubscriptionKind[]
-  >({
-    groupVersionKind: SubscriptionModelGroupVersionKind,
-    isList: true,
-    namespace: DEFAULT_OPERATOR_NAMESPACE,
-  });
-
-  const subscription = useMemo(
-    () => subscriptions?.find((sub) => sub?.spec?.name.endsWith(KUBEVIRT_HYPERCONVERGED)),
-    [subscriptions],
-  );
-
-  const [installedCSV, loadedCSV, loadCSVError] = useK8sWatchResource<ClusterServiceVersionKind>(
-    subscription && {
-      groupVersionKind: ClusterServiceVersionModelGroupVersionKind,
-      name: subscription?.status?.installedCSV,
-      namespace: subscription?.metadata?.namespace,
-    },
-  );
+  const {
+    installedCSV,
+    loaded: loadedCSV,
+    loadErrors: loadCSVError,
+    subscription,
+  } = useKubevirtClusterServiceVersion();
 
   const [catalogSource, loadedSource, loadSourceError] = useK8sWatchResource<CatalogSourceKind>(
     subscription && {
@@ -57,9 +39,9 @@ export const useKubevirtCSVDetails = (): UseKubevirtCSVDetails => {
     },
   );
 
-  const loadErrors = loadSourceError || loadSubscriptionError || loadCSVError;
+  const loadErrors = loadSourceError || loadCSVError;
 
-  const loaded = loadedSubscription && loadedCSV && loadedSource;
+  const loaded = loadedCSV && loadedSource;
 
   const catalogSourceMissing = useMemo(
     () =>

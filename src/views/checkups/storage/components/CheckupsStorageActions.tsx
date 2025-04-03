@@ -24,6 +24,13 @@ const CheckupsStorageActions = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
+
+  const [newestJob] = jobs
+    .filter((it) => it?.metadata?.creationTimestamp)
+    .sort((a, b) => a.metadata.creationTimestamp.localeCompare(b.metadata.creationTimestamp))
+    .reverse();
+  const checkupImage = newestJob?.spec?.template?.spec?.containers?.[0]?.image;
+
   const { createModal } = useModal();
   const [isActionsOpen, setIsActionsOpen] = useState<boolean>(false);
 
@@ -60,9 +67,9 @@ const CheckupsStorageActions = ({
         <DropdownItem
           onClick={() => {
             setIsActionsOpen(false);
-            return rerunStorageCheckup(configMap);
+            return rerunStorageCheckup(configMap, checkupImage);
           }}
-          isDisabled={configMap?.data?.[STATUS_SUCCEEDED] === undefined}
+          isDisabled={configMap?.data?.[STATUS_SUCCEEDED] === undefined || !checkupImage}
           key="rerun"
         >
           {t('Rerun')}

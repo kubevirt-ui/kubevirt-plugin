@@ -117,6 +117,7 @@ export type ClusterServiceVersionKind = {
     };
     installModes: { supported: boolean; type: InstallModeType }[];
     provider?: { name: string };
+    relatedImages: { image: string; name: string }[];
     replaces?: string;
     version?: string;
   };
