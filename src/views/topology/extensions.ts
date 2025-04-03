@@ -100,4 +100,15 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.topology/details/tab-section',
   },
+  {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC'],
+    },
+    properties: {
+      adapt: {
+        $codeRef: 'topology.getVMSidePanelPodsAdapter',
+      },
+    },
+    type: 'console.topology/adapter/pod',
+  },
 ];

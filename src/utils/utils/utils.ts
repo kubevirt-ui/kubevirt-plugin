@@ -34,6 +34,15 @@ export const get = (obj: unknown, path: string | string[], defaultValue = undefi
   return result === undefined || result === obj ? defaultValue : result;
 };
 
+export const pick = (object, keys) => {
+  return keys.reduce((obj, key) => {
+    if (object && object.hasOwnProperty(key)) {
+      obj[key] = object[key];
+    }
+    return obj;
+  }, {});
+};
+
 export const isUpstream = (window as any).SERVER_FLAGS?.branding === 'okd';
 
 export const DEFAULT_OPERATOR_NAMESPACE = isUpstream ? KUBEVIRT_HYPERCONVERGED : OPENSHIFT_CNV;
