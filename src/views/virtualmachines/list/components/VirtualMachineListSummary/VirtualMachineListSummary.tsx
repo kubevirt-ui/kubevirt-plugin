@@ -1,7 +1,6 @@
 import React, { FC, useState } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VM_STATUS } from '@kubevirt-utils/resources/vm/utils/vmStatus';
 import { FilterValue } from '@openshift-console/dynamic-plugin-sdk';
@@ -34,7 +33,7 @@ const VirtualMachineListSummary: FC<VirtualMachineListSummaryProps> = ({
       toggleContent={
         <Content className="vm-list-summary__expand-section-toggle" component="h3">
           <ProjectDiagramIcon className="vm-list-summary__expand-section-toggle-icon" />{' '}
-          {namespace ?? ALL_PROJECTS}
+          {namespace ?? t('All projects summary')}
         </Content>
       }
       className="vm-list-summary__expand-section"

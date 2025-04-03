@@ -4,8 +4,10 @@ import React, {
   RefAttributes,
   useImperativeHandle,
   useMemo,
+  useRef,
   useState,
 } from 'react';
+import classNames from 'classnames';
 
 import {
   VirtualMachineInstanceMigrationModelGroupVersionKind,
@@ -24,6 +26,7 @@ import {
 } from '@kubevirt-utils/components/GuidedTour/utils/constants';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
+import useContainerWidth from '@kubevirt-utils/hooks/useContainerWidth';
 import { KUBEVIRT_APISERVER_PROXY } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import useKubevirtDataPodHealth from '@kubevirt-utils/hooks/useKubevirtDataPod/hooks/useKubevirtDataPodHealth';
@@ -38,12 +41,11 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   K8sResourceCommon,
   ListPageBody,
-  ListPageHeader,
   OnFilterChange,
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { Flex, FlexItem, Pagination } from '@patternfly/react-core';
+import { Flex, Pagination } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
 import useQuery from '@virtualmachines/details/tabs/metrics/NetworkCharts/hook/useQuery';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
@@ -54,12 +56,12 @@ import VirtualMachineBulkActionButton from './components/VirtualMachineBulkActio
 import VirtualMachineEmptyState from './components/VirtualMachineEmptyState/VirtualMachineEmptyState';
 import VirtualMachineListSummary from './components/VirtualMachineListSummary/VirtualMachineListSummary';
 import VirtualMachineRow from './components/VirtualMachineRow/VirtualMachineRow';
-import VirtualMachinesCreateButton from './components/VirtualMachinesCreateButton/VirtualMachinesCreateButton';
 import VirtualMachineSelection from './components/VirtualMachineSelection/VirtualMachineSelection';
 import useExistingSelectedVMs from './hooks/useExistingSelectedVMs';
 import useSelectedFilters from './hooks/useSelectedFilters';
 import useVirtualMachineColumns from './hooks/useVirtualMachineColumns';
 import useVMMetrics from './hooks/useVMMetrics';
+import { getListManagementGroupSize, ListManagementGroupSize } from './listManagementGroupSize';
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
 import './VirtualMachinesList.scss';
@@ -174,6 +176,11 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
     query,
   ]);
 
+  const listManagementGroupRef = useRef<HTMLDivElement>(null);
+  const listManagementGroupSize = getListManagementGroupSize(
+    useContainerWidth(listManagementGroupRef),
+  );
+
   const onPageChange = ({ endIndex, page, perPage, startIndex }) => {
     setPagination(() => ({
       endIndex,
@@ -226,62 +233,63 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
         onFilterChange={onFilterChange}
         vms={unfilterData}
       />
-      <div className="vm-list-page-header">
-        <ListPageHeader title={t('VirtualMachines')}>
-          <Flex>
-            <FlexItem>
-              <VirtualMachineBulkActionButton vms={data} />
-            </FlexItem>
-            <FlexItem>
-              <VirtualMachinesCreateButton namespace={namespace} />
-            </FlexItem>
-          </Flex>
-        </ListPageHeader>
-      </div>
       <ListPageBody>
         <div className="vm-listpagebody">
-          <div className="list-managment-group">
-            <VirtualMachineSelection loaded={loaded} pagination={pagination} vms={data} />
-            <ListPageFilter
-              columnLayout={{
-                columns: columns?.map(({ additional, id, title }) => ({
-                  additional,
-                  id,
-                  title,
-                })),
-                id: VirtualMachineModelRef,
-                selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
-                type: t('VirtualMachine'),
-              }}
-              onFilterChange={(...args) => {
-                onFilterChange(...args);
-                setPagination((prevPagination) => ({
-                  ...prevPagination,
-                  endIndex: prevPagination?.perPage,
-                  page: 1,
-                  startIndex: 0,
-                }));
-              }}
-              data={unfilteredData}
-              loaded={loaded}
-              rowFilters={filters}
-              searchFilters={searchFilters}
-            />
-            {!isEmpty(dataFilters) && (
-              <Pagination
-                onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
-                  onPageChange({ endIndex, page, perPage, startIndex })
-                }
-                onSetPage={(_e, page, perPage, startIndex, endIndex) =>
-                  onPageChange({ endIndex, page, perPage, startIndex })
-                }
-                className="list-managment-group__pagination"
-                isLastFullPageShown
-                itemCount={data?.length}
-                page={pagination?.page}
-                perPage={pagination?.perPage}
-                perPageOptions={paginationDefaultValues}
+          <div className="list-managment-group" ref={listManagementGroupRef}>
+            <Flex
+              className={classNames('list-managment-group__toolbar', {
+                'is-compact': listManagementGroupSize === ListManagementGroupSize.sm,
+              })}
+            >
+              <VirtualMachineSelection loaded={loaded} pagination={pagination} vms={data} />
+              <ListPageFilter
+                columnLayout={{
+                  columns: columns?.map(({ additional, id, title }) => ({
+                    additional,
+                    id,
+                    title,
+                  })),
+                  id: VirtualMachineModelRef,
+                  selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
+                  type: t('VirtualMachine'),
+                }}
+                onFilterChange={(...args) => {
+                  onFilterChange(...args);
+                  setPagination((prevPagination) => ({
+                    ...prevPagination,
+                    endIndex: prevPagination?.perPage,
+                    page: 1,
+                    startIndex: 0,
+                  }));
+                }}
+                data={unfilteredData}
+                listManagementGroupSize={listManagementGroupSize}
+                loaded={loaded}
+                rowFilters={filters}
+                searchFilters={searchFilters}
               />
+            </Flex>
+            {!isEmpty(dataFilters) && (
+              <Flex flexWrap={{ default: 'nowrap' }}>
+                <div className="vm-actions-toggle">
+                  <VirtualMachineBulkActionButton vms={data} />
+                </div>
+                <Pagination
+                  onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
+                    onPageChange({ endIndex, page, perPage, startIndex })
+                  }
+                  onSetPage={(_e, page, perPage, startIndex, endIndex) =>
+                    onPageChange({ endIndex, page, perPage, startIndex })
+                  }
+                  className="list-managment-group__pagination"
+                  isCompact={listManagementGroupSize !== ListManagementGroupSize.lg}
+                  isLastFullPageShown
+                  itemCount={data?.length}
+                  page={pagination?.page}
+                  perPage={pagination?.perPage}
+                  perPageOptions={paginationDefaultValues}
+                />
+              </Flex>
             )}
           </div>
           <VirtualizedTable<K8sResourceCommon>

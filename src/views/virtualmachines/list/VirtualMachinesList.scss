@@ -4,17 +4,44 @@
   }
 }
 
-.vm-listpagebody .pf-v6-c-table {
-  .selection-column {
-    --pf-v6-c-table--cell--Width: 5%;
+.vm-listpagebody {
+  .pf-v6-c-table {
+    .selection-column {
+      --pf-v6-c-table--cell--Width: 5%;
+    }
+  }
+
+  .list-managment-group {
+    flex-wrap: nowrap;
+    column-gap: var(--pf-t--global--spacer--md);
+
+    .pf-v6-c-toolbar__content-section {
+      flex-wrap: nowrap;
+    }
+
+    .pf-v6-c-toolbar__item {
+      column-gap: 0;
+    }
+
+    &__toolbar {
+      flex-wrap: nowrap;
+
+      &.is-compact {
+        .pf-v6-c-toolbar__group:where(.pf-m-toggle-group) {
+          .pf-v6-c-toolbar__toggle {
+            display: unset;
+          }
+
+          .pf-v6-c-toolbar__item {
+            display: none;
+          }
+        }
+      }
+    }
   }
 }
 
-.vm-list-page-header {
-  h1.co-m-pane__heading {
-    font-size: var(--pf-t--global--font--size--lg);
-  }
-
+.vm-actions-toggle {
   .kv-actions-dropdown {
     .pf-v6-c-menu-toggle {
       z-index: 0;

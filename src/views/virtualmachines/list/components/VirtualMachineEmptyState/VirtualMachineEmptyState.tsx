@@ -3,7 +3,7 @@ import { Trans } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom-v5-compat';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { ListPageBody, ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
+import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Button,
   ButtonVariant,
@@ -29,42 +29,39 @@ const VirtualMachineEmptyState: FC<VirtualMachineEmptyStateProps> = ({ catalogUR
   const navigate = useNavigate();
 
   return (
-    <>
-      <ListPageHeader title={t('VirtualMachines')} />
-      <ListPageBody>
-        <EmptyState
-          className="VirtualMachineEmptyState"
-          headingLevel="h4"
-          icon={VirtualMachineIcon}
-          titleText={<>{t('No VirtualMachines found')}</>}
-          variant={EmptyStateVariant.lg}
-        >
-          <EmptyStateBody>
-            <Trans ns="plugin__kubevirt-plugin" t={t}>
-              Click <b>Create VirtualMachine</b> to create your first VirtualMachine or view the{' '}
-              <Button isInline onClick={() => navigate(catalogURL)} variant={ButtonVariant.link}>
-                catalog
-              </Button>{' '}
-              tab to create a VirtualMachine from the available options
-            </Trans>
-          </EmptyStateBody>
-          <EmptyStateFooter>
-            <EmptyStateActions>
-              <VirtualMachinesCreateButton
-                buttonText={t('Create VirtualMachine')}
-                namespace={namespace}
-              />
-            </EmptyStateActions>
-            <br />
-            <EmptyStateActions>
-              <Link to={'/quickstart?keyword=virtual+machine'}>
-                {t('Learn how to use VirtualMachines')} <RouteIcon />
-              </Link>
-            </EmptyStateActions>
-          </EmptyStateFooter>
-        </EmptyState>
-      </ListPageBody>
-    </>
+    <ListPageBody>
+      <EmptyState
+        className="VirtualMachineEmptyState"
+        headingLevel="h4"
+        icon={VirtualMachineIcon}
+        titleText={<>{t('No VirtualMachines found')}</>}
+        variant={EmptyStateVariant.lg}
+      >
+        <EmptyStateBody>
+          <Trans ns="plugin__kubevirt-plugin" t={t}>
+            Click <b>Create VirtualMachine</b> to create your first VirtualMachine or view the{' '}
+            <Button isInline onClick={() => navigate(catalogURL)} variant={ButtonVariant.link}>
+              catalog
+            </Button>{' '}
+            tab to create a VirtualMachine from the available options
+          </Trans>
+        </EmptyStateBody>
+        <EmptyStateFooter>
+          <EmptyStateActions>
+            <VirtualMachinesCreateButton
+              buttonText={t('Create VirtualMachine')}
+              namespace={namespace}
+            />
+          </EmptyStateActions>
+          <br />
+          <EmptyStateActions>
+            <Link to={'/quickstart?keyword=virtual+machine'}>
+              {t('Learn how to use VirtualMachines')} <RouteIcon />
+            </Link>
+          </EmptyStateActions>
+        </EmptyStateFooter>
+      </EmptyState>
+    </ListPageBody>
   );
 };
 

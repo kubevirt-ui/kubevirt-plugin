@@ -20,6 +20,7 @@ import {
   ToolbarToggleGroup,
 } from '@patternfly/react-core';
 import { FilterIcon } from '@patternfly/react-icons';
+import { ListManagementGroupSize } from '@virtualmachines/list/listManagementGroupSize';
 
 import ColumnManagement from '../ColumnManagementModal/ColumnManagement';
 import FormPFSelect from '../FormPFSelect/FormPFSelect';
@@ -51,6 +52,7 @@ type ListPageFilterProps = {
   hideColumnManagement?: boolean;
   hideLabelFilter?: boolean;
   hideNameLabelFilters?: boolean;
+  listManagementGroupSize?: ListManagementGroupSize;
   loaded?: boolean;
   nameFilterPlaceholder?: string;
   onFilterChange?: OnFilterChange;
@@ -64,6 +66,7 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
   hideColumnManagement,
   hideLabelFilter,
   hideNameLabelFilters,
+  listManagementGroupSize,
   loaded,
   nameFilterPlaceholder,
   onFilterChange,
@@ -135,7 +138,6 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
 
   return (
     <Toolbar
-      className="co-toolbar-no-padding pf-m-toggle-group-container"
       clearAllFilters={clearAll}
       clearFiltersButtonText={t('Clear all filters')}
       data-test="filter-toolbar"
@@ -147,6 +149,7 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
             filters={filters}
             filtersNameMap={filtersNameMap}
             generatedRowFilters={generatedRowFilters}
+            listManagementGroupSize={listManagementGroupSize}
             rowFilters={toolbarFilters}
             selectedRowFilters={selectedRowFilters}
             updateRowFilterSelected={updateRowFilterSelected}
