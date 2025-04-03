@@ -122,4 +122,14 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.topology/adapter/network',
   },
+  {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC'],
+    },
+    properties: {
+      link: { $codeRef: 'topology.getVMSideBarResourceLink' },
+      priority: 100,
+    },
+    type: 'console.topology/details/resource-link',
+  },
 ];

@@ -2,4 +2,8 @@ export { default as useVMSidePanelDetailsTabSection } from './hooks/useVMSidePan
 export { isKubevirtResource as isResourceDepicted } from './utils/is-kubevirt-resource';
 export { getKubevirtComponentFactory as kubevirtComponentFactory } from './utils/kubevirt-component-factory';
 export { getKubevirtTopologyDataModel as getKubevirtDataModel } from './utils/kubevirt-data-transformer';
-export { getVMSidePanelNetworkAdapter, getVMSidePanelPodsAdapter } from './utils/vm-tab-sections';
+export {
+  getVMSideBarResourceLink,
+  getVMSidePanelNetworkAdapter,
+  getVMSidePanelPodsAdapter,
+} from './utils/vm-tab-sections';
