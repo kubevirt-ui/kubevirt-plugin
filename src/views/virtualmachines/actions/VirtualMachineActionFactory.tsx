@@ -174,7 +174,7 @@ export const VirtualMachineActionFactory = {
         resource: VirtualMachineModel.plural,
         verb: 'patch',
       },
-      cta: () => createModal((props) => <VirtualMachineMigrateModal vm={vm} {...props} />),
+      cta: () => createModal((props) => <VirtualMachineMigrateModal vms={[vm]} {...props} />),
       description: t('Migrate VirtualMachine storage to a different StorageClass'),
       id: 'vm-migrate-storage',
       label: t('Storage'),

@@ -8,11 +8,21 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { getVolumePVC, isDiskMigratable, isPVCMigratable } from '../../utils';
 
+export type MigrationDisksTableData = {
+  drive: string;
+  isSelectable: boolean;
+  name: string;
+  pvc: IoK8sApiCoreV1PersistentVolumeClaim;
+  size: string;
+  storageClass: string;
+  vm: V1VirtualMachine;
+};
+
 export const getTableDiskData = (
   vm: V1VirtualMachine,
   volume: V1Volume,
   pvcs: IoK8sApiCoreV1PersistentVolumeClaim[],
-) => {
+): MigrationDisksTableData => {
   const volumeDisk = getDisks(vm)?.find((disk) => disk.name === volume.name);
   const volumePVC = getVolumePVC(volume, pvcs);
 
@@ -27,5 +37,6 @@ export const getTableDiskData = (
     pvc: volumePVC,
     size: pvcSize?.value === 0 ? NO_DATA_DASH : pvcSize?.string,
     storageClass: volumePVC?.spec?.storageClassName,
+    vm,
   };
 };
