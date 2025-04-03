@@ -1,12 +1,9 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
-import classNames from 'classnames';
 
 import { useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { Menu, MenuContent, MenuItem, MenuList, TooltipPosition } from '@patternfly/react-core';
 
 import { ActionDropdownItemType } from '../ActionsDropdown/constants';
-
-import './action-dropdown-item.scss';
 
 type ActionDropdownItemProps = {
   action: ActionDropdownItemType;
@@ -36,9 +33,6 @@ const ActionDropdownItem: FC<ActionDropdownItemProps> = ({ action, setIsOpen }) 
 
   return (
     <MenuItem
-      className={classNames('ActionDropdownItem', {
-        ActionDropdownItem__disabled: isDisabled,
-      })}
       flyoutMenu={
         action?.options && (
           <Menu containsFlyout id={`menu-${action.id}`}>
