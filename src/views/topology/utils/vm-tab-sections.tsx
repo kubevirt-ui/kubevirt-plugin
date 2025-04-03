@@ -1,4 +1,8 @@
-import { AdapterDataType, PodsAdapterDataType } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  AdapterDataType,
+  NetworkAdapterType,
+  PodsAdapterDataType,
+} from '@openshift-console/dynamic-plugin-sdk';
 import { GraphElement } from '@patternfly/react-topology';
 
 import usePodsAdapterForVM from '../hooks/usePodsAdapterForVM';
@@ -12,4 +16,10 @@ export const getVMSidePanelPodsAdapter = (
   if (element.getType() !== TYPE_VIRTUAL_MACHINE) return null;
   const resource = getResource(element);
   return { provider: usePodsAdapterForVM, resource };
+};
+
+export const getVMSidePanelNetworkAdapter = (element: GraphElement): NetworkAdapterType => {
+  if (element.getType() !== TYPE_VIRTUAL_MACHINE) return undefined;
+  const resource = getResource(element);
+  return { resource };
 };
