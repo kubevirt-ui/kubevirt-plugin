@@ -118,4 +118,14 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.topology/adapter/network',
   },
+  {
+    flags: {
+      required: ['KUBEVIRT'],
+    },
+    properties: {
+      link: { $codeRef: 'topologySidebar.getVMSideBarResourceLink' },
+      priority: 100,
+    },
+    type: 'console.topology/details/resource-link',
+  },
 ];
