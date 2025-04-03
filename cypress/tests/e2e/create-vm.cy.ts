@@ -49,7 +49,6 @@ describe('Create VMs from Template', () => {
     tab.navigateToConfiguration();
     cy.contains(VM_TMPL_CUST.description).should('be.visible');
     cy.contains(VM_TMPL_CUST.hostname).should('be.visible');
-    cy.byButtonText('Boot management').click();
     cy.contains(VM_TMPL_CUST.bootMode).should('be.visible');
     tab.navigateToConsole();
     cy.contains('.pf-v6-c-clipboard-copy', VM_TMPL_CUST.cloudInitUname).should('be.visible');

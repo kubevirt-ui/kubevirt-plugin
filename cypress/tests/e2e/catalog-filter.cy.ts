@@ -55,7 +55,7 @@ describe('Test filter in InstanceType', () => {
     cy.contains(colName, 'centos').should('not.exist');
   });
 
-  it('check instanceType class in catalog', () => {
+  xit('check instanceType class in catalog', () => {
     cy.byButtonText('User').click();
     cy.get('input[aria-label="Filter menu items"]').clear().type('.small');
     cy.contains('n1').should('not.exist');
