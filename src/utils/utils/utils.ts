@@ -31,6 +31,15 @@ export const isEqual = (x, y) => {
     : x === y;
 };
 
+export const pick = (object, keys) => {
+  return keys.reduce((obj, key) => {
+    if (object && object.hasOwnProperty(key)) {
+      obj[key] = object[key];
+    }
+    return obj;
+  }, {});
+};
+
 export const get = (obj: unknown, path: string | string[], defaultValue = undefined) => {
   const travel = (regexp: RegExp) =>
     String.prototype.split

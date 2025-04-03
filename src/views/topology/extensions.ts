@@ -96,4 +96,15 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.topology/details/tab-section',
   },
+  {
+    flags: {
+      required: ['KUBEVIRT'],
+    },
+    properties: {
+      adapt: {
+        $codeRef: 'topologySidebar.getVMSidePanelPodsAdapter',
+      },
+    },
+    type: 'console.topology/adapter/pod',
+  },
 ];
