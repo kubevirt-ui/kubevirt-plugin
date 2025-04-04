@@ -1,7 +1,11 @@
 import { ComponentClass } from 'react';
 
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { InstanceTypeSeries, InstanceTypeSize } from '@kubevirt-utils/resources/instancetype/types';
+import {
+  InstanceTypeSeries,
+  InstanceTypeSize,
+  InstanceTypeSizes,
+} from '@kubevirt-utils/resources/instancetype/types';
 import {
   MemoryIcon,
   MicrochipIcon,
@@ -11,6 +15,7 @@ import {
   RegistryIcon,
   ServerGroupIcon,
   ServerIcon,
+  ShippingFastIcon,
   TrendUpIcon,
   UserIcon,
 } from '@patternfly/react-icons';
@@ -41,7 +46,7 @@ export const initialMenuItems: InstanceTypesMenuItemsData = {
 };
 
 export const instanceTypeSeriesNameMapper: {
-  [key in 'server' | Exclude<InstanceTypeSeries, 'rt1'>]: {
+  [key in 'server' | InstanceTypeSeries]: {
     disabled?: boolean;
     Icon: ComponentClass;
     possibleSizes?: InstanceTypeSize[];
@@ -87,6 +92,11 @@ export const instanceTypeSeriesNameMapper: {
       '8xlarge',
     ],
     seriesLabel: t('O series'),
+  },
+  rt1: {
+    Icon: ShippingFastIcon,
+    possibleSizes: [...InstanceTypeSizes],
+    seriesLabel: t('RT series'),
   },
   server: {
     disabled: true,

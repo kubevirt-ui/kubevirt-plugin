@@ -3,17 +3,20 @@ import {
   V1beta1VirtualMachineInstancetype,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 
-export type InstanceTypeSize =
-  | '2xlarge'
-  | '2xmedium'
-  | '4xlarge'
-  | '8xlarge'
-  | 'large'
-  | 'medium'
-  | 'micro'
-  | 'nano'
-  | 'small'
-  | 'xlarge';
+export const InstanceTypeSizes = [
+  '2xlarge',
+  '2xmedium',
+  '4xlarge',
+  '8xlarge',
+  'large',
+  'medium',
+  'micro',
+  'nano',
+  'small',
+  'xlarge',
+] as const;
+
+export type InstanceTypeSize = typeof InstanceTypeSizes[number];
 
 export type InstanceTypeSeries =
   | 'cx1'
