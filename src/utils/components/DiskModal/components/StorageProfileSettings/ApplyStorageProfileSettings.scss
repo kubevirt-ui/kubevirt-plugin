@@ -3,4 +3,9 @@
     margin-left: var(--pf-t--global--spacer--md);
     margin-top: var(--pf-t--global--spacer--sm);
   }
+  &--labelWithGap {
+    display: flex;
+    gap: var(--pf-t--global--spacer--sm);
+    align-items: anchor-center;
+  }
 }

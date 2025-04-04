@@ -1,8 +1,11 @@
+import { uniq } from 'lodash';
+
 import {
   V1beta1StorageSpecAccessModesEnum,
   V1beta1StorageSpecVolumeModeEnum,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { ClaimPropertySets } from '@kubevirt-utils/types/storage';
 
 export const initialAccessModes: V1beta1StorageSpecAccessModesEnum[] = [
   V1beta1StorageSpecAccessModesEnum.ReadWriteMany,
@@ -252,3 +255,16 @@ export const getVolumeModeForProvisioner = (
 
   return initialVolumeModes;
 };
+
+export const getAccessModesForVolume = (
+  claimPropertySets: ClaimPropertySets,
+  volumeMode?: string,
+) =>
+  uniq(
+    claimPropertySets
+      .filter((it) => it.volumeMode === volumeMode)
+      .flatMap((it) => it.accessModes)
+      .filter(Boolean)
+      .map((mode) => V1beta1StorageSpecAccessModesEnum[mode])
+      .filter(Boolean),
+  );
