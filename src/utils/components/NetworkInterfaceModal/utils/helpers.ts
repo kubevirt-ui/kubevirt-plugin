@@ -13,8 +13,8 @@ import {
 } from '@kubevirt-utils/resources/vm';
 import { BRIDGE, UDN_BINDING_NAME } from '@kubevirt-utils/resources/vm/utils/constants';
 import {
-  interfaceLabels,
-  interfacesTypes,
+  interfaceLabelsProxy,
+  interfaceTypesProxy,
   NetworkPresentation,
 } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
@@ -136,10 +136,10 @@ export const createInterface = ({
   interfaceLinkState,
   interfaceMACAddress,
   interfaceModel,
-  interfaceType = interfacesTypes.bridge,
+  interfaceType = interfaceTypesProxy.bridge,
   nicName,
 }: CreateInterfaceOptions): V1Interface => {
-  const resolvedInterfaceProp = interfaceLabels[interfaceType];
+  const resolvedInterfaceProp = interfaceLabelsProxy[interfaceType];
   const validInterfaceProp: keyof V1Interface =
     resolvedInterfaceProp === UDN_BINDING_NAME ? BRIDGE : resolvedInterfaceProp;
 
@@ -157,7 +157,7 @@ export const getNadType = (nad: NetworkAttachmentDefinition): string => {
     const config = JSON.parse(nad?.spec?.config);
     //can be config.type or config.plugin first element only!
     const interfaceType = config?.type || config?.plugins?.[0]?.type;
-    return interfacesTypes?.[interfaceType];
+    return interfaceTypesProxy?.[interfaceType];
   } catch (e) {
     kubevirtConsole.log('Cannot convert NAD config: ', e);
   }
