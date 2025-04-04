@@ -1,4 +1,4 @@
-export const TYPE_VIRTUAL_MACHINE = 'virtual-machine';
+export const VIRTUAL_MACHINE_TYPE = 'virtual-machine';
 
 export const WORKLOAD_TYPES = [
   'deployments',
