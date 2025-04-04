@@ -18,7 +18,7 @@ import { getVMNamesByNamespace } from '@virtualmachines/actions/components/Confi
 import './ConfirmMultipleVMActionsModal.scss';
 
 type ConfirmMultipleVMActionsModalProps = {
-  action: (vm: V1VirtualMachine) => Promise<string>;
+  action: (vm: V1VirtualMachine) => Promise<string | void>;
   actionType: string;
   isOpen: boolean;
   onClose: () => void;
@@ -56,7 +56,11 @@ const ConfirmMultipleVMActionsModal: FC<ConfirmMultipleVMActionsModalProps> = ({
         title={t('{{actionType}} {{numVMs}} VirtualMachines?', { actionType, numVMs })}
       />
       <ModalBody>
-        {t('Are you sure you want to stop ')}
+        {
+          <>
+            {t('Are you sure you want to')} {t(actionType.toLowerCase())}
+          </>
+        }
         <Popover
           bodyContent={<VMsByNamespacePopover vmsByNamespace={vmsByNamespace} />}
           className="confirm-multiple-vm-actions-modal__popover"

@@ -28,7 +28,7 @@ type LabelsModalProps = {
   modalDescriptionText?: string;
   obj: K8sResourceCommon;
   onClose: () => void;
-  onLabelsSubmit: (labels: { [key: string]: string }) => Promise<K8sResourceCommon | void>;
+  onLabelsSubmit: (labels: { [key: string]: string }) => Promise<any>;
 };
 
 export const LabelsModal: FC<LabelsModalProps> = memo(
