@@ -2,6 +2,7 @@ import { EncodedExtension } from '@openshift/dynamic-plugin-sdk-webpack';
 import type { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plugin-sdk-webpack';
 
 export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
+  actions: 'src/views/topology/actions.ts',
   topology: 'src/views/topology/utils/topology-plugin.ts',
   topologySidebar: 'src/views/topology/topology-sidebar.ts',
 };
@@ -127,5 +128,15 @@ export const extensions: EncodedExtension[] = [
       priority: 100,
     },
     type: 'console.topology/details/resource-link',
+  },
+  {
+    flags: {
+      required: ['KUBEVIRT'],
+    },
+    properties: {
+      contextId: 'topology-actions',
+      provider: { $codeRef: 'actions.useModifyApplicationActionProvider' },
+    },
+    type: 'console.action/provider',
   },
 ];

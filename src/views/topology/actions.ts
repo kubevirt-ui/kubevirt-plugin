@@ -1,0 +1,3 @@
+import useModifyApplicationActionProvider2 from './hooks/useModifyApplicationActionProvider';
+
+export const useModifyApplicationActionProvider = useModifyApplicationActionProvider2;
