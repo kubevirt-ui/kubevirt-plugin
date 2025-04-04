@@ -31,7 +31,7 @@ const VMRightClickActionMenu: FC<VMRightClickActionMenuProps> = ({ hideMenu, tri
   return (
     <Popper
       popper={
-        <Menu className="right-click-action-menu" containsFlyout>
+        <Menu className="right-click-action-menu--vm" containsFlyout>
           <MenuContent>
             <MenuList>
               {actions?.map((action) => (
@@ -41,9 +41,9 @@ const VMRightClickActionMenu: FC<VMRightClickActionMenuProps> = ({ hideMenu, tri
           </MenuContent>
         </Menu>
       }
-      appendTo={triggerElement}
+      distance={-6}
       isVisible
-      position="end"
+      triggerRef={() => triggerElement}
     />
   );
 };
