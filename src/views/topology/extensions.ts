@@ -132,4 +132,14 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.topology/details/resource-link',
   },
+  {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC'],
+    },
+    properties: {
+      contextId: 'topology-actions',
+      provider: { $codeRef: 'topology.useModifyApplicationActionProvider' },
+    },
+    type: 'console.action/provider',
+  },
 ];
