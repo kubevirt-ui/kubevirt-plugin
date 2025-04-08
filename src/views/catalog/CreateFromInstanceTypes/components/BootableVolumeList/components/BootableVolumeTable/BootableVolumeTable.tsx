@@ -18,6 +18,7 @@ import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 import { Table, TableVariant, Tbody, Th, Thead, Tr } from '@patternfly/react-table';
 import { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
 
+import { FAVORITES_COLUMN_ID } from '../../utils/constants';
 import BootableVolumeRow from '../BootableVolumeRow/BootableVolumeRow';
 
 type BootableVolumeTableProps = {
@@ -51,7 +52,7 @@ const BootableVolumeTable: FC<BootableVolumeTableProps> = ({
           {activeColumns.map((col, columnIndex) => (
             <Th
               sort={
-                columnIndex === 0
+                col.id === FAVORITES_COLUMN_ID
                   ? { ...getSortType(columnIndex), isFavorites: true }
                   : getSortType(columnIndex)
               }

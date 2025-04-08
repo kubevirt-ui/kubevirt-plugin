@@ -33,12 +33,10 @@ import {
 } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { formatBytes } from '@kubevirt-utils/resources/vm/utils/disk/size';
-import { Content, ContentVariants, Label } from '@patternfly/react-core';
+import { Content, ContentVariants, Flex, Label } from '@patternfly/react-core';
 import { TableText, Tr, WrapModifier } from '@patternfly/react-table';
 
 import TableData from './TableData';
-
-import './BootableVolumeRow.scss';
 
 type BootableVolumeRowProps = {
   activeColumnIDs: string[];
@@ -93,7 +91,6 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
         getName(selectedBootableVolume) === bootVolumeName &&
         getNamespace(selectedBootableVolume) === bootVolumeNamespace
       }
-      className="bootable-volume-row"
       isClickable
       isSelectable
       onClick={() => handleOnClick()}
@@ -108,17 +105,18 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
         }}
         activeColumnIDs={activeColumnIDs}
         id="favorites"
+        modifier="fitContent"
       />
       <TableData activeColumnIDs={activeColumnIDs} id="name" width={20}>
-        <img alt="os-icon" className="vm-catalog-row-icon" src={icon} />
-        <Content className="bootable-volume-row__name--text" component={ContentVariants.small}>
-          {bootVolumeName}
-        </Content>
-        {isDeprecated(bootVolumeName) && <DeprecatedBadge />}
-        {isCloning && <Label className="vm-catalog-row-label">{t('Clone in progress')}</Label>}
-        {isDataSourceUploading(bootableVolume as V1beta1DataSource) && (
-          <Label className="vm-catalog-row-label">{t('Upload in progress')}</Label>
-        )}
+        <Flex alignItems={{ default: 'alignItemsCenter' }} columnGap={{ default: 'columnGapNone' }}>
+          <img alt="os-icon" className="vm-catalog-row-icon" src={icon} />
+          <Content component={ContentVariants.small}>{bootVolumeName}</Content>
+          {isDeprecated(bootVolumeName) && <DeprecatedBadge />}
+          {isCloning && <Label className="vm-catalog-row-label">{t('Clone in progress')}</Label>}
+          {isDataSourceUploading(bootableVolume as V1beta1DataSource) && (
+            <Label className="vm-catalog-row-label">{t('Upload in progress')}</Label>
+          )}
+        </Flex>
       </TableData>
       {volumeListNamespace === ALL_PROJECTS && (
         <TableData activeColumnIDs={activeColumnIDs} id="namespace" width={20}>
