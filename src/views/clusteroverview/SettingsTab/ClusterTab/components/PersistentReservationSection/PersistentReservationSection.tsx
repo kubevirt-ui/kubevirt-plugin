@@ -18,6 +18,8 @@ import {
 
 import ExpandSection from '../../../ExpandSection/ExpandSection';
 
+import '@kubevirt-utils/styles/cursor.scss';
+
 type PersistentReservationSectionProps = {
   hyperConvergeConfiguration: [hyperConvergeConfig: HyperConverged, loaded: boolean, error: Error];
 };
@@ -70,9 +72,9 @@ const PersistentReservationSection: FC<PersistentReservationSectionProps> = ({
         {hyperLoaded && (
           <SplitItem>
             <Switch
+              className={isLoading && 'kv-cursor--loading'}
               id="persistent-reservation-section"
               isChecked={persistentReservation}
-              isDisabled={isLoading}
               onChange={(_, checked: boolean) => onChange(checked)}
             />
           </SplitItem>
