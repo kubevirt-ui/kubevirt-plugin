@@ -3,7 +3,7 @@ import React, { Dispatch, FC, MouseEvent, SetStateAction, useMemo } from 'react'
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { interfacesTypes } from '@kubevirt-utils/resources/vm/utils/network/constants';
+import { interfaceTypesProxy } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { FormGroup, SelectOption } from '@patternfly/react-core';
 
 import { networkNameStartWithPod } from '../utils/helpers';
@@ -29,11 +29,11 @@ const NetworkInterfaceTypeSelect: FC<NetworkInterfaceTypeSelectProps> = ({
       // in case of NAD network, networkName should be a string - enabled if nad type is bridge or undefined or no nad
       allowOption:
         !isPodNetworkName &&
-        (interfaceType === interfacesTypes.bridge || !interfaceType || !networkName),
+        (interfaceType === interfaceTypesProxy.bridge || !interfaceType || !networkName),
       description: t(
         'The VirtualMachine will be bridged to the selected network, ideal for L2 devices',
       ),
-      id: interfacesTypes.bridge,
+      id: interfaceTypesProxy.bridge,
       name: t('Bridge'),
     },
     masquerade: {
@@ -42,18 +42,18 @@ const NetworkInterfaceTypeSelect: FC<NetworkInterfaceTypeSelectProps> = ({
       description: t(
         'Put the VirtualMachine behind a NAT Proxy for high compatibility with different network providers. The VirtualMachines IP will differ from the IP seen on the pod network',
       ),
-      id: interfacesTypes.masquerade,
+      id: interfaceTypesProxy.masquerade,
       name: t('Masquerade'),
     },
     sriov: {
       // in case of NAD network, networkName should be a string - enabled if nad type is sriov or undefined or no nad
       allowOption:
         !isPodNetworkName &&
-        (interfaceType === interfacesTypes.sriov || !interfaceType || !networkName),
+        (interfaceType === interfaceTypesProxy.sriov || !interfaceType || !networkName),
       description: t(
         'Attach a virtual function network device to the VirtualMachine for high performance',
       ),
-      id: interfacesTypes.sriov,
+      id: interfaceTypesProxy.sriov,
       name: t('SR-IOV'),
     },
   };

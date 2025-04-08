@@ -19,7 +19,7 @@ import {
   getInterfaces,
 } from '@kubevirt-utils/resources/vm';
 import { DEFAULT_NETWORK_INTERFACE } from '@kubevirt-utils/resources/vm/utils/constants';
-import { interfacesTypes } from '@kubevirt-utils/resources/vm/utils/network/constants';
+import { interfaceTypesProxy } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import {
   getNetworkInterface,
   getNetworkInterfaceState,
@@ -88,7 +88,7 @@ export const isPendingRemoval = (
 
 export const isSRIOVInterface = (vm: V1VirtualMachine, nicName: string) => {
   const iface = getNetworkInterface(vm, nicName);
-  return interfacesTypes[getNetworkInterfaceType(iface)] === interfacesTypes.sriov;
+  return interfaceTypesProxy[getNetworkInterfaceType(iface)] === interfaceTypesProxy.sriov;
 };
 
 export const getInterfaceState = (vm: V1VirtualMachine, nicName: string): NetworkInterfaceState => {

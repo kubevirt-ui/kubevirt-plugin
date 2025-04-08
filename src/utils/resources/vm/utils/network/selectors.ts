@@ -3,7 +3,7 @@ import { getInterfaces } from '@kubevirt-utils/resources/vm';
 
 import { NO_DATA_DASH, UDN_BINDING_NAME } from '../constants';
 
-import { interfacesTypes } from './constants';
+import { interfaceTypesProxy } from './constants';
 
 /**
  * function to get network interface type
@@ -13,7 +13,7 @@ import { interfacesTypes } from './constants';
 export const getNetworkInterfaceType = (iface: V1Interface): string => {
   if (iface?.binding?.name === UDN_BINDING_NAME) return UDN_BINDING_NAME;
 
-  const drive = Object.keys(interfacesTypes)?.find((ifaceType: string) => iface?.[ifaceType]);
+  const drive = Object.keys(interfaceTypesProxy)?.find((ifaceType: string) => iface?.[ifaceType]);
   return drive ?? NO_DATA_DASH;
 };
 
@@ -23,7 +23,7 @@ export const getNetworkInterfaceType = (iface: V1Interface): string => {
  * @returns interface type
  */
 export const getPrintableNetworkInterfaceType = (iface: V1Interface): string =>
-  interfacesTypes[getNetworkInterfaceType(iface)];
+  interfaceTypesProxy[getNetworkInterfaceType(iface)];
 
 /**
  * function to get a specific network interface by name
