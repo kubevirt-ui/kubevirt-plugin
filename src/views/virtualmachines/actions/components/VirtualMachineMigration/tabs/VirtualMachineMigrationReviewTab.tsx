@@ -1,10 +1,9 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 import { Trans } from 'react-i18next';
 
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getVolumes } from '@kubevirt-utils/resources/vm';
 import {
   Alert,
   AlertVariant,
@@ -16,14 +15,16 @@ import {
 } from '@patternfly/react-core';
 import { Table, Tbody, Td, Tr } from '@patternfly/react-table';
 
-import { getVolumeFromPVC } from '../utils';
+import { getAllVolumesCount } from '../utils/utils';
+
+import ReviewVolumesColumn from './components/ReviewVolumesColumn';
 
 type VirtualMachineMigrationReviewTabProps = {
   defaultStorageClassName: string;
   destinationStorageClass: string;
   migrationError: Error;
   pvcs: IoK8sApiCoreV1PersistentVolumeClaim[];
-  vm: V1VirtualMachine;
+  vms: V1VirtualMachine[];
 };
 
 const VirtualMachineMigrationReviewTab: FC<VirtualMachineMigrationReviewTabProps> = ({
@@ -31,13 +32,11 @@ const VirtualMachineMigrationReviewTab: FC<VirtualMachineMigrationReviewTabProps
   destinationStorageClass,
   migrationError,
   pvcs,
-  vm,
+  vms,
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const volumes = getVolumes(vm);
-
-  const volumesToMigrate = getVolumeFromPVC(volumes, pvcs);
+  const allVolumesCount = useMemo(() => getAllVolumesCount(vms), [vms]);
 
   return (
     <Stack hasGutter>
@@ -72,15 +71,13 @@ const VirtualMachineMigrationReviewTab: FC<VirtualMachineMigrationReviewTabProps
               <Td width={30}>
                 <strong>
                   {t('Migrating {{migrationCount}} out of {{allCount}}', {
-                    allCount: volumes?.length,
-                    migrationCount: volumesToMigrate?.length,
+                    allCount: allVolumesCount,
+                    migrationCount: pvcs?.length,
                   })}
                 </strong>
               </Td>
               <Td>
-                {volumesToMigrate.map((volume) => (
-                  <div key={volume.name}>{volume.name}</div>
-                ))}
+                <ReviewVolumesColumn pvcsToMigrate={pvcs} vms={vms} />
               </Td>
             </Tr>
           </Tbody>

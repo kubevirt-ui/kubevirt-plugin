@@ -1,46 +1,85 @@
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { Dispatch, FC, SetStateAction, useMemo } from 'react';
+import { Trans } from 'react-i18next';
 
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-utils/models';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { convertToBaseValue, humanizeBinaryBytes } from '@kubevirt-utils/utils/humanize.js';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
-import { Content, ContentVariants, Radio, Stack, StackItem, Title } from '@patternfly/react-core';
+import {
+  Alert,
+  AlertVariant,
+  Content,
+  ContentVariants,
+  Radio,
+  Stack,
+  StackItem,
+  Title,
+} from '@patternfly/react-core';
 
-import { entireVMSelected } from '../utils';
+import { entireVMSelected, getAllVolumesCount } from '../utils/utils';
 
+import SelectedStorageTooltip from './components/SelectedStorageTooltip';
 import SelectMigrationDisksTable from './components/SelectMigrationDisksTable';
 
 type VirtualMachineMigrationDetailsProps = {
   pvcs: IoK8sApiCoreV1PersistentVolumeClaim[];
   selectedPVCs: IoK8sApiCoreV1PersistentVolumeClaim[];
   setSelectedPVCs: Dispatch<SetStateAction<IoK8sApiCoreV1PersistentVolumeClaim[]>>;
-  vm: V1VirtualMachine;
+  vms: V1VirtualMachine[];
 };
 
 const VirtualMachineMigrationDetails: FC<VirtualMachineMigrationDetailsProps> = ({
   pvcs,
   selectedPVCs,
   setSelectedPVCs,
-  vm,
+  vms,
 }) => {
   const { t } = useKubevirtTranslation();
 
   const allVolumes = entireVMSelected(selectedPVCs);
+
+  const volumesCount = useMemo(() => getAllVolumesCount(vms), [vms]);
+
+  const storageClasses = Array.from(new Set(pvcs?.map((pvc) => pvc.spec.storageClassName)));
+
+  const pvcsToMigrate = allVolumes ? pvcs : selectedPVCs;
+
+  const totalAmount = humanizeBinaryBytes(
+    pvcsToMigrate?.reduce((acc, pvc) => {
+      acc += convertToBaseValue(pvc.spec?.resources?.requests?.storage);
+      return acc;
+    }, 0),
+  )?.string;
 
   return (
     <Stack hasGutter>
       <StackItem>
         <Title headingLevel="h2">{t('Migration details')}</Title>
         <Content component={ContentVariants.p}>
-          {t('Select the storage to migrate for')}
-          <ResourceLink
-            groupVersionKind={VirtualMachineModelGroupVersionKind}
-            inline
-            name={getName(vm)}
-            namespace={getNamespace(vm)}
-          />
+          {vms.length === 1 ? (
+            <>
+              {t('Select the storage to migrate for')}
+              <ResourceLink
+                groupVersionKind={VirtualMachineModelGroupVersionKind}
+                inline
+                name={getName(vms?.[0])}
+                namespace={getNamespace(vms?.[0])}
+              />
+            </>
+          ) : (
+            <Trans t={t}>
+              <Content>
+                Select the storage to migrate for{' '}
+                <SelectedStorageTooltip vms={vms}>
+                  {{ vmsCount: vms?.length }} VirtualMachines with {{ volumesCount }} Volumes
+                </SelectedStorageTooltip>{' '}
+                from the source (current) storage class {storageClasses?.join(', ')}
+              </Content>
+            </Trans>
+          )}
         </Content>
       </StackItem>
       <StackItem>
@@ -65,10 +104,15 @@ const VirtualMachineMigrationDetails: FC<VirtualMachineMigrationDetailsProps> = 
             pvcs={pvcs}
             selectedPVCs={selectedPVCs}
             setSelectedPVCs={setSelectedPVCs}
-            vm={vm}
+            vms={vms}
           />
         </StackItem>
       )}
+
+      <Alert
+        title={t('Total storage to migrate is {{totalAmount}}', { totalAmount })}
+        variant={AlertVariant.info}
+      />
     </Stack>
   );
 };

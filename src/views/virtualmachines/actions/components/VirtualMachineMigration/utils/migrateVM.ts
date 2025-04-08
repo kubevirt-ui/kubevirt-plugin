@@ -2,20 +2,12 @@ import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolume
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import {
-  V1beta1StorageSpecAccessModesEnum,
-  V1Disk,
-  V1VirtualMachine,
-  V1VirtualMachineInstanceMigration,
-  V1Volume,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { MAX_NAME_LENGTH } from '@kubevirt-utils/components/SSHSecretModal/utils/constants';
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { getDataVolumeTemplates, getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
+import { getDataVolumeTemplates, getVolumes } from '@kubevirt-utils/resources/vm';
 import { UPDATE_STRATEGIES } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getStorageClassName } from '@kubevirt-utils/resources/vm/utils/dataVolumeTemplate/selectors';
-import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
 import { getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, k8sDelete, k8sPatch, Patch } from '@openshift-console/dynamic-plugin-sdk';
 import { getMigrationClaimNameAnnotation } from '@virtualmachines/actions/utils';
@@ -95,7 +87,7 @@ const createBlankDataVolumes = async (
       }),
     );
 
-    throw new Error(rejectedRequests?.[0].reason);
+    throw new Error(rejectedRequests?.[0]?.reason);
   }
 
   const dataVolumesCreated = fulfilledRequests.map((result) => result.value);
@@ -200,59 +192,4 @@ export const migrateVM = async (
 
     throw error;
   }
-};
-
-export const entireVMSelected = (selectedPVCs: IoK8sApiCoreV1PersistentVolumeClaim[]) =>
-  selectedPVCs === null;
-
-export const getVolumeFromPVC = (
-  volumes: V1Volume[],
-  pvcs: IoK8sApiCoreV1PersistentVolumeClaim[],
-): V1Volume[] => {
-  const pvcNames = pvcs.map((pvc) => getName(pvc));
-
-  return volumes.filter(
-    (volume) =>
-      pvcNames.includes(volume?.persistentVolumeClaim?.claimName) ||
-      pvcNames.includes(volume?.dataVolume?.name),
-  );
-};
-
-export const getMigrationSuccessTimestamp = (vmim: V1VirtualMachineInstanceMigration): string =>
-  vmim?.status?.phaseTransitionTimestamps?.find(
-    (phaseTransition) => phaseTransition.phase === vmimStatuses.Succeeded,
-  )?.phaseTransitionTimestamp;
-
-export const getMigrationStatusLabel = (vmim: V1VirtualMachineInstanceMigration): string => {
-  if (vmim?.status?.phase === vmimStatuses.Failed) return t('Failed');
-  if (vmimStatuses.Succeeded === vmim?.status?.phase) return t('Migration completed successfully');
-
-  return t('In progress');
-};
-
-export const isPVCMigratable = (pvc: IoK8sApiCoreV1PersistentVolumeClaim) =>
-  pvc?.spec?.accessModes?.includes(V1beta1StorageSpecAccessModesEnum.ReadWriteMany);
-
-export const isDiskMigratable = (disk: V1Disk) => !disk?.shareable;
-
-export const getVolumePVC = (volume: V1Volume, pvcs: IoK8sApiCoreV1PersistentVolumeClaim[]) =>
-  pvcs?.find(
-    (pvc) =>
-      getName(pvc) === volume.dataVolume?.name ||
-      getName(pvc) === volume.persistentVolumeClaim?.claimName,
-  );
-
-export const getMigratableVMPVCs = (
-  vm: V1VirtualMachine,
-  pvcs: IoK8sApiCoreV1PersistentVolumeClaim[],
-) => {
-  return getVolumes(vm)?.reduce((acc, volume) => {
-    const pvc = getVolumePVC(volume, pvcs);
-    const volumeDisk = getDisks(vm)?.find((disk) => disk.name === volume.name);
-    if (isPVCMigratable(pvc) && isDiskMigratable(volumeDisk)) {
-      acc.push(pvc);
-    }
-
-    return acc;
-  }, []);
 };
