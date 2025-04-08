@@ -1,13 +1,16 @@
-import React, { Dispatch, FC, SetStateAction, useEffect, useRef, useState } from 'react';
+import React, { Dispatch, FC, ReactNode, SetStateAction, useEffect, useRef, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   Button,
   ButtonVariant,
+  HelperText,
+  HelperTextItem,
   KeyTypes,
   MenuToggle,
   MenuToggleElement,
+  MenuToggleProps,
   Select,
   SelectList,
   SelectOption,
@@ -16,15 +19,18 @@ import {
   TextInputGroupMain,
   TextInputGroupUtilities,
 } from '@patternfly/react-core';
-import { FolderIcon, SearchIcon, TimesIcon } from '@patternfly/react-icons';
+import { SearchIcon, TimesIcon } from '@patternfly/react-icons';
 
-import { CREATE_NEW, NOT_FOUND } from './utils/constants';
+import { CREATE_NEW, INVALID, NOT_FOUND } from './utils/constants';
 import { createItemId } from './utils/utils';
 
 type SelectTypeaheadProps = {
   canCreate?: boolean;
+  createNewOption?: (filterValue: string) => SelectOptionProps;
   dataTestId?: string;
   getCreateOption?: (inputValue: string, canCreate?: boolean) => SelectOptionProps;
+  getCreationNotAllowedMessage?: (filterValue: string) => ReactNode;
+  getToggleStatus?: (filterValue: string) => MenuToggleProps['status'];
   initialOptions: SelectOptionProps[];
   isFullWidth?: boolean;
   placeholder?: string;
@@ -35,9 +41,12 @@ type SelectTypeaheadProps = {
 
 const SelectTypeahead: FC<SelectTypeaheadProps> = ({
   canCreate = false,
+  createNewOption,
   dataTestId,
   getCreateOption,
-  initialOptions,
+  getCreationNotAllowedMessage,
+  getToggleStatus,
+  initialOptions = [],
   isFullWidth = false,
   placeholder,
   selected,
@@ -54,24 +63,47 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
   const textInputRef = useRef<HTMLInputElement>();
 
   useEffect(() => {
-    const newSelectOptions: SelectOptionProps[] = filterValue
-      ? (initialOptions || [])?.filter((menuItem) =>
-          String(menuItem.children).toLowerCase().includes(filterValue.toLowerCase()),
+    const filteredOptions: SelectOptionProps[] = filterValue
+      ? initialOptions.filter((menuItem) =>
+          String(menuItem.value).toLowerCase().includes(filterValue.toLowerCase()),
         )
-      : initialOptions || [];
+      : initialOptions;
 
     if (canCreate) {
-      const createOption = getCreateOption?.(filterValue, canCreate);
-      if (createOption && !newSelectOptions.some((option) => option.value === CREATE_NEW)) {
-        newSelectOptions.push(createOption);
+      const creationNotAllowedMessage = getCreationNotAllowedMessage?.(filterValue);
+
+      if (creationNotAllowedMessage && filteredOptions.length === 0) {
+        setSelectOptions([
+          {
+            children: (
+              <HelperText>
+                <HelperTextItem variant="error">{creationNotAllowedMessage}</HelperTextItem>
+              </HelperText>
+            ),
+            isDisabled: true,
+            value: INVALID,
+          },
+        ]);
+        return;
+      }
+
+      if (!creationNotAllowedMessage) {
+        const createOption = getCreateOption?.(filterValue, canCreate);
+        const optionExists = filteredOptions.some((option) => option.value === filterValue);
+
+        if (createOption && !optionExists) {
+          setSelectOptions([createOption, ...filteredOptions]);
+          return;
+        }
       }
     }
 
-    if (!canCreate && newSelectOptions.length === 0 && filterValue) {
-      newSelectOptions.push({ children: t('Not found'), isDisabled: true, value: NOT_FOUND });
+    if (!canCreate && filteredOptions.length === 0 && filterValue) {
+      setSelectOptions([{ children: t('Not found'), isDisabled: true, value: NOT_FOUND }]);
+      return;
     }
 
-    setSelectOptions(newSelectOptions);
+    setSelectOptions(filteredOptions);
   }, [canCreate, filterValue, getCreateOption, initialOptions, t]);
 
   const setActiveAndFocusedItem = (itemIndex: number) => {
@@ -105,10 +137,10 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
     if (!value) return;
 
     if (value === CREATE_NEW) {
-      if (!initialOptions?.some((item) => item.children === filterValue)) {
-        setInitialOptions?.((prevFolders) => [
-          ...(prevFolders || []),
-          { children: filterValue, icon: <FolderIcon />, value: filterValue },
+      if (!initialOptions.some((item) => item.value === filterValue)) {
+        setInitialOptions?.((prevOptions) => [
+          ...(prevOptions || []),
+          createNewOption(filterValue),
         ]);
       }
       setSelected(filterValue);
@@ -212,6 +244,10 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
     textInputRef?.current?.focus();
   };
 
+  const onTextInputClick = () => {
+    setIsOpen(true);
+  };
+
   const onClearButtonClick = () => {
     setSelected('');
     setInputValue('');
@@ -226,6 +262,7 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
       isFullWidth={isFullWidth}
       onClick={onToggleClick}
       ref={toggleRef}
+      status={getToggleStatus?.(filterValue)}
       variant="typeahead"
     >
       <TextInputGroup isPlain>
@@ -234,7 +271,7 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
           icon={<SearchIcon />}
           innerRef={textInputRef}
           onChange={onTextInputChange}
-          onClick={onToggleClick}
+          onClick={onTextInputClick}
           onKeyDown={onInputKeyDown}
           placeholder={placeholder}
           value={inputValue}
@@ -267,6 +304,7 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
       onSelect={onSelect}
       selected={selected}
       toggle={toggle}
+      variant="typeahead"
     >
       <SelectList>
         {selectOptions?.map((option, index) => (

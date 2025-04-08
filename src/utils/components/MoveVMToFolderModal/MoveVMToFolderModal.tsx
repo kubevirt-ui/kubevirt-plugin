@@ -7,6 +7,7 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { Stack, StackItem } from '@patternfly/react-core';
+import { FolderIcon } from '@patternfly/react-icons';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
 type MoveVMToFolderModalProps = {
@@ -23,6 +24,7 @@ const MoveVMToFolderModal: FC<MoveVMToFolderModalProps> = ({ isOpen, onClose, on
   return (
     <TabModal<V1VirtualMachine>
       headerText={t('Move to folder')}
+      isDisabled={!folderName}
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={() => onSubmit(folderName)}
@@ -42,6 +44,12 @@ const MoveVMToFolderModal: FC<MoveVMToFolderModalProps> = ({ isOpen, onClose, on
             setSelectedFolder={setFolderName}
           />
         </StackItem>
+        {folderName && (
+          <StackItem>
+            <FolderIcon />
+            <span className="pf-v6-u-ml-sm">{folderName}</span>
+          </StackItem>
+        )}
       </Stack>
     </TabModal>
   );
