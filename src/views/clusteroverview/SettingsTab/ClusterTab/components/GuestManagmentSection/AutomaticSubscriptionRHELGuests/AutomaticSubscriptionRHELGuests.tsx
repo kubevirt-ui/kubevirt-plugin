@@ -87,12 +87,12 @@ const AutomaticSubscriptionRHELGuests: FC<AutomaticSubscriptionRHELGuestsProps> 
                   switchIsOn={featureEnabled}
                   title={t('Enable auto updates for RHEL VirtualMachines')}
                 />
-                <AutomaticSubscriptionCustomUrl
-                  isDisabled={
-                    selected?.value === AutomaticSubscriptionTypeEnum.ENABLE_PREDICTIVE_ANALYTICS
-                  }
-                  customUrl={formProps.subscriptionData?.customUrl}
-                />
+                {selected?.value ===
+                  AutomaticSubscriptionTypeEnum.MONITOR_AND_MANAGE_SUBSCRIPTIONS && (
+                  <AutomaticSubscriptionCustomUrl
+                    customUrl={formProps.subscriptionData?.customUrl}
+                  />
+                )}
               </>
             )}
           </>
