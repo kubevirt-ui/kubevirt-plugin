@@ -61,8 +61,8 @@ export const bootsourceTH = 'th[data-label="Boot source"]';
 export const cpuTH = 'th[data-label="CPU | Memory"]';
 export const vmCount = '.pf-v6-c-menu-toggle__text > b';
 export const kebabBtn = '.pf-v6-c-table__td.dropdown-kebab-pf.pf-v6-c-table__action';
-export const selectDropdownToggle = 'button.virtual-machine-selection';
-export const selectAllDropdownOption = '*[data-test-id="select-all"]';
+export const selectDropdownToggle = '[data-ouia-component-id="BulkSelect-toggle"]';
+export const selectAllDropdownOption = '[data-ouia-component-id="BulkSelect-select-all"]';
 
 // VM overview tab
 export const vmStatusOnOverview = '[data-test-id="virtual-machine-overview-details-status"]';
