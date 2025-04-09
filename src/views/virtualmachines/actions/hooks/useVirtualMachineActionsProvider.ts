@@ -88,7 +88,15 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
       treeViewFoldersEnabled && VirtualMachineActionFactory.moveToFolder(vm, createModal),
       VirtualMachineActionFactory.delete(vm, createModal),
     ].filter(Boolean);
-  }, [vm, vmim, isSingleNodeCluster, createModal, virtctlCommand, treeViewFoldersEnabled]);
+  }, [
+    vm,
+    vmim,
+    isSingleNodeCluster,
+    createModal,
+    confirmVMActionsEnabled,
+    virtctlCommand,
+    treeViewFoldersEnabled,
+  ]);
 
   return useMemo(() => [actions, !inFlight, undefined], [actions, inFlight]);
 };

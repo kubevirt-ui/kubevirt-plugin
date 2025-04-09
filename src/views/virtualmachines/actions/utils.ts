@@ -1,9 +1,11 @@
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { getAnnotation, getName } from '@kubevirt-utils/resources/shared';
+import { getAnnotation, getLabels, getName } from '@kubevirt-utils/resources/shared';
 import { getDataVolumeTemplates, getVolumes } from '@kubevirt-utils/resources/vm';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sDelete, Patch } from '@openshift-console/dynamic-plugin-sdk';
+import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
 import { ANNOTATION_PREFIX_MIGRATION_ORIGIN_CLAIMNAME } from './constants';
 
@@ -101,4 +103,63 @@ export const createRollbackPatchData = (vm: V1VirtualMachine): Patch[] => {
   }, [] as Patch[]);
 
   return [...dataVolumeRollback, ...pvcRollback];
+};
+
+export const getCommonLabels = (vms: V1VirtualMachine[]): { [key: string]: string } => {
+  if (vms.length === 0) return {};
+
+  const commonLabels = vms.reduce((acc, vm) => {
+    const labels = getLabels(vm);
+
+    if (Object.keys(acc).length === 0) {
+      return { ...labels };
+    }
+
+    Object.keys(acc).forEach((key) => {
+      if (labels[key] !== acc[key]) {
+        delete acc[key];
+      }
+    });
+
+    return acc;
+  }, {});
+
+  delete commonLabels[VM_FOLDER_LABEL];
+  return commonLabels;
+};
+
+export const getLabelsDiffPatch = (
+  newLabels: { [key: string]: string },
+  vmLabels: { [key: string]: string },
+): Patch[] => {
+  const patchArray = [];
+
+  if (isEmpty(vmLabels)) {
+    patchArray.push({
+      op: 'add',
+      path: `/metadata/labels`,
+      value: {},
+    });
+  }
+
+  const labelsPatchReplace = Object.entries(newLabels || {}).map(([key, value]) => ({
+    op: vmLabels?.[key] ? 'replace' : 'add',
+    path: `/metadata/labels/${key?.replace('/', '~1')}`,
+    value,
+  }));
+
+  const labelsPatchDelete = Object.keys(vmLabels || {}).reduce((acc, key) => {
+    if (!(key in newLabels)) {
+      acc.push({
+        op: 'remove',
+        path: `/metadata/labels/${key?.replace('/', '~1')}`,
+      });
+    }
+    return acc;
+  }, []);
+
+  patchArray.push(...labelsPatchReplace);
+  patchArray.push(...labelsPatchDelete);
+
+  return patchArray;
 };
