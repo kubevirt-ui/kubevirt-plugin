@@ -9,6 +9,7 @@ import { getVMIMFromMapper } from '@virtualmachines/utils/mappers';
 
 import { vmimMapperSignal, vmsSignal } from '../../utils/signals';
 
+import { MENU_DISTANCE } from './constants';
 import { getVMComponentsFromID } from './utils';
 
 type VMRightClickActionMenuProps = {
@@ -31,7 +32,7 @@ const VMRightClickActionMenu: FC<VMRightClickActionMenuProps> = ({ hideMenu, tri
   return (
     <Popper
       popper={
-        <Menu className="right-click-action-menu" containsFlyout>
+        <Menu className="right-click-action-menu--vm" containsFlyout>
           <MenuContent>
             <MenuList>
               {actions?.map((action) => (
@@ -41,9 +42,9 @@ const VMRightClickActionMenu: FC<VMRightClickActionMenuProps> = ({ hideMenu, tri
           </MenuContent>
         </Menu>
       }
-      appendTo={triggerElement}
+      distance={MENU_DISTANCE}
       isVisible
-      position="end"
+      triggerRef={() => triggerElement}
     />
   );
 };
