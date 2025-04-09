@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
+import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -15,6 +16,8 @@ type UseStatusActionButtonsType = (isSubmitting: boolean) => {
 const useStatusActionButtons: UseStatusActionButtonsType = (isSubmitting) => {
   const instanceTypeVMStore = useInstanceTypeVMStore();
 
+  const [_, vmsNotSupported] = useNamespaceUDN(instanceTypeVMStore?.vmNamespaceTarget);
+
   const {
     instanceTypeVMState: { selectedBootableVolume, selectedInstanceType, vmName },
   } = instanceTypeVMStore;
@@ -27,11 +30,12 @@ const useStatusActionButtons: UseStatusActionButtonsType = (isSubmitting) => {
   });
 
   const disableButtonTooltipContent = useMemo(
-    () => getDisableButtonTooltipContent(instanceTypeVMStore, canCreateVM),
-    [instanceTypeVMStore, canCreateVM],
+    () => getDisableButtonTooltipContent(instanceTypeVMStore, canCreateVM, vmsNotSupported),
+    [instanceTypeVMStore, canCreateVM, vmsNotSupported],
   );
 
-  const isCreationDisabled = isSubmitting || !isEmpty(disableButtonTooltipContent);
+  const isCreationDisabled =
+    isSubmitting || !isEmpty(disableButtonTooltipContent) || vmsNotSupported;
 
   return {
     disableButtonTooltipContent,

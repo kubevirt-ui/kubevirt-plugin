@@ -1,51 +1,47 @@
-import {
-  ClusterUserDefinedNetworkModelGroupVersionKind,
-  modelToGroupVersionKind,
-  ProjectModel,
-  UserDefinedNetworkModelGroupVersionKind,
-} from '@kubevirt-utils/models';
-import {
-  ClusterUserDefinedNetworkKind,
-  UserDefinedNetworkKind,
-  UserDefinedNetworkRole,
-} from '@kubevirt-utils/resources/udn/types';
-import { matchSelector } from '@kubevirt-utils/utils/matchSelector';
+import { useMemo } from 'react';
+
+import { NetworkAttachmentDefinitionModelGroupVersionKind } from '@kubevirt-utils/models';
+import { UserDefinedNetworkRole } from '@kubevirt-utils/resources/udn/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { NetworkAttachmentDefinitionKind } from '@overview/OverviewTab/inventory-card/utils/types';
+
+import { LAYER3_TOPOLOGY, PrimaryTopologies } from '../constants';
 
 const useNamespaceUDN = (
   namespace: string,
 ): [
   isNamespaceManagedByUDN: boolean,
-  udn: ClusterUserDefinedNetworkKind | UserDefinedNetworkKind,
+  vmsNotSupported: boolean,
+  nad?: NetworkAttachmentDefinitionKind,
 ] => {
-  const [project] = useK8sWatchResource<K8sResourceCommon>({
-    groupVersionKind: modelToGroupVersionKind(ProjectModel),
-    name: namespace,
-  });
-
-  const [udns] = useK8sWatchResource<UserDefinedNetworkKind[]>({
-    groupVersionKind: UserDefinedNetworkModelGroupVersionKind,
+  const [nads] = useK8sWatchResource<NetworkAttachmentDefinitionKind[]>({
+    groupVersionKind: NetworkAttachmentDefinitionModelGroupVersionKind,
     isList: true,
     namespace,
   });
 
-  const [clusterUDNs] = useK8sWatchResource<ClusterUserDefinedNetworkKind[]>({
-    groupVersionKind: ClusterUserDefinedNetworkModelGroupVersionKind,
-    isList: true,
-  });
+  const udnNAD = useMemo(
+    () =>
+      nads?.find((nad) => {
+        const config = JSON.parse(nad?.spec?.config || '{}');
 
-  const primaryUDN = udns?.find(
-    (udn) => udn?.spec?.layer2?.role === UserDefinedNetworkRole.Primary,
+        return (
+          PrimaryTopologies.includes(config.topology) &&
+          config.role === UserDefinedNetworkRole.Primary.toLowerCase()
+        );
+      }),
+    [nads],
   );
 
-  const primaryClustersUDNs = clusterUDNs
-    ?.filter((clusterUDN) => matchSelector(project, clusterUDN?.spec?.namespaceSelector))
-    ?.find((udn) => udn?.spec?.network?.layer2?.role === UserDefinedNetworkRole.Primary);
+  const isNamespaceManagedByUDN = useMemo(() => !isEmpty(udnNAD), [udnNAD]);
 
-  const isNamespaceManagedByUDN = !isEmpty(primaryUDN || primaryClustersUDNs);
+  const vmsNotSupported = useMemo(() => {
+    const config = JSON.parse(udnNAD?.spec?.config || '{}');
+    return config.topology === LAYER3_TOPOLOGY;
+  }, [udnNAD]);
 
-  return [isNamespaceManagedByUDN, primaryUDN || primaryClustersUDNs];
+  return [isNamespaceManagedByUDN, vmsNotSupported, udnNAD];
 };
 
 export default useNamespaceUDN;

@@ -77,7 +77,7 @@ const useCreateDrawerForm = (
 ) => {
   const { updateTabsData, updateVM } = useWizardVMContext();
 
-  const [isUDNManagedNamespace] = useNamespaceUDN(namespace);
+  const [isUDNManagedNamespace, vmsNotSupported] = useNamespaceUDN(namespace);
   const [authorizedSSHKeys, updateAuthorizedSSHKeys] = useKubevirtUserSettings('ssh');
   const { featureEnabled: autoUpdateEnabled } = useFeatures(AUTOMATIC_UPDATE_FEATURE_NAME);
   const { featureEnabled: isDisabledGuestSystemLogs } = useFeatures(
@@ -344,7 +344,11 @@ const useCreateDrawerForm = (
     createError,
     folder: getLabel(vm, VM_FOLDER_LABEL),
     isCustomizeDisabled:
-      !processedTemplateAccessReview || !credentialsValid || isCustomizing || !isValidVmName,
+      !processedTemplateAccessReview ||
+      !credentialsValid ||
+      isCustomizing ||
+      !isValidVmName ||
+      vmsNotSupported,
     isCustomizeLoading: isCustomizing || modelsLoading,
     isQuickCreateDisabled:
       !isBootSourceAvailable ||
@@ -355,7 +359,8 @@ const useCreateDrawerForm = (
       !hasValidSource(template) ||
       storageClassRequiredMissing ||
       !isValidVmName ||
-      !credentialsValid,
+      !credentialsValid ||
+      vmsNotSupported,
     isQuickCreateLoading: isQuickCreating || modelsLoading,
     nameField,
     onChangeFolder,

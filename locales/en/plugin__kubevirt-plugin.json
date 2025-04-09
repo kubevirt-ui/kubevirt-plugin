@@ -1469,6 +1469,7 @@
   "VirtualMachine actions confirmation": "VirtualMachine actions confirmation",
   "VirtualMachine boot from golden image": "VirtualMachine boot from golden image",
   "VirtualMachine boot order": "VirtualMachine boot order",
+  "VirtualMachine creation is not supported due to incompatible UserDefinedNetwork configuration": "VirtualMachine creation is not supported due to incompatible UserDefinedNetwork configuration",
   "VirtualMachine details": "VirtualMachine details",
   "VirtualMachine hotplug volume": "VirtualMachine hotplug volume",
   "VirtualMachine is currently {{ status }}": "VirtualMachine is currently {{ status }}",
