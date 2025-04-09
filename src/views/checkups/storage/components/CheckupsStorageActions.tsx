@@ -10,7 +10,7 @@ import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
 
 import DeleteCheckupModal from '../../components/DeleteCheckupModal';
-import { STATUS_SUCCEEDED } from '../../utils/utils';
+import { getCheckupImageFromNewestJob, STATUS_SUCCEEDED } from '../../utils/utils';
 import { deleteStorageCheckup, rerunStorageCheckup } from '../utils/utils';
 
 const CheckupsStorageActions = ({
@@ -24,6 +24,9 @@ const CheckupsStorageActions = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
+
+  const checkupImage = getCheckupImageFromNewestJob(jobs);
+
   const { createModal } = useModal();
   const [isActionsOpen, setIsActionsOpen] = useState<boolean>(false);
 
@@ -60,9 +63,9 @@ const CheckupsStorageActions = ({
         <DropdownItem
           onClick={() => {
             setIsActionsOpen(false);
-            return rerunStorageCheckup(configMap);
+            return rerunStorageCheckup(configMap, checkupImage);
           }}
-          isDisabled={configMap?.data?.[STATUS_SUCCEEDED] === undefined}
+          isDisabled={configMap?.data?.[STATUS_SUCCEEDED] === undefined || !checkupImage}
           key="rerun"
         >
           {t('Rerun')}

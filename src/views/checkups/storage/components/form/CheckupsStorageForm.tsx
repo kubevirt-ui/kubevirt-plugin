@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import CheckupImageField from 'src/views/checkups/components/CheckupImageField';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useRelatedImage from '@kubevirt-utils/hooks/useRelatedImage';
 import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 import {
   Button,
@@ -16,6 +18,8 @@ import {
 } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
 
+import { storageCheckupImageSettings } from '../../utils/const';
+
 import CheckupsStorageFormActions from './CheckupsStorageFormActions';
 
 import './checkups-storage-form.scss';
@@ -24,6 +28,9 @@ const CheckupsStorageForm = () => {
   const { t } = useKubevirtTranslation();
   const [name, setName] = useState<string>(generatePrettyName('kubevirt-storage-checkup'));
   const [timeOut, setTimeOut] = useState<string>('10');
+  const [checkupImage, checkupImageLoaded, checkupImageLoadError] = useRelatedImage(
+    storageCheckupImageSettings,
+  );
 
   return (
     <Grid>
@@ -66,7 +73,12 @@ const CheckupsStorageForm = () => {
                 value={timeOut}
               />
             </FormGroup>
-            <CheckupsStorageFormActions name={name} timeOut={timeOut} />
+            <CheckupImageField
+              checkupImage={checkupImage}
+              checkupImageLoaded={checkupImageLoaded}
+              checkupImageLoadError={checkupImageLoadError}
+            />
+            <CheckupsStorageFormActions checkupImage={checkupImage} name={name} timeOut={timeOut} />
           </FormSection>
         </Form>
       </GridItem>

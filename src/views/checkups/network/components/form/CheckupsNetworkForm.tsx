@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
+import CheckupImageField from 'src/views/checkups/components/CheckupImageField';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useRelatedImage from '@kubevirt-utils/hooks/useRelatedImage';
 import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 import { Form, FormGroup, FormSection, Grid, GridItem, TextInput } from '@patternfly/react-core';
+
+import { networkCheckupImageSettings } from '../../utils/const';
 
 import CheckupsNetworkFormActions from './CheckupsNetworkFormActions';
 import CheckupsNetworkFormLatency from './CheckupsNetworkFormLatency';
@@ -13,7 +17,9 @@ import './checkups-network-form.scss';
 
 const CheckupsNetworkForm = () => {
   const { t } = useKubevirtTranslation();
-
+  const [checkupImage, checkupImageLoaded, checkupImageLoadError] = useRelatedImage(
+    networkCheckupImageSettings,
+  );
   const [isDesiredLatency, setIsDesiredLatency] = useState<boolean>(false);
   const [isNodesChecked, setIsNodesChecked] = useState<boolean>(false);
 
@@ -69,7 +75,13 @@ const CheckupsNetworkForm = () => {
               setNodeSource={setNodeSource}
               setNodeTarget={setNodeTarget}
             />
+            <CheckupImageField
+              checkupImage={checkupImage}
+              checkupImageLoaded={checkupImageLoaded}
+              checkupImageLoadError={checkupImageLoadError}
+            />
             <CheckupsNetworkFormActions
+              checkupImage={checkupImage}
               desiredLatency={desiredLatency}
               isNodesChecked={isNodesChecked}
               name={name}

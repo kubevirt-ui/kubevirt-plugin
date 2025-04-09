@@ -9,6 +9,7 @@ import { ActionGroup, Alert, AlertVariant, Button, ButtonVariant } from '@patter
 import { createNetworkCheckup } from '../../utils/utils';
 
 type CheckupsNetworkFormActionsProps = {
+  checkupImage: string;
   desiredLatency: string;
   isNodesChecked: boolean;
   name: string;
@@ -19,6 +20,7 @@ type CheckupsNetworkFormActionsProps = {
 };
 
 const CheckupsNetworkFormActions: FC<CheckupsNetworkFormActionsProps> = ({
+  checkupImage,
   desiredLatency,
   isNodesChecked,
   name,
@@ -32,7 +34,7 @@ const CheckupsNetworkFormActions: FC<CheckupsNetworkFormActionsProps> = ({
   const [namespace] = useActiveNamespace();
   const [error, setError] = useState<string>(null);
   const shouldDisableNodes = isNodesChecked ? nodeSource && nodeTarget : true;
-  const isSubmitDisabled = !name || !selectedNAD || !shouldDisableNodes;
+  const isSubmitDisabled = !name || !selectedNAD || !shouldDisableNodes || !checkupImage;
 
   return (
     <>
@@ -42,6 +44,7 @@ const CheckupsNetworkFormActions: FC<CheckupsNetworkFormActionsProps> = ({
             setError(null);
             try {
               await createNetworkCheckup({
+                checkupImage,
                 desiredLatency,
                 name,
                 namespace,

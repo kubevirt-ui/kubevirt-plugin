@@ -183,6 +183,7 @@ export const findObjectByName = (arr: K8sResourceCommon[], name: string) =>
   (arr || []).find((obj) => obj?.metadata?.name === name);
 
 type CreateNetworkCheckupType = (arg: {
+  checkupImage: string;
   desiredLatency: string;
   name: string;
   namespace: string;
@@ -192,7 +193,11 @@ type CreateNetworkCheckupType = (arg: {
   selectedNAD: string;
 }) => Promise<IoK8sApiCoreV1ConfigMap>;
 
-const createJob = (name: string, namespace: string): Promise<IoK8sApiBatchV1Job> =>
+const createJob = (
+  name: string,
+  namespace: string,
+  checkupImage: string,
+): Promise<IoK8sApiBatchV1Job> =>
   k8sCreate({
     data: {
       metadata: {
@@ -221,8 +226,7 @@ const createJob = (name: string, namespace: string): Promise<IoK8sApiBatchV1Job>
                     valueFrom: { fieldRef: { fieldPath: 'metadata.uid' } },
                   },
                 ],
-                image:
-                  'registry.redhat.io/container-native-virtualization/vm-network-latency-checkup-rhel9:v4.13.0',
+                image: checkupImage,
                 name: VM_LATENCY_CHECKUP_SA,
                 runAsNonRoot: 'true',
                 seccompProfile: { type: 'RuntimeDefault' },
@@ -239,6 +243,7 @@ const createJob = (name: string, namespace: string): Promise<IoK8sApiBatchV1Job>
   });
 
 export const createNetworkCheckup: CreateNetworkCheckupType = async ({
+  checkupImage,
   desiredLatency,
   name,
   namespace,
@@ -266,7 +271,7 @@ export const createNetworkCheckup: CreateNetworkCheckupType = async ({
     },
     model: ConfigMapModel,
   });
-  return await createJob(name, namespace);
+  return await createJob(name, namespace, checkupImage);
 };
 
 export const deleteNetworkCheckup = async (
@@ -291,6 +296,7 @@ export const deleteNetworkCheckup = async (
 
 export const rerunNetworkCheckup = async (
   resource: IoK8sApiCoreV1ConfigMap,
+  checkupImage: string,
 ): Promise<IoK8sApiBatchV1Job> => {
   const isSucceeded = resource?.data?.[STATUS_SUCCEEDED] === 'true';
   await k8sPatch<IoK8sApiCoreV1ConfigMap>({
@@ -312,5 +318,5 @@ export const rerunNetworkCheckup = async (
     resource,
   });
 
-  return createJob(resource.metadata.name, resource.metadata.namespace);
+  return createJob(resource.metadata.name, resource.metadata.namespace, checkupImage);
 };

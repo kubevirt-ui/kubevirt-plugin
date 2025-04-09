@@ -95,3 +95,12 @@ export const getConfigMapStatus = (
   )
     return NetworkCheckupsStatus.Running;
 };
+
+export const getCheckupImageFromNewestJob = (jobs: IoK8sApiBatchV1Job[]): string => {
+  const [newestJob] =
+    jobs
+      ?.filter((it) => it?.metadata?.creationTimestamp)
+      .sort((a, b) => b.metadata.creationTimestamp.localeCompare(a.metadata.creationTimestamp)) ??
+    [];
+  return newestJob?.spec?.template?.spec?.containers?.[0]?.image;
+};

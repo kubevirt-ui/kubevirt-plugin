@@ -9,11 +9,16 @@ import { ActionGroup, Alert, AlertVariant, Button, ButtonVariant } from '@patter
 import { createStorageCheckup } from '../../utils/utils';
 
 type CheckupsStorageFormActionsProps = {
+  checkupImage: string;
   name: string;
   timeOut: string;
 };
 
-const CheckupsStorageFormActions: FC<CheckupsStorageFormActionsProps> = ({ name, timeOut }) => {
+const CheckupsStorageFormActions: FC<CheckupsStorageFormActionsProps> = ({
+  checkupImage,
+  name,
+  timeOut,
+}) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const [namespace] = useActiveNamespace();
@@ -26,14 +31,14 @@ const CheckupsStorageFormActions: FC<CheckupsStorageFormActionsProps> = ({ name,
           onClick={async () => {
             setError(null);
             try {
-              await createStorageCheckup(namespace, timeOut, name);
+              await createStorageCheckup(namespace, timeOut, name, checkupImage);
               navigate(`/k8s/ns/${namespace}/checkups/storage`);
             } catch (e) {
               kubevirtConsole.log(e);
               setError(e?.message);
             }
           }}
-          isDisabled={isEmpty(name) || isEmpty(timeOut)}
+          isDisabled={isEmpty(name) || isEmpty(timeOut) || !checkupImage}
           variant={ButtonVariant.primary}
         >
           {t('Run')}
