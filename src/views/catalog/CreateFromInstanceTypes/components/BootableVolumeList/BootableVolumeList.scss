@@ -19,26 +19,3 @@
     }
   }
 }
-
-.BootableVolumeList {
-  &-table {
-    th:first-child {
-      padding-right: 0;
-      padding-left: var(--pf-t--global--spacer--sm);
-      margin-right: var(--pf-t--global--spacer--sm);
-      .pf-v6-c-table__sort-indicator {
-        margin: 0;
-      }
-    }
-    tbody {
-      tr {
-        td:first-child {
-          padding-left: 0;
-          width: unset;
-          display: flex;
-          justify-content: center;
-        }
-      }
-    }
-  }
-}

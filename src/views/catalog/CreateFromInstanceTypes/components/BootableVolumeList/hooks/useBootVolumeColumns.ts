@@ -5,6 +5,16 @@ import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/type
 import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 import { ColumnLayout } from '@openshift-console/dynamic-plugin-sdk-internal/lib/extensions/console-types';
 
+import {
+  DESCRIPTION_COLUMN_ID,
+  FAVORITES_COLUMN_ID,
+  NAME_COLUMN_ID,
+  NAMESPACE_COLUMN_ID,
+  OPERATING_SYSTEM_COLUMN_ID,
+  SIZE_COLUMN_ID,
+  STORAGE_CLASS_COLUMN_ID,
+} from '../utils/constants';
+
 type UseBootVolumesColumns = (
   volumeListNamespace: string,
   isModal: boolean,
@@ -20,35 +30,35 @@ const useBootVolumeColumns: UseBootVolumesColumns = (volumeListNamespace, isModa
 
   const columns: TableColumn<BootableVolume>[] = [
     {
-      id: 'favorites',
+      id: FAVORITES_COLUMN_ID,
       title: '',
     },
     {
-      id: 'name',
+      id: NAME_COLUMN_ID,
       title: t('Volume name'),
     },
     ...(volumeListNamespace === ALL_PROJECTS
       ? [
           {
-            id: 'namespace',
+            id: NAMESPACE_COLUMN_ID,
             title: t('Namespace'),
           },
         ]
       : []),
     {
-      id: 'operating-system',
+      id: OPERATING_SYSTEM_COLUMN_ID,
       title: t('Operating system'),
     },
     {
-      id: 'storage-class',
+      id: STORAGE_CLASS_COLUMN_ID,
       title: t('Storage class'),
     },
     {
-      id: 'size',
+      id: SIZE_COLUMN_ID,
       title: t('Size'),
     },
     {
-      id: 'description',
+      id: DESCRIPTION_COLUMN_ID,
       title: t('Description'),
     },
   ];
