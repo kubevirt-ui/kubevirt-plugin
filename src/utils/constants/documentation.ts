@@ -48,6 +48,7 @@ export const documentationURL = {
   PROJECTS: 'https://docs.okd.io/latest/applications/projects/working-with-projects.html',
   REDHAT_BLOG: `${REDHAT_BASE_URL}/blog/channel/red-hat-openshift`,
   SNAPSHOT: `${REDHAT_DOC_URL}/html/storage/using-container-storage-interface-csi#persistent-storage-csi-snapshots`,
+  STORAGE_PROFILES: `${REDHAT_DOC_URL}/html/virtualization/storage#virt-configuring-storage-profile`,
   SUPPORT_URL: 'https://access.redhat.com/articles/4234591',
   SYSPREP: `${REDHAT_DOC_URL}/html/virtualization/virtual-machines#virt-creating-windows-vm_virt-creating-vms-uploading-images`,
   TAINTS_TOLERATION: `${REDHAT_DOC_URL}/html/virtualization/virtual-machines#virt-about-node-placement-vms_virt-specifying-nodes-for-vms`,
