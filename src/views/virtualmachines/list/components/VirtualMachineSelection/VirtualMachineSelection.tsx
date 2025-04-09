@@ -1,19 +1,12 @@
-import React, { FC, Ref, useState } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
-import {
-  Checkbox,
-  Dropdown,
-  MenuItem,
-  MenuToggle,
-  MenuToggleElement,
-} from '@patternfly/react-core';
+import { BulkSelect } from '@patternfly/react-component-groups/dist/dynamic/BulkSelect';
+import { FlexItem } from '@patternfly/react-core';
 import useExistingSelectedVMs from '@virtualmachines/list/hooks/useExistingSelectedVMs';
 
-import { deselectAll, selectAll } from '../../selectedVMs';
+import { handleBulkSelect } from './utils/bulkSelect';
 
 import './virtual-machine-selection.scss';
 
@@ -24,68 +17,28 @@ type VirtualMachineSelectionProps = {
 };
 
 const VirtualMachineSelection: FC<VirtualMachineSelectionProps> = ({ loaded, pagination, vms }) => {
-  const { t } = useKubevirtTranslation();
-  const [isOpen, setIsOpen] = useState(false);
   const existingSelectedVMs = useExistingSelectedVMs(vms);
 
   if (!loaded) return null;
 
-  const onToggle = () => {
-    setIsOpen((prevIsOpen) => !prevIsOpen);
-  };
-
-  const onSelectItem = (vmsToSelect?: V1VirtualMachine[]) => {
-    vmsToSelect ? selectAll(vmsToSelect) : deselectAll();
-
-    setIsOpen(false);
-  };
-
   const currentPageVMs = vms?.slice(pagination.startIndex, pagination.endIndex);
 
-  const numCurrentPageVMs = currentPageVMs.length;
-
-  const selectionIsEmpty = isEmpty(existingSelectedVMs);
-  const isChecked = !selectionIsEmpty && existingSelectedVMs.length === vms.length;
-  const partiallyChecked = !selectionIsEmpty && !isChecked;
+  const isPageChecked = currentPageVMs.every((vm) => existingSelectedVMs.includes(vm));
+  const isPagePartiallyChecked =
+    !isPageChecked && currentPageVMs.some((vm) => existingSelectedVMs.includes(vm));
 
   return (
-    <Dropdown
-      toggle={(toggleRef: Ref<MenuToggleElement>) => (
-        <MenuToggle
-          className="virtual-machine-selection"
-          isExpanded={isOpen}
-          onClick={onToggle}
-          ref={toggleRef}
-        >
-          <Checkbox
-            label={
-              !selectionIsEmpty
-                ? t('{{length}} selected', { length: existingSelectedVMs.length })
-                : null
-            }
-            onChange={(event, checked) => {
-              event.stopPropagation();
-              if (!checked) deselectAll();
-            }}
-            id="select-action-dropdown"
-            isChecked={partiallyChecked ? null : isChecked}
-          />
-        </MenuToggle>
-      )}
-      isOpen={isOpen}
-      onOpenChange={setIsOpen}
-      shouldFocusToggleOnSelect
-    >
-      <MenuItem data-test-id="select-none" onClick={() => onSelectItem()}>
-        {t('Select none (0) items')}
-      </MenuItem>
-      <MenuItem data-test-id="select-page" onClick={() => onSelectItem(currentPageVMs)}>
-        {t('Select page ({{value}}) items', { value: numCurrentPageVMs })}
-      </MenuItem>
-      <MenuItem data-test-id="select-all" onClick={() => onSelectItem(vms)}>
-        {t('Select all ({{value}}) items', { value: vms.length })}
-      </MenuItem>
-    </Dropdown>
+    <FlexItem className="virtual-machine-selection">
+      <BulkSelect
+        canSelectAll
+        onSelect={(value) => handleBulkSelect(value, vms, currentPageVMs)}
+        pageCount={currentPageVMs.length}
+        pagePartiallySelected={isPagePartiallyChecked}
+        pageSelected={isPageChecked}
+        selectedCount={existingSelectedVMs.length}
+        totalCount={vms.length}
+      />
+    </FlexItem>
   );
 };
 
