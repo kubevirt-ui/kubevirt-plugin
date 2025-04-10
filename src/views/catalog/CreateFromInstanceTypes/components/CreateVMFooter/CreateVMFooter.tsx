@@ -38,6 +38,8 @@ import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { Checkbox, Stack, StackItem } from '@patternfly/react-core';
 
+import { NOT_SUPPORTED_VM_ERROR } from '../../../utils/constants';
+
 import ActionButtons from './components/ActionButtons/ActionButtons';
 import YamlAndCLIViewerModal from './components/YamlAndCLIViewerModal/YamlAndCLIViewerModal';
 import useGeneratedVM from './hooks/useGeneratedVM';
@@ -55,7 +57,7 @@ const CreateVMFooter: FC = () => {
   const [authorizedSSHKeys, setAuthorizedSSHKeys] = useKubevirtUserSettings('ssh');
 
   const [activeNamespace] = useActiveNamespace();
-  const [isUDNManagedNamespace] = useNamespaceUDN(
+  const [isUDNManagedNamespace, vmsNotSupported] = useNamespaceUDN(
     activeNamespace === ALL_NAMESPACES_SESSION_KEY ? DEFAULT_NAMESPACE : activeNamespace,
   );
 
@@ -144,9 +146,9 @@ const CreateVMFooter: FC = () => {
   return (
     <footer className="create-vm-instance-type-footer">
       <Stack hasGutter>
-        {error && (
+        {(error || vmsNotSupported) && (
           <StackItem>
-            <ErrorAlert error={error} />
+            <ErrorAlert error={error || NOT_SUPPORTED_VM_ERROR} />
           </StackItem>
         )}
         <StackItem>

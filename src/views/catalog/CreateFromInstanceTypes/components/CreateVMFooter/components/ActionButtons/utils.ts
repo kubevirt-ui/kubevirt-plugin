@@ -1,4 +1,5 @@
 import { InstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/utils/types';
+import { NOT_SUPPORTED_VM_ERROR } from '@catalog/utils/constants';
 import { isValidVMName } from '@kubevirt-utils/components/VMNameValidationHelperText/utils/utils';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -6,6 +7,7 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 export const getDisableButtonTooltipContent = (
   instanceTypeVMStore: InstanceTypeVMStore,
   canCreate: boolean,
+  udnConfigurationIssue: boolean,
 ) => {
   const {
     instanceTypeVMState: { selectedBootableVolume, selectedInstanceType, vmName },
@@ -20,6 +22,8 @@ export const getDisableButtonTooltipContent = (
   if (isEmpty(vmName)) return t('VirtualMachine name field is mandatory');
   if (isEmpty(selectedInstanceType)) return t('An InstanceType must be selected');
   if (!isValidVmName) return t('VirtualMachine name not valid');
+
+  if (udnConfigurationIssue) return NOT_SUPPORTED_VM_ERROR.message;
 
   if (!canCreate)
     return t(

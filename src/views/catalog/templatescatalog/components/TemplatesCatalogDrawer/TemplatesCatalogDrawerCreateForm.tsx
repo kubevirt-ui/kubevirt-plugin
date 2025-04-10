@@ -1,6 +1,7 @@
 import React, { FC, memo } from 'react';
 
 import { DRAWER_FORM_ID } from '@catalog/templatescatalog/utils/consts';
+import { NOT_SUPPORTED_VM_ERROR } from '@catalog/utils/constants';
 import FolderSelect from '@kubevirt-utils/components/FolderSelect/FolderSelect';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { validateVMName } from '@kubevirt-utils/components/VMNameValidationHelperText/utils/utils';
@@ -13,6 +14,7 @@ import { TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
+import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
 import {
   Alert,
   AlertVariant,
@@ -45,6 +47,7 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
     const { t } = useKubevirtTranslation();
 
     const { isBootSourceAvailable, templateLoadingError } = useDrawerContext();
+    const [__, vmsNotSupported] = useNamespaceUDN(namespace);
 
     const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
 
@@ -67,7 +70,9 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
 
     const vmNameValidated = validateVMName(nameField);
 
-    const error = templateLoadingError || createError;
+    const vmsNotSupportedError = vmsNotSupported ? NOT_SUPPORTED_VM_ERROR : null;
+
+    const error = templateLoadingError || createError || vmsNotSupportedError;
     return (
       <div className="template-catalog-drawer-form" id="quick-create-form">
         <Stack hasGutter>

@@ -1,16 +1,12 @@
 import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 
-import UserDefinedNetworkModel from '@kubevirt-ui/kubevirt-api/console/models/UserDefinedNetworkModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { getConsoleVirtctlCommand } from '@kubevirt-utils/components/SSHAccess/utils';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  ClusterUserDefinedNetworkModelGroupVersionKind,
-  UserDefinedNetworkModelGroupVersionKind,
-} from '@kubevirt-utils/models';
+import { NetworkAttachmentDefinitionModelGroupVersionKind } from '@kubevirt-utils/models';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
@@ -36,7 +32,7 @@ type ConsoleOverVirtctlProps = {
 const ConsoleOverVirtctl: FC<ConsoleOverVirtctlProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
 
-  const [isNamespaceManagedByUDN, udn] = useNamespaceUDN(getNamespace(vm));
+  const [isNamespaceManagedByUDN, _, nad] = useNamespaceUDN(getNamespace(vm));
 
   return (
     <DescriptionListGroup className="pf-v6-c-description-list__group">
@@ -82,14 +78,10 @@ const ConsoleOverVirtctl: FC<ConsoleOverVirtctlProps> = ({ vm }) => {
           <>
             {t("Virtctl is disabled for this namespace as it's managed by")}{' '}
             <ResourceLink
-              groupVersionKind={
-                udn.kind === UserDefinedNetworkModel.kind
-                  ? UserDefinedNetworkModelGroupVersionKind
-                  : ClusterUserDefinedNetworkModelGroupVersionKind
-              }
+              groupVersionKind={NetworkAttachmentDefinitionModelGroupVersionKind}
               inline
-              name={getName(udn)}
-              namespace={getNamespace(udn)}
+              name={getName(nad)}
+              namespace={getNamespace(nad)}
             />{' '}
           </>
         ) : (
