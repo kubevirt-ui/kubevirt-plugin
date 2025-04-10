@@ -3,9 +3,10 @@ import React, { FC } from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import SelectTypeahead from '../SelectTypeahead/SelectTypeahead';
-import { getCreateNewFolderOption } from '../SelectTypeahead/utils/utils';
 
 import useFolderOptions from './hooks/useFolderOptions';
+import { createNewFolderOption, getCreateNewFolderOption } from './utils/options';
+import { getCreationNotAllowedMessage, getToggleStatus } from './utils/validation';
 
 type FoldersSelectProps = {
   isFullWidth?: boolean;
@@ -25,8 +26,11 @@ const FolderSelect: FC<FoldersSelectProps> = ({
   return (
     <SelectTypeahead
       canCreate
+      createNewOption={createNewFolderOption}
       dataTestId="vm-folder-select"
       getCreateOption={getCreateNewFolderOption}
+      getCreationNotAllowedMessage={getCreationNotAllowedMessage}
+      getToggleStatus={getToggleStatus}
       initialOptions={folderOptions}
       isFullWidth={isFullWidth}
       placeholder={t('Search folder')}
