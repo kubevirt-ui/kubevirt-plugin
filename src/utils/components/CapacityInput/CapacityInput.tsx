@@ -14,12 +14,13 @@ import { SelectOption } from '@patternfly/react-core';
 import FormGroupHelperText from '../FormGroupHelperText/FormGroupHelperText';
 import FormPFSelect from '../FormPFSelect/FormPFSelect';
 
-import { CAPACITY_UNITS, removeByteSuffix } from './utils';
+import { CAPACITY_UNITS, getUnitFromSize, getValueFromSize, removeByteSuffix } from './utils';
 
 type CapacityInputProps = {
   isEditingCreatedDisk?: boolean;
   isMinusDisabled?: boolean;
   label?: string;
+  minValue?: number;
   onChange: (quantity: string) => void;
   size: string;
 };
@@ -28,23 +29,31 @@ const CapacityInput: FC<CapacityInputProps> = ({
   isEditingCreatedDisk,
   isMinusDisabled,
   label,
+  minValue,
   onChange,
   size,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [unitValue = ''] = size?.match(/[a-zA-Z]+/g) || [];
-  const [sizeValue = 0] = size?.match(/[0-9]+/g) || [];
-  const unit = !unitValue?.endsWith('B') ? `${unitValue}B` : unitValue;
-  const value = Number(sizeValue);
+  const unit = getUnitFromSize(size);
+  const value = getValueFromSize(size);
 
   const onFormatChange = (_, newUnit: CAPACITY_UNITS) => {
     onChange(`${Number(value)}${removeByteSuffix(newUnit)}`);
   };
   const unitOptions = Object.values(CAPACITY_UNITS);
-  if (!unitOptions?.includes(unit as CAPACITY_UNITS)) unitOptions.push(unit as CAPACITY_UNITS);
+  if (!unitOptions?.includes(unit)) unitOptions.push(unit);
 
   const validated: ValidatedOptions =
-    !value || value <= 0 ? ValidatedOptions.error : ValidatedOptions.default;
+    !value || value <= 0 || (minValue && value < minValue)
+      ? ValidatedOptions.error
+      : ValidatedOptions.default;
+
+  const getErrorValue = () => {
+    if (value > 0) {
+      return t('less than');
+    }
+    return value < 0 ? t('negative') : t('zero');
+  };
 
   return (
     <FormGroup
@@ -91,10 +100,12 @@ const CapacityInput: FC<CapacityInputProps> = ({
         </SplitItem>
       </Split>
       <FormGroupHelperText validated={validated}>
-        {validated === ValidatedOptions.error &&
-          t('Size cannot be {{errorValue}}', {
-            errorValue: value < 0 ? 'negative' : 'zero',
-          })}
+        {validated === ValidatedOptions.error && (
+          <>
+            {t('Size cannot be')} {getErrorValue()}
+            {value > 0 && ` ${minValue} ${unit}`}
+          </>
+        )}
       </FormGroupHelperText>
     </FormGroup>
   );
