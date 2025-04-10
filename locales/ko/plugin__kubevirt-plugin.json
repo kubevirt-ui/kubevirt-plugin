@@ -769,7 +769,6 @@
   "Link state: {{runtimeState}}": "Link state: {{runtimeState}}",
   "Linux only": "Linux만 해당",
   "Live migratable": "라이브 마이그레이션 가능",
-  "Live migrate or restart the VirtualMachine to apply changes.": "실시간 마이그레이션 또는 VirtualMachine를 다시 시작하여 변경 사항을 적용합니다.",
   "Live migration": "실시간 마이그레이션",
   "Live migration network": "실시간 마이그레이션 네트워크",
   "Live migrations settings": "실시간 마이그레이션 설정",

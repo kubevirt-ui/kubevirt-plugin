@@ -772,7 +772,6 @@
   "Link state: {{runtimeState}}": "Link state: {{runtimeState}}",
   "Linux only": "Linux uniquement",
   "Live migratable": "Migratoire vivant",
-  "Live migrate or restart the VirtualMachine to apply changes.": "Migrez en direct ou redémarrez la machine virtuelle pour appliquer les modifications.",
   "Live migration": "Migration dynamique",
   "Live migration network": "Réseau de migration dynamique",
   "Live migrations settings": "Paramètres de migration dynamique",
