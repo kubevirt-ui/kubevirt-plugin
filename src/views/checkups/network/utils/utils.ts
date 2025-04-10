@@ -206,7 +206,6 @@ const createJob = (name: string, namespace: string): Promise<IoK8sApiBatchV1Job>
           spec: {
             containers: [
               {
-                capabilities: { drop: ['ALL'] },
                 env: [
                   {
                     name: CONFIGMAP_NAMESPACE,
@@ -224,8 +223,6 @@ const createJob = (name: string, namespace: string): Promise<IoK8sApiBatchV1Job>
                 image:
                   'registry.redhat.io/container-native-virtualization/vm-network-latency-checkup-rhel9:v4.13.0',
                 name: VM_LATENCY_CHECKUP_SA,
-                runAsNonRoot: 'true',
-                seccompProfile: { type: 'RuntimeDefault' },
                 securityContext: { allowPrivilegeEscalation: false },
               },
             ],
