@@ -1,4 +1,4 @@
-import React, { FC, useCallback } from 'react';
+import React, { FC, useCallback, useState } from 'react';
 
 import HyperConvergedModel from '@kubevirt-ui/kubevirt-api/console/models/HyperConvergedModel';
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
@@ -26,6 +26,8 @@ const AutomaticImagesDownload: FC<AutomaticImagesDownloadProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const isAdmin = useIsAdmin();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [imageLoadingIndex, setImageLoadingIndex] = useState<number>(-1);
 
   const [hyperConverged, loaded] = hyperConvergeConfiguration;
   const isEnabledAutomaticImagesDownload =
@@ -39,6 +41,7 @@ const AutomaticImagesDownload: FC<AutomaticImagesDownloadProps> = ({
 
   const onChangeAutomaticImagesDownload = useCallback(
     (val: boolean) => {
+      setIsLoading(true);
       k8sPatch({
         data: [
           {
@@ -49,13 +52,14 @@ const AutomaticImagesDownload: FC<AutomaticImagesDownloadProps> = ({
         ],
         model: HyperConvergedModel,
         resource: hyperConverged,
-      });
+      }).finally(() => setIsLoading(false));
     },
     [hyperConverged],
   );
 
   const onChangeDataImportCronTemplate = useCallback(
     (val: boolean, index: number) => {
+      setImageLoadingIndex(index);
       const copyBootSources = [...bootSources];
       copyBootSources[index].metadata.annotations = {
         ...copyBootSources[index].metadata.annotations,
@@ -71,7 +75,7 @@ const AutomaticImagesDownload: FC<AutomaticImagesDownloadProps> = ({
         ],
         model: HyperConvergedModel,
         resource: hyperConverged,
-      });
+      }).finally(() => setImageLoadingIndex(-1));
     },
     [bootSources, hyperConverged],
   );
@@ -82,6 +86,7 @@ const AutomaticImagesDownload: FC<AutomaticImagesDownloadProps> = ({
         helpTextIconContent={t('Enable automatic images download and update')}
         id="auto-image-download"
         isDisabled={!loaded || !isAdmin}
+        isLoading={isLoading}
         newBadge={newBadge}
         switchIsOn={Boolean(isEnabledAutomaticImagesDownload)}
         title={t('Automatic images download')}
@@ -99,6 +104,7 @@ const AutomaticImagesDownload: FC<AutomaticImagesDownloadProps> = ({
                 }
                 id={`${name}-auto-image-download-switch`}
                 inlineCheckbox
+                isLoading={index === imageLoadingIndex}
                 key={name}
                 newBadge={newBadge}
                 title={name}

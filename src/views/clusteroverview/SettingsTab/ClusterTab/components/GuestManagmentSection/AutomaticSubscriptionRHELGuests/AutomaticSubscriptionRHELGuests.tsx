@@ -84,6 +84,7 @@ const AutomaticSubscriptionRHELGuests: FC<AutomaticSubscriptionRHELGuestsProps> 
                   }}
                   id={AUTOMATIC_UPDATE_FEATURE_NAME}
                   isDisabled={isInitialLoad}
+                  isLoading={loading}
                   switchIsOn={featureEnabled}
                   title={t('Enable auto updates for RHEL VirtualMachines')}
                 />

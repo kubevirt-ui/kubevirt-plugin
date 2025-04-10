@@ -31,6 +31,7 @@ const PreviewFeaturesTab: FC = () => {
             <SectionWithSwitch
               externalLink={feature.externalLink}
               id={feature.id}
+              isLoading={feature.loading}
               maxWidth="350px"
               switchIsOn={feature.featureEnabled}
               title={feature.label}

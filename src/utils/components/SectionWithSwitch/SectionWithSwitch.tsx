@@ -15,6 +15,7 @@ type SectionWithSwitchProps = {
   id?: string;
   inlineCheckbox?: boolean;
   isDisabled?: boolean;
+  isLoading?: boolean;
   maxWidth?: string;
   newBadge?: boolean;
   switchIsOn: boolean;
@@ -28,6 +29,7 @@ const SectionWithSwitch: FC<SectionWithSwitchProps> = ({
   id,
   inlineCheckbox,
   isDisabled,
+  isLoading,
   maxWidth,
   newBadge = false,
   switchIsOn,
@@ -37,7 +39,11 @@ const SectionWithSwitch: FC<SectionWithSwitchProps> = ({
   const Wrapper = inlineCheckbox ? 'div' : Split;
   return (
     <Wrapper className="section-with-switch" id={id} style={{ maxWidth }}>
-      <div className="section-with-switch__text">
+      <div
+        className={classNames('section-with-switch__text', {
+          'section-with-switch__inline': inlineCheckbox,
+        })}
+      >
         {title}
         {externalLink && <ExternalLink href={externalLink} />}
         {helpTextIconContent && (
@@ -54,6 +60,7 @@ const SectionWithSwitch: FC<SectionWithSwitchProps> = ({
       <SplitItem className={classNames({ 'section-with-switch__inline': inlineCheckbox })}>
         {children}{' '}
         <Switch
+          className={isLoading && 'kv-cursor--loading'}
           isChecked={switchIsOn}
           isDisabled={isDisabled}
           onChange={(_, checked: boolean) => turnOnSwitch(checked)}

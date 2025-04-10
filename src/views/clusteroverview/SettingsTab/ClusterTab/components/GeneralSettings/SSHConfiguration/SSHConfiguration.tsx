@@ -13,7 +13,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { useMetalLBOperatorInstalled } from '@kubevirt-utils/hooks/useMetalLBOperatorInstalled/useMetalLBOperatorInstalled';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
-import { Form, FormGroup, TextInput } from '@patternfly/react-core';
+import { TextInput } from '@patternfly/react-core';
 
 import ExpandSection from '../../../../ExpandSection/ExpandSection';
 
@@ -28,8 +28,14 @@ const SSHConfiguration: FC<SSHConfigurationProps> = ({ newBadge }) => {
   } = useFeaturesConfigMap();
   const hasMetalLBInstalled = useMetalLBOperatorInstalled();
 
+  const [loadBalancerIsLoading, setLoadBalancerIsLoading] = useState<boolean>(false);
+  const [nodePortIsLoading, setNodePortIsLoading] = useState<boolean>(false);
+
   const onChange = useCallback(
     (val: string, field: string) => {
+      const setIsLoading =
+        field === LOAD_BALANCER_ENABLED ? setLoadBalancerIsLoading : setNodePortIsLoading;
+      setIsLoading(true);
       k8sPatch({
         data: [
           {
@@ -40,7 +46,7 @@ const SSHConfiguration: FC<SSHConfigurationProps> = ({ newBadge }) => {
         ],
         model: ConfigMapModel,
         resource: featureConfigMap,
-      });
+      }).finally(() => setIsLoading(false));
     },
     [featureConfigMap],
   );
@@ -60,6 +66,7 @@ const SSHConfiguration: FC<SSHConfigurationProps> = ({ newBadge }) => {
         }
         id="load-balancer-feature"
         isDisabled={!loaded || !isAdmin || hasMetalLBInstalled}
+        isLoading={loadBalancerIsLoading}
         newBadge={newBadge}
         title={t('SSH over LoadBalancer service')}
         turnOnSwitch={(checked) => onChange(checked.toString(), LOAD_BALANCER_ENABLED)}
@@ -75,29 +82,23 @@ const SSHConfiguration: FC<SSHConfigurationProps> = ({ newBadge }) => {
         id="node-port-feature"
         inlineCheckbox
         isDisabled={!loaded || !isAdmin || isEmpty(featureConfigMap?.data?.[NODE_PORT_ADDRESS])}
+        isLoading={nodePortIsLoading}
         newBadge={newBadge}
         title={t('SSH over NodePort service')}
         turnOnSwitch={(checked) => onChange(checked.toString(), NODE_PORT_ENABLED)}
       >
-        <Form isHorizontal>
-          <FormGroup
-            fieldId="node-address"
-            isRequired
-            label={t('Node address')}
-            placeholder={t('Enter node address to access the cluster')}
-          >
-            <TextInput
-              onChange={(_event, value: string) => {
-                setUrl(value);
-                onTextChange(value, NODE_PORT_ADDRESS);
-              }}
-              id="node-address"
-              isRequired
-              name="node-address"
-              value={url ?? featureConfigMap?.data?.[NODE_PORT_ADDRESS]}
-            />
-          </FormGroup>
-        </Form>
+        <TextInput
+          onChange={(_event, value: string) => {
+            setUrl(value);
+            onTextChange(value, NODE_PORT_ADDRESS);
+          }}
+          className="pf-v6-u-mr-md"
+          id="node-address"
+          isRequired
+          name="node-address"
+          placeholder={t('Enter node address')}
+          value={url ?? featureConfigMap?.data?.[NODE_PORT_ADDRESS]}
+        />
       </SectionWithSwitch>
     </ExpandSection>
   );

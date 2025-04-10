@@ -1,4 +1,4 @@
-import React, { FC, useCallback } from 'react';
+import React, { FC, useCallback, useState } from 'react';
 
 import HyperConvergedModel from '@kubevirt-ui/kubevirt-api/console/models/HyperConvergedModel';
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
@@ -21,9 +21,11 @@ const MemoryDensity: FC<MemoryDensityProps> = ({ hyperConvergeConfiguration, new
   const { t } = useKubevirtTranslation();
   const isAdmin = useIsAdmin();
   const [hyperConverge, hyperLoaded] = hyperConvergeConfiguration;
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const onChange = useCallback(
     (checked: boolean) => {
+      setIsLoading(true);
       k8sPatch({
         data: [
           {
@@ -34,7 +36,7 @@ const MemoryDensity: FC<MemoryDensityProps> = ({ hyperConvergeConfiguration, new
         ],
         model: HyperConvergedModel,
         resource: hyperConverge,
-      });
+      }).finally(() => setIsLoading(false));
     },
     [hyperConverge],
   );
@@ -49,6 +51,7 @@ const MemoryDensity: FC<MemoryDensityProps> = ({ hyperConvergeConfiguration, new
         helpTextIconContent={t('Configures the VM workloads to use swap for higher density')}
         id="memory-density-feature"
         isDisabled={!hyperLoaded || !isAdmin}
+        isLoading={isLoading}
         newBadge={newBadge}
         switchIsOn={Boolean(higherDensity > MEMORY_OVERCOMMIT_STARTING_VALUE)}
         title={t('Enable memory density')}
