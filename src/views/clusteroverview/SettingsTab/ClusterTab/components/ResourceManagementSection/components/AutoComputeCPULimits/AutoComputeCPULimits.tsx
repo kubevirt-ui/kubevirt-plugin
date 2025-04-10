@@ -23,12 +23,15 @@ const AutoComputeCPULimits: FC<AutoComputeCPULimitsProps> = ({
   const [featureEnabled, setFeatureEnabled] = useState<boolean>(
     Boolean(featureGates?.[AUTO_RESOURCE_LIMITS_FEATURE_GATE]),
   );
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error>();
 
   const onFeatureChange = (switchOn: boolean) => {
+    setIsLoading(true);
     updateAutoResourceLimitsFeatureGate(hco, switchOn)
       .then(() => setFeatureEnabled(switchOn))
-      .catch((err) => setError(err.message));
+      .catch((err) => setError(err.message))
+      .finally(() => setIsLoading(false));
   };
 
   return (
@@ -39,6 +42,7 @@ const AutoComputeCPULimits: FC<AutoComputeCPULimitsProps> = ({
         </SplitItem>
         <SplitItem>
           <Switch
+            className={isLoading && 'kv-cursor--loading'}
             id="auto-compute-cpu-limits"
             isChecked={featureEnabled}
             isDisabled={!hcoLoaded}

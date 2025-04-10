@@ -14,8 +14,11 @@ type VMActionsConfirmationProps = {
 const VMActionsConfirmation: FC<VMActionsConfirmationProps> = ({ newBadge }) => {
   const { t } = useKubevirtTranslation();
   const isAdmin = useIsAdmin();
-  const { featureEnabled: confirmVMActionsEnabled, toggleFeature: toggleConfirmVMActionsEnabled } =
-    useFeatures(CONFIRM_VM_ACTIONS);
+  const {
+    featureEnabled: confirmVMActionsEnabled,
+    loading,
+    toggleFeature: toggleConfirmVMActionsEnabled,
+  } = useFeatures(CONFIRM_VM_ACTIONS);
 
   return (
     <ExpandSection toggleText={t('VirtualMachine actions confirmation')}>
@@ -23,6 +26,7 @@ const VMActionsConfirmation: FC<VMActionsConfirmationProps> = ({ newBadge }) => 
         helpTextIconContent={t('Confirm requested VirtualMachine actions before executing them')}
         id="confirm-vm-actions"
         isDisabled={!isAdmin}
+        isLoading={loading}
         newBadge={newBadge}
         switchIsOn={confirmVMActionsEnabled}
         title={t('Confirm VirtualMachine actions')}

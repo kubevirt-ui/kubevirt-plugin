@@ -18,8 +18,6 @@ import {
 
 import ExpandSection from '../../../ExpandSection/ExpandSection';
 
-import '@kubevirt-utils/styles/cursor.scss';
-
 type PersistentReservationSectionProps = {
   hyperConvergeConfiguration: [hyperConvergeConfig: HyperConverged, loaded: boolean, error: Error];
 };
@@ -51,9 +49,10 @@ const PersistentReservationSection: FC<PersistentReservationSectionProps> = ({
       });
 
       await toggleFeature(checked);
-      setIsLoading(false);
     } catch (err) {
       setError(err.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 

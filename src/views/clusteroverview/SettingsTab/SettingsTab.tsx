@@ -10,6 +10,7 @@ import PreviewFeaturesTab from './PreviewFeaturesTab/PreviewFeaturesTab';
 import UserTab from './UserTab/UserTab';
 
 import './settings-tab.scss';
+import '@kubevirt-utils/styles/cursor.scss';
 
 const SettingsTab: FC = () => {
   const { t } = useKubevirtTranslation();

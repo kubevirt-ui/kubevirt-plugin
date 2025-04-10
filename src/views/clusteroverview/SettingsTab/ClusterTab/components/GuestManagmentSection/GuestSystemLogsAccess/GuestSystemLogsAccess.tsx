@@ -37,6 +37,7 @@ const GuestSystemLogsAccess: FC<GuestSystemLogsAccessProps> = ({
     hyperConverge?.spec?.virtualMachineOptions?.disableSerialConsoleLog;
 
   const [error, setError] = useState<Error>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isChecked, setIsChecked] = useState<boolean>();
 
   useEffect(() => {
@@ -45,6 +46,7 @@ const GuestSystemLogsAccess: FC<GuestSystemLogsAccessProps> = ({
   }, [disableSerialConsoleLog, guestSystemLogsAccessToggle]);
 
   const onChange = async (checked: boolean) => {
+    setIsLoading(true);
     try {
       await k8sPatch<HyperConverged>({
         data: [
@@ -61,6 +63,8 @@ const GuestSystemLogsAccess: FC<GuestSystemLogsAccessProps> = ({
       setIsChecked(checked);
     } catch (err) {
       setError(err.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -80,6 +84,7 @@ const GuestSystemLogsAccess: FC<GuestSystemLogsAccessProps> = ({
         {hyperLoaded && (
           <SplitItem>
             <Switch
+              className={isLoading && 'kv-cursor--loading'}
               id="guest-system-log-access"
               isChecked={isChecked}
               onChange={(_, checked: boolean) => onChange(checked)}

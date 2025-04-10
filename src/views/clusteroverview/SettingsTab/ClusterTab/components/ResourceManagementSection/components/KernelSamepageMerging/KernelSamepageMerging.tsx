@@ -44,9 +44,11 @@ const KernelSamepageMerging: FC<KernelSamepageMergingProps> = ({
     [ksmConfiguration, hyperLoaded],
   );
 
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState(null);
 
   const onKSMchange = (value: boolean) => {
+    setIsLoading(true);
     k8sPatch<HyperConverged>({
       data: [
         {
@@ -59,7 +61,8 @@ const KernelSamepageMerging: FC<KernelSamepageMergingProps> = ({
       resource: hyperConverge,
     })
       .then(() => setIsEnabled(value))
-      .catch((err) => setError(err.message));
+      .catch((err) => setError(err.message))
+      .finally(() => setIsLoading(false));
   };
 
   return (
@@ -80,6 +83,7 @@ const KernelSamepageMerging: FC<KernelSamepageMergingProps> = ({
         {hyperLoaded && (
           <SplitItem>
             <Switch
+              className={isLoading && 'kv-cursor--loading'}
               id="kernel-samepage-merging"
               isChecked={isEnabled}
               onChange={(_, checked: boolean) => onKSMchange(checked)}
