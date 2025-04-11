@@ -1,26 +1,24 @@
 import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Button, ButtonVariant, Tooltip } from '@patternfly/react-core';
-import { PanelCloseIcon, PanelOpenIcon } from '@patternfly/react-icons';
+import { Tooltip } from '@patternfly/react-core';
+import { AngleLeftIcon, AngleRightIcon } from '@patternfly/react-icons';
 
 type PanelToggleButtonProps = {
-  className?: string;
   isOpen: boolean;
   toggleDrawer: () => void;
 };
 
-const PanelToggleButton: FC<PanelToggleButtonProps> = ({ className, isOpen, toggleDrawer }) => {
+const PanelToggleButton: FC<PanelToggleButtonProps> = ({ isOpen, toggleDrawer }) => {
   const { t } = useKubevirtTranslation();
+
+  const SvgIcon = isOpen ? AngleLeftIcon : AngleRightIcon;
+
   return (
     <Tooltip content={isOpen ? t('Close') : t('Open')}>
-      <Button
-        className={className}
-        hasNoPadding
-        icon={isOpen ? <PanelCloseIcon /> : <PanelOpenIcon />}
-        onClick={toggleDrawer}
-        variant={ButtonVariant.plain}
-      />
+      <button className="vms-tree-view__panel-toggle-button" onClick={toggleDrawer}>
+        <SvgIcon />
+      </button>
     </Tooltip>
   );
 };

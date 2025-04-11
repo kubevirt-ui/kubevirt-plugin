@@ -54,23 +54,16 @@ const TreeViewContent: FC<TreeViewContentProps> = ({
     );
   }
 
+  const panelToggleButton = <PanelToggleButton isOpen={isOpen} toggleDrawer={toggleDrawer} />;
+
   if (!isOpen) {
-    return (
-      <PanelToggleButton
-        className="vms-tree-view__action"
-        isOpen={isOpen}
-        toggleDrawer={toggleDrawer}
-      />
-    );
+    return panelToggleButton;
   }
 
   return (
     <>
-      <TreeViewToolbar
-        closeComponent={<PanelToggleButton isOpen={isOpen} toggleDrawer={toggleDrawer} />}
-        isSwitchDisabled={isSwitchDisabled}
-        onSearch={onSearch}
-      />
+      {panelToggleButton}
+      <TreeViewToolbar isSwitchDisabled={isSwitchDisabled} onSearch={onSearch} />
       <DrawerHead className="vms-tree-view__header-section">
         <Content className="vms-tree-view__title" component="p">
           <TreeViewCollapseExpand setShowAll={setShowAll} showAll={showAll} />
