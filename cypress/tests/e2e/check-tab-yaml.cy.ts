@@ -7,14 +7,10 @@ import { navigateToConfigurationSubTab, subTabName, tab } from '../../views/tab'
 
 describe('Check all virtualization pages can be loaded', () => {
   before(() => {
-    cy.visit('');
+    cy.visitVMs();
   });
 
   describe('Check VirtualMachines page', () => {
-    it('visit VM list page', () => {
-      cy.visitVMs();
-    });
-
     it('start example vm', () => {
       cy.byLegacyTestID(Example).click();
       cy.get(sel.iconStartBtn, { timeout: MINUTE }).click();
