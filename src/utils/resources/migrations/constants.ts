@@ -4,7 +4,42 @@ import {
   K8sResourceCondition,
 } from '@openshift-console/dynamic-plugin-sdk';
 
-export type MigPlan = K8sResourceCommon & { spec: any; status?: { suffix: string } };
+export const MIGRATION_PHASES = {
+  Completed: 'Completed',
+  Failed: 'Failed',
+  InProgress: 'InProgress',
+  Pending: 'Pending',
+};
+
+export type PersistentVolumesMigPlan = {
+  capacity: string;
+  name: string;
+  proposedCapacity: string;
+  pvc: {
+    accessModes: string[];
+    name: string;
+    namespace: string;
+    volumeMode: string;
+  };
+  selection: {
+    action: 'copy' | 'skip';
+    copyMethod: string;
+    storageClass: string;
+  };
+  storageClass: string;
+  supported: {
+    actions: string[];
+    copyMethods: string[];
+  };
+};
+
+export type MigPlan = K8sResourceCommon & {
+  spec: {
+    [key: string]: any;
+    persistentVolumes?: PersistentVolumesMigPlan[];
+  };
+  status?: { conditions: K8sResourceCondition[]; suffix: string };
+};
 
 export const MigPlanModel: K8sModel = {
   abbr: 'MP',
@@ -32,6 +67,7 @@ export type MigMigration = K8sResourceCommon & {
   status?: {
     conditions?: K8sResourceCondition[];
     phase: string;
+    startTimestamp?: string;
   };
 };
 
@@ -58,11 +94,24 @@ export type LiveMigrationProgress = {
   vmNamespace: string;
 };
 
+export type PodProgress = {
+  lastObservedProgressPercent: string;
+  pvcRef: {
+    name: string;
+    namespace: string;
+  };
+  totalElapsedTime: string;
+};
+
 export type DirectVolumeMigration = K8sResourceCommon & {
   status?: {
+    failedLiveMigration?: LiveMigrationProgress[];
+    failedPods?: PodProgress[];
     phase: string;
     runningLiveMigration?: LiveMigrationProgress[];
+    runningPods?: PodProgress[];
     successfulLiveMigration?: LiveMigrationProgress[];
+    successfulPods?: PodProgress[];
   };
 };
 
@@ -82,3 +131,5 @@ export const MigMigrationStatuses = {
   Completed: 'Completed',
   Failed: 'Failed',
 };
+
+export const DEFAULT_MIGRATION_NAMESPACE = 'openshift-migration';

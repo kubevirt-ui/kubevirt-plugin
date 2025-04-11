@@ -1,28 +1,33 @@
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  DEFAULT_MIGRATION_NAMESPACE,
+  MigMigration,
+  MigMigrationModel,
+  MigPlan,
+  MigPlanModel,
+} from '@kubevirt-utils/resources/migrations/constants';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, k8sGet, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
-
-import { MigMigration, MigMigrationModel, MigPlan, MigPlanModel } from '../constants';
 
 const getEmptyMigPlan = (namespace: string): MigPlan => ({
   apiVersion: `${MigPlanModel.apiGroup}/${MigPlanModel.apiVersion}`,
   kind: MigPlanModel.kind,
   metadata: {
     name: `migplan-${getRandomChars()}`,
-    namespace: 'openshift-migration',
+    namespace: DEFAULT_MIGRATION_NAMESPACE,
   },
   spec: {
     destMigClusterRef: {
       name: 'host',
-      namespace: 'openshift-migration',
+      namespace: DEFAULT_MIGRATION_NAMESPACE,
     },
     liveMigrate: true,
     namespaces: [namespace],
     srcMigClusterRef: {
       name: 'host',
-      namespace: 'openshift-migration',
+      namespace: DEFAULT_MIGRATION_NAMESPACE,
     },
   },
 });
@@ -32,7 +37,7 @@ const getEmptyMigMigration = (migPlan: MigPlan): MigMigration => ({
   kind: MigMigrationModel.kind,
   metadata: {
     name: `migmigration-${migPlan?.status?.suffix || getRandomChars()}`,
-    namespace: 'openshift-migration',
+    namespace: DEFAULT_MIGRATION_NAMESPACE,
   },
   spec: {
     canceled: false,

@@ -12,7 +12,7 @@ import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
 import { ProgressVariant } from '@patternfly/react-core';
 
-import { MigMigrationStatuses } from '../constants';
+import { MigMigrationStatuses } from '../../../../../../utils/resources/migrations/constants';
 
 export const entireVMSelected = (selectedPVCs: IoK8sApiCoreV1PersistentVolumeClaim[]) =>
   selectedPVCs === null;

@@ -96,4 +96,9 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.telemetry/listener',
   } as EncodedExtension<TelemetryListener>,
+
+  {
+    properties: { handler: { $codeRef: 'kubevirtFlags.useStorageMigrationEnabled' } },
+    type: 'console.flag/hookProvider',
+  } as EncodedExtension<FeatureFlagHookProvider>,
 ];
