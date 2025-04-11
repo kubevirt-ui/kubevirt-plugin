@@ -17,7 +17,10 @@ import {
 import { CloseIcon, WarningTriangleIcon } from '@patternfly/react-icons';
 import { rollbackStorageMigration } from '@virtualmachines/actions/actions';
 
-import { MigMigration, MigMigrationModel } from './constants';
+import {
+  MigMigration,
+  MigMigrationModel,
+} from '../../../../../utils/resources/migrations/constants';
 
 type VirtualMachineMigrationRollbackProps = {
   migMigration?: MigMigration;

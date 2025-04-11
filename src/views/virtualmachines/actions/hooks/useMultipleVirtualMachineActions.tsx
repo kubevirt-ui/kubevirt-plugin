@@ -11,8 +11,8 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 import { isPaused, isRunning, isStopped } from '@virtualmachines/utils';
 
+import { MigPlanModel } from '../../../../utils/resources/migrations/constants';
 import { BulkVirtualMachineActionFactory } from '../BulkVirtualMachineActionFactory';
-import { MigPlanModel } from '../components/VirtualMachineMigration/constants';
 
 import { ACTIONS_ID } from './constants';
 

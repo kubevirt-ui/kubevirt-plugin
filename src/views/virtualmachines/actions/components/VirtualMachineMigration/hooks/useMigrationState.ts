@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 
-import { MigMigration } from '../constants';
+import { MigMigration } from '../../../../../../utils/resources/migrations/constants';
 import { migrateBulkVMs } from '../utils/migrateBulkVMs';
 import { migrateVM } from '../utils/migrateVM';
 
