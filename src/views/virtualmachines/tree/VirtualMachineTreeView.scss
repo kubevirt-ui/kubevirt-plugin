@@ -1,5 +1,5 @@
 .vms-tree-view {
-  overflow-x: hidden;
+  overflow: visible;
 
   .pf-v6-c-tree-view__list-item {
     position: relative;
@@ -22,18 +22,42 @@
     width: 100%;
   }
 
-  &__toolbar-top-panel {
-    align-items: center;
-    margin: var(--pf-t--global--spacer--sm) var(--pf-t--global--spacer--md) 0
-      var(--pf-t--global--spacer--sm);
-  }
-
   &__search-input {
-    width: 100%;
+    margin-top: var(--pf-t--global--spacer--sm);
+    margin-inline: var(--pf-t--global--spacer--md);
   }
 
   &__action {
     padding: var(--pf-t--global--spacer--sm);
+  }
+
+  &__panel-toggle-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    position: absolute;
+    right: -0.5rem;
+    top: 1.375rem;
+    z-index: var(--pf-t--global--z-index--2xl);
+    border: 1px solid var(--pf-t--global--icon--color--brand--default);
+    border-radius: 100%;
+    background: var(--pf-t--global--background--color--primary--default);
+
+    &:hover {
+      border-color: var(--pf-t--global--icon--color--brand--hover);
+
+      svg {
+        color: var(--pf-t--global--icon--color--brand--hover);
+      }
+    }
+
+    svg {
+      color: var(--pf-t--global--icon--color--brand--default);
+      width: 1rem;
+      height: 1rem;
+    }
   }
 
   &__header-section {

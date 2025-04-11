@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FC, ReactNode } from 'react';
+import React, { ChangeEvent, FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
@@ -18,16 +18,11 @@ import {
 import { HIDE, SHOW, SHOW_EMPTY_PROJECTS_KEY, TREE_VIEW_SEARCH_ID } from '../utils/constants';
 
 type TreeViewToolbarProps = {
-  closeComponent: ReactNode;
   isSwitchDisabled: boolean;
   onSearch: (event: ChangeEvent<HTMLInputElement>) => void;
 };
 
-const TreeViewToolbar: FC<TreeViewToolbarProps> = ({
-  closeComponent,
-  isSwitchDisabled,
-  onSearch,
-}) => {
+const TreeViewToolbar: FC<TreeViewToolbarProps> = ({ isSwitchDisabled, onSearch }) => {
   const { t } = useKubevirtTranslation();
   const [showEmptyProjects, setShowEmptyProjects] = useLocalStorage(SHOW_EMPTY_PROJECTS_KEY, HIDE);
 
@@ -36,17 +31,13 @@ const TreeViewToolbar: FC<TreeViewToolbarProps> = ({
       <ToolbarContent className="vms-tree-view-toolbar-content">
         <Stack className="vms-tree-view__toolbar-section" hasGutter>
           <StackItem>
-            <Split className="vms-tree-view__toolbar-top-panel" hasGutter>
-              <SplitItem className="vms-tree-view__search-input" isFilled>
-                <TreeViewSearch
-                  id={TREE_VIEW_SEARCH_ID}
-                  name={TREE_VIEW_SEARCH_ID}
-                  onSearch={onSearch}
-                  placeholder={t('Search')}
-                />
-              </SplitItem>
-              <SplitItem>{closeComponent}</SplitItem>
-            </Split>
+            <TreeViewSearch
+              className="vms-tree-view__search-input"
+              id={TREE_VIEW_SEARCH_ID}
+              name={TREE_VIEW_SEARCH_ID}
+              onSearch={onSearch}
+              placeholder={t('Search')}
+            />
           </StackItem>
           <Divider />
           <StackItem>
