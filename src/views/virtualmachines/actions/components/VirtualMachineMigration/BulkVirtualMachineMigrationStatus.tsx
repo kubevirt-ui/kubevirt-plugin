@@ -15,9 +15,13 @@ import {
 } from '@patternfly/react-core';
 import { CloseIcon } from '@patternfly/react-icons';
 
+import {
+  MigMigration,
+  MigMigrationStatuses,
+} from '../../../../../utils/resources/migrations/constants';
+
 import useProgressMigration from './hooks/useProgressMigration';
 import { getMigMigrationStatusLabel } from './utils/utils';
-import { MigMigration, MigMigrationStatuses } from './constants';
 import VirtualMachineMigrationRollback from './VirtualMachineMigrationRollback';
 
 type BulkVirtualMachineMigrationStatusProps = {

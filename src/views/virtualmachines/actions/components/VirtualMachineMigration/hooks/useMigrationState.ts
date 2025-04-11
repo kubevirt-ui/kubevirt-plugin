@@ -3,9 +3,8 @@ import { useState } from 'react';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 
-import { MigMigration } from '../constants';
+import { MigMigration } from '../../../../../../utils/resources/migrations/constants';
 import { migrateBulkVMs } from '../utils/migrateBulkVMs';
-import { migrateVM } from '../utils/migrateVM';
 
 type UseMigrationState = (
   vms: V1VirtualMachine[],
@@ -35,11 +34,9 @@ const useMigrationState: UseMigrationState = (
     setMigrationLoading(true);
     setMigrationError(null);
     try {
-      vms.length === 1
-        ? await migrateVM(vms?.[0], pvcsToMigrate, destinationStorageClass)
-        : setMigMigration(
-            await migrateBulkVMs(vms, namespacePVCs, pvcsToMigrate, destinationStorageClass),
-          );
+      setMigMigration(
+        await migrateBulkVMs(vms, namespacePVCs, pvcsToMigrate, destinationStorageClass),
+      );
 
       setMigrationStarted(true);
     } catch (apiError) {
