@@ -4,11 +4,6 @@ import { catalogNav } from '../../views/selector';
 import * as tView from '../../views/selector-template';
 
 describe('Test template list page', () => {
-  before(() => {
-    cy.visit('');
-    cy.switchToVirt();
-  });
-
   beforeEach(() => {
     cy.clickVirtLink(catalogNav);
     cy.visitTemplates();

@@ -1,5 +1,4 @@
 import { topConsumerCard } from '../../views/overview';
-import { Perspective, switchPerspective } from '../../views/perspective';
 import { tab } from '../../views/tab';
 
 const enum Card {
@@ -13,13 +12,11 @@ const enum Card {
 
 describe('Test Virtualization Top consumer tab', () => {
   before(() => {
-    cy.visit('');
-    switchPerspective(Perspective.Administrator);
+    cy.visitOverview();
+    tab.navigateToTopConsumers();
   });
 
   it('ID(CNV-9295) check data available for cpu, memory and storage', () => {
-    cy.visitOverview();
-    tab.navigateToTopConsumers();
     cy.get(topConsumerCard).eq(Card.CPU).should('not.contain', 'No data available');
     cy.get(topConsumerCard).eq(Card.Memory).should('not.contain', 'No data available');
     cy.get(topConsumerCard).eq(Card.Storage_throughput).should('not.contain', 'No data available');

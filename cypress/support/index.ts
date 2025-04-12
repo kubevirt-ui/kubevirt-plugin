@@ -4,6 +4,7 @@ import './nav.ts';
 import './project.ts';
 import './resource.ts';
 import './selectors.ts';
+import './commands.ts';
 
 declare global {
   namespace Cypress {

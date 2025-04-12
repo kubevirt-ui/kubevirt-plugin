@@ -25,7 +25,7 @@ module.exports = defineConfig({
   },
   retries: {
     openMode: 0,
-    runMode: 3,
+    runMode: 0,
   },
   screenshotOnRunFailure: true,
   screenshotsFolder: './gui-test-screenshots/screenshots/',
