@@ -2,10 +2,10 @@ import React, { FC, Ref, useRef } from 'react';
 import classNames from 'classnames';
 
 import { TopologyDataObject } from '@openshift-console/dynamic-plugin-sdk/lib/extensions/topology-types';
+import { BaseNode } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { Tooltip } from '@patternfly/react-core';
 import { VirtualMachineIcon } from '@patternfly/react-icons/dist/esm/icons/virtual-machine-icon';
 import {
-  BaseNode, // TODO Remove. This isn't the right version
   Node,
   NodeModel,
   observer,

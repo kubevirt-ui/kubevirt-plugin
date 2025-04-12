@@ -27,16 +27,14 @@ import {
 } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { getOSNameFromGuestAgent, useGuestOS } from '@kubevirt-utils/resources/vmi';
 import {
+  getGroupVersionKindForModel,
+  getGroupVersionKindForResource,
   K8sModel,
   ResourceLink,
   useAccessReview,
   useAnnotationsModal,
   useLabelsModal,
 } from '@openshift-console/dynamic-plugin-sdk';
-import {
-  getGroupVersionKindForModel,
-  getGroupVersionKindForResource,
-} from '@openshift-console/dynamic-plugin-sdk/lib/utils/k8s';
 import { getK8sModel } from '@openshift-console/dynamic-plugin-sdk/lib/utils/k8s/hooks/useK8sModel';
 import { Button } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';

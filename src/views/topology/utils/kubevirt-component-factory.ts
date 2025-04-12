@@ -3,6 +3,8 @@ import { ComponentType } from 'react';
 import {
   contextMenuActions,
   createConnectorCallback,
+  withContextMenu,
+  withCreateConnector,
   withEditReviewAccess,
 } from '@openshift-console/dynamic-plugin-sdk-internal';
 import {
@@ -10,8 +12,6 @@ import {
   NodeComponentProps,
   nodeDragSourceSpec,
   nodeDropTargetSpec,
-  withContextMenu, // TODO Remove this is not the correct version
-  withCreateConnector,
   withDndDrop,
   withDragNode,
   withSelection,
