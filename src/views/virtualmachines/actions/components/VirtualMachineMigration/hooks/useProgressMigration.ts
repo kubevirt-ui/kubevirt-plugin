@@ -10,7 +10,7 @@ import {
   LiveMigrationProgress,
   MigMigration,
   MigMigrationModel,
-} from '../constants';
+} from '../../../../../../utils/resources/migrations/constants';
 
 import { sortMigrationsProgresses } from './utils';
 

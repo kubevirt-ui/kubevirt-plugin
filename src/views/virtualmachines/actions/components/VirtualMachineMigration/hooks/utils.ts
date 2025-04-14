@@ -1,4 +1,4 @@
-import { LiveMigrationProgress } from '../constants';
+import { LiveMigrationProgress } from '../../../../../../utils/resources/migrations/constants';
 
 export const sortMigrationsProgresses = (
   a: LiveMigrationProgress,

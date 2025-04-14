@@ -135,7 +135,7 @@ export const columnSortingCompare = <T>(
   pagination: { [key: string]: any },
   compareFunction: (a: T, b: T) => number,
 ) => {
-  const { endIndex, startIndex } = pagination;
+  const { endIndex, startIndex } = pagination || { endIndex: data.length, startIndex: 0 };
   const predicate = (a: T, b: T) => {
     const { first, second } =
       direction === 'asc' ? { first: a, second: b } : { first: b, second: a };
