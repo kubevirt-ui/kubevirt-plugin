@@ -25,7 +25,7 @@ const SysprepInfo: FC = () => {
             )}
           </Content>
         </StackItem>
-        <StackItem className="text-muted">
+        <StackItem className="pf-v6-u-text-color-subtle">
           {t(
             'An answer file is an XML-based file that contains setting definitions and values to use during Windows Setup',
           )}{' '}

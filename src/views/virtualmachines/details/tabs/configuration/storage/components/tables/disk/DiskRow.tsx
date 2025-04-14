@@ -106,11 +106,7 @@ const DiskRow: FC<
       <TableData activeColumnIDs={activeColumnIDs} id="storage-class">
         {obj?.storageClass}
       </TableData>
-      <TableData
-        activeColumnIDs={activeColumnIDs}
-        className="dropdown-kebab-pf pf-v6-c-table__action"
-        id=""
-      >
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="">
         <DiskRowActions customize={customize} obj={obj} onDiskUpdate={onSubmit} vm={vm} vmi={vmi} />
       </TableData>
     </>

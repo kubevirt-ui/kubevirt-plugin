@@ -1,21 +1,4 @@
 .vm-catalog {
-  .co-catalog-page__header {
-    width: 100%;
-  }
-
-  .co-catalog-page__toolbar {
-    padding-top: 0px;
-  }
-
-  .co-catalog-page--with-sidebar {
-    padding-bottom: 0;
-    margin-top: var(--pf-t--global--spacer--md);
-  }
-
-  .co-catalog-page__tabs {
-    padding-bottom: var(--pf-t--global--spacer--sm);
-  }
-
   &-row-icon {
     width: var(--pf-t--global--spacer--xl);
     padding-right: var(--pf-t--global--spacer--sm);
@@ -28,10 +11,11 @@
 
   &-grid {
     padding: var(--pf-t--global--spacer--lg);
+  }
 
-    &-tile {
-      color: var(--pf-t--global--text--color--regular);
-    }
+  &-table-container {
+    padding: var(--pf-t--global--spacer--sm) var(--pf-t--global--spacer--lg)
+      var(--pf-t--global--spacer--lg);
   }
 
   .vm-catalog-grid-container,
@@ -41,8 +25,6 @@
     position: relative;
     height: 100%;
     overflow-y: auto;
-    border-top: 1px solid var(--pf-t--global--border--color--default);
-    border-left: 1px solid var(--pf-t--global--border--color--default);
   }
 
   .vm-catalog-grid-tile:hover {

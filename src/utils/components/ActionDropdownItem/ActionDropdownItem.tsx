@@ -57,7 +57,7 @@ const ActionDropdownItem: FC<ActionDropdownItemProps> = ({ action, setIsOpen }) 
       {action?.icon && (
         <>
           {' '}
-          <span className="text-muted">{action.icon}</span>
+          <span className="pf-v6-u-text-color-subtle">{action.icon}</span>
         </>
       )}
     </MenuItem>

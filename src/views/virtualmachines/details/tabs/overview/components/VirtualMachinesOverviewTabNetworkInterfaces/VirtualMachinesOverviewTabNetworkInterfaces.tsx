@@ -36,7 +36,7 @@ const VirtualMachinesOverviewTabInterfaces: FC<VirtualMachinesOverviewTabInterfa
   return (
     <div className="VirtualMachinesOverviewTabInterfaces--main">
       <Card>
-        <CardTitle className="text-muted">
+        <CardTitle className="pf-v6-u-text-color-subtle">
           <Link
             to={createURL(
               `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Network}`,

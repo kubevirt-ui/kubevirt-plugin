@@ -51,7 +51,7 @@ const VirtualMachinesOverviewTabActiveUser: FC<VirtualMachinesOverviewTabActiveU
 
   return (
     <Card>
-      <CardTitle className="text-muted">
+      <CardTitle className="pf-v6-u-text-color-subtle">
         {t('Active users ({{users}})', { users: userList?.length })}
       </CardTitle>
       <Divider />

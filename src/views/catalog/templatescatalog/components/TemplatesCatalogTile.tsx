@@ -75,7 +75,7 @@ export const TemplateTile: React.FC<TemplateTileProps> = React.memo(
               <StackItem>
                 <b>{displayName}</b>
               </StackItem>
-              <StackItem className="text-secondary">{template.metadata.name}</StackItem>
+              <StackItem className="pf-v6-u-text-color-subtle">{template.metadata.name}</StackItem>
             </Stack>
           }
           className="vm-catalog-grid-tile"

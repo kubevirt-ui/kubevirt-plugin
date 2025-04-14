@@ -47,7 +47,7 @@ const VirtualMachinesOverviewTabGeneral: FC<VirtualMachinesOverviewTabGeneralPro
   return (
     <div className="VirtualMachinesOverviewTabGeneral--main">
       <Card>
-        <CardTitle className="text-muted">{t('General')}</CardTitle>
+        <CardTitle className="pf-v6-u-text-color-subtle">{t('General')}</CardTitle>
         <Divider />
         <CardBody isFilled>
           <DescriptionList className="pf-v6-c-description-list" isHorizontal>

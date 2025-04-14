@@ -61,7 +61,7 @@ const useClusterInstancetypeListColumns: UseClusterInstancetypeListColumns = (pa
       },
       {
         id: '',
-        props: { className: 'dropdown-kebab-pf pf-v6-c-table__action' },
+        props: { className: 'pf-v6-c-table__action' },
         title: '',
       },
     ],

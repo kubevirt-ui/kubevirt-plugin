@@ -9,12 +9,12 @@ const TolerationModalDescriptionText: React.FC = () => {
   const { t } = useKubevirtTranslation();
   return (
     <>
-      <Content className="text-muted" component={ContentVariants.p}>
+      <Content className="pf-v6-u-text-color-subtle" component={ContentVariants.p}>
         {t(
           'Tolerations are applied to VirtualMachines, and allow (but do not require) the VirtualMachines to schedule onto Nodes with matching taints.',
         )}
       </Content>
-      <Content className="text-muted" component={ContentVariants.p}>
+      <Content className="pf-v6-u-text-color-subtle" component={ContentVariants.p}>
         {t(
           'Add tolerations to allow a VirtualMachine to schedule onto Nodes with matching taints.',
         )}

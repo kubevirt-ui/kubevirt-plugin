@@ -54,7 +54,7 @@ const CPUUtil: FC<CPUUtilProps> = ({ pods, vmi }) => {
         <div className="util-title">{t('CPU')}</div>
         <div className="util-summary" data-test-id="util-summary-cpu">
           <div className="util-summary-value">{`${isReady ? cpuUsage?.toFixed(2) : 0}m`}</div>
-          <div className="util-summary-text text-muted">
+          <div className="util-summary-text pf-v6-u-text-color-subtle">
             <div>{t('Requested of ')}</div>
             <div>{`${isReady ? cpuRequested?.toFixed(2) : 0}m`}</div>
           </div>

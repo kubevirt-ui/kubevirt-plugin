@@ -43,7 +43,7 @@ const VirtualMachinesOverviewTabSnapshots: React.FC<VirtualMachinesOverviewTabSn
       data-test-id="virtual-machine-overview-snapshots"
     >
       <Card>
-        <CardTitle className="text-muted">
+        <CardTitle className="pf-v6-u-text-color-subtle">
           <Link to={snapshotsTabLink}>
             {t('Snapshots ({{snapshots}})', { snapshots: snapshots.length || 0 })}
           </Link>

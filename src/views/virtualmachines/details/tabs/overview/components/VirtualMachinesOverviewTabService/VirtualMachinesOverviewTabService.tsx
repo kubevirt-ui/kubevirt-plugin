@@ -30,7 +30,7 @@ const VirtualMachinesOverviewTabService: FC<VirtualMachinesOverviewTabServicePro
 
   return (
     <Card>
-      <CardTitle className="text-muted">
+      <CardTitle className="pf-v6-u-text-color-subtle">
         {t('Services ({{services}})', { services: data?.length })}
       </CardTitle>
       <Divider />

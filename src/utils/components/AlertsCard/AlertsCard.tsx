@@ -113,7 +113,7 @@ const AlertsCard: FC<AlertsCardProps> = ({ className, isOverviewPage = false, so
         })}
         className="alerts-card__header"
       >
-        <CardTitle className="text-muted card-title">
+        <CardTitle className="pf-v6-u-text-color-subtle card-title">
           {t('Alerts ({{alertsQuantity}})', { alertsQuantity })}
         </CardTitle>
       </CardHeader>

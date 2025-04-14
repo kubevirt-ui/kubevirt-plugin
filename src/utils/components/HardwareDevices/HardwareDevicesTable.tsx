@@ -16,7 +16,8 @@ type HardwareDevicesTableProps = {
 const HardwareDevicesTable: React.FC<HardwareDevicesTableProps> = ({ devices }) => {
   const { t } = useKubevirtTranslation();
 
-  if (!devices?.length) return <span className="text-muted">{t('Not available')}</span>;
+  if (!devices?.length)
+    return <span className="pf-v6-u-text-color-subtle">{t('Not available')}</span>;
 
   return (
     <DescriptionList
