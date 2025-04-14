@@ -211,7 +211,6 @@ const createJob = (
           spec: {
             containers: [
               {
-                capabilities: { drop: ['ALL'] },
                 env: [
                   {
                     name: CONFIGMAP_NAMESPACE,
@@ -228,8 +227,6 @@ const createJob = (
                 ],
                 image: checkupImage,
                 name: VM_LATENCY_CHECKUP_SA,
-                runAsNonRoot: 'true',
-                seccompProfile: { type: 'RuntimeDefault' },
                 securityContext: { allowPrivilegeEscalation: false },
               },
             ],
