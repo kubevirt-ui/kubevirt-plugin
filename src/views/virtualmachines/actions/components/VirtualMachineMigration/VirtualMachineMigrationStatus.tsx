@@ -105,7 +105,7 @@ const VirtualMachineMigrationStatus: FC<VirtualMachineMigrationStatusProps> = ({
         </ActionListItem>
         {migrationLogURL && (
           <ActionListItem className="migration-status__view-report">
-            <ExternalLink href={migrationLogURL}>{t('View report')}</ExternalLink>
+            <ExternalLink href={migrationLogURL}>{t('View logs')}</ExternalLink>
           </ActionListItem>
         )}
       </ActionList>

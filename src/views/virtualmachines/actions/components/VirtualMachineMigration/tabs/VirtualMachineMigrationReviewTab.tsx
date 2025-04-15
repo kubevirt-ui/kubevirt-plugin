@@ -25,6 +25,7 @@ type VirtualMachineMigrationReviewTabProps = {
   migrationError: Error;
   pvcs: IoK8sApiCoreV1PersistentVolumeClaim[];
   vms: V1VirtualMachine[];
+  vmStorageClassNames: string[];
 };
 
 const VirtualMachineMigrationReviewTab: FC<VirtualMachineMigrationReviewTabProps> = ({
@@ -33,6 +34,7 @@ const VirtualMachineMigrationReviewTab: FC<VirtualMachineMigrationReviewTabProps
   migrationError,
   pvcs,
   vms,
+  vmStorageClassNames,
 }) => {
   const { t } = useKubevirtTranslation();
 
@@ -57,6 +59,12 @@ const VirtualMachineMigrationReviewTab: FC<VirtualMachineMigrationReviewTabProps
                 <strong>{t('Migration type')}</strong>
               </Td>
               <Td>{t('VirtualMachine storage')}</Td>
+            </Tr>
+            <Tr>
+              <Td width={30}>
+                <strong>{t('Source StorageClasses')}</strong>
+              </Td>
+              <Td>{vmStorageClassNames.join(', ')}</Td>
             </Tr>
             <Tr>
               <Td width={30}>
