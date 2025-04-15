@@ -22,66 +22,64 @@ export const addVolume = (vol: volData) => {
     uploadImage,
     volName,
   } = vol;
-  cy.get('#tab-modal').within(() => {
-    cy.wait(3000); // give seconds to wait for modal loaded
-    switch (sourceType) {
-      case 'Upload': {
-        cy.dropFile(uploadImage, uploadImage.split('/').pop(), iView.upload);
-        if (iso) {
-          cy.get('input[id="iso-checkbox"]').check();
-        }
-        break;
+  cy.wait(3000); // give seconds to wait for modal loaded
+  switch (sourceType) {
+    case 'Upload': {
+      cy.dropFile(uploadImage, uploadImage.split('/').pop(), iView.upload);
+      if (iso) {
+        cy.get('input[id="iso-checkbox"]').check();
       }
-      case 'Volume': {
-        cy.contains(iView.toggleText, 'Volume').click();
-        cy.get('.pf-v6-c-menu__list-item').eq(1).click();
-        cy.contains('.pf-v6-c-menu-toggle__text', '--- Select Volume project ---').click();
-        cy.get(`[data-test-id="select-option-${project}"]`).click();
-        cy.contains('.pf-v6-c-menu-toggle__text', '--- Select Volume name ---').click();
-        cy.get(`[data-test-id="${pvcName}"]`).click();
-        break;
-      }
-      case 'Volume snapshot': {
-        cy.contains(iView.toggleText, 'Volume').click();
-        cy.contains(iView.menuItemText, 'Volume snapshot').click();
-        cy.get('button[placeholder="--- Select VolumeSnapshot project ---"]').click();
-        cy.get('input[placeholder="--- Select VolumeSnapshot project ---"]').type('os-images');
-        cy.byLegacyTestID(index.OS_IMAGES_NS).click();
-        cy.wait(2000);
-        cy.contains(iView.toggleText, '--- Select VolumeSnapshot name ---').click();
-        cy.byButtonText(volName).click();
-        break;
-      }
-      case 'Registry': {
-        cy.contains(iView.toggleText, 'Volume').click();
-        cy.contains(iView.menuItemText, 'Registry').click();
-        cy.get(iView.registryURL)
-          .type(registryURL, { delay: 1000 })
-          .should('have.value', registryURL);
-        cy.get(iView.cronExp).type('0 0 * * 2');
-        break;
-      }
+      break;
     }
-    cy.wait(2000); // give a bit more time for volume present in the modal
-    cy.get(iView.volumeName).type(name);
-    // select preference
-    cy.contains(iView.toggleText, iView.selectPreferenceText).click();
-    cy.get(iView.searchPreference).type(preference);
-    cy.get(iView.preferenceValue(preference)).click();
-    // select instanceType
-    cy.contains(iView.toggleText, iView.selectInstanceText).click();
-    cy.contains(iView.menuItemText, 'Red Hat provided').click();
-    cy.contains(iView.menuItemText, 'U series').click();
-    if (instanceType) {
-      cy.contains(iView.menuItemText, instanceType).click();
-    } else {
-      cy.contains(iView.menuItemText, 'nano:').click();
+    case 'Volume': {
+      cy.contains(iView.toggleText, 'Volume').click();
+      cy.get('.pf-v6-c-menu__list-item').eq(1).click();
+      cy.contains('.pf-v6-c-menu-toggle__text', '--- Select Volume project ---').click();
+      cy.get(`[data-test-id="select-option-${project}"]`).click();
+      cy.contains('.pf-v6-c-menu-toggle__text', '--- Select Volume name ---').click();
+      cy.get(`[data-test-id="${pvcName}"]`).click();
+      break;
     }
-    cy.get(iView.description).scrollIntoView().type(`Test volume from ${sourceType}`); // file description
-    cy.clickSaveBtn();
-    cy.wait(60000);
-    cy.contains(iView.modalTitle, iView.modalTitleText).should('not.exist');
-  });
+    case 'Volume snapshot': {
+      cy.contains(iView.toggleText, 'Volume').click();
+      cy.contains(iView.menuItemText, 'Volume snapshot').click();
+      cy.get('button[placeholder="--- Select VolumeSnapshot project ---"]').click();
+      cy.get('input[placeholder="--- Select VolumeSnapshot project ---"]').type('os-images');
+      cy.byLegacyTestID(index.OS_IMAGES_NS).click();
+      cy.wait(2000);
+      cy.contains(iView.toggleText, '--- Select VolumeSnapshot name ---').click();
+      cy.byButtonText(volName).click();
+      break;
+    }
+    case 'Registry': {
+      cy.contains(iView.toggleText, 'Volume').click();
+      cy.contains(iView.menuItemText, 'Registry').click();
+      cy.get(iView.registryURL)
+        .type(registryURL, { delay: 1000 })
+        .should('have.value', registryURL);
+      cy.get(iView.cronExp).type('0 0 * * 2');
+      break;
+    }
+  }
+  cy.wait(2000); // give a bit more time for volume present in the modal
+  cy.get(iView.volumeName).type(name);
+  // select preference
+  cy.contains(iView.toggleText, iView.selectPreferenceText).click();
+  cy.get(iView.searchPreference).type(preference);
+  cy.get(iView.preferenceValue(preference)).click();
+  // select instanceType
+  cy.contains(iView.toggleText, iView.selectInstanceText).click();
+  cy.contains(iView.menuItemText, 'Red Hat provided').click();
+  cy.contains(iView.menuItemText, 'U series').click();
+  if (instanceType) {
+    cy.contains(iView.menuItemText, instanceType).click();
+  } else {
+    cy.contains(iView.menuItemText, 'nano:').click();
+  }
+  cy.get(iView.description).scrollIntoView().type(`Test volume from ${sourceType}`); // file description
+  cy.clickSaveBtn();
+  cy.wait(60000);
+  cy.contains(iView.modalTitle, iView.modalTitleText).should('not.exist');
 };
 
 export const delVolume = (name: string) => {
