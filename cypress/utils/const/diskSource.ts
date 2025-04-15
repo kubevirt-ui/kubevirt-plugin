@@ -244,6 +244,6 @@ export const templateDisks: Disk[] = [
   // urlDisk,
 ];
 
-export const vmDisks: Disk[] = [blankDisk, ephemeralDisk, cloneDisk /*, registryDisk*/];
+export const vmDisks: Disk[] = [blankDisk, ephemeralDisk /*, cloneDisk, registryDisk*/];
 
 export const vmDisks1: Disk[] = [evDisk /*, uploadDisk, urlDisk */];

@@ -29,15 +29,6 @@ fi
 
 yarn run $yarn_script
 
-echo "=========================================================================================="
-echo " 1 H WAIT STARTED 1 H WAIT STARTED 1 H WAIT STARTED 1 H WAIT STARTED 1 H WAIT STARTED 1 H "
-echo "=========================================================================================="
-
-sleep 1h
-
-echo "==========================================================================================="
-echo " 1 H WAIT ENDED 1 H WAIT ENDED 1 H WAIT ENDED 1 H WAIT ENDED 1 H WAIT ENDED 1 H WAIT ENDED "
-echo "==========================================================================================="
 
 # Generate Cypress report.
 yarn run cypress-postreport
