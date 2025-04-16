@@ -14,6 +14,8 @@ import { ProgressVariant } from '@patternfly/react-core';
 
 import { MigMigrationStatuses } from '../../../../../../utils/resources/migrations/constants';
 
+import { PVC_BOUND_STATUS } from './constants';
+
 export const entireVMSelected = (selectedPVCs: IoK8sApiCoreV1PersistentVolumeClaim[]) =>
   selectedPVCs === null;
 
@@ -60,7 +62,8 @@ export const getProgressVariantByMigMigrationStatus = (
 };
 
 export const isPVCMigratable = (pvc: IoK8sApiCoreV1PersistentVolumeClaim) =>
-  pvc?.spec?.accessModes?.includes(V1beta1StorageSpecAccessModesEnum.ReadWriteMany);
+  pvc?.spec?.accessModes?.includes(V1beta1StorageSpecAccessModesEnum.ReadWriteMany) &&
+  pvc?.status?.phase === PVC_BOUND_STATUS;
 
 export const isDiskMigratable = (disk: V1Disk) => !disk?.shareable;
 

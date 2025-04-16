@@ -50,7 +50,7 @@ export const getTableDiskData = (
   vms: V1VirtualMachine[],
   pvcs: IoK8sApiCoreV1PersistentVolumeClaim[],
 ) => {
-  if (isEmpty(vms) || isEmpty(pvcs)) {
+  if (isEmpty(vms)) {
     return [];
   }
 

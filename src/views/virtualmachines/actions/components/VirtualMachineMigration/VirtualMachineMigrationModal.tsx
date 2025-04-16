@@ -18,7 +18,6 @@ import VirtualMachineMigrationDetails from './tabs/VirtualMachineMigrationDetail
 import VirtualMachineMigrationReviewTab from './tabs/VirtualMachineMigrationReviewTab';
 import { entireVMSelected, getMigratableVMPVCs } from './utils/utils';
 import BulkVirtualMachineMigrationStatus from './BulkVirtualMachineMigrationStatus';
-import VirtualMachineMigrationStatus from './VirtualMachineMigrationStatus';
 
 import './virtual-machine-migration-modal.scss';
 
@@ -84,15 +83,9 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
     >
       <ModalBody>
         <StateHandler error={loadingError} loaded>
-          {migrationStarted && migMigration && (
+          {migrationStarted ? (
             <BulkVirtualMachineMigrationStatus migMigration={migMigration} onClose={onClose} />
-          )}
-
-          {migrationStarted && isEmpty(migMigration) && (
-            <VirtualMachineMigrationStatus onClose={onClose} vm={vms?.[0]} />
-          )}
-
-          {!migrationStarted && (
+          ) : (
             <Wizard
               header={
                 <WizardHeader

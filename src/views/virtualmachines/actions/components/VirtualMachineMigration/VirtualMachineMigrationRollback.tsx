@@ -1,7 +1,6 @@
 import React, { FC, useState } from 'react';
 import { Trans } from 'react-i18next';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -15,7 +14,6 @@ import {
   Title,
 } from '@patternfly/react-core';
 import { CloseIcon, WarningTriangleIcon } from '@patternfly/react-icons';
-import { rollbackStorageMigration } from '@virtualmachines/actions/actions';
 
 import {
   MigMigration,
@@ -26,14 +24,12 @@ type VirtualMachineMigrationRollbackProps = {
   migMigration?: MigMigration;
   onClose: () => void;
   onContinue: () => void;
-  vm?: V1VirtualMachine;
 };
 
 const VirtualMachineMigrationRollback: FC<VirtualMachineMigrationRollbackProps> = ({
   migMigration,
   onClose,
   onContinue,
-  vm,
 }) => {
   const { t } = useKubevirtTranslation();
   const [loadingRollback, setLoadingRollback] = useState(false);
@@ -43,13 +39,14 @@ const VirtualMachineMigrationRollback: FC<VirtualMachineMigrationRollbackProps> 
     setLoadingRollback(true);
 
     try {
-      vm
-        ? await rollbackStorageMigration(vm)
-        : await k8sPatch({
-            data: [{ op: 'replace', path: '/spec/rollback', value: 'true' }],
-            model: MigMigrationModel,
-            resource: migMigration,
-          });
+      await k8sPatch({
+        data: [
+          { op: 'replace', path: '/spec/rollback', value: 'true' },
+          { op: 'remove', path: '/spec/migrateState' },
+        ],
+        model: MigMigrationModel,
+        resource: migMigration,
+      });
       onClose();
     } catch (apiError) {
       setErrorRollback(errorRollback);
