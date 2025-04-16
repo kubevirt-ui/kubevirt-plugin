@@ -59,7 +59,9 @@ const VirtualMachineNavigator: FC = () => {
     <>
       <ListPageHeader title={t('VirtualMachines')}>
         <SearchBar />
-        <VirtualMachinesCreateButton namespace={namespace} />
+        <div>
+          <VirtualMachinesCreateButton namespace={namespace} />
+        </div>
       </ListPageHeader>
       <Divider />
       <VirtualMachineTreeView onFilterChange={onFilterChange} {...treeProps}>

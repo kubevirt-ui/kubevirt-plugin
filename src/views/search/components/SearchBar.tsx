@@ -22,16 +22,18 @@ import {
   Stack,
   StackItem,
   Tooltip,
-  Toolbar,
-  ToolbarContent,
-  ToolbarGroup,
-  ToolbarItem,
+  InputGroup,
+  Menu,
+  MenuToggle,
+  InputGroupItem,
 } from '@patternfly/react-core';
-import { SearchPlusIcon } from '@patternfly/react-icons';
+import { FilterIcon } from '@patternfly/react-icons';
 import debounce from 'lodash/debounce';
 import { useNavigate } from 'react-router-dom-v5-compat';
 import { useVirtualMachineSearchSuggestions } from '@virtualmachines/search/hooks/useVirtualMachineSearchSuggestions';
 import AdvancedSearchModal, { AdvancedSearchInputs } from './AdvancedSearchModal';
+
+import './search-bar.scss';
 
 export type SearchSuggestResult = {
   resources: { name: string; namespace?: string }[];
@@ -132,6 +134,7 @@ const SearchBar: FC<SearchBarProps> = () => {
     <SearchInput
       value={searchQuery}
       onChange={onSearchInputChange}
+      onClick={() => searchQuery && setIsSearchSuggestBoxOpen(true)}
       onClear={onSearchInputClear}
       placeholder={t('Search VirtualMachines')}
       ref={searchInputRef}
@@ -149,8 +152,13 @@ const SearchBar: FC<SearchBarProps> = () => {
   const suggestMatchesBy = searchSuggestResult?.resourcesMatching ?? { description: 0 };
 
   const searchSuggestBox = (
-    <div ref={searchSuggestBoxRef} role="dialog" aria-label={t('Search suggest box')}>
-      <Panel variant="bordered">
+    <Menu
+      className="pf-v6-u-pt-0"
+      ref={searchSuggestBoxRef}
+      role="dialog"
+      aria-label={t('Search suggest box')}
+    >
+      <Panel>
         <PanelHeader>
           <Button
             variant="link"
@@ -164,55 +172,57 @@ const SearchBar: FC<SearchBarProps> = () => {
         </PanelHeader>
         <Divider />
         <PanelMain>
-          <PanelMainBody>
-            {isSearchInProgress && (
-              <EmptyState
-                titleText="Loading results"
-                icon={Spinner}
-                variant="sm"
-                headingLevel="h4"
-              />
-            )}
-            {!isSearchInProgress && (
-              <Stack hasGutter>
-                {suggestResources.length > 0 &&
-                  suggestResources.map(({ name, namespace }, index) => (
-                    <StackItem key={`${index}_${name}`}>
-                      {/* TODO: add prop to ResourceLink to highlight specific text */}
-                      <ResourceLink
-                        groupVersionKind={VirtualMachineModelGroupVersionKind}
-                        name={name}
-                        namespace={namespace}
-                        hideIcon
-                      />
+          {isSearchInProgress && (
+            <EmptyState titleText="Loading results" icon={Spinner} variant="sm" headingLevel="h4" />
+          )}
+          {!isSearchInProgress && (
+            <>
+              <PanelMainBody>
+                <Stack hasGutter>
+                  {suggestResources.length > 0 &&
+                    suggestResources.map(({ name, namespace }, index) => (
+                      <StackItem key={`${index}_${name}`}>
+                        {/* TODO: add prop to ResourceLink to highlight specific text */}
+                        <ResourceLink
+                          groupVersionKind={VirtualMachineModelGroupVersionKind}
+                          name={name}
+                          namespace={namespace}
+                          hideIcon
+                        />
+                      </StackItem>
+                    ))}
+                  {suggestResources.length === 0 && (
+                    <StackItem>
+                      {t('No results matching name "{{searchQuery}}"', { searchQuery })}
                     </StackItem>
-                  ))}
-                {suggestResources.length === 0 && (
+                  )}
+                </Stack>
+              </PanelMainBody>
+              <Divider />
+              <PanelMainBody>
+                <Stack hasGutter>
                   <StackItem>
-                    {t('No results matching name "{{searchQuery}}"', { searchQuery })}
+                    <strong>{t('More suggestions')}</strong>
                   </StackItem>
-                )}
-                <StackItem>
-                  <strong>{t('More suggestions')}</strong>
-                </StackItem>
-                <StackItem>
-                  {t('Description')}
-                  <Button
-                    variant="link"
-                    size="sm"
-                    onClick={() => {
-                      showSearchModal({ description: searchQuery });
-                    }}
-                  >
-                    {t('({{count}})', { count: suggestMatchesBy.description })}
-                  </Button>
-                </StackItem>
-              </Stack>
-            )}
-          </PanelMainBody>
+                  <StackItem>
+                    {t('Description')}
+                    <Button
+                      variant="link"
+                      size="sm"
+                      onClick={() => {
+                        showSearchModal({ description: searchQuery });
+                      }}
+                    >
+                      {t('({{count}})', { count: suggestMatchesBy.description })}
+                    </Button>
+                  </StackItem>
+                </Stack>
+              </PanelMainBody>
+            </>
+          )}
         </PanelMain>
         <Divider />
-        <PanelFooter>
+        <PanelFooter className="pf-v6-u-pt-md">
           <Button
             variant="secondary"
             size="sm"
@@ -224,40 +234,34 @@ const SearchBar: FC<SearchBarProps> = () => {
           </Button>
         </PanelFooter>
       </Panel>
-    </div>
+    </Menu>
   );
 
   return (
-    <Toolbar id="vm-search-toolbar" isFullHeight>
-      <ToolbarContent toolbarId="vm-search-toolbar">
-        <ToolbarGroup>
-          <ToolbarItem>
-            <Popper
-              trigger={searchInput}
-              triggerRef={searchInputRef}
-              popper={searchSuggestBox}
-              popperRef={searchSuggestBoxRef}
-              isVisible={isSearchSuggestBoxOpen}
-              appendTo={getSearchInputElement}
-              enableFlip={false}
-            />
-          </ToolbarItem>
-        </ToolbarGroup>
-        <ToolbarGroup variant="action-group-plain">
-          <ToolbarItem>
-            <Tooltip content={t('Advanced search')}>
-              <Button
-                icon={<SearchPlusIcon />}
-                variant="plain"
-                onClick={() => {
-                  showSearchModal();
-                }}
-              />
-            </Tooltip>
-          </ToolbarItem>
-        </ToolbarGroup>
-      </ToolbarContent>
-    </Toolbar>
+    <InputGroup className="vm-search-bar pf-v6-u-mr-md">
+      <Popper
+        trigger={searchInput}
+        triggerRef={searchInputRef}
+        popper={searchSuggestBox}
+        popperRef={searchSuggestBoxRef}
+        isVisible={isSearchSuggestBoxOpen}
+        appendTo={getSearchInputElement}
+        enableFlip={false}
+        onDocumentClick={() => setIsSearchSuggestBoxOpen(false)}
+      />
+      <Tooltip content={t('Advanced search')}>
+        <Button
+          icon={<FilterIcon />}
+          variant="control"
+          onClick={() => {
+            showSearchModal();
+          }}
+        />
+      </Tooltip>
+      <InputGroupItem>
+        <MenuToggle>{t('Saved searches')}</MenuToggle>
+      </InputGroupItem>
+    </InputGroup>
   );
 };
 
