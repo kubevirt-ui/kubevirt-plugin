@@ -37,17 +37,20 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
   vm,
 }) => {
   const { t } = useKubevirtTranslation();
-
-  const { loaded, loadError, nads } = useNADsData(vm?.metadata?.namespace || namespace);
+  const vmiNamespace = vm?.metadata?.namespace || namespace;
+  const { loaded, loadError, nads } = useNADsData(vmiNamespace);
 
   const currentlyUsedNADsNames = useMemo(
     () => getNetworks(vm)?.map((network) => network?.multus?.networkName),
     [vm],
   );
 
-  const filteredNADs = nads?.filter(
-    (nad) => !currentlyUsedNADsNames?.includes(`${getNamespace(nad)}/${getName(nad)}`),
-  );
+  const filteredNADs = nads
+    ?.filter((nad) => !currentlyUsedNADsNames?.includes(`${getNamespace(nad)}/${getName(nad)}`))
+    .filter(
+      (nad) =>
+        getNamespace(nad) !== vmiNamespace || !currentlyUsedNADsNames?.includes(getName(nad)),
+    );
 
   const selectedFirstOnLoad = useRef(false);
 
@@ -67,11 +70,12 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
     const options = filteredNADs?.map((nad) => {
       const { name, namespace: nadNamespace, uid } = nad?.metadata;
       const type = getNadType(nad);
-      const value = `${nadNamespace}/${name}`;
+      const displayedValue = `${nadNamespace}/${name}`;
+      const value = nadNamespace === vmiNamespace ? name : displayedValue;
       return {
         children: (
           <>
-            {value} <Label isCompact>{getNadType(nad)} Binding</Label>
+            {displayedValue} <Label isCompact>{getNadType(nad)} Binding</Label>
           </>
         ),
         key: uid,
@@ -93,7 +97,7 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
       });
     }
     return options;
-  }, [isPodNetworkingOptionExists, filteredNADs, podNetworkingText]);
+  }, [isPodNetworkingOptionExists, filteredNADs, podNetworkingText, vmiNamespace]);
 
   const validated =
     canCreateNetworkInterface || isEditing ? ValidatedOptions.default : ValidatedOptions.error;
