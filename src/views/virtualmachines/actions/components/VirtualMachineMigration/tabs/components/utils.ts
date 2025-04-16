@@ -6,7 +6,7 @@ import { getPrintableDiskDrive } from '@kubevirt-utils/resources/vm/utils/disk/s
 import { convertToBaseValue, humanizeBinaryBytes } from '@kubevirt-utils/utils/humanize.js';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
-import { getVolumePVC, isDiskMigratable, isPVCMigratable } from '../../utils/utils';
+import { getVolumePVC } from '../../utils/utils';
 
 export type MigrationDisksTableData = {
   drive: string;
@@ -32,7 +32,7 @@ const getDiskData = (
 
   return {
     drive: getPrintableDiskDrive(volumeDisk),
-    isSelectable: isDiskMigratable(volumeDisk) && !isEmpty(volumePVC) && isPVCMigratable(volumePVC),
+    isSelectable: !isEmpty(volumePVC),
     name: volume.name,
     pvc: volumePVC,
     size: pvcSize?.value === 0 ? NO_DATA_DASH : pvcSize?.string,
@@ -50,7 +50,7 @@ export const getTableDiskData = (
   vms: V1VirtualMachine[],
   pvcs: IoK8sApiCoreV1PersistentVolumeClaim[],
 ) => {
-  if (isEmpty(vms) || isEmpty(pvcs)) {
+  if (isEmpty(vms)) {
     return [];
   }
 

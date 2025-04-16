@@ -5,16 +5,13 @@ import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdo
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { CONFIRM_VM_ACTIONS, TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
-import { modelToGroupVersionKind } from '@kubevirt-utils/models';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 import { isPaused, isRunning, isStopped } from '@virtualmachines/utils';
 
-import { MigPlanModel } from '../../../../utils/resources/migrations/constants';
 import { BulkVirtualMachineActionFactory } from '../BulkVirtualMachineActionFactory';
 
 import { ACTIONS_ID } from './constants';
+import useIsMTCInstalled from './useIsMTCInstalled';
 
 type UseMultipleVirtualMachineActions = (vms: V1VirtualMachine[]) => ActionDropdownItemType[];
 
@@ -23,9 +20,7 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms)
   const { featureEnabled: confirmVMActionsEnabled } = useFeatures(CONFIRM_VM_ACTIONS);
   const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
 
-  const [migPlan] = useK8sModel(modelToGroupVersionKind(MigPlanModel));
-
-  const mtcInstalled = !isEmpty(migPlan);
+  const mtcInstalled = useIsMTCInstalled();
 
   return useMemo(() => {
     const namespaces = new Set(vms?.map((vm) => getNamespace(vm)));

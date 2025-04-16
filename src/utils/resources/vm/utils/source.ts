@@ -141,3 +141,12 @@ export const vmBootDiskSourceIsRegistry = (vm: V1VirtualMachine) => {
   const rootDataVolumeTemplateSpec = getRootDataVolumeTemplateSpec(vm);
   return Boolean(rootDataVolumeTemplateSpec?.spec?.source?.registry);
 };
+
+export const getVMPVCNames = (vm: V1VirtualMachine) =>
+  getVolumes(vm)?.reduce((acc, volume) => {
+    const pvcName = volume.persistentVolumeClaim?.claimName || volume.dataVolume?.name;
+    if (pvcName) {
+      acc.push(pvcName);
+    }
+    return acc;
+  }, [] as string[]);

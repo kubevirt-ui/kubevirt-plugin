@@ -51,7 +51,7 @@ const getEmptyMigMigration = (migPlan: MigPlan): MigMigration => ({
   },
 });
 
-export const migrateBulkVMs = async (
+export const migrateVMs = async (
   vms: V1VirtualMachine[],
   namespacePVCs: IoK8sApiCoreV1PersistentVolumeClaim[],
   selectedPVCs: IoK8sApiCoreV1PersistentVolumeClaim[],

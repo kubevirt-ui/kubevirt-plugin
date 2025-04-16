@@ -1,15 +1,14 @@
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import {
-  V1beta1StorageSpecAccessModesEnum,
-  V1Disk,
   V1VirtualMachine,
   V1VirtualMachineInstanceMigration,
   V1Volume,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
+import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ProgressVariant } from '@patternfly/react-core';
 
 import { MigMigrationStatuses } from '../../../../../../utils/resources/migrations/constants';
@@ -59,11 +58,6 @@ export const getProgressVariantByMigMigrationStatus = (
   return null;
 };
 
-export const isPVCMigratable = (pvc: IoK8sApiCoreV1PersistentVolumeClaim) =>
-  pvc?.spec?.accessModes?.includes(V1beta1StorageSpecAccessModesEnum.ReadWriteMany);
-
-export const isDiskMigratable = (disk: V1Disk) => !disk?.shareable;
-
 export const getVolumePVC = (volume: V1Volume, pvcs: IoK8sApiCoreV1PersistentVolumeClaim[]) =>
   pvcs?.find(
     (pvc) =>
@@ -77,8 +71,7 @@ export const getMigratableVMPVCs = (
 ): IoK8sApiCoreV1PersistentVolumeClaim[] => {
   return getVolumes(vm)?.reduce((acc, volume) => {
     const pvc = getVolumePVC(volume, pvcs);
-    const volumeDisk = getDisks(vm)?.find((disk) => disk.name === volume.name);
-    if (isPVCMigratable(pvc) && isDiskMigratable(volumeDisk)) {
+    if (!isEmpty(pvc)) {
       acc.push(pvc);
     }
 
