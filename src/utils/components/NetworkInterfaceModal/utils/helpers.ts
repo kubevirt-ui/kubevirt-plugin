@@ -3,7 +3,6 @@ import produce from 'immer';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1Interface, V1Network, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { NetworkInterfaceState } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/types';
-import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   getAutoAttachPodInterface,
@@ -115,8 +114,7 @@ export const createNetwork = (nicName: string, networkName: string): V1Network =
   };
 
   if (!networkNameStartWithPod(networkName) && networkName) {
-    const [namespace, name] = networkName?.split('/');
-    network.multus = { networkName: namespace === DEFAULT_NAMESPACE ? networkName : name };
+    network.multus = { networkName };
   } else {
     network.pod = {};
   }
