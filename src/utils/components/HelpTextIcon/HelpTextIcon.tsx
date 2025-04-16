@@ -2,7 +2,7 @@ import * as React from 'react';
 import { FC, ReactNode } from 'react';
 import classNames from 'classnames';
 
-import { Popover, PopoverPosition } from '@patternfly/react-core';
+import { Icon, IconSize, Popover, PopoverPosition } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
 
 import './HelpTextIcon.scss';
@@ -12,6 +12,7 @@ type HelpTextIconProps = {
   className?: string;
   helpIconClassName?: string;
   position?: PopoverPosition;
+  size?: IconSize;
 };
 
 const HelpTextIcon: FC<HelpTextIconProps> = ({
@@ -19,9 +20,12 @@ const HelpTextIcon: FC<HelpTextIconProps> = ({
   className = 'help-text-icon__popover',
   helpIconClassName = '',
   position = PopoverPosition.top,
+  size,
 }) => (
   <Popover aria-label={'Help'} bodyContent={bodyContent} className={className} position={position}>
-    <HelpIcon className={classNames('help-icon__cursor', helpIconClassName)} />
+    <Icon size={size}>
+      <HelpIcon className={classNames('help-icon__cursor', helpIconClassName)} />
+    </Icon>
   </Popover>
 );
 

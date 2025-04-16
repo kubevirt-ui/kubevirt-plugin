@@ -60,7 +60,7 @@ export const workloadTH = 'th[data-label="Workload profile"]';
 export const bootsourceTH = 'th[data-label="Boot source"]';
 export const cpuTH = 'th[data-label="CPU | Memory"]';
 export const vmCount = '.pf-v6-c-menu-toggle__text > b';
-export const kebabBtn = '.pf-v6-c-table__td.dropdown-kebab-pf.pf-v6-c-table__action';
+export const kebabBtn = '.pf-v6-c-table__td.pf-v6-c-table__action';
 export const selectDropdownToggle = '[data-ouia-component-id="BulkSelect-toggle"]';
 export const selectAllDropdownOption = '[data-ouia-component-id="BulkSelect-select-all"]';
 

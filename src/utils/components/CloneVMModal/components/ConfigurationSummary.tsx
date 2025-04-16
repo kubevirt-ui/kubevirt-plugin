@@ -41,7 +41,7 @@ const ConfigurationSummary: FC<ConfigurationSummaryProps> = ({ vm }) => {
 
   return (
     <FormGroup fieldId="configuration" hasNoPaddingTop label={t('Configuration')}>
-      <Content className="text-muted" component={ContentVariants.dt}>
+      <Content className="pf-v6-u-text-color-subtle" component={ContentVariants.dt}>
         {t('Operating system')}
       </Content>
 
@@ -53,13 +53,13 @@ const ConfigurationSummary: FC<ConfigurationSummaryProps> = ({ vm }) => {
         <InstanceTypeConfiguration itMatcher={itMatcher} />
       ) : (
         <>
-          <Content className="text-muted" component={ContentVariants.dt}>
+          <Content className="pf-v6-u-text-color-subtle" component={ContentVariants.dt}>
             {t('Flavor')}
           </Content>
           <Content component={ContentVariants.dd}>
             <CPUMemory vm={vm} vmi={vmi} />
           </Content>
-          <Content className="text-muted" component={ContentVariants.dt}>
+          <Content className="pf-v6-u-text-color-subtle" component={ContentVariants.dt}>
             {t('Workload profile')}
           </Content>
           <Content component={ContentVariants.dd}>
@@ -69,16 +69,16 @@ const ConfigurationSummary: FC<ConfigurationSummaryProps> = ({ vm }) => {
           </Content>
         </>
       )}
-      <Content className="text-muted" component={ContentVariants.dt}>
+      <Content className="pf-v6-u-text-color-subtle" component={ContentVariants.dt}>
         {t('NICs')}
       </Content>
       <Content component={ContentVariants.dd}>
         {(interfaces || [])?.map(({ model, name }) => (
           <div key={name}>{model ? `${name} - ${model}` : name}</div>
         ))}
-        {isEmpty(interfaces) && <span className="text-muted">None</span>}
+        {isEmpty(interfaces) && <span className="pf-v6-u-text-color-subtle">None</span>}
       </Content>
-      <Content className="text-muted" component={ContentVariants.dt}>
+      <Content className="pf-v6-u-text-color-subtle" component={ContentVariants.dt}>
         {t('Disks')}
       </Content>
       <Content component={ContentVariants.dd}>

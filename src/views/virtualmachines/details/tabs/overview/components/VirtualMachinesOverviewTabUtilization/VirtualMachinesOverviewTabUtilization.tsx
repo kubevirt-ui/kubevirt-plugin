@@ -43,7 +43,7 @@ const VirtualMachinesOverviewTabUtilization: FC<VirtualMachinesOverviewTabUtiliz
   return (
     <Card className="VirtualMachinesOverviewTabUtilization--main">
       <div className="title">
-        <CardTitle className="text-muted">
+        <CardTitle className="pf-v6-u-text-color-subtle">
           <DescriptionListTermHelpText>
             <Popover
               bodyContent={

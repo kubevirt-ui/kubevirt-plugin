@@ -13,7 +13,11 @@ const WorkloadProfile: React.FC<WorkloadProfileProps> = ({ annotations }) => {
   const { t } = useKubevirtTranslation();
   const workloadProfile = annotations?.[VM_WORKLOAD_ANNOTATION];
 
-  return <div>{workloadProfile ?? <div className="text-muted">{t('Not available')} </div>}</div>;
+  return (
+    <div>
+      {workloadProfile ?? <div className="pf-v6-u-text-color-subtle">{t('Not available')} </div>}
+    </div>
+  );
 };
 
 export default WorkloadProfile;

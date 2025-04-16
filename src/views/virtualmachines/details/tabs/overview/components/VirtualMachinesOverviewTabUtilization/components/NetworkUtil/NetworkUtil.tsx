@@ -75,9 +75,9 @@ const NetworkUtil: React.FC<NetworkUtilProps> = ({ vmi }) => {
                       {networkInterface?.name}
                     </Link>
                     {networkInterface?.name === networkInterfaceTotal ? (
-                      <div className="text-muted">{`${networkInterfaceTotal} MBps`}</div>
+                      <div className="pf-v6-u-text-color-subtle">{`${networkInterfaceTotal} MBps`}</div>
                     ) : (
-                      <div className="text-muted">
+                      <div className="pf-v6-u-text-color-subtle">
                         {networkTotal?.data?.result?.map(
                           (name) =>
                             name?.metric?.interface === networkInterface?.name &&
@@ -111,14 +111,14 @@ const NetworkUtil: React.FC<NetworkUtilProps> = ({ vmi }) => {
 
         <div className="util-summary" data-test-id="util-summary-network-transfer">
           <div className="util-summary-value">{`${totalTransferred}ps`}</div>
-          <div className="util-summary-text text-muted network-value">
+          <div className="util-summary-text pf-v6-u-text-color-subtle network-value">
             <div>{t('Total')}</div>
           </div>
         </div>
       </div>
       <ComponentReady isReady={isReady}>
         <div className="network-metrics">
-          <div className="network-metrics--row text-muted">
+          <div className="network-metrics--row pf-v6-u-text-color-subtle">
             <div className="network-metrics--row__sum">
               {`${xbytes(networkInData || 0, {
                 fixed: 0,
@@ -126,7 +126,7 @@ const NetworkUtil: React.FC<NetworkUtilProps> = ({ vmi }) => {
             </div>
             <div className="network-metrics--row__title">{t('In')}</div>
           </div>
-          <div className="network-metrics--row text-muted">
+          <div className="network-metrics--row pf-v6-u-text-color-subtle">
             <div className="network-metrics--row__sum">
               {`${xbytes(networkOutData || 0, {
                 fixed: 0,

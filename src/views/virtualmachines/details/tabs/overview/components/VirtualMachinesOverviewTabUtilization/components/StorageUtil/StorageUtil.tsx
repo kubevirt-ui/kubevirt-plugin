@@ -41,7 +41,7 @@ const StorageUtil: FC<StorageUtilProps> = ({ vmi }) => {
           <div className="util-summary-value">
             {xbytes(usedBytes || 0, { fixed: 2, iec: true })}
           </div>
-          <div className="util-summary-text text-muted">
+          <div className="util-summary-text pf-v6-u-text-color-subtle">
             <div>{t('Used of ')}</div>
             <div>{xbytes(totalBytes || 0, { fixed: 2, iec: true })}</div>
           </div>

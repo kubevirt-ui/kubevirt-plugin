@@ -55,10 +55,16 @@ const EnvironmentForm: FC<EnvironmentFormProps> = ({ onEditChange, updateVM, vm 
       <Form className="environment-form__form">
         {environments.length !== 0 && (
           <div className="row pairs-list__heading">
-            <div className="col-xs-5 text-secondary text-uppercase" id="environment-name-header">
+            <div
+              className="col-xs-5 pf-v6-u-text-color-subtle text-uppercase"
+              id="environment-name-header"
+            >
               {t('config map / secret / service account')}
             </div>
-            <div className="col-xs-5 text-secondary text-uppercase" id="environment-serial-header">
+            <div
+              className="col-xs-5 pf-v6-u-text-color-subtle text-uppercase"
+              id="environment-serial-header"
+            >
               {t('Serial Number')}
             </div>
             <div className="col-xs-1 co-empty__header" />

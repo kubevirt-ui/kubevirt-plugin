@@ -8,7 +8,7 @@ import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { logTemplateFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
 import { TEMPLATE_SELECTED } from '@kubevirt-utils/extensions/telemetry/utils/constants';
-import { Stack, Toolbar, ToolbarContent } from '@patternfly/react-core';
+import { Card, Flex, FlexItem, PageSection, Stack } from '@patternfly/react-core';
 
 import { TemplatesCatalogDrawer } from './components/TemplatesCatalogDrawer/TemplatesCatalogDrawer';
 import { TemplatesCatalogEmptyState } from './components/TemplatesCatalogEmptyState';
@@ -44,42 +44,42 @@ const TemplatesCatalog: FC<TemplatesCatalogProps> = ({ currentTab }) => {
   useHideDeprecatedTemplateTiles(currentTab, onFilterChange);
 
   return (
-    <Stack className="vm-catalog" hasGutter>
+    <PageSection className="vm-catalog">
       {loaded ? (
-        <div className="co-catalog-page co-catalog-page--with-sidebar">
-          <TemplatesCatalogFilters filters={filters} onFilterChange={onFilterChange} />
-          <Stack className="co-catalog-page__content">
-            <Toolbar inset={{ default: 'insetNone' }} isSticky>
-              <ToolbarContent>
+        <Card className="pf-v6-u-pt-md">
+          <Flex flexWrap={{ default: 'nowrap' }}>
+            <TemplatesCatalogFilters filters={filters} onFilterChange={onFilterChange} />
+            <FlexItem grow={{ default: 'grow' }}>
+              <Stack className="co-catalog-page__content">
                 <TemplatesCatalogHeader
                   filters={filters}
                   itemCount={filteredTemplates.length}
                   onFilterChange={onFilterChange}
                 />
-              </ToolbarContent>
-            </Toolbar>
-            {filteredTemplates?.length > 0 ? (
-              <TemplatesCatalogItems
-                onTemplateClick={(template) => {
-                  clearSessionStorageVM();
-                  setSelectedTemplate(template);
-                  logTemplateFlowEvent(TEMPLATE_SELECTED, template);
-                }}
-                availableDatasources={availableDatasources}
-                availableTemplatesUID={availableTemplatesUID}
-                bootSourcesLoaded={bootSourcesLoaded}
-                filters={filters}
-                loaded={loaded}
-                templates={filteredTemplates}
-              />
-            ) : (
-              <TemplatesCatalogEmptyState
-                bootSourcesLoaded={bootSourcesLoaded}
-                onClearFilters={clearAll}
-              />
-            )}
-          </Stack>
-        </div>
+                {filteredTemplates?.length > 0 ? (
+                  <TemplatesCatalogItems
+                    onTemplateClick={(template) => {
+                      clearSessionStorageVM();
+                      setSelectedTemplate(template);
+                      logTemplateFlowEvent(TEMPLATE_SELECTED, template);
+                    }}
+                    availableDatasources={availableDatasources}
+                    availableTemplatesUID={availableTemplatesUID}
+                    bootSourcesLoaded={bootSourcesLoaded}
+                    filters={filters}
+                    loaded={loaded}
+                    templates={filteredTemplates}
+                  />
+                ) : (
+                  <TemplatesCatalogEmptyState
+                    bootSourcesLoaded={bootSourcesLoaded}
+                    onClearFilters={clearAll}
+                  />
+                )}
+              </Stack>
+            </FlexItem>
+          </Flex>
+        </Card>
       ) : (
         skeletonCatalog
       )}
@@ -89,7 +89,7 @@ const TemplatesCatalog: FC<TemplatesCatalogProps> = ({ currentTab }) => {
         onClose={() => setSelectedTemplate(undefined)}
         template={selectedTemplate}
       />
-    </Stack>
+    </PageSection>
   );
 };
 

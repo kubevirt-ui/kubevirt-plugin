@@ -24,7 +24,7 @@ const BaseTemplate: React.FC<BaseTemplateProps> = ({ template }) => {
             {...baseTemplate}
           />
         ) : (
-          <Content className="text-muted" component="p">
+          <Content className="pf-v6-u-text-color-subtle" component="p">
             {t('Not available')}
           </Content>
         )

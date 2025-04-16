@@ -11,7 +11,7 @@ const DynamicSSHKeyInjectionDescription = ({ isDynamicSSHInjectionEnabled }) => 
   if (isDynamicSSHInjectionEnabled) return <>{t('Store the key in a project secret.')}</>;
 
   return (
-    <StackItem className="text-muted">
+    <StackItem className="pf-v6-u-text-color-subtle">
       {t('Dynamic SSH key injection is not enabled in this virtual machine.')}{' '}
       <Button
         component="a"

@@ -22,7 +22,7 @@ export const selectPVCNS = '--- Select PVC project ---';
 export const PVCNSValue = (name: string) => `[data-test-id="${name}"]`;
 export const selectPVCName = '--- Select PVC name ---';
 export const PVCNameValue = (name: string) => `[data-test-id="${name}"]`;
-export const delBtn = '.pf-v6-c-table__td.dropdown-kebab-pf.pf-v6-c-table__action';
+export const delBtn = '.pf-v6-c-table__td.pf-v6-c-table__action';
 export const searchBtn = 'input[type="search"]';
 export const qsDrawer = '[data-qs="qs-step-intro"]';
 

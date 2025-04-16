@@ -43,7 +43,7 @@ const VirtualMachinesOverviewTabHardwareDevices: React.FC<
   return (
     <div className="VirtualMachinesOverviewTabHardware--main">
       <Card>
-        <CardTitle className="text-muted">
+        <CardTitle className="pf-v6-u-text-color-subtle">
           {t('Hardware devices ({{devices}})', { devices: hostDevicesCount + gpusCount })}
         </CardTitle>
         <Divider />

@@ -18,7 +18,7 @@ const InstanceTypeConfiguration: FC<InstanceTypeConfigurationProps> = ({ itMatch
 
   return (
     <>
-      <Content className="text-muted" component={ContentVariants.dt}>
+      <Content className="pf-v6-u-text-color-subtle" component={ContentVariants.dt}>
         {t('InstanceType')}
       </Content>
 

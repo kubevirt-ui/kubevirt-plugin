@@ -25,7 +25,10 @@ const AlertStatusItem: React.FC<AlertStatusItemProps> = ({ alertDetails, alertTy
       </div>
       <div className="alert-item__text">
         <div className="alert-item__message">
-          <div className="alert-item__header alert-item__text text-secondary" data-test="timestamp">
+          <div
+            className="alert-item__header alert-item__text pf-v6-u-text-color-subtle"
+            data-test="timestamp"
+          >
             <span className="co-resource-item__resource-name">
               {isVMAlert && (
                 <span className="co-m-resource-icon co-m-resource-icon--md alert-item__resource-icon">

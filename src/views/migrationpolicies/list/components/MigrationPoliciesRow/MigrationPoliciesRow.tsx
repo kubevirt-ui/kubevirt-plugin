@@ -54,11 +54,7 @@ const MigrationPoliciesRow: React.FC<RowProps<V1alpha1MigrationPolicy>> = ({
         selector={mp?.spec?.selectors?.virtualMachineInstanceSelector}
       />
     </TableData>
-    <TableData
-      activeColumnIDs={activeColumnIDs}
-      className="dropdown-kebab-pf pf-v6-c-table__action"
-      id=""
-    >
+    <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="">
       <MigrationPoliciesActions isKebabToggle mp={mp} />
     </TableData>
   </>

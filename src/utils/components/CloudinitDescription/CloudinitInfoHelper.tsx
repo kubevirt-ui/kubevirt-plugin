@@ -15,7 +15,7 @@ const CloudInitInfoHelper = () => {
         )}
       </StackItem>
       <StackItem>
-        <div className="text-muted">
+        <div className="pf-v6-u-text-color-subtle">
           {t('The cloud-init service is enabled by default in Fedora and RHEL images.')}{' '}
           <Button
             icon={<ExternalLinkSquareAltIcon />}

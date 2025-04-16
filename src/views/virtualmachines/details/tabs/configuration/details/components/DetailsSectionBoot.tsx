@@ -60,7 +60,7 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
     >
       <VirtualMachineDescriptionItem
         descriptionData={
-          <div className={classNames({ 'text-muted': !canUpdateVM })}>
+          <div className={classNames({ 'pf-v6-u-text-color-subtle': !canUpdateVM })}>
             {getBootloaderTitleFromVM(instanceTypeVM || vm, preferredBootmode)}
           </div>
         }

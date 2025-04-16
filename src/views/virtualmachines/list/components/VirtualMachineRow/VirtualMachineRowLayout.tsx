@@ -100,11 +100,7 @@ const VirtualMachineRowLayout: FC<
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="storageclassname">
         {storageClasses?.join(', ') || NO_DATA_DASH}
       </TableData>
-      <TableData
-        activeColumnIDs={activeColumnIDs}
-        className="dropdown-kebab-pf pf-v6-c-table__action"
-        id=""
-      >
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="">
         <VirtualMachineActions actions={actions} isKebabToggle />
       </TableData>
     </>

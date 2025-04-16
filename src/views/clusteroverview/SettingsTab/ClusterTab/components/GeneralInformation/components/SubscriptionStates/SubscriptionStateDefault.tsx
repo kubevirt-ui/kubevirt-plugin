@@ -13,7 +13,7 @@ const SubscriptionStateDefault: React.FC<SubscriptionStateDefaultProps> = ({ sub
   const { t } = useKubevirtTranslation();
 
   return (
-    <span className={cn({ 'text-muted': isEmpty(subscription?.status?.state) })}>
+    <span className={cn({ 'pf-v6-u-text-color-subtle': isEmpty(subscription?.status?.state) })}>
       {subscription?.status?.state || t('Unknown failure')}
     </span>
   );

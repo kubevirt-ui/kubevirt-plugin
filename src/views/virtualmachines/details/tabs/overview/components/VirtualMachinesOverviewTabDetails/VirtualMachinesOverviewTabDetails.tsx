@@ -97,7 +97,7 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
   return (
     <div className="VirtualMachinesOverviewTabDetails--details">
       <Card>
-        <CardTitle className="text-muted card-title">
+        <CardTitle className="pf-v6-u-text-color-subtle card-title">
           <Link
             to={createURL(
               `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Details}`,

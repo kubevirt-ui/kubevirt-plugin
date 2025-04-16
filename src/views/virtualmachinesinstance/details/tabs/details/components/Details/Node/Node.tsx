@@ -13,7 +13,7 @@ const Node: React.FC<NodeProps> = ({ nodeName }) => {
   return nodeName ? (
     <ResourceLink kind={NodeModel.kind} name={nodeName} />
   ) : (
-    <div className="text-muted">{t('Not available')} </div>
+    <div className="pf-v6-u-text-color-subtle">{t('Not available')} </div>
   );
 };
 

@@ -68,7 +68,7 @@ const CheckupsNetworkListEmptyState = ({ isPermitted, nadsInNamespace }) => {
           </Button>
         </EmptyStateActions>
         {!nadsInNamespace && (
-          <p className="CheckupsNetworkListEmptyState--title__namespace text-muted">
+          <p className="CheckupsNetworkListEmptyState--title__namespace pf-v6-u-text-color-subtle">
             {t('Add a NetworkAttachmentDefinition to this namespace in order to use checkups')}
           </p>
         )}

@@ -90,7 +90,7 @@ const VirtualMachinesOverviewTabSnapshotsRow: FC<VirtualMachinesOverviewTabSnaps
             </DescriptionListTermHelpTextButton>
           </Popover>
         </DescriptionListTermHelpText>
-        <span className="text-muted timestamp">{`(${timestamp})`}</span>
+        <span className="pf-v6-u-text-color-subtle timestamp">{`(${timestamp})`}</span>
       </div>
       <Dropdown
         isOpen={isKebabOpen}

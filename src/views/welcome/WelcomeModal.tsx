@@ -50,7 +50,10 @@ const WelcomeModal: FC = () => {
                 <Title headingLevel="h2">Welcome to</Title>
                 <Title headingLevel="h1">OpenShift Virtualization</Title>
 
-                <Content className="text-muted WelcomeModal__text" component={ContentVariants.p}>
+                <Content
+                  className="pf-v6-u-text-color-subtle WelcomeModal__text"
+                  component={ContentVariants.p}
+                >
                   Use OpenShift Virtualization to run and manage virtualized workloads alongside
                   container workloads. You can manage both Linux and Windows virtual machines.
                 </Content>

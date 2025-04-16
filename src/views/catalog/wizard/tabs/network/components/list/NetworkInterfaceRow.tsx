@@ -43,11 +43,7 @@ const NetworkInterfaceRow: FC<
       <TableData activeColumnIDs={activeColumnIDs} id="macAddress">
         {iface.macAddress || NO_DATA_DASH}
       </TableData>
-      <TableData
-        activeColumnIDs={activeColumnIDs}
-        className="dropdown-kebab-pf pf-v6-c-table__action"
-        id=""
-      >
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="">
         <NetworkInterfaceActions
           nicName={network?.name}
           nicPresentation={{ iface, network }}
