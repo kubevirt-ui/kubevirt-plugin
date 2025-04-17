@@ -6,7 +6,7 @@ import { getProjectOptions } from '@kubevirt-utils/components/ProjectDropdown/ut
 import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
-type ProjectDropdownProps = {
+export type ProjectDropdownProps = {
   includeAllProjects?: boolean;
   onChange: (project: string) => void;
   selectedProject: string;

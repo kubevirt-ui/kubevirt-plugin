@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 
+import { LabelsEditor } from '@kubevirt-utils/components/LabelsEditor/LabelsEditor';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Operator } from '@openshift-console/dynamic-plugin-sdk-internal/lib/api/common-types';
 import { Button, ButtonVariant, GridItem, TextInput } from '@patternfly/react-core';
@@ -7,8 +8,6 @@ import { MinusCircleIcon } from '@patternfly/react-icons';
 import { SimpleSelect } from '@patternfly/react-templates';
 
 import { AffinityLabel } from '../../../../utils/types';
-
-import { AffinityEditRowValues } from './AffinityEditRowValues';
 
 type AffinityExpressionRowProps = {
   expression: AffinityLabel;
@@ -66,7 +65,7 @@ const AffinityExpressionRow: FC<AffinityExpressionRowProps> = ({
         />
       </GridItem>
       <GridItem span={5}>
-        <AffinityEditRowValues
+        <LabelsEditor
           isHidden={!enableValueField}
           onClear={() => onChange({ ...expression, values: [] })}
           onSelect={onSelectValues}
