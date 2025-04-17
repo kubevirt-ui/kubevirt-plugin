@@ -1,4 +1,7 @@
-import React, { FC, useState, useCallback, useEffect, useRef } from 'react';
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom-v5-compat';
+import debounce from 'lodash/debounce';
+
 import {
   VirtualMachineModelGroupVersionKind,
   VirtualMachineModelRef,
@@ -7,31 +10,32 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import {
-  SearchInput,
-  SearchInputProps,
-  Popper,
+  Button,
+  Divider,
+  EmptyState,
+  InputGroup,
+  InputGroupItem,
+  Menu,
+  MenuToggle,
   Panel,
-  PanelHeader,
   PanelFooter,
+  PanelHeader,
   PanelMain,
   PanelMainBody,
-  Divider,
-  Button,
-  EmptyState,
+  Popper,
+  SearchInput,
+  SearchInputProps,
   Spinner,
   Stack,
   StackItem,
   Tooltip,
-  InputGroup,
-  Menu,
-  MenuToggle,
-  InputGroupItem,
 } from '@patternfly/react-core';
-import { FilterIcon } from '@patternfly/react-icons';
-import debounce from 'lodash/debounce';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import SlidersHIcon from '@patternfly/react-icons/dist/esm/icons/sliders-h-icon';
 import { useVirtualMachineSearchSuggestions } from '@virtualmachines/search/hooks/useVirtualMachineSearchSuggestions';
-import AdvancedSearchModal, { AdvancedSearchInputs } from './AdvancedSearchModal';
+
+import AdvancedSearchModal, {
+  AdvancedSearchInputs,
+} from './AdvancedSearchModal/AdvancedSearchModal';
 
 import './search-bar.scss';
 
@@ -40,13 +44,15 @@ export type SearchSuggestResult = {
   resourcesMatching: Record<'description', number>;
 };
 
-type SearchBarProps = {};
-
-const urlEncodeSearchInputs = ({ name, namespace, description }: AdvancedSearchInputs) => {
+const urlEncodeSearchInputs = ({
+  description,
+  name,
+  projects: namespaces,
+}: AdvancedSearchInputs) => {
   const result: string[] = [];
 
   result.push(name ? `${name}` : '');
-  result.push(namespace ? `ns=${namespace}` : '');
+  result.push(namespaces ? `ns=${namespaces.join(',')}` : '');
   result.push(description ? `ds=${description}` : '');
 
   return result
@@ -55,7 +61,7 @@ const urlEncodeSearchInputs = ({ name, namespace, description }: AdvancedSearchI
     .join('+');
 };
 
-const SearchBar: FC<SearchBarProps> = () => {
+const SearchBar: FC = () => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const navigate = useNavigate();
@@ -117,12 +123,12 @@ const SearchBar: FC<SearchBarProps> = () => {
       // TODO: hide suggest box before opening modal?
       createModal(({ isOpen, onClose }) => (
         <AdvancedSearchModal
-          isOpen={isOpen}
-          onClose={onClose}
           onSubmit={(searchInputs) => {
             navigateToSearchResults(searchInputs);
             onClose();
           }}
+          isOpen={isOpen}
+          onClose={onClose}
           prefillInputs={prefillInputs}
         />
       ));
@@ -132,13 +138,13 @@ const SearchBar: FC<SearchBarProps> = () => {
 
   const searchInput = (
     <SearchInput
-      value={searchQuery}
+      id="vm-search-input"
       onChange={onSearchInputChange}
-      onClick={() => searchQuery && setIsSearchSuggestBoxOpen(true)}
       onClear={onSearchInputClear}
+      onClick={() => searchQuery && setIsSearchSuggestBoxOpen(true)}
       placeholder={t('Search VirtualMachines')}
       ref={searchInputRef}
-      id="vm-search-input"
+      value={searchQuery}
     />
   );
 
@@ -153,19 +159,19 @@ const SearchBar: FC<SearchBarProps> = () => {
 
   const searchSuggestBox = (
     <Menu
+      aria-label={t('Search suggest box')}
       className="pf-v6-u-pt-0"
       ref={searchSuggestBoxRef}
       role="dialog"
-      aria-label={t('Search suggest box')}
     >
       <Panel>
         <PanelHeader>
           <Button
-            variant="link"
-            size="sm"
             onClick={() => {
               navigateToSearchResults({ name: searchQuery });
             }}
+            size="sm"
+            variant="link"
           >
             <strong>{t('All search results for "{{searchQuery}}"', { searchQuery })}</strong>
           </Button>
@@ -173,7 +179,7 @@ const SearchBar: FC<SearchBarProps> = () => {
         <Divider />
         <PanelMain>
           {isSearchInProgress && (
-            <EmptyState titleText="Loading results" icon={Spinner} variant="sm" headingLevel="h4" />
+            <EmptyState headingLevel="h4" icon={Spinner} titleText="Loading results" variant="sm" />
           )}
           {!isSearchInProgress && (
             <>
@@ -185,9 +191,9 @@ const SearchBar: FC<SearchBarProps> = () => {
                         {/* TODO: add prop to ResourceLink to highlight specific text */}
                         <ResourceLink
                           groupVersionKind={VirtualMachineModelGroupVersionKind}
+                          hideIcon
                           name={name}
                           namespace={namespace}
-                          hideIcon
                         />
                       </StackItem>
                     ))}
@@ -207,11 +213,11 @@ const SearchBar: FC<SearchBarProps> = () => {
                   <StackItem>
                     {t('Description')}
                     <Button
-                      variant="link"
-                      size="sm"
                       onClick={() => {
                         showSearchModal({ description: searchQuery });
                       }}
+                      size="sm"
+                      variant="link"
                     >
                       {t('({{count}})', { count: suggestMatchesBy.description })}
                     </Button>
@@ -224,11 +230,13 @@ const SearchBar: FC<SearchBarProps> = () => {
         <Divider />
         <PanelFooter className="pf-v6-u-pt-md">
           <Button
-            variant="secondary"
-            size="sm"
             onClick={() => {
               showSearchModal();
             }}
+            icon={<SlidersHIcon />}
+            iconPosition="end"
+            size="sm"
+            variant="secondary"
           >
             {t('Advanced search')}
           </Button>
@@ -240,22 +248,22 @@ const SearchBar: FC<SearchBarProps> = () => {
   return (
     <InputGroup className="vm-search-bar pf-v6-u-mr-md">
       <Popper
-        trigger={searchInput}
-        triggerRef={searchInputRef}
-        popper={searchSuggestBox}
-        popperRef={searchSuggestBoxRef}
-        isVisible={isSearchSuggestBoxOpen}
         appendTo={getSearchInputElement}
         enableFlip={false}
+        isVisible={isSearchSuggestBoxOpen}
         onDocumentClick={() => setIsSearchSuggestBoxOpen(false)}
+        popper={searchSuggestBox}
+        popperRef={searchSuggestBoxRef}
+        trigger={searchInput}
+        triggerRef={searchInputRef}
       />
       <Tooltip content={t('Advanced search')}>
         <Button
-          icon={<FilterIcon />}
-          variant="control"
           onClick={() => {
             showSearchModal();
           }}
+          icon={<SlidersHIcon />}
+          variant="control"
         />
       </Tooltip>
       <InputGroupItem>
