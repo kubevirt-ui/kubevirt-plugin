@@ -54,7 +54,7 @@ type VirtualMachinesOverviewTabDetailsProps = {
   instanceTypeExpandedSpec: V1VirtualMachine;
   loaded: boolean;
   vm: Fleet<V1VirtualMachine>;
-  vmi: V1VirtualMachineInstance;
+  vmi: Fleet<V1VirtualMachineInstance>;
 };
 
 const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsProps> = ({

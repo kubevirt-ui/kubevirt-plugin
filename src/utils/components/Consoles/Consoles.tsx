@@ -8,8 +8,8 @@ import { getGPUDevices, isHeadlessMode } from '@kubevirt-utils/resources/vm';
 import { isWindows } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { RFBCreate } from '@novnc/novnc/lib/rfb';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Bullseye, Flex, FlexItem, Stack, StackItem } from '@patternfly/react-core';
+import { Fleet, useFleetK8sWatchResource } from '@stolostron/multicluster-sdk';
 
 import { AccessConsoles } from './components/AccessConsoles/AccessConsoles';
 import CloudInitCredentials from './components/CloudInitCredentials/CloudInitCredentials';
@@ -28,7 +28,7 @@ import './consoles.scss';
 type ConsolesProps = {
   consoleContainerClass?: string;
   isStandAlone?: boolean;
-  vmi: V1VirtualMachineInstance;
+  vmi: Fleet<V1VirtualMachineInstance>;
 };
 
 const Consoles: FC<ConsolesProps> = ({ consoleContainerClass, isStandAlone, vmi }) => {
@@ -36,7 +36,8 @@ const Consoles: FC<ConsolesProps> = ({ consoleContainerClass, isStandAlone, vmi 
   const [type, setType] = useState<string>(VNC_CONSOLE_TYPE);
   const [rfb, setRFB] = useState<RFBCreate>(null);
   const [serialSocket, setSerialSocket] = useState<WSFactoryExtends>(null);
-  const [vm] = useK8sWatchResource<V1VirtualMachine>({
+  const [vm] = useFleetK8sWatchResource<V1VirtualMachine>({
+    cluster: vmi?.cluster,
     groupVersionKind: VirtualMachineModelGroupVersionKind,
     name: vmi?.metadata?.name,
     namespace: vmi?.metadata?.namespace,

@@ -1,9 +1,9 @@
 import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import Loading from '@kubevirt-utils/components/Loading/Loading';
 import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
 import useInstanceTypeExpandSpec from '@kubevirt-utils/resources/vm/hooks/useInstanceTypeExpandSpec';
-import { Loading } from '@patternfly/quickstarts';
 import { Bullseye } from '@patternfly/react-core';
 import { Fleet, FleetSupport, ResourceTabComponent } from '@stolostron/multicluster-sdk';
 
