@@ -1,5 +1,5 @@
 import { VirtualMachineData } from '../../types/vm';
-import { cloneDisk, DiskSource, vmDisks } from '../../utils/const/diskSource';
+import { blankDisk, cloneDisk, DiskSource, ephemeralDisk } from '../../utils/const/diskSource';
 import { TEST_NS } from '../../utils/const/index';
 import { TEMPLATE } from '../../utils/const/template';
 import { yamlEditor } from '../../views/selector-common';
@@ -9,7 +9,7 @@ import { tab } from '../../views/tab';
 import { vm } from '../../views/vm-flow';
 
 const CUST_VM: VirtualMachineData = {
-  disks: vmDisks,
+  disks: [blankDisk, ephemeralDisk],
   iType: 'u1.medium',
   name: 'vm-customized-it',
   namespace: TEST_NS,
@@ -49,16 +49,16 @@ describe('Test Catalog', () => {
   });
 
   it('test CLI and YAML in instanceTypes tab', () => {
-    cy.contains('tr.pf-m-clickable', 'centos-stream10').click();
+    cy.contains('tr.pf-m-clickable', 'centos-stream9').click();
     cy.contains('U series').click();
     cy.byButtonText('medium').click();
-    cy.contains(listGroup, 'Operating system').should('contain', 'CentOS Stream 10');
+    cy.contains(listGroup, 'Operating system').should('contain', 'CentOS Stream 9');
     cy.contains(listGroup, 'InstanceType').should('contain', 'u1.medium');
     cy.byButtonText('YAML & CLI').click();
     cy.get('.pf-v6-c-modal-box__body').within(() => {
       cy.byButtonText('CLI').click();
       cy.contains(yamlEditor, 'virtctl create vm')
-        .should('contain', '--preference=centos.stream10')
+        .should('contain', '--preference=centos.stream9')
         .and('contain', '--instancetype=u1.medium');
     });
     cy.get(closeButton).click({ force: true });
