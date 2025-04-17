@@ -1,6 +1,7 @@
 import { IoK8sApiCoreV1Pod } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { Fleet } from '@stolostron/multicluster-sdk';
 
 /**
  * Get if the pod is in a ready status
@@ -20,7 +21,7 @@ export const isPodReady = (pod): boolean =>
  * @param {K8sResourceCommon[]} pods - The pods to check
  * @returns {*}
  */
-export const getVMIPod = (vmi: V1VirtualMachineInstance, pods: IoK8sApiCoreV1Pod[]) => {
+export const getVMIPod = (vmi: V1VirtualMachineInstance, pods: Fleet<IoK8sApiCoreV1Pod>[]) => {
   if (!pods || !vmi) {
     return null;
   }
