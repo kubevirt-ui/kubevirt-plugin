@@ -43,5 +43,3 @@ const labels2types: LabelMap = Object.fromEntries(
 
 export const interfaceTypesProxy = new Proxy<TypeMap>(types2labels, typeHandler);
 export const interfaceLabelsProxy = new Proxy<LabelMap>(labels2types, labelHandler);
-
-export const PRIMARY_UDN_BINDING = 'primary-udn-kubevirt-binding';
