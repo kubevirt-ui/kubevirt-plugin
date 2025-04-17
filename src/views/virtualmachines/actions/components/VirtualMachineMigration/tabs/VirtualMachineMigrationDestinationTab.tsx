@@ -4,13 +4,14 @@ import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFi
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, StorageClassModel } from '@kubevirt-utils/models';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
-import { Content, ContentVariants, Stack, StackItem, Title } from '@patternfly/react-core';
+import { Content, ContentVariants, Label, Stack, StackItem, Title } from '@patternfly/react-core';
 
 type VirtualMachineMigrationDestinationTabProps = {
   defaultStorageClassName: string;
   destinationStorageClass: string;
   setSelectedStorageClass: Dispatch<SetStateAction<string>>;
   sortedStorageClasses: string[];
+  vmStorageClassNames: string[];
 };
 
 const StorageClassModelGroupVersionKind = modelToGroupVersionKind(StorageClassModel);
@@ -20,6 +21,7 @@ const VirtualMachineMigrationDestinationTab: FC<VirtualMachineMigrationDestinati
   destinationStorageClass,
   setSelectedStorageClass,
   sortedStorageClasses,
+  vmStorageClassNames,
 }) => {
   const { t } = useKubevirtTranslation();
   return (
@@ -41,7 +43,8 @@ const VirtualMachineMigrationDestinationTab: FC<VirtualMachineMigrationDestinati
                   linkTo={false}
                   name={storageClass}
                 />
-                {defaultStorageClassName === storageClass ? t('(default)') : ''}
+                {vmStorageClassNames.includes(storageClass) && <Label>{t('current')}</Label>}{' '}
+                {defaultStorageClassName === storageClass && <Label>{t('default')}</Label>}
               </>
             ),
             value: storageClass,

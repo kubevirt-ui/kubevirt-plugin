@@ -60,15 +60,19 @@ const VirtualMachineMigrationDetails: FC<VirtualMachineMigrationDetailsProps> = 
         <Title headingLevel="h2">{t('Migration details')}</Title>
         <Content component={ContentVariants.p}>
           {vms.length === 1 ? (
-            <>
-              {t('Select the storage to migrate for')}
-              <ResourceLink
-                groupVersionKind={VirtualMachineModelGroupVersionKind}
-                inline
-                name={getName(vms?.[0])}
-                namespace={getNamespace(vms?.[0])}
-              />
-            </>
+            <Trans t={t}>
+              <Content>
+                Select the storage to migrate for{' '}
+                <ResourceLink
+                  groupVersionKind={VirtualMachineModelGroupVersionKind}
+                  inline
+                  name={getName(vms?.[0])}
+                  namespace={getNamespace(vms?.[0])}
+                />
+                from the source (current) storage class{' '}
+                {{ storageClasses: storageClasses?.join(', ') }}
+              </Content>
+            </Trans>
           ) : (
             <Trans t={t}>
               <Content>
@@ -76,7 +80,8 @@ const VirtualMachineMigrationDetails: FC<VirtualMachineMigrationDetailsProps> = 
                 <SelectedStorageTooltip vms={vms}>
                   {{ vmsCount: vms?.length }} VirtualMachines with {{ volumesCount }} Volumes
                 </SelectedStorageTooltip>{' '}
-                from the source (current) storage class {storageClasses?.join(', ')}
+                from the source (current) storage class{' '}
+                {{ storageClasses: storageClasses?.join(', ') }}
               </Content>
             </Trans>
           )}

@@ -75,6 +75,11 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
     useMigrationState(vms, namespacePVCs, pvcsToMigrate, destinationStorageClass);
   const nothingSelected = !entireVMSelected(selectedPVCs) && isEmpty(selectedPVCs);
 
+  const vmStorageClassNames = useMemo(
+    () => Array.from(new Set(vmsPVCs?.map((pvc) => pvc.spec.storageClassName))),
+    [vmsPVCs],
+  );
+
   return (
     <Modal
       className="virtual-machine-migration-modal"
@@ -128,6 +133,7 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
                   destinationStorageClass={destinationStorageClass}
                   setSelectedStorageClass={setSelectedStorageClass}
                   sortedStorageClasses={sortedStorageClasses}
+                  vmStorageClassNames={vmStorageClassNames}
                 />
               </WizardStep>
               <WizardStep
@@ -145,6 +151,7 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
                   migrationError={migrationError}
                   pvcs={pvcsToMigrate}
                   vms={vms}
+                  vmStorageClassNames={vmStorageClassNames}
                 />
               </WizardStep>
             </Wizard>
