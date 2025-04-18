@@ -163,7 +163,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
         );
       },
     );
-    return [vmToShow, matchedVMs, matchedVMs];
+    return [vmToShow, matchedVMs, matchedVMs?.slice(pagination.startIndex, pagination.endIndex)];
   }, [
     featureEnabled,
     isProxyPodAlive,
