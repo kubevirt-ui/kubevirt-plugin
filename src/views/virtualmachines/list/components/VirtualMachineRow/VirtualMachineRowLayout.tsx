@@ -15,6 +15,7 @@ import VirtualMachineActions from '@virtualmachines/actions/components/VirtualMa
 import useVirtualMachineActionsProvider from '@virtualmachines/actions/hooks/useVirtualMachineActionsProvider';
 import { getDeletionProtectionPrintableStatus } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
 import { deselectVM, isVMSelected, selectVM } from '@virtualmachines/list/selectedVMs';
+import { isRunning } from '@virtualmachines/utils';
 
 import { VMStatusConditionLabelList } from '../VMStatusConditionLabel';
 
@@ -45,6 +46,8 @@ const VirtualMachineRowLayout: FC<
   // TODO: investigate using the index prop
   index;
   const selected = isVMSelected(obj);
+
+  const vmRunning = isRunning(obj);
 
   const vmName = useMemo(() => getName(obj), [obj]);
   const vmNamespace = useMemo(() => getNamespace(obj), [obj]);
@@ -86,13 +89,15 @@ const VirtualMachineRowLayout: FC<
         {ips}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="memory-usage">
-        <MemoryPercentage vmiMemory={vmiMemory} vmName={vmName} vmNamespace={vmNamespace} />
+        {vmRunning && (
+          <MemoryPercentage vmiMemory={vmiMemory} vmName={vmName} vmNamespace={vmNamespace} />
+        )}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="cpu-usage">
-        <CPUPercentage vmName={vmName} vmNamespace={vmNamespace} />
+        {vmRunning && <CPUPercentage vmName={vmName} vmNamespace={vmNamespace} />}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="network-usage">
-        <NetworkUsage vmName={vmName} vmNamespace={vmNamespace} />
+        {vmRunning && <NetworkUsage vmName={vmName} vmNamespace={vmNamespace} />}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="deletion-protection">
         {getDeletionProtectionPrintableStatus(obj)}
