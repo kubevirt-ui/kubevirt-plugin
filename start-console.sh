@@ -1,50 +1,74 @@
-#!/usr/bin/env bash
-#Please run this script under bash 4+
-set -euo pipefail
+#!/bin/sh
+set -eu
 
-#Cloning, pulling and running other plugins starting from port 9002
-# to add more plugin simply add more properites to dic. [name-of-plugin]={git-repo-url}
-declare -A plugins=(["monitoring-plugin"]="https://github.com/openshift/monitoring-plugin.git", ["networking-console-plugin"]="https://github.com/openshift/networking-console-plugin.git")
-declare -A runningPlugins=(["podman-linux"]="kubevirt-plugin=http://localhost:9001", ["podman"]="kubevirt-plugin=http://host.containers.internal:9001", ["docker"]="kubevirt-plugin=http://host.docker.internal:9001")
+# Define plugins (name=url)
+plugins="
+monitoring-plugin=https://github.com/openshift/monitoring-plugin.git
+networking-console-plugin=https://github.com/openshift/networking-console-plugin.git
+"
+
+# Plugin URLs per container runtime
+running_podman_linux="kubevirt-plugin=http://localhost:9001"
+running_podman="kubevirt-plugin=http://host.containers.internal:9001"
+running_docker="kubevirt-plugin=http://host.docker.internal:9001"
+
+get_plugin_url() {
+    name="$1"
+    echo "$plugins" | while IFS='=' read -r key val; do
+        [ "$key" = "$name" ] && echo "$val" && return
+    done
+}
 
 INITIAL_PORT=9002
-for arg in $@; do
+
+for arg in "$@"; do
+    plugin_url=$(get_plugin_url "$arg")
+
+    if [ -z "$plugin_url" ]; then
+        echo "Unknown plugin: $arg"
+        exit 1
+    fi
 
     if [ ! -d "../$arg" ]; then
-        echo "Creating a folder $arg ..."
-        cd ../
-        echo "Cloning "${plugins[$arg]}" ..."
-        git clone ${plugins[$arg]}
-        cd $arg
+        echo "Creating folder $arg ..."
+        cd ..
+        echo "Cloning $plugin_url ..."
+        git clone "$plugin_url"
+        cd "$arg"
     else
-        cd ../$arg
+        cd "../$arg"
     fi
+
     git pull
 
-    if [ "$(lsof -t -i:$INITIAL_PORT)" != "" ]; then
-        kill -9 $(lsof -t -i:$INITIAL_PORT)
-    fi
 
-    if [ $arg = "monitoring-plugin" ]; then
+    pid="$(lsof -t -i:$INITIAL_PORT 2>/dev/null || true)"
+    [ -n "$pid" ] && kill -9 "$pid"
+
+
+    if [ "$arg" = "monitoring-plugin" ]; then
         cd web
         npm install
         PORT=$INITIAL_PORT npm start --port=$INITIAL_PORT &
     else
-      yarn
-      PORT=$INITIAL_PORT yarn start --port=$INITIAL_PORT &
+        yarn
+        PORT=$INITIAL_PORT yarn start --port="$INITIAL_PORT" &
     fi
 
-    runningPlugins["podman-linux"]+=",${arg}=http://localhost:${INITIAL_PORT}"
-    runningPlugins["podman"]+=",${arg}=http://host.containers.internal:${INITIAL_PORT}"
-    runningPlugins["docker"]+=",${arg}=http://host.docker.internal:${INITIAL_PORT}"
-    INITIAL_PORT=$(($INITIAL_PORT + 1))
+
+    running_podman_linux="$running_podman_linux,$arg=http://localhost:$INITIAL_PORT"
+    running_podman="$running_podman,$arg=http://host.containers.internal:$INITIAL_PORT"
+    running_docker="$running_docker,$arg=http://host.docker.internal:$INITIAL_PORT"
+
+    INITIAL_PORT=$((INITIAL_PORT + 1))
 done
 
-CONSOLE_IMAGE=${CONSOLE_IMAGE:="quay.io/openshift/origin-console:latest"}
-CONSOLE_PORT=${CONSOLE_PORT:=9000}
+CONSOLE_IMAGE=${CONSOLE_IMAGE:-"quay.io/openshift/origin-console:latest"}
+CONSOLE_PORT=${CONSOLE_PORT:-9000}
 
 echo "Starting local OpenShift console..."
 
+# Set required env vars
 BRIDGE_USER_AUTH="disabled"
 BRIDGE_K8S_MODE="off-cluster"
 BRIDGE_K8S_AUTH="bearer-token"
@@ -60,21 +84,27 @@ echo "API Server: $BRIDGE_K8S_MODE_OFF_CLUSTER_ENDPOINT"
 echo "Console Image: $CONSOLE_IMAGE"
 echo "Console URL: http://localhost:${CONSOLE_PORT}"
 
-#Prefer podman if installed. Otherwise, fall back to docker.
-if [ -x "$(command -v podman)" ]; then
+# Build --env args dynamically
+env_args=""
+for var in $(set | grep '^BRIDGE_' | cut -d= -f1); do
+    eval val=\$$var
+    env_args="$env_args --env $var=$val"
+done
+
+# Prefer podman
+if command -v podman >/dev/null; then
     if [ "$(uname -s)" = "Linux" ]; then
-        # Use host networking on Linux since host.containers.internal is unreachable in some environments.
-        BRIDGE_PLUGINS="${runningPlugins["podman-linux"]}"
-        podman run --pull=always --rm --network=host --env-file <(set | grep BRIDGE) $CONSOLE_IMAGE
+        env_args="$env_args --env BRIDGE_PLUGINS=$running_podman_linux"
+        sh -c "podman run --pull=always --rm --network=host $env_args \"$CONSOLE_IMAGE\""
     else
-        BRIDGE_PLUGINS="${runningPlugins["podman"]}"
-        podman run --platform=linux/x86_64 --pull=always --rm -p "$CONSOLE_PORT":9000 --env-file <(set | grep BRIDGE) $CONSOLE_IMAGE
+        env_args="$env_args --env BRIDGE_PLUGINS=$running_podman"
+        sh -c "podman run --platform=linux/x86_64 --pull=always --rm -p \"$CONSOLE_PORT\":9000 $env_args \"$CONSOLE_IMAGE\""
     fi
 else
-    BRIDGE_PLUGINS="${runningPlugins["docker"]}"
-    if [ "$(uname)" == "Darwin" ]; then
-        docker run --platform=linux/x86_64 --pull=always --rm -p "$CONSOLE_PORT":9000 --env-file <(set | grep BRIDGE) $CONSOLE_IMAGE
+    env_args="$env_args --env BRIDGE_PLUGINS=$running_docker"
+    if [ "$(uname)" = "Darwin" ]; then
+        sh -c "docker run --platform=linux/x86_64 --pull=always --rm -p \"$CONSOLE_PORT\":9000 $env_args \"$CONSOLE_IMAGE\""
     else
-        docker run --pull=always --rm -p "$CONSOLE_PORT":9000 --env-file <(set | grep BRIDGE) $CONSOLE_IMAGE
+        sh -c "docker run --pull=always --rm -p \"$CONSOLE_PORT\":9000 $env_args \"$CONSOLE_IMAGE\""
     fi
 fi
