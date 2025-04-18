@@ -19,7 +19,7 @@ export const getVMTotalsQueries = (namespace: string, namespacesList: string[]) 
 
   return {
     [VMTotalsQueries.TOTAL_CPU_REQUESTED]: `${sumByNamespace}(kube_pod_resource_request{resource='cpu',${filterCpuRequestedByNamespace}})`,
-    [VMTotalsQueries.TOTAL_CPU_USAGE]: `${sumByNamespace}(rate(kubevirt_vmi_cpu_usage_seconds_total${filterByNamespace}[5m]))`,
+    [VMTotalsQueries.TOTAL_CPU_USAGE]: `${sumByNamespace}(rate(kubevirt_vmi_cpu_usage_seconds_total${filterByNamespace}[30s]))`,
     [VMTotalsQueries.TOTAL_MEMORY_USAGE]: `${sumByNamespace}(kubevirt_vmi_memory_available_bytes${filterByNamespace} - kubevirt_vmi_memory_usable_bytes${filterByNamespace})`,
     [VMTotalsQueries.TOTAL_STORAGE_CAPACITY]: `${sumByNamespace}(max(kubevirt_vmi_filesystem_capacity_bytes${filterByNamespace}) by (namespace, name, disk_name))`,
     [VMTotalsQueries.TOTAL_STORAGE_USAGE]: `${sumByNamespace}(max(kubevirt_vmi_filesystem_used_bytes${filterByNamespace}) by (namespace, name, disk_name))`,

@@ -86,13 +86,13 @@ const VirtualMachineRowLayout: FC<
         {ips}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="memory-usage">
-        <MemoryPercentage vmiMemory={vmiMemory} vmName={vmName} vmNamespace={vmNamespace} />
+        <MemoryPercentage vm={obj} vmiMemory={vmiMemory} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="cpu-usage">
-        <CPUPercentage vmName={vmName} vmNamespace={vmNamespace} />
+        <CPUPercentage vm={obj} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="network-usage">
-        <NetworkUsage vmName={vmName} vmNamespace={vmNamespace} />
+        <NetworkUsage vm={obj} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="deletion-protection">
         {getDeletionProtectionPrintableStatus(obj)}
