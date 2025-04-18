@@ -8,7 +8,7 @@ import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getDevices, useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm';
 import { getVMIPod } from '@kubevirt-utils/resources/vmi';
-import { Bullseye } from '@patternfly/react-core';
+import { Bullseye, spinnerSize } from '@patternfly/react-core';
 import { isRunning } from '@virtualmachines/utils';
 
 import useVirtualMachineLogData from './hooks/useVirtualMachineLogData';
@@ -37,7 +37,7 @@ const VirtualMachineLogViewer = ({ connect, vm }) => {
   if (!loaded) {
     return (
       <Bullseye>
-        <Loading />
+        <Loading size={spinnerSize.xl} />
       </Bullseye>
     );
   }

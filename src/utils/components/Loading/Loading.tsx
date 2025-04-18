@@ -1,11 +1,13 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
-const Loading: React.FC = () => (
-  <div className="co-m-loader co-an-fade-in-out" data-test="loading-indicator">
-    <div className="co-m-loader-dot__one" />
-    <div className="co-m-loader-dot__two" />
-    <div className="co-m-loader-dot__three" />
-  </div>
-);
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { Spinner, spinnerSize } from '@patternfly/react-core';
+
+type Loading = { size?: spinnerSize };
+
+const Loading: FC<Loading> = ({ size = spinnerSize.md }) => {
+  const { t } = useKubevirtTranslation();
+  return <Spinner aria-label={t('Loading')} size={size} />;
+};
 
 export default React.memo(Loading);
