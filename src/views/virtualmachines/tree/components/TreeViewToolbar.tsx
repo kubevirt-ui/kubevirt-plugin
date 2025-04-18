@@ -18,11 +18,11 @@ import {
 import { HIDE, SHOW, SHOW_EMPTY_PROJECTS_KEY, TREE_VIEW_SEARCH_ID } from '../utils/constants';
 
 type TreeViewToolbarProps = {
-  isSwitchDisabled: boolean;
+  hideSwitch: boolean;
   onSearch: (event: ChangeEvent<HTMLInputElement>) => void;
 };
 
-const TreeViewToolbar: FC<TreeViewToolbarProps> = ({ isSwitchDisabled, onSearch }) => {
+const TreeViewToolbar: FC<TreeViewToolbarProps> = ({ hideSwitch, onSearch }) => {
   const { t } = useKubevirtTranslation();
   const [showEmptyProjects, setShowEmptyProjects] = useLocalStorage(SHOW_EMPTY_PROJECTS_KEY, HIDE);
 
@@ -39,22 +39,25 @@ const TreeViewToolbar: FC<TreeViewToolbarProps> = ({ isSwitchDisabled, onSearch 
               placeholder={t('Search')}
             />
           </StackItem>
-          <Divider />
-          <StackItem>
-            <Split>
-              <SplitItem className="pf-v6-u-ml-md">
-                <Content component="p">{t('Show only projects with VirtualMachines')}</Content>
-              </SplitItem>
-              <SplitItem isFilled />
-              <Switch
-                checked={!isSwitchDisabled && showEmptyProjects === HIDE}
-                className="vms-tree-view__toolbar-switch"
-                isDisabled={isSwitchDisabled}
-                isReversed
-                onChange={(_, checked) => setShowEmptyProjects(checked ? HIDE : SHOW)}
-              />
-            </Split>
-          </StackItem>
+          {!hideSwitch && (
+            <>
+              <Divider />
+              <StackItem>
+                <Split>
+                  <SplitItem className="pf-v6-u-ml-md">
+                    <Content component="p">{t('Show only projects with VirtualMachines')}</Content>
+                  </SplitItem>
+                  <SplitItem isFilled />
+                  <Switch
+                    checked={showEmptyProjects === HIDE}
+                    className="vms-tree-view__toolbar-switch"
+                    isReversed
+                    onChange={(_, checked) => setShowEmptyProjects(checked ? HIDE : SHOW)}
+                  />
+                </Split>
+              </StackItem>
+            </>
+          )}
           <Divider />
         </Stack>
       </ToolbarContent>

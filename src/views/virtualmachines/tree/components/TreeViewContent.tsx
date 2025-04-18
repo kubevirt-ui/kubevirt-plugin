@@ -22,8 +22,8 @@ import TreeViewCollapseExpand from './TreeViewCollapseExpand';
 import TreeViewToolbar from './TreeViewToolbar';
 
 type TreeViewContentProps = {
+  hideSwitch: boolean;
   isOpen: boolean;
-  isSwitchDisabled: boolean;
   loaded: boolean;
   onSelect: (_event: React.MouseEvent, treeViewItem: TreeViewDataItem) => void;
   selectedTreeItem: TreeViewDataItem;
@@ -32,8 +32,8 @@ type TreeViewContentProps = {
 };
 
 const TreeViewContent: FC<TreeViewContentProps> = ({
+  hideSwitch,
   isOpen,
-  isSwitchDisabled,
   loaded,
   onSelect,
   selectedTreeItem,
@@ -63,7 +63,7 @@ const TreeViewContent: FC<TreeViewContentProps> = ({
   return (
     <>
       {panelToggleButton}
-      <TreeViewToolbar isSwitchDisabled={isSwitchDisabled} onSearch={onSearch} />
+      <TreeViewToolbar hideSwitch={hideSwitch} onSearch={onSearch} />
       <DrawerHead className="vms-tree-view__header-section">
         <Content className="vms-tree-view__title" component="p">
           <TreeViewCollapseExpand setShowAll={setShowAll} showAll={showAll} />

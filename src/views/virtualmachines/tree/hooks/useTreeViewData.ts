@@ -22,7 +22,7 @@ import { vmimMapperSignal, vmsSignal } from '../utils/signals';
 import { createTreeViewData, isSystemNamespace } from '../utils/utils';
 
 export type UseTreeViewData = {
-  isSwitchDisabled: boolean;
+  hideSwitch: boolean;
   loaded: boolean;
   loadError: any;
   treeData: TreeViewDataItem[];
@@ -118,10 +118,10 @@ export const useTreeViewData = (): UseTreeViewData => {
     [projectNames, memoizedVMs, loaded, isAdmin, treeViewFoldersEnabled, location.pathname],
   );
 
-  const isSwitchDisabled = useMemo(() => projectNames.every(isSystemNamespace), [projectNames]);
+  const hideSwitch = useMemo(() => projectNames.every(isSystemNamespace), [projectNames]);
 
   return {
-    isSwitchDisabled,
+    hideSwitch,
     loaded,
     loadError: projectNamesError,
     treeData,
