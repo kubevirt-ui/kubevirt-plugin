@@ -48,7 +48,7 @@ export const addDisk = (disk: Disk) => {
     case 'PVC': {
       if (diskSource.pvcNS) {
         cy.contains(diskSource.selectPVCNS).click();
-        cy.get(`[data-test-id="${diskSource.pvcNS}`).click();
+        cy.get(`[data-test-id="${diskSource.pvcNS}"]`).click();
       }
       cy.wait(3000);
       cy.contains(diskSource.selectPVCName).click();
