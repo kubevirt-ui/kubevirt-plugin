@@ -83,7 +83,7 @@
     "@typescript-eslint/parser": "^5.14.0",
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.11.0",
-    "cypress": "^14.0.x",
+    "cypress": "^14.3.x",
     "cypress-multi-reporters": "^1.5.0",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^8.5.0",
