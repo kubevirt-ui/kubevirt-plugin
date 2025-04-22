@@ -53,7 +53,7 @@ export const TemplatesCatalogFilters: FC<{
           title={t('User templates')}
         />
       </VerticalTabs>
-      <FilterSidePanel className="co-catalog-page__tabs" id="vm-catalog-filter-panel">
+      <FilterSidePanel id="vm-catalog-filter-panel">
         <TemplatesCatalogFiltersGroup
           filters={[
             { label: t('Hide deprecated templates'), value: HIDE_DEPRECATED_TEMPLATES_KEY },

@@ -29,7 +29,7 @@ const OwnerReferences: FC<OwnerReferencesProps> = ({ obj }) => {
   return !isEmpty(ownerReferences) ? (
     <div>{ownerReferences}</div>
   ) : (
-    <span className="text-muted">{t('No owner')}</span>
+    <span className="pf-v6-u-text-color-subtle">{t('No owner')}</span>
   );
 };
 

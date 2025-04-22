@@ -135,13 +135,17 @@ export const WizardDescriptionItem: FC<WizardDescriptionItemProps> = React.memo(
               type="button"
               variant={ButtonVariant.link}
             >
-              {description ?? <span className="text-muted">{t('Not available')}</span>}
+              {description ?? (
+                <span className="pf-v6-u-text-color-subtle">{t('Not available')}</span>
+              )}
             </Button>
           </DescriptionListDescription>
         ) : (
           <div data-test-id={testId}>
             <DescriptionListDescription className="pf-v6-c-description-list__description">
-              {description ?? <span className="text-muted">{t('Not available')}</span>}
+              {description ?? (
+                <span className="pf-v6-u-text-color-subtle">{t('Not available')}</span>
+              )}
             </DescriptionListDescription>
           </div>
         )}

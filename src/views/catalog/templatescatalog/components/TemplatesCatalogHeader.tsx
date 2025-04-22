@@ -5,10 +5,12 @@ import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
+  Flex,
   pluralize,
   SearchInput,
   Split,
   SplitItem,
+  Title,
   ToggleGroup,
   ToggleGroupItem,
 } from '@patternfly/react-core';
@@ -43,7 +45,7 @@ export const TemplatesCatalogHeader: FC<{
 
   return (
     <div className="co-catalog-page__header">
-      <div className="co-catalog-page__heading text-capitalize">
+      <Title className="pf-v6-u-mb-md" headingLevel="h2" size="lg">
         {(filters?.onlyDefault || hasNoDefaultUserAllFilters(filters)) && (
           <>
             {t('Default templates')}{' '}
@@ -57,13 +59,14 @@ export const TemplatesCatalogHeader: FC<{
                   />
                 </>
               }
+              size="headingLg"
             />
           </>
         )}
         {filters?.onlyUser && t('User templates')}
         {filters?.allItems && t('All templates')}
-      </div>
-      <div className="co-catalog-page__filter">
+      </Title>
+      <Flex justifyContent={{ default: 'justifyContentSpaceBetween' }}>
         <div>
           <SearchInput
             onChange={(_, val) => {
@@ -106,7 +109,7 @@ export const TemplatesCatalogHeader: FC<{
             </ToggleGroup>
           </SplitItem>
         </Split>
-      </div>
+      </Flex>
     </div>
   );
 });

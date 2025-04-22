@@ -88,11 +88,7 @@ const BootableVolumesRow: FC<
       <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-15" id="preference">
         {getSourcePreferenceLabelValue(obj)}
       </TableData>
-      <TableData
-        activeColumnIDs={activeColumnIDs}
-        className="dropdown-kebab-pf pf-v6-c-table__action"
-        id=""
-      >
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="">
         {isBootableVolumePVCKind(obj) ? (
           <BootableVolumesActions preferences={preferences} source={obj} />
         ) : (

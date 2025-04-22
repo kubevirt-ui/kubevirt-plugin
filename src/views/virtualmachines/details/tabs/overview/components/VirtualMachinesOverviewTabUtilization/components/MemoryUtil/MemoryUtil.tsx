@@ -45,7 +45,7 @@ const MemoryUtil: FC<MemoryUtilProps> = ({ vmi }) => {
           <div className="util-summary-value">
             {xbytes(memoryUsed || 0, { fixed: 0, iec: true })}
           </div>
-          <div className="util-summary-text text-muted">
+          <div className="util-summary-text pf-v6-u-text-color-subtle">
             <div>{t('Used of ')}</div>
             <div>{`${memory?.size} ${memory?.unit}B`}</div>
           </div>

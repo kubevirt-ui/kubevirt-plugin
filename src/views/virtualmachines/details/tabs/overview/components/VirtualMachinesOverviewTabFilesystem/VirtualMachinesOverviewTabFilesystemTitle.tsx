@@ -8,7 +8,7 @@ const VirtualMachinesOverviewTabFilesystemTitle = () => {
   const { t } = useKubevirtTranslation();
 
   return (
-    <CardTitle className="text-muted">
+    <CardTitle className="pf-v6-u-text-color-subtle">
       {t('File systems')}{' '}
       <HelpTextIcon
         bodyContent={t(

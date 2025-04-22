@@ -67,7 +67,7 @@ const AffinityForm: React.FC<AffinityFormProps> = ({
 
   return (
     <Form>
-      <Content className="text-muted" component={ContentVariants.p}>
+      <Content className="pf-v6-u-text-color-subtle" component={ContentVariants.p}>
         {t(
           'Define an affinity rule. This rule will be added to the list of affinity rules applied to this workload.',
         )}

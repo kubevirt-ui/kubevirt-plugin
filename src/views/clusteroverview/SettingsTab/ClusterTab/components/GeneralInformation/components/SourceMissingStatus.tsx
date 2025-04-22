@@ -12,7 +12,7 @@ const SourceMissingStatus: React.FC = () => {
   return (
     <>
       <GenericStatus Icon={YellowExclamationTriangleIcon} title={t('Cannot update')} />
-      <span className="text-muted">{t('CatalogSource not found')}</span>
+      <span className="pf-v6-u-text-color-subtle">{t('CatalogSource not found')}</span>
     </>
   );
 };
