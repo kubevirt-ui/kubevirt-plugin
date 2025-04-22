@@ -33,7 +33,7 @@ type VirtualMachineTreeViewProps = {
 
 const VirtualMachineTreeView: FC<VirtualMachineTreeViewProps> = ({
   children,
-  isSwitchDisabled,
+  hideSwitch,
   loaded,
   loadError,
   onFilterChange,
@@ -80,8 +80,8 @@ const VirtualMachineTreeView: FC<VirtualMachineTreeViewProps> = ({
             style={styles}
           >
             <TreeViewContent
+              hideSwitch={hideSwitch}
               isOpen={isOpen}
-              isSwitchDisabled={isSwitchDisabled}
               loaded={loaded}
               onSelect={onSelect}
               selectedTreeItem={selected}
