@@ -5,7 +5,10 @@ import {
   OPENSHIFT_MULTUS_NS,
   OPENSHIFT_SRIOV_NETWORK_OPERATOR_NS,
 } from '@kubevirt-utils/constants/constants';
+import { getLabel } from '@kubevirt-utils/resources/shared';
+import { UDN_LABEL } from '@kubevirt-utils/resources/udn/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 const resources = {
   default: {
@@ -41,3 +44,6 @@ export const getExtraNADResources = (
     return newMap;
   }, {});
 };
+
+export const filterUDNNads = (nads: K8sResourceCommon[]) =>
+  nads?.filter((nad) => getLabel(nad, UDN_LABEL) === undefined);
