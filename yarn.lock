@@ -1014,13 +1014,13 @@
     dompurify "^3.1.3"
     history "^5.0.0"
 
-"@patternfly/react-catalog-view-extension@6.0.0":
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/@patternfly/react-catalog-view-extension/-/react-catalog-view-extension-6.0.0.tgz#9054d9cbfde3c53d76d91706a6836fe698d43bdb"
-  integrity sha512-AfvfJXjADXX1YZnWNZLe0mLgBepSnn4Xn9SQsvTeS+PLFFGgJQEsbhRyFXdGVJLVU/19+a/YOpHgZZeI2dus0A==
+"@patternfly/react-catalog-view-extension@^6.1.0":
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/@patternfly/react-catalog-view-extension/-/react-catalog-view-extension-6.1.0.tgz#6caec6d55d385ae6d77864585b13f9dfbe98ea23"
+  integrity sha512-cQnafDmY/PwcImWx8xI498jXxFwF9WlOl3d5MzGzmpZbKLHHHsKz+khh/CRtUA+Ws0GztlkFBlNpVMMuX4IdmA==
   dependencies:
-    "@patternfly/react-core" "^6.0.0"
-    "@patternfly/react-styles" "^6.0.0"
+    "@patternfly/react-core" "^6.1.0"
+    "@patternfly/react-styles" "^6.1.0"
 
 "@patternfly/react-charts@8.1.0":
   version "8.1.0"
