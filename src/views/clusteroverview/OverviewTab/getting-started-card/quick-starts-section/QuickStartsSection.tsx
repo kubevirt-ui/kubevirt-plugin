@@ -41,10 +41,6 @@ const QuickStartsSection: FC<QuickStartsSectionProps> = ({
         );
         const slicedQuickStarts = orderedQuickStarts.slice(0, 2);
 
-        if (loaded && slicedQuickStarts.length === 0) {
-          return null;
-        }
-
         const links: GettingStartedLink[] = loaded
           ? slicedQuickStarts.map((quickStart: QuickStart) => ({
               id: quickStart.metadata.name,
