@@ -47,6 +47,7 @@ import {
   getVMIBootLoader,
   getVMIDevices,
   getVMIInterfaces,
+  getVMINetworks,
   getVMIVolumes,
 } from '@kubevirt-utils/resources/vmi/utils/selectors';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -56,6 +57,7 @@ import {
   getAutoAttachPodInterface,
   getBootloader,
   getDisks,
+  getNetworks,
   isHeadlessMode,
 } from '../../../resources/vm/utils/selectors';
 
@@ -183,9 +185,28 @@ export const getChangedNICs = (vm: V1VirtualMachine, vmi: V1VirtualMachineInstan
     ...(vmNICsNames?.filter((nic) => !unchangedNICs?.includes(nic)) || []),
     ...(vmiNICsNames?.filter((nic) => !unchangedNICs?.includes(nic)) || []),
     ...(unchangedNICs?.filter((nic) => isPendingHotPlugNIC(vm, vmi, nic)) || []),
+
+    ...(getChangedNADsInterfaces(vm, vmi) || []),
   ];
 
-  return changedNICs;
+  return Array.from(new Set(changedNICs));
+};
+
+export const getChangedNADsInterfaces = (
+  vm: V1VirtualMachine,
+  vmi: V1VirtualMachineInstance,
+): string[] => {
+  const vmiNetworks = getVMINetworks(vmi);
+
+  return (getNetworks(vm) || []).reduce((acc, network) => {
+    const vmiNetworkName = vmiNetworks?.find((vmiNetwork) => vmiNetwork?.name === network?.name)
+      ?.multus?.networkName;
+
+    if (vmiNetworkName !== network?.multus?.networkName) {
+      acc.push(network?.name);
+    }
+    return acc;
+  }, []);
 };
 
 export const hasPendingChange = (pendingChange: PendingChange[]) =>
