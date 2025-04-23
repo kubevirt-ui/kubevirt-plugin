@@ -1,4 +1,4 @@
-import { OS_IMAGES_NS, SECOND } from '../../utils/const/index';
+import { CNV_NS, OS_IMAGES_NS, SECOND } from '../../utils/const/index';
 import { tab } from '../../views/tab';
 
 describe('Test Cluster General settings', () => {
@@ -28,7 +28,7 @@ describe('Test Cluster General settings', () => {
       const maxPerCluster = '.spec.liveMigrationConfig.parallelMigrationsPerCluster';
       const maxPerNode = '.spec.liveMigrationConfig.parallelOutboundMigrationsPerNode';
       const spec = '.spec.liveMigrationConfig';
-      const cmd = `oc get -n kubevirt-hyperconverged hyperconverged kubevirt-hyperconverged -o jsonpath='{${spec}}'`;
+      const cmd = `oc get -n ${CNV_NS} hyperconverged kubevirt-hyperconverged -o jsonpath='{${spec}}'`;
       cy.exec(cmd).then((res) => {
         cy.task('log', res.stdout);
       });

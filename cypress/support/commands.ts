@@ -1,3 +1,5 @@
+import { CNV_NS } from '../utils/const/index';
+
 export {};
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -10,7 +12,7 @@ declare global {
 
 Cypress.Commands.add('checkHCOSpec', (spec: string, matchString: string, include: boolean) => {
   cy.exec(
-    `oc get -n kubevirt-hyperconverged hyperconverged kubevirt-hyperconverged -o jsonpath='{${spec}}'`,
+    `oc get -n ${CNV_NS} hyperconverged kubevirt-hyperconverged -o jsonpath='{${spec}}'`,
   ).then((result) => {
     if (include) {
       expect(result.stdout).contain(matchString);

@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 
-set -eExuo pipefail
+set -x
+set +e
+
+# export namespace for downstream
+export CYPRESS_CNV_NS='openshift-cnv';
+export CYPRESS_OS_IMAGES_NS='openshift-virtualization-os-images';
 
 # Install dependencies.
 yarn install --ignore-engines
@@ -28,7 +33,6 @@ if [ -n "${spec-}" ]; then
 fi
 
 yarn run $yarn_script
-
 
 # Generate Cypress report.
 yarn run cypress-postreport
