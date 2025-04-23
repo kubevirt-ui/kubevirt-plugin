@@ -26,7 +26,7 @@ export const extensions: EncodedExtension[] = [
         'data-quickstart-id': 'qs-nav-storagemigrations',
         'data-test-id': 'storagemigrations-nav-item',
       },
-      href: 'storagemigrations',
+      href: '/k8s/storagemigrations',
       id: 'storagemigrations',
       name: '%plugin__kubevirt-plugin~Storage MigrationPlans%',
       prefixNamespaced: false,
