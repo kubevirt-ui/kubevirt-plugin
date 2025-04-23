@@ -46,7 +46,7 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
   getCreateOption,
   getCreationNotAllowedMessage,
   getToggleStatus,
-  initialOptions = [],
+  initialOptions,
   isFullWidth = false,
   placeholder,
   selected,
@@ -64,10 +64,10 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
 
   useEffect(() => {
     const filteredOptions: SelectOptionProps[] = filterValue
-      ? initialOptions.filter((menuItem) =>
+      ? (initialOptions || [])?.filter((menuItem) =>
           String(menuItem.value).toLowerCase().includes(filterValue.toLowerCase()),
         )
-      : initialOptions;
+      : initialOptions || [];
 
     if (canCreate) {
       const creationNotAllowedMessage = getCreationNotAllowedMessage?.(filterValue);
@@ -137,7 +137,7 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
     if (!value) return;
 
     if (value === CREATE_NEW) {
-      if (!initialOptions.some((item) => item.value === filterValue)) {
+      if (!initialOptions?.some((item) => item.value === filterValue)) {
         setInitialOptions?.((prevOptions) => [
           ...(prevOptions || []),
           createNewOption(filterValue),
