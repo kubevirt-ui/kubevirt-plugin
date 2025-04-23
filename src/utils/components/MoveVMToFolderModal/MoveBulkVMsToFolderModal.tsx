@@ -8,6 +8,7 @@ import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { Popover, PopoverPosition, Stack, StackItem } from '@patternfly/react-core';
 
 import BulkVMsPopover from './BulkVMsPopover';
+import SelectedFolderIndicator from './SelectedFolderIndicator';
 
 type MoveBulkVMToFolderModalProps = {
   isOpen: boolean;
@@ -58,6 +59,7 @@ const MoveBulkVMToFolderModal: FC<MoveBulkVMToFolderModalProps> = ({
             setSelectedFolder={setFolderName}
           />
         </StackItem>
+        <SelectedFolderIndicator folderName={folderName} />
       </Stack>
     </TabModal>
   );
