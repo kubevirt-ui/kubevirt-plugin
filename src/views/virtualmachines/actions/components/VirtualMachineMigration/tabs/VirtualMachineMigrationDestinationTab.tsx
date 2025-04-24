@@ -3,8 +3,11 @@ import React, { Dispatch, FC, SetStateAction } from 'react';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, StorageClassModel } from '@kubevirt-utils/models';
+import { POPPER_CONTAINER_ID } from '@kubevirt-utils/utils/constants';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import { Content, ContentVariants, Label, Stack, StackItem, Title } from '@patternfly/react-core';
+
+import useMigratableStorageClasses from '../hooks/useMigratableStorageClasses';
 
 type VirtualMachineMigrationDestinationTabProps = {
   defaultStorageClassName: string;
@@ -24,6 +27,9 @@ const VirtualMachineMigrationDestinationTab: FC<VirtualMachineMigrationDestinati
   vmStorageClassNames,
 }) => {
   const { t } = useKubevirtTranslation();
+
+  const allowedStorageProfilesNames = useMigratableStorageClasses();
+
   return (
     <Stack hasGutter>
       <StackItem>
@@ -47,10 +53,11 @@ const VirtualMachineMigrationDestinationTab: FC<VirtualMachineMigrationDestinati
                 {defaultStorageClassName === storageClass && <Label>{t('default')}</Label>}
               </>
             ),
+            isDisabled: !allowedStorageProfilesNames?.includes(storageClass),
             value: storageClass,
           }))}
           popperProps={{
-            appendTo: () => document.getElementById('virtual-machine-migration-modal'),
+            appendTo: () => document.getElementById(POPPER_CONTAINER_ID),
           }}
           selected={destinationStorageClass}
           setSelected={setSelectedStorageClass}
