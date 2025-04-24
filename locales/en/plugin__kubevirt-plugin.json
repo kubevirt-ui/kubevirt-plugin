@@ -880,6 +880,7 @@
   "No matching nodes found for the {{cpuManagerLabel}} label": "No matching nodes found for the {{cpuManagerLabel}} label",
   "No matching Nodes found for the labels": "No matching Nodes found for the labels",
   "No matching Projects found for the labels": "No matching Projects found for the labels",
+  "No migratable disks": "No migratable disks",
   "No MigrationPolicies found": "No MigrationPolicies found",
   "No MigrationPolicy": "No MigrationPolicy",
   "No migrations found": "No migrations found",
