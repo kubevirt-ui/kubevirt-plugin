@@ -10,6 +10,7 @@ import { modelToGroupVersionKind, NodeModel } from '@kubevirt-utils/models';
 import { getMemory } from '@kubevirt-utils/resources/vm';
 import { getVMIIPAddressesWithName } from '@kubevirt-utils/resources/vmi';
 import { ResourceLink, RowProps } from '@openshift-console/dynamic-plugin-sdk';
+import { PVCMapper } from '@virtualmachines/utils/mappers';
 
 import FirstItemListPopover from '../FirstItemListPopover/FirstItemListPopover';
 
@@ -20,12 +21,18 @@ const VirtualMachineRunningRow: FC<
     V1VirtualMachine,
     {
       isSingleNodeCluster: boolean;
+      pvcMapper: PVCMapper;
       status: ReactNode;
       vmi: V1VirtualMachineInstance;
       vmim: V1VirtualMachineInstanceMigration;
     }
   >
-> = ({ activeColumnIDs, index, obj, rowData: { isSingleNodeCluster, status, vmi, vmim } }) => {
+> = ({
+  activeColumnIDs,
+  index,
+  obj,
+  rowData: { isSingleNodeCluster, pvcMapper, status, vmi, vmim },
+}) => {
   const { t } = useKubevirtTranslation();
 
   const ipAddressess = vmi && getVMIIPAddressesWithName(vmi);
@@ -41,6 +48,7 @@ const VirtualMachineRunningRow: FC<
             truncate
           />
         ),
+        pvcMapper,
         status,
         vmim,
         vmiMemory: getMemory(vmi),

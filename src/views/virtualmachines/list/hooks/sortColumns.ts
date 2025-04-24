@@ -1,10 +1,15 @@
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { getMemory, getVirtualMachineStorageClasses } from '@kubevirt-utils/resources/vm';
+import { getMemory } from '@kubevirt-utils/resources/vm';
 import { columnSortingCompare, isEmpty } from '@kubevirt-utils/utils/utils';
 import { SortByDirection } from '@patternfly/react-table';
 import { getDeletionProtectionPrintableStatus } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
-import { getVMIFromMapper, VMIMapper } from '@virtualmachines/utils/mappers';
+import {
+  getVirtualMachineStorageClasses,
+  getVMIFromMapper,
+  PVCMapper,
+  VMIMapper,
+} from '@virtualmachines/utils/mappers';
 
 import {
   getCPUUsagePercentage,
@@ -47,21 +52,22 @@ export const sortByCPUUsage = (
   return columnSortingCompare(data, direction, pagination, compareCPUUsage);
 };
 
-export const sortByNetworkUsage = (
+export const sortByStorageclassName = (
   data: V1VirtualMachine[],
   direction: SortByDirection,
   pagination: { [key: string]: any },
+  pvcMapper: PVCMapper,
 ) => {
-  const compareNetworkUsage = (a: V1VirtualMachine, b: V1VirtualMachine): number => {
-    const storageClassA = getVirtualMachineStorageClasses(a)?.[0];
-    const storageClassB = getVirtualMachineStorageClasses(b)?.[0];
+  const compareStorageClasses = (a: V1VirtualMachine, b: V1VirtualMachine): number => {
+    const [storageClassA] = getVirtualMachineStorageClasses(a, pvcMapper);
+    const [storageClassB] = getVirtualMachineStorageClasses(b, pvcMapper);
 
     if (isEmpty(storageClassA)) return -1;
     if (isEmpty(storageClassB)) return 1;
     return storageClassA.localeCompare(storageClassB);
   };
 
-  return columnSortingCompare(data, direction, pagination, compareNetworkUsage);
+  return columnSortingCompare(data, direction, pagination, compareStorageClasses);
 };
 
 export const sortByMemoryUsage = (
@@ -99,12 +105,12 @@ export const sortByDeletionProtection = (
   return columnSortingCompare(data, direction, pagination, compareDeletionProtection);
 };
 
-export const sortByStorageclassName = (
+export const sortByNetworkUsage = (
   data: V1VirtualMachine[],
   direction: SortByDirection,
   pagination: { [key: string]: any },
 ) => {
-  const compareStorageclasses = (a: V1VirtualMachine, b: V1VirtualMachine): number => {
+  const compareNetworkUsage = (a: V1VirtualMachine, b: V1VirtualMachine): number => {
     const networkUsageA = getNetworkUsagePercentage(getName(a), getNamespace(a));
     const networkUsageB = getNetworkUsagePercentage(getName(b), getNamespace(b));
 
@@ -113,5 +119,5 @@ export const sortByStorageclassName = (
     return networkUsageA - networkUsageB;
   };
 
-  return columnSortingCompare(data, direction, pagination, compareStorageclasses);
+  return columnSortingCompare(data, direction, pagination, compareNetworkUsage);
 };

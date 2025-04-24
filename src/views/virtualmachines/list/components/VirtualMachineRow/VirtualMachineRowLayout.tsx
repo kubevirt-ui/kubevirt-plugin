@@ -1,20 +1,25 @@
 import React, { FC, ReactNode, useMemo } from 'react';
 
-import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
+import {
+  modelToGroupVersionKind,
+  StorageClassModel,
+  VirtualMachineModelGroupVersionKind,
+} from '@kubevirt-ui/kubevirt-api/console';
 import {
   V1VirtualMachine,
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { getVirtualMachineStorageClasses } from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 import { Checkbox } from '@patternfly/react-core';
 import VirtualMachineActions from '@virtualmachines/actions/components/VirtualMachineActions/VirtualMachineActions';
 import useVirtualMachineActionsProvider from '@virtualmachines/actions/hooks/useVirtualMachineActionsProvider';
 import { getDeletionProtectionPrintableStatus } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
 import { deselectVM, isVMSelected, selectVM } from '@virtualmachines/list/selectedVMs';
+import { getVirtualMachineStorageClasses, PVCMapper } from '@virtualmachines/utils/mappers';
 
 import { VMStatusConditionLabelList } from '../VMStatusConditionLabel';
 
@@ -31,6 +36,7 @@ const VirtualMachineRowLayout: FC<
       ips: ReactNode | string;
       isSingleNodeCluster: boolean;
       node: ReactNode | string;
+      pvcMapper: PVCMapper;
       status: ReactNode;
       vmim: V1VirtualMachineInstanceMigration;
       vmiMemory?: string;
@@ -40,7 +46,7 @@ const VirtualMachineRowLayout: FC<
   activeColumnIDs,
   index,
   obj,
-  rowData: { ips, isSingleNodeCluster, node, status, vmim, vmiMemory },
+  rowData: { ips, isSingleNodeCluster, node, pvcMapper, status, vmim, vmiMemory },
 }) => {
   // TODO: investigate using the index prop
   index;
@@ -49,7 +55,11 @@ const VirtualMachineRowLayout: FC<
   const vmName = useMemo(() => getName(obj), [obj]);
   const vmNamespace = useMemo(() => getNamespace(obj), [obj]);
 
-  const storageClasses = useMemo(() => getVirtualMachineStorageClasses(obj), [obj]);
+  const storageClasses = useMemo(
+    () => getVirtualMachineStorageClasses(obj, pvcMapper),
+    [obj, pvcMapper],
+  );
+
   const [actions] = useVirtualMachineActionsProvider(obj, vmim, isSingleNodeCluster);
   return (
     <>
@@ -98,7 +108,15 @@ const VirtualMachineRowLayout: FC<
         {getDeletionProtectionPrintableStatus(obj)}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="storageclassname">
-        {storageClasses?.join(', ') || NO_DATA_DASH}
+        {isEmpty(storageClasses)
+          ? NO_DATA_DASH
+          : storageClasses.map((storageClass) => (
+              <ResourceLink
+                groupVersionKind={modelToGroupVersionKind(StorageClassModel)}
+                key={storageClass}
+                name={storageClass}
+              />
+            ))}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="">
         <VirtualMachineActions actions={actions} isKebabToggle />

@@ -12,6 +12,7 @@ import { RowProps } from '@openshift-console/dynamic-plugin-sdk';
 import VirtualMachineMigrationPercentage from '@virtualmachines/details/tabs/overview/components/VirtualMachinesOverviewTabDetails/components/VirtualMachineMigrationPercentage';
 import StatusWithPopover from '@virtualmachines/details/tabs/overview/components/VirtualMachinesOverviewTabDetails/components/VirtualMachineStatusWithPopover/VirtualMachineStatusWithPopover';
 import { printableVMStatus } from '@virtualmachines/utils';
+import { PVCMapper } from '@virtualmachines/utils/mappers';
 
 import VirtualMachineRowLayout from './VirtualMachineRowLayout';
 import VirtualMachineRunningRow from './VirtualMachineRunningRow';
@@ -23,9 +24,15 @@ const VirtualMachineRow: FC<
       getVmi: (namespace: string, name: string) => V1VirtualMachineInstance;
       getVmim: (ns: string, name: string) => V1VirtualMachineInstanceMigration;
       isSingleNodeCluster: boolean;
+      pvcMapper: PVCMapper;
     }
   >
-> = ({ activeColumnIDs, index, obj: vm, rowData: { getVmi, getVmim, isSingleNodeCluster } }) => {
+> = ({
+  activeColumnIDs,
+  index,
+  obj: vm,
+  rowData: { getVmi, getVmim, isSingleNodeCluster, pvcMapper },
+}) => {
   const vmName = getName(vm);
   const vmNamespace = getNamespace(vm);
   const vmi = getVmi(vmNamespace, vmName);
@@ -41,6 +48,7 @@ const VirtualMachineRow: FC<
     <VirtualMachineRunningRow
       rowData={{
         isSingleNodeCluster,
+        pvcMapper,
         status,
         vmi,
         vmim: getVmim(vmNamespace, vmName),
@@ -51,10 +59,17 @@ const VirtualMachineRow: FC<
     />
   ) : (
     <VirtualMachineRowLayout
+      rowData={{
+        ips: NO_DATA_DASH,
+        isSingleNodeCluster,
+        node: NO_DATA_DASH,
+        pvcMapper,
+        status,
+        vmim: null,
+      }}
       activeColumnIDs={activeColumnIDs}
       index={index}
       obj={vm}
-      rowData={{ ips: NO_DATA_DASH, isSingleNodeCluster, node: NO_DATA_DASH, status, vmim: null }}
     />
   );
 };

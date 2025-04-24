@@ -10,11 +10,14 @@ import React, {
 import classNames from 'classnames';
 
 import {
+  modelToGroupVersionKind,
+  PersistentVolumeClaimModel,
   VirtualMachineInstanceMigrationModelGroupVersionKind,
   VirtualMachineInstanceModelGroupVersionKind,
   VirtualMachineModelGroupVersionKind,
   VirtualMachineModelRef,
 } from '@kubevirt-ui/kubevirt-api/console';
+import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import {
   V1VirtualMachine,
   V1VirtualMachineInstance,
@@ -49,6 +52,7 @@ import { Flex, Pagination } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
 import useQuery from '@virtualmachines/details/tabs/metrics/NetworkCharts/hook/useQuery';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
+import { convertIntoPVCMapper } from '@virtualmachines/utils/mappers';
 
 import { useVMListFilters } from '../utils';
 
@@ -117,6 +121,16 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
     },
   );
 
+  const [pvcs] = useKubevirtWatchResource<IoK8sApiCoreV1PersistentVolumeClaim[]>({
+    groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
+    isList: true,
+    limit: OBJECTS_FETCHING_LIMIT,
+    namespace,
+    namespaced: true,
+  });
+
+  const pvcMapper = useMemo(() => convertIntoPVCMapper(pvcs), [pvcs]);
+
   const [isSingleNodeCluster, isSingleNodeLoaded] = useSingleNodeCluster();
 
   const [vmims, vmimsLoaded] = useKubevirtWatchResource<V1VirtualMachineInstanceMigration[]>({
@@ -127,7 +141,12 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
     namespaced: true,
   });
 
-  const { filters, searchFilters, vmiMapper, vmimMapper } = useVMListFilters(vmis, vmToShow, vmims);
+  const { filters, searchFilters, vmiMapper, vmimMapper } = useVMListFilters(
+    vmis,
+    vmToShow,
+    vmims,
+    pvcMapper,
+  );
 
   const [pagination, setPagination] = useState(paginationInitialState);
 
@@ -195,6 +214,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
     pagination,
     data,
     vmiMapper,
+    pvcMapper,
   );
 
   const loaded =
@@ -303,6 +323,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
               getVmim: (ns: string, name: string) => vmimMapper?.[ns]?.[name],
               isSingleNodeCluster,
               kind,
+              pvcMapper,
             }}
             allRowsSelected={allVMsSelected}
             columns={activeColumns}
