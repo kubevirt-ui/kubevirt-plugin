@@ -9,7 +9,7 @@ describe('Test Virtualization Overview page', () => {
   });
 
   it('Verify links in get started are not outdated', () => {
-    cy.get('[data-test-id="dashboard"]')
+    cy.get('[data-test-id="dashboard"]', { timeout: 90000 })
       .find('a')
       .each(($a) => {
         const message = $a.text();

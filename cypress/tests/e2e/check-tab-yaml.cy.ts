@@ -171,7 +171,7 @@ describe('Check all virtualization pages can be loaded', () => {
     });
 
     it('create VirtualMachineClusterInstanceType from YAML', () => {
-      cy.get('div.co-operator-details__actions').find(sel.itemCreateBtn).click();
+      cy.get('div.co-m-list').find(sel.itemCreateBtn).eq(0).click();
       cy.get(sel.saveBtn).click();
       cy.get(sel.breadcrumb).click();
       cy.get(sel.nameFilter).first().type(Example);
@@ -195,7 +195,7 @@ describe('Check all virtualization pages can be loaded', () => {
     });
 
     it('create VirtualMachineClusterPreference from YAML', () => {
-      cy.get('div.co-operator-details__actions').find(sel.itemCreateBtn).click();
+      cy.get('div.co-m-list').find(sel.itemCreateBtn).eq(0).click();
       cy.get(sel.saveBtn).click();
       cy.get(sel.breadcrumb).click();
       cy.get(sel.nameFilter).first().type(Example);

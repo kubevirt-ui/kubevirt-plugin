@@ -1,11 +1,11 @@
 import secretFixture from '../../fixtures/secret';
-import { TEST_NS, TEST_SECRET_NAME } from '../../utils/const/index';
+import { CNV_NS, TEST_NS, TEST_SECRET_NAME } from '../../utils/const/index';
 import { authSSHKey, YAML } from '../../utils/const/string';
 import { itemCreateBtn, mastheadLogo, saveBtn } from '../../views/selector';
 import { manageKeysText, useExisting } from '../../views/selector-catalog';
 import { tab } from '../../views/tab';
 
-const WELCOME_OFF_CMD = `oc patch configmap -n kubevirt-hyperconverged kubevirt-user-settings --type=merge --patch '{"data": {"kube-admin": "{\\"quickStart\\":{\\"dontShowWelcomeModal\\":true}}"}}'`;
+const WELCOME_OFF_CMD = `oc patch configmap -n ${CNV_NS} kubevirt-user-settings --type=merge --patch '{"data": {"kube-admin": "{\\"quickStart\\":{\\"dontShowWelcomeModal\\":true}}"}}'`;
 
 describe('Prepare the cluster for test', () => {
   before(() => {
@@ -16,11 +16,15 @@ describe('Prepare the cluster for test', () => {
   });
 
   it('create test namespace', () => {
-    cy.exec(`oc new-project ${TEST_NS}`);
+    cy.exec(`oc get ns ${TEST_NS} || oc new-project ${TEST_NS}`);
   });
 
   it('create test secret', () => {
-    cy.exec(`echo '${JSON.stringify(secretFixture)}' | oc create -f -`);
+    cy.exec(
+      `oc get secret -n ${TEST_NS} ${TEST_SECRET_NAME} || echo '${JSON.stringify(
+        secretFixture,
+      )}' | oc create -f -`,
+    );
   });
 
   it('close the welcome modal by CLI', () => {
@@ -60,7 +64,7 @@ describe('Prepare the cluster for test', () => {
 
   it('create example VM', () => {
     cy.visitVMsVirt();
-    cy.get(itemCreateBtn).click();
+    cy.get(itemCreateBtn, { timeout: 60000 }).click();
     cy.byButtonText(YAML).click();
     cy.get(saveBtn).click();
   });

@@ -142,6 +142,10 @@ export BRIDGE_BASE_ADDRESS
 # https://docs.cypress.io/guides/guides/continuous-integration.html#Colors
 export NO_COLOR=1
 
+# export namespace for upstream test
+export CYPRESS_CNV_NS='kubevirt-hyperconverged';
+export CYPRESS_OS_IMAGES_NS='kubevirt-os-images';
+
 # Install dependencies.
 yarn install --ignore-engines
 
