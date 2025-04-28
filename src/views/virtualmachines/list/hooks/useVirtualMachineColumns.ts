@@ -1,7 +1,6 @@
 import { useCallback, useMemo } from 'react';
 
 import { NodeModel, VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
 import { columnSorting } from '@kubevirt-utils/utils/utils';
@@ -25,8 +24,6 @@ import {
 
 const useVirtualMachineColumns = (
   namespace: string,
-  pagination: { [key: string]: any },
-  data: V1VirtualMachine[],
   vmiMapper: VMIMapper,
   pvcMapper: PVCMapper,
 ): [TableColumn<K8sResourceCommon>[], TableColumn<K8sResourceCommon>[], boolean] => {
@@ -39,23 +36,25 @@ const useVirtualMachineColumns = (
   });
 
   const sorting = useCallback(
-    (direction, path) => columnSorting(data, direction, pagination, path),
-    [data, pagination],
+    (dataToSort, direction, path) => columnSorting(dataToSort, direction, null, path),
+    [],
   );
 
   const sortingUsingFunction = useCallback(
-    (direction, compareFunction) => compareFunction(data, direction, pagination),
-    [data, pagination],
+    (dataToSort, direction, compareFunction) => compareFunction(dataToSort, direction, null),
+    [],
   );
 
   const sortingUsingFunctionWithMapper = useCallback(
-    (direction, compareFunction) => compareFunction(data, direction, pagination, vmiMapper),
-    [data, pagination, vmiMapper],
+    (dataToSort, direction, compareFunction) =>
+      compareFunction(dataToSort, direction, null, vmiMapper),
+    [vmiMapper],
   );
 
   const sortingUsingFunctionWithPVCMapper = useCallback(
-    (direction, compareFunction) => compareFunction(data, direction, pagination, pvcMapper),
-    [data, pagination, pvcMapper],
+    (dataToSort, direction, compareFunction) =>
+      compareFunction(dataToSort, direction, null, pvcMapper),
+    [pvcMapper],
   );
 
   const columns: TableColumn<K8sResourceCommon>[] = useMemo(
@@ -68,7 +67,7 @@ const useVirtualMachineColumns = (
       {
         id: 'name',
         props: { className: 'pf-m-width-20' },
-        sort: (_, direction) => sorting(direction, 'metadata.name'),
+        sort: (data, direction) => sorting(data, direction, 'metadata.name'),
         title: t('Name'),
         transforms: [sortable],
       },
@@ -76,7 +75,7 @@ const useVirtualMachineColumns = (
         ? [
             {
               id: 'namespace',
-              sort: (_, direction) => sorting(direction, 'metadata.namespace'),
+              sort: (data, direction) => sorting(data, direction, 'metadata.namespace'),
               title: t('Namespace'),
               transforms: [sortable],
             },
@@ -84,7 +83,7 @@ const useVirtualMachineColumns = (
         : []),
       {
         id: 'status',
-        sort: (_, direction) => sorting(direction, 'status.printableStatus'),
+        sort: (data, direction) => sorting(data, direction, 'status.printableStatus'),
         title: t('Status'),
         transforms: [sortable],
       },
@@ -96,7 +95,8 @@ const useVirtualMachineColumns = (
         ? [
             {
               id: 'node',
-              sort: (_, direction) => sortingUsingFunctionWithMapper(direction, sortByNode),
+              sort: (data, direction) =>
+                sortingUsingFunctionWithMapper(data, direction, sortByNode),
               title: t('Node'),
               transforms: [sortable],
             },
@@ -105,7 +105,7 @@ const useVirtualMachineColumns = (
       {
         additional: true,
         id: 'created',
-        sort: (_, direction) => sorting(direction, 'metadata.creationTimestamp'),
+        sort: (data, direction) => sorting(data, direction, 'metadata.creationTimestamp'),
         title: t('Created'),
         transforms: [sortable],
       },
@@ -116,36 +116,37 @@ const useVirtualMachineColumns = (
       {
         additional: true,
         id: 'memory-usage',
-        sort: (_, direction) => sortingUsingFunctionWithMapper(direction, sortByMemoryUsage),
+        sort: (data, direction) =>
+          sortingUsingFunctionWithMapper(data, direction, sortByMemoryUsage),
         title: t('Memory'),
         transforms: [sortable],
       },
       {
         additional: true,
         id: 'cpu-usage',
-        sort: (_, direction) => sortingUsingFunction(direction, sortByCPUUsage),
+        sort: (data, direction) => sortingUsingFunction(data, direction, sortByCPUUsage),
         title: t('CPU'),
         transforms: [sortable],
       },
       {
         additional: true,
         id: 'network-usage',
-        sort: (_, direction) => sortingUsingFunction(direction, sortByNetworkUsage),
+        sort: (data, direction) => sortingUsingFunction(data, direction, sortByNetworkUsage),
         title: t('Network'),
         transforms: [sortable],
       },
       {
         additional: true,
         id: 'deletion-protection',
-        sort: (_, direction) => sortingUsingFunction(direction, sortByDeletionProtection),
+        sort: (data, direction) => sortingUsingFunction(data, direction, sortByDeletionProtection),
         title: t('Deletion protection'),
         transforms: [sortable],
       },
       {
         additional: true,
         id: 'storageclassname',
-        sort: (_, direction) =>
-          sortingUsingFunctionWithPVCMapper(direction, sortByStorageclassName),
+        sort: (data, direction) =>
+          sortingUsingFunctionWithPVCMapper(data, direction, sortByStorageclassName),
         title: t('Storage class'),
         transforms: [sortable],
       },

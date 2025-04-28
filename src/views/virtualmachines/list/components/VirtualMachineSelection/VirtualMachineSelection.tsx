@@ -1,7 +1,6 @@
 import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
 import { BulkSelect } from '@patternfly/react-component-groups/dist/dynamic/BulkSelect';
 import { FlexItem } from '@patternfly/react-core';
 import useExistingSelectedVMs from '@virtualmachines/list/hooks/useExistingSelectedVMs';
@@ -11,17 +10,19 @@ import { handleBulkSelect } from './utils/bulkSelect';
 import './virtual-machine-selection.scss';
 
 type VirtualMachineSelectionProps = {
+  currentPageVMs: V1VirtualMachine[];
   loaded?: boolean;
-  pagination: PaginationState;
   vms: V1VirtualMachine[];
 };
 
-const VirtualMachineSelection: FC<VirtualMachineSelectionProps> = ({ loaded, pagination, vms }) => {
+const VirtualMachineSelection: FC<VirtualMachineSelectionProps> = ({
+  currentPageVMs,
+  loaded,
+  vms,
+}) => {
   const existingSelectedVMs = useExistingSelectedVMs(vms);
 
   if (!loaded) return null;
-
-  const currentPageVMs = vms?.slice(pagination.startIndex, pagination.endIndex);
 
   const isPageChecked =
     currentPageVMs.length && currentPageVMs.every((vm) => existingSelectedVMs.includes(vm));
