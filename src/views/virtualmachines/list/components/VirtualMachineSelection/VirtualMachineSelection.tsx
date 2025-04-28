@@ -23,7 +23,8 @@ const VirtualMachineSelection: FC<VirtualMachineSelectionProps> = ({ loaded, pag
 
   const currentPageVMs = vms?.slice(pagination.startIndex, pagination.endIndex);
 
-  const isPageChecked = currentPageVMs.every((vm) => existingSelectedVMs.includes(vm));
+  const isPageChecked =
+    currentPageVMs.length && currentPageVMs.every((vm) => existingSelectedVMs.includes(vm));
   const isPagePartiallyChecked =
     !isPageChecked && currentPageVMs.some((vm) => existingSelectedVMs.includes(vm));
 

@@ -271,28 +271,26 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
                 searchFilters={searchFilters}
               />
             </Flex>
-            {!isEmpty(dataFilters) && (
-              <Flex flexWrap={{ default: 'nowrap' }}>
-                <div className="vm-actions-toggle">
-                  <VirtualMachineBulkActionButton vms={data} />
-                </div>
-                <Pagination
-                  onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
-                    onPageChange({ endIndex, page, perPage, startIndex })
-                  }
-                  onSetPage={(_e, page, perPage, startIndex, endIndex) =>
-                    onPageChange({ endIndex, page, perPage, startIndex })
-                  }
-                  className="list-managment-group__pagination"
-                  isCompact={listManagementGroupSize !== ListManagementGroupSize.lg}
-                  isLastFullPageShown
-                  itemCount={data?.length}
-                  page={pagination?.page}
-                  perPage={pagination?.perPage}
-                  perPageOptions={paginationDefaultValues}
-                />
-              </Flex>
-            )}
+            <Flex flexWrap={{ default: 'nowrap' }}>
+              <div className="vm-actions-toggle">
+                <VirtualMachineBulkActionButton vms={data} />
+              </div>
+              <Pagination
+                onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
+                  onPageChange({ endIndex, page, perPage, startIndex })
+                }
+                onSetPage={(_e, page, perPage, startIndex, endIndex) =>
+                  onPageChange({ endIndex, page, perPage, startIndex })
+                }
+                className="list-managment-group__pagination"
+                isCompact={listManagementGroupSize !== ListManagementGroupSize.lg}
+                isLastFullPageShown
+                itemCount={data?.length}
+                page={pagination?.page}
+                perPage={pagination?.perPage}
+                perPageOptions={paginationDefaultValues}
+              />
+            </Flex>
           </div>
           <VirtualizedTable<K8sResourceCommon>
             EmptyMsg={() => (
