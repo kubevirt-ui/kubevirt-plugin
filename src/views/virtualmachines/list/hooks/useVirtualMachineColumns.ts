@@ -12,7 +12,7 @@ import {
   useAccessReview,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { sortable } from '@patternfly/react-table';
-import { VMIMapper } from '@virtualmachines/utils/mappers';
+import { PVCMapper, VMIMapper } from '@virtualmachines/utils/mappers';
 
 import {
   sortByCPUUsage,
@@ -20,6 +20,7 @@ import {
   sortByMemoryUsage,
   sortByNetworkUsage,
   sortByNode,
+  sortByStorageclassName,
 } from './sortColumns';
 
 const useVirtualMachineColumns = (
@@ -27,6 +28,7 @@ const useVirtualMachineColumns = (
   pagination: { [key: string]: any },
   data: V1VirtualMachine[],
   vmiMapper: VMIMapper,
+  pvcMapper: PVCMapper,
 ): [TableColumn<K8sResourceCommon>[], TableColumn<K8sResourceCommon>[], boolean] => {
   const { t } = useKubevirtTranslation();
 
@@ -49,6 +51,11 @@ const useVirtualMachineColumns = (
   const sortingUsingFunctionWithMapper = useCallback(
     (direction, compareFunction) => compareFunction(data, direction, pagination, vmiMapper),
     [data, pagination, vmiMapper],
+  );
+
+  const sortingUsingFunctionWithPVCMapper = useCallback(
+    (direction, compareFunction) => compareFunction(data, direction, pagination, pvcMapper),
+    [data, pagination, pvcMapper],
   );
 
   const columns: TableColumn<K8sResourceCommon>[] = useMemo(
@@ -137,7 +144,8 @@ const useVirtualMachineColumns = (
       {
         additional: true,
         id: 'storageclassname',
-        sort: (_, direction) => sortingUsingFunction(direction, sortByNetworkUsage),
+        sort: (_, direction) =>
+          sortingUsingFunctionWithPVCMapper(direction, sortByStorageclassName),
         title: t('Storage class'),
         transforms: [sortable],
       },
@@ -147,7 +155,15 @@ const useVirtualMachineColumns = (
         title: '',
       },
     ],
-    [canGetNode, namespace, sorting, sortingUsingFunction, sortingUsingFunctionWithMapper, t],
+    [
+      canGetNode,
+      namespace,
+      sorting,
+      sortingUsingFunction,
+      sortingUsingFunctionWithMapper,
+      sortingUsingFunctionWithPVCMapper,
+      t,
+    ],
   );
 
   const [activeColumns, , loaded] = useKubevirtUserSettingsTableColumns<K8sResourceCommon>({

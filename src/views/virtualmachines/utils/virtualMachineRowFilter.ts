@@ -8,13 +8,12 @@ import {
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useSingleNodeCluster from '@kubevirt-utils/hooks/useSingleNodeCluster';
 import { getInstanceTypePrefix } from '@kubevirt-utils/resources/bootableresources/helpers';
-import { getAnnotation } from '@kubevirt-utils/resources/shared';
+import { getAnnotation, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import {
   ANNOTATIONS,
   LABEL_USED_TEMPLATE_NAME,
   OS_NAME_LABELS,
 } from '@kubevirt-utils/resources/template';
-import { getVirtualMachineStorageClasses } from '@kubevirt-utils/resources/vm';
 import {
   getOperatingSystem,
   getOperatingSystemName,
@@ -23,7 +22,7 @@ import { getVMIIPAddresses } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
-import { VMIMapper, VMIMMapper } from './mappers';
+import { getVirtualMachineStorageClasses, PVCMapper, VMIMapper, VMIMMapper } from './mappers';
 import { compareCIDR, getLatestMigrationForEachVM, isLiveMigratable } from './utils';
 import { isErrorPrintableStatus, printableVMStatus } from './virtualMachineStatuses';
 
@@ -211,10 +210,31 @@ const useIPSearchFilter = (vmiMapper: VMIMapper): RowFilter => ({
   type: 'ip',
 });
 
-const useStorageclassFilter = (vms: V1VirtualMachine[]): RowFilter => {
-  const storageClasses = useMemo(
-    () => Array.from(new Set(vms?.map((vm) => getVirtualMachineStorageClasses(vm)).flat())),
-    [vms],
+type StorageClassByVM = { [namespace in string]: { [name in string]: Set<string> } };
+
+const useStorageclassFilter = (vms: V1VirtualMachine[], pvcMapper: PVCMapper): RowFilter => {
+  const { allStorageClasses, storageClassesByVM } = vms.reduce(
+    (acc, vm) => {
+      const vmNamespace = getNamespace(vm);
+      const vmName = getName(vm);
+
+      const storageClasses = getVirtualMachineStorageClasses(vm, pvcMapper);
+
+      storageClasses.forEach((storageClass) => {
+        acc.allStorageClasses.add(storageClass);
+        if (isEmpty(acc.storageClassesByVM[vmNamespace])) acc.storageClassesByVM[vmNamespace] = {};
+
+        if (isEmpty(acc.storageClassesByVM[vmNamespace][vmName]))
+          acc.storageClassesByVM[vmNamespace][vmName] = new Set<string>();
+
+        acc.storageClassesByVM[vmNamespace][vmName].add(storageClass);
+      });
+      return acc;
+    },
+    {
+      allStorageClasses: new Set<string>(),
+      storageClassesByVM: {} as StorageClassByVM,
+    },
   );
 
   return {
@@ -223,15 +243,14 @@ const useStorageclassFilter = (vms: V1VirtualMachine[]): RowFilter => {
 
       if (isEmpty(selectedStorageClasses)) return true;
 
-      return getVirtualMachineStorageClasses(obj).some((storageClassName) =>
-        selectedStorageClasses.includes(storageClassName),
+      return selectedStorageClasses.some((selectedStorageClass) =>
+        storageClassesByVM?.[getNamespace(obj)]?.[getName(obj)]?.has(selectedStorageClass),
       );
     },
     filterGroupName: t('Storage class'),
-    isMatch: (obj, id) =>
-      getVirtualMachineStorageClasses(obj).some((storageClassName) => storageClassName === id),
+    isMatch: (obj, id) => storageClassesByVM?.[getNamespace(obj)]?.[getName(obj)]?.has(id),
     items:
-      storageClasses?.map((storageClassName) => ({
+      Array.from(allStorageClasses)?.map((storageClassName) => ({
         id: storageClassName,
         title: storageClassName,
       })) || [],
@@ -243,6 +262,7 @@ export const useVMListFilters = (
   vmis: V1VirtualMachineInstance[],
   vms: V1VirtualMachine[],
   vmims: V1VirtualMachineInstanceMigration[],
+  pvcMapper: PVCMapper,
 ): {
   filters: RowFilter<V1VirtualMachine>[];
   searchFilters: RowFilter<V1VirtualMachine>[];
@@ -280,7 +300,7 @@ export const useVMListFilters = (
   const liveMigratableFilter = useLiveMigratableFilter();
   const instanceTypesFilter = useInstanceTypesFilter(vms);
   const searchByIP = useIPSearchFilter(vmiMapper);
-  const storageClassFilters = useStorageclassFilter(vms);
+  const storageClassFilters = useStorageclassFilter(vms, pvcMapper);
 
   return {
     filters: [
