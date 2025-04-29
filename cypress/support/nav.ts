@@ -20,6 +20,8 @@ declare global {
       visitOverviewVirt(): void;
       visitPreferences(): void;
       visitPreferencesVirt(): void;
+      visitPVC(): void;
+      visitStorageclass(): void;
       visitTemplates(): void;
       visitTemplatesVirt(): void;
       visitVMs(): void;
@@ -113,4 +115,16 @@ Cypress.Commands.add('visitCheckups', () => {
 
 Cypress.Commands.add('visitCheckupsVirt', () => {
   cy.get(nav.checkupNav, { timeout: 5 * MINUTE }).click();
+});
+
+Cypress.Commands.add('visitPVC', () => {
+  cy.get('[data-quickstart-id="qs-nav-storage"]', { timeout: MINUTE }).scrollIntoView();
+  cy.contains('Storage').should('be.visible');
+  cy.clickNavLink(['Storage', 'PersistentVolumeClaims']);
+});
+
+Cypress.Commands.add('visitStorageclass', () => {
+  cy.get('[data-quickstart-id="qs-nav-storage"]', { timeout: MINUTE }).scrollIntoView();
+  cy.contains('Storage').should('be.visible');
+  cy.clickNavLink(['Storage', 'StorageClasses']);
 });
