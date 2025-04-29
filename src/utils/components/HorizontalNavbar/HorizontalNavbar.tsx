@@ -23,6 +23,14 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({ instanceTypeExpandedSpec,
 
   const params = useParams();
 
+  const [memoParams, setMemoParams] = useState(params);
+
+  useEffect(() => {
+    setMemoParams((preParams) =>
+      JSON.stringify(params) !== JSON.stringify(preParams) ? params : preParams,
+    );
+  }, [params]);
+
   const dynamicPluginPages = useDynamicPages(VirtualMachineModel);
 
   const allPages = useMemo(
@@ -76,7 +84,7 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({ instanceTypeExpandedSpec,
                 <Component
                   instanceTypeExpandedSpec={instanceTypeExpandedSpec}
                   obj={vm}
-                  params={params}
+                  params={memoParams}
                   {...props}
                 />
               )}
