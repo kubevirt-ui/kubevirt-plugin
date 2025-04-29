@@ -80,7 +80,7 @@ const CheckupsNetworkDetailsPageSection: FC<CheckupsNetworkDetailsPageSectionPro
               descriptionData={
                 configMap?.data?.[STATUS_MAX_LATENCY_NANO]
                   ? t('{{time}} Nanoseconds', {
-                      time: configMap?.data?.[STATUS_MIN_LATENCY_NANO],
+                      time: configMap?.data?.[STATUS_MAX_LATENCY_NANO],
                     })
                   : NO_DATA_DASH
               }
