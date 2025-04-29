@@ -73,6 +73,7 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
 
   const { migMigration, migrationError, migrationLoading, migrationStarted, onSubmit } =
     useMigrationState(vms, namespacePVCs, pvcsToMigrate, destinationStorageClass);
+
   const nothingSelected = !entireVMSelected(selectedPVCs) && isEmpty(selectedPVCs);
 
   const vmStorageClassNames = useMemo(
@@ -112,7 +113,7 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
               title={t('Migrate VirtualMachine storage')}
             >
               <WizardStep
-                footer={{ isNextDisabled: nothingSelected }}
+                footer={{ isNextDisabled: nothingSelected || isEmpty(vmsPVCs) }}
                 id="wizard-migration-details"
                 name={t('Migration details')}
               >

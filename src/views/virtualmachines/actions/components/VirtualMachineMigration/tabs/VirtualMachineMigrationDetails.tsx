@@ -7,6 +7,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-utils/models';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { convertToBaseValue, humanizeBinaryBytes } from '@kubevirt-utils/utils/humanize.js';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
@@ -91,6 +92,7 @@ const VirtualMachineMigrationDetails: FC<VirtualMachineMigrationDetailsProps> = 
         <Radio
           id="all-volumes"
           isChecked={allVolumes}
+          isDisabled={isEmpty(pvcs)}
           label={t('The entire VirtualMachine')}
           name="volumes"
           onChange={() => setSelectedPVCs(null)}
@@ -98,6 +100,7 @@ const VirtualMachineMigrationDetails: FC<VirtualMachineMigrationDetailsProps> = 
         <Radio
           id="selected-volumes"
           isChecked={!allVolumes}
+          isDisabled={isEmpty(pvcs)}
           label={t('Selected volumes')}
           name="volumes"
           onChange={() => setSelectedPVCs([])}
@@ -114,10 +117,14 @@ const VirtualMachineMigrationDetails: FC<VirtualMachineMigrationDetailsProps> = 
         </StackItem>
       )}
 
-      <Alert
-        title={t('Total storage to migrate is {{totalAmount}}', { totalAmount })}
-        variant={AlertVariant.info}
-      />
+      {isEmpty(pvcs) ? (
+        <Alert title={t('No migratable disks')} variant={AlertVariant.danger} />
+      ) : (
+        <Alert
+          title={t('Total storage to migrate is {{totalAmount}}', { totalAmount })}
+          variant={AlertVariant.info}
+        />
+      )}
     </Stack>
   );
 };
