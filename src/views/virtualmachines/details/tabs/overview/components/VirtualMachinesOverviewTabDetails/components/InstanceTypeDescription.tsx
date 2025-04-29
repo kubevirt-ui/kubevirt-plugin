@@ -5,6 +5,10 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import {
+  getInstanceTypeRevisionName,
+  getPreferenceRevisionName,
+} from '@kubevirt-utils/resources/instancetype/selectors';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getInstanceTypeMatcher, getPreferenceMatcher } from '@kubevirt-utils/resources/vm';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
@@ -31,7 +35,7 @@ const InstanceTypeDescription: FC<InstanceTypeDescriptionProps> = ({ vm }) => {
             <ResourceLink
               displayName={itMatcher.name}
               groupVersionKind={ControllerRevisionModelGroupVersionKind}
-              name={itMatcher.revisionName}
+              name={getInstanceTypeRevisionName(vm)}
               namespace={getNamespace(vm)}
             />
           ) : (
@@ -51,7 +55,7 @@ const InstanceTypeDescription: FC<InstanceTypeDescriptionProps> = ({ vm }) => {
             <ResourceLink
               displayName={preferenceMatcher.name}
               groupVersionKind={ControllerRevisionModelGroupVersionKind}
-              name={preferenceMatcher.revisionName}
+              name={getPreferenceRevisionName(vm)}
               namespace={getNamespace(vm)}
             />
           ) : (
