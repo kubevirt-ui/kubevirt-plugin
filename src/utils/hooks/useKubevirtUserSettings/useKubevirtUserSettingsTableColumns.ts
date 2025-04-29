@@ -27,7 +27,9 @@ const useKubevirtUserSettingsTableColumns: UseKubevirtUserSettingsTableColumnsTy
   };
 
   const activeColumns = columns?.filter((col) =>
-    userColumns?.[columnManagementID]?.includes(col?.id),
+    userColumns?.[columnManagementID]
+      ? userColumns?.[columnManagementID]?.includes(col?.id)
+      : !col?.additional,
   );
 
   return [
