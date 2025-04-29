@@ -14,6 +14,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { WSFactory } from '@openshift-console/dynamic-plugin-sdk/lib/utils/k8s/ws-factory';
 import { Button, EmptyState, EmptyStateBody, EmptyStateFooter } from '@patternfly/react-core';
+import { Fleet, useFleetK8sAPIPath } from '@stolostron/multicluster-sdk';
 
 import { INSECURE, SECURE } from '../../utils/constants';
 import { isConnectionEncrypted } from '../../utils/utils';
@@ -27,7 +28,7 @@ const { destroyed, init, open } = ConsoleState;
 
 type SerialConsoleConnectorProps = {
   onConnect?: Dispatch<SetStateAction<WebSocket>>;
-  vmi: V1VirtualMachineInstance;
+  vmi: Fleet<V1VirtualMachineInstance>;
 };
 
 const SerialConsoleConnector: FC<SerialConsoleConnectorProps> = ({ onConnect, vmi }) => {
@@ -37,6 +38,7 @@ const SerialConsoleConnector: FC<SerialConsoleConnectorProps> = ({ onConnect, vm
 
   const terminalRef = useRef(null);
   const [socket, setSocket] = useState<WebSocket>(null);
+  const k8sAPIPath = useFleetK8sAPIPath(vmi.cluster);
 
   const connect = useCallback(() => {
     if (socket) {
@@ -49,7 +51,7 @@ const SerialConsoleConnector: FC<SerialConsoleConnectorProps> = ({ onConnect, vm
         window.location.port || (isConnectionEncrypted() ? SECURE : INSECURE)
       }`,
       jsonParse: false,
-      path: `/api/kubernetes/apis/subresources.kubevirt.io/v1/namespaces/${vmi?.metadata?.namespace}/virtualmachineinstances/${vmi?.metadata?.name}/console`,
+      path: `${k8sAPIPath}/apis/subresources.kubevirt.io/v1/namespaces/${vmi?.metadata?.namespace}/virtualmachineinstances/${vmi?.metadata?.name}/console`,
       reconnect: false,
       subprotocols: ['plain.kubevirt.io'],
     };

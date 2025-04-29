@@ -1,5 +1,6 @@
 import { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plugin-sdk-webpack';
 
+import { exposedModules as MulticlusterExposedModules } from './src/multicluster/extensions';
 import { exposedModules as VirtualizationPerspectiveExposedModules } from './src/perspective/extensions';
 import { exposedModules as utilsExposedModules } from './src/utils/extension';
 import { exposedModules as CDIUploadProviderExposedModules } from './src/views/cdi-upload-provider/extensions';
@@ -21,6 +22,7 @@ const metadata: ConsolePluginBuildMetadata = {
     ...VirtualMachinesExposedModules,
     ...CDIUploadProviderExposedModules,
     ...StorageMigrationExposedModules,
+    ...MulticlusterExposedModules,
     BootableVolumesList: './views/bootablevolumes/list/BootableVolumesList.tsx',
     Catalog: './views/catalog/Catalog.tsx',
     ClusterOverviewPage: './views/clusteroverview/ClusterOverviewPage.tsx',

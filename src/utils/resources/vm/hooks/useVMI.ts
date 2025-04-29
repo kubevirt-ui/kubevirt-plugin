@@ -1,20 +1,22 @@
 import { VirtualMachineInstanceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { Fleet, useFleetK8sWatchResource } from '@stolostron/multicluster-sdk';
 
 type UseVMI = (
   vmName: string,
   vmNamespace: string,
+  vmCluster?: string,
   fetch?: boolean,
 ) => {
-  vmi: V1VirtualMachineInstance;
+  vmi: Fleet<V1VirtualMachineInstance>;
   vmiLoaded: boolean;
   vmiLoadError: Error;
 };
 
-const useVMI: UseVMI = (vmName, vmNamespace, fetch = true) => {
-  const [vmi, vmiLoaded, vmiLoadError] = useK8sWatchResource<V1VirtualMachineInstance>(
+const useVMI: UseVMI = (vmName, vmNamespace, vmCluster, fetch = true) => {
+  const [vmi, vmiLoaded, vmiLoadError] = useFleetK8sWatchResource<V1VirtualMachineInstance>(
     fetch && {
+      cluster: vmCluster,
       groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
       isList: false,
       name: vmName,

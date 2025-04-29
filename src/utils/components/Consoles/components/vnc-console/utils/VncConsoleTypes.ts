@@ -2,6 +2,7 @@ import { FC, HTMLProps, MouseEventHandler } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { RFBCreate } from '@novnc/novnc/lib/rfb';
+import { Fleet } from '@stolostron/multicluster-sdk';
 
 export type VncConsoleActionsProps = {
   /** VNC console additional send keys elements */
@@ -24,5 +25,5 @@ export type VncConsoleProps = HTMLProps<HTMLDivElement> & {
   onConnect?: (rfb: RFBCreate) => void;
   scaleViewport?: boolean;
   viewOnly?: boolean;
-  vmi: V1VirtualMachineInstance;
+  vmi: Fleet<V1VirtualMachineInstance>;
 };

@@ -8,7 +8,7 @@ import {
   V1beta1VirtualMachineRestore,
   V1beta1VirtualMachineSnapshot,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { useFleetK8sWatchResource } from '@stolostron/multicluster-sdk';
 
 import { getVmRestoreSnapshotName, getVmRestoreTime } from '../utils/selectors';
 
@@ -19,19 +19,21 @@ export type UseSnapshotData = {
   snapshots: V1beta1VirtualMachineSnapshot[];
 };
 
-const useSnapshotData = (vmName: string, namespace: string): UseSnapshotData => {
-  const [snapshots, snapshotsLoaded, snapshotsError] = useK8sWatchResource<
+const useSnapshotData = (vmName: string, namespace: string, cluster?: string): UseSnapshotData => {
+  const [snapshots, snapshotsLoaded, snapshotsError] = useFleetK8sWatchResource<
     V1beta1VirtualMachineSnapshot[]
   >({
+    cluster,
     groupVersionKind: VirtualMachineSnapshotModelGroupVersionKind,
     isList: true,
     namespace,
     namespaced: true,
   });
 
-  const [restores, restoresLoaded, restoresError] = useK8sWatchResource<
+  const [restores, restoresLoaded, restoresError] = useFleetK8sWatchResource<
     V1beta1VirtualMachineRestore[]
   >({
+    cluster,
     groupVersionKind: VirtualMachineRestoreModelGroupVersionKind,
     isList: true,
     namespace,

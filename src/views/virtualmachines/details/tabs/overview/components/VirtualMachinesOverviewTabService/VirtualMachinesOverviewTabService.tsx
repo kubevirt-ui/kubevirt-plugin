@@ -9,8 +9,9 @@ import { getServicesForVmi } from '@kubevirt-utils/resources/vmi';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { ServicesList } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { Card, CardBody, CardTitle, Divider } from '@patternfly/react-core';
+import { Fleet } from '@stolostron/multicluster-sdk';
 
-type VirtualMachinesOverviewTabServiceProps = { vm: V1VirtualMachine };
+type VirtualMachinesOverviewTabServiceProps = { vm: Fleet<V1VirtualMachine> };
 
 const VirtualMachinesOverviewTabService: FC<VirtualMachinesOverviewTabServiceProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
@@ -21,7 +22,7 @@ const VirtualMachinesOverviewTabService: FC<VirtualMachinesOverviewTabServicePro
     namespace: vm?.metadata?.namespace,
   });
 
-  const { vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
+  const { vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace, vm.cluster);
 
   const data = getServicesForVmi(
     services,
