@@ -16,10 +16,12 @@ export const orderQuickStarts = (
 ): Merge<QuickStart[], { metadata: ObjectMetadata }>[] => {
   const orderedQuickStarts: Merge<QuickStart, { metadata: ObjectMetadata }>[] = [];
   const filteredQuickStarts = filter ? allQuickStarts.filter(filter) : allQuickStarts;
+
   const isFeatured = (quickStart: Merge<QuickStart, { metadata: ObjectMetadata }>) =>
     featured?.includes(quickStart?.metadata?.name);
   const getStatus = (quickStart: Merge<QuickStart, { metadata: ObjectMetadata }>) =>
     getQuickStartStatus(allQuickStartStates, quickStart?.metadata?.name);
+
   // Prioritize featured quick starts and keep specified order
   if (featured) {
     const featuredQuickStartsByName = filteredQuickStarts.reduce((acc, q) => {
@@ -35,16 +37,21 @@ export const orderQuickStarts = (
       }
     });
   }
-  // Show other in progress quick starts (which are not featured)
+
+  // Show non-featured in progress quick starts
   orderedQuickStarts.push(
     ...filteredQuickStarts.filter(
       (q) => !isFeatured(q) && getStatus(q) === QuickStartStatus.IN_PROGRESS,
     ),
   );
-  // Show other not started quick starts (which are not featured)
+
+  // Show non-featured completed and unstarted quick starts
   orderedQuickStarts.push(
     ...filteredQuickStarts.filter(
-      (q) => !isFeatured(q) && getStatus(q) === QuickStartStatus.NOT_STARTED,
+      (q) =>
+        !isFeatured(q) &&
+        (getStatus(q) === QuickStartStatus.NOT_STARTED ||
+          getStatus(q) === QuickStartStatus.COMPLETE),
     ),
   );
   return orderedQuickStarts;
