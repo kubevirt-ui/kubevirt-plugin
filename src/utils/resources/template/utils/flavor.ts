@@ -26,7 +26,9 @@ export const parseCPU = (cpu: V1CPU): V1CPU => {
  */
 export const vCPUCount = (cpu: V1CPU): number => {
   const parsedCpu = parseCPU(cpu);
-  return parsedCpu.sockets * parsedCpu.cores * parsedCpu.threads;
+
+  // VMs migrated from vSphere may not have spec.template.spec.domain.cpu.threads set
+  return parsedCpu.sockets * parsedCpu.cores * (parsedCpu.threads || 1);
 };
 
 /**
