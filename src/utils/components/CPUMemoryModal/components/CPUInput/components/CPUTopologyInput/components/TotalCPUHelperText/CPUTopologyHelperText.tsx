@@ -15,7 +15,8 @@ const CPUTopologyHelperText: FC<CPUTopologyHelperTextProps> = ({ cpu }) => {
   const { t } = useKubevirtTranslation();
   const { cores, sockets, threads } = cpu || {};
 
-  const totalCPU = cores * sockets * threads;
+  // VMs migrated from vSphere may not have spec.template.spec.domain.cpu.threads set
+  const totalCPU = cores * sockets * (threads || 1);
 
   return (
     <div className="cpu-topology-helper-text">
