@@ -1,7 +1,9 @@
 import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
-import { Link } from 'react-router-dom-v5-compat';
 
+import QuickStartLauncherLink from '@catalog/CreateFromInstanceTypes/components/BootableVolumeList/components/BootableVolumesPipelinesHint/QuickStartLauncherLink/QuickStartLauncherLink';
+import useQuickStart from '@catalog/CreateFromInstanceTypes/components/BootableVolumeList/hooks/useQuickStart';
+import { WINDOWS_BOOTSOURCE_PIPELINE } from '@catalog/CreateFromInstanceTypes/components/BootableVolumeList/utils/constants';
 import { UseInstanceTypeAndPreferencesValues } from '@catalog/CreateFromInstanceTypes/state/utils/types';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -17,6 +19,7 @@ const CreateFromInstanceTypeTitle: FC<CreateFromInstanceTypeTitleProps> = ({
   instanceTypesAndPreferencesData,
 }) => {
   const { t } = useKubevirtTranslation();
+  const [windowsQS, windowsQSLoaded] = useQuickStart(WINDOWS_BOOTSOURCE_PIPELINE);
 
   return (
     <>
@@ -35,9 +38,11 @@ const CreateFromInstanceTypeTitle: FC<CreateFromInstanceTypeTitleProps> = ({
             </div>
             <div>
               Learn how to{' '}
-              <Link to="/quickstart?quickstart=windows-bootsource-pipeline">
-                create a bootable volume automatically by using pipelines
-              </Link>
+              <QuickStartLauncherLink
+                quickStart={windowsQS}
+                quickStartLoaded={windowsQSLoaded}
+                text={t('create a bootable volume automatically by using pipelines')}
+              />
             </div>
           </Trans>
         )}
