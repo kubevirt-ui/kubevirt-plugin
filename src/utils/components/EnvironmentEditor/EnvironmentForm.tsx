@@ -95,7 +95,7 @@ const EnvironmentForm: FC<EnvironmentFormProps> = ({ onEditChange, updateVM, vm 
               type="button"
               variant={ButtonVariant.link}
             >
-              {t('Add Config Map, Secret or Service Account')}
+              {t('Add Config Map, Secret, or Service Account')}
             </Button>
           </div>
         </div>
