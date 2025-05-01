@@ -17,10 +17,10 @@ const EnvironmentFormTitle: FC = memo(() => {
           <Title headingLevel="h2">{t('Environment')}</Title>
         </SearchItem>
       )}
-      {t('Include all values from existing config maps, secrets or service accounts (as disk)')}{' '}
+      {t('Include all values from existing config maps, secrets, or service accounts (as disk)')}{' '}
       <HelpTextIcon
         bodyContent={t(
-          'Add new values by referencing an existing config map, secret or service account. Using these values requires mounting them manually to the VM.',
+          'Add new values by referencing an existing config map, secret, or service account. Using these values requires mounting them manually to the VM.',
         )}
       />
     </>
