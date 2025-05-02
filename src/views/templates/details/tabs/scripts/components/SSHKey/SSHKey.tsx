@@ -59,14 +59,14 @@ const SSHKey: FC<SSHKeyProps> = ({ template }) => {
   );
 
   const onSubmit = async (sshDetails: SSHSecretDetails) => {
-    const { secretOption, sshPubKey, sshSecretName, sshSecretNamespace } = sshDetails;
+    const { secretOption, sshPubKey, sshSecretName } = sshDetails;
 
     if (isEqualObject(sshDetails, initialSSHDetails)) {
       return Promise.resolve();
     }
 
     if (secretOption === SecretSelectionOption.addNew) {
-      await createSSHSecret(sshPubKey, sshSecretName, sshSecretNamespace);
+      await createSSHSecret(sshPubKey, sshSecretName, getNamespace(template));
     }
 
     const newTemplate = produce(template, (draftTemplate) => {
