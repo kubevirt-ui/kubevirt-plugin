@@ -90,6 +90,6 @@ export const STATUS_TO_PROGRESS_VARIANT = {
 
 export const ALREADY_CREATED_ERROR_CODE = 409;
 
-export const UPSTREAM_UPLOADER_IMAGE = 'quay.io/kubevirt/tekton-tasks:v0.23.0';
+export const UPSTREAM_UPLOADER_IMAGE = 'quay.io/kubevirt/tekton-tasks:v0.24.0';
 export const DOWNSTREAM_UPLOADER_IMAGE =
-  'registry.redhat.io/container-native-virtualization/kubevirt-tekton-tasks-create-datavolume-rhel9:v4.18.0-27';
+  'registry.redhat.io/container-native-virtualization/kubevirt-tekton-tasks-create-datavolume-rhel9:v4.18';
