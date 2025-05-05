@@ -10,13 +10,14 @@ import { getConsoleVirtctlCommand } from '@kubevirt-utils/components/SSHAccess/u
 import { CONFIRM_VM_ACTIONS, TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
-import { getUpdateStrategy } from '@kubevirt-utils/resources/vm';
-import { UPDATE_STRATEGIES } from '@kubevirt-utils/resources/vm/utils/constants';
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
 import { useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 import { printableVMStatus } from '../../utils';
 import { VirtualMachineActionFactory } from '../VirtualMachineActionFactory';
+
+import useIsMTCInstalled from './useIsMTCInstalled';
+import useCurrentStorageMigration from './useStorageMigrations';
 
 type UseVirtualMachineActionsProvider = (
   vm: V1VirtualMachine,
@@ -34,6 +35,9 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
 
   const virtctlCommand = getConsoleVirtctlCommand(vm);
 
+  const mtcInstalled = useIsMTCInstalled();
+  const [currentStorageMigration, currentStorageMigrationLoaded] = useCurrentStorageMigration(vm);
+
   const [, inFlight] = useK8sModel(VirtualMachineModelRef);
 
   const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
@@ -45,8 +49,6 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
     const currentMigrationExist =
       vmim && ![vmimStatuses.Failed, vmimStatuses.Succeeded].includes(vmim?.status?.phase);
 
-    const isStorageMigration =
-      currentMigrationExist && getUpdateStrategy(vm) === UPDATE_STRATEGIES.Migration;
     const isComputeMigration = printableStatus === Migrating || currentMigrationExist;
 
     const startOrStop = ((printableStatusMachine) => {
@@ -63,14 +65,16 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
 
     const migrateStorage = VirtualMachineActionFactory.migrateStorage(vm, createModal);
 
-    const cancelMigration = isStorageMigration
-      ? VirtualMachineActionFactory.cancelStorageMigration(vm, vmim, isSingleNodeCluster)
+    const startMigrationActions = mtcInstalled
+      ? [migrateCompute, migrateStorage]
+      : [migrateCompute];
+
+    const cancelMigration = currentStorageMigration
+      ? VirtualMachineActionFactory.cancelStorageMigration(currentStorageMigration)
       : VirtualMachineActionFactory.cancelComputeMigration(vm, vmim, isSingleNodeCluster);
 
     const migrationActions =
-      isComputeMigration || isStorageMigration
-        ? [cancelMigration]
-        : [migrateCompute, migrateStorage];
+      isComputeMigration || currentStorageMigration ? [cancelMigration] : startMigrationActions;
 
     const pauseOrUnpause =
       printableStatus === Paused
@@ -93,12 +97,17 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
     vmim,
     isSingleNodeCluster,
     createModal,
+    currentStorageMigration,
     confirmVMActionsEnabled,
     virtctlCommand,
     treeViewFoldersEnabled,
+    mtcInstalled,
   ]);
 
-  return useMemo(() => [actions, !inFlight, undefined], [actions, inFlight]);
+  return useMemo(
+    () => [actions, !inFlight && currentStorageMigrationLoaded, undefined],
+    [actions, inFlight, currentStorageMigrationLoaded],
+  );
 };
 
 export default useVirtualMachineActionsProvider;

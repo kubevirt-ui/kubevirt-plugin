@@ -13,6 +13,11 @@ import CloneVMModal from '@kubevirt-utils/components/CloneVMModal/CloneVMModal';
 import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SnapshotModal from '@kubevirt-utils/components/SnapshotModal/SnapshotModal';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import {
+  DEFAULT_MIGRATION_NAMESPACE,
+  MigMigration,
+  MigMigrationModel,
+} from '@kubevirt-utils/resources/migrations/constants';
 import { asAccessReview, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -38,7 +43,6 @@ import {
   migrateVM,
   pauseVM,
   restartVM,
-  rollbackStorageMigration,
   startVM,
   stopVM,
   unpauseVM,
@@ -76,23 +80,23 @@ export const VirtualMachineActionFactory = {
       label: t('Cancel compute migration'),
     };
   },
-  cancelStorageMigration: (
-    vm: V1VirtualMachine,
-    vmim: V1VirtualMachineInstanceMigration,
-    isSingleNodeCluster: boolean,
-  ): Action => {
+  cancelStorageMigration: (currentStorageMigration: MigMigration): Action => {
     return {
       accessReview: {
-        group: VirtualMachineModel.apiGroup,
-        namespace: vm?.metadata?.namespace,
-        resource: VirtualMachineModel.plural,
+        group: MigMigrationModel.apiGroup,
+        namespace: DEFAULT_MIGRATION_NAMESPACE,
+        resource: MigMigrationModel.plural,
         verb: 'patch',
       },
-      cta: () => {
-        cancelMigration(vmim);
-        return rollbackStorageMigration(vm);
-      },
-      disabled: isSingleNodeCluster,
+      cta: () =>
+        k8sPatch({
+          data: [
+            { op: 'replace', path: '/spec/rollback', value: true },
+            { op: 'remove', path: '/spec/migrateState' },
+          ],
+          model: MigMigrationModel,
+          resource: currentStorageMigration,
+        }),
       id: 'vm-action-cancel-storage-migrate',
       label: t('Cancel storage migration'),
     };

@@ -1,10 +1,8 @@
 import React, { FC, useState } from 'react';
+import { Link } from 'react-router-dom-v5-compat';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
+import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getMigrationPod } from '@kubevirt-utils/resources/vmim/selectors';
-import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
 import { Timestamp } from '@openshift-console/dynamic-plugin-sdk';
 import {
   ActionList,
@@ -18,31 +16,42 @@ import {
 } from '@patternfly/react-core';
 import { CloseIcon } from '@patternfly/react-icons';
 
-import useCurrentStorageMigration from './hooks/useCurrentStorageMigration';
-import { getMigrationStatusLabel, getMigrationSuccessTimestamp } from './utils/utils';
+import {
+  MigMigration,
+  MigMigrationStatuses,
+} from '../../../../../utils/resources/migrations/constants';
+
+import useProgressMigration from './hooks/useProgressMigration';
+import { getMigMigrationStatusLabel } from './utils/utils';
 import VirtualMachineMigrationRollback from './VirtualMachineMigrationRollback';
 
 type VirtualMachineMigrationStatusProps = {
+  migMigration: MigMigration;
   onClose: () => void;
-  vm: V1VirtualMachine;
 };
 
-const VirtualMachineMigrationStatus: FC<VirtualMachineMigrationStatusProps> = ({ onClose, vm }) => {
+const VirtualMachineMigrationStatus: FC<VirtualMachineMigrationStatusProps> = ({
+  migMigration,
+  onClose,
+}) => {
   const { t } = useKubevirtTranslation();
-  const vmim = useCurrentStorageMigration(vm);
   const [rollbacking, setRollbacking] = useState(false);
 
-  const migrationPod = getMigrationPod(vmim);
-  const migrationLogURL = migrationPod && `/k8s/ns/default/pods/${migrationPod}/logs`;
+  const {
+    completedMigrationTimestamp,
+    creationTimestamp,
+    error: fetchingError,
+    status,
+  } = useProgressMigration(migMigration);
 
-  const migrationCompleted = vmimStatuses.Succeeded === vmim?.status?.phase;
+  const migrationCompleted = status === MigMigrationStatuses.Completed;
 
   if (rollbacking)
     return (
       <VirtualMachineMigrationRollback
+        migMigration={migMigration}
         onClose={onClose}
         onContinue={() => setRollbacking(false)}
-        vm={vm}
       />
     );
 
@@ -58,7 +67,7 @@ const VirtualMachineMigrationStatus: FC<VirtualMachineMigrationStatusProps> = ({
           />
         </div>
         <div className="pf-v6-c-wizard__title">
-          <h2 className="pf-v6-c-wizard__title-text">{t('Migrate VirtualMachine storage')}</h2>
+          <h2 className="pf-v6-c-wizard__title-text">{t('Migrate VirtualMachines storage')}</h2>
         </div>
         <div className="pf-v6-c-wizard__description">
           {t('Migrate VirtualMachine storage to a different StorageClass.')}
@@ -67,30 +76,28 @@ const VirtualMachineMigrationStatus: FC<VirtualMachineMigrationStatusProps> = ({
 
       <DescriptionList className="migration-status__body">
         <DescriptionListGroup>
-          <DescriptionListTerm>{getMigrationStatusLabel(vmim)}</DescriptionListTerm>
+          <DescriptionListTerm>{getMigMigrationStatusLabel(status)}</DescriptionListTerm>
         </DescriptionListGroup>
 
         <DescriptionListGroup>
           <DescriptionListTerm>{t('Started on')}</DescriptionListTerm>
           <DescriptionListDescription>
-            {vmim?.metadata?.creationTimestamp ? (
-              <Timestamp timestamp={vmim?.metadata?.creationTimestamp} />
-            ) : (
-              t('Not started yet')
-            )}
+            {creationTimestamp ? <Timestamp timestamp={creationTimestamp} /> : t('Not started yet')}
           </DescriptionListDescription>
         </DescriptionListGroup>
 
         <DescriptionListGroup>
           <DescriptionListTerm>{t('Status')}</DescriptionListTerm>
           <DescriptionListDescription>
-            {vmim?.status?.phase || t('Requested')}
+            {status || t('Requested')}
 
             {migrationCompleted && (
               <>
-                {t('Migrated at')} <Timestamp timestamp={getMigrationSuccessTimestamp(vmim)} />{' '}
+                {t('Migrated at')} <Timestamp timestamp={completedMigrationTimestamp} />{' '}
               </>
             )}
+
+            <ErrorAlert error={fetchingError} />
           </DescriptionListDescription>
         </DescriptionListGroup>
       </DescriptionList>
@@ -103,11 +110,11 @@ const VirtualMachineMigrationStatus: FC<VirtualMachineMigrationStatusProps> = ({
             </Button>
           )}
         </ActionListItem>
-        {migrationLogURL && (
-          <ActionListItem className="migration-status__view-report">
-            <ExternalLink href={migrationLogURL}>{t('View logs')}</ExternalLink>
-          </ActionListItem>
-        )}
+        <ActionListItem className="migration-status__view-report">
+          <Link onClick={onClose} to="/k8s/storagemigrations">
+            {t('View storage migrations')}
+          </Link>
+        </ActionListItem>
       </ActionList>
     </div>
   );

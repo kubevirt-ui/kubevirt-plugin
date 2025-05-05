@@ -7,8 +7,6 @@ import { POPPER_CONTAINER_ID } from '@kubevirt-utils/utils/constants';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import { Content, ContentVariants, Label, Stack, StackItem, Title } from '@patternfly/react-core';
 
-import useMigratableStorageClasses from '../hooks/useMigratableStorageClasses';
-
 type VirtualMachineMigrationDestinationTabProps = {
   defaultStorageClassName: string;
   destinationStorageClass: string;
@@ -27,8 +25,6 @@ const VirtualMachineMigrationDestinationTab: FC<VirtualMachineMigrationDestinati
   vmStorageClassNames,
 }) => {
   const { t } = useKubevirtTranslation();
-
-  const allowedStorageProfilesNames = useMigratableStorageClasses();
 
   return (
     <Stack hasGutter>
@@ -53,7 +49,6 @@ const VirtualMachineMigrationDestinationTab: FC<VirtualMachineMigrationDestinati
                 {defaultStorageClassName === storageClass && <Label>{t('default')}</Label>}
               </>
             ),
-            isDisabled: !allowedStorageProfilesNames?.includes(storageClass),
             value: storageClass,
           }))}
           popperProps={{
