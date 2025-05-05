@@ -32,6 +32,13 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
   const location = useLocation();
 
   const params = useParams();
+  const [memoParams, setMemoParams] = useState(params);
+
+  useEffect(() => {
+    setMemoParams((preParams) =>
+      JSON.stringify(params) !== JSON.stringify(preParams) ? params : preParams,
+    );
+  }, [params]);
 
   const dynamicPluginPages = useDynamicPages(VirtualMachineModel);
 
@@ -53,6 +60,29 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
   }, [allPages, location?.pathname]);
 
   const [activeItem, setActiveItem] = useState<number | string>();
+
+  const RoutesComponents = useMemo(() => {
+    return allPages.map((page) => {
+      const Component = page.component;
+      return (
+        <Route
+          Component={(props) => (
+            <StateHandler error={error} loaded={loaded} withBullseye>
+              <Component
+                instanceTypeExpandedSpec={instanceTypeExpandedSpec}
+                obj={vm}
+                params={memoParams}
+                {...props}
+              />
+            </StateHandler>
+          )}
+          key={page.href}
+          path={page.href}
+        />
+      );
+    });
+  }, [allPages, vm, error, loaded, instanceTypeExpandedSpec, memoParams]);
+
   return (
     <>
       <Nav variant="horizontal">
@@ -74,30 +104,10 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
                 {item.name}
               </NavLink>
             );
-          })}
+          })}{' '}
         </NavList>
       </Nav>
-      <Routes>
-        {allPages.map((page) => {
-          const Component = page.component;
-          return (
-            <Route
-              Component={(props) => (
-                <StateHandler error={error} loaded={loaded} withBullseye>
-                  <Component
-                    instanceTypeExpandedSpec={instanceTypeExpandedSpec}
-                    obj={vm}
-                    params={params}
-                    {...props}
-                  />
-                </StateHandler>
-              )}
-              key={page.href}
-              path={page.href}
-            />
-          );
-        })}
-      </Routes>
+      <Routes>{RoutesComponents}</Routes>
     </>
   );
 };
