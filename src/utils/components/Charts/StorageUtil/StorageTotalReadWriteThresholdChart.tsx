@@ -25,6 +25,7 @@ import useResponsiveCharts from '../hooks/useResponsiveCharts';
 import { getUtilizationQueries } from '../utils/queries';
 import {
   findMaxYValue,
+  getNumberOfDigitsAfterDecimalPoint,
   MILLISECONDS_MULTIPLIER,
   queriesToLink,
   tickFormat,
@@ -97,8 +98,10 @@ const StorageTotalReadWriteThresholdChart: React.FC<StorageTotalReadWriteThresho
                 },
                 tickLabels,
               }}
+              tickFormat={(tick: number) =>
+                xbytes(tick, { fixed: getNumberOfDigitsAfterDecimalPoint(yMax), iec: true })
+              }
               dependentAxis
-              tickFormat={(tick: number) => xbytes(tick, { fixed: 2, iec: true })}
               tickValues={[0, yMax]}
             />
             <ChartAxis

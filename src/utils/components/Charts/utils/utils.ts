@@ -118,3 +118,27 @@ export const findMigrationMaxYValue = (processedData, remainingData, dirtyRateDa
   );
   return Math.max(...max);
 };
+
+/**
+ * Calculate the number of digits that should be displayed after decimal point
+ * based on a static list of threshold values.
+ * @param bytes
+ */
+export const getNumberOfDigitsAfterDecimalPoint = (bytes: number) => {
+  const threshold2digits: [string, number][] = [
+    ['1 GiB', 0],
+    ['10 GiB', 2],
+    ['100 GiB', 1],
+    ['1 TiB', 0],
+    ['10 TiB', 2],
+    ['100 TiB', 1],
+    ['1 PiB', 0],
+  ];
+
+  const [, digitsAfterDecimalPoint = 2] =
+    threshold2digits
+      .map(([threshold, value]) => [xbytes.parse(threshold).bytes, value])
+      .find(([threshold]) => bytes < threshold) ?? [];
+
+  return digitsAfterDecimalPoint;
+};

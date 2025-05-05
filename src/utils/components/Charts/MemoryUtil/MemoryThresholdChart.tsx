@@ -26,6 +26,7 @@ import useResponsiveCharts from '../hooks/useResponsiveCharts';
 import { getUtilizationQueries } from '../utils/queries';
 import {
   findMaxYValue,
+  getNumberOfDigitsAfterDecimalPoint,
   MILLISECONDS_MULTIPLIER,
   queriesToLink,
   tickFormat,
@@ -107,8 +108,10 @@ const MemoryThresholdChart: FC<MemoryThresholdChartProps> = ({ vmi }) => {
                 },
                 tickLabels,
               }}
+              tickFormat={(tick: number) =>
+                xbytes(tick, { fixed: getNumberOfDigitsAfterDecimalPoint(yMax), iec: true })
+              }
               dependentAxis
-              tickFormat={(tick: number) => xbytes(tick, { fixed: 2, iec: true })}
               tickValues={[0, yMax]}
             />
             <ChartGroup>
