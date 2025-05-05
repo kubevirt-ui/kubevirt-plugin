@@ -33,10 +33,12 @@ import {
 } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { formatBytes } from '@kubevirt-utils/resources/vm/utils/disk/size';
-import { Content, ContentVariants, Flex, Label } from '@patternfly/react-core';
+import { Content, ContentVariants, Flex, FlexItem, Label } from '@patternfly/react-core';
 import { TableText, Tr, WrapModifier } from '@patternfly/react-table';
 
 import TableData from './TableData';
+
+import '../../BootableVolumeList.scss';
 
 type BootableVolumeRowProps = {
   activeColumnIDs: string[];
@@ -108,13 +110,15 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
         modifier="fitContent"
       />
       <TableData activeColumnIDs={activeColumnIDs} id="name" width={20}>
-        <Flex alignItems={{ default: 'alignItemsCenter' }} columnGap={{ default: 'columnGapNone' }}>
-          <img alt="os-icon" className="vm-catalog-row-icon" src={icon} />
-          <Content component={ContentVariants.small}>{bootVolumeName}</Content>
+        <Flex alignItems={{ default: 'alignItemsCenter' }} columnGap={{ default: 'columnGapXs' }}>
+          <img alt="os-icon" className="bootable-volume-row-icon" src={icon} />
+          <FlexItem>
+            <Content component={ContentVariants.small}>{bootVolumeName}</Content>
+          </FlexItem>
           {isDeprecated(bootVolumeName) && <DeprecatedBadge />}
-          {isCloning && <Label className="vm-catalog-row-label">{t('Clone in progress')}</Label>}
+          {isCloning && <Label isCompact>{t('Clone in progress')}</Label>}
           {isDataSourceUploading(bootableVolume as V1beta1DataSource) && (
-            <Label className="vm-catalog-row-label">{t('Upload in progress')}</Label>
+            <Label isCompact>{t('Upload in progress')}</Label>
           )}
         </Flex>
       </TableData>
