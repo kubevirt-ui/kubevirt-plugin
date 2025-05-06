@@ -15,9 +15,8 @@ import {
 import { FilterIcon } from '@patternfly/react-icons';
 import { ListManagementGroupSize } from '@virtualmachines/list/listManagementGroupSize';
 
-import FormPFSelect from '../FormPFSelect/FormPFSelect';
-
-import { Filter, FilterKeys, generateRowFilters, intersection } from './utils';
+import FormPFSelect from '../../FormPFSelect/FormPFSelect';
+import { Filter, FilterKeys, generateRowFilters, intersection } from '../utils';
 
 type RowFiltersProps = {
   filters: Filter;

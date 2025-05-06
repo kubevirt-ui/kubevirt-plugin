@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from 'react';
-import { useLocation } from 'react-router-dom-v5-compat';
+
+import useQuery from '@kubevirt-utils/hooks/useQuery';
 
 import { useQueryParamsMethods } from './useQueryParamsMethods';
 
@@ -9,9 +10,8 @@ type UseRowFiltersParametersType = (inputs: {
 }) => [string[], (selected: string[]) => void];
 
 export const useRowFiltersParameters: UseRowFiltersParametersType = ({ filterKeys, filters }) => {
-  const location = useLocation();
   const { setOrRemoveQueryArgument } = useQueryParamsMethods();
-  const queryParams = useMemo(() => new URLSearchParams(location.search), [location]);
+  const queryParams = useQuery();
 
   const selectedRowFilters = useMemo(
     () =>

@@ -2,14 +2,10 @@ import React, { FC, useMemo } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { labelParser } from '@kubevirt-utils/components/ListPageFilter/utils';
-// TODO: replace with '@patternfly/react-templates' once this PR https://github.com/patternfly/patternfly-react/pull/11791 gets merged
-import {
-  MultiTypeaheadSelect,
-  MultiTypeaheadSelectOption,
-} from '@kubevirt-utils/components/SelectMultiTypeahead/SelectMultiTypeahead';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-utils/models';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { MultiTypeaheadSelect, MultiTypeaheadSelectOption } from '@patternfly/react-templates';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 
 type LabelsMultiSelectProps = {
