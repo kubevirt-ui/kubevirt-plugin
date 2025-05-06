@@ -1,6 +1,7 @@
 import * as fuzzy from 'fuzzysearch';
 
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { numberOperatorInfo } from '@kubevirt-utils/utils/constants';
 import {
   K8sResourceCommon,
   MatchExpression,
@@ -10,6 +11,7 @@ import {
   RowReducerFilter,
   Selector,
 } from '@openshift-console/dynamic-plugin-sdk';
+import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 import { TextFiltersType, useSearchFiltersParameters } from './hooks/useSearchFiltersParameters';
 import { STATIC_SEARCH_FILTERS, STATIC_SEARCH_FILTERS_PLACEHOLDERS } from './constants';
@@ -163,4 +165,21 @@ export const getSearchTextPlaceholder = (
       filterName: selectedSearchFilter?.filterGroupName,
     })
   );
+};
+
+export const getFilterLabels = (filter: RowFilter, query: string) => {
+  if (!query) {
+    return [];
+  }
+
+  if (
+    filter.type === VirtualMachineRowFilterType.CPU ||
+    filter.type === VirtualMachineRowFilterType.Memory
+  ) {
+    const [operator, number, unit] = query.split(' ');
+
+    return [`${numberOperatorInfo[operator].sign} ${number}${unit ? ` ${unit}` : ''}`];
+  }
+
+  return [query];
 };

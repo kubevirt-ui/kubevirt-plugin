@@ -19,13 +19,13 @@ export const useSearchFiltersParameters = (searchFilters: RowFilter[]): TextFilt
   );
 
   const searchTextFilters = useMemo(() => {
-    const filters = searchFilters?.reduce((acc, filter) => {
+    const filters = searchFilters?.reduce<Record<string, string>>((acc, filter) => {
       const { type } = filter;
       const filterValue = queryParams.get(type);
 
       if (filterValue) acc[type] = filterValue;
       return acc;
-    }, {} as { [key in string]: string });
+    }, {});
 
     return filters;
   }, [queryParams, searchFilters]);

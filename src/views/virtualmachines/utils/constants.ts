@@ -8,10 +8,14 @@ export const booleanTextIds = {
 };
 
 export enum VirtualMachineRowFilterType {
+  CPU = 'cpu',
+  DateCreatedFrom = 'dateCreatedFrom',
+  DateCreatedTo = 'dateCreatedTo',
   Description = 'description',
   InstanceType = 'instanceType',
   IP = 'ip',
   LiveMigratable = 'live-migratable',
+  Memory = 'memory',
   Node = 'node',
   OS = 'os',
   Project = 'project',
@@ -26,4 +30,8 @@ export const validSearchQueryParams: string[] = [
   VirtualMachineRowFilterType.Description,
   VirtualMachineRowFilterType.Project,
   VirtualMachineRowFilterType.IP,
+  VirtualMachineRowFilterType.DateCreatedFrom,
+  VirtualMachineRowFilterType.DateCreatedTo,
+  VirtualMachineRowFilterType.CPU,
+  VirtualMachineRowFilterType.Memory,
 ];

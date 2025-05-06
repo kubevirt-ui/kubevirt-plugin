@@ -1,8 +1,9 @@
 import React, { FC, useMemo } from 'react';
 
+import { NumberOperator } from '@kubevirt-utils/utils/constants';
 import { SimpleSelect, SimpleSelectOption } from '@patternfly/react-templates';
 
-import { NumberOperator, numberOperatorSelectOptions } from './constants';
+import { numberOperatorSelectOptions } from './constants';
 
 type NumberOperatorSelectProps = {
   onSelect: (value: NumberOperator) => void;

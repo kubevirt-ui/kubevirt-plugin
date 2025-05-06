@@ -15,8 +15,17 @@ export const useNavigateToSearchResults: UseNavigateToSearchResults = () => {
   const { setAllQueryArguments } = useQueryParamsMethods();
 
   const applyFilter = useCallback(
-    ({ description, ip, labels, name, projects }: AdvancedSearchInputs) => {
-      // TODO: support all available search inputs (Date, vCPU, Memory)
+    ({
+      dateCreatedFrom,
+      dateCreatedTo,
+      description,
+      ip,
+      labels,
+      memory,
+      name,
+      projects,
+      vCPU,
+    }: AdvancedSearchInputs) => {
       setAllQueryArguments({
         ...(name ? { [STATIC_SEARCH_FILTERS.name]: name } : {}),
         ...(labels?.length > 0 ? { [STATIC_SEARCH_FILTERS.labels]: labels.join(',') } : {}),
@@ -24,6 +33,18 @@ export const useNavigateToSearchResults: UseNavigateToSearchResults = () => {
         ...(ip ? { [VirtualMachineRowFilterType.IP]: ip } : {}),
         ...(projects?.length > 0
           ? { [VirtualMachineRowFilterType.Project]: projects.join(',') }
+          : {}),
+        ...(dateCreatedFrom
+          ? { [VirtualMachineRowFilterType.DateCreatedFrom]: dateCreatedFrom }
+          : {}),
+        ...(dateCreatedTo ? { [VirtualMachineRowFilterType.DateCreatedTo]: dateCreatedTo } : {}),
+        ...(!isNaN(vCPU?.value)
+          ? { [VirtualMachineRowFilterType.CPU]: `${vCPU.operator} ${vCPU.value}` }
+          : {}),
+        ...(!isNaN(memory?.value)
+          ? {
+              [VirtualMachineRowFilterType.Memory]: `${memory.operator} ${memory.value} ${memory.unit}`,
+            }
           : {}),
       });
     },

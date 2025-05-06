@@ -40,9 +40,9 @@ const VirtualMachineSearchResults: FC = () => {
       </ListPageHeader>
       <Divider />
       <VirtualMachinesList
+        isSearchResultsPage
         kind={VirtualMachineModelRef}
         namespace={namespace}
-        showSummary={false}
       />
     </>
   );
