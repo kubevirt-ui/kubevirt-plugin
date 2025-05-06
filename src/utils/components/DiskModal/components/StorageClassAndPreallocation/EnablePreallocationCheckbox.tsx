@@ -43,12 +43,7 @@ const EnablePreallocationCheckbox: FC<EnablePreallocationCheckboxProps> = ({ isD
               <>
                 <Trans ns="plugin__kubevirt-plugin">
                   Refer to the
-                  <Link
-                    to={{
-                      pathname: documentationURL.DATAVOLUME_PREALLOCATIONS,
-                    }}
-                    target="_blank"
-                  >
+                  <Link target="_blank" to={documentationURL.DATAVOLUME_PREALLOCATIONS}>
                     {' '}
                     Documentation{' '}
                   </Link>
