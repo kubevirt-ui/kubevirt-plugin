@@ -1,6 +1,8 @@
 .vms-tree-view {
   overflow: visible;
 
+  --pf-v6-c-drawer__panel--PaddingBlockStart: 0;
+
   .pf-v6-c-tree-view__list-item {
     position: relative;
   }
@@ -23,8 +25,7 @@
   }
 
   &__search-input {
-    margin-top: var(--pf-t--global--spacer--sm);
-    margin-inline: var(--pf-t--global--spacer--md);
+    margin: var(--pf-t--global--spacer--md);
   }
 
   &__action {
@@ -74,7 +75,7 @@
   }
 
   &__toolbar-switch {
-    margin-right: var(--pf-t--global--spacer--sm);
+    margin-right: var(--pf-t--global--spacer--md);
     margin-bottom: 0;
   }
 }

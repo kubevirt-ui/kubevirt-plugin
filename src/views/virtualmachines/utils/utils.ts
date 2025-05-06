@@ -23,15 +23,20 @@ const ipStringToBinary = (ip: string) =>
     .map((classes) => decimalToBinary(parseInt(classes)).padStart(8, '0'))
     .join('');
 
+const isValidIP = (ip: string) =>
+  /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(3[0-2]|[1-2]?\d))?$/.test(
+    ip,
+  );
+
 export const compareCIDR = (ipSearch: string, ip: string) => {
+  if (!isValidIP(ipSearch)) {
+    return false;
+  }
+
   const [baseIp, range] = ipSearch.split('/');
-
   const baseIpBinary = ipStringToBinary(baseIp);
-
   const ipBinary = ipStringToBinary(ip);
-
   const rangeNumber = parseInt(range);
-
   const baseIpBinarySlice = baseIpBinary.slice(0, rangeNumber);
   const ipBinarySlice = ipBinary.slice(0, rangeNumber);
 

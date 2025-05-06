@@ -1,5 +1,5 @@
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
+import { ADVANCED_SEARCH, TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
@@ -25,6 +25,7 @@ type UsePreviewFeaturesData = () => {
 const usePreviewFeaturesData: UsePreviewFeaturesData = () => {
   const { t } = useKubevirtTranslation();
   const treeViewFoldersFeature = useFeatures(TREE_VIEW_FOLDERS);
+  const advancedSearchFeature = useFeatures(ADVANCED_SEARCH);
 
   const features = [
     {
@@ -32,6 +33,12 @@ const usePreviewFeaturesData: UsePreviewFeaturesData = () => {
       id: TREE_VIEW_FOLDERS,
       label: t('Enable folders in Virtual Machines tree view'),
       ...treeViewFoldersFeature,
+    },
+    {
+      externalLink: null,
+      id: ADVANCED_SEARCH,
+      label: t('Enable advanced search in Virtual Machines list'),
+      ...advancedSearchFeature,
     },
   ];
 

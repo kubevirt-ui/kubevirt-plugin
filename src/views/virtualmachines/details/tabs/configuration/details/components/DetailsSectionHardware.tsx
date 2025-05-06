@@ -38,7 +38,7 @@ const DetailsSectionHardware: FC<DetailsSectionHardwareProps> = ({
 
   useEffect(() => {
     expandURLHash(getSearchItemsIds(getDetailsTabHardwareIds(vm)), location?.hash, setIsExpanded);
-  }, [location?.hash, vm]);
+  }, [location?.hash, vm, setIsExpanded]);
 
   const onEditHostDevices = () => {
     createModal(({ isOpen, onClose }) => (

@@ -103,7 +103,7 @@ const useBootableVolumesColumns = (
         title: '',
       },
     ],
-    [t, sorting, startIndex, endIndex, preferences],
+    [t, sorting, startIndex, endIndex, preferences, namespace],
   );
 
   const [activeColumns, , loaded] = useKubevirtUserSettingsTableColumns<K8sResourceCommon>({

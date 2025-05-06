@@ -3,7 +3,7 @@ import React, { FC, useState } from 'react';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VM_STATUS } from '@kubevirt-utils/resources/vm/utils/vmStatus';
-import { FilterValue } from '@openshift-console/dynamic-plugin-sdk';
+import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import { ERROR } from '@overview/OverviewTab/vm-statuses-card/utils/constants';
 import { getVMStatuses } from '@overview/OverviewTab/vm-statuses-card/utils/utils';
 import VMStatusItem from '@overview/OverviewTab/vm-statuses-card/VMStatusItem';
@@ -26,7 +26,7 @@ import './VirtualMachineListSummary.scss';
 
 type VirtualMachineListSummaryProps = {
   namespace: string;
-  onFilterChange?: (type: string, value: FilterValue) => void;
+  onFilterChange?: OnFilterChange;
   vmis: V1VirtualMachineInstance[];
   vms: V1VirtualMachine[];
 };

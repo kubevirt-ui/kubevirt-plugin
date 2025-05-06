@@ -4,7 +4,7 @@ import { useLocation, useNavigate, useParams, useSearchParams } from 'react-rout
 import { useQueryParamsMethods } from '@kubevirt-utils/components/ListPageFilter/hooks/useQueryParamsMethods';
 import { ALL_NAMESPACES, ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { FilterValue } from '@openshift-console/dynamic-plugin-sdk';
+import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import { useLastNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { TEXT_FILTER_LABELS_ID } from '@virtualmachines/list/hooks/constants';
 
@@ -16,7 +16,7 @@ import {
 import { treeDataMap, TreeViewDataItemWithHref } from '../utils/utils';
 
 const useTreeViewSelect = (
-  onFilterChange: (type: string, value: FilterValue) => void,
+  onFilterChange: OnFilterChange,
 ): [
   selected: TreeViewDataItemWithHref,
   onSelect: (_event: MouseEvent, treeViewItem: TreeViewDataItemWithHref) => void,

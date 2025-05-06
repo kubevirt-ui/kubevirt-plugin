@@ -14,7 +14,7 @@ export type UserSettingFavorites = [
 export type KubevirtUserSetting = [
   value: { [key: string]: any },
   updater: (val: any) => Promise<{ [key: string]: any }>,
-  loading: boolean,
+  loaded: boolean,
   error: Error,
 ];
 

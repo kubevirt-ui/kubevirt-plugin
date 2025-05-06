@@ -65,7 +65,7 @@ const useClusterInstancetypeListColumns: UseClusterInstancetypeListColumns = (pa
         title: '',
       },
     ],
-    [t, sorting],
+    [t, sorting, sortingMemory],
   );
 
   const [activeColumns, , loadedColumns] =

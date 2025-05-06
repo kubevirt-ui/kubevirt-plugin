@@ -62,6 +62,7 @@ import VirtualMachineListSummary from './components/VirtualMachineListSummary/Vi
 import VirtualMachineRow from './components/VirtualMachineRow/VirtualMachineRow';
 import VirtualMachineSelection from './components/VirtualMachineSelection/VirtualMachineSelection';
 import useExistingSelectedVMs from './hooks/useExistingSelectedVMs';
+import useFiltersFromURL from './hooks/useFiltersFromURL';
 import useSelectedFilters from './hooks/useSelectedFilters';
 import useVirtualMachineColumns from './hooks/useVirtualMachineColumns';
 import useVMMetrics from './hooks/useVMMetrics';
@@ -73,10 +74,12 @@ import './VirtualMachinesList.scss';
 type VirtualMachinesListProps = {
   kind: string;
   namespace: string;
+  showSummary?: boolean;
 } & RefAttributes<{ onFilterChange: OnFilterChange } | null>;
 
-const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, namespace }, ref) => {
+const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref) => {
   const { t } = useKubevirtTranslation();
+  const { kind, namespace, showSummary = true } = props;
   const catalogURL = `/k8s/ns/${namespace || DEFAULT_NAMESPACE}/catalog`;
   const { featureEnabled, loading: loadingFeatureProxy } = useFeatures(KUBEVIRT_APISERVER_PROXY);
   const isProxyPodAlive = useKubevirtDataPodHealth();
@@ -86,7 +89,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
 
   const query = useQuery();
 
-  const [vm, vmLoaded, loadError] = useKubevirtWatchResource<V1VirtualMachine[]>(
+  const [vms, vmsLoaded, loadError] = useKubevirtWatchResource<V1VirtualMachine[]>(
     {
       groupVersionKind: VirtualMachineModelGroupVersionKind,
       isList: true,
@@ -105,9 +108,9 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
     },
   );
 
-  const vmToShow = useMemo(() => (runningTourSignal.value ? [tourGuideVM] : vm), [vm]);
+  const vmsToShow = useMemo(() => (runningTourSignal.value ? [tourGuideVM] : vms), [vms]);
 
-  const [vmis, vmiLoaded] = useKubevirtWatchResource<V1VirtualMachineInstance[]>(
+  const [vmis, vmisLoaded] = useKubevirtWatchResource<V1VirtualMachineInstance[]>(
     {
       groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
       isList: true,
@@ -141,19 +144,22 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
     namespaced: true,
   });
 
-  const { filters, searchFilters, vmiMapper, vmimMapper } = useVMListFilters(
+  const { dropdownFilters, filters, searchFilters, vmiMapper, vmimMapper } = useVMListFilters(
     vmis,
-    vmToShow,
+    vmsToShow,
     vmims,
     pvcMapper,
   );
 
+  const filtersFromURL = useFiltersFromURL(filters, [...dropdownFilters, ...searchFilters]);
+
   const [pagination, setPagination] = useState(paginationInitialState);
 
-  const [unfilterData, dataFilters, onFilterChange] = useListPageFilter<
-    V1VirtualMachine,
-    V1VirtualMachine
-  >(vmToShow, [...filters, ...searchFilters]);
+  const [_, filteredData, onFilterChange] = useListPageFilter<V1VirtualMachine, V1VirtualMachine>(
+    vmsToShow,
+    [...filters, ...dropdownFilters, ...searchFilters],
+    filtersFromURL,
+  );
 
   // Allow using folder filters from the tree view
   useImperativeHandle(
@@ -166,15 +172,12 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
 
   const selectedFilters = useSelectedFilters(filters, searchFilters);
 
-  const [unfilteredData, data, paginatedVMs] = useMemo(() => {
-    if (!featureEnabled || isProxyPodAlive === false)
-      return [
-        unfilterData,
-        dataFilters,
-        dataFilters?.slice(pagination.startIndex, pagination.endIndex),
-      ];
+  const [data, paginatedVMs] = useMemo(() => {
+    if (!featureEnabled || isProxyPodAlive === false) {
+      return [filteredData, filteredData?.slice(pagination.startIndex, pagination.endIndex)];
+    }
 
-    const matchedVMs = vmToShow?.filter(
+    const matchedVMs = vmsToShow?.filter(
       ({ metadata: { name, namespace: ns }, status: { printableStatus = '' } = {} }) => {
         return (
           vmiMapper?.mapper?.[ns]?.[name] ||
@@ -182,15 +185,15 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
         );
       },
     );
-    return [vmToShow, matchedVMs, matchedVMs?.slice(pagination.startIndex, pagination.endIndex)];
+
+    return [matchedVMs, matchedVMs?.slice(pagination.startIndex, pagination.endIndex)];
   }, [
     featureEnabled,
     isProxyPodAlive,
-    unfilterData,
-    dataFilters,
+    filteredData,
     pagination.startIndex,
     pagination.endIndex,
-    vmToShow,
+    vmsToShow,
     vmiMapper?.mapper,
     query,
   ]);
@@ -218,8 +221,8 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
   );
 
   const loaded =
-    vmLoaded &&
-    vmiLoaded &&
+    vmsLoaded &&
+    vmisLoaded &&
     vmimsLoaded &&
     isSingleNodeLoaded &&
     !loadingFeatureProxy &&
@@ -227,20 +230,24 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
 
   const vmsFilteredWithProxy = isProxyPodAlive && selectedFilters.length > 0;
 
-  const noVMs = isEmpty(unfilteredData) && !vmsFilteredWithProxy;
+  const noVMs = isEmpty(vmsToShow) && !vmsFilteredWithProxy;
 
   const existingSelectedVMs = useExistingSelectedVMs(data);
   const allVMsSelected = data?.length === existingSelectedVMs.length;
 
+  const vmSummary = (
+    <VirtualMachineListSummary
+      namespace={namespace}
+      onFilterChange={onFilterChange}
+      vmis={vmis}
+      vms={vmsToShow}
+    />
+  );
+
   if (loaded && noVMs) {
     return (
       <>
-        <VirtualMachineListSummary
-          namespace={namespace}
-          onFilterChange={onFilterChange}
-          vmis={vmis}
-          vms={data}
-        />
+        {showSummary && vmSummary}
         <VirtualMachineEmptyState catalogURL={catalogURL} namespace={namespace} />
       </>
     );
@@ -249,12 +256,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
   return (
     /* All of this table and components should be replaced to our own fitted components */
     <>
-      <VirtualMachineListSummary
-        namespace={namespace}
-        onFilterChange={onFilterChange}
-        vmis={vmis}
-        vms={unfilterData}
-      />
+      {showSummary && vmSummary}
       <ListPageBody>
         <div className="vm-listpagebody">
           <div className="list-managment-group" ref={listManagementGroupRef}>
@@ -284,11 +286,13 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
                     startIndex: 0,
                   }));
                 }}
-                data={unfilteredData}
+                data={vmsToShow}
+                dropdownFilters={dropdownFilters}
                 listManagementGroupSize={listManagementGroupSize}
                 loaded={loaded}
                 rowFilters={filters}
                 searchFilters={searchFilters}
+                showProjectFilter
               />
             </Flex>
             <Flex flexWrap={{ default: 'nowrap' }}>
@@ -329,7 +333,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
             loaded={loaded}
             loadError={loadError}
             Row={VirtualMachineRow}
-            unfilteredData={unfilteredData}
+            unfilteredData={vmsToShow}
           />
         </div>
       </ListPageBody>

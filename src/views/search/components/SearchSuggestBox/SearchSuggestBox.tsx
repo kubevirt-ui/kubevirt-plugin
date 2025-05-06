@@ -1,0 +1,132 @@
+import React, { FC } from 'react';
+
+import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
+import { MAX_SUGGESTIONS } from '@kubevirt-utils/components/ListPageFilter/constants';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  Button,
+  ButtonVariant,
+  EmptyState,
+  EmptyStateBody,
+  Panel,
+  PanelMain,
+  PanelMainBody,
+  Spinner,
+  Stack,
+  StackItem,
+} from '@patternfly/react-core';
+import SlidersHIcon from '@patternfly/react-icons/dist/esm/icons/sliders-h-icon';
+
+import { AdvancedSearchInputs, SearchSuggestResult } from '../../utils/types';
+
+import RelatedSuggestions from './components/RelatedSuggestions';
+import SearchSuggestBoxFooter from './components/SearchSuggestBoxFooter';
+import SearchSuggestBoxHeader from './components/SearchSuggestBoxHeader';
+
+export type SearchSuggestBoxProps = {
+  isSearchInProgress: boolean;
+  maxResourceLinks?: number;
+  navigateToSearchResults: (searchInputs: AdvancedSearchInputs) => void;
+  searchQuery: string;
+  searchSuggestResult?: SearchSuggestResult;
+  showSearchModal: (prefillInputs?: AdvancedSearchInputs) => void;
+};
+
+const SearchSuggestBox: FC<SearchSuggestBoxProps> = ({
+  isSearchInProgress,
+  maxResourceLinks = MAX_SUGGESTIONS,
+  navigateToSearchResults,
+  searchQuery,
+  searchSuggestResult,
+  showSearchModal,
+}) => {
+  const { t } = useKubevirtTranslation();
+
+  const suggestResources = searchSuggestResult?.resources.slice(0, maxResourceLinks) ?? [];
+  const hasResourcesToSuggest = suggestResources.length > 0;
+
+  const hasRelatedSuggestions = Object.values(searchSuggestResult?.resourcesMatching ?? {}).some(
+    (count) => count > 0,
+  );
+
+  return (
+    <Panel>
+      {hasResourcesToSuggest && (
+        <SearchSuggestBoxHeader
+          navigateToSearchResults={navigateToSearchResults}
+          searchQuery={searchQuery}
+        />
+      )}
+      <PanelMain>
+        {isSearchInProgress && (
+          <EmptyState
+            headingLevel="h4"
+            icon={Spinner}
+            titleText={t('Loading results')}
+            variant="xs"
+          />
+        )}
+        {!isSearchInProgress && (
+          <>
+            <PanelMainBody>
+              <Stack hasGutter>
+                {hasResourcesToSuggest &&
+                  suggestResources.map((resource, index) => (
+                    <StackItem key={`${index}_${resource.name}`}>
+                      <ResourceLink
+                        groupVersionKind={VirtualMachineModelGroupVersionKind}
+                        hideIcon
+                        name={resource.name}
+                        namespace={resource.namespace}
+                      />
+                    </StackItem>
+                  ))}
+                {!hasResourcesToSuggest && (
+                  <StackItem>
+                    <EmptyState
+                      headingLevel="h4"
+                      titleText={t('No results found for "{{searchQuery}}"', { searchQuery })}
+                      variant="xs"
+                    >
+                      <EmptyStateBody>
+                        {t('Try using the')}{' '}
+                        <Button
+                          onClick={() => {
+                            showSearchModal();
+                          }}
+                          icon={<SlidersHIcon />}
+                          iconPosition="end"
+                          isInline
+                          variant={ButtonVariant.link}
+                        >
+                          {t('advanced search')}
+                        </Button>
+                      </EmptyStateBody>
+                    </EmptyState>
+                  </StackItem>
+                )}
+              </Stack>
+            </PanelMainBody>
+            {hasRelatedSuggestions && (
+              <RelatedSuggestions
+                searchQuery={searchQuery}
+                searchSuggestResult={searchSuggestResult}
+                showSearchModal={showSearchModal}
+              />
+            )}
+          </>
+        )}
+      </PanelMain>
+      {hasResourcesToSuggest && (
+        <SearchSuggestBoxFooter
+          onAdvancedSearchClick={() => {
+            showSearchModal({ name: searchQuery });
+          }}
+        />
+      )}
+    </Panel>
+  );
+};
+
+export default SearchSuggestBox;

@@ -22,6 +22,7 @@ import { getVMIIPAddresses } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
+import { VirtualMachineRowFilterType } from './constants';
 import { getVirtualMachineStorageClasses, PVCMapper, VMIMapper, VMIMMapper } from './mappers';
 import { compareCIDR, getLatestMigrationForEachVM, isLiveMigratable } from './utils';
 import { isErrorPrintableStatus, printableVMStatus } from './virtualMachineStatuses';
@@ -51,7 +52,7 @@ const useStatusFilter = (): RowFilter => ({
     );
   },
   items: statusFilterItems,
-  type: 'status',
+  type: VirtualMachineRowFilterType.Status,
 });
 
 const useLiveMigratableFilter = (): RowFilter => {
@@ -72,7 +73,7 @@ const useLiveMigratableFilter = (): RowFilter => {
       { id: 'notMigratable', title: t('Not migratable') },
     ],
     reducer: (obj) => (isLiveMigratable(obj, isSingleNodeCluster) ? 'migratable' : 'notMigratable'),
-    type: 'live-migratable',
+    type: VirtualMachineRowFilterType.LiveMigratable,
   };
 };
 
@@ -102,7 +103,7 @@ const useTemplatesFilter = (vms: V1VirtualMachine[]): RowFilter => {
     filterGroupName: t('Template'),
     items: templates,
     reducer: (obj) => obj?.metadata?.labels?.[LABEL_USED_TEMPLATE_NAME] ?? noTemplate,
-    type: 'template',
+    type: VirtualMachineRowFilterType.Template,
   };
 };
 
@@ -128,7 +129,7 @@ const useOSFilter = (): RowFilter => {
       title: osName,
     })),
     reducer: getOSName,
-    type: 'os',
+    type: VirtualMachineRowFilterType.OS,
   };
 };
 
@@ -152,7 +153,7 @@ const useNodesFilter = (vmiMapper: VMIMapper): RowFilter => {
     items: sortedNodeNamesItems,
     reducer: (obj) =>
       vmiMapper?.mapper?.[obj?.metadata?.namespace]?.[obj?.metadata?.name]?.status?.nodeName,
-    type: 'node',
+    type: VirtualMachineRowFilterType.Node,
   };
 };
 const useInstanceTypesFilter = (vms: V1VirtualMachine[]): RowFilter => {
@@ -184,7 +185,7 @@ const useInstanceTypesFilter = (vms: V1VirtualMachine[]): RowFilter => {
       const instanceTypeName = getInstanceTypePrefix(obj?.spec?.instancetype?.name);
       return instanceTypeName ?? noInstanceType;
     },
-    type: 'instanceType',
+    type: VirtualMachineRowFilterType.InstanceType,
   };
 };
 
@@ -198,21 +199,47 @@ const useIPSearchFilter = (vmiMapper: VMIMapper): RowFilter => ({
 
     const ipAddresses = getVMIIPAddresses(vmi);
 
-    if (search.includes('/')) {
-      return ipAddresses.some((ipAddress) => compareCIDR(search, ipAddress));
-    }
-
-    return ipAddresses.some((ipAddress) => ipAddress?.includes(search));
+    return search.includes('/')
+      ? ipAddresses.some((ipAddress) => compareCIDR(search, ipAddress))
+      : ipAddresses.some((ipAddress) => ipAddress?.includes(search));
   },
   filterGroupName: t('IP Address'),
   isMatch: () => true,
   items: [],
-  type: 'ip',
+  type: VirtualMachineRowFilterType.IP,
+});
+
+const useDescriptionFilter = (): RowFilter => ({
+  filter: (input, obj) => {
+    const search = input.selected?.[0];
+
+    if (!search) return true;
+
+    return obj.metadata?.annotations?.description?.toLowerCase().includes(search.toLowerCase());
+  },
+  filterGroupName: t('Description'),
+  isMatch: () => true,
+  items: [],
+  type: VirtualMachineRowFilterType.Description,
+});
+
+const useProjectFilter = (): RowFilter => ({
+  filter: (input, obj) => {
+    if (isEmpty(input.selected)) {
+      return true;
+    }
+
+    return input.selected.some((projectName) => projectName === getNamespace(obj));
+  },
+  filterGroupName: t('Project'),
+  isMatch: () => true,
+  items: [],
+  type: VirtualMachineRowFilterType.Project,
 });
 
 type StorageClassByVM = { [namespace in string]: { [name in string]: Set<string> } };
 
-const useStorageclassFilter = (vms: V1VirtualMachine[], pvcMapper: PVCMapper): RowFilter => {
+const useStorageClassFilter = (vms: V1VirtualMachine[], pvcMapper: PVCMapper): RowFilter => {
   const { allStorageClasses, storageClassesByVM } = vms.reduce(
     (acc, vm) => {
       const vmNamespace = getNamespace(vm);
@@ -254,7 +281,7 @@ const useStorageclassFilter = (vms: V1VirtualMachine[], pvcMapper: PVCMapper): R
         id: storageClassName,
         title: storageClassName,
       })) || [],
-    type: 'storageclassname',
+    type: VirtualMachineRowFilterType.StorageClassName,
   };
 };
 
@@ -264,6 +291,7 @@ export const useVMListFilters = (
   vmims: V1VirtualMachineInstanceMigration[],
   pvcMapper: PVCMapper,
 ): {
+  dropdownFilters: RowFilter<V1VirtualMachine>[];
   filters: RowFilter<V1VirtualMachine>[];
   searchFilters: RowFilter<V1VirtualMachine>[];
   vmiMapper: VMIMapper;
@@ -299,10 +327,15 @@ export const useVMListFilters = (
   const nodesFilter = useNodesFilter(vmiMapper);
   const liveMigratableFilter = useLiveMigratableFilter();
   const instanceTypesFilter = useInstanceTypesFilter(vms);
+  const storageClassFilters = useStorageClassFilter(vms, pvcMapper);
+
+  const projectFilter = useProjectFilter();
+
   const searchByIP = useIPSearchFilter(vmiMapper);
-  const storageClassFilters = useStorageclassFilter(vms, pvcMapper);
+  const searchByDescription = useDescriptionFilter();
 
   return {
+    dropdownFilters: [projectFilter],
     filters: [
       statusFilter,
       templatesFilter,
@@ -312,7 +345,7 @@ export const useVMListFilters = (
       instanceTypesFilter,
       storageClassFilters,
     ],
-    searchFilters: [searchByIP],
+    searchFilters: [searchByIP, searchByDescription],
     vmiMapper,
     vmimMapper,
   };

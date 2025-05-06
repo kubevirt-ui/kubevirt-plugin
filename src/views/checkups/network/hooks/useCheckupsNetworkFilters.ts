@@ -1,5 +1,9 @@
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { FilterValue, RowFilter, useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  OnFilterChange,
+  RowFilter,
+  useListPageFilter,
+} from '@openshift-console/dynamic-plugin-sdk';
 
 import { filters } from '../utils/filters';
 
@@ -8,7 +12,7 @@ type UseCheckupsNetworkFilters = (
 ) => [
   unfilteredData: IoK8sApiCoreV1ConfigMap[],
   dataFilter: IoK8sApiCoreV1ConfigMap[],
-  onFilterChange: (type: string, value: FilterValue) => void,
+  onFilterChange: OnFilterChange,
   filters: RowFilter<IoK8sApiCoreV1ConfigMap>[],
 ];
 
