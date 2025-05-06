@@ -4,10 +4,11 @@ import classNames from 'classnames';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { Label, SelectList } from '@patternfly/react-core';
 
-import { useDocumentListener } from './hooks/useDocumentListener';
-import { MAX_SUGGESTIONS, suggestionBoxKeyHandler } from './constants';
+import { MAX_SUGGESTIONS, suggestionBoxKeyHandler } from '../constants';
+import { useDocumentListener } from '../hooks/useDocumentListener';
+import { fuzzyCaseInsensitive, labelParser } from '../utils';
+
 import SearchFilter from './SearchFilter';
-import { fuzzyCaseInsensitive, labelParser } from './utils';
 
 type AutocompleteInputProps = {
   data?: K8sResourceCommon[];

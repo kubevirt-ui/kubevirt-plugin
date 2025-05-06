@@ -1,8 +1,8 @@
 import React, { FC, useMemo } from 'react';
-import { useLocation } from 'react-router-dom-v5-compat';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
+import useQuery from '@kubevirt-utils/hooks/useQuery';
 import { SelectProps, ToolbarFilter } from '@patternfly/react-core';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
@@ -14,8 +14,7 @@ type ProjectFilterProps = {
 
 const ProjectFilter: FC<ProjectFilterProps> = ({ applyTextFilters }) => {
   const { t } = useKubevirtTranslation();
-  const location = useLocation();
-  const queryParams = useMemo(() => new URLSearchParams(location.search), [location]);
+  const queryParams = useQuery();
 
   const selectedProjects = useMemo(
     () => queryParams.get(VirtualMachineRowFilterType.Project)?.split(',') ?? [],
