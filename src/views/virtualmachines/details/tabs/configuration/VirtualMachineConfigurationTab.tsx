@@ -9,6 +9,7 @@ import { getName } from '@kubevirt-utils/resources/shared';
 import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
 import { PageSection, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
+import { isRunning } from '@virtualmachines/utils';
 
 import { getNamespace } from '../../../../cdi-upload-provider/utils/selectors';
 
@@ -24,7 +25,7 @@ const VirtualMachineConfigurationTab: FC<NavPageComponentProps> = ({
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { vmi } = useVMI(getName(vm), getNamespace(vm));
+  const { vmi } = useVMI(getName(vm), getNamespace(vm), isRunning(vm));
   const { allInstanceTypes } = useInstanceTypesAndPreferences();
   const [activeTabKey, setActiveTabKey] = useState<number | string>(
     VirtualMachineDetailsTab.Details,

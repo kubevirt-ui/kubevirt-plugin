@@ -1,17 +1,16 @@
 import React, { FC } from 'react';
 import { useLocation } from 'react-router-dom-v5-compat';
 
-import { VirtualMachineInstanceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import DetailsPageTitle from '@kubevirt-utils/components/DetailsPageTitle/DetailsPageTitle';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import PaneHeading from '@kubevirt-utils/components/PaneHeading/PaneHeading';
 import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useSingleNodeCluster from '@kubevirt-utils/hooks/useSingleNodeCluster';
+import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
 import useVirtualMachineInstanceMigration from '@kubevirt-utils/resources/vmi/hooks/useVirtualMachineInstanceMigration';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Label, Split, SplitItem, Title } from '@patternfly/react-core';
 import VirtualMachineActions from '@virtualmachines/actions/components/VirtualMachineActions/VirtualMachineActions';
 import VMActionsIconBar from '@virtualmachines/actions/components/VMActionsIconBar/VMActionsIconBar';
@@ -20,7 +19,7 @@ import VirtualMachinePendingChangesAlert from '@virtualmachines/details/VirtualM
 import VMNotMigratableLabel from '@virtualmachines/list/components/VMNotMigratableLabel/VMNotMigratableLabel';
 
 import VirtualMachineBreadcrumb from '../list/components/VirtualMachineBreadcrumb/VirtualMachineBreadcrumb';
-import { getVMStatusIcon } from '../utils';
+import { getVMStatusIcon, isRunning } from '../utils';
 
 import { vmTabsWithYAML } from './utils/constants';
 
@@ -40,12 +39,7 @@ const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({
   const { t } = useKubevirtTranslation();
   const location = useLocation();
 
-  const [vmi] = useK8sWatchResource<V1VirtualMachineInstance>({
-    groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
-    isList: false,
-    name: vm?.metadata?.name,
-    namespace: vm?.metadata?.namespace,
-  });
+  const { vmi } = useVMI(vm?.metadata?.name, vm?.metadata?.namespace, isRunning(vm));
   const vmim = useVirtualMachineInstanceMigration(vm);
   const [isSingleNodeCluster] = useSingleNodeCluster();
   const [actions] = useVirtualMachineActionsProvider(vm, vmim, isSingleNodeCluster);

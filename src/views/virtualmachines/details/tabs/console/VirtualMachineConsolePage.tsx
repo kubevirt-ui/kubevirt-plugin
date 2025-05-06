@@ -1,26 +1,19 @@
 import React, { FC } from 'react';
 
-import { VirtualMachineInstanceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
-import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Consoles from '@kubevirt-utils/components/Consoles/Consoles';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
 import { Bullseye, EmptyState, EmptyStateBody, PageSection } from '@patternfly/react-core';
 import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
 
-import { printableVMStatus } from '../../../utils';
+import { isRunning, printableVMStatus } from '../../../utils';
 
 import './VirtualMachineConsolePage.scss';
 
 const VirtualMachineConsolePage: FC<NavPageComponentProps> = ({ obj: vm }) => {
   const { t } = useKubevirtTranslation();
-  const [vmi, vmiLoaded] = useK8sWatchResource<V1VirtualMachineInstance>({
-    groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
-    isList: false,
-    name: vm?.metadata?.name,
-    namespace: vm?.metadata?.namespace,
-  });
+  const { vmi, vmiLoaded } = useVMI(vm?.metadata?.name, vm?.metadata?.namespace, isRunning(vm));
 
   if (!vmi || vm?.status?.printableStatus === printableVMStatus.Stopped) {
     return (
