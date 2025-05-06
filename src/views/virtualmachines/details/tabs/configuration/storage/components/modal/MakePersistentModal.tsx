@@ -33,7 +33,9 @@ const MakePersistentModal: FC<MakePersistentModalProps> = ({
   const { t } = useKubevirtTranslation();
 
   const makePersistent = async () => {
-    const volumeToPersist = getVMIVolumes(vmi).find((vmiVolume) => vmiVolume.name === volume?.name);
+    const volumeToPersist = getVMIVolumes(vmi)?.find(
+      (vmiVolume) => vmiVolume.name === volume?.name,
+    );
 
     const vmPersistent = await persistVolume(vm, vmi, volumeToPersist);
 
