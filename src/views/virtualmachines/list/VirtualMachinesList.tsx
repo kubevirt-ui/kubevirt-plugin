@@ -28,7 +28,6 @@ import {
   tourGuideVM,
 } from '@kubevirt-utils/components/GuidedTour/utils/constants';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
-import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import useContainerWidth from '@kubevirt-utils/hooks/useContainerWidth';
 import { KUBEVIRT_APISERVER_PROXY } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
@@ -39,14 +38,11 @@ import {
   paginationDefaultValues,
   paginationInitialState,
 } from '@kubevirt-utils/hooks/usePagination/utils/constants';
-import useSingleNodeCluster from '@kubevirt-utils/hooks/useSingleNodeCluster';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
-  K8sResourceCommon,
   ListPageBody,
   OnFilterChange,
   useListPageFilter,
-  VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Flex, Pagination } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
@@ -57,12 +53,11 @@ import { convertIntoPVCMapper } from '@virtualmachines/utils/mappers';
 import { useVMListFilters } from '../utils';
 
 import VirtualMachineBulkActionButton from './components/VirtualMachineBulkActionButton';
-import VirtualMachineEmptyState from './components/VirtualMachineEmptyState/VirtualMachineEmptyState';
 import VirtualMachineListSummary from './components/VirtualMachineListSummary/VirtualMachineListSummary';
-import VirtualMachineRow from './components/VirtualMachineRow/VirtualMachineRow';
 import VirtualMachineSelection from './components/VirtualMachineSelection/VirtualMachineSelection';
-import useExistingSelectedVMs from './hooks/useExistingSelectedVMs';
+import VirtualMachineTable from './components/VirtualMachineTable/VirtualMachineTable';
 import useSelectedFilters from './hooks/useSelectedFilters';
+import useSortData from './hooks/useSortData';
 import useVirtualMachineColumns from './hooks/useVirtualMachineColumns';
 import useVMMetrics from './hooks/useVMMetrics';
 import { getListManagementGroupSize, ListManagementGroupSize } from './listManagementGroupSize';
@@ -75,9 +70,8 @@ type VirtualMachinesListProps = {
   namespace: string;
 } & RefAttributes<{ onFilterChange: OnFilterChange } | null>;
 
-const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, namespace }, ref) => {
+const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ namespace }, ref) => {
   const { t } = useKubevirtTranslation();
-  const catalogURL = `/k8s/ns/${namespace || DEFAULT_NAMESPACE}/catalog`;
   const { featureEnabled, loading: loadingFeatureProxy } = useFeatures(KUBEVIRT_APISERVER_PROXY);
   const isProxyPodAlive = useKubevirtDataPodHealth();
 
@@ -131,8 +125,6 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
 
   const pvcMapper = useMemo(() => convertIntoPVCMapper(pvcs), [pvcs]);
 
-  const [isSingleNodeCluster, isSingleNodeLoaded] = useSingleNodeCluster();
-
   const [vmims, vmimsLoaded] = useKubevirtWatchResource<V1VirtualMachineInstanceMigration[]>({
     groupVersionKind: VirtualMachineInstanceMigrationModelGroupVersionKind,
     isList: true,
@@ -166,13 +158,8 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
 
   const selectedFilters = useSelectedFilters(filters, searchFilters);
 
-  const [unfilteredData, data, paginatedVMs] = useMemo(() => {
-    if (!featureEnabled || isProxyPodAlive === false)
-      return [
-        unfilterData,
-        dataFilters,
-        dataFilters?.slice(pagination.startIndex, pagination.endIndex),
-      ];
+  const [unfilteredData, data] = useMemo(() => {
+    if (!featureEnabled || isProxyPodAlive === false) return [unfilterData, dataFilters];
 
     const matchedVMs = vmToShow?.filter(
       ({ metadata: { name, namespace: ns }, status: { printableStatus = '' } = {} }) => {
@@ -182,14 +169,12 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
         );
       },
     );
-    return [vmToShow, matchedVMs, matchedVMs?.slice(pagination.startIndex, pagination.endIndex)];
+    return [vmToShow, matchedVMs];
   }, [
     featureEnabled,
     isProxyPodAlive,
     unfilterData,
     dataFilters,
-    pagination.startIndex,
-    pagination.endIndex,
     vmToShow,
     vmiMapper?.mapper,
     query,
@@ -211,40 +196,17 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
 
   const [columns, activeColumns, loadedColumns] = useVirtualMachineColumns(
     namespace,
-    pagination,
-    data,
     vmiMapper,
     pvcMapper,
   );
 
-  const loaded =
-    vmLoaded &&
-    vmiLoaded &&
-    vmimsLoaded &&
-    isSingleNodeLoaded &&
-    !loadingFeatureProxy &&
-    loadedColumns;
+  const dataSorted = useSortData(data, activeColumns, pagination);
+
+  const loaded = vmLoaded && vmiLoaded && vmimsLoaded && !loadingFeatureProxy && loadedColumns;
 
   const vmsFilteredWithProxy = isProxyPodAlive && selectedFilters.length > 0;
 
   const noVMs = isEmpty(unfilteredData) && !vmsFilteredWithProxy;
-
-  const existingSelectedVMs = useExistingSelectedVMs(data);
-  const allVMsSelected = data?.length === existingSelectedVMs.length;
-
-  if (loaded && noVMs) {
-    return (
-      <>
-        <VirtualMachineListSummary
-          namespace={namespace}
-          onFilterChange={onFilterChange}
-          vmis={vmis}
-          vms={data}
-        />
-        <VirtualMachineEmptyState catalogURL={catalogURL} namespace={namespace} />
-      </>
-    );
-  }
 
   return (
     /* All of this table and components should be replaced to our own fitted components */
@@ -263,7 +225,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
                 'is-compact': listManagementGroupSize === ListManagementGroupSize.sm,
               })}
             >
-              <VirtualMachineSelection loaded={loaded} pagination={pagination} vms={data} />
+              <VirtualMachineSelection currentPageVMs={dataSorted} loaded={loaded} vms={data} />
               <ListPageFilter
                 columnLayout={{
                   columns: columns?.map(({ additional, id, title }) => ({
@@ -312,24 +274,17 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
               />
             </Flex>
           </div>
-          <VirtualizedTable<K8sResourceCommon>
-            EmptyMsg={() => (
-              <div className="pf-v6-u-text-align-center">{t('No VirtualMachines found')}</div>
-            )}
-            rowData={{
-              getVmi: (ns: string, name: string) => vmiMapper?.mapper?.[ns]?.[name],
-              getVmim: (ns: string, name: string) => vmimMapper?.[ns]?.[name],
-              isSingleNodeCluster,
-              kind,
-              pvcMapper,
-            }}
-            allRowsSelected={allVMsSelected}
-            columns={activeColumns}
-            data={paginatedVMs}
+
+          <VirtualMachineTable
+            activeColumns={activeColumns}
+            data={dataSorted}
+            empty={noVMs}
             loaded={loaded}
             loadError={loadError}
-            Row={VirtualMachineRow}
-            unfilteredData={unfilteredData}
+            namespace={namespace}
+            pvcMapper={pvcMapper}
+            vmiMapper={vmiMapper}
+            vmimMapper={vmimMapper}
           />
         </div>
       </ListPageBody>

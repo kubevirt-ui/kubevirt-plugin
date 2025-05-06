@@ -9,6 +9,10 @@
     .selection-column {
       --pf-v6-c-table--cell--Width: 5%;
     }
+
+    td.vm-column:empty {
+      width: var(--pf-v6-c-table--cell--Width);
+    }
   }
 
   .list-managment-group {
