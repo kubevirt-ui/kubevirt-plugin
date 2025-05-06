@@ -18,6 +18,7 @@ import { Checkbox } from '@patternfly/react-core';
 import VirtualMachineActions from '@virtualmachines/actions/components/VirtualMachineActions/VirtualMachineActions';
 import useVirtualMachineActionsProvider from '@virtualmachines/actions/hooks/useVirtualMachineActionsProvider';
 import { getDeletionProtectionPrintableStatus } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
+import { filterConditions } from '@virtualmachines/list/components/VirtualMachineRow/utils/utils';
 import { deselectVM, isVMSelected, selectVM } from '@virtualmachines/list/selectedVMs';
 import { getVirtualMachineStorageClasses, PVCMapper } from '@virtualmachines/utils/mappers';
 
@@ -84,7 +85,7 @@ const VirtualMachineRowLayout: FC<
         {status}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="conditions">
-        <VMStatusConditionLabelList conditions={obj?.status?.conditions?.filter((c) => c.reason)} />
+        <VMStatusConditionLabelList conditions={filterConditions(obj?.status?.conditions)} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="node">
         {node}
