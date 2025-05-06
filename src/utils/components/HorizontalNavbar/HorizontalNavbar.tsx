@@ -104,7 +104,7 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
                 {item.name}
               </NavLink>
             );
-          })}{' '}
+          })}
         </NavList>
       </Nav>
       <Routes>{RoutesComponents}</Routes>
