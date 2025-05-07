@@ -2,6 +2,7 @@ import React, { FC, useState } from 'react';
 import { Trans } from 'react-i18next';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { MigMigration, MigMigrationModel } from '@kubevirt-utils/resources/migrations/constants';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import {
   ActionList,
@@ -14,11 +15,6 @@ import {
   Title,
 } from '@patternfly/react-core';
 import { CloseIcon, WarningTriangleIcon } from '@patternfly/react-icons';
-
-import {
-  MigMigration,
-  MigMigrationModel,
-} from '../../../../../utils/resources/migrations/constants';
 
 type VirtualMachineMigrationRollbackProps = {
   migMigration?: MigMigration;
@@ -41,7 +37,7 @@ const VirtualMachineMigrationRollback: FC<VirtualMachineMigrationRollbackProps> 
     try {
       await k8sPatch({
         data: [
-          { op: 'replace', path: '/spec/rollback', value: 'true' },
+          { op: 'replace', path: '/spec/rollback', value: true },
           { op: 'remove', path: '/spec/migrateState' },
         ],
         model: MigMigrationModel,
@@ -49,7 +45,7 @@ const VirtualMachineMigrationRollback: FC<VirtualMachineMigrationRollbackProps> 
       });
       onClose();
     } catch (apiError) {
-      setErrorRollback(errorRollback);
+      setErrorRollback(apiError);
     } finally {
       setLoadingRollback(false);
     }
