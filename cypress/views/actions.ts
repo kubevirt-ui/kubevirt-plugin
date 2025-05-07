@@ -16,6 +16,7 @@ export const DELETE = 'vm-action-delete';
 export const COPYSSH = 'vm-action-copy-ssh';
 export const ActionStart = '[data-test-id="selected-vms-action-start"]';
 export const ActionStop = '[data-test-id="selected-vms-action-stop"]';
+export const kebabBtn = '[data-test-id="kebab-button"]';
 
 export const tabModal = '#tab-modal';
 export const startClone = '#start-clone';

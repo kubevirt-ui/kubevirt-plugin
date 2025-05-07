@@ -5,4 +5,5 @@ import './e2e/catalog-filter.cy.ts';
 import './e2e/create-vm.cy.ts';
 import './e2e/d-networking.cy.ts';
 import './e2e/template-list.cy.ts';
+import './e2e/set-default-sc.cy.ts';
 // import './e2e/catalog-create.cy.ts';
