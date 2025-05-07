@@ -11,12 +11,13 @@ import useExistingSelectedVMs from '../hooks/useExistingSelectedVMs';
 type VirtualMachineBulkActionButtonProps = {
   vms: V1VirtualMachine[];
 };
+
 const VirtualMachineBulkActionButton: FC<VirtualMachineBulkActionButtonProps> = ({ vms }) => {
   const { t } = useKubevirtTranslation();
 
   const selectedVirtualMachines = useExistingSelectedVMs(vms);
 
-  const actions = useMultipleVirtualMachineActions(selectedVirtualMachines);
+  const actions = useMultipleVirtualMachineActions(selectedVirtualMachines, vms);
 
   return (
     <ActionsDropdown

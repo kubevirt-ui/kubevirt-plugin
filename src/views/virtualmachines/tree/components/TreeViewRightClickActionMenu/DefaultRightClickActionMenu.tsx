@@ -20,7 +20,7 @@ const DefaultRightClickActionMenu: FC<DefaultRightClickActionMenuProps> = ({
   const { namespace, prefix } = getElementComponentsFromID(triggerElement);
 
   const vms = getVMsTrigger(triggerElement);
-  const actions = useMultipleVirtualMachineActions(vms);
+  const actions = useMultipleVirtualMachineActions(vms, vms);
 
   const navigate = useNavigate();
 
