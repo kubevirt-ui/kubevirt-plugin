@@ -1,25 +1,37 @@
 import { useMemo } from 'react';
 
+import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
 
-import { getPVCWatch } from './utils';
+import { getPVCAndDVWatches } from './utils';
 
 const useDisksSources = (vm: V1VirtualMachine) => {
-  const pvcWatches = useMemo(() => getPVCWatch(vm), [vm]);
+  const { dvWatches, pvcWatches } = useMemo(() => getPVCAndDVWatches(vm), [vm]);
 
   const pvcWatchesResult = useK8sWatchResources<{
     [key: string]: IoK8sApiCoreV1PersistentVolumeClaim;
   }>(pvcWatches);
 
+  const dvWatchesResult = useK8sWatchResources<{ [key: string]: V1beta1DataVolume }>(dvWatches);
+
+  const dvs = useMemo(
+    () =>
+      Object.values(dvWatchesResult || [])
+        .map((watch) => watch.data)
+        .filter((dv) => !isEmpty(dv)),
+    [dvWatchesResult],
+  );
+
   const pvcs = useMemo(
     () =>
       Object.values(pvcWatchesResult || [])
         .map((watch) => watch.data)
-        .filter((data) => !isEmpty(data)),
-    [pvcWatchesResult],
+        .filter((pvc) => !isEmpty(pvc) && !dvs.some((dv) => getName(dv) === getName(pvc))),
+    [dvs, pvcWatchesResult],
   );
 
   const loaded = useMemo(
@@ -36,7 +48,7 @@ const useDisksSources = (vm: V1VirtualMachine) => {
     [pvcWatchesResult],
   );
 
-  return { loaded, loadingError, pvcs };
+  return { dvs, loaded, loadingError, pvcs };
 };
 
 export default useDisksSources;

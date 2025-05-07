@@ -32,6 +32,7 @@ type UseDisksTableDisks = (
  * @returns disks data and loading state
  */
 const useDisksTableData: UseDisksTableDisks = (vm, vmi) => {
+  const { dvs, loaded, loadingError, pvcs } = useDisksSources(vm);
   const isVMRunning = isRunning(vm);
 
   const vmDisks = useMemo(
@@ -41,6 +42,7 @@ const useDisksTableData: UseDisksTableDisks = (vm, vmi) => {
         : [...(getDisks(vm) || []), ...getRunningVMMissingDisksFromVMI(getDisks(vm) || [], vmi)],
     [vm, vmi, isVMRunning],
   );
+
   const vmVolumes = useMemo(
     () =>
       !isVMRunning
@@ -51,8 +53,6 @@ const useDisksTableData: UseDisksTableDisks = (vm, vmi) => {
           ],
     [vm, vmi, isVMRunning],
   );
-
-  const { loaded, loadingError, pvcs } = useDisksSources(vm);
 
   const disks = useMemo(() => {
     const isInstanceTypeVM = Boolean(getInstanceTypeMatcher(vm));
@@ -72,11 +72,17 @@ const useDisksTableData: UseDisksTableDisks = (vm, vmi) => {
           metadata?.name === volume?.dataVolume?.name,
       );
 
-      return { dataVolumeTemplate, disk, pvc, volume };
+      const dataVolume = dvs?.find(
+        ({ metadata }) =>
+          metadata?.name === volume?.persistentVolumeClaim?.claimName ||
+          metadata?.name === volume?.dataVolume?.name,
+      );
+
+      return { dataVolume, dataVolumeTemplate, disk, pvc, volume };
     });
 
     return getDiskRowDataLayout(diskDevices, getBootDisk(vm));
-  }, [vm, vmVolumes, vmDisks, pvcs]);
+  }, [dvs, vm, vmVolumes, vmDisks, pvcs]);
 
   return [disks || [], loaded, loadingError, isVMRunning ? vmi : null];
 };
