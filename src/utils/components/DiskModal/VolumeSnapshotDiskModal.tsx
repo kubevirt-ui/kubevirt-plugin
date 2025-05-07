@@ -68,7 +68,7 @@ const VolumeSnapshotDiskModal: FC<V1SubDiskModalProps> = ({
           <DiskSizeInput isCreated={isCreated} namespace={namespace} pvc={pvc} />
           <DiskTypeSelect isVMRunning={isVMRunning} />
           <DiskInterfaceSelect isVMRunning={isVMRunning} />
-          {!isCreated && <StorageClassAndPreallocation vm={vm} />}
+          {!isCreated && !pvc && <StorageClassAndPreallocation vm={vm} />}
           <AdvancedSettings />
         </Form>
       </TabModal>
