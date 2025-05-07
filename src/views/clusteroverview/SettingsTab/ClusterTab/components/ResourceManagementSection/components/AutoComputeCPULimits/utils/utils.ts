@@ -9,9 +9,9 @@ export const updateAutoResourceLimitsFeatureGate = (hcoCR: HyperConverged, switc
   k8sPatch<HyperConverged>({
     data: [
       {
-        op: hcoCR?.spec?.featureGates ? K8S_OPS.ADD : K8S_OPS.REPLACE,
-        path: '/spec/featureGates',
-        value: { [AUTO_RESOURCE_LIMITS_FEATURE_GATE]: switchState },
+        op: K8S_OPS.REPLACE,
+        path: `/spec/featureGates/${AUTO_RESOURCE_LIMITS_FEATURE_GATE}`,
+        value: switchState,
       },
     ],
     model: HyperConvergedModel,
