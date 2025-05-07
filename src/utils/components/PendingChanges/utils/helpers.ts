@@ -119,7 +119,8 @@ export const checkBootModeChanged = (
   }
   const vmiBootloader = getVMIBootLoader(vmi);
   const vmBootloader = getBootloader(vm);
-  return !isEqualObject(vmiBootloader, vmBootloader);
+  const usesDefaultBootloader = vmBootloader === undefined;
+  return !usesDefaultBootloader && !isEqualObject(vmiBootloader, vmBootloader);
 };
 
 export const getChangedEnvDisks = (

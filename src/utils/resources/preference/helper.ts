@@ -15,7 +15,7 @@ export const getPreferredBootmode = (preference: V1beta1VirtualMachinePreference
     return BootMode.uefiSecure;
   if (
     preference?.spec?.firmware?.preferredUseEfi ||
-    !preference?.spec?.firmware?.preferredEfi?.secureBoot
+    preference?.spec?.firmware?.preferredEfi?.secureBoot === false
   )
     return BootMode.uefi;
   if (
@@ -26,6 +26,6 @@ export const getPreferredBootmode = (preference: V1beta1VirtualMachinePreference
 };
 
 export const getPreferenceModelFromMatcher = (preferenceMatcher: V1PreferenceMatcher): K8sModel =>
-  preferenceMatcher?.kind?.includes('cluster')
-    ? VirtualMachineClusterPreferenceModel
-    : VirtualMachinePreferenceModel;
+  preferenceMatcher?.kind === VirtualMachinePreferenceModel.kind
+    ? VirtualMachinePreferenceModel
+    : VirtualMachineClusterPreferenceModel;
