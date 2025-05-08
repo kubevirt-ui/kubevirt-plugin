@@ -7,6 +7,7 @@ import { ResourceDetails } from '@stolostron/multicluster-sdk';
 
 export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
   FleetConsoleStandAlone: './utils/components/Consoles/FleetConsoleStandAlone.tsx',
+  FleetVirtualMachineNavPage: './views/virtualmachines/details/FleetVirtualMachineNavPage.tsx',
   FleetVirtualMachinesOverviewTab:
     './views/virtualmachines/details/tabs/overview/FleetVirtualMachinesOverviewTab.tsx',
 };
@@ -15,6 +16,17 @@ export const extensions: EncodedExtension[] = [
   {
     properties: {
       component: { $codeRef: 'FleetVirtualMachinesOverviewTab' },
+      model: {
+        group: 'kubevirt.io',
+        kind: 'VirtualMachine',
+        version: 'v1',
+      },
+    },
+    type: 'acm.resource/details',
+  } as EncodedExtension<ResourceDetails>,
+  {
+    properties: {
+      component: { $codeRef: 'FleetVirtualMachineNavPage' },
       model: {
         group: 'kubevirt.io',
         kind: 'VirtualMachine',

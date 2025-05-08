@@ -27,7 +27,7 @@ const VirtualMachinesOverviewTab: FC<NavPageComponentProps> = ({
   const { error, loaded, pods, vmi } = useVMIAndPodsForVM(
     vm?.metadata?.name,
     vm?.metadata?.namespace,
-    vm.cluster,
+    vm?.cluster,
   );
   const [guestAgentData, guestAgentDataLoaded, guestAgentDataLoadError] = useGuestOS(vmi);
   const isFleetSupported = useIsFleetSupported();

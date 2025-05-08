@@ -34,7 +34,7 @@ const VirtualMachinesOverviewTabSnapshots: React.FC<VirtualMachinesOverviewTabSn
   vm,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { snapshots } = useSnapshotData(vm?.metadata?.name, vm?.metadata?.namespace, vm.cluster);
+  const { snapshots } = useSnapshotData(vm?.metadata?.name, vm?.metadata?.namespace, vm?.cluster);
   const { createModal } = useModal();
   const snapshotsTabLink = createURL('snapshots', location?.pathname);
 

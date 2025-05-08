@@ -13,7 +13,12 @@ import './VirtualMachineConsolePage.scss';
 
 const VirtualMachineConsolePage: FC<NavPageComponentProps> = ({ obj: vm }) => {
   const { t } = useKubevirtTranslation();
-  const { vmi, vmiLoaded } = useVMI(vm?.metadata?.name, vm?.metadata?.namespace, isRunning(vm));
+  const { vmi, vmiLoaded } = useVMI(
+    vm?.metadata?.name,
+    vm?.metadata?.namespace,
+    vm?.cluster,
+    isRunning(vm),
+  );
 
   if (!vmi || vm?.status?.printableStatus === printableVMStatus.Stopped) {
     return (
