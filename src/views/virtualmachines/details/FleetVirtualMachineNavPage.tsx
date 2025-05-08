@@ -7,62 +7,46 @@ import {
 } from '@kubevirt-utils/components/GuidedTour/utils/constants';
 import HorizontalNavbar from '@kubevirt-utils/components/HorizontalNavbar/HorizontalNavbar';
 import { SidebarEditorProvider } from '@kubevirt-utils/components/SidebarEditor/SidebarEditorContext';
-import { getResourceDetailsTitle } from '@kubevirt-utils/constants/page-constants';
 import { getName } from '@kubevirt-utils/resources/shared';
 import useInstanceTypeExpandSpec from '@kubevirt-utils/resources/vm/hooks/useInstanceTypeExpandSpec';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { DocumentTitle } from '@openshift-console/dynamic-plugin-sdk';
-import { useFleetK8sWatchResource } from '@stolostron/multicluster-sdk';
+import { Bullseye, Spinner } from '@patternfly/react-core';
+import { Fleet, FleetSupport } from '@stolostron/multicluster-sdk';
 
 import { useVirtualMachineTabs } from './hooks/useVirtualMachineTabs';
 import VirtualMachineNavPageTitle from './VirtualMachineNavPageTitle';
 
 import './virtual-machine-page.scss';
 
-export type VirtualMachineDetailsPageProps = {
+export type FleetVirtualMachineNavPageProps = {
   cluster?: string;
-  kind: string;
+  model: { group: string; kind: string; version: string };
   name: string;
   namespace: string;
+  resource: Fleet<V1VirtualMachine>;
 };
 
-const VirtualMachineNavPage: React.FC<VirtualMachineDetailsPageProps> = ({
-  cluster,
-  kind,
-  name,
-  namespace,
-}) => {
-  const [vm, isLoaded, loadError] = useFleetK8sWatchResource<V1VirtualMachine>(
-    runningTourSignal.value
-      ? null
-      : {
-          cluster,
-          kind,
-          name,
-          namespace,
-        },
-  );
-
+const FleetVirtualMachineNavPageInner = ({ vm }) => {
   const vmToShow = runningTourSignal.value ? tourGuideVM : vm;
 
-  const [instanceTypeExpandedSpec, expandedSpecLoading] = useInstanceTypeExpandSpec(vmToShow);
+  const [instanceTypeExpandedSpec, expandedSpecLoading, expandedSpecError] =
+    useInstanceTypeExpandSpec(vmToShow);
 
   const pages = useVirtualMachineTabs();
 
   return (
     <SidebarEditorProvider>
-      <DocumentTitle>{getResourceDetailsTitle(getName(vmToShow), 'VirtualMachine')}</DocumentTitle>
       <VirtualMachineNavPageTitle
         instanceTypeExpandedSpec={instanceTypeExpandedSpec}
-        isLoaded={isLoaded || !isEmpty(loadError)}
-        name={name}
+        isLoaded={!expandedSpecLoading || !isEmpty(expandedSpecError)}
+        name={getName(vmToShow)}
         vm={vmToShow}
       />
       <div className="VirtualMachineNavPage--tabs__main">
         <HorizontalNavbar
-          error={loadError}
+          error={expandedSpecError}
           instanceTypeExpandedSpec={instanceTypeExpandedSpec}
-          loaded={isLoaded && !expandedSpecLoading}
+          loaded={!expandedSpecLoading}
           pages={pages}
           vm={vmToShow}
         />
@@ -71,4 +55,18 @@ const VirtualMachineNavPage: React.FC<VirtualMachineDetailsPageProps> = ({
   );
 };
 
-export default VirtualMachineNavPage;
+const FleetVirtualMachineNavPage: React.FC<FleetVirtualMachineNavPageProps> = ({ resource }) => {
+  return (
+    <FleetSupport
+      loading={
+        <Bullseye>
+          <Spinner />
+        </Bullseye>
+      }
+    >
+      <FleetVirtualMachineNavPageInner vm={resource} />
+    </FleetSupport>
+  );
+};
+
+export default FleetVirtualMachineNavPage;

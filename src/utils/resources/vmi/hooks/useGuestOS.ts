@@ -16,7 +16,7 @@ export const useGuestOS: UseGuestOS = (vmi) => {
   const [loaded, setLoaded] = useState(false);
   const [data, setData] = useState<V1VirtualMachineInstanceGuestAgentInfo>({});
   const [error, setError] = useState(null);
-  const k8sAPIPath = useFleetK8sAPIPath(vmi.cluster);
+  const k8sAPIPath = useFleetK8sAPIPath(vmi?.cluster);
 
   useEffect(() => {
     const guestOS = vmi?.status?.guestOSInfo?.id;

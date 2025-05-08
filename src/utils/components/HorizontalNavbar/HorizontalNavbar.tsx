@@ -84,7 +84,7 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
                   data-test-id={`horizontal-link-${item.name}`}
                   id={`horizontal-pageHeader-${item.name}`}
                   onClick={() => setActiveItem(item.name.toLowerCase())}
-                  to={trimLastHistoryPath(location, paths) + item.href}
+                  to={trimLastHistoryPath(location, paths) + item.href + (location.search || '')}
                 >
                   {item.name}
                 </NavLink>

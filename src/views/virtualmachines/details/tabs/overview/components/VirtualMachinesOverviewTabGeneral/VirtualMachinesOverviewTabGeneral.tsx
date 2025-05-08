@@ -53,7 +53,7 @@ const VirtualMachinesOverviewTabGeneral: FC<VirtualMachinesOverviewTabGeneralPro
               )}
               descriptionData={
                 <FleetResourceLink
-                  cluster={vm.cluster}
+                  cluster={vm?.cluster}
                   groupVersionKind={modelToGroupVersionKind(NamespaceModel)}
                   name={vm?.metadata?.namespace}
                 />

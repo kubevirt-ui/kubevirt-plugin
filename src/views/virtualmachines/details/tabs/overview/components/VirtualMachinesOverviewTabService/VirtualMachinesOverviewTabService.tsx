@@ -23,7 +23,7 @@ const VirtualMachinesOverviewTabService: FC<VirtualMachinesOverviewTabServicePro
     namespace: vm?.metadata?.namespace,
   });
 
-  const { vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace, vm.cluster);
+  const { vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace, vm?.cluster);
 
   const data = getServicesForVmi(
     services,
