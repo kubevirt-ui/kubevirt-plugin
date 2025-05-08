@@ -5,8 +5,8 @@ import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Consoles from '@kubevirt-utils/components/Consoles/Consoles';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Bullseye, EmptyState, EmptyStateBody, PageSection } from '@patternfly/react-core';
+import { useFleetK8sWatchResource } from '@stolostron/multicluster-sdk';
 import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
 
 import { printableVMStatus } from '../../../utils';
@@ -15,7 +15,8 @@ import './VirtualMachineConsolePage.scss';
 
 const VirtualMachineConsolePage: FC<NavPageComponentProps> = ({ obj: vm }) => {
   const { t } = useKubevirtTranslation();
-  const [vmi, vmiLoaded] = useK8sWatchResource<V1VirtualMachineInstance>({
+  const [vmi, vmiLoaded] = useFleetK8sWatchResource<V1VirtualMachineInstance>({
+    cluster: vm?.cluster,
     groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
     isList: false,
     name: vm?.metadata?.name,

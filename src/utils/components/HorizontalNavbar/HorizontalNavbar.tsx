@@ -47,6 +47,30 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
   }, [allPages, location?.pathname]);
 
   const [activeItem, setActiveItem] = useState<number | string>();
+
+  const RoutesMemo = useMemo(
+    () =>
+      allPages.map((page) => {
+        const Component = page.component;
+        return (
+          <Route
+            Component={(props) => (
+              <StateHandler error={error} loaded={loaded} withBullseye>
+                <Component
+                  instanceTypeExpandedSpec={instanceTypeExpandedSpec}
+                  obj={vm}
+                  {...props}
+                />
+              </StateHandler>
+            )}
+            key={page.href}
+            path={page.href}
+          />
+        );
+      }),
+    [allPages, vm, error, loaded, instanceTypeExpandedSpec],
+  );
+
   return (
     <>
       <nav className="pf-v6-c-tabs pf-m-page-insets">
@@ -66,7 +90,7 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
                   data-test-id={`horizontal-link-${item.name}`}
                   id={`horizontal-pageHeader-${item.name}`}
                   onClick={() => setActiveItem(item.name.toLowerCase())}
-                  to={trimLastHistoryPath(location, paths) + item.href}
+                  to={trimLastHistoryPath(location, paths) + item.href + (location.search || '')}
                 >
                   {item.name}
                 </NavLink>
@@ -75,26 +99,8 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
           })}
         </ul>
       </nav>
-      <Routes>
-        {allPages.map((page) => {
-          const Component = page.component;
-          return (
-            <Route
-              Component={(props) => (
-                <StateHandler error={error} loaded={loaded} withBullseye>
-                  <Component
-                    instanceTypeExpandedSpec={instanceTypeExpandedSpec}
-                    obj={vm}
-                    {...props}
-                  />
-                </StateHandler>
-              )}
-              key={page.href}
-              path={page.href}
-            />
-          );
-        })}
-      </Routes>
+
+      <Routes>{RoutesMemo}</Routes>
     </>
   );
 };

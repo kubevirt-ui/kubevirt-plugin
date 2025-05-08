@@ -118,7 +118,7 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
                   descriptionData={getName(vm)}
                   descriptionHeader={t('Name')}
                 />
-                {vm.cluster && (
+                {vm?.cluster && (
                   <VirtualMachineDescriptionItem
                     descriptionData={
                       <FleetResourceLink
@@ -127,7 +127,7 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
                           kind: 'ManagedCluster',
                           version: 'v1',
                         }}
-                        name={vm.cluster}
+                        name={vm?.cluster}
                         truncate
                       />
                     }
