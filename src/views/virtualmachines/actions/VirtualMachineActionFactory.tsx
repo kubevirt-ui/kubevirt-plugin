@@ -21,7 +21,7 @@ import {
 import { asAccessReview, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { Action, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
+import { Action, k8sPatch, Patch } from '@openshift-console/dynamic-plugin-sdk';
 import { CopyIcon } from '@patternfly/react-icons';
 import VirtualMachineMigrateModal from '@virtualmachines/actions/components/VirtualMachineMigration/VirtualMachineMigrationModal';
 import { isDeletionProtectionEnabled } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
@@ -81,6 +81,14 @@ export const VirtualMachineActionFactory = {
     };
   },
   cancelStorageMigration: (currentStorageMigration: MigMigration): Action => {
+    const canceled =
+      currentStorageMigration?.spec?.rollback || currentStorageMigration?.spec?.canceled;
+
+    const patch: Patch[] = [{ op: 'replace', path: '/spec/rollback', value: true }];
+
+    if (currentStorageMigration?.spec?.migrateState)
+      patch.push({ op: 'remove', path: '/spec/migrateState' });
+
     return {
       accessReview: {
         group: MigMigrationModel.apiGroup,
@@ -90,15 +98,13 @@ export const VirtualMachineActionFactory = {
       },
       cta: () =>
         k8sPatch({
-          data: [
-            { op: 'replace', path: '/spec/rollback', value: true },
-            { op: 'remove', path: '/spec/migrateState' },
-          ],
+          data: patch,
           model: MigMigrationModel,
           resource: currentStorageMigration,
         }),
+      disabled: canceled,
       id: 'vm-action-cancel-storage-migrate',
-      label: t('Cancel storage migration'),
+      label: canceled ? t('Cancelling storage migration') : t('Cancel storage migration'),
     };
   },
   clone: (vm: V1VirtualMachine, createModal: (modal: ModalComponent) => void): Action => {
