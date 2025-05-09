@@ -55,13 +55,14 @@ export const MigPlanModel: K8sModel = {
 
 export type MigMigration = K8sResourceCommon & {
   spec: {
-    canceled: boolean;
+    canceled?: boolean;
     migPlanRef: {
       name: string;
       namespace: string;
     };
     migrateState: boolean;
     quiescePods: boolean;
+    rollback?: boolean;
     stage: boolean;
   };
   status?: {

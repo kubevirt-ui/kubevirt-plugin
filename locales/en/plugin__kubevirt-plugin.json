@@ -252,6 +252,7 @@
   "Cancel Upload": "Cancel Upload",
   "Canceled": "Canceled",
   "Canceling ongoing migration": "Canceling ongoing migration",
+  "Cancelling storage migration": "Cancelling storage migration",
   "Cancelling upload": "Cancelling upload",
   "Cannot cancel migration for \"{{ status }}\" status": "Cannot cancel migration for \"{{ status }}\" status",
   "Cannot update": "Cannot update",
