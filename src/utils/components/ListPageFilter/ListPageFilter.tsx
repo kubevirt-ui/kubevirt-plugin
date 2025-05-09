@@ -221,7 +221,6 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
                           );
                           setSearchInputText('');
                         }}
-                        className="co-text-node"
                         data={data}
                         placeholder={STATIC_SEARCH_FILTERS_PLACEHOLDERS.labels}
                         setTextValue={setSearchInputText}
