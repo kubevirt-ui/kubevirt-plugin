@@ -37,7 +37,7 @@ export const isCommonTemplate = (template: V1Template): boolean =>
 export const isDeprecatedTemplate = (template: V1Template): boolean =>
   getAnnotation(template, ANNOTATIONS.deprecated) === 'true';
 
-export const replaceTemplateVM = (template: V1Template, vm: V1VirtualMachine) => {
+export const replaceTemplateVM = (template: V1Template, vm: V1VirtualMachine): V1Template => {
   const vmIndex = template.objects?.findIndex((object) => object.kind === VirtualMachineModel.kind);
 
   return produce(template, (draftTemplate) => {

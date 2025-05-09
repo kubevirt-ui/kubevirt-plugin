@@ -33,7 +33,7 @@ import {
   Split,
   SplitItem,
 } from '@patternfly/react-core';
-import { Fleet, FleetResourceLink } from '@stolostron/multicluster-sdk';
+import { FleetResourceLink } from '@stolostron/multicluster-sdk';
 import { createURL } from '@virtualmachines/details/tabs/overview/utils/utils';
 import VMNotMigratableLabel from '@virtualmachines/list/components/VMNotMigratableLabel/VMNotMigratableLabel';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
@@ -53,8 +53,8 @@ type VirtualMachinesOverviewTabDetailsProps = {
   guestAgentDataLoaded: boolean;
   instanceTypeExpandedSpec: V1VirtualMachine;
   loaded: boolean;
-  vm: Fleet<V1VirtualMachine>;
-  vmi: Fleet<V1VirtualMachineInstance>;
+  vm: V1VirtualMachine;
+  vmi: V1VirtualMachineInstance;
 };
 
 const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsProps> = ({

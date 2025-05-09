@@ -83,7 +83,10 @@ export const extensions: EncodedExtension[] = [
     properties: {
       component: { $codeRef: 'ConsoleStandAlone' },
       exact: false,
-      path: ['/k8s/ns/:ns/kubevirt.io~v1~VirtualMachine/:name/console/standalone'],
+      path: [
+        '/k8s/ns/:ns/kubevirt.io~v1~VirtualMachine/:name/console/standalone',
+        '/:cluster/k8s/ns/:ns/kubevirt.io~v1~VirtualMachine/:name/console/standalone',
+      ],
     },
     type: 'console.page/route/standalone',
   } as EncodedExtension<StandaloneRoutePage>,

@@ -5,13 +5,11 @@ import Loading from '@kubevirt-utils/components/Loading/Loading';
 import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
 import useInstanceTypeExpandSpec from '@kubevirt-utils/resources/vm/hooks/useInstanceTypeExpandSpec';
 import { Bullseye } from '@patternfly/react-core';
-import { Fleet, FleetSupport, ResourceTabComponent } from '@stolostron/multicluster-sdk';
+import { FleetSupport, ResourceTabComponent } from '@stolostron/multicluster-sdk';
 
 import VirtualMachineConfigurationTab from './VirtualMachineConfigurationTab';
 
-const VirtualMachineConfigurationInstanceTypeLoader: FC<{ vm: Fleet<V1VirtualMachine> }> = ({
-  vm,
-}) => {
+const VirtualMachineConfigurationInstanceTypeLoader: FC<{ vm: V1VirtualMachine }> = ({ vm }) => {
   const [instanceTypeExpandedSpec, expandedSpecLoading, errorExpandedSpec] =
     useInstanceTypeExpandSpec(vm);
 
@@ -26,7 +24,7 @@ const VirtualMachineConfigurationInstanceTypeLoader: FC<{ vm: Fleet<V1VirtualMac
 };
 
 const FleetVirtualMachineConfigurationTab: ResourceTabComponent = ({ resource }) => {
-  const vm = resource as Fleet<V1VirtualMachine>;
+  const vm = resource as V1VirtualMachine;
   return (
     <FleetSupport
       loading={

@@ -1,18 +1,14 @@
 import { modelToGroupVersionKind, PodModel } from '@kubevirt-ui/kubevirt-api/console';
+import { IoK8sApiCoreV1Pod } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
-import {
-  Fleet,
-  FleetK8sResourceCommon,
-  useFleetK8sWatchResource,
-} from '@stolostron/multicluster-sdk';
+import { FleetK8sResourceCommon, useFleetK8sWatchResource } from '@stolostron/multicluster-sdk';
 
 type UseVMIAndPodsForVMValues = {
   error: any;
   loaded: boolean;
-  pods: K8sResourceCommon[];
-  vmi: Fleet<V1VirtualMachineInstance>;
+  pods: IoK8sApiCoreV1Pod[];
+  vmi: V1VirtualMachineInstance;
 };
 
 export const useVMIAndPodsForVM = (

@@ -14,7 +14,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { WSFactory } from '@openshift-console/dynamic-plugin-sdk/lib/utils/k8s/ws-factory';
 import { Button, EmptyState, EmptyStateBody, EmptyStateFooter } from '@patternfly/react-core';
-import { Fleet, useFleetK8sAPIPath } from '@stolostron/multicluster-sdk';
+import { useFleetK8sAPIPath } from '@stolostron/multicluster-sdk';
 
 import { INSECURE, SECURE } from '../../utils/constants';
 import { isConnectionEncrypted } from '../../utils/utils';
@@ -28,7 +28,7 @@ const { destroyed, init, open } = ConsoleState;
 
 type SerialConsoleConnectorProps = {
   onConnect?: Dispatch<SetStateAction<WebSocket>>;
-  vmi: Fleet<V1VirtualMachineInstance>;
+  vmi: V1VirtualMachineInstance;
 };
 
 const SerialConsoleConnector: FC<SerialConsoleConnectorProps> = ({ onConnect, vmi }) => {

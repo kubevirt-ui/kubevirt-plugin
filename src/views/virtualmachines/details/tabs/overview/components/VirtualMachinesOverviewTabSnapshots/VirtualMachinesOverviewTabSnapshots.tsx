@@ -17,7 +17,6 @@ import {
   Divider,
   Label,
 } from '@patternfly/react-core';
-import { Fleet } from '@stolostron/multicluster-sdk';
 
 import useSnapshotData from '../../../snapshots/hooks/useSnapshotData';
 import { createURL } from '../../utils/utils';
@@ -27,7 +26,7 @@ import VirtualMachinesOverviewTabSnapshotsRow from './VirtualMachinesOverviewTab
 import './virtual-machines-overview-tab-snapshots.scss';
 
 type VirtualMachinesOverviewTabSnapshotsProps = {
-  vm: Fleet<V1VirtualMachine>;
+  vm: V1VirtualMachine;
 };
 
 const VirtualMachinesOverviewTabSnapshots: React.FC<VirtualMachinesOverviewTabSnapshotsProps> = ({
