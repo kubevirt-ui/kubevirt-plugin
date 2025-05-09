@@ -74,6 +74,7 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
               }
               isOpen={isOpen}
               onClose={onClose}
+              preferredBootmode={preferredBootmode}
               vm={instanceTypeVM || vm}
               vmi={vmi}
             />
