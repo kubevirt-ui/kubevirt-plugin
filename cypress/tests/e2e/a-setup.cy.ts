@@ -40,7 +40,8 @@ describe('Prepare the cluster for test', () => {
   });
 
   it('configure public ssh key', () => {
-    cy.visitOverview();
+    cy.visitVMsVirt();
+    cy.visitOverviewVirt();
     tab.navigateToSettings();
     cy.contains('button[role="tab"]', 'User').click();
     cy.contains(manageKeysText).click();
