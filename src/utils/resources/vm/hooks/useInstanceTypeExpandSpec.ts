@@ -7,10 +7,10 @@ import { isInstanceTypeVM } from '@kubevirt-utils/resources/instancetype/helper'
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { consoleFetch } from '@openshift-console/dynamic-plugin-sdk';
-import { Fleet, useFleetK8sAPIPath } from '@stolostron/multicluster-sdk';
+import { useFleetK8sAPIPath } from '@stolostron/multicluster-sdk';
 
 type UseInstanceTypeExpandSpec = (
-  vm?: Fleet<V1VirtualMachine>,
+  vm?: V1VirtualMachine,
 ) => [
   instanceTypeExpandedSpec: V1VirtualMachine,
   loadingExpandedSpec: boolean,

@@ -1,4 +1,3 @@
-import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import {
   getTemplateVirtualMachineObject,
   TEMPLATE_TYPE_BASE,

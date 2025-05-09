@@ -6,27 +6,14 @@ import { ResourceDetails } from '@stolostron/multicluster-sdk';
 //import { FLEET_STANDALONE_CONSOLE_PATH } from '../utils/components/Consoles/FleetConsoleStandAlone';
 
 export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
-  FleetConsoleStandAlone: './utils/components/Consoles/FleetConsoleStandAlone.tsx',
-  FleetVirtualMachineNavPage: './views/virtualmachines/details/FleetVirtualMachineNavPage.tsx',
-  FleetVirtualMachinesOverviewTab:
-    './views/virtualmachines/details/tabs/overview/FleetVirtualMachinesOverviewTab.tsx',
+  ConsoleStandAlone: './utils/components/Consoles/ConsoleStandAlone.tsx',
+  VirtualMachineNavPage: './views/virtualmachines/details/VirtualMachineNavPage.tsx',
 };
 
 export const extensions: EncodedExtension[] = [
   {
     properties: {
-      component: { $codeRef: 'FleetVirtualMachinesOverviewTab' },
-      model: {
-        group: 'kubevirt.io',
-        kind: 'VirtualMachine',
-        version: 'v1',
-      },
-    },
-    type: 'acm.resource/details',
-  } as EncodedExtension<ResourceDetails>,
-  {
-    properties: {
-      component: { $codeRef: 'FleetVirtualMachineNavPage' },
+      component: { $codeRef: 'VirtualMachineNavPage' },
       model: {
         group: 'kubevirt.io',
         kind: 'VirtualMachine',
@@ -40,7 +27,7 @@ export const extensions: EncodedExtension[] = [
       required: ['KUBEVIRT_DYNAMIC'],
     },
     properties: {
-      component: { $codeRef: 'FleetConsoleStandAlone' },
+      component: { $codeRef: 'ConsoleStandAlone' },
       exact: false,
       path: ['/multicloud/infrastructure/vmconsole/:cluster/:namespace/:name'],
     },

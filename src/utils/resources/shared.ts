@@ -9,14 +9,12 @@ import { TemplateModel } from '@kubevirt-utils/models';
 import {
   AccessReviewResourceAttributes,
   K8sModel,
-  K8sResourceCommon,
   K8sResourceKind,
   K8sVerb,
   Operator,
   OwnerReference,
   WatchK8sResults,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { Fleet } from '@stolostron/multicluster-sdk';
 
 import { isDataSourceReady } from '../../views/datasources/utils';
 
@@ -345,9 +343,8 @@ export const getUID = <A extends K8sResourceCommon = K8sResourceCommon>(resource
  * @param resource k8s resource with optional cluster
  * @returns resource's cluster
  */
-export const getCluster = <A extends Fleet<K8sResourceCommon> = Fleet<K8sResourceCommon>>(
-  resource?: A,
-) => resource?.cluster;
+export const getCluster = <A extends K8sResourceCommon = K8sResourceCommon>(resource?: A) =>
+  resource?.cluster;
 
 export type ResourceMap<A> = { [name: string]: A };
 export type NamespacedResourceMap<A> = { [namespace: string]: ResourceMap<A> };
