@@ -7,6 +7,7 @@ import { Stack, StackItem } from '@patternfly/react-core';
 import ExpandSection from '../../../ExpandSection/ExpandSection';
 
 import AutoComputeCPULimits from './components/AutoComputeCPULimits/AutoComputeCPULimits';
+import DeschedulerSettings from './components/DeschedulerSettings/DeschedulerSettings';
 import KernelSamepageMerging from './components/KernelSamepageMerging/KernelSamepageMerging';
 
 type ResourceManagementSectionProps = {
@@ -34,6 +35,9 @@ const ResourceManagementSection: FC<ResourceManagementSectionProps> = ({
             hyperConvergeConfiguration={hyperConvergeConfiguration}
             newBadge={newBadge}
           />
+        </StackItem>
+        <StackItem isFilled>
+          <DeschedulerSettings newBadge={newBadge} />
         </StackItem>
       </Stack>
     </ExpandSection>
