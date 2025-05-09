@@ -51,6 +51,29 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({ instanceTypeExpandedSpec,
   }, [allPages, location?.pathname]);
 
   const [activeItem, setActiveItem] = useState<number | string>();
+
+  const RoutesComponents = useMemo(
+    () =>
+      allPages.map((page) => {
+        const Component = page.component;
+        return (
+          <Route
+            Component={(props) => (
+              <Component
+                instanceTypeExpandedSpec={instanceTypeExpandedSpec}
+                obj={vm}
+                params={memoParams}
+                {...props}
+              />
+            )}
+            key={page.href}
+            path={page.href}
+          />
+        );
+      }),
+    [allPages, vm, instanceTypeExpandedSpec, memoParams],
+  );
+
   return (
     <>
       <Nav variant="horizontal">
@@ -75,25 +98,7 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({ instanceTypeExpandedSpec,
           })}
         </NavList>
       </Nav>
-      <Routes>
-        {allPages.map((page) => {
-          const Component = page.component;
-          return (
-            <Route
-              Component={(props) => (
-                <Component
-                  instanceTypeExpandedSpec={instanceTypeExpandedSpec}
-                  obj={vm}
-                  params={memoParams}
-                  {...props}
-                />
-              )}
-              key={page.href}
-              path={page.href}
-            />
-          );
-        })}
-      </Routes>
+      <Routes>{RoutesComponents}</Routes>
     </>
   );
 };
