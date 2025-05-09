@@ -5,6 +5,14 @@ import {
   OTHER,
 } from '@kubevirt-utils/components/DiskModal/components/utils/constants';
 import { VolumeTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
+import {
+  getDataVolumeSize,
+  getDataVolumeStorageClassName,
+  getPhase,
+  getPVCSize,
+  getPVCStorageClassName,
+} from '@kubevirt-utils/resources/bootableresources/selectors';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { DiskRawData, DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import {
   getPrintableDiskDrive,
@@ -37,23 +45,24 @@ export const getDiskRowDataLayout = (
         !!device?.volume?.configMap || !!device?.volume?.secret || !!device?.volume?.serviceAccount,
       metadata: { name: device?.volume?.name },
       name: device?.volume?.name,
-      namespace: device?.pvc?.metadata?.namespace,
+      namespace: getNamespace(device?.pvc),
       size: NO_DATA_DASH,
       source: OTHER,
       storageClass: device?.dataVolumeTemplate?.spec?.storage?.storageClassName || NO_DATA_DASH,
     };
 
-    const pvcSize = device?.pvc?.spec?.resources?.requests?.storage;
+    const dataSourceSize = getPVCSize(device?.pvc) || getDataVolumeSize(device?.dataVolume);
     const dataVolumeCustomSize =
       device?.dataVolumeTemplate?.spec?.storage?.resources?.requests?.storage;
-    const size = humanizeBinaryBytes(convertToBaseValue(pvcSize || dataVolumeCustomSize));
+    const size = humanizeBinaryBytes(convertToBaseValue(dataSourceSize || dataVolumeCustomSize));
 
     diskRowDataObject.size = size.value === 0 ? NO_DATA_DASH : size.string;
 
-    if (device?.pvc) {
-      diskRowDataObject.source = device?.pvc?.metadata?.name;
-      diskRowDataObject.sourceStatus = device?.pvc?.status?.phase;
-      diskRowDataObject.storageClass = device?.pvc?.spec?.storageClassName;
+    if (device?.pvc || device?.dataVolume) {
+      diskRowDataObject.source = getName(device?.pvc) || getName(device?.dataVolume);
+      diskRowDataObject.sourceStatus = getPhase(device?.pvc) || getPhase(device?.dataVolume);
+      diskRowDataObject.storageClass =
+        getPVCStorageClassName(device?.pvc) || getDataVolumeStorageClassName(device?.dataVolume);
     }
 
     if (volumeSource === VolumeTypes.CONTAINER_DISK) {
