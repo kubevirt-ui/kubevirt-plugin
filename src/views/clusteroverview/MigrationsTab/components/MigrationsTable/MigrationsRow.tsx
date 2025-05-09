@@ -10,6 +10,11 @@ import {
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
+import {
+  getMigrationPhase,
+  getMigrationSourceNode,
+  getMigrationTargetNode,
+} from '@kubevirt-utils/resources/vmim/selectors';
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
 import {
   GenericStatus,
@@ -25,15 +30,21 @@ import { MigrationTableDataLayout } from './utils/utils';
 import MigrationActionsDropdown from './MigrationActionsDropdown';
 
 const MigrationsRow: FC<RowProps<MigrationTableDataLayout>> = ({ activeColumnIDs, obj }) => {
-  const StatusIcon = iconMapper?.[obj?.vmim?.status?.phase];
+  const { vmim, vmiObj } = obj;
+
+  const sourceNode = getMigrationSourceNode(vmim);
+  const targetNode = getMigrationTargetNode(vmim);
+  const migrationPhase = getMigrationPhase(vmim);
+
+  const StatusIcon = iconMapper?.[migrationPhase];
 
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} id="vm-name">
         <ResourceLink
           groupVersionKind={VirtualMachineModelGroupVersionKind}
-          name={getName(obj.vmiObj)}
-          namespace={getNamespace(obj.vmiObj)}
+          name={getName(vmiObj)}
+          namespace={getNamespace(vmiObj)}
         />
       </TableData>
       <TableData
@@ -43,38 +54,29 @@ const MigrationsRow: FC<RowProps<MigrationTableDataLayout>> = ({ activeColumnIDs
       >
         <ResourceLink
           groupVersionKind={modelToGroupVersionKind(NamespaceModel)}
-          name={getNamespace(obj.vmiObj)}
+          name={getNamespace(vmiObj)}
         />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="status">
         <Tooltip
-          content={`${obj?.vmim?.status?.phase} ${
-            obj?.vmiObj?.status?.migrationState?.endTimestamp || ''
-          }`}
           hidden={
-            obj?.vmim?.status?.phase !== vmimStatuses.Failed &&
-            obj?.vmim?.status?.phase !== vmimStatuses.Succeeded
+            migrationPhase !== vmimStatuses.Failed && migrationPhase !== vmimStatuses.Succeeded
           }
+          content={`${migrationPhase} ${vmiObj?.status?.migrationState?.endTimestamp || ''}`}
         >
-          <GenericStatus Icon={StatusIcon} title={obj?.vmim?.status?.phase} />
+          <GenericStatus Icon={StatusIcon} title={migrationPhase} />
         </Tooltip>
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="source">
-        {obj?.vmiObj?.status?.migrationState?.sourceNode ? (
-          <ResourceLink
-            groupVersionKind={modelToGroupVersionKind(NodeModel)}
-            name={obj?.vmiObj?.status?.migrationState?.sourceNode}
-          />
+        {sourceNode ? (
+          <ResourceLink groupVersionKind={modelToGroupVersionKind(NodeModel)} name={sourceNode} />
         ) : (
           NO_DATA_DASH
         )}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="target">
-        {obj?.vmiObj?.status?.migrationState?.targetNode ? (
-          <ResourceLink
-            groupVersionKind={modelToGroupVersionKind(NodeModel)}
-            name={obj?.vmiObj?.status?.migrationState?.targetNode}
-          />
+        {targetNode ? (
+          <ResourceLink groupVersionKind={modelToGroupVersionKind(NodeModel)} name={targetNode} />
         ) : (
           NO_DATA_DASH
         )}
@@ -85,19 +87,19 @@ const MigrationsRow: FC<RowProps<MigrationTableDataLayout>> = ({ activeColumnIDs
       <TableData activeColumnIDs={activeColumnIDs} id="vmim-name">
         <ResourceLink
           groupVersionKind={VirtualMachineInstanceMigrationModelGroupVersionKind}
-          name={obj?.vmim?.metadata?.name}
-          namespace={obj?.vmim?.metadata?.namespace}
+          name={getName(vmim)}
+          namespace={getNamespace(vmim)}
         />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="created">
-        <Timestamp timestamp={obj?.vmim?.metadata?.creationTimestamp} />
+        <Timestamp timestamp={vmim?.metadata?.creationTimestamp} />
       </TableData>
       <TableData
         activeColumnIDs={activeColumnIDs}
         className="dropdown-kebab-pf pf-v5-c-table__action"
         id=""
       >
-        <MigrationActionsDropdown isKebabToggle vmim={obj?.vmim} />
+        <MigrationActionsDropdown isKebabToggle vmim={vmim} />
       </TableData>
     </>
   );
