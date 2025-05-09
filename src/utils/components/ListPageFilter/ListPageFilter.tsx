@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 
 import useDeepCompareMemoize from '@kubevirt-utils/hooks/useDeepCompareMemoize/useDeepCompareMemoize';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -20,11 +20,13 @@ import {
 } from '@patternfly/react-core';
 import { FilterIcon } from '@patternfly/react-icons';
 import { ListManagementGroupSize } from '@virtualmachines/list/listManagementGroupSize';
+import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 import ColumnManagement from '../ColumnManagementModal/ColumnManagement';
 import FormPFSelect from '../FormPFSelect/FormPFSelect';
 
 import ProjectFilter from './components/ProjectFilter';
+import { useAdvancedFiltersParameters } from './hooks/useAdvancedFiltersParameters';
 import useListPageFiltersMethods from './hooks/useListPageFiltersMethods';
 import { useRowFiltersParameters } from './hooks/useRowFiltersParametersType';
 import { useSearchFiltersParameters } from './hooks/useSearchFiltersParameters';
@@ -40,6 +42,7 @@ import {
   Filter,
   FilterKeys,
   generateRowFilters,
+  getFilterLabels,
   getFiltersData,
   getInitialSearchText,
   getInitialSearchType,
@@ -47,6 +50,7 @@ import {
 } from './utils';
 
 type ListPageFilterProps = {
+  className?: string;
   columnLayout?: ColumnLayout;
   data?: K8sResourceCommon[];
   dropdownFilters?: RowFilter[];
@@ -63,6 +67,7 @@ type ListPageFilterProps = {
 };
 
 const ListPageFilter: FC<ListPageFilterProps> = ({
+  className,
   columnLayout,
   data,
   dropdownFilters = [],
@@ -78,6 +83,14 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
   showProjectFilter = false,
 }) => {
   const { t } = useKubevirtTranslation();
+
+  const [toolbarIsExpanded, setToolbarIsExpanded] = useState(false);
+
+  useEffect(() => {
+    if (listManagementGroupSize !== ListManagementGroupSize.sm) {
+      setToolbarIsExpanded(false);
+    }
+  }, [listManagementGroupSize]);
 
   const toolbarFilters = rowFilters?.filter((filter) => 'items' in filter);
 
@@ -96,6 +109,7 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
   });
 
   const textFilters = useSearchFiltersParameters(searchFilters);
+  const advancedFiltersObject = useAdvancedFiltersParameters(dropdownFilters);
 
   const filterDropdownItems: Record<string, string> = {
     ...searchFilters.reduce(
@@ -142,10 +156,15 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
 
   return (
     <Toolbar
+      toggleIsExpanded={() => {
+        setToolbarIsExpanded(!toolbarIsExpanded);
+      }}
+      className={className}
       clearAllFilters={clearAll}
       clearFiltersButtonText={t('Clear all filters')}
       data-test="filter-toolbar"
       id="filter-toolbar"
+      isExpanded={toolbarIsExpanded}
     >
       <ToolbarContent>
         <ToolbarToggleGroup breakpoint="md" toggleIcon={<FilterIcon />}>
@@ -158,9 +177,85 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
             selectedRowFilters={selectedRowFilters}
             updateRowFilterSelected={updateRowFilterSelected}
           />
-          {showProjectFilter && <ProjectFilter applyTextFilters={applyTextFilters} />}
+          {(showProjectFilter || dropdownFilters?.length > 0) && (
+            <ToolbarItem>
+              {showProjectFilter && <ProjectFilter applyTextFilters={applyTextFilters} />}
+              {dropdownFilters?.length > 0 &&
+                dropdownFilters
+                  .filter((filter) => filter.type !== VirtualMachineRowFilterType.Project)
+                  .map((filter) => (
+                    <ToolbarFilter
+                      categoryName={filter.filterGroupName}
+                      deleteLabel={() => applyTextFilters(filter.type)}
+                      key={filter.type}
+                      labels={getFilterLabels(filter, advancedFiltersObject[filter.type])}
+                    >
+                      <></>
+                    </ToolbarFilter>
+                  ))}
+            </ToolbarItem>
+          )}
           {filterDropdownKeys.length !== 0 && (
             <ToolbarItem className="co-filter-search--full-width">
+              <ToolbarFilter
+                deleteLabel={() => {
+                  applyTextFilters('name');
+                  searchType === STATIC_SEARCH_FILTERS.name && setSearchInputText('');
+                }}
+                categoryName={t('Name')}
+                labels={textFilters.name ? [textFilters.name] : []}
+              >
+                <InputGroup className="co-filter-group">
+                  {filterDropdownKeys.length > 1 && (
+                    <InputGroupItem isFill>
+                      <FormPFSelect
+                        onSelect={onSelect}
+                        selected={searchType}
+                        selectedLabel={filterDropdownItems?.[searchType]}
+                      >
+                        {filterDropdownKeys.map((key) => (
+                          <SelectOption key={key} value={key}>
+                            {filterDropdownItems?.[key]}
+                          </SelectOption>
+                        ))}
+                      </FormPFSelect>
+                    </InputGroupItem>
+                  )}
+
+                  {searchType === STATIC_SEARCH_FILTERS.labels ? (
+                    <AutocompleteInput
+                      onSuggestionSelect={(selected) => {
+                        const newLabels = new Set([...textFilters.labels, selected]);
+                        applyTextFilters(
+                          STATIC_SEARCH_FILTERS.labels,
+                          Array.from(newLabels).join(','),
+                        );
+                        setSearchInputText('');
+                      }}
+                      className="co-text-node"
+                      data={data}
+                      placeholder={STATIC_SEARCH_FILTERS_PLACEHOLDERS.labels}
+                      setTextValue={setSearchInputText}
+                      textValue={searchInputText}
+                    />
+                  ) : (
+                    <SearchFilter
+                      onChange={(_, newSearchInput: string) => {
+                        setSearchInputText(newSearchInput);
+                        applyTextFiltersWithDebounce(searchType, newSearchInput);
+                      }}
+                      placeholder={getSearchTextPlaceholder(
+                        searchType,
+                        selectedSearchFilter,
+                        nameFilterPlaceholder,
+                      )}
+                      data-test={`${searchType}-filter-input`}
+                      value={searchInputText || ''}
+                    />
+                  )}
+                </InputGroup>
+              </ToolbarFilter>
+
               <ToolbarFilter
                 deleteLabel={(category, labelToDelete: string) => {
                   const newLabels = textFilters?.labels?.filter((label) => label !== labelToDelete);
@@ -172,79 +267,22 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
                 categoryName={STATIC_SEARCH_FILTERS_LABELS.labels}
                 labels={textFilters.labels ?? []}
               >
-                {searchFilters.map((filter) => (
-                  <ToolbarFilter
-                    deleteLabel={() => {
-                      applyTextFilters(filter.type);
-                      searchType === filter.type && setSearchInputText('');
-                    }}
-                    categoryName={filter.filterGroupName}
-                    key={filter.type}
-                    labels={textFilters[filter.type] ? [textFilters[filter.type]] : []}
-                  >
-                    <></>
-                  </ToolbarFilter>
-                ))}
+                <></>
+              </ToolbarFilter>
 
+              {searchFilters.map((filter) => (
                 <ToolbarFilter
                   deleteLabel={() => {
-                    applyTextFilters('name');
-                    searchType === STATIC_SEARCH_FILTERS.name && setSearchInputText('');
+                    applyTextFilters(filter.type);
+                    searchType === filter.type && setSearchInputText('');
                   }}
-                  categoryName={t('Name')}
-                  labels={textFilters.name ? [textFilters.name] : []}
+                  categoryName={filter.filterGroupName}
+                  key={filter.type}
+                  labels={textFilters[filter.type] ? [textFilters[filter.type]] : []}
                 >
-                  <InputGroup className="co-filter-group">
-                    {filterDropdownKeys.length > 1 && (
-                      <InputGroupItem isFill>
-                        <FormPFSelect
-                          onSelect={onSelect}
-                          selected={searchType}
-                          selectedLabel={filterDropdownItems?.[searchType]}
-                        >
-                          {filterDropdownKeys.map((key) => (
-                            <SelectOption key={key} value={key}>
-                              {filterDropdownItems?.[key]}
-                            </SelectOption>
-                          ))}
-                        </FormPFSelect>
-                      </InputGroupItem>
-                    )}
-
-                    {searchType === STATIC_SEARCH_FILTERS.labels ? (
-                      <AutocompleteInput
-                        onSuggestionSelect={(selected) => {
-                          const newLabels = new Set([...textFilters.labels, selected]);
-                          applyTextFilters(
-                            STATIC_SEARCH_FILTERS.labels,
-                            Array.from(newLabels).join(','),
-                          );
-                          setSearchInputText('');
-                        }}
-                        className="co-text-node"
-                        data={data}
-                        placeholder={STATIC_SEARCH_FILTERS_PLACEHOLDERS.labels}
-                        setTextValue={setSearchInputText}
-                        textValue={searchInputText}
-                      />
-                    ) : (
-                      <SearchFilter
-                        onChange={(_, newSearchInput: string) => {
-                          setSearchInputText(newSearchInput);
-                          applyTextFiltersWithDebounce(searchType, newSearchInput);
-                        }}
-                        placeholder={getSearchTextPlaceholder(
-                          searchType,
-                          selectedSearchFilter,
-                          nameFilterPlaceholder,
-                        )}
-                        data-test={`${searchType}-filter-input`}
-                        value={searchInputText || ''}
-                      />
-                    )}
-                  </InputGroup>
+                  <></>
                 </ToolbarFilter>
-              </ToolbarFilter>
+              ))}
             </ToolbarItem>
           )}
         </ToolbarToggleGroup>
