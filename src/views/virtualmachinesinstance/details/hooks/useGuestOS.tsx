@@ -7,10 +7,10 @@ import {
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { isGuestAgentConnected, vmiStatuses } from '@kubevirt-utils/resources/vmi';
 import { consoleFetch } from '@openshift-console/dynamic-plugin-sdk';
-import { Fleet, useFleetK8sAPIPath } from '@stolostron/multicluster-sdk';
+import { useFleetK8sAPIPath } from '@stolostron/multicluster-sdk';
 
 type UseGuestOS = (
-  vmi: Fleet<V1VirtualMachineInstance>,
+  vmi: V1VirtualMachineInstance,
 ) => [V1VirtualMachineInstanceGuestAgentInfo, boolean, any, boolean];
 
 const useGuestOS: UseGuestOS = (vmi) => {

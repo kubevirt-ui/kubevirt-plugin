@@ -7,6 +7,7 @@ import {
 } from '@kubevirt-utils/components/GuidedTour/utils/constants';
 import HorizontalNavbar from '@kubevirt-utils/components/HorizontalNavbar/HorizontalNavbar';
 import { SidebarEditorProvider } from '@kubevirt-utils/components/SidebarEditor/SidebarEditorContext';
+import { VirtualMachineModelGroupVersionKind } from '@kubevirt-utils/models';
 import useInstanceTypeExpandSpec from '@kubevirt-utils/resources/vm/hooks/useInstanceTypeExpandSpec';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useFleetK8sWatchResource } from '@stolostron/multicluster-sdk';
@@ -18,14 +19,12 @@ import './virtual-machine-page.scss';
 
 export type VirtualMachineDetailsPageProps = {
   cluster?: string;
-  kind: string;
   name: string;
   namespace: string;
 };
 
 const VirtualMachineNavPage: React.FC<VirtualMachineDetailsPageProps> = ({
   cluster,
-  kind,
   name,
   namespace,
 }) => {
@@ -34,7 +33,7 @@ const VirtualMachineNavPage: React.FC<VirtualMachineDetailsPageProps> = ({
       ? null
       : {
           cluster,
-          kind,
+          groupVersionKind: VirtualMachineModelGroupVersionKind,
           name,
           namespace,
         },

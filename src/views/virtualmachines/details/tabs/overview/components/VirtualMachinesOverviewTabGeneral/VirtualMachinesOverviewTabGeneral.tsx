@@ -17,14 +17,14 @@ import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getVMIPod } from '@kubevirt-utils/resources/vmi';
 import { K8sResourceCommon, K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { Card, CardBody, CardTitle, DescriptionList, Divider } from '@patternfly/react-core';
-import { Fleet, FleetResourceLink } from '@stolostron/multicluster-sdk';
+import { FleetResourceLink } from '@stolostron/multicluster-sdk';
 
 import './virtual-machines-overview-tab-general.scss';
 
 type VirtualMachinesOverviewTabGeneralProps = {
-  pods: Fleet<K8sResourceCommon>[];
-  vm: Fleet<V1VirtualMachine>;
-  vmi: Fleet<V1VirtualMachineInstance>;
+  pods: K8sResourceCommon[];
+  vm: V1VirtualMachine;
+  vmi: V1VirtualMachineInstance;
 };
 
 const VirtualMachinesOverviewTabGeneral: FC<VirtualMachinesOverviewTabGeneralProps> = ({
@@ -94,6 +94,7 @@ const VirtualMachinesOverviewTabGeneral: FC<VirtualMachinesOverviewTabGeneralPro
               }
               descriptionHeader={t('VirtualMachineInstance')}
             />
+
             <VirtualMachineDescriptionItem
               descriptionData={
                 pod?.metadata?.name ? (

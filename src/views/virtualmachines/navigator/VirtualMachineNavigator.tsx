@@ -71,11 +71,7 @@ const VirtualMachineNavigator: FC = () => {
             />
           </>
         ) : (
-          <VirtualMachineNavPage
-            kind={VirtualMachineModelRef}
-            name={vmName}
-            namespace={namespace}
-          />
+          <VirtualMachineNavPage name={vmName} namespace={namespace} />
         )}
       </VirtualMachineTreeView>
     </>

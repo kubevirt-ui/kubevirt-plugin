@@ -1,6 +1,6 @@
 import { VirtualMachineInstanceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { Fleet, useFleetK8sWatchResource } from '@stolostron/multicluster-sdk';
+import { useFleetK8sWatchResource } from '@stolostron/multicluster-sdk';
 
 type UseVMI = (
   vmName: string,
@@ -8,7 +8,7 @@ type UseVMI = (
   vmCluster?: string,
   fetch?: boolean,
 ) => {
-  vmi: Fleet<V1VirtualMachineInstance>;
+  vmi: V1VirtualMachineInstance;
   vmiLoaded: boolean;
   vmiLoadError: Error;
 };
