@@ -7,10 +7,12 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { Popover, PopoverPosition, Stack, StackItem } from '@patternfly/react-core';
 
+import useRemoveFolderQuery from './hooks/useRemoveFolderQuery';
 import BulkVMsPopover from './BulkVMsPopover';
 import SelectedFolderIndicator from './SelectedFolderIndicator';
 
 type MoveBulkVMToFolderModalProps = {
+  allVMs: V1VirtualMachine[];
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (folderName: string) => Promise<V1VirtualMachine[] | void>;
@@ -18,6 +20,7 @@ type MoveBulkVMToFolderModalProps = {
 };
 
 const MoveBulkVMToFolderModal: FC<MoveBulkVMToFolderModalProps> = ({
+  allVMs,
   isOpen,
   onClose,
   onSubmit,
@@ -28,12 +31,17 @@ const MoveBulkVMToFolderModal: FC<MoveBulkVMToFolderModalProps> = ({
 
   const namespace = getNamespace(vms?.[0]);
 
+  const removeFolderQuery = useRemoveFolderQuery(vms, allVMs);
+
   return (
     <TabModal<V1VirtualMachine>
+      onSubmit={() => {
+        removeFolderQuery?.(folderName);
+        return onSubmit(folderName);
+      }}
       headerText={t('Move to folder')}
       isOpen={isOpen}
       onClose={onClose}
-      onSubmit={() => onSubmit(folderName)}
       submitBtnText={t('Save')}
     >
       <Stack hasGutter>

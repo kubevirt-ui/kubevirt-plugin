@@ -5,10 +5,12 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import FolderSelect from '@kubevirt-utils/components/FolderSelect/FolderSelect';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useVMsInNamespace from '@kubevirt-utils/hooks/useVMsInNamespace';
 import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { Stack, StackItem } from '@patternfly/react-core';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
+import useRemoveFolderQuery from './hooks/useRemoveFolderQuery';
 import SelectedFolderIndicator from './SelectedFolderIndicator';
 
 type MoveVMToFolderModalProps = {
@@ -22,12 +24,18 @@ const MoveVMToFolderModal: FC<MoveVMToFolderModalProps> = ({ isOpen, onClose, on
   const { t } = useKubevirtTranslation();
   const [folderName, setFolderName] = useState<string>(getLabel(vm, VM_FOLDER_LABEL));
 
+  const allVMsInNamespace = useVMsInNamespace(getNamespace(vm));
+  const removeFolderQuery = useRemoveFolderQuery([vm], allVMsInNamespace);
+
   return (
     <TabModal<V1VirtualMachine>
+      onSubmit={() => {
+        removeFolderQuery?.(folderName);
+        return onSubmit(folderName);
+      }}
       headerText={t('Move to folder')}
       isOpen={isOpen}
       onClose={onClose}
-      onSubmit={() => onSubmit(folderName)}
       submitBtnText={t('Save')}
     >
       <Stack hasGutter>

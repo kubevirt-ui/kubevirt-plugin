@@ -76,6 +76,7 @@ export const BulkVirtualMachineActionFactory = {
 
   moveToFolder: (
     vms: V1VirtualMachine[],
+    allVMs: V1VirtualMachine[],
     createModal: (modal: ModalComponent) => void,
   ): Action => ({
     cta: () =>
@@ -100,6 +101,7 @@ export const BulkVirtualMachineActionFactory = {
               }),
             );
           }}
+          allVMs={allVMs}
           isOpen={isOpen}
           onClose={onClose}
           vms={vms}

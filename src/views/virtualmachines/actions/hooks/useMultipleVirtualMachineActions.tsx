@@ -13,9 +13,12 @@ import { BulkVirtualMachineActionFactory } from '../BulkVirtualMachineActionFact
 import { ACTIONS_ID } from './constants';
 import useIsMTCInstalled from './useIsMTCInstalled';
 
-type UseMultipleVirtualMachineActions = (vms: V1VirtualMachine[]) => ActionDropdownItemType[];
+type UseMultipleVirtualMachineActions = (
+  vms: V1VirtualMachine[],
+  allVMs: V1VirtualMachine[],
+) => ActionDropdownItemType[];
 
-const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms) => {
+const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms, allVMs) => {
   const { createModal } = useModal();
   const { featureEnabled: confirmVMActionsEnabled } = useFeatures(CONFIRM_VM_ACTIONS);
   const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
@@ -34,7 +37,7 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms)
       BulkVirtualMachineActionFactory.unpause(vms),
 
       ...(treeViewFoldersEnabled
-        ? [BulkVirtualMachineActionFactory.moveToFolder(vms, createModal)]
+        ? [BulkVirtualMachineActionFactory.moveToFolder(vms, allVMs, createModal)]
         : []),
 
       BulkVirtualMachineActionFactory.delete(vms, createModal),

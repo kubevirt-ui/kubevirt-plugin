@@ -2,6 +2,7 @@ import React, {
   FC,
   forwardRef,
   RefAttributes,
+  useEffect,
   useImperativeHandle,
   useMemo,
   useRef,
@@ -61,6 +62,7 @@ import VirtualMachineEmptyState from './components/VirtualMachineEmptyState/Virt
 import VirtualMachineListSummary from './components/VirtualMachineListSummary/VirtualMachineListSummary';
 import VirtualMachineRow from './components/VirtualMachineRow/VirtualMachineRow';
 import VirtualMachineSelection from './components/VirtualMachineSelection/VirtualMachineSelection';
+import { TEXT_FILTER_LABELS_ID } from './hooks/constants';
 import useExistingSelectedVMs from './hooks/useExistingSelectedVMs';
 import useFiltersFromURL from './hooks/useFiltersFromURL';
 import useSelectedFilters from './hooks/useSelectedFilters';
@@ -160,6 +162,12 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
     [...filters, ...dropdownFilters, ...searchFilters],
     filtersFromURL,
   );
+
+  // Used for removing folder filter
+  // only passing filtersFromURL to useListPageFilter hook's staticFilters doesn't work, because label filter is hardcoded in the hook as a dynamic filter
+  useEffect(() => {
+    onFilterChange?.(TEXT_FILTER_LABELS_ID, filtersFromURL[TEXT_FILTER_LABELS_ID]);
+  }, [query]);
 
   // Allow using folder filters from the tree view
   useImperativeHandle(
