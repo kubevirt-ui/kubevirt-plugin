@@ -2,15 +2,14 @@ import React, { Dispatch, FC, SetStateAction, useMemo, useState } from 'react';
 import classNames from 'classnames';
 
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { Label, SelectList } from '@patternfly/react-core';
 
 import { useDocumentListener } from './hooks/useDocumentListener';
 import { MAX_SUGGESTIONS, suggestionBoxKeyHandler } from './constants';
 import SearchFilter from './SearchFilter';
-import SuggestionLine from './SuggestionLine';
 import { fuzzyCaseInsensitive, labelParser } from './utils';
 
 type AutocompleteInputProps = {
-  className?: string;
   data?: K8sResourceCommon[];
   onSuggestionSelect: (selected: string) => void;
   placeholder?: string;
@@ -20,7 +19,6 @@ type AutocompleteInputProps = {
 };
 
 const AutocompleteInput: FC<AutocompleteInputProps> = ({
-  className,
   data,
   onSuggestionSelect,
   placeholder,
@@ -56,15 +54,19 @@ const AutocompleteInput: FC<AutocompleteInputProps> = ({
         value={textValue}
       />
       {visible && (
-        <div
+        <SelectList
           className={classNames('co-suggestion-box__suggestions', {
             'co-suggestion-box__suggestions--shadowed': suggestions?.length > 0,
           })}
         >
           {suggestions?.map((elem) => (
-            <SuggestionLine className={className} key={elem} onClick={onSelect} suggestion={elem} />
+            <div key={elem}>
+              <Label color="purple" onClick={() => onSelect(elem)} variant="outline">
+                {elem}
+              </Label>
+            </div>
           ))}
-        </div>
+        </SelectList>
       )}
     </div>
   );
