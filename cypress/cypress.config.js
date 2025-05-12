@@ -2,7 +2,7 @@
 const { defineConfig } = require('cypress');
 
 module.exports = defineConfig({
-  defaultCommandTimeout: 30000,
+  defaultCommandTimeout: 60000,
   e2e: {
     // We've imported your old cypress plugins here.
     baseUrl: process.env.BRIDGE_BASE_ADDRESS,

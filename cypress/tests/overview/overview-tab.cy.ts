@@ -57,7 +57,7 @@ describe('Test Virtualization Overview page', () => {
     cy.visitOverviewVirt();
     cy.get('div.vm-statuses-card__body')
       .find('span.vm-statuses-card__status-item--value')
-      .eq(2)
+      .eq(1)
       .find('a')
       .click();
     cy.contains(DEFAULT_VM_NAME).should('exist');
