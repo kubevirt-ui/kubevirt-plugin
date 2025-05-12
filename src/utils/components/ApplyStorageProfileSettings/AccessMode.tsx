@@ -1,34 +1,36 @@
 import React, { FC } from 'react';
-import { useFormContext } from 'react-hook-form';
 import { Trans } from 'react-i18next';
 import { Link } from 'react-router-dom-v5-compat';
 
+import {
+  V1beta1StorageSpecAccessModesEnum,
+  V1beta1StorageSpecVolumeModeEnum,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ClaimPropertySets } from '@kubevirt-utils/types/storage';
 import { FormGroup, Radio } from '@patternfly/react-core';
 
-import { V1DiskFormState } from '../../utils/types';
-import { ACCESS_MODE_FIELD, ACCESS_MODE_FIELDID, VOLUME_MODE_FIELD } from '../utils/constants';
-import { ACCESS_MODE_RADIO_OPTIONS, getAccessModesForVolume } from '../utils/modesMapping';
-
 import RecommendationLabel from './RecommendationLabel';
+import { ACCESS_MODE_RADIO_OPTIONS, getAccessModesForVolume } from './utils';
 
 import './ApplyStorageProfileSettings.scss';
 
 type AccessModeProps = {
+  accessMode: V1beta1StorageSpecAccessModesEnum;
   claimPropertySets: ClaimPropertySets;
+  setAccessMode: (accessMode: V1beta1StorageSpecAccessModesEnum) => void;
+  volumeMode: V1beta1StorageSpecVolumeModeEnum;
 };
 
-const AccessMode: FC<AccessModeProps> = ({ claimPropertySets }) => {
+export const AccessMode: FC<AccessModeProps> = ({
+  accessMode,
+  claimPropertySets,
+  setAccessMode,
+  volumeMode,
+}) => {
   const { t } = useKubevirtTranslation();
-
-  const { setValue, watch } = useFormContext<V1DiskFormState>();
-
-  const [accessModes, volumeMode] = watch([ACCESS_MODE_FIELD, VOLUME_MODE_FIELD]);
-
-  const accessMode = accessModes?.[0];
 
   const accessModesForVolume = getAccessModesForVolume(claimPropertySets, volumeMode);
 
@@ -38,9 +40,8 @@ const AccessMode: FC<AccessModeProps> = ({ claimPropertySets }) => {
         <HelpTextIcon
           bodyContent={
             <Trans ns="plugin__kubevirt-plugin" t={t}>
-              Learn more about
+              Learn more about{' '}
               <Link target="_blank" to={documentationURL.STORAGE_PROFILES}>
-                {' '}
                 StorageProfile
               </Link>
               .
@@ -48,7 +49,6 @@ const AccessMode: FC<AccessModeProps> = ({ claimPropertySets }) => {
           }
         />
       }
-      fieldId={ACCESS_MODE_FIELDID}
       isStack
       label={t('Access Mode')}
     >
@@ -65,13 +65,13 @@ const AccessMode: FC<AccessModeProps> = ({ claimPropertySets }) => {
           }
           onChange={(event, checked) => {
             if (checked) {
-              setValue(ACCESS_MODE_FIELD, [value]);
+              setAccessMode(value);
             }
           }}
           id={value}
           isChecked={value === accessMode}
           key={value}
-          name={ACCESS_MODE_FIELD}
+          name="accessMode"
         />
       ))}
     </FormGroup>

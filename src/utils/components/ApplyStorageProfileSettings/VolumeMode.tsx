@@ -1,33 +1,39 @@
 import React, { FC, useCallback, useEffect } from 'react';
-import { useFormContext } from 'react-hook-form';
 import { Trans } from 'react-i18next';
 import { Link } from 'react-router-dom-v5-compat';
 import { uniq } from 'lodash';
 
-import { V1beta1StorageSpecVolumeModeEnum } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
+import {
+  V1beta1StorageSpecAccessModesEnum,
+  V1beta1StorageSpecVolumeModeEnum,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ClaimPropertySets } from '@kubevirt-utils/types/storage';
 import { FormGroup, Radio } from '@patternfly/react-core';
 
-import { V1DiskFormState } from '../../utils/types';
-import { ACCESS_MODE_FIELD, VOLUME_MODE_FIELD, VOLUMEMODE_FIELDID } from '../utils/constants';
-import { getAccessModesForVolume, VOLUME_MODE_RADIO_OPTIONS } from '../utils/modesMapping';
+import HelpTextIcon from '../HelpTextIcon/HelpTextIcon';
 
 import RecommendationLabel from './RecommendationLabel';
+import { getAccessModesForVolume, VOLUME_MODE_RADIO_OPTIONS } from './utils';
 
 import './ApplyStorageProfileSettings.scss';
+
 type VolumeModeProps = {
   claimPropertySets: ClaimPropertySets;
+  setAccessMode: (accessMode?: V1beta1StorageSpecAccessModesEnum) => void;
+  setVolumeMode: (volumeMode?: V1beta1StorageSpecVolumeModeEnum) => void;
+  volumeMode: V1beta1StorageSpecVolumeModeEnum;
 };
 
-const VolumeMode: FC<VolumeModeProps> = ({ claimPropertySets }) => {
+export const VolumeMode: FC<VolumeModeProps> = ({
+  claimPropertySets,
+  setAccessMode,
+  setVolumeMode,
+  volumeMode,
+}) => {
   const { t } = useKubevirtTranslation();
 
-  const { setValue, watch } = useFormContext<V1DiskFormState>();
-
-  const volumeMode = watch(VOLUME_MODE_FIELD);
   const recommendedVolumeModes = uniq(
     claimPropertySets
       .map((it) => it.volumeMode)
@@ -39,10 +45,10 @@ const VolumeMode: FC<VolumeModeProps> = ({ claimPropertySets }) => {
   const setBothModes = useCallback(
     (mode) => {
       const accessModes = getAccessModesForVolume(claimPropertySets, mode);
-      setValue(VOLUME_MODE_FIELD, mode);
-      setValue(ACCESS_MODE_FIELD, accessModes.length > 0 ? [accessModes[0]] : undefined);
+      setAccessMode(accessModes[0]);
+      setVolumeMode(mode);
     },
-    [claimPropertySets, setValue],
+    [claimPropertySets, setAccessMode, setVolumeMode],
   );
 
   useEffect(() => {
@@ -59,9 +65,8 @@ const VolumeMode: FC<VolumeModeProps> = ({ claimPropertySets }) => {
         <HelpTextIcon
           bodyContent={
             <Trans ns="plugin__kubevirt-plugin" t={t}>
-              Learn more about
+              Learn more about{' '}
               <Link target="_blank" to={documentationURL.STORAGE_PROFILES}>
-                {' '}
                 StorageProfile
               </Link>
               .
@@ -69,7 +74,6 @@ const VolumeMode: FC<VolumeModeProps> = ({ claimPropertySets }) => {
           }
         />
       }
-      fieldId={VOLUMEMODE_FIELDID}
       isStack
       label={t('Volume Mode')}
     >
@@ -92,7 +96,7 @@ const VolumeMode: FC<VolumeModeProps> = ({ claimPropertySets }) => {
           id={value}
           isChecked={value === volumeMode}
           key={value}
-          name={VOLUME_MODE_FIELD}
+          name="volumeMode"
         />
       ))}
     </FormGroup>
