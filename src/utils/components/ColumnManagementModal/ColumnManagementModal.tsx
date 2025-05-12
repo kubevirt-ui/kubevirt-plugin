@@ -18,9 +18,8 @@ import {
   Stack,
 } from '@patternfly/react-core';
 
-import { MAX_VIEW_COLS } from './constants';
 import DataListRow from './DataListRow';
-import { createInputId, getColumnId } from './utils';
+import { createInputId, getColumnId, getMaxColumnsToSelect } from './utils';
 
 import './column-management-modal.scss';
 
@@ -70,7 +69,9 @@ export const ColumnManagementModal: FC<ColumnManagementModalProps> = ({
     onClose();
   };
 
-  const areMaxColumnsDisplayed = checkedColumns.size >= MAX_VIEW_COLS;
+  const maxColumnsToSelect = getMaxColumnsToSelect(columns);
+  const areMaxColumnsDisplayed =
+    checkedColumns.size - (checkedColumns.has('') ? 1 : 0) >= maxColumnsToSelect;
 
   const resetColumns = (event: SyntheticEvent): void => {
     event.preventDefault();
@@ -87,7 +88,7 @@ export const ColumnManagementModal: FC<ColumnManagementModalProps> = ({
         <p className="co-m-form-row">{t('Selected columns will appear in the table.')}</p>
         <Alert
           isInline
-          title={t('You can select up to {{MAX_VIEW_COLS}} columns', { MAX_VIEW_COLS })}
+          title={t('You can select up to {{maxColumnsToSelect}} columns', { maxColumnsToSelect })}
           variant={AlertVariant.info}
         >
           {!showNamespaceOverride && t('The namespace column is only shown when in "All projects"')}
