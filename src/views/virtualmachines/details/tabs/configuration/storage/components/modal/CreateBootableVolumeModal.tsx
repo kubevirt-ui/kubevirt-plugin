@@ -21,7 +21,6 @@ import { removeByteSuffix } from '@kubevirt-utils/components/CapacityInput/utils
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useStorageProfileClaimPropertySets from '@kubevirt-utils/hooks/useStorageProfileClaimPropertySets';
 import { modelToGroupVersionKind, PersistentVolumeClaimModel } from '@kubevirt-utils/models';
 import { getName, getNamespace, getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { getInstanceTypeMatcher, getPreferenceMatcher } from '@kubevirt-utils/resources/vm';
@@ -29,7 +28,7 @@ import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { hasSizeUnit } from '@kubevirt-utils/resources/vm/utils/disk/size';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
-import { PopoverPosition, Stack, Title } from '@patternfly/react-core';
+import { Form, PopoverPosition, Stack, Title } from '@patternfly/react-core';
 
 import { createBootableVolumeFromDisk } from './utils';
 
@@ -67,11 +66,6 @@ const CreateBootableVolumeModal: FC<CreateBootableVolumeModalProps> = ({
     pvcNamespace: diskObj?.namespace,
     storageClassName: diskObj?.storageClass === NO_DATA_DASH ? null : diskObj?.storageClass,
   });
-  const applyStorageProfileState = useState<boolean>(true);
-
-  const claimPropertySetsData = useStorageProfileClaimPropertySets(
-    bootableVolume?.storageClassName,
-  );
 
   const setBootableVolumeField: SetBootableVolumeFieldType = useCallback(
     (key, fieldKey) => (value) =>
@@ -94,13 +88,7 @@ const CreateBootableVolumeModal: FC<CreateBootableVolumeModalProps> = ({
   };
 
   const onSubmit = async () => {
-    const createdDS = await createBootableVolumeFromDisk(
-      diskObj,
-      vm,
-      bootableVolume,
-      applyStorageProfileState[0],
-      claimPropertySetsData.claimPropertySets,
-    );
+    const createdDS = await createBootableVolumeFromDisk(diskObj, vm, bootableVolume);
 
     navigate(getResourceUrl({ model: DataSourceModel, resource: createdDS }));
   };
@@ -126,30 +114,30 @@ const CreateBootableVolumeModal: FC<CreateBootableVolumeModalProps> = ({
       onSubmit={onSubmit}
       submitBtnText={t('Save')}
     >
-      <Stack hasGutter>
-        <Title className="pf-u-mt-md" headingLevel="h5">
-          {t('Destination details')}
-        </Title>
-        <VolumeDestination
-          applyStorageProfileState={applyStorageProfileState}
-          bootableVolume={bootableVolume}
-          claimPropertySetsData={claimPropertySetsData}
-          setBootableVolumeField={setBootableVolumeField}
-        />
-        <Title className="pf-u-mt-md" headingLevel="h5">
-          {t('Volume metadata')}{' '}
-          <HelpTextIcon
-            bodyContent={t('Set the volume metadata to use the volume as a bootable image.')}
-            helpIconClassName="add-bootable-volume-modal__title-help-text-icon"
-            position={PopoverPosition.right}
+      <Form>
+        <Stack hasGutter>
+          <Title className="pf-u-mt-md" headingLevel="h5">
+            {t('Destination details')}
+          </Title>
+          <VolumeDestination
+            bootableVolume={bootableVolume}
+            setBootableVolumeField={setBootableVolumeField}
           />
-        </Title>
-        <VolumeMetadata
-          bootableVolume={bootableVolume}
-          deleteLabel={deleteLabel}
-          setBootableVolumeField={setBootableVolumeField}
-        />
-      </Stack>
+          <Title className="pf-u-mt-md" headingLevel="h5">
+            {t('Volume metadata')}{' '}
+            <HelpTextIcon
+              bodyContent={t('Set the volume metadata to use the volume as a bootable image.')}
+              helpIconClassName="add-bootable-volume-modal__title-help-text-icon"
+              position={PopoverPosition.right}
+            />
+          </Title>
+          <VolumeMetadata
+            bootableVolume={bootableVolume}
+            deleteLabel={deleteLabel}
+            setBootableVolumeField={setBootableVolumeField}
+          />
+        </Stack>
+      </Form>
     </TabModal>
   );
 };

@@ -2,10 +2,8 @@ import React, { FC, useMemo } from 'react';
 import { Trans } from 'react-i18next';
 
 import { V1beta1StorageSpecAccessModesEnum } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import {
-  getVolumeModeForProvisioner,
-  VOLUME_MODE_RADIO_OPTIONS,
-} from '@kubevirt-utils/components/DiskModal/components/utils/modesMapping';
+import { VOLUME_MODE_RADIO_OPTIONS } from '@kubevirt-utils/components/ApplyStorageProfileSettings/utils';
+import { getVolumeModeForProvisioner } from '@kubevirt-utils/components/DiskModal/components/utils/modesMapping';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, Radio } from '@patternfly/react-core';
 
