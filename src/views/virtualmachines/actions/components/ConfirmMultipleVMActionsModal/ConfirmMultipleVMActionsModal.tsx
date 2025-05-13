@@ -44,6 +44,8 @@ const ConfirmMultipleVMActionsModal: FC<ConfirmMultipleVMActionsModalProps> = ({
     onClose();
   };
 
+  const isDeletionModal = actionType === 'Delete';
+
   return (
     <Modal
       className="confirm-multiple-vm-actions-modal"
@@ -54,11 +56,12 @@ const ConfirmMultipleVMActionsModal: FC<ConfirmMultipleVMActionsModalProps> = ({
     >
       <ModalHeader
         title={t('{{actionType}} {{numVMs}} VirtualMachines?', { actionType, numVMs })}
+        titleIconVariant={isDeletionModal ? 'warning' : null}
       />
       <ModalBody>
         {
           <>
-            {t('Are you sure you want to')} {t(actionType.toLowerCase())}
+            {t('Are you sure you want to')} {t(actionType.toLowerCase())}{' '}
           </>
         }
         <Popover
@@ -75,7 +78,11 @@ const ConfirmMultipleVMActionsModal: FC<ConfirmMultipleVMActionsModalProps> = ({
         </Popover>
       </ModalBody>
       <ModalFooter>
-        <Button key="confirm" onClick={submitHandler}>
+        <Button
+          key="confirm"
+          onClick={submitHandler}
+          variant={isDeletionModal ? 'danger' : 'primary'}
+        >
           {t(actionType)}
         </Button>
         <Button key="cancel" onClick={onClose} variant={ButtonVariant.link}>

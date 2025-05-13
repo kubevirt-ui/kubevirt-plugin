@@ -144,13 +144,7 @@ export const ColumnManagementModal: FC<ColumnManagementModalProps> = ({
               {error.message}
             </Alert>
           )}
-          <Flex className="column-management-modal__action-list">
-            <Button key="reset" onClick={resetColumns} variant={ButtonVariant.link}>
-              {t('Restore default columns')}
-            </Button>
-            <Button onClick={onClose} variant={ButtonVariant.secondary}>
-              {t('Cancel')}
-            </Button>
+          <Flex spaceItems={{ default: 'spaceItemsSm' }}>
             <Button
               form="modal-with-form-form"
               isDisabled={!loaded}
@@ -160,6 +154,12 @@ export const ColumnManagementModal: FC<ColumnManagementModalProps> = ({
               variant={ButtonVariant.primary}
             >
               {t('Save')}
+            </Button>
+            <Button key="reset" onClick={resetColumns} variant={ButtonVariant.secondary}>
+              {t('Restore default columns')}
+            </Button>
+            <Button onClick={onClose} variant={ButtonVariant.link}>
+              {t('Cancel')}
             </Button>
           </Flex>
         </Stack>

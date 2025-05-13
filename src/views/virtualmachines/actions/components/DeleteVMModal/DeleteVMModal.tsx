@@ -92,6 +92,7 @@ const DeleteVMModal: FC<DeleteVMModalProps> = ({ isOpen, onClose, vm }) => {
       onSubmit={onDelete}
       submitBtnText={t('Delete')}
       submitBtnVariant={ButtonVariant.danger}
+      titleIconVariant="warning"
     >
       <Stack hasGutter>
         <StackItem>

@@ -5,12 +5,11 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import {
-  ActionList,
-  ActionListItem,
   Alert,
   AlertVariant,
   Button,
   ButtonVariant,
+  Flex,
   Modal,
   ModalBody,
   ModalFooter,
@@ -123,30 +122,22 @@ const TabModal: TabModalFC = memo(
                 </Alert>
               </StackItem>
             )}
-            <StackItem>
-              <ActionList>
-                <ActionListItem>
-                  <Button
-                    isDisabled={isDisabled || isSubmitting}
-                    isLoading={isLoading || isSubmitting}
-                    onClick={handleSubmit}
-                    variant={submitBtnVariant ?? ButtonVariant.primary}
-                  >
-                    {submitBtnText || t('Save')}
-                  </Button>
-                </ActionListItem>
-                <ActionListItem>
-                  <Button onClick={closeModal} variant={ButtonVariant.link}>
-                    {t('Cancel')}
-                  </Button>
-                </ActionListItem>
-                {actionItemLink && (
-                  <ActionListItem className="kv-tabmodal-footer__action-item-link">
-                    {actionItemLink}
-                  </ActionListItem>
-                )}
-              </ActionList>
-            </StackItem>
+            <Flex spaceItems={{ default: 'spaceItemsSm' }}>
+              <Button
+                isDisabled={isDisabled || isSubmitting}
+                isLoading={isLoading || isSubmitting}
+                onClick={handleSubmit}
+                variant={submitBtnVariant ?? ButtonVariant.primary}
+              >
+                {submitBtnText || t('Save')}
+              </Button>
+              <Button onClick={closeModal} variant={ButtonVariant.link}>
+                {t('Cancel')}
+              </Button>
+              {actionItemLink && (
+                <div className="kv-tabmodal-footer__action-item-link">{actionItemLink}</div>
+              )}
+            </Flex>
           </Stack>
         </ModalFooter>
       </Modal>
