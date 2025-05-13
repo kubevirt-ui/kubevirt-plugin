@@ -75,6 +75,9 @@ export const waitForStatus = (vmName: string, status: string, onList = true) => 
 export const vm = {
   create: (vmData: VirtualMachineData, waitForRunning = true) => {
     cy.visitCatalog();
+    if (vmData.namespace !== undefined) {
+      cy.switchProject(vmData.namespace);
+    }
     cy.get(cView.templateTab).click();
     //cy.switchProject(vmData.namespace);
     if (vmData.userTemplate) {
