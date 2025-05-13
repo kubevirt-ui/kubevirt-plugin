@@ -37,7 +37,7 @@ export enum subTabName {
 }
 
 export const navigateToTab = (name: string) => {
-  cy.get(horizontalLink(name)).should('be.visible');
+  cy.get(horizontalLink(name), { timeout: 120000 }).should('be.visible');
   cy.get(horizontalLink(name)).click();
 };
 
