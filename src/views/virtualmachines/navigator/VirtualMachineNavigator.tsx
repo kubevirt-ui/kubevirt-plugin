@@ -28,7 +28,6 @@ const VirtualMachineNavigator: FC = () => {
   const location = useLocation();
   const [activeNamespace] = useActiveNamespace();
   const namespace = activeNamespace === ALL_NAMESPACES_SESSION_KEY ? null : activeNamespace;
-  const vmName = location.pathname.split('/')?.[5];
 
   const isVirtualMachineListPage = useMemo(
     () =>
@@ -71,7 +70,7 @@ const VirtualMachineNavigator: FC = () => {
             />
           </>
         ) : (
-          <VirtualMachineNavPage name={vmName} namespace={namespace} />
+          <VirtualMachineNavPage />
         )}
       </VirtualMachineTreeView>
     </>

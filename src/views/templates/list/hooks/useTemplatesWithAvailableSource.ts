@@ -57,7 +57,7 @@ export const useTemplatesWithAvailableSource = ({
     loaded: bootSourcesLoaded,
   } = useAvailableDataSourcesAndPVCs(templates, loaded);
 
-  const availableTemplates: V1Template[] = React.useMemo(() => {
+  const availableTemplates = React.useMemo(() => {
     const isReady = loaded && availableDatasources && availablePVCs;
     const temps =
       isReady &&
