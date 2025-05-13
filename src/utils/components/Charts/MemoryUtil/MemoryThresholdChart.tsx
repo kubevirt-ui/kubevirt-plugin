@@ -25,7 +25,9 @@ import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
 import { getUtilizationQueries } from '../utils/queries';
 import {
+  addTimestampToTooltip,
   findMaxYValue,
+  formatMemoryThresholdTooltipData,
   getNumberOfDigitsAfterDecimalPoint,
   MILLISECONDS_MULTIPLIER,
   queriesToLink,
@@ -75,13 +77,8 @@ const MemoryThresholdChart: FC<MemoryThresholdChartProps> = ({ vmi }) => {
           <Chart
             containerComponent={
               <ChartVoronoiContainer
-                labels={({ datum }) => {
-                  return `${datum?.name}: ${xbytes(datum?.y, {
-                    fixed: 2,
-                    iec: true,
-                  })}`;
-                }}
                 constrainToVisibleArea
+                labels={addTimestampToTooltip(formatMemoryThresholdTooltipData)}
               />
             }
             domain={{

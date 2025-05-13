@@ -1,5 +1,4 @@
 import React from 'react';
-import xbytes from 'xbytes';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -17,7 +16,13 @@ import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
 import { getUtilizationQueries } from '../utils/queries';
-import { MILLISECONDS_MULTIPLIER, tickFormat, TICKS_COUNT } from '../utils/utils';
+import {
+  addTimestampToTooltip,
+  formatStorageReadThresholdTooltipData,
+  MILLISECONDS_MULTIPLIER,
+  tickFormat,
+  TICKS_COUNT,
+} from '../utils/utils';
 
 type StorageThresholdChartProps = {
   vmi: V1VirtualMachineInstance;
@@ -53,10 +58,8 @@ const StorageReadThresholdChart: React.FC<StorageThresholdChartProps> = ({ vmi }
         <Chart
           containerComponent={
             <ChartVoronoiContainer
-              labels={({ datum }) => {
-                return `Data read: ${xbytes(datum?.y, { fixed: 2, iec: true })}`;
-              }}
               constrainToVisibleArea
+              labels={addTimestampToTooltip(formatStorageReadThresholdTooltipData)}
             />
           }
           domain={{

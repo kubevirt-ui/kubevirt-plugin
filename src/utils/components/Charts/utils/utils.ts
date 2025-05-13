@@ -4,13 +4,16 @@ import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOp
 import {
   dateFormatterNoYear,
   timeFormatter,
+  timestampFor,
 } from '@kubevirt-utils/components/Timestamp/utils/datetime';
+import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   PrometheusResponse,
   PrometheusResult,
   PrometheusValue,
 } from '@openshift-console/dynamic-plugin-sdk';
+import { ChartPoint } from '@overview/OverviewTab/metric-charts-card/utils/hooks/types';
 import { ALL_NETWORKS } from '@virtualmachines/details/tabs/metrics/utils/constants';
 
 export const SINGLE_VM_DURATION = 'SINGLE_VM_DURATION';
@@ -142,3 +145,54 @@ export const getNumberOfDigitsAfterDecimalPoint = (bytes: number) => {
 
   return digitsAfterDecimalPoint;
 };
+
+export const addTimestampToTooltip =
+  (formatData: (point: ChartPoint) => string) =>
+  ({ datum }: { datum: ChartPoint }) =>
+    `${timestampFor(datum?.x as Date, new Date(), false)}\n ${formatData(datum)}`;
+
+// Resource utilization charts
+
+export const formatCPUUtilTooltipData = (datum: ChartPoint) =>
+  `${datum?.name}: ${datum?.y?.toFixed(2)}'s`;
+
+export const formatMemoryThresholdTooltipData = (datum: ChartPoint) =>
+  `${datum?.name}: ${xbytes(datum?.y, {
+    fixed: 2,
+    iec: true,
+  })}`;
+
+// Storage charts
+
+export const formatStorageReadThresholdTooltipData = (datum: ChartPoint) =>
+  t('Data read: {{input}}', { input: xbytes(datum?.y, { fixed: 2, iec: true }) });
+
+export const formatStorageWriteThresholdTooltipData = (datum: ChartPoint) =>
+  t('Data written: {{input}}', { input: xbytes(datum?.y, { fixed: 2, iec: true }) });
+
+export const formatStorageTotalReadWriteThresholdTooltipData = (datum: ChartPoint) =>
+  t('Data transfer: {{input}}', {
+    input: xbytes(datum?.y, { fixed: 2, iec: true }),
+  });
+
+export const formatStorageIOPSTotalThresholdTooltipData = (datum: ChartPoint) =>
+  t('IOPS total: {{input}}', { input: datum?.y?.toFixed(2) });
+
+// Network charts
+
+export const formatNetworkThresholdSingleSourceTooltipData = (datum: ChartPoint) =>
+  `${xbytes(datum?.y, {
+    fixed: 2,
+    iec: true,
+  })}ps`;
+
+export const formatNetworkThresholdTooltipData = (datum: ChartPoint) =>
+  `${datum?.name}: ${xbytes(datum?.y, { fixed: 2, iec: true })}`;
+
+// Migration charts
+
+export const formatMigrationThresholdTooltipData = (datum: ChartPoint) =>
+  `${datum?.name}: ${xbytes(datum?.y, { fixed: 2, iec: true })}`;
+
+export const formatMigrationThresholdDiskRateTooltipData = (datum: ChartPoint) =>
+  `${datum?.name}: ${xbytes(datum?.y, { fixed: 2, iec: true })}`;

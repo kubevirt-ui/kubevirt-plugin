@@ -27,7 +27,9 @@ import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
 import { getUtilizationQueries } from '../utils/queries';
 import {
+  addTimestampToTooltip,
   findMaxYValue,
+  formatCPUUtilTooltipData,
   MILLISECONDS_MULTIPLIER,
   queriesToLink,
   tickFormat,
@@ -85,10 +87,8 @@ const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ pods, vmi }) => {
           <Chart
             containerComponent={
               <ChartVoronoiContainer
-                labels={({ datum }) => {
-                  return `${datum?.name}: ${datum?.y?.toFixed(2)}'s`;
-                }}
                 constrainToVisibleArea
+                labels={addTimestampToTooltip(formatCPUUtilTooltipData)}
               />
             }
             domain={{

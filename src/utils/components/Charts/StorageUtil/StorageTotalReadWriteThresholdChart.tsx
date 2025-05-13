@@ -4,7 +4,6 @@ import xbytes from 'xbytes';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { tickLabels } from '@kubevirt-utils/components/Charts/ChartLabels/styleOverrides';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -24,7 +23,9 @@ import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
 import { getUtilizationQueries } from '../utils/queries';
 import {
+  addTimestampToTooltip,
   findMaxYValue,
+  formatStorageTotalReadWriteThresholdTooltipData,
   getNumberOfDigitsAfterDecimalPoint,
   MILLISECONDS_MULTIPLIER,
   queriesToLink,
@@ -39,7 +40,6 @@ type StorageTotalReadWriteThresholdChartProps = {
 const StorageTotalReadWriteThresholdChart: React.FC<StorageTotalReadWriteThresholdChartProps> = ({
   vmi,
 }) => {
-  const { t } = useKubevirtTranslation();
   const { currentTime, duration, timespan } = useDuration();
   const queries = React.useMemo(
     () => getUtilizationQueries({ duration, obj: vmi }),
@@ -74,12 +74,8 @@ const StorageTotalReadWriteThresholdChart: React.FC<StorageTotalReadWriteThresho
           <Chart
             containerComponent={
               <ChartVoronoiContainer
-                labels={({ datum }) =>
-                  t('Data transfer: {{input}}', {
-                    input: xbytes(datum?.y, { fixed: 2, iec: true }),
-                  })
-                }
                 constrainToVisibleArea
+                labels={addTimestampToTooltip(formatStorageTotalReadWriteThresholdTooltipData)}
               />
             }
             domain={{

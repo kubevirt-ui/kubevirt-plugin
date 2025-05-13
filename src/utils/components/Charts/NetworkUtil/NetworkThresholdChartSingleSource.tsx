@@ -1,6 +1,5 @@
 import React, { FC } from 'react';
 import { Link } from 'react-router-dom-v5-compat';
-import xbytes from 'xbytes';
 
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { PrometheusResult } from '@openshift-console/dynamic-plugin-sdk';
@@ -20,7 +19,9 @@ import { tickLabels } from '../ChartLabels/styleOverrides';
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
 import {
+  addTimestampToTooltip,
   findNetworkMaxYValue,
+  formatNetworkThresholdSingleSourceTooltipData,
   formatNetworkYTick,
   MILLISECONDS_MULTIPLIER,
   tickFormat,
@@ -75,13 +76,8 @@ const NetworkThresholdSingleSourceChart: FC<NetworkThresholdSingleSourceChartPro
                     legendData={legendData}
                   />
                 }
-                labels={({ datum }) => {
-                  return `${xbytes(datum?.y, {
-                    fixed: 2,
-                    iec: true,
-                  })}ps`;
-                }}
                 cursorDimension="x"
+                labels={addTimestampToTooltip(formatNetworkThresholdSingleSourceTooltipData)}
                 mouseFollowTooltips
                 voronoiDimension="x"
               />
