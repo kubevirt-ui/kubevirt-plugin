@@ -526,6 +526,6 @@ export const getPendingChangesByTab = (pendingChanges: PendingChange[]) => {
 };
 
 export const restartRequired = (vm: V1VirtualMachine): boolean =>
-  getStatusConditions(vm).some(
+  getStatusConditions(vm)?.some(
     (condition) => condition?.type === RESTART_REQUIRED && condition?.status === 'True',
   );

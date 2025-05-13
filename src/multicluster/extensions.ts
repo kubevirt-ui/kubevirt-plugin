@@ -1,7 +1,6 @@
 import { EncodedExtension } from '@openshift/dynamic-plugin-sdk-webpack';
 import { StandaloneRoutePage } from '@openshift-console/dynamic-plugin-sdk';
 import type { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plugin-sdk-webpack';
-import { ResourceDetails } from '@stolostron/multicluster-sdk';
 
 //import { FLEET_STANDALONE_CONSOLE_PATH } from '../utils/components/Consoles/FleetConsoleStandAlone';
 
@@ -11,17 +10,6 @@ export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
 };
 
 export const extensions: EncodedExtension[] = [
-  {
-    properties: {
-      component: { $codeRef: 'VirtualMachineNavPage' },
-      model: {
-        group: 'kubevirt.io',
-        kind: 'VirtualMachine',
-        version: 'v1',
-      },
-    },
-    type: 'acm.resource/details',
-  } as EncodedExtension<ResourceDetails>,
   {
     flags: {
       required: ['KUBEVIRT_DYNAMIC'],
@@ -33,4 +21,14 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.page/route/standalone',
   } as EncodedExtension<StandaloneRoutePage>,
+
+  {
+    properties: {
+      component: {
+        $codeRef: 'VirtualMachineNavPage',
+      },
+      path: ['/multicloud/infrastructure/virtualmachines/:cluster/:namespace/:name'],
+    },
+    type: 'console.page/route',
+  },
 ];
