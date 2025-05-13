@@ -9,6 +9,7 @@ import {
 import { ALL_NAMESPACES, ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { FilterValue, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { k8sBasePath } from '@openshift-console/dynamic-plugin-sdk/lib/utils/k8s/k8s';
+import { SortByDirection } from '@patternfly/react-table';
 
 import { ItemsToFilterProps } from './types';
 
@@ -169,3 +170,32 @@ export const removeDockerPrefix = (image: string) => image?.replace(DOCKER_PREFI
 
 export const isAllNamespaces = (namespace: string) =>
   !namespace || namespace === ALL_NAMESPACES || namespace === ALL_NAMESPACES_SESSION_KEY;
+
+/**
+ * Compares all types by converting them to string.
+ * Nullish entities are converted to empty string.
+ * @see localeCompare
+ * @param a -
+ * @param b -
+ * @param locale to be used by string compareFn
+ */
+export const universalComparator = (a: any, b: any, locale?: string): number =>
+  localeCompare(String(a ?? ''), String(b ?? ''), locale);
+
+/**
+ * Uses native string localCompare method with numeric option enabled.
+ *
+ * @param a -
+ * @param b -
+ * @param locale to be used by string compareFn
+ */
+export const localeCompare = (a: string, b: string, locale: string): number =>
+  a.localeCompare(b, locale, { numeric: true });
+
+export const sortByDirection = (
+  comparator: (a: any, b: any, locale?: string) => number,
+  direction: SortByDirection,
+) => {
+  const multiplier = direction === SortByDirection.desc ? -1 : 1;
+  return (a: any, b: any, locale?: string) => multiplier * comparator(a, b, locale);
+};

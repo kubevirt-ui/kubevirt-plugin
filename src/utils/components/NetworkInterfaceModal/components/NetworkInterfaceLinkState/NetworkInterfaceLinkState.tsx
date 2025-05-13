@@ -9,7 +9,7 @@ import './NetworkInterfaceLinkState.scss';
 
 type NetworkInterfaceLinkStateProps = {
   isDisabled: boolean;
-  linkState: string;
+  linkState: NetworkInterfaceState;
   setLinkState: Dispatch<SetStateAction<string>>;
 };
 
@@ -42,8 +42,8 @@ const NetworkInterfaceLinkState: FC<NetworkInterfaceLinkStateProps> = ({
         <FormPFSelect
           isDisabled={isDisabled}
           onSelect={handleChange}
-          selected={linkState}
-          selectedLabel={linkState && linkStateOptions[linkState].name}
+          selected={isDisabled ? undefined : linkState}
+          selectedLabel={isDisabled ? undefined : linkState && linkStateOptions[linkState]?.name}
           toggleProps={{ isFullWidth: true }}
         >
           {Object.values(linkStateOptions)?.map(({ id, name }) => (

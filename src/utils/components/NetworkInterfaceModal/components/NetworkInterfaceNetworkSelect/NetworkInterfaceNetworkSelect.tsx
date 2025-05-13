@@ -1,4 +1,12 @@
-import React, { Dispatch, FC, SetStateAction, useEffect, useMemo, useRef } from 'react';
+import React, {
+  Dispatch,
+  FC,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
@@ -102,14 +110,17 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
   const validated =
     canCreateNetworkInterface || isEditing ? ValidatedOptions.default : ValidatedOptions.error;
 
-  const handleChange = (value: string) => {
-    setNetworkName(value);
-    setInterfaceType(
-      value === podNetworkingText
-        ? interfaceTypesProxy.masquerade
-        : networkOptions.find((netOption) => value === netOption?.value)?.type,
-    );
-  };
+  const handleChange = useCallback(
+    (value: string) => {
+      setNetworkName(value);
+      setInterfaceType(
+        value === podNetworkingText
+          ? interfaceTypesProxy.masquerade
+          : networkOptions.find((netOption) => value === netOption?.value)?.type,
+      );
+    },
+    [setNetworkName, setInterfaceType, podNetworkingText, networkOptions],
+  );
 
   // This useEffect is to handle the submit button and init value
   useEffect(() => {
@@ -121,7 +132,7 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
 
     // if networkName is empty, and pod network exists we can create a NIC with existing NAD if there is one
     if (loaded && !loadError && !selectedFirstOnLoad.current) {
-      setNetworkName(networkOptions?.[0]?.value);
+      handleChange(networkOptions?.[0]?.value);
       selectedFirstOnLoad.current = true;
 
       return;
@@ -140,6 +151,7 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
     networkOptions,
     setNetworkName,
     setSubmitDisabled,
+    handleChange,
   ]);
 
   return (

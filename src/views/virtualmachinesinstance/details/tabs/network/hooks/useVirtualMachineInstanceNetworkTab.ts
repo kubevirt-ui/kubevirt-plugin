@@ -1,10 +1,9 @@
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
-
-import { NetworkPresentation } from './../utils/virtualMachineInstancePageNetworkTabUtils';
+import { VMINetworkPresentation } from '@kubevirt-utils/resources/vmi/types';
 
 type UseVirtualMachineInstanceNetworkTab = (
   vmi: V1VirtualMachineInstance,
-) => [NetworkPresentation[]];
+) => [VMINetworkPresentation[]];
 
 export const useVirtualMachineInstanceNetworkTab: UseVirtualMachineInstanceNetworkTab = (vmi) => {
   const networks = vmi?.spec?.networks;

@@ -18,8 +18,7 @@ import {
   DropdownList,
 } from '@patternfly/react-core';
 import {
-  getInterfaceState,
-  isSRIOVInterface,
+  getConfigInterfaceStateFromVm,
   setNetworkInterfaceState,
 } from '@virtualmachines/details/tabs/configuration/network/utils/utils';
 import { isRunning } from '@virtualmachines/utils';
@@ -44,8 +43,7 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
 
   const isHotPlugNIC = Boolean(nicPresentation?.iface?.bridge);
 
-  const interfaceState = getInterfaceState(vm, nicName);
-  const isSRIOVIface = isSRIOVInterface(vm, nicName);
+  const interfaceState = getConfigInterfaceStateFromVm(vm, nicName);
 
   const onEditModalOpen = () => {
     createModal(({ isOpen, onClose }) => (
@@ -105,20 +103,18 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
       popperProps={{ position: 'right' }}
     >
       <DropdownList>
-        {interfaceState === NetworkInterfaceState.DOWN ? (
+        {interfaceState === NetworkInterfaceState.DOWN && (
           <DropdownItem
             data-test-id="set-link-up"
-            isDisabled={isSRIOVIface}
             key="network-interface-state-up"
             onClick={() => setNetworkInterfaceState(vm, nicName, NetworkInterfaceState.UP)}
           >
             {t('Set link up')}
           </DropdownItem>
-        ) : (
+        )}
+        {interfaceState === NetworkInterfaceState.UP && (
           <DropdownItem
             data-test-id="set-link-down"
-            description={isSRIOVIface && t('Not available for SR-IOV interfaces')}
-            isDisabled={isSRIOVIface}
             key="network-interface-state-down"
             onClick={() => setNetworkInterfaceState(vm, nicName, NetworkInterfaceState.DOWN)}
           >
