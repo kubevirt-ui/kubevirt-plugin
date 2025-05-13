@@ -1,4 +1,5 @@
 import React from 'react';
+import { useParams } from 'react-router-dom-v5-compat';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
@@ -20,17 +21,13 @@ import VirtualMachineNavPageTitle from './VirtualMachineNavPageTitle';
 
 import './virtual-machine-page.scss';
 
-export type VirtualMachineDetailsPageProps = {
-  cluster?: string;
-  name: string;
-  namespace: string;
-};
+const VirtualMachineNavPage: React.FC = () => {
+  const { cluster, name, namespace } = useParams<{
+    cluster?: string;
+    name: string;
+    namespace: string;
+  }>();
 
-const VirtualMachineNavPage: React.FC<VirtualMachineDetailsPageProps> = ({
-  cluster,
-  name,
-  namespace,
-}) => {
   const [vm, isLoaded, loadError] = useFleetK8sWatchResource<V1VirtualMachine>(
     runningTourSignal.value
       ? null
