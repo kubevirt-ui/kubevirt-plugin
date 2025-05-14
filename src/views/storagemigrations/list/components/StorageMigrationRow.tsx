@@ -46,10 +46,10 @@ const StorageMigrationRow: FC<StorageMigrationRowProps> = ({
         />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="storagemigration">
-        {getSelectedPVFromMigPlan(obj).length} {t('Volumes')}
+        {t('{{count}} Volumes', { count: getSelectedPVFromMigPlan(obj)?.length ?? 0 })}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="targetsc">
-        {targetStorageClasses.map((storageClass) => (
+        {targetStorageClasses?.map((storageClass) => (
           <ResourceLink
             groupVersionKind={modelToGroupVersionKind(StorageClassModel)}
             key={storageClass}

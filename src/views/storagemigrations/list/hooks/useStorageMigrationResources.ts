@@ -28,6 +28,9 @@ const useStorageMigrationResources: UseStorageMigrationResources = () => {
     namespaced: true,
   });
 
+  const storageMigPlans =
+    migPlans?.filter((plan) => plan?.spec?.persistentVolumes?.length > 0) ?? [];
+
   const [migMigrations, migrationsLoaded, migrationsError] = useK8sWatchResource<MigMigration[]>({
     groupVersionKind: getGroupVersionKindForModel(MigMigrationModel),
     isList: true,
@@ -47,7 +50,7 @@ const useStorageMigrationResources: UseStorageMigrationResources = () => {
     loaded: plansLoaded && migrationsLoaded && dvLoaded,
     loadError: plansError || migrationsError || dvError,
     migMigrations,
-    migPlans,
+    migPlans: storageMigPlans,
   };
 };
 
