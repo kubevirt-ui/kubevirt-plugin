@@ -2,7 +2,6 @@ import React from 'react';
 import { Link } from 'react-router-dom-v5-compat';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -20,7 +19,9 @@ import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
 import { getUtilizationQueries } from '../utils/queries';
 import {
+  addTimestampToTooltip,
   findMaxYValue,
+  formatStorageIOPSTotalThresholdTooltipData,
   MILLISECONDS_MULTIPLIER,
   queriesToLink,
   tickFormat,
@@ -32,7 +33,6 @@ type StorageIOPSTotalThresholdChartProps = {
 };
 
 const StorageIOPSTotalThresholdChart: React.FC<StorageIOPSTotalThresholdChartProps> = ({ vmi }) => {
-  const { t } = useKubevirtTranslation();
   const { currentTime, duration, timespan } = useDuration();
   const queries = React.useMemo(
     () => getUtilizationQueries({ duration, obj: vmi }),
@@ -64,7 +64,7 @@ const StorageIOPSTotalThresholdChart: React.FC<StorageIOPSTotalThresholdChartPro
             containerComponent={
               <ChartVoronoiContainer
                 constrainToVisibleArea
-                labels={({ datum }) => t('IOPS total: {{input}}', { input: datum?.y?.toFixed(2) })}
+                labels={addTimestampToTooltip(formatStorageIOPSTotalThresholdTooltipData)}
               />
             }
             domain={{

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom-v5-compat';
-import xbytes from 'xbytes';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -20,7 +19,14 @@ import { tickLabels } from '../ChartLabels/styleOverrides';
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
 import { getUtilizationQueries } from '../utils/queries';
-import { MILLISECONDS_MULTIPLIER, queriesToLink, tickFormat, TICKS_COUNT } from '../utils/utils';
+import {
+  addTimestampToTooltip,
+  formatNetworkThresholdTooltipData,
+  MILLISECONDS_MULTIPLIER,
+  queriesToLink,
+  tickFormat,
+  TICKS_COUNT,
+} from '../utils/utils';
 
 type NetworkThresholdChartProps = {
   vmi: V1VirtualMachineInstance;
@@ -69,10 +75,8 @@ const NetworkThresholdChart: React.FC<NetworkThresholdChartProps> = ({ vmi }) =>
           <Chart
             containerComponent={
               <ChartVoronoiContainer
-                labels={({ datum }) => {
-                  return `${datum?.name}: ${xbytes(datum?.y, { fixed: 2, iec: true })}`;
-                }}
                 constrainToVisibleArea
+                labels={addTimestampToTooltip(formatNetworkThresholdTooltipData)}
               />
             }
             domain={{

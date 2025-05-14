@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom-v5-compat';
-import xbytes from 'xbytes';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -24,8 +23,10 @@ import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
 import { getUtilizationQueries } from '../utils/queries';
 import {
+  addTimestampToTooltip,
   findMigrationMaxYValue,
   formatMemoryYTick,
+  formatMigrationThresholdTooltipData,
   getPrometheusData,
   MILLISECONDS_MULTIPLIER,
   queriesToLink,
@@ -107,10 +108,8 @@ const MigrationThresholdChart: React.FC<MigrationThresholdChartProps> = ({ vmi }
           <Chart
             containerComponent={
               <ChartVoronoiContainer
-                labels={({ datum }) => {
-                  return `${datum?.name}: ${xbytes(datum?.y, { fixed: 2, iec: true })}`;
-                }}
                 constrainToVisibleArea
+                labels={addTimestampToTooltip(formatMigrationThresholdTooltipData)}
               />
             }
             domain={{
