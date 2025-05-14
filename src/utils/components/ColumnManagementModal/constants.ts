@@ -1,4 +1,4 @@
-export const MAX_VIEW_COLS = 9;
+export const MAX_VIEW_COLS = 10;
 
 export const NAME_COLUMN_ID = 'name';
 
