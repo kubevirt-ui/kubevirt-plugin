@@ -21,17 +21,18 @@ for arg in $@; do
     fi
     git pull
 
-    if [ $arg = "monitoring-plugin" ]; then
-        cd web
-    fi
-
-    yarn
-
     if [ "$(lsof -t -i:$INITIAL_PORT)" != "" ]; then
         kill -9 $(lsof -t -i:$INITIAL_PORT)
     fi
 
-    PORT=$INITIAL_PORT yarn start --port=$INITIAL_PORT &
+    if [ $arg = "monitoring-plugin" ]; then
+        cd web
+        npm install
+        PORT=$INITIAL_PORT npm start --port=$INITIAL_PORT &
+    else
+      yarn
+      PORT=$INITIAL_PORT yarn start --port=$INITIAL_PORT &
+    fi
 
     runningPlugins["podman-linux"]+=",${arg}=http://localhost:${INITIAL_PORT}"
     runningPlugins["podman"]+=",${arg}=http://host.containers.internal:${INITIAL_PORT}"
