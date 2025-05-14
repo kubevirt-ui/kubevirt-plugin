@@ -22,10 +22,14 @@ import VirtualMachineNavPageTitle from './VirtualMachineNavPageTitle';
 import './virtual-machine-page.scss';
 
 const VirtualMachineNavPage: React.FC = () => {
-  const { cluster, name, namespace } = useParams<{
+  const {
+    cluster,
+    name,
+    ns: namespace,
+  } = useParams<{
     cluster?: string;
     name: string;
-    namespace: string;
+    ns: string;
   }>();
 
   const [vm, isLoaded, loadError] = useFleetK8sWatchResource<V1VirtualMachine>(

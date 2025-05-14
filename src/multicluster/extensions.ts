@@ -27,7 +27,7 @@ export const extensions: EncodedExtension[] = [
       component: {
         $codeRef: 'VirtualMachineNavPage',
       },
-      path: ['/multicloud/infrastructure/virtualmachines/:cluster/:namespace/:name'],
+      path: ['/multicloud/infrastructure/virtualmachines/:cluster/:ns/:name'],
     },
     type: 'console.page/route',
   },

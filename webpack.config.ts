@@ -165,6 +165,9 @@ const config: Configuration = {
   ],
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
+    fallback: {
+      path: require.resolve('path-browserify'),
+    },
     modules: [path.join(__dirname, 'node_modules')],
     plugins: [new TsconfigPathsPlugin()],
   },
