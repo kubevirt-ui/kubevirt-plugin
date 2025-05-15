@@ -63,6 +63,7 @@
   "<0>This is a Windows VirtualMachine but no Service for the RDP (Remote Desktop Protocol) can be found.</0><br/><2>For better experience accessing Windows console, it is recommended to use the RDP.<1>Create RDP Service</1></2>": "<0>This is a Windows VirtualMachine but no Service for the RDP (Remote Desktop Protocol) can be found.</0><br/><2>For better experience accessing Windows console, it is recommended to use the RDP.<1>Create RDP Service</1></2>",
   "<0>Unattend.xml</0><1>Unattend can be used to configure windows setup and can be picked up several times during windows setup/configuration.</1><2><0>{t('Learn more')}</0></2>": "<0>Unattend.xml</0><1>Unattend can be used to configure windows setup and can be picked up several times during windows setup/configuration.</1><2><0>{t('Learn more')}</0></2>",
   "<0>Welcome to</0><1>OpenShift Virtualization</1><2>Use OpenShift Virtualization to run and manage virtualized workloads alongside container workloads. You can manage both Linux and Windows virtual machines.</2><3>What do you want to do next?</3><4></4><5></5>": "<0>Welcome to</0><1>OpenShift Virtualization</1><2>Use OpenShift Virtualization to run and manage virtualized workloads alongside container workloads. You can manage both Linux and Windows virtual machines.</2><3>What do you want to do next?</3><4></4><5></5>",
+  "1 VirtualMachine in {{namespace}} namespace?": "1 VirtualMachine in {{namespace}} namespace?",
   "2xlarge": "2xlarge",
   "3 (default)": "3 (default)",
   "404: Not Found": "404: Not Found",
