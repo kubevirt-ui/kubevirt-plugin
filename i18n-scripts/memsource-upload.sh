@@ -16,9 +16,9 @@ done
 
 BRANCH=$(git branch  --show-current)
 
-echo "Creating project with title \"[OCP $VERSION] UI Localization - Sprint $SPRINT/Branch $BRANCH\""
+echo "Creating project with title \"[CNV $VERSION] UI Localization - Sprint $SPRINT/Branch $BRANCH\""
 
-PROJECT_INFO=$(memsource project create --name "[OCP $VERSION] UI Localization - Sprint $SPRINT/Branch $BRANCH" --template-id 169304 -f json)
+PROJECT_INFO=$(memsource project create --name "[CNV $VERSION] UI Localization - Sprint $SPRINT/Branch $BRANCH" --template-id 169304 -f json)
 PROJECT_ID=$(echo "$PROJECT_INFO" | jq -r '.uid')
 
 echo "Exporting PO files"

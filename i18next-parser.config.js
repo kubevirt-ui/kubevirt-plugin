@@ -4,6 +4,9 @@ const { CustomJSONLexer } = require('./i18n-scripts/lexers');
 module.exports = {
   createOldCatalogs: false,
   defaultNamespace: 'plugin__kubevirt-plugin',
+  defaultValue: (lng, ns, key) => {
+    return key;
+  },
   input: ['src/**/*.{js,jsx,ts,tsx,json}'],
   keySeparator: false,
   // see below for more details
@@ -29,10 +32,9 @@ module.exports = {
       },
     ],
   },
-  locales: ['en'],
+  locales: ['en', 'es', 'fr', 'ja', 'ko', 'zh'],
   namespaceSeparator: '~',
   reactNamespace: false,
   sort: true,
-
   useKeysAsDefaultValue: true,
 };
