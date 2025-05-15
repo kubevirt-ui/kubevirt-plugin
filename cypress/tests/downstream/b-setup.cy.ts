@@ -6,12 +6,14 @@ import { vm } from '../../views/vm-flow';
 
 describe('Create VMs from InstanceType', () => {
   before(() => {
-    cy.visitOverview();
-    cy.visitCatalog();
-    cy.switchProject(TEST_NS);
+    cy.login();
+    cy.visit('');
   });
 
   it('quick create VM from IT', () => {
+    cy.visitOverview();
+    cy.visitCatalog();
+    cy.switchProject(TEST_NS);
     vm.instanceCreate(VM_IT_QUICK);
   });
 

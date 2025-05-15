@@ -20,13 +20,9 @@ describe('Test VM actions confirm', () => {
     cy.get('#confirm-vm-actions').find('input.pf-v6-c-switch__input').check({ force: true });
   });
 
-  it('start example vm', () => {
-    // no confirm for start
+  it('navigate to example vm', () => {
     cy.visitVMsVirt();
     cy.byLegacyTestID(Example).click();
-    cy.get('.kv-actions-dropdown').click();
-    cy.get('[data-test-id="vm-action-start"]').click();
-    cy.wait(15000);
   });
 
   it('verify confirm message on VM actions', () => {
