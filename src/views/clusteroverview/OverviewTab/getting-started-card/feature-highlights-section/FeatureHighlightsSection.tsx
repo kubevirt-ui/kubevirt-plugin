@@ -34,12 +34,12 @@ const FeatureHighlightsSection: React.FC = () => {
     },
     {
       external: true,
-      href: documentationURL.HIGHLIGHTS_418,
+      href: documentationURL.HIGHLIGHTS_419,
       id: 'item2',
       title: (
         <FeatureHighlightsTitle
           readTime={t('5 min')}
-          title={t('OpenShift Virtualization 4.18 Highlights')}
+          title={t('OpenShift Virtualization 4.19 Highlights')}
         />
       ),
     },
