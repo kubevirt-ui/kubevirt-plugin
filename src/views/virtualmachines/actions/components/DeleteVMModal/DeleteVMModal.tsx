@@ -1,5 +1,5 @@
 import React, { FC, useState } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import VirtualMachineModel, {
@@ -40,6 +40,7 @@ type DeleteVMModalProps = {
 const DeleteVMModal: FC<DeleteVMModalProps> = ({ isOpen, onClose, vm }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const [gracePeriodCheckbox, setGracePeriodCheckbox] = useState<boolean>(false);
   const [gracePeriodSeconds, setGracePeriodSeconds] = useState<number>(
     vm?.spec?.template?.spec?.terminationGracePeriodSeconds || DEFAULT_GRACE_PERIOD,
@@ -80,7 +81,11 @@ const DeleteVMModal: FC<DeleteVMModalProps> = ({ isOpen, onClose, vm }) => {
       deselectVM(updatedVM);
     }
 
-    navigate(`/k8s/${lastNamespacePath}/${VirtualMachineModelRef}`);
+    if (!location.pathname.endsWith('/search')) {
+      navigate(
+        `/k8s/${lastNamespacePath}/${VirtualMachineModelRef}${location.search}${location.hash}`,
+      );
+    }
   };
 
   return (
