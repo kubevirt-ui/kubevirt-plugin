@@ -8,16 +8,12 @@ import {
   V1beta1DataImportCron,
   V1beta1DataSource,
 } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
-import {
-  V1beta1DataVolumeSource,
-  V1beta1StorageSpecVolumeModeEnum,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1DataVolumeSource } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { KUBEVIRT_ISO_LABEL } from '@kubevirt-utils/resources/bootableresources/constants';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
 import { DATA_SOURCE_CRONJOB_LABEL } from '@kubevirt-utils/resources/template';
-import { ClaimPropertySets } from '@kubevirt-utils/types/storage';
 import { appendDockerPrefix, getRandomChars } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -29,23 +25,14 @@ import {
 } from './constants';
 
 type createBootableVolumeType = (input: {
-  applyStorageProfileSettings: boolean;
   bootableVolume: AddBootableVolumeState;
-  claimPropertySets: ClaimPropertySets;
   onCreateVolume: (createdVolume: BootableVolume) => void;
   sourceType: DROPDOWN_FORM_SELECTION;
   uploadData: ({ dataVolume, file }: UploadDataProps) => Promise<void>;
 }) => (dataSource: V1beta1DataSource) => Promise<V1beta1DataSource>;
 
 export const createBootableVolume: createBootableVolumeType =
-  ({
-    applyStorageProfileSettings,
-    bootableVolume,
-    claimPropertySets,
-    onCreateVolume,
-    sourceType,
-    uploadData,
-  }) =>
+  ({ bootableVolume, onCreateVolume, sourceType, uploadData }) =>
   async (dataSource: V1beta1DataSource) => {
     const { bootableVolumeNamespace } = bootableVolume;
     const draftDataSource = setDataSourceMetadata(
@@ -59,19 +46,11 @@ export const createBootableVolume: createBootableVolumeType =
         createBootableVolumeFromUpload(
           bootableVolume,
           bootableVolumeNamespace,
-          applyStorageProfileSettings,
-          claimPropertySets,
           draftDataSource,
           uploadData,
         ),
       [DROPDOWN_FORM_SELECTION.USE_EXISTING_PVC]: () =>
-        createPVCBootableVolume(
-          bootableVolume,
-          bootableVolumeNamespace,
-          applyStorageProfileSettings,
-          claimPropertySets,
-          draftDataSource,
-        ),
+        createPVCBootableVolume(bootableVolume, bootableVolumeNamespace, draftDataSource),
       [DROPDOWN_FORM_SELECTION.USE_REGISTRY]: () =>
         createDataSourceWithImportCron(bootableVolume, draftDataSource),
       [DROPDOWN_FORM_SELECTION.USE_SNAPSHOT]: () =>
@@ -90,12 +69,11 @@ export const getInstanceTypeFromVolume = (bootableVolume: BootableVolume): strin
 
 const getDataVolumeWithSource = (
   bootableVolume: AddBootableVolumeState,
-  applyStorageProfileSettings: boolean,
-  claimPropertySets: ClaimPropertySets,
   namespace: string,
   dataVolumeSource: V1beta1DataVolumeSource,
 ) => {
-  const { bootableVolumeName, labels, size, storageClassName } = bootableVolume || {};
+  const { accessMode, bootableVolumeName, labels, size, storageClassName, volumeMode } =
+    bootableVolume || {};
 
   return produce(emptySourceDataVolume, (draftBootableVolume) => {
     draftBootableVolume.metadata.name = bootableVolumeName;
@@ -107,11 +85,8 @@ const getDataVolumeWithSource = (
       draftBootableVolume.spec.storage.storageClassName = storageClassName;
     }
 
-    if (!applyStorageProfileSettings) {
-      draftBootableVolume.spec.storage.accessModes = claimPropertySets?.[0]?.accessModes;
-      draftBootableVolume.spec.storage.volumeMode = claimPropertySets?.[0]
-        ?.volumeMode as V1beta1StorageSpecVolumeModeEnum;
-    }
+    draftBootableVolume.spec.storage.accessModes = accessMode ? [accessMode] : undefined;
+    draftBootableVolume.spec.storage.volumeMode = volumeMode;
 
     draftBootableVolume.spec.source = dataVolumeSource;
   });
@@ -140,20 +115,12 @@ const setDataSourceMetadata = (
 const createBootableVolumeFromUpload = async (
   bootableVolume: AddBootableVolumeState,
   namespace: string,
-  applyStorageProfileSettings: boolean,
-  claimPropertySets: ClaimPropertySets,
   draftDataSource: V1beta1DataSource,
   uploadData: ({ dataVolume, file }: UploadDataProps) => Promise<void>,
 ) => {
   const { isIso, uploadFile } = bootableVolume || {};
 
-  const bootableVolumeToCreate = getDataVolumeWithSource(
-    bootableVolume,
-    applyStorageProfileSettings,
-    claimPropertySets,
-    namespace,
-    { upload: {} },
-  );
+  const bootableVolumeToCreate = getDataVolumeWithSource(bootableVolume, namespace, { upload: {} });
 
   const dataSourceToCreate = produce(draftDataSource, (draftDS) => {
     if (isIso) {
@@ -196,19 +163,13 @@ const createSnapshotDataSource = async (
 export const createPVCBootableVolume = async (
   bootableVolume: AddBootableVolumeState,
   namespace: string,
-  applyStorageProfileSettings: boolean,
-  claimPropertySets: ClaimPropertySets,
   draftDataSource: V1beta1DataSource,
 ) => {
   const { pvcName, pvcNamespace } = bootableVolume || {};
 
-  const bootableVolumeToCreate = getDataVolumeWithSource(
-    bootableVolume,
-    applyStorageProfileSettings,
-    claimPropertySets,
-    namespace,
-    { pvc: { name: pvcName, namespace: pvcNamespace } },
-  );
+  const bootableVolumeToCreate = getDataVolumeWithSource(bootableVolume, namespace, {
+    pvc: { name: pvcName, namespace: pvcNamespace },
+  });
 
   const dataSourceToCreate = produce(draftDataSource, (draftDS) => {
     draftDS.spec.source = {

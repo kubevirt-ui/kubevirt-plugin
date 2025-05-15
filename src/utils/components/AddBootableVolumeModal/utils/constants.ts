@@ -6,6 +6,10 @@ import {
   V1beta1DataSource,
   V1beta1DataVolume,
 } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import {
+  V1beta1StorageSpecAccessModesEnum,
+  V1beta1StorageSpecVolumeModeEnum,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/utils/constants';
 import { OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
 import { CDI_BIND_REQUESTED_ANNOTATION } from '@kubevirt-utils/hooks/useCDIUpload/consts';
@@ -26,6 +30,7 @@ export const optionsValueLabelMapper = {
 };
 
 export type AddBootableVolumeState = {
+  accessMode?: V1beta1StorageSpecAccessModesEnum;
   annotations?: { [key: string]: string };
   bootableVolumeName: string;
   bootableVolumeNamespace: string;
@@ -43,6 +48,7 @@ export type AddBootableVolumeState = {
   storageClassProvisioner?: string;
   uploadFile?: File | string;
   uploadFilename?: string;
+  volumeMode?: V1beta1StorageSpecVolumeModeEnum;
 };
 
 export type SetBootableVolumeFieldType = (

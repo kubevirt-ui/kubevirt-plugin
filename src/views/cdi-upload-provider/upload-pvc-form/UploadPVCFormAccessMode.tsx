@@ -1,9 +1,7 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
 
-import {
-  ACCESS_MODE_RADIO_OPTIONS,
-  getAccessModeForProvisioner,
-} from '@kubevirt-utils/components/DiskModal/components/utils/modesMapping';
+import { ACCESS_MODE_RADIO_OPTIONS } from '@kubevirt-utils/components/ApplyStorageProfileSettings/utils';
+import { getAccessModeForProvisioner } from '@kubevirt-utils/components/DiskModal/components/utils/modesMapping';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, Radio } from '@patternfly/react-core';
 
