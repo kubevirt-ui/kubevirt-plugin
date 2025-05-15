@@ -80,26 +80,24 @@ const SSHConfiguration: FC<SSHConfigurationProps> = ({ newBadge }) => {
           !isEmpty(featureConfigMap?.data?.[NODE_PORT_ADDRESS])
         }
         id="node-port-feature"
-        inlineCheckbox
         isDisabled={!loaded || !isAdmin || isEmpty(featureConfigMap?.data?.[NODE_PORT_ADDRESS])}
         isLoading={nodePortIsLoading}
         newBadge={newBadge}
         title={t('SSH over NodePort service')}
         turnOnSwitch={(checked) => onChange(checked.toString(), NODE_PORT_ENABLED)}
-      >
-        <TextInput
-          onChange={(_event, value: string) => {
-            setUrl(value);
-            onTextChange(value, NODE_PORT_ADDRESS);
-          }}
-          className="pf-v6-u-mr-md"
-          id="node-address"
-          isRequired
-          name="node-address"
-          placeholder={t('Enter node address')}
-          value={url ?? featureConfigMap?.data?.[NODE_PORT_ADDRESS]}
-        />
-      </SectionWithSwitch>
+      />
+      <TextInput
+        onChange={(_event, value: string) => {
+          setUrl(value);
+          onTextChange(value, NODE_PORT_ADDRESS);
+        }}
+        className="pf-v6-u-mr-md"
+        id="node-address"
+        isRequired
+        name="node-address"
+        placeholder={t('Enter node address')}
+        value={url ?? featureConfigMap?.data?.[NODE_PORT_ADDRESS]}
+      />
     </ExpandSection>
   );
 };
