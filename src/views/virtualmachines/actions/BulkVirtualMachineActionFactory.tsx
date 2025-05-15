@@ -14,7 +14,7 @@ import ConfirmMultipleVMActionsModal from './components/ConfirmMultipleVMActions
 import VirtualMachineMigrateModal from './components/VirtualMachineMigration/VirtualMachineMigrationModal';
 import { ACTIONS_ID } from './hooks/constants';
 import { deleteVM, pauseVM, restartVM, startVM, stopVM, unpauseVM } from './actions';
-import { getCommonLabels, getLabelsDiffPatch } from './utils';
+import { getCommonLabels, getLabelsDiffPatch, isSameNamespace } from './utils';
 
 export const BulkVirtualMachineActionFactory = {
   delete: (vms: V1VirtualMachine[], createModal: (modal: ModalComponent) => void): Action => ({
@@ -105,6 +105,7 @@ export const BulkVirtualMachineActionFactory = {
           vms={vms}
         />
       )),
+    disabled: !isSameNamespace(vms),
     id: ACTIONS_ID.MOVE_TO_FOLDER,
     label: t('Move to folder'),
   }),

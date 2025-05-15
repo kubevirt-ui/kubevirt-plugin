@@ -1,6 +1,7 @@
 import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { RemoveFolderQuery } from '@kubevirt-utils/components/MoveVMToFolderModal/hooks/useRemoveFolderQuery';
 import { getLabels, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
@@ -14,9 +15,10 @@ import {
   REMOVE_DRAG_BACKGROUND_COLOR,
   VALID_DRAG_TARGET_BACKGROUND_COLOR,
 } from './constants';
-import { getVMFromElementID } from './utils';
+import { getVMFromElementID, isVMAloneInFolder } from './utils';
 
 let draggingVM: null | V1VirtualMachine = null;
+let isDraggingVMAloneInFolder = false;
 
 export const changeVMFolder = (newFolder: string) =>
   k8sPatch({
@@ -47,6 +49,7 @@ const dragStartHandler = (event) => {
   event.target.style.backgroundColor = REMOVE_DRAG_BACKGROUND_COLOR;
 
   draggingVM = getVMFromElementID(elementId);
+  isDraggingVMAloneInFolder = isVMAloneInFolder(draggingVM);
 };
 
 type RemoveListenerFunction = () => void;
@@ -63,7 +66,10 @@ export const addDragEventListener = (treeViewItem: TreeViewDataItem): RemoveList
     vmHTMLElement.removeEventListener(DRAG_N_DROP_LISTENERS.DRAG_START, dragStartHandler);
 };
 
-export const dropEventListeners = (treeViewItem: TreeViewDataItem): RemoveListenerFunction => {
+export const addDropEventListeners = (
+  treeViewItem: TreeViewDataItem,
+  removeFolderQuery: RemoveFolderQuery,
+): RemoveListenerFunction => {
   const dropHTMLElement = document.getElementById(treeViewItem.id);
 
   const [_, dropNamespace, folderName] = treeViewItem.id.split('/');
@@ -74,6 +80,9 @@ export const dropEventListeners = (treeViewItem: TreeViewDataItem): RemoveListen
     event.stopPropagation();
     event.preventDefault();
 
+    if (isDraggingVMAloneInFolder) {
+      removeFolderQuery?.(folderName);
+    }
     changeVMFolder(folderName);
 
     dropHTMLElement.style.backgroundColor = REMOVE_DRAG_BACKGROUND_COLOR;

@@ -7,6 +7,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { Popover, PopoverPosition, Stack, StackItem } from '@patternfly/react-core';
 
+import useRemoveFolderQuery from './hooks/useRemoveFolderQuery';
 import BulkVMsPopover from './BulkVMsPopover';
 import SelectedFolderIndicator from './SelectedFolderIndicator';
 
@@ -28,12 +29,17 @@ const MoveBulkVMToFolderModal: FC<MoveBulkVMToFolderModalProps> = ({
 
   const namespace = getNamespace(vms?.[0]);
 
+  const removeFolderQuery = useRemoveFolderQuery(vms);
+
   return (
     <TabModal<V1VirtualMachine>
+      onSubmit={() => {
+        removeFolderQuery?.(folderName);
+        return onSubmit(folderName);
+      }}
       headerText={t('Move to folder')}
       isOpen={isOpen}
       onClose={onClose}
-      onSubmit={() => onSubmit(folderName)}
       submitBtnText={t('Save')}
     >
       <Stack hasGutter>
@@ -44,10 +50,12 @@ const MoveBulkVMToFolderModal: FC<MoveBulkVMToFolderModalProps> = ({
             position={PopoverPosition.right}
           >
             <a>
-              {t('{{numVMs}} VirtualMachines in {{namespace}} namespace?', {
-                namespace,
-                numVMs: vms.length,
-              })}
+              {vms.length === 1
+                ? t('1 VirtualMachine in {{namespace}} namespace?', { namespace })
+                : t('{{numVMs}} VirtualMachines in {{namespace}} namespace?', {
+                    namespace,
+                    numVMs: vms.length,
+                  })}
             </a>
           </Popover>
         </StackItem>

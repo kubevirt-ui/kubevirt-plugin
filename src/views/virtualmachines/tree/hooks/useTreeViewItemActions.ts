@@ -1,5 +1,6 @@
 import { MouseEvent, useCallback, useLayoutEffect, useMemo, useState } from 'react';
 
+import useRemoveFolderQuery from '@kubevirt-utils/components/MoveVMToFolderModal/hooks/useRemoveFolderQuery';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { TreeViewDataItem, TreeViewProps } from '@patternfly/react-core';
 
@@ -11,7 +12,7 @@ import {
 } from '../utils/utils';
 
 import { RIGHT_CLICK_LISTENER } from './constants';
-import { addDragEventListener, dropEventListeners } from './dragndrop';
+import { addDragEventListener, addDropEventListeners } from './dragndrop';
 
 type UseTreeViewItemActions = (treeData: TreeViewDataItem[]) => {
   addListeners: TreeViewProps['onExpand'];
@@ -21,6 +22,8 @@ type UseTreeViewItemActions = (treeData: TreeViewDataItem[]) => {
 
 const useTreeViewItemActions: UseTreeViewItemActions = (treeData) => {
   const [triggerElement, setTriggerElement] = useState<HTMLElement>();
+
+  const removeFolderQuery = useRemoveFolderQuery();
 
   const dropElements = useMemo(
     () => [...getAllTreeViewFolderItems(treeData), ...getAllTreeViewProjectItems(treeData)],
@@ -62,10 +65,12 @@ const useTreeViewItemActions: UseTreeViewItemActions = (treeData) => {
   useLayoutEffect(() => {
     if (!dropElements) return;
 
-    const removeEventListeners = dropElements.map(dropEventListeners);
+    const removeEventListeners = dropElements.map((element) =>
+      addDropEventListeners(element, removeFolderQuery),
+    );
 
     return () => removeEventListeners?.forEach((removeEventListener) => removeEventListener?.());
-  }, [dropElements]);
+  }, [dropElements, removeFolderQuery]);
 
   const addListeners = useCallback(
     (event: MouseEvent, item: TreeViewDataItem) => {
@@ -83,12 +88,12 @@ const useTreeViewItemActions: UseTreeViewItemActions = (treeData) => {
 
         vmItems?.forEach(addDragEventListener);
 
-        dropInnerElements.forEach(dropEventListeners);
+        dropInnerElements.forEach((element) => addDropEventListeners(element, removeFolderQuery));
 
         allItems.forEach(addRightClickEvent);
       }, 200);
     },
-    [addRightClickEvent],
+    [addRightClickEvent, removeFolderQuery],
   );
 
   const hideMenu = useCallback(() => setTriggerElement(null), []);
