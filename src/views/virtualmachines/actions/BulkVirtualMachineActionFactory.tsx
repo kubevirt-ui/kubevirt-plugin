@@ -37,11 +37,11 @@ export const BulkVirtualMachineActionFactory = {
 
       createModal(({ isOpen, onClose }) => (
         <LabelsModal
-          onLabelsSubmit={(labels) => {
+          onLabelsSubmit={(newLabels) => {
             return Promise.all(
               vms.map((vm) =>
                 k8sPatch<V1VirtualMachine>({
-                  data: getLabelsDiffPatch(labels, getLabels(vm)),
+                  data: getLabelsDiffPatch(newLabels, commonLabels, getLabels(vm)),
                   model: VirtualMachineModel,
                   resource: vm,
                 }),

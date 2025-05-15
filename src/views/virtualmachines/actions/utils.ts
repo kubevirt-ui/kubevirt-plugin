@@ -9,6 +9,8 @@ import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
 import { ANNOTATION_PREFIX_MIGRATION_ORIGIN_CLAIMNAME } from './constants';
 
+type Labels = { [key: string]: string };
+
 export const deleteUnusedDataVolumes = (
   vm: V1VirtualMachine,
   namespace: string,
@@ -105,23 +107,24 @@ export const createRollbackPatchData = (vm: V1VirtualMachine): Patch[] => {
   return [...dataVolumeRollback, ...pvcRollback];
 };
 
-export const getCommonLabels = (vms: V1VirtualMachine[]): { [key: string]: string } => {
+export const getCommonLabels = (vms: V1VirtualMachine[]): Labels => {
   if (vms.length === 0) return {};
 
-  const commonLabels = vms.reduce((acc, vm) => {
-    const labels = getLabels(vm);
+  const commonLabels = vms.reduce<Labels>((common, vm, index) => {
+    const currentVMLabels = getLabels(vm, {});
 
-    if (Object.keys(acc).length === 0) {
-      return { ...labels };
+    if (index === 0) {
+      return currentVMLabels;
     }
 
-    Object.keys(acc).forEach((key) => {
-      if (labels[key] !== acc[key]) {
-        delete acc[key];
+    const intersection: Labels = {};
+    Object.keys(common).forEach((key) => {
+      if (currentVMLabels[key] === common[key]) {
+        intersection[key] = common[key];
       }
     });
 
-    return acc;
+    return intersection;
   }, {});
 
   delete commonLabels[VM_FOLDER_LABEL];
@@ -129,12 +132,13 @@ export const getCommonLabels = (vms: V1VirtualMachine[]): { [key: string]: strin
 };
 
 export const getLabelsDiffPatch = (
-  newLabels: { [key: string]: string },
-  vmLabels: { [key: string]: string },
+  newCommonLabels: Labels,
+  initialCommonLabels: Labels,
+  initialVMLabels: Labels,
 ): Patch[] => {
   const patchArray = [];
 
-  if (isEmpty(vmLabels)) {
+  if (isEmpty(initialVMLabels)) {
     patchArray.push({
       op: 'add',
       path: `/metadata/labels`,
@@ -142,14 +146,14 @@ export const getLabelsDiffPatch = (
     });
   }
 
-  const labelsPatchReplace = Object.entries(newLabels || {}).map(([key, value]) => ({
-    op: vmLabels?.[key] ? 'replace' : 'add',
+  const labelsPatchReplace = Object.entries(newCommonLabels || {}).map(([key, value]) => ({
+    op: initialCommonLabels?.[key] ? 'replace' : 'add',
     path: `/metadata/labels/${key?.replace('/', '~1')}`,
     value,
   }));
 
-  const labelsPatchDelete = Object.keys(vmLabels || {}).reduce((acc, key) => {
-    if (!(key in newLabels)) {
+  const labelsPatchDelete = Object.keys(initialCommonLabels || {}).reduce((acc, key) => {
+    if (!(key in newCommonLabels)) {
       acc.push({
         op: 'remove',
         path: `/metadata/labels/${key?.replace('/', '~1')}`,

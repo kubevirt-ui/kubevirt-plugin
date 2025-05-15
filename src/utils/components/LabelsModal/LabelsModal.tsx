@@ -46,10 +46,17 @@ export const LabelsModal: FC<LabelsModalProps> = memo(
     const [isInputValid, setIsInputValid] = useState(true);
 
     const initLabels = useMemo(() => {
-      if (!isEmpty(initialLabels)) return initialLabels;
-      if (!isEmpty(obj?.metadata?.labels)) return obj?.metadata?.labels;
+      if (initialLabels !== null && initialLabels !== undefined) {
+        return initialLabels;
+      }
+
+      if (!isEmpty(obj?.metadata?.labels)) {
+        return obj?.metadata?.labels;
+      }
+
       return {};
     }, [initialLabels, obj?.metadata?.labels]);
+
     const [labels, setLabels] = useState<string[]>(labelsToArray(initLabels));
 
     const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
