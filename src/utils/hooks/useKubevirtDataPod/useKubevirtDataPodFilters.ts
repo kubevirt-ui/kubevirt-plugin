@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 
+import useQuery from '@kubevirt-utils/hooks/useQuery';
 import { debounce } from '@kubevirt-utils/utils/debounce';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import useQuery from '@virtualmachines/details/tabs/metrics/NetworkCharts/hook/useQuery';
 
 import useDeepCompareMemoize from '../useDeepCompareMemoize/useDeepCompareMemoize';
 

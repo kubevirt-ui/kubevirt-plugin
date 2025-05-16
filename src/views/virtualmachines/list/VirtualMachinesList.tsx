@@ -29,6 +29,10 @@ import {
   tourGuideVM,
 } from '@kubevirt-utils/components/GuidedTour/utils/constants';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
+import {
+  ExposedFilterFunctions,
+  ResetTextSearch,
+} from '@kubevirt-utils/components/ListPageFilter/types';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import useContainerWidth from '@kubevirt-utils/hooks/useContainerWidth';
 import { KUBEVIRT_APISERVER_PROXY } from '@kubevirt-utils/hooks/useFeatures/constants';
@@ -40,33 +44,32 @@ import {
   paginationDefaultValues,
   paginationInitialState,
 } from '@kubevirt-utils/hooks/usePagination/utils/constants';
+import useQuery from '@kubevirt-utils/hooks/useQuery';
 import useSingleNodeCluster from '@kubevirt-utils/hooks/useSingleNodeCluster';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   K8sResourceCommon,
   ListPageBody,
-  OnFilterChange,
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Flex, Pagination } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
-import useQuery from '@virtualmachines/details/tabs/metrics/NetworkCharts/hook/useQuery';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 import { convertIntoPVCMapper } from '@virtualmachines/utils/mappers';
-
-import { useVMListFilters } from '../utils';
 
 import VirtualMachineBulkActionButton from './components/VirtualMachineBulkActionButton';
 import VirtualMachineEmptyState from './components/VirtualMachineEmptyState/VirtualMachineEmptyState';
 import VirtualMachineListSummary from './components/VirtualMachineListSummary/VirtualMachineListSummary';
 import VirtualMachineRow from './components/VirtualMachineRow/VirtualMachineRow';
+import VirtualMachineSearchResultsHeader from './components/VirtualMachineSearchResultsHeader';
 import VirtualMachineSelection from './components/VirtualMachineSelection/VirtualMachineSelection';
 import { TEXT_FILTER_LABELS_ID } from './hooks/constants';
 import useExistingSelectedVMs from './hooks/useExistingSelectedVMs';
 import useFiltersFromURL from './hooks/useFiltersFromURL';
 import useSelectedFilters from './hooks/useSelectedFilters';
 import useVirtualMachineColumns from './hooks/useVirtualMachineColumns';
+import { useVMListFilters } from './hooks/useVMListFilters/useVMListFilters';
 import useVMMetrics from './hooks/useVMMetrics';
 import { getListManagementGroupSize, ListManagementGroupSize } from './listManagementGroupSize';
 
@@ -74,17 +77,19 @@ import '@kubevirt-utils/styles/list-managment-group.scss';
 import './VirtualMachinesList.scss';
 
 type VirtualMachinesListProps = {
+  isSearchResultsPage?: boolean;
   kind: string;
   namespace: string;
-  showSummary?: boolean;
-} & RefAttributes<{ onFilterChange: OnFilterChange } | null>;
+} & RefAttributes<ExposedFilterFunctions | null>;
 
 const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref) => {
   const { t } = useKubevirtTranslation();
-  const { kind, namespace, showSummary = true } = props;
+  const { isSearchResultsPage = false, kind, namespace } = props;
   const catalogURL = `/k8s/ns/${namespace || DEFAULT_NAMESPACE}/catalog`;
   const { featureEnabled, loading: loadingFeatureProxy } = useFeatures(KUBEVIRT_APISERVER_PROXY);
   const isProxyPodAlive = useKubevirtDataPodHealth();
+
+  const listPageFilterRef = useRef<{ resetTextSearch: ResetTextSearch } | null>(null);
 
   useSignals();
   useVMMetrics();
@@ -146,20 +151,20 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
     namespaced: true,
   });
 
-  const { dropdownFilters, filters, searchFilters, vmiMapper, vmimMapper } = useVMListFilters(
-    vmis,
-    vmsToShow,
-    vmims,
-    pvcMapper,
-  );
+  const { advancedFilters, filters, projectFilter, searchFilters, vmiMapper, vmimMapper } =
+    useVMListFilters(vmis, vmsToShow, vmims, pvcMapper);
 
-  const filtersFromURL = useFiltersFromURL(filters, [...dropdownFilters, ...searchFilters]);
+  const filtersFromURL = useFiltersFromURL(filters, [
+    ...advancedFilters,
+    ...searchFilters,
+    projectFilter,
+  ]);
 
   const [pagination, setPagination] = useState(paginationInitialState);
 
   const [_, filteredData, onFilterChange] = useListPageFilter<V1VirtualMachine, V1VirtualMachine>(
     vmsToShow,
-    [...filters, ...dropdownFilters, ...searchFilters],
+    [...filters, ...advancedFilters, ...searchFilters, projectFilter],
     filtersFromURL,
   );
 
@@ -174,8 +179,11 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
     ref,
     () => ({
       onFilterChange,
+      resetTextSearch: (newTextFilters) => {
+        listPageFilterRef.current?.resetTextSearch(newTextFilters);
+      },
     }),
-    [onFilterChange],
+    [onFilterChange, listPageFilterRef.current],
   );
 
   const selectedFilters = useSelectedFilters(filters, searchFilters);
@@ -255,7 +263,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
   if (loaded && noVMs) {
     return (
       <>
-        {showSummary && vmSummary}
+        {!isSearchResultsPage && vmSummary}
         <VirtualMachineEmptyState catalogURL={catalogURL} namespace={namespace} />
       </>
     );
@@ -264,45 +272,44 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
   return (
     /* All of this table and components should be replaced to our own fitted components */
     <>
-      {showSummary && vmSummary}
+      {!isSearchResultsPage && vmSummary}
       <ListPageBody>
         <div className="vm-listpagebody">
+          {isSearchResultsPage && <VirtualMachineSearchResultsHeader />}
+          <ListPageFilter
+            className={classNames('list-managment-group__toolbar', {
+              'is-compact': listManagementGroupSize === ListManagementGroupSize.sm,
+            })}
+            columnLayout={{
+              columns: columns?.map(({ additional, id, title }) => ({
+                additional,
+                id,
+                title,
+              })),
+              id: VirtualMachineModelRef,
+              selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
+              type: t('VirtualMachine'),
+            }}
+            onFilterChange={(...args) => {
+              onFilterChange(...args);
+              setPagination((prevPagination) => ({
+                ...prevPagination,
+                endIndex: prevPagination?.perPage,
+                page: 1,
+                startIndex: 0,
+              }));
+            }}
+            advancedFilters={advancedFilters}
+            data={vmsToShow}
+            listManagementGroupSize={listManagementGroupSize}
+            loaded={loaded}
+            projectFilter={projectFilter}
+            refProp={listPageFilterRef}
+            rowFilters={filters}
+            searchFilters={searchFilters}
+          />
           <div className="list-managment-group" ref={listManagementGroupRef}>
-            <Flex
-              className={classNames('list-managment-group__toolbar', {
-                'is-compact': listManagementGroupSize === ListManagementGroupSize.sm,
-              })}
-            >
-              <VirtualMachineSelection loaded={loaded} pagination={pagination} vms={data} />
-              <ListPageFilter
-                columnLayout={{
-                  columns: columns?.map(({ additional, id, title }) => ({
-                    additional,
-                    id,
-                    title,
-                  })),
-                  id: VirtualMachineModelRef,
-                  selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
-                  type: t('VirtualMachine'),
-                }}
-                onFilterChange={(...args) => {
-                  onFilterChange(...args);
-                  setPagination((prevPagination) => ({
-                    ...prevPagination,
-                    endIndex: prevPagination?.perPage,
-                    page: 1,
-                    startIndex: 0,
-                  }));
-                }}
-                data={vmsToShow}
-                dropdownFilters={dropdownFilters}
-                listManagementGroupSize={listManagementGroupSize}
-                loaded={loaded}
-                rowFilters={filters}
-                searchFilters={searchFilters}
-                showProjectFilter
-              />
-            </Flex>
+            <VirtualMachineSelection loaded={loaded} pagination={pagination} vms={data} />
             <Flex flexWrap={{ default: 'nowrap' }}>
               <div className="vm-actions-toggle">
                 <VirtualMachineBulkActionButton vms={data} />

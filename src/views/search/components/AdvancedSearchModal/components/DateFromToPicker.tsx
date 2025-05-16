@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, SetStateAction, useState } from 'react';
+import React, { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { DatePicker, DatePickerProps, Split, SplitItem } from '@patternfly/react-core';
@@ -20,19 +20,28 @@ const DateFromToPicker: FC<DateFromToPickerProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const [dateFrom, setDateFrom] = useState<Date>();
+  const [dateTo, setDateTo] = useState<Date>();
+
+  useEffect(() => {
+    if ((dateFromString && !dateFrom) || (dateToString && !dateTo) || dateFrom > dateTo) {
+      setIsValidDate(false);
+    } else {
+      setIsValidDate(true);
+    }
+  }, [dateFrom, dateTo, dateFromString, dateToString, setIsValidDate]);
 
   const onDateChange: (
     setDateString: (dateString: string) => void,
-    setDate?: (date: Date) => void,
+    setDate: (date: Date) => void,
   ) => DatePickerProps['onChange'] = (setDateString, setDate) => (_, dateString, date) => {
     if (date) {
       setDateString(dateString);
-      setDate?.(date);
+      setDate(date);
       return;
     }
 
-    setDateString('');
-    setDate?.(undefined);
+    setDateString(dateString);
+    setDate(undefined);
   };
 
   return (
@@ -44,18 +53,9 @@ const DateFromToPicker: FC<DateFromToPickerProps> = ({
       />
       <SplitItem className="pf-v6-u-pt-sm pf-v6-u-px-md">{t('to')}</SplitItem>
       <DatePicker
-        validators={[
-          (date) => {
-            if (date < dateFrom) {
-              setIsValidDate(false);
-              return t('Date To cannot be before Date From');
-            }
-            setIsValidDate(true);
-            return '';
-          },
-        ]}
-        onChange={onDateChange(setDateToString)}
+        onChange={onDateChange(setDateToString, setDateTo)}
         placeholder={t('To')}
+        validators={[(date) => (date < dateFrom ? t('Date To cannot be before Date From') : '')]}
         value={dateToString}
       />
     </Split>

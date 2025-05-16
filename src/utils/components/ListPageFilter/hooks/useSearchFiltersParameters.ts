@@ -1,16 +1,12 @@
 import { useMemo } from 'react';
-import { useLocation } from 'react-router-dom-v5-compat';
 
+import useQuery from '@kubevirt-utils/hooks/useQuery';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
-export type TextFiltersType = {
-  labels: string[];
-  name: string;
-} & { [key: string]: string };
+import { TextFiltersType } from '../types';
 
 export const useSearchFiltersParameters = (searchFilters: RowFilter[]): TextFiltersType => {
-  const location = useLocation();
-  const queryParams = useMemo(() => new URLSearchParams(location.search), [location]);
+  const queryParams = useQuery();
 
   const nameTextFilter = useMemo(() => queryParams.get('name'), [queryParams]);
   const labelTextFilters = useMemo(
@@ -19,13 +15,13 @@ export const useSearchFiltersParameters = (searchFilters: RowFilter[]): TextFilt
   );
 
   const searchTextFilters = useMemo(() => {
-    const filters = searchFilters?.reduce((acc, filter) => {
+    const filters = searchFilters?.reduce<Record<string, string>>((acc, filter) => {
       const { type } = filter;
       const filterValue = queryParams.get(type);
 
       if (filterValue) acc[type] = filterValue;
       return acc;
-    }, {} as { [key in string]: string });
+    }, {});
 
     return filters;
   }, [queryParams, searchFilters]);
