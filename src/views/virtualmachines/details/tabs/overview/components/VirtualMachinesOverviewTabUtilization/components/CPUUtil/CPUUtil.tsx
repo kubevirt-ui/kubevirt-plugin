@@ -6,6 +6,7 @@ import TitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/Title
 import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/ComponentReady';
 import { getUtilizationQueries } from '@kubevirt-utils/components/Charts/utils/queries';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVMIPod } from '@kubevirt-utils/resources/vmi';
 import {
   K8sResourceCommon,
@@ -25,28 +26,43 @@ const CPUUtil: FC<CPUUtilProps> = ({ pods, vmi }) => {
   const vmiPod = useMemo(() => getVMIPod(vmi, pods), [pods, vmi]);
   const { currentTime, duration } = useDuration();
   const queries = useMemo(
-    () => getUtilizationQueries({ duration, launcherPodName: vmiPod?.metadata?.name, obj: vmi }),
+    () =>
+      getUtilizationQueries({
+        duration,
+        launcherPodName: vmiPod?.metadata?.name,
+        obj: vmi,
+      }),
     [vmi, vmiPod, duration],
   );
+
+  const namespace = getNamespace(vmi);
 
   const [dataCPURequested] = usePrometheusPoll({
     endpoint: PrometheusEndpoint?.QUERY,
     endTime: currentTime,
-    namespace: vmi?.metadata?.namespace,
+    namespace: namespace,
     query: queries.CPU_REQUESTED,
   });
 
   const [dataCPUUsage] = usePrometheusPoll({
     endpoint: PrometheusEndpoint?.QUERY,
     endTime: currentTime,
-    namespace: vmi?.metadata?.namespace,
+    namespace: namespace,
     query: queries?.CPU_USAGE,
+  });
+
+  const [dataCPUUtil] = usePrometheusPoll({
+    endpoint: PrometheusEndpoint?.QUERY,
+    endTime: currentTime,
+    namespace: namespace,
+    query: queries?.CPU_UTILIZATION,
   });
 
   const cpuUsage = +dataCPUUsage?.data?.result?.[0]?.value?.[1];
   const cpuRequested = +dataCPURequested?.data?.result?.[0]?.value?.[1];
-  const averageCPUUsage = (cpuUsage / cpuRequested) * 100;
-  const isReady = !Number.isNaN(cpuUsage) && !Number.isNaN(cpuRequested);
+
+  const averageCPUUsage = +dataCPUUtil?.data?.result?.[0]?.value?.[1];
+  const isReady = !Number.isNaN(averageCPUUsage);
 
   return (
     <div className="util">
