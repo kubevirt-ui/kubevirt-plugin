@@ -1,3 +1,4 @@
+import { VirtualMachineData } from '../types/vm';
 import { K8S_KIND } from '../utils/const/index';
 
 declare global {
@@ -5,6 +6,7 @@ declare global {
   namespace Cypress {
     interface Chainable {
       deleteResource(kind: string, name: string, namespace?: string): void;
+      deleteVM(vms: VirtualMachineData[]): void;
       dropFile(filePath: string, fileName: string, inputSelector: string): void;
     }
   }
@@ -30,6 +32,19 @@ Cypress.Commands.add('deleteResource', (kind: string, name: string, namespace?: 
       { failOnNonZeroExit: false, timeout: 1800000 },
     );
   }
+});
+
+Cypress.Commands.add('deleteVM', (vms: VirtualMachineData[]) => {
+  vms.forEach((vm) => {
+    cy.exec(
+      `oc delete --ignore-not-found=true -n ${vm.namespace} --cascade ${K8S_KIND.VM} ${vm.name} --wait=true --timeout=180s`,
+      { failOnNonZeroExit: false, timeout: 1800000 },
+    );
+    cy.exec(
+      `oc delete --ignore-not-found=true -n ${vm.namespace} vmi ${vm.name} --wait=true --timeout=180s`,
+      { failOnNonZeroExit: false, timeout: 1800000 },
+    );
+  });
 });
 
 Cypress.Commands.add('dropFile', (filePath, fileName, inputSelector) => {
