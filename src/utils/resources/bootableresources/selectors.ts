@@ -15,8 +15,8 @@ export const getVolumeSnapshotSize = (volumeSnapshot: VolumeSnapshotKind) =>
 export const getVolumeSnapshotStorageClass = (volumeSnapshot: VolumeSnapshotKind) =>
   volumeSnapshot?.spec?.volumeSnapshotClassName;
 
-export const getPVCSize = (pvc: IoK8sApiCoreV1PersistentVolumeClaim) =>
-  pvc?.spec?.resources?.requests?.storage;
+export const getPVCStorageCapacity = (pvc: IoK8sApiCoreV1PersistentVolumeClaim) =>
+  pvc?.status?.capacity?.storage;
 
 export const getPVCStorageClassName = (pvc: IoK8sApiCoreV1PersistentVolumeClaim) =>
   pvc?.spec?.storageClassName;
