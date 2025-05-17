@@ -58,7 +58,7 @@ const AdvancedSettings: FC = () => {
             />
             <HelpTextIcon
               bodyContent={t(
-                'The disk must be attached to the VirtualMAchine as a SCSI LUN for this option to work. It should only be used for cluster-aware applications',
+                'The disk must be attached to the VirtualMachine as a SCSI LUN for this option to work. It should only be used for cluster-aware applications',
               )}
             />
           </Split>

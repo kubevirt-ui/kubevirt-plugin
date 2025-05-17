@@ -65,7 +65,7 @@ const OtherDiskModal: FC<V1SubDiskModalProps> = ({
           <DiskSizeInput isCreated={isCreated} namespace={namespace} pvc={pvc} />
           <DiskTypeSelect isVMRunning={isVMRunning} />
           <DiskInterfaceSelect isVMRunning={isVMRunning} />
-          {doesDataVolumeTemplateHaveDisk(vm, editDiskName) && (
+          {doesDataVolumeTemplateHaveDisk(vm, editDiskName) && !isCreated && (
             <StorageClassAndPreallocation vm={vm} />
           )}
           <AdvancedSettings />
