@@ -185,7 +185,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
       return [filteredData, filteredData?.slice(pagination.startIndex, pagination.endIndex)];
     }
 
-    const matchedVMs = vmsToShow?.filter(
+    const matchedVMs = filteredData?.filter(
       ({ metadata: { name, namespace: ns }, status: { printableStatus = '' } = {} }) => {
         return (
           vmiMapper?.mapper?.[ns]?.[name] ||
