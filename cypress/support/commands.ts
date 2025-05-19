@@ -7,6 +7,9 @@ declare global {
     interface Chainable {
       checkHCOSpec(spec: string, matchString: string, include: boolean): void;
       checkVMSpec(vmName: string, spec: string, matchString: string, include: boolean): void;
+      patchVM(vmName: string, status: string): void;
+      startVM(vmName: string): void;
+      stopVM(vmName: string): void;
     }
   }
 }
@@ -35,3 +38,18 @@ Cypress.Commands.add(
     });
   },
 );
+
+Cypress.Commands.add('patchVM', (vmName: string, status: string) => {
+  cy.exec(
+    `oc patch virtualmachine ${vmName} --type merge -p '{"spec":{"runStrategy":"${status}"}}'`,
+  );
+});
+
+Cypress.Commands.add('startVM', (vmName: string) => {
+  cy.patchVM(vmName, 'Always');
+  cy.exec(`oc wait --for=condition=ready vm/${vmName} --timeout=120s`, { timeout: 120000 });
+});
+
+Cypress.Commands.add('stopVM', (vmName: string) => {
+  cy.patchVM(vmName, 'Halted');
+});
