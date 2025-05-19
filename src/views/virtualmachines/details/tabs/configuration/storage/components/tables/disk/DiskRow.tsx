@@ -3,6 +3,7 @@ import React, { FC } from 'react';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, PersistentVolumeClaimModel } from '@kubevirt-utils/models';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { NameWithPercentages } from '@kubevirt-utils/resources/vm/hooks/types';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
@@ -86,7 +87,7 @@ const DiskRow: FC<
           <ResourceLink
             groupVersionKind={modelToGroupVersionKind(PersistentVolumeClaimModel)}
             name={obj?.source}
-            namespace={obj?.namespace}
+            namespace={obj?.namespace || getNamespace(vm)}
           />
         )}
 
