@@ -1,4 +1,3 @@
-import { TEST_NS } from '../../utils/const/index';
 import { VM_IT_CUST, VM_IT_QUICK, VM_TMPL_CUST, VM_TMPL_QUICK } from '../../utils/const/testVM';
 import { descrText } from '../../views/selector-common';
 import { tab } from '../../views/tab';
@@ -6,9 +5,7 @@ import { vm } from '../../views/vm-flow';
 
 describe('Create VMs from InstanceType', () => {
   before(() => {
-    cy.visitOverview();
-    cy.visitCatalog();
-    cy.switchProject(TEST_NS);
+    cy.visitCatalogVirt();
   });
 
   it('quick create VM from IT', () => {

@@ -7,6 +7,9 @@ set +e
 export CYPRESS_CNV_NS='openshift-cnv';
 export CYPRESS_OS_IMAGES_NS='openshift-virtualization-os-images';
 
+# setup cluster
+bash test-setup.sh
+
 # Install dependencies.
 yarn install --ignore-engines
 
