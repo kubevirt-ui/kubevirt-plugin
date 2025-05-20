@@ -2,6 +2,7 @@ import produce from 'immer';
 import { create } from 'zustand';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
+import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getInstanceTypeFromVolume } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/utils';
@@ -34,9 +35,11 @@ export const useInstanceTypeVMStore = create<InstanceTypeVMStore>()((set, get) =
       selectedVolume: BootableVolume,
       pvcSource: IoK8sApiCoreV1PersistentVolumeClaim,
       volumeSnapshotSource: VolumeSnapshotKind,
+      dvSource: V1beta1DataVolume,
     ) =>
       set(
         produce<InstanceTypeVMStore>(({ instanceTypeVMState }) => {
+          instanceTypeVMState.dvSource = dvSource;
           instanceTypeVMState.selectedBootableVolume = selectedVolume;
           instanceTypeVMState.pvcSource = pvcSource;
           instanceTypeVMState.volumeSnapshotSource = volumeSnapshotSource;

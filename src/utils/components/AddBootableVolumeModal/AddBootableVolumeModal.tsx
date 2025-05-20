@@ -1,18 +1,15 @@
 import React, { FC, useCallback, useState } from 'react';
 
+import { InstanceTypeVMStoreActions } from '@catalog/CreateFromInstanceTypes/state/utils/types';
 import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { UPLOAD_STATUS } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getValidNamespace, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { Form, PopoverPosition, Title } from '@patternfly/react-core';
-
-import { VolumeSnapshotKind } from '../SelectSnapshot/types';
 
 import SchedulingSettings from './components/SchedulingSettings';
 import SourceTypeSelection from './components/SourceTypeSelection/SourceTypeSelection';
@@ -33,11 +30,7 @@ import './AddBootableVolumeModal.scss';
 type AddBootableVolumeModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  onCreateVolume?: (
-    source: BootableVolume,
-    pvcSource?: IoK8sApiCoreV1PersistentVolumeClaim,
-    volumeSnapshotSource?: VolumeSnapshotKind,
-  ) => void;
+  onCreateVolume?: InstanceTypeVMStoreActions['onSelectCreatedVolume'];
 };
 
 const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({

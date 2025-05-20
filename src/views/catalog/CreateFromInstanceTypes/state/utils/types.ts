@@ -1,6 +1,9 @@
 import { Dispatch } from 'react';
 
-import { V1beta1DataImportCron } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import {
+  V1beta1DataImportCron,
+  V1beta1DataVolume,
+} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import {
   V1beta1VirtualMachineClusterInstancetype,
@@ -12,6 +15,7 @@ import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/ty
 import { SSHSecretDetails } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import { SysprepData } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
+import { NamespacedResourceMap } from '@kubevirt-utils/resources/shared';
 
 export type InstanceTypes = (
   | V1beta1VirtualMachineClusterInstancetype
@@ -29,11 +33,10 @@ export type UseInstanceTypeAndPreferencesValues = {
 export type UseBootableVolumesValues = {
   bootableVolumes: BootableVolume[];
   dataImportCrons: V1beta1DataImportCron[];
+  dvSources: NamespacedResourceMap<V1beta1DataVolume>;
   error: Error;
   loaded: boolean;
-  pvcSources: {
-    [resourceKeyName: string]: IoK8sApiCoreV1PersistentVolumeClaim;
-  };
+  pvcSources: NamespacedResourceMap<IoK8sApiCoreV1PersistentVolumeClaim>;
   volumeSnapshotSources: { [dataSourceName: string]: VolumeSnapshotKind };
 };
 
@@ -45,6 +48,7 @@ export type SysprepConfigMapData = {
 
 export type InstanceTypeVMState = {
   customDiskSize: string;
+  dvSource: V1beta1DataVolume;
   folder: string;
   isDynamicSSHInjection: boolean;
   pvcSource: IoK8sApiCoreV1PersistentVolumeClaim;
@@ -88,12 +92,13 @@ export type InstanceTypeVMStoreState = {
   volumeListNamespace: string;
 };
 
-type InstanceTypeVMStoreActions = {
+export type InstanceTypeVMStoreActions = {
   applySSHFromSettings: (sshSecretName: string, targetNamespace: string) => void;
   onSelectCreatedVolume: (
     selectedVolume: BootableVolume,
-    pvcSource: IoK8sApiCoreV1PersistentVolumeClaim,
-    volumeSnapshotSource: VolumeSnapshotKind,
+    pvcSource?: IoK8sApiCoreV1PersistentVolumeClaim,
+    volumeSnapshotSource?: VolumeSnapshotKind,
+    dvSource?: V1beta1DataVolume,
   ) => void;
   resetInstanceTypeVMState: () => void;
   setCustomDiskSize: (diskSize: null | string) => void;
