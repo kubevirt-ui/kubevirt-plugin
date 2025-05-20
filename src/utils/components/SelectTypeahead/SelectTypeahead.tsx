@@ -212,6 +212,10 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
     textInputRef?.current?.focus();
   };
 
+  const onTextInputClick = () => {
+    setIsOpen(true);
+  };
+
   const onClearButtonClick = () => {
     setSelected('');
     setInputValue('');
@@ -234,7 +238,7 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
           icon={<SearchIcon />}
           innerRef={textInputRef}
           onChange={onTextInputChange}
-          onClick={onToggleClick}
+          onClick={onTextInputClick}
           onKeyDown={onInputKeyDown}
           placeholder={placeholder}
           value={inputValue}
@@ -262,6 +266,7 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
       data-test={dataTestId}
       id={dataTestId}
       isOpen={isOpen}
+      isScrollable
       onSelect={onSelect}
       selected={selected}
       toggle={toggle}
