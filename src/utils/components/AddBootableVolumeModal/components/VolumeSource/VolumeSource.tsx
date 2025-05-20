@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 
+import HTTPSource from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeSource/components/HTTPSource';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -45,6 +46,9 @@ const VolumeSource: FC<VolumeSourceProps> = ({
     ),
     [DROPDOWN_FORM_SELECTION.USE_EXISTING_PVC]: (
       <PVCSource bootableVolume={bootableVolume} setBootableVolumeField={setBootableVolumeField} />
+    ),
+    [DROPDOWN_FORM_SELECTION.USE_HTTP]: (
+      <HTTPSource setBootableVolumeField={setBootableVolumeField} />
     ),
     [DROPDOWN_FORM_SELECTION.USE_REGISTRY]: (
       <FormGroup fieldId="volume-registry-url" isRequired label={t('Registry URL')}>

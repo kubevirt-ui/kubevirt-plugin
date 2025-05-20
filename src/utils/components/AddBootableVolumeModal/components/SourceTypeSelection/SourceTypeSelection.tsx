@@ -102,6 +102,14 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
           >
             {optionsValueLabelMapper[DROPDOWN_FORM_SELECTION.USE_REGISTRY]}
           </SelectOption>
+          <SelectOption
+            data-test-id="use-http"
+            description={t('Import content via URL (HTTP or HTTPS endpoint).')}
+            isDisabled={!canCreateDS}
+            value={DROPDOWN_FORM_SELECTION.USE_HTTP}
+          >
+            {optionsValueLabelMapper[DROPDOWN_FORM_SELECTION.USE_HTTP]}
+          </SelectOption>
         </SelectGroup>
       </Select>
     </FormGroup>

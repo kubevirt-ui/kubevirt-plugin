@@ -18,6 +18,7 @@ import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 export enum DROPDOWN_FORM_SELECTION {
   UPLOAD_VOLUME = 'volume',
   USE_EXISTING_PVC = 'pvc',
+  USE_HTTP = 'http',
   USE_REGISTRY = 'registry',
   USE_SNAPSHOT = 'snapshot',
 }
@@ -25,6 +26,7 @@ export enum DROPDOWN_FORM_SELECTION {
 export const optionsValueLabelMapper = {
   [DROPDOWN_FORM_SELECTION.UPLOAD_VOLUME]: t('Volume'),
   [DROPDOWN_FORM_SELECTION.USE_EXISTING_PVC]: t('Volume'),
+  [DROPDOWN_FORM_SELECTION.USE_HTTP]: t('URL'),
   [DROPDOWN_FORM_SELECTION.USE_REGISTRY]: t('Registry'),
   [DROPDOWN_FORM_SELECTION.USE_SNAPSHOT]: t('Volume snapshot'),
 };
@@ -48,6 +50,7 @@ export type AddBootableVolumeState = {
   storageClassProvisioner?: string;
   uploadFile?: File | string;
   uploadFilename?: string;
+  url?: string;
   volumeMode?: V1beta1StorageSpecVolumeModeEnum;
 };
 
