@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 
+import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, PersistentVolumeClaimModel } from '@kubevirt-utils/models';
@@ -40,7 +41,20 @@ const DiskRow: FC<
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const provisioningPercentage = provisioningPercentages?.[obj?.source];
+  const {
+    drive,
+    hasDataVolume,
+    interface: iface,
+    isBootDisk,
+    isEnvDisk,
+    name,
+    namespace,
+    size,
+    source,
+    storageClass,
+  } = obj;
+
+  const provisioningPercentage = provisioningPercentages?.[source];
 
   const hasPVC = isPVCSource(obj);
 
@@ -58,21 +72,21 @@ const DiskRow: FC<
                 }
                 position={PopoverPosition.right}
               >
-                <span className="provisioning-popover-button">{obj?.name}</span>
+                <span className="provisioning-popover-button">{name}</span>
               </Popover>
             ) : (
-              obj?.name
+              name
             )}{' '}
-            <HotplugLabel diskName={obj?.name} vm={vm} vmi={vmi} />
+            <HotplugLabel diskName={name} vm={vm} vmi={vmi} />
           </StackItem>
-          {obj?.isBootDisk && (
+          {isBootDisk && (
             <StackItem>
               <Label className="disk-row-label-bootable" color="blue" variant="filled">
                 {t('bootable')}
               </Label>
             </StackItem>
           )}
-          {obj?.isEnvDisk && (
+          {isEnvDisk && (
             <StackItem>
               <Label color="blue" variant="filled">
                 {t('environment disk')}
@@ -83,29 +97,31 @@ const DiskRow: FC<
       </TableData>
 
       <TableData activeColumnIDs={activeColumnIDs} id="source">
-        {sourcesLoaded && hasPVC && (
+        {sourcesLoaded && (hasPVC || hasDataVolume) && (
           <ResourceLink
-            groupVersionKind={modelToGroupVersionKind(PersistentVolumeClaimModel)}
-            name={obj?.source}
-            namespace={obj?.namespace || getNamespace(vm)}
+            groupVersionKind={modelToGroupVersionKind(
+              hasDataVolume ? DataVolumeModel : PersistentVolumeClaimModel,
+            )}
+            name={source}
+            namespace={namespace || getNamespace(vm)}
           />
         )}
 
-        {!sourcesLoaded && hasPVC && <Skeleton width="200px" />}
+        {!sourcesLoaded && (hasPVC || hasDataVolume) && <Skeleton width="200px" />}
 
-        {!hasPVC && obj?.source}
+        {!hasPVC && source}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="size">
-        {readableSizeUnit(obj?.size)}
+        {readableSizeUnit(size)}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="drive">
-        {obj?.drive}
+        {drive}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="interface">
-        {obj?.interface}
+        {iface}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="storage-class">
-        {obj?.storageClass}
+        {storageClass}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="">
         <DiskRowActions customize={customize} obj={obj} onDiskUpdate={onSubmit} vm={vm} vmi={vmi} />
