@@ -60,7 +60,7 @@ const VirtualMachineNavigator: FC = () => {
   return (
     <>
       <ListPageHeader title={t('VirtualMachines')}>
-        {advancedSearchEnabled && <SearchBar />}
+        {advancedSearchEnabled && <SearchBar onFilterChange={onFilterChange} />}
         <div>
           <VirtualMachinesCreateButton namespace={namespace} />
         </div>

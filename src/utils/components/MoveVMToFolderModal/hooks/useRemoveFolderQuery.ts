@@ -2,10 +2,10 @@ import { useMemo } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useQueryParamsMethods } from '@kubevirt-utils/components/ListPageFilter/hooks/useQueryParamsMethods';
+import useQuery from '@kubevirt-utils/hooks/useQuery';
 import useVMsInNamespace from '@kubevirt-utils/hooks/useVMsInNamespace';
 import { getLabel, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import useQuery from '@virtualmachines/details/tabs/metrics/NetworkCharts/hook/useQuery';
 import { TEXT_FILTER_LABELS_ID } from '@virtualmachines/list/hooks/constants';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 

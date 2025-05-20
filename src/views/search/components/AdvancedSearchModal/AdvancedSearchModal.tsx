@@ -5,6 +5,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import {
   Button,
   ButtonVariant,
+  Divider,
   Form,
   FormGroup,
   InputGroup,
@@ -22,9 +23,12 @@ import { AdvancedSearchInputs } from '../../utils/types';
 import DateFromToPicker from './components/DateFromToPicker';
 import LabelsMultiSelect from './components/LabelsMultiSelect';
 import MemoryUnitSelect from './components/MemoryUnitSelect';
+import ModalExpandableSection from './components/ModalExpandableSection';
 import NumberInput from './components/NumberInput';
 import ProjectMultiSelect from './components/ProjectMultiSelect';
 import { initialMemory, initialVCPU } from './constants';
+
+import './advanced-search-modal.scss';
 
 type AdvancedSearchModalProps = Pick<ModalComponentProps, 'isOpen' | 'onClose'> & {
   onSubmit: (searchInputs: AdvancedSearchInputs) => void;
@@ -112,88 +116,90 @@ const AdvancedSearchModal: FC<AdvancedSearchModalProps> = ({
     >
       <ModalHeader title={t('Advanced search')} />
       <ModalBody>
-        <Form>
-          <FormGroup label={t('Name')}>
-            <TextInput
-              data-test-id="adv-search-vm-name"
-              onChange={(_, value) => setName(value)}
-              type="text"
-              value={name}
-            />
-          </FormGroup>
-          <FormGroup label={t('Project')}>
-            <ProjectMultiSelect projects={projects} setProjects={setProjects} />
-          </FormGroup>
-          <FormGroup label={t('Description')}>
-            <TextInput
-              data-test-id="adv-search-vm-description"
-              onChange={(_, value) => setDescription(value)}
-              type="text"
-              value={description}
-            />
-          </FormGroup>
-          <FormGroup label={t('Labels')}>
-            <LabelsMultiSelect
-              initialInputValue={prefillInputs.labelInputText}
-              labels={labels}
-              setLabels={setLabels}
-            />
-          </FormGroup>
-          <FormGroup label={t('IP')}>
-            <TextInput
-              data-test-id="adv-search-vm-ip"
-              onChange={(_, value) => setIP(value)}
-              type="text"
-              value={ip}
-            />
-          </FormGroup>
-          {/* TODO: implement functionality for Date, vCPU, Memory */}
-          {false && (
-            <>
-              <FormGroup label={t('Date created')}>
-                <DateFromToPicker
-                  dateFromString={dateFromString}
-                  dateToString={dateToString}
-                  setDateFromString={setDateFromString}
-                  setDateToString={setDateToString}
-                  setIsValidDate={setIsValidDate}
+        <ModalExpandableSection title={t('Details')}>
+          <Form>
+            <FormGroup label={t('Name')}>
+              <TextInput
+                data-test-id="adv-search-vm-name"
+                onChange={(_, value) => setName(value)}
+                type="text"
+                value={name}
+              />
+            </FormGroup>
+            <FormGroup label={t('Project')}>
+              <ProjectMultiSelect projects={projects} setProjects={setProjects} />
+            </FormGroup>
+            <FormGroup label={t('Description')}>
+              <TextInput
+                data-test-id="adv-search-vm-description"
+                onChange={(_, value) => setDescription(value)}
+                type="text"
+                value={description}
+              />
+            </FormGroup>
+            <FormGroup label={t('Labels')}>
+              <LabelsMultiSelect
+                initialInputValue={prefillInputs.labelInputText}
+                labels={labels}
+                setLabels={setLabels}
+              />
+            </FormGroup>
+            <FormGroup label={t('Date created')}>
+              <DateFromToPicker
+                dateFromString={dateFromString}
+                dateToString={dateToString}
+                setDateFromString={setDateFromString}
+                setDateToString={setDateToString}
+                setIsValidDate={setIsValidDate}
+              />
+            </FormGroup>
+            <FormGroup label={t('vCPU')}>
+              <InputGroup>
+                <NumberOperatorSelect
+                  onSelect={(operator) => setVCPU((previous) => ({ ...previous, operator }))}
+                  selected={vCPU.operator}
                 />
-              </FormGroup>
-              <FormGroup label={t('vCPU')}>
-                <InputGroup>
-                  <NumberOperatorSelect
-                    onSelect={(operator) => setVCPU((previous) => ({ ...previous, operator }))}
-                    selected={vCPU.operator}
+                <InputGroupItem>
+                  <NumberInput
+                    setValue={(value) => setVCPU((previous) => ({ ...previous, value }))}
+                    value={vCPU.value}
                   />
-                  <InputGroupItem>
-                    <NumberInput
-                      setValue={(value) => setVCPU((previous) => ({ ...previous, value }))}
-                      value={vCPU.value}
-                    />
-                  </InputGroupItem>
-                </InputGroup>
-              </FormGroup>
-              <FormGroup label={t('Memory')}>
-                <InputGroup>
-                  <NumberOperatorSelect
-                    onSelect={(operator) => setMemory((previous) => ({ ...previous, operator }))}
-                    selected={memory.operator}
+                </InputGroupItem>
+              </InputGroup>
+            </FormGroup>
+            <FormGroup label={t('Memory')}>
+              <InputGroup>
+                <NumberOperatorSelect
+                  onSelect={(operator) => setMemory((previous) => ({ ...previous, operator }))}
+                  selected={memory.operator}
+                />
+                <InputGroupItem>
+                  <NumberInput
+                    setValue={(value) => setMemory((previous) => ({ ...previous, value }))}
+                    value={memory.value}
                   />
-                  <InputGroupItem>
-                    <NumberInput
-                      setValue={(value) => setMemory((previous) => ({ ...previous, value }))}
-                      value={memory.value}
-                    />
-                  </InputGroupItem>
-                  <MemoryUnitSelect
-                    onSelect={(unit) => setMemory((previous) => ({ ...previous, unit }))}
-                    selected={memory.unit}
-                  />
-                </InputGroup>
-              </FormGroup>
-            </>
-          )}
-        </Form>
+                </InputGroupItem>
+                <MemoryUnitSelect
+                  onSelect={(unit) => setMemory((previous) => ({ ...previous, unit }))}
+                  selected={memory.unit}
+                />
+              </InputGroup>
+            </FormGroup>
+          </Form>
+        </ModalExpandableSection>
+        <Divider className="pf-v6-u-my-md" />
+        <ModalExpandableSection isDefaultExpanded={false} title={t('Network')}>
+          <Form>
+            <FormGroup label={t('IP')}>
+              <TextInput
+                data-test-id="adv-search-vm-ip"
+                onChange={(_, value) => setIP(value)}
+                type="text"
+                value={ip}
+              />
+            </FormGroup>
+          </Form>
+        </ModalExpandableSection>
       </ModalBody>
       <ModalFooter>
         <Button isDisabled={isEmptyForm || !isValidDate} onClick={submitForm}>

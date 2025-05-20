@@ -11,16 +11,20 @@
     }
   }
 
+  .pf-v6-c-toolbar__item {
+    column-gap: 0;
+  }
+
+  .pf-v6-c-toolbar {
+    padding-block: 0;
+  }
+
   .list-managment-group {
     flex-wrap: nowrap;
     column-gap: var(--pf-t--global--spacer--md);
 
     .pf-v6-c-toolbar__content-section {
       flex-wrap: nowrap;
-    }
-
-    .pf-v6-c-toolbar__item {
-      column-gap: 0;
     }
 
     &__toolbar {

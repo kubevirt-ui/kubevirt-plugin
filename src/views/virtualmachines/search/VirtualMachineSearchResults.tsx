@@ -1,12 +1,20 @@
-import React, { FC, useEffect } from 'react';
+import React, { FC, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
+import {
+  ExposedFilterFunctions,
+  ResetTextSearch,
+} from '@kubevirt-utils/components/ListPageFilter/types';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { ADVANCED_SEARCH } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
-import { ListPageHeader, useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  ListPageHeader,
+  OnFilterChange,
+  useActiveNamespace,
+} from '@openshift-console/dynamic-plugin-sdk';
 import { Divider } from '@patternfly/react-core';
 import SearchBar from '@search/components/SearchBar';
 import { useHideNamespaceBar } from '@virtualmachines/hooks/useHideNamespaceBar';
@@ -30,19 +38,30 @@ const VirtualMachineSearchResults: FC = () => {
     }
   }, [advancedSearchEnabled, advancedSearchLoading, navigate]);
 
+  const vmListRef = useRef<ExposedFilterFunctions | null>(null);
+
+  const onFilterChange: OnFilterChange = (type, value) => {
+    vmListRef.current?.onFilterChange(type, value);
+  };
+
+  const resetTextSearch: ResetTextSearch = (newTextFilters) => {
+    vmListRef.current?.resetTextSearch(newTextFilters);
+  };
+
   return (
     <>
       <ListPageHeader title={t('VirtualMachines')}>
-        <SearchBar />
+        <SearchBar onFilterChange={onFilterChange} resetTextSearch={resetTextSearch} />
         <div>
           <VirtualMachinesCreateButton namespace={namespace} />
         </div>
       </ListPageHeader>
       <Divider />
       <VirtualMachinesList
+        isSearchResultsPage
         kind={VirtualMachineModelRef}
         namespace={namespace}
-        showSummary={false}
+        ref={vmListRef}
       />
     </>
   );
