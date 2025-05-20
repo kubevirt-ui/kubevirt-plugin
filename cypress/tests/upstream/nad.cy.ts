@@ -3,6 +3,7 @@ import { createNAD, deleteNAD } from '../../views/nad';
 
 describe('Test network attachments', () => {
   beforeEach(() => {
+    cy.beforeSpec();
     cy.visitNAD();
   });
 

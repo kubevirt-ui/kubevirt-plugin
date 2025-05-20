@@ -1,0 +1,12 @@
+import './upstream/a-setup.cy.ts';
+import './upstream/a-shared-vm.cy.ts';
+import './upstream/check-tab-yaml.cy.ts';
+import './upstream/catalog-filter.cy.ts';
+//import './upstream/catalog-create.cy.ts';
+import './upstream/template-list.cy.ts';
+import './upstream/overview-tab.cy.ts';
+import './upstream/top-consumers-tab.cy.ts';
+import './upstream/settings-cluster-general.cy.ts';
+import './upstream/vm-actions-confirm.cy.ts';
+import './upstream/nad.cy.ts';
+import './upstream/set-default-sc.cy.ts';

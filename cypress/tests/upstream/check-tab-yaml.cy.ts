@@ -7,7 +7,8 @@ import { navigateToConfigurationSubTab, subTabName, tab } from '../../views/tab'
 
 describe('Check all virtualization pages can be loaded', () => {
   before(() => {
-    cy.visitVMs();
+    cy.beforeSpec();
+    cy.visitVMsVirt();
   });
 
   describe('Check VirtualMachines page', () => {

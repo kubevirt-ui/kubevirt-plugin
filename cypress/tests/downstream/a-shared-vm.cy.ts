@@ -6,8 +6,8 @@ import { vm } from '../../views/vm-flow';
 
 describe('Create VMs from InstanceType', () => {
   before(() => {
-    cy.visitOverview();
-    cy.visitCatalog();
+    cy.visitOverviewVirt();
+    cy.visitCatalogVirt();
     cy.switchProject(TEST_NS);
   });
 
@@ -29,9 +29,7 @@ describe('Create VMs from InstanceType', () => {
     cy.contains('.pf-v6-c-clipboard-copy', VM_IT_CUST.cloudInitUname).should('be.visible');
     cy.contains('.pf-v6-c-clipboard-copy', VM_IT_CUST.cloudInitPwd).should('be.visible');
   });
-});
 
-describe('Create VMs from Template', () => {
   it('quick create VM from Template', () => {
     vm.create(VM_TMPL_QUICK);
   });

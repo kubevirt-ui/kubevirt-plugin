@@ -4,6 +4,7 @@ const gp2_csi = 'gp2-csi';
 
 describe('Set default storageclass', () => {
   before(() => {
+    cy.beforeSpec();
     cy.visitStorageclass();
   });
 
