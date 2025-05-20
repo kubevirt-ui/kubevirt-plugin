@@ -301,6 +301,7 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
       data-test={dataTestId}
       id={dataTestId}
       isOpen={isOpen}
+      isScrollable
       onSelect={onSelect}
       selected={selected}
       toggle={toggle}

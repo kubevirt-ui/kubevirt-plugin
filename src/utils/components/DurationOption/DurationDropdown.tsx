@@ -25,6 +25,7 @@ const DurationDropdown: FC<DurationDropdownProps> = ({ selectedDuration, selectH
     <Select
       data-test-id="duration-select-dropdown"
       isOpen={isOpen}
+      isScrollable
       onOpenChange={setIsOpen}
       onSelect={onSelect}
       selected={selected}
