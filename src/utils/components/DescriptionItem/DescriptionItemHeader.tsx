@@ -68,7 +68,8 @@ export const DescriptionItemHeader: FC<DescriptionItemHeaderProps> = ({
 
   return (
     <DescriptionListTerm className="DescriptionItemHeader--list-term">
-      {descriptionHeader} {label}
+      {descriptionHeader}
+      <span className="pf-v6-u-ml-xs">{label}</span>
     </DescriptionListTerm>
   );
 };

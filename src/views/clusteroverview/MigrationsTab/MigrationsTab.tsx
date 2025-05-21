@@ -85,9 +85,6 @@ const MigrationsTab: React.FC = () => {
                 </CardBody>
               </GridItem>
               <GridItem span={6}>
-                <CardHeader>
-                  <CardTitle>{t('Bandwidth consumption')}</CardTitle>
-                </CardHeader>
                 <CardBody className="kv-monitoring-card__body">
                   <BandwidthConsumptionCharts duration={duration} />
                 </CardBody>
