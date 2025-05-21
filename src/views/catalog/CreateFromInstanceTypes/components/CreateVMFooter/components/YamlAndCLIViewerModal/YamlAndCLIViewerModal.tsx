@@ -39,7 +39,7 @@ const YamlAndCLIViewerModal: FC<YamlAndCLIViewerModalProps> = ({ isOpen, onClose
         <Suspense fallback={<Loading />}>
           <Tabs activeKey={activeTabKey} onSelect={handleTabClick}>
             <Tab eventKey={TAB.YAML} title={t('YAML')}>
-              <YamlAndCLIEditor code={dump(vm || '')} minHeight={350} />
+              <YamlAndCLIEditor code={dump(vm || '')} minHeight="350px" />
             </Tab>
             <Tab eventKey={TAB.CLI} title={t('CLI')}>
               <YamlAndCLIEditor
@@ -48,7 +48,7 @@ const YamlAndCLIViewerModal: FC<YamlAndCLIViewerModalProps> = ({ isOpen, onClose
                   selectedBootableVolume,
                   sshSecretCredentials?.sshPubKey,
                 )}
-                minHeight={150}
+                minHeight="150px"
               />
             </Tab>
           </Tabs>
