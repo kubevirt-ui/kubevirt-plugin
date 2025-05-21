@@ -62,7 +62,7 @@ const VirtualMachineTemplatesRow: React.FC<
       <TableData activeColumnIDs={activeColumnIDs} id="cpu">
         {useVirtualMachineTemplatesCPUMemory(obj)}
       </TableData>
-      <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="">
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="actions">
         <VirtualMachineTemplatesActions isKebabToggle template={obj} />
       </TableData>
     </>

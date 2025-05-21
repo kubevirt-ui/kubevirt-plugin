@@ -50,7 +50,7 @@ const NetworkInterfaceRow: FC<RowProps<NetworkPresentation, { template: V1Templa
       <TableData activeColumnIDs={activeColumnIDs} id="macAddress">
         <TemplateValue value={iface.macAddress || NO_DATA_DASH} />
       </TableData>
-      <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="">
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="actions">
         <NetworkInterfaceActions
           nicName={network.name}
           nicPresentation={{ iface, network }}

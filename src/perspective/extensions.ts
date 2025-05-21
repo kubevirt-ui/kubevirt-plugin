@@ -147,7 +147,7 @@ const virtualizationSection = [
         'data-border': 'no-border',
         'data-class': 'kv-plugin-virt-perspective-element',
         'data-quickstart-id': 'qs-nav-bootablevolumes',
-        'data-test-id': '-bootablevolumes-nav-item',
+        'data-test-id': 'bootablevolumes-nav-item',
       },
       href: 'bootablevolumes',
       id: 'virtualization-bootablevolumes-virt-perspective',
@@ -211,6 +211,10 @@ const networkingSection = [
   } as EncodedExtension<NavSection>,
   {
     properties: {
+      dataAttributes: {
+        'data-quickstart-id': 'qs-nav-services',
+        'data-test-id': 'services-nav-item',
+      },
       id: 'services-virt-perspective',
       model: {
         kind: 'Service',
@@ -225,6 +229,10 @@ const networkingSection = [
   {
     flags: { required: ['OPENSHIFT'] },
     properties: {
+      dataAttributes: {
+        'data-quickstart-id': 'qs-nav-routes',
+        'data-test-id': 'routes-nav-item',
+      },
       id: 'routes-virt-perspective',
       insertAfter: 'services-virt-perspective',
       model: {
@@ -240,6 +248,10 @@ const networkingSection = [
   },
   {
     properties: {
+      dataAttributes: {
+        'data-quickstart-id': 'qs-nav-ingresses',
+        'data-test-id': 'ingresses-nav-item',
+      },
       id: 'ingresses-virt-perspective',
       insertAfter: 'routes-virt-perspective',
       model: {
@@ -255,6 +267,10 @@ const networkingSection = [
   },
   {
     properties: {
+      dataAttributes: {
+        'data-quickstart-id': 'qs-nav-networkpolicies',
+        'data-test-id': 'networkpolicies-nav-item',
+      },
       id: 'networkpolicies-virt-perspective',
       insertAfter: 'ingresses-virt-perspective',
       model: {
@@ -271,6 +287,11 @@ const networkingSection = [
   {
     flags: { required: ['MULTI_NETWORK_POLICY_ENABLED'] },
     properties: {
+      dataAttributes: {
+        'data-border': 'no-border',
+        'data-quickstart-id': 'qs-nav-multinetworkpolicies',
+        'data-test-id': 'multinetworkpolicies-nav-item',
+      },
       id: 'multinetworkpolicies-virt-perspective',
       insertAfter: 'networkpolicies-virt-perspective',
       model: {
@@ -289,6 +310,10 @@ const networkingSection = [
       required: ['NET_ATTACH_DEF', 'KUBEVIRT_DYNAMIC'],
     },
     properties: {
+      dataAttributes: {
+        'data-quickstart-id': 'qs-nav-nads',
+        'data-test-id': 'nads-nav-item',
+      },
       id: 'networkattachmentdefinitions-virt-perspective',
       model: {
         group: 'k8s.cni.cncf.io',

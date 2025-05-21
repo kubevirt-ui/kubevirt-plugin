@@ -58,7 +58,7 @@ const DiskRow: React.FC<RowProps<DiskRowDataLayout>> = ({ activeColumnIDs, obj }
       <TableData activeColumnIDs={activeColumnIDs} id="storage-class">
         {obj?.storageClass}
       </TableData>
-      <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="">
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="actions">
         <DiskRowActions diskName={obj?.name} />
       </TableData>
     </>

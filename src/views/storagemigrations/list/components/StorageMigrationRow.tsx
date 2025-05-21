@@ -74,8 +74,8 @@ const StorageMigrationRow: FC<StorageMigrationRowProps> = ({
       </TableData>
       <TableData
         activeColumnIDs={activeColumnIDs}
-        className="dropdown-kebab-pf pf-v6-c-table__action"
-        id=""
+        className="pf-v6-c-table__action"
+        id="actions"
       ></TableData>
     </>
   );
