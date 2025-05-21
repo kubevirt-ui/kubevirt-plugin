@@ -3,6 +3,7 @@ import React, { FC } from 'react';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { StatusGroupMapper } from '@openshift-console/dynamic-plugin-sdk';
 import { OffIcon } from '@patternfly/react-icons';
+import { VirtualMachineRowFilterType } from '@virtualmachines/utils/constants';
 
 import {
   getVmStatusLabelFromPrintable,
@@ -14,20 +15,22 @@ import {
 import './inventory.scss';
 
 export const getVMStatusGroups: StatusGroupMapper = (vms) => {
+  const filterType = VirtualMachineRowFilterType.Status;
+
   const groups = {
     [InventoryStatusGroup.ERROR]: {
       count: 0,
-      filterType: 'vm-status',
+      filterType,
       statusIDs: [StatusSimpleLabel.Error],
     },
     [InventoryStatusGroup.NOT_MAPPED]: {
       count: 0,
-      filterType: 'vm-status',
+      filterType,
       statusIDs: [VMStatusSimpleLabel.Running],
     },
     [InventoryStatusGroup.PROGRESS]: {
       count: 0,
-      filterType: 'vm-status',
+      filterType,
       statusIDs: [
         StatusSimpleLabel.Importing,
         VMStatusSimpleLabel.Starting,
@@ -39,17 +42,17 @@ export const getVMStatusGroups: StatusGroupMapper = (vms) => {
     },
     [InventoryStatusGroup.UNKNOWN]: {
       count: 0,
-      filterType: 'vm-status',
+      filterType,
       statusIDs: [StatusSimpleLabel.Other],
     },
     [InventoryStatusGroup.WARN]: {
       count: 0,
-      filterType: 'vm-status',
+      filterType,
       statusIDs: [VMStatusSimpleLabel.Paused],
     },
     'vm-stopped': {
       count: 0,
-      filterType: 'vm-status',
+      filterType,
       statusIDs: [VMStatusSimpleLabel.Stopped],
     },
   };
