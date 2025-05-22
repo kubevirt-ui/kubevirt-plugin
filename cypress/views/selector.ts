@@ -12,7 +12,7 @@ export const vmNav = '[data-test-id="virtualmachines-nav-item"]';
 export const templateNav = '[data-test-id="templates-nav-item"]';
 export const itNav = '[data-test-id="virtualmachineclusterinstancetypes-nav-item"]';
 export const preferenceNav = '[data-test-id="virtualmachineclusterpreferences-nav-item"]';
-export const volumeNav = '[data-test-id="-bootablevolumes-nav-item"]';
+export const volumeNav = '[data-test-id="bootablevolumes-nav-item"]';
 export const mpNav = '[data-test-id="migrationpolicies-nav-item"]';
 export const checkupNav = '[data-test-id="virtualization-checkups-nav-item"]';
 export const resourceTitle = '[data-test-id="resource-title"]';

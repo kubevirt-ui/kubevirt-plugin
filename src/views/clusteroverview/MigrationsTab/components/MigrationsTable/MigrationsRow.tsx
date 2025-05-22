@@ -94,7 +94,7 @@ const MigrationsRow: FC<RowProps<MigrationTableDataLayout>> = ({ activeColumnIDs
       <TableData activeColumnIDs={activeColumnIDs} id="created">
         <Timestamp timestamp={vmim?.metadata?.creationTimestamp} />
       </TableData>
-      <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="">
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="actions">
         <MigrationActionsDropdown isKebabToggle vmim={vmim} />
       </TableData>
     </>

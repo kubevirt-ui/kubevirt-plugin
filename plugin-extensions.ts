@@ -429,7 +429,7 @@ const extensions: EncodedExtension[] = [
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-bootablevolumes',
-        'data-test-id': '-bootablevolumes-nav-item',
+        'data-test-id': 'bootablevolumes-nav-item',
       },
       href: 'bootablevolumes',
       id: 'virtualization-bootablevolumes',

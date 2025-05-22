@@ -64,7 +64,11 @@ const VirtualMachineRowLayout: FC<
   const [actions] = useVirtualMachineActionsProvider(obj, vmim, isSingleNodeCluster);
   return (
     <>
-      <TableData activeColumnIDs={activeColumnIDs} className="selection-column vm-column" id="">
+      <TableData
+        activeColumnIDs={activeColumnIDs}
+        className="selection-column vm-column"
+        id="check"
+      >
         <Checkbox
           id={`select-${obj?.metadata?.uid}`}
           isChecked={selected}
@@ -119,7 +123,7 @@ const VirtualMachineRowLayout: FC<
               />
             ))}
       </TableData>
-      <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="">
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="actions">
         <VirtualMachineActions actions={actions} isKebabToggle />
       </TableData>
     </>
