@@ -87,8 +87,7 @@ const TextFiltersToolbarItem: FC<TextFiltersToolbarItemProps> = ({
           {searchType === STATIC_SEARCH_FILTERS.labels ? (
             <AutocompleteInput
               onSuggestionSelect={(selected) => {
-                const newLabels = new Set([...textFilters.labels, selected]);
-                applyTextFilters(STATIC_SEARCH_FILTERS.labels, Array.from(newLabels).join(','));
+                applyTextFilters(STATIC_SEARCH_FILTERS.labels, [...textFilters.labels, selected]);
                 setSearchInputText('');
               }}
               data={data}
@@ -117,7 +116,7 @@ const TextFiltersToolbarItem: FC<TextFiltersToolbarItemProps> = ({
       <ToolbarFilter
         deleteLabel={(_, labelToDelete: string) => {
           const newLabels = textFilters?.labels?.filter((label) => label !== labelToDelete);
-          applyTextFilters(STATIC_SEARCH_FILTERS.labels, newLabels.join(','));
+          applyTextFilters(STATIC_SEARCH_FILTERS.labels, newLabels);
         }}
         deleteLabelGroup={() => {
           applyTextFilters(STATIC_SEARCH_FILTERS.labels);

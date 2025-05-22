@@ -36,14 +36,15 @@ const useListPageFiltersMethods: UseListPageFiltersMethods = ({
 
     setOrRemoveQueryArgument(type, valueIsArray ? value.join(',') : value);
 
-    if (type === STATIC_SEARCH_FILTERS.labels && !valueIsArray) {
-      applyFilters(type, { all: value ? [value] : [] });
+    const values = valueIsArray ? value : [value];
+    const selectedValues = value ? values : [];
+
+    if (type === STATIC_SEARCH_FILTERS.labels) {
+      applyFilters(type, { all: selectedValues });
       return;
     }
 
-    const selectedValues = valueIsArray ? value : [value];
-
-    applyFilters(type, { selected: value ? selectedValues : [] });
+    applyFilters(type, { selected: selectedValues });
   };
 
   const applyTextFiltersWithDebounce: ApplyTextFilters = useDebounceCallback(applyTextFilters, 250);
@@ -72,7 +73,7 @@ const useListPageFiltersMethods: UseListPageFiltersMethods = ({
     applyTextFilters(STATIC_SEARCH_FILTERS.name);
     applyTextFilters(STATIC_SEARCH_FILTERS.labels);
 
-    searchFilters.forEach((filter) => applyTextFilters(filter.type));
+    searchFilters.forEach((filter) => filter && applyTextFilters(filter.type));
     setSearchInputText('');
   };
 
