@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom-v5-compat';
 
 import useClusterPreferences from '@catalog/CreateFromInstanceTypes/state/hooks/useClusterPreferences';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
+import { PageTitles } from '@kubevirt-utils/constants/page-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   paginationDefaultValues,
@@ -13,6 +14,7 @@ import useBootableVolumes from '@kubevirt-utils/resources/bootableresources/hook
 import useHideDeprecatedBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useHideDeprecatedBootableVolumes';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
+  DocumentTitle,
   K8sResourceCommon,
   ListPageBody,
   ListPageHeader,
@@ -62,7 +64,8 @@ const BootableVolumesList: FC = () => {
 
   return (
     <>
-      <ListPageHeader title={t('Bootable volumes')}>
+      <DocumentTitle>{PageTitles.BootableVolumes}</DocumentTitle>
+      <ListPageHeader title={PageTitles.BootableVolumes}>
         <BootableVolumeAddButton namespace={namespace} />
       </ListPageHeader>
 

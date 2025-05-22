@@ -34,6 +34,7 @@ import {
   ResetTextSearch,
 } from '@kubevirt-utils/components/ListPageFilter/types';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
+import { PageTitles } from '@kubevirt-utils/constants/page-constants';
 import useContainerWidth from '@kubevirt-utils/hooks/useContainerWidth';
 import { KUBEVIRT_APISERVER_PROXY } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
@@ -48,6 +49,7 @@ import useQuery from '@kubevirt-utils/hooks/useQuery';
 import useSingleNodeCluster from '@kubevirt-utils/hooks/useSingleNodeCluster';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
+  DocumentTitle,
   K8sResourceCommon,
   ListPageBody,
   useListPageFilter,
@@ -272,6 +274,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
   return (
     /* All of this table and components should be replaced to our own fitted components */
     <>
+      <DocumentTitle>{PageTitles.VirtualMachines}</DocumentTitle>
       {!isSearchResultsPage && vmSummary}
       <ListPageBody>
         <div className="vm-listpagebody">
