@@ -1,3 +1,4 @@
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -16,7 +17,7 @@ const statusFilterItems = [
   ErrorStatus,
 ];
 
-export const useStatusFilter = (): RowFilter => ({
+export const useStatusFilter = (): RowFilter<V1VirtualMachine> => ({
   filter: (statuses, obj) => {
     const status = obj?.status?.printableStatus;
     const isError = statuses.selected.includes(ErrorStatus.id) && isErrorPrintableStatus(status);

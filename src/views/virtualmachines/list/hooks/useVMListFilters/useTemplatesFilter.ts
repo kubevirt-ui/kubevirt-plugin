@@ -6,7 +6,7 @@ import { LABEL_USED_TEMPLATE_NAME } from '@kubevirt-utils/resources/template';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
-export const useTemplatesFilter = (vms: V1VirtualMachine[]): RowFilter => {
+export const useTemplatesFilter = (vms: V1VirtualMachine[]): RowFilter<V1VirtualMachine> => {
   const noTemplate = t('None');
   const templates = useMemo(
     () =>
