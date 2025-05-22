@@ -127,8 +127,8 @@ export const getCommonLabels = (vms: V1VirtualMachine[]): Labels => {
     return intersection;
   }, {});
 
-  delete commonLabels[VM_FOLDER_LABEL];
-  return commonLabels;
+  const { [VM_FOLDER_LABEL]: _, ...commonLabelsWithoutFolder } = commonLabels;
+  return commonLabelsWithoutFolder;
 };
 
 export const getLabelsDiffPatch = (
