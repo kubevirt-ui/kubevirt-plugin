@@ -1,6 +1,6 @@
 import { TEST_NS, TEST_SECRET_NAME } from '../../utils/const/index';
 import { authSSHKey, YAML } from '../../utils/const/string';
-import { itemCreateBtn, mastheadLogo, saveBtn } from '../../views/selector';
+import { itemCreateBtn, saveBtn } from '../../views/selector';
 import { manageKeysText, useExisting } from '../../views/selector-catalog';
 import { tab } from '../../views/tab';
 
@@ -13,7 +13,7 @@ describe('Prepare the cluster for test', () => {
   });
 
   it('switch to Virtualization perspective and default project', () => {
-    cy.get(mastheadLogo).scrollIntoView();
+    cy.scrollTo('top');
     cy.switchToVirt();
     cy.switchProject(TEST_NS);
   });
