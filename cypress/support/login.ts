@@ -35,7 +35,9 @@ Cypress.Commands.add('login', (provider: string, username: string, password: str
         cy.contains(idp).should('be.visible').click();
       }
     });
-    cy.get('#inputUsername').type(username || KUBEADMIN_USERNAME);
+    cy.get('#inputUsername')
+      .clear()
+      .type(username || KUBEADMIN_USERNAME);
     cy.get('#inputPassword').type(password || Cypress.env('BRIDGE_KUBEADMIN_PASSWORD'));
     cy.get(submitButton).click();
     cy.wait(20000);
@@ -44,7 +46,7 @@ Cypress.Commands.add('login', (provider: string, username: string, password: str
         cy.get(tour).click();
       }
     });
-    cy.byTestID('user-dropdown-toggle', { timeout: 5 * MINUTE }).should('be.visible');
+    cy.byTestID('user-dropdown', { timeout: 5 * MINUTE }).should('be.visible');
   });
 });
 
