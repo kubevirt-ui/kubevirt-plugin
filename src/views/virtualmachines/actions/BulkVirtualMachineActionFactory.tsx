@@ -33,7 +33,7 @@ export const BulkVirtualMachineActionFactory = {
     id: ACTIONS_ID.DELETE,
     label: t('Delete'),
   }),
-  editLabel: (vms: V1VirtualMachine[], createModal: (modal: ModalComponent) => void): Action => ({
+  editLabels: (vms: V1VirtualMachine[], createModal: (modal: ModalComponent) => void): Action => ({
     cta: () => {
       const commonLabels = getCommonLabels(vms);
 

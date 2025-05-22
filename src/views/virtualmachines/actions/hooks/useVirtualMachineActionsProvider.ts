@@ -82,6 +82,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
         : VirtualMachineActionFactory.pause(vm, createModal, confirmVMActionsEnabled);
 
     return [
+      VirtualMachineActionFactory.editLabels(vm, createModal),
       startOrStop,
       VirtualMachineActionFactory.restart(vm, createModal, confirmVMActionsEnabled),
       pauseOrUnpause,

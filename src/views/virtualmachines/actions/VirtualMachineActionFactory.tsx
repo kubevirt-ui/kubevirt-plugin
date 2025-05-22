@@ -10,6 +10,7 @@ import {
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import CloneVMModal from '@kubevirt-utils/components/CloneVMModal/CloneVMModal';
+import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
 import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SnapshotModal from '@kubevirt-utils/components/SnapshotModal/SnapshotModal';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -149,6 +150,32 @@ export const VirtualMachineActionFactory = {
       label: t('Delete'),
     };
   },
+  editLabels: (vm: V1VirtualMachine, createModal: (modal: ModalComponent) => void): Action => ({
+    accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
+    cta: () =>
+      createModal(({ isOpen, onClose }) => (
+        <LabelsModal
+          onLabelsSubmit={(labels) =>
+            k8sPatch({
+              data: [
+                {
+                  op: 'replace',
+                  path: '/metadata/labels',
+                  value: labels,
+                },
+              ],
+              model: VirtualMachineModel,
+              resource: vm,
+            })
+          }
+          isOpen={isOpen}
+          obj={vm}
+          onClose={onClose}
+        />
+      )),
+    id: 'vm-action-edit-labels',
+    label: t('Edit labels'),
+  }),
   forceStop: (vm: V1VirtualMachine): Action => {
     return {
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
