@@ -2,6 +2,7 @@ import React, { FC, useMemo, useState } from 'react';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { DocumentTitle } from '@openshift-console/dynamic-plugin-sdk';
 import { Form, FormGroup, TextInput } from '@patternfly/react-core';
 
 import MigrationPolicyConfigurations from '../../../components/MigrationPolicyConfigurations/MigrationPolicyConfigurations';
@@ -31,6 +32,7 @@ const MigrationPolicyCreateForm: FC = () => {
 
   return (
     <div className="migration-policy__form kv-m-pane__form">
+      <DocumentTitle>{t('Create MigrationPolicy')}</DocumentTitle>
       <MigrationPolicyCreateFormHeader />
       <Form className="migration-policy__form-body">
         <FormGroup fieldId="create-description">

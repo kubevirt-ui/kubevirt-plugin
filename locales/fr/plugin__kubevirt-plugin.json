@@ -33,6 +33,7 @@
   "{{matchingNodeText}} matching": "{{matchingNodeText}} matching",
   "{{matchingProjectText}} matching": "{{matchingProjectText}} matching",
   "{{minutes}}{{seconds}} seconds": "{{minutes}}{{seconds}} seconds",
+  "{{name}} · {{resourceKind}} · Details": "{{name}} · {{resourceKind}} · Details",
   "{{nameOrId}} - Default data image already exists": "{{nameOrId}} - Default data image already exists",
   "{{nameOrId}} - Template missing data image definition": "{{nameOrId}} - Template missing data image definition",
   "{{numRemaining}} more": "{{numRemaining}} more",
