@@ -3,6 +3,7 @@ import { tab } from '../../views/tab';
 
 describe('Test Cluster General settings', () => {
   before(() => {
+    cy.visitOverviewVirt();
     tab.navigateToOverview();
     tab.navigateToSettings();
   });

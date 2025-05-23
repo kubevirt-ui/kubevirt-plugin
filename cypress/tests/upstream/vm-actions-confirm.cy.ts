@@ -2,14 +2,7 @@ import { Example } from '../../utils/const/string';
 import { tab } from '../../views/tab';
 
 describe('Test VM actions confirm', () => {
-  before(() => {
-    cy.login();
-    cy.visit('');
-    cy.switchToVirt();
-  });
-
-  it('navigate to settings', () => {
-    cy.visitCatalogVirt();
+  before('navigate to settings', () => {
     cy.visitOverviewVirt();
     tab.navigateToSettings();
   });

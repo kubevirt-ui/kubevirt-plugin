@@ -3,9 +3,7 @@ import * as oView from '../../views/selector-overview';
 
 describe('Test Virtualization Overview page', () => {
   before(() => {
-    cy.login();
-    cy.visit('');
-    cy.switchToVirt();
+    cy.visitOverviewVirt();
   });
 
   it('Verify links in get started are not outdated', () => {

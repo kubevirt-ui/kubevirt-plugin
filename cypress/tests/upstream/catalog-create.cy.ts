@@ -37,7 +37,7 @@ const PVC_VM: VirtualMachineData = {
 
 describe('Test Catalog', () => {
   before(() => {
-    cy.visitCatalog();
+    cy.visitCatalogVirt();
   });
 
   it('create InstanceType VM with multiple disks', () => {

@@ -146,6 +146,9 @@ export NO_COLOR=1
 export CYPRESS_CNV_NS='kubevirt-hyperconverged';
 export CYPRESS_OS_IMAGES_NS='kubevirt-os-images';
 
+# setup cluster
+bash test-setup.sh
+
 # Install dependencies.
 yarn install --ignore-engines
 
@@ -153,7 +156,7 @@ yarn install --ignore-engines
 yarn add global mochawesome-report-generator --ignore-engines
 
 # Run tests.
-yarn run test-cypress-headless
+yarn run test-cypress-headless --spec="tests/us.cy.ts"
 
 # Generate Cypress report.
 yarn run cypress-postreport

@@ -1,0 +1,15 @@
+#!/bin/bash
+
+set -ex
+
+export TEST_NS='auto-test-ns'
+export TEST_SECRET_NAME='auto-test-secret'
+
+# create test namespace
+oc new-project ${TEST_NS}
+
+# close welcome modal
+oc patch configmap -n ${CYPRESS_CNV_NS} kubevirt-user-settings --type=merge --patch '{"data": {"kube-admin": "{\"quickStart\":{\"dontShowWelcomeModal\":true}}"}}'
+
+# create secret
+oc create -f cypress/fixtures/secret.yaml
