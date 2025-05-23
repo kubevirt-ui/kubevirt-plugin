@@ -15,7 +15,7 @@ import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/k
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
 
-import { getLabel, getName, getNamespace } from '../shared';
+import { getLabel, getName, getNamespace, NamespacedResourceMap } from '../shared';
 
 import { deprecatedOSNames, KUBEVIRT_ISO_LABEL } from './constants';
 import { BootableVolume } from './types';
@@ -42,6 +42,11 @@ export const getBootableVolumePVCSource = (
         (bootableVolume as V1beta1DataSource)?.spec?.source?.pvc?.name
       ];
 };
+
+export const getDataVolumeForPVC = (
+  pvc: IoK8sApiCoreV1PersistentVolumeClaim,
+  dvSources: NamespacedResourceMap<V1beta1DataVolume>,
+) => (pvc ? dvSources?.[getNamespace(pvc)]?.[getName(pvc)] : null);
 
 export const getInstanceTypePrefix = (instanceTypeNamePrefix: string): string => {
   if (instanceTypeNamePrefix?.includes('.')) {

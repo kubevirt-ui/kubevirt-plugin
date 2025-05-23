@@ -6,6 +6,7 @@ import { getTemplateOSIcon, getVolumeNameOSIcon } from '@catalog/templatescatalo
 import {
   V1beta1DataImportCron,
   V1beta1DataSource,
+  V1beta1DataVolume,
 } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -17,6 +18,8 @@ import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isDeprecated } from '@kubevirt-utils/resources/bootableresources/helpers';
 import {
+  getDataVolumeSize,
+  getPVCSize,
   getVolumeSnapshotSize,
   getVolumeSnapshotStorageClass,
 } from '@kubevirt-utils/resources/bootableresources/selectors';
@@ -46,6 +49,7 @@ type BootableVolumeRowProps = {
   rowData: {
     bootableVolumeSelectedState: [BootableVolume, InstanceTypeVMStore['onSelectCreatedVolume']];
     dataImportCron: V1beta1DataImportCron;
+    dvSource: V1beta1DataVolume;
     favorites: [isFavorite: boolean, updaterFavorites: (val: boolean) => void];
     preference: V1beta1VirtualMachineClusterPreference;
     pvcSource: IoK8sApiCoreV1PersistentVolumeClaim;
@@ -59,6 +63,7 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
   rowData: {
     bootableVolumeSelectedState: [selectedBootableVolume, setSelectedBootableVolume],
     dataImportCron,
+    dvSource,
     favorites,
     preference,
     pvcSource,
@@ -69,14 +74,16 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
   const bootVolumeName = getName(bootableVolume);
   const bootVolumeNamespace = getNamespace(bootableVolume);
   const sizeData = formatBytes(
-    pvcSource?.spec?.resources?.requests?.storage || getVolumeSnapshotSize(volumeSnapshotSource),
+    getDataVolumeSize(dvSource) ||
+      getPVCSize(pvcSource) ||
+      getVolumeSnapshotSize(volumeSnapshotSource),
   );
   const icon = getVolumeNameOSIcon(bootVolumeName) || getTemplateOSIcon(preference);
 
   const [isFavorite, addOrRemoveFavorite] = favorites;
 
   const handleOnClick = () => {
-    setSelectedBootableVolume(bootableVolume, pvcSource, volumeSnapshotSource);
+    setSelectedBootableVolume(bootableVolume, pvcSource, volumeSnapshotSource, dvSource);
     logITFlowEvent(BOOTABLE_VOLUME_SELECTED, null, {
       selectedBootableVolume: getName(bootableVolume),
     });

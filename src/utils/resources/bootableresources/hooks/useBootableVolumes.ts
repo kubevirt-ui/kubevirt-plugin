@@ -9,9 +9,11 @@ import {
   VolumeSnapshotModel,
 } from '@kubevirt-ui/kubevirt-api/console';
 import DataImportCronModel from '@kubevirt-ui/kubevirt-api/console/models/DataImportCronModel';
+import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import {
   V1beta1DataImportCron,
   V1beta1DataSource,
+  V1beta1DataVolume,
 } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
@@ -57,6 +59,12 @@ const useBootableVolumes: UseBootableVolumes = (namespace) => {
     namespace: projectsNamespace,
   });
 
+  const [dvs, loadedDVs, loadErrorDVs] = useK8sWatchResource<V1beta1DataVolume[]>({
+    groupVersionKind: modelToGroupVersionKind(DataVolumeModel),
+    isList: true,
+    namespace: projectsNamespace,
+  });
+
   // getting volumesnapshot as this can also be a source of DS
   const [volumeSnapshots] = useK8sWatchResource<VolumeSnapshotKind[]>({
     groupVersionKind: modelToGroupVersionKind(VolumeSnapshotModel),
@@ -65,13 +73,13 @@ const useBootableVolumes: UseBootableVolumes = (namespace) => {
   });
 
   const error = useMemo(
-    () => dataSourcesError || loadErrorPVCs || dataImportCronsError,
-    [dataSourcesError, loadErrorPVCs, dataImportCronsError],
+    () => dataSourcesError || loadErrorDVs || loadErrorPVCs || dataImportCronsError,
+    [dataSourcesError, loadErrorDVs, loadErrorPVCs, dataImportCronsError],
   );
 
   const loaded = useMemo(
-    () => (error ? true : loadedDataSources && loadedPVCs && loadedDataImportCrons),
-    [error, loadedDataSources, loadedPVCs, loadedDataImportCrons],
+    () => (error ? true : loadedDataSources && loadedDVs && loadedPVCs && loadedDataImportCrons),
+    [error, loadedDataSources, loadedDVs, loadedPVCs, loadedDataImportCrons],
   );
 
   const readyOrCloningDataSources = useMemo(
@@ -79,6 +87,7 @@ const useBootableVolumes: UseBootableVolumes = (namespace) => {
     [dataSources, dataImportCrons],
   );
   const pvcSources = useMemo(() => convertResourceArrayToMap(pvcs, true), [pvcs]);
+  const dvSources = useMemo(() => convertResourceArrayToMap(dvs, true), [dvs]);
 
   const bootableVolumes: BootableVolume[] = useMemo(() => {
     const dataSourceVolumes =
@@ -105,6 +114,7 @@ const useBootableVolumes: UseBootableVolumes = (namespace) => {
   return {
     bootableVolumes,
     dataImportCrons,
+    dvSources,
     error,
     loaded,
     pvcSources,
