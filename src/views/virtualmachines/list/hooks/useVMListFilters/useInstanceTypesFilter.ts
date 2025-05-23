@@ -6,7 +6,7 @@ import { getInstanceTypePrefix } from '@kubevirt-utils/resources/bootableresourc
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
-export const useInstanceTypesFilter = (vms: V1VirtualMachine[]): RowFilter => {
+export const useInstanceTypesFilter = (vms: V1VirtualMachine[]): RowFilter<V1VirtualMachine> => {
   const noInstanceType = t('No InstanceType');
   const instanceTypes = useMemo(
     () =>

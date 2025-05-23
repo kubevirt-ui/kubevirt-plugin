@@ -8,7 +8,10 @@ import { getVirtualMachineStorageClasses, PVCMapper } from '@virtualmachines/uti
 
 type StorageClassByVM = { [namespace in string]: { [name in string]: Set<string> } };
 
-export const useStorageClassFilter = (vms: V1VirtualMachine[], pvcMapper: PVCMapper): RowFilter => {
+export const useStorageClassFilter = (
+  vms: V1VirtualMachine[],
+  pvcMapper: PVCMapper,
+): RowFilter<V1VirtualMachine> => {
   const { allStorageClasses, storageClassesByVM } = vms.reduce(
     (acc, vm) => {
       const vmNamespace = getNamespace(vm);

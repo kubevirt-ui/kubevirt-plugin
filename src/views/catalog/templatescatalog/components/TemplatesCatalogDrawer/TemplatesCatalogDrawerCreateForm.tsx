@@ -22,6 +22,7 @@ import {
   ButtonVariant,
   Checkbox,
   DescriptionList,
+  Form,
   FormGroup,
   Split,
   SplitItem,
@@ -74,7 +75,7 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
 
     const error = templateLoadingError || createError || vmsNotSupportedError;
     return (
-      <div className="template-catalog-drawer-form" id="quick-create-form">
+      <Form className="template-catalog-drawer-form" id="quick-create-form">
         <Stack hasGutter>
           <>
             <StackItem>
@@ -98,7 +99,7 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
                 </SplitItem>
                 {treeViewFoldersEnabled && (
                   <SplitItem>
-                    <FormGroup fieldId="vm-folder-field" isRequired label={t('Folder')}>
+                    <FormGroup fieldId="vm-folder-field" label={t('Folder')}>
                       <FolderSelect
                         setSelectedFolder={(newFolder) => {
                           onChangeFolder(newFolder);
@@ -203,7 +204,7 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
             </Split>
           </StackItem>
         </Stack>
-      </div>
+      </Form>
     );
   },
 );

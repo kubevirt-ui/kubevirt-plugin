@@ -1,10 +1,11 @@
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVMIIPAddresses } from '@kubevirt-utils/resources/vmi';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { compareCIDR, VirtualMachineRowFilterType } from '@virtualmachines/utils';
 import { VMIMapper } from '@virtualmachines/utils/mappers';
 
-export const useIPSearchFilter = (vmiMapper: VMIMapper): RowFilter => ({
+export const useIPSearchFilter = (vmiMapper: VMIMapper): RowFilter<V1VirtualMachine> => ({
   filter: (input, obj) => {
     const search = input.selected?.[0];
 

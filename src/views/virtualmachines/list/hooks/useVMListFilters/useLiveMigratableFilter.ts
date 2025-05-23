@@ -1,3 +1,4 @@
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useSingleNodeCluster from '@kubevirt-utils/hooks/useSingleNodeCluster';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
@@ -5,7 +6,7 @@ import { isLiveMigratable } from '@virtualmachines/utils';
 
 import { VirtualMachineRowFilterType } from '../../../utils/constants';
 
-export const useLiveMigratableFilter = (): RowFilter => {
+export const useLiveMigratableFilter = (): RowFilter<V1VirtualMachine> => {
   const [isSingleNodeCluster] = useSingleNodeCluster();
 
   return {
