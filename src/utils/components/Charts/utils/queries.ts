@@ -3,6 +3,7 @@ import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 enum VMQueries {
   CPU_REQUESTED = 'CPU_REQUESTED',
   CPU_USAGE = 'CPU_USAGE',
+  CPU_UTILIZATION = 'CPU_UTILIZATION',
   FILESYSTEM_READ_USAGE = 'FILESYSTEM_READ_USAGE',
   FILESYSTEM_USAGE_TOTAL = 'FILESYSTEM_TOTAL_USAGE',
   FILESYSTEM_WRITE_USAGE = 'FILESYSTEM_WRITE_USAGE',
@@ -23,6 +24,7 @@ enum VMQueries {
 }
 
 type UtilizationQueriesArgs = {
+  clusterID?: string;
   duration?: string;
   launcherPodName?: string;
   nic?: string;
@@ -42,6 +44,21 @@ export const getUtilizationQueries: GetUtilizationQueries = ({
   return {
     [VMQueries.CPU_REQUESTED]: `sum(kube_pod_resource_request{resource='cpu',pod='${launcherPodName}',namespace='${namespace}'}) BY (name, namespace)`,
     [VMQueries.CPU_USAGE]: `sum(rate(kubevirt_vmi_cpu_usage_seconds_total{name='${name}',namespace='${namespace}'}[${duration}])) BY (name, namespace)`,
+    [VMQueries.CPU_UTILIZATION]: `(sum by (name)(rate(kubevirt_vmi_cpu_usage_seconds_total{name="${name}", namespace="${namespace}"}[${duration}]))>0)
+/
+(sum by (name) (
+(kubevirt_vm_resource_requests{name="${name}", namespace="${namespace}", resource="cpu", unit="cores", source=~"default|domain"})
+* ignoring (unit)(kubevirt_vm_resource_requests{name="${name}", namespace="${namespace}", resource="cpu", unit="sockets", source=~"default|domain"})
+* ignoring (unit)(kubevirt_vm_resource_requests{name="${name}", namespace="${namespace}", resource="cpu", unit="threads", source=~"default|domain"})
+)) or
+sum by (name) (
+(kubevirt_vm_resource_requests{name="${name}", namespace="${namespace}", resource="cpu", unit="cores", source=~"default|domain"})
+* ignoring (unit)(kubevirt_vm_resource_requests{name="${name}", namespace="${namespace}", resource="cpu", unit="sockets", source=~"default|domain"})
+)
+ or
+sum by (name) (
+(kubevirt_vm_resource_requests{name="${name}", namespace="${namespace}", resource="cpu", unit="cores", source=~"default|domain"})
+)`,
     [VMQueries.FILESYSTEM_READ_USAGE]: `sum(rate(kubevirt_vmi_storage_read_traffic_bytes_total{name='${name}',namespace='${namespace}'}[${duration}])) BY (name, namespace)`,
     [VMQueries.FILESYSTEM_USAGE_TOTAL]: `sum(rate(kubevirt_vmi_storage_read_traffic_bytes_total{name='${name}',namespace='${namespace}'}[${duration}]) + rate(kubevirt_vmi_storage_write_traffic_bytes_total{name='${name}',namespace='${namespace}'}[${duration}])) BY (name, namespace)`,
     [VMQueries.FILESYSTEM_WRITE_USAGE]: `sum(rate(kubevirt_vmi_storage_write_traffic_bytes_total{name='${name}',namespace='${namespace}'}[${duration}])) BY (name, namespace)`,
