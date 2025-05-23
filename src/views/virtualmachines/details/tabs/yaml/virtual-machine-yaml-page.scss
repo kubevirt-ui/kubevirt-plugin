@@ -1,4 +1,8 @@
 .VirtualMachineYAML--main {
-  height: 100%;
+  //Height of navbar
+  height: calc(100% - 45px);
   display: flex;
+  .co-file-dropzone.co-file-dropzone__flex {
+    height: 100%;
+  }
 }
