@@ -12,6 +12,6 @@ export const setInterfaceLinkState = (
 ) =>
   produce(vm, (draftVM) => {
     ensurePath(draftVM, ['spec.template.spec.domain.devices.interfaces']);
-    const interfaceToUpdate = getInterface(vm, nicName);
+    const interfaceToUpdate = getInterface(draftVM, nicName);
     if (interfaceToUpdate) interfaceToUpdate.state = desiredState;
   });

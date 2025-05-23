@@ -1,68 +1,89 @@
 import React, { FC } from 'react';
 
-import {
-  V1Network,
-  V1VirtualMachine,
-  V1VirtualMachineInstanceNetworkInterface,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import EphemeralBadge from '@kubevirt-utils/components/badges/EphemeralBadge/EphemeralBadge';
 import PendingBadge from '@kubevirt-utils/components/badges/PendingBadge/PendingBadge';
+import { toNetworkNameLabel } from '@kubevirt-utils/constants/network-columns';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
-import { getPrintableNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
+import { Label, Tooltip } from '@patternfly/react-core';
 
-import { getNetworkInterfaceStateIcon, isInterfaceEphemeral } from '../../utils/utils';
+import {
+  describeConfiguredState,
+  getConfigInterfaceState,
+  getNetworkInterfaceStateIcon,
+  getRuntimeInterfaceState,
+} from '../../utils/utils';
 
 import NetworkInterfaceActions from './NetworkInterfaceActions';
+import { SimpeNicPresentation } from './NetworkInterfaceList';
 
 export type NetworkInterfaceRowProps = {
-  obj: NetworkPresentation;
+  obj: SimpeNicPresentation;
 };
 
 const NetworkInterfaceRow: FC<
   RowProps<
-    NetworkPresentation,
+    SimpeNicPresentation,
     {
-      isInterfaceEphemeral: (
-        network: V1Network,
-        iface: V1VirtualMachineInstanceNetworkInterface,
-      ) => undefined | V1VirtualMachineInstanceNetworkInterface;
-      isPending: (network: V1Network) => boolean;
       vm: V1VirtualMachine;
+      vmi: V1VirtualMachineInstance;
     }
   >
-> = ({ activeColumnIDs, obj: { iface, network }, rowData: { isPending, vm } }) => {
+> = ({
+  activeColumnIDs,
+  obj: {
+    config,
+    configLinkState,
+    iface,
+    interfaceName,
+    isInterfaceEphemeral,
+    isPending,
+    isSRIOV,
+    network,
+    runtimeLinkState,
+    type,
+  },
+  rowData: { vm },
+}) => {
   const { t } = useKubevirtTranslation();
-  const ephemeralNic = isInterfaceEphemeral(network, iface);
   const nicName = network?.name;
-  const InterfaceStateIcon = getNetworkInterfaceStateIcon(vm, nicName);
+  const RuntimeLinkStateIcon = getNetworkInterfaceStateIcon(
+    getRuntimeInterfaceState(runtimeLinkState),
+  );
 
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} id="name">
-        {nicName || ephemeralNic?.interfaceName || NO_DATA_DASH}
-        {isPending(network) && !ephemeralNic && <PendingBadge />}
-        {ephemeralNic && <EphemeralBadge />}
+        {!nicName && interfaceName ? <Label>{interfaceName}</Label> : nicName || NO_DATA_DASH}
+        {isPending && !isInterfaceEphemeral && <PendingBadge />}
+        {isInterfaceEphemeral && <EphemeralBadge />}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="model">
-        {iface.model || NO_DATA_DASH}
+        {iface?.model || NO_DATA_DASH}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="network">
-        {network?.pod ? t('Pod networking') : network?.multus?.networkName || NO_DATA_DASH}
+        {toNetworkNameLabel(t, { network }) || NO_DATA_DASH}
       </TableData>
-      <TableData activeColumnIDs={activeColumnIDs} id="state">
-        <InterfaceStateIcon />
+      <TableData activeColumnIDs={activeColumnIDs} id="runtime_link_state">
+        <Tooltip
+          content={describeConfiguredState(
+            t,
+            getConfigInterfaceState(config?.iface, configLinkState, isSRIOV),
+          )}
+        >
+          <RuntimeLinkStateIcon />
+        </Tooltip>
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="type">
-        {getPrintableNetworkInterfaceType(iface)}
+        {type}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="macAddress">
-        {iface?.macAddress || ephemeralNic?.mac || NO_DATA_DASH}
+        {iface?.macAddress || NO_DATA_DASH}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="actions">
-        <NetworkInterfaceActions nicName={nicName} nicPresentation={{ iface, network }} vm={vm} />
+        <NetworkInterfaceActions nicName={nicName} nicPresentation={config} vm={vm} />
       </TableData>
     </>
   );

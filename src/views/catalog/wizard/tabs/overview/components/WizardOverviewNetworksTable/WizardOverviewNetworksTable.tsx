@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { WizardDescriptionItem } from '@catalog/wizard/components/WizardDescriptionItem';
 import { V1Interface, V1Network } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { toNetworkNameLabel } from '@kubevirt-utils/constants/network-columns';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { BRIDGE, MASQUERADE, SRIOV } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getNetworkInterfaceRowData } from '@kubevirt-utils/resources/vm/utils/network/rowData';
@@ -42,9 +43,7 @@ export const WizardOverviewNetworksTable: React.FC<{
         description={
           <Stack>
             {networkData.map((n) => (
-              <StackItem key={n.network.name}>
-                {n.network.pod ? t('Pod networking') : n.network.multus?.networkName || '-'}
-              </StackItem>
+              <StackItem key={n.network.name}>{toNetworkNameLabel(t, n) || '-'}</StackItem>
             ))}
           </Stack>
         }

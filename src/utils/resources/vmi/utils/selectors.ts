@@ -50,3 +50,14 @@ export const getVMIDevices = (vmi: V1VirtualMachineInstance): V1Devices =>
 
 export const getVMIBootLoader = (vmi: V1VirtualMachineInstance): V1Bootloader =>
   vmi?.spec?.domain?.firmware.bootloader;
+
+export const getNetworkInterface = (
+  vmi: V1VirtualMachineInstance,
+  interfaceName: string,
+): undefined | V1VirtualMachineInstanceNetworkInterface =>
+  getVMIStatusInterfaces(vmi)?.find((iface) => iface?.name === interfaceName);
+
+export const getNetworkInterfaceState = (
+  vm: V1VirtualMachineInstance,
+  interfaceName: string,
+): string | undefined => (getNetworkInterface(vm, interfaceName) as any)?.link_state;
