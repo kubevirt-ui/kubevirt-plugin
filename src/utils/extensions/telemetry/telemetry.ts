@@ -4,11 +4,18 @@ import { createVMFlowTypes } from '@kubevirt-utils/extensions/telemetry/utils/co
 import { getName } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
-const SEGMENT_KEY =
+const apiKey =
   (window as any).SERVER_FLAGS?.telemetry?.DEVSANDBOX_SEGMENT_API_KEY ||
   (window as any).SERVER_FLAGS?.telemetry?.SEGMENT_API_KEY ||
   (window as any).SERVER_FLAGS?.telemetry?.SEGMENT_PUBLIC_API_KEY ||
   '';
+
+const jsHost = (window as any).SERVER_FLAGS.telemetry?.SEGMENT_JS_HOST;
+
+/** Full segment JS URL */
+const jsURL =
+  (window as any).SERVER_FLAGS?.telemetry?.SEGMENT_JS_URL ||
+  `https://${jsHost}/analytics.js/v1/${encodeURIComponent(apiKey)}/analytics.min.js`;
 
 const initSegment = () => {
   const analytics = ((window as any).analytics = (window as any).analytics || []);
@@ -60,8 +67,7 @@ const initSegment = () => {
       const t = document.createElement('script');
       t.type = 'text/javascript';
       t.async = true;
-      t.src =
-        'https://cdn.segment.com/analytics.js/v1/' + encodeURIComponent(key) + '/analytics.min.js';
+      t.src = jsURL;
       const n = document.getElementsByTagName('script')[0];
       if (n.parentNode) {
         n.parentNode.insertBefore(t, n);
@@ -69,8 +75,8 @@ const initSegment = () => {
       analytics._loadOptions = e;
     };
     analytics.SNIPPET_VERSION = '4.13.1';
-    if (SEGMENT_KEY) {
-      analytics.load(SEGMENT_KEY);
+    if (apiKey) {
+      analytics.load(apiKey);
     }
   }
 };
