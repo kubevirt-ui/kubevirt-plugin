@@ -101,11 +101,15 @@ export const fillInstanceType = (vmData: VirtualMachineData) => {
     folder,
     iType,
     name,
+    namespace,
     newSecret,
     newSecretName,
     secretProject,
     volume,
   } = vmData;
+  if (namespace !== undefined) {
+    cy.switchProject(namespace);
+  }
   cy.contains(iView.volName, volume).click();
   cy.byButtonText('User').click();
   cy.get('input[aria-label="Filter menu items"]').clear().type('medium');
@@ -186,13 +190,19 @@ export const fillDetails = (vmData: VirtualMachineData) => {
         $el.click();
       }
     });
-    cy.get('[data-test-id="start-pause-mode"]').find('input[type="checkbox"]').check();
+    cy.get('[data-test-id="start-pause-mode"]')
+      .find('input[type="checkbox"]')
+      .check({ force: true });
   }
   if (headless) {
-    cy.get(`[data-test-id="${vmData.name}-headless"]`).find('input[type="checkbox"]').check();
+    cy.get(`[data-test-id="${vmData.name}-headless"]`)
+      .find('input[type="checkbox"]')
+      .check({ force: true });
   }
   if (guestlog) {
-    cy.get('[data-test-id="guest-system-log-access"]').find('input[type="checkbox"]').check();
+    cy.get('[data-test-id="guest-system-log-access"]')
+      .find('input[type="checkbox"]')
+      .check({ force: true });
   }
 };
 
