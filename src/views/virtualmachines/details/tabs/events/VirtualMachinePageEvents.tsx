@@ -4,7 +4,7 @@ import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ResourceEventStream } from '@openshift-console/dynamic-plugin-sdk';
 import { Bullseye, Title } from '@patternfly/react-core';
-import { ResourceEventStream as MultiClusterResourceEventStream } from '@stolostron/multicluster-sdk';
+import { FleetResourceEventStream } from '@stolostron/multicluster-sdk';
 import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
 
 import './VirtualMachinePageEventsTab.scss';
@@ -25,7 +25,7 @@ const VirtualMachinePageEventsTab: FC<NavPageComponentProps> = ({ obj: vm }) => 
         }
       >
         {vm?.cluster ? (
-          <MultiClusterResourceEventStream resource={vm} />
+          <FleetResourceEventStream resource={vm} />
         ) : (
           <ResourceEventStream resource={vm} />
         )}

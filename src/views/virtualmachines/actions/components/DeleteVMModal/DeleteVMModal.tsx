@@ -18,7 +18,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { useLastNamespacePath } from '@kubevirt-utils/hooks/useLastNamespacePath';
 import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
 import { ButtonVariant, Stack, StackItem } from '@patternfly/react-core';
-import { fleetDeleteResource } from '@stolostron/multicluster-sdk';
+import { fleetK8sDelete } from '@stolostron/multicluster-sdk';
 import { deselectVM, isVMSelected } from '@virtualmachines/list/selectedVMs';
 
 import DeleteOwnedResourcesMessage from './components/DeleteOwnedResourcesMessage';
@@ -69,7 +69,7 @@ const DeleteVMModal: FC<DeleteVMModalProps> = ({ isOpen, onClose, vm }) => {
 
     await Promise.allSettled(deleteSecrets(secrets));
 
-    await fleetDeleteResource({
+    await fleetK8sDelete({
       cluster: updatedVM?.cluster,
       json: gracePeriodCheckbox
         ? { apiVersion: 'v1', gracePeriodSeconds, kind: 'DeleteOptions' }

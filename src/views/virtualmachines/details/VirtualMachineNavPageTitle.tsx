@@ -11,6 +11,7 @@ import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
 import useVirtualMachineInstanceMigration from '@kubevirt-utils/resources/vmi/hooks/useVirtualMachineInstanceMigration';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Label, Split, SplitItem, Title } from '@patternfly/react-core';
+import { useFleetK8sWatchResource } from '@stolostron/multicluster-sdk';
 import VirtualMachineActions from '@virtualmachines/actions/components/VirtualMachineActions/VirtualMachineActions';
 import VMActionsIconBar from '@virtualmachines/actions/components/VMActionsIconBar/VMActionsIconBar';
 import useVirtualMachineActionsProvider from '@virtualmachines/actions/hooks/useVirtualMachineActionsProvider';
@@ -38,7 +39,7 @@ const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({
   const { t } = useKubevirtTranslation();
   const location = useLocation();
 
-  const { vmi } = useVMI(vm?.metadata?.name, vm?.metadata?.namespace, isRunning(vm));
+  const { vmi } = useVMI(vm?.metadata?.name, vm?.metadata?.namespace, vm?.cluster, isRunning(vm));
   const vmim = useVirtualMachineInstanceMigration(vm);
   const [actions] = useVirtualMachineActionsProvider(vm, vmim);
   const StatusIcon = getVMStatusIcon(vm?.status?.printableStatus);

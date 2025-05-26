@@ -11,7 +11,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
 import { getVolumeSnapshotStatuses } from '@kubevirt-utils/resources/vm';
 import { Form, FormGroup, TextArea, TextInput } from '@patternfly/react-core';
-import { fleetCreate } from '@stolostron/multicluster-sdk';
+import { fleetK8sCreate } from '@stolostron/multicluster-sdk';
 import { deadlineUnits } from '@virtualmachines/details/tabs/snapshots/utils/consts';
 import {
   getEmptyVMSnapshotResource,
@@ -61,7 +61,7 @@ const SnapshotModal: FC<SnapshotModalProps> = ({ isOpen, onClose, vm }) => {
   return (
     <TabModal<V1beta1VirtualMachineSnapshot>
       onSubmit={(obj) =>
-        fleetCreate<V1beta1VirtualMachineSnapshot>({
+        fleetK8sCreate<V1beta1VirtualMachineSnapshot>({
           cluster: vm?.cluster,
           data: obj,
           model: VirtualMachineSnapshotModel,

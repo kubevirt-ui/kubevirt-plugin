@@ -11,11 +11,13 @@ type UseVirtualMachineLogData = (args: { connect?: boolean; pod: K8sResourceComm
 };
 
 const useVirtualMachineLogData: UseVirtualMachineLogData = ({ connect = true, pod }) => {
-  const baseK8sPath = useFleetK8sAPIPath(pod?.cluster);
+  const [baseK8sPath, k8sApiPathLoaded] = useFleetK8sAPIPath(pod?.cluster);
   const url = `${baseK8sPath}/api/v1/namespaces/${pod?.metadata?.namespace}/pods/${pod?.metadata?.name}/log`;
 
   const socket = useWebSocket<{ object: K8sResourceCommon; type: string }>(
-    `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}${url}`,
+    k8sApiPathLoaded
+      ? `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}${url}`
+      : null,
     {
       onClose: () => kubevirtConsole.log('websocket closed kubevirt: ', url),
       onError: (err) => kubevirtConsole.log('Websocket error kubevirt:', err),

@@ -9,7 +9,7 @@ import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getLabels, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Action } from '@openshift-console/dynamic-plugin-sdk';
-import { fleetPatchResource } from '@stolostron/multicluster-sdk';
+import { fleetK8sPatch } from '@stolostron/multicluster-sdk';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
 import ConfirmMultipleVMActionsModal from './components/ConfirmMultipleVMActionsModal/ConfirmMultipleVMActionsModal';
@@ -43,7 +43,7 @@ export const BulkVirtualMachineActionFactory = {
           onLabelsSubmit={(newLabels) => {
             return Promise.all(
               vms.map((vm) =>
-                fleetPatchResource<V1VirtualMachine>({
+                fleetK8sPatch<V1VirtualMachine>({
                   cluster: vm?.cluster,
                   data: getLabelsDiffPatch(labels, getLabels(vm)),
                   model: VirtualMachineModel,
@@ -91,7 +91,7 @@ export const BulkVirtualMachineActionFactory = {
               vms.map((vm) => {
                 const labels = vm?.metadata?.labels || {};
                 labels[VM_FOLDER_LABEL] = folderName;
-                return fleetPatchResource<V1VirtualMachine>({
+                return fleetK8sPatch<V1VirtualMachine>({
                   data: [
                     {
                       op: 'replace',

@@ -21,7 +21,7 @@ import {
   getWorkload,
 } from '@kubevirt-utils/resources/vm';
 import { k8sPatch, k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
-import { fleetPatchResource } from '@stolostron/multicluster-sdk';
+import { fleetK8sPatch } from '@stolostron/multicluster-sdk';
 import { printableVMStatus } from '@virtualmachines/utils';
 
 export const updateStartStrategy = (checked: boolean, vm: V1VirtualMachine) => {
@@ -149,7 +149,7 @@ export const updateGuestSystemAccessLog = (updatedVM: V1VirtualMachine, checked:
 };
 
 export const updateDescription = (updatedVM: V1VirtualMachine, updatedDescription: string) => {
-  return fleetPatchResource({
+  return fleetK8sPatch({
     data: [
       {
         op: 'replace',

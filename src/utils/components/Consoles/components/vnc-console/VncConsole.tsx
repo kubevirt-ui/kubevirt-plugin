@@ -51,7 +51,7 @@ export const VncConsole: FC<VncConsoleProps> = ({
     ),
     [staticRenderLocationRef, status],
   );
-  const k8sAPIPath = useFleetK8sAPIPath(vmi.cluster);
+  const [k8sAPIPath, k8sApiPathLoaded] = useFleetK8sAPIPath(vmi.cluster);
 
   const connect = useCallback(() => {
     setStatus(connecting);
@@ -132,6 +132,7 @@ export const VncConsole: FC<VncConsoleProps> = ({
   ]);
 
   useEffect(() => {
+    if (!k8sApiPathLoaded) return;
     if (!rfb && status === disconnected) {
       try {
         initLogging('debug');
@@ -147,7 +148,7 @@ export const VncConsole: FC<VncConsoleProps> = ({
         onConnect?.(null);
       }
     };
-  }, [onConnect, connect, rfb, status]);
+  }, [onConnect, connect, rfb, status, k8sApiPathLoaded]);
 
   return (
     <>
