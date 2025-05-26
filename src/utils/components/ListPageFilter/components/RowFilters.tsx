@@ -63,7 +63,7 @@ const RowFilters: FC<RowFiltersProps> = ({
               };
             })}
             categoryName={key}
-            deleteLabel={(filter, label: ToolbarLabel) => updateRowFilterSelected([label.key])}
+            deleteLabel={(_filter, label: ToolbarLabel) => updateRowFilterSelected([label.key])}
             deleteLabelGroup={() => clearAllRowFilter(key)}
             key={key}
             labelGroupExpandedText={t('Show less')}

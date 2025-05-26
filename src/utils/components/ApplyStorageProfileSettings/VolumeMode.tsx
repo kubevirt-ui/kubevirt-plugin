@@ -88,7 +88,7 @@ export const VolumeMode: FC<VolumeModeProps> = ({
               />
             </div>
           }
-          onChange={(event, checked) => {
+          onChange={(_event, checked) => {
             if (checked) {
               setBothModes(value);
             }

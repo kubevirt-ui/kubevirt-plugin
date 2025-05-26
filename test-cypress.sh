@@ -11,7 +11,7 @@ export CYPRESS_OS_IMAGES_NS='openshift-virtualization-os-images';
 bash test-setup.sh
 
 # Install dependencies.
-yarn install --ignore-engines
+yarn install --frozen-lockfile
 
 # Add mochawesome-report-generator
 yarn add global mochawesome-report-generator --ignore-engines

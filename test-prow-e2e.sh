@@ -27,13 +27,13 @@ function generateLogsAndCopyArtifacts {
   oc get pods -n ${NS} -o wide >> ${ARTIFACT_DIR}/pod_details_openshift-kubevirt.yaml
   oc get pods -n ${NS} -o yaml >> ${ARTIFACT_DIR}/pod_details_openshift-kubevirt.yaml
   for pod in `oc get pods -n ${NS} --no-headers -o custom-columns=":metadata.name" | grep "kubevirt"`; do
-        echo $pod 
+        echo $pod
         oc logs $pod -n ${NS} > ${ARTIFACT_DIR}/${pod}.logs
   done
   oc get serviceaccounts -n ${NS} -o wide > ${ARTIFACT_DIR}/serviceaccount.yaml
   oc get serviceaccounts -n ${NS} -o yaml >> ${ARTIFACT_DIR}/serviceaccount.yaml
   oc get console.v1.operator.openshift.io cluster -o yaml >> ${ARTIFACT_DIR}/cluster.yaml
-  
+
   if [ -d "$ARTIFACT_DIR" ] && [ -d "$SCREENSHOTS_DIR" ]; then
     if [[ -z "$(ls -A -- "$SCREENSHOTS_DIR")" ]]; then
       echo "No artifacts were copied."
@@ -59,7 +59,7 @@ unset KUBERNETES_SERVICE_HOST
 unset KUBERNETES_PORT
 unset KUBERNETES_PORT_443_TCP_PORT
 
-PULL_SECRET_PATH="/var/run/operator-secret/dockerconfig" 
+PULL_SECRET_PATH="/var/run/operator-secret/dockerconfig"
 NAMESPACE="openshift-marketplace"
 SECRET_NAME="ocs-secret"
 NS="kubevirt-hyperconverged"
@@ -78,7 +78,7 @@ function linkSecrets {
 }
 
 function deleteAllPods {
-  oc delete pods --all -n $1 
+  oc delete pods --all -n $1
 }
 
 echo "Creating secret for CI builds in ${NAMESPACE}"
@@ -150,7 +150,7 @@ export CYPRESS_OS_IMAGES_NS='kubevirt-os-images';
 bash test-setup.sh
 
 # Install dependencies.
-yarn install --ignore-engines
+yarn install --frozen-lockfile
 
 # Add mochawesome-report-generator
 yarn add global mochawesome-report-generator --ignore-engines

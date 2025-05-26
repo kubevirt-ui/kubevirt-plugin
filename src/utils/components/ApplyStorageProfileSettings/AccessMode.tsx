@@ -63,7 +63,7 @@ export const AccessMode: FC<AccessModeProps> = ({
               />
             </div>
           }
-          onChange={(event, checked) => {
+          onChange={(_event, checked) => {
             if (checked) {
               setAccessMode(value);
             }

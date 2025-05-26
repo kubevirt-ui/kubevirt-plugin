@@ -28,22 +28,24 @@ const createInitialStateFromSource: Record<
   Exclude<SourceTypes, SourceTypes.OTHER>,
   (volume: V1Volume, dataVolumeTemplate: V1DataVolumeTemplateSpec) => void
 > = {
-  [SourceTypes.BLANK]: (volume: V1Volume, dataVolumeTemplate: V1DataVolumeTemplateSpec) =>
+  [SourceTypes.BLANK]: (_volume: V1Volume, dataVolumeTemplate: V1DataVolumeTemplateSpec) =>
     (dataVolumeTemplate.spec.source.blank = {}),
-  [SourceTypes.CLONE_PVC]: (volume: V1Volume, dataVolumeTemplate: V1DataVolumeTemplateSpec) =>
+  [SourceTypes.CLONE_PVC]: (_volume: V1Volume, dataVolumeTemplate: V1DataVolumeTemplateSpec) =>
     (dataVolumeTemplate.spec.source.pvc = { name: '', namespace: '' }),
-  [SourceTypes.DATA_SOURCE]: (volume: V1Volume, dataVolumeTemplate: V1DataVolumeTemplateSpec) =>
+  [SourceTypes.DATA_SOURCE]: (_volume: V1Volume, dataVolumeTemplate: V1DataVolumeTemplateSpec) =>
     (dataVolumeTemplate.spec.sourceRef = { kind: DataSourceModel.kind, name: '', namespace: '' }),
   [SourceTypes.EPHEMERAL]: (volume: V1Volume) => (volume.containerDisk = { image: '' }),
-  [SourceTypes.HTTP]: (volume: V1Volume, dataVolumeTemplate: V1DataVolumeTemplateSpec) =>
+  [SourceTypes.HTTP]: (_volume: V1Volume, dataVolumeTemplate: V1DataVolumeTemplateSpec) =>
     (dataVolumeTemplate.spec.source.http = { url: '' }),
   [SourceTypes.PVC]: (volume: V1Volume) => (volume.persistentVolumeClaim = { claimName: '' }),
-  [SourceTypes.REGISTRY]: (volume: V1Volume, dataVolumeTemplate: V1DataVolumeTemplateSpec) =>
+  [SourceTypes.REGISTRY]: (_volume: V1Volume, dataVolumeTemplate: V1DataVolumeTemplateSpec) =>
     (dataVolumeTemplate.spec.source.registry = { url: '' }),
-  [SourceTypes.UPLOAD]: (volume: V1Volume, dataVolumeTemplate: V1DataVolumeTemplateSpec) =>
+  [SourceTypes.UPLOAD]: (_volume: V1Volume, dataVolumeTemplate: V1DataVolumeTemplateSpec) =>
     (dataVolumeTemplate.spec.source.upload = {}),
-  [SourceTypes.VOLUME_SNAPSHOT]: (volume: V1Volume, dataVolumeTemplate: V1DataVolumeTemplateSpec) =>
-    (dataVolumeTemplate.spec.source.snapshot = { name: '', namespace: '' }),
+  [SourceTypes.VOLUME_SNAPSHOT]: (
+    _volume: V1Volume,
+    dataVolumeTemplate: V1DataVolumeTemplateSpec,
+  ) => (dataVolumeTemplate.spec.source.snapshot = { name: '', namespace: '' }),
 };
 
 export const getDefaultEditValues = (
