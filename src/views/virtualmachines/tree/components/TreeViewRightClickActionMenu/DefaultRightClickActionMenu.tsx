@@ -1,11 +1,16 @@
 import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
+import classNames from 'classnames';
 
 import ActionDropdownItem from '@kubevirt-utils/components/ActionDropdownItem/ActionDropdownItem';
 import { Menu, MenuContent, MenuList, Popper } from '@patternfly/react-core';
 import useMultipleVirtualMachineActions from '@virtualmachines/actions/hooks/useMultipleVirtualMachineActions';
-import { PROJECT_SELECTOR_PREFIX } from '@virtualmachines/tree/utils/constants';
+import {
+  FOLDER_SELECTOR_PREFIX,
+  PROJECT_SELECTOR_PREFIX,
+} from '@virtualmachines/tree/utils/constants';
 
+import { MENU_DISTANCE } from './constants';
 import { getCreateVMAction, getElementComponentsFromID, getVMsTrigger } from './utils';
 
 type DefaultRightClickActionMenuProps = {
@@ -29,7 +34,13 @@ const DefaultRightClickActionMenu: FC<DefaultRightClickActionMenuProps> = ({
   return (
     <Popper
       popper={
-        <Menu className="right-click-action-menu" containsFlyout>
+        <Menu
+          className={classNames(
+            'right-click-action-menu',
+            prefix === FOLDER_SELECTOR_PREFIX ? 'right-click-action-menu--nested-1' : '',
+          )}
+          containsFlyout
+        >
           <MenuContent>
             <MenuList>
               {actions?.map((action) => (
@@ -39,9 +50,9 @@ const DefaultRightClickActionMenu: FC<DefaultRightClickActionMenuProps> = ({
           </MenuContent>
         </Menu>
       }
-      appendTo={triggerElement}
+      distance={MENU_DISTANCE}
       isVisible
-      position="end"
+      triggerRef={() => triggerElement.children.item(0) as HTMLElement}
     />
   );
 };
