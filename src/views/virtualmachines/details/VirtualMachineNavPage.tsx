@@ -1,5 +1,4 @@
-import React from 'react';
-import { useParams } from 'react-router-dom-v5-compat';
+import React, { useMemo } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
@@ -9,6 +8,7 @@ import {
 import HorizontalNavbar from '@kubevirt-utils/components/HorizontalNavbar/HorizontalNavbar';
 import { SidebarEditorProvider } from '@kubevirt-utils/components/SidebarEditor/SidebarEditorContext';
 import { getResourceDetailsTitle } from '@kubevirt-utils/constants/page-constants';
+import useMemoizedParams from '@kubevirt-utils/hooks/useMemoizedParams';
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-utils/models';
 import { getName } from '@kubevirt-utils/resources/shared';
 import useInstanceTypeExpandSpec from '@kubevirt-utils/resources/vm/hooks/useInstanceTypeExpandSpec';
@@ -26,7 +26,7 @@ const VirtualMachineNavPage: React.FC = () => {
     cluster,
     name,
     ns: namespace,
-  } = useParams<{
+  } = useMemoizedParams<{
     cluster?: string;
     name: string;
     ns: string;
@@ -43,31 +43,37 @@ const VirtualMachineNavPage: React.FC = () => {
         },
   );
 
-  const vmToShow = runningTourSignal.value ? tourGuideVM : vm;
+  const vmToShow = useMemo(() => (runningTourSignal.value ? tourGuideVM : vm), [vm]);
 
   const [instanceTypeExpandedSpec, expandedSpecLoading] = useInstanceTypeExpandSpec(vmToShow);
 
   const pages = useVirtualMachineTabs();
 
-  return (
-    <SidebarEditorProvider>
-      <DocumentTitle>{getResourceDetailsTitle(getName(vmToShow), 'VirtualMachine')}</DocumentTitle>
-      <VirtualMachineNavPageTitle
-        instanceTypeExpandedSpec={instanceTypeExpandedSpec}
-        isLoaded={isLoaded || !isEmpty(loadError)}
-        name={name}
-        vm={vmToShow}
-      />
-      <div className="VirtualMachineNavPage--tabs__main">
-        <HorizontalNavbar
-          error={loadError}
+  return useMemo(
+    () => (
+      <SidebarEditorProvider>
+        <DocumentTitle>
+          {getResourceDetailsTitle(getName(vmToShow), 'VirtualMachine')}
+        </DocumentTitle>
+
+        <VirtualMachineNavPageTitle
           instanceTypeExpandedSpec={instanceTypeExpandedSpec}
-          loaded={isLoaded && !expandedSpecLoading}
-          pages={pages}
+          isLoaded={isLoaded || !isEmpty(loadError)}
+          name={name}
           vm={vmToShow}
         />
-      </div>
-    </SidebarEditorProvider>
+        <div className="VirtualMachineNavPage--tabs__main">
+          <HorizontalNavbar
+            error={loadError}
+            instanceTypeExpandedSpec={instanceTypeExpandedSpec}
+            loaded={isLoaded && !expandedSpecLoading}
+            pages={pages}
+            vm={vmToShow}
+          />
+        </div>
+      </SidebarEditorProvider>
+    ),
+    [expandedSpecLoading, instanceTypeExpandedSpec, isLoaded, loadError, name, pages, vmToShow],
   );
 };
 

@@ -16,7 +16,11 @@ import VirtualMachineBasicLogViewer from './VirtualMachineBasicLogViewer/Virtual
 
 const VirtualMachineLogViewer = ({ connect, vm }) => {
   const { t } = useKubevirtTranslation();
-  const { loaded, pods, vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
+  const { loaded, pods, vmi } = useVMIAndPodsForVM(
+    vm?.metadata?.name,
+    vm?.metadata?.namespace,
+    vm?.cluster,
+  );
   const pod = getVMIPod(vmi, pods);
   const { featureEnabled: isClusterDisabledGuestSystemLogs } = useFeatures(
     DISABLED_GUEST_SYSTEM_LOGS_ACCESS,

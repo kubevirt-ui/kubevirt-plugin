@@ -10,8 +10,9 @@ import RestoreModal from '@kubevirt-utils/components/SnapshotModal/RestoreModal'
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { k8sDelete, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
+import { useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { ButtonVariant, Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
+import { fleetDeleteResource } from '@stolostron/multicluster-sdk';
 
 type SnapshotActionsMenuProps = {
   isRestoreDisabled: boolean;
@@ -55,7 +56,8 @@ const SnapshotActionsMenu: FC<SnapshotActionsMenuProps> = ({ isRestoreDisabled, 
     createModal(({ isOpen, onClose }) => (
       <TabModal<V1beta1VirtualMachineSnapshot>
         onSubmit={(obj) =>
-          k8sDelete({
+          fleetDeleteResource({
+            cluster: obj?.cluster,
             model: VirtualMachineSnapshotModel,
             resource: obj,
           })

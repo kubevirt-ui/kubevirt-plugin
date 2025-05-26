@@ -4,14 +4,15 @@ import { useEffect, useState } from 'react';
 import useWebSocket from 'react-use-websocket';
 
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { useFleetK8sAPIPath } from '@stolostron/multicluster-sdk';
 
 type UseVirtualMachineLogData = (args: { connect?: boolean; pod: K8sResourceCommon }) => {
   data: string[];
 };
 
 const useVirtualMachineLogData: UseVirtualMachineLogData = ({ connect = true, pod }) => {
-  const url = `/api/kubernetes/api/v1/namespaces/${pod?.metadata?.namespace}/pods/${pod?.metadata?.name}/log`;
+  const baseK8sPath = useFleetK8sAPIPath(pod?.cluster);
+  const url = `${baseK8sPath}/api/v1/namespaces/${pod?.metadata?.namespace}/pods/${pod?.metadata?.name}/log`;
 
   const socket = useWebSocket<{ object: K8sResourceCommon; type: string }>(
     `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}${url}`,

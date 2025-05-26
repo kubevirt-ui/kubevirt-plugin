@@ -7,7 +7,15 @@ declare module '@kubevirt-ui/kubevirt-api/kubevirt' {
     cluster?: string;
   }
 
+  interface V1beta1VirtualMachineSnapshot extends kubevirtUITypes.V1beta1VirtualMachineSnapshot {
+    cluster?: string;
+  }
+
   interface V1VirtualMachine extends kubevirtUITypes.V1VirtualMachine {
+    cluster?: string;
+  }
+  interface V1VirtualMachineInstanceMigration
+    extends kubevirtUITypes.V1VirtualMachineInstanceMigration {
     cluster?: string;
   }
 }

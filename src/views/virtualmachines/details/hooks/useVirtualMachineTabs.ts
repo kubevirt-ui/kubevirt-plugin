@@ -18,7 +18,7 @@ import VirtualMachineYAMLPage from '../tabs/yaml/VirtualMachineYAMLPage';
 export const useVirtualMachineTabs = () => {
   const { t } = useKubevirtTranslation();
 
-  const tabs = useMemo(
+  return useMemo(
     () => [
       {
         component: VirtualMachinesOverviewTab,
@@ -117,5 +117,4 @@ export const useVirtualMachineTabs = () => {
     ],
     [t],
   );
-  return tabs;
 };

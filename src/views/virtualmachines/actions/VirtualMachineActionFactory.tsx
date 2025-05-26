@@ -22,8 +22,9 @@ import {
 import { asAccessReview, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { Action, k8sPatch, Patch } from '@openshift-console/dynamic-plugin-sdk';
+import { Action, Patch } from '@openshift-console/dynamic-plugin-sdk';
 import { CopyIcon } from '@patternfly/react-icons';
+import { fleetPatchResource } from '@stolostron/multicluster-sdk';
 import VirtualMachineMigrateModal from '@virtualmachines/actions/components/VirtualMachineMigration/VirtualMachineMigrationModal';
 import { isDeletionProtectionEnabled } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
@@ -236,7 +237,7 @@ export const VirtualMachineActionFactory = {
             onSubmit={(folderName) => {
               const labels = vm?.metadata?.labels || {};
               labels[VM_FOLDER_LABEL] = folderName;
-              return k8sPatch({
+              return fleetPatchResource({
                 data: [
                   {
                     op: 'replace',

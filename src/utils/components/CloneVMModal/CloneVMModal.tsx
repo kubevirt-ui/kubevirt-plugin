@@ -54,7 +54,7 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
   const [initialCloneRequest, setInitialCloneRequest] = useState<V1beta1VirtualMachineClone>();
 
   const sendCloneRequest = async () => {
-    const vmSameName = await vmExist(cloneName, namespace);
+    const vmSameName = await vmExist(cloneName, namespace, source?.cluster);
 
     if (vmSameName) {
       throw new Error(t('VirtualMachine with this name already exists'));
@@ -72,13 +72,13 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
 
   useEffect(() => {
     if (cloneRequest?.status?.phase === CLONING_STATUSES.SUCCEEDED) {
-      startCloneVM && runVM(cloneName, namespace, vmUseRunning);
+      startCloneVM && runVM(cloneName, namespace, source?.cluster, vmUseRunning);
 
       navigate(`/k8s/ns/${namespace}/${VirtualMachineModelRef}/${cloneName}`);
 
       onClose();
     }
-  }, [cloneRequest, startCloneVM, cloneName, namespace, onClose, navigate, vmUseRunning]);
+  }, [cloneRequest, startCloneVM, cloneName, namespace, onClose, navigate, vmUseRunning, source]);
 
   return (
     <TabModal
