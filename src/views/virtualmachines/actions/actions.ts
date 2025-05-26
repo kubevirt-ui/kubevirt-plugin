@@ -19,6 +19,7 @@ import {
   k8sPatch,
   Patch,
 } from '@openshift-console/dynamic-plugin-sdk';
+import { getBaseURLApiPath } from '@stolostron/multicluster-sdk';
 
 import { createRollbackPatchData, deleteUnusedDataVolumes } from './utils';
 
@@ -44,6 +45,8 @@ export const VMActionRequest = async (
     metadata: { name, namespace },
   } = vm;
 
+  const k8sAPIPath = getBaseURLApiPath(vm?.cluster);
+
   try {
     // TODO: when this bz resolves https://bugzilla.redhat.com/show_bug.cgi?id=2056656
     // we can do the call to k8sUpdate instead of consoleFetch
@@ -56,7 +59,7 @@ export const VMActionRequest = async (
     //   path: action,
     // });
     // Promise.resolve(promise);
-    const url = `/api/kubernetes/apis/subresources.${model.apiGroup}/${model.apiVersion}/namespaces/${namespace}/${model.plural}/${name}/${action}`;
+    const url = `${k8sAPIPath}/apis/subresources.${model.apiGroup}/${model.apiVersion}/namespaces/${namespace}/${model.plural}/${name}/${action}`;
 
     const response = await consoleFetch(url, {
       body: body ? JSON.stringify(body) : undefined,
