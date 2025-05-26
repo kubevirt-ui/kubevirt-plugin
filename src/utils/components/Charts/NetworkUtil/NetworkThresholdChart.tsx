@@ -4,7 +4,7 @@ import xbytes from 'xbytes';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
+import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Chart,
   ChartArea,
@@ -14,6 +14,7 @@ import {
 } from '@patternfly/react-charts/victory';
 import chart_color_blue_300 from '@patternfly/react-tokens/dist/esm/chart_color_blue_300';
 import chart_color_blue_400 from '@patternfly/react-tokens/dist/esm/chart_color_blue_400';
+import { useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
 import { tickLabels } from '../ChartLabels/styleOverrides';
@@ -34,7 +35,8 @@ const NetworkThresholdChart: React.FC<NetworkThresholdChartProps> = ({ vmi }) =>
   );
   const { height, ref, width } = useResponsiveCharts();
 
-  const [networkIn] = usePrometheusPoll({
+  const [networkIn] = useFleetPrometheusPoll({
+    cluster: vmi?.cluster,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     endTime: currentTime,
     namespace: vmi?.metadata?.namespace,
@@ -42,7 +44,8 @@ const NetworkThresholdChart: React.FC<NetworkThresholdChartProps> = ({ vmi }) =>
     timespan,
   });
 
-  const [networkOut] = usePrometheusPoll({
+  const [networkOut] = useFleetPrometheusPoll({
+    cluster: vmi?.cluster,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     endTime: currentTime,
     namespace: vmi?.metadata?.namespace,

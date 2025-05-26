@@ -3,7 +3,7 @@ import xbytes from 'xbytes';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
+import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Chart,
   ChartArea,
@@ -12,6 +12,7 @@ import {
   ChartVoronoiContainer,
 } from '@patternfly/react-charts/victory';
 import chart_color_blue_300 from '@patternfly/react-tokens/dist/esm/chart_color_blue_300';
+import { useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
 import ComponentReady from '../ComponentReady/ComponentReady';
@@ -33,7 +34,8 @@ const StorageReadThresholdChart: React.FC<StorageThresholdChartProps> = ({ vmi }
   );
   const { height, ref, width } = useResponsiveCharts();
 
-  const [data] = usePrometheusPoll({
+  const [data] = useFleetPrometheusPoll({
+    cluster: vmi?.cluster,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     endTime: currentTime,
     namespace: vmi?.metadata?.namespace,

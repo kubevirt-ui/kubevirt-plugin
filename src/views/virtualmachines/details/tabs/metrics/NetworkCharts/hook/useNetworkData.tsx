@@ -7,11 +7,8 @@ import {
   getPrometheusDataByNic,
   queriesToLink,
 } from '@kubevirt-utils/components/Charts/utils/utils';
-import {
-  PrometheusEndpoint,
-  PrometheusResult,
-  usePrometheusPoll,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { PrometheusEndpoint, PrometheusResult } from '@openshift-console/dynamic-plugin-sdk';
+import { useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';
 
 import useDuration from '../../hooks/useDuration';
 import { ALL_NETWORKS } from '../../utils/constants';
@@ -36,28 +33,32 @@ const useNetworkData: UseNetworkData = (vmi, nic) => {
   );
   const isAllNetwork = nic === ALL_NETWORKS;
 
-  const [networkByNICTotal] = usePrometheusPoll({
+  const [networkByNICTotal] = useFleetPrometheusPoll({
+    cluster: vmi?.cluster,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     endTime: currentTime,
     namespace: vmi?.metadata?.namespace,
     query: queries?.NETWORK_TOTAL_BY_INTERFACE_USAGE,
     timespan,
   });
-  const [networkByNICIn] = usePrometheusPoll({
+  const [networkByNICIn] = useFleetPrometheusPoll({
+    cluster: vmi?.cluster,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     endTime: currentTime,
     namespace: vmi?.metadata?.namespace,
     query: queries?.NETWORK_IN_BY_INTERFACE_USAGE,
     timespan,
   });
-  const [networkByNICOut] = usePrometheusPoll({
+  const [networkByNICOut] = useFleetPrometheusPoll({
+    cluster: vmi?.cluster,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     endTime: currentTime,
     namespace: vmi?.metadata?.namespace,
     query: queries?.NETWORK_OUT_BY_INTERFACE_USAGE,
     timespan,
   });
-  const [networkTotal] = usePrometheusPoll({
+  const [networkTotal] = useFleetPrometheusPoll({
+    cluster: vmi?.cluster,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     endTime: currentTime,
     namespace: vmi?.metadata?.namespace,
@@ -65,7 +66,8 @@ const useNetworkData: UseNetworkData = (vmi, nic) => {
     timespan,
   });
 
-  const [networkIn] = usePrometheusPoll({
+  const [networkIn] = useFleetPrometheusPoll({
+    cluster: vmi?.cluster,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     endTime: currentTime,
     namespace: vmi?.metadata?.namespace,
@@ -73,13 +75,15 @@ const useNetworkData: UseNetworkData = (vmi, nic) => {
     timespan,
   });
 
-  const [networkOut] = usePrometheusPoll({
+  const [networkOut] = useFleetPrometheusPoll({
+    cluster: vmi?.cluster,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     endTime: currentTime,
     namespace: vmi?.metadata?.namespace,
     query: isAllNetwork && queries?.NETWORK_OUT_USAGE,
     timespan,
   });
+
   return {
     data: {
       in: [

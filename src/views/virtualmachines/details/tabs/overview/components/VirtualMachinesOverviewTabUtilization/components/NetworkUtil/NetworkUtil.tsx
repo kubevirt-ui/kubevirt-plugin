@@ -9,8 +9,9 @@ import { getUtilizationQueries } from '@kubevirt-utils/components/Charts/utils/q
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
+import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import { Button, ButtonVariant, Content, ContentVariants, Popover } from '@patternfly/react-core';
+import { useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
 type NetworkUtilProps = {
@@ -25,21 +26,24 @@ const NetworkUtil: React.FC<NetworkUtilProps> = ({ vmi }) => {
     [vmi, duration],
   );
   const interfacesNames = useMemo(() => vmi?.spec?.domain?.devices?.interfaces, [vmi]);
-  const [networkIn] = usePrometheusPoll({
+  const [networkIn] = useFleetPrometheusPoll({
+    cluster: vmi?.cluster,
     endpoint: PrometheusEndpoint?.QUERY,
     endTime: currentTime,
     namespace: vmi?.metadata?.namespace,
     query: queries?.NETWORK_IN_USAGE,
   });
 
-  const [networkTotal] = usePrometheusPoll({
+  const [networkTotal] = useFleetPrometheusPoll({
+    cluster: vmi?.cluster,
     endpoint: PrometheusEndpoint?.QUERY,
     endTime: currentTime,
     namespace: vmi?.metadata?.namespace,
     query: queries?.NETWORK_TOTAL_BY_INTERFACE_USAGE,
   });
 
-  const [networkOut] = usePrometheusPoll({
+  const [networkOut] = useFleetPrometheusPoll({
+    cluster: vmi?.cluster,
     endpoint: PrometheusEndpoint?.QUERY,
     endTime: currentTime,
     namespace: vmi?.metadata?.namespace,

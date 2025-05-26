@@ -12,7 +12,7 @@ import { RUNSTRATEGY_ALWAYS } from '@kubevirt-utils/constants/constants';
 import { MAX_K8S_NAME_LENGTH } from '@kubevirt-utils/utils/constants';
 import { isVM } from '@kubevirt-utils/utils/typeGuards';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
-import { k8sCreate, k8sGet, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
+import { fleetCreate, fleetGet, fleetPatchResource } from '@stolostron/multicluster-sdk';
 
 const cloneVMToVM: V1alpha1VirtualMachineClone = {
   apiVersion: `${VirtualMachineCloneModel.apiGroup}/${VirtualMachineCloneModel.apiVersion}`,
@@ -56,14 +56,15 @@ export const cloneVM = (
     );
   });
 
-  return k8sCreate<V1alpha1VirtualMachineClone>({
+  return fleetCreate<V1alpha1VirtualMachineClone>({
+    cluster: source?.cluster,
     data: cloningRequest,
     model: VirtualMachineCloneModel,
   });
 };
 
-export const runVM = (vmName: string, vmNamespace: string, useRunning = false) =>
-  k8sPatch({
+export const runVM = (vmName: string, vmNamespace: string, cluster?: string, useRunning = false) =>
+  fleetPatchResource({
     data: [
       useRunning
         ? {
@@ -80,13 +81,15 @@ export const runVM = (vmName: string, vmNamespace: string, useRunning = false) =
     model: VirtualMachineModel,
     resource: {
       apiVersion: VirtualMachineModel.apiVersion,
+      cluster,
       kind: VirtualMachineModel.kind,
       metadata: { name: vmName, namespace: vmNamespace },
     },
   });
 
-export const vmExist = (vmName: string, vmNamespace: string) =>
-  k8sGet<V1VirtualMachine>({
+export const vmExist = (vmName: string, vmNamespace: string, cluster?: string) =>
+  fleetGet<V1VirtualMachine>({
+    cluster,
     model: VirtualMachineModel,
     name: vmName,
     ns: vmNamespace,

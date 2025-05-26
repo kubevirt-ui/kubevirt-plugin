@@ -11,14 +11,13 @@ import {
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getUpdateStrategy } from '@kubevirt-utils/resources/vm';
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
+import { consoleFetch, K8sModel, Patch } from '@openshift-console/dynamic-plugin-sdk';
 import {
-  consoleFetch,
-  k8sCreate,
-  k8sDelete,
-  K8sModel,
-  k8sPatch,
-  Patch,
-} from '@openshift-console/dynamic-plugin-sdk';
+  fleetCreate,
+  fleetDeleteResource,
+  fleetPatchResource,
+  getBaseURLApiPath,
+} from '@stolostron/multicluster-sdk';
 
 import { createRollbackPatchData, deleteUnusedDataVolumes } from './utils';
 
@@ -44,6 +43,8 @@ export const VMActionRequest = async (
     metadata: { name, namespace },
   } = vm;
 
+  const k8sAPIPath = getBaseURLApiPath(vm?.cluster);
+
   try {
     // TODO: when this bz resolves https://bugzilla.redhat.com/show_bug.cgi?id=2056656
     // we can do the call to k8sUpdate instead of consoleFetch
@@ -56,7 +57,7 @@ export const VMActionRequest = async (
     //   path: action,
     // });
     // Promise.resolve(promise);
-    const url = `/api/kubernetes/apis/subresources.${model.apiGroup}/${model.apiVersion}/namespaces/${namespace}/${model.plural}/${name}/${action}`;
+    const url = `${k8sAPIPath}/apis/subresources.${model.apiGroup}/${model.apiVersion}/namespaces/${namespace}/${model.plural}/${name}/${action}`;
 
     const response = await consoleFetch(url, {
       body: body ? JSON.stringify(body) : undefined,
@@ -96,7 +97,8 @@ export const migrateVM = async (vm: V1VirtualMachine) => {
       vmiName: name,
     },
   };
-  await k8sCreate({
+  await fleetCreate({
+    cluster: vm?.cluster,
     data: migrationData,
     model: VirtualMachineInstanceMigrationModel,
     ns: namespace,
@@ -104,14 +106,16 @@ export const migrateVM = async (vm: V1VirtualMachine) => {
 };
 
 export const cancelMigration = async (vmim: V1VirtualMachineInstanceMigration) => {
-  await k8sDelete({
+  await fleetDeleteResource({
+    cluster: vmim?.cluster,
     model: VirtualMachineInstanceMigrationModel,
     resource: vmim,
   });
 };
 
 export const deleteVM = async (vm: V1VirtualMachine) => {
-  await k8sDelete({
+  await fleetDeleteResource({
+    cluster: vm?.cluster,
     model: VirtualMachineModel,
     resource: vm,
   });
@@ -127,7 +131,8 @@ export const rollbackStorageMigration = async (vm: V1VirtualMachine) => {
     path: '/spec/updateVolumesStrategy',
   });
 
-  await k8sPatch<V1VirtualMachine>({
+  await fleetPatchResource<V1VirtualMachine>({
+    cluster: vm?.cluster,
     data: patchData,
     model: VirtualMachineModel,
     resource: vm,
