@@ -18,9 +18,11 @@ const useGuestOS: UseGuestOS = (vmi) => {
   const [data, setData] = React.useState<V1VirtualMachineInstanceGuestAgentInfo>({});
   const [error, setError] = React.useState(null);
   const isGuestAgent = isGuestAgentConnected(vmi);
-  const k8sAPIPath = useFleetK8sAPIPath(vmi.cluster);
+  const [k8sAPIPath, k8sApiPathLoaded] = useFleetK8sAPIPath(vmi.cluster);
 
   React.useEffect(() => {
+    if (!k8sApiPathLoaded) return;
+
     setError(null);
     const namespace = vmi?.metadata?.namespace;
     const name = vmi?.metadata?.name;
@@ -41,7 +43,7 @@ const useGuestOS: UseGuestOS = (vmi) => {
     } else {
       setLoaded(true);
     }
-  }, [vmi, isGuestAgent, k8sAPIPath]);
+  }, [vmi, isGuestAgent, k8sAPIPath, k8sApiPathLoaded]);
 
   return [data, loaded, error, isGuestAgent];
 };

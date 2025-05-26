@@ -22,9 +22,13 @@ const useInstanceTypeExpandSpec: UseInstanceTypeExpandSpec = (vm) => {
   const [errorExpandedSpec, setErrorExpandedSpec] = useState<Error>();
   const isInstanceType = useMemo(() => isInstanceTypeVM(vm), [vm]);
   const innerVM = useDeepCompareMemoize(vm);
-  const k8sAPIPath = useFleetK8sAPIPath(vm?.cluster);
+  const [k8sAPIPath, k8sApiPathLoaded] = useFleetK8sAPIPath(vm?.cluster);
 
   useEffect(() => {
+    if (!k8sApiPathLoaded) {
+      return;
+    }
+
     const fetch = async () => {
       const url = `${k8sAPIPath}/apis/subresources.${VirtualMachineModel.apiGroup}/${
         VirtualMachineModel.apiVersion
@@ -45,7 +49,7 @@ const useInstanceTypeExpandSpec: UseInstanceTypeExpandSpec = (vm) => {
       }
     };
     !isEmpty(innerVM) && isInstanceType && fetch();
-  }, [innerVM, isInstanceType, k8sAPIPath]);
+  }, [innerVM, isInstanceType, k8sAPIPath, k8sApiPathLoaded]);
 
   return [instanceTypeExpandedSpec, loadingExpandedSpec, errorExpandedSpec];
 };

@@ -16,9 +16,11 @@ export const useGuestOS: UseGuestOS = (vmi) => {
   const [loaded, setLoaded] = useState(false);
   const [data, setData] = useState<V1VirtualMachineInstanceGuestAgentInfo>({});
   const [error, setError] = useState(null);
-  const k8sAPIPath = useFleetK8sAPIPath(vmi?.cluster);
+  const [k8sAPIPath, k8sApiPathLoaded] = useFleetK8sAPIPath(vmi?.cluster);
 
   useEffect(() => {
+    if (!k8sApiPathLoaded) return;
+
     const guestOS = vmi?.status?.guestOSInfo?.id;
 
     setError(null);
@@ -36,7 +38,7 @@ export const useGuestOS: UseGuestOS = (vmi) => {
       });
     }
     (!vmi || (!guestOS && vmi?.metadata)) && setLoaded(true);
-  }, [k8sAPIPath, loaded, vmi]);
+  }, [k8sAPIPath, loaded, vmi, k8sApiPathLoaded]);
 
   return [data, loaded, error];
 };

@@ -8,7 +8,7 @@ import {
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { fleetCreate } from '@stolostron/multicluster-sdk';
+import { fleetK8sCreate } from '@stolostron/multicluster-sdk';
 
 import { getVMRestoreSnapshotResource } from '../../../views/virtualmachines/details/tabs/snapshots/utils/helpers';
 
@@ -31,7 +31,7 @@ const RestoreModal: FC<DeleteResourceModalProps> = ({ isOpen, onClose, snapshot 
   return (
     <TabModal<V1beta1VirtualMachineRestore>
       onSubmit={(obj) =>
-        fleetCreate({
+        fleetK8sCreate({
           cluster: snapshot?.cluster,
           data: obj,
           model: VirtualMachineRestoreModel,

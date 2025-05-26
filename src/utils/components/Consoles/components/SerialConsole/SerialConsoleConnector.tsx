@@ -38,7 +38,7 @@ const SerialConsoleConnector: FC<SerialConsoleConnectorProps> = ({ onConnect, vm
 
   const terminalRef = useRef(null);
   const [socket, setSocket] = useState<WebSocket>(null);
-  const k8sAPIPath = useFleetK8sAPIPath(vmi.cluster);
+  const [k8sAPIPath, k8sAPIPathLoaded] = useFleetK8sAPIPath(vmi.cluster);
 
   const connect = useCallback(() => {
     if (socket) {
@@ -83,11 +83,12 @@ const SerialConsoleConnector: FC<SerialConsoleConnectorProps> = ({ onConnect, vm
     };
     setSocket(createdSocket);
     onConnect?.(createdSocket);
-  }, [socket, vmi?.metadata?.namespace, vmi?.metadata?.name, onConnect, pasteText]);
+  }, [socket, vmi?.metadata?.namespace, vmi?.metadata?.name, onConnect, pasteText, k8sAPIPath]);
 
   useEffect(() => {
+    if (!k8sAPIPathLoaded) return;
     !socket && connect();
-  }, [connect, socket]);
+  }, [connect, socket, k8sAPIPathLoaded]);
 
   return (
     <>

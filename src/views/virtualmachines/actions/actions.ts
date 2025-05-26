@@ -10,7 +10,7 @@ import {
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { consoleFetch, K8sModel } from '@openshift-console/dynamic-plugin-sdk';
-import { fleetCreate, fleetDeleteResource, getBaseURLApiPath } from '@stolostron/multicluster-sdk';
+import { fleetK8sCreate, fleetK8sDelete, getFleetK8sAPIPath } from '@stolostron/multicluster-sdk';
 
 const generateRandomString = () => Math.random().toString(36).substring(2, 7);
 
@@ -34,9 +34,8 @@ export const VMActionRequest = async (
     metadata: { name, namespace },
   } = vm;
 
-  const k8sAPIPath = getBaseURLApiPath(vm?.cluster);
-
   try {
+    const k8sAPIPath = await getFleetK8sAPIPath(vm?.cluster);
     // TODO: when this bz resolves https://bugzilla.redhat.com/show_bug.cgi?id=2056656
     // we can do the call to k8sUpdate instead of consoleFetch
 
@@ -88,7 +87,7 @@ export const migrateVM = async (vm: V1VirtualMachine) => {
       vmiName: name,
     },
   };
-  await fleetCreate({
+  await fleetK8sCreate({
     cluster: vm?.cluster,
     data: migrationData,
     model: VirtualMachineInstanceMigrationModel,
@@ -97,7 +96,7 @@ export const migrateVM = async (vm: V1VirtualMachine) => {
 };
 
 export const cancelMigration = async (vmim: V1VirtualMachineInstanceMigration) => {
-  await fleetDeleteResource({
+  await fleetK8sDelete({
     cluster: vmim?.cluster,
     model: VirtualMachineInstanceMigrationModel,
     resource: vmim,
@@ -105,7 +104,7 @@ export const cancelMigration = async (vmim: V1VirtualMachineInstanceMigration) =
 };
 
 export const deleteVM = async (vm: V1VirtualMachine) => {
-  await fleetDeleteResource({
+  await fleetK8sDelete({
     cluster: vm?.cluster,
     model: VirtualMachineModel,
     resource: vm,
