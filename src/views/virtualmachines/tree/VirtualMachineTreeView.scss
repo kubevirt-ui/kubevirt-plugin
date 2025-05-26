@@ -16,10 +16,6 @@
     z-index: 100;
   }
 
-  .right-click-action-menu {
-    transform: translateY(30px) translateX(50px);
-  }
-
   &__toolbar-section {
     width: 100%;
   }
@@ -80,9 +76,17 @@
   }
 }
 
-.right-click-action-menu--vm {
+.right-click-action-menu {
   min-width: 0 !important;
+  margin-left: 2.5rem;
+}
+
+.right-click-action-menu--nested-1 {
   margin-left: 3.5rem;
+}
+
+.right-click-action-menu--nested-2 {
+  margin-left: 4.5rem;
 }
 
 .pf-v6-c-drawer__body.vms-tree-view-body {
