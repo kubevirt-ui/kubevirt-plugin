@@ -75,7 +75,7 @@ const StorageMigrationRow: FC<StorageMigrationRowProps> = ({
       <TableData
         activeColumnIDs={activeColumnIDs}
         className="pf-v6-c-table__action"
-        id="actions"
+        id=""
       ></TableData>
     </>
   );

@@ -44,7 +44,7 @@ const SnapshotRow: React.FC<
       <TableData activeColumnIDs={activeColumnIDs} id="indications">
         <IndicationLabelList snapshot={snapshot} />
       </TableData>
-      <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="actions">
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="">
         <SnapshotActionsMenu isRestoreDisabled={isRestoreDisabled} snapshot={snapshot} />
       </TableData>
     </>

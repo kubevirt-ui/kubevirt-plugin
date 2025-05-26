@@ -37,7 +37,7 @@ const AffinityRow: React.FC<
       <TableData activeColumnIDs={activeColumnIDs} id="terms">
         <div>{expressionsLabel}</div> <div>{fieldsLabel}</div>
       </TableData>
-      <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="actions">
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="">
         <AffinityRowActionsDropdown affinity={affinity} onDelete={onDelete} onEdit={onEdit} />
       </TableData>
     </>
