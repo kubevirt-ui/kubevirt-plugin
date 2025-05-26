@@ -33,7 +33,7 @@ const ClusterInstancetypeRow: FC<RowProps<V1beta1VirtualMachineClusterInstancety
     <TableData activeColumnIDs={activeColumnIDs} id="vendor">
       {getLabel(it, VENDOR_LABEL, NO_DATA_DASH)}
     </TableData>
-    <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="actions">
+    <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="">
       <ClusterInstancetypeActions instanceType={it} isKebabToggle />
     </TableData>
   </>

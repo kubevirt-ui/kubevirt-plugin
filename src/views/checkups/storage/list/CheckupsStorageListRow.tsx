@@ -56,7 +56,7 @@ const CheckupsStorageListRow = ({
       <TableData activeColumnIDs={activeColumnIDs} id="complete-time">
         <Timestamp timestamp={configMap?.data?.[STATUS_COMPILATION_TIME_STAMP]} />
       </TableData>
-      <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="actions">
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="">
         <CheckupsStorageActions
           configMap={configMap}
           isKebab

@@ -123,7 +123,7 @@ const DiskRow: FC<
       <TableData activeColumnIDs={activeColumnIDs} id="storage-class">
         {storageClass}
       </TableData>
-      <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="actions">
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="">
         <DiskRowActions customize={customize} obj={obj} onDiskUpdate={onSubmit} vm={vm} vmi={vmi} />
       </TableData>
     </>
