@@ -1,5 +1,4 @@
-import { useCallback } from 'react';
-
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
 import { ANNOTATIONS, OS_NAME_LABELS } from '@kubevirt-utils/resources/template';
@@ -10,17 +9,23 @@ import {
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
-export const useOSFilter = (): RowFilter => {
-  const getOSName = useCallback((obj) => {
+export const useOSFilter = (): RowFilter<V1VirtualMachine> => {
+  const getOSName = (obj: V1VirtualMachine) => {
     const osAnnotation = getAnnotation(obj?.spec?.template, ANNOTATIONS.os);
     const osLabel = getOperatingSystemName(obj) || getOperatingSystem(obj);
+    const osPreference = obj?.spec?.preference?.name;
+
+    const termStartsWithOSName = (os: string, term?: string) =>
+      term?.toLowerCase()?.startsWith(os.toLowerCase());
+
     const osName = Object.values(OS_NAME_LABELS).find(
       (osKey) =>
-        osAnnotation?.toLowerCase()?.startsWith(osKey?.toLowerCase()) ||
-        osLabel?.toLowerCase()?.startsWith(osKey?.toLowerCase()),
+        termStartsWithOSName(osKey, osAnnotation) ||
+        termStartsWithOSName(osKey, osLabel) ||
+        termStartsWithOSName(osKey, osPreference),
     );
     return osName;
-  }, []);
+  };
 
   return {
     filter: (selectedOS, obj) => {
