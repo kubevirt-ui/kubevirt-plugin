@@ -13,7 +13,6 @@ describe('Prepare the cluster for test', () => {
   });
 
   it('switch to Virtualization perspective and default project', () => {
-    cy.scrollTo('top');
     cy.switchToVirt();
     cy.switchProject(TEST_NS);
   });

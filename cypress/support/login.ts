@@ -46,7 +46,9 @@ Cypress.Commands.add('login', (provider: string, username: string, password: str
         cy.get(tour).click();
       }
     });
-    cy.byTestID('user-dropdown', { timeout: 5 * MINUTE }).should('be.visible');
+    cy.byTestID(['user-dropdown-toggle', 'user-dropdown'], { timeout: 5 * MINUTE }).should(
+      'be.visible',
+    );
   });
 });
 
@@ -58,7 +60,7 @@ Cypress.Commands.add('logout', () => {
       return;
     }
     cy.task('log', '  Logging out');
-    cy.byTestID('user-dropdown').click();
+    cy.byTestID(['user-dropdown-toggle', 'user-dropdown']).click();
     cy.byTestID('log-out').should('be.visible');
     // eslint-disable-next-line cypress/no-force
     cy.byTestID('log-out').click();

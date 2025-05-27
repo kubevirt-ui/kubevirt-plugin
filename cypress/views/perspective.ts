@@ -15,7 +15,9 @@ const toggle = '[data-test-id="perspective-switcher-toggle"]';
 const menu = '[data-test-id="perspective-switcher-menu"]';
 
 export const switchPerspective = (perspective: Perspective) => {
-  cy.get(header, { timeout: 5 * MINUTE }).should('be.visible');
+  cy.get(header, { timeout: 5 * MINUTE })
+    .scrollIntoView()
+    .should('be.visible');
   cy.wait(10 * SECOND);
   cy.get(header).within(($title) => {
     if ($title.find('h2').text() == perspective) {
@@ -24,7 +26,7 @@ export const switchPerspective = (perspective: Perspective) => {
     }
     cy.get(toggle).click();
     cy.get(menu).should('be.visible');
-    cy.contains(option, perspective).click();
+    cy.contains(option, perspective).closest('button').click();
     cy.task('log', `Switching to [${perspective}]`);
   });
 };
