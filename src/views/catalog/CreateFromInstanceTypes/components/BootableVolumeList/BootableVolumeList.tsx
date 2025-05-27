@@ -16,7 +16,7 @@ import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/type
 import { convertResourceArrayToMap, getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
-import { FormGroup, Split, SplitItem } from '@patternfly/react-core';
+import { FormGroup, Skeleton, Split, SplitItem } from '@patternfly/react-core';
 
 import BootableVolumeEmptyState from '../BootableVolumeEmptyState/BootableVolumeEmptyState';
 
@@ -100,7 +100,9 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
     }
   }, [isAdmin, volumeListNamespace, setVolumeListNamespace]);
 
-  const displayVolumes = !isEmpty(bootableVolumes) && loaded && loadedColumns;
+  const isVolumesLoaded = loaded && loadedColumns;
+  const isEmptyVolumes = isEmpty(bootableVolumes);
+  const displayVolumes = isVolumesLoaded && !isEmptyVolumes;
 
   const onModalBootableVolumeSelect = (modalSelectedVolume: BootableVolume) => {
     const selectedVolumeIndex = sortedData?.findIndex(
@@ -145,8 +147,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
                 data={unfilteredData}
                 hideLabelFilter
                 hideNameLabelFilters={!displayShowAllButton}
-                loaded={Boolean(loaded) && loadedColumns}
-                // nameFilter={!displayShowAllButton && "modal-name"} can remove comment once this merged https://github.com/openshift/console/pull/12438 and build into new SDK version
+                loaded={loaded && loadedColumns}
                 rowFilters={filters}
               />
             </SplitItem>
@@ -170,7 +171,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
           </>
         )}
       </Split>
-      {displayVolumes ? (
+      {displayVolumes && (
         <>
           <BootableVolumeTable
             selectedBootableVolumeState={
@@ -187,8 +188,14 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
           />
           <BootableVolumesPipelinesHint bootableVolumes={bootableVolumes} />
         </>
-      ) : (
-        <BootableVolumeEmptyState />
+      )}
+      {isVolumesLoaded && isEmptyVolumes && <BootableVolumeEmptyState />}
+      {!isVolumesLoaded && (
+        <>
+          <Skeleton className="pf-v6-u-my-md" />
+          <Skeleton className="pf-v6-u-my-md" />
+          <Skeleton className="pf-v6-u-my-md" />
+        </>
       )}
     </>
   );

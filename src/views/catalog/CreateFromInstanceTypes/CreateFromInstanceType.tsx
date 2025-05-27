@@ -50,15 +50,10 @@ const CreateFromInstanceType: FC<CreateFromInstanceTypeProps> = ({ currentTab })
   const [favorites = [], updaterFavorites, loadedFavorites] =
     useKubevirtUserSettings('favoriteBootableVolumes');
 
-  if (
-    !bootableVolumesData?.loaded ||
-    !instanceTypesAndPreferencesData?.loaded ||
-    !loaded ||
-    (!loadedFavorites && !favorites)
-  ) {
+  if (!instanceTypesAndPreferencesData?.loaded || !loaded || (!loadedFavorites && !favorites)) {
     return (
       <Bullseye className="create-vm-instance-type-section__page-loader">
-        <Loading />
+        <Loading size="lg" />
       </Bullseye>
     );
   }
