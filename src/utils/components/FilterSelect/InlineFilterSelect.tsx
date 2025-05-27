@@ -5,7 +5,6 @@ import {
   Divider,
   MenuSearch,
   MenuSearchInput,
-  MenuToggleProps,
   SearchInput,
   Select,
   SelectList,
@@ -13,7 +12,7 @@ import {
   SelectProps,
 } from '@patternfly/react-core';
 
-import SelectToggle from '../toggles/SelectToggle';
+import SelectToggle, { MenuTogglePropsWithTestId } from '../toggles/SelectToggle';
 
 import InlineFilterSelectOptionContent from './components/InlineFilterSelectOptionContent';
 import InlineFilterSelectOptions from './components/InlineFilterSelectOptions';
@@ -32,7 +31,7 @@ type InlineFilterSelectProps = {
   selected: string;
   selectProps?: Omit<SelectProps, 'toggle'>;
   setSelected: (val: string) => void;
-  toggleProps?: MenuToggleProps;
+  toggleProps?: MenuTogglePropsWithTestId;
 };
 
 const InlineFilterSelect: FC<InlineFilterSelectProps> = ({

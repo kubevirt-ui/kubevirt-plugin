@@ -30,8 +30,8 @@ describe('Prepare the cluster for test', () => {
       if ($body.text().includes(TEST_SECRET_NAME)) {
         cy.task('log', 'secret is configured');
       } else {
-        cy.contains('Select project').click();
-        cy.byLegacyTestID(TEST_NS).click({ force: true });
+        cy.byLegacyTestID('select-project-toggle').click();
+        cy.byLegacyTestID(`select-option-${TEST_NS}`).click({ force: true });
         cy.get('button.project-ssh-row__secret-name').click();
         cy.get(useExisting).click();
         cy.contains('Select secret').click();
