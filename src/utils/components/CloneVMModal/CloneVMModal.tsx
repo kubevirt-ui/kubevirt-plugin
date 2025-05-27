@@ -36,7 +36,7 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
   const namespace = source?.metadata?.namespace;
 
   const [cloneName, setCloneName] = useState(
-    `${source?.metadata?.name}-${isVM(source) && 'clone-'}${getRandomChars()}`.substring(
+    `${source?.metadata?.name}${isVM(source) ? '-clone-' : '-'}${getRandomChars()}`.substring(
       0,
       MAX_K8S_NAME_LENGTH,
     ),
