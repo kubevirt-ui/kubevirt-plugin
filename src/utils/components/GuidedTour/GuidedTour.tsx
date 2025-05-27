@@ -25,9 +25,11 @@ const GuidedTour: FC = () => {
       callback={(callbackProps: CallBackProps) => {
         const { action, index, size, step, type } = callbackProps;
         const route = step?.data?.route;
-        if (step?.target === '#tour-step-ssh') {
-          document.getElementById('tour-step-ssh')?.scrollIntoView();
+
+        if (typeof step?.target === 'string') {
+          document.querySelector(step.target)?.scrollIntoView();
         }
+
         if (!isEmpty(route) && location.pathname !== route) {
           navigate(route);
         }
