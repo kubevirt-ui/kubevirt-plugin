@@ -3,22 +3,21 @@ import React, { FC } from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import ConnectToConsole from '../ConnectToConsole';
+import { CustomConnectComponentProps } from '../vnc-console/utils/VncConsoleTypes';
 
-import { CustomConnectComponentProps } from './utils/VncConsoleTypes';
-
-const VncConnect: FC<CustomConnectComponentProps> = ({ connect, isConnecting }) => {
+const SerialConnect: FC<CustomConnectComponentProps> = ({ connect, isConnecting }) => {
   const { t } = useKubevirtTranslation();
   return (
     <ConnectToConsole
       {...{
         connect,
-        connectingMsg: t('Connecting'),
+        connectingMsg: t('Loading ...'),
         connectMsg: t('Connect'),
         isConnecting,
-        message: t('Click Connect to open the VNC console.'),
+        message: t('Click Connect to open serial console.'),
       }}
     />
   );
 };
 
-export default VncConnect;
+export default SerialConnect;
