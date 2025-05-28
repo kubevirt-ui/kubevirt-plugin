@@ -16,6 +16,7 @@ const SearchSuggestBoxFooter: FC<SearchSuggestBoxFooterProps> = ({ onAdvancedSea
       <Divider />
       <PanelFooter className="pf-v6-u-py-md">
         <Button
+          data-test="results-advanced-search"
           icon={<SlidersHIcon />}
           iconPosition="end"
           onClick={onAdvancedSearchClick}

@@ -95,6 +95,7 @@ const SearchSuggestBox: FC<SearchSuggestBoxProps> = ({
                           onClick={() => {
                             showSearchModal();
                           }}
+                          data-test="try-advanced-search"
                           icon={<SlidersHIcon />}
                           iconPosition="end"
                           isInline

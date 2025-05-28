@@ -84,6 +84,7 @@ const SavedSearchesDropdown: FC = () => {
             {name}
           </DropdownItem>
         ))}
+        data-test={`saved-searches`}
       </DropdownList>
     );
   };
