@@ -41,9 +41,6 @@ const GuidedTour: FC = () => {
 
         if (type === EVENTS.STEP_AFTER) {
           if (action === ACTIONS.PREV) {
-            if (step.target === '#tour-step-ssh') {
-              document.getElementById('tour-step-ssh')?.scrollIntoView();
-            }
             prevStep();
 
             return;
