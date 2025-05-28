@@ -11,7 +11,6 @@ import { isRunning } from '@virtualmachines/utils';
 import './CPUMemory.scss';
 
 type CPUMemoryProps = {
-  fetchVMI?: boolean;
   vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };

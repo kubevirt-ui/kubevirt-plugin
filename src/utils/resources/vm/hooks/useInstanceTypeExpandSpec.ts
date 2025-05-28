@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import useDeepCompareMemoize from '@kubevirt-utils/hooks/useDeepCompareMemoize/useDeepCompareMemoize';
-import { isInstanceTypeVM } from '@kubevirt-utils/resources/instancetype/helper';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import {
+  getInstanceTypeExpandSpecURL,
+  isInstanceTypeVM,
+} from '@kubevirt-utils/resources/instancetype/helper';
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { consoleFetch } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -24,11 +25,7 @@ const useInstanceTypeExpandSpec: UseInstanceTypeExpandSpec = (vm) => {
 
   useEffect(() => {
     const fetch = async () => {
-      const url = `api/kubernetes/apis/subresources.${VirtualMachineModel.apiGroup}/${
-        VirtualMachineModel.apiVersion
-      }/namespaces/${getNamespace(innerVM)}/${VirtualMachineModel.plural}/${getName(
-        innerVM,
-      )}/expand-spec`;
+      const url = getInstanceTypeExpandSpecURL(innerVM);
 
       setLoadingExpandedSpec(true);
       try {
