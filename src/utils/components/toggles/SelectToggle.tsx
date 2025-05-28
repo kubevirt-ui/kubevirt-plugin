@@ -2,8 +2,11 @@ import React, { Ref } from 'react';
 
 import { MenuToggle, MenuToggleElement, MenuToggleProps } from '@patternfly/react-core';
 
-type SelectToggleProps = MenuToggleProps & {
+export type MenuTogglePropsWithTestId = MenuToggleProps & {
   'data-test-id'?: string;
+};
+
+type SelectToggleProps = MenuTogglePropsWithTestId & {
   selected: any;
 };
 

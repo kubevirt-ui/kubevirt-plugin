@@ -83,9 +83,13 @@ const SSHAuthKeyRow: FC<SSHAuthKeyRowProps> = ({
               groupVersionKind: modelToGroupVersionKind(ProjectModel),
               value: opt,
             }))}
+            toggleProps={{
+              'data-test-id': 'select-project-toggle',
+              isFullWidth: true,
+              placeholder: t('Select project'),
+            }}
             selected={projectName}
             setSelected={(newProject) => onAuthKeyChange({ ...row, projectName: newProject })}
-            toggleProps={{ isFullWidth: true, placeholder: t('Select project') }}
           />
         ) : (
           <Truncate content={projectName} />
