@@ -16,11 +16,13 @@
   height: 100%;
 }
 
-.console-container-stand-alone {
-  height: calc(100% - 75px);
+.console-container {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
-.pf-v6-c-console__xterm {
-  height: 100%;
-  margin: 10px;
+.console-container-stand-alone {
+  height: calc(100% - 75px);
 }

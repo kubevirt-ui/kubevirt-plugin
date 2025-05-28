@@ -1,63 +1,73 @@
-import React, { FC } from 'react';
+import React, { FC, memo, useState } from 'react';
 
-import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  ConsoleState,
+  VNC_CONSOLE_TYPE,
+} from '@kubevirt-utils/components/Consoles/components/utils/ConsoleConsts';
+import { ConsoleComponentState } from '@kubevirt-utils/components/Consoles/components/utils/types';
+import HideConsole from '@kubevirt-utils/components/Consoles/components/vnc-console/HideConsole';
 import VncConsole from '@kubevirt-utils/components/Consoles/components/vnc-console/VncConsole';
+import { getConsoleBasePath } from '@kubevirt-utils/components/Consoles/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { isHeadlessMode as isHeadlessModeVMI } from '@kubevirt-utils/resources/vm/utils/selectors';
-import { vmiStatuses } from '@kubevirt-utils/resources/vmi';
-import { useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { Bullseye, Button, ButtonVariant } from '@patternfly/react-core';
 import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 
 import VirtualMachinesOverviewTabDetailsConsoleConnect from './VirtualMachinesOverviewTabDetailsConsoleConnect';
 
 type VirtualMachinesOverviewTabDetailsConsoleProps = {
-  vmi: V1VirtualMachineInstance;
+  canConnectConsole: boolean;
+  isHeadlessMode: boolean;
+  isVMRunning: boolean;
+  vmName: string;
+  vmNamespace: string;
 };
 
 const VirtualMachinesOverviewTabDetailsConsole: FC<
   VirtualMachinesOverviewTabDetailsConsoleProps
-> = ({ vmi }) => {
+> = ({ canConnectConsole, isHeadlessMode, isVMRunning, vmName, vmNamespace }) => {
   const { t } = useKubevirtTranslation();
-
-  const isHeadlessMode = isHeadlessModeVMI(vmi);
-  const isVMRunning = vmi?.status?.phase === vmiStatuses.Running;
-  const [canConnectConsole] = useAccessReview({
-    group: 'subresources.kubevirt.io',
-    name: vmi?.metadata?.name,
-    namespace: vmi?.metadata?.namespace,
-    resource: 'virtualmachineinstances/vnc',
-    verb: 'get',
+  const [{ actions, state }, setState] = useState<ConsoleComponentState>({
+    actions: {},
+    state: ConsoleState.init,
+    type: VNC_CONSOLE_TYPE,
   });
+  const enableConsole = isVMRunning && !isHeadlessMode && canConnectConsole;
+  const showConnect =
+    !enableConsole || // connect component is also empty state here
+    state === ConsoleState.disconnected ||
+    state === ConsoleState.connecting;
   return (
     <Bullseye className="console-overview">
       <div className="link">
         <Button
           onClick={() =>
             window.open(
-              `/k8s/ns/${vmi?.metadata?.namespace}/kubevirt.io~v1~VirtualMachine/${vmi?.metadata?.name}/console/standalone`,
+              `/k8s/ns/${vmNamespace}/kubevirt.io~v1~VirtualMachine/${vmName}/console/standalone`,
             )
           }
           icon={<ExternalLinkAltIcon className="icon" />}
           iconPosition="end"
-          isDisabled={!isVMRunning || isHeadlessMode || !canConnectConsole}
+          isDisabled={!enableConsole}
           variant={ButtonVariant.link}
         >
           {t('Open web console')}
         </Button>
       </div>
-      {isVMRunning && !isHeadlessMode && canConnectConsole ? (
-        <>
+      {enableConsole && (
+        <HideConsole isHidden={state !== ConsoleState.connected}>
           <VncConsole
-            CustomConnectComponent={VirtualMachinesOverviewTabDetailsConsoleConnect}
+            basePath={getConsoleBasePath({ name: vmName, namespace: vmNamespace })}
+            setState={setState}
             viewOnly
-            vmi={vmi}
           />
-        </>
-      ) : (
+        </HideConsole>
+      )}
+      {showConnect && (
         <div className="console-vnc">
           <VirtualMachinesOverviewTabDetailsConsoleConnect
-            isDisabled
+            connect={actions?.connect}
+            isConnecting={state === ConsoleState.connecting}
+            isDisabled={!enableConsole}
             isHeadlessMode={isHeadlessMode}
           />
         </div>
@@ -66,4 +76,4 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
   );
 };
 
-export default VirtualMachinesOverviewTabDetailsConsole;
+export default memo(VirtualMachinesOverviewTabDetailsConsole);
