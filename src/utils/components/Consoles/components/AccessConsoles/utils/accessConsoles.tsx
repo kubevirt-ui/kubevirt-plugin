@@ -1,24 +1,32 @@
 import { Dispatch, SetStateAction } from 'react';
-
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { RFBCreate } from '@novnc/novnc/lib/rfb';
+import { TFunction } from 'react-i18next';
 
 import {
+  ConsoleState,
   DESKTOP_VIEWER_CONSOLE_TYPE,
   SERIAL_CONSOLE_TYPE,
   VNC_CONSOLE_TYPE,
-  WSFactoryExtends,
 } from '../../utils/ConsoleConsts';
+import { ConsoleType } from '../../utils/types';
 
-export type AccessConsolesProps = {
-  isWindowsVM: boolean;
-  rfb?: RFBCreate;
-  serialSocket?: WSFactoryExtends;
-  setType: Dispatch<SetStateAction<string>>;
-  type: string;
+export type AccessConsolesActions = {
+  connect?: () => void;
+  disconnect?: () => void;
+  sendCtrlAlt1?: () => void;
+  sendCtrlAlt2?: () => void;
+  sendCtrlAltDel?: () => void;
+  sendPaste?: () => void;
 };
 
-export const typeMap = (isWindowsVM: boolean) => ({
+export type AccessConsolesProps = {
+  actions: AccessConsolesActions;
+  isWindowsVM: boolean;
+  setType: Dispatch<SetStateAction<ConsoleType>>;
+  state: ConsoleState;
+  type: ConsoleType;
+};
+
+export const typeMap = (isWindowsVM: boolean, t: TFunction): { [key in ConsoleType]: string } => ({
   ...(isWindowsVM && { [DESKTOP_VIEWER_CONSOLE_TYPE]: t('Desktop viewer') }),
   [SERIAL_CONSOLE_TYPE]: t('Serial console'),
   [VNC_CONSOLE_TYPE]: t('VNC console'),
