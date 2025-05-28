@@ -16,7 +16,7 @@ export const BootModeTitles = {
 
 export const bootloaderOptions: BootloaderLabel[] = [
   {
-    description: t('Use BIOS when bootloading the guest OS (Default)'),
+    description: t('Use BIOS when bootloading the guest OS'),
     title: BootModeTitles[BootMode.bios],
     value: BootMode.bios,
   },

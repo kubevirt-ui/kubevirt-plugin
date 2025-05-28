@@ -1475,7 +1475,7 @@
   "URL is required": "URL is required",
   "Usage": "Usage",
   "Use \"{{inputValue}}\"": "Use \"{{inputValue}}\"",
-  "Use BIOS when bootloading the guest OS (Default)": "Use BIOS when bootloading the guest OS (Default)",
+  "Use BIOS when bootloading the guest OS": "Use BIOS when bootloading the guest OS",
   "Use commas to separate between IP addresses": "Use commas to separate between IP addresses",
   "Use cron formatting to set when and how often to look for new imports.": "Use cron formatting to set when and how often to look for new imports.",
   "Use custom registration server url": "Use custom registration server url",
