@@ -127,7 +127,11 @@ const AdvancedSearchModal: FC<AdvancedSearchModalProps> = ({
               />
             </FormGroup>
             <FormGroup label={t('Project')}>
-              <ProjectMultiSelect projects={projects} setProjects={setProjects} />
+              <ProjectMultiSelect
+                data-test-id="adv-search-vm-project"
+                projects={projects}
+                setProjects={setProjects}
+              />
             </FormGroup>
             <FormGroup label={t('Description')}>
               <TextInput
@@ -139,6 +143,7 @@ const AdvancedSearchModal: FC<AdvancedSearchModalProps> = ({
             </FormGroup>
             <FormGroup label={t('Labels')}>
               <LabelsMultiSelect
+                data-test-id="adv-search-vm-labels"
                 initialInputValue={prefillInputs.labelInputText}
                 labels={labels}
                 setLabels={setLabels}
@@ -146,6 +151,7 @@ const AdvancedSearchModal: FC<AdvancedSearchModalProps> = ({
             </FormGroup>
             <FormGroup label={t('Date created')}>
               <DateFromToPicker
+                data-test-id="adv-search-date"
                 dateFromString={dateFromString}
                 dateToString={dateToString}
                 setDateFromString={setDateFromString}
@@ -156,11 +162,13 @@ const AdvancedSearchModal: FC<AdvancedSearchModalProps> = ({
             <FormGroup label={t('vCPU')}>
               <InputGroup>
                 <NumberOperatorSelect
+                  data-test-id="adv-search-vcpu-operator"
                   onSelect={(operator) => setVCPU((previous) => ({ ...previous, operator }))}
                   selected={vCPU.operator}
                 />
                 <InputGroupItem>
                   <NumberInput
+                    data-test-id="adv-search-vcpu-value"
                     setValue={(value) => setVCPU((previous) => ({ ...previous, value }))}
                     value={vCPU.value}
                   />
@@ -170,16 +178,19 @@ const AdvancedSearchModal: FC<AdvancedSearchModalProps> = ({
             <FormGroup label={t('Memory')}>
               <InputGroup>
                 <NumberOperatorSelect
+                  data-test-id="adv-search-mem-operator"
                   onSelect={(operator) => setMemory((previous) => ({ ...previous, operator }))}
                   selected={memory.operator}
                 />
                 <InputGroupItem>
                   <NumberInput
+                    data-test-id="adv-search-mem-value"
                     setValue={(value) => setMemory((previous) => ({ ...previous, value }))}
                     value={memory.value}
                   />
                 </InputGroupItem>
                 <MemoryUnitSelect
+                  data-test-id="adv-search-mem-unit"
                   onSelect={(unit) => setMemory((previous) => ({ ...previous, unit }))}
                   selected={memory.unit}
                 />
