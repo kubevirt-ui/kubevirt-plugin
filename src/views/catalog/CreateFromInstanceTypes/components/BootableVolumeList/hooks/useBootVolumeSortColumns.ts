@@ -1,34 +1,38 @@
 import { useState } from 'react';
 
 import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
+import { getDiskSize } from '@catalog/CreateFromInstanceTypes/utils/utils';
+import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
 import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
-import { getBootableVolumePVCSource } from '@kubevirt-utils/resources/bootableresources/helpers';
 import {
-  getVolumeSnapshotSize,
-  getVolumeSnapshotStorageClass,
-} from '@kubevirt-utils/resources/bootableresources/selectors';
+  getBootableVolumePVCSource,
+  getDataVolumeForPVC,
+} from '@kubevirt-utils/resources/bootableresources/helpers';
+import { getVolumeSnapshotStorageClass } from '@kubevirt-utils/resources/bootableresources/selectors';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import {
+  getName,
+  getNamespace,
+  NamespacedResourceMap,
+  ResourceMap,
+} from '@kubevirt-utils/resources/shared';
 import { DESCRIPTION_ANNOTATION } from '@kubevirt-utils/resources/vm';
 import { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
 
 type UseBootVolumeSortColumns = (
   unsortedData: BootableVolume[],
   volumeFavorites: string[],
-  preferences: {
-    [resourceKeyName: string]: V1beta1VirtualMachineClusterPreference;
-  },
-  pvcSources: {
-    [resourceKeyName: string]: IoK8sApiCoreV1PersistentVolumeClaim;
-  },
+  preferences: ResourceMap<V1beta1VirtualMachineClusterPreference>,
+  pvcSources: NamespacedResourceMap<IoK8sApiCoreV1PersistentVolumeClaim>,
   volumeSnapshotSources: {
     [datSourceName: string]: VolumeSnapshotKind;
   },
   pagination: PaginationState,
   includeNamespaceColumn: boolean,
+  dvSources: NamespacedResourceMap<V1beta1DataVolume>,
 ) => {
   getSortType: (columnIndex: number) => ThSortType;
   sortedData: BootableVolume[];
@@ -43,12 +47,14 @@ const useBootVolumeSortColumns: UseBootVolumeSortColumns = (
   volumeSnapshotSources,
   pagination,
   includeNamespaceColumn,
+  dvSources,
 ) => {
   const [activeSortIndex, setActiveSortIndex] = useState<null | number>(0);
   const [activeSortDirection, setActiveSortDirection] = useState<'asc' | 'desc' | null>('asc');
 
   const getSortableRowValues = (bootableVolume: BootableVolume): string[] => {
     const pvcSource = getBootableVolumePVCSource(bootableVolume, pvcSources);
+    const dvSource = getDataVolumeForPVC(pvcSource, dvSources);
     const volumeSnapshotSource = volumeSnapshotSources?.[bootableVolume?.metadata?.name];
 
     return [
@@ -56,7 +62,7 @@ const useBootVolumeSortColumns: UseBootVolumeSortColumns = (
       ...(includeNamespaceColumn ? [getNamespace(bootableVolume)] : []),
       getName(preferences[bootableVolume?.metadata?.labels?.[DEFAULT_PREFERENCE_LABEL]]),
       pvcSource?.spec?.storageClassName || getVolumeSnapshotStorageClass(volumeSnapshotSource),
-      pvcSource?.spec?.resources?.requests?.storage || getVolumeSnapshotSize(volumeSnapshotSource),
+      getDiskSize(dvSource, pvcSource, volumeSnapshotSource),
       bootableVolume?.metadata?.annotations?.[DESCRIPTION_ANNOTATION],
     ];
   };

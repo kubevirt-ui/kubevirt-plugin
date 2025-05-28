@@ -11,6 +11,7 @@ import { UserSettingFavorites } from '@kubevirt-utils/hooks/useKubevirtUserSetti
 import {
   getBootableVolumePVCSource,
   getDataImportCronFromDataSource,
+  getDataVolumeForPVC,
 } from '@kubevirt-utils/resources/bootableresources/helpers';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getLabel, getName } from '@kubevirt-utils/resources/shared';
@@ -43,7 +44,7 @@ const BootableVolumeTable: FC<BootableVolumeTableProps> = ({
   sortedPaginatedData,
 }) => {
   const [volumeFavorites, updateFavorites] = favorites;
-  const { dataImportCrons, pvcSources, volumeSnapshotSources } = bootableVolumesData;
+  const { dataImportCrons, dvSources, pvcSources, volumeSnapshotSources } = bootableVolumesData;
 
   return (
     <Table className="BootableVolumeList-table" variant={TableVariant.compact}>
@@ -65,32 +66,38 @@ const BootableVolumeTable: FC<BootableVolumeTableProps> = ({
         </Tr>
       </Thead>
       <Tbody>
-        {sortedPaginatedData.map((bs) => (
-          <BootableVolumeRow
-            rowData={{
-              bootableVolumeSelectedState: selectedBootableVolumeState,
-              dataImportCron: getDataImportCronFromDataSource(
-                dataImportCrons,
-                bs as V1beta1DataSource,
-              ),
-              favorites: [
-                volumeFavorites?.includes(bs?.metadata?.name),
-                (addTofavorites: boolean) =>
-                  updateFavorites(
-                    addTofavorites
-                      ? [...volumeFavorites, bs?.metadata?.name]
-                      : volumeFavorites.filter((fav: string) => fav !== bs?.metadata?.name),
-                  ),
-              ],
-              preference: preferencesMap[getLabel(bs, DEFAULT_PREFERENCE_LABEL)],
-              pvcSource: getBootableVolumePVCSource(bs, pvcSources),
-              volumeSnapshotSource: volumeSnapshotSources?.[bs?.metadata?.name],
-            }}
-            activeColumnIDs={activeColumns?.map((col) => col?.id)}
-            bootableVolume={bs}
-            key={getName(bs)}
-          />
-        ))}
+        {sortedPaginatedData.map((bootSource) => {
+          const bootSourceName = getName(bootSource);
+          const pvcSource = getBootableVolumePVCSource(bootSource, pvcSources);
+
+          return (
+            <BootableVolumeRow
+              rowData={{
+                bootableVolumeSelectedState: selectedBootableVolumeState,
+                dataImportCron: getDataImportCronFromDataSource(
+                  dataImportCrons,
+                  bootSource as V1beta1DataSource,
+                ),
+                dvSource: getDataVolumeForPVC(pvcSource, dvSources),
+                favorites: [
+                  volumeFavorites?.includes(bootSourceName),
+                  (addTofavorites: boolean) =>
+                    updateFavorites(
+                      addTofavorites
+                        ? [...volumeFavorites, bootSourceName]
+                        : volumeFavorites.filter((fav: string) => fav !== bootSourceName),
+                    ),
+                ],
+                preference: preferencesMap[getLabel(bootSource, DEFAULT_PREFERENCE_LABEL)],
+                pvcSource,
+                volumeSnapshotSource: volumeSnapshotSources?.[bootSourceName],
+              }}
+              activeColumnIDs={activeColumns?.map((col) => col?.id)}
+              bootableVolume={bootSource}
+              key={bootSourceName}
+            />
+          );
+        })}
       </Tbody>
     </Table>
   );

@@ -59,8 +59,9 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
     volumeListNamespace,
   } = useInstanceTypeVMStore();
 
-  const { pvcSource, selectedBootableVolume, volumeSnapshotSource } = instanceTypeVMState;
-  const { bootableVolumes, loaded, pvcSources, volumeSnapshotSources } = bootableVolumesData;
+  const { dvSource, pvcSource, selectedBootableVolume, volumeSnapshotSource } = instanceTypeVMState;
+  const { bootableVolumes, dvSources, loaded, pvcSources, volumeSnapshotSources } =
+    bootableVolumesData;
 
   const preferencesMap = useMemo(
     () => convertResourceArrayToMap(preferencesData),
@@ -92,6 +93,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
     volumeSnapshotSources,
     pagination,
     volumeListNamespace === ALL_PROJECTS,
+    dvSources,
   );
 
   useEffect(() => {
@@ -111,7 +113,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
 
     setPagination(getPaginationFromVolumeIndex(selectedVolumeIndex));
 
-    onSelectCreatedVolume(modalSelectedVolume, pvcSource, volumeSnapshotSource);
+    onSelectCreatedVolume(modalSelectedVolume, pvcSource, volumeSnapshotSource, dvSource);
   };
 
   return (
