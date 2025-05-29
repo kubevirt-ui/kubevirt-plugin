@@ -7,9 +7,11 @@ import {
 } from '@kubevirt-utils/components/GuidedTour/utils/constants';
 import HorizontalNavbar from '@kubevirt-utils/components/HorizontalNavbar/HorizontalNavbar';
 import { SidebarEditorProvider } from '@kubevirt-utils/components/SidebarEditor/SidebarEditorContext';
+import { getResourceDetailsTitle } from '@kubevirt-utils/constants/page-constants';
+import { getName } from '@kubevirt-utils/resources/shared';
 import useInstanceTypeExpandSpec from '@kubevirt-utils/resources/vm/hooks/useInstanceTypeExpandSpec';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { DocumentTitle, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 import { useVirtualMachineTabs } from './hooks/useVirtualMachineTabs';
 import VirtualMachineNavPageTitle from './VirtualMachineNavPageTitle';
@@ -45,6 +47,7 @@ const VirtualMachineNavPage: React.FC<VirtualMachineDetailsPageProps> = ({
 
   return (
     <SidebarEditorProvider>
+      <DocumentTitle>{getResourceDetailsTitle(getName(vmToShow), 'VirtualMachine')}</DocumentTitle>
       <VirtualMachineNavPageTitle
         instanceTypeExpandedSpec={instanceTypeExpandedSpec}
         isLoaded={isLoaded || !isEmpty(loadError)}

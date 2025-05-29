@@ -3,6 +3,7 @@ import { useDebounceCallback } from 'src/views/clusteroverview/utils/hooks/useDe
 import { OnFilterChange, RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
 import { STATIC_SEARCH_FILTERS } from '../constants';
+import { ApplyTextFilters, ListPageFiltersMethodsOutputs } from '../types';
 import { generateRowFilters, intersection } from '../utils';
 
 import { useQueryParamsMethods } from './useQueryParamsMethods';
@@ -16,32 +17,37 @@ type ListPageFiltersMethodsInputs = {
   setSearchInputText: (text: string) => void;
 };
 
-const useListPageFiltersMethods = ({
+type UseListPageFiltersMethods = (
+  inputs: ListPageFiltersMethodsInputs,
+) => ListPageFiltersMethodsOutputs;
+
+const useListPageFiltersMethods: UseListPageFiltersMethods = ({
   applyFilters,
   generatedRowFilters,
   onRowFilterSearchParamChange,
   searchFilters,
   selectedRowFilters,
   setSearchInputText,
-}: ListPageFiltersMethodsInputs) => {
+}) => {
   const { setOrRemoveQueryArgument } = useQueryParamsMethods();
 
-  const applyTextFilters = (type: string, value?: string | string[]) => {
+  const applyTextFilters: ApplyTextFilters = (type, value?) => {
     const valueIsArray = Array.isArray(value);
 
     setOrRemoveQueryArgument(type, valueIsArray ? value.join(',') : value);
 
-    if (type === STATIC_SEARCH_FILTERS.labels && !valueIsArray) {
-      applyFilters(type, { all: value ? [value] : [] });
+    const values = valueIsArray ? value : [value];
+    const selectedValues = value ? values : [];
+
+    if (type === STATIC_SEARCH_FILTERS.labels) {
+      applyFilters(type, { all: selectedValues });
       return;
     }
 
-    const selectedValues = valueIsArray ? value : [value];
-
-    applyFilters(type, { selected: value ? selectedValues : [] });
+    applyFilters(type, { selected: selectedValues });
   };
 
-  const applyTextFiltersWithDebounce = useDebounceCallback(applyTextFilters, 250);
+  const applyTextFiltersWithDebounce: ApplyTextFilters = useDebounceCallback(applyTextFilters, 250);
 
   const applyRowFilter = (selected: string[]) => {
     generatedRowFilters?.forEach?.(({ items, type }) => {
@@ -67,7 +73,7 @@ const useListPageFiltersMethods = ({
     applyTextFilters(STATIC_SEARCH_FILTERS.name);
     applyTextFilters(STATIC_SEARCH_FILTERS.labels);
 
-    searchFilters.forEach((filter) => applyTextFilters(filter.type));
+    searchFilters.forEach((filter) => filter && applyTextFilters(filter.type));
     setSearchInputText('');
   };
 

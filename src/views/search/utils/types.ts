@@ -1,5 +1,5 @@
 import { CAPACITY_UNITS } from '@kubevirt-utils/components/CapacityInput/utils';
-import { NumberOperator } from '@kubevirt-utils/components/NumberOperatorSelect/constants';
+import { NumberOperator } from '@kubevirt-utils/utils/constants';
 
 export type AdvancedSearchInputs = Partial<{
   dateCreatedFrom: string;

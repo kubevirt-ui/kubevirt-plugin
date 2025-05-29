@@ -54,6 +54,10 @@ export const cloneVM = (
       0,
       MAX_K8S_NAME_LENGTH,
     );
+
+    if (draftCloneData.metadata.name.endsWith('-')) {
+      draftCloneData.metadata.name = draftCloneData.metadata.name.slice(0, -1);
+    }
   });
 
   return k8sCreate<V1alpha1VirtualMachineClone>({

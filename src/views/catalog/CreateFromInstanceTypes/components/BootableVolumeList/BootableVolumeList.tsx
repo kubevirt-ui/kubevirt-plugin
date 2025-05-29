@@ -16,7 +16,7 @@ import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/type
 import { convertResourceArrayToMap, getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
-import { FormGroup, Split, SplitItem } from '@patternfly/react-core';
+import { FormGroup, Skeleton, Split, SplitItem } from '@patternfly/react-core';
 
 import BootableVolumeEmptyState from '../BootableVolumeEmptyState/BootableVolumeEmptyState';
 
@@ -59,8 +59,9 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
     volumeListNamespace,
   } = useInstanceTypeVMStore();
 
-  const { pvcSource, selectedBootableVolume, volumeSnapshotSource } = instanceTypeVMState;
-  const { bootableVolumes, loaded, pvcSources, volumeSnapshotSources } = bootableVolumesData;
+  const { dvSource, pvcSource, selectedBootableVolume, volumeSnapshotSource } = instanceTypeVMState;
+  const { bootableVolumes, dvSources, loaded, pvcSources, volumeSnapshotSources } =
+    bootableVolumesData;
 
   const preferencesMap = useMemo(
     () => convertResourceArrayToMap(preferencesData),
@@ -92,6 +93,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
     volumeSnapshotSources,
     pagination,
     volumeListNamespace === ALL_PROJECTS,
+    dvSources,
   );
 
   useEffect(() => {
@@ -100,7 +102,9 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
     }
   }, [isAdmin, volumeListNamespace, setVolumeListNamespace]);
 
-  const displayVolumes = !isEmpty(bootableVolumes) && loaded && loadedColumns;
+  const isVolumesLoaded = loaded && loadedColumns;
+  const isEmptyVolumes = isEmpty(bootableVolumes);
+  const displayVolumes = isVolumesLoaded && !isEmptyVolumes;
 
   const onModalBootableVolumeSelect = (modalSelectedVolume: BootableVolume) => {
     const selectedVolumeIndex = sortedData?.findIndex(
@@ -109,7 +113,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
 
     setPagination(getPaginationFromVolumeIndex(selectedVolumeIndex));
 
-    onSelectCreatedVolume(modalSelectedVolume, pvcSource, volumeSnapshotSource);
+    onSelectCreatedVolume(modalSelectedVolume, pvcSource, volumeSnapshotSource, dvSource);
   };
 
   return (
@@ -145,8 +149,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
                 data={unfilteredData}
                 hideLabelFilter
                 hideNameLabelFilters={!displayShowAllButton}
-                loaded={Boolean(loaded) && loadedColumns}
-                // nameFilter={!displayShowAllButton && "modal-name"} can remove comment once this merged https://github.com/openshift/console/pull/12438 and build into new SDK version
+                loaded={loaded && loadedColumns}
                 rowFilters={filters}
               />
             </SplitItem>
@@ -170,7 +173,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
           </>
         )}
       </Split>
-      {displayVolumes ? (
+      {displayVolumes && (
         <>
           <BootableVolumeTable
             selectedBootableVolumeState={
@@ -187,8 +190,14 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
           />
           <BootableVolumesPipelinesHint bootableVolumes={bootableVolumes} />
         </>
-      ) : (
-        <BootableVolumeEmptyState />
+      )}
+      {isVolumesLoaded && isEmptyVolumes && <BootableVolumeEmptyState />}
+      {!isVolumesLoaded && (
+        <>
+          <Skeleton className="pf-v6-u-my-md" />
+          <Skeleton className="pf-v6-u-my-md" />
+          <Skeleton className="pf-v6-u-my-md" />
+        </>
       )}
     </>
   );

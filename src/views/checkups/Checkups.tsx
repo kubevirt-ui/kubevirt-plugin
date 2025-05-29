@@ -1,8 +1,9 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
+import { PageTitles } from '@kubevirt-utils/constants/page-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
+import { DocumentTitle, ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
 import { Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 import { createURL } from '@virtualmachines/details/tabs/overview/utils/utils';
 
@@ -29,7 +30,8 @@ const CheckupsList: FC = () => {
 
   return (
     <>
-      <ListPageHeader title={t('Checkups')}>
+      <DocumentTitle>{PageTitles.Checkups}</DocumentTitle>
+      <ListPageHeader title={PageTitles.Checkups}>
         <CheckupsRunButton />
       </ListPageHeader>
       <Tabs
@@ -37,6 +39,7 @@ const CheckupsList: FC = () => {
           setActiveTabKey(tabIndex);
         }}
         activeKey={activeTabKey}
+        className="co-horizontal-nav"
       >
         <Tab eventKey={0} title={<TabTitleText>{t('Network latency')}</TabTitleText>}>
           <CheckupsNetworkList />

@@ -4,7 +4,7 @@ export const virtualizationNav = '[data-test-id="virtualization-nav-item"]';
 export const overviewNav = '[data-test-id="virtualization-overview-nav-item"]';
 export const catalogNav = '[data-test-id="virtualization-catalog-nav-item"]';
 export const vmNav = '[data-test-id="virtualmachines-nav-item"]';
-export const volNav = '[data-test-id="-bootablevolumes-nav-item"]';
+export const volNav = '[data-test-id="bootablevolumes-nav-item"]';
 export const templateNav = '[data-test-id="templates-nav-item"]';
 export const migrationPoliciesNav = '[data-test-id="migrationpolicies-nav-item"]';
 export const instanceTypesNav = '[data-test-id="virtualmachineclusterinstancetypes-nav-item"]';

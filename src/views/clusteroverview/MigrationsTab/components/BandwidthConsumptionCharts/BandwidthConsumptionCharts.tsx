@@ -5,7 +5,7 @@ import useResponsiveCharts from '@kubevirt-utils/components/Charts/hooks/useResp
 import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { Bullseye, Divider, Grid, HelperText, HelperTextItem } from '@patternfly/react-core';
+import { Divider, Grid } from '@patternfly/react-core';
 
 import MigrationsTimeAxis from './components/MigrationsTimeAxis';
 import MigrationsUtilizationChart from './components/MigrationsUtilizationChart';
@@ -28,41 +28,33 @@ const BandwidthConsumptionCharts: React.FC<BandwidthConsumptionChartsProps> = ({
     useMigrationChartsData(duration, currentTime, timespan);
 
   return (
-    <div>
-      {!isEmpty(bandwidthConsumed) || !isEmpty(migrationsCount) ? (
-        <Grid ref={ref}>
-          <MigrationsTimeAxis domainX={domainX} timespan={timespan} />
-          <MigrationsUtilizationChart
-            domain={{
-              x: domainX,
-              y: getDomainY(maxBandwidthConsumed),
-            }}
-            chartData={bandwidthConsumed}
-            labels={getLabel(timespan, bandwidthConsumed, true)}
-            tickFormat={(y) => xbytes(y, { fixed: 0, iec: true, prefixIndex: 3 })}
-            tickValues={getTickValuesAxisY(maxBandwidthConsumed)}
-            title={t('Network consumption')}
-          />
-          <Divider />
-          <MigrationsUtilizationChart
-            domain={{
-              x: domainX,
-              y: getDomainY(maxMigrationCount, 1),
-            }}
-            chartData={migrationsCount}
-            labels={getLabel(timespan, migrationsCount)}
-            tickValues={getTickValuesAxisY(maxMigrationCount, 1)}
-            title={t('Running migrations')}
-          />
-        </Grid>
-      ) : (
-        <Bullseye>
-          <HelperText>
-            <HelperTextItem variant="warning">{t('No Datapoints found')}</HelperTextItem>
-          </HelperText>
-        </Bullseye>
+    <Grid ref={ref}>
+      {(!isEmpty(bandwidthConsumed) || !isEmpty(migrationsCount)) && (
+        <MigrationsTimeAxis domainX={domainX} timespan={timespan} />
       )}
-    </div>
+      <MigrationsUtilizationChart
+        domain={{
+          x: domainX,
+          y: getDomainY(maxBandwidthConsumed),
+        }}
+        chartData={bandwidthConsumed}
+        labels={getLabel(timespan, bandwidthConsumed, true)}
+        tickFormat={(y) => xbytes(y, { fixed: 0, iec: true, prefixIndex: 3 })}
+        tickValues={getTickValuesAxisY(maxBandwidthConsumed)}
+        title={t('Bandwidth consumption')}
+      />
+      <Divider />
+      <MigrationsUtilizationChart
+        domain={{
+          x: domainX,
+          y: getDomainY(maxMigrationCount, 1),
+        }}
+        chartData={migrationsCount}
+        labels={getLabel(timespan, migrationsCount)}
+        tickValues={getTickValuesAxisY(maxMigrationCount, 1)}
+        title={t('Running migrations')}
+      />
+    </Grid>
   );
 };
 

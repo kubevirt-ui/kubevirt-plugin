@@ -2,10 +2,12 @@ import React, { FC, MouseEvent } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { InstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/utils/types';
+import { getDiskSize } from '@catalog/CreateFromInstanceTypes/utils/utils';
 import { getTemplateOSIcon, getVolumeNameOSIcon } from '@catalog/templatescatalog/utils/os-icons';
 import {
   V1beta1DataImportCron,
   V1beta1DataSource,
+  V1beta1DataVolume,
 } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -16,10 +18,7 @@ import { BOOTABLE_VOLUME_SELECTED } from '@kubevirt-utils/extensions/telemetry/u
 import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isDeprecated } from '@kubevirt-utils/resources/bootableresources/helpers';
-import {
-  getVolumeSnapshotSize,
-  getVolumeSnapshotStorageClass,
-} from '@kubevirt-utils/resources/bootableresources/selectors';
+import { getVolumeSnapshotStorageClass } from '@kubevirt-utils/resources/bootableresources/selectors';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import {
   getName,
@@ -46,6 +45,7 @@ type BootableVolumeRowProps = {
   rowData: {
     bootableVolumeSelectedState: [BootableVolume, InstanceTypeVMStore['onSelectCreatedVolume']];
     dataImportCron: V1beta1DataImportCron;
+    dvSource: V1beta1DataVolume;
     favorites: [isFavorite: boolean, updaterFavorites: (val: boolean) => void];
     preference: V1beta1VirtualMachineClusterPreference;
     pvcSource: IoK8sApiCoreV1PersistentVolumeClaim;
@@ -59,6 +59,7 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
   rowData: {
     bootableVolumeSelectedState: [selectedBootableVolume, setSelectedBootableVolume],
     dataImportCron,
+    dvSource,
     favorites,
     preference,
     pvcSource,
@@ -68,15 +69,13 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
   const { t } = useKubevirtTranslation();
   const bootVolumeName = getName(bootableVolume);
   const bootVolumeNamespace = getNamespace(bootableVolume);
-  const sizeData = formatBytes(
-    pvcSource?.spec?.resources?.requests?.storage || getVolumeSnapshotSize(volumeSnapshotSource),
-  );
+  const sizeData = formatBytes(getDiskSize(dvSource, pvcSource, volumeSnapshotSource));
   const icon = getVolumeNameOSIcon(bootVolumeName) || getTemplateOSIcon(preference);
 
   const [isFavorite, addOrRemoveFavorite] = favorites;
 
   const handleOnClick = () => {
-    setSelectedBootableVolume(bootableVolume, pvcSource, volumeSnapshotSource);
+    setSelectedBootableVolume(bootableVolume, pvcSource, volumeSnapshotSource, dvSource);
     logITFlowEvent(BOOTABLE_VOLUME_SELECTED, null, {
       selectedBootableVolume: getName(bootableVolume),
     });

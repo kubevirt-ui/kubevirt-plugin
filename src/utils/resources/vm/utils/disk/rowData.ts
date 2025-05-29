@@ -9,7 +9,7 @@ import {
   getDataVolumeSize,
   getDataVolumeStorageClassName,
   getPhase,
-  getPVCSize,
+  getPVCStorageCapacity,
   getPVCStorageClassName,
 } from '@kubevirt-utils/resources/bootableresources/selectors';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
@@ -40,6 +40,7 @@ export const getDiskRowDataLayout = (
 
     const diskRowDataObject: DiskRowDataLayout = {
       drive: isEmpty(disk) ? NO_DATA_DASH : getPrintableDiskDrive(disk),
+      hasDataVolume: Boolean(dataVolume),
       interface: isEmpty(disk) ? NO_DATA_DASH : getPrintableDiskInterface(disk),
       isBootDisk: disk?.name === bootDisk?.name,
       isEnvDisk: !!volume?.configMap || !!volume?.secret || !!volume?.serviceAccount,
@@ -51,7 +52,7 @@ export const getDiskRowDataLayout = (
       storageClass: dataVolumeTemplate?.spec?.storage?.storageClassName || NO_DATA_DASH,
     };
 
-    const dataSourceSize = getPVCSize(pvc) || getDataVolumeSize(dataVolume);
+    const dataSourceSize = getPVCStorageCapacity(pvc) || getDataVolumeSize(dataVolume);
     const dataVolumeCustomSize = dataVolumeTemplate?.spec?.storage?.resources?.requests?.storage;
     const size = humanizeBinaryBytes(convertToBaseValue(dataSourceSize || dataVolumeCustomSize));
 

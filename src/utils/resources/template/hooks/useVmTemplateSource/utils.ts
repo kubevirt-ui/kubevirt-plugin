@@ -123,6 +123,8 @@ export const isDataSourceCloning = (dataSource: V1beta1DataSource): boolean =>
         'CloneInProgress',
         'CloneScheduled',
         'CSICloneInProgress',
+        'ImportInProgress',
+        'ImportScheduled',
         'Pending',
         'PVCBound',
         'SnapshotForSmartCloneInProgress',

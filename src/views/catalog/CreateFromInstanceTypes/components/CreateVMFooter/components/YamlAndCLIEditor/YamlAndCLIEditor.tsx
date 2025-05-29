@@ -8,7 +8,7 @@ import { CopyIcon, DownloadIcon } from '@patternfly/react-icons';
 
 type YamlAndCLIEditorProps = {
   code: string;
-  minHeight: number;
+  minHeight: string;
 };
 
 const YamlAndCLIEditor: FC<YamlAndCLIEditorProps> = ({ code, minHeight }) => {

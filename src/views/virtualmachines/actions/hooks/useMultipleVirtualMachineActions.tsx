@@ -26,7 +26,7 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms)
     const namespaces = new Set(vms?.map((vm) => getNamespace(vm)));
 
     const actions: ActionDropdownItemType[] = [
-      BulkVirtualMachineActionFactory.editLabel(vms, createModal),
+      BulkVirtualMachineActionFactory.editLabels(vms, createModal),
       BulkVirtualMachineActionFactory.start(vms),
       BulkVirtualMachineActionFactory.restart(vms, createModal, confirmVMActionsEnabled),
       BulkVirtualMachineActionFactory.stop(vms, createModal, confirmVMActionsEnabled),

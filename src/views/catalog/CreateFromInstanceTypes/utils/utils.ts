@@ -3,6 +3,8 @@ import produce from 'immer';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import VirtualMachineInstancetypeModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstancetypeModel';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
+import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1Interface, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   addDNFUpdateToRunCMD,
@@ -12,6 +14,7 @@ import {
 } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
 import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/utils/constants';
 import { InterfaceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
+import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
 import { addSecretToVM } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import { sysprepDisk, sysprepVolume } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
 import { ROOTDISK } from '@kubevirt-utils/constants/constants';
@@ -21,6 +24,11 @@ import {
   isBootableVolumeISO,
   isBootableVolumePVCKind,
 } from '@kubevirt-utils/resources/bootableresources/helpers';
+import {
+  getDataVolumeSize,
+  getPVCSize,
+  getVolumeSnapshotSize,
+} from '@kubevirt-utils/resources/bootableresources/selectors';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { OS_NAME_TYPES, OS_NAME_TYPES_NOT_SUPPORTED } from '@kubevirt-utils/resources/template';
@@ -109,6 +117,7 @@ export const generateVM: GenerateVMCallback = ({
   targetNamespace,
 }) => {
   const {
+    dvSource,
     folder,
     pvcSource,
     selectedBootableVolume,
@@ -158,17 +167,18 @@ export const generateVM: GenerateVMCallback = ({
               namespace: getNamespace(selectedBootableVolume),
             },
             storage: {
-              resources: pvcSource
-                ? {
-                    requests: {
-                      storage: pvcSource?.spec?.resources?.requests?.storage,
+              resources:
+                dvSource || pvcSource
+                  ? {
+                      requests: {
+                        storage: getDataVolumeSize(dvSource) || getPVCSize(pvcSource),
+                      },
+                    }
+                  : {
+                      requests: {
+                        storage: DEFAULT_DISK_SIZE,
+                      },
                     },
-                  }
-                : {
-                    requests: {
-                      storage: DEFAULT_DISK_SIZE,
-                    },
-                  },
               storageClassName,
             },
           },
@@ -357,3 +367,9 @@ export const useIsWindowsBootableVolume = (): boolean => {
 
   return defaultPreferenceName?.startsWith(OS_WINDOWS_PREFIX);
 };
+
+export const getDiskSize = (
+  dataVolume: V1beta1DataVolume,
+  pvc: IoK8sApiCoreV1PersistentVolumeClaim,
+  volumeSnapshot: VolumeSnapshotKind,
+) => getDataVolumeSize(dataVolume) || getPVCSize(pvc) || getVolumeSnapshotSize(volumeSnapshot);

@@ -57,9 +57,7 @@ const SavedSearchesDropdown: FC = () => {
     if (searches.length === 0) {
       return (
         <div className={emptyStateWrapperClass}>
-          {t(
-            "You haven’t saved any searches yet. Run a search and click 'Save search' to add it here.",
-          )}
+          {t("When you search for something and click 'Save search', it’ll show up here.")}
         </div>
       );
     }

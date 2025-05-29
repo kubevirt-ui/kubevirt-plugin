@@ -5,8 +5,12 @@ declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Cypress {
     interface Chainable {
+      beforeSpec(): void;
       checkHCOSpec(spec: string, matchString: string, include: boolean): void;
       checkVMSpec(vmName: string, spec: string, matchString: string, include: boolean): void;
+      patchVM(vmName: string, status: string): void;
+      startVM(vmName: string): void;
+      stopVM(vmName: string): void;
     }
   }
 }
@@ -35,3 +39,27 @@ Cypress.Commands.add(
     });
   },
 );
+
+Cypress.Commands.add('patchVM', (vmName: string, status: string) => {
+  cy.exec(
+    `oc patch virtualmachine ${vmName} --type merge -p '{"spec":{"runStrategy":"${status}"}}'`,
+  );
+});
+
+Cypress.Commands.add('startVM', (vmName: string) => {
+  cy.patchVM(vmName, 'Always');
+  cy.exec(`oc wait --for=condition=ready vm/${vmName} --timeout=120s`, { timeout: 120000 });
+});
+
+Cypress.Commands.add('stopVM', (vmName: string) => {
+  cy.patchVM(vmName, 'Halted');
+});
+
+Cypress.Commands.add('beforeSpec', () => {
+  cy.visit('');
+  cy.get('[data-test="username"]', { timeout: 180000 }).should('exist');
+  cy.switchToVirt();
+  cy.contains('[data-test-id="resource-title"]', 'Virtualization', { timeout: 180000 }).should(
+    'exist',
+  );
+});

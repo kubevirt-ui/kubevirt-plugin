@@ -12,15 +12,21 @@ import {
   V1beta1DataVolume,
 } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import {
+  getDataSourcePVCName,
+  getDataSourcePVCNamespace,
+} from '@kubevirt-utils/resources/bootableresources/selectors';
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
 
-import { getLabel, getName, getNamespace } from '../shared';
+import { getLabel, getName, getNamespace, NamespacedResourceMap } from '../shared';
 
 import { deprecatedOSNames, KUBEVIRT_ISO_LABEL } from './constants';
 import { BootableVolume } from './types';
 
-export const isBootableVolumePVCKind = (bootableVolume: BootableVolume): boolean =>
+export const isBootableVolumePVCKind = (
+  bootableVolume: BootableVolume,
+): bootableVolume is IoK8sApiCoreV1PersistentVolumeClaim =>
   bootableVolume?.kind === PersistentVolumeClaimModel.kind;
 
 export const getBootableVolumeGroupVersionKind = (bootableVolume: BootableVolume) =>
@@ -30,18 +36,21 @@ export const getBootableVolumeGroupVersionKind = (bootableVolume: BootableVolume
 
 export const getBootableVolumePVCSource = (
   bootableVolume: BootableVolume,
-  pvcSources: {
-    [resourceKeyName: string]: IoK8sApiCoreV1PersistentVolumeClaim;
-  },
+  pvcSources: NamespacedResourceMap<IoK8sApiCoreV1PersistentVolumeClaim>,
 ): IoK8sApiCoreV1PersistentVolumeClaim | null => {
   if (isEmpty(bootableVolume)) return null;
 
   return isBootableVolumePVCKind(bootableVolume)
     ? bootableVolume
-    : pvcSources?.[(bootableVolume as V1beta1DataSource)?.spec?.source?.pvc?.namespace]?.[
-        (bootableVolume as V1beta1DataSource)?.spec?.source?.pvc?.name
+    : pvcSources?.[getDataSourcePVCNamespace(bootableVolume as V1beta1DataSource)]?.[
+        getDataSourcePVCName(bootableVolume as V1beta1DataSource)
       ];
 };
+
+export const getDataVolumeForPVC = (
+  pvc: IoK8sApiCoreV1PersistentVolumeClaim,
+  dvSources: NamespacedResourceMap<V1beta1DataVolume>,
+) => (pvc ? dvSources?.[getNamespace(pvc)]?.[getName(pvc)] : null);
 
 export const getInstanceTypePrefix = (instanceTypeNamePrefix: string): string => {
   if (instanceTypeNamePrefix?.includes('.')) {

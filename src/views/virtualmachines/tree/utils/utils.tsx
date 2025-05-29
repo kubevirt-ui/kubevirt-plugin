@@ -168,7 +168,7 @@ const createAllNamespacesTreeItem = (
 
   const allNamespacesTreeItem: TreeViewDataItemWithHref = {
     children: treeViewData,
-    customBadgeContent: allVMsCount || 0,
+    customBadgeContent: allVMsCount || '0',
     defaultExpanded: true,
     href: getResourceUrl({
       model: VirtualMachineModel,

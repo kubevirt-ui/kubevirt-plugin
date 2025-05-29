@@ -12,7 +12,7 @@ import { V1beta1DataVolumeSource } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { KUBEVIRT_ISO_LABEL } from '@kubevirt-utils/resources/bootableresources/constants';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
-import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
+import { buildOwnerReference, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { DATA_SOURCE_CRONJOB_LABEL } from '@kubevirt-utils/resources/template';
 import { appendDockerPrefix, getRandomChars } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
@@ -51,6 +51,8 @@ export const createBootableVolume: createBootableVolumeType =
         ),
       [DROPDOWN_FORM_SELECTION.USE_EXISTING_PVC]: () =>
         createPVCBootableVolume(bootableVolume, bootableVolumeNamespace, draftDataSource),
+      [DROPDOWN_FORM_SELECTION.USE_HTTP]: () =>
+        createHTTPDataSource(bootableVolume, draftDataSource, bootableVolumeNamespace),
       [DROPDOWN_FORM_SELECTION.USE_REGISTRY]: () =>
         createDataSourceWithImportCron(bootableVolume, draftDataSource),
       [DROPDOWN_FORM_SELECTION.USE_SNAPSHOT]: () =>
@@ -131,17 +133,47 @@ const createBootableVolumeFromUpload = async (
     }
     draftDS.spec.source = {
       pvc: {
-        name: bootableVolumeToCreate.metadata.name,
-        namespace: bootableVolumeToCreate.metadata.namespace,
+        name: getName(bootableVolumeToCreate),
+        namespace: getNamespace(bootableVolumeToCreate),
       },
     };
   });
+
   await uploadData({
     dataVolume: bootableVolumeToCreate,
     file: uploadFile as File,
   });
 
   return await k8sCreate({ data: dataSourceToCreate, model: DataSourceModel });
+};
+
+const createHTTPDataSource = async (
+  bootableVolume: AddBootableVolumeState,
+  draftDataSource: V1beta1DataSource,
+  namespace: string,
+) => {
+  const bootableVolumeToCreate = getDataVolumeWithSource(bootableVolume, namespace, {
+    http: { url: bootableVolume.url },
+  });
+
+  const dataSourceToCreate = produce(draftDataSource, (draftDS) => {
+    draftDS.spec.source = {
+      pvc: {
+        name: getName(bootableVolumeToCreate),
+        namespace: getNamespace(bootableVolumeToCreate),
+      },
+    };
+  });
+
+  const createdDS = await k8sCreate({ data: dataSourceToCreate, model: DataSourceModel });
+
+  try {
+    await k8sCreate({ data: bootableVolumeToCreate, model: DataVolumeModel });
+  } catch (error) {
+    k8sDelete({ model: DataSourceModel, resource: createdDS });
+    throw error;
+  }
+  return createdDS;
 };
 
 const createSnapshotDataSource = async (
@@ -174,8 +206,8 @@ export const createPVCBootableVolume = async (
   const dataSourceToCreate = produce(draftDataSource, (draftDS) => {
     draftDS.spec.source = {
       pvc: {
-        name: bootableVolumeToCreate.metadata.name,
-        namespace: bootableVolumeToCreate.metadata.namespace,
+        name: getName(bootableVolumeToCreate),
+        namespace: getNamespace(bootableVolumeToCreate),
       },
     };
   });
@@ -207,7 +239,7 @@ export const createDataSourceWithImportCron: CreateDataSourceWithImportCronType 
   const dataImportCronName = `${bootableVolumeName}-import-cron-${getRandomChars()}`;
   const dataImportCron = produce(initialDataImportCron, (draft) => {
     draft.metadata.name = dataImportCronName;
-    draft.metadata.namespace = initialDataSource?.metadata?.namespace;
+    draft.metadata.namespace = getNamespace(initialDataSource);
     draft.spec = {
       garbageCollect: 'Outdated',
       importsToKeep: retainRevisions,

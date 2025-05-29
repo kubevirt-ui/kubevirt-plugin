@@ -5,7 +5,7 @@ export enum ListManagementGroupSize {
 }
 
 export const getListManagementGroupSize = (width: number) => {
-  if (width < 880) return ListManagementGroupSize.sm;
-  if (width < 1090) return ListManagementGroupSize.md;
+  if (width < 660) return ListManagementGroupSize.sm;
+  if (width < 735) return ListManagementGroupSize.md;
   return ListManagementGroupSize.lg;
 };

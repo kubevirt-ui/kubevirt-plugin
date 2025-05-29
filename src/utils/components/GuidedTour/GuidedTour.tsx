@@ -26,6 +26,10 @@ const GuidedTour: FC = () => {
         const { action, index, size, step, type } = callbackProps;
         const route = step?.data?.route;
 
+        if (typeof step?.target === 'string') {
+          document.querySelector(step.target)?.scrollIntoView();
+        }
+
         if (!isEmpty(route) && location.pathname !== route) {
           navigate(route);
         }
@@ -38,6 +42,7 @@ const GuidedTour: FC = () => {
         if (type === EVENTS.STEP_AFTER) {
           if (action === ACTIONS.PREV) {
             prevStep();
+
             return;
           }
           if (action === ACTIONS.NEXT) {

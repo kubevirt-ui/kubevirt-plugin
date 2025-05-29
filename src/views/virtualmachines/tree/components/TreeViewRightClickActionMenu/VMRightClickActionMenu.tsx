@@ -1,10 +1,12 @@
 import React, { FC } from 'react';
+import classNames from 'classnames';
 
 import ActionDropdownItem from '@kubevirt-utils/components/ActionDropdownItem/ActionDropdownItem';
 import useSingleNodeCluster from '@kubevirt-utils/hooks/useSingleNodeCluster';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { Menu, MenuContent, MenuList, Popper } from '@patternfly/react-core';
 import useVirtualMachineActionsProvider from '@virtualmachines/actions/hooks/useVirtualMachineActionsProvider';
+import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 import { getVMIMFromMapper } from '@virtualmachines/utils/mappers';
 
 import { vmimMapperSignal, vmsSignal } from '../../utils/signals';
@@ -29,10 +31,18 @@ const VMRightClickActionMenu: FC<VMRightClickActionMenuProps> = ({ hideMenu, tri
 
   const [actions] = useVirtualMachineActionsProvider(vm, vmim, isSingleNodeCluster);
 
+  const vmHasFolder = !!getLabel(vm, VM_FOLDER_LABEL);
+
   return (
     <Popper
       popper={
-        <Menu className="right-click-action-menu--vm" containsFlyout>
+        <Menu
+          className={classNames(
+            'right-click-action-menu',
+            vmHasFolder ? 'right-click-action-menu--nested-2' : 'right-click-action-menu--nested-1',
+          )}
+          containsFlyout
+        >
           <MenuContent>
             <MenuList>
               {actions?.map((action) => (

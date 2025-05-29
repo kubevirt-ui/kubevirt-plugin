@@ -8,9 +8,9 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { SelectOption, Title } from '@patternfly/react-core';
 
+import useQuery from '../../../../../../utils/hooks/useQuery';
 import { ALL_NETWORKS } from '../utils/constants';
 
-import useQuery from './hook/useQuery';
 import NetworkChartsByNIC from './NetworkChartsByNIC';
 
 import '../virtual-machine-metrics-tab.scss';

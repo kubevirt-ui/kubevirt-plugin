@@ -7,6 +7,7 @@ import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalPr
 import MoveBulkVMToFolderModal from '@kubevirt-utils/components/MoveVMToFolderModal/MoveBulkVMsToFolderModal';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getLabels, getNamespace } from '@kubevirt-utils/resources/shared';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Action, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
@@ -28,10 +29,11 @@ export const BulkVirtualMachineActionFactory = {
           vms={vms}
         />
       )),
+    disabled: isEmpty(vms),
     id: ACTIONS_ID.DELETE,
     label: t('Delete'),
   }),
-  editLabel: (vms: V1VirtualMachine[], createModal: (modal: ModalComponent) => void): Action => ({
+  editLabels: (vms: V1VirtualMachine[], createModal: (modal: ModalComponent) => void): Action => ({
     cta: () => {
       const commonLabels = getCommonLabels(vms);
 
@@ -55,6 +57,7 @@ export const BulkVirtualMachineActionFactory = {
         />
       ));
     },
+    disabled: isEmpty(vms),
     id: ACTIONS_ID.EDIT_LABELS,
     label: t('Edit labels'),
   }),
@@ -105,7 +108,7 @@ export const BulkVirtualMachineActionFactory = {
           vms={vms}
         />
       )),
-    disabled: !isSameNamespace(vms),
+    disabled: !isSameNamespace(vms) || isEmpty(vms),
     id: ACTIONS_ID.MOVE_TO_FOLDER,
     label: t('Move to folder'),
   }),
@@ -126,6 +129,7 @@ export const BulkVirtualMachineActionFactory = {
             />
           ))
         : vms.forEach(pauseVM),
+    disabled: isEmpty(vms),
     id: ACTIONS_ID.PAUSE,
     label: t('Pause'),
   }),
@@ -146,11 +150,13 @@ export const BulkVirtualMachineActionFactory = {
             />
           ))
         : vms.forEach(restartVM),
+    disabled: isEmpty(vms),
     id: ACTIONS_ID.RESTART,
     label: t('Restart'),
   }),
   start: (vms: V1VirtualMachine[]): Action => ({
     cta: () => vms.forEach(startVM),
+    disabled: isEmpty(vms),
     id: ACTIONS_ID.START,
     label: t('Start'),
   }),
@@ -172,11 +178,13 @@ export const BulkVirtualMachineActionFactory = {
           ))
         : vms.forEach((vm) => stopVM(vm));
     },
+    disabled: isEmpty(vms),
     id: ACTIONS_ID.STOP,
     label: t('Stop'),
   }),
   unpause: (vms: V1VirtualMachine[]): Action => ({
     cta: () => vms.forEach(unpauseVM),
+    disabled: isEmpty(vms),
     id: ACTIONS_ID.UNPAUSE,
     label: t('Unpause'),
   }),

@@ -7,12 +7,13 @@ import { VirtualMachineInstancetypeModelRef } from '@kubevirt-ui/kubevirt-api/co
 import VirtualMachineClusterInstancetypeModel, {
   VirtualMachineClusterInstancetypeModelRef,
 } from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineClusterInstancetypeModel';
+import { PageTitles } from '@kubevirt-utils/constants/page-constants';
 import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
 import useIsSearchPage from '@kubevirt-utils/hooks/useIsSearchPage';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ListPageProps } from '@kubevirt-utils/utils/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
+import { DocumentTitle, ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
 import { Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 
 import InstancetypeCreateButton from './components/InstancetypeCreateButton/InstancetypeCreateButton';
@@ -58,16 +59,16 @@ const InstanceTypePage: FC<ListPageProps> = (props) => {
     );
   }
 
+  const pageTitle =
+    activeTabKey === 0
+      ? PageTitles.VirtualMachineClusterInstanceTypes
+      : PageTitles.VirtualMachineInstanceTypes;
+
   return (
     <>
+      <DocumentTitle>{pageTitle}</DocumentTitle>
       <div className={classNames({ 'list-header-spacer': activeTabKey === 0 })}>
-        <ListPageHeader
-          title={
-            activeTabKey === 0
-              ? t('VirtualMachineClusterInstanceTypes')
-              : t('VirtualMachineInstanceTypes')
-          }
-        >
+        <ListPageHeader title={pageTitle}>
           {(activeTabKey === 0 || (!isEmpty(instanceTypes) && loaded && !loadError)) && (
             <InstancetypeCreateButton namespace={activeNamespace} />
           )}
@@ -82,6 +83,7 @@ const InstanceTypePage: FC<ListPageProps> = (props) => {
           );
         }}
         activeKey={activeTabKey}
+        className="co-horizontal-nav"
         style={{ flexShrink: 0 }}
       >
         <Tab
