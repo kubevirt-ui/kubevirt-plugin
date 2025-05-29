@@ -1,35 +1,14 @@
-import secretFixture from '../../fixtures/secret';
-import { CNV_NS, TEST_NS, TEST_SECRET_NAME } from '../../utils/const/index';
+import { TEST_NS, TEST_SECRET_NAME } from '../../utils/const/index';
 import { authSSHKey, YAML } from '../../utils/const/string';
 import { itemCreateBtn, mastheadLogo, saveBtn } from '../../views/selector';
 import { manageKeysText, useExisting } from '../../views/selector-catalog';
 import { tab } from '../../views/tab';
-
-const WELCOME_OFF_CMD = `oc patch configmap -n ${CNV_NS} kubevirt-user-settings --type=merge --patch '{"data": {"kube-admin": "{\\"quickStart\\":{\\"dontShowWelcomeModal\\":true}}"}}'`;
 
 describe('Prepare the cluster for test', () => {
   before(() => {
     cy.login();
     cy.exec('oc whoami').then((result) => {
       cy.task('log', `Running as: [${result.stdout}]`);
-    });
-  });
-
-  it('create test namespace', () => {
-    cy.exec(`oc get ns ${TEST_NS} || oc new-project ${TEST_NS}`);
-  });
-
-  it('create test secret', () => {
-    cy.exec(
-      `oc get secret -n ${TEST_NS} ${TEST_SECRET_NAME} || echo '${JSON.stringify(
-        secretFixture,
-      )}' | oc create -f -`,
-    );
-  });
-
-  it('close the welcome modal by CLI', () => {
-    cy.exec(WELCOME_OFF_CMD).then((result) => {
-      cy.task('log', `WELCOME_OFF_CMD: [${result.stdout}]`);
     });
   });
 
@@ -40,7 +19,8 @@ describe('Prepare the cluster for test', () => {
   });
 
   it('configure public ssh key', () => {
-    cy.visitOverview();
+    cy.visitVMsVirt();
+    cy.visitOverviewVirt();
     tab.navigateToSettings();
     cy.contains('button[role="tab"]', 'User').click();
     cy.contains(manageKeysText).click();

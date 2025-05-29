@@ -3,6 +3,7 @@ import { tab } from '../../views/tab';
 
 describe('Test Cluster General settings', () => {
   before(() => {
+    cy.beforeSpec();
     tab.navigateToOverview();
     tab.navigateToSettings();
   });
@@ -18,6 +19,7 @@ describe('Test Cluster General settings', () => {
     it('set live migration limits', () => {
       cy.contains('General settings').click();
       cy.contains('Live migration').click();
+      cy.wait(3000);
       cy.get('input[name="parallelMigrationsPerCluster"]').clear().type('4');
       cy.get('input[name="parallelOutboundMigrationsPerNode"]').clear().type('1');
       cy.contains('Set live migration network').click();

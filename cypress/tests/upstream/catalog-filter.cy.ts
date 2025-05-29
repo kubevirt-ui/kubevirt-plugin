@@ -7,7 +7,8 @@ import { cardTitleV6 } from '../../views/selector-overview';
 
 describe('Test filter in InstanceType', () => {
   before(() => {
-    cy.visitCatalog();
+    cy.beforeSpec();
+    cy.visitCatalogVirt();
   });
 
   it('test hint in InstanceTypes boot volume', () => {

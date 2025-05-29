@@ -1,12 +1,11 @@
 import { ALL_PROJ_NS } from '../../utils/const/index';
 import { TEMPLATE } from '../../utils/const/template';
-import { catalogNav } from '../../views/selector';
 import * as tView from '../../views/selector-template';
 
 describe('Test template list page', () => {
   beforeEach(() => {
-    cy.clickVirtLink(catalogNav);
-    cy.visitTemplates();
+    cy.beforeSpec();
+    cy.visitTemplatesVirt();
   });
 
   it('filter template by name', () => {

@@ -12,7 +12,7 @@ const enum Card {
 
 describe('Test Virtualization Top consumer tab', () => {
   before(() => {
-    cy.visitOverview();
+    cy.beforeSpec();
     tab.navigateToTopConsumers();
   });
 
