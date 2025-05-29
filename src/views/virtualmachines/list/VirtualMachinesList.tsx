@@ -46,6 +46,7 @@ import {
   K8sResourceCommon,
   ListPageBody,
   OnFilterChange,
+  useK8sWatchResource,
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
@@ -126,7 +127,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
     },
   );
 
-  const [pvcs] = useKubevirtWatchResource<IoK8sApiCoreV1PersistentVolumeClaim[]>({
+  const [pvcs] = useK8sWatchResource<IoK8sApiCoreV1PersistentVolumeClaim[]>({
     groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
     isList: true,
     limit: OBJECTS_FETCHING_LIMIT,
