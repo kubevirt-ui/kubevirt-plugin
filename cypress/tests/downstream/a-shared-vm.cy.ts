@@ -26,7 +26,9 @@ describe('Create VMs from InstanceType', () => {
     cy.contains(VM_IT_CUST.description).should('be.visible');
     cy.contains(VM_IT_CUST.hostname).should('be.visible');
     tab.navigateToConsole();
+    cy.byTestID('username-show-hide-button').click();
     cy.contains('.pf-v6-c-clipboard-copy', VM_IT_CUST.cloudInitUname).should('be.visible');
+    cy.byTestID('password-show-hide-button').click();
     cy.contains('.pf-v6-c-clipboard-copy', VM_IT_CUST.cloudInitPwd).should('be.visible');
   });
 
@@ -44,7 +46,9 @@ describe('Create VMs from InstanceType', () => {
     cy.contains(VM_TMPL_CUST.hostname).should('be.visible');
     cy.contains(VM_TMPL_CUST.bootMode).should('be.visible');
     tab.navigateToConsole();
+    cy.byTestID('username-show-hide-button').click();
     cy.contains('.pf-v6-c-clipboard-copy', VM_TMPL_CUST.cloudInitUname).should('be.visible');
+    cy.byTestID('password-show-hide-button').click();
     cy.contains('.pf-v6-c-clipboard-copy', VM_TMPL_CUST.cloudInitPwd).should('be.visible');
   });
 });
