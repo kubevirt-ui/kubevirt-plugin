@@ -2,26 +2,26 @@ import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Tooltip, TooltipPosition } from '@patternfly/react-core';
-import { InProgressIcon } from '@patternfly/react-icons';
+import { HelpIcon } from '@patternfly/react-icons';
 
 import { NetworkIconProps } from './NetworkIcon';
 import { stateText } from './utils';
 
 import './LinkStateIcon.scss';
 
-const LinkStateAbsentIcon: FC<NetworkIconProps> = ({ configuredState, runtimeState }) => {
+const LinkStateUnsupportedIcon: FC<NetworkIconProps> = ({ configuredState, runtimeState }) => {
   const { t } = useKubevirtTranslation();
 
   return (
     <Tooltip
       content={`${stateText({ configuredState, runtimeState, t })}\n${t(
-        'This interface is currently hot-unplugged until the VirtualMachine is migrated.',
+        'Link state is not available for this type of network interface',
       )}`}
       position={TooltipPosition.right}
     >
-      <InProgressIcon className="link-state-icon" />
+      <HelpIcon className="link-state-icon" />
     </Tooltip>
   );
 };
 
-export default LinkStateAbsentIcon;
+export default LinkStateUnsupportedIcon;

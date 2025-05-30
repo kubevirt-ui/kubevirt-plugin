@@ -2,16 +2,11 @@ import produce from 'immer';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import {
-  V1Interface,
   V1Network,
   V1VirtualMachine,
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceNetworkInterface,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import LinkStateAbsentIcon from '@kubevirt-utils/components/NetworkIcons/LinkStateAbsentIcon';
-import LinkStateDownIcon from '@kubevirt-utils/components/NetworkIcons/LinkStateDownIcon';
-import LinkStateSRIOVIcon from '@kubevirt-utils/components/NetworkIcons/LinkStateSRIOVIcon';
-import LinkStateUpIcon from '@kubevirt-utils/components/NetworkIcons/LinkStateUpIcon';
 import { NetworkInterfaceState } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/types';
 import {
   getAutoAttachPodInterface,
@@ -26,7 +21,8 @@ import {
   getNetworkInterfaceType,
 } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { getVMIInterfaces, getVMIStatusInterfaces } from '@kubevirt-utils/resources/vmi';
-import { ensurePath, isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
+import { isNetworkInterfaceState } from '@kubevirt-utils/utils/typeGuards';
+import { ensurePath, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { isRunning, isStopped } from '@virtualmachines/utils';
 
@@ -50,17 +46,24 @@ export const isPendingHotPlugNIC = (
   nicName: string,
 ): boolean => {
   const vmRunning = isRunning(vm);
+  const vmiAvailable = !!vmi;
 
-  return vmRunning && (!isActiveOnGuest(vmi, nicName, vmRunning) || isAbsent(vm, nicName));
+  return (
+    vmRunning &&
+    vmiAvailable &&
+    (!isActiveOnGuest(vmi, nicName, vmRunning) || isAbsent(vm, nicName))
+  );
 };
 
 export const interfaceNotFound = (vm: V1VirtualMachine, nicName: string) =>
   !Boolean(getInterfaces(vm)?.find((iface) => iface?.name === nicName));
 
 //special case - when u add ephemeral nic from vm console terminal
-export const isInterfaceEphemeral = (network: V1Network, iface: V1Interface) => {
-  const ifaceVMIStatus = iface as V1VirtualMachineInstanceNetworkInterface;
-  const ifaceVMI = !network && ifaceVMIStatus.infoSource === 'guest-agent' && ifaceVMIStatus;
+export const isInterfaceEphemeral = (
+  network: V1Network,
+  ifaceVMIStatus: V1VirtualMachineInstanceNetworkInterface,
+) => {
+  const ifaceVMI = !network && ifaceVMIStatus && ifaceVMIStatus?.infoSource === 'guest-agent';
 
   return ifaceVMI;
 };
@@ -86,20 +89,52 @@ export const isPendingRemoval = (
   return interfaceNotFound(vm, nicName) && isActiveOnGuest(vmi, nicName, isVMRunning);
 };
 
-export const isSRIOVInterface = (vm: V1VirtualMachine, nicName: string) => {
+export const isSRIOVInterfaceByVM = (vm: V1VirtualMachine, nicName: string) => {
   const iface = getNetworkInterface(vm, nicName);
   return interfaceTypesProxy[getNetworkInterfaceType(iface)] === interfaceTypesProxy.sriov;
 };
 
-export const getInterfaceState = (vm: V1VirtualMachine, nicName: string): NetworkInterfaceState => {
-  const simpleIfaceState = getNetworkInterfaceState(vm, nicName);
+export const isSRIOVInterface = <T extends { sriov?: object }>(iface: T) => !!iface?.sriov;
 
-  if (isSRIOVInterface(vm, nicName)) return undefined;
+export const getConfigInterfaceStateFromVm = (
+  vm: V1VirtualMachine,
+  nicName: string,
+): NetworkInterfaceState =>
+  getConfigInterfaceState(
+    getNetworkInterface(vm, nicName),
+    getNetworkInterfaceState(vm, nicName),
+    isSRIOVInterfaceByVM(vm, nicName),
+  );
 
-  return isEmpty(simpleIfaceState)
-    ? NetworkInterfaceState.UP
-    : (simpleIfaceState as NetworkInterfaceState);
+export const getConfigInterfaceState = (
+  iface?: unknown,
+  ifaceState?: string,
+  isSRIOV?: boolean,
+): NetworkInterfaceState => {
+  if (!iface) {
+    // no interface
+    return NetworkInterfaceState.NONE;
+  }
+  if (isSRIOV) {
+    return NetworkInterfaceState.UNSUPPORTED;
+  }
+
+  return isNetworkInterfaceState(ifaceState) ? ifaceState : NetworkInterfaceState.UP;
 };
+
+export const getRuntimeInterfaceState = (simpleIfaceState: string): NetworkInterfaceState => {
+  return isNetworkInterfaceState(simpleIfaceState) ? simpleIfaceState : NetworkInterfaceState.NONE;
+};
+
+export const getAggregatedInterfaceState = (
+  currentSate: NetworkInterfaceState,
+  desiredState: NetworkInterfaceState,
+) =>
+  currentSate === NetworkInterfaceState.NONE &&
+  (desiredState === NetworkInterfaceState.ABSENT ||
+    desiredState === NetworkInterfaceState.UNSUPPORTED)
+    ? desiredState
+    : currentSate;
 
 export const setNetworkInterfaceState = (
   vm: V1VirtualMachine,
@@ -120,13 +155,5 @@ export const setNetworkInterfaceState = (
   }).catch((error) => kubevirtConsole.error(error));
 };
 
-const interfaceStateIcons = {
-  [NetworkInterfaceState.ABSENT]: LinkStateAbsentIcon,
-  [NetworkInterfaceState.DOWN]: LinkStateDownIcon,
-  [NetworkInterfaceState.UP]: LinkStateUpIcon,
-};
-
-export const getNetworkInterfaceStateIcon = (vm: V1VirtualMachine, nicName: string) => {
-  const interfaceState = getInterfaceState(vm, nicName);
-  return isSRIOVInterface(vm, nicName) ? LinkStateSRIOVIcon : interfaceStateIcons[interfaceState];
-};
+export const isLinkStateEditable = (state: NetworkInterfaceState) =>
+  state === NetworkInterfaceState.DOWN || state === NetworkInterfaceState.UP;
