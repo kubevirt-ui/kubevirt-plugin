@@ -24,6 +24,7 @@ import TreeViewToolbar from './TreeViewToolbar';
 type TreeViewContentProps = {
   hideSwitch: boolean;
   isOpen: boolean;
+  isSmallScreen: boolean;
   loaded: boolean;
   onSelect: (_event: React.MouseEvent, treeViewItem: TreeViewDataItem) => void;
   selectedTreeItem: TreeViewDataItem;
@@ -34,6 +35,7 @@ type TreeViewContentProps = {
 const TreeViewContent: FC<TreeViewContentProps> = ({
   hideSwitch,
   isOpen,
+  isSmallScreen,
   loaded,
   onSelect,
   selectedTreeItem,
@@ -56,13 +58,13 @@ const TreeViewContent: FC<TreeViewContentProps> = ({
 
   const panelToggleButton = <PanelToggleButton isOpen={isOpen} toggleDrawer={toggleDrawer} />;
 
-  if (!isOpen) {
+  if (!isOpen && !isSmallScreen) {
     return panelToggleButton;
   }
 
   return (
     <>
-      {panelToggleButton}
+      {!isSmallScreen && panelToggleButton}
       <TreeViewToolbar hideSwitch={hideSwitch} onSearch={onSearch} />
       <DrawerHead className="vms-tree-view__header-section">
         <Content className="vms-tree-view__title" component="p">

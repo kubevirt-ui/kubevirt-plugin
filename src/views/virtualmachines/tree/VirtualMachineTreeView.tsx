@@ -1,5 +1,6 @@
 import React, { CSSProperties, FC, useMemo } from 'react';
 
+import useIsSmallScreen from '@kubevirt-utils/hooks/useIsSmallScreen';
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
 import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
@@ -40,6 +41,8 @@ const VirtualMachineTreeView: FC<VirtualMachineTreeViewProps> = ({
   onFilterChange,
   treeData,
 }) => {
+  const isSmallScreen = useIsSmallScreen();
+
   const [drawerWidth, setDrawerWidth] = useLocalStorage(TREE_VIEW_LAST_WIDTH, OPEN_DRAWER_SIZE);
   const [drawerOpen, setDrawerOpen] = useLocalStorage(SHOW_TREE_VIEW, SHOW);
 
@@ -69,32 +72,41 @@ const VirtualMachineTreeView: FC<VirtualMachineTreeViewProps> = ({
   };
 
   const styles = { ...widthStyles, ...heightStyles } as CSSProperties;
+
+  const treeView = (
+    <TreeViewContent
+      hideSwitch={hideSwitch}
+      isOpen={isOpen}
+      isSmallScreen={isSmallScreen}
+      loaded={loaded}
+      onSelect={onSelect}
+      selectedTreeItem={selected}
+      toggleDrawer={toggleDrawer}
+      treeData={treeData}
+    />
+  );
+
   return (
-    <Drawer isExpanded isInline position="start">
-      <DrawerContent
-        panelContent={
-          <DrawerPanelContent
-            className="vms-tree-view"
-            id={TREE_VIEW_PANEL_ID}
-            isResizable={isOpen}
-            onResize={(_, width: number) => setDrawerWidth(`${String(width)}px`)}
-            style={styles}
-          >
-            <TreeViewContent
-              hideSwitch={hideSwitch}
-              isOpen={isOpen}
-              loaded={loaded}
-              onSelect={onSelect}
-              selectedTreeItem={selected}
-              toggleDrawer={toggleDrawer}
-              treeData={treeData}
-            />
-          </DrawerPanelContent>
-        }
-      >
-        <DrawerContentBody style={heightStyles}>{children}</DrawerContentBody>
-      </DrawerContent>
-    </Drawer>
+    <>
+      {isSmallScreen && treeView}
+      <Drawer isExpanded={!isSmallScreen} isInline position="start">
+        <DrawerContent
+          panelContent={
+            <DrawerPanelContent
+              className="vms-tree-view"
+              id={TREE_VIEW_PANEL_ID}
+              isResizable={isOpen}
+              onResize={(_, width: number) => setDrawerWidth(`${String(width)}px`)}
+              style={styles}
+            >
+              {treeView}
+            </DrawerPanelContent>
+          }
+        >
+          <DrawerContentBody style={heightStyles}>{children}</DrawerContentBody>
+        </DrawerContent>
+      </Drawer>
+    </>
   );
 };
 

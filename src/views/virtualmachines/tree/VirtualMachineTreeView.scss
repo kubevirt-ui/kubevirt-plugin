@@ -89,16 +89,11 @@
   margin-left: 4.5rem;
 }
 
-.pf-v6-c-drawer__body.vms-tree-view-body {
-  padding: 0;
+.vms-tree-view-body {
+  padding: 0 var(--pf-t--global--spacer--sm);
+  height: fit-content;
 }
 
-.pf-v6-c-drawer__panel-main {
-  .pf-v6-c-drawer__body {
-    padding: 0 var(--pf-t--global--spacer--sm);
-    height: fit-content;
-  }
-}
 .pf-v6-c-toolbar__content.vms-tree-view-toolbar-content {
   width: 100%;
   padding: 0;
