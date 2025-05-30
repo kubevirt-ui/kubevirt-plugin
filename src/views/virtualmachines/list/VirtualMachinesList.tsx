@@ -47,6 +47,7 @@ import {
 } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import useQuery from '@kubevirt-utils/hooks/useQuery';
 import useSingleNodeCluster from '@kubevirt-utils/hooks/useSingleNodeCluster';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   DocumentTitle,
@@ -58,6 +59,7 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Flex, Pagination } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
+import { vmsSignal } from '@virtualmachines/tree/utils/signals';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 import { convertIntoPVCMapper } from '@virtualmachines/utils/mappers';
 
@@ -70,11 +72,10 @@ import VirtualMachineSelection from './components/VirtualMachineSelection/Virtua
 import { TEXT_FILTER_LABELS_ID } from './hooks/constants';
 import useExistingSelectedVMs from './hooks/useExistingSelectedVMs';
 import useFiltersFromURL from './hooks/useFiltersFromURL';
-import useSelectedFilters from './hooks/useSelectedFilters';
 import useVirtualMachineColumns from './hooks/useVirtualMachineColumns';
 import { useVMListFilters } from './hooks/useVMListFilters/useVMListFilters';
 import useVMMetrics from './hooks/useVMMetrics';
-import { getListManagementGroupSize, ListManagementGroupSize } from './listManagementGroupSize';
+import { getListPageBodySize, ListPageBodySize } from './listPageBodySize';
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
 import './VirtualMachinesList.scss';
@@ -189,8 +190,6 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
     [onFilterChange, listPageFilterRef.current],
   );
 
-  const selectedFilters = useSelectedFilters(filters, searchFilters);
-
   const [data, paginatedVMs] = useMemo(() => {
     if (!featureEnabled || isProxyPodAlive === false) {
       return [filteredData, filteredData?.slice(pagination.startIndex, pagination.endIndex)];
@@ -217,10 +216,8 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
     query,
   ]);
 
-  const listManagementGroupRef = useRef<HTMLDivElement>(null);
-  const listManagementGroupSize = getListManagementGroupSize(
-    useContainerWidth(listManagementGroupRef),
-  );
+  const listPageBodyRef = useRef<HTMLDivElement>(null);
+  const listPageBodySize = getListPageBodySize(useContainerWidth(listPageBodyRef));
 
   const onPageChange = ({ endIndex, page, perPage, startIndex }) => {
     setPagination(() => ({
@@ -247,113 +244,108 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
     !loadingFeatureProxy &&
     loadedColumns;
 
-  const vmsFilteredWithProxy = isProxyPodAlive && selectedFilters.length > 0;
-
-  const noVMs = isEmpty(vmsToShow) && !vmsFilteredWithProxy;
-
   const existingSelectedVMs = useExistingSelectedVMs(data);
-  const allVMsSelected = data?.length === existingSelectedVMs.length;
+  const isAllVMsSelected = data?.length === existingSelectedVMs.length;
 
-  const vmSummary = (
-    <VirtualMachineListSummary
-      namespace={namespace}
-      onFilterChange={onFilterChange}
-      vmis={vmis}
-      vms={vmsToShow}
-    />
+  const allVMs = vmsSignal?.value;
+
+  const hasNoVMs = isEmpty(
+    namespace ? allVMs?.filter((resource) => getNamespace(resource) === namespace) : allVMs,
   );
-
-  if (loaded && noVMs) {
-    return (
-      <>
-        {!isSearchResultsPage && vmSummary}
-        <VirtualMachineEmptyState catalogURL={catalogURL} namespace={namespace} />
-      </>
-    );
-  }
 
   return (
     /* All of this table and components should be replaced to our own fitted components */
     <>
       <DocumentTitle>{PageTitles.VirtualMachines}</DocumentTitle>
-      {!isSearchResultsPage && vmSummary}
+      {!isSearchResultsPage && (
+        <VirtualMachineListSummary
+          namespace={namespace}
+          onFilterChange={onFilterChange}
+          vmis={vmis}
+          vms={allVMs}
+        />
+      )}
       <ListPageBody>
-        <div className="vm-listpagebody">
+        <div className="vm-listpagebody" ref={listPageBodyRef}>
           {isSearchResultsPage && <VirtualMachineSearchResultsHeader />}
-          <ListPageFilter
-            className={classNames('list-managment-group__toolbar', {
-              'is-compact': listManagementGroupSize === ListManagementGroupSize.sm,
-            })}
-            columnLayout={{
-              columns: columns?.map(({ additional, id, title }) => ({
-                additional,
-                id,
-                title,
-              })),
-              id: VirtualMachineModelRef,
-              selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
-              type: t('VirtualMachine'),
-            }}
-            onFilterChange={(...args) => {
-              onFilterChange(...args);
-              setPagination((prevPagination) => ({
-                ...prevPagination,
-                endIndex: prevPagination?.perPage,
-                page: 1,
-                startIndex: 0,
-              }));
-            }}
-            advancedFilters={advancedFilters}
-            data={vmsToShow}
-            listManagementGroupSize={listManagementGroupSize}
-            loaded={loaded}
-            projectFilter={projectFilter}
-            refProp={listPageFilterRef}
-            rowFilters={filters}
-            searchFilters={searchFilters}
-          />
-          <div className="list-managment-group" ref={listManagementGroupRef}>
-            <VirtualMachineSelection loaded={loaded} pagination={pagination} vms={data} />
-            <Flex flexWrap={{ default: 'nowrap' }}>
-              <div className="vm-actions-toggle">
-                <VirtualMachineBulkActionButton vms={data} />
-              </div>
-              <Pagination
-                onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
-                  onPageChange({ endIndex, page, perPage, startIndex })
-                }
-                onSetPage={(_e, page, perPage, startIndex, endIndex) =>
-                  onPageChange({ endIndex, page, perPage, startIndex })
-                }
-                className="list-managment-group__pagination"
-                isCompact={listManagementGroupSize !== ListManagementGroupSize.lg}
-                isLastFullPageShown
-                itemCount={data?.length}
-                page={pagination?.page}
-                perPage={pagination?.perPage}
-                perPageOptions={paginationDefaultValues}
+          {loaded && hasNoVMs ? (
+            <VirtualMachineEmptyState catalogURL={catalogURL} namespace={namespace} />
+          ) : (
+            <>
+              <ListPageFilter
+                className={classNames('list-managment-group__toolbar', {
+                  'is-compact': listPageBodySize === ListPageBodySize.sm,
+                })}
+                columnLayout={{
+                  columns: columns?.map(({ additional, id, title }) => ({
+                    additional,
+                    id,
+                    title,
+                  })),
+                  id: VirtualMachineModelRef,
+                  selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
+                  type: t('VirtualMachine'),
+                }}
+                onFilterChange={(...args) => {
+                  onFilterChange(...args);
+                  setPagination((prevPagination) => ({
+                    ...prevPagination,
+                    endIndex: prevPagination?.perPage,
+                    page: 1,
+                    startIndex: 0,
+                  }));
+                }}
+                advancedFilters={advancedFilters}
+                data={allVMs}
+                listPageBodySize={listPageBodySize}
+                loaded
+                projectFilter={projectFilter}
+                refProp={listPageFilterRef}
+                rowFilters={filters}
+                searchFilters={searchFilters}
               />
-            </Flex>
-          </div>
-          <VirtualizedTable<K8sResourceCommon>
-            EmptyMsg={() => (
-              <div className="pf-v6-u-text-align-center">{t('No VirtualMachines found')}</div>
-            )}
-            rowData={{
-              getVmi: (ns: string, name: string) => vmiMapper?.mapper?.[ns]?.[name],
-              getVmim: (ns: string, name: string) => vmimMapper?.[ns]?.[name],
-              isSingleNodeCluster,
-              kind,
-              pvcMapper,
-            }}
-            allRowsSelected={allVMsSelected}
-            columns={activeColumns}
-            data={paginatedVMs}
-            loaded={loaded}
-            loadError={loadError}
-            Row={VirtualMachineRow}
-            unfilteredData={vmsToShow}
-          />
+              <div className="list-managment-group">
+                <VirtualMachineSelection pagination={pagination} vms={data} />
+                <Flex flexWrap={{ default: 'nowrap' }}>
+                  <VirtualMachineBulkActionButton vms={data} />
+                  <Pagination
+                    onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
+                      onPageChange({ endIndex, page, perPage, startIndex })
+                    }
+                    onSetPage={(_e, page, perPage, startIndex, endIndex) =>
+                      onPageChange({ endIndex, page, perPage, startIndex })
+                    }
+                    className="list-managment-group__pagination"
+                    isCompact={listPageBodySize !== ListPageBodySize.lg}
+                    isLastFullPageShown
+                    itemCount={data?.length}
+                    page={pagination?.page}
+                    perPage={pagination?.perPage}
+                    perPageOptions={paginationDefaultValues}
+                  />
+                </Flex>
+                <VirtualizedTable<K8sResourceCommon>
+                  EmptyMsg={() => (
+                    <div className="pf-v6-u-text-align-center">{t('No VirtualMachines found')}</div>
+                  )}
+                  rowData={{
+                    getVmi: (ns: string, name: string) => vmiMapper?.mapper?.[ns]?.[name],
+                    getVmim: (ns: string, name: string) => vmimMapper?.[ns]?.[name],
+                    isSingleNodeCluster,
+                    kind,
+                    pvcMapper,
+                  }}
+                  allRowsSelected={isAllVMsSelected}
+                  columns={activeColumns}
+                  data={paginatedVMs}
+                  loaded
+                  loadError={loadError}
+                  Row={VirtualMachineRow}
+                  unfilteredData={vmsToShow}
+                />
+              </div>
+            </>
+          )}
         </div>
       </ListPageBody>
     </>
