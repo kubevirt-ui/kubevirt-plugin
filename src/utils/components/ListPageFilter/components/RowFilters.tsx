@@ -13,7 +13,7 @@ import {
   ToolbarLabel,
 } from '@patternfly/react-core';
 import { FilterIcon } from '@patternfly/react-icons';
-import { ListManagementGroupSize } from '@virtualmachines/list/listManagementGroupSize';
+import { ListPageBodySize } from '@virtualmachines/list/listPageBodySize';
 
 import FormPFSelect from '../../FormPFSelect/FormPFSelect';
 import { Filter, FilterKeys, generateRowFilters, intersection } from '../utils';
@@ -22,7 +22,7 @@ type RowFiltersProps = {
   filters: Filter;
   filtersNameMap: FilterKeys;
   generatedRowFilters: ReturnType<typeof generateRowFilters>;
-  listManagementGroupSize?: ListManagementGroupSize;
+  listPageBodySize?: ListPageBodySize;
   rowFilters: RowFilter[];
   selectedRowFilters: string[];
   updateRowFilterSelected: (id: string[]) => void;
@@ -32,7 +32,7 @@ const RowFilters: FC<RowFiltersProps> = ({
   filters,
   filtersNameMap,
   generatedRowFilters,
-  listManagementGroupSize,
+  listPageBodySize,
   rowFilters,
   selectedRowFilters,
   updateRowFilterSelected,
@@ -73,9 +73,6 @@ const RowFilters: FC<RowFiltersProps> = ({
         ),
         <div data-test-id="filter-dropdown-toggle">
           <FormPFSelect
-            selectedLabel={
-              listManagementGroupSize === ListManagementGroupSize.md ? <span></span> : t('Filter')
-            }
             toggleProps={{
               icon: (
                 <Icon className="span--icon__right-margin">
@@ -86,6 +83,7 @@ const RowFilters: FC<RowFiltersProps> = ({
             closeOnSelect={false}
             onSelect={onRowFilterSelect}
             selected={selectedRowFilters}
+            selectedLabel={listPageBodySize === ListPageBodySize.md ? <span></span> : t('Filter')}
           >
             {generatedRowFilters.map((rowFilter) => (
               <SelectGroup key={rowFilter.filterGroupName} label={rowFilter.filterGroupName}>
