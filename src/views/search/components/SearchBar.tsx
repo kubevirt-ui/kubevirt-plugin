@@ -122,6 +122,7 @@ const SearchBar: FC<SearchBarProps> = ({ onFilterChange, resetTextSearch }) => {
         }
         trigger={
           <SearchInput
+            data-test-id="vm-search-input"
             id="vm-search-input"
             onChange={onSearchInputChange}
             onClear={onSearchInputClear}
@@ -132,6 +133,7 @@ const SearchBar: FC<SearchBarProps> = ({ onFilterChange, resetTextSearch }) => {
           />
         }
         appendTo={() => document.querySelector('#vm-search-input')}
+        data-test-id="search-results"
         enableFlip={false}
         isVisible={isSearchSuggestBoxOpen}
         onDocumentClick={() => setIsSearchSuggestBoxOpen(false)}
@@ -143,18 +145,25 @@ const SearchBar: FC<SearchBarProps> = ({ onFilterChange, resetTextSearch }) => {
           onClick={() => {
             showSearchModal();
           }}
+          data-test-id="vm-advanced-search"
           icon={<SlidersHIcon />}
           variant="control"
         />
       </Tooltip>
       <InputGroupItem>
-        <Button isDisabled={!urlSearchQuery} onClick={showSaveSearchModal} variant="link">
+        <Button
+          data-test-id="save-search"
+          isDisabled={!urlSearchQuery}
+          onClick={showSaveSearchModal}
+          variant="link"
+        >
           {t('Save search')}
         </Button>
       </InputGroupItem>
       <InputGroupItem>
         <SavedSearchesDropdown />
       </InputGroupItem>
+      data-test-id={'vm-adv-search-toolbar'}
     </InputGroup>
   );
 };
