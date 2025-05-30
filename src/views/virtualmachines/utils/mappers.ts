@@ -4,16 +4,16 @@ import {
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getName, getNamespace, NamespacedResourceMap } from '@kubevirt-utils/resources/shared';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 export type VMIMapper = {
-  mapper: { [key: string]: { [key: string]: V1VirtualMachineInstance } };
+  mapper: NamespacedResourceMap<V1VirtualMachineInstance>;
   nodeNames: { [key: string]: { id: string; title: string } };
 };
 
-export type VMIMMapper = { [key: string]: { [key: string]: V1VirtualMachineInstanceMigration } };
+export type VMIMMapper = NamespacedResourceMap<V1VirtualMachineInstanceMigration>;
 
 export const getVMIFromMapper = (VMIMapper: VMIMapper, vm: V1VirtualMachine) =>
   VMIMapper?.mapper?.[getNamespace(vm)]?.[getName(vm)];
