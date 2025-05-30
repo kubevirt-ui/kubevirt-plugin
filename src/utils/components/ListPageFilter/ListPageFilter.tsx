@@ -17,7 +17,7 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Toolbar, ToolbarContent, ToolbarToggleGroup } from '@patternfly/react-core';
 import { FilterIcon } from '@patternfly/react-icons';
-import { ListManagementGroupSize } from '@virtualmachines/list/listManagementGroupSize';
+import { ListPageBodySize } from '@virtualmachines/list/listPageBodySize';
 
 import ColumnManagement from '../ColumnManagementModal/ColumnManagement';
 
@@ -39,7 +39,7 @@ type ListPageFilterProps = {
   hideColumnManagement?: boolean;
   hideLabelFilter?: boolean;
   hideNameLabelFilters?: boolean;
-  listManagementGroupSize?: ListManagementGroupSize;
+  listPageBodySize?: ListPageBodySize;
   loaded?: boolean;
   nameFilterPlaceholder?: string;
   onFilterChange?: OnFilterChange;
@@ -57,7 +57,7 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
   hideColumnManagement,
   hideLabelFilter,
   hideNameLabelFilters,
-  listManagementGroupSize,
+  listPageBodySize,
   loaded,
   nameFilterPlaceholder,
   onFilterChange,
@@ -71,10 +71,10 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
   const [toolbarIsExpanded, setToolbarIsExpanded] = useState(false);
 
   useEffect(() => {
-    if (listManagementGroupSize !== ListManagementGroupSize.sm) {
+    if (listPageBodySize !== ListPageBodySize.sm) {
       setToolbarIsExpanded(false);
     }
-  }, [listManagementGroupSize]);
+  }, [listPageBodySize]);
 
   const toolbarFilters = rowFilters?.filter((filter) => 'items' in filter);
 
@@ -149,7 +149,7 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
             filters={filters}
             filtersNameMap={filtersNameMap}
             generatedRowFilters={generatedRowFilters}
-            listManagementGroupSize={listManagementGroupSize}
+            listPageBodySize={listPageBodySize}
             rowFilters={toolbarFilters}
             selectedRowFilters={selectedRowFilters}
             updateRowFilterSelected={updateRowFilterSelected}
