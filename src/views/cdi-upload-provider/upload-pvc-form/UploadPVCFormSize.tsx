@@ -39,7 +39,7 @@ const UploadPVCFormSize = ({
     handleRequestSizeInputChange({ unit: requestSizeUnit, value: newValue });
   };
 
-  const onUnitChange = (event: MouseEvent<HTMLInputElement>, value: string) => {
+  const onUnitChange = (_event: MouseEvent<HTMLInputElement>, value: string) => {
     handleRequestSizeInputChange({
       unit: value,
       value: requestSizeValue,

@@ -74,7 +74,7 @@ const createTopologyVMNodeData = (
 };
 
 export const getKubevirtTopologyDataModel = (
-  namespace: string,
+  _namespace: string,
   resources: TopologyDataResources,
 ): Promise<Model> => {
   const vmsDataModel: Model = { edges: [], nodes: [] };

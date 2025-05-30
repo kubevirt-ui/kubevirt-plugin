@@ -24,7 +24,7 @@ const DeviceNameSelect: FC<DeviceNameSelectProps> = ({
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const onToggle = () => setIsOpen((prevIsOpen) => !prevIsOpen);
-  const onSelect = (event: MouseEvent<HTMLSelectElement>, value: string) => {
+  const onSelect = (_event: MouseEvent<HTMLSelectElement>, value: string) => {
     setDeviceName(value);
     setIsOpen(false);
   };

@@ -14,7 +14,7 @@ const VMsPerResourceCard = () => {
   const [vmResourceOption, setvmResourceOption] = useState(vmsPerResourceOptions[0]?.title);
   const [type, setType] = useState(vmsPerResourceOptions[0]?.type);
 
-  const handleSelect = (event, value) => {
+  const handleSelect = (_event, value) => {
     const selected = vmsPerResourceOptions?.find((option) => option.title === value);
     setvmResourceOption(selected?.title);
     setType(selected?.type);

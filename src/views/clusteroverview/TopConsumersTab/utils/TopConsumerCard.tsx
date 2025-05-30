@@ -61,7 +61,7 @@ const TopConsumerCard: FC<TopConsumersMetricCard> = ({
       <div className="kv-top-consumer-card__header">
         <div>
           <FormPFSelect
-            onSelect={(e, value) => onMetricSelect(value)}
+            onSelect={(_e, value) => onMetricSelect(value)}
             selected={t(TopConsumerMetric.fromString(metricKey)?.getDropdownLabel())}
             toggleProps={{ id: 'kv-top-consumers-card-metric-select' }}
           >
@@ -74,7 +74,7 @@ const TopConsumerCard: FC<TopConsumersMetricCard> = ({
         </div>
         <div className="kv-top-consumer-card__scope-select">
           <FormPFSelect
-            onSelect={(e, value) => onScopeSelect(value)}
+            onSelect={(_e, value) => onScopeSelect(value)}
             selected={t(TopConsumerScope.fromString(scopeKey)?.getDropdownLabel())}
             toggleProps={{ id: 'kv-top-consumers-card-scope-select' }}
           >

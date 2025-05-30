@@ -1,20 +1,18 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import { pathsToModuleNameMapper } from 'ts-jest';
+import { TsJestTransformerOptions, pathsToModuleNameMapper } from 'ts-jest';
+import { Config } from '@jest/types';
 
-import type { Config } from '@jest/types';
 const { compilerOptions } = require('./tsconfig');
+
+const tsJestOptions: TsJestTransformerOptions = {
+  tsconfig: './tsconfig-jest.json',
+};
 
 // Sync object
 const config: Config.InitialOptions = {
   globals: {
     SERVER_FLAGS: {
       basePath: 'http://localhost:9000/',
-    },
-    'ts-jest': {
-      diagnostics: {
-        ignoreCodes: ['TS151001'],
-      },
-      isolatedModules: true,
     },
   },
   moduleFileExtensions: ['js', 'jsx', 'ts', 'tsx'],
@@ -28,14 +26,17 @@ const config: Config.InitialOptions = {
   preset: 'ts-jest',
   setupFilesAfterEnv: ['<rootDir>/jest-setup.ts'],
   testEnvironment: 'jest-environment-jsdom',
+  testEnvironmentOptions: {
+    url: 'http://localhost/',
+  },
   testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/dist/'],
   testRegex: '.*\\.test\\.(ts|tsx|js|jsx)$',
-  testURL: 'http://localhost/',
   transform: {
-    '^.+\\.[t|j]sx?$': 'ts-jest',
+    '^.+\\.[t|j]sx?$': ['ts-jest', tsJestOptions],
   },
   transformIgnorePatterns: [
-    '<rootDir>/node_modules/(?!(@kubevirt-ui/kubevirt-api|byte-size|@patternfly|@openshift-console\\S*?)/.*)',
+    '<rootDir>/node_modules/(?!(@kubevirt-ui|byte-size|@patternfly|@preact|@openshift-console\\S*?)/.*)',
   ],
 };
+
 export default config;

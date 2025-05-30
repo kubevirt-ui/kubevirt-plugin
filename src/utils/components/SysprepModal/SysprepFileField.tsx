@@ -52,7 +52,7 @@ const SysprepFileField: FC<SysprepFileFieldProps> = ({ id, onChange, value }) =>
   return (
     <>
       <FileUpload
-        onFileInputChange={(event: DropEvent, file: File) => {
+        onFileInputChange={(_event: DropEvent, file: File) => {
           setData((currentData: SysprepFile) => ({ ...currentData, fileName: file.name }));
         }}
         onReadFinished={() =>
@@ -61,7 +61,7 @@ const SysprepFileField: FC<SysprepFileFieldProps> = ({ id, onChange, value }) =>
         onReadStarted={() =>
           setData((currentData: SysprepFile) => ({ ...currentData, isLoading: true }))
         }
-        onTextChange={(event: ChangeEvent<HTMLTextAreaElement>, text: string) =>
+        onTextChange={(_event: ChangeEvent<HTMLTextAreaElement>, text: string) =>
           onFieldChange(text)
         }
         validated={
@@ -75,7 +75,7 @@ const SysprepFileField: FC<SysprepFileFieldProps> = ({ id, onChange, value }) =>
         id={`sysprep-${id}-input`}
         isLoading={data.isLoading}
         isReadOnly={false}
-        onDataChange={(event: DropEvent, text: string) => onFieldChange(text)}
+        onDataChange={(_event: DropEvent, text: string) => onFieldChange(text)}
         type="text"
         value={data.value}
       />

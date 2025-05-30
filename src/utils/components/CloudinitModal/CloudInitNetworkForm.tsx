@@ -30,7 +30,7 @@ export const CloudinitNetworkForm: React.FC<CloudinitNetworkFormProps> = ({
 
       <FormGroup fieldId="custom-network-checkbox">
         <Checkbox
-          onChange={(event: FormEvent<HTMLInputElement>, checked: boolean) =>
+          onChange={(_event: FormEvent<HTMLInputElement>, checked: boolean) =>
             setEnableNetworkData(checked)
           }
           description={t('check this option to add network data section to the cloud-init script.')}

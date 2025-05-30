@@ -26,11 +26,11 @@ const AffinityExpressionRow: FC<AffinityExpressionRowProps> = ({
   const { id, key, operator, values = [] } = expression;
   const enableValueField = operator !== Operator.Exists && operator !== Operator.DoesNotExist;
 
-  const onSelectOperator = (event, selection) => {
+  const onSelectOperator = (_event, selection) => {
     onChange({ ...expression, operator: selection });
   };
 
-  const onSelectValues = (event, selection) => {
+  const onSelectValues = (_event, selection) => {
     const isValueExist = values.some((item) => item === selection);
     if (isValueExist) {
       onChange({ ...expression, values: values.filter((item) => item !== selection) });

@@ -34,7 +34,7 @@ const isMultiDayDuration = (duration: string): boolean =>
   );
 
 export const tickFormat =
-  (duration: string, currentTime: number) => (tick: any, index: number, ticks: any[]) => {
+  (duration: string, currentTime: number) => (_tick: any, index: number, ticks: any[]) => {
     const isFirst = index === 0;
     const isLast = index === ticks.length - 1;
     if (isLast || isFirst) {
