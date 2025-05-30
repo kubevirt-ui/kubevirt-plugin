@@ -11,16 +11,12 @@ import { handleBulkSelect } from './utils/bulkSelect';
 import './virtual-machine-selection.scss';
 
 type VirtualMachineSelectionProps = {
-  loaded?: boolean;
   pagination: PaginationState;
   vms: V1VirtualMachine[];
 };
 
-const VirtualMachineSelection: FC<VirtualMachineSelectionProps> = ({ loaded, pagination, vms }) => {
+const VirtualMachineSelection: FC<VirtualMachineSelectionProps> = ({ pagination, vms }) => {
   const existingSelectedVMs = useExistingSelectedVMs(vms);
-
-  if (!loaded) return null;
-
   const currentPageVMs = vms?.slice(pagination.startIndex, pagination.endIndex);
 
   const isPageChecked =

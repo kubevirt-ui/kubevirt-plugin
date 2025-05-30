@@ -19,6 +19,7 @@ import {
 } from '@patternfly/react-core';
 import { ProjectDiagramIcon } from '@patternfly/react-icons';
 import useVMTotalsMetrics from '@virtualmachines/list/hooks/useVMTotalsMetrics';
+import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 import VirtualMachineUsageItem from '../VirtualMachineUsageItem/VirtualMachineUsageItem';
 
@@ -45,6 +46,9 @@ const VirtualMachineListSummary: FC<VirtualMachineListSummaryProps> = ({
   const { cpuRequested, cpuUsage, memoryCapacity, memoryUsage, storageCapacity, storageUsage } =
     useVMTotalsMetrics(vms, vmis);
 
+  const onStatusChange = (status: 'Error' | VM_STATUS) => () =>
+    onFilterChange(VirtualMachineRowFilterType.Status, { selected: [status] });
+
   return (
     <ExpandableSection
       toggleContent={
@@ -67,25 +71,25 @@ const VirtualMachineListSummary: FC<VirtualMachineListSummaryProps> = ({
               <VMStatusItem
                 count={primaryStatuses.Error}
                 namespace={namespace}
-                onFilterChange={() => onFilterChange('status', { selected: [ERROR] })}
+                onFilterChange={onStatusChange(ERROR)}
                 status={ERROR}
               />
               <VMStatusItem
                 count={primaryStatuses.Running}
                 namespace={namespace}
-                onFilterChange={() => onFilterChange('status', { selected: [VM_STATUS.Running] })}
+                onFilterChange={onStatusChange(VM_STATUS.Running)}
                 status={VM_STATUS.Running}
               />
               <VMStatusItem
                 count={primaryStatuses.Stopped}
                 namespace={namespace}
-                onFilterChange={() => onFilterChange('status', { selected: [VM_STATUS.Stopped] })}
+                onFilterChange={onStatusChange(VM_STATUS.Stopped)}
                 status={VM_STATUS.Stopped}
               />
               <VMStatusItem
                 count={primaryStatuses.Paused}
                 namespace={namespace}
-                onFilterChange={() => onFilterChange('status', { selected: [VM_STATUS.Paused] })}
+                onFilterChange={onStatusChange(VM_STATUS.Paused)}
                 status={VM_STATUS.Paused}
               />
             </Grid>
