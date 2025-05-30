@@ -4,10 +4,11 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getCloudInitCredentials } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { Flex, FlexItem } from '@patternfly/react-core';
+import { Flex } from '@patternfly/react-core';
 
 import { LINE_FEED } from '../vnc-console/utils/util';
 
+import CloudInitCredentialsItem from './CloudInitCredentialsItem';
 import InlineCodeClipboardCopy from './InlineCodeClipboardCopy';
 
 type CloudInitCredentialsContentProps = {
@@ -49,12 +50,18 @@ const CloudInitCredentialsContent: FC<CloudInitCredentialsContentProps> = ({ vm 
   );
   return (
     <Flex className="cloud-init-credentials-user-pass">
-      <FlexItem>
-        {t('User name')} {usernames}
-      </FlexItem>
-      <FlexItem>
-        {t('Password')} {passwords}
-      </FlexItem>
+      <CloudInitCredentialsItem
+        credentials={usernames}
+        credentialTitle={t('User name')}
+        hideCredentialText={t('Hide username')}
+        showCredentialText={t('Show username')}
+      />
+      <CloudInitCredentialsItem
+        credentials={passwords}
+        credentialTitle={t('Password')}
+        hideCredentialText={t('Hide password')}
+        showCredentialText={t('Show password')}
+      />
     </Flex>
   );
 };
