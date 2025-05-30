@@ -20,6 +20,7 @@ import { getDataVolumeTemplateSize } from '../components/utils/selectors';
 
 import { DEFAULT_DISK_SIZE } from './constants';
 import { getEmptyVMDataVolumeResource, hotplugPromise, produceVMDisks } from './helpers';
+import { createDataVolumeName } from './helpers';
 import { V1DiskFormState } from './types';
 
 const applyDiskAsBootable = (vm: V1VirtualMachine, diskName: string): V1VirtualMachine => {
@@ -130,6 +131,12 @@ export const submit = async ({ data, editDiskName, onSubmit, pvc, vm }: SubmitIn
   const shouldHotplug = isVMRunning && isCreatingDisk && isEmpty(data.volume.containerDisk);
 
   const isInitialBootDisk = getBootDisk(vm)?.name === editDiskName;
+
+  if (data.volume.dataVolume) {
+    const newDataVolumeName = createDataVolumeName(vm, data.disk.name);
+    data.volume.dataVolume.name = newDataVolumeName;
+    data.dataVolumeTemplate.metadata.name = newDataVolumeName;
+  }
 
   const vmWithDisk = isEditDisk ? editDisk(data, editDiskName, vm) : addDisk(data, vm);
 
