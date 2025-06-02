@@ -1,15 +1,15 @@
 import { modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineCloneModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineCloneModel';
-import { V1alpha1VirtualMachineClone } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1VirtualMachineClone } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 type UseCloneVMModal = (
   cloneRequestName: string,
   cloneRequestNamespace: string,
-) => V1alpha1VirtualMachineClone;
+) => V1beta1VirtualMachineClone;
 
 const useCloneVMModal: UseCloneVMModal = (cloneRequestName, cloneRequestNamespace) => {
-  const [freshVMCloneRequest] = useK8sWatchResource<V1alpha1VirtualMachineClone>(
+  const [freshVMCloneRequest] = useK8sWatchResource<V1beta1VirtualMachineClone>(
     cloneRequestName &&
       cloneRequestNamespace && {
         groupVersionKind: modelToGroupVersionKind(VirtualMachineCloneModel),

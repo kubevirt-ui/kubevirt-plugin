@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import {
-  V1alpha1VirtualMachineClone,
+  V1beta1VirtualMachineClone,
   V1beta1VirtualMachineSnapshot,
   V1VirtualMachine,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -51,7 +51,7 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
 
   const [startCloneVM, setStartCloneVM] = useState(false);
 
-  const [initialCloneRequest, setInitialCloneRequest] = useState<V1alpha1VirtualMachineClone>();
+  const [initialCloneRequest, setInitialCloneRequest] = useState<V1beta1VirtualMachineClone>();
 
   const sendCloneRequest = async () => {
     const vmSameName = await vmExist(cloneName, namespace);

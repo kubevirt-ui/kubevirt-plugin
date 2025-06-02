@@ -2,7 +2,7 @@ import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolume
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import {
-  K8sIoApiCoreV1ResourceRequirements,
+  K8sIoApiCoreV1VolumeResourceRequirements,
   V1beta1PersistentVolumeClaim,
   V1VirtualMachine,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -14,6 +14,7 @@ import {
   TEMPLATE_DATA_SOURCE_NAME_PARAMETER,
   TEMPLATE_DATA_SOURCE_NAMESPACE_PARAMETER,
 } from '@kubevirt-utils/resources/template';
+import { TEMPLATE_VERSION_LABEL } from '@kubevirt-utils/resources/template';
 import { getDataVolumeTemplates } from '@kubevirt-utils/resources/vm';
 import { multipliers } from '@kubevirt-utils/utils/units';
 import {
@@ -22,7 +23,6 @@ import {
   K8sResourceCommon,
 } from '@openshift-console/dynamic-plugin-sdk';
 
-import { TEMPLATE_VERSION_LABEL } from './../../../utils/resources/template/utils/constants';
 import {
   CDI_CLONE_TOKEN_ANNOTAION,
   CDI_KUBEVIRT_IO,
@@ -42,7 +42,7 @@ const getAnnotation = (
   defaultValue?: string,
 ): string => pvc?.metadata?.annotations?.[annotationName] || defaultValue;
 
-const getStorageSize = (value: K8sIoApiCoreV1ResourceRequirements): string =>
+const getStorageSize = (value: K8sIoApiCoreV1VolumeResourceRequirements): string =>
   value?.requests.storage;
 
 const getParameterValue = (obj: V1Template, name: string, defaultValue = null): string =>

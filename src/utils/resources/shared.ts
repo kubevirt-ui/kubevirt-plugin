@@ -3,7 +3,7 @@ import {
   V1beta1DataImportCron,
   V1beta1DataSource,
 } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
-import { V1alpha1Condition, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1Condition, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { TemplateModel } from '@kubevirt-utils/models';
 import {
@@ -104,14 +104,14 @@ export const getResourceUrl = (urlProps: ResourceUrlProps): string => {
  * @param condition - condition to check
  * @returns condition's reason
  */
-export const getConditionReason = (condition: V1alpha1Condition): string => condition?.reason;
+export const getConditionReason = (condition: V1beta1Condition): string => condition?.reason;
 
 /**
  * function for checking if a condition is true
  * @param condition - condition to check
  * @returns true if condition is true, false otherwise
  */
-export const isConditionStatusTrue = (condition: V1alpha1Condition): boolean =>
+export const isConditionStatusTrue = (condition: V1beta1Condition): boolean =>
   condition?.status === 'True';
 
 /**
@@ -119,8 +119,7 @@ export const isConditionStatusTrue = (condition: V1alpha1Condition): boolean =>
  * @param entity - entity to get condition from
  * @returns array of conditions
  */
-export const getStatusConditions = (entity): V1alpha1Condition[] =>
-  entity?.status?.conditions ?? [];
+export const getStatusConditions = (entity): V1beta1Condition[] => entity?.status?.conditions ?? [];
 
 /**
  * A selector for a resource's conditions based on type
@@ -128,7 +127,7 @@ export const getStatusConditions = (entity): V1alpha1Condition[] =>
  * @param type - type of the condition
  * @returns condition based on type
  */
-export const getStatusConditionsByType = (entity, type: string): V1alpha1Condition =>
+export const getStatusConditionsByType = (entity, type: string): V1beta1Condition =>
   getStatusConditions(entity)?.find((condition) => condition?.type === type);
 
 /**
