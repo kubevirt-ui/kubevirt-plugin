@@ -4,7 +4,7 @@ import VirtualMachineCloneModel from '@kubevirt-ui/kubevirt-api/console/models/V
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import VirtualMachineSnapshotModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineSnapshotModel';
 import {
-  V1alpha1VirtualMachineClone,
+  V1beta1VirtualMachineClone,
   V1beta1VirtualMachineSnapshot,
   V1VirtualMachine,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -14,7 +14,7 @@ import { isVM } from '@kubevirt-utils/utils/typeGuards';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, k8sGet, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 
-const cloneVMToVM: V1alpha1VirtualMachineClone = {
+const cloneVMToVM: V1beta1VirtualMachineClone = {
   apiVersion: `${VirtualMachineCloneModel.apiGroup}/${VirtualMachineCloneModel.apiVersion}`,
   kind: VirtualMachineCloneModel.kind,
   metadata: {
@@ -60,7 +60,7 @@ export const cloneVM = (
     }
   });
 
-  return k8sCreate<V1alpha1VirtualMachineClone>({
+  return k8sCreate<V1beta1VirtualMachineClone>({
     data: cloningRequest,
     model: VirtualMachineCloneModel,
   });

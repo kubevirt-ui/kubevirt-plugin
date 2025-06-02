@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { V1alpha1VirtualMachineClone } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1VirtualMachineClone } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Alert,
@@ -14,7 +14,7 @@ import {
 import { CLONING_STATUSES, STATUS_TO_PROGRESS_VARIANT } from '../utils/constants';
 
 type CloningStatusProps = {
-  vmCloneRequest: V1alpha1VirtualMachineClone;
+  vmCloneRequest: V1beta1VirtualMachineClone;
 };
 
 const CloningStatus: FC<CloningStatusProps> = ({ vmCloneRequest }) => {
