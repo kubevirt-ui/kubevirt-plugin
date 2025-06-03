@@ -161,6 +161,15 @@ export const getNadType = (nad: NetworkAttachmentDefinition): string => {
   }
 };
 
+export const getNADRole = (nad: NetworkAttachmentDefinition): string => {
+  try {
+    const config = JSON.parse(nad?.spec?.config);
+    return config?.role;
+  } catch (e) {
+    kubevirtConsole.log('Cannot convert NAD config: ', e);
+  }
+};
+
 export const deleteNetworkInterface = (
   vm: V1VirtualMachine,
   nicName: string,
