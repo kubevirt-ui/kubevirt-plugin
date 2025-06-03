@@ -2,36 +2,38 @@
 #Please run this script under bash 4+
 set -euo pipefail
 
+source ./route-console.sh
+
 #Cloning, pulling and running other plugins starting from port 9002
 # to add more plugin simply add more properites to dic. [name-of-plugin]={git-repo-url}
-declare -A plugins=(["monitoring-plugin"]="https://github.com/openshift/monitoring-plugin.git", ["networking-console-plugin"]="https://github.com/openshift/networking-console-plugin.git")
-declare -A runningPlugins=(["podman-linux"]="kubevirt-plugin=http://localhost:9001", ["podman"]="kubevirt-plugin=http://host.containers.internal:9001", ["docker"]="kubevirt-plugin=http://host.docker.internal:9001")
+declare -A plugins=(["monitoring-plugin"]="https://github.com/openshift/monitoring-plugin.git" ["networking-console-plugin"]="https://github.com/openshift/networking-console-plugin.git")
+declare -A runningPlugins=(["podman-linux"]="kubevirt-plugin=http://localhost:9001" ["podman"]="kubevirt-plugin=http://host.containers.internal:9001" ["docker"]="kubevirt-plugin=http://host.docker.internal:9001")
 
 INITIAL_PORT=9002
-for arg in $@; do
+for arg in "$@"; do
 
     if [ ! -d "../$arg" ]; then
         echo "Creating a folder $arg ..."
         cd ../
-        echo "Cloning "${plugins[$arg]}" ..."
-        git clone ${plugins[$arg]}
-        cd $arg
+        echo "Cloning ""${plugins[$arg]}"" ..."
+        git clone "${plugins[$arg]}"
+        cd "$arg"
     else
-        cd ../$arg
+        cd ../"$arg"
     fi
     git pull
 
     if [ "$(lsof -t -i:$INITIAL_PORT)" != "" ]; then
-        kill -9 $(lsof -t -i:$INITIAL_PORT)
+        kill -9 "$(lsof -t -i:$INITIAL_PORT)"
     fi
 
-    if [ $arg = "monitoring-plugin" ]; then
+    if [ "$arg" = "monitoring-plugin" ]; then
         cd web
         npm install
         PORT=$INITIAL_PORT npm start --port=$INITIAL_PORT &
     else
-      yarn
-      PORT=$INITIAL_PORT yarn start --port=$INITIAL_PORT &
+        yarn
+        PORT=$INITIAL_PORT yarn start --port=$INITIAL_PORT &
     fi
 
     runningPlugins["podman-linux"]+=",${arg}=http://localhost:${INITIAL_PORT}"
@@ -45,36 +47,38 @@ CONSOLE_PORT=${CONSOLE_PORT:=9000}
 
 echo "Starting local OpenShift console..."
 
-BRIDGE_USER_AUTH="disabled"
-BRIDGE_K8S_MODE="off-cluster"
-BRIDGE_K8S_AUTH="bearer-token"
-BRIDGE_K8S_MODE_OFF_CLUSTER_SKIP_VERIFY_TLS=true
-BRIDGE_K8S_MODE_OFF_CLUSTER_ENDPOINT=$(oc whoami --show-server)
-BRIDGE_K8S_MODE_OFF_CLUSTER_THANOS=$(oc -n openshift-config-managed get configmap monitoring-shared-config -o jsonpath='{.data.thanosPublicURL}')
-BRIDGE_K8S_MODE_OFF_CLUSTER_ALERTMANAGER=$(oc -n openshift-config-managed get configmap monitoring-shared-config -o jsonpath='{.data.alertmanagerPublicURL}')
-BRIDGE_K8S_AUTH_BEARER_TOKEN=$(oc whoami --show-token 2>/dev/null)
-BRIDGE_USER_SETTINGS_LOCATION="localstorage"
-BRIDGE_I18N_NAMESPACES="plugin__kubevirt-plugin"
+export BRIDGE_USER_AUTH="disabled"
+export BRIDGE_K8S_MODE="off-cluster"
+export BRIDGE_K8S_AUTH="bearer-token"
+export BRIDGE_K8S_MODE_OFF_CLUSTER_SKIP_VERIFY_TLS=true
+export BRIDGE_K8S_MODE_OFF_CLUSTER_ENDPOINT=$(oc whoami --show-server)
+export BRIDGE_K8S_MODE_OFF_CLUSTER_THANOS=$(oc -n openshift-config-managed get configmap monitoring-shared-config -o jsonpath='{.data.thanosPublicURL}')
+export BRIDGE_K8S_MODE_OFF_CLUSTER_ALERTMANAGER=$(oc -n openshift-config-managed get configmap monitoring-shared-config -o jsonpath='{.data.alertmanagerPublicURL}')
+export BRIDGE_K8S_AUTH_BEARER_TOKEN=$(oc whoami --show-token 2>/dev/null)
+export BRIDGE_USER_SETTINGS_LOCATION="localstorage"
+export BRIDGE_I18N_NAMESPACES="plugin__kubevirt-plugin"
 
 echo "API Server: $BRIDGE_K8S_MODE_OFF_CLUSTER_ENDPOINT"
 echo "Console Image: $CONSOLE_IMAGE"
 echo "Console URL: http://localhost:${CONSOLE_PORT}"
 
 #Prefer podman if installed. Otherwise, fall back to docker.
+
 if [ -x "$(command -v podman)" ]; then
     if [ "$(uname -s)" = "Linux" ]; then
         # Use host networking on Linux since host.containers.internal is unreachable in some environments.
-        BRIDGE_PLUGINS="${runningPlugins["podman-linux"]}"
-        podman run --pull=always --rm --network=host --env-file <(set | grep BRIDGE) $CONSOLE_IMAGE
+        export BRIDGE_PLUGINS="${runningPlugins["podman-linux"]}"
+        export "$(compgen -v | grep '^BRIDGE_')"
+        podman run --pull=always --rm --network=host --env "BRIDGE_*" "$CONSOLE_IMAGE"
     else
-        BRIDGE_PLUGINS="${runningPlugins["podman"]}"
-        podman run --platform=linux/x86_64 --pull=always --rm -p "$CONSOLE_PORT":9000 --env-file <(set | grep BRIDGE) $CONSOLE_IMAGE
+        export BRIDGE_PLUGINS="${runningPlugins["podman"]}"
+        podman run --platform=linux/x86_64 --pull=always --rm -p "$CONSOLE_PORT":9000 --env "BRIDGE_*" "$CONSOLE_IMAGE"
     fi
 else
-    BRIDGE_PLUGINS="${runningPlugins["docker"]}"
+    export BRIDGE_PLUGINS="${runningPlugins["docker"]}"
     if [ "$(uname)" == "Darwin" ]; then
-        docker run --platform=linux/x86_64 --pull=always --rm -p "$CONSOLE_PORT":9000 --env-file <(set | grep BRIDGE) $CONSOLE_IMAGE
+        docker run --platform=linux/x86_64 --pull=always --rm -p "$CONSOLE_PORT":9000 --env "BRIDGE_*" "$CONSOLE_IMAGE"
     else
-        docker run --pull=always --rm -p "$CONSOLE_PORT":9000 --env-file <(set | grep BRIDGE) $CONSOLE_IMAGE
+        docker run --pull=always --rm -p "$CONSOLE_PORT":9000 --env "BRIDGE_*" "$CONSOLE_IMAGE"
     fi
 fi
