@@ -3,10 +3,10 @@ import { useCallback, useEffect, useState } from 'react';
 import { SecretModel } from '@kubevirt-ui/kubevirt-api/console';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { k8sGet } from '@openshift-console/dynamic-plugin-sdk';
+import { k8sGet, useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 
-import { initialAuthKeyRow } from '../utils/constants';
 import { AuthKeyRow } from '../utils/types';
+import { createAuthKeyRow } from '../utils/utils';
 
 import useSSHAuthProjects from './useSSHAuthProjects';
 
@@ -41,7 +41,9 @@ const useSSHAuthKeys: UseSSHAuthKeys = () => {
   const [authorizedSSHKeys = {}, updateAuthorizedSSHKeys, loadedSettings] =
     useKubevirtUserSettings('ssh');
 
-  const [authKeyRows, setAuthKeyRows] = useState<AuthKeyRow[]>([initialAuthKeyRow]);
+  const [activeNamespace] = useActiveNamespace();
+
+  const [authKeyRows, setAuthKeyRows] = useState<AuthKeyRow[]>([createAuthKeyRow(activeNamespace)]);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -71,7 +73,7 @@ const useSSHAuthKeys: UseSSHAuthKeys = () => {
   const onAuthKeyAdd = useCallback(() => {
     setAuthKeyRows((prevKeys) => [
       ...prevKeys,
-      { id: prevKeys.at(-1).id + 1, projectName: '', secretName: '' },
+      createAuthKeyRow(activeNamespace, prevKeys.at(-1).id + 1),
     ]);
   }, []);
 
@@ -100,7 +102,7 @@ const useSSHAuthKeys: UseSSHAuthKeys = () => {
 
       setAuthKeyRows((prevKeys) => {
         const updatedKeys = prevKeys.filter(({ id }) => id !== keyToRemove.id);
-        return isEmpty(updatedKeys) ? [initialAuthKeyRow] : updatedKeys;
+        return isEmpty(updatedKeys) ? [createAuthKeyRow(activeNamespace)] : updatedKeys;
       });
     },
     [authorizedSSHKeys, updateAuthorizedSSHKeys],
