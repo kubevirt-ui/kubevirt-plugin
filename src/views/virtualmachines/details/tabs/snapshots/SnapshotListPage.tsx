@@ -34,7 +34,6 @@ const SnapshotListPage: FC<NavPageComponentProps> = ({ obj: vm }) => {
               <SnapshotModal isOpen={isOpen} onClose={onClose} vm={vm} />
             ))
           }
-          className="list-page-create-button-margin"
         >
           {t('Take snapshot')}
         </ListPageCreateButton>

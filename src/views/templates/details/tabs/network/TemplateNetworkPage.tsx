@@ -37,9 +37,7 @@ const TemplateNetwork: FC<TemplateNetworkProps> = ({ obj: template }) => {
     <PageSection>
       <SidebarEditor<V1Template> onResourceUpdate={onSubmitTemplate} resource={template}>
         <Stack hasGutter>
-          <Title className="list-page-create-button-margin" headingLevel="h2">
-            {t('Network interfaces')}
-          </Title>
+          <Title headingLevel="h2">{t('Network interfaces')}</Title>
           <StackItem>
             <Button
               onClick={() =>
