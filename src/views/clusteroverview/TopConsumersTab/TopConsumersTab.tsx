@@ -44,7 +44,7 @@ const TopConsumersTab: FC = () => {
                 </div>
                 <div className="kv-top-consumers-card__dropdown--num-items">
                   <FormPFSelect
-                    onSelect={(e, value) => onNumItemsSelect(value)}
+                    onSelect={(_e, value) => onNumItemsSelect(value)}
                     selected={localStorageData?.[TOP_CONSUMERS_NUM_ITEMS_KEY]}
                     toggleProps={{ id: 'kv-top-consumers-card-amount-select' }}
                   >

@@ -23,7 +23,7 @@ const SelectParameterValueType: FC<ParameterValueEditorProps> = ({
 
   const valueType = getValueTypeFromParameter(parameter);
 
-  const handleChange = (event: MouseEvent<HTMLSelectElement>, value: string) => {
+  const handleChange = (_event: MouseEvent<HTMLSelectElement>, value: string) => {
     const newParameter = { ...parameter };
     switch (value) {
       case PARAMETER_VALUE_TYPES.GENERATED:

@@ -9,6 +9,7 @@
     "module": "esnext",
     "moduleResolution": "node",
     "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "outDir": "dist",
     "paths": {
       "@catalog/*": ["src/views/catalog/*"],

@@ -26,7 +26,7 @@ export const editSysprepObject = (
 };
 
 export const pushSysprepObject = (
-  vm: V1VirtualMachine,
+  _vm: V1VirtualMachine,
   updateTabsData: WizardVMContextType['updateTabsData'],
   sysprepData: IoK8sApiCoreV1ConfigMap['data'],
   sysprepName: string,

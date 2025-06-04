@@ -61,7 +61,7 @@ const AlertsCard: FC<AlertsCardProps> = ({ className, isOverviewPage = false, so
                 )}
                 {isAdmin ? (
                   <FormPFSelect
-                    onSelect={(e, value) => setAlertScope(value)}
+                    onSelect={(_e, value) => setAlertScope(value)}
                     popperProps={{ position: 'right' }}
                     selected={alertScope}
                     toggleProps={{ id: 'overview-alerts-card' }}
@@ -89,7 +89,7 @@ const AlertsCard: FC<AlertsCardProps> = ({ className, isOverviewPage = false, so
                     position={PopoverPosition.top}
                   >
                     <FormPFSelect
-                      onSelect={(e, value) => setAlertScope(value)}
+                      onSelect={(_e, value) => setAlertScope(value)}
                       selected={alertScope}
                       toggleProps={{ id: 'overview-alerts-card' }}
                     >

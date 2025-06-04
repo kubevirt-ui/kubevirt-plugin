@@ -73,7 +73,7 @@ const useTreeViewItemActions: UseTreeViewItemActions = (treeData) => {
   }, [dropElements, removeFolderQuery]);
 
   const addListeners = useCallback(
-    (event: MouseEvent, item: TreeViewDataItem) => {
+    (_event: MouseEvent, item: TreeViewDataItem) => {
       // wait for children elements to show
       setTimeout(() => {
         const allItems = getAllTreeViewItems([item])?.filter(

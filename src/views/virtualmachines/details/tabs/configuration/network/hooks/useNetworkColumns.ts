@@ -27,7 +27,7 @@ const useNetworkColumns = (data: NetworkPresentation[]) => {
       },
       {
         id: 'network',
-        sort: 'network.pod' || 'network.multus.networkName',
+        sort: 'network.pod',
         title: t('Network'),
         transforms: [sortable],
       },

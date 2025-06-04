@@ -23,7 +23,7 @@ import VMNode from '../components/nodes/VMNode/VMNode';
 import { TYPE_VIRTUAL_MACHINE } from './constants';
 
 export const getKubevirtComponentFactory = (
-  kind,
+  _kind,
   type,
 ): ComponentType<{ element: GraphElement }> | undefined =>
   type === TYPE_VIRTUAL_MACHINE

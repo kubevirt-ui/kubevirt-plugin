@@ -46,15 +46,15 @@ const UploadSource: FC<UploadSourceProps> = ({ onFileSelected, relevantUpload, t
           <Controller
             render={({ field: { onChange, value: fileValue }, fieldState: { error } }) => (
               <FileUpload
-                onDataChange={(event: DropEvent, data: string) => {
+                onDataChange={(_event: DropEvent, data: string) => {
                   onFileSelected(data);
                   onChange({ value: data });
                 }}
-                onFileInputChange={(event: DropEvent, file: File) => {
+                onFileInputChange={(_event: DropEvent, file: File) => {
                   onFileSelected(file);
                   onChange({ filename: file.name });
                 }}
-                onTextChange={(event: ChangeEvent, text: string) => {
+                onTextChange={(_event: ChangeEvent, text: string) => {
                   onFileSelected(text);
                   onChange({ value: text });
                 }}
