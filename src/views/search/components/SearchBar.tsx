@@ -102,12 +102,13 @@ const SearchBar: FC<SearchBarProps> = ({ onFilterChange, resetTextSearch }) => {
   }, [createModal, saveSearch, urlSearchQuery]);
 
   return (
-    <InputGroup className="vm-search-bar">
+    <InputGroup className="vm-search-bar" data-test="vm-adv-search-toolbar">
       <Popper
         popper={
           <Menu
             aria-label={t('Search suggest box')}
             className="pf-v6-u-py-0"
+            data-test="search-results"
             ref={searchSuggestBoxRef}
             role="dialog"
           >
@@ -133,7 +134,6 @@ const SearchBar: FC<SearchBarProps> = ({ onFilterChange, resetTextSearch }) => {
           />
         }
         appendTo={() => document.querySelector('#vm-search-input')}
-        data-test="search-results"
         enableFlip={false}
         isVisible={isSearchSuggestBoxOpen}
         onDocumentClick={() => setIsSearchSuggestBoxOpen(false)}
@@ -163,7 +163,6 @@ const SearchBar: FC<SearchBarProps> = ({ onFilterChange, resetTextSearch }) => {
       <InputGroupItem>
         <SavedSearchesDropdown />
       </InputGroupItem>
-      data-test={'vm-adv-search-toolbar'}
     </InputGroup>
   );
 };
