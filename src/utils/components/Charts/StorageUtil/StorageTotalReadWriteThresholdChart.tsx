@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom-v5-compat';
 import xbytes from 'xbytes';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { tickLabels } from '@kubevirt-utils/components/Charts/ChartLabels/styleOverrides';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
@@ -94,6 +95,7 @@ const StorageTotalReadWriteThresholdChart: React.FC<StorageTotalReadWriteThresho
                 grid: {
                   stroke: chart_color_black_200.value,
                 },
+                tickLabels,
               }}
               dependentAxis
               tickFormat={(tick: number) => xbytes(tick, { fixed: 2, iec: true })}
@@ -101,7 +103,7 @@ const StorageTotalReadWriteThresholdChart: React.FC<StorageTotalReadWriteThresho
             />
             <ChartAxis
               style={{
-                tickLabels: { padding: 2 },
+                tickLabels: { padding: 2, ...tickLabels },
                 ticks: { stroke: 'transparent' },
               }}
               axisComponent={<></>}

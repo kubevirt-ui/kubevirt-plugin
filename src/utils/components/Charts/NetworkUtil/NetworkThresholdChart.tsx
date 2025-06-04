@@ -16,6 +16,7 @@ import chart_color_blue_300 from '@patternfly/react-tokens/dist/esm/chart_color_
 import chart_color_blue_400 from '@patternfly/react-tokens/dist/esm/chart_color_blue_400';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
+import { tickLabels } from '../ChartLabels/styleOverrides';
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
 import { getUtilizationQueries } from '../utils/queries';
@@ -84,7 +85,7 @@ const NetworkThresholdChart: React.FC<NetworkThresholdChartProps> = ({ vmi }) =>
           >
             <ChartAxis
               style={{
-                tickLabels: { padding: 2 },
+                tickLabels: { padding: 2, ...tickLabels },
                 ticks: { stroke: 'transparent' },
               }}
               axisComponent={<></>}
