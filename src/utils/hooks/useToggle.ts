@@ -18,9 +18,5 @@ export const useToggle: UseToggle = (key = '', defaultValue) => {
     localStorage.setItem(key, JSON.stringify(isToggled));
   }, [isToggled, key]);
 
-  const toggle = (): void => {
-    setIsToggled((prev) => !prev);
-  };
-
-  return [isToggled, toggle];
+  return [isToggled, setIsToggled];
 };
