@@ -2077,10 +2077,12 @@
   dependencies:
     undici-types "~6.20.0"
 
-"@types/node@^16.11.12":
-  version "16.11.52"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-16.11.52.tgz#d797437435455f237800c171d05639f0335c37b9"
-  integrity sha512-GnstYouCa9kbYokBCWEVrszJ1P2rGAQpKrqACHKuixkaT8XGu8nsqHvEUIGqDs5vwtsJ7LrYqnPDKRD1V+M39A==
+"@types/node@^18.x":
+  version "18.19.103"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.19.103.tgz#9bbd31a54e240fc469cca409d7507ebc77536458"
+  integrity sha512-hHTHp+sEz6SxFsp+SA+Tqrua3AbmlAw+Y//aEwdHrdZkYVRWdvWD3y5uPZ0flYOkgskaFWqZ/YGFm3FaFQ0pRw==
+  dependencies:
+    undici-types "~5.26.4"
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.1"
@@ -5908,7 +5910,7 @@ global-dirs@^3.0.0:
 
 global@^4.4.0:
   version "4.4.0"
-  resolved "https://registry.npmjs.org/global/-/global-4.4.0.tgz#3e7b105179006a323ed71aafca3e9c57a5cc6406"
+  resolved "https://registry.yarnpkg.com/global/-/global-4.4.0.tgz#3e7b105179006a323ed71aafca3e9c57a5cc6406"
   integrity sha512-wv/LAoHdRE3BeTGz53FAamhGlPLhlssK45usmGFThIi4XqnBmjKQ16u+RNbP7WvigRZDxUsM0J3gcQ5yicaL0w==
   dependencies:
     min-document "^2.19.0"
@@ -8098,7 +8100,7 @@ mochawesome-merge@^4.2.1:
 
 mochawesome-report-generator@^6.2.0:
   version "6.2.0"
-  resolved "https://registry.npmjs.org/mochawesome-report-generator/-/mochawesome-report-generator-6.2.0.tgz#65a30a11235ba7a68e1cf0ca1df80d764b93ae78"
+  resolved "https://registry.yarnpkg.com/mochawesome-report-generator/-/mochawesome-report-generator-6.2.0.tgz#65a30a11235ba7a68e1cf0ca1df80d764b93ae78"
   integrity sha512-Ghw8JhQFizF0Vjbtp9B0i//+BOkV5OWcQCPpbO0NGOoxV33o+gKDYU0Pr2pGxkIHnqZ+g5mYiXF7GMNgAcDpSg==
   dependencies:
     chalk "^4.1.2"
@@ -10760,6 +10762,11 @@ underscore.string@~3.3.4:
   dependencies:
     sprintf-js "^1.1.1"
     util-deprecate "^1.0.2"
+
+undici-types@~5.26.4:
+  version "5.26.5"
+  resolved "https://registry.yarnpkg.com/undici-types/-/undici-types-5.26.5.tgz#bcd539893d00b56e964fd2657a4866b221a65617"
+  integrity sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==
 
 undici-types@~6.20.0:
   version "6.20.0"
