@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import { TsJestTransformerOptions, pathsToModuleNameMapper } from 'ts-jest';
+import { pathsToModuleNameMapper, TsJestTransformerOptions } from 'ts-jest';
+
 import { Config } from '@jest/types';
 
 const { compilerOptions } = require('./tsconfig');

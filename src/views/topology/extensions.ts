@@ -2,7 +2,7 @@ import { EncodedExtension } from '@openshift/dynamic-plugin-sdk-webpack';
 import type { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plugin-sdk-webpack';
 
 export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
-  topology: 'src/views/topology/topology-plugin.ts',
+  topology: 'src/views/topology/topology.ts',
 };
 
 export const extensions: EncodedExtension[] = [
@@ -32,14 +32,14 @@ export const extensions: EncodedExtension[] = [
       priority: 200,
       resources: {
         dataVolumes: {
-          model: { group: 'cdi.kubevirt.io', kind: 'DataVolume' },
+          model: { group: 'cdi.kubevirt.io', kind: 'DataVolume', version: 'v1beta1' },
           opts: {
             isList: true,
             optional: true,
           },
         },
         migrations: {
-          model: { group: 'kubevirt.io', kind: 'VirtualMachineInstanceMigration' },
+          model: { group: 'kubevirt.io', kind: 'VirtualMachineInstanceMigration', version: 'v1' },
           opts: {
             isList: true,
             optional: true,
@@ -53,14 +53,14 @@ export const extensions: EncodedExtension[] = [
           },
         },
         virtualmachineinstances: {
-          model: { group: 'kubevirt.io', kind: 'VirtualMachineInstance' },
+          model: { group: 'kubevirt.io', kind: 'VirtualMachineInstance', version: 'v1' },
           opts: {
             isList: true,
             optional: true,
           },
         },
         virtualmachines: {
-          model: { group: 'kubevirt.io', kind: 'VirtualMachine' },
+          model: { group: 'kubevirt.io', kind: 'VirtualMachine', version: 'v1' },
           opts: {
             isList: true,
             optional: true,
@@ -86,5 +86,18 @@ export const extensions: EncodedExtension[] = [
       },
     },
     type: 'console.topology/data/factory',
+  },
+  {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC'],
+    },
+    properties: {
+      id: 'topology-tab-section-vm-details',
+      provider: {
+        $codeRef: 'topology.useVMSidePanelDetailsTabSection',
+      },
+      tab: 'topology-side-bar-tab-details',
+    },
+    type: 'console.topology/details/tab-section',
   },
 ];
