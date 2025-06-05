@@ -102,12 +102,13 @@ const SearchBar: FC<SearchBarProps> = ({ onFilterChange, resetTextSearch }) => {
   }, [createModal, saveSearch, urlSearchQuery]);
 
   return (
-    <InputGroup className="vm-search-bar">
+    <InputGroup className="vm-search-bar" data-test="vm-adv-search-toolbar">
       <Popper
         popper={
           <Menu
             aria-label={t('Search suggest box')}
             className="pf-v6-u-py-0"
+            data-test="search-results"
             ref={searchSuggestBoxRef}
             role="dialog"
           >
@@ -122,6 +123,7 @@ const SearchBar: FC<SearchBarProps> = ({ onFilterChange, resetTextSearch }) => {
         }
         trigger={
           <SearchInput
+            data-test="vm-search-input"
             id="vm-search-input"
             onChange={onSearchInputChange}
             onClear={onSearchInputClear}
@@ -143,12 +145,18 @@ const SearchBar: FC<SearchBarProps> = ({ onFilterChange, resetTextSearch }) => {
           onClick={() => {
             showSearchModal();
           }}
+          data-test="vm-advanced-search"
           icon={<SlidersHIcon />}
           variant="control"
         />
       </Tooltip>
       <InputGroupItem>
-        <Button isDisabled={!urlSearchQuery} onClick={showSaveSearchModal} variant="link">
+        <Button
+          data-test="save-search"
+          isDisabled={!urlSearchQuery}
+          onClick={showSaveSearchModal}
+          variant="link"
+        >
           {t('Save search')}
         </Button>
       </InputGroupItem>

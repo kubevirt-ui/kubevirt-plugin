@@ -7,7 +7,7 @@ type NumberInputProps = {
   value: number;
 };
 
-const NumberInput: FC<NumberInputProps> = ({ setValue, value }) => {
+const NumberInput: FC<NumberInputProps> = ({ setValue, value, ...props }) => {
   return (
     <TextInput
       onChange={(_, newValue) => {
@@ -20,6 +20,7 @@ const NumberInput: FC<NumberInputProps> = ({ setValue, value }) => {
       }}
       type="text"
       value={isNaN(value) ? '' : value}
+      {...props}
     />
   );
 };

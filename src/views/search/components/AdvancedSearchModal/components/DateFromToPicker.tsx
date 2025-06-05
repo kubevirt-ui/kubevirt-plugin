@@ -4,6 +4,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { DatePicker, DatePickerProps, Split, SplitItem } from '@patternfly/react-core';
 
 type DateFromToPickerProps = {
+  'data-test'?: string;
   dateFromString: string;
   dateToString: string;
   setDateFromString: Dispatch<SetStateAction<string>>;
@@ -12,6 +13,7 @@ type DateFromToPickerProps = {
 };
 
 const DateFromToPicker: FC<DateFromToPickerProps> = ({
+  'data-test': dataTest,
   dateFromString,
   dateToString,
   setDateFromString,
@@ -47,12 +49,14 @@ const DateFromToPicker: FC<DateFromToPickerProps> = ({
   return (
     <Split>
       <DatePicker
+        data-test={dataTest && `${dataTest}-from`}
         onChange={onDateChange(setDateFromString, setDateFrom)}
         placeholder={t('From')}
         value={dateFromString}
       />
       <SplitItem className="pf-v6-u-pt-sm pf-v6-u-px-md">{t('to')}</SplitItem>
       <DatePicker
+        data-test={dataTest && `${dataTest}-to`}
         onChange={onDateChange(setDateToString, setDateTo)}
         placeholder={t('To')}
         validators={[(date) => (date < dateFrom ? t('Date To cannot be before Date From') : '')]}

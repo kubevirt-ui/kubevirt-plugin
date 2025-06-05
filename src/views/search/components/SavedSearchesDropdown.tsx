@@ -63,7 +63,7 @@ const SavedSearchesDropdown: FC = () => {
     }
 
     return (
-      <DropdownList className="saved-searches-dropdown-menu">
+      <DropdownList className="saved-searches-dropdown-menu" data-test="saved-searches">
         {searches.map(({ description, name }) => (
           <DropdownItem
             actions={
