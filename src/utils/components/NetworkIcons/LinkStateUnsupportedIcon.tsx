@@ -1,20 +1,24 @@
 import React, { FC } from 'react';
 
-import PlugCircleMinusIcon from '@kubevirt-utils/components/NetworkIcons/PlugCircleMinusIcon';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Tooltip, TooltipPosition } from '@patternfly/react-core';
+import { HelpIcon } from '@patternfly/react-icons';
 
 import { NetworkIconProps } from './NetworkIcon';
 import StateText from './StateText';
 
 import './LinkStateIcon.scss';
 
-const LinkStateDownIcon: FC<NetworkIconProps> = ({ configuredState, runtimeState }) => {
+const LinkStateUnsupportedIcon: FC<NetworkIconProps> = ({ configuredState, runtimeState }) => {
+  const { t } = useKubevirtTranslation();
+
   return (
     <Tooltip
       content={
         <StateText
           {...{
             configuredState,
+            details: t('Link state is not available for this type of network interface'),
             runtimeState,
           }}
         />
@@ -22,9 +26,9 @@ const LinkStateDownIcon: FC<NetworkIconProps> = ({ configuredState, runtimeState
       isContentLeftAligned
       position={TooltipPosition.right}
     >
-      <PlugCircleMinusIcon className="link-state-icon" />
+      <HelpIcon className="link-state-icon" />
     </Tooltip>
   );
 };
 
-export default LinkStateDownIcon;
+export default LinkStateUnsupportedIcon;

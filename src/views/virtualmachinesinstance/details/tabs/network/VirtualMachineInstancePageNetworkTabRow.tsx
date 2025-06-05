@@ -1,6 +1,8 @@
 import * as React from 'react';
 
+import { toNetworkNameLabel } from '@kubevirt-utils/constants/network-columns';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getPrintableNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { TableData } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -23,7 +25,7 @@ const VirtualMachineInstancePageNetworkTabRow: React.FC<
         {iface?.model || '-'}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="network">
-        {network?.pod ? t('Pod networking') : network?.multus?.networkName || '-'}
+        {toNetworkNameLabel(t, { network }) || NO_DATA_DASH}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="type">
         {getPrintableNetworkInterfaceType(iface)}
