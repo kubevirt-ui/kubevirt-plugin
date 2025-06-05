@@ -12,7 +12,6 @@ import {
   createNetwork,
   updateVMNetworkInterfaces,
 } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
-import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
 
 type VirtualMachinesNetworkInterfaceModalProps = {
@@ -33,7 +32,6 @@ const VirtualMachinesNetworkInterfaceModal: FC<VirtualMachinesNetworkInterfaceMo
   onAddNetworkInterface,
   onClose,
   vm,
-  vmi,
 }) => {
   const onSubmit = useCallback(
     ({
@@ -65,7 +63,6 @@ const VirtualMachinesNetworkInterfaceModal: FC<VirtualMachinesNetworkInterfaceMo
 
   return (
     <NetworkInterfaceModal
-      Header={vmi && <ModalPendingChangesAlert />}
       headerText={headerText}
       isOpen={isOpen}
       onClose={onClose}
