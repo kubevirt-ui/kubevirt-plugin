@@ -3,7 +3,7 @@ import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
 import { TableColumn, useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
-import { sortable, SortByDirection } from '@patternfly/react-table';
+import { sortable } from '@patternfly/react-table';
 
 import {
   columnsSorting,
@@ -14,6 +14,8 @@ import {
 import {
   CONFIG_PARAM_NAD_NAME,
   CONFIG_PARAM_SAMPLE_DURATION,
+  CONFIG_PARAM_SOURCE_NODE,
+  CONFIG_PARAM_TARGET_NODE,
   STATUS_MAX_LATENCY_NANO,
   STATUS_SOURCE_NODE,
   STATUS_TARGET_NODE,
@@ -46,62 +48,58 @@ const useCheckupsNetworkCheckupsListColumns = (): [
       : []),
     {
       id: 'nad',
-      sort: (data: IoK8sApiCoreV1ConfigMap[], sortDirection: SortByDirection) =>
-        columnsSorting(data, sortDirection, CONFIG_PARAM_NAD_NAME),
+      sort: (data, sortDirection) => columnsSorting(data, sortDirection, CONFIG_PARAM_NAD_NAME),
       title: t('NetworkAttachmentDefinition'),
       transforms: [sortable],
     },
     {
       id: 'status',
-      sort: (data: IoK8sApiCoreV1ConfigMap[], sortDirection: SortByDirection) =>
-        columnsSorting(data, sortDirection, STATUS_SUCCEEDED),
+      sort: (data, sortDirection) => columnsSorting(data, sortDirection, STATUS_SUCCEEDED),
       title: t('Status'),
       transforms: [sortable],
     },
     {
       id: 'latency',
-      sort: (data: IoK8sApiCoreV1ConfigMap[], sortDirection: SortByDirection) =>
-        columnsSorting(data, sortDirection, STATUS_MAX_LATENCY_NANO),
+      sort: (data, sortDirection) => columnsSorting(data, sortDirection, STATUS_MAX_LATENCY_NANO),
       title: t('Latency'),
       transforms: [sortable],
     },
     {
       additional: true,
       id: 'duration',
-      sort: (data: IoK8sApiCoreV1ConfigMap[], sortDirection: SortByDirection) =>
-        columnsSorting(data, sortDirection, CONFIG_PARAM_SAMPLE_DURATION, true),
+      sort: (data, sortDirection) =>
+        columnsSorting(data, sortDirection, CONFIG_PARAM_SAMPLE_DURATION),
       title: t('Duration'),
       transforms: [sortable],
     },
     {
       additional: true,
       id: 'source-node',
-      sort: (data: IoK8sApiCoreV1ConfigMap[], sortDirection: SortByDirection) =>
-        columnsSorting(data, sortDirection, STATUS_SOURCE_NODE),
+      sort: (data, sortDirection) =>
+        columnsSorting(data, sortDirection, STATUS_SOURCE_NODE, CONFIG_PARAM_SOURCE_NODE),
       title: t('Source node'),
       transforms: [sortable],
     },
     {
       additional: true,
       id: 'target-node',
-      sort: (data: IoK8sApiCoreV1ConfigMap[], sortDirection: SortByDirection) =>
-        columnsSorting(data, sortDirection, STATUS_TARGET_NODE),
+      sort: (data, sortDirection) =>
+        columnsSorting(data, sortDirection, STATUS_TARGET_NODE, CONFIG_PARAM_TARGET_NODE),
       title: t('Target node'),
       transforms: [sortable],
     },
     {
       additional: true,
       id: 'start-time',
-      sort: (data: IoK8sApiCoreV1ConfigMap[], sortDirection: SortByDirection) =>
-        columnsSorting(data, sortDirection, STATUS_START_TIME_STAMP, true),
+      sort: (data, sortDirection) => columnsSorting(data, sortDirection, STATUS_START_TIME_STAMP),
       title: t('Start time'),
       transforms: [sortable],
     },
     {
       additional: true,
       id: 'complete-time',
-      sort: (data: IoK8sApiCoreV1ConfigMap[], sortDirection: SortByDirection) =>
-        columnsSorting(data, sortDirection, STATUS_COMPILATION_TIME_STAMP, true),
+      sort: (data, sortDirection) =>
+        columnsSorting(data, sortDirection, STATUS_COMPILATION_TIME_STAMP),
       title: t('Complete time'),
       transforms: [sortable],
     },

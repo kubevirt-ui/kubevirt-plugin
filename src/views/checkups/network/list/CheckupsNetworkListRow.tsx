@@ -12,6 +12,8 @@ import CheckupsNetworkActions from '../components/CheckupsNetworkActions';
 import {
   CONFIG_PARAM_NAD_NAME,
   CONFIG_PARAM_SAMPLE_DURATION,
+  CONFIG_PARAM_SOURCE_NODE,
+  CONFIG_PARAM_TARGET_NODE,
   STATUS_MAX_LATENCY_NANO,
   STATUS_MIN_LATENCY_NANO,
   STATUS_SOURCE_NODE,
@@ -67,10 +69,14 @@ const CheckupsNetworkListRow = ({
         {configMap?.data?.[STATUS_MAX_LATENCY_NANO]}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="source-node">
-        {configMap?.data?.[STATUS_SOURCE_NODE] || NO_DATA_DASH}
+        {configMap?.data?.[STATUS_SOURCE_NODE] ||
+          configMap?.data?.[CONFIG_PARAM_SOURCE_NODE] ||
+          NO_DATA_DASH}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="target-node">
-        {configMap?.data?.[STATUS_TARGET_NODE] || NO_DATA_DASH}
+        {configMap?.data?.[STATUS_TARGET_NODE] ||
+          configMap?.data?.[CONFIG_PARAM_TARGET_NODE] ||
+          NO_DATA_DASH}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="start-time">
         <Timestamp timestamp={configMap?.data?.[STATUS_START_TIME_STAMP]} />
