@@ -59,9 +59,7 @@ export const DescriptionItemHeader: FC<DescriptionItemHeaderProps> = ({
         headerContent={descriptionHeader}
         maxWidth={maxWidth || '30rem'}
       >
-        <DescriptionListTermHelpTextButton className="pf-v6-c-description-list__text">
-          {descriptionHeader}
-        </DescriptionListTermHelpTextButton>
+        <DescriptionListTermHelpTextButton>{descriptionHeader}</DescriptionListTermHelpTextButton>
       </Popover>
     );
   }

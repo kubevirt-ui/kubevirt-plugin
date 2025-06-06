@@ -31,7 +31,7 @@ const InitialRunTab: FC<ConfigurationInnerTabProps> = ({ vm, vmi }) => {
           <Title headingLevel="h2">
             <SearchItem id="initial-run">{t('Initial run')}</SearchItem>
           </Title>
-          <DescriptionList className="pf-v6-c-description-list">
+          <DescriptionList>
             <InitialRunTabCloudinit
               canUpdateVM={canUpdateVM}
               onSubmit={onSubmitYAML}

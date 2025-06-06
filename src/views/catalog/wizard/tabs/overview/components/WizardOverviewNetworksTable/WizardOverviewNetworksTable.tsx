@@ -23,11 +23,7 @@ export const WizardOverviewNetworksTable: React.FC<{
   const networkData = getNetworkInterfaceRowData(networks, interfaces);
 
   return (
-    <DescriptionList
-      className="pf-v6-c-description-list"
-      columnModifier={{ default: '3Col' }}
-      isInlineGrid={isInlineGrid}
-    >
+    <DescriptionList columnModifier={{ default: '3Col' }} isInlineGrid={isInlineGrid}>
       <WizardDescriptionItem
         description={
           <Stack>

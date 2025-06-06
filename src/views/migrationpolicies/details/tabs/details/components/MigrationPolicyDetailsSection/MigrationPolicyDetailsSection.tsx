@@ -61,7 +61,7 @@ const MigrationPolicyDetailsSection: FC<MigrationPolicyDetailsSectionProps> = ({
       </Title>
       <Grid hasGutter>
         <GridItem span={5}>
-          <DescriptionList className="pf-v6-c-description-list">
+          <DescriptionList>
             <VirtualMachineDescriptionItem
               bodyContent={t(
                 'Name must be unique within a namespace. Is required when creating resources, although some resources may allow a client to request the generation of an appropriate name automatically. Name is primarily intended for creation idempotence and configuration definition. ',
@@ -95,7 +95,7 @@ const MigrationPolicyDetailsSection: FC<MigrationPolicyDetailsSectionProps> = ({
               </DescriptionListTerm>
 
               <DescriptionListDescription>
-                <DescriptionList className="pf-v6-c-description-list">
+                <DescriptionList>
                   <VirtualMachineDescriptionItem
                     bodyContent={t(
                       'BandwidthPerMigration limits the amount of network bandwith live migrations are allowed to use. The value is in quantity per second. Defaults to 0 (no limit). ',

@@ -19,7 +19,7 @@ const AuthorizedSSHKey: FC<AuthorizedSSHKeyProps> = ({ authorizedSSHKey, namespa
 
   return (
     <SplitItem>
-      <DescriptionList className="pf-v6-c-description-list">
+      <DescriptionList>
         <VirtualMachineDescriptionItem
           onEditClick={() =>
             createModal((modalProps) => (

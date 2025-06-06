@@ -48,7 +48,7 @@ const CheckupsNetworkDetailsPageSection: FC<CheckupsNetworkDetailsPageSectionPro
       </Title>
       <Grid>
         <GridItem span={6}>
-          <DescriptionList className="pf-v6-c-description-list">
+          <DescriptionList>
             <VirtualMachineDescriptionItem
               descriptionData={configMap?.metadata?.name}
               descriptionHeader={t('Name')}
@@ -97,7 +97,7 @@ const CheckupsNetworkDetailsPageSection: FC<CheckupsNetworkDetailsPageSectionPro
           </DescriptionList>
         </GridItem>
         <GridItem span={6}>
-          <DescriptionList className="pf-v6-c-description-list">
+          <DescriptionList>
             <VirtualMachineDescriptionItem
               descriptionData={
                 <ResourceLink

@@ -54,7 +54,7 @@ const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
 
   return (
     <GridItem span={5}>
-      <DescriptionList className="pf-v6-c-description-list">
+      <DescriptionList>
         <VirtualMachineDescriptionItem
           descriptionData={
             <NodeSelectorDetailItem nodeSelector={vm?.spec?.template?.spec?.nodeSelector} />
