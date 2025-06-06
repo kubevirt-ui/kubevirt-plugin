@@ -55,7 +55,11 @@ export const uploadStatusToProgressVariant = {
   [UPLOAD_STATUS.SUCCESS]: ProgressVariant.success,
 };
 
-const PVC_STATUS_DELAY = 2 * 1000;
+const WAIT_FOR_UPLOAD_READY = {
+  COUNT: 150,
+  INTERVAL_MS: 2 * 1000,
+};
+
 const DV_UPLOAD_STATES = {
   READY: 'UploadReady',
   SCHEDULED: 'UploadScheduled',
@@ -79,13 +83,13 @@ export const killUploadPVC = async (name: string, namespace: string) => {
   return k8sDelete({ model: DataVolumeModel, resource: { metadata: { name, namespace } } });
 };
 
-const waitForUploadReady = async (dataVolume: V1beta1DataVolume, counter = 30) => {
+const waitForUploadReady = async (dataVolume: V1beta1DataVolume) => {
   let dv = dataVolume;
-  for (let i = 0; i < counter; i++) {
+  for (let i = 0; i < WAIT_FOR_UPLOAD_READY.COUNT; i++) {
     if (dv?.status?.phase === DV_UPLOAD_STATES.READY) {
       return true;
     }
-    await delay(PVC_STATUS_DELAY);
+    await delay(WAIT_FOR_UPLOAD_READY.INTERVAL_MS);
     dv = await getDataVolume(dataVolume?.metadata?.name, dataVolume?.metadata?.namespace);
   }
 
