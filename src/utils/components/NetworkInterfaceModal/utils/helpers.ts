@@ -2,7 +2,6 @@ import produce from 'immer';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1Interface, V1Network, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { NetworkInterfaceState } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/types';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   getAutoAttachPodInterface,
@@ -16,6 +15,7 @@ import {
   interfaceTypesProxy,
   NetworkPresentation,
 } from '@kubevirt-utils/resources/vm/utils/network/constants';
+import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { ABSENT } from '@virtualmachines/details/tabs/configuration/network/utils/constants';

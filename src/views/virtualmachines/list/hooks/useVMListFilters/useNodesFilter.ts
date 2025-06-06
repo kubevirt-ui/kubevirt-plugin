@@ -1,18 +1,14 @@
 import { useMemo } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { universalComparator } from '@kubevirt-utils/utils/utils';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 import { VMIMapper } from '@virtualmachines/utils/mappers';
 
 export const useNodesFilter = (vmiMapper: VMIMapper): RowFilter<V1VirtualMachine> => {
   const sortedNodeNamesItems = useMemo(() => {
-    return Object.values(vmiMapper?.nodeNames).sort((a, b) =>
-      a?.id?.localeCompare(b?.id, undefined, {
-        numeric: true,
-        sensitivity: 'base',
-      }),
-    );
+    return Object.values(vmiMapper?.nodeNames).sort((a, b) => universalComparator(a?.id, b?.id));
   }, [vmiMapper]);
 
   return {

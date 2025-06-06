@@ -1,8 +1,8 @@
 import produce from 'immer';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { NetworkInterfaceState } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/types';
 import { getInterface } from '@kubevirt-utils/resources/vm';
+import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 
 export const setInterfaceLinkState = (
