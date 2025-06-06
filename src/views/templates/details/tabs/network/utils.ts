@@ -4,12 +4,12 @@ import { WritableDraft } from 'immer/dist/internal';
 import { produceVMNetworks } from '@catalog/utils/WizardVMContext';
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { NetworkInterfaceState } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/types';
 import {
   getTemplateVirtualMachineObject,
   replaceTemplateVM,
 } from '@kubevirt-utils/resources/template';
 import { getInterface } from '@kubevirt-utils/resources/vm';
+import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 

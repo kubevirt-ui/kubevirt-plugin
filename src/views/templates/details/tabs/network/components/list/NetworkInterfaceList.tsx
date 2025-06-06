@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import useNetworkColumns from '@kubevirt-utils/hooks/useNetworkColums';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
 import { getNetworkInterfaceRowData } from '@kubevirt-utils/resources/vm/utils/network/rowData';
@@ -10,7 +11,6 @@ import {
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
 
-import useNetworkColumns from '../../hooks/useNetworkColumns';
 import useNetworkRowFilters from '../../hooks/useNetworkRowFilters';
 
 import NetworkInterfaceRow from './NetworkInterfaceRow';
@@ -28,7 +28,7 @@ const NetworkInterfaceList: React.FC<NetworkInterfaceListProps> = ({ template })
   const networkInterfacesData = getNetworkInterfaceRowData(networks, interfaces);
   const [data, filteredData, onFilterChange] = useListPageFilter(networkInterfacesData, filters);
 
-  const columns = useNetworkColumns(filteredData);
+  const columns = useNetworkColumns();
   return (
     <>
       <ListPageFilter data={data} loaded onFilterChange={onFilterChange} rowFilters={filters} />

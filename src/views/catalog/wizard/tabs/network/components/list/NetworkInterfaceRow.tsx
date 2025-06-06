@@ -4,6 +4,7 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
+import { getNetworkNameLabel } from '@kubevirt-utils/resources/vm/utils/network/network-columns';
 import { getPrintableNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 import { getNetworkInterfaceStateIcon } from '@virtualmachines/details/tabs/configuration/network/utils/utils';
@@ -32,7 +33,7 @@ const NetworkInterfaceRow: FC<
         {iface.model || NO_DATA_DASH}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="network">
-        {network?.pod ? t('Pod networking') : network?.multus?.networkName || NO_DATA_DASH}
+        {getNetworkNameLabel(t, { network }) || NO_DATA_DASH}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="state">
         <InterfaceStateIcon />
