@@ -111,6 +111,7 @@ const TabModal: TabModalFC = memo(
                 <Alert isInline title={t('An error occurred')} variant={AlertVariant.danger}>
                   <Stack hasGutter>
                     <StackItem>{error.message}</StackItem>
+                    {error.response?.data && <StackItem>{error.response?.data}</StackItem>}
                     {error?.href && (
                       <StackItem>
                         <a href={error.href} rel="noreferrer" target="_blank">
