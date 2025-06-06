@@ -5,16 +5,12 @@ import {
   getVMINetworks,
   getVMIStatusInterfaces,
 } from '@kubevirt-utils/resources/vmi/utils/selectors';
-import {
-  removeDuplicatesByName,
-  sortByDirection,
-  universalComparator,
-} from '@kubevirt-utils/utils/utils';
+import { sortByDirection, universalComparator } from '@kubevirt-utils/utils/utils';
 import { SortByDirection } from '@patternfly/react-table';
-import { isRunning } from '@virtualmachines/utils';
 
 import { NetworkPresentation } from './constants';
 import { getPrintableNetworkInterfaceType } from './selectors';
+import { NICState } from './types';
 
 export const sortNICs = (nics: NetworkPresentation[], direction: SortByDirection) =>
   nics.sort((a: NetworkPresentation, b: NetworkPresentation) =>
@@ -23,19 +19,41 @@ export const sortNICs = (nics: NetworkPresentation[], direction: SortByDirection
       getPrintableNetworkInterfaceType(b.iface),
     ),
   );
+export const getInterfacesAndNetworks = (
+  vm: V1VirtualMachine,
+  vmi: V1VirtualMachineInstance,
+): NICState[] => {
+  const vmInterfaces = getInterfaces(vm) ?? [];
+  const config: { [key: string]: NetworkPresentation } = Object.fromEntries(
+    (getNetworks(vm) ?? []).map((network) => [
+      network.name,
+      { iface: vmInterfaces.find((iface) => iface.name === network.name), network },
+    ]),
+  );
 
-export const getInterfacesAndNetworks = (vm: V1VirtualMachine, vmi: V1VirtualMachineInstance) => {
-  const vmNetworks = getNetworks(vm) || [];
-  const vmInterfaces = getInterfaces(vm) || [];
+  const vmiInterfaces = getVMIInterfaces(vmi) ?? [];
+  const vmiStatusInterfaces = getVMIStatusInterfaces(vmi) ?? [];
+  const runtimeWithNetwork = Object.fromEntries(
+    (getVMINetworks(vmi) ?? []).map((network) => [
+      network.name,
+      {
+        iface: vmiInterfaces.find((iface) => iface.name === network.name),
+        network,
+        status: vmiStatusInterfaces.find((iface) => iface.name === network.name),
+      },
+    ]),
+  );
 
-  const vmiInterfaces = (isRunning(vm) ? getVMIStatusInterfaces(vmi) : getVMIInterfaces(vmi)) || [];
-  const vmiNetworks = getVMINetworks(vmi) || [];
+  const allNetworkNames = new Set([...Object.keys(config), ...Object.keys(runtimeWithNetwork)]);
 
-  const networks = removeDuplicatesByName([...vmNetworks, ...vmiNetworks]);
-  const interfaces = removeDuplicatesByName([...vmInterfaces, ...vmiInterfaces]);
+  const withNetwork = Array.from(allNetworkNames).map((name) => ({
+    config: config[name],
+    runtime: runtimeWithNetwork[name],
+  }));
 
-  return {
-    interfaces,
-    networks,
-  };
+  const runtimeInterfacesOnly = vmiStatusInterfaces
+    .filter((iface) => !allNetworkNames.has(iface.name))
+    .map((status) => ({ runtime: { status } }));
+
+  return [...withNetwork, ...runtimeInterfacesOnly];
 };

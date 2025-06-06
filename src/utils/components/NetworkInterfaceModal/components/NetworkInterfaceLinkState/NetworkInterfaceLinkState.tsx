@@ -1,6 +1,7 @@
 import React, { Dispatch, FC, MouseEvent, SetStateAction } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
+import { describeNetworkState } from '@kubevirt-utils/components/NetworkIcons/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
 import { FormGroup, SelectOption } from '@patternfly/react-core';
@@ -9,7 +10,7 @@ import './NetworkInterfaceLinkState.scss';
 
 type NetworkInterfaceLinkStateProps = {
   isDisabled: boolean;
-  linkState: string;
+  linkState: NetworkInterfaceState;
   setLinkState: Dispatch<SetStateAction<string>>;
 };
 
@@ -19,17 +20,6 @@ const NetworkInterfaceLinkState: FC<NetworkInterfaceLinkStateProps> = ({
   setLinkState,
 }) => {
   const { t } = useKubevirtTranslation();
-
-  const linkStateOptions = {
-    down: {
-      id: NetworkInterfaceState.DOWN,
-      name: t('Down'),
-    },
-    up: {
-      id: NetworkInterfaceState.UP,
-      name: t('Up'),
-    },
-  };
 
   const handleChange = (event: MouseEvent<HTMLSelectElement>, value: string) => {
     event.preventDefault();
@@ -42,13 +32,13 @@ const NetworkInterfaceLinkState: FC<NetworkInterfaceLinkStateProps> = ({
         <FormPFSelect
           isDisabled={isDisabled}
           onSelect={handleChange}
-          selected={linkState}
-          selectedLabel={linkState && linkStateOptions[linkState].name}
+          selected={isDisabled ? undefined : linkState}
+          selectedLabel={isDisabled ? undefined : linkState && describeNetworkState(t, linkState)}
           toggleProps={{ isFullWidth: true }}
         >
-          {Object.values(linkStateOptions)?.map(({ id, name }) => (
-            <SelectOption data-test-id={`link-state-select-${id}`} key={id} value={id}>
-              {name}
+          {[NetworkInterfaceState.DOWN, NetworkInterfaceState.UP].map((state) => (
+            <SelectOption data-test-id={`link-state-select-${state}`} key={state} value={state}>
+              {describeNetworkState(t, state)}
             </SelectOption>
           ))}
         </FormPFSelect>
