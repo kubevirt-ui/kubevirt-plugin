@@ -7,13 +7,13 @@ import {
   getExtraNADResources,
 } from '@kubevirt-utils/components/NetworkInterfaceModal/components/hooks/utils';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { K8sResourceCommon, useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
+import { useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
 
-import { UseNADsData } from './types';
+import { NetworkAttachmentDefinition, UseNADsData } from './types';
 
 const useNADsData: UseNADsData = (namespace) => {
   const nadListPermissionsMap = useNADListPermissions();
-  const data = useK8sWatchResources<{ [key: string]: K8sResourceCommon[] }>({
+  const data = useK8sWatchResources<{ [key: string]: NetworkAttachmentDefinition[] }>({
     [namespace]: {
       groupVersionKind: NetworkAttachmentDefinitionModelGroupVersionKind,
       isList: true,

@@ -28,7 +28,7 @@ const useNamespaceUDN = (
 
         return (
           PrimaryTopologies.includes(config.topology) &&
-          config.role === UserDefinedNetworkRole.Primary.toLowerCase()
+          config.role === UserDefinedNetworkRole.primary
         );
       }),
     [nads],

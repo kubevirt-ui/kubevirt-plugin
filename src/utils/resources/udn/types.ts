@@ -5,8 +5,8 @@ export type UserDefinedNetworkAnnotations = {
 };
 
 export enum UserDefinedNetworkRole {
-  Primary = 'Primary',
-  Secondary = 'Secondary',
+  primary = 'primary',
+  secondary = 'secondary',
 }
 
 export type UserDefinedNetworkLayer2 = {
