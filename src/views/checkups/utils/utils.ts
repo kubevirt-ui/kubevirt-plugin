@@ -5,6 +5,7 @@ import {
   IoK8sApiCoreV1ConfigMap,
   IoK8sApiCoreV1Container,
 } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { SortByDirection } from '@patternfly/react-table';
 
@@ -22,11 +23,18 @@ export const generateWithNumbers = (name: string): string =>
 export const findObjectByName = <T extends K8sResourceCommon>(arr: T[], name: string): T =>
   (arr || []).find((obj) => obj?.metadata?.name === name);
 
-const sortData = (data: IoK8sApiCoreV1ConfigMap[], field: string, isNumberCompare = false) => {
+const sortData = (data: IoK8sApiCoreV1ConfigMap[], field: string, alternativeField: string) => {
   return data.sort((a, b) => {
-    const numbersCompare = a?.data?.[field] > b?.data?.[field] ? 1 : -1;
-    const stringCompare = a?.data?.[field]?.localeCompare(b?.data?.[field]) ? 1 : -1;
-    return isNumberCompare ? numbersCompare : stringCompare;
+    const aParam = a?.data?.[field] || a?.data?.[alternativeField];
+    const bParam = b?.data?.[field] || b?.data?.[alternativeField];
+
+    if (isEmpty(aParam)) return -1;
+    if (isEmpty(bParam)) return 1;
+
+    return aParam?.localeCompare(bParam, undefined, {
+      numeric: true,
+      sensitivity: 'base',
+    });
   });
 };
 
@@ -34,9 +42,9 @@ export const columnsSorting = (
   data: IoK8sApiCoreV1ConfigMap[],
   sortDirection: SortByDirection,
   field: string,
-  isNumberCompare = false,
+  alternativeField = '',
 ) => {
-  const sortedArr = sortData(data, field, isNumberCompare);
+  const sortedArr = sortData(data, field, alternativeField);
   return sortDirection === 'asc' ? sortedArr.reverse() : sortedArr;
 };
 
@@ -77,6 +85,7 @@ export const getJobStatus = (job: IoK8sApiBatchV1Job): NetworkCheckupsStatus => 
   if (job?.status?.succeeded === 0 || job?.status?.failed === 1)
     return NetworkCheckupsStatus.Failed;
 };
+
 export const getConfigMapStatus = (
   configMap: IoK8sApiCoreV1ConfigMap,
   jobStatus: NetworkCheckupsStatus,

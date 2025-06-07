@@ -24,6 +24,8 @@ import {
   CONFIG_PARAM_NAD_NAME,
   CONFIG_PARAM_NAD_NAMESPACE,
   CONFIG_PARAM_SAMPLE_DURATION,
+  CONFIG_PARAM_SOURCE_NODE,
+  CONFIG_PARAM_TARGET_NODE,
   STATUS_AVG_LATENCY_NANO,
   STATUS_MAX_LATENCY_NANO,
   STATUS_MIN_LATENCY_NANO,
@@ -41,6 +43,12 @@ const CheckupsNetworkDetailsPageSection: FC<CheckupsNetworkDetailsPageSectionPro
   job,
 }) => {
   const { t } = useKubevirtTranslation();
+
+  const sourceNode =
+    configMap?.data?.[STATUS_SOURCE_NODE] || configMap?.data?.[CONFIG_PARAM_SOURCE_NODE];
+  const targetNode =
+    configMap?.data?.[STATUS_TARGET_NODE] || configMap?.data?.[CONFIG_PARAM_TARGET_NODE];
+
   return (
     <PageSection>
       <Title className="co-section-heading" headingLevel="h2">
@@ -130,10 +138,10 @@ const CheckupsNetworkDetailsPageSection: FC<CheckupsNetworkDetailsPageSectionPro
             />
             <VirtualMachineDescriptionItem
               descriptionData={
-                configMap?.data?.[STATUS_SOURCE_NODE] ? (
+                sourceNode ? (
                   <ResourceLink
                     groupVersionKind={modelToGroupVersionKind(NodeModel)}
-                    name={configMap?.data?.[STATUS_SOURCE_NODE]}
+                    name={sourceNode}
                   />
                 ) : (
                   NO_DATA_DASH
@@ -143,10 +151,10 @@ const CheckupsNetworkDetailsPageSection: FC<CheckupsNetworkDetailsPageSectionPro
             />
             <VirtualMachineDescriptionItem
               descriptionData={
-                configMap?.data?.[STATUS_TARGET_NODE] ? (
+                targetNode ? (
                   <ResourceLink
                     groupVersionKind={modelToGroupVersionKind(NodeModel)}
-                    name={configMap?.data?.[STATUS_TARGET_NODE]}
+                    name={targetNode}
                   />
                 ) : (
                   NO_DATA_DASH
