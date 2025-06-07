@@ -3,7 +3,6 @@ import { useMemo } from 'react';
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -30,8 +29,8 @@ const useDisksSources = (vm: V1VirtualMachine) => {
     () =>
       Object.values(pvcWatchesResult || [])
         .map((watch) => watch.data)
-        .filter((pvc) => !isEmpty(pvc) && !dvs.some((dv) => getName(dv) === getName(pvc))),
-    [dvs, pvcWatchesResult],
+        .filter((pvc) => !isEmpty(pvc)),
+    [pvcWatchesResult],
   );
 
   const loaded = useMemo(
