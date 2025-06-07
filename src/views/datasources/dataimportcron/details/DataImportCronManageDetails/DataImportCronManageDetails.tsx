@@ -1,5 +1,4 @@
 import React from 'react';
-import classnames from 'classnames';
 
 import {
   V1beta1DataImportCron,
@@ -41,9 +40,7 @@ export const DataImportCronManageDetails: React.FC<DataImportCronManageDetailsPr
   return (
     <VirtualMachineDescriptionItem
       descriptionData={
-        <DescriptionList
-          className={classnames('pf-v6-c-description-list', 'kv-dataimportcron-managed-details')}
-        >
+        <DescriptionList className="kv-dataimportcron-managed-details">
           <VirtualMachineDescriptionItem
             descriptionData={isAutoUpdated ? t('On') : t('Off')}
             descriptionHeader={t('Automatic updates')}
@@ -58,7 +55,7 @@ export const DataImportCronManageDetails: React.FC<DataImportCronManageDetailsPr
           />
           <VirtualMachineDescriptionItem
             descriptionData={
-              <DescriptionList className="pf-v6-c-description-list" isHorizontal>
+              <DescriptionList isHorizontal>
                 <DescriptionListGroup>
                   <DescriptionListTerm>{t('Cron expression')}</DescriptionListTerm>
                   <DescriptionListDescription>

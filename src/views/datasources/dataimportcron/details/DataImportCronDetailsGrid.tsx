@@ -41,7 +41,7 @@ export const DataImportCronDetailsGrid: React.FC<DataImportCronDetailsGridProps>
   return (
     <Grid hasGutter>
       <GridItem span={5}>
-        <DescriptionList className="pf-v6-c-description-list">
+        <DescriptionList>
           <VirtualMachineDescriptionItem
             // body-content text copied from: https://github.com/kubevirt-ui/kubevirt-api/blob/main/containerized-data-importer/models/V1ObjectMeta.ts#L96
             bodyContent={t(

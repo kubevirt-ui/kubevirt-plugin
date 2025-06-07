@@ -70,12 +70,12 @@ const SSHCommand: React.FC<SSHCommandProps> = ({
     sshService?.spec?.type === SERVICE_TYPES.LOAD_BALANCER && !isLoadBalancerBonded(sshService);
 
   return (
-    <DescriptionListGroup className="pf-v6-c-description-list__group">
+    <DescriptionListGroup>
       <DescriptionListTerm className="pf-v6-u-font-size-xs">
         {t('SSH service type')}
       </DescriptionListTerm>
 
-      <DescriptionListDescription className="pf-v6-c-description-list__description">
+      <DescriptionListDescription>
         <Stack hasGutter>
           {sshServiceLoaded && !loading ? (
             <>

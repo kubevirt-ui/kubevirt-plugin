@@ -111,7 +111,7 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
                   </SplitItem>
                 )}
                 <SplitItem>
-                  <DescriptionList className="pf-v6-c-description-list">
+                  <DescriptionList>
                     <VirtualMachineDescriptionItem
                       descriptionData={namespace}
                       descriptionHeader={t('Project')}

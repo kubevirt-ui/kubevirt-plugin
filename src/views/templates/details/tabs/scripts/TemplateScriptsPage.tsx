@@ -1,5 +1,4 @@
 import React, { FC, useCallback } from 'react';
-import classnames from 'classnames';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -65,12 +64,7 @@ const TemplateScriptsPage: FC<TemplateScriptsPageProps> = ({ obj: template }) =>
   return (
     <PageSection>
       <SidebarEditor<V1Template> onResourceUpdate={onSubmitTemplate} resource={template}>
-        <DescriptionList
-          className={classnames(
-            'pf-v6-c-description-list',
-            'template-scripts-tab__description-list',
-          )}
-        >
+        <DescriptionList className="template-scripts-tab__description-list">
           <VirtualMachineDescriptionItem
             descriptionHeader={
               <Flex className="vm-description-item__title">

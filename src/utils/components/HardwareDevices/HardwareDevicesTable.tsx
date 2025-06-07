@@ -1,5 +1,4 @@
 import * as React from 'react';
-import classnames from 'classnames';
 
 import { V1GPU, V1HostDevice } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -20,10 +19,7 @@ const HardwareDevicesTable: React.FC<HardwareDevicesTableProps> = ({ devices }) 
     return <span className="pf-v6-u-text-color-subtle">{t('Not available')}</span>;
 
   return (
-    <DescriptionList
-      className={classnames('pf-v6-c-description-list', 'hardware-devices-table')}
-      columnModifier={{ default: '2Col' }}
-    >
+    <DescriptionList className="hardware-devices-table" columnModifier={{ default: '2Col' }}>
       <VirtualMachineDescriptionItem
         descriptionData={
           <Stack>

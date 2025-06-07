@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom-v5-compat';
 
+import DetailsPageBody from '@kubevirt-utils/components/DetailsPageBody/DetailsPageBody';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
@@ -32,34 +33,33 @@ const CheckupsStorageDetailsPage = () => {
     );
 
   return (
-    <PageSection>
+    <>
       <CheckupsStorageDetailsPageHeader configMap={configMap} jobs={jobMatches} />
-      <Tabs
-        onSelect={(_, tabIndex: number) => {
-          setActiveTabKey(tabIndex);
-        }}
-        activeKey={activeTabKey}
-      >
-        <Tab eventKey={0} title={<TabTitleText>{t('Details')}</TabTitleText>}>
-          <PageSection>
-            <CheckupsStorageDetailsPageSection configMap={configMap} job={jobMatches?.[0]} />
-          </PageSection>
-          <PageSection>
-            <Divider />
-          </PageSection>
-          <PageSection>
-            <CheckupsDetailsPageHistory error={error} jobs={jobMatches} loading={loading} />
-          </PageSection>
-        </Tab>
-        <Tab
-          className="CheckupsStorageDetailsPage--yaml"
-          eventKey={1}
-          title={<TabTitleText>{t('YAML')}</TabTitleText>}
+      <DetailsPageBody>
+        <Tabs
+          onSelect={(_, tabIndex: number) => {
+            setActiveTabKey(tabIndex);
+          }}
+          activeKey={activeTabKey}
+          className="co-horizontal-nav"
         >
-          <ResourceYAMLEditor initialResource={configMap} />
-        </Tab>
-      </Tabs>
-    </PageSection>
+          <Tab eventKey={0} title={<TabTitleText>{t('Details')}</TabTitleText>}>
+            <PageSection>
+              <CheckupsStorageDetailsPageSection configMap={configMap} job={jobMatches?.[0]} />
+            </PageSection>
+            <PageSection>
+              <Divider />
+            </PageSection>
+            <PageSection>
+              <CheckupsDetailsPageHistory error={error} jobs={jobMatches} loading={loading} />
+            </PageSection>
+          </Tab>
+          <Tab eventKey={1} title={<TabTitleText>{t('YAML')}</TabTitleText>}>
+            <ResourceYAMLEditor initialResource={configMap} />
+          </Tab>
+        </Tabs>
+      </DetailsPageBody>
+    </>
   );
 };
 

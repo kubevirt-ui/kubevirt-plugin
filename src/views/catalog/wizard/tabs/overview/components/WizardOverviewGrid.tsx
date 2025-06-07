@@ -103,7 +103,7 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
   return (
     <Grid className="wizard-overview-tab__grid" hasGutter>
       <GridItem rowSpan={4} span={6}>
-        <DescriptionList className="pf-v6-c-description-list">
+        <DescriptionList>
           <WizardDescriptionItem
             onEditClick={() =>
               createModal((modalProps) => (
@@ -286,7 +286,7 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
         </DescriptionList>
       </GridItem>
       <GridItem rowSpan={4} span={6}>
-        <DescriptionList className="pf-v6-c-description-list">
+        <DescriptionList>
           <WizardDescriptionItem
             description={
               <WizardOverviewNetworksTable

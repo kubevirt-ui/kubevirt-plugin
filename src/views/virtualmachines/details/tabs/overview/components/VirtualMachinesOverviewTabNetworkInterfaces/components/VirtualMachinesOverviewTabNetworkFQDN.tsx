@@ -28,7 +28,7 @@ const VirtualMachinesOverviewTabNetworkFQDN: FC<VirtualMachinesOverviewTabNetwor
   return (
     <>
       <Divider />
-      <DescriptionList className="pf-v6-c-description-list" isHorizontal>
+      <DescriptionList isHorizontal>
         <VirtualMachineDescriptionItem
           descriptionData={
             <ClipboardCopy

@@ -25,7 +25,7 @@ const VirtualMachinesInstancePageSchedulingTab: FC<
     <PageSection>
       <Grid hasGutter>
         <GridItem span={6}>
-          <DescriptionList className="pf-v6-c-description-list">
+          <DescriptionList>
             <VirtualMachineDescriptionItem
               descriptionData={<NodeSelectorDetailItem nodeSelector={vmi?.spec?.nodeSelector} />}
               descriptionHeader={t('Node selector')}
@@ -45,7 +45,7 @@ const VirtualMachinesInstancePageSchedulingTab: FC<
           </DescriptionList>
         </GridItem>
         <GridItem span={6}>
-          <DescriptionList className="pf-v6-c-description-list">
+          <DescriptionList>
             <VirtualMachineDescriptionItem
               descriptionData={<DedicatedResources vmi={vmi} />}
               descriptionHeader={t('Dedicated resources')}

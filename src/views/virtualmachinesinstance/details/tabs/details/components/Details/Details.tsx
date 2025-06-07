@@ -60,7 +60,7 @@ const Details: React.FC<DetailsProps> = ({ pathname, vmi }) => {
       </Title>
       <Grid hasGutter>
         <GridItem span={5}>
-          <DescriptionList className="pf-v6-c-description-list">
+          <DescriptionList>
             <Name name={vmi?.metadata?.name} />
             <Namespace namespace={vmi?.metadata?.namespace} />
             <Labels vmi={vmi} />
@@ -84,7 +84,7 @@ const Details: React.FC<DetailsProps> = ({ pathname, vmi }) => {
         </GridItem>
         <GridItem span={1}></GridItem>
         <GridItem span={5}>
-          <DescriptionList className="pf-v6-c-description-list">
+          <DescriptionList>
             <VirtualMachineDescriptionItem
               descriptionData={<VirtualMachinesInstancesStatus status={vmi?.status?.phase} />}
               descriptionHeader={t('Status')}

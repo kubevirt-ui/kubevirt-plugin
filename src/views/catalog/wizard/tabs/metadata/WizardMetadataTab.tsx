@@ -1,5 +1,4 @@
 import * as React from 'react';
-import classnames from 'classnames';
 
 import { WizardTab } from '@catalog/wizard/tabs';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
@@ -29,12 +28,7 @@ const WizardMetadataTab: WizardTab = ({ loaded, updateVM, vm }) => {
       >
         {(resource) => (
           <>
-            <DescriptionList
-              className={classnames(
-                'pf-v6-c-description-list',
-                'wizard-metadata-tab__description-list',
-              )}
-            >
+            <DescriptionList className="wizard-metadata-tab__description-list">
               <WizardDescriptionItem
                 description={
                   <MetadataLabels labels={resource?.metadata?.labels} model={VirtualMachineModel} />
