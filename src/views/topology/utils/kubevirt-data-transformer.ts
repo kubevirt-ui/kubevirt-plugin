@@ -21,7 +21,7 @@ import { getKubevirtModelAvailableAPIVersion } from '../../cdi-upload-provider/u
 
 import { getImageForIconClass } from './icon-image-utils/catalog-item-icon';
 import { VMNodeData } from './types/types';
-import { TYPE_VIRTUAL_MACHINE, WORKLOAD_TYPES } from './constants';
+import { VIRTUAL_MACHINE_TYPE, WORKLOAD_TYPES } from './constants';
 import { WorkloadModelProps } from './utils';
 
 export const getOperatingSystemImage = (vm: V1VirtualMachine, templates: V1Template[]): string => {
@@ -69,7 +69,7 @@ const createTopologyVMNodeData = (
     name: name || labels['app.kubernetes.io/instance'],
     resource: vm,
     resources: vmOverview,
-    type: TYPE_VIRTUAL_MACHINE,
+    type: VIRTUAL_MACHINE_TYPE,
   };
 };
 
@@ -90,7 +90,7 @@ export const getKubevirtTopologyDataModel = (
       vmsDataModel?.nodes.push(
         getTopologyNodeItem(
           vm,
-          TYPE_VIRTUAL_MACHINE,
+          VIRTUAL_MACHINE_TYPE,
           data,
           WorkloadModelProps,
           undefined,

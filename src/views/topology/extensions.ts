@@ -100,4 +100,46 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.topology/details/tab-section',
   },
+  {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC'],
+    },
+    properties: {
+      adapt: {
+        $codeRef: 'topology.getVMSidePanelPodsAdapter',
+      },
+    },
+    type: 'console.topology/adapter/pod',
+  },
+  {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC'],
+    },
+    properties: {
+      adapt: {
+        $codeRef: 'topology.getVMSidePanelNetworkAdapter',
+      },
+    },
+    type: 'console.topology/adapter/network',
+  },
+  {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC'],
+    },
+    properties: {
+      link: { $codeRef: 'topology.getVMSideBarResourceLink' },
+      priority: 100,
+    },
+    type: 'console.topology/details/resource-link',
+  },
+  {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC'],
+    },
+    properties: {
+      contextId: 'topology-actions',
+      provider: { $codeRef: 'topology.useModifyApplicationActionProvider' },
+    },
+    type: 'console.action/provider',
+  },
 ];

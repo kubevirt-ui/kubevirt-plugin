@@ -20,13 +20,13 @@ import {
 import CreateConnector from '../components/CreateConnector';
 import VMNode from '../components/nodes/VMNode/VMNode';
 
-import { TYPE_VIRTUAL_MACHINE } from './constants';
+import { VIRTUAL_MACHINE_TYPE } from './constants';
 
 export const getKubevirtComponentFactory = (
   _kind,
   type,
 ): ComponentType<{ element: GraphElement }> | undefined =>
-  type === TYPE_VIRTUAL_MACHINE
+  type === VIRTUAL_MACHINE_TYPE
     ? withCreateConnector(
         createConnectorCallback(),
         CreateConnector,
