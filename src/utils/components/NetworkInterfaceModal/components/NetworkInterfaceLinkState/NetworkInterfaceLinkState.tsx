@@ -1,8 +1,8 @@
 import React, { Dispatch, FC, MouseEvent, SetStateAction } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
-import { NetworkInterfaceState } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
 import { FormGroup, SelectOption } from '@patternfly/react-core';
 
 import './NetworkInterfaceLinkState.scss';
