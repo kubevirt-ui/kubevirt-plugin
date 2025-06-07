@@ -11,6 +11,13 @@
   height: 100%;
 }
 
+.console-container {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
 .console-container-stand-alone {
   height: calc(100% - 75px);
 }

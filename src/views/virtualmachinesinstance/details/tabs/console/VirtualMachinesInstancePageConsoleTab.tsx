@@ -1,7 +1,10 @@
 import React, { FC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import Consoles from '@kubevirt-utils/components/Consoles/Consoles';
+import StableConsole from '@kubevirt-utils/components/Consoles/StableConsole';
+import { getConsolePath } from '@kubevirt-utils/components/Consoles/utils/utils';
+import { isHeadlessMode } from '@kubevirt-utils/resources/vm';
+import { isWindows } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { PageSection } from '@patternfly/react-core';
 
 type VirtualMachinesInstancePageConsoleTabProps = {
@@ -12,7 +15,12 @@ const VirtualMachinesInstancePageConsoleTab: FC<VirtualMachinesInstancePageConso
   obj: vmi,
 }) => (
   <PageSection>
-    <Consoles vmi={vmi} />
+    <StableConsole
+      isHeadlessMode={isHeadlessMode(vmi)}
+      isVmRunning={!!vmi}
+      isWindowsVM={isWindows(vmi)}
+      path={getConsolePath({ name: vmi?.metadata?.name, namespace: vmi?.metadata?.namespace })}
+    />
   </PageSection>
 );
 
