@@ -22,6 +22,7 @@ const VirtualMachineBulkActionButton: FC<VirtualMachineBulkActionButtonProps> = 
   return (
     <ActionsDropdown
       actions={actions}
+      className="vm-actions-toggle"
       disabledTooltip={t('Select multiple VirtualMachines to perform an action for all of them')}
       isDisabled={isEmpty(selectedVirtualMachines)}
       variant="secondary"

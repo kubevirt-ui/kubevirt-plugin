@@ -13,7 +13,7 @@ const useExistingSelectedVMs = (vms: V1VirtualMachine[]) => {
       selectedVMs.value
         .map((selectedVM) => vmsMapper?.[selectedVM.namespace]?.[selectedVM.name])
         .filter(Boolean),
-    [selectedVMs.value, vmsMapper],
+    [vmsMapper],
   );
 
   return existingSelectedVirtualMachines;
