@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import Loggable = Cypress.Loggable;
-import Timeoutable = Cypress.Timeoutable;
-import Withinable = Cypress.Withinable;
-import Shadow = Cypress.Shadow;
 import { MINUTE, SECOND } from '../utils/const/index';
 import { Perspective, switchPerspective } from '../views/perspective';
 
 export {};
+
+type GetOptions = Parameters<Cypress.Chainable['get']>[1];
+
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Cypress {
@@ -14,15 +13,9 @@ declare global {
       byButtonText(selector: string): Chainable;
       byLegacyTestID(selector: string): Chainable;
       byTestActionID(selector: string): Chainable;
-      byTestID(
-        selector: string,
-        options?: Partial<Loggable & Timeoutable & Withinable & Shadow>,
-      ): Chainable;
+      byTestID(selector: string | string[], options?: GetOptions): Chainable;
       byTestOperandLink(selector: string): Chainable;
-      byTestOperatorRow(
-        selector: string,
-        options?: Partial<Loggable & Timeoutable & Withinable & Shadow>,
-      ): Chainable;
+      byTestOperatorRow(selector: string, options?: GetOptions): Chainable;
       byTestRows(selector: string): Chainable;
       checkSubTitle(title: string, timeout?: number): void;
       checkTitle(title: string, timeout?: number): void;
@@ -35,12 +28,12 @@ declare global {
   }
 }
 
-Cypress.Commands.add(
-  'byTestID',
-  (selector: string, options?: Partial<Loggable & Timeoutable & Withinable & Shadow>) => {
-    cy.get(`[data-test="${selector}"]`, options);
-  },
-);
+Cypress.Commands.add('byTestID', (selector: string | string[], options?: GetOptions) => {
+  const getSelector = Array.isArray(selector)
+    ? selector.map((id) => `[data-test="${id}"]`).join(', ')
+    : `[data-test="${selector}"]`;
+  cy.get(getSelector, options);
+});
 
 Cypress.Commands.add('byLegacyTestID', (selector: string) =>
   cy.get(`[data-test-id="${selector}"]`),
@@ -55,7 +48,7 @@ Cypress.Commands.add('byTestRows', (selector: string) => cy.get(`[data-test-rows
 Cypress.Commands.add('byTestActionID', (selector: string) =>
   cy.get(`[data-test-action="${selector}"]:not(.pf-m-disabled)`),
 );
-Cypress.Commands.add('byTestOperatorRow', (selector: string, options?: object) =>
+Cypress.Commands.add('byTestOperatorRow', (selector: string, options?: GetOptions) =>
   cy.get(`[data-test-operator-row="${selector}"]`, options),
 );
 Cypress.Commands.add('clickNavLink', (path: [string, string?]) => {
