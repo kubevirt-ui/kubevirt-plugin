@@ -14,6 +14,11 @@
     padding: var(--pf-t--global--spacer--2xl);
     padding-left: calc(var(--pf-t--global--spacer--3xl) * 2);
   }
+
+
+  &--indented {
+    margin-left: 0.8rem;
+  }
 }
 
 .section-divider {

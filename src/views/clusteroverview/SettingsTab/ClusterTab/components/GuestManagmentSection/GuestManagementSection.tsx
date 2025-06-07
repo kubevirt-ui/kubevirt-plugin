@@ -24,13 +24,13 @@ const GuestManagementSection: FC<GuestManagementSectionProps> = ({
     <ExpandSection toggleText={t('Guest management')}>
       <Stack hasGutter>
         <StackItem isFilled>
-          <AutomaticSubscriptionRHELGuests newBadge={newBadge} />
-        </StackItem>
-        <StackItem isFilled>
           <GuestSystemLogsAccess
             hyperConvergeConfiguration={hyperConvergeConfiguration}
             newBadge={newBadge}
           />
+        </StackItem>
+        <StackItem isFilled>
+          <AutomaticSubscriptionRHELGuests newBadge={newBadge} />
         </StackItem>
       </Stack>
     </ExpandSection>
