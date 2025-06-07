@@ -1,6 +1,5 @@
 import * as React from 'react';
 
-import { bytesFromQuantity } from '@catalog/utils/quantity';
 import { PersistentVolumeClaimModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -10,21 +9,27 @@ import {
   getDisks,
   getVolumes,
 } from '@kubevirt-utils/resources/vm';
+import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { DiskRawData, DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import {
   getPrintableDiskDrive,
   getPrintableDiskInterface,
 } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
+import { convertToBaseValue, humanizeBinaryBytes } from '@kubevirt-utils/utils/humanize.js';
 import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
-type UseDisksTableDisks = (vm: V1VirtualMachine) => [DiskRowDataLayout[], boolean, any];
+type UseDisksTableDisks = (
+  vm: V1VirtualMachine,
+  pvcNamespace?: string,
+) => [DiskRowDataLayout[], boolean, any];
 
 /**
  * A Hook for getting disks data for a VM
  * @param vm - virtual machine to get disks from
+ * @param pvcNamespace - optional namespace to get pvcs from, if not provided vm namespace is used
  * @returns disks data and loading state
  */
-const useWizardDisksTableData: UseDisksTableDisks = (vm: V1VirtualMachine) => {
+const useWizardDisksTableData: UseDisksTableDisks = (vm, pvcNamespace) => {
   const { t } = useKubevirtTranslation();
   const vmDisks = getDisks(vm);
   const vmVolumes = getVolumes(vm);
@@ -33,7 +38,7 @@ const useWizardDisksTableData: UseDisksTableDisks = (vm: V1VirtualMachine) => {
   const [pvcs, loaded, loadingError] = useK8sWatchResource<K8sResourceCommon[]>({
     isList: true,
     kind: PersistentVolumeClaimModel.kind,
-    namespace: vm?.metadata?.namespace,
+    namespace: pvcNamespace ?? vm?.metadata?.namespace,
     namespaced: true,
   });
 
@@ -74,7 +79,7 @@ const useWizardDisksTableData: UseDisksTableDisks = (vm: V1VirtualMachine) => {
       const storageClass =
         device?.dataVolumeTemplate?.spec?.storage?.storageClassName ||
         device?.dataVolumeTemplate?.spec?.pvc?.storageClassName ||
-        '-';
+        NO_DATA_DASH;
 
       return {
         drive: getPrintableDiskDrive(device?.disk),
@@ -87,7 +92,7 @@ const useWizardDisksTableData: UseDisksTableDisks = (vm: V1VirtualMachine) => {
         metadata: { name: device?.disk?.name },
         name: device?.disk?.name,
         namespace: device?.pvc?.metadata?.namespace,
-        size: size ? bytesFromQuantity(size, 2).join('') : '-',
+        size: size ? humanizeBinaryBytes(convertToBaseValue(size)).string : NO_DATA_DASH,
         source: source(),
         storageClass,
       };

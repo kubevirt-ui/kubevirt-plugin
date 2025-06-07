@@ -76,7 +76,6 @@ const TemplateDisksPage: FC<TemplateDisksPageProps> = ({ obj: template }) => {
                     />
                   ));
                 }}
-                className="list-page-create-button-margin"
               />
             </StackItem>
           )}
