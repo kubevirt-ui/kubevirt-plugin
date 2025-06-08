@@ -2,7 +2,7 @@ import './upstream/a-setup.cy.ts';
 import './upstream/a-shared-vm.cy.ts';
 import './upstream/check-tab-yaml.cy.ts';
 import './upstream/catalog-filter.cy.ts';
-//import './upstream/catalog-create.cy.ts';
+import './upstream/catalog-create.cy.ts';
 import './upstream/template-list.cy.ts';
 import './upstream/overview-tab.cy.ts';
 import './upstream/top-consumers-tab.cy.ts';
