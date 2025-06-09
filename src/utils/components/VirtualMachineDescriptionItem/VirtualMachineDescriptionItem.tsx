@@ -70,8 +70,8 @@ const VirtualMachineDescriptionItem: FC<VirtualMachineDescriptionItemProps> = ({
   );
 
   return (
-    <DescriptionListGroup className={`pf-v6-c-description-list__group ${className && className}`}>
-      <DescriptionListTermHelpText className="pf-v6-c-description-list__term">
+    <DescriptionListGroup className={className}>
+      <DescriptionListTermHelpText>
         <Flex
           justifyContent={{
             default: editOnTitleJustify ? 'justifyContentSpaceBetween' : 'justifyContentFlexStart',
@@ -108,10 +108,7 @@ const VirtualMachineDescriptionItem: FC<VirtualMachineDescriptionItemProps> = ({
         </Flex>
       </DescriptionListTermHelpText>
 
-      <DescriptionListDescription
-        className="pf-v6-c-description-list__description"
-        data-test-id={testId}
-      >
+      <DescriptionListDescription data-test-id={testId}>
         {subTitle && <div className="pf-v6-c-description-list__text pf-v6-u-my-sm">{subTitle}</div>}
         {isEdit && !showEditOnTitle ? description : descriptionData}
       </DescriptionListDescription>
