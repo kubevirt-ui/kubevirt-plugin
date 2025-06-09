@@ -89,7 +89,7 @@ export const uploadDataVolume = async (
 export const editDisk = (data: V1DiskFormState, diskName: string, vm: V1VirtualMachine) => {
   const volumes = getVolumes(vm);
   const diskindex = getDisks(vm)?.findIndex((disk) => disk.name === diskName);
-  const volumeindex = getVolumes(vm)?.findIndex((volume) => volume.name === diskName);
+  const volumeindex = volumes?.findIndex((volume) => volume.name === diskName);
   const dataVolumeTemplateindex = getDataVolumeTemplates(vm)?.findIndex(
     (dv) => getName(dv) === volumes[volumeindex]?.dataVolume?.name,
   );
@@ -132,7 +132,7 @@ export const submit = async ({ data, editDiskName, onSubmit, pvc, vm }: SubmitIn
 
   const isInitialBootDisk = getBootDisk(vm)?.name === editDiskName;
 
-  if (data.volume.dataVolume) {
+  if (isCreatingDisk && data.volume.dataVolume && data.dataVolumeTemplate?.metadata) {
     const newDataVolumeName = createDataVolumeName(vm, data.disk.name);
     data.volume.dataVolume.name = newDataVolumeName;
     data.dataVolumeTemplate.metadata.name = newDataVolumeName;

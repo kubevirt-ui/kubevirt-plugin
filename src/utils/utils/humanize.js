@@ -12,7 +12,7 @@ const TYPES = {
   binaryBytesWithoutB: {
     divisor: 1024,
     space: true,
-    units: ['i', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei'],
+    units: ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei'],
   },
   decimalBytes: {
     divisor: 1000,
@@ -196,7 +196,7 @@ const humanize = (units.humanize = (
   const formattedValue = formatValue(converted.value);
 
   return {
-    string: type.space ? `${formattedValue} ${converted.unit}` : formattedValue + converted.unit,
+    string: `${formattedValue}${type.space && converted.unit ? ' ' : ''}${converted.unit}`,
     unit: converted.unit,
     value: converted.value,
   };

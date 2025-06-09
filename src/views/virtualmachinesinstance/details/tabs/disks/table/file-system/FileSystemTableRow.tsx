@@ -1,8 +1,8 @@
 import * as React from 'react';
 
+import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
+import { getHumanizedSize } from '@kubevirt-utils/utils/units';
 import { TableData } from '@openshift-console/dynamic-plugin-sdk';
-
-import { convertBytes } from '../../utils/virtualMachinesInstancePageDisksTabUtils';
 
 type FileSystemTableRowProps = {
   activeColumnIDs: Set<string>;
@@ -10,8 +10,8 @@ type FileSystemTableRowProps = {
 };
 
 const FileSystemTableRow: React.FC<FileSystemTableRowProps> = ({ activeColumnIDs, obj }) => {
-  const totalBytes = convertBytes(obj?.totalBytes);
-  const usedBytes = convertBytes(obj?.usedBytes);
+  const totalBytes = obj?.totalBytes ? getHumanizedSize(obj.totalBytes).string : NO_DATA_DASH;
+  const usedBytes = obj?.usedBytes ? getHumanizedSize(obj.usedBytes).string : NO_DATA_DASH;
 
   return (
     <>
@@ -25,10 +25,10 @@ const FileSystemTableRow: React.FC<FileSystemTableRowProps> = ({ activeColumnIDs
         {obj?.mountPoint}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="totalBytes">
-        {totalBytes.value} {totalBytes.unit}
+        {totalBytes}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="usedBytes">
-        {usedBytes.value} {usedBytes.unit}
+        {usedBytes}
       </TableData>
     </>
   );

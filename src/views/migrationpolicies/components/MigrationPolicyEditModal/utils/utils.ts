@@ -1,10 +1,9 @@
 import produce from 'immer';
 import { migrationPolicySpecKeys } from 'src/views/migrationpolicies/utils/constants';
 
-import { bytesFromQuantity } from '@catalog/utils/quantity';
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { DESCRIPTION_ANNOTATION } from '@kubevirt-utils/resources/vm';
-import { BinaryUnit } from '@kubevirt-utils/utils/units';
+import { BinaryUnit, getHumanizedSize } from '@kubevirt-utils/utils/units';
 
 import { getEmptyMigrationPolicy } from '../../../utils/utils';
 
@@ -25,7 +24,7 @@ export const extractEditMigrationPolicyInitialValues = (
     initState.allowAutoConverge = mp?.spec?.allowAutoConverge;
   }
   if (migrationPolicySpecKeys.BANDWIDTH_PER_MIGRATION in mp?.spec) {
-    const [value, unit] = bytesFromQuantity(mp?.spec?.bandwidthPerMigration);
+    const { unit, value } = getHumanizedSize(mp?.spec?.bandwidthPerMigration);
     initState.bandwidthPerMigration = { unit: fromIECUnit(unit), value };
   }
   if (migrationPolicySpecKeys.COMPLETION_TIMEOUT_PER_GIB in mp?.spec) {
