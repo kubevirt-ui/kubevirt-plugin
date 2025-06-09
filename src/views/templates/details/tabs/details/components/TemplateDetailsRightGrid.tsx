@@ -39,7 +39,7 @@ const TemplateDetailsRightGrid: React.FC<TemplateDetailsGridProps> = ({ template
   };
 
   return (
-    <DescriptionList className="pf-v6-c-description-list">
+    <DescriptionList>
       <BootOrderItem template={template} />
       <BootSource template={template} />
       <VirtualMachineDescriptionItem

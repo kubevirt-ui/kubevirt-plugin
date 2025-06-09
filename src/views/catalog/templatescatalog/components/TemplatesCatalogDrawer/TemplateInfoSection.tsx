@@ -55,7 +55,7 @@ export const TemplateInfoSection: FC = memo(() => {
       onToggle={(_event, val) => setIsTemplateInfoExpanded(val)}
       toggleText={t('Template info')}
     >
-      <DescriptionList className="pf-v6-c-description-list">
+      <DescriptionList>
         <VirtualMachineDescriptionItem
           descriptionData={displayName}
           descriptionHeader={t('Operating system')}

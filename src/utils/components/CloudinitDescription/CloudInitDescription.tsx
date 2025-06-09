@@ -25,11 +25,7 @@ export const CloudInitDescription: FC<{ vm: V1VirtualMachine }> = ({ vm }) => {
         <CloudInitInfoHelper />
       </StackItem>
       <StackItem>
-        <DescriptionList
-          className="pf-v6-c-description-list"
-          columnModifier={{ lg: '1Col', xl: '3Col' }}
-          isCompact
-        >
+        <DescriptionList columnModifier={{ lg: '1Col', xl: '3Col' }} isCompact>
           <VirtualMachineDescriptionItem
             descriptionData={userData?.user || NO_DATA_DASH}
             descriptionHeader={t('User')}

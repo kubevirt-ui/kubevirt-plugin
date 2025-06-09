@@ -38,7 +38,7 @@ const ManualConnection: React.FunctionComponent<ManualConnectionProps> = ({
         {textManualConnection || t('Manual Connection')}
       </Title>
       <p>{msg}</p>
-      <DescriptionList className="pf-v6-c-description-list">
+      <DescriptionList>
         {address && <Detail title={textAddress || t('Address')} value={address} />}
         {!address && spice && (
           <Detail title={textSpiceAddress || t('SPICE Address')} value={spice?.address} />

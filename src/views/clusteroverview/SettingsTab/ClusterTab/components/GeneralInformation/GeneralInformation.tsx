@@ -61,7 +61,7 @@ const GeneralInformation: FC<GeneralInformationProps> = ({
       </SplitItem>
       <Divider orientation={{ default: 'vertical' }} />
       <SplitItem>
-        <DescriptionList className="pf-v6-c-description-list">
+        <DescriptionList>
           <VirtualMachineDescriptionItem
             descriptionData={
               loaded ? (

@@ -1,5 +1,4 @@
 import React from 'react';
-import classnames from 'classnames';
 
 import { WizardDescriptionItem } from '@catalog/wizard/components/WizardDescriptionItem';
 import { WizardTab } from '@catalog/wizard/tabs';
@@ -35,9 +34,7 @@ const WizardScriptsTab: WizardTab = ({ tabsData, updateVM, vm }) => {
         pathsToHighlight={PATHS_TO_HIGHLIGHT.SCRIPTS_TAB}
         resource={vm}
       >
-        <DescriptionList
-          className={classnames('pf-v6-c-description-list', 'wizard-scripts-tab__description-list')}
-        >
+        <DescriptionList className="wizard-scripts-tab__description-list">
           <DescriptionListDescription>
             <AlertScripts />
           </DescriptionListDescription>

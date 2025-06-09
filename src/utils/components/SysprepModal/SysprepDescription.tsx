@@ -35,11 +35,7 @@ export const SysprepDescription: FC<{
         <SysprepInfo />
       </StackItem>
       <StackItem>
-        <DescriptionList
-          className="pf-v6-c-description-list"
-          columnModifier={{ lg: '1Col', xl: '2Col' }}
-          isCompact
-        >
+        <DescriptionList columnModifier={{ lg: '1Col', xl: '2Col' }} isCompact>
           <VirtualMachineDescriptionItem
             descriptionData={
               isEmpty(selectedSysprepName) ? (

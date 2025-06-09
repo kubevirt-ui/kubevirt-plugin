@@ -69,7 +69,7 @@ const CustomizeInstanceTypeDetailsTab = () => {
       </Title>
       <Grid>
         <GridItem span={5}>
-          <DescriptionList className="pf-v6-c-description-list">
+          <DescriptionList>
             <VirtualMachineDescriptionItem
               descriptionData={
                 getAnnotation(vm, DESCRIPTION_ANNOTATION) || <MutedTextSpan text={t('None')} />
@@ -202,7 +202,7 @@ const CustomizeInstanceTypeDetailsTab = () => {
           </DescriptionList>
         </GridItem>
         <GridItem span={5}>
-          <DescriptionList className="pf-v6-c-description-list">
+          <DescriptionList>
             <DetailsSectionHardware
               onSubmit={(type: HARDWARE_DEVICE_TYPE, updatedVM: V1VirtualMachine) =>
                 Promise.resolve(

@@ -1,5 +1,4 @@
 import React, { FC, useState } from 'react';
-import classnames from 'classnames';
 
 import {
   V1beta1VirtualMachineSnapshot,
@@ -57,10 +56,10 @@ const VirtualMachinesOverviewTabSnapshotsRow: FC<VirtualMachinesOverviewTabSnaps
     <div className="VirtualMachinesOverviewTabSnapshotsRow--main">
       <div className="name">
         <Icon />
-        <DescriptionListTermHelpText className="pf-v6-c-description-list__term">
+        <DescriptionListTermHelpText>
           <Popover
             bodyContent={
-              <DescriptionList className="pf-v6-c-description-list" isHorizontal>
+              <DescriptionList isHorizontal>
                 <VirtualMachineDescriptionItem
                   descriptionData={
                     <>
@@ -83,9 +82,7 @@ const VirtualMachinesOverviewTabSnapshotsRow: FC<VirtualMachinesOverviewTabSnaps
             headerContent={snapshot?.metadata?.name}
             position={PopoverPosition.left}
           >
-            <DescriptionListTermHelpTextButton
-              className={classnames('pf-v6-c-description-list__text', 'icon-spacer__offset')}
-            >
+            <DescriptionListTermHelpTextButton className="icon-spacer__offset">
               {snapshot?.metadata?.name}
             </DescriptionListTermHelpTextButton>
           </Popover>

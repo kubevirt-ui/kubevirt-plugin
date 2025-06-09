@@ -26,7 +26,7 @@ const MoreInformationDefault: React.FC<MoreInformationDefaultProps> = ({ textMor
           </p>
         </Trans>
       )}
-      <DescriptionList className="pf-v6-c-description-list" isHorizontal>
+      <DescriptionList isHorizontal>
         <Detail title={'RHEL, CentOS'} value={'sudo yum install virt-viewer'} />
         <Detail title={'Fedora'} value={'sudo dnf install virt-viewer'} />
         <Detail title={'Ubuntu, Debian'} value={'sudo apt-get install virt-viewer'} />
