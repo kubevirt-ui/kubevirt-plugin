@@ -74,6 +74,9 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
     true,
   );
 
+  const cpuMemoryVM =
+    instanceTypeExpandedSpec?.metadata?.uid === vm?.metadata?.uid ? instanceTypeExpandedSpec : vm;
+
   const timestampPluralized = pluralize(timestamp['value'], timestamp['time']);
 
   const { fallback, hostname, osName } = useMemo(() => {
@@ -159,7 +162,7 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
                   descriptionHeader={t('Operating system')}
                 />
                 <VirtualMachineDescriptionItem
-                  descriptionData={<CPUMemory vm={instanceTypeExpandedSpec || vm} vmi={vmi} />}
+                  descriptionData={<CPUMemory vm={cpuMemoryVM || vm} vmi={vmi} />}
                   descriptionHeader={t('CPU | Memory')}
                 />
                 <VirtualMachineDescriptionItem

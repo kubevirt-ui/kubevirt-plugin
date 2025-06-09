@@ -85,6 +85,8 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
   const vmWorkload = getWorkload(vm);
   const vmName = getName(vm);
 
+  const cpuMemoryVM = instanceTypeVM?.metadata?.uid === vm?.metadata?.uid ? instanceTypeVM : vm;
+
   const isInstanceType = isInstanceTypeVM(vm);
   const deletionProtectionEnabled = isDeletionProtectionEnabled(vm);
 
@@ -178,7 +180,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
               }
               bodyContent={isInstanceType ? null : <CPUDescription cpu={getCPU(vm)} />}
               data-test-id={`${vmName}-cpu-memory`}
-              descriptionData={<CPUMemory vm={instanceTypeVM || vm} vmi={vmi} />}
+              descriptionData={<CPUMemory vm={cpuMemoryVM || vm} vmi={vmi} />}
               isEdit={canUpdateVM}
               isPopover
             />
