@@ -10,4 +10,4 @@ export const WorkloadModelProps = {
   width: NODE_WIDTH,
 };
 
-export const isVMType = (type: string) => type !== VIRTUAL_MACHINE_TYPE;
+export const isVMType = (type: string) => type === VIRTUAL_MACHINE_TYPE;
