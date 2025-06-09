@@ -22,9 +22,9 @@ const CPUMemory: FC<CPUMemoryProps> = ({ vm, vmi }) => {
 
   if ((isVMRunning && !vmi) || !vm) return <Skeleton className="pf-m-width-sm" />;
 
-  const cpu = vCPUCount(getCPU(vm) || getCPU(vmi));
+  const cpu = vCPUCount(getCPU(vmi) || getCPU(vm));
 
-  const memory = readableSizeUnit(getMemory(vm) || getMemory(vmi));
+  const memory = readableSizeUnit(getMemory(vmi) || getMemory(vm));
 
   return (
     <span
