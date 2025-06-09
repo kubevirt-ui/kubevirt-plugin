@@ -218,6 +218,7 @@ export const VirtualMachineActionFactory = {
     };
   },
   migrationActions: (migrationActions): ActionDropdownItemType => ({
+    cta: () => null, // Required to avoid breaking actions in the topology view
     id: 'migration-menu',
     label: 'Migration',
     options: migrationActions,
