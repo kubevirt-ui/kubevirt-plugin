@@ -8,7 +8,7 @@ import TopologyVMDetailsPanel from '../components/vm/VMDetailsPanel/TopologyVMDe
 import { VMNode } from '../utils/types/types';
 
 const useVMSidePanelDetailsTabSection: DetailsTabSectionExtensionHook = (element: GraphElement) => {
-  if (isVMType(element.getType())) {
+  if (!isVMType(element.getType())) {
     return [undefined, true, undefined];
   }
   const section = <TopologyVMDetailsPanel vmNode={element as VMNode} />;
