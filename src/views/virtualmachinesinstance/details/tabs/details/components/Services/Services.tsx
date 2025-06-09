@@ -4,6 +4,7 @@ import { modelToGroupVersionKind, ServiceModel } from '@kubevirt-ui/kubevirt-api
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getServicesForVmi } from '@kubevirt-utils/resources/vmi';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { ServicesList } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { Icon, Title } from '@patternfly/react-core';
@@ -30,7 +31,7 @@ const Services = ({ pathname, vmi }) => {
       <Title className="co-section-heading" headingLevel="h2">
         {t('Services')}
       </Title>
-      <ServicesList data={data || []} loaded={loaded} />
+      {!isEmpty(ServicesList) && <ServicesList data={data} loaded={loaded} />}
     </div>
   );
 };

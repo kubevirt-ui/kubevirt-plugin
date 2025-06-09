@@ -6,6 +6,7 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm';
 import { getServicesForVmi } from '@kubevirt-utils/resources/vmi';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { ServicesList } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { Card, CardBody, CardTitle, Divider } from '@patternfly/react-core';
@@ -35,7 +36,7 @@ const VirtualMachinesOverviewTabService: FC<VirtualMachinesOverviewTabServicePro
       </CardTitle>
       <Divider />
       <CardBody isFilled>
-        <ServicesList data={data || []} loaded={loaded} />
+        {!isEmpty(ServicesList) && <ServicesList data={data} loaded={loaded} />}
       </CardBody>
     </Card>
   );
