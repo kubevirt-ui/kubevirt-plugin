@@ -76,7 +76,6 @@ const WizardDisksTab: WizardTab = ({ tabsData, updateTabsData, updateVM, vm }) =
                 />
               ));
             }}
-            className="list-page-create-button-margin"
           />
           <Flex>
             <FlexItem>
