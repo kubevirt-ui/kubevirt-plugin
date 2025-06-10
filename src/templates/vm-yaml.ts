@@ -8,14 +8,14 @@ metadata:
     description: VM example
   labels:
     app: example
-    os.template.kubevirt.io/fedora: 'true'
+    os.template.kubevirt.io/rhel9: 'true'
 spec:
   runStrategy: Halted
   template:
     metadata:
       annotations:
         vm.kubevirt.io/flavor: small
-        vm.kubevirt.io/os: fedora
+        vm.kubevirt.io/os: rhel9
         vm.kubevirt.io/workload: server
       labels:
         kubevirt.io/domain: example
@@ -50,12 +50,12 @@ spec:
       volumes:
         - name: rootdisk
           containerDisk:
-            image: 'quay.io/containerdisks/fedora'
+            image: 'registry.redhat.io/rhel9/rhel-guest-image'
         - cloudInitNoCloud:
             userData: |-
               #cloud-config
-              user: fedora
-              password: fedora
+              user: rhel
+              password: $RANDOM
               chpasswd: { expire: False }
           name: cloudinitdisk
 `;
