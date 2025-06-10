@@ -1,4 +1,5 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
+import { useParams } from 'react-router-dom-v5-compat';
 
 import { SINGLE_VM_DURATION } from '@kubevirt-utils/components/Charts/utils/utils';
 import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
@@ -12,10 +13,19 @@ type UseDuration = () => {
 };
 
 const useDuration: UseDuration = () => {
+  const { cluster } = useParams<{ cluster?: string }>();
+
   const [duration, setDuration] = useLocalStorage(
     SINGLE_VM_DURATION,
-    DurationOption.FIVE_MIN.toString(),
+    cluster ? DurationOption.FIFTEEN_MIN.toString() : DurationOption.FIVE_MIN.toString(),
   );
+
+  useEffect(() => {
+    if (cluster && duration === DurationOption.FIVE_MIN.toString()) {
+      setDuration(DurationOption.FIFTEEN_MIN.toString());
+    }
+  }, [cluster, duration, setDuration]);
+
   const currentTime = useMemo<number>(() => Date.now(), []);
   const timespan = DurationOption?.getMilliseconds(duration);
 

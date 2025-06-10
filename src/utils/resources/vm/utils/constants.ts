@@ -49,3 +49,5 @@ export enum VirtualMachineStatusConditionTypes {
   RestartRequired = 'RestartRequired',
   StorageLiveMigratable = 'StorageLiveMigratable',
 }
+
+export const BASE_ACM_VM_PATH = '/multicloud/infrastructure/virtualmachines';

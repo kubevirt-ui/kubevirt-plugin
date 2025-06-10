@@ -15,6 +15,7 @@ import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 import { Checkbox } from '@patternfly/react-core';
+import { FleetResourceLink } from '@stolostron/multicluster-sdk';
 import VirtualMachineActions from '@virtualmachines/actions/components/VirtualMachineActions/VirtualMachineActions';
 import useVirtualMachineActionsProvider from '@virtualmachines/actions/hooks/useVirtualMachineActionsProvider';
 import { getDeletionProtectionPrintableStatus } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
@@ -71,7 +72,8 @@ const VirtualMachineRowLayout: FC<
         />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-20 vm-column" id="name">
-        <ResourceLink
+        <FleetResourceLink
+          cluster={obj?.cluster}
           groupVersionKind={VirtualMachineModelGroupVersionKind}
           name={vmName}
           namespace={vmNamespace}

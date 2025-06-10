@@ -8,6 +8,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { useParams } from 'react-router-dom-v5-compat';
 import classNames from 'classnames';
 
 import {
@@ -38,7 +39,6 @@ import { PageTitles } from '@kubevirt-utils/constants/page-constants';
 import useContainerWidth from '@kubevirt-utils/hooks/useContainerWidth';
 import { KUBEVIRT_APISERVER_PROXY } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
-import useKubevirtDataPodHealth from '@kubevirt-utils/hooks/useKubevirtDataPod/hooks/useKubevirtDataPodHealth';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource';
 import {
@@ -51,12 +51,12 @@ import {
   DocumentTitle,
   K8sResourceCommon,
   ListPageBody,
-  useK8sWatchResource,
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Flex, Pagination } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
+import { useFleetK8sWatchResource } from '@stolostron/multicluster-sdk';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 import { convertIntoPVCMapper } from '@virtualmachines/utils/mappers';
 
@@ -89,9 +89,11 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
   const { isSearchResultsPage = false, kind, namespace } = props;
   const catalogURL = `/k8s/ns/${namespace || DEFAULT_NAMESPACE}/catalog`;
   const { featureEnabled, loading: loadingFeatureProxy } = useFeatures(KUBEVIRT_APISERVER_PROXY);
-  const isProxyPodAlive = useKubevirtDataPodHealth();
+  const isProxyPodAlive = false;
 
   const listPageFilterRef = useRef<{ resetTextSearch: ResetTextSearch } | null>(null);
+
+  const params = useParams<{ cluster: string }>();
 
   useSignals();
   useVMMetrics();
@@ -100,6 +102,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
 
   const [vms, vmsLoaded, loadError] = useKubevirtWatchResource<V1VirtualMachine[]>(
     {
+      cluster: params.cluster,
       groupVersionKind: VirtualMachineModelGroupVersionKind,
       isList: true,
       limit: OBJECTS_FETCHING_LIMIT,
@@ -121,6 +124,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
 
   const [vmis, vmisLoaded] = useKubevirtWatchResource<V1VirtualMachineInstance[]>(
     {
+      cluster: params.cluster,
       groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
       isList: true,
       limit: OBJECTS_FETCHING_LIMIT,
@@ -133,7 +137,8 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
     },
   );
 
-  const [pvcs] = useK8sWatchResource<IoK8sApiCoreV1PersistentVolumeClaim[]>({
+  const [pvcs] = useFleetK8sWatchResource<IoK8sApiCoreV1PersistentVolumeClaim[]>({
+    cluster: params.cluster,
     groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
     isList: true,
     limit: OBJECTS_FETCHING_LIMIT,
@@ -143,7 +148,8 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
 
   const pvcMapper = useMemo(() => convertIntoPVCMapper(pvcs), [pvcs]);
 
-  const [vmims, vmimsLoaded] = useKubevirtWatchResource<V1VirtualMachineInstanceMigration[]>({
+  const [vmims, vmimsLoaded] = useFleetK8sWatchResource<V1VirtualMachineInstanceMigration[]>({
+    cluster: params.cluster,
     groupVersionKind: VirtualMachineInstanceMigrationModelGroupVersionKind,
     isList: true,
     limit: OBJECTS_FETCHING_LIMIT,
@@ -172,6 +178,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
   // only passing filtersFromURL to useListPageFilter hook's staticFilters doesn't work, because label filter is hardcoded in the hook as a dynamic filter
   useEffect(() => {
     onFilterChange?.(TEXT_FILTER_LABELS_ID, filtersFromURL[TEXT_FILTER_LABELS_ID]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
   // Allow using folder filters from the tree view
@@ -183,7 +190,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
         listPageFilterRef.current?.resetTextSearch(newTextFilters);
       },
     }),
-    [onFilterChange, listPageFilterRef.current],
+    [onFilterChange],
   );
 
   const selectedFilters = useSelectedFilters(filters, searchFilters);
@@ -209,7 +216,6 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
     filteredData,
     pagination.startIndex,
     pagination.endIndex,
-    vmsToShow,
     vmiMapper?.mapper,
     query,
   ]);

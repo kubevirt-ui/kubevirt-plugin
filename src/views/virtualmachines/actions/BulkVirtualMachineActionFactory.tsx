@@ -44,8 +44,7 @@ export const BulkVirtualMachineActionFactory = {
             return Promise.all(
               vms.map((vm) =>
                 fleetK8sPatch<V1VirtualMachine>({
-                  cluster: vm?.cluster,
-                  data: getLabelsDiffPatch(labels, getLabels(vm)),
+                  data: getLabelsDiffPatch(newLabels, commonLabels, getLabels(vm)),
                   model: VirtualMachineModel,
                   resource: vm,
                 }),

@@ -9,13 +9,17 @@ import {
   V1VirtualMachine,
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import useAllClusters from '@kubevirt-utils/hooks/useAllClusters/useAllClusters';
 import { TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
+import useHubCluster from '@kubevirt-utils/hooks/useHubCluster/useHubCluster';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
-import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource';
+import useMemoizedParams from '@kubevirt-utils/hooks/useMemoizedParams';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
-import { useK8sWatchResource, useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
+import { getName } from '@kubevirt-utils/resources/shared';
+import { useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
 import { TreeViewDataItem } from '@patternfly/react-core';
+import { useFleetK8sWatchResource } from '@stolostron/multicluster-sdk';
 import { getLatestMigrationForEachVM, OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 
 import { vmimMapperSignal, vmsSignal } from '../utils/signals';
@@ -32,10 +36,19 @@ export const useTreeViewData = (): UseTreeViewData => {
   const isAdmin = useIsAdmin();
   const location = useLocation();
 
-  const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
-  const [projectNames, projectNamesLoaded, projectNamesError] = useProjects();
+  const params = useMemoizedParams<{ cluster: string }>();
 
-  const [allVMs, allVMsLoaded] = useK8sWatchResource<V1VirtualMachine[]>({
+  const [hubCluster] = useHubCluster();
+
+  const [clusters] = useAllClusters();
+
+  const cluster = params.cluster || getName(hubCluster);
+
+  const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
+  const [projectNames, projectNamesLoaded, projectNamesError] = useProjects(cluster);
+
+  const [allVMs, allVMsLoaded] = useFleetK8sWatchResource<V1VirtualMachine[]>({
+    cluster,
     groupVersionKind: VirtualMachineModelGroupVersionKind,
     isList: true,
     limit: OBJECTS_FETCHING_LIMIT,
@@ -57,7 +70,8 @@ export const useTreeViewData = (): UseTreeViewData => {
     ),
   );
 
-  const [allVMIM] = useKubevirtWatchResource<V1VirtualMachineInstanceMigration[]>({
+  const [allVMIM] = useFleetK8sWatchResource<V1VirtualMachineInstanceMigration[]>({
+    cluster,
     groupVersionKind: VirtualMachineInstanceMigrationModelGroupVersionKind,
     isList: true,
     limit: OBJECTS_FETCHING_LIMIT,
@@ -113,9 +127,20 @@ export const useTreeViewData = (): UseTreeViewData => {
             isAdmin,
             location.pathname,
             treeViewFoldersEnabled,
+            cluster,
+            clusters,
           )
         : [],
-    [projectNames, memoizedVMs, loaded, isAdmin, treeViewFoldersEnabled, location.pathname],
+    [
+      projectNames,
+      memoizedVMs,
+      loaded,
+      isAdmin,
+      treeViewFoldersEnabled,
+      location.pathname,
+      clusters,
+      cluster,
+    ],
   );
 
   const hideSwitch = useMemo(() => projectNames.every(isSystemNamespace), [projectNames]);

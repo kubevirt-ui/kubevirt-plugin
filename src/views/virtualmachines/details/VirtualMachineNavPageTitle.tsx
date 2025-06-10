@@ -11,7 +11,6 @@ import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
 import useVirtualMachineInstanceMigration from '@kubevirt-utils/resources/vmi/hooks/useVirtualMachineInstanceMigration';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Label, Split, SplitItem, Title } from '@patternfly/react-core';
-import { useFleetK8sWatchResource } from '@stolostron/multicluster-sdk';
 import VirtualMachineActions from '@virtualmachines/actions/components/VirtualMachineActions/VirtualMachineActions';
 import VMActionsIconBar from '@virtualmachines/actions/components/VMActionsIconBar/VMActionsIconBar';
 import useVirtualMachineActionsProvider from '@virtualmachines/actions/hooks/useVirtualMachineActionsProvider';
