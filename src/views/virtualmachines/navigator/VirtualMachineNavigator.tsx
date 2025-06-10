@@ -1,18 +1,13 @@
 import React, { FC, useMemo, useRef } from 'react';
-import { useLocation } from 'react-router-dom-v5-compat';
+import { useLocation, useParams } from 'react-router-dom-v5-compat';
 
 import CreateResourceDefaultPage from '@kubevirt-utils/components/CreateResourceDefaultPage/CreateResourceDefaultPage';
 import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
-import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { ADVANCED_SEARCH } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
-import {
-  ListPageHeader,
-  OnFilterChange,
-  useActiveNamespace,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { ListPageHeader, OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import { Divider } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
 import SearchBar from '@search/components/SearchBar';
@@ -29,16 +24,26 @@ const VirtualMachineNavigator: FC = () => {
   const { t } = useKubevirtTranslation();
   const vmListRef = useRef<{ onFilterChange: OnFilterChange } | null>(null);
   const location = useLocation();
-  const [activeNamespace] = useActiveNamespace();
-  const namespace = activeNamespace === ALL_NAMESPACES_SESSION_KEY ? null : activeNamespace;
+
+  const { cluster, ns: namespace } = useParams<{ cluster: string; ns: string }>();
 
   const { featureEnabled: advancedSearchEnabled } = useFeatures(ADVANCED_SEARCH);
 
   const isVirtualMachineListPage = useMemo(
     () =>
       location.pathname.endsWith(VirtualMachineModelRef) ||
-      location.pathname.endsWith(`${VirtualMachineModelRef}/`),
-    [location.pathname],
+      location.pathname.endsWith(`${VirtualMachineModelRef}/`) ||
+      location.pathname.endsWith(`/multicloud/infrastructure/virtualmachines`) ||
+      location.pathname.endsWith(`/multicloud/infrastructure/virtualmachines/`) ||
+      location.pathname.endsWith(`/multicloud/infrastructure/virtualmachines/${cluster}`) ||
+      location.pathname.endsWith(`/multicloud/infrastructure/virtualmachines/${cluster}/`) ||
+      location.pathname.endsWith(
+        `/multicloud/infrastructure/virtualmachines/${cluster}/${namespace}`,
+      ) ||
+      location.pathname.endsWith(
+        `/multicloud/infrastructure/virtualmachines/${cluster}/${namespace}/`,
+      ),
+    [location.pathname, cluster, namespace],
   );
 
   const treeProps = useTreeViewData();

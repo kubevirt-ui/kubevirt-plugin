@@ -99,7 +99,7 @@ export const VirtualMachineActionFactory = {
         verb: 'patch',
       },
       cta: () =>
-        k8sPatch({
+        fleetK8sPatch({
           data: patch,
           model: MigMigrationModel,
           resource: currentStorageMigration,
@@ -157,7 +157,7 @@ export const VirtualMachineActionFactory = {
       createModal(({ isOpen, onClose }) => (
         <LabelsModal
           onLabelsSubmit={(labels) =>
-            k8sPatch({
+            fleetK8sPatch({
               data: [
                 {
                   op: 'replace',

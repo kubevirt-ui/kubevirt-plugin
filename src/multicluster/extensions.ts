@@ -6,7 +6,7 @@ import type { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plug
 
 export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
   ConsoleStandAlone: './utils/components/Consoles/ConsoleStandAlone.tsx',
-  VirtualMachineNavPage: './views/virtualmachines/details/VirtualMachineNavPage.tsx',
+  Navigator: './views/virtualmachines/navigator/VirtualMachineNavigator.tsx',
 };
 
 export const extensions: EncodedExtension[] = [
@@ -25,9 +25,14 @@ export const extensions: EncodedExtension[] = [
   {
     properties: {
       component: {
-        $codeRef: 'VirtualMachineNavPage',
+        $codeRef: 'Navigator',
       },
-      path: ['/multicloud/infrastructure/virtualmachines/:cluster/:ns/:name'],
+      path: [
+        '/multicloud/infrastructure/virtualmachines/:cluster/:ns/:name',
+        '/multicloud/infrastructure/virtualmachines/:cluster/:ns',
+        '/multicloud/infrastructure/virtualmachines/:cluster',
+        '/multicloud/infrastructure/virtualmachines',
+      ],
     },
     type: 'console.page/route',
   },
