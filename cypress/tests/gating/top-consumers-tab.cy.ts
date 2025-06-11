@@ -1,13 +1,14 @@
+/* eslint-disable */
 import { topConsumerCard } from '../../views/overview';
 import { tab } from '../../views/tab';
 
 const enum Card {
   CPU = 0,
   Memory,
+  Memory_Swap,
+  vCPU_Wait,
   Storage_IOPS,
   Storage_throughput,
-  Swap,
-  vCPU,
 }
 
 describe('Test Virtualization Top consumer tab', () => {
