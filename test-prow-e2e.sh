@@ -156,7 +156,7 @@ yarn install --frozen-lockfile
 yarn add global mochawesome-report-generator --ignore-engines
 
 # Run tests.
-yarn run test-cypress-headless --spec="tests/us.cy.ts"
+yarn run test-cypress-headless --spec="tests/gating.cy.ts"
 
 # Generate Cypress report.
 yarn run cypress-postreport
