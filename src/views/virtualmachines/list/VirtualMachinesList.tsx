@@ -46,7 +46,6 @@ import {
   paginationInitialState,
 } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import useQuery from '@kubevirt-utils/hooks/useQuery';
-import useSingleNodeCluster from '@kubevirt-utils/hooks/useSingleNodeCluster';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   DocumentTitle,
@@ -144,8 +143,6 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
 
   const pvcMapper = useMemo(() => convertIntoPVCMapper(pvcs), [pvcs]);
 
-  const [isSingleNodeCluster, isSingleNodeLoaded] = useSingleNodeCluster();
-
   const [vmims, vmimsLoaded] = useKubevirtWatchResource<V1VirtualMachineInstanceMigration[]>({
     groupVersionKind: VirtualMachineInstanceMigrationModelGroupVersionKind,
     isList: true,
@@ -239,13 +236,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
     pvcMapper,
   );
 
-  const loaded =
-    vmsLoaded &&
-    vmisLoaded &&
-    vmimsLoaded &&
-    isSingleNodeLoaded &&
-    !loadingFeatureProxy &&
-    loadedColumns;
+  const loaded = vmsLoaded && vmisLoaded && vmimsLoaded && !loadingFeatureProxy && loadedColumns;
 
   const vmsFilteredWithProxy = isProxyPodAlive && selectedFilters.length > 0;
 
@@ -342,7 +333,6 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
             rowData={{
               getVmi: (ns: string, name: string) => vmiMapper?.mapper?.[ns]?.[name],
               getVmim: (ns: string, name: string) => vmimMapper?.[ns]?.[name],
-              isSingleNodeCluster,
               kind,
               pvcMapper,
             }}

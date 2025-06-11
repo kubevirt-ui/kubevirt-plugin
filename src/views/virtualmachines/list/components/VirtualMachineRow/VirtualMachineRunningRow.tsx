@@ -20,19 +20,13 @@ const VirtualMachineRunningRow: FC<
   RowProps<
     V1VirtualMachine,
     {
-      isSingleNodeCluster: boolean;
       pvcMapper: PVCMapper;
       status: ReactNode;
       vmi: V1VirtualMachineInstance;
       vmim: V1VirtualMachineInstanceMigration;
     }
   >
-> = ({
-  activeColumnIDs,
-  index,
-  obj,
-  rowData: { isSingleNodeCluster, pvcMapper, status, vmi, vmim },
-}) => {
+> = ({ activeColumnIDs, index, obj, rowData: { pvcMapper, status, vmi, vmim } }) => {
   const { t } = useKubevirtTranslation();
 
   const ipAddressess = vmi && getVMIIPAddressesWithName(vmi);
@@ -40,7 +34,6 @@ const VirtualMachineRunningRow: FC<
     <VirtualMachineRowLayout
       rowData={{
         ips: <FirstItemListPopover headerContent={t('IP addresses')} items={ipAddressess} />,
-        isSingleNodeCluster,
         node: (
           <ResourceLink
             groupVersionKind={modelToGroupVersionKind(NodeModel)}

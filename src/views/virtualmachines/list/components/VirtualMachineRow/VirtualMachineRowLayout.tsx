@@ -35,7 +35,6 @@ const VirtualMachineRowLayout: FC<
     V1VirtualMachine,
     {
       ips: ReactNode | string;
-      isSingleNodeCluster: boolean;
       node: ReactNode | string;
       pvcMapper: PVCMapper;
       status: ReactNode;
@@ -47,7 +46,7 @@ const VirtualMachineRowLayout: FC<
   activeColumnIDs,
   index,
   obj,
-  rowData: { ips, isSingleNodeCluster, node, pvcMapper, status, vmim, vmiMemory },
+  rowData: { ips, node, pvcMapper, status, vmim, vmiMemory },
 }) => {
   // TODO: investigate using the index prop
   index;
@@ -61,7 +60,7 @@ const VirtualMachineRowLayout: FC<
     [obj, pvcMapper],
   );
 
-  const [actions] = useVirtualMachineActionsProvider(obj, vmim, isSingleNodeCluster);
+  const [actions] = useVirtualMachineActionsProvider(obj, vmim);
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} className="selection-column vm-column" id="">
