@@ -4,18 +4,21 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { SimplifiedAlerts } from '@kubevirt-utils/components/AlertsCard/utils/types';
 import { createAlertKey } from '@kubevirt-utils/components/AlertsCard/utils/utils';
 import { KUBEVIRT } from '@kubevirt-utils/constants/constants';
-import { MONITORING_URL_BASE } from '@kubevirt-utils/constants/prometheus';
+import { getAlertsBasePath } from '@kubevirt-utils/constants/prometheus';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { PrometheusRulesResponse } from '@kubevirt-utils/types/prometheus';
 import { generateAlertId, labelsToParams } from '@kubevirt-utils/utils/prometheus';
 import {
   PrometheusEndpoint,
   RuleStates,
+  useActivePerspective,
   usePrometheusPoll,
 } from '@openshift-console/dynamic-plugin-sdk';
 
 type UseVMAlerts = (vm: V1VirtualMachine) => SimplifiedAlerts;
 
 const useVMAlerts: UseVMAlerts = (vm: V1VirtualMachine) => {
+  const [perspective] = useActivePerspective();
   const [query] = usePrometheusPoll({
     endpoint: PrometheusEndpoint?.RULES,
   });
@@ -23,7 +26,7 @@ const useVMAlerts: UseVMAlerts = (vm: V1VirtualMachine) => {
   const vmAlerts = React.useMemo(() => {
     // eslint-disable-next-line perfectionist/sort-objects
     const data = { critical: [], warning: [], info: [] };
-    const vmName = vm?.metadata?.name;
+    const vmName = getName(vm);
     return (
       (query as PrometheusRulesResponse)?.data?.groups?.reduce((acc, ruleGroup) => {
         ruleGroup?.rules?.forEach((rule) => {
@@ -47,7 +50,7 @@ const useVMAlerts: UseVMAlerts = (vm: V1VirtualMachine) => {
                     description: alert?.annotations?.summary,
                     isVMAlert: true,
                     key: createAlertKey(alert?.activeAt, alert?.labels),
-                    link: `${MONITORING_URL_BASE}/${generateAlertId(
+                    link: `${getAlertsBasePath(perspective, getNamespace(vm))}/${generateAlertId(
                       ruleGroup,
                       rule,
                     )}?${labelsToParams(alert?.labels)}`,

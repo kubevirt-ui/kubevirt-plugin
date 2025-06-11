@@ -1,12 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom-v5-compat';
 
+import { getAlertsBasePath } from '@kubevirt-utils/constants/prometheus';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   DashboardsOverviewHealthSubsystem as DynamicDashboardsOverviewHealthSubsystem,
   isDashboardsOverviewHealthSubsystem as isDynamicDashboardsOverviewHealthSubsystem,
   isResolvedDashboardsOverviewHealthURLSubsystem,
   K8sResourceCommon,
+  useActivePerspective,
   useK8sWatchResource,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { HealthBody } from '@openshift-console/dynamic-plugin-sdk-internal';
@@ -23,6 +25,7 @@ import VirtualizationAlerts from './utils/VirtualizationAlerts';
 
 const StatusCard = () => {
   const { t } = useKubevirtTranslation();
+  const [perspective] = useActivePerspective();
   const subsystems = useDashboardSubsystems<DynamicDashboardsOverviewHealthSubsystem>(
     isDynamicDashboardsOverviewHealthSubsystem,
   );
@@ -59,7 +62,7 @@ const StatusCard = () => {
     <Card className="co-overview-card--gradient" data-test-id="kv-overview-status-card">
       <CardHeader
         actions={{
-          actions: <Link to="/monitoring/alerts">{t('View alerts')}</Link>,
+          actions: <Link to={getAlertsBasePath(perspective)}>{t('View alerts')}</Link>,
           className: 'co-overview-card__actions',
           hasNoOffset: false,
         }}
