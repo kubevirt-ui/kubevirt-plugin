@@ -1,36 +1,28 @@
-import { useMemo } from 'react';
-
-import { InfrastructureModel, modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
+import { modelToGroupVersionKind, NodeModel } from '@kubevirt-ui/kubevirt-api/console';
+import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import {
-  K8sResourceCommon,
   K8sVerb,
   useAccessReview,
   useK8sWatchResource,
 } from '@openshift-console/dynamic-plugin-sdk';
 
 type UseSingleNodeCluster = () => [isSingleNodeCluster: boolean, loaded: boolean];
+
 const useSingleNodeCluster: UseSingleNodeCluster = () => {
   const [canAccessInfra] = useAccessReview({
-    group: InfrastructureModel.apiGroup,
-    resource: InfrastructureModel.plural,
+    group: NodeModel.apiGroup,
+    resource: NodeModel.plural,
     verb: 'list' as K8sVerb,
   });
 
-  const [infrastructure, loaded] = useK8sWatchResource<
-    K8sResourceCommon & {
-      status: { infrastructureTopology: string };
-    }
-  >({
-    groupVersionKind: modelToGroupVersionKind(InfrastructureModel),
-    namespaced: false,
+  const [nodes, nodesLoaded] = useK8sWatchResource<IoK8sApiCoreV1Node[]>({
+    groupVersionKind: modelToGroupVersionKind(NodeModel),
+    isList: true,
   });
 
-  const isSingleNodeCluster = useMemo(
-    () => infrastructure?.status?.infrastructureTopology === 'SingleReplica',
-    [infrastructure],
-  );
+  const isSingleNodeCluster = nodes?.length === 1;
 
-  return canAccessInfra ? [isSingleNodeCluster, loaded] : [undefined, true];
+  return canAccessInfra ? [isSingleNodeCluster, nodesLoaded] : [undefined, true];
 };
 
 export default useSingleNodeCluster;
