@@ -72,6 +72,7 @@ const VirtualMachineRowLayout: FC<
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-20 vm-column" id="name">
         <ResourceLink
+          data-test="name-column"
           groupVersionKind={VirtualMachineModelGroupVersionKind}
           name={vmName}
           namespace={vmNamespace}
@@ -119,7 +120,7 @@ const VirtualMachineRowLayout: FC<
             ))}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="">
-        <VirtualMachineActions actions={actions} isKebabToggle />
+        <VirtualMachineActions actions={actions} data-test="row-action" isKebabToggle />
       </TableData>
     </>
   );
