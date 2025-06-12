@@ -70,7 +70,7 @@ const GuestSystemLogsAccess: FC<GuestSystemLogsAccessProps> = ({
 
   return (
     <>
-      <Split>
+      <Split className="settings-tab--indented">
         <SplitItem isFilled>
           {t('Enable guest system log access')}{' '}
           <HelpTextIcon
