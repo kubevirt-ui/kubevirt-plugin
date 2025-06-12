@@ -1,4 +1,4 @@
-import { TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
+import { TemplateModel, VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineClusterInstancetypeModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineClusterInstancetypeModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { instanceTypeSeriesNameMapper } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/constants';
@@ -108,4 +108,13 @@ export const vmsPerResourceCount = (resourceToVMCountMap): number =>
 export const getFilterKey = (resourceItem: RunningVMsChartLegendLabelItem) => {
   if (resourceItem.type === UNCATEGORIZED_VM) return null;
   return resourceItem.isInstanceType ? INSTANCETYPE_FILTER_KEY : TEMPLATE_FILTER_KEY;
+};
+
+export const getLinkPath = (resourceItem: RunningVMsChartLegendLabelItem, namespace: string) => {
+  const filterKey = getFilterKey(resourceItem);
+  return resourceItem?.type !== UNCATEGORIZED_VM
+    ? `/k8s/${namespace}/${VirtualMachineModelRef}?rowFilter-${filterKey}=${getInstanceTypePrefix(
+        resourceItem.name,
+      )}`
+    : '/k8s/all-namespaces/kubevirt.io~v1~VirtualMachine?rowFilter-instanceType=No+InstanceType&rowFilter-template=None';
 };
