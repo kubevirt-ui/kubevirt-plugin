@@ -8,6 +8,7 @@ import {
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup } from '@patternfly/react-core';
 
+import { initialBootableVolumeState } from '../AddBootableVolumeModal/utils/constants';
 import InlineFilterSelect from '../FilterSelect/InlineFilterSelect';
 import Loading from '../Loading/Loading';
 
@@ -18,6 +19,7 @@ import './select-snapshot.scss';
 type SelectSnapshotProps = {
   selectSnapshotName: (value: string) => void;
   selectSnapshotNamespace?: (value: string) => void;
+  setDiskSize?: (size: string) => void;
   snapshotNameSelected: string;
   snapshotNamespaceSelected: string;
 };
@@ -25,6 +27,7 @@ type SelectSnapshotProps = {
 const SelectSnapshot: FC<SelectSnapshotProps> = ({
   selectSnapshotName,
   selectSnapshotNamespace,
+  setDiskSize,
   snapshotNameSelected,
   snapshotNamespaceSelected,
 }) => {
@@ -36,6 +39,7 @@ const SelectSnapshot: FC<SelectSnapshotProps> = ({
     (newProject) => {
       selectSnapshotNamespace && selectSnapshotNamespace(newProject);
       selectSnapshotName(undefined);
+      setDiskSize(initialBootableVolumeState.size);
     },
     [selectSnapshotNamespace, selectSnapshotName],
   );
@@ -45,6 +49,9 @@ const SelectSnapshot: FC<SelectSnapshotProps> = ({
       snapshots?.map((snapshot) => snapshot?.metadata?.name)?.sort((a, b) => a?.localeCompare(b)),
     [snapshots],
   );
+
+  const getSnapshotSize = (snapshotName: string) =>
+    snapshots?.find((snapshot) => snapshot.metadata?.name === snapshotName)?.status?.restoreSize;
 
   return (
     <div>
@@ -82,13 +89,16 @@ const SelectSnapshot: FC<SelectSnapshotProps> = ({
               groupVersionKind: modelToGroupVersionKind(VolumeSnapshotModel),
               value: name,
             }))}
+            setSelected={(snapshotName) => {
+              selectSnapshotName(snapshotName);
+              setDiskSize(getSnapshotSize(snapshotName));
+            }}
             toggleProps={{
               isDisabled: !snapshotNamespaceSelected,
               isFullWidth: true,
               placeholder: t('--- Select VolumeSnapshot name ---'),
             }}
             selected={snapshotNameSelected}
-            setSelected={selectSnapshotName}
           />
         </FormGroup>
       ) : (
