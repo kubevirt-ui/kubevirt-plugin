@@ -21,12 +21,14 @@ const useEditTemplateAccessReview = (
 } => {
   const isCommonTemplate = isCommonVMTemplate(template);
   const [canUpdateTemplate, canUpdateLoading] = useAccessReview({
+    group: TemplateModel.apiGroup,
     namespace: template?.metadata?.namespace,
     resource: TemplateModel.plural,
     verb: 'update',
   });
 
   const [canPatchTemplate, canPatchLoading] = useAccessReview({
+    group: TemplateModel.apiGroup,
     namespace: template?.metadata?.namespace,
     resource: TemplateModel.plural,
     verb: 'patch',
