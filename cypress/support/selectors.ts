@@ -29,6 +29,7 @@ declare global {
       clickApplyBtn(): void;
       clickNavLink(path: [string, string?]): Chainable;
       clickSaveBtn(): void;
+      clickSearchBtn(): void;
       clickVirtLink(path: string): void;
       switchToVirt(): void;
     }
@@ -85,7 +86,13 @@ Cypress.Commands.add('clickVirtLink', (navItemSelector: string) => {
   cy.get(navItemSelector).click();
 });
 
-Cypress.Commands.add('clickSaveBtn', () => cy.contains('button[type="button"]', 'Save').click());
+Cypress.Commands.add('clickSaveBtn', () => {
+  cy.contains('button[type="button"].pf-m-primary', 'Save').click();
+});
+
+Cypress.Commands.add('clickSearchBtn', () => {
+  cy.contains('button[type="button"].pf-m-primary', 'Search').click({ force: true });
+});
 Cypress.Commands.add('clickApplyBtn', () => cy.contains('button[type="button"]', 'Apply').click());
 
 Cypress.Commands.add('switchToVirt', () => {

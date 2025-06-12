@@ -1,5 +1,6 @@
 import './upstream/a-setup.cy.ts';
 import './upstream/a-shared-vm.cy.ts';
+import './upstream/vm-adv-search.cy.ts';
 import './upstream/check-tab-yaml.cy.ts';
 import './upstream/catalog-filter.cy.ts';
 //import './upstream/catalog-create.cy.ts';
