@@ -493,6 +493,7 @@
   "Disabling Deletion Protection will allow you to delete this VirtualMachine. VirtualMachine deletion can result in data loss or service disruption.": "Deshabilitar la protección contra eliminación le permitirá eliminar esta VirtualMachine. Eliminar una VirtualMachine puede provocar la pérdida de datos o la interrupción del servicio.",
   "Disconnect": "Desconectar",
   "Disk size": "Tamaño del disco",
+  "Disk size will be determined by the volume snapshot size": "Disk size will be determined by the volume snapshot size",
   "Disk source": "Fuente del disco",
   "Disk Source represents the source for our disk, this can be HTTP, Registry or an existing PVC": "La fuente del disco representa la fuente de nuestro disco, que puede ser HTTP, registro o una PVC existente",
   "Disk Type": "Tipo de disco",

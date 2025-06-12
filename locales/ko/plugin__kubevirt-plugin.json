@@ -491,6 +491,7 @@
   "Disabling Deletion Protection will allow you to delete this VirtualMachine. VirtualMachine deletion can result in data loss or service disruption.": "삭제 보호를 비활성화하면 이 VirtualMachine을 삭제할 수 있습니다. VirtualMachine 삭제로 인해 데이터가 손실되거나 서비스 중단이 발생할 수 있습니다.",
   "Disconnect": "연결 해제",
   "Disk size": "디스크 크기",
+  "Disk size will be determined by the volume snapshot size": "Disk size will be determined by the volume snapshot size",
   "Disk source": "디스크 소스",
   "Disk Source represents the source for our disk, this can be HTTP, Registry or an existing PVC": "디스크 소스는 디스크의 소스, HTTP, Registry 또는 기존 PVC일 수 있습니다.",
   "Disk Type": "디스크 유형",

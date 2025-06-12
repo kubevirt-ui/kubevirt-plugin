@@ -12,12 +12,14 @@ import { DROPDOWN_FORM_SELECTION, optionsValueLabelMapper } from '../../utils/co
 type SourceTypeSelectionProps = {
   formSelection: DROPDOWN_FORM_SELECTION;
   namespace: string;
+  resetDiskSize: () => void;
   setFormSelection: (value: DROPDOWN_FORM_SELECTION) => void;
 };
 
 const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
   formSelection,
   namespace,
+  resetDiskSize,
   setFormSelection,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -31,8 +33,15 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
       event.preventDefault();
       setFormSelection(value);
       setIsOpen(false);
+
+      if (
+        formSelection === DROPDOWN_FORM_SELECTION.USE_SNAPSHOT &&
+        value !== DROPDOWN_FORM_SELECTION.USE_SNAPSHOT
+      ) {
+        resetDiskSize();
+      }
     },
-    [setFormSelection],
+    [setFormSelection, resetDiskSize],
   );
 
   useEffect(() => {
