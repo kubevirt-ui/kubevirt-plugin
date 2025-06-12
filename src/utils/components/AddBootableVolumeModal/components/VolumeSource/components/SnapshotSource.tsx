@@ -17,6 +17,7 @@ const SnapshotSource: FC<SnapshotSourceProps> = ({ bootableVolume, setBootableVo
     <SelectSnapshot
       selectSnapshotName={setBootableVolumeField('snapshotName')}
       selectSnapshotNamespace={setBootableVolumeField('snapshotNamespace')}
+      setDiskSize={setBootableVolumeField('size')}
       snapshotNameSelected={snapshotName}
       snapshotNamespaceSelected={snapshotNamespace}
     />
