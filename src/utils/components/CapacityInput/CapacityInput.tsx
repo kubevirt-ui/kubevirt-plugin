@@ -23,6 +23,8 @@ import {
 } from './utils';
 
 type CapacityInputProps = {
+  helperText?: string;
+  isDisabled?: boolean;
   isEditingCreatedDisk?: boolean;
   isMinusDisabled?: boolean;
   label?: string;
@@ -32,6 +34,8 @@ type CapacityInputProps = {
 };
 
 const CapacityInput: FC<CapacityInputProps> = ({
+  helperText,
+  isDisabled,
   isEditingCreatedDisk,
   isMinusDisabled,
   label,
@@ -72,18 +76,18 @@ const CapacityInput: FC<CapacityInputProps> = ({
               Number(value) < Number.MAX_SAFE_INTEGER &&
               onChange(`${Number(value) + 1}${removeByteSuffix(unit)}`)
             }
-            isDisabled={isEditingCreatedDisk}
+            isDisabled={isDisabled || isEditingCreatedDisk}
             max={Number.MAX_SAFE_INTEGER}
             min={1}
             minusBtnAriaLabel={t('Decrement')}
-            minusBtnProps={{ isDisabled: isMinusDisabled }}
+            minusBtnProps={{ isDisabled: isDisabled || isMinusDisabled }}
             onMinus={() => onChange(`${Number(value) - 1}${removeByteSuffix(unit)}`)}
             plusBtnAriaLabel={t('Increment')}
             value={value}
           />
         </SplitItem>
         <SplitItem>
-          <FormPFSelect onSelect={onFormatChange} selected={unit}>
+          <FormPFSelect isDisabled={isDisabled} onSelect={onFormatChange} selected={unit}>
             <SelectList>
               {unitOptions.map((formatOption) => (
                 <SelectOption
@@ -106,6 +110,7 @@ const CapacityInput: FC<CapacityInputProps> = ({
           </>
         )}
       </FormGroupHelperText>
+      {helperText && <FormGroupHelperText>{helperText}</FormGroupHelperText>}
     </FormGroup>
   );
 };
