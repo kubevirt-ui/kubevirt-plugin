@@ -5,6 +5,7 @@ import {
   V1VirtualMachine,
   V1VirtualMachineInstance,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import useNetworkColumns from '@kubevirt-utils/hooks/useNetworkColums';
 import { getAutoAttachPodInterface } from '@kubevirt-utils/resources/vm';
 import { getNetworkInterfaceRowData } from '@kubevirt-utils/resources/vm/utils/network/rowData';
 import { getInterfacesAndNetworks } from '@kubevirt-utils/resources/vm/utils/network/utils';
@@ -15,7 +16,6 @@ import {
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
 
-import useNetworkColumns from '../../hooks/useNetworkColumns';
 import useNetworkRowFilters from '../../hooks/useNetworkRowFilters';
 import { isInterfaceEphemeral, isPendingHotPlugNIC, isPendingRemoval } from '../../utils/utils';
 
@@ -37,7 +37,7 @@ const NetworkInterfaceList: FC<NetworkInterfaceTableProps> = ({ vm, vmi }) => {
 
   const [data, filteredData, onFilterChange] = useListPageFilter(networkInterfacesData, filters);
 
-  const columns = useNetworkColumns(filteredData);
+  const columns = useNetworkColumns();
 
   const autoattachPodInterface = getAutoAttachPodInterface(vm) !== false;
 

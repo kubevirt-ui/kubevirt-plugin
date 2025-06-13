@@ -5,23 +5,24 @@ import {
   getVMINetworks,
   getVMIStatusInterfaces,
 } from '@kubevirt-utils/resources/vmi/utils/selectors';
-import { removeDuplicatesByName } from '@kubevirt-utils/utils/utils';
+import {
+  removeDuplicatesByName,
+  sortByDirection,
+  universalComparator,
+} from '@kubevirt-utils/utils/utils';
+import { SortByDirection } from '@patternfly/react-table';
 import { isRunning } from '@virtualmachines/utils';
 
 import { NetworkPresentation } from './constants';
 import { getPrintableNetworkInterfaceType } from './selectors';
 
-export const sortNICs = (nics: NetworkPresentation[], direction: string) =>
-  nics.sort((a: NetworkPresentation, b: NetworkPresentation) => {
-    const aUpdated = getPrintableNetworkInterfaceType(a.iface);
-    const bUpdated = getPrintableNetworkInterfaceType(b.iface);
-
-    if (aUpdated && bUpdated) {
-      return direction === 'asc'
-        ? aUpdated.localeCompare(bUpdated)
-        : bUpdated.localeCompare(aUpdated);
-    }
-  });
+export const sortNICs = (nics: NetworkPresentation[], direction: SortByDirection) =>
+  nics.sort((a: NetworkPresentation, b: NetworkPresentation) =>
+    sortByDirection(universalComparator, direction)(
+      getPrintableNetworkInterfaceType(a.iface),
+      getPrintableNetworkInterfaceType(b.iface),
+    ),
+  );
 
 export const getInterfacesAndNetworks = (vm: V1VirtualMachine, vmi: V1VirtualMachineInstance) => {
   const vmNetworks = getNetworks(vm) || [];

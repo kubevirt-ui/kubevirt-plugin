@@ -4,7 +4,6 @@ import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import NICHotPlugModalAlert from '@kubevirt-utils/components/BridgedNICHotPlugModalAlert/NICHotPlugModalAlert';
 import NetworkInterfaceLinkState from '@kubevirt-utils/components/NetworkInterfaceModal/components/NetworkInterfaceLinkState/NetworkInterfaceLinkState';
-import { NetworkInterfaceState } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/types';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -12,6 +11,7 @@ import {
   NetworkPresentation,
 } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { getNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
+import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
 import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { ExpandableSection, Form } from '@patternfly/react-core';
