@@ -24,3 +24,10 @@ export enum K8S_OPS {
   REMOVE = 'remove',
   REPLACE = 'replace',
 }
+
+export enum PERSPECTIVES {
+  ACM = 'acm',
+  ADMIN = 'admin',
+  DEVELOPER = 'dev',
+  VIRTUALIZATION = 'virtualization-perspective',
+}
