@@ -7,6 +7,7 @@ import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/Com
 import { getUtilizationQueries } from '@kubevirt-utils/components/Charts/utils/queries';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVMIPod } from '@kubevirt-utils/resources/vmi';
+import { humanizeCpuCores } from '@kubevirt-utils/utils/humanize.js';
 import {
   K8sResourceCommon,
   PrometheusEndpoint,
@@ -43,8 +44,8 @@ const CPUUtil: FC<CPUUtilProps> = ({ pods, vmi }) => {
     query: queries?.CPU_USAGE,
   });
 
-  const cpuUsage = +dataCPUUsage?.data?.result?.[0]?.value?.[1];
-  const cpuRequested = +dataCPURequested?.data?.result?.[0]?.value?.[1];
+  const cpuUsage = humanizeCpuCores(+dataCPUUsage?.data?.result?.[0]?.value?.[1]).value;
+  const cpuRequested = humanizeCpuCores(+dataCPURequested?.data?.result?.[0]?.value?.[1]).value;
   const averageCPUUsage = (cpuUsage / cpuRequested) * 100;
   const isReady = !Number.isNaN(cpuUsage) && !Number.isNaN(cpuRequested);
 

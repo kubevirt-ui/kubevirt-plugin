@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom-v5-compat';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getVMIPod } from '@kubevirt-utils/resources/vmi';
+import { humanizeCpuCores } from '@kubevirt-utils/utils/humanize.js';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   K8sResourceCommon,
@@ -70,11 +71,19 @@ const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ pods, vmi }) => {
   const cpuRequested = dataCPURequested?.data?.result?.[0]?.values;
 
   const chartData = cpuUsage?.map(([x, y]) => {
-    return { name: 'CPU usage', x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y) };
+    return {
+      name: 'CPU usage',
+      x: new Date(x * MILLISECONDS_MULTIPLIER),
+      y: humanizeCpuCores(Number(y)).value,
+    };
   });
 
   const thresholdData = cpuRequested?.map(([x, y]) => {
-    return { name: 'CPU requested', x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y) };
+    return {
+      name: 'CPU requested',
+      x: new Date(x * MILLISECONDS_MULTIPLIER),
+      y: humanizeCpuCores(Number(y)).value,
+    };
   });
 
   const isReady = !isEmpty(chartData) && !isEmpty(thresholdData);
