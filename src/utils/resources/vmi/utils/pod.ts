@@ -1,6 +1,5 @@
 import { IoK8sApiCoreV1Pod } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 /**
  * Get if the pod is in a ready status
@@ -17,7 +16,7 @@ export const isPodReady = (pod): boolean =>
  * @date 4/10/2022 - 8:13:37 AM
  *
  * @param {V1VirtualMachineInstance} vmi - The vmi to check
- * @param {K8sResourceCommon[]} pods - The pods to check
+ * @param {IoK8sApiCoreV1Pod[]} pods - The pods to check
  * @returns {*}
  */
 export const getVMIPod = (vmi: V1VirtualMachineInstance, pods: IoK8sApiCoreV1Pod[]) => {
@@ -37,8 +36,8 @@ export const getVMIPod = (vmi: V1VirtualMachineInstance, pods: IoK8sApiCoreV1Pod
 
   // Return the newest, most ready Pod created
   return prefixedPods
-    .sort((a: K8sResourceCommon, b: K8sResourceCommon) =>
+    .sort((a: IoK8sApiCoreV1Pod, b: IoK8sApiCoreV1Pod) =>
       a.metadata.creationTimestamp > b.metadata.creationTimestamp ? -1 : 1,
     )
-    .sort((a: K8sResourceCommon) => (isPodReady(a) ? -1 : 1))[0];
+    .sort((a: IoK8sApiCoreV1Pod) => (isPodReady(a) ? -1 : 1))[0];
 };

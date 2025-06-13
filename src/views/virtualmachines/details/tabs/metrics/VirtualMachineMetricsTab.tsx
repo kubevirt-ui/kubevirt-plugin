@@ -20,7 +20,11 @@ import './virtual-machine-metrics-tab.scss';
 const VirtualMachineMetricsTab: FC<NavPageComponentProps> = ({ obj: vm }) => {
   const { t } = useKubevirtTranslation();
   const location = useLocation();
-  const { loaded, pods, vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
+  const { loaded, pods, vmi } = useVMIAndPodsForVM(
+    vm?.metadata?.name,
+    vm?.metadata?.namespace,
+    vm?.cluster,
+  );
 
   const [expended, setExpended] = useState<{ [key in MetricsTabExpendedSections]: boolean }>({
     [MetricsTabExpendedSections.migration]: true,

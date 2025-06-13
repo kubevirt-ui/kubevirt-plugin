@@ -9,12 +9,8 @@ import {
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import {
-  consoleFetch,
-  k8sCreate,
-  k8sDelete,
-  K8sModel,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { consoleFetch, K8sModel } from '@openshift-console/dynamic-plugin-sdk';
+import { fleetK8sCreate, fleetK8sDelete, getFleetK8sAPIPath } from '@stolostron/multicluster-sdk';
 
 const generateRandomString = () => Math.random().toString(36).substring(2, 7);
 
@@ -39,6 +35,7 @@ export const VMActionRequest = async (
   } = vm;
 
   try {
+    const k8sAPIPath = await getFleetK8sAPIPath(vm?.cluster);
     // TODO: when this bz resolves https://bugzilla.redhat.com/show_bug.cgi?id=2056656
     // we can do the call to k8sUpdate instead of consoleFetch
 
@@ -50,7 +47,7 @@ export const VMActionRequest = async (
     //   path: action,
     // });
     // Promise.resolve(promise);
-    const url = `/api/kubernetes/apis/subresources.${model.apiGroup}/${model.apiVersion}/namespaces/${namespace}/${model.plural}/${name}/${action}`;
+    const url = `${k8sAPIPath}/apis/subresources.${model.apiGroup}/${model.apiVersion}/namespaces/${namespace}/${model.plural}/${name}/${action}`;
 
     const response = await consoleFetch(url, {
       body: body ? JSON.stringify(body) : undefined,
@@ -90,7 +87,8 @@ export const migrateVM = async (vm: V1VirtualMachine) => {
       vmiName: name,
     },
   };
-  await k8sCreate({
+  await fleetK8sCreate({
+    cluster: vm?.cluster,
     data: migrationData,
     model: VirtualMachineInstanceMigrationModel,
     ns: namespace,
@@ -98,14 +96,16 @@ export const migrateVM = async (vm: V1VirtualMachine) => {
 };
 
 export const cancelMigration = async (vmim: V1VirtualMachineInstanceMigration) => {
-  await k8sDelete({
+  await fleetK8sDelete({
+    cluster: vmim?.cluster,
     model: VirtualMachineInstanceMigrationModel,
     resource: vmim,
   });
 };
 
 export const deleteVM = async (vm: V1VirtualMachine) => {
-  await k8sDelete({
+  await fleetK8sDelete({
+    cluster: vm?.cluster,
     model: VirtualMachineModel,
     resource: vm,
   });

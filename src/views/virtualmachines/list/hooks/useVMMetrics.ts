@@ -1,15 +1,11 @@
 import { useEffect, useMemo } from 'react';
+import { useParams } from 'react-router-dom-v5-compat';
 
 import { IoK8sApiCoreV1Pod } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { modelToGroupVersionKind, PodModel } from '@kubevirt-utils/models';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import {
-  PrometheusEndpoint,
-  useActiveNamespace,
-  useK8sWatchResource,
-  usePrometheusPoll,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
+import { useFleetK8sWatchResource, useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';
 
 import { setVMCPURequested, setVMCPUUsage, setVMMemoryUsage, setVMNetworkUsage } from '../metrics';
 
@@ -17,48 +13,50 @@ import { getVMListQueries, VMListQueries } from './constants';
 import { getVMNamesFromPodsNames } from './utils';
 
 const useVMMetrics = () => {
-  const [activeNamespace] = useActiveNamespace();
-  const allNamespace = useMemo(
-    () => activeNamespace === ALL_NAMESPACES_SESSION_KEY,
-    [activeNamespace],
-  );
+  const { cluster, ns: namespace } = useParams<{ cluster?: string; ns?: string }>();
+
   const currentTime = useMemo<number>(() => Date.now(), []);
 
-  const [pods] = useK8sWatchResource<IoK8sApiCoreV1Pod[]>({
+  const [pods] = useFleetK8sWatchResource<IoK8sApiCoreV1Pod[]>({
+    cluster,
     groupVersionKind: modelToGroupVersionKind(PodModel),
     isList: true,
-    namespace: allNamespace ? undefined : activeNamespace,
+    namespace,
   });
 
   const launcherNameToVMName = useMemo(() => getVMNamesFromPodsNames(pods), [pods]);
 
-  const queries = useMemo(() => getVMListQueries(activeNamespace), [activeNamespace]);
+  const queries = useMemo(() => getVMListQueries(namespace, cluster), [namespace, cluster]);
 
-  const [memoryUsageResponse] = usePrometheusPoll({
+  const [memoryUsageResponse] = useFleetPrometheusPoll({
+    cluster,
     endpoint: PrometheusEndpoint?.QUERY,
     endTime: currentTime,
-    namespace: allNamespace ? undefined : activeNamespace,
+    namespace,
     query: queries?.[VMListQueries.MEMORY_USAGE],
   });
 
-  const [networkTotalResponse] = usePrometheusPoll({
+  const [networkTotalResponse] = useFleetPrometheusPoll({
+    cluster,
     endpoint: PrometheusEndpoint?.QUERY,
     endTime: currentTime,
-    namespace: allNamespace ? undefined : activeNamespace,
+    namespace,
     query: queries?.NETWORK_TOTAL_USAGE,
   });
 
-  const [cpuUsageResponse] = usePrometheusPoll({
+  const [cpuUsageResponse] = useFleetPrometheusPoll({
+    cluster,
     endpoint: PrometheusEndpoint?.QUERY,
     endTime: currentTime,
-    namespace: allNamespace ? undefined : activeNamespace,
+    namespace,
     query: queries?.[VMListQueries.CPU_USAGE],
   });
 
-  const [cpuRequestedResponse] = usePrometheusPoll({
+  const [cpuRequestedResponse] = useFleetPrometheusPoll({
+    cluster,
     endpoint: PrometheusEndpoint?.QUERY,
     endTime: currentTime,
-    namespace: allNamespace ? undefined : activeNamespace,
+    namespace,
     query: queries?.[VMListQueries.CPU_REQUESTED],
   });
 

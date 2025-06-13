@@ -7,12 +7,9 @@ import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/Com
 import { getUtilizationQueries } from '@kubevirt-utils/components/Charts/utils/queries';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVMIPod } from '@kubevirt-utils/resources/vmi';
-import {
-  K8sResourceCommon,
-  PrometheusEndpoint,
-  usePrometheusPoll,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { K8sResourceCommon, PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import { ChartDonutUtilization } from '@patternfly/react-charts/victory';
+import { useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
 type CPUUtilProps = {
@@ -29,14 +26,16 @@ const CPUUtil: FC<CPUUtilProps> = ({ pods, vmi }) => {
     [vmi, vmiPod, duration],
   );
 
-  const [dataCPURequested] = usePrometheusPoll({
+  const [dataCPURequested] = useFleetPrometheusPoll({
+    cluster: vmi?.cluster,
     endpoint: PrometheusEndpoint?.QUERY,
     endTime: currentTime,
     namespace: vmi?.metadata?.namespace,
     query: queries.CPU_REQUESTED,
   });
 
-  const [dataCPUUsage] = usePrometheusPoll({
+  const [dataCPUUsage] = useFleetPrometheusPoll({
+    cluster: vmi?.cluster,
     endpoint: PrometheusEndpoint?.QUERY,
     endTime: currentTime,
     namespace: vmi?.metadata?.namespace,

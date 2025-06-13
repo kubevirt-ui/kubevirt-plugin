@@ -23,6 +23,7 @@ const SnapshotListPage: FC<NavPageComponentProps> = ({ obj: vm }) => {
   const { error, loaded, restoresMap, snapshots } = useSnapshotData(
     vm?.metadata?.name,
     vm?.metadata?.namespace,
+    vm?.cluster,
   );
 
   return (

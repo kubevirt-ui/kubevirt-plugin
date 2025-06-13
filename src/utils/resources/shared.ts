@@ -9,7 +9,6 @@ import { TemplateModel } from '@kubevirt-utils/models';
 import {
   AccessReviewResourceAttributes,
   K8sModel,
-  K8sResourceCommon,
   K8sResourceKind,
   K8sVerb,
   Operator,
@@ -338,6 +337,14 @@ export const getNamespace = <A extends K8sResourceCommon = K8sResourceCommon>(re
  */
 export const getUID = <A extends K8sResourceCommon = K8sResourceCommon>(resource: A): string =>
   resource?.metadata?.uid;
+
+/**
+ *
+ * @param resource k8s resource with optional cluster
+ * @returns resource's cluster
+ */
+export const getCluster = <A extends K8sResourceCommon = K8sResourceCommon>(resource?: A) =>
+  resource?.cluster;
 
 export type ResourceMap<A> = { [name: string]: A };
 export type NamespacedResourceMap<A> = { [namespace: string]: ResourceMap<A> };

@@ -1,22 +1,25 @@
 import { modelToGroupVersionKind, PodModel } from '@kubevirt-ui/kubevirt-api/console';
+import { IoK8sApiCoreV1Pod } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
-import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { FleetK8sResourceCommon, useFleetK8sWatchResource } from '@stolostron/multicluster-sdk';
 
 type UseVMIAndPodsForVMValues = {
   error: any;
   loaded: boolean;
-  pods: K8sResourceCommon[];
+  pods: IoK8sApiCoreV1Pod[];
   vmi: V1VirtualMachineInstance;
 };
 
 export const useVMIAndPodsForVM = (
   vmName: string,
   vmNamespace: string,
+  vmCluster?: string,
 ): UseVMIAndPodsForVMValues => {
-  const { vmi, vmiLoaded, vmiLoadError } = useVMI(vmName, vmNamespace);
+  const { vmi, vmiLoaded, vmiLoadError } = useVMI(vmName, vmNamespace, vmCluster);
 
-  const [pods, podsLoaded, podsLoadError] = useK8sWatchResource<K8sResourceCommon[]>({
+  const [pods, podsLoaded, podsLoadError] = useFleetK8sWatchResource<FleetK8sResourceCommon[]>({
+    cluster: vmCluster,
     groupVersionKind: modelToGroupVersionKind(PodModel),
     isList: true,
     namespace: vmNamespace,
