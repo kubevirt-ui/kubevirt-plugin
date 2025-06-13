@@ -18,7 +18,7 @@ import {
   getPrintableDiskDrive,
   getPrintableDiskInterface,
 } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
-import { convertToBaseValue, humanizeBinaryBytes } from '@kubevirt-utils/utils/humanize.js';
+import { getHumanizedSize } from '@kubevirt-utils/utils/units';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { NO_DATA_DASH } from '../constants';
@@ -54,7 +54,7 @@ export const getDiskRowDataLayout = (
 
     const dataSourceSize = getPVCStorageCapacity(pvc) || getDataVolumeSize(dataVolume);
     const dataVolumeCustomSize = dataVolumeTemplate?.spec?.storage?.resources?.requests?.storage;
-    const size = humanizeBinaryBytes(convertToBaseValue(dataSourceSize || dataVolumeCustomSize));
+    const size = getHumanizedSize(dataSourceSize || dataVolumeCustomSize);
 
     diskRowDataObject.size = size.value === 0 ? NO_DATA_DASH : size.string;
 

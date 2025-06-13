@@ -1,9 +1,7 @@
 import React, { FC, useMemo } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
-import { bytesToDiskSize } from '@catalog/utils/quantity';
 import { modelToGroupVersionKind, VolumeSnapshotModel } from '@kubevirt-ui/kubevirt-api/console';
-import { removeByteSuffix } from '@kubevirt-utils/components/CapacityInput/utils';
 import { V1DiskFormState } from '@kubevirt-utils/components/DiskModal/utils/types';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
@@ -11,6 +9,7 @@ import Loading from '@kubevirt-utils/components/Loading/Loading';
 import useSnapshots from '@kubevirt-utils/components/SelectSnapshot/useSnapshots';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { convertResourceArrayToMap, getName } from '@kubevirt-utils/resources/shared';
+import { getHumanizedSize } from '@kubevirt-utils/utils/units';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { FormGroup, ValidatedOptions } from '@patternfly/react-core';
 
@@ -61,7 +60,8 @@ const DiskSourceSnapshotVolumeSelectName: FC = () => {
               onChange(snapshotName);
               const selectedSnapshot = snapshotsMapper[snapshotName];
               const selectedSnapshotSize = selectedSnapshot?.status?.restoreSize;
-              setValue(DISK_SIZE_FIELD, removeByteSuffix(bytesToDiskSize(selectedSnapshotSize)));
+              const humanizedSize = getHumanizedSize(selectedSnapshotSize, 'withoutB');
+              setValue(DISK_SIZE_FIELD, `${humanizedSize.value}${humanizedSize.unit}`);
             }}
             toggleProps={{
               isDisabled: isEmpty(namespace),

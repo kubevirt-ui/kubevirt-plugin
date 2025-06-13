@@ -4,13 +4,12 @@ import {
   modelToGroupVersionKind,
   PersistentVolumeClaimModel,
 } from '@kubevirt-ui/kubevirt-api/console';
+import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
+import { getHumanizedSize } from '@kubevirt-utils/utils/units';
 import { TableData } from '@openshift-console/dynamic-plugin-sdk';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 
-import {
-  convertBytes,
-  DiskPresentation,
-} from '../../utils/virtualMachinesInstancePageDisksTabUtils';
+import { DiskPresentation } from '../../utils/virtualMachinesInstancePageDisksTabUtils';
 
 type DiskTableRowProps = {
   activeColumnIDs: Set<string>;
@@ -18,9 +17,9 @@ type DiskTableRowProps = {
 };
 
 const DisksTableRow: React.FC<DiskTableRowProps> = ({ activeColumnIDs, obj }) => {
-  const convertedSize = convertBytes(Number(obj?.size));
-  const size = obj?.size && convertedSize?.unit && `${convertedSize.value} ${convertedSize.unit}`;
-  const defaultSize = obj?.size || '-';
+  const size = obj?.size && getHumanizedSize(obj.size).string;
+  const defaultSize = obj?.size || NO_DATA_DASH;
+
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} id="name">

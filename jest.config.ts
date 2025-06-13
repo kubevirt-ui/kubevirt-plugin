@@ -36,7 +36,7 @@ const config: Config.InitialOptions = {
     '^.+\\.[t|j]sx?$': ['ts-jest', tsJestOptions],
   },
   transformIgnorePatterns: [
-    '<rootDir>/node_modules/(?!(@kubevirt-ui|byte-size|@patternfly|@preact|@openshift-console\\S*?)/.*)',
+    '<rootDir>/node_modules/(?!(@kubevirt-ui|@patternfly|@preact|@openshift-console\\S*?)/.*)',
   ],
 };
 

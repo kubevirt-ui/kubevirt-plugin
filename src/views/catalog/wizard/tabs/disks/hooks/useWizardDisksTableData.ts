@@ -15,7 +15,7 @@ import {
   getPrintableDiskDrive,
   getPrintableDiskInterface,
 } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
-import { convertToBaseValue, humanizeBinaryBytes } from '@kubevirt-utils/utils/humanize.js';
+import { getHumanizedSize } from '@kubevirt-utils/utils/units';
 import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 type UseDisksTableDisks = (
@@ -92,7 +92,7 @@ const useWizardDisksTableData: UseDisksTableDisks = (vm, pvcNamespace) => {
         metadata: { name: device?.disk?.name },
         name: device?.disk?.name,
         namespace: device?.pvc?.metadata?.namespace,
-        size: size ? humanizeBinaryBytes(convertToBaseValue(size)).string : NO_DATA_DASH,
+        size: size ? getHumanizedSize(size).string : NO_DATA_DASH,
         source: source(),
         storageClass,
       };

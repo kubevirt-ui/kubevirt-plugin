@@ -1,3 +1,9 @@
+import {
+  convertToBaseValue,
+  humanizeBinaryBytes,
+  humanizeBinaryBytesWithoutB,
+} from './humanize.js';
+
 export enum BinaryUnit {
   B = 'B',
   Gi = 'Gi',
@@ -23,26 +29,6 @@ multipliers.P = multipliers.T * 1000;
 multipliers.E = multipliers.P * 1000;
 multipliers.Z = multipliers.E * 1000;
 
-export const customUnits = {
-  IS: [
-    { from: 0, to: multipliers.Ki, unit: 'B' },
-    { from: multipliers.Ki, long: 'thousand', to: multipliers.Mi, unit: 'KiB' },
-    { from: multipliers.Mi, long: 'million', to: multipliers.Gi, unit: 'MiB' },
-    { from: multipliers.Gi, long: 'billion', to: multipliers.Ti, unit: 'GiB' },
-    { from: multipliers.Ti, long: 'billion', unit: 'TiB' },
-  ],
-};
-
-export const binaryUnits = {
-  IS: [
-    { from: 0, to: multipliers.Ki, unit: 'B' },
-    { from: multipliers.Ki, long: 'thousand', to: multipliers.Mi, unit: 'Ki' },
-    { from: multipliers.Mi, long: 'million', to: multipliers.Gi, unit: 'Mi' },
-    { from: multipliers.Gi, long: 'billion', to: multipliers.Ti, unit: 'Gi' },
-    { from: multipliers.Ti, long: 'billion', unit: 'Ti' },
-  ],
-};
-
 /**
  * A function to return unit for disk size/memory with 'B' suffix.
  * @param {BinaryUnit | string} unit - unit
@@ -66,4 +52,14 @@ export const readableSizeUnit = (combinedStr: string): string => {
 
   // if there isn't any specific value/size present, return the original string, for example for the dynamic disk size
   return !value ? combinedStr : `${value} ${toIECUnit(unit)}`;
+};
+
+export const getHumanizedSize = (size: string, bytesOption: 'withB' | 'withoutB' = 'withB') => {
+  const baseValue = convertToBaseValue(size);
+
+  if (bytesOption === 'withoutB') {
+    return humanizeBinaryBytesWithoutB(baseValue);
+  }
+
+  return humanizeBinaryBytes(baseValue);
 };

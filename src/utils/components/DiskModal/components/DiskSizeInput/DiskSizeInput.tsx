@@ -3,7 +3,7 @@ import { useFormContext } from 'react-hook-form';
 
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { convertToBaseValue, humanizeBinaryBytes } from '@kubevirt-utils/utils/humanize.js';
+import { getHumanizedSize } from '@kubevirt-utils/utils/units';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import CapacityInput from '../../../CapacityInput/CapacityInput';
@@ -38,13 +38,10 @@ const DiskSizeInput: FC<DiskSizeInputProps> = ({ isCreated, isDisabled, namespac
 
   return (
     <CapacityInput
-      size={
-        getDataVolumeTemplateSize(diskState) ||
-        humanizeBinaryBytes(convertToBaseValue(pvcSize)).string
-      }
       isEditingCreatedDisk={isDisabled}
       label={t('Disk size')}
       onChange={(quantity) => setValue(DISK_SIZE_FIELD, quantity)}
+      size={getDataVolumeTemplateSize(diskState) || getHumanizedSize(pvcSize).string}
     />
   );
 };

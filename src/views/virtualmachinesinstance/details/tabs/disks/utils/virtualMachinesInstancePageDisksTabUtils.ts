@@ -1,5 +1,3 @@
-import byteSize from 'byte-size';
-
 import { V1beta1PersistentVolumeClaim, V1Disk } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -37,11 +35,6 @@ const findDrive = (obj: DiskRaw) => {
   );
   return type || 'disk';
 };
-
-export const convertBytes = (bytes: number) =>
-  byteSize(bytes, {
-    units: 'iec',
-  });
 
 export const diskStructureCreator = (disks: DiskRaw[]): DiskPresentation[] => {
   return disks?.map((device) => {
