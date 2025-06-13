@@ -1,13 +1,12 @@
 import { useState } from 'react';
 
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 
-import { MigMigration } from '../../../../../../utils/resources/migrations/constants';
+import { MigMigration, MigPlan } from '../../../../../../utils/resources/migrations/constants';
 import { migrateVMs } from '../utils/migrateVMs';
 
 type UseMigrationState = (
-  vms: V1VirtualMachine[],
+  migPlan: MigPlan,
   namespacePVCs: IoK8sApiCoreV1PersistentVolumeClaim[],
   pvcsToMigrate: IoK8sApiCoreV1PersistentVolumeClaim[],
   destinationStorageClass: string,
@@ -20,7 +19,7 @@ type UseMigrationState = (
 };
 
 const useMigrationState: UseMigrationState = (
-  vms,
+  migPlan,
   namespacePVCs,
   pvcsToMigrate,
   destinationStorageClass,
@@ -34,7 +33,9 @@ const useMigrationState: UseMigrationState = (
     setMigrationLoading(true);
     setMigrationError(null);
     try {
-      setMigMigration(await migrateVMs(vms, namespacePVCs, pvcsToMigrate, destinationStorageClass));
+      setMigMigration(
+        await migrateVMs(migPlan, namespacePVCs, pvcsToMigrate, destinationStorageClass),
+      );
 
       setMigrationStarted(true);
     } catch (apiError) {
