@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { FC, useCallback, useMemo, useState } from 'react';
 
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -7,11 +7,26 @@ import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
 import useDefaultStorageClass from '@kubevirt-utils/hooks/useDefaultStorage/useDefaultStorageClass';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, PersistentVolumeClaimModel } from '@kubevirt-utils/models';
+import { MigPlanModel } from '@kubevirt-utils/resources/migrations/constants';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
-import { Modal, ModalBody, Wizard, WizardHeader, WizardStep } from '@patternfly/react-core';
+import {
+  k8sDelete,
+  ResourceLink,
+  useK8sWatchResource,
+} from '@openshift-console/dynamic-plugin-sdk';
+import {
+  Alert,
+  AlertVariant,
+  Modal,
+  ModalBody,
+  Wizard,
+  WizardHeader,
+  WizardStep,
+} from '@patternfly/react-core';
 
+import useCreateEmptyMigPlan from './hooks/useCreateEmptyMigPlan';
+import useExistingMigrationPlan from './hooks/useExistingMigrationPlan';
 import useMigrationState from './hooks/useMigrationState';
 import VirtualMachineMigrationDestinationTab from './tabs/VirtualMachineMigrationDestinationTab';
 import VirtualMachineMigrationDetails from './tabs/VirtualMachineMigrationDetails';
@@ -34,7 +49,12 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
+  const migrationNamespace = getNamespace(vms?.[0]);
   const [selectedStorageClass, setSelectedStorageClass] = useState('');
+
+  const currentMigPlanCreation = useCreateEmptyMigPlan(migrationNamespace);
+
+  const [existingMigPlan] = useExistingMigrationPlan(currentMigPlanCreation, migrationNamespace);
 
   const [selectedPVCs, setSelectedPVCs] = useState<IoK8sApiCoreV1PersistentVolumeClaim[] | null>(
     null,
@@ -71,7 +91,12 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
   );
 
   const { migMigration, migrationError, migrationLoading, migrationStarted, onSubmit } =
-    useMigrationState(vms, namespacePVCs, pvcsToMigrate, destinationStorageClass);
+    useMigrationState(
+      currentMigPlanCreation,
+      namespacePVCs,
+      pvcsToMigrate,
+      destinationStorageClass,
+    );
 
   const nothingSelected = !entireVMSelected(selectedPVCs) && isEmpty(selectedPVCs);
 
@@ -79,6 +104,16 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
     () => Array.from(new Set(vmsPVCs?.map((pvc) => pvc.spec.storageClassName))),
     [vmsPVCs],
   );
+
+  const onCloseMigrationModal = useCallback(() => {
+    onClose();
+
+    if (!migrationStarted)
+      k8sDelete({
+        model: MigPlanModel,
+        resource: currentMigPlanCreation,
+      });
+  }, [onClose, migrationStarted, currentMigPlanCreation]);
 
   return (
     <Modal
@@ -90,36 +125,60 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
       <ModalBody>
         <StateHandler error={loadingError} loaded>
           {migrationStarted ? (
-            <VirtualMachineMigrationStatus migMigration={migMigration} onClose={onClose} />
+            <VirtualMachineMigrationStatus
+              migMigration={migMigration}
+              onClose={onCloseMigrationModal}
+            />
           ) : (
             <Wizard
               header={
                 <WizardHeader
                   closeButtonAriaLabel={t('Close header')}
                   description={t('Migrate VirtualMachine storage to a different StorageClass.')}
-                  onClose={onClose}
+                  onClose={onCloseMigrationModal}
                   title={t('Migrate VirtualMachine storage')}
                 />
               }
-              onClose={onClose}
+              onClose={onCloseMigrationModal}
               onSave={onSubmit}
               title={t('Migrate VirtualMachine storage')}
             >
               <WizardStep
-                footer={{ isNextDisabled: nothingSelected || isEmpty(vmsPVCs) }}
+                footer={{
+                  isNextDisabled: nothingSelected || !isEmpty(existingMigPlan) || isEmpty(vmsPVCs),
+                }}
                 id="wizard-migration-details"
                 name={t('Migration details')}
               >
-                {loaded && scLoaded ? (
+                {!isEmpty(existingMigPlan) && (
+                  <Alert
+                    title={t('An existing migration plan for this namespace was found. ')}
+                    variant={AlertVariant.danger}
+                  >
+                    {t(
+                      'The following migration plan needs to be deleted or moved into a different namespace: ',
+                    )}
+
+                    <ResourceLink
+                      groupVersionKind={modelToGroupVersionKind(MigPlanModel)}
+                      inline
+                      name={getName(existingMigPlan?.[0])}
+                      namespace={getNamespace(existingMigPlan?.[0])}
+                      onClick={onCloseMigrationModal}
+                    />
+                  </Alert>
+                )}
+
+                {isEmpty(existingMigPlan) && loaded && scLoaded && (
                   <VirtualMachineMigrationDetails
                     pvcs={vmsPVCs}
                     selectedPVCs={selectedPVCs}
                     setSelectedPVCs={setSelectedPVCs}
                     vms={vms}
                   />
-                ) : (
-                  <Loading />
                 )}
+
+                {(!loaded || !scLoaded) && <Loading />}
               </WizardStep>
               <WizardStep id="wizard-migrate-destination" name={t('Destination StorageClass')}>
                 <VirtualMachineMigrationDestinationTab
