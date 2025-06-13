@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
+import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, StorageClassModel } from '@kubevirt-utils/models';
 import { MigPlan, MigPlanModel } from '@kubevirt-utils/resources/migrations/constants';
@@ -13,6 +14,7 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Progress } from '@patternfly/react-core';
 
+import useStorageMigrationActions from '../../actions/useStorageMigrationActions';
 import { MigPlanMap } from '../constants';
 import { getSelectedPVFromMigPlan, getStorageClassesFromMigPlan } from '../utils';
 
@@ -35,6 +37,9 @@ const StorageMigrationRow: FC<StorageMigrationRowProps> = ({
   const directVolumeMigration = migPlanMap[migPlanName]?.directVolumeMigration;
 
   const statusMigration = getStatusMigration(migMigration, directVolumeMigration);
+
+  const [storageMigrationActions] = useStorageMigrationActions(obj);
+
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-30" id="name">
@@ -72,11 +77,13 @@ const StorageMigrationRow: FC<StorageMigrationRowProps> = ({
           t('Migration plan is pending')
         )}
       </TableData>
-      <TableData
-        activeColumnIDs={activeColumnIDs}
-        className="pf-v6-c-table__action"
-        id=""
-      ></TableData>
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="">
+        <ActionsDropdown
+          actions={storageMigrationActions}
+          id="storage-migplans-actions"
+          isKebabToggle
+        />
+      </TableData>
     </>
   );
 };
