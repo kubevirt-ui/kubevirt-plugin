@@ -7,7 +7,6 @@ import Loading from '@kubevirt-utils/components/Loading/Loading';
 import PaneHeading from '@kubevirt-utils/components/PaneHeading/PaneHeading';
 import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useSingleNodeCluster from '@kubevirt-utils/hooks/useSingleNodeCluster';
 import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
 import useVirtualMachineInstanceMigration from '@kubevirt-utils/resources/vmi/hooks/useVirtualMachineInstanceMigration';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -41,8 +40,7 @@ const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({
 
   const { vmi } = useVMI(vm?.metadata?.name, vm?.metadata?.namespace, isRunning(vm));
   const vmim = useVirtualMachineInstanceMigration(vm);
-  const [isSingleNodeCluster] = useSingleNodeCluster();
-  const [actions] = useVirtualMachineActionsProvider(vm, vmim, isSingleNodeCluster);
+  const [actions] = useVirtualMachineActionsProvider(vm, vmim);
   const StatusIcon = getVMStatusIcon(vm?.status?.printableStatus);
 
   const isSidebarEditorDisplayed = vmTabsWithYAML.find((tab) =>

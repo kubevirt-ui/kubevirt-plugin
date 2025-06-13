@@ -5,7 +5,6 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useDeschedulerInstalled } from '@kubevirt-utils/hooks/useDeschedulerInstalled';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
-import useSingleNodeCluster from '@kubevirt-utils/hooks/useSingleNodeCluster';
 import { DESCHEDULER_EVICT_LABEL } from '@kubevirt-utils/resources/vmi';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
@@ -20,8 +19,7 @@ const Descheduler: FC<DeschedulerProps> = ({ vm }) => {
   const deschedulerLabel =
     vm?.spec?.template?.metadata?.annotations?.[DESCHEDULER_EVICT_LABEL] === 'true';
   const [isChecked, setChecked] = useState<boolean>(deschedulerLabel);
-  const [isSingleNodeCluster] = useSingleNodeCluster();
-  const isMigratable = isLiveMigratable(vm, isSingleNodeCluster);
+  const isMigratable = isLiveMigratable(vm);
   const isDeschedulerInstalled = useDeschedulerInstalled();
   const isAdmin = useIsAdmin();
   const isDeschedulerEnabled = isAdmin && isDeschedulerInstalled && isMigratable;
