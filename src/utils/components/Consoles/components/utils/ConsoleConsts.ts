@@ -19,6 +19,13 @@ export const DESKTOP_VIEWER_CONSOLE_TYPE = 'Desktop viewer';
 export const SPICE_CONSOLE_TYPE = 'SpiceConsole';
 export const RDP_CONSOLE_TYPE = 'RdpConsole';
 
+const ConsoleTypes = [VNC_CONSOLE_TYPE, SERIAL_CONSOLE_TYPE, DESKTOP_VIEWER_CONSOLE_TYPE] as const;
+
+export type ConsoleType = typeof ConsoleTypes[number];
+
+export const isConsoleType = (value: unknown): value is ConsoleType =>
+  typeof value === 'string' && ConsoleTypes.some((type) => type === value);
+
 export interface WSFactoryExtends extends WSFactory {
   onPaste: () => void;
 }

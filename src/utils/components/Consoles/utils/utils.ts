@@ -15,4 +15,7 @@ export const clipboardCopyFunc = (
   );
 };
 
+export const getConsolePath = ({ name, namespace }) =>
+  `api/kubernetes/apis/subresources.kubevirt.io/v1/namespaces/${namespace}/virtualmachineinstances/${name}`;
+
 export const sleep = (ms = 500) => new Promise((resolve) => setTimeout(resolve, ms));

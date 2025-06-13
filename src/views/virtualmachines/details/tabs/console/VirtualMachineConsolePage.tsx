@@ -1,9 +1,12 @@
 import React, { FC } from 'react';
 
-import Consoles from '@kubevirt-utils/components/Consoles/Consoles';
+import StableConsole from '@kubevirt-utils/components/Consoles/StableConsole';
+import { getConsolePath } from '@kubevirt-utils/components/Consoles/utils/utils';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isHeadlessMode } from '@kubevirt-utils/resources/vm';
 import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
+import { isWindows } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { Bullseye, EmptyState, EmptyStateBody, PageSection } from '@patternfly/react-core';
 import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
 
@@ -35,7 +38,13 @@ const VirtualMachineConsolePage: FC<NavPageComponentProps> = ({ obj: vm }) => {
 
   return (
     <PageSection className="VirtualMachineConsolePage-page-section" hasBodyWrapper={false}>
-      <Consoles consoleContainerClass="virtual-machine-console-page" vmi={vmi} />
+      <StableConsole
+        consoleContainerClass="virtual-machine-console-page"
+        isHeadlessMode={isHeadlessMode(vmi)}
+        isVmRunning={true}
+        isWindowsVM={isWindows(vmi)}
+        path={getConsolePath({ name: vm?.metadata?.name, namespace: vm?.metadata?.namespace })}
+      />
     </PageSection>
   );
 };
