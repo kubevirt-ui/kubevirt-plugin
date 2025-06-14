@@ -57,6 +57,7 @@
     "victory-pie": "^37.3.2",
     "victory-scatter": "^37.3.2",
     "victory-stack": "^37.3.2",
+    "vnc-keymaps": "file:../vnc-keymaps/vnc-keymaps-0.0.1.tgz",
     "xbytes": "^1.7.0",
     "xterm": "^4.18.0",
     "xterm-addon-fit": "^0.5.0",

@@ -11198,6 +11198,10 @@ vinyl@^3.0.0, vinyl@~3.0.0:
     replace-ext "^2.0.0"
     teex "^1.0.1"
 
+"vnc-keymaps@file:../vnc-keymaps/vnc-keymaps-0.0.1.tgz":
+  version "0.0.1"
+  resolved "file:../vnc-keymaps/vnc-keymaps-0.0.1.tgz#3acbf82eadde23535980c7b2c6ee8d3afb1e2cdc"
+
 void-elements@3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/void-elements/-/void-elements-3.1.0.tgz#614f7fbf8d801f0bb5f0661f5b2f5785750e4f09"
