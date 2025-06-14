@@ -4,7 +4,6 @@ import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import NICHotPlugModalAlert from '@kubevirt-utils/components/BridgedNICHotPlugModalAlert/NICHotPlugModalAlert';
 import NetworkInterfaceLinkState from '@kubevirt-utils/components/NetworkInterfaceModal/components/NetworkInterfaceLinkState/NetworkInterfaceLinkState';
-import { NetworkInterfaceState } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/types';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -12,10 +11,14 @@ import {
   NetworkPresentation,
 } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { getNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
+import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
 import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { ExpandableSection, Form } from '@patternfly/react-core';
-import { getInterfaceState } from '@virtualmachines/details/tabs/configuration/network/utils/utils';
+import {
+  getConfigInterfaceStateFromVM,
+  isLinkStateEditable,
+} from '@virtualmachines/details/tabs/configuration/network/utils/utils';
 import { isRunning } from '@virtualmachines/utils';
 
 import NameFormField from './components/NameFormField';
@@ -76,12 +79,13 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
   const [interfaceMACAddress, setInterfaceMACAddress] = useState(iface?.macAddress);
   const [macError, setMacError] = useState<boolean>(false);
   const [interfaceLinkState, setInterfaceLinkState] = useState<NetworkInterfaceState>(
-    getInterfaceState(vm, nicName),
+    !network ? NetworkInterfaceState.UP : getConfigInterfaceStateFromVM(vm, nicName),
   );
   const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
-    if (interfaceType === interfaceTypesProxy.sriov) setInterfaceLinkState(undefined);
+    if (interfaceType === interfaceTypesProxy.sriov)
+      setInterfaceLinkState(NetworkInterfaceState.UNSUPPORTED);
   }, [interfaceType]);
 
   const isValid = nicName && networkName && !networkSelectError && !macError;
@@ -90,7 +94,9 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
     return (
       onSubmit &&
       onSubmit({
-        interfaceLinkState,
+        interfaceLinkState: isLinkStateEditable(interfaceLinkState)
+          ? interfaceLinkState
+          : undefined,
         interfaceMACAddress,
         interfaceModel,
         interfaceType,
@@ -153,7 +159,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
             setIsError={setMacError}
           />
           <NetworkInterfaceLinkState
-            isDisabled={interfaceType === interfaceTypesProxy.sriov}
+            isDisabled={!isLinkStateEditable(interfaceLinkState)}
             linkState={interfaceLinkState}
             setLinkState={setInterfaceLinkState}
           />

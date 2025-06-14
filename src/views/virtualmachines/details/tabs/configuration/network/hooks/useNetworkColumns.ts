@@ -1,62 +1,53 @@
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
+import { TFunction } from 'react-i18next';
 
+import {
+  Actions,
+  compareWithDirection,
+  MacAddress,
+  Model,
+  Name,
+  Network,
+} from '@kubevirt-utils/constants/network-columns';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
-import { sortNICs } from '@kubevirt-utils/resources/vm/utils/network/utils';
 import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 import { sortable } from '@patternfly/react-table';
 
-const useNetworkColumns = (data: NetworkPresentation[]) => {
+import { SimpleNICPresentation } from '../utils/types';
+
+export const RuntimeLinkState = <T extends { runtimeLinkState?: string }>(
+  t: TFunction,
+): TableColumn<T> => ({
+  id: 'runtime_link_state',
+  sort: (data, direction) =>
+    data.sort((a, b) => compareWithDirection(direction, a?.runtimeLinkState, b?.runtimeLinkState)),
+  title: t('State'),
+  transforms: [sortable],
+});
+
+const Type = <T extends { type?: string }>(t: TFunction): TableColumn<T> => ({
+  id: 'type',
+  sort: (data, direction) => data.sort((a, b) => compareWithDirection(direction, a?.type, b?.type)),
+  title: t('Type'),
+  transforms: [sortable],
+});
+
+const useNetworkColumns = () => {
   const { t } = useKubevirtTranslation();
 
-  const sorting = useCallback((direction) => sortNICs(data, direction), [data]);
-
-  const columns: TableColumn<NetworkPresentation>[] = useMemo(
-    () => [
-      {
-        id: 'name',
-        sort: 'network.name',
-        title: t('Name'),
-        transforms: [sortable],
-      },
-      {
-        id: 'model',
-        sort: 'iface.model',
-        title: t('Model'),
-        transforms: [sortable],
-      },
-      {
-        id: 'network',
-        sort: 'network.pod',
-        title: t('Network'),
-        transforms: [sortable],
-      },
-      {
-        id: 'state',
-        sort: 'iface.state',
-        title: t('State'),
-        transforms: [sortable],
-      },
-      {
-        id: 'type',
-        sort: (_, direction) => sorting(direction),
-        title: t('Type'),
-        transforms: [sortable],
-      },
-      {
-        id: 'macAddress',
-        sort: 'iface.macAddress',
-        title: t('MAC address'),
-        transforms: [sortable],
-      },
-      {
-        id: '',
-        props: { className: 'pf-v6-c-table__action' },
-        title: '',
-      },
-    ],
-    [sorting, t],
-  );
+  const columns: TableColumn<SimpleNICPresentation>[] = useMemo(() => {
+    return [
+      ...[
+        Name<SimpleNICPresentation>,
+        Model<SimpleNICPresentation>,
+        Network<SimpleNICPresentation>,
+        RuntimeLinkState<SimpleNICPresentation>,
+        Type<SimpleNICPresentation>,
+        MacAddress<SimpleNICPresentation>,
+      ].map((builder) => builder(t)),
+      Actions,
+    ];
+  }, [t]);
 
   return columns;
 };

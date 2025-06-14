@@ -1,16 +1,27 @@
 import React, { FC } from 'react';
 
 import PlugCircleCheckIcon from '@kubevirt-utils/components/NetworkIcons/PlugCircleCheckIcon';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Tooltip, TooltipPosition } from '@patternfly/react-core';
+
+import { NetworkIconProps } from './NetworkIcon';
+import StateText from './StateText';
 
 import './LinkStateIcon.scss';
 
-const LinkStateUpIcon: FC = ({}) => {
-  const { t } = useKubevirtTranslation();
-
+const LinkStateUpIcon: FC<NetworkIconProps> = ({ configuredState, runtimeState }) => {
   return (
-    <Tooltip content={t('Up')} position={TooltipPosition.right}>
+    <Tooltip
+      content={
+        <StateText
+          {...{
+            configuredState,
+            runtimeState,
+          }}
+        />
+      }
+      isContentLeftAligned
+      position={TooltipPosition.right}
+    >
       <PlugCircleCheckIcon className="link-state-icon" />
     </Tooltip>
   );

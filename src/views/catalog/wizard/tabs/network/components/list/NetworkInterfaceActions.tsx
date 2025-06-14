@@ -5,17 +5,17 @@ import { setInterfaceLinkState } from '@catalog/wizard/tabs/network/utils/utils'
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import { NetworkInterfaceState } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/types';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
+import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ButtonVariant, Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
 import {
-  getInterfaceState,
-  isSRIOVInterface,
+  getConfigInterfaceStateFromVM,
+  isSRIOVNetworkByVM,
 } from '@virtualmachines/details/tabs/configuration/network/utils/utils';
 
 import WizardEditNetworkInterfaceModal from '../modal/WizardEditNetworkInterfaceModal';
@@ -41,8 +41,8 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
   const label = t('Delete NIC?');
   const editBtnText = t('Edit');
   const submitBtnText = t('Delete');
-  const interfaceState = getInterfaceState(vm, nicName);
-  const isSRIOVIface = isSRIOVInterface(vm, nicName);
+  const interfaceState = getConfigInterfaceStateFromVM(vm, nicName);
+  const isSRIOVIface = isSRIOVNetworkByVM(vm, nicName);
 
   const onEditModalOpen = () => {
     createModal(({ isOpen, onClose }) => (
@@ -104,7 +104,7 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
       popperProps={{ position: 'right' }}
       toggle={KebabToggle({ id: 'toggle-id-network', onClick: onToggle })}
     >
-      {interfaceState === NetworkInterfaceState.DOWN ? (
+      {interfaceState === NetworkInterfaceState.DOWN && (
         <DropdownItem
           isDisabled={isSRIOVIface}
           key="network-interface-state-up"
@@ -112,7 +112,8 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
         >
           {t('Set link up')}
         </DropdownItem>
-      ) : (
+      )}
+      {interfaceState === NetworkInterfaceState.UP && (
         <DropdownItem
           description={isSRIOVIface && t('Not available for SR-IOV interfaces')}
           isDisabled={isSRIOVIface}
