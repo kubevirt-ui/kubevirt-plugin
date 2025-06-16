@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom-v5-compat';
 import { useImmer } from 'use-immer';
 
 import { TemplateModel, TemplateParameter, V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -96,11 +97,8 @@ const TemplateParametersPage: FC<TemplateParametersPageProps> = ({ obj: template
               {index !== parameters.length - 1 && <Divider />}
             </>
           ))}
-          {error && (
-            <Alert isInline title={t('Error')} variant={AlertVariant.danger}>
-              {error}
-            </Alert>
-          )}
+
+          <ErrorAlert error={error} />
 
           {success && (
             <Alert isInline title={t('Success')} variant={AlertVariant.info}>

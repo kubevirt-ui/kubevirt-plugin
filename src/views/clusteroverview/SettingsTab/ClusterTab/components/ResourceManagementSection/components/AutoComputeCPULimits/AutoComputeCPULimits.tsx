@@ -24,7 +24,7 @@ const AutoComputeCPULimits: FC<AutoComputeCPULimitsProps> = ({
     Boolean(featureGates?.[AUTO_RESOURCE_LIMITS_FEATURE_GATE]),
   );
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<Error>();
+  const [error, setError] = useState<string>();
 
   const onFeatureChange = (switchOn: boolean) => {
     setIsLoading(true);
