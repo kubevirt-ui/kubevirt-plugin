@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import VncConsole from '@kubevirt-utils/components/Consoles/components/vnc-console/VncConsole';
@@ -20,6 +20,8 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
 > = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
 
+  const [connect, setConnect] = useState(false);
+
   const isHeadlessMode = isHeadlessModeVMI(vmi);
   const isVMRunning = vmi?.status?.phase === vmiStatuses.Running;
   const [canConnectConsole] = useAccessReview({
@@ -29,6 +31,8 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
     resource: 'virtualmachineinstances/vnc',
     verb: 'get',
   });
+
+  const availableConsole = isVMRunning && !isHeadlessMode && canConnectConsole;
   return (
     <Bullseye className="console-overview">
       <div className="link">
@@ -46,7 +50,7 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
           {t('Open web console')}
         </Button>
       </div>
-      {isVMRunning && !isHeadlessMode && canConnectConsole ? (
+      {availableConsole && connect && (
         <>
           <VncConsole
             CustomConnectComponent={VirtualMachinesOverviewTabDetailsConsoleConnect}
@@ -54,7 +58,19 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
             vmi={vmi}
           />
         </>
-      ) : (
+      )}
+
+      {availableConsole && !connect && (
+        <div className="console-vnc">
+          <VirtualMachinesOverviewTabDetailsConsoleConnect
+            connect={() => setConnect(true)}
+            isConnecting={false}
+            isHeadlessMode={isHeadlessMode}
+          />
+        </div>
+      )}
+
+      {!availableConsole && (
         <div className="console-vnc">
           <VirtualMachinesOverviewTabDetailsConsoleConnect
             isDisabled
