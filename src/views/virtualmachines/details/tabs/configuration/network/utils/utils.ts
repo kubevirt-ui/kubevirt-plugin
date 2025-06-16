@@ -12,7 +12,6 @@ import LinkStateAbsentIcon from '@kubevirt-utils/components/NetworkIcons/LinkSta
 import LinkStateDownIcon from '@kubevirt-utils/components/NetworkIcons/LinkStateDownIcon';
 import LinkStateSRIOVIcon from '@kubevirt-utils/components/NetworkIcons/LinkStateSRIOVIcon';
 import LinkStateUpIcon from '@kubevirt-utils/components/NetworkIcons/LinkStateUpIcon';
-import { NetworkInterfaceState } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/types';
 import {
   getAutoAttachPodInterface,
   getInterface,
@@ -25,6 +24,7 @@ import {
   getNetworkInterfaceState,
   getNetworkInterfaceType,
 } from '@kubevirt-utils/resources/vm/utils/network/selectors';
+import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
 import { getVMIInterfaces, getVMIStatusInterfaces } from '@kubevirt-utils/resources/vmi';
 import { ensurePath, isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';

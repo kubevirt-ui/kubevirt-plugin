@@ -1,9 +1,11 @@
 import { V1Interface, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getInterfaces } from '@kubevirt-utils/resources/vm';
+import { isNetworkInterfaceState } from '@kubevirt-utils/utils/typeGuards';
 
 import { NO_DATA_DASH, UDN_BINDING_NAME } from '../constants';
 
 import { interfaceTypesProxy } from './constants';
+import { NetworkInterfaceState } from './types';
 
 /**
  * function to get network interface type
@@ -46,3 +48,19 @@ export const getNetworkInterfaceState = (
   vm: V1VirtualMachine,
   interfaceName: string,
 ): string | undefined => getNetworkInterface(vm, interfaceName)?.state;
+
+export const getConfigInterfaceState = (
+  iface?: unknown,
+  ifaceState?: string,
+  isSRIOV?: boolean,
+): NetworkInterfaceState => {
+  if (!iface) {
+    // no interface
+    return NetworkInterfaceState.NONE;
+  }
+  if (isSRIOV) {
+    return NetworkInterfaceState.UNSUPPORTED;
+  }
+
+  return isNetworkInterfaceState(ifaceState) ? ifaceState : NetworkInterfaceState.UP;
+};

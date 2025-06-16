@@ -3,7 +3,13 @@ import * as React from 'react';
 import { WizardDescriptionItem } from '@catalog/wizard/components/WizardDescriptionItem';
 import { V1Interface, V1Network } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { BRIDGE, MASQUERADE, SRIOV } from '@kubevirt-utils/resources/vm/utils/constants';
+import {
+  BRIDGE,
+  MASQUERADE,
+  NO_DATA_DASH,
+  SRIOV,
+} from '@kubevirt-utils/resources/vm/utils/constants';
+import { getNetworkNameLabel } from '@kubevirt-utils/resources/vm/utils/network/network-columns';
 import { getNetworkInterfaceRowData } from '@kubevirt-utils/resources/vm/utils/network/rowData';
 import { getPrintableNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { DescriptionList, Stack, StackItem } from '@patternfly/react-core';
@@ -39,7 +45,7 @@ export const WizardOverviewNetworksTable: React.FC<{
           <Stack>
             {networkData.map((n) => (
               <StackItem key={n.network.name}>
-                {n.network.pod ? t('Pod networking') : n.network.multus?.networkName || '-'}
+                {getNetworkNameLabel(t, n) || NO_DATA_DASH}
               </StackItem>
             ))}
           </Stack>
