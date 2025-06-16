@@ -1,6 +1,14 @@
 import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import cn from 'classnames';
+import {
+  CharMappingWithModifiers,
+  KeyboardLayout,
+  KeyMapDef,
+  keyMaps,
+  resolveCharMapping,
+} from 'vnc-keymaps';
 
+import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import KeyTable from '@novnc/novnc/lib/input/keysym';
@@ -13,14 +21,8 @@ import { isConnectionEncrypted, sleep } from '../../utils/utils';
 import { ConsoleState, WS, WSS } from '../utils/ConsoleConsts';
 import useCopyPasteConsole from '../utils/hooks/useCopyPasteConsole';
 
-import {
-  HORIZONTAL_TAB,
-  isShiftKeyRequired,
-  LATIN_1_FIRST_CHAR,
-  LATIN_1_LAST_CHAR,
-  LINE_FEED,
-} from './utils/util';
 import { VncConsoleProps } from './utils/VncConsoleTypes';
+import UnsupportedCharModal from './UnsupportedCharModal';
 import VncConnect from './VncConnect';
 
 import './vnc-console.scss';
@@ -41,6 +43,7 @@ export const VncConsole: FC<VncConsoleProps> = ({
   const [activeTabKey, setActiveTabKey] = useState<number | string>(0);
   const pasteText = useCopyPasteConsole();
   const staticRenderLocationRef = useRef(null);
+  const { createModal } = useModal();
   const StaticRenderLocation = useMemo(
     () => (
       <div
@@ -88,29 +91,58 @@ export const VncConsole: FC<VncConsoleProps> = ({
         this.sendKey(KeyTable.XK_Alt_L, 'AltLeft', false);
         this.sendKey(KeyTable.XK_Control_L, 'ControlLeft', false);
       };
-      rfbInstnce.sendPasteCMD = async function sendPasteCMD() {
+      rfbInstnce.sendPasteCMD = async function sendPasteCMD(selectedKeyboard: KeyboardLayout) {
         if (this._rfbConnectionState !== connected || this._viewOnly) {
           return;
         }
         const clipboardText = await navigator?.clipboard?.readText?.();
         const text = clipboardText || pasteText.current;
-        for (const codePoint of text) {
-          const codePointIndex = codePoint.codePointAt(0);
-          if (codePointIndex === LINE_FEED) {
-            this.sendKey(KeyTable.XK_Return);
-          } else if (codePointIndex === HORIZONTAL_TAB) {
-            this.sendKey(KeyTable.XK_Tab);
-          } else if (codePointIndex >= LATIN_1_FIRST_CHAR && codePointIndex <= LATIN_1_LAST_CHAR) {
-            // qemu maintains virtual keyboard state (caps lock, shift, etc)
-            // keysyms are checked against that state and lower case version will be picked
-            // if there is no shift/caps lock turn on
-            const shiftRequired = isShiftKeyRequired(codePoint);
-            shiftRequired && this.sendKey(KeyTable.XK_Shift_L, 'ShiftLeft', true);
-            // long text is getting truncated without a delay
+        const keyMap: KeyMapDef = keyMaps[selectedKeyboard];
+        const mappedChars: CharMappingWithModifiers[] = [...text].map((codePoint) =>
+          resolveCharMapping(codePoint, keyMap.map),
+        );
+
+        const unsupportedChars = mappedChars.filter(({ mapping }) => mapping.scanCode === 0);
+        if (unsupportedChars.length) {
+          createModal((props) => (
+            <UnsupportedCharModal
+              {...props}
+              unsupportedChars={Array.from(
+                new Set(unsupportedChars.map(({ mapping }) => mapping.char ?? '<unknown>')),
+              )}
+            />
+          ));
+          return;
+        }
+
+        for (const toType of mappedChars) {
+          const { keysym, scanCode } = toType.mapping;
+
+          // qemu maintains virtual keyboard state (caps lock, shift, etc)
+          // keysyms are checked against that state and lower case version will be picked
+          // if there is no shift/caps lock turn on
+          for (const modifier of toType.modifiers) {
+            RFBCreate.messages.QEMUExtendedKeyEvent(
+              this._sock,
+              modifier.keysym,
+              true,
+              modifier.scanCode,
+            );
             await sleep(50);
-            // Latin-1 set that maps directly to keysym
-            this.sendKey(codePointIndex);
-            shiftRequired && this.sendKey(KeyTable.XK_Shift_L, 'ShiftLeft', false);
+          }
+
+          RFBCreate.messages.QEMUExtendedKeyEvent(this._sock, keysym, true, scanCode);
+          // long text is getting truncated without a delay
+          await sleep(50);
+
+          for (const modifier of toType.modifiers) {
+            RFBCreate.messages.QEMUExtendedKeyEvent(
+              this._sock,
+              modifier.keysym,
+              false,
+              modifier.scanCode,
+            );
+            await sleep(50);
           }
         }
       };
@@ -126,6 +158,7 @@ export const VncConsole: FC<VncConsoleProps> = ({
     scaleViewport,
     onConnect,
     pasteText,
+    createModal,
   ]);
 
   useEffect(() => {

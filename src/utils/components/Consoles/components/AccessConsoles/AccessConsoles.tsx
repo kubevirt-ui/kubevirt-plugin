@@ -1,4 +1,5 @@
-import React, { FC, MouseEvent, useEffect, useState } from 'react';
+import React, { FC, MouseEvent, Ref, useEffect, useState } from 'react';
+import { isKeyboardLayout, KeyboardLayout, keyMaps } from 'vnc-keymaps';
 
 import DropdownToggle from '@kubevirt-utils/components/toggles/DropdownToggle';
 import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';
@@ -6,9 +7,14 @@ import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Button,
   ButtonVariant,
+  Divider,
   Dropdown,
+  DropdownGroup,
   DropdownItem,
   DropdownList,
+  MenuToggle,
+  MenuToggleAction,
+  MenuToggleElement,
   Select,
   SelectOption,
 } from '@patternfly/react-core';
@@ -25,6 +31,7 @@ import './access-consoles.scss';
 const { connected } = ConsoleState;
 
 export const AccessConsoles: FC<AccessConsolesProps> = ({
+  isVnc,
   isWindowsVM,
   rfb,
   serialSocket,
@@ -34,6 +41,9 @@ export const AccessConsoles: FC<AccessConsolesProps> = ({
   const [isOpenSelectType, setIsOpenSelectType] = useState<boolean>(false);
   const [isOpenSendKey, setIsOpenSendKey] = useState<boolean>(false);
   const [status, setStatus] = useState<string>();
+  const defaultKeyboard: KeyboardLayout = 'en-us';
+  const [selectedKeyboard, setSelectedKeyboard] = useState<KeyboardLayout>(defaultKeyboard);
+  const [isKeyboardSelectOpen, setIsKeyboardSelectOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const statusCallback = () => setStatus(connected);
@@ -60,7 +70,7 @@ export const AccessConsoles: FC<AccessConsolesProps> = ({
   const onInjectTextFromClipboard = (e: MouseEvent<HTMLButtonElement>) => {
     e.currentTarget.blur();
     e.preventDefault();
-    rfb?.sendPasteCMD();
+    rfb?.sendPasteCMD(selectedKeyboard);
     serialSocket?.onPaste();
   };
 
@@ -69,18 +79,73 @@ export const AccessConsoles: FC<AccessConsolesProps> = ({
     serialSocket?.destroy();
   };
 
+  const typeInLabel = t('Paste to console ({{selectedKeyboard}})', { selectedKeyboard });
   return (
     <>
-      <Button
-        icon={
-          <>
-            <PasteIcon /> {t('Paste to console')}
-          </>
-        }
-        className="vnc-paste-button"
-        onClick={onInjectTextFromClipboard}
-        variant={ButtonVariant.link}
-      />
+      {isVnc && (
+        <Dropdown
+          onSelect={(_event, value?: number | string) => {
+            isKeyboardLayout(value) && setSelectedKeyboard(value);
+            setIsKeyboardSelectOpen(false);
+          }}
+          toggle={(toggleRef: Ref<MenuToggleElement>) => (
+            <MenuToggle
+              splitButtonItems={[
+                <MenuToggleAction
+                  aria-label={typeInLabel}
+                  key={typeInLabel}
+                  onClick={onInjectTextFromClipboard}
+                >
+                  <PasteIcon />
+                  {typeInLabel}
+                </MenuToggleAction>,
+              ]}
+              className="vnc-paste-button"
+              isExpanded={isKeyboardSelectOpen}
+              onClick={() => setIsKeyboardSelectOpen(!isKeyboardSelectOpen)}
+              ref={toggleRef}
+              variant="secondary"
+            >
+              {selectedKeyboard}
+            </MenuToggle>
+          )}
+          isOpen={isKeyboardSelectOpen}
+          isScrollable
+          onOpenChange={(isOpen) => setIsKeyboardSelectOpen(isOpen)}
+          selected={selectedKeyboard}
+          shouldFocusToggleOnSelect
+        >
+          <DropdownGroup>
+            <DropdownItem description={defaultKeyboard} value={defaultKeyboard}>
+              {keyMaps[defaultKeyboard].description}
+            </DropdownItem>
+          </DropdownGroup>
+          <Divider component="li" />
+          <DropdownList>
+            {Object.entries(keyMaps)
+              .filter(([value]) => value !== defaultKeyboard)
+              .sort(([, a], [, b]) => a.description.localeCompare(b.description))
+              .map(([value, def]) => (
+                <DropdownItem description={value} key={value} value={value}>
+                  {def.description}
+                </DropdownItem>
+              ))}
+          </DropdownList>
+        </Dropdown>
+      )}
+      {!isVnc && (
+        <Button
+          icon={
+            <>
+              <PasteIcon /> {t('Paste to console')}
+            </>
+          }
+          className="vnc-paste-button"
+          onClick={onInjectTextFromClipboard}
+          variant={ButtonVariant.link}
+        />
+      )}
+
       <Select
         onSelect={(_, selection: string) => {
           setType(selection);
