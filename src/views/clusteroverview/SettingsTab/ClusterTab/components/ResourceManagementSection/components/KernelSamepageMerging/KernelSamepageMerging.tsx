@@ -45,7 +45,7 @@ const KernelSamepageMerging: FC<KernelSamepageMergingProps> = ({
   );
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<null | string>(null);
 
   const onKSMchange = (value: boolean) => {
     setIsLoading(true);

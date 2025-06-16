@@ -29,7 +29,7 @@ const PersistentReservationSection: FC<PersistentReservationSectionProps> = ({
   const [hyperConverge, hyperLoaded] = hyperConvergeConfiguration;
   const persistentReservation = Boolean(hyperConverge?.spec?.featureGates?.persistentReservation);
 
-  const [error, setError] = useState<Error>(null);
+  const [error, setError] = useState<string>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { toggleFeature } = useFeatures(FEATURE_HCO_PERSISTENT_RESERVATION);
 

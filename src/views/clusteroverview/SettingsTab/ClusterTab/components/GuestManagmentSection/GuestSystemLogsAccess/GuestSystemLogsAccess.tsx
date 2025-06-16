@@ -36,7 +36,7 @@ const GuestSystemLogsAccess: FC<GuestSystemLogsAccessProps> = ({
   const disableSerialConsoleLog =
     hyperConverge?.spec?.virtualMachineOptions?.disableSerialConsoleLog;
 
-  const [error, setError] = useState<Error>(null);
+  const [error, setError] = useState<string>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isChecked, setIsChecked] = useState<boolean>();
 
