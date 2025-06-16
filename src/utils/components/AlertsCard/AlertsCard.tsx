@@ -6,7 +6,7 @@ import AlertsDrawer from '@kubevirt-utils/components/AlertsCard/AlertsDrawer';
 import {
   ALERTS_SCOPE_KEY,
   ALL_ALERTS,
-  VIEW_ALL_ALERTS_PATH,
+  ALL_VIRT_ALERTS_URL_PARAMS,
   VIRTUALIZATION_ONLY_ALERTS,
 } from '@kubevirt-utils/components/AlertsCard/utils/constants';
 import { SimplifiedAlerts } from '@kubevirt-utils/components/AlertsCard/utils/types';
@@ -15,9 +15,11 @@ import {
   removeVMAlerts,
 } from '@kubevirt-utils/components/AlertsCard/utils/utils';
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
+import { getAlertsPath } from '@kubevirt-utils/constants/prometheus';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
+import { useActivePerspective } from '@openshift-console/dynamic-plugin-sdk';
 import { Card, CardHeader, CardTitle, Popover, PopoverPosition } from '@patternfly/react-core';
 import { SelectOption } from '@patternfly/react-core';
 
@@ -32,6 +34,7 @@ type AlertsCardProps = {
 const AlertsCard: FC<AlertsCardProps> = ({ className, isOverviewPage = false, sortedAlerts }) => {
   const { t } = useKubevirtTranslation();
   const isAdmin = useIsAdmin();
+  const [perspective] = useActivePerspective();
   const [alertScope, setAlertScope] = useLocalStorage(
     ALERTS_SCOPE_KEY,
     isAdmin ? VIRTUALIZATION_ONLY_ALERTS : ALL_ALERTS, // for admins show the number of virtualization health alerts by default
@@ -55,7 +58,10 @@ const AlertsCard: FC<AlertsCardProps> = ({ className, isOverviewPage = false, so
             actions: (
               <>
                 {isAdmin && (
-                  <Link className="alerts-card__view-all-link" to={VIEW_ALL_ALERTS_PATH}>
+                  <Link
+                    className="alerts-card__view-all-link"
+                    to={getAlertsPath(perspective, null, ALL_VIRT_ALERTS_URL_PARAMS)}
+                  >
                     {t('View all')}
                   </Link>
                 )}
