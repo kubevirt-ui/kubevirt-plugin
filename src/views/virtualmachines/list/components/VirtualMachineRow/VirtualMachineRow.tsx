@@ -23,16 +23,10 @@ const VirtualMachineRow: FC<
     {
       getVmi: (namespace: string, name: string) => V1VirtualMachineInstance;
       getVmim: (ns: string, name: string) => V1VirtualMachineInstanceMigration;
-      isSingleNodeCluster: boolean;
       pvcMapper: PVCMapper;
     }
   >
-> = ({
-  activeColumnIDs,
-  index,
-  obj: vm,
-  rowData: { getVmi, getVmim, isSingleNodeCluster, pvcMapper },
-}) => {
+> = ({ activeColumnIDs, index, obj: vm, rowData: { getVmi, getVmim, pvcMapper } }) => {
   const vmName = getName(vm);
   const vmNamespace = getNamespace(vm);
   const vmi = getVmi(vmNamespace, vmName);
@@ -47,7 +41,6 @@ const VirtualMachineRow: FC<
   return !isEmpty(vmi) ? (
     <VirtualMachineRunningRow
       rowData={{
-        isSingleNodeCluster,
         pvcMapper,
         status,
         vmi,
@@ -61,7 +54,6 @@ const VirtualMachineRow: FC<
     <VirtualMachineRowLayout
       rowData={{
         ips: NO_DATA_DASH,
-        isSingleNodeCluster,
         node: NO_DATA_DASH,
         pvcMapper,
         status,

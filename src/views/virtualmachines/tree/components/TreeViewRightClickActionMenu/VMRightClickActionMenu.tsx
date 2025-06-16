@@ -2,7 +2,6 @@ import React, { FC } from 'react';
 import classNames from 'classnames';
 
 import ActionDropdownItem from '@kubevirt-utils/components/ActionDropdownItem/ActionDropdownItem';
-import useSingleNodeCluster from '@kubevirt-utils/hooks/useSingleNodeCluster';
 import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { Menu, MenuContent, MenuList, Popper } from '@patternfly/react-core';
 import useVirtualMachineActionsProvider from '@virtualmachines/actions/hooks/useVirtualMachineActionsProvider';
@@ -22,14 +21,12 @@ type VMRightClickActionMenuProps = {
 const VMRightClickActionMenu: FC<VMRightClickActionMenuProps> = ({ hideMenu, triggerElement }) => {
   const { vmName, vmNamespace } = getVMComponentsFromID(triggerElement);
 
-  const [isSingleNodeCluster] = useSingleNodeCluster();
-
   const vmim = getVMIMFromMapper(vmimMapperSignal.value, vmName, vmNamespace);
   const vm = vmsSignal?.value?.find(
     (resource) => getName(resource) === vmName && getNamespace(resource) === vmNamespace,
   );
 
-  const [actions] = useVirtualMachineActionsProvider(vm, vmim, isSingleNodeCluster);
+  const [actions] = useVirtualMachineActionsProvider(vm, vmim);
 
   const vmHasFolder = !!getLabel(vm, VM_FOLDER_LABEL);
 

@@ -65,7 +65,6 @@ export const VirtualMachineActionFactory = {
   cancelComputeMigration: (
     vm: V1VirtualMachine,
     vmim: V1VirtualMachineInstanceMigration,
-    isSingleNodeCluster: boolean,
   ): Action => {
     return {
       accessReview: {
@@ -76,7 +75,7 @@ export const VirtualMachineActionFactory = {
       },
       cta: () => cancelMigration(vmim),
       description: !!vmim?.metadata?.deletionTimestamp && t('Canceling ongoing migration'),
-      disabled: isSingleNodeCluster || !vmim || !!vmim?.metadata?.deletionTimestamp,
+      disabled: !vmim || !!vmim?.metadata?.deletionTimestamp,
       id: 'vm-action-cancel-migrate',
       label: t('Cancel compute migration'),
     };
@@ -188,7 +187,7 @@ export const VirtualMachineActionFactory = {
       label: t('Force stop'),
     };
   },
-  migrateCompute: (vm: V1VirtualMachine, isSingleNodeCluster: boolean): Action => {
+  migrateCompute: (vm: V1VirtualMachine): Action => {
     return {
       accessReview: {
         group: VirtualMachineInstanceMigrationModel.apiGroup,
@@ -198,7 +197,7 @@ export const VirtualMachineActionFactory = {
       },
       cta: () => migrateVM(vm),
       description: t('Migrate VirtualMachine to a different Node'),
-      disabled: !isLiveMigratable(vm, isSingleNodeCluster),
+      disabled: !isLiveMigratable(vm),
       id: 'vm-action-migrate',
       label: t('Compute'),
     };

@@ -22,14 +22,9 @@ import useCurrentStorageMigration from './useStorageMigrations';
 type UseVirtualMachineActionsProvider = (
   vm: V1VirtualMachine,
   vmim?: V1VirtualMachineInstanceMigration,
-  isSingleNodeCluster?: boolean,
 ) => [ActionDropdownItemType[], boolean, any];
 
-const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
-  vm,
-  vmim,
-  isSingleNodeCluster,
-) => {
+const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, vmim) => {
   const { createModal } = useModal();
   const { featureEnabled: confirmVMActionsEnabled } = useFeatures(CONFIRM_VM_ACTIONS);
 
@@ -61,7 +56,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
       return map[printableStatusMachine] || map.default;
     })(printableStatus);
 
-    const migrateCompute = VirtualMachineActionFactory.migrateCompute(vm, isSingleNodeCluster);
+    const migrateCompute = VirtualMachineActionFactory.migrateCompute(vm);
 
     const migrateStorage = VirtualMachineActionFactory.migrateStorage(vm, createModal);
 
@@ -71,7 +66,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
 
     const cancelMigration = currentStorageMigration
       ? VirtualMachineActionFactory.cancelStorageMigration(currentStorageMigration)
-      : VirtualMachineActionFactory.cancelComputeMigration(vm, vmim, isSingleNodeCluster);
+      : VirtualMachineActionFactory.cancelComputeMigration(vm, vmim);
 
     const migrationActions =
       isComputeMigration || currentStorageMigration ? [cancelMigration] : startMigrationActions;
@@ -96,7 +91,6 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
   }, [
     vm,
     vmim,
-    isSingleNodeCluster,
     createModal,
     currentStorageMigration,
     confirmVMActionsEnabled,
