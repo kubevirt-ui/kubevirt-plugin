@@ -13,10 +13,7 @@ import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/networ
 import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { ButtonVariant, Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
-import {
-  getInterfaceState,
-  isSRIOVInterface,
-} from '@virtualmachines/details/tabs/configuration/network/utils/utils';
+import { getConfigInterfaceStateFromVM } from '@virtualmachines/details/tabs/configuration/network/utils/utils';
 
 import useEditTemplateAccessReview from '../../../../hooks/useIsTemplateEditable';
 import { setTemplateNetworkInterfaceState } from '../../utils';
@@ -38,8 +35,7 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
   const { isTemplateEditable } = useEditTemplateAccessReview(template);
 
   const templateVM = getTemplateVirtualMachineObject(template);
-  const interfaceState = getInterfaceState(templateVM, nicName);
-  const isSRIOVIface = isSRIOVInterface(templateVM, nicName);
+  const interfaceState = getConfigInterfaceStateFromVM(templateVM, nicName);
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const label = t('Delete NIC?');
@@ -109,23 +105,21 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
       popperProps={{ appendTo: getContentScrollableElement, position: 'right' }}
     >
       <DropdownList>
-        {interfaceState === NetworkInterfaceState.DOWN ? (
+        {interfaceState === NetworkInterfaceState.DOWN && (
           <DropdownItem
             onClick={() =>
               setTemplateNetworkInterfaceState(template, nicName, NetworkInterfaceState.UP)
             }
-            isDisabled={isSRIOVIface}
             key="network-interface-state-up"
           >
             {t('Set link up')}
           </DropdownItem>
-        ) : (
+        )}
+        {interfaceState === NetworkInterfaceState.UP && (
           <DropdownItem
             onClick={() =>
               setTemplateNetworkInterfaceState(template, nicName, NetworkInterfaceState.DOWN)
             }
-            description={isSRIOVIface && t('Not available for SR-IOV interfaces')}
-            isDisabled={isSRIOVIface}
             key="network-interface-state-down"
           >
             {t('Set link down')}

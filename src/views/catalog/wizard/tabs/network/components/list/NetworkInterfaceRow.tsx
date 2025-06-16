@@ -1,13 +1,14 @@
 import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import NetworkIcon from '@kubevirt-utils/components/NetworkIcons/NetworkIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { getNetworkNameLabel } from '@kubevirt-utils/resources/vm/utils/network/network-columns';
 import { getPrintableNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
-import { getNetworkInterfaceStateIcon } from '@virtualmachines/details/tabs/configuration/network/utils/utils';
+import { getConfigInterfaceStateFromVM } from '@virtualmachines/details/tabs/configuration/network/utils/utils';
 
 import NetworkInterfaceActions from './NetworkInterfaceActions';
 
@@ -22,7 +23,6 @@ const NetworkInterfaceRow: FC<
   >
 > = ({ activeColumnIDs, obj: { iface, network }, rowData: { onUpdateVM, vm } }) => {
   const { t } = useKubevirtTranslation();
-  const InterfaceStateIcon = getNetworkInterfaceStateIcon(vm, network?.name);
 
   return (
     <>
@@ -36,7 +36,7 @@ const NetworkInterfaceRow: FC<
         {getNetworkNameLabel(t, { network }) || NO_DATA_DASH}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="state">
-        <InterfaceStateIcon />
+        <NetworkIcon configuredState={getConfigInterfaceStateFromVM(vm, network?.name)} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="type">
         {getPrintableNetworkInterfaceType(iface)}

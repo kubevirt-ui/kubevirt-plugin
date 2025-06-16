@@ -15,7 +15,10 @@ import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/networ
 import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { ExpandableSection, Form } from '@patternfly/react-core';
-import { getInterfaceState } from '@virtualmachines/details/tabs/configuration/network/utils/utils';
+import {
+  getConfigInterfaceStateFromVM,
+  isLinkStateEditable,
+} from '@virtualmachines/details/tabs/configuration/network/utils/utils';
 import { isRunning } from '@virtualmachines/utils';
 
 import NameFormField from './components/NameFormField';
@@ -76,12 +79,13 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
   const [interfaceMACAddress, setInterfaceMACAddress] = useState(iface?.macAddress);
   const [macError, setMacError] = useState<boolean>(false);
   const [interfaceLinkState, setInterfaceLinkState] = useState<NetworkInterfaceState>(
-    getInterfaceState(vm, nicName),
+    !network ? NetworkInterfaceState.UP : getConfigInterfaceStateFromVM(vm, nicName),
   );
   const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
-    if (interfaceType === interfaceTypesProxy.sriov) setInterfaceLinkState(undefined);
+    if (interfaceType === interfaceTypesProxy.sriov)
+      setInterfaceLinkState(NetworkInterfaceState.UNSUPPORTED);
   }, [interfaceType]);
 
   const isValid = nicName && networkName && !networkSelectError && !macError;
@@ -90,7 +94,9 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
     return (
       onSubmit &&
       onSubmit({
-        interfaceLinkState,
+        interfaceLinkState: isLinkStateEditable(interfaceLinkState)
+          ? interfaceLinkState
+          : undefined,
         interfaceMACAddress,
         interfaceModel,
         interfaceType,
@@ -153,7 +159,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
             setIsError={setMacError}
           />
           <NetworkInterfaceLinkState
-            isDisabled={interfaceType === interfaceTypesProxy.sriov}
+            isDisabled={!isLinkStateEditable(interfaceLinkState)}
             linkState={interfaceLinkState}
             setLinkState={setInterfaceLinkState}
           />
