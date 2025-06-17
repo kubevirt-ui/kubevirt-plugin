@@ -1,3 +1,4 @@
+import { TEST_NS } from '../../utils/const/index';
 import { NAD_BRIDGE, NAD_LOCALNET, NAD_OVN } from '../../utils/const/nad';
 import { createNAD, deleteNAD } from '../../views/nad';
 
@@ -5,6 +6,7 @@ describe('Test network attachments', () => {
   beforeEach(() => {
     cy.beforeSpec();
     cy.visitNAD();
+    cy.switchProject(TEST_NS);
   });
 
   it('create NAD with MAC Spoof checked', () => {

@@ -16,15 +16,13 @@ const menu = '[data-test-id="perspective-switcher-menu"]';
 
 export const switchPerspective = (perspective: Perspective) => {
   cy.get(header, { timeout: 5 * MINUTE }).should('be.visible');
-  cy.wait(10 * SECOND);
+  cy.wait(10 * SECOND); // for safety and remove flaky
   cy.get(header).within(($title) => {
-    if ($title.find('h2').text() == perspective) {
-      cy.task('log', `Already at [${perspective}]`);
-      return;
+    if ($title.find('h2').text() !== perspective) {
+      cy.get(toggle).click();
+      cy.get(menu).should('be.visible');
+      cy.contains(option, perspective).click();
+      cy.task('log', `Switching to [${perspective}]`);
     }
-    cy.get(toggle).click();
-    cy.get(menu).should('be.visible');
-    cy.contains(option, perspective).click();
-    cy.task('log', `Switching to [${perspective}]`);
   });
 };
