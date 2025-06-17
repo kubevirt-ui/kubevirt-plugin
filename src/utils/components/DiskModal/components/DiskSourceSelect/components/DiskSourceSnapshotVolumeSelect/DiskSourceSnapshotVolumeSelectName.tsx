@@ -9,7 +9,7 @@ import Loading from '@kubevirt-utils/components/Loading/Loading';
 import useSnapshots from '@kubevirt-utils/components/SelectSnapshot/useSnapshots';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { convertResourceArrayToMap, getName } from '@kubevirt-utils/resources/shared';
-import { getHumanizedSize } from '@kubevirt-utils/utils/units';
+import { formatQuantityString } from '@kubevirt-utils/utils/units';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { FormGroup, ValidatedOptions } from '@patternfly/react-core';
 
@@ -60,8 +60,7 @@ const DiskSourceSnapshotVolumeSelectName: FC = () => {
               onChange(snapshotName);
               const selectedSnapshot = snapshotsMapper[snapshotName];
               const selectedSnapshotSize = selectedSnapshot?.status?.restoreSize;
-              const humanizedSize = getHumanizedSize(selectedSnapshotSize, 'withoutB');
-              setValue(DISK_SIZE_FIELD, `${humanizedSize.value}${humanizedSize.unit}`);
+              setValue(DISK_SIZE_FIELD, formatQuantityString(selectedSnapshotSize));
             }}
             toggleProps={{
               isDisabled: isEmpty(namespace),

@@ -7,7 +7,7 @@ import { getDefaultStorageClass } from '@kubevirt-utils/components/DiskModal/com
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useStorageProfileClaimPropertySets from '@kubevirt-utils/hooks/useStorageProfileClaimPropertySets';
-import { BinaryUnit } from '@kubevirt-utils/utils/units';
+import { BinaryUnit } from '@kubevirt-utils/utils/unitConstants';
 import {
   Alert,
   AlertVariant,

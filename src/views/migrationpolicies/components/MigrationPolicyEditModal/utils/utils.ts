@@ -3,16 +3,11 @@ import { migrationPolicySpecKeys } from 'src/views/migrationpolicies/utils/const
 
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { DESCRIPTION_ANNOTATION } from '@kubevirt-utils/resources/vm';
-import { BinaryUnit, getHumanizedSize } from '@kubevirt-utils/utils/units';
+import { toQuantity } from '@kubevirt-utils/utils/units';
 
 import { getEmptyMigrationPolicy } from '../../../utils/utils';
 
 import { EditMigrationPolicyInitialState } from './constants';
-
-export const fromIECUnit = (unit: string): BinaryUnit => {
-  const newUnit = unit?.endsWith('B') ? (unit.slice(0, -1) as BinaryUnit) : (unit as BinaryUnit);
-  return newUnit;
-};
 
 export const extractEditMigrationPolicyInitialValues = (
   mp: V1alpha1MigrationPolicy,
@@ -24,8 +19,7 @@ export const extractEditMigrationPolicyInitialValues = (
     initState.allowAutoConverge = mp?.spec?.allowAutoConverge;
   }
   if (migrationPolicySpecKeys.BANDWIDTH_PER_MIGRATION in mp?.spec) {
-    const { unit, value } = getHumanizedSize(mp?.spec?.bandwidthPerMigration);
-    initState.bandwidthPerMigration = { unit: fromIECUnit(unit), value };
+    initState.bandwidthPerMigration = toQuantity(mp?.spec?.bandwidthPerMigration);
   }
   if (migrationPolicySpecKeys.COMPLETION_TIMEOUT_PER_GIB in mp?.spec) {
     initState.completionTimeoutPerGiB = mp?.spec?.completionTimeoutPerGiB;

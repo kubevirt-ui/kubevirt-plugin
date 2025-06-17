@@ -1,40 +1,27 @@
+import { Quantity } from '@kubevirt-utils/types/quantity.js';
+
 import {
   convertToBaseValue,
   humanizeBinaryBytes,
   humanizeBinaryBytesWithoutB,
 } from './humanize.js';
-
-export enum BinaryUnit {
-  B = 'B',
-  Gi = 'Gi',
-  Ki = 'Ki',
-  Mi = 'Mi',
-  Ti = 'Ti',
-}
-
-export const multipliers: Record<string, number> = {};
-multipliers.B = 1;
-multipliers.Ki = multipliers.B * 1024;
-multipliers.Mi = multipliers.Ki * 1024;
-multipliers.Gi = multipliers.Mi * 1024;
-multipliers.Ti = multipliers.Gi * 1024;
-multipliers.Pi = multipliers.Ti * 1024;
-multipliers.Ei = multipliers.Pi * 1024;
-multipliers.Zi = multipliers.Ei * 1024;
-multipliers.K = multipliers.B * 1000;
-multipliers.M = multipliers.K * 1000;
-multipliers.G = multipliers.M * 1000;
-multipliers.T = multipliers.G * 1000;
-multipliers.P = multipliers.T * 1000;
-multipliers.E = multipliers.P * 1000;
-multipliers.Z = multipliers.E * 1000;
+import {
+  BinaryUnit,
+  binaryUnitsOrdered,
+  DecimalUnit,
+  decimalUnitsOrdered,
+  NUMBER_REGEX,
+  QuantityUnit,
+  UNIT_REGEX,
+} from './unitConstants';
+import { isEmpty } from './utils';
 
 /**
  * A function to return unit for disk size/memory with 'B' suffix.
- * @param {BinaryUnit | string} unit - unit
+ * @param {QuantityUnit | string} unit - unit
  * @returns {string}
  */
-export const toIECUnit = (unit: BinaryUnit | string): string =>
+export const addByteSuffix = (unit: QuantityUnit | string): string =>
   !unit || unit.endsWith('B') ? unit : `${unit}B`;
 
 /**
@@ -51,7 +38,7 @@ export const readableSizeUnit = (combinedStr: string): string => {
       : [combinedString?.slice(0, index), combinedString?.slice(index)];
 
   // if there isn't any specific value/size present, return the original string, for example for the dynamic disk size
-  return !value ? combinedStr : `${value} ${toIECUnit(unit)}`;
+  return !value ? combinedStr : `${value} ${addByteSuffix(unit)}`;
 };
 
 export const getHumanizedSize = (size: string, bytesOption: 'withB' | 'withoutB' = 'withB') => {
@@ -62,4 +49,104 @@ export const getHumanizedSize = (size: string, bytesOption: 'withB' | 'withoutB'
   }
 
   return humanizeBinaryBytes(baseValue);
+};
+
+export const extractUnitFromQuantityString = (quantityString: string) =>
+  quantityString.match(UNIT_REGEX)?.[0];
+
+export const extractNumberFromQuantityString = (quantityString: string) => {
+  const match = quantityString.match(NUMBER_REGEX);
+  return match ? parseFloat(match[0]) : null;
+};
+
+export const isBinaryUnit = (unit: string): unit is BinaryUnit =>
+  binaryUnitsOrdered.includes(BinaryUnit[unit]);
+
+export const isDecimalUnit = (unit: string): unit is DecimalUnit =>
+  decimalUnitsOrdered.includes(DecimalUnit[unit]);
+
+const isQuantityUnit = (unit: string): unit is QuantityUnit =>
+  isBinaryUnit(unit) || isDecimalUnit(unit);
+
+/**
+ * Converts a quantity string to a Quantity object.
+ * @param quantityString - The quantity string to convert, must be in a {@link https://github.com/kubevirt/kubevirt/blob/205d9455db56d5fcd42fb331122cfef358f19a69/vendor/k8s.io/apimachinery/pkg/api/resource/quantity.go#L33 Kubernetes Quantity} format
+ * @param keepInitialUnit - Whether to keep the initial unit.
+ * @returns The Quantity object.
+ */
+export const toQuantity = (quantityString: string, keepInitialUnit = true): Quantity => {
+  const preferredUnit = keepInitialUnit ? extractUnitFromQuantityString(quantityString) : null;
+
+  if (isQuantityUnit(preferredUnit)) {
+    return {
+      unit: preferredUnit,
+      value: extractNumberFromQuantityString(quantityString),
+    };
+  }
+
+  // convert bytes or millibytes to a larger unit (if the corresponding value for that unit is >= 1)
+  // value CAN BE a floating point number
+  const { unit, value } = getHumanizedSize(quantityString, 'withoutB');
+
+  return { unit, value };
+};
+
+export const quantityToString = ({ unit, value }: Quantity) =>
+  `${value}${unit === 'B' ? '' : unit}`;
+
+/**
+ * Converts bytes to a larger unit (if the corresponding value for that unit is >= 1)
+ * @param value - The value to convert.
+ * @param base - The base to convert to.
+ * @returns The converted value and unit.
+ */
+const convertBytes = (value: number, base: 'BINARY' | 'DECIMAL') => {
+  if (value === 0) {
+    return { unitIndex: 0, value };
+  }
+
+  const divisor = base === 'BINARY' ? 1024 : 1000;
+  let index = 0;
+
+  while (value % divisor === 0) {
+    value /= divisor;
+    index++;
+  }
+
+  return { unitIndex: index, value };
+};
+
+/**
+ * Formats the quantity string that is in bytes format to a more simplified quantity string in integer + unit format (if the conversion to an integer is possible).
+ * e.g. '1024' to 1Ki or '1000000' to 1M
+ *
+ * @param quantityString string to format, must be in a {@link https://github.com/kubevirt/kubevirt/blob/205d9455db56d5fcd42fb331122cfef358f19a69/vendor/k8s.io/apimachinery/pkg/api/resource/quantity.go#L33 Kubernetes Quantity} format
+ * @returns formatted quantity string
+ */
+export const formatQuantityString = (quantityString: string) => {
+  if (isEmpty(quantityString)) {
+    return null;
+  }
+
+  const unit = extractUnitFromQuantityString(quantityString);
+
+  // special case when unit = 'm' can occur, e.g. if we create a PVC with floating point number like 0.2Gi (1/5 Gi) which can't be converted to bytes (power of 2 is not divisible by 5), 'm' then stands for milibytes
+  if (isQuantityUnit(unit) || unit === 'm') {
+    return quantityString;
+  }
+
+  if (!isEmpty(unit)) {
+    // ERROR: formatQuantityString helper called with quantityString argument which is not in Quantity format
+    return quantityString;
+  }
+
+  const bytes = Number(quantityString);
+  const { unitIndex: binaryUnitIndex, value: binaryValue } = convertBytes(bytes, 'BINARY');
+  const { unitIndex: decimalUnitIndex, value: decimalValue } = convertBytes(bytes, 'DECIMAL');
+
+  if (binaryUnitIndex >= decimalUnitIndex) {
+    return quantityToString({ unit: binaryUnitsOrdered[binaryUnitIndex], value: binaryValue });
+  }
+
+  return quantityToString({ unit: decimalUnitsOrdered[decimalUnitIndex], value: decimalValue });
 };

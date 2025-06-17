@@ -10,10 +10,7 @@ import React, {
 import { useDrawerContext } from '@catalog/templatescatalog/components/TemplatesCatalogDrawer/hooks/useDrawerContext';
 import { V1beta1DataVolumeSpec, V1ContainerDiskSource } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
-import {
-  getIsMinusDisabled,
-  getUnitFromSize,
-} from '@kubevirt-utils/components/CapacityInput/utils';
+import { getIsMinusDisabled } from '@kubevirt-utils/components/CapacityInput/utils';
 import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
@@ -82,8 +79,7 @@ export const SelectSource: FC<SelectSourceProps> = ({
     getTemplateVirtualMachineObject(originalTemplate),
   );
 
-  const currentSize = getUnitFromSize(volumeQuantity);
-  const minDiskValue = getMinDiskSize(templateDiskSize, currentSize);
+  const minDiskValue = getMinDiskSize(templateDiskSize, volumeQuantity);
   const isMinusDisabled = getIsMinusDisabled(minDiskValue, volumeQuantity);
 
   const pvcNameSelected = (selectedSource as V1beta1DataVolumeSpec)?.source?.pvc?.name;
