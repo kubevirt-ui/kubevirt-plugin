@@ -1,5 +1,5 @@
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { BinaryUnit } from '@kubevirt-utils/utils/units';
+import { BinaryUnit } from '@kubevirt-utils/utils/unitConstants';
 
 import BandwidthInput from '../compnents/BandwidthInput/BandwidthInput';
 import CompletionTimeout from '../compnents/CompletionTimeout/CompletionTimeout';

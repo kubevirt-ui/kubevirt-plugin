@@ -2,20 +2,20 @@ import React, { ChangeEvent, Dispatch, FC, SetStateAction, useCallback } from 'r
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { BinaryUnit, toIECUnit } from '@kubevirt-utils/utils/units';
+import { QuantityUnit } from '@kubevirt-utils/utils/unitConstants';
+import { BinaryUnit } from '@kubevirt-utils/utils/unitConstants';
+import { addByteSuffix } from '@kubevirt-utils/utils/units';
 import { NumberInput, SelectOption, Split, SplitItem } from '@patternfly/react-core';
-
-import { fromIECUnit } from '../../../MigrationPolicyEditModal/utils/utils';
 
 type BandwidthInputProps = {
   setState: Dispatch<
     SetStateAction<{
-      unit: BinaryUnit;
+      unit: QuantityUnit;
       value: number;
     }>
   >;
   state: {
-    unit: BinaryUnit;
+    unit: QuantityUnit;
     value: number;
   };
 };
@@ -26,8 +26,8 @@ const BandwidthInput: FC<BandwidthInputProps> = ({ setState, state }) => {
   const { t } = useKubevirtTranslation();
 
   const onSelectUnit = useCallback(
-    (_, newUnit: BinaryUnit) => {
-      setState((prev) => ({ ...prev, unit: fromIECUnit(newUnit) }));
+    (_, newUnit: QuantityUnit) => {
+      setState((prev) => ({ ...prev, unit: newUnit }));
     },
     [setState],
   );
@@ -52,11 +52,11 @@ const BandwidthInput: FC<BandwidthInputProps> = ({ setState, state }) => {
         <FormPFSelect
           onSelect={onSelectUnit}
           selected={state?.unit}
-          selectedLabel={toIECUnit(state?.unit)}
+          selectedLabel={addByteSuffix(state?.unit)}
         >
           {unitOptions.map((unitOption) => (
             <SelectOption key={unitOption} value={unitOption}>
-              {toIECUnit(unitOption)}
+              {addByteSuffix(unitOption)}
             </SelectOption>
           ))}
         </FormPFSelect>
