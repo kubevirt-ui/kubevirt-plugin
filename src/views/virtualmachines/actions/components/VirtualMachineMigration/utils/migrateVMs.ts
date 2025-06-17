@@ -1,5 +1,4 @@
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   DEFAULT_MIGRATION_NAMESPACE,
   MigMigration,
@@ -11,7 +10,7 @@ import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, k8sGet, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 
-const getEmptyMigPlan = (namespace: string): MigPlan => ({
+export const getEmptyMigPlan = (namespace: string): MigPlan => ({
   apiVersion: `${MigPlanModel.apiGroup}/${MigPlanModel.apiVersion}`,
   kind: MigPlanModel.kind,
   metadata: {
@@ -52,50 +51,50 @@ const getEmptyMigMigration = (migPlan: MigPlan): MigMigration => ({
 });
 
 export const migrateVMs = async (
-  vms: V1VirtualMachine[],
+  migPlan: MigPlan,
   namespacePVCs: IoK8sApiCoreV1PersistentVolumeClaim[],
   selectedPVCs: IoK8sApiCoreV1PersistentVolumeClaim[],
   destinationStorageClass: string,
 ) => {
-  const namespace = getNamespace(vms?.[0]);
-
-  const emptyMigPlan = getEmptyMigPlan(namespace);
-  await k8sCreate<MigPlan>({
-    data: emptyMigPlan,
-    model: MigPlanModel,
-  });
-
   const migPlanWithStatus = await k8sGet<MigPlan>({
     model: MigPlanModel,
-    name: getName(emptyMigPlan),
-    ns: getNamespace(emptyMigPlan),
+    name: getName(migPlan),
+    ns: getNamespace(migPlan),
   });
 
-  const persistentVolumes = namespacePVCs.map((pvc) => ({
-    capacity: pvc.status.capacity?.storage,
-    name: pvc.spec.volumeName,
-    proposedCapacity: '0',
-    pvc: {
-      accessModes: ['Auto'],
-      hasReference: true,
-      name: getName(pvc),
-      namespace: getNamespace(pvc),
-      ownerType: 'VirtualMachine',
-      volumeMode: 'Auto',
-    },
-    selection: {
-      action: selectedPVCs.find((selectedPVC) => getName(selectedPVC) === getName(pvc))
-        ? 'copy'
-        : 'skip',
-      copyMethod: 'block',
-      storageClass: destinationStorageClass,
-    },
-    storageClass: pvc.spec.storageClassName,
-    supported: {
-      actions: ['skip', 'copy'],
-      copyMethods: ['filesystem', 'block', 'snapshot'],
-    },
-  }));
+  const suffix = migPlanWithStatus.status?.suffix || getRandomChars();
+
+  const persistentVolumes = namespacePVCs.map((pvc) => {
+    const pvcOriginalName = getName(pvc);
+
+    const pvcNewName = `${pvcOriginalName.replace(/-mig-[\d\w]+/, '')}-mig-${suffix}`;
+
+    return {
+      capacity: pvc.status.capacity?.storage,
+      name: pvc.spec.volumeName,
+      proposedCapacity: '0',
+      pvc: {
+        accessModes: ['Auto'],
+        hasReference: true,
+        name: `${pvcOriginalName}:${pvcNewName}`,
+        namespace: getNamespace(pvc),
+        ownerType: 'VirtualMachine',
+        volumeMode: 'Auto',
+      },
+      selection: {
+        action: selectedPVCs.find((selectedPVC) => getName(selectedPVC) === pvcOriginalName)
+          ? 'copy'
+          : 'skip',
+        copyMethod: 'block',
+        storageClass: destinationStorageClass,
+      },
+      storageClass: pvc.spec.storageClassName,
+      supported: {
+        actions: ['skip', 'copy'],
+        copyMethods: ['filesystem', 'block', 'snapshot'],
+      },
+    };
+  });
 
   await k8sPatch<MigPlan>({
     data: [{ op: 'replace', path: '/spec/persistentVolumes', value: persistentVolumes }],
