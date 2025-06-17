@@ -4,7 +4,6 @@ import Timeoutable = Cypress.Timeoutable;
 import Withinable = Cypress.Withinable;
 import Shadow = Cypress.Shadow;
 import { MINUTE, SECOND } from '../utils/const/index';
-import { Perspective, switchPerspective } from '../views/perspective';
 
 export {};
 declare global {
@@ -31,7 +30,6 @@ declare global {
       clickSaveBtn(): void;
       clickSearchBtn(): void;
       clickVirtLink(path: string): void;
-      switchToVirt(): void;
     }
   }
 }
@@ -94,10 +92,6 @@ Cypress.Commands.add('clickSearchBtn', () => {
   cy.contains('button[type="button"].pf-m-primary', 'Search').click({ force: true });
 });
 Cypress.Commands.add('clickApplyBtn', () => cy.contains('button[type="button"]', 'Apply').click());
-
-Cypress.Commands.add('switchToVirt', () => {
-  switchPerspective(Perspective.Virtualization);
-});
 
 Cypress.Commands.add('checkTitle', (title: string, timeout?: number) => {
   const t_o = timeout ? timeout : 3 * MINUTE;

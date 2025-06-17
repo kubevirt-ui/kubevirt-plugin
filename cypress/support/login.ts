@@ -28,7 +28,6 @@ Cypress.Commands.add('login', (provider: string, username: string, password: str
 
     cy.get('[data-test-id=login]', { timeout: 5 * MINUTE }).should('be.visible');
     const idp = provider || KUBEADMIN_IDP;
-    cy.task('log', `  Logging in as ${username || KUBEADMIN_USERNAME}`);
     cy.byLegacyTestID('login').should('be.visible');
     cy.get('body').then(($body) => {
       if ($body.text().includes(idp)) {
@@ -45,6 +44,9 @@ Cypress.Commands.add('login', (provider: string, username: string, password: str
       }
     });
     cy.byTestID('user-dropdown-toggle', { timeout: 5 * MINUTE }).should('be.visible');
+    cy.exec('oc whoami').then((result) => {
+      cy.task('log', ` Logged in as: [${result.stdout}]`);
+    });
   });
 });
 

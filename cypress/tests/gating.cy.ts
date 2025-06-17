@@ -1,9 +1,8 @@
-import './gating/a-setup.cy.ts';
-import './gating/a-shared-vm.cy.ts';
+import './setup/setup.cy.ts';
+import './setup/shared-vm.cy.ts';
 import './gating/vm-adv-search.cy.ts';
 import './gating/check-tab-yaml.cy.ts';
 import './gating/catalog-filter.cy.ts';
-//import './gating/catalog-create.cy.ts';
 import './gating/template-list.cy.ts';
 import './gating/overview-tab.cy.ts';
 import './gating/top-consumers-tab.cy.ts';

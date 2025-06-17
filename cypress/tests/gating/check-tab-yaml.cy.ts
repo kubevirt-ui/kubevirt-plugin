@@ -182,6 +182,7 @@ describe('Check all virtualization pages can be loaded', () => {
 
     it('create VirtualMachineInstanceType from YAML', () => {
       cy.contains('span.pf-v6-c-tabs__item-text', userButtonTxt).click();
+      cy.switchProject(TEST_NS);
       cy.get(sel.itemCreateBtn).click();
       cy.get(sel.saveBtn).click();
       cy.get(sel.breadcrumb).click();
@@ -206,6 +207,7 @@ describe('Check all virtualization pages can be loaded', () => {
 
     it('create VirtualMachinePreference from YAML', () => {
       cy.contains('span.pf-v6-c-tabs__item-text', userButtonTxt).click();
+      cy.switchProject(TEST_NS);
       cy.get(sel.itemCreateBtn).click();
       cy.get(sel.saveBtn).click();
       cy.get(sel.breadcrumb).click();
@@ -221,6 +223,8 @@ describe('Check all virtualization pages can be loaded', () => {
     });
 
     it('create bootable volume from YAML', () => {
+      cy.switchProject(TEST_NS);
+      cy.wait(3000);
       cy.get(sel.itemCreateBtn).click();
       cy.byButtonText(YAML).click();
       cy.get(sel.saveBtn).click();
