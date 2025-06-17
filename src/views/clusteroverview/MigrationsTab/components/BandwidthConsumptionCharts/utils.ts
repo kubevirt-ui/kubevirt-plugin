@@ -7,7 +7,7 @@ import {
 } from '@kubevirt-utils/components/Timestamp/utils/datetime';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { MILLISECONDS_TO_SECONDS_MULTIPLIER } from '@kubevirt-utils/resources/vm/utils/constants';
-import { multipliers } from '@kubevirt-utils/utils/units';
+import { multipliers } from '@kubevirt-utils/utils/unitConstants';
 import { PrometheusValue } from '@openshift-console/dynamic-plugin-sdk';
 
 import { ChartDataObject, GRID_LINES } from './constants';
