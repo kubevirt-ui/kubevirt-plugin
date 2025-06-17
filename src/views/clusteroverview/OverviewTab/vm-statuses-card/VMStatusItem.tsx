@@ -1,9 +1,7 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom-v5-compat';
 
-import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
-import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
-import { isAllNamespaces } from '@kubevirt-utils/utils/utils';
+import { getVMListPathWithRowFilters } from '@kubevirt-utils/resources/vm/utils/utils';
 import { GridItem } from '@patternfly/react-core';
 
 import { vmStatusIcon } from './utils/utils';
@@ -24,9 +22,7 @@ const VMStatusItem: React.FC<VMStatusItemProps> = ({
   status,
 }) => {
   const Icon = vmStatusIcon[status];
-  const path = `/k8s/${
-    isAllNamespaces(namespace) ? ALL_NAMESPACES : `ns/${namespace}`
-  }/${VirtualMachineModelRef}?rowFilter-status=${status}`;
+  const path = getVMListPathWithRowFilters(namespace, { status });
 
   return (
     <GridItem className="vm-statuses-card__grid-item" span={3}>

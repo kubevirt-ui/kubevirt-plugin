@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom-v5-compat';
 
-import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
+import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
+import { getVMListPathWithRowFilters } from '@kubevirt-utils/resources/vm/utils/utils';
 
 import { getVMStatusIcon } from '../utils';
 
@@ -14,7 +15,7 @@ export type VMStatusInventoryItemProps = {
 
 const VMStatusInventoryItem: React.FC<VMStatusInventoryItemProps> = ({ count, status }) => {
   const Icon = getVMStatusIcon(status);
-  const to = `/k8s/all-namespaces/${VirtualMachineModelRef}?rowFilter-status=${status}`;
+  const to = getVMListPathWithRowFilters(ALL_NAMESPACES, { status });
 
   return (
     <div className="co-inventory-card__status">

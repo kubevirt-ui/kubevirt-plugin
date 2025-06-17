@@ -7,6 +7,7 @@ import {
   LABEL_USED_TEMPLATE_NAME,
   LABEL_USED_TEMPLATE_NAMESPACE,
 } from '@kubevirt-utils/resources/template';
+import { getVMListPathWithRowFilters } from '@kubevirt-utils/resources/vm/utils/utils';
 
 import { RunningVMsChartLegendLabelItem } from '../RunningVMsChartLegendLabel';
 
@@ -108,4 +109,14 @@ export const vmsPerResourceCount = (resourceToVMCountMap): number =>
 export const getFilterKey = (resourceItem: RunningVMsChartLegendLabelItem) => {
   if (resourceItem.type === UNCATEGORIZED_VM) return null;
   return resourceItem.isInstanceType ? INSTANCETYPE_FILTER_KEY : TEMPLATE_FILTER_KEY;
+};
+
+export const getLinkPath = (resourceItem: RunningVMsChartLegendLabelItem, namespace: string) => {
+  const filterKey = getFilterKey(resourceItem);
+  const filters =
+    resourceItem?.type === UNCATEGORIZED_VM
+      ? { instanceType: 'No+InstanceType', template: 'None' }
+      : { [filterKey]: getInstanceTypePrefix(resourceItem.name) };
+
+  return getVMListPathWithRowFilters(namespace, filters);
 };
