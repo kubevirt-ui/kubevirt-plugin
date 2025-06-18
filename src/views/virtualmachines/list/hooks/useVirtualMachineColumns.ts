@@ -22,6 +22,7 @@ import {
   sortByNode,
   sortByStorageclassName,
 } from './sortColumns';
+import useACMHeaders from './useACMHeaders';
 
 const useVirtualMachineColumns = (
   namespace: string,
@@ -57,6 +58,8 @@ const useVirtualMachineColumns = (
     (direction, compareFunction) => compareFunction(data, direction, pagination, pvcMapper),
     [data, pagination, pvcMapper],
   );
+
+  const acmHeaders = useACMHeaders();
 
   const columns: TableColumn<K8sResourceCommon>[] = useMemo(
     () => [
@@ -149,6 +152,7 @@ const useVirtualMachineColumns = (
         title: t('Storage class'),
         transforms: [sortable],
       },
+      ...acmHeaders,
       {
         id: '',
         props: { className: 'pf-v6-c-table__action' },
@@ -163,6 +167,7 @@ const useVirtualMachineColumns = (
       sortingUsingFunctionWithMapper,
       sortingUsingFunctionWithPVCMapper,
       t,
+      acmHeaders,
     ],
   );
 

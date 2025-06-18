@@ -32,6 +32,7 @@ export function buildACMVirtualMachineActionsFromExtensions(
   virtualMachine: V1VirtualMachine,
   actionExtensions: ResolvedExtension<ACMVirtualMachineActionExtension>[],
   createModal: (modal: ModalComponent) => void,
+  hubClusterName: string,
 ): ActionDropdownItemType[] {
   if (!actionExtensions?.length) return [];
 
@@ -42,7 +43,7 @@ export function buildACMVirtualMachineActionsFromExtensions(
         createModal(({ isOpen, onClose }) => (
           <ModalComp
             close={onClose}
-            cluster={virtualMachine.cluster}
+            cluster={virtualMachine?.cluster || hubClusterName}
             isOpen={isOpen}
             resource={virtualMachine}
           />

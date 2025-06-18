@@ -12,14 +12,12 @@ import {
 import useAllClusters from '@kubevirt-utils/hooks/useAllClusters/useAllClusters';
 import { TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
-import useHubCluster from '@kubevirt-utils/hooks/useHubCluster/useHubCluster';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import useMemoizedParams from '@kubevirt-utils/hooks/useMemoizedParams';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
-import { getName } from '@kubevirt-utils/resources/shared';
 import { useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
 import { TreeViewDataItem } from '@patternfly/react-core';
-import { useFleetK8sWatchResource } from '@stolostron/multicluster-sdk';
+import { useFleetK8sWatchResource, useHubClusterName } from '@stolostron/multicluster-sdk';
 import { getLatestMigrationForEachVM, OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 
 import { vmimMapperSignal, vmsSignal } from '../utils/signals';
@@ -38,11 +36,11 @@ export const useTreeViewData = (): UseTreeViewData => {
 
   const params = useMemoizedParams<{ cluster: string }>();
 
-  const [hubCluster] = useHubCluster();
+  const hubClusterName = useHubClusterName();
 
   const [clusters] = useAllClusters();
 
-  const cluster = params.cluster || getName(hubCluster);
+  const cluster = params.cluster || hubClusterName;
 
   const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
   const [projectNames, projectNamesLoaded, projectNamesError] = useProjects(cluster);
