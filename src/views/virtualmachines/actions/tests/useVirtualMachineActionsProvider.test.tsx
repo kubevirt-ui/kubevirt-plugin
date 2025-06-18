@@ -12,6 +12,7 @@ jest.mock('@openshift-console/dynamic-plugin-sdk', () => ({
   useFlag: jest.fn(() => true),
   useK8sModel: jest.fn(() => [[], true]),
   useK8sWatchResource: jest.fn(() => [[], true]),
+  useResolvedExtensions: jest.fn(() => [[], true, undefined]),
 }));
 afterEach(cleanup);
 

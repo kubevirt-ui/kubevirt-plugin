@@ -5,6 +5,7 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
 import { columnSorting } from '@kubevirt-utils/utils/utils';
+import useACMExtensionsHeaders from '@multicluster/hooks/useACMExtensionsHeaders';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import {
   K8sResourceCommon,
@@ -60,6 +61,8 @@ const useVirtualMachineColumns = (
     (direction, compareFunction) => compareFunction(data, direction, pagination, pvcMapper),
     [data, pagination, pvcMapper],
   );
+
+  const acmHeaders = useACMExtensionsHeaders();
 
   const columns: TableColumn<K8sResourceCommon>[] = useMemo(
     () => [
@@ -162,6 +165,7 @@ const useVirtualMachineColumns = (
         title: t('Storage class'),
         transforms: [sortable],
       },
+      ...acmHeaders,
       {
         id: '',
         props: { className: 'pf-v6-c-table__action' },
@@ -176,6 +180,7 @@ const useVirtualMachineColumns = (
       sortingUsingFunctionWithMapper,
       sortingUsingFunctionWithPVCMapper,
       t,
+      acmHeaders,
     ],
   );
 

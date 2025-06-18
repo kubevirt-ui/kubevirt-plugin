@@ -13,6 +13,7 @@ import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import ACMExtentionsTableData from '@multicluster/components/ACMExtentionsTableData';
 import { ManagedClusterModel } from '@multicluster/constants';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
@@ -64,6 +65,7 @@ const VirtualMachineRowLayout: FC<
   );
 
   const [actions] = useVirtualMachineActionsProvider(obj, vmim);
+
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} className="selection-column vm-column" id="">
@@ -128,6 +130,7 @@ const VirtualMachineRowLayout: FC<
               />
             ))}
       </TableData>
+      <ACMExtentionsTableData activeColumnIDs={activeColumnIDs} vm={obj} />
       <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="">
         <VirtualMachineActions actions={actions} data-test="row-action" isKebabToggle />
       </TableData>
