@@ -28,6 +28,7 @@ import { VMStatusConditionLabelList } from '../VMStatusConditionLabel';
 import CPUPercentage from './components/CPUPercentage';
 import MemoryPercentage from './components/MemoryPercentage';
 import NetworkUsage from './components/NetworkUsage';
+import useACMTableData from './hooks/useACMTableData';
 
 import './virtual-machine-row-layout.scss';
 
@@ -62,6 +63,8 @@ const VirtualMachineRowLayout: FC<
   );
 
   const [actions] = useVirtualMachineActionsProvider(obj, vmim);
+
+  const [acmTableData] = useACMTableData(obj, activeColumnIDs);
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} className="selection-column vm-column" id="">
@@ -120,6 +123,7 @@ const VirtualMachineRowLayout: FC<
               />
             ))}
       </TableData>
+      {acmTableData}
       <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="">
         <VirtualMachineActions actions={actions} isKebabToggle />
       </TableData>
