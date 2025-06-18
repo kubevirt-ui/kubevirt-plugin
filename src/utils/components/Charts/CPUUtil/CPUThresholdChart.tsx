@@ -17,7 +17,7 @@ import {
 import chart_color_black_200 from '@patternfly/react-tokens/dist/esm/chart_color_black_200';
 import chart_color_blue_300 from '@patternfly/react-tokens/dist/esm/chart_color_blue_300';
 import chart_color_orange_300 from '@patternfly/react-tokens/dist/esm/chart_color_orange_300';
-import { useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';
+import { useFleetPrometheusPoll, useHubClusterName } from '@stolostron/multicluster-sdk';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
 import { tickLabels } from '../ChartLabels/styleOverrides';
@@ -43,9 +43,18 @@ const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ pods, vmi }) => {
   const vmiPod = useMemo(() => getVMIPod(vmi, pods), [pods, vmi]);
   const { currentTime, duration, timespan } = useDuration();
   const { height, ref, width } = useResponsiveCharts();
+
+  const hubClusterName = useHubClusterName();
+
   const queries = useMemo(
-    () => getUtilizationQueries({ duration, launcherPodName: vmiPod?.metadata?.name, obj: vmi }),
-    [vmi, vmiPod, duration],
+    () =>
+      getUtilizationQueries({
+        duration,
+        hubClusterName,
+        launcherPodName: vmiPod?.metadata?.name,
+        obj: vmi,
+      }),
+    [vmi, vmiPod, duration, hubClusterName],
   );
 
   const [dataCPURequested] = useFleetPrometheusPoll({

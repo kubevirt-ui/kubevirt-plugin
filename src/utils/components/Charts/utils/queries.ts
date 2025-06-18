@@ -1,3 +1,5 @@
+import { isEmpty } from '@kubevirt-utils/utils/utils';
+
 enum VMQueries {
   CPU_REQUESTED = 'CPU_REQUESTED',
   CPU_USAGE = 'CPU_USAGE',
@@ -22,23 +24,32 @@ enum VMQueries {
 
 type UtilizationQueriesArgs = {
   duration?: string;
+  hubClusterName?: string;
   launcherPodName?: string;
   nic?: string;
   obj: K8sResourceCommon;
 };
 
-type GetUtilizationQueries = ({ duration, launcherPodName, nic, obj }: UtilizationQueriesArgs) => {
+type GetUtilizationQueries = ({
+  duration,
+  hubClusterName,
+  launcherPodName,
+  nic,
+  obj,
+}: UtilizationQueriesArgs) => {
   [key in VMQueries]: string;
 };
 
 export const getUtilizationQueries: GetUtilizationQueries = ({
   duration,
+  hubClusterName,
   launcherPodName,
   obj,
 }) => {
   const { name, namespace } = obj?.metadata || {};
 
-  const clusterFilter = obj?.cluster ? `,cluster='${obj.cluster}'` : '';
+  const clusterFilter =
+    !isEmpty(obj?.cluster) && obj?.cluster === hubClusterName ? `,cluster='${obj.cluster}'` : '';
   return {
     [VMQueries.CPU_REQUESTED]: `sum(kube_pod_resource_request{resource='cpu'${clusterFilter},pod='${launcherPodName}',namespace='${namespace}'}) BY (name, namespace, cluster)`,
     [VMQueries.CPU_USAGE]: `sum(rate(kubevirt_vmi_cpu_usage_seconds_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}])) BY (name, namespace, cluster)`,

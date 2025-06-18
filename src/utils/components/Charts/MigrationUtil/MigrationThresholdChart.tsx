@@ -16,7 +16,7 @@ import chart_color_black_200 from '@patternfly/react-tokens/dist/esm/chart_color
 import chart_color_blue_300 from '@patternfly/react-tokens/dist/esm/chart_color_blue_300';
 import chart_color_green_300 from '@patternfly/react-tokens/dist/esm/chart_color_green_300';
 import chart_color_orange_300 from '@patternfly/react-tokens/dist/esm/chart_color_orange_300';
-import { useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';
+import { useFleetPrometheusPoll, useHubClusterName } from '@stolostron/multicluster-sdk';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
 import { tickLabels } from '../ChartLabels/styleOverrides';
@@ -42,7 +42,12 @@ type MigrationThresholdChartProps = {
 const MigrationThresholdChart: React.FC<MigrationThresholdChartProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
   const { currentTime, duration, timespan } = useDuration();
-  const queries = useMemo(() => getUtilizationQueries({ duration, obj: vmi }), [vmi, duration]);
+  const hubClusterName = useHubClusterName();
+
+  const queries = useMemo(
+    () => getUtilizationQueries({ duration, hubClusterName, obj: vmi }),
+    [vmi, duration, hubClusterName],
+  );
   const { height, ref, width } = useResponsiveCharts();
 
   const [migrationDataProcessed] = useFleetPrometheusPoll({

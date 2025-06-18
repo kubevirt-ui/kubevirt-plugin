@@ -5,7 +5,11 @@ import { IoK8sApiCoreV1Pod } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { modelToGroupVersionKind, PodModel } from '@kubevirt-utils/models';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
-import { useFleetK8sWatchResource, useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';
+import {
+  useFleetK8sWatchResource,
+  useFleetPrometheusPoll,
+  useHubClusterName,
+} from '@stolostron/multicluster-sdk';
 
 import { setVMCPURequested, setVMCPUUsage, setVMMemoryUsage, setVMNetworkUsage } from '../metrics';
 
@@ -16,6 +20,7 @@ const useVMMetrics = () => {
   const { cluster, ns: namespace } = useParams<{ cluster?: string; ns?: string }>();
 
   const currentTime = useMemo<number>(() => Date.now(), []);
+  const hubClusterName = useHubClusterName();
 
   const [pods] = useFleetK8sWatchResource<IoK8sApiCoreV1Pod[]>({
     cluster,
@@ -26,7 +31,10 @@ const useVMMetrics = () => {
 
   const launcherNameToVMName = useMemo(() => getVMNamesFromPodsNames(pods), [pods]);
 
-  const queries = useMemo(() => getVMListQueries(namespace, cluster), [namespace, cluster]);
+  const queries = useMemo(
+    () => getVMListQueries(namespace, cluster === hubClusterName ? undefined : cluster),
+    [namespace, hubClusterName, cluster],
+  );
 
   const [memoryUsageResponse] = useFleetPrometheusPoll({
     cluster,

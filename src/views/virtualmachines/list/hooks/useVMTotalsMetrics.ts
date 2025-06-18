@@ -5,7 +5,7 @@ import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevir
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import { METRICS } from '@overview/OverviewTab/metric-charts-card/utils/constants';
-import { useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';
+import { useFleetPrometheusPoll, useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import { getCpuText, getMemoryCapacityText, getMetricText } from '../utils/processVMTotalsMetrics';
 import { getVMTotalsQueries, VMTotalsQueries } from '../utils/totalsQueries';
@@ -13,13 +13,20 @@ import { getVMTotalsQueries, VMTotalsQueries } from '../utils/totalsQueries';
 const useVMTotalsMetrics = (vms: V1VirtualMachine[], vmis: V1VirtualMachineInstance[]) => {
   const { cluster, ns: namespace } = useParams<{ cluster?: string; ns?: string }>();
 
+  const hubClusterName = useHubClusterName();
+
   const currentTime = useMemo<number>(() => Date.now(), []);
 
   const namespacesList = useMemo(() => [...new Set(vms.map((vm) => getNamespace(vm)))], [vms]);
 
   const queries = useMemo(
-    () => getVMTotalsQueries(namespace, namespacesList, cluster),
-    [namespace, namespacesList],
+    () =>
+      getVMTotalsQueries(
+        namespace,
+        namespacesList,
+        cluster === hubClusterName ? undefined : cluster,
+      ),
+    [namespace, namespacesList, cluster, hubClusterName],
   );
 
   const prometheusPollProps = {

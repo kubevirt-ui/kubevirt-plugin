@@ -17,7 +17,7 @@ import {
 import chart_color_black_200 from '@patternfly/react-tokens/dist/esm/chart_color_black_200';
 import chart_color_blue_300 from '@patternfly/react-tokens/dist/esm/chart_color_blue_300';
 import chart_color_orange_300 from '@patternfly/react-tokens/dist/esm/chart_color_orange_300';
-import { useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';
+import { useFleetPrometheusPoll, useHubClusterName } from '@stolostron/multicluster-sdk';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
 import ComponentReady from '../ComponentReady/ComponentReady';
@@ -42,9 +42,10 @@ const StorageTotalReadWriteThresholdChart: React.FC<StorageTotalReadWriteThresho
   vmi,
 }) => {
   const { currentTime, duration, timespan } = useDuration();
+  const hubClusterName = useHubClusterName();
   const queries = React.useMemo(
-    () => getUtilizationQueries({ duration, obj: vmi }),
-    [vmi, duration],
+    () => getUtilizationQueries({ duration, hubClusterName, obj: vmi }),
+    [vmi, duration, hubClusterName],
   );
 
   const { height, ref, width } = useResponsiveCharts();

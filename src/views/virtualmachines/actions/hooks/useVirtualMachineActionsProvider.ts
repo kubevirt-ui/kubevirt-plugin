@@ -16,6 +16,7 @@ import { useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 import { printableVMStatus } from '../../utils';
 import { VirtualMachineActionFactory } from '../VirtualMachineActionFactory';
 
+import useACMExtensionActions from './useACMExtensionActions';
 import useIsMTCInstalled from './useIsMTCInstalled';
 import useCurrentStorageMigration from './useStorageMigrations';
 
@@ -29,6 +30,8 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
   const { featureEnabled: confirmVMActionsEnabled } = useFeatures(CONFIRM_VM_ACTIONS);
 
   const virtctlCommand = getConsoleVirtctlCommand(vm);
+
+  const acmVirtualMachineActions = useACMExtensionActions(vm);
 
   const mtcInstalled = useIsMTCInstalled();
   const [currentStorageMigration, currentStorageMigrationLoaded] = useCurrentStorageMigration(vm);
@@ -87,6 +90,8 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
       VirtualMachineActionFactory.copySSHCommand(vm, virtctlCommand),
       treeViewFoldersEnabled && VirtualMachineActionFactory.moveToFolder(vm, createModal),
       VirtualMachineActionFactory.delete(vm, createModal),
+
+      ...acmVirtualMachineActions,
     ].filter(Boolean);
   }, [
     vm,
@@ -97,6 +102,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
     virtctlCommand,
     treeViewFoldersEnabled,
     mtcInstalled,
+    acmVirtualMachineActions,
   ]);
 
   return useMemo(

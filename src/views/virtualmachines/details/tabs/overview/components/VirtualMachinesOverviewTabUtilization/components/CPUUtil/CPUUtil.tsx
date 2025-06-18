@@ -10,7 +10,7 @@ import { getVMIPod } from '@kubevirt-utils/resources/vmi';
 import { humanizeCpuCores } from '@kubevirt-utils/utils/humanize.js';
 import { K8sResourceCommon, PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import { ChartDonutUtilization } from '@patternfly/react-charts/victory';
-import { useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';
+import { useFleetPrometheusPoll, useHubClusterName } from '@stolostron/multicluster-sdk';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
 type CPUUtilProps = {
@@ -21,10 +21,17 @@ type CPUUtilProps = {
 const CPUUtil: FC<CPUUtilProps> = ({ pods, vmi }) => {
   const { t } = useKubevirtTranslation();
   const vmiPod = useMemo(() => getVMIPod(vmi, pods), [pods, vmi]);
+  const hubClusterName = useHubClusterName();
   const { currentTime, duration } = useDuration();
   const queries = useMemo(
-    () => getUtilizationQueries({ duration, launcherPodName: vmiPod?.metadata?.name, obj: vmi }),
-    [vmi, vmiPod, duration],
+    () =>
+      getUtilizationQueries({
+        duration,
+        hubClusterName,
+        launcherPodName: vmiPod?.metadata?.name,
+        obj: vmi,
+      }),
+    [vmi, vmiPod, duration, hubClusterName],
   );
 
   const [dataCPURequested] = useFleetPrometheusPoll({

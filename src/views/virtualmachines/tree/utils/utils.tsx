@@ -261,6 +261,7 @@ export const createTreeViewData = (
                 hasBadge: false,
                 icon: <Spinner size="sm" />,
                 id: 'loading',
+                name: 'loading',
               } as TreeViewDataItemWithHref,
             ],
       defaultExpanded: selectedCluster === clusterName,

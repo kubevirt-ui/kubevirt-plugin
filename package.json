@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@apollo/client": "^3.13.8",
     "@novnc/novnc": "^1.5.0",
     "@patternfly/quickstarts": "6.1.0",
     "@patternfly/react-catalog-view-extension": "^6.1.0",
@@ -25,6 +26,7 @@
     "file-saver": "^2.0.5",
     "fuzzysearch": "^1.0.3",
     "global": "^4.4.0",
+    "graphql": "^16.11.0",
     "immer": "^9.0.12",
     "js-abbreviation-number": "^1.4.0",
     "js-yaml": "^4.1.0",

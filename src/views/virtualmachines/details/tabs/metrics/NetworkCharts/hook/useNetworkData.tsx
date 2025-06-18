@@ -8,7 +8,7 @@ import {
   queriesToLink,
 } from '@kubevirt-utils/components/Charts/utils/utils';
 import { PrometheusEndpoint, PrometheusResult } from '@openshift-console/dynamic-plugin-sdk';
-import { useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';
+import { useFleetPrometheusPoll, useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import useDuration from '../../hooks/useDuration';
 import { ALL_NETWORKS } from '../../utils/constants';
@@ -27,9 +27,10 @@ type UseNetworkData = (
 
 const useNetworkData: UseNetworkData = (vmi, nic) => {
   const { currentTime, duration, timespan } = useDuration();
+  const hubClusterName = useHubClusterName();
   const queries = useMemo(
-    () => getUtilizationQueries({ duration, nic, obj: vmi }),
-    [vmi, duration, nic],
+    () => getUtilizationQueries({ duration, hubClusterName, nic, obj: vmi }),
+    [vmi, duration, nic, hubClusterName],
   );
   const isAllNetwork = nic === ALL_NETWORKS;
 
