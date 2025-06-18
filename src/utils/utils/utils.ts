@@ -17,8 +17,14 @@ export const kubevirtConsole = console;
 
 export const clusterBasePath = k8sBasePath.slice(0, k8sBasePath.lastIndexOf('api/kubernetes'));
 
+export const isAllNamespaces = (namespace: string) =>
+  !namespace || namespace === ALL_NAMESPACES || namespace === ALL_NAMESPACES_SESSION_KEY;
+
 export const getValidNamespace = (activeNamespace: string) =>
   activeNamespace === ALL_NAMESPACES_SESSION_KEY ? DEFAULT_NAMESPACE : activeNamespace;
+
+export const getNamespacePathSegment = (namespace: string) =>
+  isAllNamespaces(namespace) ? ALL_NAMESPACES : `ns/${namespace}`;
 
 export const isEmpty = (obj) =>
   [Array, Object].includes((obj || {}).constructor) && !Object.entries(obj || {}).length;
@@ -171,9 +177,6 @@ export const appendDockerPrefix = (image: string) => {
   return image?.startsWith(DOCKER_PREFIX) ? image : DOCKER_PREFIX.concat(image);
 };
 export const removeDockerPrefix = (image: string) => image?.replace(DOCKER_PREFIX, '');
-
-export const isAllNamespaces = (namespace: string) =>
-  !namespace || namespace === ALL_NAMESPACES || namespace === ALL_NAMESPACES_SESSION_KEY;
 
 /**
  * Compares all types by converting them to string.
