@@ -685,6 +685,7 @@
   "Learn more about supported formats": "Learn more about supported formats",
   "Learn more about templates": "Learn more about templates",
   "Learn more about working with projects": "Learn more about working with projects",
+  "less than": "less than",
   "Limitations": "Limitations",
   "Linux only": "Linux only",
   "Live migratable": "Live migratable",
@@ -791,6 +792,7 @@
   "Namespace": "Namespace",
   "Namespace defines the space within which each name must be unique. An empty namespace is equivalent to the \"default\" namespace, but \"default\" is the canonical representation. Not all objects are required to be scoped to a namespace - the value of this field for those objects will be empty. Must be a DNS_LABEL. Cannot be updated. ": "Namespace defines the space within which each name must be unique. An empty namespace is equivalent to the \"default\" namespace, but \"default\" is the canonical representation. Not all objects are required to be scoped to a namespace - the value of this field for those objects will be empty. Must be a DNS_LABEL. Cannot be updated. ",
   "Namespace of the VirtualMachine": "Namespace of the VirtualMachine",
+  "negative": "negative",
   "Network": "Network",
   "Network ({{count}})_one": "Network ({{count}})",
   "Network ({{count}})_other": "Network ({{count}})",
@@ -1160,7 +1162,7 @@
   "Show VirtualMachine per Templates": "Show VirtualMachine per Templates",
   "Single user (RWO)": "Single user (RWO)",
   "Size": "Size",
-  "Size cannot be {{errorValue}}": "Size cannot be {{errorValue}}",
+  "Size cannot be": "Size cannot be",
   "Small scale consumption, recommended for using the graphical console": "Small scale consumption, recommended for using the graphical console",
   "Snapshots": "Snapshots",
   "Snapshots ({{snapshots}})": "Snapshots ({{snapshots}})",
@@ -1530,5 +1532,6 @@
   "You don't have access to this section due to cluster policy.": "You don't have access to this section due to cluster policy.",
   "You don't have permission to perform this action": "You don't have permission to perform this action",
   "You must ensure that the configuration is correct before starting the VirtualMachine.": "You must ensure that the configuration is correct before starting the VirtualMachine.",
-  "You're in view-only mode": "You're in view-only mode"
+  "You're in view-only mode": "You're in view-only mode",
+  "zero": "zero"
 }

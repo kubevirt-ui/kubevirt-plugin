@@ -1,3 +1,5 @@
+import { convertToBaseValue, humanizeBinaryBytes } from './humanize.js';
+
 export enum BinaryUnit {
   B = 'B',
   Gi = 'Gi',
@@ -66,4 +68,24 @@ export const readableSizeUnit = (combinedStr: string): string => {
 
   // if there isn't any specific value/size present, return the original string, for example for the dynamic disk size
   return !value ? combinedStr : `${value} ${toIECUnit(unit)}`;
+};
+
+const extractUnitFromQuantityString = (quantityString: string): null | string => {
+  const unitRegex = /[a-zA-Z]+$/; // Matches alphabetic characters at the end of the string
+  const match = quantityString.match(unitRegex);
+  return match ? match[0] : null;
+};
+
+export const toQuantity = (
+  quantityString: string,
+  keepDefaultUnit = true,
+): {
+  string: string;
+  unit: string;
+  value: number;
+} => {
+  const preferredUnit = keepDefaultUnit ? extractUnitFromQuantityString(quantityString) : null;
+
+  const baseValue = convertToBaseValue(quantityString);
+  return humanizeBinaryBytes(baseValue, null, toIECUnit(preferredUnit));
 };
