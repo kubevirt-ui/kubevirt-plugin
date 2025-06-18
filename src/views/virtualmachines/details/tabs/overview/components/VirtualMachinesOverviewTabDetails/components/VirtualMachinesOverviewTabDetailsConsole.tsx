@@ -1,8 +1,11 @@
 import React, { FC } from 'react';
+import { generatePath } from 'react-router-dom-v5-compat';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import VncConsole from '@kubevirt-utils/components/Consoles/components/vnc-console/VncConsole';
+import { FLEET_STANDALONE_CONSOLE_PATH } from '@kubevirt-utils/components/Consoles/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isHeadlessMode as isHeadlessModeVMI } from '@kubevirt-utils/resources/vm/utils/selectors';
 import { vmiStatuses } from '@kubevirt-utils/resources/vmi';
 import { useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
@@ -35,7 +38,13 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
         <Button
           onClick={() =>
             window.open(
-              `/k8s/ns/${vmi?.metadata?.namespace}/kubevirt.io~v1~VirtualMachine/${vmi?.metadata?.name}/console/standalone`,
+              vmi?.cluster
+                ? generatePath(FLEET_STANDALONE_CONSOLE_PATH, {
+                    cluster: vmi.cluster,
+                    name: getName(vmi),
+                    namespace: getNamespace(vmi),
+                  })
+                : `/k8s/ns/${vmi?.metadata?.namespace}/kubevirt.io~v1~VirtualMachine/${vmi?.metadata?.name}/console/standalone`,
             )
           }
           icon={<ExternalLinkAltIcon className="icon" />}

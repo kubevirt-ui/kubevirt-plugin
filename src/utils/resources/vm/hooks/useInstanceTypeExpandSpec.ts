@@ -7,9 +7,10 @@ import { isInstanceTypeVM } from '@kubevirt-utils/resources/instancetype/helper'
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { consoleFetch } from '@openshift-console/dynamic-plugin-sdk';
+import { useFleetK8sAPIPath } from '@stolostron/multicluster-sdk';
 
 type UseInstanceTypeExpandSpec = (
-  vm: V1VirtualMachine,
+  vm?: V1VirtualMachine,
 ) => [
   instanceTypeExpandedSpec: V1VirtualMachine,
   loadingExpandedSpec: boolean,
@@ -21,10 +22,15 @@ const useInstanceTypeExpandSpec: UseInstanceTypeExpandSpec = (vm) => {
   const [errorExpandedSpec, setErrorExpandedSpec] = useState<Error>();
   const isInstanceType = useMemo(() => isInstanceTypeVM(vm), [vm]);
   const innerVM = useDeepCompareMemoize(vm);
+  const [k8sAPIPath, k8sApiPathLoaded] = useFleetK8sAPIPath(vm?.cluster);
 
   useEffect(() => {
+    if (!k8sApiPathLoaded) {
+      return;
+    }
+
     const fetch = async () => {
-      const url = `api/kubernetes/apis/subresources.${VirtualMachineModel.apiGroup}/${
+      const url = `${k8sAPIPath}/apis/subresources.${VirtualMachineModel.apiGroup}/${
         VirtualMachineModel.apiVersion
       }/namespaces/${getNamespace(innerVM)}/${VirtualMachineModel.plural}/${getName(
         innerVM,
@@ -43,7 +49,7 @@ const useInstanceTypeExpandSpec: UseInstanceTypeExpandSpec = (vm) => {
       }
     };
     !isEmpty(innerVM) && isInstanceType && fetch();
-  }, [innerVM, isInstanceType]);
+  }, [innerVM, isInstanceType, k8sAPIPath, k8sApiPathLoaded]);
 
   return [instanceTypeExpandedSpec, loadingExpandedSpec, errorExpandedSpec];
 };

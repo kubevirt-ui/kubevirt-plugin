@@ -15,6 +15,7 @@ import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 import { Checkbox } from '@patternfly/react-core';
+import { FleetResourceLink } from '@stolostron/multicluster-sdk';
 import VirtualMachineActions from '@virtualmachines/actions/components/VirtualMachineActions/VirtualMachineActions';
 import useVirtualMachineActionsProvider from '@virtualmachines/actions/hooks/useVirtualMachineActionsProvider';
 import { getDeletionProtectionPrintableStatus } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
@@ -27,6 +28,7 @@ import { VMStatusConditionLabelList } from '../VMStatusConditionLabel';
 import CPUPercentage from './components/CPUPercentage';
 import MemoryPercentage from './components/MemoryPercentage';
 import NetworkUsage from './components/NetworkUsage';
+import useACMTableData from './hooks/useACMTableData';
 
 import './virtual-machine-row-layout.scss';
 
@@ -61,6 +63,8 @@ const VirtualMachineRowLayout: FC<
   );
 
   const [actions] = useVirtualMachineActionsProvider(obj, vmim);
+
+  const [acmTableData] = useACMTableData(obj, activeColumnIDs);
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} className="selection-column vm-column" id="">
@@ -71,7 +75,8 @@ const VirtualMachineRowLayout: FC<
         />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-20 vm-column" id="name">
-        <ResourceLink
+        <FleetResourceLink
+          cluster={obj?.cluster}
           groupVersionKind={VirtualMachineModelGroupVersionKind}
           name={vmName}
           namespace={vmNamespace}
@@ -118,6 +123,7 @@ const VirtualMachineRowLayout: FC<
               />
             ))}
       </TableData>
+      {acmTableData}
       <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="">
         <VirtualMachineActions actions={actions} isKebabToggle />
       </TableData>
