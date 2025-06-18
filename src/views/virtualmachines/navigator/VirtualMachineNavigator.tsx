@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useRef } from 'react';
+import React, { FC, memo, useMemo, useRef } from 'react';
 import { useLocation } from 'react-router-dom-v5-compat';
 
 import CreateResourceDefaultPage from '@kubevirt-utils/components/CreateResourceDefaultPage/CreateResourceDefaultPage';
@@ -24,12 +24,11 @@ import VirtualMachineTreeView from '@virtualmachines/tree/VirtualMachineTreeView
 
 import { defaultVMYamlTemplate } from '../../../templates';
 
-const VirtualMachineNavigator: FC = () => {
+const VirtualMachineNavigator: FC<{ activeNamespace: string }> = memo(({ activeNamespace }) => {
   useSignals();
   const { t } = useKubevirtTranslation();
   const vmListRef = useRef<{ onFilterChange: OnFilterChange } | null>(null);
   const location = useLocation();
-  const [activeNamespace] = useActiveNamespace();
   const namespace = activeNamespace === ALL_NAMESPACES_SESSION_KEY ? null : activeNamespace;
   const vmName = location.pathname.split('/')?.[5];
 
@@ -86,6 +85,11 @@ const VirtualMachineNavigator: FC = () => {
       </VirtualMachineTreeView>
     </>
   );
+});
+
+const VirtualMachineNavigatorWithNamespace: FC = () => {
+  const [activeNamespace] = useActiveNamespace();
+  return <VirtualMachineNavigator activeNamespace={activeNamespace} />;
 };
 
-export default VirtualMachineNavigator;
+export default VirtualMachineNavigatorWithNamespace;

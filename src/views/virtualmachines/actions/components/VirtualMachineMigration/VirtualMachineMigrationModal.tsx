@@ -126,7 +126,7 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
       variant="large"
     >
       <ModalBody>
-        <StateHandler error={loadingError || migPlanCreationError} loaded>
+        <StateHandler error={loadingError || migPlanCreationError} hasData loaded>
           {migrationStarted ? (
             <VirtualMachineMigrationStatus
               migMigration={migMigration}

@@ -29,13 +29,6 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
   const location = useLocation();
 
   const params = useParams();
-  const [memoParams, setMemoParams] = useState(params);
-
-  useEffect(() => {
-    setMemoParams((preParams) =>
-      JSON.stringify(params) !== JSON.stringify(preParams) ? params : preParams,
-    );
-  }, [params]);
 
   const dynamicPluginPages = useDynamicPages(VirtualMachineModel);
 
@@ -58,27 +51,24 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
 
   const [activeItem, setActiveItem] = useState<number | string>();
 
-  const RoutesComponents = useMemo(() => {
-    return allPages.map((page) => {
-      const Component = page.component;
-      return (
-        <Route
-          Component={(props) => (
-            <StateHandler error={error} loaded={loaded} withBullseye>
-              <Component
-                instanceTypeExpandedSpec={instanceTypeExpandedSpec}
-                obj={vm}
-                params={memoParams}
-                {...props}
-              />
-            </StateHandler>
-          )}
-          key={page.href}
-          path={page.href}
-        />
-      );
-    });
-  }, [allPages, vm, error, loaded, instanceTypeExpandedSpec, memoParams]);
+  const RoutesComponents = allPages.map((page) => {
+    const Component = page.component;
+    return (
+      <Route
+        element={
+          <StateHandler error={error} hasData={!!vm} loaded={loaded} withBullseye>
+            <Component
+              instanceTypeExpandedSpec={instanceTypeExpandedSpec}
+              obj={vm}
+              params={params}
+            />
+          </StateHandler>
+        }
+        key={page.href}
+        path={page.href}
+      />
+    );
+  });
 
   return (
     <>
