@@ -8,8 +8,15 @@ import Loading from '@kubevirt-utils/components/Loading/Loading';
 import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
 import useDefaultStorageClass from '@kubevirt-utils/hooks/useDefaultStorage/useDefaultStorageClass';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { modelToGroupVersionKind, PersistentVolumeClaimModel } from '@kubevirt-utils/models';
-import { MigPlanModel } from '@kubevirt-utils/resources/migrations/constants';
+import {
+  modelToGroupVersionKind,
+  modelToRef,
+  PersistentVolumeClaimModel,
+} from '@kubevirt-utils/models';
+import {
+  DEFAULT_MIGRATION_NAMESPACE,
+  MigPlanModel,
+} from '@kubevirt-utils/resources/migrations/constants';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sDelete, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
@@ -164,7 +171,10 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
                   >
                     <Trans ns="plugin__kubevirt-plugin" t={t}>
                       Click{' '}
-                      <Link onClick={onClose} to="/k8s/storagemigrations">
+                      <Link
+                        onClick={onClose}
+                        to={`/k8s/ns/${DEFAULT_MIGRATION_NAMESPACE}/${modelToRef(MigPlanModel)}`}
+                      >
                         {t('Storage Migrations')}
                       </Link>{' '}
                       to review and delete existing MigPlans.

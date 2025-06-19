@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom-v5-compat';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { modelToRef } from '@kubevirt-utils/models';
 import { Timestamp } from '@openshift-console/dynamic-plugin-sdk';
 import {
   ActionList,
@@ -17,8 +18,10 @@ import {
 import { CloseIcon } from '@patternfly/react-icons';
 
 import {
+  DEFAULT_MIGRATION_NAMESPACE,
   MigMigration,
   MigMigrationStatuses,
+  MigPlanModel,
 } from '../../../../../utils/resources/migrations/constants';
 
 import useProgressMigration from './hooks/useProgressMigration';
@@ -111,7 +114,10 @@ const VirtualMachineMigrationStatus: FC<VirtualMachineMigrationStatusProps> = ({
           )}
         </ActionListItem>
         <ActionListItem className="migration-status__view-report">
-          <Link onClick={onClose} to="/k8s/storagemigrations">
+          <Link
+            onClick={onClose}
+            to={`/k8s/ns/${DEFAULT_MIGRATION_NAMESPACE}/${modelToRef(MigPlanModel)}`}
+          >
             {t('View storage migrations')}
           </Link>
         </ActionListItem>

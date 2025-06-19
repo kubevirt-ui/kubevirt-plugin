@@ -1,14 +1,14 @@
 import { EncodedExtension } from '@openshift/dynamic-plugin-sdk-webpack';
 import {
   FeatureFlagHookProvider,
-  HrefNavItem,
   NavSection,
-  RoutePage,
+  ResourceActionProvider,
 } from '@openshift-console/dynamic-plugin-sdk';
 import type { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plugin-sdk-webpack';
 
 export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
   StorageMigrationList: './views/storagemigrations/list/StorageMigrationList.tsx',
+  useStorageMigrationActions: './views/storagemigrations/actions/useStorageMigrationActions.tsx',
 };
 
 export const extensions: EncodedExtension[] = [
@@ -49,32 +49,17 @@ export const extensions: EncodedExtension[] = [
     type: 'console.navigation/section',
   } as EncodedExtension<NavSection>,
   {
-    flags: {
-      required: ['STORAGE_MIGRATION_ENABLED'],
-    },
     properties: {
       component: { $codeRef: 'StorageMigrationList' },
-      path: ['/k8s/storagemigrations'],
-    },
-    type: 'console.page/route',
-  } as EncodedExtension<RoutePage>,
-  {
-    flags: {
-      required: ['STORAGE_MIGRATION_ENABLED'],
-    },
-    properties: {
-      dataAttributes: {
-        'data-quickstart-id': 'qs-nav-storagemigrations',
-        'data-test-id': 'storagemigrations-nav-item',
+      model: {
+        group: 'migration.openshift.io',
+        kind: 'MigPlan',
+        version: 'v1alpha1',
       },
-      href: '/k8s/storagemigrations',
-      id: 'storagemigrations',
-      name: '%plugin__kubevirt-plugin~Storage MigrationPlans%',
-      prefixNamespaced: false,
-      section: 'migration',
     },
-    type: 'console.navigation/href',
-  } as EncodedExtension<HrefNavItem>,
+    type: 'console.page/resource/list',
+  },
+
   {
     flags: {
       required: ['STORAGE_MIGRATION_ENABLED'],
@@ -84,12 +69,51 @@ export const extensions: EncodedExtension[] = [
         'data-quickstart-id': 'qs-nav-storagemigrations-virt-perspective',
         'data-test-id': 'storagemigrations-virt-perspective-nav-item',
       },
-      href: '/k8s/storagemigrations',
       id: 'storagemigrations-virt-perspective',
-      name: '%plugin__kubevirt-plugin~Storage MigrationPlans%',
-      prefixNamespaced: false,
+      model: {
+        group: 'migration.openshift.io',
+        kind: 'MigPlan',
+        version: 'v1alpha1',
+      },
+      name: '%plugin__kubevirt-plugin~Storage migrations%',
       section: 'migration-virt-perspective',
     },
-    type: 'console.navigation/href',
-  } as EncodedExtension<HrefNavItem>,
+    type: 'console.navigation/resource-ns',
+  },
+  {
+    flags: {
+      required: ['STORAGE_MIGRATION_ENABLED'],
+    },
+    properties: {
+      dataAttributes: {
+        'data-quickstart-id': 'qs-nav-storagemigrations',
+        'data-test-id': 'storagemigrations-nav-item',
+      },
+      id: 'storagemigrations',
+      model: {
+        group: 'migration.openshift.io',
+        kind: 'MigPlan',
+        version: 'v1alpha1',
+      },
+      name: '%plugin__kubevirt-plugin~Storage migrations%',
+      section: 'migration',
+    },
+    type: 'console.navigation/resource-ns',
+  },
+  {
+    flags: {
+      required: ['STORAGE_MIGRATION_ENABLED'],
+    },
+    properties: {
+      model: {
+        group: 'migration.openshift.io',
+        kind: 'MigPlan',
+        version: 'v1alpha1',
+      },
+      provider: {
+        $codeRef: 'useStorageMigrationActions',
+      },
+    },
+    type: 'console.action/resource-provider',
+  } as EncodedExtension<ResourceActionProvider>,
 ];

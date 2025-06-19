@@ -96,7 +96,7 @@ const useStorageMigrationActions: ExtensionHook<Action[], MigPlan> = (migPlan) =
           )),
         disabled: false,
         id: 'migplan-delete-action',
-        label: t('Delete'),
+        label: t('Delete {{kind}}', { kind: MigPlanModel.kind }),
       },
     ],
     [
