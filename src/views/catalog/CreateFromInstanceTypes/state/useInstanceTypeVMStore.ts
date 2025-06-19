@@ -13,6 +13,8 @@ import { getLabel } from '@kubevirt-utils/resources/shared';
 import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 
+import { getDiskSize } from '../utils/utils';
+
 import { instanceTypeVMStoreInitialState } from './utils/state';
 import { InstanceTypeVMStore } from './utils/types';
 import { getSSHCredentials } from './utils/utils';
@@ -43,6 +45,11 @@ export const useInstanceTypeVMStore = create<InstanceTypeVMStore>()((set, get) =
           instanceTypeVMState.selectedBootableVolume = selectedVolume;
           instanceTypeVMState.pvcSource = pvcSource;
           instanceTypeVMState.volumeSnapshotSource = volumeSnapshotSource;
+          instanceTypeVMState.customDiskSize = getDiskSize(
+            dvSource,
+            pvcSource,
+            volumeSnapshotSource,
+          );
           instanceTypeVMState.selectedInstanceType = {
             name: getInstanceTypeFromVolume(selectedVolume),
             namespace: null,
