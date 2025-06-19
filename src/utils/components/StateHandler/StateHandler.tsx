@@ -16,11 +16,18 @@ import Loading from '../Loading/Loading';
 
 type StateHandlerProps = {
   error?: any;
+  hasData: boolean;
   loaded: boolean;
   withBullseye?: boolean;
 };
 
-const StateHandler: FC<StateHandlerProps> = ({ children, error, loaded, withBullseye = false }) => {
+const StateHandler: FC<StateHandlerProps> = ({
+  children,
+  error,
+  hasData,
+  loaded,
+  withBullseye = false,
+}) => {
   const { t } = useKubevirtTranslation();
 
   if (error) {
@@ -50,7 +57,7 @@ const StateHandler: FC<StateHandlerProps> = ({ children, error, loaded, withBull
     );
   }
 
-  if (!loaded) {
+  if (!loaded && !hasData) {
     return withBullseye ? (
       <Bullseye>
         <Loading />
