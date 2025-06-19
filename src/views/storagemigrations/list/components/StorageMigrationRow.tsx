@@ -1,9 +1,8 @@
 import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
-import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { modelToGroupVersionKind, StorageClassModel } from '@kubevirt-utils/models';
+import { modelToGroupVersionKind, modelToRef, StorageClassModel } from '@kubevirt-utils/models';
 import { MigPlan, MigPlanModel } from '@kubevirt-utils/resources/migrations/constants';
 import { getName, getNamespace, getResourceUrl } from '@kubevirt-utils/resources/shared';
 import {
@@ -12,9 +11,9 @@ import {
   TableData,
   Timestamp,
 } from '@openshift-console/dynamic-plugin-sdk';
+import { LazyActionMenu } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { Progress } from '@patternfly/react-core';
 
-import useStorageMigrationActions from '../../actions/useStorageMigrationActions';
 import { MigPlanMap } from '../constants';
 import { getSelectedPVFromMigPlan, getStorageClassesFromMigPlan } from '../utils';
 
@@ -37,8 +36,6 @@ const StorageMigrationRow: FC<StorageMigrationRowProps> = ({
   const directVolumeMigration = migPlanMap[migPlanName]?.directVolumeMigration;
 
   const statusMigration = getStatusMigration(migMigration, directVolumeMigration);
-
-  const [storageMigrationActions] = useStorageMigrationActions(obj);
 
   return (
     <>
@@ -78,11 +75,7 @@ const StorageMigrationRow: FC<StorageMigrationRowProps> = ({
         )}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="">
-        <ActionsDropdown
-          actions={storageMigrationActions}
-          id="storage-migplans-actions"
-          isKebabToggle
-        />
+        <LazyActionMenu context={{ [modelToRef(MigPlanModel)]: obj }} />
       </TableData>
     </>
   );
