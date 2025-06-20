@@ -1,41 +1,35 @@
+import { Quantity } from '@kubevirt-utils/types/quantity.js';
+
 import {
   convertToBaseValue,
   humanizeBinaryBytes,
   humanizeBinaryBytesWithoutB,
 } from './humanize.js';
-
-export enum BinaryUnit {
-  B = 'B',
-  Gi = 'Gi',
-  Ki = 'Ki',
-  Mi = 'Mi',
-  Ti = 'Ti',
-}
-
-export const multipliers: Record<string, number> = {};
-multipliers.B = 1;
-multipliers.Ki = multipliers.B * 1024;
-multipliers.Mi = multipliers.Ki * 1024;
-multipliers.Gi = multipliers.Mi * 1024;
-multipliers.Ti = multipliers.Gi * 1024;
-multipliers.Pi = multipliers.Ti * 1024;
-multipliers.Ei = multipliers.Pi * 1024;
-multipliers.Zi = multipliers.Ei * 1024;
-multipliers.K = multipliers.B * 1000;
-multipliers.M = multipliers.K * 1000;
-multipliers.G = multipliers.M * 1000;
-multipliers.T = multipliers.G * 1000;
-multipliers.P = multipliers.T * 1000;
-multipliers.E = multipliers.P * 1000;
-multipliers.Z = multipliers.E * 1000;
+import {
+  BinaryUnit,
+  binaryUnitsOrdered,
+  DecimalUnit,
+  decimalUnitsOrdered,
+  QuantityUnit,
+} from './unitConstants';
 
 /**
  * A function to return unit for disk size/memory with 'B' suffix.
- * @param {BinaryUnit | string} unit - unit
+ * @param {QuantityUnit | string} unit - unit
  * @returns {string}
  */
-export const toIECUnit = (unit: BinaryUnit | string): string =>
+export const addByteSuffix = (unit: QuantityUnit | string): string =>
   !unit || unit.endsWith('B') ? unit : `${unit}B`;
+
+/**
+ * A function to return unit for disk size/memory without 'B' suffix.
+ * @param {string} unit - unit
+ * @returns {QuantityUnit}
+ */
+export const removeByteSuffix = (unit: string): QuantityUnit => {
+  const newUnit = unit?.endsWith('B') && unit !== 'B' ? unit.slice(0, -1) : unit;
+  return newUnit as QuantityUnit;
+};
 
 /**
  * A function to return the string for displaying more readable disk size/memory info
@@ -51,15 +45,105 @@ export const readableSizeUnit = (combinedStr: string): string => {
       : [combinedString?.slice(0, index), combinedString?.slice(index)];
 
   // if there isn't any specific value/size present, return the original string, for example for the dynamic disk size
-  return !value ? combinedStr : `${value} ${toIECUnit(unit)}`;
+  return !value ? combinedStr : `${value} ${addByteSuffix(unit)}`;
 };
 
 export const getHumanizedSize = (size: string, bytesOption: 'withB' | 'withoutB' = 'withB') => {
   const baseValue = convertToBaseValue(size);
 
   if (bytesOption === 'withoutB') {
-    return humanizeBinaryBytesWithoutB(baseValue);
+    return humanizeBinaryBytesWithoutB(baseValue, null);
   }
 
-  return humanizeBinaryBytes(baseValue);
+  return humanizeBinaryBytes(baseValue, null);
+};
+
+const extractUnitFromQuantityString = (quantityString: string): null | string => {
+  const unitRegex = /[a-zA-Z]+$/; // Matches alphabetic characters at the end of the string
+  const match = quantityString.match(unitRegex);
+  return match ? match[0] : null;
+};
+
+const extractNumberFromQuantityString = (quantityString: string): null | number => {
+  const numberRegex = /^[0-9.]+/; // Matches numeric characters (including decimal) at the start of the string
+  const match = quantityString.match(numberRegex);
+  return match ? parseFloat(match[0]) : null;
+};
+
+export const isBinaryUnit = (unit: string): unit is BinaryUnit =>
+  binaryUnitsOrdered.includes(BinaryUnit[unit]);
+
+export const isDecimalUnit = (unit: string): unit is DecimalUnit =>
+  decimalUnitsOrdered.includes(DecimalUnit[unit]);
+
+const isQuantityUnit = (unit: string): unit is QuantityUnit =>
+  isBinaryUnit(unit) || isDecimalUnit(unit);
+
+export const toQuantity = (quantityString: string, keepInitialUnit = true): Quantity => {
+  const preferredUnit = keepInitialUnit ? extractUnitFromQuantityString(quantityString) : null;
+
+  if (isQuantityUnit(preferredUnit)) {
+    return {
+      unit: preferredUnit,
+      value: extractNumberFromQuantityString(quantityString),
+    };
+  }
+
+  // This toQuantity helper could attempt the same conversion for bytes as the formatQuantityString helper, so we don't have to call formatQuantityString helper first if then toQuantity is going to be called on it anyway
+  const { unit, value } = getHumanizedSize(quantityString, 'withoutB');
+
+  return { unit, value };
+};
+
+export const quantityToString = ({ unit, value }: Quantity) =>
+  `${value}${unit === BinaryUnit.B ? '' : unit}`;
+
+const convertBytes = (value: number, base: 'BINARY' | 'DECIMAL') => {
+  const divisor = base === 'BINARY' ? 1024 : 1000;
+  let index = 0;
+
+  while (value % divisor === 0) {
+    value /= divisor;
+    index++;
+  }
+
+  return { unitIndex: index, value };
+};
+
+/**
+ * Formats the quantity string that is in bytes format to a more simplified quantity string in integer + unit format (if the conversion to an integer is possible).
+ * e.g. '1024' to 1Ki or '1000000' to 1M
+ *
+ * @param quantityString string to format, must be in a Kubernetes Quantity format: https://kubernetes.io/docs/reference/kubernetes-api/common-definitions/quantity/
+ * @returns formatted quantity string
+ */
+export const formatQuantityString = (quantityString: string) => {
+  const unit = extractUnitFromQuantityString(quantityString);
+
+  if (isQuantityUnit(unit)) {
+    return quantityString;
+  }
+
+  if (unit === 'm') {
+    // TODO handle specifically, or probably just leave it as it is to be consistent, but then in CapacityInput we have to adjust
+    return quantityString;
+  }
+
+  if (unit !== null) {
+    // ERROR: formatQuantityString helper called with quantityString argument which is not in Quantity format
+    return quantityString;
+  }
+
+  // convert bytes to integer + unit if possible
+  const bytes = Number(quantityString);
+  const { unitIndex: binaryUnitIndex, value: binaryValue } = convertBytes(bytes, 'BINARY');
+  const { unitIndex: decimalUnitIndex, value: decimalValue } = convertBytes(bytes, 'DECIMAL');
+
+  if (binaryUnitIndex >= decimalUnitIndex) {
+    const binaryUnit = binaryUnitsOrdered[binaryUnitIndex];
+
+    return `${binaryValue}${binaryUnit === BinaryUnit.B ? '' : binaryUnit}`;
+  }
+
+  return `${decimalValue}${decimalUnitsOrdered[decimalUnitIndex]}`;
 };

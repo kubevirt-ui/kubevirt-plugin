@@ -11,8 +11,9 @@ import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePVCs from '@kubevirt-utils/hooks/usePVCs';
+import { getPVCSize } from '@kubevirt-utils/resources/bootableresources/selectors';
 import { convertResourceArrayToMap, getName } from '@kubevirt-utils/resources/shared';
-import { getHumanizedSize } from '@kubevirt-utils/utils/units';
+import { formatQuantityString } from '@kubevirt-utils/utils/units';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { FormGroup, ValidatedOptions } from '@patternfly/react-core';
 
@@ -62,9 +63,7 @@ const DiskSourceClonePVCSelectName: FC = () => {
             setSelected={(pvcName) => {
               onChange(pvcName);
               const selectedPVC = pvcMapper[pvcName];
-              const selectedPVCSize = selectedPVC?.spec?.resources?.requests?.storage;
-              const humanizedSize = getHumanizedSize(selectedPVCSize, 'withoutB');
-              setValue(DISK_SIZE_FIELD, `${humanizedSize.value}${humanizedSize.unit}`);
+              setValue(DISK_SIZE_FIELD, formatQuantityString(getPVCSize(selectedPVC)));
             }}
             toggleProps={{
               isDisabled: isEmpty(namespace),
