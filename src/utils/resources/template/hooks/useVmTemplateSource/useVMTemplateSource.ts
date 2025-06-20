@@ -132,6 +132,19 @@ export const useVMTemplateSource = (template: V1Template): UseVMTemplateSourceVa
           setLoaded(true);
         }
         break;
+      case BOOT_SOURCE.SNAPSHOT:
+        {
+          setTemplateBootSource({
+            source: bootSource.source,
+            sourceValue: {
+              snapshot: bootSource?.source?.snapshot,
+            },
+            type: bootSource.type,
+          });
+          setIsBootSourceAvailable(true);
+          setLoaded(true);
+        }
+        break;
       default:
         setIsBootSourceAvailable(false);
         setLoaded(true);

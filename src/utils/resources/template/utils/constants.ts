@@ -103,24 +103,19 @@ export enum BOOT_SOURCE {
   NONE = 'NONE',
   PVC = 'PVC',
   REGISTRY = 'REGISTRY',
+  SNAPSHOT = 'SNAPSHOT',
   URL = 'URL',
 }
 
-// t('PVC')
-// t('PVC (auto import)')
-// t('URL')
-// t('Registry')
-// t('Container disk')
-// t('No boot source')
-
 export const BOOT_SOURCE_LABELS = {
-  [BOOT_SOURCE.CONTAINER_DISK]: 'Container disk',
-  [BOOT_SOURCE.DATA_SOURCE]: 'PVC',
-  [BOOT_SOURCE.DATA_SOURCE_AUTO_IMPORT]: 'PVC (auto import)',
-  [BOOT_SOURCE.NONE]: 'No boot source',
-  [BOOT_SOURCE.PVC]: 'PVC',
-  [BOOT_SOURCE.REGISTRY]: 'Registry',
-  [BOOT_SOURCE.URL]: 'URL',
+  [BOOT_SOURCE.CONTAINER_DISK]: t('Container disk'),
+  [BOOT_SOURCE.DATA_SOURCE]: t('PVC'),
+  [BOOT_SOURCE.DATA_SOURCE_AUTO_IMPORT]: t('PVC (auto import)'),
+  [BOOT_SOURCE.NONE]: t('No boot source'),
+  [BOOT_SOURCE.PVC]: t('PVC'),
+  [BOOT_SOURCE.REGISTRY]: t('Registry'),
+  [BOOT_SOURCE.SNAPSHOT]: t('Snapshot'),
+  [BOOT_SOURCE.URL]: t('URL'),
 };
 
 export const OS_IMAGE_LINKS = {
