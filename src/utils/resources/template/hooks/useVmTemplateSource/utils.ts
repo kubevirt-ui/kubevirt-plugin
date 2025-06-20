@@ -13,6 +13,7 @@ import {
   V1beta1DataVolumeSourcePVC,
   V1beta1DataVolumeSourceRef,
   V1beta1DataVolumeSourceRegistry,
+  V1beta1DataVolumeSourceSnapshot,
   V1beta1PersistentVolumeClaim,
   V1ContainerDiskSource,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -30,6 +31,7 @@ export type TemplateBootSource = {
     http?: V1beta1DataVolumeSourceHTTP;
     pvc?: V1beta1DataVolumeSourcePVC;
     registry?: V1beta1DataVolumeSourceRegistry;
+    snapshot?: V1beta1DataVolumeSourceSnapshot;
     sourceRef?: V1beta1DataVolumeSourceRef;
   };
   sourceValue?: {
@@ -37,6 +39,7 @@ export type TemplateBootSource = {
     http?: V1beta1DataVolumeSourceHTTP;
     pvc?: V1beta1PersistentVolumeClaim;
     registry?: V1beta1DataVolumeSourceRegistry;
+    snapshot?: V1beta1DataVolumeSourceSnapshot;
     sourceRef?: V1beta1PersistentVolumeClaim;
   };
   storageClassName?: string;
