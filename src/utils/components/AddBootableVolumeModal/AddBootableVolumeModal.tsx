@@ -74,6 +74,9 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
       return { ...prev, labels: updatedLabels };
     });
   };
+
+  const resetDiskSize = () => setBootableVolumeField('size')(initialBootableVolumeState.size);
+
   return (
     <TabModal
       onClose={() => {
@@ -99,6 +102,7 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
         <SourceTypeSelection
           formSelection={sourceType}
           namespace={namespace}
+          resetDiskSize={resetDiskSize}
           setFormSelection={setSourceType}
         />
         <Title headingLevel="h5">{t('Source details')}</Title>
@@ -119,6 +123,7 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
         </Title>
         <VolumeDestination
           bootableVolume={bootableVolume}
+          isSnapshotSourceType={sourceType === DROPDOWN_FORM_SELECTION.USE_SNAPSHOT}
           setBootableVolumeField={setBootableVolumeField}
         />
         <Title className="pf-v6-u-mt-md" headingLevel="h5">
