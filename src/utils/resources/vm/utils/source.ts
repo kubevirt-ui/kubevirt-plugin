@@ -98,6 +98,12 @@ export const getVMBootSourceType = (vm: V1VirtualMachine): TemplateBootSource =>
         type: BOOT_SOURCE.PVC,
       };
     }
+    if (source?.snapshot) {
+      return {
+        source: { snapshot: source?.snapshot },
+        type: BOOT_SOURCE.SNAPSHOT,
+      };
+    }
   }
 
   if (volume?.containerDisk) {

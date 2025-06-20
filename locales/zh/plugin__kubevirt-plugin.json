@@ -1260,6 +1260,7 @@
   "Size": "大小",
   "Size cannot be": "大小不能是",
   "Small scale consumption, recommended for using the graphical console": "低资源消耗，建议使用图形控制台时使用",
+  "Snapshot": "Snapshot",
   "Snapshots": "快照",
   "Snapshots ({{snapshots}})": "快照 ({{snapshots}})",
   "Sockets": "插槽",

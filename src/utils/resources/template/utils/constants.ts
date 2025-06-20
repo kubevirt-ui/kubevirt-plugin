@@ -103,6 +103,7 @@ export enum BOOT_SOURCE {
   NONE = 'NONE',
   PVC = 'PVC',
   REGISTRY = 'REGISTRY',
+  SNAPSHOT = 'SNAPSHOT',
   URL = 'URL',
 }
 
@@ -112,6 +113,7 @@ export enum BOOT_SOURCE {
 // t('Registry')
 // t('Container disk')
 // t('No boot source')
+// t('Snapshot')
 
 export const BOOT_SOURCE_LABELS = {
   [BOOT_SOURCE.CONTAINER_DISK]: 'Container disk',
@@ -120,6 +122,7 @@ export const BOOT_SOURCE_LABELS = {
   [BOOT_SOURCE.NONE]: 'No boot source',
   [BOOT_SOURCE.PVC]: 'PVC',
   [BOOT_SOURCE.REGISTRY]: 'Registry',
+  [BOOT_SOURCE.SNAPSHOT]: 'Snapshot',
   [BOOT_SOURCE.URL]: 'URL',
 };
 
