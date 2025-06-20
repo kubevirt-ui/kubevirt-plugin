@@ -5,7 +5,7 @@ import {
   IoK8sApiCoreV1ConfigMap,
   IoK8sApiCoreV1Container,
 } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { sortByDirection, universalComparator } from '@kubevirt-utils/utils/utils';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { SortByDirection } from '@patternfly/react-table';
 
@@ -23,30 +23,18 @@ export const generateWithNumbers = (name: string): string =>
 export const findObjectByName = <T extends K8sResourceCommon>(arr: T[], name: string): T =>
   (arr || []).find((obj) => obj?.metadata?.name === name);
 
-const sortData = (data: IoK8sApiCoreV1ConfigMap[], field: string, alternativeField: string) => {
-  return data.sort((a, b) => {
-    const aParam = a?.data?.[field] || a?.data?.[alternativeField];
-    const bParam = b?.data?.[field] || b?.data?.[alternativeField];
-
-    if (isEmpty(aParam)) return -1;
-    if (isEmpty(bParam)) return 1;
-
-    return aParam?.localeCompare(bParam, undefined, {
-      numeric: true,
-      sensitivity: 'base',
-    });
-  });
-};
-
 export const columnsSorting = (
   data: IoK8sApiCoreV1ConfigMap[],
   sortDirection: SortByDirection,
   field: string,
   alternativeField = '',
-) => {
-  const sortedArr = sortData(data, field, alternativeField);
-  return sortDirection === 'asc' ? sortedArr.reverse() : sortedArr;
-};
+) =>
+  data.sort((a, b) => {
+    const aParam = a?.data?.[field] || a?.data?.[alternativeField];
+    const bParam = b?.data?.[field] || b?.data?.[alternativeField];
+
+    return sortByDirection(universalComparator, sortDirection)(aParam, bParam);
+  });
 
 export const trimLastHistoryPath = (pathName: Location['pathname']): string => {
   return pathName.endsWith('checkups') ? pathName : pathName.replace(/\/[^\/]*$/, '');
