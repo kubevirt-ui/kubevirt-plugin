@@ -2,6 +2,7 @@
 
 set -ex
 
+export DOWNSTREAM=true
 export TEST_NS='auto-test-ns'
 export TEST_SECRET_NAME='auto-test-secret'
 

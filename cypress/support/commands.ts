@@ -1,4 +1,5 @@
 import { CNV_NS, TEST_NS } from '../utils/const/index';
+import { Perspective, switchPerspective } from '../views/perspective';
 
 export {};
 declare global {
@@ -11,21 +12,10 @@ declare global {
       patchVM(vmName: string, status: string): void;
       startVM(vmName: string): void;
       stopVM(vmName: string): void;
+      switchToVirt(): void;
     }
   }
 }
-
-Cypress.Commands.add('checkHCOSpec', (spec: string, matchString: string, include: boolean) => {
-  cy.exec(
-    `oc get -n ${CNV_NS} hyperconverged kubevirt-hyperconverged -o jsonpath='{${spec}}'`,
-  ).then((result) => {
-    if (include) {
-      expect(result.stdout).contain(matchString);
-    } else {
-      expect(result.stdout).not.contain(matchString);
-    }
-  });
-});
 
 Cypress.Commands.add(
   'checkVMSpec',
@@ -40,6 +30,18 @@ Cypress.Commands.add(
   },
 );
 
+Cypress.Commands.add('checkHCOSpec', (spec: string, matchString: string, include: boolean) => {
+  cy.exec(
+    `oc get -n openshift-cnv hyperconverged kubevirt-hyperconverged -o jsonpath='{${spec}}'`,
+  ).then((result) => {
+    if (include) {
+      expect(result.stdout).contain(matchString);
+    } else {
+      expect(result.stdout).not.contain(matchString);
+    }
+  });
+});
+
 Cypress.Commands.add('patchVM', (vmName: string, status: string) => {
   cy.exec(
     `oc patch virtualmachine ${vmName} --type merge -p '{"spec":{"runStrategy":"${status}"}}'`,
@@ -53,6 +55,10 @@ Cypress.Commands.add('startVM', (vmName: string) => {
 
 Cypress.Commands.add('stopVM', (vmName: string) => {
   cy.patchVM(vmName, 'Halted');
+});
+
+Cypress.Commands.add('switchToVirt', () => {
+  return switchPerspective(Perspective.Virtualization);
 });
 
 Cypress.Commands.add('beforeSpec', () => {

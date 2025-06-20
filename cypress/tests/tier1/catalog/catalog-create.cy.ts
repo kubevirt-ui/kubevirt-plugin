@@ -1,12 +1,12 @@
-import { VirtualMachineData } from '../../types/vm';
-import { cloneDisk, DiskSource, vmDisks } from '../../utils/const/diskSource';
-import { TEST_NS } from '../../utils/const/index';
-import { TEMPLATE } from '../../utils/const/template';
-import { yamlEditor } from '../../views/selector-common';
-import { closeButton } from '../../views/selector-overview';
-import { listGroup } from '../../views/selector-template';
-import { tab } from '../../views/tab';
-import { vm } from '../../views/vm-flow';
+import { VirtualMachineData } from '../../../types/vm';
+import { cloneDisk, DiskSource, vmDisks } from '../../../utils/const/diskSource';
+import { TEST_NS } from '../../../utils/const/index';
+import { TEMPLATE } from '../../../utils/const/template';
+import { yamlEditor } from '../../../views/selector-common';
+import { closeButton } from '../../../views/selector-overview';
+import { listGroup } from '../../../views/selector-template';
+import { tab } from '../../../views/tab';
+import { vm } from '../../../views/vm-flow';
 
 const CUST_VM: VirtualMachineData = {
   disks: vmDisks,
