@@ -28,6 +28,7 @@
     }
 
     &__toolbar {
+      z-index: 0;
       flex-wrap: nowrap;
 
       &.is-compact {
@@ -46,9 +47,7 @@
 }
 
 .vm-actions-toggle {
-  .kv-actions-dropdown {
-    .pf-v6-c-menu-toggle {
-      z-index: 0;
-    }
+  .pf-v6-c-menu-toggle {
+    z-index: 0;
   }
 }
