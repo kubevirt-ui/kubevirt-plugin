@@ -2,7 +2,6 @@ import React, { FC, ReactNode, useCallback, useEffect, useState } from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import NICHotPlugModalAlert from '@kubevirt-utils/components/BridgedNICHotPlugModalAlert/NICHotPlugModalAlert';
 import NetworkInterfaceLinkState from '@kubevirt-utils/components/NetworkInterfaceModal/components/NetworkInterfaceLinkState/NetworkInterfaceLinkState';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -16,7 +15,6 @@ import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { ExpandableSection, Form } from '@patternfly/react-core';
 import { getInterfaceState } from '@virtualmachines/details/tabs/configuration/network/utils/utils';
-import { isRunning } from '@virtualmachines/utils';
 
 import NameFormField from './components/NameFormField';
 import NetworkInterfaceMACAddressInput from './components/NetworkInterfaceMacAddressInput';
@@ -55,7 +53,6 @@ type NetworkInterfaceModalProps = {
 
 const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
   fixedName = false,
-  Header = null,
   headerText,
   isOpen,
   namespace,
@@ -108,12 +105,6 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
     onSubmit,
   ]);
 
-  const isHotPlugNIC =
-    interfaceType === interfaceTypesProxy.bridge || interfaceType === interfaceTypesProxy.sriov;
-  const vmIsRunning = isRunning(vm);
-  const showRestartHeader = !isHotPlugNIC;
-  const showRestartOrMigrateHeader = vmIsRunning && isHotPlugNIC;
-
   return (
     <TabModal<K8sResourceCommon>
       headerText={headerText}
@@ -124,8 +115,6 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
       onSubmit={onSubmitModal()}
     >
       <Form>
-        {showRestartHeader && Header}
-        {showRestartOrMigrateHeader && <NICHotPlugModalAlert />}
         <NameFormField isDisabled={fixedName} objName={nicName} setObjName={setNicName} />
         <NetworkInterfaceModelSelect
           interfaceModel={interfaceModel}
