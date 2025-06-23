@@ -491,6 +491,7 @@
   "Disabling Deletion Protection will allow you to delete this VirtualMachine. VirtualMachine deletion can result in data loss or service disruption.": "禁用删除保护将允许您删除此 VirtualMachine。VirtualMachine 删除可能会导致数据丢失或服务中断。",
   "Disconnect": "断开连接",
   "Disk size": "磁盘大小",
+  "Disk size will be determined by the volume snapshot size": "Disk size will be determined by the volume snapshot size",
   "Disk source": "磁盘源",
   "Disk Source represents the source for our disk, this can be HTTP, Registry or an existing PVC": "磁盘源代表磁盘的源，可以是 HTTP、Registry 或一个现有的 PVC",
   "Disk Type": "磁盘类型",

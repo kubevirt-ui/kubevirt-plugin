@@ -13,11 +13,13 @@ import StorageClassSelect from './StorageClass/StorageClassSelect';
 
 type VolumeDestinationProps = {
   bootableVolume: AddBootableVolumeState;
+  isSnapshotSourceType?: boolean;
   setBootableVolumeField: SetBootableVolumeFieldType;
 };
 
 const VolumeDestination: FC<VolumeDestinationProps> = ({
   bootableVolume,
+  isSnapshotSourceType,
   setBootableVolumeField,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -49,8 +51,12 @@ const VolumeDestination: FC<VolumeDestinationProps> = ({
             setVolumeMode={setBootableVolumeField('volumeMode')}
           />
         </GridItem>
-        <GridItem span={6}>
+        <GridItem>
           <CapacityInput
+            helperText={
+              isSnapshotSourceType && t('Disk size will be determined by the volume snapshot size')
+            }
+            isDisabled={isSnapshotSourceType}
             label={t('Disk size')}
             onChange={setBootableVolumeField('size')}
             size={size}
