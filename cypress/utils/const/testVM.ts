@@ -10,7 +10,6 @@ import {
 import { TEMPLATE } from './template';
 
 export const VM_IT_QUICK: VirtualMachineData = {
-  iType: 'u1.medium',
   name: QUICK_VM_IT_NAME,
   namespace: TEST_NS,
   volume: 'fedora',
@@ -22,7 +21,6 @@ export const VM_IT_CUST: VirtualMachineData = {
   cloudInitUname: 'cnv-test',
   description: 'Customized VM from Instancetype',
   hostname: 'vm-it-host',
-  iType: 'o1.small',
   name: CUST_VM_IT_NAME,
   namespace: TEST_NS,
   newSecret: 'test-it-secret',

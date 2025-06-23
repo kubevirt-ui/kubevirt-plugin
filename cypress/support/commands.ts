@@ -1,4 +1,5 @@
 import { CNV_NS, TEST_NS } from '../utils/const/index';
+import { Perspective, switchPerspective } from '../views/perspective';
 
 export {};
 declare global {
@@ -11,6 +12,7 @@ declare global {
       patchVM(vmName: string, status: string): void;
       startVM(vmName: string): void;
       stopVM(vmName: string): void;
+      switchToVirt(): void;
     }
   }
 }
@@ -53,6 +55,10 @@ Cypress.Commands.add('startVM', (vmName: string) => {
 
 Cypress.Commands.add('stopVM', (vmName: string) => {
   cy.patchVM(vmName, 'Halted');
+});
+
+Cypress.Commands.add('switchToVirt', () => {
+  return switchPerspective(Perspective.Virtualization);
 });
 
 Cypress.Commands.add('beforeSpec', () => {

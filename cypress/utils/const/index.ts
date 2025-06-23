@@ -1,3 +1,4 @@
+export const dsIT = Cypress.env('DOWNSTREAM') ? it : xit;
 export const QUICK_VM_IT_NAME = 'vm-it-quick';
 export const CUST_VM_IT_NAME = 'vm-it-custom';
 export const QUICK_VM_TMPL_NAME = 'vm-template-quick';
