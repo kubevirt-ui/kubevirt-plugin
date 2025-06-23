@@ -16,7 +16,7 @@ import { getName } from '@kubevirt-utils/resources/shared';
 import { getRootDiskSecretRef, getVolumes } from '@kubevirt-utils/resources/vm';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
-import useDataVolumeConvertedVolumeNames from './useDataVolumeConvertedVolumeNames';
+import useConvertedVolumeNames from './useConvertedVolumeNames';
 
 type UseDeleteVMResources = (vm: V1VirtualMachine) => {
   dataVolumes: V1beta1DataVolume[];
@@ -28,7 +28,7 @@ type UseDeleteVMResources = (vm: V1VirtualMachine) => {
 };
 
 const useDeleteVMResources: UseDeleteVMResources = (vm) => {
-  const { dvVolumesNames, isDataVolumeGarbageCollector } = useDataVolumeConvertedVolumeNames(
+  const { dvVolumesNames, isDataVolumeGarbageCollector, pvcVolumesNames } = useConvertedVolumeNames(
     getVolumes(vm),
   );
   const namespace = vm?.metadata?.namespace;
@@ -41,9 +41,7 @@ const useDeleteVMResources: UseDeleteVMResources = (vm) => {
     namespaced: true,
   });
 
-  const filteredDataVolumes = dataVolumes?.filter((dv) =>
-    dvVolumesNames?.includes(dv?.metadata?.name),
-  );
+  const filteredDataVolumes = dataVolumes?.filter((dv) => dvVolumesNames?.includes(getName(dv)));
 
   const [pvcs, pvcsLoaded, pvcsLoadError] = useK8sWatchResource<
     IoK8sApiCoreV1PersistentVolumeClaim[]
@@ -55,7 +53,7 @@ const useDeleteVMResources: UseDeleteVMResources = (vm) => {
   });
 
   const filteredPvcs = isDataVolumeGarbageCollector
-    ? pvcs?.filter((pvc) => dvVolumesNames?.includes(pvc?.metadata?.name))
+    ? pvcs?.filter((pvc) => [...dvVolumesNames, ...pvcVolumesNames].includes(getName(pvc)))
     : [];
 
   const [snapshots, snapshotsLoaded, snapshotsLoadError] = useK8sWatchResource<
