@@ -28,7 +28,7 @@ const VirtualMachineTemplatesSource: React.FC<VirtualMachineTemplatesSourceProps
     availableDatasources?.[
       `${bootSource?.source?.sourceRef?.namespace}-${bootSource?.source?.sourceRef?.name}`
     ];
-  const bootSourceLabel = t(getVMBootSourceLabel(bootSource?.type, dataSource));
+  const bootSourceLabel = getVMBootSourceLabel(bootSource?.type, dataSource);
   const isBootSourceAvailable = availableTemplatesUID.has(template?.metadata?.uid);
 
   const isCloningSource =
