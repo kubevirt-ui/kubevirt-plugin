@@ -3,12 +3,13 @@ import { V1beta1CDIConfig } from '@kubevirt-ui/kubevirt-api/containerized-data-i
 import { V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
-type UseDataVolumeConvertedVolumeNames = (vmVolumes: V1Volume[]) => {
+type UseConvertedVolumeNames = (vmVolumes: V1Volume[]) => {
   dvVolumesNames: string[];
   isDataVolumeGarbageCollector: boolean;
+  pvcVolumesNames: string[];
 };
 
-const useDataVolumeConvertedVolumeNames: UseDataVolumeConvertedVolumeNames = (vmVolumes) => {
+const useConvertedVolumeNames: UseConvertedVolumeNames = (vmVolumes) => {
   const [cdiConfig] = useK8sWatchResource<V1beta1CDIConfig>({
     groupVersionKind: CDIConfigModelGroupVersionKind,
     isList: false,
@@ -21,10 +22,15 @@ const useDataVolumeConvertedVolumeNames: UseDataVolumeConvertedVolumeNames = (vm
     .filter((volume) => volume?.dataVolume)
     ?.map((volume) => volume?.dataVolume?.name);
 
+  const pvcVolumesNames = (vmVolumes || [])
+    .filter((volume) => volume?.persistentVolumeClaim)
+    ?.map((volume) => volume?.persistentVolumeClaim?.claimName);
+
   return {
     dvVolumesNames,
     isDataVolumeGarbageCollector,
+    pvcVolumesNames,
   };
 };
 
-export default useDataVolumeConvertedVolumeNames;
+export default useConvertedVolumeNames;
