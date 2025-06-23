@@ -33,7 +33,7 @@ const GIB_IN_BYTES = 1024;
 
 const StorageWriteThresholdChart: React.FC<StorageThresholdChartProps> = ({ vmi }) => {
   const { currentTime, duration, timespan } = useDuration();
-  const hubClusterName = useHubClusterName();
+  const [hubClusterName] = useHubClusterName();
   const queries = React.useMemo(
     () => getUtilizationQueries({ duration, hubClusterName, obj: vmi }),
     [vmi, duration, hubClusterName],

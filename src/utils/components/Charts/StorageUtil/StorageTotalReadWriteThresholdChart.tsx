@@ -42,7 +42,7 @@ const StorageTotalReadWriteThresholdChart: React.FC<StorageTotalReadWriteThresho
   vmi,
 }) => {
   const { currentTime, duration, timespan } = useDuration();
-  const hubClusterName = useHubClusterName();
+  const [hubClusterName] = useHubClusterName();
   const queries = React.useMemo(
     () => getUtilizationQueries({ duration, hubClusterName, obj: vmi }),
     [vmi, duration, hubClusterName],

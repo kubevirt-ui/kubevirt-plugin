@@ -44,7 +44,7 @@ const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ pods, vmi }) => {
   const { currentTime, duration, timespan } = useDuration();
   const { height, ref, width } = useResponsiveCharts();
 
-  const hubClusterName = useHubClusterName();
+  const [hubClusterName] = useHubClusterName();
 
   const queries = useMemo(
     () =>

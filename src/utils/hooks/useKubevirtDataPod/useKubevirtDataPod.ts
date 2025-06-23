@@ -110,9 +110,14 @@ const useKubevirtDataPod: UseKubevirtDataPod = <T extends K8sResourceCommon>(
     }
   }, [socket.lastJsonMessage]);
 
+  const watchResult: [T, boolean, Error] = useMemo(
+    () => [data, loaded, error],
+    [data, loaded, error],
+  );
+
   if (!watchOptions) return [<T>(<unknown>[]), false, null];
 
-  return [data, loaded, error];
+  return watchResult;
 };
 
 export default useKubevirtDataPod;

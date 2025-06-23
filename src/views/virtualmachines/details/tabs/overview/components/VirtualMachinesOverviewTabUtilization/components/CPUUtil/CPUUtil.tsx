@@ -21,7 +21,7 @@ type CPUUtilProps = {
 const CPUUtil: FC<CPUUtilProps> = ({ pods, vmi }) => {
   const { t } = useKubevirtTranslation();
   const vmiPod = useMemo(() => getVMIPod(vmi, pods), [pods, vmi]);
-  const hubClusterName = useHubClusterName();
+  const [hubClusterName] = useHubClusterName();
   const { currentTime, duration } = useDuration();
   const queries = useMemo(
     () =>

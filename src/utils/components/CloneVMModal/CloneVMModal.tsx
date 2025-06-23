@@ -9,6 +9,7 @@ import {
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { MAX_K8S_NAME_LENGTH } from '@kubevirt-utils/utils/constants';
 import { isVM } from '@kubevirt-utils/utils/typeGuards';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
@@ -68,15 +69,25 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
   const cloneRequest = useCloneVMModal(
     initialCloneRequest?.metadata?.name,
     initialCloneRequest?.metadata?.namespace,
+    source?.cluster,
   );
 
   useEffect(() => {
     if (cloneRequest?.status?.phase === CLONING_STATUSES.SUCCEEDED) {
       startCloneVM && runVM(cloneName, namespace, source?.cluster, vmUseRunning);
 
-      navigate(`/k8s/ns/${namespace}/${VirtualMachineModelRef}/${cloneName}`);
-
       onClose();
+
+      if (cloneRequest?.cluster) {
+        navigate(
+          `/multicloud/infrastructure/virtualmachines/${cloneRequest?.cluster}/${getNamespace(
+            cloneRequest,
+          )}/${cloneName}`,
+        );
+        return;
+      }
+
+      navigate(`/k8s/ns/${namespace}/${VirtualMachineModelRef}/${cloneName}`);
     }
   }, [cloneRequest, startCloneVM, cloneName, namespace, onClose, navigate, vmUseRunning, source]);
 

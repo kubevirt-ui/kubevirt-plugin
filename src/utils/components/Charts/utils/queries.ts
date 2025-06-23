@@ -50,25 +50,27 @@ export const getUtilizationQueries: GetUtilizationQueries = ({
 
   const clusterFilter =
     !isEmpty(obj?.cluster) && obj?.cluster === hubClusterName ? `,cluster='${obj.cluster}'` : '';
+
+  const sumByCluster = !isEmpty(obj?.cluster) && obj?.cluster === hubClusterName ? ', cluster' : '';
   return {
-    [VMQueries.CPU_REQUESTED]: `sum(kube_pod_resource_request{resource='cpu'${clusterFilter},pod='${launcherPodName}',namespace='${namespace}'}) BY (name, namespace, cluster)`,
-    [VMQueries.CPU_USAGE]: `sum(rate(kubevirt_vmi_cpu_usage_seconds_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}])) BY (name, namespace, cluster)`,
-    [VMQueries.FILESYSTEM_READ_USAGE]: `sum(rate(kubevirt_vmi_storage_read_traffic_bytes_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}])) BY (name, namespace, cluster)`,
-    [VMQueries.FILESYSTEM_USAGE_TOTAL]: `sum(rate(kubevirt_vmi_storage_read_traffic_bytes_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}]) + rate(kubevirt_vmi_storage_write_traffic_bytes_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}])) BY (name, namespace, cluster)`,
-    [VMQueries.FILESYSTEM_WRITE_USAGE]: `sum(rate(kubevirt_vmi_storage_write_traffic_bytes_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}])) BY (name, namespace, cluster)`,
+    [VMQueries.CPU_REQUESTED]: `sum(kube_pod_resource_request{resource='cpu'${clusterFilter},pod='${launcherPodName}',namespace='${namespace}'}) BY (name, namespace${sumByCluster})`,
+    [VMQueries.CPU_USAGE]: `sum(rate(kubevirt_vmi_cpu_usage_seconds_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}])) BY (name, namespace${sumByCluster})`,
+    [VMQueries.FILESYSTEM_READ_USAGE]: `sum(rate(kubevirt_vmi_storage_read_traffic_bytes_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}])) BY (name, namespace${sumByCluster})`,
+    [VMQueries.FILESYSTEM_USAGE_TOTAL]: `sum(rate(kubevirt_vmi_storage_read_traffic_bytes_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}]) + rate(kubevirt_vmi_storage_write_traffic_bytes_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}])) BY (name, namespace${sumByCluster})`,
+    [VMQueries.FILESYSTEM_WRITE_USAGE]: `sum(rate(kubevirt_vmi_storage_write_traffic_bytes_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}])) BY (name, namespace${sumByCluster})`,
     [VMQueries.INSTANT_MIGRATION_DATA_PROCESSED]: `kubevirt_vmi_migration_data_processed_bytes{name='${name}',namespace='${namespace}'${clusterFilter}}`,
     [VMQueries.INSTANT_MIGRATION_DATA_REMAINING]: `kubevirt_vmi_migration_data_remaining_bytes{name='${name}',namespace='${namespace}'${clusterFilter}}`,
     [VMQueries.MEMORY_USAGE]: `last_over_time(kubevirt_vmi_memory_used_bytes{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}])`,
-    [VMQueries.MIGRATION_DATA_PROCESSED]: `sum(sum_over_time(kubevirt_vmi_migration_data_processed_bytes{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}]))  BY (name, namespace, cluster)`,
-    [VMQueries.MIGRATION_DATA_REMAINING]: `sum(sum_over_time(kubevirt_vmi_migration_data_remaining_bytes{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}]))  BY (name, namespace, cluster)`,
-    [VMQueries.MIGRATION_DISK_TRANSFER_RATE]: `sum(sum_over_time(kubevirt_vmi_migration_disk_transfer_rate_bytes	{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}]))  BY (name, namespace, cluster)`,
-    [VMQueries.MIGRATION_MEMORY_DIRTY_RATE]: `sum(sum_over_time(kubevirt_vmi_migration_dirty_memory_rate_bytes{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}]))  BY (name, namespace, cluster)`,
-    [VMQueries.NETWORK_IN_BY_INTERFACE_USAGE]: `sum(rate(kubevirt_vmi_network_receive_bytes_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}])) BY (name, namespace, cluster, interface)`,
-    [VMQueries.NETWORK_IN_USAGE]: `sum(rate(kubevirt_vmi_network_receive_bytes_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}])) BY (name, namespace, cluster)`,
-    [VMQueries.NETWORK_OUT_BY_INTERFACE_USAGE]: `sum(rate(kubevirt_vmi_network_transmit_bytes_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}])) BY (name, namespace, cluster, interface)`,
-    [VMQueries.NETWORK_OUT_USAGE]: `sum(rate(kubevirt_vmi_network_transmit_bytes_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}])) BY (name, namespace, cluster)`,
-    [VMQueries.NETWORK_TOTAL_BY_INTERFACE_USAGE]: `sum(rate(kubevirt_vmi_network_receive_bytes_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}])) BY (name, namespace, cluster, interface)`,
-    [VMQueries.NETWORK_TOTAL_USAGE]: `sum(rate(kubevirt_vmi_network_receive_bytes_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}])) BY (name, namespace, cluster)`,
-    [VMQueries.STORAGE_IOPS_TOTAL]: `sum(rate(kubevirt_vmi_storage_iops_read_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}]) + rate(kubevirt_vmi_storage_iops_write_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}])) BY (name, namespace, cluster)`,
+    [VMQueries.MIGRATION_DATA_PROCESSED]: `sum(sum_over_time(kubevirt_vmi_migration_data_processed_bytes{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}]))  BY (name, namespace${sumByCluster})`,
+    [VMQueries.MIGRATION_DATA_REMAINING]: `sum(sum_over_time(kubevirt_vmi_migration_data_remaining_bytes{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}]))  BY (name, namespace${sumByCluster})`,
+    [VMQueries.MIGRATION_DISK_TRANSFER_RATE]: `sum(sum_over_time(kubevirt_vmi_migration_disk_transfer_rate_bytes	{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}]))  BY (name, namespace${sumByCluster})`,
+    [VMQueries.MIGRATION_MEMORY_DIRTY_RATE]: `sum(sum_over_time(kubevirt_vmi_migration_dirty_memory_rate_bytes{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}]))  BY (name, namespace${sumByCluster})`,
+    [VMQueries.NETWORK_IN_BY_INTERFACE_USAGE]: `sum(rate(kubevirt_vmi_network_receive_bytes_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}])) BY (name, namespace${sumByCluster}, interface)`,
+    [VMQueries.NETWORK_IN_USAGE]: `sum(rate(kubevirt_vmi_network_receive_bytes_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}])) BY (name, namespace${sumByCluster})`,
+    [VMQueries.NETWORK_OUT_BY_INTERFACE_USAGE]: `sum(rate(kubevirt_vmi_network_transmit_bytes_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}])) BY (name, namespace${sumByCluster}, interface)`,
+    [VMQueries.NETWORK_OUT_USAGE]: `sum(rate(kubevirt_vmi_network_transmit_bytes_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}])) BY (name, namespace${sumByCluster})`,
+    [VMQueries.NETWORK_TOTAL_BY_INTERFACE_USAGE]: `sum(rate(kubevirt_vmi_network_receive_bytes_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}])) BY (name, namespace${sumByCluster}, interface)`,
+    [VMQueries.NETWORK_TOTAL_USAGE]: `sum(rate(kubevirt_vmi_network_receive_bytes_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}])) BY (name, namespace${sumByCluster})`,
+    [VMQueries.STORAGE_IOPS_TOTAL]: `sum(rate(kubevirt_vmi_storage_iops_read_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}]) + rate(kubevirt_vmi_storage_iops_write_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}])) BY (name, namespace${sumByCluster})`,
   };
 };

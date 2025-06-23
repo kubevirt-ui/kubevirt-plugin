@@ -5,18 +5,22 @@ import {
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getInstanceTypeModelFromMatcher } from '@kubevirt-utils/resources/instancetype/helper';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { useFleetK8sWatchResource } from '@stolostron/multicluster-sdk';
 
-type UseInstanceType = (instanceTypeMatcher: V1InstancetypeMatcher) => {
+type UseInstanceType = (
+  instanceTypeMatcher: V1InstancetypeMatcher,
+  cluster?: string,
+) => {
   instanceType: V1beta1VirtualMachineInstancetype;
   instanceTypeLoaded: boolean;
   instanceTypeLoadError: Error;
 };
 
-const useInstanceType: UseInstanceType = (instanceTypeMatcher) => {
+const useInstanceType: UseInstanceType = (instanceTypeMatcher, cluster) => {
   const [instanceType, instanceTypeLoaded, instanceTypeLoadError] =
-    useK8sWatchResource<V1beta1VirtualMachineInstancetype>(
+    useFleetK8sWatchResource<V1beta1VirtualMachineInstancetype>(
       !isEmpty(instanceTypeMatcher) && {
+        cluster,
         groupVersionKind: modelToGroupVersionKind(
           getInstanceTypeModelFromMatcher(instanceTypeMatcher),
         ),

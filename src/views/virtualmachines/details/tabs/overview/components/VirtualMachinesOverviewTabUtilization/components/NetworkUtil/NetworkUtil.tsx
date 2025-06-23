@@ -21,7 +21,7 @@ type NetworkUtilProps = {
 const NetworkUtil: React.FC<NetworkUtilProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
   const { currentTime, duration } = useDuration();
-  const hubClusterName = useHubClusterName();
+  const [hubClusterName] = useHubClusterName();
   const queries = React.useMemo(
     () => getUtilizationQueries({ duration, hubClusterName, obj: vmi }),
     [vmi, duration, hubClusterName],

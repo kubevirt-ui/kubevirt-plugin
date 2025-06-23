@@ -20,7 +20,7 @@ const useMigrationPercentage: UseMigrationPercentage = (vm) => {
   const namespace = getNamespace(vm);
 
   const vmim = useVirtualMachineInstanceMigration(vm);
-  const hubClusterName = useHubClusterName();
+  const [hubClusterName] = useHubClusterName();
 
   const queries = useMemo(
     () => getUtilizationQueries({ hubClusterName, obj: vm }),

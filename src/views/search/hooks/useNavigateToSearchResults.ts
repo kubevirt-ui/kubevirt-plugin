@@ -5,6 +5,7 @@ import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { STATIC_SEARCH_FILTERS } from '@kubevirt-utils/components/ListPageFilter/constants';
 import { useQueryParamsMethods } from '@kubevirt-utils/components/ListPageFilter/hooks/useQueryParamsMethods';
 import { ResetTextSearch, TextFiltersType } from '@kubevirt-utils/components/ListPageFilter/types';
+import useIsACMPage from '@kubevirt-utils/hooks/useIsACMPage';
 import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
@@ -20,6 +21,8 @@ export const useNavigateToSearchResults: UseNavigateToSearchResults = (
   resetTextSearch,
 ) => {
   const navigate = useNavigate();
+
+  const isACMPage = useIsACMPage();
   const { setAllQueryArguments } = useQueryParamsMethods();
 
   const resetCurrentFilter = useCallback(() => {
@@ -80,9 +83,13 @@ export const useNavigateToSearchResults: UseNavigateToSearchResults = (
 
   return useCallback(
     (searchInputs) => {
-      navigate(`/k8s/all-namespaces/${VirtualMachineModelRef}/search`);
+      navigate(
+        isACMPage
+          ? '/multicloud/infrastructure/virtualmachines/search'
+          : `/k8s/all-namespaces/${VirtualMachineModelRef}/search`,
+      );
       applyFilter(searchInputs);
     },
-    [navigate, applyFilter],
+    [navigate, isACMPage, applyFilter],
   );
 };

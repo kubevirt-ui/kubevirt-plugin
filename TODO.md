@@ -1,7 +1,0 @@
-- don't use context
-- fix the declare resource
-- don't use wrapper
-- change their vm list links pointing to the console standalone smoothly with clustern ame in the param
-- change our vnc console with cluster param
-- record a video with before and after
-- Use console plugin resource to choose from where to fetch data (Acm is working or not)

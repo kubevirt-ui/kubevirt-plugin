@@ -2,6 +2,7 @@ import { useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom-v5-compat';
 
 import { IoK8sApiCoreV1Pod } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import useIsACMPage from '@kubevirt-utils/hooks/useIsACMPage';
 import { modelToGroupVersionKind, PodModel } from '@kubevirt-utils/models';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
@@ -20,7 +21,8 @@ const useVMMetrics = () => {
   const { cluster, ns: namespace } = useParams<{ cluster?: string; ns?: string }>();
 
   const currentTime = useMemo<number>(() => Date.now(), []);
-  const hubClusterName = useHubClusterName();
+  const [hubClusterName] = useHubClusterName();
+  const isACMPage = useIsACMPage();
 
   const [pods] = useFleetK8sWatchResource<IoK8sApiCoreV1Pod[]>({
     cluster,
@@ -32,8 +34,13 @@ const useVMMetrics = () => {
   const launcherNameToVMName = useMemo(() => getVMNamesFromPodsNames(pods), [pods]);
 
   const queries = useMemo(
-    () => getVMListQueries(namespace, cluster === hubClusterName ? undefined : cluster),
-    [namespace, hubClusterName, cluster],
+    () =>
+      getVMListQueries(
+        namespace,
+        cluster === hubClusterName ? undefined : cluster,
+        isACMPage && isEmpty(cluster),
+      ),
+    [namespace, hubClusterName, cluster, isACMPage],
   );
 
   const [memoryUsageResponse] = useFleetPrometheusPoll({

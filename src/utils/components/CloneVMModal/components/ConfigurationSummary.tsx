@@ -31,7 +31,7 @@ const ConfigurationSummary: FC<ConfigurationSummaryProps> = ({ vm }) => {
 
   const itMatcher: V1InstancetypeMatcher = vm?.spec?.instancetype;
 
-  const { vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
+  const { vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace, vm?.cluster);
   const [guestAgentData] = useGuestOS(vmi);
   const osName = (guestAgentData?.os?.prettyName || guestAgentData?.os?.name) ?? (
     <GuestAgentIsRequiredText vmi={vmi} />
@@ -50,7 +50,7 @@ const ConfigurationSummary: FC<ConfigurationSummaryProps> = ({ vm }) => {
       </Content>
 
       {itMatcher ? (
-        <InstanceTypeConfiguration itMatcher={itMatcher} />
+        <InstanceTypeConfiguration cluster={vm?.cluster} itMatcher={itMatcher} />
       ) : (
         <>
           <Content className="pf-v6-u-text-color-subtle" component={ContentVariants.dt}>

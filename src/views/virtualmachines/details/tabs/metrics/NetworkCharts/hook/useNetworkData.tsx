@@ -27,7 +27,7 @@ type UseNetworkData = (
 
 const useNetworkData: UseNetworkData = (vmi, nic) => {
   const { currentTime, duration, timespan } = useDuration();
-  const hubClusterName = useHubClusterName();
+  const [hubClusterName] = useHubClusterName();
   const queries = useMemo(
     () => getUtilizationQueries({ duration, hubClusterName, nic, obj: vmi }),
     [vmi, duration, nic, hubClusterName],

@@ -36,7 +36,7 @@ type StorageIOPSTotalThresholdChartProps = {
 const StorageIOPSTotalThresholdChart: React.FC<StorageIOPSTotalThresholdChartProps> = ({ vmi }) => {
   const { currentTime, duration, timespan } = useDuration();
 
-  const hubClusterName = useHubClusterName();
+  const [hubClusterName] = useHubClusterName();
   const queries = React.useMemo(
     () => getUtilizationQueries({ duration, hubClusterName, obj: vmi }),
     [vmi, duration, hubClusterName],

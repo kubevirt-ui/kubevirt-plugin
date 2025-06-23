@@ -9,12 +9,13 @@ import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import { Content, ContentVariants, Skeleton } from '@patternfly/react-core';
 
 type InstanceTypeConfigurationProps = {
+  cluster?: string;
   itMatcher: V1InstancetypeMatcher;
 };
 
-const InstanceTypeConfiguration: FC<InstanceTypeConfigurationProps> = ({ itMatcher }) => {
+const InstanceTypeConfiguration: FC<InstanceTypeConfigurationProps> = ({ cluster, itMatcher }) => {
   const { t } = useKubevirtTranslation();
-  const { instanceType, instanceTypeLoaded } = useInstanceType(itMatcher);
+  const { instanceType, instanceTypeLoaded } = useInstanceType(itMatcher, cluster);
 
   return (
     <>

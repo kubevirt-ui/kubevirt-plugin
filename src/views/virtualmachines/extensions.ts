@@ -57,7 +57,10 @@ export const extensions: EncodedExtension[] = [
   {
     properties: {
       component: { $codeRef: 'VirtualMachineSearchResults' },
-      path: ['/k8s/all-namespaces/kubevirt.io~v1~VirtualMachine/search'],
+      path: [
+        '/k8s/all-namespaces/kubevirt.io~v1~VirtualMachine/search',
+        '/multicloud/infrastructure/virtualmachines/search',
+      ],
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,

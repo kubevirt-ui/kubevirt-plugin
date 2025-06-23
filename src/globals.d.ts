@@ -18,6 +18,10 @@ declare module '@kubevirt-ui/kubevirt-api/kubevirt' {
     extends kubevirtUITypes.V1VirtualMachineInstanceMigration {
     cluster?: string;
   }
+
+  interface V1beta1VirtualMachineClone extends kubevirtUITypes.V1beta1VirtualMachineClone {
+    cluster?: string;
+  }
 }
 
 declare module '@kubevirt-ui/kubevirt-api/kubernetes' {

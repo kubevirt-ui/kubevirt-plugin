@@ -11,7 +11,7 @@ import {
 
 const useACMExtensionActions = (vm): ActionDropdownItemType[] => {
   const { createModal } = useModal();
-  const hubClusterName = useHubClusterName();
+  const [hubClusterName] = useHubClusterName();
   const [virtualMachineActionExtensions, virtualMachineActionExtensionsResolved] =
     useResolvedExtensions<ACMVirtualMachineActionExtension>(isACMVirtualMachineActionExtension);
 

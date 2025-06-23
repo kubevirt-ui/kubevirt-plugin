@@ -12,7 +12,7 @@ export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
 export const extensions: EncodedExtension[] = [
   {
     flags: {
-      required: ['KUBEVIRT_DYNAMIC'],
+      required: ['KUBEVIRT_DYNAMIC_ACM'],
     },
     properties: {
       component: { $codeRef: 'ConsoleStandAlone' },
@@ -23,6 +23,9 @@ export const extensions: EncodedExtension[] = [
   } as EncodedExtension<StandaloneRoutePage>,
 
   {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC_ACM'],
+    },
     properties: {
       component: {
         $codeRef: 'Navigator',

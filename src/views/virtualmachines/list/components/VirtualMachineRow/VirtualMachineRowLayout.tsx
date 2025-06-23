@@ -2,6 +2,7 @@ import React, { FC, ReactNode, useMemo } from 'react';
 
 import {
   modelToGroupVersionKind,
+  ProjectModel,
   StorageClassModel,
   VirtualMachineModelGroupVersionKind,
 } from '@kubevirt-ui/kubevirt-api/console';
@@ -83,7 +84,12 @@ const VirtualMachineRowLayout: FC<
         />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="namespace">
-        <ResourceLink kind="Namespace" name={vmNamespace} truncate />
+        <FleetResourceLink
+          cluster={obj?.cluster}
+          groupVersionKind={modelToGroupVersionKind(ProjectModel)}
+          name={vmNamespace}
+          truncate
+        />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="status">
         {status}

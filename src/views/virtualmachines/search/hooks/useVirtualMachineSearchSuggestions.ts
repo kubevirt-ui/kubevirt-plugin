@@ -5,9 +5,9 @@ import {
   VirtualMachineModelGroupVersionKind,
 } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import { getAnnotation, getLabels, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVMIIPAddresses } from '@kubevirt-utils/resources/vmi/utils/ips';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { SearchSuggestResult } from '@search/utils/types';
 import { compareCIDR, OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 
@@ -18,14 +18,14 @@ type UseVirtualMachineSearchSuggestions = (
 export const useVirtualMachineSearchSuggestions: UseVirtualMachineSearchSuggestions = (
   searchQuery,
 ) => {
-  const [vms, vmsLoaded] = useK8sWatchResource<V1VirtualMachine[]>({
+  const [vms, vmsLoaded] = useKubevirtWatchResource<V1VirtualMachine[]>({
     groupVersionKind: VirtualMachineModelGroupVersionKind,
     isList: true,
     limit: OBJECTS_FETCHING_LIMIT,
     namespaced: true,
   });
 
-  const [vmis, vmisLoaded] = useK8sWatchResource<V1VirtualMachineInstance[]>({
+  const [vmis, vmisLoaded] = useKubevirtWatchResource<V1VirtualMachineInstance[]>({
     groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
     isList: true,
     limit: OBJECTS_FETCHING_LIMIT,

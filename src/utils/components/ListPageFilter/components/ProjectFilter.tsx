@@ -48,7 +48,7 @@ const ProjectFilter: FC<ProjectFilterProps> = ({ applyTextFilters }) => {
       labels={selectedProjects}
     >
       <CheckboxSelect
-        options={allProjects.map((project) => ({
+        options={allProjects?.map((project) => ({
           children: project,
           isSelected: selectedProjects.includes(project),
           value: project,

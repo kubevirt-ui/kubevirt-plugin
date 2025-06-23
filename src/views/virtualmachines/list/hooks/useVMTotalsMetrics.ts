@@ -2,7 +2,9 @@ import { useMemo } from 'react';
 import { useParams } from 'react-router-dom-v5-compat';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import useIsACMPage from '@kubevirt-utils/hooks/useIsACMPage';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import { METRICS } from '@overview/OverviewTab/metric-charts-card/utils/constants';
 import { useFleetPrometheusPoll, useHubClusterName } from '@stolostron/multicluster-sdk';
@@ -13,7 +15,8 @@ import { getVMTotalsQueries, VMTotalsQueries } from '../utils/totalsQueries';
 const useVMTotalsMetrics = (vms: V1VirtualMachine[], vmis: V1VirtualMachineInstance[]) => {
   const { cluster, ns: namespace } = useParams<{ cluster?: string; ns?: string }>();
 
-  const hubClusterName = useHubClusterName();
+  const [hubClusterName] = useHubClusterName();
+  const isACMPage = useIsACMPage();
 
   const currentTime = useMemo<number>(() => Date.now(), []);
 
@@ -25,8 +28,9 @@ const useVMTotalsMetrics = (vms: V1VirtualMachine[], vmis: V1VirtualMachineInsta
         namespace,
         namespacesList,
         cluster === hubClusterName ? undefined : cluster,
+        isACMPage && isEmpty(cluster),
       ),
-    [namespace, namespacesList, cluster, hubClusterName],
+    [namespace, namespacesList, cluster, hubClusterName, isACMPage],
   );
 
   const prometheusPollProps = {
