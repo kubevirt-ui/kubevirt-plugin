@@ -13,6 +13,7 @@ import { SetBootableVolumeFieldType } from '@kubevirt-utils/components/AddBootab
 import { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useUserPreferences from '@kubevirt-utils/hooks/useUserPreferences';
+import { getValidNamespace } from '@kubevirt-utils/utils/utils';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 
 type UsePreferenceSelectOptions = (
@@ -29,9 +30,10 @@ const usePreferenceSelectOptions: UsePreferenceSelectOptions = (
 ) => {
   const { t } = useKubevirtTranslation();
   const [activeNamespace] = useActiveNamespace();
+  const namespace = getValidNamespace(activeNamespace);
 
   const [preferences, preferencesLoaded] = useClusterPreferences();
-  const [userPreferences = [], userPreferencesLoaded] = useUserPreferences(activeNamespace);
+  const [userPreferences = [], userPreferencesLoaded] = useUserPreferences(namespace);
 
   const preferenceSelectOptions = useMemo(() => {
     const preferenceOptions: EnhancedSelectOptionProps[] = getResourceDropdownOptions({

@@ -1,6 +1,10 @@
 import React, { FC, useCallback, useMemo, useState } from 'react';
 
 import useInstanceTypesAndPreferences from '@catalog/CreateFromInstanceTypes/state/hooks/useInstanceTypesAndPreferences';
+import { DEFAULT_INSTANCETYPE_KIND_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
+import VirtualMachineClusterInstancetypeModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineClusterInstancetypeModel';
+import VirtualMachineInstancetypeModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstancetypeModel';
+import { SetBootableVolumeFieldType } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/constants';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, PopoverPosition } from '@patternfly/react-core';
@@ -15,11 +19,13 @@ import { getInstanceTypeMenuItems } from './utils/utils';
 
 type InstanceTypeMenuItemsProps = {
   selected: string;
+  setBootableVolumeField: SetBootableVolumeFieldType;
   setSelected: (value: string) => void;
 };
 
 export const InstanceTypeDrilldownSelect: FC<InstanceTypeMenuItemsProps> = ({
   selected,
+  setBootableVolumeField,
   setSelected,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -29,11 +35,12 @@ export const InstanceTypeDrilldownSelect: FC<InstanceTypeMenuItemsProps> = ({
   const menuItems = useMemo(() => getInstanceTypeMenuItems(allInstanceTypes), [allInstanceTypes]);
 
   const onSelect = useCallback(
-    (value: string) => {
+    (kind: string) => (value: string) => {
+      setBootableVolumeField('labels', DEFAULT_INSTANCETYPE_KIND_LABEL)(kind);
       setSelected(value);
       setIsOpen(false);
     },
-    [setSelected],
+    [setBootableVolumeField, setSelected],
   );
 
   return (
@@ -59,14 +66,14 @@ export const InstanceTypeDrilldownSelect: FC<InstanceTypeMenuItemsProps> = ({
           <RedHatInstanceTypeSeriesMenu
             selected={selected}
             series={menuItems.redHatProvided.items}
-            setSelected={onSelect}
+            setSelected={onSelect(VirtualMachineClusterInstancetypeModel.kind)}
           />
         </DrilldownMenuItem>
         <DrilldownMenuItem {...menuItems.userProvided}>
           <UserInstanceTypeMenu
             allInstanceTypes={allInstanceTypes}
             selected={selected}
-            setSelected={onSelect}
+            setSelected={onSelect(VirtualMachineInstancetypeModel.kind)}
           />
         </DrilldownMenuItem>
       </ComposableDrilldownSelect>

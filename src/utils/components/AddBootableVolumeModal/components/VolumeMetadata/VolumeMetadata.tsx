@@ -39,6 +39,7 @@ const VolumeMetadata: FC<VolumeMetadataProps> = ({
 
       <InstanceTypeDrilldownSelect
         selected={labels?.[DEFAULT_INSTANCETYPE_LABEL]}
+        setBootableVolumeField={setBootableVolumeField}
         setSelected={setBootableVolumeField('labels', DEFAULT_INSTANCETYPE_LABEL)}
       />
       <FormGroup label={t('Description')}>
