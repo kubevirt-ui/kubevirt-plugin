@@ -34,6 +34,7 @@ const VolumeMetadata: FC<VolumeMetadataProps> = ({
         deleteLabel={deleteLabel}
         selectedPreference={labels?.[DEFAULT_PREFERENCE_LABEL]}
         setBootableVolumeField={setBootableVolumeField}
+        volumeLabels={bootableVolume?.labels}
       />
 
       <InstanceTypeDrilldownSelect

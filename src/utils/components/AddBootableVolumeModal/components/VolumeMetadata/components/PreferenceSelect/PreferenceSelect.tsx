@@ -1,66 +1,48 @@
-import React, { FC, useMemo } from 'react';
+import React, { FC } from 'react';
 
-import useClusterPreferences from '@catalog/CreateFromInstanceTypes/state/hooks/useClusterPreferences';
-import {
-  DEFAULT_PREFERENCE_KIND_LABEL,
-  DEFAULT_PREFERENCE_LABEL,
-} from '@catalog/CreateFromInstanceTypes/utils/constants';
-import {
-  VirtualMachineClusterPreferenceModelGroupVersionKind,
-  VirtualMachinePreferenceModelGroupVersionKind,
-} from '@kubevirt-ui/kubevirt-api/console';
+import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
+import usePreferenceSelectOptions from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/PreferenceSelect/hooks/usePreferenceSelectOptions';
 import { SetBootableVolumeFieldType } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/constants';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
-import { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useUserPreferences from '@kubevirt-utils/hooks/useUserPreferences';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { FormGroup, PopoverPosition } from '@patternfly/react-core';
 
-import { getResourceDropdownOptions } from './utils/utils';
+import { getSelectedKeyByLabel } from './utils/utils';
 import PreferencePopoverContent from './PreferencePopoverContent';
 
 type PreferenceSelectProps = {
   deleteLabel: (labelKey: string) => void;
   selectedPreference: string;
   setBootableVolumeField: SetBootableVolumeFieldType;
+  volumeLabels: { [key: string]: string };
 };
 
 const PreferenceSelect: FC<PreferenceSelectProps> = ({
   deleteLabel,
   selectedPreference,
   setBootableVolumeField,
+  volumeLabels,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [activeNamespace] = useActiveNamespace();
+  const { preferenceSelectOptions, preferencesLoaded } = usePreferenceSelectOptions(
+    deleteLabel,
+    setBootableVolumeField,
+  );
 
-  const [preferences, preferencesLoaded] = useClusterPreferences();
-  const [userPreferences = [], userPreferencesLoaded] = useUserPreferences(activeNamespace);
+  if (!preferencesLoaded) return <Loading />;
 
-  const options = useMemo(() => {
-    const preferenceOptions: EnhancedSelectOptionProps[] = getResourceDropdownOptions(
-      preferences,
-      VirtualMachineClusterPreferenceModelGroupVersionKind,
-      () => deleteLabel(DEFAULT_PREFERENCE_KIND_LABEL),
-      t('Cluster preferences'),
-    );
+  const handleSelect = (value: string) => {
+    const selectedValue = preferenceSelectOptions.find((option) => option.value === value);
+    setBootableVolumeField('labels', DEFAULT_PREFERENCE_LABEL)(selectedValue.label);
+  };
 
-    const userPreferenceOptions: EnhancedSelectOptionProps[] = getResourceDropdownOptions(
-      userPreferences,
-      VirtualMachinePreferenceModelGroupVersionKind,
-      () =>
-        setBootableVolumeField(
-          'labels',
-          DEFAULT_PREFERENCE_KIND_LABEL,
-        )(VirtualMachinePreferenceModelGroupVersionKind.kind),
-      t('User preferences'),
-    );
-    return [...userPreferenceOptions, ...preferenceOptions];
-  }, [preferences, userPreferences, deleteLabel, setBootableVolumeField, t]);
-
-  if (!preferencesLoaded || !userPreferencesLoaded) return <Loading />;
+  const selectedPreferenceKey = getSelectedKeyByLabel(
+    selectedPreference,
+    preferenceSelectOptions,
+    volumeLabels,
+  );
 
   return (
     <FormGroup
@@ -76,9 +58,9 @@ const PreferenceSelect: FC<PreferenceSelectProps> = ({
       isRequired
     >
       <InlineFilterSelect
-        options={options}
-        selected={selectedPreference}
-        setSelected={setBootableVolumeField('labels', DEFAULT_PREFERENCE_LABEL)}
+        options={preferenceSelectOptions}
+        selected={selectedPreferenceKey}
+        setSelected={handleSelect}
         toggleProps={{ isFullWidth: true, placeholder: t('Select preference') }}
       />
     </FormGroup>

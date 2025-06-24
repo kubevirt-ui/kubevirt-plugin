@@ -11,7 +11,11 @@ type InlineFilterSelectOptionContentProps = {
 
 const InlineFilterSelectOptionContent: FC<InlineFilterSelectOptionContentProps> = ({ option }) =>
   !isEmpty(option?.groupVersionKind) ? (
-    <ResourceLink groupVersionKind={option.groupVersionKind} linkTo={false} name={option.value} />
+    <ResourceLink
+      groupVersionKind={option.groupVersionKind}
+      linkTo={false}
+      name={option?.label || option.value}
+    />
   ) : (
     <>{option?.children}</>
   );
