@@ -21,7 +21,7 @@ const useContainerWidth = (containerRef: MutableRefObject<HTMLElement>) => {
     resizeObserver.observe(container);
 
     return () => resizeObserver.disconnect();
-  }, []);
+  }, [containerRef]);
 
   return containerWidth;
 };
