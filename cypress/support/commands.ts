@@ -1,4 +1,4 @@
-import { CNV_NS, TEST_NS } from '../utils/const/index';
+import { CNV_NS, K8S_KIND, TEST_NS } from '../utils/const/index';
 import { Perspective, switchPerspective } from '../views/perspective';
 
 export {};
@@ -9,9 +9,10 @@ declare global {
       beforeSpec(): void;
       checkHCOSpec(spec: string, matchString: string, include: boolean): void;
       checkVMSpec(vmName: string, spec: string, matchString: string, include: boolean): void;
+      deleteVM(vmName: string[]): void;
       patchVM(vmName: string, status: string): void;
-      startVM(vmName: string): void;
-      stopVM(vmName: string): void;
+      startVM(vmName: string[]): void;
+      stopVM(vmName: string[]): void;
       switchToVirt(): void;
     }
   }
@@ -48,13 +49,17 @@ Cypress.Commands.add('patchVM', (vmName: string, status: string) => {
   );
 });
 
-Cypress.Commands.add('startVM', (vmName: string) => {
-  cy.patchVM(vmName, 'Always');
-  cy.exec(`oc wait --for=condition=ready vm/${vmName} --timeout=120s`, { timeout: 120000 });
+Cypress.Commands.add('startVM', (vms: string[]) => {
+  vms.forEach((vmName) => {
+    cy.patchVM(vmName, 'Always');
+    cy.exec(`oc wait --for=condition=ready vm/${vmName} --timeout=300s`, { timeout: 300000 });
+  });
 });
 
-Cypress.Commands.add('stopVM', (vmName: string) => {
-  cy.patchVM(vmName, 'Halted');
+Cypress.Commands.add('stopVM', (vms: string[]) => {
+  vms.forEach((vmName) => {
+    cy.patchVM(vmName, 'Halted');
+  });
 });
 
 Cypress.Commands.add('switchToVirt', () => {
@@ -64,8 +69,18 @@ Cypress.Commands.add('switchToVirt', () => {
 Cypress.Commands.add('beforeSpec', () => {
   cy.visit('');
   cy.get('[data-test="username"]', { timeout: 180000 }).should('exist');
+  cy.wait(15000); // wait here because page refresh might happen
   cy.switchToVirt();
   cy.contains('[data-test-id="resource-title"]', 'Virtualization', { timeout: 180000 }).should(
     'exist',
   );
+});
+
+Cypress.Commands.add('deleteVM', (vms: string[]) => {
+  vms.forEach((vmName) => {
+    cy.exec(
+      `oc delete --ignore-not-found=true --cascade ${K8S_KIND.VM} ${vmName} --wait=true --timeout=180s`,
+      { failOnNonZeroExit: false, timeout: 1800000 },
+    );
+  });
 });
