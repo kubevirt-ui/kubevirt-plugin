@@ -1,3 +1,7 @@
+import { VMINetworkPresentation } from '@kubevirt-utils/resources/vmi/types';
+
+import { NetworkPresentation } from './constants';
+
 export enum NetworkInterfaceState {
   'ABSENT' = 'absent',
   'DOWN' = 'down',
@@ -5,3 +9,7 @@ export enum NetworkInterfaceState {
   'UNSUPPORTED' = 'unsupported',
   'UP' = 'up',
 }
+export type NICState = {
+  config?: NetworkPresentation;
+  runtime: VMINetworkPresentation;
+};

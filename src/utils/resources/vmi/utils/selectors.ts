@@ -57,3 +57,13 @@ export const getVMIBootLoader = (vmi: V1VirtualMachineInstance): V1Bootloader =>
  * @returns {string} the virtual machine instance's node name
  */
 export const getVMINodeName = (vmi: V1VirtualMachineInstance): string => vmi?.status?.nodeName;
+export const getNetworkInterface = (
+  vmi: V1VirtualMachineInstance,
+  interfaceName: string,
+): undefined | V1VirtualMachineInstanceNetworkInterface =>
+  getVMIStatusInterfaces(vmi)?.find((iface) => iface?.name === interfaceName);
+
+export const getNetworkInterfaceState = (
+  vm: V1VirtualMachineInstance,
+  interfaceName: string,
+): string | undefined => getNetworkInterface(vm, interfaceName)?.linkState;
