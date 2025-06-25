@@ -8,6 +8,11 @@ import {
 } from '@kubevirt-utils/components/GuidedTour/utils/constants';
 import { ALL_NAMESPACES_SESSION_KEY, ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import { getLabel, getName, getNamespace, getResourceUrl } from '@kubevirt-utils/resources/shared';
+import {
+  getACMVMListNamespacesURL,
+  getACMVMListURL,
+  getACMVMURL,
+} from '@kubevirt-utils/resources/vm';
 import { TreeViewDataItem } from '@patternfly/react-core';
 import { FolderIcon, FolderOpenIcon, ProjectDiagramIcon } from '@patternfly/react-icons';
 import { signal } from '@preact/signals-react';
@@ -33,6 +38,7 @@ const buildProjectMap = (
   currentVMTab: string,
   treeViewDataMap: Record<string, TreeViewDataItemWithHref>,
   foldersEnabled: boolean,
+  isACMTreeView = false,
 ) => {
   const projectMap: Record<
     string,
@@ -52,11 +58,13 @@ const buildProjectMap = (
 
     const vmTreeItem: TreeViewDataItemWithHref = {
       defaultExpanded: currentPageVMName && currentPageVMName === vmName,
-      href: `${getResourceUrl({
-        activeNamespace: vmNamespace,
-        model: VirtualMachineModel,
-        resource: { metadata: { name: vmName, namespace: vmNamespace } },
-      })}/${currentVMTab}`,
+      href: isACMTreeView
+        ? getACMVMURL(vm.cluster, vmNamespace, vmName)
+        : `${getResourceUrl({
+            activeNamespace: vmNamespace,
+            model: VirtualMachineModel,
+            resource: { metadata: { name: vmName, namespace: vmNamespace } },
+          })}/${currentVMTab}`,
       icon: <VMStatusIcon />,
       id: vmTreeItemID,
       name: vmName,
@@ -89,6 +97,7 @@ const createFolderTreeItems = (
   project: string,
   currentPageVMName: string,
   treeViewDataMap: Record<string, TreeViewDataItemWithHref>,
+  cluster?: string,
 ): TreeViewDataItemWithHref[] =>
   Object.entries(folders).map(([folder, vmItems]) => {
     const folderTreeItemID = `${FOLDER_SELECTOR_PREFIX}/${project}/${folder}`;
@@ -99,10 +108,12 @@ const createFolderTreeItems = (
       children: vmItems,
       defaultExpanded: folderExpanded,
       expandedIcon: <FolderOpenIcon />,
-      href: getResourceUrl({
-        activeNamespace: project,
-        model: VirtualMachineModel,
-      }),
+      href: cluster
+        ? getACMVMListNamespacesURL(cluster, project)
+        : getResourceUrl({
+            activeNamespace: project,
+            model: VirtualMachineModel,
+          }),
       icon: <FolderIcon />,
       id: folderTreeItemID,
       name: folder,
@@ -121,12 +132,14 @@ const createProjectTreeItem = (
   currentPageVMName: string,
   currentPageNamespace: string,
   treeViewDataMap: Record<string, TreeViewDataItemWithHref>,
+  cluster?: string,
 ): TreeViewDataItemWithHref => {
   const projectFolders = createFolderTreeItems(
     projectMap[project]?.folders || {},
     project,
     currentPageVMName,
     treeViewDataMap,
+    cluster,
   );
 
   const sortProjectFolders = projectFolders.sort((folderA, folderB) =>
@@ -140,10 +153,12 @@ const createProjectTreeItem = (
     children: projectChildren,
     customBadgeContent: projectMap[project]?.count || 0,
     defaultExpanded: currentPageNamespace === project,
-    href: getResourceUrl({
-      activeNamespace: project,
-      model: VirtualMachineModel,
-    }),
+    href: cluster
+      ? getACMVMListNamespacesURL(cluster, project)
+      : getResourceUrl({
+          activeNamespace: project,
+          model: VirtualMachineModel,
+        }),
     icon: <ProjectDiagramIcon />,
     id: projectTreeItemID,
     name: project,
@@ -160,6 +175,7 @@ const createAllNamespacesTreeItem = (
   treeViewData: TreeViewDataItemWithHref[],
   treeViewDataMap: Record<string, TreeViewDataItemWithHref>,
   projectMap: Record<string, any>,
+  cluster?: string,
 ): TreeViewDataItemWithHref => {
   const allVMsCount = Object.keys(projectMap).reduce((acc, ns) => {
     acc += projectMap[ns]?.count;
@@ -170,9 +186,11 @@ const createAllNamespacesTreeItem = (
     children: treeViewData,
     customBadgeContent: allVMsCount || '0',
     defaultExpanded: true,
-    href: getResourceUrl({
-      model: VirtualMachineModel,
-    }),
+    href: cluster
+      ? getACMVMListURL(cluster)
+      : getResourceUrl({
+          model: VirtualMachineModel,
+        }),
     icon: <ProjectDiagramIcon />,
     id: ALL_NAMESPACES_SESSION_KEY,
     name: ALL_PROJECTS,
@@ -229,6 +247,73 @@ export const createTreeViewData = (
   return tree;
 };
 
+export const createMultiClusterTreeViewData = (
+  vms: V1VirtualMachine[],
+  pathname: string,
+  foldersEnabled: boolean,
+  clusters?: K8sResourceCommon[],
+): TreeViewDataItem[] => {
+  const { currentVMTab, vmName, vmNamespace } = getVMInfoFromPathname(pathname);
+
+  const treeViewDataMap: Record<string, TreeViewDataItem> = {};
+
+  const treeWithClusters = clusters?.map((cluster) => {
+    const clusterName = getName(cluster);
+
+    const vmsInCluster = vms?.filter((vm) => vm.cluster === clusterName);
+
+    const projectsInCluster = vmsInCluster.reduce((namespaces, vm) => {
+      const namespace = getNamespace(vm);
+      if (!namespaces.includes(namespace)) namespaces.push(namespace);
+
+      return namespaces;
+    }, []);
+
+    const projectMap = buildProjectMap(
+      vmsInCluster,
+      vmName,
+      currentVMTab,
+      treeViewDataMap,
+      foldersEnabled,
+      true,
+    );
+
+    const treeViewData = projectsInCluster.map((project) =>
+      createProjectTreeItem(project, projectMap, vmName, vmNamespace, treeViewDataMap, clusterName),
+    );
+
+    const clusterTreeItem: TreeViewDataItemWithHref = {
+      children: treeViewData,
+      hasBadge: false,
+      href: `/multicloud/infrastructure/virtualmachines/${clusterName}`,
+      icon: <ProjectDiagramIcon />,
+      id: `cluster/${clusterName}`,
+      name: clusterName,
+    };
+
+    if (!treeViewDataMap[clusterTreeItem.id]) {
+      treeViewDataMap[clusterTreeItem.id] = clusterTreeItem;
+    }
+
+    return clusterTreeItem;
+  });
+
+  treeDataMap.value = treeViewDataMap;
+
+  const clusterTreeItem: TreeViewDataItemWithHref[] = [
+    {
+      children: treeWithClusters,
+      hasBadge: false,
+      href: `/multicloud/infrastructure/virtualmachines`,
+      icon: <ProjectDiagramIcon />,
+      id: 'ALL_CLUSTERS',
+      name: 'All clusters',
+    },
+  ];
+
+  return clusterTreeItem;
+};
+
 export const filterItems = (item: TreeViewDataItem, input: string) => {
   if ((item.name as string).toLowerCase().includes(input.toLowerCase())) {
     return true;
@@ -246,13 +331,19 @@ export const filterItems = (item: TreeViewDataItem, input: string) => {
 // Show / hide projects that has no VMs depending on a flag
 // hide system namespaces unless they contain VMs
 export const filterNamespaceItems = (item: TreeViewDataItem, showEmptyProjects: boolean) => {
-  const hasVMs = item.id !== ALL_NAMESPACES_SESSION_KEY && item.children.length > 0;
+  const hasVMs =
+    item.id !== ALL_NAMESPACES_SESSION_KEY &&
+    !item.id.startsWith('cluster') &&
+    item.children?.length > 0;
   const projectName = item.name as string;
 
   if (item.id.startsWith(PROJECT_SELECTOR_PREFIX)) {
     // if (hasVMs) return true;
     if ((showEmptyProjects && !isSystemNamespace(projectName)) || hasVMs) return true;
   }
+
+  if (item.id.startsWith('cluster')) return true;
+
   if (item.children) {
     return (
       (item.children = item.children

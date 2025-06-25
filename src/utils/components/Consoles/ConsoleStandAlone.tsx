@@ -6,8 +6,12 @@ import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm/hooks';
 import Consoles from './Consoles';
 
 const ConsoleStandAlone: FC = () => {
-  const { name, ns } = useParams<{ name: string; ns: string }>();
-  const { vmi } = useVMIAndPodsForVM(name, ns);
+  const { cluster, name, namespace } = useParams<{
+    cluster?: string;
+    name: string;
+    namespace: string;
+  }>();
+  const { vmi } = useVMIAndPodsForVM(name, namespace, cluster);
 
   return <Consoles consoleContainerClass="console-container-stand-alone" isStandAlone vmi={vmi} />;
 };

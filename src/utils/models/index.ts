@@ -27,3 +27,15 @@ export const QuickStartModel: K8sModel = {
   plural: 'consolequickstarts',
   propagationPolicy: 'Background',
 };
+
+export const ManagedClusterModel: K8sModel = {
+  abbr: 'MC',
+  apiGroup: 'clusterview.open-cluster-management.io',
+  apiVersion: 'v1',
+  crd: true,
+  kind: 'ManagedCluster',
+  label: 'ManagedCluster',
+  labelPlural: 'ManagedClusters',
+  namespaced: false,
+  plural: 'managedclusters',
+};

@@ -1,4 +1,5 @@
 import { MouseEvent, useCallback, useLayoutEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom-v5-compat';
 
 import useRemoveFolderQuery from '@kubevirt-utils/components/MoveVMToFolderModal/hooks/useRemoveFolderQuery';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
@@ -9,6 +10,7 @@ import {
   getAllTreeViewItems,
   getAllTreeViewProjectItems,
   getAllTreeViewVMItems,
+  TreeViewDataItemWithHref,
 } from '../utils/utils';
 
 import { RIGHT_CLICK_LISTENER } from './constants';
@@ -24,6 +26,7 @@ const useTreeViewItemActions: UseTreeViewItemActions = (treeData) => {
   const [triggerElement, setTriggerElement] = useState<HTMLElement>();
 
   const removeFolderQuery = useRemoveFolderQuery();
+  const navigate = useNavigate();
 
   const dropElements = useMemo(
     () => [...getAllTreeViewFolderItems(treeData), ...getAllTreeViewProjectItems(treeData)],
@@ -74,6 +77,9 @@ const useTreeViewItemActions: UseTreeViewItemActions = (treeData) => {
 
   const addListeners = useCallback(
     (_event: MouseEvent, item: TreeViewDataItem) => {
+      if (item.id.startsWith('cluster') && (item as TreeViewDataItemWithHref).href)
+        navigate((item as TreeViewDataItemWithHref).href);
+
       // wait for children elements to show
       setTimeout(() => {
         const allItems = getAllTreeViewItems([item])?.filter(
@@ -93,7 +99,7 @@ const useTreeViewItemActions: UseTreeViewItemActions = (treeData) => {
         allItems.forEach(addRightClickEvent);
       }, 200);
     },
-    [addRightClickEvent, removeFolderQuery],
+    [addRightClickEvent, navigate, removeFolderQuery],
   );
 
   const hideMenu = useCallback(() => setTriggerElement(null), []);
