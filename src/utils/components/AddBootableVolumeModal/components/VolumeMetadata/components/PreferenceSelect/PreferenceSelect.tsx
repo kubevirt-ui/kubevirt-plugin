@@ -2,7 +2,10 @@ import React, { FC } from 'react';
 
 import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
 import usePreferenceSelectOptions from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/PreferenceSelect/hooks/usePreferenceSelectOptions';
-import { SetBootableVolumeFieldType } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/constants';
+import {
+  AddBootableVolumeState,
+  SetBootableVolumeFieldType,
+} from '@kubevirt-utils/components/AddBootableVolumeModal/utils/constants';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -13,21 +16,22 @@ import { getSelectedKeyByLabel } from './utils/utils';
 import PreferencePopoverContent from './PreferencePopoverContent';
 
 type PreferenceSelectProps = {
+  bootableVolume: AddBootableVolumeState;
   deleteLabel: (labelKey: string) => void;
-  selectedPreference: string;
   setBootableVolumeField: SetBootableVolumeFieldType;
-  volumeLabels: { [key: string]: string };
 };
 
 const PreferenceSelect: FC<PreferenceSelectProps> = ({
+  bootableVolume,
   deleteLabel,
-  selectedPreference,
   setBootableVolumeField,
-  volumeLabels,
 }) => {
   const { t } = useKubevirtTranslation();
+
+  const { bootableVolumeNamespace, labels } = bootableVolume;
   const { preferenceSelectOptions, preferencesLoaded } = usePreferenceSelectOptions(
     deleteLabel,
+    bootableVolumeNamespace,
     setBootableVolumeField,
   );
 
@@ -38,10 +42,11 @@ const PreferenceSelect: FC<PreferenceSelectProps> = ({
     setBootableVolumeField('labels', DEFAULT_PREFERENCE_LABEL)(selectedValue.label);
   };
 
+  const selectedPreference = labels?.[DEFAULT_PREFERENCE_LABEL];
   const selectedPreferenceKey = getSelectedKeyByLabel(
     selectedPreference,
     preferenceSelectOptions,
-    volumeLabels,
+    labels,
   );
 
   return (
