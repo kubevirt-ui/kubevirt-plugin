@@ -27,18 +27,17 @@ const VirtualMachineRowLayout: FC<
     V1VirtualMachine,
     {
       ips: ReactNode | string;
-      isSingleNodeCluster: boolean;
       node: ReactNode | string;
       vmim: V1VirtualMachineInstanceMigration;
       vmiMemory?: string;
     }
   >
-> = ({ activeColumnIDs, obj, rowData: { ips, isSingleNodeCluster, node, vmim, vmiMemory } }) => {
+> = ({ activeColumnIDs, obj, rowData: { ips, node, vmim, vmiMemory } }) => {
   const selected = isVMSelected(obj);
 
   const vmName = useMemo(() => getName(obj), [obj]);
   const vmNamespace = useMemo(() => getNamespace(obj), [obj]);
-  const [actions] = useVirtualMachineActionsProvider(obj, vmim, isSingleNodeCluster);
+  const [actions] = useVirtualMachineActionsProvider(obj, vmim);
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} className="selection-column vm-column" id="">

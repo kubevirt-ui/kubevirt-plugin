@@ -19,17 +19,15 @@ const VirtualMachineRow: FC<
     {
       getVmi: (namespace: string, name: string) => V1VirtualMachineInstance;
       getVmim: (ns: string, name: string) => V1VirtualMachineInstanceMigration;
-      isSingleNodeCluster: boolean;
     }
   >
-> = ({ activeColumnIDs, obj: vm, rowData: { getVmi, getVmim, isSingleNodeCluster } }) => {
+> = ({ activeColumnIDs, obj: vm, rowData: { getVmi, getVmim } }) => {
   const vmName = getName(vm);
   const vmNamespace = getNamespace(vm);
   const vmi = getVmi(vmNamespace, vmName);
   return !isEmpty(vmi) ? (
     <VirtualMachineRunningRow
       rowData={{
-        isSingleNodeCluster,
         vmi,
         vmim: getVmim(vmNamespace, vmName),
       }}
@@ -40,7 +38,7 @@ const VirtualMachineRow: FC<
     <VirtualMachineRowLayout
       activeColumnIDs={activeColumnIDs}
       obj={vm}
-      rowData={{ ips: NO_DATA_DASH, isSingleNodeCluster, node: NO_DATA_DASH, vmim: null }}
+      rowData={{ ips: NO_DATA_DASH, node: NO_DATA_DASH, vmim: null }}
     />
   );
 };

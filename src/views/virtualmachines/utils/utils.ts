@@ -5,8 +5,7 @@ import {
 
 import { printableVMStatus } from './virtualMachineStatuses';
 
-export const isLiveMigratable = (vm: V1VirtualMachine, isSingleNodeCluster: boolean): boolean =>
-  !isSingleNodeCluster &&
+export const isLiveMigratable = (vm: V1VirtualMachine): boolean =>
   vm?.status?.printableStatus === printableVMStatus.Running &&
   !!vm?.status?.conditions?.find(
     ({ status, type }) => type === 'LiveMigratable' && status === 'True',

@@ -29,7 +29,6 @@ import {
   paginationDefaultValues,
   paginationInitialState,
 } from '@kubevirt-utils/hooks/usePagination/utils/constants';
-import useSingleNodeCluster from '@kubevirt-utils/hooks/useSingleNodeCluster';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   K8sResourceCommon,
@@ -108,8 +107,6 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
     },
   );
 
-  const [isSingleNodeCluster, isSingleNodeLoaded] = useSingleNodeCluster();
-
   const [vmims, vmimsLoaded] = useKubevirtWatchResource<V1VirtualMachineInstanceMigration[]>({
     groupVersionKind: VirtualMachineInstanceMigrationModelGroupVersionKind,
     isList: true,
@@ -167,13 +164,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
     data,
   );
 
-  const loaded =
-    vmLoaded &&
-    vmiLoaded &&
-    vmimsLoaded &&
-    isSingleNodeLoaded &&
-    !loadingFeatureProxy &&
-    loadedColumns;
+  const loaded = vmLoaded && vmiLoaded && vmimsLoaded && !loadingFeatureProxy && loadedColumns;
 
   const vmsFilteredWithProxy = isProxyPodAlive && selectedFilters.length > 0;
 
@@ -265,7 +256,6 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
             rowData={{
               getVmi: (ns: string, name: string) => vmiMapper?.mapper?.[ns]?.[name],
               getVmim: (ns: string, name: string) => vmimMapper?.[ns]?.[name],
-              isSingleNodeCluster,
               kind,
             }}
             allRowsSelected={allVMsSelected}
