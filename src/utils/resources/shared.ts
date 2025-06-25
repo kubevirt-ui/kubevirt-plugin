@@ -9,7 +9,6 @@ import { TemplateModel } from '@kubevirt-utils/models';
 import {
   AccessReviewResourceAttributes,
   K8sModel,
-  K8sResourceCommon,
   K8sResourceKind,
   K8sVerb,
   Operator,

@@ -38,7 +38,7 @@ const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({
   const { t } = useKubevirtTranslation();
   const location = useLocation();
 
-  const { vmi } = useVMI(vm?.metadata?.name, vm?.metadata?.namespace, isRunning(vm));
+  const { vmi } = useVMI(vm?.metadata?.name, vm?.metadata?.namespace, vm?.cluster, isRunning(vm));
   const vmim = useVirtualMachineInstanceMigration(vm);
   const [actions] = useVirtualMachineActionsProvider(vm, vmim);
   const StatusIcon = getVMStatusIcon(vm?.status?.printableStatus);

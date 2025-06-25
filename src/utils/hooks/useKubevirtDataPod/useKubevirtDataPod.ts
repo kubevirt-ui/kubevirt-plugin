@@ -18,12 +18,14 @@ import {
 } from './utils/utils';
 import useKubevirtDataPodFilters from './useKubevirtDataPodFilters';
 
-type UseKubevirtDataPod = <T extends K8sResourceCommon>(
+type UseKubevirtDataPod = <T extends K8sResourceCommon | K8sResourceCommon[]>(
   watchOptions: WatchK8sResource,
   filterOptions?: { [key: string]: string },
 ) => [T, boolean, Error];
 
-const useKubevirtDataPod: UseKubevirtDataPod = <T extends K8sResourceCommon>(
+const nullResponse: [undefined, boolean, Error] = [undefined, false, null];
+
+const useKubevirtDataPod: UseKubevirtDataPod = <T extends K8sResourceCommon | K8sResourceCommon[]>(
   watchOptions: WatchK8sResource,
   filterOptions?: { [key: string]: string },
 ) => {
@@ -87,8 +89,9 @@ const useKubevirtDataPod: UseKubevirtDataPod = <T extends K8sResourceCommon>(
 
     if (socket?.lastJsonMessage?.type == 'DELETED') {
       setData((prevData) => {
-        const filteredItems = (prevData as T & { items: T[] })?.items?.filter(
-          (item) => !compareNameAndNamespace(item, socket?.lastJsonMessage?.object),
+        const filteredItems = (prevData as T & { items })?.items?.filter(
+          (item: K8sResourceCommon) =>
+            !compareNameAndNamespace(item, socket?.lastJsonMessage?.object),
         );
         return { ...prevData, items: filteredItems };
       });
@@ -97,7 +100,7 @@ const useKubevirtDataPod: UseKubevirtDataPod = <T extends K8sResourceCommon>(
 
     if (socket?.lastJsonMessage?.object) {
       setData((prevData) => {
-        const newData = (prevData as T & { items: T[] })?.items.map((item) => {
+        const newData = (prevData as T & { items })?.items.map((item: K8sResourceCommon) => {
           if (compareNameAndNamespace(item, socket?.lastJsonMessage?.object)) {
             return socket?.lastJsonMessage?.object;
           }
@@ -110,9 +113,14 @@ const useKubevirtDataPod: UseKubevirtDataPod = <T extends K8sResourceCommon>(
     }
   }, [socket.lastJsonMessage]);
 
-  if (!watchOptions) return [<T>(<unknown>[]), false, null];
+  const watchResult: [T, boolean, Error] = useMemo(
+    () => [data, loaded, error],
+    [data, loaded, error],
+  );
 
-  return [data, loaded, error];
+  if (!watchOptions) return nullResponse;
+
+  return watchResult;
 };
 
 export default useKubevirtDataPod;

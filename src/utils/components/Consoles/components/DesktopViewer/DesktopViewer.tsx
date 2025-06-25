@@ -13,6 +13,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
 import { getVMIPod } from '@kubevirt-utils/resources/vmi';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Form, FormGroup, SelectList, SelectOption } from '@patternfly/react-core';
 import { isRunning } from '@virtualmachines/utils';
@@ -23,14 +24,19 @@ import { MULTUS, POD } from './utils/constants';
 import { DesktopViewerProps, Network } from './utils/types';
 import { getDefaultNetwork, getRdpAddressPort, getVmRdpNetworks } from './utils/utils';
 
-const DesktopViewer: FC<DesktopViewerProps> = ({ vmName: name, vmNamespace: namespace }) => {
+const DesktopViewer: FC<DesktopViewerProps> = ({
+  vmCluster,
+  vmName: name,
+  vmNamespace: namespace,
+}) => {
   const { t } = useKubevirtTranslation();
-  const [vm, vmLoaded] = useK8sWatchResource<V1VirtualMachine>({
+  const [vm, vmLoaded] = useK8sWatchData<V1VirtualMachine>({
+    cluster: vmCluster,
     groupVersionKind: VirtualMachineModelGroupVersionKind,
     name,
     namespace,
   });
-  const { vmi, vmiLoaded } = useVMI(vm?.metadata?.name, vm?.metadata?.namespace, isRunning(vm));
+  const { vmi, vmiLoaded } = useVMI(name, namespace, vmCluster, isRunning(vm));
 
   const networks = getVmRdpNetworks(vm, vmi);
   const [selectedNetwork, setSelectedNetwork] = useState<Network>(getDefaultNetwork(networks));

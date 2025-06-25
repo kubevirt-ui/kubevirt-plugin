@@ -40,7 +40,7 @@ import { KUBEVIRT_APISERVER_PROXY } from '@kubevirt-utils/hooks/useFeatures/cons
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import useKubevirtDataPodHealth from '@kubevirt-utils/hooks/useKubevirtDataPod/hooks/useKubevirtDataPodHealth';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource';
+import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import {
   paginationDefaultValues,
   paginationInitialState,
@@ -48,11 +48,11 @@ import {
 import useQuery from '@kubevirt-utils/hooks/useQuery';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import {
   DocumentTitle,
   K8sResourceCommon,
   ListPageBody,
-  useK8sWatchResource,
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
@@ -80,6 +80,7 @@ import '@kubevirt-utils/styles/list-managment-group.scss';
 import './VirtualMachinesList.scss';
 
 type VirtualMachinesListProps = {
+  cluster?: string;
   isSearchResultsPage?: boolean;
   kind: string;
   namespace: string;
@@ -101,6 +102,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
 
   const [vms, vmsLoaded, loadError] = useKubevirtWatchResource<V1VirtualMachine[]>(
     {
+      cluster: props.cluster,
       groupVersionKind: VirtualMachineModelGroupVersionKind,
       isList: true,
       limit: OBJECTS_FETCHING_LIMIT,
@@ -122,6 +124,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
 
   const [vmis, vmisLoaded] = useKubevirtWatchResource<V1VirtualMachineInstance[]>(
     {
+      cluster: props.cluster,
       groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
       isList: true,
       limit: OBJECTS_FETCHING_LIMIT,
@@ -134,7 +137,8 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
     },
   );
 
-  const [pvcs] = useK8sWatchResource<IoK8sApiCoreV1PersistentVolumeClaim[]>({
+  const [pvcs] = useK8sWatchData<IoK8sApiCoreV1PersistentVolumeClaim[]>({
+    cluster: props.cluster,
     groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
     isList: true,
     limit: OBJECTS_FETCHING_LIMIT,
@@ -144,7 +148,8 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
 
   const pvcMapper = useMemo(() => convertIntoPVCMapper(pvcs), [pvcs]);
 
-  const [vmims, vmimsLoaded] = useKubevirtWatchResource<V1VirtualMachineInstanceMigration[]>({
+  const [vmims, vmimsLoaded] = useK8sWatchData<V1VirtualMachineInstanceMigration[]>({
+    cluster: props.cluster,
     groupVersionKind: VirtualMachineInstanceMigrationModelGroupVersionKind,
     isList: true,
     limit: OBJECTS_FETCHING_LIMIT,
