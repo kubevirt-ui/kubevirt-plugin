@@ -21,14 +21,9 @@ import { VirtualMachineActionFactory } from '../VirtualMachineActionFactory';
 type UseVirtualMachineActionsProvider = (
   vm: V1VirtualMachine,
   vmim?: V1VirtualMachineInstanceMigration,
-  isSingleNodeCluster?: boolean,
 ) => [ActionDropdownItemType[], boolean, any];
 
-const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
-  vm,
-  vmim,
-  isSingleNodeCluster,
-) => {
+const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, vmim) => {
   const { createModal } = useModal();
 
   const virtctlCommand = getConsoleVirtctlCommand(vm);
@@ -59,13 +54,13 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
       return map[printableStatusMachine] || map.default;
     })(printableStatus);
 
-    const migrateCompute = VirtualMachineActionFactory.migrateCompute(vm, isSingleNodeCluster);
+    const migrateCompute = VirtualMachineActionFactory.migrateCompute(vm);
 
     const migrateStorage = VirtualMachineActionFactory.migrateStorage(vm, createModal);
 
     const cancelMigration = isStorageMigration
-      ? VirtualMachineActionFactory.cancelStorageMigration(vm, vmim, isSingleNodeCluster)
-      : VirtualMachineActionFactory.cancelComputeMigration(vm, vmim, isSingleNodeCluster);
+      ? VirtualMachineActionFactory.cancelStorageMigration(vm, vmim)
+      : VirtualMachineActionFactory.cancelComputeMigration(vm, vmim);
 
     const migrationActions =
       isComputeMigration || isStorageMigration
@@ -90,15 +85,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (
         VirtualMachineActionFactory.moveToFolder(vm, createModal),
       VirtualMachineActionFactory.delete(vm, createModal),
     ].filter(Boolean);
-  }, [
-    vm,
-    vmim,
-    isSingleNodeCluster,
-    createModal,
-    virtctlCommand,
-    treeViewEnabled,
-    treeViewFoldersEnabled,
-  ]);
+  }, [vm, vmim, createModal, virtctlCommand, treeViewEnabled, treeViewFoldersEnabled]);
 
   return useMemo(() => [actions, !inFlight, undefined], [actions, inFlight]);
 };

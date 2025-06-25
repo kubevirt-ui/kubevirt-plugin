@@ -2,7 +2,6 @@ import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useSingleNodeCluster from '@kubevirt-utils/hooks/useSingleNodeCluster';
 import { Label } from '@patternfly/react-core';
 import { isLiveMigratable, printableVMStatus } from '@virtualmachines/utils';
 
@@ -14,8 +13,7 @@ type VMNotMigratableLabelProps = {
 
 const VMNotMigratableLabel: FC<VMNotMigratableLabelProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
-  const [isSingleNodeCluster] = useSingleNodeCluster();
-  const isMigratable = isLiveMigratable(vm, isSingleNodeCluster);
+  const isMigratable = isLiveMigratable(vm);
   const isRunning = vm?.status?.printableStatus === printableVMStatus.Running;
 
   if (!isRunning || isMigratable) return null;

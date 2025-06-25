@@ -6,7 +6,6 @@ import {
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useSingleNodeCluster from '@kubevirt-utils/hooks/useSingleNodeCluster';
 import { getInstanceTypePrefix } from '@kubevirt-utils/resources/bootableresources/helpers';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
 import {
@@ -60,11 +59,9 @@ const useStatusFilter = (): RowFilter => ({
 });
 
 const useLiveMigratableFilter = (): RowFilter => {
-  const [isSingleNodeCluster] = useSingleNodeCluster();
-
   return {
     filter: (selectedItems, obj) => {
-      const isMigratable = isLiveMigratable(obj, isSingleNodeCluster);
+      const isMigratable = isLiveMigratable(obj);
       return (
         selectedItems?.selected?.length === 0 ||
         (selectedItems?.selected?.includes('migratable') && isMigratable) ||
@@ -76,7 +73,7 @@ const useLiveMigratableFilter = (): RowFilter => {
       { id: 'migratable', title: t('Migratable') },
       { id: 'notMigratable', title: t('Not migratable') },
     ],
-    reducer: (obj) => (isLiveMigratable(obj, isSingleNodeCluster) ? 'migratable' : 'notMigratable'),
+    reducer: (obj) => (isLiveMigratable(obj) ? 'migratable' : 'notMigratable'),
     type: 'live-migratable',
   };
 };
