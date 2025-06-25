@@ -2,7 +2,10 @@ import React, { FC, useState } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { UseBootableVolumesValues } from '@catalog/CreateFromInstanceTypes/state/utils/types';
-import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1beta1VirtualMachineClusterPreference,
+  V1beta1VirtualMachinePreference,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { UserSettingFavorites } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/types';
@@ -18,6 +21,7 @@ type BootableVolumeListModalProps = {
   onClose: () => void;
   onSelect: (selectedBootableVolume: BootableVolume) => void;
   preferencesData: V1beta1VirtualMachineClusterPreference[];
+  userPreferencesData: V1beta1VirtualMachinePreference[];
 };
 
 const BootableVolumeListModal: FC<BootableVolumeListModalProps> = ({

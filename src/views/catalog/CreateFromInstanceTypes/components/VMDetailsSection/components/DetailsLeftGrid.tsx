@@ -5,6 +5,7 @@ import {
   instanceTypeActionType,
   UseInstanceTypeAndPreferencesValues,
 } from '@catalog/CreateFromInstanceTypes/state/utils/types';
+import { V1beta1VirtualMachinePreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import FolderSelect from '@kubevirt-utils/components/FolderSelect/FolderSelect';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { validateVMName } from '@kubevirt-utils/components/VMNameValidationHelperText/utils/utils';
@@ -18,11 +19,15 @@ import { DescriptionList, TextInput } from '@patternfly/react-core';
 
 import { getCPUAndMemoryFromDefaultInstanceType, getOSFromDefaultPreference } from '../utils/utils';
 
-type DetailsLeftGridProps = {
+export type DetailsLeftGridProps = {
   instanceTypesAndPreferencesData: UseInstanceTypeAndPreferencesValues;
+  userPreferencesData: V1beta1VirtualMachinePreference[];
 };
 
-const DetailsLeftGrid: FC<DetailsLeftGridProps> = ({ instanceTypesAndPreferencesData }) => {
+const DetailsLeftGrid: FC<DetailsLeftGridProps> = ({
+  instanceTypesAndPreferencesData,
+  userPreferencesData,
+}) => {
   const { t } = useKubevirtTranslation();
   const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
 
@@ -32,6 +37,10 @@ const DetailsLeftGrid: FC<DetailsLeftGridProps> = ({ instanceTypesAndPreferences
   const { clusterInstanceTypes, preferences } = instanceTypesAndPreferencesData;
 
   const preferencesMap = useMemo(() => convertResourceArrayToMap(preferences), [preferences]);
+  const userPreferencesMap = useMemo(
+    () => convertResourceArrayToMap(userPreferencesData, true),
+    [userPreferencesData],
+  );
   const instanceTypesMap = useMemo(
     () => convertResourceArrayToMap(clusterInstanceTypes),
     [clusterInstanceTypes],
@@ -39,7 +48,12 @@ const DetailsLeftGrid: FC<DetailsLeftGridProps> = ({ instanceTypesAndPreferences
 
   const vmNameValidated = validateVMName(vmName);
 
-  const operatingSystem = getOSFromDefaultPreference(selectedBootableVolume, preferencesMap);
+  const operatingSystem = getOSFromDefaultPreference(
+    selectedBootableVolume,
+    preferencesMap,
+    userPreferencesMap,
+  );
+
   const cpuMemoryString = !isEmpty(instanceTypesMap?.[selectedInstanceType?.name])
     ? getCPUAndMemoryFromDefaultInstanceType(instanceTypesMap[selectedInstanceType?.name])
     : null;

@@ -1,4 +1,8 @@
 import {
+  DEFAULT_PREFERENCE_KIND_LABEL,
+  DEFAULT_PREFERENCE_LABEL,
+} from '@catalog/CreateFromInstanceTypes/utils/constants';
+import {
   modelToGroupVersionKind,
   PersistentVolumeClaimModel,
 } from '@kubevirt-ui/kubevirt-api/console';
@@ -6,6 +10,7 @@ import DataSourceModel, {
   DataSourceModelGroupVersionKind,
 } from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
+import VirtualMachinePreferenceModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachinePreferenceModel';
 import {
   V1beta1DataImportCron,
   V1beta1DataSource,
@@ -13,13 +18,18 @@ import {
 } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import {
+  V1beta1VirtualMachineClusterPreference,
+  V1beta1VirtualMachinePreference,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
   getDataSourcePVCName,
   getDataSourcePVCNamespace,
 } from '@kubevirt-utils/resources/bootableresources/selectors';
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
 
-import { getLabel, getName, getNamespace, NamespacedResourceMap } from '../shared';
+import { VirtualMachinePreference } from '../preference/types';
+import { getLabel, getName, getNamespace, NamespacedResourceMap, ResourceMap } from '../shared';
 
 import { deprecatedOSNames, KUBEVIRT_ISO_LABEL } from './constants';
 import { BootableVolume } from './types';
@@ -93,3 +103,18 @@ export const getDataImportCronFromDataSource = (
       cron?.spec?.managedDataSource === getName(dataSource) &&
       getNamespace(dataSource) === getNamespace(cron),
   );
+
+export const hasUserPreference = (bootableVolume: BootableVolume) =>
+  getLabel(bootableVolume, DEFAULT_PREFERENCE_KIND_LABEL) === VirtualMachinePreferenceModel.kind;
+
+export const getPreference = (
+  bootableVolume: BootableVolume,
+  preferencesMap: ResourceMap<V1beta1VirtualMachineClusterPreference>,
+  userPreferencesMap: NamespacedResourceMap<V1beta1VirtualMachinePreference>,
+): VirtualMachinePreference => {
+  const preferenceName = getLabel(bootableVolume, DEFAULT_PREFERENCE_LABEL);
+
+  return hasUserPreference(bootableVolume)
+    ? userPreferencesMap[getNamespace(bootableVolume)]?.[preferenceName]
+    : preferencesMap[preferenceName];
+};

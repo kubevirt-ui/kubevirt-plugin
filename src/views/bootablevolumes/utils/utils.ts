@@ -1,10 +1,10 @@
-import { PersistentVolumeClaimModel } from '@kubevirt-ui/kubevirt-api/console';
-import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
-import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   DEFAULT_INSTANCETYPE_LABEL,
   DEFAULT_PREFERENCE_LABEL,
-} from '@kubevirt-utils/resources/bootableresources/constants';
+} from '@catalog/CreateFromInstanceTypes/utils/constants';
+import { PersistentVolumeClaimModel } from '@kubevirt-ui/kubevirt-api/console';
+import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
+import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { isBootableVolumePVCKind } from '@kubevirt-utils/resources/bootableresources/helpers';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { ANNOTATIONS, OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
