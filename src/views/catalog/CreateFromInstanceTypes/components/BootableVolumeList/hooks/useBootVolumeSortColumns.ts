@@ -1,10 +1,12 @@
 import { useState } from 'react';
 
-import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
 import { getDiskSize } from '@catalog/CreateFromInstanceTypes/utils/utils';
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1beta1VirtualMachineClusterPreference,
+  V1beta1VirtualMachinePreference,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
 import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
 import {
@@ -22,10 +24,13 @@ import {
 import { DESCRIPTION_ANNOTATION } from '@kubevirt-utils/resources/vm';
 import { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
 
+import { getOSFromDefaultPreference } from '../../VMDetailsSection/utils/utils';
+
 type UseBootVolumeSortColumns = (
   unsortedData: BootableVolume[],
   volumeFavorites: string[],
-  preferences: ResourceMap<V1beta1VirtualMachineClusterPreference>,
+  clusterPreferencesMap: ResourceMap<V1beta1VirtualMachineClusterPreference>,
+  userPreferencesMap: NamespacedResourceMap<V1beta1VirtualMachinePreference>,
   pvcSources: NamespacedResourceMap<IoK8sApiCoreV1PersistentVolumeClaim>,
   volumeSnapshotSources: {
     [datSourceName: string]: VolumeSnapshotKind;
@@ -42,7 +47,8 @@ type UseBootVolumeSortColumns = (
 const useBootVolumeSortColumns: UseBootVolumeSortColumns = (
   unsortedData = [],
   volumeFavorites,
-  preferences,
+  clusterPreferencesMap,
+  userPreferencesMap,
   pvcSources,
   volumeSnapshotSources,
   pagination,
@@ -60,7 +66,7 @@ const useBootVolumeSortColumns: UseBootVolumeSortColumns = (
     return [
       getName(bootableVolume),
       ...(includeNamespaceColumn ? [getNamespace(bootableVolume)] : []),
-      getName(preferences[bootableVolume?.metadata?.labels?.[DEFAULT_PREFERENCE_LABEL]]),
+      getOSFromDefaultPreference(bootableVolume, clusterPreferencesMap, userPreferencesMap),
       pvcSource?.spec?.storageClassName || getVolumeSnapshotStorageClass(volumeSnapshotSource),
       getDiskSize(dvSource, pvcSource, volumeSnapshotSource),
       bootableVolume?.metadata?.annotations?.[DESCRIPTION_ANNOTATION],

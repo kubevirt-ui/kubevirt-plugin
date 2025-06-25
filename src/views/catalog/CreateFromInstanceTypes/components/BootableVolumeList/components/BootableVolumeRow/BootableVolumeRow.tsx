@@ -2,6 +2,7 @@ import React, { FC, MouseEvent } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { InstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/utils/types';
+import { PREFERENCE_DISPLAY_NAME_KEY } from '@catalog/CreateFromInstanceTypes/utils/constants';
 import { getDiskSize } from '@catalog/CreateFromInstanceTypes/utils/utils';
 import { getTemplateOSIcon, getVolumeNameOSIcon } from '@catalog/templatescatalog/utils/os-icons';
 import {
@@ -10,7 +11,6 @@ import {
   V1beta1DataVolume,
 } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import DeprecatedBadge from '@kubevirt-utils/components/badges/DeprecatedBadge/DeprecatedBadge';
 import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
 import { logITFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
@@ -20,7 +20,9 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { isDeprecated } from '@kubevirt-utils/resources/bootableresources/helpers';
 import { getVolumeSnapshotStorageClass } from '@kubevirt-utils/resources/bootableresources/selectors';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
+import { VirtualMachinePreference } from '@kubevirt-utils/resources/preference/types';
 import {
+  getAnnotation,
   getName,
   getNamespace,
   isDataImportCronProgressing,
@@ -47,7 +49,7 @@ type BootableVolumeRowProps = {
     dataImportCron: V1beta1DataImportCron;
     dvSource: V1beta1DataVolume;
     favorites: [isFavorite: boolean, updaterFavorites: (val: boolean) => void];
-    preference: V1beta1VirtualMachineClusterPreference;
+    preference: VirtualMachinePreference;
     pvcSource: IoK8sApiCoreV1PersistentVolumeClaim;
     volumeSnapshotSource: VolumeSnapshotKind;
   };
@@ -127,7 +129,7 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
         </TableData>
       )}
       <TableData activeColumnIDs={activeColumnIDs} id="operating-system" width={20}>
-        {preference?.metadata?.annotations?.[ANNOTATIONS.displayName] || NO_DATA_DASH}
+        {getAnnotation(preference, PREFERENCE_DISPLAY_NAME_KEY, NO_DATA_DASH)}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="storage-class" width={15}>
         {getVolumeSnapshotStorageClass(volumeSnapshotSource) ||
@@ -139,7 +141,7 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id={ANNOTATIONS.description} width={30}>
         <TableText wrapModifier={WrapModifier.truncate}>
-          {bootableVolume?.metadata?.annotations?.[ANNOTATIONS.description] || NO_DATA_DASH}
+          {getAnnotation(bootableVolume, ANNOTATIONS.description, NO_DATA_DASH)}
         </TableText>
       </TableData>
     </Tr>

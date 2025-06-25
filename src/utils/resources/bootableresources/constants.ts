@@ -1,4 +1,5 @@
 export const DEFAULT_PREFERENCE_LABEL = 'instancetype.kubevirt.io/default-preference';
+export const DEFAULT_PREFERENCE_KIND_LABEL = 'instancetype.kubevirt.io/default-preference-kind';
 export const DEFAULT_INSTANCETYPE_LABEL = 'instancetype.kubevirt.io/default-instancetype';
 
 export const COMMON_INSTANCETYPES = 'common-instancetypes';

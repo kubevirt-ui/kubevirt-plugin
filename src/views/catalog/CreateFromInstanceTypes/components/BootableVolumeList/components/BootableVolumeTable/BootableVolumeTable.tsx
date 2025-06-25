@@ -4,17 +4,20 @@ import {
   InstanceTypeVMStore,
   UseBootableVolumesValues,
 } from '@catalog/CreateFromInstanceTypes/state/utils/types';
-import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
-import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1beta1VirtualMachineClusterPreference,
+  V1beta1VirtualMachinePreference,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { UserSettingFavorites } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/types';
 import {
   getBootableVolumePVCSource,
   getDataImportCronFromDataSource,
   getDataVolumeForPVC,
+  getPreference,
 } from '@kubevirt-utils/resources/bootableresources/helpers';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
-import { getLabel, getName } from '@kubevirt-utils/resources/shared';
+import { getName, NamespacedResourceMap, ResourceMap } from '@kubevirt-utils/resources/shared';
 import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 import { Table, TableVariant, Tbody, Th, Thead, Tr } from '@patternfly/react-table';
 import { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
@@ -27,11 +30,10 @@ type BootableVolumeTableProps = {
   bootableVolumesData: UseBootableVolumesValues;
   favorites: UserSettingFavorites;
   getSortType: (columnIndex: number) => ThSortType;
-  preferencesMap: {
-    [resourceKeyName: string]: V1beta1VirtualMachineClusterPreference;
-  };
+  preferencesMap: ResourceMap<V1beta1VirtualMachineClusterPreference>;
   selectedBootableVolumeState?: [BootableVolume, InstanceTypeVMStore['onSelectCreatedVolume']];
   sortedPaginatedData: BootableVolume[];
+  userPreferencesMap: NamespacedResourceMap<V1beta1VirtualMachinePreference>;
 };
 
 const BootableVolumeTable: FC<BootableVolumeTableProps> = ({
@@ -42,6 +44,7 @@ const BootableVolumeTable: FC<BootableVolumeTableProps> = ({
   preferencesMap,
   selectedBootableVolumeState,
   sortedPaginatedData,
+  userPreferencesMap,
 }) => {
   const [volumeFavorites, updateFavorites] = favorites;
   const { dataImportCrons, dvSources, pvcSources, volumeSnapshotSources } = bootableVolumesData;
@@ -88,7 +91,7 @@ const BootableVolumeTable: FC<BootableVolumeTableProps> = ({
                         : volumeFavorites.filter((fav: string) => fav !== bootSourceName),
                     ),
                 ],
-                preference: preferencesMap[getLabel(bootSource, DEFAULT_PREFERENCE_LABEL)],
+                preference: getPreference(bootSource, preferencesMap, userPreferencesMap),
                 pvcSource,
                 volumeSnapshotSource: volumeSnapshotSources?.[bootSourceName],
               }}
