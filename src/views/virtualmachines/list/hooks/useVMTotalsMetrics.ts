@@ -2,9 +2,9 @@ import { useMemo } from 'react';
 import { useParams } from 'react-router-dom-v5-compat';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import useIsACMPage from '@kubevirt-utils/hooks/useIsACMPage';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import { METRICS } from '@overview/OverviewTab/metric-charts-card/utils/constants';
 import { useFleetPrometheusPoll, useHubClusterName } from '@stolostron/multicluster-sdk';

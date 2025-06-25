@@ -1,7 +1,9 @@
 import React, { FC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isHeadlessMode } from '@kubevirt-utils/resources/vm';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 
 import VirtualMachinesOverviewTabDetailsConsole from './VirtualMachinesOverviewTabDetailsConsole';
@@ -24,8 +26,9 @@ const VirtualMachinesOverviewTabDetailsConsoleWrapper: FC<{ vmi: V1VirtualMachin
       canConnectConsole={canConnectConsole}
       isHeadlessMode={headlesMode}
       isVMRunning={runningVM}
-      vmName={vmi?.metadata?.name}
-      vmNamespace={vmi?.metadata?.namespace}
+      vmCluster={getCluster(vmi)}
+      vmName={getName(vmi)}
+      vmNamespace={getNamespace(vmi)}
     />
   );
 };

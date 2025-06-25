@@ -4,7 +4,7 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-utils/models';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { Flex, Skeleton, Title } from '@patternfly/react-core';
 
 import CloudInitCredentialsContent from './CloudInitCredentialsContent';
@@ -12,16 +12,19 @@ import CloudInitCredentialsContent from './CloudInitCredentialsContent';
 import './cloud-init-credentials.scss';
 
 type CloudInitCredentialsProps = {
+  vmCluster?: string;
   vmName: string;
   vmNamespace: string;
 };
 
 const CloudInitCredentials: FC<CloudInitCredentialsProps> = ({
+  vmCluster,
   vmName: name,
   vmNamespace: namespace,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [vm, isLoaded] = useK8sWatchResource<V1VirtualMachine>({
+  const [vm, isLoaded] = useK8sWatchData<V1VirtualMachine>({
+    cluster: vmCluster,
     groupVersionKind: VirtualMachineModelGroupVersionKind,
     name,
     namespace,

@@ -1,36 +1,62 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import VmNotRunning from '@kubevirt-utils/components/Consoles/components/VmNotRunning';
 import Consoles from '@kubevirt-utils/components/Consoles/Consoles';
 import { getConsoleBasePath } from '@kubevirt-utils/components/Consoles/utils/utils';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isHeadlessMode } from '@kubevirt-utils/resources/vm';
 import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
 import { isWindows } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
-import { PageSection } from '@patternfly/react-core';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { Bullseye, PageSection, Spinner } from '@patternfly/react-core';
+import { useFleetK8sAPIPath } from '@stolostron/multicluster-sdk';
 import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
 
-import { isRunning, printableVMStatus } from '../../../utils';
+import { isRunning, isStopped } from '../../../utils';
 
 const VirtualMachineConsolePage: FC<NavPageComponentProps> = ({ obj: vm }) => {
-  const { vmi, vmiLoaded } = useVMI(vm?.metadata?.name, vm?.metadata?.namespace, isRunning(vm));
+  const cluster = getCluster(vm);
+  const name = getName(vm);
+  const namespace = getNamespace(vm);
 
-  if (vmiLoaded && (!vmi || vm?.status?.printableStatus === printableVMStatus.Stopped)) {
-    return <VmNotRunning />;
-  }
+  const [apiPath, apiPathLoaded] = useFleetK8sAPIPath(cluster);
 
-  return (
-    <PageSection className="virtual-machine-console-page-section" hasBodyWrapper={false}>
-      <Consoles
-        consoleContainerClass="virtual-machine-console-page"
-        isHeadlessMode={isHeadlessMode(vmi)}
-        isVmRunning={true}
-        isWindowsVM={isWindows(vmi)}
-        path={getConsoleBasePath({ name: vm?.metadata?.name, namespace: vm?.metadata?.namespace })}
-        vmName={vm?.metadata?.name}
-        vmNamespace={vm?.metadata?.namespace}
-      />
-    </PageSection>
-  );
+  const { vmi, vmiLoaded } = useVMI(name, namespace, cluster, isRunning(vm));
+
+  const loading = !apiPathLoaded || !vmiLoaded;
+  const notRunning = vmiLoaded && (!vmi || isStopped(vm));
+
+  return useMemo(() => {
+    if (notRunning) {
+      return <VmNotRunning />;
+    }
+
+    if (loading)
+      return (
+        <Bullseye>
+          <Spinner />
+        </Bullseye>
+      );
+
+    return (
+      <PageSection className="virtual-machine-console-page-section" hasBodyWrapper={false}>
+        <Consoles
+          path={getConsoleBasePath({
+            apiPath,
+            name,
+            namespace,
+          })}
+          consoleContainerClass="virtual-machine-console-page"
+          isHeadlessMode={isHeadlessMode(vmi)}
+          isVmRunning={true}
+          isWindowsVM={isWindows(vmi)}
+          vmCluster={cluster}
+          vmName={name}
+          vmNamespace={namespace}
+        />
+      </PageSection>
+    );
+  }, [apiPath, cluster, loading, name, namespace, notRunning, vmi]);
 };
 
 export default VirtualMachineConsolePage;

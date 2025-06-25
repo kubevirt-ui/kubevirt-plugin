@@ -19,6 +19,7 @@ const config: Config.InitialOptions = {
   moduleFileExtensions: ['js', 'jsx', 'ts', 'tsx'],
   moduleNameMapper: {
     '@console/*': '<rootDir>/__mocks__/dummy.ts',
+    '@stolostron/multicluster-sdk': '<rootDir>/__mocks__/multicluster-sdk.ts',
     '\\.(css|less|scss|svg)$': '<rootDir>/__mocks__/dummy.ts',
     'react-i18next': '<rootDir>/__mocks__/react-i18next.ts',
     'react-router-dom-v5-compat': '<rootDir>/__mocks__/react-router-dom-v5-compat.ts',

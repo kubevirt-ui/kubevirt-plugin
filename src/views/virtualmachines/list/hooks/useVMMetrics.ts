@@ -2,10 +2,10 @@ import { useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom-v5-compat';
 
 import { IoK8sApiCoreV1Pod } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import useIsACMPage from '@kubevirt-utils/hooks/useIsACMPage';
-import useK8sWatchData from '@kubevirt-utils/hooks/useK8sWatchData';
 import { modelToGroupVersionKind, PodModel } from '@kubevirt-utils/models';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import { useFleetPrometheusPoll, useHubClusterName } from '@stolostron/multicluster-sdk';
 

@@ -1,5 +1,5 @@
-import React, { FC, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import React, { FC, useCallback, useEffect, useMemo, useRef } from 'react';
+import { useNavigate, useParams } from 'react-router-dom-v5-compat';
 
 import {
   ExposedFilterFunctions,
@@ -25,6 +25,8 @@ const VirtualMachineSearchResults: FC = () => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const [activeNamespace] = useActiveNamespace();
+
+  const { cluster } = useParams<{ cluster?: string }>();
   const namespace = activeNamespace === ALL_NAMESPACES_SESSION_KEY ? null : activeNamespace;
 
   const { featureEnabled: advancedSearchEnabled, loading: advancedSearchLoading } =
@@ -40,30 +42,34 @@ const VirtualMachineSearchResults: FC = () => {
 
   const vmListRef = useRef<ExposedFilterFunctions | null>(null);
 
-  const onFilterChange: OnFilterChange = (type, value) => {
+  const onFilterChange: OnFilterChange = useCallback((type, value) => {
     vmListRef.current?.onFilterChange(type, value);
-  };
+  }, []);
 
-  const resetTextSearch: ResetTextSearch = (newTextFilters) => {
+  const resetTextSearch: ResetTextSearch = useCallback((newTextFilters) => {
     vmListRef.current?.resetTextSearch(newTextFilters);
-  };
+  }, []);
 
-  return (
-    <>
-      <ListPageHeader title={t('VirtualMachines')}>
-        <SearchBar onFilterChange={onFilterChange} resetTextSearch={resetTextSearch} />
-        <div>
-          <VirtualMachinesCreateButton namespace={namespace} />
-        </div>
-      </ListPageHeader>
-      <Divider />
-      <VirtualMachinesList
-        isSearchResultsPage
-        kind={VirtualMachineModelRef}
-        namespace={namespace}
-        ref={vmListRef}
-      />
-    </>
+  return useMemo(
+    () => (
+      <>
+        <ListPageHeader title={t('VirtualMachines')}>
+          <SearchBar onFilterChange={onFilterChange} resetTextSearch={resetTextSearch} />
+          <div>
+            <VirtualMachinesCreateButton namespace={namespace} />
+          </div>
+        </ListPageHeader>
+        <Divider />
+        <VirtualMachinesList
+          cluster={cluster}
+          isSearchResultsPage
+          kind={VirtualMachineModelRef}
+          namespace={namespace}
+          ref={vmListRef}
+        />
+      </>
+    ),
+    [cluster, namespace, onFilterChange, resetTextSearch, t],
   );
 };
 
