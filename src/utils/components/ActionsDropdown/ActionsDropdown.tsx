@@ -1,4 +1,5 @@
 import React, { FC, memo, ReactNode, useRef, useState } from 'react';
+import classNames from 'classnames';
 
 import DropdownToggle from '@kubevirt-utils/components/toggles/DropdownToggle';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
@@ -23,6 +24,7 @@ type ActionsDropdownProps = {
 
 const ActionsDropdown: FC<ActionsDropdownProps> = ({
   actions = [],
+  className,
   disabledTooltip,
   isDisabled,
   isKebabToggle,
@@ -57,7 +59,7 @@ const ActionsDropdown: FC<ActionsDropdownProps> = ({
 
   if (isDisabled)
     return (
-      <div className="kv-actions-dropdown" ref={containerRef}>
+      <div className={classNames('kv-actions-dropdown', className)} ref={containerRef}>
         <Tooltip content={disabledTooltip}>
           <span> {Toggle(toggleRef)}</span>
         </Tooltip>
@@ -65,7 +67,7 @@ const ActionsDropdown: FC<ActionsDropdownProps> = ({
     );
 
   return (
-    <div className="kv-actions-dropdown" ref={containerRef}>
+    <div className={classNames('kv-actions-dropdown', className)} ref={containerRef}>
       {Toggle(toggleRef)}
       <Popper
         popper={
