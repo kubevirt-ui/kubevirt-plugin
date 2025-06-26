@@ -1,4 +1,4 @@
-import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 export const TEXT_FILTER_NAME_ID = 'name';
 export const TEXT_FILTER_LABELS_ID = 'labels';
@@ -10,14 +10,18 @@ export const VMListQueries = {
   NETWORK_TOTAL_USAGE: 'NETWORK_TOTAL_USAGE',
 };
 
-export const getVMListQueries = (namespace: string) => {
-  const namespaceFilter =
-    namespace === ALL_NAMESPACES_SESSION_KEY ? '' : `namespace='${namespace}'`;
+export const getVMListQueries = (namespace: string, cluster?: string, allClusters = false) => {
+  const namespaceFilter = isEmpty(namespace) ? '' : `namespace='${namespace}'`;
 
+  const clusterFilter = cluster ? `cluster='${cluster}'` : '';
+
+  const filters = [namespaceFilter, clusterFilter].filter((filter) => filter.length > 0).join(',');
+
+  const duration = cluster || allClusters ? '15m' : '30s';
   return {
-    [VMListQueries.CPU_REQUESTED]: `kube_pod_resource_request{resource='cpu',${namespaceFilter}}`,
-    [VMListQueries.CPU_USAGE]: `rate(kubevirt_vmi_cpu_usage_seconds_total{${namespaceFilter}}[30s])`,
-    [VMListQueries.MEMORY_USAGE]: `kubevirt_vmi_memory_used_bytes{${namespaceFilter}}`,
-    [VMListQueries.NETWORK_TOTAL_USAGE]: `rate(kubevirt_vmi_network_transmit_bytes_total{${namespaceFilter}}[30s]) + rate(kubevirt_vmi_network_receive_bytes_total{${namespaceFilter}}[30s])`,
+    [VMListQueries.CPU_REQUESTED]: `kube_pod_resource_request{resource='cpu',${filters}}`,
+    [VMListQueries.CPU_USAGE]: `rate(kubevirt_vmi_cpu_usage_seconds_total{${filters}}[${duration}])`,
+    [VMListQueries.MEMORY_USAGE]: `kubevirt_vmi_memory_used_bytes{${filters}}`,
+    [VMListQueries.NETWORK_TOTAL_USAGE]: `rate(kubevirt_vmi_network_transmit_bytes_total{${filters}}[${duration}]) + rate(kubevirt_vmi_network_receive_bytes_total{${filters}}[${duration}])`,
   };
 };

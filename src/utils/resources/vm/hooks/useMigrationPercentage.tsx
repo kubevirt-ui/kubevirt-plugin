@@ -6,6 +6,7 @@ import { getNamespace } from '@kubevirt-utils/resources/shared';
 import useVirtualMachineInstanceMigration from '@kubevirt-utils/resources/vmi/hooks/useVirtualMachineInstanceMigration';
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
 import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
+import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import { MIGRATION__PROMETHEUS_DELAY } from '../utils/constants';
 
@@ -19,8 +20,12 @@ const useMigrationPercentage: UseMigrationPercentage = (vm) => {
   const namespace = getNamespace(vm);
 
   const vmim = useVirtualMachineInstanceMigration(vm);
+  const [hubClusterName] = useHubClusterName();
 
-  const queries = useMemo(() => getUtilizationQueries({ obj: vm }), [vm]);
+  const queries = useMemo(
+    () => getUtilizationQueries({ hubClusterName, obj: vm }),
+    [vm, hubClusterName],
+  );
 
   const [dataProcessedBytes] = usePrometheusPoll({
     delay: MIGRATION__PROMETHEUS_DELAY,
