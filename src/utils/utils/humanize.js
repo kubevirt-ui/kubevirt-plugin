@@ -234,7 +234,7 @@ export const humanizeCpuCores = (v) => {
   const value = v < 1 ? round(v * 1000) : v;
   const unit = v < 1 ? 'm' : '';
   return {
-    string: `${formatValue(value)}${unit}`,
+    string: `${formatValue(value)} ${unit}`,
     unit,
     value,
   };
