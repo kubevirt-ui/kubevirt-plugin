@@ -10,6 +10,8 @@ import {
   ButtonVariant,
   DataList,
   Flex,
+  Grid,
+  GridItem,
   Modal,
   ModalBody,
   ModalFooter,
@@ -93,17 +95,13 @@ export const ColumnManagementModal: FC<ColumnManagementModalProps> = ({
         >
           {!showNamespaceOverride && t('The namespace column is only shown when in "All projects"')}
         </Alert>
-        <div className="row co-m-form-row pf-v6-u-mt-lg">
-          <div className="col-sm-12">
-            <span className="col-sm-6">
+        <div className="co-m-form-row pf-v6-u-mt-lg">
+          <Grid hasGutter>
+            <GridItem sm={6}>
               <label className="control-label">
                 {t('Default {{resourceKind}} columns', { resourceKind: type })}
               </label>
-              <DataList
-                aria-label={t('Default column list')}
-                id="defalt-column-management"
-                isCompact
-              >
+              <DataList aria-label={t('Default column list')} isCompact>
                 {defaultColumns.map((defaultColumn) => (
                   <DataListRow
                     checkedColumns={checkedColumns}
@@ -115,14 +113,10 @@ export const ColumnManagementModal: FC<ColumnManagementModalProps> = ({
                   />
                 ))}
               </DataList>
-            </span>
-            <span className="col-sm-6">
+            </GridItem>
+            <GridItem sm={6}>
               <label className="control-label">{t('Additional columns')}</label>
-              <DataList
-                aria-label={t('Additional column list')}
-                id="additional-column-management"
-                isCompact
-              >
+              <DataList aria-label={t('Additional column list')} isCompact>
                 {additionalColumns.map((additionalColumn) => (
                   <DataListRow
                     checkedColumns={checkedColumns}
@@ -134,8 +128,8 @@ export const ColumnManagementModal: FC<ColumnManagementModalProps> = ({
                   />
                 ))}
               </DataList>
-            </span>
-          </div>
+            </GridItem>
+          </Grid>
         </div>
       </ModalBody>
       <ModalFooter>
