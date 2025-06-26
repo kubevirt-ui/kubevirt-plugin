@@ -10,8 +10,9 @@ import { getMemorySize } from '@kubevirt-utils/components/CPUMemoryModal/utils/C
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getMemory } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
+import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import { ChartDonutUtilization } from '@patternfly/react-charts/victory';
+import { useFleetPrometheusPoll, useHubClusterName } from '@stolostron/multicluster-sdk';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
 type MemoryUtilProps = {
@@ -21,11 +22,16 @@ type MemoryUtilProps = {
 const MemoryUtil: FC<MemoryUtilProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
   const { currentTime, duration } = useDuration();
-  const queries = useMemo(() => getUtilizationQueries({ duration, obj: vmi }), [vmi, duration]);
+  const [hubClusterName] = useHubClusterName();
+  const queries = useMemo(
+    () => getUtilizationQueries({ duration, hubClusterName, obj: vmi }),
+    [vmi, duration, hubClusterName],
+  );
 
   const memory = getMemorySize(getMemory(vmi));
 
-  const [data] = usePrometheusPoll({
+  const [data] = useFleetPrometheusPoll({
+    cluster: vmi?.cluster,
     endpoint: PrometheusEndpoint?.QUERY,
     endTime: currentTime,
     namespace: vmi?.metadata?.namespace,

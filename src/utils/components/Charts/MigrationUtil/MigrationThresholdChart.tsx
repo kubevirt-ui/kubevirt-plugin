@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom-v5-compat';
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
+import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Chart,
   ChartArea,
@@ -16,6 +16,7 @@ import chart_color_black_200 from '@patternfly/react-tokens/dist/esm/chart_color
 import chart_color_blue_300 from '@patternfly/react-tokens/dist/esm/chart_color_blue_300';
 import chart_color_green_300 from '@patternfly/react-tokens/dist/esm/chart_color_green_300';
 import chart_color_orange_300 from '@patternfly/react-tokens/dist/esm/chart_color_orange_300';
+import { useFleetPrometheusPoll, useHubClusterName } from '@stolostron/multicluster-sdk';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
 import { tickLabels } from '../ChartLabels/styleOverrides';
@@ -41,10 +42,16 @@ type MigrationThresholdChartProps = {
 const MigrationThresholdChart: React.FC<MigrationThresholdChartProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
   const { currentTime, duration, timespan } = useDuration();
-  const queries = useMemo(() => getUtilizationQueries({ duration, obj: vmi }), [vmi, duration]);
+  const [hubClusterName] = useHubClusterName();
+
+  const queries = useMemo(
+    () => getUtilizationQueries({ duration, hubClusterName, obj: vmi }),
+    [vmi, duration, hubClusterName],
+  );
   const { height, ref, width } = useResponsiveCharts();
 
-  const [migrationDataProcessed] = usePrometheusPoll({
+  const [migrationDataProcessed] = useFleetPrometheusPoll({
+    cluster: vmi?.cluster,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     endTime: currentTime,
     namespace: vmi?.metadata?.namespace,
@@ -52,7 +59,8 @@ const MigrationThresholdChart: React.FC<MigrationThresholdChartProps> = ({ vmi }
     timespan,
   });
 
-  const [migrationDataRemaining] = usePrometheusPoll({
+  const [migrationDataRemaining] = useFleetPrometheusPoll({
+    cluster: vmi?.cluster,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     endTime: currentTime,
     namespace: vmi?.metadata?.namespace,
@@ -60,7 +68,8 @@ const MigrationThresholdChart: React.FC<MigrationThresholdChartProps> = ({ vmi }
     timespan,
   });
 
-  const [migrationDataDirtyRate] = usePrometheusPoll({
+  const [migrationDataDirtyRate] = useFleetPrometheusPoll({
+    cluster: vmi?.cluster,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     endTime: currentTime,
     namespace: vmi?.metadata?.namespace,
