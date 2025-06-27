@@ -27,7 +27,7 @@ const useVirtualMachineInstanceActionsProvider: UseVirtualMachineInstanceActions
       {
         cta: () =>
           window.open(
-            `/k8s/ns/${vmi?.metadata?.namespace}/kubevirt.io~v1~VirtualMachineInstance/${vmi?.metadata?.name}/console/standalone`,
+            `/k8s/ns/${vmi?.metadata?.namespace}/kubevirt.io~v1~VirtualMachine/${vmi?.metadata?.name}/console/standalone`,
           ),
         disabled: inFlight,
         icon: <ExternalLinkAltIcon />,
