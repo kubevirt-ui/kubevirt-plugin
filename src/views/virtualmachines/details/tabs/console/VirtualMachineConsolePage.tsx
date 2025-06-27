@@ -9,8 +9,6 @@ import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
 
 import { isRunning, printableVMStatus } from '../../../utils';
 
-import './VirtualMachineConsolePage.scss';
-
 const VirtualMachineConsolePage: FC<NavPageComponentProps> = ({ obj: vm }) => {
   const { t } = useKubevirtTranslation();
   const { vmi, vmiLoaded } = useVMI(vm?.metadata?.name, vm?.metadata?.namespace, isRunning(vm));
@@ -34,7 +32,7 @@ const VirtualMachineConsolePage: FC<NavPageComponentProps> = ({ obj: vm }) => {
   }
 
   return (
-    <PageSection className="VirtualMachineConsolePage-page-section" hasBodyWrapper={false}>
+    <PageSection className="virtual-machine-console-page-section" hasBodyWrapper={false}>
       <Consoles consoleContainerClass="virtual-machine-console-page" vmi={vmi} />
     </PageSection>
   );
