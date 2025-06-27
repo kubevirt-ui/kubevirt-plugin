@@ -4,7 +4,7 @@ import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/u
 import { getDiskSize } from '@catalog/CreateFromInstanceTypes/utils/utils';
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
 import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/utils/constants';
-import { getHumanizedSize } from '@kubevirt-utils/utils/units';
+import { formatQuantityString } from '@kubevirt-utils/utils/units';
 
 const DiskSize: FC = () => {
   const { instanceTypeVMState, setCustomDiskSize } = useInstanceTypeVMStore();
@@ -12,9 +12,13 @@ const DiskSize: FC = () => {
   const { customDiskSize, dvSource, pvcSource, volumeSnapshotSource } = instanceTypeVMState;
 
   const pvcDiskSize = getDiskSize(dvSource, pvcSource, volumeSnapshotSource);
-  const sizeData = getHumanizedSize(pvcDiskSize || DEFAULT_DISK_SIZE).string;
 
-  return <CapacityInput onChange={setCustomDiskSize} size={customDiskSize || sizeData} />;
+  return (
+    <CapacityInput
+      onChange={setCustomDiskSize}
+      size={customDiskSize || formatQuantityString(pvcDiskSize) || DEFAULT_DISK_SIZE}
+    />
+  );
 };
 
 export default DiskSize;
