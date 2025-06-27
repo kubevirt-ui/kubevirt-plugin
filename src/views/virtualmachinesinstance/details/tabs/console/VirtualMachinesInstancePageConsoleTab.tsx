@@ -11,8 +11,8 @@ type VirtualMachinesInstancePageConsoleTabProps = {
 const VirtualMachinesInstancePageConsoleTab: FC<VirtualMachinesInstancePageConsoleTabProps> = ({
   obj: vmi,
 }) => (
-  <PageSection>
-    <Consoles vmi={vmi} />
+  <PageSection className="virtual-machine-console-page-section" hasBodyWrapper={false}>
+    <Consoles consoleContainerClass="virtual-machine-console-page" vmi={vmi} />
   </PageSection>
 );
 
