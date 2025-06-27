@@ -1,4 +1,10 @@
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
+import { isUpstream } from '@kubevirt-utils/utils/utils';
+
+const randomPassword = Math.random().toString(36).slice(-6);
+
+const type = isUpstream ? 'fedora' : 'rhel10';
+const password = isUpstream ? 'fedora' : randomPassword;
 
 export const defaultVMYamlTemplate = `apiVersion: ${VirtualMachineModel.apiGroup}/${VirtualMachineModel.apiVersion}
 kind: ${VirtualMachineModel.kind}
@@ -8,14 +14,14 @@ metadata:
     description: VM example
   labels:
     app: example
-    os.template.kubevirt.io/fedora: 'true'
+    os.template.kubevirt.io/${type}: 'true'
 spec:
   runStrategy: Halted
   template:
     metadata:
       annotations:
         vm.kubevirt.io/flavor: small
-        vm.kubevirt.io/os: fedora
+        vm.kubevirt.io/os: ${type}
         vm.kubevirt.io/workload: server
       labels:
         kubevirt.io/domain: example
@@ -50,12 +56,12 @@ spec:
       volumes:
         - name: rootdisk
           containerDisk:
-            image: 'quay.io/containerdisks/fedora'
+            image: 'quay.io/containerdisks/${type}'
         - cloudInitNoCloud:
             userData: |-
               #cloud-config
-              user: fedora
-              password: fedora
+              user: ${type}
+              password: ${password}
               chpasswd: { expire: False }
           name: cloudinitdisk
 `;
