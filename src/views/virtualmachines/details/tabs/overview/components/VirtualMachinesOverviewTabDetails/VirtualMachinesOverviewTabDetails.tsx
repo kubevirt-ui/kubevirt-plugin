@@ -41,7 +41,7 @@ import { printableVMStatus } from '@virtualmachines/utils';
 import InstanceTypeDescription from './components/InstanceTypeDescription';
 import TemplateDescription from './components/TemplateDescription';
 import VirtualMachineMigrationPercentage from './components/VirtualMachineMigrationPercentage';
-import VirtualMachinesOverviewTabDetailsConsole from './components/VirtualMachinesOverviewTabDetailsConsole';
+import VirtualMachinesOverviewTabDetailsConsoleWrapper from './components/VirtualMachineOverviewTabDetailsConsoleWrapper';
 import StatusPopover from './components/VirtualMachineStatusWithPopover/VirtualMachineStatusWithPopover';
 
 import './virtual-machines-overview-tab-details.scss';
@@ -186,7 +186,7 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
             <GridItem span={5}>
               <div className="right-column">
                 <div className="title">{t('VNC console')}</div>
-                <VirtualMachinesOverviewTabDetailsConsole vmi={vmi} />
+                <VirtualMachinesOverviewTabDetailsConsoleWrapper vmi={vmi} />
               </div>
             </GridItem>
           </Grid>
