@@ -4,6 +4,7 @@ import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getMemorySize } from '@kubevirt-utils/components/CPUMemoryModal/utils/CpuMemoryUtils';
 import { getMemory } from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
+import { humanizeCpuCores } from '@kubevirt-utils/utils/humanize.js';
 import { PrometheusResponse } from '@openshift-console/dynamic-plugin-sdk';
 import { METRICS } from '@overview/OverviewTab/metric-charts-card/utils/constants';
 import {
@@ -27,7 +28,7 @@ export const getCpuText = (response: PrometheusResponse) => {
   if (isNaN(value)) {
     return NO_DATA_DASH;
   }
-  return `${value.toLocaleString()} m`;
+  return humanizeCpuCores(value).string;
 };
 
 export const getMemoryCapacityText = (vmis: V1VirtualMachineInstance[]) => {

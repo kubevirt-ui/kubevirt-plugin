@@ -2,6 +2,7 @@ import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import {
   humanizeBinaryBytes,
+  humanizeCpuCores,
   humanizeDecimalBytes,
   humanizeSeconds,
 } from '../../../../utils/utils/humanize';
@@ -16,7 +17,7 @@ export const humanizeTopConsumerMetric = (value: number, metric: TopConsumerMetr
   let humanizedValue;
   switch (metric) {
     case TopConsumerMetric.CPU:
-      humanizedValue = humanizeSeconds(value, 's', 'ms');
+      humanizedValue = humanizeCpuCores(value);
       break;
     case TopConsumerMetric.MEMORY:
       humanizedValue = humanizeBinaryBytes(value, 'B', 'GiB');
