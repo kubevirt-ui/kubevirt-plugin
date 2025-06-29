@@ -29,10 +29,15 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.context-provider',
   } as EncodedExtension<ContextProvider>,
-
   {
     properties: {
       handler: { $codeRef: 'kubevirtFlags.enableKubevirtDynamicFlag' },
+    },
+    type: 'console.flag',
+  } as EncodedExtension<FeatureFlag>,
+  {
+    properties: {
+      handler: { $codeRef: 'kubevirtFlags.enableKubevirtDynamicACMFlag' },
     },
     type: 'console.flag',
   } as EncodedExtension<FeatureFlag>,

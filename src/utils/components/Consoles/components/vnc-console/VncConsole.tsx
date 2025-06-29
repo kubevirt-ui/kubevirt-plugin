@@ -2,11 +2,13 @@ import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 're
 import cn from 'classnames';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import KeyTable from '@novnc/novnc/lib/input/keysym';
 import RFBCreate from '@novnc/novnc/lib/rfb';
 import { initLogging } from '@novnc/novnc/lib/util/logging';
 import { Tab, Tabs, TabTitleText } from '@patternfly/react-core';
+import { useFleetK8sAPIPath } from '@stolostron/multicluster-sdk';
 
 import { INSECURE, SECURE } from '../../utils/constants';
 import { isConnectionEncrypted, sleep } from '../../utils/utils';
@@ -50,14 +52,17 @@ export const VncConsole: FC<VncConsoleProps> = ({
     ),
     [staticRenderLocationRef, status],
   );
+  const [k8sAPIPath, k8sApiPathLoaded] = useFleetK8sAPIPath(vmi.cluster);
 
   const connect = useCallback(() => {
     setStatus(connecting);
     setRfb(() => {
       const isEncrypted = isConnectionEncrypted();
-      const path = `api/kubernetes/apis/subresources.kubevirt.io/v1/namespaces/${vmi?.metadata?.namespace}/virtualmachineinstances/${vmi?.metadata?.name}/vnc`;
+      const path = `${k8sAPIPath}/apis/subresources.kubevirt.io/v1/namespaces/${getNamespace(
+        vmi,
+      )}/virtualmachineinstances/${getName(vmi)}/vnc`;
       const port = window.location.port || (isEncrypted ? SECURE : INSECURE);
-      const url = `${isEncrypted ? WSS : WS}://${window.location.hostname}:${port}/${path}`;
+      const url = `${isEncrypted ? WSS : WS}://${window.location.hostname}:${port}${path}`;
       const rfbInstnce = new RFBCreate(staticRenderLocationRef.current, url);
       rfbInstnce?.addEventListener('connect', () => setStatus(connected));
       rfbInstnce?.addEventListener('disconnect', () => {
@@ -119,7 +124,9 @@ export const VncConsole: FC<VncConsoleProps> = ({
       onConnect?.(rfbInstnce);
       return rfbInstnce;
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
+    k8sAPIPath,
     vmi?.metadata?.namespace,
     vmi?.metadata?.name,
     viewOnly,
@@ -129,6 +136,7 @@ export const VncConsole: FC<VncConsoleProps> = ({
   ]);
 
   useEffect(() => {
+    if (!k8sApiPathLoaded) return;
     if (!rfb && status === disconnected) {
       try {
         initLogging('debug');
@@ -144,7 +152,7 @@ export const VncConsole: FC<VncConsoleProps> = ({
         onConnect?.(null);
       }
     };
-  }, [onConnect, connect, rfb, status]);
+  }, [onConnect, connect, rfb, status, k8sApiPathLoaded]);
 
   return (
     <>

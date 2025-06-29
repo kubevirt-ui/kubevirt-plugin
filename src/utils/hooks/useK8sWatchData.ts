@@ -1,5 +1,4 @@
-import { useMemo } from 'react';
-
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResource, WatchK8sResult } from '@openshift-console/dynamic-plugin-sdk';
 import { FleetWatchK8sResource, useFleetK8sWatchResource } from '@stolostron/multicluster-sdk';
 
@@ -10,12 +9,16 @@ const useK8sWatchData = <T>(resource: FleetWatchK8sResource | null): WatchK8sRes
     cluster ? resource : null,
   );
 
-  const k8sWatchResult = useK8sWatchResource<T>(cluster ? null : resource);
-
-  return useMemo(
-    () => (cluster ? [fleetData, fleetLoaded, fleetError] : k8sWatchResult),
-    [cluster, fleetData, fleetError, fleetLoaded, k8sWatchResult],
+  const [k8sWatchData, k8sWatchLoaded, k8sWatchError] = useK8sWatchResource<T>(
+    cluster ? null : resource,
   );
+
+  if (!resource || isEmpty(resource) || isEmpty(resource?.groupVersionKind))
+    return [undefined, true, undefined];
+
+  return cluster
+    ? [fleetData, fleetLoaded, fleetError]
+    : [k8sWatchData, k8sWatchLoaded, k8sWatchError];
 };
 
 export default useK8sWatchData;

@@ -11,9 +11,11 @@ import React, {
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { WSFactory } from '@openshift-console/dynamic-plugin-sdk/lib/utils/k8s/ws-factory';
 import { Button, EmptyState, EmptyStateBody, EmptyStateFooter } from '@patternfly/react-core';
+import { useFleetK8sAPIPath } from '@stolostron/multicluster-sdk';
 
 import { INSECURE, SECURE } from '../../utils/constants';
 import { isConnectionEncrypted } from '../../utils/utils';
@@ -37,6 +39,7 @@ const SerialConsoleConnector: FC<SerialConsoleConnectorProps> = ({ onConnect, vm
 
   const terminalRef = useRef(null);
   const [socket, setSocket] = useState<WebSocket>(null);
+  const [k8sAPIPath, k8sAPIPathLoaded] = useFleetK8sAPIPath(vmi.cluster);
 
   const connect = useCallback(() => {
     if (socket) {
@@ -49,7 +52,9 @@ const SerialConsoleConnector: FC<SerialConsoleConnectorProps> = ({ onConnect, vm
         window.location.port || (isConnectionEncrypted() ? SECURE : INSECURE)
       }`,
       jsonParse: false,
-      path: `/api/kubernetes/apis/subresources.kubevirt.io/v1/namespaces/${vmi?.metadata?.namespace}/virtualmachineinstances/${vmi?.metadata?.name}/console`,
+      path: `${k8sAPIPath}/apis/subresources.kubevirt.io/v1/namespaces/${getNamespace(
+        vmi,
+      )}/virtualmachineinstances/${getName(vmi)}/console`,
       reconnect: false,
       subprotocols: ['plain.kubevirt.io'],
     };
@@ -81,11 +86,13 @@ const SerialConsoleConnector: FC<SerialConsoleConnectorProps> = ({ onConnect, vm
     };
     setSocket(createdSocket);
     onConnect?.(createdSocket);
-  }, [socket, vmi?.metadata?.namespace, vmi?.metadata?.name, onConnect, pasteText]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socket, vmi?.metadata?.namespace, vmi?.metadata?.name, onConnect, pasteText, k8sAPIPath]);
 
   useEffect(() => {
+    if (!k8sAPIPathLoaded) return;
     !socket && connect();
-  }, [connect, socket]);
+  }, [connect, socket, k8sAPIPathLoaded]);
 
   return (
     <>

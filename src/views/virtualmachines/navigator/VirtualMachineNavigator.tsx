@@ -1,18 +1,14 @@
-import React, { FC, memo, useMemo, useRef } from 'react';
-import { useLocation } from 'react-router-dom-v5-compat';
+import React, { FC, useMemo, useRef } from 'react';
+import { useLocation, useParams } from 'react-router-dom-v5-compat';
 
 import CreateResourceDefaultPage from '@kubevirt-utils/components/CreateResourceDefaultPage/CreateResourceDefaultPage';
 import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
-import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { ADVANCED_SEARCH } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
+import useIsACMPage from '@kubevirt-utils/hooks/useIsACMPage';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
-import {
-  ListPageHeader,
-  OnFilterChange,
-  useActiveNamespace,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { ListPageHeader, OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import { Divider } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
 import SearchBar from '@search/components/SearchBar';
@@ -24,21 +20,24 @@ import VirtualMachineTreeView from '@virtualmachines/tree/VirtualMachineTreeView
 
 import { defaultVMYamlTemplate } from '../../../templates';
 
-const VirtualMachineNavigator: FC<{ activeNamespace: string }> = memo(({ activeNamespace }) => {
+const VirtualMachineNavigator: FC = () => {
   useSignals();
   const { t } = useKubevirtTranslation();
   const vmListRef = useRef<{ onFilterChange: OnFilterChange } | null>(null);
   const location = useLocation();
-  const namespace = activeNamespace === ALL_NAMESPACES_SESSION_KEY ? null : activeNamespace;
-  const vmName = location.pathname.split('/')?.[5];
+
+  const isACMTreeView = useIsACMPage();
+
+  const { ns: namespace } = useParams<{ ns: string }>();
 
   const { featureEnabled: advancedSearchEnabled } = useFeatures(ADVANCED_SEARCH);
 
   const isVirtualMachineListPage = useMemo(
     () =>
       location.pathname.endsWith(VirtualMachineModelRef) ||
-      location.pathname.endsWith(`${VirtualMachineModelRef}/`),
-    [location.pathname],
+      location.pathname.endsWith(`${VirtualMachineModelRef}/`) ||
+      isACMTreeView,
+    [location.pathname, isACMTreeView],
   );
 
   const treeProps = useTreeViewData();
@@ -76,20 +75,11 @@ const VirtualMachineNavigator: FC<{ activeNamespace: string }> = memo(({ activeN
             />
           </>
         ) : (
-          <VirtualMachineNavPage
-            kind={VirtualMachineModelRef}
-            name={vmName}
-            namespace={namespace}
-          />
+          <VirtualMachineNavPage />
         )}
       </VirtualMachineTreeView>
     </>
   );
-});
-
-const VirtualMachineNavigatorWithNamespace: FC = () => {
-  const [activeNamespace] = useActiveNamespace();
-  return <VirtualMachineNavigator activeNamespace={activeNamespace} />;
 };
 
-export default VirtualMachineNavigatorWithNamespace;
+export default VirtualMachineNavigator;

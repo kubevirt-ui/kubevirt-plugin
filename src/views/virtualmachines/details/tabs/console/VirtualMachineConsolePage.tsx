@@ -3,6 +3,7 @@ import React, { FC } from 'react';
 import Consoles from '@kubevirt-utils/components/Consoles/Consoles';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
 import { Bullseye, EmptyState, EmptyStateBody, PageSection } from '@patternfly/react-core';
 import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
@@ -11,7 +12,7 @@ import { isRunning, printableVMStatus } from '../../../utils';
 
 const VirtualMachineConsolePage: FC<NavPageComponentProps> = ({ obj: vm }) => {
   const { t } = useKubevirtTranslation();
-  const { vmi, vmiLoaded } = useVMI(vm?.metadata?.name, vm?.metadata?.namespace, isRunning(vm));
+  const { vmi, vmiLoaded } = useVMI(getName(vm), getNamespace(vm), vm?.cluster, isRunning(vm));
 
   if (!vmi || vm?.status?.printableStatus === printableVMStatus.Stopped) {
     return (
