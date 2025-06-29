@@ -96,6 +96,7 @@ const TabModal: TabModalFC = memo(
     return (
       <Modal
         className="ocs-modal"
+        data-test="dialog-modal"
         id="tab-modal"
         isOpen={isOpen}
         onClose={closeModal}
@@ -125,6 +126,7 @@ const TabModal: TabModalFC = memo(
             )}
             <Flex spaceItems={{ default: 'spaceItemsSm' }}>
               <Button
+                data-test="save-button"
                 isDisabled={isDisabled || isSubmitting}
                 isLoading={isLoading || isSubmitting}
                 onClick={handleSubmit}
@@ -132,7 +134,7 @@ const TabModal: TabModalFC = memo(
               >
                 {submitBtnText || t('Save')}
               </Button>
-              <Button onClick={closeModal} variant={ButtonVariant.link}>
+              <Button data-test="cancel-button" onClick={closeModal} variant={ButtonVariant.link}>
                 {t('Cancel')}
               </Button>
               {actionItemLink && (

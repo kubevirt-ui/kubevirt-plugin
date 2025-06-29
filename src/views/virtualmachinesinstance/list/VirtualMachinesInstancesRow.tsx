@@ -21,7 +21,12 @@ const VirtualMachinesInstancesRow: React.FC<VirtualMachinesInstancesRowProps> = 
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} id="name">
-        <ResourceLink kind={kind} name={obj.metadata.name} namespace={obj.metadata.namespace} />
+        <ResourceLink
+          data-test="name-column"
+          kind={kind}
+          name={obj.metadata.name}
+          namespace={obj.metadata.namespace}
+        />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="namespace">
         <ResourceLink kind="Namespace" name={obj.metadata.namespace} />
@@ -43,7 +48,7 @@ const VirtualMachinesInstancesRow: React.FC<VirtualMachinesInstancesRowProps> = 
         <VirtualMachinesInstancesIP vmi={obj} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="">
-        <VirtualMachinesInsanceActions vmi={obj} />
+        <VirtualMachinesInsanceActions data-test="row-action" vmi={obj} />
       </TableData>
     </>
   );

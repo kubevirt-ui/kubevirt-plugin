@@ -67,7 +67,11 @@ const ActionsDropdown: FC<ActionsDropdownProps> = ({
     );
 
   return (
-    <div className={classNames('kv-actions-dropdown', className)} ref={containerRef}>
+    <div
+      className={classNames('kv-actions-dropdown', className)}
+      data-test="actions-dropdown"
+      ref={containerRef}
+    >
       {Toggle(toggleRef)}
       <Popper
         popper={
