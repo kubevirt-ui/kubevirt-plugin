@@ -119,7 +119,7 @@ const VirtualMachineRowLayout: FC<
             ))}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="">
-        <VirtualMachineActions actions={actions} isKebabToggle />
+        <VirtualMachineActions actions={actions} data-test="row-action" isKebabToggle />
       </TableData>
     </>
   );

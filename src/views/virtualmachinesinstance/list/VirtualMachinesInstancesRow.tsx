@@ -43,7 +43,7 @@ const VirtualMachinesInstancesRow: React.FC<VirtualMachinesInstancesRowProps> = 
         <VirtualMachinesInstancesIP vmi={obj} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="">
-        <VirtualMachinesInsanceActions vmi={obj} />
+        <VirtualMachinesInsanceActions data-test="row-action" vmi={obj} />
       </TableData>
     </>
   );
