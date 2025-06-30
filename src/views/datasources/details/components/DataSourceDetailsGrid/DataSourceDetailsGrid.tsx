@@ -1,10 +1,8 @@
 import React from 'react';
 import { getDataSourceCronJob } from 'src/views/datasources/utils';
 
-import { DEFAULT_INSTANCETYPE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
 import { PersistentVolumeClaimModel } from '@kubevirt-ui/kubevirt-api/console';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
-import { VirtualMachineClusterInstancetypeModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineClusterInstancetypeModel';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import PreferencePopoverContent from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/PreferenceSelect/PreferencePopoverContent';
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
@@ -16,13 +14,13 @@ import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getLabel } from '@kubevirt-utils/resources/shared';
 import { k8sPatch, ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, Grid, GridItem } from '@patternfly/react-core';
 
 import DataSourceAnnotations from '../DataSourceAnnotations/DataSourceAnnotations';
 import DataSourceImportCronDescription from '../DataSourceImportCronDescription/DataSourceImportCronDescription';
 
+import DataSourceInstanceTypeLink from './DataSourceInstanceTypeLink';
 import DataSourcePreferenceLink from './DataSourcePreferenceLink';
 
 type DataSourceDetailsGridProps = {
@@ -174,13 +172,8 @@ export const DataSourceDetailsGrid: React.FC<DataSourceDetailsGridProps> = ({ da
             />
           )}
           <VirtualMachineDescriptionItem
-            descriptionData={
-              <ResourceLink
-                groupVersionKind={VirtualMachineClusterInstancetypeModelGroupVersionKind}
-                name={getLabel(dataSource, DEFAULT_INSTANCETYPE_LABEL)}
-              />
-            }
             bodyContent={t('The default InstanceType for this volume.')}
+            descriptionData={<DataSourceInstanceTypeLink dataSource={dataSource} />}
             descriptionHeader={t('Default InstanceType')}
             isPopover
           />

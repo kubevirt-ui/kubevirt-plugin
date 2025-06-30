@@ -1,3 +1,4 @@
+import { DEFAULT_INSTANCETYPE_KIND_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
 import {
   DEFAULT_PREFERENCE_KIND_LABEL,
   DEFAULT_PREFERENCE_LABEL,
@@ -10,6 +11,7 @@ import DataSourceModel, {
   DataSourceModelGroupVersionKind,
 } from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
+import VirtualMachineInstancetypeModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstancetypeModel';
 import VirtualMachinePreferenceModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachinePreferenceModel';
 import {
   V1beta1DataImportCron,
@@ -106,6 +108,10 @@ export const getDataImportCronFromDataSource = (
 
 export const hasUserPreference = (bootableVolume: BootableVolume) =>
   getLabel(bootableVolume, DEFAULT_PREFERENCE_KIND_LABEL) === VirtualMachinePreferenceModel.kind;
+
+export const hasUserInstanceType = (bootableVolume: BootableVolume) =>
+  getLabel(bootableVolume, DEFAULT_INSTANCETYPE_KIND_LABEL) ===
+  VirtualMachineInstancetypeModel.kind;
 
 export const getPreference = (
   bootableVolume: BootableVolume,
