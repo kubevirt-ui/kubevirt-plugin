@@ -1,13 +1,21 @@
 import React, { FC, useMemo, useState } from 'react';
 
-import { modelToGroupVersionKind, PodModel, ServiceModel } from '@kubevirt-ui/kubevirt-api/console';
+import {
+  modelToGroupVersionKind,
+  PodModel,
+  ServiceModel,
+  VirtualMachineModelGroupVersionKind,
+} from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1Pod, IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
+import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
 import { getVMIPod } from '@kubevirt-utils/resources/vmi';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Form, FormGroup, SelectList, SelectOption } from '@patternfly/react-core';
+import { isRunning } from '@virtualmachines/utils';
 
 import MultusNetwork from './Components/MultusNetwork';
 import RDPConnector from './Components/RDPConnector';
@@ -15,8 +23,14 @@ import { MULTUS, POD } from './utils/constants';
 import { DesktopViewerProps, Network } from './utils/types';
 import { getDefaultNetwork, getRdpAddressPort, getVmRdpNetworks } from './utils/utils';
 
-const DesktopViewer: FC<DesktopViewerProps> = ({ vm, vmi }) => {
+const DesktopViewer: FC<DesktopViewerProps> = ({ vmName: name, vmNamespace: namespace }) => {
   const { t } = useKubevirtTranslation();
+  const [vm, vmLoaded] = useK8sWatchResource<V1VirtualMachine>({
+    groupVersionKind: VirtualMachineModelGroupVersionKind,
+    name,
+    namespace,
+  });
+  const { vmi, vmiLoaded } = useVMI(vm?.metadata?.name, vm?.metadata?.namespace, isRunning(vm));
 
   const networks = getVmRdpNetworks(vm, vmi);
   const [selectedNetwork, setSelectedNetwork] = useState<Network>(getDefaultNetwork(networks));
@@ -52,6 +66,12 @@ const DesktopViewer: FC<DesktopViewerProps> = ({ vm, vmi }) => {
     );
   });
 
+  const isLoading =
+    (!podsLoaded && !pods) ||
+    (!servicesLoaded && !services) ||
+    (!vmLoaded && !vm) ||
+    (!vmiLoaded && !vmi);
+
   return (
     <>
       <Form className="kv-vm-consoles__rdp-actions" isHorizontal>
@@ -68,7 +88,7 @@ const DesktopViewer: FC<DesktopViewerProps> = ({ vm, vmi }) => {
       </Form>
       {networkType === POD && (
         <RDPConnector
-          isLoading={!podsLoaded || !servicesLoaded}
+          isLoading={isLoading}
           rdpServiceAddressPort={rdpServiceAddressPort}
           vm={vm}
           vmi={vmi}

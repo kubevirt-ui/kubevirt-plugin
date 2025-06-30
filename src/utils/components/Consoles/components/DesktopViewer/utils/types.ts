@@ -153,8 +153,8 @@ export type MoreInformationDefaultProps = {
 };
 
 export type DesktopViewerProps = {
-  vm: V1VirtualMachine;
-  vmi: V1VirtualMachineInstance;
+  vmName: string;
+  vmNamespace: string;
 };
 
 export type RDPServiceNotConfiguredProps = {

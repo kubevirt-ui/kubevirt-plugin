@@ -1,8 +1,9 @@
-import React, { FC, MouseEvent, useEffect, useState } from 'react';
+/* eslint-disable @typescript-eslint/no-shadow */
+import React, { FC, useState } from 'react';
 
 import DropdownToggle from '@kubevirt-utils/components/toggles/DropdownToggle';
 import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Button,
   ButtonVariant,
@@ -16,7 +17,7 @@ import { SelectList } from '@patternfly/react-core';
 import {} from '@patternfly/react-core';
 import { PasteIcon } from '@patternfly/react-icons';
 
-import { ConsoleState } from '../utils/ConsoleConsts';
+import { ConsoleState, isConsoleType, VNC_CONSOLE_TYPE } from '../utils/ConsoleConsts';
 
 import { AccessConsolesProps, typeMap } from './utils/accessConsoles';
 
@@ -25,49 +26,30 @@ import './access-consoles.scss';
 const { connected } = ConsoleState;
 
 export const AccessConsoles: FC<AccessConsolesProps> = ({
+  actions,
   isWindowsVM,
-  rfb,
-  serialSocket,
   setType,
+  state,
   type,
 }) => {
   const [isOpenSelectType, setIsOpenSelectType] = useState<boolean>(false);
   const [isOpenSendKey, setIsOpenSendKey] = useState<boolean>(false);
-  const [status, setStatus] = useState<string>();
-
-  useEffect(() => {
-    const statusCallback = () => setStatus(connected);
-    rfb?.addEventListener('connect', statusCallback);
-
-    () => rfb?.removeEventListener('connect', statusCallback);
-  }, [rfb]);
+  const { t } = useKubevirtTranslation();
 
   const customButtons = [
     {
-      onClick: () => rfb?.sendCtrlAltDel(),
+      onClick: () => actions.sendCtrlAltDel?.(),
       text: 'Ctrl + Alt + Delete',
     },
     {
-      onClick: () => rfb?.sendCtrlAlt1(),
+      onClick: () => actions.sendCtrlAlt1?.(),
       text: 'Ctrl + Alt + 1',
     },
     {
-      onClick: () => rfb?.sendCtrlAlt2(),
+      onClick: () => actions.sendCtrlAlt2?.(),
       text: 'Ctrl + Alt + 2',
     },
   ];
-
-  const onInjectTextFromClipboard = (e: MouseEvent<HTMLButtonElement>) => {
-    e.currentTarget.blur();
-    e.preventDefault();
-    rfb?.sendPasteCMD();
-    serialSocket?.onPaste();
-  };
-
-  const onDisconnect = () => {
-    rfb?.disconnect();
-    serialSocket?.destroy();
-  };
 
   return (
     <>
@@ -78,12 +60,12 @@ export const AccessConsoles: FC<AccessConsolesProps> = ({
           </>
         }
         className="vnc-paste-button"
-        onClick={onInjectTextFromClipboard}
+        onClick={actions.sendPaste}
         variant={ButtonVariant.link}
       />
       <Select
         onSelect={(_, selection: string) => {
-          setType(selection);
+          isConsoleType(selection) && setType(selection);
           setIsOpenSelectType(false);
         }}
         toggle={SelectToggle({
@@ -100,10 +82,10 @@ export const AccessConsoles: FC<AccessConsolesProps> = ({
         selected={type}
       >
         <SelectList>
-          {Object.values(typeMap(isWindowsVM)).map((name: string) => {
+          {Object.entries(typeMap(isWindowsVM, t)).map(([type, label]) => {
             return (
-              <SelectOption id={name} key={name} value={name}>
-                {name}
+              <SelectOption id={type} key={type} value={type}>
+                {label}
               </SelectOption>
             );
           })}
@@ -114,7 +96,7 @@ export const AccessConsoles: FC<AccessConsolesProps> = ({
           children: <>{t('Send key')}</>,
           className: 'access-consoles-selector',
           id: 'pf-v6-c-console__actions-vnc-toggle-id',
-          isDisabled: !rfb,
+          isDisabled: type !== VNC_CONSOLE_TYPE,
           isExpanded: isOpenSendKey,
           onClick: () => setIsOpenSendKey((prevIsOpen) => !prevIsOpen),
         })}
@@ -124,7 +106,7 @@ export const AccessConsoles: FC<AccessConsolesProps> = ({
       >
         <DropdownList>
           {customButtons?.map(({ onClick, text }) => (
-            <DropdownItem key={text} onClick={onClick}>
+            <DropdownItem isDisabled={!onClick} key={text} onClick={onClick}>
               {text}
             </DropdownItem>
           ))}
@@ -132,8 +114,8 @@ export const AccessConsoles: FC<AccessConsolesProps> = ({
       </Dropdown>
       <Button
         className="vnc-actions-disconnect-button"
-        isDisabled={status !== connected}
-        onClick={onDisconnect}
+        isDisabled={state !== connected || !actions.disconnect}
+        onClick={actions.disconnect}
         variant={ButtonVariant.secondary}
       >
         {t('Disconnect')}
