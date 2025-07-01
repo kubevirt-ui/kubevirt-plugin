@@ -57,7 +57,7 @@ import {
   KUBEVIRT_OS,
 } from './constants';
 
-const generateCloudInitPassword = () =>
+export const generateCloudInitPassword = () =>
   `${getRandomChars(4)}-${getRandomChars(4)}-${getRandomChars(4)}`;
 
 const getCloudInitUserNameByOS = (selectedPreferenceName: string, osLabel: string): string => {

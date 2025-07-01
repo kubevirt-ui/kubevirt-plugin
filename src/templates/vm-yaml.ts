@@ -1,12 +1,15 @@
+import { generateCloudInitPassword } from '@catalog/CreateFromInstanceTypes/utils/utils';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { isUpstream } from '@kubevirt-utils/utils/utils';
 
-const randomPassword = Math.random().toString(36).slice(-6);
-
 const type = isUpstream ? 'fedora' : 'rhel10';
-const password = isUpstream ? 'fedora' : randomPassword;
+const image = isUpstream
+  ? 'quay.io/containerdisks/fedora'
+  : 'registry.redhat.io/rhel10/rhel-guest-image';
 
-export const defaultVMYamlTemplate = `apiVersion: ${VirtualMachineModel.apiGroup}/${VirtualMachineModel.apiVersion}
+export const defaultVMYamlTemplate = () => `apiVersion: ${VirtualMachineModel.apiGroup}/${
+  VirtualMachineModel.apiVersion
+}
 kind: ${VirtualMachineModel.kind}
 metadata:
   name: example
@@ -56,12 +59,12 @@ spec:
       volumes:
         - name: rootdisk
           containerDisk:
-            image: 'quay.io/containerdisks/${type}'
+            image: ${image}
         - cloudInitNoCloud:
             userData: |-
               #cloud-config
               user: ${type}
-              password: ${password}
+              password: ${generateCloudInitPassword()}
               chpasswd: { expire: False }
           name: cloudinitdisk
 `;
