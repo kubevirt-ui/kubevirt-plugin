@@ -28,18 +28,18 @@ const SettingsTab: FC = () => {
         >
           {isAdmin && (
             <Tab eventKey={0} title={<TabTitleText>{t('Cluster')}</TabTitleText>}>
-              <div className="settings-tab__content">
+              <div className="settings-tab__content" data-test="cluster-settings">
                 <ClusterTab />
               </div>
             </Tab>
           )}
           <Tab eventKey={1} title={<TabTitleText>{t('User')}</TabTitleText>}>
-            <div className="settings-tab__content">
+            <div className="settings-tab__content" data-test="user-settings">
               <UserTab />
             </div>
           </Tab>
           <Tab eventKey={2} title={<TabTitleText>{t('Preview features')}</TabTitleText>}>
-            <div className="settings-tab__content">
+            <div className="settings-tab__content" data-test="preview-features">
               <PreviewFeaturesTab />
             </div>
           </Tab>

@@ -27,13 +27,13 @@ describe('Cluster Test Preparation', () => {
     cy.visitOverviewVirt();
 
     tab.navigateToSettings();
-    cy.contains('button[role="tab"]', 'User').click();
-    cy.contains(manageKeysText).click();
+    cy.byButtonText('User').click();
+    cy.byButtonText(manageKeysText).click();
 
     cy.contains(authSSHKey, { timeout: 20000 }).should('be.visible');
     cy.wait(10000);
 
-    cy.get('.settings-tab__content')
+    cy.byLegacyTestID('settings-user-ssh-key')
       .then(($body) => {
         if ($body.text().includes(TEST_SECRET_NAME)) {
           cy.task('log', 'SSH secret is already configured');
