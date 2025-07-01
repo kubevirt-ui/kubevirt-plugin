@@ -8,7 +8,7 @@ import {
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Divider, PageSection, Title } from '@patternfly/react-core';
 
-import { DataSourceDetailsGrid } from './components/DataSourceDetailsGrid.tsx/DataSourceDetailsGrid';
+import { DataSourceDetailsGrid } from './components/DataSourceDetailsGrid/DataSourceDetailsGrid';
 
 type DataSourceDetailsPageProps = {
   obj?: V1beta1DataSource;
