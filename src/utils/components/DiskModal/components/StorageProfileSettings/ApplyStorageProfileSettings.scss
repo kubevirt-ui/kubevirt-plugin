@@ -1,6 +1,11 @@
 .ApplyStorageProfileSettings {
   &--volume-access-section {
-    margin-left: var(--pf-global--spacer--md);
-    margin-top: var(--pf-global--spacer--sm);
+    margin-left: var(--pf-v5-global--spacer--sm);
+    margin-top: var(--pf-v5-global--spacer--sm);
+  }
+  &--labelWithGap {
+    display: flex;
+    gap: var(--pf-v5-global--spacer--sm);
+    align-items: anchor-center;
   }
 }
