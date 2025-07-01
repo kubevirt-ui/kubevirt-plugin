@@ -3,7 +3,10 @@ import React, { FC, useEffect, useMemo, useState } from 'react';
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { UseBootableVolumesValues } from '@catalog/CreateFromInstanceTypes/state/utils/types';
 import { CREATE_VM_TAB } from '@catalog/CreateVMHorizontalNav/constants';
-import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1beta1VirtualMachineClusterPreference,
+  V1beta1VirtualMachinePreference,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import ProjectDropdown from '@kubevirt-utils/components/ProjectDropdown/ProjectDropdown';
 import { OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
@@ -39,6 +42,7 @@ type BootableVolumeListProps = {
   favorites: UserSettingFavorites;
   preferencesData: V1beta1VirtualMachineClusterPreference[];
   selectedBootableVolumeState?: [BootableVolume, (selectedVolume: BootableVolume) => void];
+  userPreferencesData: V1beta1VirtualMachinePreference[];
 };
 
 const BootableVolumeList: FC<BootableVolumeListProps> = ({
@@ -48,6 +52,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
   favorites,
   preferencesData,
   selectedBootableVolumeState,
+  userPreferencesData,
 }) => {
   const { t } = useKubevirtTranslation();
   const isAdmin = useIsAdmin();
@@ -66,6 +71,11 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
   const preferencesMap = useMemo(
     () => convertResourceArrayToMap(preferencesData),
     [preferencesData],
+  );
+
+  const userPreferencesMap = useMemo(
+    () => convertResourceArrayToMap(userPreferencesData, true),
+    [userPreferencesData],
   );
 
   const { activeColumns, columnLayout, loadedColumns } = useBootVolumeColumns(
@@ -89,6 +99,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
     data,
     volumeFavorites,
     preferencesMap,
+    userPreferencesMap,
     pvcSources,
     volumeSnapshotSources,
     pagination,
@@ -168,6 +179,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
                 favorites={favorites}
                 onSelect={onModalBootableVolumeSelect}
                 preferencesData={preferencesData}
+                userPreferencesData={userPreferencesData}
               />
             )}
           </>
@@ -187,6 +199,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
             getSortType={getSortType}
             preferencesMap={preferencesMap}
             sortedPaginatedData={sortedPaginatedData}
+            userPreferencesMap={userPreferencesMap}
           />
           <BootableVolumesPipelinesHint bootableVolumes={bootableVolumes} />
         </>

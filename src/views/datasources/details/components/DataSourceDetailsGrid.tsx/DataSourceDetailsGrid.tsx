@@ -1,10 +1,8 @@
 import React from 'react';
 import { getDataSourceCronJob } from 'src/views/datasources/utils';
 
-import {
-  PersistentVolumeClaimModel,
-  VirtualMachineClusterPreferenceModelGroupVersionKind,
-} from '@kubevirt-ui/kubevirt-api/console';
+import { DEFAULT_INSTANCETYPE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
+import { PersistentVolumeClaimModel } from '@kubevirt-ui/kubevirt-api/console';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import { VirtualMachineClusterInstancetypeModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineClusterInstancetypeModel';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
@@ -18,16 +16,14 @@ import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  DEFAULT_INSTANCETYPE_LABEL,
-  DEFAULT_PREFERENCE_LABEL,
-} from '@kubevirt-utils/resources/bootableresources/constants';
 import { getLabel } from '@kubevirt-utils/resources/shared';
 import { k8sPatch, ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, Grid, GridItem } from '@patternfly/react-core';
 
 import DataSourceAnnotations from '../DataSourceAnnotations/DataSourceAnnotations';
 import DataSourceImportCronDescription from '../DataSourceImportCronDescription/DataSourceImportCronDescription';
+
+import DataSourcePreferenceLink from './DataSourcePreferenceLink';
 
 type DataSourceDetailsGridProps = {
   dataSource: V1beta1DataSource;
@@ -189,13 +185,8 @@ export const DataSourceDetailsGrid: React.FC<DataSourceDetailsGridProps> = ({ da
             isPopover
           />
           <VirtualMachineDescriptionItem
-            descriptionData={
-              <ResourceLink
-                groupVersionKind={VirtualMachineClusterPreferenceModelGroupVersionKind}
-                name={getLabel(dataSource, DEFAULT_PREFERENCE_LABEL)}
-              />
-            }
             bodyContent={<PreferencePopoverContent />}
+            descriptionData={<DataSourcePreferenceLink dataSource={dataSource} />}
             descriptionHeader={t('Preference')}
             isPopover
           />

@@ -1,7 +1,10 @@
 import React, { FC, useState } from 'react';
 
 import { UseBootableVolumesValues } from '@catalog/CreateFromInstanceTypes/state/utils/types';
-import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1beta1VirtualMachineClusterPreference,
+  V1beta1VirtualMachinePreference,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { UserSettingFavorites } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/types';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
@@ -14,6 +17,7 @@ type ShowAllBootableVolumesButtonProps = {
   favorites: UserSettingFavorites;
   onSelect: (selectedBootableVolume: BootableVolume) => void;
   preferencesData: V1beta1VirtualMachineClusterPreference[];
+  userPreferencesData: V1beta1VirtualMachinePreference[];
 };
 
 const ShowAllBootableVolumesButton: FC<ShowAllBootableVolumesButtonProps> = (props) => {
