@@ -67,17 +67,19 @@ const SavedSearchesDropdown: FC = () => {
         {searches.map(({ description, name }) => (
           <DropdownItem
             actions={
-              <MenuItemAction
-                aria-label={t('Delete saved search')}
-                icon={<TrashIcon />}
-                onClick={() => deleteSearch(name)}
-              />
+              <div data-test={`delete-search-item-${name}`}>
+                <MenuItemAction
+                  aria-label={t('Delete saved search')}
+                  icon={<TrashIcon />}
+                  onClick={() => deleteSearch(name)}
+                />
+              </div>
             }
             onClick={() => {
               applySearch(name);
               setOpen(false);
             }}
-            data-test-id={`saved-search-item--${name}`}
+            data-test={`saved-search-item-${name}`}
             description={description}
             key={name}
           >

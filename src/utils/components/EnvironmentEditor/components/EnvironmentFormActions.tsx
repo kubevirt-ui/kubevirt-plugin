@@ -81,6 +81,7 @@ const EnvironmentFormActions: React.FC<EnvironmentFormActionsProps> = ({
       <StackItem>
         <ActionGroup className="pf-v6-c-form">
           <Button
+            data-test="save-button"
             isDisabled={isSaveDisabled || loading}
             isLoading={loading}
             onClick={onSubmit}
@@ -88,7 +89,12 @@ const EnvironmentFormActions: React.FC<EnvironmentFormActionsProps> = ({
           >
             {t('Save')}
           </Button>
-          <Button onClick={onReload} type="button" variant={ButtonVariant.secondary}>
+          <Button
+            data-test="reload-button"
+            onClick={onReload}
+            type="button"
+            variant={ButtonVariant.secondary}
+          >
             {t('Reload')}
           </Button>
         </ActionGroup>

@@ -106,10 +106,21 @@ const TemplateParametersPage: FC<TemplateParametersPageProps> = ({ obj: template
             </Alert>
           )}
           <ActionGroup className="pf-v6-c-form">
-            <Button isDisabled={isSaveDisabled} isLoading={loading} onClick={onSave} type="submit">
+            <Button
+              data-test="save-button"
+              isDisabled={isSaveDisabled}
+              isLoading={loading}
+              onClick={onSave}
+              type="submit"
+            >
               {t('Save')}
             </Button>
-            <Button onClick={goBack} type="button" variant={ButtonVariant.secondary}>
+            <Button
+              data-test="cancel-button"
+              onClick={goBack}
+              type="button"
+              variant={ButtonVariant.secondary}
+            >
               {t('Cancel')}
             </Button>
           </ActionGroup>
