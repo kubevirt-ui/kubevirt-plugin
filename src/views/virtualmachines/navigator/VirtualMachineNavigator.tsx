@@ -1,18 +1,15 @@
-import React, { FC, memo, useMemo, useRef } from 'react';
+import React, { ComponentProps, FC, memo, useMemo, useRef } from 'react';
 import { useLocation } from 'react-router-dom-v5-compat';
 
 import CreateResourceDefaultPage from '@kubevirt-utils/components/CreateResourceDefaultPage/CreateResourceDefaultPage';
 import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { ADVANCED_SEARCH } from '@kubevirt-utils/hooks/useFeatures/constants';
-import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
+import useFeatureReadOnly from '@kubevirt-utils/hooks/useFeatures/useFeatureReadOnly';
+import withFeatures from '@kubevirt-utils/hooks/useFeatures/withFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
-import {
-  ListPageHeader,
-  OnFilterChange,
-  useActiveNamespace,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { ListPageHeader, OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import { Divider } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
 import SearchBar from '@search/components/SearchBar';
@@ -32,7 +29,8 @@ const VirtualMachineNavigator: FC<{ activeNamespace: string }> = memo(({ activeN
   const namespace = activeNamespace === ALL_NAMESPACES_SESSION_KEY ? null : activeNamespace;
   const vmName = location.pathname.split('/')?.[5];
 
-  const { featureEnabled: advancedSearchEnabled } = useFeatures(ADVANCED_SEARCH);
+  const { featureEnabled: advancedSearchEnabled, loading: loadingFeatureFlag } =
+    useFeatureReadOnly(ADVANCED_SEARCH);
 
   const isVirtualMachineListPage = useMemo(
     () =>
@@ -59,7 +57,9 @@ const VirtualMachineNavigator: FC<{ activeNamespace: string }> = memo(({ activeN
   return (
     <>
       <ListPageHeader title={t('VirtualMachines')}>
-        {advancedSearchEnabled && <SearchBar onFilterChange={onFilterChange} />}
+        {advancedSearchEnabled && !loadingFeatureFlag && (
+          <SearchBar onFilterChange={onFilterChange} />
+        )}
         <div>
           <VirtualMachinesCreateButton namespace={namespace} />
         </div>
@@ -87,9 +87,7 @@ const VirtualMachineNavigator: FC<{ activeNamespace: string }> = memo(({ activeN
   );
 });
 
-const VirtualMachineNavigatorWithNamespace: FC = () => {
-  const [activeNamespace] = useActiveNamespace();
-  return <VirtualMachineNavigator activeNamespace={activeNamespace} />;
-};
-
-export default VirtualMachineNavigatorWithNamespace;
+export const VirtualMachineNavigatorWithFeatures = memo(
+  withFeatures<ComponentProps<typeof VirtualMachineNavigator>>(VirtualMachineNavigator),
+);
+export default VirtualMachineNavigator;

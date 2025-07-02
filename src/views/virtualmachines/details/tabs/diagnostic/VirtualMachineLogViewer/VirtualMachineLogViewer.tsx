@@ -4,7 +4,7 @@ import { V1Devices } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { getChangedGuestSystemAccessLog } from '@kubevirt-utils/components/PendingChanges/utils/helpers';
 import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeatures/constants';
-import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
+import useFeatureReadOnly from '@kubevirt-utils/hooks/useFeatures/useFeatureReadOnly';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getDevices, useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm';
 import { getVMIPod } from '@kubevirt-utils/resources/vmi';
@@ -18,7 +18,7 @@ const VirtualMachineLogViewer = ({ connect, vm }) => {
   const { t } = useKubevirtTranslation();
   const { loaded, pods, vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
   const pod = getVMIPod(vmi, pods);
-  const { featureEnabled: isClusterDisabledGuestSystemLogs } = useFeatures(
+  const { featureEnabled: isClusterDisabledGuestSystemLogs } = useFeatureReadOnly(
     DISABLED_GUEST_SYSTEM_LOGS_ACCESS,
   );
 

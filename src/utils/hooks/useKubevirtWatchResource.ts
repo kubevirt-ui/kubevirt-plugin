@@ -7,7 +7,7 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 
 import { KUBEVIRT_APISERVER_PROXY } from './useFeatures/constants';
-import { useFeatures } from './useFeatures/useFeatures';
+import useFeatureReadOnly from './useFeatures/useFeatureReadOnly';
 import useKubevirtDataPodHealth from './useKubevirtDataPod/hooks/useKubevirtDataPodHealth';
 import useKubevirtDataPod from './useKubevirtDataPod/useKubevirtDataPod';
 type Result<R extends K8sResourceCommon | K8sResourceCommon[]> = [R, boolean, Error];
@@ -21,7 +21,7 @@ const useKubevirtWatchResource: UseKubevirtWatchResource = <T>(watchOptions, fil
   const [loadedData, setLoadedData] = useState<boolean>(false);
   const [loadErrorData, setLoadErrorData] = useState<Error>();
   const isProxyPodAlive = useKubevirtDataPodHealth();
-  const { featureEnabled, loading } = useFeatures(KUBEVIRT_APISERVER_PROXY);
+  const { featureEnabled, loading } = useFeatureReadOnly(KUBEVIRT_APISERVER_PROXY);
   const shouldUseProxyPod = useMemo(() => {
     if (!featureEnabled && !loading) return false;
     if (featureEnabled && !loading && isProxyPodAlive !== null) return isProxyPodAlive;

@@ -3,7 +3,7 @@ import { Controller, useFormContext } from 'react-hook-form';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { FEATURE_HCO_PERSISTENT_RESERVATION } from '@kubevirt-utils/hooks/useFeatures/constants';
-import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
+import useFeatureReadOnly from '@kubevirt-utils/hooks/useFeatures/useFeatureReadOnly';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { diskTypes } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { getDiskDrive } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
@@ -23,7 +23,7 @@ const AdvancedSettings: FC = () => {
   const sharable = getDiskSharable(disk);
   const lunReservation = getLunReservation(disk);
 
-  const { featureEnabled } = useFeatures(FEATURE_HCO_PERSISTENT_RESERVATION);
+  const { featureEnabled } = useFeatureReadOnly(FEATURE_HCO_PERSISTENT_RESERVATION);
 
   const isLunType = diskType === diskTypes.lun;
   return (

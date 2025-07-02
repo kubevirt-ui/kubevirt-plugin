@@ -6,7 +6,7 @@ import {
   LOAD_BALANCER_ENABLED,
   NODE_PORT_ENABLED,
 } from '@kubevirt-utils/hooks/useFeatures/constants';
-import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
+import useFeatureReadOnly from '@kubevirt-utils/hooks/useFeatures/useFeatureReadOnly';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useMetalLBOperatorInstalled } from '@kubevirt-utils/hooks/useMetalLBOperatorInstalled/useMetalLBOperatorInstalled';
 import { SelectList, SelectOption } from '@patternfly/react-core';
@@ -27,8 +27,8 @@ const SSHServiceSelect: FC<SSHServiceSelectProps> = ({
   const { t } = useKubevirtTranslation();
   const hasMetalLBInstalled = useMetalLBOperatorInstalled();
 
-  const { featureEnabled: loadBalancerConfigFlag } = useFeatures(LOAD_BALANCER_ENABLED);
-  const { featureEnabled: nodePortEnabled } = useFeatures(NODE_PORT_ENABLED);
+  const { featureEnabled: loadBalancerConfigFlag } = useFeatureReadOnly(LOAD_BALANCER_ENABLED);
+  const { featureEnabled: nodePortEnabled } = useFeatureReadOnly(NODE_PORT_ENABLED);
 
   const loadBalancerEnabled = loadBalancerConfigFlag || hasMetalLBInstalled;
 
