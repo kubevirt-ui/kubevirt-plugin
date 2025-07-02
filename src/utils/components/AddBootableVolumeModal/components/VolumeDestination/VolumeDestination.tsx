@@ -1,10 +1,9 @@
-import React, { Dispatch, FC, SetStateAction, useState } from 'react';
+import React, { FC, useState } from 'react';
 
-import ApplyStorageProfileSettingsCheckbox from '@kubevirt-utils/components/ApplyStorageProfileSettingsCheckbox/ApplyStorageProfileSettingsCheckbox';
+import ApplyStorageProfileSettings from '@kubevirt-utils/components/ApplyStorageProfileSettings/ApplyStorageProfileSettings';
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
 import ProjectDropdown from '@kubevirt-utils/components/ProjectDropdown/ProjectDropdown';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { UseStorageProfileClaimPropertySetsValue } from '@kubevirt-utils/hooks/useStorageProfileClaimPropertySets';
 import { FormGroup, Grid, GridItem, TextInput } from '@patternfly/react-core';
 
 import { AddBootableVolumeState, SetBootableVolumeFieldType } from '../../utils/constants';
@@ -13,27 +12,25 @@ import DefaultStorageClassAlert from './StorageClass/DefaultStorageClassAlert';
 import StorageClassSelect from './StorageClass/StorageClassSelect';
 
 type VolumeDestinationProps = {
-  applyStorageProfileState: [boolean, Dispatch<SetStateAction<boolean>>];
   bootableVolume: AddBootableVolumeState;
-  claimPropertySetsData: UseStorageProfileClaimPropertySetsValue;
   setBootableVolumeField: SetBootableVolumeFieldType;
 };
 
 const VolumeDestination: FC<VolumeDestinationProps> = ({
-  applyStorageProfileState,
   bootableVolume,
-  claimPropertySetsData,
   setBootableVolumeField,
 }) => {
   const { t } = useKubevirtTranslation();
   const [showSCAlert, setShowSCAlert] = useState(false);
 
-  const { bootableVolumeName, bootableVolumeNamespace, size, storageClassName } =
-    bootableVolume || {};
-
-  const [applyStorageProfile, setApplyStorageProfile] = applyStorageProfileState;
-
-  const { claimPropertySets, loaded: storageProfileLoaded } = claimPropertySetsData;
+  const {
+    accessMode,
+    bootableVolumeName,
+    bootableVolumeNamespace,
+    size,
+    storageClassName,
+    volumeMode,
+  } = bootableVolume || {};
 
   return (
     <>
@@ -46,11 +43,10 @@ const VolumeDestination: FC<VolumeDestinationProps> = ({
           />
         </GridItem>
         <GridItem>
-          <ApplyStorageProfileSettingsCheckbox
-            claimPropertySets={claimPropertySets}
-            disabled={!storageProfileLoaded}
-            handleChange={setApplyStorageProfile}
-            isChecked={applyStorageProfile}
+          <ApplyStorageProfileSettings
+            {...{ accessMode, storageClassName, volumeMode }}
+            setAccessMode={setBootableVolumeField('accessMode')}
+            setVolumeMode={setBootableVolumeField('volumeMode')}
           />
         </GridItem>
         <GridItem span={6}>

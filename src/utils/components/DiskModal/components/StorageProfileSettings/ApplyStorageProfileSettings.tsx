@@ -1,49 +1,34 @@
 import React, { FC } from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useStorageProfileClaimPropertySets from '@kubevirt-utils/hooks/useStorageProfileClaimPropertySets';
-import { Flex, FlexItem, Skeleton } from '@patternfly/react-core';
+import ApplyStorageProfileSettings from '@kubevirt-utils/components/ApplyStorageProfileSettings/ApplyStorageProfileSettings';
 
 import { V1DiskFormState } from '../../utils/types';
-import { DATAVOLUME_TEMPLATE_STORAGE } from '../utils/constants';
+import {
+  ACCESS_MODE_FIELD,
+  DATAVOLUME_TEMPLATE_STORAGE,
+  VOLUME_MODE_FIELD,
+} from '../utils/constants';
 
-import AccessMode from './AccessMode';
-import VolumeMode from './VolumeMode';
+const ApplyStorageProfileSettingsToDisk: FC = () => {
+  const { setValue, watch } = useFormContext<V1DiskFormState>();
 
-import './ApplyStorageProfileSettings.scss';
-
-const ApplyStorageProfileSettings: FC = () => {
-  const { t } = useKubevirtTranslation();
-  const { watch } = useFormContext<V1DiskFormState>();
-
-  const [storage] = watch([DATAVOLUME_TEMPLATE_STORAGE]);
+  const [storage, accessModes, volumeMode] = watch([
+    DATAVOLUME_TEMPLATE_STORAGE,
+    ACCESS_MODE_FIELD,
+    VOLUME_MODE_FIELD,
+  ]);
   const { storageClassName = '' } = storage ?? {};
 
-  const { claimPropertySets, error, loaded } = useStorageProfileClaimPropertySets(storageClassName);
-
-  if (!loaded) {
-    return <Skeleton screenreaderText={t('Loading StorageProfile')} />;
-  }
-
-  if (loaded && error) {
-    return <ErrorAlert error={error} />;
-  }
+  const accessMode = accessModes?.[0];
 
   return (
-    <Flex
-      className="ApplyStorageProfileSettings--volume-access-section"
-      spaceItems={{ default: 'spaceItems3xl' }}
-    >
-      <FlexItem>
-        <VolumeMode claimPropertySets={claimPropertySets ?? []} />
-      </FlexItem>
-      <FlexItem>
-        <AccessMode claimPropertySets={claimPropertySets ?? []} />
-      </FlexItem>
-    </Flex>
+    <ApplyStorageProfileSettings
+      {...{ accessMode, storageClassName, volumeMode }}
+      setAccessMode={(value) => setValue(ACCESS_MODE_FIELD, value ? [value] : undefined)}
+      setVolumeMode={(value) => setValue(VOLUME_MODE_FIELD, value)}
+    />
   );
 };
 
-export default ApplyStorageProfileSettings;
+export default ApplyStorageProfileSettingsToDisk;

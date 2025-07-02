@@ -7,7 +7,6 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { UPLOAD_STATUS } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useStorageProfileClaimPropertySets from '@kubevirt-utils/hooks/useStorageProfileClaimPropertySets';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getValidNamespace, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
@@ -59,13 +58,7 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
     DROPDOWN_FORM_SELECTION.UPLOAD_VOLUME,
   );
 
-  const applyStorageProfileState = useState<boolean>(true);
-
   const { upload, uploadData } = useCDIUpload();
-
-  const claimPropertySetsData = useStorageProfileClaimPropertySets(
-    bootableVolume?.storageClassName,
-  );
 
   const { labels } = bootableVolume || {};
 
@@ -97,9 +90,7 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
         onClose();
       }}
       onSubmit={createBootableVolume({
-        applyStorageProfileSettings: applyStorageProfileState[0],
         bootableVolume,
-        claimPropertySets: claimPropertySetsData?.claimPropertySets,
         onCreateVolume,
         sourceType,
         uploadData,
@@ -134,9 +125,7 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
           {t('Destination details')}
         </Title>
         <VolumeDestination
-          applyStorageProfileState={applyStorageProfileState}
           bootableVolume={bootableVolume}
-          claimPropertySetsData={claimPropertySetsData}
           setBootableVolumeField={setBootableVolumeField}
         />
         <Title className="pf-u-mt-md" headingLevel="h5">

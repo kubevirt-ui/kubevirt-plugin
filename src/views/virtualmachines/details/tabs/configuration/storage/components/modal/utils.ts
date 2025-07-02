@@ -25,7 +25,6 @@ import {
 } from '@kubevirt-utils/resources/vm';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { getVMIDevices } from '@kubevirt-utils/resources/vmi';
-import { ClaimPropertySets } from '@kubevirt-utils/types/storage';
 import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sGet } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -33,8 +32,6 @@ export const createBootableVolumeFromDisk = async (
   diskObj: DiskRowDataLayout,
   vm: V1VirtualMachine,
   bootableVolumeSource: AddBootableVolumeState,
-  applyStorageProfileSettings: boolean,
-  claimPropertySets: ClaimPropertySets,
 ) => {
   const dataSource = produce(emptyDataSource, (draftDataSource) => {
     draftDataSource.metadata.name = bootableVolumeSource.bootableVolumeName;
@@ -46,13 +43,7 @@ export const createBootableVolumeFromDisk = async (
     };
   });
 
-  return createPVCBootableVolume(
-    bootableVolumeSource,
-    diskObj?.namespace,
-    applyStorageProfileSettings,
-    claimPropertySets,
-    dataSource,
-  );
+  return createPVCBootableVolume(bootableVolumeSource, diskObj?.namespace, dataSource);
 };
 
 const addDiskToVM = (draftVM: WritableDraft<V1VirtualMachine>, diskToPersist: V1Disk) => {
