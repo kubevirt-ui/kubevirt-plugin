@@ -1,12 +1,9 @@
-import { useMemo } from 'react';
-
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { getUtilizationQueries } from '@kubevirt-utils/components/Charts/utils/queries';
+import useVMQueries from '@kubevirt-utils/hooks/useVMQueries';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import useVirtualMachineInstanceMigration from '@kubevirt-utils/resources/vmi/hooks/useVirtualMachineInstanceMigration';
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
 import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
-import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import { MIGRATION__PROMETHEUS_DELAY } from '../utils/constants';
 
@@ -20,24 +17,22 @@ const useMigrationPercentage: UseMigrationPercentage = (vm) => {
   const namespace = getNamespace(vm);
 
   const vmim = useVirtualMachineInstanceMigration(vm);
-  const [hubClusterName] = useHubClusterName();
+  const queries = useVMQueries(vm);
 
-  const queries = useMemo(
-    () => getUtilizationQueries({ hubClusterName, obj: vm }),
-    [vm, hubClusterName],
-  );
-
-  const [dataProcessedBytes] = usePrometheusPoll({
+  const prometheusProps = {
+    cluster: vm?.cluster,
     delay: MIGRATION__PROMETHEUS_DELAY,
     endpoint: PrometheusEndpoint?.QUERY,
     namespace,
+  };
+
+  const [dataProcessedBytes] = usePrometheusPoll({
+    ...prometheusProps,
     query: queries.INSTANT_MIGRATION_DATA_PROCESSED,
   });
 
   const [dataRemainingBytes] = usePrometheusPoll({
-    delay: MIGRATION__PROMETHEUS_DELAY,
-    endpoint: PrometheusEndpoint?.QUERY,
-    namespace,
+    ...prometheusProps,
     query: queries.INSTANT_MIGRATION_DATA_REMAINING,
   });
 

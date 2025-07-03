@@ -4,13 +4,13 @@ import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import SubTitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/SubTitleChartLabel';
 import TitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/TitleChartLabel';
 import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/ComponentReady';
-import { getUtilizationQueries } from '@kubevirt-utils/components/Charts/utils/queries';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useVMQueries from '@kubevirt-utils/hooks/useVMQueries';
 import { getVMIPod } from '@kubevirt-utils/resources/vmi';
 import { humanizeCpuCores } from '@kubevirt-utils/utils/humanize.js';
 import { K8sResourceCommon, PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import { ChartDonutUtilization } from '@patternfly/react-charts/victory';
-import { useFleetPrometheusPoll, useHubClusterName } from '@stolostron/multicluster-sdk';
+import { useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
 type CPUUtilProps = {
@@ -21,32 +21,24 @@ type CPUUtilProps = {
 const CPUUtil: FC<CPUUtilProps> = ({ pods, vmi }) => {
   const { t } = useKubevirtTranslation();
   const vmiPod = useMemo(() => getVMIPod(vmi, pods), [pods, vmi]);
-  const [hubClusterName] = useHubClusterName();
-  const { currentTime, duration } = useDuration();
-  const queries = useMemo(
-    () =>
-      getUtilizationQueries({
-        duration,
-        hubClusterName,
-        launcherPodName: vmiPod?.metadata?.name,
-        obj: vmi,
-      }),
-    [vmi, vmiPod, duration, hubClusterName],
-  );
+  const { currentTime } = useDuration();
 
-  const [dataCPURequested] = useFleetPrometheusPoll({
+  const queries = useVMQueries(vmi, vmiPod?.metadata?.name);
+
+  const prometheusProps = {
     cluster: vmi?.cluster,
     endpoint: PrometheusEndpoint?.QUERY,
     endTime: currentTime,
     namespace: vmi?.metadata?.namespace,
+  };
+
+  const [dataCPURequested] = useFleetPrometheusPoll({
+    ...prometheusProps,
     query: queries.CPU_REQUESTED,
   });
 
   const [dataCPUUsage] = useFleetPrometheusPoll({
-    cluster: vmi?.cluster,
-    endpoint: PrometheusEndpoint?.QUERY,
-    endTime: currentTime,
-    namespace: vmi?.metadata?.namespace,
+    ...prometheusProps,
     query: queries?.CPU_USAGE,
   });
 

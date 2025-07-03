@@ -1,18 +1,18 @@
-import React, { FC, useMemo } from 'react';
+import React, { FC } from 'react';
 import xbytes from 'xbytes';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import SubTitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/SubTitleChartLabel';
 import TitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/TitleChartLabel';
 import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/ComponentReady';
-import { getUtilizationQueries } from '@kubevirt-utils/components/Charts/utils/queries';
 import { getMemorySize } from '@kubevirt-utils/components/CPUMemoryModal/utils/CpuMemoryUtils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useVMQueries from '@kubevirt-utils/hooks/useVMQueries';
 import { getMemory } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import { ChartDonutUtilization } from '@patternfly/react-charts/victory';
-import { useFleetPrometheusPoll, useHubClusterName } from '@stolostron/multicluster-sdk';
+import { useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
 type MemoryUtilProps = {
@@ -21,13 +21,9 @@ type MemoryUtilProps = {
 
 const MemoryUtil: FC<MemoryUtilProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
-  const { currentTime, duration } = useDuration();
-  const [hubClusterName] = useHubClusterName();
-  const queries = useMemo(
-    () => getUtilizationQueries({ duration, hubClusterName, obj: vmi }),
-    [vmi, duration, hubClusterName],
-  );
+  const { currentTime } = useDuration();
 
+  const queries = useVMQueries(vmi);
   const memory = getMemorySize(getMemory(vmi));
 
   const [data] = useFleetPrometheusPoll({
