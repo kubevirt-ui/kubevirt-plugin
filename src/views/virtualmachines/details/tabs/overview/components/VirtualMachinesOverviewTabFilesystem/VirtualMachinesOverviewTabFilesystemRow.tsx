@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { formatBytes } from '@kubevirt-utils/resources/vm/utils/disk/size';
+import { getHumanizedSize } from '@kubevirt-utils/utils/units';
 import { TableData } from '@openshift-console/dynamic-plugin-sdk';
 
 type VirtualMachinesOverviewTabFilesystemRowProps = {
@@ -12,8 +12,8 @@ const VirtualMachinesOverviewTabFilesystemRow: FC<VirtualMachinesOverviewTabFile
   activeColumnIDs,
   obj,
 }) => {
-  const totalBytes = formatBytes(String(obj?.totalBytes));
-  const usedBytes = formatBytes(String(obj?.usedBytes));
+  const totalBytes = getHumanizedSize(String(obj?.totalBytes)).string;
+  const usedBytes = getHumanizedSize(String(obj?.usedBytes)).string;
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} id="diskName">

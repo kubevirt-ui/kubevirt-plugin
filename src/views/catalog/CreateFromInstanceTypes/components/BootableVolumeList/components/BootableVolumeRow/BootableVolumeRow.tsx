@@ -33,7 +33,7 @@ import {
   isDataSourceUploading,
 } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { formatBytes } from '@kubevirt-utils/resources/vm/utils/disk/size';
+import { getHumanizedSize } from '@kubevirt-utils/utils/units';
 import { Content, ContentVariants, Flex, FlexItem, Label } from '@patternfly/react-core';
 import { TableText, Tr, WrapModifier } from '@patternfly/react-table';
 
@@ -71,7 +71,7 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
   const { t } = useKubevirtTranslation();
   const bootVolumeName = getName(bootableVolume);
   const bootVolumeNamespace = getNamespace(bootableVolume);
-  const sizeData = formatBytes(getDiskSize(dvSource, pvcSource, volumeSnapshotSource));
+  const sizeData = getHumanizedSize(getDiskSize(dvSource, pvcSource, volumeSnapshotSource)).string;
   const icon = getVolumeNameOSIcon(bootVolumeName) || getTemplateOSIcon(preference);
 
   const [isFavorite, addOrRemoveFavorite] = favorites;
