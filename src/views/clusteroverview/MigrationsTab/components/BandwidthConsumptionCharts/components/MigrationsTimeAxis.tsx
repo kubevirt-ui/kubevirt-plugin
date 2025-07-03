@@ -17,7 +17,7 @@ const MigrationsTimeAxis: FC<MigrationsTimeAxisProps> = ({ domainX, timespan }) 
   const { width } = useResponsiveCharts();
   return (
     <div className="co-utilization-card__item co-utilization-card__item-header">
-      <div className="co-utilization-card__item-section co-u-hidden co-u-visible-on-xl">
+      <div className="co-utilization-card__item-section">
         <span className="co-utilization-card__item-text" data-test="utilization-card-item-text">
           {t('Resource')}
         </span>

@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Button, ButtonVariant, TextInput, Tooltip } from '@patternfly/react-core';
+import { Button, ButtonVariant, Grid, GridItem, TextInput, Tooltip } from '@patternfly/react-core';
 import { MinusCircleIcon } from '@patternfly/react-icons';
 
 import { EnvironmentKind } from '../constants';
@@ -36,8 +36,8 @@ const EnvironmentEditor: FC<EnvironmentEditorProps> = ({
   const { t } = useKubevirtTranslation();
 
   return (
-    <div className="row pairs-list__row">
-      <div className="col-xs-5 pairs-list__value-pair-field">
+    <Grid className="pairs-list__row" hasGutter>
+      <GridItem className="pairs-list__value-pair-field" sm={5}>
         <EnvironmentSelectResource
           diskName={diskName}
           environmentName={environmentName}
@@ -47,9 +47,8 @@ const EnvironmentEditor: FC<EnvironmentEditorProps> = ({
           onChange={onChange}
           serial={serial}
         />
-      </div>
-
-      <div className="col-xs-5 pairs-list__name-field">
+      </GridItem>
+      <GridItem className="pairs-list__name-field" sm={5}>
         <TextInput
           aria-labelledby="environment-serial-header"
           id={`${id}-serial`}
@@ -57,8 +56,8 @@ const EnvironmentEditor: FC<EnvironmentEditorProps> = ({
           type="text"
           value={serial}
         />
-      </div>
-      <div className="col-xs-1 pairs-list__action">
+      </GridItem>
+      <GridItem className="pairs-list__action" sm={1}>
         <Tooltip content={t('Remove')}>
           <Button
             className="pairs-list__span-btns"
@@ -70,8 +69,8 @@ const EnvironmentEditor: FC<EnvironmentEditorProps> = ({
             <span className="sr-only">{t('Delete')}</span>
           </Button>
         </Tooltip>
-      </div>
-    </div>
+      </GridItem>
+    </Grid>
   );
 };
 export default EnvironmentEditor;

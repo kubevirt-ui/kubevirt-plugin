@@ -43,7 +43,7 @@ const DataSourcePageTitle: React.FC<DataSourcePageTitleProps> = ({
           <span className="co-m-resource-icon co-m-resource-icon--lg">{t('DS')}</span>
           <span data-test-id="resource-title">{name ?? dataSource?.metadata?.name} </span>
           {isDataSourceReady(dataSource) && (
-            <span className="dps-resource-item__resource-status hidden-xs">
+            <span className="dps-resource-item__resource-status pf-v6-u-display-none pf-v6-u-display-inline-on-md">
               <Label isCompact>{t('Ready')}</Label>
             </span>
           )}
