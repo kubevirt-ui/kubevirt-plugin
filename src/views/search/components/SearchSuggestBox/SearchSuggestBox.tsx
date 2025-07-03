@@ -52,80 +52,82 @@ const SearchSuggestBox: FC<SearchSuggestBoxProps> = ({
 
   return (
     <Panel>
-      {hasResourcesToSuggest && (
-        <SearchSuggestBoxHeader
-          navigateToSearchResults={navigateToSearchResults}
-          searchQuery={searchQuery}
-        />
-      )}
-      <PanelMain>
-        {isSearchInProgress && (
-          <EmptyState
-            headingLevel="h4"
-            icon={Spinner}
-            titleText={t('Loading results')}
-            variant="xs"
+      <div data-test="search-bar-results">
+        {hasResourcesToSuggest && (
+          <SearchSuggestBoxHeader
+            navigateToSearchResults={navigateToSearchResults}
+            searchQuery={searchQuery}
           />
         )}
-        {!isSearchInProgress && (
-          <>
-            <PanelMainBody>
-              <Stack hasGutter>
-                {hasResourcesToSuggest &&
-                  suggestResources.map((resource, index) => (
-                    <StackItem key={`${index}_${resource.name}`}>
-                      <ResourceLink
-                        groupVersionKind={VirtualMachineModelGroupVersionKind}
-                        hideIcon
-                        name={resource.name}
-                        namespace={resource.namespace}
-                      />
+        <PanelMain>
+          {isSearchInProgress && (
+            <EmptyState
+              headingLevel="h4"
+              icon={Spinner}
+              titleText={t('Loading results')}
+              variant="xs"
+            />
+          )}
+          {!isSearchInProgress && (
+            <>
+              <PanelMainBody>
+                <Stack hasGutter>
+                  {hasResourcesToSuggest &&
+                    suggestResources.map((resource, index) => (
+                      <StackItem key={`${index}_${resource.name}`}>
+                        <ResourceLink
+                          groupVersionKind={VirtualMachineModelGroupVersionKind}
+                          hideIcon
+                          name={resource.name}
+                          namespace={resource.namespace}
+                        />
+                      </StackItem>
+                    ))}
+                  {!hasResourcesToSuggest && (
+                    <StackItem>
+                      <EmptyState
+                        headingLevel="h4"
+                        titleText={t('No results found for "{{searchQuery}}"', { searchQuery })}
+                        variant="xs"
+                      >
+                        <EmptyStateBody>
+                          {t('Try using the')}{' '}
+                          <Button
+                            onClick={() => {
+                              showSearchModal();
+                            }}
+                            data-test="try-advanced-search"
+                            icon={<SlidersHIcon />}
+                            iconPosition="end"
+                            isInline
+                            variant={ButtonVariant.link}
+                          >
+                            {t('advanced search')}
+                          </Button>
+                        </EmptyStateBody>
+                      </EmptyState>
                     </StackItem>
-                  ))}
-                {!hasResourcesToSuggest && (
-                  <StackItem>
-                    <EmptyState
-                      headingLevel="h4"
-                      titleText={t('No results found for "{{searchQuery}}"', { searchQuery })}
-                      variant="xs"
-                    >
-                      <EmptyStateBody>
-                        {t('Try using the')}{' '}
-                        <Button
-                          onClick={() => {
-                            showSearchModal();
-                          }}
-                          data-test="try-advanced-search"
-                          icon={<SlidersHIcon />}
-                          iconPosition="end"
-                          isInline
-                          variant={ButtonVariant.link}
-                        >
-                          {t('advanced search')}
-                        </Button>
-                      </EmptyStateBody>
-                    </EmptyState>
-                  </StackItem>
-                )}
-              </Stack>
-            </PanelMainBody>
-            {hasRelatedSuggestions && (
-              <RelatedSuggestions
-                searchQuery={searchQuery}
-                searchSuggestResult={searchSuggestResult}
-                showSearchModal={showSearchModal}
-              />
-            )}
-          </>
+                  )}
+                </Stack>
+              </PanelMainBody>
+              {hasRelatedSuggestions && (
+                <RelatedSuggestions
+                  searchQuery={searchQuery}
+                  searchSuggestResult={searchSuggestResult}
+                  showSearchModal={showSearchModal}
+                />
+              )}
+            </>
+          )}
+        </PanelMain>
+        {hasResourcesToSuggest && (
+          <SearchSuggestBoxFooter
+            onAdvancedSearchClick={() => {
+              showSearchModal({ name: searchQuery });
+            }}
+          />
         )}
-      </PanelMain>
-      {hasResourcesToSuggest && (
-        <SearchSuggestBoxFooter
-          onAdvancedSearchClick={() => {
-            showSearchModal({ name: searchQuery });
-          }}
-        />
-      )}
+      </div>
     </Panel>
   );
 };

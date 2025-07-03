@@ -94,6 +94,7 @@ const VirtualMachineTreeView: FC<VirtualMachineTreeViewProps> = ({
           panelContent={
             <DrawerPanelContent
               className="vms-tree-view"
+              data-test="vms-tree-view"
               id={TREE_VIEW_PANEL_ID}
               isResizable={isOpen}
               onResize={(_, width: number) => setDrawerWidth(`${String(width)}px`)}
