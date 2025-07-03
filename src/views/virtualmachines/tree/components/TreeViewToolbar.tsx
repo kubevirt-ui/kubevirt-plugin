@@ -1,7 +1,7 @@
 import React, { ChangeEvent, FC } from 'react';
 
 import { ADVANCED_SEARCH } from '@kubevirt-utils/hooks/useFeatures/constants';
-import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
+import useFeatureReadOnly from '@kubevirt-utils/hooks/useFeatures/useFeatureReadOnly';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 import {
@@ -27,7 +27,7 @@ type TreeViewToolbarProps = {
 const TreeViewToolbar: FC<TreeViewToolbarProps> = ({ hideSwitch, onSearch }) => {
   const { t } = useKubevirtTranslation();
   const [showEmptyProjects, setShowEmptyProjects] = useLocalStorage(SHOW_EMPTY_PROJECTS_KEY, HIDE);
-  const { featureEnabled: advancedSearchEnabled } = useFeatures(ADVANCED_SEARCH);
+  const { featureEnabled: advancedSearchEnabled } = useFeatureReadOnly(ADVANCED_SEARCH);
 
   if (advancedSearchEnabled && hideSwitch) {
     return null;

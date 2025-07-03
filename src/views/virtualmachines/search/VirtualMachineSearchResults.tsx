@@ -7,7 +7,7 @@ import {
 } from '@kubevirt-utils/components/ListPageFilter/types';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { ADVANCED_SEARCH } from '@kubevirt-utils/hooks/useFeatures/constants';
-import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
+import useFeatureReadOnly from '@kubevirt-utils/hooks/useFeatures/useFeatureReadOnly';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
 import {
@@ -28,7 +28,7 @@ const VirtualMachineSearchResults: FC = () => {
   const namespace = activeNamespace === ALL_NAMESPACES_SESSION_KEY ? null : activeNamespace;
 
   const { featureEnabled: advancedSearchEnabled, loading: advancedSearchLoading } =
-    useFeatures(ADVANCED_SEARCH);
+    useFeatureReadOnly(ADVANCED_SEARCH);
 
   useHideNamespaceBar();
 

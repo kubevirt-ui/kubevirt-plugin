@@ -1,10 +1,9 @@
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { NODE_PORT_ADDRESS } from '@kubevirt-utils/hooks/useFeatures/constants';
+import useFeatureReadOnly from '@kubevirt-utils/hooks/useFeatures/useFeatureReadOnly';
 import { getCloudInitCredentials } from '@kubevirt-utils/resources/vmi';
 import { getSSHNodePort } from '@kubevirt-utils/utils/utils';
-
-import { useFeatures } from '../../hooks/useFeatures/useFeatures';
 
 import { SERVICE_TYPES } from './constants';
 
@@ -22,7 +21,7 @@ const useSSHCommand = (
   vm: V1VirtualMachine,
   sshService: IoK8sApiCoreV1Service,
 ): useSSHCommandResult => {
-  const { featureEnabled: nodePortAddress } = useFeatures(NODE_PORT_ADDRESS);
+  const { value: nodePortAddress } = useFeatureReadOnly(NODE_PORT_ADDRESS);
 
   const consoleHostname = () => {
     if (sshService?.spec?.type === SERVICE_TYPES.LOAD_BALANCER) {

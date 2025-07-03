@@ -19,7 +19,7 @@ import {
   DISABLED_GUEST_SYSTEM_LOGS_ACCESS,
   TREE_VIEW_FOLDERS,
 } from '@kubevirt-utils/hooks/useFeatures/constants';
-import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
+import useFeatureReadOnly from '@kubevirt-utils/hooks/useFeatures/useFeatureReadOnly';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotation, getLabel } from '@kubevirt-utils/resources/shared';
 import { getVmCPUMemory, WORKLOADS_LABELS } from '@kubevirt-utils/resources/template';
@@ -53,9 +53,9 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
   const { ns } = useParams<{ ns: string }>();
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
+  const { featureEnabled: treeViewFoldersEnabled } = useFeatureReadOnly(TREE_VIEW_FOLDERS);
   const { cpuCount, memory } = getVmCPUMemory(vm);
-  const { featureEnabled: isDisabledGuestSystemLogs } = useFeatures(
+  const { featureEnabled: isDisabledGuestSystemLogs } = useFeatureReadOnly(
     DISABLED_GUEST_SYSTEM_LOGS_ACCESS,
   );
   const description = getAnnotation(vm, 'description');

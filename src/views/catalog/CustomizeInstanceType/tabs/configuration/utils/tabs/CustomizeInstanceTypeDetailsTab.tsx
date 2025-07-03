@@ -16,7 +16,7 @@ import {
   DISABLED_GUEST_SYSTEM_LOGS_ACCESS,
   TREE_VIEW_FOLDERS,
 } from '@kubevirt-utils/hooks/useFeatures/constants';
-import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
+import useFeatureReadOnly from '@kubevirt-utils/hooks/useFeatures/useFeatureReadOnly';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getPreferredBootmode } from '@kubevirt-utils/resources/preference/helper';
 import { asAccessReview, getAnnotation, getLabel, getName } from '@kubevirt-utils/resources/shared';
@@ -40,10 +40,10 @@ const CustomizeInstanceTypeDetailsTab = () => {
   const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
   const [canUpdateVM] = useAccessReview(accessReview || {});
 
-  const { featureEnabled: isGuestSystemLogsDisabled } = useFeatures(
+  const { featureEnabled: isGuestSystemLogsDisabled } = useFeatureReadOnly(
     DISABLED_GUEST_SYSTEM_LOGS_ACCESS,
   );
-  const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
+  const { featureEnabled: treeViewFoldersEnabled } = useFeatureReadOnly(TREE_VIEW_FOLDERS);
 
   const logSerialConsole = vm?.spec?.template?.spec?.domain?.devices?.logSerialConsole;
   const [isCheckedGuestSystemAccessLog, setIsCheckedGuestSystemAccessLog] = useState<boolean>();

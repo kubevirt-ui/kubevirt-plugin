@@ -3,7 +3,7 @@ import React, { FC } from 'react';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { CONFIRM_VM_ACTIONS } from '@kubevirt-utils/hooks/useFeatures/constants';
-import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
+import useFeatureReadOnly from '@kubevirt-utils/hooks/useFeatures/useFeatureReadOnly';
 import { Flex } from '@patternfly/react-core';
 import ActionIconButton from '@virtualmachines/actions/components/VMActionsIconBar/components/ActionIconButton';
 import { getVMActionIconsDetails } from '@virtualmachines/actions/components/VMActionsIconBar/utils/utils';
@@ -14,7 +14,7 @@ type VMActionsIconBarProps = {
 
 const VMActionsIconBar: FC<VMActionsIconBarProps> = ({ vm }) => {
   const { createModal } = useModal();
-  const { featureEnabled: confirmVMActionsEnabled } = useFeatures(CONFIRM_VM_ACTIONS);
+  const { featureEnabled: confirmVMActionsEnabled } = useFeatureReadOnly(CONFIRM_VM_ACTIONS);
 
   return (
     <Flex className="vm-actions-icon-bar" spaceItems={{ default: 'spaceItemsSm' }}>

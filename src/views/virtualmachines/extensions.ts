@@ -9,7 +9,7 @@ import type { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plug
 export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
   LogsStandAlone:
     './views/virtualmachines/details/tabs/diagnostic/VirtualMachineLogViewer/VirtualMachineLogViewerStandAlone/VirtualMachineLogViewerStandAlone.tsx',
-  Navigator: './views/virtualmachines/navigator/VirtualMachineNavigator.tsx',
+  Navigator: './views/virtualmachines/navigator/SingleClusterVirtualMachineNavigator.tsx',
   useVirtualMachineActionsProvider:
     './views/virtualmachines/actions/hooks/useVirtualMachineActionsProvider.ts',
   VirtualMachineSearchResults: './views/virtualmachines/search/VirtualMachineSearchResults.tsx',

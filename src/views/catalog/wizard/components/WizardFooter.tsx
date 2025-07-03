@@ -15,7 +15,7 @@ import {
   CUSTOMIZE_PAGE_CREATE_VM_BUTTON_CLICKED,
 } from '@kubevirt-utils/extensions/telemetry/utils/constants';
 import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeatures/constants';
-import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
+import useFeatureReadOnly from '@kubevirt-utils/hooks/useFeatures/useFeatureReadOnly';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getResourceUrl } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
@@ -45,7 +45,7 @@ export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
   const { isBootSourceAvailable, loaded: bootSourceLoaded } = useWizardSourceAvailable();
   const { createVM, error, loaded: vmCreateLoaded } = useWizardVMCreate();
   const { createModal } = useModal();
-  const { featureEnabled: isDisableGuestSystemAccessLog } = useFeatures(
+  const { featureEnabled: isDisableGuestSystemAccessLog } = useFeatureReadOnly(
     DISABLED_GUEST_SYSTEM_LOGS_ACCESS,
   );
 

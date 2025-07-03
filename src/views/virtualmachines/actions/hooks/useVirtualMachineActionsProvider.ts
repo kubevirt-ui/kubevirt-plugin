@@ -8,7 +8,7 @@ import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdo
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { getConsoleVirtctlCommand } from '@kubevirt-utils/components/SSHAccess/utils';
 import { CONFIRM_VM_ACTIONS, TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
-import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
+import useFeatureReadOnly from '@kubevirt-utils/hooks/useFeatures/useFeatureReadOnly';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
 import { useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
@@ -26,7 +26,7 @@ type UseVirtualMachineActionsProvider = (
 
 const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, vmim) => {
   const { createModal } = useModal();
-  const { featureEnabled: confirmVMActionsEnabled } = useFeatures(CONFIRM_VM_ACTIONS);
+  const { featureEnabled: confirmVMActionsEnabled } = useFeatureReadOnly(CONFIRM_VM_ACTIONS);
 
   const virtctlCommand = getConsoleVirtctlCommand(vm);
 
@@ -35,7 +35,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
 
   const [, inFlight] = useK8sModel(VirtualMachineModelRef);
 
-  const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
+  const { featureEnabled: treeViewFoldersEnabled } = useFeatureReadOnly(TREE_VIEW_FOLDERS);
 
   const actions: ActionDropdownItemType[] = useMemo(() => {
     const printableStatus = vm?.status?.printableStatus;

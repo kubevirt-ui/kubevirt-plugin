@@ -4,7 +4,7 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { CONFIRM_VM_ACTIONS, TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
-import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
+import useFeatureReadOnly from '@kubevirt-utils/hooks/useFeatures/useFeatureReadOnly';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isPaused, isRunning, isStopped } from '@virtualmachines/utils';
 
@@ -17,8 +17,8 @@ type UseMultipleVirtualMachineActions = (vms: V1VirtualMachine[]) => ActionDropd
 
 const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms) => {
   const { createModal } = useModal();
-  const { featureEnabled: confirmVMActionsEnabled } = useFeatures(CONFIRM_VM_ACTIONS);
-  const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
+  const { featureEnabled: confirmVMActionsEnabled } = useFeatureReadOnly(CONFIRM_VM_ACTIONS);
+  const { featureEnabled: treeViewFoldersEnabled } = useFeatureReadOnly(TREE_VIEW_FOLDERS);
 
   const mtcInstalled = useIsMTCInstalled();
 

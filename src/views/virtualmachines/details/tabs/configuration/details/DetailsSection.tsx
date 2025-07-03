@@ -17,7 +17,7 @@ import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import WorkloadProfileModal from '@kubevirt-utils/components/WorkloadProfileModal/WorkloadProfileModal';
 import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeatures/constants';
-import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
+import useFeatureReadOnly from '@kubevirt-utils/hooks/useFeatures/useFeatureReadOnly';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isInstanceTypeVM } from '@kubevirt-utils/resources/instancetype/helper';
 import { InstanceTypeUnion } from '@kubevirt-utils/resources/instancetype/types';
@@ -64,7 +64,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
   const { t } = useKubevirtTranslation();
   const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
   const [canUpdateVM] = useAccessReview(accessReview || {});
-  const { featureEnabled: isGuestSystemLogsDisabled } = useFeatures(
+  const { featureEnabled: isGuestSystemLogsDisabled } = useFeatureReadOnly(
     DISABLED_GUEST_SYSTEM_LOGS_ACCESS,
   );
 

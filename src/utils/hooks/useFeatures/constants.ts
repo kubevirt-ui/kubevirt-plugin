@@ -7,6 +7,8 @@ import {
 import { DEFAULT_OPERATOR_NAMESPACE } from '@kubevirt-utils/utils/utils';
 import { K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
 
+import { FeaturesType } from './types';
+
 export const AUTOMATIC_SUBSCRIPTION_ACTIVATION_KEY = 'automaticSubscriptionActivationKey';
 export const AUTOMATIC_SUBSCRIPTION_ORGANIZATION_ID = 'automaticSubscriptionOrganizationId';
 export const AUTOMATIC_SUBSCRIPTION_CUSTOM_URL = 'automaticSubscriptionCustomUrl';
@@ -28,20 +30,25 @@ const FEATURES_ROLE_NAME = 'kubevirt-ui-features-reader';
 const FEATURES_ROLE_BINDING_NAME = 'kubevirt-ui-features-reader-binding';
 
 export const FEATURE_HCO_PERSISTENT_RESERVATION = 'persistentReservationHCO';
+export const AUTOMATIC_UPDATE_FEATURE_NAME = 'auto-update-rhel-vms';
+
+export const defaultFeatures: FeaturesType = {
+  [ADVANCED_SEARCH]: 'false',
+  [AUTOMATIC_SUBSCRIPTION_ACTIVATION_KEY]: '',
+  [AUTOMATIC_SUBSCRIPTION_ORGANIZATION_ID]: '',
+  [AUTOMATIC_UPDATE_FEATURE_NAME]: 'false',
+  [CONFIRM_VM_ACTIONS]: 'false',
+  [DISABLED_GUEST_SYSTEM_LOGS_ACCESS]: 'false',
+  [FEATURE_HCO_PERSISTENT_RESERVATION]: 'false',
+  [KUBEVIRT_APISERVER_PROXY]: 'true',
+  [LOAD_BALANCER_ENABLED]: 'false',
+  [NODE_PORT_ADDRESS]: '',
+  [NODE_PORT_ENABLED]: 'false',
+  [TREE_VIEW_FOLDERS]: 'false',
+};
 
 export const featuresConfigMapInitialState: IoK8sApiCoreV1ConfigMap = {
-  data: {
-    [ADVANCED_SEARCH]: 'false',
-    [AUTOMATIC_SUBSCRIPTION_ACTIVATION_KEY]: '',
-    [AUTOMATIC_SUBSCRIPTION_ORGANIZATION_ID]: '',
-    [CONFIRM_VM_ACTIONS]: 'false',
-    [DISABLED_GUEST_SYSTEM_LOGS_ACCESS]: 'false',
-    [KUBEVIRT_APISERVER_PROXY]: 'true',
-    [LOAD_BALANCER_ENABLED]: 'false',
-    [NODE_PORT_ADDRESS]: '',
-    [NODE_PORT_ENABLED]: 'false',
-    [TREE_VIEW_FOLDERS]: 'false',
-  },
+  data: defaultFeatures,
   metadata: {
     name: FEATURES_CONFIG_MAP_NAME,
     namespace: DEFAULT_OPERATOR_NAMESPACE,

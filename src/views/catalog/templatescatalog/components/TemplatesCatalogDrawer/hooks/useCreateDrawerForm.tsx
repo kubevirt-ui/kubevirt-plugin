@@ -1,7 +1,6 @@
 import { MouseEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 import produce from 'immer';
-import { AUTOMATIC_UPDATE_FEATURE_NAME } from 'src/views/clusteroverview/SettingsTab/ClusterTab/components/GuestManagmentSection/AutomaticSubscriptionRHELGuests/utils/constants';
 
 import { quickCreateVM } from '@catalog/utils/quick-create-vm';
 import { isRHELTemplate } from '@catalog/utils/utils';
@@ -32,8 +31,11 @@ import {
   CUSTOMIZE_VM_BUTTON_CLICKED,
   CUSTOMIZE_VM_FAILED,
 } from '@kubevirt-utils/extensions/telemetry/utils/constants';
-import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeatures/constants';
-import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
+import {
+  AUTOMATIC_UPDATE_FEATURE_NAME,
+  DISABLED_GUEST_SYSTEM_LOGS_ACCESS,
+} from '@kubevirt-utils/hooks/useFeatures/constants';
+import useFeatureReadOnly from '@kubevirt-utils/hooks/useFeatures/useFeatureReadOnly';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
 import {
@@ -79,8 +81,8 @@ const useCreateDrawerForm = (
 
   const [isUDNManagedNamespace, vmsNotSupported] = useNamespaceUDN(namespace);
   const [authorizedSSHKeys, updateAuthorizedSSHKeys] = useKubevirtUserSettings('ssh');
-  const { featureEnabled: autoUpdateEnabled } = useFeatures(AUTOMATIC_UPDATE_FEATURE_NAME);
-  const { featureEnabled: isDisabledGuestSystemLogs } = useFeatures(
+  const { featureEnabled: autoUpdateEnabled } = useFeatureReadOnly(AUTOMATIC_UPDATE_FEATURE_NAME);
+  const { featureEnabled: isDisabledGuestSystemLogs } = useFeatureReadOnly(
     DISABLED_GUEST_SYSTEM_LOGS_ACCESS,
   );
 

@@ -3,6 +3,7 @@ import React, { FC, useEffect, useMemo, useState } from 'react';
 import NewBadge from '@kubevirt-utils/components/badges/NewBadge/NewBadge';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
+import { AUTOMATIC_UPDATE_FEATURE_NAME } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useRHELAutomaticSubscription from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/useRHELAutomaticSubscription';
@@ -17,7 +18,6 @@ import {
   AutomaticSubscriptionTypeEnum,
   getSubscriptionItem,
 } from './components/AutomaticSubscriptionType/utils/utils';
-import { AUTOMATIC_UPDATE_FEATURE_NAME } from './utils/constants';
 
 type AutomaticSubscriptionRHELGuestsProps = {
   newBadge?: boolean;

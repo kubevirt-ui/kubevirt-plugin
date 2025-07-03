@@ -6,12 +6,12 @@ import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 
 import { FEATURES_CONFIG_MAP_NAME, featuresConfigMapInitialState } from './constants';
 import { applyMissingFeatures, createFeaturesConfigMap } from './createFeaturesConfigMap';
-import { UseFeaturesValues } from './types';
+import { FeaturesType, UseFeaturesValues } from './types';
 import useFeaturesConfigMap from './useFeaturesConfigMap';
 
 type UseFeatures = (featureName: string) => UseFeaturesValues;
 
-export const useFeatures: UseFeatures = (featureName) => {
+export const useFeatures: UseFeatures = (featureName: keyof FeaturesType) => {
   const [createError, setCreateError] = useState(null);
   const [createInProgress, setCreateInProgress] = useState(false);
   const { featuresConfigMapData, isAdmin } = useFeaturesConfigMap(!createError);
