@@ -7,6 +7,7 @@ import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { getName } from '@kubevirt-utils/resources/shared';
 import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { PageSection, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
 import { isRunning } from '@virtualmachines/utils';
@@ -25,7 +26,7 @@ const VirtualMachineConfigurationTab: FC<NavPageComponentProps> = ({
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { vmi } = useVMI(getName(vm), getNamespace(vm), isRunning(vm));
+  const { vmi } = useVMI(getName(vm), getNamespace(vm), getCluster(vm), isRunning(vm));
   const { allInstanceTypes } = useInstanceTypesAndPreferences();
   const [activeTabKey, setActiveTabKey] = useState<number | string>(
     VirtualMachineDetailsTab.Details,
