@@ -2,6 +2,7 @@ import React, { FC, useMemo } from 'react';
 import { Link } from 'react-router-dom-v5-compat';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import useVMQueries from '@kubevirt-utils/hooks/useVMQueries';
 import { getVMIPod } from '@kubevirt-utils/resources/vmi';
 import { humanizeCpuCores } from '@kubevirt-utils/utils/humanize.js';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -17,13 +18,12 @@ import {
 import chart_color_black_200 from '@patternfly/react-tokens/dist/esm/chart_color_black_200';
 import chart_color_blue_300 from '@patternfly/react-tokens/dist/esm/chart_color_blue_300';
 import chart_color_orange_300 from '@patternfly/react-tokens/dist/esm/chart_color_orange_300';
-import { useFleetPrometheusPoll, useHubClusterName } from '@stolostron/multicluster-sdk';
+import { useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
 import { tickLabels } from '../ChartLabels/styleOverrides';
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
-import { getUtilizationQueries } from '../utils/queries';
 import {
   addTimestampToTooltip,
   findMaxYValue,
@@ -44,35 +44,26 @@ const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ pods, vmi }) => {
   const { currentTime, duration, timespan } = useDuration();
   const { height, ref, width } = useResponsiveCharts();
 
-  const [hubClusterName] = useHubClusterName();
+  const queries = useVMQueries(vmi, vmiPod?.metadata?.name);
 
-  const queries = useMemo(
-    () =>
-      getUtilizationQueries({
-        duration,
-        hubClusterName,
-        launcherPodName: vmiPod?.metadata?.name,
-        obj: vmi,
-      }),
-    [vmi, vmiPod, duration, hubClusterName],
-  );
-
-  const [dataCPURequested] = useFleetPrometheusPoll({
+  const prometheusProps = {
     cluster: vmi?.cluster,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     endTime: currentTime,
     namespace: vmi?.metadata?.namespace,
-    query: queries.CPU_REQUESTED,
     timespan,
+  };
+
+  const [dataCPURequested] = useFleetPrometheusPoll({
+    ...prometheusProps,
+    endpoint: PrometheusEndpoint?.QUERY_RANGE,
+    query: queries.CPU_REQUESTED,
   });
 
   const [dataCPUUsage] = useFleetPrometheusPoll({
-    cluster: vmi?.cluster,
+    ...prometheusProps,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
-    endTime: currentTime,
-    namespace: vmi?.metadata?.namespace,
     query: queries?.CPU_USAGE,
-    timespan,
   });
 
   const cpuUsage = dataCPUUsage?.data?.result?.[0]?.values;
