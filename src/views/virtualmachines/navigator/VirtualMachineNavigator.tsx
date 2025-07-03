@@ -51,7 +51,7 @@ const VirtualMachineNavigator: FC<{ activeNamespace: string }> = memo(({ activeN
     return (
       <CreateResourceDefaultPage
         header={t('Create VirtualMachine')}
-        initialResource={defaultVMYamlTemplate}
+        initialResource={defaultVMYamlTemplate()}
       />
     );
   }
