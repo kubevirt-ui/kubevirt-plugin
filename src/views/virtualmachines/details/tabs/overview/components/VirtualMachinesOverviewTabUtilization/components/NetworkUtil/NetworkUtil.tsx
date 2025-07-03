@@ -5,13 +5,13 @@ import xbytes from 'xbytes';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/ComponentReady';
-import { getUtilizationQueries } from '@kubevirt-utils/components/Charts/utils/queries';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useVMQueries from '@kubevirt-utils/hooks/useVMQueries';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import { Button, ButtonVariant, Content, ContentVariants, Popover } from '@patternfly/react-core';
-import { useFleetPrometheusPoll, useHubClusterName } from '@stolostron/multicluster-sdk';
+import { useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
 type NetworkUtilProps = {
@@ -20,36 +20,34 @@ type NetworkUtilProps = {
 
 const NetworkUtil: React.FC<NetworkUtilProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
-  const { currentTime, duration } = useDuration();
-  const [hubClusterName] = useHubClusterName();
-  const queries = React.useMemo(
-    () => getUtilizationQueries({ duration, hubClusterName, obj: vmi }),
-    [vmi, duration, hubClusterName],
-  );
+  const { currentTime } = useDuration();
+
+  const queries = useVMQueries(vmi);
+
   const interfacesNames = useMemo(() => vmi?.spec?.domain?.devices?.interfaces, [vmi]);
-  const [networkIn] = useFleetPrometheusPoll({
+
+  const prometheusProps = {
     cluster: vmi?.cluster,
     endpoint: PrometheusEndpoint?.QUERY,
     endTime: currentTime,
     namespace: vmi?.metadata?.namespace,
+  };
+
+  const [networkIn] = useFleetPrometheusPoll({
+    ...prometheusProps,
     query: queries?.NETWORK_IN_USAGE,
   });
 
   const [networkTotal] = useFleetPrometheusPoll({
-    cluster: vmi?.cluster,
-    endpoint: PrometheusEndpoint?.QUERY,
-    endTime: currentTime,
-    namespace: vmi?.metadata?.namespace,
+    ...prometheusProps,
     query: queries?.NETWORK_TOTAL_BY_INTERFACE_USAGE,
   });
 
   const [networkOut] = useFleetPrometheusPoll({
-    cluster: vmi?.cluster,
-    endpoint: PrometheusEndpoint?.QUERY,
-    endTime: currentTime,
-    namespace: vmi?.metadata?.namespace,
+    ...prometheusProps,
     query: queries?.NETWORK_OUT_USAGE,
   });
+
   const networkInterfaceTotal = Number(networkTotal?.data?.result?.[0]?.value?.[1])?.toFixed(2);
   const networkInData = +networkIn?.data?.result?.[0]?.value?.[1];
   const networkOutData = +networkOut?.data?.result?.[0]?.value?.[1];

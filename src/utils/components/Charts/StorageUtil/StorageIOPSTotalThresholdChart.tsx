@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom-v5-compat';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import useVMQueries from '@kubevirt-utils/hooks/useVMQueries';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -13,12 +14,11 @@ import {
 } from '@patternfly/react-charts/victory';
 import chart_color_black_200 from '@patternfly/react-tokens/dist/esm/chart_color_black_200';
 import chart_color_blue_300 from '@patternfly/react-tokens/dist/esm/chart_color_blue_300';
-import { useFleetPrometheusPoll, useHubClusterName } from '@stolostron/multicluster-sdk';
+import { useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
-import { getUtilizationQueries } from '../utils/queries';
 import {
   addTimestampToTooltip,
   findMaxYValue,
@@ -36,11 +36,7 @@ type StorageIOPSTotalThresholdChartProps = {
 const StorageIOPSTotalThresholdChart: React.FC<StorageIOPSTotalThresholdChartProps> = ({ vmi }) => {
   const { currentTime, duration, timespan } = useDuration();
 
-  const [hubClusterName] = useHubClusterName();
-  const queries = React.useMemo(
-    () => getUtilizationQueries({ duration, hubClusterName, obj: vmi }),
-    [vmi, duration, hubClusterName],
-  );
+  const queries = useVMQueries(vmi);
   const { height, ref, width } = useResponsiveCharts();
 
   const [data] = useFleetPrometheusPoll({
