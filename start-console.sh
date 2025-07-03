@@ -1,6 +1,8 @@
 #!/bin/sh
 set -eu
 
+source ./route-console.sh
+
 # Define plugins (name=url)
 plugins="
 monitoring-plugin=https://github.com/openshift/monitoring-plugin.git
@@ -41,10 +43,8 @@ for arg in "$@"; do
 
     git pull
 
-
     pid="$(lsof -t -i:$INITIAL_PORT 2>/dev/null || true)"
     [ -n "$pid" ] && kill -9 "$pid"
-
 
     if [ "$arg" = "monitoring-plugin" ]; then
         cd web
@@ -54,7 +54,6 @@ for arg in "$@"; do
         yarn
         PORT=$INITIAL_PORT yarn start --port="$INITIAL_PORT" &
     fi
-
 
     running_podman_linux="$running_podman_linux,$arg=http://localhost:$INITIAL_PORT"
     running_podman="$running_podman,$arg=http://host.containers.internal:$INITIAL_PORT"
@@ -88,7 +87,7 @@ echo "Console URL: http://localhost:${CONSOLE_PORT}"
 env_args=""
 for var in $(set | grep '^BRIDGE_' | cut -d= -f1); do
     eval val=\$$var
-    env_args="$env_args --env $var=$val"
+    env_args="$env_args --env $var='$val'"
 done
 
 # Prefer podman
