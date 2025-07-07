@@ -5,7 +5,7 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { Button, ButtonVariant, Form } from '@patternfly/react-core';
+import { Button, ButtonVariant, Form, Grid, GridItem } from '@patternfly/react-core';
 import { PlusCircleIcon } from '@patternfly/react-icons';
 
 import EnvironmentEditor from './components/EnvironmentEditor';
@@ -54,21 +54,23 @@ const EnvironmentForm: FC<EnvironmentFormProps> = ({ onEditChange, updateVM, vm 
       <EnvironmentFormTitle />
       <Form className="environment-form__form">
         {environments.length !== 0 && (
-          <div className="row pairs-list__heading">
-            <div
-              className="col-xs-5 pf-v6-u-text-color-subtle text-uppercase"
+          <Grid className="pairs-list__heading" hasGutter>
+            <GridItem
+              className="pf-v6-u-text-color-subtle text-uppercase"
               id="environment-name-header"
+              sm={5}
             >
               {t('config map / secret / service account')}
-            </div>
-            <div
-              className="col-xs-5 pf-v6-u-text-color-subtle text-uppercase"
+            </GridItem>
+            <GridItem
+              className="pf-v6-u-text-color-subtle text-uppercase"
               id="environment-serial-header"
+              sm={5}
             >
               {t('Serial Number')}
-            </div>
-            <div className="col-xs-1 co-empty__header" />
-          </div>
+            </GridItem>
+            <GridItem className="co-empty__header" sm={1} />
+          </Grid>
         )}
 
         {environments.map((environment, index) => (
@@ -86,18 +88,16 @@ const EnvironmentForm: FC<EnvironmentFormProps> = ({ onEditChange, updateVM, vm 
           />
         ))}
 
-        <div className="row">
-          <div className="col-xs-12">
-            <Button
-              className="pf-m-link--align-left"
-              icon={<PlusCircleIcon />}
-              onClick={onEnvironmentAdd}
-              type="button"
-              variant={ButtonVariant.link}
-            >
-              {t('Add Config Map, Secret, or Service Account')}
-            </Button>
-          </div>
+        <div>
+          <Button
+            className="pf-m-link--align-left"
+            icon={<PlusCircleIcon />}
+            onClick={onEnvironmentAdd}
+            type="button"
+            variant={ButtonVariant.link}
+          >
+            {t('Add Config Map, Secret, or Service Account')}
+          </Button>
         </div>
 
         <EnvironmentFormActions
