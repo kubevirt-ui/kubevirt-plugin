@@ -1,9 +1,10 @@
-import React, { FC, useMemo } from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router-dom-v5-compat';
 import xbytes from 'xbytes';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getMemorySize } from '@kubevirt-utils/components/CPUMemoryModal/utils/CpuMemoryUtils';
+import useVMQueries from '@kubevirt-utils/hooks/useVMQueries';
 import { getMemory } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
@@ -18,13 +19,12 @@ import {
 import chart_color_black_200 from '@patternfly/react-tokens/dist/esm/chart_color_black_200';
 import chart_color_blue_300 from '@patternfly/react-tokens/dist/esm/chart_color_blue_300';
 import chart_color_orange_300 from '@patternfly/react-tokens/dist/esm/chart_color_orange_300';
-import { useFleetPrometheusPoll, useHubClusterName } from '@stolostron/multicluster-sdk';
+import { useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
 import { tickLabels } from '../ChartLabels/styleOverrides';
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
-import { getUtilizationQueries } from '../utils/queries';
 import {
   addTimestampToTooltip,
   findMaxYValue,
@@ -42,11 +42,8 @@ type MemoryThresholdChartProps = {
 
 const MemoryThresholdChart: FC<MemoryThresholdChartProps> = ({ vmi }) => {
   const { currentTime, duration, timespan } = useDuration();
-  const [hubClusterName] = useHubClusterName();
-  const queries = useMemo(
-    () => getUtilizationQueries({ duration, hubClusterName, obj: vmi }),
-    [vmi, duration, hubClusterName],
-  );
+
+  const queries = useVMQueries(vmi);
   const { height, ref, width } = useResponsiveCharts();
 
   const memory = getMemorySize(getMemory(vmi));
