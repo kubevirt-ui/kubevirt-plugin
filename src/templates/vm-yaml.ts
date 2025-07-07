@@ -2,7 +2,7 @@ import { generateCloudInitPassword } from '@catalog/CreateFromInstanceTypes/util
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { isUpstream } from '@kubevirt-utils/utils/utils';
 
-const type = isUpstream ? 'fedora' : 'rhel10';
+const osType = isUpstream ? 'fedora' : 'rhel10';
 const image = isUpstream
   ? 'quay.io/containerdisks/fedora'
   : 'registry.redhat.io/rhel10/rhel-guest-image';
@@ -17,14 +17,14 @@ metadata:
     description: VM example
   labels:
     app: example
-    os.template.kubevirt.io/${type}: 'true'
+    os.template.kubevirt.io/${osType}: 'true'
 spec:
   runStrategy: Halted
   template:
     metadata:
       annotations:
         vm.kubevirt.io/flavor: small
-        vm.kubevirt.io/os: ${type}
+        vm.kubevirt.io/os: ${osType}
         vm.kubevirt.io/workload: server
       labels:
         kubevirt.io/domain: example
@@ -63,7 +63,7 @@ spec:
         - cloudInitNoCloud:
             userData: |-
               #cloud-config
-              user: ${type}
+              user: ${osType}
               password: ${generateCloudInitPassword()}
               chpasswd: { expire: False }
           name: cloudinitdisk
