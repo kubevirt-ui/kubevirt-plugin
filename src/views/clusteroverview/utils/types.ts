@@ -1,5 +1,5 @@
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { K8sResourceCommon, Selector } from '@openshift-console/dynamic-plugin-sdk';
 
 export type Descriptor<T = any> = {
   description: string;
@@ -210,3 +210,62 @@ export type CatalogSourceKind = {
 export type TemplateList = K8sResourceCommon & {
   items: V1Template[];
 };
+
+export type PackageManifestKind = {
+  apiVersion: 'packages.operators.coreos.com/v1';
+  kind: 'PackageManifest';
+  spec: any;
+  status: {
+    catalogSource: string;
+    catalogSourceDisplayName: string;
+    catalogSourceNamespace: string;
+    catalogSourcePublisher: string;
+    channels: {
+      currentCSV: string;
+      currentCSVDesc: {
+        annotations?: any;
+        apiservicedefinitions?: {
+          owned?: APIServiceDefinition[];
+          required?: APIServiceDefinition[];
+        };
+        customresourcedefinitions?: { owned?: CRDDescription[]; required?: CRDDescription[] };
+        description?: string;
+        displayName: string;
+        icon: { base64data: string; mediatype: string }[];
+        installModes: { supported: boolean; type: InstallModeType }[];
+        keywords?: string[];
+        provider: {
+          name: string;
+        };
+        version: string;
+      };
+      deprecation?: { message: string };
+      entries?: {
+        deprecation?: { message: string };
+        name: string;
+        version: string;
+      }[];
+      name: string;
+    }[];
+    defaultChannel: string;
+    deprecation?: { message: string };
+    packageName: string;
+    provider: {
+      name: string;
+    };
+  };
+} & K8sResourceKind;
+
+export type OperatorGroupKind = {
+  apiVersion: 'operators.coreos.com/v1';
+  kind: 'OperatorGroup';
+  spec?: {
+    selector?: Selector;
+    serviceAccount?: K8sResourceKind;
+    targetNamespaces?: string[];
+  };
+  status?: {
+    lastUpdated: string;
+    namespaces?: string[];
+  };
+} & K8sResourceKind;

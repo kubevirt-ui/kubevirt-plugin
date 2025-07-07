@@ -39,3 +39,17 @@ export const DNSConfigModel: K8sModel = {
   namespaced: false,
   plural: 'dnses',
 };
+
+export const OperatorGroupModel: K8sModel = {
+  abbr: 'OG',
+  apiGroup: 'operators.coreos.com',
+  apiVersion: 'v1',
+  crd: true,
+  kind: 'OperatorGroup',
+  label: 'OperatorGroup',
+  labelKey: 'olm~OperatorGroup',
+  labelPlural: 'OperatorGroups',
+  labelPluralKey: 'olm~OperatorGroups',
+  namespaced: true,
+  plural: 'operatorgroups',
+};
