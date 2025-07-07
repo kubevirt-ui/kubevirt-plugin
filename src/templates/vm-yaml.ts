@@ -1,6 +1,15 @@
+import { generateCloudInitPassword } from '@catalog/CreateFromInstanceTypes/utils/utils';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
+import { isUpstream } from '@kubevirt-utils/utils/utils';
 
-export const defaultVMYamlTemplate = `apiVersion: ${VirtualMachineModel.apiGroup}/${VirtualMachineModel.apiVersion}
+const osType = isUpstream ? 'fedora' : 'rhel10';
+const image = isUpstream
+  ? 'quay.io/containerdisks/fedora'
+  : 'registry.redhat.io/rhel10/rhel-guest-image';
+
+export const defaultVMYamlTemplate = () => `apiVersion: ${VirtualMachineModel.apiGroup}/${
+  VirtualMachineModel.apiVersion
+}
 kind: ${VirtualMachineModel.kind}
 metadata:
   name: example
@@ -8,14 +17,14 @@ metadata:
     description: VM example
   labels:
     app: example
-    os.template.kubevirt.io/fedora: 'true'
+    os.template.kubevirt.io/${osType}: 'true'
 spec:
   runStrategy: Halted
   template:
     metadata:
       annotations:
         vm.kubevirt.io/flavor: small
-        vm.kubevirt.io/os: fedora
+        vm.kubevirt.io/os: ${osType}
         vm.kubevirt.io/workload: server
       labels:
         kubevirt.io/domain: example
@@ -50,12 +59,12 @@ spec:
       volumes:
         - name: rootdisk
           containerDisk:
-            image: 'quay.io/containerdisks/fedora'
+            image: ${image}
         - cloudInitNoCloud:
             userData: |-
               #cloud-config
-              user: fedora
-              password: fedora
+              user: ${osType}
+              password: ${generateCloudInitPassword()}
               chpasswd: { expire: False }
           name: cloudinitdisk
 `;
