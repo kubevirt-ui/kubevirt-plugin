@@ -20,21 +20,26 @@ type UseSSHAuthKeys = () => {
 };
 
 const filterAuthRows = async (rows: AuthKeyRow[]) => {
-  const filteredRowsPromises: Promise<AuthKeyRow>[] = rows.map(async (row) => {
-    try {
-      await k8sGet({
-        model: SecretModel,
-        name: row.secretName,
-        ns: row.projectName,
-      }); // Assuming k8sGet returns an object or throws an error
-      return row;
-    } catch (error) {
-      // If an error occurs during k8sGet, return a new object representing the error
-      return { ...row, secretName: '' };
-    }
-  });
+  const filteredRows = await Promise.all(
+    rows.map(async (row) => {
+      if (!row?.projectName || !row?.secretName) return null;
 
-  return Promise.all(filteredRowsPromises);
+      try {
+        await k8sGet({
+          model: SecretModel,
+          name: row.secretName,
+          ns: row.projectName,
+        });
+        return row;
+      } catch {
+        return null;
+      }
+    }),
+  );
+
+  const validRows = filteredRows.filter((r): r is AuthKeyRow => r !== null);
+
+  return validRows.length > 0 ? validRows : [createAuthKeyRow(rows[0].projectName)];
 };
 
 const useSSHAuthKeys: UseSSHAuthKeys = () => {
