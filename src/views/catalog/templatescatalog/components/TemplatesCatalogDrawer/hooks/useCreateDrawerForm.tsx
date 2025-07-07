@@ -306,6 +306,10 @@ const useCreateDrawerForm = (
         currentTabsData.applySSHToSettings = sshDetails?.applyKeyToProject;
       });
 
+      if (sshDetails?.secretOption === SecretSelectionOption.addNew) {
+        await createSSHSecret(sshDetails?.sshPubKey, sshDetails?.sshSecretName, namespace);
+      }
+
       // update context vm
       await updateVM(
         !isEmpty(authorizedSSHKey) ? addSecretToVM(updatedVM, authorizedSSHKey) : updatedVM,
