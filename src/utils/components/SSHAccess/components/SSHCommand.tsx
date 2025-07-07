@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
 
+import VirtualMachineInstanceModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstanceModel';
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
   AlertVariant,
@@ -19,6 +22,7 @@ import {
 
 import { SERVICE_TYPES } from '../constants';
 import useSSHCommand, { isLoadBalancerBonded } from '../useSSHCommand';
+import { addSSHSelectorLabelToVM } from '../utils';
 import { createSSHService, deleteSSHService } from '../utils';
 
 import SSHServiceSelect from './SSHServiceSelect';
@@ -41,6 +45,18 @@ const SSHCommand: React.FC<SSHCommandProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error>();
 
+  const [vmi] = useK8sWatchResource<V1VirtualMachineInstance>({
+    groupVersionKind: {
+      group: VirtualMachineInstanceModel.apiGroup,
+      kind: VirtualMachineInstanceModel.kind,
+      version: VirtualMachineInstanceModel.apiVersion,
+    },
+    name: vm?.metadata?.name,
+    namespace: vm?.metadata?.namespace,
+  });
+
+  const [, forceRerender] = useState({});
+
   const onSSHChange = async (newServiceType: SERVICE_TYPES) => {
     setLoading(true);
 
@@ -51,9 +67,12 @@ const SSHCommand: React.FC<SSHCommandProps> = ({
       }
 
       if (newServiceType && newServiceType !== SERVICE_TYPES.NONE) {
+        await addSSHSelectorLabelToVM(vm, vmi, vm?.metadata?.name);
+
         const newService = await createSSHService(vm, newServiceType);
         setSSHService(newService);
       }
+      forceRerender({});
     } catch (apiError) {
       setError(apiError);
     } finally {
