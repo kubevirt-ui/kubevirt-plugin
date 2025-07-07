@@ -55,8 +55,6 @@ const SSHCommand: React.FC<SSHCommandProps> = ({
     namespace: vm?.metadata?.namespace,
   });
 
-  const [, forceRerender] = useState({});
-
   const onSSHChange = async (newServiceType: SERVICE_TYPES) => {
     setLoading(true);
 
@@ -72,7 +70,6 @@ const SSHCommand: React.FC<SSHCommandProps> = ({
         const newService = await createSSHService(vm, newServiceType);
         setSSHService(newService);
       }
-      forceRerender({});
     } catch (apiError) {
       setError(apiError);
     } finally {
