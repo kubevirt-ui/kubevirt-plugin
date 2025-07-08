@@ -85,7 +85,7 @@ Cypress.Commands.add('clickVirtLink', (navItemSelector: string) => {
 });
 
 Cypress.Commands.add('clickSaveBtn', () => {
-  cy.contains('button[type="button"].pf-m-primary', 'Save').click();
+  cy.byTestID('save-button').click();
 });
 
 Cypress.Commands.add('clickSearchBtn', () => {

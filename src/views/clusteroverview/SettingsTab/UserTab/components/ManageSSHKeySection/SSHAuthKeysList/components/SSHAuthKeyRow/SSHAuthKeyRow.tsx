@@ -96,7 +96,7 @@ const SSHAuthKeyRow: FC<SSHAuthKeyRowProps> = ({
         )}
       </GridItem>
       <GridItem span={1} />
-      <GridItem className="ssh-auth-row__edit-button" span={5}>
+      <GridItem className="ssh-auth-row__edit-button" data-test="configure-ssh-key" span={5}>
         <AddProjectAuthKeyButton
           onSubmit={onSubmit}
           secretName={secretName}

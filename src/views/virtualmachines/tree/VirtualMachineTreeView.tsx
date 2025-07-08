@@ -89,7 +89,7 @@ const VirtualMachineTreeView: FC<VirtualMachineTreeViewProps> = ({
   return (
     <>
       {isSmallScreen && treeView}
-      <Drawer isExpanded={!isSmallScreen} isInline position="start">
+      <Drawer data-test="vms-treeview" isExpanded={!isSmallScreen} isInline position="start">
         <DrawerContent
           panelContent={
             <DrawerPanelContent

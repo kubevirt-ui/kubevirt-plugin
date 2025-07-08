@@ -10,13 +10,12 @@ const SRCH_VMS = [CENTOS9_VM, CENTOS10_VM, FEDORA_VM];
 const U1_SM_IT = 'u1.small';
 const O1_MD_IT = 'o1.medium';
 const CX1_LG_IT = 'cx1.large';
-
 const NAME_CELL = 'td[data-label="name"]';
-const ADV_SRCH_BTN = 'button[data-test="vm-advanced-search"]';
+const ADV_SRCH_BTN = 'vm-advanced-search';
 
 const searchVMsListed = (existence: boolean) => {
   SRCH_VMS.forEach((name) => {
-    cy.contains(NAME_CELL, name).should(existence ? 'exist' : 'not.exist');
+    cy.byLegacyTestID(name).should(existence ? 'exist' : 'not.exist');
   });
 };
 
@@ -54,55 +53,53 @@ describe('Test Advanced search for VMs', () => {
 
   describe('Test advanced search', () => {
     it('test VM search bar', () => {
-      cy.get('#vm-search-input').type('sssss');
-      cy.get('.pf-v6-c-panel').within(() => {
+      cy.byTestID('vm-search-input').type('sssss');
+      cy.byTestID('search-bar-results').within(() => {
         cy.byButtonText('All search results found').should('exist');
         SRCH_VMS.forEach((name) => {
-          cy.contains(`a[data-test-id="${name}"]`, name)
-            .should('have.attr', 'href')
-            .and('contain', name);
+          cy.byLegacyTestID(name).should('have.attr', 'href').and('contain', name);
         });
       });
-      cy.get('button[data-test="results-advanced-search"]').click();
+      cy.byTestID('results-advanced-search').click();
       cy.get('button[aria-label="Close"]').click();
       cy.get('button[aria-label="Reset"]').click();
-      cy.get('#vm-search-input').should('not.have.value');
+      cy.byTestID('vm-search-input').should('not.have.value');
     });
 
     it('test VM search in other project', () => {
-      cy.get(ADV_SRCH_BTN).click();
-      cy.get('[data-test="adv-search-vm-project-toggle"]').find('input').type(TEST_NS);
-      cy.contains('button.pf-v6-c-menu__item', TEST_NS).click();
+      cy.byTestID(ADV_SRCH_BTN).click();
+      cy.byTestID('adv-search-vm-project-toggle').find('input').type(TEST_NS);
+      cy.contains('button[role="option"]', TEST_NS).click();
       cy.clickSearchBtn();
       searchVMsListed(false);
     });
 
     it('test VM search by description', () => {
       ['centos-stream9', 'centos-stream10', 'fedora'].forEach((volume) => {
-        cy.get(ADV_SRCH_BTN).click();
-        cy.get('input[data-test="adv-search-vm-description"]').type(volume);
+        cy.byTestID(ADV_SRCH_BTN).click();
+        cy.byTestID('adv-search-vm-description').type(volume);
         cy.clickSearchBtn();
         cy.contains(NAME_CELL, volume).should('exist');
       });
     });
 
     it('test VM search by labels', () => {
-      cy.get(ADV_SRCH_BTN).click();
-      cy.get('[data-test="adv-search-vm-labels-toggle"]').find('input').type(O1_MD_IT);
+      cy.byTestID(ADV_SRCH_BTN).click();
+      cy.byTestID('adv-search-vm-labels-toggle').find('input').type(O1_MD_IT);
       cy.byButtonText(`instancetype/${O1_MD_IT}=true`).click();
       cy.clickSearchBtn();
       cy.contains(NAME_CELL, CENTOS9_VM).should('exist');
       cy.contains(NAME_CELL, CENTOS10_VM).should('not.exist');
       cy.contains(NAME_CELL, FEDORA_VM).should('not.exist');
-      cy.get(ADV_SRCH_BTN).click();
-      cy.get('[data-test="adv-search-vm-labels-toggle"]').find('input').type(CX1_LG_IT);
+      cy.byTestID(ADV_SRCH_BTN).click();
+      cy.byTestID('adv-search-vm-labels-toggle').find('input').type(CX1_LG_IT);
       cy.byButtonText(`instancetype/${CX1_LG_IT}=true`).click();
       cy.clickSearchBtn();
       cy.contains(NAME_CELL, CENTOS9_VM).should('not.exist');
       cy.contains(NAME_CELL, CENTOS10_VM).should('exist');
       cy.contains(NAME_CELL, FEDORA_VM).should('not.exist');
-      cy.get(ADV_SRCH_BTN).click();
-      cy.get('[data-test="adv-search-vm-labels-toggle"]').find('input').type(U1_SM_IT);
+      cy.byTestID(ADV_SRCH_BTN).click();
+      cy.byTestID('adv-search-vm-labels-toggle').find('input').type(U1_SM_IT);
       cy.byButtonText(`instancetype/${U1_SM_IT}=true`).click();
       cy.clickSearchBtn();
       cy.contains(NAME_CELL, CENTOS9_VM).should('not.exist');
@@ -111,16 +108,16 @@ describe('Test Advanced search for VMs', () => {
     });
 
     it('test VM search by vCPU', () => {
-      cy.get(ADV_SRCH_BTN).click();
-      cy.get('input[data-test="adv-search-vcpu-value"]').type('1');
+      cy.byTestID(ADV_SRCH_BTN).click();
+      cy.byTestID('adv-search-vcpu-value').type('1');
       cy.clickSearchBtn();
       cy.contains(NAME_CELL, CENTOS9_VM).should('not.exist');
       cy.contains(NAME_CELL, CENTOS10_VM).should('exist');
       cy.contains(NAME_CELL, FEDORA_VM).should('not.exist');
-      cy.get(ADV_SRCH_BTN).click();
-      cy.get('button[data-test="adv-search-vcpu-operator-toggle"]').click();
+      cy.byTestID(ADV_SRCH_BTN).click();
+      cy.byTestID('adv-search-vcpu-operator-toggle').click();
       cy.byButtonText('Less than').click();
-      cy.get('input[data-test="adv-search-vcpu-value"]').type('2');
+      cy.byTestID('adv-search-vcpu-value').type('2');
       cy.clickSearchBtn();
       cy.contains(NAME_CELL, CENTOS9_VM).should('exist');
       cy.contains(NAME_CELL, CENTOS10_VM).should('not.exist');
@@ -128,16 +125,16 @@ describe('Test Advanced search for VMs', () => {
     });
 
     it('test VM search by memory', () => {
-      cy.get(ADV_SRCH_BTN).click();
-      cy.get('input[data-test="adv-search-mem-value"]').type('2');
+      cy.byTestID(ADV_SRCH_BTN).click();
+      cy.byTestID('adv-search-mem-value').type('2');
       cy.clickSearchBtn();
       cy.contains(NAME_CELL, CENTOS9_VM).should('exist');
       cy.contains(NAME_CELL, CENTOS10_VM).should('exist');
       cy.contains(NAME_CELL, FEDORA_VM).should('not.exist');
-      cy.get(ADV_SRCH_BTN).click();
-      cy.get('button[data-test="adv-search-mem-operator-toggle"]').click();
+      cy.byTestID(ADV_SRCH_BTN).click();
+      cy.byTestID('adv-search-mem-operator-toggle').click();
       cy.byButtonText('Less than').click();
-      cy.get('input[data-test="adv-search-mem-value"]').type('4');
+      cy.byTestID('adv-search-mem-value').type('4');
       cy.clickSearchBtn();
       cy.contains(NAME_CELL, CENTOS9_VM).should('not.exist');
       cy.contains(NAME_CELL, CENTOS10_VM).should('not.exist');
@@ -153,12 +150,12 @@ describe('Test Advanced search for VMs', () => {
           .then((stdout) => {
             const ip = stdout.split(': ')[1];
             if (ip) {
-              cy.get(ADV_SRCH_BTN).click();
-              cy.get('.pf-v6-c-modal-box[role="dialog"]').within(() => {
+              cy.byTestID(ADV_SRCH_BTN).click();
+              cy.byTestID('adv-search-network').within(() => {
                 cy.byButtonText('Network').click();
-                cy.get('input[data-test="adv-search-vm-ip"]').type(ip);
-                cy.clickSearchBtn();
+                cy.byTestID('adv-search-vm-ip').type(ip);
               });
+              cy.clickSearchBtn();
               cy.contains(NAME_CELL, name).should('exist');
             }
           });
@@ -166,14 +163,14 @@ describe('Test Advanced search for VMs', () => {
     });
 
     it('test VM search by name', () => {
-      cy.get(ADV_SRCH_BTN).click();
-      cy.get('input[data-test="adv-search-vm-name"]').type('10');
+      cy.byTestID(ADV_SRCH_BTN).click();
+      cy.byTestID('adv-search-vm-name').type('10');
       cy.clickSearchBtn();
       cy.contains(NAME_CELL, CENTOS9_VM).should('not.exist');
       cy.contains(NAME_CELL, CENTOS10_VM).should('exist');
       cy.contains(NAME_CELL, FEDORA_VM).should('not.exist');
-      cy.get(ADV_SRCH_BTN).click();
-      cy.get('input[data-test="adv-search-vm-name"]').type('sssss');
+      cy.byTestID(ADV_SRCH_BTN).click();
+      cy.byTestID('adv-search-vm-name').type('sssss');
       cy.clickSearchBtn();
       searchVMsListed(true);
     });
@@ -186,16 +183,16 @@ describe('Test Advanced search for VMs', () => {
 
   describe('Test saving search', () => {
     it('test saving search', () => {
-      cy.get('#vm-search-input').type('centos');
+      cy.byTestID('vm-search-input').type('centos');
       cy.byButtonText('All search results found').click();
       cy.checkSubTitle('Search results');
       cy.contains(NAME_CELL, CENTOS9_VM).should('exist');
       cy.contains(NAME_CELL, CENTOS10_VM).should('exist');
       cy.contains(NAME_CELL, FEDORA_VM).should('not.exist');
-      cy.get('button[data-test="save-search"]').click();
+      cy.byTestID('save-search').click();
       cy.checkTitle('Save search');
-      cy.get('input[data-test-id="save-search-name"]').type(SAVE_NAME);
-      cy.get('input[data-test-id="save-search-description"]').type(SAVE_DESCR);
+      cy.byLegacyTestID('save-search-name').type(SAVE_NAME);
+      cy.byLegacyTestID('save-search-description').type(SAVE_DESCR);
       cy.clickSaveBtn();
     });
 
@@ -203,7 +200,7 @@ describe('Test Advanced search for VMs', () => {
       cy.byButtonText('Clear all filters').click();
       searchVMsListed(true);
       cy.byButtonText('Saved searches').click();
-      cy.get('[data-test="saved-searches"]').within(() => {
+      cy.byTestID('saved-searches').within(() => {
         cy.byButtonText(SAVE_NAME).click();
       });
       cy.contains(NAME_CELL, CENTOS9_VM).should('exist');
@@ -213,8 +210,8 @@ describe('Test Advanced search for VMs', () => {
 
     it('test removing saved search', () => {
       cy.byButtonText('Saved searches').click();
-      cy.contains('li.pf-v6-c-menu__list-item', SAVE_NAME).within(() => {
-        cy.get('button[aria-label="Delete saved search"]').click();
+      cy.byTestID(`saved-search-item-${SAVE_NAME}`).within(() => {
+        cy.byTestID(`delete-search-item-${SAVE_NAME}`).click();
       });
       cy.wait(1000);
       cy.byButtonText('Saved searches').click();
@@ -224,7 +221,7 @@ describe('Test Advanced search for VMs', () => {
 
     it('exit search', () => {
       cy.byButtonText('Back to VirtualMachines list').click();
-      cy.get('#vms-tree-view-panel').should('exist');
+      cy.byTestID('vms-treeview').should('exist');
     });
   });
 });

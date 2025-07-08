@@ -70,10 +70,15 @@ const SaveSearchModal: FC<SaveSearchModalProps> = ({ isOpen, onClose, onSubmit }
         </Form>
       </ModalBody>
       <ModalFooter>
-        <Button isDisabled={isEmptyForm} onClick={submitForm} variant="primary">
+        <Button
+          data-test="save-button"
+          isDisabled={isEmptyForm}
+          onClick={submitForm}
+          variant="primary"
+        >
           {t('Save')}
         </Button>
-        <Button onClick={onClose} variant="secondary">
+        <Button data-test="cancel-button" onClick={onClose} variant="secondary">
           {t('Cancel')}
         </Button>
       </ModalFooter>
