@@ -2,7 +2,9 @@ import React from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import useVMQueries from '@kubevirt-utils/hooks/useVMQueries';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Chart,
@@ -38,10 +40,10 @@ const StorageReadThresholdChart: React.FC<StorageThresholdChartProps> = ({ vmi }
   const { height, ref, width } = useResponsiveCharts();
 
   const [data] = useFleetPrometheusPoll({
-    cluster: vmi?.cluster,
+    cluster: getCluster(vmi),
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     endTime: currentTime,
-    namespace: vmi?.metadata?.namespace,
+    namespace: getNamespace(vmi),
     query: queries?.FILESYSTEM_READ_USAGE,
     timespan,
   });

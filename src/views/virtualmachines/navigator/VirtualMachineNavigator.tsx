@@ -7,7 +7,7 @@ import { ADVANCED_SEARCH } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
-import useIsACMPage from '@multicluster/useIsACMPage';
+import { isACMListPath } from '@multicluster/urls';
 import { ListPageHeader, OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import { Divider } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
@@ -26,8 +26,6 @@ const VirtualMachineNavigator: FC = () => {
   const vmListRef = useRef<{ onFilterChange: OnFilterChange } | null>(null);
   const location = useLocation();
 
-  const isACMTreeView = useIsACMPage();
-
   const { cluster, ns: namespace } = useParams<{ cluster?: string; ns: string }>();
 
   const { featureEnabled: advancedSearchEnabled } = useFeatures(ADVANCED_SEARCH);
@@ -36,8 +34,8 @@ const VirtualMachineNavigator: FC = () => {
     () =>
       location.pathname.endsWith(VirtualMachineModelRef) ||
       location.pathname.endsWith(`${VirtualMachineModelRef}/`) ||
-      isACMTreeView,
-    [location.pathname, isACMTreeView],
+      isACMListPath(location.pathname),
+    [location.pathname],
   );
 
   const treeProps = useTreeViewData();

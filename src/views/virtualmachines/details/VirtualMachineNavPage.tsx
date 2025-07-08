@@ -59,7 +59,6 @@ const VirtualMachineNavPage: FC = () => {
         <VirtualMachineNavPageTitle
           instanceTypeExpandedSpec={instanceTypeExpandedSpec}
           isLoaded={isLoaded || !isEmpty(loadError)}
-          name={name}
           vm={vmToShow}
         />
         <div className="VirtualMachineNavPage--tabs__main">

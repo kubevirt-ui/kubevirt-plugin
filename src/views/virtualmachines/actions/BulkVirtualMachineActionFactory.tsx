@@ -8,7 +8,8 @@ import MoveBulkVMToFolderModal from '@kubevirt-utils/components/MoveVMToFolderMo
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getLabels, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { Action, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
+import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
+import { Action } from '@openshift-console/dynamic-plugin-sdk';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
 import ConfirmMultipleVMActionsModal from './components/ConfirmMultipleVMActionsModal/ConfirmMultipleVMActionsModal';
@@ -42,7 +43,7 @@ export const BulkVirtualMachineActionFactory = {
           onLabelsSubmit={(newLabels) => {
             return Promise.all(
               vms.map((vm) =>
-                k8sPatch<V1VirtualMachine>({
+                kubevirtK8sPatch<V1VirtualMachine>({
                   data: getLabelsDiffPatch(newLabels, commonLabels, getLabels(vm)),
                   model: VirtualMachineModel,
                   resource: vm,
@@ -89,7 +90,7 @@ export const BulkVirtualMachineActionFactory = {
               vms.map((vm) => {
                 const labels = vm?.metadata?.labels || {};
                 labels[VM_FOLDER_LABEL] = folderName;
-                return k8sPatch<V1VirtualMachine>({
+                return kubevirtK8sPatch<V1VirtualMachine>({
                   data: [
                     {
                       op: 'replace',

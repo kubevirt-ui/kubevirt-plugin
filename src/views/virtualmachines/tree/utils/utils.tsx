@@ -8,7 +8,8 @@ import {
 } from '@kubevirt-utils/components/GuidedTour/utils/constants';
 import { ALL_NAMESPACES_SESSION_KEY, ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { getVMListNamespacesURL, getVMListURL, getVMURL } from '@multicluster/urls';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { getVMListNamespacesURL, getVMListURL, getVMURL, isACMPath } from '@multicluster/urls';
 import { TreeViewDataItem } from '@patternfly/react-core';
 import { FolderIcon, FolderOpenIcon, ProjectDiagramIcon } from '@patternfly/react-icons';
 import { signal } from '@preact/signals-react';
@@ -55,7 +56,7 @@ const buildProjectMap = (
 
     const vmTreeItem: TreeViewDataItemWithHref = {
       defaultExpanded: currentPageVMName && currentPageVMName === vmName,
-      href: `${getVMURL(vm.cluster, vmNamespace, vmName)}/${currentVMTab}`,
+      href: `${getVMURL(getCluster(vm), vmNamespace, vmName)}/${currentVMTab}`,
       icon: <VMStatusIcon />,
       id: vmTreeItemID,
       name: vmName,
@@ -181,6 +182,16 @@ const createAllNamespacesTreeItem = (
 
 const getVMInfoFromPathname = (pathname: string) => {
   const splitPathname = pathname.split('/');
+  const isACMTreeView = isACMPath(pathname);
+
+  if (isACMTreeView) {
+    const currentVMTab = splitPathname?.[7] || '';
+    const vmName = splitPathname?.[6];
+    const vmNamespace = splitPathname?.[5];
+
+    return { currentVMTab, vmName, vmNamespace };
+  }
+
   const currentVMTab = splitPathname?.[6] || '';
   const vmName = splitPathname?.[5];
   const vmNamespace = splitPathname?.[3];
@@ -226,7 +237,7 @@ const createSingleClusterTreeViewData = (
 
 const getVMsPerCluster = (vms: V1VirtualMachine[]): Record<string, V1VirtualMachine[]> => {
   return vms.reduce((acc, vm) => {
-    const cluster = vm?.cluster;
+    const cluster = getCluster(vm);
 
     if (!acc[cluster]) {
       acc[cluster] = [];

@@ -2,8 +2,10 @@ import React, { FC, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom-v5-compat';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { Overview } from '@openshift-console/dynamic-plugin-sdk';
 import { ExpandableSection, Title } from '@patternfly/react-core';
 import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
@@ -20,7 +22,7 @@ import './virtual-machine-metrics-tab.scss';
 const VirtualMachineMetricsTab: FC<NavPageComponentProps> = ({ obj: vm }) => {
   const { t } = useKubevirtTranslation();
   const location = useLocation();
-  const { loaded, pods, vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
+  const { loaded, pods, vmi } = useVMIAndPodsForVM(getName(vm), getNamespace(vm), getCluster(vm));
 
   const [expended, setExpended] = useState<{ [key in MetricsTabExpendedSections]: boolean }>({
     [MetricsTabExpendedSections.migration]: true,
