@@ -3,7 +3,6 @@ import React, { FC } from 'react';
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { MAX_SUGGESTIONS } from '@kubevirt-utils/components/ListPageFilter/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Button,
   ButtonVariant,
@@ -17,6 +16,7 @@ import {
   StackItem,
 } from '@patternfly/react-core';
 import SlidersHIcon from '@patternfly/react-icons/dist/esm/icons/sliders-h-icon';
+import { FleetResourceLink } from '@stolostron/multicluster-sdk';
 
 import { AdvancedSearchInputs, SearchSuggestResult } from '../../utils/types';
 
@@ -75,7 +75,8 @@ const SearchSuggestBox: FC<SearchSuggestBoxProps> = ({
                   {hasResourcesToSuggest &&
                     suggestResources.map((resource, index) => (
                       <StackItem key={`${index}_${resource.name}`}>
-                        <ResourceLink
+                        <FleetResourceLink
+                          cluster={resource.cluster}
                           groupVersionKind={VirtualMachineModelGroupVersionKind}
                           hideIcon
                           name={resource.name}

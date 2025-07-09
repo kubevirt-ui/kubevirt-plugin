@@ -1,11 +1,12 @@
 import { EncodedExtension } from '@openshift/dynamic-plugin-sdk-webpack';
-import { FeatureFlag, StandaloneRoutePage } from '@openshift-console/dynamic-plugin-sdk';
+import { FeatureFlag, RoutePage, StandaloneRoutePage } from '@openshift-console/dynamic-plugin-sdk';
 import type { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plugin-sdk-webpack';
 
 export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
   acmFlags: './multicluster/flags.ts',
   ConsoleStandAlone: './utils/components/Consoles/ConsoleStandAlone.tsx',
   Navigator: './views/virtualmachines/navigator/VirtualMachineNavigator.tsx',
+  VirtualMachineSearchResults: './views/virtualmachines/search/VirtualMachineSearchResults.tsx',
 };
 
 export const extensions: EncodedExtension[] = [
@@ -38,6 +39,13 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.page/route',
   },
+  {
+    properties: {
+      component: { $codeRef: 'VirtualMachineSearchResults' },
+      path: ['/multicloud/infrastructure/virtualmachines/search'],
+    },
+    type: 'console.page/route',
+  } as EncodedExtension<RoutePage>,
   {
     properties: {
       handler: { $codeRef: 'acmFlags.enableKubevirtDynamicACMFlag' },

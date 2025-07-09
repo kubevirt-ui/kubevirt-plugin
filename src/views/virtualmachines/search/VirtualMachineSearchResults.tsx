@@ -10,6 +10,7 @@ import { ADVANCED_SEARCH } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
+import useVMListURL from '@multicluster/hooks/useVMListURL';
 import {
   ListPageHeader,
   OnFilterChange,
@@ -21,10 +22,15 @@ import { useHideNamespaceBar } from '@virtualmachines/hooks/useHideNamespaceBar'
 import VirtualMachinesCreateButton from '@virtualmachines/list/components/VirtualMachinesCreateButton/VirtualMachinesCreateButton';
 import VirtualMachinesList from '@virtualmachines/list/VirtualMachinesList';
 
+import useVMSearchQueries from './hooks/useVMSearchQueries';
+
 const VirtualMachineSearchResults: FC = () => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const [activeNamespace] = useActiveNamespace();
+  const vmListURL = useVMListURL();
+
+  const vmSearchQueries = useVMSearchQueries();
 
   const { cluster } = useParams<{ cluster?: string }>();
   const namespace = activeNamespace === ALL_NAMESPACES_SESSION_KEY ? null : activeNamespace;
@@ -36,9 +42,9 @@ const VirtualMachineSearchResults: FC = () => {
 
   useEffect(() => {
     if (!advancedSearchEnabled && !advancedSearchLoading) {
-      navigate(`/k8s/all-namespaces/${VirtualMachineModelRef}`);
+      navigate(vmListURL);
     }
-  }, [advancedSearchEnabled, advancedSearchLoading, navigate]);
+  }, [advancedSearchEnabled, advancedSearchLoading, vmListURL, navigate]);
 
   const vmListRef = useRef<ExposedFilterFunctions | null>(null);
 
@@ -62,14 +68,14 @@ const VirtualMachineSearchResults: FC = () => {
         <Divider />
         <VirtualMachinesList
           cluster={cluster}
-          isSearchResultsPage
           kind={VirtualMachineModelRef}
           namespace={namespace}
           ref={vmListRef}
+          searchQueries={vmSearchQueries}
         />
       </>
     ),
-    [cluster, namespace, onFilterChange, resetTextSearch, t],
+    [cluster, namespace, onFilterChange, resetTextSearch, t, vmSearchQueries],
   );
 };
 
