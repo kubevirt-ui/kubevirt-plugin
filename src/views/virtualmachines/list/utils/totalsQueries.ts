@@ -8,6 +8,14 @@ export const VMTotalsQueries = {
   TOTAL_STORAGE_USAGE: 'TOTAL_STORAGE_USAGE',
 };
 
+const getSumBy = (isAllNamespaces: boolean, cluster?: string, allClusters = false) => {
+  if (allClusters || isAllNamespaces) return 'sum';
+
+  if (cluster) return 'sum by (namespace, cluster)';
+
+  return 'sum by (namespace)';
+};
+
 export const getVMTotalsQueries = (
   namespace: string,
   namespacesList: string[],
@@ -18,11 +26,6 @@ export const getVMTotalsQueries = (
 
   const clusterFilter = cluster ? `cluster='${cluster}'` : '';
 
-  const sumByNamespaceWithCluster = isAllNamespaces
-    ? 'sum by (cluster)'
-    : 'sum by (namespace, cluster)';
-  const sumByNamespace = isAllNamespaces ? 'sum' : 'sum by (namespace)';
-
   const filterByNamespace = isAllNamespaces
     ? `{${clusterFilter}}`
     : `{namespace='${namespace}',${clusterFilter}}`;
@@ -32,7 +35,7 @@ export const getVMTotalsQueries = (
     : `namespace='${namespace}',${clusterFilter}`;
 
   const duration = cluster || allClusters ? '15m' : '30s';
-  const sumBy = cluster || allClusters ? sumByNamespaceWithCluster : sumByNamespace;
+  const sumBy = getSumBy(isAllNamespaces, cluster, allClusters);
 
   return {
     [VMTotalsQueries.TOTAL_CPU_REQUESTED]: `${sumBy}(kube_pod_resource_request{resource='cpu',${filterCpuRequestedByNamespace}})`,

@@ -1,25 +1,27 @@
 import { useEffect, useMemo } from 'react';
-import { useParams } from 'react-router-dom-v5-compat';
 
 import { IoK8sApiCoreV1Pod } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import { modelToGroupVersionKind, PodModel } from '@kubevirt-utils/models';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
-import useIsACMPage from '@multicluster/useIsACMPage';
+import useVMListQueries from '@multicluster/hooks/useVMListQueries';
 import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
-import { useFleetPrometheusPoll, useHubClusterName } from '@stolostron/multicluster-sdk';
+import { useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';
 
 import { setVMCPURequested, setVMCPUUsage, setVMMemoryUsage, setVMNetworkUsage } from '../metrics';
 
-import { getVMListQueries, VMListQueries } from './constants';
+import { VMListQueries } from './constants';
 import { getVMNamesFromPodsNames } from './utils';
 
 const useVMMetrics = () => {
-  const { cluster, ns: namespace } = useParams<{ cluster?: string; ns?: string }>();
+  const namespace = useNamespaceParam();
+  const cluster = useClusterParam();
+  const allClusters = useIsAllClustersPage();
 
   const currentTime = useMemo<number>(() => Date.now(), []);
-  const [hubClusterName] = useHubClusterName();
-  const isACMPage = useIsACMPage();
 
   const [pods] = useK8sWatchData<IoK8sApiCoreV1Pod[]>({
     cluster,
@@ -30,45 +32,33 @@ const useVMMetrics = () => {
 
   const launcherNameToVMName = useMemo(() => getVMNamesFromPodsNames(pods), [pods]);
 
-  const queries = useMemo(
-    () =>
-      getVMListQueries(
-        namespace,
-        cluster === hubClusterName ? undefined : cluster,
-        isACMPage && isEmpty(cluster),
-      ),
-    [namespace, hubClusterName, cluster, isACMPage],
-  );
+  const queries = useVMListQueries();
 
-  const [memoryUsageResponse] = useFleetPrometheusPoll({
+  const prometheusPollProps = {
+    allClusters,
     cluster,
     endpoint: PrometheusEndpoint?.QUERY,
     endTime: currentTime,
     namespace,
+  };
+
+  const [memoryUsageResponse] = useFleetPrometheusPoll({
+    ...prometheusPollProps,
     query: queries?.[VMListQueries.MEMORY_USAGE],
   });
 
   const [networkTotalResponse] = useFleetPrometheusPoll({
-    cluster,
-    endpoint: PrometheusEndpoint?.QUERY,
-    endTime: currentTime,
-    namespace,
+    ...prometheusPollProps,
     query: queries?.NETWORK_TOTAL_USAGE,
   });
 
   const [cpuUsageResponse] = useFleetPrometheusPoll({
-    cluster,
-    endpoint: PrometheusEndpoint?.QUERY,
-    endTime: currentTime,
-    namespace,
+    ...prometheusPollProps,
     query: queries?.[VMListQueries.CPU_USAGE],
   });
 
   const [cpuRequestedResponse] = useFleetPrometheusPoll({
-    cluster,
-    endpoint: PrometheusEndpoint?.QUERY,
-    endTime: currentTime,
-    namespace,
+    ...prometheusPollProps,
     query: queries?.[VMListQueries.CPU_REQUESTED],
   });
 
