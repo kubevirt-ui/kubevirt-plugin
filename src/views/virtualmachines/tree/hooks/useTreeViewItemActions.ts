@@ -2,12 +2,12 @@ import { MouseEvent, useCallback, useLayoutEffect, useMemo, useState } from 'rea
 import { useNavigate } from 'react-router-dom-v5-compat';
 
 import useRemoveFolderQuery from '@kubevirt-utils/components/MoveVMToFolderModal/hooks/useRemoveFolderQuery';
-import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { TreeViewDataItem, TreeViewProps } from '@patternfly/react-core';
 
+import { CLUSTER_SELECTOR_PREFIX } from '../utils/constants';
 import {
+  getAllRightClickableTreeViewItems,
   getAllTreeViewFolderItems,
-  getAllTreeViewItems,
   getAllTreeViewProjectItems,
   getAllTreeViewVMItems,
   TreeViewDataItemWithHref,
@@ -48,11 +48,9 @@ const useTreeViewItemActions: UseTreeViewItemActions = (treeData) => {
   }, []);
 
   useLayoutEffect(() => {
-    const allItems = getAllTreeViewItems(treeData)?.filter(
-      (treeItem) => treeItem.id !== ALL_NAMESPACES_SESSION_KEY,
-    );
+    const allRightClickableItems = getAllRightClickableTreeViewItems(treeData);
 
-    const removeRightClickListeners = allItems?.map(addRightClickEvent);
+    const removeRightClickListeners = allRightClickableItems?.map(addRightClickEvent);
 
     return () => removeRightClickListeners?.forEach((removeListener) => removeListener?.());
   }, [treeData, addRightClickEvent]);
@@ -77,14 +75,12 @@ const useTreeViewItemActions: UseTreeViewItemActions = (treeData) => {
 
   const addListeners = useCallback(
     (_event: MouseEvent, item: TreeViewDataItem) => {
-      if (item.id.startsWith('cluster') && (item as TreeViewDataItemWithHref).href)
+      if (item.id.startsWith(CLUSTER_SELECTOR_PREFIX) && (item as TreeViewDataItemWithHref).href)
         navigate((item as TreeViewDataItemWithHref).href);
 
       // wait for children elements to show
       setTimeout(() => {
-        const allItems = getAllTreeViewItems([item])?.filter(
-          (treeItem) => treeItem.id !== ALL_NAMESPACES_SESSION_KEY,
-        );
+        const allRightClickableItems = getAllRightClickableTreeViewItems([item]);
 
         const vmItems = getAllTreeViewVMItems([item]);
         const dropInnerElements = [
@@ -96,7 +92,7 @@ const useTreeViewItemActions: UseTreeViewItemActions = (treeData) => {
 
         dropInnerElements.forEach((element) => addDropEventListeners(element, removeFolderQuery));
 
-        allItems.forEach(addRightClickEvent);
+        allRightClickableItems.forEach(addRightClickEvent);
       }, 200);
     },
     [addRightClickEvent, navigate, removeFolderQuery],

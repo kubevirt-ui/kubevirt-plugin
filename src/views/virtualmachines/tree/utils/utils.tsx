@@ -16,6 +16,8 @@ import { signal } from '@preact/signals-react';
 import { statusIcon } from '../icons/utils';
 
 import {
+  ALL_CLUSTERS_ID,
+  CLUSTER_SELECTOR_PREFIX,
   FOLDER_SELECTOR_PREFIX,
   PROJECT_SELECTOR_PREFIX,
   SYSTEM_NAMESPACES,
@@ -277,7 +279,7 @@ const createMultiClusterTreeViewData = (
       hasBadge: false,
       href: `/multicloud/infrastructure/virtualmachines/${clusterName}`,
       icon: <ProjectDiagramIcon />,
-      id: `cluster/${clusterName}`,
+      id: `${CLUSTER_SELECTOR_PREFIX}/${clusterName}`,
       name: clusterName,
     };
 
@@ -296,7 +298,7 @@ const createMultiClusterTreeViewData = (
       hasBadge: false,
       href: `/multicloud/infrastructure/virtualmachines`,
       icon: <ProjectDiagramIcon />,
-      id: 'ALL_CLUSTERS',
+      id: ALL_CLUSTERS_ID,
       name: 'All clusters',
     },
   ];
@@ -385,10 +387,20 @@ export const getAllTreeViewItems = (treeData: TreeViewDataItem[]) => {
 export const getAllTreeViewVMItems = (treeData: TreeViewDataItem[]): TreeViewDataItem[] =>
   getAllTreeViewItems(treeData).filter((treeItem) => !treeItem.children);
 
-export const getAllTreeViewFolderItems = (treeData: TreeViewDataItem[]): TreeViewDataItem[] =>
-  getAllTreeViewItems(treeData).filter((treeItem) =>
-    treeItem.id.startsWith(FOLDER_SELECTOR_PREFIX),
+export const getAllRightClickableTreeViewItems = (
+  treeData: TreeViewDataItem[],
+): TreeViewDataItem[] =>
+  getAllTreeViewItems(treeData).filter(
+    (treeItem) =>
+      !treeItem.id.startsWith(CLUSTER_SELECTOR_PREFIX) &&
+      !treeItem.id.startsWith(ALL_CLUSTERS_ID) &&
+      treeItem.id !== ALL_NAMESPACES_SESSION_KEY,
   );
+
+export const getAllTreeViewFolderItems = (treeData: TreeViewDataItem[]): TreeViewDataItem[] =>
+  getAllTreeViewItems(treeData)?.filter((treeItem) =>
+    treeItem.id.startsWith(FOLDER_SELECTOR_PREFIX),
+  ) || [];
 
 export const getAllTreeViewProjectItems = (treeData: TreeViewDataItem[]): TreeViewDataItem[] =>
   getAllTreeViewItems(treeData).filter((treeItem) =>
