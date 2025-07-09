@@ -6,7 +6,7 @@ const useIsACMPage = () => {
 
   return useMemo(
     () => location.pathname.startsWith('/multicloud/infrastructure/virtualmachines'),
-    [location],
+    [location.pathname],
   );
 };
 

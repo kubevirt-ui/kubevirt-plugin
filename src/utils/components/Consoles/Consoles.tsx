@@ -28,6 +28,7 @@ type ConsolesProps = {
   isVmRunning?: boolean;
   isWindowsVM: boolean;
   path: string;
+  vmCluster?: string;
   vmName: string;
   vmNamespace: string;
 };
@@ -37,6 +38,7 @@ const Consoles: FC<ConsolesProps> = ({
   isHeadlessMode,
   isWindowsVM,
   path,
+  vmCluster,
   vmName,
   vmNamespace,
 }) => {
@@ -59,7 +61,13 @@ const Consoles: FC<ConsolesProps> = ({
       <StackItem className="consoles-actions">
         <Flex className="consoles-actions-inner-flex">
           <FlexItem>
-            {!isWindowsVM && <CloudInitCredentials vmName={vmName} vmNamespace={vmNamespace} />}
+            {!isWindowsVM && (
+              <CloudInitCredentials
+                vmCluster={vmCluster}
+                vmName={vmName}
+                vmNamespace={vmNamespace}
+              />
+            )}
           </FlexItem>
           <FlexItem>
             <AccessConsoles
@@ -95,7 +103,7 @@ const Consoles: FC<ConsolesProps> = ({
           </HideConsole>
         )}
         {type === DESKTOP_VIEWER_CONSOLE_TYPE && (
-          <DesktopViewer vmName={vmName} vmNamespace={vmNamespace} />
+          <DesktopViewer vmCluster={vmCluster} vmName={vmName} vmNamespace={vmNamespace} />
         )}
       </StackItem>
     </Stack>

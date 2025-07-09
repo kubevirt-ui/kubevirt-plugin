@@ -153,6 +153,7 @@ export type MoreInformationDefaultProps = {
 };
 
 export type DesktopViewerProps = {
+  vmCluster?: string;
   vmName: string;
   vmNamespace: string;
 };

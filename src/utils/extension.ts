@@ -29,7 +29,6 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.context-provider',
   } as EncodedExtension<ContextProvider>,
-
   {
     properties: {
       handler: { $codeRef: 'kubevirtFlags.enableKubevirtDynamicFlag' },

@@ -9,8 +9,9 @@ import HideConsole from '@kubevirt-utils/components/Consoles/components/vnc-cons
 import VncConsole from '@kubevirt-utils/components/Consoles/components/vnc-console/VncConsole';
 import { getConsoleBasePath } from '@kubevirt-utils/components/Consoles/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Bullseye, Button, ButtonVariant } from '@patternfly/react-core';
+import { Bullseye, Button, ButtonVariant, Spinner } from '@patternfly/react-core';
 import { ExternalLinkAltIcon } from '@patternfly/react-icons';
+import { useFleetK8sAPIPath } from '@stolostron/multicluster-sdk';
 
 import VirtualMachinesOverviewTabDetailsConsoleConnect from './VirtualMachinesOverviewTabDetailsConsoleConnect';
 
@@ -18,14 +19,16 @@ type VirtualMachinesOverviewTabDetailsConsoleProps = {
   canConnectConsole: boolean;
   isHeadlessMode: boolean;
   isVMRunning: boolean;
+  vmCluster?: string;
   vmName: string;
   vmNamespace: string;
 };
 
 const VirtualMachinesOverviewTabDetailsConsole: FC<
   VirtualMachinesOverviewTabDetailsConsoleProps
-> = ({ canConnectConsole, isHeadlessMode, isVMRunning, vmName, vmNamespace }) => {
+> = ({ canConnectConsole, isHeadlessMode, isVMRunning, vmCluster, vmName, vmNamespace }) => {
   const { t } = useKubevirtTranslation();
+  const [apiPath, apiPathLoaded] = useFleetK8sAPIPath(vmCluster);
   const [{ actions, state }, setState] = useState<ConsoleComponentState>({
     actions: {},
     state: ConsoleState.init,
@@ -36,6 +39,14 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
     !enableConsole || // connect component is also empty state here
     state === ConsoleState.disconnected ||
     state === ConsoleState.connecting;
+
+  if (!apiPathLoaded)
+    return (
+      <Bullseye>
+        <Spinner />
+      </Bullseye>
+    );
+
   return (
     <Bullseye className="console-overview">
       <div className="link">
@@ -56,7 +67,7 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
       {enableConsole && (
         <HideConsole isHidden={state !== ConsoleState.connected}>
           <VncConsole
-            basePath={getConsoleBasePath({ name: vmName, namespace: vmNamespace })}
+            basePath={getConsoleBasePath({ apiPath, name: vmName, namespace: vmNamespace })}
             setState={setState}
             viewOnly
           />

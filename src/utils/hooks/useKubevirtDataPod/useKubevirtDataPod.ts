@@ -18,12 +18,14 @@ import {
 } from './utils/utils';
 import useKubevirtDataPodFilters from './useKubevirtDataPodFilters';
 
-type UseKubevirtDataPod = <T extends K8sResourceCommon>(
+type UseKubevirtDataPod = <T extends K8sResourceCommon | K8sResourceCommon[]>(
   watchOptions: WatchK8sResource,
   filterOptions?: { [key: string]: string },
 ) => [T, boolean, Error];
 
-const useKubevirtDataPod: UseKubevirtDataPod = <T extends K8sResourceCommon>(
+const nullResponse: [undefined, boolean, Error] = [undefined, false, null];
+
+const useKubevirtDataPod: UseKubevirtDataPod = <T extends K8sResourceCommon | K8sResourceCommon[]>(
   watchOptions: WatchK8sResource,
   filterOptions?: { [key: string]: string },
 ) => {
@@ -65,7 +67,7 @@ const useKubevirtDataPod: UseKubevirtDataPod = <T extends K8sResourceCommon>(
           jsonData?.metadata?.resourceVersion,
         );
         setResourceVersion(getResourceVersion(watchOptionsMemoized.groupVersionKind.kind));
-        setData(jsonData);
+        setData(jsonData?.items ? jsonData.items : jsonData);
         setShouldConnect(true);
         setLoaded(true);
       } catch (e) {
@@ -79,7 +81,9 @@ const useKubevirtDataPod: UseKubevirtDataPod = <T extends K8sResourceCommon>(
   useEffect(() => {
     if (socket?.lastJsonMessage?.type == 'ADDED') {
       setData((prevData) => {
-        (prevData as T & { items: T[] })?.items?.push(<T>socket?.lastJsonMessage?.object);
+        if (!Array.isArray(prevData)) return socket?.lastJsonMessage?.object as T;
+
+        (prevData as K8sResourceCommon[])?.push(socket?.lastJsonMessage?.object);
         return prevData;
       });
       return;
@@ -87,32 +91,45 @@ const useKubevirtDataPod: UseKubevirtDataPod = <T extends K8sResourceCommon>(
 
     if (socket?.lastJsonMessage?.type == 'DELETED') {
       setData((prevData) => {
-        const filteredItems = (prevData as T & { items: T[] })?.items?.filter(
-          (item) => !compareNameAndNamespace(item, socket?.lastJsonMessage?.object),
+        if (!Array.isArray(prevData)) return undefined;
+
+        const filteredItems = (prevData as K8sResourceCommon[])?.filter(
+          (item: K8sResourceCommon) =>
+            !compareNameAndNamespace(item, socket?.lastJsonMessage?.object),
         );
-        return { ...prevData, items: filteredItems };
+        return filteredItems as T;
       });
       return;
     }
 
     if (socket?.lastJsonMessage?.object) {
       setData((prevData) => {
-        const newData = (prevData as T & { items: T[] })?.items.map((item) => {
+        if (!Array.isArray(prevData)) return socket?.lastJsonMessage?.object as T;
+
+        const newData = (prevData as K8sResourceCommon[])?.map((item: K8sResourceCommon) => {
           if (compareNameAndNamespace(item, socket?.lastJsonMessage?.object)) {
             return socket?.lastJsonMessage?.object;
           }
           return item;
         });
-        return !isEmpty(newData)
-          ? { ...prevData, items: newData }
-          : (socket?.lastJsonMessage?.object as T);
+        return !isEmpty(newData) ? (newData as T) : ([socket?.lastJsonMessage?.object] as T);
       });
     }
-  }, [socket.lastJsonMessage]);
+  }, [socket?.lastJsonMessage]);
 
-  if (!watchOptions) return [<T>(<unknown>[]), false, null];
+  const defaultData = useMemo(
+    () => (watchOptions?.isList ? ([] as T) : undefined),
+    [watchOptions?.isList],
+  );
 
-  return [data, loaded, error];
+  const watchResult: [T, boolean, Error] = useMemo(
+    () => [isEmpty(data) ? defaultData : data, loaded, error],
+    [data, defaultData, loaded, error],
+  );
+
+  if (!watchOptions) return nullResponse;
+
+  return watchResult;
 };
 
 export default useKubevirtDataPod;
