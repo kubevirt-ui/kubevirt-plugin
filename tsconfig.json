@@ -21,7 +21,8 @@
     },
     "skipLibCheck": true,
     "sourceMap": true,
-    "target": "es2016"
+    "target": "es2016",
+    "typeRoots": ["node_modules/@types", "@types"]
   },
   "exclude": ["**/node_modules", "**/dist"],
   "include": ["src", "images"]
