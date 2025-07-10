@@ -50,7 +50,7 @@ export const pick = (object, keys) => {
   }, {});
 };
 
-export const isUpstream = (window as any).SERVER_FLAGS?.branding === 'okd';
+export const isUpstream = window.SERVER_FLAGS.branding === 'okd';
 
 export const DEFAULT_OPERATOR_NAMESPACE = isUpstream ? KUBEVIRT_HYPERCONVERGED : OPENSHIFT_CNV;
 
