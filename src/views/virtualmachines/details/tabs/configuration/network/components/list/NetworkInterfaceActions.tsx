@@ -6,6 +6,8 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import { deleteNetworkInterface } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
+import useFQDN from '@kubevirt-utils/hooks/useFQDN/useFQDN';
+import useIsFQDNEnabled from '@kubevirt-utils/hooks/useFQDN/useIsFQDNEnabled';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { getNetworkInterface } from '@kubevirt-utils/resources/vm/utils/network/selectors';
@@ -18,6 +20,7 @@ import {
   DropdownItem,
   DropdownList,
 } from '@patternfly/react-core';
+import { CopyIcon } from '@patternfly/react-icons';
 import {
   getConfigInterfaceStateFromVM,
   setNetworkInterfaceState,
@@ -47,6 +50,9 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
   const interfaceState = getConfigInterfaceStateFromVM(vm, nicName);
 
   const isInterfaceMissing = !getNetworkInterface(vm, nicName);
+
+  const fqdn = useFQDN(nicName, vm);
+  const isFQDNEnabled = useIsFQDNEnabled();
 
   const onEditModalOpen = () => {
     createModal(({ isOpen, onClose }) => (
@@ -122,6 +128,15 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
             onClick={() => setNetworkInterfaceState(vm, nicName, NetworkInterfaceState.DOWN)}
           >
             {t('Set link down')}
+          </DropdownItem>
+        )}
+        {isFQDNEnabled && fqdn && (
+          <DropdownItem
+            icon={<CopyIcon />}
+            key="network-interface-copy-fqdn"
+            onClick={() => navigator.clipboard.writeText(fqdn)}
+          >
+            {t('Copy FQDN')}
           </DropdownItem>
         )}
         <DropdownItem key="network-interface-edit" onClick={onEditModalOpen}>

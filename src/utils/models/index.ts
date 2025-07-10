@@ -27,3 +27,15 @@ export const QuickStartModel: K8sModel = {
   plural: 'consolequickstarts',
   propagationPolicy: 'Background',
 };
+
+export const DNSConfigModel: K8sModel = {
+  abbr: 'DNS',
+  apiGroup: 'config.openshift.io',
+  apiVersion: 'v1',
+  crd: false,
+  kind: 'DNS',
+  label: 'DNS',
+  labelPlural: 'DNSes',
+  namespaced: false,
+  plural: 'dnses',
+};
