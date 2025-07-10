@@ -1,24 +1,22 @@
 import { useMemo } from 'react';
-import { useParams } from 'react-router-dom-v5-compat';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
-import useIsACMPage from '@multicluster/useIsACMPage';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
 import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import { METRICS } from '@overview/OverviewTab/metric-charts-card/utils/constants';
-import { useFleetPrometheusPoll, useHubClusterName } from '@stolostron/multicluster-sdk';
+import { useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';
 
 import { getCpuText, getMemoryCapacityText, getMetricText } from '../utils/processVMTotalsMetrics';
 import { getVMTotalsQueries, VMTotalsQueries } from '../utils/totalsQueries';
 
 const useVMTotalsMetrics = (vms: V1VirtualMachine[], vmis: V1VirtualMachineInstance[]) => {
-  const { cluster, ns: namespace } = useParams<{ cluster?: string; ns?: string }>();
+  const namespace = useNamespaceParam();
 
-  const [hubClusterName] = useHubClusterName();
-  const isACMPage = useIsACMPage();
-
-  const allClusters = isACMPage && isEmpty(cluster);
+  const cluster = useClusterParam();
+  const isAllClustersPage = useIsAllClustersPage();
 
   const currentTime = useMemo<number>(() => Date.now(), []);
 
@@ -29,13 +27,14 @@ const useVMTotalsMetrics = (vms: V1VirtualMachine[], vmis: V1VirtualMachineInsta
       getVMTotalsQueries(
         namespace,
         namespacesList,
-        cluster === hubClusterName ? undefined : cluster,
-        allClusters,
+        isAllClustersPage ? undefined : cluster,
+        isAllClustersPage,
       ),
-    [namespace, namespacesList, cluster, hubClusterName, allClusters],
+    [namespace, namespacesList, cluster, isAllClustersPage],
   );
 
   const prometheusPollProps = {
+    allClusters: isAllClustersPage,
     cluster,
     endpoint: PrometheusEndpoint?.QUERY,
     endTime: currentTime,
