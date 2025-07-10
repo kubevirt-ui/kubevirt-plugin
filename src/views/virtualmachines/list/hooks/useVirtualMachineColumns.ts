@@ -5,6 +5,7 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
 import { columnSorting } from '@kubevirt-utils/utils/utils';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import {
   K8sResourceCommon,
   K8sVerb,
@@ -31,6 +32,8 @@ const useVirtualMachineColumns = (
   pvcMapper: PVCMapper,
 ): [TableColumn<K8sResourceCommon>[], TableColumn<K8sResourceCommon>[], boolean] => {
   const { t } = useKubevirtTranslation();
+
+  const isACMPage = useIsACMPage();
 
   const [canGetNode] = useAccessReview({
     namespace: namespace,
@@ -72,6 +75,16 @@ const useVirtualMachineColumns = (
         title: t('Name'),
         transforms: [sortable],
       },
+      ...(isACMPage
+        ? [
+            {
+              id: 'cluster',
+              sort: (_, direction) => sorting(direction, 'cluster'),
+              title: t('Cluster'),
+              transforms: [sortable],
+            },
+          ]
+        : []),
       ...(!namespace
         ? [
             {

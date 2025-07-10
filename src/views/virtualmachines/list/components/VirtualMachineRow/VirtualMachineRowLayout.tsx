@@ -13,6 +13,8 @@ import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { ManagedClusterModel } from '@multicluster/constants';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 import { Checkbox } from '@patternfly/react-core';
 import VirtualMachineActions from '@virtualmachines/actions/components/VirtualMachineActions/VirtualMachineActions';
@@ -54,6 +56,7 @@ const VirtualMachineRowLayout: FC<
 
   const vmName = useMemo(() => getName(obj), [obj]);
   const vmNamespace = useMemo(() => getNamespace(obj), [obj]);
+  const vmCluster = getCluster(obj);
 
   const storageClasses = useMemo(
     () => getVirtualMachineStorageClasses(obj, pvcMapper),
@@ -75,6 +78,13 @@ const VirtualMachineRowLayout: FC<
           groupVersionKind={VirtualMachineModelGroupVersionKind}
           name={vmName}
           namespace={vmNamespace}
+        />
+      </TableData>
+      <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="cluster">
+        <ResourceLink
+          groupVersionKind={modelToGroupVersionKind(ManagedClusterModel)}
+          name={vmCluster}
+          truncate
         />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="namespace">
