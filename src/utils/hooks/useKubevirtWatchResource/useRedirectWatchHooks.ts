@@ -13,6 +13,7 @@ import { Result } from './useKubevirtWatchResource';
 const useRedirectWatchHooks = <T extends K8sResourceCommon | K8sResourceCommon[]>(
   watchOptions: WatchK8sResource & { cluster?: string },
   filterOptions?: { [key: string]: string },
+  searchQueries?: { [key: string]: string },
   shouldUseProxyPod?: boolean,
 ): Result<T> => {
   const isACMTreeView = useIsACMPage();
@@ -24,6 +25,7 @@ const useRedirectWatchHooks = <T extends K8sResourceCommon | K8sResourceCommon[]
   const k8sWatch = useK8sWatchData<T>(!usePod && !useMulticlusterSearch ? watchOptions : null);
   const multiSearchWatch = useMulticlusterSearchWatch<T>(
     !usePod && useMulticlusterSearch && watchOptions,
+    searchQueries,
   );
 
   const kubevirtPodWatch = useKubevirtDataPod<T>(usePod ? watchOptions : {}, filterOptions);

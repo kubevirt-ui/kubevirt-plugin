@@ -13,9 +13,14 @@ export type Result<R extends K8sResourceCommon | K8sResourceCommon[]> = [R, bool
 type UseKubevirtWatchResource = <T extends K8sResourceCommon | K8sResourceCommon[]>(
   watchOptions: WatchK8sResource & { cluster?: string },
   filterOptions?: { [key: string]: string },
+  searchQueries?: { [key: string]: string },
 ) => Result<T>;
 
-const useKubevirtWatchResource: UseKubevirtWatchResource = <T>(watchOptions, filterOptions) => {
+const useKubevirtWatchResource: UseKubevirtWatchResource = <T>(
+  watchOptions,
+  filterOptions,
+  searchQueries,
+) => {
   const isProxyPodAlive = useKubevirtDataPodHealth();
   const { featureEnabled, loading } = useFeatures(KUBEVIRT_APISERVER_PROXY);
 
@@ -26,7 +31,7 @@ const useKubevirtWatchResource: UseKubevirtWatchResource = <T>(watchOptions, fil
     return null;
   }, [featureEnabled, loading, isProxyPodAlive, watchOptions?.cluster]);
 
-  return useRedirectWatchHooks<T>(watchOptions, filterOptions, shouldUseProxyPod);
+  return useRedirectWatchHooks<T>(watchOptions, filterOptions, searchQueries, shouldUseProxyPod);
 };
 
 export default useKubevirtWatchResource;

@@ -58,6 +58,7 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Flex, Pagination } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
+import { VMSearchQueries } from '@virtualmachines/search/hooks/useVMSearchQueries';
 import { vmsSignal } from '@virtualmachines/tree/utils/signals';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 import { convertIntoPVCMapper } from '@virtualmachines/utils/mappers';
@@ -81,14 +82,16 @@ import './VirtualMachinesList.scss';
 
 type VirtualMachinesListProps = {
   cluster?: string;
-  isSearchResultsPage?: boolean;
   kind: string;
   namespace: string;
+  searchQueries?: VMSearchQueries;
 } & RefAttributes<ExposedFilterFunctions | null>;
 
 const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref) => {
   const { t } = useKubevirtTranslation();
-  const { isSearchResultsPage = false, kind, namespace } = props;
+  const { kind, namespace, searchQueries } = props;
+  const isSearchResultsPage = !isEmpty(searchQueries);
+
   const catalogURL = `/k8s/ns/${namespace || DEFAULT_NAMESPACE}/catalog`;
   const { featureEnabled, loading: loadingFeatureProxy } = useFeatures(KUBEVIRT_APISERVER_PROXY);
   const isProxyPodAlive = useKubevirtDataPodHealth();
@@ -118,6 +121,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
       'rowFilter-status': 'status.printableStatus',
       'rowFilter-template': 'metadata.labels.vm\\.kubevirt\\.io/template',
     },
+    searchQueries?.vmQueries,
   );
 
   const vmsToShow = useMemo(() => (runningTourSignal.value ? [tourGuideVM] : vms), [vms]);
@@ -135,6 +139,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
       ip: 'status.interfaces',
       'rowFilter-node': 'status.nodeName',
     },
+    searchQueries?.vmiQueries,
   );
 
   const [pvcs] = useK8sWatchData<IoK8sApiCoreV1PersistentVolumeClaim[]>({

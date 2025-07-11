@@ -22,6 +22,6 @@ export type AdvancedSearchInputs = Partial<{
 }>;
 
 export type SearchSuggestResult = {
-  resources: { name: string; namespace?: string }[];
+  resources: { cluster?: string; name: string; namespace?: string }[];
   resourcesMatching: Record<'description' | 'ip' | 'labels', number>;
 };

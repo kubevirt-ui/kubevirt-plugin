@@ -1,10 +1,10 @@
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
-import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { STATIC_SEARCH_FILTERS } from '@kubevirt-utils/components/ListPageFilter/constants';
 import { useQueryParamsMethods } from '@kubevirt-utils/components/ListPageFilter/hooks/useQueryParamsMethods';
 import { ResetTextSearch, TextFiltersType } from '@kubevirt-utils/components/ListPageFilter/types';
+import useVMSearchURL from '@multicluster/hooks/useVMSearchURL';
 import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
@@ -20,6 +20,7 @@ export const useNavigateToSearchResults: UseNavigateToSearchResults = (
   resetTextSearch,
 ) => {
   const navigate = useNavigate();
+  const searchURL = useVMSearchURL();
   const { setAllQueryArguments } = useQueryParamsMethods();
 
   const resetCurrentFilter = useCallback(() => {
@@ -80,9 +81,9 @@ export const useNavigateToSearchResults: UseNavigateToSearchResults = (
 
   return useCallback(
     (searchInputs) => {
-      navigate(`/k8s/all-namespaces/${VirtualMachineModelRef}/search`);
+      navigate(searchURL);
       applyFilter(searchInputs);
     },
-    [navigate, applyFilter],
+    [navigate, applyFilter, searchURL],
   );
 };
