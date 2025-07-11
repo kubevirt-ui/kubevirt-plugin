@@ -5,6 +5,7 @@ import {
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import useVMExpandSpecMap from '@kubevirt-utils/hooks/useVMExpandSpecMap';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
 import { PVCMapper, VMIMapper, VMIMMapper } from '../../../utils/mappers';
@@ -61,6 +62,8 @@ export const useVMListFilters = (
 
   const vmimMapper: VMIMMapper = useMemo(() => getLatestMigrationForEachVM(vmims), [vmims]);
 
+  const vmExpandSpecMap = useVMExpandSpecMap(vms);
+
   const statusFilter = useStatusFilter();
   const templatesFilter = useTemplatesFilter(vms);
   const osFilters = useOSFilter();
@@ -72,8 +75,8 @@ export const useVMListFilters = (
   const projectFilter = useProjectFilter();
   const dateFromFilter = useDateFilter('from');
   const dateToFilter = useDateFilter('to');
-  const cpuFilter = useCPUFilter(vmiMapper);
-  const memoryFilter = useMemoryFilter(vmiMapper);
+  const cpuFilter = useCPUFilter(vmiMapper, vmExpandSpecMap);
+  const memoryFilter = useMemoryFilter(vmiMapper, vmExpandSpecMap);
 
   const searchByIP = useIPSearchFilter(vmiMapper);
   const searchByDescription = useDescriptionFilter();

@@ -1,5 +1,6 @@
 import VirtualMachineClusterInstancetypeModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineClusterInstancetypeModel';
 import VirtualMachineInstancetypeModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstancetypeModel';
+import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import {
   V1InstancetypeMatcher,
   V1VirtualMachine,
@@ -9,7 +10,7 @@ import { isVM } from '@kubevirt-utils/utils/typeGuards';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
-import { getAnnotation } from '../shared';
+import { getAnnotation, getName, getNamespace } from '../shared';
 
 import {
   CLUSTER_INSTANCE_TYPE_NAME_ANNOTATION,
@@ -39,3 +40,8 @@ export const getInstanceTypeNameFromAnnotation = (
 export const getPreferenceNameFromAnnotation = (vm: V1VirtualMachine | V1VirtualMachineInstance) =>
   getAnnotation(vm, NAMESPACED_PREFERENCE_NAME_ANNOTATION) ??
   getAnnotation(vm, CLUSTER_PREFERENCE_NAME_ANNOTATION);
+
+export const getInstanceTypeExpandSpecURL = (vm: V1VirtualMachine) =>
+  `api/kubernetes/apis/subresources.${VirtualMachineModel.apiGroup}/${
+    VirtualMachineModel.apiVersion
+  }/namespaces/${getNamespace(vm)}/${VirtualMachineModel.plural}/${getName(vm)}/expand-spec`;
