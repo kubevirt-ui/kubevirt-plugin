@@ -6,8 +6,10 @@ import TitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/Title
 import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/ComponentReady';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useVMQueries from '@kubevirt-utils/hooks/useVMQueries';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVMIPod } from '@kubevirt-utils/resources/vmi';
 import { humanizeCpuCores } from '@kubevirt-utils/utils/humanize.js';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { K8sResourceCommon, PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import { ChartDonutUtilization } from '@patternfly/react-charts/victory';
 import { useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';
@@ -26,10 +28,10 @@ const CPUUtil: FC<CPUUtilProps> = ({ pods, vmi }) => {
   const queries = useVMQueries(vmi, vmiPod?.metadata?.name);
 
   const prometheusProps = {
-    cluster: vmi?.cluster,
+    cluster: getCluster(vmi),
     endpoint: PrometheusEndpoint?.QUERY,
     endTime: currentTime,
-    namespace: vmi?.metadata?.namespace,
+    namespace: getNamespace(vmi),
   };
 
   const [dataCPURequested] = useFleetPrometheusPoll({

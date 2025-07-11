@@ -5,6 +5,8 @@ import {
   queriesToLink,
 } from '@kubevirt-utils/components/Charts/utils/utils';
 import useVMQueries from '@kubevirt-utils/hooks/useVMQueries';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { PrometheusEndpoint, PrometheusResult } from '@openshift-console/dynamic-plugin-sdk';
 import { useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';
 
@@ -31,10 +33,10 @@ const useNetworkData: UseNetworkData = (vmi, nic) => {
   const isAllNetwork = nic === ALL_NETWORKS;
 
   const prometheusProps = {
-    cluster: vmi?.cluster,
+    cluster: getCluster(vmi),
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     endTime: currentTime,
-    namespace: vmi?.metadata?.namespace,
+    namespace: getNamespace(vmi),
     timespan,
   };
   const [networkByNICTotal] = useFleetPrometheusPoll({

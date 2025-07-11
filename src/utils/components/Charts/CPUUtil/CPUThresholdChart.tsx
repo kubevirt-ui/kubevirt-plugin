@@ -3,9 +3,11 @@ import { Link } from 'react-router-dom-v5-compat';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import useVMQueries from '@kubevirt-utils/hooks/useVMQueries';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVMIPod } from '@kubevirt-utils/resources/vmi';
 import { humanizeCpuCores } from '@kubevirt-utils/utils/humanize.js';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { K8sResourceCommon, PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Chart,
@@ -47,10 +49,10 @@ const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ pods, vmi }) => {
   const queries = useVMQueries(vmi, vmiPod?.metadata?.name);
 
   const prometheusProps = {
-    cluster: vmi?.cluster,
+    cluster: getCluster(vmi),
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     endTime: currentTime,
-    namespace: vmi?.metadata?.namespace,
+    namespace: getNamespace(vmi),
     timespan,
   };
 

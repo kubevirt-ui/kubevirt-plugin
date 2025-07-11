@@ -5,7 +5,9 @@ import xbytes from 'xbytes';
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { tickLabels } from '@kubevirt-utils/components/Charts/ChartLabels/styleOverrides';
 import useVMQueries from '@kubevirt-utils/hooks/useVMQueries';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Chart,
@@ -48,10 +50,10 @@ const StorageTotalReadWriteThresholdChart: React.FC<StorageTotalReadWriteThresho
   const { height, ref, width } = useResponsiveCharts();
 
   const [data] = useFleetPrometheusPoll({
-    cluster: vmi?.cluster,
+    cluster: getCluster(vmi),
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     endTime: currentTime,
-    namespace: vmi?.metadata?.namespace,
+    namespace: getNamespace(vmi),
     query: queries?.FILESYSTEM_TOTAL_USAGE,
     timespan,
   });

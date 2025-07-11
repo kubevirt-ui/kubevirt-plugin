@@ -1,8 +1,12 @@
-import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
-
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 
+import { VirtualMachineModel } from '../views/dashboard-extensions/utils';
+
 import { BASE_ACM_VM_PATH } from './constants';
+
+export const isACMPath = (pathname: string): boolean => pathname.startsWith(BASE_ACM_VM_PATH);
+export const isACMListPath = (pathname: string): boolean =>
+  pathname.startsWith(BASE_ACM_VM_PATH) && pathname.split('/').length < 7;
 
 export const getACMVMURL = (cluster: string, namespace: string, name: string): string =>
   `${BASE_ACM_VM_PATH}/${cluster}/${namespace}/${name}`;

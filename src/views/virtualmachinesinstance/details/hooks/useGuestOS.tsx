@@ -1,11 +1,11 @@
 import * as React from 'react';
 
-import VirtualMachineInstanceModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstanceModel';
 import {
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceGuestAgentInfo,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { isGuestAgentConnected, vmiStatuses } from '@kubevirt-utils/resources/vmi';
+import useGuestAgentURL from '@multicluster/hooks/useGuestAgentURL';
 import { consoleFetch } from '@openshift-console/dynamic-plugin-sdk';
 
 type UseGuestOS = (
@@ -17,17 +17,16 @@ const useGuestOS: UseGuestOS = (vmi) => {
   const [data, setData] = React.useState<V1VirtualMachineInstanceGuestAgentInfo>({});
   const [error, setError] = React.useState(null);
   const isGuestAgent = isGuestAgentConnected(vmi);
+  const [guestAgentURL, guestAgentURLLoaded] = useGuestAgentURL(vmi);
 
   React.useEffect(() => {
+    if (!guestAgentURLLoaded) return;
+
     setError(null);
-    const namespace = vmi?.metadata?.namespace;
-    const name = vmi?.metadata?.name;
 
     if (vmi?.status?.phase === vmiStatuses.Running && isGuestAgent) {
       (async () => {
-        const response = await consoleFetch(
-          `api/kubernetes/apis/subresources.${VirtualMachineInstanceModel.apiGroup}/${VirtualMachineInstanceModel.apiVersion}/namespaces/${namespace}/${VirtualMachineInstanceModel.plural}/${name}/guestosinfo`,
-        );
+        const response = await consoleFetch(guestAgentURL);
         const jsonData = await response.json();
         setData(jsonData);
         setLoaded(true);
@@ -39,7 +38,7 @@ const useGuestOS: UseGuestOS = (vmi) => {
     } else {
       setLoaded(true);
     }
-  }, [vmi, isGuestAgent]);
+  }, [vmi, isGuestAgent, guestAgentURL, guestAgentURLLoaded]);
 
   return [data, loaded, error, isGuestAgent];
 };

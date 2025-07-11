@@ -1,20 +1,23 @@
 import React, { FC } from 'react';
 
 import { modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
-import { V1InstancetypeMatcher } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getInstanceTypeModelFromMatcher } from '@kubevirt-utils/resources/instancetype/helper';
+import { getInstanceTypeMatcher } from '@kubevirt-utils/resources/vm';
 import useInstanceType from '@kubevirt-utils/resources/vm/hooks/useInstanceType';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import { Content, ContentVariants, Skeleton } from '@patternfly/react-core';
 
 type InstanceTypeConfigurationProps = {
-  itMatcher: V1InstancetypeMatcher;
+  vm: V1VirtualMachine;
 };
 
-const InstanceTypeConfiguration: FC<InstanceTypeConfigurationProps> = ({ itMatcher }) => {
+const InstanceTypeConfiguration: FC<InstanceTypeConfigurationProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
-  const { instanceType, instanceTypeLoaded } = useInstanceType(itMatcher);
+  const itMatcher = getInstanceTypeMatcher(vm);
+  const { instanceType, instanceTypeLoaded } = useInstanceType(itMatcher, getCluster(vm));
 
   return (
     <>

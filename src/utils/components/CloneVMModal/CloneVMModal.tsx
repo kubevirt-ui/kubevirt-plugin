@@ -1,7 +1,6 @@
 import React, { FC, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
-import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import {
   V1beta1VirtualMachineClone,
   V1beta1VirtualMachineSnapshot,
@@ -9,9 +8,12 @@ import {
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { MAX_K8S_NAME_LENGTH } from '@kubevirt-utils/utils/constants';
 import { isVM } from '@kubevirt-utils/utils/typeGuards';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { getVMURL } from '@multicluster/urls';
 import { Form, ModalVariant } from '@patternfly/react-core';
 
 import CloningStatus from './components/CloningStatus';
@@ -21,7 +23,7 @@ import SnapshotContentConfigurationSummary from './components/SnapshotContentCon
 import StartClonedVMCheckbox from './components/StartClonedVMCheckbox/StartClonedVMCheckbox';
 import useCloneVMModal from './hooks/useCloneVMModal';
 import { CLONING_STATUSES } from './utils/constants';
-import { cloneVM, runVM, vmExist } from './utils/helpers';
+import { cloneVM, runVM, vmExists } from './utils/helpers';
 
 type CloneVMModalProps = {
   headerText?: string;
@@ -33,13 +35,11 @@ type CloneVMModalProps = {
 const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, source }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
-  const namespace = source?.metadata?.namespace;
+  const namespace = getNamespace(source);
+  const name = getName(source);
 
   const [cloneName, setCloneName] = useState(
-    `${source?.metadata?.name}${isVM(source) ? '-clone-' : '-'}${getRandomChars()}`.substring(
-      0,
-      MAX_K8S_NAME_LENGTH,
-    ),
+    `${name}${isVM(source) ? '-clone-' : '-'}${getRandomChars()}`.substring(0, MAX_K8S_NAME_LENGTH),
   );
 
   const vmUseRunning = useMemo(
@@ -54,7 +54,7 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
   const [initialCloneRequest, setInitialCloneRequest] = useState<V1beta1VirtualMachineClone>();
 
   const sendCloneRequest = async () => {
-    const vmSameName = await vmExist(cloneName, namespace);
+    const vmSameName = await vmExists(cloneName, namespace, getCluster(source));
 
     if (vmSameName) {
       throw new Error(t('VirtualMachine with this name already exists'));
@@ -66,19 +66,19 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
   };
 
   const cloneRequest = useCloneVMModal(
-    initialCloneRequest?.metadata?.name,
-    initialCloneRequest?.metadata?.namespace,
+    getName(initialCloneRequest),
+    getNamespace(initialCloneRequest),
+    getCluster(initialCloneRequest),
   );
 
   useEffect(() => {
     if (cloneRequest?.status?.phase === CLONING_STATUSES.SUCCEEDED) {
-      startCloneVM && runVM(cloneName, namespace, vmUseRunning);
+      startCloneVM && runVM(cloneName, namespace, getCluster(source), vmUseRunning);
 
-      navigate(`/k8s/ns/${namespace}/${VirtualMachineModelRef}/${cloneName}`);
-
+      navigate(getVMURL(cloneRequest?.cluster, namespace, cloneName));
       onClose();
     }
-  }, [cloneRequest, startCloneVM, cloneName, namespace, onClose, navigate, vmUseRunning]);
+  }, [cloneRequest, startCloneVM, cloneName, namespace, onClose, navigate, vmUseRunning, source]);
 
   return (
     <TabModal

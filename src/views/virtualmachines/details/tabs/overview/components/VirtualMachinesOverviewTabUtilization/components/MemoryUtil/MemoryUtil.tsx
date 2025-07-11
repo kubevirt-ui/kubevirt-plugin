@@ -8,8 +8,10 @@ import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/Com
 import { getMemorySize } from '@kubevirt-utils/components/CPUMemoryModal/utils/CpuMemoryUtils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useVMQueries from '@kubevirt-utils/hooks/useVMQueries';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getMemory } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import { ChartDonutUtilization } from '@patternfly/react-charts/victory';
 import { useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';
@@ -27,10 +29,10 @@ const MemoryUtil: FC<MemoryUtilProps> = ({ vmi }) => {
   const memory = getMemorySize(getMemory(vmi));
 
   const [data] = useFleetPrometheusPoll({
-    cluster: vmi?.cluster,
+    cluster: getCluster(vmi),
     endpoint: PrometheusEndpoint?.QUERY,
     endTime: currentTime,
-    namespace: vmi?.metadata?.namespace,
+    namespace: getNamespace(vmi),
     query: queries?.MEMORY_USAGE,
   });
 

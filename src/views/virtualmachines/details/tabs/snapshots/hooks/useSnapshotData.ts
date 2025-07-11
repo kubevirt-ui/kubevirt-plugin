@@ -1,14 +1,15 @@
-import * as React from 'react';
+import { useMemo } from 'react';
 
-import {
-  VirtualMachineRestoreModelGroupVersionKind,
-  VirtualMachineSnapshotModelGroupVersionKind,
-} from '@kubevirt-ui/kubevirt-api/console';
+import { VirtualMachineRestoreModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
+import VirtualMachineSnapshotModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineSnapshotModel';
 import {
   V1beta1VirtualMachineRestore,
   V1beta1VirtualMachineSnapshot,
+  V1VirtualMachine,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { useFleetK8sWatchResource } from '@stolostron/multicluster-sdk';
 
 import { getVmRestoreSnapshotName, getVmRestoreTime } from '../utils/selectors';
 
@@ -19,36 +20,43 @@ export type UseSnapshotData = {
   snapshots: V1beta1VirtualMachineSnapshot[];
 };
 
-const useSnapshotData = (vmName: string, namespace: string): UseSnapshotData => {
-  const [snapshots, snapshotsLoaded, snapshotsError] = useK8sWatchResource<
+const useSnapshotData = (vm: V1VirtualMachine): UseSnapshotData => {
+  const cluster = getCluster(vm);
+  const namespace = getNamespace(vm);
+  const vmName = getName(vm);
+
+  const [snapshots, snapshotsLoaded, snapshotsError] = useFleetK8sWatchResource<
     V1beta1VirtualMachineSnapshot[]
   >({
-    groupVersionKind: VirtualMachineSnapshotModelGroupVersionKind,
+    cluster,
+    groupVersionKind: {
+      group: VirtualMachineSnapshotModel.apiGroup,
+      kind: VirtualMachineSnapshotModel.kind,
+      version: 'v1alpha1',
+    },
     isList: true,
     namespace,
     namespaced: true,
   });
 
-  const [restores, restoresLoaded, restoresError] = useK8sWatchResource<
+  const [restores, restoresLoaded, restoresError] = useFleetK8sWatchResource<
     V1beta1VirtualMachineRestore[]
   >({
+    cluster,
     groupVersionKind: VirtualMachineRestoreModelGroupVersionKind,
     isList: true,
     namespace,
     namespaced: true,
   });
 
-  const loaded = React.useMemo(
+  const loaded = useMemo(
     () => snapshotsLoaded && restoresLoaded,
     [snapshotsLoaded, restoresLoaded],
   );
 
-  const error = React.useMemo(
-    () => snapshotsError || restoresError,
-    [snapshotsError, restoresError],
-  );
+  const error = useMemo(() => snapshotsError || restoresError, [snapshotsError, restoresError]);
 
-  const restoresMap = React.useMemo(() => {
+  const restoresMap = useMemo(() => {
     // we map each snapshot to its restores array
     const tempMap = restores?.reduce((restoreMap, currentRestore) => {
       const relevantRestore = restoreMap[getVmRestoreSnapshotName(currentRestore)];
