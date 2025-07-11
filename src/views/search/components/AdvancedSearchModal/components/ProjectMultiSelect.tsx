@@ -1,9 +1,9 @@
-import React, { FC, useMemo } from 'react';
+import React, { FC } from 'react';
 
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
-import { getSelectDataTestProps } from '@kubevirt-utils/utils/selectDataTest';
-import { MultiTypeaheadSelect, MultiTypeaheadSelectOption } from '@patternfly/react-templates';
+
+import MultiSelect from './MultiSelect';
 
 type ProjectMultiSelectProps = {
   'data-test'?: string;
@@ -16,26 +16,17 @@ const ProjectMultiSelect: FC<ProjectMultiSelectProps> = ({
   projects,
   setProjects,
 }) => {
+  const { t } = useKubevirtTranslation();
   const [projectNames] = useProjects();
-  const projectOptions = useMemo<MultiTypeaheadSelectOption[]>(
-    () =>
-      projectNames.map((projectName) => ({
-        content: projectName,
-        selected: projects.includes(projectName),
-        value: projectName,
-      })),
-    [projects, projectNames],
-  );
 
   return (
-    <MultiTypeaheadSelect
-      onSelectionChange={(_e, selectedProjects: string[]) => {
-        setProjects(selectedProjects);
-      }}
-      initialOptions={projectOptions}
-      isScrollable
-      placeholder={projects.length > 0 ? t('Select project') : t('All projects')}
-      {...getSelectDataTestProps(dataTest)}
+    <MultiSelect
+      allResourceNames={projectNames}
+      data-test={dataTest}
+      emptyValuePlaceholder={t('All projects')}
+      selectedResourceNames={projects}
+      selectPlaceholder={t('Select project')}
+      setSelectedResourceNames={setProjects}
     />
   );
 };
