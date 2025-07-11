@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { Dispatch, FC, SetStateAction, useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
@@ -9,7 +9,7 @@ import MultiSelect from './MultiSelect';
 type ClusterMultiSelectProps = {
   clusters: string[];
   'data-test'?: string;
-  setClusters: React.Dispatch<React.SetStateAction<string[]>>;
+  setClusters: Dispatch<SetStateAction<string[]>>;
 };
 
 const ClusterMultiSelect: FC<ClusterMultiSelectProps> = ({

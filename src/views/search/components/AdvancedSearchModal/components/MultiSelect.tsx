@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { Dispatch, FC, SetStateAction, useMemo } from 'react';
 
 import { getSelectDataTestProps } from '@kubevirt-utils/utils/selectDataTest';
 import { MultiTypeaheadSelect, MultiTypeaheadSelectOption } from '@patternfly/react-templates';
@@ -9,7 +9,7 @@ type MultiSelectProps = {
   emptyValuePlaceholder?: string;
   selectedResourceNames: string[];
   selectPlaceholder?: string;
-  setSelectedResourceNames: React.Dispatch<React.SetStateAction<string[]>>;
+  setSelectedResourceNames: Dispatch<SetStateAction<string[]>>;
 };
 
 const MultiSelect: FC<MultiSelectProps> = ({
