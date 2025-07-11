@@ -16,6 +16,7 @@ const useVMSearchQueries = (): VMSearchQueries => {
 
   const ip = searchParams.get(VirtualMachineRowFilterType.IP);
   const project = searchParams.get(VirtualMachineRowFilterType.Project);
+  const clusters = searchParams.get(VirtualMachineRowFilterType.Cluster);
 
   return useMemo(() => {
     const queries: VMSearchQueries = {
@@ -28,6 +29,11 @@ const useVMSearchQueries = (): VMSearchQueries => {
       queries.vmiQueries.name = `*${vmName}*`;
     }
 
+    if (clusters) {
+      queries.vmQueries.cluster = clusters;
+      queries.vmiQueries.cluster = clusters;
+    }
+
     if (ip) queries.vmiQueries.ipaddress = `*${ip}*`;
 
     if (project) {
@@ -36,7 +42,7 @@ const useVMSearchQueries = (): VMSearchQueries => {
     }
 
     return queries;
-  }, [vmName, ip, project]);
+  }, [vmName, ip, project, clusters]);
 };
 
 export default useVMSearchQueries;

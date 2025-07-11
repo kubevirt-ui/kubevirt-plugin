@@ -33,6 +33,7 @@ export const useNavigateToSearchResults: UseNavigateToSearchResults = (
 
   const applyFilter = useCallback(
     ({
+      clusters,
       dateCreatedFrom,
       dateCreatedTo,
       description,
@@ -61,6 +62,9 @@ export const useNavigateToSearchResults: UseNavigateToSearchResults = (
         ...(labels?.length > 0 ? { [STATIC_SEARCH_FILTERS.labels]: labels.join(',') } : {}),
         ...(projects?.length > 0
           ? { [VirtualMachineRowFilterType.Project]: projects.join(',') }
+          : {}),
+        ...(clusters?.length > 0
+          ? { [VirtualMachineRowFilterType.Cluster]: clusters.join(',') }
           : {}),
         ...(dateCreatedFrom
           ? { [VirtualMachineRowFilterType.DateCreatedFrom]: dateCreatedFrom }
