@@ -11,6 +11,7 @@ import { CONFIRM_VM_ACTIONS, TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/use
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
+import useACMExtensionActions from '@multicluster/hooks/useACMExtensionActions/useACMExtensionActions';
 import { useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 import { printableVMStatus } from '../../utils';
@@ -32,6 +33,8 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
 
   const mtcInstalled = useIsMTCInstalled();
   const [currentStorageMigration, currentStorageMigrationLoaded] = useCurrentStorageMigration(vm);
+
+  const acmActions = useACMExtensionActions(vm);
 
   const [, inFlight] = useK8sModel(VirtualMachineModelRef);
 
@@ -87,6 +90,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
       treeViewFoldersEnabled && VirtualMachineActionFactory.moveToFolder(vm, createModal),
       VirtualMachineActionFactory.editLabels(vm, createModal),
       VirtualMachineActionFactory.delete(vm, createModal),
+      ...acmActions,
     ].filter(Boolean);
   }, [
     vm,
@@ -97,6 +101,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
     virtctlCommand,
     treeViewFoldersEnabled,
     mtcInstalled,
+    acmActions,
   ]);
 
   return useMemo(
