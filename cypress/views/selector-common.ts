@@ -63,6 +63,7 @@ export const vmCount = '.pf-v6-c-menu-toggle__text > b';
 export const kebabBtn = '.pf-v6-c-table__td.pf-v6-c-table__action';
 export const selectDropdownToggle = '[data-ouia-component-id="BulkSelect-toggle"]';
 export const selectAllDropdownOption = '[data-ouia-component-id="BulkSelect-select-all"]';
+export const projectActionStop = 'selected-vms-action-stop';
 
 // VM overview tab
 export const vmStatusOnOverview = '[data-test-id="virtual-machine-overview-details-status"]';

@@ -115,11 +115,9 @@ export const fillOverview = (vmData: VirtualMachineData) => {
   }
   if (bootMode) {
     cy.get(cView.bootModeEditBtn).click();
-    cy.get(tabModal).within(() => {
-      cy.get(cView.menuToggle).click();
-      cy.byButtonText(bootMode).click();
-      cy.clickSaveBtn();
-    });
+    cy.get(cView.modalBox).find(cView.menuToggle).click();
+    cy.contains('span.pf-v6-c-menu__item-text', bootMode).click();
+    cy.clickSaveBtn();
   }
   if (workload) {
     cy.get(cView.workloadEditBtn).click();

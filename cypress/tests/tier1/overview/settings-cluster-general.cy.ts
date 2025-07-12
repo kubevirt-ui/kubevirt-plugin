@@ -10,6 +10,7 @@ describe('Test Cluster General settings', () => {
 
   describe('Test Automatic images download', () => {
     it('disable centos-stream-9-image-cron', () => {
+      cy.contains('General settings').click();
       cy.contains('Templates and images management').click();
       cy.contains('Automatic images download').click();
       cy.get('#centos-stream9-image-cron-auto-image-download-switch')
@@ -19,8 +20,10 @@ describe('Test Cluster General settings', () => {
     });
 
     it('delete centos-stream9 volumesnapshot', () => {
-      const cmd = `oc delete datavolume -n ${OS_IMAGES_NS} -l cdi.kubevirt.io/dataImportCron=centos-stream9-image-cron`;
-      cy.exec(cmd);
+      const delete_volumesnapshot = `oc delete volumesnapshot -n ${OS_IMAGES_NS} -l cdi.kubevirt.io/dataImportCron=centos-stream9-image-cron`;
+      cy.exec(delete_volumesnapshot);
+      const delete_datasource = `oc delete datasource -n ${OS_IMAGES_NS} -l cdi.kubevirt.io/dataImportCron=centos-stream9-image-cron`;
+      cy.exec(delete_datasource);
       cy.wait(10 * SECOND);
     });
 
@@ -40,8 +43,10 @@ describe('Test Cluster General settings', () => {
       },
       () => {
         cy.wait(15 * SECOND);
-        const cmd = `oc get datavolume -n ${OS_IMAGES_NS} -l cdi.kubevirt.io/dataImportCron=centos-stream9-image-cron | grep centos-stream9`;
-        cy.exec(cmd);
+        const get_volumesnapshot = `oc get volumesnapshot -n ${OS_IMAGES_NS} -l cdi.kubevirt.io/dataImportCron=centos-stream9-image-cron | grep centos-stream9`;
+        cy.exec(get_volumesnapshot);
+        const get_datasource = `oc get datasource -n ${OS_IMAGES_NS} -l cdi.kubevirt.io/dataImportCron=centos-stream9-image-cron | grep centos-stream9`;
+        cy.exec(get_datasource);
       },
     );
   });
