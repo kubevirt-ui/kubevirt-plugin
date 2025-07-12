@@ -2,6 +2,7 @@ import React, { FC, useMemo, useState } from 'react';
 
 import { ModalComponentProps } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import {
   Button,
   ButtonVariant,
@@ -20,6 +21,7 @@ import {
 import NumberOperatorSelect from '../../../../utils/components/NumberOperatorSelect/NumberOperatorSelect';
 import { AdvancedSearchInputs } from '../../utils/types';
 
+import ClusterMultiSelect from './components/ClusterMultiSelect';
 import DateFromToPicker from './components/DateFromToPicker';
 import LabelsMultiSelect from './components/LabelsMultiSelect';
 import MemoryUnitSelect from './components/MemoryUnitSelect';
@@ -43,8 +45,11 @@ const AdvancedSearchModal: FC<AdvancedSearchModalProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
+  const isACMPage = useIsACMPage();
+
   const [name, setName] = useState(prefillInputs.name ?? '');
   const [projects, setProjects] = useState(prefillInputs.projects ?? []);
+  const [clusters, setClusters] = useState(prefillInputs.clusters ?? []);
   const [description, setDescription] = useState(prefillInputs.description ?? '');
   const [labels, setLabels] = useState(prefillInputs.labels ?? []);
   const [ip, setIP] = useState(prefillInputs.ip ?? '');
@@ -59,6 +64,7 @@ const AdvancedSearchModal: FC<AdvancedSearchModalProps> = ({
     () =>
       name === '' &&
       projects.length === 0 &&
+      clusters.length === 0 &&
       description === '' &&
       labels.length === 0 &&
       ip === '' &&
@@ -69,6 +75,7 @@ const AdvancedSearchModal: FC<AdvancedSearchModalProps> = ({
     [
       name,
       projects,
+      clusters,
       description,
       labels,
       ip,
@@ -82,6 +89,7 @@ const AdvancedSearchModal: FC<AdvancedSearchModalProps> = ({
   const resetForm = () => {
     setName('');
     setProjects([]);
+    setClusters([]);
     setDescription('');
     setLabels([]);
     setIP('');
@@ -94,6 +102,7 @@ const AdvancedSearchModal: FC<AdvancedSearchModalProps> = ({
 
   const submitForm = () => {
     onSubmit({
+      clusters,
       dateCreatedFrom: dateFromString,
       dateCreatedTo: dateToString,
       description,
@@ -127,6 +136,15 @@ const AdvancedSearchModal: FC<AdvancedSearchModalProps> = ({
                   value={name}
                 />
               </FormGroup>
+              {isACMPage && (
+                <FormGroup label={t('Cluster')}>
+                  <ClusterMultiSelect
+                    clusters={clusters}
+                    data-test="adv-search-vm-cluster"
+                    setClusters={setClusters}
+                  />
+                </FormGroup>
+              )}
               <FormGroup label={t('Project')}>
                 <ProjectMultiSelect
                   data-test="adv-search-vm-project"
