@@ -6,6 +6,7 @@ import { getConsoleBasePath } from '@kubevirt-utils/components/Consoles/utils/ut
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isHeadlessMode } from '@kubevirt-utils/resources/vm';
 import { isWindows } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { Bullseye, PageSection, Spinner } from '@patternfly/react-core';
 import { useFleetK8sAPIPath } from '@stolostron/multicluster-sdk';
 
@@ -16,7 +17,8 @@ type VirtualMachinesInstancePageConsoleTabProps = {
 const VirtualMachinesInstancePageConsoleTab: FC<VirtualMachinesInstancePageConsoleTabProps> = ({
   obj: vmi,
 }) => {
-  const [apiPath, apiPathLoaded] = useFleetK8sAPIPath(vmi?.cluster);
+  const cluster = getCluster(vmi);
+  const [apiPath, apiPathLoaded] = useFleetK8sAPIPath(cluster);
 
   if (!apiPathLoaded)
     return (
@@ -37,7 +39,7 @@ const VirtualMachinesInstancePageConsoleTab: FC<VirtualMachinesInstancePageConso
         isHeadlessMode={isHeadlessMode(vmi)}
         isVmRunning={!!vmi}
         isWindowsVM={isWindows(vmi)}
-        vmCluster={vmi?.cluster}
+        vmCluster={cluster}
         vmName={getName(vmi)}
         vmNamespace={getNamespace(vmi)}
       />

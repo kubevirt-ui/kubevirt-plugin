@@ -8,7 +8,7 @@ import {
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
+import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 
 import { getVMRestoreSnapshotResource } from '../../../views/virtualmachines/details/tabs/snapshots/utils/helpers';
 
@@ -31,7 +31,8 @@ const RestoreModal: FC<DeleteResourceModalProps> = ({ isOpen, onClose, snapshot 
   return (
     <TabModal<V1beta1VirtualMachineRestore>
       onSubmit={(obj) =>
-        k8sCreate({
+        kubevirtK8sCreate({
+          cluster: snapshot?.cluster,
           data: obj,
           model: VirtualMachineRestoreModel,
         })

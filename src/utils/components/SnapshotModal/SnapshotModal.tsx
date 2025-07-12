@@ -10,7 +10,8 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
 import { getVolumeSnapshotStatuses } from '@kubevirt-utils/resources/vm';
-import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 import { Form, FormGroup, TextArea, TextInput } from '@patternfly/react-core';
 import { deadlineUnits } from '@virtualmachines/details/tabs/snapshots/utils/consts';
 import {
@@ -61,7 +62,8 @@ const SnapshotModal: FC<SnapshotModalProps> = ({ isOpen, onClose, vm }) => {
   return (
     <TabModal<V1beta1VirtualMachineSnapshot>
       onSubmit={(obj) =>
-        k8sCreate<V1beta1VirtualMachineSnapshot>({
+        kubevirtK8sCreate<V1beta1VirtualMachineSnapshot>({
+          cluster: getCluster(vm),
           data: obj,
           model: VirtualMachineSnapshotModel,
         })

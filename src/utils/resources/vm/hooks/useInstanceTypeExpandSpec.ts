@@ -1,15 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import useDeepCompareMemoize from '@kubevirt-utils/hooks/useDeepCompareMemoize/useDeepCompareMemoize';
 import { isInstanceTypeVM } from '@kubevirt-utils/resources/instancetype/helper';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
+import useInstanceTypeSpecURL from '@multicluster/hooks/useInstanceTypeSpecURL';
 import { consoleFetch } from '@openshift-console/dynamic-plugin-sdk';
 
 type UseInstanceTypeExpandSpec = (
-  vm: V1VirtualMachine,
+  vm?: V1VirtualMachine,
 ) => [
   instanceTypeExpandedSpec: V1VirtualMachine,
   loadingExpandedSpec: boolean,
@@ -21,15 +21,16 @@ const useInstanceTypeExpandSpec: UseInstanceTypeExpandSpec = (vm) => {
   const [errorExpandedSpec, setErrorExpandedSpec] = useState<Error>();
   const isInstanceType = useMemo(() => isInstanceTypeVM(vm), [vm]);
   const innerVM = useDeepCompareMemoize(vm);
+  const name = getName(innerVM);
+  const namespace = getNamespace(innerVM);
+  const [url, urlLoaded] = useInstanceTypeSpecURL(innerVM);
 
   useEffect(() => {
-    const fetch = async () => {
-      const url = `api/kubernetes/apis/subresources.${VirtualMachineModel.apiGroup}/${
-        VirtualMachineModel.apiVersion
-      }/namespaces/${getNamespace(innerVM)}/${VirtualMachineModel.plural}/${getName(
-        innerVM,
-      )}/expand-spec`;
+    if (!urlLoaded) {
+      return;
+    }
 
+    const fetch = async () => {
       setLoadingExpandedSpec(true);
       try {
         const response = await consoleFetch(url);
@@ -43,7 +44,7 @@ const useInstanceTypeExpandSpec: UseInstanceTypeExpandSpec = (vm) => {
       }
     };
     !isEmpty(innerVM) && isInstanceType && fetch();
-  }, [innerVM, isInstanceType]);
+  }, [namespace, name, isInstanceType, url, urlLoaded, innerVM]);
 
   return [instanceTypeExpandedSpec, loadingExpandedSpec, errorExpandedSpec];
 };

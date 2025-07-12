@@ -5,9 +5,10 @@ import CPUMemory from '@kubevirt-utils/components/CPUMemory/CPUMemory';
 import GuestAgentIsRequiredText from '@kubevirt-utils/components/GuestAgentIsRequiredText/GuestAgentIsRequiredText';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getAnnotation } from '@kubevirt-utils/resources/shared';
+import { getAnnotation, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import {
   getDisks,
+  getInstanceTypeMatcher,
   getInterfaces,
   useVMIAndPodsForVM,
   VM_WORKLOAD_ANNOTATION,
@@ -18,6 +19,7 @@ import {
 } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { useGuestOS } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { Content, ContentVariants, FormGroup } from '@patternfly/react-core';
 
 import InstanceTypeConfiguration from './InstanceTypeConfiguration';
@@ -29,9 +31,9 @@ type ConfigurationSummaryProps = {
 const ConfigurationSummary: FC<ConfigurationSummaryProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
 
-  const itMatcher: V1InstancetypeMatcher = vm?.spec?.instancetype;
+  const itMatcher: V1InstancetypeMatcher = getInstanceTypeMatcher(vm);
 
-  const { vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
+  const { vmi } = useVMIAndPodsForVM(getName(vm), getNamespace(vm), getCluster(vm));
   const [guestAgentData] = useGuestOS(vmi);
   const osName = (guestAgentData?.os?.prettyName || guestAgentData?.os?.name) ?? (
     <GuestAgentIsRequiredText vmi={vmi} />
@@ -50,7 +52,7 @@ const ConfigurationSummary: FC<ConfigurationSummaryProps> = ({ vm }) => {
       </Content>
 
       {itMatcher ? (
-        <InstanceTypeConfiguration itMatcher={itMatcher} />
+        <InstanceTypeConfiguration vm={vm} />
       ) : (
         <>
           <Content className="pf-v6-u-text-color-subtle" component={ContentVariants.dt}>

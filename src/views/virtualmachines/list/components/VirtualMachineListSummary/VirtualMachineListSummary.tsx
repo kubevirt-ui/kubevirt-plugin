@@ -23,6 +23,8 @@ import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 import VirtualMachineUsageItem from '../VirtualMachineUsageItem/VirtualMachineUsageItem';
 
+import useSummaryTitle from './hooks/useSummaryTitle';
+
 import './VirtualMachineListSummary.scss';
 
 type VirtualMachineListSummaryProps = {
@@ -41,6 +43,8 @@ const VirtualMachineListSummary: FC<VirtualMachineListSummaryProps> = ({
   const { t } = useKubevirtTranslation();
   const [isExpanded, setIsExpanded] = useState<boolean>(true);
 
+  const summaryTitle = useSummaryTitle(namespace);
+
   const { primaryStatuses } = getVMStatuses(vms || []);
 
   const { cpuRequested, cpuUsage, memoryCapacity, memoryUsage, storageCapacity, storageUsage } =
@@ -54,7 +58,7 @@ const VirtualMachineListSummary: FC<VirtualMachineListSummaryProps> = ({
       toggleContent={
         <Content className="vm-list-summary__expand-section-toggle" component="h3">
           <ProjectDiagramIcon className="vm-list-summary__expand-section-toggle-icon" />{' '}
-          {namespace ?? t('All projects summary')}
+          {summaryTitle}
         </Content>
       }
       className="vm-list-summary__expand-section"

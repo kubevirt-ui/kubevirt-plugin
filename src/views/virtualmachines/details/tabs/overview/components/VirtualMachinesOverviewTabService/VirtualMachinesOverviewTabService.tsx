@@ -4,9 +4,11 @@ import { modelToGroupVersionKind, ServiceModel } from '@kubevirt-ui/kubevirt-api
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm';
 import { getServicesForVmi } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { ServicesList } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { Card, CardBody, CardTitle, Divider } from '@patternfly/react-core';
@@ -22,7 +24,7 @@ const VirtualMachinesOverviewTabService: FC<VirtualMachinesOverviewTabServicePro
     namespace: vm?.metadata?.namespace,
   });
 
-  const { vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
+  const { vmi } = useVMIAndPodsForVM(getName(vm), getNamespace(vm), getCluster(vm));
 
   const data = getServicesForVmi(
     services,

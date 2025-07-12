@@ -2,8 +2,10 @@ import React, { FC, Suspense } from 'react';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { ResourceEventStream } from '@openshift-console/dynamic-plugin-sdk';
 import { Bullseye, Title } from '@patternfly/react-core';
+import { FleetResourceEventStream } from '@stolostron/multicluster-sdk';
 import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
 
 import './VirtualMachinePageEventsTab.scss';
@@ -23,7 +25,11 @@ const VirtualMachinePageEventsTab: FC<NavPageComponentProps> = ({ obj: vm }) => 
           </Bullseye>
         }
       >
-        {vm?.metadata && <ResourceEventStream resource={vm} />}
+        {getCluster(vm) ? (
+          <FleetResourceEventStream resource={vm} />
+        ) : (
+          <ResourceEventStream resource={vm} />
+        )}
       </Suspense>
     </>
   );

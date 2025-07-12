@@ -6,8 +6,10 @@ import { getChangedGuestSystemAccessLog } from '@kubevirt-utils/components/Pendi
 import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getDevices, useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm';
 import { getVMIPod } from '@kubevirt-utils/resources/vmi';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { Bullseye, spinnerSize } from '@patternfly/react-core';
 import { isRunning } from '@virtualmachines/utils';
 
@@ -16,7 +18,8 @@ import VirtualMachineBasicLogViewer from './VirtualMachineBasicLogViewer/Virtual
 
 const VirtualMachineLogViewer = ({ connect, vm }) => {
   const { t } = useKubevirtTranslation();
-  const { loaded, pods, vmi } = useVMIAndPodsForVM(vm?.metadata?.name, vm?.metadata?.namespace);
+  const { loaded, pods, vmi } = useVMIAndPodsForVM(getName(vm), getNamespace(vm), getCluster(vm));
+
   const pod = getVMIPod(vmi, pods);
   const { featureEnabled: isClusterDisabledGuestSystemLogs } = useFeatures(
     DISABLED_GUEST_SYSTEM_LOGS_ACCESS,

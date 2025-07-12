@@ -20,11 +20,13 @@ import {
   getVolumes,
   getWorkload,
 } from '@kubevirt-utils/resources/vm';
-import { k8sPatch, k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sPatch, kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 import { printableVMStatus } from '@virtualmachines/utils';
 
 export const updateStartStrategy = (checked: boolean, vm: V1VirtualMachine) => {
-  k8sPatch({
+  kubevirtK8sPatch({
+    cluster: getCluster(vm),
     data: [
       {
         op: 'replace',
@@ -44,7 +46,8 @@ export const updateBootLoader = (updatedVM: V1VirtualMachine, vm: V1VirtualMachi
 
   const hasSMMFeatureDefined = domainFeatures?.smm !== undefined;
 
-  return k8sPatch({
+  return kubevirtK8sPatch({
+    cluster: getCluster(updatedVM),
     data: [
       {
         op: bootLoaderBeforeUpdate ? 'replace' : 'add',
@@ -72,7 +75,8 @@ export const updateBootLoader = (updatedVM: V1VirtualMachine, vm: V1VirtualMachi
 };
 
 export const updateBootOrder = (updatedVM: V1VirtualMachine) =>
-  k8sPatch({
+  kubevirtK8sPatch({
+    cluster: getCluster(updatedVM),
     data: [
       {
         op: 'replace',
@@ -94,7 +98,8 @@ export const updateMetadata = (
   data: { [key: string]: string },
   type: string,
 ) =>
-  k8sPatch({
+  kubevirtK8sPatch({
+    cluster: getCluster(updatedVM),
     data: [
       {
         op: 'replace',
@@ -113,7 +118,8 @@ export const updateLabels = (updatedVM: V1VirtualMachine, data: { [key: string]:
   updateMetadata(updatedVM, data, 'labels');
 
 export const updateHardwareDevices = (type: string, vm: V1VirtualMachine) =>
-  k8sPatch({
+  kubevirtK8sPatch({
+    cluster: getCluster(vm),
     data: [
       {
         op: 'replace',
@@ -126,7 +132,8 @@ export const updateHardwareDevices = (type: string, vm: V1VirtualMachine) =>
   });
 
 export const onSubmitYAML = (updatedVM: V1VirtualMachine) =>
-  k8sUpdate({
+  kubevirtK8sUpdate({
+    cluster: getCluster(updatedVM),
     data: updatedVM,
     model: VirtualMachineModel,
     name: getName(updatedVM),
@@ -134,7 +141,8 @@ export const onSubmitYAML = (updatedVM: V1VirtualMachine) =>
   });
 
 export const updateGuestSystemAccessLog = (updatedVM: V1VirtualMachine, checked: boolean) => {
-  return k8sPatch({
+  return kubevirtK8sPatch({
+    cluster: getCluster(updatedVM),
     data: [
       {
         op: 'replace',
@@ -148,7 +156,8 @@ export const updateGuestSystemAccessLog = (updatedVM: V1VirtualMachine, checked:
 };
 
 export const updateDescription = (updatedVM: V1VirtualMachine, updatedDescription: string) => {
-  return k8sPatch({
+  return kubevirtK8sPatch({
+    cluster: getCluster(updatedVM),
     data: [
       {
         op: 'replace',
@@ -165,7 +174,8 @@ export const updateWorkload = (updatedVM: V1VirtualMachine, newWorkload: WORKLOA
   const vmWorkload = getWorkload(updatedVM);
   if (vmWorkload === newWorkload) return;
 
-  return k8sPatch({
+  return kubevirtK8sPatch({
+    cluster: getCluster(updatedVM),
     data: [
       {
         op: 'replace',
@@ -179,7 +189,8 @@ export const updateWorkload = (updatedVM: V1VirtualMachine, newWorkload: WORKLOA
 };
 
 export const updatedVirtualMachine = (updatedVM: V1VirtualMachine) =>
-  k8sPatch({
+  kubevirtK8sPatch({
+    cluster: getCluster(updatedVM),
     data: [
       {
         op: 'replace',
@@ -200,7 +211,8 @@ export const updatedInstanceType = (
   vmToBeUpdated: V1VirtualMachine,
   instanceType: V1beta1VirtualMachineClusterInstancetype | V1beta1VirtualMachineInstancetype,
 ) =>
-  k8sPatch({
+  kubevirtK8sPatch({
+    cluster: vmToBeUpdated?.cluster,
     data: [
       {
         op: 'replace',
@@ -213,7 +225,8 @@ export const updatedInstanceType = (
   });
 
 export const updatedHostname = (updatedVM: V1VirtualMachine) =>
-  k8sPatch({
+  kubevirtK8sPatch({
+    cluster: getCluster(updatedVM),
     data: [
       {
         op: 'replace',
@@ -226,7 +239,8 @@ export const updatedHostname = (updatedVM: V1VirtualMachine) =>
   });
 
 export const updateHeadlessMode = (updatedVM: V1VirtualMachine, checked: boolean) =>
-  k8sPatch({
+  kubevirtK8sPatch({
+    cluster: getCluster(updatedVM),
     data: [
       {
         op: 'replace',
@@ -239,7 +253,8 @@ export const updateHeadlessMode = (updatedVM: V1VirtualMachine, checked: boolean
   });
 
 export const updateDisks = (updatedVM: V1VirtualMachine) =>
-  k8sPatch({
+  kubevirtK8sPatch({
+    cluster: getCluster(updatedVM),
     data: [
       {
         op: 'replace',
@@ -262,7 +277,8 @@ export const updateDisks = (updatedVM: V1VirtualMachine) =>
   });
 
 export const updateVolumes = (updatedVM: V1VirtualMachine) =>
-  k8sPatch({
+  kubevirtK8sPatch({
+    cluster: getCluster(updatedVM),
     data: [
       {
         op: 'replace',

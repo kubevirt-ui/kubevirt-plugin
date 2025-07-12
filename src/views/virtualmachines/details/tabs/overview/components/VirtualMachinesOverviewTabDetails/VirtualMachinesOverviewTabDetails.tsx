@@ -19,6 +19,7 @@ import { getInstanceTypeMatcher } from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getOSNameFromGuestAgent } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { Timestamp } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Card,
@@ -33,6 +34,7 @@ import {
   Split,
   SplitItem,
 } from '@patternfly/react-core';
+import { FleetResourceLink } from '@stolostron/multicluster-sdk';
 import { createURL } from '@virtualmachines/details/tabs/overview/utils/utils';
 import VMNotMigratableLabel from '@virtualmachines/list/components/VMNotMigratableLabel/VMNotMigratableLabel';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
@@ -96,6 +98,7 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
   }, [loaded, error, guestAgentDataLoaded, guestAgentData, vmi]);
 
   const vmPrintableStatus = getVMStatus(vm);
+  const cluster = getCluster(vm);
 
   return (
     <div className="VirtualMachinesOverviewTabDetails--details">
@@ -120,6 +123,23 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
                   descriptionData={getName(vm)}
                   descriptionHeader={t('Name')}
                 />
+                {cluster && (
+                  <VirtualMachineDescriptionItem
+                    descriptionData={
+                      <FleetResourceLink
+                        groupVersionKind={{
+                          group: 'cluster.open-cluster-management.io',
+                          kind: 'ManagedCluster',
+                          version: 'v1',
+                        }}
+                        name={cluster}
+                        truncate
+                      />
+                    }
+                    data-test-id="virtual-machine-overview-details-cluster"
+                    descriptionHeader={t('Cluster')}
+                  />
+                )}
                 {treeViewFoldersEnabled && (
                   <VirtualMachineDescriptionItem
                     data-test-id="virtual-machine-overview-details-folder"

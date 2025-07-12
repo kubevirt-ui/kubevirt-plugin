@@ -1,11 +1,12 @@
 import { VirtualMachineInstanceMigrationModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachineInstanceMigration } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { MIGRATION_VMI_NAME_LABEL } from '@kubevirt-utils/resources/vmim/constants';
-import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 const useVirtualMachineInstanceMigration = (resource: K8sResourceCommon) => {
-  const [vmims] = useK8sWatchResource<V1VirtualMachineInstanceMigration[]>(
+  const [vmims] = useK8sWatchData<V1VirtualMachineInstanceMigration[]>(
     resource && {
+      cluster: resource?.cluster,
       groupVersionKind: VirtualMachineInstanceMigrationModelGroupVersionKind,
       isList: true,
       namespace: resource?.metadata?.namespace,

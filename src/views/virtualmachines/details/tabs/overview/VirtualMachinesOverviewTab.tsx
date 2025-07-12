@@ -1,8 +1,10 @@
 import React, { FC } from 'react';
 
 import AlertsCard from '@kubevirt-utils/components/AlertsCard/AlertsCard';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm';
 import { useGuestOS } from '@kubevirt-utils/resources/vmi';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { Grid, GridItem, PageSection } from '@patternfly/react-core';
 import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
 
@@ -24,8 +26,9 @@ const VirtualMachinesOverviewTab: FC<NavPageComponentProps> = ({
 }) => {
   const vmAlerts = useVMAlerts(vm);
   const { error, loaded, pods, vmi } = useVMIAndPodsForVM(
-    vm?.metadata?.name,
-    vm?.metadata?.namespace,
+    getName(vm),
+    getNamespace(vm),
+    getCluster(vm),
   );
   const [guestAgentData, guestAgentDataLoaded, guestAgentDataLoadError] = useGuestOS(vmi);
 

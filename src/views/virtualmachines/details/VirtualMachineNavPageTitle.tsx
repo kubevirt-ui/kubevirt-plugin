@@ -7,9 +7,11 @@ import Loading from '@kubevirt-utils/components/Loading/Loading';
 import PaneHeading from '@kubevirt-utils/components/PaneHeading/PaneHeading';
 import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
 import useVirtualMachineInstanceMigration from '@kubevirt-utils/resources/vmi/hooks/useVirtualMachineInstanceMigration';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { Label, Split, SplitItem, Title } from '@patternfly/react-core';
 import VirtualMachineActions from '@virtualmachines/actions/components/VirtualMachineActions/VirtualMachineActions';
 import VMActionsIconBar from '@virtualmachines/actions/components/VMActionsIconBar/VMActionsIconBar';
@@ -25,20 +27,22 @@ import { vmTabsWithYAML } from './utils/constants';
 type VirtualMachineNavPageTitleProps = {
   instanceTypeExpandedSpec: V1VirtualMachine;
   isLoaded?: boolean;
-  name: string;
   vm: V1VirtualMachine;
 };
 
 const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({
   instanceTypeExpandedSpec,
   isLoaded,
-  name,
   vm,
 }) => {
   const { t } = useKubevirtTranslation();
   const location = useLocation();
 
-  const { vmi } = useVMI(vm?.metadata?.name, vm?.metadata?.namespace, vm?.cluster, isRunning(vm));
+  const name = getName(vm);
+  const namespace = getNamespace(vm);
+  const cluster = getCluster(vm);
+
+  const { vmi } = useVMI(name, namespace, cluster, isRunning(vm));
   const vmim = useVirtualMachineInstanceMigration(vm);
   const [actions] = useVirtualMachineActionsProvider(vm, vmim);
   const StatusIcon = getVMStatusIcon(vm?.status?.printableStatus);
@@ -48,7 +52,9 @@ const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({
   );
 
   return (
-    <DetailsPageTitle breadcrumb={<VirtualMachineBreadcrumb />}>
+    <DetailsPageTitle
+      breadcrumb={<VirtualMachineBreadcrumb cluster={cluster} namespace={namespace} />}
+    >
       <PaneHeading>
         <Title headingLevel="h1">
           <Split hasGutter>

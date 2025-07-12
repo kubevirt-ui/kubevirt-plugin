@@ -17,7 +17,8 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useLastNamespacePath } from '@kubevirt-utils/hooks/useLastNamespacePath';
 import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
-import { k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sDelete } from '@multicluster/k8sRequests';
 import { ButtonVariant, Stack, StackItem } from '@patternfly/react-core';
 import { deselectVM, isVMSelected } from '@virtualmachines/list/selectedVMs';
 
@@ -69,7 +70,8 @@ const DeleteVMModal: FC<DeleteVMModalProps> = ({ isOpen, onClose, vm }) => {
 
     await Promise.allSettled(deleteSecrets(secrets));
 
-    await k8sDelete({
+    await kubevirtK8sDelete({
+      cluster: getCluster(updatedVM),
       json: gracePeriodCheckbox
         ? { apiVersion: 'v1', gracePeriodSeconds, kind: 'DeleteOptions' }
         : null,

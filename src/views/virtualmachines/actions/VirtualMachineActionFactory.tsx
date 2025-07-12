@@ -22,7 +22,8 @@ import {
 import { asAccessReview, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { Action, k8sPatch, Patch } from '@openshift-console/dynamic-plugin-sdk';
+import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
+import { Action, Patch } from '@openshift-console/dynamic-plugin-sdk';
 import { CopyIcon } from '@patternfly/react-icons';
 import VirtualMachineMigrateModal from '@virtualmachines/actions/components/VirtualMachineMigration/VirtualMachineMigrationModal';
 import { isDeletionProtectionEnabled } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
@@ -97,7 +98,7 @@ export const VirtualMachineActionFactory = {
         verb: 'patch',
       },
       cta: () =>
-        k8sPatch({
+        kubevirtK8sPatch({
           data: patch,
           model: MigMigrationModel,
           resource: currentStorageMigration,
@@ -155,7 +156,7 @@ export const VirtualMachineActionFactory = {
       createModal(({ isOpen, onClose }) => (
         <LabelsModal
           onLabelsSubmit={(labels) =>
-            k8sPatch({
+            kubevirtK8sPatch({
               data: [
                 {
                   op: 'replace',
@@ -236,7 +237,7 @@ export const VirtualMachineActionFactory = {
             onSubmit={(folderName) => {
               const labels = vm?.metadata?.labels || {};
               labels[VM_FOLDER_LABEL] = folderName;
-              return k8sPatch({
+              return kubevirtK8sPatch({
                 data: [
                   {
                     op: 'replace',

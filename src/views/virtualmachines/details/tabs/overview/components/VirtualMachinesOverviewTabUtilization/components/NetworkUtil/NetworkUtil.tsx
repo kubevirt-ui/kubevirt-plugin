@@ -7,8 +7,9 @@ import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/ComponentReady';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useVMQueries from '@kubevirt-utils/hooks/useVMQueries';
-import { getResourceUrl } from '@kubevirt-utils/resources/shared';
+import { getNamespace, getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import { Button, ButtonVariant, Content, ContentVariants, Popover } from '@patternfly/react-core';
 import { useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';
@@ -27,10 +28,10 @@ const NetworkUtil: React.FC<NetworkUtilProps> = ({ vmi }) => {
   const interfacesNames = useMemo(() => vmi?.spec?.domain?.devices?.interfaces, [vmi]);
 
   const prometheusProps = {
-    cluster: vmi?.cluster,
+    cluster: getCluster(vmi),
     endpoint: PrometheusEndpoint?.QUERY,
     endTime: currentTime,
-    namespace: vmi?.metadata?.namespace,
+    namespace: getNamespace(vmi),
   };
 
   const [networkIn] = useFleetPrometheusPoll({
