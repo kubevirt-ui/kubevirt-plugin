@@ -25,7 +25,8 @@
     },
     "skipLibCheck": true,
     "sourceMap": true,
-    "target": "es2021"
+    "target": "es2021",
+    "typeRoots": ["node_modules/@types", "@types"]
   },
   "exclude": ["**/node_modules", "**/dist"],
   "include": ["src", "images"]
