@@ -5,6 +5,7 @@ import { EyeIcon, EyeSlashIcon } from '@patternfly/react-icons';
 
 type CloudInitCredentialsItemProps = {
   'button-data-test'?: string;
+  copyButtons: ReactNode;
   credentials: ReactNode;
   credentialTitle: string;
   hideCredentialText: string;
@@ -13,6 +14,7 @@ type CloudInitCredentialsItemProps = {
 
 const CloudInitCredentialsItem: FC<CloudInitCredentialsItemProps> = ({
   'button-data-test': buttonDataTest,
+  copyButtons,
   credentials,
   credentialTitle,
   hideCredentialText,
@@ -22,7 +24,13 @@ const CloudInitCredentialsItem: FC<CloudInitCredentialsItemProps> = ({
 
   return (
     <FlexItem spacer={{ default: 'spacerSm' }}>
-      {credentialTitle} {isVisible ? credentials : '●●●●●●●●●'}{' '}
+      {credentialTitle}{' '}
+      {isVisible ? (
+        <code className="cloud-init-credentials-inline-code">{credentials}</code>
+      ) : (
+        '●●●●●●●●●'
+      )}{' '}
+      {copyButtons}{' '}
       <Tooltip content={isVisible ? hideCredentialText : showCredentialText}>
         <Button
           data-test={buttonDataTest}
