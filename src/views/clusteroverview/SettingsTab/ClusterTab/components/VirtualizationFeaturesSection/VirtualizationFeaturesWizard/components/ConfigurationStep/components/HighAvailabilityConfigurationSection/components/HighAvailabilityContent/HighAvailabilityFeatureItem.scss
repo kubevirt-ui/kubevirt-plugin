@@ -1,0 +1,31 @@
+.high-availability-feature-item {
+  div &__checkbox {
+    margin-bottom: var(--pf-t--global--spacer--sm);
+    //font-size: var(--pf-v6-c-title--m-md--FontSize);
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  &__title-row {
+    margin-bottom: var(--pf-t--global--spacer--md);
+  }
+
+  &__options-row {
+    padding-left: var(--pf-t--global--spacer--md);
+    margin-bottom: var(--pf-t--global--spacer--md);
+  }
+
+  &__checkbox-container {
+    width: 668px;
+  }
+
+  &__icon-container {
+    margin-inline-start: auto;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  &__alternative-checkbox {
+    margin-bottom: var(--pf-t--global--spacer--md);
+  }
+}
