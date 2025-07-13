@@ -1,7 +1,7 @@
-import React, { FC, ReactNode, useState } from 'react';
+import { FC, ReactNode, useState } from 'react';
+import React from 'react';
 import classNames from 'classnames';
 
-import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import {
   ExpandableSection,
   ExpandableSectionToggle,
@@ -12,14 +12,19 @@ import {
   StackItem,
 } from '@patternfly/react-core';
 
+import HelpTextIcon from '../HelpTextIcon/HelpTextIcon';
+
 import './ExpandSectionWithCustomToggle.scss';
 
 type ExpandSectionWithCustomToggleProps = {
   children?: ReactNode;
   className?: string;
   customContent?: ReactNode;
+  expandSectionClassName?: string;
   helpTextContent?: ReactNode;
   id: string;
+  isIndented?: boolean;
+  toggleClassname?: string;
   toggleContent: ReactNode;
 };
 
@@ -27,8 +32,11 @@ const ExpandSectionWithCustomToggle: FC<ExpandSectionWithCustomToggleProps> = ({
   children,
   className,
   customContent,
+  expandSectionClassName = '',
   helpTextContent,
   id,
+  isIndented = false,
+  toggleClassname = '',
   toggleContent,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -40,11 +48,16 @@ const ExpandSectionWithCustomToggle: FC<ExpandSectionWithCustomToggleProps> = ({
   };
 
   return (
-    <Stack className={classNames('expand-section-custom-toggle', className)} hasGutter>
-      <StackItem>
+    <Stack className={classNames('expand-section-custom-toggle', className)}>
+      <StackItem
+        className={classNames({
+          'expand-section-custom-toggle__toggle-container--expanded': isExpanded,
+        })}
+      >
         <Split>
           <SplitItem isFilled>
             <ExpandableSectionToggle
+              className={toggleClassname}
               contentId={contentID}
               isExpanded={isExpanded}
               onToggle={onToggle}
@@ -71,11 +84,14 @@ const ExpandSectionWithCustomToggle: FC<ExpandSectionWithCustomToggleProps> = ({
       </StackItem>
       <StackItem>
         <ExpandableSection
-          className="expand-section-custom-toggle__expandable-section"
+          className={classNames(
+            'expand-section-custom-toggle__expandable-section',
+            expandSectionClassName,
+          )}
           contentId={contentID}
           isDetached
           isExpanded={isExpanded}
-          isIndented
+          isIndented={isIndented}
           toggleId={toggleID}
         >
           {children}
