@@ -12,3 +12,5 @@ export enum InstallState {
   'NOT_INSTALLED' = 'notInstalled',
   'UNKNOWN' = 'unknown',
 }
+
+export type OperatorsToInstall = Partial<Record<VirtualizationFeatureOperators, boolean>>;

@@ -5,7 +5,7 @@ import useKubeDescheduler from '@kubevirt-utils/resources/descheduler/hooks/useK
 import { getDeviationThreshold } from '@kubevirt-utils/resources/descheduler/selectors';
 import { DeviationThreshold } from '@kubevirt-utils/resources/descheduler/types';
 import { updateDeviationThreshold } from '@kubevirt-utils/resources/descheduler/utils';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { Radio, Split, SplitItem, Stack, StackItem } from '@patternfly/react-core';
 
 import './DeschedulerSection.scss';
@@ -19,7 +19,9 @@ const DeschedulerSection: FC = () => {
 
   const handleDeviationThresholdChange = (selectedThreshold: DeviationThreshold) => {
     setSelectedLevel(selectedThreshold);
-    updateDeviationThreshold(descheduler, selectedThreshold);
+    updateDeviationThreshold(descheduler, selectedThreshold).catch((err) =>
+      kubevirtConsole.error(err),
+    );
   };
 
   const isDisabled = !deschedulerLoaded || isEmpty(descheduler);

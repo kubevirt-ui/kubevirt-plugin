@@ -1,0 +1,22 @@
+.virt-feature-configuration-item {
+  &__header-row {
+    margin-bottom: var(--pf-t--global--spacer--md);
+  }
+
+  &__title-container {
+    width: 700px;
+  }
+
+  &__help-icon-container {
+    margin-left: var(--pf-t--global--spacer--sm);
+  }
+
+  &__hub-link {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  &__link-icon {
+    margin-left: var(--pf-t--global--spacer--sm);
+  }
+}

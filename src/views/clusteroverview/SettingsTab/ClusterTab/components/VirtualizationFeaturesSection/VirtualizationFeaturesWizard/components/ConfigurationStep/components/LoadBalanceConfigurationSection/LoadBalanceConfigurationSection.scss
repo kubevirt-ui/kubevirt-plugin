@@ -1,0 +1,10 @@
+.load-balance-configuration-section {
+  &__help-icon {
+    margin-left: var(--pf-t--global--spacer--md);
+  }
+}
+
+#load-balance-configuration-section--toggle {
+  font-weight: 500;
+  font-size: 16px;
+}

@@ -4,7 +4,7 @@ export const NODE_HEALTH_OPERATOR_NAME = 'node-healthcheck-operator';
 export const FENCE_AGENTS_OPERATOR_NAME = 'fence-agents-remediation';
 export const DESCHEDULER_OPERATOR_NAME = 'cluster-kube-descheduler-operator';
 
-export const FEATURE_PACKAGE_NAMES = [
+export const operatorPackageNames = [
   NMSTATE_OPERATOR_NAME,
   NETOBSERV_OPERATOR_NAME,
   NODE_HEALTH_OPERATOR_NAME,

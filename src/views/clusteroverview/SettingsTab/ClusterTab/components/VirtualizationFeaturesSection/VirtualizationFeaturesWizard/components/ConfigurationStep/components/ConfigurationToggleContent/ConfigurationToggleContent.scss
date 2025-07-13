@@ -1,0 +1,19 @@
+.feature-configuration-toggle-content {
+  width: 100%;
+
+  &__icon-switch-container {
+    margin-inline-start: auto;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  &__hub-link {
+    margin-inline-start: auto;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  &__link-icon {
+    margin-left: var(--pf-t--global--spacer--sm);
+  }
+}

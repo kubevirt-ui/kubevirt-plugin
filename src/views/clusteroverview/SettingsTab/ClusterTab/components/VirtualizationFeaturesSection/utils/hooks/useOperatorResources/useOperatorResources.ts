@@ -1,6 +1,6 @@
 import { getName } from '@kubevirt-utils/resources/shared';
 import { useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
-import { FEATURE_PACKAGE_NAMES } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/constants';
+import { operatorPackageNames } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/constants';
 import { OperatorResources } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/hooks/useOperatorResources/utils/types';
 import { watchedOperatorResources } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/hooks/useOperatorResources/utils/utils';
 import {
@@ -13,8 +13,8 @@ import {
 type UseOperatorResources = () => {
   clusterServiceVersions: ClusterServiceVersionKind[];
   filteredPackageManifests: PackageManifestKind[];
-  loaded: boolean;
   operatorGroups: OperatorGroupKind[];
+  operatorResourcesLoaded: boolean;
   subscriptions: SubscriptionKind[];
 };
 
@@ -29,10 +29,10 @@ const useOperatorResources: UseOperatorResources = () => {
 
   const allPackageManifests = [...packageManifests, ...marketplacePackageManifests];
   const filteredPackageManifests = allPackageManifests.filter((pkg) =>
-    FEATURE_PACKAGE_NAMES.includes(getName(pkg)),
+    operatorPackageNames.includes(getName(pkg)),
   );
 
-  const loaded =
+  const operatorResourcesLoaded =
     data?.clusterServiceVersions?.loaded &&
     data?.packageManifests?.loaded &&
     data?.marketplacePackageManifests?.loaded &&
@@ -42,8 +42,8 @@ const useOperatorResources: UseOperatorResources = () => {
   return {
     clusterServiceVersions,
     filteredPackageManifests,
-    loaded,
     operatorGroups,
+    operatorResourcesLoaded,
     subscriptions,
   };
 };
