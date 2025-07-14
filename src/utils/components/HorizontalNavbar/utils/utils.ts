@@ -1,23 +1,21 @@
 import { ComponentType } from 'react';
-import { Location } from 'react-router-dom-v5-compat';
 
 import { NavPage } from '@openshift-console/dynamic-plugin-sdk';
 import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
 
-export const trimLastHistoryPath = (location: Location, paths: string[]): string => {
-  const pathName = location?.pathname;
+export const trimLastHistoryPath = (currentPathname: string, paths: string[]): string => {
   let relativeUrl: string;
   for (const path of paths) {
-    if (pathName.endsWith('/' + path)) {
+    if (currentPathname.endsWith('/' + path)) {
       if (path !== '') {
-        relativeUrl = pathName.slice(0, pathName.length - path.length);
+        relativeUrl = currentPathname.slice(0, currentPathname.length - path.length);
       }
       if (path === '') {
-        relativeUrl = pathName;
+        relativeUrl = currentPathname;
       }
     }
   }
-  if (!relativeUrl) relativeUrl = pathName + '/';
+  if (!relativeUrl) relativeUrl = currentPathname + '/';
 
   return relativeUrl;
 };

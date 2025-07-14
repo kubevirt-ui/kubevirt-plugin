@@ -12,6 +12,7 @@ import useDynamicPages from './utils/useDynamicPages';
 import { NavPageKubevirt, trimLastHistoryPath } from './utils/utils';
 
 type HorizontalNavbarProps = {
+  basePath?: string;
   error?: any;
   instanceTypeExpandedSpec?: V1VirtualMachine;
   loaded: boolean;
@@ -20,6 +21,7 @@ type HorizontalNavbarProps = {
 };
 
 const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
+  basePath = '',
   error,
   instanceTypeExpandedSpec,
   loaded,
@@ -43,8 +45,10 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
     const defaultPage = allPages.find(({ href }) => isEmpty(href));
 
     const initialActiveTab =
-      allPages.find(({ href }) => !isEmpty(href) && location?.pathname.includes('/' + href)) ||
-      defaultPage;
+      allPages.find(
+        ({ href }) =>
+          !isEmpty(href) && location?.pathname?.replace(basePath, '').includes('/' + href),
+      ) || defaultPage;
 
     setActiveItem(initialActiveTab?.name?.toLowerCase());
   }, [allPages, location?.pathname]);
@@ -85,11 +89,15 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
                 key={item.name}
               >
                 <NavLink
+                  to={
+                    basePath +
+                    trimLastHistoryPath(location.pathname.replace(basePath, ''), paths) +
+                    item.href
+                  }
                   className="pf-v6-c-tabs__link"
                   data-test-id={`horizontal-link-${item.name}`}
                   id={`horizontal-pageHeader-${item.name}`}
                   onClick={() => setActiveItem(item.name.toLowerCase())}
-                  to={trimLastHistoryPath(location, paths) + item.href}
                 >
                   {item.name}
                 </NavLink>
