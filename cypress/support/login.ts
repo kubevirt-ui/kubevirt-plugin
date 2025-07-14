@@ -13,42 +13,69 @@ declare global {
 
 const KUBEADMIN_USERNAME = 'kubeadmin';
 const KUBEADMIN_IDP = 'kube:admin';
-const tour = '[data-test="tour-step-footer-secondary"]';
 
-Cypress.Commands.add('login', (provider: string, username: string, password: string) => {
-  // Check if auth is disabled (for a local development environment).
-  cy.visit(''); // visits baseUrl which is set in plugins.js
-  cy.window().then((win) => {
-    if (win.SERVER_FLAGS.authDisabled) {
-      cy.task('log', '  skipping login, console is running with auth disabled');
-      return;
-    }
-    // Make sure we clear the cookie in case a previous test failed to logout.
-    cy.clearCookie('openshift-session-token');
+Cypress.Commands.add(
+  'login',
+  (
+    provider: string = KUBEADMIN_IDP,
+    username: string = KUBEADMIN_USERNAME,
+    password: string = Cypress.env('BRIDGE_KUBEADMIN_PASSWORD'),
+  ) => {
+    // Constants for selectors
+    const SELECTORS = {
+      loginButton: '[data-test-id=login], [data-test=login]',
+      passwordInput: '#inputPassword',
+      submitButton: 'button[type=submit]',
+      tourPopup: '[data-test="tour-step-footer-secondary"]',
+      userDropdown: '[data-test="user-dropdown-toggle"]',
+      usernameInput: '#inputUsername',
+    };
 
-    cy.get('[data-test-id=login]', { timeout: 5 * MINUTE }).should('be.visible');
-    const idp = provider || KUBEADMIN_IDP;
-    cy.byLegacyTestID('login').should('be.visible');
-    cy.get('body').then(($body) => {
-      if ($body.text().includes(idp)) {
-        cy.contains(idp).should('be.visible').click();
+    // Visit the base URL and check auth status
+    cy.visit('/');
+    cy.window().then((win: any) => {
+      if (win.SERVER_FLAGS?.authDisabled) {
+        cy.log('Skipping login - console is running with auth disabled');
+        return;
       }
+
+      // Clear session token
+      cy.clearCookie('openshift-session-token');
+
+      // Login flow
+      cy.get(SELECTORS.loginButton, { timeout: 300000 }).should('be.visible');
+
+      // Handle IDP selection if present
+      const idp = provider || KUBEADMIN_IDP;
+      cy.get('body').then(($body) => {
+        if ($body.text().includes(idp)) {
+          cy.contains(idp).should('be.visible').click();
+        }
+      });
+
+      // Fill and submit credentials
+      cy.get(SELECTORS.usernameInput).type(username);
+      cy.get(SELECTORS.passwordInput).type(password, { log: false }); // Hide password in logs
+      cy.get(SELECTORS.submitButton).click();
+
+      cy.wait(20000);
+
+      // Close tour popup if present
+      cy.get('body').then(($body) => {
+        if ($body.find(SELECTORS.tourPopup).length) {
+          cy.get(SELECTORS.tourPopup).click();
+        }
+      });
+
+      cy.get(SELECTORS.userDropdown, { timeout: 300000 }).should('be.visible');
+
+      // Verify login via CLI
+      cy.exec('oc whoami').then((result) => {
+        cy.log(`Logged in as: ${result.stdout.trim()}`);
+      });
     });
-    cy.get('#inputUsername').type(username || KUBEADMIN_USERNAME);
-    cy.get('#inputPassword').type(password || Cypress.env('BRIDGE_KUBEADMIN_PASSWORD'));
-    cy.get(submitButton).click();
-    cy.wait(20000);
-    cy.get('body').then(($body) => {
-      if ($body.find(tour).length) {
-        cy.get(tour).click();
-      }
-    });
-    cy.byTestID('user-dropdown-toggle', { timeout: 5 * MINUTE }).should('be.visible');
-    cy.exec('oc whoami').then((result) => {
-      cy.task('log', ` Logged in as: [${result.stdout}]`);
-    });
-  });
-});
+  },
+);
 
 Cypress.Commands.add('logout', () => {
   // Check if auth is disabled (for a local development environment).

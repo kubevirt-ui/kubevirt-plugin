@@ -92,6 +92,7 @@ export const cpuField = '.input-cpu';
 export const memField = '.input-memory';
 export const restoreSetting = 'Restore template settings';
 export const bootModeEditBtn = '[data-test-id="wizard-overview-boot-method-edit"]';
+export const modalBox = '.pf-v6-c-modal-box__body';
 export const menuToggle = 'button.pf-v6-c-menu-toggle';
 export const menuItemMain = '.pf-v6-c-menu__item-main';
 export const menuItem = '.pf-v6-c-menu__item';
