@@ -5,8 +5,8 @@ import { STATIC_SEARCH_FILTERS } from '@kubevirt-utils/components/ListPageFilter
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 export type VMSearchQueries = {
-  vmiQueries: { [key: string]: string };
-  vmQueries: { [key: string]: string };
+  vmiQueries: { key: string; value: string }[];
+  vmQueries: { key: string; value: string }[];
 };
 
 const useVMSearchQueries = (): VMSearchQueries => {
@@ -16,27 +16,36 @@ const useVMSearchQueries = (): VMSearchQueries => {
 
   const ip = searchParams.get(VirtualMachineRowFilterType.IP);
   const project = searchParams.get(VirtualMachineRowFilterType.Project);
+  const createdFrom = searchParams.get(VirtualMachineRowFilterType.DateCreatedFrom);
+  const createdTo = searchParams.get(VirtualMachineRowFilterType.DateCreatedTo);
 
   return useMemo(() => {
     const queries: VMSearchQueries = {
-      vmiQueries: {},
-      vmQueries: {},
+      vmiQueries: [],
+      vmQueries: [],
     };
 
-    if (vmName) {
-      queries.vmQueries.name = `*${vmName}*`;
-      queries.vmiQueries.name = `*${vmName}*`;
+    if (createdFrom) {
+      queries.vmQueries.push({ key: 'created', value: `>=${createdFrom}` });
+    }
+    if (createdTo) {
+      queries.vmQueries.push({ key: 'created', value: `<=${createdTo}` });
     }
 
-    if (ip) queries.vmiQueries.ipaddress = `*${ip}*`;
+    if (vmName) {
+      queries.vmQueries.push({ key: 'name', value: `*${vmName}*` });
+      queries.vmiQueries.push({ key: 'name', value: `*${vmName}*` });
+    }
+
+    if (ip) queries.vmiQueries.push({ key: 'ipaddress', value: `*${ip}*` });
 
     if (project) {
-      queries.vmQueries.project = project;
-      queries.vmiQueries.project = project;
+      queries.vmQueries.push({ key: 'project', value: project });
+      queries.vmiQueries.push({ key: 'project', value: project });
     }
 
     return queries;
-  }, [vmName, ip, project]);
+  }, [createdFrom, createdTo, vmName, ip, project]);
 };
 
 export default useVMSearchQueries;

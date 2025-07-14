@@ -13,7 +13,7 @@ import { Result } from './useKubevirtWatchResource';
 const useRedirectWatchHooks = <T extends K8sResourceCommon | K8sResourceCommon[]>(
   watchOptions: WatchK8sResource & { cluster?: string },
   filterOptions?: { [key: string]: string },
-  searchQueries?: { [key: string]: string },
+  searchQueries?: { key: string; value: string }[],
   shouldUseProxyPod?: boolean,
 ): Result<T> => {
   const isACMTreeView = useIsACMPage();
