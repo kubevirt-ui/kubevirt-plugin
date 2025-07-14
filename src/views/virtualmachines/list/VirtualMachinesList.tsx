@@ -240,6 +240,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
     filteredVMs,
     vmiMapper,
     pvcMapper,
+    props.cluster,
   );
 
   const loaded = vmsLoaded && vmisLoaded && vmimsLoaded && !loadingFeatureProxy && loadedColumns;

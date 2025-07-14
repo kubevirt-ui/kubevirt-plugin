@@ -8,6 +8,7 @@ export const booleanTextIds = {
 };
 
 export enum VirtualMachineRowFilterType {
+  Cluster = 'cluster',
   CPU = 'cpu',
   DateCreatedFrom = 'dateCreatedFrom',
   DateCreatedTo = 'dateCreatedTo',
@@ -34,4 +35,5 @@ export const validSearchQueryParams: string[] = [
   VirtualMachineRowFilterType.DateCreatedTo,
   VirtualMachineRowFilterType.CPU,
   VirtualMachineRowFilterType.Memory,
+  VirtualMachineRowFilterType.Cluster,
 ];

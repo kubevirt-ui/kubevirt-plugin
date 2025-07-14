@@ -31,6 +31,7 @@ const useVirtualMachineColumns = (
   data: V1VirtualMachine[],
   vmiMapper: VMIMapper,
   pvcMapper: PVCMapper,
+  cluster?: string,
 ): [TableColumn<K8sResourceCommon>[], TableColumn<K8sResourceCommon>[], boolean] => {
   const { t } = useKubevirtTranslation();
 
@@ -78,7 +79,7 @@ const useVirtualMachineColumns = (
         title: t('Name'),
         transforms: [sortable],
       },
-      ...(isACMPage
+      ...(isACMPage && !cluster
         ? [
             {
               id: 'cluster',
