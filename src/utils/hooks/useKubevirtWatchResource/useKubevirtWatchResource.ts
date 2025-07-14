@@ -13,7 +13,7 @@ export type Result<R extends K8sResourceCommon | K8sResourceCommon[]> = [R, bool
 type UseKubevirtWatchResource = <T extends K8sResourceCommon | K8sResourceCommon[]>(
   watchOptions: WatchK8sResource & { cluster?: string },
   filterOptions?: { [key: string]: string },
-  searchQueries?: { [key: string]: string },
+  searchQueries?: { key: string; value: string }[],
 ) => Result<T>;
 
 const useKubevirtWatchResource: UseKubevirtWatchResource = <T>(
