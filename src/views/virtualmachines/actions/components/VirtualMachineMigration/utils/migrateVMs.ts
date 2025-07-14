@@ -8,7 +8,8 @@ import {
 } from '@kubevirt-utils/resources/migrations/constants';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
-import { k8sCreate, k8sGet, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sCreate, kubevirtK8sGet, kubevirtK8sPatch } from '@multicluster/k8sRequests';
 
 export const getEmptyMigPlan = (namespace: string): MigPlan => ({
   apiVersion: `${MigPlanModel.apiGroup}/${MigPlanModel.apiVersion}`,
@@ -56,7 +57,9 @@ export const migrateVMs = async (
   selectedPVCs: IoK8sApiCoreV1PersistentVolumeClaim[],
   destinationStorageClass: string,
 ) => {
-  const migPlanWithStatus = await k8sGet<MigPlan>({
+  const cluster = getCluster(migPlan);
+  const migPlanWithStatus = await kubevirtK8sGet<MigPlan>({
+    cluster,
     model: MigPlanModel,
     name: getName(migPlan),
     ns: getNamespace(migPlan),
@@ -96,13 +99,15 @@ export const migrateVMs = async (
     };
   });
 
-  await k8sPatch<MigPlan>({
+  await kubevirtK8sPatch<MigPlan>({
+    cluster,
     data: [{ op: 'replace', path: '/spec/persistentVolumes', value: persistentVolumes }],
     model: MigPlanModel,
     resource: migPlanWithStatus,
   });
 
-  return k8sCreate({
+  return kubevirtK8sCreate({
+    cluster,
     data: getEmptyMigMigration(migPlanWithStatus),
     model: MigMigrationModel,
   });

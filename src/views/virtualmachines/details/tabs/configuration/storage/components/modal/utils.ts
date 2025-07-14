@@ -26,7 +26,8 @@ import {
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { getVMIDevices } from '@kubevirt-utils/resources/vmi';
 import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
-import { k8sGet } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sGet } from '@multicluster/k8sRequests';
 
 export const createBootableVolumeFromDisk = async (
   diskObj: DiskRowDataLayout,
@@ -64,7 +65,8 @@ const addDataVolumeToVM = async (
 
   if (dataVolumeTemplates.find((dataVolume) => dataVolume.metadata.name === dataVolumeName)) return;
 
-  const originDataVolume = await k8sGet<V1beta1DataVolume>({
+  const originDataVolume = await kubevirtK8sGet<V1beta1DataVolume>({
+    cluster: getCluster(draftVM),
     model: DataVolumeModel,
     name: dataVolumeName,
     ns: getNamespace(draftVM),

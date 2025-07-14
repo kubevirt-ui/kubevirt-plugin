@@ -1,12 +1,13 @@
 import React from 'react';
 import cn from 'classnames';
 
+import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import { DataVolumeModelGroupVersionKind } from '@kubevirt-utils/models';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
+import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
+import { getCluster } from '@multicluster/helpers/selectors';
 import {
   RedExclamationCircleIcon,
-  ResourceLink,
-  useActiveNamespace,
   YellowExclamationTriangleIcon,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { ExpandableRowContent, Tbody, Td, Tr } from '@patternfly/react-table';
@@ -21,7 +22,7 @@ const VirtualMachineDiagnosticTabRow = ({
   obj,
   setExpend,
 }) => {
-  const [namespace] = useActiveNamespace();
+  const namespace = useNamespaceParam();
 
   const isExpanded = expend?.expended.has(obj?.id) && obj?.message;
   const activeColumnsObj = new Set<string>(activeColumns.map(({ id }) => id));
@@ -46,7 +47,8 @@ const VirtualMachineDiagnosticTabRow = ({
         {[...activeColumnsObj]?.map((column) => (
           <Td id={column} key={column}>
             {column === NAME_COLUMN_ID && dataVolumeResourceLink ? (
-              <ResourceLink
+              <MulticlusterResourceLink
+                cluster={getCluster(obj)}
                 groupVersionKind={DataVolumeModelGroupVersionKind}
                 name={obj?.[column]?.toString()}
                 namespace={namespace}

@@ -4,20 +4,24 @@ import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui/kubevirt-api
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import { getProjectOptions } from '@kubevirt-utils/components/ProjectDropdown/utils/utils';
 import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
-import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
+import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 type ProjectDropdownProps = {
+  cluster?: string;
   includeAllProjects?: boolean;
   onChange: (project: string) => void;
   selectedProject: string;
 };
 
 const ProjectDropdown: FC<ProjectDropdownProps> = ({
+  cluster,
   includeAllProjects = true,
   onChange,
   selectedProject,
 }) => {
-  const [projects] = useK8sWatchResource<K8sResourceCommon[]>({
+  const [projects] = useK8sWatchData<K8sResourceCommon[]>({
+    cluster,
     groupVersionKind: modelToGroupVersionKind(ProjectModel),
     isList: true,
     namespaced: false,

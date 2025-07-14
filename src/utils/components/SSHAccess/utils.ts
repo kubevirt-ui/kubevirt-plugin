@@ -7,12 +7,9 @@ import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getCloudInitCredentials } from '@kubevirt-utils/resources/vmi';
 import { ensurePath, getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
-import {
-  k8sCreate,
-  k8sDelete,
-  K8sResourceCommon,
-  k8sUpdate,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sCreate, kubevirtK8sDelete, kubevirtK8sUpdate } from '@multicluster/k8sRequests';
+import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 import { buildOwnerReference, getName, getNamespace } from './../../resources/shared';
 import { PORT, SERVICE_TYPES, SSH_PORT, VM_LABEL_AS_SSH_SERVICE_SELECTOR } from './constants';
@@ -43,7 +40,7 @@ const buildSSHServiceFromVM = (vm: V1VirtualMachine, type: SERVICE_TYPES) => ({
 });
 
 export const deleteSSHService = (sshService: IoK8sApiCoreV1Service) =>
-  k8sDelete<IoK8sApiCoreV1Service>({
+  kubevirtK8sDelete<IoK8sApiCoreV1Service>({
     model: ServiceModel,
     name: sshService?.metadata?.name,
     ns: sshService?.metadata?.namespace,
@@ -68,7 +65,8 @@ export const addSSHSelectorLabelToVM = async (
       draftVMI.metadata.labels[VM_LABEL_AS_SSH_SERVICE_SELECTOR] = labelValue;
     });
 
-    await k8sUpdate<V1VirtualMachineInstance>({
+    await kubevirtK8sUpdate<V1VirtualMachineInstance>({
+      cluster: getCluster(vmi),
       data: vmiWithLabel,
       model: VirtualMachineInstanceModel,
       name: vmiWithLabel?.metadata?.name,
@@ -76,7 +74,8 @@ export const addSSHSelectorLabelToVM = async (
     });
   }
 
-  return k8sUpdate<V1VirtualMachine>({
+  return kubevirtK8sUpdate<V1VirtualMachine>({
+    cluster: getCluster(vm),
     data: vmWithLabel,
     model: VirtualMachineModel,
     name: vmWithLabel?.metadata?.name,
@@ -90,7 +89,8 @@ export const createSSHService = async (
 ): Promise<K8sResourceCommon> => {
   const serviceResource = buildSSHServiceFromVM(vm, type);
 
-  return k8sCreate({
+  return kubevirtK8sCreate({
+    cluster: getCluster(vm),
     data: serviceResource,
     model: ServiceModel,
     ns: getNamespace(vm),

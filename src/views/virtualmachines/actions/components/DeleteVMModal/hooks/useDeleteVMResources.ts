@@ -14,7 +14,8 @@ import {
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { getRootDiskSecretRef, getVolumes } from '@kubevirt-utils/resources/vm';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 import useConvertedVolumeNames from './useConvertedVolumeNames';
 
@@ -28,13 +29,16 @@ type UseDeleteVMResources = (vm: V1VirtualMachine) => {
 };
 
 const useDeleteVMResources: UseDeleteVMResources = (vm) => {
+  const cluster = getCluster(vm);
   const { dvVolumesNames, isDataVolumeGarbageCollector, pvcVolumesNames } = useConvertedVolumeNames(
     getVolumes(vm),
+    cluster,
   );
   const namespace = vm?.metadata?.namespace;
-  const [dataVolumes, dataVolumesLoaded, dataVolumesLoadError] = useK8sWatchResource<
+  const [dataVolumes, dataVolumesLoaded, dataVolumesLoadError] = useK8sWatchData<
     V1beta1DataVolume[]
   >({
+    cluster,
     groupVersionKind: modelToGroupVersionKind(DataVolumeModel),
     isList: true,
     namespace,
@@ -43,9 +47,8 @@ const useDeleteVMResources: UseDeleteVMResources = (vm) => {
 
   const filteredDataVolumes = dataVolumes?.filter((dv) => dvVolumesNames?.includes(getName(dv)));
 
-  const [pvcs, pvcsLoaded, pvcsLoadError] = useK8sWatchResource<
-    IoK8sApiCoreV1PersistentVolumeClaim[]
-  >({
+  const [pvcs, pvcsLoaded, pvcsLoadError] = useK8sWatchData<IoK8sApiCoreV1PersistentVolumeClaim[]>({
+    cluster,
     groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
     isList: true,
     namespace,
@@ -56,16 +59,18 @@ const useDeleteVMResources: UseDeleteVMResources = (vm) => {
     ? pvcs?.filter((pvc) => [...dvVolumesNames, ...pvcVolumesNames].includes(getName(pvc)))
     : [];
 
-  const [snapshots, snapshotsLoaded, snapshotsLoadError] = useK8sWatchResource<
+  const [snapshots, snapshotsLoaded, snapshotsLoadError] = useK8sWatchData<
     V1beta1VirtualMachineSnapshot[]
   >({
+    cluster,
     groupVersionKind: modelToGroupVersionKind(VirtualMachineSnapshotModel),
     isList: true,
     namespace,
     namespaced: true,
   });
 
-  const [secrets, secretsLoaded, secretsLoadError] = useK8sWatchResource<IoK8sApiCoreV1Secret[]>({
+  const [secrets, secretsLoaded, secretsLoadError] = useK8sWatchData<IoK8sApiCoreV1Secret[]>({
+    cluster,
     groupVersionKind: modelToGroupVersionKind(SecretModel),
     isList: true,
     namespace,

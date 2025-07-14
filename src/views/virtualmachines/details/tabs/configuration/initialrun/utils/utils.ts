@@ -10,10 +10,12 @@ import {
   sysprepVolume,
   UNATTEND,
 } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { UpdateCustomizeInstanceType } from '@kubevirt-utils/store/customizeInstanceType';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { k8sCreate, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sCreate, kubevirtK8sPatch } from '@multicluster/k8sRequests';
 
 export const patchVMWithExistingSysprepConfigMap = async (
   name: string,
@@ -40,7 +42,8 @@ export const patchVMWithExistingSysprepConfigMap = async (
           path: `spec.template.spec.volumes`,
         },
       ])
-    : await k8sPatch<V1VirtualMachine>({
+    : await kubevirtK8sPatch<V1VirtualMachine>({
+        cluster: getCluster(vm),
         data: [
           {
             op: 'replace',
@@ -82,7 +85,8 @@ export const createSysprepConfigMap = async (
   });
 
   if (externalSysprepConfig) {
-    await k8sPatch({
+    await kubevirtK8sPatch({
+      cluster: getCluster(externalSysprepConfig),
       data: [
         {
           op: 'replace',
@@ -96,7 +100,12 @@ export const createSysprepConfigMap = async (
     return;
   }
 
-  await k8sCreate({ data: configMap, model: ConfigMapModel, ns: vm?.metadata?.namespace });
+  await kubevirtK8sCreate({
+    cluster: getCluster(vm),
+    data: configMap,
+    model: ConfigMapModel,
+    ns: getNamespace(vm),
+  });
   onSubmit
     ? onSubmit([
         {
@@ -110,7 +119,8 @@ export const createSysprepConfigMap = async (
           path: `spec.template.spec.volumes`,
         },
       ])
-    : await k8sPatch<V1VirtualMachine>({
+    : await kubevirtK8sPatch<V1VirtualMachine>({
+        cluster: getCluster(vm),
         data: [
           {
             op: 'replace',

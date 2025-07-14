@@ -2,7 +2,9 @@ import { V1beta1CDIConfig } from '@kubevirt-ui/kubevirt-api/containerized-data-i
 import { V1VirtualMachine, V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { CDIConfigModelGroupVersionKind, modelToGroupVersionKind } from '@kubevirt-utils/models';
 import { buildOwnerReference, compareOwnerReferences } from '@kubevirt-utils/resources/shared';
-import { K8sModel, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
+import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk-internal/lib/extensions/console-types';
 
 import { mapVolumeTypeToK8sModel } from './utils/constants';
@@ -20,7 +22,10 @@ type UseVolumeOwnedResource = (
 };
 
 const useVolumeOwnedResource: UseVolumeOwnedResource = (vm, volume) => {
-  const [cdiConfig, isCdiConfigLoaded, isCdiConfigError] = useK8sWatchResource<V1beta1CDIConfig>({
+  const cluster = getCluster(vm);
+
+  const [cdiConfig, isCdiConfigLoaded, isCdiConfigError] = useK8sWatchData<V1beta1CDIConfig>({
+    cluster,
     groupVersionKind: CDIConfigModelGroupVersionKind,
     isList: false,
     namespaced: false,
@@ -33,12 +38,13 @@ const useVolumeOwnedResource: UseVolumeOwnedResource = (vm, volume) => {
     volumeResourceModel && modelToGroupVersionKind(volumeResourceModel);
   const volumeResourceName = getVolumeResourceName(volume);
   const watchVolumeResource = {
+    cluster,
     groupVersionKind: volumeGroupVersionKind,
     isList: false,
     name: volumeResourceName,
     namespace: vm.metadata.namespace,
   };
-  const [resource, loaded, error] = useK8sWatchResource<K8sResourceCommon>(
+  const [resource, loaded, error] = useK8sWatchData<K8sResourceCommon>(
     volumeGroupVersionKind && volumeResourceName && watchVolumeResource,
   );
 

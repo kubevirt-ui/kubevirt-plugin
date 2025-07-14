@@ -27,6 +27,7 @@ const VolumeDestination: FC<VolumeDestinationProps> = ({
 
   const {
     accessMode,
+    bootableVolumeCluster,
     bootableVolumeName,
     bootableVolumeNamespace,
     size,
@@ -79,6 +80,7 @@ const VolumeDestination: FC<VolumeDestinationProps> = ({
       </FormGroup>
       <FormGroup label={t('Destination project')}>
         <ProjectDropdown
+          cluster={bootableVolumeCluster}
           includeAllProjects={false}
           onChange={setBootableVolumeField('bootableVolumeNamespace')}
           selectedProject={bootableVolumeNamespace}

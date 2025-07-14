@@ -15,7 +15,7 @@ import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/type
 import { buildOwnerReference, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { DATA_SOURCE_CRONJOB_LABEL } from '@kubevirt-utils/resources/template';
 import { appendDockerPrefix, getRandomChars } from '@kubevirt-utils/utils/utils';
-import { k8sCreate, k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
+import { kubevirtK8sCreate, kubevirtK8sDelete } from '@multicluster/k8sRequests';
 
 import {
   AddBootableVolumeState,
@@ -144,7 +144,11 @@ const createBootableVolumeFromUpload = async (
     file: uploadFile as File,
   });
 
-  return await k8sCreate({ data: dataSourceToCreate, model: DataSourceModel });
+  return await kubevirtK8sCreate({
+    cluster: bootableVolume.bootableVolumeCluster,
+    data: dataSourceToCreate,
+    model: DataSourceModel,
+  });
 };
 
 const createHTTPDataSource = async (
@@ -165,12 +169,24 @@ const createHTTPDataSource = async (
     };
   });
 
-  const createdDS = await k8sCreate({ data: dataSourceToCreate, model: DataSourceModel });
+  const createdDS = await kubevirtK8sCreate({
+    cluster: bootableVolume.bootableVolumeCluster,
+    data: dataSourceToCreate,
+    model: DataSourceModel,
+  });
 
   try {
-    await k8sCreate({ data: bootableVolumeToCreate, model: DataVolumeModel });
+    await kubevirtK8sCreate({
+      cluster: bootableVolume.bootableVolumeCluster,
+      data: bootableVolumeToCreate,
+      model: DataVolumeModel,
+    });
   } catch (error) {
-    k8sDelete({ model: DataSourceModel, resource: createdDS });
+    kubevirtK8sDelete({
+      cluster: bootableVolume.bootableVolumeCluster,
+      model: DataSourceModel,
+      resource: createdDS,
+    });
     throw error;
   }
   return createdDS;
@@ -189,7 +205,7 @@ const createSnapshotDataSource = async (
     };
   });
 
-  return await k8sCreate({ data: dataSourceToCreate, model: DataSourceModel });
+  return await kubevirtK8sCreate({ data: dataSourceToCreate, model: DataSourceModel });
 };
 
 export const createPVCBootableVolume = async (
@@ -212,12 +228,24 @@ export const createPVCBootableVolume = async (
     };
   });
 
-  const createdDS = await k8sCreate({ data: dataSourceToCreate, model: DataSourceModel });
+  const createdDS = await kubevirtK8sCreate({
+    cluster: bootableVolume.bootableVolumeCluster,
+    data: dataSourceToCreate,
+    model: DataSourceModel,
+  });
 
   try {
-    await k8sCreate({ data: bootableVolumeToCreate, model: DataVolumeModel });
+    await kubevirtK8sCreate({
+      cluster: bootableVolume.bootableVolumeCluster,
+      data: bootableVolumeToCreate,
+      model: DataVolumeModel,
+    });
   } catch (error) {
-    k8sDelete({ model: DataSourceModel, resource: createdDS });
+    kubevirtK8sDelete({
+      cluster: bootableVolume.bootableVolumeCluster,
+      model: DataSourceModel,
+      resource: createdDS,
+    });
     throw error;
   }
   return createdDS;
@@ -228,6 +256,7 @@ export const createDataSourceWithImportCron: CreateDataSourceWithImportCronType 
   initialDataSource,
 ) => {
   const {
+    bootableVolumeCluster,
     bootableVolumeName,
     cronExpression,
     registryURL,
@@ -266,7 +295,8 @@ export const createDataSourceWithImportCron: CreateDataSourceWithImportCronType 
   });
 
   // dry run to validate the DataImportCron
-  await k8sCreate<V1beta1DataImportCron>({
+  await kubevirtK8sCreate<V1beta1DataImportCron>({
+    cluster: bootableVolumeCluster,
     data: dataImportCron,
     model: DataImportCronModel,
     queryParams: {
@@ -275,14 +305,16 @@ export const createDataSourceWithImportCron: CreateDataSourceWithImportCronType 
     },
   });
 
-  const createdDataSource = await k8sCreate<V1beta1DataSource>({
+  const createdDataSource = await kubevirtK8sCreate<V1beta1DataSource>({
+    cluster: bootableVolumeCluster,
     data: produce(initialDataSource, (draftDataSource) => {
       draftDataSource.metadata.labels[DATA_SOURCE_CRONJOB_LABEL] = dataImportCronName;
     }),
     model: DataSourceModel,
   });
 
-  await k8sCreate<V1beta1DataImportCron>({
+  await kubevirtK8sCreate<V1beta1DataImportCron>({
+    cluster: bootableVolumeCluster,
     data: produce(dataImportCron, (draft) => {
       draft.metadata.ownerReferences = [
         buildOwnerReference(createdDataSource, { blockOwnerDeletion: false }),

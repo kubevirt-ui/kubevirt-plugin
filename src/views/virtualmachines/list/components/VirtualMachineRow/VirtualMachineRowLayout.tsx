@@ -2,6 +2,7 @@ import React, { FC, ReactNode, useMemo } from 'react';
 
 import {
   modelToGroupVersionKind,
+  NamespaceModel,
   StorageClassModel,
   VirtualMachineModelGroupVersionKind,
 } from '@kubevirt-ui/kubevirt-api/console';
@@ -14,6 +15,7 @@ import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import ACMExtentionsTableData from '@multicluster/components/ACMExtentionsTableData';
+import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 import { ManagedClusterModel } from '@multicluster/constants';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
@@ -76,7 +78,8 @@ const VirtualMachineRowLayout: FC<
         />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-20 vm-column" id="name">
-        <ResourceLink
+        <MulticlusterResourceLink
+          cluster={vmCluster}
           groupVersionKind={VirtualMachineModelGroupVersionKind}
           name={vmName}
           namespace={vmNamespace}
@@ -90,7 +93,12 @@ const VirtualMachineRowLayout: FC<
         />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="namespace">
-        <ResourceLink kind="Namespace" name={vmNamespace} truncate />
+        <MulticlusterResourceLink
+          cluster={vmCluster}
+          groupVersionKind={modelToGroupVersionKind(NamespaceModel)}
+          name={vmNamespace}
+          truncate
+        />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="status">
         {status}
@@ -123,7 +131,8 @@ const VirtualMachineRowLayout: FC<
         {isEmpty(storageClasses)
           ? NO_DATA_DASH
           : storageClasses.map((storageClass) => (
-              <ResourceLink
+              <MulticlusterResourceLink
+                cluster={vmCluster}
                 groupVersionKind={modelToGroupVersionKind(StorageClassModel)}
                 key={storageClass}
                 name={storageClass}

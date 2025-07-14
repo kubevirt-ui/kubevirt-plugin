@@ -34,6 +34,7 @@ export const optionsValueLabelMapper = {
 export type AddBootableVolumeState = {
   accessMode?: V1beta1StorageSpecAccessModesEnum;
   annotations?: { [key: string]: string };
+  bootableVolumeCluster?: string;
   bootableVolumeName: string;
   bootableVolumeNamespace: string;
   cronExpression?: string;
