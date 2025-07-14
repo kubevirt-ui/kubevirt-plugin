@@ -66,12 +66,9 @@ export const fillReviewAndCreate = (vmData: VirtualMachineData) => {
         cy.get(cView.diskSourceDropDown).click();
         cy.wait(3000);
         cy.get(diskSource.catalogSelector).click();
-        //cy.contains(diskSource.selectPVCNS).click();
         cy.contains('.pf-v6-c-menu-toggle__text', '--- Select PVC project ---').click();
         cy.contains('#select-inline-filter-listbox li', diskSource.pvcNS).click();
-        // cy.byButtonText(diskSource.pvcNS).click();
         cy.wait(3000);
-        //cy.contains(diskSource.selectPVCName).click();
         cy.contains('.pf-v6-c-menu-toggle__text', '--- Select PVC name ---').click();
         cy.contains('.pf-v6-c-menu__list-item', diskSource.pvcName).click();
         break;
@@ -251,7 +248,6 @@ export const fillScripts = (vmData: VirtualMachineData) => {
   tab.navigateToTScripts();
   if (cloudInitUname || cloudInitPwd || ethName) {
     cy.contains(descrGroup, cloudInit).find('button').eq(0).click();
-    // cy.get(cView.cloudInitEditBtn).click();
     if (cloudInitUname) {
       cy.get(cView.cloudInitUser).clear().type(cloudInitUname);
     }
@@ -259,8 +255,6 @@ export const fillScripts = (vmData: VirtualMachineData) => {
       cy.get(cView.cloudInitPwd).clear().type(cloudInitPwd);
     }
     if (ethName) {
-      // cy.contains(descrGroup, cloudInit).find('button').eq(0).click();
-      // // cy.get(cView.cloudInitEditBtn).click();
       cy.get(cView.networkCheckbox).check();
       cy.get(cView.ethName).type(ethName);
       cy.get(cView.ipAddr).type(ipAddr);
@@ -270,7 +264,6 @@ export const fillScripts = (vmData: VirtualMachineData) => {
   }
   if (newSecret) {
     cy.contains(descrGroup, authSSHKey).find('button').click();
-    // cy.get(cView.sshEditBtn).click();
     cy.get(cView.none).click();
     cy.get(cView.addNew).click();
     cy.dropFile('./fixtures/rsa.pub', 'rsa.pub', cView.uploadSecret);
@@ -281,7 +274,6 @@ export const fillScripts = (vmData: VirtualMachineData) => {
   }
   if (existSecret) {
     cy.contains(descrGroup, authSSHKey).find('button').click();
-    // cy.get(cView.sshEditBtn).click();
     cy.get(iView.useExisting).click();
     cy.get('button[placeholder="Select secret"]').click();
     cy.get(`button#select-inline-filter-${existSecret}`).click();
@@ -290,7 +282,6 @@ export const fillScripts = (vmData: VirtualMachineData) => {
   }
   if (sysprepFile) {
     cy.contains(descrGroup, sysPrep).find('button').eq(0).click();
-    // cy.get(vmView.vmSysprepEdit).click();
     cy.dropFile(sysprepFile, sysprepFile.split('/').pop(), vmView.autoUnInput);
     cy.dropFile(sysprepFile, sysprepFile.split('/').pop(), vmView.unattendInput);
     cy.clickSaveBtn();
@@ -298,7 +289,6 @@ export const fillScripts = (vmData: VirtualMachineData) => {
   }
   if (sysprepName) {
     cy.contains(descrGroup, sysPrep).find('button').eq(0).click();
-    // cy.get(vmView.vmSysprepEdit).click();
     cy.byButtonText('Attach existing sysprep').click();
     cy.byButtonText('--- Select sysprep ---').click();
     cy.byButtonText(`sysprep-${sysprepName}`).click();
