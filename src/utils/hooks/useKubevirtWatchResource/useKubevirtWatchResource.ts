@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 
 import { K8sResourceCommon, WatchK8sResource } from '@openshift-console/dynamic-plugin-sdk';
+import { AdvancedSearchFilter } from '@stolostron/multicluster-sdk/lib/api/search/types';
 
 import { KUBEVIRT_APISERVER_PROXY } from '../useFeatures/constants';
 import { useFeatures } from '../useFeatures/useFeatures';
@@ -13,7 +14,7 @@ export type Result<R extends K8sResourceCommon | K8sResourceCommon[]> = [R, bool
 type UseKubevirtWatchResource = <T extends K8sResourceCommon | K8sResourceCommon[]>(
   watchOptions: WatchK8sResource & { cluster?: string },
   filterOptions?: { [key: string]: string },
-  searchQueries?: { [key: string]: string },
+  searchQueries?: AdvancedSearchFilter,
 ) => Result<T>;
 
 const useKubevirtWatchResource: UseKubevirtWatchResource = <T>(
