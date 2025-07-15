@@ -127,6 +127,7 @@ export type instanceTypeData = {
 export type VirtualMachineData = TemplateData &
   instanceTypeData & {
     addEnvDisk?: boolean;
+    allTemplate?: boolean;
     bootFromCD?: boolean;
     cdSource?: CDSource;
     diskSource?: DiskSource;

@@ -5,12 +5,13 @@ import { getRow, tabModal } from './actions';
 import { addDisk, addNic } from './modals';
 import * as cView from './selector-catalog';
 import * as vmView from './selector-common';
-import { descrGroup } from './selector-common';
+import { cpuInput, descrGroup, memInput } from './selector-common';
 import * as iView from './selector-instance';
 import { tab } from './tab';
 
 export const fillReviewAndCreate = (vmData: VirtualMachineData) => {
-  const { bootFromCD, cdSource, diskSource, mountWinDriver, name, tRegPwd, tRegUname } = vmData;
+  const { bootFromCD, cdSource, cpu, diskSource, mem, mountWinDriver, name, tRegPwd, tRegUname } =
+    vmData;
   if (bootFromCD) {
     cy.get(cView.bootFromCD).check();
     switch (cdSource.name) {
@@ -91,6 +92,16 @@ export const fillReviewAndCreate = (vmData: VirtualMachineData) => {
     cy.get(cView.winDrivers).uncheck();
   }
   cy.get(cView.vmName).clear().type(name);
+  if (cpu) {
+    cy.get(cView.editCPU).click();
+    cy.get(cpuInput).clear().type(cpu);
+    cy.clickSaveBtn();
+  }
+  if (mem) {
+    cy.get(cView.editCPU).click();
+    cy.get(memInput).clear().type(cpu);
+    cy.clickSaveBtn();
+  }
 };
 
 export const fillOverview = (vmData: VirtualMachineData) => {

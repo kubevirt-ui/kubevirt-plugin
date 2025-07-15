@@ -101,6 +101,8 @@ export const fillDesc = 'textarea[aria-label="description text area"]';
 export const cpuMem = '[data-test-id="virtual-machine-overview-details-cpu-memory"]';
 export const cpuField = '.input-cpu';
 export const memField = '.input-memory';
+export const cpuInput = 'input[name="cpu-input"]';
+export const memInput = 'input[name="memory-input"]';
 export const workload = (name: string) => `button[data-test-id="${name}-workload-profile"]`;
 export const hostname = (name: string) => `button[data-test-id="${name}-hostname"]`;
 export const hostnameInput = 'input[id="hostname"]';
