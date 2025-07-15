@@ -50,7 +50,7 @@ const SerialConsole: FC<SerialConsoleConnectorProps> = ({ basePath, setState }) 
         window.location.port || (isConnectionEncrypted() ? SECURE : INSECURE)
       }`,
       jsonParse: false,
-      path: `/${basePath}/console`,
+      path: `${basePath}/console`,
       reconnect: false,
       subprotocols: ['plain.kubevirt.io'],
     };

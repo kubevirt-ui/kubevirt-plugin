@@ -61,7 +61,7 @@ export const VncConsole: FC<VncConsoleProps> = ({
     const isEncrypted = isConnectionEncrypted();
     const path = `${basePath}/vnc`;
     const port = window.location.port || (isEncrypted ? SECURE : INSECURE);
-    const url = `${isEncrypted ? WSS : WS}://${window.location.hostname}:${port}/${path}`;
+    const url = `${isEncrypted ? WSS : WS}://${window.location.hostname}:${port}${path}`;
     const rfbInst = new RFBCreate(staticRenderLocationRef.current, url);
     rfbInst.addEventListener(
       'connect',
