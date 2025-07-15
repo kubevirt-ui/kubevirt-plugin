@@ -21,7 +21,7 @@ const CloudInitCredentialsContent: FC<CloudInitCredentialsContentProps> = ({ vm 
   const { t } = useKubevirtTranslation();
   const { users } = getCloudInitCredentials(vm);
 
-  if (isEmpty(users)) {
+  if (!Array.isArray(users) || isEmpty(users)) {
     return (
       <div className="pf-v6-u-ml-md">
         {t('No credentials, see operating system documentation for the default username.')}
