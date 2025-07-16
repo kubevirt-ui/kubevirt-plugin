@@ -6,6 +6,7 @@ import {
   StandaloneRoutePage,
 } from '@openshift-console/dynamic-plugin-sdk';
 import type { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plugin-sdk-webpack';
+import { ResourceRoute } from '@stolostron/multicluster-sdk';
 
 import { ACMVirtualMachineActionExtension } from './hooks/useACMExtensionActions/constants';
 import { CROSS_CLUSTER_MIGRATION_ACTION_ID } from './constants';
@@ -16,6 +17,7 @@ export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
   CrossClusterMigration:
     './multicluster/components/CrossClusterMigration/CrossClusterMigration.tsx',
   Navigator: './views/virtualmachines/navigator/VirtualMachineNavigator.tsx',
+  urls: './multicluster/urls.ts',
   VirtualMachineSearchResults: './views/virtualmachines/search/VirtualMachineSearchResults.tsx',
 };
 
@@ -142,4 +144,24 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
+  {
+    properties: {
+      handler: { $codeRef: 'urls.getFleetResourceRoute' },
+      model: {
+        group: 'kubevirt.io',
+        kind: 'VirtualMachine',
+      },
+    },
+    type: 'acm.resource/route',
+  } as EncodedExtension<ResourceRoute>,
+  {
+    properties: {
+      handler: { $codeRef: 'urls.getFleetResourceRoute' },
+      model: {
+        group: 'kubevirt.io',
+        kind: 'VirtualMachineInstance',
+      },
+    },
+    type: 'acm.resource/route',
+  } as EncodedExtension<ResourceRoute>,
 ];

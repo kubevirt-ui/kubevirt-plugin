@@ -1,5 +1,6 @@
 import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
+import { ResourceRouteHandler } from '@stolostron/multicluster-sdk';
 
 import { VirtualMachineModel } from '../views/dashboard-extensions/utils';
 
@@ -51,3 +52,19 @@ export const getVMListNamespacesURL = (cluster: string, namespace: string): stri
         activeNamespace: namespace,
         model: VirtualMachineModel,
       });
+
+export const getFleetResourceRoute: ResourceRouteHandler = ({
+  cluster,
+  model,
+  name,
+  namespace,
+}) => {
+  const { group, kind, version } = model;
+  switch (kind) {
+    case 'VirtualMachine':
+    case 'VirtualMachineInstance':
+      return `/k8s/cluster/${cluster}/ns/${namespace}/${group}~${version}~VirtualMachine/${name}`;
+    default:
+      return null;
+  }
+};
