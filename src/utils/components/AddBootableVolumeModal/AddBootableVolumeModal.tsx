@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useState } from 'react';
+import React, { FC, useCallback, useMemo, useState } from 'react';
 
 import { InstanceTypeVMStoreActions } from '@catalog/CreateFromInstanceTypes/state/utils/types';
 import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
@@ -66,6 +66,22 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
     [],
   );
 
+  const isRegistryFormValid = useMemo(() => {
+    if (sourceType !== DROPDOWN_FORM_SELECTION.USE_REGISTRY) return true;
+
+    const { registryCredentials, registryURL } = bootableVolume;
+    const { password, username } = registryCredentials || {};
+
+    const credentialsValid = (username && password) || (!username && !password);
+
+    return !!(registryURL && credentialsValid);
+  }, [sourceType, bootableVolume.registryURL, bootableVolume.registryCredentials]);
+
+  const isFormValid = useMemo(() => {
+    const hasRequiredPreference = !!labels?.[DEFAULT_PREFERENCE_LABEL];
+    return hasRequiredPreference && isRegistryFormValid;
+  }, [labels, isRegistryFormValid]);
+
   const deleteLabel = (labelKey: string) => {
     setBootableVolume((prev) => {
       const updatedLabels = { ...prev?.labels };
@@ -92,7 +108,7 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
         uploadData,
       })}
       headerText={t('Add volume')}
-      isDisabled={!labels?.[DEFAULT_PREFERENCE_LABEL]}
+      isDisabled={!isFormValid}
       isOpen={isOpen}
       obj={emptyDataSource}
       submitBtnText={t('Save')}
