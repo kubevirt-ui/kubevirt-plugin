@@ -1,48 +1,63 @@
 import { SECOND, VM_ACTION, VM_STATUS } from '../../../utils/const/index';
-import { VM_IT_CUST, VM_IT_QUICK, VM_TMPL_CUST, VM_TMPL_QUICK } from '../../../utils/const/testVM';
-import { getRow, MIGRATE_MENU, MIGRATE_STORAGE } from '../../../views/actions';
+import { VM_IT_CUST, VM_TMPL_CUST } from '../../../utils/const/testVM';
+import { BULK_MIGRATE, getRow } from '../../../views/actions';
 import { storageclassMigrate } from '../../../views/migrate-modal';
 import * as nav from '../../../views/selector';
 import { selectAllDropdownOption, selectDropdownToggle } from '../../../views/selector-common';
 import { tab } from '../../../views/tab';
 import { waitForStatus } from '../../../views/vm-flow';
 
-const destSC = 'hostpath-csi-basic';
+const DESTINATION_STORAGE_CLASS = 'hostpath-csi-basic';
+const VM_NAMES = [VM_IT_CUST.name, VM_TMPL_CUST.name];
+const WAIT_TIME = 30 * SECOND;
 
 describe('Test bulk actions', () => {
   before(() => {
-    cy.login();
-    cy.visit('');
-    cy.visitVMs();
+    cy.startVM(VM_NAMES);
+    cy.beforeSpec();
+    cy.visitVMsVirt();
+  });
+
+  after(() => {
+    cy.stopVM(VM_NAMES);
   });
 
   it('stop all VMs by selection', () => {
+    // Select and stop all VMs
+    cy.get(`[data-test-id=${VM_IT_CUST.name}]`).should('be.visible');
     cy.get(selectDropdownToggle).click();
     cy.get(selectAllDropdownOption).click();
+
     cy.byButtonText('Actions').click();
     cy.byButtonText(VM_ACTION.Stop).click();
-    cy.wait(30 * SECOND);
+
+    // Verify VMs are stopped
+    cy.wait(WAIT_TIME);
     cy.clickVirtLink(nav.catalogNav);
-    cy.wait(30 * SECOND);
+    cy.wait(WAIT_TIME);
     cy.clickVirtLink(nav.vmNav);
-    waitForStatus(VM_TMPL_QUICK.name, VM_STATUS.Stopped);
-    waitForStatus(VM_TMPL_CUST.name, VM_STATUS.Stopped);
-    waitForStatus(VM_IT_QUICK.name, VM_STATUS.Stopped);
-    waitForStatus(VM_IT_CUST.name, VM_STATUS.Stopped);
+
+    VM_NAMES.forEach((vmName) => waitForStatus(vmName, VM_STATUS.Stopped));
   });
 
   it('bulk storageclass migration', () => {
-    getRow(VM_TMPL_QUICK.name, () => cy.get('input[type="checkbox"]').check({ force: true }));
-    getRow(VM_IT_QUICK.name, () => cy.get('input[type="checkbox"]').check({ force: true }));
+    // Select VMs for migration
+    VM_NAMES.forEach((vmName) => {
+      getRow(vmName, () => cy.get('input[type="checkbox"]').check({ force: true }));
+    });
+
+    // Perform migration
     cy.byButtonText('Actions').click();
-    cy.byButtonText(MIGRATE_MENU).click();
-    cy.get(MIGRATE_STORAGE).click();
-    storageclassMigrate(destSC);
+    cy.get(BULK_MIGRATE).click();
+    storageclassMigrate(DESTINATION_STORAGE_CLASS);
   });
 
   it('ID(CNV-11626) verify the storageclass of the disks', () => {
-    cy.byLegacyTestID(VM_IT_QUICK.name).click();
+    cy.byLegacyTestID(VM_IT_CUST.name).click();
     tab.navigateToConfigurationStorage();
-    getRow('rootdisk', () => cy.contains(destSC, { timeout: 60000 }).should('exist'));
+
+    getRow('rootdisk', () => {
+      cy.contains(DESTINATION_STORAGE_CLASS, { timeout: 60000 }).should('exist');
+    });
   });
 });
