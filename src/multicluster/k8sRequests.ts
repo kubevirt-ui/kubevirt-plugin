@@ -7,16 +7,15 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import {
   fleetK8sCreate,
+  FleetK8sCreateUpdateOptions,
   fleetK8sDelete,
+  FleetK8sDeleteOptions,
   fleetK8sGet,
+  FleetK8sGetOptions,
   fleetK8sPatch,
+  FleetK8sPatchOptions,
   fleetK8sUpdate,
   getFleetK8sAPIPath,
-  OptionsCreate,
-  OptionsDelete,
-  OptionsGet,
-  OptionsPatch,
-  OptionsUpdate,
 } from '@stolostron/multicluster-sdk';
 
 import { BASE_K8S_API_PATH } from './constants';
@@ -28,7 +27,7 @@ export const getKubevirtBaseAPIPath = async (cluster?: string) => {
 };
 
 export const kubevirtK8sPatch = async <R extends K8sResourceCommon>(
-  options: OptionsPatch<R>,
+  options: FleetK8sPatchOptions<R>,
 ): Promise<R> => {
   if (options?.cluster) {
     const object = await fleetK8sPatch(options);
@@ -41,7 +40,7 @@ export const kubevirtK8sPatch = async <R extends K8sResourceCommon>(
 };
 
 export const kubevirtK8sUpdate = async <R extends K8sResourceCommon>(
-  options: OptionsUpdate<R>,
+  options: FleetK8sCreateUpdateOptions<R>,
 ): Promise<R> => {
   if (options?.cluster || options?.data?.cluster) {
     const object = await fleetK8sUpdate(options);
@@ -54,7 +53,7 @@ export const kubevirtK8sUpdate = async <R extends K8sResourceCommon>(
 };
 
 export const kubevirtK8sGet = async <R extends K8sResourceCommon>(
-  options: OptionsGet,
+  options: FleetK8sGetOptions,
 ): Promise<R> => {
   if (options?.cluster) {
     const object = await fleetK8sGet<R>(options);
@@ -69,7 +68,7 @@ export const kubevirtK8sGet = async <R extends K8sResourceCommon>(
 };
 
 export const kubevirtK8sDelete = async <R extends K8sResourceCommon>(
-  options: OptionsDelete<R>,
+  options: FleetK8sDeleteOptions<R>,
 ): Promise<R> => {
   if (options?.cluster || options?.resource?.cluster) {
     const object = await fleetK8sDelete(options);
@@ -82,7 +81,7 @@ export const kubevirtK8sDelete = async <R extends K8sResourceCommon>(
 };
 
 export const kubevirtK8sCreate = async <R extends K8sResourceCommon>(
-  options: OptionsCreate<R>,
+  options: FleetK8sCreateUpdateOptions<R>,
 ): Promise<R> => {
   if (options?.cluster || options?.data?.cluster) {
     const object = await fleetK8sCreate(options);
