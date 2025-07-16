@@ -18,8 +18,8 @@ const tour = '[data-test="tour-step-footer-secondary"]';
 Cypress.Commands.add('login', (provider: string, username: string, password: string) => {
   // Check if auth is disabled (for a local development environment).
   cy.visit(''); // visits baseUrl which is set in plugins.js
-  cy.window().then((win: any) => {
-    if (win.SERVER_FLAGS?.authDisabled) {
+  cy.window().then((win) => {
+    if (win.SERVER_FLAGS.authDisabled) {
       cy.task('log', '  skipping login, console is running with auth disabled');
       return;
     }
@@ -50,8 +50,8 @@ Cypress.Commands.add('login', (provider: string, username: string, password: str
 
 Cypress.Commands.add('logout', () => {
   // Check if auth is disabled (for a local development environment).
-  cy.window().then((win: any) => {
-    if (win.SERVER_FLAGS?.authDisabled) {
+  cy.window().then((win) => {
+    if (win.SERVER_FLAGS.authDisabled) {
       cy.task('log', '  skipping logout, console is running with auth disabled');
       return;
     }
