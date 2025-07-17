@@ -41,6 +41,7 @@ export type AddBootableVolumeState = {
   labels?: { [key: string]: string };
   pvcName: string;
   pvcNamespace: string;
+  registryCredentials?: { password: string; username: string };
   registryURL?: string;
   retainRevisions?: number;
   size?: string;
@@ -57,7 +58,7 @@ export type AddBootableVolumeState = {
 export type SetBootableVolumeFieldType = (
   key: keyof AddBootableVolumeState,
   fieldKey?: string,
-) => (value: boolean | number | string) => void;
+) => (value: { password: string; username: string } | boolean | File | number | string) => void;
 
 export const initialBootableVolumeState: AddBootableVolumeState = {
   annotations: {},
@@ -68,6 +69,7 @@ export const initialBootableVolumeState: AddBootableVolumeState = {
   labels: {},
   pvcName: null,
   pvcNamespace: null,
+  registryCredentials: { password: '', username: '' },
   registryURL: null,
   retainRevisions: 3,
   size: DEFAULT_DISK_SIZE,

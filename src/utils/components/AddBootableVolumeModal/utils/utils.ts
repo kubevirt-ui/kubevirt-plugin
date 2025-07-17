@@ -12,6 +12,7 @@ import { V1beta1DataVolumeSource } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { KUBEVIRT_ISO_LABEL } from '@kubevirt-utils/resources/bootableresources/constants';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
+import { createUserPasswordSecret } from '@kubevirt-utils/resources/secret/utils';
 import { buildOwnerReference, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { DATA_SOURCE_CRONJOB_LABEL } from '@kubevirt-utils/resources/template';
 import { appendDockerPrefix, getRandomChars } from '@kubevirt-utils/utils/utils';
@@ -230,11 +231,27 @@ export const createDataSourceWithImportCron: CreateDataSourceWithImportCronType 
   const {
     bootableVolumeName,
     cronExpression,
+    registryCredentials,
     registryURL,
     retainRevisions,
     size,
     storageClassName,
   } = bootableVolume;
+
+  const { password, username } = registryCredentials || {};
+  const addRegistrySecret = !!(username && password);
+  const imageSecretName = addRegistrySecret
+    ? `${bootableVolumeName}-registry-secret-${getRandomChars()}`
+    : null;
+
+  if (addRegistrySecret) {
+    await createUserPasswordSecret({
+      namespace: getNamespace(initialDataSource),
+      password,
+      secretName: imageSecretName,
+      username,
+    });
+  }
 
   const dataImportCronName = `${bootableVolumeName}-import-cron-${getRandomChars()}`;
   const dataImportCron = produce(initialDataImportCron, (draft) => {
@@ -250,6 +267,7 @@ export const createDataSourceWithImportCron: CreateDataSourceWithImportCronType 
           source: {
             registry: {
               url: appendDockerPrefix(registryURL),
+              ...(addRegistrySecret && { secretRef: imageSecretName }),
             },
           },
           storage: {
