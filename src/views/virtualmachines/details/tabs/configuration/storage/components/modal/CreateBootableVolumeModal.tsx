@@ -27,7 +27,8 @@ import { getInstanceTypeMatcher, getPreferenceMatcher } from '@kubevirt-utils/re
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { hasSizeUnit } from '@kubevirt-utils/resources/vm/utils/disk/size';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { Form, PopoverPosition, Stack, Title } from '@patternfly/react-core';
 
 import { createBootableVolumeFromDisk } from './utils';
@@ -48,7 +49,8 @@ const CreateBootableVolumeModal: FC<CreateBootableVolumeModalProps> = ({
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
 
-  const [pvc, pvcLoaded] = useK8sWatchResource<IoK8sApiCoreV1PersistentVolumeClaim>({
+  const [pvc, pvcLoaded] = useK8sWatchData<IoK8sApiCoreV1PersistentVolumeClaim>({
+    cluster: getCluster(vm),
     groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
     name: diskObj.source,
     namespace: diskObj?.namespace,
@@ -56,6 +58,7 @@ const CreateBootableVolumeModal: FC<CreateBootableVolumeModalProps> = ({
 
   const [bootableVolume, setBootableVolume] = useState<AddBootableVolumeState>({
     ...initialBootableVolumeState,
+    bootableVolumeCluster: getCluster(vm),
     bootableVolumeName: `${getName(vm)}-${diskObj.name}`,
     bootableVolumeNamespace: getNamespace(vm),
     labels: {

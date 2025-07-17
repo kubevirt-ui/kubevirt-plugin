@@ -7,11 +7,9 @@ import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevir
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
-import {
-  K8sVerb,
-  useAccessReview,
-  useK8sWatchResource,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
+import { K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { Grid, GridItem, Title } from '@patternfly/react-core';
 
 import SchedulingSectionLeftGrid from './SchedulingSectionLeftGrid';
@@ -26,7 +24,8 @@ type SchedulingSectionProps = {
 
 const SchedulingSection: FC<SchedulingSectionProps> = ({ instanceTypeVM, onSubmit, vm, vmi }) => {
   const { t } = useKubevirtTranslation();
-  const [nodes, nodesLoaded] = useK8sWatchResource<IoK8sApiCoreV1Node[]>({
+  const [nodes, nodesLoaded] = useK8sWatchData<IoK8sApiCoreV1Node[]>({
+    cluster: getCluster(vm),
     groupVersionKind: modelToGroupVersionKind(NodeModel),
     isList: true,
   });

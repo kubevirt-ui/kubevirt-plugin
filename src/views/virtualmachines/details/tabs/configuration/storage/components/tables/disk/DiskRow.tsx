@@ -8,7 +8,9 @@ import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { NameWithPercentages } from '@kubevirt-utils/resources/vm/hooks/types';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
-import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
+import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Label,
   Popover,
@@ -98,10 +100,11 @@ const DiskRow: FC<
 
       <TableData activeColumnIDs={activeColumnIDs} id="source">
         {sourcesLoaded && (hasPVC || hasDataVolume) && (
-          <ResourceLink
+          <MulticlusterResourceLink
             groupVersionKind={modelToGroupVersionKind(
               hasDataVolume ? DataVolumeModel : PersistentVolumeClaimModel,
             )}
+            cluster={getCluster(vm)}
             name={source}
             namespace={namespace || getNamespace(vm)}
           />

@@ -8,7 +8,8 @@ import { VirtualMachineModelGroupVersionKind } from '@kubevirt-utils/models';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { convertToBaseValue, humanizeBinaryBytes } from '@kubevirt-utils/utils/humanize.js';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
+import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
+import { getCluster } from '@multicluster/helpers/selectors';
 import {
   Alert,
   AlertVariant,
@@ -64,7 +65,8 @@ const VirtualMachineMigrationDetails: FC<VirtualMachineMigrationDetailsProps> = 
             <Trans t={t}>
               <Content>
                 Select the storage to migrate for{' '}
-                <ResourceLink
+                <MulticlusterResourceLink
+                  cluster={getCluster(vms?.[0])}
                   groupVersionKind={VirtualMachineModelGroupVersionKind}
                   inline
                   name={getName(vms?.[0])}

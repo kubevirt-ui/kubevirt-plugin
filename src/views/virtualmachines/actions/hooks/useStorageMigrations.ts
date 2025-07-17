@@ -8,17 +8,20 @@ import {
   MigPlanModel,
 } from '@kubevirt-utils/resources/migrations/constants';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 import useIsMTCInstalled from './useIsMTCInstalled';
 import { getVMMigPlans, sortMigPlansByCreationTimestamp } from './utils';
 
 const useCurrentStorageMigration = (vm: V1VirtualMachine): [MigMigration, boolean] => {
   const mtcInstalled = useIsMTCInstalled();
+  const cluster = getCluster(vm);
 
-  const [migPlans, migPlansLoaded] = useK8sWatchResource<MigPlan[]>(
+  const [migPlans, migPlansLoaded] = useK8sWatchData<MigPlan[]>(
     mtcInstalled
       ? {
+          cluster,
           groupVersionKind: modelToGroupVersionKind(MigPlanModel),
           isList: true,
           namespace: DEFAULT_MIGRATION_NAMESPACE,
@@ -26,9 +29,10 @@ const useCurrentStorageMigration = (vm: V1VirtualMachine): [MigMigration, boolea
       : null,
   );
 
-  const [migMigrations, migMigrationsLoaded] = useK8sWatchResource<MigMigration[]>(
+  const [migMigrations, migMigrationsLoaded] = useK8sWatchData<MigMigration[]>(
     mtcInstalled
       ? {
+          cluster,
           groupVersionKind: modelToGroupVersionKind(MigMigrationModel),
           isList: true,
           namespace: DEFAULT_MIGRATION_NAMESPACE,

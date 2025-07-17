@@ -6,7 +6,9 @@ import {
   V1beta1VirtualMachineSnapshot,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
-import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
+import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 
 import { snapshotStatuses } from '../../utils/consts';
 import IndicationLabelList from '../IndicationLabel/IndicationLabelList';
@@ -26,7 +28,8 @@ const SnapshotRow: React.FC<
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} id="name">
-        <ResourceLink
+        <MulticlusterResourceLink
+          cluster={getCluster(snapshot)}
           groupVersionKind={VirtualMachineSnapshotModelGroupVersionKind}
           name={snapshot?.metadata?.name}
           namespace={snapshot?.metadata?.namespace}

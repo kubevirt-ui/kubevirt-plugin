@@ -11,7 +11,8 @@ import {
 } from '@kubevirt-utils/resources/instancetype/selectors';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getInstanceTypeMatcher, getPreferenceMatcher } from '@kubevirt-utils/resources/vm';
-import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
+import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
+import { getCluster } from '@multicluster/helpers/selectors';
 
 type InstanceTypeDescriptionProps = {
   vm: V1VirtualMachine;
@@ -32,7 +33,8 @@ const InstanceTypeDescription: FC<InstanceTypeDescriptionProps> = ({ vm }) => {
         )}
         descriptionData={
           itMatcher ? (
-            <ResourceLink
+            <MulticlusterResourceLink
+              cluster={getCluster(vm)}
               displayName={itMatcher.name}
               groupVersionKind={ControllerRevisionModelGroupVersionKind}
               name={getInstanceTypeRevisionName(vm)}
@@ -52,7 +54,8 @@ const InstanceTypeDescription: FC<InstanceTypeDescriptionProps> = ({ vm }) => {
         )}
         descriptionData={
           preferenceMatcher ? (
-            <ResourceLink
+            <MulticlusterResourceLink
+              cluster={getCluster(vm)}
               displayName={preferenceMatcher.name}
               groupVersionKind={ControllerRevisionModelGroupVersionKind}
               name={getPreferenceRevisionName(vm)}

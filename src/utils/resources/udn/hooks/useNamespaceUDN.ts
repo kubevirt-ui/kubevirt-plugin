@@ -3,19 +3,21 @@ import { useMemo } from 'react';
 import { NetworkAttachmentDefinitionModelGroupVersionKind } from '@kubevirt-utils/models';
 import { UserDefinedNetworkRole } from '@kubevirt-utils/resources/udn/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { NetworkAttachmentDefinitionKind } from '@overview/OverviewTab/inventory-card/utils/types';
 
 import { LAYER3_TOPOLOGY, PrimaryTopologies } from '../constants';
 
 const useNamespaceUDN = (
   namespace: string,
+  cluster?: string,
 ): [
   isNamespaceManagedByUDN: boolean,
   vmsNotSupported: boolean,
   nad?: NetworkAttachmentDefinitionKind,
 ] => {
-  const [nads] = useK8sWatchResource<NetworkAttachmentDefinitionKind[]>({
+  const [nads] = useK8sWatchData<NetworkAttachmentDefinitionKind[]>({
+    cluster,
     groupVersionKind: NetworkAttachmentDefinitionModelGroupVersionKind,
     isList: true,
     namespace,

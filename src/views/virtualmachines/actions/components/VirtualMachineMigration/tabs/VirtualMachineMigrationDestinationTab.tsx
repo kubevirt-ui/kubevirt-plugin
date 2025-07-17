@@ -4,7 +4,8 @@ import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFi
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, StorageClassModel } from '@kubevirt-utils/models';
 import { POPPER_CONTAINER_ID } from '@kubevirt-utils/utils/constants';
-import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
+import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { Content, ContentVariants, Label, Stack, StackItem, Title } from '@patternfly/react-core';
 
 type VirtualMachineMigrationDestinationTabProps = {
@@ -24,6 +25,7 @@ const VirtualMachineMigrationDestinationTab: FC<VirtualMachineMigrationDestinati
   sortedStorageClasses,
   vmStorageClassNames,
 }) => {
+  const cluster = useClusterParam();
   const { t } = useKubevirtTranslation();
 
   return (
@@ -39,7 +41,8 @@ const VirtualMachineMigrationDestinationTab: FC<VirtualMachineMigrationDestinati
           options={sortedStorageClasses?.map((storageClass) => ({
             children: (
               <>
-                <ResourceLink
+                <MulticlusterResourceLink
+                  cluster={cluster}
                   groupVersionKind={StorageClassModelGroupVersionKind}
                   inline
                   linkTo={false}

@@ -9,7 +9,8 @@ import { dateTimeFormatter } from '@kubevirt-utils/components/Timestamp/utils/da
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import useVirtualMachineInstanceMigration from '@kubevirt-utils/resources/vmi/hooks/useVirtualMachineInstanceMigration';
-import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
+import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { Popover, PopoverPosition, Stack, StackItem } from '@patternfly/react-core';
 
 import { getMigrationPhaseIcon } from './utils';
@@ -66,7 +67,8 @@ const MigrationProgressPopover: React.FC<MigrationProgressPopoverProps> = ({ chi
           <StackItem>
             <b>{t('Policy')}</b>{' '}
             {vmi?.status?.migrationState?.migrationPolicyName ? (
-              <ResourceLink
+              <MulticlusterResourceLink
+                cluster={getCluster(vmi)}
                 groupVersionKind={MigrationPolicyModelGroupVersionKind}
                 name={vmi.status.migrationState.migrationPolicyName}
               />

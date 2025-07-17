@@ -19,7 +19,9 @@ import {
 } from '@kubevirt-utils/resources/migrations/constants';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { k8sDelete, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
+import { k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
   AlertVariant,
@@ -55,26 +57,29 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
   const { t } = useKubevirtTranslation();
 
   const migrationNamespace = getNamespace(vms?.[0]);
+  const cluster = getCluster(vms?.[0]);
   const [selectedStorageClass, setSelectedStorageClass] = useState('');
 
   const [currentMigPlanCreation, migPlanCreationLoaded, migPlanCreationError] =
-    useCreateEmptyMigPlan(migrationNamespace);
+    useCreateEmptyMigPlan(migrationNamespace, cluster);
 
   const [existingMigPlan, migrationPlansLoaded] = useExistingMigrationPlan(
     currentMigPlanCreation,
     migrationNamespace,
+    cluster,
   );
 
   const [selectedPVCs, setSelectedPVCs] = useState<IoK8sApiCoreV1PersistentVolumeClaim[] | null>(
     null,
   );
 
-  const [namespacePVCs, loaded, loadingError] = useK8sWatchResource<
+  const [namespacePVCs, loaded, loadingError] = useK8sWatchData<
     IoK8sApiCoreV1PersistentVolumeClaim[]
   >({
+    cluster,
     groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
     isList: true,
-    namespace: getNamespace(vms[0]),
+    namespace: migrationNamespace,
   });
 
   const vmsPVCs = useMemo(
@@ -82,7 +87,8 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
     [vms, namespacePVCs],
   );
 
-  const [{ clusterDefaultStorageClass, sortedStorageClasses }, scLoaded] = useDefaultStorageClass();
+  const [{ clusterDefaultStorageClass, sortedStorageClasses }, scLoaded] =
+    useDefaultStorageClass(cluster);
 
   const pvcsToMigrate = useMemo(
     () => (entireVMSelected(selectedPVCs) ? vmsPVCs : selectedPVCs),
