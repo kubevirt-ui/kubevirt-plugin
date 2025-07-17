@@ -118,6 +118,10 @@ export const vm = {
     if (vmData.userTemplate) {
       cy.get(cView.uTemplate).click();
     }
+    if (vmData.allTemplate) {
+      cy.get(cView.aTemplate).click();
+    }
+    cy.get(cView.searchCatalog).type(vmData.template.metadataName);
     cy.get(`div[data-test-id="${vmData.template.metadataName}"]`).click();
     catalog.fillReviewAndCreate(vmData);
     cy.get(cView.customizeVMBtn).click();
