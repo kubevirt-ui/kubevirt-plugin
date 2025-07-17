@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+
 import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import useIsACMPage from '@multicluster/useIsACMPage';
@@ -17,14 +19,15 @@ const useACMExtensionActions = (vm): ActionDropdownItemType[] => {
   const [virtualMachineActionExtensions, virtualMachineActionExtensionsResolved] =
     useResolvedExtensions<ACMVirtualMachineActionExtension>(isACMVirtualMachineActionExtension);
 
-  if (!isACMPage) return [];
-
-  return buildACMVirtualMachineActionsFromExtensions(
-    vm,
-    virtualMachineActionExtensionsResolved ? virtualMachineActionExtensions : [],
-    createModal,
-    hubClusterName,
-  );
+  return useMemo(() => {
+    if (!isACMPage) return [];
+    return buildACMVirtualMachineActionsFromExtensions(
+      vm,
+      virtualMachineActionExtensionsResolved ? virtualMachineActionExtensions : [],
+      createModal,
+      hubClusterName,
+    );
+  }, [vm, virtualMachineActionExtensionsResolved, createModal, hubClusterName]);
 };
 
 export default useACMExtensionActions;

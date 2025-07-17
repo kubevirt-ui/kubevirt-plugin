@@ -42,6 +42,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
 
   const actions: ActionDropdownItemType[] = useMemo(() => {
     const printableStatus = vm?.status?.printableStatus;
+
     const { Migrating, Paused } = printableVMStatus;
 
     const currentMigrationExist =
