@@ -9,7 +9,7 @@ import {
   getDataVolumeSize,
   getDataVolumeStorageClassName,
   getPhase,
-  getPVCStorageCapacity,
+  getPVCSize,
   getPVCStorageClassName,
 } from '@kubevirt-utils/resources/bootableresources/selectors';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
@@ -52,9 +52,10 @@ export const getDiskRowDataLayout = (
       storageClass: dataVolumeTemplate?.spec?.storage?.storageClassName || NO_DATA_DASH,
     };
 
-    const dataSourceSize = getPVCStorageCapacity(pvc) || getDataVolumeSize(dataVolume);
+    const dataSourceSize = getPVCSize(pvc) || getDataVolumeSize(dataVolume);
     const dataVolumeCustomSize = dataVolumeTemplate?.spec?.storage?.resources?.requests?.storage;
-    const size = getHumanizedSize(dataSourceSize || dataVolumeCustomSize);
+
+    const size = getHumanizedSize(dataVolumeCustomSize || dataSourceSize);
 
     diskRowDataObject.size = size.value === 0 ? NO_DATA_DASH : size.string;
 
