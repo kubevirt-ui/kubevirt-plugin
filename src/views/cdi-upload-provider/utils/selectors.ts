@@ -16,7 +16,7 @@ import {
 } from '@kubevirt-utils/resources/template';
 import { TEMPLATE_VERSION_LABEL } from '@kubevirt-utils/resources/template';
 import { getDataVolumeTemplates } from '@kubevirt-utils/resources/vm';
-import { multipliers } from '@kubevirt-utils/utils/units';
+import { multipliers } from '@kubevirt-utils/utils/unitConstants';
 import {
   getAPIVersionForModel,
   K8sModel,

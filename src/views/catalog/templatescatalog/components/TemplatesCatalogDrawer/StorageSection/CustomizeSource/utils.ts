@@ -1,16 +1,13 @@
-import xbytes from 'xbytes';
-
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import {
   V1beta1DataVolumeSource,
   V1beta1DataVolumeSpec,
   V1ContainerDiskSource,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { removeByteSuffix } from '@kubevirt-utils/components/CapacityInput/utils';
 import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/utils/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateContainerDisks } from '@kubevirt-utils/resources/template';
-import { hasSizeUnit } from '@kubevirt-utils/resources/vm/utils/disk/size';
+import { formatQuantityString } from '@kubevirt-utils/utils/units';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import {
@@ -24,14 +21,8 @@ import {
   UPLOAD_SOURCE_NAME,
 } from '../constants';
 
-export const getQuantityFromSource = (source: V1beta1DataVolumeSpec) => {
-  const storage = source?.storage?.resources?.requests?.storage;
-  const quantity = hasSizeUnit(storage)
-    ? storage
-    : xbytes(Number(storage), { iec: true, space: false });
-
-  return removeByteSuffix(quantity);
-};
+export const getQuantityFromSource = (source: V1beta1DataVolumeSpec) =>
+  formatQuantityString(source?.storage?.resources?.requests?.storage);
 
 export const getSourceTypeFromDiskSource = (
   diskSource: V1beta1DataVolumeSpec | V1ContainerDiskSource,
