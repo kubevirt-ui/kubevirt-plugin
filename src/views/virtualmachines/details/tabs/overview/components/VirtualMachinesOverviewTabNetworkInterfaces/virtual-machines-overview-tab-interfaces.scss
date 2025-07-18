@@ -16,3 +16,14 @@
     margin: var(--pf-t--global--spacer--2xl);
   }
 }
+
+.VirtualMachinesOverviewTabInterfaces--popover {
+  .pf-v6-c-clipboard-copy__text {
+    max-width: 10rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    vertical-align: bottom;
+  }
+}
