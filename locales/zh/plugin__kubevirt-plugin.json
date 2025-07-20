@@ -1473,7 +1473,6 @@
   "Up to date": "最新",
   "Update status": "更新状态",
   "Updated": "已更新",
-  "Updates to the sockets value are applied immediately.{<br/>}To apply changes to the cores or threads values, you must restart the VirtualMachine.": "Updates to the sockets value are applied immediately.{<br/>}To apply changes to the cores or threads values, you must restart the VirtualMachine.",
   "Upgrade": "升级",
   "Upgrade available": "有可用的升级",
   "Upgrading": "升级",

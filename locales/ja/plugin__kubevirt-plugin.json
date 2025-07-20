@@ -1473,7 +1473,6 @@
   "Up to date": "最新",
   "Update status": "更新ステータス",
   "Updated": "更新",
-  "Updates to the sockets value are applied immediately.{<br/>}To apply changes to the cores or threads values, you must restart the VirtualMachine.": "Updates to the sockets value are applied immediately.{<br/>}To apply changes to the cores or threads values, you must restart the VirtualMachine.",
   "Upgrade": "アップグレード",
   "Upgrade available": "利用可能なアップグレード",
   "Upgrading": "アップグレード",

@@ -1478,7 +1478,6 @@
   "Up to date": "Al día de hoy",
   "Update status": "Estado de actualización",
   "Updated": "Actualizado",
-  "Updates to the sockets value are applied immediately.{<br/>}To apply changes to the cores or threads values, you must restart the VirtualMachine.": "Updates to the sockets value are applied immediately.{<br/>}To apply changes to the cores or threads values, you must restart the VirtualMachine.",
   "Upgrade": "Mejorar",
   "Upgrade available": "Actualización disponible",
   "Upgrading": "Completando mejora",

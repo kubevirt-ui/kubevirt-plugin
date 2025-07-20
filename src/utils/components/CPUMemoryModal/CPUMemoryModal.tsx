@@ -1,5 +1,4 @@
 import React, { FC, useState } from 'react';
-import { Trans } from 'react-i18next';
 import produce from 'immer';
 
 import { V1CPU, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -102,16 +101,6 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
     >
       <ModalHeader title={t('Edit CPU | Memory')} />
       <ModalBody>
-        <Alert
-          title={
-            <Trans ns="plugin__kubevirt-plugin" t={t}>
-              Updates to the sockets value are applied immediately.{<br />}To apply changes to the
-              cores or threads values, you must restart the VirtualMachine.
-            </Trans>
-          }
-          isInline
-          variant={AlertVariant.info}
-        />
         <div className="inputs">
           <CPUInput currentCPU={getCPU(vm)} setUserEnteredCPU={setCPU} userEnteredCPU={cpu} />
           <MemoryInput
