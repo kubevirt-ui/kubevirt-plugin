@@ -1473,7 +1473,6 @@
   "Up to date": "Up to date",
   "Update status": "Update status",
   "Updated": "Updated",
-  "Updates to the sockets value are applied immediately.{<br/>}To apply changes to the cores or threads values, you must restart the VirtualMachine.": "Updates to the sockets value are applied immediately.{<br/>}To apply changes to the cores or threads values, you must restart the VirtualMachine.",
   "Upgrade": "Upgrade",
   "Upgrade available": "Upgrade available",
   "Upgrading": "Upgrading",

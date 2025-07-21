@@ -1473,7 +1473,6 @@
   "Up to date": "최신 정보",
   "Update status": "업데이트 상태",
   "Updated": "업데이트됨",
-  "Updates to the sockets value are applied immediately.{<br/>}To apply changes to the cores or threads values, you must restart the VirtualMachine.": "Updates to the sockets value are applied immediately.{<br/>}To apply changes to the cores or threads values, you must restart the VirtualMachine.",
   "Upgrade": "업그레이드",
   "Upgrade available": "업그레이드 가능",
   "Upgrading": "업그레이드",
