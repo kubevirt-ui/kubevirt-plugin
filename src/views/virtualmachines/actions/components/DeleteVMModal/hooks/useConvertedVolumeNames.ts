@@ -1,16 +1,20 @@
 import { CDIConfigModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1CDIConfig } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
-type UseConvertedVolumeNames = (vmVolumes: V1Volume[]) => {
+type UseConvertedVolumeNames = (
+  vmVolumes: V1Volume[],
+  cluster: string,
+) => {
   dvVolumesNames: string[];
   isDataVolumeGarbageCollector: boolean;
   pvcVolumesNames: string[];
 };
 
-const useConvertedVolumeNames: UseConvertedVolumeNames = (vmVolumes) => {
-  const [cdiConfig] = useK8sWatchResource<V1beta1CDIConfig>({
+const useConvertedVolumeNames: UseConvertedVolumeNames = (vmVolumes, cluster) => {
+  const [cdiConfig] = useK8sWatchData<V1beta1CDIConfig>({
+    cluster,
     groupVersionKind: CDIConfigModelGroupVersionKind,
     isList: false,
     namespaced: false,

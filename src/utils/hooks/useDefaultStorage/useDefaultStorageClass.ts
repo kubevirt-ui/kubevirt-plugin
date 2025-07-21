@@ -4,7 +4,7 @@ import { modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import { StorageClassModel } from '@kubevirt-utils/models';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 import { isEmpty } from '../../utils/utils';
 
@@ -13,7 +13,7 @@ import {
   DEFAULT_VIRT_STORAGE_CLASS_ANNOTATION,
 } from './constants';
 
-type UseDefaultStorageClass = () => [
+type UseDefaultStorageClass = (cluster?: string) => [
   {
     clusterDefaultStorageClass: IoK8sApiStorageV1StorageClass;
     sortedStorageClasses: string[];
@@ -23,8 +23,9 @@ type UseDefaultStorageClass = () => [
   boolean,
 ];
 
-const useDefaultStorageClass: UseDefaultStorageClass = () => {
-  const [storageClasses, loaded] = useK8sWatchResource<IoK8sApiStorageV1StorageClass[]>({
+const useDefaultStorageClass: UseDefaultStorageClass = (cluster) => {
+  const [storageClasses, loaded] = useK8sWatchData<IoK8sApiStorageV1StorageClass[]>({
+    cluster,
     groupVersionKind: modelToGroupVersionKind(StorageClassModel),
     isList: true,
   });

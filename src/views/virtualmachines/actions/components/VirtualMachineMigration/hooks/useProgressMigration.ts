@@ -2,7 +2,8 @@ import { useMemo } from 'react';
 
 import { modelToGroupVersionKind } from '@kubevirt-utils/models';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 import {
   DirectVolumeMigration,
@@ -23,9 +24,10 @@ type UseProgressMigration = (migMigration: MigMigration) => {
 };
 
 const useProgressMigration: UseProgressMigration = (migMigration) => {
-  const [watchMigMigration, _, migMigrationError] = useK8sWatchResource<MigMigration>(
+  const [watchMigMigration, _, migMigrationError] = useK8sWatchData<MigMigration>(
     migMigration
       ? {
+          cluster: getCluster(migMigration),
           groupVersionKind: modelToGroupVersionKind(MigMigrationModel),
           name: getName(migMigration),
           namespace: getNamespace(migMigration),
@@ -33,11 +35,10 @@ const useProgressMigration: UseProgressMigration = (migMigration) => {
       : null,
   );
 
-  const [directVolumeMigrations, __, directVolumeError] = useK8sWatchResource<
-    DirectVolumeMigration[]
-  >(
+  const [directVolumeMigrations, __, directVolumeError] = useK8sWatchData<DirectVolumeMigration[]>(
     migMigration
       ? {
+          cluster: getCluster(migMigration),
           groupVersionKind: modelToGroupVersionKind(DirectVolumeMigrationModel),
           isList: true,
           namespace: getNamespace(migMigration),

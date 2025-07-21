@@ -2,7 +2,8 @@ import { ServiceModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getServicesForVmi } from '@kubevirt-utils/resources/vmi';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 import { SSH_PORT } from './constants';
 
@@ -10,12 +11,13 @@ export type UseSSHServiceReturnType = [service: IoK8sApiCoreV1Service, loaded: b
 
 const useSSHService = (vm: V1VirtualMachine): UseSSHServiceReturnType => {
   const watchServiceResources = {
+    cluster: getCluster(vm),
     isList: true,
     kind: ServiceModel.kind,
     namespace: vm?.metadata?.namespace,
   };
 
-  const [services, servicesLoaded, servicesError] = useK8sWatchResource<IoK8sApiCoreV1Service[]>(
+  const [services, servicesLoaded, servicesError] = useK8sWatchData<IoK8sApiCoreV1Service[]>(
     vm && watchServiceResources,
   );
 

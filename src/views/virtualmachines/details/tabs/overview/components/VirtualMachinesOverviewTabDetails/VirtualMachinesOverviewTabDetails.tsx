@@ -14,11 +14,14 @@ import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constan
 import { TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { modelToGroupVersionKind } from '@kubevirt-utils/models';
 import { getLabel, getName, getVMStatus } from '@kubevirt-utils/resources/shared';
 import { getInstanceTypeMatcher } from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getOSNameFromGuestAgent } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
+import { ManagedClusterModel } from '@multicluster/constants';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { Timestamp } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -34,7 +37,6 @@ import {
   Split,
   SplitItem,
 } from '@patternfly/react-core';
-import { FleetResourceLink } from '@stolostron/multicluster-sdk';
 import { createURL } from '@virtualmachines/details/tabs/overview/utils/utils';
 import VMNotMigratableLabel from '@virtualmachines/list/components/VMNotMigratableLabel/VMNotMigratableLabel';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
@@ -126,12 +128,8 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
                 {cluster && (
                   <VirtualMachineDescriptionItem
                     descriptionData={
-                      <FleetResourceLink
-                        groupVersionKind={{
-                          group: 'cluster.open-cluster-management.io',
-                          kind: 'ManagedCluster',
-                          version: 'v1',
-                        }}
+                      <MulticlusterResourceLink
+                        groupVersionKind={modelToGroupVersionKind(ManagedClusterModel)}
                         name={cluster}
                         truncate
                       />

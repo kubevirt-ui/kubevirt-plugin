@@ -8,7 +8,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getLabel } from '@kubevirt-utils/resources/shared';
 import { LABEL_USED_TEMPLATE_NAMESPACE } from '@kubevirt-utils/resources/template';
 import { VM_TEMPLATE_ANNOTATION } from '@kubevirt-utils/resources/vm';
-import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
+import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
+import { getCluster } from '@multicluster/helpers/selectors';
 
 type TemplateDescriptionProps = {
   vm: V1VirtualMachine;
@@ -24,7 +25,8 @@ const TemplateDescription: FC<TemplateDescriptionProps> = ({ vm }) => {
     <VirtualMachineDescriptionItem
       descriptionData={
         templateName && templateNamespace ? (
-          <ResourceLink
+          <MulticlusterResourceLink
+            cluster={getCluster(vm)}
             groupVersionKind={modelToGroupVersionKind(TemplateModel)}
             name={templateName}
             namespace={templateNamespace}

@@ -18,7 +18,8 @@ import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { UpdateCustomizeInstanceType } from '@kubevirt-utils/store/customizeInstanceType';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 import { createSysprepConfigMap, patchVMWithExistingSysprepConfigMap } from '../utils/utils';
 
@@ -30,14 +31,16 @@ type InitialRunTabSysprepProps = {
 const InitialRunTabSysprep: FC<InitialRunTabSysprepProps> = ({ canUpdateVM, onSubmit, vm }) => {
   const { createModal } = useModal();
   const vmVolumes = getVolumes(vm);
+  const cluster = getCluster(vm);
 
   const currentSysprepVolume = vmVolumes?.find(getSysprepConfigMapName);
   const currentVMSysprepName = getSysprepConfigMapName(currentSysprepVolume);
 
   const sysprepSelected = !isEmpty(currentVMSysprepName) && currentVMSysprepName;
   const [externalSysprepConfig, sysprepLoaded, sysprepLoadError] =
-    useK8sWatchResource<IoK8sApiCoreV1ConfigMap>(
+    useK8sWatchData<IoK8sApiCoreV1ConfigMap>(
       sysprepSelected && {
+        cluster,
         groupVersionKind: modelToGroupVersionKind(ConfigMapModel),
         name: sysprepSelected,
         namespace: vm?.metadata?.namespace,

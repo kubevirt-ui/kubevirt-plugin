@@ -9,8 +9,9 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { modelToGroupVersionKind, NodeModel } from '@kubevirt-utils/models';
 import { getMemory } from '@kubevirt-utils/resources/vm';
 import { getVMIIPAddressesWithName } from '@kubevirt-utils/resources/vmi';
+import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { RowProps } from '@openshift-console/dynamic-plugin-sdk';
-import { FleetResourceLink } from '@stolostron/multicluster-sdk';
 import { PVCMapper } from '@virtualmachines/utils/mappers';
 
 import FirstItemListPopover from '../FirstItemListPopover/FirstItemListPopover';
@@ -36,8 +37,8 @@ const VirtualMachineRunningRow: FC<
       rowData={{
         ips: <FirstItemListPopover headerContent={t('IP addresses')} items={ipAddressess} />,
         node: (
-          <FleetResourceLink
-            cluster={obj.cluster}
+          <MulticlusterResourceLink
+            cluster={getCluster(obj)}
             groupVersionKind={modelToGroupVersionKind(NodeModel)}
             name={vmi?.status?.nodeName}
             truncate

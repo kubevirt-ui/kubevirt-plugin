@@ -5,13 +5,15 @@ import {
   MigPlanModel,
 } from '@kubevirt-utils/resources/migrations/constants';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 const useExistingMigrationPlan = (
   currentMigPlanCreation: MigPlan,
   namespace: string,
+  cluster?: string,
 ): [existingMigPlan: MigPlan[], loaded: boolean] => {
-  const [migrationPlans, loaded, loadError] = useK8sWatchResource<MigPlan[]>({
+  const [migrationPlans, loaded, loadError] = useK8sWatchData<MigPlan[]>({
+    cluster,
     groupVersionKind: modelToGroupVersionKind(MigPlanModel),
     isList: true,
     namespace: DEFAULT_MIGRATION_NAMESPACE,
