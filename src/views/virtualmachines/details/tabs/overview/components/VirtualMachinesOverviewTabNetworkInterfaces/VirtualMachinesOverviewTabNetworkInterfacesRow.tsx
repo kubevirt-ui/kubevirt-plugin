@@ -1,6 +1,9 @@
 import React, { FC } from 'react';
 import FirstItemListPopover from 'src/views/virtualmachines/list/components/FirstItemListPopover/FirstItemListPopover';
 
+import InlineCodeClipboardCopy from '@kubevirt-utils/components/Consoles/components/CloudInitCredentials/InlineCodeClipboardCopy';
+import useFQDN from '@kubevirt-utils/hooks/useFQDN/useFQDN';
+import useIsFQDNEnabled from '@kubevirt-utils/hooks/useFQDN/useIsFQDNEnabled';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getPrintableNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
@@ -32,6 +35,10 @@ const VirtualMachinesOverviewTabInterfacesRow: FC<
     [t('Network')]: obj?.network?.multus?.networkName || t('Pod networking'),
     [t('Type')]: getPrintableNetworkInterfaceType(obj?.iface),
   };
+
+  const fqdn = useFQDN(obj?.network?.name, obj?.vm);
+  const isFQDNEnabled = useIsFQDNEnabled();
+
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} id="name">
@@ -48,8 +55,17 @@ const VirtualMachinesOverviewTabInterfacesRow: FC<
                       </DescriptionListDescription>
                     </DescriptionListGroup>
                   ))}
+                  {isFQDNEnabled && fqdn && (
+                    <DescriptionListGroup>
+                      <DescriptionListTerm>{t('FQDN')}</DescriptionListTerm>
+                      <DescriptionListDescription>
+                        <InlineCodeClipboardCopy clipboardText={fqdn} />
+                      </DescriptionListDescription>
+                    </DescriptionListGroup>
+                  )}
                 </DescriptionList>
               }
+              className="VirtualMachinesOverviewTabInterfaces--popover"
               hasAutoWidth
               position={PopoverPosition.left}
             >

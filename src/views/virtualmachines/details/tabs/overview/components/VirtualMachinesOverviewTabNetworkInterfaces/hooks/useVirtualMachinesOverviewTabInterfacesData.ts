@@ -19,6 +19,7 @@ const useVirtualMachinesOverviewTabInterfacesData: UseVirtualMachinesOverviewTab
       ip,
     })),
     network: runtime?.network ?? config?.network,
+    vm,
   }));
 
 export default useVirtualMachinesOverviewTabInterfacesData;
