@@ -27,7 +27,14 @@ const useACMExtensionActions = (vm): ActionDropdownItemType[] => {
       createModal,
       hubClusterName,
     );
-  }, [vm, virtualMachineActionExtensionsResolved, createModal, hubClusterName]);
+  }, [
+    isACMPage,
+    vm,
+    virtualMachineActionExtensionsResolved,
+    virtualMachineActionExtensions,
+    createModal,
+    hubClusterName,
+  ]);
 };
 
 export default useACMExtensionActions;

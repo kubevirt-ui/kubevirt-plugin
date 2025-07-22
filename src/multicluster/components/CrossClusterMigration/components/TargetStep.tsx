@@ -6,7 +6,10 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getTargetCluster, getTargetNamespace } from '@kubevirt-utils/resources/plan/selectors';
+import {
+  getTargetNamespace,
+  getTargetProviderName,
+} from '@kubevirt-utils/resources/plan/selectors';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { Bullseye, Form, FormGroup, Split, SplitItem, Title } from '@patternfly/react-core';
@@ -29,7 +32,7 @@ const TargetStep: FC<TargetStepProps> = ({ migrationPlan, setMigrationPlan, vms 
   const sourceCluster = getCluster(vms?.[0]) ?? hubClusterName;
   const sourceNamespace = getNamespace(vms?.[0]);
 
-  const selectedClusterTarget = getTargetCluster(migrationPlan);
+  const selectedClusterTarget = getTargetProviderName(migrationPlan);
   const selectedProjectTarget = getTargetNamespace(migrationPlan);
 
   const {
