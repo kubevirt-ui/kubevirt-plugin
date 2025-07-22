@@ -2,9 +2,14 @@ import { EncodedExtension } from '@openshift/dynamic-plugin-sdk-webpack';
 import { FeatureFlag, RoutePage, StandaloneRoutePage } from '@openshift-console/dynamic-plugin-sdk';
 import type { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plugin-sdk-webpack';
 
+import { ACMVirtualMachineActionExtension } from './hooks/useACMExtensionActions/constants';
+import { CROSS_CLUSTER_MIGRATION_ACTION_ID } from './constants';
+
 export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
   acmFlags: './multicluster/flags.ts',
   ConsoleStandAlone: './utils/components/Consoles/ConsoleStandAlone.tsx',
+  CrossClusterMigration:
+    './multicluster/components/CrossClusterMigration/CrossClusterMigration.tsx',
   Navigator: './views/virtualmachines/navigator/VirtualMachineNavigator.tsx',
   VirtualMachineSearchResults: './views/virtualmachines/search/VirtualMachineSearchResults.tsx',
 };
@@ -52,4 +57,21 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.flag',
   } as EncodedExtension<FeatureFlag>,
+
+  {
+    properties: {
+      component: {
+        $codeRef: 'CrossClusterMigration.default',
+      },
+      id: CROSS_CLUSTER_MIGRATION_ACTION_ID,
+      model: [
+        {
+          apiVersion: 'kubevirt.io/v1',
+          kind: 'VirtualMachine',
+        },
+      ],
+      title: '%plugin__kubevirt-plugin~Cross cluster migration%',
+    },
+    type: 'acm.virtualmachine/action',
+  } as EncodedExtension<ACMVirtualMachineActionExtension>,
 ];

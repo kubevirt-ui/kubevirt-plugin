@@ -1,0 +1,16 @@
+.crossclustermigration-target-step {
+  &__box {
+    border: var(--pf-t--global--border--width--regular) solid
+      var(--pf-t--global--border--color--default);
+    border-radius: var(--pf-t--global--border--radius--large);
+    padding: var(--pf-t--global--spacer--md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--pf-t--global--spacer--md);
+
+    .pf-v6-c-form__group {
+      padding-left: var(--pf-t--global--spacer--sm);
+      padding-right: var(--pf-t--global--spacer--sm);
+    }
+  }
+}
