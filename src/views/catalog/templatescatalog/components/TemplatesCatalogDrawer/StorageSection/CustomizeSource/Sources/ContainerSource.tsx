@@ -8,7 +8,9 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { FormGroup, ValidatedOptions } from '@patternfly/react-core';
 
 type ContainerSourceProps = {
-  onInputValueChange: FormEventHandler<HTMLInputElement>;
+  containerImage?: string;
+  onInputValueChange?: FormEventHandler<HTMLInputElement>;
+
   registryCredentials: { password: string; username: string };
   registrySourceHelperText: string;
   selectedSourceType: string;
@@ -17,6 +19,7 @@ type ContainerSourceProps = {
 };
 
 const ContainerSource: FC<ContainerSourceProps> = ({
+  containerImage,
   onInputValueChange,
   registryCredentials,
   registrySourceHelperText,
@@ -25,10 +28,11 @@ const ContainerSource: FC<ContainerSourceProps> = ({
   testId,
 }) => {
   const { t } = useKubevirtTranslation();
-  const {
-    formState: { errors },
-    register,
-  } = useFormContext();
+
+  const form = useFormContext();
+
+  const errors = form?.formState?.errors || {};
+  const register = form?.register;
 
   const validated = errors?.[`${testId}-containerImage`]
     ? ValidatedOptions.error
@@ -47,13 +51,14 @@ const ContainerSource: FC<ContainerSourceProps> = ({
         label={t('Container Image')}
       >
         <FormTextInput
-          {...register(`${testId}-containerImage`, { required: true })}
+          {...(register ? register(`${testId}-containerImage`, { required: true }) : {})}
           aria-label={t('Container Image')}
           data-test-id={`${testId}-container-source-input`}
           id={`${testId}-${selectedSourceType}`}
-          onChange={onInputValueChange}
+          onChange={register ? onInputValueChange : onInputValueChange}
           type="text"
           validated={validated}
+          value={register ? undefined : containerImage}
         />
         <FormGroupHelperText validated={validated}>
           {errors?.[`${testId}-containerImage`]
@@ -67,7 +72,7 @@ const ContainerSource: FC<ContainerSourceProps> = ({
         label={t('Username')}
       >
         <FormTextInput
-          {...register(`${testId}-username`)}
+          {...(register ? register(`${testId}-username`) : {})}
           validated={
             errors?.[`${testId}-username`] ? ValidatedOptions.error : ValidatedOptions.default
           }
@@ -76,6 +81,7 @@ const ContainerSource: FC<ContainerSourceProps> = ({
           id={`${testId}-${selectedSourceType}-username`}
           onChange={(e) => handleCredentialsChange(e, 'username')}
           type="text"
+          value={register ? undefined : registryCredentials?.username}
         />
       </FormGroup>
       <FormGroup
@@ -84,7 +90,7 @@ const ContainerSource: FC<ContainerSourceProps> = ({
         label={t('Password')}
       >
         <FormPasswordInput
-          {...register(`${testId}-password`)}
+          {...(register ? register(`${testId}-password`) : {})}
           validated={
             errors?.[`${testId}-password`] ? ValidatedOptions.error : ValidatedOptions.default
           }
@@ -93,6 +99,7 @@ const ContainerSource: FC<ContainerSourceProps> = ({
           id={`${testId}-${selectedSourceType}`}
           onChange={(e) => handleCredentialsChange(e, 'password')}
           type="text"
+          value={register ? undefined : registryCredentials?.password}
         />
       </FormGroup>
     </>

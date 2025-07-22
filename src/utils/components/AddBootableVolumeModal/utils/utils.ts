@@ -15,6 +15,7 @@ import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/type
 import { createUserPasswordSecret } from '@kubevirt-utils/resources/secret/utils';
 import { buildOwnerReference, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { DATA_SOURCE_CRONJOB_LABEL } from '@kubevirt-utils/resources/template';
+import { MAX_K8S_NAME_LENGTH } from '@kubevirt-utils/utils/constants';
 import { appendDockerPrefix, getRandomChars } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -241,7 +242,7 @@ export const createDataSourceWithImportCron: CreateDataSourceWithImportCronType 
   const { password, username } = registryCredentials || {};
   const addRegistrySecret = !!(username && password);
   const imageSecretName = addRegistrySecret
-    ? `${bootableVolumeName}-registry-secret-${getRandomChars()}`
+    ? `${bootableVolumeName}-registry-secret-${getRandomChars()}`.substring(0, MAX_K8S_NAME_LENGTH)
     : null;
 
   if (addRegistrySecret) {
