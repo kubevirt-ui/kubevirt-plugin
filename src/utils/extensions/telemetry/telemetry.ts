@@ -4,11 +4,23 @@ import { createVMFlowTypes } from '@kubevirt-utils/extensions/telemetry/utils/co
 import { getName } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
-const SEGMENT_KEY =
-  (window as any).SERVER_FLAGS?.telemetry?.DEVSANDBOX_SEGMENT_API_KEY ||
-  (window as any).SERVER_FLAGS?.telemetry?.SEGMENT_API_KEY ||
-  (window as any).SERVER_FLAGS?.telemetry?.SEGMENT_PUBLIC_API_KEY ||
+// Segment "apiHost" parameter, should be like "api.segment.io/v1"
+const apiHost = window.SERVER_FLAGS.telemetry?.SEGMENT_API_HOST || '';
+
+// Segment JS host, defaults to "cdn.segment.com" if not defined
+const jsHost = window.SERVER_FLAGS.telemetry?.SEGMENT_JS_HOST || 'cdn.segment.com';
+
+// Segment API key, should look like a hash
+const apiKey =
+  window.SERVER_FLAGS.telemetry?.SEGMENT_API_KEY ||
+  window.SERVER_FLAGS.telemetry?.SEGMENT_PUBLIC_API_KEY ||
+  window.SERVER_FLAGS.telemetry?.DEVSANDBOX_SEGMENT_API_KEY ||
   '';
+
+// Segment analytics.min.js script URL
+const jsURL =
+  window.SERVER_FLAGS.telemetry?.SEGMENT_JS_URL ||
+  `https://${jsHost}/analytics.js/v1/${encodeURIComponent(apiKey)}/analytics.min.js`;
 
 const initSegment = () => {
   const analytics = ((window as any).analytics = (window as any).analytics || []);
@@ -16,68 +28,78 @@ const initSegment = () => {
     return;
   }
 
-  if (analytics.invoked)
-    window.console &&
-      kubevirtConsole.error &&
-      kubevirtConsole.error('Segment snippet included twice.');
-  else {
-    analytics.invoked = true;
-    analytics.methods = [
-      'trackSubmit',
-      'trackClick',
-      'trackLink',
-      'trackForm',
-      'pageview',
-      'identify',
-      'reset',
-      'group',
-      'track',
-      'ready',
-      'alias',
-      'debug',
-      'page',
-      'once',
-      'off',
-      'on',
-      'addSourceMiddleware',
-      'addIntegrationMiddleware',
-      'setAnonymousId',
-      'addDestinationMiddleware',
-    ];
-    analytics.factory = function (e: string) {
-      return function (...args) {
-        const t = Array.prototype.slice.call(args);
-        t.unshift(e);
-        analytics.push(t);
-        return analytics;
-      };
-    };
-    for (let e = 0; e < analytics.methods.length; e++) {
-      const key = analytics.methods[e];
-      analytics[key] = analytics.factory(key);
-    }
-    analytics.load = function (key: string, e: Event) {
-      const t = document.createElement('script');
-      t.type = 'text/javascript';
-      t.async = true;
-      t.src =
-        'https://cdn.segment.com/analytics.js/v1/' + encodeURIComponent(key) + '/analytics.min.js';
-      const n = document.getElementsByTagName('script')[0];
-      if (n.parentNode) {
-        n.parentNode.insertBefore(t, n);
-      }
-      analytics._loadOptions = e;
-    };
-    analytics.SNIPPET_VERSION = '4.13.1';
-    if (SEGMENT_KEY) {
-      analytics.load(SEGMENT_KEY);
-    }
+  if (analytics.invoked) {
+    kubevirtConsole.error('Segment snippet included twice');
+    return;
   }
+
+  analytics.invoked = true;
+  analytics.methods = [
+    'trackSubmit',
+    'trackClick',
+    'trackLink',
+    'trackForm',
+    'pageview',
+    'identify',
+    'reset',
+    'group',
+    'track',
+    'ready',
+    'alias',
+    'debug',
+    'page',
+    'once',
+    'off',
+    'on',
+    'addSourceMiddleware',
+    'addIntegrationMiddleware',
+    'setAnonymousId',
+    'addDestinationMiddleware',
+  ];
+  analytics.factory = function (e: string) {
+    return function () {
+      // eslint-disable-next-line prefer-rest-params
+      const t = Array.prototype.slice.call(arguments);
+      t.unshift(e);
+      analytics.push(t);
+      return analytics;
+    };
+  };
+  for (const key of analytics.methods) {
+    analytics[key] = analytics.factory(key);
+  }
+  analytics.load = function (_key: string, e: Event) {
+    const t = document.createElement('script');
+    t.type = 'text/javascript';
+    t.async = true;
+    t.src = jsURL;
+    const n = document.getElementsByTagName('script')[0];
+    if (n.parentNode) {
+      n.parentNode.insertBefore(t, n);
+    }
+    analytics._loadOptions = e;
+  };
+  analytics.SNIPPET_VERSION = '4.13.1';
+  const options: Record<string, any> = {};
+  if (apiHost) {
+    options.integrations = { 'Segment.io': { apiHost } };
+  }
+  analytics.load(apiKey, options);
 };
 
-initSegment();
+if (apiKey) {
+  initSegment();
+}
 
 export const eventMonitor = async (eventType: string, properties?: any) => {
+  if (!apiKey) {
+    kubevirtConsole.warn(
+      'Segment API key not available, ignoring telemetry event',
+      eventType,
+      properties,
+    );
+    return;
+  }
   const anonymousIP = {
     context: {
       ip: '0.0.0.0',

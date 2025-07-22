@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/// <reference path="../../@types/console/index.d.ts" />
+
 /* eslint-disable @typescript-eslint/no-namespace */
 import './login.ts';
 import './nav.ts';
