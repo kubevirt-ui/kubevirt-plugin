@@ -1158,6 +1158,11 @@
   resolved "https://registry.yarnpkg.com/@jsonjoy.com/util/-/util-1.5.0.tgz#6008e35b9d9d8ee27bc4bfaa70c8cbf33a537b4c"
   integrity sha512-ojoNsrIuPI9g6o8UxhraZQSyF2ByJanAY4cTFbc8Mf2AXEF4aQRGY1dJxyJpuyav8r9FGflEt/Ff3u5Nt6YMPA==
 
+"@kubev2v/types@^0.0.22":
+  version "0.0.22"
+  resolved "https://registry.yarnpkg.com/@kubev2v/types/-/types-0.0.22.tgz#582091a79cdb159be7789dcd62a2632542592c60"
+  integrity sha512-1s2RhE9zPf2esJzcy0KCbcso4SJE2Mp9ObV3We0c8KCGvp8i42xCxBIV9vMDiM14ZRlCUMo7gGB9GdZvexDURg==
+
 "@kubevirt-ui/kubevirt-api@^1.3.8":
   version "1.3.8"
   resolved "https://registry.yarnpkg.com/@kubevirt-ui/kubevirt-api/-/kubevirt-api-1.3.8.tgz#1a5f49533e92c050be8ad686f0d3db2a3ee52c46"

@@ -5,6 +5,8 @@ export const BASE_K8S_API_PATH = '/api/kubernetes';
 
 export const FLAG_KUBEVIRT_DYNAMIC_ACM = 'KUBEVIRT_DYNAMIC_ACM';
 
+export const CROSS_CLUSTER_MIGRATION_ACTION_ID = 'cross-cluster-migration';
+
 export const ManagedClusterModel: K8sModel = {
   abbr: 'MC',
   apiGroup: 'clusterview.open-cluster-management.io',
