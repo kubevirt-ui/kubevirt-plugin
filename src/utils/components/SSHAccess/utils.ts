@@ -104,7 +104,7 @@ export const getConsoleVirtctlCommand = (vm: V1VirtualMachine, identityFlag?: st
     getCloudInitCredentials(vm)?.users?.[0]?.name,
   ];
 
-  return `virtctl -n ${vmNamespace} ssh ${userName}@${vmName} ${
+  return `virtctl -n ${vmNamespace} ssh ${userName}@vm/${vmName} ${
     !isEmpty(identityFlag) ? identityFlag : '--identity-file=<path_to_sshkey>'
   }`;
 };
