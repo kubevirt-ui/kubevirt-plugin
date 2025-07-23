@@ -18,7 +18,7 @@ import ACMExtentionsTableData from '@multicluster/components/ACMExtentionsTableD
 import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 import { ManagedClusterModel } from '@multicluster/constants';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
+import { RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 import { Checkbox } from '@patternfly/react-core';
 import VirtualMachineActions from '@virtualmachines/actions/components/VirtualMachineActions/VirtualMachineActions';
 import useVirtualMachineActionsProvider from '@virtualmachines/actions/hooks/useVirtualMachineActionsProvider';
@@ -86,7 +86,7 @@ const VirtualMachineRowLayout: FC<
         />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="cluster">
-        <ResourceLink
+        <MulticlusterResourceLink
           groupVersionKind={modelToGroupVersionKind(ManagedClusterModel)}
           name={vmCluster}
           truncate
