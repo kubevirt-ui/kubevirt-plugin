@@ -1,60 +1,45 @@
 import React, { FC, ReactNode } from 'react';
 
-import NewBadge from '@kubevirt-utils/components/badges/NewBadge/NewBadge';
-import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
-import { PopoverPosition, Split, SplitItem, Switch } from '@patternfly/react-core';
-
-import ExpandSection from '../../../views/clusteroverview/SettingsTab/ExpandSection/ExpandSection';
+import ExpandSectionWithCustomToggle from '@kubevirt-utils/components/ExpandSectionWithCustomToggle/ExpandSectionWithCustomToggle';
+import { Switch } from '@patternfly/react-core';
 
 import './ExpandSectionWithSwitch.scss';
 
 type ExpandSectionWithSwitchProps = {
   children: ReactNode;
-  helpTextIconContent?: ReactNode;
-  id?: string;
+  helpTextContent?: ReactNode;
+  id: string;
   isDisabled?: boolean;
-  newBadge: boolean;
-  switchIsOn: boolean;
-  toggleContent?: ReactNode;
-  toggleText?: string;
-  turnOnSwitch: (checked: boolean) => void;
+  switchState: boolean;
+  toggleContent: ReactNode;
+  toggleSwitch: (checked: boolean) => void;
 };
 
 const ExpandSectionWithSwitch: FC<ExpandSectionWithSwitchProps> = ({
   children,
-  helpTextIconContent,
+  helpTextContent,
   id,
   isDisabled,
-  newBadge = false,
-  switchIsOn,
+  switchState,
   toggleContent,
-  toggleText,
-  turnOnSwitch,
+  toggleSwitch,
 }) => (
-  <Split className="expand-section-with-switch" id={id}>
-    <SplitItem>
-      <ExpandSection isDisabled={isDisabled} toggleContent={toggleContent} toggleText={toggleText}>
-        {children}
-      </ExpandSection>
-    </SplitItem>
-    {helpTextIconContent && (
-      <SplitItem isFilled>
-        <HelpTextIcon
-          bodyContent={helpTextIconContent}
-          helpIconClassName="expand-section-with-switch__help-icon"
-          position={PopoverPosition.right}
+  <ExpandSectionWithCustomToggle
+    customContent={
+      <div className="expand-section-with-switch__switch-container">
+        <Switch
+          isChecked={switchState}
+          isDisabled={isDisabled}
+          onChange={(_, checked: boolean) => toggleSwitch(checked)}
         />
-        {newBadge && <NewBadge />}
-      </SplitItem>
-    )}
-    <SplitItem>
-      <Switch
-        isChecked={switchIsOn}
-        isDisabled={isDisabled}
-        onChange={(_, checked: boolean) => turnOnSwitch(checked)}
-      />
-    </SplitItem>
-  </Split>
+      </div>
+    }
+    helpTextContent={helpTextContent}
+    id={id}
+    toggleContent={toggleContent}
+  >
+    {children}
+  </ExpandSectionWithCustomToggle>
 );
 
 export default ExpandSectionWithSwitch;

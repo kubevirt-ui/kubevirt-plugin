@@ -1,0 +1,22 @@
+.expand-section-custom-toggle {
+  &__custom-content {
+    display: inline-flex;
+    align-items: center;
+    width: 100%;
+  }
+
+  &__help-icon {
+    color: var(--pf-t--global--text--color--regular);
+    margin-left: var(--pf-t--global--spacer--xs);
+  }
+
+  &__help-icon-container {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  &__expandable-section {
+    width: 500px;
+    margin-left: var(--pf-t--global--spacer--md);
+  }
+}

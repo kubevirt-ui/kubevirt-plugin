@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
+import VirtualizationFeaturesSection from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/VirtualizationFeaturesList/VirtualizationFeaturesSection';
 import { Divider } from '@patternfly/react-core';
 
 import { useKubevirtCSVDetails } from '../../utils/hooks/useKubevirtCSVDetails';
@@ -21,6 +22,8 @@ const ClusterTab: FC = () => {
   return (
     <>
       <GeneralInformation {...CSVDetails} />
+      <VirtualizationFeaturesSection />
+      <Divider className="section-divider" />
       <GeneralSettings
         hyperConvergeConfiguration={hyperConvergeConfiguration}
         newBadge={newBadge}
@@ -36,7 +39,6 @@ const ClusterTab: FC = () => {
         newBadge={newBadge}
       />
       <Divider className="section-divider" />
-
       <PersistentReservationSection hyperConvergeConfiguration={hyperConvergeConfiguration} />
       <ErrorAlert error={error} />
     </>

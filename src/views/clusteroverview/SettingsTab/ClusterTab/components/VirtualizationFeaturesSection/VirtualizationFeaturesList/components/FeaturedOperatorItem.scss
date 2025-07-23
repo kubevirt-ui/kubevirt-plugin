@@ -1,0 +1,9 @@
+.featured-operator-item {
+  padding-left: var(--pf-t--global--spacer--lg);
+
+  &__icon-container {
+    margin-inline-start: auto;
+    display: inline-flex;
+    align-items: center;
+  }
+}
