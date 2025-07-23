@@ -72,7 +72,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
       return map[printableStatusMachine] || map.default;
     })(printableStatus);
 
-    const migrateCompute = VirtualMachineActionFactory.migrateCompute(vm);
+    const migrateCompute = VirtualMachineActionFactory.migrateCompute(vm, createModal);
 
     const migrateStorage = VirtualMachineActionFactory.migrateStorage(vm, createModal);
 

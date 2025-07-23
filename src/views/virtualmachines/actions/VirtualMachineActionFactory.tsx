@@ -26,6 +26,7 @@ import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { Patch } from '@openshift-console/dynamic-plugin-sdk';
 import { CopyIcon } from '@patternfly/react-icons';
+import ComputeMigrationModal from '@virtualmachines/actions/components/VirtualMachineComputeMigration/ComputeMigrationModal';
 import VirtualMachineMigrateModal from '@virtualmachines/actions/components/VirtualMachineMigration/VirtualMachineMigrationModal';
 import { isDeletionProtectionEnabled } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
@@ -41,15 +42,7 @@ import {
 
 import ConfirmVMActionModal from './components/ConfirmVMActionModal/ConfirmVMActionModal';
 import DeleteVMModal from './components/DeleteVMModal/DeleteVMModal';
-import {
-  cancelMigration,
-  migrateVM,
-  pauseVM,
-  restartVM,
-  startVM,
-  stopVM,
-  unpauseVM,
-} from './actions';
+import { cancelMigration, pauseVM, restartVM, startVM, stopVM, unpauseVM } from './actions';
 
 const {
   Migrating,
@@ -200,7 +193,10 @@ export const VirtualMachineActionFactory = {
       label: t('Force stop'),
     };
   },
-  migrateCompute: (vm: V1VirtualMachine): ActionDropdownItemType => {
+  migrateCompute: (
+    vm: V1VirtualMachine,
+    createModal: (modal: ModalComponent) => void,
+  ): ActionDropdownItemType => {
     return {
       accessReview: {
         cluster: getCluster(vm),
@@ -209,7 +205,7 @@ export const VirtualMachineActionFactory = {
         resource: VirtualMachineInstanceMigrationModel.plural,
         verb: 'create',
       },
-      cta: () => migrateVM(vm),
+      cta: () => createModal((props) => <ComputeMigrationModal {...props} vm={vm} />),
       description: t('Migrate VirtualMachine to a different Node'),
       disabled: !isLiveMigratable(vm),
       id: 'vm-action-migrate',

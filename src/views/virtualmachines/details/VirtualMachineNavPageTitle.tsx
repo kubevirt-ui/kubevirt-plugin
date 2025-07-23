@@ -14,6 +14,7 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { Label, Split, SplitItem, Title } from '@patternfly/react-core';
 import VirtualMachineActions from '@virtualmachines/actions/components/VirtualMachineActions/VirtualMachineActions';
+import FailedMigrationAlert from '@virtualmachines/actions/components/VirtualMachineComputeMigration/components/FailedMigrationAlert/FailedMigrationAlert';
 import VMActionsIconBar from '@virtualmachines/actions/components/VMActionsIconBar/VMActionsIconBar';
 import useVirtualMachineActionsProvider from '@virtualmachines/actions/hooks/useVirtualMachineActionsProvider';
 import VirtualMachinePendingChangesAlert from '@virtualmachines/details/VirtualMachinePendingChangesAlert/VirtualMachinePendingChangesAlert';
@@ -92,6 +93,7 @@ const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({
         vm={vm}
         vmi={vmi}
       />
+      <FailedMigrationAlert vm={vm} vmim={vmim} />
     </DetailsPageTitle>
   );
 };
