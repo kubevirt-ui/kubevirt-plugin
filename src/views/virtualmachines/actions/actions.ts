@@ -17,7 +17,7 @@ import {
 } from '@multicluster/k8sRequests';
 import { consoleFetch, K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
-const generateRandomString = () => Math.random().toString(36).substring(2, 7);
+export const generateRandomString = () => Math.random().toString(36).substring(2, 7);
 
 export enum VMActionType {
   AddVolume = 'addvolume',
