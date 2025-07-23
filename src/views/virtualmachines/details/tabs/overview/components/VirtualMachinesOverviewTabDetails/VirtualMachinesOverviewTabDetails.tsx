@@ -6,6 +6,7 @@ import {
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceGuestAgentInfo,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import NUMABadge from '@kubevirt-utils/components/badges/NUMABadge/NUMABadge';
 import CPUMemory from '@kubevirt-utils/components/CPUMemory/CPUMemory';
 import GuestAgentIsRequiredText from '@kubevirt-utils/components/GuestAgentIsRequiredText/GuestAgentIsRequiredText';
 import { timestampFor } from '@kubevirt-utils/components/Timestamp/utils/datetime';
@@ -16,7 +17,7 @@ import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind } from '@kubevirt-utils/models';
 import { getLabel, getName, getVMStatus } from '@kubevirt-utils/resources/shared';
-import { getInstanceTypeMatcher } from '@kubevirt-utils/resources/vm';
+import { getInstanceTypeMatcher, hasNUMAConfiguration } from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getOSNameFromGuestAgent } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -30,6 +31,7 @@ import {
   CardTitle,
   DescriptionList,
   Divider,
+  Flex,
   Grid,
   GridItem,
   pluralize,
@@ -180,7 +182,12 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
                   descriptionHeader={t('Operating system')}
                 />
                 <VirtualMachineDescriptionItem
-                  descriptionData={<CPUMemory vm={cpuMemoryVM || vm} vmi={vmi} />}
+                  descriptionData={
+                    <Flex>
+                      <CPUMemory vm={cpuMemoryVM || vm} vmi={vmi} />
+                      {hasNUMAConfiguration(cpuMemoryVM) && <NUMABadge />}
+                    </Flex>
+                  }
                   descriptionHeader={t('CPU | Memory')}
                 />
                 <VirtualMachineDescriptionItem

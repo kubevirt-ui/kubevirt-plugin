@@ -3,6 +3,7 @@ import React, { FC, useEffect, useMemo, useState } from 'react';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { INSTANCETYPE_CLASS_DISPLAY_NAME } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/constants';
+import NUMABadge from '@kubevirt-utils/components/badges/NUMABadge/NUMABadge';
 import CPUDescription from '@kubevirt-utils/components/CPUDescription/CPUDescription';
 import CPUMemory from '@kubevirt-utils/components/CPUMemory/CPUMemory';
 import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CPUMemoryModal';
@@ -29,6 +30,7 @@ import {
   getInstanceTypeMatcher,
   getMachineType,
   getWorkload,
+  hasNUMAConfiguration,
 } from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -178,6 +180,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
               subTitle={
                 instanceType && getAnnotation(instanceType, INSTANCETYPE_CLASS_DISPLAY_NAME)
               }
+              additionalContent={hasNUMAConfiguration(cpuMemoryVM) && <NUMABadge />}
               bodyContent={isInstanceType ? null : <CPUDescription cpu={getCPU(vm)} />}
               data-test-id={`${vmName}-cpu-memory`}
               descriptionData={<CPUMemory vm={cpuMemoryVM || vm} vmi={vmi} />}
