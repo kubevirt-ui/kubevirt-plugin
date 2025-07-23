@@ -17,7 +17,7 @@ import {
 } from '@multicluster/k8sRequests';
 import { consoleFetch, K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
-const generateRandomString = () => Math.random().toString(36).substring(2, 7);
+export const generateRandomString = () => Math.random().toString(36).substring(2, 7);
 
 export enum VMActionType {
   AddVolume = 'addvolume',
@@ -80,7 +80,7 @@ export const addPersistentVolume = async (vm: V1VirtualMachine, body: V1AddVolum
   VMActionRequest(vm, VMActionType.AddVolume, VirtualMachineModel, body);
 export const removeVolume = async (vm: V1VirtualMachine, body: V1RemoveVolumeOptions) =>
   VMActionRequest(vm, VMActionType.RemoveVolume, VirtualMachineModel, body);
-export const migrateVM = async (vm: V1VirtualMachine) => {
+export const migrateVM = async (vm: V1VirtualMachine, node?: string) => {
   const { name, namespace } = vm?.metadata;
   const migrationData: V1VirtualMachineInstanceMigration = {
     apiVersion: 'kubevirt.io/v1',
@@ -92,6 +92,9 @@ export const migrateVM = async (vm: V1VirtualMachine) => {
       vmiName: name,
     },
   };
+
+  if (node) migrationData.spec.addedNodeSelector = { 'kubernetes.io/hostname': node };
+
   await kubevirtK8sCreate({
     cluster: getCluster(vm),
     data: migrationData,
