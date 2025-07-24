@@ -72,7 +72,7 @@ export const getRandomChars = (len = 6): string => {
 export const addRandomSuffix = (str: string) => str.concat(`-${getRandomChars()}`);
 
 export const SSH_PUBLIC_KEY_VALIDATION_REGEX =
-  /^(ssh-(rsa|dss|ed25519)|sk-ssh-(rsa|ed25519)@openssh\.com|ecdsa-sha2-nistp(256|384|521)) [A-Za-z0-9+/]+={0,3}( .*)?$/;
+  /^(ssh-(rsa|dss|ed25519)|sk-ssh-(rsa|ed25519)@openssh\.com|ecdsa-sha2-nistp(256|384|521))\s+[A-Za-z0-9+/=]+(?:\s+.+)?$/;
 
 export const validateSSHPublicKey = (value: string): boolean => {
   const trimmedValue = value?.trim();
