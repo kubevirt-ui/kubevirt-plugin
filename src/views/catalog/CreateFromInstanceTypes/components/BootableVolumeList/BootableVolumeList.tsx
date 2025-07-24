@@ -9,7 +9,6 @@ import {
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import ProjectDropdown from '@kubevirt-utils/components/ProjectDropdown/ProjectDropdown';
-import { OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
 import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -17,7 +16,7 @@ import { UserSettingFavorites } from '@kubevirt-utils/hooks/useKubevirtUserSetti
 import useHideDeprecatedBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useHideDeprecatedBootableVolumes';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { convertResourceArrayToMap, getName } from '@kubevirt-utils/resources/shared';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { isEmpty, OS_IMAGES_NS } from '@kubevirt-utils/utils/utils';
 import { useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { FormGroup, Skeleton, Split, SplitItem } from '@patternfly/react-core';
 
@@ -109,7 +108,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
 
   useEffect(() => {
     if (!isAdmin && volumeListNamespace === ALL_PROJECTS) {
-      setVolumeListNamespace(OPENSHIFT_OS_IMAGES_NS);
+      setVolumeListNamespace(OS_IMAGES_NS);
     }
   }, [isAdmin, volumeListNamespace, setVolumeListNamespace]);
 

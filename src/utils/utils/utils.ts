@@ -4,7 +4,9 @@ import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import {
   DEFAULT_NAMESPACE,
   KUBEVIRT_HYPERCONVERGED,
+  KUBEVIRT_OS_IMAGES_NS,
   OPENSHIFT_CNV,
+  OPENSHIFT_OS_IMAGES_NS,
 } from '@kubevirt-utils/constants/constants';
 import { ALL_NAMESPACES, ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { FilterValue, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
@@ -53,6 +55,8 @@ export const pick = (object, keys) => {
 export const isUpstream = window.SERVER_FLAGS.branding === 'okd';
 
 export const DEFAULT_OPERATOR_NAMESPACE = isUpstream ? KUBEVIRT_HYPERCONVERGED : OPENSHIFT_CNV;
+
+export const OS_IMAGES_NS = isUpstream ? KUBEVIRT_OS_IMAGES_NS : OPENSHIFT_OS_IMAGES_NS;
 
 export const isString = (val: unknown) => val !== null && typeof val === 'string';
 
