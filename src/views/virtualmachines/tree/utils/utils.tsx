@@ -122,6 +122,7 @@ const createProjectTreeItem = (
   currentPageNamespace: string,
   treeViewDataMap: Record<string, TreeViewDataItemWithHref>,
   cluster?: string,
+  clusterSelected = true,
 ): TreeViewDataItemWithHref => {
   const projectFolders = createFolderTreeItems(
     projectMap[project]?.folders || {},
@@ -141,7 +142,7 @@ const createProjectTreeItem = (
   const projectTreeItem: TreeViewDataItemWithHref = {
     children: projectChildren,
     customBadgeContent: projectMap[project]?.count || 0,
-    defaultExpanded: currentPageNamespace === project,
+    defaultExpanded: currentPageNamespace === project && clusterSelected,
     href: getVMListNamespacesURL(cluster, project),
     icon: <ProjectDiagramIcon />,
     id: projectTreeItemID,
@@ -190,15 +191,16 @@ const getVMInfoFromPathname = (pathname: string) => {
     const currentVMTab = splitPathname?.[7] || '';
     const vmName = splitPathname?.[6];
     const vmNamespace = splitPathname?.[5];
+    const vmCluster = splitPathname?.[4];
 
-    return { currentVMTab, vmName, vmNamespace };
+    return { currentVMTab, vmCluster, vmName, vmNamespace };
   }
 
   const currentVMTab = splitPathname?.[6] || '';
   const vmName = splitPathname?.[5];
   const vmNamespace = splitPathname?.[3];
 
-  return { currentVMTab, vmName, vmNamespace };
+  return { currentVMTab, vmCluster: null, vmName, vmNamespace };
 };
 
 const createSingleClusterTreeViewData = (
@@ -255,57 +257,71 @@ const createMultiClusterTreeViewData = (
   foldersEnabled: boolean,
   clusters?: K8sResourceCommon[],
 ): TreeViewDataItem[] => {
-  const { currentVMTab, vmName, vmNamespace } = getVMInfoFromPathname(pathname);
+  const { currentVMTab, vmCluster, vmName, vmNamespace } = getVMInfoFromPathname(pathname);
 
   const vmsPerCluster = getVMsPerCluster(vms);
 
   const treeViewDataMap: Record<string, TreeViewDataItem> = {};
 
-  const treeWithClusters = clusters?.map((cluster) => {
-    const clusterName = getName(cluster);
+  const treeWithClusters = clusters
+    ?.sort((a, b) => getName(a).localeCompare(getName(b)))
+    .map((cluster) => {
+      const clusterName = getName(cluster);
 
-    const vmsInCluster = vmsPerCluster[clusterName];
+      const clusterVMs = vmsPerCluster[clusterName];
 
-    const projectsInCluster = vmsInCluster.reduce((namespaces, vm) => {
-      const namespace = getNamespace(vm);
-      if (!namespaces.includes(namespace)) namespaces.push(namespace);
+      const clusterProjects = clusterVMs.reduce((namespaces, vm) => {
+        const namespace = getNamespace(vm);
+        if (!namespaces.includes(namespace)) namespaces.push(namespace);
 
-      return namespaces;
-    }, []);
+        return namespaces;
+      }, []);
 
-    const projectMap = buildProjectMap(
-      vmsInCluster,
-      vmName,
-      currentVMTab,
-      treeViewDataMap,
-      foldersEnabled,
-    );
+      const projectMap = buildProjectMap(
+        clusterVMs,
+        vmName,
+        currentVMTab,
+        treeViewDataMap,
+        foldersEnabled,
+      );
 
-    const treeViewData = projectsInCluster.map((project) =>
-      createProjectTreeItem(project, projectMap, vmName, vmNamespace, treeViewDataMap, clusterName),
-    );
+      const clusterSelected = vmCluster === clusterName;
 
-    const clusterTreeItem: TreeViewDataItemWithHref = {
-      children: treeViewData,
-      hasBadge: false,
-      href: `/multicloud/infrastructure/virtualmachines/${clusterName}`,
-      icon: <ProjectDiagramIcon />,
-      id: `${CLUSTER_SELECTOR_PREFIX}/${clusterName}`,
-      name: clusterName,
-    };
+      const treeViewData = clusterProjects.map((project) =>
+        createProjectTreeItem(
+          project,
+          projectMap,
+          vmName,
+          vmNamespace,
+          treeViewDataMap,
+          clusterName,
+          clusterSelected,
+        ),
+      );
 
-    if (!treeViewDataMap[clusterTreeItem.id]) {
-      treeViewDataMap[clusterTreeItem.id] = clusterTreeItem;
-    }
+      const clusterTreeItem: TreeViewDataItemWithHref = {
+        children: treeViewData,
+        defaultExpanded: clusterSelected,
+        hasBadge: false,
+        href: `/multicloud/infrastructure/virtualmachines/${clusterName}`,
+        icon: <ProjectDiagramIcon />,
+        id: `${CLUSTER_SELECTOR_PREFIX}/${clusterName}`,
+        name: clusterName,
+      };
 
-    return clusterTreeItem;
-  });
+      if (!treeViewDataMap[clusterTreeItem.id]) {
+        treeViewDataMap[clusterTreeItem.id] = clusterTreeItem;
+      }
+
+      return clusterTreeItem;
+    });
 
   treeDataMap.value = treeViewDataMap;
 
   const clusterTreeItem: TreeViewDataItemWithHref[] = [
     {
       children: treeWithClusters,
+      defaultExpanded: true,
       hasBadge: false,
       href: `/multicloud/infrastructure/virtualmachines`,
       icon: <ProjectDiagramIcon />,
