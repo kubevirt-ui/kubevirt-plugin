@@ -1,0 +1,39 @@
+import React, { FC } from 'react';
+
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import {
+  FENCE_AGENTS_OPERATOR_NAME,
+  NODE_HEALTH_OPERATOR_NAME,
+} from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/constants';
+import { isInstalled } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/utils';
+import { useVirtualizationFeaturesContext } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/VirtualizationFeaturesContext/VirtualizationFeaturesContext';
+import NotInstalledIcon from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/VirtualizationFeaturesList/components/icons/NotInstalledIcon';
+import { Split, SplitItem } from '@patternfly/react-core';
+
+import './HAInstallStatusMessage.scss';
+
+const HAInstallStatusMessage: FC = () => {
+  const { t } = useKubevirtTranslation();
+  const { operatorDetailsMap } = useVirtualizationFeaturesContext();
+
+  const nhcInstalled = isInstalled(operatorDetailsMap?.[NODE_HEALTH_OPERATOR_NAME]?.installState);
+  const nhcInstallMsg = nhcInstalled ? t('Installed') : t('Not installed');
+
+  const farInstalled = isInstalled(operatorDetailsMap?.[FENCE_AGENTS_OPERATOR_NAME]?.installState);
+  const farInstallMsg = farInstalled ? t('Installed') : t('Not installed');
+
+  if (nhcInstalled && farInstalled) return null;
+
+  return (
+    <Split>
+      <SplitItem>
+        <NotInstalledIcon />
+      </SplitItem>
+      <SplitItem className="ha-install-status-message">
+        {t(`Requires NHC (${nhcInstallMsg}) and FAR (${farInstallMsg})`)}
+      </SplitItem>
+    </Split>
+  );
+};
+
+export default HAInstallStatusMessage;

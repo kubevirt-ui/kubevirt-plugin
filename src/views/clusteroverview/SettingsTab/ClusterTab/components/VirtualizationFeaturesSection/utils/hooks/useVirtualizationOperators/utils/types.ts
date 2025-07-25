@@ -3,7 +3,12 @@ import {
   InstallState,
   VirtualizationFeatureOperators,
 } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/types';
-import { PackageManifestKind, SubscriptionKind } from '@overview/utils/types';
+import {
+  ClusterServiceVersionKind,
+  OperatorGroupKind,
+  PackageManifestKind,
+  SubscriptionKind,
+} from '@overview/utils/types';
 
 export enum OLMAnnotation {
   ActionText = 'marketplace.openshift.io/action-text',
@@ -113,6 +118,14 @@ export enum DefaultCatalogSource {
   RedHatMarketPlace = 'redhat-marketplace',
   RedHatOperators = 'redhat-operators',
 }
+
+export type OperatorResources = {
+  clusterServiceVersions: ClusterServiceVersionKind[];
+  marketplacePackageManifests: PackageManifestKind[];
+  operatorGroups: OperatorGroupKind[];
+  packageManifests: PackageManifestKind[];
+  subscriptions: SubscriptionKind[];
+};
 
 export type VirtFeatureOperatorItem = {
   [key: string]: any;

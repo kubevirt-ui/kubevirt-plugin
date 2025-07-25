@@ -1,4 +1,8 @@
 .expand-section-custom-toggle {
+  &__toggle-container--expanded {
+    margin-bottom: var(--pf-t--global--spacer--md);
+  }
+
   &__custom-content {
     display: inline-flex;
     align-items: center;
@@ -17,6 +21,6 @@
 
   &__expandable-section {
     width: 500px;
-    margin-left: var(--pf-t--global--spacer--md);
+    padding-left: 0;
   }
 }

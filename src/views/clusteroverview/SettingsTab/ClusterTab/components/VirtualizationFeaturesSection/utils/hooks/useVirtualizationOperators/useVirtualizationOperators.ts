@@ -1,11 +1,15 @@
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import { NON_STANDALONE_ANNOTATION_VALUE } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/hooks/useVirtualizationOperators/utils/constants';
+import { InstallState } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/types';
+
+import useOperatorResources from '../useOperatorResources/useOperatorResources';
+
+import { NON_STANDALONE_ANNOTATION_VALUE } from './utils/constants';
 import {
   OLMAnnotation,
   OperatorDetailsMap,
   VirtFeatureOperatorItem,
   VirtFeatureOperatorItemsMap,
-} from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/hooks/useVirtualizationOperators/utils/types';
+} from './utils/types';
 import {
   clusterServiceVersionFor,
   computeInstallState,
@@ -14,10 +18,7 @@ import {
   getPackageUID,
   groupOperatorItems,
   subscriptionFor,
-} from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/hooks/useVirtualizationOperators/utils/utils';
-import { InstallState } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/types';
-
-import useOperatorResources from '../useOperatorResources/useOperatorResources';
+} from './utils/utils';
 
 type UseVirtualizationOperators = () => {
   loaded: boolean;
