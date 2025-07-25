@@ -30,6 +30,12 @@ declare module '@kubevirt-ui/kubevirt-api/kubernetes' {
   }
 }
 
+declare module '@kubev2v/types' {
+  interface V1beta1Plan extends mtvTypes.V1beta1Plan {
+    cluster?: string;
+  }
+}
+
 declare global {
   type K8sResourceCommon = OriginalK8sResourceCommon & {
     cluster?: string;

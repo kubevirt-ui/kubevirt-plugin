@@ -11,6 +11,7 @@ import { CONFIRM_VM_ACTIONS, TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/use
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
+import { CROSS_CLUSTER_MIGRATION_ACTION_ID } from '@multicluster/constants';
 import useACMExtensionActions from '@multicluster/hooks/useACMExtensionActions/useACMExtensionActions';
 import { useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -41,6 +42,13 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
   const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
 
   const actions: ActionDropdownItemType[] = useMemo(() => {
+    const crossClusterMigration = acmActions.find(
+      (action) => action.id === CROSS_CLUSTER_MIGRATION_ACTION_ID,
+    );
+    const otherACMActions = acmActions.filter(
+      (action) => action.id !== CROSS_CLUSTER_MIGRATION_ACTION_ID,
+    );
+
     const printableStatus = vm?.status?.printableStatus;
 
     const { Migrating, Paused } = printableVMStatus;
@@ -68,6 +76,10 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
       ? [migrateCompute, migrateStorage]
       : [migrateCompute];
 
+    if (crossClusterMigration) {
+      startMigrationActions.unshift(crossClusterMigration);
+    }
+
     const cancelMigration = currentStorageMigration
       ? VirtualMachineActionFactory.cancelStorageMigration(currentStorageMigration)
       : VirtualMachineActionFactory.cancelComputeMigration(vm, vmim);
@@ -91,7 +103,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
       treeViewFoldersEnabled && VirtualMachineActionFactory.moveToFolder(vm, createModal),
       VirtualMachineActionFactory.editLabels(vm, createModal),
       VirtualMachineActionFactory.delete(vm, createModal),
-      ...acmActions,
+      ...otherACMActions,
     ].filter(Boolean);
   }, [
     vm,
