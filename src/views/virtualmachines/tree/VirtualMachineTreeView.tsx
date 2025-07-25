@@ -1,10 +1,13 @@
 import React, { CSSProperties, FC, useMemo } from 'react';
 
 import useIsSmallScreen from '@kubevirt-utils/hooks/useIsSmallScreen';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
 import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import {
+  Alert,
+  AlertVariant,
   Drawer,
   DrawerContent,
   DrawerContentBody,
@@ -42,11 +45,12 @@ const VirtualMachineTreeView: FC<VirtualMachineTreeViewProps> = ({
   treeData,
 }) => {
   const isSmallScreen = useIsSmallScreen();
+  const { t } = useKubevirtTranslation();
 
   const [drawerWidth, setDrawerWidth] = useLocalStorage(TREE_VIEW_LAST_WIDTH, OPEN_DRAWER_SIZE);
   const [drawerOpen, setDrawerOpen] = useLocalStorage(SHOW_TREE_VIEW, SHOW);
 
-  const [selected, onSelect] = useTreeViewSelect(onFilterChange);
+  const [selected, onSelect, alertMessage] = useTreeViewSelect(onFilterChange);
 
   const isOpen = useMemo(() => drawerOpen === SHOW, [drawerOpen]);
   useHideNamespaceBar();
@@ -103,7 +107,19 @@ const VirtualMachineTreeView: FC<VirtualMachineTreeViewProps> = ({
             </DrawerPanelContent>
           }
         >
-          <DrawerContentBody style={heightStyles}>{children}</DrawerContentBody>
+          <DrawerContentBody style={heightStyles}>
+            {alertMessage && (
+              <Alert
+                className="co-alert co-alert-space"
+                isInline
+                title={t('Warning')}
+                variant={AlertVariant.warning}
+              >
+                {alertMessage}
+              </Alert>
+            )}
+            {children}
+          </DrawerContentBody>
         </DrawerContent>
       </Drawer>
     </>
