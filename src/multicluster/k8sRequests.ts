@@ -27,49 +27,68 @@ export const getKubevirtBaseAPIPath = async (cluster?: string) => {
   return await getFleetK8sAPIPath(cluster);
 };
 
-export const kubevirtK8sPatch = <R extends K8sResourceCommon>(
+export const kubevirtK8sPatch = async <R extends K8sResourceCommon>(
   options: OptionsPatch<R>,
 ): Promise<R> => {
   if (options?.cluster) {
-    return fleetK8sPatch(options);
+    const object = await fleetK8sPatch(options);
+
+    if (object) object.cluster = options?.cluster;
+    return object;
   }
 
   return k8sPatch(options);
 };
 
-export const kubevirtK8sUpdate = <R extends K8sResourceCommon>(
+export const kubevirtK8sUpdate = async <R extends K8sResourceCommon>(
   options: OptionsUpdate<R>,
 ): Promise<R> => {
   if (options?.cluster || options?.data?.cluster) {
-    return fleetK8sUpdate(options);
+    const object = await fleetK8sUpdate(options);
+
+    if (object) object.cluster = options?.cluster || options?.data?.cluster;
+    return object;
   }
 
   return k8sUpdate(options);
 };
 
-export const kubevirtK8sGet = <R extends K8sResourceCommon>(options: OptionsGet): Promise<R> => {
+export const kubevirtK8sGet = async <R extends K8sResourceCommon>(
+  options: OptionsGet,
+): Promise<R> => {
   if (options?.cluster) {
-    return fleetK8sGet(options);
+    const object = await fleetK8sGet<R>(options);
+
+    if (object) {
+      object.cluster = options?.cluster;
+    }
+    return object;
   }
 
-  return k8sGet(options);
+  return k8sGet(options) as Promise<R>;
 };
 
-export const kubevirtK8sDelete = <R extends K8sResourceCommon>(
+export const kubevirtK8sDelete = async <R extends K8sResourceCommon>(
   options: OptionsDelete<R>,
 ): Promise<R> => {
   if (options?.cluster || options?.resource?.cluster) {
-    return fleetK8sDelete(options);
+    const object = await fleetK8sDelete(options);
+
+    if (object) object.cluster = options?.cluster || options?.resource?.cluster;
+    return object;
   }
 
   return k8sDelete(options);
 };
 
-export const kubevirtK8sCreate = <R extends K8sResourceCommon>(
+export const kubevirtK8sCreate = async <R extends K8sResourceCommon>(
   options: OptionsCreate<R>,
 ): Promise<R> => {
   if (options?.cluster || options?.data?.cluster) {
-    return fleetK8sCreate(options);
+    const object = await fleetK8sCreate(options);
+
+    if (object) object.cluster = options?.cluster || options?.data?.cluster;
+    return object;
   }
 
   return k8sCreate(options);

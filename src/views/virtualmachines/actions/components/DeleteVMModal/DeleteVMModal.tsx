@@ -2,9 +2,7 @@ import React, { FC, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
-import VirtualMachineModel, {
-  VirtualMachineModelRef,
-} from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
+import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import {
@@ -14,11 +12,13 @@ import {
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import { GracePeriodInput } from '@kubevirt-utils/components/GracePeriodInput/GracePeriodInput';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
+import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useLastNamespacePath } from '@kubevirt-utils/hooks/useLastNamespacePath';
 import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sDelete } from '@multicluster/k8sRequests';
+import { getVMListNamespacesURL, getVMListURL } from '@multicluster/urls';
+import { useLastNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { ButtonVariant, Stack, StackItem } from '@patternfly/react-core';
 import { deselectVM, isVMSelected } from '@virtualmachines/list/selectedVMs';
 
@@ -54,7 +54,7 @@ const DeleteVMModal: FC<DeleteVMModalProps> = ({ isOpen, onClose, vm }) => {
   const [snapshotsToSave, setSnapshotsToSave] = useState<V1beta1VirtualMachineSnapshot[]>([]);
 
   const { dataVolumes, loaded, pvcs, secrets, snapshots } = useDeleteVMResources(vm);
-  const lastNamespacePath = useLastNamespacePath();
+  const [lastNamespace] = useLastNamespace();
 
   const onDelete = async (updatedVM: V1VirtualMachine) => {
     const vmOwnerRef = buildOwnerReference(updatedVM);
@@ -84,9 +84,13 @@ const DeleteVMModal: FC<DeleteVMModalProps> = ({ isOpen, onClose, vm }) => {
     }
 
     if (!location.pathname.endsWith('/search')) {
-      navigate(
-        `/k8s/${lastNamespacePath}/${VirtualMachineModelRef}${location.search}${location.hash}`,
-      );
+      const cluster = getCluster(vm);
+      const vmListURL =
+        lastNamespace === ALL_NAMESPACES_SESSION_KEY
+          ? getVMListURL(cluster)
+          : getVMListNamespacesURL(cluster, lastNamespace);
+
+      navigate(`${vmListURL}${location.search}${location.hash}`);
     }
   };
 

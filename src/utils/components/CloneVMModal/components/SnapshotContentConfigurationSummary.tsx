@@ -10,7 +10,9 @@ import {
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
+import { getCluster } from '@multicluster/helpers/selectors';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { Alert, AlertVariant } from '@patternfly/react-core';
 
 import ConfigurationSummary from './ConfigurationSummary';
@@ -24,14 +26,14 @@ const SnapshotContentConfigurationSummary: FC<SnapshotContentConfigurationSummar
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const [snapshotContent, loaded, error] =
-    useK8sWatchResource<V1beta1VirtualMachineSnapshotContent>(
-      snapshot && {
-        groupVersionKind: modelToGroupVersionKind(VirtualMachineSnapshotContentModel),
-        name: snapshot.status.virtualMachineSnapshotContentName,
-        namespace: snapshot.metadata.namespace || DEFAULT_NAMESPACE,
-      },
-    );
+  const [snapshotContent, loaded, error] = useK8sWatchData<V1beta1VirtualMachineSnapshotContent>(
+    snapshot && {
+      cluster: getCluster(snapshot),
+      groupVersionKind: modelToGroupVersionKind(VirtualMachineSnapshotContentModel),
+      name: snapshot.status.virtualMachineSnapshotContentName,
+      namespace: getNamespace(snapshot) || DEFAULT_NAMESPACE,
+    },
+  );
 
   if (!loaded) return <Loading />;
 
