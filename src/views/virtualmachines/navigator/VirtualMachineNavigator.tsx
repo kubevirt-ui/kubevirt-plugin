@@ -1,5 +1,5 @@
-import React, { FC, useMemo, useRef } from 'react';
-import { useLocation, useParams } from 'react-router-dom-v5-compat';
+import React, { FC, useEffect, useMemo, useRef } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom-v5-compat';
 
 import CreateResourceDefaultPage from '@kubevirt-utils/components/CreateResourceDefaultPage/CreateResourceDefaultPage';
 import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
@@ -7,11 +7,14 @@ import { ADVANCED_SEARCH } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
-import { isACMListPath } from '@multicluster/urls';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
+import useAllClusters from '@multicluster/hooks/useAllClusters/useAllClusters';
+import { getACMVMListNamespacesURL, getACMVMListURL, isACMPath } from '@multicluster/urls';
 import { ListPageHeader, OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import { Divider } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
 import SearchBar from '@search/components/SearchBar';
+import { useHubClusterName } from '@stolostron/multicluster-sdk';
 import VirtualMachineNavPage from '@virtualmachines/details/VirtualMachineNavPage';
 import VirtualMachinesCreateButton from '@virtualmachines/list/components/VirtualMachinesCreateButton/VirtualMachinesCreateButton';
 import VirtualMachinesList from '@virtualmachines/list/VirtualMachinesList';
@@ -25,6 +28,10 @@ const VirtualMachineNavigator: FC = () => {
   const { t } = useKubevirtTranslation();
   const vmListRef = useRef<{ onFilterChange: OnFilterChange } | null>(null);
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const [clusters] = useAllClusters();
+  const [hubClusterName] = useHubClusterName();
 
   const { cluster, ns: namespace } = useParams<{ cluster?: string; ns: string }>();
 
@@ -33,10 +40,19 @@ const VirtualMachineNavigator: FC = () => {
   const isVirtualMachineListPage = useMemo(
     () =>
       location.pathname.endsWith(VirtualMachineModelRef) ||
-      location.pathname.endsWith(`${VirtualMachineModelRef}/`) ||
-      isACMListPath(location.pathname),
+      location.pathname.endsWith(`${VirtualMachineModelRef}/`),
     [location.pathname],
   );
+
+  useEffect(() => {
+    if (!isEmpty(clusters) && !isACMPath(location.pathname)) {
+      navigate(
+        namespace
+          ? getACMVMListNamespacesURL(cluster || hubClusterName, namespace)
+          : getACMVMListURL(cluster),
+      );
+    }
+  }, [location.pathname, clusters, navigate, namespace, cluster, hubClusterName]);
 
   const treeProps = useTreeViewData();
 
