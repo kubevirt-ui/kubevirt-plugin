@@ -19,6 +19,7 @@ import EditButtonWithTooltip from './EditButtonWithTooltip';
 import './VirtualMachineDescriptionItem.scss';
 
 type VirtualMachineDescriptionItemProps = {
+  additionalContent?: ReactNode;
   bodyContent?: ReactNode;
   breadcrumb?: string;
   className?: string;
@@ -38,6 +39,7 @@ type VirtualMachineDescriptionItemProps = {
 };
 
 const VirtualMachineDescriptionItem: FC<VirtualMachineDescriptionItemProps> = ({
+  additionalContent,
   bodyContent,
   breadcrumb,
   className,
@@ -59,14 +61,17 @@ const VirtualMachineDescriptionItem: FC<VirtualMachineDescriptionItemProps> = ({
   const NotAvailable = <MutedTextSpan text={t('Not available')} />;
 
   const description = (
-    <EditButtonWithTooltip
-      isEditable={!isDisabled}
-      onEditClick={onEditClick}
-      testId={testId}
-      tooltipContent={messageOnDisabled}
-    >
-      {descriptionData ?? NotAvailable}
-    </EditButtonWithTooltip>
+    <>
+      <EditButtonWithTooltip
+        isEditable={!isDisabled}
+        onEditClick={onEditClick}
+        testId={testId}
+        tooltipContent={messageOnDisabled}
+      >
+        {descriptionData ?? NotAvailable}
+      </EditButtonWithTooltip>
+      {additionalContent}
+    </>
   );
 
   return (

@@ -252,6 +252,13 @@ export const getMemoryCPU = <T>(obj: T): { cpu: V1CPU; memory: string } => ({
 });
 
 /**
+ * A selector that returns whether the resource has NUMA configuration
+ * @param {T} obj resource such as VM or VMI
+ * @returns {boolean} true if NUMA is configured
+ */
+export const hasNUMAConfiguration = <T>(obj: T): boolean => !!getCPU(obj)?.numa;
+
+/**
  * A selector that returns the amount of CPU cores of the resource
  * @param {T} obj resource such as VM or VMI
  * @returns {number} the number of CPU cores
