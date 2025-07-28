@@ -1,7 +1,7 @@
 import { VirtualMachineData } from '../types/vm';
 import { authSSHKey, cloudInit, sysPrep } from '../utils/const/string';
 
-import { getRow, tabModal } from './actions';
+import { getRow } from './actions';
 import { addDisk, addNic } from './modals';
 import * as cView from './selector-catalog';
 import * as vmView from './selector-common';
@@ -102,9 +102,9 @@ export const fillReviewAndCreate = (vmData: VirtualMachineData) => {
 };
 
 export const fillOverview = (vmData: VirtualMachineData) => {
-  const { bootMode, cpu, description, gpu, headless, hostname, name, startInPause, workload } =
+  const { bootMode, cpu, description, gpu, headless, hostname, mem, name, startInPause, workload } =
     vmData;
-  cy.contains('h1', 'Customize and create VirtualMachine', { timeout: 180000 }).should('exist');
+  cy.checkTitle('Customize and create VirtualMachine');
   if (name) {
     cy.get(cView.nameEditBtn).click();
     cy.get(cView.nameInput).clear().type(name);
@@ -117,8 +117,14 @@ export const fillOverview = (vmData: VirtualMachineData) => {
   }
   if (cpu) {
     cy.get(cView.cpuEditBtn).click();
-    cy.get('input[name="cpu-input"]').clear().type('3');
-    cy.get('input[name="memory-input"]').clear().type('3');
+    cy.get('input[name="cpu-input"]').clear();
+    cy.get('input[name="cpu-input"]').type(cpu);
+    cy.clickSaveBtn();
+  }
+  if (mem) {
+    cy.get(cView.cpuEditBtn).click();
+    cy.get('input[name="memory-input"]').clear();
+    cy.get('input[name="memory-input"]').type(cpu);
     cy.clickSaveBtn();
   }
   if (bootMode) {

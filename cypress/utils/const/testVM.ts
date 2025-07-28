@@ -37,6 +37,7 @@ export const VM_TMPL_CUST: VirtualMachineData = {
   bootMode: 'UEFI (secure)',
   cloudInitPwd: 'set-own-pwd',
   cloudInitUname: 'cnv-test',
+  cpu: '2',
   description: 'Customized VM from Template',
   existSecret: 'auto-test-secret',
   hostname: 'vm-template-host',
