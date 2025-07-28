@@ -10,6 +10,7 @@ import {
 
 export enum SourceTypes {
   BLANK = 'blank',
+  CDROM = 'cdrom',
   CLONE_PVC = 'pvc',
   DATA_SOURCE = 'dataSource',
   EPHEMERAL = 'containerDisk',

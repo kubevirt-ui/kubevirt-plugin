@@ -28,6 +28,7 @@ const DiskTypeSelect: FC<DiskTypeSelectProps> = ({ isVMRunning }) => {
   if (!diskState) return null;
 
   const diskType = getDiskDrive(diskState.disk);
+  const isCDROM = diskType === diskTypes.cdrom;
 
   const diskInterface = diskState.disk?.[diskType]?.bus || InterfaceTypes.VIRTIO;
 
@@ -48,6 +49,7 @@ const DiskTypeSelect: FC<DiskTypeSelectProps> = ({ isVMRunning }) => {
 
             setValue(`disk.${val as DiskType}`, { bus: newDiskInterface });
           }}
+          isDisabled={isCDROM}
           selected={diskType}
           selectedLabel={diskTypesLabels[diskType]}
           toggleProps={{ isFullWidth: true }}
@@ -56,7 +58,6 @@ const DiskTypeSelect: FC<DiskTypeSelectProps> = ({ isVMRunning }) => {
             {Object.values(diskTypes).map((type) => (
               <SelectOption
                 data-test-id={`${DISKTYPE_SELECT_FIELDID}-${type}`}
-                isDisabled={isVMRunning && type === diskTypes.cdrom}
                 key={type}
                 value={type}
               >
@@ -66,7 +67,9 @@ const DiskTypeSelect: FC<DiskTypeSelectProps> = ({ isVMRunning }) => {
           </SelectList>
         </FormPFSelect>
         <FormGroupHelperText>
-          {t('Hot plug is enabled only for Disk and Lun types')}
+          {isCDROM
+            ? t('CD-ROM type is automatically set and cannot be changed')
+            : t('Hot plug is enabled only for Disk and Lun types')}
         </FormGroupHelperText>
       </FormGroup>
     </div>

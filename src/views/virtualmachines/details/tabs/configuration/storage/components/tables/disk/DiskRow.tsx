@@ -5,8 +5,10 @@ import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevir
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, PersistentVolumeClaimModel } from '@kubevirt-utils/models';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
+import { getDisks } from '@kubevirt-utils/resources/vm';
 import { NameWithPercentages } from '@kubevirt-utils/resources/vm/hooks/types';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
+import { isCDROMDisk } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -23,6 +25,7 @@ import {
 import { isPVCSource } from './utils/helpers';
 import DiskRowActions from './DiskRowActions';
 import { HotplugLabel } from './HotplugLabel';
+import ISOBadge from './ISOBadge';
 
 const DiskRow: FC<
   RowProps<
@@ -60,6 +63,11 @@ const DiskRow: FC<
 
   const hasPVC = isPVCSource(obj);
 
+  const disks = getDisks(vm) || [];
+  const disk = disks.find((d) => d.name === name);
+  const isCDROM = disk && isCDROMDisk(disk);
+  const displayName = isCDROM ? t('cd-rom') : name;
+
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} id="name">
@@ -74,12 +82,13 @@ const DiskRow: FC<
                 }
                 position={PopoverPosition.right}
               >
-                <span className="provisioning-popover-button">{name}</span>
+                <span className="provisioning-popover-button">{displayName}</span>
               </Popover>
             ) : (
-              name
+              displayName
             )}{' '}
             <HotplugLabel diskName={name} vm={vm} vmi={vmi} />
+            <ISOBadge diskName={name} vm={vm} />
           </StackItem>
           {isBootDisk && (
             <StackItem>

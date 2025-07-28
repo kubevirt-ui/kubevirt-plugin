@@ -12,6 +12,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getName } from '@kubevirt-utils/resources/shared';
 import { getDataVolumeTemplates, getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
+import { isCDROMDisk } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
 import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
 import { ButtonVariant, Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
 import { updateDisks } from '@virtualmachines/details/tabs/configuration/details/utils/utils';
@@ -20,7 +21,9 @@ import { isRunning } from '@virtualmachines/utils';
 import CreateBootableVolumeModal from '../../modal/CreateBootableVolumeModal';
 import DeleteDiskModal from '../../modal/DeleteDiskModal';
 import DetachModal from '../../modal/DetachModal';
+import EjectCDROMModal from '../../modal/EjectCDROMModal';
 import MakePersistentModal from '../../modal/MakePersistentModal';
+import MountCDROMModal from '../../modal/MountCDROMModal';
 
 import { isHotplugVolume, isPVCSource } from './utils/helpers';
 
@@ -49,10 +52,41 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
   const isVMRunning = isRunning(vm);
   const isHotplug = isHotplugVolume(vm, diskName, vmi);
 
-  const volumes = isVMRunning
-    ? [...(getVolumes(vm) || []), ...getRunningVMMissingVolumesFromVMI(getVolumes(vm) || [], vmi)]
-    : getVolumes(vm);
+  const vmDisk = getDisks(vm)?.find((d) => d.name === diskName);
+  const isCDROM = vmDisk ? isCDROMDisk(vmDisk) : false;
+
+  // For CD-ROM operations update VM spec directly
+  // For other operations use vmi when VM is running
+  const volumes = isVMRunning ? vmi?.spec?.volumes : getVolumes(vm);
   const volume = volumes?.find(({ name }) => name === diskName);
+
+  const vmVolumes = getVolumes(vm);
+  const vmVolume = vmVolumes?.find(({ name }) => name === diskName);
+
+  const effectiveVolume = isCDROM ? vmVolume : volume;
+
+  const isCDROMOperationsEnabled = React.useMemo(() => {
+    return isCDROM;
+  }, [isCDROM]);
+
+  const isCDROMMountedState = React.useMemo(() => {
+    if (!effectiveVolume) return false;
+
+    const hasDataVolume = !!effectiveVolume.dataVolume?.name;
+    const hasPVC = !!effectiveVolume.persistentVolumeClaim?.claimName;
+
+    if (effectiveVolume.containerDisk?.image) {
+      const image = effectiveVolume.containerDisk.image.toLowerCase();
+      const isEmptyImage =
+        image.includes('ubi-micro') ||
+        image.includes('scratch') ||
+        image.includes('empty') ||
+        image.includes('ubi8/ubi-micro');
+      return !isEmptyImage;
+    }
+
+    return hasDataVolume || hasPVC;
+  }, [effectiveVolume]);
 
   const editBtnText = t('Edit');
   const deleteBtnText = t('Detach');
@@ -122,6 +156,28 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
       <MakePersistentModal isOpen={isOpen} onClose={onClose} vm={vm} vmi={vmi} volume={volume} />
     ));
 
+  const ejectCDROM = () =>
+    createModal(({ isOpen, onClose }) => (
+      <EjectCDROMModal
+        cdromName={diskName}
+        isOpen={isOpen}
+        onClose={onClose}
+        onSubmit={onDiskUpdate || updateDisks}
+        vm={vm}
+      />
+    ));
+
+  const mountCDROM = () =>
+    createModal(({ isOpen, onClose }) => (
+      <MountCDROMModal
+        cdromName={diskName}
+        isOpen={isOpen}
+        onClose={onClose}
+        onSubmit={onDiskUpdate || updateDisks}
+        vm={vm}
+      />
+    ));
+
   const onModalOpen = (createModalCallback: () => void) => {
     createModalCallback();
     setIsDropdownOpen(false);
@@ -148,6 +204,16 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
         <DropdownItem key="disk-edit" onClick={() => onModalOpen(createEditDiskModal)}>
           {editBtnText}
         </DropdownItem>
+        {isCDROMOperationsEnabled && isCDROMMountedState && (
+          <DropdownItem key="cdrom-eject" onClick={() => onModalOpen(ejectCDROM)}>
+            {t('Eject')}
+          </DropdownItem>
+        )}
+        {isCDROMOperationsEnabled && !isCDROMMountedState && (
+          <DropdownItem key="cdrom-mount" onClick={() => onModalOpen(mountCDROM)}>
+            {t('Mount')}
+          </DropdownItem>
+        )}
         <DropdownItem key="disk-delete" onClick={() => onModalOpen(createDeleteDiskModal)}>
           {deleteBtnText}
         </DropdownItem>
