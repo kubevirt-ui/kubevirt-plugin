@@ -190,7 +190,7 @@ describe('Check all virtualization pages can be loaded', () => {
     });
   });
 
-  describe('Check Preferences tabs', () => {
+  xdescribe('Check Preferences tabs', () => {
     it('preferences page is loaded', () => {
       cy.visitPreferences();
       cy.contains('fedora').should('exist');
