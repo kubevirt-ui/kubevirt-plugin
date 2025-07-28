@@ -325,3 +325,6 @@ export const isHeadlessMode = (vm: V1VirtualMachine | V1VirtualMachineInstance) 
   const devices = isVM(vm) ? vm?.spec?.template?.spec?.domain?.devices : vm?.spec?.domain?.devices;
   return devices?.autoattachGraphicsDevice === false;
 };
+
+export const getArchitecture = (vm: V1VirtualMachine): string =>
+  vm?.spec?.template?.spec?.architecture;
