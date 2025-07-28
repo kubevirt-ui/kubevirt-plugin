@@ -184,6 +184,7 @@ export const produceVMDisks = (
 export const doesSourceRequireDataVolume = (diskSource: SourceTypes): boolean => {
   return [
     SourceTypes.BLANK,
+    SourceTypes.CDROM,
     SourceTypes.CLONE_PVC,
     SourceTypes.DATA_SOURCE,
     SourceTypes.HTTP,
@@ -238,3 +239,78 @@ export const doesDataVolumeTemplateHaveDisk = (vm: V1VirtualMachine, diskName: s
 
 export const createDataVolumeName = (vm: V1VirtualMachine, diskName: string) =>
   `dv-${getName(vm)}-${diskName}-${getRandomChars()}`;
+
+export const mountISOToCDROM = async (
+  vm: V1VirtualMachine,
+  diskState: V1DiskFormState,
+): Promise<V1VirtualMachine> => {
+  const volumes = getVolumes(vm) || [];
+  const volumeIndex = volumes.findIndex((volume) => volume.name === diskState.disk.name);
+
+  if (volumeIndex === -1) {
+    throw new Error(t('CD-ROM volume {{name}} not found', { name: diskState.disk.name }));
+  }
+
+  if (diskState.dataVolumeTemplate) {
+    const dataVolume = getEmptyVMDataVolumeResource(vm);
+    dataVolume.metadata = diskState.dataVolumeTemplate.metadata;
+    dataVolume.spec = { ...diskState.dataVolumeTemplate.spec } as any;
+
+    await k8sCreate({ data: dataVolume, model: DataVolumeModel });
+  }
+
+  let newVolumeSource = {};
+
+  if (diskState.dataVolumeTemplate) {
+    newVolumeSource = {
+      dataVolume: {
+        name: diskState.dataVolumeTemplate.metadata.name,
+      },
+    };
+  } else if (diskState.volume?.persistentVolumeClaim) {
+    newVolumeSource = {
+      persistentVolumeClaim: {
+        claimName: diskState.volume.persistentVolumeClaim.claimName,
+      },
+    };
+  } else {
+    throw new Error(t('Invalid disk source for CD-ROM mount'));
+  }
+
+  return produceVMDisks(vm, (draftVM) => {
+    draftVM.spec.template.spec.volumes[volumeIndex] = {
+      name: diskState.disk.name,
+      ...newVolumeSource,
+    };
+  });
+};
+
+export const ejectISOFromCDROM = (vm: V1VirtualMachine, cdromName: string): V1VirtualMachine => {
+  const volumes = getVolumes(vm) || [];
+  const volumeIndex = volumes.findIndex((volume) => volume.name === cdromName);
+
+  if (volumeIndex === -1) {
+    throw new Error(t('CD-ROM volume {{name}} not found', { name: cdromName }));
+  }
+
+  return produceVMDisks(vm, (draftVM) => {
+    const currentVolume = draftVM.spec.template.spec.volumes[volumeIndex];
+
+    if (currentVolume?.dataVolume?.name) {
+      const dataVolumeTemplateIndex = (draftVM.spec.dataVolumeTemplates || []).findIndex(
+        (dv) => getName(dv) === currentVolume.dataVolume.name,
+      );
+
+      if (dataVolumeTemplateIndex >= 0) {
+        draftVM.spec.dataVolumeTemplates.splice(dataVolumeTemplateIndex, 1);
+      }
+    }
+
+    draftVM.spec.template.spec.volumes[volumeIndex] = {
+      containerDisk: {
+        image: 'registry.access.redhat.com/ubi8/ubi-micro:latest',
+      },
+      name: cdromName,
+    };
+  });
+};

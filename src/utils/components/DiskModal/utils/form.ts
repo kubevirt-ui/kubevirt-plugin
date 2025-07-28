@@ -15,7 +15,7 @@ import {
 import { generatePrettyName, isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { DEFAULT_DISK_SIZE } from './constants';
-import { createDataVolumeName, doesSourceRequireDataVolume } from './helpers';
+import { createDataVolumeName, doesSourceRequireDataVolume, getDefaultDiskType } from './helpers';
 import { DefaultFormValues, InterfaceTypes, SourceTypes, V1DiskFormState } from './types';
 
 const getDefaultDataVolumeTemplate = (name: string): V1DataVolumeTemplateSpec => ({
@@ -28,6 +28,8 @@ const createInitialStateFromSource: Record<
   (volume: V1Volume, dataVolumeTemplate: V1DataVolumeTemplateSpec) => void
 > = {
   [SourceTypes.BLANK]: (_volume: V1Volume, dataVolumeTemplate: V1DataVolumeTemplateSpec) =>
+    (dataVolumeTemplate.spec.source.blank = {}),
+  [SourceTypes.CDROM]: (_volume: V1Volume, dataVolumeTemplate: V1DataVolumeTemplateSpec) =>
     (dataVolumeTemplate.spec.source.blank = {}),
   [SourceTypes.CLONE_PVC]: (_volume: V1Volume, dataVolumeTemplate: V1DataVolumeTemplateSpec) =>
     (dataVolumeTemplate.spec.source.pvc = { name: '', namespace: '' }),
@@ -74,7 +76,8 @@ export const getDefaultCreateValues = (
   vm: V1VirtualMachine,
   createDiskSource: SourceTypes,
 ): V1DiskFormState => {
-  const newDiskName = generatePrettyName('disk');
+  const namePrefix = createDiskSource === SourceTypes.CDROM ? 'cd-rom' : 'disk';
+  const newDiskName = generatePrettyName(namePrefix);
   const newDataVolumeName = createDataVolumeName(vm, newDiskName);
 
   const withDataVolume = doesSourceRequireDataVolume(createDiskSource);
@@ -89,10 +92,15 @@ export const getDefaultCreateValues = (
 
   createInitialStateFromSource?.[createDiskSource]?.(volume, dataVolumeTemplate);
 
+  const isCDROM = createDiskSource === SourceTypes.CDROM;
+  const diskInterface = isCDROM ? InterfaceTypes.SATA : getDefaultDiskType(isRunning(vm));
+
+  const diskConfig = isCDROM ? { cdrom: { bus: diskInterface } } : { disk: { bus: diskInterface } };
+
   return {
     dataVolumeTemplate,
     disk: {
-      disk: { bus: InterfaceTypes.VIRTIO },
+      ...diskConfig,
       name: newDiskName,
     },
     isBootSource: false,

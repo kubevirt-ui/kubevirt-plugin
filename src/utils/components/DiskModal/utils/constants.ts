@@ -1,5 +1,6 @@
 /* eslint-disable require-jsdoc */
 
+import AddCDROMModal from '../AddCDROMModal';
 import BlankDiskModal from '../BlankDiskModal';
 import ClonePVCDiskModal from '../ClonePVCDiskModal';
 import ContainerDiskModal from '../ContainerDiskModal';
@@ -16,6 +17,7 @@ export const DEFAULT_CDROM_DISK_SIZE = '10Gi';
 
 export const DiskModalBySource = {
   [SourceTypes.BLANK]: BlankDiskModal,
+  [SourceTypes.CDROM]: AddCDROMModal,
   [SourceTypes.CLONE_PVC]: ClonePVCDiskModal,
   [SourceTypes.EPHEMERAL]: ContainerDiskModal,
   [SourceTypes.HTTP]: HTTPDiskModal,
