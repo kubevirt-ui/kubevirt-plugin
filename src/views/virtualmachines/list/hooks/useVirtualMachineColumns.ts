@@ -7,13 +7,9 @@ import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevi
 import { columnSorting } from '@kubevirt-utils/utils/utils';
 import useACMExtensionsHeaders from '@multicluster/hooks/useACMExtensionsHeaders';
 import useIsACMPage from '@multicluster/useIsACMPage';
-import {
-  K8sResourceCommon,
-  K8sVerb,
-  TableColumn,
-  useAccessReview,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { K8sResourceCommon, K8sVerb, TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 import { sortable } from '@patternfly/react-table';
+import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 import { PVCMapper, VMIMapper } from '@virtualmachines/utils/mappers';
 
 import {
@@ -37,8 +33,9 @@ const useVirtualMachineColumns = (
 
   const isACMPage = useIsACMPage();
 
-  const [canGetNode] = useAccessReview({
-    namespace: namespace,
+  const [canGetNode] = useFleetAccessReview({
+    cluster,
+    namespace,
     resource: NodeModel.plural,
     verb: 'get' as K8sVerb,
   });

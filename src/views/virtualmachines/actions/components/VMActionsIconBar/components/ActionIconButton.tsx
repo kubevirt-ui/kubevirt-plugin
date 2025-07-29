@@ -1,8 +1,8 @@
 import React, { FC } from 'react';
 import classNames from 'classnames';
 
-import { useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { Button, ButtonVariant, SplitItem, Tooltip } from '@patternfly/react-core';
+import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 import { VMActionIconDetails } from '@virtualmachines/actions/components/VMActionsIconBar/utils/types';
 
 import '../VMActionsIconBar.scss';
@@ -14,7 +14,7 @@ const ActionIconButton: FC<VMActionIconDetails> = ({
   isDisabled,
   isHidden,
 }) => {
-  const [actionAllowed] = useAccessReview(action?.accessReview);
+  const [actionAllowed] = useFleetAccessReview(action?.accessReview);
 
   const handleClick = () => {
     if (typeof action?.cta === 'function') {

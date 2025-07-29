@@ -22,8 +22,9 @@ import {
 import { asAccessReview, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
-import { Action, Patch } from '@openshift-console/dynamic-plugin-sdk';
+import { Patch } from '@openshift-console/dynamic-plugin-sdk';
 import { CopyIcon } from '@patternfly/react-icons';
 import VirtualMachineMigrateModal from '@virtualmachines/actions/components/VirtualMachineMigration/VirtualMachineMigrationModal';
 import { isDeletionProtectionEnabled } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
@@ -66,11 +67,12 @@ export const VirtualMachineActionFactory = {
   cancelComputeMigration: (
     vm: V1VirtualMachine,
     vmim: V1VirtualMachineInstanceMigration,
-  ): Action => {
+  ): ActionDropdownItemType => {
     return {
       accessReview: {
+        cluster: getCluster(vm),
         group: VirtualMachineInstanceMigrationModel.apiGroup,
-        namespace: vm?.metadata?.namespace,
+        namespace: getNamespace(vm),
         resource: VirtualMachineInstanceMigrationModel.plural,
         verb: 'delete',
       },
@@ -81,7 +83,7 @@ export const VirtualMachineActionFactory = {
       label: t('Cancel compute migration'),
     };
   },
-  cancelStorageMigration: (currentStorageMigration: MigMigration): Action => {
+  cancelStorageMigration: (currentStorageMigration: MigMigration): ActionDropdownItemType => {
     const canceled =
       currentStorageMigration?.spec?.rollback || currentStorageMigration?.spec?.canceled;
 
@@ -92,6 +94,7 @@ export const VirtualMachineActionFactory = {
 
     return {
       accessReview: {
+        cluster: getCluster(currentStorageMigration),
         group: MigMigrationModel.apiGroup,
         namespace: DEFAULT_MIGRATION_NAMESPACE,
         resource: MigMigrationModel.plural,
@@ -108,7 +111,10 @@ export const VirtualMachineActionFactory = {
       label: canceled ? t('Cancelling storage migration') : t('Cancel storage migration'),
     };
   },
-  clone: (vm: V1VirtualMachine, createModal: (modal: ModalComponent) => void): Action => {
+  clone: (
+    vm: V1VirtualMachine,
+    createModal: (modal: ModalComponent) => void,
+  ): ActionDropdownItemType => {
     return {
       accessReview: asAccessReview(VirtualMachineCloneModel, vm, 'create'),
       cta: () =>
@@ -120,7 +126,7 @@ export const VirtualMachineActionFactory = {
       label: t('Clone'),
     };
   },
-  copySSHCommand: (vm: V1VirtualMachine, command: string): Action => {
+  copySSHCommand: (vm: V1VirtualMachine, command: string): ActionDropdownItemType => {
     return {
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
       cta: () => command && navigator.clipboard.writeText(command),
@@ -131,7 +137,10 @@ export const VirtualMachineActionFactory = {
       label: t('Copy SSH command'),
     };
   },
-  delete: (vm: V1VirtualMachine, createModal: (modal: ModalComponent) => void): Action => {
+  delete: (
+    vm: V1VirtualMachine,
+    createModal: (modal: ModalComponent) => void,
+  ): ActionDropdownItemType => {
     return {
       accessReview: asAccessReview(VirtualMachineModel, vm, 'delete'),
       cta: () =>
@@ -150,7 +159,10 @@ export const VirtualMachineActionFactory = {
       label: t('Delete'),
     };
   },
-  editLabels: (vm: V1VirtualMachine, createModal: (modal: ModalComponent) => void): Action => ({
+  editLabels: (
+    vm: V1VirtualMachine,
+    createModal: (modal: ModalComponent) => void,
+  ): ActionDropdownItemType => ({
     accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
     cta: () =>
       createModal(({ isOpen, onClose }) => (
@@ -176,7 +188,7 @@ export const VirtualMachineActionFactory = {
     id: 'vm-action-edit-labels',
     label: t('Edit labels'),
   }),
-  forceStop: (vm: V1VirtualMachine): Action => {
+  forceStop: (vm: V1VirtualMachine): ActionDropdownItemType => {
     return {
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
       cta: () =>
@@ -188,9 +200,10 @@ export const VirtualMachineActionFactory = {
       label: t('Force stop'),
     };
   },
-  migrateCompute: (vm: V1VirtualMachine): Action => {
+  migrateCompute: (vm: V1VirtualMachine): ActionDropdownItemType => {
     return {
       accessReview: {
+        cluster: getCluster(vm),
         group: VirtualMachineInstanceMigrationModel.apiGroup,
         namespace: vm?.metadata?.namespace,
         resource: VirtualMachineInstanceMigrationModel.plural,
@@ -203,14 +216,12 @@ export const VirtualMachineActionFactory = {
       label: t('Compute'),
     };
   },
-  migrateStorage: (vm: V1VirtualMachine, createModal: (modal: ModalComponent) => void): Action => {
+  migrateStorage: (
+    vm: V1VirtualMachine,
+    createModal: (modal: ModalComponent) => void,
+  ): ActionDropdownItemType => {
     return {
-      accessReview: {
-        group: VirtualMachineModel.apiGroup,
-        namespace: getNamespace(vm),
-        resource: VirtualMachineModel.plural,
-        verb: 'patch',
-      },
+      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
       cta: () => createModal((props) => <VirtualMachineMigrateModal vms={[vm]} {...props} />),
       description: t('Migrate VirtualMachine storage to a different StorageClass'),
       id: 'vm-migrate-storage',
@@ -223,14 +234,12 @@ export const VirtualMachineActionFactory = {
     label: 'Migration',
     options: migrationActions,
   }),
-  moveToFolder: (vm: V1VirtualMachine, createModal: (modal: ModalComponent) => void): Action => {
+  moveToFolder: (
+    vm: V1VirtualMachine,
+    createModal: (modal: ModalComponent) => void,
+  ): ActionDropdownItemType => {
     return {
-      accessReview: {
-        group: VirtualMachineModel.apiGroup,
-        namespace: getNamespace(vm),
-        resource: VirtualMachineModel.plural,
-        verb: 'patch',
-      },
+      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
       cta: () =>
         createModal((props) => (
           <MoveVMToFolderModal
@@ -261,7 +270,7 @@ export const VirtualMachineActionFactory = {
     vm: V1VirtualMachine,
     createModal: (modal: ModalComponent) => void,
     confirmVMActions: boolean,
-  ): Action => {
+  ): ActionDropdownItemType => {
     return {
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
       cta: () =>
@@ -285,7 +294,7 @@ export const VirtualMachineActionFactory = {
     vm: V1VirtualMachine,
     createModal: (modal: ModalComponent) => void,
     confirmVMActions: boolean,
-  ): Action => {
+  ): ActionDropdownItemType => {
     return {
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
       cta: () =>
@@ -310,7 +319,10 @@ export const VirtualMachineActionFactory = {
       label: t('Restart'),
     };
   },
-  snapshot: (vm: V1VirtualMachine, createModal: (modal: ModalComponent) => void): Action => {
+  snapshot: (
+    vm: V1VirtualMachine,
+    createModal: (modal: ModalComponent) => void,
+  ): ActionDropdownItemType => {
     return {
       accessReview: asAccessReview(VirtualMachineSnapshotModel, vm, 'create'),
       cta: () => createModal((props) => <SnapshotModal vm={vm} {...props} />),
@@ -318,7 +330,7 @@ export const VirtualMachineActionFactory = {
       label: t('Take snapshot'),
     };
   },
-  start: (vm: V1VirtualMachine): Action => {
+  start: (vm: V1VirtualMachine): ActionDropdownItemType => {
     return {
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
       cta: () => startVM(vm),
@@ -343,7 +355,7 @@ export const VirtualMachineActionFactory = {
     vm: V1VirtualMachine,
     createModal: (modal: ModalComponent) => void,
     confirmVMActions: boolean,
-  ): Action => {
+  ): ActionDropdownItemType => {
     return {
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
       cta: () =>
@@ -368,7 +380,7 @@ export const VirtualMachineActionFactory = {
       label: t('Stop'),
     };
   },
-  unpause: (vm: V1VirtualMachine): Action => {
+  unpause: (vm: V1VirtualMachine): ActionDropdownItemType => {
     return {
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
       cta: () => unpauseVM(vm),

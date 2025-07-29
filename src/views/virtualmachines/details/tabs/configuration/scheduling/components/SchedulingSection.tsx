@@ -9,8 +9,9 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
-import { K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
+import { K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
 import { Grid, GridItem, Title } from '@patternfly/react-core';
+import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 
 import SchedulingSectionLeftGrid from './SchedulingSectionLeftGrid';
 import SchedulingSectionRightGrid from './SchedulingSectionRightGrid';
@@ -30,7 +31,7 @@ const SchedulingSection: FC<SchedulingSectionProps> = ({ instanceTypeVM, onSubmi
     isList: true,
   });
   const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
-  const [canUpdateVM] = useAccessReview(accessReview || {});
+  const [canUpdateVM] = useFleetAccessReview(accessReview || {});
 
   return (
     <>

@@ -11,8 +11,9 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
-import { k8sUpdate, K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
+import { k8sUpdate, K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
 import { Stack } from '@patternfly/react-core';
+import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 
 import { useDynamicSSHInjection } from '../hooks/useDynamicSSHInjection';
 
@@ -34,7 +35,7 @@ const SSHTabAuthorizedSSHKey: FC<SSHTabAuthorizedSSHKeyProps> = ({
   const { createModal } = useModal();
   const [authorizedSSHKeys, updateAuthorizedSSHKeys, loaded] = useKubevirtUserSettings('ssh');
   const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
-  const [canUpdateVM] = useAccessReview(accessReview || {});
+  const [canUpdateVM] = useFleetAccessReview(accessReview || {});
   const secretName = useMemo(() => getVMSSHSecretName(vm), [vm]);
   const isDynamicSSHInjectionEnabled = useDynamicSSHInjection(vm);
   const isEditable =

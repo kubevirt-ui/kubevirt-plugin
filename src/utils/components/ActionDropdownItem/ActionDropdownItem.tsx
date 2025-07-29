@@ -1,7 +1,7 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
 
-import { useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { Menu, MenuContent, MenuItem, MenuList, TooltipPosition } from '@patternfly/react-core';
+import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 
 import { ActionDropdownItemType } from '../ActionsDropdown/constants';
 
@@ -11,7 +11,7 @@ type ActionDropdownItemProps = {
 };
 
 const ActionDropdownItem: FC<ActionDropdownItemProps> = ({ action, setIsOpen }) => {
-  const [accessReview] = useAccessReview(action?.accessReview || {});
+  const [accessReview] = useFleetAccessReview(action?.accessReview || {});
 
   const actionAllowed = accessReview || action?.accessReview === undefined;
   const isDisabled = !actionAllowed || action?.disabled;

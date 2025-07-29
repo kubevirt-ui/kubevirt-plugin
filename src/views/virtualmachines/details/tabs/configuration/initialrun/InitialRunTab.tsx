@@ -6,8 +6,9 @@ import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEdito
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
-import { K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
+import { K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, Divider, PageSection, Title } from '@patternfly/react-core';
+import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 
 import { onSubmitYAML } from '../details/utils/utils';
 import { ConfigurationInnerTabProps } from '../utils/types';
@@ -18,7 +19,7 @@ import InitialRunTabSysprep from './components/InitialRunTabSysprep';
 const InitialRunTab: FC<ConfigurationInnerTabProps> = ({ vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
-  const [canUpdateVM] = useAccessReview(accessReview || {});
+  const [canUpdateVM] = useFleetAccessReview(accessReview || {});
 
   return (
     <SidebarEditor
