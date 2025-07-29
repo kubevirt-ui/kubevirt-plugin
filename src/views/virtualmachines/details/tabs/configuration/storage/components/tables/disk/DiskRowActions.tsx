@@ -2,7 +2,10 @@ import React, { FC, useState } from 'react';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
-import { produceVMDisks } from '@kubevirt-utils/components/DiskModal/utils/helpers';
+import {
+  getRunningVMMissingVolumesFromVMI,
+  produceVMDisks,
+} from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -46,7 +49,9 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
   const isVMRunning = isRunning(vm);
   const isHotplug = isHotplugVolume(vm, diskName, vmi);
 
-  const volumes = isVMRunning ? vmi?.spec?.volumes : getVolumes(vm);
+  const volumes = isVMRunning
+    ? [...(getVolumes(vm) || []), ...getRunningVMMissingVolumesFromVMI(getVolumes(vm) || [], vmi)]
+    : getVolumes(vm);
   const volume = volumes?.find(({ name }) => name === diskName);
 
   const editBtnText = t('Edit');

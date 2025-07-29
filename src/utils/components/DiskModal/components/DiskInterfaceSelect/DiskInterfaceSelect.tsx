@@ -33,10 +33,12 @@ const DiskInterfaceSelect: FC<DiskInterfaceSelectProps> = ({ isVMRunning }) => {
           onSelect={(_, val) => setValue(`disk.${diskType}.bus`, val as string)}
           selected={diskInterface}
           selectedLabel={selectedLabel}
-          toggleProps={{ isDisabled: isVMRunning, isFullWidth: true }}
+          toggleProps={{ isFullWidth: true }}
         >
           {Object.entries(diskInterfaceOptions).map(([id, { description, label }]) => {
-            const isDisabled = diskType === diskTypes.cdrom && id === InterfaceTypes.VIRTIO;
+            const isDisabled =
+              (diskType === diskTypes.cdrom && id === InterfaceTypes.VIRTIO) ||
+              (isVMRunning && id === InterfaceTypes.SATA);
             return (
               <SelectOption
                 data-test-id={`disk-interface-select-${id}`}
@@ -51,7 +53,7 @@ const DiskInterfaceSelect: FC<DiskInterfaceSelectProps> = ({ isVMRunning }) => {
           })}
         </FormPFSelect>
         <FormGroupHelperText>
-          {t('Hot plug is enabled only for "SCSI" interface')}
+          {t('Hot plug is enabled only for SCSI and VirtIO interface')}
         </FormGroupHelperText>
       </div>
     </FormGroup>
