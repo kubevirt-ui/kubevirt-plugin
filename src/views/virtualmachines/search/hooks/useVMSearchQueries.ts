@@ -2,11 +2,12 @@ import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom-v5-compat';
 
 import { STATIC_SEARCH_FILTERS } from '@kubevirt-utils/components/ListPageFilter/constants';
+import { AdvancedSearchFilter } from '@stolostron/multicluster-sdk/lib/api/search/types';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 export type VMSearchQueries = {
-  vmiQueries: { [key: string]: string };
-  vmQueries: { [key: string]: string };
+  vmiQueries: AdvancedSearchFilter;
+  vmQueries: AdvancedSearchFilter;
 };
 
 const useVMSearchQueries = (): VMSearchQueries => {
@@ -17,32 +18,41 @@ const useVMSearchQueries = (): VMSearchQueries => {
   const ip = searchParams.get(VirtualMachineRowFilterType.IP);
   const project = searchParams.get(VirtualMachineRowFilterType.Project);
   const clusters = searchParams.get(VirtualMachineRowFilterType.Cluster);
+  const createdFrom = searchParams.get(VirtualMachineRowFilterType.DateCreatedFrom);
+  const createdTo = searchParams.get(VirtualMachineRowFilterType.DateCreatedTo);
 
   return useMemo(() => {
     const queries: VMSearchQueries = {
-      vmiQueries: {},
-      vmQueries: {},
+      vmiQueries: [],
+      vmQueries: [],
     };
 
-    if (vmName) {
-      queries.vmQueries.name = `*${vmName}*`;
-      queries.vmiQueries.name = `*${vmName}*`;
+    if (createdFrom) {
+      queries.vmQueries.push({ property: 'created', values: [`>=${createdFrom}`] });
+    }
+    if (createdTo) {
+      queries.vmQueries.push({ property: 'created', values: [`<=${createdTo}`] });
     }
 
     if (clusters) {
-      queries.vmQueries.cluster = clusters;
-      queries.vmiQueries.cluster = clusters;
+      queries.vmQueries.push({ property: 'cluster', values: clusters.split(',') });
+      queries.vmiQueries.push({ property: 'cluster', values: clusters.split(',') });
     }
 
-    if (ip) queries.vmiQueries.ipaddress = `*${ip}*`;
+    if (vmName) {
+      queries.vmQueries.push({ property: 'name', values: [`*${vmName}*`] });
+      queries.vmiQueries.push({ property: 'name', values: [`*${vmName}*`] });
+    }
+
+    if (ip) queries.vmiQueries.push({ property: 'ipaddress', values: [`*${ip}*`] });
 
     if (project) {
-      queries.vmQueries.project = project;
-      queries.vmiQueries.project = project;
+      queries.vmQueries.push({ property: 'namespace', values: project.split(',') });
+      queries.vmiQueries.push({ property: 'namespace', values: project.split(',') });
     }
 
     return queries;
-  }, [vmName, ip, project, clusters]);
+  }, [createdFrom, createdTo, vmName, ip, project, clusters]);
 };
 
 export default useVMSearchQueries;
