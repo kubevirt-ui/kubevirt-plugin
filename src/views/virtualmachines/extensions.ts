@@ -1,6 +1,8 @@
 import { EncodedExtension } from '@openshift/dynamic-plugin-sdk-webpack';
 import {
+  HrefNavItem,
   ResourceActionProvider,
+  ResourceNSNavItem,
   RoutePage,
   StandaloneRoutePage,
 } from '@openshift-console/dynamic-plugin-sdk';
@@ -61,4 +63,43 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
+
+  {
+    flags: {
+      disallowed: ['KUBEVIRT_DYNAMIC_ACM'],
+    },
+    properties: {
+      dataAttributes: {
+        'data-quickstart-id': 'qs-nav-virtualmachines',
+        'data-test-id': 'virtualmachines-nav-item',
+      },
+      id: 'virtualmachines',
+      model: {
+        group: 'kubevirt.io',
+        kind: 'VirtualMachine',
+        version: 'v1',
+      },
+      name: '%plugin__kubevirt-plugin~VirtualMachines%',
+      section: 'virtualization',
+    },
+    type: 'console.navigation/resource-ns',
+  } as EncodedExtension<ResourceNSNavItem>,
+  {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC_ACM'],
+    },
+    properties: {
+      dataAttributes: {
+        'data-quickstart-id': 'qs-nav-virtualization-catalog',
+        'data-test-id': 'virtualization-catalog-nav-item',
+      },
+      href: '/k8s/all-clusters/all-namespaces/kubevirt.io~v1~VirtualMachine',
+      id: 'virtualmachines',
+      insertAfter: 'virtualization-catalog',
+      insertBefore: 'templates',
+      name: '%plugin__kubevirt-plugin~VirtualMachines%',
+      section: 'virtualization',
+    },
+    type: 'console.navigation/href',
+  } as EncodedExtension<HrefNavItem>,
 ];

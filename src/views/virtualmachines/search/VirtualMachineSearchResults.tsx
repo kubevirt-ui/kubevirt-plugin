@@ -22,7 +22,6 @@ import { useHideNamespaceBar } from '@virtualmachines/hooks/useHideNamespaceBar'
 import VirtualMachinesCreateButton from '@virtualmachines/list/components/VirtualMachinesCreateButton/VirtualMachinesCreateButton';
 import VirtualMachinesList from '@virtualmachines/list/VirtualMachinesList';
 
-import useClustersSearchRedirect from './hooks/useClustersSearchRedirect';
 import useVMSearchQueries from './hooks/useVMSearchQueries';
 
 const VirtualMachineSearchResults: FC = () => {
@@ -40,7 +39,6 @@ const VirtualMachineSearchResults: FC = () => {
     useFeatures(ADVANCED_SEARCH);
 
   useHideNamespaceBar();
-  useClustersSearchRedirect();
 
   useEffect(() => {
     if (!advancedSearchEnabled && !advancedSearchLoading) {
