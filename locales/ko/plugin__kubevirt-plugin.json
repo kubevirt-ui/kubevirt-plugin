@@ -541,7 +541,7 @@
   "Edit disk": "디스크 편집",
   "Edit Display name": "표시 이름 편집",
   "Edit hostname": "호스트 이름 편집",
-  "Edit Instance Type": "인스턴스 유형 편집",
+  "Edit InstanceType": "Edit InstanceType",
   "Edit labels": "라벨 편집",
   "Edit Labels": "라벨 편집",
   "Edit MigrationPolicy": "MigrationPolicy 편집",

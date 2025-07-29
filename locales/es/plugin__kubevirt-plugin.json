@@ -549,7 +549,7 @@
   "Edit disk": "Editar disco",
   "Edit Display name": "Editar nombre para mostrar",
   "Edit hostname": "Editar nombre de host",
-  "Edit Instance Type": "Editar tipo de instancia",
+  "Edit InstanceType": "Edit InstanceType",
   "Edit labels": "Editar etiquetas",
   "Edit Labels": "Editar etiquetas",
   "Edit MigrationPolicy": "Editar MigrationPolicy",

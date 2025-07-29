@@ -48,7 +48,7 @@ const InstanceTypeModal: FC<InstanceTypeModalProps> = ({
 
   return (
     <TabModal
-      headerText={t('Edit Instance Type')}
+      headerText={t('Edit InstanceType')}
       isOpen={isOpen}
       obj={getInstanceTypeFromSeriesAndSize(mappedInstanceTypes, series, size)}
       onClose={onClose}
