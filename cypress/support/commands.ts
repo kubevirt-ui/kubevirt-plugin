@@ -8,6 +8,7 @@ declare global {
     interface Chainable {
       beforeSpec(): void;
       checkHCOSpec(spec: string, matchString: string, include: boolean): void;
+      checkVMISpec(vmName: string, spec: string, matchString: string, include: boolean): void;
       checkVMSpec(vmName: string, spec: string, matchString: string, include: boolean): void;
       deleteVM(vmName: string[]): void;
       patchVM(vmName: string, status: string): void;
@@ -30,16 +31,35 @@ Cypress.Commands.add('checkHCOSpec', (spec: string, matchString: string, include
   });
 });
 
-Cypress.Commands.add(
-  'checkVMSpec',
-  (vmName: string, spec: string, matchString: string, include: boolean) => {
-    cy.exec(`oc get -n ${TEST_NS} vm ${vmName} -o jsonpath='{${spec}}'`).then((result) => {
+const checkSpec = (
+  resourceType: string,
+  vmName: string,
+  jsonPath: string,
+  matchString: string,
+  include: boolean,
+) => {
+  cy.exec(`oc get -n ${TEST_NS} ${resourceType} ${vmName} -o jsonpath='{${jsonPath}}'`).then(
+    (result) => {
       if (include) {
         expect(result.stdout).contain(matchString);
       } else {
         expect(result.stdout).not.contain(matchString);
       }
-    });
+    },
+  );
+};
+
+Cypress.Commands.add(
+  'checkVMSpec',
+  (vmName: string, spec: string, matchString: string, include: boolean) => {
+    checkSpec('vm', vmName, spec, matchString, include);
+  },
+);
+
+Cypress.Commands.add(
+  'checkVMISpec',
+  (vmName: string, spec: string, matchString: string, include: boolean) => {
+    checkSpec('vmi', vmName, spec, matchString, include);
   },
 );
 

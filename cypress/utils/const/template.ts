@@ -36,6 +36,11 @@ export const TEMPLATE = {
     metadataName: 'rhel9-server-small',
     name: 'Red Hat Enterprise Linux 9 VM',
   },
+  RHEL9_LARGE: {
+    dvName: 'rhel9',
+    metadataName: 'rhel9-server-large',
+    name: 'Red Hat Enterprise Linux 9 VM',
+  },
   WIN10: {
     dvName: 'win10',
     metadataName: 'windows10-desktop-medium',

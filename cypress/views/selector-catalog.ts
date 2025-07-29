@@ -33,6 +33,9 @@ export const customizeVMBtn = '[data-test-id="customize-vm-btn"]';
 export const quickCreateVMBtn = '[data-test-id="quick-create-vm-btn"]';
 export const vmName = '[data-test-id="template-catalog-vm-name-input"]';
 export const uTemplate = '#user-templates';
+export const aTemplate = '#all-templates';
+export const searchCatalog = '[data-test="search-catalog"]';
+export const editCPU = '[data-test-id="edit-cpu-mem"]';
 
 // review and create
 export const vmCustomizeName = '#vm-customize-NAME';

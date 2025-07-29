@@ -109,6 +109,7 @@ export const TemplateInfoSection: FC = memo(() => {
               />
             ))
           }
+          data-test-id="edit-cpu-mem"
           descriptionData={<CPUMemory vm={vm} />}
           descriptionHeader={t('CPU | Memory')}
           isEdit
