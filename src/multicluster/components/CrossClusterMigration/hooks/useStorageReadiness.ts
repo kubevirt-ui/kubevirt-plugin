@@ -29,7 +29,7 @@ export type UseStorageReadinessReturnType = {
 
 const useStorageReadiness = (
   vms: V1VirtualMachine[],
-  targetProvider: string,
+  targetProviderUID: string,
   storageMap: V1beta1StorageMap,
   setStorageMap: Updater<V1beta1StorageMap>,
 ) => {
@@ -47,7 +47,7 @@ const useStorageReadiness = (
     data: targetStorageClasses,
     error: targetStorageClassesError,
     loaded: targetStorageClassesLoaded,
-  } = useProviderStorageClasses(targetProvider);
+  } = useProviderStorageClasses(targetProviderUID);
 
   const [pvcs, pvcsLoaded, pvcsError] = useK8sWatchData<IoK8sApiCoreV1PersistentVolumeClaim[]>({
     cluster: sourceCluster,

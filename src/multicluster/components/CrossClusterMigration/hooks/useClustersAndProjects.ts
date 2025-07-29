@@ -1,19 +1,38 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
+import { V1beta1Provider } from '@kubev2v/types';
+import { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-utils/models';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { ManagedClusterModel } from '@multicluster/constants';
 import useAllClusters from '@multicluster/hooks/useAllClusters/useAllClusters';
+import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
-import { getClusterFromProvider } from '../utils';
+import { getClusterFromProvider, getProviderByClusterName } from '../utils';
 
 import useProviders from './useProviders';
 import { getSelectableOptions } from './utils';
 
-const useClustersAndProjects = (sourceCluster: string, selectedClusterTarget: string) => {
+type UseClustersAndProjects = (
+  sourceCluster: string,
+  selectedClusterTarget: string,
+) => {
+  clustersError: any;
+  clustersLoaded: boolean;
+  clustersOptions: EnhancedSelectOptionProps[];
+  getProviderFromClusterName: (clusterName: string) => V1beta1Provider;
+  projectOptions: EnhancedSelectOptionProps[];
+  projectsError: any;
+  projectsLoaded: boolean;
+  providers: V1beta1Provider[];
+};
+
+const useClustersAndProjects: UseClustersAndProjects = (sourceCluster, selectedClusterTarget) => {
   const [clusters, clustersLoaded, clustersError] = useAllClusters();
   const [providers, providersLoaded, providersError] = useProviders();
+
+  const [hubClusterName, hubClusterLoaded, hubClusterError] = useHubClusterName();
 
   const clustersNames = useMemo(() => {
     return clusters?.map((cluster) => getName(cluster));
@@ -24,8 +43,8 @@ const useClustersAndProjects = (sourceCluster: string, selectedClusterTarget: st
   }, [clustersNames, sourceCluster]);
 
   const enabledClusters = useMemo(() => {
-    return providers?.map((provider) => getClusterFromProvider(getName(provider)));
-  }, [providers]);
+    return providers?.map((provider) => getClusterFromProvider(getName(provider), hubClusterName));
+  }, [providers, hubClusterName]);
 
   const clustersOptions = getSelectableOptions(
     selectableClusters,
@@ -36,13 +55,22 @@ const useClustersAndProjects = (sourceCluster: string, selectedClusterTarget: st
   const [projects, projectsLoaded, projectsError] = useProjects(selectedClusterTarget);
   const projectOptions = getSelectableOptions(projects, modelToGroupVersionKind(ProjectModel));
 
+  const getProviderFromClusterName = useCallback(
+    (clusterName: string) => {
+      return getProviderByClusterName(clusterName, hubClusterName, providers);
+    },
+    [providers, hubClusterName],
+  );
+
   return {
-    clustersError: clustersError || providersError,
-    clustersLoaded: clustersLoaded || providersLoaded,
+    clustersError: clustersError || providersError || hubClusterError,
+    clustersLoaded: clustersLoaded && providersLoaded && hubClusterLoaded,
     clustersOptions,
+    getProviderFromClusterName,
     projectOptions,
     projectsError,
     projectsLoaded,
+    providers,
   };
 };
 

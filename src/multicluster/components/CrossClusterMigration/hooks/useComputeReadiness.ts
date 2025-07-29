@@ -7,7 +7,7 @@ import { getArchitecture } from '@kubevirt-utils/resources/vm/utils/selectors';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 const useComputeReadiness = (vms: V1VirtualMachine[], targetCluster: string) => {
-  const vmsArchs = useMemo(() => vms.map((vm) => getArchitecture(vm)), [vms]);
+  const vmsArchs = useMemo(() => Array.from(new Set(vms.map((vm) => getArchitecture(vm)))), [vms]);
 
   const [nodes, nodesLoaded, nodesError] = useK8sWatchData<IoK8sApiCoreV1Node[]>({
     cluster: targetCluster,
@@ -16,7 +16,7 @@ const useComputeReadiness = (vms: V1VirtualMachine[], targetCluster: string) => 
   });
 
   const nodesArchs = useMemo(
-    () => nodes.map((node) => node.status?.nodeInfo?.architecture),
+    () => Array.from(new Set(nodes.map((node) => node.status?.nodeInfo?.architecture))),
     [nodes],
   );
 

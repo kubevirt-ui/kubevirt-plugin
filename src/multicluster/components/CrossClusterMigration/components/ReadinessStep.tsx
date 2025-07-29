@@ -2,24 +2,16 @@ import React, { FC } from 'react';
 import { Updater } from 'use-immer';
 
 import { V1beta1NetworkMap, V1beta1Plan, V1beta1StorageMap } from '@kubev2v/types';
+import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getTargetProviderName } from '@kubevirt-utils/resources/plan/selectors';
+import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
+import { modelToGroupVersionKind } from '@kubevirt-utils/models';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { Title, Wizard, WizardStep } from '@patternfly/react-core';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
-import useComputeReadiness from '../hooks/useComputeReadiness';
-import useNetworkReadiness from '../hooks/useNetworkReadiness';
-import useStorageReadiness from '../hooks/useStorageReadiness';
-import useVersionReadiness from '../hooks/useVersionReadiness';
-import { getClusterFromProvider } from '../utils';
-
-import ComputeCompatibility from './ComputeCompatibility';
-import MainReadinessCheck from './MainReadinessCheck';
-import NetworkMapping from './NetworkMapping';
-import ReadinessWizardNavItem from './ReadinessWizardNavItem';
-import StorageMapping from './StorageMapping';
-import VersionCompatibility from './VersionCompatibility';
+import ReadinessStepBody from './ReadinessStepBody';
 
 type ReadinessStepProps = {
   migrationPlan: V1beta1Plan;
@@ -34,132 +26,34 @@ type ReadinessStepProps = {
 const ReadinessStep: FC<ReadinessStepProps> = ({
   migrationPlan,
   networkMap,
+  setMigrationPlan,
   setNetworkMap,
   setStorageMap,
   storageMap,
   vms,
 }) => {
-  const { t } = useKubevirtTranslation();
-  const targetProvider = getTargetProviderName(migrationPlan);
-  const targetCluster = getClusterFromProvider(targetProvider);
+  const namespace = getNamespace(vms?.[0]);
+  const cluster = getCluster(vms?.[0]);
 
-  const {
-    changeStorageMap,
-    isReady: storageIsReady,
-    loaded: storageLoaded,
-    targetStorageClasses,
-  } = useStorageReadiness(vms, targetProvider, storageMap, setStorageMap);
-
-  const {
-    changeNetworkMap,
-    isReady: networkIsReady,
-    loaded: networkLoaded,
-    targetNADs,
-  } = useNetworkReadiness(vms, targetProvider, networkMap, setNetworkMap);
-
-  const {
-    isReady: computeIsReady,
-    loaded: computeLoaded,
-    nodesArchs,
-    vmsArchs,
-  } = useComputeReadiness(vms, targetCluster);
-
-  const {
-    isReady: versionIsReady,
-    loaded: versionLoaded,
-    sourceClusterVersion,
-    sourceKubevirtVersion,
-    targetClusterVersion,
-    targetKubevirtVersion,
-  } = useVersionReadiness(getCluster(vms?.[0]), targetCluster);
+  const [fetchedVMs, fetchedVMsLoaded, fetchedVMsError] = useK8sWatchData<V1VirtualMachine[]>({
+    cluster,
+    groupVersionKind: modelToGroupVersionKind(VirtualMachineModel),
+    isList: true,
+    namespace,
+  });
 
   return (
-    <>
-      <Title className="cross-cluster-migration-title" headingLevel="h4">
-        {t('Migration readiness')}
-      </Title>
-
-      <MainReadinessCheck
-        checks={[networkIsReady, storageIsReady, computeIsReady, versionIsReady]}
-        loadedChecks={[networkLoaded, storageLoaded, computeLoaded, versionLoaded]}
+    <StateHandler error={fetchedVMsError} hasData={!isEmpty(fetchedVMs)} loaded={fetchedVMsLoaded}>
+      <ReadinessStepBody
+        migrationPlan={migrationPlan}
+        networkMap={networkMap}
+        setMigrationPlan={setMigrationPlan}
+        setNetworkMap={setNetworkMap}
+        setStorageMap={setStorageMap}
+        storageMap={storageMap}
+        vms={fetchedVMs}
       />
-
-      <Wizard footer={<></>}>
-        <WizardStep
-          navItem={{
-            content: (
-              <ReadinessWizardNavItem
-                checked={networkIsReady}
-                loaded={networkLoaded}
-                title={t('Network mapping')}
-              />
-            ),
-          }}
-          id="network-mapping"
-          name={t('Network mapping')}
-        >
-          <NetworkMapping
-            changeNetworkMap={changeNetworkMap}
-            nads={targetNADs}
-            networkMap={networkMap}
-          />
-        </WizardStep>
-        <WizardStep
-          navItem={{
-            content: (
-              <ReadinessWizardNavItem
-                checked={storageIsReady}
-                loaded={storageLoaded}
-                title={t('Storage mapping')}
-              />
-            ),
-          }}
-          id="storage-mapping"
-          name={t('Storage mapping')}
-        >
-          <StorageMapping
-            changeStorageMap={changeStorageMap}
-            storageClasses={targetStorageClasses}
-            storageMap={storageMap}
-          />
-        </WizardStep>
-        <WizardStep
-          navItem={{
-            content: (
-              <ReadinessWizardNavItem
-                checked={computeIsReady}
-                loaded={computeLoaded}
-                title={t('Compute compatibility')}
-              />
-            ),
-          }}
-          id="compute-compatibility"
-          name={t('Compute compatibility')}
-        >
-          <ComputeCompatibility nodesArchs={nodesArchs} vmArchs={vmsArchs} />
-        </WizardStep>
-        <WizardStep
-          navItem={{
-            content: (
-              <ReadinessWizardNavItem
-                checked={versionIsReady}
-                loaded={versionLoaded}
-                title={t('Version compatibility')}
-              />
-            ),
-          }}
-          id="version-compatibility"
-          name={t('Version compatibility')}
-        >
-          <VersionCompatibility
-            sourceClusterVersion={sourceClusterVersion}
-            sourceKubevirtVersion={sourceKubevirtVersion}
-            targetClusterVersion={targetClusterVersion}
-            targetKubevirtVersion={targetKubevirtVersion}
-          />
-        </WizardStep>
-      </Wizard>
-    </>
+    </StateHandler>
   );
 };
 

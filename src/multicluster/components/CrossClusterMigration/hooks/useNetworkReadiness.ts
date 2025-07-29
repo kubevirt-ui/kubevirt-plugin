@@ -25,11 +25,11 @@ export type UseNetworkReadinessReturnType = {
 
 const useNetworkReadiness = (
   vms: V1VirtualMachine[],
-  targetProvider: string,
+  targetProviderUID: string,
   networkMap: V1beta1NetworkMap,
   setNetworkMap: Updater<V1beta1NetworkMap>,
 ): UseNetworkReadinessReturnType => {
-  const { data, error, loaded } = useProviderNADs(targetProvider);
+  const { data, error, loaded } = useProviderNADs(targetProviderUID);
 
   useEffect(() => {
     if (loaded && networkMap === null) {

@@ -6,6 +6,7 @@ import {
   V1beta1NetworkMap,
   V1beta1NetworkMapSpecMap,
   V1beta1Plan,
+  V1beta1Provider,
   V1beta1StorageMap,
   V1beta1StorageMapSpecMap,
 } from '@kubev2v/types';
@@ -14,8 +15,8 @@ import { NetworkAttachmentDefinition } from '@kubevirt-utils/components/NetworkI
 import { getName, getNamespace, getUID } from '@kubevirt-utils/resources/shared';
 import { getNetworks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
-import { getCluster } from '@multicluster/helpers/selectors';
 
+import { HOST_PROVIDER_NAME } from './hooks/constants';
 import { MTV_MIGRATION_NAMESPACE, POD_NETWORK_TYPE } from './constants';
 import { GetInitialStorageMapParams } from './types';
 
@@ -40,7 +41,7 @@ export const getInitialMigrationPlan = (vms: V1VirtualMachine[]): V1beta1Plan =>
       source: {
         apiVersion: `${ProviderModel.apiGroup}/${ProviderModel.apiVersion}`,
         kind: ProviderModel.kind,
-        name: getCluster(vms?.[0]),
+        name: null,
         namespace: MTV_MIGRATION_NAMESPACE,
       },
     },
@@ -166,7 +167,7 @@ export const getInitialStorageMap = ({
       map: storageClasses.map((storageClass): V1beta1StorageMapSpecMap => {
         return {
           destination: {
-            storageClass: getName(targetStorageClasses.find((sc) => getName(sc) === storageClass)),
+            storageClass: targetStorageClasses.find((sc) => sc.name === storageClass)?.name,
           },
           source: {
             id: getUID(sourceStorageClasses.find((sc) => getName(sc) === storageClass)),
@@ -198,6 +199,28 @@ export const getClusterMajorMinorVersion = (clusterVersion: string) => {
   return version.length > 1 ? version[0] + '.' + version[1] : version[0];
 };
 
-export const getClusterFromProvider = (provider: string) => {
-  return provider.replace(/^mtv-/, '');
+export const getClusterFromProvider = (provider: string, hubClusterName: string) => {
+  if (provider === HOST_PROVIDER_NAME) {
+    return hubClusterName;
+  }
+
+  return provider?.replace(/-mtv$/, '');
+};
+
+export const getProviderNameFromCluster = (cluster: string) => {
+  if (!cluster) return '';
+
+  return cluster + '-mtv';
+};
+
+export const getProviderByClusterName = (
+  cluster: string,
+  hubClusterName: string,
+  providers: V1beta1Provider[],
+) => {
+  if (cluster === hubClusterName) {
+    return providers?.find((provider) => getName(provider) === HOST_PROVIDER_NAME);
+  }
+
+  return providers?.find((provider) => getName(provider) === getProviderNameFromCluster(cluster));
 };
