@@ -80,7 +80,7 @@ const DeleteDiskModal: FC<DeleteDiskModalProps> = ({
         }
         // we don't need to delete the owned resource
         // so we remove the resource's ownerReference from the owned resource
-        const vmOwnerRef = buildOwnerReference(updatedVM);
+        const vmOwnerRef = buildOwnerReference(vm);
         const updatedVolumeOwnerReferences = volumeResource?.metadata?.ownerReferences?.filter(
           (ref) => {
             return !compareOwnerReferences(ref, vmOwnerRef);

@@ -13,7 +13,6 @@ import {
   getVolumes,
 } from '@kubevirt-utils/resources/vm';
 import { generatePrettyName, isEmpty } from '@kubevirt-utils/utils/utils';
-import { isRunning } from '@virtualmachines/utils';
 
 import { DEFAULT_DISK_SIZE } from './constants';
 import { createDataVolumeName, doesSourceRequireDataVolume, getDefaultDiskType } from './helpers';
@@ -93,7 +92,7 @@ export const getDefaultCreateValues = (
   return {
     dataVolumeTemplate,
     disk: {
-      disk: { bus: getDefaultDiskType(isRunning(vm)) },
+      disk: { bus: getDefaultDiskType },
       name: newDiskName,
     },
     isBootSource: false,

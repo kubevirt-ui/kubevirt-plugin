@@ -30,7 +30,7 @@ const DiskTypeSelect: FC<DiskTypeSelectProps> = ({ isVMRunning }) => {
 
   const diskType = getDiskDrive(diskState.disk);
 
-  const defaultInterface = getDefaultDiskType(isVMRunning);
+  const defaultInterface = getDefaultDiskType;
   const diskInterface = diskState.disk?.[diskType]?.bus || defaultInterface;
 
   return (
