@@ -240,7 +240,7 @@ const createSingleClusterTreeViewData = (
 };
 
 const getVMsPerCluster = (vms: V1VirtualMachine[]): Record<string, V1VirtualMachine[]> => {
-  return vms.reduce((acc, vm) => {
+  return vms?.reduce((acc, vm) => {
     const cluster = getCluster(vm);
 
     if (!acc[cluster]) {
@@ -265,10 +265,10 @@ const createMultiClusterTreeViewData = (
 
   const treeWithClusters = clusters
     ?.sort((a, b) => getName(a).localeCompare(getName(b)))
-    .map((cluster) => {
+    ?.map((cluster) => {
       const clusterName = getName(cluster);
 
-      const clusterVMs = vmsPerCluster[clusterName];
+      const clusterVMs = vmsPerCluster[clusterName] || [];
 
       const clusterProjects = clusterVMs.reduce((namespaces, vm) => {
         const namespace = getNamespace(vm);
