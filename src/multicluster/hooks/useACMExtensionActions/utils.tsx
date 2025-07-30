@@ -31,6 +31,11 @@ export function buildACMVirtualMachineActionsFromExtensions(
             resource={virtualMachine}
           />
         )),
+      description: action.properties.description,
+      disabled:
+        typeof action.properties.isDisabled === 'function'
+          ? action.properties.isDisabled(virtualMachine)
+          : action.properties.isDisabled,
       id: action.properties.id,
       label: action.properties.title,
     };

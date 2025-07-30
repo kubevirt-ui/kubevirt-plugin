@@ -15,6 +15,8 @@ export type ACMActionExtensionProps = {
     isOpen: boolean;
     resource?: any;
   }>;
+  /** Display a description for this action */
+  description?: string;
   /** Action identifier */
   id: string;
   /** Display an action as being ariaDisabled */

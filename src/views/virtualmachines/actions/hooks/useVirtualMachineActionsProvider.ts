@@ -19,6 +19,7 @@ import { printableVMStatus } from '../../utils';
 import { VirtualMachineActionFactory } from '../VirtualMachineActionFactory';
 
 import useIsMTCInstalled from './useIsMTCInstalled';
+import useIsMTVInstalled from './useIsMTVInstalled';
 import useCurrentStorageMigration from './useStorageMigrations';
 
 type UseVirtualMachineActionsProvider = (
@@ -33,6 +34,8 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
   const virtctlCommand = getConsoleVirtctlCommand(vm);
 
   const mtcInstalled = useIsMTCInstalled();
+  const mtvInstalled = useIsMTVInstalled();
+
   const [currentStorageMigration, currentStorageMigrationLoaded] = useCurrentStorageMigration(vm);
 
   const acmActions = useACMExtensionActions(vm);
@@ -45,6 +48,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
     const crossClusterMigration = acmActions.find(
       (action) => action.id === CROSS_CLUSTER_MIGRATION_ACTION_ID,
     );
+
     const otherACMActions = acmActions.filter(
       (action) => action.id !== CROSS_CLUSTER_MIGRATION_ACTION_ID,
     );
@@ -76,7 +80,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
       ? [migrateCompute, migrateStorage]
       : [migrateCompute];
 
-    if (crossClusterMigration) {
+    if (crossClusterMigration && mtvInstalled) {
       startMigrationActions.unshift(crossClusterMigration);
     }
 
@@ -115,6 +119,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
     treeViewFoldersEnabled,
     mtcInstalled,
     acmActions,
+    mtvInstalled,
   ]);
 
   return useMemo(

@@ -400,6 +400,7 @@
   "CreationTimestamp is a timestamp representing the server time when this object was created. It is not guaranteed to be set in happens-before order across separate operations. Clients may not set this value. It is represented in RFC3339 form and is in UTC.": "CreationTimestamp は、このオブジェクトが作成されたサーバー時刻を表すタイムスタンプです。この値は、必ずしも個々の操作の発生順序どおりに設定されるとは限りません。クライアントはこの値を設定できません。RFC3339 形式および UTC で表されます。",
   "Critical": "重大",
   "Cron expression": "cron 式",
+  "Cross-cluster migration is not supported on this cluster.": "Cross-cluster migration is not supported on this cluster.",
   "current": "現在",
   "Custom": "カスタム",
   "Customize and create VirtualMachine": "VirtualMachine のカスタマイズと作成",

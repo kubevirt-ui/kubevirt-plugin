@@ -400,6 +400,7 @@
   "CreationTimestamp is a timestamp representing the server time when this object was created. It is not guaranteed to be set in happens-before order across separate operations. Clients may not set this value. It is represented in RFC3339 form and is in UTC.": "CreationTimestamp는 이 개체가 생성될 때 서버 시간을 나타내는 타임스탬프입니다. 서로 다른 작업 간에 발생 순서(happens-before)로 설정된다는 보장은 없습니다. 클라이언트는 이 값을 설정할 수 없습니다. 이 값은 RFC3339 형식의 UTC 시간으로 표시됩니다.",
   "Critical": "심각",
   "Cron expression": "Cron 표현식",
+  "Cross-cluster migration is not supported on this cluster.": "Cross-cluster migration is not supported on this cluster.",
   "current": "현재",
   "Custom": "사용자 정의",
   "Customize and create VirtualMachine": "VirtualMachine 사용자 정의 및 생성",
