@@ -2,6 +2,7 @@ import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { ADVANCED_SEARCH, TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { FEATURE_KUBEVIRT_ACM_TREEVIEW } from '@multicluster/constants';
 
 type Feature = {
   canEdit: boolean;
@@ -26,6 +27,7 @@ const usePreviewFeaturesData: UsePreviewFeaturesData = () => {
   const { t } = useKubevirtTranslation();
   const treeViewFoldersFeature = useFeatures(TREE_VIEW_FOLDERS);
   const advancedSearchFeature = useFeatures(ADVANCED_SEARCH);
+  const kubevirtACMTreeviewFeature = useFeatures(FEATURE_KUBEVIRT_ACM_TREEVIEW);
 
   const features = [
     {
@@ -39,6 +41,12 @@ const usePreviewFeaturesData: UsePreviewFeaturesData = () => {
       id: ADVANCED_SEARCH,
       label: t('Enable advanced search in Virtual Machines list'),
       ...advancedSearchFeature,
+    },
+    {
+      externalLink: null,
+      id: FEATURE_KUBEVIRT_ACM_TREEVIEW,
+      label: t('Enable Kubevirt multicluster tree view'),
+      ...kubevirtACMTreeviewFeature,
     },
   ];
 

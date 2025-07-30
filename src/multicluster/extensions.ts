@@ -1,5 +1,9 @@
 import { EncodedExtension } from '@openshift/dynamic-plugin-sdk-webpack';
-import { FeatureFlag, RoutePage, StandaloneRoutePage } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  FeatureFlagHookProvider,
+  RoutePage,
+  StandaloneRoutePage,
+} from '@openshift-console/dynamic-plugin-sdk';
 import type { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plugin-sdk-webpack';
 
 import { ACMVirtualMachineActionExtension } from './hooks/useACMExtensionActions/constants';
@@ -50,12 +54,11 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
+
   {
-    properties: {
-      handler: { $codeRef: 'acmFlags.enableKubevirtDynamicACMFlag' },
-    },
-    type: 'console.flag',
-  } as EncodedExtension<FeatureFlag>,
+    properties: { handler: { $codeRef: 'acmFlags.useKubevirtDynamicACMFlag' } },
+    type: 'console.flag/hookProvider',
+  } as EncodedExtension<FeatureFlagHookProvider>,
 
   {
     properties: {
