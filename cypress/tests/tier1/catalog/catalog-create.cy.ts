@@ -1,8 +1,7 @@
 import { VirtualMachineData } from '../../../types/vm';
-import { cloneDisk, DiskSource, vmDisks } from '../../../utils/const/diskSource';
+import { DiskSource, vmDisks } from '../../../utils/const/diskSource';
 import { TEST_NS } from '../../../utils/const/index';
 import { TEMPLATE } from '../../../utils/const/template';
-import { yamlEditor } from '../../../views/selector-common';
 import { volName } from '../../../views/selector-instance';
 import { closeButton } from '../../../views/selector-overview';
 import { listGroup } from '../../../views/selector-template';
@@ -37,7 +36,7 @@ const PVC_VM: VirtualMachineData = {
 };
 
 const vol = 'centos-stream10';
-const VM_NAMES = [PVC_VM.name, MIN_VM.name, CUST_VM.name];
+const VMs = [PVC_VM, MIN_VM, CUST_VM];
 
 describe('Test Catalog', () => {
   before(() => {
@@ -47,7 +46,7 @@ describe('Test Catalog', () => {
   });
 
   after(() => {
-    cy.deleteVM(VM_NAMES);
+    cy.deleteVMs(VMs);
   });
 
   it('create InstanceType VM with multiple disks', () => {

@@ -1,0 +1,65 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: ${NAME}
+  annotations:
+    description: VM ${NAME}
+  labels:
+    app: ${NAME}
+    vm.kubevirt.io/template: ${TEMPLATE}
+  namespace: auto-test-ns
+spec:
+  running: false
+  template:
+    metadata:
+      annotations:
+        vm.kubevirt.io/flavor: small
+        vm.kubevirt.io/os: ${VM_OS}
+        vm.kubevirt.io/workload: server
+    spec:
+      domain:
+        cpu:
+          cores: 1
+          sockets: 1
+          threads: 1
+        devices:
+          disks:
+            - disk:
+                bus: virtio
+              name: rootdisk
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+          interfaces:
+            - masquerade: {}
+              model: virtio
+              name: default
+          networkInterfaceMultiqueue: true
+          rng: {}
+        features:
+          acpi: {}
+          smm:
+            enabled: true
+        firmware:
+          bootloader:
+            efi: {}
+        machine:
+          type: q35
+        resources:
+          requests:
+            memory: 2Gi
+      networks:
+        - name: default
+          pod: {}
+      terminationGracePeriodSeconds: 180
+      volumes:
+        - name: rootdisk
+          containerDisk:
+            image: 'quay.io/kubevirt/cirros-container-disk-demo:latest'
+        - cloudInitNoCloud:
+            userData: |-
+              #cloud-config
+              user: cnv-tester
+              password: set-own-pwd
+              chpasswd: { expire: False }
+          name: cloudinitdisk

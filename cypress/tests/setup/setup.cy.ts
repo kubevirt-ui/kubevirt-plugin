@@ -1,6 +1,6 @@
 import { TEST_NS, TEST_SECRET_NAME } from '../../utils/const/index';
 import { authSSHKey, YAML } from '../../utils/const/string';
-import { itemCreateBtn, mastheadLogo, saveBtn } from '../../views/selector';
+import { itemCreateBtn, saveBtn } from '../../views/selector';
 import { manageKeysText, useExisting } from '../../views/selector-catalog';
 import { tab } from '../../views/tab';
 
@@ -16,8 +16,6 @@ function configureSSHSecret() {
 
 describe('Cluster Test Preparation', () => {
   before(() => {
-    cy.login();
-    cy.get(mastheadLogo).scrollIntoView();
     cy.switchToVirt();
     cy.switchProject(TEST_NS);
   });

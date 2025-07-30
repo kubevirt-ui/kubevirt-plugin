@@ -16,14 +16,18 @@ declare global {
       visitMPs(): void;
       visitMPsVirt(): void;
       visitNAD(): void;
+      visitNNC(): void;
       visitOverview(): void;
       visitOverviewVirt(): void;
       visitPreferences(): void;
       visitPreferencesVirt(): void;
       visitPVC(): void;
+      visitSecrets(): void;
       visitStorageclass(): void;
       visitTemplates(): void;
       visitTemplatesVirt(): void;
+      visitUDN(): void;
+      visitVMCI(): void;
       visitVMs(): void;
       visitVMsVirt(): void;
       visitVolumes(): void;
@@ -127,4 +131,34 @@ Cypress.Commands.add('visitStorageclass', () => {
   cy.get('[data-quickstart-id="qs-nav-storage"]', { timeout: MINUTE }).scrollIntoView();
   cy.contains('Storage').should('be.visible');
   cy.clickNavLink(['Storage', 'StorageClasses']);
+});
+
+Cypress.Commands.add('visitUDN', () => {
+  cy.get('[data-quickstart-id="qs-nav-networking"]', { timeout: MINUTE }).scrollIntoView();
+  cy.contains('Networking').should('be.visible');
+  cy.clickNavLink(['Networking', 'UserDefinedNetworks']);
+  cy.checkTitle('UserDefinedNetworks', MINUTE);
+  cy.byButtonText('Create').should('be.visible');
+});
+
+Cypress.Commands.add('visitNNC', () => {
+  cy.get('[data-quickstart-id="qs-nav-networking"]', { timeout: MINUTE }).scrollIntoView();
+  cy.contains('Networking').should('be.visible');
+  cy.clickNavLink(['Networking', 'Node network configuration']);
+  cy.checkSubTitle('Node network configuration', MINUTE);
+  cy.byButtonText('Create').should('be.visible');
+});
+
+Cypress.Commands.add('visitSecrets', () => {
+  cy.get('[data-quickstart-id="qs-nav-workloads"]', { timeout: MINUTE }).scrollIntoView();
+  cy.contains('Workloads').should('be.visible');
+  cy.clickNavLink(['Workloads', 'Secrets']);
+  cy.checkTitle('Secrets', MINUTE);
+  cy.byButtonText('Create').should('be.visible');
+});
+
+Cypress.Commands.add('visitVMCI', () => {
+  cy.get('[data-test-id="virtualmachineclusterinstancetypes-nav-item"]').click();
+  cy.checkTitle('VirtualMachineClusterInstanceTypes', MINUTE);
+  cy.contains('cx1.medium').should('be.visible');
 });

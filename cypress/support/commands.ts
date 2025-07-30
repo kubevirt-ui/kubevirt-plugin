@@ -1,4 +1,5 @@
-import { CNV_NS, K8S_KIND, TEST_NS } from '../utils/const/index';
+import { VirtualMachineData } from '../types/vm';
+import { CNV_NS, K8S_KIND, MINUTE, SECOND, TEST_NS } from '../utils/const/index';
 import { Perspective, switchPerspective } from '../views/perspective';
 
 export {};
@@ -10,7 +11,7 @@ declare global {
       checkHCOSpec(spec: string, matchString: string, include: boolean): void;
       checkVMISpec(vmName: string, spec: string, matchString: string, include: boolean): void;
       checkVMSpec(vmName: string, spec: string, matchString: string, include: boolean): void;
-      deleteVM(vmName: string[]): void;
+      deleteVMs(VMs: VirtualMachineData[]): void;
       patchVM(vmName: string, status: string): void;
       startVM(vmName: string[]): void;
       stopVM(vmName: string[]): void;
@@ -88,19 +89,19 @@ Cypress.Commands.add('switchToVirt', () => {
 
 Cypress.Commands.add('beforeSpec', () => {
   cy.visit('');
-  cy.get('[data-test="username"]', { timeout: 180000 }).should('exist');
-  cy.wait(15000); // wait here because page refresh might happen
+  cy.get('[data-test="username"]', { timeout: 3 * MINUTE }).should('exist');
+  cy.wait(15 * SECOND); // wait here because page refresh might happen
   cy.switchToVirt();
-  cy.contains('[data-test-id="resource-title"]', 'Virtualization', { timeout: 180000 }).should(
+  cy.contains('[data-test-id="resource-title"]', 'Virtualization', { timeout: 3 * MINUTE }).should(
     'exist',
   );
 });
 
-Cypress.Commands.add('deleteVM', (vms: string[]) => {
-  vms.forEach((vmName) => {
+Cypress.Commands.add('deleteVMs', (VMs: VirtualMachineData[]) => {
+  VMs.forEach((vm) => {
     cy.exec(
-      `oc delete --ignore-not-found=true --cascade ${K8S_KIND.VM} ${vmName} --wait=true --timeout=180s`,
-      { failOnNonZeroExit: false, timeout: 1800000 },
+      `oc delete --ignore-not-found=true --cascade ${K8S_KIND.VM} ${vm.name} --wait=true --timeout=180s`,
+      { failOnNonZeroExit: false, timeout: 3 * MINUTE },
     );
   });
 });
