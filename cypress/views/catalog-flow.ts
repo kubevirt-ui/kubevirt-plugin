@@ -1,11 +1,11 @@
 import { VirtualMachineData } from '../types/vm';
 import { authSSHKey, cloudInit, sysPrep } from '../utils/const/string';
 
-import { getRow, tabModal } from './actions';
+import { getRow } from './actions';
 import { addDisk, addNic } from './modals';
 import * as cView from './selector-catalog';
 import * as vmView from './selector-common';
-import { cpuInput, descrGroup, memInput } from './selector-common';
+import { cpuInput, descrGroup, memInput, row } from './selector-common';
 import * as iView from './selector-instance';
 import { tab } from './tab';
 
@@ -143,7 +143,7 @@ export const fillOverview = (vmData: VirtualMachineData) => {
     cy.byButtonText('nvidia.com').click();
     cy.get('input#name').clear().type('vgpu_test');
     cy.get('button.pf-m-plain>svg[viewBox="0 0 512 512"]').click();
-    cy.get('[data-test-rows="resource-row"]').contains('vgpu_test').should('exist');
+    cy.get(row).contains('vgpu_test').should('exist');
     cy.clickSaveBtn();
     cy.get('.hardware-devices-table').should('contain', 'vgpu_test');
   }

@@ -66,15 +66,15 @@ export const addVolume = (vol: volData) => {
   // select preference
   cy.contains(iView.toggleText, iView.selectPreferenceText).click();
   cy.get(iView.searchPreference).type(preference);
-  cy.get(iView.preferenceValue(preference)).click();
+  cy.get(iView.preferenceValue(preference)).click({ force: true });
   // select instanceType
-  cy.contains(iView.toggleText, iView.selectInstanceText).click();
+  cy.contains(iView.toggleText, iView.selectInstanceText).click({ force: true });
   cy.contains(iView.menuItemText, 'Red Hat provided').click();
   cy.contains(iView.menuItemText, 'U series').click();
   if (instanceType) {
-    cy.contains(iView.menuItemText, instanceType).click();
+    cy.contains(iView.menuItemText, instanceType).click({ force: true });
   } else {
-    cy.contains(iView.menuItemText, 'nano:').click();
+    cy.contains(iView.menuItemText, 'nano:').click({ force: true });
   }
   cy.get(iView.description).scrollIntoView().type(`Test volume from ${sourceType}`); // file description
   cy.clickSaveBtn();

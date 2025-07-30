@@ -7,6 +7,8 @@ export TEST_NS='auto-test-ns'
 export TEST_SECRET_NAME='auto-test-secret'
 
 # create test namespace
+oc delete project auto-test-ns --ignore-not-found
+sleep 10
 oc new-project ${TEST_NS}
 
 # close welcome modal

@@ -55,7 +55,7 @@ export const action = {
       if (startOnClone) {
         cy.get(startClone).check();
       }
-      cy.clickCloneBtn();
+      cy.clickSaveBtn();
     });
   },
   cloneTemplate: (tName) => {
@@ -101,6 +101,7 @@ export const action = {
     cy.byButtonText('Migration').click();
     cy.wait(500);
     cy.byLegacyTestID(MIGRATE_COMPUTE).click();
+    cy.byButtonText('Migrate VirtualMachine').click();
   },
   pause: (vmName: string, onList = true) => {
     if (onList) {
@@ -144,4 +145,13 @@ export const action = {
     }
     cy.byLegacyTestID(UNPAUSE).click();
   },
+};
+
+export const checkActionMenu = (item: string) => {
+  cy.byButtonText('Actions').click();
+  cy.contains('button', 'Edit labels').should('exist');
+  cy.contains('button', 'Edit annotations').should('exist');
+  cy.contains('button', `Edit ${item}`).should('exist');
+  cy.contains('button', `Delete ${item}`).should('exist');
+  cy.byButtonText('Actions').click();
 };

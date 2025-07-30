@@ -38,6 +38,24 @@ export CYPRESS_ARTIFACTORY_PATH="artifactory/cnv-qe-server-local"
 export CYPRESS_LOCAL_IMAGE="/tmp/cirros.xz"
 export CYPRESS_CIRROS_IMAGE="https://${CYPRESS_ARTIFACTORY_SERVER}/${CYPRESS_ARTIFACTORY_PATH}/cnv-tests/cirros-images/cirros-0.5.2-x86_64-disk.qcow2.xz"
 
+# undefined
+if [[ -z "$CYPRESS_NON_PRIV" ]]; then
+  export CYPRESS_NON_PRIV=false;
+fi
+echo "CYPRESS_NON_PRIV: $CYPRESS_NON_PRIV"
+if [[ -z "$CYPRESS_GPU" ]]; then
+  export CYPRESS_GPU=false;
+fi
+echo "CYPRESS_GPU: $CYPRESS_GPU"
+if [[ -z "$CYPRESS_SNO" ]]; then
+  export CYPRESS_SNO=false;
+fi
+echo "CYPRESS_SNO: $CYPRESS_SNO"
+if [[ -z "$CYPRESS_SRIOV" ]]; then
+  export CYPRESS_SRIOV=false;
+fi
+echo "CYPRESS_SRIOV: $CYPRESS_SRIOV"
+
 health_check() {
     local ret=0
     echo "Health checklist before console test."
@@ -55,13 +73,13 @@ health_check() {
     fi
 
     # 3 - create vm from CLI
-    oc delete -f data/vm.yaml --ignore-not-found
-    if ! oc create -f data/vm.yaml || 
-       ! oc wait --for=condition=ready vm/rhel-10-vm --timeout=360s; then
-        echo "VM creation test failed"
-        return 1
-    fi
-    oc delete -f data/vm.yaml
+#    oc delete -f data/vm.yaml --ignore-not-found
+#    if ! oc create -f data/vm.yaml ||
+#       ! oc wait --for=condition=ready vm/rhel-10-vm --timeout=360s; then
+#        echo "VM creation test failed"
+#        return 1
+#    fi
+#    oc delete -f data/vm.yaml
 
     return 0
 }

@@ -7,7 +7,7 @@ import * as cView from './selector-catalog';
 import { descrGroup } from './selector-common';
 import * as iView from './selector-instance';
 import * as tView from './selector-template';
-import { tab, tabName } from './tab';
+import { tab } from './tab';
 
 export const getRow = (name: string, within: VoidFunction) =>
   cy.byTestRows('resource-row').contains(name).parents('tr').within(within);
@@ -24,16 +24,19 @@ export const template = {
       if (tData.name) {
         cy.get(tView.displayName).clear().type(tData.name);
       }
-      if (tData.namespace) {
-        cy.get('button.pf-v6-c-menu-toggle[placeholder="Select project"]').click();
-        cy.contains(cView.menuItem, tData.namespace).click();
-      }
       if (tData.provider) {
         cy.get(tView.provider).clear().type(tData.provider);
       }
-      cy.byButtonText('Clone').click();
     });
-    cy.get(`[data-test-id=${tabName.Scheduling}]`).should('exist');
+    if (tData.namespace) {
+      cy.get('button.pf-v6-c-menu-toggle[placeholder="Select project"]').click();
+      cy.get('input[placeholder="Select project"]').clear().type(tData.namespace);
+      cy.contains(cView.menuItem, tData.namespace).click();
+    }
+    cy.byButtonText('Clone').click();
+    cy.checkTitle(tData.name);
+    cy.checkSubTitle('Template details');
+    // cy.get(`[data-test-id=${tabName.Scheduling}]`).should('exist');
   },
   delete: (tName: string) => {
     action.deleteTemplate(tName);

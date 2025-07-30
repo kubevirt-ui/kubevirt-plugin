@@ -64,6 +64,7 @@ export const kebabBtn = '.pf-v6-c-table__td.pf-v6-c-table__action';
 export const selectDropdownToggle = '[data-ouia-component-id="BulkSelect-toggle"]';
 export const selectAllDropdownOption = '[data-ouia-component-id="BulkSelect-select-all"]';
 export const projectActionStop = 'selected-vms-action-stop';
+export const treeNode = 'button.pf-v6-c-tree-view__node-text';
 
 // VM overview tab
 export const vmStatusOnOverview = '[data-test-id="virtual-machine-overview-details-status"]';
@@ -108,6 +109,7 @@ export const workload = (name: string) => `button[data-test-id="${name}-workload
 export const hostname = (name: string) => `button[data-test-id="${name}-hostname"]`;
 export const hostnameInput = 'input[id="hostname"]';
 export const label = '.pf-v6-c-label-group__list-item';
+export const labelGroup = '.pf-v6-c-label-group';
 export const sshAccess = (name: string) => `[data-test-id="${name}-ssh-access"]`;
 export const sshTypeSelect = '#ssh-service-select';
 export const sshTypeNodeport = '#NodePort';
@@ -173,8 +175,13 @@ export const cronDS = '#datasource-create-source-cron';
 export const delMP = 'mp-action-delete';
 
 // YAML
-export const yamlEditor = '.react-monaco-editor-container';
+export const yamlEditor = '[data-mode-id="yaml"]';
 
 // Volumes page
 export const addText = 'Add';
 export const mainTable = '.co-m-pane__body.co-m-pane__body--no-top-margin';
+
+export const ingressHeader = '#ingress-header';
+export const egressHeader = '#egress-header';
+export const ingressOff = '#denyAllIngress';
+export const egressOff = '#denyAllEgress';

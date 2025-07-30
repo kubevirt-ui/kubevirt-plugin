@@ -37,6 +37,7 @@ export enum subTabName {
 }
 
 export const navigateToTab = (name: string) => {
+  cy.get('nav.pf-v6-c-tabs').scrollIntoView();
   cy.get(horizontalLink(name), { timeout: 120000 }).should('be.visible');
   cy.get(horizontalLink(name)).click();
 };
