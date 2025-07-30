@@ -1,3 +1,4 @@
+import { VirtualMachineData } from '../types/vm';
 import { CNV_NS, K8S_KIND, TEST_NS } from '../utils/const/index';
 import { Perspective, switchPerspective } from '../views/perspective';
 
@@ -10,7 +11,9 @@ declare global {
       checkHCOSpec(spec: string, matchString: string, include: boolean): void;
       checkVMISpec(vmName: string, spec: string, matchString: string, include: boolean): void;
       checkVMSpec(vmName: string, spec: string, matchString: string, include: boolean): void;
-      deleteVM(vmName: string[]): void;
+      deleteResource(kind: string, name: string, namespace?: string): void;
+      deleteResources(kind: string, resources: string[], namespace?: string): void;
+      deleteVM(vms: VirtualMachineData[]): void;
       patchVM(vmName: string, status: string): void;
       startVM(vmName: string[]): void;
       stopVM(vmName: string[]): void;
@@ -69,6 +72,34 @@ Cypress.Commands.add('patchVM', (vmName: string, status: string) => {
   );
 });
 
+Cypress.Commands.add('deleteResource', (kind: string, name: string, namespace?: string) => {
+  // If cluster resource, ommit namespace
+  if (!namespace) {
+    cy.exec(
+      `oc delete --ignore-not-found=true --cascade ${kind} ${name} --wait=true --timeout=180s`,
+      { failOnNonZeroExit: false, timeout: 1800000 },
+    );
+    return;
+  }
+  cy.exec(
+    `oc delete --ignore-not-found=true -n ${namespace} --cascade ${kind} ${name} --wait=true --timeout=180s`,
+    { failOnNonZeroExit: false, timeout: 1800000 },
+  );
+  if (kind === K8S_KIND.VM) {
+    // VMI may still be there while VM is being deleted. Wait for VMI to be deleted before continuing
+    cy.exec(
+      `oc delete --ignore-not-found=true -n ${namespace} vmi ${name} --wait=true --timeout=180s`,
+      { failOnNonZeroExit: false, timeout: 1800000 },
+    );
+  }
+});
+
+Cypress.Commands.add('deleteResources', (kind: string, resources: string[], namespace?: string) => {
+  resources.forEach((res) => {
+    cy.deleteResource(kind, res, namespace);
+  });
+});
+
 Cypress.Commands.add('startVM', (vms: string[]) => {
   vms.forEach((vmName) => {
     cy.patchVM(vmName, 'Always');
@@ -96,10 +127,14 @@ Cypress.Commands.add('beforeSpec', () => {
   );
 });
 
-Cypress.Commands.add('deleteVM', (vms: string[]) => {
-  vms.forEach((vmName) => {
+Cypress.Commands.add('deleteVM', (vms: VirtualMachineData[]) => {
+  vms.forEach((vm) => {
     cy.exec(
-      `oc delete --ignore-not-found=true --cascade ${K8S_KIND.VM} ${vmName} --wait=true --timeout=180s`,
+      `oc delete --ignore-not-found=true -n ${vm.namespace} --cascade ${K8S_KIND.VM} ${vm.name} --wait=true --timeout=180s`,
+      { failOnNonZeroExit: false, timeout: 1800000 },
+    );
+    cy.exec(
+      `oc delete --ignore-not-found=true -n ${vm.namespace} vmi ${vm.name} --wait=true --timeout=180s`,
       { failOnNonZeroExit: false, timeout: 1800000 },
     );
   });

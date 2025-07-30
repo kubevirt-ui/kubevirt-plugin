@@ -1,7 +1,7 @@
-import { TEST_NS, VM_STATUS } from '../../../utils/const/index';
-import { VM_IT_CUST, VM_TMPL_CUST } from '../../../utils/const/testVM';
-import { projectActionStop } from '../../../views/selector-common';
-import { waitForStatus } from '../../../views/vm-flow';
+import { TEST_NS, VM_STATUS } from '../../utils/const/index';
+import { VM_IT_CUST, VM_TMPL_CUST } from '../../utils/const/testVM';
+import { projectActionStop } from '../../views/selector-common';
+import { waitForStatus } from '../../views/vm-flow';
 
 const VM_NAMES = [VM_IT_CUST.name, VM_TMPL_CUST.name];
 
