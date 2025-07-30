@@ -41,9 +41,19 @@ export class TopConsumerMetric extends TopConsumerMetricObjectEnum<string> {
     dropdownLabel: 'By IOPS',
   });
 
+  static readonly STORAGE_READ_LATENCY = new TopConsumerMetric('storage-read-latency', {
+    chartLabel: 'Storage read latency',
+    dropdownLabel: 'By read latency',
+  });
+
   static readonly STORAGE_THROUGHPUT = new TopConsumerMetric('storage-throughput', {
     chartLabel: 'Storage throughput',
     dropdownLabel: 'By throughput',
+  });
+
+  static readonly STORAGE_WRITE_LATENCY = new TopConsumerMetric('storage-write-latency', {
+    chartLabel: 'Storage write latency',
+    dropdownLabel: 'By write latency',
   });
 
   static readonly VCPU_WAIT = new TopConsumerMetric('vcpu-wait', {

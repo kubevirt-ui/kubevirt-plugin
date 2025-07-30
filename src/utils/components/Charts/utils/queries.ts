@@ -20,6 +20,12 @@ enum VMQueries {
   NETWORK_TOTAL_BY_INTERFACE_USAGE = 'NETWORK_TOTAL_BY_INTERFACE_USAGE',
   NETWORK_TOTAL_USAGE = 'NETWORK_TOTAL_USAGE',
   STORAGE_IOPS_TOTAL = 'STORAGE_IOPS_TOTAL',
+  STORAGE_READ_LATENCY_AVG = 'STORAGE_READ_LATENCY_AVG',
+  STORAGE_READ_LATENCY_MAX = 'STORAGE_READ_LATENCY_MAX',
+  STORAGE_READ_LATENCY_PER_DRIVE = 'STORAGE_READ_LATENCY_PER_DRIVE',
+  STORAGE_WRITE_LATENCY_AVG = 'STORAGE_WRITE_LATENCY_AVG',
+  STORAGE_WRITE_LATENCY_MAX = 'STORAGE_WRITE_LATENCY_MAX',
+  STORAGE_WRITE_LATENCY_PER_DRIVE = 'STORAGE_WRITE_LATENCY_PER_DRIVE',
 }
 
 type UtilizationQueriesArgs = {
@@ -72,5 +78,11 @@ export const getUtilizationQueries: GetUtilizationQueries = ({
     [VMQueries.NETWORK_TOTAL_BY_INTERFACE_USAGE]: `sum(rate(kubevirt_vmi_network_receive_bytes_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}])) BY (name, namespace${sumByCluster}, interface)`,
     [VMQueries.NETWORK_TOTAL_USAGE]: `sum(rate(kubevirt_vmi_network_receive_bytes_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}])) BY (name, namespace${sumByCluster})`,
     [VMQueries.STORAGE_IOPS_TOTAL]: `sum(rate(kubevirt_vmi_storage_iops_read_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}]) + rate(kubevirt_vmi_storage_iops_write_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}])) BY (name, namespace${sumByCluster})`,
+    [VMQueries.STORAGE_READ_LATENCY_AVG]: `avg by (name, namespace${sumByCluster})(rate(kubevirt_vmi_storage_read_times_seconds_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}]) / rate(kubevirt_vmi_storage_iops_read_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}]) > 0)`,
+    [VMQueries.STORAGE_READ_LATENCY_MAX]: `max by (name, namespace${sumByCluster})(rate(kubevirt_vmi_storage_read_times_seconds_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}]) / rate(kubevirt_vmi_storage_iops_read_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}]) > 0)`,
+    [VMQueries.STORAGE_READ_LATENCY_PER_DRIVE]: `sum by (name, namespace, drive${sumByCluster})(rate(kubevirt_vmi_storage_read_times_seconds_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}]) / rate(kubevirt_vmi_storage_iops_read_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}]) > 0)`,
+    [VMQueries.STORAGE_WRITE_LATENCY_AVG]: `avg by (name, namespace${sumByCluster})(rate(kubevirt_vmi_storage_write_times_seconds_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}]) / rate(kubevirt_vmi_storage_iops_write_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}]) > 0)`,
+    [VMQueries.STORAGE_WRITE_LATENCY_MAX]: `max by (name, namespace${sumByCluster})(rate(kubevirt_vmi_storage_write_times_seconds_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}]) / rate(kubevirt_vmi_storage_iops_write_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}]) > 0)`,
+    [VMQueries.STORAGE_WRITE_LATENCY_PER_DRIVE]: `sum by (name, namespace, drive${sumByCluster})(rate(kubevirt_vmi_storage_write_times_seconds_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}]) / rate(kubevirt_vmi_storage_iops_write_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}]) > 0)`,
   };
 };
