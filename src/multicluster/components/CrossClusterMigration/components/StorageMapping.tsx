@@ -1,20 +1,19 @@
 import React, { FC, useMemo } from 'react';
 
 import { V1beta1StorageMap } from '@kubev2v/types';
-import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind } from '@kubevirt-utils/models';
 import { StorageClassModel } from '@kubevirt-utils/models';
-import { getName } from '@kubevirt-utils/resources/shared';
 import { FormGroup, Split, SplitItem, TextInput, Title } from '@patternfly/react-core';
 
+import { ProviderStorageClass } from '../hooks/useProviderStorageClasses';
 import { UseStorageReadinessReturnType } from '../hooks/useStorageReadiness';
 
 type StorageMappingProps = {
   changeStorageMap: UseStorageReadinessReturnType['changeStorageMap'];
-  storageClasses: IoK8sApiStorageV1StorageClass[];
+  storageClasses: ProviderStorageClass[];
   storageMap: V1beta1StorageMap;
 };
 
@@ -26,14 +25,13 @@ const StorageMapping: FC<StorageMappingProps> = ({
   const { t } = useKubevirtTranslation();
   const storageClassOptions = useMemo(
     () =>
-      storageClasses.map((storageClass): EnhancedSelectOptionProps => {
-        const name = getName(storageClass);
-        return {
-          children: name,
+      storageClasses.map(
+        (storageClass): EnhancedSelectOptionProps => ({
+          children: storageClass.name,
           groupVersionKind: modelToGroupVersionKind(StorageClassModel),
-          value: name,
-        };
-      }),
+          value: storageClass.name,
+        }),
+      ),
     [storageClasses],
   );
 
