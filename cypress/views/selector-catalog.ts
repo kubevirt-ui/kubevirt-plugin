@@ -35,7 +35,7 @@ export const vmName = '[data-test-id="template-catalog-vm-name-input"]';
 export const uTemplate = '#user-templates';
 export const aTemplate = '#all-templates';
 export const searchCatalog = '[data-test="search-catalog"]';
-export const editCPU = '[data-test-id="edit-cpu-mem"]';
+export const editCPU = '[data-test-id="virtual-machine-overview-details-cpu-memory"]';
 
 // review and create
 export const vmCustomizeName = '#vm-customize-NAME';

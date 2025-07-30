@@ -65,5 +65,3 @@ health_check() {
 
     return 0
 }
-
-health_check

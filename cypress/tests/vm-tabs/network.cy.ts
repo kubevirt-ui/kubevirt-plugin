@@ -1,5 +1,5 @@
-import { Example } from '../../../utils/const/string';
-import { navigateToConfigurationSubTab, subTabName } from '../../../views/tab';
+import { Example } from '../../utils/const/string';
+import { navigateToConfigurationSubTab, subTabName } from '../../views/tab';
 
 const spec = '.spec.template.spec.domain.devices.interfaces';
 const state_down = `"state":"down"`;

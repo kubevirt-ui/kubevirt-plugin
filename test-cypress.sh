@@ -10,7 +10,8 @@ export CYPRESS_OS_IMAGES_NS='openshift-virtualization-os-images';
 # setup cluster
 bash test-cleanup.sh
 bash test-setup.sh
-bash test-setup-downstream.sh
+. test-setup-downstream.sh
+health_check
 
 # Install dependencies.
 yarn install --frozen-lockfile

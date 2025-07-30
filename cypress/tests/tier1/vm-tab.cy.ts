@@ -1,2 +1,10 @@
-import './vm-tabs/network.cy.ts';
-import './vm-tabs/vm-adv-search.cy.ts';
+import '../setup/login.cy.ts';
+import '../vm-tabs/a-start-vm.cy.ts';
+import '../vm-tabs/details.cy.ts';
+import '../vm-tabs/overview.cy.ts';
+import '../vm-tabs/metrics.cy.ts';
+import '../vm-tabs/ssh.cy.ts';
+import '../vm-tabs/initial-run.cy.ts';
+import '../vm-tabs/snapshots.cy.ts';
+import '../vm-tabs/network.cy.ts';
+import '../vm-tabs/vm-adv-search.cy.ts';

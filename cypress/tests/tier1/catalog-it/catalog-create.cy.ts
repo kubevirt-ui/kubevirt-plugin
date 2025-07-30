@@ -37,7 +37,7 @@ const PVC_VM: VirtualMachineData = {
 };
 
 const vol = 'centos-stream10';
-const VM_NAMES = [PVC_VM.name, MIN_VM.name, CUST_VM.name];
+const VM_NAMES = [PVC_VM, MIN_VM, CUST_VM];
 
 describe('Test Catalog', () => {
   before(() => {

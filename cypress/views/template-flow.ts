@@ -111,8 +111,8 @@ export const template = {
   },
   editScripts: (tData: TemplateData) => {
     if (
-      tData.cloudInitUname ||
-      tData.cloudInitPwd ||
+      tData.username ||
+      tData.password ||
       tData.ethName ||
       tData.ipAddr ||
       tData.gateway ||
@@ -121,18 +121,12 @@ export const template = {
     ) {
       tab.navigateToTScripts();
     }
-    if (
-      tData.cloudInitUname ||
-      tData.cloudInitPwd ||
-      tData.ethName ||
-      tData.ipAddr ||
-      tData.gateway
-    ) {
+    if (tData.username || tData.password || tData.ethName || tData.ipAddr || tData.gateway) {
       // tab.navigateToTScripts();
       // cy.byButtonText('Edit').click();
       cy.contains(descrGroup, cloudInit).find('button').eq(0).click();
-      cy.get(tView.username).clear().type(tData.cloudInitUname);
-      cy.get(tView.userpasswd).clear().type(tData.cloudInitPwd);
+      cy.get(tView.username).clear().type(tData.username);
+      cy.get(tView.userpasswd).clear().type(tData.password);
       if (tData.ethName || tData.ipAddr || tData.gateway) {
         // add network data always
         cy.get(tView.network).check();

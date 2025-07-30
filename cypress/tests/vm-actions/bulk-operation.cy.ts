@@ -1,11 +1,15 @@
-import { SECOND, VM_ACTION, VM_STATUS } from '../../../utils/const/index';
-import { VM_IT_CUST, VM_TMPL_CUST } from '../../../utils/const/testVM';
-import { BULK_MIGRATE, getRow } from '../../../views/actions';
-import { storageclassMigrate } from '../../../views/migrate-modal';
-import * as nav from '../../../views/selector';
-import { selectAllDropdownOption, selectDropdownToggle } from '../../../views/selector-common';
-import { tab } from '../../../views/tab';
-import { waitForStatus } from '../../../views/vm-flow';
+import { SECOND, VM_ACTION, VM_STATUS } from '../../utils/const/index';
+import { VM_IT_CUST, VM_TMPL_CUST } from '../../utils/const/testVM';
+import { BULK_MIGRATE, getRow } from '../../views/actions';
+import { storageclassMigrate } from '../../views/migrate-modal';
+import * as nav from '../../views/selector';
+import {
+  confirmBtn,
+  selectAllDropdownOption,
+  selectDropdownToggle,
+} from '../../views/selector-common';
+import { tab } from '../../views/tab';
+import { waitForStatus } from '../../views/vm-flow';
 
 const DESTINATION_STORAGE_CLASS = 'hostpath-csi-basic';
 const VM_NAMES = [VM_IT_CUST.name, VM_TMPL_CUST.name];
@@ -30,6 +34,7 @@ describe('Test bulk actions', () => {
 
     cy.byButtonText('Actions').click();
     cy.byButtonText(VM_ACTION.Stop).click();
+    cy.get(confirmBtn).click();
 
     // Verify VMs are stopped
     cy.wait(WAIT_TIME);
@@ -48,6 +53,7 @@ describe('Test bulk actions', () => {
 
     // Perform migration
     cy.byButtonText('Actions').click();
+    cy.contains('.pf-v6-c-menu__item-text', 'Migrate').click();
     cy.get(BULK_MIGRATE).click();
     storageclassMigrate(DESTINATION_STORAGE_CLASS);
   });

@@ -22,3 +22,4 @@ oc delete VirtualMachineClusterPreference example --ignore-not-found --wait=fals
 oc delete VirtualMachinePreference example -n ${TEST_NS} --ignore-not-found --wait=false
 oc delete MigrationPolicy example --ignore-not-found --wait=false
 oc delete migplan --all -n ${TEST_NS} --ignore-not-found --wait=false
+oc delete ns auto-test-ns

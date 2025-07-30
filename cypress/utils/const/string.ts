@@ -7,6 +7,7 @@ export const noEvictionStrategy = 'None';
 export const machineType = 'q35'; // don't use full string here as it can be different from versions and platforms
 export const YAML = 'YAML';
 export const withForm = 'With form';
+export const withYAML = 'With YAML';
 
 //MigrationPolicy
 export const addConfiguration = 'Add configuration';

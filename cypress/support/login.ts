@@ -1,10 +1,12 @@
-import { MINUTE } from '../utils/const/index';
+import { MINUTE, TEST_NS } from '../utils/const/index';
+import { Perspective, switchPerspective, topology, tour } from '../views/perspective';
 import { submitButton } from '../views/selector-common';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Cypress {
     interface Chainable {
+      Login(): void;
       login(providerName?: string, username?: string, password?: string): Chainable<Element>;
       logout(): Chainable<Element>;
     }
@@ -76,6 +78,28 @@ Cypress.Commands.add(
     });
   },
 );
+
+Cypress.Commands.add('Login', () => {
+  if (Cypress.env('NON_PRIV')) {
+    cy.exec(`oc adm policy add-role-to-user admin test -n ${TEST_NS}`);
+    cy.login(
+      Cypress.env('NON_PRIV_IDP'),
+      Cypress.env('NON_PRIV_USER'),
+      Cypress.env('NON_PRIV_PASSWD'),
+    );
+    // skip tour
+    cy.get('body').then(($body) => {
+      if ($body.find(tour).length) {
+        cy.get(tour).click();
+      }
+      if ($body.find(topology).length) {
+        switchPerspective(Perspective.Administrator);
+      }
+    });
+  } else {
+    cy.login();
+  }
+});
 
 Cypress.Commands.add('logout', () => {
   // Check if auth is disabled (for a local development environment).

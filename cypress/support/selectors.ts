@@ -26,6 +26,7 @@ declare global {
       checkSubTitle(title: string, timeout?: number): void;
       checkTitle(title: string, timeout?: number): void;
       clickApplyBtn(): void;
+      clickCancelBtn(): void;
       clickNavLink(path: [string, string?]): Chainable;
       clickSaveBtn(): void;
       clickSearchBtn(): void;
@@ -85,7 +86,7 @@ Cypress.Commands.add('clickVirtLink', (navItemSelector: string) => {
 });
 
 Cypress.Commands.add('clickSaveBtn', () => {
-  cy.byTestID('save-button').click();
+  cy.get('button[data-test="save-button"]').click();
 });
 
 Cypress.Commands.add('clickSearchBtn', () => {
@@ -102,3 +103,7 @@ Cypress.Commands.add('checkSubTitle', (subTitle: string, timeout?: number) => {
   const t_o = timeout ? timeout : 3 * MINUTE;
   cy.contains('h2', subTitle, { timeout: t_o }).should('exist');
 });
+
+Cypress.Commands.add('clickCancelBtn', () =>
+  cy.contains('button[type="button"]', 'Cancel').click(),
+);

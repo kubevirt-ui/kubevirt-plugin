@@ -18,7 +18,7 @@ function verifyCustomizedVM(vmConfig: typeof VM_IT_CUST, osDescription?: string)
   }
 
   tab.navigateToConsole();
-  verifyCloudInitCredentials(vmConfig.cloudInitUname, vmConfig.cloudInitPwd);
+  verifyCloudInitCredentials(vmConfig.username, vmConfig.password);
 }
 
 function verifyCloudInitCredentials(username: string, password: string) {
