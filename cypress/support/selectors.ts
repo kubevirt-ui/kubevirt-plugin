@@ -29,6 +29,7 @@ declare global {
       clickNavLink(path: [string, string?]): Chainable;
       clickSaveBtn(): void;
       clickSearchBtn(): void;
+      clickSubmitBtn(): void;
       clickVirtLink(path: string): void;
     }
   }
@@ -91,6 +92,9 @@ Cypress.Commands.add('clickSaveBtn', () => {
 Cypress.Commands.add('clickSearchBtn', () => {
   cy.contains('button[type="button"].pf-m-primary', 'Search').click({ force: true });
 });
+
+Cypress.Commands.add('clickSubmitBtn', () => cy.get('button[type="submit"]').click());
+
 Cypress.Commands.add('clickApplyBtn', () => cy.contains('button[type="button"]', 'Apply').click());
 
 Cypress.Commands.add('checkTitle', (title: string, timeout?: number) => {

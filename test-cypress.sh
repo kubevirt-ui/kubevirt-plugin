@@ -8,9 +8,9 @@ export CYPRESS_CNV_NS='openshift-cnv';
 export CYPRESS_OS_IMAGES_NS='openshift-virtualization-os-images';
 
 # setup cluster
-bash test-cleanup.sh
-bash test-setup.sh
-bash test-setup-downstream.sh
+source test-cleanup.sh
+source test-setup.sh
+source test-setup-downstream.sh
 
 # Install dependencies.
 yarn install --frozen-lockfile
@@ -41,4 +41,4 @@ yarn run $yarn_script
 
 # Generate Cypress report.
 yarn run cypress-postreport
-bash test-cleanup.sh
+source test-cleanup.sh

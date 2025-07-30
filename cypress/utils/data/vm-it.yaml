@@ -1,0 +1,42 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: ${NAME}
+  namespace: default
+spec:
+  dataVolumeTemplates:
+    - metadata:
+        name: ${NAME}-volume
+      spec:
+        sourceRef:
+          kind: DataSource
+          name: ${VOLUME}
+          namespace: openshift-virtualization-os-images
+        storage:
+          resources: {}
+          storageClassName: hostpath-csi-basic
+  instancetype:
+    name: u1.small
+  preference:
+    name: ${VOLSPEC}
+  running: false
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: headless
+    spec:
+      domain:
+        devices: {}
+      subdomain: headless
+      volumes:
+        - dataVolume:
+            name: ${NAME}-volume
+          name: rootdisk
+        - cloudInitNoCloud:
+            userData: |
+              #cloud-config
+              user: cnv-tester
+              password: set-own-pwd
+              chpasswd:
+                expire: false
+          name: cloudinitdisk
