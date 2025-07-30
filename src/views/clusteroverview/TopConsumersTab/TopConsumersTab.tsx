@@ -75,6 +75,12 @@ const TopConsumersTab: FC = () => {
             localStorageData={localStorageData}
             rowNumber={2}
             setLocalStorageData={setLocalStorageData}
+            topGrid
+          />
+          <TopConsumersGridRow
+            localStorageData={localStorageData}
+            rowNumber={3}
+            setLocalStorageData={setLocalStorageData}
           />
         </CardBody>
       </Card>
