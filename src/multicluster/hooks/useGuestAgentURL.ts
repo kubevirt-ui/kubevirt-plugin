@@ -2,10 +2,11 @@ import VirtualMachineInstanceModel from '@kubevirt-ui/kubevirt-api/console/model
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { useFleetK8sAPIPath } from '@stolostron/multicluster-sdk';
+
+import useK8sBaseAPIPath from './useK8sBaseAPIPath';
 
 const useGuestAgentURL = (vmi: V1VirtualMachineInstance): [string, boolean] => {
-  const [k8sAPIPath, k8sAPIPathLoaded] = useFleetK8sAPIPath(getCluster(vmi));
+  const [k8sAPIPath, k8sAPIPathLoaded] = useK8sBaseAPIPath(getCluster(vmi));
 
   const url = `${k8sAPIPath}/apis/subresources.${VirtualMachineInstanceModel.apiGroup}/${
     VirtualMachineInstanceModel.apiVersion

@@ -9,9 +9,9 @@ import HideConsole from '@kubevirt-utils/components/Consoles/components/vnc-cons
 import VncConsole from '@kubevirt-utils/components/Consoles/components/vnc-console/VncConsole';
 import { getConsoleBasePath } from '@kubevirt-utils/components/Consoles/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useK8sBaseAPIPath from '@multicluster/hooks/useK8sBaseAPIPath';
 import { Bullseye, Button, ButtonVariant, Spinner } from '@patternfly/react-core';
 import { ExternalLinkAltIcon } from '@patternfly/react-icons';
-import { useFleetK8sAPIPath } from '@stolostron/multicluster-sdk';
 
 import VirtualMachinesOverviewTabDetailsConsoleConnect from './VirtualMachinesOverviewTabDetailsConsoleConnect';
 
@@ -28,7 +28,7 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
   VirtualMachinesOverviewTabDetailsConsoleProps
 > = ({ canConnectConsole, isHeadlessMode, isVMRunning, vmCluster, vmName, vmNamespace }) => {
   const { t } = useKubevirtTranslation();
-  const [apiPath, apiPathLoaded] = useFleetK8sAPIPath(vmCluster);
+  const [apiPath, apiPathLoaded] = useK8sBaseAPIPath(vmCluster);
   const [{ actions, state }, setState] = useState<ConsoleComponentState>({
     actions: {},
     state: ConsoleState.init,

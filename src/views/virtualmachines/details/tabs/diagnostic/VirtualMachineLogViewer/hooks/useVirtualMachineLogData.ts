@@ -6,14 +6,14 @@ import useWebSocket from 'react-use-websocket';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { useFleetK8sAPIPath } from '@stolostron/multicluster-sdk';
+import useK8sBaseAPIPath from '@multicluster/hooks/useK8sBaseAPIPath';
 
 type UseVirtualMachineLogData = (args: { connect?: boolean; pod: K8sResourceCommon }) => {
   data: string[];
 };
 
 const useVirtualMachineLogData: UseVirtualMachineLogData = ({ connect = true, pod }) => {
-  const [baseK8sPath, k8sAPIPathLoaded] = useFleetK8sAPIPath(getCluster(pod));
+  const [baseK8sPath, k8sAPIPathLoaded] = useK8sBaseAPIPath(getCluster(pod));
   const url = `${baseK8sPath}/api/v1/namespaces/${getNamespace(pod)}/pods/${getName(pod)}/log`;
 
   const socket = useWebSocket<{ object: K8sResourceCommon; type: string }>(

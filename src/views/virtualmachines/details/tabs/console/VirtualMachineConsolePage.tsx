@@ -8,8 +8,8 @@ import { isHeadlessMode } from '@kubevirt-utils/resources/vm';
 import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
 import { isWindows } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { getCluster } from '@multicluster/helpers/selectors';
+import useK8sBaseAPIPath from '@multicluster/hooks/useK8sBaseAPIPath';
 import { Bullseye, PageSection, Spinner } from '@patternfly/react-core';
-import { useFleetK8sAPIPath } from '@stolostron/multicluster-sdk';
 import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
 
 import { isRunning, isStopped } from '../../../utils';
@@ -19,7 +19,7 @@ const VirtualMachineConsolePage: FC<NavPageComponentProps> = ({ obj: vm }) => {
   const name = getName(vm);
   const namespace = getNamespace(vm);
 
-  const [apiPath, apiPathLoaded] = useFleetK8sAPIPath(cluster);
+  const [apiPath, apiPathLoaded] = useK8sBaseAPIPath(cluster);
 
   const { vmi, vmiLoaded } = useVMI(name, namespace, cluster, isRunning(vm));
 
