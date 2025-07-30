@@ -1,4 +1,4 @@
-import { K8S_KIND, OS_IMAGES_NS, TEST_NS } from '../../utils/const/index';
+import { K8S_KIND, OS_IMAGES_NS, TEST_NS } from '../../../utils/const/index';
 
 const SEARCH_NS = 'auto-search-ns';
 const SAVE_NAME = 'Saved search CNV QE';
