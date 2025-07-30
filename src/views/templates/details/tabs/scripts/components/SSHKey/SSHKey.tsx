@@ -19,7 +19,8 @@ import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 import {
   Button,
   ButtonVariant,
@@ -66,7 +67,7 @@ const SSHKey: FC<SSHKeyProps> = ({ template }) => {
     }
 
     if (secretOption === SecretSelectionOption.addNew) {
-      await createSSHSecret(sshPubKey, sshSecretName, getNamespace(template));
+      await createSSHSecret(sshPubKey, sshSecretName, getNamespace(template), getCluster(template));
     }
 
     const newTemplate = produce(template, (draftTemplate) => {
@@ -87,7 +88,8 @@ const SSHKey: FC<SSHKeyProps> = ({ template }) => {
       }
     });
 
-    return k8sUpdate({
+    return kubevirtK8sUpdate({
+      cluster: getCluster(newTemplate),
       data: newTemplate,
       model: TemplateModel,
       name: getName(newTemplate),
@@ -118,6 +120,7 @@ const SSHKey: FC<SSHKeyProps> = ({ template }) => {
                 createModal((modalProps) => (
                   <SSHSecretModal
                     {...modalProps}
+                    cluster={getCluster(template)}
                     initialSSHSecretDetails={initialSSHDetails}
                     isTemplate
                     namespace={getNamespace(template)}

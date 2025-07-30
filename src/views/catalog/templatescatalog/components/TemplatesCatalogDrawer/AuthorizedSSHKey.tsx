@@ -9,9 +9,10 @@ import { DescriptionList, HelperText, HelperTextItem, SplitItem } from '@pattern
 
 type AuthorizedSSHKeyProps = {
   authorizedSSHKey: string;
+  cluster?: string;
   namespace: string;
 };
-const AuthorizedSSHKey: FC<AuthorizedSSHKeyProps> = ({ authorizedSSHKey, namespace }) => {
+const AuthorizedSSHKey: FC<AuthorizedSSHKeyProps> = ({ authorizedSSHKey, cluster, namespace }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const { copyTemplateSecretToTargetNS, onSSHChange, overwriteTemplateSSHKey, sshDetails } =
@@ -25,6 +26,7 @@ const AuthorizedSSHKey: FC<AuthorizedSSHKeyProps> = ({ authorizedSSHKey, namespa
             createModal((modalProps) => (
               <SSHSecretModal
                 {...modalProps}
+                cluster={cluster}
                 initialSSHSecretDetails={sshDetails}
                 namespace={namespace}
                 onSubmit={onSSHChange}

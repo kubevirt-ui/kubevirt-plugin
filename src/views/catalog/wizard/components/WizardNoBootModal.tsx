@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom-v5-compat';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import { getCatalogURL } from '@multicluster/urls';
 import { Button, ButtonVariant, Stack, StackItem } from '@patternfly/react-core';
 
 export const WizardNoBootModal: React.VFC<{
@@ -14,10 +16,12 @@ export const WizardNoBootModal: React.VFC<{
 }> = ({ isOpen, namespace, onClose, onSubmit }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
+  const cluster = useClusterParam();
+  const baseCatalogURL = getCatalogURL(cluster, namespace);
 
   const goToDisksTab = () => {
     onClose();
-    navigate(`/k8s/ns/${namespace}/catalog/template/review/disks`);
+    navigate(`${baseCatalogURL}/template/review/disks`);
   };
 
   return (

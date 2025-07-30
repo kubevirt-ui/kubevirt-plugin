@@ -14,12 +14,16 @@ import {
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { createSSHSecret } from '@kubevirt-utils/resources/secret/utils';
-import { getResourceUrl } from '@kubevirt-utils/resources/shared';
+import { getName } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
 import { clearCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { createHeadlessService } from '@kubevirt-utils/utils/headless-service';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { k8sCreate, useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
+import { getCatalogURL, getVMURL } from '@multicluster/urls';
+import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Button,
   ButtonVariant,
@@ -35,13 +39,14 @@ import './CustomizeITVMFooter.scss';
 const CustomizeITVMFooter: FC = () => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
+  const cluster = useClusterParam();
   const [activeNamespace] = useActiveNamespace();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<any | Error>(null);
   const { instanceTypeVMState, setStartVM, startVM, vm, vmNamespaceTarget } =
     useInstanceTypeVMStore();
 
-  const [isUDNManagedNamespace] = useNamespaceUDN(activeNamespace);
+  const [isUDNManagedNamespace] = useNamespaceUDN(activeNamespace, cluster);
   const [authorizedSSHKeys, setAuthorizedSSHKeys] = useKubevirtUserSettings('ssh');
   const { sshSecretCredentials } = instanceTypeVMState;
   const { applyKeyToProject, secretOption, sshPubKey, sshSecretName } = sshSecretCredentials || {};
@@ -80,19 +85,19 @@ const CustomizeITVMFooter: FC = () => {
                   setError(null);
 
                   try {
-                    const createdVM = await k8sCreate({
+                    const createdVM = await kubevirtK8sCreate({
                       data: vmSignal.value || vm,
                       model: VirtualMachineModel,
                     });
                     logITFlowEvent(CUSTOMIZE_VM_SUCCEEDED, createdVM);
                     if (secretOption === SecretSelectionOption.addNew) {
-                      createSSHSecret(sshPubKey, sshSecretName, vmNamespaceTarget);
+                      createSSHSecret(sshPubKey, sshSecretName, vmNamespaceTarget, getCluster(vm));
                     }
                     clearCustomizeInstanceType();
 
                     if (!isUDNManagedNamespace) createHeadlessService(createdVM);
 
-                    navigate(getResourceUrl({ model: VirtualMachineModel, resource: createdVM }));
+                    navigate(getVMURL(getCluster(vm), vmNamespaceTarget, getName(createdVM)));
                   } catch (err) {
                     setError(err);
                     logITFlowEvent(CUSTOMIZE_VM_FAILED, vm);
@@ -111,7 +116,7 @@ const CustomizeITVMFooter: FC = () => {
                 onClick={() => {
                   logITFlowEvent(CANCEL_CUSTOMIZE_VM_BUTTON_CLICKED, vm);
                   clearCustomizeInstanceType();
-                  navigate(`/k8s/ns/${activeNamespace}/catalog`);
+                  navigate(getCatalogURL(getCluster(vm), activeNamespace));
                 }}
                 variant={ButtonVariant.link}
               >

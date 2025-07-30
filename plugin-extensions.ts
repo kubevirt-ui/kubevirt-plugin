@@ -55,6 +55,26 @@ const extensions: EncodedExtension[] = [
     type: 'console.navigation/section',
   },
   {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC_ACM'],
+    },
+    properties: {
+      dataAttributes: {
+        'data-quickstart-id': 'qs-nav-virtualization-catalog',
+        'data-test-id': 'virtualization-catalog-nav-item',
+      },
+      href: '/k8s/all-clusters/all-namespaces/catalog',
+      id: 'virtualization-catalog',
+      insertBefore: 'virtualmachines',
+      name: '%plugin__kubevirt-plugin~Catalog%',
+      section: 'virtualization',
+    },
+    type: 'console.navigation/href',
+  },
+  {
+    flags: {
+      disallowed: ['KUBEVIRT_DYNAMIC_ACM'],
+    },
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-virtualization-catalog',

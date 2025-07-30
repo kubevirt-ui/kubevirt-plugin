@@ -8,7 +8,8 @@ import { V1beta1DataVolumeSourcePVC } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { ROOTDISK } from '@kubevirt-utils/constants/constants';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { getDataVolumeTemplates, getVolumes } from '@kubevirt-utils/resources/vm';
-import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 
 const getBootSourceDataVolumeTemplate = (template: V1Template) => {
   const vm = getTemplateVirtualMachineObject(template);
@@ -46,7 +47,8 @@ export const cloneStorage = async (template: V1Template, pvcName: string, namesp
     namespace,
     rootDiskDataVolumeTemplate?.spec as unknown as V1beta1DataVolumeSpec,
   );
-  await k8sCreate({
+  await kubevirtK8sCreate({
+    cluster: getCluster(template),
     data: dataVolume,
     model: DataVolumeModel,
     ns: namespace,

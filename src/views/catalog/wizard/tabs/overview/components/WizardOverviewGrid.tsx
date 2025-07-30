@@ -32,6 +32,8 @@ import {
   VM_WORKLOAD_ANNOTATION,
 } from '@kubevirt-utils/resources/vm';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import { getCatalogURL } from '@multicluster/urls';
 import { DescriptionList, Grid, GridItem, Switch } from '@patternfly/react-core';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 import { printableVMStatus } from '@virtualmachines/utils';
@@ -78,6 +80,9 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
   const nDevices = hostDevicesCount + gpusCount;
   const [isChecked, setIsChecked] = useState<boolean>(!!startStrategy);
   const [isCheckedGuestSystemLogAccess, setIsCheckedGuestSystemLogAccess] = useState<boolean>();
+
+  const cluster = useClusterParam();
+  const baseCatalogURL = getCatalogURL(cluster, ns);
 
   useEffect(() => {
     setIsCheckedGuestSystemLogAccess(
@@ -295,10 +300,8 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
                 networks={networks}
               />
             }
-            onTitleClick={() =>
-              navigate(`/k8s/ns/${ns}/catalog/template/review/network-interfaces`)
-            }
             count={networks?.length}
+            onTitleClick={() => navigate(`${baseCatalogURL}/template/review/network-interfaces`)}
             testId="wizard-overview-network-interfaces"
             title={t('Network interfaces')}
           />
@@ -306,7 +309,7 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
           <WizardDescriptionItem
             count={disks?.length}
             description={<WizardOverviewDisksTable isInlineGrid vm={vm} />}
-            onTitleClick={() => navigate(`/k8s/ns/${ns}/catalog/template/review/disks`)}
+            onTitleClick={() => navigate(`${baseCatalogURL}/template/review/disks`)}
             testId="wizard-overview-disks"
             title={t('Disks')}
           />

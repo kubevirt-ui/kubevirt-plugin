@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 
 import { ProcessedTemplatesModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
-import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 
 import { generateParamsWithPrettyName } from './../utils/helpers';
 
@@ -16,6 +17,7 @@ export const useProcessedTemplate = (
   template: V1Template,
   namespace: string = DEFAULT_NAMESPACE,
 ): [V1Template, boolean, any] => {
+  const cluster = useClusterParam();
   const [processedTemplate, setProcessedTemplate] = useState<undefined | V1Template>(undefined);
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState<any>();
@@ -24,7 +26,8 @@ export const useProcessedTemplate = (
 
     if (template) {
       const parameters = generateParamsWithPrettyName(template);
-      k8sCreate<V1Template>({
+      kubevirtK8sCreate<V1Template>({
+        cluster,
         data: {
           ...template,
           metadata: { ...template?.metadata, namespace },
@@ -46,7 +49,7 @@ export const useProcessedTemplate = (
           setError(err);
         });
     }
-  }, [template, namespace]);
+  }, [template, namespace, cluster]);
 
   return [processedTemplate, loaded, error];
 };

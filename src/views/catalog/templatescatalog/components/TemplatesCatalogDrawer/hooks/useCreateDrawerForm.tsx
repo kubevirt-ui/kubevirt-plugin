@@ -41,7 +41,7 @@ import {
   createUserPasswordSecret,
   encodeSecretKey,
 } from '@kubevirt-utils/resources/secret/utils';
-import { getAnnotation, getLabel, getResourceUrl } from '@kubevirt-utils/resources/shared';
+import { getAnnotation, getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import {
   ANNOTATIONS,
   bootDiskSourceIsRegistry,
@@ -61,8 +61,13 @@ import {
   HEADLESS_SERVICE_NAME,
 } from '@kubevirt-utils/utils/headless-service';
 import { addRandomSuffix, ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
-import { k8sCreate, useAccessReview, useK8sModels } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
+import { getCatalogURL, getVMURL } from '@multicluster/urls';
+import { useK8sModels } from '@openshift-console/dynamic-plugin-sdk';
 import { getLabels } from '@overview/OverviewTab/inventory-card/utils/flattenTemplates';
+import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
 import { allRequiredParametersAreFulfilled, hasValidSource, uploadFiles } from '../utils';
@@ -75,10 +80,11 @@ const useCreateDrawerForm = (
   subscriptionData: RHELAutomaticSubscriptionData,
   authorizedSSHKey: string,
 ) => {
+  const cluster = useClusterParam();
   const { updateTabsData, updateVM } = useWizardVMContext();
 
-  const [isUDNManagedNamespace, vmsNotSupported] = useNamespaceUDN(namespace);
-  const [authorizedSSHKeys, updateAuthorizedSSHKeys] = useKubevirtUserSettings('ssh');
+  const [isUDNManagedNamespace, vmsNotSupported] = useNamespaceUDN(namespace, cluster);
+  const [authorizedSSHKeys, updateAuthorizedSSHKeys] = useKubevirtUserSettings('ssh', cluster);
   const { featureEnabled: autoUpdateEnabled } = useFeatures(AUTOMATIC_UPDATE_FEATURE_NAME);
   const { featureEnabled: isDisabledGuestSystemLogs } = useFeatures(
     DISABLED_GUEST_SYSTEM_LOGS_ACCESS,
@@ -109,7 +115,8 @@ const useCreateDrawerForm = (
   const [createError, setCreateError] = useState(undefined);
   const [models, modelsLoading] = useK8sModels();
 
-  const [processedTemplateAccessReview] = useAccessReview({
+  const [processedTemplateAccessReview] = useFleetAccessReview({
+    cluster,
     group: ProcessedTemplatesModel.apiGroup,
     namespace,
     resource: ProcessedTemplatesModel.plural,
@@ -128,6 +135,7 @@ const useCreateDrawerForm = (
 
     if (addRegistrySecret) {
       await createUserPasswordSecret({
+        cluster,
         namespace,
         password,
         secretName: imageSecretName,
@@ -195,6 +203,7 @@ const useCreateDrawerForm = (
         uploadData: (processedTemplate) =>
           uploadFiles({
             cdFile,
+            cluster,
             diskFile,
             namespace,
             updateTabsData,
@@ -205,11 +214,13 @@ const useCreateDrawerForm = (
       });
 
       if (sshDetails?.secretOption === SecretSelectionOption.addNew) {
-        await createSSHSecret(sshDetails?.sshPubKey, sshDetails?.sshSecretName, namespace);
+        await createSSHSecret(sshDetails?.sshPubKey, sshDetails?.sshSecretName, namespace, cluster);
       }
 
       setIsQuickCreating(false);
-      navigate(getResourceUrl({ model: VirtualMachineModel, resource: quickCreatedVM }));
+      navigate(
+        getVMURL(getCluster(quickCreatedVM), getNamespace(quickCreatedVM), getName(quickCreatedVM)),
+      );
       logTemplateFlowEvent(CREATE_VM_SUCCEEDED, templateToProcess);
     } catch (error) {
       setCreateError(error);
@@ -227,7 +238,8 @@ const useCreateDrawerForm = (
     logTemplateFlowEvent(CUSTOMIZE_VM_BUTTON_CLICKED, template);
 
     try {
-      const processedTemplate = await k8sCreate<V1Template>({
+      const processedTemplate = await kubevirtK8sCreate<V1Template>({
+        cluster,
         data: { ...template, metadata: { ...template?.metadata, namespace } },
         model: ProcessedTemplatesModel,
         ns: namespace,
@@ -238,6 +250,7 @@ const useCreateDrawerForm = (
 
       const vmObject = await uploadFiles({
         cdFile,
+        cluster,
         diskFile,
         namespace,
         updateTabsData,
@@ -312,7 +325,7 @@ const useCreateDrawerForm = (
       await updateVM(
         !isEmpty(authorizedSSHKey) ? addSecretToVM(updatedVM, authorizedSSHKey) : updatedVM,
       );
-      navigate(`/k8s/ns/${namespace}/catalog/template/review`);
+      navigate(`${getCatalogURL(cluster, namespace)}/template/review`);
     } catch (error) {
       setCreateError(error);
       logTemplateFlowEvent(CUSTOMIZE_VM_FAILED, template);

@@ -105,7 +105,13 @@ export const getResourceUrl = (urlProps: ResourceUrlProps): string => {
   const ref = crd ? `${model.apiGroup || 'core'}~${model.apiVersion}~${model.kind}` : plural || '';
   const name = resource?.metadata?.name || '';
 
-  return `/k8s/${namespaced ? namespaceUrl : 'cluster'}/${ref}/${name}`;
+  const url = `/k8s/${namespaced ? namespaceUrl : 'cluster'}/${ref}`;
+
+  if (name) {
+    return `${url}/${name}`;
+  }
+
+  return url;
 };
 
 /**

@@ -16,7 +16,9 @@ import {
   getPrintableDiskInterface,
 } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
 import { getHumanizedSize } from '@kubevirt-utils/utils/units';
-import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
+import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 type UseDisksTableDisks = (
   vm: V1VirtualMachine,
@@ -35,7 +37,8 @@ const useWizardDisksTableData: UseDisksTableDisks = (vm, pvcNamespace) => {
   const vmVolumes = getVolumes(vm);
   const vmDataVolumeTemplates = getDataVolumeTemplates(vm);
 
-  const [pvcs, loaded, loadingError] = useK8sWatchResource<K8sResourceCommon[]>({
+  const [pvcs, loaded, loadingError] = useK8sWatchData<K8sResourceCommon[]>({
+    cluster: getCluster(vm),
     isList: true,
     kind: PersistentVolumeClaimModel.kind,
     namespace: pvcNamespace ?? vm?.metadata?.namespace,

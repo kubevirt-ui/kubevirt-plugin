@@ -49,6 +49,7 @@ import useQuery from '@kubevirt-utils/hooks/useQuery';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
+import { getCatalogURL } from '@multicluster/urls';
 import {
   DocumentTitle,
   K8sResourceCommon,
@@ -89,10 +90,10 @@ type VirtualMachinesListProps = {
 
 const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref) => {
   const { t } = useKubevirtTranslation();
-  const { kind, namespace, searchQueries } = props;
+  const { cluster, kind, namespace, searchQueries } = props;
   const isSearchResultsPage = !isEmpty(searchQueries);
 
-  const catalogURL = `/k8s/ns/${namespace || DEFAULT_NAMESPACE}/catalog`;
+  const catalogURL = getCatalogURL(cluster, namespace || DEFAULT_NAMESPACE);
   const { featureEnabled, loading: loadingFeatureProxy } = useFeatures(KUBEVIRT_APISERVER_PROXY);
   const isProxyPodAlive = useKubevirtDataPodHealth();
 
@@ -105,7 +106,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
 
   const [vms, vmsLoaded, loadError] = useKubevirtWatchResource<V1VirtualMachine[]>(
     {
-      cluster: props.cluster,
+      cluster,
       groupVersionKind: VirtualMachineModelGroupVersionKind,
       isList: true,
       limit: OBJECTS_FETCHING_LIMIT,
@@ -128,7 +129,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
 
   const [vmis, vmisLoaded] = useKubevirtWatchResource<V1VirtualMachineInstance[]>(
     {
-      cluster: props.cluster,
+      cluster,
       groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
       isList: true,
       limit: OBJECTS_FETCHING_LIMIT,
@@ -143,7 +144,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
   );
 
   const [pvcs] = useK8sWatchData<IoK8sApiCoreV1PersistentVolumeClaim[]>({
-    cluster: props.cluster,
+    cluster,
     groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
     isList: true,
     limit: OBJECTS_FETCHING_LIMIT,
@@ -154,7 +155,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
   const pvcMapper = useMemo(() => convertIntoPVCMapper(pvcs), [pvcs]);
 
   const [vmims, vmimsLoaded] = useK8sWatchData<V1VirtualMachineInstanceMigration[]>({
-    cluster: props.cluster,
+    cluster,
     groupVersionKind: VirtualMachineInstanceMigrationModelGroupVersionKind,
     isList: true,
     limit: OBJECTS_FETCHING_LIMIT,

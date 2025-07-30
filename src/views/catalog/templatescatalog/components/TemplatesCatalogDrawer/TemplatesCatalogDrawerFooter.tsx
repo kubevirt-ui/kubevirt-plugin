@@ -5,10 +5,9 @@ import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import useRHELAutomaticSubscription from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/useRHELAutomaticSubscription';
-import {
-  getGroupVersionKindForModel,
-  useK8sWatchResource,
-} from '@openshift-console/dynamic-plugin-sdk';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
+import { getGroupVersionKindForModel } from '@openshift-console/dynamic-plugin-sdk';
 import { Stack, StackItem, Title } from '@patternfly/react-core';
 
 import { useDrawerContext } from './hooks/useDrawerContext';
@@ -25,13 +24,17 @@ export const TemplatesCatalogDrawerFooter: FC<TemplateCatalogDrawerFooterProps> 
   onCancel,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [authorizedSSHKeys, updateAuthorizedSSHKeys, userSettingsLoaded] =
-    useKubevirtUserSettings('ssh');
+  const cluster = useClusterParam();
+  const [authorizedSSHKeys, updateAuthorizedSSHKeys, userSettingsLoaded] = useKubevirtUserSettings(
+    'ssh',
+    cluster,
+  );
   const { loaded: loadedRHELSubscription, subscriptionData } = useRHELAutomaticSubscription();
   const { templateDataLoaded, templateLoadingError } = useDrawerContext();
 
-  const [, , loadError] = useK8sWatchResource<IoK8sApiCoreV1Secret>(
+  const [, , loadError] = useK8sWatchData<IoK8sApiCoreV1Secret>(
     authorizedSSHKeys?.[namespace] && {
+      cluster,
       groupVersionKind: getGroupVersionKindForModel(SecretModel),
       isList: false,
       name: authorizedSSHKeys?.[namespace],

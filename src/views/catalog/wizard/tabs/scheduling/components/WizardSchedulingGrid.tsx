@@ -14,7 +14,8 @@ import NodeSelectorModal from '@kubevirt-utils/components/NodeSelectorModal/Node
 import TolerationsModal from '@kubevirt-utils/components/TolerationsModal/TolerationsModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getEvictionStrategy } from '@kubevirt-utils/resources/vm';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { DescriptionList, Grid, GridItem } from '@patternfly/react-core';
 
 import { WizardDescriptionItem } from '../../../components/WizardDescriptionItem';
@@ -34,7 +35,8 @@ const WizardSchedulingGrid: FC<WizardSchedulingGridProps> = ({ updateVM, vm }) =
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
-  const [nodes, nodesLoaded] = useK8sWatchResource<IoK8sApiCoreV1Node[]>({
+  const [nodes, nodesLoaded] = useK8sWatchData<IoK8sApiCoreV1Node[]>({
+    cluster: getCluster(vm),
     groupVersionKind: modelToGroupVersionKind(NodeModel),
     isList: true,
   });

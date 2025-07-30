@@ -4,7 +4,9 @@ import axios from 'axios';
 import { modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import CDIConfigModel from '@kubevirt-ui/kubevirt-api/console/models/CDIConfigModel';
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
-import { useK8sWatchResource, WatchK8sResource } from '@openshift-console/dynamic-plugin-sdk';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 import { useKubevirtTranslation } from '../useKubevirtTranslation';
 
@@ -17,16 +19,17 @@ import {
   UPLOAD_STATUS,
 } from './utils';
 
-const resource: WatchK8sResource = {
-  groupVersionKind: modelToGroupVersionKind(CDIConfigModel),
-  isList: false,
-  name: 'config',
-  namespaced: false,
-};
-
 export const useCDIUpload = (): UseCDIUploadValues => {
+  const cluster = useClusterParam();
   const { t } = useKubevirtTranslation();
-  const [cdiConfig, configLoaded, configError] = useK8sWatchResource<CDIConfig>(resource);
+  const [cdiConfig, configLoaded, configError] = useK8sWatchData<CDIConfig>({
+    cluster,
+    groupVersionKind: modelToGroupVersionKind(CDIConfigModel),
+    isList: false,
+    name: 'config',
+    namespaced: false,
+  });
+
   const [upload, setUpload] = React.useState<DataUpload>();
   const uploadProxyURL = getUploadProxyURL(cdiConfig);
 
@@ -34,17 +37,19 @@ export const useCDIUpload = (): UseCDIUploadValues => {
     const { CancelToken } = axios;
     const cancelSource = CancelToken.source();
     const noRouteFound = configError || !configLoaded || !uploadProxyURL;
+    const namespace = getNamespace(dataVolume);
+    const name = getName(dataVolume);
 
     const newUpload: DataUpload = {
       cancelUpload: () => {
         cancelSource.cancel();
         setUpload({ ...newUpload, uploadStatus: UPLOAD_STATUS.CANCELED });
-        return killUploadPVC(dataVolume.metadata.name, dataVolume.metadata.namespace);
+        return killUploadPVC(name, namespace, cluster);
       },
       fileName: file?.name,
-      namespace: dataVolume.metadata.namespace,
+      namespace,
       progress: 0,
-      pvcName: dataVolume.metadata.name,
+      pvcName: name,
       uploadError: noRouteFound && {
         message: t('No Upload URL found {{configError}}', { configError }),
       },

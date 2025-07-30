@@ -5,7 +5,9 @@ import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFi
 import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
+import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { Content, ContentVariants } from '@patternfly/react-core';
 
 import './TemplatesCatalogProjectsDropdown.scss';
@@ -18,7 +20,9 @@ type TemplatesCatalogProjectsDropdownProps = {
 export const TemplatesCatalogProjectsDropdown: FC<TemplatesCatalogProjectsDropdownProps> = memo(
   ({ onChange, selectedProject }) => {
     const { t } = useKubevirtTranslation();
-    const [projects] = useK8sWatchResource<K8sResourceCommon[]>({
+    const cluster = useClusterParam();
+    const [projects] = useK8sWatchData<K8sResourceCommon[]>({
+      cluster,
       groupVersionKind: modelToGroupVersionKind(ProjectModel),
       isList: true,
       namespaced: false,

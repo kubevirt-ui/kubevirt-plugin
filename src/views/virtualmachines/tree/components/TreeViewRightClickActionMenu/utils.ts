@@ -3,14 +3,16 @@ import { NavigateFunction } from 'react-router-dom-v5-compat';
 import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getLabel, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getCatalogURL } from '@multicluster/urls';
 import { FOLDER_SELECTOR_PREFIX, VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 import { vmsSignal } from '@virtualmachines/tree/utils/signals';
 
 export const getCreateVMAction = (
   navigate: NavigateFunction,
   namespace: string,
+  cluster?: string,
 ): ActionDropdownItemType => ({
-  cta: () => navigate(`/k8s/ns/${namespace}/catalog`),
+  cta: () => navigate(`${getCatalogURL(cluster, namespace)}`),
   id: 'create-vm',
   label: t('Create VirtualMachine'),
 });

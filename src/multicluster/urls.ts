@@ -19,6 +19,9 @@ export const getACMVMSearchURL = (): string =>
 export const getACMVMListNamespacesURL = (cluster: string, namespace: string): string =>
   `/k8s/cluster/${cluster}/ns/${namespace}/kubevirt.io~v1~VirtualMachine`;
 
+export const getCatalogURL = (cluster: string, namespace: string): string =>
+  cluster ? `/k8s/cluster/${cluster}/ns/${namespace}/catalog` : `/k8s/ns/${namespace}/catalog`;
+
 export const getVMURL = (cluster: string, namespace: string, name: string): string =>
   cluster
     ? getACMVMURL(cluster, namespace, name)

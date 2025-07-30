@@ -14,6 +14,9 @@ export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
 
 const virtualizationSection = [
   {
+    flags: {
+      disallowed: ['KUBEVIRT_DYNAMIC_ACM'],
+    },
     properties: {
       dataAttributes: {
         'data-border': 'no-border',
@@ -27,6 +30,25 @@ const virtualizationSection = [
       name: '%plugin__kubevirt-plugin~Catalog%',
       perspective: 'virtualization-perspective',
       prefixNamespaced: true,
+    },
+    type: 'console.navigation/href',
+  } as EncodedExtension<HrefNavItem>,
+  {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC_ACM'],
+    },
+    properties: {
+      dataAttributes: {
+        'data-border': 'no-border',
+        'data-class': 'kv-plugin-virt-perspective-element',
+        'data-quickstart-id': 'qs-nav-virtualization-catalog',
+        'data-test-id': 'virtualization-catalog-nav-item',
+      },
+      href: '/k8s/all-clusters/all-namespaces/catalog',
+      id: 'virtualization-catalog-virt-perspective',
+      insertBefore: 'virtualmachines',
+      name: '%plugin__kubevirt-plugin~Catalog%',
+      perspective: 'virtualization-perspective',
     },
     type: 'console.navigation/href',
   } as EncodedExtension<HrefNavItem>,

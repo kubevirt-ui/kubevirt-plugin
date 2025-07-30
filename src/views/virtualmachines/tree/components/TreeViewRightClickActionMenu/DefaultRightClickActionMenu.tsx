@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom-v5-compat';
 import classNames from 'classnames';
 
 import ActionDropdownItem from '@kubevirt-utils/components/ActionDropdownItem/ActionDropdownItem';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { Menu, MenuContent, MenuList, Popper } from '@patternfly/react-core';
 import useMultipleVirtualMachineActions from '@virtualmachines/actions/hooks/useMultipleVirtualMachineActions';
 import {
@@ -25,11 +26,13 @@ const DefaultRightClickActionMenu: FC<DefaultRightClickActionMenuProps> = ({
   const { namespace, prefix } = getElementComponentsFromID(triggerElement);
 
   const vms = getVMsTrigger(triggerElement);
+  const cluster = getCluster(vms?.[0]);
   const actions = useMultipleVirtualMachineActions(vms);
 
   const navigate = useNavigate();
 
-  if (prefix === PROJECT_SELECTOR_PREFIX) actions.unshift(getCreateVMAction(navigate, namespace));
+  if (prefix === PROJECT_SELECTOR_PREFIX)
+    actions.unshift(getCreateVMAction(navigate, namespace, cluster));
 
   return (
     <Popper

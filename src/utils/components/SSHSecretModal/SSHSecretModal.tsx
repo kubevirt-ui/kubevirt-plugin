@@ -13,6 +13,7 @@ import { SecretSelectionOption, SSHSecretDetails } from './utils/types';
 import { validateSecretName, validateSecretNameUnique } from './utils/utils';
 
 type SSHSecretModalProps = {
+  cluster?: string;
   initialSSHSecretDetails: SSHSecretDetails;
   isOpen: boolean;
   isTemplate?: boolean;
@@ -23,6 +24,7 @@ type SSHSecretModalProps = {
 };
 
 const SSHSecretModal: FC<SSHSecretModalProps> = ({
+  cluster,
   initialSSHSecretDetails,
   isOpen,
   isTemplate = false,
@@ -58,7 +60,7 @@ const SSHSecretModal: FC<SSHSecretModalProps> = ({
       onSubmit={async () => {
         const { secretOption, sshPubKey, sshSecretName } = sshDetails;
         if (secretOption === SecretSelectionOption.addNew) {
-          await createSSHSecret(sshPubKey, sshSecretName, namespace, true);
+          await createSSHSecret(sshPubKey, sshSecretName, namespace, cluster, true);
         }
 
         return onSubmit(sshDetails);

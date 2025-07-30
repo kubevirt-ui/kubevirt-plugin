@@ -7,6 +7,7 @@ import {
   V1beta1PersistentVolumeClaim,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 
 import { BOOT_SOURCE } from '../../utils/constants';
 
@@ -23,13 +24,14 @@ export const useVMTemplateSource = (template: V1Template): UseVMTemplateSourceVa
   const [loaded, setLoaded] = useState<boolean>(false);
   const [error, setError] = useState<any>();
   const prevBootSourceRef = useRef<TemplateBootSource>();
+  const cluster = useClusterParam();
 
   const bootSource = useMemo(() => getTemplateBootSourceType(template), [template]);
 
   const getPVCSource = async ({ name, namespace }: V1beta1DataVolumeSourcePVC) => {
     setLoaded(false);
     try {
-      const pvc = (await getPVC(name, namespace)) as V1beta1PersistentVolumeClaim;
+      const pvc = (await getPVC(name, namespace, cluster)) as V1beta1PersistentVolumeClaim;
       if (pvc) {
         setIsBootSourceAvailable(true);
         setTemplateBootSource({
@@ -53,7 +55,7 @@ export const useVMTemplateSource = (template: V1Template): UseVMTemplateSourceVa
   const getDataSourceCondition = async ({ name, namespace }: V1beta1DataVolumeSourceRef) => {
     setLoaded(false);
     try {
-      const dataSource = await getDataSource(name, namespace);
+      const dataSource = await getDataSource(name, namespace, cluster);
       if (
         dataSource?.status?.conditions?.find((c) => c?.type === 'Ready' && c?.status === 'True')
       ) {

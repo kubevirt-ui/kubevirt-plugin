@@ -33,6 +33,7 @@ import {
 } from '@kubevirt-utils/resources/template';
 import useVMTemplateGeneratedParams from '@kubevirt-utils/resources/template/hooks/useVMTemplateGeneratedParams';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 
 import { getDiskSource } from '../StorageSection/utils';
 
@@ -66,6 +67,7 @@ export type DrawerContext = {
 };
 
 const useDrawer = (template: V1Template) => {
+  const cluster = useClusterParam();
   const [customizedTemplate, setCustomizedTemplate] = useImmer(template);
   const [sshDetails, setSSHDetails] = useState<SSHSecretDetails>(null);
   const { isBootSourceAvailable, loaded: bootSourceLoaded } = useVMTemplateSource(template);
@@ -80,7 +82,7 @@ const useDrawer = (template: V1Template) => {
   const [registryCredentials, setRegistryCredentials] = useState({ password: '', username: '' });
 
   const [templateWithGeneratedParams, loading, error] = useVMTemplateGeneratedParams(template);
-  const [{ clusterDefaultStorageClass, virtDefaultStorageClass }] = useDefaultStorageClass();
+  const [{ clusterDefaultStorageClass, virtDefaultStorageClass }] = useDefaultStorageClass(cluster);
 
   const vm = useMemo(
     () => getTemplateVirtualMachineObject(customizedTemplate),

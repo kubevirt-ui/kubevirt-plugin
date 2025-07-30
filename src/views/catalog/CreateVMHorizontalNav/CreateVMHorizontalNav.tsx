@@ -5,6 +5,7 @@ import CreateFromInstanceType from '@catalog/CreateFromInstanceTypes/CreateFromI
 import TemplatesCatalog from '@catalog/templatescatalog/TemplatesCatalog';
 import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getCatalogURL } from '@multicluster/urls';
 import { PageSection, Stack, StackItem, Tab, Tabs, Title } from '@patternfly/react-core';
 import { CatalogIcon, ImageIcon } from '@patternfly/react-icons';
 
@@ -24,7 +25,7 @@ const CreateVMHorizontalNav: FC = () => {
   );
 
   const catalogURL = useMemo(
-    () => `/k8s/${params?.ns ? `ns/${params?.ns}` : ALL_NAMESPACES}/catalog`,
+    () => getCatalogURL(params?.cluster, params?.ns || ALL_NAMESPACES),
     [params],
   );
 

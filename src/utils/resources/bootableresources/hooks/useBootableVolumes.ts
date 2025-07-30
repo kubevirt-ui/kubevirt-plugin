@@ -24,16 +24,18 @@ import {
   getReadyOrCloningOrUploadingDataSources,
 } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { Operator, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
+import { Operator } from '@openshift-console/dynamic-plugin-sdk';
 
 type UseBootableVolumes = (namespace?: string) => UseBootableVolumesValues;
 
 const useBootableVolumes: UseBootableVolumes = (namespace) => {
   const projectsNamespace = namespace === ALL_PROJECTS ? null : namespace;
+  const cluster = useClusterParam();
 
-  const [dataSources, loadedDataSources, dataSourcesError] = useK8sWatchResource<
-    V1beta1DataSource[]
-  >({
+  const [dataSources, loadedDataSources, dataSourcesError] = useK8sWatchData<V1beta1DataSource[]>({
+    cluster,
     groupVersionKind: DataSourceModelGroupVersionKind,
     isList: true,
     namespace: projectsNamespace,
@@ -42,31 +44,33 @@ const useBootableVolumes: UseBootableVolumes = (namespace) => {
     },
   });
 
-  const [dataImportCrons, loadedDataImportCrons, dataImportCronsError] = useK8sWatchResource<
+  const [dataImportCrons, loadedDataImportCrons, dataImportCronsError] = useK8sWatchData<
     V1beta1DataImportCron[]
   >({
+    cluster,
     groupVersionKind: modelToGroupVersionKind(DataImportCronModel),
     isList: true,
     namespace: projectsNamespace,
   });
 
   // getting all pvcs since there could be a case where a DS has the label and it's underlying PVC does not
-  const [pvcs, loadedPVCs, loadErrorPVCs] = useK8sWatchResource<
-    IoK8sApiCoreV1PersistentVolumeClaim[]
-  >({
+  const [pvcs, loadedPVCs, loadErrorPVCs] = useK8sWatchData<IoK8sApiCoreV1PersistentVolumeClaim[]>({
+    cluster,
     groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
     isList: true,
     namespace: projectsNamespace,
   });
 
-  const [dvs, loadedDVs, loadErrorDVs] = useK8sWatchResource<V1beta1DataVolume[]>({
+  const [dvs, loadedDVs, loadErrorDVs] = useK8sWatchData<V1beta1DataVolume[]>({
+    cluster,
     groupVersionKind: modelToGroupVersionKind(DataVolumeModel),
     isList: true,
     namespace: projectsNamespace,
   });
 
   // getting volumesnapshot as this can also be a source of DS
-  const [volumeSnapshots] = useK8sWatchResource<VolumeSnapshotKind[]>({
+  const [volumeSnapshots] = useK8sWatchData<VolumeSnapshotKind[]>({
+    cluster,
     groupVersionKind: modelToGroupVersionKind(VolumeSnapshotModel),
     isList: true,
     namespace: projectsNamespace,

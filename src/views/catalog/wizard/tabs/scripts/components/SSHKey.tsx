@@ -9,6 +9,7 @@ import SecretNameLabel from '@kubevirt-utils/components/SSHSecretModal/component
 import SSHSecretModal from '@kubevirt-utils/components/SSHSecretModal/SSHSecretModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { Content, ContentVariants, Stack } from '@patternfly/react-core';
 
 const SSHKey: FC = () => {
@@ -35,6 +36,7 @@ const SSHKey: FC = () => {
         createModal((modalProps) => (
           <SSHSecretModal
             {...modalProps}
+            cluster={getCluster(vm)}
             initialSSHSecretDetails={sshDetails}
             namespace={getNamespace(vm)}
             onSubmit={onSubmit}
