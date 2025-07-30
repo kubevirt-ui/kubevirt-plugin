@@ -7,7 +7,6 @@ import { ADVANCED_SEARCH } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
-import { isACMListPath } from '@multicluster/urls';
 import { ListPageHeader, OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import { Divider } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
@@ -19,6 +18,8 @@ import { useTreeViewData } from '@virtualmachines/tree/hooks/useTreeViewData';
 import VirtualMachineTreeView from '@virtualmachines/tree/VirtualMachineTreeView';
 
 import { defaultVMYamlTemplate } from '../../../templates';
+
+import useClustersRedirect from './hooks/useClustersRedirect';
 
 const VirtualMachineNavigator: FC = () => {
   useSignals();
@@ -33,10 +34,11 @@ const VirtualMachineNavigator: FC = () => {
   const isVirtualMachineListPage = useMemo(
     () =>
       location.pathname.endsWith(VirtualMachineModelRef) ||
-      location.pathname.endsWith(`${VirtualMachineModelRef}/`) ||
-      isACMListPath(location.pathname),
+      location.pathname.endsWith(`${VirtualMachineModelRef}/`),
     [location.pathname],
   );
+
+  useClustersRedirect();
 
   const treeProps = useTreeViewData();
 

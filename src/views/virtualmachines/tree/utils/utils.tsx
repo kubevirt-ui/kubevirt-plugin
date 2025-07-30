@@ -9,7 +9,13 @@ import {
 import { ALL_NAMESPACES_SESSION_KEY, ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { getVMListNamespacesURL, getVMListURL, getVMURL, isACMPath } from '@multicluster/urls';
+import {
+  getACMVMListURL,
+  getVMListNamespacesURL,
+  getVMListURL,
+  getVMURL,
+  isACMPath,
+} from '@multicluster/urls';
 import { TreeViewDataItem } from '@patternfly/react-core';
 import { FolderIcon, FolderOpenIcon, ProjectDiagramIcon } from '@patternfly/react-icons';
 import { signal } from '@preact/signals-react';
@@ -188,10 +194,10 @@ const getVMInfoFromPathname = (pathname: string) => {
   const isACMTreeView = isACMPath(pathname);
 
   if (isACMTreeView) {
-    const currentVMTab = splitPathname?.[7] || '';
-    const vmName = splitPathname?.[6];
+    const currentVMTab = splitPathname?.[8] || '';
+    const vmName = splitPathname?.[7];
     const vmNamespace = splitPathname?.[5];
-    const vmCluster = splitPathname?.[4];
+    const vmCluster = splitPathname?.[3];
 
     return { currentVMTab, vmCluster, vmName, vmNamespace };
   }
@@ -303,7 +309,7 @@ const createMultiClusterTreeViewData = (
         children: treeViewData,
         defaultExpanded: clusterSelected,
         hasBadge: false,
-        href: `/multicloud/infrastructure/virtualmachines/${clusterName}`,
+        href: getACMVMListURL(clusterName),
         icon: <ProjectDiagramIcon />,
         id: `${CLUSTER_SELECTOR_PREFIX}/${clusterName}`,
         name: clusterName,
@@ -323,7 +329,7 @@ const createMultiClusterTreeViewData = (
       children: treeWithClusters,
       defaultExpanded: true,
       hasBadge: false,
-      href: `/multicloud/infrastructure/virtualmachines`,
+      href: getACMVMListURL(),
       icon: <ProjectDiagramIcon />,
       id: ALL_CLUSTERS_ID,
       name: 'All clusters',

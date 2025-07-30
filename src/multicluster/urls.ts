@@ -2,20 +2,22 @@ import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 
 import { VirtualMachineModel } from '../views/dashboard-extensions/utils';
 
-import { BASE_ACM_VM_PATH } from './constants';
-
-export const isACMPath = (pathname: string): boolean => pathname.startsWith(BASE_ACM_VM_PATH);
-export const isACMListPath = (pathname: string): boolean =>
-  pathname.startsWith(BASE_ACM_VM_PATH) && pathname.split('/').length < 7;
+export const isACMPath = (pathname: string): boolean =>
+  pathname.startsWith('/k8s/cluster') || pathname.startsWith('/k8s/all-clusters');
 
 export const getACMVMURL = (cluster: string, namespace: string, name: string): string =>
-  `${BASE_ACM_VM_PATH}/${cluster}/${namespace}/${name}`;
+  `/k8s/cluster/${cluster}/ns/${namespace}/kubevirt.io~v1~VirtualMachine/${name}`;
 
-export const getACMVMListURL = (cluster?: string): string => `${BASE_ACM_VM_PATH}/${cluster || ''}`;
-export const getACMVMSearchURL = (): string => `${BASE_ACM_VM_PATH}/search`;
+export const getACMVMListURL = (cluster?: string): string =>
+  cluster
+    ? `/k8s/cluster/${cluster}/all-namespaces/kubevirt.io~v1~VirtualMachine`
+    : `/k8s/all-clusters/all-namespaces/kubevirt.io~v1~VirtualMachine`;
+
+export const getACMVMSearchURL = (): string =>
+  `/k8s/all-clusters/all-namespaces/kubevirt.io~v1~VirtualMachine/search`;
 
 export const getACMVMListNamespacesURL = (cluster: string, namespace: string): string =>
-  `${BASE_ACM_VM_PATH}/${cluster}/${namespace}`;
+  `/k8s/cluster/${cluster}/ns/${namespace}/kubevirt.io~v1~VirtualMachine`;
 
 export const getVMURL = (cluster: string, namespace: string, name: string): string =>
   cluster

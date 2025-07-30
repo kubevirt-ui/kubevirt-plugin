@@ -26,7 +26,6 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.page/route/standalone',
   } as EncodedExtension<StandaloneRoutePage>,
-
   {
     flags: {
       required: ['KUBEVIRT_DYNAMIC_ACM'],
@@ -36,10 +35,10 @@ export const extensions: EncodedExtension[] = [
         $codeRef: 'Navigator',
       },
       path: [
-        '/multicloud/infrastructure/virtualmachines/:cluster/:ns/:name',
-        '/multicloud/infrastructure/virtualmachines/:cluster/:ns',
-        '/multicloud/infrastructure/virtualmachines/:cluster',
-        '/multicloud/infrastructure/virtualmachines',
+        '/k8s/cluster/:cluster/ns/:ns/kubevirt.io~v1~VirtualMachine/:name',
+        '/k8s/cluster/:cluster/ns/:ns/kubevirt.io~v1~VirtualMachine',
+        '/k8s/cluster/:cluster/all-namespaces/kubevirt.io~v1~VirtualMachine',
+        '/k8s/all-clusters/all-namespaces/kubevirt.io~v1~VirtualMachine',
       ],
     },
     type: 'console.page/route',
@@ -47,7 +46,7 @@ export const extensions: EncodedExtension[] = [
   {
     properties: {
       component: { $codeRef: 'VirtualMachineSearchResults' },
-      path: ['/multicloud/infrastructure/virtualmachines/search'],
+      path: ['/k8s/all-clusters/all-namespaces/kubevirt.io~v1~VirtualMachine/search'],
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,

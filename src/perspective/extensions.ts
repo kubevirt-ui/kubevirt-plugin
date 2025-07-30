@@ -31,6 +31,9 @@ const virtualizationSection = [
     type: 'console.navigation/href',
   } as EncodedExtension<HrefNavItem>,
   {
+    flags: {
+      disallowed: ['KUBEVIRT_DYNAMIC_ACM'],
+    },
     properties: {
       dataAttributes: {
         'data-border': 'no-border',
@@ -48,7 +51,29 @@ const virtualizationSection = [
       perspective: 'virtualization-perspective',
     },
     type: 'console.navigation/resource-ns',
-  },
+  } as EncodedExtension<ResourceNSNavItem>,
+
+  {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC_ACM'],
+    },
+    properties: {
+      dataAttributes: {
+        'data-border': 'no-border',
+        'data-class': 'kv-plugin-virt-perspective-element',
+        'data-quickstart-id': 'qs-nav-virtualmachines',
+        'data-test-id': 'virtualmachines-nav-item',
+      },
+      href: '/k8s/all-clusters/all-namespaces/kubevirt.io~v1~VirtualMachine',
+      id: 'virtualmachines-virt-perspective',
+      insertAfter: 'virtualization-catalog-virt-perspective',
+      insertBefore: 'templates-virt-perspective',
+      name: '%plugin__kubevirt-plugin~VirtualMachines%',
+      perspective: 'virtualization-perspective',
+    },
+    type: 'console.navigation/href',
+  } as EncodedExtension<HrefNavItem>,
+
   {
     properties: {
       dataAttributes: {
