@@ -5,6 +5,8 @@ import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 
 import { ActionDropdownItemType } from '../ActionsDropdown/constants';
 
+import './ActionDropdownItem.scss';
+
 type ActionDropdownItemProps = {
   action: ActionDropdownItemType;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
@@ -35,7 +37,7 @@ const ActionDropdownItem: FC<ActionDropdownItemProps> = ({ action, setIsOpen }) 
     <MenuItem
       flyoutMenu={
         action?.options && (
-          <Menu containsFlyout id={`menu-${action.id}`}>
+          <Menu className="kv-actions-dropdown-submenu" containsFlyout id={`menu-${action.id}`}>
             <MenuContent>
               <MenuList>
                 {action?.options?.map((option) => (

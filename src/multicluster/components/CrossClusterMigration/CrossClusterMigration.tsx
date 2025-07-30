@@ -11,8 +11,8 @@ import './CrossClusterMigration.scss';
 const CrossClusterMigration: FC<{
   close: () => void;
   isOpen?: boolean;
-  resource: V1VirtualMachine;
-  resources: V1VirtualMachine[];
+  resource?: V1VirtualMachine;
+  resources?: V1VirtualMachine[];
 }> = ({ close, isOpen = true, resource, resources }) => {
   const vms = useMemo(() => (resource ? [resource] : resources), [resource, resources]);
   return (
