@@ -34,8 +34,9 @@ import {
 } from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
+import { K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, Grid, GridItem, Switch, Title } from '@patternfly/react-core';
+import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 import DeletionProtectionModal from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/DeletionProtectionModal';
 import { VMDeletionProtectionOptions } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/types';
 import { isDeletionProtectionEnabled } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
@@ -65,7 +66,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
   const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
-  const [canUpdateVM] = useAccessReview(accessReview || {});
+  const [canUpdateVM] = useFleetAccessReview(accessReview || {});
   const { featureEnabled: isGuestSystemLogsDisabled } = useFeatures(
     DISABLED_GUEST_SYSTEM_LOGS_ACCESS,
   );

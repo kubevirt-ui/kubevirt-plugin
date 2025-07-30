@@ -2,6 +2,7 @@ import React from 'react';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
 import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import MoveBulkVMToFolderModal from '@kubevirt-utils/components/MoveVMToFolderModal/MoveBulkVMsToFolderModal';
@@ -9,7 +10,6 @@ import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getLabels, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
-import { Action } from '@openshift-console/dynamic-plugin-sdk';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
 import ConfirmMultipleVMActionsModal from './components/ConfirmMultipleVMActionsModal/ConfirmMultipleVMActionsModal';
@@ -19,7 +19,10 @@ import { deleteVM, pauseVM, restartVM, startVM, stopVM, unpauseVM } from './acti
 import { getCommonLabels, getLabelsDiffPatch, isSameNamespace } from './utils';
 
 export const BulkVirtualMachineActionFactory = {
-  delete: (vms: V1VirtualMachine[], createModal: (modal: ModalComponent) => void): Action => ({
+  delete: (
+    vms: V1VirtualMachine[],
+    createModal: (modal: ModalComponent) => void,
+  ): ActionDropdownItemType => ({
     cta: () =>
       createModal(({ isOpen, onClose }) => (
         <ConfirmMultipleVMActionsModal
@@ -34,7 +37,10 @@ export const BulkVirtualMachineActionFactory = {
     id: ACTIONS_ID.DELETE,
     label: t('Delete'),
   }),
-  editLabels: (vms: V1VirtualMachine[], createModal: (modal: ModalComponent) => void): Action => ({
+  editLabels: (
+    vms: V1VirtualMachine[],
+    createModal: (modal: ModalComponent) => void,
+  ): ActionDropdownItemType => ({
     cta: () => {
       const commonLabels = getCommonLabels(vms);
 
@@ -65,7 +71,7 @@ export const BulkVirtualMachineActionFactory = {
   migrateStorage: (
     vms: V1VirtualMachine[],
     createModal: (modal: ModalComponent) => void,
-  ): Action => ({
+  ): ActionDropdownItemType => ({
     accessReview: {
       group: VirtualMachineModel.apiGroup,
       namespace: getNamespace(vms?.[0]),
@@ -81,7 +87,7 @@ export const BulkVirtualMachineActionFactory = {
   moveToFolder: (
     vms: V1VirtualMachine[],
     createModal: (modal: ModalComponent) => void,
-  ): Action => ({
+  ): ActionDropdownItemType => ({
     cta: () =>
       createModal(({ isOpen, onClose }) => (
         <MoveBulkVMToFolderModal
@@ -117,7 +123,7 @@ export const BulkVirtualMachineActionFactory = {
     vms: V1VirtualMachine[],
     createModal: (modal: ModalComponent) => void,
     confirmVMActionsEnabled: boolean,
-  ): Action => ({
+  ): ActionDropdownItemType => ({
     cta: () =>
       confirmVMActionsEnabled
         ? createModal(({ isOpen, onClose }) => (
@@ -138,7 +144,7 @@ export const BulkVirtualMachineActionFactory = {
     vms: V1VirtualMachine[],
     createModal: (modal: ModalComponent) => void,
     confirmVMActionsEnabled: boolean,
-  ): Action => ({
+  ): ActionDropdownItemType => ({
     cta: () =>
       confirmVMActionsEnabled
         ? createModal(({ isOpen, onClose }) => (
@@ -155,7 +161,7 @@ export const BulkVirtualMachineActionFactory = {
     id: ACTIONS_ID.RESTART,
     label: t('Restart'),
   }),
-  start: (vms: V1VirtualMachine[]): Action => ({
+  start: (vms: V1VirtualMachine[]): ActionDropdownItemType => ({
     cta: () => vms.forEach(startVM),
     disabled: isEmpty(vms),
     id: ACTIONS_ID.START,
@@ -165,7 +171,7 @@ export const BulkVirtualMachineActionFactory = {
     vms: V1VirtualMachine[],
     createModal: (modal: ModalComponent) => void,
     confirmVMActionsEnabled: boolean,
-  ): Action => ({
+  ): ActionDropdownItemType => ({
     cta: () => {
       confirmVMActionsEnabled
         ? createModal(({ isOpen, onClose }) => (
@@ -183,7 +189,7 @@ export const BulkVirtualMachineActionFactory = {
     id: ACTIONS_ID.STOP,
     label: t('Stop'),
   }),
-  unpause: (vms: V1VirtualMachine[]): Action => ({
+  unpause: (vms: V1VirtualMachine[]): ActionDropdownItemType => ({
     cta: () => vms.forEach(unpauseVM),
     disabled: isEmpty(vms),
     id: ACTIONS_ID.UNPAUSE,

@@ -16,9 +16,9 @@ import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getVMIPod } from '@kubevirt-utils/resources/vmi';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { K8sResourceCommon, K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
+import { K8sResourceCommon, K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
 import { Card, CardBody, CardTitle, DescriptionList, Divider } from '@patternfly/react-core';
-import { FleetResourceLink } from '@stolostron/multicluster-sdk';
+import { FleetResourceLink, useFleetAccessReview } from '@stolostron/multicluster-sdk';
 
 import './virtual-machines-overview-tab-general.scss';
 
@@ -34,7 +34,8 @@ const VirtualMachinesOverviewTabGeneral: FC<VirtualMachinesOverviewTabGeneralPro
   vmi,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [canGetNode] = useAccessReview({
+  const [canGetNode] = useFleetAccessReview({
+    cluster: getCluster(vm),
     namespace: vm?.metadata?.namespace,
     resource: NodeModel.plural,
     verb: 'get' as K8sVerb,

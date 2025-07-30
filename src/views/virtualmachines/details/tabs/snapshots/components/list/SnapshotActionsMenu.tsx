@@ -12,8 +12,8 @@ import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sDelete } from '@multicluster/k8sRequests';
-import { useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { ButtonVariant, Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
+import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 
 type SnapshotActionsMenuProps = {
   isRestoreDisabled: boolean;
@@ -25,7 +25,8 @@ const SnapshotActionsMenu: FC<SnapshotActionsMenuProps> = ({ isRestoreDisabled, 
   const { createModal } = useModal();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const [canClone] = useAccessReview({
+  const [canClone] = useFleetAccessReview({
+    cluster: getCluster(snapshot),
     group: VirtualMachineCloneModel.apiGroup,
     namespace: snapshot.metadata.namespace,
     resource: VirtualMachineCloneModel.plural,

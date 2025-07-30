@@ -4,14 +4,15 @@ import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isHeadlessMode } from '@kubevirt-utils/resources/vm';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
+import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 
 import VirtualMachinesOverviewTabDetailsConsole from './VirtualMachinesOverviewTabDetailsConsole';
 
 const VirtualMachinesOverviewTabDetailsConsoleWrapper: FC<{ vmi: V1VirtualMachineInstance }> = ({
   vmi,
 }) => {
-  const [canConnectConsole] = useAccessReview({
+  const [canConnectConsole] = useFleetAccessReview({
+    cluster: getCluster(vmi),
     group: 'subresources.kubevirt.io',
     name: vmi?.metadata?.name,
     namespace: vmi?.metadata?.namespace,

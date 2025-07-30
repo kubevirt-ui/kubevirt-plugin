@@ -6,8 +6,8 @@ import {
 import { V1beta1Condition, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { TemplateModel } from '@kubevirt-utils/models';
+import { getCluster } from '@multicluster/helpers/selectors';
 import {
-  AccessReviewResourceAttributes,
   K8sModel,
   K8sResourceKind,
   K8sVerb,
@@ -15,6 +15,7 @@ import {
   OwnerReference,
   WatchK8sResults,
 } from '@openshift-console/dynamic-plugin-sdk';
+import { FleetAccessReviewResourceAttributes } from '@stolostron/multicluster-sdk';
 
 import { isDataSourceReady } from '../../views/datasources/utils';
 
@@ -193,11 +194,12 @@ export const asAccessReview = (
   obj: K8sResourceCommon,
   verb: K8sVerb,
   subresource?: string,
-): AccessReviewResourceAttributes => {
+): FleetAccessReviewResourceAttributes => {
   if (!obj) {
     return null;
   }
   return {
+    cluster: getCluster(obj),
     group: model.apiGroup,
     name: obj?.metadata?.name,
     namespace: obj?.metadata?.namespace,
