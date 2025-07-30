@@ -1544,6 +1544,7 @@
   "Use template size PVC": "使用模板大小 PVC",
   "Use the default Template disk source": "使用默认模板磁盘源",
   "Use this disk as a boot source": "使用此磁盘作为一个引导源",
+  "Use UEFI when bootloading the guest OS.": "Use UEFI when bootloading the guest OS.",
   "Use UEFI when bootloading the guest OS. Requires SMM feature, if the SMM feature is not set, choosing this method will set it to true": "在引导加载客户机操作系统时使用 UEFI。如果未设置 SMM 功能，则需要 SMM 功能，选择此方法会将它设置为 true",
   "Use volume already available on the cluster": "使用集群中已可用的卷",
   "Used": "使用了",

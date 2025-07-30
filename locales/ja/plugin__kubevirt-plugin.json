@@ -1544,6 +1544,7 @@
   "Use template size PVC": "テンプレートサイズ PVC の使用",
   "Use the default Template disk source": "デフォルトのテンプレートディスクソースの使用",
   "Use this disk as a boot source": "このディスクをブートソースとして使用する",
+  "Use UEFI when bootloading the guest OS.": "Use UEFI when bootloading the guest OS.",
   "Use UEFI when bootloading the guest OS. Requires SMM feature, if the SMM feature is not set, choosing this method will set it to true": "ゲスト OS のブートロード時に UEFI を使用します。SMM 機能が必要です。SMM 機能が設定されていない場合にこの方法を選択すると、機能が true に設定されます",
   "Use volume already available on the cluster": "クラスターですでに利用可能なボリュームを使用する",
   "Used": "使用済み",
