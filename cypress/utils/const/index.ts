@@ -1,8 +1,7 @@
+export const adminOnlyDescribe = Cypress.env('NON_PRIV') ? xdescribe : describe;
+export const adminOnlyIT = Cypress.env('NON_PRIV') ? xit : it;
+export const nonPrivIT = Cypress.env('NON_PRIV') ? it : xit;
 export const dsIT = Cypress.env('DOWNSTREAM') ? it : xit;
-export const QUICK_VM_IT_NAME = 'vm-it-quick';
-export const CUST_VM_IT_NAME = 'vm-it-custom';
-export const QUICK_VM_TMPL_NAME = 'vm-template-quick';
-export const CUST_VM_TMPL_NAME = 'vm-template-custom';
 export const TEST_NS = 'auto-test-ns';
 export const OCP_NS = 'openshift'; // use default can reduce flaky
 export const TEST_PVC_NAME = 'auto-test-pvc';
@@ -28,8 +27,6 @@ export const CLEANUP_SCRIPT = '../cleanup.sh';
 export const DUMP_SCRIPT = './utils/dump.sh';
 export const TEST_SECRET_NAME = 'auto-test-secret';
 export const RSA_SECRET_NAME = 'auto-rsa-secret';
-export const QUAY_USER = 'openshift-cnv+cnv_qe_internal_read_only';
-export const QUAY_USER_PASSWD = '9T8B4VWWRPTEZFFB6GOQ79C64VMTYFCKUM35B640AY71X379IFX8VR6GQX8DX94I';
 export const TREEVIEW_ROOT_ID = '#vms-tree-view-panel';
 
 // VM Status

@@ -4,12 +4,12 @@
 export type DiskSource = {
   catalogInput?: string; // input selector in catalog
   catalogSelector?: string; // source selector in catalog
-  dsRegPwd?: string;
-  dsRegUname?: string; // username and passwd for registry
   input?: string; // input selector in disk modal
   name?: string;
   pvcName?: string;
   pvcNS?: string;
+  rPasswd?: string;
+  rUsername?: string; // username and passwd for registry
   selector?: string; // source selector in disk modal
   selectPVCName?: string;
   selectPVCNS?: string;
@@ -83,11 +83,11 @@ export type schedulingData = {
 };
 
 export type cloudInitData = {
-  cloudInitPwd?: string;
-  cloudInitUname?: string;
   ethName?: string;
   gateway?: string;
   ipAddr?: string;
+  password?: string;
+  username?: string;
 };
 
 export type scriptsData = cloudInitData & {
@@ -115,8 +115,8 @@ export type TemplateData = detailsData &
     namespace?: string;
     nics?: NIC[];
     provider?: string;
-    tRegPwd?: string;
-    tRegUname?: string; // username and passwd for registry
+    rPasswd?: string;
+    rUsername?: string; // username and passwd for registry
   };
 
 export type instanceTypeData = {

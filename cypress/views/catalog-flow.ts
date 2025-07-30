@@ -10,7 +10,7 @@ import * as iView from './selector-instance';
 import { tab } from './tab';
 
 export const fillReviewAndCreate = (vmData: VirtualMachineData) => {
-  const { bootFromCD, cdSource, cpu, diskSource, mem, mountWinDriver, name, tRegPwd, tRegUname } =
+  const { bootFromCD, cdSource, cpu, diskSource, mem, mountWinDriver, name, rPasswd, rUsername } =
     vmData;
   if (bootFromCD) {
     cy.get(cView.bootFromCD).check();
@@ -57,9 +57,9 @@ export const fillReviewAndCreate = (vmData: VirtualMachineData) => {
         cy.get(diskSource.catalogSelector).click();
         cy.wait(3000);
         cy.get(diskSource.catalogInput).wait(2000).focus().type(diskSource.value, { delay: 500 });
-        if (tRegUname) {
-          cy.get(diskSource.dsRegUname).type(tRegUname);
-          cy.get(diskSource.dsRegPwd).type(tRegPwd);
+        if (rUsername) {
+          cy.get(diskSource.rUsername).type(rUsername);
+          cy.get(diskSource.rPasswd).type(rPasswd);
         }
         break;
       }
@@ -247,25 +247,25 @@ export const fillMetadata = (vmData: VirtualMachineData) => {
 
 export const fillScripts = (vmData: VirtualMachineData) => {
   const {
-    cloudInitPwd,
-    cloudInitUname,
     ethName,
     existSecret,
     gateway,
     ipAddr,
     newSecret,
+    password,
     sysprepFile,
     sysprepName,
+    username,
   } = vmData;
   tab.navigateToTScripts();
-  if (cloudInitUname || cloudInitPwd || ethName) {
+  if (username || password || ethName) {
     cy.contains(descrGroup, cloudInit).find('button').eq(0).click();
     // cy.get(cView.cloudInitEditBtn).click();
-    if (cloudInitUname) {
-      cy.get(cView.cloudInitUser).clear().type(cloudInitUname);
+    if (username) {
+      cy.get(cView.cloudInitUser).clear().type(username);
     }
-    if (cloudInitPwd) {
-      cy.get(cView.cloudInitPwd).clear().type(cloudInitPwd);
+    if (password) {
+      cy.get(cView.cloudInitPwd).clear().type(password);
     }
     if (ethName) {
       // cy.contains(descrGroup, cloudInit).find('button').eq(0).click();

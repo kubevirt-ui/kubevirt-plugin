@@ -96,7 +96,7 @@ export const addDisk = (disk: Disk) => {
     cy.contains('Advanced settings').click();
     cy.get('input[id="lun-reservation"]').scrollIntoView().check();
   }
-  cy.clickSaveBtn();
+  cy.get('[aria-labelledby="tab-modal"]').find('button[data-test="save-button"]').click();
   cy.contains('h1', addDiskTxt, { timeout: MINUTE * 3 }).should('not.exist');
 };
 
