@@ -4,6 +4,7 @@ import { Updater } from 'use-immer';
 import { V1beta1NetworkMap, V1beta1NetworkMapSpecMapDestination } from '@kubev2v/types';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { NetworkAttachmentDefinition } from '@kubevirt-utils/components/NetworkInterfaceModal/components/hooks/types';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { POD_NETWORK_TYPE } from '../constants';
@@ -25,11 +26,11 @@ export type UseNetworkReadinessReturnType = {
 
 const useNetworkReadiness = (
   vms: V1VirtualMachine[],
-  targetProviderUID: string,
+  targetCluster: string,
   networkMap: V1beta1NetworkMap,
   setNetworkMap: Updater<V1beta1NetworkMap>,
 ): UseNetworkReadinessReturnType => {
-  const { data, error, loaded } = useProviderNADs(targetProviderUID);
+  const { data, error, loaded } = useProviderNADs(targetCluster, getNamespace(vms?.[0]));
 
   useEffect(() => {
     if (loaded && networkMap === null) {

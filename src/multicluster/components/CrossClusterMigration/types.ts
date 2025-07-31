@@ -1,11 +1,12 @@
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import {
+  IoK8sApiCoreV1PersistentVolumeClaim,
+  IoK8sApiStorageV1StorageClass,
+} from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-
-import { ProviderStorageClass } from './hooks/useProviderStorageClasses';
 
 export type GetInitialStorageMapParams = {
   pvcs: IoK8sApiCoreV1PersistentVolumeClaim[];
-  sourceStorageClasses: K8sResourceCommon[];
-  targetStorageClasses: ProviderStorageClass[];
+  sourceStorageClasses: IoK8sApiStorageV1StorageClass[];
+  targetStorageClasses: IoK8sApiStorageV1StorageClass[];
   vms: V1VirtualMachine[];
 };

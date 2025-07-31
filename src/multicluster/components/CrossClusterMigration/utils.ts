@@ -167,7 +167,7 @@ export const getInitialStorageMap = ({
       map: storageClasses.map((storageClass): V1beta1StorageMapSpecMap => {
         return {
           destination: {
-            storageClass: targetStorageClasses.find((sc) => sc.name === storageClass)?.name,
+            storageClass: getName(targetStorageClasses.find((sc) => getName(sc) === storageClass)),
           },
           source: {
             id: getUID(sourceStorageClasses.find((sc) => getName(sc) === storageClass)),

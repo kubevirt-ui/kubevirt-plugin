@@ -4,10 +4,7 @@ import { Updater } from 'use-immer';
 import { V1beta1NetworkMap, V1beta1Plan, V1beta1StorageMap } from '@kubev2v/types';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  getTargetProviderName,
-  getTargetProviderUID,
-} from '@kubevirt-utils/resources/plan/selectors';
+import { getTargetProviderName } from '@kubevirt-utils/resources/plan/selectors';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { Title, Wizard, WizardStep } from '@patternfly/react-core';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
@@ -47,7 +44,6 @@ const ReadinessStepBody: FC<ReadinessStepBodyProps> = ({
   const [hubClusterName] = useHubClusterName();
 
   const targetProvider = getTargetProviderName(migrationPlan);
-  const targetProviderUID = getTargetProviderUID(migrationPlan);
   const targetCluster = getClusterFromProvider(targetProvider, hubClusterName);
 
   const {
@@ -55,14 +51,14 @@ const ReadinessStepBody: FC<ReadinessStepBodyProps> = ({
     isReady: storageIsReady,
     loaded: storageLoaded,
     targetStorageClasses,
-  } = useStorageReadiness(vms, targetProviderUID, storageMap, setStorageMap);
+  } = useStorageReadiness(vms, targetCluster, storageMap, setStorageMap);
 
   const {
     changeNetworkMap,
     isReady: networkIsReady,
     loaded: networkLoaded,
     targetNADs,
-  } = useNetworkReadiness(vms, targetProviderUID, networkMap, setNetworkMap);
+  } = useNetworkReadiness(vms, targetCluster, networkMap, setNetworkMap);
 
   const {
     isReady: computeIsReady,
