@@ -1559,6 +1559,7 @@
   "Use template size PVC": "Utiliser une revendication de volume persistant de la taille du modèle",
   "Use the default Template disk source": "Utiliser la source de disque de modèle par défaut",
   "Use this disk as a boot source": "Utilisez ce disque comme source de démarrage",
+  "Use UEFI when bootloading the guest OS.": "Use UEFI when bootloading the guest OS.",
   "Use UEFI when bootloading the guest OS. Requires SMM feature, if the SMM feature is not set, choosing this method will set it to true": "Utiliser l'UEFI lors du démarrage du système d'exploitation invité. Nécessite la fonctionnalité SMM. Si elle n'est pas activée, cette méthode la définira sur «\u00a0true\u00a0».",
   "Use volume already available on the cluster": "Utiliser le volume déjà disponible sur le cluster",
   "Used": "Utilisée",

@@ -1551,6 +1551,7 @@
   "Use template size PVC": "Use template size PVC",
   "Use the default Template disk source": "Use the default Template disk source",
   "Use this disk as a boot source": "Use this disk as a boot source",
+  "Use UEFI when bootloading the guest OS.": "Use UEFI when bootloading the guest OS.",
   "Use UEFI when bootloading the guest OS. Requires SMM feature, if the SMM feature is not set, choosing this method will set it to true": "Use UEFI when bootloading the guest OS. Requires SMM feature, if the SMM feature is not set, choosing this method will set it to true",
   "Use volume already available on the cluster": "Use volume already available on the cluster",
   "Used": "Used",

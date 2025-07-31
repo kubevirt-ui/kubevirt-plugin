@@ -21,9 +21,7 @@ export const bootloaderOptions: BootloaderLabel[] = [
     value: BootMode.bios,
   },
   {
-    description: t(
-      'Use UEFI when bootloading the guest OS. Requires SMM feature, if the SMM feature is not set, choosing this method will set it to true',
-    ),
+    description: t('Use UEFI when bootloading the guest OS.'),
     title: BootModeTitles[BootMode.uefi],
     value: BootMode.uefi,
   },
