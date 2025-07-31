@@ -570,6 +570,7 @@
   "Enable folders in Virtual Machines tree view": "Enable folders in Virtual Machines tree view",
   "Enable guest system log access": "Enable guest system log access",
   "Enable headless mode": "Enable headless mode",
+  "Enable Kubevirt multicluster tree view": "Enable Kubevirt multicluster tree view",
   "Enable load-aware descheduling": "Enable load-aware descheduling",
   "Enable memory density": "Enable memory density",
   "Enable persistent reservation": "Enable persistent reservation",
