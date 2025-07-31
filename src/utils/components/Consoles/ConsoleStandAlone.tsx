@@ -4,8 +4,8 @@ import { useParams } from 'react-router-dom-v5-compat';
 import { isHeadlessMode } from '@kubevirt-utils/resources/vm';
 import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
 import { isWindows } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
+import useK8sBaseAPIPath from '@multicluster/hooks/useK8sBaseAPIPath';
 import { Bullseye, Spinner } from '@patternfly/react-core';
-import { useFleetK8sAPIPath } from '@stolostron/multicluster-sdk';
 
 import ErrorAlert from '../ErrorAlert/ErrorAlert';
 
@@ -14,7 +14,7 @@ import Consoles from './Consoles';
 
 const ConsoleStandAlone: FC = () => {
   const { cluster, name, ns } = useParams<{ cluster?: string; name: string; ns: string }>();
-  const [apiPath, apiPathLoaded] = useFleetK8sAPIPath(cluster);
+  const [apiPath, apiPathLoaded] = useK8sBaseAPIPath(cluster);
   const { vmi, vmiLoaded, vmiLoadError } = useVMI(name, ns, cluster);
 
   if (!vmi && vmiLoadError) {
