@@ -26,23 +26,20 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms)
     const namespaces = new Set(vms?.map((vm) => getNamespace(vm)));
 
     const actions: ActionDropdownItemType[] = [
-      BulkVirtualMachineActionFactory.editLabels(vms, createModal),
       BulkVirtualMachineActionFactory.start(vms),
-      BulkVirtualMachineActionFactory.restart(vms, createModal, confirmVMActionsEnabled),
       BulkVirtualMachineActionFactory.stop(vms, createModal, confirmVMActionsEnabled),
+      BulkVirtualMachineActionFactory.restart(vms, createModal, confirmVMActionsEnabled),
       BulkVirtualMachineActionFactory.pause(vms, createModal, confirmVMActionsEnabled),
       BulkVirtualMachineActionFactory.unpause(vms),
-
+      ...(namespaces.size === 1 && mtcInstalled
+        ? [BulkVirtualMachineActionFactory.migrateStorage(vms, createModal)]
+        : []),
       ...(treeViewFoldersEnabled
         ? [BulkVirtualMachineActionFactory.moveToFolder(vms, createModal)]
         : []),
-
+      BulkVirtualMachineActionFactory.editLabels(vms, createModal),
       BulkVirtualMachineActionFactory.delete(vms, createModal),
     ];
-
-    if (namespaces.size === 1 && mtcInstalled) {
-      actions.push(BulkVirtualMachineActionFactory.migrateStorage(vms, createModal));
-    }
 
     if (vms.every(isStopped)) {
       return actions.filter((action) => action.id !== ACTIONS_ID.STOP);

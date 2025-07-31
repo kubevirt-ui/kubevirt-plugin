@@ -77,7 +77,6 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
         : VirtualMachineActionFactory.pause(vm, createModal, confirmVMActionsEnabled);
 
     return [
-      VirtualMachineActionFactory.editLabels(vm, createModal),
       startOrStop,
       VirtualMachineActionFactory.restart(vm, createModal, confirmVMActionsEnabled),
       pauseOrUnpause,
@@ -86,6 +85,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
       VirtualMachineActionFactory.migrationActions(migrationActions),
       VirtualMachineActionFactory.copySSHCommand(vm, virtctlCommand),
       treeViewFoldersEnabled && VirtualMachineActionFactory.moveToFolder(vm, createModal),
+      VirtualMachineActionFactory.editLabels(vm, createModal),
       VirtualMachineActionFactory.delete(vm, createModal),
     ].filter(Boolean);
   }, [

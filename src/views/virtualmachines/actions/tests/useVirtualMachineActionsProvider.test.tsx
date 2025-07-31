@@ -27,7 +27,6 @@ describe('useVirtualMachineActionsProvider tests', () => {
 
     // Running vm should have stop, restart, pause, migrate and delete actions
     expect(runningVMActions).toEqual([
-      'vm-action-edit-labels',
       'vm-action-stop',
       'vm-action-restart',
       'vm-action-pause',
@@ -35,6 +34,7 @@ describe('useVirtualMachineActionsProvider tests', () => {
       'vm-action-snapshot',
       'migration-menu',
       'vm-action-copy-ssh',
+      'vm-action-edit-labels',
       'vm-action-delete',
     ]);
   });
@@ -51,7 +51,6 @@ describe('useVirtualMachineActionsProvider tests', () => {
 
     // Stopped vm should have start, restart, pause, migrate and delete actions
     expect(stoppedVMActions).toEqual([
-      'vm-action-edit-labels',
       'vm-action-start',
       'vm-action-restart',
       'vm-action-pause',
@@ -59,6 +58,7 @@ describe('useVirtualMachineActionsProvider tests', () => {
       'vm-action-snapshot',
       'migration-menu',
       'vm-action-copy-ssh',
+      'vm-action-edit-labels',
       'vm-action-delete',
     ]);
   });
@@ -75,7 +75,6 @@ describe('useVirtualMachineActionsProvider tests', () => {
 
     // Paused vm should have stop, restart, unpause, migrate and delete actions
     expect(pausedVMActions).toEqual([
-      'vm-action-edit-labels',
       'vm-action-stop',
       'vm-action-restart',
       'vm-action-unpause',
@@ -83,6 +82,7 @@ describe('useVirtualMachineActionsProvider tests', () => {
       'vm-action-snapshot',
       'migration-menu',
       'vm-action-copy-ssh',
+      'vm-action-edit-labels',
       'vm-action-delete',
     ]);
   });
@@ -102,7 +102,6 @@ describe('useVirtualMachineActionsProvider tests', () => {
 
     // Migrating vm should have stop, restart, pause, migrate and delete actions
     expect(migratingVMActions).toEqual([
-      'vm-action-edit-labels',
       'vm-action-stop',
       'vm-action-restart',
       'vm-action-pause',
@@ -110,6 +109,7 @@ describe('useVirtualMachineActionsProvider tests', () => {
       'vm-action-snapshot',
       'migration-menu',
       'vm-action-copy-ssh',
+      'vm-action-edit-labels',
       'vm-action-delete',
     ]);
 
