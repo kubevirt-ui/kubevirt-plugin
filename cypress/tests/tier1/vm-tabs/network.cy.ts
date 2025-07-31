@@ -26,14 +26,14 @@ describe('Set network down/up', () => {
     cy.contains('Pod networking', { timeout: 120000 }).should('be.visible');
     cy.wait(5000);
     cy.get('#toggle-id-6').click({ force: true });
-    cy.get('[data-test-id="set-link-down"]').should('be.visible').click();
+    cy.contains('.pf-v6-c-menu__item-text', 'Set link down').click();
     cy.get('svg[fill="red"]', { timeout: 60000 }).should('exist');
     cy.checkVMSpec(Example, spec, state_down, true);
   });
 
   it('set network link up', () => {
     cy.get('#toggle-id-6').click({ force: true });
-    cy.get('[data-test-id="set-link-up"]').should('be.visible').click();
+    cy.contains('.pf-v6-c-menu__item-text', 'Set link up').click();
     cy.get('svg[fill="green"]', { timeout: 60000 }).should('exist');
     cy.checkVMSpec(Example, spec, state_up, true);
   });
