@@ -117,28 +117,6 @@ const virtualizationSection = [
   } as EncodedExtension<ResourceClusterNavItem>,
   {
     flags: {
-      required: ['KUBEVIRT_PREFERENCES'],
-    },
-    properties: {
-      dataAttributes: {
-        'data-border': 'no-border',
-        'data-class': 'kv-plugin-virt-perspective-element',
-        'data-quickstart-id': 'qs-nav-virtualmachineclusterpreferences',
-        'data-test-id': 'virtualmachineclusterpreferences-nav-item',
-      },
-      id: 'virtualmachineclusterpreferences-virt-perspective',
-      model: {
-        group: 'instancetype.kubevirt.io',
-        kind: 'VirtualMachineClusterPreference',
-        version: 'v1beta1',
-      },
-      name: '%plugin__kubevirt-plugin~Preferences%',
-      perspective: 'virtualization-perspective',
-    },
-    type: 'console.navigation/resource-cluster',
-  } as EncodedExtension<ResourceClusterNavItem>,
-  {
-    flags: {
       required: ['OPENSHIFT'],
     },
     properties: {

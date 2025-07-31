@@ -154,26 +154,6 @@ const extensions: EncodedExtension[] = [
     type: 'console.page/route',
   },
   {
-    flags: {
-      required: ['KUBEVIRT_PREFERENCES'],
-    },
-    properties: {
-      dataAttributes: {
-        'data-quickstart-id': 'qs-nav-virtualmachineclusterpreferences',
-        'data-test-id': 'virtualmachineclusterpreferences-nav-item',
-      },
-      id: 'virtualmachineclusterpreferences',
-      model: {
-        group: 'instancetype.kubevirt.io',
-        kind: 'VirtualMachineClusterPreference',
-        version: 'v1beta1',
-      },
-      name: '%plugin__kubevirt-plugin~Preferences%',
-      section: 'virtualization',
-    },
-    type: 'console.navigation/resource-cluster',
-  },
-  {
     properties: {
       component: {
         $codeRef: 'PreferencePage',

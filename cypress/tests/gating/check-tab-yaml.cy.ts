@@ -190,31 +190,6 @@ describe('Check all virtualization pages can be loaded', () => {
     });
   });
 
-  describe('Check Preferences tabs', () => {
-    it('preferences page is loaded', () => {
-      cy.visitPreferences();
-      cy.contains('fedora').should('exist');
-    });
-
-    it('create VirtualMachineClusterPreference from YAML', () => {
-      cy.get('div.co-m-list').find(sel.itemCreateBtn).eq(0).click();
-      cy.get(sel.saveBtn).click();
-      cy.get(sel.breadcrumb).click();
-      cy.get(sel.nameFilter).first().type(Example);
-      cy.byLegacyTestID(Example).should('exist');
-      cy.byLegacyTestID('fedora').should('not.exist');
-    });
-
-    it('create VirtualMachinePreference from YAML', () => {
-      cy.contains('span.pf-v6-c-tabs__item-text', userButtonTxt).click();
-      cy.switchProject(TEST_NS);
-      cy.get(sel.itemCreateBtn).click();
-      cy.get(sel.saveBtn).click();
-      cy.get(sel.breadcrumb).click();
-      cy.byLegacyTestID(Example).should('exist');
-    });
-  });
-
   describe('Check Bootable volumes page', () => {
     it('bootable volume page is loaded', () => {
       cy.visitVolumes();
