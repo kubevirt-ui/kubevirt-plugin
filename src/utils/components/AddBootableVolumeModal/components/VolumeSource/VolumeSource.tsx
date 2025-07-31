@@ -1,23 +1,23 @@
 import React, { FC } from 'react';
 
 import HTTPSource from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeSource/components/HTTPSource';
-import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { FormGroup, TextInput } from '@patternfly/react-core';
 
-import { AddBootableVolumeState, DROPDOWN_FORM_SELECTION } from '../../utils/constants';
+import {
+  AddBootableVolumeState,
+  DROPDOWN_FORM_SELECTION,
+  SetBootableVolumeFieldType,
+} from '../../utils/constants';
 
 import DiskSourceUploadPVC from './components/DiskSourceUploadPVC';
 import PVCSource from './components/PVCSource';
+import RegistrySource from './components/RegistrySource';
 import SnapshotSource from './components/SnapshotSource';
 
 type VolumeSourceProps = {
   bootableVolume: AddBootableVolumeState;
-  setBootableVolumeField: (
-    key: keyof AddBootableVolumeState,
-    fieldKey?: string,
-  ) => (value: boolean | File | number | string) => void;
+  setBootableVolumeField: SetBootableVolumeFieldType;
   sourceType: DROPDOWN_FORM_SELECTION;
   upload: DataUpload;
 };
@@ -29,7 +29,7 @@ const VolumeSource: FC<VolumeSourceProps> = ({
   upload,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { registryURL, uploadFile, uploadFilename } = bootableVolume || {};
+  const { uploadFile, uploadFilename } = bootableVolume || {};
 
   const sourceComponentByType = {
     [DROPDOWN_FORM_SELECTION.UPLOAD_VOLUME]: (
@@ -51,18 +51,10 @@ const VolumeSource: FC<VolumeSourceProps> = ({
       <HTTPSource setBootableVolumeField={setBootableVolumeField} />
     ),
     [DROPDOWN_FORM_SELECTION.USE_REGISTRY]: (
-      <FormGroup fieldId="volume-registry-url" isRequired label={t('Registry URL')}>
-        <TextInput
-          data-test-id="volume-registry-url"
-          id="volume-registry-url"
-          onChange={(_, value: string) => setBootableVolumeField('registryURL')(value)}
-          type="text"
-          value={registryURL}
-        />
-        <FormGroupHelperText>
-          {t('Example: quay.io/containerdisks/centos:7-2009')}
-        </FormGroupHelperText>
-      </FormGroup>
+      <RegistrySource
+        bootableVolume={bootableVolume}
+        setBootableVolumeField={setBootableVolumeField}
+      />
     ),
     [DROPDOWN_FORM_SELECTION.USE_SNAPSHOT]: (
       <SnapshotSource
