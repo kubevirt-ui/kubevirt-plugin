@@ -9,7 +9,7 @@ import {
 
 const ErrorStatus = { id: 'Error', title: 'Error' };
 
-const statusFilterItems = [
+export const statusFilterItems = [
   ...Object.keys(printableVMStatus).map((status) => ({
     id: status,
     title: status,

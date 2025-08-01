@@ -3,7 +3,7 @@ import { Dispatch, SetStateAction, useState } from 'react';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { SelectProps } from '@patternfly/react-core';
 
-import { ResetTextSearch, TextFiltersType } from '../types';
+import { TextFiltersType } from '../types';
 import { getInitialSearchText, getInitialSearchType } from '../utils';
 
 type UseTextFilterState = (inputs: {
@@ -12,7 +12,6 @@ type UseTextFilterState = (inputs: {
   textFilterSelectOptionNames: Record<string, string>;
 }) => {
   onSelect: SelectProps['onSelect'];
-  resetTextSearch: ResetTextSearch;
   searchInputText: string;
   searchType: string;
   setSearchInputText: Dispatch<SetStateAction<string>>;
@@ -36,20 +35,8 @@ const useTextFilterState: UseTextFilterState = ({
     setSearchType(value);
   };
 
-  const resetTextSearch = (newTextFilters: TextFiltersType) => {
-    const newSearchType = getInitialSearchType(
-      searchFilters,
-      newTextFilters,
-      textFilterSelectOptionNames,
-    );
-
-    setSearchType(newSearchType);
-    setSearchInputText(getInitialSearchText(newTextFilters, newSearchType));
-  };
-
   return {
     onSelect,
-    resetTextSearch,
     searchInputText,
     searchType,
     setSearchInputText,

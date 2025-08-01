@@ -1,10 +1,7 @@
 import React, { FC, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom-v5-compat';
 
-import {
-  ExposedFilterFunctions,
-  ResetTextSearch,
-} from '@kubevirt-utils/components/ListPageFilter/types';
+import { ExposedFilterFunctions } from '@kubevirt-utils/components/ListPageFilter/types';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { ADVANCED_SEARCH } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
@@ -52,15 +49,11 @@ const VirtualMachineSearchResults: FC = () => {
     vmListRef.current?.onFilterChange(type, value);
   }, []);
 
-  const resetTextSearch: ResetTextSearch = useCallback((newTextFilters) => {
-    vmListRef.current?.resetTextSearch(newTextFilters);
-  }, []);
-
   return useMemo(
     () => (
       <>
         <ListPageHeader title={t('VirtualMachines')}>
-          <SearchBar onFilterChange={onFilterChange} resetTextSearch={resetTextSearch} />
+          <SearchBar onFilterChange={onFilterChange} />
           <div>
             <VirtualMachinesCreateButton namespace={namespace} />
           </div>
@@ -75,7 +68,7 @@ const VirtualMachineSearchResults: FC = () => {
         />
       </>
     ),
-    [cluster, namespace, onFilterChange, resetTextSearch, t, vmSearchQueries],
+    [cluster, namespace, onFilterChange, t, vmSearchQueries],
   );
 };
 
