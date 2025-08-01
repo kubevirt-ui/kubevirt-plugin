@@ -5,7 +5,7 @@ import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { compareCIDR, VirtualMachineRowFilterType } from '@virtualmachines/utils';
 import { VMIMapper } from '@virtualmachines/utils/mappers';
 
-export const useIPSearchFilter = (vmiMapper: VMIMapper): RowFilter<V1VirtualMachine> => ({
+export const getIPFilter = (vmiMapper: VMIMapper): RowFilter<V1VirtualMachine> => ({
   filter: (input, obj) => {
     const search = input.selected?.[0];
 

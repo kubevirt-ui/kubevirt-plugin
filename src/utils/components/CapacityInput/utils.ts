@@ -6,6 +6,8 @@ export enum CAPACITY_UNITS {
   TiB = 'TiB',
 }
 
+export const capacityUnitsOrdered = [CAPACITY_UNITS.MiB, CAPACITY_UNITS.GiB, CAPACITY_UNITS.TiB];
+
 export const removeByteSuffix = (quantity: string): string => quantity?.replace(/[Bb]/, '');
 
 export const getValueFromSize = (size: string) => {

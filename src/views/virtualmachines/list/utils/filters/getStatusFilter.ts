@@ -9,7 +9,7 @@ import {
 
 const ErrorStatus = { id: 'Error', title: 'Error' };
 
-const statusFilterItems = [
+export const statusFilterItems = [
   ...Object.keys(printableVMStatus).map((status) => ({
     id: status,
     title: status,
@@ -17,7 +17,7 @@ const statusFilterItems = [
   ErrorStatus,
 ];
 
-export const useStatusFilter = (): RowFilter<V1VirtualMachine> => ({
+export const getStatusFilter = (): RowFilter<V1VirtualMachine> => ({
   filter: (statuses, obj) => {
     const status = obj?.status?.printableStatus;
     const isError = statuses.selected.includes(ErrorStatus.id) && isErrorPrintableStatus(status);

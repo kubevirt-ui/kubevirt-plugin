@@ -6,6 +6,6 @@ export enum ListPageBodySize {
 
 export const getListPageBodySize = (width: number) => {
   if (width < 660) return ListPageBodySize.sm;
-  if (width < 735) return ListPageBodySize.md;
+  if (width < 1100) return ListPageBodySize.md;
   return ListPageBodySize.lg;
 };
