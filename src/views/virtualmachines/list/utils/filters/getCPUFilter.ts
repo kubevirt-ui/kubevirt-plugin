@@ -7,7 +7,7 @@ import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 import { VMIMapper } from '@virtualmachines/utils/mappers';
 
-export const useCPUFilter = (vmiMapper: VMIMapper): RowFilter<V1VirtualMachine> => ({
+export const getCPUFilter = (vmiMapper: VMIMapper): RowFilter<V1VirtualMachine> => ({
   filter: (input, obj) => {
     const cpuInfo = input.selected?.[0];
 

@@ -1,21 +1,24 @@
 import React, { Dispatch, FC, SetStateAction, useMemo } from 'react';
 
 import { getSelectDataTestProps } from '@kubevirt-utils/utils/selectDataTest';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { MultiTypeaheadSelect, MultiTypeaheadSelectOption } from '@patternfly/react-templates';
 
-type MultiSelectProps = {
+type MultiSelectTypeaheadProps = {
   allResourceNames: string[];
   'data-test'?: string;
   emptyValuePlaceholder?: string;
+  initialInputValue?: string;
   selectedResourceNames: string[];
   selectPlaceholder?: string;
   setSelectedResourceNames: Dispatch<SetStateAction<string[]>>;
 };
 
-const MultiSelect: FC<MultiSelectProps> = ({
+const MultiSelectTypeahead: FC<MultiSelectTypeaheadProps> = ({
   allResourceNames,
   'data-test': dataTest,
-  emptyValuePlaceholder,
+  emptyValuePlaceholder = '',
+  initialInputValue,
   selectedResourceNames,
   selectPlaceholder,
   setSelectedResourceNames,
@@ -35,12 +38,13 @@ const MultiSelect: FC<MultiSelectProps> = ({
       onSelectionChange={(_e, selectedProjects: string[]) => {
         setSelectedResourceNames(selectedProjects);
       }}
+      initialInputValue={initialInputValue}
       initialOptions={resourceOptions}
       isScrollable
-      placeholder={selectedResourceNames.length > 0 ? selectPlaceholder : emptyValuePlaceholder}
+      placeholder={isEmpty(selectedResourceNames) ? emptyValuePlaceholder : selectPlaceholder}
       {...getSelectDataTestProps(dataTest)}
     />
   );
 };
 
-export default MultiSelect;
+export default MultiSelectTypeahead;

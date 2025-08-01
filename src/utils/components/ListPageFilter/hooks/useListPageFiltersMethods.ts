@@ -6,7 +6,7 @@ import { STATIC_SEARCH_FILTERS } from '../constants';
 import { ApplyTextFilters, ListPageFiltersMethodsOutputs } from '../types';
 import { generateRowFilters, intersection } from '../utils';
 
-import { useQueryParamsMethods } from './useQueryParamsMethods';
+import { useApplyFiltersWithQuery } from './useApplyFiltersWithQuery';
 
 type ListPageFiltersMethodsInputs = {
   applyFilters: OnFilterChange;
@@ -29,23 +29,7 @@ const useListPageFiltersMethods: UseListPageFiltersMethods = ({
   selectedRowFilters,
   setSearchInputText,
 }) => {
-  const { setOrRemoveQueryArgument } = useQueryParamsMethods();
-
-  const applyTextFilters: ApplyTextFilters = (type, value?) => {
-    const valueIsArray = Array.isArray(value);
-
-    setOrRemoveQueryArgument(type, valueIsArray ? value.join(',') : value);
-
-    const values = valueIsArray ? value : [value];
-    const selectedValues = value ? values : [];
-
-    if (type === STATIC_SEARCH_FILTERS.labels) {
-      applyFilters(type, { all: selectedValues });
-      return;
-    }
-
-    applyFilters(type, { selected: selectedValues });
-  };
+  const applyTextFilters = useApplyFiltersWithQuery(applyFilters);
 
   const applyTextFiltersWithDebounce: ApplyTextFilters = useDebounceCallback(applyTextFilters, 250);
 

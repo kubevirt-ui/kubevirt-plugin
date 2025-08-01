@@ -2,7 +2,7 @@ import { useCallback, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
-import { validSearchQueryParams } from '@virtualmachines/utils';
+import { validSearchQueryParams } from '@search/utils/constants';
 
 type SavedSearchData = {
   description: string;

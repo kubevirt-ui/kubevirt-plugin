@@ -7,7 +7,7 @@ import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 import { VMIMapper } from '@virtualmachines/utils/mappers';
 
-export const useMemoryFilter = (vmiMapper: VMIMapper): RowFilter<V1VirtualMachine> => ({
+export const getMemoryFilter = (vmiMapper: VMIMapper): RowFilter<V1VirtualMachine> => ({
   filter: (input, obj) => {
     const memoryInfo = input.selected?.[0];
 

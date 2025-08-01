@@ -1,11 +1,4 @@
-import React, {
-  FC,
-  MutableRefObject,
-  useEffect,
-  useImperativeHandle,
-  useMemo,
-  useState,
-} from 'react';
+import React, { FC, useMemo, useState } from 'react';
 
 import useDeepCompareMemoize from '@kubevirt-utils/hooks/useDeepCompareMemoize/useDeepCompareMemoize';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -17,64 +10,47 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Toolbar, ToolbarContent, ToolbarToggleGroup } from '@patternfly/react-core';
 import { FilterIcon } from '@patternfly/react-icons';
-import { ListPageBodySize } from '@virtualmachines/list/listPageBodySize';
 
 import ColumnManagement from '../ColumnManagementModal/ColumnManagement';
 
-import AdvancedFiltersToolbarItem from './components/AdvancedFiltersToolbarItem';
 import RowFilters from './components/RowFilters';
 import TextFiltersToolbarItem from './components/TextFiltersToolbarItem';
 import useListPageFiltersMethods from './hooks/useListPageFiltersMethods';
 import { useRowFiltersParameters } from './hooks/useRowFiltersParameters';
 import { useSearchFiltersParameters } from './hooks/useSearchFiltersParameters';
 import useTextFilterState from './hooks/useTextFilterState';
-import { ResetTextSearch } from './types';
 import { Filter, FilterKeys, generateRowFilters, getFiltersData } from './utils';
 
 type ListPageFilterProps = {
-  advancedFilters?: RowFilter[];
   className?: string;
   columnLayout?: ColumnLayout;
   data?: K8sResourceCommon[];
   hideColumnManagement?: boolean;
   hideLabelFilter?: boolean;
   hideNameLabelFilters?: boolean;
-  listPageBodySize?: ListPageBodySize;
   loaded?: boolean;
   nameFilterPlaceholder?: string;
   onFilterChange?: OnFilterChange;
-  projectFilter?: RowFilter;
-  refProp?: MutableRefObject<{ resetTextSearch: ResetTextSearch }>;
   rowFilters?: RowFilter[];
   searchFilters?: RowFilter[];
 };
 
 const ListPageFilter: FC<ListPageFilterProps> = ({
-  advancedFilters = [],
   className,
   columnLayout,
   data,
   hideColumnManagement,
   hideLabelFilter,
   hideNameLabelFilters,
-  listPageBodySize,
   loaded,
   nameFilterPlaceholder,
   onFilterChange,
-  projectFilter,
-  refProp,
   rowFilters,
   searchFilters = [],
 }) => {
   const { t } = useKubevirtTranslation();
 
   const [toolbarIsExpanded, setToolbarIsExpanded] = useState(false);
-
-  useEffect(() => {
-    if (listPageBodySize !== ListPageBodySize.sm) {
-      setToolbarIsExpanded(false);
-    }
-  }, [listPageBodySize]);
 
   const toolbarFilters = rowFilters?.filter((filter) => 'items' in filter);
 
@@ -106,16 +82,11 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
     ...(!hideNameLabelFilters ? { name: t('Name') } : {}),
   };
 
-  const { onSelect, resetTextSearch, searchInputText, searchType, setSearchInputText } =
-    useTextFilterState({ searchFilters, textFilters, textFilterSelectOptionNames });
-
-  useImperativeHandle(
-    refProp,
-    () => ({
-      resetTextSearch,
-    }),
-    [resetTextSearch],
-  );
+  const { onSelect, searchInputText, searchType, setSearchInputText } = useTextFilterState({
+    searchFilters,
+    textFilters,
+    textFilterSelectOptionNames,
+  });
 
   const applyFilters: OnFilterChange = (type, input) => onFilterChange?.(type, input);
 
@@ -124,7 +95,7 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
       applyFilters,
       generatedRowFilters,
       onRowFilterSearchParamChange,
-      searchFilters: [...searchFilters, ...advancedFilters, projectFilter],
+      searchFilters,
       selectedRowFilters,
       setSearchInputText,
     });
@@ -149,15 +120,9 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
             filters={filters}
             filtersNameMap={filtersNameMap}
             generatedRowFilters={generatedRowFilters}
-            listPageBodySize={listPageBodySize}
             rowFilters={toolbarFilters}
             selectedRowFilters={selectedRowFilters}
             updateRowFilterSelected={updateRowFilterSelected}
-          />
-          <AdvancedFiltersToolbarItem
-            advancedFilters={advancedFilters}
-            applyTextFilters={applyTextFilters}
-            showProjectFilter={!!projectFilter}
           />
           <TextFiltersToolbarItem
             applyTextFilters={applyTextFilters}

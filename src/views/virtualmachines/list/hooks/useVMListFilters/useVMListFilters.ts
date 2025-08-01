@@ -1,96 +1,89 @@
 import { useMemo } from 'react';
 
+import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import {
   V1VirtualMachine,
-  V1VirtualMachineInstance,
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
+import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils/constants';
 
 import { PVCMapper, VMIMapper, VMIMMapper } from '../../../utils/mappers';
 import { getLatestMigrationForEachVM } from '../../../utils/utils';
+import { getArchitectureFilter } from '../../utils/filters/getArchitectureFilter';
+import { getCPUFilter } from '../../utils/filters/getCPUFilter';
+import { getDateFilter } from '../../utils/filters/getDateFilter';
+import { getDescriptionFilter } from '../../utils/filters/getDescriptionFilter';
+import { getHWDevicesFilter } from '../../utils/filters/getHWDevicesFilter';
+import { getIPFilter } from '../../utils/filters/getIPFilter';
+import { getMemoryFilter } from '../../utils/filters/getMemoryFilter';
+import { getNADsFilter } from '../../utils/filters/getNADsFilter';
+import { getOSFilter } from '../../utils/filters/getOSFilter';
+import { getSchedulingFilter } from '../../utils/filters/getSchedulingFilter';
+import { getStatusFilter } from '../../utils/filters/getStatusFilter';
+import { useVirtualMachineInstanceMapper } from '../useVirtualMachineInstanceMapper';
 
-import { useCPUFilter } from './useCPUFilter';
-import { useDateFilter } from './useDateFilter';
-import { useDescriptionFilter } from './useDescriptionFilter';
-import { useInstanceTypesFilter } from './useInstanceTypesFilter';
-import { useIPSearchFilter } from './useIPSearchFilter';
-import { useLiveMigratableFilter } from './useLiveMigratableFilter';
-import { useMemoryFilter } from './useMemoryFilter';
 import { useNodesFilter } from './useNodesFilter';
-import { useOSFilter } from './useOSFilter';
 import { useProjectFilter } from './useProjectFilter';
-import { useStatusFilter } from './useStatusFilter';
 import { useStorageClassFilter } from './useStorageClassFilter';
-import { useTemplatesFilter } from './useTemplatesFilter';
 
 export const useVMListFilters = (
-  vmis: V1VirtualMachineInstance[],
-  vms: V1VirtualMachine[],
   vmims: V1VirtualMachineInstanceMigration[],
   pvcMapper: PVCMapper,
 ): {
-  advancedFilters: RowFilter<V1VirtualMachine>[];
-  filters: RowFilter<V1VirtualMachine>[];
-  projectFilter: RowFilter<V1VirtualMachine>;
-  searchFilters: RowFilter<V1VirtualMachine>[];
+  filtersWithSelect: RowFilter<V1VirtualMachine>[];
+  hiddenFilters: RowFilter<V1VirtualMachine>[];
   vmiMapper: VMIMapper;
   vmimMapper: VMIMMapper;
 } => {
-  const vmiMapper: VMIMapper = useMemo(() => {
-    return (Array.isArray(vmis) ? vmis : [])?.reduce(
-      (acc, vmi) => {
-        const name = vmi?.metadata?.name;
-        const namespace = vmi?.metadata?.namespace;
-        if (!acc.mapper[namespace]) {
-          acc.mapper[namespace] = {};
-        }
-        acc.mapper[namespace][name] = vmi;
-        const nodeName = vmi?.status?.nodeName;
-        if (nodeName && !acc?.nodeNames?.[nodeName]) {
-          acc.nodeNames[nodeName] = {
-            id: nodeName,
-            title: nodeName,
-          };
-        }
-        return acc;
-      },
-      { mapper: {}, nodeNames: {} },
-    );
-  }, [vmis]);
+  const vmiMapper = useVirtualMachineInstanceMapper();
 
   const vmimMapper: VMIMMapper = useMemo(() => getLatestMigrationForEachVM(vmims), [vmims]);
 
-  const statusFilter = useStatusFilter();
-  const templatesFilter = useTemplatesFilter(vms);
-  const osFilters = useOSFilter();
-  const nodesFilter = useNodesFilter(vmiMapper);
-  const liveMigratableFilter = useLiveMigratableFilter();
-  const instanceTypesFilter = useInstanceTypesFilter(vms);
-  const storageClassFilters = useStorageClassFilter(vms, pvcMapper);
+  const [vms] = useKubevirtWatchResource<V1VirtualMachine[]>({
+    groupVersionKind: VirtualMachineModelGroupVersionKind,
+    isList: true,
+    limit: OBJECTS_FETCHING_LIMIT,
+  });
 
   const projectFilter = useProjectFilter();
-  const dateFromFilter = useDateFilter('from');
-  const dateToFilter = useDateFilter('to');
-  const cpuFilter = useCPUFilter(vmiMapper);
-  const memoryFilter = useMemoryFilter(vmiMapper);
+  const statusFilter = getStatusFilter();
+  const osFilters = getOSFilter();
+  const storageClassFilter = useStorageClassFilter(vms, pvcMapper);
+  const hwDevicesFilter = getHWDevicesFilter();
+  const schedulingFilter = getSchedulingFilter();
+  const nodesFilter = useNodesFilter(vmiMapper);
 
-  const searchByIP = useIPSearchFilter(vmiMapper);
-  const searchByDescription = useDescriptionFilter();
+  const descriptionFilter = getDescriptionFilter();
+  const cpuFilter = getCPUFilter(vmiMapper);
+  const memoryFilter = getMemoryFilter(vmiMapper);
+  const dateFromFilter = getDateFilter('from');
+  const dateToFilter = getDateFilter('to');
+  const architectureFilter = getArchitectureFilter(vms);
+  const ipFilter = getIPFilter(vmiMapper);
+  const nadFilter = getNADsFilter();
 
   return {
-    advancedFilters: [dateFromFilter, dateToFilter, cpuFilter, memoryFilter],
-    filters: [
+    filtersWithSelect: [
+      projectFilter,
       statusFilter,
-      templatesFilter,
       osFilters,
-      liveMigratableFilter,
+      storageClassFilter,
+      hwDevicesFilter,
+      schedulingFilter,
       nodesFilter,
-      instanceTypesFilter,
-      storageClassFilters,
     ],
-    projectFilter,
-    searchFilters: [searchByIP, searchByDescription],
+    hiddenFilters: [
+      descriptionFilter,
+      cpuFilter,
+      memoryFilter,
+      dateFromFilter,
+      dateToFilter,
+      architectureFilter,
+      ipFilter,
+      nadFilter,
+    ],
     vmiMapper,
     vmimMapper,
   };

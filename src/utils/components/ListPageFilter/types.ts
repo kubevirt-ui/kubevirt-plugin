@@ -14,9 +14,11 @@ export type TextFiltersType = {
   name?: string;
 } & { [key: string]: string };
 
-export type ResetTextSearch = (newTextFilters: TextFiltersType) => void;
-
 export type ExposedFilterFunctions = {
   onFilterChange: OnFilterChange;
-  resetTextSearch?: ResetTextSearch;
+};
+
+export type FilterInfo = {
+  filterGroupName: string;
+  query: string;
 };

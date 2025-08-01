@@ -10,7 +10,7 @@ const useVMSearchURL = () => {
     ? getACMVMSearchURL()
     : `${getResourceUrl({
         model: VirtualMachineModel,
-      })}search`;
+      })}/search`;
 
   return searchURL;
 };

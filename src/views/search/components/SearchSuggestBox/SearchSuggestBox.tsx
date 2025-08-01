@@ -18,7 +18,11 @@ import {
 import SlidersHIcon from '@patternfly/react-icons/dist/esm/icons/sliders-h-icon';
 import { FleetResourceLink } from '@stolostron/multicluster-sdk';
 
-import { AdvancedSearchInputs, SearchSuggestResult } from '../../utils/types';
+import {
+  AdvancedSearchInputs,
+  AdvancedSearchQueryInputs,
+  SearchSuggestResult,
+} from '../../utils/types';
 
 import RelatedSuggestions from './components/RelatedSuggestions';
 import SearchSuggestBoxFooter from './components/SearchSuggestBoxFooter';
@@ -27,7 +31,7 @@ import SearchSuggestBoxHeader from './components/SearchSuggestBoxHeader';
 export type SearchSuggestBoxProps = {
   isSearchInProgress: boolean;
   maxResourceLinks?: number;
-  navigateToSearchResults: (searchInputs: AdvancedSearchInputs) => void;
+  navigateToSearchResults: (searchInputs: AdvancedSearchQueryInputs) => void;
   searchQuery: string;
   searchSuggestResult?: SearchSuggestResult;
   showSearchModal: (prefillInputs?: AdvancedSearchInputs) => void;

@@ -31,15 +31,10 @@
       z-index: 0;
       flex-wrap: nowrap;
 
-      &.is-compact {
-        .pf-v6-c-toolbar__group:where(.pf-m-toggle-group) {
-          .pf-v6-c-toolbar__toggle {
-            display: unset;
-          }
-
-          .pf-v6-c-toolbar__item {
-            display: none;
-          }
+      .pf-v6-c-toolbar__content {
+        .pf-v6-c-toolbar__group {
+          display: flex;
+          flex-wrap: wrap;
         }
       }
     }

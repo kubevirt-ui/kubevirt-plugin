@@ -11,6 +11,7 @@ import {
   RowReducerFilter,
   Selector,
 } from '@openshift-console/dynamic-plugin-sdk';
+import { getRowFilterQueryKey } from '@search/utils/query';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 import { useSearchFiltersParameters } from './hooks/useSearchFiltersParameters';
@@ -84,7 +85,7 @@ export const getFiltersData = (generatedRowFilters) =>
       } as FilterKeys,
       {
         ...filterKeysAcc,
-        [filterGroupName]: `rowFilter-${type}`,
+        [filterGroupName]: getRowFilterQueryKey(type),
       } as FilterKeys,
       // Default selections
       Array.from(new Set([...defaultSelectedAcc, ...(defaultSelected ?? [])])),
@@ -182,5 +183,5 @@ export const getFilterLabels = (query?: string, filterType?: VirtualMachineRowFi
     return [`${numberOperatorInfo[operator].sign} ${number}${unit ? ` ${unit}` : ''}`];
   }
 
-  return [query];
+  return query.split(',');
 };
