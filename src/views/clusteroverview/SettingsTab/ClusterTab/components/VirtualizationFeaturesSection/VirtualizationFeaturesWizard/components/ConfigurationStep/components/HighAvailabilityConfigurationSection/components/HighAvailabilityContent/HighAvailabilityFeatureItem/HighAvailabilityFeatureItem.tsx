@@ -53,7 +53,7 @@ const HighAvailabilityFeatureItem: FC<HighAvailabilityFeatureItemProps> = ({
             />
           </SplitItem>
           <SplitItem>
-            {!installed && <ExternalLink href={operatorHubURL}>{t('Manage')}</ExternalLink>}
+            {installed && <ExternalLink href={operatorHubURL}>{t('Manage')}</ExternalLink>}
           </SplitItem>
           <SplitItem className="high-availability-feature-item__icon-container">
             {installed && <InstalledIconWithTooltip />}

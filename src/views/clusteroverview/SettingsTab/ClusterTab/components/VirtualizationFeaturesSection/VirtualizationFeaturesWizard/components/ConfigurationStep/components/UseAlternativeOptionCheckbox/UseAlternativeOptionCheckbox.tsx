@@ -4,6 +4,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import UseAlternativeOptionHelpIcon from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/VirtualizationFeaturesWizard/components/ConfigurationStep/components/UseAlternativeOptionHelpIcon/UseAlternativeOptionHelpIcon';
 import { Checkbox, Split, SplitItem } from '@patternfly/react-core';
 
+import './UseAlternativeCheckbox.scss';
+
 type UseAlternativeOptionCheckboxProps = {
   className?: string;
   id: string;
@@ -23,9 +25,13 @@ const UseAlternativeOptionCheckbox: FC<UseAlternativeOptionCheckboxProps> = ({
     <Split className={className}>
       <SplitItem>
         <Checkbox
+          label={
+            <div className="use-alternative-checkbox__text">
+              {t('I am using an alternative solution for this feature')}
+            </div>
+          }
           id={id}
           isChecked={isChecked}
-          label={<div>{t('I am using an alternative solution for this feature')}</div>}
           onChange={(_, checked) => onChange(checked)}
         />
       </SplitItem>
