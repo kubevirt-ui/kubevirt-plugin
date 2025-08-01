@@ -11,6 +11,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import useUserPreferences from '@kubevirt-utils/hooks/useUserPreferences';
 import useBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useBootableVolumes';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { Bullseye, Card, Divider, Grid, GridItem, List, PageSection } from '@patternfly/react-core';
 
@@ -29,6 +30,7 @@ type CreateFromInstanceTypeProps = { currentTab: CREATE_VM_TAB };
 
 const CreateFromInstanceType: FC<CreateFromInstanceTypeProps> = ({ currentTab }) => {
   const { t } = useKubevirtTranslation();
+  const cluster = useClusterParam();
   const sectionState = useState<INSTANCE_TYPES_SECTIONS>(INSTANCE_TYPES_SECTIONS.SELECT_VOLUME);
 
   const { resetInstanceTypeVMState, setVMNamespaceTarget, volumeListNamespace } =
@@ -39,7 +41,7 @@ const CreateFromInstanceType: FC<CreateFromInstanceTypeProps> = ({ currentTab })
     volumeListNamespace === ALL_PROJECTS ? ALL_NAMESPACES_SESSION_KEY : volumeListNamespace,
   );
   const [activeNamespace] = useActiveNamespace();
-  const [authorizedSSHKeys, , loaded] = useKubevirtUserSettings('ssh');
+  const [authorizedSSHKeys, , loaded] = useKubevirtUserSettings('ssh', cluster);
 
   useEffect(() => {
     resetInstanceTypeVMState();
@@ -51,8 +53,10 @@ const CreateFromInstanceType: FC<CreateFromInstanceTypeProps> = ({ currentTab })
     setVMNamespaceTarget(authorizedSSHKeys?.[targetNS], targetNS);
   }, [activeNamespace, authorizedSSHKeys, setVMNamespaceTarget]);
 
-  const [favorites = [], updaterFavorites, loadedFavorites] =
-    useKubevirtUserSettings('favoriteBootableVolumes');
+  const [favorites = [], updaterFavorites, loadedFavorites] = useKubevirtUserSettings(
+    'favoriteBootableVolumes',
+    cluster,
+  );
 
   if (
     !instanceTypesAndPreferencesData?.loaded ||

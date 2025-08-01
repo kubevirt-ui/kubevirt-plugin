@@ -6,6 +6,8 @@ import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/Sideba
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import { getCatalogURL } from '@multicluster/urls';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -22,6 +24,7 @@ export const WizardHeader: FC<{ namespace: string }> = memo(({ namespace }) => {
   const { tabsData } = useWizardVMContext();
   const navigate = useNavigate();
   const location = useLocation();
+  const cluster = useClusterParam();
 
   const templateName = tabsData?.overview?.templateMetadata?.name;
   const templateDisplayName = tabsData?.overview?.templateMetadata?.displayName || templateName;
@@ -39,7 +42,9 @@ export const WizardHeader: FC<{ namespace: string }> = memo(({ namespace }) => {
         <BreadcrumbItem>
           <Button
             onClick={() =>
-              onBreadcrumbClick(`/k8s/ns/${namespace || DEFAULT_NAMESPACE}/catalog/template`)
+              onBreadcrumbClick(
+                `${getCatalogURL(cluster, namespace || DEFAULT_NAMESPACE)}/template`,
+              )
             }
             isInline
             variant={ButtonVariant.link}

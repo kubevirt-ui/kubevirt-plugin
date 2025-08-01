@@ -76,4 +76,18 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'acm.virtualmachine/action',
   } as EncodedExtension<ACMVirtualMachineActionExtension>,
+
+  {
+    properties: {
+      component: {
+        $codeRef: 'Catalog',
+      },
+      path: [
+        '/k8s/all-clusters/all-namespaces/catalog',
+        '/k8s/cluster/:cluster/ns/:ns/catalog',
+        '/k8s/cluster/:cluster/all-namespaces/catalog',
+      ],
+    },
+    type: 'console.page/route',
+  } as EncodedExtension<RoutePage>,
 ];

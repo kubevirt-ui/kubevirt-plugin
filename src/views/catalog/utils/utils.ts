@@ -6,10 +6,9 @@ import { SecretModel, V1Template } from '@kubevirt-utils/models';
 import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
 import { getTemplateOS, OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
+import { kubevirtK8sCreate, kubevirtK8sDelete } from '@multicluster/k8sRequests';
 import {
   getGroupVersionKindForResource,
-  k8sCreate,
-  k8sDelete,
   K8sModel,
   K8sResourceCommon,
 } from '@openshift-console/dynamic-plugin-sdk';
@@ -25,6 +24,7 @@ export const createMultipleResources = async (
   resources: K8sResourceCommon[],
   models: { [key: string]: K8sModel },
   namespace?: string,
+  cluster?: string,
 ): Promise<K8sResourceCommon[]> => {
   const vm = resources.find((object) => object.kind === VirtualMachineModel.kind);
   const otherResources = resources.filter(
@@ -34,7 +34,8 @@ export const createMultipleResources = async (
       object.metadata.namespace !== vm.metadata.namespace,
   );
 
-  const vmCreated = await k8sCreate<V1VirtualMachine>({
+  const vmCreated = await kubevirtK8sCreate<V1VirtualMachine>({
+    cluster,
     data: vm as V1VirtualMachine,
     model: VirtualMachineModel,
   });
@@ -48,7 +49,8 @@ export const createMultipleResources = async (
 
         const model = models[ref] || models[resource.kind];
 
-        return k8sCreate<K8sResourceCommon>({
+        return kubevirtK8sCreate<K8sResourceCommon>({
+          cluster,
           data: produce(resource, (draftObject) => {
             ensurePath(draftObject, 'metadata');
 
@@ -73,7 +75,8 @@ export const createMultipleResources = async (
 
     return [vmCreated, ...(otherResourcesCreated || [])];
   } catch (error) {
-    await k8sDelete({
+    await kubevirtK8sDelete({
+      cluster,
       model: VirtualMachineModel,
       resource: vm,
     });

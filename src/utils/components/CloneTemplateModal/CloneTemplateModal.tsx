@@ -17,7 +17,9 @@ import {
   TEMPLATE_VERSION_LABEL,
 } from '@kubevirt-utils/resources/template';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
-import { k8sCreate, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
+import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { ButtonVariant, Form, FormGroup, TextInput } from '@patternfly/react-core';
 
 import FormGroupHelperText from '../FormGroupHelperText/FormGroupHelperText';
@@ -89,7 +91,8 @@ const CloneTemplateModal: FC<CloneTemplateModalProps> = ({
         draftVM.spec.dataVolumeTemplates[0].spec.source.pvc.namespace = selectedProject;
       });
     }
-    const clonedTemplate = await k8sCreate<V1Template>({
+    const clonedTemplate = await kubevirtK8sCreate<V1Template>({
+      cluster: getCluster(obj),
       data: templateToCreate,
       model: TemplateModel,
     });

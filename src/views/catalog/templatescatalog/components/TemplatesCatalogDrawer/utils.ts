@@ -88,8 +88,10 @@ export const getUploadDataVolume = (
   name: string,
   namespace: string,
   storage?: string,
+  cluster?: string,
 ): V1beta1DataVolume => ({
   apiVersion: `${DataVolumeModel.apiGroup}/${DataVolumeModel.apiVersion}`,
+  cluster,
   kind: DataVolumeModel.kind,
   metadata: {
     name,
@@ -116,11 +118,12 @@ const uploadFile = async (
   storage: string,
   dataVolumeName: string,
   namespace: string,
+  cluster?: string,
   updateTabsData?: Updater<TabsData>,
 ): Promise<V1Volume | void> => {
   if (!storage || !file) return Promise.resolve();
 
-  const uploadDV = getUploadDataVolume(dataVolumeName, namespace, storage);
+  const uploadDV = getUploadDataVolume(dataVolumeName, namespace, storage, cluster);
 
   await uploadData({ dataVolume: uploadDV, file: file as File });
 
@@ -155,6 +158,7 @@ const replaceVolume = (vm: V1VirtualMachine, oldDVName: string, volume: V1Volume
 
 type UploadFiles = (input: {
   cdFile?: File | string;
+  cluster: string;
   diskFile?: File | string;
   namespace: string;
   updateTabsData?: Updater<TabsData>;
@@ -165,6 +169,7 @@ type UploadFiles = (input: {
 
 export const uploadFiles: UploadFiles = ({
   cdFile,
+  cluster,
   diskFile,
   namespace,
   updateTabsData,
@@ -189,6 +194,7 @@ export const uploadFiles: UploadFiles = ({
       dataVolumeTemplate?.spec?.storage?.resources?.requests?.storage || DEFAULT_DISK_SIZE,
       diskDVName,
       namespace,
+      cluster,
       updateTabsData,
     ),
     uploadFile(
@@ -198,6 +204,7 @@ export const uploadFiles: UploadFiles = ({
       cdDataVolumeTemplate?.spec?.storage?.resources?.requests?.storage || DEFAULT_CDROM_DISK_SIZE,
       cdDVName,
       namespace,
+      cluster,
       updateTabsData,
     ),
   ]).then(([newDiskVolume, newCDVolume]) => {

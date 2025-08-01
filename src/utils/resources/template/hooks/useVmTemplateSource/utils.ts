@@ -19,7 +19,7 @@ import {
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getBootDisk, getVolumes } from '@kubevirt-utils/resources/vm';
 import { getVMBootSourceType } from '@kubevirt-utils/resources/vm/utils/source';
-import { k8sGet } from '@openshift-console/dynamic-plugin-sdk';
+import { kubevirtK8sGet } from '@multicluster/k8sRequests';
 
 import { poorManProcess } from '../../utils';
 import { BOOT_SOURCE } from '../../utils/constants';
@@ -58,10 +58,12 @@ export const getTemplateBootSourceType = (template: V1Template): TemplateBootSou
  * a function to k8sGet a PVC
  * @param name the name of the PVC
  * @param ns  the namespace of the PVC
+ * @param cluster
  * @returns a promise that resolves into the PVC
  */
-export const getPVC = (name: string, ns: string) =>
-  k8sGet<IoK8sApiCoreV1PersistentVolumeClaim>({
+export const getPVC = (name: string, ns: string, cluster?: string) =>
+  kubevirtK8sGet<IoK8sApiCoreV1PersistentVolumeClaim>({
+    cluster,
     model: PersistentVolumeClaimModel,
     name,
     ns,
@@ -71,10 +73,12 @@ export const getPVC = (name: string, ns: string) =>
  * a function to k8sGet a DataVolume
  * @param name the name of the DataVolume
  * @param ns  the namespace of the DataVolume
+ * @param cluster
  * @returns a promise that resolves into the DataVolume
  */
-export const getDataVolume = (name: string, ns: string) =>
-  k8sGet<V1beta1DataVolume>({
+export const getDataVolume = (name: string, ns: string, cluster?: string) =>
+  kubevirtK8sGet<V1beta1DataVolume>({
+    cluster,
     model: DataVolumeModel,
     name,
     ns,
@@ -84,10 +88,12 @@ export const getDataVolume = (name: string, ns: string) =>
  * a function to k8sGet a DataSource
  * @param name the name of the DataSource
  * @param ns  the namespace of the DataSource
+ * @param cluster
  * @returns a promise that resolves into the DataSource
  */
-export const getDataSource = (name: string, ns: string) =>
-  k8sGet<V1beta1DataSource>({
+export const getDataSource = (name: string, ns: string, cluster?: string) =>
+  kubevirtK8sGet<V1beta1DataSource>({
+    cluster,
     model: DataSourceModel,
     name,
     ns,
@@ -97,12 +103,13 @@ export const getDataSource = (name: string, ns: string) =>
  * a function to k8sGet a DataSource
  * @param name the name of the DataSource
  * @param ns  the namespace of the DataSource
+ * @param cluster
  * @returns a promise that resolves into the DataSource
  */
-export const getDataSourcePVC = (name: string, ns: string) =>
-  getDataSource(name, ns)
+export const getDataSourcePVC = (name: string, ns: string, cluster?: string) =>
+  getDataSource(name, ns, cluster)
     .then((data) => data?.spec?.source?.pvc)
-    .then((pvc) => getPVC(pvc.name, pvc.namespace));
+    .then((pvc) => getPVC(pvc.name, pvc.namespace, cluster));
 
 /**
  * a function that returns true if the data source is ready

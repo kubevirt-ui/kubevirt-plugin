@@ -26,7 +26,9 @@ import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { isWindows } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { generatePrettyName, isEmpty, validateSSHPublicKey } from '@kubevirt-utils/utils/utils';
-import { k8sUpdate, WatchK8sResults } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
+import { WatchK8sResults } from '@openshift-console/dynamic-plugin-sdk';
 
 export const getAllSecrets = (
   secretsData: WatchK8sResults<{ [p: string]: IoK8sApiCoreV1Secret[] }>,
@@ -82,7 +84,8 @@ export const removeSecretFromVM = (vm: V1VirtualMachine) =>
   });
 
 export const detachVMSecret = async (vm: V1VirtualMachine) => {
-  await k8sUpdate({
+  await kubevirtK8sUpdate({
+    cluster: getCluster(vm),
     data: removeSecretFromVM(vm),
     model: VirtualMachineModel,
   });

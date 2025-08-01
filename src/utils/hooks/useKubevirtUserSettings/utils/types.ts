@@ -18,4 +18,4 @@ export type KubevirtUserSetting = [
   error: Error,
 ];
 
-export type UseKubevirtUserSettings = (key?: string) => KubevirtUserSetting;
+export type UseKubevirtUserSettings = (key?: string, cluster?: string) => KubevirtUserSetting;

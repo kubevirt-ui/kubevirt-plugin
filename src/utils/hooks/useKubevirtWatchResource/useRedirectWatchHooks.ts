@@ -4,8 +4,7 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { WatchK8sResource } from '@openshift-console/dynamic-plugin-sdk';
-import { useFleetSearchPoll } from '@stolostron/multicluster-sdk';
-import { AdvancedSearchFilter } from '@stolostron/multicluster-sdk/lib/api/search/types';
+import { AdvancedSearchFilter, useFleetSearchPoll } from '@stolostron/multicluster-sdk';
 
 import useKubevirtDataPod from '../useKubevirtDataPod/useKubevirtDataPod';
 
@@ -24,7 +23,7 @@ const useRedirectWatchHooks = <T extends K8sResourceCommon | K8sResourceCommon[]
   const usePod = shouldUseProxyPod && !isACMTreeView;
 
   const k8sWatch = useK8sWatchData<T>(!usePod && !useMulticlusterSearch ? watchOptions : null);
-  const multiSearchWatch = useFleetSearchPoll<T>(
+  const [multiSearchData, multiSearchLoading, multiSearchError] = useFleetSearchPoll<T>(
     !usePod && useMulticlusterSearch && watchOptions,
     searchQueries,
   );
@@ -38,14 +37,17 @@ const useRedirectWatchHooks = <T extends K8sResourceCommon | K8sResourceCommon[]
 
     if (usePod) return kubevirtPodWatch;
 
-    if (useMulticlusterSearch) return multiSearchWatch as Result<T>;
+    if (useMulticlusterSearch)
+      return [multiSearchData, multiSearchLoading, multiSearchError] as Result<T>;
 
     return k8sWatch;
   }, [
     watchOptions?.isList,
     shouldUseProxyPod,
     useMulticlusterSearch,
-    multiSearchWatch,
+    multiSearchData,
+    multiSearchLoading,
+    multiSearchError,
     usePod,
     kubevirtPodWatch,
     k8sWatch,

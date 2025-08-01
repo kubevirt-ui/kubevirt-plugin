@@ -2,51 +2,46 @@ import { useMemo } from 'react';
 
 import { modelToGroupVersionKind, SecretModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import {
-  getMappedProjectsWithKeys,
-  getSecretsLoaded,
-} from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
-import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
-import { getValidNamespace, isEmpty } from '@kubevirt-utils/utils/utils';
-import { useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
+import { getMappedProjectsWithKeys } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 import { SecretsData } from '../utils/types';
 
-type UseSecretsData = (secretsNamespace: string, currentNamespace: string) => SecretsData;
+type UseSecretsData = (
+  secretsNamespace: string,
+  currentNamespace: string,
+  cluster?: string,
+) => SecretsData;
 
-const useSecretsData: UseSecretsData = (secretsNamespace, currentNamespace) => {
-  const watchedResources = {
-    [currentNamespace]: {
+const useSecretsData: UseSecretsData = (secretsNamespace, currentNamespace, cluster) => {
+  const [currentNamespaceSecrets, currentNamespaceSecretsLoaded, currentNamespaceSecretsError] =
+    useK8sWatchData<IoK8sApiCoreV1Secret[]>({
+      cluster,
       groupVersionKind: modelToGroupVersionKind(SecretModel),
       isList: true,
       limit: 10000,
-      namespace: getValidNamespace(currentNamespace),
-    },
-    ...(secretsNamespace !== currentNamespace && {
-      [secretsNamespace]: {
-        groupVersionKind: modelToGroupVersionKind(SecretModel),
-        isList: true,
-        ...(secretsNamespace !== ALL_NAMESPACES_SESSION_KEY && {
-          namespace: secretsNamespace,
-        }),
-        limit: 10000,
-      },
-    }),
-  };
+      namespace: currentNamespace,
+    });
 
-  const secretsData = useK8sWatchResources<{ [key: string]: IoK8sApiCoreV1Secret[] }>(
-    watchedResources,
-  );
+  const [secretsNamespaceSecrets, secretsNamespaceSecretsLoaded, secretsNamespaceSecretsError] =
+    useK8sWatchData<IoK8sApiCoreV1Secret[]>(
+      secretsNamespace !== currentNamespace
+        ? {
+            cluster,
+            groupVersionKind: modelToGroupVersionKind(SecretModel),
+            isList: true,
+            limit: 10000,
+            namespace: secretsNamespace,
+          }
+        : null,
+    );
 
-  const secretsArrays = Object.values(secretsData)?.map((watchedResource) => watchedResource?.data);
-  const allSecrets = secretsArrays?.reduce((acc, secretsArray) => {
-    return [...acc, ...secretsArray];
-  }, []);
+  const allSecrets = useMemo(() => {
+    return [...(currentNamespaceSecrets || []), ...(secretsNamespaceSecrets || [])];
+  }, [currentNamespaceSecrets, secretsNamespaceSecrets]);
 
-  const secretsLoaded = getSecretsLoaded(secretsData);
-  const secretsLoadError = Object.values(secretsData)
-    ?.map((data) => data.loadError)
-    ?.find((error) => !isEmpty(error));
+  const secretsLoaded = currentNamespaceSecretsLoaded && secretsNamespaceSecretsLoaded;
+  const secretsLoadError = currentNamespaceSecretsError || secretsNamespaceSecretsError;
 
   const projectsWithSecrets = useMemo(() => getMappedProjectsWithKeys(allSecrets), [allSecrets]);
 

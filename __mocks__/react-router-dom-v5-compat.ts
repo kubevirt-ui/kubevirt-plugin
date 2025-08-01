@@ -8,4 +8,7 @@ module.exports = {
     push: jest.fn(),
     replace: jest.fn(),
   }),
+  useParams: () => ({
+    ns: 'default',
+  }),
 };

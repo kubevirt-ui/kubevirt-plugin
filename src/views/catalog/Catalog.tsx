@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 import { Route, Routes } from 'react-router-dom-v5-compat';
 
+import ClusterProjectDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterProjectDropdown';
 import { PageTitles } from '@kubevirt-utils/constants/page-constants';
 import { DocumentTitle } from '@openshift-console/dynamic-plugin-sdk';
 import { useSignals } from '@preact/signals-react/runtime';
@@ -16,6 +17,7 @@ const Catalog: FC = () => {
   return (
     <WizardVMContextProvider>
       <DocumentTitle>{PageTitles.Catalog}</DocumentTitle>
+      <ClusterProjectDropdown />
       <Routes>
         <Route Component={Wizard} path={'template/review/*'} />
         <Route Component={CustomizeInstanceTypeVirtualMachine} path={`review/*`} />

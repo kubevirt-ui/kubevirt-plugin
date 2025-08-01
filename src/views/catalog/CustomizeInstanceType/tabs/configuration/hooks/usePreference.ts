@@ -8,7 +8,8 @@ import { getPreferenceModelFromMatcher } from '@kubevirt-utils/resources/prefere
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getPreferenceMatcher } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 const usePreference = (
   vm: V1VirtualMachine,
@@ -16,7 +17,8 @@ const usePreference = (
   const vmPreference = getPreferenceMatcher(vm);
 
   const [preference, preferenceLoaded, preferenceError] =
-    useK8sWatchResource<V1beta1VirtualMachinePreference>({
+    useK8sWatchData<V1beta1VirtualMachinePreference>({
+      cluster: getCluster(vm),
       groupVersionKind: modelToGroupVersionKind(getPreferenceModelFromMatcher(vmPreference)),
       name: vmPreference?.name,
       namespace: vmPreference.kind === VirtualMachinePreferenceModel.kind ? getNamespace(vm) : null,

@@ -25,6 +25,7 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 type UseTemplateSecrets = (
   namespaceDefaultSecretName: string,
   targetNamespace: string,
+  cluster?: string,
 ) => {
   copyTemplateSecretToTargetNS: boolean;
   onSSHChange: (details: SSHSecretDetails) => Promise<void>;
@@ -32,13 +33,17 @@ type UseTemplateSecrets = (
   sshDetails: SSHSecretDetails;
 };
 
-const useTemplateSecrets: UseTemplateSecrets = (namespaceDefaultSecretName, targetNamespace) => {
+const useTemplateSecrets: UseTemplateSecrets = (
+  namespaceDefaultSecretName,
+  targetNamespace,
+  cluster,
+) => {
   const { setSSHDetails, setVM, sshDetails, template, vm } = useDrawerContext();
 
   const [templateSecretDetails] = useState<TemplateSSHDetails>(getTemplateSSHSecret(template));
   const { templateSecretName, templateSecretNamespace } = templateSecretDetails;
 
-  const secretsData = useSecretsData(targetNamespace, templateSecretNamespace);
+  const secretsData = useSecretsData(targetNamespace, templateSecretNamespace, cluster);
   const templateSecret: IoK8sApiCoreV1Secret = getSecretByNameAndNS(
     templateSecretName,
     templateSecretNamespace,

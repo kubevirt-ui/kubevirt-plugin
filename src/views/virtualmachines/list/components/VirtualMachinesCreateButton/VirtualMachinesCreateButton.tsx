@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom-v5-compat';
 import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import { getCatalogURL, getVMListNamespacesURL } from '@multicluster/urls';
 import { ListPageCreateDropdown } from '@openshift-console/dynamic-plugin-sdk';
 
 type VirtualMachinesCreateButtonProps = {
@@ -17,6 +19,7 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
+  const cluster = useClusterParam();
 
   const createItems = {
     instanceType: t('From InstanceType'),
@@ -26,8 +29,8 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
   };
 
   const catalogURL = useMemo(
-    () => `/k8s/ns/${namespace || DEFAULT_NAMESPACE}/catalog`,
-    [namespace],
+    () => getCatalogURL(cluster, namespace || DEFAULT_NAMESPACE),
+    [namespace, cluster],
   );
 
   const onCreate = useCallback(
@@ -39,11 +42,11 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
           return navigate(catalogURL);
         default:
           return navigate(
-            `/k8s/ns/${namespace || DEFAULT_NAMESPACE}/${VirtualMachineModelRef}/~new`,
+            `${getVMListNamespacesURL(cluster, namespace || DEFAULT_NAMESPACE)}/~new`,
           );
       }
     },
-    [catalogURL, navigate, namespace],
+    [catalogURL, navigate, namespace, cluster],
   );
 
   return (

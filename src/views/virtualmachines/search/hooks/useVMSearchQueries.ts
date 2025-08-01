@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom-v5-compat';
 
 import { STATIC_SEARCH_FILTERS } from '@kubevirt-utils/components/ListPageFilter/constants';
-import { AdvancedSearchFilter } from '@stolostron/multicluster-sdk/lib/api/search/types';
+import { AdvancedSearchFilter } from '@stolostron/multicluster-sdk';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 export type VMSearchQueries = {

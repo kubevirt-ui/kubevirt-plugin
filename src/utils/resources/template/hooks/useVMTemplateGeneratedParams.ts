@@ -3,11 +3,13 @@ import { useParams } from 'react-router-dom-v5-compat';
 
 import { ProcessedTemplatesModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
-import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 
 import { generateParamsWithPrettyName } from './../utils/helpers';
 
 export default (template: V1Template): [template: V1Template, loading: boolean, error: Error] => {
+  const cluster = useClusterParam();
   const [error, setError] = useState<Error>();
   const { ns: namespace = DEFAULT_NAMESPACE } = useParams<{ ns: string }>();
   const [templateWithGeneratedValues, setTemplateWithGeneratedValues] = useState<V1Template>();
@@ -35,7 +37,8 @@ export default (template: V1Template): [template: V1Template, loading: boolean, 
       return;
     }
     setLoading(true);
-    k8sCreate<V1Template>({
+    kubevirtK8sCreate<V1Template>({
+      cluster,
       data: {
         ...template,
         metadata: { ...template?.metadata, namespace },
@@ -62,7 +65,7 @@ export default (template: V1Template): [template: V1Template, loading: boolean, 
         setError(apiError);
         setLoading(false);
       });
-  }, [namespace, template]);
+  }, [namespace, template, cluster]);
 
   return [templateWithGeneratedValues, loading, error];
 };

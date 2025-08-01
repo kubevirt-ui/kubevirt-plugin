@@ -7,7 +7,9 @@ import {
 } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { convertResourceArrayToMap } from '@kubevirt-utils/resources/shared';
-import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
+import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 type useProjectsAndPVCsReturnType = {
   error: Error;
@@ -19,7 +21,9 @@ type useProjectsAndPVCsReturnType = {
 };
 
 export const useProjectsAndPVCs = (projectSelected: string): useProjectsAndPVCsReturnType => {
-  const [projects, projectsLoaded, projectsErrors] = useK8sWatchResource<K8sResourceCommon[]>({
+  const cluster = useClusterParam();
+  const [projects, projectsLoaded, projectsErrors] = useK8sWatchData<K8sResourceCommon[]>({
+    cluster,
     groupVersionKind: modelToGroupVersionKind(ProjectModel),
     isList: true,
     namespaced: true,
@@ -32,6 +36,7 @@ export const useProjectsAndPVCs = (projectSelected: string): useProjectsAndPVCsR
 
   const pvcWatchResource = projectSelected
     ? {
+        cluster,
         groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
         isList: true,
         namespace: projectSelected,
@@ -40,7 +45,7 @@ export const useProjectsAndPVCs = (projectSelected: string): useProjectsAndPVCsR
     : null;
 
   const [pvcs, pvcsLoaded, pvcsErrors] =
-    useK8sWatchResource<IoK8sApiCoreV1PersistentVolumeClaim[]>(pvcWatchResource);
+    useK8sWatchData<IoK8sApiCoreV1PersistentVolumeClaim[]>(pvcWatchResource);
 
   const pvcNamesFilteredByProjects = useMemo(
     () =>

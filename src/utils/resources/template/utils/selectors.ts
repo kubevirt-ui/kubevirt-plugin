@@ -3,6 +3,7 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import { V1Disk, V1Network, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getAnnotation, getLabel } from '@kubevirt-utils/resources/shared';
 import { getCPU } from '@kubevirt-utils/resources/vm';
+import { getCluster } from '@multicluster/helpers/selectors';
 
 import { ANNOTATIONS } from './annotations';
 import {
@@ -20,8 +21,10 @@ import {
  * A selector that returns the VirtualMachine object of a given template
  * @param {V1Template} template - template
  */
-export const getTemplateVirtualMachineObject = (template: V1Template): V1VirtualMachine =>
-  template?.objects?.find((obj) => obj.kind === VirtualMachineModel.kind);
+export const getTemplateVirtualMachineObject = (template: V1Template): V1VirtualMachine => {
+  const vm = template?.objects?.find((obj) => obj.kind === VirtualMachineModel.kind);
+  return { ...vm, cluster: getCluster(template) };
+};
 
 /**
  * returns true if the given template is a default variant

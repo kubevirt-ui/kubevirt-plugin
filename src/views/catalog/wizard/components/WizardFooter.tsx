@@ -20,6 +20,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getName, getResourceUrl } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
 import { createHeadlessService } from '@kubevirt-utils/utils/headless-service';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import { getCatalogURL } from '@multicluster/urls';
 import {
   Alert,
   AlertVariant,
@@ -39,8 +41,9 @@ import { WizardNoBootModal } from './WizardNoBootModal';
 
 export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
   const navigate = useNavigate();
+  const cluster = useClusterParam();
   const { t } = useKubevirtTranslation();
-  const [isUDNManagedNamespace] = useNamespaceUDN(namespace);
+  const [isUDNManagedNamespace] = useNamespaceUDN(namespace, cluster);
   const { disableVmCreate, loaded: vmContextLoaded, updateVM, vm } = useWizardVMContext();
   const { isBootSourceAvailable, loaded: bootSourceLoaded } = useWizardSourceAvailable();
   const { createVM, error, loaded: vmCreateLoaded } = useWizardVMCreate();
@@ -140,7 +143,7 @@ export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
                   });
                   if (confirm(t('Are you sure you want to cancel?'))) {
                     clearSessionStorageVM();
-                    navigate(`/k8s/ns/${namespace}/catalog/template`);
+                    navigate(`${getCatalogURL(cluster, namespace)}/template`);
                   }
                 }}
                 variant={ButtonVariant.link}

@@ -18,7 +18,9 @@ import {
   UDN_BINDING_NAME,
 } from '@kubevirt-utils/resources/vm/utils/constants';
 import { createHeadlessService } from '@kubevirt-utils/utils/headless-service';
-import { k8sCreate, K8sModel } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
+import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 import { createMultipleResources, isRHELTemplate } from './utils';
 
@@ -49,7 +51,9 @@ export const quickCreateVM: QuickCreateVMType = async ({
   template,
   uploadData,
 }) => {
-  const processedTemplate = await k8sCreate<V1Template>({
+  const cluster = getCluster(template);
+  const processedTemplate = await kubevirtK8sCreate<V1Template>({
+    cluster,
     data: { ...template, metadata: { ...template?.metadata, namespace } },
     model: ProcessedTemplatesModel,
     ns: namespace,
@@ -92,7 +96,7 @@ export const quickCreateVM: QuickCreateVMType = async ({
 
   const { objects } = replaceTemplateVM(processedTemplate, overridedVM);
 
-  const createdObjects = await createMultipleResources(objects, models, namespace);
+  const createdObjects = await createMultipleResources(objects, models, namespace, cluster);
 
   const createdVM = createdObjects.find(
     (object) => object.kind === VirtualMachineModel.kind,

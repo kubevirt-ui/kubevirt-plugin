@@ -28,13 +28,15 @@ import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { createSSHSecret } from '@kubevirt-utils/resources/secret/utils';
-import { getResourceUrl } from '@kubevirt-utils/resources/shared';
+import { getName } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
 import { useDriversImage } from '@kubevirt-utils/resources/vm/utils/disk/useDriversImage';
 import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { createHeadlessService } from '@kubevirt-utils/utils/headless-service';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
+import { getCatalogURL, getVMURL } from '@multicluster/urls';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { Checkbox, Stack, StackItem } from '@patternfly/react-core';
 
@@ -49,6 +51,7 @@ import './CreateVMFooter.scss';
 const CreateVMFooter: FC = () => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
+  const cluster = useClusterParam();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<any | Error>(null);
   const { createModal } = useModal();
@@ -83,13 +86,14 @@ const CreateVMFooter: FC = () => {
       setAuthorizedSSHKeys({ ...authorizedSSHKeys, [vmNamespaceTarget]: sshSecretName });
     }
 
-    return k8sCreate({
+    return kubevirtK8sCreate({
+      cluster,
       data: generatedVM,
       model: VirtualMachineModel,
     })
       .then(async (createdVM) => {
         if (secretOption === SecretSelectionOption.addNew) {
-          createSSHSecret(sshPubKey, sshSecretName, vmNamespaceTarget);
+          createSSHSecret(sshPubKey, sshSecretName, vmNamespaceTarget, cluster);
         }
 
         if (isWindowsOSVolume) {
@@ -102,7 +106,8 @@ const CreateVMFooter: FC = () => {
               sysprepName: name,
             });
 
-            await k8sCreate<IoK8sApiCoreV1ConfigMap>({
+            await kubevirtK8sCreate<IoK8sApiCoreV1ConfigMap>({
+              cluster,
               data: configMap,
               model: ConfigMapModel,
               ns: vmNamespaceTarget,
@@ -112,7 +117,7 @@ const CreateVMFooter: FC = () => {
 
         if (!isUDNManagedNamespace) createHeadlessService(createdVM);
 
-        navigate(getResourceUrl({ model: VirtualMachineModel, resource: createdVM }));
+        navigate(getVMURL(cluster, vmNamespaceTarget, getName(createdVM)));
 
         logITFlowEvent(CREATE_VM_SUCCEEDED, createdVM);
       })
@@ -134,7 +139,9 @@ const CreateVMFooter: FC = () => {
       logITFlowEvent(CUSTOMIZE_VM_BUTTON_CLICKED, vmSignal.value);
 
       navigate(
-        `/k8s/ns/${vmNamespaceTarget}/catalog/review/${VirtualMachineDetailsTab.Configurations}`,
+        `${getCatalogURL(cluster, vmNamespaceTarget)}/review/${
+          VirtualMachineDetailsTab.Configurations
+        }`,
       );
     } catch (err) {
       setError(err);

@@ -3,6 +3,8 @@ import * as React from 'react';
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import { getCatalogURL } from '@multicluster/urls';
 import {
   K8sResourceCommon,
   ListPageBody,
@@ -17,6 +19,7 @@ import VirtualMachineInstanceEmptyState from './components/VirtualMachineInstanc
 import useVirtualMachinesInstancesColumns from './hooks/useVirtualMachinesInstancesColumns';
 import { filters } from './utils';
 import VirtualMachinesInstancesRow from './VirtualMachinesInstancesRow';
+
 type VirtualMachinesInstancesListProps = {
   kind: string;
   namespace: string;
@@ -27,7 +30,8 @@ const VirtualMachinesInstancesList: React.FC<VirtualMachinesInstancesListProps> 
   namespace,
 }) => {
   const { t } = useKubevirtTranslation();
-  const catalogURL = `/k8s/ns/${namespace || DEFAULT_NAMESPACE}/catalog`;
+  const cluster = useClusterParam();
+  const catalogURL = getCatalogURL(cluster, namespace || DEFAULT_NAMESPACE);
 
   const [vmis, loaded, loadError] = useK8sWatchResource<V1VirtualMachineInstance[]>({
     isList: true,

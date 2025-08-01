@@ -8,7 +8,9 @@ import {
   SSHSecretDetails,
 } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { k8sCreate, k8sDelete, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sCreate, kubevirtK8sDelete } from '@multicluster/k8sRequests';
+import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 import { getName } from '../shared';
 
@@ -72,6 +74,7 @@ export const getInitialSSHDetails = ({
       };
 
 type CreateUserPasswordSecretType = (input: {
+  cluster?: string;
   namespace: string;
   password: string;
   secretName: string;
@@ -79,12 +82,14 @@ type CreateUserPasswordSecretType = (input: {
 }) => Promise<IoK8sApiCoreV1Secret>;
 
 export const createUserPasswordSecret: CreateUserPasswordSecretType = ({
+  cluster,
   namespace,
   password,
   secretName,
   username,
 }) =>
-  k8sCreate({
+  kubevirtK8sCreate({
+    cluster,
     data: {
       apiVersion: 'v1',
       data: {
@@ -106,9 +111,11 @@ export const createSSHSecret = (
   sshKey: string,
   secretName: string,
   secretNamespace: string,
+  cluster?: string,
   dryRun = false,
 ) =>
-  k8sCreate<K8sResourceCommon & { data?: { [key: string]: string } }>({
+  kubevirtK8sCreate<K8sResourceCommon & { data?: { [key: string]: string } }>({
+    cluster,
     data: {
       apiVersion: SecretModel.apiVersion,
       data: { key: encodeSecretKey(sshKey) },
@@ -124,7 +131,8 @@ export const createSSHSecret = (
 
 export const deleteSecret = (secret: IoK8sApiCoreV1Secret) =>
   secret &&
-  k8sDelete({
+  kubevirtK8sDelete({
+    cluster: getCluster(secret),
     model: SecretModel,
     resource: secret,
   });

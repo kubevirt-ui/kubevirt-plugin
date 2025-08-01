@@ -10,6 +10,7 @@ import {
   getPVC,
 } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import { getVMBootSourceType } from '@kubevirt-utils/resources/vm/utils/source';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 
 import { useWizardVMContext } from './WizardVMContext';
 
@@ -21,6 +22,7 @@ type UseWizardSourceAvailable = {
 
 export const useWizardSourceAvailable = (): UseWizardSourceAvailable => {
   const { vm } = useWizardVMContext();
+  const cluster = useClusterParam();
   const [isBootSourceAvailable, setIsBootSourceAvailable] = React.useState<boolean>(true);
   const [loaded, setLoaded] = React.useState<boolean>(true);
   const [error, setError] = React.useState<any>();
@@ -31,7 +33,7 @@ export const useWizardSourceAvailable = (): UseWizardSourceAvailable => {
 
   const getPVCSource = ({ name, namespace }: V1beta1DataVolumeSourcePVC) => {
     setLoaded(false);
-    return getPVC(name, namespace)
+    return getPVC(name, namespace, cluster)
       .then(() => {
         setIsBootSourceAvailable(true);
       })
@@ -44,7 +46,7 @@ export const useWizardSourceAvailable = (): UseWizardSourceAvailable => {
 
   const getDataSourceCondition = ({ name, namespace }: V1beta1DataVolumeSourceRef) => {
     setLoaded(false);
-    return getDataSource(name, namespace)
+    return getDataSource(name, namespace, cluster)
       .then((dataSource) => {
         if (
           dataSource?.status?.conditions?.find((c) => c.type === 'Ready' && c.status === 'True')

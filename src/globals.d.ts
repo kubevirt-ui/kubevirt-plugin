@@ -2,6 +2,12 @@ import kubevirtUITypes from '@kubevirt-ui/kubevirt-api';
 import type { V1Template as OriginalV1Template } from '@kubevirt-ui/kubevirt-api/console';
 import type { K8sResourceCommon as OriginalK8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
+declare module '@kubevirt-ui/kubevirt-api/containerized-data-importer/models' {
+  interface V1beta1DataVolume extends kubevirtUITypes.V1beta1DataVolume {
+    cluster?: string;
+  }
+}
+
 declare module '@kubevirt-ui/kubevirt-api/kubevirt' {
   interface V1VirtualMachineInstance extends kubevirtUITypes.V1VirtualMachineInstance {
     cluster?: string;

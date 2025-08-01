@@ -11,7 +11,8 @@ import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/ty
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getLabel } from '@kubevirt-utils/resources/shared';
 import { generatePrettyName } from '@kubevirt-utils/utils/utils';
-import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 
 import { getDiskSize } from '../utils/utils';
 
@@ -83,7 +84,8 @@ export const useInstanceTypeVMStore = create<InstanceTypeVMStore>()((set, get) =
       set({ startVM: checked });
     },
     setVM: async (vm) => {
-      await k8sCreate<V1VirtualMachine>({
+      await kubevirtK8sCreate<V1VirtualMachine>({
+        cluster: getCluster(vm),
         data: vm,
         model: VirtualMachineModel,
         queryParams: {

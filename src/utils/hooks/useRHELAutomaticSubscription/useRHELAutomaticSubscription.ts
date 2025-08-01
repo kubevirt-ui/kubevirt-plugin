@@ -10,13 +10,15 @@ import {
 } from '@kubevirt-utils/hooks/useFeatures/constants';
 import useFeaturesConfigMap from '@kubevirt-utils/hooks/useFeatures/useFeaturesConfigMap';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 
 import { RHELAutomaticSubscriptionFormProps } from './utils/types';
 
 type UseRHELAutomaticSubscription = () => RHELAutomaticSubscriptionFormProps;
 
 const useRHELAutomaticSubscription: UseRHELAutomaticSubscription = () => {
+  const cluster = useClusterParam();
   const {
     featuresConfigMapData: [featureConfigMap, loaded, loadError],
     isAdmin,
@@ -45,7 +47,8 @@ const useRHELAutomaticSubscription: UseRHELAutomaticSubscription = () => {
         type !== undefined ? type : draftCM.data[AUTOMATIC_SUBSCRIPTION_TYPE_KEY];
     });
 
-    k8sUpdate({
+    kubevirtK8sUpdate({
+      cluster,
       data: updatedConfigMap,
       model: ConfigMapModel,
     }).finally(() => setLoading(false));

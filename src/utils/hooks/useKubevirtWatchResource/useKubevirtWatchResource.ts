@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { K8sResourceCommon, WatchK8sResource } from '@openshift-console/dynamic-plugin-sdk';
-import { AdvancedSearchFilter } from '@stolostron/multicluster-sdk/lib/api/search/types';
+import { AdvancedSearchFilter } from '@stolostron/multicluster-sdk';
 
 import { KUBEVIRT_APISERVER_PROXY } from '../useFeatures/constants';
 import { useFeatures } from '../useFeatures/useFeatures';

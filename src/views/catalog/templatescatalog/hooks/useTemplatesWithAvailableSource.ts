@@ -8,6 +8,7 @@ import {
   useVmTemplates,
 } from '@kubevirt-utils/resources/template';
 import { getTemplateBootSourceType } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 
 import { useAvailableDataSourcesAndPVCs } from './useAvailableDataSourcesAndPVCs';
 
@@ -22,7 +23,8 @@ export const useTemplatesWithAvailableSource = ({
   onlyAvailable,
   onlyDefault,
 }: useTemplatesWithAvailableSourceProps): useTemplatesWithAvailableSourceValues => {
-  const { loaded, loadError, templates } = useVmTemplates(namespace);
+  const cluster = useClusterParam();
+  const { loaded, loadError, templates } = useVmTemplates(namespace, cluster);
   const {
     availableDatasources,
     availablePVCs,

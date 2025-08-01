@@ -1,6 +1,8 @@
 import { ServiceModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 
 import { kubevirtConsole } from './utils';
 
@@ -10,11 +12,12 @@ export const HEADLESS_SERVICE_PORT = 5434;
 
 export const createHeadlessService = async (createdVM: V1VirtualMachine) => {
   try {
-    await k8sCreate({
+    await kubevirtK8sCreate({
+      cluster: getCluster(createdVM),
       data: {
         apiVersion: ServiceModel.apiVersion,
         kind: ServiceModel.kind,
-        metadata: { name: HEADLESS_SERVICE_NAME, namespace: createdVM?.metadata?.namespace },
+        metadata: { name: HEADLESS_SERVICE_NAME, namespace: getNamespace(createdVM) },
         spec: {
           clusterIP: 'None',
           ports: [

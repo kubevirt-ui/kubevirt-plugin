@@ -1,6 +1,8 @@
 import { VirtualMachineClusterPreferenceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { Selector, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
+import { Selector } from '@openshift-console/dynamic-plugin-sdk';
 
 type UseClusterPreferences = (
   fieldSelector?: string,
@@ -8,9 +10,11 @@ type UseClusterPreferences = (
 ) => [preferences: V1beta1VirtualMachineClusterPreference[], loaded: boolean, loadError: Error];
 
 const useClusterPreferences: UseClusterPreferences = (fieldSelector, selector) => {
-  const [preferences, loaded, loadError] = useK8sWatchResource<
+  const cluster = useClusterParam();
+  const [preferences, loaded, loadError] = useK8sWatchData<
     V1beta1VirtualMachineClusterPreference[]
   >({
+    cluster,
     fieldSelector,
     groupVersionKind: VirtualMachineClusterPreferenceModelGroupVersionKind,
     isList: true,
