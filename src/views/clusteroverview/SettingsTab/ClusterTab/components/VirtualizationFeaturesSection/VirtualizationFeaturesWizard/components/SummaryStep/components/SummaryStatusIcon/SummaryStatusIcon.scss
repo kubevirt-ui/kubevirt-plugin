@@ -1,0 +1,13 @@
+.summary-status-icon {
+  &__icon {
+    margin-right: var(--pf-t--global--spacer--xs);
+  }
+
+  &__icon-margin {
+    margin-left: 50px;
+  }
+
+  &__message {
+    width: 125px;
+  }
+}

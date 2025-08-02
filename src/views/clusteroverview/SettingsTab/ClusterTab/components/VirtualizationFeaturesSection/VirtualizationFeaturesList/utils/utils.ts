@@ -1,11 +1,14 @@
-import { ElementType } from 'react';
-
+import { VirtFeatureOperatorItem } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/hooks/useVirtualizationOperators/utils/types';
 import { InstallState } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/types';
-import InstalledIcon from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/VirtualizationFeaturesList/components/icons/InstalledIcon';
 
-import NotInstalledIcon from '../components/icons/NotInstalledIcon';
+export const getOperatorHubURL = (uid: string) => `/operatorhub/all-namespaces?details-item=${uid}`;
 
-export const getInstallStateIcon = (installState: InstallState): ElementType => {
-  if (installState === InstallState.INSTALLED) return InstalledIcon;
-  return NotInstalledIcon;
+export const getInstallStatus = (operators: VirtFeatureOperatorItem[]): InstallState => {
+  const isInstalled = operators?.some((operator) => operator?.installed);
+  const isInstalling = operators?.some((operator) => operator?.isInstalling);
+
+  if (isInstalled) return InstallState.INSTALLED;
+  if (isInstalling) return InstallState.INSTALLING;
+
+  return InstallState.NOT_INSTALLED;
 };
