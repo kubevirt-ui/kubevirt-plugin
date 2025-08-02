@@ -9,6 +9,8 @@ import MoveBulkVMToFolderModal from '@kubevirt-utils/components/MoveVMToFolderMo
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getLabels, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import CrossClusterMigration from '@multicluster/components/CrossClusterMigration/CrossClusterMigration';
+import { CROSS_CLUSTER_MIGRATION_ACTION_ID } from '@multicluster/constants';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
@@ -19,6 +21,19 @@ import { deleteVM, pauseVM, restartVM, startVM, stopVM, unpauseVM } from './acti
 import { getCommonLabels, getLabelsDiffPatch, isSameNamespace } from './utils';
 
 export const BulkVirtualMachineActionFactory = {
+  crossClusterMigration: (
+    vms: V1VirtualMachine[],
+    createModal: (modal: ModalComponent) => void,
+    isDisabled: boolean,
+  ): ActionDropdownItemType => ({
+    cta: () =>
+      createModal(({ isOpen, onClose }) => (
+        <CrossClusterMigration close={onClose} isOpen={isOpen} resources={vms} />
+      )),
+    disabled: isEmpty(vms) || isDisabled,
+    id: CROSS_CLUSTER_MIGRATION_ACTION_ID,
+    label: t('Cross-cluster migration'),
+  }),
   delete: (
     vms: V1VirtualMachine[],
     createModal: (modal: ModalComponent) => void,

@@ -409,6 +409,7 @@
   "CreationTimestamp is a timestamp representing the server time when this object was created. It is not guaranteed to be set in happens-before order across separate operations. Clients may not set this value. It is represented in RFC3339 form and is in UTC.": "CreationTimestamp est un horodatage représentant l'heure de création de cet objet sur le serveur. Il n'est pas garanti qu'il soit défini dans l'ordre d'apparition avant pour les différentes opérations. Les clients ne peuvent pas définir cette valeur. Elle est représentée au format RFC3339 et est exprimée en UTC.",
   "Critical": "Critique",
   "Cron expression": "Expression Cron",
+  "Cross-cluster migration": "Cross-cluster migration",
   "Cross-cluster migration is not supported on this cluster.": "Cross-cluster migration is not supported on this cluster.",
   "current": "en cours",
   "Custom": "Personnalisé",
