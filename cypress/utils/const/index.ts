@@ -1,8 +1,11 @@
+export const adminOnlyDescribe = Cypress.env('NON_PRIV') ? xdescribe : describe;
+export const adminOnlyIT = Cypress.env('NON_PRIV') ? xit : it;
+export const nonPrivIT = Cypress.env('NON_PRIV') ? it : xit;
 export const dsIT = Cypress.env('DOWNSTREAM') ? it : xit;
-export const QUICK_VM_IT_NAME = 'vm-it-quick';
-export const CUST_VM_IT_NAME = 'vm-it-custom';
-export const QUICK_VM_TMPL_NAME = 'vm-template-quick';
-export const CUST_VM_TMPL_NAME = 'vm-template-custom';
+export const VM_IT_NAME = 'vm-it-quick';
+export const VM_IT_CUST_NAME = 'vm-it-custom';
+export const VM_TMPL_NAME = 'vm-template-quick';
+export const VM_TMPL_CUST_NAME = 'vm-template-custom';
 export const TEST_NS = 'auto-test-ns';
 export const OCP_NS = 'openshift'; // use default can reduce flaky
 export const TEST_PVC_NAME = 'auto-test-pvc';

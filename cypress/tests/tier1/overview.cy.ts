@@ -1,1 +1,11 @@
+import '../setup/login.cy.ts';
+import './overview/overview.cy.ts';
+import './overview/quickstarts.cy.ts';
+import './overview/topconsumers.cy.ts';
+import './overview/migrations.cy.ts';
 import './overview/settings-cluster-general.cy.ts';
+import './overview/settings-cluster-guest.cy.ts';
+import './overview/settings-cluster-resource.cy.ts';
+import './overview/settings-cluster-scsi.cy.ts';
+import './overview/settings-user.cy.ts';
+import './overview/settings-preview.cy.ts';

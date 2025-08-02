@@ -11,7 +11,7 @@ module.exports = defineConfig({
     setupNodeEvents(on, config) {
       return require('./plugin.js')(on, config);
     },
-    specPattern: 'tests/*.cy.{js,jsx,ts,tsx}',
+    specPattern: 'tests/**/*.cy.{js,jsx,ts,tsx}',
     supportFile: 'support/index.ts',
     testIsolation: false,
   },
