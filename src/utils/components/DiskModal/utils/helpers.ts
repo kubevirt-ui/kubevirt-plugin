@@ -181,8 +181,7 @@ export const produceVMDisks = (
   });
 };
 
-export const getDefaultDiskType = (isVMRunning: boolean): InterfaceTypes =>
-  isVMRunning ? InterfaceTypes.SCSI : InterfaceTypes.VIRTIO;
+export const getDefaultDiskType = InterfaceTypes.VIRTIO;
 
 export const doesSourceRequireDataVolume = (diskSource: SourceTypes): boolean => {
   return [
