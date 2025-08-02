@@ -145,3 +145,11 @@ export const action = {
     cy.byLegacyTestID(UNPAUSE).click();
   },
 };
+
+export const checkActionMenu = (item: string) => {
+  cy.byButtonText('Actions').click();
+  cy.contains('button', 'Edit labels').should('exist');
+  cy.contains('button', 'Edit annotations').should('exist');
+  cy.contains('button', `Edit ${item}`).should('exist');
+  cy.contains('button', `Delete ${item}`).should('exist');
+};
