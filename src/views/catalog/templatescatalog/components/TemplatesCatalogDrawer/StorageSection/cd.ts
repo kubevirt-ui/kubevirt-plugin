@@ -9,7 +9,7 @@ import {
 import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { ensurePath, removeDockerPrefix } from '@kubevirt-utils/utils/utils';
 
-import { INSTALLATION_CDROM_DISK, INSTALLATION_CDROM_NAME } from './constants';
+import { createInstallationCdromDisk, INSTALLATION_CDROM_NAME } from './constants';
 
 export const addInstallationCDRom = (
   virtualMachine: V1VirtualMachine,
@@ -72,7 +72,9 @@ export const addInstallationCDRom = (
       }));
 
     if (!getDisks(draftVM)?.find((disk) => disk.name === INSTALLATION_CDROM_NAME))
-      draftVM.spec.template.spec.domain.devices.disks.push(INSTALLATION_CDROM_DISK);
+      draftVM.spec.template.spec.domain.devices.disks.push(
+        createInstallationCdromDisk(draftVM.spec.template.spec.architecture),
+      );
 
     const otherVolumes = (getVolumes(draftVM) || [])?.filter(
       (volume) => volume.name !== INSTALLATION_CDROM_NAME,

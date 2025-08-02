@@ -39,13 +39,18 @@ export const DISK_SOURCES_WITH_DEFAULT: SOURCE_OPTIONS_IDS[] = [
 
 export const INSTALLATION_CDROM_NAME = 'installation-cdrom';
 
-export const INSTALLATION_CDROM_DISK: V1Disk = {
-  bootOrder: 1,
-  cdrom: {
-    bus: InterfaceTypes.SATA,
-  },
-  name: INSTALLATION_CDROM_NAME,
+export const createInstallationCdromDisk = (arch: string): V1Disk => {
+  // s390x architecture does not support SATA
+  const busType: InterfaceTypes = arch === 's390x' ? InterfaceTypes.SCSI : InterfaceTypes.SATA;
+  return {
+    bootOrder: 1,
+    cdrom: {
+      bus: busType,
+    },
+    name: INSTALLATION_CDROM_NAME,
+  };
 };
+
 export const CUSTOMIZE_TEMPLATE_TITLE = t('Customize template parameters');
 
 export const sourceOptions = {
