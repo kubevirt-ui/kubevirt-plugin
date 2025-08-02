@@ -2,7 +2,7 @@ import { Disk, NIC } from '../types/vm';
 import { MINUTE } from '../utils/const/index';
 import { addDiskTxt } from '../utils/const/string';
 
-import { nameInput } from './actions';
+import { nameInput, tabModal } from './actions';
 import { menuItemText } from './selector-instance';
 import { diskSelect } from './selector-template';
 import { getRow } from './vm-flow';
@@ -96,7 +96,9 @@ export const addDisk = (disk: Disk) => {
     cy.contains('Advanced settings').click();
     cy.get('input[id="lun-reservation"]').scrollIntoView().check();
   }
-  cy.clickSaveBtn();
+  cy.get(tabModal).within(() => {
+    cy.clickSaveBtn();
+  });
   cy.contains('h1', addDiskTxt, { timeout: MINUTE * 3 }).should('not.exist');
 };
 

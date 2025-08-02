@@ -1,10 +1,11 @@
 import { VirtualMachineData } from '../types/vm';
 import * as index from '../utils/const/index';
 
+import { action, DELETE } from './actions';
 import * as catalog from './catalog-flow';
 import * as instance from './instance-flow';
 import * as cView from './selector-catalog';
-import { vmStatusOnList, vmStatusTop } from './selector-common';
+import { kebabBtn, vmStatusOnList, vmStatusTop } from './selector-common';
 import * as iView from './selector-instance';
 import { tab } from './tab';
 
@@ -172,6 +173,18 @@ export const vm = {
       cy.wait(3000);
     }
   },
+  delete: (vmName: string, gracePeriod?: string, skipDeleteDisk?: boolean) => {
+    getRow(vmName, () => cy.get(kebabBtn).click());
+    cy.byLegacyTestID(DELETE).click();
+    if (gracePeriod) {
+      cy.get('input[id="grace-period-checkbox"]').check();
+      cy.get('input[data-test="grace-period-seconds-input"]').clear().type(gracePeriod);
+    }
+    if (skipDeleteDisk) {
+      cy.get('input[id="delete-owned-resources"]').uncheck();
+    }
+    cy.byButtonText('Delete').click();
+  },
   instanceCreate: (vmData: VirtualMachineData, waitForRunning = true) => {
     cy.visitCatalog(); // navigate back
     instance.fillInstanceType(vmData);
@@ -186,6 +199,14 @@ export const vm = {
       checkStatus(vmData.name, index.VM_STATUS.Running, 3 * index.MINUTE, false);
       // wait for vmi appear
       cy.wait(3000);
+    }
+  },
+  migrate: (vmName: string, waitForComplete = true) => {
+    waitForStatus(vmName, index.VM_STATUS.Running);
+    action.migrate(vmName);
+    if (waitForComplete) {
+      waitForStatus(vmName, index.VM_STATUS.Migrating);
+      waitForStatus(vmName, index.VM_STATUS.Running);
     }
   },
 };
