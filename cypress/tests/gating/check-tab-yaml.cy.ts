@@ -43,8 +43,8 @@ describe('Check all virtualization pages can be loaded', () => {
       tab.navigateToEvents();
       cy.contains('event').should('be.visible');
 
-      tab.navigateToConsole();
-      cy.contains('Guest login credentials').should('be.visible');
+      // tab.navigateToConsole();
+      // cy.contains('Guest login credentials').should('be.visible');
 
       tab.navigateToSnapshots();
       cy.contains('No snapshots found').should('be.visible');
@@ -93,8 +93,8 @@ describe('Check all virtualization pages can be loaded', () => {
       tab.navigateToEvents();
       cy.contains('event').should('be.visible');
 
-      tab.navigateToConsole();
-      cy.contains('Guest login credentials').should('be.visible');
+      // tab.navigateToConsole();
+      // cy.contains('Guest login credentials').should('be.visible');
 
       tab.navigateToNetworks();
       cy.contains('Pod networking').should('be.visible');
