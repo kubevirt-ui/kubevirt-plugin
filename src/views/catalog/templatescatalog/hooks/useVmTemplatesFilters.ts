@@ -19,6 +19,7 @@ export const useTemplatesFilters = (): [
 
   const [filters, setFilters] = useState<TemplateFilters>({
     [CATALOG_FILTERS.ALL_ITEMS]: params.get(CATALOG_FILTERS.ONLY_DEFAULT) === 'false',
+    [CATALOG_FILTERS.ARCHITECTURE]: new Set([...params.getAll(CATALOG_FILTERS.ARCHITECTURE)]),
     [CATALOG_FILTERS.HIDE_DEPRECATED_TEMPLATES]:
       params.get(CATALOG_FILTERS.HIDE_DEPRECATED_TEMPLATES) === 'true',
     [CATALOG_FILTERS.IS_LIST]: params.get(CATALOG_FILTERS.IS_LIST) === 'true',
@@ -103,6 +104,7 @@ export const useTemplatesFilters = (): [
   const clearAll = () => {
     setFilters({
       [CATALOG_FILTERS.ALL_ITEMS]: false,
+      [CATALOG_FILTERS.ARCHITECTURE]: new Set(),
       [CATALOG_FILTERS.HIDE_DEPRECATED_TEMPLATES]: true,
       [CATALOG_FILTERS.IS_LIST]: filters.isList,
       [CATALOG_FILTERS.NAMESPACE]: '',

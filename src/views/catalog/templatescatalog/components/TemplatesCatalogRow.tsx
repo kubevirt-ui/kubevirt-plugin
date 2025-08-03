@@ -1,7 +1,8 @@
-import * as React from 'react';
+import React, { FC, memo } from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import ArchitectureLabel from '@kubevirt-utils/components/ArchitectureLabel/ArchitectureLabel';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotation, getName } from '@kubevirt-utils/resources/shared';
 import {
@@ -13,6 +14,7 @@ import {
 } from '@kubevirt-utils/resources/template';
 import { getTemplateBootSourceType } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import { getVMBootSourceLabel } from '@kubevirt-utils/resources/vm/utils/source';
+import { ARCHITECTURE_ID, getArchitecture } from '@kubevirt-utils/utils/architecture';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
@@ -22,7 +24,7 @@ import { getTemplateOSIcon } from '../utils/os-icons';
 
 import TemplateRowAvailableSource from './TemplateRowAvailableSource/TemplateRowAvailableSource';
 
-export const TemplatesCatalogRow: React.FC<
+export const TemplatesCatalogRow: FC<
   RowProps<
     V1Template,
     {
@@ -31,7 +33,7 @@ export const TemplatesCatalogRow: React.FC<
       onTemplateClick: (template: V1Template) => void;
     }
   >
-> = React.memo(
+> = memo(
   ({
     activeColumnIDs,
     obj,
@@ -58,6 +60,9 @@ export const TemplatesCatalogRow: React.FC<
               </Label>
             )}
           </Button>
+        </TableData>
+        <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-10" id={ARCHITECTURE_ID}>
+          <ArchitectureLabel architecture={getArchitecture(obj)} />
         </TableData>
         <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-10" id="workload">
           {WORKLOADS_LABELS?.[workload]}

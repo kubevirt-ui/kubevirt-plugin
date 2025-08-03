@@ -75,21 +75,12 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
     const credentialsValid = (username && password) || (!username && !password);
 
     return !!(registryURL && credentialsValid);
-  }, [sourceType, bootableVolume.registryURL, bootableVolume.registryCredentials]);
+  }, [sourceType, bootableVolume]);
 
   const isFormValid = useMemo(() => {
     const hasRequiredPreference = !!labels?.[DEFAULT_PREFERENCE_LABEL];
     return hasRequiredPreference && isRegistryFormValid;
   }, [labels, isRegistryFormValid]);
-
-  const deleteLabel = (labelKey: string) => {
-    setBootableVolume((prev) => {
-      const updatedLabels = { ...prev?.labels };
-      delete updatedLabels[labelKey];
-
-      return { ...prev, labels: updatedLabels };
-    });
-  };
 
   const resetDiskSize = () => setBootableVolumeField('size')(initialBootableVolumeState.size);
 
@@ -152,7 +143,6 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
         </Title>
         <VolumeMetadata
           bootableVolume={bootableVolume}
-          deleteLabel={deleteLabel}
           setBootableVolumeField={setBootableVolumeField}
         />
       </Form>

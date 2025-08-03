@@ -17,6 +17,7 @@ import {
   isDefaultVariantTemplate,
 } from '@kubevirt-utils/resources/template/utils/selectors';
 import { getCPUSockets, getMemory } from '@kubevirt-utils/resources/vm';
+import { getArchitecture } from '@kubevirt-utils/utils/architecture';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 
 import { TemplateFilters } from './types';
@@ -49,6 +50,9 @@ export const filterTemplates = (
 
         const osNameFilter = filters?.osName?.size <= 0 || filters?.osName?.has(getTemplateOS(tmp));
 
+        const architectureFilter =
+          filters?.architecture?.size <= 0 || filters?.architecture?.has(getArchitecture(tmp));
+
         const hideDeprecatedTemplatesFilter =
           !filters?.hideDeprecatedTemplates || !isDeprecatedTemplate(tmp);
 
@@ -58,6 +62,7 @@ export const filterTemplates = (
           textFilter &&
           workloadFilter &&
           osNameFilter &&
+          architectureFilter &&
           hideDeprecatedTemplatesFilter
         );
       })
