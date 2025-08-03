@@ -1,11 +1,11 @@
-import { SECOND, VM_ACTION, VM_STATUS } from '../../../utils/const/index';
-import { VM_IT_CUST, VM_TMPL_CUST } from '../../../utils/const/testVM';
-import { BULK_MIGRATE, getRow } from '../../../views/actions';
-import { storageclassMigrate } from '../../../views/migrate-modal';
-import * as nav from '../../../views/selector';
-import { selectAllDropdownOption, selectDropdownToggle } from '../../../views/selector-common';
-import { tab } from '../../../views/tab';
-import { waitForStatus } from '../../../views/vm-flow';
+import { SECOND, VM_ACTION, VM_STATUS } from '../../utils/const/index';
+import { VM_IT_CUST, VM_TMPL_CUST } from '../../utils/const/testVM';
+import { BULK_MIGRATE, getRow } from '../../views/actions';
+import { storageclassMigrate } from '../../views/migrate-modal';
+import * as nav from '../../views/selector';
+import { selectAllDropdownOption, selectDropdownToggle } from '../../views/selector-common';
+import { tab } from '../../views/tab';
+import { waitForStatus } from '../../views/vm-flow';
 
 const DESTINATION_STORAGE_CLASS = 'hostpath-csi-basic';
 const VM_NAMES = [VM_IT_CUST.name, VM_TMPL_CUST.name];
