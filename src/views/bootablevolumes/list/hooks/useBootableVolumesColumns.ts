@@ -5,6 +5,11 @@ import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-ap
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
+import {
+  ARCHITECTURE_ID,
+  ARCHITECTURE_LABEL,
+  ARCHITECTURE_TITLE,
+} from '@kubevirt-utils/utils/architecture';
 import { columnSorting } from '@kubevirt-utils/utils/utils';
 import {
   K8sResourceCommon,
@@ -37,6 +42,13 @@ const useBootableVolumesColumns = (
         props: { className: 'pf-m-width-20' },
         sort: (_, direction) => sorting(direction, 'metadata.name'),
         title: t('Name'),
+        transforms: [sortable],
+      },
+      {
+        id: ARCHITECTURE_ID,
+        props: { className: 'pf-m-width-10' },
+        sort: (_, direction) => sorting(direction, `metadata.labels.[${ARCHITECTURE_LABEL}]`),
+        title: ARCHITECTURE_TITLE,
         transforms: [sortable],
       },
       ...(namespace === ALL_NAMESPACES_SESSION_KEY

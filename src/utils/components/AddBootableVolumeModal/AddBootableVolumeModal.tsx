@@ -75,7 +75,7 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
     const credentialsValid = (username && password) || (!username && !password);
 
     return !!(registryURL && credentialsValid);
-  }, [sourceType, bootableVolume.registryURL, bootableVolume.registryCredentials]);
+  }, [sourceType, bootableVolume]);
 
   const isFormValid = useMemo(() => {
     const hasRequiredPreference = !!labels?.[DEFAULT_PREFERENCE_LABEL];

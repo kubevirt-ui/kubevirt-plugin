@@ -38,6 +38,7 @@ import {
   UDN_BINDING_NAME,
 } from '@kubevirt-utils/resources/vm/utils/constants';
 import { OS_WINDOWS_PREFIX } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
+import { getArchitecture, NODE_ARCHITECTURE_LABEL } from '@kubevirt-utils/utils/architecture';
 import {
   HEADLESS_SERVICE_LABEL,
   HEADLESS_SERVICE_NAME,
@@ -146,6 +147,8 @@ export const generateVM: GenerateVMCallback = ({
     ? ({ binding: { name: UDN_BINDING_NAME }, name: DEFAULT_NETWORK_INTERFACE.name } as V1Interface)
     : DEFAULT_NETWORK_INTERFACE;
 
+  const volumeArchitecture = getArchitecture(selectedBootableVolume);
+
   let emptyVM: V1VirtualMachine = {
     apiVersion: `${VirtualMachineModel.apiGroup}/${VirtualMachineModel.apiVersion}`,
     kind: VirtualMachineModel.kind,
@@ -202,6 +205,11 @@ export const generateVM: GenerateVMCallback = ({
           labels: {},
         },
         spec: {
+          ...(!isEmpty(volumeArchitecture) && {
+            nodeSelector: {
+              [NODE_ARCHITECTURE_LABEL]: volumeArchitecture,
+            },
+          }),
           domain: {
             devices: {
               autoattachPodInterface: false,

@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import ArchitectureLabel from '@kubevirt-utils/components/ArchitectureLabel/ArchitectureLabel';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isDeprecatedTemplate } from '@kubevirt-utils/resources/template';
+import { ARCHITECTURE_ID, getArchitecture } from '@kubevirt-utils/utils/architecture';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 import { Label } from '@patternfly/react-core';
 
@@ -33,7 +35,7 @@ const VirtualMachineTemplatesRow: React.FC<
 
   return (
     <>
-      <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-30" id="name">
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-20" id="name">
         <ResourceLink
           onClick={() =>
             navigate(`/k8s/ns/${obj.metadata.namespace}/templates/${obj.metadata.name}`)
@@ -44,6 +46,9 @@ const VirtualMachineTemplatesRow: React.FC<
         />
 
         {isDeprecatedTemplate(obj) && <Label isCompact>{t('Deprecated')}</Label>}
+      </TableData>
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-10" id={ARCHITECTURE_ID}>
+        <ArchitectureLabel architecture={getArchitecture(obj)} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="namespace">
         <ResourceLink kind="Namespace" name={obj.metadata.namespace} />
