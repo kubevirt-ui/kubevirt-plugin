@@ -1,4 +1,7 @@
+import { useMemo } from 'react';
+
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
+import useHcoWorkloadArchitectures from '@kubevirt-utils/hooks/useHcoWorkloadArchitectures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   ISO,
@@ -12,13 +15,28 @@ import {
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { OS_NAMES } from '@kubevirt-utils/resources/template';
-import { getItemNameWithOther } from '@kubevirt-utils/utils/utils';
+import {
+  ARCHITECTURE_ID,
+  ARCHITECTURE_TITLE,
+  getArchitecture,
+} from '@kubevirt-utils/utils/architecture';
+import { getItemNameWithOther, includeFilter } from '@kubevirt-utils/utils/utils';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
 import { getBootVolumeOS } from '../utils/utils';
 
 const useBootVolumeFilters = (isModal: boolean): RowFilter<BootableVolume>[] => {
   const { t } = useKubevirtTranslation();
+
+  const workloadsArchitectures = useHcoWorkloadArchitectures();
+  const workloadsArchitecturesItems = useMemo(
+    () =>
+      workloadsArchitectures.map((arch) => ({
+        id: arch,
+        title: arch,
+      })),
+    [workloadsArchitectures],
+  );
 
   return [
     {
@@ -33,6 +51,14 @@ const useBootVolumeFilters = (isModal: boolean): RowFilter<BootableVolume>[] => 
       ],
       reducer: (obj) => isDeprecated(getName(obj)) && SHOW_DEPRECATED_BOOTABLE_VOLUMES_LABEL,
       type: SHOW_DEPRECATED_BOOTABLE_VOLUMES,
+    },
+    {
+      filter: (availableArchitectures, obj) =>
+        includeFilter(availableArchitectures, workloadsArchitecturesItems, getArchitecture(obj)),
+      filterGroupName: ARCHITECTURE_TITLE,
+      items: workloadsArchitecturesItems,
+      reducer: (obj) => getItemNameWithOther(getArchitecture(obj), workloadsArchitecturesItems),
+      type: ARCHITECTURE_ID,
     },
     {
       filter: (availableOsNames, obj) => {

@@ -7,20 +7,16 @@ import { FormGroup, TextInput } from '@patternfly/react-core';
 
 import { AddBootableVolumeState, SetBootableVolumeFieldType } from '../../utils/constants';
 
+import ArchitectureSelect from './components/ArchitectureSelect/ArchitectureSelect';
 import { InstanceTypeDrilldownSelect } from './components/InstanceTypeDrilldownSelect/InstanceTypeDrilldownSelect';
 import PreferenceSelect from './components/PreferenceSelect/PreferenceSelect';
 
 type VolumeMetadataProps = {
   bootableVolume: AddBootableVolumeState;
-  deleteLabel: (labelKey: string) => void;
   setBootableVolumeField: SetBootableVolumeFieldType;
 };
 
-const VolumeMetadata: FC<VolumeMetadataProps> = ({
-  bootableVolume,
-  deleteLabel,
-  setBootableVolumeField,
-}) => {
+const VolumeMetadata: FC<VolumeMetadataProps> = ({ bootableVolume, setBootableVolumeField }) => {
   const { t } = useKubevirtTranslation();
 
   const { annotations, labels } = bootableVolume || {};
@@ -29,7 +25,6 @@ const VolumeMetadata: FC<VolumeMetadataProps> = ({
     <>
       <PreferenceSelect
         bootableVolume={bootableVolume}
-        deleteLabel={deleteLabel}
         setBootableVolumeField={setBootableVolumeField}
       />
 
@@ -37,6 +32,10 @@ const VolumeMetadata: FC<VolumeMetadataProps> = ({
         selected={labels?.[DEFAULT_INSTANCETYPE_LABEL]}
         setBootableVolumeField={setBootableVolumeField}
         setSelected={setBootableVolumeField('labels', DEFAULT_INSTANCETYPE_LABEL)}
+      />
+      <ArchitectureSelect
+        bootableVolumeState={bootableVolume}
+        setBootableVolumeField={setBootableVolumeField}
       />
       <FormGroup label={t('Description')}>
         <TextInput
