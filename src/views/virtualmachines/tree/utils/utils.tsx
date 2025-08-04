@@ -102,6 +102,7 @@ const createFolderTreeItems = (
   project: string,
   currentPageVMName: string,
   treeViewDataMap: Record<string, TreeViewDataItemWithHref>,
+  queryParams?: string,
   cluster?: string,
 ): TreeViewDataItemWithHref[] =>
   Object.entries(folders).map(([folder, vmItems]) => {
@@ -113,7 +114,7 @@ const createFolderTreeItems = (
       children: vmItems,
       defaultExpanded: folderExpanded,
       expandedIcon: <FolderOpenIcon />,
-      href: getVMListNamespacesURL(cluster, project),
+      href: `${getVMListNamespacesURL(cluster, project)}${queryParams || ''}`,
       icon: <FolderIcon />,
       id: folderTreeItemID,
       name: folder,
@@ -132,6 +133,7 @@ const createProjectTreeItem = (
   currentPageVMName: string,
   currentPageNamespace: string,
   treeViewDataMap: Record<string, TreeViewDataItemWithHref>,
+  queryParams?: string,
   cluster?: string,
   clusterSelected = true,
 ): TreeViewDataItemWithHref => {
@@ -140,6 +142,7 @@ const createProjectTreeItem = (
     project,
     currentPageVMName,
     treeViewDataMap,
+    queryParams,
     cluster,
   );
 
@@ -152,9 +155,9 @@ const createProjectTreeItem = (
   const projectTreeItemID = `${PROJECT_SELECTOR_PREFIX}/${project}`;
   const projectTreeItem: TreeViewDataItemWithHref = {
     children: projectChildren,
-    customBadgeContent: projectMap[project]?.count || 0,
+    customBadgeContent: projectMap[project]?.count || '0',
     defaultExpanded: currentPageNamespace === project && clusterSelected,
-    href: getVMListNamespacesURL(cluster, project),
+    href: `${getVMListNamespacesURL(cluster, project)}${queryParams || ''}`,
     icon: <ProjectDiagramIcon />,
     id: projectTreeItemID,
     name: project,
@@ -171,6 +174,7 @@ const createAllNamespacesTreeItem = (
   treeViewData: TreeViewDataItemWithHref[],
   treeViewDataMap: Record<string, TreeViewDataItemWithHref>,
   projectMap: Record<string, any>,
+  queryParams?: string,
   cluster?: string,
 ): TreeViewDataItemWithHref => {
   const allVMsCount = Object.keys(projectMap).reduce((acc, ns) => {
@@ -182,7 +186,7 @@ const createAllNamespacesTreeItem = (
     children: treeViewData,
     customBadgeContent: allVMsCount || '0',
     defaultExpanded: true,
-    href: getVMListURL(cluster),
+    href: `${getVMListURL(cluster)}${queryParams || ''}`,
     icon: <ProjectDiagramIcon />,
     id: ALL_NAMESPACES_SESSION_KEY,
     name: ALL_PROJECTS,
@@ -220,6 +224,7 @@ const createSingleClusterTreeViewData = (
   isAdmin: boolean,
   pathname: string,
   foldersEnabled: boolean,
+  queryParams: string,
 ): TreeViewDataItem[] => {
   const { currentVMTab, vmName, vmNamespace } = getVMInfoFromPathname(pathname);
 
@@ -236,11 +241,11 @@ const createSingleClusterTreeViewData = (
   );
 
   const treeViewData = projectsToShow.map((project) =>
-    createProjectTreeItem(project, projectMap, vmName, vmNamespace, treeViewDataMap),
+    createProjectTreeItem(project, projectMap, vmName, vmNamespace, treeViewDataMap, queryParams),
   );
 
   const allNamespacesTreeItem = isAdmin
-    ? createAllNamespacesTreeItem(treeViewData, treeViewDataMap, projectMap)
+    ? createAllNamespacesTreeItem(treeViewData, treeViewDataMap, projectMap, queryParams)
     : null;
 
   treeDataMap.value = treeViewDataMap;
@@ -266,6 +271,7 @@ const createMultiClusterTreeViewData = (
   vms: V1VirtualMachine[],
   pathname: string,
   foldersEnabled: boolean,
+  queryParams?: string,
   clusterNames?: string[],
 ): TreeViewDataItem[] => {
   const { currentVMTab, vmCluster, vmName, vmNamespace } = getVMInfoFromPathname(pathname);
@@ -303,6 +309,7 @@ const createMultiClusterTreeViewData = (
           vmName,
           vmNamespace,
           treeViewDataMap,
+          queryParams,
           clusterName,
           clusterSelected,
         ),
@@ -349,6 +356,7 @@ export type CreateTreeViewDataParams = (params: {
   isAdmin: boolean;
   pathname: string;
   projectNames: string[];
+  queryParams: string;
   vms: V1VirtualMachine[];
 }) => TreeViewDataItem[];
 
@@ -359,13 +367,21 @@ export const createTreeViewData: CreateTreeViewDataParams = ({
   isAdmin,
   pathname,
   projectNames,
+  queryParams,
   vms,
 }) => {
   if (isACMTreeView) {
-    return createMultiClusterTreeViewData(vms, pathname, foldersEnabled, clusterNames);
+    return createMultiClusterTreeViewData(vms, pathname, foldersEnabled, queryParams, clusterNames);
   }
 
-  return createSingleClusterTreeViewData(projectNames, vms, isAdmin, pathname, foldersEnabled);
+  return createSingleClusterTreeViewData(
+    projectNames,
+    vms,
+    isAdmin,
+    pathname,
+    foldersEnabled,
+    queryParams,
+  );
 };
 
 export const filterItems = (item: TreeViewDataItem, input: string) => {
