@@ -553,7 +553,7 @@
   "Edit disk": "Modifier le disque",
   "Edit Display name": "Modifier le nom d'affichage",
   "Edit hostname": "Modifier le nom d'hôte",
-  "Edit Instance Type": "Modifier le type d'instance",
+  "Edit InstanceType": "Edit InstanceType",
   "Edit labels": "Modifier les étiquettes",
   "Edit Labels": "Modifier les étiquettes",
   "Edit MigrationPolicy": "Supprimer la police de migration ?",

@@ -545,7 +545,7 @@
   "Edit disk": "编辑磁盘",
   "Edit Display name": "编辑显示名称",
   "Edit hostname": "编辑主机名",
-  "Edit Instance Type": "编辑实例类型",
+  "Edit InstanceType": "Edit InstanceType",
   "Edit labels": "编辑标签",
   "Edit Labels": "编辑标签",
   "Edit MigrationPolicy": "编辑 MigrationPolicy",

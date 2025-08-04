@@ -545,7 +545,7 @@
   "Edit disk": "ディスクの編集",
   "Edit Display name": "表示名の編集",
   "Edit hostname": "ホスト名の編集",
-  "Edit Instance Type": "インスタンスタイプの編集",
+  "Edit InstanceType": "Edit InstanceType",
   "Edit labels": "ラベルの編集",
   "Edit Labels": "ラベルの編集",
   "Edit MigrationPolicy": "MigrationPolicy の編集",
