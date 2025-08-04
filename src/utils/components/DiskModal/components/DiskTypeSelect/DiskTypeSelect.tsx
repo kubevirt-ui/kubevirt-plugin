@@ -12,7 +12,6 @@ import {
 import { getDiskDrive } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
 import { FormGroup, SelectList, SelectOption } from '@patternfly/react-core';
 
-import { getDefaultDiskType } from '../../utils/helpers';
 import { InterfaceTypes, V1DiskFormState } from '../../utils/types';
 import { DISKTYPE_SELECT_FIELDID } from '../utils/constants';
 
@@ -30,8 +29,7 @@ const DiskTypeSelect: FC<DiskTypeSelectProps> = ({ isVMRunning }) => {
 
   const diskType = getDiskDrive(diskState.disk);
 
-  const defaultInterface = getDefaultDiskType(isVMRunning);
-  const diskInterface = diskState.disk?.[diskType]?.bus || defaultInterface;
+  const diskInterface = diskState.disk?.[diskType]?.bus || InterfaceTypes.VIRTIO;
 
   return (
     <div data-test-id={DISKTYPE_SELECT_FIELDID}>
@@ -68,7 +66,7 @@ const DiskTypeSelect: FC<DiskTypeSelectProps> = ({ isVMRunning }) => {
           </SelectList>
         </FormPFSelect>
         <FormGroupHelperText>
-          {t('Hot plug is enabled only for "Disk" and "Lun" types')}
+          {t('Hot plug is enabled only for Disk and Lun types')}
         </FormGroupHelperText>
       </FormGroup>
     </div>

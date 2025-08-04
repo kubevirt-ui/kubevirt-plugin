@@ -26,7 +26,7 @@ import { ensurePath, getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 import { addPersistentVolume, removeVolume } from '@virtualmachines/actions/actions';
 
-import { InterfaceTypes, SourceTypes, V1DiskFormState } from './types';
+import { SourceTypes, V1DiskFormState } from './types';
 
 export const getEmptyVMDataVolumeResource = (
   vm: V1VirtualMachine,
@@ -180,9 +180,6 @@ export const produceVMDisks = (
     updateDisks(draftVM);
   });
 };
-
-export const getDefaultDiskType = (isVMRunning: boolean): InterfaceTypes =>
-  isVMRunning ? InterfaceTypes.SCSI : InterfaceTypes.VIRTIO;
 
 export const doesSourceRequireDataVolume = (diskSource: SourceTypes): boolean => {
   return [

@@ -13,11 +13,10 @@ import {
   getVolumes,
 } from '@kubevirt-utils/resources/vm';
 import { generatePrettyName, isEmpty } from '@kubevirt-utils/utils/utils';
-import { isRunning } from '@virtualmachines/utils';
 
 import { DEFAULT_DISK_SIZE } from './constants';
-import { createDataVolumeName, doesSourceRequireDataVolume, getDefaultDiskType } from './helpers';
-import { DefaultFormValues, SourceTypes, V1DiskFormState } from './types';
+import { createDataVolumeName, doesSourceRequireDataVolume } from './helpers';
+import { DefaultFormValues, InterfaceTypes, SourceTypes, V1DiskFormState } from './types';
 
 const getDefaultDataVolumeTemplate = (name: string): V1DataVolumeTemplateSpec => ({
   metadata: { name },
@@ -93,7 +92,7 @@ export const getDefaultCreateValues = (
   return {
     dataVolumeTemplate,
     disk: {
-      disk: { bus: getDefaultDiskType(isRunning(vm)) },
+      disk: { bus: InterfaceTypes.VIRTIO },
       name: newDiskName,
     },
     isBootSource: false,
