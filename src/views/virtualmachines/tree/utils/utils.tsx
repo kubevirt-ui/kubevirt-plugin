@@ -189,7 +189,7 @@ const createAllNamespacesTreeItem = (
   return allNamespacesTreeItem;
 };
 
-const getVMInfoFromPathname = (pathname: string) => {
+export const getVMInfoFromPathname = (pathname: string) => {
   const splitPathname = pathname.split('/');
   const isACMTreeView = isACMPath(pathname);
 
