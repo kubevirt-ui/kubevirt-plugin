@@ -12,8 +12,10 @@ import { V1beta1DataVolumeSource } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { KUBEVIRT_ISO_LABEL } from '@kubevirt-utils/resources/bootableresources/constants';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
+import { createUserPasswordSecret } from '@kubevirt-utils/resources/secret/utils';
 import { buildOwnerReference, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { DATA_SOURCE_CRONJOB_LABEL } from '@kubevirt-utils/resources/template';
+import { MAX_K8S_NAME_LENGTH } from '@kubevirt-utils/utils/constants';
 import { appendDockerPrefix, getRandomChars } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sCreate, kubevirtK8sDelete } from '@multicluster/k8sRequests';
 
@@ -259,11 +261,27 @@ export const createDataSourceWithImportCron: CreateDataSourceWithImportCronType 
     bootableVolumeCluster,
     bootableVolumeName,
     cronExpression,
+    registryCredentials,
     registryURL,
     retainRevisions,
     size,
     storageClassName,
   } = bootableVolume;
+
+  const { password, username } = registryCredentials || {};
+  const addRegistrySecret = !!(username && password);
+  const imageSecretName = addRegistrySecret
+    ? `${bootableVolumeName}-registry-secret-${getRandomChars()}`.substring(0, MAX_K8S_NAME_LENGTH)
+    : null;
+
+  if (addRegistrySecret) {
+    await createUserPasswordSecret({
+      namespace: getNamespace(initialDataSource),
+      password,
+      secretName: imageSecretName,
+      username,
+    });
+  }
 
   const dataImportCronName = `${bootableVolumeName}-import-cron-${getRandomChars()}`;
   const dataImportCron = produce(initialDataImportCron, (draft) => {
@@ -279,6 +297,7 @@ export const createDataSourceWithImportCron: CreateDataSourceWithImportCronType 
           source: {
             registry: {
               url: appendDockerPrefix(registryURL),
+              ...(addRegistrySecret && { secretRef: imageSecretName }),
             },
           },
           storage: {
