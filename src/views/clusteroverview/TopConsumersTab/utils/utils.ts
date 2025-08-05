@@ -28,6 +28,12 @@ export const humanizeTopConsumerMetric = (value: number, metric: TopConsumerMetr
     case TopConsumerMetric.VCPU_WAIT:
       humanizedValue = humanizeSeconds(value, 's', 'ms');
       break;
+    case TopConsumerMetric.STORAGE_READ_LATENCY:
+      humanizedValue = humanizeSeconds(value, 's', 'ms');
+      break;
+    case TopConsumerMetric.STORAGE_WRITE_LATENCY:
+      humanizedValue = humanizeSeconds(value, 's', 'ms');
+      break;
     case TopConsumerMetric.STORAGE_THROUGHPUT:
       humanizedValue = humanizeDecimalBytes(value);
       break;
@@ -85,6 +91,14 @@ export const initialTopConsumerCardSettings: {
   },
   'topConsumerCard-2-3': {
     metric: TopConsumerMetric.STORAGE_IOPS,
+    scope: TopConsumerScope.VM,
+  },
+  'topConsumerCard-3-1': {
+    metric: TopConsumerMetric.STORAGE_READ_LATENCY,
+    scope: TopConsumerScope.VM,
+  },
+  'topConsumerCard-3-2': {
+    metric: TopConsumerMetric.STORAGE_WRITE_LATENCY,
     scope: TopConsumerScope.VM,
   },
 };

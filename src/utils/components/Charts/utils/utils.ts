@@ -16,6 +16,8 @@ import {
 import { ChartPoint } from '@overview/OverviewTab/metric-charts-card/utils/hooks/types';
 import { ALL_NETWORKS } from '@virtualmachines/details/tabs/metrics/utils/constants';
 
+import { humanizeSeconds } from '../../../utils/humanize';
+
 export const SINGLE_VM_DURATION = 'SINGLE_VM_DURATION';
 export const TICKS_COUNT = 100;
 export const MILLISECONDS_MULTIPLIER = 1000;
@@ -177,6 +179,23 @@ export const formatStorageTotalReadWriteThresholdTooltipData = (datum: ChartPoin
 
 export const formatStorageIOPSTotalThresholdTooltipData = (datum: ChartPoint) =>
   t('IOPS total: {{input}}', { input: datum?.y?.toFixed(2) });
+
+export const formatStorageLatencyTooltipData = (datum: ChartPoint) => {
+  const humanized = humanizeSeconds(datum?.y, 's', 'ms');
+  return t('Latency: {{input}} {{unit}}', { input: humanized.value, unit: humanized.unit });
+};
+
+export const formatStorageReadLatencyAvgMaxTooltipData = (datum: ChartPoint) =>
+  t('{{name}}: {{input}}ms', {
+    input: (datum?.y * 1000)?.toFixed(2),
+    name: datum?.name || 'Read latency',
+  });
+
+export const formatStorageWriteLatencyAvgMaxTooltipData = (datum: ChartPoint) =>
+  t('{{name}}: {{input}}ms', {
+    input: (datum?.y * 1000)?.toFixed(2),
+    name: datum?.name || 'Write latency',
+  });
 
 // Network charts
 
