@@ -1,14 +1,25 @@
+import { FC } from 'react';
+
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { ADVANCED_SEARCH, TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
+import {
+  ADVANCED_SEARCH,
+  PASST_UDN_NETWORK,
+  TREE_VIEW_FOLDERS,
+} from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FEATURE_KUBEVIRT_ACM_TREEVIEW } from '@multicluster/constants';
+
+import PasstPopoverContent from '../PasstPopoverContent';
+
+import usePasstFeatureFlag from './usePasstFeatureFlag';
 
 type Feature = {
   canEdit: boolean;
   error?: Error;
   externalLink: string;
   featureEnabled: boolean;
+  helpPopoverContent?: FC;
   id: string;
   label: string;
   loading: boolean;
@@ -28,6 +39,7 @@ const usePreviewFeaturesData: UsePreviewFeaturesData = () => {
   const treeViewFoldersFeature = useFeatures(TREE_VIEW_FOLDERS);
   const advancedSearchFeature = useFeatures(ADVANCED_SEARCH);
   const kubevirtACMTreeviewFeature = useFeatures(FEATURE_KUBEVIRT_ACM_TREEVIEW);
+  const passtFeatureFlag = usePasstFeatureFlag();
 
   const features = [
     {
@@ -47,6 +59,13 @@ const usePreviewFeaturesData: UsePreviewFeaturesData = () => {
       id: FEATURE_KUBEVIRT_ACM_TREEVIEW,
       label: t('Enable Kubevirt multicluster tree view'),
       ...kubevirtACMTreeviewFeature,
+    },
+    {
+      externalLink: null,
+      helpPopoverContent: PasstPopoverContent,
+      id: PASST_UDN_NETWORK,
+      label: t('Enable Passt binding for primary user-defined networks'),
+      ...passtFeatureFlag,
     },
   ];
 

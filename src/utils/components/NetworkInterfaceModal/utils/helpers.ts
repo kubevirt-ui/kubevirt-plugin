@@ -9,7 +9,11 @@ import {
   getInterfaces,
   getNetworks,
 } from '@kubevirt-utils/resources/vm';
-import { BRIDGE, UDN_BINDING_NAME } from '@kubevirt-utils/resources/vm/utils/constants';
+import {
+  BRIDGE,
+  PASST_BINDING_NAME,
+  UDN_BINDING_NAME,
+} from '@kubevirt-utils/resources/vm/utils/constants';
 import {
   interfaceLabelsProxy,
   interfaceTypesProxy,
@@ -141,13 +145,21 @@ export const createInterface = ({
   const validInterfaceProp: keyof V1Interface =
     resolvedInterfaceProp === UDN_BINDING_NAME ? BRIDGE : resolvedInterfaceProp;
 
-  return {
+  const createdInterface: V1Interface = {
     macAddress: interfaceMACAddress,
     model: interfaceModel,
     name: nicName,
-    state: interfaceLinkState,
-    [validInterfaceProp]: {},
   };
+
+  if (resolvedInterfaceProp !== PASST_BINDING_NAME) {
+    createdInterface.state = interfaceLinkState;
+    createdInterface[validInterfaceProp] = {};
+  } else {
+    createdInterface.binding = { name: PASST_BINDING_NAME };
+    return createdInterface;
+  }
+
+  return createdInterface;
 };
 
 export const getNadType = (nad: NetworkAttachmentDefinition): string => {

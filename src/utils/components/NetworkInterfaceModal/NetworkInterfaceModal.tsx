@@ -6,6 +6,7 @@ import NICHotPlugModalAlert from '@kubevirt-utils/components/BridgedNICHotPlugMo
 import NetworkInterfaceLinkState from '@kubevirt-utils/components/NetworkInterfaceModal/components/NetworkInterfaceLinkState/NetworkInterfaceLinkState';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
 import {
   interfaceTypesProxy,
   NetworkPresentation,
@@ -25,6 +26,7 @@ import NameFormField from './components/NameFormField';
 import NetworkInterfaceMACAddressInput from './components/NetworkInterfaceMacAddressInput';
 import NetworkInterfaceModelSelect from './components/NetworkInterfaceModelSelect';
 import NetworkInterfaceNetworkSelect from './components/NetworkInterfaceNetworkSelect/NetworkInterfaceNetworkSelect';
+import NetworkInterfacePasst from './components/NetworkInterfacePasst';
 import { interfaceModelType } from './utils/constants';
 import { getNetworkName } from './utils/helpers';
 
@@ -69,6 +71,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const { iface = null, network = null } = nicPresentation;
+
   const [nicName, setNicName] = useState(network?.name || generatePrettyName('nic'));
   const [interfaceModel, setInterfaceModel] = useState(iface?.model || interfaceModelType.VIRTIO);
   const [networkName, setNetworkName] = useState(getNetworkName(network));
@@ -139,7 +142,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
         />
         <NetworkInterfaceNetworkSelect
           isEditing={Boolean(network) && Boolean(iface)}
-          namespace={namespace}
+          namespace={namespace || getNamespace(vm)}
           networkName={networkName}
           setInterfaceType={setInterfaceType}
           setNetworkName={setNetworkName}
@@ -162,6 +165,11 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
             isDisabled={!isLinkStateEditable(interfaceLinkState)}
             linkState={interfaceLinkState}
             setLinkState={setInterfaceLinkState}
+          />
+          <NetworkInterfacePasst
+            namespace={getNamespace(vm)}
+            onChange={() => setInterfaceType(interfaceTypesProxy.passt)}
+            passtEnabled={interfaceType === interfaceTypesProxy.passt}
           />
         </ExpandableSection>
       </Form>
