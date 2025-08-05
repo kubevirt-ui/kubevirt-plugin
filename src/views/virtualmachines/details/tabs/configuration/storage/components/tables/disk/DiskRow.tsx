@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -26,6 +26,9 @@ import { isPVCSource } from './utils/helpers';
 import DiskRowActions from './DiskRowActions';
 import { HotplugLabel } from './HotplugLabel';
 import ISOBadge from './ISOBadge';
+
+import '../tables.scss';
+import './disklist.scss';
 
 const DiskRow: FC<
   RowProps<
@@ -63,10 +66,15 @@ const DiskRow: FC<
 
   const hasPVC = isPVCSource(obj);
 
-  const disks = getDisks(vm) || [];
-  const disk = disks.find((d) => d.name === name);
-  const isCDROM = disk && isCDROMDisk(disk);
-  const displayName = isCDROM ? t('cd-rom') : name;
+  const { displayName } = useMemo(() => {
+    const disks = getDisks(vm) || [];
+    const foundDisk = disks.find((disk) => disk.name === name);
+    const cdrom = foundDisk && isCDROMDisk(foundDisk);
+    const cdromName = t('CD-ROM');
+    return {
+      displayName: cdrom ? cdromName : name,
+    };
+  }, [vm, name]);
 
   return (
     <>

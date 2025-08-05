@@ -12,10 +12,14 @@ import {
   getDisks,
   getVolumes,
 } from '@kubevirt-utils/resources/vm';
+import {
+  CDROM_DEVICE_NAME,
+  DISK_DEVICE_NAME,
+} from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { generatePrettyName, isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { DEFAULT_DISK_SIZE } from './constants';
-import { createDataVolumeName, doesSourceRequireDataVolume, getDefaultDiskType } from './helpers';
+import { createDataVolumeName, doesSourceRequireDataVolume } from './helpers';
 import { DefaultFormValues, InterfaceTypes, SourceTypes, V1DiskFormState } from './types';
 
 const getDefaultDataVolumeTemplate = (name: string): V1DataVolumeTemplateSpec => ({
@@ -76,7 +80,7 @@ export const getDefaultCreateValues = (
   vm: V1VirtualMachine,
   createDiskSource: SourceTypes,
 ): V1DiskFormState => {
-  const namePrefix = createDiskSource === SourceTypes.CDROM ? 'cd-rom' : 'disk';
+  const namePrefix = createDiskSource === SourceTypes.CDROM ? CDROM_DEVICE_NAME : DISK_DEVICE_NAME;
   const newDiskName = generatePrettyName(namePrefix);
   const newDataVolumeName = createDataVolumeName(vm, newDiskName);
 
@@ -93,9 +97,10 @@ export const getDefaultCreateValues = (
   createInitialStateFromSource?.[createDiskSource]?.(volume, dataVolumeTemplate);
 
   const isCDROM = createDiskSource === SourceTypes.CDROM;
-  const diskInterface = isCDROM ? InterfaceTypes.SATA : getDefaultDiskType(isRunning(vm));
 
-  const diskConfig = isCDROM ? { cdrom: { bus: diskInterface } } : { disk: { bus: diskInterface } };
+  const diskConfig = isCDROM
+    ? { cdrom: { bus: InterfaceTypes.SATA } }
+    : { disk: { bus: InterfaceTypes.VIRTIO } };
 
   return {
     dataVolumeTemplate,
