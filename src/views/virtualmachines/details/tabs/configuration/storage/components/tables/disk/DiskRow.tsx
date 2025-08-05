@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -7,7 +7,10 @@ import { modelToGroupVersionKind, PersistentVolumeClaimModel } from '@kubevirt-u
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getDisks } from '@kubevirt-utils/resources/vm';
 import { NameWithPercentages } from '@kubevirt-utils/resources/vm/hooks/types';
-import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
+import {
+  CDROM_DEVICE_NAME,
+  DiskRowDataLayout,
+} from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { isCDROMDisk } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
@@ -26,6 +29,9 @@ import { isPVCSource } from './utils/helpers';
 import DiskRowActions from './DiskRowActions';
 import { HotplugLabel } from './HotplugLabel';
 import ISOBadge from './ISOBadge';
+
+import '../tables.scss';
+import './disklist.scss';
 
 const DiskRow: FC<
   RowProps<
@@ -63,10 +69,14 @@ const DiskRow: FC<
 
   const hasPVC = isPVCSource(obj);
 
-  const disks = getDisks(vm) || [];
-  const disk = disks.find((d) => d.name === name);
-  const isCDROM = disk && isCDROMDisk(disk);
-  const displayName = isCDROM ? t('cd-rom') : name;
+  const { displayName } = useMemo(() => {
+    const disks = getDisks(vm) || [];
+    const foundDisk = disks.find((disk) => disk.name === name);
+    const cdrom = foundDisk && isCDROMDisk(foundDisk);
+    return {
+      displayName: cdrom ? t('{{deviceName}}', { deviceName: CDROM_DEVICE_NAME }) : name,
+    };
+  }, [vm, name, t]);
 
   return (
     <>

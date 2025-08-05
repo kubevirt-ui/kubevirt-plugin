@@ -15,7 +15,7 @@ const ISOBadge: FC<ISOBadgeProps> = ({ diskName, vm }) => {
   const { t } = useKubevirtTranslation();
 
   const disks = getDisks(vm) || [];
-  const disk = disks.find((d) => d.name === diskName);
+  const disk = disks.find((vmDisk) => vmDisk.name === diskName);
 
   if (!disk || !isCDROMDisk(disk)) {
     return null;
@@ -23,14 +23,12 @@ const ISOBadge: FC<ISOBadgeProps> = ({ diskName, vm }) => {
 
   return (
     <Popover
-      bodyContent={<div>{diskName}</div>}
+      bodyContent={diskName}
       hasAutoWidth
       position={PopoverPosition.top}
       triggerAction="hover"
     >
-      <Badge className="pf-v6-u-ml-xs" isRead>
-        {t('ISO')}
-      </Badge>
+      <Badge isRead>{t('ISO')}</Badge>
     </Popover>
   );
 };

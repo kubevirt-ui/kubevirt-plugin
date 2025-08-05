@@ -12,7 +12,8 @@ import {
 import { getDiskDrive } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
 import { FormGroup, SelectList, SelectOption } from '@patternfly/react-core';
 
-import { InterfaceTypes, V1DiskFormState } from '../../utils/types';
+import { getSourceFromVolume } from '../../utils/helpers';
+import { InterfaceTypes, SourceTypes, V1DiskFormState } from '../../utils/types';
 import { DISKTYPE_SELECT_FIELDID } from '../utils/constants';
 
 type DiskTypeSelectProps = {
@@ -29,6 +30,9 @@ const DiskTypeSelect: FC<DiskTypeSelectProps> = ({ isVMRunning }) => {
 
   const diskType = getDiskDrive(diskState.disk);
   const isCDROM = diskType === diskTypes.cdrom;
+
+  const diskSource = getSourceFromVolume(diskState.volume, diskState.dataVolumeTemplate);
+  const shouldDisableCDROM = isVMRunning && diskSource !== SourceTypes.CDROM && !isCDROM;
 
   const diskInterface = diskState.disk?.[diskType]?.bus || InterfaceTypes.VIRTIO;
 
@@ -58,6 +62,7 @@ const DiskTypeSelect: FC<DiskTypeSelectProps> = ({ isVMRunning }) => {
             {Object.values(diskTypes).map((type) => (
               <SelectOption
                 data-test-id={`${DISKTYPE_SELECT_FIELDID}-${type}`}
+                isDisabled={shouldDisableCDROM}
                 key={type}
                 value={type}
               >

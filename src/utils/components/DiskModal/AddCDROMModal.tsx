@@ -1,12 +1,12 @@
-import React, { FC, useState } from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
+import React, { FC, useMemo, useState } from 'react';
+import { FormProvider, useForm, useWatch } from 'react-hook-form';
 
 import { PendingChangesAlert } from '@kubevirt-utils/components/PendingChanges/PendingChangesAlert/PendingChangesAlert';
 import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { UPLOAD_STATUS } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
+import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import {
   Checkbox,
   Content,
@@ -45,12 +45,46 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
   });
 
   const {
+    control,
     formState: { isSubmitting, isValid },
-    handleSubmit,
+    getValues,
   } = methods;
 
-  const isFormValid =
-    isValid && (!uploadEnabled || (uploadEnabled && !!methods.watch('uploadFile')));
+  const uploadFile = useWatch({ control, name: 'uploadFile' });
+  const isFormValid = useMemo(() => {
+    const baseValid = isValid && (!uploadEnabled || (uploadEnabled && !isEmpty(uploadFile)));
+
+    if (uploadEnabled && !isEmpty(upload?.uploadStatus) && uploadFile) {
+      return baseValid && upload.uploadStatus === UPLOAD_STATUS.SUCCESS;
+    }
+
+    return baseValid;
+  }, [isValid, uploadEnabled, uploadFile, upload?.uploadStatus]);
+
+  const handleModalSubmit = async () => {
+    const data = getValues();
+
+    if (uploadEnabled && data.uploadFile?.file) {
+      const uploadedDataVolume = await uploadDataVolume(vm, uploadData, data);
+      onUploadedDataVolume?.(uploadedDataVolume);
+
+      data.dataVolumeTemplate.spec.source = {
+        pvc: {
+          name: getName(uploadedDataVolume),
+          namespace: getNamespace(uploadedDataVolume) || vmNamespace,
+        },
+      };
+    } else {
+      data.dataVolumeTemplate.spec.source = {
+        upload: {},
+      };
+    }
+
+    const vmWithDisk = addDisk(data, vm);
+    const updatedVM = reorderBootDisk(vmWithDisk, data.disk.name, data.isBootSource, false);
+
+    return onSubmit(updatedVM);
+  };
 
   return (
     <FormProvider {...methods}>
@@ -65,40 +99,17 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
           }
           onClose();
         }}
-        onSubmit={() =>
-          handleSubmit(async (data) => {
-            if (uploadEnabled && data.uploadFile?.file) {
-              const uploadedDataVolume = await uploadDataVolume(vm, uploadData, data);
-              onUploadedDataVolume?.(uploadedDataVolume);
-
-              data.dataVolumeTemplate.spec.source = {
-                pvc: {
-                  name: getName(uploadedDataVolume),
-                  namespace: getNamespace(uploadedDataVolume) || vmNamespace,
-                },
-              };
-            } else {
-              data.dataVolumeTemplate.spec.source = {
-                blank: {},
-              };
-            }
-
-            const vmWithDisk = addDisk(data, vm);
-            const updatedVM = reorderBootDisk(vmWithDisk, data.disk.name, data.isBootSource, false);
-
-            return onSubmit(updatedVM);
-          })()
-        }
         closeOnSubmit={isFormValid}
-        headerText={t('Add CD ROM')}
+        headerText={t('Add CD-ROM')}
         isDisabled={!isFormValid}
         isLoading={isSubmitting}
         isOpen={isOpen}
+        onSubmit={handleModalSubmit}
         submitBtnText={t('Add')}
       >
         <Stack hasGutter>
           <StackItem>
-            <Content component={ContentVariants.p}>{t('Add CD ROM to the cluster')}</Content>
+            <Content component={ContentVariants.p}>{t('Add CD-ROM to the cluster')}</Content>
           </StackItem>
           <StackItem>
             {isVMRunning && (

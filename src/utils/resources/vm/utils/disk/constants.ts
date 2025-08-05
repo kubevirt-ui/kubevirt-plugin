@@ -39,6 +39,8 @@ export const diskTypesLabels = {
   lun: 'LUN',
 };
 
+export const CDROM_DEVICE_NAME = 'cd-rom';
+export const DISK_DEVICE_NAME = 'disk';
 export const WINDOWS_DRIVERS_DISK = 'windows-drivers-disk';
 export const VIRTIO_WIN_IMAGE = 'virtio-win-image';
 
@@ -48,3 +50,9 @@ export const VIRTIO_WIN_CONFIG_MAP_NAMESPACES = ['openshift-cnv', 'kubevirt-hype
 
 export const DEFAULT_WINDOWS_DRIVERS_DISK_IMAGE =
   'registry.redhat.io/container-native-virtualization/virtio-win';
+
+export const EMPTY_DISK_IMAGE_PATTERNS = {
+  BLANK: '',
+  EMPTY: 'empty',
+  SCRATCH: 'scratch',
+} as const;

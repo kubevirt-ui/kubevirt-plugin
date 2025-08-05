@@ -6,11 +6,16 @@ import {
   V1VirtualMachine,
   V1Volume,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { createDataVolumeName } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
-import { ensurePath, generatePrettyName, removeDockerPrefix } from '@kubevirt-utils/utils/utils';
+import { CDROM_DEVICE_NAME } from '@kubevirt-utils/resources/vm/utils/disk/constants';
+import {
+  ensurePath,
+  generatePrettyName,
+  isEmpty,
+  removeDockerPrefix,
+} from '@kubevirt-utils/utils/utils';
 
-import { INSTALLATION_CDROM_DISK, INSTALLATION_CDROM_NAME } from './constants';
+import { createInstallationCdromDisk, INSTALLATION_CDROM_NAME } from './constants';
 
 const createEmptyCDROMVolume = (cdromName: string): V1Volume => ({
   name: cdromName,
@@ -24,9 +29,9 @@ export const addInstallationCDRom = (
 ): V1VirtualMachine => {
   let cdVolume: V1Volume = undefined;
   let cdDataVolumeTemplate: V1DataVolumeTemplateSpec = undefined;
-  const dataVolumeName = createDataVolumeName(virtualMachine, cdromName);
+  const dataVolumeName = `${virtualMachine?.metadata?.name}-${cdromName}`;
 
-  if (!cdSource || Object.keys(cdSource).length === 0) {
+  if (isEmpty(cdSource) || !cdSource) {
     cdVolume = createEmptyCDROMVolume(cdromName);
   } else if ('image' in cdSource) {
     cdVolume = {
@@ -45,7 +50,8 @@ export const addInstallationCDRom = (
         },
         name: cdromName,
       };
-    } else if (cdDataVolumeSource?.http || cdDataVolumeSource?.pvc || cdDataVolumeSource?.upload) {
+    }
+    if (cdDataVolumeSource?.http || cdDataVolumeSource?.pvc || cdDataVolumeSource?.upload) {
       cdVolume = {
         dataVolume: {
           name: dataVolumeName,
@@ -83,13 +89,10 @@ export const addInstallationCDRom = (
         }));
     }
 
-    const cdromDisk = {
-      ...INSTALLATION_CDROM_DISK,
-      name: cdromName,
-    };
-
-    if (!getDisks(draftVM)?.find((disk) => disk.name === cdromName))
-      draftVM.spec.template.spec.domain.devices.disks.push(cdromDisk);
+    if (!getDisks(draftVM)?.find((disk) => disk.name === INSTALLATION_CDROM_NAME))
+      draftVM.spec.template.spec.domain.devices.disks.push(
+        createInstallationCdromDisk(draftVM.spec.template.spec.architecture),
+      );
 
     const otherVolumes = (getVolumes(draftVM) || [])?.filter((volume) => volume.name !== cdromName);
 
@@ -125,7 +128,7 @@ export const removeCDInstallation = (virtualMachine: V1VirtualMachine): V1Virtua
 };
 
 export const generateCDROMName = (): string => {
-  return generatePrettyName('cd-rom');
+  return generatePrettyName(CDROM_DEVICE_NAME);
 };
 
 export const addCDRomDevice = (
