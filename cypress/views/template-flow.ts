@@ -67,10 +67,7 @@ export const template = {
     }
     // enable headless
     if (tData.headless) {
-      // cy.get(tView.headlessEditBtn).click();
       cy.get(tView.enableHeadless).check();
-      // cy.clickSaveBtn();
-      // cy.wait(3000); // wait for backend update the VM
     }
   },
   editDisks: (tData: TemplateData) => {
@@ -95,7 +92,6 @@ export const template = {
     if (tData.dedicatedResources) {
       tab.navigateToTScheduling();
       cy.contains(descrGroup, 'Dedicated resources').find('button').click();
-      // cy.get(tView.dedicatedResEditBtn).click();
       cy.get(tView.enableDedicatedRes).check();
       cy.clickSaveBtn();
       cy.wait(3000); // wait for backend update the VM
@@ -103,7 +99,6 @@ export const template = {
     if (tData.evictionStrategy) {
       tab.navigateToTScheduling();
       cy.contains(descrGroup, 'Eviction strategy').find('button').click();
-      // cy.get(tView.liveMigrateEditBtn).click();
       cy.get(tView.disableLMBtn).uncheck();
       cy.clickSaveBtn();
       cy.wait(3000); // wait for backend update the VM
@@ -128,8 +123,6 @@ export const template = {
       tData.ipAddr ||
       tData.gateway
     ) {
-      // tab.navigateToTScripts();
-      // cy.byButtonText('Edit').click();
       cy.contains(descrGroup, cloudInit).find('button').eq(0).click();
       cy.get(tView.username).clear().type(tData.cloudInitUname);
       cy.get(tView.userpasswd).clear().type(tData.cloudInitPwd);
@@ -150,8 +143,6 @@ export const template = {
       cy.wait(3000);
     }
     if (tData.newSecret) {
-      // tab.navigateToTScripts();
-      // cy.contains(authSSHKey).parent().parent().find('button').click();
       cy.contains(descrGroup, authSSHKey).find('button').eq(0).click();
       cy.get(iView.addNew).click();
       cy.dropFile('./fixtures/rsa.pub', 'rsa.pub', cView.uploadSecret);
@@ -160,10 +151,7 @@ export const template = {
       cy.clickSaveBtn();
       cy.wait(3000);
     }
-    // https://bugzilla.redhat.com/show_bug.cgi?id=2187664
     if (tData.existSecret) {
-      // tab.navigateToTScripts();
-      // cy.contains(authSSHKey).parent().parent().find('button').click();
       cy.contains(descrGroup, authSSHKey).find('button').eq(0).click();
       cy.get(iView.useExisting).click();
       cy.contains(iView.selectSecretText).click();
