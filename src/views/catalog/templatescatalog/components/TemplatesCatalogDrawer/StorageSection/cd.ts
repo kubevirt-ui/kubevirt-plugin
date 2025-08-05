@@ -6,8 +6,8 @@ import {
   V1VirtualMachine,
   V1Volume,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { createDataVolumeName } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
+import { CDROM_DEVICE_NAME } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { ensurePath, generatePrettyName, removeDockerPrefix } from '@kubevirt-utils/utils/utils';
 
 import { INSTALLATION_CDROM_DISK, INSTALLATION_CDROM_NAME } from './constants';
@@ -24,7 +24,7 @@ export const addInstallationCDRom = (
 ): V1VirtualMachine => {
   let cdVolume: V1Volume = undefined;
   let cdDataVolumeTemplate: V1DataVolumeTemplateSpec = undefined;
-  const dataVolumeName = createDataVolumeName(virtualMachine, cdromName);
+  const dataVolumeName = `${virtualMachine?.metadata?.name}-${cdromName}`;
 
   if (!cdSource || Object.keys(cdSource).length === 0) {
     cdVolume = createEmptyCDROMVolume(cdromName);
@@ -45,7 +45,8 @@ export const addInstallationCDRom = (
         },
         name: cdromName,
       };
-    } else if (cdDataVolumeSource?.http || cdDataVolumeSource?.pvc || cdDataVolumeSource?.upload) {
+    }
+    if (cdDataVolumeSource?.http || cdDataVolumeSource?.pvc || cdDataVolumeSource?.upload) {
       cdVolume = {
         dataVolume: {
           name: dataVolumeName,
@@ -125,7 +126,7 @@ export const removeCDInstallation = (virtualMachine: V1VirtualMachine): V1Virtua
 };
 
 export const generateCDROMName = (): string => {
-  return generatePrettyName('cd-rom');
+  return generatePrettyName(CDROM_DEVICE_NAME);
 };
 
 export const addCDRomDevice = (

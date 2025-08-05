@@ -78,7 +78,7 @@ export const getCDROMStatus = (vm: V1VirtualMachine, vmi?: V1VirtualMachineInsta
   const volumes = isVMRunning ? vmi?.spec?.volumes : getVolumes(vm);
 
   return cdroms.map((disk) => {
-    const volume = volumes?.find((v) => v.name === disk.name);
+    const volume = volumes?.find((vmVolume) => vmVolume.name === disk.name);
     const isMounted = volume ? isCDROMMounted(volume) : false;
 
     return {
@@ -92,4 +92,20 @@ export const getCDROMStatus = (vm: V1VirtualMachine, vmi?: V1VirtualMachineInsta
       volume,
     };
   });
+};
+
+export const hasDataVolume = (volume: V1Volume): boolean => {
+  return !!volume?.dataVolume?.name;
+};
+
+export const hasPersistentVolumeClaim = (volume: V1Volume): boolean => {
+  return !!volume?.persistentVolumeClaim?.claimName;
+};
+
+export const hasContainerDisk = (volume: V1Volume): boolean => {
+  return !!volume?.containerDisk?.image;
+};
+
+export const getContainerDiskImage = (volume: V1Volume): null | string => {
+  return volume?.containerDisk?.image?.toLowerCase() || null;
 };
