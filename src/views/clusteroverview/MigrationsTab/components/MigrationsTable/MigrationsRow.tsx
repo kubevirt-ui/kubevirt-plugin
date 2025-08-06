@@ -9,6 +9,7 @@ import {
 } from '@kubevirt-ui/kubevirt-api/console';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import useMigrationPercentage from '@kubevirt-utils/resources/vm/hooks/useMigrationPercentage';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import {
   getMigrationPhase,
@@ -22,7 +23,8 @@ import {
   RowProps,
   TableData,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { Tooltip } from '@patternfly/react-core';
+import { Progress, ProgressMeasureLocation, Tooltip } from '@patternfly/react-core';
+import { getMigrationProgressVariant } from '@virtualmachines/details/tabs/metrics/utils/utils';
 
 import MigrationPolicyTooltip from './components/MigrationPolicyTooltip/MigrationPolicyTooltip';
 import { iconMapper } from './utils/statuses';
@@ -35,6 +37,9 @@ const MigrationsRow: FC<RowProps<MigrationTableDataLayout>> = ({ activeColumnIDs
   const sourceNode = getMigrationSourceNode(vmim);
   const targetNode = getMigrationTargetNode(vmim);
   const migrationPhase = getMigrationPhase(vmim);
+
+  const { isFailed, percentage } = useMigrationPercentage(vmiObj);
+  const progressStatus = getMigrationProgressVariant(percentage, isFailed);
 
   const StatusIcon = iconMapper?.[migrationPhase];
 
@@ -66,6 +71,13 @@ const MigrationsRow: FC<RowProps<MigrationTableDataLayout>> = ({ activeColumnIDs
         >
           <GenericStatus Icon={StatusIcon} title={migrationPhase} />
         </Tooltip>
+      </TableData>
+      <TableData activeColumnIDs={activeColumnIDs} id="progress-indicator">
+        <Progress
+          measureLocation={ProgressMeasureLocation.top}
+          value={percentage}
+          variant={progressStatus}
+        />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="source">
         {sourceNode ? (

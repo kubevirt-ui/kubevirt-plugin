@@ -50,6 +50,10 @@ const useVirtualMachineInstanceMigrationsColumns = (): [
       transforms: [sortable],
     },
     {
+      id: 'progress-indicator',
+      title: t('Progress'),
+    },
+    {
       id: 'source',
       sort: 'vmiObj.status.migrationState.sourceNode',
       title: t('Source'),
