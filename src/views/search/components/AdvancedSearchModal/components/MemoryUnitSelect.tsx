@@ -1,6 +1,9 @@
 import React, { FC, useMemo } from 'react';
 
-import { CAPACITY_UNITS } from '@kubevirt-utils/components/CapacityInput/utils';
+import {
+  CAPACITY_UNITS,
+  capacityUnitsOrdered,
+} from '@kubevirt-utils/components/CapacityInput/utils';
 import { getSelectDataTestProps } from '@kubevirt-utils/utils/selectDataTest';
 import { SimpleSelect, SimpleSelectOption } from '@patternfly/react-templates';
 
@@ -17,7 +20,7 @@ const MemoryUnitSelect: FC<MemoryUnitSelectProps> = ({
 }) => {
   const initialOptions = useMemo<SimpleSelectOption[]>(
     () =>
-      Object.values(CAPACITY_UNITS).map((unit) => ({
+      capacityUnitsOrdered.map((unit) => ({
         content: unit,
         selected: unit === selected,
         value: unit,

@@ -1,6 +1,7 @@
 import React, { FC, ReactNode, Ref, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   Badge,
   MenuToggle,
@@ -16,6 +17,7 @@ type CheckboxSelectProps = {
   onSelect?: SelectProps['onSelect'];
   options?: SelectOptionProps[];
   selectedValues: any[];
+  showAllBadge?: boolean;
   toggleTitle?: ReactNode;
 };
 
@@ -23,6 +25,7 @@ const CheckboxSelect: FC<CheckboxSelectProps> = ({
   onSelect,
   options,
   selectedValues,
+  showAllBadge,
   toggleTitle,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -32,9 +35,20 @@ const CheckboxSelect: FC<CheckboxSelectProps> = ({
     setIsOpen(!isOpen);
   };
 
+  const hasSelectedValues = !isEmpty(selectedValues);
+
   const toggle = (toggleRef: Ref<MenuToggleElement>) => (
-    <MenuToggle isExpanded={isOpen} onClick={onToggleClick} ref={toggleRef}>
-      {toggleTitle} <Badge isRead>{selectedValues.length || t('All')}</Badge>
+    <MenuToggle
+      badge={
+        showAllBadge || hasSelectedValues ? (
+          <Badge isRead>{selectedValues.length || t('All')}</Badge>
+        ) : null
+      }
+      isExpanded={isOpen}
+      onClick={onToggleClick}
+      ref={toggleRef}
+    >
+      {toggleTitle}
     </MenuToggle>
   );
 
@@ -53,6 +67,7 @@ const CheckboxSelect: FC<CheckboxSelectProps> = ({
         {options.map((option, index) => (
           <SelectOption hasCheckbox key={index} {...option} />
         ))}
+        {isEmpty(options) && <SelectOption isDisabled>{t('No options found')}</SelectOption>}
       </SelectList>
     </Select>
   );
