@@ -13,6 +13,7 @@ import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMac
 import useDefaultStorageClass from '@kubevirt-utils/hooks/useDefaultStorage/useDefaultStorageClass';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { DescriptionList } from '@patternfly/react-core';
 
 import DiskSize from './DiskSize';
@@ -24,8 +25,9 @@ import './details-right-grid.scss';
 const DetailsRightGrid: FC = () => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+  const cluster = useClusterParam();
   const [{ clusterDefaultStorageClass, sortedStorageClasses, virtDefaultStorageClass }, loaded] =
-    useDefaultStorageClass();
+    useDefaultStorageClass(cluster);
   const isWindowsOSVolume = useIsWindowsBootableVolume();
 
   const {

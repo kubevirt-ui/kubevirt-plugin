@@ -3,6 +3,7 @@ import React, { FC, useMemo, useState } from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { createSSHSecret } from '@kubevirt-utils/resources/secret/utils';
 import { isEmpty, validateSSHPublicKey } from '@kubevirt-utils/utils/utils';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 
 import MutedTextSpan from '../MutedTextSpan/MutedTextSpan';
 import TabModal from '../TabModal/TabModal';
@@ -13,7 +14,6 @@ import { SecretSelectionOption, SSHSecretDetails } from './utils/types';
 import { validateSecretName, validateSecretNameUnique } from './utils/utils';
 
 type SSHSecretModalProps = {
-  cluster?: string;
   initialSSHSecretDetails: SSHSecretDetails;
   isOpen: boolean;
   isTemplate?: boolean;
@@ -24,7 +24,6 @@ type SSHSecretModalProps = {
 };
 
 const SSHSecretModal: FC<SSHSecretModalProps> = ({
-  cluster,
   initialSSHSecretDetails,
   isOpen,
   isTemplate = false,
@@ -34,10 +33,10 @@ const SSHSecretModal: FC<SSHSecretModalProps> = ({
   onSubmit,
 }) => {
   const { t } = useKubevirtTranslation();
-
+  const cluster = useClusterParam();
   const [sshDetails, setSSHDetails] = useState<SSHSecretDetails>(initialSSHSecretDetails);
   const [localNSProject, setLocalNSProject] = useState<string>(namespace);
-  const secretsData = useSecretsData(localNSProject, namespace);
+  const secretsData = useSecretsData(localNSProject, namespace, cluster);
 
   const isDisabled = useMemo(() => {
     const { allSecrets, secretsLoaded } = secretsData;
@@ -72,6 +71,7 @@ const SSHSecretModal: FC<SSHSecretModalProps> = ({
     >
       <MutedTextSpan text={t('SSH key is saved in the project as a secret')} />
       <SSHSecretModalBody
+        cluster={cluster}
         isTemplate={isTemplate}
         isUserTab={isUserTab}
         localNSProject={localNSProject}

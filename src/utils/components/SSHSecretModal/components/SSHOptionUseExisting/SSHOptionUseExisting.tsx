@@ -30,6 +30,7 @@ import SecretDropdown from '../SecretDropdown/SecretDropdown';
 import './SSHOptionUseExisting.scss';
 
 type SSHOptionUseExistingProps = {
+  cluster?: string;
   localNSProject: string;
   namespace?: string;
   projectsWithSecrets: { [namespace: string]: IoK8sApiCoreV1Secret[] };
@@ -41,6 +42,7 @@ type SSHOptionUseExistingProps = {
 };
 
 const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
+  cluster,
   localNSProject,
   namespace,
   projectsWithSecrets,
@@ -56,7 +58,7 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
   const [selectedProject, setSelectedProject] = useState<string>(
     localNSProject || namespace || sshDetails?.sshSecretNamespace,
   );
-  const [projects] = useProjects();
+  const [projects] = useProjects(cluster);
 
   useEffect(
     () =>

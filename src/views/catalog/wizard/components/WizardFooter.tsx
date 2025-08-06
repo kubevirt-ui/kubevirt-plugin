@@ -43,7 +43,7 @@ export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
   const navigate = useNavigate();
   const cluster = useClusterParam();
   const { t } = useKubevirtTranslation();
-  const [isUDNManagedNamespace] = useNamespaceUDN(namespace, cluster);
+  const [isUDNManagedNamespace] = useNamespaceUDN(namespace);
   const { disableVmCreate, loaded: vmContextLoaded, updateVM, vm } = useWizardVMContext();
   const { isBootSourceAvailable, loaded: bootSourceLoaded } = useWizardSourceAvailable();
   const { createVM, error, loaded: vmCreateLoaded } = useWizardVMCreate();
