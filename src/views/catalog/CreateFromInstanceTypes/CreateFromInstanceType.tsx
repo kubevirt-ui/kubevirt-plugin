@@ -5,12 +5,12 @@ import VMDetailsSection from '@catalog/CreateFromInstanceTypes/components/VMDeta
 import { CREATE_VM_TAB } from '@catalog/CreateVMHorizontalNav/constants';
 import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
-import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { ALL_NAMESPACES_SESSION_KEY, ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import useUserPreferences from '@kubevirt-utils/hooks/useUserPreferences';
 import useBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useBootableVolumes';
+import { getValidNamespace } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { Bullseye, Card, Divider, Grid, GridItem, List, PageSection } from '@patternfly/react-core';
@@ -36,11 +36,13 @@ const CreateFromInstanceType: FC<CreateFromInstanceTypeProps> = ({ currentTab })
   const { resetInstanceTypeVMState, setVMNamespaceTarget, volumeListNamespace } =
     useInstanceTypeVMStore();
   const bootableVolumesData = useBootableVolumes(volumeListNamespace);
-  const instanceTypesAndPreferencesData = useInstanceTypesAndPreferences();
+  const [activeNamespace] = useActiveNamespace();
+  const instanceTypesAndPreferencesData = useInstanceTypesAndPreferences(
+    getValidNamespace(activeNamespace),
+  );
   const [userPreferences, userPreferencesLoaded, userPreferencesError] = useUserPreferences(
     volumeListNamespace === ALL_PROJECTS ? ALL_NAMESPACES_SESSION_KEY : volumeListNamespace,
   );
-  const [activeNamespace] = useActiveNamespace();
   const [authorizedSSHKeys, , loaded] = useKubevirtUserSettings('ssh', cluster);
 
   useEffect(() => {
@@ -48,8 +50,7 @@ const CreateFromInstanceType: FC<CreateFromInstanceTypeProps> = ({ currentTab })
   }, [resetInstanceTypeVMState]);
 
   useEffect(() => {
-    const targetNS =
-      activeNamespace === ALL_NAMESPACES_SESSION_KEY ? DEFAULT_NAMESPACE : activeNamespace;
+    const targetNS = getValidNamespace(activeNamespace);
     setVMNamespaceTarget(authorizedSSHKeys?.[targetNS], targetNS);
   }, [activeNamespace, authorizedSSHKeys, setVMNamespaceTarget]);
 

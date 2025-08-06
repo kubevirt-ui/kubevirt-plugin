@@ -1,6 +1,5 @@
 import React, { FC } from 'react';
 
-import { DEFAULT_INSTANCETYPE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
 import { FormGroup, TextInput } from '@patternfly/react-core';
@@ -23,7 +22,7 @@ const VolumeMetadata: FC<VolumeMetadataProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const { annotations, labels } = bootableVolume || {};
+  const { annotations } = bootableVolume || {};
 
   return (
     <>
@@ -32,11 +31,10 @@ const VolumeMetadata: FC<VolumeMetadataProps> = ({
         deleteLabel={deleteLabel}
         setBootableVolumeField={setBootableVolumeField}
       />
-
       <InstanceTypeDrilldownSelect
-        selected={labels?.[DEFAULT_INSTANCETYPE_LABEL]}
+        bootableVolume={bootableVolume}
+        deleteLabel={deleteLabel}
         setBootableVolumeField={setBootableVolumeField}
-        setSelected={setBootableVolumeField('labels', DEFAULT_INSTANCETYPE_LABEL)}
       />
       <FormGroup label={t('Description')}>
         <TextInput

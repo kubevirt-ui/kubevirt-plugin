@@ -1,6 +1,9 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect, useMemo } from 'react';
 
-import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
+import {
+  DEFAULT_PREFERENCE_KIND_LABEL,
+  DEFAULT_PREFERENCE_LABEL,
+} from '@catalog/CreateFromInstanceTypes/utils/constants';
 import usePreferenceSelectOptions from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/PreferenceSelect/hooks/usePreferenceSelectOptions';
 import {
   AddBootableVolumeState,
@@ -30,16 +33,13 @@ const PreferenceSelect: FC<PreferenceSelectProps> = ({
 
   const { bootableVolumeNamespace, labels } = bootableVolume;
   const { preferenceSelectOptions, preferencesLoaded } = usePreferenceSelectOptions(
-    deleteLabel,
     bootableVolumeNamespace,
     setBootableVolumeField,
   );
 
-  if (!preferencesLoaded) return <Loading />;
-
   const handleSelect = (value: string) => {
-    const selectedValue = preferenceSelectOptions.find((option) => option.value === value);
-    setBootableVolumeField('labels', DEFAULT_PREFERENCE_LABEL)(selectedValue.label);
+    const selectedOption = preferenceSelectOptions.find((option) => option.value === value);
+    setBootableVolumeField('labels', DEFAULT_PREFERENCE_LABEL)(selectedOption.label);
   };
 
   const selectedPreference = labels?.[DEFAULT_PREFERENCE_LABEL];
@@ -48,6 +48,20 @@ const PreferenceSelect: FC<PreferenceSelectProps> = ({
     preferenceSelectOptions,
     labels,
   );
+
+  const isExistingOption = useMemo(
+    () => preferenceSelectOptions?.some((option) => option.value === selectedPreferenceKey),
+    [preferenceSelectOptions, selectedPreferenceKey],
+  );
+
+  useEffect(() => {
+    if (!isExistingOption) {
+      deleteLabel(DEFAULT_PREFERENCE_LABEL);
+      deleteLabel(DEFAULT_PREFERENCE_KIND_LABEL);
+    }
+  }, [deleteLabel, isExistingOption]);
+
+  if (!preferencesLoaded) return <Loading />;
 
   return (
     <FormGroup

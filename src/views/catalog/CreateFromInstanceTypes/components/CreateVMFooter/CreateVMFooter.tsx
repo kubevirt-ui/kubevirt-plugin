@@ -14,7 +14,6 @@ import {
   generateNewSysprepConfig,
   UNATTEND,
 } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
-import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { logITFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
 import {
@@ -24,7 +23,6 @@ import {
   CUSTOMIZE_VM_BUTTON_CLICKED,
   VIEW_YAML_AND_CLI_CLICKED,
 } from '@kubevirt-utils/extensions/telemetry/utils/constants';
-import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { createSSHSecret } from '@kubevirt-utils/resources/secret/utils';
@@ -33,7 +31,7 @@ import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN
 import { useDriversImage } from '@kubevirt-utils/resources/vm/utils/disk/useDriversImage';
 import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { createHeadlessService } from '@kubevirt-utils/utils/headless-service';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { getValidNamespace, isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 import { getCatalogURL, getVMURL } from '@multicluster/urls';
@@ -61,7 +59,7 @@ const CreateVMFooter: FC = () => {
 
   const [activeNamespace] = useActiveNamespace();
   const [isUDNManagedNamespace, vmsNotSupported] = useNamespaceUDN(
-    activeNamespace === ALL_NAMESPACES_SESSION_KEY ? DEFAULT_NAMESPACE : activeNamespace,
+    getValidNamespace(activeNamespace),
   );
 
   const { instanceTypeVMState, setStartVM, setVM, startVM, vmNamespaceTarget } =
