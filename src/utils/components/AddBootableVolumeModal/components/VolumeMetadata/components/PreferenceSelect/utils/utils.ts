@@ -43,8 +43,6 @@ export const getSelectedKeyByLabel = (
   // Name could be duplicated between cluster and user Preferences
   const matchingOptions = options.filter((option) => option.label === label);
 
-  if (matchingOptions.length === 1) return matchingOptions[0]?.value;
-
   const isClusterPreference =
     volumeLabels?.[DEFAULT_PREFERENCE_KIND_LABEL] === VirtualMachineClusterPreferenceModel.kind;
 

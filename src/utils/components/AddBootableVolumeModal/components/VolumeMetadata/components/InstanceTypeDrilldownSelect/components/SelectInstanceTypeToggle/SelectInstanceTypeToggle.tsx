@@ -1,21 +1,33 @@
 import React, { FC } from 'react';
 
-import { VirtualMachineClusterInstancetypeModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
+import {
+  VirtualMachineClusterInstancetypeModelGroupVersionKind,
+  VirtualMachineInstancetypeModelGroupVersionKind,
+} from '@kubevirt-ui/kubevirt-api/console';
+import VirtualMachineClusterInstancetypeModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineClusterInstancetypeModel';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 
 type SelectInstanceTypeToggleProps = {
   selected: string;
+  selectedKind: string;
 };
-const SelectInstanceTypeToggle: FC<SelectInstanceTypeToggleProps> = ({ selected }) => {
+const SelectInstanceTypeToggle: FC<SelectInstanceTypeToggleProps> = ({
+  selected,
+  selectedKind,
+}) => {
   const { t } = useKubevirtTranslation();
 
   if (isEmpty(selected)) return t('Select InstanceType');
 
   return (
     <ResourceLink
-      groupVersionKind={VirtualMachineClusterInstancetypeModelGroupVersionKind}
+      groupVersionKind={
+        selectedKind === VirtualMachineClusterInstancetypeModel.kind
+          ? VirtualMachineClusterInstancetypeModelGroupVersionKind
+          : VirtualMachineInstancetypeModelGroupVersionKind
+      }
       linkTo={false}
       name={selected}
     />
