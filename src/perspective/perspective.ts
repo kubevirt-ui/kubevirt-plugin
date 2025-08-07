@@ -13,3 +13,6 @@ export const getLandingPageURL: ResolvedExtension<Perspective>['properties']['la
 
 export const getImportRedirectURL: ResolvedExtension<Perspective>['properties']['importRedirectURL'] =
   (namespace: string) => `/k8s/ns/${namespace}/virtualization-overview`;
+
+export const getACMLandingPageURL: ResolvedExtension<Perspective>['properties']['landingPageURL'] =
+  () => `/k8s/all-clusters/all-namespaces/kubevirt.io~v1~VirtualMachine`;

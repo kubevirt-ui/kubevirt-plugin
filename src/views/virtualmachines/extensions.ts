@@ -1,6 +1,5 @@
 import { EncodedExtension } from '@openshift/dynamic-plugin-sdk-webpack';
 import {
-  HrefNavItem,
   ResourceActionProvider,
   ResourceNSNavItem,
   RoutePage,
@@ -65,9 +64,6 @@ export const extensions: EncodedExtension[] = [
   } as EncodedExtension<RoutePage>,
 
   {
-    flags: {
-      disallowed: ['KUBEVIRT_DYNAMIC_ACM'],
-    },
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-virtualmachines',
@@ -84,22 +80,4 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.navigation/resource-ns',
   } as EncodedExtension<ResourceNSNavItem>,
-  {
-    flags: {
-      required: ['KUBEVIRT_DYNAMIC_ACM'],
-    },
-    properties: {
-      dataAttributes: {
-        'data-quickstart-id': 'qs-nav-virtualization-catalog',
-        'data-test-id': 'virtualization-catalog-nav-item',
-      },
-      href: '/k8s/all-clusters/all-namespaces/kubevirt.io~v1~VirtualMachine',
-      id: 'virtualmachines',
-      insertAfter: 'virtualization-catalog',
-      insertBefore: 'templates',
-      name: '%plugin__kubevirt-plugin~VirtualMachines%',
-      section: 'virtualization',
-    },
-    type: 'console.navigation/href',
-  } as EncodedExtension<HrefNavItem>,
 ];

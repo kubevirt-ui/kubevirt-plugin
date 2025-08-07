@@ -97,6 +97,9 @@ const virtualizationSection = [
   } as EncodedExtension<HrefNavItem>,
 
   {
+    flags: {
+      disallowed: ['KUBEVIRT_DYNAMIC_ACM'],
+    },
     properties: {
       dataAttributes: {
         'data-border': 'no-border',
@@ -117,6 +120,7 @@ const virtualizationSection = [
   },
   {
     flags: {
+      disallowed: ['KUBEVIRT_DYNAMIC_ACM'],
       required: ['KUBEVIRT_INSTANCETYPES'],
     },
     properties: {
@@ -139,6 +143,7 @@ const virtualizationSection = [
   } as EncodedExtension<ResourceClusterNavItem>,
   {
     flags: {
+      disallowed: ['KUBEVIRT_DYNAMIC_ACM'],
       required: ['OPENSHIFT'],
     },
     properties: {
@@ -158,6 +163,9 @@ const virtualizationSection = [
     type: 'console.navigation/href',
   } as EncodedExtension<HrefNavItem>,
   {
+    flags: {
+      disallowed: ['KUBEVIRT_DYNAMIC_ACM'],
+    },
     properties: {
       id: 'VirtualizationSeparator-virt-perspective',
       insertAfter: 'virtualization-bootablevolumes-virt-perspective',
@@ -167,6 +175,9 @@ const virtualizationSection = [
     type: 'console.navigation/separator',
   } as EncodedExtension<Separator>,
   {
+    flags: {
+      disallowed: ['KUBEVIRT_DYNAMIC_ACM'],
+    },
     properties: {
       dataAttributes: {
         'data-border': 'no-border',
@@ -184,6 +195,9 @@ const virtualizationSection = [
     type: 'console.navigation/href',
   } as EncodedExtension<HrefNavItem>,
   {
+    flags: {
+      disallowed: ['KUBEVIRT_DYNAMIC_ACM'],
+    },
     properties: {
       dataAttributes: {
         'data-border': 'no-border',
@@ -204,6 +218,7 @@ const virtualizationSection = [
   } as EncodedExtension<ResourceClusterNavItem>,
   {
     flags: {
+      disallowed: ['KUBEVIRT_DYNAMIC_ACM'],
       required: ['KUBEVIRT_DYNAMIC'],
     },
     properties: {
@@ -225,6 +240,9 @@ const virtualizationSection = [
 
 const networkingSection = [
   {
+    flags: {
+      disallowed: ['KUBEVIRT_DYNAMIC_ACM'],
+    },
     properties: {
       dataAttributes: { 'data-quickstart-id': 'qs-nav-networking' },
       id: 'networking-virt-perspective',
@@ -376,6 +394,9 @@ const networkingSection = [
 
 const storageSection = [
   {
+    flags: {
+      disallowed: ['KUBEVIRT_DYNAMIC_ACM'],
+    },
     properties: {
       dataAttributes: { 'data-quickstart-id': 'qs-nav-storage' },
       id: 'storage-virt-perspective',
@@ -480,7 +501,7 @@ const storageSection = [
 
 const computeSection = [
   {
-    flags: { required: ['CAN_LIST_NODE'] },
+    flags: { disallowed: ['KUBEVIRT_DYNAMIC_ACM'], required: ['CAN_LIST_NODE'] },
     properties: {
       dataAttributes: { 'data-quickstart-id': 'qs-nav-compute' },
       id: 'compute-virt-perspective',
@@ -608,6 +629,9 @@ const computeSection = [
 
 export const extensions: EncodedExtension[] = [
   {
+    flags: {
+      disallowed: ['KUBEVIRT_DYNAMIC_ACM'],
+    },
     properties: {
       icon: { $codeRef: 'perspective.icon' },
       id: 'virtualization-perspective',
@@ -617,8 +641,24 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.perspective',
   },
+  {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC_ACM'],
+    },
+    properties: {
+      icon: { $codeRef: 'perspective.icon' },
+      id: 'virtualization-perspective',
+      importRedirectURL: { $codeRef: 'perspective.getACMLandingPageURL' },
+      landingPageURL: { $codeRef: 'perspective.getACMLandingPageURL' },
+      name: '%plugin__console-virt-perspective-plugin~Fleet Virtualization%',
+    },
+    type: 'console.perspective',
+  },
   ...virtualizationSection,
   {
+    flags: {
+      disallowed: ['KUBEVIRT_DYNAMIC_ACM'],
+    },
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-sec-virtualization',
