@@ -807,7 +807,6 @@
   "Link state: {{runtimeState}}": "Link state: {{runtimeState}}",
   "Linux only": "Linux only",
   "Live migratable": "Live migratable",
-  "Live migrate or restart the VirtualMachine to apply changes.": "Live migrate or restart the VirtualMachine to apply changes.",
   "Live migration": "Live migration",
   "Live migration network": "Live migration network",
   "Live migrations settings": "Live migrations settings",

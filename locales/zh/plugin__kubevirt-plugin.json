@@ -804,7 +804,6 @@
   "Link state: {{runtimeState}}": "Link state: {{runtimeState}}",
   "Linux only": "仅限 Linux",
   "Live migratable": "实时迁移",
-  "Live migrate or restart the VirtualMachine to apply changes.": "实时迁移或重启 VirtualMachine 以应用更改。",
   "Live migration": "实时迁移",
   "Live migration network": "实时迁移网络",
   "Live migrations settings": "实时迁移设置",
