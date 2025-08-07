@@ -2,12 +2,14 @@ import { isNil } from 'lodash';
 
 import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { ObjectMetadata } from '@openshift-console/dynamic-plugin-sdk';
 import {
   DESCHEDULER_OPERATOR_NAME,
   FENCE_AGENTS_OPERATOR_NAME,
   NETOBSERV_OPERATOR_NAME,
   NMSTATE_OPERATOR_NAME,
   NODE_HEALTH_OPERATOR_NAME,
+  operatorPackageNames,
 } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/constants';
 import { INSTALL_SUCCEEDED_STATUS } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/hooks/useVirtualizationOperators/utils/constants';
 import {
@@ -31,9 +33,36 @@ import {
   OperatorDetails,
   OperatorDetailsMap,
   PackageSource,
+  ParseJSONAnnotationOptions,
   VirtFeatureOperatorItem,
   VirtFeatureOperatorItemsMap,
 } from './types';
+
+export const isArrayOfStrings = (value: any): value is string[] =>
+  Array.isArray(value) && !value.some((element) => typeof element !== 'string');
+
+export const parseJSONAnnotation = <T = any>(
+  annotations: ObjectMetadata['annotations'],
+  key: string,
+  options: ParseJSONAnnotationOptions,
+): T => {
+  const { onError, validate } = options ?? {};
+  const annotation = annotations?.[key];
+  if (!annotation) {
+    return null;
+  }
+  try {
+    const parsed: T = JSON.parse(annotation);
+    const valid = validate?.(parsed) ?? true;
+    if (!valid) {
+      throw new Error(`Invalid value: "${annotation}"`);
+    }
+    return parsed;
+  } catch (e) {
+    onError?.(e.message);
+    return null;
+  }
+};
 
 /**
  * Determines if a given Operator package has a `Subscription` that makes it available in the given namespace.
@@ -89,6 +118,8 @@ export const getPackageUID = (pkg: PackageManifestKind) =>
 
 export const groupOperatorItems = (items: VirtFeatureOperatorItem[]): VirtFeatureOperatorItemsMap =>
   items.reduce((acc, item) => {
+    if (getPackageSource(item?.obj) !== 'Red Hat' && !isInstalled(item?.installState)) return acc;
+
     const operatorName = getName(item?.obj);
     if (!acc?.[operatorName]) acc[operatorName] = [];
     acc[operatorName].push(item);
@@ -126,8 +157,8 @@ const getInstallStatus = (operators: VirtFeatureOperatorItem[]): InstallState =>
 
 export const getOperatorData = (
   operatorItemsMap: VirtFeatureOperatorItemsMap,
-): OperatorDetailsMap =>
-  isEmpty(operatorItemsMap)
+): OperatorDetailsMap => {
+  const operatorsData = isEmpty(operatorItemsMap)
     ? defaultVirtFeatureOperatorItemsMap
     : Object.entries(operatorItemsMap).reduce((acc, [operatorName, operatorItems]) => {
         acc[operatorName] = {
@@ -137,3 +168,11 @@ export const getOperatorData = (
 
         return acc;
       }, {} as OperatorDetailsMap);
+
+  const operatorsDataKeys = Object.keys(operatorsData);
+  operatorPackageNames.forEach((name) => {
+    if (!operatorsDataKeys.includes(name)) operatorsData[name] = defaultOperatorData;
+  });
+
+  return operatorsData;
+};

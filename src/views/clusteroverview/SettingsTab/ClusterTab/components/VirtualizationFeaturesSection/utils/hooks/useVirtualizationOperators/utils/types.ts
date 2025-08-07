@@ -3,7 +3,12 @@ import {
   InstallState,
   VirtualizationFeatureOperators,
 } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/types';
-import { PackageManifestKind, SubscriptionKind } from '@overview/utils/types';
+import {
+  ClusterServiceVersionKind,
+  OperatorGroupKind,
+  PackageManifestKind,
+  SubscriptionKind,
+} from '@overview/utils/types';
 
 export enum OLMAnnotation {
   ActionText = 'marketplace.openshift.io/action-text',
@@ -41,42 +46,6 @@ export enum OLMAnnotation {
   ValidSubscription = 'operators.openshift.io/valid-subscription',
 }
 
-export enum CapabilityLevel {
-  BasicInstall = 'Basic Install',
-  DeepInsights = 'Deep Insights',
-  FullLifecycle = 'Full Lifecycle',
-  SeamlessUpgrades = 'Seamless Upgrades',
-}
-
-export type CSVAnnotations = {
-  [OLMAnnotation.ActionText]?: string;
-  [OLMAnnotation.Capabilities]?: CapabilityLevel;
-  [OLMAnnotation.Categories]?: string;
-  [OLMAnnotation.CertifiedLevel]?: string;
-  [OLMAnnotation.CNF]?: string;
-  [OLMAnnotation.CNI]?: string;
-  [OLMAnnotation.ContainerImage]?: string;
-  [OLMAnnotation.CreatedAt]?: string;
-  [OLMAnnotation.CSI]?: string;
-  [OLMAnnotation.Description]?: string;
-  [OLMAnnotation.Disconnected]?: string;
-  [OLMAnnotation.FIPSCompliant]?: string;
-  [OLMAnnotation.HealthIndex]?: string;
-  [OLMAnnotation.InfrastructureFeatures]?: string;
-  [OLMAnnotation.ProxyAware]?: string;
-  [OLMAnnotation.RemoteWorkflow]?: string;
-  [OLMAnnotation.Repository]?: string;
-  [OLMAnnotation.Support]?: string;
-  [OLMAnnotation.SupportWorkflow]?: string;
-  [OLMAnnotation.Tags]?: string[];
-  [OLMAnnotation.TLSProfiles]?: string;
-  [OLMAnnotation.TLSProfiles]?: string;
-  [OLMAnnotation.TokenAuthAWS]?: string;
-  [OLMAnnotation.TokenAuthAzure]?: string;
-  [OLMAnnotation.TokenAuthGCP]?: string;
-  [OLMAnnotation.ValidSubscription]?: string;
-} & ObjectMetadata['annotations'];
-
 type AnnotationParserOptions = {
   onError?: (e: any) => void;
 };
@@ -85,14 +54,6 @@ export type AnnotationParser<
   Result = any,
   Options extends AnnotationParserOptions = AnnotationParserOptions,
 > = (annotations: ObjectMetadata['annotations'], options?: Options) => Result;
-
-export enum ValidSubscriptionValue {
-  OpenShiftContainerPlatform = 'OpenShift Container Platform',
-  OpenShiftKubernetesEngine = 'OpenShift Kubernetes Engine',
-  OpenShiftPlatformPlus = 'OpenShift Platform Plus',
-  OpenShiftVirtualizationEngine = 'OpenShift Virtualization Engine',
-  RequiresSeparateSubscription = 'Requires separate subscription',
-}
 
 export type ParseJSONAnnotationOptions = {
   onError?: (error: any) => void;
@@ -140,3 +101,9 @@ export type OperatorDetails = {
 };
 
 export type OperatorDetailsMap = { [key in VirtualizationFeatureOperators]: OperatorDetails };
+
+export type OperatorResources = {
+  clusterServiceVersions: ClusterServiceVersionKind[];
+  operatorGroups: OperatorGroupKind[];
+  subscriptions: SubscriptionKind[];
+};

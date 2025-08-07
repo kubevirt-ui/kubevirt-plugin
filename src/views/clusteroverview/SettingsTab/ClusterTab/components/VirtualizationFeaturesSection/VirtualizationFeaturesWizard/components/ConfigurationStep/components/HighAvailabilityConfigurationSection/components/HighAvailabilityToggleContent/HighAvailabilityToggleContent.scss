@@ -1,0 +1,15 @@
+.high-availability-toggle-content {
+  width: 100%;
+
+  &__icon-switch-container {
+    margin-inline-start: auto;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  &__install-status-msg {
+    margin-left: var(--pf-t--global--spacer--md);
+    display: inline-flex;
+    align-items: center;
+  }
+}

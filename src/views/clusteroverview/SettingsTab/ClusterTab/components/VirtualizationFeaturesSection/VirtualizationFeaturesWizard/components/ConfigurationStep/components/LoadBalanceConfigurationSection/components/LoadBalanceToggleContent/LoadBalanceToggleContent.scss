@@ -1,0 +1,19 @@
+.load-balance-toggle-content {
+  margin-inline-start: auto;
+
+  &__icon-switch-container {
+    margin-inline-start: auto;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  &__hub-link {
+    margin-inline-start: auto;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  &__link-icon {
+    margin-left: var(--pf-t--global--spacer--sm);
+  }
+}

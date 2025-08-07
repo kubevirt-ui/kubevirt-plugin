@@ -2,7 +2,6 @@ import React, { FC } from 'react';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
-import VirtualizationFeaturesSection from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/VirtualizationFeaturesList/VirtualizationFeaturesSection';
 import { Divider } from '@patternfly/react-core';
 
 import { useKubevirtCSVDetails } from '../../utils/hooks/useKubevirtCSVDetails';
@@ -13,6 +12,7 @@ import GeneralSettings from './components/GeneralSettings/GeneralSettings';
 import GuestManagementSection from './components/GuestManagmentSection/GuestManagementSection';
 import PersistentReservationSection from './components/PersistentReservationSection/PersistentReservationSection';
 import ResourceManagementSection from './components/ResourceManagementSection/ResourceManagementSection';
+import VirtualizationFeaturesList from './components/VirtualizationFeaturesSection/VirtualizationFeaturesList/VirtualizationFeaturesList';
 
 const ClusterTab: FC = () => {
   const hyperConvergeConfiguration = useHyperConvergeConfiguration();
@@ -22,7 +22,7 @@ const ClusterTab: FC = () => {
   return (
     <>
       <GeneralInformation {...CSVDetails} />
-      <VirtualizationFeaturesSection />
+      <VirtualizationFeaturesList />
       <Divider className="section-divider" />
       <GeneralSettings
         hyperConvergeConfiguration={hyperConvergeConfiguration}

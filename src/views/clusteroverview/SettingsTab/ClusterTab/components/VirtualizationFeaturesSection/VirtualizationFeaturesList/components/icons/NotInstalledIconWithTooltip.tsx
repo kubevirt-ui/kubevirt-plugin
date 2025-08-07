@@ -1,10 +1,10 @@
 import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import NotInstalledIcon from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/VirtualizationFeaturesWizard/components/SummaryStep/components/icons/NotInstalledIcon';
 import { Tooltip, TooltipPosition } from '@patternfly/react-core';
-import { InfoCircleIcon } from '@patternfly/react-icons';
 
-const NotInstalledIcon: FC = () => {
+const NotInstalledIconWithTooltip: FC = () => {
   const { t } = useKubevirtTranslation();
 
   return (
@@ -12,9 +12,9 @@ const NotInstalledIcon: FC = () => {
       content={t('Click "Configure features" to install this feature')}
       position={TooltipPosition.right}
     >
-      <InfoCircleIcon />
+      <NotInstalledIcon />
     </Tooltip>
   );
 };
 
-export default NotInstalledIcon;
+export default NotInstalledIconWithTooltip;
