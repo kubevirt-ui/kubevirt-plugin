@@ -7,7 +7,6 @@ import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-utils/models';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { ManagedClusterModel } from '@multicluster/constants';
 import useAllClusters from '@multicluster/hooks/useAllClusters/useAllClusters';
-import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import { getClusterFromProvider, getProviderByClusterName } from '../utils';
 
@@ -32,8 +31,6 @@ const useClustersAndProjects: UseClustersAndProjects = (sourceCluster, selectedC
   const [clusters, clustersLoaded, clustersError] = useAllClusters();
   const [providers, providersLoaded, providersError] = useProviders();
 
-  const [hubClusterName, hubClusterLoaded, hubClusterError] = useHubClusterName();
-
   const clustersNames = useMemo(() => {
     return clusters?.map((cluster) => getName(cluster));
   }, [clusters]);
@@ -43,8 +40,8 @@ const useClustersAndProjects: UseClustersAndProjects = (sourceCluster, selectedC
   }, [clustersNames, sourceCluster]);
 
   const enabledClusters = useMemo(() => {
-    return providers?.map((provider) => getClusterFromProvider(getName(provider), hubClusterName));
-  }, [providers, hubClusterName]);
+    return providers?.map((provider) => getClusterFromProvider(getName(provider)));
+  }, [providers]);
 
   const clustersOptions = getSelectableOptions(
     selectableClusters,
@@ -57,14 +54,14 @@ const useClustersAndProjects: UseClustersAndProjects = (sourceCluster, selectedC
 
   const getProviderFromClusterName = useCallback(
     (clusterName: string) => {
-      return getProviderByClusterName(clusterName, hubClusterName, providers);
+      return getProviderByClusterName(clusterName, providers);
     },
-    [providers, hubClusterName],
+    [providers],
   );
 
   return {
-    clustersError: clustersError || providersError || hubClusterError,
-    clustersLoaded: clustersLoaded && providersLoaded && hubClusterLoaded,
+    clustersError: clustersError || providersError,
+    clustersLoaded: clustersLoaded && providersLoaded,
     clustersOptions,
     getProviderFromClusterName,
     projectOptions,

@@ -7,7 +7,6 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getTargetProviderName } from '@kubevirt-utils/resources/plan/selectors';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { Title, Wizard, WizardStep } from '@patternfly/react-core';
-import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import useComputeReadiness from '../hooks/useComputeReadiness';
 import useNetworkReadiness from '../hooks/useNetworkReadiness';
@@ -41,10 +40,9 @@ const ReadinessStepBody: FC<ReadinessStepBodyProps> = ({
   vms,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [hubClusterName] = useHubClusterName();
 
   const targetProvider = getTargetProviderName(migrationPlan);
-  const targetCluster = getClusterFromProvider(targetProvider, hubClusterName);
+  const targetCluster = getClusterFromProvider(targetProvider);
 
   const {
     changeStorageMap,
