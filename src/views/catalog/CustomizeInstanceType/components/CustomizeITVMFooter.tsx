@@ -20,7 +20,6 @@ import { clearCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/cust
 import { createHeadlessService } from '@kubevirt-utils/utils/headless-service';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
-import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 import { getCatalogURL, getVMURL } from '@multicluster/urls';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
@@ -39,14 +38,13 @@ import './CustomizeITVMFooter.scss';
 const CustomizeITVMFooter: FC = () => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
-  const cluster = useClusterParam();
   const [activeNamespace] = useActiveNamespace();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<any | Error>(null);
   const { instanceTypeVMState, setStartVM, startVM, vm, vmNamespaceTarget } =
     useInstanceTypeVMStore();
 
-  const [isUDNManagedNamespace] = useNamespaceUDN(activeNamespace, cluster);
+  const [isUDNManagedNamespace] = useNamespaceUDN(activeNamespace);
   const [authorizedSSHKeys, setAuthorizedSSHKeys] = useKubevirtUserSettings('ssh');
   const { sshSecretCredentials } = instanceTypeVMState;
   const { applyKeyToProject, secretOption, sshPubKey, sshSecretName } = sshSecretCredentials || {};

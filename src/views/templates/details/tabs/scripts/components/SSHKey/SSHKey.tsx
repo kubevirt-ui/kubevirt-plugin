@@ -120,7 +120,6 @@ const SSHKey: FC<SSHKeyProps> = ({ template }) => {
                 createModal((modalProps) => (
                   <SSHSecretModal
                     {...modalProps}
-                    cluster={getCluster(template)}
                     initialSSHSecretDetails={initialSSHDetails}
                     isTemplate
                     namespace={getNamespace(template)}
