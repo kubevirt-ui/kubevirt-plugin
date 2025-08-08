@@ -16,7 +16,6 @@ import { getName, getNamespace, getUID } from '@kubevirt-utils/resources/shared'
 import { getNetworks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
 
-import { HOST_PROVIDER_NAME } from './hooks/constants';
 import { MTV_MIGRATION_NAMESPACE, POD_NETWORK_TYPE } from './constants';
 import { GetInitialStorageMapParams } from './types';
 
@@ -199,11 +198,7 @@ export const getClusterMajorMinorVersion = (clusterVersion: string) => {
   return version.length > 1 ? version[0] + '.' + version[1] : version[0];
 };
 
-export const getClusterFromProvider = (provider: string, hubClusterName: string) => {
-  if (provider === HOST_PROVIDER_NAME) {
-    return hubClusterName;
-  }
-
+export const getClusterFromProvider = (provider: string) => {
   return provider?.replace(/-mtv$/, '');
 };
 
@@ -213,14 +208,6 @@ export const getProviderNameFromCluster = (cluster: string) => {
   return cluster + '-mtv';
 };
 
-export const getProviderByClusterName = (
-  cluster: string,
-  hubClusterName: string,
-  providers: V1beta1Provider[],
-) => {
-  if (cluster === hubClusterName) {
-    return providers?.find((provider) => getName(provider) === HOST_PROVIDER_NAME);
-  }
-
+export const getProviderByClusterName = (cluster: string, providers: V1beta1Provider[]) => {
   return providers?.find((provider) => getName(provider) === getProviderNameFromCluster(cluster));
 };

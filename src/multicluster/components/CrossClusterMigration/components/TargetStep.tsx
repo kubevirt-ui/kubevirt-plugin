@@ -44,7 +44,7 @@ const TargetStep: FC<TargetStepProps> = ({ migrationPlan, setMigrationPlan, vms 
   const sourceNamespace = getNamespace(vms?.[0]);
 
   const selectedProviderTarget = getTargetProviderName(migrationPlan);
-  const selectedClusterTarget = getClusterFromProvider(selectedProviderTarget, hubClusterName);
+  const selectedClusterTarget = getClusterFromProvider(selectedProviderTarget);
   const selectedProjectTarget = getTargetNamespace(migrationPlan);
 
   const {
