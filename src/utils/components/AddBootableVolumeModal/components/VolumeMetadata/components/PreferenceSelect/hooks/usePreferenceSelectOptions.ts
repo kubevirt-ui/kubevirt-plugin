@@ -15,7 +15,6 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useUserPreferences from '@kubevirt-utils/hooks/useUserPreferences';
 
 type UsePreferenceSelectOptions = (
-  deleteLabel: (labelKey: string) => void,
   namespace: string,
   setBootableVolumeField: SetBootableVolumeFieldType,
 ) => {
@@ -24,7 +23,6 @@ type UsePreferenceSelectOptions = (
 };
 
 const usePreferenceSelectOptions: UsePreferenceSelectOptions = (
-  deleteLabel,
   namespace,
   setBootableVolumeField,
 ) => {
@@ -57,8 +55,9 @@ const usePreferenceSelectOptions: UsePreferenceSelectOptions = (
         )(VirtualMachinePreferenceModelGroupVersionKind.kind),
       resources: userPreferences,
     });
+
     return [...userPreferenceOptions, ...preferenceOptions];
-  }, [preferences, userPreferences, deleteLabel, setBootableVolumeField, t]);
+  }, [preferences, userPreferences, setBootableVolumeField, t]);
 
   return {
     preferenceSelectOptions,

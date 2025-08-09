@@ -36,11 +36,13 @@ const CreateFromInstanceType: FC<CreateFromInstanceTypeProps> = ({ currentTab })
   const { resetInstanceTypeVMState, setVMNamespaceTarget, volumeListNamespace } =
     useInstanceTypeVMStore();
   const bootableVolumesData = useBootableVolumes(volumeListNamespace);
-  const instanceTypesAndPreferencesData = useInstanceTypesAndPreferences();
+  const [activeNamespace] = useActiveNamespace();
+  const instanceTypesAndPreferencesData = useInstanceTypesAndPreferences(
+    activeNamespace === ALL_NAMESPACES_SESSION_KEY ? DEFAULT_NAMESPACE : activeNamespace,
+  );
   const [userPreferences, userPreferencesLoaded, userPreferencesError] = useUserPreferences(
     volumeListNamespace === ALL_PROJECTS ? ALL_NAMESPACES_SESSION_KEY : volumeListNamespace,
   );
-  const [activeNamespace] = useActiveNamespace();
   const [authorizedSSHKeys, , loaded] = useKubevirtUserSettings('ssh', cluster);
 
   useEffect(() => {

@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { FC } from 'react';
 
 import { instanceTypeSeriesNameMapper } from '../../utils/constants';
 import { RedHatInstanceTypeSeries } from '../../utils/types';
@@ -8,8 +8,9 @@ import RedHatInstanceTypeSeriesSizesMenuItems from './RedHatInstanceTypeSeriesSi
 
 type RedHatInstanceTypeSeriesMenuProps = {
   selected: string;
+  selectedKind: string;
   series: RedHatInstanceTypeSeries[];
-  setSelected: Dispatch<SetStateAction<string>>;
+  setSelected: (value: string) => void;
 };
 
 const RedHatInstanceTypeSeriesMenu: FC<RedHatInstanceTypeSeriesMenuProps> = ({
