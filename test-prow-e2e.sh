@@ -147,7 +147,7 @@ export CYPRESS_CNV_NS='kubevirt-hyperconverged';
 export CYPRESS_OS_IMAGES_NS='kubevirt-os-images';
 
 # setup cluster
-bash test-setup.sh
+source test-setup.sh
 
 # Install dependencies.
 yarn install --frozen-lockfile

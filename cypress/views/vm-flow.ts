@@ -1,10 +1,12 @@
 import { VirtualMachineData } from '../types/vm';
 import * as index from '../utils/const/index';
+import { TEST_NS } from '../utils/const/index';
 
+import { action, DELETE } from './actions';
 import * as catalog from './catalog-flow';
 import * as instance from './instance-flow';
 import * as cView from './selector-catalog';
-import { vmStatusOnList, vmStatusTop } from './selector-common';
+import { kebabBtn, vmStatusOnList, vmStatusTop } from './selector-common';
 import * as iView from './selector-instance';
 import { tab } from './tab';
 
@@ -80,9 +82,9 @@ export const vm = {
     if (vmData.userTemplate) {
       cy.get(cView.uTemplate).click();
     }
-    cy.get(`[data-test-id="boot-source-available-Boot source available"]`)
-      .find(':checkbox')
-      .check();
+    // cy.get(`[data-test-id="boot-source-available-Boot source available"]`)
+    //   .find(':checkbox')
+    //   .check();
     cy.get(`div[data-test-id="${vmData.template.metadataName}"]`).click();
     // wait for page is loaded completely
     cy.wait(5000);
@@ -111,6 +113,7 @@ export const vm = {
   },
   customizeCreate: (vmData: VirtualMachineData, waitForRunning = true) => {
     cy.visitCatalog();
+    cy.switchProject(vmData.namespace);
     cy.get(cView.templateTab).click();
     cy.get(`[data-test-id="boot-source-available-Boot source available"]`)
       .find(':checkbox')
@@ -160,7 +163,7 @@ export const vm = {
     cy.visitCatalog();
     instance.customizeIT(vmData);
     if (!vmData.startOnCreation && vmData.startOnCreation !== undefined) {
-      cy.get(iView.startBtn).uncheck();
+      cy.get(cView.startOnCreation).uncheck();
     }
     cy.byButtonText(iView.createBtnText).click({ force: true });
     cy.get('[data-test="global-notifications"]').scrollIntoView();
@@ -171,6 +174,18 @@ export const vm = {
       // wait for vmi appear
       cy.wait(3000);
     }
+  },
+  delete: (vmName: string, gracePeriod?: string, skipDeleteDisk?: boolean) => {
+    getRow(vmName, () => cy.get(kebabBtn).click());
+    cy.byLegacyTestID(DELETE).click();
+    if (gracePeriod) {
+      cy.get('input[id="grace-period-checkbox"]').check();
+      cy.get('input[data-test="grace-period-seconds-input"]').clear().type(gracePeriod);
+    }
+    if (skipDeleteDisk) {
+      cy.get('input[id="delete-owned-resources"]').uncheck();
+    }
+    cy.byButtonText('Delete').click();
   },
   instanceCreate: (vmData: VirtualMachineData, waitForRunning = true) => {
     cy.visitCatalog(); // navigate back
@@ -186,6 +201,14 @@ export const vm = {
       checkStatus(vmData.name, index.VM_STATUS.Running, 3 * index.MINUTE, false);
       // wait for vmi appear
       cy.wait(3000);
+    }
+  },
+  migrate: (vmName: string, waitForComplete = true) => {
+    waitForStatus(vmName, index.VM_STATUS.Running);
+    action.migrate(vmName);
+    if (waitForComplete) {
+      waitForStatus(vmName, index.VM_STATUS.Migrating);
+      waitForStatus(vmName, index.VM_STATUS.Running);
     }
   },
 };
