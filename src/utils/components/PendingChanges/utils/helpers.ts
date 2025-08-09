@@ -39,6 +39,8 @@ import {
   getVolumes,
 } from '@kubevirt-utils/resources/vm';
 import { DEFAULT_NETWORK_INTERFACE } from '@kubevirt-utils/resources/vm/utils/constants';
+import { interfaceTypesProxy } from '@kubevirt-utils/resources/vm/utils/network/constants';
+import { getNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import {
   DESCHEDULER_EVICT_LABEL,
   getEvictionStrategy as getVMIEvictionStrategy,
@@ -179,9 +181,18 @@ export const getChangedNICs = (vm: V1VirtualMachine, vmi: V1VirtualMachineInstan
     vmNICsNames.push(DEFAULT_NETWORK_INTERFACE.name);
   }
 
-  const unchangedNICs = vmNICsNames?.filter((vmNicName) =>
-    vmiNICsNames?.some((vmiNicName) => vmNicName === vmiNicName),
-  );
+  const unchangedNICs =
+    vmInterfaces
+      ?.filter((vmNic) =>
+        vmiInterfaces?.some(
+          (vmiNic) =>
+            vmNic.name === vmiNic.name &&
+            interfaceTypesProxy[getNetworkInterfaceType(vmNic)] ===
+              interfaceTypesProxy[getNetworkInterfaceType(vmiNic)],
+        ),
+      )
+      ?.map((nic) => nic?.name) || [];
+
   const changedNICs = [
     ...(vmNICsNames?.filter((nic) => !unchangedNICs?.includes(nic)) || []),
     ...(vmiNICsNames?.filter((nic) => !unchangedNICs?.includes(nic)) || []),

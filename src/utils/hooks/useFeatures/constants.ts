@@ -22,6 +22,7 @@ export const CONFIRM_VM_ACTIONS = 'confirmVMActions';
 
 export const TREE_VIEW_FOLDERS = 'treeViewFolders';
 export const ADVANCED_SEARCH = 'advancedSearch';
+export const PASST_UDN_NETWORK = 'passtUDNNetwork';
 
 export const FEATURES_CONFIG_MAP_NAME = 'kubevirt-ui-features';
 const FEATURES_ROLE_NAME = 'kubevirt-ui-features-reader';
@@ -40,6 +41,7 @@ export const featuresConfigMapInitialState: IoK8sApiCoreV1ConfigMap = {
     [LOAD_BALANCER_ENABLED]: 'false',
     [NODE_PORT_ADDRESS]: '',
     [NODE_PORT_ENABLED]: 'false',
+    [PASST_UDN_NETWORK]: 'false',
     [TREE_VIEW_FOLDERS]: 'false',
   },
   metadata: {

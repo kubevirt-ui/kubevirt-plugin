@@ -9,6 +9,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { NetworkAttachmentDefinitionModelGroupVersionKind } from '@kubevirt-utils/models';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
+import { getInterfaces, PASST_BINDING_NAME } from '@kubevirt-utils/resources/vm';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Content,
@@ -33,6 +34,7 @@ const ConsoleOverVirtctl: FC<ConsoleOverVirtctlProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
 
   const [isNamespaceManagedByUDN, _, nad] = useNamespaceUDN(getNamespace(vm));
+  const usesPasst = getInterfaces(vm)?.some((iface) => iface?.binding?.name === PASST_BINDING_NAME);
 
   return (
     <DescriptionListGroup>
@@ -42,6 +44,12 @@ const ConsoleOverVirtctl: FC<ConsoleOverVirtctlProps> = ({ vm }) => {
           <Popover
             bodyContent={
               <>
+                {isNamespaceManagedByUDN && (
+                  <div>
+                    {t('Configure the VirtualMachine network to use the Passt network binding.')}
+                  </div>
+                )}
+                <br />
                 <Trans t={t}>
                   <div>
                     Open an SSH connection with the VM using the cluster API server. You must be
@@ -74,7 +82,7 @@ const ConsoleOverVirtctl: FC<ConsoleOverVirtctlProps> = ({ vm }) => {
         </Content>
       </DescriptionListTerm>
       <DescriptionListDescription>
-        {isNamespaceManagedByUDN ? (
+        {isNamespaceManagedByUDN && !usesPasst ? (
           <>
             {t("Virtctl is disabled for this namespace as it's managed by")}{' '}
             <ResourceLink
