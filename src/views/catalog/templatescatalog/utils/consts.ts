@@ -1,5 +1,6 @@
 export enum CATALOG_FILTERS {
   ALL_ITEMS = 'allItems',
+  ARCHITECTURE = 'architecture',
   HIDE_DEPRECATED_TEMPLATES = 'hideDeprecatedTemplates',
   IS_LIST = 'isList',
   NAMESPACE = 'namespace',

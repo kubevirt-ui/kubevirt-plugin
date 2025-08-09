@@ -1,8 +1,9 @@
-import React, { FC, memo } from 'react';
+import React, { FC, memo, useMemo } from 'react';
 
 import { CATALOG_FILTERS } from '@catalog/templatescatalog/utils/consts';
 import { hasNoDefaultUserAllFilters } from '@catalog/templatescatalog/utils/helpers';
 import { TemplateFilters } from '@catalog/templatescatalog/utils/types';
+import useHcoWorkloadArchitectures from '@kubevirt-utils/hooks/useHcoWorkloadArchitectures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   HIDE_DEPRECATED_TEMPLATES_KEY,
@@ -11,6 +12,7 @@ import {
   WORKLOADS,
   WORKLOADS_LABELS,
 } from '@kubevirt-utils/resources/template/utils/constants';
+import { ARCHITECTURE_TITLE } from '@kubevirt-utils/utils/architecture';
 import { VerticalTabs, VerticalTabsTab } from '@patternfly/react-catalog-view-extension';
 import { FilterSidePanel } from '@patternfly/react-catalog-view-extension/dist/esm/components/FilterSidePanel';
 
@@ -23,6 +25,16 @@ export const TemplatesCatalogFilters: FC<{
   onFilterChange: (type: CATALOG_FILTERS, value: boolean | string) => void;
 }> = memo(({ filters, onFilterChange }) => {
   const { t } = useKubevirtTranslation();
+
+  const workloadsArchitectures = useHcoWorkloadArchitectures();
+  const workloadsArchitecturesItems = useMemo(
+    () =>
+      workloadsArchitectures.map((arch) => ({
+        label: arch,
+        value: arch,
+      })),
+    [workloadsArchitectures],
+  );
 
   return (
     <div className="co-catalog-page__tabs">
@@ -96,6 +108,13 @@ export const TemplatesCatalogFilters: FC<{
           groupLabel={t('Workload')}
           onFilterClick={onFilterChange}
           pickedFilters={filters.workload}
+        />
+        <TemplatesCatalogFiltersGroup
+          filters={workloadsArchitecturesItems}
+          groupKey={CATALOG_FILTERS.ARCHITECTURE}
+          groupLabel={ARCHITECTURE_TITLE}
+          onFilterClick={onFilterChange}
+          pickedFilters={filters.architecture}
         />
       </FilterSidePanel>
     </div>

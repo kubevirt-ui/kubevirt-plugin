@@ -1,4 +1,5 @@
 import produce from 'immer';
+import { isEmpty } from 'lodash';
 
 import { ProcessedTemplatesModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
@@ -17,6 +18,7 @@ import {
   DEFAULT_NETWORK_INTERFACE,
   UDN_BINDING_NAME,
 } from '@kubevirt-utils/resources/vm/utils/constants';
+import { getArchitecture, NODE_ARCHITECTURE_LABEL } from '@kubevirt-utils/utils/architecture';
 import { createHeadlessService } from '@kubevirt-utils/utils/headless-service';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
@@ -91,6 +93,13 @@ export const quickCreateVM: QuickCreateVMType = async ({
     if (isUDNManagedNamespace && defaultInterface) {
       delete defaultInterface.masquerade;
       defaultInterface.binding = { name: UDN_BINDING_NAME };
+    }
+
+    const templateArchitecture = getArchitecture(processedTemplate);
+    if (!isEmpty(templateArchitecture)) {
+      draftVM.spec.template.spec.nodeSelector = {
+        [NODE_ARCHITECTURE_LABEL]: templateArchitecture,
+      };
     }
   });
 
