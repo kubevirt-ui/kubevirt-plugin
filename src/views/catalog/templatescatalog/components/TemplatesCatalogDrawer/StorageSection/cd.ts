@@ -7,48 +7,58 @@ import {
   V1Volume,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
-import { ensurePath, removeDockerPrefix } from '@kubevirt-utils/utils/utils';
+import { CDROM_DEVICE_NAME } from '@kubevirt-utils/resources/vm/utils/disk/constants';
+import { ensurePath, generatePrettyName, removeDockerPrefix } from '@kubevirt-utils/utils/utils';
 
 import { INSTALLATION_CDROM_DISK, INSTALLATION_CDROM_NAME } from './constants';
+
+const createEmptyCDROMVolume = (cdromName: string): V1Volume => ({
+  name: cdromName,
+});
 
 export const addInstallationCDRom = (
   virtualMachine: V1VirtualMachine,
   cdSource: V1beta1DataVolumeSpec | V1ContainerDiskSource,
+  cdromName: string = INSTALLATION_CDROM_NAME,
+  shouldSetBootOrder: boolean = true,
 ): V1VirtualMachine => {
   let cdVolume: V1Volume = undefined;
   let cdDataVolumeTemplate: V1DataVolumeTemplateSpec = undefined;
-  const dataVolumeName = `${virtualMachine?.metadata?.name}-${INSTALLATION_CDROM_NAME}`;
+  const dataVolumeName = `${virtualMachine?.metadata?.name}-${cdromName}`;
 
-  if ('image' in cdSource) {
+  if (!cdSource || Object.keys(cdSource).length === 0) {
+    cdVolume = createEmptyCDROMVolume(cdromName);
+  } else if ('image' in cdSource) {
     cdVolume = {
       containerDisk: {
         image: removeDockerPrefix((cdSource as V1ContainerDiskSource).image),
       },
-      name: INSTALLATION_CDROM_NAME,
+      name: cdromName,
     };
-  }
+  } else {
+    const cdDataVolumeSource = (cdSource as V1beta1DataVolumeSpec)?.source;
 
-  const cdDataVolumeSource = (cdSource as V1beta1DataVolumeSpec)?.source;
+    if (cdDataVolumeSource?.registry) {
+      cdVolume = {
+        containerDisk: {
+          image: removeDockerPrefix(cdDataVolumeSource?.registry.url),
+        },
+        name: cdromName,
+      };
+    }
+    if (cdDataVolumeSource?.http || cdDataVolumeSource?.pvc || cdDataVolumeSource?.upload) {
+      cdVolume = {
+        dataVolume: {
+          name: dataVolumeName,
+        },
+        name: cdromName,
+      };
 
-  if (cdDataVolumeSource?.registry) {
-    cdVolume = {
-      containerDisk: {
-        image: removeDockerPrefix(cdDataVolumeSource?.registry.url),
-      },
-      name: INSTALLATION_CDROM_NAME,
-    };
-  } else if (cdDataVolumeSource?.http || cdDataVolumeSource?.pvc || cdDataVolumeSource?.upload) {
-    cdVolume = {
-      dataVolume: {
-        name: dataVolumeName,
-      },
-      name: INSTALLATION_CDROM_NAME,
-    };
-
-    cdDataVolumeTemplate = {
-      metadata: { name: dataVolumeName },
-      spec: { source: cdDataVolumeSource, storage: (cdSource as V1beta1DataVolumeSpec)?.storage },
-    };
+      cdDataVolumeTemplate = {
+        metadata: { name: dataVolumeName },
+        spec: { source: cdDataVolumeSource, storage: (cdSource as V1beta1DataVolumeSpec)?.storage },
+      };
+    }
   }
 
   if (!cdVolume) return virtualMachine;
@@ -65,27 +75,34 @@ export const addInstallationCDRom = (
     ensurePath(draftVM, 'spec.template.spec.domain.devices.disks');
 
     draftVM.spec.dataVolumeTemplates = dataVolumeTemplates;
-    draftVM.spec.template.spec.domain.devices.disks =
-      draftVM.spec.template.spec.domain.devices.disks.map((disk, index) => ({
-        ...disk,
-        bootOrder: disk.name === INSTALLATION_CDROM_NAME ? 1 : 2 + index,
-      }));
 
-    if (!getDisks(draftVM)?.find((disk) => disk.name === INSTALLATION_CDROM_NAME))
-      draftVM.spec.template.spec.domain.devices.disks.push(INSTALLATION_CDROM_DISK);
+    if (shouldSetBootOrder) {
+      draftVM.spec.template.spec.domain.devices.disks =
+        draftVM.spec.template.spec.domain.devices.disks.map((disk, index) => ({
+          ...disk,
+          bootOrder: disk.name === cdromName ? 1 : 2 + index,
+        }));
+    }
 
-    const otherVolumes = (getVolumes(draftVM) || [])?.filter(
-      (volume) => volume.name !== INSTALLATION_CDROM_NAME,
-    );
+    const cdromDisk = {
+      ...INSTALLATION_CDROM_DISK,
+      name: cdromName,
+    };
+
+    if (!getDisks(draftVM)?.find((disk) => disk.name === cdromName))
+      draftVM.spec.template.spec.domain.devices.disks.push(cdromDisk);
+
+    const otherVolumes = (getVolumes(draftVM) || [])?.filter((volume) => volume.name !== cdromName);
 
     draftVM.spec.template.spec.volumes = [...otherVolumes, cdVolume];
   });
 };
 
-export const removeCDInstallation = (virtualMachine: V1VirtualMachine): V1VirtualMachine => {
-  const cdVolume = getVolumes(virtualMachine)?.find(
-    (volume) => volume.name === INSTALLATION_CDROM_NAME,
-  );
+export const removeCDRomDevice = (
+  virtualMachine: V1VirtualMachine,
+  cdromName: string,
+): V1VirtualMachine => {
+  const cdVolume = getVolumes(virtualMachine)?.find((volume) => volume.name === cdromName);
 
   if (!cdVolume) return virtualMachine;
 
@@ -96,11 +113,31 @@ export const removeCDInstallation = (virtualMachine: V1VirtualMachine): V1Virtua
       );
 
     draftVM.spec.template.spec.domain.devices.disks = getDisks(draftVM).filter(
-      (disk) => disk.name !== INSTALLATION_CDROM_NAME,
+      (disk) => disk.name !== cdromName,
     );
     draftVM.spec.template.spec.volumes = getVolumes(draftVM).filter(
-      (volume) => volume.name !== INSTALLATION_CDROM_NAME,
+      (volume) => volume.name !== cdromName,
     );
-    draftVM.spec.template.spec.volumes.push(cdVolume);
   });
+};
+
+export const removeCDInstallation = (virtualMachine: V1VirtualMachine): V1VirtualMachine => {
+  return removeCDRomDevice(virtualMachine, INSTALLATION_CDROM_NAME);
+};
+
+export const generateCDROMName = (): string => {
+  return generatePrettyName(CDROM_DEVICE_NAME);
+};
+
+export const addCDRomDevice = (
+  virtualMachine: V1VirtualMachine,
+  cdromName: string,
+  cdSource?: V1beta1DataVolumeSpec | V1ContainerDiskSource,
+): V1VirtualMachine => {
+  return addInstallationCDRom(virtualMachine, cdSource || ({} as any), cdromName, false);
+};
+
+export const addEmptyCDROMDevice = (vm: V1VirtualMachine, cdromName?: string): V1VirtualMachine => {
+  const name = cdromName || generateCDROMName();
+  return addCDRomDevice(vm, name);
 };

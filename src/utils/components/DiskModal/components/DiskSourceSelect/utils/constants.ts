@@ -17,6 +17,7 @@ export const diskSourcePasswordFieldID = 'disk-source-password';
 
 export const optionLabelMapper: { [key in SourceTypes]: string } = {
   [SourceTypes.BLANK]: t('Empty disk (blank)'),
+  [SourceTypes.CDROM]: t('CD ROM'),
   [SourceTypes.CLONE_PVC]: t('Clone volume'),
   [SourceTypes.DATA_SOURCE]: t('Use DataSource'),
   [SourceTypes.EPHEMERAL]: t('Ephemeral disk (Container image)'),
@@ -58,4 +59,10 @@ export const blankOption: DiskSourceOptionGroupItem = {
   description: t('Create a disk with no contents.'),
   id: SourceTypes.BLANK,
   label: optionLabelMapper[SourceTypes.BLANK],
+};
+
+export const cdromOption: DiskSourceOptionGroupItem = {
+  description: t('Add a CD ROM to the VirtualMachine configuration'),
+  id: SourceTypes.CDROM,
+  label: optionLabelMapper[SourceTypes.CDROM],
 };

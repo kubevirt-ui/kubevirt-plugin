@@ -1,17 +1,26 @@
-import React, { FC, useState } from 'react';
+import { FC, useMemo, useState } from 'react';
+import React from 'react';
 
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
 import {
-  getRunningVMMissingVolumesFromVMI,
-  produceVMDisks,
-} from '@kubevirt-utils/components/DiskModal/utils/helpers';
+  V1VirtualMachine,
+  V1VirtualMachineInstance,
+  V1Volume,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
+import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
+import { produceVMDisks } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { getDataVolumeTemplates, getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
+import {
+  hasContainerDisk,
+  hasDataVolume,
+  hasPersistentVolumeClaim,
+  isCDROMDisk,
+} from '@kubevirt-utils/resources/vm/utils/disk/selectors';
+import { isEmptyContainerDiskImage } from '@kubevirt-utils/resources/vm/utils/disk/utils';
 import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
 import { ButtonVariant, Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
 import { updateDisks } from '@virtualmachines/details/tabs/configuration/details/utils/utils';
@@ -20,7 +29,9 @@ import { isRunning } from '@virtualmachines/utils';
 import CreateBootableVolumeModal from '../../modal/CreateBootableVolumeModal';
 import DeleteDiskModal from '../../modal/DeleteDiskModal';
 import DetachModal from '../../modal/DetachModal';
+import EjectCDROMModal from '../../modal/EjectCDROMModal';
 import MakePersistentModal from '../../modal/MakePersistentModal';
+import MountCDROMModal from '../../modal/MountCDROMModal';
 
 import { isHotplugVolume, isPVCSource } from './utils/helpers';
 
@@ -49,10 +60,35 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
   const isVMRunning = isRunning(vm);
   const isHotplug = isHotplugVolume(vm, diskName, vmi);
 
-  const volumes = isVMRunning
-    ? [...(getVolumes(vm) || []), ...getRunningVMMissingVolumesFromVMI(getVolumes(vm) || [], vmi)]
-    : getVolumes(vm);
-  const volume = volumes?.find(({ name }) => name === diskName);
+  const vmDisk = getDisks(vm)?.find((disk) => disk.name === diskName);
+  const isCDROM = vmDisk ? isCDROMDisk(vmDisk) : false;
+
+  const { isCDROMMountedState, volume } = useMemo(() => {
+    const vols = isVMRunning ? vmi?.spec?.volumes : getVolumes(vm);
+    const vol = vols?.find(({ name }) => name === diskName);
+
+    const vmVols = getVolumes(vm);
+    const vmVol = vmVols?.find(({ name }) => name === diskName);
+
+    const effective = isCDROM ? vmVol : vol;
+
+    const isMountedVolume = (targetVolume: undefined | V1Volume): boolean => {
+      if (!targetVolume) return false;
+      if (hasContainerDisk(targetVolume)) {
+        return !isEmptyContainerDiskImage(targetVolume);
+      }
+      return hasDataVolume(targetVolume) || hasPersistentVolumeClaim(targetVolume);
+    };
+
+    const mounted = isMountedVolume(effective);
+
+    return {
+      isCDROMMountedState: mounted,
+      volume: vol,
+    };
+  }, [vm, vmi, isVMRunning, diskName, isCDROM]);
+
+  const isCDROMOperationsEnabled = isCDROM;
 
   const editBtnText = t('Edit');
   const deleteBtnText = t('Detach');
@@ -122,6 +158,19 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
       <MakePersistentModal isOpen={isOpen} onClose={onClose} vm={vm} vmi={vmi} volume={volume} />
     ));
 
+  const createCDROMModal = () => {
+    const Component = isCDROMMountedState ? EjectCDROMModal : MountCDROMModal;
+    return createModal(({ isOpen, onClose }) => (
+      <Component
+        cdromName={diskName}
+        isOpen={isOpen}
+        onClose={onClose}
+        onSubmit={onDiskUpdate || updateDisks}
+        vm={vm}
+      />
+    ));
+  };
+
   const onModalOpen = (createModalCallback: () => void) => {
     createModalCallback();
     setIsDropdownOpen(false);
@@ -148,6 +197,11 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
         <DropdownItem key="disk-edit" onClick={() => onModalOpen(createEditDiskModal)}>
           {editBtnText}
         </DropdownItem>
+        {isCDROMOperationsEnabled && (
+          <DropdownItem key="cdrom" onClick={() => onModalOpen(createCDROMModal)}>
+            {isCDROMMountedState ? t('Eject') : t('Mount')}
+          </DropdownItem>
+        )}
         <DropdownItem key="disk-delete" onClick={() => onModalOpen(createDeleteDiskModal)}>
           {deleteBtnText}
         </DropdownItem>

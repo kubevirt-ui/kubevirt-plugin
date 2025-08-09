@@ -12,6 +12,10 @@ import {
   getDisks,
   getVolumes,
 } from '@kubevirt-utils/resources/vm';
+import {
+  CDROM_DEVICE_NAME,
+  DISK_DEVICE_NAME,
+} from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { generatePrettyName, isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { DEFAULT_DISK_SIZE } from './constants';
@@ -28,6 +32,8 @@ const createInitialStateFromSource: Record<
   (volume: V1Volume, dataVolumeTemplate: V1DataVolumeTemplateSpec) => void
 > = {
   [SourceTypes.BLANK]: (_volume: V1Volume, dataVolumeTemplate: V1DataVolumeTemplateSpec) =>
+    (dataVolumeTemplate.spec.source.blank = {}),
+  [SourceTypes.CDROM]: (_volume: V1Volume, dataVolumeTemplate: V1DataVolumeTemplateSpec) =>
     (dataVolumeTemplate.spec.source.blank = {}),
   [SourceTypes.CLONE_PVC]: (_volume: V1Volume, dataVolumeTemplate: V1DataVolumeTemplateSpec) =>
     (dataVolumeTemplate.spec.source.pvc = { name: '', namespace: '' }),
@@ -74,7 +80,8 @@ export const getDefaultCreateValues = (
   vm: V1VirtualMachine,
   createDiskSource: SourceTypes,
 ): V1DiskFormState => {
-  const newDiskName = generatePrettyName('disk');
+  const namePrefix = createDiskSource === SourceTypes.CDROM ? CDROM_DEVICE_NAME : DISK_DEVICE_NAME;
+  const newDiskName = generatePrettyName(namePrefix);
   const newDataVolumeName = createDataVolumeName(vm, newDiskName);
 
   const withDataVolume = doesSourceRequireDataVolume(createDiskSource);
@@ -89,10 +96,16 @@ export const getDefaultCreateValues = (
 
   createInitialStateFromSource?.[createDiskSource]?.(volume, dataVolumeTemplate);
 
+  const isCDROM = createDiskSource === SourceTypes.CDROM;
+
+  const diskConfig = isCDROM
+    ? { cdrom: { bus: InterfaceTypes.SATA } }
+    : { disk: { bus: InterfaceTypes.VIRTIO } };
+
   return {
     dataVolumeTemplate,
     disk: {
-      disk: { bus: InterfaceTypes.VIRTIO },
+      ...diskConfig,
       name: newDiskName,
     },
     isBootSource: false,

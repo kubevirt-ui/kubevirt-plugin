@@ -2,7 +2,10 @@ import produce from 'immer';
 import { WritableDraft } from 'immer/dist/internal';
 
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
-import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import {
+  V1beta1DataVolume,
+  V1beta1DataVolumeSpec,
+} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import {
   V1AddVolumeOptions,
   V1DataVolumeTemplateSpec,
@@ -184,6 +187,7 @@ export const produceVMDisks = (
 export const doesSourceRequireDataVolume = (diskSource: SourceTypes): boolean => {
   return [
     SourceTypes.BLANK,
+    SourceTypes.CDROM,
     SourceTypes.CLONE_PVC,
     SourceTypes.DATA_SOURCE,
     SourceTypes.HTTP,
@@ -238,3 +242,69 @@ export const doesDataVolumeTemplateHaveDisk = (vm: V1VirtualMachine, diskName: s
 
 export const createDataVolumeName = (vm: V1VirtualMachine, diskName: string) =>
   `dv-${getName(vm)}-${diskName}-${getRandomChars()}`;
+
+const getVolumeSourceForMount = (diskState: V1DiskFormState) => {
+  if (diskState.dataVolumeTemplate) {
+    return {
+      dataVolume: {
+        name: diskState.dataVolumeTemplate.metadata.name,
+      },
+    };
+  }
+  return {
+    persistentVolumeClaim: {
+      claimName: diskState.volume.persistentVolumeClaim.claimName,
+    },
+  };
+};
+
+export const mountISOToCDROM = async (
+  vm: V1VirtualMachine,
+  diskState: V1DiskFormState,
+): Promise<V1VirtualMachine> => {
+  const volumes = getVolumes(vm) || [];
+  const volumeIndex = volumes.findIndex((volume) => volume.name === diskState.disk.name);
+
+  if (diskState.dataVolumeTemplate) {
+    const dataVolume = getEmptyVMDataVolumeResource(vm);
+    dataVolume.metadata = diskState.dataVolumeTemplate.metadata;
+    dataVolume.spec = { ...diskState.dataVolumeTemplate.spec } as unknown as V1beta1DataVolumeSpec;
+
+    await k8sCreate({ data: dataVolume, model: DataVolumeModel });
+  }
+
+  const newVolumeSource = getVolumeSourceForMount(diskState);
+
+  return produceVMDisks(vm, (draftVM) => {
+    draftVM.spec.template.spec.volumes[volumeIndex] = {
+      name: diskState.disk.name,
+      ...newVolumeSource,
+    };
+  });
+};
+
+export const ejectISOFromCDROM = (vm: V1VirtualMachine, cdromName: string): V1VirtualMachine => {
+  const volumes = getVolumes(vm) || [];
+  const volumeIndex = volumes.findIndex((volume) => volume.name === cdromName);
+
+  return produceVMDisks(vm, (draftVM) => {
+    const currentVolume = draftVM.spec.template.spec.volumes[volumeIndex];
+
+    if (currentVolume?.dataVolume?.name) {
+      const dataVolumeTemplateIndex = (draftVM.spec.dataVolumeTemplates || []).findIndex(
+        (dv) => getName(dv) === currentVolume.dataVolume.name,
+      );
+
+      if (dataVolumeTemplateIndex >= 0) {
+        draftVM.spec.dataVolumeTemplates.splice(dataVolumeTemplateIndex, 1);
+      }
+    }
+
+    draftVM.spec.template.spec.volumes[volumeIndex] = {
+      containerDisk: {
+        image: '',
+      },
+      name: cdromName,
+    };
+  });
+};
