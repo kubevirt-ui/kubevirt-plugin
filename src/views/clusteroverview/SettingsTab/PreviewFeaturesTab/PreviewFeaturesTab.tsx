@@ -30,6 +30,7 @@ const PreviewFeaturesTab: FC = () => {
           <StackItem isFilled key={feature.id}>
             <SectionWithSwitch
               externalLink={feature.externalLink}
+              helpTextIconContent={feature?.helpPopoverContent}
               id={feature.id}
               isDisabled={!feature.canEdit}
               isLoading={feature.loading}

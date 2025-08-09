@@ -6,8 +6,6 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
 import { FormGroup, SelectOption } from '@patternfly/react-core';
 
-import './NetworkInterfaceLinkState.scss';
-
 type NetworkInterfaceLinkStateProps = {
   isDisabled: boolean;
   linkState: NetworkInterfaceState;
@@ -27,7 +25,7 @@ const NetworkInterfaceLinkState: FC<NetworkInterfaceLinkStateProps> = ({
   };
 
   return (
-    <FormGroup className="link-state" fieldId="link-state" label={t('Link state')}>
+    <FormGroup className="form-group-margin" fieldId="link-state" label={t('Link state')}>
       <div data-test-id="link-state-select">
         <FormPFSelect
           isDisabled={isDisabled}

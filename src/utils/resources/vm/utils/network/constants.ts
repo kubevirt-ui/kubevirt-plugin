@@ -1,7 +1,7 @@
 /* eslint-disable require-jsdoc */
 import { V1Interface, V1Network } from '@kubevirt-ui/kubevirt-api/kubevirt';
 
-import { BRIDGE, MASQUERADE, SRIOV, UDN_BINDING_NAME } from '../constants';
+import { BRIDGE, MASQUERADE, PASST_BINDING_NAME, SRIOV, UDN_BINDING_NAME } from '../constants';
 
 export type NetworkPresentation = {
   iface: V1Interface;
@@ -23,8 +23,10 @@ const labelHandler = {
 export type InterfaceTypes =
   | typeof BRIDGE
   | typeof MASQUERADE
+  | typeof PASST_BINDING_NAME
   | typeof SRIOV
   | typeof UDN_BINDING_NAME;
+
 type LabelMap = { [key: string]: InterfaceTypes };
 type TypeMap = { [key in InterfaceTypes]: string };
 
@@ -32,6 +34,7 @@ const types2labels: TypeMap = {
   bridge: 'Bridge',
   l2bridge: 'L2 bridge',
   masquerade: 'Masquerade',
+  passt: 'Passt',
   sriov: 'SR-IOV',
 };
 

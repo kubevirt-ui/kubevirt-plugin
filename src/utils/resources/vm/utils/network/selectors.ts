@@ -2,7 +2,7 @@ import { V1Interface, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevir
 import { getInterfaces } from '@kubevirt-utils/resources/vm';
 import { isNetworkInterfaceState } from '@kubevirt-utils/utils/typeGuards';
 
-import { NO_DATA_DASH, UDN_BINDING_NAME } from '../constants';
+import { NO_DATA_DASH, PASST_BINDING_NAME, UDN_BINDING_NAME } from '../constants';
 
 import { interfaceTypesProxy } from './constants';
 import { NetworkInterfaceState } from './types';
@@ -14,6 +14,7 @@ import { NetworkInterfaceState } from './types';
  */
 export const getNetworkInterfaceType = (iface: V1Interface): string => {
   if (iface?.binding?.name === UDN_BINDING_NAME) return UDN_BINDING_NAME;
+  if (iface?.binding?.name === PASST_BINDING_NAME) return PASST_BINDING_NAME;
 
   const drive = Object.keys(interfaceTypesProxy)?.find((ifaceType: string) => iface?.[ifaceType]);
   return drive ?? NO_DATA_DASH;
