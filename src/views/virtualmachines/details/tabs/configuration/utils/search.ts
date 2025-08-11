@@ -1,6 +1,7 @@
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getInstanceTypeMatcher } from '@kubevirt-utils/resources/vm';
+import { hasS390xArchitecture } from '@kubevirt-utils/resources/vm/utils/architecture';
 
 export type SearchItem = {
   description: string;
@@ -18,9 +19,14 @@ export const getDetailsTabBootIds: SearchItemGetter = () => [
   { description: '', id: 'start-pause-mode', title: t('Start in pause mode') },
 ];
 
-export const getDetailsTabHardwareIds: SearchItemGetter = () => [
+export const getDetailsTabHardwareIds: SearchItemGetter = (vm) => [
   { description: '', id: 'hardware-devices', title: t('Hardware devices') },
-  { description: '', id: 'gpu-devices', title: t('GPU devices') },
+  {
+    description: '',
+    id: 'gpu-devices',
+    isDisabled: hasS390xArchitecture(vm),
+    title: t('GPU devices'),
+  },
   { description: '', id: 'host-devices', title: t('Host devices') },
 ];
 

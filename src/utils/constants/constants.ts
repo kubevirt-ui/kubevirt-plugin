@@ -32,3 +32,9 @@ export enum PERSPECTIVES {
   DEVELOPER = 'dev',
   VIRTUALIZATION = 'virtualization-perspective',
 }
+
+export enum ARCHITECTURES {
+  AMD64 = 'amd64',
+  ARM64 = 'arm64',
+  S390X = 's390x',
+}

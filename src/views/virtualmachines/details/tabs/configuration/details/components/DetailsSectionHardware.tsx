@@ -11,6 +11,7 @@ import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useToggle } from '@kubevirt-utils/hooks/useToggle';
 import { getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
+import { hasS390xArchitecture } from '@kubevirt-utils/resources/vm/utils/architecture';
 import { Bullseye, Divider, ExpandableSection, Flex, Grid, GridItem } from '@patternfly/react-core';
 
 import { getSearchItemsIds } from '../../search/utils/utils';
@@ -35,6 +36,7 @@ const DetailsSectionHardware: FC<DetailsSectionHardwareProps> = ({
   const onSubmit = onSubmitProp || updateHardwareDevices;
   const hostDevices = getHostDevices(vm);
   const gpus = getGPUDevices(vm);
+  const vmHasS390xArchitecture = hasS390xArchitecture(vm);
 
   useEffect(() => {
     expandURLHash(getSearchItemsIds(getDetailsTabHardwareIds(vm)), location?.hash, setIsExpanded);
@@ -86,20 +88,24 @@ const DetailsSectionHardware: FC<DetailsSectionHardwareProps> = ({
       onToggle={(_event, val) => setIsExpanded(val)}
     >
       <Grid>
-        <GridItem span={4}>
-          <HardwareDeviceTitle canEdit onClick={onEditGPU} title={t('GPU devices')} />
-          <HardwareDevicesTable devices={gpus} />
-        </GridItem>
+        {!vmHasS390xArchitecture && (
+          <>
+            <GridItem span={5}>
+              <HardwareDeviceTitle canEdit onClick={onEditGPU} title={t('GPU devices')} />
+              <HardwareDevicesTable devices={gpus} />
+            </GridItem>
 
-        <GridItem span={1}>
-          <Bullseye>
-            <Flex className={'DetailsSection-divider__height'}>
-              <Divider orientation={{ default: 'vertical' }} />
-            </Flex>
-          </Bullseye>
-        </GridItem>
+            <GridItem span={1}>
+              <Bullseye>
+                <Flex className="DetailsSection-divider__height">
+                  <Divider orientation={{ default: 'vertical' }} />
+                </Flex>
+              </Bullseye>
+            </GridItem>
+          </>
+        )}
 
-        <GridItem span={4}>
+        <GridItem span={vmHasS390xArchitecture ? 11 : 5}>
           <HardwareDeviceTitle canEdit onClick={onEditHostDevices} title={t('Host devices')} />
           <HardwareDevicesTable devices={hostDevices} />
         </GridItem>

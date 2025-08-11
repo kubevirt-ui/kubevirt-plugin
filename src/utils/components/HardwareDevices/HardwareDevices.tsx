@@ -3,6 +3,7 @@ import React, { FC } from 'react';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
+import { hasS390xArchitecture } from '@kubevirt-utils/resources/vm/utils/architecture';
 import {
   DescriptionList,
   DescriptionListDescription,
@@ -37,6 +38,7 @@ const HardwareDevices: FC<HardwareDevicesProps> = ({
 
   const hostDevices = getHostDevices(vm);
   const gpus = getGPUDevices(vm);
+  const vmHasS390xArchitecture = hasS390xArchitecture(vm);
 
   const onEditGPU = () => {
     createModal(({ isOpen, onClose }) => (
@@ -72,17 +74,19 @@ const HardwareDevices: FC<HardwareDevicesProps> = ({
 
   return (
     <DescriptionList>
-      <DescriptionListGroup>
-        <HardwareDeviceTitle
-          canEdit={canEdit}
-          hideEdit={hideEdit}
-          onClick={onEditGPU}
-          title={t('GPU devices')}
-        />
-        <DescriptionListDescription>
-          <HardwareDevicesTable devices={gpus} />
-        </DescriptionListDescription>
-      </DescriptionListGroup>
+      {!vmHasS390xArchitecture && (
+        <DescriptionListGroup>
+          <HardwareDeviceTitle
+            canEdit={canEdit}
+            hideEdit={hideEdit}
+            onClick={onEditGPU}
+            title={t('GPU devices')}
+          />
+          <DescriptionListDescription>
+            <HardwareDevicesTable devices={gpus} />
+          </DescriptionListDescription>
+        </DescriptionListGroup>
+      )}
 
       <DescriptionListGroup>
         <HardwareDeviceTitle
