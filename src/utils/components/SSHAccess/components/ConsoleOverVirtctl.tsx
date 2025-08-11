@@ -6,11 +6,9 @@ import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { getConsoleVirtctlCommand } from '@kubevirt-utils/components/SSHAccess/utils';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { NetworkAttachmentDefinitionModelGroupVersionKind } from '@kubevirt-utils/models';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
 import { getInterfaces, PASST_BINDING_NAME } from '@kubevirt-utils/resources/vm';
-import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Content,
   DescriptionListDescription,
@@ -22,6 +20,7 @@ import {
 } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
 
+import VirtctlDisabled from './VirtctlDisabled';
 import VirtctlSSHCommandClipboardCopy from './VirtctlSSHCommandClipboardCopy';
 
 import './ConsoleOverVirtctl.scss';
@@ -33,7 +32,7 @@ type ConsoleOverVirtctlProps = {
 const ConsoleOverVirtctl: FC<ConsoleOverVirtctlProps> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
 
-  const [isNamespaceManagedByUDN, _, nad] = useNamespaceUDN(getNamespace(vm));
+  const [isNamespaceManagedByUDN] = useNamespaceUDN(getNamespace(vm));
   const usesPasst = getInterfaces(vm)?.some((iface) => iface?.binding?.name === PASST_BINDING_NAME);
 
   return (
@@ -44,11 +43,6 @@ const ConsoleOverVirtctl: FC<ConsoleOverVirtctlProps> = ({ vm }) => {
           <Popover
             bodyContent={
               <>
-                {isNamespaceManagedByUDN && (
-                  <div>
-                    {t('Configure the VirtualMachine network to use the Passt network binding.')}
-                  </div>
-                )}
                 <br />
                 <Trans t={t}>
                   <div>
@@ -83,15 +77,7 @@ const ConsoleOverVirtctl: FC<ConsoleOverVirtctlProps> = ({ vm }) => {
       </DescriptionListTerm>
       <DescriptionListDescription>
         {isNamespaceManagedByUDN && !usesPasst ? (
-          <>
-            {t("Virtctl is disabled for this namespace as it's managed by")}{' '}
-            <ResourceLink
-              groupVersionKind={NetworkAttachmentDefinitionModelGroupVersionKind}
-              inline
-              name={getName(nad)}
-              namespace={getNamespace(nad)}
-            />{' '}
-          </>
+          <VirtctlDisabled namespace={getNamespace(vm)} />
         ) : (
           <VirtctlSSHCommandClipboardCopy vm={vm} />
         )}

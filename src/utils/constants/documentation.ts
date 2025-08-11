@@ -40,6 +40,7 @@ export const documentationURL = {
   OS_IMAGE_OTHER: 'https://alt.fedoraproject.org/cloud/',
   OS_IMAGE_RHEL: `${RH_ACCESS_URL}/downloads/content/479`,
   OS_IMAGE_WINDOWS: 'https://www.microsoft.com/en-us/software-download/windows10ISO',
+  PASST: `${KV_UG_URL}/user-guide/network/net_binding_plugins/passt/#vm-passt-network-interface`,
   PROJECTS: 'https://docs.okd.io/latest/applications/projects/working-with-projects.html',
   REDHAT_BLOG: `${REDHAT_BASE_URL}/blog/channel/red-hat-openshift`,
   SNAPSHOT: `${REDHAT_DOC_URL}/html/storage/using-container-storage-interface-csi#persistent-storage-csi-snapshots`,

@@ -1,40 +1,86 @@
-import React, { FC } from 'react';
+import React, { FC, useCallback, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom-v5-compat';
 
+import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
+import { interfaceTypesProxy } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import usePasstFeatureFlag from '@overview/SettingsTab/PreviewFeaturesTab/hooks/usePasstFeatureFlag';
-import { Checkbox, FormGroup, Popover, Split, SplitItem } from '@patternfly/react-core';
+import { FormGroup, Popover, Select, SelectOption, Split, SplitItem } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
+
+import {
+  BINDING_SELECT_DESCRIPTION,
+  BINDING_SELECT_TITLE,
+  L2BRIDGE_BINDING,
+  PASST_BINDING,
+} from './constants';
 
 type NetworkInterfacePasstProps = {
   namespace: string;
-  onChange: (enabled: boolean) => void;
   passtEnabled: boolean;
+  setInterfaceType: (newValue: string) => void;
 };
 
 const NetworkInterfacePasst: FC<NetworkInterfacePasstProps> = ({
   namespace,
-  onChange,
   passtEnabled,
+  setInterfaceType,
 }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
   const passtFeatureFlag = usePasstFeatureFlag();
 
   const [isNamespaceManagedByUDN] = useNamespaceUDN(namespace);
   const { t } = useKubevirtTranslation();
 
+  const onToggle = useCallback(() => {
+    setIsOpen((currentIsOpen) => !currentIsOpen);
+  }, []);
+
+  const selected = useMemo(() => (passtEnabled ? PASST_BINDING : L2BRIDGE_BINDING), [passtEnabled]);
+
+  const onSelect = useCallback(
+    (_, value: string) => {
+      setInterfaceType(
+        value === PASST_BINDING ? interfaceTypesProxy.passt : interfaceTypesProxy.l2bridge,
+      );
+      onToggle();
+    },
+    [onToggle, setInterfaceType],
+  );
+
   if (!isNamespaceManagedByUDN) return null;
 
   return (
-    <FormGroup className="form-group-margin" fieldId="passt-checkbox">
-      <Split hasGutter>
-        <Checkbox
-          id="passt-checkbox"
-          isChecked={passtEnabled}
-          isDisabled={!passtFeatureFlag.featureEnabled}
-          label={t('Enable Passt network binding')}
-          onChange={(_, checked) => onChange(checked)}
-        />
+    <Split hasGutter>
+      <FormGroup className="form-group-margin" fieldId="passt-checkbox">
+        <Select
+          toggle={SelectToggle({
+            'data-test-id': 'source-type-select',
+            isExpanded: isOpen,
+            isFullWidth: true,
+            onClick: onToggle,
+            selected: BINDING_SELECT_TITLE[selected],
+          })}
+          isOpen={isOpen}
+          onOpenChange={setIsOpen}
+          onSelect={onSelect}
+          selected={selected}
+        >
+          <SelectOption
+            description={BINDING_SELECT_DESCRIPTION[L2BRIDGE_BINDING]}
+            value={L2BRIDGE_BINDING}
+          >
+            {BINDING_SELECT_TITLE[L2BRIDGE_BINDING]}
+          </SelectOption>
+          <SelectOption
+            description={BINDING_SELECT_DESCRIPTION[PASST_BINDING]}
+            value={PASST_BINDING}
+          >
+            {BINDING_SELECT_TITLE[PASST_BINDING]}
+          </SelectOption>
+        </Select>
         <SplitItem>
           {!passtFeatureFlag.featureEnabled && (
             <Popover
@@ -55,8 +101,8 @@ const NetworkInterfacePasst: FC<NetworkInterfacePasstProps> = ({
             </Popover>
           )}
         </SplitItem>
-      </Split>
-    </FormGroup>
+      </FormGroup>
+    </Split>
   );
 };
 
