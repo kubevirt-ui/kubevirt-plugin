@@ -1,11 +1,7 @@
 import { FC } from 'react';
 
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import {
-  ADVANCED_SEARCH,
-  PASST_UDN_NETWORK,
-  TREE_VIEW_FOLDERS,
-} from '@kubevirt-utils/hooks/useFeatures/constants';
+import { PASST_UDN_NETWORK, TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FEATURE_KUBEVIRT_ACM_TREEVIEW } from '@multicluster/constants';
@@ -37,7 +33,6 @@ type UsePreviewFeaturesData = () => {
 const usePreviewFeaturesData: UsePreviewFeaturesData = () => {
   const { t } = useKubevirtTranslation();
   const treeViewFoldersFeature = useFeatures(TREE_VIEW_FOLDERS);
-  const advancedSearchFeature = useFeatures(ADVANCED_SEARCH);
   const kubevirtACMTreeviewFeature = useFeatures(FEATURE_KUBEVIRT_ACM_TREEVIEW);
   const passtFeatureFlag = usePasstFeatureFlag();
 
@@ -47,12 +42,6 @@ const usePreviewFeaturesData: UsePreviewFeaturesData = () => {
       id: TREE_VIEW_FOLDERS,
       label: t('Enable folders in Virtual Machines tree view'),
       ...treeViewFoldersFeature,
-    },
-    {
-      externalLink: null,
-      id: ADVANCED_SEARCH,
-      label: t('Enable advanced search in Virtual Machines list'),
-      ...advancedSearchFeature,
     },
     {
       externalLink: null,

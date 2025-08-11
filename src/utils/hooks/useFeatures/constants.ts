@@ -21,7 +21,6 @@ export const DISABLED_GUEST_SYSTEM_LOGS_ACCESS = 'disabledGuestSystemLogsAccess'
 export const CONFIRM_VM_ACTIONS = 'confirmVMActions';
 
 export const TREE_VIEW_FOLDERS = 'treeViewFolders';
-export const ADVANCED_SEARCH = 'advancedSearch';
 export const PASST_UDN_NETWORK = 'passtUDNNetwork';
 
 export const FEATURES_CONFIG_MAP_NAME = 'kubevirt-ui-features';
@@ -32,7 +31,6 @@ export const FEATURE_HCO_PERSISTENT_RESERVATION = 'persistentReservationHCO';
 
 export const featuresConfigMapInitialState: IoK8sApiCoreV1ConfigMap = {
   data: {
-    [ADVANCED_SEARCH]: 'false',
     [AUTOMATIC_SUBSCRIPTION_ACTIVATION_KEY]: '',
     [AUTOMATIC_SUBSCRIPTION_ORGANIZATION_ID]: '',
     [CONFIRM_VM_ACTIONS]: 'false',

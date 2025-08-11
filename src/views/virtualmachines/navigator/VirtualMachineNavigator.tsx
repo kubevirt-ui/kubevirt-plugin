@@ -3,8 +3,6 @@ import { useLocation, useParams } from 'react-router-dom-v5-compat';
 
 import CreateResourceDefaultPage from '@kubevirt-utils/components/CreateResourceDefaultPage/CreateResourceDefaultPage';
 import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
-import { ADVANCED_SEARCH } from '@kubevirt-utils/hooks/useFeatures/constants';
-import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
 import { ListPageHeader, OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
@@ -28,8 +26,6 @@ const VirtualMachineNavigator: FC = () => {
   const location = useLocation();
 
   const { cluster, ns: namespace } = useParams<{ cluster?: string; ns: string }>();
-
-  const { featureEnabled: advancedSearchEnabled } = useFeatures(ADVANCED_SEARCH);
 
   const isVirtualMachineListPage = useMemo(
     () =>
@@ -56,7 +52,7 @@ const VirtualMachineNavigator: FC = () => {
       ) : (
         <>
           <ListPageHeader title={t('VirtualMachines')}>
-            {advancedSearchEnabled && <SearchBar onFilterChange={onFilterChange} />}
+            <SearchBar onFilterChange={onFilterChange} />
             <div>
               <VirtualMachinesCreateButton namespace={namespace} />
             </div>
@@ -79,15 +75,7 @@ const VirtualMachineNavigator: FC = () => {
           </VirtualMachineTreeView>
         </>
       ),
-    [
-      advancedSearchEnabled,
-      isVirtualMachineListPage,
-      cluster,
-      location.pathname,
-      namespace,
-      t,
-      treeProps,
-    ],
+    [isVirtualMachineListPage, cluster, location.pathname, namespace, t, treeProps],
   );
 };
 
