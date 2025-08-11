@@ -3,7 +3,6 @@ import React, { FC } from 'react';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import useDefaultStorageClass from '@kubevirt-utils/hooks/useDefaultStorage/useDefaultStorageClass';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { FormGroup } from '@patternfly/react-core';
 
 type StorageClassSelectProps = {
@@ -18,8 +17,7 @@ const StorageClassSelect: FC<StorageClassSelectProps> = ({
   storageClassRequired,
 }) => {
   const { t } = useKubevirtTranslation();
-  const cluster = useClusterParam();
-  const [{ sortedStorageClasses }] = useDefaultStorageClass(cluster);
+  const [{ sortedStorageClasses }] = useDefaultStorageClass();
 
   if (!storageClassRequired) return null;
 

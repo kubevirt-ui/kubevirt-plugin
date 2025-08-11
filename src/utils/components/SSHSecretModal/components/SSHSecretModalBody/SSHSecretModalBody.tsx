@@ -16,6 +16,7 @@ import SSHOptionUseExisting from '../SSHOptionUseExisting/SSHOptionUseExisting';
 import './SSHSecretModalBody.scss';
 
 type SSHSecretModalBodyProps = {
+  cluster?: string;
   isTemplate: boolean;
   isUserTab: boolean;
   localNSProject: string;
@@ -27,6 +28,7 @@ type SSHSecretModalBodyProps = {
 };
 
 const SSHSecretModalBody: FC<SSHSecretModalBodyProps> = ({
+  cluster,
   isTemplate,
   isUserTab,
   localNSProject,
@@ -59,6 +61,7 @@ const SSHSecretModalBody: FC<SSHSecretModalBodyProps> = ({
       <GridItem className="ssh-secret-section__body">
         {secretSelectionOption === SecretSelectionOption.useExisting && (
           <SSHOptionUseExisting
+            cluster={cluster}
             localNSProject={localNSProject}
             namespace={namespace}
             projectsWithSecrets={projectsWithSecrets}

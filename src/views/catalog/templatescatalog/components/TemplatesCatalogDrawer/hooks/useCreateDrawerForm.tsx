@@ -83,7 +83,7 @@ const useCreateDrawerForm = (
   const cluster = useClusterParam();
   const { updateTabsData, updateVM } = useWizardVMContext();
 
-  const [isUDNManagedNamespace, vmsNotSupported] = useNamespaceUDN(namespace, cluster);
+  const [isUDNManagedNamespace, vmsNotSupported] = useNamespaceUDN(namespace);
   const [authorizedSSHKeys, updateAuthorizedSSHKeys] = useKubevirtUserSettings('ssh', cluster);
   const { featureEnabled: autoUpdateEnabled } = useFeatures(AUTOMATIC_UPDATE_FEATURE_NAME);
   const { featureEnabled: isDisabledGuestSystemLogs } = useFeatures(

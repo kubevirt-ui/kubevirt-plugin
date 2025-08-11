@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom-v5-compat';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
-import useClusterParam from '@multicluster/hooks/useClusterParam';
 import usePasstFeatureFlag from '@overview/SettingsTab/PreviewFeaturesTab/hooks/usePasstFeatureFlag';
 import { Checkbox, FormGroup, Popover, Split, SplitItem } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
@@ -19,10 +18,9 @@ const NetworkInterfacePasst: FC<NetworkInterfacePasstProps> = ({
   onChange,
   passtEnabled,
 }) => {
-  const cluster = useClusterParam();
   const passtFeatureFlag = usePasstFeatureFlag();
 
-  const [isNamespaceManagedByUDN] = useNamespaceUDN(namespace, cluster);
+  const [isNamespaceManagedByUDN] = useNamespaceUDN(namespace);
   const { t } = useKubevirtTranslation();
 
   if (!isNamespaceManagedByUDN) return null;
