@@ -14,6 +14,7 @@ import { getNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/netw
 import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
 import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import usePasstFeatureFlag from '@overview/SettingsTab/PreviewFeaturesTab/hooks/usePasstFeatureFlag';
 import { ExpandableSection, Form } from '@patternfly/react-core';
 import {
   getConfigInterfaceStateFromVM,
@@ -69,11 +70,12 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
   const { t } = useKubevirtTranslation();
   const { iface = null, network = null } = nicPresentation;
 
+  const { featureEnabled: passtEnabled } = usePasstFeatureFlag();
   const [nicName, setNicName] = useState(network?.name || generatePrettyName('nic'));
   const [interfaceModel, setInterfaceModel] = useState(iface?.model || interfaceModelType.VIRTIO);
-  const [networkName, setNetworkName] = useState(getNetworkName(network));
+  const [networkName, setNetworkName] = useState(getNetworkName(network, t));
   const [networkSelectError, setNetworkSelectError] = useState<boolean>(false);
-  const [interfaceType, setInterfaceType] = useState(
+  const [interfaceType, setInterfaceType] = useState<string>(
     interfaceTypesProxy[getNetworkInterfaceType(iface)],
   );
   const [interfaceMACAddress, setInterfaceMACAddress] = useState(iface?.macAddress);
@@ -144,6 +146,11 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
           onToggle={(_, expand) => setIsExpanded(expand)}
           toggleText={t('Advanced')}
         >
+          <NetworkInterfacePasst
+            interfaceType={interfaceType}
+            namespace={getNamespace(vm)}
+            setInterfaceType={setInterfaceType}
+          />
           <NetworkInterfaceMACAddressInput
             interfaceMACAddress={interfaceMACAddress}
             isDisabled={!networkName}
@@ -151,14 +158,9 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
             setIsError={setMacError}
           />
           <NetworkInterfaceLinkState
-            isDisabled={!isLinkStateEditable(interfaceLinkState)}
+            isDisabled={!isLinkStateEditable(interfaceLinkState) || passtEnabled}
             linkState={interfaceLinkState}
             setLinkState={setInterfaceLinkState}
-          />
-          <NetworkInterfacePasst
-            namespace={getNamespace(vm)}
-            onChange={() => setInterfaceType(interfaceTypesProxy.passt)}
-            passtEnabled={interfaceType === interfaceTypesProxy.passt}
           />
         </ExpandableSection>
       </Form>

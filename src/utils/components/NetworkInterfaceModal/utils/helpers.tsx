@@ -1,8 +1,10 @@
+import React from 'react';
+import { TFunction } from 'react-i18next';
 import produce from 'immer';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1Interface, V1Network, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import TechPreviewBadge from '@kubevirt-utils/components/TechPreviewBadge/TechPreviewBadge';
 import {
   getAutoAttachPodInterface,
   getInterface,
@@ -33,7 +35,7 @@ export const podNetworkExists = (vm: V1VirtualMachine): boolean =>
 export const networkNameStartWithPod = (networkName: string): boolean =>
   networkName?.startsWith('Pod');
 
-export const getNetworkName = (network: V1Network): string => {
+export const getNetworkName = (network: V1Network, t: TFunction): string => {
   if (network) {
     return network?.pod ? t('Pod networking') : network?.multus?.networkName;
   }
@@ -199,3 +201,24 @@ export const deleteNetworkInterface = (
 
   return updateVMNetworkInterfaces(vm, networks, interfaces);
 };
+
+export const getPASSTSelectableOptions = (t: TFunction) => [
+  {
+    description: t(
+      'The default binding. Extend the L2 domain of the user-defined network into the VirtualMachine',
+    ),
+    id: interfaceLabelsProxy[interfaceTypesProxy.l2bridge],
+    title: interfaceTypesProxy.l2bridge,
+  },
+  {
+    description: t(
+      'User-space network binding offering a better integration with virtctl ssh and port-forward, network probes, and observability.',
+    ),
+    id: interfaceLabelsProxy[interfaceTypesProxy.passt],
+    title: (
+      <>
+        {interfaceTypesProxy.passt} <TechPreviewBadge />
+      </>
+    ),
+  },
+];
