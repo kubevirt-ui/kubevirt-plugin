@@ -1531,10 +1531,10 @@
   dependencies:
     "@sinonjs/commons" "^3.0.0"
 
-"@stolostron/multicluster-sdk@0.5.1":
-  version "0.5.1"
-  resolved "https://registry.yarnpkg.com/@stolostron/multicluster-sdk/-/multicluster-sdk-0.5.1.tgz#524a69e8d94312b9247ca396b214442a8cf916e1"
-  integrity sha512-ezlpxSGkPvaPDpvGFGRAaS9FVbuO5+EWBzBiXxezGj2ndptTHSyCkHkVrClTbSnxEiw5wXbcvfpU0ATSmQj5ew==
+"@stolostron/multicluster-sdk@0.5.2":
+  version "0.5.2"
+  resolved "https://registry.yarnpkg.com/@stolostron/multicluster-sdk/-/multicluster-sdk-0.5.2.tgz#707d583fab9a3a758f9f0c32cf6dfdb20626ff80"
+  integrity sha512-OSbj2i6jM3r09+MEooj+BDOT+norznME+20VjOfy8NQlNxJEjf0C+esRnpHy/hbl/697U8v99L7759N4jH0nKg==
   dependencies:
     "@apollo/client" "3.10.8"
     "@patternfly/react-component-groups" "^6.2.1"
