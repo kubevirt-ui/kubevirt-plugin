@@ -23,7 +23,7 @@ const useRedirectWatchHooks = <T extends K8sResourceCommon | K8sResourceCommon[]
   const usePod = shouldUseProxyPod && !isACMTreeView;
 
   const k8sWatch = useK8sWatchData<T>(!usePod && !useMulticlusterSearch ? watchOptions : null);
-  const [multiSearchData, multiSearchLoading, multiSearchError] = useFleetSearchPoll<T>(
+  const [multiSearchData, multiSearchLoaded, multiSearchError] = useFleetSearchPoll<T>(
     !usePod && useMulticlusterSearch && watchOptions,
     searchQueries,
   );
@@ -38,7 +38,7 @@ const useRedirectWatchHooks = <T extends K8sResourceCommon | K8sResourceCommon[]
     if (usePod) return kubevirtPodWatch;
 
     if (useMulticlusterSearch)
-      return [multiSearchData, multiSearchLoading, multiSearchError] as Result<T>;
+      return [multiSearchData, multiSearchLoaded, multiSearchError] as Result<T>;
 
     return k8sWatch;
   }, [
@@ -46,7 +46,7 @@ const useRedirectWatchHooks = <T extends K8sResourceCommon | K8sResourceCommon[]
     shouldUseProxyPod,
     useMulticlusterSearch,
     multiSearchData,
-    multiSearchLoading,
+    multiSearchLoaded,
     multiSearchError,
     usePod,
     kubevirtPodWatch,
