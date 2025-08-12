@@ -1,11 +1,13 @@
-import React, { FC, ReactNode, useState } from 'react';
+import React, { FC, useState } from 'react';
 
-import { Button, FlexItem, Tooltip } from '@patternfly/react-core';
+import { Button, Flex, FlexItem, Tooltip } from '@patternfly/react-core';
 import { EyeIcon, EyeSlashIcon } from '@patternfly/react-icons';
+
+import InlineCodeClipboardCopy from './InlineCodeClipboardCopy';
 
 type CloudInitCredentialsItemProps = {
   'button-data-test'?: string;
-  credentials: ReactNode;
+  credentials: string;
   credentialTitle: string;
   hideCredentialText: string;
   showCredentialText: string;
@@ -18,20 +20,26 @@ const CloudInitCredentialsItem: FC<CloudInitCredentialsItemProps> = ({
   hideCredentialText,
   showCredentialText,
 }) => {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isCredentialsVisible, setIsCredentialsVisible] = useState(false);
 
   return (
-    <FlexItem spacer={{ default: 'spacerSm' }}>
-      {credentialTitle} {isVisible ? credentials : '●●●●●●●●●'}{' '}
-      <Tooltip content={isVisible ? hideCredentialText : showCredentialText}>
-        <Button
-          data-test={buttonDataTest}
-          icon={isVisible ? <EyeSlashIcon /> : <EyeIcon />}
-          onClick={() => setIsVisible(!isVisible)}
-          variant="plain"
+    <>
+      <Flex display={{ default: 'inlineFlex' }} spaceItems={{ default: 'spaceItemsSm' }}>
+        <FlexItem>{credentialTitle}</FlexItem>
+        <InlineCodeClipboardCopy
+          clipboardText={credentials}
+          isCredentialsVisible={isCredentialsVisible}
         />
-      </Tooltip>
-    </FlexItem>
+        <Tooltip content={isCredentialsVisible ? hideCredentialText : showCredentialText}>
+          <Button
+            data-test={buttonDataTest}
+            icon={isCredentialsVisible ? <EyeSlashIcon /> : <EyeIcon />}
+            onClick={() => setIsCredentialsVisible(!isCredentialsVisible)}
+            variant="plain"
+          />
+        </Tooltip>
+      </Flex>
+    </>
   );
 };
 

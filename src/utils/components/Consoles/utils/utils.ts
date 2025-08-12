@@ -1,13 +1,5 @@
 export const isConnectionEncrypted = () => window.location.protocol === 'https:';
 
-export const clipboardCopyFunc = (
-  _: React.ClipboardEvent<HTMLDivElement>,
-  text?: React.ReactNode,
-) => {
-  const textString = text?.toString();
-  navigator.clipboard.writeText(textString);
-};
-
 export const getConsoleBasePath = ({ apiPath = '/api/kubernetes', name, namespace }) =>
   `${apiPath}/apis/subresources.kubevirt.io/v1/namespaces/${namespace}/virtualmachineinstances/${name}`;
 
@@ -18,3 +10,9 @@ export const readFromClipboard = async () =>
     .readText()
     // eslint-disable-next-line no-console
     .catch((err) => console.error('Failed to read from clipboard', err));
+
+export const writeToClipboard = async (text: string) =>
+  navigator.clipboard
+    .writeText(text)
+    // eslint-disable-next-line no-console
+    .catch((err) => console.error('Failed to write to clipboard', err));
