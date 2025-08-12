@@ -19,8 +19,6 @@ import VirtualMachineTreeView from '@virtualmachines/tree/VirtualMachineTreeView
 
 import { defaultVMYamlTemplate } from '../../../templates';
 
-import useClustersRedirect from './hooks/useClustersRedirect';
-
 const VirtualMachineNavigator: FC = () => {
   useSignals();
   const { t } = useKubevirtTranslation();
@@ -37,8 +35,6 @@ const VirtualMachineNavigator: FC = () => {
       location.pathname.endsWith(`${VirtualMachineModelRef}/`),
     [location.pathname],
   );
-
-  useClustersRedirect();
 
   const treeProps = useTreeViewData();
 
