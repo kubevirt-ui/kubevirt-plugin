@@ -570,7 +570,6 @@
   "Elapsed time since login": "ログインからの経過時間",
   "Empty disk (blank)": "空のディスク (空白)",
   "Enable": "有効にする",
-  "Enable advanced search in Virtual Machines list": "仮想マシンのリストで詳細検索を有効にする",
   "Enable auto updates for RHEL VirtualMachines": "RHEL VirtualMachine の自動更新を有効にする",
   "Enable automatic images download and update": "イメージの自動ダウンロードと更新を有効にする",
   "Enable automatic subscription for Red Hat Enterprise Linux VirtualMachines.\n": "Red Hat Enterprise Linux VirtualMachine の自動サブスクリプションを有効にします。\n",
