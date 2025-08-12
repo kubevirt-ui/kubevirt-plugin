@@ -9,6 +9,7 @@ import {
 import { ALL_NAMESPACES_SESSION_KEY, ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
+import { UseMulticlusterNamespacesReturnType } from '@multicluster/hooks/useMulticlusterProjects';
 import {
   getACMVMListURL,
   getVMListNamespacesURL,
@@ -209,7 +210,7 @@ export const getVMInfoFromPathname = (pathname: string) => {
   return { currentVMTab, vmCluster: null, vmName, vmNamespace };
 };
 
-const createSingleClusterTreeViewData = (
+export const createSingleClusterTreeViewData = (
   projectNames: string[],
   vms: V1VirtualMachine[],
   isAdmin: boolean,
@@ -257,11 +258,12 @@ const getVMsPerCluster = (vms: V1VirtualMachine[]): Record<string, V1VirtualMach
   }, {});
 };
 
-const createMultiClusterTreeViewData = (
+export const createMultiClusterTreeViewData = (
   vms: V1VirtualMachine[],
   pathname: string,
   foldersEnabled: boolean,
-  clusters?: K8sResourceCommon[],
+  clusters: K8sResourceCommon[],
+  projectsByClusters: UseMulticlusterNamespacesReturnType[0],
 ): TreeViewDataItem[] => {
   const { currentVMTab, vmCluster, vmName, vmNamespace } = getVMInfoFromPathname(pathname);
 
@@ -276,12 +278,7 @@ const createMultiClusterTreeViewData = (
 
       const clusterVMs = vmsPerCluster[clusterName] || [];
 
-      const clusterProjects = clusterVMs.reduce((namespaces, vm) => {
-        const namespace = getNamespace(vm);
-        if (!namespaces.includes(namespace)) namespaces.push(namespace);
-
-        return namespaces;
-      }, []);
+      const clusterProjects = projectsByClusters[clusterName]?.map((project) => getName(project));
 
       const projectMap = buildProjectMap(
         clusterVMs,
@@ -293,7 +290,7 @@ const createMultiClusterTreeViewData = (
 
       const clusterSelected = vmCluster === clusterName;
 
-      const treeViewData = clusterProjects.map((project) =>
+      const treeViewData = clusterProjects?.map((project) =>
         createProjectTreeItem(
           project,
           projectMap,
@@ -339,32 +336,6 @@ const createMultiClusterTreeViewData = (
   return clusterTreeItem;
 };
 
-export type CreateTreeViewDataParams = (params: {
-  clusters?: K8sResourceCommon[];
-  foldersEnabled: boolean;
-  isACMTreeView?: boolean;
-  isAdmin: boolean;
-  pathname: string;
-  projectNames: string[];
-  vms: V1VirtualMachine[];
-}) => TreeViewDataItem[];
-
-export const createTreeViewData: CreateTreeViewDataParams = ({
-  clusters,
-  foldersEnabled,
-  isACMTreeView,
-  isAdmin,
-  pathname,
-  projectNames,
-  vms,
-}) => {
-  if (isACMTreeView) {
-    return createMultiClusterTreeViewData(vms, pathname, foldersEnabled, clusters);
-  }
-
-  return createSingleClusterTreeViewData(projectNames, vms, isAdmin, pathname, foldersEnabled);
-};
-
 export const filterItems = (item: TreeViewDataItem, input: string) => {
   if ((item.name as string).toLowerCase().includes(input.toLowerCase())) {
     return true;
@@ -384,7 +355,8 @@ export const filterItems = (item: TreeViewDataItem, input: string) => {
 export const filterNamespaceItems = (item: TreeViewDataItem, showEmptyProjects: boolean) => {
   const hasVMs =
     item.id !== ALL_NAMESPACES_SESSION_KEY &&
-    !item.id.startsWith('cluster') &&
+    item.id !== ALL_CLUSTERS_ID &&
+    !item.id.startsWith(CLUSTER_SELECTOR_PREFIX) &&
     item.children?.length > 0;
   const projectName = item.name as string;
 
@@ -392,8 +364,6 @@ export const filterNamespaceItems = (item: TreeViewDataItem, showEmptyProjects: 
     // if (hasVMs) return true;
     if ((showEmptyProjects && !isSystemNamespace(projectName)) || hasVMs) return true;
   }
-
-  if (item.id.startsWith('cluster')) return true;
 
   if (item.children) {
     return (

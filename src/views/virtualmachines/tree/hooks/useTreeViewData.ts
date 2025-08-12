@@ -15,13 +15,18 @@ import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
 import useAllClusters from '@multicluster/hooks/useAllClusters/useAllClusters';
+import useMulticlusterNamespaces from '@multicluster/hooks/useMulticlusterProjects';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
 import { TreeViewDataItem } from '@patternfly/react-core';
 import { getLatestMigrationForEachVM, OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 
 import { vmimMapperSignal, vmsSignal } from '../utils/signals';
-import { createTreeViewData, isSystemNamespace } from '../utils/utils';
+import {
+  createMultiClusterTreeViewData,
+  createSingleClusterTreeViewData,
+  isSystemNamespace,
+} from '../utils/utils';
 
 export type UseTreeViewData = {
   hideSwitch: boolean;
@@ -40,6 +45,8 @@ export const useTreeViewData = (): UseTreeViewData => {
 
   const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
   const [projectNames, projectNamesLoaded, projectNamesError] = useProjects();
+  const [namespacesByCluster, multiclusterNamespacesLoaded, multiclusterNamespacesError] =
+    useMulticlusterNamespaces();
 
   const loadVMsPerNamespace = !isACMTreeView && projectNamesLoaded && !isAdmin;
 
@@ -110,8 +117,10 @@ export const useTreeViewData = (): UseTreeViewData => {
 
   vmsSignal.value = memoizedVMs;
 
+  const projectsLoaded = isACMTreeView ? multiclusterNamespacesLoaded : projectNamesLoaded;
+
   const loaded =
-    projectNamesLoaded &&
+    projectsLoaded &&
     (loadVMsPerNamespace
       ? Object.values(allowedResources).some((resource) => resource.loaded)
       : allVMsLoaded);
@@ -119,24 +128,33 @@ export const useTreeViewData = (): UseTreeViewData => {
   const treeData = useMemo(() => {
     if (!loaded) return [];
 
-    return createTreeViewData({
-      clusters,
-      foldersEnabled: treeViewFoldersEnabled,
-      isACMTreeView,
-      isAdmin,
-      pathname: location.pathname,
+    if (isACMTreeView) {
+      return createMultiClusterTreeViewData(
+        memoizedVMs,
+        location.pathname,
+        treeViewFoldersEnabled,
+        clusters,
+        namespacesByCluster,
+      );
+    }
+
+    return createSingleClusterTreeViewData(
       projectNames,
-      vms: memoizedVMs,
-    });
+      memoizedVMs,
+      isAdmin,
+      location.pathname,
+      treeViewFoldersEnabled,
+    );
   }, [
+    loaded,
+    isACMTreeView,
     projectNames,
     memoizedVMs,
-    loaded,
     isAdmin,
-    treeViewFoldersEnabled,
     location.pathname,
+    treeViewFoldersEnabled,
     clusters,
-    isACMTreeView,
+    namespacesByCluster,
   ]);
 
   const hideSwitch = useMemo(() => projectNames?.every(isSystemNamespace), [projectNames]);
@@ -145,9 +163,9 @@ export const useTreeViewData = (): UseTreeViewData => {
     () => ({
       hideSwitch,
       loaded,
-      loadError: projectNamesError,
+      loadError: projectNamesError || multiclusterNamespacesError,
       treeData,
     }),
-    [hideSwitch, loaded, projectNamesError, treeData],
+    [hideSwitch, loaded, multiclusterNamespacesError, projectNamesError, treeData],
   );
 };
