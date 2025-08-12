@@ -35,18 +35,18 @@ const SearchFilter = forwardRef<HTMLInputElement, SearchFilterProps>((props, ref
   }, [inputRef]);
 
   return (
-    <div className="has-feedback">
+    <div className="co-text-filter">
       <TextInput
         {...otherInputProps}
         aria-label={placeholder}
-        className={classNames('co-text-filter', className)}
+        className={classNames('co-text-filter__text-input', className)}
         data-test-id="item-filter"
         placeholder={placeholder}
         ref={inputRef}
         tabIndex={0}
         type="text"
       />
-      <span className="co-text-filter-feedback">
+      <span className="co-text-filter__feedback">
         <kbd className="co-kbd co-kbd__filter-input">/</kbd>
       </span>
     </div>
