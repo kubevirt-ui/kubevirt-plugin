@@ -17,7 +17,12 @@ import {
   isACMPath,
 } from '@multicluster/urls';
 import { TreeViewDataItem } from '@patternfly/react-core';
-import { FolderIcon, FolderOpenIcon, ProjectDiagramIcon } from '@patternfly/react-icons';
+import {
+  ClusterIcon,
+  FolderIcon,
+  FolderOpenIcon,
+  ProjectDiagramIcon,
+} from '@patternfly/react-icons';
 import { signal } from '@preact/signals-react';
 
 import { statusIcon } from '../icons/utils';
@@ -310,7 +315,7 @@ const createMultiClusterTreeViewData = (
         defaultExpanded: clusterSelected,
         hasBadge: false,
         href: getACMVMListURL(clusterName),
-        icon: <ProjectDiagramIcon />,
+        icon: <ClusterIcon />,
         id: `${CLUSTER_SELECTOR_PREFIX}/${clusterName}`,
         name: clusterName,
       };
@@ -330,7 +335,7 @@ const createMultiClusterTreeViewData = (
       defaultExpanded: true,
       hasBadge: false,
       href: getACMVMListURL(),
-      icon: <ProjectDiagramIcon />,
+      icon: <ClusterIcon />,
       id: ALL_CLUSTERS_ID,
       name: 'All clusters',
     },
