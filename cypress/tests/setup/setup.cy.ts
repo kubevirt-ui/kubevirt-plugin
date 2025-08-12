@@ -48,7 +48,7 @@ describe('Cluster Test Preparation', () => {
 
   it('create example VM', () => {
     cy.visitVMsVirt();
-    cy.get(itemCreateBtn, { timeout: 60000 }).click();
+    cy.get(itemCreateBtn, { timeout: 60000 }).first().click();
     cy.byButtonText(YAML).click();
     cy.get(saveBtn).click();
   });

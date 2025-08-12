@@ -75,6 +75,7 @@ import '@kubevirt-utils/styles/list-managment-group.scss';
 import './VirtualMachinesList.scss';
 
 type VirtualMachinesListProps = {
+  allVMsLoaded?: boolean;
   cluster?: string;
   kind: string;
   namespace: string;
@@ -83,7 +84,7 @@ type VirtualMachinesListProps = {
 
 const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref) => {
   const { t } = useKubevirtTranslation();
-  const { cluster, kind, namespace, searchQueries } = props;
+  const { allVMsLoaded, cluster, kind, namespace, searchQueries } = props;
   const isSearchResultsPage = !isEmpty(searchQueries);
 
   const catalogURL = getCatalogURL(cluster, namespace || DEFAULT_NAMESPACE);
@@ -106,11 +107,8 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
     {
       labels: 'metadata.labels',
       name: 'metadata.name',
-      'rowFilter-instanceType': 'spec.instancetype.name',
-      'rowFilter-live-migratable': 'status.conditions',
       'rowFilter-os': 'spec.template.metadata.annotations.vm\\.kubevirt\\.io/os',
       'rowFilter-status': 'status.printableStatus',
-      'rowFilter-template': 'metadata.labels.vm\\.kubevirt\\.io/template',
     },
     searchQueries?.vmQueries,
   );
@@ -205,11 +203,10 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
   const existingSelectedVMs = useExistingSelectedVMs(filteredVMs);
   const isAllVMsSelected = filteredVMs?.length === existingSelectedVMs.length;
 
-  const vmsForSummary = namespace
-    ? vmsSignal?.value?.filter((vm) => getNamespace(vm) === namespace)
-    : vmsSignal?.value;
-
-  const showEmptyState = !isSearchResultsPage && isEmpty(vmsForSummary);
+  const allVMs = vmsSignal?.value;
+  const hasNoVMs = isEmpty(
+    namespace ? allVMs?.filter((resource) => getNamespace(resource) === namespace) : allVMs,
+  );
 
   return (
     /* All of this table and components should be replaced to our own fitted components */
@@ -220,13 +217,13 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
           namespace={namespace}
           onFilterChange={onFilterChange}
           vmis={vmis}
-          vms={vmsForSummary}
+          vms={allVMs}
         />
       )}
       <ListPageBody>
         <div className="vm-listpagebody" ref={listPageBodyRef}>
           {isSearchResultsPage && <VirtualMachineSearchResultsHeader />}
-          {loaded && showEmptyState ? (
+          {!isSearchResultsPage && allVMsLoaded && hasNoVMs ? (
             <VirtualMachineEmptyState catalogURL={catalogURL} namespace={namespace} />
           ) : (
             <>
@@ -293,7 +290,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
                 allRowsSelected={isAllVMsSelected}
                 columns={activeColumns}
                 data={paginatedVMs}
-                loaded
+                loaded={loaded}
                 loadError={loadError}
                 Row={VirtualMachineRow}
                 unfilteredData={vmsToShow}
