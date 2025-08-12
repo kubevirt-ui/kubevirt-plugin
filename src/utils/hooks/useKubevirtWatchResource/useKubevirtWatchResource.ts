@@ -9,7 +9,11 @@ import useKubevirtDataPodHealth from '../useKubevirtDataPod/hooks/useKubevirtDat
 
 import useRedirectWatchHooks from './useRedirectWatchHooks';
 
-export type Result<R extends K8sResourceCommon | K8sResourceCommon[]> = [R, boolean, Error];
+export type Result<R extends K8sResourceCommon | K8sResourceCommon[]> = [
+  resource: R,
+  resourceLoaded: boolean,
+  resourceLoadError: Error,
+];
 
 type UseKubevirtWatchResource = <T extends K8sResourceCommon | K8sResourceCommon[]>(
   watchOptions: WatchK8sResource & { cluster?: string },
