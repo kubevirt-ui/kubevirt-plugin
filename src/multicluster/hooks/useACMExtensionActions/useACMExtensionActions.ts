@@ -23,7 +23,7 @@ const useACMExtensionActions = (vm): ActionDropdownItemType[] => {
   const { t } = useKubevirtTranslation();
   const isACMPage = useIsACMPage();
   const [hubClusterName] = useHubClusterName();
-  const [provider, providerLoaded] = useProviderByClusterName(getCluster(vm));
+  const [provider, providerLoaded] = useProviderByClusterName(getCluster(vm) ?? hubClusterName);
 
   const [virtualMachineActionExtensions, virtualMachineActionExtensionsResolved] =
     useResolvedExtensions<ACMVirtualMachineActionExtension>(isACMVirtualMachineActionExtension);
