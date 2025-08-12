@@ -2,6 +2,8 @@
 
 set -ex
 
+export DOWNSTREAM=true
+
 # export node
 get_node() {
     local index=$1

@@ -6,12 +6,7 @@ set +e
 # export namespace for downstream
 export CYPRESS_CNV_NS='openshift-cnv';
 export CYPRESS_OS_IMAGES_NS='openshift-virtualization-os-images';
-export CYPRESS_TEST_NS='auto-test-ns';
-
-# setup cluster
-bash test-cleanup.sh
-bash test-setup.sh
-bash test-setup-downstream.sh
+export CYPRESS_TEST_NS='default'
 
 # Install dependencies.
 yarn install --frozen-lockfile
@@ -32,13 +27,15 @@ yarn_script="test-cypress-headless"
 
 if [ -n "${gui-}" ]; then
   yarn_script="test-cypress"
+  yarn run $yarn_script 
 fi
 
 if [ -n "${spec-}" ]; then
   yarn_script="$yarn_script --spec '$spec'"
+  yarn run $yarn_script 
+else
+  yarn run $yarn_script  --spec 'tests/acm.cy.ts'
 fi
-
-yarn run $yarn_script
 
 # Generate Cypress report.
 yarn run cypress-postreport

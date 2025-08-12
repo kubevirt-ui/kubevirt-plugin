@@ -3,6 +3,7 @@ import { MINUTE, SECOND } from '../utils/const/index';
 export enum Perspective {
   Administrator = 'Administrator',
   Developer = 'Developer',
+  FleetVirtualization = 'Fleet Virtualization',
   Virtualization = 'Virtualization',
 }
 
