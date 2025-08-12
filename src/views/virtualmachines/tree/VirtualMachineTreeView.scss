@@ -91,7 +91,15 @@
 
 .vms-tree-view-body {
   padding: 0 var(--pf-t--global--spacer--sm);
-  height: fit-content;
+  height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+
+  .pf-v6-c-tree-view {
+    flex: 1;
+    overflow-y: auto;
+  }
 }
 
 .pf-v6-c-toolbar__content.vms-tree-view-toolbar-content {

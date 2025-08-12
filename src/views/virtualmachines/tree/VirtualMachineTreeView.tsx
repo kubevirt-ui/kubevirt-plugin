@@ -71,8 +71,10 @@ const VirtualMachineTreeView: FC<VirtualMachineTreeViewProps> = ({
     setDrawerWidth(size);
   };
 
+  const contentBoundry = getContentScrollableElement().getBoundingClientRect();
+  const footerSpace = window.innerHeight - contentBoundry.bottom;
   const heightStyles: CSSProperties = {
-    height: getContentScrollableElement().offsetHeight || 0,
+    height: getContentScrollableElement().offsetHeight - footerSpace || 0,
   };
 
   const widthStyles: any = {
