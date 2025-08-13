@@ -7,6 +7,7 @@ export const initialValue: DrawerContext = {
   diskFile: null,
   diskUpload: null,
   isBootSourceAvailable: null,
+  originalTemplate: null,
   registryCredentials: { password: '', username: '' },
   setCDFile: null,
   setDiskFile: null,

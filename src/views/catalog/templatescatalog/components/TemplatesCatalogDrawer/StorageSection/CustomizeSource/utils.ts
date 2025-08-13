@@ -6,11 +6,12 @@ import {
   V1beta1DataVolumeSpec,
   V1ContainerDiskSource,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { removeByteSuffix } from '@kubevirt-utils/components/CapacityInput/utils';
+import { CAPACITY_UNITS, removeByteSuffix } from '@kubevirt-utils/components/CapacityInput/utils';
 import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/utils/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateContainerDisks } from '@kubevirt-utils/resources/template';
 import { hasSizeUnit } from '@kubevirt-utils/resources/vm/utils/disk/size';
+import { convertToBaseValue, humanizeBinaryBytes } from '@kubevirt-utils/utils/humanize.js';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import {
@@ -117,4 +118,11 @@ export const getRegistryHelperText = (template: V1Template) => {
     return t('Enter a container image (for example: {{containerDisk}})', {
       containerDisk: containerDisks[0],
     });
+};
+
+export const getMinDiskSize = (templateDiskSize: string, currentSize: CAPACITY_UNITS): number => {
+  const templateSizeBytes = convertToBaseValue(templateDiskSize);
+  const templateSizeHuman = humanizeBinaryBytes(templateSizeBytes, null, currentSize);
+
+  return templateSizeHuman.value;
 };
