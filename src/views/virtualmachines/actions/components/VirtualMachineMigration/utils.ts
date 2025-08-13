@@ -7,13 +7,13 @@ import {
   V1VirtualMachineInstanceMigration,
   V1Volume,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { MAX_NAME_LENGTH } from '@kubevirt-utils/components/SSHSecretModal/utils/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getDataVolumeTemplates, getVolumes } from '@kubevirt-utils/resources/vm';
 import { UPDATE_STRATEGIES } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getStorageClassName } from '@kubevirt-utils/resources/vm/utils/dataVolumeTemplate/selectors';
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
+import { MAX_K8S_NAME_LENGTH } from '@kubevirt-utils/utils/constants';
 import { getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, k8sDelete, k8sPatch, Patch } from '@openshift-console/dynamic-plugin-sdk';
 import { getMigrationClaimNameAnnotation } from '@virtualmachines/actions/utils';
@@ -27,7 +27,7 @@ const getBlankDataVolume = (
   const randomChars = getRandomChars();
 
   const originName = dataVolumeName.replace(/-mig-[\d\w]+$/, '');
-  const namePrefix = `${originName}-mig`.substring(0, MAX_NAME_LENGTH - 5 - randomChars.length);
+  const namePrefix = `${originName}-mig`.substring(0, MAX_K8S_NAME_LENGTH - 5 - randomChars.length);
 
   return {
     apiVersion: `${DataVolumeModel.apiGroup}/${DataVolumeModel.apiVersion}`,
