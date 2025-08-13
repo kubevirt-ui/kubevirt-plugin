@@ -67,3 +67,6 @@ export const getNetworkInterfaceState = (
   vm: V1VirtualMachineInstance,
   interfaceName: string,
 ): string | undefined => getNetworkInterface(vm, interfaceName)?.linkState;
+
+export const getVMIArchitecture = (vmi: V1VirtualMachineInstance): string =>
+  vmi?.spec?.architecture;

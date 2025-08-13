@@ -3,6 +3,7 @@ import * as React from 'react';
 import { V1GPU, V1HostDevice, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
+import { hasS390xArchitecture } from '@kubevirt-utils/resources/vm/utils/architecture';
 import { VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Card,
@@ -32,6 +33,7 @@ const VirtualMachinesOverviewTabHardwareDevices: React.FC<
   const hostDevicesCount = hostDevices?.length;
   const gpus = getGPUDevices(vm);
   const gpusCount = gpus?.length;
+  const vmHasS390xArchitecture = hasS390xArchitecture(vm);
 
   const handleTabClick = (
     _: React.MouseEvent<HTMLElement, MouseEvent>,
@@ -49,26 +51,30 @@ const VirtualMachinesOverviewTabHardwareDevices: React.FC<
         <Divider />
         <CardBody isFilled>
           <Tabs activeKey={activeTabKey} onSelect={handleTabClick}>
-            <Tab
-              eventKey={0}
-              title={<TabTitleText>{t('GPU devices ({{gpusCount}})', { gpusCount })}</TabTitleText>}
-            >
-              <VirtualizedTable<V1GPU>
-                columns={columns}
-                data={gpus}
-                loaded
-                loadError={false}
-                Row={VirtualMachinesOverviewTabHardwareDevicesRow}
-                unfilteredData={gpus}
-              />
-            </Tab>
+            {!vmHasS390xArchitecture && (
+              <Tab
+                title={
+                  <TabTitleText>{t('GPU devices ({{gpusCount}})', { gpusCount })}</TabTitleText>
+                }
+                eventKey={0}
+              >
+                <VirtualizedTable<V1GPU>
+                  columns={columns}
+                  data={gpus}
+                  loaded
+                  loadError={false}
+                  Row={VirtualMachinesOverviewTabHardwareDevicesRow}
+                  unfilteredData={gpus}
+                />
+              </Tab>
+            )}
             <Tab
               title={
                 <TabTitleText>
                   {t('Host devices ({{hostDevicesCount}})', { hostDevicesCount })}
                 </TabTitleText>
               }
-              eventKey={1}
+              eventKey={vmHasS390xArchitecture ? 0 : 1}
             >
               <VirtualizedTable<V1HostDevice>
                 columns={columns}

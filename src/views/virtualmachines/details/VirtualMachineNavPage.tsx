@@ -72,7 +72,7 @@ const VirtualMachineNavPage: FC = () => {
         </div>
       </SidebarEditorProvider>
     ),
-    [expandedSpecLoading, instanceTypeExpandedSpec, isLoaded, loadError, name, pages, vmToShow],
+    [expandedSpecLoading, instanceTypeExpandedSpec, isLoaded, loadError, pages, vmToShow],
   );
 };
 

@@ -129,7 +129,7 @@ const Details: React.FC<DetailsProps> = ({ pathname, vmi }) => {
               descriptionHeader={t('SSH access')}
             />
             <VirtualMachineDescriptionItem
-              descriptionData={<HardwareDevices devices={vmi?.spec?.domain?.devices} />}
+              descriptionData={<HardwareDevices vmi={vmi} />}
               descriptionHeader={t('Hardware devices')}
             />
           </DescriptionList>

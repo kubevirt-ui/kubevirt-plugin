@@ -3,6 +3,7 @@ import React, { FC } from 'react';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm';
+import { hasS390xArchitecture } from '@kubevirt-utils/resources/vm/utils/architecture';
 import { getVMIPod } from '@kubevirt-utils/resources/vmi';
 import { DescriptionList } from '@patternfly/react-core';
 import SSHTabAuthorizedSSHKey from '@virtualmachines/details/tabs/configuration/ssh/components/SSHTabAuthorizedSSHKey';
@@ -27,6 +28,7 @@ export type VMResourceListProps = {
 const VMDetailsPanelRightColumn: FC<VMResourceListProps> = ({ vm, vmi }) => {
   const { pods } = useVMIAndPodsForVM(getName(vm), getNamespace(vm));
   const launcherPod = getVMIPod(vmi, pods);
+  const vmHasS390xArchitecture = hasS390xArchitecture(vm);
 
   return (
     <DescriptionList
@@ -43,7 +45,7 @@ const VMDetailsPanelRightColumn: FC<VMResourceListProps> = ({ vm, vmi }) => {
       <VMWorkloadProfileDetailsItem vm={vm} />
       <VMUserCredentialsDetailsItem vm={vm} vmi={vmi} />
       <SSHTabAuthorizedSSHKey className="topology-vm-details-panel__item" vm={vm} />
-      <VMGPUDevicesDetailsItem vm={vm} vmi={vmi} />
+      {!vmHasS390xArchitecture && <VMGPUDevicesDetailsItem vm={vm} vmi={vmi} />}
       <VMHostDevicesDetailsItem vm={vm} vmi={vmi} />
     </DescriptionList>
   );
