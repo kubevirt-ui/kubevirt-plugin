@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import MultiSelectTypeahead from '@kubevirt-utils/components/MultiSelectTypeahead/MultiSelectTypeahead';
@@ -6,19 +6,17 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { usePVCMapper } from '@kubevirt-utils/hooks/usePVCMapper';
 import { useStorageClasses } from '@kubevirt-utils/hooks/useStorageClasses';
 import { FormGroup } from '@patternfly/react-core';
+import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
+
+import { useAdvancedSearchField } from '../store/useAdvancedSearchStore';
 
 type StorageClassFieldProps = {
-  setStorageClasses: Dispatch<SetStateAction<string[]>>;
-  storageClasses: string[];
   vms: V1VirtualMachine[];
 };
 
-const StorageClassField: FC<StorageClassFieldProps> = ({
-  setStorageClasses,
-  storageClasses,
-  vms,
-}) => {
+const StorageClassField: FC<StorageClassFieldProps> = ({ vms }) => {
   const { t } = useKubevirtTranslation();
+  const { setValue, value } = useAdvancedSearchField(VirtualMachineRowFilterType.StorageClass);
 
   const pvcMapper = usePVCMapper(null);
 
@@ -29,9 +27,9 @@ const StorageClassField: FC<StorageClassFieldProps> = ({
       <MultiSelectTypeahead
         allResourceNames={Array.from(allStorageClasses)}
         data-test="adv-search-vm-storage-class"
-        selectedResourceNames={storageClasses}
+        selectedResourceNames={value}
         selectPlaceholder={t('Select storage class')}
-        setSelectedResourceNames={setStorageClasses}
+        setSelectedResourceNames={setValue}
       />
     </FormGroup>
   );

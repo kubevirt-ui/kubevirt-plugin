@@ -1,34 +1,28 @@
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Checkbox, FormGroup } from '@patternfly/react-core';
-import { SchedulingValue } from '@search/utils/types';
+import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
-type SchedulingFieldProps = {
-  scheduling: SchedulingValue;
-  setScheduling: Dispatch<SetStateAction<SchedulingValue>>;
-};
+import { useAdvancedSearchField } from '../store/useAdvancedSearchStore';
 
-const SchedulingField: FC<SchedulingFieldProps> = ({ scheduling, setScheduling }) => {
+const SchedulingField: FC = () => {
   const { t } = useKubevirtTranslation();
+  const { setValue, value } = useAdvancedSearchField(VirtualMachineRowFilterType.Scheduling);
 
   return (
     <FormGroup isInline label={t('Scheduling')} role="group">
       <Checkbox
-        onChange={(_, checked) =>
-          setScheduling((previous) => ({ ...previous, affinityRules: checked }))
-        }
         id="adv-search-vm-scheduling-affinity-rules"
-        isChecked={scheduling.affinityRules}
+        isChecked={value.affinityRules}
         label={t('Affinity rules')}
+        onChange={(_, checked) => setValue({ ...value, affinityRules: checked })}
       />
       <Checkbox
-        onChange={(_, checked) =>
-          setScheduling((previous) => ({ ...previous, nodeSelector: checked }))
-        }
         id="adv-search-vm-scheduling-node-selector"
-        isChecked={scheduling.nodeSelector}
+        isChecked={value.nodeSelector}
         label={t('Node selector')}
+        onChange={(_, checked) => setValue({ ...value, nodeSelector: checked })}
       />
     </FormGroup>
   );

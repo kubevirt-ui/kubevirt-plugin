@@ -1,30 +1,28 @@
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Checkbox, FormGroup } from '@patternfly/react-core';
-import { HWDevicesValue } from '@search/utils/types';
+import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
-type HardwareDevicesFieldProps = {
-  hwDevices: HWDevicesValue;
-  setHWDevices: Dispatch<SetStateAction<HWDevicesValue>>;
-};
+import { useAdvancedSearchField } from '../store/useAdvancedSearchStore';
 
-const HardwareDevicesField: FC<HardwareDevicesFieldProps> = ({ hwDevices, setHWDevices }) => {
+const HardwareDevicesField: FC = () => {
   const { t } = useKubevirtTranslation();
+  const { setValue, value } = useAdvancedSearchField(VirtualMachineRowFilterType.HWDevices);
 
   return (
     <FormGroup isInline label={t('Hardware devices')} role="group">
       <Checkbox
         id="adv-search-vm-hardware-gpu-devices"
-        isChecked={hwDevices.gpu}
+        isChecked={value.gpu}
         label={t('GPU devices')}
-        onChange={(_, checked) => setHWDevices((previous) => ({ ...previous, gpu: checked }))}
+        onChange={(_, checked) => setValue({ ...value, gpu: checked })}
       />
       <Checkbox
         id="adv-search-vm-hardware-host-devices"
-        isChecked={hwDevices.host}
+        isChecked={value.host}
         label={t('Host devices')}
-        onChange={(_, checked) => setHWDevices((previous) => ({ ...previous, host: checked }))}
+        onChange={(_, checked) => setValue({ ...value, host: checked })}
       />
     </FormGroup>
   );

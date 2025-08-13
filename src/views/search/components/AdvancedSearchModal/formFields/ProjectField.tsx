@@ -4,14 +4,13 @@ import MultiSelectTypeahead from '@kubevirt-utils/components/MultiSelectTypeahea
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
 import { FormGroup } from '@patternfly/react-core';
+import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
-type ProjectFieldProps = {
-  projects: string[];
-  setProjects: (projects: string[]) => void;
-};
+import { useAdvancedSearchField } from '../store/useAdvancedSearchStore';
 
-const ProjectField: FC<ProjectFieldProps> = ({ projects, setProjects }) => {
+const ProjectField: FC = () => {
   const { t } = useKubevirtTranslation();
+  const { setValue, value } = useAdvancedSearchField(VirtualMachineRowFilterType.Project);
 
   const [allProjectNames] = useProjects();
 
@@ -21,9 +20,9 @@ const ProjectField: FC<ProjectFieldProps> = ({ projects, setProjects }) => {
         allResourceNames={allProjectNames}
         data-test="adv-search-vm-project"
         emptyValuePlaceholder={t('All projects')}
-        selectedResourceNames={projects}
+        selectedResourceNames={value}
         selectPlaceholder={t('Select project')}
-        setSelectedResourceNames={setProjects}
+        setSelectedResourceNames={setValue}
       />
     </FormGroup>
   );

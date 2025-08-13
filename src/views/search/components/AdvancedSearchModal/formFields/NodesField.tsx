@@ -5,14 +5,13 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { FormGroup } from '@patternfly/react-core';
 import { useVirtualMachineInstanceMapper } from '@virtualmachines/list/hooks/useVirtualMachineInstanceMapper';
 import { useNodesFilter } from '@virtualmachines/list/hooks/useVMListFilters/useNodesFilter';
+import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
-type NodesFieldProps = {
-  nodes: string[];
-  setNodes: (nodes: string[]) => void;
-};
+import { useAdvancedSearchField } from '../store/useAdvancedSearchStore';
 
-const NodesField: FC<NodesFieldProps> = ({ nodes, setNodes }) => {
+const NodesField: FC = () => {
   const { t } = useKubevirtTranslation();
+  const { setValue, value } = useAdvancedSearchField(VirtualMachineRowFilterType.Node);
 
   const vmiMapper = useVirtualMachineInstanceMapper();
   const nodesFilter = useNodesFilter(vmiMapper);
@@ -24,9 +23,9 @@ const NodesField: FC<NodesFieldProps> = ({ nodes, setNodes }) => {
       <MultiSelectTypeahead
         allResourceNames={allNodes}
         data-test="adv-search-vm-nodes"
-        selectedResourceNames={nodes}
+        selectedResourceNames={value}
         selectPlaceholder={t('Select node')}
-        setSelectedResourceNames={setNodes}
+        setSelectedResourceNames={setValue}
       />
     </FormGroup>
   );

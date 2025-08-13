@@ -2,31 +2,22 @@ import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup } from '@patternfly/react-core';
+import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 import DateFromToPicker from '../components/DateFromToPicker';
 import DateSelect from '../components/DateSelect';
 import { DateSelectOption } from '../constants/dateSelect';
+import { useAdvancedSearchField } from '../store/useAdvancedSearchStore';
 
-type DateCreatedFieldProps = {
-  dateFromString: string;
-  dateOption?: DateSelectOption;
-  dateToString: string;
-  setDateFromString: (date: string) => void;
-  setDateOption: (option: DateSelectOption) => void;
-  setDateToString: (date: string) => void;
-  setIsValidDate: (isValid: boolean) => void;
-};
-
-const DateCreatedField: FC<DateCreatedFieldProps> = ({
-  dateFromString,
-  dateOption,
-  dateToString,
-  setDateFromString,
-  setDateOption,
-  setDateToString,
-  setIsValidDate,
-}) => {
+const DateCreatedField: FC = () => {
   const { t } = useKubevirtTranslation();
+  const { setValue: setDateFromString, value: dateFromString } = useAdvancedSearchField(
+    VirtualMachineRowFilterType.DateCreatedFrom,
+  );
+  const { setValue: setDateToString, value: dateToString } = useAdvancedSearchField(
+    VirtualMachineRowFilterType.DateCreatedTo,
+  );
+  const { setValue: setDateOption, value: dateOption } = useAdvancedSearchField('dateOption');
 
   return (
     <FormGroup label={t('Date created')}>
@@ -45,7 +36,6 @@ const DateCreatedField: FC<DateCreatedFieldProps> = ({
             dateToString={dateToString}
             setDateFromString={setDateFromString}
             setDateToString={setDateToString}
-            setIsValidDate={setIsValidDate}
           />
         </div>
       )}

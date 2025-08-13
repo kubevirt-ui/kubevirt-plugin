@@ -2,22 +2,21 @@ import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, TextInput } from '@patternfly/react-core';
+import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
-type DescriptionFieldProps = {
-  description: string;
-  setDescription: (description: string) => void;
-};
+import { useAdvancedSearchField } from '../store/useAdvancedSearchStore';
 
-const DescriptionField: FC<DescriptionFieldProps> = ({ description, setDescription }) => {
+const DescriptionField: FC = () => {
   const { t } = useKubevirtTranslation();
+  const { setValue, value } = useAdvancedSearchField(VirtualMachineRowFilterType.Description);
 
   return (
     <FormGroup label={t('Description')}>
       <TextInput
         data-test="adv-search-vm-description"
-        onChange={(_, value) => setDescription(value)}
+        onChange={(_, newValue) => setValue(newValue)}
         type="text"
-        value={description}
+        value={value}
       />
     </FormGroup>
   );
