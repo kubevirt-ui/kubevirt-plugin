@@ -1,6 +1,7 @@
 import { EncodedExtension } from '@openshift/dynamic-plugin-sdk-webpack';
 import {
   FeatureFlagHookProvider,
+  HrefNavItem,
   RoutePage,
   StandaloneRoutePage,
 } from '@openshift-console/dynamic-plugin-sdk';
@@ -19,6 +20,57 @@ export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
 };
 
 export const extensions: EncodedExtension[] = [
+  {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC_ACM'],
+    },
+    properties: {
+      icon: { $codeRef: 'perspective.icon' },
+      id: 'fleet-virtualization-perspective',
+      importRedirectURL: { $codeRef: 'perspective.getACMLandingPageURL' },
+      landingPageURL: { $codeRef: 'perspective.getACMLandingPageURL' },
+      name: '%plugin__console-virt-perspective-plugin~Fleet Virtualization%',
+    },
+    type: 'console.perspective',
+  },
+  {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC_ACM'],
+    },
+    properties: {
+      dataAttributes: {
+        'data-border': 'no-border',
+        'data-class': 'kv-plugin-virt-perspective-element',
+        'data-quickstart-id': 'qs-nav-virtualization-catalog',
+        'data-test-id': 'virtualization-catalog-nav-item',
+      },
+      href: '/k8s/all-clusters/all-namespaces/catalog',
+      id: 'virtualization-catalog-virt-perspective',
+      insertBefore: 'virtualmachines-virt-perspective',
+      name: '%plugin__kubevirt-plugin~Catalog%',
+      perspective: 'fleet-virtualization-perspective',
+    },
+    type: 'console.navigation/href',
+  } as EncodedExtension<HrefNavItem>,
+
+  {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC_ACM'],
+    },
+    properties: {
+      dataAttributes: {
+        'data-border': 'no-border',
+        'data-class': 'kv-plugin-virt-perspective-element',
+        'data-quickstart-id': 'qs-nav-virtualmachines',
+        'data-test-id': 'virtualmachines-nav-item',
+      },
+      href: '/k8s/all-clusters/all-namespaces/kubevirt.io~v1~VirtualMachine',
+      id: 'virtualmachines-virt-perspective',
+      name: '%plugin__kubevirt-plugin~VirtualMachines%',
+      perspective: 'fleet-virtualization-perspective',
+    },
+    type: 'console.navigation/href',
+  } as EncodedExtension<HrefNavItem>,
   {
     flags: {
       required: ['KUBEVIRT_DYNAMIC_ACM'],
