@@ -21,16 +21,19 @@ import {
   getTemplateVirtualMachineObject,
 } from '@kubevirt-utils/resources/template';
 import { getRootDataVolumeTemplateSpec, getVolumes } from '@kubevirt-utils/resources/vm';
+import { convertToBaseValue } from '@kubevirt-utils/utils/humanize.js';
 import { ensurePath, isEmpty, removeDockerPrefix } from '@kubevirt-utils/utils/utils';
 
 import { INSTALLATION_CDROM_NAME } from './StorageSection/constants';
 
-export const hasValidSource = (template: V1Template) => {
+export const hasValidSource = (template: V1Template, originalTemplate: V1Template) => {
   const vm = getTemplateVirtualMachineObject(template);
 
   const hasValidDVSources = hasVMValidDVSources(vm);
   const hasValidVolumeSources = hasVMValidVolumeSources(vm);
-  return hasValidDVSources && hasValidVolumeSources;
+  const hasValidDiskSize = hasValidDiskSizes(vm, originalTemplate);
+
+  return hasValidDVSources && hasValidVolumeSources && hasValidDiskSize;
 };
 
 const hasVMValidDVSources = (vm: V1VirtualMachine) => {
@@ -58,6 +61,22 @@ const hasVMValidVolumeSources = (vm: V1VirtualMachine) =>
 
     return true;
   });
+
+const hasValidDiskSizes = (vm: V1VirtualMachine, originalTemplate: V1Template): boolean => {
+  const originalTemplateRootDVSpec = getRootDataVolumeTemplateSpec(
+    getTemplateVirtualMachineObject(originalTemplate),
+  );
+  const originalTemplateDiskSize = convertToBaseValue(
+    originalTemplateRootDVSpec?.spec?.storage?.resources?.requests?.storage,
+  );
+
+  const currentRootDVSpec = getRootDataVolumeTemplateSpec(vm);
+  const currentDiskSize = convertToBaseValue(
+    currentRootDVSpec?.spec?.storage?.resources?.requests?.storage,
+  );
+
+  return currentDiskSize >= originalTemplateDiskSize;
+};
 
 export const allRequiredParametersAreFulfilled = (template: V1Template) =>
   template.parameters

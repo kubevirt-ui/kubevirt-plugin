@@ -124,6 +124,16 @@ export const getRootDiskSecretRef = (vm: V1VirtualMachine): string => {
 };
 
 /**
+ * A selector for the virtual machine's root data volume storage request
+ * @param {V1VirtualMachine} vm
+ * @returns the virtual machine's root data volume requested storage
+ */
+export const getRootDiskStorageRequests = (vm: V1VirtualMachine): string => {
+  const dataVolumeTemplateSpec = getRootDataVolumeTemplateSpec(vm);
+  return dataVolumeTemplateSpec?.spec?.storage?.resources?.requests?.storage;
+};
+
+/**
  * A selector for the virtual machine's config maps
  * @param {V1VirtualMachine} vm the virtual machine
  * @returns the virtual machine config maps

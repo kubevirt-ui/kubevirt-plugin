@@ -10,8 +10,14 @@ import React, {
 import { useDrawerContext } from '@catalog/templatescatalog/components/TemplatesCatalogDrawer/hooks/useDrawerContext';
 import { V1beta1DataVolumeSpec, V1ContainerDiskSource } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
+import {
+  getIsMinusDisabled,
+  getUnitFromSize,
+} from '@kubevirt-utils/components/CapacityInput/utils';
 import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
+import { getRootDiskStorageRequests } from '@kubevirt-utils/resources/vm';
 import { appendDockerPrefix } from '@kubevirt-utils/utils/utils';
 
 import {
@@ -33,6 +39,7 @@ import SelectSourceOption from './SelectSourceOption';
 import {
   getContainerDiskSource,
   getGenericSourceCustomization,
+  getMinDiskSize,
   getPVCSource,
   getQuantityFromSource,
   getSourceTypeFromDiskSource,
@@ -67,9 +74,17 @@ export const SelectSource: FC<SelectSourceProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const initialDiskSource = useRef(selectedSource);
-  const { registryCredentials, setRegistryCredentials } = useDrawerContext();
+  const { originalTemplate, registryCredentials, setRegistryCredentials } = useDrawerContext();
 
   const volumeQuantity = getQuantityFromSource(selectedSource as V1beta1DataVolumeSpec);
+
+  const templateDiskSize = getRootDiskStorageRequests(
+    getTemplateVirtualMachineObject(originalTemplate),
+  );
+
+  const currentSize = getUnitFromSize(volumeQuantity);
+  const minDiskValue = getMinDiskSize(templateDiskSize, currentSize);
+  const isMinusDisabled = getIsMinusDisabled(minDiskValue, volumeQuantity);
 
   const pvcNameSelected = (selectedSource as V1beta1DataVolumeSpec)?.source?.pvc?.name;
   const pvcNamespaceSelected = (selectedSource as V1beta1DataVolumeSpec)?.source?.pvc?.namespace;
@@ -193,7 +208,13 @@ export const SelectSource: FC<SelectSourceProps> = ({
       )}
 
       {showSizeInput && selectedSourceType !== CONTAINER_DISK_SOURCE_NAME && (
-        <CapacityInput label={t('Disk size')} onChange={setVolumeQuantity} size={volumeQuantity} />
+        <CapacityInput
+          isMinusDisabled={isMinusDisabled}
+          label={t('Disk size')}
+          minValue={minDiskValue}
+          onChange={setVolumeQuantity}
+          size={volumeQuantity}
+        />
       )}
     </>
   );
