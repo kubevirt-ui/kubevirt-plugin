@@ -8,9 +8,9 @@ import { Form, FormGroup, SelectList, SelectOption } from '@patternfly/react-cor
 
 import FormPFSelect from '../FormPFSelect/FormPFSelect';
 
-import { bootloaderOptions, BootMode, BootModeTitles } from './utils/constants';
+import { BootMode, BootModeTitles } from './utils/constants';
 import { BootloaderOptionValue } from './utils/types';
-import { getBootloaderFromVM, updatedVMBootMode } from './utils/utils';
+import { getBootloaderFromVM, getBootloaderOptions, updatedVMBootMode } from './utils/utils';
 
 type FirmwareBootloaderModalProps = {
   isOpen: boolean;
@@ -32,6 +32,8 @@ const FirmwareBootloaderModal: FC<FirmwareBootloaderModalProps> = ({
   const { t } = useKubevirtTranslation();
   const [selectedFirmwareBootloader, setSelectedFirmwareBootloader] =
     useState<BootloaderOptionValue>(getBootloaderFromVM(vm, preferredBootmode));
+
+  const bootloaderOptions = useMemo(() => getBootloaderOptions(vm), [vm]);
 
   const handleChange = (event: MouseEvent<HTMLSelectElement>, value: BootloaderOptionValue) => {
     event.preventDefault();

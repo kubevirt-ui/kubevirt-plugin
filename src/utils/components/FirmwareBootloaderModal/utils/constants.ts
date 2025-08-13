@@ -1,20 +1,22 @@
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
-import { BootloaderLabel } from './types';
+import { BootloaderOption } from './types';
 
 export enum BootMode {
   bios = 'bios',
+  ipl = 'ipl',
   uefi = 'uefi',
   uefiSecure = 'uefiSecure',
 }
 
 export const BootModeTitles = {
   [BootMode.bios]: t('BIOS'),
+  [BootMode.ipl]: t('IPL'),
   [BootMode.uefi]: t('UEFI'),
   [BootMode.uefiSecure]: t('UEFI (secure)'),
 };
 
-export const bootloaderOptions: BootloaderLabel[] = [
+export const defaultBootloaderOptions: BootloaderOption[] = [
   {
     description: t('Use BIOS when bootloading the guest OS'),
     title: BootModeTitles[BootMode.bios],
@@ -31,5 +33,13 @@ export const bootloaderOptions: BootloaderLabel[] = [
     ),
     title: BootModeTitles[BootMode.uefiSecure],
     value: BootMode.uefiSecure,
+  },
+];
+
+export const s390xBootloaderOptions: BootloaderOption[] = [
+  {
+    description: t('Use IPL (Initial Program Load) when bootloading the guest OS'),
+    title: BootModeTitles[BootMode.ipl],
+    value: BootMode.ipl,
   },
 ];
