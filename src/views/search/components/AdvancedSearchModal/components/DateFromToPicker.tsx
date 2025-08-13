@@ -3,13 +3,14 @@ import React, { Dispatch, FC, SetStateAction, useEffect, useState } from 'react'
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { DatePicker, DatePickerProps, Split, SplitItem } from '@patternfly/react-core';
 
+import { useAdvancedSearchField } from '../store/useAdvancedSearchStore';
+
 type DateFromToPickerProps = {
   'data-test'?: string;
   dateFromString: string;
   dateToString: string;
   setDateFromString: Dispatch<SetStateAction<string>>;
   setDateToString: Dispatch<SetStateAction<string>>;
-  setIsValidDate: Dispatch<SetStateAction<boolean>>;
 };
 
 const DateFromToPicker: FC<DateFromToPickerProps> = ({
@@ -18,11 +19,11 @@ const DateFromToPicker: FC<DateFromToPickerProps> = ({
   dateToString,
   setDateFromString,
   setDateToString,
-  setIsValidDate,
 }) => {
   const { t } = useKubevirtTranslation();
   const [dateFrom, setDateFrom] = useState<Date>();
   const [dateTo, setDateTo] = useState<Date>();
+  const { setValue: setIsValidDate } = useAdvancedSearchField('isValidDate');
 
   useEffect(() => {
     if ((dateFromString && !dateFrom) || (dateToString && !dateTo) || dateFrom > dateTo) {

@@ -5,16 +5,18 @@ import { labelParser } from '@kubevirt-utils/components/ListPageFilter/utils';
 import MultiSelectTypeahead from '@kubevirt-utils/components/MultiSelectTypeahead/MultiSelectTypeahead';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup } from '@patternfly/react-core';
+import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
+
+import { useAdvancedSearchField } from '../store/useAdvancedSearchStore';
 
 type LabelsFieldProps = {
-  initialInputValue?: string;
-  labels: string[];
-  setLabels: (labels: string[]) => void;
   vms: V1VirtualMachine[];
 };
 
-const LabelsField: FC<LabelsFieldProps> = ({ initialInputValue, labels, setLabels, vms }) => {
+const LabelsField: FC<LabelsFieldProps> = ({ vms }) => {
   const { t } = useKubevirtTranslation();
+  const { setValue, value } = useAdvancedSearchField(VirtualMachineRowFilterType.Labels);
+  const { value: labelInputValue } = useAdvancedSearchField('labelInputText');
 
   const allLabels = useMemo(() => Array.from(labelParser(vms)), [vms]);
 
@@ -23,10 +25,10 @@ const LabelsField: FC<LabelsFieldProps> = ({ initialInputValue, labels, setLabel
       <MultiSelectTypeahead
         allResourceNames={allLabels}
         data-test="adv-search-vm-labels"
-        initialInputValue={initialInputValue}
-        selectedResourceNames={labels}
+        initialInputValue={labelInputValue}
+        selectedResourceNames={value}
         selectPlaceholder={t('Add label')}
-        setSelectedResourceNames={setLabels}
+        setSelectedResourceNames={setValue}
       />
     </FormGroup>
   );

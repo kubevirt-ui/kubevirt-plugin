@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, SetStateAction, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { NetworkAttachmentDefinitionModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import MultiSelectTypeahead from '@kubevirt-utils/components/MultiSelectTypeahead/MultiSelectTypeahead';
@@ -7,17 +7,13 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { FormGroup } from '@patternfly/react-core';
+import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
-type NetworkAttachmentDefinitionsFieldProps = {
-  networkAttachmentDefinitions: string[];
-  setNetworkAttachmentDefinitions: Dispatch<SetStateAction<string[]>>;
-};
+import { useAdvancedSearchField } from '../store/useAdvancedSearchStore';
 
-const NetworkAttachmentDefinitionsField: FC<NetworkAttachmentDefinitionsFieldProps> = ({
-  networkAttachmentDefinitions,
-  setNetworkAttachmentDefinitions,
-}) => {
+const NetworkAttachmentDefinitionsField: FC = () => {
   const { t } = useKubevirtTranslation();
+  const { setValue, value } = useAdvancedSearchField(VirtualMachineRowFilterType.NAD);
 
   const [allNetworkAttachmentDefinitions] = useK8sWatchResource<NetworkAttachmentDefinition[]>({
     groupVersionKind: NetworkAttachmentDefinitionModelGroupVersionKind,
@@ -36,9 +32,9 @@ const NetworkAttachmentDefinitionsField: FC<NetworkAttachmentDefinitionsFieldPro
         allResourceNames={allOptions}
         data-test="adv-search-vm-nad"
         emptyValuePlaceholder={placeholder}
-        selectedResourceNames={networkAttachmentDefinitions}
+        selectedResourceNames={value}
         selectPlaceholder={placeholder}
-        setSelectedResourceNames={setNetworkAttachmentDefinitions}
+        setSelectedResourceNames={setValue}
       />
     </FormGroup>
   );

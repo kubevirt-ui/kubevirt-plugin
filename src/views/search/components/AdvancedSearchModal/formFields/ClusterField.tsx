@@ -5,14 +5,13 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getName } from '@kubevirt-utils/resources/shared';
 import useAllClusters from '@multicluster/hooks/useAllClusters/useAllClusters';
 import { FormGroup } from '@patternfly/react-core';
+import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
-type ClusterFieldProps = {
-  clusters: string[];
-  setClusters: (clusters: string[]) => void;
-};
+import { useAdvancedSearchField } from '../store/useAdvancedSearchStore';
 
-const ClusterField: FC<ClusterFieldProps> = ({ clusters, setClusters }) => {
+const ClusterField: FC = () => {
   const { t } = useKubevirtTranslation();
+  const { setValue, value } = useAdvancedSearchField(VirtualMachineRowFilterType.Cluster);
 
   const [allClusters] = useAllClusters();
 
@@ -24,9 +23,9 @@ const ClusterField: FC<ClusterFieldProps> = ({ clusters, setClusters }) => {
         allResourceNames={clusterNames}
         data-test="adv-search-vm-cluster"
         emptyValuePlaceholder={t('All clusters')}
-        selectedResourceNames={clusters}
+        selectedResourceNames={value}
         selectPlaceholder={t('Select cluster')}
-        setSelectedResourceNames={setClusters}
+        setSelectedResourceNames={setValue}
       />
     </FormGroup>
   );

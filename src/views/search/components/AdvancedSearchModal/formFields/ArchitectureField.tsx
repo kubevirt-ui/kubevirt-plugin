@@ -5,19 +5,17 @@ import MultiSelectTypeahead from '@kubevirt-utils/components/MultiSelectTypeahea
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup } from '@patternfly/react-core';
 import { getArchitectureFilter } from '@virtualmachines/list/utils/filters/getArchitectureFilter';
+import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
+
+import { useAdvancedSearchField } from '../store/useAdvancedSearchStore';
 
 type ArchitectureFieldProps = {
-  architectures: string[];
-  setArchitectures: (architectures: string[]) => void;
   vms: V1VirtualMachine[];
 };
 
-const ArchitectureField: FC<ArchitectureFieldProps> = ({
-  architectures,
-  setArchitectures,
-  vms,
-}) => {
+const ArchitectureField: FC<ArchitectureFieldProps> = ({ vms }) => {
   const { t } = useKubevirtTranslation();
+  const { setValue, value } = useAdvancedSearchField(VirtualMachineRowFilterType.Architecture);
 
   const allArchitectures = useMemo(
     () => getArchitectureFilter(vms).items.map((item) => item.id),
@@ -33,9 +31,9 @@ const ArchitectureField: FC<ArchitectureFieldProps> = ({
       <MultiSelectTypeahead
         allResourceNames={allArchitectures}
         data-test="adv-search-vm-architecture-type"
-        selectedResourceNames={architectures}
+        selectedResourceNames={value}
         selectPlaceholder={t('Select architecture type')}
-        setSelectedResourceNames={setArchitectures}
+        setSelectedResourceNames={setValue}
       />
     </FormGroup>
   );

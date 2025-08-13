@@ -2,22 +2,21 @@ import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, TextInput } from '@patternfly/react-core';
+import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
-type IPFieldProps = {
-  ip: string;
-  setIP: (ip: string) => void;
-};
+import { useAdvancedSearchField } from '../store/useAdvancedSearchStore';
 
-const IPField: FC<IPFieldProps> = ({ ip, setIP }) => {
+const IPField: FC = () => {
   const { t } = useKubevirtTranslation();
+  const { setValue, value } = useAdvancedSearchField(VirtualMachineRowFilterType.IP);
 
   return (
     <FormGroup label={t('IP address')}>
       <TextInput
         data-test="adv-search-vm-ip"
-        onChange={(_, value) => setIP(value)}
+        onChange={(_, newValue) => setValue(newValue)}
         type="text"
-        value={ip}
+        value={value}
       />
     </FormGroup>
   );
