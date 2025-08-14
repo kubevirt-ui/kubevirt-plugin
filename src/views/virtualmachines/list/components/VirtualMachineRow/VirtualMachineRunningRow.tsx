@@ -1,4 +1,5 @@
 import React, { FC, ReactNode } from 'react';
+import { removeIpV6 } from 'src/utils/utils/utils';
 
 import {
   V1VirtualMachine,
@@ -31,7 +32,9 @@ const VirtualMachineRunningRow: FC<
 > = ({ activeColumnIDs, index, obj, rowData: { pvcMapper, status, vmi, vmim } }) => {
   const { t } = useKubevirtTranslation();
 
-  const ipAddressess = vmi && getVMIIPAddressesWithName(vmi);
+  let ipAddressess = vmi && getVMIIPAddressesWithName(vmi);
+  ipAddressess = removeIpV6(ipAddressess);
+
   return (
     <VirtualMachineRowLayout
       rowData={{

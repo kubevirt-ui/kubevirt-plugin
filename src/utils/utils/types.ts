@@ -16,3 +16,5 @@ export type ListPageProps = {
   selector?: Selector;
   showTitle?: boolean;
 };
+
+export type IpAddress = { interfaceName: string; ip: string };
