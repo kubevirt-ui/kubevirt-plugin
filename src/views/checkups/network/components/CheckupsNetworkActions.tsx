@@ -34,7 +34,7 @@ const CheckupsNetworkActions: FC<CheckupsNetworkActionsProps> = ({
   const onToggle = () => setIsActionsOpen((prevIsOpen) => !prevIsOpen);
   const Toggle = isKebab
     ? KebabToggle({ isExpanded: isActionsOpen, onClick: onToggle })
-    : DropdownToggle({ isExpanded: isActionsOpen, onClick: onToggle, placeholder: t('Actions') });
+    : DropdownToggle({ children: t('Actions'), isExpanded: isActionsOpen, onClick: onToggle });
 
   const deleteCheckup = () => {
     setIsActionsOpen(false);
