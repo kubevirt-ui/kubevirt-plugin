@@ -1,5 +1,12 @@
-import { V1Disk } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1Disk,
+  V1VirtualMachine,
+  V1VirtualMachineInstance,
+  V1Volume,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { InterfaceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
+import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
+import { isRunning } from '@virtualmachines/utils';
 
 import { DiskType, diskTypes, diskTypesLabels } from './constants';
 
@@ -41,4 +48,64 @@ export const getPrintableDiskInterface = (disk: V1Disk): string => {
     return diskInterface.toUpperCase();
   }
   return diskInterface ?? '';
+};
+
+export const isCDROMDisk = (disk: V1Disk): boolean => {
+  return getDiskDrive(disk) === diskTypes.cdrom;
+};
+
+export const isCDROMMounted = (volume: V1Volume): boolean => {
+  return !!(
+    volume?.containerDisk?.image ||
+    volume?.dataVolume?.name ||
+    volume?.persistentVolumeClaim?.claimName
+  );
+};
+
+export const getCDROMSourceName = (volume: V1Volume): string => {
+  return (
+    volume?.dataVolume?.name ||
+    volume?.persistentVolumeClaim?.claimName ||
+    volume?.containerDisk?.image ||
+    ''
+  );
+};
+
+export const getCDROMStatus = (vm: V1VirtualMachine, vmi?: V1VirtualMachineInstance) => {
+  const isVMRunning = isRunning(vm);
+  const disks = isVMRunning ? vmi?.spec?.domain?.devices?.disks : getDisks(vm) || [];
+  const cdroms = disks.filter(isCDROMDisk);
+  const volumes = isVMRunning ? vmi?.spec?.volumes : getVolumes(vm);
+
+  return cdroms.map((disk) => {
+    const volume = volumes?.find((vmVolume) => vmVolume.name === disk.name);
+    const isMounted = volume ? isCDROMMounted(volume) : false;
+
+    return {
+      canDelete: !isVMRunning,
+      canEject: isVMRunning && isMounted,
+      canMount: isVMRunning && !isMounted,
+      disk,
+      isMounted,
+      name: disk.name,
+      sourceName: isMounted ? getCDROMSourceName(volume) : null,
+      volume,
+    };
+  });
+};
+
+export const hasDataVolume = (volume: V1Volume): boolean => {
+  return !!volume?.dataVolume?.name;
+};
+
+export const hasPersistentVolumeClaim = (volume: V1Volume): boolean => {
+  return !!volume?.persistentVolumeClaim?.claimName;
+};
+
+export const hasContainerDisk = (volume: V1Volume): boolean => {
+  return !!volume?.containerDisk?.image;
+};
+
+export const getContainerDiskImage = (volume: V1Volume): null | string => {
+  return volume?.containerDisk?.image?.toLowerCase() || null;
 };
