@@ -1,7 +1,8 @@
-import React, { Dispatch, FC, SetStateAction, useMemo, useState } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 
 import { InstanceTypes } from '@catalog/CreateFromInstanceTypes/state/utils/types';
 import { VirtualMachineInstancetypeModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
+import VirtualMachineClusterInstancetypeModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineClusterInstancetypeModel';
 import { isRedHatInstanceType } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineClusterInstancetypeModelGroupVersionKind } from '@kubevirt-utils/models';
@@ -12,14 +13,16 @@ import { MenuItem, MenuSearch, MenuSearchInput, SearchInput } from '@patternfly/
 
 type UserInstanceTypeMenuProps = {
   allInstanceTypes: InstanceTypes;
+  onSelect: (kind: string, value: string) => void;
   selected: string;
-  setSelected: Dispatch<SetStateAction<string>>;
+  selectedKind: string;
 };
 
 const UserInstanceTypeMenu: FC<UserInstanceTypeMenuProps> = ({
   allInstanceTypes,
+  onSelect,
   selected,
-  setSelected,
+  selectedKind,
 }) => {
   const { t } = useKubevirtTranslation();
 
@@ -55,21 +58,22 @@ const UserInstanceTypeMenu: FC<UserInstanceTypeMenuProps> = ({
       )}
       {filteredItems.map((it) => {
         const itName = getName(it);
+        const itKind = it?.kind;
         return (
           <MenuItem
             icon={
               <ResourceIcon
                 groupVersionKind={
-                  it?.kind === 'VirtualMachineClusterInstancetype'
+                  itKind === VirtualMachineClusterInstancetypeModel.kind
                     ? VirtualMachineClusterInstancetypeModelGroupVersionKind
                     : VirtualMachineInstancetypeModelGroupVersionKind
                 }
               />
             }
-            isSelected={selected === itName}
+            isSelected={selected === itName && selectedKind === itKind}
             itemId={itName}
             key={itName}
-            onClick={() => setSelected(itName)}
+            onClick={() => onSelect(itKind, itName)}
           >
             {itName}
           </MenuItem>

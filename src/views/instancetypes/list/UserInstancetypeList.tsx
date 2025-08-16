@@ -1,6 +1,5 @@
 import React, { FC } from 'react';
 
-import useVirtualMachineInstanceTypes from '@catalog/CreateFromInstanceTypes/state/hooks/useVirtualMachineInstanceTypes';
 import { VirtualMachineInstancetypeModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1VirtualMachineInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
@@ -22,21 +21,23 @@ import useUserInstancetypeListColumns from './hooks/useUserInstancetypeListColum
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
 
-const UserInstancetypeList: FC<ListPageProps> = ({
-  fieldSelector,
+type UserInstancetypeListProps = ListPageProps & {
+  instanceTypes: V1beta1VirtualMachineInstancetype[];
+  loaded: boolean;
+  loadError: Error;
+};
+
+const UserInstancetypeList: FC<UserInstancetypeListProps> = ({
   hideColumnManagement,
   hideNameLabelFilters,
   hideTextFilter,
+  instanceTypes,
+  loaded,
+  loadError,
   nameFilter,
   namespace,
-  selector,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [instanceTypes, loaded, loadError] = useVirtualMachineInstanceTypes(
-    fieldSelector,
-    selector,
-    true,
-  );
 
   const { onPaginationChange, pagination } = usePagination();
 

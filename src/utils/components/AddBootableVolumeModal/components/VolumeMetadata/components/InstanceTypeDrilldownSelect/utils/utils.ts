@@ -1,11 +1,9 @@
 import { parseSize } from 'xbytes';
 
-import {
-  V1beta1VirtualMachineClusterInstancetype,
-  V1beta1VirtualMachineInstancetype,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import { VENDOR_LABEL } from '@kubevirt-utils/constants/constants';
+import { InstanceTypeUnion } from '@kubevirt-utils/resources/instancetype/types';
 import { getAnnotation, getLabel, getName } from '@kubevirt-utils/resources/shared';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -50,9 +48,7 @@ const getRedHatInstanceTypeSeriesAndSize = (
   };
 };
 
-const hasRedHatSeriesSizeLabel = (
-  instanceType: V1beta1VirtualMachineClusterInstancetype | V1beta1VirtualMachineInstancetype,
-) => {
+const hasRedHatSeriesSizeLabel = (instanceType: InstanceTypeUnion) => {
   const [seriesName, sizeLabel = ''] = getName(instanceType).split('.');
 
   const rhInstanceTypeSize = instanceTypeSeriesNameMapper[seriesName]?.possibleSizes?.find(
@@ -62,9 +58,7 @@ const hasRedHatSeriesSizeLabel = (
   return !isEmpty(rhInstanceTypeSize);
 };
 
-export const isRedHatInstanceType = (
-  instanceType: V1beta1VirtualMachineClusterInstancetype | V1beta1VirtualMachineInstancetype,
-): boolean => {
+export const isRedHatInstanceType = (instanceType: InstanceTypeUnion): boolean => {
   if (getLabel(instanceType, VENDOR_LABEL) !== REDHAT_COM) return false;
   return hasRedHatSeriesSizeLabel(instanceType);
 };
@@ -110,3 +104,14 @@ export const getInstanceTypeMenuItems = (
 
   return itemsData;
 };
+
+export const isExistingInstanceType = (
+  allInstanceTypes: InstanceTypeUnion[],
+  selectedInstanceType: string,
+  selectedInstanceTypeKind: string,
+) =>
+  allInstanceTypes.some(
+    (instanceType) =>
+      getName(instanceType) === selectedInstanceType &&
+      instanceType.kind === selectedInstanceTypeKind,
+  );

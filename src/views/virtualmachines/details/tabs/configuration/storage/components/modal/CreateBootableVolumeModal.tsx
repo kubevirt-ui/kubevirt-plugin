@@ -81,14 +81,14 @@ const CreateBootableVolumeModal: FC<CreateBootableVolumeModalProps> = ({
     [],
   );
 
-  const deleteLabel = (labelKey: string) => {
+  const deleteLabel = useCallback((labelKey: string) => {
     setBootableVolume((prev) => {
       const updatedLabels = { ...prev?.labels };
       delete updatedLabels[labelKey];
 
       return { ...prev, labels: updatedLabels };
     });
-  };
+  }, []);
 
   const onSubmit = async () => {
     const createdDS = await createBootableVolumeFromDisk(diskObj, vm, bootableVolume);
