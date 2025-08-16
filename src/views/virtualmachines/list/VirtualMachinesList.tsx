@@ -60,7 +60,6 @@ import {
 import { Flex, Pagination } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
 import { VMSearchQueries } from '@virtualmachines/search/hooks/useVMSearchQueries';
-import { vmsSignal } from '@virtualmachines/tree/utils/signals';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 import { convertIntoPVCMapper } from '@virtualmachines/utils/mappers';
 
@@ -73,6 +72,7 @@ import VirtualMachineSelection from './components/VirtualMachineSelection/Virtua
 import { TEXT_FILTER_LABELS_ID } from './hooks/constants';
 import useExistingSelectedVMs from './hooks/useExistingSelectedVMs';
 import useFiltersFromURL from './hooks/useFiltersFromURL';
+import useIsLoading from './hooks/useIsLoading';
 import useVirtualMachineColumns from './hooks/useVirtualMachineColumns';
 import { useVMListFilters } from './hooks/useVMListFilters/useVMListFilters';
 import useVMMetrics from './hooks/useVMMetrics';
@@ -103,6 +103,15 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
   useVMMetrics();
 
   const query = useQuery();
+
+  const [allVMs, allVMsLoaded] = useKubevirtWatchResource<V1VirtualMachine[]>({
+    cluster,
+    groupVersionKind: VirtualMachineModelGroupVersionKind,
+    isList: true,
+    limit: OBJECTS_FETCHING_LIMIT,
+    namespace,
+    namespaced: true,
+  });
 
   const [vms, vmsLoaded, loadError] = useKubevirtWatchResource<V1VirtualMachine[]>(
     {
@@ -245,11 +254,10 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
   );
 
   const loaded = vmsLoaded && vmisLoaded && vmimsLoaded && !loadingFeatureProxy && loadedColumns;
+  const isLoading = useIsLoading(loaded);
 
   const existingSelectedVMs = useExistingSelectedVMs(filteredVMs);
   const isAllVMsSelected = filteredVMs?.length === existingSelectedVMs.length;
-
-  const allVMs = vmsSignal?.value;
 
   const hasNoVMs = isEmpty(
     namespace ? allVMs?.filter((resource) => getNamespace(resource) === namespace) : allVMs,
@@ -270,7 +278,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
       <ListPageBody>
         <div className="vm-listpagebody" ref={listPageBodyRef}>
           {isSearchResultsPage && <VirtualMachineSearchResultsHeader />}
-          {loaded && hasNoVMs ? (
+          {allVMsLoaded && hasNoVMs ? (
             <VirtualMachineEmptyState catalogURL={catalogURL} namespace={namespace} />
           ) : (
             <>
@@ -340,7 +348,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
                 allRowsSelected={isAllVMsSelected}
                 columns={activeColumns}
                 data={paginatedVMs}
-                loaded
+                loaded={!isLoading}
                 loadError={loadError}
                 Row={VirtualMachineRow}
                 unfilteredData={vmsToShow}
