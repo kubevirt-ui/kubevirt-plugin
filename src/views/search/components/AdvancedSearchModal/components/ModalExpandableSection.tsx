@@ -17,7 +17,7 @@ const ModalExpandableSection: FC<ModalExpandableSectionProps> = ({
   return (
     <ExpandableSection
       toggleContent={
-        <Title className="pf-v6-u-text-color-regular" headingLevel="h2" size="lg">
+        <Title className="pf-v6-u-text-color-regular" headingLevel="h3" size="md">
           {title}
         </Title>
       }

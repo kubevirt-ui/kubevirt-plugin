@@ -3,43 +3,34 @@ import { useSearchParams } from 'react-router-dom-v5-compat';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { FilterValue, RowFilter } from '@openshift-console/dynamic-plugin-sdk';
+import { getRowFilterQueryKey } from '@search/utils/query';
+import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
-import { TEXT_FILTER_LABELS_ID, TEXT_FILTER_NAME_ID } from './constants';
-
-const useFiltersFromURL = (
-  rowFilters: RowFilter<V1VirtualMachine>[],
-  otherFilters: RowFilter<V1VirtualMachine>[],
-) => {
+const useFiltersFromURL = (filters: RowFilter<V1VirtualMachine>[]) => {
   const [searchParams] = useSearchParams();
 
   return useMemo(() => {
     const staticFilters: { [key: string]: FilterValue } = {};
 
-    const addFilter = (
-      filterKey: string,
-      searchParamPreposition = '',
-      filterValueType = 'selected',
-    ) => {
-      const searchParamValue = searchParams.get(`${searchParamPreposition}${filterKey}`);
+    const addFilter = (filterKey: string) => {
+      const searchParamValue = searchParams.get(getRowFilterQueryKey(filterKey));
 
       if (searchParamValue) {
+        const filterValueType =
+          filterKey === VirtualMachineRowFilterType.Labels ? 'all' : 'selected';
         staticFilters[filterKey] = { [filterValueType]: searchParamValue.split(',') };
       }
     };
 
-    for (const filter of rowFilters) {
-      addFilter(filter.type, 'rowFilter-');
-    }
-
-    for (const filter of otherFilters) {
+    for (const filter of filters) {
       addFilter(filter.type);
     }
 
-    addFilter(TEXT_FILTER_NAME_ID);
-    addFilter(TEXT_FILTER_LABELS_ID, '', 'all');
+    addFilter(VirtualMachineRowFilterType.Name);
+    addFilter(VirtualMachineRowFilterType.Labels);
 
     return staticFilters;
-  }, [searchParams, otherFilters, rowFilters]);
+  }, [searchParams, filters]);
 };
 
 export default useFiltersFromURL;
