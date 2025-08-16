@@ -1,4 +1,7 @@
+import { useMemo } from 'react';
+
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import useHcoWorkloadArchitectures from '@kubevirt-utils/hooks/useHcoWorkloadArchitectures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   getTemplateOS,
@@ -8,6 +11,11 @@ import {
   isDeprecatedTemplate,
   OS_NAMES,
 } from '@kubevirt-utils/resources/template';
+import {
+  ARCHITECTURE_ID,
+  ARCHITECTURE_TITLE,
+  getArchitecture,
+} from '@kubevirt-utils/utils/architecture';
 import { ItemsToFilterProps } from '@kubevirt-utils/utils/types';
 import { getItemNameWithOther, includeFilter } from '@kubevirt-utils/utils/utils';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
@@ -38,6 +46,15 @@ const useVirtualMachineTemplatesFilters = (
 ): RowFilter<V1Template>[] => {
   const { t } = useKubevirtTranslation();
   const providers = useTemplateProviders();
+  const workloadsArchitectures = useHcoWorkloadArchitectures();
+  const workloadsArchitecturesItems = useMemo(
+    () =>
+      workloadsArchitectures.map((arch) => ({
+        id: arch,
+        title: arch,
+      })),
+    [workloadsArchitectures],
+  );
 
   return [
     {
@@ -52,6 +69,14 @@ const useVirtualMachineTemplatesFilters = (
       ],
       reducer: (obj) => isDeprecatedTemplate(obj) && HIDE_DEPRECATED_TEMPLATES_KEY,
       type: HIDE_DEPRECATED_TEMPLATES,
+    },
+    {
+      filter: (availableArchitectures, obj) =>
+        includeFilter(availableArchitectures, workloadsArchitecturesItems, getArchitecture(obj)),
+      filterGroupName: ARCHITECTURE_TITLE,
+      items: workloadsArchitecturesItems,
+      reducer: (obj) => getItemNameWithOther(getArchitecture(obj), workloadsArchitecturesItems),
+      type: ARCHITECTURE_ID,
     },
     {
       filter: ({ selected }, obj) => selected?.length === 0 || isDefaultVariantTemplate(obj),

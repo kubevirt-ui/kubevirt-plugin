@@ -17,20 +17,17 @@ import PreferencePopoverContent from './PreferencePopoverContent';
 
 type PreferenceSelectProps = {
   bootableVolume: AddBootableVolumeState;
-  deleteLabel: (labelKey: string) => void;
   setBootableVolumeField: SetBootableVolumeFieldType;
 };
 
 const PreferenceSelect: FC<PreferenceSelectProps> = ({
   bootableVolume,
-  deleteLabel,
   setBootableVolumeField,
 }) => {
   const { t } = useKubevirtTranslation();
 
   const { bootableVolumeNamespace, labels } = bootableVolume;
   const { preferenceSelectOptions, preferencesLoaded } = usePreferenceSelectOptions(
-    deleteLabel,
     bootableVolumeNamespace,
     setBootableVolumeField,
   );

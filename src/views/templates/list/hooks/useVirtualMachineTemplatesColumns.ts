@@ -1,6 +1,11 @@
 import { modelToRef, TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
+import {
+  ARCHITECTURE_ID,
+  ARCHITECTURE_LABEL,
+  ARCHITECTURE_TITLE,
+} from '@kubevirt-utils/utils/architecture';
 import { K8sResourceCommon, TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 import { sortable } from '@patternfly/react-table';
 
@@ -12,9 +17,16 @@ const useVirtualMachineTemplatesColumns = (
   const columns = [
     {
       id: 'name',
-      props: { className: 'pf-m-width-30' },
+      props: { className: 'pf-m-width-20' },
       sort: 'metadata.name',
       title: t('Name'),
+      transforms: [sortable],
+    },
+    {
+      id: ARCHITECTURE_ID,
+      props: { className: 'pf-m-width-10' },
+      sort: `metadata.labels.[${ARCHITECTURE_LABEL}]`,
+      title: ARCHITECTURE_TITLE,
       transforms: [sortable],
     },
     ...(!namespace

@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import ArchitectureLabel from '@kubevirt-utils/components/ArchitectureLabel/ArchitectureLabel';
 import DeprecatedBadge from '@kubevirt-utils/components/badges/DeprecatedBadge/DeprecatedBadge';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -15,6 +16,7 @@ import {
   getTemplateWorkload,
 } from '@kubevirt-utils/resources/template/utils/selectors';
 import { getVMBootSourceLabel } from '@kubevirt-utils/resources/vm/utils/source';
+import { ARCHITECTURE_TITLE, getArchitecture } from '@kubevirt-utils/utils/architecture';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { CatalogTile } from '@patternfly/react-catalog-view-extension';
 import { Badge, Skeleton, Stack, StackItem } from '@patternfly/react-core';
@@ -85,6 +87,10 @@ export const TemplateTile: React.FC<TemplateTileProps> = React.memo(
           <Stack hasGutter>
             <StackItem>
               <Stack>
+                <StackItem>
+                  <b>{ARCHITECTURE_TITLE}</b>{' '}
+                  <ArchitectureLabel architecture={getArchitecture(template)} />
+                </StackItem>
                 <StackItem>
                   <b>{t('Project')}</b> {template.metadata.namespace}
                 </StackItem>
