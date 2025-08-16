@@ -3,8 +3,8 @@ import produce from 'immer';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import {
-  bootloaderOptions,
   BootModeTitles,
+  getBootloaderOptions,
 } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/constants';
 import { BootloaderOptionValue } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/types';
 import {
@@ -31,8 +31,11 @@ const TemplateBootloaderModal: FC<TemplateBootloaderModalProps> = ({
   template,
 }) => {
   const { t } = useKubevirtTranslation();
+  const vm = getTemplateVirtualMachineObject(template);
   const [selectedFirmwareBootloader, setSelectedFirmwareBootloader] =
-    useState<BootloaderOptionValue>(getBootloaderFromVM(getTemplateVirtualMachineObject(template)));
+    useState<BootloaderOptionValue>(getBootloaderFromVM(vm));
+
+  const bootloaderOptions = useMemo(() => getBootloaderOptions(vm), [vm]);
 
   const handleChange = (event: MouseEvent<HTMLSelectElement>, value: BootloaderOptionValue) => {
     event.preventDefault();

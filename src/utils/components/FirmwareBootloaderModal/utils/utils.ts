@@ -1,6 +1,12 @@
-import produce from 'immer';
+import { produce } from 'immer';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { ARCHITECTURES } from '@kubevirt-utils/constants/constants';
+import {
+  getArchitecture,
+  getBootloader,
+  getDomainFeatures,
+} from '@kubevirt-utils/resources/vm/utils/selectors';
 import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { BootMode, BootModeTitles } from './constants';
@@ -12,16 +18,20 @@ export const getBootloaderFromVM = (
   vm: V1VirtualMachine,
   defaultBootmode = BootMode.bios,
 ): BootloaderOptionValue => {
-  const secureBoot = vm?.spec?.template?.spec?.domain?.firmware?.bootloader?.efi;
+  if (getArchitecture(vm) === ARCHITECTURES.S390X) {
+    return BootMode.ipl;
+  }
 
-  if (secureBoot?.secureBoot === true || isObjectEmpty(secureBoot)) {
+  const uefiBoot = getBootloader(vm)?.efi;
+
+  if (uefiBoot?.secureBoot === true || isObjectEmpty(uefiBoot)) {
     return BootMode.uefiSecure;
   }
-  if (secureBoot?.secureBoot === false) {
+  if (uefiBoot?.secureBoot === false) {
     return BootMode.uefi;
   }
 
-  if (vm?.spec?.template?.spec?.domain?.firmware?.bootloader?.bios) return BootMode.bios;
+  if (getBootloader(vm)?.bios) return BootMode.bios;
 
   return defaultBootmode;
 };
@@ -46,6 +56,17 @@ export const updatedVMBootMode = (
   firmwareBootloader: BootloaderOptionValue,
 ) =>
   produce<V1VirtualMachine>(vm as V1VirtualMachine, (vmDraft: V1VirtualMachine) => {
+    if (getArchitecture(vm) === ARCHITECTURES.S390X && firmwareBootloader === BootMode.ipl) {
+      if (getBootloader(vmDraft)) {
+        delete vmDraft.spec.template.spec.domain.firmware.bootloader;
+      }
+
+      if (getDomainFeatures(vmDraft)?.smm) {
+        delete vmDraft.spec.template.spec.domain.features.smm;
+      }
+      return;
+    }
+
     ensurePath(vmDraft, 'spec.template.spec.domain.firmware.bootloader');
     ensurePath(vmDraft, 'spec.template.spec.domain.features.smm');
     vmDraft.spec.template.spec.domain.features.smm = { enabled: true };
