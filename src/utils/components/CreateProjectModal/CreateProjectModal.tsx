@@ -5,7 +5,9 @@ import { ProjectRequestModel } from '@kubevirt-ui/kubevirt-api/console';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { k8sCreate, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
+import useIsACMPage from '@multicluster/useIsACMPage';
+import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Button,
   ButtonVariant,
@@ -20,6 +22,8 @@ import { HelpIcon } from '@patternfly/react-icons';
 import ExternalLink from '../ExternalLink/ExternalLink';
 import TabModal from '../TabModal/TabModal';
 
+import SelectCluster from './components/SelectCluster';
+
 type CreateProjectModalProps = {
   createdProject?: (value: K8sResourceCommon) => void;
   isOpen: boolean;
@@ -33,13 +37,17 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const [name, setName] = useState<string>();
+  const [cluster, setCluster] = useState<string>();
   const [description, setDescription] = useState<string>();
   const [displayName, setDisplayName] = useState<string>();
+
+  const isACMPage = useIsACMPage();
 
   return (
     <TabModal<K8sResourceCommon & { description: string; displayName: string }>
       onSubmit={(data) =>
-        k8sCreate({
+        kubevirtK8sCreate({
+          cluster,
           data,
           model: ProjectRequestModel,
         }).then((value) => createdProject?.(value))
@@ -90,6 +98,11 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
             value={name}
           />
         </FormGroup>
+        {isACMPage && (
+          <FormGroup fieldId="cluster-name" label="Cluster">
+            <SelectCluster selectedCluster={cluster} setSelectedCluster={setCluster} />
+          </FormGroup>
+        )}
         <FormGroup fieldId="display-name" label="Display name">
           <TextInput
             id="display-name"
