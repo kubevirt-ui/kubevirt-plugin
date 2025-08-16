@@ -4,12 +4,15 @@ import classNames from 'classnames';
 import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { getVMURL } from '@multicluster/urls';
 
 import StateHandler from '../StateHandler/StateHandler';
 
 import useDynamicPages from './utils/useDynamicPages';
-import { NavPageKubevirt, trimLastHistoryPath } from './utils/utils';
+import { NavPageKubevirt } from './utils/utils';
 
 type HorizontalNavbarProps = {
   error?: any;
@@ -37,17 +40,23 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
     [pages, dynamicPluginPages],
   );
 
-  const paths = allPages.map((page) => page.href);
+  const vmBasePath = vm ? getVMURL(getCluster(vm), getNamespace(vm), getName(vm)) : '';
+
+  const horizontalNavbarPath = useMemo(() => {
+    return location?.pathname.replace(vmBasePath, '');
+  }, [location?.pathname, vmBasePath]);
 
   useEffect(() => {
+    if (isEmpty(vmBasePath)) return;
+
     const defaultPage = allPages.find(({ href }) => isEmpty(href));
 
     const initialActiveTab =
-      allPages.find(({ href }) => !isEmpty(href) && location?.pathname.includes('/' + href)) ||
+      allPages.find(({ href }) => !isEmpty(href) && horizontalNavbarPath.includes('/' + href)) ||
       defaultPage;
 
     setActiveItem(initialActiveTab?.name?.toLowerCase());
-  }, [allPages, location?.pathname]);
+  }, [allPages, horizontalNavbarPath, vmBasePath]);
 
   const [activeItem, setActiveItem] = useState<number | string>();
 
@@ -89,7 +98,7 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
                   data-test-id={`horizontal-link-${item.name}`}
                   id={`horizontal-pageHeader-${item.name}`}
                   onClick={() => setActiveItem(item.name.toLowerCase())}
-                  to={trimLastHistoryPath(location, paths) + item.href}
+                  to={`${vmBasePath}/${item.href}`}
                 >
                   {item.name}
                 </NavLink>
