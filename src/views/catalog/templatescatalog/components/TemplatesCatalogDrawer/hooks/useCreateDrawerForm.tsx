@@ -95,6 +95,7 @@ const useCreateDrawerForm = (
     cdFile,
     diskFile,
     isBootSourceAvailable,
+    originalTemplate,
     registryCredentials,
     setVM,
     sshDetails,
@@ -369,7 +370,7 @@ const useCreateDrawerForm = (
       !nameField ||
       isEmpty(models) ||
       !allRequiredParametersAreFulfilled(template) ||
-      !hasValidSource(template) ||
+      !hasValidSource(template, originalTemplate) ||
       storageClassRequiredMissing ||
       !isValidVmName ||
       !credentialsValid ||
