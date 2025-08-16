@@ -118,6 +118,7 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
       </ModalBody>
       <ModalFooter>
         <Button
+          data-test="save-button"
           isDisabled={updateInProcess}
           isLoading={updateInProcess}
           key="confirm"
@@ -135,13 +136,19 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
             setMemory(defaultMemorySize);
             setMemoryUnit(defaultMemoryUnit);
           }}
+          data-test="restore-button"
           isLoading={templateName && !defaultsLoaded}
           key="default"
           variant={ButtonVariant.secondary}
         >
           {t('Restore template settings')}
         </Button>
-        <Button key="cancel" onClick={onClose} variant={ButtonVariant.link}>
+        <Button
+          data-test="cancel-button"
+          key="cancel"
+          onClick={onClose}
+          variant={ButtonVariant.link}
+        >
           {t('Cancel')}
         </Button>
       </ModalFooter>
