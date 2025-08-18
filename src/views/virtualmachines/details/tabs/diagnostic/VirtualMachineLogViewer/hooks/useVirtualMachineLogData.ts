@@ -8,6 +8,8 @@ import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useK8sBaseAPIPath from '@multicluster/hooks/useK8sBaseAPIPath';
 
+import { GUEST_CONSOLE_LOG_CONTAINER_NAME } from '../constants';
+
 type UseVirtualMachineLogData = (args: { connect?: boolean; pod: K8sResourceCommon }) => {
   data: string[];
 };
@@ -26,7 +28,7 @@ const useVirtualMachineLogData: UseVirtualMachineLogData = ({ connect = true, po
       onOpen: () => kubevirtConsole.log('websocket open kubevirt: ', url),
       protocols: ['base64.binary.k8s.io'],
       queryParams: {
-        container: 'guest-console-log',
+        container: GUEST_CONSOLE_LOG_CONTAINER_NAME,
         follow: 'true',
       },
       retryOnError: true,

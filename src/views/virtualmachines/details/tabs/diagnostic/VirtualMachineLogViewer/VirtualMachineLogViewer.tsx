@@ -15,6 +15,7 @@ import { isRunning } from '@virtualmachines/utils';
 
 import useVirtualMachineLogData from './hooks/useVirtualMachineLogData';
 import VirtualMachineBasicLogViewer from './VirtualMachineBasicLogViewer/VirtualMachineBasicLogViewer';
+import { GUEST_CONSOLE_LOG_CONTAINER_NAME } from './constants';
 
 const VirtualMachineLogViewer = ({ connect, vm }) => {
   const { t } = useKubevirtTranslation();
@@ -32,7 +33,9 @@ const VirtualMachineLogViewer = ({ connect, vm }) => {
   const isNeededRestart = getChangedGuestSystemAccessLog(vm, vmi);
 
   const isPodLogContainerExist = Boolean(
-    pod?.spec?.containers?.find((container) => container?.name === 'guest-console-log'),
+    pod?.spec?.initContainers?.find(
+      (container) => container?.name === GUEST_CONSOLE_LOG_CONTAINER_NAME,
+    ),
   );
 
   const { data } = useVirtualMachineLogData({ connect: connect && isPodLogContainerExist, pod });
