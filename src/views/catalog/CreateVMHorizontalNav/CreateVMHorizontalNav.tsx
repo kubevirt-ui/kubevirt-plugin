@@ -3,7 +3,6 @@ import { useNavigate, useParams } from 'react-router-dom-v5-compat';
 
 import CreateFromInstanceType from '@catalog/CreateFromInstanceTypes/CreateFromInstanceType';
 import TemplatesCatalog from '@catalog/templatescatalog/TemplatesCatalog';
-import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getCatalogURL } from '@multicluster/urls';
 import { PageSection, Stack, StackItem, Tab, Tabs, Title } from '@patternfly/react-core';
@@ -24,10 +23,7 @@ const CreateVMHorizontalNav: FC = () => {
       : CREATE_VM_TAB.INSTANCE_TYPES,
   );
 
-  const catalogURL = useMemo(
-    () => getCatalogURL(params?.cluster, params?.ns || ALL_NAMESPACES),
-    [params],
-  );
+  const catalogURL = useMemo(() => getCatalogURL(params?.cluster, params?.ns), [params]);
 
   const handleTabClick = (_event: MouseEvent, tabIndex: CREATE_VM_TAB) => {
     setCurrentTab(tabIndex);
