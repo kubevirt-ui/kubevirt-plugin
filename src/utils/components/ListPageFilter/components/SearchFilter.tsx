@@ -46,9 +46,6 @@ const SearchFilter = forwardRef<HTMLInputElement, SearchFilterProps>((props, ref
         tabIndex={0}
         type="text"
       />
-      <span className="co-text-filter__feedback">
-        <kbd className="co-kbd co-kbd__filter-input">/</kbd>
-      </span>
     </div>
   );
 });
