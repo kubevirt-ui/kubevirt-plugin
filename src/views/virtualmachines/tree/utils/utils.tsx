@@ -266,7 +266,7 @@ const createMultiClusterTreeViewData = (
   vms: V1VirtualMachine[],
   pathname: string,
   foldersEnabled: boolean,
-  clusters?: K8sResourceCommon[],
+  clusterNames?: string[],
 ): TreeViewDataItem[] => {
   const { currentVMTab, vmCluster, vmName, vmNamespace } = getVMInfoFromPathname(pathname);
 
@@ -274,11 +274,9 @@ const createMultiClusterTreeViewData = (
 
   const treeViewDataMap: Record<string, TreeViewDataItem> = {};
 
-  const treeWithClusters = clusters
-    ?.sort((a, b) => getName(a).localeCompare(getName(b)))
-    ?.map((cluster) => {
-      const clusterName = getName(cluster);
-
+  const treeWithClusters = clusterNames
+    ?.sort((a, b) => a.localeCompare(b))
+    ?.map((clusterName) => {
       const clusterVMs = vmsPerCluster[clusterName] || [];
 
       const clusterProjects = clusterVMs.reduce((namespaces, vm) => {
@@ -345,7 +343,7 @@ const createMultiClusterTreeViewData = (
 };
 
 export type CreateTreeViewDataParams = (params: {
-  clusters?: K8sResourceCommon[];
+  clusterNames?: string[];
   foldersEnabled: boolean;
   isACMTreeView?: boolean;
   isAdmin: boolean;
@@ -355,7 +353,7 @@ export type CreateTreeViewDataParams = (params: {
 }) => TreeViewDataItem[];
 
 export const createTreeViewData: CreateTreeViewDataParams = ({
-  clusters,
+  clusterNames,
   foldersEnabled,
   isACMTreeView,
   isAdmin,
@@ -364,7 +362,7 @@ export const createTreeViewData: CreateTreeViewDataParams = ({
   vms,
 }) => {
   if (isACMTreeView) {
-    return createMultiClusterTreeViewData(vms, pathname, foldersEnabled, clusters);
+    return createMultiClusterTreeViewData(vms, pathname, foldersEnabled, clusterNames);
   }
 
   return createSingleClusterTreeViewData(projectNames, vms, isAdmin, pathname, foldersEnabled);

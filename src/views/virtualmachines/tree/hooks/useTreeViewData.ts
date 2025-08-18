@@ -14,10 +14,10 @@ import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
-import useAllClusters from '@multicluster/hooks/useAllClusters/useAllClusters';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
 import { TreeViewDataItem } from '@patternfly/react-core';
+import { useFleetClusterNames } from '@stolostron/multicluster-sdk';
 import { getLatestMigrationForEachVM, OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 
 import { vmimMapperSignal, vmsSignal } from '../utils/signals';
@@ -34,7 +34,7 @@ export const useTreeViewData = (): UseTreeViewData => {
   const isAdmin = useIsAdmin();
   const location = useLocation();
 
-  const [clusters] = useAllClusters();
+  const [clusterNames] = useFleetClusterNames();
 
   const isACMTreeView = useIsACMPage();
 
@@ -120,7 +120,7 @@ export const useTreeViewData = (): UseTreeViewData => {
     if (!loaded) return [];
 
     return createTreeViewData({
-      clusters,
+      clusterNames,
       foldersEnabled: treeViewFoldersEnabled,
       isACMTreeView,
       isAdmin,
@@ -135,7 +135,7 @@ export const useTreeViewData = (): UseTreeViewData => {
     isAdmin,
     treeViewFoldersEnabled,
     location.pathname,
-    clusters,
+    clusterNames,
     isACMTreeView,
   ]);
 

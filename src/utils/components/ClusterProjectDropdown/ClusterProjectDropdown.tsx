@@ -8,10 +8,9 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import useAllClusters from '@multicluster/hooks/useAllClusters/useAllClusters';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { Spinner } from '@patternfly/react-core';
-import { useHubClusterName } from '@stolostron/multicluster-sdk';
+import { useFleetClusterNames, useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import InlineFilterSelect from '../FilterSelect/InlineFilterSelect';
 import ProjectDropdown from '../ProjectDropdown/ProjectDropdown';
@@ -37,7 +36,7 @@ const ClusterProjectDropdown: FC<ClusterProjectDropdownProps> = ({
   const [hubClusterName, hubClusterNameLoaded] = useHubClusterName();
   const [projects, projectLoaded] = useProjects(cluster || hubClusterName);
 
-  const [clusters, clustersLoaded] = useAllClusters();
+  const [clusterNames, clustersLoaded] = useFleetClusterNames();
 
   const onClusterChange = useCallback(
     (newCluster: string) => {
@@ -89,7 +88,7 @@ const ClusterProjectDropdown: FC<ClusterProjectDropdownProps> = ({
       <div className="cluster-dropdown">
         {clustersLoaded ? (
           <InlineFilterSelect
-            options={getClusterOptions(includeAllClusters, clusters)}
+            options={getClusterOptions(includeAllClusters, clusterNames)}
             selected={cluster || ALL_CLUSTERS_KEY}
             setSelected={onClusterChange}
             toggleProps={{ isFullWidth: true }}

@@ -1,18 +1,15 @@
 import { modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { ALL_CLUSTERS, ALL_CLUSTERS_KEY } from '@kubevirt-utils/hooks/constants';
-import { getName } from '@kubevirt-utils/resources/shared';
 import { ManagedClusterModel } from '@multicluster/constants';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
-export const getClusterOptions = (includeAllClusters: boolean, clusters: K8sResourceCommon[]) => {
-  const clusterOptions = clusters
-    .sort((a, b) => getName(a).localeCompare(getName(b)))
-    .map((proj) => {
-      const name = getName(proj);
+export const getClusterOptions = (includeAllClusters: boolean, clusterNames: string[]) => {
+  const clusterOptions = clusterNames
+    .sort((a, b) => a.localeCompare(b))
+    .map((clusterName) => {
       return {
-        children: name,
+        children: clusterName,
         groupVersionKind: modelToGroupVersionKind(ManagedClusterModel),
-        value: name,
+        value: clusterName,
       };
     });
 
