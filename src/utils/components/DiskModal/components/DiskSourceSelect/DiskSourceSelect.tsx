@@ -8,7 +8,7 @@ import { Divider, SelectGroup, SelectList } from '@patternfly/react-core';
 import { SourceTypes } from '../../utils/types';
 
 import DiskSourceOption from './components/DiskSourceOption/DiskSourceOption';
-import { attachExistingGroupOptions, blankOption } from './utils/constants';
+import { attachExistingGroupOptions, blankOption, cdromOption } from './utils/constants';
 
 import './DiskSourceSelect.scss';
 
@@ -23,7 +23,7 @@ const DiskSourceSelect: FC<DiskSourceSelectProps> = ({ className, onSelect }) =>
     <FormPFSelect
       className={classNames('disk-source-select', className)}
       onSelect={(_, val) => onSelect(val as SourceTypes)}
-      selectedLabel={t('Add disk')}
+      selectedLabel={t('Add')}
       toggleProps={{ className: 'pf-v6-u-mb-sm', variant: 'primary' }}
     >
       <SelectList>
@@ -37,6 +37,8 @@ const DiskSourceSelect: FC<DiskSourceSelectProps> = ({ className, onSelect }) =>
             <DiskSourceOption key={item.id} {...item} onSelect={onSelect} />
           ))}
         </SelectGroup>
+        <Divider />
+        <DiskSourceOption {...cdromOption} onSelect={onSelect} />
       </SelectList>
     </FormPFSelect>
   );

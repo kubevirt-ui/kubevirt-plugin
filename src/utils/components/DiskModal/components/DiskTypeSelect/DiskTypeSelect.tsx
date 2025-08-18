@@ -12,7 +12,8 @@ import {
 import { getDiskDrive } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
 import { FormGroup, SelectList, SelectOption } from '@patternfly/react-core';
 
-import { InterfaceTypes, V1DiskFormState } from '../../utils/types';
+import { getSourceFromVolume } from '../../utils/helpers';
+import { InterfaceTypes, SourceTypes, V1DiskFormState } from '../../utils/types';
 import { DISKTYPE_SELECT_FIELDID } from '../utils/constants';
 
 type DiskTypeSelectProps = {
@@ -28,6 +29,10 @@ const DiskTypeSelect: FC<DiskTypeSelectProps> = ({ isVMRunning }) => {
   if (!diskState) return null;
 
   const diskType = getDiskDrive(diskState.disk);
+  const isCDROM = diskType === diskTypes.cdrom;
+
+  const diskSource = getSourceFromVolume(diskState.volume, diskState.dataVolumeTemplate);
+  const shouldDisableCDROM = isVMRunning && diskSource !== SourceTypes.CDROM && !isCDROM;
 
   const diskInterface = diskState.disk?.[diskType]?.bus || InterfaceTypes.VIRTIO;
 
@@ -48,6 +53,7 @@ const DiskTypeSelect: FC<DiskTypeSelectProps> = ({ isVMRunning }) => {
 
             setValue(`disk.${val as DiskType}`, { bus: newDiskInterface });
           }}
+          isDisabled={isCDROM}
           selected={diskType}
           selectedLabel={diskTypesLabels[diskType]}
           toggleProps={{ isFullWidth: true }}
@@ -56,7 +62,7 @@ const DiskTypeSelect: FC<DiskTypeSelectProps> = ({ isVMRunning }) => {
             {Object.values(diskTypes).map((type) => (
               <SelectOption
                 data-test-id={`${DISKTYPE_SELECT_FIELDID}-${type}`}
-                isDisabled={isVMRunning && type === diskTypes.cdrom}
+                isDisabled={shouldDisableCDROM}
                 key={type}
                 value={type}
               >
@@ -66,7 +72,9 @@ const DiskTypeSelect: FC<DiskTypeSelectProps> = ({ isVMRunning }) => {
           </SelectList>
         </FormPFSelect>
         <FormGroupHelperText>
-          {t('Hot plug is enabled only for Disk and Lun types')}
+          {isCDROM
+            ? t('CD-ROM type is automatically set and cannot be changed')
+            : t('Hot plug is enabled only for Disk and Lun types')}
         </FormGroupHelperText>
       </FormGroup>
     </div>

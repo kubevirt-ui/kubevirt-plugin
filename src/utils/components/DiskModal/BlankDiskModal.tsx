@@ -22,6 +22,7 @@ import { submit } from './utils/submit';
 import { SourceTypes, V1DiskFormState, V1SubDiskModalProps } from './utils/types';
 
 const BlankDiskModal: FC<V1SubDiskModalProps> = ({
+  createDiskSource,
   editDiskName,
   isCreated,
   isOpen,
@@ -38,7 +39,7 @@ const BlankDiskModal: FC<V1SubDiskModalProps> = ({
   const methods = useForm<V1DiskFormState>({
     defaultValues: isEditDisk
       ? getDefaultEditValues(vm, editDiskName)
-      : getDefaultCreateValues(vm, SourceTypes.BLANK),
+      : getDefaultCreateValues(vm, createDiskSource || SourceTypes.BLANK),
     mode: 'all',
   });
 

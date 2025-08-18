@@ -1,12 +1,14 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, PersistentVolumeClaimModel } from '@kubevirt-utils/models';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
+import { getDisks } from '@kubevirt-utils/resources/vm';
 import { NameWithPercentages } from '@kubevirt-utils/resources/vm/hooks/types';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
+import { isCDROMDisk } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -23,6 +25,10 @@ import {
 import { isPVCSource } from './utils/helpers';
 import DiskRowActions from './DiskRowActions';
 import { HotplugLabel } from './HotplugLabel';
+import ISOBadge from './ISOBadge';
+
+import '../tables.scss';
+import './disklist.scss';
 
 const DiskRow: FC<
   RowProps<
@@ -60,6 +66,16 @@ const DiskRow: FC<
 
   const hasPVC = isPVCSource(obj);
 
+  const { displayName } = useMemo(() => {
+    const disks = getDisks(vm) || [];
+    const foundDisk = disks.find((disk) => disk.name === name);
+    const cdrom = foundDisk && isCDROMDisk(foundDisk);
+    const cdromName = t('CD-ROM');
+    return {
+      displayName: cdrom ? cdromName : name,
+    };
+  }, [vm, name]);
+
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} id="name">
@@ -74,12 +90,13 @@ const DiskRow: FC<
                 }
                 position={PopoverPosition.right}
               >
-                <span className="provisioning-popover-button">{name}</span>
+                <span className="provisioning-popover-button">{displayName}</span>
               </Popover>
             ) : (
-              name
+              displayName
             )}{' '}
             <HotplugLabel diskName={name} vm={vm} vmi={vmi} />
+            <ISOBadge diskName={name} vm={vm} />
           </StackItem>
           {isBootDisk && (
             <StackItem>
