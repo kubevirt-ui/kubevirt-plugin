@@ -29,6 +29,7 @@ import {
   addTimestampToTooltip,
   findMaxYValue,
   formatStorageLatencyTooltipData,
+  getDriveName,
   MILLISECONDS_MULTIPLIER,
   queriesToLink,
   tickFormat,
@@ -66,7 +67,7 @@ const StorageWriteLatencyPerDriveChart: React.FC<StorageWriteLatencyPerDriveChar
   const results = data?.data?.result || [];
 
   const chartDataSeries = results.map((result, index) => {
-    const driveName = result.metric?.drive || `Drive ${index}`;
+    const driveName = getDriveName(result.metric?.drive, index);
     const values = result.values || [];
 
     const chartData = values.map(([x, y]) => ({
@@ -83,6 +84,11 @@ const StorageWriteLatencyPerDriveChart: React.FC<StorageWriteLatencyPerDriveChar
 
   const allData = chartDataSeries.flatMap((series) => series.data);
   const yMax = findMaxYValue(allData);
+
+  const legendData = chartDataSeries.map((series) => ({
+    name: series.name,
+    symbol: { fill: series.color, type: 'square' },
+  }));
 
   const linkToMetrics = queriesToLink(queries.STORAGE_WRITE_LATENCY_PER_DRIVE);
 
@@ -102,7 +108,9 @@ const StorageWriteLatencyPerDriveChart: React.FC<StorageWriteLatencyPerDriveChar
               y: [0, yMax],
             }}
             height={height}
-            padding={{ bottom: 35, left: 80, right: 35, top: 35 }}
+            legendData={legendData}
+            legendPosition="bottom"
+            padding={{ bottom: 55, left: 80, right: 35, top: 35 }}
             scale={{ x: 'time', y: 'linear' }}
             width={width}
           >

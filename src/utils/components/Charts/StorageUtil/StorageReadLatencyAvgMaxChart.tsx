@@ -25,8 +25,10 @@ import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
 import {
   addTimestampToTooltip,
+  AVG_LABEL,
   findMaxYValue,
   formatStorageReadLatencyAvgMaxTooltipData,
+  MAX_LABEL,
   MILLISECONDS_MULTIPLIER,
   queriesToLink,
   tickFormat,
@@ -75,6 +77,17 @@ const StorageReadLatencyAvgMaxChart: React.FC<StorageReadLatencyAvgMaxChartProps
   const allData = [...(avgChartData || []), ...(maxChartData || [])];
   const yMax = findMaxYValue(allData);
 
+  const legendData = [
+    {
+      name: AVG_LABEL,
+      symbol: { fill: chart_color_blue_300.value, type: 'square' },
+    },
+    {
+      name: MAX_LABEL,
+      symbol: { fill: chart_color_orange_300.value, type: 'square' },
+    },
+  ];
+
   const linkToMetrics = queriesToLink(queries.STORAGE_READ_LATENCY_AVG);
 
   return (
@@ -96,7 +109,9 @@ const StorageReadLatencyAvgMaxChart: React.FC<StorageReadLatencyAvgMaxChartProps
               y: [0, yMax],
             }}
             height={height}
-            padding={{ bottom: 35, left: 80, right: 35, top: 35 }}
+            legendData={legendData}
+            legendPosition="bottom"
+            padding={{ bottom: 55, left: 80, right: 35, top: 35 }}
             scale={{ x: 'time', y: 'linear' }}
             width={width}
           >
@@ -129,7 +144,7 @@ const StorageReadLatencyAvgMaxChart: React.FC<StorageReadLatencyAvgMaxChartProps
                     },
                   }}
                   data={avgChartData}
-                  name="Average"
+                  name={AVG_LABEL}
                 />
               )}
               {maxChartData && (
@@ -141,7 +156,7 @@ const StorageReadLatencyAvgMaxChart: React.FC<StorageReadLatencyAvgMaxChartProps
                     },
                   }}
                   data={maxChartData}
-                  name="Maximum"
+                  name={MAX_LABEL}
                 />
               )}
             </ChartGroup>
