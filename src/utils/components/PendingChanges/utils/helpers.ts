@@ -105,9 +105,18 @@ export const checkBootOrderChanged = (
     .map(getCleanDisk)
     .sort(sortDisks);
   const vmiDisks = (vmi?.spec?.domain?.devices?.disks || []).map(getCleanDisk).sort(sortDisks);
-  if (vmDisks?.length !== vmiDisks?.length) return true;
 
-  const hasChanges = vmDisks?.some((val, idx) => !isEqualObject(val, vmiDisks[idx]));
+  const temporaryHotplugVolumeNames = differenceWith(getVMIVolumes(vmi), getVolumes(vm), isEqual)
+    .filter((volume) => volume?.dataVolume || volume?.persistentVolumeClaim)
+    .map((volume) => volume.name);
+
+  const vmiNonHotplugDisks = vmiDisks.filter(
+    (disk) => !temporaryHotplugVolumeNames.includes(disk.name),
+  );
+
+  if (vmDisks?.length !== vmiNonHotplugDisks?.length) return true;
+
+  const hasChanges = vmDisks?.some((val, idx) => !isEqualObject(val, vmiNonHotplugDisks[idx]));
 
   return hasChanges;
 };
@@ -313,10 +322,17 @@ export const getChangedVolumesHotplug = (
   const differentVolumes: V1Volume[] = differenceWith(getVMIVolumes(vmi), getVolumes(vm), isEqual);
 
   if (!isEmpty(differentVolumes)) {
-    return differentVolumes.filter(
-      (volume: V1Volume) =>
-        volume?.dataVolume?.hotpluggable || volume?.persistentVolumeClaim?.hotpluggable,
-    );
+    const result = differentVolumes.filter((volume: V1Volume) => {
+      const hasHotpluggableFlag =
+        volume?.dataVolume?.hotpluggable || volume?.persistentVolumeClaim?.hotpluggable;
+
+      if (volume?.dataVolume || volume?.persistentVolumeClaim) {
+        return false;
+      }
+
+      return !!hasHotpluggableFlag;
+    });
+    return result;
   }
 };
 
