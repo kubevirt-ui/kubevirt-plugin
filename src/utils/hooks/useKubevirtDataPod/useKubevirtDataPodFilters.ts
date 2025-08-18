@@ -20,6 +20,10 @@ const useKubevirtDataPodFilters: UseKubevirtDataPodFilters = (filters) => {
     const url = new URLSearchParams();
     for (const [key, value] of query.entries()) {
       const valueReplaced = value === 'No InstanceType' || value === 'None' ? null : value;
+
+      if (key === 'rowFilter-status' && value === 'Error') {
+        continue;
+      }
       filtersCompared?.[key] && url.set(filtersCompared?.[key], valueReplaced);
     }
     const urlString = url.toString();
