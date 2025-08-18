@@ -26,3 +26,7 @@ export const getErrorValue = (value: number) => {
   }
   return value < 0 ? t('negative') : t('zero');
 };
+
+export const getIsMinusDisabled = (minValue: number | undefined, currentValue: string): boolean => {
+  return minValue ? Math.ceil(minValue) >= getValueFromSize(currentValue) || !currentValue : false;
+};

@@ -46,6 +46,7 @@ export type DrawerContext = {
   diskFile: File | string;
   diskUpload: DataUpload;
   isBootSourceAvailable: boolean;
+  originalTemplate: V1Template;
   registryCredentials: { password: string; username: string };
   setCDFile: (file: File | string) => void;
   setDiskFile: (file: File | string) => void;
@@ -128,6 +129,7 @@ const useDrawer = (template: V1Template) => {
     diskFile,
     diskUpload,
     isBootSourceAvailable: isDefaultDiskSource ? isBootSourceAvailable : true,
+    originalTemplate: template,
     registryCredentials,
     setCDFile,
     setDiskFile,
