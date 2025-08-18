@@ -30,7 +30,7 @@ export const kubevirtK8sPatch = async <R extends K8sResourceCommon>(
   options: FleetK8sPatchOptions<R>,
 ): Promise<R> => {
   if (options?.cluster) {
-    const object = await fleetK8sPatch(options);
+    const object = await fleetK8sPatch<R>(options);
 
     if (object) object.cluster = options?.cluster;
     return object;
@@ -43,7 +43,7 @@ export const kubevirtK8sUpdate = async <R extends K8sResourceCommon>(
   options: FleetK8sCreateUpdateOptions<R>,
 ): Promise<R> => {
   if (options?.cluster || options?.data?.cluster) {
-    const object = await fleetK8sUpdate(options);
+    const object = await fleetK8sUpdate<R>(options);
 
     if (object) object.cluster = options?.cluster || options?.data?.cluster;
     return object;
@@ -71,7 +71,7 @@ export const kubevirtK8sDelete = async <R extends K8sResourceCommon>(
   options: FleetK8sDeleteOptions<R>,
 ): Promise<R> => {
   if (options?.cluster || options?.resource?.cluster) {
-    const object = await fleetK8sDelete(options);
+    const object = await fleetK8sDelete<R>(options);
 
     if (object) object.cluster = options?.cluster || options?.resource?.cluster;
     return object;
@@ -84,7 +84,7 @@ export const kubevirtK8sCreate = async <R extends K8sResourceCommon>(
   options: FleetK8sCreateUpdateOptions<R>,
 ): Promise<R> => {
   if (options?.cluster || options?.data?.cluster) {
-    const object = await fleetK8sCreate(options);
+    const object = await fleetK8sCreate<R>(options);
 
     if (object) object.cluster = options?.cluster || options?.data?.cluster;
     return object;

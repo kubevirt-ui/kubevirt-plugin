@@ -1,8 +1,7 @@
-import React, { Dispatch, FC, SetStateAction, useMemo } from 'react';
+import React, { Dispatch, FC, SetStateAction } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getName } from '@kubevirt-utils/resources/shared';
-import useAllClusters from '@multicluster/hooks/useAllClusters/useAllClusters';
+import { useFleetClusterNames } from '@stolostron/multicluster-sdk';
 
 import MultiSelect from './MultiSelect';
 
@@ -18,9 +17,7 @@ const ClusterMultiSelect: FC<ClusterMultiSelectProps> = ({
   setClusters,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [allClusters] = useAllClusters();
-
-  const clusterNames = useMemo(() => allClusters.map((cluster) => getName(cluster)), [allClusters]);
+  const [clusterNames] = useFleetClusterNames();
 
   return (
     <MultiSelect
