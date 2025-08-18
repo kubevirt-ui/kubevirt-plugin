@@ -1,49 +1,54 @@
 import React, { FC } from 'react';
 
-import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { ToolbarFilter, ToolbarItem } from '@patternfly/react-core';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 import { useAdvancedFiltersParameters } from '../hooks/useAdvancedFiltersParameters';
+import { useNameAndLabelParameters } from '../hooks/useNameAndLabelParameters';
 import { ApplyTextFilters } from '../types';
 import { getFilterLabels } from '../utils';
 
-import ProjectFilter from './ProjectFilter';
-
 type AdvancedFiltersToolbarItemProps = {
   advancedFilters: RowFilter[];
-  applyTextFilters: ApplyTextFilters;
-  showProjectFilter: boolean;
+  applyFilters: ApplyTextFilters;
 };
 
 const AdvancedFiltersToolbarItem: FC<AdvancedFiltersToolbarItemProps> = ({
   advancedFilters,
-  applyTextFilters,
-  showProjectFilter,
+  applyFilters,
 }) => {
   const advancedFiltersObject = useAdvancedFiltersParameters(advancedFilters);
+  const nameAndLabelFiltersObject = useNameAndLabelParameters();
+  const filtersObject = {
+    ...advancedFiltersObject,
+    ...nameAndLabelFiltersObject,
+  };
 
-  if (!showProjectFilter && isEmpty(advancedFilters)) {
-    return null;
-  }
+  const removeFilter = (filterType: string) => applyFilters(filterType, null);
 
   return (
     <ToolbarItem>
-      {showProjectFilter && <ProjectFilter applyTextFilters={applyTextFilters} />}
-      {advancedFilters?.map((filter) => (
-        <ToolbarFilter
-          labels={getFilterLabels(
-            advancedFiltersObject[filter.type],
-            filter.type as VirtualMachineRowFilterType,
-          )}
-          categoryName={filter.filterGroupName}
-          deleteLabel={() => applyTextFilters(filter.type)}
-          key={filter.type}
-        >
-          <></>
-        </ToolbarFilter>
-      ))}
+      {Object.entries(filtersObject).map(([filterType, { filterGroupName, query }]) => {
+        const labels = getFilterLabels(query, filterType as VirtualMachineRowFilterType);
+
+        const deleteLabel = (_, labelToDelete: string) => {
+          const newLabels = labels.filter((label) => label !== labelToDelete);
+          applyFilters(filterType, newLabels);
+        };
+
+        return (
+          <ToolbarFilter
+            categoryName={filterGroupName}
+            deleteLabel={deleteLabel}
+            deleteLabelGroup={() => removeFilter(filterType)}
+            key={filterType}
+            labels={labels}
+          >
+            <></>
+          </ToolbarFilter>
+        );
+      })}
     </ToolbarItem>
   );
 };

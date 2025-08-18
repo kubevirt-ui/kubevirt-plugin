@@ -126,6 +126,7 @@ export const useTreeViewData = (): UseTreeViewData => {
       isAdmin,
       pathname: location.pathname,
       projectNames,
+      queryParams: location.search,
       vms: memoizedVMs,
     });
   }, [
@@ -136,6 +137,7 @@ export const useTreeViewData = (): UseTreeViewData => {
     treeViewFoldersEnabled,
     location.pathname,
     clusterNames,
+    location.search,
     isACMTreeView,
   ]);
 

@@ -1,7 +1,6 @@
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import debounce from 'lodash/debounce';
 
-import { ResetTextSearch } from '@kubevirt-utils/components/ListPageFilter/types';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
@@ -32,10 +31,9 @@ import './search-bar.scss';
 
 type SearchBarProps = {
   onFilterChange: OnFilterChange;
-  resetTextSearch?: ResetTextSearch;
 };
 
-const SearchBar: FC<SearchBarProps> = ({ onFilterChange, resetTextSearch }) => {
+const SearchBar: FC<SearchBarProps> = ({ onFilterChange }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
@@ -48,7 +46,7 @@ const SearchBar: FC<SearchBarProps> = ({ onFilterChange, resetTextSearch }) => {
   const searchSuggestBoxRef = useRef<HTMLDivElement>();
 
   const [vmSuggestions, vmSuggestionsLoaded] = useVirtualMachineSearchSuggestions(searchQuery);
-  const navigateToSearchResults = useNavigateToSearchResults(onFilterChange, resetTextSearch);
+  const navigateToSearchResults = useNavigateToSearchResults(onFilterChange);
   const { saveSearch, urlSearchQuery } = useSavedSearchData();
 
   useEffect(() => {

@@ -115,7 +115,7 @@ export const getRootDataVolumeTemplateSpec = (vm: V1VirtualMachine): V1DataVolum
 
 /**
  * A selector for the virtual machine's root data volume secretRef
- * @param {V1VirtualMachine} vm
+ * @param {V1VirtualMachine} vm the virtual machine
  * @returns the virtual machine's root data volume secretRef
  */
 export const getRootDiskSecretRef = (vm: V1VirtualMachine): string => {
