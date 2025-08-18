@@ -21,6 +21,11 @@ import { humanizeSeconds } from '../../../utils/humanize';
 export const SINGLE_VM_DURATION = 'SINGLE_VM_DURATION';
 export const TICKS_COUNT = 100;
 export const MILLISECONDS_MULTIPLIER = 1000;
+export const AVG_LABEL = t('Average');
+export const MAX_LABEL = t('Maximum');
+
+export const getDriveName = (drive: string | undefined, index: number): string =>
+  drive || t('Drive {{index}}', { index });
 
 export const queriesToLink = (queries: string | string[]) => {
   const queriesArray = Array.isArray(queries) ? queries : [queries];
