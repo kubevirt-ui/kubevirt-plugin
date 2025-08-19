@@ -1,18 +1,15 @@
 import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Badge } from '@patternfly/react-core';
-import { WarningTriangleIcon } from '@patternfly/react-icons';
-
-import './TechPreviewBadge.scss';
+import { Label } from '@patternfly/react-core';
 
 const TechPreviewBadge: FC = () => {
   const { t } = useKubevirtTranslation();
 
   return (
-    <Badge className="kv-tech-preview-badge ">
-      <WarningTriangleIcon /> {t('Technology preview')}
-    </Badge>
+    <Label isCompact status="warning" variant="outline">
+      {t('Technology preview')}
+    </Label>
   );
 };
 
