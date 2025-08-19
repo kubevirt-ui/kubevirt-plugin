@@ -30,6 +30,7 @@ import {
 } from '@kubevirt-utils/resources/vm';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { getVMIDevices } from '@kubevirt-utils/resources/vmi';
+import { ARCHITECTURE_LABEL } from '@kubevirt-utils/utils/architecture';
 import { ensurePath, generatePrettyName, isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sGet } from '@multicluster/k8sRequests';
@@ -37,22 +38,48 @@ import { kubevirtK8sGet } from '@multicluster/k8sRequests';
 const UPLOAD_MODE_SELECT = 'select';
 const UPLOAD_MODE_UPLOAD = 'upload';
 
+const getBootableVolumeDraft = (
+  diskObj: DiskRowDataLayout,
+  vm: V1VirtualMachine,
+  bootableVolumeSource: AddBootableVolumeState,
+  architecture?: string,
+) => {
+  const hasSelectedArchitecture = !isEmpty(architecture);
+  const { bootableVolumeName, bootableVolumeNamespace, labels } = bootableVolumeSource ?? {};
+  const dataSource = produce(emptyDataSource, (draftDataSource) => {
+    draftDataSource.metadata.name = hasSelectedArchitecture
+      ? `${bootableVolumeName}-${architecture}`
+      : bootableVolumeName;
+    draftDataSource.metadata.namespace = bootableVolumeNamespace;
+
+    draftDataSource.metadata.labels = {
+      [DEFAULT_PREFERENCE_LABEL]: getPreferenceMatcher(vm)?.name,
+      ...(hasSelectedArchitecture ? { [ARCHITECTURE_LABEL]: architecture } : {}),
+      ...(labels || {}),
+    };
+  });
+
+  return createPVCBootableVolume(bootableVolumeSource, diskObj?.namespace, dataSource);
+};
+
 export const createBootableVolumeFromDisk = async (
   diskObj: DiskRowDataLayout,
   vm: V1VirtualMachine,
   bootableVolumeSource: AddBootableVolumeState,
 ) => {
-  const dataSource = produce(emptyDataSource, (draftDataSource) => {
-    draftDataSource.metadata.name = bootableVolumeSource.bootableVolumeName;
-    draftDataSource.metadata.namespace = bootableVolumeSource.bootableVolumeNamespace;
+  const architectures = bootableVolumeSource?.architectures;
+  if (isEmpty(architectures)) {
+    return getBootableVolumeDraft(diskObj, vm, bootableVolumeSource);
+  }
 
-    draftDataSource.metadata.labels = {
-      [DEFAULT_PREFERENCE_LABEL]: getPreferenceMatcher(vm)?.name,
-      ...(bootableVolumeSource.labels || {}),
-    };
-  });
+  const bootableVolumes = await Promise.all(
+    architectures.map((architecture) =>
+      getBootableVolumeDraft(diskObj, vm, bootableVolumeSource, architecture),
+    ),
+  );
 
-  return createPVCBootableVolume(bootableVolumeSource, diskObj?.namespace, dataSource);
+  // return the first bootable volume to navigate to (arbitrarily chosen)
+  return bootableVolumes?.[0];
 };
 
 const addDiskToVM = (draftVM: WritableDraft<V1VirtualMachine>, diskToPersist: V1Disk) => {

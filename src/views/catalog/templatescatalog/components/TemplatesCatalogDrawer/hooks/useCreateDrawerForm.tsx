@@ -56,6 +56,7 @@ import {
   DEFAULT_NETWORK_INTERFACE,
   UDN_BINDING_NAME,
 } from '@kubevirt-utils/resources/vm/utils/constants';
+import { getArchitecture, NODE_ARCHITECTURE_LABEL } from '@kubevirt-utils/utils/architecture';
 import {
   HEADLESS_SERVICE_LABEL,
   HEADLESS_SERVICE_NAME,
@@ -290,6 +291,13 @@ const useCreateDrawerForm = (
         if (isUDNManagedNamespace && defaultInterface) {
           delete defaultInterface.masquerade;
           defaultInterface.binding = { name: UDN_BINDING_NAME };
+        }
+
+        const templateArchitecture = getArchitecture(processedTemplate);
+        if (!isEmpty(templateArchitecture)) {
+          vmDraft.spec.template.spec.nodeSelector = {
+            [NODE_ARCHITECTURE_LABEL]: templateArchitecture,
+          };
         }
       });
 

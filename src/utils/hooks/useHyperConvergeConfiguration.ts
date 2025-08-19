@@ -19,6 +19,7 @@ export type HyperConverged = K8sResourceCommon & {
       deployTektonTaskResources?: boolean;
       disableMDevConfiguration?: boolean;
       enableCommonBootImageImport?: boolean;
+      enableMultiArchBootImageImport?: boolean;
       nonRoot?: boolean;
       persistentReservation?: boolean;
       root?: boolean;
@@ -34,6 +35,9 @@ export type HyperConverged = K8sResourceCommon & {
   };
   status: {
     dataImportCronTemplates: K8sResourceCommon[];
+    nodeInfo: {
+      workloadsArchitectures: string[];
+    };
   };
 };
 

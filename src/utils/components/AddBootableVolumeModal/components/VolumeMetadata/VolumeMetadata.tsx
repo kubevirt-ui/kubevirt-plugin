@@ -6,6 +6,7 @@ import { FormGroup, TextInput } from '@patternfly/react-core';
 
 import { AddBootableVolumeState, SetBootableVolumeFieldType } from '../../utils/constants';
 
+import ArchitectureSelect from './components/ArchitectureSelect/ArchitectureSelect';
 import { InstanceTypeDrilldownSelect } from './components/InstanceTypeDrilldownSelect/InstanceTypeDrilldownSelect';
 import PreferenceSelect from './components/PreferenceSelect/PreferenceSelect';
 
@@ -34,6 +35,10 @@ const VolumeMetadata: FC<VolumeMetadataProps> = ({
       <InstanceTypeDrilldownSelect
         bootableVolume={bootableVolume}
         deleteLabel={deleteLabel}
+        setBootableVolumeField={setBootableVolumeField}
+      />
+      <ArchitectureSelect
+        bootableVolumeState={bootableVolume}
         setBootableVolumeField={setBootableVolumeField}
       />
       <FormGroup label={t('Description')}>

@@ -7,6 +7,7 @@ import {
   V1beta1DataSource,
 } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import ArchitectureLabel from '@kubevirt-utils/components/ArchitectureLabel/ArchitectureLabel';
 import DeprecatedBadge from '@kubevirt-utils/components/badges/DeprecatedBadge/DeprecatedBadge';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -24,6 +25,7 @@ import {
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
 import { isDataSourceCloning } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
+import { ARCHITECTURE_ID, getArchitecture } from '@kubevirt-utils/utils/architecture';
 import {
   ResourceLink,
   RowProps,
@@ -71,6 +73,9 @@ const BootableVolumesRow: FC<
         />
         {isDeprecated(bootableVolumeName) && <DeprecatedBadge />}
         {obj.kind === DataSourceModel.kind && isCloning && <Label>{t('Clone in progress')}</Label>}
+      </TableData>
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-10" id={ARCHITECTURE_ID}>
+        <ArchitectureLabel architecture={getArchitecture(obj)} />
       </TableData>
       {namespace === ALL_NAMESPACES_SESSION_KEY && (
         <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-20" id="namespace">

@@ -34,6 +34,7 @@ export const optionsValueLabelMapper = {
 export type AddBootableVolumeState = {
   accessMode?: V1beta1StorageSpecAccessModesEnum;
   annotations?: { [key: string]: string };
+  architectures?: string[];
   bootableVolumeCluster?: string;
   bootableVolumeName: string;
   bootableVolumeNamespace: string;
@@ -59,7 +60,9 @@ export type AddBootableVolumeState = {
 export type SetBootableVolumeFieldType = (
   key: keyof AddBootableVolumeState,
   fieldKey?: string,
-) => (value: { password: string; username: string } | boolean | File | number | string) => void;
+) => (
+  value: { password: string; username: string } | boolean | File | number | string | string[],
+) => void;
 
 export const initialBootableVolumeState: AddBootableVolumeState = {
   annotations: {},
