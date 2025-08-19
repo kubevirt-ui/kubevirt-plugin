@@ -50,3 +50,10 @@ export const getVMIDevices = (vmi: V1VirtualMachineInstance): V1Devices =>
 
 export const getVMIBootLoader = (vmi: V1VirtualMachineInstance): V1Bootloader =>
   vmi?.spec?.domain?.firmware.bootloader;
+
+/**
+ * A selector for the virtual machine instance's node name
+ * @param {V1VirtualMachineInstance} vmi the virtual machine instance
+ * @returns {string} the virtual machine instance's node name
+ */
+export const getVMINodeName = (vmi: V1VirtualMachineInstance): string => vmi?.status?.nodeName;
