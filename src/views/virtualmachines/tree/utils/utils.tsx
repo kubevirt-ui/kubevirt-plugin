@@ -399,8 +399,12 @@ export const filterItems = (item: TreeViewDataItem, input: string) => {
 
 // Show projects that has VMs all the time.
 // Show / hide projects that has no VMs depending on a flag
-// hide system namespaces unless they contain VMs
-export const filterNamespaceItems = (item: TreeViewDataItem, showEmptyProjects: boolean) => {
+// hide system namespaces unless they contain VMs OR there are no non-system namespaces
+export const filterNamespaceItems = (
+  item: TreeViewDataItem,
+  showEmptyProjects: boolean,
+  hasNonSystemNamespaces: boolean = true,
+) => {
   const hasVMs =
     item.id !== ALL_NAMESPACES_SESSION_KEY &&
     !item.id.startsWith('cluster') &&
@@ -408,8 +412,13 @@ export const filterNamespaceItems = (item: TreeViewDataItem, showEmptyProjects: 
   const projectName = item.name as string;
 
   if (item.id.startsWith(PROJECT_SELECTOR_PREFIX)) {
-    // if (hasVMs) return true;
-    if ((showEmptyProjects && !isSystemNamespace(projectName)) || hasVMs) return true;
+    const isSystemNS = isSystemNamespace(projectName);
+
+    if (hasVMs) return true;
+
+    if (showEmptyProjects && !isSystemNS) return true;
+
+    if (showEmptyProjects && isSystemNS && !hasNonSystemNamespaces) return true;
   }
 
   if (item.id.startsWith('cluster')) return true;
@@ -418,7 +427,8 @@ export const filterNamespaceItems = (item: TreeViewDataItem, showEmptyProjects: 
     return (
       (item.children = item.children
         .map((opt) => Object.assign({}, opt))
-        .filter((child) => filterNamespaceItems(child, showEmptyProjects))).length > 0
+        .filter((child) => filterNamespaceItems(child, showEmptyProjects, hasNonSystemNamespaces)))
+        .length > 0
     );
   }
 };

@@ -2,12 +2,13 @@ import { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom-v5-compat';
 import { useNavigate, useSearchParams } from 'react-router-dom-v5-compat';
 
-import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
+import { DEFAULT_NAMESPACE, OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
 import { ALL_NAMESPACES, ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { getVMListNamespacesURL } from '@multicluster/urls';
 import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import { useLastNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
@@ -20,6 +21,7 @@ import {
 import { TreeViewDataItemWithHref } from '../utils/utils';
 import { getVMInfoFromPathname } from '../utils/utils';
 
+import { ALL_NAMESPACES_PATH } from './constants';
 import useTreeViewSelect from './useTreeViewSelect';
 
 type UseSelectNamespaceBasedOnPrivilegesProps = {
@@ -42,9 +44,20 @@ const useSelectNamespaceBasedOnPrivileges = ({
   const [alertMessage, setAlertMessage] = useState<string>(null);
 
   const location = useLocation();
+  const cluster = useClusterParam();
   const { ns } = useParams<{ ns: string }>();
 
   useEffect(() => {
+    if (!isAdmin && location.pathname.includes(ALL_NAMESPACES_PATH)) {
+      if (projectNamesLoaded && !isEmpty(projectNames)) {
+        const preferredProject = projectNames.includes(DEFAULT_NAMESPACE)
+          ? DEFAULT_NAMESPACE
+          : projectNames[0];
+        navigate(getVMListNamespacesURL(null, preferredProject));
+        return;
+      }
+    }
+
     const selectAllNamespaces = () => {
       setSelected(dataMap?.[ALL_NAMESPACES_SESSION_KEY]);
       setLastNamespace(ALL_NAMESPACES);
@@ -64,15 +77,27 @@ const useSelectNamespaceBasedOnPrivileges = ({
     };
 
     const selectDefaultProjectFallback = (): boolean => {
-      if (projectNames.includes(DEFAULT_NAMESPACE)) return false;
-
-      const treeItem = dataMap?.[`${PROJECT_SELECTOR_PREFIX}/${DEFAULT_NAMESPACE}`];
-      if (treeItem) {
-        setSelected(treeItem);
-        setLastNamespace(DEFAULT_NAMESPACE);
-        navigate(getVMListNamespacesURL(null, DEFAULT_NAMESPACE));
-        return true;
+      if (projectNames.includes(DEFAULT_NAMESPACE)) {
+        const treeItem = dataMap?.[`${PROJECT_SELECTOR_PREFIX}/${DEFAULT_NAMESPACE}`];
+        if (treeItem) {
+          setSelected(treeItem);
+          setLastNamespace(DEFAULT_NAMESPACE);
+          navigate(getVMListNamespacesURL(cluster, DEFAULT_NAMESPACE));
+          return true;
+        }
       }
+
+      if (projectNames.includes(OPENSHIFT_OS_IMAGES_NS)) {
+        const treeItem = dataMap?.[`${PROJECT_SELECTOR_PREFIX}/${OPENSHIFT_OS_IMAGES_NS}`];
+        if (treeItem) {
+          setSelected(treeItem);
+          setLastNamespace(OPENSHIFT_OS_IMAGES_NS);
+          navigate(getVMListNamespacesURL(null, OPENSHIFT_OS_IMAGES_NS));
+          return true;
+        }
+      }
+
+      return false;
     };
 
     const selectFolderOrVMOrProject = () => {
@@ -114,6 +139,7 @@ const useSelectNamespaceBasedOnPrivileges = ({
   }, [
     dataMap,
     location.pathname,
+    cluster,
     ns,
     searchParams,
     selected,
