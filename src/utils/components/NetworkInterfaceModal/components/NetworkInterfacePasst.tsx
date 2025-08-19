@@ -30,7 +30,7 @@ const NetworkInterfacePasst: FC<NetworkInterfacePasstProps> = ({
 
   const selectedType = interfaceType || interfaceTypesProxy.l2bridge;
 
-  const selectedOption = options.find((option) => option.id === interfaceType);
+  const selectedOption = options.find((option) => option.id === selectedType);
 
   const onToggle = useCallback(() => {
     setIsOpen((currentIsOpen) => !currentIsOpen);

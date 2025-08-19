@@ -207,14 +207,14 @@ export const getPASSTSelectableOptions = (t: TFunction) => [
     description: t(
       'The default binding. Extend the L2 domain of the user-defined network into the VirtualMachine',
     ),
-    id: interfaceLabelsProxy[interfaceTypesProxy.l2bridge],
+    id: interfaceTypesProxy.l2bridge,
     title: interfaceTypesProxy.l2bridge,
   },
   {
     description: t(
       'User-space network binding offering a better integration with virtctl ssh and port-forward, network probes, and observability.',
     ),
-    id: interfaceLabelsProxy[interfaceTypesProxy.passt],
+    id: interfaceTypesProxy.passt,
     title: (
       <>
         {interfaceTypesProxy.passt} <TechPreviewBadge />
