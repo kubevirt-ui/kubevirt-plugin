@@ -21,7 +21,7 @@ import { printableVMStatus } from '@virtualmachines/utils';
 
 import { getSearchItemsIds } from '../../search/utils/utils';
 import { expandURLHash, getDetailsTabBootIds } from '../../utils/search';
-import { updateBootLoader, updatedBootOrder, updateStartStrategy } from '../utils/utils';
+import { updateBootLoader, updateBootOrder, updateStartStrategy } from '../utils/utils';
 
 type DetailsSectionBootProps = {
   canUpdateVM: boolean;
@@ -103,7 +103,7 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
                         },
                       ]),
                     )
-                  : updatedBootOrder(updatedVM)
+                  : updateBootOrder(updatedVM)
               }
               vm={vm}
               vmi={vmi}
