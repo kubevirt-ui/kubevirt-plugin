@@ -8,12 +8,15 @@ import VirtualMachineClusterInstancetypeModel, {
   VirtualMachineClusterInstancetypeModelRef,
 } from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineClusterInstancetypeModel';
 import { PageTitles } from '@kubevirt-utils/constants/page-constants';
-import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
 import useIsSearchPage from '@kubevirt-utils/hooks/useIsSearchPage';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ListPageProps } from '@kubevirt-utils/utils/types';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { DocumentTitle, ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
+import { isAllNamespaces, isEmpty } from '@kubevirt-utils/utils/utils';
+import {
+  DocumentTitle,
+  ListPageHeader,
+  useActiveNamespace,
+} from '@openshift-console/dynamic-plugin-sdk';
 import { Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 
 import InstancetypeCreateButton from './components/InstancetypeCreateButton/InstancetypeCreateButton';
@@ -26,7 +29,10 @@ const InstanceTypePage: FC<ListPageProps> = (props) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const activeNamespace = props?.namespace ?? ALL_NAMESPACES;
+
+  const { fieldSelector, selector } = props;
+
+  const [activeNamespace] = useActiveNamespace();
 
   const isSearchPage = useIsSearchPage();
 
@@ -34,15 +40,15 @@ const InstanceTypePage: FC<ListPageProps> = (props) => {
     () => (location?.pathname.includes(VirtualMachineClusterInstancetypeModel.kind) ? 0 : 1),
     [location?.pathname],
   );
-  const [instanceTypes, loaded, loadError] = useVirtualMachineInstanceTypes(
-    props?.fieldSelector,
-    props?.selector,
-    true,
-  );
+  const [instanceTypes, loaded, loadError] = useVirtualMachineInstanceTypes({
+    fieldSelector,
+    namespace: activeNamespace,
+    selector,
+  });
 
   const urlUserInstancetypes = useMemo(
     () =>
-      activeNamespace === ALL_NAMESPACES
+      isAllNamespaces(activeNamespace)
         ? `/k8s/all-namespaces/${VirtualMachineInstancetypeModelRef}`
         : `/k8s/ns/${activeNamespace}/${VirtualMachineInstancetypeModelRef}`,
     [activeNamespace],
@@ -55,7 +61,12 @@ const InstanceTypePage: FC<ListPageProps> = (props) => {
     return kindSearched === VirtualMachineClusterInstancetypeModelRef ? (
       <ClusterInstancetypeList {...props} />
     ) : (
-      <UserInstancetypeList {...props} />
+      <UserInstancetypeList
+        {...props}
+        instanceTypes={instanceTypes}
+        loaded={loaded}
+        loadError={loadError}
+      />
     );
   }
 
@@ -102,7 +113,12 @@ const InstanceTypePage: FC<ListPageProps> = (props) => {
           }
           eventKey={1}
         >
-          <UserInstancetypeList {...props} />
+          <UserInstancetypeList
+            {...props}
+            instanceTypes={instanceTypes}
+            loaded={loaded}
+            loadError={loadError}
+          />
         </Tab>
       </Tabs>
     </>

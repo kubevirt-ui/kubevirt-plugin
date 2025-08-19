@@ -82,14 +82,14 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
     return hasRequiredPreference && isRegistryFormValid;
   }, [labels, isRegistryFormValid]);
 
-  const deleteLabel = (labelKey: string) => {
+  const deleteLabel = useCallback((labelKey: string) => {
     setBootableVolume((prev) => {
       const updatedLabels = { ...prev?.labels };
       delete updatedLabels[labelKey];
 
       return { ...prev, labels: updatedLabels };
     });
-  };
+  }, []);
 
   const resetDiskSize = () => setBootableVolumeField('size')(initialBootableVolumeState.size);
 

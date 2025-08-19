@@ -6,13 +6,12 @@ import {
   useIsWindowsBootableVolume,
 } from '@catalog/CreateFromInstanceTypes/utils/utils';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
-import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import useRHELAutomaticSubscription from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/useRHELAutomaticSubscription';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
 import { addWinDriverVolume } from '@kubevirt-utils/resources/vm/utils/disk/drivers';
 import { useDriversImage } from '@kubevirt-utils/resources/vm/utils/disk/useDriversImage';
+import { getValidNamespace } from '@kubevirt-utils/utils/utils';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { AUTOMATIC_UPDATE_FEATURE_NAME } from '@overview/SettingsTab/ClusterTab/components/GuestManagmentSection/AutomaticSubscriptionRHELGuests/utils/constants';
 
@@ -25,9 +24,7 @@ const useGeneratedVM = () => {
   const { instanceTypeVMState, startVM, vmNamespaceTarget } = useInstanceTypeVMStore();
 
   const [activeNamespace] = useActiveNamespace();
-  const [isUDNManagedNamespace] = useNamespaceUDN(
-    activeNamespace === ALL_NAMESPACES_SESSION_KEY ? DEFAULT_NAMESPACE : activeNamespace,
-  );
+  const [isUDNManagedNamespace] = useNamespaceUDN(getValidNamespace(activeNamespace));
 
   const generatedVM = useMemo(
     () =>
