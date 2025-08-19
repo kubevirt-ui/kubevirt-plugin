@@ -76,7 +76,6 @@ export const vm = {
   create: (vmData: VirtualMachineData, waitForRunning = true) => {
     cy.visitCatalog();
     cy.get(cView.templateTab).click();
-    //cy.switchProject(vmData.namespace);
     if (vmData.userTemplate) {
       cy.get(cView.uTemplate).click();
     }
@@ -102,8 +101,6 @@ export const vm = {
     cy.get(cView.quickCreateVMBtn).click();
     cy.get('[data-test="global-notifications"]').scrollIntoView();
     if (waitForRunning && vmData.startOnCreation !== false) {
-      // wait here for other state showing before running
-      // cy.wait(90000);
       checkStatus(vmData.name, index.VM_STATUS.Running, 3 * index.MINUTE, false);
       // wait for vmi appear
       cy.wait(3000);
@@ -149,8 +146,6 @@ export const vm = {
     });
     cy.get('[data-test="global-notifications"]').scrollIntoView();
     if (waitForRunning && vmData.startOnCreation !== false) {
-      // wait here for other state showing before running
-      // cy.wait(90000);
       checkStatus(vmData.name, index.VM_STATUS.Running, 3 * index.MINUTE, false);
       // wait for vmi appear
       cy.wait(3000);
