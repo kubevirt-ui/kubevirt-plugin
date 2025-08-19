@@ -20,9 +20,9 @@ import { RESTART_REQUIRED } from '@kubevirt-utils/components/PendingChanges/util
 import {
   VirtualMachineConfigurationTabInner,
   VirtualMachineDetailsTab,
-  VirtualMachineDetailsTabLabel,
 } from '@kubevirt-utils/constants/tabs-constants';
 import { getInstanceTypeNameFromAnnotation } from '@kubevirt-utils/resources/instancetype/helper';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import {
   getAffinity,
   getCPU,
@@ -228,20 +228,6 @@ export const getChangedNADsInterfaces = (
     }
     return acc;
   }, []);
-};
-
-export const hasPendingChange = (pendingChange: PendingChange[]) =>
-  pendingChange?.some((p) => p.hasPendingChange);
-
-// Checks for other types of changes and non-hot-plug NIC changes
-export const nonHotPlugNICChangesExist = (
-  pendingChanges: PendingChange[],
-  nonHotPlugNICsExist: boolean,
-) => {
-  const moreChangeTypesExist = pendingChanges
-    ?.filter((change) => change?.hasPendingChange)
-    ?.some((change) => change?.tabLabel !== VirtualMachineDetailsTabLabel.Network);
-  return moreChangeTypesExist || nonHotPlugNICsExist;
 };
 
 const isHotPlugNIC = (
@@ -509,48 +495,17 @@ export const getChangedHeadlessMode = (
   return isHeadlessMode(vm) !== isHeadlessMode(vmi);
 };
 
-export const getTabURL = (vm: V1VirtualMachine, tab: string) => {
-  const tabPath = VirtualMachineConfigurationTabInner[tab]
-    ? `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineConfigurationTabInner[tab]}`
+export const getTabURL = (vm: V1VirtualMachine, tab: VirtualMachineDetailsTab) => {
+  const tabPath = VirtualMachineConfigurationTabInner.has(tab)
+    ? `${VirtualMachineDetailsTab.Configurations}/${tab}`
     : tab;
-  return `/k8s/ns/${vm?.metadata?.namespace}/${VirtualMachineModelRef}/${vm?.metadata?.name}/${tabPath}`;
+  return `/k8s/ns/${getNamespace(vm)}/${VirtualMachineModelRef}/${getName(vm)}/${tabPath}`;
 };
 
-export const getPendingChangesByTab = (pendingChanges: PendingChange[]) => {
-  const pendingChangesDetailsTab = pendingChanges?.filter(
-    (change) =>
-      change?.tabLabel === VirtualMachineDetailsTabLabel.Details && change?.hasPendingChange,
-  );
-  const pendingChangesSchedulingTab = pendingChanges?.filter(
-    (change) =>
-      change?.tabLabel === VirtualMachineDetailsTabLabel.Scheduling && change?.hasPendingChange,
-  );
-  const pendingChangesEnvTab = pendingChanges?.filter(
-    (change) =>
-      change?.tabLabel === VirtualMachineDetailsTabLabel.Environment && change?.hasPendingChange,
-  );
-  const pendingChangesNICsTab = pendingChanges?.filter(
-    (change) =>
-      change?.tabLabel === VirtualMachineDetailsTabLabel.Network && change?.hasPendingChange,
-  );
-  const pendingChangesScriptsTab = pendingChanges?.filter(
-    (change) =>
-      change?.tabLabel === VirtualMachineDetailsTabLabel.Scripts && change?.hasPendingChange,
-  );
-  const pendingChangesDisksTab = pendingChanges?.filter(
-    (change) =>
-      change?.tabLabel === VirtualMachineDetailsTabLabel.Disks && change?.hasPendingChange,
-  );
-
-  return {
-    pendingChangesDetailsTab,
-    pendingChangesDisksTab,
-    pendingChangesEnvTab,
-    pendingChangesNICsTab,
-    pendingChangesSchedulingTab,
-    pendingChangesScriptsTab,
-  };
-};
+export const getPendingChangesByTab = (
+  pendingChanges: PendingChange[],
+  tab: VirtualMachineDetailsTab,
+) => pendingChanges?.filter((change) => change?.tab === tab && change?.hasPendingChange);
 
 export const restartRequired = (vm: V1VirtualMachine): boolean =>
   getStatusConditions(vm).some(

@@ -4,6 +4,7 @@ import { V1VirtualMachineCondition } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import PendingChangesBreadcrumb from '@kubevirt-utils/components/PendingChanges/PendingChangesBreadcrumb/PendingChangesBreadcrumb';
 import { getPendingChangesByTab } from '@kubevirt-utils/components/PendingChanges/utils/helpers';
 import { PendingChange } from '@kubevirt-utils/components/PendingChanges/utils/types';
+import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { List } from '@patternfly/react-core';
 
@@ -18,15 +19,15 @@ const RestartPendingChanges: FC<RestartPendingChangesProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const pendingChangesTabs = getPendingChangesByTab(pendingChanges);
-  const {
-    pendingChangesDetailsTab,
-    pendingChangesDisksTab,
-    pendingChangesEnvTab,
-    pendingChangesNICsTab,
-    pendingChangesSchedulingTab,
-    pendingChangesScriptsTab,
-  } = pendingChangesTabs;
+  const tabs = [
+    VirtualMachineDetailsTab.Details,
+    VirtualMachineDetailsTab.Scheduling,
+    VirtualMachineDetailsTab.Environment,
+    VirtualMachineDetailsTab.Network,
+    VirtualMachineDetailsTab.SSH,
+    VirtualMachineDetailsTab.InitialRun,
+    VirtualMachineDetailsTab.Storage,
+  ];
 
   return (
     <span>
@@ -36,12 +37,12 @@ const RestartPendingChanges: FC<RestartPendingChangesProps> = ({
         )}
 
       <List>
-        <PendingChangesBreadcrumb pendingChanges={pendingChangesDetailsTab} />
-        <PendingChangesBreadcrumb pendingChanges={pendingChangesSchedulingTab} />
-        <PendingChangesBreadcrumb pendingChanges={pendingChangesEnvTab} />
-        <PendingChangesBreadcrumb pendingChanges={pendingChangesNICsTab} />
-        <PendingChangesBreadcrumb pendingChanges={pendingChangesScriptsTab} />
-        <PendingChangesBreadcrumb pendingChanges={pendingChangesDisksTab} />
+        {tabs.map((tab) => (
+          <PendingChangesBreadcrumb
+            key={tab}
+            pendingChanges={getPendingChangesByTab(pendingChanges, tab)}
+          />
+        ))}
       </List>
     </span>
   );

@@ -1,7 +1,5 @@
-import {
-  VirtualMachineDetailsTab,
-  VirtualMachineDetailsTabLabel,
-} from '@kubevirt-utils/constants/tabs-constants';
+import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
+import { getTabNameAndTitle } from '@virtualmachines/details/utils/utils';
 
 import CustomizeInstanceTypeDetailsTab from './tabs/CustomizeInstanceTypeDetailsTab';
 import CustomizeInstanceTypeInitialRunTab from './tabs/CustomizeInstanceTypeInitialRunTab';
@@ -14,37 +12,30 @@ import CustomizeInstanceTypeStorageTab from './tabs/CustomizeInstanceTypeStorage
 export const tabs = [
   {
     Component: CustomizeInstanceTypeDetailsTab,
-    name: VirtualMachineDetailsTab.Details,
-    title: VirtualMachineDetailsTabLabel.Details,
+    ...getTabNameAndTitle(VirtualMachineDetailsTab.Details),
   },
   {
     Component: CustomizeInstanceTypeStorageTab,
-    name: VirtualMachineDetailsTab.Storage,
-    title: VirtualMachineDetailsTabLabel.Storage,
+    ...getTabNameAndTitle(VirtualMachineDetailsTab.Storage),
   },
   {
     Component: CustomizeInstanceTypeNetworkTab,
-    name: VirtualMachineDetailsTab.Network,
-    title: VirtualMachineDetailsTabLabel.Network,
+    ...getTabNameAndTitle(VirtualMachineDetailsTab.Network),
   },
   {
     Component: CustomizeInstanceTypeSchedulingTab,
-    name: VirtualMachineDetailsTab.Scheduling,
-    title: VirtualMachineDetailsTabLabel.Scheduling,
+    ...getTabNameAndTitle(VirtualMachineDetailsTab.Scheduling),
   },
   {
     Component: CustomizeInstanceTypeSSHTab,
-    name: VirtualMachineDetailsTab.SSH,
-    title: VirtualMachineDetailsTabLabel.SSH,
+    ...getTabNameAndTitle(VirtualMachineDetailsTab.SSH),
   },
   {
     Component: CustomizeInstanceTypeInitialRunTab,
-    name: VirtualMachineDetailsTab['Initial-run'],
-    title: VirtualMachineDetailsTabLabel['Initial-run'],
+    ...getTabNameAndTitle(VirtualMachineDetailsTab.InitialRun),
   },
   {
     Component: CustomizeInstanceTypeMetadataTab,
-    name: VirtualMachineDetailsTab.Metadata,
-    title: VirtualMachineDetailsTabLabel.Metadata,
+    ...getTabNameAndTitle(VirtualMachineDetailsTab.Metadata),
   },
 ];
