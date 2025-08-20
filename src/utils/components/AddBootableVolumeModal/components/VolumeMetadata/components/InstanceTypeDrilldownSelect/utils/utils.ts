@@ -115,3 +115,11 @@ export const isExistingInstanceType = (
       getName(instanceType) === selectedInstanceType &&
       instanceType.kind === selectedInstanceTypeKind,
   );
+
+export const seriesHasHugepagesVariant = (seriesName: string): boolean =>
+  seriesName === 'cx1' || seriesName === 'm1';
+
+export const is1GiInstanceType = (sizeLabel: string): boolean => sizeLabel.endsWith('1gi');
+
+export const getOppositeHugepagesInstanceType = (instanceTypeName: string, checked: boolean) =>
+  checked ? `${instanceTypeName}1gi` : `${instanceTypeName.replace(/1gi$/, '')}`;
