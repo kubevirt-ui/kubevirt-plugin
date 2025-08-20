@@ -16,6 +16,7 @@ import {
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getInitialSSHDetails } from '@kubevirt-utils/resources/secret/utils';
+import { getName } from '@kubevirt-utils/resources/shared';
 import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { DescriptionList, HelperText, HelperTextItem, SplitItem } from '@patternfly/react-core';
@@ -79,6 +80,7 @@ const AuthorizedSSHKey: FC<AuthorizedSSHKeyProps> = ({ authorizedSSHKey, namespa
     if (isEmpty(sshDetails)) {
       const initialSSHDetails = getInitialSSHDetails({
         applyKeyToProject: !isEmpty(authorizedSSHKey),
+        isTemplateSecret: true,
         secretToCreate:
           isEmpty(authorizedSSHKey) && !isEmpty(additionalSecretResource)
             ? additionalSecretResource
@@ -108,13 +110,14 @@ const AuthorizedSSHKey: FC<AuthorizedSSHKeyProps> = ({ authorizedSSHKey, namespa
           descriptionHeader={t('Public SSH key')}
           isEdit
         />
-        {!isEmpty(additionalSecretResource) && (
-          <HelperText>
-            <HelperTextItem hasIcon variant="warning">
-              {t('This key will override the SSH key secret set on the template')}
-            </HelperTextItem>
-          </HelperText>
-        )}
+        {!isEmpty(additionalSecretResource) &&
+          sshDetails?.sshSecretName !== getName(additionalSecretResource) && (
+            <HelperText>
+              <HelperTextItem hasIcon variant="warning">
+                {t('This key will override the SSH key secret set on the template')}
+              </HelperTextItem>
+            </HelperText>
+          )}
       </DescriptionList>
     </SplitItem>
   );

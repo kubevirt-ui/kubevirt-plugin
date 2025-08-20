@@ -166,6 +166,12 @@ const useCreateDrawerForm = (
 
         draftTemplate.objects = modifiedTemplateObjects;
 
+        if (sshDetails?.sshSecretName) {
+          draftTemplate.objects = draftTemplate.objects?.filter(
+            (obj) => !(obj.kind === SecretModel.kind),
+          );
+        }
+
         if (sshDetails?.sshSecretName && sshDetails?.applyKeyToProject) {
           updateAuthorizedSSHKeys({
             ...authorizedSSHKeys,

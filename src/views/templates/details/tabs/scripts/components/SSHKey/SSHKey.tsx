@@ -59,7 +59,12 @@ const SSHKey: FC<SSHKeyProps> = ({ template }) => {
   );
 
   const initialSSHDetails = useMemo(
-    () => getInitialSSHDetails({ secretToCreate, sshSecretName: vmAttachedSecretName }),
+    () =>
+      getInitialSSHDetails({
+        isTemplateSecret: true,
+        secretToCreate,
+        sshSecretName: vmAttachedSecretName,
+      }),
     [vmAttachedSecretName, secretToCreate],
   );
 
