@@ -34,7 +34,7 @@ const DetailsLeftGrid: FC<DetailsLeftGridProps> = ({
   const { instanceTypeVMState, setInstanceTypeVMState, vmNamespaceTarget } =
     useInstanceTypeVMStore();
   const { folder, selectedBootableVolume, selectedInstanceType, vmName } = instanceTypeVMState;
-  const { clusterInstanceTypes, preferences } = instanceTypesAndPreferencesData;
+  const { allInstanceTypes, preferences } = instanceTypesAndPreferencesData;
 
   const preferencesMap = useMemo(() => convertResourceArrayToMap(preferences), [preferences]);
   const userPreferencesMap = useMemo(
@@ -42,8 +42,8 @@ const DetailsLeftGrid: FC<DetailsLeftGridProps> = ({
     [userPreferencesData],
   );
   const instanceTypesMap = useMemo(
-    () => convertResourceArrayToMap(clusterInstanceTypes),
-    [clusterInstanceTypes],
+    () => convertResourceArrayToMap(allInstanceTypes),
+    [allInstanceTypes],
   );
 
   const vmNameValidated = validateVMName(vmName);
