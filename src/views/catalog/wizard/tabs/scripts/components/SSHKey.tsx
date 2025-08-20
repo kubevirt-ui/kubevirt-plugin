@@ -36,6 +36,7 @@ const SSHKey: FC = () => {
   const [sshDetails, setSSHDetails] = useState<SSHSecretDetails>(
     getInitialSSHDetails({
       applyKeyToProject: tabsData.applySSHToSettings,
+      isTemplateSecret: false,
       secretToCreate: tabsData.additionalObjects?.find((obj) => obj?.kind === SecretModel.kind),
       sshSecretName: vmAttachedSecretName,
     }),
