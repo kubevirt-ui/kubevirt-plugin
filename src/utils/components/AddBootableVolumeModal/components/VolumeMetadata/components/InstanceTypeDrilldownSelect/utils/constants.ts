@@ -55,7 +55,20 @@ export const instanceTypeSeriesNameMapper: {
 } = {
   cx1: {
     Icon: RegistryIcon,
-    possibleSizes: ['medium', 'large', 'xlarge', '2xlarge', '4xlarge', '8xlarge'],
+    possibleSizes: [
+      'medium',
+      'large',
+      'xlarge',
+      '2xlarge',
+      '4xlarge',
+      '8xlarge',
+      'medium1gi',
+      'large1gi',
+      'xlarge1gi',
+      '2xlarge1gi',
+      '4xlarge1gi',
+      '8xlarge1gi',
+    ],
     seriesLabel: t('CX series'),
   },
   gn1: {
@@ -70,7 +83,18 @@ export const instanceTypeSeriesNameMapper: {
   },
   m1: {
     Icon: MemoryIcon,
-    possibleSizes: ['large', 'xlarge', '2xlarge', '4xlarge', '8xlarge'],
+    possibleSizes: [
+      'large',
+      'xlarge',
+      '2xlarge',
+      '4xlarge',
+      '8xlarge',
+      'large1gi',
+      'xlarge1gi',
+      '2xlarge1gi',
+      '4xlarge1gi',
+      '8xlarge1gi',
+    ],
     seriesLabel: t('M series'),
   },
   n1: {
