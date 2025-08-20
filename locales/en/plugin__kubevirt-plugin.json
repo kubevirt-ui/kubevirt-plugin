@@ -1468,7 +1468,7 @@
   "The channel to track and receive the updates from.": "The channel to track and receive the updates from.",
   "The cloud-init service is enabled by default in Fedora and RHEL images.": "The cloud-init service is enabled by default in Fedora and RHEL images.",
   "The DataImportCron polls disk images and imports them as PersistentVolumeClaims. You can configure the image source and other settings on the DataImportCron details page.": "The DataImportCron polls disk images and imports them as PersistentVolumeClaims. You can configure the image source and other settings on the DataImportCron details page.",
-  "The default binding. Extend the L2 domain of the user-defined network into the VirtualMachine": "The default binding. Extend the L2 domain of the user-defined network into the VirtualMachine",
+  "The default binding. Extends the L2 domain of the user-defined network into the VirtualMachine": "The default binding. Extends the L2 domain of the user-defined network into the VirtualMachine",
   "The default InstanceType for this volume.": "The default InstanceType for this volume.",
   "The Descheduler can be used to evict a running VirtualMachine so that the VirtualMachine can be rescheduled onto a more suitable Node via a live migration.": "The Descheduler can be used to evict a running VirtualMachine so that the VirtualMachine can be rescheduled onto a more suitable Node via a live migration.",
   "The disk must be attached to the VirtualMachine as a SCSI LUN for this option to work. It should only be used for cluster-aware applications": "The disk must be attached to the VirtualMachine as a SCSI LUN for this option to work. It should only be used for cluster-aware applications",

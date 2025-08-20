@@ -205,7 +205,7 @@ export const deleteNetworkInterface = (
 export const getPASSTSelectableOptions = (t: TFunction) => [
   {
     description: t(
-      'The default binding. Extend the L2 domain of the user-defined network into the VirtualMachine',
+      'The default binding. Extends the L2 domain of the user-defined network into the VirtualMachine',
     ),
     id: interfaceTypesProxy.l2bridge,
     title: interfaceTypesProxy.l2bridge,
