@@ -14,6 +14,7 @@ import VirtualMachineMetricsTab from '../tabs/metrics/VirtualMachineMetricsTab';
 import VirtualMachinesOverviewTab from '../tabs/overview/VirtualMachinesOverviewTab';
 import SnapshotListPage from '../tabs/snapshots/SnapshotListPage';
 import VirtualMachineYAMLPage from '../tabs/yaml/VirtualMachineYAMLPage';
+import { getTabHrefAndName } from '../utils/utils';
 
 export const useVirtualMachineTabs = () => {
   const { t } = useKubevirtTranslation();
@@ -22,97 +23,82 @@ export const useVirtualMachineTabs = () => {
     () => [
       {
         component: VirtualMachinesOverviewTab,
-        href: VirtualMachineDetailsTab.Overview,
-        name: t(VirtualMachineDetailsTabLabel.Overview),
+        ...getTabHrefAndName(VirtualMachineDetailsTab.Overview),
       },
       {
         component: VirtualMachineMetricsTab,
-        href: VirtualMachineDetailsTab.Metrics,
-        name: t(VirtualMachineDetailsTabLabel.Metrics),
+        ...getTabHrefAndName(VirtualMachineDetailsTab.Metrics),
       },
       {
         component: VirtualMachineYAMLPage,
-        href: VirtualMachineDetailsTab.YAML,
-        name: t(VirtualMachineDetailsTabLabel.YAML),
+        ...getTabHrefAndName(VirtualMachineDetailsTab.YAML),
       },
       {
         component: VirtualMachineConfigurationTab,
-        href: VirtualMachineDetailsTab.Configurations,
-        name: t(VirtualMachineDetailsTabLabel.Configuration),
+        ...getTabHrefAndName(VirtualMachineDetailsTab.Configurations),
       },
       {
         component: VirtualMachineConfigurationTab,
-        href: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.SSH}`,
+        ...getTabHrefAndName(VirtualMachineDetailsTab.SSH),
         isHidden: true,
-        name: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.SSH}`,
       },
       {
         component: VirtualMachineConfigurationTab,
-        href: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab['Initial-run']}`,
+        ...getTabHrefAndName(VirtualMachineDetailsTab.InitialRun),
         isHidden: true,
-        name: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab['Initial-run']}`,
       },
       {
         component: VirtualMachineConfigurationTab,
-        href: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Storage}`,
+        ...getTabHrefAndName(VirtualMachineDetailsTab.Storage),
         isHidden: true,
-        name: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Storage}`,
       },
       {
         component: VirtualMachineConfigurationTab,
-        href: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Details}`,
+        ...getTabHrefAndName(VirtualMachineDetailsTab.Details),
         isHidden: true,
-        name: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Details}`,
       },
       {
         component: VirtualMachineConfigurationTab,
-        href: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Metadata}`,
+        ...getTabHrefAndName(VirtualMachineDetailsTab.Metadata),
         isHidden: true,
-        name: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Metadata}`,
       },
       {
         component: VirtualMachineConfigurationTab,
-        href: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Network}`,
+        ...getTabHrefAndName(VirtualMachineDetailsTab.Network),
         isHidden: true,
-        name: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Network}`,
       },
       {
         component: VirtualMachineConfigurationTab,
-        href: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Scheduling}`,
+        ...getTabHrefAndName(VirtualMachineDetailsTab.Scheduling),
         isHidden: true,
-        name: `${VirtualMachineDetailsTab.Configurations}/${VirtualMachineDetailsTab.Scheduling}`,
       },
       {
         component: VirtualMachinePageEventsTab,
-        href: VirtualMachineDetailsTab.Events,
-        name: t(VirtualMachineDetailsTabLabel.Events),
+        ...getTabHrefAndName(VirtualMachineDetailsTab.Events),
       },
       {
         component: VirtualMachineConsolePage,
-        href: VirtualMachineDetailsTab.Console,
-        name: t(VirtualMachineDetailsTabLabel.Console),
+        ...getTabHrefAndName(VirtualMachineDetailsTab.Console),
       },
       {
         component: SnapshotListPage,
-        href: VirtualMachineDetailsTab.Snapshots,
-        name: t(VirtualMachineDetailsTabLabel.Snapshots),
+        ...getTabHrefAndName(VirtualMachineDetailsTab.Snapshots),
       },
       {
         component: VirtualMachineDiagnosticTab,
-        href: VirtualMachineDetailsTab.Diagnostics,
-        name: t(VirtualMachineDetailsTabLabel.Diagnostics),
+        ...getTabHrefAndName(VirtualMachineDetailsTab.Diagnostics),
       },
       {
         component: VirtualMachineDiagnosticTab,
         href: `${VirtualMachineDetailsTab.Diagnostics}/${VirtualMachineDetailsTab.Tables}`,
         isHidden: true,
-        name: t(VirtualMachineDetailsTabLabel.Diagnostics),
+        name: t(VirtualMachineDetailsTabLabel.diagnostics),
       },
       {
         component: VirtualMachineDiagnosticTab,
         href: `${VirtualMachineDetailsTab.Diagnostics}/${VirtualMachineDetailsTab.Logs}`,
         isHidden: true,
-        name: t(VirtualMachineDetailsTabLabel.Diagnostics),
+        name: t(VirtualMachineDetailsTabLabel.diagnostics),
       },
     ],
     [t],

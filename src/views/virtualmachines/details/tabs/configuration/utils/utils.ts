@@ -1,7 +1,5 @@
-import {
-  VirtualMachineDetailsTab,
-  VirtualMachineDetailsTabLabel,
-} from '@kubevirt-utils/constants/tabs-constants';
+import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
+import { getTabNameAndTitle } from '@virtualmachines/details/utils/utils';
 
 import DetailsTab from '../details/DetailsTab';
 import InitialRunTab from '../initialrun/InitialRunTab';
@@ -14,38 +12,31 @@ import StorageTab from '../storage/StorageTab';
 export const tabs = [
   {
     Component: DetailsTab,
-    name: VirtualMachineDetailsTab.Details,
-    title: VirtualMachineDetailsTabLabel.Details,
+    ...getTabNameAndTitle(VirtualMachineDetailsTab.Details),
   },
   {
     Component: StorageTab,
-    name: VirtualMachineDetailsTab.Storage,
-    title: VirtualMachineDetailsTabLabel.Storage,
+    ...getTabNameAndTitle(VirtualMachineDetailsTab.Storage),
   },
   {
     Component: NetworkInterfaceListPage,
-    name: VirtualMachineDetailsTab.Network,
-    title: VirtualMachineDetailsTabLabel.Network,
+    ...getTabNameAndTitle(VirtualMachineDetailsTab.Network),
   },
   {
     Component: VirtualMachineSchedulingPage,
-    name: VirtualMachineDetailsTab.Scheduling,
-    title: VirtualMachineDetailsTabLabel.Scheduling,
+    ...getTabNameAndTitle(VirtualMachineDetailsTab.Scheduling),
   },
   {
     Component: SSHTab,
-    name: VirtualMachineDetailsTab.SSH,
-    title: VirtualMachineDetailsTabLabel.SSH,
+    ...getTabNameAndTitle(VirtualMachineDetailsTab.SSH),
   },
   {
     Component: InitialRunTab,
-    name: VirtualMachineDetailsTab['Initial-run'],
-    title: VirtualMachineDetailsTabLabel['Initial-run'],
+    ...getTabNameAndTitle(VirtualMachineDetailsTab.InitialRun),
   },
   {
     Component: MetadataTab,
-    name: VirtualMachineDetailsTab.Metadata,
-    title: VirtualMachineDetailsTabLabel.Metadata,
+    ...getTabNameAndTitle(VirtualMachineDetailsTab.Metadata),
   },
 ];
 

@@ -134,21 +134,27 @@ export const usePendingChanges = (
       ns: updatedVM?.metadata?.namespace,
     });
 
+  const createProps = (tab: VirtualMachineDetailsTab, additionalAction?: () => void) => ({
+    handleAction: () => {
+      navigate(getTabURL(vm, tab));
+      additionalAction?.();
+    },
+    tab,
+    tabLabel: VirtualMachineDetailsTabLabel[tab],
+  });
+
   return [
     {
-      handleAction: () => {
-        navigate(getTabURL(vm, VirtualMachineDetailsTab.Details));
+      ...createProps(VirtualMachineDetailsTab.Details, () =>
         createModal(({ isOpen, onClose }) => (
           <CPUMemoryModal isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vm={vm} />
-        ));
-      },
+        )),
+      ),
       hasPendingChange: !isInstanceTypeVM(vm) && cpuMemoryChanged && restartRequired(vm),
       label: t('CPU | Memory'),
-      tabLabel: VirtualMachineDetailsTabLabel.Details,
     },
     {
-      handleAction: () => {
-        navigate(getTabURL(vm, VirtualMachineDetailsTab.Details));
+      ...createProps(VirtualMachineDetailsTab.Details, () =>
         createModal(({ isOpen, onClose }) => (
           <StandaloneInstanceTypeModal
             isOpen={isOpen}
@@ -156,38 +162,31 @@ export const usePendingChanges = (
             onSubmit={updatedInstanceType}
             vm={vm}
           />
-        ));
-      },
+        )),
+      ),
       hasPendingChange: isInstanceTypeVM(vm) && instanceTypeChanged && restartRequired(vm),
       label: t('InstanceType'),
-      tabLabel: VirtualMachineDetailsTabLabel.Details,
     },
-
     {
-      handleAction: () => {
-        navigate(getTabURL(vm, VirtualMachineDetailsTab.Details));
+      ...createProps(VirtualMachineDetailsTab.Details, () =>
         createModal(({ isOpen, onClose }) => (
           <BootOrderModal isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vm={vm} vmi={vmi} />
-        ));
-      },
+        )),
+      ),
       hasPendingChange: bootOrderChanged,
       label: t('Boot disk'),
-      tabLabel: VirtualMachineDetailsTabLabel.Details,
     },
     {
-      handleAction: () => {
-        navigate(getTabURL(vm, VirtualMachineDetailsTab.Details));
+      ...createProps(VirtualMachineDetailsTab.Details, () =>
         createModal(({ isOpen, onClose }) => (
           <HostnameModal isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vm={vm} vmi={vmi} />
-        ));
-      },
+        )),
+      ),
       hasPendingChange: hostnameChanged,
       label: t('Hostname'),
-      tabLabel: VirtualMachineDetailsTabLabel.Details,
     },
     {
-      handleAction: () => {
-        navigate(getTabURL(vm, VirtualMachineDetailsTab.Details));
+      ...createProps(VirtualMachineDetailsTab.Details, () =>
         createModal(({ isOpen, onClose }) => (
           <FirmwareBootloaderModal
             isOpen={isOpen}
@@ -196,44 +195,32 @@ export const usePendingChanges = (
             vm={vm}
             vmi={vmi}
           />
-        ));
-      },
+        )),
+      ),
       hasPendingChange: bootModeChanged,
       label: t('Boot mode'),
-      tabLabel: VirtualMachineDetailsTabLabel.Details,
     },
     {
-      handleAction: () => {
-        navigate(getTabURL(vm, VirtualMachineDetailsTab.Environment));
-      },
+      ...createProps(VirtualMachineDetailsTab.Environment),
       hasPendingChange: !isEmpty(modifiedEnvDisks),
       label:
         !isEmpty(modifiedEnvDisks) && modifiedEnvDisks?.length > 1
           ? modifiedEnvDisks.join(', ')
           : modifiedEnvDisks[0],
-      tabLabel: VirtualMachineDetailsTabLabel.Environment,
     },
     {
+      ...createProps(VirtualMachineDetailsTab.Network),
       appliedOnLiveMigration: true,
-      handleAction: () => {
-        navigate(getTabURL(vm, VirtualMachineDetailsTab.Network));
-      },
       hasPendingChange: !isEmpty(hotPlugNICs),
       label: hotPlugNICs?.length > 1 ? hotPlugNICs.join(', ') : hotPlugNICs[0],
-      tabLabel: VirtualMachineDetailsTabLabel.Network,
     },
     {
-      handleAction: () => {
-        navigate(getTabURL(vm, VirtualMachineDetailsTab.Network));
-      },
+      ...createProps(VirtualMachineDetailsTab.Network),
       hasPendingChange: !isEmpty(nonHotPlugNICs),
       label: nonHotPlugNICs?.length > 1 ? nonHotPlugNICs.join(', ') : nonHotPlugNICs[0],
-      tabLabel: VirtualMachineDetailsTabLabel.Network,
     },
-
     {
-      handleAction: () => {
-        navigate(getTabURL(vm, VirtualMachineDetailsTab.Details));
+      ...createProps(VirtualMachineDetailsTab.Details, () =>
         createModal(({ isOpen, onClose }) => (
           <HardwareDevicesModal
             btnText={t('Add GPU device')}
@@ -246,18 +233,16 @@ export const usePendingChanges = (
             vm={vm}
             vmi={vmi}
           />
-        ));
-      },
+        )),
+      ),
       hasPendingChange: !isEmpty(modifiedGPUDevices),
       label:
         !isEmpty(modifiedGPUDevices) && modifiedGPUDevices?.length > 1
           ? modifiedGPUDevices.join(', ')
           : modifiedGPUDevices[0],
-      tabLabel: VirtualMachineDetailsTabLabel.Details,
     },
     {
-      handleAction: () => {
-        navigate(getTabURL(vm, VirtualMachineDetailsTab.Details));
+      ...createProps(VirtualMachineDetailsTab.Details, () =>
         createModal(({ isOpen, onClose }) => (
           <HardwareDevicesModal
             btnText={t('Add Host device')}
@@ -270,18 +255,16 @@ export const usePendingChanges = (
             vm={vm}
             vmi={vmi}
           />
-        ));
-      },
+        )),
+      ),
       hasPendingChange: !isEmpty(modifiedHostDevices),
       label:
         !isEmpty(modifiedHostDevices) && modifiedHostDevices?.length > 1
           ? modifiedHostDevices.join(', ')
           : modifiedHostDevices[0],
-      tabLabel: VirtualMachineDetailsTabLabel.Details,
     },
     {
-      handleAction: () => {
-        navigate(getTabURL(vm, VirtualMachineDetailsTab.Scheduling));
+      ...createProps(VirtualMachineDetailsTab.Scheduling, () =>
         createModal(({ isOpen, onClose }) => (
           <DedicatedResourcesModal
             headerText={t('Dedicated resources')}
@@ -291,15 +274,13 @@ export const usePendingChanges = (
             vm={vm}
             vmi={vmi}
           />
-        ));
-      },
+        )),
+      ),
       hasPendingChange: dedicatedResourcesChanged,
       label: t('Dedicated resources'),
-      tabLabel: VirtualMachineDetailsTabLabel.Scheduling,
     },
     {
-      handleAction: () => {
-        navigate(getTabURL(vm, VirtualMachineDetailsTab.Scheduling));
+      ...createProps(VirtualMachineDetailsTab.Scheduling, () =>
         createModal(({ isOpen, onClose }) => (
           <EvictionStrategyModal
             headerText={t('Eviction strategy')}
@@ -309,14 +290,13 @@ export const usePendingChanges = (
             vm={vm}
             vmi={vmi}
           />
-        ));
-      },
+        )),
+      ),
       hasPendingChange: evictionStrategyChanged,
       label: t('Eviction strategy'),
-      tabLabel: VirtualMachineDetailsTabLabel.Scheduling,
     },
     {
-      handleAction: () => {
+      ...createProps(VirtualMachineDetailsTab.Details, () =>
         createModal(({ isOpen, onClose }) => (
           <StartPauseModal
             headerText={t('Start in pause mode')}
@@ -326,15 +306,13 @@ export const usePendingChanges = (
             vm={vm}
             vmi={vmi}
           />
-        ));
-      },
+        )),
+      ),
       hasPendingChange: startStrategyChanged,
       label: t('Start in pause mode'),
-      tabLabel: VirtualMachineDetailsTabLabel.Details,
     },
     {
-      handleAction: () => {
-        navigate(getTabURL(vm, VirtualMachineDetailsTab.Scheduling));
+      ...createProps(VirtualMachineDetailsTab.Scheduling, () =>
         createModal(({ isOpen, onClose }) => (
           <NodeSelectorModal
             isOpen={isOpen}
@@ -344,26 +322,22 @@ export const usePendingChanges = (
             onSubmit={onSubmit}
             vm={vm}
           />
-        ));
-      },
+        )),
+      ),
       hasPendingChange: nodeSelectorChanged,
       label: t('Node selector'),
-      tabLabel: VirtualMachineDetailsTabLabel.Scheduling,
     },
     {
-      handleAction: () => {
-        navigate(getTabURL(vm, VirtualMachineDetailsTab.Scripts));
+      ...createProps(VirtualMachineDetailsTab.InitialRun, () =>
         createModal(({ isOpen, onClose }) => (
           <CloudinitModal isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vm={vm} vmi={vmi} />
-        ));
-      },
+        )),
+      ),
       hasPendingChange: cloudInitChanged,
       label: t('Cloud-init'),
-      tabLabel: VirtualMachineDetailsTabLabel.Scripts,
     },
     {
-      handleAction: () => {
-        navigate(getTabURL(vm, VirtualMachineDetailsTab.Scheduling));
+      ...createProps(VirtualMachineDetailsTab.Scheduling, () =>
         createModal(({ isOpen, onClose }) => (
           <TolerationsModal
             isOpen={isOpen}
@@ -374,15 +348,13 @@ export const usePendingChanges = (
             vm={vm}
             vmi={vmi}
           />
-        ));
-      },
+        )),
+      ),
       hasPendingChange: tolerationsChanged,
       label: t('Tolerations'),
-      tabLabel: VirtualMachineDetailsTabLabel.Scheduling,
     },
     {
-      handleAction: () => {
-        navigate(getTabURL(vm, VirtualMachineDetailsTab.Scheduling));
+      ...createProps(VirtualMachineDetailsTab.Scheduling, () =>
         createModal(({ isOpen, onClose }) => (
           <AffinityModal
             isOpen={isOpen}
@@ -392,15 +364,13 @@ export const usePendingChanges = (
             onSubmit={onSubmit}
             vm={vm}
           />
-        ));
-      },
+        )),
+      ),
       hasPendingChange: affinityChanged,
       label: t('Affinity rules'),
-      tabLabel: VirtualMachineDetailsTabLabel.Scheduling,
     },
     {
-      handleAction: () => {
-        navigate(getTabURL(vm, VirtualMachineDetailsTab.Scheduling));
+      ...createProps(VirtualMachineDetailsTab.Scheduling, () =>
         createModal(({ isOpen, onClose }) => (
           <DeschedulerModal
             isOpen={isOpen}
@@ -409,15 +379,13 @@ export const usePendingChanges = (
             vm={vm}
             vmi={vmi}
           />
-        ));
-      },
+        )),
+      ),
       hasPendingChange: deschedulerChanged,
       label: t('Descheduler'),
-      tabLabel: VirtualMachineDetailsTabLabel.Scheduling,
     },
     {
-      handleAction: () => {
-        navigate(getTabURL(vm, VirtualMachineDetailsTab.Scripts));
+      ...createProps(VirtualMachineDetailsTab.SSH, () =>
         createModal(({ isOpen, onClose }) => (
           <VMSSHSecretModal
             authorizedSSHKeys={authorizedSSHKeys}
@@ -427,25 +395,20 @@ export const usePendingChanges = (
             updateVM={onSubmit}
             vm={vm}
           />
-        ));
-      },
+        )),
+      ),
       hasPendingChange: sshServiceChanged,
       label: t('Public SSH key'),
-      tabLabel: VirtualMachineDetailsTabLabel.Scripts,
     },
     {
-      handleAction: () => {
-        navigate(getTabURL(vm, VirtualMachineDetailsTab.Storage));
-      },
+      ...createProps(VirtualMachineDetailsTab.Storage),
       hasPendingChange: !isEmpty(modifiedVolumesHotplug),
       label: `${t('Make persistent disk')} - (${(modifiedVolumesHotplug || [])
         .map((volume) => volume?.name)
         .join(', ')})`,
-      tabLabel: VirtualMachineDetailsTabLabel.Disks,
     },
     {
-      handleAction: () => {
-        navigate(getTabURL(vm, VirtualMachineDetailsTab.Details));
+      ...createProps(VirtualMachineDetailsTab.Details, () =>
         createModal(({ isOpen, onClose }) => (
           <HardwareDevicesHeadlessModeModal
             isOpen={isOpen}
@@ -454,19 +417,15 @@ export const usePendingChanges = (
             vm={vm}
             vmi={vmi}
           />
-        ));
-      },
+        )),
+      ),
       hasPendingChange: modifiedHeadlessMode,
       label: t('Headless mode'),
-      tabLabel: VirtualMachineDetailsTabLabel.Details,
     },
     {
-      handleAction: () => {
-        navigate(getTabURL(vm, VirtualMachineDetailsTab.Details));
-      },
+      ...createProps(VirtualMachineDetailsTab.Details),
       hasPendingChange: modifiedGuestSystemAccessLog,
       label: t('Guest system log access'),
-      tabLabel: VirtualMachineDetailsTabLabel.Details,
     },
   ];
 };
