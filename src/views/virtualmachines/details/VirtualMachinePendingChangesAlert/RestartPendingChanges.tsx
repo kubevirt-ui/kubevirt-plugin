@@ -29,21 +29,28 @@ const RestartPendingChanges: FC<RestartPendingChangesProps> = ({
     VirtualMachineDetailsTab.Storage,
   ];
 
+  const hasPendingChanges = pendingChanges?.some((change) => change?.hasPendingChange);
+
   return (
     <span>
-      {restartRequiredCondition?.message ||
-        t(
-          'The following areas have pending changes that will be applied when this VirtualMachine is restarted.',
-        )}
+      <p>
+        {restartRequiredCondition?.message ||
+          t('RestartRequired condition has been set on this VirtualMachine.')}
+      </p>
+      {hasPendingChanges && (
+        <>
+          <p>{t('Detected changes:')}</p>
 
-      <List>
-        {tabs.map((tab) => (
-          <PendingChangesBreadcrumb
-            key={tab}
-            pendingChanges={getPendingChangesByTab(pendingChanges, tab)}
-          />
-        ))}
-      </List>
+          <List>
+            {tabs.map((tab) => (
+              <PendingChangesBreadcrumb
+                key={tab}
+                pendingChanges={getPendingChangesByTab(pendingChanges, tab)}
+              />
+            ))}
+          </List>
+        </>
+      )}
     </span>
   );
 };
