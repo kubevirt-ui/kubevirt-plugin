@@ -8,7 +8,7 @@ export const isGuestAgentConnected = (vmi: V1VirtualMachineInstance): boolean =>
     (condition) => condition?.type === 'AgentConnected' && condition?.status === 'True',
   );
 
-export const getOsNameFromGuestAgent = (
+export const getOSNameFromGuestAgent = (
   guestAgentData: V1VirtualMachineInstanceGuestAgentInfo,
 ): string =>
   guestAgentData?.os?.name?.includes('Windows') && guestAgentData?.os?.version?.includes('Windows')
