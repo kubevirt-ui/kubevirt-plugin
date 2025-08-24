@@ -8,7 +8,6 @@ import {
   V1VirtualMachineInstance,
   V1Volume,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { V1Disk } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   convertYAMLToNetworkDataObject,
   convertYAMLUserDataObject,
@@ -57,6 +56,7 @@ import { isPendingHotPlugNIC } from '@virtualmachines/details/tabs/configuration
 
 import {
   getAutoAttachPodInterface,
+  getBootDisk,
   getBootloader,
   getDisks,
   getNetworks,
@@ -91,6 +91,31 @@ export const checkCPUMemoryChanged = (
   return vmMemory !== vmiMemory || vmCPUSockets !== vmiCPUSockets;
 };
 
+// Helper function to get boot disk from VMI (similar to getBootDisk but for VMI)
+const getVMIBootDisk = (vmi: V1VirtualMachineInstance) => {
+  const vmiDisks = vmi?.spec?.domain?.devices?.disks || [];
+  const vmiVolumes = vmi?.spec?.volumes || [];
+
+  // Check if there's a rootdisk volume (indicates InstanceType VM)
+  const hasRootDiskVolume = vmiVolumes.some((volume) => volume.name === 'rootdisk');
+
+  // Check for disks with explicit bootOrder
+  const disksWithBootOrder = vmiDisks.filter((disk) => disk.bootOrder);
+  if (disksWithBootOrder.length > 0) {
+    return disksWithBootOrder.reduce((acc, disk) => {
+      return acc.bootOrder < disk.bootOrder ? acc : disk;
+    });
+  }
+
+  // For InstanceType VMs with rootdisk, return rootdisk as boot disk
+  if (hasRootDiskVolume) {
+    return { name: 'rootdisk' };
+  }
+
+  // Default to first disk if no explicit bootOrder
+  return vmiDisks[0];
+};
+
 export const checkBootOrderChanged = (
   vm: V1VirtualMachine,
   vmi: V1VirtualMachineInstance,
@@ -99,26 +124,13 @@ export const checkBootOrderChanged = (
     return false;
   }
 
-  const getCleanDisk = (disk: V1Disk) => ({ bootOrder: disk?.bootOrder, name: disk?.name });
-  const sortDisks = (a: V1Disk, b: V1Disk) => (a?.name > b?.name ? 1 : -1);
-  const vmDisks = (vm?.spec?.template?.spec?.domain?.devices?.disks || [])
-    .map(getCleanDisk)
-    .sort(sortDisks);
-  const vmiDisks = (vmi?.spec?.domain?.devices?.disks || []).map(getCleanDisk).sort(sortDisks);
+  // Use the existing getBootDisk() function for VM and helper for VMI
+  const vmBootDisk = getBootDisk(vm);
+  const vmiBootDisk = getVMIBootDisk(vmi);
 
-  const temporaryHotplugVolumeNames = differenceWith(getVMIVolumes(vmi), getVolumes(vm), isEqual)
-    .filter((volume) => volume?.dataVolume || volume?.persistentVolumeClaim)
-    .map((volume) => volume.name);
-
-  const vmiNonHotplugDisks = vmiDisks.filter(
-    (disk) => !temporaryHotplugVolumeNames.includes(disk.name),
-  );
-
-  if (vmDisks?.length !== vmiNonHotplugDisks?.length) return true;
-
-  const hasChanges = vmDisks?.some((val, idx) => !isEqualObject(val, vmiNonHotplugDisks[idx]));
-
-  return hasChanges;
+  // Instead of comparing all bootOrder values,
+  // just compare which disk is actually the boot disk
+  return vmBootDisk?.name !== vmiBootDisk?.name;
 };
 
 export const checkBootModeChanged = (
