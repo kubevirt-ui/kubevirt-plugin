@@ -8,7 +8,6 @@ import {
   V1VirtualMachineInstance,
   V1Volume,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { V1Disk } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   convertYAMLToNetworkDataObject,
   convertYAMLUserDataObject,
@@ -99,26 +98,32 @@ export const checkBootOrderChanged = (
     return false;
   }
 
-  const getCleanDisk = (disk: V1Disk) => ({ bootOrder: disk?.bootOrder, name: disk?.name });
-  const sortDisks = (a: V1Disk, b: V1Disk) => (a?.name > b?.name ? 1 : -1);
-  const vmDisks = (vm?.spec?.template?.spec?.domain?.devices?.disks || [])
-    .map(getCleanDisk)
-    .sort(sortDisks);
-  const vmiDisks = (vmi?.spec?.domain?.devices?.disks || []).map(getCleanDisk).sort(sortDisks);
+  // Get only disks that actually have boot order defined
+  const vmBootableDisks = (vm?.spec?.template?.spec?.domain?.devices?.disks || [])
+    .filter((disk) => disk.bootOrder !== undefined && disk.bootOrder !== null)
+    .map((disk) => ({ bootOrder: disk.bootOrder, name: disk.name }))
+    .sort((a, b) => a.bootOrder - b.bootOrder); // Sort by actual boot order
 
-  const temporaryHotplugVolumeNames = differenceWith(getVMIVolumes(vmi), getVolumes(vm), isEqual)
-    .filter((volume) => volume?.dataVolume || volume?.persistentVolumeClaim)
-    .map((volume) => volume.name);
+  const vmiBootableDisks = (vmi?.spec?.domain?.devices?.disks || [])
+    .filter((disk) => disk.bootOrder !== undefined && disk.bootOrder !== null)
+    .map((disk) => ({ bootOrder: disk.bootOrder, name: disk.name }))
+    .sort((a, b) => a.bootOrder - b.bootOrder); // Sort by actual boot order
 
-  const vmiNonHotplugDisks = vmiDisks.filter(
-    (disk) => !temporaryHotplugVolumeNames.includes(disk.name),
-  );
+  // If no bootable disks in either, no boot order change
+  if (vmBootableDisks.length === 0 && vmiBootableDisks.length === 0) {
+    return false;
+  }
 
-  if (vmDisks?.length !== vmiNonHotplugDisks?.length) return true;
+  // If different number of bootable disks, boot order changed
+  if (vmBootableDisks.length !== vmiBootableDisks.length) {
+    return true;
+  }
 
-  const hasChanges = vmDisks?.some((val, idx) => !isEqualObject(val, vmiNonHotplugDisks[idx]));
-
-  return hasChanges;
+  // Compare boot order of each bootable disk
+  return vmBootableDisks.some((vmDisk, index) => {
+    const vmiDisk = vmiBootableDisks[index];
+    return vmDisk.bootOrder !== vmiDisk.bootOrder || vmDisk.name !== vmiDisk.name;
+  });
 };
 
 export const checkBootModeChanged = (
