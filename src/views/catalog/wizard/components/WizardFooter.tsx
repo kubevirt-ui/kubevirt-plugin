@@ -2,7 +2,6 @@ import React, { FC, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { useWizardSourceAvailable } from '@catalog/utils/useWizardSourceAvailable';
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import {
   RUNSTRATEGY_ALWAYS,
@@ -17,11 +16,11 @@ import {
 import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getName, getResourceUrl } from '@kubevirt-utils/resources/shared';
+import { getName } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
 import { createHeadlessService } from '@kubevirt-utils/utils/headless-service';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import { getCatalogURL } from '@multicluster/urls';
+import { getCatalogURL, getVMURL } from '@multicluster/urls';
 import {
   Alert,
   AlertVariant,
@@ -59,7 +58,7 @@ export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
         if (!isUDNManagedNamespace) createHeadlessService(createdVM);
 
         clearSessionStorageVM();
-        navigate(getResourceUrl({ model: VirtualMachineModel, resource: createdVM }));
+        navigate(getVMURL(cluster, namespace, getName(createdVM)));
       },
     });
 

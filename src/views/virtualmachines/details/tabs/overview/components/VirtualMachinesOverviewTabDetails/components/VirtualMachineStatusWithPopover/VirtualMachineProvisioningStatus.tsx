@@ -1,10 +1,11 @@
 import React, { FC } from 'react';
 import { Link } from 'react-router-dom-v5-compat';
 
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getResourceUrl, getVMStatus } from '@kubevirt-utils/resources/shared';
+import { getName, getNamespace, getVMStatus } from '@kubevirt-utils/resources/shared';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { getVMURL } from '@multicluster/urls';
 import { Content, Popover, PopoverPosition, Progress, ProgressSize } from '@patternfly/react-core';
 
 import useProvisioningPercentage from '../../../../../../../../../utils/resources/vm/hooks/useProvisioningPercentage';
@@ -44,9 +45,7 @@ const VirtualMachineProvisioningStatus: FC<VirtualMachineProvisioningStatusProps
           ))}
           <br />
           <Content component="p">
-            <Link
-              to={`${getResourceUrl({ model: VirtualMachineModel, resource: vm })}/diagnostics`}
-            >
+            <Link to={`${getVMURL(getCluster(vm), getNamespace(vm), getName(vm))}/diagnostics`}>
               {t('View diagnostic')}
             </Link>
           </Content>
