@@ -25,6 +25,7 @@ export const submitButton = 'button[type=submit]';
 export const resourceTitle = '[data-test-id="resource-title"]';
 export const itemCreateBtn = '[data-test="item-create"]';
 export const createBtn = '[data-test="save-changes"]';
+export const saveBtn = '[data-test="save-changes"]';
 export const modalHeader = '.pf-v6-c-modal-box__header';
 export const emptyMsg = '#no-templates-msg';
 export const row = '[data-test-rows="resource-row"]';
@@ -63,7 +64,10 @@ export const vmCount = '.pf-v6-c-menu-toggle__text > b';
 export const kebabBtn = '.pf-v6-c-table__td.pf-v6-c-table__action';
 export const selectDropdownToggle = '[data-ouia-component-id="BulkSelect-toggle"]';
 export const selectAllDropdownOption = '[data-ouia-component-id="BulkSelect-select-all"]';
+export const selectPage = '[aria-label="Select page"]';
+export const projectActionStart = 'selected-vms-action-start';
 export const projectActionStop = 'selected-vms-action-stop';
+export const confirmBtn = 'button.pf-v6-c-button.pf-m-primary';
 
 // VM overview tab
 export const vmStatusOnOverview = '[data-test-id="virtual-machine-overview-details-status"]';
@@ -178,3 +182,8 @@ export const yamlEditor = '.react-monaco-editor-container';
 // Volumes page
 export const addText = 'Add';
 export const mainTable = '.co-m-pane__body.co-m-pane__body--no-top-margin';
+
+// ACM page
+export const closeACMBtn = 'div.pf-v5-c-modal-box__close';
+export const clusterDropdown = '[data-test-id="cluster-dropdown-toggle"]';
+export const itemText = '.pf-v6-c-menu__item-text';
