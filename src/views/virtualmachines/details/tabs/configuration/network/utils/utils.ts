@@ -40,7 +40,7 @@ export const isActiveOnGuest = (
 export const isAbsent = (vm: V1VirtualMachine, nicName: string) =>
   getInterfaces(vm)?.find((iface) => iface?.name === nicName)?.state === ABSENT;
 
-export const isPendingHotPlugNIC = (
+export const isPendingNICAdd = (
   vm: V1VirtualMachine,
   vmi: V1VirtualMachineInstance,
   nicName: string,
@@ -68,7 +68,7 @@ export const isInterfaceEphemeral = (
   return ifaceVMI;
 };
 
-export const isPendingRemoval = (
+export const isPendingNICRemoval = (
   vm: V1VirtualMachine,
   vmi: V1VirtualMachineInstance,
   nicName: string,

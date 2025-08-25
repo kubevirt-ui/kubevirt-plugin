@@ -4,7 +4,7 @@ import {
   V1VirtualMachineInstance,
 } from '@kubevirt-ui/kubevirt-api/kubevirt/models';
 
-import { getChangedNICs, getSortedNICs } from '../utils/helpers';
+import { getChangedNICs } from '../utils/helpers';
 
 type TestData = {
   vm: V1VirtualMachine;
@@ -863,55 +863,162 @@ const removeTypeBridgeAutomigrationBlocked: TestData = {
   },
 };
 
-const getChanges = ({ vm, vmi }: TestData) => getSortedNICs(getChangedNICs(vm, vmi), vm, vmi);
+const removeNewlyAdded: TestData = {
+  vm: {
+    apiVersion: 'kubevirt.io/v1',
+    kind: 'VirtualMachine',
+    metadata: {
+      name: 'test-name',
+      namespace: 'test-namespace',
+    },
+    spec: {
+      template: {
+        spec: {
+          domain: {
+            devices: {
+              autoattachPodInterface: false,
+              interfaces: [
+                {
+                  macAddress: '02:62:1a:d8:e4:08',
+                  masquerade: {},
+                  model: 'virtio',
+                  name: 'default',
+                  state: 'up',
+                },
+                {
+                  bridge: {},
+                  macAddress: '02:62:1a:d8:e4:23',
+                  model: 'virtio',
+                  name: 'nic-yellow-grouse-94',
+                  state: 'absent',
+                },
+              ],
+            },
+          },
+          networks: [
+            {
+              name: 'default',
+              pod: {},
+            },
+            {
+              multus: {
+                networkName: 'default/nad-aesthetic-orangutan',
+              },
+              name: 'nic-yellow-grouse-94',
+            },
+          ],
+        },
+      },
+    },
+    status: {
+      conditions: [
+        {
+          reason: 'AutoMigrationDueToLiveUpdate',
+          status: 'True',
+          type: 'MigrationRequired',
+        },
+      ],
+      printableStatus: 'Running',
+    },
+  },
+  vmi: {
+    apiVersion: 'kubevirt.io/v1',
+    kind: 'VirtualMachineInstance',
+    metadata: {
+      name: 'test-name',
+      namespace: 'test-namespace',
+    },
+    spec: {
+      domain: {
+        devices: {
+          autoattachPodInterface: false,
+          interfaces: [
+            {
+              macAddress: '02:62:1a:d8:e4:08',
+              masquerade: {},
+              model: 'virtio',
+              name: 'default',
+              state: 'up',
+            },
+            {
+              bridge: {},
+              macAddress: '02:62:1a:d8:e4:23',
+              model: 'virtio',
+              name: 'nic-yellow-grouse-94',
+              state: 'up',
+            },
+          ],
+        },
+      },
+      networks: [
+        {
+          name: 'default',
+          pod: {},
+        },
+        {
+          multus: {
+            networkName: 'default/nad-aesthetic-orangutan',
+          },
+          name: 'nic-yellow-grouse-94',
+        },
+      ],
+    },
+    status: {
+      conditions: [
+        {
+          reason: 'AutoMigrationDueToLiveUpdate',
+          status: 'True',
+          type: 'MigrationRequired',
+        },
+      ],
+      interfaces: [
+        {
+          infoSource: 'domain, guest-agent',
+          interfaceName: 'eth0',
+          ipAddress: '10.128.2.237',
+          ipAddresses: ['10.128.2.237', 'fe80::62:1aff:fed8:e408'],
+          linkState: 'up',
+          mac: '02:62:1a:d8:e4:08',
+          name: 'default',
+          podInterfaceName: 'eth0',
+          queueCount: 1,
+        },
+      ],
+    },
+  },
+};
+
+const getChanges = ({ vm, vmi }: TestData) => getChangedNICs(vm, vmi);
 
 describe('NIC updates on a running VM', () => {
   test('update binding from l2bridge to passt', () => {
-    const { hotPlugNICs, nonHotPlugNICs } = getChanges(enablePasst);
-    expect(hotPlugNICs).toEqual([]);
-    expect(nonHotPlugNICs).toEqual(['default']);
+    expect(getChanges(enablePasst)).toEqual(['default']);
   });
   test('update model from virtio to e1000e', () => {
-    const { hotPlugNICs, nonHotPlugNICs } = getChanges(updateModel);
-    expect(hotPlugNICs).toEqual([]);
-    // FIXME: no indication but RestartRequired
-    expect(nonHotPlugNICs).toEqual([]);
+    expect(getChanges(updateModel)).toEqual(['nic-coffee-xerinae-51']);
   });
   test('update NAD for e1000e', () => {
-    const { hotPlugNICs, nonHotPlugNICs } = getChanges(updateNetwork_e1000e);
-    expect(hotPlugNICs).toEqual(['nic-coffee-xerinae-51']);
-    // FIXME: "live migrated or restarted" but RestartRequired
-    expect(nonHotPlugNICs).toEqual([]);
+    expect(getChanges(updateNetwork_e1000e)).toEqual(['nic-coffee-xerinae-51']);
   });
   test('update NAD for virtio', () => {
-    const { hotPlugNICs, nonHotPlugNICs } = getChanges(updateNetwork_virtio);
-    expect(hotPlugNICs).toEqual(['nic-lavender-kite-80']);
-    // FIXME: "live migrated or restarted" but RestartRequired
-    expect(nonHotPlugNICs).toEqual([]);
+    expect(getChanges(updateNetwork_virtio)).toEqual(['nic-lavender-kite-80']);
   });
 });
 
 describe('NIC removal on a running VM', () => {
   test('removing NIC by deleting from VM spec(type bridge)', () => {
-    const { hotPlugNICs, nonHotPlugNICs } = getChanges(removeByDeleteTypeBridge);
-    expect(hotPlugNICs).toEqual(['nic-lavender-kite-80']);
-    // FIXME: "live migrated or restarted" but RestartRequired
-    // FIXME: the UI triggered this bug by incorrectly deleting NIC (not setting "absent")
-    expect(nonHotPlugNICs).toEqual([]);
+    expect(getChanges(removeByDeleteTypeBridge)).toEqual(['nic-lavender-kite-80']);
   });
   test('removing NIC (type bridge) but blocked', () => {
-    const { hotPlugNICs, nonHotPlugNICs } = getChanges(removeTypeBridgeAutomigrationBlocked);
-    //FIXME: "live migrated or restarted" but 'Synchronizing with the Domain failed.'
-    expect(hotPlugNICs).toEqual(['nic-maroon-frog-98']);
-    expect(nonHotPlugNICs).toEqual([]);
+    expect(getChanges(removeTypeBridgeAutomigrationBlocked)).toEqual(['nic-maroon-frog-98']);
+  });
+  test('removing newly added NIC', () => {
+    expect(getChanges(removeNewlyAdded)).toEqual(['nic-yellow-grouse-94']);
   });
 });
 
 describe('NIC add on a running VM', () => {
   test('adding NIC type bridge but waiting for automigration', () => {
-    const { hotPlugNICs, nonHotPlugNICs } = getChanges(addTypeBridgeWaitingForAutomigration);
-    //FIXME: "live migrated or restarted" but AutoMigrationDueToLiveUpdate
-    expect(hotPlugNICs).toEqual(['nic-maroon-frog-98']);
-    expect(nonHotPlugNICs).toEqual([]);
+    expect(getChanges(addTypeBridgeWaitingForAutomigration)).toEqual(['nic-maroon-frog-98']);
   });
 });

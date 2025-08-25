@@ -15,6 +15,7 @@ import {
   getCloudInitData,
   getCloudInitVolume,
 } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
+import { InterfaceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import { RESTART_REQUIRED } from '@kubevirt-utils/components/PendingChanges/utils/constants';
 import {
@@ -38,9 +39,8 @@ import {
   getTolerations,
   getVolumes,
 } from '@kubevirt-utils/resources/vm';
-import { DEFAULT_NETWORK_INTERFACE } from '@kubevirt-utils/resources/vm/utils/constants';
-import { interfaceTypesProxy } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { getNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
+import { getInterfacesAndNetworks } from '@kubevirt-utils/resources/vm/utils/network/utils';
 import {
   DESCHEDULER_EVICT_LABEL,
   getEvictionStrategy as getVMIEvictionStrategy,
@@ -53,10 +53,13 @@ import {
   getVMIVolumes,
 } from '@kubevirt-utils/resources/vmi/utils/selectors';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { isPendingHotPlugNIC } from '@virtualmachines/details/tabs/configuration/network/utils/utils';
+import {
+  isInterfaceEphemeral,
+  isPendingNICAdd,
+  isPendingNICRemoval,
+} from '@virtualmachines/details/tabs/configuration/network/utils/utils';
 
 import {
-  getAutoAttachPodInterface,
   getBootloader,
   getDisks,
   getNetworks,
@@ -173,44 +176,36 @@ export const getInterfaceByName = (
   getVMIInterfaces(vmi)?.find((iface) => iface?.name === name);
 
 export const getChangedNICs = (vm: V1VirtualMachine, vmi: V1VirtualMachineInstance): string[] => {
-  if (isEmpty(vm) || isEmpty(vmi)) {
-    return [];
-  }
-  const vmInterfaces = getInterfaces(vm);
-  const vmiInterfaces = getVMIInterfaces(vmi);
-  const vmNICsNames = vmInterfaces?.map((nic) => nic?.name) || [];
-  const vmiNICsNames = vmiInterfaces?.map((nic) => nic?.name) || [];
+  const realNICs = getInterfacesAndNetworks(vm, vmi).filter(
+    (state) => !isInterfaceEphemeral(state.runtime?.network, state.runtime?.status),
+  );
+  const pending = realNICs
+    .map((state) => state?.runtime?.network?.name ?? state?.config?.network?.name)
+    .filter(Boolean)
+    .filter(
+      (networkName) =>
+        isPendingNICAdd(vm, vmi, networkName) || isPendingNICRemoval(vm, vmi, networkName),
+    );
+  const updated = realNICs
+    // NIC must exist in both VM and VMI in a valid update scenario
+    // this handles also autoattachPodInterface = true (no config in the VM)
+    .filter((state) => state.config && state?.runtime?.network)
+    // add/removal are handled separately
+    .filter((state) => !pending.includes(state.runtime?.network?.name))
+    .filter(
+      (state) =>
+        // NAD changed
+        state.config.network?.multus?.networkName !== state.runtime.network?.multus?.networkName ||
+        // type change covers binding change (l2bridge <-> passt)
+        getNetworkInterfaceType(state.config.iface) !==
+          getNetworkInterfaceType(state.runtime.iface) ||
+        // model change (virtio <-> e1000e)
+        (state.config.iface?.model ?? InterfaceTypes.VIRTIO) !==
+          (state.runtime.iface?.model ?? InterfaceTypes.VIRTIO),
+    )
+    .map((state) => state.runtime?.network?.name);
 
-  const autoAttachPodInterface = getAutoAttachPodInterface(vm) !== false;
-  if (
-    autoAttachPodInterface &&
-    vmiInterfaces?.find((nic) => nic.name === DEFAULT_NETWORK_INTERFACE.name) &&
-    !vmNICsNames.includes(DEFAULT_NETWORK_INTERFACE.name)
-  ) {
-    vmNICsNames.push(DEFAULT_NETWORK_INTERFACE.name);
-  }
-
-  const unchangedNICs =
-    vmInterfaces
-      ?.filter((vmNic) =>
-        vmiInterfaces?.some(
-          (vmiNic) =>
-            vmNic.name === vmiNic.name &&
-            interfaceTypesProxy[getNetworkInterfaceType(vmNic)] ===
-              interfaceTypesProxy[getNetworkInterfaceType(vmiNic)],
-        ),
-      )
-      ?.map((nic) => nic?.name) || [];
-
-  const changedNICs = [
-    ...(vmNICsNames?.filter((nic) => !unchangedNICs?.includes(nic)) || []),
-    ...(vmiNICsNames?.filter((nic) => !unchangedNICs?.includes(nic)) || []),
-    ...(unchangedNICs?.filter((nic) => isPendingHotPlugNIC(vm, vmi, nic)) || []),
-
-    ...(getChangedNADsInterfaces(vm, vmi) || []),
-  ];
-
-  return Array.from(new Set(changedNICs));
+  return Array.from(new Set([...pending, ...updated]));
 };
 
 export const getChangedNADsInterfaces = (
@@ -229,29 +224,6 @@ export const getChangedNADsInterfaces = (
     return acc;
   }, []);
 };
-
-const isHotPlugNIC = (
-  nicName: string,
-  vm: V1VirtualMachine,
-  vmi: V1VirtualMachineInstance,
-): boolean => {
-  const iface = getInterfaceByName(nicName, vm, vmi);
-  return Boolean(iface?.bridge || iface?.sriov);
-};
-
-export const getSortedNICs = (
-  changedNICs: string[],
-  vm: V1VirtualMachine,
-  vmi: V1VirtualMachineInstance,
-): { hotPlugNICs: string[]; nonHotPlugNICs: string[] } =>
-  changedNICs?.reduce(
-    (acc, nicName) => {
-      const isHotPlug = isHotPlugNIC(nicName, vm, vmi);
-      isHotPlug ? acc.hotPlugNICs.push(nicName) : acc.nonHotPlugNICs.push(nicName);
-      return acc;
-    },
-    { hotPlugNICs: [], nonHotPlugNICs: [] },
-  );
 
 export const getChangedGPUDevices = (
   vm: V1VirtualMachine,

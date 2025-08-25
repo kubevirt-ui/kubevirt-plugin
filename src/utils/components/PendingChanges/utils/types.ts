@@ -1,7 +1,6 @@
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 
 export type PendingChange = {
-  appliedOnLiveMigration?: boolean;
   handleAction: () => void;
   hasPendingChange: boolean;
   label: string;
