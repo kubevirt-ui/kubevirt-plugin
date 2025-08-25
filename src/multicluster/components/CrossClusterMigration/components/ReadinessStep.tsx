@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 import { Updater } from 'use-immer';
 
 import { V1beta1NetworkMap, V1beta1Plan, V1beta1StorageMap } from '@kubev2v/types';
@@ -6,7 +6,7 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
 import { modelToGroupVersionKind } from '@kubevirt-utils/models';
-import { getNamespace } from '@kubevirt-utils/resources/shared';
+import { getNamespace, getUID } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
@@ -34,6 +34,7 @@ const ReadinessStep: FC<ReadinessStepProps> = ({
 }) => {
   const namespace = getNamespace(vms?.[0]);
   const cluster = getCluster(vms?.[0]);
+  const uids = useMemo(() => vms?.map((vm) => getUID(vm)) || [], [vms]);
 
   const [fetchedVMs, fetchedVMsLoaded, fetchedVMsError] = useK8sWatchData<V1VirtualMachine[]>({
     cluster,
@@ -41,6 +42,11 @@ const ReadinessStep: FC<ReadinessStepProps> = ({
     isList: true,
     namespace,
   });
+
+  const selectedFetchedVMs = useMemo(
+    () => fetchedVMs?.filter((vm) => uids.includes(getUID(vm))),
+    [uids, fetchedVMs],
+  );
 
   return (
     <StateHandler error={fetchedVMsError} hasData={!isEmpty(fetchedVMs)} loaded={fetchedVMsLoaded}>
@@ -51,7 +57,7 @@ const ReadinessStep: FC<ReadinessStepProps> = ({
         setNetworkMap={setNetworkMap}
         setStorageMap={setStorageMap}
         storageMap={storageMap}
-        vms={fetchedVMs}
+        vms={selectedFetchedVMs}
       />
     </StateHandler>
   );
