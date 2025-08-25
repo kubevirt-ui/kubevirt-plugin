@@ -56,7 +56,7 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
   useEffect(() => {
     const newSelectOptions: SelectOptionProps[] = filterValue
       ? (initialOptions || [])?.filter((menuItem) =>
-          String(menuItem.children).toLowerCase().includes(filterValue.toLowerCase()),
+          String(menuItem.value).toLowerCase().includes(filterValue.toLowerCase()),
         )
       : initialOptions || [];
 
