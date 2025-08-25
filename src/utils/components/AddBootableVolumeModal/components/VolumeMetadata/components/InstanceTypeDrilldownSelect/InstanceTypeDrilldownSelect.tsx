@@ -92,7 +92,7 @@ export const InstanceTypeDrilldownSelect: FC<InstanceTypeMenuItemsProps> = ({
           <RedHatInstanceTypeSeriesMenu
             selected={selectedInstanceType}
             selectedKind={selectedInstanceTypeKind}
-            series={menuItems.redHatProvided.items}
+            seriesList={menuItems.redHatProvided.items}
             setSelected={(value) => onSelect(VirtualMachineClusterInstancetypeModel.kind, value)}
           />
         </DrilldownMenuItem>
