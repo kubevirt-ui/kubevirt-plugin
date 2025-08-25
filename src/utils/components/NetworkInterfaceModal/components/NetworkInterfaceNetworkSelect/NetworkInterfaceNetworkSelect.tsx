@@ -1,12 +1,4 @@
-import React, {
-  Dispatch,
-  FC,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-} from 'react';
+import React, { Dispatch, FC, SetStateAction, useCallback, useEffect, useMemo } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
@@ -22,6 +14,7 @@ import { getNadType, networkNameStartWithPod, podNetworkExists } from '../../uti
 import useNADsData from '../hooks/useNADsData';
 
 import NetworkSelectHelperPopover from './components/NetworkSelectHelperPopover/NetworkSelectHelperPopover';
+import { getCreateNetworkOption } from './utils';
 
 type NetworkInterfaceNetworkSelectProps = {
   editInitValueNetworkName?: string | undefined;
@@ -59,8 +52,6 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
       (nad) =>
         getNamespace(nad) !== vmiNamespace || !currentlyUsedNADsNames?.includes(getName(nad)),
     );
-
-  const selectedFirstOnLoad = useRef(false);
 
   const hasPodNetwork = useMemo(() => podNetworkExists(vm), [vm]);
   const hasNads = useMemo(() => filteredNADs?.length > 0, [filteredNADs]);
@@ -130,14 +121,6 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
       return;
     }
 
-    // if networkName is empty, and pod network exists we can create a NIC with existing NAD if there is one
-    if (loaded && !loadError && !selectedFirstOnLoad.current) {
-      handleChange(networkOptions?.[0]?.value);
-      selectedFirstOnLoad.current = true;
-
-      return;
-    }
-
     // if no nads and pod network already exists, we can't create a NIC
     if (loaded && (loadError || !canCreateNetworkInterface)) {
       setSubmitDisabled(true);
@@ -166,16 +149,12 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
           <Loading />
         ) : (
           <SelectTypeahead
-            getCreateOption={(inputValue) => (
-              <>
-                {t(`Use "{{inputValue}}"`, { inputValue })}{' '}
-                <Label isCompact>{interfaceTypesProxy.bridge} Binding</Label>
-              </>
-            )}
+            canCreate
             dataTestId="select-nad"
+            getCreateOption={getCreateNetworkOption}
             initialOptions={networkOptions}
             isFullWidth
-            placeholder={t('Select a NetworkAttachmentDefinitions')}
+            placeholder={t('Select a NetworkAttachmentDefinition')}
             selected={networkName}
             setSelected={handleChange}
           />
