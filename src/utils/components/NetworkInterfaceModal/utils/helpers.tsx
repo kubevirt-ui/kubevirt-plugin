@@ -11,11 +11,7 @@ import {
   getInterfaces,
   getNetworks,
 } from '@kubevirt-utils/resources/vm';
-import {
-  BRIDGE,
-  PASST_BINDING_NAME,
-  UDN_BINDING_NAME,
-} from '@kubevirt-utils/resources/vm/utils/constants';
+import { PASST_BINDING_NAME, UDN_BINDING_NAME } from '@kubevirt-utils/resources/vm/utils/constants';
 import {
   interfaceLabelsProxy,
   interfaceTypesProxy,
@@ -144,8 +140,8 @@ export const createInterface = ({
   nicName,
 }: CreateInterfaceOptions): V1Interface => {
   const resolvedInterfaceProp = interfaceLabelsProxy[interfaceType];
-  const validInterfaceProp: keyof V1Interface =
-    resolvedInterfaceProp === UDN_BINDING_NAME ? BRIDGE : resolvedInterfaceProp;
+  const isBinding =
+    resolvedInterfaceProp === UDN_BINDING_NAME || resolvedInterfaceProp === PASST_BINDING_NAME;
 
   const createdInterface: V1Interface = {
     macAddress: interfaceMACAddress,
@@ -153,12 +149,11 @@ export const createInterface = ({
     name: nicName,
   };
 
-  if (resolvedInterfaceProp !== PASST_BINDING_NAME) {
-    createdInterface.state = interfaceLinkState;
-    createdInterface[validInterfaceProp] = {};
+  if (isBinding) {
+    createdInterface.binding = { name: resolvedInterfaceProp };
   } else {
-    createdInterface.binding = { name: PASST_BINDING_NAME };
-    return createdInterface;
+    createdInterface.state = interfaceLinkState;
+    createdInterface[resolvedInterfaceProp] = {};
   }
 
   return createdInterface;
