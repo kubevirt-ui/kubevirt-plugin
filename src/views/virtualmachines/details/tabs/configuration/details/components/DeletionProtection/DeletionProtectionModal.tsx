@@ -19,7 +19,7 @@ type DeletionProtectionModalProps = {
   deletionProtectionOption: VMDeletionProtectionOptions;
   isOpen: boolean;
   onCancel: () => void;
-  onClose: (enableDeletionProtection?: boolean) => void;
+  onConfirm: (enableDeletionProtection?: boolean) => void;
   vm: V1VirtualMachine;
 };
 
@@ -27,7 +27,7 @@ const DeletionProtectionModal: FC<DeletionProtectionModalProps> = ({
   deletionProtectionOption,
   isOpen,
   onCancel,
-  onClose,
+  onConfirm,
   vm,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -36,7 +36,7 @@ const DeletionProtectionModal: FC<DeletionProtectionModalProps> = ({
   const vmNamespace = getNamespace(vm);
 
   const submitHandler = () => {
-    onClose(enableDeletionProtection);
+    onConfirm(enableDeletionProtection);
   };
 
   return (

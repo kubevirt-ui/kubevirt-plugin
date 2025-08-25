@@ -264,7 +264,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
                             ? VMDeletionProtectionOptions.ENABLE
                             : VMDeletionProtectionOptions.DISABLE
                         }
-                        onClose={(enableDeletionProtection) => {
+                        onConfirm={(enableDeletionProtection) => {
                           setDeletionProtectionForVM(vm, enableDeletionProtection);
                           onClose();
                         }}

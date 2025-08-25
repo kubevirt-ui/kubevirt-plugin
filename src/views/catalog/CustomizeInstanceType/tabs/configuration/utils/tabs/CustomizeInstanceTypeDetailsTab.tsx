@@ -219,7 +219,7 @@ const CustomizeInstanceTypeDetailsTab = () => {
                             ? VMDeletionProtectionOptions.ENABLE
                             : VMDeletionProtectionOptions.DISABLE
                         }
-                        onClose={(enableDeletionProtection) => {
+                        onConfirm={(enableDeletionProtection) => {
                           updateCustomizeInstanceType([
                             {
                               data: enableDeletionProtection ? 'true' : 'false',
