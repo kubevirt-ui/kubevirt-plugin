@@ -14,18 +14,19 @@ import {
   ModalVariant,
 } from '@patternfly/react-core';
 import { VMDeletionProtectionOptions } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/types';
-import { setDeletionProtectionForVM } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
 
 type DeletionProtectionModalProps = {
   deletionProtectionOption: VMDeletionProtectionOptions;
   isOpen: boolean;
-  onClose: () => void;
+  onCancel: () => void;
+  onClose: (enableDeletionProtection?: boolean) => void;
   vm: V1VirtualMachine;
 };
 
 const DeletionProtectionModal: FC<DeletionProtectionModalProps> = ({
   deletionProtectionOption,
   isOpen,
+  onCancel,
   onClose,
   vm,
 }) => {
@@ -35,15 +36,14 @@ const DeletionProtectionModal: FC<DeletionProtectionModalProps> = ({
   const vmNamespace = getNamespace(vm);
 
   const submitHandler = () => {
-    setDeletionProtectionForVM(vm, enableDeletionProtection);
-    onClose();
+    onClose(enableDeletionProtection);
   };
 
   return (
     <Modal
       className="deletion-protection-modal"
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={onCancel}
       onSubmit={submitHandler}
       variant={ModalVariant.medium}
     >
@@ -92,7 +92,13 @@ const DeletionProtectionModal: FC<DeletionProtectionModalProps> = ({
         <Button key="confirm" onClick={submitHandler}>
           {enableDeletionProtection ? t('Enable') : t('Disable')}
         </Button>
-        <Button key="cancel" onClick={onClose} variant={ButtonVariant.link}>
+        <Button
+          onClick={() => {
+            onCancel();
+          }}
+          key="cancel"
+          variant={ButtonVariant.link}
+        >
           {t('Cancel')}
         </Button>
       </ModalFooter>
