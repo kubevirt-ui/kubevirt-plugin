@@ -11,6 +11,7 @@ import { FormGroup, SelectOption } from '@patternfly/react-core';
 import { InterfaceTypes, V1DiskFormState } from '../../utils/types';
 
 import { diskInterfaceOptions } from './utils/constants';
+import { getInterfaceTypeHelperText } from './utils/util';
 
 type DiskInterfaceSelectProps = {
   isVMRunning: boolean;
@@ -26,6 +27,9 @@ const DiskInterfaceSelect: FC<DiskInterfaceSelectProps> = ({ isVMRunning }) => {
   const diskInterface = disk?.[diskType]?.bus || InterfaceTypes.VIRTIO;
 
   const selectedLabel = diskInterfaceOptions?.[diskInterface]?.label;
+
+  const userHelpText = getInterfaceTypeHelperText(disk, isVMRunning);
+
   return (
     <FormGroup fieldId="disk-interface" isRequired label={t('Interface')}>
       <div data-test-id="disk-interface-select">
@@ -38,6 +42,7 @@ const DiskInterfaceSelect: FC<DiskInterfaceSelectProps> = ({ isVMRunning }) => {
           {Object.entries(diskInterfaceOptions).map(([id, { description, label }]) => {
             const isDisabled =
               (diskType === diskTypes.cdrom && id === InterfaceTypes.VIRTIO) ||
+              (diskType === diskTypes.lun && id !== InterfaceTypes.SCSI) ||
               (isVMRunning && id === InterfaceTypes.SATA);
             return (
               <SelectOption
@@ -52,9 +57,7 @@ const DiskInterfaceSelect: FC<DiskInterfaceSelectProps> = ({ isVMRunning }) => {
             );
           })}
         </FormPFSelect>
-        <FormGroupHelperText>
-          {t('Hot plug is enabled only for SCSI and VirtIO interface')}
-        </FormGroupHelperText>
+        <FormGroupHelperText>{userHelpText}</FormGroupHelperText>
       </div>
     </FormGroup>
   );
