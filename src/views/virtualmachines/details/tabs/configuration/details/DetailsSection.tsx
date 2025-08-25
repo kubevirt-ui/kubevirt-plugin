@@ -39,7 +39,10 @@ import { DescriptionList, Grid, GridItem, Switch, Title } from '@patternfly/reac
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 import DeletionProtectionModal from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/DeletionProtectionModal';
 import { VMDeletionProtectionOptions } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/types';
-import { isDeletionProtectionEnabled } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
+import {
+  isDeletionProtectionEnabled,
+  setDeletionProtectionForVM,
+} from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
 
 import DetailsSectionBoot from './components/DetailsSectionBoot';
 import DetailsSectionHardware from './components/DetailsSectionHardware';
@@ -254,23 +257,22 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
               descriptionData={
                 <Switch
                   onChange={(_event, checked) =>
-                    createModal(({ isOpen, onClose }) =>
-                      checked ? (
-                        <DeletionProtectionModal
-                          deletionProtectionOption={VMDeletionProtectionOptions.ENABLE}
-                          isOpen={isOpen}
-                          onClose={onClose}
-                          vm={vm}
-                        />
-                      ) : (
-                        <DeletionProtectionModal
-                          deletionProtectionOption={VMDeletionProtectionOptions.DISABLE}
-                          isOpen={isOpen}
-                          onClose={onClose}
-                          vm={vm}
-                        />
-                      ),
-                    )
+                    createModal(({ isOpen, onClose }) => (
+                      <DeletionProtectionModal
+                        deletionProtectionOption={
+                          checked
+                            ? VMDeletionProtectionOptions.ENABLE
+                            : VMDeletionProtectionOptions.DISABLE
+                        }
+                        onConfirm={(enableDeletionProtection) => {
+                          setDeletionProtectionForVM(vm, enableDeletionProtection);
+                          onClose();
+                        }}
+                        isOpen={isOpen}
+                        onCancel={onClose}
+                        vm={vm}
+                      />
+                    ))
                   }
                   id="deletion-protection"
                   isChecked={deletionProtectionEnabled}
