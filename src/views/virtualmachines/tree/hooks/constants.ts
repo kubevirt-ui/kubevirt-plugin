@@ -16,3 +16,5 @@ export const DROP_EFFECTS = {
 };
 
 export const REMOVE_DRAG_BACKGROUND_COLOR = 'unset';
+
+export const ALL_NAMESPACES_PATH = '/all-namespaces/';
