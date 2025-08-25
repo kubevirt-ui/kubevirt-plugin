@@ -13,7 +13,7 @@ import { FilterValue, K8sResourceCommon } from '@openshift-console/dynamic-plugi
 import { k8sBasePath } from '@openshift-console/dynamic-plugin-sdk/lib/utils/k8s/k8s';
 import { SortByDirection } from '@patternfly/react-table';
 
-import { ItemsToFilterProps } from './types';
+import { IPAddress, ItemsToFilterProps } from './types';
 
 export const kubevirtConsole = console;
 
@@ -212,3 +212,16 @@ export const sortByDirection = (
 
 export const compareWithDirection = (direction: SortByDirection, a: any, b: any) =>
   sortByDirection(universalComparator, direction)(a, b);
+
+export const ipv6Regex =
+  /^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^::1$|^::$|^(?:[0-9a-fA-F]{1,4}:)*::(?:[0-9a-fA-F]{1,4}:)*[0-9a-fA-F]{1,4}$|^(?:[0-9a-fA-F]{1,4}:)*::[0-9a-fA-F]{1,4}$|^[0-9a-fA-F]{1,4}::(?:[0-9a-fA-F]{1,4}:)*[0-9a-fA-F]{1,4}$/;
+
+export const isIPv6 = (ip: string): boolean => {
+  ip = ip.trim();
+  return ipv6Regex.test(ip);
+};
+
+export const removeIPV6 = (ipAddress: IPAddress[]) => {
+  const ipAddressWithoutIPv6 = ipAddress.filter((item) => !isIPv6(item.ip));
+  return ipAddressWithoutIPv6;
+};
