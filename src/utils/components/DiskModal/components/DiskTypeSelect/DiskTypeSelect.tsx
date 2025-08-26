@@ -14,6 +14,7 @@ import { FormGroup, SelectList, SelectOption } from '@patternfly/react-core';
 
 import { getSourceFromVolume } from '../../utils/helpers';
 import { InterfaceTypes, SourceTypes, V1DiskFormState } from '../../utils/types';
+import { getDiskTypeHelperText } from '../DiskInterfaceSelect/utils/util';
 import { DISKTYPE_SELECT_FIELDID } from '../utils/constants';
 
 type DiskTypeSelectProps = {
@@ -32,9 +33,14 @@ const DiskTypeSelect: FC<DiskTypeSelectProps> = ({ isVMRunning }) => {
   const isCDROM = diskType === diskTypes.cdrom;
 
   const diskSource = getSourceFromVolume(diskState.volume, diskState.dataVolumeTemplate);
-  const shouldDisableCDROM = isVMRunning && diskSource !== SourceTypes.CDROM && !isCDROM;
+
+  const shouldDisableOption = (optionType: DiskType): boolean => {
+    return optionType === diskTypes.cdrom && isVMRunning && diskSource !== SourceTypes.CDROM;
+  };
 
   const diskInterface = diskState.disk?.[diskType]?.bus || InterfaceTypes.VIRTIO;
+
+  const userHelpText = getDiskTypeHelperText(diskState.disk, isVMRunning);
 
   return (
     <div data-test-id={DISKTYPE_SELECT_FIELDID}>
@@ -45,9 +51,10 @@ const DiskTypeSelect: FC<DiskTypeSelectProps> = ({ isVMRunning }) => {
             setValue('disk.lun', null);
             setValue('disk.disk', null);
 
-            // cdrom does not support virtio
+            //cd-rom doesn't support virtio and LUN only supports SCSI
             const newDiskInterface =
-              val === diskTypes.cdrom && diskInterface === InterfaceTypes.VIRTIO
+              (val === diskTypes.cdrom && diskInterface === InterfaceTypes.VIRTIO) ||
+              (val === diskTypes.lun && diskInterface !== InterfaceTypes.SCSI)
                 ? InterfaceTypes.SCSI
                 : diskInterface;
 
@@ -62,7 +69,7 @@ const DiskTypeSelect: FC<DiskTypeSelectProps> = ({ isVMRunning }) => {
             {Object.values(diskTypes).map((type) => (
               <SelectOption
                 data-test-id={`${DISKTYPE_SELECT_FIELDID}-${type}`}
-                isDisabled={shouldDisableCDROM}
+                isDisabled={shouldDisableOption(type)}
                 key={type}
                 value={type}
               >
@@ -71,11 +78,7 @@ const DiskTypeSelect: FC<DiskTypeSelectProps> = ({ isVMRunning }) => {
             ))}
           </SelectList>
         </FormPFSelect>
-        <FormGroupHelperText>
-          {isCDROM
-            ? t('CD-ROM type is automatically set and cannot be changed')
-            : t('Hot plug is enabled only for Disk and Lun types')}
-        </FormGroupHelperText>
+        <FormGroupHelperText>{userHelpText}</FormGroupHelperText>
       </FormGroup>
     </div>
   );
