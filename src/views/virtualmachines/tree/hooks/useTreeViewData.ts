@@ -14,6 +14,7 @@ import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
+import { getName } from '@kubevirt-utils/resources/shared';
 import useMulticlusterNamespaces from '@multicluster/hooks/useMulticlusterProjects';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
@@ -107,15 +108,14 @@ export const useTreeViewData = (): UseTreeViewData => {
 
   vmimMapperSignal.value = memoizedVMIMs;
 
-  const memoizedVMs = useMemo(
-    () =>
-      loadVMsPerNamespace
-        ? Object.values(allowedResources).flatMap((resource) => resource.data)
-        : allVMs,
-    [allVMs, allowedResources, loadVMsPerNamespace],
-  );
+  const sortedMemoizedVMs = useMemo(() => {
+    const vms = loadVMsPerNamespace
+      ? Object.values(allowedResources).flatMap((resource) => resource.data)
+      : allVMs;
+    return vms.sort((a, b) => getName(a).localeCompare(getName(b)));
+  }, [allVMs, allowedResources, loadVMsPerNamespace]);
 
-  vmsSignal.value = memoizedVMs;
+  vmsSignal.value = sortedMemoizedVMs;
 
   const projectsLoaded = isACMTreeView ? multiclusterNamespacesLoaded : projectNamesLoaded;
 
@@ -130,7 +130,7 @@ export const useTreeViewData = (): UseTreeViewData => {
 
     if (isACMTreeView) {
       return createMultiClusterTreeViewData(
-        memoizedVMs,
+        sortedMemoizedVMs,
         location.pathname,
         treeViewFoldersEnabled,
         namespacesByCluster,
@@ -141,7 +141,7 @@ export const useTreeViewData = (): UseTreeViewData => {
 
     return createSingleClusterTreeViewData(
       projectNames,
-      memoizedVMs,
+      sortedMemoizedVMs,
       isAdmin,
       location.pathname,
       treeViewFoldersEnabled,
@@ -151,7 +151,7 @@ export const useTreeViewData = (): UseTreeViewData => {
     loaded,
     isACMTreeView,
     projectNames,
-    memoizedVMs,
+    sortedMemoizedVMs,
     isAdmin,
     location.pathname,
     treeViewFoldersEnabled,
