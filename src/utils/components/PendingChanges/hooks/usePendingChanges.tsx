@@ -37,6 +37,7 @@ import { DESCHEDULER_EVICT_LABEL } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sUpdate, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { updatedInstanceType } from '@virtualmachines/details/tabs/configuration/details/utils/utils';
+import { isRunning } from '@virtualmachines/utils';
 
 import {
   checkBootModeChanged,
@@ -60,7 +61,6 @@ import {
   getChangedStartStrategy,
   getChangedTolerations,
   getChangedVolumesHotplug,
-  getSortedNICs,
   getTabURL,
   restartRequired,
 } from '../utils/helpers';
@@ -82,6 +82,10 @@ export const usePendingChanges = (
     groupVersionKind: modelToGroupVersionKind(NodeModel),
     isList: true,
   });
+
+  if (!vmi || !isRunning(vm)) {
+    return [];
+  }
 
   const instanceTypeChanged = checkInstanceTypeChanged(vm, vmi);
   const cpuMemoryChanged = checkCPUMemoryChanged(vm, vmi);
@@ -116,8 +120,6 @@ export const usePendingChanges = (
 
   const modifiedEnvDisks = getChangedEnvDisks(vm, vmi);
   const modifiedNICs = getChangedNICs(vm, vmi);
-
-  const { hotPlugNICs, nonHotPlugNICs } = getSortedNICs(modifiedNICs, vm, vmi);
 
   const modifiedGPUDevices = getChangedGPUDevices(vm, vmi);
   const modifiedHostDevices = getChangedHostDevices(vm, vmi);
@@ -210,14 +212,8 @@ export const usePendingChanges = (
     },
     {
       ...createProps(VirtualMachineDetailsTab.Network),
-      appliedOnLiveMigration: true,
-      hasPendingChange: !isEmpty(hotPlugNICs),
-      label: hotPlugNICs?.length > 1 ? hotPlugNICs.join(', ') : hotPlugNICs[0],
-    },
-    {
-      ...createProps(VirtualMachineDetailsTab.Network),
-      hasPendingChange: !isEmpty(nonHotPlugNICs),
-      label: nonHotPlugNICs?.length > 1 ? nonHotPlugNICs.join(', ') : nonHotPlugNICs[0],
+      hasPendingChange: !isEmpty(modifiedNICs),
+      label: modifiedNICs.join(', '),
     },
     {
       ...createProps(VirtualMachineDetailsTab.Details, () =>

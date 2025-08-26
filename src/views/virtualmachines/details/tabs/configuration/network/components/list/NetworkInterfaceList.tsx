@@ -16,8 +16,8 @@ import useNetworkRowFilters from '../../hooks/useNetworkRowFilters';
 import { SimpleNICPresentation } from '../../utils/types';
 import {
   isInterfaceEphemeral,
-  isPendingHotPlugNIC,
-  isPendingRemoval,
+  isPendingNICAdd,
+  isPendingNICRemoval,
   isSRIOVInterface,
 } from '../../utils/utils';
 
@@ -46,8 +46,8 @@ const NetworkInterfaceList: FC<NetworkInterfaceTableProps> = ({ vm, vmi }) => {
           interfaceName: runtime?.status?.interfaceName,
           isInterfaceEphemeral: !!isInterfaceEphemeral(runtime?.network, runtime?.status),
           isPending:
-            isPendingHotPlugNIC(vm, vmi, runtime?.network?.name) ||
-            isPendingRemoval(vm, vmi, runtime?.network?.name),
+            isPendingNICAdd(vm, vmi, runtime?.network?.name) ||
+            isPendingNICRemoval(vm, vmi, runtime?.network?.name),
           isSRIOV: isSRIOVInterface(config?.iface),
           network: {
             multus: runtime?.network?.multus ?? config?.network?.multus,
