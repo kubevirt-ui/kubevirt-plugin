@@ -15,6 +15,7 @@ import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
 import { getName } from '@kubevirt-utils/resources/shared';
+import { universalComparator } from '@kubevirt-utils/utils/utils';
 import useMulticlusterNamespaces from '@multicluster/hooks/useMulticlusterProjects';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
@@ -112,7 +113,7 @@ export const useTreeViewData = (): UseTreeViewData => {
     const vms = loadVMsPerNamespace
       ? Object.values(allowedResources).flatMap((resource) => resource.data)
       : allVMs;
-    return vms.sort((a, b) => getName(a).localeCompare(getName(b)));
+    return vms.sort((a, b) => universalComparator(getName(a), getName(b)));
   }, [allVMs, allowedResources, loadVMsPerNamespace]);
 
   vmsSignal.value = sortedMemoizedVMs;
