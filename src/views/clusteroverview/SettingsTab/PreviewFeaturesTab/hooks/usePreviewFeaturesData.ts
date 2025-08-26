@@ -5,6 +5,7 @@ import { PASST_UDN_NETWORK, TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useF
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FEATURE_KUBEVIRT_ACM_TREEVIEW } from '@multicluster/constants';
+import { useIsFleetAvailable } from '@stolostron/multicluster-sdk';
 
 import PasstPopoverContent from '../PasstPopoverContent';
 
@@ -36,6 +37,8 @@ const usePreviewFeaturesData: UsePreviewFeaturesData = () => {
   const kubevirtACMTreeviewFeature = useFeatures(FEATURE_KUBEVIRT_ACM_TREEVIEW);
   const passtFeatureFlag = usePasstFeatureFlag();
 
+  const isFleetAvailable = useIsFleetAvailable();
+
   const features = [
     {
       externalLink: null,
@@ -48,6 +51,7 @@ const usePreviewFeaturesData: UsePreviewFeaturesData = () => {
       id: FEATURE_KUBEVIRT_ACM_TREEVIEW,
       label: t('Enable Kubevirt multicluster tree view'),
       ...kubevirtACMTreeviewFeature,
+      canEdit: isFleetAvailable && kubevirtACMTreeviewFeature?.canEdit,
     },
     {
       externalLink: null,
