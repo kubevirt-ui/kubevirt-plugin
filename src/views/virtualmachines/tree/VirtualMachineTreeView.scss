@@ -90,6 +90,7 @@
 }
 
 .vms-tree-view-body {
+  --pf-v6-c-drawer__panel__body--PaddingBlockEnd: 30px;
   padding: 0 var(--pf-t--global--spacer--sm);
   height: 100%;
   overflow-y: auto;
