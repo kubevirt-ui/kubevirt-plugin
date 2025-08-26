@@ -5,6 +5,7 @@ import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/u
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { SecretSelectionOption } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
+import { RUNSTRATEGY_ALWAYS, RUNSTRATEGY_HALTED } from '@kubevirt-utils/constants/constants';
 import { logITFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
 import {
   CANCEL_CUSTOMIZE_VM_BUTTON_CLICKED,
@@ -16,7 +17,11 @@ import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettin
 import { createSSHSecret } from '@kubevirt-utils/resources/secret/utils';
 import { getName } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
-import { clearCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import {
+  clearCustomizeInstanceType,
+  updateCustomizeInstanceType,
+  vmSignal,
+} from '@kubevirt-utils/store/customizeInstanceType';
 import { createHeadlessService } from '@kubevirt-utils/utils/headless-service';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -57,10 +62,18 @@ const CustomizeITVMFooter: FC = () => {
         </StackItem>
         <StackItem>
           <Checkbox
+            onChange={(_, checked: boolean) => {
+              setStartVM(checked);
+              updateCustomizeInstanceType([
+                {
+                  data: checked ? RUNSTRATEGY_ALWAYS : RUNSTRATEGY_HALTED,
+                  path: 'spec.runStrategy',
+                },
+              ]);
+            }}
             id="start-after-create-checkbox"
             isChecked={startVM}
             label={t('Start this VirtualMachine after creation')}
-            onChange={(_, checked: boolean) => setStartVM(checked)}
           />
         </StackItem>
         <StackItem />
