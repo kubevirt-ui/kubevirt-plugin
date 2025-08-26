@@ -26,7 +26,8 @@ import { isStopped } from '@virtualmachines/utils';
 import { NetworkAttachmentDefinition } from '../components/hooks/types';
 
 export const podNetworkExists = (vm: V1VirtualMachine): boolean =>
-  !!vm?.spec?.template?.spec?.networks?.find((network) => typeof network.pod === 'object');
+  !!vm?.spec?.template?.spec?.networks?.find((network) => typeof network.pod === 'object') ||
+  getAutoAttachPodInterface(vm) !== false;
 
 export const networkNameStartWithPod = (networkName: string): boolean =>
   networkName?.startsWith('Pod');
