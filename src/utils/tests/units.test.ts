@@ -127,13 +127,21 @@ describe('Test quantity utilities', () => {
       });
     });
 
-    describe('keepInitialUnit parameter', () => {
-      it('converts 1Ki with keepInitialUnit=false', () => {
-        expect(toQuantity('1Ki', false)).toStrictEqual({ unit: 'Ki', value: 1 });
+    describe('Exponential notation', () => {
+      it('converts 12e6 (scientific notation)', () => {
+        expect(toQuantity('12e6')).toStrictEqual({ unit: 'M', value: 12 });
       });
 
-      it('converts 1024 with keepInitialUnit=false', () => {
-        expect(toQuantity('1024', false)).toStrictEqual({ unit: 'Ki', value: 1 });
+      it('converts 1.5E3 (scientific notation with uppercase E)', () => {
+        expect(toQuantity('1.5E3')).toStrictEqual({ unit: 'k', value: 1.5 });
+      });
+
+      it('converts 2.5e-3 (scientific notation with negative exponent)', () => {
+        expect(toQuantity('2.5e-3')).toStrictEqual({ unit: 'B', value: 0.0025 });
+      });
+
+      it('converts 1e+9 (scientific notation with positive exponent)', () => {
+        expect(toQuantity('1e+9')).toStrictEqual({ unit: 'G', value: 1 });
       });
     });
   });

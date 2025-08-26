@@ -40,6 +40,8 @@ export const decimalUnitsOrdered: DecimalUnit[] = [
   DecimalUnit.E,
 ];
 
+export const decimalUnitsOrderedDescending = [...decimalUnitsOrdered].reverse();
+
 export const multipliers: Record<string, number> = {};
 multipliers.B = 1;
 multipliers.Ki = multipliers.B * 1024;
@@ -61,4 +63,7 @@ multipliers.Z = multipliers.E * 1000;
 export const UNIT_REGEX = /[a-zA-Z]+$/;
 
 /** Matches numeric characters (including decimal) at the start of the string */
-export const NUMBER_REGEX = /^[0-9.]+/;
+export const NUMBER_REGEX = /^[0-9]*\.?[0-9]+/;
+
+/** Matches exponential notation patterns */
+export const EXPONENTIAL_REGEX = /^[0-9]*\.?[0-9]+[eE][-+]?[0-9]+$/;

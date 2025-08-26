@@ -10,6 +10,8 @@ import {
   binaryUnitsOrdered,
   DecimalUnit,
   decimalUnitsOrdered,
+  decimalUnitsOrderedDescending,
+  EXPONENTIAL_REGEX,
   NUMBER_REGEX,
   QuantityUnit,
   UNIT_REGEX,
@@ -59,6 +61,9 @@ export const extractNumberFromQuantityString = (quantityString: string) => {
   return match ? parseFloat(match[0]) : null;
 };
 
+const isExponentialNotation = (quantityString: string): boolean =>
+  EXPONENTIAL_REGEX.test(quantityString);
+
 export const isBinaryUnit = (unit: string): unit is BinaryUnit =>
   binaryUnitsOrdered.includes(BinaryUnit[unit]);
 
@@ -69,13 +74,45 @@ const isQuantityUnit = (unit: string): unit is QuantityUnit =>
   isBinaryUnit(unit) || isDecimalUnit(unit);
 
 /**
+ * Converts exponential notation to decimal format with appropriate unit
+ * @param quantityString a quantity string in exponential notation
+ */
+const convertExponentialToDecimal = (quantityString: string): Quantity => {
+  const numericValue = parseFloat(quantityString);
+
+  const decimalMultipliers: Record<DecimalUnit, number> = {
+    [DecimalUnit.B]: 1,
+    [DecimalUnit.E]: 1e18,
+    [DecimalUnit.G]: 1e9,
+    [DecimalUnit.k]: 1e3,
+    [DecimalUnit.M]: 1e6,
+    [DecimalUnit.P]: 1e15,
+    [DecimalUnit.T]: 1e12,
+  };
+
+  // Find the appropriate unit by checking from largest to smallest
+  const largestUnit = decimalUnitsOrderedDescending.find(
+    (unit) => numericValue / decimalMultipliers[unit] >= 1,
+  );
+
+  if (!largestUnit) {
+    return { unit: DecimalUnit.B, value: numericValue };
+  }
+
+  return { unit: largestUnit, value: numericValue / decimalMultipliers[largestUnit] };
+};
+
+/**
  * Converts a quantity string to a Quantity object.
  * @param quantityString - The quantity string to convert, must be in a {@link https://github.com/kubevirt/kubevirt/blob/205d9455db56d5fcd42fb331122cfef358f19a69/vendor/k8s.io/apimachinery/pkg/api/resource/quantity.go#L33 Kubernetes Quantity} format
- * @param keepInitialUnit - Whether to keep the initial unit.
  * @returns The Quantity object.
  */
-export const toQuantity = (quantityString: string, keepInitialUnit = true): Quantity => {
-  const preferredUnit = keepInitialUnit ? extractUnitFromQuantityString(quantityString) : null;
+export const toQuantity = (quantityString: string): Quantity => {
+  if (isExponentialNotation(quantityString)) {
+    return convertExponentialToDecimal(quantityString);
+  }
+
+  const preferredUnit = extractUnitFromQuantityString(quantityString);
 
   if (isQuantityUnit(preferredUnit)) {
     return {
