@@ -38,6 +38,8 @@ export const BRIDGE = 'bridge';
 export const MASQUERADE = 'masquerade';
 export const SRIOV = 'sriov';
 
+export const POD_NETWORK = 'POD_NETWORK';
+
 export enum UPDATE_STRATEGIES {
   Migration = 'Migration',
 }

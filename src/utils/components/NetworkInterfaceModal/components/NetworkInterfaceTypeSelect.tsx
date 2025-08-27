@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, MouseEvent, SetStateAction, useMemo } from 'react';
+import React, { Dispatch, FC, MouseEvent, SetStateAction } from 'react';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
@@ -6,7 +6,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { interfaceTypesProxy } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { FormGroup, SelectOption } from '@patternfly/react-core';
 
-import { networkNameStartWithPod } from '../utils/helpers';
+import { isPodNetworkName } from '../utils/helpers';
 
 type NetworkInterfaceTypeSelectProps = {
   interfaceType: string;
@@ -22,13 +22,12 @@ const NetworkInterfaceTypeSelect: FC<NetworkInterfaceTypeSelectProps> = ({
   showTypeHelperText,
 }) => {
   const { t } = useKubevirtTranslation();
-  const isPodNetworkName = useMemo(() => networkNameStartWithPod(networkName), [networkName]);
 
   const interfaceTypeOptions = {
     bridge: {
       // in case of NAD network, networkName should be a string - enabled if nad type is bridge or undefined or no nad
       allowOption:
-        !isPodNetworkName &&
+        !isPodNetworkName(networkName) &&
         (interfaceType === interfaceTypesProxy.bridge || !interfaceType || !networkName),
       description: t(
         'The VirtualMachine will be bridged to the selected network, ideal for L2 devices',
@@ -38,7 +37,7 @@ const NetworkInterfaceTypeSelect: FC<NetworkInterfaceTypeSelectProps> = ({
     },
     masquerade: {
       // in case of pod network, networkName is undefined
-      allowOption: isPodNetworkName,
+      allowOption: isPodNetworkName(networkName),
       description: t(
         'Put the VirtualMachine behind a NAT Proxy for high compatibility with different network providers. The VirtualMachines IP will differ from the IP seen on the pod network',
       ),
@@ -48,7 +47,7 @@ const NetworkInterfaceTypeSelect: FC<NetworkInterfaceTypeSelectProps> = ({
     sriov: {
       // in case of NAD network, networkName should be a string - enabled if nad type is sriov or undefined or no nad
       allowOption:
-        !isPodNetworkName &&
+        !isPodNetworkName(networkName) &&
         (interfaceType === interfaceTypesProxy.sriov || !interfaceType || !networkName),
       description: t(
         'Attach a virtual function network device to the VirtualMachine for high performance',
