@@ -9,7 +9,7 @@ export const CROSS_CLUSTER_MIGRATION_ACTION_ID = 'cross-cluster-migration';
 
 export const ManagedClusterModel: K8sModel = {
   abbr: 'MC',
-  apiGroup: 'clusterview.open-cluster-management.io',
+  apiGroup: 'cluster.open-cluster-management.io',
   apiVersion: 'v1',
   crd: true,
   kind: 'ManagedCluster',
