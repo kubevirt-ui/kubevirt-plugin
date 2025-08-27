@@ -86,6 +86,7 @@
   "A ControllerRevision resource is cloned from the InstanceType when creating the VirtualMachine": "VirtualMachine の作成時に InstanceType から ControllerRevision リソースのクローンが作成されます",
   "A ControllerRevision resource is cloned from the Preference when creating the VirtualMachine": "VirtualMachine の作成時に Preference から ControllerRevision リソースのクローンが作成されます",
   "A list of matching Nodes will be provided on label input below.": "一致するノードのリストが以下のラベル入力時に提供されます。",
+  "a lowercase RFC 1123 label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character": "a lowercase RFC 1123 label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character",
   "A Project name must consist of lower case alphanumeric characters or ', and must start and end with an alphanumeric character (e.g. 'my-name' or '123-abc'). You must create a Namespace to be able to create projects that begin with 'openshift-', 'kubernetes-', or 'kube-'.": "プロジェクト名は、小文字の英数字または ' で指定し、先頭と末尾を英数字にする必要があります (例: 'my-name' または '123-abc')。'openshift-'、'kubernetes-'、'kube-' が先頭に付くプロジェクトを作成するには、namespace を作成する必要があります。",
   "A unique name for the storage claim within the project": "プロジェクト内のストレージ要求の一意の名前",
   "A unique namespace for the storage claim within the project": "プロジェクト内のストレージ要求の一意の namespace",
