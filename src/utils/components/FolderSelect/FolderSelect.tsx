@@ -6,7 +6,7 @@ import SelectTypeahead from '../SelectTypeahead/SelectTypeahead';
 
 import useFolderOptions from './hooks/useFolderOptions';
 import { createNewFolderOption, getCreateNewFolderOption } from './utils/options';
-import { getCreationNotAllowedMessage, getToggleStatus } from './utils/validation';
+import { getToggleStatus } from './utils/validation';
 
 type FoldersSelectProps = {
   isFullWidth?: boolean;
@@ -25,18 +25,21 @@ const FolderSelect: FC<FoldersSelectProps> = ({
 
   return (
     <SelectTypeahead
+      addOption={(input) =>
+        setFolderOptions((prev) => [
+          ...(prev ?? []).filter((opt) => opt.value !== input),
+          createNewFolderOption(input),
+        ])
+      }
       canCreate
-      createNewOption={createNewFolderOption}
       dataTestId="vm-folder-select"
-      getCreateOption={getCreateNewFolderOption}
-      getCreationNotAllowedMessage={getCreationNotAllowedMessage}
+      getCreateAction={getCreateNewFolderOption}
       getToggleStatus={getToggleStatus}
-      initialOptions={folderOptions}
       isFullWidth={isFullWidth}
+      options={folderOptions?.map((option) => ({ optionProps: option, value: option.value })) ?? []}
       placeholder={t('Search folder')}
-      selected={selectedFolder}
-      setInitialOptions={setFolderOptions}
-      setSelected={setSelectedFolder}
+      selectedValue={selectedFolder}
+      setSelectedValue={setSelectedFolder}
     />
   );
 };
