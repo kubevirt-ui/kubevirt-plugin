@@ -1,12 +1,12 @@
-import React, { Dispatch, FC, ReactNode, SetStateAction, useEffect, useRef, useState } from 'react';
+/* eslint-disable @typescript-eslint/no-shadow */
+import React, { FC, useRef, useState } from 'react';
+import { TFunction } from 'react-i18next';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { getRandomChars } from '@kubevirt-utils/utils/utils';
 import {
   Button,
   ButtonVariant,
-  HelperText,
-  HelperTextItem,
   KeyTypes,
   MenuToggle,
   MenuToggleElement,
@@ -21,90 +21,97 @@ import {
 } from '@patternfly/react-core';
 import { SearchIcon, TimesIcon } from '@patternfly/react-icons';
 
-import { CREATE_NEW, INVALID, NOT_FOUND } from './utils/constants';
+import { CREATE_NEW, INVALID } from './utils/constants';
 import { createItemId } from './utils/utils';
 
-type SelectTypeaheadProps = {
-  canCreate?: boolean;
-  createNewOption?: (filterValue: string) => SelectOptionProps;
-  dataTestId?: string;
-  getCreateOption?: (inputValue: string, canCreate?: boolean) => SelectOptionProps;
-  getCreationNotAllowedMessage?: (filterValue: string) => ReactNode;
-  getToggleStatus?: (filterValue: string) => MenuToggleProps['status'];
-  initialOptions: SelectOptionProps[];
-  isFullWidth?: boolean;
-  placeholder?: string;
-  selected: string;
-  setInitialOptions?: Dispatch<SetStateAction<SelectOptionProps[]>>;
-  setSelected: (newFolder: string) => void;
+export type SelectTypeaheadOptionProps = {
+  label?: string;
+  optionProps?: SelectOptionProps;
+  value: string;
 };
 
+type SelectTypeaheadProps = {
+  addOption?: (value: string) => void;
+  canCreate?: boolean;
+  dataTestId?: string;
+  getCreateAction?: (value: string, t: TFunction) => SelectOptionProps;
+  getToggleStatus?: (value: string) => MenuToggleProps['status'];
+  isDisabled?: boolean;
+  isFullWidth?: boolean;
+  options: SelectTypeaheadOptionProps[];
+  placeholder?: string;
+  selectedValue: string;
+  setSelectedValue: (value: string) => void;
+};
+
+const getDisplayValue = (option: SelectTypeaheadOptionProps) =>
+  option?.label ?? option?.value ?? '';
+
 const SelectTypeahead: FC<SelectTypeaheadProps> = ({
+  addOption,
   canCreate = false,
-  createNewOption,
   dataTestId,
-  getCreateOption,
-  getCreationNotAllowedMessage,
+  getCreateAction,
   getToggleStatus,
-  initialOptions,
+  isDisabled,
   isFullWidth = false,
+  options,
   placeholder,
-  selected,
-  setInitialOptions,
-  setSelected,
+  selectedValue,
+  setSelectedValue,
 }) => {
+  const [randomIdSuffix] = useState(getRandomChars());
+  const createActionId = `${CREATE_NEW}-${randomIdSuffix}`;
+  const invalidActionId = `${INVALID}-${randomIdSuffix}`;
   const { t } = useKubevirtTranslation();
+  const selected = options.find((option) => option.value === selectedValue);
+
   const [isOpen, setIsOpen] = useState(false);
-  const [inputValue, setInputValue] = useState<string>(selected);
-  const [filterValue, setFilterValue] = useState<string>('');
-  const [selectOptions, setSelectOptions] = useState<SelectOptionProps[]>();
+  const [inputValue, setInputValue] = useState<string>(getDisplayValue(selected));
+
   const [focusedItemIndex, setFocusedItemIndex] = useState<null | number>(null);
   const [activeItemId, setActiveItemId] = useState<null | string>(null);
   const textInputRef = useRef<HTMLInputElement>();
 
-  useEffect(() => {
-    const filteredOptions: SelectOptionProps[] = filterValue
-      ? (initialOptions || [])?.filter((menuItem) =>
-          String(menuItem.value).toLowerCase().includes(filterValue.toLowerCase()),
-        )
-      : initialOptions || [];
+  // extend "empty" search state: show all options if a value is selected
+  const showAllOptions = !inputValue || inputValue === getDisplayValue(selected);
+  const filteredOptions: SelectTypeaheadOptionProps[] = options?.filter(
+    ({ label, value }) =>
+      showAllOptions ||
+      [value ?? '', label ?? ''].some((it) => it.toLowerCase().includes(inputValue.toLowerCase())),
+  );
 
-    if (canCreate) {
-      const creationNotAllowedMessage = getCreationNotAllowedMessage?.(filterValue);
+  // newly created option has label === value so both need to be unique
+  // treat name conflict that same as no input - in most cases: encourage user to type more
+  const isNameConflict = options.some(
+    (opt) => getDisplayValue(opt) === inputValue || opt.value === inputValue,
+  );
+  const createOption: SelectTypeaheadOptionProps = canCreate && {
+    optionProps: getCreateAction?.(isNameConflict ? '' : inputValue, t),
+    value: createActionId,
+  };
 
-      if (creationNotAllowedMessage && filteredOptions.length === 0) {
-        setSelectOptions([
-          {
-            children: (
-              <HelperText>
-                <HelperTextItem variant="error">{creationNotAllowedMessage}</HelperTextItem>
-              </HelperText>
-            ),
-            isDisabled: true,
-            value: INVALID,
-          },
-        ]);
-        return;
-      }
+  const notFoundOption: SelectTypeaheadOptionProps = !canCreate &&
+    filteredOptions.length === 0 &&
+    inputValue && {
+      label: t('No results found for "{{value}}"', { value: inputValue }),
+      optionProps: { isDisabled: true },
+      value: invalidActionId,
+    };
 
-      if (!creationNotAllowedMessage) {
-        const createOption = getCreateOption?.(filterValue, canCreate);
-        const optionExists = filteredOptions.some((option) => option.value === filterValue);
+  const notAvailableOption: SelectTypeaheadOptionProps = !canCreate &&
+    options.length === 0 &&
+    !inputValue && {
+      label: t('No options are available'),
+      optionProps: { isDisabled: true },
+      value: invalidActionId,
+    };
 
-        if (createOption && !optionExists) {
-          setSelectOptions([createOption, ...filteredOptions]);
-          return;
-        }
-      }
-    }
-
-    if (!canCreate && filteredOptions.length === 0 && filterValue) {
-      setSelectOptions([{ children: t('Not found'), isDisabled: true, value: NOT_FOUND }]);
-      return;
-    }
-
-    setSelectOptions(filteredOptions);
-  }, [canCreate, filterValue, getCreateOption, getCreationNotAllowedMessage, initialOptions, t]);
+  const selectOptions: SelectTypeaheadOptionProps[] = [
+    // in the current design extra options are mutually exlusive
+    notAvailableOption || notFoundOption || createOption,
+    ...filteredOptions,
+  ].filter(Boolean);
 
   const setActiveAndFocusedItem = (itemIndex: number) => {
     setFocusedItemIndex(itemIndex);
@@ -117,17 +124,33 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
     setActiveItemId(null);
   };
 
+  const openMenu = () => {
+    if (!isOpen) {
+      setIsOpen(true);
+    }
+  };
+
   const closeMenu = () => {
     setIsOpen(false);
     resetActiveAndFocusedItem();
   };
 
-  const selectOption = (value: number | string, content: number | string) => {
-    setInputValue(String(content));
-    setFilterValue('');
-    setSelected(String(value));
-
+  const closeMenuAndSetInputToSelected = () => {
     closeMenu();
+    setInputToSelected();
+  };
+
+  const setInputToSelected = () => {
+    const option = options.find((o) => o.value === selectedValue);
+    if (option) {
+      setInputValue(getDisplayValue(option));
+    }
+  };
+
+  const selectOption = (option: SelectTypeaheadOptionProps) => {
+    closeMenu();
+    setInputValue(getDisplayValue(option));
+    setSelectedValue(option.value);
   };
 
   const onSelect = (
@@ -136,47 +159,34 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
   ) => {
     if (!value) return;
 
-    if (value === CREATE_NEW) {
-      if (!initialOptions?.some((item) => item.value === filterValue)) {
-        setInitialOptions?.((prevOptions) => [
-          ...(prevOptions || []),
-          createNewOption(filterValue),
-        ]);
-      }
-      setSelected(filterValue);
-      setFilterValue('');
-      closeMenu();
+    if (value === createActionId) {
+      addOption(inputValue);
+      selectOption({ value: inputValue });
       return;
     }
 
-    const optionChildren = selectOptions.find((option) => option.value === value)?.children;
-
-    if (typeof optionChildren === 'object') return selectOption(value, value);
-
-    selectOption(value, optionChildren as string);
+    const option = options.find((option) => option.value === value);
+    if (option) {
+      selectOption(option);
+    }
   };
 
   const onTextInputChange = (_event: React.FormEvent<HTMLInputElement>, value: string) => {
     setInputValue(value);
-    setFilterValue(value);
 
-    if (!isEmpty(value) && !isOpen) setIsOpen(true);
+    if (value) {
+      openMenu();
+    }
 
     resetActiveAndFocusedItem();
-
-    if (value !== selected) {
-      setSelected('');
-    }
   };
 
   const handleMenuArrowKeys = (key: string) => {
     let indexToFocus = 0;
 
-    if (!isOpen) {
-      setIsOpen(true);
-    }
+    openMenu();
 
-    if (selectOptions.every((option) => option.isDisabled)) {
+    if (selectOptions.every((option) => option.optionProps?.isDisabled)) {
       return;
     }
 
@@ -189,7 +199,7 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
       }
 
       // Skip disabled options
-      while (selectOptions[indexToFocus].isDisabled) {
+      while (selectOptions[indexToFocus]?.optionProps?.isDisabled) {
         indexToFocus--;
         if (indexToFocus === -1) {
           indexToFocus = selectOptions.length - 1;
@@ -206,7 +216,7 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
       }
 
       // Skip disabled options
-      while (selectOptions[indexToFocus].isDisabled) {
+      while (selectOptions[indexToFocus]?.optionProps?.isDisabled) {
         indexToFocus++;
         if (indexToFocus === selectOptions.length) {
           indexToFocus = 0;
@@ -222,13 +232,12 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
 
     switch (event.key) {
       case 'Enter':
-        if (isOpen && focusedItem && !focusedItem.isAriaDisabled) {
-          onSelect(undefined, focusedItem.value as string);
+        event.preventDefault();
+        if (isOpen && focusedItem && !focusedItem.optionProps?.isAriaDisabled) {
+          onSelect(undefined, focusedItem.value);
         }
 
-        if (!isOpen) {
-          setIsOpen(true);
-        }
+        openMenu();
 
         break;
       case 'ArrowUp':
@@ -240,29 +249,28 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
   };
 
   const onToggleClick = () => {
-    setIsOpen((open) => !open);
+    setIsOpen((isOpen) => !isOpen);
     textInputRef?.current?.focus();
   };
 
-  const onTextInputClick = () => {
-    setIsOpen(true);
-  };
+  const onTextInputClick = openMenu;
 
   const onClearButtonClick = () => {
-    setSelected('');
+    setSelectedValue(undefined);
     setInputValue('');
-    setFilterValue('');
     resetActiveAndFocusedItem();
     textInputRef?.current?.focus();
   };
 
   const toggle = (toggleRef: React.Ref<MenuToggleElement>) => (
     <MenuToggle
+      aria-label="Typeahead menu toggle"
+      isDisabled={isDisabled}
       isExpanded={isOpen}
       isFullWidth={isFullWidth}
       onClick={onToggleClick}
       ref={toggleRef}
-      status={getToggleStatus?.(filterValue)}
+      status={getToggleStatus?.(inputValue)}
       variant="typeahead"
     >
       <TextInputGroup isPlain>
@@ -276,13 +284,15 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
           placeholder={placeholder}
           value={inputValue}
           {...(activeItemId && { 'aria-activedescendant': activeItemId })}
+          aria-controls={`select-typeahead-listbox-${randomIdSuffix}`}
           isExpanded={isOpen}
           role="combobox"
         />
 
-        {!isEmpty(inputValue) && (
+        {!!inputValue && (
           <TextInputGroupUtilities>
             <Button
+              aria-label="Clear input value"
               icon={<TimesIcon />}
               onClick={onClearButtonClick}
               variant={ButtonVariant.plain}
@@ -295,28 +305,32 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
 
   return (
     <Select
-      onOpenChange={(open) => {
-        !open && closeMenu();
+      onOpenChange={(isOpen) => {
+        !isOpen && closeMenuAndSetInputToSelected();
       }}
       data-test={dataTestId}
       id={dataTestId}
       isOpen={isOpen}
       isScrollable
       onSelect={onSelect}
-      selected={selected}
+      selected={selectedValue}
       toggle={toggle}
       variant="typeahead"
     >
-      <SelectList>
-        {selectOptions?.map((option, index) => (
-          <SelectOption
-            className={option.className}
-            id={createItemId(option.value)}
-            isFocused={focusedItemIndex === index}
-            key={option.value || option.children}
-            {...option}
-          />
-        ))}
+      <SelectList id={`select-typeahead-listbox-${randomIdSuffix}`}>
+        {selectOptions?.map(
+          ({ label, optionProps: { children, ...otherOptionProps }, value }, index) => (
+            <SelectOption
+              {...otherOptionProps}
+              id={createItemId(value)}
+              isFocused={focusedItemIndex === index}
+              key={value}
+              value={value}
+            >
+              {children ?? label ?? value}
+            </SelectOption>
+          ),
+        )}
       </SelectList>
     </Select>
   );
