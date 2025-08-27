@@ -38,8 +38,8 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
 
   const [currentStorageMigration, currentStorageMigrationLoaded] = useCurrentStorageMigration(vm);
 
-  const acmActions = useACMExtensionActions(vm);
-
+  const rawAcmActions = useACMExtensionActions(vm);
+  const acmActions = useMemo(() => rawAcmActions, [vm]);
   const [, inFlight] = useK8sModel(VirtualMachineModelRef);
 
   const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);

@@ -44,6 +44,7 @@ import {
   DESCHEDULER_EVICT_LABEL,
   getEvictionStrategy as getVMIEvictionStrategy,
 } from '@kubevirt-utils/resources/vmi';
+import { getVMIBootDisk } from '@kubevirt-utils/resources/vmi/utils/disks';
 import {
   getVMIBootLoader,
   getVMIDevices,
@@ -91,31 +92,6 @@ export const checkCPUMemoryChanged = (
   return vmMemory !== vmiMemory || vmCPUSockets !== vmiCPUSockets;
 };
 
-// Helper function to get boot disk from VMI (similar to getBootDisk but for VMI)
-const getVMIBootDisk = (vmi: V1VirtualMachineInstance) => {
-  const vmiDisks = vmi?.spec?.domain?.devices?.disks || [];
-  const vmiVolumes = vmi?.spec?.volumes || [];
-
-  // Check if there's a rootdisk volume (indicates InstanceType VM)
-  const hasRootDiskVolume = vmiVolumes.some((volume) => volume.name === 'rootdisk');
-
-  // Check for disks with explicit bootOrder
-  const disksWithBootOrder = vmiDisks.filter((disk) => disk.bootOrder);
-  if (disksWithBootOrder.length > 0) {
-    return disksWithBootOrder.reduce((acc, disk) => {
-      return acc.bootOrder < disk.bootOrder ? acc : disk;
-    });
-  }
-
-  // For InstanceType VMs with rootdisk, return rootdisk as boot disk
-  if (hasRootDiskVolume) {
-    return { name: 'rootdisk' };
-  }
-
-  // Default to first disk if no explicit bootOrder
-  return vmiDisks[0];
-};
-
 export const checkBootOrderChanged = (
   vm: V1VirtualMachine,
   vmi: V1VirtualMachineInstance,
@@ -123,13 +99,8 @@ export const checkBootOrderChanged = (
   if (isEmpty(vm) || isEmpty(vmi) || isEmpty(getDisks(vm))) {
     return false;
   }
-
-  // Use the existing getBootDisk() function for VM and helper for VMI
   const vmBootDisk = getBootDisk(vm);
   const vmiBootDisk = getVMIBootDisk(vmi);
-
-  // Instead of comparing all bootOrder values,
-  // just compare which disk is actually the boot disk
   return vmBootDisk?.name !== vmiBootDisk?.name;
 };
 
@@ -153,7 +124,7 @@ export const getChangedEnvDisks = (
   if (isEmpty(vm) || isEmpty(vmi)) {
     return [];
   }
-  // to get env disks, we want to filter the volumes with configMap/ prop set
+
   const vmVolumes = getVolumes(vm)?.filter(
     (vol) => vol?.configMap || vol?.secret || vol?.serviceAccount,
   );
@@ -163,8 +134,6 @@ export const getChangedEnvDisks = (
 
   const vmEnvDisksNames = vmVolumes?.map((vol) => vol?.name);
   const vmiEnvDisksNames = vmiVolumes?.map((vol) => vol?.name);
-  // to get the changed disks, we want to intersect between the two name arrays
-  // and get the disks that are NOT in the intersection
   const unchangedEnvDisks = vmEnvDisksNames?.filter((vmDiskName) =>
     vmiEnvDisksNames?.some((vmiDiskName) => vmDiskName === vmiDiskName),
   );
