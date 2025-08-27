@@ -11,7 +11,11 @@ import {
   getInterfaces,
   getNetworks,
 } from '@kubevirt-utils/resources/vm';
-import { PASST_BINDING_NAME, UDN_BINDING_NAME } from '@kubevirt-utils/resources/vm/utils/constants';
+import {
+  PASST_BINDING_NAME,
+  POD_NETWORK,
+  UDN_BINDING_NAME,
+} from '@kubevirt-utils/resources/vm/utils/constants';
 import {
   interfaceLabelsProxy,
   interfaceTypesProxy,
@@ -29,12 +33,11 @@ export const podNetworkExists = (vm: V1VirtualMachine): boolean =>
   !!vm?.spec?.template?.spec?.networks?.find((network) => typeof network.pod === 'object') ||
   getAutoAttachPodInterface(vm) !== false;
 
-export const networkNameStartWithPod = (networkName: string): boolean =>
-  networkName?.startsWith('Pod');
+export const isPodNetworkName = (networkName: string): boolean => networkName === POD_NETWORK;
 
-export const getNetworkName = (network: V1Network, t: TFunction): string => {
+export const getNetworkName = (network: V1Network): string => {
   if (network) {
-    return network?.pod ? t('Pod networking') : network?.multus?.networkName;
+    return network?.pod ? POD_NETWORK : network?.multus?.networkName;
   }
   return null;
 };
@@ -116,7 +119,7 @@ export const createNetwork = (nicName: string, networkName: string): V1Network =
     name: nicName,
   };
 
-  if (!networkNameStartWithPod(networkName) && networkName) {
+  if (!isPodNetworkName(networkName) && networkName) {
     network.multus = { networkName };
   } else {
     network.pod = {};
