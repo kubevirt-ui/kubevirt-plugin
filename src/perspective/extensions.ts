@@ -176,12 +176,52 @@ const virtualizationSection = [
   } as EncodedExtension<HrefNavItem>,
 ];
 
+const migrationSection = [
+  {
+    flags: {
+      required: ['SHOW_MIGRATION_SECTION'],
+    },
+    properties: {
+      dataAttributes: {
+        'data-quickstart-id': 'qs-nav-sec-migration-virt-perspective',
+        'data-testid': 'migration-virt-perspective-nav-item',
+      },
+      id: 'migration-virt-perspective',
+      insertAfter: 'cluster-virt-perspective',
+      name: '%plugin__kubevirt-plugin~Migration%',
+      perspective: 'virtualization-perspective',
+    },
+    type: 'console.navigation/section',
+  } as EncodedExtension<NavSection>,
+  {
+    flags: {
+      required: ['STORAGE_MIGRATION_ENABLED'],
+    },
+    properties: {
+      dataAttributes: {
+        'data-quickstart-id': 'qs-nav-storagemigrations-virt-perspective',
+        'data-test-id': 'storagemigrations-virt-perspective-nav-item',
+      },
+      id: 'storagemigrations-virt-perspective',
+      model: {
+        group: 'migration.openshift.io',
+        kind: 'MigPlan',
+        version: 'v1alpha1',
+      },
+      name: '%plugin__kubevirt-plugin~Storage migrations%',
+      perspective: 'virtualization-perspective',
+      section: 'migration-virt-perspective',
+    },
+    type: 'console.navigation/resource-ns',
+  } as EncodedExtension<ResourceNSNavItem>,
+];
+
 const networkingSection = [
   {
     properties: {
       dataAttributes: { 'data-quickstart-id': 'qs-nav-networking' },
       id: 'networking-virt-perspective',
-      insertAfter: 'virtualization-virt-perspective',
+      insertAfter: 'migration-virt-perspective',
       name: '%console-app~Networking%',
       perspective: 'virtualization-perspective',
     },
@@ -601,6 +641,7 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.navigation/href',
   } as EncodedExtension<HrefNavItem>,
+  ...migrationSection,
   ...networkingSection,
   ...storageSection,
   ...computeSection,

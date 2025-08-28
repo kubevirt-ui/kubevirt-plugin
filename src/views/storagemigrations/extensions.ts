@@ -31,23 +31,7 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.navigation/section',
   } as EncodedExtension<NavSection>,
-  {
-    flags: {
-      required: ['SHOW_MIGRATION_SECTION'],
-    },
-    properties: {
-      dataAttributes: {
-        'data-quickstart-id': 'qs-nav-sec-migration-virt-perspective',
-        'data-testid': 'migration-virt-perspective-nav-item',
-      },
-      id: 'migration-virt-perspective',
-      insertAfter: 'virtualization-virt-perspective',
-      insertBefore: 'networking-virt-perspective',
-      name: '%plugin__kubevirt-plugin~Migration%',
-      perspective: 'virtualization-perspective',
-    },
-    type: 'console.navigation/section',
-  } as EncodedExtension<NavSection>,
+
   {
     properties: {
       component: { $codeRef: 'StorageMigrationList' },
@@ -60,26 +44,6 @@ export const extensions: EncodedExtension[] = [
     type: 'console.page/resource/list',
   },
 
-  {
-    flags: {
-      required: ['STORAGE_MIGRATION_ENABLED'],
-    },
-    properties: {
-      dataAttributes: {
-        'data-quickstart-id': 'qs-nav-storagemigrations-virt-perspective',
-        'data-test-id': 'storagemigrations-virt-perspective-nav-item',
-      },
-      id: 'storagemigrations-virt-perspective',
-      model: {
-        group: 'migration.openshift.io',
-        kind: 'MigPlan',
-        version: 'v1alpha1',
-      },
-      name: '%plugin__kubevirt-plugin~Storage migrations%',
-      section: 'migration-virt-perspective',
-    },
-    type: 'console.navigation/resource-ns',
-  },
   {
     flags: {
       required: ['STORAGE_MIGRATION_ENABLED'],
