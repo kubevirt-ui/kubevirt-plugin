@@ -231,6 +231,11 @@ export const diskModalTitle = (isEditDisk: boolean, isVMRunning: boolean) => {
 export const getOS = (vm: V1VirtualMachine) =>
   getAnnotation(vm?.spec?.template, ANNOTATIONS.os) || getOperatingSystem(vm);
 
+export const getOSNameWithoutVersionNumber = (osName: string): string => {
+  const name = osName?.match(/[a-zA-Z]+/g);
+  return name?.[0];
+};
+
 export const doesDataVolumeTemplateHaveDisk = (vm: V1VirtualMachine, diskName: string) => {
   const diskVolume = getVolumes(vm)?.find((volume) => volume.name === diskName);
   const dataVolumeTemplate = getDataVolumeTemplates(vm)?.find(

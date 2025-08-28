@@ -12,7 +12,7 @@ const TYPES = {
   binaryBytesWithoutB: {
     divisor: 1024,
     space: true,
-    units: ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei'],
+    units: ['B', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei'],
   },
   decimalBytes: {
     divisor: 1000,
@@ -27,7 +27,7 @@ const TYPES = {
   decimalBytesWithoutB: {
     divisor: 1000,
     space: true,
-    units: ['', 'k', 'M', 'G', 'T', 'P', 'E'],
+    units: ['B', 'k', 'M', 'G', 'T', 'P', 'E'],
   },
   numeric: {
     divisor: 1000,

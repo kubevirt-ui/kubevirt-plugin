@@ -3,7 +3,7 @@ import React, { ChangeEvent, Dispatch, FC, SetStateAction } from 'react';
 import { memorySizesTypes } from '@kubevirt-utils/components/CPUMemoryModal/utils/CpuMemoryUtils';
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { toIECUnit } from '@kubevirt-utils/utils/units';
+import { addByteSuffix } from '@kubevirt-utils/utils/units';
 import { NumberInput, SelectList, SelectOption, Title, TitleSizes } from '@patternfly/react-core';
 
 import './MemoryInput.scss';
@@ -38,13 +38,13 @@ const MemoryInput: FC<MemoryInputProps> = ({ memory, memoryUnit, setMemory, setM
 
       <FormPFSelect
         selected={memoryUnit}
-        selectedLabel={toIECUnit(memoryUnit)}
+        selectedLabel={addByteSuffix(memoryUnit)}
         toggleProps={{ className: 'input-memory--dropdown' }}
       >
         <SelectList>
           {memorySizesTypes.map((value: string) => (
             <SelectOption key={value} onClick={() => setMemoryUnit(value)} value={value}>
-              {toIECUnit(value)}
+              {addByteSuffix(value)}
             </SelectOption>
           ))}
         </SelectList>

@@ -8,13 +8,14 @@ import {
   modelToGroupVersionKind,
   PersistentVolumeClaimModel,
 } from '@kubevirt-utils/models';
+import { getPVCSize } from '@kubevirt-utils/resources/bootableresources/selectors';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 const usePVCSourceSize = (
   dataSourceRef: V1beta1DataVolumeSourceRef,
   pvcClaimName: string,
   pvcClaimNamespace: string,
-) => {
+): [pvcSize: string, loaded: boolean, error: any] => {
   const [dataSource, dsLoaded, dsError] = useK8sWatchResource<V1beta1DataSource>(
     dataSourceRef
       ? {
@@ -25,7 +26,7 @@ const usePVCSourceSize = (
       : null,
   );
 
-  const pvcWathcResource = pvcClaimName
+  const pvcWatchResource = pvcClaimName
     ? {
         groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
         name: pvcClaimName,
@@ -41,10 +42,10 @@ const usePVCSourceSize = (
     : null;
 
   const [pvc, loaded, error] = useK8sWatchResource<IoK8sApiCoreV1PersistentVolumeClaim>(
-    pvcWathcResource || dataSourcePVCWatchRequest,
+    pvcWatchResource || dataSourcePVCWatchRequest,
   );
 
-  return [pvc?.spec?.resources?.requests?.storage, loaded && dsLoaded, error || dsError];
+  return [getPVCSize(pvc), loaded && dsLoaded, error || dsError];
 };
 
 export default usePVCSourceSize;

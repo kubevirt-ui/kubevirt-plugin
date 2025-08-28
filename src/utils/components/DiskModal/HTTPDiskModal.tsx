@@ -3,7 +3,6 @@ import { FormProvider, useForm } from 'react-hook-form';
 
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
-import { hasSizeUnit as getOSNameWithoutVersionNumber } from '@kubevirt-utils/resources/vm/utils/disk/size';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Form } from '@patternfly/react-core';
 import { isRunning } from '@virtualmachines/utils';
@@ -20,7 +19,7 @@ import DiskTypeSelect from './components/DiskTypeSelect/DiskTypeSelect';
 import PendingChanges from './components/PendingChanges';
 import StorageClassAndPreallocation from './components/StorageClassAndPreallocation/StorageClassAndPreallocation';
 import { getDefaultCreateValues, getDefaultEditValues } from './utils/form';
-import { diskModalTitle, getOS } from './utils/helpers';
+import { diskModalTitle, getOS, getOSNameWithoutVersionNumber } from './utils/helpers';
 import { submit } from './utils/submit';
 import { SourceTypes, V1DiskFormState, V1SubDiskModalProps } from './utils/types';
 

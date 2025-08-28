@@ -2,7 +2,8 @@ import React, { FC, useCallback, useMemo } from 'react';
 
 import useProjects from '@kubevirt-utils/hooks/useProjects';
 import usePVCs from '@kubevirt-utils/hooks/usePVCs';
-import { getHumanizedSize } from '@kubevirt-utils/utils/units';
+import { getPVCSize } from '@kubevirt-utils/resources/bootableresources/selectors';
+import { formatQuantityString } from '@kubevirt-utils/utils/units';
 
 import DiskSourcePVCSelectName from './DiskSourcePVCSelectName';
 import DiskSourcePVCSelectNamespace from './DiskSourcePVCSelectNamespace';
@@ -37,9 +38,7 @@ const DiskSourcePVCSelect: FC<DiskSourcePVCSelectProps> = ({
     (selection) => {
       selectPVCName(selection);
       const selectedPVC = pvcs?.find((pvc) => pvc?.metadata?.name === selection);
-      const selectedPVCSize = selectedPVC?.spec?.resources?.requests?.storage;
-      const humanizedSize = getHumanizedSize(selectedPVCSize, 'withoutB');
-      setDiskSize && setDiskSize(`${humanizedSize.value}${humanizedSize.unit}`);
+      setDiskSize && setDiskSize(formatQuantityString(getPVCSize(selectedPVC)));
     },
     [selectPVCName, pvcs, setDiskSize],
   );

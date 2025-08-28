@@ -1,6 +1,5 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
-import xbytes from 'xbytes';
 
 import {
   DEFAULT_INSTANCETYPE_LABEL,
@@ -17,16 +16,16 @@ import {
   initialBootableVolumeState,
   SetBootableVolumeFieldType,
 } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/constants';
-import { removeByteSuffix } from '@kubevirt-utils/components/CapacityInput/utils';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, PersistentVolumeClaimModel } from '@kubevirt-utils/models';
+import { getPVCSize } from '@kubevirt-utils/resources/bootableresources/selectors';
 import { getName, getNamespace, getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { getInstanceTypeMatcher, getPreferenceMatcher } from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
-import { hasSizeUnit } from '@kubevirt-utils/resources/vm/utils/disk/size';
+import { formatQuantityString } from '@kubevirt-utils/utils/units';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { Form, PopoverPosition, Stack, Title } from '@patternfly/react-core';
@@ -99,11 +98,9 @@ const CreateBootableVolumeModal: FC<CreateBootableVolumeModalProps> = ({
   useEffect(() => {
     if (!pvcLoaded) return;
 
-    const pvcSize = pvc?.spec?.resources?.requests?.storage;
+    const pvcSize = getPVCSize(pvc);
 
-    const newBootSize = hasSizeUnit(pvcSize)
-      ? pvcSize
-      : removeByteSuffix(xbytes(Number(pvcSize), { iec: true, space: false }));
+    const newBootSize = formatQuantityString(pvcSize);
 
     setBootableVolumeField('size')(newBootSize);
   }, [pvc, pvcLoaded, setBootableVolumeField]);
