@@ -9,7 +9,7 @@ import type { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plug
 import { ResourceRoute } from '@stolostron/multicluster-sdk';
 
 import { ACMVirtualMachineActionExtension } from './hooks/useACMExtensionActions/constants';
-import { CROSS_CLUSTER_MIGRATION_ACTION_ID } from './constants';
+import { CROSS_CLUSTER_MIGRATION_ACTION_ID, KUBEVIRT_VM_PATH } from './constants';
 
 export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
   acmFlags: './multicluster/flags.ts',
@@ -66,7 +66,7 @@ export const extensions: EncodedExtension[] = [
         'data-quickstart-id': 'qs-nav-virtualmachines',
         'data-test-id': 'virtualmachines-nav-item',
       },
-      href: '/k8s/all-clusters/all-namespaces/kubevirt.io~v1~VirtualMachine',
+      href: `/k8s/all-clusters/all-namespaces/${KUBEVIRT_VM_PATH}`,
       id: 'virtualmachines-virt-perspective',
       name: '%plugin__kubevirt-plugin~VirtualMachines%',
       perspective: 'fleet-virtualization-perspective',
@@ -80,7 +80,7 @@ export const extensions: EncodedExtension[] = [
     properties: {
       component: { $codeRef: 'ConsoleStandAlone' },
       exact: false,
-      path: ['/multicloud/infrastructure/vmconsole/:cluster/:namespace/:name'],
+      path: [`/k8s/cluster/:cluster/ns/:ns/${KUBEVIRT_VM_PATH}/:name/console/standalone`],
     },
     type: 'console.page/route/standalone',
   } as EncodedExtension<StandaloneRoutePage>,
@@ -93,10 +93,10 @@ export const extensions: EncodedExtension[] = [
         $codeRef: 'Navigator',
       },
       path: [
-        '/k8s/cluster/:cluster/ns/:ns/kubevirt.io~v1~VirtualMachine/:name',
-        '/k8s/cluster/:cluster/ns/:ns/kubevirt.io~v1~VirtualMachine',
-        '/k8s/cluster/:cluster/all-namespaces/kubevirt.io~v1~VirtualMachine',
-        '/k8s/all-clusters/all-namespaces/kubevirt.io~v1~VirtualMachine',
+        `/k8s/cluster/:cluster/ns/:ns/${KUBEVIRT_VM_PATH}/:name`,
+        `/k8s/cluster/:cluster/ns/:ns/${KUBEVIRT_VM_PATH}`,
+        `/k8s/cluster/:cluster/all-namespaces/${KUBEVIRT_VM_PATH}`,
+        `/k8s/all-clusters/all-namespaces/${KUBEVIRT_VM_PATH}`,
       ],
     },
     type: 'console.page/route',
@@ -104,7 +104,7 @@ export const extensions: EncodedExtension[] = [
   {
     properties: {
       component: { $codeRef: 'VirtualMachineSearchResults' },
-      path: ['/k8s/all-clusters/all-namespaces/kubevirt.io~v1~VirtualMachine/search'],
+      path: [`/k8s/all-clusters/all-namespaces/${KUBEVIRT_VM_PATH}/search`],
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,

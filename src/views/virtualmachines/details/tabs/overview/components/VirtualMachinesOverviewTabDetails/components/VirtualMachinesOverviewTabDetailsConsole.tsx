@@ -10,6 +10,7 @@ import VncConsole from '@kubevirt-utils/components/Consoles/components/vnc-conso
 import { getConsoleBasePath } from '@kubevirt-utils/components/Consoles/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useK8sBaseAPIPath from '@multicluster/hooks/useK8sBaseAPIPath';
+import { getConsoleStandaloneURL } from '@multicluster/urls';
 import { Bullseye, Button, ButtonVariant, Spinner } from '@patternfly/react-core';
 import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 
@@ -51,14 +52,10 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
     <Bullseye className="console-overview">
       <div className="link">
         <Button
-          onClick={() =>
-            window.open(
-              `/k8s/ns/${vmNamespace}/kubevirt.io~v1~VirtualMachine/${vmName}/console/standalone`,
-            )
-          }
           icon={<ExternalLinkAltIcon className="icon" />}
           iconPosition="end"
           isDisabled={!enableConsole}
+          onClick={() => window.open(getConsoleStandaloneURL(vmNamespace, vmName, vmCluster))}
           variant={ButtonVariant.link}
         >
           {t('Open web console')}
