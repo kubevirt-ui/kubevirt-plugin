@@ -44,7 +44,7 @@ export const extensions: EncodedExtension[] = [
     properties: {
       description: '%plugin__kubevirt-plugin~Create a Virtual Machine from a template%',
       groupId: 'developer-catalog',
-      href: '/k8s/ns/:namespace/catalog/template',
+      href: '/k8s/ns/:ns/catalog/template',
       icon: { $codeRef: 'icons.vmIconElement' },
       id: 'dev-catalog-virtualization',
       label: '%plugin__kubevirt-plugin~Virtual Machines%',

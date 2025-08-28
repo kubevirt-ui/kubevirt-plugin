@@ -10,9 +10,9 @@ import {
   getSecretNameErrorMessage,
 } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
   AlertVariant,
@@ -53,7 +53,7 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
   sshDetails,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [activeNamespace] = useActiveNamespace();
+  const activeNamespace = useNamespaceParam();
   const [nameErrorMessage, setNameErrorMessage] = useState<string>(null);
   const [selectedProject, setSelectedProject] = useState<string>(
     localNSProject || namespace || sshDetails?.sshSecretNamespace,

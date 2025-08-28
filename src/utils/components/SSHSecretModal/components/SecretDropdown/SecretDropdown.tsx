@@ -7,10 +7,10 @@ import {
   generateValidSecretName,
 } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import { decodeSecret } from '@kubevirt-utils/resources/secret/utils';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 
 import { SecretSelectionOption, SSHSecretDetails } from '../../utils/types';
 
@@ -32,7 +32,7 @@ const SecretDropdown: FC<SecretDropdownProps> = ({
   sshDetails,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [activeNamespace] = useActiveNamespace();
+  const activeNamespace = useNamespaceParam();
 
   const [secretName, setSecretName] = useState<string>(sshDetails?.sshSecretName);
   useEffect(

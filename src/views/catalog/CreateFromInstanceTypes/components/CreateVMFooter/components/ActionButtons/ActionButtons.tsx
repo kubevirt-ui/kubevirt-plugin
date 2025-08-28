@@ -7,8 +7,8 @@ import HidableTooltip from '@kubevirt-utils/components/HidableTooltip/HidableToo
 import { logITFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
 import { CANCEL_CREATE_VM_BUTTON_CLICKED } from '@kubevirt-utils/extensions/telemetry/utils/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Button,
   ButtonVariant,
@@ -34,8 +34,7 @@ const ActionButtons: FC<ActionButtonsProps> = ({
   onViewYAML,
 }) => {
   const navigate = useNavigate();
-
-  const [activeNamespace] = useActiveNamespace();
+  const namespace = useNamespaceParam();
 
   const { t } = useKubevirtTranslation();
 
@@ -45,8 +44,8 @@ const ActionButtons: FC<ActionButtonsProps> = ({
 
   const onCancel = useCallback(() => {
     logITFlowEvent(CANCEL_CREATE_VM_BUTTON_CLICKED, null, { vmName: vmName });
-    navigate(getResourceUrl({ activeNamespace, model: VirtualMachineModel }));
-  }, [activeNamespace, navigate, vmName]);
+    navigate(getResourceUrl({ activeNamespace: namespace, model: VirtualMachineModel }));
+  }, [navigate, namespace, vmName]);
 
   const { disableButtonTooltipContent, isCreationDisabled, isViewYAMLDisabled } =
     useStatusActionButtons(isLoading);

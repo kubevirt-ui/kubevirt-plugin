@@ -8,11 +8,11 @@ import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { ALL_NAMESPACES_SESSION_KEY, ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
+import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import useUserPreferences from '@kubevirt-utils/hooks/useUserPreferences';
 import useBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useBootableVolumes';
 import { getValidNamespace } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { Bullseye, Card, Divider, Grid, GridItem, List, PageSection } from '@patternfly/react-core';
 
 import AddBootableVolumeButton from './components/AddBootableVolumeButton/AddBootableVolumeButton';
@@ -31,14 +31,14 @@ type CreateFromInstanceTypeProps = { currentTab: CREATE_VM_TAB };
 const CreateFromInstanceType: FC<CreateFromInstanceTypeProps> = ({ currentTab }) => {
   const { t } = useKubevirtTranslation();
   const cluster = useClusterParam();
+  const namespace = useNamespaceParam();
   const sectionState = useState<INSTANCE_TYPES_SECTIONS>(INSTANCE_TYPES_SECTIONS.SELECT_VOLUME);
 
   const { resetInstanceTypeVMState, setVMNamespaceTarget, volumeListNamespace } =
     useInstanceTypeVMStore();
   const bootableVolumesData = useBootableVolumes(volumeListNamespace);
-  const [activeNamespace] = useActiveNamespace();
   const instanceTypesAndPreferencesData = useInstanceTypesAndPreferences(
-    getValidNamespace(activeNamespace),
+    getValidNamespace(namespace),
   );
   const [userPreferences, userPreferencesLoaded, userPreferencesError] = useUserPreferences(
     volumeListNamespace === ALL_PROJECTS ? ALL_NAMESPACES_SESSION_KEY : volumeListNamespace,
@@ -50,9 +50,9 @@ const CreateFromInstanceType: FC<CreateFromInstanceTypeProps> = ({ currentTab })
   }, [resetInstanceTypeVMState]);
 
   useEffect(() => {
-    const targetNS = getValidNamespace(activeNamespace);
+    const targetNS = getValidNamespace(namespace);
     setVMNamespaceTarget(authorizedSSHKeys?.[targetNS], targetNS);
-  }, [activeNamespace, authorizedSSHKeys, setVMNamespaceTarget]);
+  }, [authorizedSSHKeys, namespace, setVMNamespaceTarget]);
 
   const [favorites = [], updaterFavorites, loadedFavorites] = useKubevirtUserSettings(
     'favoriteBootableVolumes',
