@@ -8,7 +8,6 @@ import {
   V1VirtualMachineInstance,
   V1Volume,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { V1Disk } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   convertYAMLToNetworkDataObject,
   convertYAMLUserDataObject,
@@ -45,6 +44,7 @@ import {
   DESCHEDULER_EVICT_LABEL,
   getEvictionStrategy as getVMIEvictionStrategy,
 } from '@kubevirt-utils/resources/vmi';
+import { getVMIBootDisk } from '@kubevirt-utils/resources/vmi/utils/discs';
 import {
   getVMIBootLoader,
   getVMIDevices,
@@ -60,6 +60,7 @@ import {
 } from '@virtualmachines/details/tabs/configuration/network/utils/utils';
 
 import {
+  getBootDisk,
   getBootloader,
   getDisks,
   getNetworks,
@@ -102,26 +103,10 @@ export const checkBootOrderChanged = (
     return false;
   }
 
-  const getCleanDisk = (disk: V1Disk) => ({ bootOrder: disk?.bootOrder, name: disk?.name });
-  const sortDisks = (a: V1Disk, b: V1Disk) => (a?.name > b?.name ? 1 : -1);
-  const vmDisks = (vm?.spec?.template?.spec?.domain?.devices?.disks || [])
-    .map(getCleanDisk)
-    .sort(sortDisks);
-  const vmiDisks = (vmi?.spec?.domain?.devices?.disks || []).map(getCleanDisk).sort(sortDisks);
+  const vmBootDisk = getBootDisk(vm);
+  const vmiBootDisk = getVMIBootDisk(vmi);
 
-  const temporaryHotplugVolumeNames = differenceWith(getVMIVolumes(vmi), getVolumes(vm), isEqual)
-    .filter((volume) => volume?.dataVolume || volume?.persistentVolumeClaim)
-    .map((volume) => volume.name);
-
-  const vmiNonHotplugDisks = vmiDisks.filter(
-    (disk) => !temporaryHotplugVolumeNames.includes(disk.name),
-  );
-
-  if (vmDisks?.length !== vmiNonHotplugDisks?.length) return true;
-
-  const hasChanges = vmDisks?.some((val, idx) => !isEqualObject(val, vmiNonHotplugDisks[idx]));
-
-  return hasChanges;
+  return vmBootDisk?.name !== vmiBootDisk?.name;
 };
 
 export const checkBootModeChanged = (
@@ -477,7 +462,9 @@ export const getTabURL = (vm: V1VirtualMachine, tab: VirtualMachineDetailsTab) =
 export const getPendingChangesByTab = (
   pendingChanges: PendingChange[],
   tab: VirtualMachineDetailsTab,
-) => pendingChanges?.filter((change) => change?.tab === tab && change?.hasPendingChange);
+): PendingChange[] => {
+  return pendingChanges?.filter((change) => change?.tab === tab && change?.hasPendingChange) || [];
+};
 
 export const restartRequired = (vm: V1VirtualMachine): boolean =>
   getStatusConditions(vm).some(
