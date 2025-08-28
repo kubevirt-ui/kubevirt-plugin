@@ -1,22 +1,5 @@
 import { formatQuantityString, getHumanizedSize, toQuantity } from '@kubevirt-utils/utils/units';
 
-jest.mock('@kubevirt-utils/utils/utils', () => ({
-  isEmpty: (obj: any) =>
-    [Array, Object].includes((obj || {}).constructor) && !Object.entries(obj || {}).length,
-  isString: (value: any) => typeof value === 'string',
-}));
-
-beforeAll(() => {
-  const originalNumberFormat = Intl.NumberFormat;
-  Intl.NumberFormat = jest.fn((_locale, options) => {
-    return new originalNumberFormat('en-US', options);
-  }) as any;
-});
-
-afterAll(() => {
-  jest.restoreAllMocks();
-});
-
 describe('Test quantity utilities', () => {
   describe('From International System units', () => {
     it('Ki in KiB', () => {
@@ -194,6 +177,14 @@ describe('Test quantity utilities', () => {
 
       it('returns milibytes unchanged', () => {
         expect(formatQuantityString('500m')).toBe('500m');
+      });
+
+      it('returns microbytes unchanged', () => {
+        expect(formatQuantityString('250u')).toBe('250u');
+      });
+
+      it('returns nanobytes unchanged', () => {
+        expect(formatQuantityString('100n')).toBe('100n');
       });
     });
 

@@ -73,7 +73,11 @@ const CapacityInput: FC<CapacityInputProps> = ({
           <NumberInput
             onChange={(event: ChangeEvent<HTMLInputElement>) => {
               const numberValue = Number(event.target.value);
-              if (Number.isInteger(numberValue) && numberValue <= Number.MAX_SAFE_INTEGER) {
+              if (
+                Number.isInteger(numberValue) &&
+                numberValue >= 1 &&
+                numberValue <= Number.MAX_SAFE_INTEGER
+              ) {
                 onValueChange(numberValue);
               }
             }}

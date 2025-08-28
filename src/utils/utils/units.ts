@@ -73,6 +73,10 @@ export const isDecimalUnit = (unit: string): unit is DecimalUnit =>
 const isQuantityUnit = (unit: string): unit is QuantityUnit =>
   isBinaryUnit(unit) || isDecimalUnit(unit);
 
+const isFractionalUnit = (unit: string): boolean => {
+  return unit === 'm' || unit === 'u' || unit === 'n';
+};
+
 /**
  * Converts exponential notation to decimal format with appropriate unit
  * @param quantityString a quantity string in exponential notation
@@ -168,13 +172,14 @@ export const formatQuantityString = (quantityString: string) => {
   const unit = extractUnitFromQuantityString(quantityString);
 
   // special case when unit = 'm' can occur, e.g. if we create a PVC with floating point number like 0.2Gi (1/5 Gi) which can't be converted to bytes (power of 2 is not divisible by 5), 'm' then stands for milibytes
-  if (isQuantityUnit(unit) || unit === 'm') {
+  if (isQuantityUnit(unit) || isFractionalUnit(unit)) {
     return quantityString;
   }
 
   if (!isEmpty(unit)) {
     // ERROR: formatQuantityString helper called with quantityString argument which is not in Quantity format
-    return quantityString;
+    // TODO: implement isQuantityString helper to check the format first
+    return '0';
   }
 
   const bytes = Number(quantityString);
