@@ -1,9 +1,9 @@
 import React, { FormEvent } from 'react';
+import { Trans } from 'react-i18next';
 
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Checkbox, Divider, FormGroup, TextInput } from '@patternfly/react-core';
-
-import FormGroupHelperText from '../FormGroupHelperText/FormGroupHelperText';
 
 import { CloudInitNetworkData } from './utils/cloudinit-utils';
 
@@ -54,6 +54,19 @@ export const CloudinitNetworkForm: React.FC<CloudinitNetworkFormProps> = ({
             />
           </FormGroup>
           <FormGroup
+            labelHelp={
+              <HelpTextIcon
+                bodyContent={
+                  <Trans ns="plugin__kubevirt-plugin">
+                    Enter one or more IP addresses and use commas to separate multiple addresses.
+                    Each address should include the subnet mask to properly configure the network
+                    interface.
+                    <br />
+                    Example: 192.168.6.25/22,2001:470:e091:6::25/64
+                  </Trans>
+                }
+              />
+            }
             className="kv-cloudint-advanced-tab--validation-text"
             fieldId={'address'}
             label={t('IP addresses')}
@@ -64,9 +77,6 @@ export const CloudinitNetworkForm: React.FC<CloudinitNetworkFormProps> = ({
               type="text"
               value={networkData?.addresses || ''}
             />
-            <FormGroupHelperText>
-              {t('Use commas to separate between IP addresses')}
-            </FormGroupHelperText>
           </FormGroup>
           <FormGroup
             className="kv-cloudint-advanced-tab--validation-text"
