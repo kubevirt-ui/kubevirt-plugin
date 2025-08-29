@@ -217,7 +217,9 @@ export const ipv6Regex =
   /^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^::1$|^::$|^(?:[0-9a-fA-F]{1,4}:)*::(?:[0-9a-fA-F]{1,4}:)*[0-9a-fA-F]{1,4}$|^(?:[0-9a-fA-F]{1,4}:)*::[0-9a-fA-F]{1,4}$|^[0-9a-fA-F]{1,4}::(?:[0-9a-fA-F]{1,4}:)*[0-9a-fA-F]{1,4}$/;
 
 export const isIPv6 = (ip: string): boolean => {
-  ip = ip.trim();
+  if (isEmpty(ip)) return false;
+
+  ip = ip?.trim();
   return ipv6Regex.test(ip);
 };
 
