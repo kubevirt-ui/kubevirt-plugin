@@ -1,4 +1,3 @@
-import { TEST_NS } from '../../utils/const/index';
 import { VM_IT_CUST, VM_TMPL_CUST } from '../../utils/const/testVM';
 import { descrText } from '../../views/selector-common';
 import { tab } from '../../views/tab';
@@ -29,13 +28,12 @@ function verifyCloudInitCredentials(username: string, password: string) {
   cy.contains('.pf-v6-c-clipboard-copy', password).should('be.visible');
 }
 
-const VM_NAMES = [VM_IT_CUST.name, VM_TMPL_CUST.name];
+// const VM_NAMES = [VM_IT_CUST.name, VM_TMPL_CUST.name];
+const VM_NAMES = [VM_IT_CUST.name];
 
 describe('Create customized VMs from InstanceType/Template', () => {
   before(() => {
-    cy.beforeSpec();
     cy.visitCatalog();
-    cy.switchProject(TEST_NS);
   });
 
   after(() => {
@@ -52,7 +50,8 @@ describe('Create customized VMs from InstanceType/Template', () => {
     });
   });
 
-  describe('Custom VM from Template', () => {
+  // TODO: revert until issue https://issues.redhat.com/browse/CNV-67099
+  xdescribe('Custom VM from Template', () => {
     it('should create VM from Template with customization', () => {
       vm.customizeCreate(VM_TMPL_CUST);
     });

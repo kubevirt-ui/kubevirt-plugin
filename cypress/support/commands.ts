@@ -14,6 +14,8 @@ declare global {
       patchVM(vmName: string, status: string): void;
       startVM(vmName: string[]): void;
       stopVM(vmName: string[]): void;
+      switchToAdmin(): void;
+      switchToFleetVirt(): void;
       switchToVirt(): void;
     }
   }
@@ -65,14 +67,16 @@ Cypress.Commands.add(
 
 Cypress.Commands.add('patchVM', (vmName: string, status: string) => {
   cy.exec(
-    `oc patch virtualmachine ${vmName} --type merge -p '{"spec":{"runStrategy":"${status}"}}'`,
+    `oc patch virtualmachine -n ${TEST_NS} ${vmName} --type merge -p '{"spec":{"runStrategy":"${status}"}}'`,
   );
 });
 
 Cypress.Commands.add('startVM', (vms: string[]) => {
   vms.forEach((vmName) => {
     cy.patchVM(vmName, 'Always');
-    cy.exec(`oc wait --for=condition=ready vm/${vmName} --timeout=300s`, { timeout: 300000 });
+    cy.exec(`oc wait --for=condition=ready -n ${TEST_NS} vm/${vmName} --timeout=300s`, {
+      timeout: 300000,
+    });
   });
 });
 
@@ -82,8 +86,16 @@ Cypress.Commands.add('stopVM', (vms: string[]) => {
   });
 });
 
+Cypress.Commands.add('switchToAdmin', () => {
+  return switchPerspective(Perspective.Administrator);
+});
+
 Cypress.Commands.add('switchToVirt', () => {
   return switchPerspective(Perspective.Virtualization);
+});
+
+Cypress.Commands.add('switchToFleetVirt', () => {
+  return switchPerspective(Perspective.FleetVirtualization);
 });
 
 Cypress.Commands.add('beforeSpec', () => {
