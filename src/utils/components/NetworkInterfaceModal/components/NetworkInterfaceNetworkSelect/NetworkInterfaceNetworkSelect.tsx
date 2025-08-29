@@ -50,6 +50,7 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
   const { t } = useKubevirtTranslation();
   const vmiNamespace = vm?.metadata?.namespace || namespace;
   const { loaded, loadError, nads } = useNADsData(vmiNamespace);
+  const [selectedFirstOnLoad, setSelectedFirstOnLoad] = useState(false);
   const [createdNetworkOptions, setCreatedNetworkOptions] = useState<
     (SelectTypeaheadOptionProps & { type: string })[]
   >([]);
@@ -152,6 +153,16 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
       return;
     }
 
+    // if networkName is empty, we can create a NIC with existing NAD if there is one
+    if (loaded && !loadError && !selectedFirstOnLoad) {
+      setSelectedFirstOnLoad(true);
+      const networkToPreselect = networkOptions?.[0]?.value;
+      if (networkToPreselect) {
+        handleChange(networkToPreselect);
+      }
+      return;
+    }
+
     // if no nads and pod network already exists, we can't create a NIC
     if (loaded && (loadError || !canCreateNetworkInterface)) {
       setSubmitDisabled(true);
@@ -163,6 +174,7 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
     loaded,
     networkName,
     networkOptions,
+    selectedFirstOnLoad,
     setNetworkName,
     setSubmitDisabled,
     handleChange,
@@ -190,6 +202,7 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
             dataTestId="select-nad"
             getCreateAction={getCreateNetworkOption}
             isFullWidth
+            key={selectedFirstOnLoad ? 'select-nad-with-preselect' : 'select-nad-without-preselect'}
             options={networkOptions}
             placeholder={t('Select a NetworkAttachmentDefinition')}
             selectedValue={networkName}
