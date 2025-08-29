@@ -5,7 +5,6 @@ import {
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { RowProps } from '@openshift-console/dynamic-plugin-sdk';
@@ -21,15 +20,13 @@ const VirtualMachineRow: FC<
   RowProps<
     V1VirtualMachine,
     {
-      getVmi: (namespace: string, name: string) => V1VirtualMachineInstance;
-      getVmim: (ns: string, name: string) => V1VirtualMachineInstanceMigration;
+      getVmi: (vm: V1VirtualMachine) => V1VirtualMachineInstance;
+      getVmim: (vm: V1VirtualMachine) => V1VirtualMachineInstanceMigration;
       pvcMapper: PVCMapper;
     }
   >
 > = ({ activeColumnIDs, index, obj: vm, rowData: { getVmi, getVmim, pvcMapper } }) => {
-  const vmName = getName(vm);
-  const vmNamespace = getNamespace(vm);
-  const vmi = getVmi(vmNamespace, vmName);
+  const vmi = getVmi(vm);
   const status = (
     <>
       <StatusWithPopover vm={vm} vmi={vmi} />
@@ -44,7 +41,7 @@ const VirtualMachineRow: FC<
         pvcMapper,
         status,
         vmi,
-        vmim: getVmim(vmNamespace, vmName),
+        vmim: getVmim(vm),
       }}
       activeColumnIDs={activeColumnIDs}
       index={index}

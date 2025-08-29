@@ -3,6 +3,7 @@ import classNames from 'classnames';
 
 import ActionDropdownItem from '@kubevirt-utils/components/ActionDropdownItem/ActionDropdownItem';
 import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { Menu, MenuContent, MenuList, Popper } from '@patternfly/react-core';
 import useVirtualMachineActionsProvider from '@virtualmachines/actions/hooks/useVirtualMachineActionsProvider';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
@@ -19,11 +20,14 @@ type VMRightClickActionMenuProps = {
 };
 
 const VMRightClickActionMenu: FC<VMRightClickActionMenuProps> = ({ hideMenu, triggerElement }) => {
-  const { vmName, vmNamespace } = getVMComponentsFromID(triggerElement);
+  const { vmCluster, vmName, vmNamespace } = getVMComponentsFromID(triggerElement);
 
-  const vmim = getVMIMFromMapper(vmimMapperSignal.value, vmName, vmNamespace);
+  const vmim = getVMIMFromMapper(vmimMapperSignal.value, vmName, vmNamespace, vmCluster);
   const vm = vmsSignal?.value?.find(
-    (resource) => getName(resource) === vmName && getNamespace(resource) === vmNamespace,
+    (resource) =>
+      getName(resource) === vmName &&
+      getNamespace(resource) === vmNamespace &&
+      getCluster(resource) === vmCluster,
   );
 
   const [actions] = useVirtualMachineActionsProvider(vm, vmim);
