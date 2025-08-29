@@ -59,6 +59,7 @@ const VirtualMachineNavigator: FC = () => {
               <>
                 <GuidedTour />
                 <VirtualMachinesList
+                  allVMsLoaded={treeProps.loaded}
                   cluster={cluster}
                   kind={VirtualMachineModelRef}
                   namespace={namespace}
