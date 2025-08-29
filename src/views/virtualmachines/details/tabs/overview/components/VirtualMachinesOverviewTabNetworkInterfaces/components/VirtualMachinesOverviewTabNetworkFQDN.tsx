@@ -3,14 +3,13 @@ import React, { FC } from 'react';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { getHostname } from '@kubevirt-utils/resources/vm';
 import {
   ClipboardCopy,
   ClipboardCopyVariant,
   DescriptionList,
   Divider,
 } from '@patternfly/react-core';
+import { getInternalFQDNURL } from '@virtualmachines/details/tabs/overview/utils/utils';
 
 import './virtual-machines-overview-tab-network-fqdn.scss';
 
@@ -36,7 +35,7 @@ const VirtualMachinesOverviewTabNetworkFQDN: FC<VirtualMachinesOverviewTabNetwor
               hoverTip={t('Copy to clipboard')}
               variant={ClipboardCopyVariant.inlineCompact}
             >
-              {`${getName(vm) || getHostname(vm)}.headless.${getNamespace(vm)}.svc.cluster.local`}
+              {getInternalFQDNURL(vm)}
             </ClipboardCopy>
           }
           className="VirtualMachinesOverviewTabNetworkFQDN--main"
