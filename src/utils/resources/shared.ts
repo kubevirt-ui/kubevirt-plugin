@@ -25,6 +25,7 @@ import {
   isDataSourceCloning,
   isDataSourceUploading,
 } from './template/hooks/useVmTemplateSource/utils';
+import { SINGLE_CLUSTER_KEY } from './constants';
 import { TEMPLATE_TYPE_LABEL } from './template';
 
 /**
@@ -370,6 +371,7 @@ export function convertResourceArrayToMap<A extends K8sResourceCommon = K8sResou
  * Otherwise, it will just be the name of the K8sResourceCommon object. (for example: objName[name])
  * @param {A extends K8sResourceCommon} resources - resources array
  * @param {boolean} isNamespaced - (optional) - a flag to indicate if the resource is namespace-scoped
+ * @param isMultiCluster - (optional) - a flag to indicate if the resource is fetched multi-cluster
  */
 export function convertResourceArrayToMap<A extends K8sResourceCommon = K8sResourceCommon>(
   resources: A[],
@@ -378,15 +380,61 @@ export function convertResourceArrayToMap<A extends K8sResourceCommon = K8sResou
   return (resources || []).reduce(
     (map, resource) => {
       const { name, namespace } = resource?.metadata || {};
+
       if (isNamespaced) {
         if (!map[namespace]) map[namespace] = {};
         (map[namespace] as ResourceMap<A>)[name] = resource;
         return map;
       }
+
       (map as ResourceMap<A>)[name] = resource;
       return map;
     },
     isNamespaced ? ({} as NamespacedResourceMap<A>) : ({} as ResourceMap<A>),
+  );
+}
+
+export type ClusterNamespacedResourceMap<A> = {
+  [cluster: string]: NamespacedResourceMap<A>;
+};
+export type ClusterResourceMap<A> = {
+  [cluster: string]: ResourceMap<A>;
+};
+
+// Function overloads
+export function convertResourceArrayToMapWithCluster<
+  A extends K8sResourceCommon = K8sResourceCommon,
+>(resources: A[], isNamespaced: true): ClusterNamespacedResourceMap<A>;
+
+export function convertResourceArrayToMapWithCluster<
+  A extends K8sResourceCommon = K8sResourceCommon,
+>(resources: A[], isNamespaced?: false): ClusterResourceMap<A>;
+
+/**
+ * convertResourceArrayToMapWithCluster is the multicluster version of convertResourceArrayToMap
+ * @param {A extends K8sResourceCommon} resources - resources array
+ * @param {boolean} isNamespaced - (optional) - a flag to indicate if the resource is namespace-scoped
+ */
+export function convertResourceArrayToMapWithCluster<
+  A extends K8sResourceCommon = K8sResourceCommon,
+>(resources: A[], isNamespaced?: boolean): ClusterNamespacedResourceMap<A> | ClusterResourceMap<A> {
+  return (resources || []).reduce(
+    (map, resource) => {
+      const cluster = getCluster(resource) || SINGLE_CLUSTER_KEY;
+      const { name, namespace } = resource?.metadata || {};
+      if (!map[cluster]) map[cluster] = {};
+
+      if (isNamespaced) {
+        if (!map[cluster][namespace]) {
+          map[cluster][namespace] = {};
+        }
+        (map[cluster] as NamespacedResourceMap<A>)[namespace][name] = resource;
+      } else {
+        (map[cluster] as ResourceMap<A>)[name] = resource;
+      }
+      return map;
+    },
+    isNamespaced ? ({} as ClusterNamespacedResourceMap<A>) : ({} as ClusterResourceMap<A>),
   );
 }
 

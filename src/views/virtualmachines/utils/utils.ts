@@ -2,6 +2,8 @@ import {
   V1VirtualMachine,
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
+import { getCluster } from '@multicluster/helpers/selectors';
 
 import { printableVMStatus } from './virtualMachineStatuses';
 
@@ -53,11 +55,15 @@ export const getLatestMigrationForEachVM = (vmims: V1VirtualMachineInstanceMigra
   (Array.isArray(vmims) ? vmims : [])?.sort(sortVMIMByTimestampCreation)?.reduce((acc, vmim) => {
     const name = vmim?.spec?.vmiName;
     const namespace = vmim?.metadata?.namespace;
-    if (!acc[namespace]) {
-      acc[namespace] = {};
+    const cluster = getCluster(vmim) || SINGLE_CLUSTER_KEY;
+
+    if (!acc[cluster]) {
+      acc[cluster] = {};
+    } else if (!acc[cluster][namespace]) {
+      acc[cluster][namespace] = {};
     }
 
-    acc[namespace][name] = vmim;
+    acc[cluster][namespace][name] = vmim;
 
     return acc;
   }, {});

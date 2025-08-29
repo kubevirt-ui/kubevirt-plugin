@@ -1,9 +1,13 @@
 import xbytes from 'xbytes';
 
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { V1CPU } from '@kubevirt-ui/kubevirt-api/kubevirt/models/V1CPU';
 import { getMemorySize } from '@kubevirt-utils/components/CPUMemoryModal/utils/CpuMemoryUtils';
+import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVCPUCount } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { signal } from '@preact/signals-core';
 
 export type MetricsType = {
@@ -17,32 +21,60 @@ export type MetricsType = {
 
 export const vmsMetrics = signal<MetricsType>({});
 
-export const getVMMetrics = (vmName: string, vmNamespace: string) => {
-  const vmMetrics = vmsMetrics.value?.[`${vmNamespace}-${vmName}`];
+export const getVMMetrics = (vm: V1VirtualMachine) => {
+  const cluster = getCluster(vm) || SINGLE_CLUSTER_KEY;
+  const namespace = getNamespace(vm);
+  const name = getName(vm);
+  const vmMetrics = vmsMetrics.value?.[`${cluster}-${namespace}-${name}`];
+  if (isEmpty(vmMetrics)) vmsMetrics.value[`${cluster}-${namespace}-${name}`] = {};
 
-  if (isEmpty(vmMetrics)) vmsMetrics.value[`${vmNamespace}-${vmName}`] = {};
-
-  return vmsMetrics.value?.[`${vmNamespace}-${vmName}`];
+  return vmsMetrics.value?.[`${cluster}-${namespace}-${name}`];
 };
 
-export const setVMMemoryUsage = (vmName: string, vmNamespace: string, memoryUsage: number) => {
-  const vmMetrics = getVMMetrics(vmName, vmNamespace);
+export const getVMMetricsWithParams = (
+  name: string,
+  namespace: string,
+  cluster = SINGLE_CLUSTER_KEY,
+) => {
+  const vmMetrics = vmsMetrics.value?.[`${cluster}-${namespace}-${name}`];
+  if (isEmpty(vmMetrics)) vmsMetrics.value[`${cluster}-${namespace}-${name}`] = {};
+
+  return vmsMetrics.value?.[`${cluster}-${namespace}-${name}`];
+};
+
+export const setVMMemoryUsage = (
+  name: string,
+  namespace: string,
+  cluster = SINGLE_CLUSTER_KEY,
+  memoryUsage: number,
+) => {
+  const vmMetrics = getVMMetricsWithParams(name, namespace, cluster);
 
   vmMetrics.memoryUsage = memoryUsage;
 };
 
-export const setVMNetworkUsage = (vmName: string, vmNamespace: string, networkUsage: number) => {
-  const vmMetrics = getVMMetrics(vmName, vmNamespace);
+export const setVMNetworkUsage = (
+  name: string,
+  namespace: string,
+  cluster = SINGLE_CLUSTER_KEY,
+  networkUsage: number,
+) => {
+  const vmMetrics = getVMMetricsWithParams(name, namespace, cluster);
   vmMetrics.networkUsage = networkUsage;
 };
 
-export const setVMCPUUsage = (vmName: string, vmNamespace: string, cpuUsage: number) => {
-  const vmMetrics = getVMMetrics(vmName, vmNamespace);
+export const setVMCPUUsage = (
+  name: string,
+  namespace: string,
+  cluster = SINGLE_CLUSTER_KEY,
+  cpuUsage: number,
+) => {
+  const vmMetrics = getVMMetricsWithParams(name, namespace, cluster);
   vmMetrics.cpuUsage = cpuUsage;
 };
 
-export const getCPUUsagePercentage = (vmName: string, vmNamespace: string, vmiCPU: V1CPU) => {
-  const { cpuUsage } = getVMMetrics(vmName, vmNamespace);
+export const getCPUUsagePercentage = (vm: V1VirtualMachine, vmiCPU: V1CPU) => {
+  const { cpuUsage } = getVMMetrics(vm);
 
   if (isEmpty(cpuUsage)) return;
 
@@ -51,12 +83,8 @@ export const getCPUUsagePercentage = (vmName: string, vmNamespace: string, vmiCP
   return (cpuUsage * 100) / cpuRequested;
 };
 
-export const getMemoryUsagePercentage = (
-  vmName: string,
-  vmNamespace: string,
-  vmiMemory: string,
-) => {
-  const { memoryUsage } = getVMMetrics(vmName, vmNamespace);
+export const getMemoryUsagePercentage = (vm: V1VirtualMachine, vmiMemory: string) => {
+  const { memoryUsage } = getVMMetrics(vm);
 
   if (isEmpty(memoryUsage) || isEmpty(vmiMemory)) return;
 
@@ -70,8 +98,8 @@ export const getMemoryUsagePercentage = (
   return percentage;
 };
 
-export const getNetworkUsagePercentage = (vmName: string, vmNamespace: string) => {
-  const { networkUsage } = getVMMetrics(vmName, vmNamespace);
+export const getNetworkUsagePercentage = (vm: V1VirtualMachine) => {
+  const { networkUsage } = getVMMetrics(vm);
 
   if (isEmpty(networkUsage)) return;
 
