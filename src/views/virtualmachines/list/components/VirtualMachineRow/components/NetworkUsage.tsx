@@ -2,7 +2,6 @@ import React, { FC } from 'react';
 import xbytes from 'xbytes';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getNetworkUsagePercentage } from '@virtualmachines/list/metrics';
@@ -13,7 +12,7 @@ type NetworkUsageProps = {
 };
 
 const NetworkUsage: FC<NetworkUsageProps> = ({ vm }) => {
-  const totalTransferred = getNetworkUsagePercentage(getName(vm), getNamespace(vm));
+  const totalTransferred = getNetworkUsagePercentage(vm);
 
   if (isEmpty(totalTransferred) || !isRunning(vm)) return <>{NO_DATA_DASH}</>;
 

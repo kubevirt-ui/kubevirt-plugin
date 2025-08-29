@@ -3,7 +3,7 @@ import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVMIIPAddresses } from '@kubevirt-utils/resources/vmi';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { compareCIDR, VirtualMachineRowFilterType } from '@virtualmachines/utils';
-import { VMIMapper } from '@virtualmachines/utils/mappers';
+import { getVMIFromMapper, VMIMapper } from '@virtualmachines/utils/mappers';
 
 export const getIPFilter = (vmiMapper: VMIMapper): RowFilter<V1VirtualMachine> => ({
   filter: (input, obj) => {
@@ -11,8 +11,7 @@ export const getIPFilter = (vmiMapper: VMIMapper): RowFilter<V1VirtualMachine> =
 
     if (!search) return true;
 
-    const vmi = vmiMapper.mapper?.[obj?.metadata?.namespace]?.[obj?.metadata?.name];
-
+    const vmi = getVMIFromMapper(vmiMapper, obj);
     const ipAddresses = getVMIIPAddresses(vmi);
 
     return search.includes('/')

@@ -66,9 +66,10 @@ const useVMMetrics = () => {
     networkTotalResponse?.data?.result?.forEach((result) => {
       const vmName = result?.metric?.name;
       const vmNamespace = result?.metric?.namespace;
+      const vmCluster = result?.metric?.cluster;
       const memoryUsage = parseFloat(result?.value?.[1]);
 
-      setVMNetworkUsage(vmName, vmNamespace, memoryUsage);
+      setVMNetworkUsage(vmName, vmNamespace, vmCluster, memoryUsage);
     });
   }, [networkTotalResponse]);
 
@@ -76,9 +77,10 @@ const useVMMetrics = () => {
     memoryUsageResponse?.data?.result?.forEach((result) => {
       const vmName = result?.metric?.name;
       const vmNamespace = result?.metric?.namespace;
+      const vmCluster = result?.metric?.cluster;
       const memoryUsage = parseFloat(result?.value?.[1]);
 
-      setVMMemoryUsage(vmName, vmNamespace, memoryUsage);
+      setVMMemoryUsage(vmName, vmNamespace, vmCluster, memoryUsage);
     });
   }, [memoryUsageResponse]);
 
@@ -86,9 +88,10 @@ const useVMMetrics = () => {
     cpuUsageResponse?.data?.result?.forEach((result) => {
       const vmName = result?.metric?.name;
       const vmNamespace = result?.metric?.namespace;
+      const vmCluster = result?.metric?.cluster;
       const cpuUsage = parseFloat(result?.value?.[1]);
 
-      setVMCPUUsage(vmName, vmNamespace, cpuUsage);
+      setVMCPUUsage(vmName, vmNamespace, vmCluster, cpuUsage);
     });
   }, [cpuUsageResponse]);
 
@@ -99,9 +102,10 @@ const useVMMetrics = () => {
       if (isEmpty(vmName)) return;
 
       const vmNamespace = result?.metric?.namespace;
+      const vmCluster = result?.metric?.cluster;
       const cpuRequested = parseFloat(result?.value?.[1]);
 
-      setVMCPURequested(vmName, vmNamespace, cpuRequested);
+      setVMCPURequested(vmName, vmNamespace, vmCluster, cpuRequested);
     });
   }, [cpuRequestedResponse, launcherNameToVMName]);
 };

@@ -25,6 +25,7 @@ import {
   isDataSourceCloning,
   isDataSourceUploading,
 } from './template/hooks/useVmTemplateSource/utils';
+import { NO_MULTICLUSTER_KEY } from './constants';
 import { TEMPLATE_TYPE_LABEL } from './template';
 
 /**
@@ -348,12 +349,20 @@ export const getUID = <A extends K8sResourceCommon = K8sResourceCommon>(resource
 
 export type ResourceMap<A> = { [name: string]: A };
 export type NamespacedResourceMap<A> = { [namespace: string]: ResourceMap<A> };
+export type ClusterNamespacedResourceMap<A> = { [cluster: string]: NamespacedResourceMap<A> };
 
 // Function overloads
 export function convertResourceArrayToMap<A extends K8sResourceCommon = K8sResourceCommon>(
   resources: A[],
   isNamespaced: true,
 ): NamespacedResourceMap<A>;
+
+// Function overloads
+export function convertResourceArrayToMap<A extends K8sResourceCommon = K8sResourceCommon>(
+  resources: A[],
+  isNamespaced: true,
+  isMultiCluster: true,
+): ClusterNamespacedResourceMap<A>;
 
 export function convertResourceArrayToMap<A extends K8sResourceCommon = K8sResourceCommon>(
   resources: A[],
@@ -370,19 +379,30 @@ export function convertResourceArrayToMap<A extends K8sResourceCommon = K8sResou
  * Otherwise, it will just be the name of the K8sResourceCommon object. (for example: objName[name])
  * @param {A extends K8sResourceCommon} resources - resources array
  * @param {boolean} isNamespaced - (optional) - a flag to indicate if the resource is namespace-scoped
+ * @param isMultiCluster - (optional) - a flag to indicate if the resource is fetched multi-cluster
  */
 export function convertResourceArrayToMap<A extends K8sResourceCommon = K8sResourceCommon>(
   resources: A[],
   isNamespaced?: boolean,
+  isMultiCluster?: boolean,
 ): NamespacedResourceMap<A> | ResourceMap<A> {
   return (resources || []).reduce(
     (map, resource) => {
+      const cluster = getCluster(resource) || NO_MULTICLUSTER_KEY;
       const { name, namespace } = resource?.metadata || {};
-      if (isNamespaced) {
+      if (isNamespaced && isMultiCluster) {
+        if (!map[cluster]) map[cluster] = {};
+        if (!map[cluster][namespace]) map[cluster][namespace] = {};
+        (map[cluster][namespace] as ResourceMap<A>)[name] = resource;
+        return map;
+      }
+
+      if (isNamespaced && !isMultiCluster) {
         if (!map[namespace]) map[namespace] = {};
         (map[namespace] as ResourceMap<A>)[name] = resource;
         return map;
       }
+
       (map as ResourceMap<A>)[name] = resource;
       return map;
     },
