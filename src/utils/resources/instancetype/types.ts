@@ -14,6 +14,12 @@ export const InstanceTypeSizes = [
   'nano',
   'small',
   'xlarge',
+  'medium1gi',
+  'large1gi',
+  'xlarge1gi',
+  '2xlarge1gi',
+  '4xlarge1gi',
+  '8xlarge1gi',
 ] as const;
 
 export type InstanceTypeSize = typeof InstanceTypeSizes[number];

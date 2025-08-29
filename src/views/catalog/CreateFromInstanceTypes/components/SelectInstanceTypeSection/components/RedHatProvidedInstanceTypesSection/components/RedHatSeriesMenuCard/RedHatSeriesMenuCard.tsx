@@ -1,15 +1,22 @@
-import React, { FC, useMemo, useRef } from 'react';
+import React, { FC, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import RedHatInstanceTypeSeriesSizesMenuItems from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/components/RedHatInstanceTypeSeriesMenu/RedHatInstanceTypeSeriesSizesMenuItem';
 import { instanceTypeSeriesNameMapper } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/constants';
 import { RedHatInstanceTypeSeries } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/types';
+import {
+  getOppositeHugepagesInstanceType,
+  seriesHasHugepagesVariant,
+} from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/utils';
+import HugepagesCheckbox from '@kubevirt-utils/components/HugepagesCheckbox/HugepagesCheckbox';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import {
+  Button,
   Card,
   CardBody,
+  CardFooter,
   CardHeader,
   Flex,
   Menu,
@@ -50,7 +57,10 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({
 
   const isMenuExpanded = useMemo(() => seriesName === activeMenu, [activeMenu, seriesName]);
   const isSelectedMenu = useMemo(
-    () => selectedInstanceType?.name?.startsWith(seriesName),
+    () =>
+      // check if namespace is null to avoid mixing with user provided instance types with similar name
+      selectedInstanceType?.namespace === null &&
+      selectedInstanceType?.name?.startsWith(seriesName),
     [selectedInstanceType, seriesName],
   );
 
@@ -67,13 +77,15 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({
     });
   }, [selectedInstanceType, seriesName, sizes, t]);
 
+  const [isHugepages, setIsHugepages] = useState(false);
+
   const card = (
     <Card
       className={classNames(
         'instance-type-series-menu-card__toggle-card',
         isSelectedMenu && 'selected',
       )}
-      onClick={(event) => onMenuToggle(event, seriesName)}
+      isCompact
       ref={cardRef}
     >
       <Flex alignItems={{ default: 'alignItemsCenter' }} direction={{ default: 'column' }}>
@@ -82,13 +94,36 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({
           {classDisplayNameAnnotation}
         </CardHeader>
         <CardBody>
-          <div className="instance-type-series-menu-card__card-toggle-text" ref={toggleRef}>
-            {seriesLabel || classAnnotation} <AngleDownIcon />
-          </div>
-          <div className="instance-type-series-menu-card__card-footer">
+          <Button
+            className="instance-type-series-menu-card__card-toggle-text"
+            icon={<AngleDownIcon />}
+            iconPosition="end"
+            onClick={(event) => onMenuToggle(event, seriesName)}
+            ref={toggleRef}
+            variant="link"
+          >
+            {seriesLabel || classAnnotation}
+          </Button>
+          <div className="instance-type-series-menu-card__card-selected-option">
             {isSelectedMenu && selectedITLabel}
           </div>
         </CardBody>
+        {seriesHasHugepagesVariant(seriesName) && (
+          <CardFooter>
+            <HugepagesCheckbox
+              onHugepagesChange={(_, checked) => {
+                setIsHugepages(checked);
+                if (isSelectedMenu) {
+                  onMenuSelect(
+                    getOppositeHugepagesInstanceType(selectedInstanceType.name, checked),
+                  );
+                }
+              }}
+              id={`${seriesName}-card`}
+              isHugepages={isHugepages}
+            />
+          </CardFooter>
+        )}
       </Flex>
     </Card>
   );
@@ -100,9 +135,10 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({
           <MenuContent>
             <MenuList>
               <RedHatInstanceTypeSeriesSizesMenuItems
+                isHugepages={isHugepages}
+                onSelect={onMenuSelect}
                 selected={selectedInstanceType?.name}
                 seriesName={seriesName}
-                setSelected={onMenuSelect}
                 sizes={sizes}
               />
             </MenuList>

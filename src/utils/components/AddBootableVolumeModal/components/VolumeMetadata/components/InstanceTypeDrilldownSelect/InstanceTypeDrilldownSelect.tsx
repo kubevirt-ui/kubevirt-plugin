@@ -56,10 +56,10 @@ export const InstanceTypeDrilldownSelect: FC<InstanceTypeMenuItemsProps> = ({
   }, [deleteLabel, isExistingOption]);
 
   const onSelect = useCallback(
-    (kind: string, value: string) => {
+    (kind: string, value: string, keepMenuOpen?: boolean) => {
       setBootableVolumeField('labels', DEFAULT_INSTANCETYPE_KIND_LABEL)(kind);
       setBootableVolumeField('labels', DEFAULT_INSTANCETYPE_LABEL)(value);
-      setIsOpen(false);
+      !keepMenuOpen && setIsOpen(false);
     },
     [setBootableVolumeField],
   );
@@ -90,10 +90,12 @@ export const InstanceTypeDrilldownSelect: FC<InstanceTypeMenuItemsProps> = ({
       >
         <DrilldownMenuItem {...menuItems.redHatProvided}>
           <RedHatInstanceTypeSeriesMenu
+            onSelect={(value, keepMenuOpen) =>
+              onSelect(VirtualMachineClusterInstancetypeModel.kind, value, keepMenuOpen)
+            }
             selected={selectedInstanceType}
             selectedKind={selectedInstanceTypeKind}
-            series={menuItems.redHatProvided.items}
-            setSelected={(value) => onSelect(VirtualMachineClusterInstancetypeModel.kind, value)}
+            seriesList={menuItems.redHatProvided.items}
           />
         </DrilldownMenuItem>
         <DrilldownMenuItem {...menuItems.userProvided}>
