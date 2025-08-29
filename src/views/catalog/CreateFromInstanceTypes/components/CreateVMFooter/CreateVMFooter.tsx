@@ -25,6 +25,7 @@ import {
 } from '@kubevirt-utils/extensions/telemetry/utils/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
+import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import { createSSHSecret } from '@kubevirt-utils/resources/secret/utils';
 import { getName } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
@@ -35,7 +36,6 @@ import { getValidNamespace, isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 import { getCatalogURL, getVMURL } from '@multicluster/urls';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { Checkbox, Stack, StackItem } from '@patternfly/react-core';
 
 import { NOT_SUPPORTED_VM_ERROR } from '../../../utils/constants';
@@ -50,6 +50,7 @@ const CreateVMFooter: FC = () => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const cluster = useClusterParam();
+  const namespace = useNamespaceParam();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<any | Error>(null);
   const { createModal } = useModal();
@@ -57,10 +58,7 @@ const CreateVMFooter: FC = () => {
 
   const [authorizedSSHKeys, setAuthorizedSSHKeys] = useKubevirtUserSettings('ssh');
 
-  const [activeNamespace] = useActiveNamespace();
-  const [isUDNManagedNamespace, vmsNotSupported] = useNamespaceUDN(
-    getValidNamespace(activeNamespace),
-  );
+  const [isUDNManagedNamespace, vmsNotSupported] = useNamespaceUDN(getValidNamespace(namespace));
 
   const { instanceTypeVMState, setStartVM, setVM, startVM, vmNamespaceTarget } =
     useInstanceTypeVMStore();

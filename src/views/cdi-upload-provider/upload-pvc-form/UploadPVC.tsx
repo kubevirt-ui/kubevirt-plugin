@@ -18,6 +18,7 @@ import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { createUploadPVC } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import {
   TEMPLATE_TYPE_BASE,
   TEMPLATE_TYPE_LABEL,
@@ -26,7 +27,6 @@ import {
 import {
   K8sVerb,
   useAccessReview,
-  useActiveNamespace,
   useK8sWatchResource,
   WatchK8sResource,
 } from '@openshift-console/dynamic-plugin-sdk';
@@ -121,8 +121,8 @@ const UploadPVCPage: FC = () => {
       : null,
   );
 
-  const [initialNamespace] = useActiveNamespace();
-  const namespace = getNamespace(dvObj) || initialNamespace;
+  const namespaceParam = useNamespaceParam();
+  const namespace = getNamespace(dvObj) || namespaceParam;
   const urlParams = new URLSearchParams(window.location.search);
   const osParam = urlParams.get(CDI_UPLOAD_OS_URL_PARAM);
   const title = t('Upload data to Persistent Volume Claim');
@@ -207,7 +207,7 @@ const UploadPVCPage: FC = () => {
             handleFileChange={handleFileChange}
             handleFileNameChange={handleFileNameChange}
             isLoading={!loadedTemplates}
-            ns={initialNamespace}
+            ns={namespaceParam}
             onChange={setDvObj}
             osParam={osParam}
             setDisableFormSubmit={setDisableFormSubmit}

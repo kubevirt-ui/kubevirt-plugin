@@ -3,8 +3,8 @@ import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import { getValidNamespace, validateSSHPublicKey } from '@kubevirt-utils/utils/utils';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import {
   FileUpload,
   Form,
@@ -28,7 +28,7 @@ type SSHKeyUploadProps = {
 
 const SSHKeyUpload: FC<SSHKeyUploadProps> = ({ secrets, setSSHDetails, sshDetails }) => {
   const { t } = useKubevirtTranslation();
-  const [activeNamespace] = useActiveNamespace();
+  const activeNamespace = useNamespaceParam();
   const [nameErrorMessage, setNameErrorMessage] = useState<string>(null);
   const [isValidKey, setIsValidKey] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);

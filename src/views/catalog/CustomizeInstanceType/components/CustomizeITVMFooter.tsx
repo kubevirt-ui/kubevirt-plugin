@@ -14,6 +14,7 @@ import {
 } from '@kubevirt-utils/extensions/telemetry/utils/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
+import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import { createSSHSecret } from '@kubevirt-utils/resources/secret/utils';
 import { getName } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
@@ -27,7 +28,6 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 import { getCatalogURL, getVMURL } from '@multicluster/urls';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Button,
   ButtonVariant,
@@ -43,13 +43,13 @@ import './CustomizeITVMFooter.scss';
 const CustomizeITVMFooter: FC = () => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
-  const [activeNamespace] = useActiveNamespace();
+  const namespace = useNamespaceParam();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<any | Error>(null);
   const { instanceTypeVMState, setStartVM, startVM, vm, vmNamespaceTarget } =
     useInstanceTypeVMStore();
 
-  const [isUDNManagedNamespace] = useNamespaceUDN(activeNamespace);
+  const [isUDNManagedNamespace] = useNamespaceUDN(namespace);
   const [authorizedSSHKeys, setAuthorizedSSHKeys] = useKubevirtUserSettings('ssh');
   const { sshSecretCredentials } = instanceTypeVMState;
   const { applyKeyToProject, secretOption, sshPubKey, sshSecretName } = sshSecretCredentials || {};
@@ -127,7 +127,7 @@ const CustomizeITVMFooter: FC = () => {
                 onClick={() => {
                   logITFlowEvent(CANCEL_CUSTOMIZE_VM_BUTTON_CLICKED, vm);
                   clearCustomizeInstanceType();
-                  navigate(getCatalogURL(getCluster(vm), activeNamespace));
+                  navigate(getCatalogURL(getCluster(vm), namespace));
                 }}
                 variant={ButtonVariant.link}
               >
