@@ -73,7 +73,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
   const { featureEnabled: passtEnabled } = usePasstFeatureFlag();
   const [nicName, setNicName] = useState(network?.name || generatePrettyName('nic'));
   const [interfaceModel, setInterfaceModel] = useState(iface?.model || interfaceModelType.VIRTIO);
-  const [networkName, setNetworkName] = useState(getNetworkName(network, t));
+  const [networkName, setNetworkName] = useState(getNetworkName(network));
   const [networkSelectError, setNetworkSelectError] = useState<boolean>(false);
   const [interfaceType, setInterfaceType] = useState<string>(
     interfaceTypesProxy[getNetworkInterfaceType(iface)],
