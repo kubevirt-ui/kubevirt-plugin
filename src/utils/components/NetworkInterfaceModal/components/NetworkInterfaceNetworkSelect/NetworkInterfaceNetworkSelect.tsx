@@ -37,6 +37,10 @@ type NetworkInterfaceNetworkSelectProps = {
   vm: V1VirtualMachine;
 };
 
+export type NetworkSelectTypeaheadOptionProps = SelectTypeaheadOptionProps & {
+  type: string;
+};
+
 const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
   editInitValueNetworkName,
   isEditing,
@@ -51,7 +55,7 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
   const vmiNamespace = vm?.metadata?.namespace || namespace;
   const { loaded, loadError, nads } = useNADsData(vmiNamespace);
   const [createdNetworkOptions, setCreatedNetworkOptions] = useState<
-    (SelectTypeaheadOptionProps & { type: string })[]
+    NetworkSelectTypeaheadOptionProps[]
   >([]);
 
   const currentlyUsedNADsNames = useMemo(
@@ -78,7 +82,7 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
 
   const podNetworkingText = useMemo(() => t('Pod Networking'), [t]);
 
-  const networkOptions: (SelectTypeaheadOptionProps & { type: string })[] = useMemo(() => {
+  const networkOptions: NetworkSelectTypeaheadOptionProps[] = useMemo(() => {
     const options = filteredNADs?.map((nad) => {
       const { name, namespace: nadNamespace } = nad?.metadata;
       const type = getNadType(nad);

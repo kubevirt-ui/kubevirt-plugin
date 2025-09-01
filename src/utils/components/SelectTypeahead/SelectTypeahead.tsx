@@ -25,8 +25,16 @@ import { CREATE_NEW, INVALID } from './utils/constants';
 import { createItemId } from './utils/utils';
 
 export type SelectTypeaheadOptionProps = {
+  /** Human readable value.
+   * 1. used as option content (may be overridden by optionProps.children)
+   * 2. if not present the value prop is used instead.
+   * 3. used for filtering the list of available options. If optionProps.children is used then its content should logically match the label prop.
+   * 4. should be unique within the list of options (to avoid user confusion)
+   */
   label?: string;
+  // pass through props
   optionProps?: SelectOptionProps;
+  // identity prop used to tract selection - should be unique within the list.
   value: string;
 };
 
@@ -76,9 +84,8 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
   // extend "empty" search state: show all options if a value is selected
   const showAllOptions = !inputValue || inputValue === getDisplayValue(selected);
   const filteredOptions: SelectTypeaheadOptionProps[] = options?.filter(
-    ({ label, value }) =>
-      showAllOptions ||
-      [value ?? '', label ?? ''].some((it) => it.toLowerCase().includes(inputValue.toLowerCase())),
+    (opt) =>
+      showAllOptions || getDisplayValue(opt).toLowerCase().includes(inputValue.toLowerCase()),
   );
 
   // newly created option has label === value so both need to be unique

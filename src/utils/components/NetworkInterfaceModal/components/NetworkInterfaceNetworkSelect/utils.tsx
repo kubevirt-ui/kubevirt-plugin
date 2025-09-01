@@ -5,7 +5,9 @@ import { interfaceTypesProxy } from '@kubevirt-utils/resources/vm/utils/network/
 import { HelperText, HelperTextItem, Label, SelectOptionProps } from '@patternfly/react-core';
 import { InfoIcon } from '@patternfly/react-icons';
 
-export const createNewNetworkOption = (value) => ({
+import { NetworkSelectTypeaheadOptionProps } from './NetworkInterfaceNetworkSelect';
+
+export const createNewNetworkOption = (value): NetworkSelectTypeaheadOptionProps => ({
   optionProps: {
     children: (
       <>
