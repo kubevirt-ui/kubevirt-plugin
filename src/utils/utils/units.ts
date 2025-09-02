@@ -53,11 +53,11 @@ export const getHumanizedSize = (size: string, bytesOption: 'withB' | 'withoutB'
   return humanizeBinaryBytes(baseValue);
 };
 
-export const extractUnitFromQuantityString = (quantityString: string) =>
-  quantityString.match(UNIT_REGEX)?.[0];
+export const extractUnitFromQuantityString = (quantityString?: string) =>
+  quantityString?.match(UNIT_REGEX)?.[0];
 
-export const extractNumberFromQuantityString = (quantityString: string) => {
-  const match = quantityString.match(NUMBER_REGEX);
+export const extractNumberFromQuantityString = (quantityString?: string) => {
+  const match = quantityString?.match(NUMBER_REGEX);
   return match ? parseFloat(match[0]) : null;
 };
 
