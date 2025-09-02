@@ -1223,7 +1223,7 @@
   "Removing Resources": "Suppression des ressources",
   "Request sent": "Demande envoyée",
   "Requested": "Demandé",
-  "Requested of ": "Demandé de ",
+  "Requested of {{cpuRequested}}": "Requested of {{cpuRequested}}",
   "Required": "Requis",
   "Required parameters": "Paramètres requis",
   "Required when automatic update is enabled": "Obligatoire lorsque la mise à jour automatique est activée",

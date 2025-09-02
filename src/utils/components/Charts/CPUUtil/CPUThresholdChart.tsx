@@ -1,14 +1,13 @@
-import React, { FC, useMemo } from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router-dom-v5-compat';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import useVMQueries from '@kubevirt-utils/hooks/useVMQueries';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
-import { getVMIPod } from '@kubevirt-utils/resources/vmi';
-import { humanizeCpuCores } from '@kubevirt-utils/utils/humanize.js';
+import { getCPU, getVCPUCount } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { K8sResourceCommon, PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
+import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Chart,
   ChartArea,
@@ -28,7 +27,6 @@ import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
 import {
   addTimestampToTooltip,
-  findMaxYValue,
   formatCPUUtilTooltipData,
   MILLISECONDS_MULTIPLIER,
   queriesToLink,
@@ -37,16 +35,14 @@ import {
 } from '../utils/utils';
 
 type CPUThresholdChartProps = {
-  pods: K8sResourceCommon[];
   vmi: V1VirtualMachineInstance;
 };
 
-const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ pods, vmi }) => {
-  const vmiPod = useMemo(() => getVMIPod(vmi, pods), [pods, vmi]);
+const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ vmi }) => {
   const { currentTime, duration, timespan } = useDuration();
   const { height, ref, width } = useResponsiveCharts();
 
-  const queries = useVMQueries(vmi, vmiPod?.metadata?.name);
+  const queries = useVMQueries(vmi);
 
   const prometheusProps = {
     cluster: getCluster(vmi),
@@ -56,12 +52,6 @@ const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ pods, vmi }) => {
     timespan,
   };
 
-  const [dataCPURequested] = useFleetPrometheusPoll({
-    ...prometheusProps,
-    endpoint: PrometheusEndpoint?.QUERY_RANGE,
-    query: queries.CPU_REQUESTED,
-  });
-
   const [dataCPUUsage] = useFleetPrometheusPoll({
     ...prometheusProps,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
@@ -69,27 +59,32 @@ const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ pods, vmi }) => {
   });
 
   const cpuUsage = dataCPUUsage?.data?.result?.[0]?.values;
-  const cpuRequested = dataCPURequested?.data?.result?.[0]?.values;
+  const cpu = getCPU(vmi);
+  const cpuRequested = getVCPUCount(cpu);
+
+  const showValuesInMillicores = cpuUsage?.some(([_, y]) => Number(y) < 1);
 
   const chartData = cpuUsage?.map(([x, y]) => {
+    const value = Number(y);
+
     return {
-      name: 'CPU usage',
+      name: showValuesInMillicores ? 'CPU usage (m)' : 'CPU usage',
       x: new Date(x * MILLISECONDS_MULTIPLIER),
-      y: humanizeCpuCores(Number(y)).value,
+      y: showValuesInMillicores ? value * 1000 : value,
     };
   });
 
-  const thresholdData = cpuRequested?.map(([x, y]) => {
-    return {
-      name: 'CPU requested',
-      x: new Date(x * MILLISECONDS_MULTIPLIER),
-      y: humanizeCpuCores(Number(y)).value,
-    };
-  });
+  const thresholdData = [
+    {
+      name: showValuesInMillicores ? 'CPU requested (m)' : 'CPU requested',
+      x: new Date(currentTime),
+      y: showValuesInMillicores ? cpuRequested * 1000 : cpuRequested,
+    },
+  ];
 
   const isReady = !isEmpty(chartData) && !isEmpty(thresholdData);
   const linkToMetrics = queriesToLink(queries?.CPU_USAGE);
-  const yMax = findMaxYValue(thresholdData);
+
   return (
     <ComponentReady isReady={isReady} linkToMetrics={linkToMetrics}>
       <div className="util-threshold-chart" ref={ref}>
@@ -118,7 +113,7 @@ const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ pods, vmi }) => {
               }}
               dependentAxis
               tickFormat={(tick: number) => tick?.toFixed(2)}
-              tickValues={[0, yMax]}
+              tickValues={[0, showValuesInMillicores ? cpuRequested * 1000 : cpuRequested]}
             />
             <ChartAxis
               style={{

@@ -1,7 +1,6 @@
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 enum VMQueries {
-  CPU_REQUESTED = 'CPU_REQUESTED',
   CPU_USAGE = 'CPU_USAGE',
   FILESYSTEM_READ_USAGE = 'FILESYSTEM_READ_USAGE',
   FILESYSTEM_USAGE_TOTAL = 'FILESYSTEM_TOTAL_USAGE',
@@ -31,27 +30,15 @@ enum VMQueries {
 type UtilizationQueriesArgs = {
   duration?: string;
   hubClusterName?: string;
-  launcherPodName?: string;
   nic?: string;
   obj: K8sResourceCommon;
 };
 
-type GetUtilizationQueries = ({
-  duration,
-  hubClusterName,
-  launcherPodName,
-  nic,
-  obj,
-}: UtilizationQueriesArgs) => {
+type GetUtilizationQueries = ({ duration, hubClusterName, nic, obj }: UtilizationQueriesArgs) => {
   [key in VMQueries]: string;
 };
 
-export const getUtilizationQueries: GetUtilizationQueries = ({
-  duration,
-  hubClusterName,
-  launcherPodName,
-  obj,
-}) => {
+export const getUtilizationQueries: GetUtilizationQueries = ({ duration, hubClusterName, obj }) => {
   const { name, namespace } = obj?.metadata || {};
 
   const clusterFilter =
@@ -59,7 +46,6 @@ export const getUtilizationQueries: GetUtilizationQueries = ({
 
   const sumByCluster = !isEmpty(obj?.cluster) && obj?.cluster === hubClusterName ? ', cluster' : '';
   return {
-    [VMQueries.CPU_REQUESTED]: `sum(kube_pod_resource_request{resource='cpu'${clusterFilter},pod='${launcherPodName}',namespace='${namespace}'}) BY (name, namespace${sumByCluster})`,
     [VMQueries.CPU_USAGE]: `sum(rate(kubevirt_vmi_cpu_usage_seconds_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}])) BY (name, namespace${sumByCluster})`,
     [VMQueries.FILESYSTEM_READ_USAGE]: `sum(rate(kubevirt_vmi_storage_read_traffic_bytes_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}])) BY (name, namespace${sumByCluster})`,
     [VMQueries.FILESYSTEM_USAGE_TOTAL]: `sum(rate(kubevirt_vmi_storage_read_traffic_bytes_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}]) + rate(kubevirt_vmi_storage_write_traffic_bytes_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}])) BY (name, namespace${sumByCluster})`,

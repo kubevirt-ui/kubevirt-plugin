@@ -1,3 +1,4 @@
+import { V1CPU } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getVMListNamespacesURL, getVMListURL } from '@multicluster/urls';
 import { getRowFilterQueryKey } from '@search/utils/query';
@@ -19,3 +20,6 @@ export const getVMListPathWithRowFilters = (
   rowFilters: Record<string, string>,
   cluster?: string,
 ) => getVMListPath(namespace, getRowFiltersString(rowFilters), cluster);
+
+export const getVCPUCount = (cpu: V1CPU) =>
+  (cpu?.sockets || 1) * (cpu?.cores || 1) * (cpu?.threads || 1);

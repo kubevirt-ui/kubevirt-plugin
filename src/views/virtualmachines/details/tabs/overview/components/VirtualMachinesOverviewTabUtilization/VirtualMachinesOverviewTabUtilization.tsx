@@ -4,7 +4,6 @@ import { Trans } from 'react-i18next';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/ComponentReady';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Card,
   CardBody,
@@ -28,13 +27,11 @@ import UtilizationThresholdCharts from './components/UtilizationThresholdCharts'
 import './virtual-machines-overview-tab-utilization.scss';
 
 type VirtualMachinesOverviewTabUtilizationProps = {
-  pods: K8sResourceCommon[];
   vm: V1VirtualMachine;
   vmi: V1VirtualMachineInstance;
 };
 
 const VirtualMachinesOverviewTabUtilization: FC<VirtualMachinesOverviewTabUtilizationProps> = ({
-  pods,
   vm,
   vmi,
 }) => {
@@ -66,7 +63,7 @@ const VirtualMachinesOverviewTabUtilization: FC<VirtualMachinesOverviewTabUtiliz
         <ComponentReady isReady={isRunning(vm)} text={t('VirtualMachine is not running')}>
           <Grid>
             <GridItem span={3}>
-              <CPUUtil pods={pods} vmi={vmi} />
+              <CPUUtil vmi={vmi} />
             </GridItem>
             <GridItem span={3}>
               <MemoryUtil vmi={vmi} />
@@ -77,7 +74,7 @@ const VirtualMachinesOverviewTabUtilization: FC<VirtualMachinesOverviewTabUtiliz
             <GridItem span={3}>
               <NetworkUtil vmi={vmi} />
             </GridItem>
-            <UtilizationThresholdCharts pods={pods} vmi={vmi} />
+            <UtilizationThresholdCharts vmi={vmi} />
           </Grid>
         </ComponentReady>
       </CardBody>

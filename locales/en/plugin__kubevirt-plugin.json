@@ -1216,7 +1216,7 @@
   "Removing Resources": "Removing Resources",
   "Request sent": "Request sent",
   "Requested": "Requested",
-  "Requested of ": "Requested of ",
+  "Requested of {{cpuRequested}}": "Requested of {{cpuRequested}}",
   "Required": "Required",
   "Required parameters": "Required parameters",
   "Required when automatic update is enabled": "Required when automatic update is enabled",

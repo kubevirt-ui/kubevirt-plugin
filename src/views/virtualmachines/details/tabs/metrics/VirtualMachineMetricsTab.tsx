@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom-v5-compat';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm';
+import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { Overview } from '@openshift-console/dynamic-plugin-sdk';
@@ -22,7 +22,7 @@ import './virtual-machine-metrics-tab.scss';
 const VirtualMachineMetricsTab: FC<NavPageComponentProps> = ({ obj: vm }) => {
   const { t } = useKubevirtTranslation();
   const location = useLocation();
-  const { loaded, pods, vmi } = useVMIAndPodsForVM(getName(vm), getNamespace(vm), getCluster(vm));
+  const { vmi, vmiLoaded } = useVMI(getName(vm), getNamespace(vm), getCluster(vm));
 
   const [expended, setExpended] = useState<{ [key in MetricsTabExpendedSections]: boolean }>({
     [MetricsTabExpendedSections.migration]: true,
@@ -35,14 +35,14 @@ const VirtualMachineMetricsTab: FC<NavPageComponentProps> = ({ obj: vm }) => {
     setExpended((currentOpen) => ({ ...currentOpen, [value]: !currentOpen?.[value] }));
 
   useEffect(() => {
-    if (!isEmpty(location?.search) && loaded) {
+    if (!isEmpty(location?.search) && vmiLoaded) {
       const focusedSectionId = Object.values(MetricsTabExpendedSections).find((focusedSection) =>
         location?.search?.includes(focusedSection),
       );
       const focusedExpandableSection = document.getElementById(focusedSectionId);
       focusedExpandableSection.scrollIntoView();
     }
-  }, [location?.search, loaded]);
+  }, [location?.search, vmiLoaded]);
 
   return (
     <div className="virtual-machine-metrics-tab__main">
@@ -57,7 +57,7 @@ const VirtualMachineMetricsTab: FC<NavPageComponentProps> = ({ obj: vm }) => {
           onToggle={onToggle(MetricsTabExpendedSections.utilization)}
           toggleText={t('Utilization')}
         >
-          <UtilizationCharts pods={pods} vmi={vmi} />
+          <UtilizationCharts vmi={vmi} />
         </ExpandableSection>
 
         <ExpandableSection
