@@ -14,6 +14,7 @@ import { getName } from '@kubevirt-utils/resources/shared';
 import useInstanceTypeExpandSpec from '@kubevirt-utils/resources/vm/hooks/useInstanceTypeExpandSpec';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
+import { getVMURL } from '@multicluster/urls';
 import { DocumentTitle } from '@openshift-console/dynamic-plugin-sdk';
 
 import { useVirtualMachineTabs } from './hooks/useVirtualMachineTabs';
@@ -63,6 +64,7 @@ const VirtualMachineNavPage: FC = () => {
         />
         <div className="VirtualMachineNavPage--tabs__main">
           <HorizontalNavbar
+            basePath={getVMURL(cluster, namespace, name)}
             error={loadError}
             instanceTypeExpandedSpec={instanceTypeExpandedSpec}
             loaded={isLoaded && !expandedSpecLoading}
