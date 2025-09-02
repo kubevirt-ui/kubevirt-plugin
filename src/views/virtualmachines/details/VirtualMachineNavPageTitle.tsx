@@ -11,7 +11,7 @@ import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
 import useVirtualMachineInstanceMigration from '@kubevirt-utils/resources/vmi/hooks/useVirtualMachineInstanceMigration';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { getCluster } from '@multicluster/helpers/selectors';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { Label, Split, SplitItem, Title } from '@patternfly/react-core';
 import VirtualMachineActions from '@virtualmachines/actions/components/VirtualMachineActions/VirtualMachineActions';
 import FailedMigrationAlert from '@virtualmachines/actions/components/VirtualMachineComputeMigration/components/FailedMigrationAlert/FailedMigrationAlert';
@@ -41,7 +41,7 @@ const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({
 
   const name = getName(vm);
   const namespace = getNamespace(vm);
-  const cluster = getCluster(vm);
+  const cluster = useClusterParam();
 
   const { vmi } = useVMI(name, namespace, cluster, isRunning(vm));
   const vmim = useVirtualMachineInstanceMigration(vm);
