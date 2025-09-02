@@ -10,10 +10,15 @@ import { getDiskDrive } from '@kubevirt-utils/resources/vm/utils/disk/selectors'
 import { Checkbox, ExpandableSection, Split, Stack, StackItem } from '@patternfly/react-core';
 
 import { V1DiskFormState } from '../../utils/types';
+import ApplyStorageProfileSettings from '../StorageProfileSettings/ApplyStorageProfileSettings';
 import { LUN_RESERVATION_FIELD, SHARABLE_FIELD } from '../utils/constants';
 import { getDiskSharable, getLunReservation } from '../utils/selectors';
 
-const AdvancedSettings: FC = () => {
+type AdvancedSettingsProps = {
+  showApplyStorageProfileSettings?: boolean;
+};
+
+const AdvancedSettings: FC<AdvancedSettingsProps> = ({ showApplyStorageProfileSettings }) => {
   const { t } = useKubevirtTranslation();
   const { control, setValue, watch } = useFormContext<V1DiskFormState>();
   const disk = watch('disk');
@@ -29,6 +34,7 @@ const AdvancedSettings: FC = () => {
   return (
     <ExpandableSection toggleText={t('Advanced settings')}>
       <Stack hasGutter>
+        {showApplyStorageProfileSettings && <ApplyStorageProfileSettings />}
         <StackItem>
           <Split hasGutter>
             <Controller

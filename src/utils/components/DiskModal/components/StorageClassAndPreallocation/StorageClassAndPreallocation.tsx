@@ -3,7 +3,6 @@ import React, { FC, useState } from 'react';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 
 import { checkDifferentStorageClassFromBootPVC } from '../../utils/helpers';
-import ApplyStorageProfileSettings from '../StorageProfileSettings/ApplyStorageProfileSettings';
 
 import DefaultStorageClassAlert from './DefaultStorageClassAlert';
 import EnablePreallocationCheckbox from './EnablePreallocationCheckbox';
@@ -25,7 +24,6 @@ const StorageClassAndPreallocation: FC<StorageClassAndPreallocationProps> = ({ v
         setShowSCAlert={setShowSCAlert}
       />
       {showSCAlert && <DefaultStorageClassAlert />}
-      <ApplyStorageProfileSettings />
       <EnablePreallocationCheckbox />
     </>
   );
