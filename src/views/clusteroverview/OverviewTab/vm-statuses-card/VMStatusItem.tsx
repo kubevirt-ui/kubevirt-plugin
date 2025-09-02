@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Link } from 'react-router-dom-v5-compat';
 
 import { getVMListPathWithRowFilters } from '@kubevirt-utils/resources/vm/utils/utils';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { GridItem } from '@patternfly/react-core';
 
 import { vmStatusIcon } from './utils/utils';
@@ -22,7 +23,8 @@ const VMStatusItem: React.FC<VMStatusItemProps> = ({
   status,
 }) => {
   const Icon = vmStatusIcon[status];
-  const path = getVMListPathWithRowFilters(namespace, { status });
+  const cluster = useClusterParam();
+  const path = getVMListPathWithRowFilters(namespace, { status }, cluster);
 
   return (
     <GridItem className="vm-statuses-card__grid-item" span={3}>
