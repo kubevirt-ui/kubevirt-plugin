@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { FC, ReactNode } from 'react';
+import { FC, MouseEventHandler, ReactNode } from 'react';
 import classNames from 'classnames';
 
 import { Icon, IconSize, Popover, PopoverPosition } from '@patternfly/react-core';
@@ -12,6 +12,7 @@ type HelpTextIconProps = {
   className?: string;
   headerContent?: ReactNode;
   helpIconClassName?: string;
+  onClick?: MouseEventHandler<HTMLSpanElement>;
   position?: PopoverPosition;
   size?: IconSize;
 };
@@ -21,6 +22,7 @@ const HelpTextIcon: FC<HelpTextIconProps> = ({
   className = 'help-text-icon__popover',
   headerContent,
   helpIconClassName = '',
+  onClick,
   position = PopoverPosition.top,
   size,
 }) => (
@@ -31,8 +33,8 @@ const HelpTextIcon: FC<HelpTextIconProps> = ({
     headerContent={headerContent}
     position={position}
   >
-    <Icon size={size}>
-      <HelpIcon className={classNames('help-icon__cursor', helpIconClassName)} />
+    <Icon onClick={onClick} size={size}>
+      <HelpIcon className={classNames('help-icon', helpIconClassName)} />
     </Icon>
   </Popover>
 );
