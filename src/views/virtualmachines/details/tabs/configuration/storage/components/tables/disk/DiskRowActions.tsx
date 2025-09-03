@@ -64,13 +64,8 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
   const isCDROM = vmDisk ? isCDROMDisk(vmDisk) : false;
 
   const { isCDROMMountedState, volume } = useMemo(() => {
-    const vols = isVMRunning ? vmi?.spec?.volumes : getVolumes(vm);
+    const vols = isVMRunning && !isCDROM ? vmi?.spec?.volumes : getVolumes(vm);
     const vol = vols?.find(({ name }) => name === diskName);
-
-    const vmVols = getVolumes(vm);
-    const vmVol = vmVols?.find(({ name }) => name === diskName);
-
-    const effective = isCDROM ? vmVol : vol;
 
     const isMountedVolume = (targetVolume: undefined | V1Volume): boolean => {
       if (!targetVolume) return false;
@@ -80,7 +75,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
       return hasDataVolume(targetVolume) || hasPersistentVolumeClaim(targetVolume);
     };
 
-    const mounted = isMountedVolume(effective);
+    const mounted = isMountedVolume(vol);
 
     return {
       isCDROMMountedState: mounted,
