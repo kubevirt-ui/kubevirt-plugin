@@ -16,11 +16,11 @@ import SelectTypeahead, {
 } from '@kubevirt-utils/components/SelectTypeahead/SelectTypeahead';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { getNetworks } from '@kubevirt-utils/resources/vm';
+import { getNetworks, POD_NETWORK } from '@kubevirt-utils/resources/vm';
 import { interfaceTypesProxy } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { FormGroup, Label, ValidatedOptions } from '@patternfly/react-core';
 
-import { getNadType, networkNameStartWithPod, podNetworkExists } from '../../utils/helpers';
+import { getNadType, isPodNetworkName, podNetworkExists } from '../../utils/helpers';
 import useNADsData from '../hooks/useNADsData';
 
 import NetworkSelectHelperPopover from './components/NetworkSelectHelperPopover/NetworkSelectHelperPopover';
@@ -74,7 +74,7 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
   const hasPodNetwork = useMemo(() => podNetworkExists(vm), [vm]);
   const hasNads = useMemo(() => filteredNADs?.length > 0, [filteredNADs]);
   const isPodNetworkingOptionExists =
-    !hasPodNetwork || (isEditing && networkNameStartWithPod(editInitValueNetworkName));
+    !hasPodNetwork || (isEditing && isPodNetworkName(editInitValueNetworkName));
 
   const canCreateNetworkInterface = useMemo(
     () => hasNads || !hasPodNetwork,
@@ -113,10 +113,10 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
               {podNetworkingText} <Label isCompact>{interfaceTypesProxy.masquerade} Binding</Label>
             </>
           ),
-          key: podNetworkingText,
+          key: POD_NETWORK,
         },
         type: interfaceTypesProxy.masquerade,
-        value: podNetworkingText,
+        value: POD_NETWORK,
       });
     }
 
@@ -141,12 +141,12 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
     (value: string) => {
       setNetworkName(value);
       setInterfaceType(
-        value === podNetworkingText
+        value === POD_NETWORK
           ? interfaceTypesProxy.masquerade
           : networkOptions.find((netOption) => value === netOption?.value)?.type,
       );
     },
-    [setNetworkName, setInterfaceType, podNetworkingText, networkOptions],
+    [setNetworkName, setInterfaceType, networkOptions],
   );
 
   // This useEffect is to handle the submit button and init value
