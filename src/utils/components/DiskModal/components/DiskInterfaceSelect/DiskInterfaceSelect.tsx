@@ -13,6 +13,8 @@ import { InterfaceTypes, V1DiskFormState } from '../../utils/types';
 import { diskInterfaceOptions } from './utils/constants';
 import { getInterfaceTypeHelperText } from './utils/util';
 
+import './DiskInterfaceSelect.scss';
+
 type DiskInterfaceSelectProps = {
   isVMRunning: boolean;
 };
@@ -28,12 +30,13 @@ const DiskInterfaceSelect: FC<DiskInterfaceSelectProps> = ({ isVMRunning }) => {
 
   const selectedLabel = diskInterfaceOptions?.[diskInterface]?.label;
 
-  const userHelpText = getInterfaceTypeHelperText(disk, isVMRunning);
+  const userHelpText = getInterfaceTypeHelperText(diskType, isVMRunning);
 
   return (
     <FormGroup fieldId="disk-interface" isRequired label={t('Interface')}>
       <div data-test-id="disk-interface-select">
         <FormPFSelect
+          className="disk-interface-select"
           onSelect={(_, val) => setValue(`disk.${diskType}.bus`, val as string)}
           selected={diskInterface}
           selectedLabel={selectedLabel}
@@ -57,7 +60,7 @@ const DiskInterfaceSelect: FC<DiskInterfaceSelectProps> = ({ isVMRunning }) => {
             );
           })}
         </FormPFSelect>
-        <FormGroupHelperText>{userHelpText}</FormGroupHelperText>
+        {userHelpText && <FormGroupHelperText>{userHelpText}</FormGroupHelperText>}
       </div>
     </FormGroup>
   );
