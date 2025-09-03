@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useRef } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
@@ -27,10 +27,10 @@ const DiskTypeSelect: FC<DiskTypeSelectProps> = ({ isVMRunning }) => {
 
   const diskState = watch();
 
-  if (!diskState) return null;
+  const diskType = getDiskDrive(diskState?.disk);
+  const initialDiskTypeRef = useRef<DiskType>(diskType);
 
-  const diskType = getDiskDrive(diskState.disk);
-  const isCDROM = diskType === diskTypes.cdrom;
+  if (!diskState) return null;
 
   const diskSource = getSourceFromVolume(diskState.volume, diskState.dataVolumeTemplate);
 
@@ -40,7 +40,7 @@ const DiskTypeSelect: FC<DiskTypeSelectProps> = ({ isVMRunning }) => {
 
   const diskInterface = diskState.disk?.[diskType]?.bus || InterfaceTypes.VIRTIO;
 
-  const userHelpText = getDiskTypeHelperText(diskState.disk, isVMRunning);
+  const userHelpText = getDiskTypeHelperText(initialDiskTypeRef.current, isVMRunning);
 
   return (
     <div data-test-id={DISKTYPE_SELECT_FIELDID}>
@@ -60,7 +60,7 @@ const DiskTypeSelect: FC<DiskTypeSelectProps> = ({ isVMRunning }) => {
 
             setValue(`disk.${val as DiskType}`, { bus: newDiskInterface });
           }}
-          isDisabled={isCDROM}
+          isDisabled={initialDiskTypeRef.current === diskTypes.cdrom}
           selected={diskType}
           selectedLabel={diskTypesLabels[diskType]}
           toggleProps={{ isFullWidth: true }}
@@ -78,7 +78,7 @@ const DiskTypeSelect: FC<DiskTypeSelectProps> = ({ isVMRunning }) => {
             ))}
           </SelectList>
         </FormPFSelect>
-        <FormGroupHelperText>{userHelpText}</FormGroupHelperText>
+        {userHelpText && <FormGroupHelperText>{userHelpText}</FormGroupHelperText>}
       </FormGroup>
     </div>
   );

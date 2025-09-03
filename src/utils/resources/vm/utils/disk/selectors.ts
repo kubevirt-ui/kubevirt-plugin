@@ -17,9 +17,7 @@ import { DiskType, diskTypes, diskTypesLabels } from './constants';
  * @returns drive type
  */
 export const getDiskDrive = (disk: V1Disk): DiskType => {
-  const drive = Object.keys(diskTypesLabels).find(
-    (driveType: string) => disk?.[driveType],
-  ) as DiskType;
+  const drive = Object.values(diskTypes).find((driveType) => disk?.[driveType]);
 
   return drive ?? diskTypes.disk;
 };
