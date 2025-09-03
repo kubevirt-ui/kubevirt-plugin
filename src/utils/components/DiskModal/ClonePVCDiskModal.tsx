@@ -69,7 +69,7 @@ const ClonePVCDiskModal: FC<V1SubDiskModalProps> = ({
           <DiskTypeSelect isVMRunning={isVMRunning} />
           <DiskInterfaceSelect isVMRunning={isVMRunning} />
           {!isCreated && <StorageClassAndPreallocation vm={vm} />}
-          <AdvancedSettings />
+          <AdvancedSettings showApplyStorageProfileSettings={!isCreated} />
         </Form>
       </TabModal>
     </FormProvider>

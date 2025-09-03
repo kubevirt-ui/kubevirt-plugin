@@ -46,6 +46,9 @@ const OtherDiskModal: FC<V1SubDiskModalProps> = ({
     handleSubmit,
   } = methods;
 
+  const showApplyStorageProfileSettings =
+    doesDataVolumeTemplateHaveDisk(vm, editDiskName) && !isCreated;
+
   return (
     <FormProvider {...methods}>
       <TabModal
@@ -65,10 +68,8 @@ const OtherDiskModal: FC<V1SubDiskModalProps> = ({
           <DiskSizeInput isCreated={isCreated} namespace={namespace} pvc={pvc} />
           <DiskTypeSelect isVMRunning={isVMRunning} />
           <DiskInterfaceSelect isVMRunning={isVMRunning} />
-          {doesDataVolumeTemplateHaveDisk(vm, editDiskName) && !isCreated && (
-            <StorageClassAndPreallocation vm={vm} />
-          )}
-          <AdvancedSettings />
+          {showApplyStorageProfileSettings && <StorageClassAndPreallocation vm={vm} />}
+          <AdvancedSettings showApplyStorageProfileSettings={showApplyStorageProfileSettings} />
         </Form>
       </TabModal>
     </FormProvider>
