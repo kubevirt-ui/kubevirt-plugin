@@ -11,10 +11,9 @@ import {
   DropdownItem,
   DropdownList,
   Select,
+  SelectList,
   SelectOption,
 } from '@patternfly/react-core';
-import { SelectList } from '@patternfly/react-core';
-import {} from '@patternfly/react-core';
 import { PasteIcon } from '@patternfly/react-icons';
 
 import { ConsoleState, isConsoleType, VNC_CONSOLE_TYPE } from '../utils/ConsoleConsts';
