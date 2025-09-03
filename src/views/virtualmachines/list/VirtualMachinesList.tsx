@@ -39,7 +39,6 @@ import {
 } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import { usePVCMapper } from '@kubevirt-utils/hooks/usePVCMapper';
 import useQuery from '@kubevirt-utils/hooks/useQuery';
-import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { getCatalogURL } from '@multicluster/urls';
@@ -69,6 +68,7 @@ import useFiltersFromURL from './hooks/useFiltersFromURL';
 import useVirtualMachineColumns from './hooks/useVirtualMachineColumns';
 import { useVMListFilters } from './hooks/useVMListFilters/useVMListFilters';
 import useVMMetrics from './hooks/useVMMetrics';
+import { filterVMsByClusterAndNamespace } from './utils/utils';
 import { getListPageBodySize, ListPageBodySize } from './listPageBodySize';
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
@@ -203,10 +203,12 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
   const existingSelectedVMs = useExistingSelectedVMs(filteredVMs);
   const isAllVMsSelected = filteredVMs?.length === existingSelectedVMs.length;
 
-  const allVMs = vmsSignal?.value;
-  const hasNoVMs = isEmpty(
-    namespace ? allVMs?.filter((resource) => getNamespace(resource) === namespace) : allVMs,
+  const allVMs = useMemo(
+    () => filterVMsByClusterAndNamespace(vmsSignal.value, namespace, cluster),
+    [vmsSignal.value, namespace, cluster],
   );
+
+  const hasNoVMs = isEmpty(allVMs);
 
   return (
     /* All of this table and components should be replaced to our own fitted components */
