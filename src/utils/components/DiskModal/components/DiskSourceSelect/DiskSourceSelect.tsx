@@ -28,7 +28,7 @@ const DiskSourceSelect: FC<DiskSourceSelectProps> = ({ className, onSelect }) =>
     >
       <SelectList>
         <DiskSourceOption {...blankOption} onSelect={onSelect} />
-        <Divider />
+        <Divider component="li" />
         <SelectGroup
           className="disk-source-select__group-title"
           label={attachExistingGroupOptions.groupLabel}
@@ -37,7 +37,7 @@ const DiskSourceSelect: FC<DiskSourceSelectProps> = ({ className, onSelect }) =>
             <DiskSourceOption key={item.id} {...item} onSelect={onSelect} />
           ))}
         </SelectGroup>
-        <Divider />
+        <Divider component="li" />
         <DiskSourceOption {...cdromOption} onSelect={onSelect} />
       </SelectList>
     </FormPFSelect>

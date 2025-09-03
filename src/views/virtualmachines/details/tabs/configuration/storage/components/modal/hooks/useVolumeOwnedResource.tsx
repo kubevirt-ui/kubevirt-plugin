@@ -31,7 +31,7 @@ const useVolumeOwnedResource: UseVolumeOwnedResource = (vm, volume) => {
     namespaced: false,
   });
 
-  const updatedVolume = volume.dataVolume ? convertDataVolumeToPVC(volume, cdiConfig) : volume;
+  const updatedVolume = volume?.dataVolume ? convertDataVolumeToPVC(volume, cdiConfig) : volume;
   const volumeType = getVolumeType(updatedVolume);
   const volumeResourceModel = mapVolumeTypeToK8sModel[volumeType];
   const volumeGroupVersionKind =

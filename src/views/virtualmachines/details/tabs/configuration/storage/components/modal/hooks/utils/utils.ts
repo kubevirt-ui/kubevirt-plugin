@@ -15,6 +15,7 @@ export const convertDataVolumeToPVC = (volume: V1Volume, cdiConfig: V1beta1CDICo
 };
 
 export const getVolumeType = (volume: V1Volume): string => {
+  if (!volume) return null;
   const volumeType = Object.keys(volume)?.find((key: VolumeTypes) =>
     Object.values(VolumeTypes).includes(key),
   );
