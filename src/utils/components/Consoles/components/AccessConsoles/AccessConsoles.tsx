@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-shadow */
-import React, { FC, useState } from 'react';
+import React, { FC, MouseEvent, useState } from 'react';
 
 import DropdownToggle from '@kubevirt-utils/components/toggles/DropdownToggle';
 import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';
@@ -59,8 +59,11 @@ export const AccessConsoles: FC<AccessConsolesProps> = ({
             <PasteIcon /> {t('Paste to console')}
           </>
         }
+        onClick={(e: MouseEvent<HTMLButtonElement>) => {
+          actions.sendPaste(true);
+          e.currentTarget.blur();
+        }}
         className="vnc-paste-button"
-        onClick={actions.sendPaste}
         variant={ButtonVariant.link}
       />
       <Select
