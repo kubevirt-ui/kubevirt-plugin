@@ -15,7 +15,7 @@ export type AccessConsolesActions = {
   sendCtrlAlt1?: () => void;
   sendCtrlAlt2?: () => void;
   sendCtrlAltDel?: () => void;
-  sendPaste?: () => void;
+  sendPaste?: (consoleFocus?: boolean) => void;
 };
 
 export type AccessConsolesProps = {
