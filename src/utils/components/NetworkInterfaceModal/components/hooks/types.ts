@@ -14,7 +14,10 @@ export type NetworkAttachmentDefinition = K8sResourceCommon & {
   spec: NetworkAttachmentDefinitionSpec;
 };
 
-export type UseNADsData = (namespace: string) => {
+export type UseNADsData = (
+  namespace: string,
+  cluster?: string,
+) => {
   loaded: boolean;
   loadError: string;
   nads: NetworkAttachmentDefinition[];

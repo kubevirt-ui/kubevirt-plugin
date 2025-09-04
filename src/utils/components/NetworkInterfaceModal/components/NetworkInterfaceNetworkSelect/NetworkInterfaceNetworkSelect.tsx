@@ -18,6 +18,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getNetworks, POD_NETWORK } from '@kubevirt-utils/resources/vm';
 import { interfaceTypesProxy } from '@kubevirt-utils/resources/vm/utils/network/constants';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { FormGroup, Label, ValidatedOptions } from '@patternfly/react-core';
 
 import { getNadType, isPodNetworkName, podNetworkExists } from '../../utils/helpers';
@@ -53,7 +54,7 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const vmiNamespace = vm?.metadata?.namespace || namespace;
-  const { loaded, loadError, nads } = useNADsData(vmiNamespace);
+  const { loaded, loadError, nads } = useNADsData(vmiNamespace, getCluster(vm));
   const [selectedFirstOnLoad, setSelectedFirstOnLoad] = useState(false);
   const [createdNetworkOptions, setCreatedNetworkOptions] = useState<
     NetworkSelectTypeaheadOptionProps[]
