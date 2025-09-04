@@ -5,7 +5,8 @@ import { useImmer } from 'use-immer';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 
 export type UpdateValidatedVM = (
   updateVM: ((vmDraft: WritableDraft<V1VirtualMachine>) => void) | V1VirtualMachine,
@@ -30,7 +31,8 @@ export const useValidatedVM = (initialVM: V1VirtualMachine): UseValidatedVMValue
     setError(undefined);
 
     // validate the updated vm with the backend (dry run)
-    return k8sCreate<V1VirtualMachine>({
+    return kubevirtK8sCreate<V1VirtualMachine>({
+      cluster: getCluster(vm),
       data: typeof updatedVM === 'function' ? produce(vm, updatedVM) : updatedVM,
       model: VirtualMachineModel,
       queryParams: {
