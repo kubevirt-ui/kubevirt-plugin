@@ -1,18 +1,22 @@
 import { useMemo } from 'react';
 
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
-import { getNamespace } from '@kubevirt-utils/resources/shared';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
 import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import { METRICS } from '@overview/OverviewTab/metric-charts-card/utils/constants';
 import { useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';
 
-import { getCpuText, getMemoryCapacityText, getMetricText } from '../utils/processVMTotalsMetrics';
+import {
+  getCpuRequestedText,
+  getCpuText,
+  getMemoryCapacityText,
+  getMetricText,
+} from '../utils/processVMTotalsMetrics';
 import { getVMTotalsQueries, VMTotalsQueries } from '../utils/totalsQueries';
 
-const useVMTotalsMetrics = (vms: V1VirtualMachine[], vmis: V1VirtualMachineInstance[]) => {
+const useVMTotalsMetrics = (vmis: V1VirtualMachineInstance[]) => {
   const namespace = useNamespaceParam();
 
   const cluster = useClusterParam();
@@ -20,17 +24,9 @@ const useVMTotalsMetrics = (vms: V1VirtualMachine[], vmis: V1VirtualMachineInsta
 
   const currentTime = useMemo<number>(() => Date.now(), []);
 
-  const namespacesList = useMemo(() => [...new Set(vms.map((vm) => getNamespace(vm)))], [vms]);
-
   const queries = useMemo(
-    () =>
-      getVMTotalsQueries(
-        namespace,
-        namespacesList,
-        isAllClustersPage ? undefined : cluster,
-        isAllClustersPage,
-      ),
-    [namespace, namespacesList, cluster, isAllClustersPage],
+    () => getVMTotalsQueries(namespace, isAllClustersPage ? undefined : cluster, isAllClustersPage),
+    [namespace, cluster, isAllClustersPage],
   );
 
   const prometheusPollProps = {
@@ -44,11 +40,6 @@ const useVMTotalsMetrics = (vms: V1VirtualMachine[], vmis: V1VirtualMachineInsta
   const [cpuUsageResponse] = useFleetPrometheusPoll({
     ...prometheusPollProps,
     query: queries?.[VMTotalsQueries.TOTAL_CPU_USAGE],
-  });
-
-  const [cpuRequestedResponse] = useFleetPrometheusPoll({
-    ...prometheusPollProps,
-    query: queries?.[VMTotalsQueries.TOTAL_CPU_REQUESTED],
   });
 
   const [memoryUsageResponse] = useFleetPrometheusPoll({
@@ -67,7 +58,7 @@ const useVMTotalsMetrics = (vms: V1VirtualMachine[], vmis: V1VirtualMachineInsta
   });
 
   return {
-    cpuRequested: getCpuText(cpuRequestedResponse),
+    cpuRequested: getCpuRequestedText(vmis),
     cpuUsage: getCpuText(cpuUsageResponse),
     memoryCapacity: getMemoryCapacityText(vmis),
     memoryUsage: getMetricText(memoryUsageResponse, METRICS.MEMORY),

@@ -1213,7 +1213,7 @@
   "Removing Resources": "删除资源",
   "Request sent": "请求发生",
   "Requested": "请求的",
-  "Requested of ": "请求的",
+  "Requested of {{cpuRequested}}": "Requested of {{cpuRequested}}",
   "Required": "必需",
   "Required parameters": "所需的参数",
   "Required when automatic update is enabled": "在启用自动更新时需要",

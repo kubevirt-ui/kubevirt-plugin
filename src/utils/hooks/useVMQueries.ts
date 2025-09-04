@@ -8,10 +8,7 @@ import { getUtilizationQueries } from '@kubevirt-utils/components/Charts/utils/q
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
-const useVMQueries = (
-  vm: V1VirtualMachine | V1VirtualMachineInstance,
-  launcherPodName?: string,
-) => {
+const useVMQueries = (vm: V1VirtualMachine | V1VirtualMachineInstance) => {
   const { duration } = useDuration();
 
   const [hubClusterName] = useHubClusterName();
@@ -21,10 +18,9 @@ const useVMQueries = (
       getUtilizationQueries({
         duration,
         hubClusterName,
-        launcherPodName,
         obj: vm,
       }),
-    [duration, hubClusterName, launcherPodName, vm],
+    [duration, hubClusterName, vm],
   );
 };
 

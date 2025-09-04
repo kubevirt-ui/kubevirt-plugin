@@ -1213,7 +1213,7 @@
   "Removing Resources": "リソースの削除",
   "Request sent": "送信済みリクエスト",
   "Requested": "要求済み",
-  "Requested of ": "要求済み / ",
+  "Requested of {{cpuRequested}}": "Requested of {{cpuRequested}}",
   "Required": "必須",
   "Required parameters": "必須パラメーター",
   "Required when automatic update is enabled": "自動更新が有効な場合に必須",

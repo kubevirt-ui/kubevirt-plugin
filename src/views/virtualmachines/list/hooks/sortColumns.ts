@@ -1,6 +1,6 @@
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { getMemory } from '@kubevirt-utils/resources/vm';
+import { getCPU, getMemory } from '@kubevirt-utils/resources/vm';
 import { columnSortingCompare, isEmpty } from '@kubevirt-utils/utils/utils';
 import { SortByDirection } from '@patternfly/react-table';
 import { getDeletionProtectionPrintableStatus } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
@@ -39,10 +39,14 @@ export const sortByCPUUsage = (
   data: V1VirtualMachine[],
   direction: SortByDirection,
   pagination: { [key: string]: any },
+  vmiMapper: VMIMapper,
 ) => {
   const compareCPUUsage = (a: V1VirtualMachine, b: V1VirtualMachine): number => {
-    const cpuUsageA = getCPUUsagePercentage(getName(a), getNamespace(a));
-    const cpuUsageB = getCPUUsagePercentage(getName(b), getNamespace(b));
+    const aCPU = getCPU(getVMIFromMapper(vmiMapper, a));
+    const bCPU = getCPU(getVMIFromMapper(vmiMapper, b));
+
+    const cpuUsageA = getCPUUsagePercentage(getName(a), getNamespace(a), aCPU);
+    const cpuUsageB = getCPUUsagePercentage(getName(b), getNamespace(b), bCPU);
 
     if (isEmpty(cpuUsageA)) return -1;
     if (isEmpty(cpuUsageB)) return 1;
