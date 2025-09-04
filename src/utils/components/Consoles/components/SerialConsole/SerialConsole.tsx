@@ -113,10 +113,13 @@ const SerialConsole: FC<SerialConsoleConnectorProps> = ({ basePath, setState }) 
         actions: {
           connect,
           disconnect,
-          sendPaste: async () => {
+          sendPaste: async (shouldFocusOnConsole: boolean) => {
             const text = await readFromClipboard();
             if (typeof text === 'string') {
               xtermRef.current?.paste(text);
+              if (shouldFocusOnConsole) {
+                xtermRef.current?.focus();
+              }
             }
           },
         },
