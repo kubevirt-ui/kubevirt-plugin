@@ -7,7 +7,7 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { DESCHEDULER_EVICT_LABEL } from '@kubevirt-utils/resources/vmi';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
-import { Alert, AlertVariant, Checkbox, Form, FormGroup } from '@patternfly/react-core';
+import { Alert, AlertVariant, Checkbox, FormGroup } from '@patternfly/react-core';
 
 type DeschedulerModalProps = {
   isOpen: boolean;
@@ -44,26 +44,23 @@ const DeschedulerModal: FC<DeschedulerModalProps> = ({ isOpen, onClose, onSubmit
       obj={updatedVirtualMachine}
       onClose={onClose}
       onSubmit={onSubmit}
+      shouldWrapInForm
     >
-      <Form>
-        {vmi && <ModalPendingChangesAlert />}
-        <FormGroup fieldId="descheduler">
-          <Checkbox
-            description={t('Allow the Descheduler to evict the VirtualMachine via live migration')}
-            id="descheduler"
-            isChecked={checked}
-            label={t('Enable Descheduler')}
-            onChange={(_, check: boolean) => setChecked(check)}
-          />
-        </FormGroup>
-        {checked && (
-          <Alert isInline title={t('Active Descheduler')} variant={AlertVariant.info}>
-            {t(
-              'This VirtualMachine is subject to the Descheduler profiles configured for eviction.',
-            )}
-          </Alert>
-        )}
-      </Form>
+      {vmi && <ModalPendingChangesAlert />}
+      <FormGroup fieldId="descheduler">
+        <Checkbox
+          description={t('Allow the Descheduler to evict the VirtualMachine via live migration')}
+          id="descheduler"
+          isChecked={checked}
+          label={t('Enable Descheduler')}
+          onChange={(_, check: boolean) => setChecked(check)}
+        />
+      </FormGroup>
+      {checked && (
+        <Alert isInline title={t('Active Descheduler')} variant={AlertVariant.info}>
+          {t('This VirtualMachine is subject to the Descheduler profiles configured for eviction.')}
+        </Alert>
+      )}
     </TabModal>
   );
 };

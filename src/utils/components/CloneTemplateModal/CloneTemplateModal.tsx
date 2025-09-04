@@ -20,7 +20,7 @@ import { getRandomChars } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
-import { ButtonVariant, Form, FormGroup, TextInput } from '@patternfly/react-core';
+import { ButtonVariant, FormGroup, TextInput } from '@patternfly/react-core';
 
 import FormGroupHelperText from '../FormGroupHelperText/FormGroupHelperText';
 
@@ -101,70 +101,65 @@ const CloneTemplateModal: FC<CloneTemplateModalProps> = ({
   };
 
   return (
-    <>
-      <TabModal<K8sResourceCommon>
-        headerText={t('Clone template')}
-        isOpen={isOpen}
-        obj={obj}
-        onClose={onClose}
-        onSubmit={onSubmit}
-        submitBtnText={t('Clone')}
-        submitBtnVariant={ButtonVariant.primary}
-      >
-        <Form className="clone-template-modal">
-          <FormGroup fieldId="name" isRequired label={t('Template name')}>
-            <TextInput
-              id="name"
-              onChange={(_, value: string) => setTemplateName(value)}
-              type="text"
-              value={templateName}
-            />
-          </FormGroup>
-          <FormGroup fieldId="namespace" label={t('Template project')}>
-            <SelectProject
-              selectedProject={selectedProject}
-              setSelectedProject={setSelectedProject}
-            />
-            <FormGroupHelperText>{t('Project name to clone the template to')}</FormGroupHelperText>
-          </FormGroup>
-          <FormGroup fieldId="display-name" label={t('Template display name')}>
-            <TextInput
-              id="display-name"
-              onChange={(_, value: string) => setTemplateDisplayName(value)}
-              type="text"
-              value={templateDisplayName}
-            />
-          </FormGroup>
-          <FormGroup fieldId="provider" label={t('Template provider')}>
-            <TextInput
-              id="provider"
-              onChange={(_, value: string) => setTemplateProvider(value)}
-              type="text"
-              value={templateProvider}
-            />
-            <FormGroupHelperText>{t('Example: your company name')}</FormGroupHelperText>
-          </FormGroup>
-          {clonableStorage && (
-            <CloneStorageCheckbox isChecked={isCloneStorageEnabled} onChange={setCloneStorage} />
-          )}
-          {isCloneStorageEnabled && (
-            <FormGroup
-              className="pvc-name-form-group"
-              fieldId="pvc-name"
-              isRequired
-              label={t('Name of the template new disk')}
-            >
-              <TextInput
-                id="pvc-name"
-                onChange={(_, value: string) => setPVCName(value)}
-                type="text"
-                value={pvcName}
-              />
-            </FormGroup>
-          )}
-        </Form>
-      </TabModal>
-    </>
+    <TabModal<K8sResourceCommon>
+      formClassName="clone-template-modal"
+      headerText={t('Clone template')}
+      isOpen={isOpen}
+      obj={obj}
+      onClose={onClose}
+      onSubmit={onSubmit}
+      shouldWrapInForm
+      submitBtnText={t('Clone')}
+      submitBtnVariant={ButtonVariant.primary}
+    >
+      <FormGroup fieldId="name" isRequired label={t('Template name')}>
+        <TextInput
+          id="name"
+          onChange={(_, value: string) => setTemplateName(value)}
+          type="text"
+          value={templateName}
+        />
+      </FormGroup>
+      <FormGroup fieldId="namespace" label={t('Template project')}>
+        <SelectProject selectedProject={selectedProject} setSelectedProject={setSelectedProject} />
+        <FormGroupHelperText>{t('Project name to clone the template to')}</FormGroupHelperText>
+      </FormGroup>
+      <FormGroup fieldId="display-name" label={t('Template display name')}>
+        <TextInput
+          id="display-name"
+          onChange={(_, value: string) => setTemplateDisplayName(value)}
+          type="text"
+          value={templateDisplayName}
+        />
+      </FormGroup>
+      <FormGroup fieldId="provider" label={t('Template provider')}>
+        <TextInput
+          id="provider"
+          onChange={(_, value: string) => setTemplateProvider(value)}
+          type="text"
+          value={templateProvider}
+        />
+        <FormGroupHelperText>{t('Example: your company name')}</FormGroupHelperText>
+      </FormGroup>
+      {clonableStorage && (
+        <CloneStorageCheckbox isChecked={isCloneStorageEnabled} onChange={setCloneStorage} />
+      )}
+      {isCloneStorageEnabled && (
+        <FormGroup
+          className="pvc-name-form-group"
+          fieldId="pvc-name"
+          isRequired
+          label={t('Name of the template new disk')}
+        >
+          <TextInput
+            id="pvc-name"
+            onChange={(_, value: string) => setPVCName(value)}
+            type="text"
+            value={pvcName}
+          />
+        </FormGroup>
+      )}
+    </TabModal>
   );
 };
 

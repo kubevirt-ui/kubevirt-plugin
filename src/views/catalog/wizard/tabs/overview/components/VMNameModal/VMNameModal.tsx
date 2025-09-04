@@ -9,7 +9,7 @@ import {
 } from '@kubevirt-utils/components/VMNameValidationHelperText/utils/utils';
 import VMNameValidationHelperText from '@kubevirt-utils/components/VMNameValidationHelperText/VMNameValidationHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Form, FormGroup, TextInput } from '@patternfly/react-core';
+import { FormGroup, TextInput } from '@patternfly/react-core';
 
 type HostnameModalProps = {
   isOpen: boolean;
@@ -39,19 +39,18 @@ const VMNameModal: React.FC<HostnameModalProps> = ({ isOpen, onClose, onSubmit, 
       obj={updatedVirtualMachine}
       onClose={onClose}
       onSubmit={onSubmit}
+      shouldWrapInForm
     >
-      <Form>
-        <FormGroup fieldId="vm-name" isRequired label={t('VirtualMachine name')}>
-          <TextInput
-            id="vm-name"
-            onChange={(_event, val) => setVMName(val)}
-            type="text"
-            validated={vmNameValidated}
-            value={vmName}
-          />
-          <VMNameValidationHelperText showDefaultHelperText vmName={vmName} />
-        </FormGroup>
-      </Form>
+      <FormGroup fieldId="vm-name" isRequired label={t('VirtualMachine name')}>
+        <TextInput
+          id="vm-name"
+          onChange={(_event, val) => setVMName(val)}
+          type="text"
+          validated={vmNameValidated}
+          value={vmName}
+        />
+        <VMNameValidationHelperText showDefaultHelperText vmName={vmName} />
+      </FormGroup>
     </TabModal>
   );
 };

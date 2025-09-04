@@ -5,7 +5,6 @@ import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { UPLOAD_STATUS } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import { Form } from '@patternfly/react-core';
 import { isRunning } from '@virtualmachines/utils';
 
 import TabModal from '../TabModal/TabModal';
@@ -80,18 +79,17 @@ const UploadDiskModal: FC<V1SubDiskModalProps> = ({
         headerText={diskModalTitle(false, isVMRunning)}
         isLoading={isSubmitting}
         isOpen={isOpen}
+        shouldWrapInForm
       >
         <PendingChanges isVMRunning={isVMRunning} />
-        <Form>
-          <BootSourceCheckbox isDisabled={isVMRunning} vm={vm} />
-          <DiskNameInput />
-          <DiskSourceUploadPVC relevantUpload={upload} />
-          <DiskSizeInput namespace={vmNamespace} />
-          <DiskTypeSelect isVMRunning={isVMRunning} />
-          <DiskInterfaceSelect isVMRunning={isVMRunning} />
-          <StorageClassAndPreallocation vm={vm} />
-          <AdvancedSettings showApplyStorageProfileSettings={true} />
-        </Form>
+        <BootSourceCheckbox isDisabled={isVMRunning} vm={vm} />
+        <DiskNameInput />
+        <DiskSourceUploadPVC relevantUpload={upload} />
+        <DiskSizeInput namespace={vmNamespace} />
+        <DiskTypeSelect isVMRunning={isVMRunning} />
+        <DiskInterfaceSelect isVMRunning={isVMRunning} />
+        <StorageClassAndPreallocation vm={vm} />
+        <AdvancedSettings showApplyStorageProfileSettings={true} />
       </TabModal>
     </FormProvider>
   );

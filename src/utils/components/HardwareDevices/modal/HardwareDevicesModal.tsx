@@ -10,7 +10,7 @@ import {
 import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { generatePrettyName, isEmpty } from '@kubevirt-utils/utils/utils';
-import { Button, ButtonVariant, Form, FormGroup, Grid, GridItem } from '@patternfly/react-core';
+import { Button, ButtonVariant, FormGroup, Grid, GridItem } from '@patternfly/react-core';
 import { MinusCircleIcon, PlusCircleIcon } from '@patternfly/react-icons';
 
 import DeviceNameSelect from '../form/DeviceNameSelect';
@@ -87,62 +87,61 @@ const HardwareDevicesModal: FC<HardwareDevicesModalProps> = ({
       obj={updatedVM}
       onClose={onClose}
       onSubmit={onSubmit}
+      shouldWrapInForm
     >
       {vmi && <ModalPendingChangesAlert />}
-      <Form>
-        <HardwareDeviceModalDescription type={type} />
-        {devices.map(({ deviceIndex, deviceName, name }) => (
-          <Grid hasGutter key={deviceIndex}>
-            <GridItem span={5}>
-              <NameFormField
-                setName={(newName: string) => {
-                  setDevices((prevDevices) => {
-                    const newDevices = [...prevDevices];
-                    newDevices[deviceIndex] = { ...newDevices[deviceIndex], name: newName };
-                    return newDevices;
-                  });
-                }}
-                index={deviceIndex}
-                name={name}
-              />
-            </GridItem>
-            <GridItem span={5}>
-              <DeviceNameSelect
-                setDeviceName={(newDeviceName: string) => {
-                  setDevices((prevDevices) => {
-                    const newDevices = [...prevDevices];
-                    newDevices[deviceIndex] = {
-                      ...newDevices[deviceIndex],
-                      deviceName: newDeviceName,
-                    };
-                    return newDevices;
-                  });
-                }}
-                deviceName={deviceName}
-                index={deviceIndex}
-                permittedHostDevices={permittedHostDevices}
-              />
-            </GridItem>
-            <GridItem className="hardware-devices-form-button" span={2}>
-              <Button
-                icon={<MinusCircleIcon />}
-                onClick={() => onDelete(deviceIndex)}
-                variant={ButtonVariant.plain}
-              />
-            </GridItem>
-          </Grid>
-        ))}
-        <FormGroup fieldId="add-button">
-          <Button
-            className="pf-m-link--align-left"
-            icon={<PlusCircleIcon />}
-            onClick={onAddDevice}
-            variant={ButtonVariant.link}
-          >
-            {btnText}
-          </Button>
-        </FormGroup>
-      </Form>
+      <HardwareDeviceModalDescription type={type} />
+      {devices.map(({ deviceIndex, deviceName, name }) => (
+        <Grid hasGutter key={deviceIndex}>
+          <GridItem span={5}>
+            <NameFormField
+              setName={(newName: string) => {
+                setDevices((prevDevices) => {
+                  const newDevices = [...prevDevices];
+                  newDevices[deviceIndex] = { ...newDevices[deviceIndex], name: newName };
+                  return newDevices;
+                });
+              }}
+              index={deviceIndex}
+              name={name}
+            />
+          </GridItem>
+          <GridItem span={5}>
+            <DeviceNameSelect
+              setDeviceName={(newDeviceName: string) => {
+                setDevices((prevDevices) => {
+                  const newDevices = [...prevDevices];
+                  newDevices[deviceIndex] = {
+                    ...newDevices[deviceIndex],
+                    deviceName: newDeviceName,
+                  };
+                  return newDevices;
+                });
+              }}
+              deviceName={deviceName}
+              index={deviceIndex}
+              permittedHostDevices={permittedHostDevices}
+            />
+          </GridItem>
+          <GridItem className="hardware-devices-form-button" span={2}>
+            <Button
+              icon={<MinusCircleIcon />}
+              onClick={() => onDelete(deviceIndex)}
+              variant={ButtonVariant.plain}
+            />
+          </GridItem>
+        </Grid>
+      ))}
+      <FormGroup fieldId="add-button">
+        <Button
+          className="pf-m-link--align-left"
+          icon={<PlusCircleIcon />}
+          onClick={onAddDevice}
+          variant={ButtonVariant.link}
+        >
+          {btnText}
+        </Button>
+      </FormGroup>
     </TabModal>
   );
 };
