@@ -35,7 +35,7 @@ export function sendCtrlAlt2() {
   this.sendKey(KeyTable.XK_Control_L, 'ControlLeft', false);
 }
 
-export async function sendPasteCMD() {
+export async function sendPasteCMD(focusOnConsole?: boolean) {
   if (this._rfbConnectionState !== 'connected' || this._viewOnly) {
     return;
   }
@@ -61,6 +61,9 @@ export async function sendPasteCMD() {
       // Latin-1 set that maps directly to keysym
       this.sendKey(codePointIndex);
       shiftRequired && this.sendKey(KeyTable.XK_Shift_L, 'ShiftLeft', false);
+    }
+    if (focusOnConsole) {
+      this.focus();
     }
   }
 }

@@ -27,11 +27,11 @@ const useKubevirtWatchResource = <T extends K8sResourceCommon | K8sResourceCommo
 
   const shouldUseProxyPod = useMemo(() => {
     if (watchOptions?.cluster) return false;
-    if (query.size === 0) return false;
+    if (!filterOptions || query.size === 0) return false;
     if (!featureEnabled && !loading) return false;
     if (featureEnabled && !loading && isProxyPodAlive !== null) return isProxyPodAlive;
     return null;
-  }, [featureEnabled, loading, isProxyPodAlive, watchOptions?.cluster, query.size]);
+  }, [featureEnabled, loading, isProxyPodAlive, watchOptions?.cluster, query.size, filterOptions]);
 
   return useRedirectWatchHooks<T>(watchOptions, filterOptions, searchQueries, shouldUseProxyPod);
 };

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-shadow */
-import React, { FC, useState } from 'react';
+import React, { FC, MouseEvent, useState } from 'react';
 
 import DropdownToggle from '@kubevirt-utils/components/toggles/DropdownToggle';
 import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';
@@ -11,10 +11,9 @@ import {
   DropdownItem,
   DropdownList,
   Select,
+  SelectList,
   SelectOption,
 } from '@patternfly/react-core';
-import { SelectList } from '@patternfly/react-core';
-import {} from '@patternfly/react-core';
 import { PasteIcon } from '@patternfly/react-icons';
 
 import { ConsoleState, isConsoleType, VNC_CONSOLE_TYPE } from '../utils/ConsoleConsts';
@@ -59,8 +58,11 @@ export const AccessConsoles: FC<AccessConsolesProps> = ({
             <PasteIcon /> {t('Paste to console')}
           </>
         }
+        onClick={(e: MouseEvent<HTMLButtonElement>) => {
+          actions.sendPaste(true);
+          e.currentTarget.blur();
+        }}
         className="vnc-paste-button"
-        onClick={actions.sendPaste}
         variant={ButtonVariant.link}
       />
       <Select

@@ -1,10 +1,10 @@
-import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
-import { getNamespacePathSegment, isEmpty } from '@kubevirt-utils/utils/utils';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { getVMListNamespacesURL, getVMListURL } from '@multicluster/urls';
 import { getRowFilterQueryKey } from '@search/utils/query';
 
-export const getVMListPath = (namespace: string, params: string) => {
-  const namespaceSegment = getNamespacePathSegment(namespace);
-  return `/k8s/${namespaceSegment}/${VirtualMachineModelRef}?${params}`;
+export const getVMListPath = (namespace: string, params: string, cluster?: string) => {
+  const vmListURL = namespace ? getVMListNamespacesURL(cluster, namespace) : getVMListURL(cluster);
+  return `${vmListURL}?${params}`;
 };
 
 const getRowFiltersString = (rowFilters: Record<string, string>) =>
@@ -17,4 +17,5 @@ const getRowFiltersString = (rowFilters: Record<string, string>) =>
 export const getVMListPathWithRowFilters = (
   namespace: string,
   rowFilters: Record<string, string>,
-) => getVMListPath(namespace, getRowFiltersString(rowFilters));
+  cluster?: string,
+) => getVMListPath(namespace, getRowFiltersString(rowFilters), cluster);
