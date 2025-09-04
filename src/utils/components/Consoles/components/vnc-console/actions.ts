@@ -35,7 +35,7 @@ export function sendCtrlAlt2() {
   this.sendKey(KeyTable.XK_Control_L, 'ControlLeft', false);
 }
 
-export async function sendPasteCMD(focusOnConsole?: boolean) {
+export async function sendPasteCMD(shouldFocusOnConsole?: boolean) {
   if (this._rfbConnectionState !== 'connected' || this._viewOnly) {
     return;
   }
@@ -62,8 +62,8 @@ export async function sendPasteCMD(focusOnConsole?: boolean) {
       this.sendKey(codePointIndex);
       shiftRequired && this.sendKey(KeyTable.XK_Shift_L, 'ShiftLeft', false);
     }
-    if (focusOnConsole) {
-      this.focus();
-    }
+  }
+  if (shouldFocusOnConsole) {
+    this.focus();
   }
 }
