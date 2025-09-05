@@ -733,7 +733,7 @@
   "How much time before the check will try to close itself": "检查在尝试关闭其自身前的时间",
   "HP series": "HP 系列",
   "Hugepages": "Hugepages",
-  "Hugepages are a memory management technique that uses larger memory blocks than the default page size to improve performance. If turned on, hugepages will have 1 GiB, if turned off, hugepages will have 2 MiB.": "Hugepages are a memory management technique that uses larger memory blocks than the default page size to improve performance. If turned on, hugepages will have 1 GiB, if turned off, hugepages will have 2 MiB.",
+  "Hugepages are a memory management technique that uses larger memory blocks than the default page size to improve performance. Hugepages series has hugepages set to 1 GiB, normal series has hugepages set to 2 MiB.": "Hugepages are a memory management technique that uses larger memory blocks than the default page size to improve performance. Hugepages series has hugepages set to 1 GiB, normal series has hugepages set to 2 MiB.",
   "HW devices": "HW devices",
   "I am using an alternative solution for this feature": "I am using an alternative solution for this feature",
   "If no nodes are specified, random nodes are selected.": "如果没有指定节点，则会随机选择节点。",
