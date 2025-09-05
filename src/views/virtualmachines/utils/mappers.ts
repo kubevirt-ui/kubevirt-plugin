@@ -4,42 +4,60 @@ import {
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { getCluster } from '@multicluster/helpers/selectors';
 
 export type VMIMapper = {
-  mapper: { [key: string]: { [key: string]: V1VirtualMachineInstance } };
+  mapper: {
+    [cluster in string]: { [namespace in string]: { [name in string]: V1VirtualMachineInstance } };
+  };
   nodeNames: { [key: string]: { id: string; title: string } };
 };
 
-export type VMIMMapper = { [key: string]: { [key: string]: V1VirtualMachineInstanceMigration } };
+export type VMIMMapper = {
+  [cluster in string]: {
+    [namespace in string]: { [name in string]: V1VirtualMachineInstanceMigration };
+  };
+};
 
 export const getVMIFromMapper = (VMIMapper: VMIMapper, vm: V1VirtualMachine) =>
-  VMIMapper?.mapper?.[getNamespace(vm)]?.[getName(vm)];
+  VMIMapper?.mapper?.[getCluster(vm) || SINGLE_CLUSTER_KEY]?.[getNamespace(vm)]?.[getName(vm)];
 
-export const getVMIMFromMapper = (VMIMMapper: VMIMMapper, name: string, namespace: string) =>
-  VMIMMapper?.mapper?.[namespace]?.[name];
+export const getVMIMFromMapper = (
+  VMIMMapper: VMIMMapper,
+  name: string,
+  namespace: string,
+  cluster?: string,
+) => VMIMMapper?.mapper?.[cluster || SINGLE_CLUSTER_KEY]?.[namespace]?.[name];
 
 export type PVCMapper = {
-  [namespace in string]: { [name in string]: IoK8sApiCoreV1PersistentVolumeClaim };
+  [cluster in string]: {
+    [namespace in string]: { [name in string]: IoK8sApiCoreV1PersistentVolumeClaim };
+  };
 };
 
 export const convertIntoPVCMapper = (pvcs: IoK8sApiCoreV1PersistentVolumeClaim[]): PVCMapper => {
   return (pvcs || []).reduce((acc, pvc) => {
+    const cluster = getCluster(pvc) || SINGLE_CLUSTER_KEY;
     const namespace = getNamespace(pvc);
 
-    if (isEmpty(acc[namespace])) acc[namespace] = {};
+    if (isEmpty(acc[cluster])) acc[cluster] = {};
 
-    acc[namespace][getName(pvc)] = pvc;
+    if (isEmpty(acc[cluster][namespace])) acc[cluster][namespace] = {};
+
+    acc[cluster][namespace][getName(pvc)] = pvc;
     return acc;
   }, {} as PVCMapper);
 };
 
 export const getVirtualMachineStorageClasses = (vm: V1VirtualMachine, pvcMapper: PVCMapper) => {
+  const cluster = getCluster(vm) || SINGLE_CLUSTER_KEY;
   const storageClassesSet = (getVolumes(vm) || []).reduce((acc, volume) => {
     const volumePVC =
-      pvcMapper?.[getNamespace(vm)]?.[
+      pvcMapper?.[cluster]?.[getNamespace(vm)]?.[
         volume.dataVolume?.name || volume.persistentVolumeClaim?.claimName
       ];
 

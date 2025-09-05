@@ -39,8 +39,10 @@ import {
 } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import { usePVCMapper } from '@kubevirt-utils/hooks/usePVCMapper';
 import useQuery from '@kubevirt-utils/hooks/useQuery';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
+import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { getCatalogURL } from '@multicluster/urls';
 import {
   DocumentTitle,
@@ -55,6 +57,7 @@ import { VMSearchQueries } from '@virtualmachines/search/hooks/useVMSearchQuerie
 import VirtualMachineFilterToolbar from '@virtualmachines/search/VirtualMachineFilterToolbar';
 import { vmsSignal } from '@virtualmachines/tree/utils/signals';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
+import { getVMIFromMapper, getVMIMFromMapper } from '@virtualmachines/utils/mappers';
 
 import VirtualMachineBulkActionButton from './components/VirtualMachineBulkActionButton';
 import VirtualMachineEmptyState from './components/VirtualMachineEmptyState/VirtualMachineEmptyState';
@@ -133,7 +136,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
 
   const pvcMapper = usePVCMapper(namespace, cluster);
 
-  const [vmims, vmimsLoaded] = useK8sWatchData<V1VirtualMachineInstanceMigration[]>({
+  const [vmims, vmimsLoaded] = useKubevirtWatchResource<V1VirtualMachineInstanceMigration[]>({
     cluster,
     groupVersionKind: VirtualMachineInstanceMigrationModelGroupVersionKind,
     isList: true,
@@ -284,8 +287,9 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
                   <div className="pf-v6-u-text-align-center">{t('No VirtualMachines found')}</div>
                 )}
                 rowData={{
-                  getVmi: (ns: string, name: string) => vmiMapper?.mapper?.[ns]?.[name],
-                  getVmim: (ns: string, name: string) => vmimMapper?.[ns]?.[name],
+                  getVmi: (vm: V1VirtualMachine) => getVMIFromMapper(vmiMapper, vm),
+                  getVmim: (vm: V1VirtualMachine) =>
+                    getVMIMFromMapper(vmimMapper, getName(vm), getNamespace(vm), getCluster(vm)),
                   kind,
                   pvcMapper,
                 }}

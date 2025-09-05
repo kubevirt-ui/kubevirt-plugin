@@ -171,14 +171,16 @@ const useVirtualMachineColumns = (
       },
     ],
     [
-      canGetNode,
-      namespace,
-      sorting,
-      sortingUsingFunction,
-      sortingUsingFunctionWithMapper,
-      sortingUsingFunctionWithPVCMapper,
       t,
+      isACMPage,
+      cluster,
+      namespace,
+      canGetNode,
       acmHeaders,
+      sorting,
+      sortingUsingFunctionWithMapper,
+      sortingUsingFunction,
+      sortingUsingFunctionWithPVCMapper,
     ],
   );
 
