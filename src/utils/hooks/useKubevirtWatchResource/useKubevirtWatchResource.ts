@@ -6,6 +6,7 @@ import { AdvancedSearchFilter } from '@stolostron/multicluster-sdk';
 import { KUBEVIRT_APISERVER_PROXY } from '../useFeatures/constants';
 import { useFeatures } from '../useFeatures/useFeatures';
 import useKubevirtDataPodHealth from '../useKubevirtDataPod/hooks/useKubevirtDataPodHealth';
+import { KubevirtDataPodFilters } from '../useKubevirtDataPod/useKubevirtDataPodFilters';
 import useQuery from '../useQuery';
 
 import useRedirectWatchHooks from './useRedirectWatchHooks';
@@ -18,7 +19,7 @@ export type Result<R extends K8sResourceCommon | K8sResourceCommon[]> = [
 
 const useKubevirtWatchResource = <T extends K8sResourceCommon | K8sResourceCommon[]>(
   watchOptions: WatchK8sResource & { cluster?: string },
-  filterOptions?: { [key: string]: string },
+  filterOptions?: KubevirtDataPodFilters,
   searchQueries?: AdvancedSearchFilter,
 ): Result<T> => {
   const isProxyPodAlive = useKubevirtDataPodHealth();
