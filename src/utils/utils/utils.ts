@@ -127,7 +127,7 @@ export const ensurePath = <T extends object>(data: T, paths: string | string[]) 
   }
 };
 
-const getValueByPath = (obj: K8sResourceCommon, path: string) => {
+export const getValueByPath = <T = K8sResourceCommon>(obj: T, path: string) => {
   const pathArray = path?.split('.');
   return pathArray?.reduce((acc, field) => acc?.[field], obj);
 };
