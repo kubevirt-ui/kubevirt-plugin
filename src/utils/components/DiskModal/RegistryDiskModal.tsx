@@ -62,7 +62,7 @@ const RegistryDiskModal: FC<V1SubDiskModalProps> = (props) => {
       <TabModal
         closeOnSubmit={isValid}
         headerText={diskModalTitle(isEditDisk, isVMRunning)}
-        isDisabled={!credentialsValid}
+        isDisabled={!credentialsValid || !isValid}
         isLoading={isSubmitting}
         isOpen={isOpen}
         onClose={onClose}

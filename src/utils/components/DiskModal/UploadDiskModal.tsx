@@ -78,6 +78,7 @@ const UploadDiskModal: FC<V1SubDiskModalProps> = ({
         }
         closeOnSubmit={isValid}
         headerText={diskModalTitle(false, isVMRunning)}
+        isDisabled={!isValid}
         isLoading={isSubmitting}
         isOpen={isOpen}
       >
