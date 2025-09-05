@@ -19,7 +19,6 @@ import { submit } from '@kubevirt-utils/components/DiskModal/utils/submit';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { Form } from '@patternfly/react-core';
 import { isRunning } from '@virtualmachines/utils';
 
 import { getDefaultCreateValues, getDefaultEditValues } from './utils/form';
@@ -67,18 +66,17 @@ const RegistryDiskModal: FC<V1SubDiskModalProps> = (props) => {
         isOpen={isOpen}
         onClose={onClose}
         onSubmit={handleSubmitForm}
+        shouldWrapInForm
       >
         <PendingChanges isVMRunning={isVMRunning} />
-        <Form>
-          <BootSourceCheckbox editDiskName={editDiskName} isDisabled={isVMRunning} vm={vm} />
-          <DiskNameInput />{' '}
-          {!isCreated && <DiskSourceContainer fieldName={REGISTRYURL_DATAVOLUME_FIELD} os={os} />}
-          <DiskSizeInput isCreated={isCreated} namespace={namespace} pvc={pvc} />
-          <DiskTypeSelect isVMRunning={isVMRunning} />
-          <DiskInterfaceSelect isVMRunning={isVMRunning} />
-          {!isCreated && <StorageClassAndPreallocation vm={vm} />}
-          <AdvancedSettings showApplyStorageProfileSettings={!isCreated} />
-        </Form>
+        <BootSourceCheckbox editDiskName={editDiskName} isDisabled={isVMRunning} vm={vm} />
+        <DiskNameInput />{' '}
+        {!isCreated && <DiskSourceContainer fieldName={REGISTRYURL_DATAVOLUME_FIELD} os={os} />}
+        <DiskSizeInput isCreated={isCreated} namespace={namespace} pvc={pvc} />
+        <DiskTypeSelect isVMRunning={isVMRunning} />
+        <DiskInterfaceSelect isVMRunning={isVMRunning} />
+        {!isCreated && <StorageClassAndPreallocation vm={vm} />}
+        <AdvancedSettings showApplyStorageProfileSettings={!isCreated} />
       </TabModal>
     </FormProvider>
   );

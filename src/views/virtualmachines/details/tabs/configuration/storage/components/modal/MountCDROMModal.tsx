@@ -9,14 +9,7 @@ import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFi
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
-import {
-  ButtonVariant,
-  FileUpload,
-  Form,
-  FormGroup,
-  Stack,
-  StackItem,
-} from '@patternfly/react-core';
+import { ButtonVariant, FileUpload, FormGroup, Stack, StackItem } from '@patternfly/react-core';
 
 import { updateDisks } from '../../../details/utils/utils';
 
@@ -87,49 +80,48 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
         isOpen={isOpen}
         onClose={onClose}
         onSubmit={handleMount}
+        shouldWrapInForm
         submitBtnText={t('Save')}
         submitBtnVariant={ButtonVariant.primary}
       >
-        <Form>
-          <Stack hasGutter>
-            <StackItem>
-              <p>{t('Mount ISO to the Virtual Machine')}</p>
-            </StackItem>
-            <StackItem>
-              <FormGroup fieldId={SELECT_ISO_FIELD_ID} isRequired label={t('Select ISO')}>
-                <InlineFilterSelect
-                  toggleProps={{
-                    isFullWidth: true,
-                    placeholder: t('Select or upload a new ISO file to the cluster'),
-                  }}
-                  options={isoOptions}
-                  selected={selectedISO}
-                  setSelected={handleISOSelection}
-                />
-              </FormGroup>
-            </StackItem>
-            <StackItem>
-              <FormGroup fieldId={UPLOAD_ISO_FIELD_ID} label={t('Upload ISO')}>
-                <FileUpload
-                  dropzoneProps={{
-                    accept: { 'application/*': [ISO_FILE_EXTENSION] },
-                  }}
-                  browseButtonText={t('Upload')}
-                  clearButtonText={t('Clear')}
-                  filename={uploadFilename}
-                  filenamePlaceholder={t('Drag and drop a file or upload')}
-                  id={UPLOAD_ISO_INPUT_ID}
-                  onClearClick={handleClearUpload}
-                  onFileInputChange={(_, file: File) => handleFileUpload(file)}
-                  value={uploadFile}
-                />
-                <p className="pf-v6-u-mt-sm pf-v6-u-color-200">
-                  {t('ISO file must be in the same project as the VirtualMachine')}
-                </p>
-              </FormGroup>
-            </StackItem>
-          </Stack>
-        </Form>
+        <Stack hasGutter>
+          <StackItem>
+            <p>{t('Mount ISO to the Virtual Machine')}</p>
+          </StackItem>
+          <StackItem>
+            <FormGroup fieldId={SELECT_ISO_FIELD_ID} isRequired label={t('Select ISO')}>
+              <InlineFilterSelect
+                toggleProps={{
+                  isFullWidth: true,
+                  placeholder: t('Select or upload a new ISO file to the cluster'),
+                }}
+                options={isoOptions}
+                selected={selectedISO}
+                setSelected={handleISOSelection}
+              />
+            </FormGroup>
+          </StackItem>
+          <StackItem>
+            <FormGroup fieldId={UPLOAD_ISO_FIELD_ID} label={t('Upload ISO')}>
+              <FileUpload
+                dropzoneProps={{
+                  accept: { 'application/*': [ISO_FILE_EXTENSION] },
+                }}
+                browseButtonText={t('Upload')}
+                clearButtonText={t('Clear')}
+                filename={uploadFilename}
+                filenamePlaceholder={t('Drag and drop a file or upload')}
+                id={UPLOAD_ISO_INPUT_ID}
+                onClearClick={handleClearUpload}
+                onFileInputChange={(_, file: File) => handleFileUpload(file)}
+                value={uploadFile}
+              />
+              <p className="pf-v6-u-mt-sm pf-v6-u-color-200">
+                {t('ISO file must be in the same project as the VirtualMachine')}
+              </p>
+            </FormGroup>
+          </StackItem>
+        </Stack>
       </TabModal>
     </FormProvider>
   );

@@ -23,7 +23,6 @@ import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import {
-  Form,
   FormGroup,
   Grid,
   GridItem,
@@ -126,99 +125,98 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
       obj={source}
       onClose={onClose}
       onSubmit={onSubmitVolumeParams()}
+      shouldWrapInForm
     >
-      <Form>
-        <FormGroup
-          label={
-            <>
-              {t('Preference')}{' '}
-              <HelpTextIcon
-                bodyContent={
-                  <>
-                    {t(
-                      'The preferred VirtualMachine attribute values required to run a given workload.',
-                    )}{' '}
-                    <ExternalLink
-                      href={documentationURL.INSTANCE_TYPES_USER_GUIDE}
-                      text={t('Read more')}
-                    />
-                  </>
-                }
-                position={PopoverPosition.right}
-              />
-            </>
-          }
-          isRequired
-        >
-          <InlineFilterSelect
-            options={preferencesNames?.map((opt) => ({
-              children: opt,
-              groupVersionKind: VirtualMachineClusterPreferenceModelGroupVersionKind,
-              value: opt,
-            }))}
-            selected={preference}
-            setSelected={setPreference}
-            toggleProps={{ placeholder: t('Select preference') }}
-          />
-        </FormGroup>
-        <Grid hasGutter>
-          <GridItem span={6}>
-            <FormGroup
-              label={
+      <FormGroup
+        label={
+          <>
+            {t('Preference')}{' '}
+            <HelpTextIcon
+              bodyContent={
                 <>
-                  {t('Default InstanceType')}{' '}
-                  <HelpTextIcon
-                    bodyContent={t('The default InstanceType for this volume.')}
-                    position={PopoverPosition.right}
+                  {t(
+                    'The preferred VirtualMachine attribute values required to run a given workload.',
+                  )}{' '}
+                  <ExternalLink
+                    href={documentationURL.INSTANCE_TYPES_USER_GUIDE}
+                    text={t('Read more')}
                   />
                 </>
               }
-            >
-              <FormPFSelect onSelect={onInstanceTypeSelect} selected={instanceType}>
-                {Object.keys(InstanceTypeCategory)?.map((instanceTypeCategory) => {
-                  const { seriesLabel, title }: CategoryDetails =
-                    categoryDetailsMap[instanceTypeCategory];
-                  return (
-                    <SelectOption
-                      description={title}
-                      key={instanceTypeCategory}
-                      value={instanceTypeCategory}
-                    >
-                      {seriesLabel}
-                    </SelectOption>
-                  );
-                })}
-              </FormPFSelect>
-            </FormGroup>
-          </GridItem>
-          <GridItem span={6}>
-            <FormGroup label={t('Size')}>
-              <FormPFSelect onSelect={onSizeSelect} selected={size}>
-                {instanceTypes?.map(({ cpus, label, memory }) => (
+              position={PopoverPosition.right}
+            />
+          </>
+        }
+        isRequired
+      >
+        <InlineFilterSelect
+          options={preferencesNames?.map((opt) => ({
+            children: opt,
+            groupVersionKind: VirtualMachineClusterPreferenceModelGroupVersionKind,
+            value: opt,
+          }))}
+          selected={preference}
+          setSelected={setPreference}
+          toggleProps={{ placeholder: t('Select preference') }}
+        />
+      </FormGroup>
+      <Grid hasGutter>
+        <GridItem span={6}>
+          <FormGroup
+            label={
+              <>
+                {t('Default InstanceType')}{' '}
+                <HelpTextIcon
+                  bodyContent={t('The default InstanceType for this volume.')}
+                  position={PopoverPosition.right}
+                />
+              </>
+            }
+          >
+            <FormPFSelect onSelect={onInstanceTypeSelect} selected={instanceType}>
+              {Object.keys(InstanceTypeCategory)?.map((instanceTypeCategory) => {
+                const { seriesLabel, title }: CategoryDetails =
+                  categoryDetailsMap[instanceTypeCategory];
+                return (
                   <SelectOption
-                    description={t('{{cpus}} CPUs, {{memory}} Memory', {
-                      cpus,
-                      memory: readableSizeUnit(memory),
-                    })}
-                    key={label}
-                    value={label}
+                    description={title}
+                    key={instanceTypeCategory}
+                    value={instanceTypeCategory}
                   >
-                    {label}
+                    {seriesLabel}
                   </SelectOption>
-                ))}
-              </FormPFSelect>
-            </FormGroup>
-          </GridItem>
-        </Grid>
-        <FormGroup label={t('Description')}>
-          <TextArea
-            aria-label={t('description text area')}
-            onChange={(_event, val) => setDescription(val)}
-            resizeOrientation="vertical"
-            value={description}
-          />
-        </FormGroup>
-      </Form>
+                );
+              })}
+            </FormPFSelect>
+          </FormGroup>
+        </GridItem>
+        <GridItem span={6}>
+          <FormGroup label={t('Size')}>
+            <FormPFSelect onSelect={onSizeSelect} selected={size}>
+              {instanceTypes?.map(({ cpus, label, memory }) => (
+                <SelectOption
+                  description={t('{{cpus}} CPUs, {{memory}} Memory', {
+                    cpus,
+                    memory: readableSizeUnit(memory),
+                  })}
+                  key={label}
+                  value={label}
+                >
+                  {label}
+                </SelectOption>
+              ))}
+            </FormPFSelect>
+          </FormGroup>
+        </GridItem>
+      </Grid>
+      <FormGroup label={t('Description')}>
+        <TextArea
+          aria-label={t('description text area')}
+          onChange={(_event, val) => setDescription(val)}
+          resizeOrientation="vertical"
+          value={description}
+        />
+      </FormGroup>
     </TabModal>
   );
 };

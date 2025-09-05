@@ -15,7 +15,7 @@ import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/networ
 import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import usePasstFeatureFlag from '@overview/SettingsTab/PreviewFeaturesTab/hooks/usePasstFeatureFlag';
-import { ExpandableSection, Form } from '@patternfly/react-core';
+import { ExpandableSection } from '@patternfly/react-core';
 import {
   getConfigInterfaceStateFromVM,
   isLinkStateEditable,
@@ -124,46 +124,45 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
       obj={vm}
       onClose={onClose}
       onSubmit={onSubmitModal()}
+      shouldWrapInForm
     >
-      <Form>
-        <NameFormField isDisabled={fixedName} objName={nicName} setObjName={setNicName} />
-        <NetworkInterfaceModelSelect
-          interfaceModel={interfaceModel}
-          setInterfaceModel={setInterfaceModel}
-        />
-        <NetworkInterfaceNetworkSelect
-          isEditing={Boolean(network) && Boolean(iface)}
-          namespace={namespace || getNamespace(vm)}
-          networkName={networkName}
+      <NameFormField isDisabled={fixedName} objName={nicName} setObjName={setNicName} />
+      <NetworkInterfaceModelSelect
+        interfaceModel={interfaceModel}
+        setInterfaceModel={setInterfaceModel}
+      />
+      <NetworkInterfaceNetworkSelect
+        isEditing={Boolean(network) && Boolean(iface)}
+        namespace={namespace || getNamespace(vm)}
+        networkName={networkName}
+        setInterfaceType={setInterfaceType}
+        setNetworkName={setNetworkName}
+        setSubmitDisabled={setNetworkSelectError}
+        vm={vm}
+      />
+      <ExpandableSection
+        className="NetworkInterfaceModal__advanced"
+        isExpanded={isExpanded}
+        onToggle={(_, expand) => setIsExpanded(expand)}
+        toggleText={t('Advanced')}
+      >
+        <NetworkInterfacePasst
+          interfaceType={interfaceType}
+          namespace={getNamespace(vm)}
           setInterfaceType={setInterfaceType}
-          setNetworkName={setNetworkName}
-          setSubmitDisabled={setNetworkSelectError}
-          vm={vm}
         />
-        <ExpandableSection
-          className="NetworkInterfaceModal__advanced"
-          isExpanded={isExpanded}
-          onToggle={(_, expand) => setIsExpanded(expand)}
-          toggleText={t('Advanced')}
-        >
-          <NetworkInterfacePasst
-            interfaceType={interfaceType}
-            namespace={getNamespace(vm)}
-            setInterfaceType={setInterfaceType}
-          />
-          <NetworkInterfaceMACAddressInput
-            interfaceMACAddress={interfaceMACAddress}
-            isDisabled={!networkName}
-            setInterfaceMACAddress={setInterfaceMACAddress}
-            setIsError={setMacError}
-          />
-          <NetworkInterfaceLinkState
-            isDisabled={!isLinkStateEditable(interfaceLinkState) || passtEnabled}
-            linkState={interfaceLinkState}
-            setLinkState={setInterfaceLinkState}
-          />
-        </ExpandableSection>
-      </Form>
+        <NetworkInterfaceMACAddressInput
+          interfaceMACAddress={interfaceMACAddress}
+          isDisabled={!networkName}
+          setInterfaceMACAddress={setInterfaceMACAddress}
+          setIsError={setMacError}
+        />
+        <NetworkInterfaceLinkState
+          isDisabled={!isLinkStateEditable(interfaceLinkState) || passtEnabled}
+          linkState={interfaceLinkState}
+          setLinkState={setInterfaceLinkState}
+        />
+      </ExpandableSection>
     </TabModal>
   );
 };
