@@ -34,6 +34,15 @@ export const get = (obj: unknown, path: string | string[], defaultValue = undefi
   return result === undefined || result === obj ? defaultValue : result;
 };
 
+export const pick = (object, keys) => {
+  return keys.reduce((obj, key) => {
+    if (object && object.hasOwnProperty(key)) {
+      obj[key] = object[key];
+    }
+    return obj;
+  }, {});
+};
+
 export const isUpstream = window.SERVER_FLAGS.branding === 'okd';
 
 export const DEFAULT_OPERATOR_NAMESPACE = isUpstream ? KUBEVIRT_HYPERCONVERGED : OPENSHIFT_CNV;
@@ -65,15 +74,6 @@ export const validateSSHPublicKey = (value: string): boolean => {
 
 export const getContentScrollableElement = (): HTMLElement =>
   document.getElementById('content-scrollable');
-
-export const findAllIndexes = <T>(
-  array: T[],
-  predicate: (element: T, index: number, array: T[]) => boolean,
-): number[] =>
-  Array.from(array.entries()).reduce<number[]>(
-    (acc, [index, element]) => (predicate(element, index, array) ? [...acc, index] : acc),
-    [],
-  );
 
 // return the name or 'Other' if the name not included in the array of available items for filtering
 export const getItemNameWithOther = (itemName: string, items: ItemsToFilterProps[]): string => {

@@ -57,6 +57,28 @@ type ResourceUrlProps = {
 };
 
 /**
+ * A selector for a resource's labels
+ * @param entity {K8sResourceCommon} - entity to get labels from
+ * @param defaultValue {{ [key: string]: string }} - default value to return if no labels are found
+ * @returns {{ [key: string]: string }} the labels for the resource
+ */
+export const getLabels = (
+  entity: K8sResourceCommon,
+  defaultValue?: { [key: string]: string },
+): { [key: string]: string } => entity?.metadata?.labels || defaultValue;
+
+/**
+ * A selector for the resource's annotations
+ * @param entity {K8sResourceCommon} - entity to get annotations from
+ * @param defaultValue {{ [key: string]: string }} - default value to return if no annotations are found
+ * @returns {{ [key: string]: string }} the annotations for the resource
+ */
+export const getAnnotations = (
+  entity: K8sResourceCommon,
+  defaultValue?: { [key: string]: string },
+): { [key: string]: string } => entity?.metadata.annotations || defaultValue;
+
+/**
  * function for getting a resource URL
  * @param {ResourceUrlProps} urlProps - object with model, resource to get the URL from (optional) and active namespace/project name (optional)
  * @returns {string} the URL for the resource

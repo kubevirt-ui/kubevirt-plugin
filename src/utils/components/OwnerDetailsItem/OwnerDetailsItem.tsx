@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Trans } from 'react-i18next';
+import classNames from 'classnames';
 
 import OwnerReferences from '@kubevirt-utils/components/OwnerReferences/OwnerReferences';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -15,14 +16,15 @@ import {
 } from '@patternfly/react-core';
 
 type OwnerDetailsItemProps = {
+  className?: string;
   obj: K8sResourceCommon;
 };
 
-const OwnerDetailsItem: React.FC<OwnerDetailsItemProps> = ({ obj }) => {
+const OwnerDetailsItem: React.FC<OwnerDetailsItemProps> = ({ className, obj }) => {
   const { t } = useKubevirtTranslation();
 
   return (
-    <DescriptionListGroup className="pf-c-description-list__group">
+    <DescriptionListGroup className={classNames('pf-c-description-list__group', className)}>
       <DescriptionListTermHelpText className="pf-c-description-list__term">
         <Popover
           bodyContent={
