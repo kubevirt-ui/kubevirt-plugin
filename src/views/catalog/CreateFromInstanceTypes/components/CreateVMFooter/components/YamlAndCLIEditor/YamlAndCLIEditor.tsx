@@ -43,7 +43,7 @@ const YamlAndCLIEditor: FC<YamlAndCLIEditorProps> = ({ code, minHeight }) => {
           </Button>
         </Tooltip>,
       ]}
-      minHeight={minHeight}
+      minHeight={minHeight?.toString()}
       options={{ readOnly: true }}
       showShortcuts
       value={code}

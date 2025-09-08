@@ -17,7 +17,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getLabel, getName, getVMStatus } from '@kubevirt-utils/resources/shared';
 import { getInstanceTypeMatcher } from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { getOsNameFromGuestAgent } from '@kubevirt-utils/resources/vmi';
+import { getOSNameFromGuestAgent } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Timestamp } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -86,7 +86,7 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
     if (!isEmpty(guestAgentData))
       return {
         hostname: guestAgentData?.hostname,
-        osName: getOsNameFromGuestAgent(guestAgentData),
+        osName: getOSNameFromGuestAgent(guestAgentData),
       };
     return {
       fallback: <GuestAgentIsRequiredText vmi={vmi} />,

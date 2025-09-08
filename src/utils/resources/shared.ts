@@ -10,6 +10,7 @@ import {
   AccessReviewResourceAttributes,
   K8sModel,
   K8sResourceCommon,
+  K8sResourceKind,
   K8sVerb,
   Operator,
   OwnerReference,
@@ -54,6 +55,28 @@ type ResourceUrlProps = {
   model: K8sModel;
   resource?: K8sResourceCommon;
 };
+
+/**
+ * A selector for a resource's labels
+ * @param entity {K8sResourceCommon} - entity to get labels from
+ * @param defaultValue {{ [key: string]: string }} - default value to return if no labels are found
+ * @returns {{ [key: string]: string }} the labels for the resource
+ */
+export const getLabels = (
+  entity: K8sResourceCommon,
+  defaultValue?: { [key: string]: string },
+): { [key: string]: string } => entity?.metadata?.labels || defaultValue;
+
+/**
+ * A selector for the resource's annotations
+ * @param entity {K8sResourceCommon} - entity to get annotations from
+ * @param defaultValue {{ [key: string]: string }} - default value to return if no annotations are found
+ * @returns {{ [key: string]: string }} the annotations for the resource
+ */
+export const getAnnotations = (
+  entity: K8sResourceCommon,
+  defaultValue?: { [key: string]: string },
+): { [key: string]: string } => entity?.metadata.annotations || defaultValue;
 
 /**
  * function for getting a resource URL
@@ -301,6 +324,14 @@ export const getName = <A extends K8sResourceCommon = K8sResourceCommon>(resourc
 export const getNamespace = <A extends K8sResourceCommon = K8sResourceCommon>(resource: A) =>
   resource?.metadata?.namespace;
 
+/**
+ * function to get a resource's UID
+ * @param {A extends K8sResourceCommon} resource the resource whose UID is to be returned
+ * @returns {string} the resource's UID
+ */
+export const getUID = <A extends K8sResourceCommon = K8sResourceCommon>(resource: A): string =>
+  resource?.metadata?.uid;
+
 export type ResourceMap<A> = { [name: string]: A };
 export type NamespacedResourceMap<A> = { [namespace: string]: ResourceMap<A> };
 
@@ -378,3 +409,18 @@ export const getReadyOrCloningOrUploadingDataSources = (
       isDataImportCronProgressing(dataImportCron)
     );
   });
+
+/**
+ *  A selector for the entity's status phase
+ * @param {K8sResourceKind} entity - entity to get the status phase from
+ * @returns status phase for the entity
+ */
+export const getStatusPhase = <T = string>(entity: K8sResourceKind): T => entity?.status?.phase;
+
+/**
+ * A selector for the entity's creation timestamp
+ * @param {K8sResourceCommon} entity - entity to get the creation timestamp from
+ * @returns {string} creation timestamp for the entity
+ */
+export const getCreationTimestamp = (entity: K8sResourceCommon): string =>
+  entity?.metadata?.creationTimestamp;

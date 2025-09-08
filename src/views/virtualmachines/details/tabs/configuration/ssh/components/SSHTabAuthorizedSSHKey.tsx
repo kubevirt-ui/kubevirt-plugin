@@ -19,11 +19,13 @@ import { useDynamicSSHInjection } from '../hooks/useDynamicSSHInjection';
 import DynamicSSHKeyInjectionDescription from './DynamicSSHKeyInjectionDescription';
 
 type SSHTabAuthorizedSSHKeyProps = {
+  className?: string;
   isCustomizeInstanceType?: boolean;
   onUpdateVM?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
   vm: V1VirtualMachine;
 };
 const SSHTabAuthorizedSSHKey: FC<SSHTabAuthorizedSSHKeyProps> = ({
+  className,
   isCustomizeInstanceType,
   onUpdateVM,
   vm,
@@ -69,6 +71,7 @@ const SSHTabAuthorizedSSHKey: FC<SSHTabAuthorizedSSHKeyProps> = ({
           />
         ))
       }
+      className={className}
       data-test-id="public-ssh-key"
       descriptionHeader={<SearchItem id="public-ssh-key">{t('Public SSH key')}</SearchItem>}
       isEdit={isEditable}
