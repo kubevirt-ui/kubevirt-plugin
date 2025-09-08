@@ -15,17 +15,20 @@ const DiskNameInput: FC = () => {
 
   const {
     formState: { errors },
+    getValues,
     register,
     setValue,
   } = useFormContext<V1DiskFormState>();
 
-  const validationError = getValueByPath(errors, VOLUME_NAME_FIELD);
+  const fieldToRegister = getValues(VOLUME_NAME_FIELD) ? VOLUME_NAME_FIELD : DISK_NAME_FIELD;
 
-  const registered = register(VOLUME_NAME_FIELD, {
+  const registered = register(fieldToRegister, {
     required: true,
     shouldUnregister: true,
     validate: (value) => getDNS1120LabelError(value)?.(t),
   });
+
+  const validationError = getValueByPath(errors, fieldToRegister);
 
   return (
     <FormGroup fieldId="name" isRequired label={t('Name')}>
