@@ -289,27 +289,22 @@ export const mountISOToCDROM = async (
 };
 
 export const ejectISOFromCDROM = (vm: V1VirtualMachine, cdromName: string): V1VirtualMachine => {
-  const volumes = getVolumes(vm) || [];
-  const volumeIndex = volumes.findIndex((volume) => volume.name === cdromName);
+  return produce(vm, (draftVM) => {
+    // Find the volume to be removed
+    const volumeToRemove = (draftVM.spec.template.spec.volumes || []).find(
+      (volume) => volume.name === cdromName,
+    );
 
-  return produceVMDisks(vm, (draftVM) => {
-    const currentVolume = draftVM.spec.template.spec.volumes[volumeIndex];
-
-    if (currentVolume?.dataVolume?.name) {
-      const dataVolumeTemplateIndex = (draftVM.spec.dataVolumeTemplates || []).findIndex(
-        (dv) => getName(dv) === currentVolume.dataVolume.name,
+    // If a DataVolume was used, remove its template
+    if (volumeToRemove?.dataVolume?.name) {
+      draftVM.spec.dataVolumeTemplates = (draftVM.spec.dataVolumeTemplates || []).filter(
+        (dataVolume) => dataVolume.metadata.name !== volumeToRemove.dataVolume.name,
       );
-
-      if (dataVolumeTemplateIndex >= 0) {
-        draftVM.spec.dataVolumeTemplates.splice(dataVolumeTemplateIndex, 1);
-      }
     }
 
-    draftVM.spec.template.spec.volumes[volumeIndex] = {
-      containerDisk: {
-        image: '',
-      },
-      name: cdromName,
-    };
+    // Remove the volume entry
+    draftVM.spec.template.spec.volumes = (draftVM.spec.template.spec.volumes || []).filter(
+      (volume) => volume.name !== cdromName,
+    );
   });
 };

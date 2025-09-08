@@ -88,26 +88,26 @@ export const uploadDataVolume = async (
 
 export const editDisk = (data: V1DiskFormState, diskName: string, vm: V1VirtualMachine) => {
   const volumes = getVolumes(vm);
-  const diskindex = getDisks(vm)?.findIndex((disk) => disk.name === diskName);
-  const volumeindex = volumes?.findIndex((volume) => volume.name === diskName);
-  const dataVolumeTemplateindex = getDataVolumeTemplates(vm)?.findIndex(
-    (dv) => getName(dv) === volumes[volumeindex]?.dataVolume?.name,
+  const diskIndex = getDisks(vm)?.findIndex((disk) => disk.name === diskName);
+  const volumeIndex = volumes?.findIndex((volume) => volume.name === diskName);
+  const dataVolumeTemplateIndex = getDataVolumeTemplates(vm)?.findIndex(
+    (dv) => getName(dv) === volumes[volumeIndex]?.dataVolume?.name,
   );
 
   return produceVMDisks(vm, (draftVM: V1VirtualMachine) => {
-    draftVM.spec.template.spec.domain.devices.disks.splice(diskindex, 1, data.disk);
-    draftVM.spec.template.spec.volumes.splice(volumeindex, 1, data.volume);
-
-    if (dataVolumeTemplateindex >= 0)
-      draftVM.spec.dataVolumeTemplates.splice(dataVolumeTemplateindex, 1, data.dataVolumeTemplate);
+    draftVM.spec.template.spec.domain.devices.disks.splice(diskIndex, 1, data.disk);
+    if (volumeIndex >= 0) {
+      draftVM.spec.template.spec.volumes.splice(volumeIndex, 1, data.volume);
+    }
+    if (dataVolumeTemplateIndex >= 0)
+      draftVM.spec.dataVolumeTemplates.splice(dataVolumeTemplateIndex, 1, data.dataVolumeTemplate);
   });
 };
 
 export const addDisk = (data: V1DiskFormState, vm: V1VirtualMachine) => {
   return produceVMDisks(vm, (draftVM: V1VirtualMachine) => {
     draftVM.spec.template.spec.domain.devices.disks.push(data.disk);
-    draftVM.spec.template.spec.volumes.push(data.volume);
-
+    if (data.volume) draftVM.spec.template.spec.volumes.push(data.volume);
     if (data.dataVolumeTemplate) draftVM.spec.dataVolumeTemplates.push(data.dataVolumeTemplate);
   });
 };

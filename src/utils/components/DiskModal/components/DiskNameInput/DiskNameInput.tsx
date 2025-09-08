@@ -20,6 +20,10 @@ const DiskNameInput: FC = () => {
           required: true,
           shouldUnregister: true,
         })}
+        {...register(DISK_NAME_FIELD, {
+          required: true,
+          shouldUnregister: true,
+        })}
         onChange={(_, newName) => {
           setValue(VOLUME_NAME_FIELD, newName);
           setValue(DISK_NAME_FIELD, newName);

@@ -93,10 +93,10 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
     const newVM = produceVMDisks(vm, (draftVM) => {
       const volumeToDelete = getVolumes(vm).find((v) => v.name === diskName);
       draftVM.spec.template.spec.domain.devices.disks = getDisks(draftVM)?.filter(
-        (disk) => disk.name !== volumeToDelete.name,
+        (disk) => disk.name !== (volumeToDelete?.name || diskName),
       );
       draftVM.spec.template.spec.volumes = getVolumes(draftVM)?.filter(
-        (v) => v.name !== volumeToDelete.name,
+        (v) => v.name !== (volumeToDelete?.name || diskName),
       );
       draftVM.spec.dataVolumeTemplates = getDataVolumeTemplates(draftVM)?.filter(
         (dataVolume) => getName(dataVolume) !== volumeToDelete?.dataVolume?.name,
@@ -120,7 +120,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
 
   const createDeleteDiskModal = () =>
     createModal(({ isOpen, onClose }) =>
-      customize ? (
+      customize || isCDROM ? (
         <DetachModal
           diskName={diskName}
           headerText={t('Detach disk?')}

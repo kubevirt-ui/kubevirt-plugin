@@ -1,10 +1,15 @@
-import { V1beta1DataVolumeSourcePVC, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1beta1DataVolumeSourcePVC,
+  V1Disk,
+  V1VirtualMachine,
+} from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   DataVolumeModelGroupVersionKind,
   modelToGroupVersionKind,
   PersistentVolumeClaimModel,
 } from '@kubevirt-utils/models';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { DiskRawData } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { getDataVolumeTemplates, getVolumes } from '../../utils';
@@ -52,4 +57,14 @@ export const getPVCAndDVWatches = (vm: V1VirtualMachine) => {
     }, {});
 
   return { dvWatches, pvcWatches };
+};
+
+export const getEjectedCDROMDrives = (diskDevices: DiskRawData[], vmDisks: V1Disk[]) => {
+  const diskDevicesSet = new Set(diskDevices.map((obj) => obj.disk.name));
+  const ejectedCDROMDrives = vmDisks.filter((obj) => !diskDevicesSet.has(obj.name));
+  const mappedEjectedCDROMDrives = ejectedCDROMDrives.map((disk) => ({
+    disk,
+    volume: disk,
+  }));
+  return mappedEjectedCDROMDrives;
 };

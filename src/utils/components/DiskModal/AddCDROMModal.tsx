@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { FC, useState } from 'react';
 import { FormProvider, useForm, useWatch } from 'react-hook-form';
 
 import { PendingChangesAlert } from '@kubevirt-utils/components/PendingChanges/PendingChangesAlert/PendingChangesAlert';
@@ -46,20 +46,17 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
 
   const {
     control,
-    formState: { isSubmitting, isValid },
+    formState: { isSubmitting },
     getValues,
   } = methods;
 
   const uploadFile = useWatch({ control, name: 'uploadFile' });
-  const isFormValid = useMemo(() => {
-    const baseValid = isValid && (!uploadEnabled || (uploadEnabled && !isEmpty(uploadFile)));
 
-    if (uploadEnabled && !isEmpty(upload?.uploadStatus) && uploadFile) {
-      return baseValid && upload.uploadStatus === UPLOAD_STATUS.SUCCESS;
-    }
-
-    return baseValid;
-  }, [isValid, uploadEnabled, uploadFile, upload?.uploadStatus]);
+  const baseValid = !uploadEnabled || (uploadEnabled && !isEmpty(uploadFile));
+  const isFormValid =
+    uploadEnabled && !isEmpty(upload?.uploadStatus) && uploadFile
+      ? baseValid && upload.uploadStatus === UPLOAD_STATUS.SUCCESS
+      : baseValid;
 
   const handleModalSubmit = async () => {
     const data = getValues();
@@ -75,9 +72,8 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
         },
       };
     } else {
-      data.dataVolumeTemplate.spec.source = {
-        upload: {},
-      };
+      delete data.dataVolumeTemplate;
+      delete data.volume;
     }
 
     const vmWithDisk = addDisk(data, vm);
