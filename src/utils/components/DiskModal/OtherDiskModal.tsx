@@ -57,6 +57,7 @@ const OtherDiskModal: FC<V1SubDiskModalProps> = ({
         }
         closeOnSubmit={isValid}
         headerText={diskModalTitle(isEditDisk, isVMRunning)}
+        isDisabled={!isValid}
         isLoading={isSubmitting}
         isOpen={isOpen}
         onClose={onClose}

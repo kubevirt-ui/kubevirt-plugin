@@ -26,6 +26,7 @@ import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
 import { getBootDisk, getDataVolumeTemplates, getVolumes } from '@kubevirt-utils/resources/vm';
 import { getOperatingSystem } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { ensurePath, getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
+import { isDNS1123Label } from '@kubevirt-utils/utils/validation';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
 import { addPersistentVolume, removeVolume } from '@virtualmachines/actions/actions';
 
@@ -245,8 +246,17 @@ export const doesDataVolumeTemplateHaveDisk = (vm: V1VirtualMachine, diskName: s
   return !isEmpty(dataVolumeTemplate);
 };
 
-export const createDataVolumeName = (vm: V1VirtualMachine, diskName: string) =>
-  `dv-${getName(vm)}-${diskName}-${getRandomChars()}`;
+export const createDataVolumeName = (vm: V1VirtualMachine, diskName: string) => {
+  const middlePart = [getName(vm), diskName].filter(isDNS1123Label).join('-').substring(0, 53);
+  // prefix: 2
+  // middlePart: max 53
+  // suffix: 6
+  // hyphens: max 2
+  // together: max 63
+  return `dv-${middlePart}${!middlePart || middlePart.endsWith('-') ? '' : '-'}${getRandomChars(
+    6,
+  )}`;
+};
 
 const getVolumeSourceForMount = (diskState: V1DiskFormState) => {
   if (diskState.dataVolumeTemplate) {
