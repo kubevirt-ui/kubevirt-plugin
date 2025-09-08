@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 import { useFormContext } from 'react-hook-form';
+import { debounce } from 'lodash';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -30,15 +31,17 @@ const DiskNameInput: FC = () => {
 
   const validationError = getValueByPath(errors, fieldToRegister);
 
+  const debouncedHandler = debounce((event, newName) => {
+    registered.onChange(event);
+    setValue(DISK_NAME_FIELD, newName);
+  }, 300);
+
   return (
     <FormGroup fieldId="name" isRequired label={t('Name')}>
       <TextInput
-        onChange={(event, newName) => {
-          registered.onChange(event);
-          setValue(DISK_NAME_FIELD, newName);
-        }}
         id="name"
         name={registered.name}
+        onChange={debouncedHandler}
         ref={registered.ref}
         validated={validationError ? 'error' : 'default'}
       />

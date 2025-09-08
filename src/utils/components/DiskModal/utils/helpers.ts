@@ -277,9 +277,6 @@ export const mountISOToCDROM = async (
   vm: V1VirtualMachine,
   diskState: V1DiskFormState,
 ): Promise<V1VirtualMachine> => {
-  const volumes = getVolumes(vm) || [];
-  const volumeIndex = volumes.findIndex((volume) => volume.name === diskState.disk.name);
-
   if (diskState.dataVolumeTemplate) {
     const dataVolume = getEmptyVMDataVolumeResource(vm);
     dataVolume.metadata = diskState.dataVolumeTemplate.metadata;
@@ -291,10 +288,24 @@ export const mountISOToCDROM = async (
   const newVolumeSource = getVolumeSourceForMount(diskState);
 
   return produceVMDisks(vm, (draftVM) => {
-    draftVM.spec.template.spec.volumes[volumeIndex] = {
-      name: diskState.disk.name,
-      ...newVolumeSource,
-    };
+    // Find the index of the existing CD-ROM volume, if it exists
+    const volumes = draftVM.spec.template.spec.volumes || [];
+    const volumeIndex = volumes.findIndex((volume) => volume.name === diskState.disk.name);
+
+    if (volumeIndex !== -1) {
+      // If a volume with the same name exists, update it
+      draftVM.spec.template.spec.volumes[volumeIndex] = {
+        name: diskState.disk.name,
+        ...newVolumeSource,
+      };
+    } else {
+      // If no volume exists, add a new entry to the volumes array
+      const newVolume = {
+        name: diskState.disk.name,
+        ...newVolumeSource,
+      };
+      draftVM.spec.template.spec.volumes = [...volumes, newVolume];
+    }
   });
 };
 
