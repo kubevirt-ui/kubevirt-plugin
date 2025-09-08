@@ -52,7 +52,7 @@ const DiskList: FC<DiskListProps> = ({ customize = false, onDiskUpdate, vm, vmi 
               createDiskSource={diskSource}
               isOpen={isOpen}
               onClose={onClose}
-              onSubmit={onDiskUpdate || updateDisks}
+              onSubmit={onSubmit}
               vm={vm}
             />
           ));
