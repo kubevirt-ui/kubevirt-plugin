@@ -6,7 +6,9 @@ import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { getCatalogURL, getVMListNamespacesURL } from '@multicluster/urls';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { ListPageCreateDropdown } from '@openshift-console/dynamic-plugin-sdk';
+import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 type VirtualMachinesCreateButtonProps = {
   buttonText?: string;
@@ -19,6 +21,8 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
+  const [hubClusterName] = useHubClusterName();
+  const isACMPage = useIsACMPage();
   const cluster = useClusterParam();
 
   const createItems = {
@@ -29,7 +33,8 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
   };
 
   const catalogURL = useMemo(
-    () => getCatalogURL(cluster, namespace || DEFAULT_NAMESPACE),
+    () =>
+      getCatalogURL(isACMPage ? cluster || hubClusterName : null, namespace || DEFAULT_NAMESPACE),
     [namespace, cluster],
   );
 
