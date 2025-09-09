@@ -158,31 +158,34 @@ const convertBytes = (value: number, base: 'BINARY' | 'DECIMAL') => {
 };
 
 /**
- * Formats the quantity string that is in bytes format to a more simplified quantity string in integer + unit format (if the conversion to an integer is possible).
+ * Formats the quantity string to a more simplified quantity string in integer + unit format (if the conversion to an integer is possible). Aims for largest unit possible and prefers binary over decimal.
  * e.g. '1024' to 1Ki or '1000000' to 1M
  *
  * @param quantityString string to format, must be in a {@link https://github.com/kubevirt/kubevirt/blob/205d9455db56d5fcd42fb331122cfef358f19a69/vendor/k8s.io/apimachinery/pkg/api/resource/quantity.go#L33 Kubernetes Quantity} format
+ * @param convertBytesOnly if true, it will only format a string that is in bytes format (other strings with a unit will be untouched). Defaults to true.
  * @returns formatted quantity string
  */
-export const formatQuantityString = (quantityString: string) => {
+export const formatQuantityString = (quantityString: string, convertBytesOnly: boolean = true) => {
   if (isEmpty(quantityString)) {
     return null;
   }
 
   const unit = extractUnitFromQuantityString(quantityString);
 
+  const isValidQuantityUnit = isQuantityUnit(unit);
+
   // special case when unit = 'm' can occur, e.g. if we create a PVC with floating point number like 0.2Gi (1/5 Gi) which can't be converted to bytes (power of 2 is not divisible by 5), 'm' then stands for milibytes
-  if (isQuantityUnit(unit) || isFractionalUnit(unit)) {
+  if ((convertBytesOnly && isValidQuantityUnit) || isFractionalUnit(unit)) {
     return quantityString;
   }
 
-  if (!isEmpty(unit)) {
+  if (!isEmpty(unit) && !isValidQuantityUnit) {
     // ERROR: formatQuantityString helper called with quantityString argument which is not in Quantity format
     // TODO: implement isQuantityString helper to check the format first
     return '0';
   }
 
-  const bytes = Number(quantityString);
+  const bytes = Number(isValidQuantityUnit ? convertToBaseValue(quantityString) : quantityString);
   const { unitIndex: binaryUnitIndex, value: binaryValue } = convertBytes(bytes, 'BINARY');
   const { unitIndex: decimalUnitIndex, value: decimalValue } = convertBytes(bytes, 'DECIMAL');
 
