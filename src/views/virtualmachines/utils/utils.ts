@@ -59,7 +59,9 @@ export const getLatestMigrationForEachVM = (vmims: V1VirtualMachineInstanceMigra
 
     if (!acc[cluster]) {
       acc[cluster] = {};
-    } else if (!acc[cluster][namespace]) {
+    }
+
+    if (!acc[cluster][namespace]) {
       acc[cluster][namespace] = {};
     }
 
