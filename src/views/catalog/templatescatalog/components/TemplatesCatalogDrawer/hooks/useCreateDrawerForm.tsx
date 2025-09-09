@@ -62,7 +62,6 @@ import {
   HEADLESS_SERVICE_NAME,
 } from '@kubevirt-utils/utils/headless-service';
 import { addRandomSuffix, ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
-import { getCluster } from '@multicluster/helpers/selectors';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 import { getCatalogURL, getVMURL } from '@multicluster/urls';
@@ -195,6 +194,7 @@ const useCreateDrawerForm = (
         models,
         overrides: {
           autoUpdateEnabled,
+          cluster,
           isDisabledGuestSystemLogs,
           isUDNManagedNamespace,
           name: nameField,
@@ -220,9 +220,7 @@ const useCreateDrawerForm = (
       }
 
       setIsQuickCreating(false);
-      navigate(
-        getVMURL(getCluster(quickCreatedVM), getNamespace(quickCreatedVM), getName(quickCreatedVM)),
-      );
+      navigate(getVMURL(cluster, getNamespace(quickCreatedVM), getName(quickCreatedVM)));
       logTemplateFlowEvent(CREATE_VM_SUCCEEDED, templateToProcess);
     } catch (error) {
       setCreateError(error);

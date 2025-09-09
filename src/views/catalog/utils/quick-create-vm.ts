@@ -20,7 +20,6 @@ import {
 import { getArchitecture, NODE_ARCHITECTURE_LABEL } from '@kubevirt-utils/utils/architecture';
 import { createHeadlessService } from '@kubevirt-utils/utils/headless-service';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -30,6 +29,7 @@ type QuickCreateVMType = (inputs: {
   models: { [key: string]: K8sModel };
   overrides: {
     autoUpdateEnabled: boolean;
+    cluster?: string;
     isDisabledGuestSystemLogs: boolean;
     isUDNManagedNamespace?: boolean;
     name: string;
@@ -44,6 +44,7 @@ export const quickCreateVM: QuickCreateVMType = async ({
   models,
   overrides: {
     autoUpdateEnabled,
+    cluster,
     isDisabledGuestSystemLogs,
     isUDNManagedNamespace,
     name,
@@ -53,7 +54,6 @@ export const quickCreateVM: QuickCreateVMType = async ({
   template,
   uploadData,
 }) => {
-  const cluster = getCluster(template);
   const processedTemplate = await kubevirtK8sCreate<V1Template>({
     cluster,
     data: { ...template, metadata: { ...template?.metadata, namespace } },
