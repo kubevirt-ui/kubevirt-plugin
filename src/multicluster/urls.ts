@@ -23,7 +23,7 @@ export const getACMVMSearchURL = (): string =>
 export const getACMVMListNamespacesURL = (cluster: string, namespace: string): string =>
   `/k8s/cluster/${cluster}/ns/${namespace}/${KUBEVIRT_VM_PATH}`;
 
-export const getCatalogURL = (cluster: string, namespace?: string): string => {
+export const getCatalogURL = (cluster?: string, namespace?: string): string => {
   const namespacePath = namespace ? `ns/${namespace}` : ALL_NAMESPACES;
 
   return cluster
