@@ -46,13 +46,12 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
 
   const {
     control,
-    formState: { isSubmitting, isValid },
+    formState: { errors, isSubmitting },
     getValues,
   } = methods;
 
   const uploadFile = useWatch({ control, name: 'uploadFile' });
-
-  const baseValid = isValid && (!uploadEnabled || (uploadEnabled && !isEmpty(uploadFile)));
+  const baseValid = isEmpty(errors) && (!uploadEnabled || (uploadEnabled && !isEmpty(uploadFile)));
   const isFormValid =
     uploadEnabled && !isEmpty(upload?.uploadStatus) && uploadFile
       ? baseValid && upload.uploadStatus === UPLOAD_STATUS.SUCCESS

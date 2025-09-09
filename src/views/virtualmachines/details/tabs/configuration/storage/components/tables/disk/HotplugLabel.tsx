@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getVolumes } from '@kubevirt-utils/resources/vm';
+import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { Label } from '@patternfly/react-core';
 
 type HotplugLabelProps = {
@@ -18,9 +18,9 @@ export const HotplugLabel: React.FC<HotplugLabelProps> = ({ diskName, vm, vmi })
     const volumeStatus = vmi?.status?.volumeStatus?.find(
       (volStatus) => volStatus.name === diskName,
     );
-
+    const vmDisks = getDisks(vm)?.find((vol) => vol?.name === diskName);
     const vmVolume = getVolumes(vm)?.find((vol) => vol?.name === diskName);
-    if (!vmVolume && vmi) {
+    if (!(vmVolume || vmDisks) && vmi) {
       return t('AutoDetach Hotplug');
     }
     if (
