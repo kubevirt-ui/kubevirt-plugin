@@ -7,7 +7,7 @@ import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
-import { Checkbox, Form, FormGroup } from '@patternfly/react-core';
+import { Checkbox, FormGroup } from '@patternfly/react-core';
 
 import FormGroupHelperText from '../FormGroupHelperText/FormGroupHelperText';
 
@@ -45,23 +45,22 @@ const StartPauseModal: React.FC<StartPauseModalProps> = ({
       obj={updatedVirtualMachine}
       onClose={onClose}
       onSubmit={onSubmit}
+      shouldWrapInForm
     >
-      <Form>
-        {vmi && <ModalPendingChangesAlert />}
-        <FormGroup fieldId="start-pause-mode" isInline>
-          <Checkbox
-            id="start-pause-mode"
-            isChecked={checked}
-            label={t('Start this VirtualMachine in pause mode')}
-            onChange={(_event, val) => setChecked(val)}
-          />
-          <FormGroupHelperText>
-            {t(
-              'Applying the start/pause mode to this Virtual Machine will cause it to partially reboot and pause.',
-            )}
-          </FormGroupHelperText>
-        </FormGroup>
-      </Form>
+      {vmi && <ModalPendingChangesAlert />}
+      <FormGroup fieldId="start-pause-mode" isInline>
+        <Checkbox
+          id="start-pause-mode"
+          isChecked={checked}
+          label={t('Start this VirtualMachine in pause mode')}
+          onChange={(_event, val) => setChecked(val)}
+        />
+        <FormGroupHelperText>
+          {t(
+            'Applying the start/pause mode to this Virtual Machine will cause it to partially reboot and pause.',
+          )}
+        </FormGroupHelperText>
+      </FormGroup>
     </TabModal>
   );
 };

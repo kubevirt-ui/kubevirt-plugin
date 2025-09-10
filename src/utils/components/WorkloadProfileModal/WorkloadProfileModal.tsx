@@ -8,7 +8,7 @@ import {
   WORKLOADS_LABELS,
 } from '@kubevirt-utils/resources/template';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
-import { Form, FormGroup } from '@patternfly/react-core';
+import { FormGroup } from '@patternfly/react-core';
 import { SelectOption } from '@patternfly/react-core';
 
 import FormPFSelect from '../FormPFSelect/FormPFSelect';
@@ -40,23 +40,22 @@ const WorkloadProfileModal: FC<WorkloadProfileModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={() => onSubmit(workload)}
+      shouldWrapInForm
     >
-      <Form>
-        <FormGroup fieldId="template-firmware-bootloader" label={t('Workload profile')}>
-          <FormPFSelect
-            onSelect={handleChange}
-            selected={workload}
-            selectedLabel={WORKLOADS_LABELS[workload]}
-            toggleProps={{ isFullWidth: true }}
-          >
-            {Object.entries(WORKLOADS_LABELS).map(([key, value]) => (
-              <SelectOption description={t(WORKLOADS_DESCRIPTIONS[key])} key={key} value={key}>
-                {value}
-              </SelectOption>
-            ))}
-          </FormPFSelect>
-        </FormGroup>
-      </Form>
+      <FormGroup fieldId="template-firmware-bootloader" label={t('Workload profile')}>
+        <FormPFSelect
+          onSelect={handleChange}
+          selected={workload}
+          selectedLabel={WORKLOADS_LABELS[workload]}
+          toggleProps={{ isFullWidth: true }}
+        >
+          {Object.entries(WORKLOADS_LABELS).map(([key, value]) => (
+            <SelectOption description={t(WORKLOADS_DESCRIPTIONS[key])} key={key} value={key}>
+              {value}
+            </SelectOption>
+          ))}
+        </FormPFSelect>
+      </FormGroup>
     </TabModal>
   );
 };

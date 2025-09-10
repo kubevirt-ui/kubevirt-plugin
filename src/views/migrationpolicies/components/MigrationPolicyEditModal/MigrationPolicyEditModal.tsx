@@ -7,7 +7,7 @@ import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { k8sCreate, k8sDelete, k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
-import { Form, FormGroup, TextInput } from '@patternfly/react-core';
+import { FormGroup, TextInput } from '@patternfly/react-core';
 
 import { migrationPoliciesPageBaseURL } from '../../list/utils/constants';
 import MigrationPolicyConfigurations from '../MigrationPolicyConfigurations/MigrationPolicyConfigurations';
@@ -74,21 +74,20 @@ const MigrationPolicyEditModal: FC<MigrationPolicyEditModalProps> = ({ isOpen, m
       obj={updatedMigrationPolicy}
       onClose={onClose}
       onSubmit={onSubmit}
+      shouldWrapInForm
     >
-      <Form>
-        <FormGroup fieldId="migration-policy-name" isRequired label={t('MigrationPolicy name')}>
-          <TextInput
-            onChange={(_, value) => setStateField('migrationPolicyName')(value)}
-            value={state?.migrationPolicyName}
-          />
-          <FormGroupHelperText>{t('Unique name of the MigrationPolicy')}</FormGroupHelperText>
-        </FormGroup>
-        <MigrationPolicyConfigurations
-          setState={setState}
-          setStateField={setStateField}
-          state={state}
+      <FormGroup fieldId="migration-policy-name" isRequired label={t('MigrationPolicy name')}>
+        <TextInput
+          onChange={(_, value) => setStateField('migrationPolicyName')(value)}
+          value={state?.migrationPolicyName}
         />
-      </Form>
+        <FormGroupHelperText>{t('Unique name of the MigrationPolicy')}</FormGroupHelperText>
+      </FormGroup>
+      <MigrationPolicyConfigurations
+        setState={setState}
+        setStateField={setStateField}
+        state={state}
+      />
     </TabModal>
   );
 };

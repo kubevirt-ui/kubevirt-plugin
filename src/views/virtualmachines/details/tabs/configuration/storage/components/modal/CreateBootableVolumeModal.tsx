@@ -28,7 +28,7 @@ import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/const
 import { formatQuantityString } from '@kubevirt-utils/utils/units';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
-import { Form, PopoverPosition, Stack, Title } from '@patternfly/react-core';
+import { PopoverPosition, Stack, Title } from '@patternfly/react-core';
 
 import { createBootableVolumeFromDisk } from './utils';
 
@@ -112,32 +112,31 @@ const CreateBootableVolumeModal: FC<CreateBootableVolumeModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={onSubmit}
+      shouldWrapInForm
       submitBtnText={t('Save')}
     >
-      <Form>
-        <Stack hasGutter>
-          <Title className="pf-v6-u-mt-md" headingLevel="h5">
-            {t('Destination details')}
-          </Title>
-          <VolumeDestination
-            bootableVolume={bootableVolume}
-            setBootableVolumeField={setBootableVolumeField}
+      <Stack hasGutter>
+        <Title className="pf-v6-u-mt-md" headingLevel="h5">
+          {t('Destination details')}
+        </Title>
+        <VolumeDestination
+          bootableVolume={bootableVolume}
+          setBootableVolumeField={setBootableVolumeField}
+        />
+        <Title className="pf-v6-u-mt-md" headingLevel="h5">
+          {t('Volume metadata')}{' '}
+          <HelpTextIcon
+            bodyContent={t('Set the volume metadata to use the volume as a bootable image.')}
+            helpIconClassName="add-bootable-volume-modal__title-help-text-icon"
+            position={PopoverPosition.right}
           />
-          <Title className="pf-v6-u-mt-md" headingLevel="h5">
-            {t('Volume metadata')}{' '}
-            <HelpTextIcon
-              bodyContent={t('Set the volume metadata to use the volume as a bootable image.')}
-              helpIconClassName="add-bootable-volume-modal__title-help-text-icon"
-              position={PopoverPosition.right}
-            />
-          </Title>
-          <VolumeMetadata
-            bootableVolume={bootableVolume}
-            deleteLabel={deleteLabel}
-            setBootableVolumeField={setBootableVolumeField}
-          />
-        </Stack>
-      </Form>
+        </Title>
+        <VolumeMetadata
+          bootableVolume={bootableVolume}
+          deleteLabel={deleteLabel}
+          setBootableVolumeField={setBootableVolumeField}
+        />
+      </Stack>
     </TabModal>
   );
 };
