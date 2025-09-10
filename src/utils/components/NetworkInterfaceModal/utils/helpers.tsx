@@ -64,6 +64,45 @@ export const updateVMNetworkInterfaces = (
     resource: vm,
   });
 
+export type PatchUpdate<T> = {
+  index: number;
+  operation: 'add' | 'replace';
+  prevValue?: T;
+  value: T;
+};
+
+export const updateVMNetworkInterfaces2 = (
+  vm: V1VirtualMachine,
+  networkUpdate: PatchUpdate<V1Network>,
+  ifaceUpdate: PatchUpdate<V1Interface>,
+) =>
+  k8sPatch({
+    data: [
+      networkUpdate.operation === 'replace' && {
+        op: 'test',
+        path: `/spec/template/spec/networks/${networkUpdate.index}`,
+        value: networkUpdate.prevValue,
+      },
+      {
+        op: networkUpdate.operation,
+        path: `/spec/template/spec/networks/${networkUpdate.index}`,
+        value: networkUpdate.value,
+      },
+      ifaceUpdate.operation === 'replace' && {
+        op: 'test',
+        path: `/spec/template/spec/domain/devices/interfaces/${ifaceUpdate.index}`,
+        value: ifaceUpdate.prevValue,
+      },
+      {
+        op: ifaceUpdate.operation,
+        path: `/spec/template/spec/domain/devices/interfaces/${ifaceUpdate.index}`,
+        value: ifaceUpdate.value,
+      },
+    ].filter(Boolean),
+    model: VirtualMachineModel,
+    resource: vm,
+  });
+
 /**
  * To delete a hot plug NIC the state of the interface is set to 'absent'. The
  * NIC will then be removed when the VM is live migrated or restarted.
