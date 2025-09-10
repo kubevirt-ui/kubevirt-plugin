@@ -10,6 +10,7 @@ import {
   seriesHasHugepagesVariant,
 } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/utils';
 import HugepagesCheckbox from '@kubevirt-utils/components/HugepagesCheckbox/HugepagesCheckbox';
+import { useClickOutside } from '@kubevirt-utils/hooks/useClickOutside/useClickOutside';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import {
@@ -37,7 +38,6 @@ type RedHatSeriesMenuCardProps = {
 
 const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({
   activeMenu,
-  menuRef,
   onMenuSelect,
   onMenuToggle,
   rhSeriesItem,
@@ -46,6 +46,7 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({
 
   const cardRef = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const {
     instanceTypeVMState: { selectedInstanceType },
   } = useInstanceTypeVMStore();
@@ -63,6 +64,14 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({
       selectedInstanceType?.name?.startsWith(seriesName),
     [selectedInstanceType, seriesName],
   );
+
+  const handleMenuClose = () => {
+    if (isMenuExpanded) {
+      onMenuToggle(undefined, seriesName);
+    }
+  };
+
+  useClickOutside([menuRef], handleMenuClose);
 
   const selectedITLabel = useMemo(() => {
     const itSize = sizes?.find(
