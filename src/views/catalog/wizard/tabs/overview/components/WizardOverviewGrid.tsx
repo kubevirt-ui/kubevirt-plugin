@@ -35,6 +35,10 @@ import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { getCatalogURL } from '@multicluster/urls';
 import { DescriptionList, Grid, GridItem, Switch } from '@patternfly/react-core';
+import DeletionProtectionModal from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/DeletionProtectionModal';
+import { VM_DELETION_PROTECTION_LABEL } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/constants';
+import { VMDeletionProtectionOptions } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/types';
+import { isDeletionProtectionEnabled } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 import { printableVMStatus } from '@virtualmachines/utils';
 
@@ -104,6 +108,8 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
       vmDraft.spec.template.spec.startStrategy = checked ? printableVMStatus.Paused : null;
     });
   };
+
+  const deletionProtectionEnabled = isDeletionProtectionEnabled(vm);
 
   return (
     <Grid className="wizard-overview-tab__grid" hasGutter>
@@ -361,6 +367,45 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
             }}
             testId="guest-system-log-access"
             title={t('Guest system log access')}
+          />
+          <WizardDescriptionItem
+            description={
+              <Switch
+                onChange={(_event, checked) =>
+                  createModal(({ isOpen, onClose }) => (
+                    <DeletionProtectionModal
+                      deletionProtectionOption={
+                        checked
+                          ? VMDeletionProtectionOptions.ENABLE
+                          : VMDeletionProtectionOptions.DISABLE
+                      }
+                      onConfirm={(enableDeletionProtection) => {
+                        updateVM((draftVM) => {
+                          draftVM.metadata.labels = {
+                            ...draftVM.metadata.labels,
+                            [VM_DELETION_PROTECTION_LABEL]: enableDeletionProtection.toString(),
+                          };
+                        });
+                        onClose();
+                      }}
+                      isOpen={isOpen}
+                      onCancel={onClose}
+                      vm={vm}
+                    />
+                  ))
+                }
+                id="deletion-protection"
+                isChecked={deletionProtectionEnabled}
+              />
+            }
+            helperPopover={{
+              content: t(
+                'Applying deletion protection to this VM will prevent deletion through the web console.',
+              ),
+              header: t('Deletion protection'),
+            }}
+            data-test-id="deletion-protection"
+            title={t('Deletion protection')}
           />
         </DescriptionList>
       </GridItem>
