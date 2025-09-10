@@ -1,5 +1,6 @@
 import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
+import { isAllNamespaces } from '@kubevirt-utils/utils/utils';
 import { ResourceRouteHandler } from '@stolostron/multicluster-sdk';
 
 import { VirtualMachineModel } from '../views/dashboard-extensions/utils';
@@ -26,8 +27,8 @@ export const getACMVMSearchURL = (): string =>
 export const getACMVMListNamespacesURL = (cluster: string, namespace: string): string =>
   `/k8s/cluster/${cluster}/ns/${namespace}/${KUBEVIRT_VM_PATH}`;
 
-export const getCatalogURL = (cluster?: string, namespace?: string): string => {
-  const namespacePath = namespace ? `ns/${namespace}` : ALL_NAMESPACES;
+export const getCatalogURL = (cluster: string, namespace?: string): string => {
+  const namespacePath = isAllNamespaces(namespace) ? ALL_NAMESPACES : `ns/${namespace}`;
 
   return cluster
     ? `/k8s/cluster/${cluster}/${namespacePath}/catalog`

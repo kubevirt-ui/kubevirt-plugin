@@ -6,8 +6,8 @@ import {
   useIsWindowsBootableVolume,
 } from '@catalog/CreateFromInstanceTypes/utils/utils';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
-import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import useRHELAutomaticSubscription from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/useRHELAutomaticSubscription';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
 import { addWinDriverVolume } from '@kubevirt-utils/resources/vm/utils/disk/drivers';
@@ -23,7 +23,7 @@ const useGeneratedVM = () => {
   const { subscriptionData } = useRHELAutomaticSubscription();
   const { instanceTypeVMState, startVM, vmNamespaceTarget } = useInstanceTypeVMStore();
 
-  const namespace = useNamespaceParam();
+  const namespace = useActiveNamespace();
   const [isUDNManagedNamespace] = useNamespaceUDN(getValidNamespace(namespace));
 
   const generatedVM = useMemo(

@@ -23,9 +23,9 @@ import {
   CUSTOMIZE_VM_BUTTON_CLICKED,
   VIEW_YAML_AND_CLI_CLICKED,
 } from '@kubevirt-utils/extensions/telemetry/utils/constants';
+import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
-import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import { createSSHSecret } from '@kubevirt-utils/resources/secret/utils';
 import { getName } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
@@ -50,7 +50,7 @@ const CreateVMFooter: FC = () => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const cluster = useClusterParam();
-  const namespace = useNamespaceParam();
+  const namespace = useActiveNamespace();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<any | Error>(null);
   const { createModal } = useModal();

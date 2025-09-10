@@ -6,9 +6,9 @@ import { CREATE_VM_TAB } from '@catalog/CreateVMHorizontalNav/constants';
 import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { ALL_NAMESPACES_SESSION_KEY, ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
+import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
-import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import useUserPreferences from '@kubevirt-utils/hooks/useUserPreferences';
 import useBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useBootableVolumes';
 import { getValidNamespace } from '@kubevirt-utils/utils/utils';
@@ -31,7 +31,7 @@ type CreateFromInstanceTypeProps = { currentTab: CREATE_VM_TAB };
 const CreateFromInstanceType: FC<CreateFromInstanceTypeProps> = ({ currentTab }) => {
   const { t } = useKubevirtTranslation();
   const cluster = useClusterParam();
-  const namespace = useNamespaceParam();
+  const namespace = useActiveNamespace();
   const sectionState = useState<INSTANCE_TYPES_SECTIONS>(INSTANCE_TYPES_SECTIONS.SELECT_VOLUME);
 
   const { resetInstanceTypeVMState, setVMNamespaceTarget, volumeListNamespace } =

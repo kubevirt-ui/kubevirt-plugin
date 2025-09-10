@@ -2,8 +2,8 @@ import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
+import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import { getValidNamespace, validateSSHPublicKey } from '@kubevirt-utils/utils/utils';
 import {
   FileUpload,
@@ -28,7 +28,7 @@ type SSHKeyUploadProps = {
 
 const SSHKeyUpload: FC<SSHKeyUploadProps> = ({ secrets, setSSHDetails, sshDetails }) => {
   const { t } = useKubevirtTranslation();
-  const activeNamespace = useNamespaceParam();
+  const activeNamespace = useActiveNamespace();
   const [nameErrorMessage, setNameErrorMessage] = useState<string>(null);
   const [isValidKey, setIsValidKey] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -43,7 +43,7 @@ const SSHKeyUpload: FC<SSHKeyUploadProps> = ({ secrets, setSSHDetails, sshDetail
       ...sshDetails,
       secretOption: SecretSelectionOption.addNew,
       sshPubKey: sshPublicKey?.trim(),
-      sshSecretNamespace: activeNamespace,
+      sshSecretNamespace: vmNamespaceTarget,
     });
   };
 
