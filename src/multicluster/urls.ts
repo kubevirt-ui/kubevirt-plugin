@@ -12,10 +12,13 @@ export const isACMPath = (pathname: string): boolean =>
 export const getACMVMURL = (cluster: string, namespace: string, name: string): string =>
   `/k8s/cluster/${cluster}/ns/${namespace}/${KUBEVIRT_VM_PATH}/${name}`;
 
-export const getACMVMListURL = (cluster?: string): string =>
-  cluster
+export const getACMVMListURL = (cluster?: string, namespace?: string): string => {
+  if (namespace) return getACMVMListNamespacesURL(cluster, namespace);
+
+  return cluster
     ? `/k8s/cluster/${cluster}/all-namespaces/${KUBEVIRT_VM_PATH}`
     : `/k8s/all-clusters/all-namespaces/${KUBEVIRT_VM_PATH}`;
+};
 
 export const getACMVMSearchURL = (): string =>
   `/k8s/all-clusters/all-namespaces/${KUBEVIRT_VM_PATH}/search`;
@@ -50,10 +53,11 @@ export const getVMURL = (cluster: string, namespace: string, name: string): stri
         resource: { metadata: { name, namespace } },
       });
 
-export const getVMListURL = (cluster: string) =>
+export const getVMListURL = (cluster?: string, namespace?: string) =>
   cluster
-    ? getACMVMListURL(cluster)
+    ? getACMVMListURL(cluster, namespace)
     : getResourceUrl({
+        activeNamespace: namespace,
         model: VirtualMachineModel,
       });
 
