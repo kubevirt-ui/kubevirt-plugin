@@ -26,6 +26,7 @@ import {
 import { createHeadlessService } from '@kubevirt-utils/utils/headless-service';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 import { getCatalogURL, getVMURL } from '@multicluster/urls';
 import {
@@ -44,6 +45,7 @@ const CustomizeITVMFooter: FC = () => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const namespace = useNamespaceParam();
+  const cluster = useClusterParam();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<any | Error>(null);
   const { instanceTypeVMState, setStartVM, startVM, vm, vmNamespaceTarget } =
@@ -97,18 +99,19 @@ const CustomizeITVMFooter: FC = () => {
 
                   try {
                     const createdVM = await kubevirtK8sCreate({
+                      cluster,
                       data: vmSignal.value || vm,
                       model: VirtualMachineModel,
                     });
                     logITFlowEvent(CUSTOMIZE_VM_SUCCEEDED, createdVM);
                     if (secretOption === SecretSelectionOption.addNew) {
-                      createSSHSecret(sshPubKey, sshSecretName, vmNamespaceTarget, getCluster(vm));
+                      createSSHSecret(sshPubKey, sshSecretName, vmNamespaceTarget, cluster);
                     }
                     clearCustomizeInstanceType();
 
                     if (!isUDNManagedNamespace) createHeadlessService(createdVM);
 
-                    navigate(getVMURL(getCluster(vm), vmNamespaceTarget, getName(createdVM)));
+                    navigate(getVMURL(cluster, vmNamespaceTarget, getName(createdVM)));
                   } catch (err) {
                     setError(err);
                     logITFlowEvent(CUSTOMIZE_VM_FAILED, vm);

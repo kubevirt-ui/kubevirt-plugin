@@ -6,6 +6,7 @@ import {
 import { convertToBaseValue, humanizeBinaryBytesWithoutB } from '@kubevirt-utils/utils/humanize.js';
 import { binaryUnitsOrdered } from '@kubevirt-utils/utils/unitConstants';
 import { BinaryUnit } from '@kubevirt-utils/utils/unitConstants';
+import { formatQuantityString } from '@kubevirt-utils/utils/units';
 
 export const getMinSizes = (pvcSize: string) => {
   const pvcSizeBytes = convertToBaseValue(pvcSize);
@@ -25,7 +26,7 @@ export const getPVCStorageForInput = (pvc: IoK8sApiCoreV1PersistentVolumeClaim) 
 
   const pvcStorageCapacity = getPVCStorageCapacity(pvc);
 
-  return convertToBaseValue(pvcStorageCapacity) > convertToBaseValue(pvcStorageRequested)
+  return convertToBaseValue(pvcStorageCapacity) >= convertToBaseValue(pvcStorageRequested)
     ? pvcStorageCapacity
-    : pvcStorageRequested;
+    : formatQuantityString(pvcStorageRequested, false);
 };
