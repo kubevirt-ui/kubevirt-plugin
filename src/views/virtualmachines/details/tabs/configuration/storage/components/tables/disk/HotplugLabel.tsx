@@ -18,9 +18,9 @@ export const HotplugLabel: React.FC<HotplugLabelProps> = ({ diskName, vm, vmi })
     const volumeStatus = vmi?.status?.volumeStatus?.find(
       (volStatus) => volStatus.name === diskName,
     );
-    const vmDisks = getDisks(vm)?.find((vol) => vol?.name === diskName);
+    const vmDisk = getDisks(vm)?.find((vol) => vol?.name === diskName);
     const vmVolume = getVolumes(vm)?.find((vol) => vol?.name === diskName);
-    if (!(vmVolume || vmDisks) && vmi) {
+    if (!(vmVolume || vmDisk) && vmi) {
       return t('AutoDetach Hotplug');
     }
     if (
