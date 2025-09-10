@@ -10,9 +10,12 @@ import NetworkInterfaceModal from '@kubevirt-utils/components/NetworkInterfaceMo
 import {
   createInterface,
   createNetwork,
-  updateVMNetworkInterfaces,
+  PatchRequest,
+  patchVM,
+  prepareInterfacePatch,
+  prepareNetworkPatch,
 } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
-import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
+import { getInterface, getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
 
 type VirtualMachinesNetworkInterfaceModalProps = {
   headerText: string;
@@ -43,6 +46,12 @@ const VirtualMachinesNetworkInterfaceModal: FC<VirtualMachinesNetworkInterfaceMo
         nicName,
       }) =>
       () => {
+        const existingInterface = getInterface(vm, nicName);
+        const existingNetwork = getNetworks(vm)?.find(({ name }) => name === nicName);
+        if (existingNetwork || existingInterface) {
+          return;
+        }
+
         const resultNetwork = createNetwork(nicName, networkName);
         const resultInterface = createInterface({
           interfaceLinkState,
@@ -52,11 +61,25 @@ const VirtualMachinesNetworkInterfaceModal: FC<VirtualMachinesNetworkInterfaceMo
           nicName,
         });
 
-        const updatedNetworks: V1Network[] = [...(getNetworks(vm) || []), resultNetwork];
-        const updatedInterfaces: V1Interface[] = [...(getInterfaces(vm) || []), resultInterface];
-        return onAddNetworkInterface
-          ? onAddNetworkInterface(updatedNetworks, updatedInterfaces)
-          : updateVMNetworkInterfaces(vm, updatedNetworks, updatedInterfaces);
+        if (onAddNetworkInterface) {
+          const updatedNetworks: V1Network[] = [...(getNetworks(vm) || []), resultNetwork];
+          const updatedInterfaces: V1Interface[] = [...(getInterfaces(vm) || []), resultInterface];
+          return onAddNetworkInterface(updatedNetworks, updatedInterfaces);
+        }
+
+        const network: PatchRequest<V1Network> = {
+          index: getNetworks(vm)?.length ?? 0,
+          operation: 'add',
+          value: resultNetwork,
+        };
+
+        const iface: PatchRequest<V1Interface> = {
+          index: getInterfaces(vm)?.length ?? 0,
+          operation: 'add',
+          value: resultInterface,
+        };
+
+        return patchVM(vm, [...prepareNetworkPatch(network), ...prepareInterfacePatch(iface)]);
       },
     [onAddNetworkInterface, vm],
   );
