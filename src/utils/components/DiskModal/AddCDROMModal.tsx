@@ -85,7 +85,7 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
     <FormProvider {...methods}>
       <TabModal
         onClose={() => {
-          if (upload?.uploadStatus === UPLOAD_STATUS.UPLOADING) {
+          if (upload?.uploadStatus) {
             try {
               upload.cancelUpload();
             } catch (error) {

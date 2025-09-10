@@ -2,10 +2,7 @@ import produce from 'immer';
 import { WritableDraft } from 'immer/dist/internal';
 
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
-import {
-  V1beta1DataVolume,
-  V1beta1DataVolumeSpec,
-} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import {
   V1AddVolumeOptions,
   V1DataVolumeTemplateSpec,
@@ -277,14 +274,6 @@ export const mountISOToCDROM = async (
   vm: V1VirtualMachine,
   diskState: V1DiskFormState,
 ): Promise<V1VirtualMachine> => {
-  if (diskState.dataVolumeTemplate) {
-    const dataVolume = getEmptyVMDataVolumeResource(vm);
-    dataVolume.metadata = diskState.dataVolumeTemplate.metadata;
-    dataVolume.spec = { ...diskState.dataVolumeTemplate.spec } as unknown as V1beta1DataVolumeSpec;
-
-    await k8sCreate({ data: dataVolume, model: DataVolumeModel });
-  }
-
   const newVolumeSource = getVolumeSourceForMount(diskState);
 
   return produceVMDisks(vm, (draftVM) => {

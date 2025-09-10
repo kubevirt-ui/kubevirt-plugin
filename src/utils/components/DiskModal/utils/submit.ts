@@ -19,8 +19,12 @@ import { isRunning } from '@virtualmachines/utils';
 import { getDataVolumeTemplateSize } from '../components/utils/selectors';
 
 import { DEFAULT_DISK_SIZE } from './constants';
-import { getEmptyVMDataVolumeResource, hotplugPromise, produceVMDisks } from './helpers';
-import { createDataVolumeName } from './helpers';
+import {
+  createDataVolumeName,
+  getEmptyVMDataVolumeResource,
+  hotplugPromise,
+  produceVMDisks,
+} from './helpers';
 import { V1DiskFormState } from './types';
 
 const applyDiskAsBootable = (vm: V1VirtualMachine, diskName: string): V1VirtualMachine => {
@@ -80,8 +84,9 @@ export const uploadDataVolume = async (
     dataVolume,
     file: data?.uploadFile?.file,
   });
-
-  delete data.dataVolumeTemplate.spec.source.upload;
+  if (data?.dataVolumeTemplate?.spec?.source?.upload) {
+    delete data.dataVolumeTemplate.spec.source.upload;
+  }
 
   return dataVolume;
 };
