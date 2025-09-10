@@ -1,16 +1,12 @@
-import React, { FC, useState } from 'react';
+import React, { FC } from 'react';
 
-import VirtualMachineClusterInstancetypeModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineClusterInstancetypeModel';
-import HugepagesCheckbox from '@kubevirt-utils/components/HugepagesCheckbox/HugepagesCheckbox';
+import HugepagesInfo from '@kubevirt-utils/components/HugepagesInfo/HugepagesInfo';
+import { Divider } from '@patternfly/react-core';
 
 import { instanceTypeSeriesNameMapper } from '../../utils/constants';
 import { RedHatInstanceTypeSeries } from '../../utils/types';
-import {
-  getOppositeHugepagesInstanceType,
-  is1GiInstanceType,
-  seriesHasHugepagesVariant,
-} from '../../utils/utils';
-import RedHatInstanceTypeSeriesSizesMenuItems from '../RedHatInstanceTypeSeriesMenu/RedHatInstanceTypeSeriesSizesMenuItem';
+import { seriesHasHugepagesVariant } from '../../utils/utils';
+import RedHatInstanceTypeSeriesSizesMenuItems from '../RedHatInstanceTypeSeriesMenu/RedHatInstanceTypeSeriesSizesMenuItems';
 
 import DrilldownMenuItem from './DrilldownMenuItem';
 
@@ -30,11 +26,15 @@ const DrilldownMenuItemWrapper: FC<DrilldownMenuItemWrapperProps> = ({
   const { classAnnotation, seriesName, sizes } = series;
   const { disabled, Icon, seriesLabel } = instanceTypeSeriesNameMapper[seriesName] || {};
 
-  const isSelectedFromSeries =
-    selectedKind === VirtualMachineClusterInstancetypeModel.kind && selected.startsWith(seriesName);
-
-  const [isHugepages, setIsHugepages] = useState(
-    isSelectedFromSeries && is1GiInstanceType(selected),
+  const getMenuItems = (isHugepages?: boolean) => (
+    <RedHatInstanceTypeSeriesSizesMenuItems
+      isHugepages={isHugepages}
+      onSelect={onSelect}
+      selected={selected}
+      selectedKind={selectedKind}
+      seriesName={seriesName}
+      sizes={sizes}
+    />
   );
 
   return disabled ? null : (
@@ -44,26 +44,17 @@ const DrilldownMenuItemWrapper: FC<DrilldownMenuItemWrapperProps> = ({
       key={seriesName}
       label={seriesLabel || classAnnotation}
     >
-      {seriesHasHugepagesVariant(seriesName) && (
-        <HugepagesCheckbox
-          onHugepagesChange={(_, checked) => {
-            setIsHugepages(checked);
-            if (isSelectedFromSeries) {
-              onSelect(getOppositeHugepagesInstanceType(selected, checked), true);
-            }
-          }}
-          id={`${seriesName}-drilldown`}
-          isHugepages={isHugepages}
-          isInDrilldownMenu
-        />
+      {seriesHasHugepagesVariant(seriesName) ? (
+        <>
+          <DrilldownMenuItem id={`${seriesName}-hugepages`} label={<HugepagesInfo />}>
+            {getMenuItems(true)}
+          </DrilldownMenuItem>
+          <Divider component="li" />
+          {getMenuItems(false)}
+        </>
+      ) : (
+        getMenuItems()
       )}
-      <RedHatInstanceTypeSeriesSizesMenuItems
-        isHugepages={isHugepages}
-        onSelect={onSelect}
-        selected={selected}
-        seriesName={seriesName}
-        sizes={sizes}
-      />
     </DrilldownMenuItem>
   );
 };

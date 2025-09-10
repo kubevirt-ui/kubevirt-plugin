@@ -1,27 +1,25 @@
-import React, { FC, useMemo, useRef, useState } from 'react';
+import React, { FC, useMemo, useRef } from 'react';
 import classNames from 'classnames';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
-import RedHatInstanceTypeSeriesSizesMenuItems from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/components/RedHatInstanceTypeSeriesMenu/RedHatInstanceTypeSeriesSizesMenuItem';
+import RedHatInstanceTypeSeriesSizesMenuItems from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/components/RedHatInstanceTypeSeriesMenu/RedHatInstanceTypeSeriesSizesMenuItems';
 import { instanceTypeSeriesNameMapper } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/constants';
 import { RedHatInstanceTypeSeries } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/types';
-import {
-  getOppositeHugepagesInstanceType,
-  seriesHasHugepagesVariant,
-} from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/utils';
-import HugepagesCheckbox from '@kubevirt-utils/components/HugepagesCheckbox/HugepagesCheckbox';
 import { useClickOutside } from '@kubevirt-utils/hooks/useClickOutside/useClickOutside';
+import { seriesHasHugepagesVariant } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/utils';
+import HugepagesInfo from '@kubevirt-utils/components/HugepagesInfo/HugepagesInfo';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import {
   Button,
   Card,
   CardBody,
-  CardFooter,
   CardHeader,
+  Divider,
   Flex,
   Menu,
   MenuContent,
+  MenuItem,
   MenuList,
   Popper,
   Tooltip,
@@ -86,8 +84,6 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({
     });
   }, [selectedInstanceType, seriesName, sizes, t]);
 
-  const [isHugepages, setIsHugepages] = useState(false);
-
   const card = (
     <Card
       className={classNames(
@@ -117,39 +113,45 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({
             {isSelectedMenu && selectedITLabel}
           </div>
         </CardBody>
-        {seriesHasHugepagesVariant(seriesName) && (
-          <CardFooter>
-            <HugepagesCheckbox
-              onHugepagesChange={(_, checked) => {
-                setIsHugepages(checked);
-                if (isSelectedMenu) {
-                  onMenuSelect(
-                    getOppositeHugepagesInstanceType(selectedInstanceType.name, checked),
-                  );
-                }
-              }}
-              id={`${seriesName}-card`}
-              isHugepages={isHugepages}
-            />
-          </CardFooter>
-        )}
       </Flex>
     </Card>
+  );
+
+  const getMenuItems = (isHugepages?: boolean) => (
+    <RedHatInstanceTypeSeriesSizesMenuItems
+      isHugepages={isHugepages}
+      onSelect={onMenuSelect}
+      selected={selectedInstanceType?.name}
+      seriesName={seriesName}
+      sizes={sizes}
+    />
   );
 
   return (
     <Popper
       popper={
-        <Menu activeMenu={activeMenu} id={seriesName} ref={menuRef}>
+        <Menu activeMenu={activeMenu} containsFlyout id={seriesName} ref={menuRef}>
           <MenuContent>
             <MenuList>
-              <RedHatInstanceTypeSeriesSizesMenuItems
-                isHugepages={isHugepages}
-                onSelect={onMenuSelect}
-                selected={selectedInstanceType?.name}
-                seriesName={seriesName}
-                sizes={sizes}
-              />
+              {seriesHasHugepagesVariant(seriesName) ? (
+                <>
+                  <MenuItem
+                    flyoutMenu={
+                      <Menu>
+                        <MenuContent>
+                          <MenuList>{getMenuItems(true)}</MenuList>
+                        </MenuContent>
+                      </Menu>
+                    }
+                  >
+                    <HugepagesInfo />
+                  </MenuItem>
+                  <Divider component="li" />
+                  {getMenuItems(false)}
+                </>
+              ) : (
+                getMenuItems()
+              )}
             </MenuList>
           </MenuContent>
         </Menu>
