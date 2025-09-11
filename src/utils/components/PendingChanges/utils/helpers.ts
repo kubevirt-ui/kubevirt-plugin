@@ -14,7 +14,7 @@ import {
   getCloudInitData,
   getCloudInitVolume,
 } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
-import { InterfaceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
+import { interfaceModelType } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/constants';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import { RESTART_REQUIRED } from '@kubevirt-utils/components/PendingChanges/utils/constants';
 import {
@@ -40,6 +40,7 @@ import {
 } from '@kubevirt-utils/resources/vm';
 import { getNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { getInterfacesAndNetworks } from '@kubevirt-utils/resources/vm/utils/network/utils';
+import { isWindows } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import {
   DESCHEDULER_EVICT_LABEL,
   getEvictionStrategy as getVMIEvictionStrategy,
@@ -152,6 +153,10 @@ export const getChangedEnvDisks = (
   return changedEnvDisks;
 };
 
+export const getDefaultInterfaceModel = (vmi: V1VirtualMachineInstance): string => {
+  return isWindows(vmi) ? interfaceModelType.E1000E : interfaceModelType.VIRTIO;
+};
+
 export const getInterfaceByName = (
   name: string,
   vm: V1VirtualMachine,
@@ -185,8 +190,8 @@ export const getChangedNICs = (vm: V1VirtualMachine, vmi: V1VirtualMachineInstan
         getNetworkInterfaceType(state.config.iface) !==
           getNetworkInterfaceType(state.runtime.iface) ||
         // model change (virtio <-> e1000e)
-        (state.config.iface?.model ?? InterfaceTypes.VIRTIO) !==
-          (state.runtime.iface?.model ?? InterfaceTypes.VIRTIO),
+        (state.config.iface?.model ?? getDefaultInterfaceModel(vmi)) !==
+          (state.runtime.iface?.model ?? getDefaultInterfaceModel(vmi)),
     )
     .map((state) => state.runtime?.network?.name);
 
