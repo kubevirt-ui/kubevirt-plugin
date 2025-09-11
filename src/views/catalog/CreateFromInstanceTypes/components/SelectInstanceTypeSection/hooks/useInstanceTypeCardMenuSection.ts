@@ -1,16 +1,14 @@
-import { MouseEvent, useRef, useState } from 'react';
+import { MouseEvent, useState } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { instanceTypeActionType } from '@catalog/CreateFromInstanceTypes/state/utils/types';
 import { logITFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
 import { INSTANCETYPE_SELECTED } from '@kubevirt-utils/extensions/telemetry/utils/constants';
-import { useClickOutside } from '@kubevirt-utils/hooks/useClickOutside/useClickOutside';
 
 import { UseInstanceTypeCardMenuSectionValues } from '../utils/types';
 
 const useInstanceTypeCardMenuSection = (): UseInstanceTypeCardMenuSectionValues => {
   const [activeMenu, setActiveMenu] = useState<string>(null);
-  const menuRef = useRef<HTMLDivElement>(null);
 
   const { setInstanceTypeVMState } = useInstanceTypeVMStore();
 
@@ -32,8 +30,7 @@ const useInstanceTypeCardMenuSection = (): UseInstanceTypeCardMenuSectionValues 
     });
   };
 
-  useClickOutside([menuRef], onMenuToggle);
-  return { activeMenu, menuRef, onMenuSelect, onMenuToggle };
+  return { activeMenu, onMenuSelect, onMenuToggle };
 };
 
 export default useInstanceTypeCardMenuSection;

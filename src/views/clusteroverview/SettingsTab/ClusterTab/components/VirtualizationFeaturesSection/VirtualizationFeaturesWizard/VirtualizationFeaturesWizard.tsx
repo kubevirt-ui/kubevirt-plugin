@@ -18,6 +18,12 @@ const VirtualizationFeaturesWizard: FC<VirtualizationFeaturesWizardProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
+  const wizardFooterProps = {
+    backButtonText: t('Back'),
+    cancelButtonText: t('Cancel'),
+    nextButtonText: t('Next'),
+  };
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} variant={ModalVariant.large}>
       <Wizard
@@ -35,10 +41,21 @@ const VirtualizationFeaturesWizard: FC<VirtualizationFeaturesWizardProps> = ({
         onClose={onClose}
         title={t('Virtualization features')}
       >
-        <WizardStep id="virtualization-features-configuration-step" name={t('Configuration')}>
+        <WizardStep
+          footer={wizardFooterProps}
+          id="virtualization-features-configuration-step"
+          name={t('Configuration')}
+        >
           <ConfigurationStepContent />
         </WizardStep>
-        <WizardStep id="virtualization-features-summary-step" name={t('Summary')}>
+        <WizardStep
+          footer={{
+            ...wizardFooterProps,
+            nextButtonText: t('Finish'),
+          }}
+          id="virtualization-features-summary-step"
+          name={t('Summary')}
+        >
           <SummaryStepContent />
         </WizardStep>
       </Wizard>

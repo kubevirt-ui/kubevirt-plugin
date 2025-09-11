@@ -1,10 +1,12 @@
 import { V1CPU } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { isAllNamespaces, isEmpty } from '@kubevirt-utils/utils/utils';
 import { getACMVMListURL, getVMListNamespacesURL, getVMListURL } from '@multicluster/urls';
 import { getRowFilterQueryKey } from '@search/utils/query';
 
 export const getVMListPath = (namespace: string, params: string, cluster?: string) => {
-  const vmListURL = namespace ? getVMListNamespacesURL(cluster, namespace) : getVMListURL(cluster);
+  const vmListURL = isAllNamespaces(namespace)
+    ? getVMListURL(cluster)
+    : getVMListNamespacesURL(cluster, namespace);
   return `${vmListURL}?${params}`;
 };
 

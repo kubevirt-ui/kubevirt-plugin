@@ -1,5 +1,3 @@
-import { MutableRefObject } from 'react';
-
 import { InstanceTypeSize } from '@kubevirt-utils/resources/instancetype/types';
 
 export enum InstanceTypeCategory {
@@ -29,7 +27,6 @@ export type CategoryDetailsMap = { [key in InstanceTypeCategory]: CategoryDetail
 
 export type UseInstanceTypeCardMenuSectionValues = {
   activeMenu: string;
-  menuRef: MutableRefObject<HTMLDivElement>;
   onMenuSelect: (itName: string) => void;
   onMenuToggle: (event?: React.MouseEvent, menuID?: string) => void;
 };
