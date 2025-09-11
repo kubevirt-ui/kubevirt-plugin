@@ -17,6 +17,7 @@ import {
   DATAVOLUME_SNAPSHOT_NAME,
   DATAVOLUME_SNAPSHOT_NAMESPACE,
   DISK_SIZE_FIELD,
+  VM_CLUSTER_FIELD,
 } from '../../../utils/constants';
 import { getErrorSnapshotName } from '../../../utils/selectors';
 import { diskSourceSnapshotVolumeNameFieldID } from '../../utils/constants';
@@ -30,9 +31,10 @@ const DiskSourceSnapshotVolumeSelectName: FC = () => {
     watch,
   } = useFormContext<V1DiskFormState>();
 
+  const vmCluster = watch(VM_CLUSTER_FIELD);
   const namespace = watch(DATAVOLUME_SNAPSHOT_NAMESPACE);
 
-  const { snapshots, snapshotsLoaded } = useSnapshots(namespace);
+  const { snapshots, snapshotsLoaded } = useSnapshots(namespace, vmCluster);
 
   const snapshotNames = useMemo(() => snapshots?.map(getName), [snapshots]);
 

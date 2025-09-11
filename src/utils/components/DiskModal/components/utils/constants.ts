@@ -11,6 +11,7 @@ export const VOLUMEMODE_FIELDID = 'volume-mode';
 export const ENABLE_PREALLOCATION_FIELDID = 'enable-preallocation';
 
 export const EXPAND_PVC_SIZE = 'expandPVCSize';
+export const VM_CLUSTER_FIELD = 'cluster';
 export const SHARABLE_FIELD = 'disk.shareable';
 export const LUN_RESERVATION_FIELD = 'disk.lun.reservation';
 export const DATAVOLUME_PVC_NAME = 'dataVolumeTemplate.spec.source.pvc.name';

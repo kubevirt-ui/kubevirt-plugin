@@ -19,8 +19,9 @@ import {
   UPLOAD_STATUS,
 } from './utils';
 
-export const useCDIUpload = (): UseCDIUploadValues => {
-  const cluster = useClusterParam();
+export const useCDIUpload = (clusterInput?: string): UseCDIUploadValues => {
+  const clusterParam = useClusterParam();
+  const cluster = clusterParam || clusterInput;
   const { t } = useKubevirtTranslation();
   const [cdiConfig, configLoaded, configError] = useK8sWatchData<CDIConfig>({
     cluster,

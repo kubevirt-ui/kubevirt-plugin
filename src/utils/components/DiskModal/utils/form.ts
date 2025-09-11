@@ -17,6 +17,7 @@ import {
   DISK_DEVICE_NAME,
 } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { generatePrettyName, isEmpty } from '@kubevirt-utils/utils/utils';
+import { getCluster } from '@multicluster/helpers/selectors';
 
 import { DEFAULT_DISK_SIZE } from './constants';
 import { createDataVolumeName, doesSourceRequireDataVolume } from './helpers';
@@ -68,6 +69,7 @@ export const getDefaultEditValues = (
   if (isEmpty(diskToEdit) && isInstanceTypeVM(vm)) diskToEdit = { name: editDiskName };
 
   return {
+    cluster: getCluster(vm),
     dataVolumeTemplate,
     disk: diskToEdit,
     isBootSource,
@@ -103,6 +105,7 @@ export const getDefaultCreateValues = (
     : { disk: { bus: InterfaceTypes.VIRTIO } };
 
   return {
+    cluster: getCluster(vm),
     dataVolumeTemplate,
     disk: {
       ...diskConfig,

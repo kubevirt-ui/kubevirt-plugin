@@ -7,16 +7,18 @@ import { V1DiskFormState } from '../../utils/types';
 import {
   ACCESS_MODE_FIELD,
   DATAVOLUME_TEMPLATE_STORAGE,
+  VM_CLUSTER_FIELD,
   VOLUME_MODE_FIELD,
 } from '../utils/constants';
 
 const ApplyStorageProfileSettingsToDisk: FC = () => {
   const { setValue, watch } = useFormContext<V1DiskFormState>();
 
-  const [storage, accessModes, volumeMode] = watch([
+  const [storage, accessModes, volumeMode, vmCluster] = watch([
     DATAVOLUME_TEMPLATE_STORAGE,
     ACCESS_MODE_FIELD,
     VOLUME_MODE_FIELD,
+    VM_CLUSTER_FIELD,
   ]);
   const { storageClassName = '' } = storage ?? {};
 
@@ -27,6 +29,7 @@ const ApplyStorageProfileSettingsToDisk: FC = () => {
       {...{ accessMode, storageClassName, volumeMode }}
       setAccessMode={(value) => setValue(ACCESS_MODE_FIELD, value ? [value] : undefined)}
       setVolumeMode={(value) => setValue(VOLUME_MODE_FIELD, value)}
+      vmCluster={vmCluster}
     />
   );
 };
