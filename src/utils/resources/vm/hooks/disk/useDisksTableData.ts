@@ -19,6 +19,7 @@ import {
 import { getDiskRowDataLayout } from '../../utils/disk/rowData';
 
 import useDisksSources from './useDisksSources';
+import { getEjectedCDROMDrives } from './utils';
 
 type UseDisksTableDisks = (
   vm: V1VirtualMachine,
@@ -56,7 +57,6 @@ const useDisksTableData: UseDisksTableDisks = (vm, vmi) => {
 
   const disks = useMemo(() => {
     const isInstanceTypeVM = Boolean(getInstanceTypeMatcher(vm));
-
     const diskDevices: DiskRawData[] = (vmVolumes || []).map((volume) => {
       let disk = vmDisks?.find(({ name }) => name === volume?.name);
 
@@ -81,7 +81,10 @@ const useDisksTableData: UseDisksTableDisks = (vm, vmi) => {
       return { dataVolume, dataVolumeTemplate, disk, pvc, volume };
     });
 
-    return getDiskRowDataLayout(diskDevices, getBootDisk(vm));
+    const ejectedCDROMDrives = getEjectedCDROMDrives(diskDevices, vmDisks);
+    const combinedDevices = [...ejectedCDROMDrives, ...diskDevices];
+
+    return getDiskRowDataLayout(combinedDevices, getBootDisk(vm));
   }, [dvs, vm, vmVolumes, vmDisks, pvcs]);
 
   return [disks || [], loaded, loadingError, isVMRunning ? vmi : null];

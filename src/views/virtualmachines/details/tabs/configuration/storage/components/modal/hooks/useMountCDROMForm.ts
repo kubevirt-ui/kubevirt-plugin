@@ -10,7 +10,7 @@ const FORM_FIELD_UPLOAD_FILE = 'uploadFile';
 
 type MountCDROMFormState = {
   selectedISO?: string;
-  uploadFile?: File;
+  uploadFile?: { file: File; filename: string };
   uploadMode: typeof UPLOAD_MODE_SELECT | typeof UPLOAD_MODE_UPLOAD;
 };
 
@@ -35,15 +35,12 @@ export const useMountCDROMForm = () => {
   const handleISOSelection = (selectedValue: string) => {
     setValue(FORM_FIELD_SELECTED_ISO, selectedValue);
     setValue(FORM_FIELD_UPLOAD_MODE, UPLOAD_MODE_SELECT);
-    setValue(FORM_FIELD_UPLOAD_FILE, null);
-    setUploadFilename('');
+    handleClearUpload();
   };
 
-  const handleFileUpload = (file: File) => {
-    setValue(FORM_FIELD_UPLOAD_FILE, file);
+  const handleFileUpload = () => {
     setValue(FORM_FIELD_UPLOAD_MODE, UPLOAD_MODE_UPLOAD);
     setValue(FORM_FIELD_SELECTED_ISO, '');
-    setUploadFilename(file.name);
   };
 
   const handleClearUpload = () => {
