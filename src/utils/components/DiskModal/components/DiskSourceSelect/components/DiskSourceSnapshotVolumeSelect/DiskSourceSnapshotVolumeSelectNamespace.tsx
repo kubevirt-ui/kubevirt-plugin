@@ -10,7 +10,11 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useProjects from '@kubevirt-utils/hooks/useProjects';
 import { FormGroup, ValidatedOptions } from '@patternfly/react-core';
 
-import { DATAVOLUME_SNAPSHOT_NAME, DATAVOLUME_SNAPSHOT_NAMESPACE } from '../../../utils/constants';
+import {
+  DATAVOLUME_SNAPSHOT_NAME,
+  DATAVOLUME_SNAPSHOT_NAMESPACE,
+  VM_CLUSTER_FIELD,
+} from '../../../utils/constants';
 import { getErrorSnapshotNamespace } from '../../../utils/selectors';
 import { diskSourceSnapshotVolumeNamespaceFieldID } from '../../utils/constants';
 
@@ -20,8 +24,11 @@ const DiskSourceSnapshotVolumeSelectNamespace: FC = () => {
     control,
     formState: { errors },
     setValue,
+    watch,
   } = useFormContext<V1DiskFormState>();
-  const [projectNames, projectsLoaded] = useProjects();
+
+  const vmCluster = watch(VM_CLUSTER_FIELD);
+  const [projectNames, projectsLoaded] = useProjects(vmCluster);
 
   if (!projectsLoaded) return <Loading />;
 

@@ -16,6 +16,7 @@ import {
   STORAGE_CLASS_PROVIDER_FIELD,
   STORAGE_SOURCE_BLANK,
   STORAGECLASS_SELECT_FIELDID,
+  VM_CLUSTER_FIELD,
 } from '../utils/constants';
 
 import { getSCSelectOptions } from './utils/helpers';
@@ -29,9 +30,14 @@ const StorageClassSelect: FC<StorageClassSelectProps> = ({ checkSC, setShowSCAle
   const { t } = useKubevirtTranslation();
   const { control, setValue, watch } = useFormContext<V1DiskFormState>();
 
-  const [storageClass, blankSource] = watch([STORAGE_CLASS_FIELD, STORAGE_SOURCE_BLANK]);
+  const [storageClass, blankSource, vmCluster] = watch([
+    STORAGE_CLASS_FIELD,
+    STORAGE_SOURCE_BLANK,
+    VM_CLUSTER_FIELD,
+  ]);
 
-  const [{ clusterDefaultStorageClass, storageClasses }, loaded] = useDefaultStorageClass();
+  const [{ clusterDefaultStorageClass, storageClasses }, loaded] =
+    useDefaultStorageClass(vmCluster);
 
   const defaultSC = useMemo(() => clusterDefaultStorageClass, [clusterDefaultStorageClass]);
 

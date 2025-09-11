@@ -24,7 +24,8 @@ import { getBootDisk, getDataVolumeTemplates, getVolumes } from '@kubevirt-utils
 import { getOperatingSystem } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { ensurePath, getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
 import { isDNS1123Label } from '@kubevirt-utils/utils/validation';
-import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 import { addPersistentVolume, removeVolume } from '@virtualmachines/actions/actions';
 
 import { SourceTypes, V1DiskFormState } from './types';
@@ -111,7 +112,8 @@ const getDataVolumeHotplugPromise = (
     },
   };
 
-  return k8sCreate({
+  return kubevirtK8sCreate({
+    cluster: getCluster(vm),
     data: resultDataVolume,
     model: DataVolumeModel,
     ns: getNamespace(resultDataVolume),

@@ -13,7 +13,8 @@ import {
   getVolumes,
 } from '@kubevirt-utils/resources/vm';
 import { generatePrettyName, isEmpty } from '@kubevirt-utils/utils/utils';
-import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { isRunning } from '@virtualmachines/utils';
 
 import { getDataVolumeTemplateSize } from '../components/utils/selectors';
@@ -148,7 +149,8 @@ export const submit = async ({ data, editDiskName, onSubmit, pvc, vm }: SubmitIn
   const newVM = reorderBootDisk(vmWithDisk, data.disk.name, data.isBootSource, isInitialBootDisk);
 
   if (data.expandPVCSize && pvc) {
-    await k8sPatch({
+    await kubevirtK8sPatch({
+      cluster: getCluster(vm),
       data: [
         {
           op: 'replace',
