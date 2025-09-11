@@ -8,10 +8,13 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
+import {
+  getAutoAttachPodInterface,
+  getInterfaces,
+  getNetworks,
+} from '@kubevirt-utils/resources/vm';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ButtonVariant, Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
 import {
   getConfigInterfaceStateFromVM,
@@ -61,9 +64,12 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
   const onDelete = useCallback(() => {
     const updatedVM = produceVMNetworks(vm, (draftVM) => {
       const vmInterfaces = getInterfaces(draftVM);
-      if (isEmpty(vmInterfaces)) {
+      const hasAutoAttachedPodNetwork = getAutoAttachPodInterface(draftVM) !== false;
+      const isExistingNetwork = getNetworks(draftVM)?.find(({ name }) => name === nicName);
+      const isPodNetwork = nicPresentation?.network?.pod;
+      if (!isExistingNetwork && hasAutoAttachedPodNetwork && isPodNetwork) {
+        // artificial pod network added only to the table but missing in the vm
         draftVM.spec.template.spec.domain.devices.autoattachPodInterface = false;
-        return;
       }
 
       draftVM.spec.template.spec.networks = getNetworks(draftVM)?.filter(
