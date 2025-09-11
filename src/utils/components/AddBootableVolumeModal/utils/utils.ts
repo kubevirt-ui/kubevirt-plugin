@@ -9,6 +9,7 @@ import {
   V1beta1DataSource,
 } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1beta1DataVolumeSource } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { OPENSHIFT_CNV } from '@kubevirt-utils/constants/constants';
 import { UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { KUBEVIRT_ISO_LABEL } from '@kubevirt-utils/resources/bootableresources/constants';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
@@ -27,7 +28,10 @@ import {
   initialDataImportCron,
 } from './constants';
 
-type createBootableVolumeType = (input: {
+export const formatRegistryURL = (registryURL: string) =>
+  registryURL?.replace(/^(https?:\/\/)/i, '');
+
+type CreateBootableVolumeType = (input: {
   bootableVolume: AddBootableVolumeState;
   onCreateVolume: (createdVolume: BootableVolume) => void;
   sourceType: DROPDOWN_FORM_SELECTION;
@@ -77,7 +81,7 @@ const getBootableVolumePromise = ({
   return actionBySourceType[sourceType]();
 };
 
-export const createBootableVolume: createBootableVolumeType =
+export const createBootableVolume: CreateBootableVolumeType =
   ({ bootableVolume, onCreateVolume, sourceType, uploadData }) =>
   async (dataSource: V1beta1DataSource) => {
     const architectures = bootableVolume?.architectures;
@@ -325,6 +329,7 @@ export const createDataSourceWithImportCron: CreateDataSourceWithImportCronType 
     storageClassName,
   } = bootableVolume;
 
+  const targetNamespace = getNamespace(initialDataSource);
   const { password, username } = registryCredentials || {};
   const addRegistrySecret = !!(username && password);
   const imageSecretName = addRegistrySecret
@@ -333,7 +338,14 @@ export const createDataSourceWithImportCron: CreateDataSourceWithImportCronType 
 
   if (addRegistrySecret) {
     await createUserPasswordSecret({
-      namespace: getNamespace(initialDataSource),
+      namespace: OPENSHIFT_CNV,
+      password,
+      secretName: imageSecretName,
+      username,
+    });
+
+    await createUserPasswordSecret({
+      namespace: targetNamespace,
       password,
       secretName: imageSecretName,
       username,
@@ -343,7 +355,7 @@ export const createDataSourceWithImportCron: CreateDataSourceWithImportCronType 
   const dataImportCronName = `${bootableVolumeName}-import-cron-${getRandomChars()}`;
   const dataImportCron = produce(initialDataImportCron, (draft) => {
     draft.metadata.name = dataImportCronName;
-    draft.metadata.namespace = getNamespace(initialDataSource);
+    draft.metadata.namespace = targetNamespace;
     draft.spec = {
       garbageCollect: 'Outdated',
       importsToKeep: retainRevisions,
