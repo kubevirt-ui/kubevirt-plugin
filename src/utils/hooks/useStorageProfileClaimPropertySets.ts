@@ -1,7 +1,7 @@
 import { modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import StorageProfileModel from '@kubevirt-ui/kubevirt-api/console/models/StorageProfileModel';
 import { ClaimPropertySets, StorageProfile } from '@kubevirt-utils/types/storage';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 export type UseStorageProfileClaimPropertySetsValue = {
   claimPropertySets: ClaimPropertySets;
@@ -11,8 +11,10 @@ export type UseStorageProfileClaimPropertySetsValue = {
 
 const useStorageProfileClaimPropertySets = (
   storageClassName: string,
+  cluster?: string,
 ): UseStorageProfileClaimPropertySetsValue => {
-  const [storageProfile, loaded, error] = useK8sWatchResource<StorageProfile>({
+  const [storageProfile, loaded, error] = useK8sWatchData<StorageProfile>({
+    cluster,
     groupVersionKind: modelToGroupVersionKind(StorageProfileModel),
     isList: false,
     name: storageClassName,

@@ -27,7 +27,8 @@ import { getBootDisk, getDataVolumeTemplates, getVolumes } from '@kubevirt-utils
 import { getOperatingSystem } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { ensurePath, getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
 import { isDNS1123Label } from '@kubevirt-utils/utils/validation';
-import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 import { addPersistentVolume, removeVolume } from '@virtualmachines/actions/actions';
 
 import { SourceTypes, V1DiskFormState } from './types';
@@ -114,7 +115,8 @@ const getDataVolumeHotplugPromise = (
     },
   };
 
-  return k8sCreate({
+  return kubevirtK8sCreate({
+    cluster: getCluster(vm),
     data: resultDataVolume,
     model: DataVolumeModel,
     ns: getNamespace(resultDataVolume),
@@ -285,7 +287,7 @@ export const mountISOToCDROM = async (
     dataVolume.metadata = diskState.dataVolumeTemplate.metadata;
     dataVolume.spec = { ...diskState.dataVolumeTemplate.spec } as unknown as V1beta1DataVolumeSpec;
 
-    await k8sCreate({ data: dataVolume, model: DataVolumeModel });
+    await kubevirtK8sCreate({ cluster: getCluster(vm), data: dataVolume, model: DataVolumeModel });
   }
 
   const newVolumeSource = getVolumeSourceForMount(diskState);

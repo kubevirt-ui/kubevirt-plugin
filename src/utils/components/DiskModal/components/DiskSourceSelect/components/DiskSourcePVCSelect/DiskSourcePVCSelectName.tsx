@@ -15,7 +15,7 @@ import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { FormGroup, ValidatedOptions } from '@patternfly/react-core';
 
-import { PVC_CLAIMNAME_FIELD } from '../../../utils/constants';
+import { PVC_CLAIMNAME_FIELD, VM_CLUSTER_FIELD } from '../../../utils/constants';
 import { diskSourcePVCNameFieldID } from '../../utils/constants';
 
 type DiskSourcePVCSelectNameProps = {
@@ -27,9 +27,12 @@ const DiskSourcePVCSelectName: FC<DiskSourcePVCSelectNameProps> = ({ vmNamespace
   const {
     control,
     formState: { errors },
+    watch,
   } = useFormContext<V1DiskFormState>();
 
-  const [pvcs, pvcsLoaded] = usePVCs(vmNamespace);
+  const vmCluster = watch(VM_CLUSTER_FIELD);
+
+  const [pvcs, pvcsLoaded] = usePVCs(vmNamespace, vmCluster);
 
   const pvcNames = useMemo(() => pvcs?.map(getName), [pvcs]);
 

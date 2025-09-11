@@ -21,6 +21,7 @@ import {
   DATAVOLUME_PVC_NAME,
   DATAVOLUME_PVC_NAMESPACE,
   DISK_SIZE_FIELD,
+  VM_CLUSTER_FIELD,
 } from '../../../utils/constants';
 import { getErrorPVCName } from '../../../utils/selectors';
 import { diskSourcePVCNameFieldID } from '../../utils/constants';
@@ -34,9 +35,10 @@ const DiskSourceClonePVCSelectName: FC = () => {
     watch,
   } = useFormContext<V1DiskFormState>();
 
+  const vmCluster = watch(VM_CLUSTER_FIELD);
   const namespace = watch(DATAVOLUME_PVC_NAMESPACE);
 
-  const [pvcs, pvcsLoaded] = usePVCs(namespace);
+  const [pvcs, pvcsLoaded] = usePVCs(namespace, vmCluster);
 
   const pvcNames = useMemo(() => pvcs?.map(getName), [pvcs]);
 

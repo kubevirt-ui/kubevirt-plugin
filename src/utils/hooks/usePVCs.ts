@@ -5,13 +5,17 @@ import {
   PersistentVolumeClaimModel,
 } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
-type UsePVCs = (namespace: string) => [IoK8sApiCoreV1PersistentVolumeClaim[], boolean, any];
+type UsePVCs = (
+  namespace: string,
+  cluster?: string,
+) => [IoK8sApiCoreV1PersistentVolumeClaim[], boolean, any];
 
-const usePVCs: UsePVCs = (namespace: string) => {
+const usePVCs: UsePVCs = (namespace, cluster) => {
   const pvcWathcResource = namespace
     ? {
+        cluster,
         groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
         isList: true,
         namespace,
@@ -20,7 +24,7 @@ const usePVCs: UsePVCs = (namespace: string) => {
     : null;
 
   const [pvcsUnsorted, loaded, error] =
-    useK8sWatchResource<IoK8sApiCoreV1PersistentVolumeClaim[]>(pvcWathcResource);
+    useK8sWatchData<IoK8sApiCoreV1PersistentVolumeClaim[]>(pvcWathcResource);
 
   const pvcs = useMemo(
     () => (pvcsUnsorted || [])?.sort((a, b) => a?.metadata?.name?.localeCompare(b?.metadata?.name)),

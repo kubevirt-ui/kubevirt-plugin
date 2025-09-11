@@ -5,6 +5,7 @@ import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { UPLOAD_STATUS } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { Form } from '@patternfly/react-core';
 import { isRunning } from '@virtualmachines/utils';
 
@@ -31,7 +32,7 @@ const UploadDiskModal: FC<V1SubDiskModalProps> = ({
   onUploadedDataVolume,
   vm,
 }) => {
-  const { upload, uploadData } = useCDIUpload();
+  const { upload, uploadData } = useCDIUpload(getCluster(vm));
   const isVMRunning = isRunning(vm);
   const vmNamespace = getNamespace(vm);
 

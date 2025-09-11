@@ -40,6 +40,7 @@ export enum VolumeTypes {
 }
 
 export type V1DiskFormState = {
+  cluster?: string;
   dataVolumeTemplate?: V1DataVolumeTemplateSpec;
   disk: V1Disk;
   expandPVCSize?: string;

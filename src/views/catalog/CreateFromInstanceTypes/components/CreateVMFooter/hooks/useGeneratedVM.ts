@@ -13,11 +13,13 @@ import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN
 import { addWinDriverVolume } from '@kubevirt-utils/resources/vm/utils/disk/drivers';
 import { useDriversImage } from '@kubevirt-utils/resources/vm/utils/disk/useDriversImage';
 import { getValidNamespace } from '@kubevirt-utils/utils/utils';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { AUTOMATIC_UPDATE_FEATURE_NAME } from '@overview/SettingsTab/ClusterTab/components/GuestManagmentSection/AutomaticSubscriptionRHELGuests/utils/constants';
 
 export type UseGeneratedVMType = () => V1VirtualMachine;
 
 const useGeneratedVM = () => {
+  const cluster = useClusterParam();
   const { featureEnabled: autoUpdateEnabled } = useFeatures(AUTOMATIC_UPDATE_FEATURE_NAME);
 
   const { subscriptionData } = useRHELAutomaticSubscription();
@@ -30,6 +32,7 @@ const useGeneratedVM = () => {
     () =>
       generateVM({
         autoUpdateEnabled,
+        cluster,
         instanceTypeState: instanceTypeVMState,
         isUDNManagedNamespace,
         startVM,
@@ -43,6 +46,7 @@ const useGeneratedVM = () => {
       startVM,
       subscriptionData,
       vmNamespaceTarget,
+      cluster,
     ],
   );
 
