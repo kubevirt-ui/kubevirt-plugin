@@ -254,6 +254,7 @@ export const convertDataVolumeToTemplate = (
   metadata: dataVolume.metadata,
   spec: {
     source: dataVolume.spec.source,
+    sourceRef: dataVolume.spec.sourceRef,
     storage: {
       accessModes: dataVolume.spec.storage?.accessModes?.map((mode) => mode as any),
       resources: dataVolume.spec.storage?.resources,

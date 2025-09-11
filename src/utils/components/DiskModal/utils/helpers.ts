@@ -281,18 +281,14 @@ export const mountISOToCDROM = async (
     const volumes = draftVM.spec.template.spec.volumes || [];
     const volumeIndex = volumes.findIndex((volume) => volume.name === diskState.disk.name);
 
+    const newVolume = {
+      name: diskState.disk.name,
+      ...newVolumeSource,
+    };
+
     if (volumeIndex !== -1) {
-      // If a volume with the same name exists, update it
-      draftVM.spec.template.spec.volumes[volumeIndex] = {
-        name: diskState.disk.name,
-        ...newVolumeSource,
-      };
+      draftVM.spec.template.spec.volumes[volumeIndex] = newVolume;
     } else {
-      // If no volume exists, add a new entry to the volumes array
-      const newVolume = {
-        name: diskState.disk.name,
-        ...newVolumeSource,
-      };
       draftVM.spec.template.spec.volumes = [...volumes, newVolume];
     }
   });

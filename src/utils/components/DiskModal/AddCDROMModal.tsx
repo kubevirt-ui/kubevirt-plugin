@@ -3,7 +3,6 @@ import { FormProvider, useForm, useWatch } from 'react-hook-form';
 
 import { PendingChangesAlert } from '@kubevirt-utils/components/PendingChanges/PendingChangesAlert/PendingChangesAlert';
 import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
-import { UPLOAD_STATUS } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
@@ -51,11 +50,10 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
   } = methods;
 
   const uploadFile = useWatch({ control, name: 'uploadFile' });
-  const baseValid = isEmpty(errors) && (!uploadEnabled || (uploadEnabled && !isEmpty(uploadFile)));
-  const isFormValid =
-    uploadEnabled && !isEmpty(upload?.uploadStatus) && uploadFile
-      ? baseValid && upload.uploadStatus === UPLOAD_STATUS.SUCCESS
-      : baseValid;
+  const hasUploadFile = !isEmpty(uploadFile);
+  const hasFormErrors = !isEmpty(errors);
+
+  const isFormValid = !hasFormErrors && (!uploadEnabled || hasUploadFile);
 
   const handleModalSubmit = async () => {
     const data = getValues();
