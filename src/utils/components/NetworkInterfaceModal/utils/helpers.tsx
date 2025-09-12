@@ -179,13 +179,10 @@ export const deleteNetworkInterface = (
   nicName: string,
   nicPresentation: NetworkPresentation,
 ) => {
-  const vmInterfaces = getInterfaces(vm);
-  const noAutoAttachPodInterface = getAutoAttachPodInterface(vm) === false;
-  const isDefaultInterface = noAutoAttachPodInterface && vmInterfaces?.[0]?.name === nicName;
+  const isPodNetwork = nicPresentation?.network?.pod;
+  const isHotUnPlug = Boolean(nicPresentation?.iface?.bridge);
 
-  const isHotPlug = Boolean(nicPresentation?.iface?.bridge);
-
-  const canBeMarkedAbsent = isHotPlug && !isStopped(vm) && !isDefaultInterface;
+  const canBeMarkedAbsent = isHotUnPlug && !isStopped(vm) && !isPodNetwork;
   const networks = updateNetworksForDeletion(nicName, vm, canBeMarkedAbsent);
   const interfaces = updateInterfacesForDeletion(nicName, vm, canBeMarkedAbsent);
 
