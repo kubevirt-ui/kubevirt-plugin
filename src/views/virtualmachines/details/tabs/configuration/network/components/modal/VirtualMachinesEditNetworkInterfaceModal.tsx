@@ -5,7 +5,8 @@ import NetworkInterfaceModal from '@kubevirt-utils/components/NetworkInterfaceMo
 import {
   createInterface,
   createNetwork,
-  updateVMNetworkInterfaces,
+  PatchUpdate,
+  updateVMNetworkInterfaces2,
 } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
@@ -42,17 +43,30 @@ const VirtualMachinesEditNetworkInterfaceModal: FC<
           nicName,
         });
 
-        const updatedNetworks: V1Network[] = [
-          ...(getNetworks(vm)?.filter(({ name }) => name !== nicPresentation?.network?.name) || []),
-          resultNetwork,
-        ];
-        const updatedInterfaces: V1Interface[] = [
-          ...(getInterfaces(vm)?.filter(({ name }) => name !== nicPresentation?.network?.name) ||
-            []),
-          resultInterface,
-        ];
+        const existingNetwork = getNetworks(vm)?.find(
+          ({ name }) => name === nicPresentation?.network?.name,
+        );
+        const network: PatchUpdate<V1Network> = {
+          index: existingNetwork
+            ? getNetworks(vm)?.indexOf(existingNetwork)
+            : getNetworks(vm)?.length,
+          operation: existingNetwork ? 'replace' : 'add',
+          prevValue: existingNetwork,
+          value: resultNetwork,
+        };
 
-        return updateVMNetworkInterfaces(vm, updatedNetworks, updatedInterfaces);
+        const existingInterface = getInterfaces(vm)?.find(
+          ({ name }) => name === nicPresentation?.network?.name,
+        );
+        const iface: PatchUpdate<V1Interface> = {
+          index: existingInterface
+            ? getInterfaces(vm)?.indexOf(existingInterface)
+            : getInterfaces(vm)?.length,
+          operation: existingInterface ? 'replace' : 'add',
+          prevValue: existingInterface,
+          value: resultInterface,
+        };
+        return updateVMNetworkInterfaces2(vm, network, iface);
       },
     [vm, nicPresentation],
   );
