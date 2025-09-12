@@ -1,5 +1,3 @@
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-
 export enum VirtualMachineDetailsTab {
   Configurations = 'configuration',
   Console = 'console',
@@ -32,20 +30,20 @@ export const VirtualMachineConfigurationTabInner = new Set([
 ]);
 
 export const VirtualMachineDetailsTabLabel: Partial<Record<VirtualMachineDetailsTab, string>> = {
-  [VirtualMachineDetailsTab.Configurations]: t('Configuration'),
-  [VirtualMachineDetailsTab.Console]: t('Console'),
-  [VirtualMachineDetailsTab.Details]: t('Details'),
-  [VirtualMachineDetailsTab.Diagnostics]: t('Diagnostics'),
-  [VirtualMachineDetailsTab.Environment]: t('Environment'),
-  [VirtualMachineDetailsTab.Events]: t('Events'),
-  [VirtualMachineDetailsTab.InitialRun]: t('Initial run'),
-  [VirtualMachineDetailsTab.Metadata]: t('Metadata'),
-  [VirtualMachineDetailsTab.Metrics]: t('Metrics'),
-  [VirtualMachineDetailsTab.Network]: t('Network'),
-  [VirtualMachineDetailsTab.Overview]: t('Overview'),
-  [VirtualMachineDetailsTab.Scheduling]: t('Scheduling'),
-  [VirtualMachineDetailsTab.Snapshots]: t('Snapshots'),
-  [VirtualMachineDetailsTab.SSH]: t('SSH'),
-  [VirtualMachineDetailsTab.Storage]: t('Storage'),
-  [VirtualMachineDetailsTab.YAML]: t('YAML'),
+  [VirtualMachineDetailsTab.Configurations]: 'Configuration',
+  [VirtualMachineDetailsTab.Console]: 'Console',
+  [VirtualMachineDetailsTab.Details]: 'Details',
+  [VirtualMachineDetailsTab.Diagnostics]: 'Diagnostics',
+  [VirtualMachineDetailsTab.Environment]: 'Environment',
+  [VirtualMachineDetailsTab.Events]: 'Events',
+  [VirtualMachineDetailsTab.InitialRun]: 'Initial run',
+  [VirtualMachineDetailsTab.Metadata]: 'Metadata',
+  [VirtualMachineDetailsTab.Metrics]: 'Metrics',
+  [VirtualMachineDetailsTab.Network]: 'Network',
+  [VirtualMachineDetailsTab.Overview]: 'Overview',
+  [VirtualMachineDetailsTab.Scheduling]: 'Scheduling',
+  [VirtualMachineDetailsTab.Snapshots]: 'Snapshots',
+  [VirtualMachineDetailsTab.SSH]: 'SSH',
+  [VirtualMachineDetailsTab.Storage]: 'Storage',
+  [VirtualMachineDetailsTab.YAML]: 'YAML',
 };
