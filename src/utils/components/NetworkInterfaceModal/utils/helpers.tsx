@@ -22,10 +22,9 @@ import {
   NetworkPresentation,
 } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
-import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
+import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { ABSENT } from '@virtualmachines/details/tabs/configuration/network/utils/constants';
-import { isStopped } from '@virtualmachines/utils';
 
 import { NetworkAttachmentDefinition } from '../components/hooks/types';
 
@@ -59,15 +58,6 @@ export const updateVMNetworkInterfaces = (
         path: '/spec/template/spec/domain/devices/interfaces',
         value: updatedInterfaces,
       },
-      ...(isEmpty(updatedInterfaces)
-        ? [
-            {
-              op: getAutoAttachPodInterface(vm) === undefined ? 'add' : 'replace',
-              path: '/spec/template/spec/domain/devices/autoattachPodInterface',
-              value: false,
-            },
-          ]
-        : []),
     ],
     model: VirtualMachineModel,
     resource: vm,
@@ -188,13 +178,10 @@ export const deleteNetworkInterface = (
   nicName: string,
   nicPresentation: NetworkPresentation,
 ) => {
-  const vmInterfaces = getInterfaces(vm);
-  const noAutoAttachPodInterface = getAutoAttachPodInterface(vm) === false;
-  const isDefaultInterface = noAutoAttachPodInterface && vmInterfaces?.[0]?.name === nicName;
+  const isPodNetwork = nicPresentation?.network?.pod;
+  const isHotUnPlug = Boolean(nicPresentation?.iface?.bridge);
 
-  const isHotPlug = Boolean(nicPresentation?.iface?.bridge);
-
-  const canBeMarkedAbsent = isHotPlug && !isStopped(vm) && !isDefaultInterface;
+  const canBeMarkedAbsent = isHotUnPlug && !isPodNetwork;
   const networks = updateNetworksForDeletion(nicName, vm, canBeMarkedAbsent);
   const interfaces = updateInterfacesForDeletion(nicName, vm, canBeMarkedAbsent);
 
