@@ -31,7 +31,7 @@ const NetworkInterfaceList: React.FC<NetworkInterfaceListProps> = ({ onUpdateVM,
   const networkInterfacesData = getNetworkInterfaceRowData(
     networks,
     interfaces,
-    getAutoAttachPodInterface(vm),
+    getAutoAttachPodInterface(vm) !== false,
   );
   const [data, filteredData, onFilterChange] = useListPageFilter(networkInterfacesData, filters);
 
