@@ -1,4 +1,4 @@
-import { V1Interface, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1Interface, V1Network, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getAutoAttachPodInterface, getInterfaces } from '@kubevirt-utils/resources/vm';
 import { isNetworkInterfaceState } from '@kubevirt-utils/utils/typeGuards';
 
@@ -68,3 +68,6 @@ export const getConfigInterfaceState = (
 
   return isNetworkInterfaceState(ifaceState) ? ifaceState : NetworkInterfaceState.UP;
 };
+
+export const isPodNetwork = (network: Partial<V1Network>): boolean =>
+  Boolean(network?.pod) && typeof network.pod === 'object';

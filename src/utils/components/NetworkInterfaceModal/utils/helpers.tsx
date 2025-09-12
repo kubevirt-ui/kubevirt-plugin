@@ -16,7 +16,10 @@ import {
   interfaceTypesProxy,
   NetworkPresentation,
 } from '@kubevirt-utils/resources/vm/utils/network/constants';
-import { hasAutoAttachedPodNetwork } from '@kubevirt-utils/resources/vm/utils/network/selectors';
+import {
+  hasAutoAttachedPodNetwork,
+  isPodNetwork,
+} from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
@@ -26,14 +29,13 @@ import { isStopped } from '@virtualmachines/utils';
 import { NetworkAttachmentDefinition } from '../components/hooks/types';
 
 export const podNetworkExists = (vm: V1VirtualMachine): boolean =>
-  !!vm?.spec?.template?.spec?.networks?.find((network) => typeof network.pod === 'object') ||
-  hasAutoAttachedPodNetwork(vm);
+  !!vm?.spec?.template?.spec?.networks?.find(isPodNetwork) || hasAutoAttachedPodNetwork(vm);
 
 export const isPodNetworkName = (networkName: string): boolean => networkName === POD_NETWORK;
 
 export const getNetworkName = (network: V1Network): string => {
   if (network) {
-    return network?.pod ? POD_NETWORK : network?.multus?.networkName;
+    return isPodNetwork(network) ? POD_NETWORK : network?.multus?.networkName;
   }
   return null;
 };
@@ -175,13 +177,15 @@ export const deleteNetworkInterface = (
   nicName: string,
   nicPresentation: NetworkPresentation,
 ) => {
-  const vmInterfaces = getInterfaces(vm);
-  const noAutoAttachPodInterface = !hasAutoAttachedPodNetwork(vm);
-  const isDefaultInterface = noAutoAttachPodInterface && vmInterfaces?.[0]?.name === nicName;
+  const existingInterface = getInterface(vm, nicName);
+  const existingNetwork = getNetworks(vm).find((net) => net.name === nicName);
+  if (!existingInterface || !existingNetwork) {
+    return;
+  }
 
-  const isHotPlug = Boolean(nicPresentation?.iface?.bridge);
-
-  const canBeMarkedAbsent = isHotPlug && !isStopped(vm) && !isDefaultInterface;
+  const isHotUnPlug = Boolean(nicPresentation?.iface?.bridge);
+  const canBeMarkedAbsent =
+    isHotUnPlug && !isStopped(vm) && !isPodNetwork(nicPresentation?.network);
   const networks = updateNetworksForDeletion(nicName, vm, canBeMarkedAbsent);
   const interfaces = updateInterfacesForDeletion(nicName, vm, canBeMarkedAbsent);
 
