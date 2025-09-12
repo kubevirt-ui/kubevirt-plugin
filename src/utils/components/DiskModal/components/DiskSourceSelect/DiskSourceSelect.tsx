@@ -8,7 +8,7 @@ import { Divider, SelectGroup, SelectList } from '@patternfly/react-core';
 import { SourceTypes } from '../../utils/types';
 
 import DiskSourceOption from './components/DiskSourceOption/DiskSourceOption';
-import { attachExistingGroupOptions, blankOption, cdromOption } from './utils/constants';
+import { getAttachExistingGroupOptions, getBlankOption, getCDROMOption } from './utils/constants';
 
 import './DiskSourceSelect.scss';
 
@@ -19,6 +19,7 @@ type DiskSourceSelectProps = {
 
 const DiskSourceSelect: FC<DiskSourceSelectProps> = ({ className, onSelect }) => {
   const { t } = useKubevirtTranslation();
+  const attachExistingGroupOptions = getAttachExistingGroupOptions(t);
   return (
     <FormPFSelect
       className={classNames('disk-source-select', className)}
@@ -27,7 +28,7 @@ const DiskSourceSelect: FC<DiskSourceSelectProps> = ({ className, onSelect }) =>
       toggleProps={{ className: 'pf-v6-u-mb-sm', variant: 'primary' }}
     >
       <SelectList>
-        <DiskSourceOption {...blankOption} onSelect={onSelect} />
+        <DiskSourceOption {...getBlankOption(t)} onSelect={onSelect} />
         <Divider component="li" />
         <SelectGroup
           className="disk-source-select__group-title"
@@ -38,7 +39,7 @@ const DiskSourceSelect: FC<DiskSourceSelectProps> = ({ className, onSelect }) =>
           ))}
         </SelectGroup>
         <Divider component="li" />
-        <DiskSourceOption {...cdromOption} onSelect={onSelect} />
+        <DiskSourceOption {...getCDROMOption(t)} onSelect={onSelect} />
       </SelectList>
     </FormPFSelect>
   );

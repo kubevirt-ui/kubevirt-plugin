@@ -1,15 +1,17 @@
+import { TFunction } from 'react-i18next';
+
 import {
   VirtualMachineConfigurationTabInner,
   VirtualMachineDetailsTab,
   VirtualMachineDetailsTabLabel,
 } from '@kubevirt-utils/constants/tabs-constants';
 
-export const getTabNameAndTitle = (tab: VirtualMachineDetailsTab) => ({
+export const getTabNameAndTitle = (tab: VirtualMachineDetailsTab, t: TFunction) => ({
   name: tab,
-  title: VirtualMachineDetailsTabLabel[tab],
+  title: t(VirtualMachineDetailsTabLabel[tab]),
 });
 
-export const getTabHrefAndName = (tab: VirtualMachineDetailsTab) => {
+export const getTabHrefAndName = (tab: VirtualMachineDetailsTab, t: TFunction) => {
   if (VirtualMachineConfigurationTabInner.has(tab)) {
     return {
       href: `${VirtualMachineDetailsTab.Configurations}/${tab}`,
@@ -19,6 +21,6 @@ export const getTabHrefAndName = (tab: VirtualMachineDetailsTab) => {
 
   return {
     href: tab,
-    name: VirtualMachineDetailsTabLabel[tab],
+    name: t(VirtualMachineDetailsTabLabel[tab]),
   };
 };

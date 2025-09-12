@@ -142,7 +142,7 @@ export const usePendingChanges = (
       additionalAction?.();
     },
     tab,
-    tabLabel: VirtualMachineDetailsTabLabel[tab],
+    tabLabel: t(VirtualMachineDetailsTabLabel[tab]),
   });
 
   return [

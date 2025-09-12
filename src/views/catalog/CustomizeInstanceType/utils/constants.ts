@@ -1,3 +1,5 @@
+import { TFunction } from 'react-i18next';
+
 import {
   VirtualMachineDetailsTab,
   VirtualMachineDetailsTabLabel,
@@ -7,49 +9,49 @@ import { getTabHrefAndName } from '@virtualmachines/details/utils/utils';
 import CustomizeInstanceTypeConfigurationTab from '../tabs/configuration/CustomizeInstanceTypeConfigurationTab';
 import CustomizeInstanceTypeYamlTab from '../tabs/yaml/CustomizeInstanceTypeYamlTab';
 
-export const pages = [
+export const getPages = (t: TFunction) => [
   {
     component: CustomizeInstanceTypeYamlTab,
     href: '',
-    name: VirtualMachineDetailsTabLabel.yaml,
+    name: t(VirtualMachineDetailsTabLabel.yaml),
   },
   {
     component: CustomizeInstanceTypeConfigurationTab,
-    ...getTabHrefAndName(VirtualMachineDetailsTab.Configurations),
+    ...getTabHrefAndName(VirtualMachineDetailsTab.Configurations, t),
   },
   {
     component: CustomizeInstanceTypeConfigurationTab,
-    ...getTabHrefAndName(VirtualMachineDetailsTab.SSH),
+    ...getTabHrefAndName(VirtualMachineDetailsTab.SSH, t),
     isHidden: true,
   },
   {
     component: CustomizeInstanceTypeConfigurationTab,
-    ...getTabHrefAndName(VirtualMachineDetailsTab.InitialRun),
+    ...getTabHrefAndName(VirtualMachineDetailsTab.InitialRun, t),
     isHidden: true,
   },
   {
     component: CustomizeInstanceTypeConfigurationTab,
-    ...getTabHrefAndName(VirtualMachineDetailsTab.Storage),
+    ...getTabHrefAndName(VirtualMachineDetailsTab.Storage, t),
     isHidden: true,
   },
   {
     component: CustomizeInstanceTypeConfigurationTab,
-    ...getTabHrefAndName(VirtualMachineDetailsTab.Details),
+    ...getTabHrefAndName(VirtualMachineDetailsTab.Details, t),
     isHidden: true,
   },
   {
     component: CustomizeInstanceTypeConfigurationTab,
-    ...getTabHrefAndName(VirtualMachineDetailsTab.Metadata),
+    ...getTabHrefAndName(VirtualMachineDetailsTab.Metadata, t),
     isHidden: true,
   },
   {
     component: CustomizeInstanceTypeConfigurationTab,
-    ...getTabHrefAndName(VirtualMachineDetailsTab.Network),
+    ...getTabHrefAndName(VirtualMachineDetailsTab.Network, t),
     isHidden: true,
   },
   {
     component: CustomizeInstanceTypeConfigurationTab,
-    ...getTabHrefAndName(VirtualMachineDetailsTab.Scheduling),
+    ...getTabHrefAndName(VirtualMachineDetailsTab.Scheduling, t),
     isHidden: true,
   },
 ];
