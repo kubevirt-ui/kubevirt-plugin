@@ -16,62 +16,65 @@ export const diskSourceEphemeralFieldID = 'disk-source-container';
 export const diskSourceUsernameFieldID = 'disk-source-username';
 export const diskSourcePasswordFieldID = 'disk-source-password';
 
-export const optionLabelMapper: { [key in SourceTypes]: string } = {
-  [SourceTypes.BLANK]: 'Empty disk (blank)',
-  [SourceTypes.CDROM]: 'CD-ROM',
-  [SourceTypes.CLONE_PVC]: 'Clone volume',
-  [SourceTypes.DATA_SOURCE]: 'Use DataSource',
-  [SourceTypes.EPHEMERAL]: 'Ephemeral disk (Container image)',
-  [SourceTypes.HTTP]: 'From URL',
-  [SourceTypes.OTHER]: 'Other',
-  [SourceTypes.PVC]: 'Volume',
-  [SourceTypes.REGISTRY]: 'From Registry',
-  [SourceTypes.UPLOAD]: 'Upload',
-  [SourceTypes.VOLUME_SNAPSHOT]: 'Volume snapshot',
-};
+export const getOptionLabels = (t: TFunction): { [key in SourceTypes]: string } => ({
+  [SourceTypes.BLANK]: t('Empty disk (blank)'),
+  [SourceTypes.CDROM]: t('CD-ROM'),
+  [SourceTypes.CLONE_PVC]: t('Clone volume'),
+  [SourceTypes.DATA_SOURCE]: t('Use DataSource'),
+  [SourceTypes.EPHEMERAL]: t('Ephemeral disk (Container image)'),
+  [SourceTypes.HTTP]: t('From URL'),
+  [SourceTypes.OTHER]: t('Other'),
+  [SourceTypes.PVC]: t('Volume'),
+  [SourceTypes.REGISTRY]: t('From Registry'),
+  [SourceTypes.UPLOAD]: t('Upload'),
+  [SourceTypes.VOLUME_SNAPSHOT]: t('Volume snapshot'),
+});
 
 export const getAttachExistingGroupOptions = (t: TFunction): DiskSourceOptionGroup => {
+  const optionLabelMapper = getOptionLabels(t);
   return {
     groupLabel: t('Use existing'),
     items: [
       {
         description: t('Any changes are lost upon reboot'),
         id: SourceTypes.EPHEMERAL,
-        label: t(optionLabelMapper[SourceTypes.EPHEMERAL]),
+        label: optionLabelMapper[SourceTypes.EPHEMERAL],
       },
       {
         description: t('Add a volume already available on the cluster.'),
         id: SourceTypes.PVC,
-        label: t(optionLabelMapper[SourceTypes.PVC]),
+        label: optionLabelMapper[SourceTypes.PVC],
       },
       {
         description: t('Add a snapshot available on the cluster to the VirtualMachine.'),
         id: SourceTypes.VOLUME_SNAPSHOT,
-        label: t(optionLabelMapper[SourceTypes.VOLUME_SNAPSHOT]),
+        label: optionLabelMapper[SourceTypes.VOLUME_SNAPSHOT],
       },
       {
         description: t(
           'Clone a volume available on the cluster and add it to the VirtualMachine. ',
         ),
         id: SourceTypes.CLONE_PVC,
-        label: t(optionLabelMapper[SourceTypes.CLONE_PVC]),
+        label: optionLabelMapper[SourceTypes.CLONE_PVC],
       },
     ],
   };
 };
 
 export const getBlankOption = (t: TFunction): DiskSourceOptionGroupItem => {
+  const optionLabelMapper = getOptionLabels(t);
   return {
     description: t('Create a disk with no contents.'),
     id: SourceTypes.BLANK,
-    label: t(optionLabelMapper[SourceTypes.BLANK]),
+    label: optionLabelMapper[SourceTypes.BLANK],
   };
 };
 
 export const getCDROMOption = (t: TFunction): DiskSourceOptionGroupItem => {
+  const optionLabelMapper = getOptionLabels(t);
   return {
     description: t('Add a CD-ROM to the VirtualMachine configuration'),
     id: SourceTypes.CDROM,
-    label: t(optionLabelMapper[SourceTypes.CDROM]),
+    label: optionLabelMapper[SourceTypes.CDROM],
   };
 };
