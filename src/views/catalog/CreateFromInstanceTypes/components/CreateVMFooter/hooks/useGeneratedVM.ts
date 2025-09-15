@@ -8,6 +8,7 @@ import {
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
+import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import useRHELAutomaticSubscription from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/useRHELAutomaticSubscription';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
 import { addWinDriverVolume } from '@kubevirt-utils/resources/vm/utils/disk/drivers';
@@ -27,12 +28,15 @@ const useGeneratedVM = () => {
 
   const namespace = useActiveNamespace();
   const [isUDNManagedNamespace] = useNamespaceUDN(getValidNamespace(namespace));
-
+  const [hyperConverge] = useHyperConvergeConfiguration();
+  const enableMultiArchBootImageImport =
+    hyperConverge.spec.featureGates?.enableMultiArchBootImageImport;
   const generatedVM = useMemo(
     () =>
       generateVM({
         autoUpdateEnabled,
         cluster,
+        enableMultiArchBootImageImport,
         instanceTypeState: instanceTypeVMState,
         isUDNManagedNamespace,
         startVM,
@@ -41,12 +45,13 @@ const useGeneratedVM = () => {
       }),
     [
       autoUpdateEnabled,
+      cluster,
+      enableMultiArchBootImageImport,
       instanceTypeVMState,
       isUDNManagedNamespace,
       startVM,
       subscriptionData,
       vmNamespaceTarget,
-      cluster,
     ],
   );
 

@@ -17,7 +17,7 @@ import {
   DEFAULT_NETWORK_INTERFACE,
   UDN_BINDING_NAME,
 } from '@kubevirt-utils/resources/vm/utils/constants';
-import { getArchitecture, NODE_ARCHITECTURE_LABEL } from '@kubevirt-utils/utils/architecture';
+import { getArchitecture } from '@kubevirt-utils/utils/architecture';
 import { createHeadlessService } from '@kubevirt-utils/utils/headless-service';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
@@ -30,6 +30,7 @@ type QuickCreateVMType = (inputs: {
   overrides: {
     autoUpdateEnabled: boolean;
     cluster?: string;
+    enableMultiArchBootImageImport?: boolean;
     isDisabledGuestSystemLogs: boolean;
     isUDNManagedNamespace?: boolean;
     name: string;
@@ -45,6 +46,7 @@ export const quickCreateVM: QuickCreateVMType = async ({
   overrides: {
     autoUpdateEnabled,
     cluster,
+    enableMultiArchBootImageImport,
     isDisabledGuestSystemLogs,
     isUDNManagedNamespace,
     name,
@@ -96,10 +98,8 @@ export const quickCreateVM: QuickCreateVMType = async ({
     }
 
     const templateArchitecture = getArchitecture(processedTemplate);
-    if (!isEmpty(templateArchitecture)) {
-      draftVM.spec.template.spec.nodeSelector = {
-        [NODE_ARCHITECTURE_LABEL]: templateArchitecture,
-      };
+    if (!isEmpty(templateArchitecture) && enableMultiArchBootImageImport) {
+      draftVM.spec.template.spec.architecture = templateArchitecture;
     }
   });
 
