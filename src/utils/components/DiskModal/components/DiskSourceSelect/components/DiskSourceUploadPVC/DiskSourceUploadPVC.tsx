@@ -13,11 +13,18 @@ import { diskSourceUploadFieldID } from '../../utils/constants';
 import { DiskSourceUploadPVCProgress } from './DiskSourceUploadPVCProgress';
 
 type DiskSourceUploadPVCProps = {
+  handleClearUpload?: () => void;
+  handleUpload?: () => void;
   label?: string;
   relevantUpload: DataUpload;
 };
 
-const DiskSourceUploadPVC: FC<DiskSourceUploadPVCProps> = ({ label, relevantUpload }) => {
+const DiskSourceUploadPVC: FC<DiskSourceUploadPVCProps> = ({
+  handleClearUpload,
+  handleUpload,
+  label,
+  relevantUpload,
+}) => {
   const { t } = useKubevirtTranslation();
   const {
     control,
@@ -40,10 +47,12 @@ const DiskSourceUploadPVC: FC<DiskSourceUploadPVCProps> = ({ label, relevantUplo
               onClearClick={() => {
                 onChange('');
                 setValue<FieldPath<V1DiskFormState>>(UPLOAD_FILENAME_FIELD, '');
+                handleClearUpload?.();
               }}
               onFileInputChange={(_, file: File) => {
                 onChange(file);
                 setValue<FieldPath<V1DiskFormState>>(UPLOAD_FILENAME_FIELD, file.name);
+                handleUpload?.();
               }}
               allowEditingUploadedText={false}
               browseButtonText={t('Upload')}

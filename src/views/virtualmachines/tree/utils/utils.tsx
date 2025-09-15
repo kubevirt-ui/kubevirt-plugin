@@ -7,6 +7,7 @@ import {
   tourGuideVM,
 } from '@kubevirt-utils/components/GuidedTour/utils/constants';
 import { ALL_NAMESPACES_SESSION_KEY, ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
+import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
 import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { UseMulticlusterNamespacesReturnType } from '@multicluster/hooks/useMulticlusterProjects';
@@ -64,13 +65,14 @@ const buildProjectMap = (
   vms?.forEach((vm) => {
     const vmNamespace = getNamespace(vm);
     const vmName = getName(vm);
+    const vmCluster = getCluster(vm);
     const folder = foldersEnabled ? getLabel(vm, VM_FOLDER_LABEL) : null;
-    const vmTreeItemID = `${vmNamespace}/${vmName}`;
+    const vmTreeItemID = `${vmCluster || SINGLE_CLUSTER_KEY}/${vmNamespace}/${vmName}`;
     const VMStatusIcon = statusIcon[vm?.status?.printableStatus];
 
     const vmTreeItem: TreeViewDataItemWithHref = {
       defaultExpanded: currentPageVMName && currentPageVMName === vmName,
-      href: `${getVMURL(getCluster(vm), vmNamespace, vmName)}/${currentVMTab}`,
+      href: `${getVMURL(vmCluster, vmNamespace, vmName)}/${currentVMTab}`,
       icon: <VMStatusIcon />,
       id: vmTreeItemID,
       name: vmName,
@@ -107,7 +109,9 @@ const createFolderTreeItems = (
   cluster?: string,
 ): TreeViewDataItemWithHref[] =>
   Object.entries(folders).map(([folder, vmItems]) => {
-    const folderTreeItemID = `${FOLDER_SELECTOR_PREFIX}/${project}/${folder}`;
+    const folderTreeItemID = `${FOLDER_SELECTOR_PREFIX}/${
+      cluster || SINGLE_CLUSTER_KEY
+    }/${project}/${folder}`;
     const folderExpanded =
       currentPageVMName && vmItems.some((item) => (item.name as string) === currentPageVMName);
 
@@ -153,7 +157,7 @@ const createProjectTreeItem = (
 
   const projectChildren = [...sortProjectFolders, ...(projectMap[project]?.ungrouped || [])];
 
-  const projectTreeItemID = `${PROJECT_SELECTOR_PREFIX}/${project}`;
+  const projectTreeItemID = `${PROJECT_SELECTOR_PREFIX}/${cluster}/${project}`;
   const projectTreeItem: TreeViewDataItemWithHref = {
     children: projectChildren,
     customBadgeContent: projectMap[project]?.count || '0',

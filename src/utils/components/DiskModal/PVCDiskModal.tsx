@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
+import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { isRunning } from '@virtualmachines/utils';
 
@@ -52,6 +53,7 @@ const PVCDiskModal: FC<V1SubDiskModalProps> = ({
         }
         closeOnSubmit={isValid}
         headerText={diskModalTitle(isEditDisk, isVMRunning)}
+        isDisabled={!isValid}
         isLoading={isSubmitting}
         isOpen={isOpen}
         onClose={onClose}
@@ -60,7 +62,7 @@ const PVCDiskModal: FC<V1SubDiskModalProps> = ({
         <PendingChanges isVMRunning={isVMRunning} />
         <BootSourceCheckbox editDiskName={editDiskName} isDisabled={isVMRunning} vm={vm} />
         <DiskNameInput />
-        <DiskSourcePVCSelect vmNamepace={vm?.metadata?.namespace} />
+        <DiskSourcePVCSelect vmNamepace={getNamespace(vm)} />
         {isCreated && <ExpandPVC pvc={pvc} />}
         <DiskTypeSelect isVMRunning={isVMRunning} />
         <DiskInterfaceSelect isVMRunning={isVMRunning} />

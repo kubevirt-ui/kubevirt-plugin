@@ -83,6 +83,8 @@ export const InstanceTypeDrilldownSelect: FC<InstanceTypeMenuItemsProps> = ({
             selectedKind={selectedInstanceTypeKind}
           />
         }
+        appendTo={document.getElementById('tab-modal')}
+        direction="up"
         id={MENUS.root}
         isOpen={isOpen}
         scrollableMenuIDs={[MENUS.userProvided]}

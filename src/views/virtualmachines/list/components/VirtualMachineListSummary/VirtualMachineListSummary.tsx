@@ -10,20 +10,18 @@ import VMStatusItem from '@overview/OverviewTab/vm-statuses-card/VMStatusItem';
 import {
   Card,
   CardTitle,
-  Content,
   Divider,
   ExpandableSection,
   Flex,
   FlexItem,
   Grid,
 } from '@patternfly/react-core';
-import { ProjectDiagramIcon } from '@patternfly/react-icons';
 import useVMTotalsMetrics from '@virtualmachines/list/hooks/useVMTotalsMetrics';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 import VirtualMachineUsageItem from '../VirtualMachineUsageItem/VirtualMachineUsageItem';
 
-import useSummaryTitle from './hooks/useSummaryTitle';
+import SummaryTitle from './components/SummaryTitle';
 
 import './VirtualMachineListSummary.scss';
 
@@ -43,27 +41,20 @@ const VirtualMachineListSummary: FC<VirtualMachineListSummaryProps> = ({
   const { t } = useKubevirtTranslation();
   const [isExpanded, setIsExpanded] = useState<boolean>(true);
 
-  const summaryTitle = useSummaryTitle(namespace);
-
   const { primaryStatuses } = getVMStatuses(vms || []);
 
   const { cpuRequested, cpuUsage, memoryCapacity, memoryUsage, storageCapacity, storageUsage } =
-    useVMTotalsMetrics(vms, vmis);
+    useVMTotalsMetrics(vmis);
 
   const onStatusChange = (status: 'Error' | VM_STATUS) => () =>
     onFilterChange(VirtualMachineRowFilterType.Status, { selected: [status] });
 
   return (
     <ExpandableSection
-      toggleContent={
-        <Content className="vm-list-summary__expand-section-toggle" component="h3">
-          <ProjectDiagramIcon className="vm-list-summary__expand-section-toggle-icon" />{' '}
-          {summaryTitle}
-        </Content>
-      }
       className="vm-list-summary__expand-section"
       isExpanded={isExpanded}
       onToggle={() => setIsExpanded((prev) => !prev)}
+      toggleContent={<SummaryTitle />}
     >
       <Card className="vm-list-summary" data-test-id="vm-list-summary">
         <Flex spaceItems={{ default: 'spaceItemsNone' }}>

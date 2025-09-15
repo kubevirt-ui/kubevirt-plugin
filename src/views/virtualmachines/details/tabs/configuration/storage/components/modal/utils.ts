@@ -6,6 +6,7 @@ import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolume
 import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import {
   V1beta1StorageSpec,
+  V1DataVolumeTemplateSpec,
   V1Disk,
   V1VirtualMachine,
   V1VirtualMachineInstance,
@@ -246,3 +247,17 @@ const buildSelectDiskState = (cdromName: string, selectedISO: string): V1DiskFor
     },
   };
 };
+
+export const convertDataVolumeToTemplate = (
+  dataVolume: V1beta1DataVolume,
+): V1DataVolumeTemplateSpec => ({
+  metadata: dataVolume.metadata,
+  spec: {
+    source: dataVolume.spec.source,
+    sourceRef: dataVolume.spec.sourceRef,
+    storage: {
+      accessModes: dataVolume.spec.storage?.accessModes?.map((mode) => mode as any),
+      resources: dataVolume.spec.storage?.resources,
+    },
+  },
+});

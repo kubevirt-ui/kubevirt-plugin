@@ -1,25 +1,31 @@
-import { FC } from 'react';
-import React from 'react';
+import React, { FC } from 'react';
 import { FormProvider } from 'react-hook-form';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { ISO_FILE_EXTENSION } from '@kubevirt-utils/components/DiskModal/utils/constants';
+import DiskSourceUploadPVC from '@kubevirt-utils/components/DiskModal/components/DiskSourceSelect/components/DiskSourceUploadPVC/DiskSourceUploadPVC';
+import { UPLOAD_FILENAME_FIELD } from '@kubevirt-utils/components/DiskModal/components/utils/constants';
 import { mountISOToCDROM } from '@kubevirt-utils/components/DiskModal/utils/helpers';
+import { uploadDataVolume } from '@kubevirt-utils/components/DiskModal/utils/submit';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
+import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
-import { ButtonVariant, FileUpload, FormGroup, Stack, StackItem } from '@patternfly/react-core';
-
-import { updateDisks } from '../../../details/utils/utils';
+import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
+import {
+  ButtonVariant,
+  Content,
+  ContentVariants,
+  FormGroup,
+  Stack,
+  StackItem,
+} from '@patternfly/react-core';
 
 import { useISOOptions } from './hooks/useISOOptions';
 import { useMountCDROMForm } from './hooks/useMountCDROMForm';
-import { buildDiskState } from './utils';
+import { buildDiskState, convertDataVolumeToTemplate } from './utils';
 
 const SELECT_ISO_FIELD_ID = 'select-iso';
-const UPLOAD_ISO_FIELD_ID = 'upload-iso';
-const UPLOAD_ISO_INPUT_ID = 'upload-iso-input';
 
 type MountCDROMModalProps = {
   cdromName: string;
@@ -50,36 +56,49 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
     uploadFilename,
     uploadMode,
   } = useMountCDROMForm();
+  const { upload, uploadData } = useCDIUpload();
+
+  const { getValues, setValue } = methods;
 
   const { isoOptions } = useISOOptions(vmNamespace);
 
-  const handleMount = async () => {
+  const handleModalSubmit = async () => {
+    const data = getValues();
     const diskState = buildDiskState(
       uploadMode,
       selectedISO,
-      uploadFile,
+      uploadFile?.file,
       vm,
       cdromName,
       uploadFilename,
     );
     if (!diskState) return;
+    if (data.uploadFile?.file) {
+      const uploadedDataVolume = await uploadDataVolume(vm, uploadData, diskState);
+      diskState.dataVolumeTemplate = convertDataVolumeToTemplate(uploadedDataVolume);
+    }
 
     const updatedVM = await mountISOToCDROM(vm, diskState);
-
-    if (onSubmit) {
-      return onSubmit(updatedVM);
-    }
-    return updateDisks(updatedVM);
+    return onSubmit(updatedVM);
   };
 
   return (
     <FormProvider {...methods}>
       <TabModal<V1VirtualMachine>
+        onClose={() => {
+          if (upload?.uploadStatus) {
+            try {
+              upload.cancelUpload();
+            } catch (error) {
+              kubevirtConsole.error(error);
+            }
+          }
+          onClose();
+        }}
         headerText={t('Mount ISO')}
         isDisabled={!isFormValid}
         isOpen={isOpen}
-        onClose={onClose}
-        onSubmit={handleMount}
+        onSubmit={handleModalSubmit}
         shouldWrapInForm
         submitBtnText={t('Save')}
         submitBtnVariant={ButtonVariant.primary}
@@ -91,35 +110,32 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
           <StackItem>
             <FormGroup fieldId={SELECT_ISO_FIELD_ID} isRequired label={t('Select ISO')}>
               <InlineFilterSelect
+                setSelected={(e) => {
+                  handleISOSelection(e);
+                  setValue(UPLOAD_FILENAME_FIELD, '');
+                }}
                 toggleProps={{
                   isFullWidth: true,
                   placeholder: t('Select or upload a new ISO file to the cluster'),
                 }}
                 options={isoOptions}
                 selected={selectedISO}
-                setSelected={handleISOSelection}
               />
             </FormGroup>
           </StackItem>
           <StackItem>
-            <FormGroup fieldId={UPLOAD_ISO_FIELD_ID} label={t('Upload ISO')}>
-              <FileUpload
-                dropzoneProps={{
-                  accept: { 'application/*': [ISO_FILE_EXTENSION] },
-                }}
-                browseButtonText={t('Upload')}
-                clearButtonText={t('Clear')}
-                filename={uploadFilename}
-                filenamePlaceholder={t('Drag and drop a file or upload')}
-                id={UPLOAD_ISO_INPUT_ID}
-                onClearClick={handleClearUpload}
-                onFileInputChange={(_, file: File) => handleFileUpload(file)}
-                value={uploadFile}
-              />
-              <p className="pf-v6-u-mt-sm pf-v6-u-color-200">
-                {t('ISO file must be in the same project as the VirtualMachine')}
-              </p>
-            </FormGroup>
+            <DiskSourceUploadPVC
+              handleClearUpload={() => {
+                handleClearUpload();
+                setValue(UPLOAD_FILENAME_FIELD, '');
+              }}
+              handleUpload={handleFileUpload}
+              label={t('Upload ISO')}
+              relevantUpload={upload}
+            />
+            <Content component={ContentVariants.small}>
+              {t('ISO file must be in the same project as the Virtual Machine')}
+            </Content>
           </StackItem>
         </Stack>
       </TabModal>

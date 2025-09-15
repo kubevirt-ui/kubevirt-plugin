@@ -16,8 +16,10 @@ import SelectTypeahead, {
 } from '@kubevirt-utils/components/SelectTypeahead/SelectTypeahead';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
 import { getNetworks, POD_NETWORK } from '@kubevirt-utils/resources/vm';
 import { interfaceTypesProxy } from '@kubevirt-utils/resources/vm/utils/network/constants';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { FormGroup, Label, ValidatedOptions } from '@patternfly/react-core';
 
 import { getNadType, isPodNetworkName, podNetworkExists } from '../../utils/helpers';
@@ -53,7 +55,11 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const vmiNamespace = vm?.metadata?.namespace || namespace;
-  const { loaded, loadError, nads } = useNADsData(vmiNamespace);
+  const { loaded, loadError, nads } = useNADsData(vmiNamespace, getCluster(vm));
+  const [isNamespaceManagedByUDN] = useNamespaceUDN(vmiNamespace);
+  const podNetworkType = isNamespaceManagedByUDN
+    ? interfaceTypesProxy.l2bridge
+    : interfaceTypesProxy.masquerade;
   const [selectedFirstOnLoad, setSelectedFirstOnLoad] = useState(false);
   const [createdNetworkOptions, setCreatedNetworkOptions] = useState<
     NetworkSelectTypeaheadOptionProps[]
@@ -110,12 +116,12 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
         optionProps: {
           children: (
             <>
-              {podNetworkingText} <Label isCompact>{interfaceTypesProxy.masquerade} Binding</Label>
+              {podNetworkingText} <Label isCompact>{podNetworkType} Binding</Label>
             </>
           ),
           key: POD_NETWORK,
         },
-        type: interfaceTypesProxy.masquerade,
+        type: podNetworkType,
         value: POD_NETWORK,
       });
     }
@@ -132,6 +138,7 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
     podNetworkingText,
     vmiNamespace,
     createdNetworkOptions,
+    podNetworkType,
   ]);
 
   const validated =
@@ -142,11 +149,11 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
       setNetworkName(value);
       setInterfaceType(
         value === POD_NETWORK
-          ? interfaceTypesProxy.masquerade
+          ? podNetworkType
           : networkOptions.find((netOption) => value === netOption?.value)?.type,
       );
     },
-    [setNetworkName, setInterfaceType, networkOptions],
+    [setNetworkName, setInterfaceType, networkOptions, podNetworkType],
   );
 
   // This useEffect is to handle the submit button and init value

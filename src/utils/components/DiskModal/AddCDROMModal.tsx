@@ -1,9 +1,8 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { FC, useState } from 'react';
 import { FormProvider, useForm, useWatch } from 'react-hook-form';
 
 import { PendingChangesAlert } from '@kubevirt-utils/components/PendingChanges/PendingChangesAlert/PendingChangesAlert';
 import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
-import { UPLOAD_STATUS } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
@@ -46,20 +45,15 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
 
   const {
     control,
-    formState: { isSubmitting, isValid },
+    formState: { errors, isSubmitting },
     getValues,
   } = methods;
 
   const uploadFile = useWatch({ control, name: 'uploadFile' });
-  const isFormValid = useMemo(() => {
-    const baseValid = isValid && (!uploadEnabled || (uploadEnabled && !isEmpty(uploadFile)));
+  const hasUploadFile = !isEmpty(uploadFile);
+  const hasFormErrors = !isEmpty(errors);
 
-    if (uploadEnabled && !isEmpty(upload?.uploadStatus) && uploadFile) {
-      return baseValid && upload.uploadStatus === UPLOAD_STATUS.SUCCESS;
-    }
-
-    return baseValid;
-  }, [isValid, uploadEnabled, uploadFile, upload?.uploadStatus]);
+  const isFormValid = !hasFormErrors && (!uploadEnabled || hasUploadFile);
 
   const handleModalSubmit = async () => {
     const data = getValues();
@@ -75,9 +69,8 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
         },
       };
     } else {
-      data.dataVolumeTemplate.spec.source = {
-        upload: {},
-      };
+      delete data.dataVolumeTemplate;
+      delete data.volume;
     }
 
     const vmWithDisk = addDisk(data, vm);
@@ -90,7 +83,7 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
     <FormProvider {...methods}>
       <TabModal
         onClose={() => {
-          if (upload?.uploadStatus === UPLOAD_STATUS.UPLOADING) {
+          if (upload?.uploadStatus) {
             try {
               upload.cancelUpload();
             } catch (error) {

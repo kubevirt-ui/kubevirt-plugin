@@ -2,10 +2,7 @@ import produce from 'immer';
 import { WritableDraft } from 'immer/dist/internal';
 
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
-import {
-  V1beta1DataVolume,
-  V1beta1DataVolumeSpec,
-} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import {
   V1AddVolumeOptions,
   V1DataVolumeTemplateSpec,
@@ -26,7 +23,9 @@ import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
 import { getBootDisk, getDataVolumeTemplates, getVolumes } from '@kubevirt-utils/resources/vm';
 import { getOperatingSystem } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { ensurePath, getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
-import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
+import { isDNS1123Label } from '@kubevirt-utils/utils/validation';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 import { addPersistentVolume, removeVolume } from '@virtualmachines/actions/actions';
 
 import { SourceTypes, V1DiskFormState } from './types';
@@ -113,7 +112,8 @@ const getDataVolumeHotplugPromise = (
     },
   };
 
-  return k8sCreate({
+  return kubevirtK8sCreate({
+    cluster: getCluster(vm),
     data: resultDataVolume,
     model: DataVolumeModel,
     ns: getNamespace(resultDataVolume),
@@ -245,8 +245,17 @@ export const doesDataVolumeTemplateHaveDisk = (vm: V1VirtualMachine, diskName: s
   return !isEmpty(dataVolumeTemplate);
 };
 
-export const createDataVolumeName = (vm: V1VirtualMachine, diskName: string) =>
-  `dv-${getName(vm)}-${diskName}-${getRandomChars()}`;
+export const createDataVolumeName = (vm: V1VirtualMachine, diskName: string) => {
+  const middlePart = [getName(vm), diskName].filter(isDNS1123Label).join('-').substring(0, 53);
+  // prefix: 2
+  // middlePart: max 53
+  // suffix: 6
+  // hyphens: max 2
+  // together: max 63
+  return `dv-${middlePart}${!middlePart || middlePart.endsWith('-') ? '' : '-'}${getRandomChars(
+    6,
+  )}`;
+};
 
 const getVolumeSourceForMount = (diskState: V1DiskFormState) => {
   if (diskState.dataVolumeTemplate) {
@@ -267,49 +276,43 @@ export const mountISOToCDROM = async (
   vm: V1VirtualMachine,
   diskState: V1DiskFormState,
 ): Promise<V1VirtualMachine> => {
-  const volumes = getVolumes(vm) || [];
-  const volumeIndex = volumes.findIndex((volume) => volume.name === diskState.disk.name);
-
-  if (diskState.dataVolumeTemplate) {
-    const dataVolume = getEmptyVMDataVolumeResource(vm);
-    dataVolume.metadata = diskState.dataVolumeTemplate.metadata;
-    dataVolume.spec = { ...diskState.dataVolumeTemplate.spec } as unknown as V1beta1DataVolumeSpec;
-
-    await k8sCreate({ data: dataVolume, model: DataVolumeModel });
-  }
-
   const newVolumeSource = getVolumeSourceForMount(diskState);
 
   return produceVMDisks(vm, (draftVM) => {
-    draftVM.spec.template.spec.volumes[volumeIndex] = {
+    // Find the index of the existing CD-ROM volume, if it exists
+    const volumes = draftVM.spec.template.spec.volumes || [];
+    const volumeIndex = volumes.findIndex((volume) => volume.name === diskState.disk.name);
+
+    const newVolume = {
       name: diskState.disk.name,
       ...newVolumeSource,
     };
+
+    if (volumeIndex !== -1) {
+      draftVM.spec.template.spec.volumes[volumeIndex] = newVolume;
+    } else {
+      draftVM.spec.template.spec.volumes = [...volumes, newVolume];
+    }
   });
 };
 
 export const ejectISOFromCDROM = (vm: V1VirtualMachine, cdromName: string): V1VirtualMachine => {
-  const volumes = getVolumes(vm) || [];
-  const volumeIndex = volumes.findIndex((volume) => volume.name === cdromName);
+  return produce(vm, (draftVM) => {
+    // Find the volume to be removed
+    const volumeToRemove = (draftVM.spec.template.spec.volumes || []).find(
+      (volume) => volume.name === cdromName,
+    );
 
-  return produceVMDisks(vm, (draftVM) => {
-    const currentVolume = draftVM.spec.template.spec.volumes[volumeIndex];
-
-    if (currentVolume?.dataVolume?.name) {
-      const dataVolumeTemplateIndex = (draftVM.spec.dataVolumeTemplates || []).findIndex(
-        (dv) => getName(dv) === currentVolume.dataVolume.name,
+    // If a DataVolume was used, remove its template
+    if (volumeToRemove?.dataVolume?.name) {
+      draftVM.spec.dataVolumeTemplates = (draftVM.spec.dataVolumeTemplates || []).filter(
+        (dataVolume) => dataVolume.metadata.name !== volumeToRemove.dataVolume.name,
       );
-
-      if (dataVolumeTemplateIndex >= 0) {
-        draftVM.spec.dataVolumeTemplates.splice(dataVolumeTemplateIndex, 1);
-      }
     }
 
-    draftVM.spec.template.spec.volumes[volumeIndex] = {
-      containerDisk: {
-        image: '',
-      },
-      name: cdromName,
-    };
+    // Remove the volume entry
+    draftVM.spec.template.spec.volumes = (draftVM.spec.template.spec.volumes || []).filter(
+      (volume) => volume.name !== cdromName,
+    );
   });
 };

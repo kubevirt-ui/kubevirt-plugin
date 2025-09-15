@@ -13,14 +13,19 @@ import {
   getVolumes,
 } from '@kubevirt-utils/resources/vm';
 import { generatePrettyName, isEmpty } from '@kubevirt-utils/utils/utils';
-import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { isRunning } from '@virtualmachines/utils';
 
 import { getDataVolumeTemplateSize } from '../components/utils/selectors';
 
 import { DEFAULT_DISK_SIZE } from './constants';
-import { getEmptyVMDataVolumeResource, hotplugPromise, produceVMDisks } from './helpers';
-import { createDataVolumeName } from './helpers';
+import {
+  createDataVolumeName,
+  getEmptyVMDataVolumeResource,
+  hotplugPromise,
+  produceVMDisks,
+} from './helpers';
 import { V1DiskFormState } from './types';
 
 const applyDiskAsBootable = (vm: V1VirtualMachine, diskName: string): V1VirtualMachine => {
@@ -80,34 +85,35 @@ export const uploadDataVolume = async (
     dataVolume,
     file: data?.uploadFile?.file,
   });
-
-  delete data.dataVolumeTemplate.spec.source.upload;
+  if (data?.dataVolumeTemplate?.spec?.source?.upload) {
+    delete data.dataVolumeTemplate.spec.source.upload;
+  }
 
   return dataVolume;
 };
 
 export const editDisk = (data: V1DiskFormState, diskName: string, vm: V1VirtualMachine) => {
   const volumes = getVolumes(vm);
-  const diskindex = getDisks(vm)?.findIndex((disk) => disk.name === diskName);
-  const volumeindex = volumes?.findIndex((volume) => volume.name === diskName);
-  const dataVolumeTemplateindex = getDataVolumeTemplates(vm)?.findIndex(
-    (dv) => getName(dv) === volumes[volumeindex]?.dataVolume?.name,
+  const diskIndex = getDisks(vm)?.findIndex((disk) => disk.name === diskName);
+  const volumeIndex = volumes?.findIndex((volume) => volume.name === diskName);
+  const dataVolumeTemplateIndex = getDataVolumeTemplates(vm)?.findIndex(
+    (dv) => getName(dv) === volumes[volumeIndex]?.dataVolume?.name,
   );
 
   return produceVMDisks(vm, (draftVM: V1VirtualMachine) => {
-    draftVM.spec.template.spec.domain.devices.disks.splice(diskindex, 1, data.disk);
-    draftVM.spec.template.spec.volumes.splice(volumeindex, 1, data.volume);
-
-    if (dataVolumeTemplateindex >= 0)
-      draftVM.spec.dataVolumeTemplates.splice(dataVolumeTemplateindex, 1, data.dataVolumeTemplate);
+    draftVM.spec.template.spec.domain.devices.disks.splice(diskIndex, 1, data.disk);
+    if (volumeIndex >= 0) {
+      draftVM.spec.template.spec.volumes.splice(volumeIndex, 1, data.volume);
+    }
+    if (dataVolumeTemplateIndex >= 0)
+      draftVM.spec.dataVolumeTemplates.splice(dataVolumeTemplateIndex, 1, data.dataVolumeTemplate);
   });
 };
 
 export const addDisk = (data: V1DiskFormState, vm: V1VirtualMachine) => {
   return produceVMDisks(vm, (draftVM: V1VirtualMachine) => {
     draftVM.spec.template.spec.domain.devices.disks.push(data.disk);
-    draftVM.spec.template.spec.volumes.push(data.volume);
-
+    if (data.volume) draftVM.spec.template.spec.volumes.push(data.volume);
     if (data.dataVolumeTemplate) draftVM.spec.dataVolumeTemplates.push(data.dataVolumeTemplate);
   });
 };
@@ -143,7 +149,8 @@ export const submit = async ({ data, editDiskName, onSubmit, pvc, vm }: SubmitIn
   const newVM = reorderBootDisk(vmWithDisk, data.disk.name, data.isBootSource, isInitialBootDisk);
 
   if (data.expandPVCSize && pvc) {
-    await k8sPatch({
+    await kubevirtK8sPatch({
+      cluster: getCluster(vm),
       data: [
         {
           op: 'replace',

@@ -101,6 +101,7 @@ export const createPopulatedCloudInitYAML = (
 };
 type GenerateVMArgs = {
   autoUpdateEnabled?: boolean;
+  cluster?: string;
   instanceTypeState: InstanceTypeVMState;
   isUDNManagedNamespace: boolean;
   startVM: boolean;
@@ -111,6 +112,7 @@ type GenerateVMCallback = (props: GenerateVMArgs) => V1VirtualMachine;
 
 export const generateVM: GenerateVMCallback = ({
   autoUpdateEnabled,
+  cluster,
   instanceTypeState,
   isUDNManagedNamespace,
   startVM,
@@ -240,6 +242,8 @@ export const generateVM: GenerateVMCallback = ({
       },
     },
   };
+
+  if (cluster) emptyVM.cluster = cluster;
 
   if (!isUDNManagedNamespace) {
     emptyVM.spec.template.metadata.labels[HEADLESS_SERVICE_LABEL] = HEADLESS_SERVICE_NAME;

@@ -19,6 +19,7 @@ type ApplyStorageProfileSettingsProps = {
   setAccessMode: (accessMode?: V1beta1StorageSpecAccessModesEnum) => void;
   setVolumeMode: (volumeMode?: V1beta1StorageSpecVolumeModeEnum) => void;
   storageClassName: string;
+  vmCluster?: string;
   volumeMode: V1beta1StorageSpecVolumeModeEnum;
 };
 
@@ -27,10 +28,14 @@ const ApplyStorageProfileSettings: FC<ApplyStorageProfileSettingsProps> = ({
   setAccessMode,
   setVolumeMode,
   storageClassName,
+  vmCluster,
   volumeMode,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { claimPropertySets, error, loaded } = useStorageProfileClaimPropertySets(storageClassName);
+  const { claimPropertySets, error, loaded } = useStorageProfileClaimPropertySets(
+    storageClassName,
+    vmCluster,
+  );
   const storageRef = useRef<string>(undefined);
 
   useEffect(() => {

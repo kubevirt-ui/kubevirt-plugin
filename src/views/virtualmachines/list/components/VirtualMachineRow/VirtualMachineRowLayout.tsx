@@ -8,10 +8,12 @@ import {
 } from '@kubevirt-ui/kubevirt-api/console';
 import {
   V1VirtualMachine,
+  V1VirtualMachineInstance,
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getCPU, getMemory } from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import ACMExtentionsTableData from '@multicluster/components/ACMExtentionsTableData';
@@ -43,16 +45,11 @@ const VirtualMachineRowLayout: FC<
       node: ReactNode | string;
       pvcMapper: PVCMapper;
       status: ReactNode;
+      vmi?: V1VirtualMachineInstance;
       vmim: V1VirtualMachineInstanceMigration;
-      vmiMemory?: string;
     }
   >
-> = ({
-  activeColumnIDs,
-  index,
-  obj,
-  rowData: { ips, node, pvcMapper, status, vmim, vmiMemory },
-}) => {
+> = ({ activeColumnIDs, index, obj, rowData: { ips, node, pvcMapper, status, vmi, vmim } }) => {
   // TODO: investigate using the index prop
   index;
   const selected = isVMSelected(obj);
@@ -116,10 +113,10 @@ const VirtualMachineRowLayout: FC<
         {ips}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="memory-usage">
-        <MemoryPercentage vm={obj} vmiMemory={vmiMemory} />
+        <MemoryPercentage vm={obj} vmiMemory={getMemory(vmi)} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="cpu-usage">
-        <CPUPercentage vm={obj} />
+        <CPUPercentage vm={obj} vmiCPU={getCPU(vmi)} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="network-usage">
         <NetworkUsage vm={obj} />

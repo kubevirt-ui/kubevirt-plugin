@@ -4,7 +4,7 @@ import { METRICS } from './constants';
 
 const metricQueriesForNamespace = {
   [METRICS.MEMORY]: (namespace) =>
-    `sum by (namespace)(kubevirt_vmi_memory_available_bytes{namespace="${namespace}"} - kubevirt_vmi_memory_usable_bytes{namespace="${namespace}"})`,
+    `sum by (namespace)(kubevirt_vmi_memory_used_bytes{namespace="${namespace}"})`,
   [METRICS.STORAGE]: (namespace) =>
     `sum by (namespace)(max(kubevirt_vmi_filesystem_used_bytes{namespace="${namespace}"}) by (namespace, name, disk_name))`,
   [METRICS.VCPU_USAGE]: (namespace) =>
@@ -14,8 +14,7 @@ const metricQueriesForNamespace = {
 };
 
 const metricQueriesForAllNamespaces = {
-  [METRICS.MEMORY]: () =>
-    `sum(kubevirt_vmi_memory_available_bytes - kubevirt_vmi_memory_usable_bytes)`,
+  [METRICS.MEMORY]: () => `sum(kubevirt_vmi_memory_used_bytes)`,
   [METRICS.STORAGE]: () =>
     `sum(max(kubevirt_vmi_filesystem_used_bytes) by (namespace, name, disk_name))`,
   [METRICS.VCPU_USAGE]: () => `count(kubevirt_vmi_vcpu_wait_seconds_total)`,

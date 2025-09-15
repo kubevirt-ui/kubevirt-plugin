@@ -8,7 +8,6 @@ import {
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, NodeModel } from '@kubevirt-utils/models';
-import { getMemory } from '@kubevirt-utils/resources/vm';
 import { getVMIIPAddressesWithName } from '@kubevirt-utils/resources/vmi';
 import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -48,8 +47,8 @@ const VirtualMachineRunningRow: FC<
         ),
         pvcMapper,
         status,
+        vmi,
         vmim,
-        vmiMemory: getMemory(vmi),
       }}
       activeColumnIDs={activeColumnIDs}
       index={index}

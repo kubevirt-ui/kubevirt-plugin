@@ -8,7 +8,7 @@ const topConsumerQueries = {
     [Metric.MEMORY_SWAP_TRAFFIC.getValue()]: (numItemsToShow) =>
       `sort_desc(topk(${numItemsToShow}, sum(kubevirt_vmi_memory_swap_in_traffic_bytes + kubevirt_vmi_memory_swap_out_traffic_bytes) by (node))) > 0`,
     [Metric.MEMORY.getValue()]: (numItemsToShow) =>
-      `sort_desc(topk(${numItemsToShow}, sum(kubevirt_vmi_memory_available_bytes-kubevirt_vmi_memory_usable_bytes) by(node))) > 0`,
+      `sort_desc(topk(${numItemsToShow}, sum(kubevirt_vmi_memory_used_bytes) by(node))) > 0`,
     [Metric.STORAGE_IOPS.getValue()]: (numItemsToShow, duration) =>
       `sort_desc(topk(${numItemsToShow}, sum(rate(kubevirt_vmi_storage_iops_read_total[${duration}]) + rate(kubevirt_vmi_storage_iops_write_total[${duration}])) by (node))) > 0`,
     [Metric.STORAGE_READ_LATENCY.getValue()]: (numItemsToShow, duration) =>
@@ -26,7 +26,7 @@ const topConsumerQueries = {
     [Metric.MEMORY_SWAP_TRAFFIC.getValue()]: (numItemsToShow) =>
       `sort_desc(topk(${numItemsToShow}, sum(kubevirt_vmi_memory_swap_in_traffic_bytes + kubevirt_vmi_memory_swap_out_traffic_bytes) by (namespace))) > 0`,
     [Metric.MEMORY.getValue()]: (numItemsToShow) =>
-      `sort_desc(topk(${numItemsToShow}, sum(kubevirt_vmi_memory_available_bytes-kubevirt_vmi_memory_usable_bytes) by (namespace))) > 0`,
+      `sort_desc(topk(${numItemsToShow}, sum(kubevirt_vmi_memory_used_bytes) by (namespace))) > 0`,
     [Metric.STORAGE_IOPS.getValue()]: (numItemsToShow, duration) =>
       `sort_desc(topk(${numItemsToShow}, sum(rate(kubevirt_vmi_storage_iops_read_total[${duration}]) + rate(kubevirt_vmi_storage_iops_write_total[${duration}])) by (namespace))) > 0`,
     [Metric.STORAGE_READ_LATENCY.getValue()]: (numItemsToShow, duration) =>
@@ -44,7 +44,7 @@ const topConsumerQueries = {
     [Metric.MEMORY_SWAP_TRAFFIC.getValue()]: (numItemsToShow, duration) =>
       `sort_desc(topk (${numItemsToShow}, sum(rate(kubevirt_vmi_memory_swap_in_traffic_bytes[${duration}]) + rate(kubevirt_vmi_memory_swap_out_traffic_bytes[${duration}]))by(name, namespace))) > 0`,
     [Metric.MEMORY.getValue()]: (numItemsToShow) =>
-      `sort_desc(topk(${numItemsToShow}, sum(kubevirt_vmi_memory_available_bytes-kubevirt_vmi_memory_usable_bytes) by(name, namespace))) > 0`,
+      `sort_desc(topk(${numItemsToShow}, sum(kubevirt_vmi_memory_used_bytes) by(name, namespace))) > 0`,
     [Metric.STORAGE_IOPS.getValue()]: (numItemsToShow, duration) =>
       `sort_desc(topk(${numItemsToShow}, sum(rate(kubevirt_vmi_storage_iops_read_total[${duration}]) + rate(kubevirt_vmi_storage_iops_write_total[${duration}])) by (namespace, name))) > 0`,
     [Metric.STORAGE_READ_LATENCY.getValue()]: (numItemsToShow, duration) =>

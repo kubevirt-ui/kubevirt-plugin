@@ -1,5 +1,6 @@
 import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
+import { isAllNamespaces } from '@kubevirt-utils/utils/utils';
 import { ResourceRouteHandler } from '@stolostron/multicluster-sdk';
 
 import { VirtualMachineModel } from '../views/dashboard-extensions/utils';
@@ -12,10 +13,13 @@ export const isACMPath = (pathname: string): boolean =>
 export const getACMVMURL = (cluster: string, namespace: string, name: string): string =>
   `/k8s/cluster/${cluster}/ns/${namespace}/${KUBEVIRT_VM_PATH}/${name}`;
 
-export const getACMVMListURL = (cluster?: string): string =>
-  cluster
+export const getACMVMListURL = (cluster?: string, namespace?: string): string => {
+  if (namespace) return getACMVMListNamespacesURL(cluster, namespace);
+
+  return cluster
     ? `/k8s/cluster/${cluster}/all-namespaces/${KUBEVIRT_VM_PATH}`
     : `/k8s/all-clusters/all-namespaces/${KUBEVIRT_VM_PATH}`;
+};
 
 export const getACMVMSearchURL = (): string =>
   `/k8s/all-clusters/all-namespaces/${KUBEVIRT_VM_PATH}/search`;
@@ -24,7 +28,7 @@ export const getACMVMListNamespacesURL = (cluster: string, namespace: string): s
   `/k8s/cluster/${cluster}/ns/${namespace}/${KUBEVIRT_VM_PATH}`;
 
 export const getCatalogURL = (cluster: string, namespace?: string): string => {
-  const namespacePath = namespace ? `ns/${namespace}` : ALL_NAMESPACES;
+  const namespacePath = isAllNamespaces(namespace) ? ALL_NAMESPACES : `ns/${namespace}`;
 
   return cluster
     ? `/k8s/cluster/${cluster}/${namespacePath}/catalog`
@@ -50,10 +54,11 @@ export const getVMURL = (cluster: string, namespace: string, name: string): stri
         resource: { metadata: { name, namespace } },
       });
 
-export const getVMListURL = (cluster: string) =>
+export const getVMListURL = (cluster?: string, namespace?: string) =>
   cluster
-    ? getACMVMListURL(cluster)
+    ? getACMVMListURL(cluster, namespace)
     : getResourceUrl({
+        activeNamespace: namespace,
         model: VirtualMachineModel,
       });
 

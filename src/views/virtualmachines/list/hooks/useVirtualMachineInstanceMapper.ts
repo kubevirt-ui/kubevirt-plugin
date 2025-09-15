@@ -2,11 +2,13 @@ import { useMemo } from 'react';
 
 import { VirtualMachineInstanceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt/models';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
+import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { VMIMapper } from '@virtualmachines/utils/mappers';
 
 export const useVirtualMachineInstanceMapper = () => {
-  const [vmis] = useK8sWatchResource<V1VirtualMachineInstance[]>({
+  const [vmis] = useKubevirtWatchResource<V1VirtualMachineInstance[]>({
     groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
     isList: true,
   });
@@ -16,10 +18,14 @@ export const useVirtualMachineInstanceMapper = () => {
       (acc, vmi) => {
         const name = vmi?.metadata?.name;
         const namespace = vmi?.metadata?.namespace;
-        if (!acc.mapper[namespace]) {
-          acc.mapper[namespace] = {};
+        const cluster = getCluster(vmi) || SINGLE_CLUSTER_KEY;
+        if (!acc.mapper[cluster]) {
+          acc.mapper[cluster] = {};
         }
-        acc.mapper[namespace][name] = vmi;
+        if (!acc.mapper[cluster][namespace]) {
+          acc.mapper[cluster][namespace] = {};
+        }
+        acc.mapper[cluster][namespace][name] = vmi;
         const nodeName = vmi?.status?.nodeName;
         if (nodeName && !acc?.nodeNames?.[nodeName]) {
           acc.nodeNames[nodeName] = {

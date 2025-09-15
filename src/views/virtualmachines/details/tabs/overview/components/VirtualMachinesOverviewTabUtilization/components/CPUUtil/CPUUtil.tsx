@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import SubTitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/SubTitleChartLabel';
@@ -7,25 +7,23 @@ import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/Com
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useVMQueries from '@kubevirt-utils/hooks/useVMQueries';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
-import { getVMIPod } from '@kubevirt-utils/resources/vmi';
+import { getCPU, getVCPUCount } from '@kubevirt-utils/resources/vm';
 import { humanizeCpuCores } from '@kubevirt-utils/utils/humanize.js';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { K8sResourceCommon, PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
+import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import { ChartDonutUtilization } from '@patternfly/react-charts/victory';
 import { useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
 type CPUUtilProps = {
-  pods: K8sResourceCommon[];
   vmi: V1VirtualMachineInstance;
 };
 
-const CPUUtil: FC<CPUUtilProps> = ({ pods, vmi }) => {
+const CPUUtil: FC<CPUUtilProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
-  const vmiPod = useMemo(() => getVMIPod(vmi, pods), [pods, vmi]);
   const { currentTime } = useDuration();
 
-  const queries = useVMQueries(vmi, vmiPod?.metadata?.name);
+  const queries = useVMQueries(vmi);
 
   const prometheusProps = {
     cluster: getCluster(vmi),
@@ -34,19 +32,22 @@ const CPUUtil: FC<CPUUtilProps> = ({ pods, vmi }) => {
     namespace: getNamespace(vmi),
   };
 
-  const [dataCPURequested] = useFleetPrometheusPoll({
-    ...prometheusProps,
-    query: queries.CPU_REQUESTED,
-  });
-
   const [dataCPUUsage] = useFleetPrometheusPoll({
     ...prometheusProps,
     query: queries?.CPU_USAGE,
   });
 
-  const cpuUsage = humanizeCpuCores(+dataCPUUsage?.data?.result?.[0]?.value?.[1]).value;
-  const cpuRequested = humanizeCpuCores(+dataCPURequested?.data?.result?.[0]?.value?.[1]).value;
-  const averageCPUUsage = (cpuUsage / cpuRequested) * 100;
+  const vmCPU = getCPU(vmi);
+
+  const cpuUsage = +(dataCPUUsage?.data?.result?.[0]?.value?.[1] || 0);
+  const cpuUsageHumanized = humanizeCpuCores(cpuUsage);
+
+  const cpuRequested = getVCPUCount(vmCPU);
+  const cpuRequestedHumanized = humanizeCpuCores(cpuRequested);
+
+  const averageCPUUsageStr = ((cpuUsage / cpuRequested) * 100).toFixed(2) || 0;
+  const averageCPUUsage = Number(averageCPUUsageStr);
+
   const isReady = !Number.isNaN(cpuUsage) && !Number.isNaN(cpuRequested);
 
   return (
@@ -54,10 +55,13 @@ const CPUUtil: FC<CPUUtilProps> = ({ pods, vmi }) => {
       <div className="util-upper">
         <div className="util-title">{t('CPU')}</div>
         <div className="util-summary" data-test-id="util-summary-cpu">
-          <div className="util-summary-value">{`${isReady ? cpuUsage?.toFixed(2) : 0}m`}</div>
+          <div className="util-summary-value">{`${isReady ? cpuUsageHumanized?.string : 0}`}</div>
           <div className="util-summary-text pf-v6-u-text-color-subtle">
-            <div>{t('Requested of ')}</div>
-            <div>{`${isReady ? cpuRequested?.toFixed(2) : 0}m`}</div>
+            <div>
+              {t('Requested of {{cpuRequested}}', {
+                cpuRequested: isReady ? cpuRequestedHumanized?.string : 0,
+              })}
+            </div>
           </div>
         </div>
       </div>
@@ -70,11 +74,11 @@ const CPUUtil: FC<CPUUtilProps> = ({ pods, vmi }) => {
             }}
             animate
             constrainToVisibleArea
-            labels={({ datum }) => (datum.x ? `${datum.x}: ${(cpuUsage || 0)?.toFixed(2)}m` : null)}
+            labels={({ datum }) => (datum.x ? `${datum.x}: ${cpuUsageHumanized?.string}` : null)}
             style={{ labels: { fontSize: 20 } }}
             subTitle={t('Used')}
             subTitleComponent={<SubTitleChartLabel y={135} />}
-            title={`${averageCPUUsage.toFixed(2) || 0}%`}
+            title={`${averageCPUUsageStr}%`}
             titleComponent={<TitleChartLabel />}
           />
         </ComponentReady>

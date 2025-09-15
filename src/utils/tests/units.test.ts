@@ -216,5 +216,69 @@ describe('Test quantity utilities', () => {
         expect(formatQuantityString('1024000')).toBe('1000Ki');
       });
     });
+
+    describe('With convertBytesOnly=false', () => {
+      describe('Converts values with existing units', () => {
+        it('converts 1024Ki to 1Mi', () => {
+          expect(formatQuantityString('1024Ki', false)).toBe('1Mi');
+        });
+
+        it('converts 2048Mi to 2Gi', () => {
+          expect(formatQuantityString('2048Mi', false)).toBe('2Gi');
+        });
+
+        it('converts 1024Gi to 1Ti', () => {
+          expect(formatQuantityString('1024Gi', false)).toBe('1Ti');
+        });
+
+        it('converts 1000k to 1M', () => {
+          expect(formatQuantityString('1000k', false)).toBe('1M');
+        });
+
+        it('converts 1000M to 1G', () => {
+          expect(formatQuantityString('1000M', false)).toBe('1G');
+        });
+
+        it('converts 1000G to 1T', () => {
+          expect(formatQuantityString('1000G', false)).toBe('1T');
+        });
+      });
+
+      describe('Edge cases', () => {
+        it('returns null for empty string', () => {
+          expect(formatQuantityString('', false)).toBe(null);
+        });
+
+        it('returns null for null input', () => {
+          expect(formatQuantityString(null, false)).toBe(null);
+        });
+
+        it('returns null for undefined input', () => {
+          expect(formatQuantityString(undefined, false)).toBe(null);
+        });
+
+        it('formats 0Ki to 0', () => {
+          expect(formatQuantityString('0Ki', false)).toBe('0');
+        });
+
+        it('returns milibytes unchanged', () => {
+          expect(formatQuantityString('500m', false)).toBe('500m');
+        });
+      });
+
+      describe('Handles bytes without units', () => {
+        it('formats 1024 to 1Ki', () => {
+          expect(formatQuantityString('1024', false)).toBe('1Ki');
+        });
+
+        it('formats 1000000 to 1M', () => {
+          expect(formatQuantityString('1000000', false)).toBe('1M');
+        });
+      });
+
+      it('keeps non-convertible string', () => {
+        expect(formatQuantityString('1025Ki', false)).toBe('1025Ki');
+      });
+    });
   });
 });

@@ -1,6 +1,5 @@
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { getMemory } from '@kubevirt-utils/resources/vm';
+import { getCPU, getMemory } from '@kubevirt-utils/resources/vm';
 import { columnSortingCompare, isEmpty } from '@kubevirt-utils/utils/utils';
 import { SortByDirection } from '@patternfly/react-table';
 import { getDeletionProtectionPrintableStatus } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
@@ -39,10 +38,14 @@ export const sortByCPUUsage = (
   data: V1VirtualMachine[],
   direction: SortByDirection,
   pagination: { [key: string]: any },
+  vmiMapper: VMIMapper,
 ) => {
   const compareCPUUsage = (a: V1VirtualMachine, b: V1VirtualMachine): number => {
-    const cpuUsageA = getCPUUsagePercentage(getName(a), getNamespace(a));
-    const cpuUsageB = getCPUUsagePercentage(getName(b), getNamespace(b));
+    const aCPU = getCPU(getVMIFromMapper(vmiMapper, a));
+    const bCPU = getCPU(getVMIFromMapper(vmiMapper, b));
+
+    const cpuUsageA = getCPUUsagePercentage(a, aCPU);
+    const cpuUsageB = getCPUUsagePercentage(b, bCPU);
 
     if (isEmpty(cpuUsageA)) return -1;
     if (isEmpty(cpuUsageB)) return 1;
@@ -79,8 +82,8 @@ export const sortByMemoryUsage = (
   const compareMemoryUsage = (a: V1VirtualMachine, b: V1VirtualMachine): number => {
     const aVMI = getVMIFromMapper(vmiMapper, a);
     const bVMI = getVMIFromMapper(vmiMapper, b);
-    const memoryUsageA = getMemoryUsagePercentage(getName(a), getNamespace(a), getMemory(aVMI));
-    const memoryUsageB = getMemoryUsagePercentage(getName(b), getNamespace(b), getMemory(bVMI));
+    const memoryUsageA = getMemoryUsagePercentage(a, getMemory(aVMI));
+    const memoryUsageB = getMemoryUsagePercentage(b, getMemory(bVMI));
 
     if (isEmpty(memoryUsageA)) return -1;
     if (isEmpty(memoryUsageB)) return 1;
@@ -111,8 +114,8 @@ export const sortByNetworkUsage = (
   pagination: { [key: string]: any },
 ) => {
   const compareNetworkUsage = (a: V1VirtualMachine, b: V1VirtualMachine): number => {
-    const networkUsageA = getNetworkUsagePercentage(getName(a), getNamespace(a));
-    const networkUsageB = getNetworkUsagePercentage(getName(b), getNamespace(b));
+    const networkUsageA = getNetworkUsagePercentage(a);
+    const networkUsageB = getNetworkUsagePercentage(b);
 
     if (isEmpty(networkUsageA)) return -1;
     if (isEmpty(networkUsageB)) return 1;
