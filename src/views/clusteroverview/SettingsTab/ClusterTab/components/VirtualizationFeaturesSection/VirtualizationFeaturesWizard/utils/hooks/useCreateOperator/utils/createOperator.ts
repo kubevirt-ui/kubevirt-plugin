@@ -11,7 +11,7 @@ import {
 import { getLabels, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
-import { VirtFeatureOperatorItem } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/hooks/useVirtualizationOperators/utils/types';
+import { VirtFeatureOperatorItem } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/VirtualizationFeaturesContext/utils/types';
 import {
   CLUSTER_MONITORING_ANNOTATION_KEY,
   OPENSHIFT_CLUSTER_MONITORING_ANNOTATION_KEY,

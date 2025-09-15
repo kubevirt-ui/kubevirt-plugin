@@ -11,11 +11,11 @@ import { getGroupVersionKindForModel } from '@openshift-console/dynamic-plugin-s
 import {
   AnnotationParser,
   OLMAnnotation,
-} from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/hooks/useVirtualizationOperators/utils/types';
+} from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/VirtualizationFeaturesContext/utils/types';
 import {
   isArrayOfStrings,
   parseJSONAnnotation,
-} from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/hooks/useVirtualizationOperators/utils/utils';
+} from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/VirtualizationFeaturesContext/utils/utils';
 import {
   CONSOLE_OPERATOR_CONFIG_NAME,
   RED_HAT_CATALOG_SOURCE,

@@ -6,7 +6,7 @@ import {
   FENCE_AGENTS_OPERATOR_NAME,
   NODE_HEALTH_OPERATOR_NAME,
 } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/constants';
-import { OperatorDetailsMap } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/hooks/useVirtualizationOperators/utils/types';
+import { OperatorDetailsMap } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/VirtualizationFeaturesContext/utils/types';
 import FeatureSummaryItem from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/VirtualizationFeaturesWizard/components/SummaryStep/components/FeatureSummaryItem/FeatureSummaryItem';
 import { getHighAvailabilityInstallState } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/VirtualizationFeaturesWizard/components/SummaryStep/components/HighAvailabilitySection/utils/utils';
 import SummaryStatusIcon from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/VirtualizationFeaturesWizard/components/SummaryStep/components/SummaryStatusIcon/SummaryStatusIcon';
