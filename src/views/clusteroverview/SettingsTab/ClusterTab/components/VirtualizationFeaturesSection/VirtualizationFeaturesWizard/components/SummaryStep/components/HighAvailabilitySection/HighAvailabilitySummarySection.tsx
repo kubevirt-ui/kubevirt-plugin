@@ -31,21 +31,20 @@ const HighAvailabilitySummarySection: FC<HighAvailabilitySummarySectionProps> = 
     <ExpandSectionWithCustomToggle
       customContent={<SummaryStatusIcon computedInstallState={jointInstallState} />}
       id="high-availability-summary-section"
-      isIndented
       toggleClassname="high-availability-summary-section__toggle"
       toggleContent={t('High availability')}
     >
-      <Stack hasGutter>
+      <Stack className="pf-v6-u-pl-xl" hasGutter>
         <StackItem>
           <FeatureSummaryItem
-            iconClassName="high-availability-summary-section__status-icon"
+            isIndented
             operatorLabel={t('Node Health Check (NHC)')}
             operatorName={NODE_HEALTH_OPERATOR_NAME}
           />
         </StackItem>
         <StackItem>
           <FeatureSummaryItem
-            iconClassName="high-availability-summary-section__status-icon"
+            isIndented
             operatorLabel={t('Fence Agents Remediation (FAR)')}
             operatorName={FENCE_AGENTS_OPERATOR_NAME}
           />

@@ -1,3 +1,4 @@
+import { getName } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { InstallState } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/types';
 
@@ -44,7 +45,7 @@ const useVirtualizationOperators: UseVirtualizationOperators = () => {
       // if a package does not have status.defaultChannel, exclude it so the app doesn't fail
       if (!defaultChannel) {
         kubevirtConsole.warn(
-          `PackageManifest ${pkg.metadata.name} has no status.defaultChannel and has been excluded`,
+          `PackageManifest ${getName(pkg)} has no status.defaultChannel and has been excluded`,
         );
         return false;
       }
@@ -70,7 +71,7 @@ const useVirtualizationOperators: UseVirtualizationOperators = () => {
 
       return {
         installState,
-        name: currentCSVDesc?.displayName ?? pkg.metadata.name,
+        name: currentCSVDesc?.displayName ?? getName(pkg),
         obj: pkg,
         source: getPackageSource(pkg),
         subscription,

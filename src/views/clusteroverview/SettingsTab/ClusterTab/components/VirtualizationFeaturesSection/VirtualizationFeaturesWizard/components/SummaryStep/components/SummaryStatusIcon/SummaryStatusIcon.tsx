@@ -1,5 +1,4 @@
 import React, { FC } from 'react';
-import classNames from 'classnames';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -19,15 +18,10 @@ import './SummaryStatusIcon.scss';
 
 type SummaryStatusIconProps = {
   computedInstallState?: InstallState;
-  iconClassName?: string;
   operatorName?: VirtualizationFeatureOperators;
 };
 
-const SummaryStatusIcon: FC<SummaryStatusIconProps> = ({
-  computedInstallState,
-  iconClassName = '',
-  operatorName,
-}) => {
+const SummaryStatusIcon: FC<SummaryStatusIconProps> = ({ computedInstallState, operatorName }) => {
   const { t } = useKubevirtTranslation();
   const { operatorDetailsMap, operatorsToInstall } = useVirtualizationFeaturesContext();
   const { installState: operatorInstallState, operatorHubURL } =
@@ -40,11 +34,7 @@ const SummaryStatusIcon: FC<SummaryStatusIconProps> = ({
 
   return (
     <Split className="summary-status-icon">
-      <SplitItem
-        className={classNames('summary-status-icon__icon', iconClassName, {
-          'summary-status-icon__icon-margin': !iconClassName,
-        })}
-      >
+      <SplitItem className="summary-status-icon__icon summary-status-icon__icon-margin">
         {Icon && <Icon />}
       </SplitItem>
       <SplitItem className="summary-status-icon__message">{message}</SplitItem>

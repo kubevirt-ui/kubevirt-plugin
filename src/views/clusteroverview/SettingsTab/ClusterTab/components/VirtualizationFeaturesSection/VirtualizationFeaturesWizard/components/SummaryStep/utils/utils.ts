@@ -6,13 +6,6 @@ import InstalledIcon from '@overview/SettingsTab/ClusterTab/components/Virtualiz
 import NotInstalledIcon from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/VirtualizationFeaturesWizard/components/SummaryStep/components/icons/NotInstalledIcon';
 import { InProgressIcon, UnknownIcon } from '@patternfly/react-icons';
 
-export const installStateIconAndMessage = {
-  [InstallState.FAILED]: { Icon: FailedInstallIcon, message: t('Failed') },
-  [InstallState.INSTALLED]: { Icon: InstalledIcon, message: t('Installed') },
-  [InstallState.INSTALLING]: { Icon: InProgressIcon, message: '' },
-  [InstallState.NOT_INSTALLED]: { Icon: NotInstalledIcon, message: t('Not configured') },
-};
-
 export const installStateIcon = {
   [InstallState.FAILED]: FailedInstallIcon,
   [InstallState.INSTALLED]: InstalledIcon,

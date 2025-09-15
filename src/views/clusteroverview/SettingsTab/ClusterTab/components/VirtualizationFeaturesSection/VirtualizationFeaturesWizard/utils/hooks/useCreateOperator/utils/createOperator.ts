@@ -64,8 +64,7 @@ export const createOperator = async (
   const suggestedNamespace = currentCSVDesc?.annotations?.[SUGGESTED_NAMESPACE_ANNOTATION_KEY];
   const suggestedNamespaceTemplate =
     getSuggestedNamespaceTemplate(currentCSVDesc.annotations, {
-      // eslint-disable-next-line no-console
-      onError: () => console.error('Could not parse JSON annotation.'),
+      onError: () => kubevirtConsole.error('Could not parse JSON annotation.'),
     }) ?? {};
   const suggestedNamespaceTemplateName = getName(suggestedNamespaceTemplate);
   const targetNamespace = suggestedNamespaceTemplateName || suggestedNamespace;
@@ -73,7 +72,6 @@ export const createOperator = async (
   const approval = InstallPlanApproval.Automatic;
   const selectedInstallMode = getDefaultInstallMode(packageManifest, updateChannelName);
 
-  // Clear any previous errors.
   const defaultNS: K8sResourceCommon = {
     metadata: {
       labels:
@@ -113,7 +111,6 @@ export const createOperator = async (
 
   try {
     if (!namespaceExists) {
-      // TODO Check for existence
       await k8sCreate({ data: ns, model: NamespaceModel }).catch((err) =>
         kubevirtConsole.error('Error: ', err),
       );
