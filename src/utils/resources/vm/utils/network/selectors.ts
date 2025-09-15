@@ -1,11 +1,14 @@
 import { V1Interface, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { getInterfaces } from '@kubevirt-utils/resources/vm';
+import { getAutoAttachPodInterface, getInterfaces } from '@kubevirt-utils/resources/vm';
 import { isNetworkInterfaceState } from '@kubevirt-utils/utils/typeGuards';
 
 import { NO_DATA_DASH, PASST_BINDING_NAME, UDN_BINDING_NAME } from '../constants';
 
 import { interfaceTypesProxy } from './constants';
 import { NetworkInterfaceState } from './types';
+
+export const hasAutoAttachedPodNetwork = (vm: V1VirtualMachine): boolean =>
+  getAutoAttachPodInterface(vm) !== false;
 
 /**
  * function to get network interface type
