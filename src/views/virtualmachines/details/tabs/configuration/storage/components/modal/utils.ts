@@ -21,6 +21,10 @@ import {
   DEFAULT_CDROM_DISK_SIZE,
   UPLOAD_SUFFIX,
 } from '@kubevirt-utils/components/DiskModal/utils/constants';
+import {
+  UPLOAD_MODE_SELECT,
+  UPLOAD_MODE_UPLOAD,
+} from '@kubevirt-utils/components/DiskModal/utils/constants';
 import { InterfaceTypes, V1DiskFormState } from '@kubevirt-utils/components/DiskModal/utils/types';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import {
@@ -35,9 +39,6 @@ import { ARCHITECTURE_LABEL } from '@kubevirt-utils/utils/architecture';
 import { ensurePath, generatePrettyName, isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sGet } from '@multicluster/k8sRequests';
-
-const UPLOAD_MODE_SELECT = 'select';
-const UPLOAD_MODE_UPLOAD = 'upload';
 
 const getBootableVolumeDraft = (
   diskObj: DiskRowDataLayout,
