@@ -7,17 +7,14 @@ import {
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceNetworkInterface,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import {
-  getAutoAttachPodInterface,
-  getInterface,
-  getInterfaces,
-} from '@kubevirt-utils/resources/vm';
+import { getInterface, getInterfaces } from '@kubevirt-utils/resources/vm';
 import { DEFAULT_NETWORK_INTERFACE } from '@kubevirt-utils/resources/vm/utils/constants';
 import { interfaceTypesProxy } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import {
   getNetworkInterface,
   getNetworkInterfaceState,
   getNetworkInterfaceType,
+  hasAutoAttachedPodNetwork,
 } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
 import { getVMIInterfaces, getVMIStatusInterfaces } from '@kubevirt-utils/resources/vmi';
@@ -77,7 +74,7 @@ export const isPendingNICRemoval = (
 
   const isVMRunning = isRunning(vm);
 
-  const autoAttachPodInterface = getAutoAttachPodInterface(vm) !== false;
+  const autoAttachPodInterface = hasAutoAttachedPodNetwork(vm);
 
   if (
     autoAttachPodInterface &&

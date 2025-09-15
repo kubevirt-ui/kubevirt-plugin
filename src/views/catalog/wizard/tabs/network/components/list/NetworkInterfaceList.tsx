@@ -2,12 +2,9 @@ import * as React from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import useNetworkColumns from '@kubevirt-utils/hooks/useNetworkColums';
-import {
-  getAutoAttachPodInterface,
-  getInterfaces,
-  getNetworks,
-} from '@kubevirt-utils/resources/vm';
+import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
 import { getNetworkInterfaceRowData } from '@kubevirt-utils/resources/vm/utils/network/rowData';
+import { hasAutoAttachedPodNetwork } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import {
   ListPageFilter,
   useListPageFilter,
@@ -31,7 +28,7 @@ const NetworkInterfaceList: React.FC<NetworkInterfaceListProps> = ({ onUpdateVM,
   const networkInterfacesData = getNetworkInterfaceRowData(
     networks,
     interfaces,
-    getAutoAttachPodInterface(vm) !== false,
+    hasAutoAttachedPodNetwork(vm),
   );
   const [data, filteredData, onFilterChange] = useListPageFilter(networkInterfacesData, filters);
 

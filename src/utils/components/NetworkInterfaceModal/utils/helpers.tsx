@@ -5,12 +5,7 @@ import produce from 'immer';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1Interface, V1Network, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TechPreviewBadge from '@kubevirt-utils/components/TechPreviewBadge/TechPreviewBadge';
-import {
-  getAutoAttachPodInterface,
-  getInterface,
-  getInterfaces,
-  getNetworks,
-} from '@kubevirt-utils/resources/vm';
+import { getInterface, getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
 import {
   PASST_BINDING_NAME,
   POD_NETWORK,
@@ -21,6 +16,7 @@ import {
   interfaceTypesProxy,
   NetworkPresentation,
 } from '@kubevirt-utils/resources/vm/utils/network/constants';
+import { hasAutoAttachedPodNetwork } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
@@ -31,7 +27,7 @@ import { NetworkAttachmentDefinition } from '../components/hooks/types';
 
 export const podNetworkExists = (vm: V1VirtualMachine): boolean =>
   !!vm?.spec?.template?.spec?.networks?.find((network) => typeof network.pod === 'object') ||
-  getAutoAttachPodInterface(vm) !== false;
+  hasAutoAttachedPodNetwork(vm);
 
 export const isPodNetworkName = (networkName: string): boolean => networkName === POD_NETWORK;
 
@@ -180,7 +176,7 @@ export const deleteNetworkInterface = (
   nicPresentation: NetworkPresentation,
 ) => {
   const vmInterfaces = getInterfaces(vm);
-  const noAutoAttachPodInterface = getAutoAttachPodInterface(vm) === false;
+  const noAutoAttachPodInterface = !hasAutoAttachedPodNetwork(vm);
   const isDefaultInterface = noAutoAttachPodInterface && vmInterfaces?.[0]?.name === nicName;
 
   const isHotPlug = Boolean(nicPresentation?.iface?.bridge);
