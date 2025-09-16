@@ -40,6 +40,7 @@ const metadata: ConsolePluginBuildMetadata = {
     TemplateNavPage: './views/templates/details/TemplateNavPage.tsx',
     useVirtualMachineInstanceActionsProvider:
       './views/virtualmachinesinstance/actions/hooks/useVirtualMachineInstanceActionsProvider.tsx',
+    VirtualizationLandingPage: 'src/perspective/VirtualizationLandingPage.tsx',
     VirtualMachinesInstancePage:
       './views/virtualmachinesinstance/details/VirtualMachinesInstancePage.tsx',
     VirtualMachinesInstancesList:

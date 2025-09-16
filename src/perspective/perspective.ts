@@ -11,6 +11,9 @@ export const icon: ResolvedExtension<Perspective>['properties']['icon'] = {
 export const getLandingPageURL: ResolvedExtension<Perspective>['properties']['landingPageURL'] =
   () => `/k8s/all-namespaces/virtualization-overview`;
 
+export const getVirtualizationLandingPageURL: ResolvedExtension<Perspective>['properties']['landingPageURL'] =
+  () => `/k8s/virtualization-landing`;
+
 export const getImportRedirectURL: ResolvedExtension<Perspective>['properties']['importRedirectURL'] =
   (namespace: string) => `/k8s/ns/${namespace}/virtualization-overview`;
 
