@@ -4,7 +4,7 @@ import {
   V1VirtualMachine,
   V1Volume,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { isInstanceTypeVM } from '@kubevirt-utils/resources/instancetype/helper';
+import { isExpandableSpecVM } from '@kubevirt-utils/resources/instancetype/helper';
 import { getName } from '@kubevirt-utils/resources/shared';
 import {
   getBootDisk,
@@ -60,7 +60,7 @@ export const getDefaultEditValues = (
     (dv) => getName(dv) === volumeToEdit?.dataVolume?.name,
   );
 
-  if (isEmpty(diskToEdit) && isInstanceTypeVM(vm)) diskToEdit = { name: editDiskName };
+  if (isEmpty(diskToEdit) && isExpandableSpecVM(vm)) diskToEdit = { name: editDiskName };
 
   return {
     dataVolumeTemplate,

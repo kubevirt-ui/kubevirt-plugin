@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import useDeepCompareMemoize from '@kubevirt-utils/hooks/useDeepCompareMemoize/useDeepCompareMemoize';
-import { isInstanceTypeVM } from '@kubevirt-utils/resources/instancetype/helper';
+import { isExpandableSpecVM } from '@kubevirt-utils/resources/instancetype/helper';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { consoleFetch } from '@openshift-console/dynamic-plugin-sdk';
@@ -19,7 +19,7 @@ const useInstanceTypeExpandSpec: UseInstanceTypeExpandSpec = (vm) => {
   const [instanceTypeExpandedSpec, setInstanceTypeExpandedSpec] = useState<V1VirtualMachine>();
   const [loadingExpandedSpec, setLoadingExpandedSpec] = useState<boolean>();
   const [errorExpandedSpec, setErrorExpandedSpec] = useState<Error>();
-  const isInstanceType = useMemo(() => isInstanceTypeVM(vm), [vm]);
+  const isExpandableSpec = useMemo(() => isExpandableSpecVM(vm), [vm]);
   const innerVM = useDeepCompareMemoize(vm);
 
   useEffect(() => {
@@ -42,8 +42,8 @@ const useInstanceTypeExpandSpec: UseInstanceTypeExpandSpec = (vm) => {
         setLoadingExpandedSpec(false);
       }
     };
-    !isEmpty(innerVM) && isInstanceType && fetch();
-  }, [innerVM, isInstanceType]);
+    !isEmpty(innerVM) && isExpandableSpec && fetch();
+  }, [isExpandableSpec, innerVM]);
 
   return [instanceTypeExpandedSpec, loadingExpandedSpec, errorExpandedSpec];
 };

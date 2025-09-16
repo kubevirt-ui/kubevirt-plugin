@@ -41,7 +41,8 @@ const VirtualMachineNavPage: React.FC<VirtualMachineDetailsPageProps> = ({
 
   const vmToShow = runningTourSignal.value ? tourGuideVM : vm;
 
-  const [instanceTypeExpandedSpec, expandedSpecLoading] = useInstanceTypeExpandSpec(vmToShow);
+  const [instanceTypeExpandedSpec, expandedSpecLoading, expandedSpecError] =
+    useInstanceTypeExpandSpec(vmToShow);
 
   const pages = useVirtualMachineTabs();
 
@@ -56,7 +57,7 @@ const VirtualMachineNavPage: React.FC<VirtualMachineDetailsPageProps> = ({
       />
       <div className="VirtualMachineNavPage--tabs__main">
         <HorizontalNavbar
-          error={loadError}
+          error={loadError || expandedSpecError}
           instanceTypeExpandedSpec={instanceTypeExpandedSpec}
           loaded={isLoaded && !expandedSpecLoading}
           pages={pages}
