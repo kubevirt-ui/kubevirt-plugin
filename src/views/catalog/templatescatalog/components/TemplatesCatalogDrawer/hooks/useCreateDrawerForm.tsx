@@ -127,7 +127,7 @@ const useCreateDrawerForm = (
 
   const [hyperConverge] = useHyperConvergeConfiguration();
   const enableMultiArchBootImageImport =
-    hyperConverge.spec.featureGates?.enableMultiArchBootImageImport;
+    hyperConverge?.spec?.featureGates?.enableMultiArchBootImageImport;
 
   const storageClassRequiredMissing = storageClassRequired && isEmpty(storageClassName);
 
