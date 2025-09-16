@@ -338,3 +338,11 @@ export const isHeadlessMode = (vm: V1VirtualMachine | V1VirtualMachineInstance) 
 
 export const getArchitecture = (vm: V1VirtualMachine): string =>
   vm?.spec?.template?.spec?.architecture;
+
+/**
+ * A selector that returns the VM template's annotations
+ * @param {V1VirtualMachine} vm the virtual machine
+ * @returns {{ [key: string]: string }} the VM template's annotations
+ */
+export const getVMTemplateAnnotations = (vm: V1VirtualMachine): { [key: string]: string } =>
+  vm?.spec?.template?.metadata?.annotations;
