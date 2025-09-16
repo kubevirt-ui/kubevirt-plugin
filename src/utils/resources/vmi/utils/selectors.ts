@@ -70,3 +70,5 @@ export const getNetworkInterfaceState = (
 
 export const getVMIArchitecture = (vmi: V1VirtualMachineInstance): string =>
   vmi?.spec?.architecture;
+
+export const getVMIDisks = (vmi: V1VirtualMachineInstance) => vmi?.spec?.domain?.devices?.disks;

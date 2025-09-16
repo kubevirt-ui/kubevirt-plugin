@@ -108,7 +108,6 @@
   "Add a volume already available on the cluster.": "添加集群中已经可用的卷。",
   "Add affinity rule": "添加关联性规则",
   "Add CD-ROM": "Add CD-ROM",
-  "Add CD-ROM to the cluster": "Add CD-ROM to the cluster",
   "Add Config Map, Secret, or Service Account": "添加配置映射、Secret 或服务帐户",
   "Add configuration": "添加配置",
   "Add disk": "添加磁盘",

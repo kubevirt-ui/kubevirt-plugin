@@ -49,6 +49,7 @@ import { getVMIBootDisk } from '@kubevirt-utils/resources/vmi/utils/discs';
 import {
   getVMIBootLoader,
   getVMIDevices,
+  getVMIDisks,
   getVMIInterfaces,
   getVMINetworks,
   getVMIVolumes,
@@ -151,6 +152,19 @@ export const getChangedEnvDisks = (
   ];
 
   return changedEnvDisks;
+};
+
+export const getChangedCDROMs = (vm: V1VirtualMachine, vmi: V1VirtualMachineInstance): string[] => {
+  if (isEmpty(vm) || isEmpty(vmi)) {
+    return [];
+  }
+
+  const vmDisks = getDisks(vm) || [];
+  const vmiDisks = getVMIDisks(vmi) || [];
+  const vmiDiskNames = vmiDisks?.map((disk) => disk.name);
+  const vmChangedCDROMs = vmDisks.filter((disk) => disk.cdrom && !vmiDiskNames.includes(disk.name));
+
+  return vmChangedCDROMs.map((disk) => `${disk.name}`);
 };
 
 export const getDefaultInterfaceModel = (vmi: V1VirtualMachineInstance): string => {

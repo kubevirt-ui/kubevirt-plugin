@@ -116,7 +116,6 @@
   "Add a volume already available on the cluster.": "Agregue un volumen ya disponible en el clúster.",
   "Add affinity rule": "Agregar regla de afinidad",
   "Add CD-ROM": "Add CD-ROM",
-  "Add CD-ROM to the cluster": "Add CD-ROM to the cluster",
   "Add Config Map, Secret, or Service Account": "Agregar mapa de configuración, secreto o cuenta de servicio",
   "Add configuration": "Agregar configuración",
   "Add disk": "Agregar disco",

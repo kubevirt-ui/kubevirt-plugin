@@ -108,7 +108,6 @@
   "Add a volume already available on the cluster.": "클러스터에서 이미 사용 가능한 볼륨을 추가합니다.",
   "Add affinity rule": "유사성 규칙 추가",
   "Add CD-ROM": "Add CD-ROM",
-  "Add CD-ROM to the cluster": "Add CD-ROM to the cluster",
   "Add Config Map, Secret, or Service Account": "구성 맵, 시크릿 또는 서비스 계정 추가",
   "Add configuration": "설정 추가",
   "Add disk": "디스크 추가",
