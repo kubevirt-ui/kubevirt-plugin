@@ -30,7 +30,7 @@ const useGeneratedVM = () => {
   const [isUDNManagedNamespace] = useNamespaceUDN(getValidNamespace(namespace));
   const [hyperConverge] = useHyperConvergeConfiguration();
   const enableMultiArchBootImageImport =
-    hyperConverge.spec.featureGates?.enableMultiArchBootImageImport;
+    hyperConverge?.spec?.featureGates?.enableMultiArchBootImageImport;
   const generatedVM = useMemo(
     () =>
       generateVM({
