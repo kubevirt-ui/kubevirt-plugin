@@ -38,7 +38,7 @@ import {
   UDN_BINDING_NAME,
 } from '@kubevirt-utils/resources/vm/utils/constants';
 import { OS_WINDOWS_PREFIX } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
-import { getArchitecture, NODE_ARCHITECTURE_LABEL } from '@kubevirt-utils/utils/architecture';
+import { getArchitecture } from '@kubevirt-utils/utils/architecture';
 import {
   HEADLESS_SERVICE_LABEL,
   HEADLESS_SERVICE_NAME,
@@ -102,6 +102,7 @@ export const createPopulatedCloudInitYAML = (
 type GenerateVMArgs = {
   autoUpdateEnabled?: boolean;
   cluster?: string;
+  enableMultiArchBootImageImport?: boolean;
   instanceTypeState: InstanceTypeVMState;
   isUDNManagedNamespace: boolean;
   startVM: boolean;
@@ -113,6 +114,7 @@ type GenerateVMCallback = (props: GenerateVMArgs) => V1VirtualMachine;
 export const generateVM: GenerateVMCallback = ({
   autoUpdateEnabled,
   cluster,
+  enableMultiArchBootImageImport,
   instanceTypeState,
   isUDNManagedNamespace,
   startVM,
@@ -207,11 +209,10 @@ export const generateVM: GenerateVMCallback = ({
           labels: {},
         },
         spec: {
-          ...(!isEmpty(volumeArchitecture) && {
-            nodeSelector: {
-              [NODE_ARCHITECTURE_LABEL]: volumeArchitecture,
-            },
-          }),
+          ...(!isEmpty(volumeArchitecture) &&
+            enableMultiArchBootImageImport && {
+              architecture: volumeArchitecture,
+            }),
           domain: {
             devices: {
               autoattachPodInterface: false,

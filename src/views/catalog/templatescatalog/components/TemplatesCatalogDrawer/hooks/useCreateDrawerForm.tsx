@@ -34,6 +34,7 @@ import {
 } from '@kubevirt-utils/extensions/telemetry/utils/constants';
 import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
+import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
 import {
@@ -56,7 +57,7 @@ import {
   DEFAULT_NETWORK_INTERFACE,
   UDN_BINDING_NAME,
 } from '@kubevirt-utils/resources/vm/utils/constants';
-import { getArchitecture, NODE_ARCHITECTURE_LABEL } from '@kubevirt-utils/utils/architecture';
+import { getArchitecture } from '@kubevirt-utils/utils/architecture';
 import {
   HEADLESS_SERVICE_LABEL,
   HEADLESS_SERVICE_NAME,
@@ -123,6 +124,10 @@ const useCreateDrawerForm = (
     resource: ProcessedTemplatesModel.plural,
     verb: 'create',
   });
+
+  const [hyperConverge] = useHyperConvergeConfiguration();
+  const enableMultiArchBootImageImport =
+    hyperConverge?.spec?.featureGates?.enableMultiArchBootImageImport;
 
   const storageClassRequiredMissing = storageClassRequired && isEmpty(storageClassName);
 
@@ -195,6 +200,7 @@ const useCreateDrawerForm = (
         overrides: {
           autoUpdateEnabled,
           cluster,
+          enableMultiArchBootImageImport,
           isDisabledGuestSystemLogs,
           isUDNManagedNamespace,
           name: nameField,
@@ -292,10 +298,8 @@ const useCreateDrawerForm = (
         }
 
         const templateArchitecture = getArchitecture(processedTemplate);
-        if (!isEmpty(templateArchitecture)) {
-          vmDraft.spec.template.spec.nodeSelector = {
-            [NODE_ARCHITECTURE_LABEL]: templateArchitecture,
-          };
+        if (!isEmpty(templateArchitecture) && enableMultiArchBootImageImport) {
+          vmDraft.spec.template.spec.architecture = templateArchitecture;
         }
       });
 
