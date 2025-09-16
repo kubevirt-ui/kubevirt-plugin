@@ -47,7 +47,7 @@ const HighAvailabilityFeatureItem: FC<HighAvailabilityFeatureItemProps> = ({
               className="high-availability-feature-item__checkbox"
               id={`${operatorName}-checkbox`}
               isChecked={operatorsToInstall?.[operatorName]}
-              isDisabled={alternativeChecked}
+              isDisabled={alternativeChecked || installed}
               label={checkboxLabel}
               onChange={(_, checked) => updateInstallRequests({ [operatorName]: checked })}
             />
@@ -65,6 +65,7 @@ const HighAvailabilityFeatureItem: FC<HighAvailabilityFeatureItemProps> = ({
           className="high-availability-feature-item__alternative-checkbox"
           id={`${operatorName}-alternative-checkbox`}
           isChecked={alternativeChecked}
+          isDisabled={installed}
           onChange={handleAlternativeOptionUpdate}
         />
         <div className="high-availability-feature-item__description">{description}</div>

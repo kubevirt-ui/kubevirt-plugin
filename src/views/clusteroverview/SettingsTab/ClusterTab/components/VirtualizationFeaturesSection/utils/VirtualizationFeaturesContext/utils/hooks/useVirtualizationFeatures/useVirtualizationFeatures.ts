@@ -39,7 +39,7 @@ export const useVirtualizationFeatures: UseVirtualizationFeatures = () => {
 
   const virtFeatureOperatorItems = getVirtualizationFeatureItems(operatorResources);
   const operatorItemsMap = groupOperatorItems(virtFeatureOperatorItems);
-  const operatorDetailsMap = getOperatorData(operatorItemsMap);
+  const operatorDetailsMap = getOperatorData(operatorItemsMap, operatorsToInstall);
 
   return {
     operatorDetailsMap,

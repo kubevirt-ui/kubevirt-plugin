@@ -13,12 +13,14 @@ import {
 } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/constants';
 import {
   InstallState,
+  OperatorsToInstall,
   VirtualizationFeatureOperators,
 } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/types';
 import {
   installFailed,
   isInstalled,
   isInstalling,
+  isNotInstalled,
 } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/utils';
 import { INSTALL_SUCCEEDED_STATUS } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/VirtualizationFeaturesContext/utils/constants';
 import {
@@ -146,9 +148,14 @@ export const computeInstallState = (
   return InstallState.NOT_INSTALLED;
 };
 
-const getInstallStatus = (operators: VirtFeatureOperatorItem[]): InstallState => {
+const getInstallStatus = (
+  operators: VirtFeatureOperatorItem[],
+  toBeInstalled: boolean,
+): InstallState => {
   const installed = operators?.some((item) => isInstalled(item?.installState));
-  const installing = operators?.some((item) => isInstalling(item?.installState));
+  const installing =
+    operators?.some((item) => isInstalling(item?.installState)) ||
+    (toBeInstalled && operators?.some((item) => isNotInstalled(item?.installState)));
   const failed = operators?.some((item) => installFailed(item?.installState));
 
   if (installed) return InstallState.INSTALLED;
@@ -160,12 +167,15 @@ const getInstallStatus = (operators: VirtFeatureOperatorItem[]): InstallState =>
 
 export const getOperatorData = (
   operatorItemsMap: VirtFeatureOperatorItemsMap,
+  operatorsToInstall: OperatorsToInstall,
 ): OperatorDetailsMap => {
   const operatorsData = isEmpty(operatorItemsMap)
     ? defaultVirtFeatureOperatorItemsMap
     : Object.entries(operatorItemsMap).reduce((acc, [operatorName, operatorItems]) => {
         acc[operatorName] = {
-          installState: getInstallStatus(operatorItems) || InstallState.UNKNOWN,
+          installState:
+            getInstallStatus(operatorItems, operatorsToInstall[operatorName]) ||
+            InstallState.UNKNOWN,
           operatorHubURL: getOperatorHubURL(operatorItems?.[0]?.uid) || undefined,
         };
 

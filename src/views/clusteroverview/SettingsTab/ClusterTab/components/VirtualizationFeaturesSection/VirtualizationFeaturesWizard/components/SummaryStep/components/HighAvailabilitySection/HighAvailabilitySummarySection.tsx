@@ -29,7 +29,7 @@ const HighAvailabilitySummarySection: FC<HighAvailabilitySummarySectionProps> = 
 
   return (
     <ExpandSectionWithCustomToggle
-      customContent={<SummaryStatusIcon computedInstallState={jointInstallState} />}
+      customContent={<SummaryStatusIcon installState={jointInstallState} />}
       id="high-availability-summary-section"
       toggleClassname="high-availability-summary-section__toggle"
       toggleContent={t('High availability')}
