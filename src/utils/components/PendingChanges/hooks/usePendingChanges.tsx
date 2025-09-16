@@ -10,7 +10,6 @@ import BootOrderModal from '@kubevirt-utils/components/BootOrderModal/BootOrderM
 import CloudinitModal from '@kubevirt-utils/components/CloudinitModal/CloudinitModal';
 import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CPUMemoryModal';
 import DedicatedResourcesModal from '@kubevirt-utils/components/DedicatedResourcesModal/DedicatedResourcesModal';
-import DeschedulerModal from '@kubevirt-utils/components/DeschedulerModal/DeschedulerModal';
 import { EVICTION_STRATEGY_DEFAULT } from '@kubevirt-utils/components/EvictionStrategy/constants';
 import EvictionStrategyModal from '@kubevirt-utils/components/EvictionStrategy/EvictionStrategyModal';
 import FirmwareBootloaderModal from '@kubevirt-utils/components/FirmwareBootloaderModal/FirmwareBootloaderModal';
@@ -33,7 +32,6 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { isInstanceTypeVM } from '@kubevirt-utils/resources/instancetype/helper';
 import { getCPU, getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
-import { DESCHEDULER_EVICT_LABEL } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sUpdate, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { updatedInstanceType } from '@virtualmachines/details/tabs/configuration/details/utils/utils';
@@ -48,7 +46,6 @@ import {
   getChangedAuthorizedSSHKey,
   getChangedCloudInit,
   getChangedDedicatedResources,
-  getChangedDescheduler,
   getChangedEnvDisks,
   getChangedEvictionStrategy,
   getChangedGPUDevices,
@@ -110,11 +107,6 @@ export const usePendingChanges = (
   const nodeSelectorChanged = getChangedNodeSelector(vm, vmi);
   const tolerationsChanged = getChangedTolerations(vm, vmi);
   const affinityChanged = getChangedAffinity(vm, vmi);
-  const deschedulerChanged = getChangedDescheduler(
-    vm,
-    vmi,
-    !!vm?.spec?.template?.metadata?.annotations?.[DESCHEDULER_EVICT_LABEL] || false,
-  );
   const cloudInitChanged = getChangedCloudInit(vm, vmi);
   const sshServiceChanged = getChangedAuthorizedSSHKey(vm, vmi);
 
@@ -364,21 +356,6 @@ export const usePendingChanges = (
       ),
       hasPendingChange: affinityChanged,
       label: t('Affinity rules'),
-    },
-    {
-      ...createProps(VirtualMachineDetailsTab.Scheduling, () =>
-        createModal(({ isOpen, onClose }) => (
-          <DeschedulerModal
-            isOpen={isOpen}
-            onClose={onClose}
-            onSubmit={onSubmit}
-            vm={vm}
-            vmi={vmi}
-          />
-        )),
-      ),
-      hasPendingChange: deschedulerChanged,
-      label: t('Descheduler'),
     },
     {
       ...createProps(VirtualMachineDetailsTab.SSH, () =>

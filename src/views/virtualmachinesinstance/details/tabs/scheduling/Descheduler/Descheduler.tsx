@@ -1,18 +1,19 @@
-import * as React from 'react';
+import { FC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { isDeschedulerEnabled } from '@kubevirt-utils/hooks/useDeschedulerSetting/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { DESCHEDULER_EVICT_LABEL } from '@kubevirt-utils/resources/vmi';
+import { getAnnotations } from '@kubevirt-utils/resources/shared';
 
 type DeschedulerProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const Descheduler: React.FC<DeschedulerProps> = ({ vmi }) => {
+const Descheduler: FC<DeschedulerProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
-  const deschedulerLabel = Boolean(vmi?.metadata?.annotations?.[DESCHEDULER_EVICT_LABEL]);
+  const deschedulerEnabled = isDeschedulerEnabled(getAnnotations(vmi));
 
-  return deschedulerLabel ? t('ON') : t('OFF');
+  return deschedulerEnabled ? t('ON') : t('OFF');
 };
 
 export default Descheduler;

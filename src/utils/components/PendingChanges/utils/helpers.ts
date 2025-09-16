@@ -41,10 +41,7 @@ import {
 import { getNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { getInterfacesAndNetworks } from '@kubevirt-utils/resources/vm/utils/network/utils';
 import { isWindows } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
-import {
-  DESCHEDULER_EVICT_LABEL,
-  getEvictionStrategy as getVMIEvictionStrategy,
-} from '@kubevirt-utils/resources/vmi';
+import { getEvictionStrategy as getVMIEvictionStrategy } from '@kubevirt-utils/resources/vmi';
 import { getVMIBootDisk } from '@kubevirt-utils/resources/vmi/utils/discs';
 import {
   getVMIBootLoader,
@@ -377,21 +374,6 @@ export const getChangedAffinity = (
   const vmiAffinity = vmi?.spec?.affinity || {};
 
   return !isEqualObject(vmAffinity, vmiAffinity);
-};
-
-export const getChangedDescheduler = (
-  vm: V1VirtualMachine,
-  vmi: V1VirtualMachineInstance,
-  currentSelection: boolean,
-): boolean => {
-  if (isEmpty(vm) || isEmpty(vmi)) {
-    return false;
-  }
-
-  const vmDescheduler = !!vm?.spec?.template?.metadata?.annotations?.[DESCHEDULER_EVICT_LABEL];
-  const vmiDescheduler = !!vmi?.metadata?.annotations?.[DESCHEDULER_EVICT_LABEL];
-
-  return vmDescheduler !== vmiDescheduler || currentSelection !== vmiDescheduler;
 };
 
 export const getChangedCloudInit = (
