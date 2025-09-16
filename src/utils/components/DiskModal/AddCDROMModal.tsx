@@ -1,6 +1,7 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { FormProvider, useForm, useWatch } from 'react-hook-form';
 
+import { FORM_FIELD_UPLOAD_FILE } from '@kubevirt-utils/components/DiskModal/utils/constants';
 import { PendingChangesAlert } from '@kubevirt-utils/components/PendingChanges/PendingChangesAlert/PendingChangesAlert';
 import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -44,14 +45,22 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
   });
 
   const {
+    clearErrors,
     control,
     formState: { errors, isSubmitting },
     getValues,
+    setValue,
   } = methods;
 
-  const uploadFile = useWatch({ control, name: 'uploadFile' });
+  const uploadFile = useWatch({ control, name: FORM_FIELD_UPLOAD_FILE });
   const hasUploadFile = !isEmpty(uploadFile);
   const hasFormErrors = !isEmpty(errors);
+
+  useEffect(() => {
+    if (!uploadEnabled) {
+      clearErrors(FORM_FIELD_UPLOAD_FILE);
+    }
+  }, [uploadEnabled, setValue]);
 
   const isFormValid = !hasFormErrors && (!uploadEnabled || hasUploadFile);
 
