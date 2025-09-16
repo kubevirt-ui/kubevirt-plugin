@@ -263,6 +263,15 @@ const extensions: EncodedExtension[] = [
     type: 'console.page/route',
   },
   {
+    properties: {
+      component: {
+        $codeRef: 'VirtualizationLandingPage',
+      },
+      path: ['/k8s/virtualization-landing'],
+    },
+    type: 'console.page/route',
+  },
+  {
     flags: {
       required: ['KUBEVIRT_DYNAMIC'],
     },
