@@ -10,6 +10,7 @@ type UseAlternativeOptionCheckboxProps = {
   className?: string;
   id: string;
   isChecked: boolean;
+  isDisabled?: boolean;
   onChange: (isChecked: boolean) => void;
 };
 
@@ -17,6 +18,7 @@ const UseAlternativeOptionCheckbox: FC<UseAlternativeOptionCheckboxProps> = ({
   className,
   id,
   isChecked,
+  isDisabled,
   onChange,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -32,6 +34,7 @@ const UseAlternativeOptionCheckbox: FC<UseAlternativeOptionCheckboxProps> = ({
           }
           id={id}
           isChecked={isChecked}
+          isDisabled={isDisabled}
           onChange={(_, checked) => onChange(checked)}
         />
       </SplitItem>

@@ -1,14 +1,9 @@
 import React, { FC } from 'react';
-import classNames from 'classnames';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  InstallState,
-  VirtualizationFeatureOperators,
-} from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/types';
+import { InstallState } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/types';
 import { installFailed } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/utils';
-import { useVirtualizationFeaturesContext } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/VirtualizationFeaturesContext/VirtualizationFeaturesContext';
 import {
   getInstallStateIcon,
   getInstallStateMessage,
@@ -18,33 +13,19 @@ import { Split, SplitItem } from '@patternfly/react-core';
 import './SummaryStatusIcon.scss';
 
 type SummaryStatusIconProps = {
-  computedInstallState?: InstallState;
-  iconClassName?: string;
-  operatorName?: VirtualizationFeatureOperators;
+  installState?: InstallState;
+  operatorHubURL?: string;
 };
 
-const SummaryStatusIcon: FC<SummaryStatusIconProps> = ({
-  computedInstallState,
-  iconClassName = '',
-  operatorName,
-}) => {
+const SummaryStatusIcon: FC<SummaryStatusIconProps> = ({ installState, operatorHubURL }) => {
   const { t } = useKubevirtTranslation();
-  const { operatorDetailsMap, operatorsToInstall } = useVirtualizationFeaturesContext();
-  const { installState: operatorInstallState, operatorHubURL } =
-    operatorDetailsMap?.[operatorName] || {};
-  const installState = operatorInstallState || computedInstallState;
-  const toBeInstalled = operatorsToInstall[operatorName];
 
-  const Icon = getInstallStateIcon(installState, toBeInstalled);
-  const message = getInstallStateMessage(installState, toBeInstalled);
+  const Icon = getInstallStateIcon(installState);
+  const message = getInstallStateMessage(installState);
 
   return (
     <Split className="summary-status-icon">
-      <SplitItem
-        className={classNames('summary-status-icon__icon', iconClassName, {
-          'summary-status-icon__icon-margin': !iconClassName,
-        })}
-      >
+      <SplitItem className="summary-status-icon__icon summary-status-icon__icon-margin">
         {Icon && <Icon />}
       </SplitItem>
       <SplitItem className="summary-status-icon__message">{message}</SplitItem>

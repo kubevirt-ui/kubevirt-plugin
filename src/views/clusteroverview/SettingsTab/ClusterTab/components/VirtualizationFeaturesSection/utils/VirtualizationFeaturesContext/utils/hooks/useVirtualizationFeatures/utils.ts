@@ -1,50 +1,51 @@
+import { getName } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { InstallState } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/types';
-
-import useOperatorResources from '../useOperatorResources/useOperatorResources';
-
-import { NON_STANDALONE_ANNOTATION_VALUE } from './utils/constants';
+import { NON_STANDALONE_ANNOTATION_VALUE } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/VirtualizationFeaturesContext/utils/constants';
 import {
   OLMAnnotation,
-  OperatorDetailsMap,
-  OperatorResources,
   VirtFeatureOperatorItem,
-  VirtFeatureOperatorItemsMap,
-} from './utils/types';
+} from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/VirtualizationFeaturesContext/utils/types';
 import {
   clusterServiceVersionFor,
   computeInstallState,
-  getOperatorData,
   getPackageSource,
   getPackageUID,
-  groupOperatorItems,
   subscriptionFor,
-} from './utils/utils';
+} from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/VirtualizationFeaturesContext/utils/utils';
+import {
+  ClusterServiceVersionKind,
+  OperatorGroupKind,
+  PackageManifestKind,
+  SubscriptionKind,
+} from '@overview/utils/types';
 
-type UseVirtualizationOperators = () => {
-  operatorDetailsMap: OperatorDetailsMap;
-  operatorItemsMap: VirtFeatureOperatorItemsMap;
-  operatorResources: OperatorResources;
+type OperatorResources = {
+  clusterServiceVersions: ClusterServiceVersionKind[];
+  filteredPackageManifests: PackageManifestKind[];
+  operatorGroups: OperatorGroupKind[];
   operatorResourcesLoaded: boolean;
+  subscriptions: SubscriptionKind[];
 };
 
-const useVirtualizationOperators: UseVirtualizationOperators = () => {
-  const resources = useOperatorResources();
+export const getVirtualizationFeatureItems = (
+  operatorResources: OperatorResources,
+): VirtFeatureOperatorItem[] => {
   const {
     clusterServiceVersions,
     filteredPackageManifests,
     operatorGroups,
     operatorResourcesLoaded,
     subscriptions,
-  } = resources;
+  } = operatorResources;
 
-  const virtFeatureOperatorItems: VirtFeatureOperatorItem[] = filteredPackageManifests
+  return filteredPackageManifests
     .filter((pkg) => {
       const { channels, defaultChannel } = pkg.status ?? {};
       // if a package does not have status.defaultChannel, exclude it so the app doesn't fail
       if (!defaultChannel) {
         kubevirtConsole.warn(
-          `PackageManifest ${pkg.metadata.name} has no status.defaultChannel and has been excluded`,
+          `PackageManifest ${getName(pkg)} has no status.defaultChannel and has been excluded`,
         );
         return false;
       }
@@ -70,7 +71,7 @@ const useVirtualizationOperators: UseVirtualizationOperators = () => {
 
       return {
         installState,
-        name: currentCSVDesc?.displayName ?? pkg.metadata.name,
+        name: currentCSVDesc?.displayName ?? getName(pkg),
         obj: pkg,
         source: getPackageSource(pkg),
         subscription,
@@ -78,17 +79,4 @@ const useVirtualizationOperators: UseVirtualizationOperators = () => {
         version: currentCSVDesc?.version,
       };
     });
-
-  const operatorResources = {
-    clusterServiceVersions,
-    operatorGroups,
-    subscriptions,
-  };
-
-  const operatorItemsMap = groupOperatorItems(virtFeatureOperatorItems);
-  const operatorDetailsMap = getOperatorData(operatorItemsMap);
-
-  return { operatorDetailsMap, operatorItemsMap, operatorResources, operatorResourcesLoaded };
 };
-
-export default useVirtualizationOperators;
