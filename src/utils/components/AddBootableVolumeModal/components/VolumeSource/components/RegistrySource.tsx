@@ -3,6 +3,7 @@ import React, { ChangeEvent, FC } from 'react';
 import ContainerSource from '@catalog/templatescatalog/components/TemplatesCatalogDrawer/StorageSection/CustomizeSource/Sources/ContainerSource';
 import { formatRegistryURL } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { removeAllWhitespace } from '@kubevirt-utils/utils/utils';
 
 import { AddBootableVolumeState, SetBootableVolumeFieldType } from '../../../utils/constants';
 
@@ -16,7 +17,8 @@ const RegistrySource: FC<RegistrySourceProps> = ({ bootableVolume, setBootableVo
   const { registryCredentials = { password: '', username: '' }, registryURL = '' } = bootableVolume;
 
   const handleInputValueChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setBootableVolumeField('registryURL')(formatRegistryURL(e.target.value));
+    const trimmedValue = removeAllWhitespace(e.target.value);
+    setBootableVolumeField('registryURL')(formatRegistryURL(trimmedValue));
   };
 
   const handleCredentialsChange = (updatedCreds: { password: string; username: string }) => {

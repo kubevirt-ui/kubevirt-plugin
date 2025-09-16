@@ -16,6 +16,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { getRootDiskStorageRequests } from '@kubevirt-utils/resources/vm';
 import { appendDockerPrefix } from '@kubevirt-utils/utils/utils';
+import { removeAllWhitespace } from '@kubevirt-utils/utils/utils';
 
 import {
   BLANK_SOURCE_NAME,
@@ -142,8 +143,7 @@ export const SelectSource: FC<SelectSourceProps> = ({
 
   const onInputValueChange: FormEventHandler<HTMLInputElement> = (event) => {
     const newVolume = showSizeInput ? volumeQuantity : null;
-    const newValue = event.currentTarget.value;
-
+    const newValue = removeAllWhitespace(event.currentTarget.value);
     const handlers = {
       [CONTAINER_DISK_SOURCE_NAME]: () => getContainerDiskSource(appendDockerPrefix(newValue)),
       [HTTP_SOURCE_NAME]: () =>
