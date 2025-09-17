@@ -590,7 +590,7 @@
   "Enable folders in Virtual Machines tree view": "在虚拟机树视图中启用文件夹",
   "Enable guest system log access": "启用客户机系统日志访问",
   "Enable headless mode": "启用无头模式",
-  "Enable Kubevirt multicluster tree view": "Enable Kubevirt multicluster tree view",
+  "Enable Kubevirt cross cluster migration": "Enable Kubevirt cross cluster migration",
   "Enable load-aware descheduling": "Enable load-aware descheduling",
   "Enable memory density": "启用内存密度",
   "Enable Passt binding for primary user-defined networks": "Enable Passt binding for primary user-defined networks",
