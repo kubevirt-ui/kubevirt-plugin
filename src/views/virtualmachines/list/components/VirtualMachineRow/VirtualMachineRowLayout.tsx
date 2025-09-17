@@ -20,6 +20,7 @@ import ACMExtentionsTableData from '@multicluster/components/ACMExtentionsTableD
 import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 import { ManagedClusterModel } from '@multicluster/constants';
 import { getCluster } from '@multicluster/helpers/selectors';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 import { Checkbox } from '@patternfly/react-core';
 import VirtualMachineActions from '@virtualmachines/actions/components/VirtualMachineActions/VirtualMachineActions';
@@ -56,7 +57,8 @@ const VirtualMachineRowLayout: FC<
 
   const vmName = useMemo(() => getName(obj), [obj]);
   const vmNamespace = useMemo(() => getNamespace(obj), [obj]);
-  const vmCluster = getCluster(obj);
+  const clusterParam = useClusterParam();
+  const vmCluster = getCluster(obj) ?? clusterParam;
 
   const storageClasses = useMemo(
     () => getVirtualMachineStorageClasses(obj, pvcMapper),
