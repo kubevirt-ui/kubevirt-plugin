@@ -130,7 +130,8 @@ export const groupOperatorItems = (items: VirtFeatureOperatorItem[]): VirtFeatur
     return acc;
   }, {} as { [key in VirtualizationFeatureOperators]: VirtFeatureOperatorItem[] });
 
-const getOperatorHubURL = (uid: string) => `/operatorhub/all-namespaces?details-item=${uid}`;
+const getOperatorHubURL = (uid: string, namespace: string) =>
+  `/catalog/ns/${namespace || 'default'}?selectedId=${uid}`;
 
 export const computeInstallState = (
   csv: ClusterServiceVersionKind,
@@ -168,6 +169,7 @@ const getInstallStatus = (
 export const getOperatorData = (
   operatorItemsMap: VirtFeatureOperatorItemsMap,
   operatorsToInstall: OperatorsToInstall,
+  namespace: string,
 ): OperatorDetailsMap => {
   const operatorsData = isEmpty(operatorItemsMap)
     ? defaultVirtFeatureOperatorItemsMap
@@ -176,7 +178,7 @@ export const getOperatorData = (
           installState:
             getInstallStatus(operatorItems, operatorsToInstall[operatorName]) ||
             InstallState.UNKNOWN,
-          operatorHubURL: getOperatorHubURL(operatorItems?.[0]?.uid) || undefined,
+          operatorHubURL: getOperatorHubURL(operatorItems?.[0]?.uid, namespace) || undefined,
         };
 
         return acc;
