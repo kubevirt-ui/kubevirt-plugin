@@ -3,6 +3,8 @@ import React, { FC } from 'react';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getValidNamespace } from '@kubevirt-utils/utils/utils';
+import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 
 import GettingStartedSectionContents from '../utils/getting-started-content/GettingStartedSectionContents';
 import useMTVResources from '../utils/hooks/useMTVResources';
@@ -14,6 +16,8 @@ const RelatedOperatorsSection: FC = () => {
   const { t } = useKubevirtTranslation();
   const { mtvLink, mtvLoaded } = useMTVResources();
   const isAdmin = useIsAdmin();
+  const [activeNamespace] = useActiveNamespace();
+  const validNamespace = getValidNamespace(activeNamespace);
 
   const moreLink: GettingStartedLink = {
     external: true,
@@ -26,7 +30,7 @@ const RelatedOperatorsSection: FC = () => {
     {
       external: !isAdmin,
       href: isAdmin
-        ? '/operatorhub/all-namespaces?keyword=nmstate'
+        ? `/catalog/ns/${validNamespace}?keyword=nmstate`
         : documentationURL.NMSTATE_OPERATOR,
       id: 'kubernetes-nmstate',
       title: t('Kubernetes NMState Operator'),
@@ -34,7 +38,7 @@ const RelatedOperatorsSection: FC = () => {
     {
       external: !isAdmin,
       href: isAdmin
-        ? '/operatorhub/all-namespaces?keyword=ODF'
+        ? `/catalog/ns/${validNamespace}?keyword=ODF`
         : documentationURL.DATA_FOUNDATION_OPERATOR,
       id: 'openshift-data-foundation',
       title: t('OpenShift Data Foundation'),
@@ -42,7 +46,7 @@ const RelatedOperatorsSection: FC = () => {
     {
       description: t('Migrate multiple virtual machine workloads to OpenShift Virtualization. '),
       external: !isAdmin,
-      href: isAdmin ? '/operatorhub/all-namespaces?keyword=MTV' : documentationURL.MTV_OPERATOR,
+      href: isAdmin ? `/catalog/ns/${validNamespace}?keyword=MTV` : documentationURL.MTV_OPERATOR,
       id: 'openshift-virtualization-mtv',
       secondaryLinkExternal: true,
       secondaryLinkHref: mtvLink,
