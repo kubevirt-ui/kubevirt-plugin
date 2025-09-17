@@ -1580,7 +1580,7 @@
   "Top consumers": "顶级消费者",
   "Topology key": "拓扑键",
   "Topology key must not be empty": "拓扑键不能为空",
-  "Topology will be set to {{sockets}} socket, 1 core, 1 thread": "拓扑将设置为 {{sockets}} 个插槽、1 个内核、1 个线程",
+  "Topology will be set to {{sockets}} socket, {{cores}} core, {{threads}} thread": "Topology will be set to {{sockets}} socket, {{cores}} core, {{threads}} thread",
   "Total": "总计",
   "Total bytes": "字节总数",
   "Total storage to migrate is {{totalAmount}}": "要迁移的总存储是 {{totalAmount}}",
