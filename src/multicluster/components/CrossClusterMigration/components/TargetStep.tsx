@@ -85,6 +85,7 @@ const TargetStep: FC<TargetStepProps> = ({ migrationPlan, setMigrationPlan, vms 
       setMigrationPlan((plan) => {
         const selectedProvider = getProviderFromClusterName(newClusterTarget);
         plan.spec.provider.destination.name = getName(selectedProvider);
+        plan.spec.provider.destination.namespace = getNamespace(selectedProvider);
         plan.spec.provider.destination.uid = getUID(selectedProvider);
       });
     },

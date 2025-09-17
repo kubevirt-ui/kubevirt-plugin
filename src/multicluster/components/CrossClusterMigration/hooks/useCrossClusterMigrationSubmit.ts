@@ -13,6 +13,8 @@ import { getName, getNamespace, getUID } from '@kubevirt-utils/resources/shared'
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 
+import { MTV_MIGRATION_NAMESPACE } from '../constants';
+
 const useCrossClusterMigrationSubmit = (
   migrationPlan: V1beta1Plan,
   setMigrationPlan: Updater<V1beta1Plan>,
@@ -92,6 +94,7 @@ const useCrossClusterMigrationSubmit = (
       const createdMigrationPlan = await kubevirtK8sCreate({
         data: finalMigrationPlan,
         model: PlanModel,
+        ns: MTV_MIGRATION_NAMESPACE,
       });
 
       setMigrationPlan(createdMigrationPlan);
