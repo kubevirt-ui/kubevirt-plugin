@@ -6,7 +6,6 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { Button, Skeleton, Stack, StackItem } from '@patternfly/react-core';
 
 import {
-  DESCHEDULER_OPERATOR_NAME,
   NETOBSERV_OPERATOR_NAME,
   NMSTATE_OPERATOR_NAME,
   NODE_HEALTH_OPERATOR_NAME,
@@ -75,7 +74,7 @@ const VirtualizationFeaturesSection: FC = () => {
           />
         </StackItem>
         <StackItem isFilled>
-          <LoadBalanceSection operatorName={DESCHEDULER_OPERATOR_NAME} />
+          <LoadBalanceSection />
         </StackItem>
       </Stack>
     </ExpandSectionWithCustomToggle>
