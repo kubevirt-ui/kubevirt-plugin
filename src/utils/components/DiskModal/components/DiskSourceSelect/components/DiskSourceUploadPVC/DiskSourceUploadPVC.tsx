@@ -15,6 +15,7 @@ import { DiskSourceUploadPVCProgress } from './DiskSourceUploadPVCProgress';
 type DiskSourceUploadPVCProps = {
   handleClearUpload?: () => void;
   handleUpload?: () => void;
+  isRequired?: boolean;
   label?: string;
   relevantUpload: DataUpload;
 };
@@ -22,6 +23,7 @@ type DiskSourceUploadPVCProps = {
 const DiskSourceUploadPVC: FC<DiskSourceUploadPVCProps> = ({
   handleClearUpload,
   handleUpload,
+  isRequired = true,
   label,
   relevantUpload,
 }) => {
@@ -42,7 +44,11 @@ const DiskSourceUploadPVC: FC<DiskSourceUploadPVCProps> = ({
     <Controller
       render={({ field: { onChange, value } }) => (
         <>
-          <FormGroup fieldId={diskSourceUploadFieldID} isRequired label={label || t('Upload data')}>
+          <FormGroup
+            fieldId={diskSourceUploadFieldID}
+            isRequired={isRequired}
+            label={label || t('Upload data')}
+          >
             <FileUpload
               onClearClick={() => {
                 onChange('');
@@ -68,7 +74,7 @@ const DiskSourceUploadPVC: FC<DiskSourceUploadPVCProps> = ({
             />
             {error && (
               <FormGroupHelperText validated={ValidatedOptions.error}>
-                {error?.message}
+                {error?.file?.message || error?.message}
               </FormGroupHelperText>
             )}
           </FormGroup>

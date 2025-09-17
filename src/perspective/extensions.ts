@@ -608,7 +608,7 @@ export const extensions: EncodedExtension[] = [
       icon: { $codeRef: 'perspective.icon' },
       id: 'virtualization-perspective',
       importRedirectURL: { $codeRef: 'perspective.getImportRedirectURL' },
-      landingPageURL: { $codeRef: 'perspective.getLandingPageURL' },
+      landingPageURL: { $codeRef: 'perspective.getVirtualizationLandingPageURL' },
       name: '%plugin__kubevirt-plugin~Virtualization%',
     },
     type: 'console.perspective',

@@ -1,17 +1,19 @@
 import { useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 
-// Modal-specific constants
-const UPLOAD_MODE_SELECT = 'select';
-const UPLOAD_MODE_UPLOAD = 'upload';
+import {
+  FORM_FIELD_UPLOAD_FILE,
+  UPLOAD_MODE_SELECT,
+  UPLOAD_MODE_UPLOAD,
+} from '@kubevirt-utils/components/DiskModal/utils/constants';
+
 const FORM_FIELD_SELECTED_ISO = 'selectedISO';
 const FORM_FIELD_UPLOAD_MODE = 'uploadMode';
-const FORM_FIELD_UPLOAD_FILE = 'uploadFile';
 
 type MountCDROMFormState = {
   selectedISO?: string;
   uploadFile?: { file: File; filename: string };
-  uploadMode: typeof UPLOAD_MODE_SELECT | typeof UPLOAD_MODE_UPLOAD;
+  uploadMode: '' | typeof UPLOAD_MODE_SELECT | typeof UPLOAD_MODE_UPLOAD;
 };
 
 export const useMountCDROMForm = () => {
@@ -21,12 +23,12 @@ export const useMountCDROMForm = () => {
     defaultValues: {
       [FORM_FIELD_SELECTED_ISO]: '',
       [FORM_FIELD_UPLOAD_FILE]: null,
-      [FORM_FIELD_UPLOAD_MODE]: UPLOAD_MODE_SELECT,
+      [FORM_FIELD_UPLOAD_MODE]: '',
     },
     mode: 'all',
   });
 
-  const { control, setValue } = methods;
+  const { clearErrors, control, setValue } = methods;
 
   const uploadMode = useWatch({ control, name: FORM_FIELD_UPLOAD_MODE });
   const selectedISO = useWatch({ control, name: FORM_FIELD_SELECTED_ISO });
@@ -35,7 +37,7 @@ export const useMountCDROMForm = () => {
   const handleISOSelection = (selectedValue: string) => {
     setValue(FORM_FIELD_SELECTED_ISO, selectedValue);
     setValue(FORM_FIELD_UPLOAD_MODE, UPLOAD_MODE_SELECT);
-    handleClearUpload();
+    handleClearUpload(false);
   };
 
   const handleFileUpload = () => {
@@ -43,13 +45,16 @@ export const useMountCDROMForm = () => {
     setValue(FORM_FIELD_SELECTED_ISO, '');
   };
 
-  const handleClearUpload = () => {
+  const handleClearUpload = (resetMode: boolean = true) => {
+    clearErrors(FORM_FIELD_UPLOAD_FILE);
     setValue(FORM_FIELD_UPLOAD_FILE, null);
     setUploadFilename('');
-    setValue(FORM_FIELD_UPLOAD_MODE, UPLOAD_MODE_SELECT);
+    if (resetMode) {
+      setValue(FORM_FIELD_UPLOAD_MODE, '');
+    }
   };
 
-  const isFormValid = Boolean(selectedISO || uploadFile);
+  const isFormValid = Boolean(selectedISO || uploadFile?.filename);
 
   return {
     handleClearUpload,

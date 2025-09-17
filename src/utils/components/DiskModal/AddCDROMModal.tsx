@@ -1,20 +1,13 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { FormProvider, useForm, useWatch } from 'react-hook-form';
 
+import { FORM_FIELD_UPLOAD_FILE } from '@kubevirt-utils/components/DiskModal/utils/constants';
 import { PendingChangesAlert } from '@kubevirt-utils/components/PendingChanges/PendingChangesAlert/PendingChangesAlert';
 import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import {
-  Checkbox,
-  Content,
-  ContentVariants,
-  Form,
-  FormGroup,
-  Stack,
-  StackItem,
-} from '@patternfly/react-core';
+import { Checkbox, Form, FormGroup, Stack, StackItem } from '@patternfly/react-core';
 import { isRunning } from '@virtualmachines/utils';
 
 import TabModal from '../TabModal/TabModal';
@@ -44,14 +37,22 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
   });
 
   const {
+    clearErrors,
     control,
     formState: { errors, isSubmitting },
     getValues,
+    setValue,
   } = methods;
 
-  const uploadFile = useWatch({ control, name: 'uploadFile' });
+  const uploadFile = useWatch({ control, name: FORM_FIELD_UPLOAD_FILE });
   const hasUploadFile = !isEmpty(uploadFile);
   const hasFormErrors = !isEmpty(errors);
+
+  useEffect(() => {
+    if (!uploadEnabled) {
+      clearErrors(FORM_FIELD_UPLOAD_FILE);
+    }
+  }, [uploadEnabled, setValue]);
 
   const isFormValid = !hasFormErrors && (!uploadEnabled || hasUploadFile);
 
@@ -102,9 +103,6 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
       >
         <Stack hasGutter>
           <StackItem>
-            <Content component={ContentVariants.p}>{t('Add CD-ROM to the cluster')}</Content>
-          </StackItem>
-          <StackItem>
             {isVMRunning && (
               <PendingChangesAlert title={t('Adding CD-ROM drive')}>
                 {t(
@@ -125,9 +123,6 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
               {uploadEnabled && (
                 <>
                   <DiskSourceUploadPVC label={t('Upload ISO')} relevantUpload={upload} />
-                  <Content component={ContentVariants.small}>
-                    {t('ISO file must be in the same project as the Virtual Machine')}
-                  </Content>
                 </>
               )}
             </Form>

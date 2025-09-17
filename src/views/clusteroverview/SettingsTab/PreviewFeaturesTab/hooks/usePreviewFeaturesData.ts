@@ -4,7 +4,7 @@ import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { PASST_UDN_NETWORK, TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { FEATURE_KUBEVIRT_ACM_TREEVIEW } from '@multicluster/constants';
+import { FEATURE_KUBEVIRT_CROSS_CLUSTER_MIGRATION } from '@multicluster/constants';
 import { useIsFleetAvailable } from '@stolostron/multicluster-sdk';
 
 import PasstPopoverContent from '../PasstPopoverContent';
@@ -34,7 +34,7 @@ type UsePreviewFeaturesData = () => {
 const usePreviewFeaturesData: UsePreviewFeaturesData = () => {
   const { t } = useKubevirtTranslation();
   const treeViewFoldersFeature = useFeatures(TREE_VIEW_FOLDERS);
-  const kubevirtACMTreeviewFeature = useFeatures(FEATURE_KUBEVIRT_ACM_TREEVIEW);
+  const kubevirtCrossClusterMigration = useFeatures(FEATURE_KUBEVIRT_CROSS_CLUSTER_MIGRATION);
   const passtFeatureFlag = usePasstFeatureFlag();
 
   const isFleetAvailable = useIsFleetAvailable();
@@ -48,10 +48,10 @@ const usePreviewFeaturesData: UsePreviewFeaturesData = () => {
     },
     {
       externalLink: null,
-      id: FEATURE_KUBEVIRT_ACM_TREEVIEW,
-      label: t('Enable Kubevirt multicluster tree view'),
-      ...kubevirtACMTreeviewFeature,
-      canEdit: isFleetAvailable && kubevirtACMTreeviewFeature?.canEdit,
+      id: FEATURE_KUBEVIRT_CROSS_CLUSTER_MIGRATION,
+      label: t('Enable Kubevirt cross cluster migration'),
+      ...kubevirtCrossClusterMigration,
+      canEdit: isFleetAvailable && kubevirtCrossClusterMigration?.canEdit,
     },
     {
       externalLink: null,
