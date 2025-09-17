@@ -107,7 +107,6 @@
   "Add a volume already available on the cluster.": "クラスターですでに利用可能なボリュームを追加します。",
   "Add affinity rule": "アフィニティールールの追加",
   "Add CD-ROM": "Add CD-ROM",
-  "Add CD-ROM to the cluster": "Add CD-ROM to the cluster",
   "Add Config Map, Secret, or Service Account": "config map、シークレット、またはサービスアカウントの追加",
   "Add configuration": "設定の追加",
   "Add disk": "ディスクの追加",

@@ -44,6 +44,7 @@ import {
   checkInstanceTypeChanged,
   getChangedAffinity,
   getChangedAuthorizedSSHKey,
+  getChangedCDROMs,
   getChangedCloudInit,
   getChangedDedicatedResources,
   getChangedEnvDisks,
@@ -111,6 +112,7 @@ export const usePendingChanges = (
   const sshServiceChanged = getChangedAuthorizedSSHKey(vm, vmi);
 
   const modifiedEnvDisks = getChangedEnvDisks(vm, vmi);
+  const modifiedCDROMs = getChangedCDROMs(vm, vmi);
   const modifiedNICs = getChangedNICs(vm, vmi);
 
   const modifiedGPUDevices = getChangedGPUDevices(vm, vmi);
@@ -201,6 +203,11 @@ export const usePendingChanges = (
         !isEmpty(modifiedEnvDisks) && modifiedEnvDisks?.length > 1
           ? modifiedEnvDisks.join(', ')
           : modifiedEnvDisks[0],
+    },
+    {
+      ...createProps(VirtualMachineDetailsTab.Storage),
+      hasPendingChange: !isEmpty(modifiedCDROMs),
+      label: modifiedCDROMs.join(', '),
     },
     {
       ...createProps(VirtualMachineDetailsTab.Network),
