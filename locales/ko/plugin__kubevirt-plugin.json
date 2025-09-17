@@ -589,7 +589,7 @@
   "Enable folders in Virtual Machines tree view": "가상 머신 트리 보기에서 폴더 활성화",
   "Enable guest system log access": "게스트 시스템 로그 액세스 활성화",
   "Enable headless mode": "헤드리스 모드 활성화",
-  "Enable Kubevirt multicluster tree view": "Enable Kubevirt multicluster tree view",
+  "Enable Kubevirt cross cluster migration": "Enable Kubevirt cross cluster migration",
   "Enable load-aware descheduling": "Enable load-aware descheduling",
   "Enable memory density": "메모리 밀도 기능 활성화",
   "Enable Passt binding for primary user-defined networks": "Enable Passt binding for primary user-defined networks",

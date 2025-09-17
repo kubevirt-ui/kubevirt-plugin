@@ -5,7 +5,7 @@ export const BASE_K8S_API_PATH = '/api/kubernetes';
 export const KUBEVIRT_VM_PATH = 'kubevirt.io~v1~VirtualMachine';
 
 export const FLAG_KUBEVIRT_DYNAMIC_ACM = 'KUBEVIRT_DYNAMIC_ACM';
-export const FEATURE_KUBEVIRT_ACM_TREEVIEW = 'kubevirtACMTreeview';
+export const FEATURE_KUBEVIRT_CROSS_CLUSTER_MIGRATION = 'kubevirtCrossClusterMigration';
 
 export const CROSS_CLUSTER_MIGRATION_ACTION_ID = 'cross-cluster-migration';
 

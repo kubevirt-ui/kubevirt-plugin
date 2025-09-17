@@ -598,7 +598,7 @@
   "Enable folders in Virtual Machines tree view": "Habilitar carpetas en la vista de árbol de máquinas virtuales",
   "Enable guest system log access": "Habilitar el acceso al registro del sistema huésped",
   "Enable headless mode": "Habilitar el modo sin cabeza",
-  "Enable Kubevirt multicluster tree view": "Enable Kubevirt multicluster tree view",
+  "Enable Kubevirt cross cluster migration": "Enable Kubevirt cross cluster migration",
   "Enable load-aware descheduling": "Enable load-aware descheduling",
   "Enable memory density": "Habilitar la densidad de memoria",
   "Enable Passt binding for primary user-defined networks": "Enable Passt binding for primary user-defined networks",

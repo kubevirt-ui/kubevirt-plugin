@@ -589,7 +589,7 @@
   "Enable folders in Virtual Machines tree view": "仮想マシンのツリービューでフォルダーを有効にする",
   "Enable guest system log access": "ゲストシステムログへのアクセスを有効にする",
   "Enable headless mode": "ヘッドレスモードを有効にする",
-  "Enable Kubevirt multicluster tree view": "Enable Kubevirt multicluster tree view",
+  "Enable Kubevirt cross cluster migration": "Enable Kubevirt cross cluster migration",
   "Enable load-aware descheduling": "Enable load-aware descheduling",
   "Enable memory density": "メモリー密度を有効にする",
   "Enable Passt binding for primary user-defined networks": "Enable Passt binding for primary user-defined networks",
