@@ -24,8 +24,8 @@ import StartPauseModal from '@kubevirt-utils/components/StartPauseModal/StartPau
 import TolerationsModal from '@kubevirt-utils/components/TolerationsModal/TolerationsModal';
 import VMSSHSecretModal from '@kubevirt-utils/components/VMSSHSecretModal/VMSSHSecretModal';
 import {
+  getVirtualMachineDetailsTabLabel,
   VirtualMachineDetailsTab,
-  VirtualMachineDetailsTabLabel,
 } from '@kubevirt-utils/constants/tabs-constants';
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -130,14 +130,17 @@ export const usePendingChanges = (
       ns: updatedVM?.metadata?.namespace,
     });
 
-  const createProps = (tab: VirtualMachineDetailsTab, additionalAction?: () => void) => ({
-    handleAction: () => {
-      navigate(getTabURL(vm, tab));
-      additionalAction?.();
-    },
-    tab,
-    tabLabel: t(VirtualMachineDetailsTabLabel[tab]),
-  });
+  const createProps = (tab: VirtualMachineDetailsTab, additionalAction?: () => void) => {
+    const tabLabels = getVirtualMachineDetailsTabLabel(t);
+    return {
+      handleAction: () => {
+        navigate(getTabURL(vm, tab));
+        additionalAction?.();
+      },
+      tab,
+      tabLabel: tabLabels[tab],
+    };
+  };
 
   return [
     {
