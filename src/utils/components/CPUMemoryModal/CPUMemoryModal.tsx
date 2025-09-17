@@ -102,7 +102,12 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
       <ModalHeader title={t('Edit CPU | Memory')} />
       <ModalBody>
         <div className="inputs">
-          <CPUInput currentCPU={getCPU(vm)} setUserEnteredCPU={setCPU} userEnteredCPU={cpu} />
+          <CPUInput
+            currentCPU={getCPU(vm)}
+            setUserEnteredCPU={setCPU}
+            templateName={vm?.metadata?.labels?.['vm.kubevirt.io/template']}
+            userEnteredCPU={cpu}
+          />
           <MemoryInput
             memory={memory}
             memoryUnit={memoryUnit}

@@ -13,6 +13,7 @@ type CPUComponentInputProps = {
   cpuComponent: CPUComponent;
   isDisabled: boolean;
   setCPU: Dispatch<SetStateAction<V1CPU>>;
+  templateName?: string;
 };
 
 const CPUComponentInput: FC<CPUComponentInputProps> = ({
@@ -20,7 +21,12 @@ const CPUComponentInput: FC<CPUComponentInputProps> = ({
   cpuComponent,
   isDisabled,
   setCPU,
+  templateName,
 }) => {
+  // Windows 11 template requires minimum 2 cores
+  const isWindows11Template = templateName === 'windows11-desktop-medium';
+  const minValue = cpuComponent === CPUComponent.cores && isWindows11Template ? 2 : 1;
+
   return (
     <>
       <GridItem span={3}>
@@ -32,12 +38,19 @@ const CPUComponentInput: FC<CPUComponentInputProps> = ({
         <NumberInput
           onChange={(e: ChangeEvent<HTMLInputElement>) => {
             const newNumber = +e?.target?.value;
-            setCPU(getUpdatedCPU(cpu, newNumber, cpuComponent));
+            if (newNumber >= minValue) {
+              setCPU(getUpdatedCPU(cpu, newNumber, cpuComponent));
+            }
+          }}
+          onMinus={() => {
+            const newValue = +cpu?.[cpuComponent] - 1;
+            if (newValue >= minValue) {
+              setCPU(getUpdatedCPU(cpu, newValue, cpuComponent));
+            }
           }}
           inputName="cpu-sockets-input"
           isDisabled={isDisabled}
-          min={1}
-          onMinus={() => setCPU(getUpdatedCPU(cpu, +cpu?.[cpuComponent] - 1, cpuComponent))}
+          min={minValue}
           onPlus={() => setCPU(getUpdatedCPU(cpu, +cpu?.[cpuComponent] + 1, cpuComponent))}
           value={cpu?.[cpuComponent]}
           widthChars={1}

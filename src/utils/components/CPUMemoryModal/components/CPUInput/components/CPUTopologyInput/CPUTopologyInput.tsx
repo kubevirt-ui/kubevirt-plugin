@@ -12,9 +12,16 @@ type CPUTopologyInputProps = {
   hide: boolean;
   isDisabled: boolean;
   setCPU: Dispatch<SetStateAction<V1CPU>>;
+  templateName?: string;
 };
 
-const CPUTopologyInput: FC<CPUTopologyInputProps> = ({ cpu, hide, isDisabled, setCPU }) => {
+const CPUTopologyInput: FC<CPUTopologyInputProps> = ({
+  cpu,
+  hide,
+  isDisabled,
+  setCPU,
+  templateName,
+}) => {
   if (hide) return null;
 
   return (
@@ -24,6 +31,7 @@ const CPUTopologyInput: FC<CPUTopologyInputProps> = ({ cpu, hide, isDisabled, se
         cpuComponent={CPUComponent.cores}
         isDisabled={isDisabled}
         setCPU={setCPU}
+        templateName={templateName}
       />
       <CPUComponentInput
         cpu={cpu}

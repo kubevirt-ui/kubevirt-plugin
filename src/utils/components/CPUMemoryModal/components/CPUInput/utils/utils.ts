@@ -20,6 +20,5 @@ export const convertTopologyToVCPUs = (cpu: V1CPU): number =>
   cpu?.cores * cpu?.sockets * (cpu?.threads || 1);
 
 export const formatVCPUsAsSockets = (cpu: V1CPU): V1CPU => {
-  const numVCPUs = convertTopologyToVCPUs(cpu);
-  return { ...cpu, ...{ cores: 1, sockets: numVCPUs, threads: 1 } };
+  return { ...cpu };
 };
