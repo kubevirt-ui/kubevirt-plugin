@@ -1594,7 +1594,7 @@
   "Top consumers": "Principales consumidores",
   "Topology key": "Clave de topología",
   "Topology key must not be empty": "La clave de topología no debe estar vacía",
-  "Topology will be set to {{sockets}} socket, 1 core, 1 thread": "La topología se establecerá en {{sockets}} socket, 1 núcleo, 1 hilo",
+  "Topology will be set to {{sockets}} socket, {{cores}} core, {{threads}} thread": "Topology will be set to {{sockets}} socket, {{cores}} core, {{threads}} thread",
   "Total": "Total",
   "Total bytes": "Bytes totales",
   "Total storage to migrate is {{totalAmount}}": "El total de almacenamiento que se debe migrar es {{totalAmount}}",
