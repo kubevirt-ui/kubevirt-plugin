@@ -8,5 +8,7 @@ export const isEmptyContainerDiskImage = (volume: V1Volume): boolean => {
   const image = getContainerDiskImage(volume);
   if (isEmpty(image)) return true;
 
-  return Object.values(EMPTY_DISK_IMAGE_PATTERNS).some((pattern) => image.includes(pattern));
+  return Object.values(EMPTY_DISK_IMAGE_PATTERNS).some(
+    (pattern) => pattern !== '' && image.includes(pattern),
+  );
 };
