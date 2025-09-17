@@ -194,3 +194,7 @@ export const addUploadDataVolumeOwnerReference = (
     )
     .catch(() => Promise.resolve());
 };
+
+export const isPvcUploading = (uploadStatus: UPLOAD_STATUS): boolean => {
+  return [UPLOAD_STATUS.ALLOCATING, UPLOAD_STATUS.UPLOADING].includes(uploadStatus);
+};

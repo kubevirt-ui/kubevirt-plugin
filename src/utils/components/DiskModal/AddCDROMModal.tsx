@@ -4,6 +4,7 @@ import { FormProvider, useForm, useWatch } from 'react-hook-form';
 import { FORM_FIELD_UPLOAD_FILE } from '@kubevirt-utils/components/DiskModal/utils/constants';
 import { PendingChangesAlert } from '@kubevirt-utils/components/PendingChanges/PendingChangesAlert/PendingChangesAlert';
 import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
+import { isPvcUploading } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
@@ -47,6 +48,7 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
   const uploadFile = useWatch({ control, name: FORM_FIELD_UPLOAD_FILE });
   const hasUploadFile = !isEmpty(uploadFile);
   const hasFormErrors = !isEmpty(errors);
+  const isUploading = isPvcUploading(upload?.uploadStatus);
 
   useEffect(() => {
     if (!uploadEnabled) {
@@ -111,11 +113,12 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
               </PendingChangesAlert>
             )}
             <Form>
-              <DiskNameInput />
+              <DiskNameInput isDisabled={isUploading} />
               <FormGroup>
                 <Checkbox
                   id="upload-iso-checkbox"
                   isChecked={uploadEnabled}
+                  isDisabled={isUploading}
                   label={t('Upload a new ISO file to the cluster')}
                   onChange={(_event, checked) => setUploadEnabled(checked)}
                 />
