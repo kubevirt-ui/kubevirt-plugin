@@ -4,6 +4,10 @@ import { FormProvider } from 'react-hook-form';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import DiskSourceUploadPVC from '@kubevirt-utils/components/DiskModal/components/DiskSourceSelect/components/DiskSourceUploadPVC/DiskSourceUploadPVC';
 import { UPLOAD_FILENAME_FIELD } from '@kubevirt-utils/components/DiskModal/components/utils/constants';
+import {
+  UPLOAD_MODE_SELECT,
+  UPLOAD_MODE_UPLOAD,
+} from '@kubevirt-utils/components/DiskModal/utils/constants';
 import { mountISOToCDROM } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import { uploadDataVolume } from '@kubevirt-utils/components/DiskModal/utils/submit';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
@@ -108,7 +112,11 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
             <p>{t('Mount ISO to the Virtual Machine')}</p>
           </StackItem>
           <StackItem>
-            <FormGroup fieldId={SELECT_ISO_FIELD_ID} isRequired label={t('Select ISO')}>
+            <FormGroup
+              fieldId={SELECT_ISO_FIELD_ID}
+              isRequired={uploadMode !== UPLOAD_MODE_UPLOAD}
+              label={t('Select ISO')}
+            >
               <InlineFilterSelect
                 setSelected={(e) => {
                   handleISOSelection(e);
@@ -120,6 +128,21 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
                 }}
                 options={isoOptions}
                 selected={selectedISO}
+              />
+            </FormGroup>
+          </StackItem>
+          <StackItem>
+            <FormGroup>
+              <DiskSourceUploadPVC
+                handleClearUpload={() => {
+                  handleClearUpload();
+                  setValue(UPLOAD_FILENAME_FIELD, '');
+                }}
+                handleUpload={handleFileUpload}
+                isRequired={uploadMode !== UPLOAD_MODE_SELECT}
+                key={uploadMode}
+                label={t('Upload ISO')}
+                relevantUpload={upload}
               />
             </FormGroup>
           </StackItem>

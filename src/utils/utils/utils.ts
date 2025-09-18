@@ -182,6 +182,10 @@ export const appendDockerPrefix = (image: string) => {
 };
 export const removeDockerPrefix = (image: string) => image?.replace(DOCKER_PREFIX, '');
 
+export const removeAllWhitespace = (str: string): string => {
+  return str.trim().replace(/\s+/g, '');
+};
+
 /**
  * Compares all types by converting them to string.
  * Nullish entities are converted to empty string.

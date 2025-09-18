@@ -157,7 +157,9 @@ const createProjectTreeItem = (
 
   const projectChildren = [...sortProjectFolders, ...(projectMap[project]?.ungrouped || [])];
 
-  const projectTreeItemID = `${PROJECT_SELECTOR_PREFIX}/${cluster}/${project}`;
+  const projectTreeItemID = `${PROJECT_SELECTOR_PREFIX}/${
+    cluster ?? SINGLE_CLUSTER_KEY
+  }/${project}`;
   const projectTreeItem: TreeViewDataItemWithHref = {
     children: projectChildren,
     customBadgeContent: projectMap[project]?.count || '0',

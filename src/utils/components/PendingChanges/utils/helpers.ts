@@ -41,14 +41,12 @@ import {
 import { getNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { getInterfacesAndNetworks } from '@kubevirt-utils/resources/vm/utils/network/utils';
 import { isWindows } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
-import {
-  DESCHEDULER_EVICT_LABEL,
-  getEvictionStrategy as getVMIEvictionStrategy,
-} from '@kubevirt-utils/resources/vmi';
+import { getEvictionStrategy as getVMIEvictionStrategy } from '@kubevirt-utils/resources/vmi';
 import { getVMIBootDisk } from '@kubevirt-utils/resources/vmi/utils/discs';
 import {
   getVMIBootLoader,
   getVMIDevices,
+  getVMIDisks,
   getVMIInterfaces,
   getVMINetworks,
   getVMIVolumes,
@@ -151,6 +149,19 @@ export const getChangedEnvDisks = (
   ];
 
   return changedEnvDisks;
+};
+
+export const getChangedCDROMs = (vm: V1VirtualMachine, vmi: V1VirtualMachineInstance): string[] => {
+  if (isEmpty(vm) || isEmpty(vmi)) {
+    return [];
+  }
+
+  const vmDisks = getDisks(vm) || [];
+  const vmiDisks = getVMIDisks(vmi) || [];
+  const vmiDiskNames = vmiDisks?.map((disk) => disk.name);
+  const vmChangedCDROMs = vmDisks.filter((disk) => disk.cdrom && !vmiDiskNames.includes(disk.name));
+
+  return vmChangedCDROMs.map((disk) => `${disk.name}`);
 };
 
 export const getDefaultInterfaceModel = (vmi: V1VirtualMachineInstance): string => {
@@ -377,21 +388,6 @@ export const getChangedAffinity = (
   const vmiAffinity = vmi?.spec?.affinity || {};
 
   return !isEqualObject(vmAffinity, vmiAffinity);
-};
-
-export const getChangedDescheduler = (
-  vm: V1VirtualMachine,
-  vmi: V1VirtualMachineInstance,
-  currentSelection: boolean,
-): boolean => {
-  if (isEmpty(vm) || isEmpty(vmi)) {
-    return false;
-  }
-
-  const vmDescheduler = !!vm?.spec?.template?.metadata?.annotations?.[DESCHEDULER_EVICT_LABEL];
-  const vmiDescheduler = !!vmi?.metadata?.annotations?.[DESCHEDULER_EVICT_LABEL];
-
-  return vmDescheduler !== vmiDescheduler || currentSelection !== vmiDescheduler;
 };
 
 export const getChangedCloudInit = (

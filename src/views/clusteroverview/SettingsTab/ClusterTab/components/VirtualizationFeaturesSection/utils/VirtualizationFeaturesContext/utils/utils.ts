@@ -11,15 +11,18 @@ import {
   NODE_HEALTH_OPERATOR_NAME,
   operatorPackageNames,
 } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/constants';
-import { INSTALL_SUCCEEDED_STATUS } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/hooks/useVirtualizationOperators/utils/constants';
 import {
   InstallState,
+  OperatorsToInstall,
   VirtualizationFeatureOperators,
 } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/types';
 import {
+  installFailed,
   isInstalled,
   isInstalling,
+  isNotInstalled,
 } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/utils';
+import { INSTALL_SUCCEEDED_STATUS } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/VirtualizationFeaturesContext/utils/constants';
 import {
   ClusterServiceVersionKind,
   ClusterServiceVersionPhase,
@@ -127,7 +130,8 @@ export const groupOperatorItems = (items: VirtFeatureOperatorItem[]): VirtFeatur
     return acc;
   }, {} as { [key in VirtualizationFeatureOperators]: VirtFeatureOperatorItem[] });
 
-const getOperatorHubURL = (uid: string) => `/operatorhub/all-namespaces?details-item=${uid}`;
+const getOperatorHubURL = (uid: string, namespace: string) =>
+  `/catalog/ns/${namespace || 'default'}?selectedId=${uid}`;
 
 export const computeInstallState = (
   csv: ClusterServiceVersionKind,
@@ -145,25 +149,36 @@ export const computeInstallState = (
   return InstallState.NOT_INSTALLED;
 };
 
-const getInstallStatus = (operators: VirtFeatureOperatorItem[]): InstallState => {
+const getInstallStatus = (
+  operators: VirtFeatureOperatorItem[],
+  toBeInstalled: boolean,
+): InstallState => {
   const installed = operators?.some((item) => isInstalled(item?.installState));
-  const installing = operators?.some((item) => isInstalling(item?.installState));
+  const installing =
+    operators?.some((item) => isInstalling(item?.installState)) ||
+    (toBeInstalled && operators?.some((item) => isNotInstalled(item?.installState)));
+  const failed = operators?.some((item) => installFailed(item?.installState));
 
   if (installed) return InstallState.INSTALLED;
   if (installing) return InstallState.INSTALLING;
+  if (failed) return InstallState.FAILED;
 
   return InstallState.NOT_INSTALLED;
 };
 
 export const getOperatorData = (
   operatorItemsMap: VirtFeatureOperatorItemsMap,
+  operatorsToInstall: OperatorsToInstall,
+  namespace: string,
 ): OperatorDetailsMap => {
   const operatorsData = isEmpty(operatorItemsMap)
     ? defaultVirtFeatureOperatorItemsMap
     : Object.entries(operatorItemsMap).reduce((acc, [operatorName, operatorItems]) => {
         acc[operatorName] = {
-          installState: getInstallStatus(operatorItems) || InstallState.UNKNOWN,
-          operatorHubURL: getOperatorHubURL(operatorItems?.[0]?.uid) || undefined,
+          installState:
+            getInstallStatus(operatorItems, operatorsToInstall[operatorName]) ||
+            InstallState.UNKNOWN,
+          operatorHubURL: getOperatorHubURL(operatorItems?.[0]?.uid, namespace) || undefined,
         };
 
         return acc;

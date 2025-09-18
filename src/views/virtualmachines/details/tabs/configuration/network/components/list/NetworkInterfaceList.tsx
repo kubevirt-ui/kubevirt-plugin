@@ -1,8 +1,10 @@
 import React, { FC, useMemo } from 'react';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { getAutoAttachPodInterface } from '@kubevirt-utils/resources/vm';
-import { getPrintableNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
+import {
+  getPrintableNetworkInterfaceType,
+  hasAutoAttachedPodNetwork,
+} from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { getInterfacesAndNetworks } from '@kubevirt-utils/resources/vm/utils/network/utils';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
@@ -65,7 +67,7 @@ const NetworkInterfaceList: FC<NetworkInterfaceTableProps> = ({ vm, vmi }) => {
 
   const columns = useNetworkColumns();
 
-  const autoattachPodInterface = getAutoAttachPodInterface(vm) !== false;
+  const autoattachPodInterface = hasAutoAttachedPodNetwork(vm);
 
   return (
     <>

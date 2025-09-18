@@ -8,6 +8,7 @@ import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useProviderByClusterName from '@multicluster/components/CrossClusterMigration/hooks/useProviderByClusterName';
+import { FEATURE_KUBEVIRT_CROSS_CLUSTER_MIGRATION } from '@multicluster/constants';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { isPaused, isRunning, isStopped } from '@virtualmachines/utils';
 
@@ -24,6 +25,12 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms)
   const { featureEnabled: confirmVMActionsEnabled } = useFeatures(CONFIRM_VM_ACTIONS);
   const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
   const mtvInstalled = useIsMTVInstalled();
+
+  const { featureEnabled: crossClusterMigrationFlagEnabled } = useFeatures(
+    FEATURE_KUBEVIRT_CROSS_CLUSTER_MIGRATION,
+  );
+  const crossClusterMigrationEnabled = mtvInstalled && crossClusterMigrationFlagEnabled;
+
   const [provider, providerLoaded] = useProviderByClusterName(getCluster(vms?.[0]));
 
   const mtcInstalled = useIsMTCInstalled();
@@ -34,7 +41,7 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms)
 
     const migrationActions = [];
 
-    if (clusters.size === 1 && namespaces.size === 1 && mtvInstalled) {
+    if (clusters.size === 1 && namespaces.size === 1 && crossClusterMigrationEnabled) {
       migrationActions.push(
         BulkVirtualMachineActionFactory.crossClusterMigration(
           vms,
@@ -81,7 +88,7 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms)
     confirmVMActionsEnabled,
     createModal,
     mtcInstalled,
-    mtvInstalled,
+    crossClusterMigrationEnabled,
     provider,
     providerLoaded,
     treeViewFoldersEnabled,

@@ -1531,10 +1531,10 @@
   dependencies:
     "@sinonjs/commons" "^3.0.0"
 
-"@stolostron/multicluster-sdk@0.7.1":
-  version "0.7.1"
-  resolved "https://registry.yarnpkg.com/@stolostron/multicluster-sdk/-/multicluster-sdk-0.7.1.tgz#855796e96a8550e4f71dc15c816394db32d39d0e"
-  integrity sha512-A+dFRddjyqQeGEtfr02hZMiA17uaftWOUfJxgOGoeAx1lUQ/gSz2PhgoYC7MeR0xzJ/809/UYI9z3E2036pjpw==
+"@stolostron/multicluster-sdk@0.7.3":
+  version "0.7.3"
+  resolved "https://registry.yarnpkg.com/@stolostron/multicluster-sdk/-/multicluster-sdk-0.7.3.tgz#1da412434163dcfa0228c00d8959397ee20990ba"
+  integrity sha512-HykJ8IrW987kSeDSn+3dC61RtGnndJifCe/DhJqzI11b4sjqMhalTa1cYZSi9eEqY8kARPhOq1OtKYhZfAgVvg==
   dependencies:
     "@apollo/client" "3.10.8"
     "@patternfly/react-component-groups" "^6.2.1"
@@ -1545,6 +1545,7 @@
     react-router-dom-v5-compat "^6.24.1"
     react-transition-group "^4.4.5"
     react-virtualized "^9.22.6"
+    zustand "^4.5.0"
 
 "@testing-library/dom@^8.0.0":
   version "8.17.1"
@@ -11074,6 +11075,11 @@ use-sync-external-store@1.2.0, use-sync-external-store@^1.2.0:
   resolved "https://registry.yarnpkg.com/use-sync-external-store/-/use-sync-external-store-1.2.0.tgz#7dbefd6ef3fe4e767a0cf5d7287aacfb5846928a"
   integrity sha512-eEgnFxGQ1Ife9bzYs6VLi8/4X6CObHMw9Qr9tPY43iKwsPw8xE8+EFsf/2cFZ5S3esXgpWgtSCtLNS41F+sKPA==
 
+use-sync-external-store@^1.2.2:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/use-sync-external-store/-/use-sync-external-store-1.5.0.tgz#55122e2a3edd2a6c106174c27485e0fd59bcfca0"
+  integrity sha512-Rb46I4cGGVBmjamjphe8L/UnvJD+uPPtTkNvX5mZgqdbavhI4EbgIWJiIHXJ8bc/i9EQGPRh4DwEURJ552Do0A==
+
 util-deprecate@^1.0.1, util-deprecate@^1.0.2, util-deprecate@~1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/util-deprecate/-/util-deprecate-1.0.2.tgz#450d4dc9fa70de732762fbd2d4a28981419a0ccf"
@@ -11948,3 +11954,10 @@ zustand@^4.3.7:
   integrity sha512-dY8ERwB9Nd21ellgkBZFhudER8KVlelZm8388B5nDAXhO/+FZDhYMuRnqDgu5SYyRgz/iaf8RKnbUs/cHfOGlQ==
   dependencies:
     use-sync-external-store "1.2.0"
+
+zustand@^4.5.0:
+  version "4.5.7"
+  resolved "https://registry.yarnpkg.com/zustand/-/zustand-4.5.7.tgz#7d6bb2026a142415dd8be8891d7870e6dbe65f55"
+  integrity sha512-CHOUy7mu3lbD6o6LJLfllpjkzhHXSBlX8B9+qPddUsIfeF5S/UZ5q0kmCsnRqT1UHFQZchNFDDzMbQsuesHWlw==
+  dependencies:
+    use-sync-external-store "^1.2.2"
