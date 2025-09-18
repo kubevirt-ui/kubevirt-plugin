@@ -4,7 +4,7 @@ import { Controller, FieldPath, useFormContext } from 'react-hook-form';
 import { V1DiskFormState } from '@kubevirt-utils/components/DiskModal/utils/types';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
-import { isPvcUploading } from '@kubevirt-utils/hooks/useCDIUpload/utils';
+import { isUploadingDisk } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { DropEvent, FileUpload, FormGroup, ValidatedOptions } from '@patternfly/react-core';
 
@@ -67,7 +67,7 @@ const DiskSourceUploadPVC: FC<DiskSourceUploadPVCProps> = ({
               filename={uploadFilename}
               filenamePlaceholder={t('Drag and drop an image or upload one')}
               id="simple-file"
-              isDisabled={isPvcUploading(relevantUpload?.uploadStatus)}
+              isDisabled={isUploadingDisk(relevantUpload?.uploadStatus)}
               isLoading={isLoading}
               onDataChange={(_event: DropEvent, droppedFile: string) => onChange(droppedFile)}
               onReadFinished={() => setIsLoading(false)}

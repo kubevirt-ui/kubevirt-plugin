@@ -13,7 +13,7 @@ import { uploadDataVolume } from '@kubevirt-utils/components/DiskModal/utils/sub
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
-import { isPvcUploading } from '@kubevirt-utils/hooks/useCDIUpload/utils';
+import { isUploadingDisk } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
@@ -63,7 +63,7 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
     uploadMode,
   } = useMountCDROMForm();
   const { upload, uploadData } = useCDIUpload();
-  const isUploading = isPvcUploading(upload?.uploadStatus);
+  const isUploading = isUploadingDisk(upload?.uploadStatus);
   const { getValues, setValue } = methods;
 
   const { isoOptions } = useISOOptions(vmNamespace);
