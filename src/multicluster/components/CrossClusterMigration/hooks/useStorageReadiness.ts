@@ -4,11 +4,7 @@ import { Updater } from 'use-immer';
 import { IoK8sApiCoreV1PersistentVolumeClaim, V1beta1StorageMap } from '@kubev2v/types';
 import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import {
-  modelToGroupVersionKind,
-  PersistentVolumeClaimModel,
-  StorageClassModel,
-} from '@kubevirt-utils/models';
+import { modelToGroupVersionKind, PersistentVolumeClaimModel } from '@kubevirt-utils/models';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -36,13 +32,6 @@ const useStorageReadiness = (
   const sourceCluster = getCluster(vms?.[0]);
   const sourceNamespace = getNamespace(vms?.[0]);
 
-  const [sourceStorageClasses, sourceStorageClassesLoaded, sourceStorageClassesError] =
-    useK8sWatchData<IoK8sApiStorageV1StorageClass[]>({
-      cluster: sourceCluster,
-      groupVersionKind: modelToGroupVersionKind(StorageClassModel),
-      isList: true,
-    });
-
   const {
     data: targetStorageClasses,
     error: targetStorageClassesError,
@@ -57,22 +46,13 @@ const useStorageReadiness = (
   });
 
   useEffect(() => {
-    if (
-      sourceStorageClassesLoaded &&
-      pvcsLoaded &&
-      targetStorageClassesLoaded &&
-      storageMap === null
-    ) {
-      setStorageMap(
-        getInitialStorageMap({ pvcs, sourceStorageClasses, targetStorageClasses, vms }),
-      );
+    if (pvcsLoaded && targetStorageClassesLoaded && storageMap === null) {
+      setStorageMap(getInitialStorageMap({ pvcs, targetStorageClasses, vms }));
     }
   }, [
     pvcs,
     pvcsLoaded,
     setStorageMap,
-    sourceStorageClasses,
-    sourceStorageClassesLoaded,
     targetStorageClassesLoaded,
     targetStorageClasses,
     storageMap,
@@ -91,9 +71,8 @@ const useStorageReadiness = (
     [setStorageMap],
   );
 
-  const error = sourceStorageClassesError || targetStorageClassesError || pvcsError;
-  const loaded =
-    (sourceStorageClassesLoaded && pvcsLoaded && targetStorageClassesLoaded) || !isEmpty(error);
+  const error = targetStorageClassesError || pvcsError;
+  const loaded = (pvcsLoaded && targetStorageClassesLoaded) || !isEmpty(error);
 
   return {
     changeStorageMap,
