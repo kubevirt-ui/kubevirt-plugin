@@ -200,7 +200,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
         <DropdownItem key="disk-delete" onClick={() => onModalOpen(createDeleteDiskModal)}>
           {deleteBtnText}
         </DropdownItem>
-        {isHotplug && (
+        {isHotplug && !isCDROMMountedState && (
           <DropdownItem
             description={t('Will make disk persistent on next reboot')}
             key="make-persistent"
