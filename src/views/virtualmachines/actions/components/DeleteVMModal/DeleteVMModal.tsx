@@ -12,14 +12,14 @@ import {
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import { GracePeriodInput } from '@kubevirt-utils/components/GracePeriodInput/GracePeriodInput';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
-import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
+import { buildOwnerReference, getNamespace } from '@kubevirt-utils/resources/shared';
+import { KUBEVIRT_VM_PATH } from '@multicluster/constants';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sDelete } from '@multicluster/k8sRequests';
-import { getVMListNamespacesURL, getVMListURL } from '@multicluster/urls';
-import { useLastNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
+import { getVMListURL, isACMPath } from '@multicluster/urls';
 import { ButtonVariant, Stack, StackItem } from '@patternfly/react-core';
+import { useHubClusterName } from '@stolostron/multicluster-sdk';
 import { deselectVM, isVMSelected } from '@virtualmachines/list/selectedVMs';
 
 import DeleteOwnedResourcesMessage from './components/DeleteOwnedResourcesMessage';
@@ -42,6 +42,7 @@ const DeleteVMModal: FC<DeleteVMModalProps> = ({ isOpen, onClose, vm }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const location = useLocation();
+  const [hubClusterName] = useHubClusterName();
   const [gracePeriodCheckbox, setGracePeriodCheckbox] = useState<boolean>(false);
   const [gracePeriodSeconds, setGracePeriodSeconds] = useState<number>(
     vm?.spec?.template?.spec?.terminationGracePeriodSeconds || DEFAULT_GRACE_PERIOD,
@@ -54,7 +55,6 @@ const DeleteVMModal: FC<DeleteVMModalProps> = ({ isOpen, onClose, vm }) => {
   const [snapshotsToSave, setSnapshotsToSave] = useState<V1beta1VirtualMachineSnapshot[]>([]);
 
   const { dataVolumes, loaded, pvcs, secrets, snapshots } = useDeleteVMResources(vm);
-  const [lastNamespace] = useLastNamespace();
 
   const onDelete = async (updatedVM: V1VirtualMachine) => {
     const vmOwnerRef = buildOwnerReference(updatedVM);
@@ -83,12 +83,13 @@ const DeleteVMModal: FC<DeleteVMModalProps> = ({ isOpen, onClose, vm }) => {
       deselectVM(updatedVM);
     }
 
-    if (!location.pathname.endsWith('/search')) {
-      const cluster = getCluster(vm);
-      const vmListURL =
-        lastNamespace === ALL_NAMESPACES_SESSION_KEY
-          ? getVMListURL(cluster)
-          : getVMListNamespacesURL(cluster, lastNamespace);
+    if (!location.pathname.endsWith('/search') && !location.pathname.endsWith(KUBEVIRT_VM_PATH)) {
+      const cluster = getCluster(vm) ?? hubClusterName;
+      const namespace = getNamespace(vm);
+
+      const clusterParam = isACMPath(location.pathname) ? cluster : null;
+
+      const vmListURL = getVMListURL(clusterParam, namespace);
 
       navigate(`${vmListURL}${location.search}${location.hash}`);
     }
