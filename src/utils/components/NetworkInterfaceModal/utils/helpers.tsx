@@ -27,7 +27,6 @@ import {
 import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { ABSENT } from '@virtualmachines/details/tabs/configuration/network/utils/constants';
-import { isStopped } from '@virtualmachines/utils';
 
 import { NetworkAttachmentDefinition } from '../components/hooks/types';
 
@@ -132,8 +131,7 @@ export const deleteNetworkInterface = (
   }
 
   const isHotUnPlug = Boolean(nicPresentation?.iface?.bridge);
-  const canBeMarkedAbsent =
-    isHotUnPlug && !isStopped(vm) && !isPodNetwork(nicPresentation?.network);
+  const canBeMarkedAbsent = isHotUnPlug && !isPodNetwork(nicPresentation?.network);
 
   if (canBeMarkedAbsent) {
     return patchVM(
