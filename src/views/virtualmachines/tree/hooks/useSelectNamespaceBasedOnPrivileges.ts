@@ -10,6 +10,7 @@ import useProjects from '@kubevirt-utils/hooks/useProjects';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { getVMListNamespacesURL } from '@multicluster/urls';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import { useLastNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 
@@ -40,6 +41,8 @@ const useSelectNamespaceBasedOnPrivileges = ({
   const navigate = useNavigate();
   const [, setLastNamespace] = useLastNamespace();
   const isAdmin = useIsAdmin();
+  const isACMPage = useIsACMPage();
+
   const [projectNames, projectNamesLoaded] = useProjects();
   const [alertMessage, setAlertMessage] = useState<string>(null);
 
@@ -48,6 +51,8 @@ const useSelectNamespaceBasedOnPrivileges = ({
   const { ns } = useParams<{ ns: string }>();
 
   useEffect(() => {
+    if (isACMPage) return;
+
     if (!isAdmin && location.pathname.includes(ALL_NAMESPACES_PATH)) {
       if (projectNamesLoaded && !isEmpty(projectNames)) {
         const preferredProject = projectNames.includes(DEFAULT_NAMESPACE)
