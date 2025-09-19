@@ -1,6 +1,7 @@
 import { TFunction } from 'react-i18next';
 
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
+import { isPodNetwork } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { sortNICs } from '@kubevirt-utils/resources/vm/utils/network/utils';
 import { sortByDirection, universalComparator } from '@kubevirt-utils/utils/utils';
 import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
@@ -18,7 +19,7 @@ export const toNetworkNameLabel = <
 >(
   t: TFunction,
   nic: T,
-) => (nic?.network?.pod ? t('Pod networking') : nic?.network?.multus?.networkName);
+) => (isPodNetwork(nic?.network) ? t('Pod networking') : nic?.network?.multus?.networkName);
 
 export const Name = <T extends { network: { name: string } }>(t: TFunction): TableColumn<T> => ({
   id: 'name',
