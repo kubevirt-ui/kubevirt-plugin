@@ -161,6 +161,7 @@
     "lint:fix": "yarn lint --fix",
     "memsource-download": "./i18n-scripts/memsource-download.sh",
     "memsource-upload": "./i18n-scripts/memsource-upload.sh",
+    "oc-login": "./oc-login-script.sh",
     "po-to-i18n": "node ./i18n-scripts/po-to-i18n.js",
     "postinstall": "cp node_modules/@openshift-console/dynamic-plugin-sdk/docs/console-extensions.md .",
     "prepare": "husky install",
