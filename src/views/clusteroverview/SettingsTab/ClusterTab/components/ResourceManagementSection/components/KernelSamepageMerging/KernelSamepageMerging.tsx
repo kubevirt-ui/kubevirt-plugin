@@ -67,7 +67,7 @@ const KernelSamepageMerging: FC<KernelSamepageMergingProps> = ({
 
   return (
     <>
-      <Split className="settings-tab--indented">
+      <Split>
         <SplitItem isFilled>
           {t('Kernel Samepage Merging (KSM)')}{' '}
           <HelpTextIcon

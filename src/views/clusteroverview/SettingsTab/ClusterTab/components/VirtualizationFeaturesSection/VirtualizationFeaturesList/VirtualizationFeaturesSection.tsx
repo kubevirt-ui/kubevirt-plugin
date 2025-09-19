@@ -53,6 +53,7 @@ const VirtualizationFeaturesSection: FC = () => {
       className="virtualization-features-section"
       customContent={ConfigureButton}
       id="virtualization-features-section"
+      isIndented
       toggleContent={t('Virtualization features')}
     >
       <Stack hasGutter>
