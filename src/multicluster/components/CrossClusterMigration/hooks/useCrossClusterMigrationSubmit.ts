@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { Updater } from 'use-immer';
 
 import {
+  MigrationModel,
   NetworkMapModel,
   PlanModel,
   StorageMapModel,
@@ -14,6 +15,8 @@ import { getRandomChars } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 
 import { MTV_MIGRATION_NAMESPACE } from '../constants';
+
+import { getCreateMigration } from './utils';
 
 const useCrossClusterMigrationSubmit = (
   migrationPlan: V1beta1Plan,
@@ -97,6 +100,11 @@ const useCrossClusterMigrationSubmit = (
         ns: MTV_MIGRATION_NAMESPACE,
       });
 
+      await kubevirtK8sCreate({
+        data: getCreateMigration(createdMigrationPlan),
+        model: MigrationModel,
+        ns: MTV_MIGRATION_NAMESPACE,
+      });
       setMigrationPlan(createdMigrationPlan);
       setSuccess(true);
     } catch (apiError) {

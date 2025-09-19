@@ -2,9 +2,11 @@ import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { RemoveFolderQuery } from '@kubevirt-utils/components/MoveVMToFolderModal/hooks/useRemoveFolderQuery';
+import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
 import { getLabels, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { TreeViewDataItem } from '@patternfly/react-core';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
@@ -21,7 +23,8 @@ let draggingVM: null | V1VirtualMachine = null;
 let isDraggingVMAloneInFolder = false;
 
 export const changeVMFolder = (newFolder: string) =>
-  k8sPatch({
+  kubevirtK8sPatch({
+    cluster: getCluster(draggingVM),
     data: [
       ...(isEmpty(getLabels(draggingVM))
         ? [
@@ -72,7 +75,7 @@ export const addDropEventListeners = (
 ): RemoveListenerFunction => {
   const dropHTMLElement = document.getElementById(treeViewItem.id);
 
-  const [_, dropNamespace, folderName] = treeViewItem.id.split('/');
+  const [_, dropCluster, dropNamespace, folderName] = treeViewItem.id.split('/');
 
   if (!dropHTMLElement) return null;
 
@@ -89,7 +92,9 @@ export const addDropEventListeners = (
   };
 
   const dragOverHandler = (event) => {
-    const dragAllowed = getNamespace(draggingVM) === dropNamespace;
+    const dragClusterAllowed =
+      dropCluster === SINGLE_CLUSTER_KEY || getCluster(draggingVM) === dropCluster;
+    const dragAllowed = getNamespace(draggingVM) === dropNamespace && dragClusterAllowed;
     event.preventDefault();
     event.stopPropagation();
     event.dataTransfer.dropEffect = dragAllowed ? DROP_EFFECTS.MOVE : DROP_EFFECTS.NONE;

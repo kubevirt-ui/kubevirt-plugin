@@ -1,5 +1,9 @@
+import { MigrationModel, V1beta1Plan } from '@kubev2v/types';
 import { modelToGroupVersionKind } from '@kubevirt-utils/models';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { getName, getNamespace, getUID } from '@kubevirt-utils/resources/shared';
+import { getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
+
+import { MTV_MIGRATION_NAMESPACE } from '../constants';
 
 export const getSelectableOptions = (
   resources: string[],
@@ -16,3 +20,21 @@ export const getSelectableOptions = (
         value: resource,
       };
     });
+
+export const getCreateMigration = (migrationPlan: V1beta1Plan) => {
+  return {
+    apiVersion: `${MigrationModel.apiGroup}/${MigrationModel.apiVersion}`,
+    kind: MigrationModel.kind,
+    metadata: {
+      name: `${getName(migrationPlan)}-${getRandomChars()}`,
+      namespace: MTV_MIGRATION_NAMESPACE,
+    },
+    spec: {
+      plan: {
+        name: getName(migrationPlan),
+        namespace: getNamespace(migrationPlan),
+        uid: getUID(migrationPlan),
+      },
+    },
+  };
+};

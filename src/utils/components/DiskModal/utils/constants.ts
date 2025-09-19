@@ -40,3 +40,7 @@ export const modalsBySource = new Proxy(DiskModalBySource, {
 export const FORM_FIELD_UPLOAD_FILE = 'uploadFile';
 export const UPLOAD_MODE_SELECT = 'select';
 export const UPLOAD_MODE_UPLOAD = 'upload';
+export const HotPlugFeatures = {
+  DeclarativeHotplugVolumes: 'DeclarativeHotplugVolumes',
+  HotplugVolumes: 'HotplugVolumes',
+};
