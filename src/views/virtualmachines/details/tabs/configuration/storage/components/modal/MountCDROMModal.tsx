@@ -9,10 +9,13 @@ import {
   UPLOAD_MODE_UPLOAD,
 } from '@kubevirt-utils/components/DiskModal/utils/constants';
 import { mountISOToCDROM } from '@kubevirt-utils/components/DiskModal/utils/helpers';
+import { isHotPluggableEnabled } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import { uploadDataVolume } from '@kubevirt-utils/components/DiskModal/utils/submit';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
+import { isUploadingDisk } from '@kubevirt-utils/hooks/useCDIUpload/utils';
+import useKubevirtHyperconvergeConfiguration from '@kubevirt-utils/hooks/useKubevirtHyperconvergeConfiguration.ts';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
@@ -61,6 +64,8 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
     uploadMode,
   } = useMountCDROMForm();
   const { upload, uploadData } = useCDIUpload();
+  const isUploading = isUploadingDisk(upload?.uploadStatus);
+  const { featureGates } = useKubevirtHyperconvergeConfiguration();
 
   const { getValues, setValue } = methods;
 
@@ -68,6 +73,7 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
 
   const handleModalSubmit = async () => {
     const data = getValues();
+    const isHotPluggable = isHotPluggableEnabled(featureGates);
     const diskState = buildDiskState(
       uploadMode,
       selectedISO,
@@ -76,13 +82,14 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
       cdromName,
       uploadFilename,
     );
+
     if (!diskState) return;
     if (data.uploadFile?.file) {
       const uploadedDataVolume = await uploadDataVolume(vm, uploadData, diskState);
       diskState.dataVolumeTemplate = convertDataVolumeToTemplate(uploadedDataVolume);
     }
 
-    const updatedVM = await mountISOToCDROM(vm, diskState);
+    const updatedVM = await mountISOToCDROM(vm, diskState, isHotPluggable);
     return onSubmit(updatedVM);
   };
 
@@ -123,6 +130,7 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
                   setValue(UPLOAD_FILENAME_FIELD, '');
                 }}
                 toggleProps={{
+                  isDisabled: isUploading,
                   isFullWidth: true,
                   placeholder: t('Select or upload a new ISO file to the cluster'),
                 }}

@@ -45,6 +45,7 @@ export const getInitialMigrationPlan = (vms: V1VirtualMachine[]): V1beta1Plan =>
       },
     },
     targetNamespace: null,
+    type: 'live',
     vms: vms.map((vm) => ({
       id: getUID(vm),
       name: getName(vm),
@@ -140,7 +141,6 @@ const getVolumePVCs = (vm: V1VirtualMachine) =>
 
 export const getInitialStorageMap = ({
   pvcs,
-  sourceStorageClasses,
   targetStorageClasses,
   vms,
 }: GetInitialStorageMapParams): V1beta1StorageMap => {
@@ -169,7 +169,6 @@ export const getInitialStorageMap = ({
             storageClass: getName(targetStorageClasses.find((sc) => getName(sc) === storageClass)),
           },
           source: {
-            id: getUID(sourceStorageClasses.find((sc) => getName(sc) === storageClass)),
             name: storageClass,
           },
         };

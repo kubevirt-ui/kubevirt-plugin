@@ -9,7 +9,7 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { isInstanceTypeVM } from '@kubevirt-utils/resources/instancetype/helper';
+import { isExpandableSpecVM } from '@kubevirt-utils/resources/instancetype/helper';
 import { getEvictionStrategy } from '@kubevirt-utils/resources/vm';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
@@ -70,8 +70,8 @@ const SchedulingSectionRightGrid: FC<SchedulingSectionRightGridProps> = ({
             ))
           }
           data-test-id="dedicated-resources"
-          descriptionData={<DedicatedResources vm={isInstanceTypeVM(vm) ? instanceTypeVM : vm} />}
-          isDisabled={isInstanceTypeVM(vm)}
+          descriptionData={<DedicatedResources vm={isExpandableSpecVM(vm) ? instanceTypeVM : vm} />}
+          isDisabled={isExpandableSpecVM(vm)}
           isEdit={canUpdateVM}
         />
         <VirtualMachineDescriptionItem

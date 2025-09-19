@@ -11,7 +11,7 @@ type UseHCPermittedHostDevicesType = () => {
 };
 
 const useHCPermittedHostDevices: UseHCPermittedHostDevicesType = () => {
-  const [hcConfig, hcLoaded, hcError] = useKubevirtHyperconvergeConfiguration();
+  const { hcConfig, hcError, hcLoaded } = useKubevirtHyperconvergeConfiguration();
 
   const { permittedHostDevices }: V1KubeVirtConfiguration = hcConfig?.spec?.configuration || {};
 

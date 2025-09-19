@@ -8,7 +8,10 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
-import { getPrintableNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
+import {
+  getPrintableNetworkInterfaceType,
+  isPodNetwork,
+} from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 import { getConfigInterfaceStateFromVM } from '@virtualmachines/details/tabs/configuration/network/utils/utils';
 
@@ -35,7 +38,7 @@ const NetworkInterfaceRow: FC<RowProps<NetworkPresentation, { template: V1Templa
         {iface.model || NO_DATA_DASH}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="network">
-        {network.pod ? (
+        {isPodNetwork(network) ? (
           t('Pod networking')
         ) : (
           <TemplateValue value={network.multus?.networkName || NO_DATA_DASH} />

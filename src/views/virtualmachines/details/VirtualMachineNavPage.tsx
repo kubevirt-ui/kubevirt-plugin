@@ -46,7 +46,8 @@ const VirtualMachineNavPage: FC = () => {
 
   const vmToShow = useMemo(() => (runningTourSignal.value ? tourGuideVM : vm), [vm]);
 
-  const [instanceTypeExpandedSpec, expandedSpecLoading] = useInstanceTypeExpandSpec(vmToShow);
+  const [instanceTypeExpandedSpec, expandedSpecLoading, expandedSpecError] =
+    useInstanceTypeExpandSpec(vmToShow);
 
   const pages = useVirtualMachineTabs();
 
@@ -65,7 +66,7 @@ const VirtualMachineNavPage: FC = () => {
         <div className="VirtualMachineNavPage--tabs__main">
           <HorizontalNavbar
             basePath={getVMURL(cluster, namespace, name)}
-            error={loadError}
+            error={loadError || expandedSpecError}
             instanceTypeExpandedSpec={instanceTypeExpandedSpec}
             loaded={isLoaded && !expandedSpecLoading}
             pages={pages}

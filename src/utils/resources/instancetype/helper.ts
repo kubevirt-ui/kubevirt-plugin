@@ -25,10 +25,13 @@ export const getInstanceTypeModelFromMatcher = (
     ? VirtualMachineClusterInstancetypeModel
     : VirtualMachineInstancetypeModel;
 
-export const isInstanceTypeVM = (vm: V1VirtualMachine | V1VirtualMachineInstance): boolean =>
+export const isExpandableSpecVM = (vm: V1VirtualMachine | V1VirtualMachineInstance): boolean =>
   isVM(vm)
     ? !isEmpty(vm?.spec?.instancetype) || !isEmpty(vm?.spec?.preference)
     : !!getInstanceTypeNameFromAnnotation(vm) || !!getPreferenceNameFromAnnotation(vm);
+
+export const isInstanceTypeVM = (vm: V1VirtualMachine | V1VirtualMachineInstance): boolean =>
+  isVM(vm) ? !isEmpty(vm?.spec?.instancetype) : !!getInstanceTypeNameFromAnnotation(vm);
 
 export const getInstanceTypeNameFromAnnotation = (
   vm: V1VirtualMachine | V1VirtualMachineInstance,
