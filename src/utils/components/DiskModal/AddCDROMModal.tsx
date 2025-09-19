@@ -2,8 +2,10 @@ import React, { FC, useEffect, useState } from 'react';
 import { FormProvider, useForm, useWatch } from 'react-hook-form';
 
 import { FORM_FIELD_UPLOAD_FILE } from '@kubevirt-utils/components/DiskModal/utils/constants';
+import { isHotPluggableEnabled } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import { PendingChangesAlert } from '@kubevirt-utils/components/PendingChanges/PendingChangesAlert/PendingChangesAlert';
 import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
+import useKubevirtHyperconvergeConfiguration from '@kubevirt-utils/hooks/useKubevirtHyperconvergeConfiguration.ts';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
@@ -30,6 +32,9 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
   const [uploadEnabled, setUploadEnabled] = useState(true);
   const isVMRunning = isRunning(vm);
   const vmNamespace = getNamespace(vm);
+  const { featureGates } = useKubevirtHyperconvergeConfiguration();
+
+  const isHotPluggable = isHotPluggableEnabled(featureGates);
 
   const methods = useForm<V1DiskFormState>({
     defaultValues: getDefaultCreateValues(vm, SourceTypes.CDROM),
@@ -69,6 +74,9 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
           namespace: getNamespace(uploadedDataVolume) || vmNamespace,
         },
       };
+      if (isHotPluggable) {
+        data.volume.dataVolume.hotpluggable = true;
+      }
     } else {
       delete data.dataVolumeTemplate;
       delete data.volume;

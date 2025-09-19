@@ -28,6 +28,7 @@ import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 import { addPersistentVolume, removeVolume } from '@virtualmachines/actions/actions';
 
+import { HotPlugFeatures } from './constants';
 import { SourceTypes, V1DiskFormState } from './types';
 
 export const getEmptyVMDataVolumeResource = (
@@ -257,17 +258,19 @@ export const createDataVolumeName = (vm: V1VirtualMachine, diskName: string) => 
   )}`;
 };
 
-const getVolumeSourceForMount = (diskState: V1DiskFormState) => {
+const getVolumeSourceForMount = (diskState: V1DiskFormState, isHotPluggable: boolean) => {
   if (diskState.dataVolumeTemplate) {
     return {
       dataVolume: {
         name: diskState.dataVolumeTemplate.metadata.name,
+        ...(isHotPluggable && { hotpluggable: true }),
       },
     };
   }
   return {
     persistentVolumeClaim: {
       claimName: diskState.volume.persistentVolumeClaim.claimName,
+      ...(isHotPluggable && { hotpluggable: true }),
     },
   };
 };
@@ -275,8 +278,9 @@ const getVolumeSourceForMount = (diskState: V1DiskFormState) => {
 export const mountISOToCDROM = async (
   vm: V1VirtualMachine,
   diskState: V1DiskFormState,
+  isHotPluggable: boolean,
 ): Promise<V1VirtualMachine> => {
-  const newVolumeSource = getVolumeSourceForMount(diskState);
+  const newVolumeSource = getVolumeSourceForMount(diskState, isHotPluggable);
 
   return produceVMDisks(vm, (draftVM) => {
     // Find the index of the existing CD-ROM volume, if it exists
@@ -315,4 +319,12 @@ export const ejectISOFromCDROM = (vm: V1VirtualMachine, cdromName: string): V1Vi
       (volume) => volume.name !== cdromName,
     );
   });
+};
+export const isHotPluggableEnabled = (featureGates: string[]) => {
+  if (featureGates?.includes(HotPlugFeatures.DeclarativeHotplugVolumes)) {
+    if (!featureGates?.includes(HotPlugFeatures.HotplugVolumes)) {
+      return true;
+    }
+  }
+  return false;
 };
