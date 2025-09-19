@@ -2,25 +2,21 @@ import React, { FC } from 'react';
 
 import ExpandSectionWithCustomToggle from '@kubevirt-utils/components/ExpandSectionWithCustomToggle/ExpandSectionWithCustomToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { DESCHEDULER_OPERATOR_NAME } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/constants';
 import { getInstallStateIcon } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/utils';
 import { useVirtualizationFeaturesContext } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/VirtualizationFeaturesContext/VirtualizationFeaturesContext';
 import DeschedulerSection from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/VirtualizationFeaturesList/components/LoadBalanceSection/components/DeschedulerSection';
 import { Split, SplitItem } from '@patternfly/react-core';
 import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 
-import { VirtualizationFeatureOperators } from '../../../utils/types';
 import IconSkeleton from '../icons/IconSkeleton/IconSkeleton';
 
 import './LoadBalanceSection.scss';
 
-type LoadBalanceSectionProps = {
-  operatorName: VirtualizationFeatureOperators;
-};
-
-const LoadBalanceSection: FC<LoadBalanceSectionProps> = ({ operatorName }) => {
+const LoadBalanceSection: FC = () => {
   const { t } = useKubevirtTranslation();
   const { operatorDetailsMap, operatorResourcesLoaded } = useVirtualizationFeaturesContext();
-  const { installState, operatorHubURL } = operatorDetailsMap?.[operatorName];
+  const { installState, operatorHubURL } = operatorDetailsMap?.[DESCHEDULER_OPERATOR_NAME];
   const Icon = getInstallStateIcon(installState);
 
   return (

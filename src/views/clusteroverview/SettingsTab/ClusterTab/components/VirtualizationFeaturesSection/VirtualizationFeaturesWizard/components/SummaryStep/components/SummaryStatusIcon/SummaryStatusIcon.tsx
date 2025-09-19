@@ -21,7 +21,7 @@ const SummaryStatusIcon: FC<SummaryStatusIconProps> = ({ installState, operatorH
   const { t } = useKubevirtTranslation();
 
   const Icon = getInstallStateIcon(installState);
-  const message = getInstallStateMessage(installState);
+  const message = getInstallStateMessage(installState, t);
 
   return (
     <Split className="summary-status-icon">
