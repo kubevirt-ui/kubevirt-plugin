@@ -19,10 +19,16 @@ import './CPUInput.scss';
 type CPUInputProps = {
   currentCPU: V1CPU;
   setUserEnteredCPU: Dispatch<SetStateAction<V1CPU>>;
+  templateName?: string;
   userEnteredCPU: V1CPU;
 };
 
-const CPUInput: FC<CPUInputProps> = ({ currentCPU, setUserEnteredCPU, userEnteredCPU }) => {
+const CPUInput: FC<CPUInputProps> = ({
+  currentCPU,
+  setUserEnteredCPU,
+  templateName,
+  userEnteredCPU,
+}) => {
   const { t } = useKubevirtTranslation();
   const [selectedRadioOption, setSelectedRadioOption] = useState<CPUInputType>(
     CPUInputType.editVCPU,
@@ -74,6 +80,7 @@ const CPUInput: FC<CPUInputProps> = ({ currentCPU, setUserEnteredCPU, userEntere
             hide={selectedRadioOption !== CPUInputType.editTopologyManually}
             isDisabled={selectedRadioOption !== CPUInputType.editTopologyManually}
             setCPU={setUserEnteredCPU}
+            templateName={templateName}
           />
         }
         onClick={() => {
