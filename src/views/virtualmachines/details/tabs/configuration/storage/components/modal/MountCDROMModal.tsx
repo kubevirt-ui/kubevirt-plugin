@@ -8,8 +8,10 @@ import {
   UPLOAD_MODE_SELECT,
   UPLOAD_MODE_UPLOAD,
 } from '@kubevirt-utils/components/DiskModal/utils/constants';
-import { mountISOToCDROM } from '@kubevirt-utils/components/DiskModal/utils/helpers';
-import { isHotPluggableEnabled } from '@kubevirt-utils/components/DiskModal/utils/helpers';
+import {
+  isHotPluggableEnabled,
+  mountISOToCDROM,
+} from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import { uploadDataVolume } from '@kubevirt-utils/components/DiskModal/utils/submit';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
@@ -140,27 +142,14 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
             </FormGroup>
           </StackItem>
           <StackItem>
-            <FormGroup>
-              <DiskSourceUploadPVC
-                handleClearUpload={() => {
-                  handleClearUpload();
-                  setValue(UPLOAD_FILENAME_FIELD, '');
-                }}
-                handleUpload={handleFileUpload}
-                isRequired={uploadMode !== UPLOAD_MODE_SELECT}
-                key={uploadMode}
-                label={t('Upload ISO')}
-                relevantUpload={upload}
-              />
-            </FormGroup>
-          </StackItem>
-          <StackItem>
             <DiskSourceUploadPVC
               handleClearUpload={() => {
                 handleClearUpload();
                 setValue(UPLOAD_FILENAME_FIELD, '');
               }}
               handleUpload={handleFileUpload}
+              isRequired={uploadMode !== UPLOAD_MODE_SELECT}
+              key={uploadMode}
               label={t('Upload ISO')}
               relevantUpload={upload}
             />

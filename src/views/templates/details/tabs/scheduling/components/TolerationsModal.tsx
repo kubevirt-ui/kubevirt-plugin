@@ -22,7 +22,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
-import { Form, ModalVariant } from '@patternfly/react-core';
+import { ModalVariant } from '@patternfly/react-core';
 
 type TolerationsModalProps = {
   isOpen: boolean;
@@ -91,7 +91,7 @@ const TolerationsModal: React.FC<TolerationsModalProps> = ({
       onSubmit={onSubmit}
     >
       <TolerationModalDescriptionText />
-      <Form>
+      <div className="pf-c-form">
         <LabelsList
           addRowText={t('Add toleration')}
           emptyStateAddRowText={t('Add toleration to specify qualifying Nodes')}
@@ -119,7 +119,7 @@ const TolerationsModal: React.FC<TolerationsModalProps> = ({
             qualifiedNodes={tolerationsLabels?.length === 0 ? nodes : qualifiedNodes}
           />
         )}
-      </Form>
+      </div>
     </TabModal>
   );
 };

@@ -77,6 +77,10 @@ const TabModal: TabModalFC = memo(
 
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
+      executeSubmit();
+    };
+
+    const executeSubmit = () => {
       setIsSubmitting(true);
       setApiError(undefined);
 
@@ -117,6 +121,7 @@ const TabModal: TabModalFC = memo(
             <Form
               className={formClassName}
               form="tab-modal-form"
+              id="tab-modal-form"
               isHorizontal={isHorizontal}
               onSubmit={handleSubmit}
             >
@@ -151,6 +156,7 @@ const TabModal: TabModalFC = memo(
                 form="tab-modal-form"
                 isDisabled={isDisabled || isSubmitting}
                 isLoading={isLoading || isSubmitting}
+                onClick={shouldWrapInForm ? undefined : executeSubmit}
                 type="submit"
                 variant={submitBtnVariant ?? ButtonVariant.primary}
               >

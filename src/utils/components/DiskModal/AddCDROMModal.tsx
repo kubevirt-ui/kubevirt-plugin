@@ -10,7 +10,7 @@ import useKubevirtHyperconvergeConfiguration from '@kubevirt-utils/hooks/useKube
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import { Checkbox, Form, FormGroup, Stack, StackItem } from '@patternfly/react-core';
+import { Checkbox, FormGroup, Stack, StackItem } from '@patternfly/react-core';
 import { isRunning } from '@virtualmachines/utils';
 
 import TabModal from '../TabModal/TabModal';
@@ -109,6 +109,7 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
         isLoading={isSubmitting}
         isOpen={isOpen}
         onSubmit={handleModalSubmit}
+        shouldWrapInForm
         submitBtnText={t('Add')}
       >
         <Stack hasGutter>
@@ -120,7 +121,7 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
                 )}
               </PendingChangesAlert>
             )}
-            <Form>
+            <div className="pf-v6-c-form">
               <DiskNameInput isDisabled={isUploading} />
               <FormGroup>
                 <Checkbox
@@ -132,11 +133,9 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
                 />
               </FormGroup>
               {uploadEnabled && (
-                <>
-                  <DiskSourceUploadPVC label={t('Upload ISO')} relevantUpload={upload} />
-                </>
+                <DiskSourceUploadPVC label={t('Upload ISO')} relevantUpload={upload} />
               )}
-            </Form>
+            </div>
           </StackItem>
         </Stack>
       </TabModal>

@@ -22,7 +22,6 @@ import {
   Button,
   ButtonVariant,
   Checkbox,
-  Form,
   FormGroup,
   Label,
   Popover,
@@ -73,80 +72,79 @@ const DedicatedResourcesModal: FC<DedicatedResourcesModalProps> = ({
       obj={updatedTemplate}
       onClose={onClose}
       onSubmit={onSubmit}
+      shouldWrapInForm
     >
-      <Form>
-        <FormGroup fieldId="dedicated-resources" isInline>
-          <Checkbox
-            description={
-              <>
-                {t('Available only on Nodes with labels')}{' '}
-                <Label className="pf-v6-u-ml-xs" color="purple" variant="outline">
-                  {!isEmpty(nodes) ? (
-                    <Link
-                      target="_blank"
-                      to={`/search?kind=${NodeModel.kind}&q=${encodeURIComponent(cpuManagerLabel)}`}
-                    >
-                      {cpuManagerLabel}
-                    </Link>
-                  ) : (
-                    cpuManagerLabel
-                  )}
-                </Label>
-              </>
+      <FormGroup fieldId="dedicated-resources" isInline>
+        <Checkbox
+          description={
+            <>
+              {t('Available only on Nodes with labels')}{' '}
+              <Label className="pf-v6-u-ml-xs" color="purple" variant="outline">
+                {!isEmpty(nodes) ? (
+                  <Link
+                    target="_blank"
+                    to={`/search?kind=${NodeModel.kind}&q=${encodeURIComponent(cpuManagerLabel)}`}
+                  >
+                    {cpuManagerLabel}
+                  </Link>
+                ) : (
+                  cpuManagerLabel
+                )}
+              </Label>
+            </>
+          }
+          id="dedicated-resources"
+          isChecked={checked}
+          label={t('Schedule this workload with dedicated resources (guaranteed policy)')}
+          onChange={(_, check: boolean) => setChecked(check)}
+        />
+      </FormGroup>
+      <FormGroup fieldId="dedicated-resources-node">
+        {!isEmpty(nodes) ? (
+          <Alert
+            title={
+              hasNodes
+                ? t('{{qualifiedNodesCount}} matching nodes found', {
+                    qualifiedNodesCount: qualifiedNodes?.length,
+                  })
+                : t('No matching nodes found for the {{cpuManagerLabel}} label', {
+                    cpuManagerLabel,
+                  })
             }
-            id="dedicated-resources"
-            isChecked={checked}
-            label={t('Schedule this workload with dedicated resources (guaranteed policy)')}
-            onChange={(_, check: boolean) => setChecked(check)}
-          />
-        </FormGroup>
-        <FormGroup fieldId="dedicated-resources-node">
-          {!isEmpty(nodes) ? (
-            <Alert
-              title={
-                hasNodes
-                  ? t('{{qualifiedNodesCount}} matching nodes found', {
-                      qualifiedNodesCount: qualifiedNodes?.length,
-                    })
-                  : t('No matching nodes found for the {{cpuManagerLabel}} label', {
-                      cpuManagerLabel,
-                    })
-              }
-              isInline
-              variant={hasNodes ? AlertVariant.success : AlertVariant.warning}
-            >
-              {hasNodes ? (
-                <Popover
-                  bodyContent={
-                    <>
-                      {qualifiedNodes?.map((node) => (
-                        <ResourceLink
-                          groupVersionKind={modelToGroupVersionKind(NodeModel)}
-                          key={node.metadata.uid}
-                          name={node.metadata.name}
-                        />
-                      ))}
-                    </>
-                  }
-                  headerContent={t('{{qualifiedNodesCount}} nodes found', {
+            isInline
+            variant={hasNodes ? AlertVariant.success : AlertVariant.warning}
+          >
+            {hasNodes ? (
+              <Popover
+                bodyContent={
+                  <>
+                    {qualifiedNodes?.map((node) => (
+                      <ResourceLink
+                        groupVersionKind={modelToGroupVersionKind(NodeModel)}
+                        key={node.metadata.uid}
+                        name={node.metadata.name}
+                      />
+                    ))}
+                  </>
+                }
+                headerContent={t('{{qualifiedNodesCount}} nodes found', {
+                  qualifiedNodesCount: qualifiedNodes?.length,
+                })}
+              >
+                <Button isInline onClick={() => setChecked(false)} variant={ButtonVariant.link}>
+                  {t('view {{qualifiedNodesCount}} matching nodes', {
                     qualifiedNodesCount: qualifiedNodes?.length,
                   })}
-                >
-                  <Button isInline onClick={() => setChecked(false)} variant={ButtonVariant.link}>
-                    {t('view {{qualifiedNodesCount}} matching nodes', {
-                      qualifiedNodesCount: qualifiedNodes?.length,
-                    })}
-                  </Button>
-                </Popover>
-              ) : (
-                t('Scheduling will not be possible at this state')
-              )}
-            </Alert>
-          ) : (
-            !loadError && !nodesLoaded && <Loading />
-          )}
-        </FormGroup>
-      </Form>
+                </Button>
+              </Popover>
+            ) : (
+              t('Scheduling will not be possible at this state')
+            )}
+          </Alert>
+        ) : (
+          !loadError && !nodesLoaded && <Loading />
+        )}
+      </FormGroup>
     </TabModal>
   );
 };

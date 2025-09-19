@@ -12,7 +12,7 @@ import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConverg
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { V1Template } from '@kubevirt-utils/models';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
-import { Checkbox, Form, FormGroup } from '@patternfly/react-core';
+import { Checkbox, FormGroup } from '@patternfly/react-core';
 
 type EvictionStrategyModalProps = {
   isOpen: boolean;
@@ -63,22 +63,21 @@ const EvictionStrategyModal: FC<EvictionStrategyModalProps> = ({
       obj={updatedTemplate}
       onClose={onClose}
       onSubmit={onSubmit}
+      shouldWrapInForm
     >
-      <Form>
-        <FormGroup fieldId="eviction-strategy" isInline>
-          <Checkbox
-            id="eviction-strategy"
-            isChecked={isChecked}
-            label={t('LiveMigrate')}
-            onChange={(_event, val) => setIsChecked(val)}
-          />
-          <FormGroupHelperText>
-            {t(
-              'EvictionStrategy can be set to "LiveMigrate" if the VirtualMachineInstance should be migrated instead of shut-off in case of a node drain.',
-            )}
-          </FormGroupHelperText>
-        </FormGroup>
-      </Form>
+      <FormGroup fieldId="eviction-strategy" isInline>
+        <Checkbox
+          id="eviction-strategy"
+          isChecked={isChecked}
+          label={t('LiveMigrate')}
+          onChange={(_event, val) => setIsChecked(val)}
+        />
+        <FormGroupHelperText>
+          {t(
+            'EvictionStrategy can be set to "LiveMigrate" if the VirtualMachineInstance should be migrated instead of shut-off in case of a node drain.',
+          )}
+        </FormGroupHelperText>
+      </FormGroup>
     </TabModal>
   );
 };
