@@ -86,6 +86,7 @@ const ExpandSectionWithCustomToggle: FC<ExpandSectionWithCustomToggleProps> = ({
         <ExpandableSection
           className={classNames(
             'expand-section-custom-toggle__expandable-section',
+            'ExpandSection',
             expandSectionClassName,
           )}
           contentId={contentID}

@@ -1,6 +1,11 @@
 .high-availability-summary-section {
   &__toggle {
-    margin-right: 140px;
+    margin-right: 148px;
+    margin-left: -0.5rem;
+  }
+
+  &__expand-section .pf-v6-c-expandable-section__content {
+    padding-left: calc(var(--pf-v6-c-expandable-section__content--PaddingInlineStart) - 0.5rem);
   }
 
   &__status-icon {

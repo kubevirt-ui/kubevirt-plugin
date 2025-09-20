@@ -58,7 +58,7 @@ const PersistentReservationSection: FC<PersistentReservationSectionProps> = ({
 
   return (
     <ExpandSection toggleText={t('SCSI persistent reservation')}>
-      <Split className="settings-tab--indented">
+      <Split>
         <SplitItem isFilled>
           {t('Enable persistent reservation')}{' '}
           <HelpTextIcon

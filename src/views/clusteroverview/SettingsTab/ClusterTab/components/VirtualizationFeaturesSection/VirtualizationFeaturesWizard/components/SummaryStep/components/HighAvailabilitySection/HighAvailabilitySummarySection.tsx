@@ -30,11 +30,13 @@ const HighAvailabilitySummarySection: FC<HighAvailabilitySummarySectionProps> = 
   return (
     <ExpandSectionWithCustomToggle
       customContent={<SummaryStatusIcon installState={jointInstallState} />}
+      expandSectionClassName="high-availability-summary-section__expand-section"
       id="high-availability-summary-section"
+      isIndented
       toggleClassname="high-availability-summary-section__toggle"
       toggleContent={t('High availability')}
     >
-      <Stack className="pf-v6-u-pl-xl" hasGutter>
+      <Stack hasGutter>
         <StackItem>
           <FeatureSummaryItem
             isIndented

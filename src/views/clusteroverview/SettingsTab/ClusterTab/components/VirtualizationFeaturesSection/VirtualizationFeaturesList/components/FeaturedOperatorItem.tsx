@@ -24,7 +24,11 @@ const FeaturedOperatorItem: FC<FeaturedOperatorItemProps> = ({ operatorName, tit
   return (
     <Split className="featured-operator-item" hasGutter>
       <SplitItem>
-        <Button onClick={() => navigate(operatorHubURL)} variant="link">
+        <Button
+          className="featured-operator-item__link-button"
+          onClick={() => navigate(operatorHubURL)}
+          variant="link"
+        >
           {title}
         </Button>
       </SplitItem>
