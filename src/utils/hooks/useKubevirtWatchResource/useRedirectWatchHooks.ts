@@ -7,12 +7,13 @@ import { WatchK8sResource } from '@openshift-console/dynamic-plugin-sdk';
 import { AdvancedSearchFilter, useFleetSearchPoll } from '@stolostron/multicluster-sdk';
 
 import useKubevirtDataPod from '../useKubevirtDataPod/useKubevirtDataPod';
+import { KubevirtDataPodFilters } from '../useKubevirtDataPod/useKubevirtDataPodFilters';
 
 import { Result } from './useKubevirtWatchResource';
 
 const useRedirectWatchHooks = <T extends K8sResourceCommon | K8sResourceCommon[]>(
   watchOptions: WatchK8sResource & { cluster?: string },
-  filterOptions?: { [key: string]: string },
+  filterOptions?: KubevirtDataPodFilters,
   searchQueries?: AdvancedSearchFilter,
   shouldUseProxyPod?: boolean,
 ): Result<T> => {
