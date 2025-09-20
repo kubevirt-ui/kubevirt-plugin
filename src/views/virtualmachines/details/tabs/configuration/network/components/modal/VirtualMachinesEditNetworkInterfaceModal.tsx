@@ -5,10 +5,13 @@ import NetworkInterfaceModal from '@kubevirt-utils/components/NetworkInterfaceMo
 import {
   createInterface,
   createNetwork,
-  updateVMNetworkInterfaces,
+  PatchRequest,
+  patchVM,
+  prepareInterfacePatch,
+  prepareNetworkPatch,
 } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
+import { getInterface, getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
 
 type VirtualMachinesEditNetworkInterfaceModalProps = {
@@ -42,17 +45,27 @@ const VirtualMachinesEditNetworkInterfaceModal: FC<
           nicName,
         });
 
-        const updatedNetworks: V1Network[] = [
-          ...(getNetworks(vm)?.filter(({ name }) => name !== nicPresentation?.network?.name) || []),
-          resultNetwork,
-        ];
-        const updatedInterfaces: V1Interface[] = [
-          ...(getInterfaces(vm)?.filter(({ name }) => name !== nicPresentation?.network?.name) ||
-            []),
-          resultInterface,
-        ];
+        const existingInterface = getInterface(vm, nicName);
+        const existingNetwork = getNetworks(vm).find(({ name }) => name === nicName);
 
-        return updateVMNetworkInterfaces(vm, updatedNetworks, updatedInterfaces);
+        if (!existingNetwork || !existingInterface) {
+          return;
+        }
+
+        const network: PatchRequest<V1Network> = {
+          index: getNetworks(vm)?.indexOf(existingNetwork),
+          operation: 'replace',
+          prevValue: existingNetwork,
+          value: { ...existingNetwork, ...resultNetwork },
+        };
+
+        const iface: PatchRequest<V1Interface> = {
+          index: getInterfaces(vm)?.indexOf(existingInterface),
+          operation: 'replace',
+          prevValue: existingInterface,
+          value: { ...existingInterface, ...resultInterface },
+        };
+        return patchVM(vm, [...prepareNetworkPatch(network), ...prepareInterfacePatch(iface)]);
       },
     [vm, nicPresentation],
   );

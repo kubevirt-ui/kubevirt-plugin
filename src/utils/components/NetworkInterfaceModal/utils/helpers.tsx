@@ -40,24 +40,62 @@ export const getNetworkName = (network: V1Network): string => {
   return null;
 };
 
-export const updateVMNetworkInterfaces = (
-  vm: V1VirtualMachine,
-  updatedNetworks: V1Network[],
-  updatedInterfaces: V1Interface[],
-) =>
+export type PatchRequest<T> =
+  | {
+      index: number;
+      operation: 'add';
+      value: T;
+    }
+  | {
+      index: number;
+      operation: 'remove';
+      prevValue: T;
+    }
+  | {
+      index: number;
+      operation: 'replace';
+      prevValue: T;
+      value: T;
+    };
+
+export type PatchItem = {
+  op: 'add' | 'remove' | 'replace' | 'test';
+  path: string;
+  value: any;
+};
+
+export const prepareNetworkPatch = (update: PatchRequest<V1Network>) => {
+  const test: PatchItem = update.operation !== 'add' && {
+    op: 'test',
+    path: `/spec/template/spec/networks/${update.index}`,
+    value: update.prevValue,
+  };
+  const modify: PatchItem = {
+    op: update.operation,
+    path: `/spec/template/spec/networks/${update.index}`,
+    value: update.operation !== 'remove' ? update.value : undefined,
+  };
+  return [test, modify].filter(Boolean);
+};
+
+export const prepareInterfacePatch = (update: PatchRequest<V1Interface>) => {
+  const test: PatchItem = update.operation !== 'add' && {
+    op: 'test',
+    path: `/spec/template/spec/domain/devices/interfaces/${update.index}`,
+    value: update.prevValue,
+  };
+
+  const modify: PatchItem = {
+    op: update.operation,
+    path: `/spec/template/spec/domain/devices/interfaces/${update.index}`,
+    value: update.operation !== 'remove' ? update.value : undefined,
+  };
+  return [test, modify].filter(Boolean);
+};
+
+export const patchVM = (vm: V1VirtualMachine, items: PatchItem[]) =>
   k8sPatch({
-    data: [
-      {
-        op: 'replace',
-        path: '/spec/template/spec/networks',
-        value: updatedNetworks,
-      },
-      {
-        op: 'replace',
-        path: '/spec/template/spec/domain/devices/interfaces',
-        value: updatedInterfaces,
-      },
-    ],
+    data: items,
     model: VirtualMachineModel,
     resource: vm,
   });
@@ -79,6 +117,8 @@ export const markInterfaceAbsent = (vm: V1VirtualMachine, nicName: string) => {
   });
 };
 
+export const markOneInterfaceAbsent = (iface: V1Interface) => ({ ...iface, state: ABSENT });
+
 const removeInterfaceToBeDeleted = (nicName: string, vm: V1VirtualMachine): V1Interface[] =>
   getInterfaces(vm)?.filter(({ name }) => name !== nicName);
 
@@ -90,17 +130,6 @@ export const updateInterfacesForDeletion = (
   return canBeMarkedAbsent
     ? markInterfaceAbsent(vm, nicName)
     : removeInterfaceToBeDeleted(nicName, vm);
-};
-
-const removeNetworkToBeDeleted = (nicName: string, vm: V1VirtualMachine): V1Network[] =>
-  getNetworks(vm)?.filter(({ name }) => name !== nicName);
-
-export const updateNetworksForDeletion = (
-  nicName: string,
-  vm: V1VirtualMachine,
-  canBeMarkedAbsent: boolean,
-): V1Network[] => {
-  return canBeMarkedAbsent ? getNetworks(vm) : removeNetworkToBeDeleted(nicName, vm);
 };
 
 export const createNetwork = (nicName: string, networkName: string): V1Network => {
@@ -186,10 +215,31 @@ export const deleteNetworkInterface = (
   const isHotUnPlug = Boolean(nicPresentation?.iface?.bridge);
   const canBeMarkedAbsent =
     isHotUnPlug && !isStopped(vm) && !isPodNetwork(nicPresentation?.network);
-  const networks = updateNetworksForDeletion(nicName, vm, canBeMarkedAbsent);
-  const interfaces = updateInterfacesForDeletion(nicName, vm, canBeMarkedAbsent);
 
-  return updateVMNetworkInterfaces(vm, networks, interfaces);
+  if (canBeMarkedAbsent) {
+    return patchVM(
+      vm,
+      prepareInterfacePatch({
+        index: getInterfaces(vm).findIndex((iface) => iface.name === nicName),
+        operation: 'replace',
+        prevValue: existingInterface,
+        value: markOneInterfaceAbsent(existingInterface),
+      }),
+    );
+  }
+
+  return patchVM(vm, [
+    ...prepareNetworkPatch({
+      index: getNetworks(vm).findIndex((net) => net.name === nicName),
+      operation: 'remove',
+      prevValue: existingNetwork,
+    }),
+    ...prepareInterfacePatch({
+      index: getInterfaces(vm).findIndex((iface) => iface.name === nicName),
+      operation: 'remove',
+      prevValue: existingInterface,
+    }),
+  ]);
 };
 
 export const getPASSTSelectableOptions = (t: TFunction) => [
