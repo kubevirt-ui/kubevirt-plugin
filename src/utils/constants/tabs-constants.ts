@@ -1,4 +1,4 @@
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { TFunction } from 'react-i18next';
 
 export enum VirtualMachineDetailsTab {
   Configurations = 'configuration',
@@ -31,7 +31,9 @@ export const VirtualMachineConfigurationTabInner = new Set([
   VirtualMachineDetailsTab.InitialRun,
 ]);
 
-export const VirtualMachineDetailsTabLabel: Partial<Record<VirtualMachineDetailsTab, string>> = {
+export const getVirtualMachineDetailsTabLabel = (
+  t: TFunction,
+): Partial<Record<VirtualMachineDetailsTab, string>> => ({
   [VirtualMachineDetailsTab.Configurations]: t('Configuration'),
   [VirtualMachineDetailsTab.Console]: t('Console'),
   [VirtualMachineDetailsTab.Details]: t('Details'),
@@ -48,4 +50,4 @@ export const VirtualMachineDetailsTabLabel: Partial<Record<VirtualMachineDetails
   [VirtualMachineDetailsTab.SSH]: t('SSH'),
   [VirtualMachineDetailsTab.Storage]: t('Storage'),
   [VirtualMachineDetailsTab.YAML]: t('YAML'),
-};
+});

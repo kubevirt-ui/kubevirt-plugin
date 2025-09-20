@@ -1,3 +1,5 @@
+import { TFunction } from 'react-i18next';
+
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { getTabNameAndTitle } from '@virtualmachines/details/utils/utils';
 
@@ -9,44 +11,45 @@ import VirtualMachineSchedulingPage from '../scheduling/SchedulingTab';
 import SSHTab from '../ssh/SSHTab';
 import StorageTab from '../storage/StorageTab';
 
-export const tabs = [
+export const getTabs = (t: TFunction) => [
   {
     Component: DetailsTab,
-    ...getTabNameAndTitle(VirtualMachineDetailsTab.Details),
+    ...getTabNameAndTitle(VirtualMachineDetailsTab.Details, t),
   },
   {
     Component: StorageTab,
-    ...getTabNameAndTitle(VirtualMachineDetailsTab.Storage),
+    ...getTabNameAndTitle(VirtualMachineDetailsTab.Storage, t),
   },
   {
     Component: NetworkInterfaceListPage,
-    ...getTabNameAndTitle(VirtualMachineDetailsTab.Network),
+    ...getTabNameAndTitle(VirtualMachineDetailsTab.Network, t),
   },
   {
     Component: VirtualMachineSchedulingPage,
-    ...getTabNameAndTitle(VirtualMachineDetailsTab.Scheduling),
+    ...getTabNameAndTitle(VirtualMachineDetailsTab.Scheduling, t),
   },
   {
     Component: SSHTab,
-    ...getTabNameAndTitle(VirtualMachineDetailsTab.SSH),
+    ...getTabNameAndTitle(VirtualMachineDetailsTab.SSH, t),
   },
   {
     Component: InitialRunTab,
-    ...getTabNameAndTitle(VirtualMachineDetailsTab.InitialRun),
+    ...getTabNameAndTitle(VirtualMachineDetailsTab.InitialRun, t),
   },
   {
     Component: MetadataTab,
-    ...getTabNameAndTitle(VirtualMachineDetailsTab.Metadata),
+    ...getTabNameAndTitle(VirtualMachineDetailsTab.Metadata, t),
   },
 ];
 
-export const innerTabs: { [key: string]: string } = tabs.reduce((acc, { name }) => {
-  acc[name] = name;
-  return acc;
-}, {});
+export const getInnerTabs = (t: TFunction): { [key: string]: string } =>
+  getTabs(t).reduce((acc, { name }) => {
+    acc[name] = name;
+    return acc;
+  }, {});
 
-export const getInnerTabFromPath = (path: string) =>
-  innerTabs[path.slice(path.lastIndexOf('/') + 1)];
+export const getInnerTabFromPath = (path: string, t: TFunction) =>
+  getInnerTabs(t)[path.slice(path.lastIndexOf('/') + 1)];
 
 export const includesConfigurationPath = (path: string, append: string): string => {
   const index = path.lastIndexOf(`${VirtualMachineDetailsTab.Configurations}`);
