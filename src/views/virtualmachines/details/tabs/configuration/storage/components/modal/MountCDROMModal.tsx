@@ -8,8 +8,10 @@ import {
   UPLOAD_MODE_SELECT,
   UPLOAD_MODE_UPLOAD,
 } from '@kubevirt-utils/components/DiskModal/utils/constants';
-import { mountISOToCDROM } from '@kubevirt-utils/components/DiskModal/utils/helpers';
-import { isHotPluggableEnabled } from '@kubevirt-utils/components/DiskModal/utils/helpers';
+import {
+  isHotPluggableEnabled,
+  mountISOToCDROM,
+} from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import { uploadDataVolume } from '@kubevirt-utils/components/DiskModal/utils/submit';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
@@ -23,7 +25,6 @@ import {
   ButtonVariant,
   Content,
   ContentVariants,
-  Form,
   FormGroup,
   Stack,
   StackItem,
@@ -111,53 +112,52 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
         isDisabled={!isFormValid}
         isOpen={isOpen}
         onSubmit={handleModalSubmit}
+        shouldWrapInForm
         submitBtnText={t('Save')}
         submitBtnVariant={ButtonVariant.primary}
       >
-        <Form>
-          <Stack hasGutter>
-            <StackItem>
-              <p>{t('Mount ISO to the Virtual Machine')}</p>
-            </StackItem>
-            <StackItem>
-              <FormGroup
-                fieldId={SELECT_ISO_FIELD_ID}
-                isRequired={uploadMode !== UPLOAD_MODE_UPLOAD}
-                label={t('Select ISO')}
-              >
-                <InlineFilterSelect
-                  setSelected={(e) => {
-                    handleISOSelection(e);
-                    setValue(UPLOAD_FILENAME_FIELD, '');
-                  }}
-                  toggleProps={{
-                    isDisabled: isUploading,
-                    isFullWidth: true,
-                    placeholder: t('Select or upload a new ISO file to the cluster'),
-                  }}
-                  options={isoOptions}
-                  selected={selectedISO}
-                />
-              </FormGroup>
-            </StackItem>
-            <StackItem>
-              <DiskSourceUploadPVC
-                handleClearUpload={() => {
-                  handleClearUpload();
+        <Stack hasGutter>
+          <StackItem>
+            <p>{t('Mount ISO to the Virtual Machine')}</p>
+          </StackItem>
+          <StackItem>
+            <FormGroup
+              fieldId={SELECT_ISO_FIELD_ID}
+              isRequired={uploadMode !== UPLOAD_MODE_UPLOAD}
+              label={t('Select ISO')}
+            >
+              <InlineFilterSelect
+                setSelected={(e) => {
+                  handleISOSelection(e);
                   setValue(UPLOAD_FILENAME_FIELD, '');
                 }}
-                handleUpload={handleFileUpload}
-                isRequired={uploadMode !== UPLOAD_MODE_SELECT}
-                key={uploadMode}
-                label={t('Upload ISO')}
-                relevantUpload={upload}
+                toggleProps={{
+                  isDisabled: isUploading,
+                  isFullWidth: true,
+                  placeholder: t('Select or upload a new ISO file to the cluster'),
+                }}
+                options={isoOptions}
+                selected={selectedISO}
               />
-              <Content component={ContentVariants.small}>
-                {t('ISO file must be in the same project as the Virtual Machine')}
-              </Content>
-            </StackItem>
-          </Stack>
-        </Form>
+            </FormGroup>
+          </StackItem>
+          <StackItem>
+            <DiskSourceUploadPVC
+              handleClearUpload={() => {
+                handleClearUpload();
+                setValue(UPLOAD_FILENAME_FIELD, '');
+              }}
+              handleUpload={handleFileUpload}
+              isRequired={uploadMode !== UPLOAD_MODE_SELECT}
+              key={uploadMode}
+              label={t('Upload ISO')}
+              relevantUpload={upload}
+            />
+            <Content component={ContentVariants.small}>
+              {t('ISO file must be in the same project as the Virtual Machine')}
+            </Content>
+          </StackItem>
+        </Stack>
       </TabModal>
     </FormProvider>
   );
