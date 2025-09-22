@@ -121,6 +121,7 @@ export const addDisk = (data: V1DiskFormState, vm: V1VirtualMachine) => {
 type SubmitInput = {
   data: V1DiskFormState;
   editDiskName: string;
+  isHotpluggable?: boolean;
   onSubmit: (
     updatedVM: V1VirtualMachine,
     diskFormState?: V1DiskFormState,
@@ -129,9 +130,15 @@ type SubmitInput = {
   vm: V1VirtualMachine;
 };
 
-export const submit = async ({ data, editDiskName, onSubmit, pvc, vm }: SubmitInput) => {
+export const submit = async ({
+  data,
+  editDiskName,
+  isHotpluggable = false,
+  onSubmit,
+  pvc,
+  vm,
+}: SubmitInput) => {
   const isVMRunning = isRunning(vm);
-
   const isEditDisk = !isEmpty(editDiskName);
   const isCreatingDisk = isEmpty(editDiskName);
   const shouldHotplug = isVMRunning && isCreatingDisk && isEmpty(data.volume.containerDisk);
@@ -142,6 +149,10 @@ export const submit = async ({ data, editDiskName, onSubmit, pvc, vm }: SubmitIn
     const newDataVolumeName = createDataVolumeName(vm, data.disk.name);
     data.volume.dataVolume.name = newDataVolumeName;
     data.dataVolumeTemplate.metadata.name = newDataVolumeName;
+  }
+
+  if (data?.disk?.cdrom && isHotpluggable) {
+    data.volume.persistentVolumeClaim.hotpluggable = true;
   }
 
   const vmWithDisk = isEditDisk ? editDisk(data, editDiskName, vm) : addDisk(data, vm);
