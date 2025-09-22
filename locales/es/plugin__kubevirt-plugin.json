@@ -1304,6 +1304,7 @@
   "Select a project in order to see user-provided InstanceTypes": "Seleccione un proyecto para ver los InstanceTypes proporcionados por el usuario.",
   "Select a resource": "Seleccionar un recurso",
   "Select a secret from a different project to copy the secret to your current project.": "Seleccione un secreto de un proyecto diferente para copiarlo en su proyecto actual.",
+  "Select a title": "Select a title",
   "Select an available secret": "Seleccionar un secreto disponible",
   "Select an existing persistent volume claim already available on the cluster and clone it.": "Seleccione una reclamación de volumen persistente existente que ya esté disponible en el clúster y clónela.",
   "Select an option to create a VirtualMachine from.": "Seleccione una opción desde la cual crear una VirtualMachine.",

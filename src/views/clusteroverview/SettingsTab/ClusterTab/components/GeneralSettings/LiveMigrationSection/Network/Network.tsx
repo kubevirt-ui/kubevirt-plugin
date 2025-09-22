@@ -11,6 +11,7 @@ import {
   AlertVariant,
   Content,
   ContentVariants,
+  Divider,
   SelectGroup,
   SelectOption,
   Skeleton,
@@ -63,6 +64,7 @@ const Network = ({ hyperConverge }) => {
           <SelectOption key="primary" value={PRIMARY_NETWORK}>
             {t('Primary live migration network')}
           </SelectOption>
+          <Divider component="li" />
           <SelectGroup key="nad" label={t('Secondary NAD networks')}>
             {nads?.map((nad) => {
               const nadName = getName(nad);

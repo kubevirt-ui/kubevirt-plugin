@@ -1297,6 +1297,7 @@
   "Select a project in order to see user-provided InstanceTypes": "사용자 제공 InstanceTypes를 보려면 프로젝트를 선택합니다.",
   "Select a resource": "리소스 선택",
   "Select a secret from a different project to copy the secret to your current project.": "다른 프로젝트에서 시크릿을 선택하여 현재 프로젝트에 시크릿을 복사합니다.",
+  "Select a title": "Select a title",
   "Select an available secret": "사용 가능한 시크릿 선택",
   "Select an existing persistent volume claim already available on the cluster and clone it.": "클러스터에서 이미 사용 가능한 기존 영구 볼륨 클레임을 선택하고 복제합니다.",
   "Select an option to create a VirtualMachine from.": "VirtualMachine을 생성하려면 옵션을 선택합니다.",

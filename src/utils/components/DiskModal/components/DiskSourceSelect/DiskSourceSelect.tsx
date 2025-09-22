@@ -3,7 +3,7 @@ import classNames from 'classnames';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Divider, SelectGroup, SelectList } from '@patternfly/react-core';
+import { Divider, SelectGroup } from '@patternfly/react-core';
 
 import { SourceTypes } from '../../utils/types';
 
@@ -27,20 +27,18 @@ const DiskSourceSelect: FC<DiskSourceSelectProps> = ({ className, onSelect }) =>
       selectedLabel={t('Add')}
       toggleProps={{ className: 'pf-v6-u-mb-sm', variant: 'primary' }}
     >
-      <SelectList>
-        <DiskSourceOption {...getBlankOption(t)} onSelect={onSelect} />
-        <Divider component="li" />
-        <SelectGroup
-          className="disk-source-select__group-title"
-          label={attachExistingGroupOptions.groupLabel}
-        >
-          {attachExistingGroupOptions.items.map((item) => (
-            <DiskSourceOption key={item.id} {...item} onSelect={onSelect} />
-          ))}
-        </SelectGroup>
-        <Divider component="li" />
-        <DiskSourceOption {...getCDROMOption(t)} onSelect={onSelect} />
-      </SelectList>
+      <DiskSourceOption {...getBlankOption(t)} onSelect={onSelect} />
+      <Divider component="li" />
+      <SelectGroup
+        className="disk-source-select__group-title"
+        label={attachExistingGroupOptions.groupLabel}
+      >
+        {attachExistingGroupOptions.items.map((item) => (
+          <DiskSourceOption key={item.id} {...item} onSelect={onSelect} />
+        ))}
+      </SelectGroup>
+      <Divider component="li" />
+      <DiskSourceOption {...getCDROMOption(t)} onSelect={onSelect} />
     </FormPFSelect>
   );
 };

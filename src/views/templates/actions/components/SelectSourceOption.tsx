@@ -1,15 +1,16 @@
 import React, { FC, ReactNode, useCallback } from 'react';
+import { TFunction } from 'react-i18next';
 import { useParams } from 'react-router-dom-v5-compat';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, SelectOption } from '@patternfly/react-core';
 import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 
 import { SOURCE_OPTIONS_IDS, SOURCE_TYPES } from '../../utils/constants';
 
-const getSourceOption = (source: SOURCE_OPTIONS_IDS, ns: string) => {
+const getSourceOption = (source: SOURCE_OPTIONS_IDS, ns: string, t: TFunction) => {
   switch (source) {
     case SOURCE_TYPES.defaultSource:
       return (
@@ -81,6 +82,7 @@ const SelectSourceOption: FC<SelectSourceOptionProps> = ({
   options,
   selectedSource,
 }) => {
+  const { t } = useKubevirtTranslation();
   const { ns } = useParams<{ ns: string }>();
 
   const onSelect = useCallback(
@@ -103,9 +105,9 @@ const SelectSourceOption: FC<SelectSourceOptionProps> = ({
         selected={selectedSource}
       >
         <SelectOption isDisabled key={0} value="Select a title">
-          Select a title
+          {t('Select a title')}
         </SelectOption>
-        {options.map((option) => getSourceOption(option, ns))}
+        {options.map((option) => getSourceOption(option, ns, t))}
       </FormPFSelect>
     </FormGroup>
   );

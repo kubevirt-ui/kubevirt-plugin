@@ -1297,6 +1297,7 @@
   "Select a project in order to see user-provided InstanceTypes": "Select a project in order to see user-provided InstanceTypes",
   "Select a resource": "Select a resource",
   "Select a secret from a different project to copy the secret to your current project.": "Select a secret from a different project to copy the secret to your current project.",
+  "Select a title": "Select a title",
   "Select an available secret": "Select an available secret",
   "Select an existing persistent volume claim already available on the cluster and clone it.": "Select an existing persistent volume claim already available on the cluster and clone it.",
   "Select an option to create a VirtualMachine from.": "Select an option to create a VirtualMachine from.",

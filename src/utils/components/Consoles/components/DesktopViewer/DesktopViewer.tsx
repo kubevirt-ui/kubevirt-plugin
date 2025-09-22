@@ -15,7 +15,7 @@ import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
 import { getVMIPod } from '@kubevirt-utils/resources/vmi';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
-import { Form, FormGroup, SelectList, SelectOption } from '@patternfly/react-core';
+import { Form, FormGroup, SelectOption } from '@patternfly/react-core';
 import { isRunning } from '@virtualmachines/utils';
 
 import MultusNetwork from './Components/MultusNetwork';
@@ -88,7 +88,7 @@ const DesktopViewer: FC<DesktopViewerProps> = ({
             selected={selectedNetwork?.name}
             toggleProps={{ id: 'pf-v6-c-console__actions-desktop-toggle-id' }}
           >
-            <SelectList>{networkItems}</SelectList>
+            {networkItems}
           </FormPFSelect>
         </FormGroup>
       </Form>
