@@ -18,3 +18,15 @@ export enum VM_STATUS {
   Unknown = 'Unknown',
   WaitingForVolumeBinding = 'WaitingForVolumeBinding',
 }
+
+export const VM_ERROR_STATUSES = [
+  VM_STATUS.CrashLoopBackOff,
+  VM_STATUS.ErrorUnschedulable,
+  VM_STATUS.ErrImagePull,
+  VM_STATUS.ImagePullBackOff,
+  VM_STATUS.ErrorPvcNotFound,
+  VM_STATUS.ErrorDataVolumeNotFound,
+  VM_STATUS.DataVolumeError,
+  VM_STATUS.Unknown,
+  VM_STATUS.WaitingForVolumeBinding,
+];
