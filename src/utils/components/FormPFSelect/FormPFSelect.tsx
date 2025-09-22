@@ -1,6 +1,6 @@
 import React, { FC, useState } from 'react';
 
-import { MenuToggleProps, Select, SelectProps } from '@patternfly/react-core';
+import { MenuToggleProps, Select, SelectList, SelectProps } from '@patternfly/react-core';
 
 import SelectToggle from '../toggles/SelectToggle';
 
@@ -11,6 +11,7 @@ type FormPFSelectProps = Omit<SelectProps, 'isOpen' | 'toggle'> & {
   toggleProps?: MenuToggleProps;
 };
 
+/** PatternFly Select component wrapper for convenient usage. Options should be passed as children and shouldn't be wrapped in SelectList. */
 const FormPFSelect: FC<FormPFSelectProps> = ({
   children,
   className,
@@ -46,7 +47,7 @@ const FormPFSelect: FC<FormPFSelectProps> = ({
       selected={selected}
       {...props}
     >
-      {children}
+      <SelectList>{children}</SelectList>
     </Select>
   );
 };

@@ -10,7 +10,7 @@ import {
   diskTypesLabels,
 } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { getDiskDrive } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
-import { FormGroup, SelectList, SelectOption } from '@patternfly/react-core';
+import { FormGroup, SelectOption } from '@patternfly/react-core';
 
 import { getSourceFromVolume } from '../../utils/helpers';
 import { InterfaceTypes, SourceTypes, V1DiskFormState } from '../../utils/types';
@@ -65,18 +65,16 @@ const DiskTypeSelect: FC<DiskTypeSelectProps> = ({ isVMRunning }) => {
           selectedLabel={diskTypesLabels[diskType]}
           toggleProps={{ isFullWidth: true }}
         >
-          <SelectList>
-            {Object.values(diskTypes).map((type) => (
-              <SelectOption
-                data-test-id={`${DISKTYPE_SELECT_FIELDID}-${type}`}
-                isDisabled={shouldDisableOption(type)}
-                key={type}
-                value={type}
-              >
-                {diskTypesLabels[type]}
-              </SelectOption>
-            ))}
-          </SelectList>
+          {Object.values(diskTypes).map((type) => (
+            <SelectOption
+              data-test-id={`${DISKTYPE_SELECT_FIELDID}-${type}`}
+              isDisabled={shouldDisableOption(type)}
+              key={type}
+              value={type}
+            >
+              {diskTypesLabels[type]}
+            </SelectOption>
+          ))}
         </FormPFSelect>
         {userHelpText && <FormGroupHelperText>{userHelpText}</FormGroupHelperText>}
       </FormGroup>

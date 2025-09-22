@@ -4,7 +4,7 @@ import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevir
 import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Form, FormGroup, SelectList, SelectOption } from '@patternfly/react-core';
+import { Form, FormGroup, SelectOption } from '@patternfly/react-core';
 
 import FormPFSelect from '../FormPFSelect/FormPFSelect';
 
@@ -62,13 +62,11 @@ const FirmwareBootloaderModal: FC<FirmwareBootloaderModalProps> = ({
             selectedLabel={BootModeTitles[selectedFirmwareBootloader]}
             toggleProps={{ isFullWidth: true }}
           >
-            <SelectList>
-              {bootloaderOptions.map(({ description, title, value }) => (
-                <SelectOption description={description} key={value} value={value}>
-                  {title}
-                </SelectOption>
-              ))}
-            </SelectList>
+            {bootloaderOptions.map(({ description, title, value }) => (
+              <SelectOption description={description} key={value} value={value}>
+                {title}
+              </SelectOption>
+            ))}
           </FormPFSelect>
         </FormGroup>
       </Form>

@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
-import { SelectList, SelectOption } from '@patternfly/react-core';
+import { SelectOption } from '@patternfly/react-core';
 
 import { getSubscriptionItem, selectItems } from './utils/utils';
 
@@ -28,13 +28,11 @@ const AutomaticSubscriptionType: FC<AutomaticSubscriptionTypeProps> = ({
         selected={selected.value}
         selectedLabel={selected.title}
       >
-        <SelectList>
-          {selectItems.map((item) => (
-            <SelectOption key={item.value} value={item.value}>
-              {item.title}
-            </SelectOption>
-          ))}
-        </SelectList>
+        {selectItems.map((item) => (
+          <SelectOption key={item.value} value={item.value}>
+            {item.title}
+          </SelectOption>
+        ))}
       </FormPFSelect>
     </div>
   );

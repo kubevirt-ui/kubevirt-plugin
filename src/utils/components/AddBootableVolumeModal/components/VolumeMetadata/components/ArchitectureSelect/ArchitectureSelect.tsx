@@ -9,7 +9,7 @@ import useHcoWorkloadArchitectures from '@kubevirt-utils/hooks/useHcoWorkloadArc
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ARCHITECTURE_TITLE } from '@kubevirt-utils/utils/architecture';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { Alert, AlertVariant, FormGroup, SelectList, SelectOption } from '@patternfly/react-core';
+import { Alert, AlertVariant, FormGroup, SelectOption } from '@patternfly/react-core';
 
 type ArchitectureSelectProps = {
   bootableVolumeState: AddBootableVolumeState;
@@ -36,25 +36,23 @@ const ArchitectureSelect: FC<ArchitectureSelectProps> = ({
           selectedLabel={architectures?.join(', ') ?? t('Select architecture')}
           toggleProps={{ isFullWidth: true }}
         >
-          <SelectList>
-            {workloadArchitectures.map((arch: string) => (
-              <SelectOption
-                onClick={() =>
-                  setBootableVolumeField('architectures')(
-                    architectures?.includes(arch)
-                      ? architectures.filter((a) => a !== arch)
-                      : [...(architectures || []), arch],
-                  )
-                }
-                hasCheckbox
-                isSelected={architectures?.includes(arch)}
-                key={arch}
-                value={arch}
-              >
-                {arch}
-              </SelectOption>
-            ))}
-          </SelectList>
+          {workloadArchitectures.map((arch: string) => (
+            <SelectOption
+              onClick={() =>
+                setBootableVolumeField('architectures')(
+                  architectures?.includes(arch)
+                    ? architectures.filter((a) => a !== arch)
+                    : [...(architectures || []), arch],
+                )
+              }
+              hasCheckbox
+              isSelected={architectures?.includes(arch)}
+              key={arch}
+              value={arch}
+            >
+              {arch}
+            </SelectOption>
+          ))}
         </FormPFSelect>
       </FormGroup>
       {!isEmpty(architectures) && (

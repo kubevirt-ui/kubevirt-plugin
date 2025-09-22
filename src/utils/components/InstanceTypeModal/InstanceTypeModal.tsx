@@ -2,7 +2,7 @@ import React, { FC, useMemo, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { InstanceTypeUnion } from '@kubevirt-utils/resources/instancetype/types';
-import { Content, Flex, FlexItem, SelectList, SelectOption } from '@patternfly/react-core';
+import { Content, Flex, FlexItem, SelectOption } from '@patternfly/react-core';
 
 import FormPFSelect from '../FormPFSelect/FormPFSelect';
 import TabModal from '../TabModal/TabModal';
@@ -73,17 +73,15 @@ const InstanceTypeModal: FC<InstanceTypeModalProps> = ({
             selected={series}
             toggleProps={{ isFullWidth: true }}
           >
-            <SelectList>
-              {Object.entries(mappedInstanceTypes).map(([key, value]) => (
-                <SelectOption
-                  description={value.descriptionSeries}
-                  key={key}
-                  value={value.displayNameSeries}
-                >
-                  {value.displayNameSeries}
-                </SelectOption>
-              ))}
-            </SelectList>
+            {Object.entries(mappedInstanceTypes).map(([key, value]) => (
+              <SelectOption
+                description={value.descriptionSeries}
+                key={key}
+                value={value.displayNameSeries}
+              >
+                {value.displayNameSeries}
+              </SelectOption>
+            ))}
           </FormPFSelect>
         </FlexItem>
         <FlexItem>

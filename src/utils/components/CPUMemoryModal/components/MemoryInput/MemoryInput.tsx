@@ -4,7 +4,7 @@ import { memorySizesTypes } from '@kubevirt-utils/components/CPUMemoryModal/util
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { addByteSuffix } from '@kubevirt-utils/utils/units';
-import { NumberInput, SelectList, SelectOption, Title, TitleSizes } from '@patternfly/react-core';
+import { NumberInput, SelectOption, Title, TitleSizes } from '@patternfly/react-core';
 
 import './MemoryInput.scss';
 
@@ -41,13 +41,11 @@ const MemoryInput: FC<MemoryInputProps> = ({ memory, memoryUnit, setMemory, setM
         selectedLabel={addByteSuffix(memoryUnit)}
         toggleProps={{ className: 'input-memory--dropdown' }}
       >
-        <SelectList>
-          {memorySizesTypes.map((value: string) => (
-            <SelectOption key={value} onClick={() => setMemoryUnit(value)} value={value}>
-              {addByteSuffix(value)}
-            </SelectOption>
-          ))}
-        </SelectList>
+        {memorySizesTypes.map((value: string) => (
+          <SelectOption key={value} onClick={() => setMemoryUnit(value)} value={value}>
+            {addByteSuffix(value)}
+          </SelectOption>
+        ))}
       </FormPFSelect>
     </div>
   );
