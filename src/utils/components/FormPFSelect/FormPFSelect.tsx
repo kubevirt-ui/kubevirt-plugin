@@ -11,7 +11,18 @@ type FormPFSelectProps = Omit<SelectProps, 'isOpen' | 'toggle'> & {
   toggleProps?: MenuToggleProps;
 };
 
-/** PatternFly Select component wrapper for convenient usage. Options should be passed as children and shouldn't be wrapped in SelectList. */
+/**
+ * PatternFly Select component wrapper for convenient usage. Options should be passed as children and shouldn't be wrapped in SelectList.
+ * @param root0
+ * @param root0.children
+ * @param root0.className
+ * @param root0.closeOnSelect
+ * @param root0.isDisabled
+ * @param root0.onSelect
+ * @param root0.selected
+ * @param root0.selectedLabel
+ * @param root0.toggleProps
+ */
 const FormPFSelect: FC<FormPFSelectProps> = ({
   children,
   className,
