@@ -77,7 +77,7 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
       ]);
 
       vmDraft.spec.template.spec.domain.cpu = cpu;
-      vmDraft.spec.template.spec.domain.memory.guest = `${memory}${memoryUnit}`;
+      vmDraft.spec.template.spec.domain.memory.guest = `${memory}${memoryUnit || ''}`;
     });
 
     try {

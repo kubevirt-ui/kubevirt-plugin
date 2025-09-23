@@ -11,7 +11,7 @@ const unitsConvertor = new Proxy(
   {
     // eslint-disable-next-line require-jsdoc
     get(target, prop) {
-      return target[prop] || target.Gi;
+      return target[prop] || '';
     },
   },
 );
