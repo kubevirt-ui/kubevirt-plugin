@@ -1030,6 +1030,7 @@
   "No owner": "No owner",
   "No parameters found in this template.": "No parameters found in this template.",
   "No preferences found": "No preferences found",
+  "No projects with VirtualMachines found": "No projects with VirtualMachines found",
   "No resource selected": "No resource selected",
   "No results found": "No results found",
   "No results found for \"{{searchQuery}}\"": "No results found for \"{{searchQuery}}\"",

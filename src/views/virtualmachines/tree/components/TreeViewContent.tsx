@@ -2,12 +2,14 @@ import React, { FC, useState } from 'react';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   Bullseye,
   Content,
   DrawerActions,
   DrawerHead,
   DrawerPanelBody,
+  EmptyState,
   TreeView,
   TreeViewDataItem,
 } from '@patternfly/react-core';
@@ -22,7 +24,6 @@ import TreeViewCollapseExpand from './TreeViewCollapseExpand';
 import TreeViewToolbar from './TreeViewToolbar';
 
 type TreeViewContentProps = {
-  hideSwitch: boolean;
   isOpen: boolean;
   isSmallScreen: boolean;
   loaded: boolean;
@@ -33,7 +34,6 @@ type TreeViewContentProps = {
 };
 
 const TreeViewContent: FC<TreeViewContentProps> = ({
-  hideSwitch,
   isOpen,
   isSmallScreen,
   loaded,
@@ -65,7 +65,7 @@ const TreeViewContent: FC<TreeViewContentProps> = ({
   return (
     <>
       {!isSmallScreen && panelToggleButton}
-      <TreeViewToolbar hideSwitch={hideSwitch} />
+      <TreeViewToolbar />
       <DrawerHead className="vms-tree-view__header-section">
         <Content className="vms-tree-view__title" component="p">
           <TreeViewCollapseExpand setShowAll={setShowAll} showAll={showAll} />
@@ -76,15 +76,23 @@ const TreeViewContent: FC<TreeViewContentProps> = ({
         </DrawerActions>
       </DrawerHead>
       <DrawerPanelBody className="vms-tree-view-body">
-        <TreeView
-          activeItems={[selectedTreeItem]}
-          allExpanded={showAll}
-          data={filteredTreeData}
-          hasBadges={loaded}
-          hasSelectableNodes
-          onExpand={addListeners}
-          onSelect={onSelect}
-        />
+        {isEmpty(filteredTreeData) ? (
+          <EmptyState
+            headingLevel="h4"
+            titleText={t('No projects with VirtualMachines found')}
+            variant="xs"
+          />
+        ) : (
+          <TreeView
+            activeItems={[selectedTreeItem]}
+            allExpanded={showAll}
+            data={filteredTreeData}
+            hasBadges={loaded}
+            hasSelectableNodes
+            onExpand={addListeners}
+            onSelect={onSelect}
+          />
+        )}
         <TreeViewRightClickActionMenu hideMenu={hideMenu} triggerElement={triggerElement} />
       </DrawerPanelBody>
     </>
