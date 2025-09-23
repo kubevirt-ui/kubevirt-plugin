@@ -1,7 +1,7 @@
 import React, { FC, useState } from 'react';
 
 import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
-import { Select, SelectOption } from '@patternfly/react-core';
+import { Select, SelectList, SelectOption } from '@patternfly/react-core';
 
 import SelectToggle from '../toggles/SelectToggle';
 
@@ -31,23 +31,25 @@ const DurationDropdown: FC<DurationDropdownProps> = ({ selectedDuration, selectH
       selected={selected}
       toggle={SelectToggle({ isExpanded: isOpen, onClick: onToggle, selected })}
     >
-      {[...DurationOption.getAll()]
-        .sort((a, b) =>
-          DurationOption.getMilliseconds(a.getValue()) <
-          DurationOption.getMilliseconds(b.getValue())
-            ? -1
-            : 1,
-        )
-        .map((durationOption) => {
-          const dropdownLabel = durationOption?.getDropdownLabel() || '';
-          const durationValue = durationOption?.getValue() || '';
+      <SelectList>
+        {[...DurationOption.getAll()]
+          .sort((a, b) =>
+            DurationOption.getMilliseconds(a.getValue()) <
+            DurationOption.getMilliseconds(b.getValue())
+              ? -1
+              : 1,
+          )
+          .map((durationOption) => {
+            const dropdownLabel = durationOption?.getDropdownLabel() || '';
+            const durationValue = durationOption?.getValue() || '';
 
-          return (
-            <SelectOption data-test-id={durationValue} key={durationValue} value={dropdownLabel}>
-              {dropdownLabel}
-            </SelectOption>
-          );
-        })}
+            return (
+              <SelectOption data-test-id={durationValue} key={durationValue} value={dropdownLabel}>
+                {dropdownLabel}
+              </SelectOption>
+            );
+          })}
+      </SelectList>
     </Select>
   );
 };

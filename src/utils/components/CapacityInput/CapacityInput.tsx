@@ -3,14 +3,7 @@ import React, { ChangeEvent, FC } from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { BinaryUnit } from '@kubevirt-utils/utils/unitConstants';
 import { addByteSuffix, quantityToString, toQuantity } from '@kubevirt-utils/utils/units';
-import {
-  FormGroup,
-  NumberInput,
-  SelectList,
-  Split,
-  SplitItem,
-  ValidatedOptions,
-} from '@patternfly/react-core';
+import { FormGroup, NumberInput, Split, SplitItem, ValidatedOptions } from '@patternfly/react-core';
 import { SelectOption } from '@patternfly/react-core';
 
 import FormGroupHelperText from '../FormGroupHelperText/FormGroupHelperText';
@@ -98,13 +91,11 @@ const CapacityInput: FC<CapacityInputProps> = ({
             onSelect={onUnitChange}
             selected={addByteSuffix(unit)}
           >
-            <SelectList>
-              {unitOptions.map((unitOption) => (
-                <SelectOption isDisabled={isEditingCreatedDisk} key={unitOption} value={unitOption}>
-                  {addByteSuffix(unitOption)}
-                </SelectOption>
-              ))}
-            </SelectList>
+            {unitOptions.map((unitOption) => (
+              <SelectOption isDisabled={isEditingCreatedDisk} key={unitOption} value={unitOption}>
+                {addByteSuffix(unitOption)}
+              </SelectOption>
+            ))}
           </FormPFSelect>
         </SplitItem>
       </Split>
