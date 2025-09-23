@@ -7,6 +7,7 @@ import {
   getVMSnapshottingStatus,
   getVMStatus,
 } from '@kubevirt-utils/resources/shared';
+import { VM_ERROR_STATUSES, VM_STATUS } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   HourglassHalfIcon,
@@ -43,7 +44,7 @@ export const errorPrintableVMStatus = {
 };
 
 export const isErrorPrintableStatus = (printableStatus: string) =>
-  Object.values(errorPrintableVMStatus).includes(printableStatus);
+  Object.values(VM_ERROR_STATUSES).includes(printableStatus as VM_STATUS);
 
 export const getVMStatusIcon = (status: string): ComponentClass | FC => {
   switch (status) {
