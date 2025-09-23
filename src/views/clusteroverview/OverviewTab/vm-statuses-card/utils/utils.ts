@@ -2,25 +2,13 @@ import { Fragment } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getVMStatus } from '@kubevirt-utils/resources/shared';
-import { VM_STATUS } from '@kubevirt-utils/resources/vm/utils/vmStatus';
+import { VM_ERROR_STATUSES, VM_STATUS } from '@kubevirt-utils/resources/vm/utils/vmStatus';
 import { RedExclamationCircleIcon } from '@openshift-console/dynamic-plugin-sdk';
 import { InProgressIcon, OffIcon, PausedIcon, SyncAltIcon } from '@patternfly/react-icons';
 
 import { ERROR } from './constants';
 
 const PRIMARY_STATUSES = [VM_STATUS.Running, VM_STATUS.Stopped, VM_STATUS.Paused, ERROR];
-
-const ERROR_STATUSES = [
-  VM_STATUS.CrashLoopBackOff,
-  VM_STATUS.ErrorUnschedulable,
-  VM_STATUS.ErrImagePull,
-  VM_STATUS.ImagePullBackOff,
-  VM_STATUS.ErrorPvcNotFound,
-  VM_STATUS.ErrorDataVolumeNotFound,
-  VM_STATUS.DataVolumeError,
-  VM_STATUS.Unknown,
-  VM_STATUS.WaitingForVolumeBinding,
-];
 
 export const vmStatusIcon = {
   Deleting: Fragment,
@@ -54,7 +42,7 @@ export const getVMStatuses = (vms: V1VirtualMachine[]): StatusCounts => {
     statusCounts[status] = statusCounts[status] + 1;
   });
 
-  statusCounts[ERROR] = ERROR_STATUSES.reduce((acc, state) => {
+  statusCounts[ERROR] = VM_ERROR_STATUSES.reduce((acc, state) => {
     const count = acc + (statusCounts?.[state] || 0);
     delete statusCounts[state];
     return count;
