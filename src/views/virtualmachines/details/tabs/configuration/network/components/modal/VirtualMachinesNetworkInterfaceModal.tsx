@@ -10,9 +10,13 @@ import NetworkInterfaceModal from '@kubevirt-utils/components/NetworkInterfaceMo
 import {
   createInterface,
   createNetwork,
-  updateVMNetworkInterfaces,
 } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
-import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
+import { getInterface, getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
+import {
+  addInterface,
+  addNetwork,
+  patchVM,
+} from '@kubevirt-utils/resources/vm/utils/network/patch';
 
 type VirtualMachinesNetworkInterfaceModalProps = {
   headerText: string;
@@ -43,6 +47,12 @@ const VirtualMachinesNetworkInterfaceModal: FC<VirtualMachinesNetworkInterfaceMo
         nicName,
       }) =>
       () => {
+        const existingInterface = getInterface(vm, nicName);
+        const existingNetwork = getNetworks(vm)?.find(({ name }) => name === nicName);
+        if (existingNetwork || existingInterface) {
+          return;
+        }
+
         const resultNetwork = createNetwork(nicName, networkName);
         const resultInterface = createInterface({
           interfaceLinkState,
@@ -52,11 +62,22 @@ const VirtualMachinesNetworkInterfaceModal: FC<VirtualMachinesNetworkInterfaceMo
           nicName,
         });
 
-        const updatedNetworks: V1Network[] = [...(getNetworks(vm) || []), resultNetwork];
-        const updatedInterfaces: V1Interface[] = [...(getInterfaces(vm) || []), resultInterface];
-        return onAddNetworkInterface
-          ? onAddNetworkInterface(updatedNetworks, updatedInterfaces)
-          : updateVMNetworkInterfaces(vm, updatedNetworks, updatedInterfaces);
+        if (onAddNetworkInterface) {
+          const updatedNetworks: V1Network[] = [...(getNetworks(vm) || []), resultNetwork];
+          const updatedInterfaces: V1Interface[] = [...(getInterfaces(vm) || []), resultInterface];
+          return onAddNetworkInterface(updatedNetworks, updatedInterfaces);
+        }
+
+        return patchVM(vm, [
+          ...addNetwork({
+            index: getNetworks(vm)?.length ?? 0,
+            value: resultNetwork,
+          }),
+          ...addInterface({
+            index: getInterfaces(vm)?.length ?? 0,
+            value: resultInterface,
+          }),
+        ]);
       },
     [onAddNetworkInterface, vm],
   );

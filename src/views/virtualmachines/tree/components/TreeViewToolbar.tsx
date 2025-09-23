@@ -16,17 +16,9 @@ import {
 
 import { HIDE, SHOW, SHOW_EMPTY_PROJECTS_KEY } from '../utils/constants';
 
-type TreeViewToolbarProps = {
-  hideSwitch: boolean;
-};
-
-const TreeViewToolbar: FC<TreeViewToolbarProps> = ({ hideSwitch }) => {
+const TreeViewToolbar: FC = () => {
   const { t } = useKubevirtTranslation();
   const [showEmptyProjects, setShowEmptyProjects] = useLocalStorage(SHOW_EMPTY_PROJECTS_KEY, HIDE);
-
-  if (hideSwitch) {
-    return null;
-  }
 
   return (
     <Toolbar className="vms-tree-view-toolbar" isSticky>

@@ -1,6 +1,8 @@
 import React, { FC } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
+import { isHotPluggableEnabled } from '@kubevirt-utils/components/DiskModal/utils/helpers';
+import useKubevirtHyperconvergeConfiguration from '@kubevirt-utils/hooks/useKubevirtHyperconvergeConfiguration.ts';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { isRunning } from '@virtualmachines/utils';
@@ -30,7 +32,8 @@ const PVCDiskModal: FC<V1SubDiskModalProps> = ({
   vm,
 }) => {
   const isVMRunning = isRunning(vm);
-
+  const { featureGates } = useKubevirtHyperconvergeConfiguration();
+  const isHotpluggable = isHotPluggableEnabled(featureGates);
   const isEditDisk = !isEmpty(editDiskName);
 
   const methods = useForm<V1DiskFormState>({
@@ -49,7 +52,9 @@ const PVCDiskModal: FC<V1SubDiskModalProps> = ({
     <FormProvider {...methods}>
       <TabModal
         onSubmit={() =>
-          handleSubmit(async (data) => submit({ data, editDiskName, onSubmit, pvc, vm }))()
+          handleSubmit(async (data) =>
+            submit({ data, editDiskName, isHotpluggable, onSubmit, pvc, vm }),
+          )()
         }
         closeOnSubmit={isValid}
         headerText={diskModalTitle(isEditDisk, isVMRunning)}

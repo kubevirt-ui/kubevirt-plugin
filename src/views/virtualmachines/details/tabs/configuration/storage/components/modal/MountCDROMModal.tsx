@@ -3,23 +3,23 @@ import { FormProvider } from 'react-hook-form';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import DiskSourceUploadPVC from '@kubevirt-utils/components/DiskModal/components/DiskSourceSelect/components/DiskSourceUploadPVC/DiskSourceUploadPVC';
+import UploadModeSelector from '@kubevirt-utils/components/DiskModal/components/UploadModeSelector/UploadModeSelector';
 import { UPLOAD_FILENAME_FIELD } from '@kubevirt-utils/components/DiskModal/components/utils/constants';
 import {
   UPLOAD_MODE_SELECT,
   UPLOAD_MODE_UPLOAD,
 } from '@kubevirt-utils/components/DiskModal/utils/constants';
-import {
-  isHotPluggableEnabled,
-  mountISOToCDROM,
-} from '@kubevirt-utils/components/DiskModal/utils/helpers';
+import { mountISOToCDROM } from '@kubevirt-utils/components/DiskModal/utils/helpers';
+import { isHotPluggableEnabled } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import { uploadDataVolume } from '@kubevirt-utils/components/DiskModal/utils/submit';
+import { VolumeTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { isUploadingDisk } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import useKubevirtHyperconvergeConfiguration from '@kubevirt-utils/hooks/useKubevirtHyperconvergeConfiguration.ts';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getNamespace } from '@kubevirt-utils/resources/shared';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import {
   ButtonVariant,
@@ -58,12 +58,14 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
     handleClearUpload,
     handleFileUpload,
     handleISOSelection,
+    handleUploadTypeChange,
     isFormValid,
     methods,
     selectedISO,
     uploadFile,
     uploadFilename,
     uploadMode,
+    uploadType,
   } = useMountCDROMForm();
   const { upload, uploadData } = useCDIUpload();
   const isUploading = isUploadingDisk(upload?.uploadStatus);
@@ -88,7 +90,18 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
     if (!diskState) return;
     if (data.uploadFile?.file) {
       const uploadedDataVolume = await uploadDataVolume(vm, uploadData, diskState);
-      diskState.dataVolumeTemplate = convertDataVolumeToTemplate(uploadedDataVolume);
+
+      if (uploadType === VolumeTypes.PERSISTENT_VOLUME_CLAIM) {
+        diskState.volume = {
+          name: diskState.volume.name,
+          persistentVolumeClaim: {
+            claimName: getName(uploadedDataVolume),
+          },
+        };
+        delete diskState.dataVolumeTemplate;
+      } else {
+        diskState.dataVolumeTemplate = convertDataVolumeToTemplate(uploadedDataVolume);
+      }
     }
 
     const updatedVM = await mountISOToCDROM(vm, diskState, isHotPluggable);
@@ -152,10 +165,18 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
               key={uploadMode}
               label={t('Upload ISO')}
               relevantUpload={upload}
-            />
-            <Content component={ContentVariants.small}>
-              {t('ISO file must be in the same project as the Virtual Machine')}
-            </Content>
+            >
+              <Content component={ContentVariants.small}>
+                {t('ISO file must be in the same project as the Virtual Machine')}
+              </Content>
+              {uploadMode === UPLOAD_MODE_UPLOAD && (
+                <UploadModeSelector
+                  isDisabled={isUploading}
+                  onUploadModeChange={handleUploadTypeChange}
+                  uploadMode={uploadType}
+                />
+              )}
+            </DiskSourceUploadPVC>
           </StackItem>
         </Stack>
       </TabModal>

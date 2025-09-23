@@ -1,15 +1,19 @@
 import React, { FC, useCallback } from 'react';
 
-import { V1Interface, V1Network, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import NetworkInterfaceModal from '@kubevirt-utils/components/NetworkInterfaceModal/NetworkInterfaceModal';
 import {
   createInterface,
   createNetwork,
-  updateVMNetworkInterfaces,
 } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
+import { getInterface, getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
+import {
+  patchVM,
+  updateInterface,
+  updateNetwork,
+} from '@kubevirt-utils/resources/vm/utils/network/patch';
 
 type VirtualMachinesEditNetworkInterfaceModalProps = {
   isOpen: boolean;
@@ -42,17 +46,25 @@ const VirtualMachinesEditNetworkInterfaceModal: FC<
           nicName,
         });
 
-        const updatedNetworks: V1Network[] = [
-          ...(getNetworks(vm)?.filter(({ name }) => name !== nicPresentation?.network?.name) || []),
-          resultNetwork,
-        ];
-        const updatedInterfaces: V1Interface[] = [
-          ...(getInterfaces(vm)?.filter(({ name }) => name !== nicPresentation?.network?.name) ||
-            []),
-          resultInterface,
-        ];
+        const existingInterface = getInterface(vm, nicName);
+        const existingNetwork = getNetworks(vm).find(({ name }) => name === nicName);
 
-        return updateVMNetworkInterfaces(vm, updatedNetworks, updatedInterfaces);
+        if (!existingNetwork || !existingInterface) {
+          return;
+        }
+
+        return patchVM(vm, [
+          ...updateNetwork({
+            currentValue: existingNetwork,
+            index: getNetworks(vm)?.indexOf(existingNetwork),
+            nextValue: resultNetwork,
+          }),
+          ...updateInterface({
+            currentValue: existingInterface,
+            index: getInterfaces(vm)?.indexOf(existingInterface),
+            nextValue: resultInterface,
+          }),
+        ]);
       },
     [vm, nicPresentation],
   );

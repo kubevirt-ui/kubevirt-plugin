@@ -1,8 +1,6 @@
 import React from 'react';
 import { TFunction } from 'react-i18next';
-import produce from 'immer';
 
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1Interface, V1Network, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import TechPreviewBadge from '@kubevirt-utils/components/TechPreviewBadge/TechPreviewBadge';
 import { getInterface, getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
@@ -17,12 +15,17 @@ import {
   NetworkPresentation,
 } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import {
+  patchVM,
+  removeInterface,
+  removeNetwork,
+  updateInterface,
+} from '@kubevirt-utils/resources/vm/utils/network/patch';
+import {
   hasAutoAttachedPodNetwork,
   isPodNetwork,
 } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { ABSENT } from '@virtualmachines/details/tabs/configuration/network/utils/constants';
 import { isStopped } from '@virtualmachines/utils';
 
@@ -40,68 +43,13 @@ export const getNetworkName = (network: V1Network): string => {
   return null;
 };
 
-export const updateVMNetworkInterfaces = (
-  vm: V1VirtualMachine,
-  updatedNetworks: V1Network[],
-  updatedInterfaces: V1Interface[],
-) =>
-  k8sPatch({
-    data: [
-      {
-        op: 'replace',
-        path: '/spec/template/spec/networks',
-        value: updatedNetworks,
-      },
-      {
-        op: 'replace',
-        path: '/spec/template/spec/domain/devices/interfaces',
-        value: updatedInterfaces,
-      },
-    ],
-    model: VirtualMachineModel,
-    resource: vm,
-  });
-
 /**
  * To delete a hot plug NIC the state of the interface is set to 'absent'. The
  * NIC will then be removed when the VM is live migrated or restarted.
- * @param vm {V1VirtualMachine} - the VirtualMachine from which to delete the NIC
- * @param nicName {string}
- * @return the virtual machine's interfaces with the hot plug NIC's state set to 'absent';
+ * @param iface {V1Interface} - the interface to mark as absent
+ * @return an interface with the state set to 'absent';
  */
-export const markInterfaceAbsent = (vm: V1VirtualMachine, nicName: string) => {
-  if (!getInterface(vm, nicName)) return undefined;
-  const vmInterfaces = getInterfaces(vm);
-
-  return produce<V1Interface[]>(vmInterfaces, (draftInterfaces: V1Interface[]) => {
-    const ifaceToDelete = draftInterfaces?.find((iface) => iface?.name === nicName);
-    if (ifaceToDelete) ifaceToDelete.state = ABSENT;
-  });
-};
-
-const removeInterfaceToBeDeleted = (nicName: string, vm: V1VirtualMachine): V1Interface[] =>
-  getInterfaces(vm)?.filter(({ name }) => name !== nicName);
-
-export const updateInterfacesForDeletion = (
-  nicName: string,
-  vm: V1VirtualMachine,
-  canBeMarkedAbsent: boolean,
-): V1Interface[] => {
-  return canBeMarkedAbsent
-    ? markInterfaceAbsent(vm, nicName)
-    : removeInterfaceToBeDeleted(nicName, vm);
-};
-
-const removeNetworkToBeDeleted = (nicName: string, vm: V1VirtualMachine): V1Network[] =>
-  getNetworks(vm)?.filter(({ name }) => name !== nicName);
-
-export const updateNetworksForDeletion = (
-  nicName: string,
-  vm: V1VirtualMachine,
-  canBeMarkedAbsent: boolean,
-): V1Network[] => {
-  return canBeMarkedAbsent ? getNetworks(vm) : removeNetworkToBeDeleted(nicName, vm);
-};
+export const markOneInterfaceAbsent = (iface: V1Interface) => ({ ...iface, state: ABSENT });
 
 export const createNetwork = (nicName: string, networkName: string): V1Network => {
   const network: V1Network = {
@@ -186,10 +134,28 @@ export const deleteNetworkInterface = (
   const isHotUnPlug = Boolean(nicPresentation?.iface?.bridge);
   const canBeMarkedAbsent =
     isHotUnPlug && !isStopped(vm) && !isPodNetwork(nicPresentation?.network);
-  const networks = updateNetworksForDeletion(nicName, vm, canBeMarkedAbsent);
-  const interfaces = updateInterfacesForDeletion(nicName, vm, canBeMarkedAbsent);
 
-  return updateVMNetworkInterfaces(vm, networks, interfaces);
+  if (canBeMarkedAbsent) {
+    return patchVM(
+      vm,
+      updateInterface({
+        currentValue: existingInterface,
+        index: getInterfaces(vm).findIndex((iface) => iface.name === nicName),
+        nextValue: markOneInterfaceAbsent(existingInterface),
+      }),
+    );
+  }
+
+  return patchVM(vm, [
+    ...removeNetwork({
+      index: getNetworks(vm).findIndex((net) => net.name === nicName),
+      value: existingNetwork,
+    }),
+    ...removeInterface({
+      index: getInterfaces(vm).findIndex((iface) => iface.name === nicName),
+      value: existingInterface,
+    }),
+  ]);
 };
 
 export const getPASSTSelectableOptions = (t: TFunction) => [
