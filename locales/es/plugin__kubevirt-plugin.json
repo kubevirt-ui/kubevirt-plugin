@@ -1037,6 +1037,7 @@
   "No owner": "Sin propietario",
   "No parameters found in this template.": "No se encontraron parámetros en esta plantilla.",
   "No preferences found": "No se encontraron preferencias",
+  "No projects with VirtualMachines found": "No projects with VirtualMachines found",
   "No resource selected": "Ningún recurso seleccionado",
   "No results found": "No se encontraron resultados",
   "No results found for \"{{searchQuery}}\"": "No se encontraron resultados para “{{searchQuery}}”",

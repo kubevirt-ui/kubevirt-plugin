@@ -1030,6 +1030,7 @@
   "No owner": "没有所有者",
   "No parameters found in this template.": "此模板中没有找到参数。",
   "No preferences found": "没有找到首选项",
+  "No projects with VirtualMachines found": "No projects with VirtualMachines found",
   "No resource selected": "未选择资源",
   "No results found": "未找到结果",
   "No results found for \"{{searchQuery}}\"": "没有为 \"{{searchQuery}}\" 找到结果",

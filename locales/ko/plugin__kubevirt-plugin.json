@@ -1030,6 +1030,7 @@
   "No owner": "소유자 없음",
   "No parameters found in this template.": "이 템플릿에 매개 변수를 찾을 수 없습니다.",
   "No preferences found": "기본 설정을 찾을 수 없음",
+  "No projects with VirtualMachines found": "No projects with VirtualMachines found",
   "No resource selected": "리소스가 선택되어 있지 않습니다",
   "No results found": "결과 없음",
   "No results found for \"{{searchQuery}}\"": "\"{{searchQuery}}\"의 결과를 찾을 수 없음",

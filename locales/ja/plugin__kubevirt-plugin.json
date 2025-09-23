@@ -1030,6 +1030,7 @@
   "No owner": "オーナーがありません",
   "No parameters found in this template.": "このテンプレートにはパラメーターが見つかりません。",
   "No preferences found": "設定が見つかりません",
+  "No projects with VirtualMachines found": "No projects with VirtualMachines found",
   "No resource selected": "リソースが選択されていません",
   "No results found": "結果が見つかりません",
   "No results found for \"{{searchQuery}}\"": "\"{{searchQuery}}\" の結果が見つかりません",

@@ -24,14 +24,9 @@ import { useFleetClusterNames } from '@stolostron/multicluster-sdk';
 import { getLatestMigrationForEachVM, OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 
 import { vmimMapperSignal, vmsSignal } from '../utils/signals';
-import {
-  createMultiClusterTreeViewData,
-  createSingleClusterTreeViewData,
-  isSystemNamespace,
-} from '../utils/utils';
+import { createMultiClusterTreeViewData, createSingleClusterTreeViewData } from '../utils/utils';
 
 export type UseTreeViewData = {
-  hideSwitch: boolean;
   loaded: boolean;
   loadError: any;
   treeData: TreeViewDataItem[];
@@ -161,15 +156,12 @@ export const useTreeViewData = (): UseTreeViewData => {
     location.search,
   ]);
 
-  const hideSwitch = useMemo(() => projectNames?.every(isSystemNamespace), [projectNames]);
-
   return useMemo(
     () => ({
-      hideSwitch,
       loaded,
       loadError: projectNamesError || multiclusterNamespacesError,
       treeData,
     }),
-    [hideSwitch, loaded, multiclusterNamespacesError, projectNamesError, treeData],
+    [loaded, multiclusterNamespacesError, projectNamesError, treeData],
   );
 };
