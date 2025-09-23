@@ -16,7 +16,7 @@ export const isLiveMigratable = (vm: V1VirtualMachine): boolean =>
 export const isRunning = (vm: V1VirtualMachine): boolean =>
   vm?.status?.printableStatus === printableVMStatus.Running;
 
-const decimalToBinary = (decimalNumber: number) => (decimalNumber >>> 0).toString(2);
+export const decimalToBinary = (decimalNumber: number) => (decimalNumber >>> 0).toString(2);
 
 const ipStringToBinary = (ip: string) =>
   ip

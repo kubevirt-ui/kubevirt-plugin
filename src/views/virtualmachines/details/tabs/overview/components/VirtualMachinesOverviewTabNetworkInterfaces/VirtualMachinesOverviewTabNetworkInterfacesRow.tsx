@@ -7,6 +7,7 @@ import useIsFQDNEnabled from '@kubevirt-utils/hooks/useFQDN/useIsFQDNEnabled';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getPrintableNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
+import { removeLinkLocalIPV6 } from '@kubevirt-utils/utils/utils';
 import { TableData } from '@openshift-console/dynamic-plugin-sdk';
 import {
   DescriptionList,
@@ -38,7 +39,7 @@ const VirtualMachinesOverviewTabInterfacesRow: FC<
 
   const fqdn = useFQDN(obj?.network?.name, obj?.vm);
   const isFQDNEnabled = useIsFQDNEnabled();
-
+  const ipAddresses = removeLinkLocalIPV6(obj?.ipAddresses ?? []);
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} id="name">
@@ -77,11 +78,11 @@ const VirtualMachinesOverviewTabInterfacesRow: FC<
         </div>
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="ip">
-        <div data-test-id={`network-interface-${obj?.ipAddresses}`}>
+        <div data-test-id={`network-interface-${ipAddresses}`}>
           <FirstItemListPopover
             headerContent={'IP addresses'}
             includeCopyFirstItem
-            items={obj?.ipAddresses}
+            items={ipAddresses}
           />
         </div>
       </TableData>
