@@ -55,7 +55,7 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
   } = methods;
 
   const uploadFile = useWatch({ control, name: FORM_FIELD_UPLOAD_FILE });
-  const hasUploadFile = !isEmpty(uploadFile);
+  const hasUploadFile = !isEmpty(uploadFile?.file);
   const hasFormErrors = !isEmpty(errors);
   const isUploading = isUploadingDisk(upload?.uploadStatus);
 
@@ -149,11 +149,13 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
               {uploadEnabled && (
                 <>
                   <DiskSourceUploadPVC label={t('Upload ISO')} relevantUpload={upload} />
-                  <UploadModeSelector
-                    isDisabled={isUploading}
-                    onUploadModeChange={setUploadMode}
-                    uploadMode={uploadMode}
-                  />
+                  {hasUploadFile && (
+                    <UploadModeSelector
+                      isDisabled={isUploading}
+                      onUploadModeChange={setUploadMode}
+                      uploadMode={uploadMode}
+                    />
+                  )}
                 </>
               )}
             </Form>

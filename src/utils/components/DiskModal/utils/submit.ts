@@ -12,7 +12,7 @@ import {
   getDisks,
   getVolumes,
 } from '@kubevirt-utils/resources/vm';
-import { generatePrettyName, isEmpty } from '@kubevirt-utils/utils/utils';
+import { ensurePath, generatePrettyName, isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { isRunning } from '@virtualmachines/utils';
@@ -152,6 +152,7 @@ export const submit = async ({
   }
 
   if (data?.disk?.cdrom && isHotpluggable) {
+    ensurePath(data, ['volume.persistentVolumeClaim']);
     data.volume.persistentVolumeClaim.hotpluggable = true;
   }
 
