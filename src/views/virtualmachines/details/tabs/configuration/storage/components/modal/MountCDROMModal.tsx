@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 import { FormProvider } from 'react-hook-form';
+import { Trans } from 'react-i18next';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import DiskSourceUploadPVC from '@kubevirt-utils/components/DiskModal/components/DiskSourceSelect/components/DiskSourceUploadPVC/DiskSourceUploadPVC';
@@ -54,7 +55,6 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const vmNamespace = getNamespace(vm);
-
   const {
     handleClearUpload,
     handleFileUpload,
@@ -132,7 +132,11 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
         <Form>
           <Stack hasGutter>
             <StackItem>
-              <p>{t('Mount ISO to the Virtual Machine')}</p>
+              <p>
+                <Trans t={t}>
+                  Mount ISO to <strong>{{ cdromName }}</strong>
+                </Trans>
+              </p>
             </StackItem>
             <StackItem>
               <FormGroup
