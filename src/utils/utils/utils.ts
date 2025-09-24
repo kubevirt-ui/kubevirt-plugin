@@ -12,6 +12,7 @@ import { ALL_NAMESPACES, ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hook
 import { FilterValue, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { k8sBasePath } from '@openshift-console/dynamic-plugin-sdk/lib/utils/k8s/k8s';
 import { SortByDirection } from '@patternfly/react-table';
+import { decimalToBinary } from '@virtualmachines/utils';
 
 import { IPAddress, ItemsToFilterProps } from './types';
 
@@ -217,17 +218,20 @@ export const sortByDirection = (
 export const compareWithDirection = (direction: SortByDirection, a: any, b: any) =>
   sortByDirection(universalComparator, direction)(a, b);
 
-export const ipv6Regex =
-  /^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^::1$|^::$|^(?:[0-9a-fA-F]{1,4}:)*::(?:[0-9a-fA-F]{1,4}:)*[0-9a-fA-F]{1,4}$|^(?:[0-9a-fA-F]{1,4}:)*::[0-9a-fA-F]{1,4}$|^[0-9a-fA-F]{1,4}::(?:[0-9a-fA-F]{1,4}:)*[0-9a-fA-F]{1,4}$/;
+/**
+ * Link-local address prefix (fe80::/10)
+ * @see https://www.rfc-editor.org/rfc/rfc4291#section-2.5.6
+ */
+export const IPV6_LINK_LOCAL_BLOCK = '1111111010';
 
-export const isIPv6 = (ip: string): boolean => {
-  if (isEmpty(ip)) return false;
-
-  ip = ip?.trim();
-  return ipv6Regex.test(ip);
+export const isIPV6LinkLocal = (ip: string): boolean => {
+  if (!ip || ip.indexOf(':') === -1) {
+    return false;
+  }
+  const firstBlock = ip.substring(0, ip.indexOf(':'));
+  const binaryFirstBlock = decimalToBinary(parseInt(firstBlock, 16)).padStart(16, '0');
+  return binaryFirstBlock.startsWith(IPV6_LINK_LOCAL_BLOCK);
 };
 
-export const removeIPV6 = (ipAddress: IPAddress[]) => {
-  const ipAddressWithoutIPv6 = ipAddress.filter((item) => !isIPv6(item.ip));
-  return ipAddressWithoutIPv6;
-};
+export const removeLinkLocalIPV6 = (ipAddress: IPAddress[]) =>
+  ipAddress.filter((item) => !isIPV6LinkLocal(item?.ip?.trim()));
