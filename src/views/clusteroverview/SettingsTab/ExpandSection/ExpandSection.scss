@@ -15,6 +15,12 @@
 
 .ExpandSection {
   .pf-v6-c-expandable-section__content {
-    padding-left: var(--pf-v6-c-expandable-section--m-display-lg--PaddingInlineStart) !important;
+    .pf-v6-c-expandable-section__toggle {
+      margin-left: -0.5rem;
+    }
+
+    .pf-v6-c-expandable-section__content {
+      padding-left: calc(var(--pf-v6-c-expandable-section__content--PaddingInlineStart) - 0.5rem);
+    }
   }
 }
