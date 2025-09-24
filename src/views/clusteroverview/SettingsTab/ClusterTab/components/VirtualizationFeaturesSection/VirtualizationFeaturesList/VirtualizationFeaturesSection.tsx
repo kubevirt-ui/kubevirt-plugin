@@ -3,6 +3,7 @@ import React, { FC } from 'react';
 import ExpandSectionWithCustomToggle from '@kubevirt-utils/components/ExpandSectionWithCustomToggle/ExpandSectionWithCustomToggle';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { CLUSTER_TAB_IDS } from '@overview/SettingsTab/search/constants';
 import { Button, Skeleton, Stack, StackItem } from '@patternfly/react-core';
 
 import {
@@ -53,6 +54,8 @@ const VirtualizationFeaturesSection: FC = () => {
       customContent={ConfigureButton}
       id="virtualization-features-section"
       isIndented
+      searchItemId={CLUSTER_TAB_IDS.virtualizationFeatures}
+      toggleClassname="ExpandSection"
       toggleContent={t('Virtualization features')}
     >
       <Stack hasGutter>

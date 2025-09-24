@@ -13,6 +13,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { useMetalLBOperatorInstalled } from '@kubevirt-utils/hooks/useMetalLBOperatorInstalled/useMetalLBOperatorInstalled';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
+import { CLUSTER_TAB_IDS } from '@overview/SettingsTab/search/constants';
 import { TextInput } from '@patternfly/react-core';
 
 import ExpandSection from '../../../../ExpandSection/ExpandSection';
@@ -56,7 +57,10 @@ const SSHConfiguration: FC<SSHConfigurationProps> = ({ newBadge }) => {
   }, 700);
 
   return (
-    <ExpandSection toggleText={t('SSH configurations')}>
+    <ExpandSection
+      searchItemId={CLUSTER_TAB_IDS.sshConfiguration}
+      toggleText={t('SSH configurations')}
+    >
       <SectionWithSwitch
         helpTextIconContent={t(
           'Enable the creation of LoadBalancer services for SSH connections to VirtualMachines. A load balancer must be configured',

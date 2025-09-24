@@ -75,7 +75,7 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
   });
 
   return (
-    <>
+    <div>
       <nav className="pf-v6-c-tabs pf-m-page-insets">
         <ul className="pf-v6-c-tabs__list">
           {allPages.map((item) => {
@@ -107,7 +107,7 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
         </ul>
       </nav>
       <Routes>{RoutesComponents}</Routes>
-    </>
+    </div>
   );
 };
 

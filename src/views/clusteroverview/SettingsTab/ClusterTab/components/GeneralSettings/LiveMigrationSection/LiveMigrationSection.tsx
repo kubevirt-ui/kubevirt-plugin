@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { CLUSTER_TAB_IDS } from '@overview/SettingsTab/search/constants';
 
 import ExpandSection from '../../../../ExpandSection/ExpandSection';
 
@@ -19,7 +20,11 @@ const LiveMigrationSection: FC<LiveMigrationSectionProps> = ({ hyperConvergeConf
   const [hyperConverge] = hyperConvergeConfiguration;
 
   return (
-    <ExpandSection className="live-migration-tab" toggleText={t('Live migration')}>
+    <ExpandSection
+      className="live-migration-tab"
+      searchItemId={CLUSTER_TAB_IDS.liveMigration}
+      toggleText={t('Live migration')}
+    >
       <Limits hyperConverge={hyperConverge} />
       <Network hyperConverge={hyperConverge} />
     </ExpandSection>

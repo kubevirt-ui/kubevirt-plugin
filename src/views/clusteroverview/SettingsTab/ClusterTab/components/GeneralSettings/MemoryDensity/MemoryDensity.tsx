@@ -6,6 +6,7 @@ import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfigurat
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
+import { CLUSTER_TAB_IDS } from '@overview/SettingsTab/search/constants';
 import { Skeleton } from '@patternfly/react-core';
 
 import ExpandSection from '../../../../ExpandSection/ExpandSection';
@@ -46,7 +47,7 @@ const MemoryDensity: FC<MemoryDensityProps> = ({ hyperConvergeConfiguration, new
   const higherDensity = hyperConverge.spec?.higherWorkloadDensity?.memoryOvercommitPercentage;
 
   return (
-    <ExpandSection toggleText={t('Memory density')}>
+    <ExpandSection searchItemId={CLUSTER_TAB_IDS.memoryDensity} toggleText={t('Memory density')}>
       <SectionWithSwitch
         helpTextIconContent={t('Configures the VM workloads to use swap for higher density')}
         id="memory-density-feature"
