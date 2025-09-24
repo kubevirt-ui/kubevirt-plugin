@@ -6,7 +6,10 @@ import {
   FORM_FIELD_UPLOAD_FILE,
   UPLOAD_MODE_UPLOAD,
 } from '@kubevirt-utils/components/DiskModal/utils/constants';
-import { isHotPluggableEnabled } from '@kubevirt-utils/components/DiskModal/utils/helpers';
+import {
+  convertDataVolumeToTemplate,
+  isHotPluggableEnabled,
+} from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import { PendingChangesAlert } from '@kubevirt-utils/components/PendingChanges/PendingChangesAlert/PendingChangesAlert';
 import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
@@ -109,12 +112,9 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
       onUploadedDataVolume?.(uploadedDataVolume);
 
       if (uploadType === DATA_VOLUME) {
-        data.dataVolumeTemplate.spec.source = {
-          pvc: {
-            name: getName(uploadedDataVolume),
-            namespace: getNamespace(uploadedDataVolume) || getNamespace(vm),
-          },
-        };
+        data.dataVolumeTemplate = convertDataVolumeToTemplate(uploadedDataVolume);
+        data.volume.dataVolume.name = getName(uploadedDataVolume);
+
         if (isHotPluggable) {
           data.volume.dataVolume.hotpluggable = true;
         }
