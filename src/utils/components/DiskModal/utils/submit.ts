@@ -12,14 +12,14 @@ import {
   getDisks,
   getVolumes,
 } from '@kubevirt-utils/resources/vm';
-import { ensurePath, generatePrettyName, isEmpty } from '@kubevirt-utils/utils/utils';
+import { ensurePath, generateUploadDiskName, isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { isRunning } from '@virtualmachines/utils';
 
 import { getDataVolumeTemplateSize } from '../components/utils/selectors';
 
-import { DEFAULT_DISK_SIZE } from './constants';
+import { DEFAULT_DISK_SIZE, UPLOAD_SUFFIX } from './constants';
 import {
   createDataVolumeName,
   getEmptyVMDataVolumeResource,
@@ -75,7 +75,7 @@ export const uploadDataVolume = async (
 ): Promise<V1beta1DataVolume> => {
   const dataVolume = getEmptyVMDataVolumeResource(vm);
 
-  dataVolume.metadata.name = generatePrettyName('upload');
+  dataVolume.metadata.name = generateUploadDiskName(data.disk.name, UPLOAD_SUFFIX);
 
   dataVolume.spec.source = { upload: {} };
   dataVolume.spec.storage.resources.requests.storage =

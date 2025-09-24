@@ -10,8 +10,11 @@ import {
   UPLOAD_MODE_SELECT,
   UPLOAD_MODE_UPLOAD,
 } from '@kubevirt-utils/components/DiskModal/utils/constants';
-import { mountISOToCDROM } from '@kubevirt-utils/components/DiskModal/utils/helpers';
-import { isHotPluggableEnabled } from '@kubevirt-utils/components/DiskModal/utils/helpers';
+import {
+  convertDataVolumeToTemplate,
+  isHotPluggableEnabled,
+  mountISOToCDROM,
+} from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import { uploadDataVolume } from '@kubevirt-utils/components/DiskModal/utils/submit';
 import { VolumeTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
@@ -34,7 +37,7 @@ import {
 
 import { useISOOptions } from './hooks/useISOOptions';
 import { useMountCDROMForm } from './hooks/useMountCDROMForm';
-import { buildDiskState, convertDataVolumeToTemplate } from './utils';
+import { buildDiskState } from './utils';
 
 const SELECT_ISO_FIELD_ID = 'select-iso';
 

@@ -176,6 +176,10 @@ export const generatePrettyName = (prefix?: string): string => {
   })}`;
 };
 
+export const generateUploadDiskName = (diskName: string, prefix: string): string => {
+  return `${diskName}-${generatePrettyName(prefix)}`;
+};
+
 const DOCKER_PREFIX = 'docker://';
 
 export const appendDockerPrefix = (image: string) => {
