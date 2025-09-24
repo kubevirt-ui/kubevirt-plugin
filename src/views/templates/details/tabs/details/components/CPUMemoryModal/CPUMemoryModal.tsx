@@ -61,7 +61,7 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({ isOpen, onClose, onSubmit, te
       ]);
 
       draftVM.spec.template.spec.domain.cpu = cpu;
-      draftVM.spec.template.spec.domain.memory.guest = `${memory}${memoryUnit}`;
+      draftVM.spec.template.spec.domain.memory.guest = `${memory}${memoryUnit || ''}`;
     });
 
     try {
