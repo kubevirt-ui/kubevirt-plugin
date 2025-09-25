@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { documentationURL } from '@kubevirt-utils/constants/documentation';
+import { documentationURL, PLUGIN_VERSION } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import GettingStartedSectionContents from '../utils/getting-started-content/GettingStartedSectionContents';
@@ -12,7 +12,6 @@ import './FeatureHighlightsSection.scss';
 
 const FeatureHighlightsSection: React.FC = () => {
   const { t } = useKubevirtTranslation();
-
   const moreLink: GettingStartedLink = {
     external: true,
     href: documentationURL.VIRTUALIZATION_BLOG,
@@ -38,8 +37,10 @@ const FeatureHighlightsSection: React.FC = () => {
       id: 'item2',
       title: (
         <FeatureHighlightsTitle
+          title={t('OpenShift Virtualization {{version}} Highlights', {
+            version: parseFloat(PLUGIN_VERSION),
+          })}
           readTime={t('5 min')}
-          title={t('OpenShift Virtualization 4.19 Highlights')}
         />
       ),
     },
