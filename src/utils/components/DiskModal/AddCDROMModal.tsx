@@ -1,8 +1,18 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect } from 'react';
 import { FormProvider, useForm, useWatch } from 'react-hook-form';
 
-import { FORM_FIELD_UPLOAD_FILE } from '@kubevirt-utils/components/DiskModal/utils/constants';
-import { isHotPluggableEnabled } from '@kubevirt-utils/components/DiskModal/utils/helpers';
+import { UPLOAD_FILENAME_FIELD } from '@kubevirt-utils/components/DiskModal/components/utils/constants';
+import {
+  FORM_FIELD_UPLOAD_FILE,
+  FORM_FIELD_UPLOAD_MODE,
+  SELECT_ISO_FIELD_ID,
+  UPLOAD_MODE_UPLOAD,
+} from '@kubevirt-utils/components/DiskModal/utils/constants';
+import {
+  convertDataVolumeToTemplate,
+  isHotPluggableEnabled,
+} from '@kubevirt-utils/components/DiskModal/utils/helpers';
+import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import { PendingChangesAlert } from '@kubevirt-utils/components/PendingChanges/PendingChangesAlert/PendingChangesAlert';
 import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { isUploadingDisk } from '@kubevirt-utils/hooks/useCDIUpload/utils';
@@ -11,6 +21,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { Checkbox, Form, FormGroup, Stack, StackItem } from '@patternfly/react-core';
+import { useISOOptions } from '@virtualmachines/details/tabs/configuration/storage/components/modal/hooks/useISOOptions';
+import { useMountCDROMForm } from '@virtualmachines/details/tabs/configuration/storage/components/modal/hooks/useMountCDROMForm';
 import { isRunning } from '@virtualmachines/utils';
 
 import TabModal from '../TabModal/TabModal';
@@ -32,14 +44,28 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
   const { t } = useKubevirtTranslation();
   const { upload, uploadData } = useCDIUpload();
   const { DATA_VOLUME } = VolumeTypes;
-  const [uploadEnabled, setUploadEnabled] = useState(true);
-  const [uploadMode, setUploadMode] = useState<
-    VolumeTypes.DATA_VOLUME | VolumeTypes.PERSISTENT_VOLUME_CLAIM
-  >(DATA_VOLUME);
   const isVMRunning = isRunning(vm);
   const { featureGates } = useKubevirtHyperconvergeConfiguration();
+  const vmNamespace = getNamespace(vm);
 
   const isHotPluggable = isHotPluggableEnabled(featureGates);
+  const { isoOptions } = useISOOptions(vmNamespace);
+
+  const {
+    handleFileUpload,
+    handleISOSelection,
+    handleUploadTypeChange,
+    methods: mountMethods,
+    selectedISO,
+    uploadMode: mountUploadMode,
+    uploadType,
+  } = useMountCDROMForm();
+
+  useEffect(() => {
+    mountMethods.setValue(FORM_FIELD_UPLOAD_MODE, UPLOAD_MODE_UPLOAD);
+  }, [mountMethods]);
+
+  const uploadEnabled = mountUploadMode === UPLOAD_MODE_UPLOAD;
 
   const methods = useForm<V1DiskFormState>({
     defaultValues: getDefaultCreateValues(vm, SourceTypes.CDROM),
@@ -65,22 +91,30 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
     }
   }, [uploadEnabled, setValue]);
 
-  const isFormValid = !hasFormErrors && (!uploadEnabled || hasUploadFile);
+  const hasValidSelection = selectedISO || hasUploadFile;
+  const hasNoSelection = !selectedISO && !uploadEnabled;
+  const isFormValid = !hasFormErrors && Boolean(hasValidSelection || hasNoSelection);
 
   const handleModalSubmit = async () => {
     const data = getValues();
 
-    if (uploadEnabled && data.uploadFile?.file) {
+    if (selectedISO) {
+      data.volume = {
+        name: data.volume.name,
+        persistentVolumeClaim: {
+          claimName: selectedISO,
+          ...(isHotPluggable && { hotpluggable: true }),
+        },
+      };
+      delete data.dataVolumeTemplate;
+    } else if (uploadEnabled && data?.uploadFile?.file) {
       const uploadedDataVolume = await uploadDataVolume(vm, uploadData, data);
       onUploadedDataVolume?.(uploadedDataVolume);
 
-      if (uploadMode === DATA_VOLUME) {
-        data.dataVolumeTemplate.spec.source = {
-          pvc: {
-            name: getName(uploadedDataVolume),
-            namespace: getNamespace(uploadedDataVolume) || getNamespace(vm),
-          },
-        };
+      if (uploadType === DATA_VOLUME) {
+        data.dataVolumeTemplate = convertDataVolumeToTemplate(uploadedDataVolume);
+        data.volume.dataVolume.name = getName(uploadedDataVolume);
+
         if (isHotPluggable) {
           data.volume.dataVolume.hotpluggable = true;
         }
@@ -137,13 +171,30 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
             )}
             <Form>
               <DiskNameInput isDisabled={isUploading} />
+              <FormGroup fieldId={SELECT_ISO_FIELD_ID} label={t('Select ISO')}>
+                <InlineFilterSelect
+                  setSelected={(e) => {
+                    handleISOSelection(e);
+                    setValue(UPLOAD_FILENAME_FIELD, '');
+                  }}
+                  toggleProps={{
+                    isDisabled: isUploading,
+                    isFullWidth: true,
+                    placeholder: t('Select or upload a new ISO file to the cluster'),
+                  }}
+                  options={isoOptions}
+                  selected={selectedISO}
+                />
+              </FormGroup>
               <FormGroup>
                 <Checkbox
+                  onChange={(_event, checked) => {
+                    checked ? handleFileUpload() : handleISOSelection('');
+                  }}
                   id="upload-iso-checkbox"
                   isChecked={uploadEnabled}
                   isDisabled={isUploading}
                   label={t('Upload a new ISO file to the cluster')}
-                  onChange={(_event, checked) => setUploadEnabled(checked)}
                 />
               </FormGroup>
               {uploadEnabled && (
@@ -152,8 +203,8 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
                   {hasUploadFile && (
                     <UploadModeSelector
                       isDisabled={isUploading}
-                      onUploadModeChange={setUploadMode}
-                      uploadMode={uploadMode}
+                      onUploadModeChange={handleUploadTypeChange}
+                      uploadMode={uploadType}
                     />
                   )}
                 </>
