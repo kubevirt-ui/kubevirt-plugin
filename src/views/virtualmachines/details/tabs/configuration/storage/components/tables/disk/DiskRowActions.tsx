@@ -1,5 +1,4 @@
-import { FC, useMemo, useState } from 'react';
-import React from 'react';
+import React, { FC, useMemo, useState } from 'react';
 
 import {
   V1VirtualMachine,
@@ -54,8 +53,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
   const { createModal } = useModal();
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
-  const diskName = obj?.name;
+  const { name: diskName, source: diskSource } = obj || {};
 
   const isVMRunning = isRunning(vm);
   const isHotplug = isHotplugVolume(vm, diskName, vmi);
@@ -162,6 +160,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
         onClose={onClose}
         onSubmit={onDiskUpdate || updateDisks}
         vm={vm}
+        {...(isCDROMMountedState && { source: diskSource })}
       />
     ));
   };

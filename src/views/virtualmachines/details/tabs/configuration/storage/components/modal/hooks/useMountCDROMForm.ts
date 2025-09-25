@@ -2,15 +2,14 @@ import { useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 
 import {
+  FORM_FIELD_SELECTED_ISO,
   FORM_FIELD_UPLOAD_FILE,
+  FORM_FIELD_UPLOAD_MODE,
+  FORM_FIELD_UPLOAD_TYPE,
   UPLOAD_MODE_SELECT,
   UPLOAD_MODE_UPLOAD,
 } from '@kubevirt-utils/components/DiskModal/utils/constants';
 import { VolumeTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
-
-const FORM_FIELD_SELECTED_ISO = 'selectedISO';
-const FORM_FIELD_UPLOAD_MODE = 'uploadMode';
-const FORM_FIELD_UPLOAD_TYPE = 'uploadType';
 
 type MountCDROMFormState = {
   selectedISO?: string;
