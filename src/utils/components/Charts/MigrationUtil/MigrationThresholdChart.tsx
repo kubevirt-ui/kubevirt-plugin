@@ -7,6 +7,7 @@ import useVMQueries from '@kubevirt-utils/hooks/useVMQueries';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Chart,
@@ -43,6 +44,8 @@ type MigrationThresholdChartProps = {
 
 const MigrationThresholdChart: React.FC<MigrationThresholdChartProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
+  const isACMPage = useIsACMPage();
+
   const { currentTime, duration, timespan } = useDuration();
 
   const queries = useVMQueries(vmi);
@@ -100,11 +103,13 @@ const MigrationThresholdChart: React.FC<MigrationThresholdChartProps> = ({ vmi }
   const isReady =
     !isEmpty(chartDataProcessed) || !isEmpty(chartDataRemaining) || !isEmpty(chartDataDirtyRate);
   const yMax = findMigrationMaxYValue(chartDataProcessed, chartDataRemaining, chartDataDirtyRate);
-  const linkToMetrics = queriesToLink([
-    queries?.MIGRATION_DATA_REMAINING,
-    queries.MIGRATION_DATA_PROCESSED,
-    queries.MIGRATION_MEMORY_DIRTY_RATE,
-  ]);
+  const linkToMetrics =
+    !isACMPage &&
+    queriesToLink([
+      queries?.MIGRATION_DATA_REMAINING,
+      queries.MIGRATION_DATA_PROCESSED,
+      queries.MIGRATION_MEMORY_DIRTY_RATE,
+    ]);
   return (
     <ComponentReady isReady={isReady} linkToMetrics={linkToMetrics}>
       <div className="util-threshold-chart" ref={ref}>

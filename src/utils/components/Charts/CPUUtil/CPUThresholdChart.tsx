@@ -7,6 +7,7 @@ import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCPU, getVCPUCount } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Chart,
@@ -39,6 +40,8 @@ type CPUThresholdChartProps = {
 };
 
 const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ vmi }) => {
+  const isACMPage = useIsACMPage();
+
   const { currentTime, duration, timespan } = useDuration();
   const { height, ref, width } = useResponsiveCharts();
 
@@ -83,7 +86,7 @@ const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ vmi }) => {
   ];
 
   const isReady = !isEmpty(chartData) && !isEmpty(thresholdData);
-  const linkToMetrics = queriesToLink(queries?.CPU_USAGE);
+  const linkToMetrics = !isACMPage && queriesToLink(queries?.CPU_USAGE);
 
   return (
     <ComponentReady isReady={isReady} linkToMetrics={linkToMetrics}>

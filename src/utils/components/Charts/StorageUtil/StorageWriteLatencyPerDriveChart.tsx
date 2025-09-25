@@ -7,6 +7,7 @@ import useVMQueries from '@kubevirt-utils/hooks/useVMQueries';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Chart,
@@ -50,6 +51,8 @@ const CHART_COLORS = [
 const StorageWriteLatencyPerDriveChart: React.FC<StorageWriteLatencyPerDriveChartProps> = ({
   vmi,
 }) => {
+  const isACMPage = useIsACMPage();
+
   const { currentTime, duration, timespan } = useDuration();
 
   const queries = useVMQueries(vmi);
@@ -90,7 +93,7 @@ const StorageWriteLatencyPerDriveChart: React.FC<StorageWriteLatencyPerDriveChar
     symbol: { fill: series.color, type: 'square' },
   }));
 
-  const linkToMetrics = queriesToLink(queries.STORAGE_WRITE_LATENCY_PER_DRIVE);
+  const linkToMetrics = !isACMPage && queriesToLink(queries.STORAGE_WRITE_LATENCY_PER_DRIVE);
 
   return (
     <ComponentReady isReady={!isEmpty(allData)} linkToMetrics={linkToMetrics}>

@@ -6,6 +6,7 @@ import useVMQueries from '@kubevirt-utils/hooks/useVMQueries';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Chart,
@@ -36,6 +37,8 @@ type StorageIOPSTotalThresholdChartProps = {
 };
 
 const StorageIOPSTotalThresholdChart: React.FC<StorageIOPSTotalThresholdChartProps> = ({ vmi }) => {
+  const isACMPage = useIsACMPage();
+
   const { currentTime, duration, timespan } = useDuration();
 
   const queries = useVMQueries(vmi);
@@ -56,7 +59,7 @@ const StorageIOPSTotalThresholdChart: React.FC<StorageIOPSTotalThresholdChartPro
     return { x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y) };
   });
   const yMax = findMaxYValue(chartData);
-  const linkToMetrics = queriesToLink(queries.STORAGE_IOPS_TOTAL);
+  const linkToMetrics = !isACMPage && queriesToLink(queries.STORAGE_IOPS_TOTAL);
 
   return (
     <ComponentReady isReady={!isEmpty(chartData)} linkToMetrics={linkToMetrics}>

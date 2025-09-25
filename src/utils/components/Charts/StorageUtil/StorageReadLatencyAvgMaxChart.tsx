@@ -7,6 +7,7 @@ import useVMQueries from '@kubevirt-utils/hooks/useVMQueries';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Chart,
@@ -40,6 +41,8 @@ type StorageReadLatencyAvgMaxChartProps = {
 };
 
 const StorageReadLatencyAvgMaxChart: React.FC<StorageReadLatencyAvgMaxChartProps> = ({ vmi }) => {
+  const isACMPage = useIsACMPage();
+
   const { currentTime, duration, timespan } = useDuration();
 
   const queries = useVMQueries(vmi);
@@ -88,7 +91,7 @@ const StorageReadLatencyAvgMaxChart: React.FC<StorageReadLatencyAvgMaxChartProps
     },
   ];
 
-  const linkToMetrics = queriesToLink(queries.STORAGE_READ_LATENCY_AVG);
+  const linkToMetrics = !isACMPage && queriesToLink(queries.STORAGE_READ_LATENCY_AVG);
 
   return (
     <ComponentReady

@@ -7,6 +7,7 @@ import useVMQueries from '@kubevirt-utils/hooks/useVMQueries';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Chart,
@@ -43,6 +44,8 @@ const MigrationThresholdChartDiskRate: React.FC<MigrationThresholdChartDiskRateP
   vmi,
 }) => {
   const { t } = useKubevirtTranslation();
+  const isACMPage = useIsACMPage();
+
   const { currentTime, duration, timespan } = useDuration();
   const queries = useVMQueries(vmi);
   const { height, ref, width } = useResponsiveCharts();
@@ -64,7 +67,7 @@ const MigrationThresholdChartDiskRate: React.FC<MigrationThresholdChartDiskRateP
 
   const isReady = !isEmpty(chartDataProcessed);
   const yMax = findMaxYValue(chartDataProcessed);
-  const linkToMetrics = queriesToLink(queries.MIGRATION_DISK_TRANSFER_RATE);
+  const linkToMetrics = !isACMPage && queriesToLink(queries.MIGRATION_DISK_TRANSFER_RATE);
   return (
     <ComponentReady isReady={isReady} linkToMetrics={linkToMetrics}>
       <div className="util-threshold-chart" ref={ref}>
