@@ -4,6 +4,8 @@ import { FormProvider, useForm, useWatch } from 'react-hook-form';
 import { UPLOAD_FILENAME_FIELD } from '@kubevirt-utils/components/DiskModal/components/utils/constants';
 import {
   FORM_FIELD_UPLOAD_FILE,
+  FORM_FIELD_UPLOAD_MODE,
+  SELECT_ISO_FIELD_ID,
   UPLOAD_MODE_UPLOAD,
 } from '@kubevirt-utils/components/DiskModal/utils/constants';
 import {
@@ -31,8 +33,6 @@ import UploadModeSelector from './components/UploadModeSelector/UploadModeSelect
 import { getDefaultCreateValues } from './utils/form';
 import { addDisk, reorderBootDisk, uploadDataVolume } from './utils/submit';
 import { SourceTypes, V1DiskFormState, V1SubDiskModalProps, VolumeTypes } from './utils/types';
-
-const SELECT_ISO_FIELD_ID = 'select-iso';
 
 const AddCDROMModal: FC<V1SubDiskModalProps> = ({
   isOpen,
@@ -62,7 +62,7 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
   } = useMountCDROMForm();
 
   useEffect(() => {
-    mountMethods.setValue('uploadMode', UPLOAD_MODE_UPLOAD);
+    mountMethods.setValue(FORM_FIELD_UPLOAD_MODE, UPLOAD_MODE_UPLOAD);
   }, [mountMethods]);
 
   const uploadEnabled = mountUploadMode === UPLOAD_MODE_UPLOAD;
@@ -107,7 +107,7 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
         },
       };
       delete data.dataVolumeTemplate;
-    } else if (uploadEnabled && data.uploadFile?.file) {
+    } else if (uploadEnabled && data?.uploadFile?.file) {
       const uploadedDataVolume = await uploadDataVolume(vm, uploadData, data);
       onUploadedDataVolume?.(uploadedDataVolume);
 

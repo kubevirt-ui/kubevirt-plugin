@@ -332,10 +332,10 @@ export const isHotPluggableEnabled = (featureGates: string[]) => {
 export const convertDataVolumeToTemplate = (
   dataVolume: V1beta1DataVolume,
 ): V1DataVolumeTemplateSpec => ({
-  metadata: dataVolume.metadata,
+  metadata: dataVolume?.metadata,
   spec: {
-    source: dataVolume.spec.source,
-    sourceRef: dataVolume.spec.sourceRef,
+    source: dataVolume.spec?.source,
+    sourceRef: dataVolume.spec?.sourceRef,
     storage: {
       accessModes: dataVolume.spec.storage?.accessModes?.map((mode) => mode as any),
       resources: dataVolume.spec.storage?.resources,
