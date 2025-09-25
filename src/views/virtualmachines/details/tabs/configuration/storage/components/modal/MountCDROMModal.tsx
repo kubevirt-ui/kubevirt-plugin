@@ -7,6 +7,7 @@ import DiskSourceUploadPVC from '@kubevirt-utils/components/DiskModal/components
 import UploadModeSelector from '@kubevirt-utils/components/DiskModal/components/UploadModeSelector/UploadModeSelector';
 import { UPLOAD_FILENAME_FIELD } from '@kubevirt-utils/components/DiskModal/components/utils/constants';
 import {
+  SELECT_ISO_FIELD_ID,
   UPLOAD_MODE_SELECT,
   UPLOAD_MODE_UPLOAD,
 } from '@kubevirt-utils/components/DiskModal/utils/constants';
@@ -38,8 +39,6 @@ import {
 import { useISOOptions } from './hooks/useISOOptions';
 import { useMountCDROMForm } from './hooks/useMountCDROMForm';
 import { buildDiskState } from './utils';
-
-const SELECT_ISO_FIELD_ID = 'select-iso';
 
 type MountCDROMModalProps = {
   cdromName: string;
@@ -106,6 +105,8 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
       } else {
         diskState.dataVolumeTemplate = convertDataVolumeToTemplate(uploadedDataVolume);
       }
+    } else if (selectedISO) {
+      delete diskState.dataVolumeTemplate;
     }
 
     const updatedVM = await mountISOToCDROM(vm, diskState, isHotPluggable);
