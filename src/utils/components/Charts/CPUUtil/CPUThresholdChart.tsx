@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 import { Link } from 'react-router-dom-v5-compat';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import useVMQueries from '@kubevirt-utils/hooks/useVMQueries';
+import useVMQuery from '@kubevirt-utils/hooks/useVMQuery';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCPU, getVCPUCount } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -25,11 +25,11 @@ import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration
 import { tickLabels } from '../ChartLabels/styleOverrides';
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
+import { VMQueries } from '../utils/queries';
 import {
   addTimestampToTooltip,
   formatCPUUtilTooltipData,
   MILLISECONDS_MULTIPLIER,
-  queriesToLink,
   tickFormat,
   TICKS_COUNT,
 } from '../utils/utils';
@@ -42,7 +42,7 @@ const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ vmi }) => {
   const { currentTime, duration, timespan } = useDuration();
   const { height, ref, width } = useResponsiveCharts();
 
-  const queries = useVMQueries(vmi);
+  const { query, queryLink } = useVMQuery(vmi, VMQueries.CPU_USAGE);
 
   const prometheusProps = {
     cluster: getCluster(vmi),
@@ -55,7 +55,7 @@ const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ vmi }) => {
   const [dataCPUUsage] = useFleetPrometheusPoll({
     ...prometheusProps,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
-    query: queries?.CPU_USAGE,
+    query,
   });
 
   const cpuUsage = dataCPUUsage?.data?.result?.[0]?.values;
@@ -83,12 +83,11 @@ const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ vmi }) => {
   ];
 
   const isReady = !isEmpty(chartData) && !isEmpty(thresholdData);
-  const linkToMetrics = queriesToLink(queries?.CPU_USAGE);
 
   return (
-    <ComponentReady isReady={isReady} linkToMetrics={linkToMetrics}>
+    <ComponentReady isReady={isReady} linkToMetrics={queryLink}>
       <div className="util-threshold-chart" ref={ref}>
-        <Link to={linkToMetrics}>
+        <Link to={queryLink}>
           <Chart
             containerComponent={
               <ChartVoronoiContainer

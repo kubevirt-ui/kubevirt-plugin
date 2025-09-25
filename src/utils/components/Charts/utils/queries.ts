@@ -1,6 +1,6 @@
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
-enum VMQueries {
+export enum VMQueries {
   CPU_USAGE = 'CPU_USAGE',
   FILESYSTEM_READ_USAGE = 'FILESYSTEM_READ_USAGE',
   FILESYSTEM_USAGE_TOTAL = 'FILESYSTEM_TOTAL_USAGE',

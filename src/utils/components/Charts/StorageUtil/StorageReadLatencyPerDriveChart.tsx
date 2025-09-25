@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom-v5-compat';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { tickLabels } from '@kubevirt-utils/components/Charts/ChartLabels/styleOverrides';
-import useVMQueries from '@kubevirt-utils/hooks/useVMQueries';
+import useVMQuery from '@kubevirt-utils/hooks/useVMQuery';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -25,13 +25,13 @@ import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration
 
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
+import { VMQueries } from '../utils/queries';
 import {
   addTimestampToTooltip,
   findMaxYValue,
   formatStorageLatencyTooltipData,
   getDriveName,
   MILLISECONDS_MULTIPLIER,
-  queriesToLink,
   tickFormat,
   TICKS_COUNT,
 } from '../utils/utils';
@@ -52,7 +52,7 @@ const StorageReadLatencyPerDriveChart: React.FC<StorageReadLatencyPerDriveChartP
 }) => {
   const { currentTime, duration, timespan } = useDuration();
 
-  const queries = useVMQueries(vmi);
+  const { query, queryLink } = useVMQuery(vmi, VMQueries.STORAGE_READ_LATENCY_PER_DRIVE);
   const { height, ref, width } = useResponsiveCharts();
 
   const [data] = useFleetPrometheusPoll({
@@ -60,7 +60,7 @@ const StorageReadLatencyPerDriveChart: React.FC<StorageReadLatencyPerDriveChartP
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     endTime: currentTime,
     namespace: getNamespace(vmi),
-    query: queries?.STORAGE_READ_LATENCY_PER_DRIVE,
+    query,
     timespan,
   });
 
@@ -90,12 +90,10 @@ const StorageReadLatencyPerDriveChart: React.FC<StorageReadLatencyPerDriveChartP
     symbol: { fill: series.color, type: 'square' },
   }));
 
-  const linkToMetrics = queriesToLink(queries.STORAGE_READ_LATENCY_PER_DRIVE);
-
   return (
-    <ComponentReady isReady={!isEmpty(allData)} linkToMetrics={linkToMetrics}>
+    <ComponentReady isReady={!isEmpty(allData)} linkToMetrics={queryLink}>
       <div className="util-threshold-chart" ref={ref}>
-        <Link to={linkToMetrics}>
+        <Link to={queryLink}>
           <Chart
             containerComponent={
               <ChartVoronoiContainer

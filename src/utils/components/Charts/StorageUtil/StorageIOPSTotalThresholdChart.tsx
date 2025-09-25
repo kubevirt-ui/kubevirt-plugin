@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom-v5-compat';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import useVMQueries from '@kubevirt-utils/hooks/useVMQueries';
+import useVMQuery from '@kubevirt-utils/hooks/useVMQuery';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -21,12 +21,12 @@ import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration
 
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
+import { VMQueries } from '../utils/queries';
 import {
   addTimestampToTooltip,
   findMaxYValue,
   formatStorageIOPSTotalThresholdTooltipData,
   MILLISECONDS_MULTIPLIER,
-  queriesToLink,
   tickFormat,
   TICKS_COUNT,
 } from '../utils/utils';
@@ -38,7 +38,7 @@ type StorageIOPSTotalThresholdChartProps = {
 const StorageIOPSTotalThresholdChart: React.FC<StorageIOPSTotalThresholdChartProps> = ({ vmi }) => {
   const { currentTime, duration, timespan } = useDuration();
 
-  const queries = useVMQueries(vmi);
+  const { query, queryLink } = useVMQuery(vmi, VMQueries.STORAGE_IOPS_TOTAL);
   const { height, ref, width } = useResponsiveCharts();
 
   const [data] = useFleetPrometheusPoll({
@@ -46,7 +46,7 @@ const StorageIOPSTotalThresholdChart: React.FC<StorageIOPSTotalThresholdChartPro
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     endTime: currentTime,
     namespace: getNamespace(vmi),
-    query: queries?.STORAGE_IOPS_TOTAL,
+    query,
     timespan,
   });
 
@@ -56,12 +56,11 @@ const StorageIOPSTotalThresholdChart: React.FC<StorageIOPSTotalThresholdChartPro
     return { x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y) };
   });
   const yMax = findMaxYValue(chartData);
-  const linkToMetrics = queriesToLink(queries.STORAGE_IOPS_TOTAL);
 
   return (
-    <ComponentReady isReady={!isEmpty(chartData)} linkToMetrics={linkToMetrics}>
+    <ComponentReady isReady={!isEmpty(chartData)} linkToMetrics={queryLink}>
       <div className="util-threshold-chart" ref={ref}>
-        <Link to={linkToMetrics}>
+        <Link to={queryLink}>
           <Chart
             containerComponent={
               <ChartVoronoiContainer

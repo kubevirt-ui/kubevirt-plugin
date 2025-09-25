@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom-v5-compat';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { tickLabels } from '@kubevirt-utils/components/Charts/ChartLabels/styleOverrides';
-import useVMQueries from '@kubevirt-utils/hooks/useVMQueries';
+import useVMQuery from '@kubevirt-utils/hooks/useVMQuery';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -23,6 +23,7 @@ import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration
 
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
+import { VMQueries } from '../utils/queries';
 import {
   addTimestampToTooltip,
   AVG_LABEL,
@@ -30,7 +31,6 @@ import {
   formatStorageWriteLatencyAvgMaxTooltipData,
   MAX_LABEL,
   MILLISECONDS_MULTIPLIER,
-  queriesToLink,
   tickFormat,
   TICKS_COUNT,
 } from '../utils/utils';
@@ -41,16 +41,20 @@ type StorageWriteLatencyAvgMaxChartProps = {
 
 const StorageWriteLatencyAvgMaxChart: React.FC<StorageWriteLatencyAvgMaxChartProps> = ({ vmi }) => {
   const { currentTime, duration, timespan } = useDuration();
-
-  const queries = useVMQueries(vmi);
   const { height, ref, width } = useResponsiveCharts();
+
+  const { query: queryAvg, queryLink: queryLinkAvg } = useVMQuery(
+    vmi,
+    VMQueries.STORAGE_WRITE_LATENCY_AVG,
+  );
+  const { query: queryMax } = useVMQuery(vmi, VMQueries.STORAGE_WRITE_LATENCY_MAX);
 
   const [avgData] = useFleetPrometheusPoll({
     cluster: getCluster(vmi),
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     endTime: currentTime,
     namespace: getNamespace(vmi),
-    query: queries?.STORAGE_WRITE_LATENCY_AVG,
+    query: queryAvg,
     timespan,
   });
 
@@ -59,7 +63,7 @@ const StorageWriteLatencyAvgMaxChart: React.FC<StorageWriteLatencyAvgMaxChartPro
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     endTime: currentTime,
     namespace: getNamespace(vmi),
-    query: queries?.STORAGE_WRITE_LATENCY_MAX,
+    query: queryMax,
     timespan,
   });
 
@@ -88,15 +92,13 @@ const StorageWriteLatencyAvgMaxChart: React.FC<StorageWriteLatencyAvgMaxChartPro
     },
   ];
 
-  const linkToMetrics = queriesToLink(queries.STORAGE_WRITE_LATENCY_AVG);
-
   return (
     <ComponentReady
       isReady={!isEmpty(avgChartData) || !isEmpty(maxChartData)}
-      linkToMetrics={linkToMetrics}
+      linkToMetrics={queryLinkAvg}
     >
       <div className="util-threshold-chart" ref={ref}>
-        <Link to={linkToMetrics}>
+        <Link to={queryLinkAvg}>
           <Chart
             containerComponent={
               <ChartVoronoiContainer
