@@ -36,7 +36,7 @@ const AutoComputeCPULimits: FC<AutoComputeCPULimitsProps> = ({
 
   return (
     <>
-      <Split className="settings-tab--indented">
+      <Split>
         <SplitItem isFilled>
           {t('Auto-compute CPU and memory limits')} {newBadge && <NewBadge />}
         </SplitItem>

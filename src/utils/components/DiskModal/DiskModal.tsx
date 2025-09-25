@@ -5,7 +5,7 @@ import { getDataVolumeTemplates, getVolumes } from '@kubevirt-utils/resources/vm
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import usePVCDiskSource from './hooks/usePVCDiskSource';
-import { modalsBySource } from './utils/constants';
+import { getDiskModalBySource } from './utils/getDiskModalBySource';
 import { getSourceFromVolume } from './utils/helpers';
 import { V1DiskModalProps } from './utils/types';
 
@@ -30,7 +30,7 @@ const DiskModal: FC<V1DiskModalProps> = ({
 
   const editDiskSource = getSourceFromVolume(diskVolume, dataVolumeTemplate);
 
-  const Modal = modalsBySource[createDiskSource || editDiskSource];
+  const Modal = getDiskModalBySource[createDiskSource || editDiskSource];
 
   return (
     <Modal
