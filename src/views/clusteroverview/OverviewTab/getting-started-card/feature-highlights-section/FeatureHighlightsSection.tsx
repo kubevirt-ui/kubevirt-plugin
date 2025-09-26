@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { documentationURL, PLUGIN_VERSION } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -10,11 +10,12 @@ import FeatureHighlightsTitle from './FeatureHighlightsTitle';
 
 import './FeatureHighlightsSection.scss';
 
-const FeatureHighlightsSection: React.FC = () => {
+const FeatureHighlightsSection: FC = () => {
+  const { FREE_PAGE_REPORTING, HIGHLIGHTS, VIRTUALIZATION_BLOG } = documentationURL;
   const { t } = useKubevirtTranslation();
   const moreLink: GettingStartedLink = {
     external: true,
-    href: documentationURL.VIRTUALIZATION_BLOG,
+    href: VIRTUALIZATION_BLOG,
     id: 'openshift-virtualization-feature-highlights',
     title: t('Visit the blog'),
   };
@@ -22,7 +23,7 @@ const FeatureHighlightsSection: React.FC = () => {
   const links: GettingStartedLink[] = [
     {
       external: true,
-      href: documentationURL.FREE_PAGE_REPORTING,
+      href: FREE_PAGE_REPORTING,
       id: 'item1',
       title: (
         <FeatureHighlightsTitle
@@ -33,12 +34,12 @@ const FeatureHighlightsSection: React.FC = () => {
     },
     {
       external: true,
-      href: documentationURL.HIGHLIGHTS,
+      href: HIGHLIGHTS,
       id: 'item2',
       title: (
         <FeatureHighlightsTitle
           title={t('OpenShift Virtualization {{version}} Highlights', {
-            version: parseFloat(PLUGIN_VERSION),
+            version: parseFloat(PLUGIN_VERSION).toFixed(2),
           })}
           readTime={t('5 min')}
         />
