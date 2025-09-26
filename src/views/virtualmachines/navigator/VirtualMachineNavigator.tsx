@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useRef } from 'react';
+import React, { FC, useCallback, useMemo, useRef } from 'react';
 import { useLocation, useParams } from 'react-router-dom-v5-compat';
 
 import CreateResourceDefaultPage from '@kubevirt-utils/components/CreateResourceDefaultPage/CreateResourceDefaultPage';
@@ -34,9 +34,9 @@ const VirtualMachineNavigator: FC = () => {
 
   const treeProps = useTreeViewData();
 
-  const onFilterChange: OnFilterChange = (type, value) => {
+  const onFilterChange: OnFilterChange = useCallback((type, value) => {
     vmListRef.current?.onFilterChange(type, value);
-  };
+  }, []);
 
   return useMemo(
     () =>

@@ -7,7 +7,7 @@ import {
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
 import { produceVMDisks } from '@kubevirt-utils/components/DiskModal/utils/helpers';
-import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import { useModalWithRouterContext } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
@@ -50,7 +50,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
   vmi,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { createModal } = useModal();
+  const { createModal } = useModalWithRouterContext();
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { name: diskName, source: diskSource } = obj || {};
