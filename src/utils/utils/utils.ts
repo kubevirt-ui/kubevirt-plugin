@@ -1,3 +1,4 @@
+import * as ipaddr from 'ipaddr.js';
 import { animals, colors, NumberDictionary, uniqueNamesGenerator } from 'unique-names-generator';
 
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
@@ -12,7 +13,6 @@ import { ALL_NAMESPACES, ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hook
 import { FilterValue, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { k8sBasePath } from '@openshift-console/dynamic-plugin-sdk/lib/utils/k8s/k8s';
 import { SortByDirection } from '@patternfly/react-table';
-import { decimalToBinary } from '@virtualmachines/utils';
 
 import { IPAddress, ItemsToFilterProps } from './types';
 
@@ -226,15 +226,13 @@ export const compareWithDirection = (direction: SortByDirection, a: any, b: any)
  * Link-local address prefix (fe80::/10)
  * @see https://www.rfc-editor.org/rfc/rfc4291#section-2.5.6
  */
-export const IPV6_LINK_LOCAL_BLOCK = '1111111010';
+export const IPV6_LINK_LOCAL_CIDR = 'fe80::/10';
 
 export const isIPV6LinkLocal = (ip: string): boolean => {
-  if (!ip || ip.indexOf(':') === -1) {
+  if (!ipaddr.IPv6.isValid(ip)) {
     return false;
   }
-  const firstBlock = ip.substring(0, ip.indexOf(':'));
-  const binaryFirstBlock = decimalToBinary(parseInt(firstBlock, 16)).padStart(16, '0');
-  return binaryFirstBlock.startsWith(IPV6_LINK_LOCAL_BLOCK);
+  return ipaddr.parse(ip).match(ipaddr.parseCIDR(IPV6_LINK_LOCAL_CIDR));
 };
 
 export const removeLinkLocalIPV6 = (ipAddress: IPAddress[]) =>

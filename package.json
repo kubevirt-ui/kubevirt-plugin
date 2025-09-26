@@ -28,6 +28,7 @@
     "fuzzysearch": "^1.0.3",
     "global": "^4.4.0",
     "immer": "^9.0.12",
+    "ipaddr.js": "2.2.0",
     "js-abbreviation-number": "^1.4.0",
     "js-yaml": "^4.1.0",
     "lodash": "^4.17.21",
