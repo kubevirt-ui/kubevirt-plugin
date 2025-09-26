@@ -4,8 +4,11 @@ set -x
 set +e
 
 # export namespace for downstream
-export CYPRESS_CNV_NS='openshift-cnv';
-export CYPRESS_OS_IMAGES_NS='openshift-virtualization-os-images';
+export DOWNSTREAM=true
+export CYPRESS_CNV_NS='openshift-cnv'
+export CYPRESS_OS_IMAGES_NS='openshift-virtualization-os-images'
+export CYPRESS_TEST_NS='auto-test-ns'
+export CYPRESS_TEST_SECRET_NAME='auto-test-secret'
 
 # setup cluster
 bash test-cleanup.sh

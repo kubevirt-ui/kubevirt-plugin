@@ -22,7 +22,6 @@ export const switchPerspective = (perspective: Perspective) => {
       cy.get(toggle).click();
       cy.get(menu).should('be.visible');
       cy.contains(option, perspective).click();
-      cy.task('log', `Switching to [${perspective}]`);
     }
   });
 };

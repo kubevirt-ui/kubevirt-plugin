@@ -143,8 +143,10 @@ export BRIDGE_BASE_ADDRESS
 export NO_COLOR=1
 
 # export namespace for upstream test
-export CYPRESS_CNV_NS='kubevirt-hyperconverged';
-export CYPRESS_OS_IMAGES_NS='kubevirt-os-images';
+export CYPRESS_CNV_NS='kubevirt-hyperconverged'
+export CYPRESS_OS_IMAGES_NS='kubevirt-os-images'
+export CYPRESS_TEST_NS='auto-test-ns'
+export CYPRESS_TEST_SECRET_NAME='auto-test-secret'
 
 # setup cluster
 bash test-setup.sh
