@@ -1,7 +1,8 @@
-import { FC, ReactNode, useState } from 'react';
+import { FC, ReactNode } from 'react';
 import React from 'react';
 import classNames from 'classnames';
 
+import useIsExpandedAndHighlighted from '@overview/SettingsTab/ExpandSection/hooks/useIsExpandedAndHighlighted';
 import {
   ExpandableSection,
   ExpandableSectionToggle,
@@ -24,6 +25,7 @@ type ExpandSectionWithCustomToggleProps = {
   helpTextContent?: ReactNode;
   id: string;
   isIndented?: boolean;
+  searchItemId?: string;
   toggleClassname?: string;
   toggleContent: ReactNode;
 };
@@ -36,10 +38,12 @@ const ExpandSectionWithCustomToggle: FC<ExpandSectionWithCustomToggleProps> = ({
   helpTextContent,
   id,
   isIndented = false,
+  searchItemId,
   toggleClassname = '',
   toggleContent,
 }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const { isExpanded, isHighlighted, setIsExpanded } = useIsExpandedAndHighlighted(searchItemId);
+
   const toggleID = `${id}--toggle`;
   const contentID = `${id}--content`;
 
@@ -57,7 +61,7 @@ const ExpandSectionWithCustomToggle: FC<ExpandSectionWithCustomToggleProps> = ({
         <Split>
           <SplitItem isFilled>
             <ExpandableSectionToggle
-              className={toggleClassname}
+              className={classNames(toggleClassname, { isHighlighted })}
               contentId={contentID}
               isExpanded={isExpanded}
               onToggle={onToggle}

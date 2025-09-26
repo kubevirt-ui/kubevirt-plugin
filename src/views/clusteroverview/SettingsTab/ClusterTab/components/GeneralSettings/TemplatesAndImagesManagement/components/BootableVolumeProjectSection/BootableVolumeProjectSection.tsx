@@ -4,6 +4,7 @@ import { OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { CLUSTER_TAB_IDS } from '@overview/SettingsTab/search/constants';
 
 import GeneralSettingsProject from '../../../shared/GeneralSettingsProject';
 
@@ -37,6 +38,7 @@ const BootableVolumeProjectSection: FC<BootableVolumeProjectSectionProps> = ({
       namespace={OPENSHIFT_OS_IMAGES_NS}
       onChange={updateHCOBootableVolumesNamespace}
       projectsData={projectsData}
+      searchItemId={CLUSTER_TAB_IDS.bootableVolumesProject}
       toggleText={t('Bootable volumes project')}
     />
   );

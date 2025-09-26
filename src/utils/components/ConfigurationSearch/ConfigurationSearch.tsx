@@ -1,8 +1,7 @@
-import React, { FC, FormEvent, MouseEvent, useEffect, useMemo, useState } from 'react';
+import React, { FC, FormEvent, MouseEvent, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 import { useLocation } from 'react-router-dom-v5-compat';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import useEventListener from '@kubevirt-utils/hooks/useEventListener';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -20,20 +19,19 @@ import {
 } from '@patternfly/react-core';
 import { SearchIcon } from '@patternfly/react-icons';
 
-import { getSearchItems, SearchItem } from '../utils/search';
+import {
+  SearchItem,
+  SearchItemWithTab,
+} from '../../../views/virtualmachines/details/tabs/configuration/utils/search';
 
-import { createConfigurationSearchURL } from './utils/utils';
+import './configuration-search.scss';
 
-import './virtual-machine-configuration-tab-search.scss';
-
-type VirtualMachineConfigurationTabSearchProps = {
-  vm: V1VirtualMachine;
+type ConfigurationSearchProps = {
+  createSearchURL: (tab: string, elementId: string, pathname: string) => string;
+  searchItems: SearchItemWithTab[];
 };
 
-const VirtualMachineConfigurationTabSearch: FC<VirtualMachineConfigurationTabSearchProps> = ({
-  vm,
-}) => {
-  const searchItems = useMemo(() => getSearchItems(vm), [vm]);
+const ConfigurationSearch: FC<ConfigurationSearchProps> = ({ createSearchURL, searchItems }) => {
   const [value, setValue] = useState<string>('');
   const navigate = useNavigate();
   const location = useLocation();
@@ -90,8 +88,8 @@ const VirtualMachineConfigurationTabSearch: FC<VirtualMachineConfigurationTabSea
   };
 
   useEffect(() => {
-    setAutocompleteOptions(getSearchItems(vm));
-  }, [vm]);
+    setAutocompleteOptions(searchItems);
+  }, [searchItems]);
 
   return (
     <Popper
@@ -101,18 +99,16 @@ const VirtualMachineConfigurationTabSearch: FC<VirtualMachineConfigurationTabSea
             <MenuList>
               {autocompleteOptions.map(({ element, tab }) => (
                 <MenuItem
-                  onClick={() =>
-                    navigate(createConfigurationSearchURL(tab, element?.id, location?.pathname))
-                  }
                   description={element?.description}
                   itemId={element?.title}
                   key={element?.id}
+                  onClick={() => navigate(createSearchURL(tab, element?.id, location?.pathname))}
                 >
                   {element?.title}
                 </MenuItem>
               ))}
               {isEmpty(autocompleteOptions) && (
-                <Bullseye className="VirtualMachineConfigurationTabSearch--main__no-results">
+                <Bullseye className="ConfigurationSearch--main__no-results">
                   <Icon color="grey" size="xl">
                     <SearchIcon />
                   </Icon>
@@ -127,8 +123,8 @@ const VirtualMachineConfigurationTabSearch: FC<VirtualMachineConfigurationTabSea
       }
       trigger={
         <SearchInput
-          className="VirtualMachineConfigurationTabSearch--main"
-          id="VirtualMachineConfigurationTabSearch-autocomplete-search"
+          className="ConfigurationSearch--main"
+          id="ConfigurationSearch-autocomplete-search"
           onChange={onChange}
           onClear={onClear}
           value={value}
@@ -139,4 +135,4 @@ const VirtualMachineConfigurationTabSearch: FC<VirtualMachineConfigurationTabSea
   );
 };
 
-export default VirtualMachineConfigurationTabSearch;
+export default ConfigurationSearch;

@@ -1,8 +1,11 @@
 import React, { FC } from 'react';
 
+import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Stack, StackItem, Title } from '@patternfly/react-core';
+
+import { PREVIEW_FEATURES_TAB_IDS } from '../search/constants';
 
 import usePreviewFeaturesData from './hooks/usePreviewFeaturesData';
 import PreviewFeaturesPopover from './PreviewFeaturesPopover';
@@ -17,7 +20,9 @@ const PreviewFeaturesTab: FC = () => {
   return (
     <>
       <Title headingLevel="h5">
-        {t('Preview features')}
+        <SearchItem id={PREVIEW_FEATURES_TAB_IDS.previewFeatures}>
+          {t('Preview features')}
+        </SearchItem>
         <PreviewFeaturesPopover />
       </Title>
       <Stack hasGutter>

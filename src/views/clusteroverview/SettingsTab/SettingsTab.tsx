@@ -1,48 +1,37 @@
-import React, { FC, useState } from 'react';
+import React, { FC } from 'react';
 
-import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import ConfigurationSearch from '@kubevirt-utils/components/ConfigurationSearch/ConfigurationSearch';
 import { Overview } from '@openshift-console/dynamic-plugin-sdk';
 import { Card, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 
-import ClusterTab from './ClusterTab/ClusterTab';
-import PreviewFeaturesTab from './PreviewFeaturesTab/PreviewFeaturesTab';
-import UserTab from './UserTab/UserTab';
+import { useSettingsTabs } from './hooks/useSettingsTabs';
+import { createSettingsSearchURL, SEARCH_ITEMS } from './search/search';
 
 import './settings-tab.scss';
 import '@kubevirt-utils/styles/cursor.scss';
 
 const SettingsTab: FC = () => {
-  const { t } = useKubevirtTranslation();
-  const isAdmin = useIsAdmin();
-  const [activeTab, setActiveTab] = useState<number>(isAdmin ? 0 : 1);
+  const { activeTab, redirectTab, tabs } = useSettingsTabs();
 
   return (
     <Overview>
+      <ConfigurationSearch createSearchURL={createSettingsSearchURL} searchItems={SEARCH_ITEMS} />
       <Card className="settings-tab__card">
-        <Tabs
-          activeKey={activeTab}
-          className="settings-tab__menu"
-          isVertical
-          onSelect={(_, activeKey) => setActiveTab(+activeKey)}
-        >
-          {isAdmin && (
-            <Tab eventKey={0} title={<TabTitleText>{t('Cluster')}</TabTitleText>}>
-              <div className="settings-tab__content" data-test="cluster-settings">
-                <ClusterTab />
-              </div>
+        <Tabs activeKey={activeTab} className="settings-tab__menu" isVertical>
+          {tabs.map(({ Component, dataTest, name, title }) => (
+            <Tab
+              eventKey={name}
+              key={name}
+              onClick={() => redirectTab(name)}
+              title={<TabTitleText>{title}</TabTitleText>}
+            >
+              {activeTab === name && (
+                <div className="settings-tab__content" data-test={dataTest}>
+                  <Component />
+                </div>
+              )}
             </Tab>
-          )}
-          <Tab eventKey={1} title={<TabTitleText>{t('User')}</TabTitleText>}>
-            <div className="settings-tab__content" data-test="user-settings">
-              <UserTab />
-            </div>
-          </Tab>
-          <Tab eventKey={2} title={<TabTitleText>{t('Preview features')}</TabTitleText>}>
-            <div className="settings-tab__content" data-test="preview-features">
-              <PreviewFeaturesTab />
-            </div>
-          </Tab>
+          ))}
         </Tabs>
       </Card>
     </Overview>

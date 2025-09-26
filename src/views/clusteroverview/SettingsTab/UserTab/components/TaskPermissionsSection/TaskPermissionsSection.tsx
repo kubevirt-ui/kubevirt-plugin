@@ -6,6 +6,7 @@ import {
   GreenCheckCircleIcon,
   YellowExclamationTriangleIcon,
 } from '@openshift-console/dynamic-plugin-sdk';
+import { USER_TAB_IDS } from '@overview/SettingsTab/search/constants';
 import { Divider, Flex, FlexItem, Skeleton, Title } from '@patternfly/react-core';
 
 import ExpandSection from '../../../ExpandSection/ExpandSection';
@@ -14,7 +15,11 @@ const TaskPermissionsSection: FC = () => {
   const { t } = useKubevirtTranslation();
   const { capabilitiesData, isLoading } = usePermissions();
   return (
-    <ExpandSection dataTestID="settings-user-permissions" toggleText={t('Permissions')}>
+    <ExpandSection
+      dataTestID="settings-user-permissions"
+      searchItemId={USER_TAB_IDS.permissions}
+      toggleText={t('Permissions')}
+    >
       <Flex>
         <FlexItem>
           <Title headingLevel="h6" size="md">

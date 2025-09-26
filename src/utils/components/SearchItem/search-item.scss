@@ -1,4 +1,11 @@
-.isColored {
+.isHighlighted:not(.ExpandSection) {
   background-color: #ffff009f;
   display: inline;
+}
+
+.isHighlighted.ExpandSection {
+  > .pf-v6-c-expandable-section__toggle > .pf-v6-c-button > .pf-v6-c-button__text {
+    background-color: #ffff009f;
+    display: inline;
+  }
 }
