@@ -33,7 +33,7 @@ const FeatureHighlightsSection: React.FC = () => {
     },
     {
       external: true,
-      href: documentationURL.HIGHLIGHTS_419,
+      href: documentationURL.HIGHLIGHTS,
       id: 'item2',
       title: (
         <FeatureHighlightsTitle
