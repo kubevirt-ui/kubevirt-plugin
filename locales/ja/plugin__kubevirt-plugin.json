@@ -1096,7 +1096,7 @@
   "OpenShift Data Foundation (ODF)": "OpenShift Data Foundation (ODF)",
   "OpenShift Data Foundation (recommended for full functionality) or another persistent storage service is required for OpenShift Virtualization": "OpenShift Virtualization には、OpenShift Data Foundation (フル機能の場合に推奨) またはその他の永続ストレージサービスが必要です",
   "Openshift version": "OpenShift バージョン",
-  "OpenShift Virtualization 4.19 Highlights": "OpenShift Virtualization 4.19 のハイライト",
+  "OpenShift Virtualization {{version}} Highlights": "OpenShift Virtualization {{version}} のハイライト",
   "Operating system": "オペレーティングシステム",
   "Operating System": "オペレーティングシステム",
   "Operating system source already defined": "オペレーティングシステムソースはすでに定義されています",

@@ -1,9 +1,12 @@
+import pluginMetadata from '../../../plugin-metadata';
+
 export const REDHAT_BASE_URL = 'https://www.redhat.com';
 export const RH_ACCESS_URL = 'https://access.redhat.com';
 export const K8_DOC_OBJ_URL = 'https://kubernetes.io/docs/concepts/overview/working-with-objects';
 export const KV_UG_URL = 'https://kubevirt.io';
 export const RH_DOC_URL = 'https://docs.redhat.com/documentation';
 export const REDHAT_DOC_URL = `${RH_DOC_URL}/openshift_container_platform/latest`;
+export const PLUGIN_VERSION = pluginMetadata.version;
 
 export const documentationURL = {
   ANNOTATIONS: `${K8_DOC_OBJ_URL}/annotations/`,
@@ -21,7 +24,7 @@ export const documentationURL = {
   DYNAMIC_SSH_KEY_INJECTION: `${REDHAT_DOC_URL}/html/virtualization/managing-vms#virt-accessing-vm-ssh`,
   FREE_PAGE_REPORTING:
     'https://developers.redhat.com/articles/2024/03/13/save-memory-openshift-virtualization-using-free-page-reporting',
-  HIGHLIGHTS_419: `${REDHAT_DOC_URL}#What's%20New`,
+  HIGHLIGHTS: `${REDHAT_DOC_URL}#What's%20New`,
   HUGEPAGES: `${RH_DOC_URL}/openshift_container_platform/4.19/html/scalability_and_performance/what-huge-pages-do-and-how-they-are-consumed`,
   INSTANCE_TYPES_USER_GUIDE: `${KV_UG_URL}/user-guide/virtual_machines/instancetypes#virtualmachinepreference`,
   LABELS: `${K8_DOC_OBJ_URL}/labels/`,

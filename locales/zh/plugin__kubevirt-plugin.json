@@ -1096,7 +1096,7 @@
   "OpenShift Data Foundation (ODF)": "OpenShift Data Foundation (ODF)",
   "OpenShift Data Foundation (recommended for full functionality) or another persistent storage service is required for OpenShift Virtualization": "OpenShift Virtualization 需要 OpenShift Data Foundation（推荐使用以利用完整功能）或其他持久性存储服务",
   "Openshift version": "OpenShift 版本",
-  "OpenShift Virtualization 4.19 Highlights": "OpenShift Virtualization 4.19 的亮点",
+  "OpenShift Virtualization {{version}} Highlights": "OpenShift Virtualization {{version}} 的亮点",
   "Operating system": "操作系统",
   "Operating System": "操作系统",
   "Operating system source already defined": "操作系统源已定义",
