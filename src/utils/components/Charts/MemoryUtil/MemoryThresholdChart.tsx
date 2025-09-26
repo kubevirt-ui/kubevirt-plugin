@@ -9,6 +9,7 @@ import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getMemory } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Chart,
@@ -43,8 +44,9 @@ type MemoryThresholdChartProps = {
 };
 
 const MemoryThresholdChart: FC<MemoryThresholdChartProps> = ({ vmi }) => {
-  const { currentTime, duration, timespan } = useDuration();
+  const isACMPage = useIsACMPage();
 
+  const { currentTime, duration, timespan } = useDuration();
   const queries = useVMQueries(vmi);
   const { height, ref, width } = useResponsiveCharts();
 
@@ -73,7 +75,7 @@ const MemoryThresholdChart: FC<MemoryThresholdChartProps> = ({ vmi }) => {
   }));
 
   const isReady = !isEmpty(chartData) || !isEmpty(thresholdLine);
-  const linkToMetrics = queriesToLink(queries?.MEMORY_USAGE);
+  const linkToMetrics = !isACMPage && queriesToLink(queries?.MEMORY_USAGE);
   const yMax = findMaxYValue(thresholdLine);
   return (
     <ComponentReady isReady={isReady} linkToMetrics={linkToMetrics}>

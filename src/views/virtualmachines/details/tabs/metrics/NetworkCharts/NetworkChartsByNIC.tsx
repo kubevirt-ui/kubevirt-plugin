@@ -3,6 +3,7 @@ import React, { FC } from 'react';
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import NetworkThresholdSingleSourceChart from '@kubevirt-utils/components/Charts/NetworkUtil/NetworkThresholdChartSingleSource';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { Card, CardBody, CardTitle, Grid, GridItem } from '@patternfly/react-core';
 
 import useNetworkData from './hook/useNetworkData';
@@ -14,6 +15,7 @@ type NetworkChartsByNICProps = {
 
 const NetworkChartsByNIC: FC<NetworkChartsByNICProps> = ({ nic, vmi }) => {
   const { t } = useKubevirtTranslation();
+  const isACMPage = useIsACMPage();
   const { data, links } = useNetworkData(vmi, nic);
 
   return (
@@ -23,7 +25,7 @@ const NetworkChartsByNIC: FC<NetworkChartsByNICProps> = ({ nic, vmi }) => {
           <Card>
             <CardTitle>{t('Network in')}</CardTitle>
             <CardBody>
-              <NetworkThresholdSingleSourceChart data={data?.in} link={links?.in} />
+              <NetworkThresholdSingleSourceChart data={data?.in} link={!isACMPage && links?.in} />
             </CardBody>
           </Card>
         </GridItem>
@@ -31,7 +33,7 @@ const NetworkChartsByNIC: FC<NetworkChartsByNICProps> = ({ nic, vmi }) => {
           <Card>
             <CardTitle>{t('Network out')}</CardTitle>
             <CardBody>
-              <NetworkThresholdSingleSourceChart data={data?.out} link={links?.out} />
+              <NetworkThresholdSingleSourceChart data={data?.out} link={!isACMPage && links?.out} />
             </CardBody>
           </Card>
         </GridItem>
@@ -39,7 +41,10 @@ const NetworkChartsByNIC: FC<NetworkChartsByNICProps> = ({ nic, vmi }) => {
           <Card>
             <CardTitle>{t('Network bandwidth')}</CardTitle>
             <CardBody>
-              <NetworkThresholdSingleSourceChart data={data?.total} link={links?.total} />
+              <NetworkThresholdSingleSourceChart
+                data={data?.total}
+                link={!isACMPage && links?.total}
+              />
             </CardBody>
           </Card>
         </GridItem>

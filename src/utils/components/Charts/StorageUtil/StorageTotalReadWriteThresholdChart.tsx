@@ -8,6 +8,7 @@ import useVMQueries from '@kubevirt-utils/hooks/useVMQueries';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Chart,
@@ -43,8 +44,9 @@ type StorageTotalReadWriteThresholdChartProps = {
 const StorageTotalReadWriteThresholdChart: React.FC<StorageTotalReadWriteThresholdChartProps> = ({
   vmi,
 }) => {
-  const { currentTime, duration, timespan } = useDuration();
+  const isACMPage = useIsACMPage();
 
+  const { currentTime, duration, timespan } = useDuration();
   const queries = useVMQueries(vmi);
 
   const { height, ref, width } = useResponsiveCharts();
@@ -68,7 +70,7 @@ const StorageTotalReadWriteThresholdChart: React.FC<StorageTotalReadWriteThresho
   const thresholdData = storageWriteData?.map(([x]) => {
     return { x: new Date(x * MILLISECONDS_MULTIPLIER), y: yMax };
   });
-  const linkToMetrics = queriesToLink(queries.FILESYSTEM_TOTAL_USAGE);
+  const linkToMetrics = !isACMPage && queriesToLink(queries.FILESYSTEM_TOTAL_USAGE);
   return (
     <ComponentReady isReady={!isEmpty(chartData)} linkToMetrics={linkToMetrics}>
       <div className="util-threshold-chart" ref={ref}>
