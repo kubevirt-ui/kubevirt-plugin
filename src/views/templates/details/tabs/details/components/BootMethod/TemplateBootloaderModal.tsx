@@ -13,7 +13,7 @@ import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
-import { Form, FormGroup, SelectOption } from '@patternfly/react-core';
+import { FormGroup, SelectOption } from '@patternfly/react-core';
 
 type TemplateBootloaderModalProps = {
   isOpen: boolean;
@@ -56,23 +56,22 @@ const TemplateBootloaderModal: FC<TemplateBootloaderModalProps> = ({
       obj={updatedTemplate}
       onClose={onClose}
       onSubmit={onSubmit}
+      shouldWrapInForm
     >
-      <Form>
-        <FormGroup fieldId="template-firmware-bootloader" label={t('Boot mode')}>
-          <FormPFSelect
-            onSelect={handleChange}
-            selected={selectedFirmwareBootloader}
-            selectedLabel={BootModeTitles[selectedFirmwareBootloader]}
-            toggleProps={{ isFullWidth: true }}
-          >
-            {bootloaderOptions.map(({ description, title, value }) => (
-              <SelectOption description={description} key={value} value={value}>
-                {title}
-              </SelectOption>
-            ))}
-          </FormPFSelect>
-        </FormGroup>
-      </Form>
+      <FormGroup fieldId="template-firmware-bootloader" label={t('Boot mode')}>
+        <FormPFSelect
+          onSelect={handleChange}
+          selected={selectedFirmwareBootloader}
+          selectedLabel={BootModeTitles[selectedFirmwareBootloader]}
+          toggleProps={{ isFullWidth: true }}
+        >
+          {bootloaderOptions.map(({ description, title, value }) => (
+            <SelectOption description={description} key={value} value={value}>
+              {title}
+            </SelectOption>
+          ))}
+        </FormPFSelect>
+      </FormGroup>
     </TabModal>
   );
 };

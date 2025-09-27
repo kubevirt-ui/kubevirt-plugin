@@ -14,7 +14,7 @@ import { isVM } from '@kubevirt-utils/utils/typeGuards';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { getVMURL } from '@multicluster/urls';
-import { Form, ModalVariant } from '@patternfly/react-core';
+import { ModalVariant } from '@patternfly/react-core';
 
 import CloningStatus from './components/CloningStatus';
 import ConfigurationSummary from './components/ConfigurationSummary';
@@ -83,26 +83,27 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
   return (
     <TabModal
       closeOnSubmit={false}
+      formClassName="pf-v6-u-w-75-on-md pf-v6-u-w-66-on-lg pf-v6-u-m-auto"
       headerText={headerText ?? t('Clone {{sourceKind}}', { sourceKind: source.kind })}
       isDisabled={Boolean(initialCloneRequest)}
+      isHorizontal
       isLoading={Boolean(initialCloneRequest)}
       isOpen={isOpen}
       modalVariant={ModalVariant.large}
       obj={source}
       onClose={onClose}
       onSubmit={sendCloneRequest}
+      shouldWrapInForm
       submitBtnText={isVM(source) ? t('Clone') : t('Create')}
     >
-      <Form className="pf-v6-u-w-75-on-md pf-v6-u-w-66-on-lg pf-v6-u-m-auto" isHorizontal>
-        <NameInput name={cloneName} setName={setCloneName} />
-        <StartClonedVMCheckbox setStartCloneVM={setStartCloneVM} startCloneVM={startCloneVM} />
-        {isVM(source) ? (
-          <ConfigurationSummary vm={source} />
-        ) : (
-          <SnapshotContentConfigurationSummary snapshot={source} />
-        )}
-        <CloningStatus vmCloneRequest={cloneRequest || initialCloneRequest} />
-      </Form>
+      <NameInput autoFocus name={cloneName} setName={setCloneName} />
+      <StartClonedVMCheckbox setStartCloneVM={setStartCloneVM} startCloneVM={startCloneVM} />
+      {isVM(source) ? (
+        <ConfigurationSummary vm={source} />
+      ) : (
+        <SnapshotContentConfigurationSummary snapshot={source} />
+      )}
+      <CloningStatus vmCloneRequest={cloneRequest || initialCloneRequest} />
     </TabModal>
   );
 };

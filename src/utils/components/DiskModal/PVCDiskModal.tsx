@@ -5,7 +5,6 @@ import { isHotPluggableEnabled } from '@kubevirt-utils/components/DiskModal/util
 import useKubevirtHyperconvergeConfiguration from '@kubevirt-utils/hooks/useKubevirtHyperconvergeConfiguration.ts';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { Form } from '@patternfly/react-core';
 import { isRunning } from '@virtualmachines/utils';
 
 import TabModal from '../TabModal/TabModal';
@@ -63,17 +62,16 @@ const PVCDiskModal: FC<V1SubDiskModalProps> = ({
         isLoading={isSubmitting}
         isOpen={isOpen}
         onClose={onClose}
+        shouldWrapInForm
       >
         <PendingChanges isVMRunning={isVMRunning} />
-        <Form>
-          <BootSourceCheckbox editDiskName={editDiskName} isDisabled={isVMRunning} vm={vm} />
-          <DiskNameInput />
-          <DiskSourcePVCSelect vmNamepace={getNamespace(vm)} />
-          {isCreated && <ExpandPVC pvc={pvc} />}
-          <DiskTypeSelect isVMRunning={isVMRunning} />
-          <DiskInterfaceSelect isVMRunning={isVMRunning} />
-          <AdvancedSettings />
-        </Form>
+        <BootSourceCheckbox editDiskName={editDiskName} isDisabled={isVMRunning} vm={vm} />
+        <DiskNameInput />
+        <DiskSourcePVCSelect vmNamepace={getNamespace(vm)} />
+        {isCreated && <ExpandPVC pvc={pvc} />}
+        <DiskTypeSelect isVMRunning={isVMRunning} />
+        <DiskInterfaceSelect isVMRunning={isVMRunning} />
+        <AdvancedSettings />
       </TabModal>
     </FormProvider>
   );

@@ -1,4 +1,4 @@
-import React, { ComponentType, memo, MouseEventHandler, ReactNode, useState } from 'react';
+import React, { ComponentType, FormEvent, memo, ReactNode, useState } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -10,6 +10,7 @@ import {
   Button,
   ButtonVariant,
   Flex,
+  Form,
   Modal,
   ModalBody,
   ModalFooter,
@@ -25,8 +26,10 @@ export type TabModalProps<T extends K8sResourceCommon = K8sResourceCommon> = {
   actionItemLink?: ReactNode;
   children: ReactNode;
   closeOnSubmit?: boolean;
+  formClassName?: string;
   headerText: string;
   isDisabled?: boolean;
+  isHorizontal?: boolean;
   isLoading?: boolean;
   isOpen: boolean;
   modalError?: any;
@@ -35,6 +38,7 @@ export type TabModalProps<T extends K8sResourceCommon = K8sResourceCommon> = {
   onClose: () => Promise<void> | void;
   onSubmit: (obj: T) => Promise<string | T | T[] | V1VirtualMachine | void>;
   positionTop?: boolean;
+  shouldWrapInForm?: boolean;
   submitBtnText?: string;
   submitBtnVariant?: ButtonVariant;
   titleIconVariant?: 'custom' | 'danger' | 'info' | 'success' | 'warning' | ComponentType<any>;
@@ -49,8 +53,10 @@ const TabModal: TabModalFC = memo(
     actionItemLink,
     children,
     closeOnSubmit = true,
+    formClassName,
     headerText,
     isDisabled,
+    isHorizontal,
     isLoading,
     isOpen,
     modalError,
@@ -59,6 +65,7 @@ const TabModal: TabModalFC = memo(
     onClose,
     onSubmit,
     positionTop = true,
+    shouldWrapInForm,
     submitBtnText,
     submitBtnVariant,
     titleIconVariant,
@@ -66,10 +73,14 @@ const TabModal: TabModalFC = memo(
     const { t } = useKubevirtTranslation();
 
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [apiError, setApiError] = useState<any>(undefined);
+    const [apiError, setApiError] = useState<Error>(undefined);
 
-    const handleSubmit: MouseEventHandler<HTMLButtonElement> = (e) => {
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
+      executeSubmit();
+    };
+
+    const executeSubmit = () => {
       setIsSubmitting(true);
       setApiError(undefined);
 
@@ -104,7 +115,22 @@ const TabModal: TabModalFC = memo(
         variant={modalVariant ?? ModalVariant.small}
       >
         <ModalHeader title={headerText} titleIconVariant={titleIconVariant} />
-        <ModalBody>{children}</ModalBody>
+
+        <ModalBody>
+          {shouldWrapInForm ? (
+            <Form
+              className={formClassName}
+              form="tab-modal-form"
+              id="tab-modal-form"
+              isHorizontal={isHorizontal}
+              onSubmit={handleSubmit}
+            >
+              {children}
+            </Form>
+          ) : (
+            <>{children}</>
+          )}
+        </ModalBody>
         <ModalFooter>
           <Stack className="kv-tabmodal-footer" hasGutter>
             {error && (
@@ -127,9 +153,11 @@ const TabModal: TabModalFC = memo(
             <Flex spaceItems={{ default: 'spaceItemsSm' }}>
               <Button
                 data-test="save-button"
+                form="tab-modal-form"
                 isDisabled={isDisabled || isSubmitting}
                 isLoading={isLoading || isSubmitting}
-                onClick={handleSubmit}
+                onClick={shouldWrapInForm ? undefined : executeSubmit}
+                type="submit"
                 variant={submitBtnVariant ?? ButtonVariant.primary}
               >
                 {submitBtnText || t('Save')}

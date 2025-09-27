@@ -5,8 +5,9 @@ import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevir
 import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getHostname } from '@kubevirt-utils/resources/vm';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
-import { Form, FormGroup, TextInput } from '@patternfly/react-core';
+import { FormGroup, TextInput } from '@patternfly/react-core';
 
 import FormGroupHelperText from '../FormGroupHelperText/FormGroupHelperText';
 
@@ -20,7 +21,7 @@ type HostnameModalProps = {
 
 const HostnameModal: FC<HostnameModalProps> = ({ isOpen, onClose, onSubmit, vm, vmi }) => {
   const { t } = useKubevirtTranslation();
-  const [newHostname, setHostname] = useState<string>(vm?.spec?.template?.spec?.hostname);
+  const [newHostname, setNewHostname] = useState<string>(getHostname(vm));
 
   const updatedVirtualMachine = useMemo(() => {
     const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
@@ -36,19 +37,19 @@ const HostnameModal: FC<HostnameModalProps> = ({ isOpen, onClose, onSubmit, vm, 
       obj={updatedVirtualMachine}
       onClose={onClose}
       onSubmit={onSubmit}
+      shouldWrapInForm
     >
-      <Form>
-        {vmi && <ModalPendingChangesAlert />}
-        <FormGroup fieldId="hostname" label={t('Hostname')}>
-          <TextInput
-            id="hostname"
-            onChange={(_event, val) => setHostname(val)}
-            type="text"
-            value={newHostname}
-          />
-          <FormGroupHelperText>{t('Please provide hostname.')}</FormGroupHelperText>
-        </FormGroup>
-      </Form>
+      {vmi && <ModalPendingChangesAlert />}
+      <FormGroup fieldId="hostname" label={t('Hostname')}>
+        <TextInput
+          autoFocus
+          id="hostname"
+          onChange={(_event, val) => setNewHostname(val)}
+          type="text"
+          value={newHostname}
+        />
+        <FormGroupHelperText>{t('Please provide hostname.')}</FormGroupHelperText>
+      </FormGroup>
     </TabModal>
   );
 };

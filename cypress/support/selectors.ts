@@ -71,7 +71,7 @@ Cypress.Commands.add('clickNavLink', (path: [string, string?]) => {
 });
 
 Cypress.Commands.add('byButtonText', (selector: string) =>
-  cy.contains('button[type="button"]', `${selector}`),
+  cy.contains('button[type="button"], button[type="submit"]', `${selector}`),
 );
 
 Cypress.Commands.add('clickVirtLink', (navItemSelector: string) => {
@@ -91,7 +91,9 @@ Cypress.Commands.add('clickSaveBtn', () => {
 Cypress.Commands.add('clickSearchBtn', () => {
   cy.contains('button[type="button"].pf-m-primary', 'Search').click({ force: true });
 });
-Cypress.Commands.add('clickApplyBtn', () => cy.contains('button[type="button"]', 'Apply').click());
+Cypress.Commands.add('clickApplyBtn', () =>
+  cy.contains('button[type="button"], button[type="submit"]', 'Apply').click(),
+);
 
 Cypress.Commands.add('checkTitle', (title: string, timeout?: number) => {
   const t_o = timeout ? timeout : 3 * MINUTE;
