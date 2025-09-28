@@ -1091,7 +1091,7 @@
   "OpenShift Data Foundation (ODF)": "OpenShift Data Foundation (ODF)",
   "OpenShift Data Foundation (recommended for full functionality) or another persistent storage service is required for OpenShift Virtualization": "OpenShift Data Foundation (recommended for full functionality) or another persistent storage service is required for OpenShift Virtualization",
   "Openshift version": "Openshift version",
-  "OpenShift Virtualization 4.19 Highlights": "OpenShift Virtualization 4.19 Highlights",
+  "OpenShift Virtualization {{version}} Highlights": "OpenShift Virtualization {{version}} Highlights",
   "Operating system": "Operating system",
   "Operating System": "Operating System",
   "Operating system source already defined": "Operating system source already defined",
