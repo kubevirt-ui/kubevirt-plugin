@@ -194,7 +194,3 @@ export const addUploadDataVolumeOwnerReference = (
     )
     .catch(() => Promise.resolve());
 };
-
-export const isUploadingDisk = (uploadStatus: UPLOAD_STATUS): boolean => {
-  return [UPLOAD_STATUS.ALLOCATING, UPLOAD_STATUS.UPLOADING].includes(uploadStatus);
-};

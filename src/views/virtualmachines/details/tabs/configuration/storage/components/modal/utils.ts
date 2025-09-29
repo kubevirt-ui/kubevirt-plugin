@@ -19,9 +19,11 @@ import {
 import { createPVCBootableVolume } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/utils';
 import {
   DEFAULT_CDROM_DISK_SIZE,
+  UPLOAD_SUFFIX,
+} from '@kubevirt-utils/components/DiskModal/utils/constants';
+import {
   UPLOAD_MODE_SELECT,
   UPLOAD_MODE_UPLOAD,
-  UPLOAD_SUFFIX,
 } from '@kubevirt-utils/components/DiskModal/utils/constants';
 import { InterfaceTypes, V1DiskFormState } from '@kubevirt-utils/components/DiskModal/utils/types';
 import { getNamespace } from '@kubevirt-utils/resources/shared';

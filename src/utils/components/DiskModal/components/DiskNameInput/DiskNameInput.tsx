@@ -11,8 +11,9 @@ import { FormGroup, TextInput, ValidatedOptions } from '@patternfly/react-core';
 import { V1DiskFormState } from '../../utils/types';
 import { DISK_NAME_FIELD, VOLUME_NAME_FIELD } from '../utils/constants';
 
-const DiskNameInput: FC<{ isDisabled?: boolean }> = ({ isDisabled }) => {
+const DiskNameInput: FC = () => {
   const { t } = useKubevirtTranslation();
+
   const {
     formState: { errors },
     getValues,
@@ -39,7 +40,6 @@ const DiskNameInput: FC<{ isDisabled?: boolean }> = ({ isDisabled }) => {
     <FormGroup fieldId="name" isRequired label={t('Name')}>
       <TextInput
         id="name"
-        isDisabled={isDisabled}
         name={registered.name}
         onChange={debouncedHandler}
         ref={registered.ref}
