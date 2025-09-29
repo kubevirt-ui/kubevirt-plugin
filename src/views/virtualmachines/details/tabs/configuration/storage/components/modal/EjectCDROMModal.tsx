@@ -1,5 +1,5 @@
-import { FC } from 'react';
-import React from 'react';
+import React, { FC } from 'react';
+import { Trans } from 'react-i18next';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { ejectISOFromCDROM } from '@kubevirt-utils/components/DiskModal/utils/helpers';
@@ -14,6 +14,7 @@ type EjectCDROMModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onSubmit?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
+  source: string;
   vm: V1VirtualMachine;
 };
 
@@ -22,6 +23,7 @@ const EjectCDROMModal: FC<EjectCDROMModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
+  source,
   vm,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -44,9 +46,10 @@ const EjectCDROMModal: FC<EjectCDROMModalProps> = ({
       submitBtnText={t('Eject')}
       submitBtnVariant={ButtonVariant.primary}
     >
-      {t('Are you sure you want to eject the mounted ISO {{cdromName}} from the VirtualMachine?', {
-        cdromName: cdromName,
-      })}
+      <Trans t={t}>
+        Are you sure you want to eject the mounted ISO <strong>{{ source }}</strong> from{' '}
+        <strong>{{ cdromName }}</strong>
+      </Trans>
     </TabModal>
   );
 };
