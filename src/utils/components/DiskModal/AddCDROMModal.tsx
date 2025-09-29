@@ -17,9 +17,10 @@ import TabModal from '../TabModal/TabModal';
 
 import DiskNameInput from './components/DiskNameInput/DiskNameInput';
 import DiskSourceUploadPVC from './components/DiskSourceSelect/components/DiskSourceUploadPVC/DiskSourceUploadPVC';
+import UploadModeSelector from './components/UploadModeSelector/UploadModeSelector';
 import { getDefaultCreateValues } from './utils/form';
 import { addDisk, reorderBootDisk, uploadDataVolume } from './utils/submit';
-import { SourceTypes, V1DiskFormState, V1SubDiskModalProps } from './utils/types';
+import { SourceTypes, V1DiskFormState, V1SubDiskModalProps, VolumeTypes } from './utils/types';
 
 const AddCDROMModal: FC<V1SubDiskModalProps> = ({
   isOpen,
@@ -30,9 +31,12 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const { upload, uploadData } = useCDIUpload();
+  const { DATA_VOLUME } = VolumeTypes;
   const [uploadEnabled, setUploadEnabled] = useState(true);
+  const [uploadMode, setUploadMode] = useState<
+    VolumeTypes.DATA_VOLUME | VolumeTypes.PERSISTENT_VOLUME_CLAIM
+  >(DATA_VOLUME);
   const isVMRunning = isRunning(vm);
-  const vmNamespace = getNamespace(vm);
   const { featureGates } = useKubevirtHyperconvergeConfiguration();
 
   const isHotPluggable = isHotPluggableEnabled(featureGates);
@@ -51,7 +55,7 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
   } = methods;
 
   const uploadFile = useWatch({ control, name: FORM_FIELD_UPLOAD_FILE });
-  const hasUploadFile = !isEmpty(uploadFile);
+  const hasUploadFile = !isEmpty(uploadFile?.file);
   const hasFormErrors = !isEmpty(errors);
   const isUploading = isUploadingDisk(upload?.uploadStatus);
 
@@ -70,14 +74,25 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
       const uploadedDataVolume = await uploadDataVolume(vm, uploadData, data);
       onUploadedDataVolume?.(uploadedDataVolume);
 
-      data.dataVolumeTemplate.spec.source = {
-        pvc: {
-          name: getName(uploadedDataVolume),
-          namespace: getNamespace(uploadedDataVolume) || vmNamespace,
-        },
-      };
-      if (isHotPluggable) {
-        data.volume.dataVolume.hotpluggable = true;
+      if (uploadMode === DATA_VOLUME) {
+        data.dataVolumeTemplate.spec.source = {
+          pvc: {
+            name: getName(uploadedDataVolume),
+            namespace: getNamespace(uploadedDataVolume) || getNamespace(vm),
+          },
+        };
+        if (isHotPluggable) {
+          data.volume.dataVolume.hotpluggable = true;
+        }
+      } else {
+        data.volume = {
+          name: data.volume.name,
+          persistentVolumeClaim: {
+            claimName: getName(uploadedDataVolume),
+            ...(isHotPluggable && { hotpluggable: true }),
+          },
+        };
+        delete data.dataVolumeTemplate;
       }
     } else {
       delete data.dataVolumeTemplate;
@@ -93,10 +108,10 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
   return (
     <FormProvider {...methods}>
       <TabModal
-        onClose={() => {
+        onClose={async () => {
           if (upload?.uploadStatus) {
             try {
-              upload.cancelUpload();
+              await upload.cancelUpload();
             } catch (error) {
               kubevirtConsole.error(error);
             }
@@ -134,6 +149,13 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
               {uploadEnabled && (
                 <>
                   <DiskSourceUploadPVC label={t('Upload ISO')} relevantUpload={upload} />
+                  {hasUploadFile && (
+                    <UploadModeSelector
+                      isDisabled={isUploading}
+                      onUploadModeChange={setUploadMode}
+                      uploadMode={uploadMode}
+                    />
+                  )}
                 </>
               )}
             </Form>

@@ -14,6 +14,7 @@ import { diskSourceUploadFieldID } from '../../utils/constants';
 import { DiskSourceUploadPVCProgress } from './DiskSourceUploadPVCProgress';
 
 type DiskSourceUploadPVCProps = {
+  children?: React.ReactNode;
   handleClearUpload?: () => void;
   handleUpload?: () => void;
   isRequired?: boolean;
@@ -22,6 +23,7 @@ type DiskSourceUploadPVCProps = {
 };
 
 const DiskSourceUploadPVC: FC<DiskSourceUploadPVCProps> = ({
+  children,
   handleClearUpload,
   handleUpload,
   isRequired = true,
@@ -80,6 +82,7 @@ const DiskSourceUploadPVC: FC<DiskSourceUploadPVCProps> = ({
               </FormGroupHelperText>
             )}
           </FormGroup>
+          {children}
           {relevantUpload && <DiskSourceUploadPVCProgress upload={relevantUpload} />}
         </>
       )}
