@@ -154,14 +154,4 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'acm.resource/route',
   } as EncodedExtension<ResourceRoute>,
-  {
-    properties: {
-      handler: { $codeRef: 'urls.getFleetResourceRoute' },
-      model: {
-        group: 'kubevirt.io',
-        kind: 'VirtualMachineInstance',
-      },
-    },
-    type: 'acm.resource/route',
-  } as EncodedExtension<ResourceRoute>,
 ];
