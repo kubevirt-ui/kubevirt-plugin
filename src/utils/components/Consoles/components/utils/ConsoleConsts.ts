@@ -11,6 +11,7 @@ export enum ConsoleState {
   'init' = 'init',
   'loading' = 'loading',
   'open' = 'open',
+  'session_already_in_use' = 'session_already_in_use',
 }
 
 export const WS = 'ws';
