@@ -365,6 +365,7 @@
   "Confirm requested VirtualMachine actions before executing them": "要求された VirtualMachine のアクションを実行する前に確認します",
   "Confirm VirtualMachine actions": "VirtualMachine のアクションの確認",
   "Connect": "接続",
+  "Connect in shared mode": "Connect in shared mode",
   "Connect with any viewer application for following protocols": "以下のプロトコルのビューアーアプリケーションに接続する",
   "Connecting": "接続中",
   "Console": "コンソール",

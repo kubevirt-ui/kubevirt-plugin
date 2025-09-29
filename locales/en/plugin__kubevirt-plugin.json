@@ -365,6 +365,7 @@
   "Confirm requested VirtualMachine actions before executing them": "Confirm requested VirtualMachine actions before executing them",
   "Confirm VirtualMachine actions": "Confirm VirtualMachine actions",
   "Connect": "Connect",
+  "Connect in shared mode": "Connect in shared mode",
   "Connect with any viewer application for following protocols": "Connect with any viewer application for following protocols",
   "Connecting": "Connecting",
   "Console": "Console",

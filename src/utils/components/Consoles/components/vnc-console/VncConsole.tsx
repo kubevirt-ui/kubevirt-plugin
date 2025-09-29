@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import React, { Dispatch, FC, memo, useCallback, useEffect, useRef } from 'react';
+import React, { Dispatch, FC, memo, useCallback, useEffect, useRef, useState } from 'react';
 
 import RFBCreate from '@novnc/novnc/lib/rfb';
 
@@ -16,6 +16,7 @@ const { connected, connecting, disconnected } = ConsoleState;
 
 export type VncConsoleProps = {
   basePath: string;
+  defaultShared?: boolean;
   scaleViewport?: boolean;
   setState: Dispatch<React.SetStateAction<ConsoleComponentState>>;
   viewOnly?: boolean;
@@ -23,6 +24,7 @@ export type VncConsoleProps = {
 
 export const VncConsole: FC<VncConsoleProps> = ({
   basePath,
+  defaultShared = true,
   scaleViewport = true,
   setState,
   viewOnly = false,
@@ -30,6 +32,8 @@ export const VncConsole: FC<VncConsoleProps> = ({
   const rfbRef = useRef<RFBCreate>(null);
   const staticRenderLocationRef = useRef(null);
   const sessionRef = useRef(0);
+  // reload component when connection mode changes
+  const [shared, setShared] = useState<boolean>(defaultShared);
   const setVncState = useCallback(
     (producer: (state: ConsoleComponentState) => Partial<ConsoleComponentState>) =>
       setState((oldState) =>
@@ -61,8 +65,10 @@ export const VncConsole: FC<VncConsoleProps> = ({
     const isEncrypted = isConnectionEncrypted();
     const path = `${basePath}/vnc`;
     const port = window.location.port || (isEncrypted ? SECURE : INSECURE);
-    const url = `${isEncrypted ? WSS : WS}://${window.location.hostname}:${port}${path}`;
-    const rfbInst = new RFBCreate(staticRenderLocationRef.current, url);
+    const url = `${isEncrypted ? WSS : WS}://${
+      window.location.hostname
+    }:${port}${path}?preserveSession=${Boolean(shared).toString()}`;
+    const rfbInst = new RFBCreate(staticRenderLocationRef.current, url, { shared });
     rfbInst.addEventListener(
       'connect',
       () => sessionID === sessionRef.current && setVncState(() => ({ state: connected })),
@@ -78,6 +84,7 @@ export const VncConsole: FC<VncConsoleProps> = ({
 
     setVncState((prev) => ({
       actions: {
+        vncSettings: { setShared, shared },
         // get methods that are not bound to rfb instance (i.e. connect())
         // those are initialized during initial loading with useEffect
         ...prev.actions,
@@ -87,7 +94,7 @@ export const VncConsole: FC<VncConsoleProps> = ({
         sendPaste: sendPasteCMD.bind(rfbInst),
       },
     }));
-  }, [basePath, viewOnly, scaleViewport, setVncState, postDisconnectCleanup]);
+  }, [basePath, viewOnly, scaleViewport, setVncState, postDisconnectCleanup, shared, setShared]);
 
   // auto-connect only on first load
   useEffect(() => {
