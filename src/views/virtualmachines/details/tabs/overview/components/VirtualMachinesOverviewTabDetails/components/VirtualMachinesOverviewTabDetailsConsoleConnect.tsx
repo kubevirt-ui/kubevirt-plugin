@@ -4,18 +4,18 @@ import cn from 'classnames';
 import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Icon } from '@patternfly/react-core';
-import { PlayIcon } from '@patternfly/react-icons';
+import { RedoIcon } from '@patternfly/react-icons';
 
 type VirtualMachinesOverviewTabDetailsConsoleConnectProps = {
-  connect?: () => void;
   isConnecting?: boolean;
   isDisabled?: boolean;
   isHeadlessMode?: boolean;
+  refresh?: () => void;
 };
 
 const VirtualMachinesOverviewTabDetailsConsoleConnect: FC<
   VirtualMachinesOverviewTabDetailsConsoleConnectProps
-> = ({ connect, isConnecting, isDisabled, isHeadlessMode }) => {
+> = ({ isConnecting, isDisabled, isHeadlessMode, refresh }) => {
   const { t } = useKubevirtTranslation();
 
   return (
@@ -24,8 +24,8 @@ const VirtualMachinesOverviewTabDetailsConsoleConnect: FC<
       {!isConnecting && (
         <div className={cn('vnc-grey-background', isDisabled && 'disabled')}>
           {!isDisabled && (
-            <Icon onClick={connect} size="md">
-              <PlayIcon />
+            <Icon onClick={refresh} size="md">
+              <RedoIcon />
             </Icon>
           )}
           {isHeadlessMode && t('Console is disabled in headless mode')}
