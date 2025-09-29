@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 
 import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
+import { getRowFilterQueryKey } from '@search/utils/query';
 
 import { STATIC_SEARCH_FILTERS } from '../constants';
 import { ApplyTextFilters } from '../types';
@@ -14,7 +15,7 @@ export const useApplyFiltersWithQuery = (applyFilters: OnFilterChange) => {
     (type, value) => {
       const valueIsArray = Array.isArray(value);
 
-      setOrRemoveQueryArgument(type, valueIsArray ? value.join(',') : value);
+      setOrRemoveQueryArgument(getRowFilterQueryKey(type), valueIsArray ? value.join(',') : value);
 
       const values = valueIsArray ? value : [value];
       const selectedValues = value ? values : [];
