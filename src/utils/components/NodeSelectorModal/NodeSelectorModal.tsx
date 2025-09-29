@@ -8,7 +8,6 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getNodeSelector } from '@kubevirt-utils/resources/vm';
 import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
-import { Form } from '@patternfly/react-core';
 
 import LabelsList from './components/LabelList';
 import LabelRow from './components/LabelRow';
@@ -76,33 +75,32 @@ const NodeSelectorModal: FC<NodeSelectorModalProps> = ({
       obj={updatedVirtualMachine}
       onClose={onClose}
       onSubmit={onSubmit}
+      shouldWrapInForm
     >
-      <Form>
-        <LabelsList
-          isEmpty={selectorLabels?.length === 0}
-          model={!isEmpty(nodes) && NodeModel}
-          onLabelAdd={onSelectorLabelAdd}
-        >
-          {selectorLabels.length > 0 && (
-            <>
-              {selectorLabels.map((label) => (
-                <LabelRow
-                  key={label.id}
-                  label={label}
-                  onChange={onLabelChange}
-                  onDelete={onLabelDelete}
-                />
-              ))}
-            </>
-          )}
-        </LabelsList>
-        {!isEmpty(nodes) && (
-          <NodeCheckerAlert
-            nodesLoaded={nodesLoaded}
-            qualifiedNodes={selectorLabels?.length === 0 ? nodes : qualifiedNodes}
-          />
+      <LabelsList
+        isEmpty={selectorLabels?.length === 0}
+        model={!isEmpty(nodes) && NodeModel}
+        onLabelAdd={onSelectorLabelAdd}
+      >
+        {selectorLabels.length > 0 && (
+          <>
+            {selectorLabels.map((label) => (
+              <LabelRow
+                key={label.id}
+                label={label}
+                onChange={onLabelChange}
+                onDelete={onLabelDelete}
+              />
+            ))}
+          </>
         )}
-      </Form>
+      </LabelsList>
+      {!isEmpty(nodes) && (
+        <NodeCheckerAlert
+          nodesLoaded={nodesLoaded}
+          qualifiedNodes={selectorLabels?.length === 0 ? nodes : qualifiedNodes}
+        />
+      )}
     </TabModal>
   );
 };

@@ -12,7 +12,7 @@ import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
 import { getVolumeSnapshotStatuses } from '@kubevirt-utils/resources/vm';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
-import { Form, FormGroup, TextArea, TextInput } from '@patternfly/react-core';
+import { FormGroup, TextArea, TextInput } from '@patternfly/react-core';
 import { deadlineUnits } from '@virtualmachines/details/tabs/snapshots/utils/consts';
 import {
   getEmptyVMSnapshotResource,
@@ -73,38 +73,35 @@ const SnapshotModal: FC<SnapshotModalProps> = ({ isOpen, onClose, vm }) => {
       isOpen={isOpen}
       obj={resultSnapshot}
       onClose={onClose}
+      shouldWrapInForm
     >
-      {
-        <Form>
-          <SupportedVolumesAlert
-            isVMRunning={vm?.status?.printableStatus === printableVMStatus.Running}
-          />
-          <FormGroup fieldId="name" isRequired label={t('Name')}>
-            <TextInput
-              id="name"
-              onChange={(_, newName: string) => setSnapshotName(newName)}
-              type="text"
-              value={snapshotName}
-            />
-          </FormGroup>
-          <FormGroup fieldId="description" label={t('Description')}>
-            <TextArea
-              id="description"
-              onChange={(_, newDescription: string) => setDescription(newDescription)}
-              value={description}
-            />
-          </FormGroup>
-          <SnapshotDeadlineFormField
-            deadline={deadline}
-            deadlineUnit={deadlineUnit}
-            setDeadline={setDeadline}
-            setDeadlineUnit={setDeadlineUnit}
-            setIsError={setSubmitDisabled}
-          />
-          <SnapshotSupportedVolumeList supportedVolumes={supportedVolumes} />
-          <UnsupportedVolumesAlert unsupportedVolumes={unsupportedVolumes} />
-        </Form>
-      }
+      <SupportedVolumesAlert
+        isVMRunning={vm?.status?.printableStatus === printableVMStatus.Running}
+      />
+      <FormGroup fieldId="name" isRequired label={t('Name')}>
+        <TextInput
+          id="name"
+          onChange={(_, newName: string) => setSnapshotName(newName)}
+          type="text"
+          value={snapshotName}
+        />
+      </FormGroup>
+      <FormGroup fieldId="description" label={t('Description')}>
+        <TextArea
+          id="description"
+          onChange={(_, newDescription: string) => setDescription(newDescription)}
+          value={description}
+        />
+      </FormGroup>
+      <SnapshotDeadlineFormField
+        deadline={deadline}
+        deadlineUnit={deadlineUnit}
+        setDeadline={setDeadline}
+        setDeadlineUnit={setDeadlineUnit}
+        setIsError={setSubmitDisabled}
+      />
+      <SnapshotSupportedVolumeList supportedVolumes={supportedVolumes} />
+      <UnsupportedVolumesAlert unsupportedVolumes={unsupportedVolumes} />
     </TabModal>
   );
 };

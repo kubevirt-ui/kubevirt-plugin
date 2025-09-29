@@ -19,7 +19,6 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
-import { Form } from '@patternfly/react-core';
 
 type NodeSelectorModalProps = {
   isOpen: boolean;
@@ -81,33 +80,32 @@ const NodeSelectorModal: React.FC<NodeSelectorModalProps> = ({
       obj={updatedTemplate}
       onClose={onClose}
       onSubmit={onSubmit}
+      shouldWrapInForm
     >
-      <Form>
-        <LabelsList
-          isEmpty={selectorLabels?.length === 0}
-          model={!isEmpty(nodes) && NodeModel}
-          onLabelAdd={onSelectorLabelAdd}
-        >
-          {selectorLabels.length > 0 && (
-            <>
-              {selectorLabels.map((label) => (
-                <LabelRow
-                  key={label.id}
-                  label={label}
-                  onChange={onLabelChange}
-                  onDelete={onLabelDelete}
-                />
-              ))}
-            </>
-          )}
-        </LabelsList>
-        {!isEmpty(nodes) && (
-          <NodeCheckerAlert
-            nodesLoaded={nodesLoaded}
-            qualifiedNodes={selectorLabels?.length === 0 ? nodes : qualifiedNodes}
-          />
+      <LabelsList
+        isEmpty={selectorLabels?.length === 0}
+        model={!isEmpty(nodes) && NodeModel}
+        onLabelAdd={onSelectorLabelAdd}
+      >
+        {selectorLabels.length > 0 && (
+          <>
+            {selectorLabels.map((label) => (
+              <LabelRow
+                key={label.id}
+                label={label}
+                onChange={onLabelChange}
+                onDelete={onLabelDelete}
+              />
+            ))}
+          </>
         )}
-      </Form>
+      </LabelsList>
+      {!isEmpty(nodes) && (
+        <NodeCheckerAlert
+          nodesLoaded={nodesLoaded}
+          qualifiedNodes={selectorLabels?.length === 0 ? nodes : qualifiedNodes}
+        />
+      )}
     </TabModal>
   );
 };

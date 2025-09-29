@@ -20,7 +20,7 @@ import useKubevirtHyperconvergeConfiguration from '@kubevirt-utils/hooks/useKube
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import { Checkbox, Form, FormGroup, Stack, StackItem } from '@patternfly/react-core';
+import { Checkbox, FormGroup, Stack, StackItem } from '@patternfly/react-core';
 import { useISOOptions } from '@virtualmachines/details/tabs/configuration/storage/components/modal/hooks/useISOOptions';
 import { useMountCDROMForm } from '@virtualmachines/details/tabs/configuration/storage/components/modal/hooks/useMountCDROMForm';
 import { isRunning } from '@virtualmachines/utils';
@@ -158,6 +158,7 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
         isLoading={isSubmitting}
         isOpen={isOpen}
         onSubmit={handleModalSubmit}
+        shouldWrapInForm
         submitBtnText={t('Add')}
       >
         <Stack hasGutter>
@@ -169,7 +170,7 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
                 )}
               </PendingChangesAlert>
             )}
-            <Form>
+            <div className="pf-v6-c-form">
               <DiskNameInput isDisabled={isUploading} />
               <FormGroup fieldId={SELECT_ISO_FIELD_ID} label={t('Select ISO')}>
                 <InlineFilterSelect
@@ -209,7 +210,7 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
                   )}
                 </>
               )}
-            </Form>
+            </div>
           </StackItem>
         </Stack>
       </TabModal>

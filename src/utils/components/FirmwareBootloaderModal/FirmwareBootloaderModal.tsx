@@ -4,7 +4,7 @@ import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevir
 import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Form, FormGroup, SelectOption } from '@patternfly/react-core';
+import { FormGroup, SelectOption } from '@patternfly/react-core';
 
 import FormPFSelect from '../FormPFSelect/FormPFSelect';
 
@@ -52,24 +52,23 @@ const FirmwareBootloaderModal: FC<FirmwareBootloaderModalProps> = ({
       obj={updatedVirtualMachine}
       onClose={onClose}
       onSubmit={onSubmit}
+      shouldWrapInForm
     >
-      <Form>
-        {vmi && <ModalPendingChangesAlert />}
-        <FormGroup fieldId="firmware-bootloader" label={t('Boot mode')}>
-          <FormPFSelect
-            onSelect={handleChange}
-            selected={selectedFirmwareBootloader}
-            selectedLabel={BootModeTitles[selectedFirmwareBootloader]}
-            toggleProps={{ isFullWidth: true }}
-          >
-            {bootloaderOptions.map(({ description, title, value }) => (
-              <SelectOption description={description} key={value} value={value}>
-                {title}
-              </SelectOption>
-            ))}
-          </FormPFSelect>
-        </FormGroup>
-      </Form>
+      {vmi && <ModalPendingChangesAlert />}
+      <FormGroup fieldId="firmware-bootloader" label={t('Boot mode')}>
+        <FormPFSelect
+          onSelect={handleChange}
+          selected={selectedFirmwareBootloader}
+          selectedLabel={BootModeTitles[selectedFirmwareBootloader]}
+          toggleProps={{ isFullWidth: true }}
+        >
+          {bootloaderOptions.map(({ description, title, value }) => (
+            <SelectOption description={description} key={value} value={value}>
+              {title}
+            </SelectOption>
+          ))}
+        </FormPFSelect>
+      </FormGroup>
     </TabModal>
   );
 };

@@ -3,7 +3,6 @@ import { FormProvider, useForm } from 'react-hook-form';
 
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { Form } from '@patternfly/react-core';
 import { isRunning } from '@virtualmachines/utils';
 
 import TabModal from '../TabModal/TabModal';
@@ -60,18 +59,17 @@ const ClonePVCDiskModal: FC<V1SubDiskModalProps> = ({
         isLoading={isSubmitting}
         isOpen={isOpen}
         onClose={onClose}
+        shouldWrapInForm
       >
         <PendingChanges isVMRunning={isVMRunning} />
-        <Form>
-          <BootSourceCheckbox editDiskName={editDiskName} isDisabled={isVMRunning} vm={vm} />
-          <DiskNameInput />
-          {!isCreated && <DiskSourceClonePVCSelect />}
-          <DiskSizeInput isCreated={isCreated} namespace={namespace} pvc={pvc} />
-          <DiskTypeSelect isVMRunning={isVMRunning} />
-          <DiskInterfaceSelect isVMRunning={isVMRunning} />
-          {!isCreated && <StorageClassAndPreallocation vm={vm} />}
-          <AdvancedSettings showApplyStorageProfileSettings={!isCreated} />
-        </Form>
+        <BootSourceCheckbox editDiskName={editDiskName} isDisabled={isVMRunning} vm={vm} />
+        <DiskNameInput />
+        {!isCreated && <DiskSourceClonePVCSelect />}
+        <DiskSizeInput isCreated={isCreated} namespace={namespace} pvc={pvc} />
+        <DiskTypeSelect isVMRunning={isVMRunning} />
+        <DiskInterfaceSelect isVMRunning={isVMRunning} />
+        {!isCreated && <StorageClassAndPreallocation vm={vm} />}
+        <AdvancedSettings showApplyStorageProfileSettings={!isCreated} />
       </TabModal>
     </FormProvider>
   );

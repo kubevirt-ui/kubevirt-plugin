@@ -30,7 +30,6 @@ import {
   ButtonVariant,
   Content,
   ContentVariants,
-  Form,
   FormGroup,
   Stack,
   StackItem,
@@ -130,65 +129,64 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
         isDisabled={!isFormValid}
         isOpen={isOpen}
         onSubmit={handleModalSubmit}
+        shouldWrapInForm
         submitBtnText={t('Save')}
         submitBtnVariant={ButtonVariant.primary}
       >
-        <Form>
-          <Stack hasGutter>
-            <StackItem>
-              <p>
-                <Trans t={t}>
-                  Mount ISO to <strong>{{ cdromName }}</strong>
-                </Trans>
-              </p>
-            </StackItem>
-            <StackItem>
-              <FormGroup
-                fieldId={SELECT_ISO_FIELD_ID}
-                isRequired={uploadMode !== UPLOAD_MODE_UPLOAD}
-                label={t('Select ISO')}
-              >
-                <InlineFilterSelect
-                  setSelected={(e) => {
-                    handleISOSelection(e);
-                    setValue(UPLOAD_FILENAME_FIELD, '');
-                  }}
-                  toggleProps={{
-                    isDisabled: isUploading,
-                    isFullWidth: true,
-                    placeholder: t('Select or upload a new ISO file to the cluster'),
-                  }}
-                  options={isoOptions}
-                  selected={selectedISO}
-                />
-              </FormGroup>
-            </StackItem>
-            <StackItem>
-              <DiskSourceUploadPVC
-                handleClearUpload={() => {
-                  handleClearUpload();
+        <Stack hasGutter>
+          <StackItem>
+            <p>
+              <Trans t={t}>
+                Mount ISO to <strong>{{ cdromName }}</strong>
+              </Trans>
+            </p>
+          </StackItem>
+          <StackItem>
+            <FormGroup
+              fieldId={SELECT_ISO_FIELD_ID}
+              isRequired={uploadMode !== UPLOAD_MODE_UPLOAD}
+              label={t('Select ISO')}
+            >
+              <InlineFilterSelect
+                setSelected={(e) => {
+                  handleISOSelection(e);
                   setValue(UPLOAD_FILENAME_FIELD, '');
                 }}
-                handleUpload={handleFileUpload}
-                isRequired={uploadMode !== UPLOAD_MODE_SELECT}
-                key={uploadMode}
-                label={t('Upload ISO')}
-                relevantUpload={upload}
-              >
-                <Content component={ContentVariants.small}>
-                  {t('ISO file must be in the same project as the Virtual Machine')}
-                </Content>
-                {uploadMode === UPLOAD_MODE_UPLOAD && (
-                  <UploadModeSelector
-                    isDisabled={isUploading}
-                    onUploadModeChange={handleUploadTypeChange}
-                    uploadMode={uploadType}
-                  />
-                )}
-              </DiskSourceUploadPVC>
-            </StackItem>
-          </Stack>
-        </Form>
+                toggleProps={{
+                  isDisabled: isUploading,
+                  isFullWidth: true,
+                  placeholder: t('Select or upload a new ISO file to the cluster'),
+                }}
+                options={isoOptions}
+                selected={selectedISO}
+              />
+            </FormGroup>
+          </StackItem>
+          <StackItem>
+            <DiskSourceUploadPVC
+              handleClearUpload={() => {
+                handleClearUpload();
+                setValue(UPLOAD_FILENAME_FIELD, '');
+              }}
+              handleUpload={handleFileUpload}
+              isRequired={uploadMode !== UPLOAD_MODE_SELECT}
+              key={uploadMode}
+              label={t('Upload ISO')}
+              relevantUpload={upload}
+            >
+              <Content component={ContentVariants.small}>
+                {t('ISO file must be in the same project as the Virtual Machine')}
+              </Content>
+              {uploadMode === UPLOAD_MODE_UPLOAD && (
+                <UploadModeSelector
+                  isDisabled={isUploading}
+                  onUploadModeChange={handleUploadTypeChange}
+                  uploadMode={uploadType}
+                />
+              )}
+            </DiskSourceUploadPVC>
+          </StackItem>
+        </Stack>
       </TabModal>
     </FormProvider>
   );

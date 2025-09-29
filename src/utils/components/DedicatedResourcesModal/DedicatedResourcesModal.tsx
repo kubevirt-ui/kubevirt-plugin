@@ -10,8 +10,7 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, NodeModel } from '@kubevirt-utils/models';
 import { getCPU } from '@kubevirt-utils/resources/vm';
-import { ensurePath } from '@kubevirt-utils/utils/utils';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
 import { ResourceLink, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
@@ -19,7 +18,6 @@ import {
   Button,
   ButtonVariant,
   Checkbox,
-  Form,
   FormGroup,
   Label,
   Popover,
@@ -76,81 +74,80 @@ const DedicatedResourcesModal: FC<DedicatedResourcesModalProps> = ({
       obj={updatedVirtualMachine}
       onClose={onClose}
       onSubmit={onSubmit}
+      shouldWrapInForm
     >
-      <Form>
-        {vmi && <ModalPendingChangesAlert />}
-        <FormGroup fieldId="dedicated-resources" isInline>
-          <Checkbox
-            description={
-              <>
-                {t('Available only on Nodes with labels')}{' '}
-                <Label className="pf-v6-u-ml-xs" color="purple" variant="outline">
-                  {!isEmpty(nodes) ? (
-                    <Link
-                      target="_blank"
-                      to={`/search?kind=${NodeModel.kind}&q=${encodeURIComponent(cpuManagerLabel)}`}
-                    >
-                      {cpuManagerLabel}
-                    </Link>
-                  ) : (
-                    cpuManagerLabel
-                  )}
-                </Label>
-              </>
+      {vmi && <ModalPendingChangesAlert />}
+      <FormGroup fieldId="dedicated-resources" isInline>
+        <Checkbox
+          description={
+            <>
+              {t('Available only on Nodes with labels')}{' '}
+              <Label className="pf-v6-u-ml-xs" color="purple" variant="outline">
+                {!isEmpty(nodes) ? (
+                  <Link
+                    target="_blank"
+                    to={`/search?kind=${NodeModel.kind}&q=${encodeURIComponent(cpuManagerLabel)}`}
+                  >
+                    {cpuManagerLabel}
+                  </Link>
+                ) : (
+                  cpuManagerLabel
+                )}
+              </Label>
+            </>
+          }
+          id="dedicated-resources"
+          isChecked={checked}
+          label={t('Schedule this workload with dedicated resources (guaranteed policy)')}
+          onChange={(_event, val) => setChecked(val)}
+        />
+      </FormGroup>
+      <FormGroup fieldId="dedicated-resources-node">
+        {!isEmpty(nodes) ? (
+          <Alert
+            title={
+              hasNodes
+                ? t('{{qualifiedNodesCount}} matching nodes found', {
+                    qualifiedNodesCount: qualifiedNodes?.length,
+                  })
+                : t('No matching nodes found for the {{cpuManagerLabel}} label', {
+                    cpuManagerLabel,
+                  })
             }
-            id="dedicated-resources"
-            isChecked={checked}
-            label={t('Schedule this workload with dedicated resources (guaranteed policy)')}
-            onChange={(_event, val) => setChecked(val)}
-          />
-        </FormGroup>
-        <FormGroup fieldId="dedicated-resources-node">
-          {!isEmpty(nodes) ? (
-            <Alert
-              title={
-                hasNodes
-                  ? t('{{qualifiedNodesCount}} matching nodes found', {
-                      qualifiedNodesCount: qualifiedNodes?.length,
-                    })
-                  : t('No matching nodes found for the {{cpuManagerLabel}} label', {
-                      cpuManagerLabel,
-                    })
-              }
-              isInline
-              variant={hasNodes ? AlertVariant.success : AlertVariant.warning}
-            >
-              {hasNodes ? (
-                <Popover
-                  bodyContent={
-                    <>
-                      {qualifiedNodes?.map((node) => (
-                        <ResourceLink
-                          groupVersionKind={modelToGroupVersionKind(NodeModel)}
-                          key={node.metadata.uid}
-                          name={node.metadata.name}
-                        />
-                      ))}
-                    </>
-                  }
-                  headerContent={t('{{qualifiedNodesCount}} nodes found', {
+            isInline
+            variant={hasNodes ? AlertVariant.success : AlertVariant.warning}
+          >
+            {hasNodes ? (
+              <Popover
+                bodyContent={
+                  <>
+                    {qualifiedNodes?.map((node) => (
+                      <ResourceLink
+                        groupVersionKind={modelToGroupVersionKind(NodeModel)}
+                        key={node.metadata.uid}
+                        name={node.metadata.name}
+                      />
+                    ))}
+                  </>
+                }
+                headerContent={t('{{qualifiedNodesCount}} nodes found', {
+                  qualifiedNodesCount: qualifiedNodes?.length,
+                })}
+              >
+                <Button isInline onClick={() => setChecked(false)} variant={ButtonVariant.link}>
+                  {t('view {{qualifiedNodesCount}} matching nodes', {
                     qualifiedNodesCount: qualifiedNodes?.length,
                   })}
-                >
-                  <Button isInline onClick={() => setChecked(false)} variant={ButtonVariant.link}>
-                    {t('view {{qualifiedNodesCount}} matching nodes', {
-                      qualifiedNodesCount: qualifiedNodes?.length,
-                    })}
-                  </Button>
-                </Popover>
-              ) : (
-                t('Scheduling will not be possible at this state')
-              )}
-            </Alert>
-          ) : (
-            !loaded && !loadError && <Loading />
-          )}
-        </FormGroup>
-      </Form>
+                </Button>
+              </Popover>
+            ) : (
+              t('Scheduling will not be possible at this state')
+            )}
+          </Alert>
+        ) : (
+          !loaded && !loadError && <Loading />
+        )}
+      </FormGroup>
     </TabModal>
   );
 };
