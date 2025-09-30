@@ -11,7 +11,7 @@ import { getRandomChars } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sCreate, kubevirtK8sGet, kubevirtK8sPatch } from '@multicluster/k8sRequests';
 
-export const getEmptyMigPlan = (namespace: string): MigPlan => ({
+export const getEmptyMigPlan = (namespaces: string[]): MigPlan => ({
   apiVersion: `${MigPlanModel.apiGroup}/${MigPlanModel.apiVersion}`,
   kind: MigPlanModel.kind,
   metadata: {
@@ -24,7 +24,7 @@ export const getEmptyMigPlan = (namespace: string): MigPlan => ({
       namespace: DEFAULT_MIGRATION_NAMESPACE,
     },
     liveMigrate: true,
-    namespaces: [namespace],
+    namespaces: namespaces,
     srcMigClusterRef: {
       name: 'host',
       namespace: DEFAULT_MIGRATION_NAMESPACE,

@@ -86,6 +86,7 @@ export const BulkVirtualMachineActionFactory = {
   migrateStorage: (
     vms: V1VirtualMachine[],
     createModal: (modal: ModalComponent) => void,
+    isDisabled: boolean,
   ): ActionDropdownItemType => ({
     accessReview: {
       group: VirtualMachineModel.apiGroup,
@@ -95,6 +96,10 @@ export const BulkVirtualMachineActionFactory = {
     },
     cta: () => createModal((props) => <VirtualMachineMigrateModal vms={vms} {...props} />),
     description: t('Migrate VirtualMachine storage to a different StorageClass'),
+    disabled: isDisabled,
+    disabledTooltip: isDisabled
+      ? t('Cross-cluster storage migration is not supported at this time.')
+      : undefined,
     id: 'vms-bulk-migrate-storage',
     label: t('Migrate storage'),
   }),

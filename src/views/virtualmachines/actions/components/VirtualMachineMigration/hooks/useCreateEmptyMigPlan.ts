@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 
+import useDeepCompareMemoize from '@kubevirt-utils/hooks/useDeepCompareMemoize/useDeepCompareMemoize';
 import { MigPlan, MigPlanModel } from '@kubevirt-utils/resources/migrations/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
@@ -7,14 +8,15 @@ import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 import { getEmptyMigPlan } from '../utils/migrateVMs';
 
 const useCreateEmptyMigPlan = (
-  namespace: string,
+  namespaces: string[],
   cluster?: string,
 ): [migPlan: MigPlan, loaded: boolean, error: Error | null] => {
   const [migPlan, setMigPlan] = useState<MigPlan>(null);
   const [error, setError] = useState<Error | null>();
+  const memoizedNamespaces = useDeepCompareMemoize(namespaces);
 
   useEffect(() => {
-    const emptyMigPlan = getEmptyMigPlan(namespace);
+    const emptyMigPlan = getEmptyMigPlan(memoizedNamespaces);
 
     kubevirtK8sCreate({
       cluster,
@@ -25,7 +27,7 @@ const useCreateEmptyMigPlan = (
         setMigPlan(createdMigPlan);
       })
       .catch(setError);
-  }, [namespace, cluster]);
+  }, [memoizedNamespaces, cluster]);
 
   return [migPlan, !isEmpty(migPlan), error];
 };

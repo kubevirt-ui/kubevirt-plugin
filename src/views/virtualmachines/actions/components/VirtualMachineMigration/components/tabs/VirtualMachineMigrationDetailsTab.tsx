@@ -21,19 +21,19 @@ import {
   Title,
 } from '@patternfly/react-core';
 
-import { entireVMSelected, getAllVolumesCount } from '../utils/utils';
+import { entireVMSelected, getAllVolumesCount } from '../../utils/utils';
 
 import SelectedStorageTooltip from './components/SelectedStorageTooltip';
 import SelectMigrationDisksTable from './components/SelectMigrationDisksTable';
 
-type VirtualMachineMigrationDetailsProps = {
+type VirtualMachineMigrationDetailsTabProps = {
   pvcs: IoK8sApiCoreV1PersistentVolumeClaim[];
   selectedPVCs: IoK8sApiCoreV1PersistentVolumeClaim[];
   setSelectedPVCs: Dispatch<SetStateAction<IoK8sApiCoreV1PersistentVolumeClaim[]>>;
   vms: V1VirtualMachine[];
 };
 
-const VirtualMachineMigrationDetails: FC<VirtualMachineMigrationDetailsProps> = ({
+const VirtualMachineMigrationDetailsTab: FC<VirtualMachineMigrationDetailsTabProps> = ({
   pvcs,
   selectedPVCs,
   setSelectedPVCs,
@@ -131,4 +131,4 @@ const VirtualMachineMigrationDetails: FC<VirtualMachineMigrationDetailsProps> = 
   );
 };
 
-export default VirtualMachineMigrationDetails;
+export default VirtualMachineMigrationDetailsTab;

@@ -5,13 +5,12 @@ import {
   V1Volume,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { MigMigrationStatuses, MigPlan } from '@kubevirt-utils/resources/migrations/constants';
 import { getLabel, getName } from '@kubevirt-utils/resources/shared';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { isEmpty, removeDuplicates } from '@kubevirt-utils/utils/utils';
 import { ProgressVariant } from '@patternfly/react-core';
-
-import { MigMigrationStatuses } from '../../../../../../utils/resources/migrations/constants';
 
 import { ALREADY_MIGRATED_PVC_LALBEL } from './constants';
 
@@ -89,3 +88,15 @@ export const getAllVolumesCount = (vms: V1VirtualMachine[]) =>
     acc = acc + getVolumes(vm).length;
     return acc;
   }, 0);
+
+export const getExistingMigPlanNamespaces = (migPlans: MigPlan[]) => {
+  const namespaces = !isEmpty(migPlans)
+    ? migPlans?.reduce((acc, migPlan) => {
+        const migPlanNamespaces = migPlan.spec?.namespaces || [];
+        acc = [...acc, ...migPlanNamespaces];
+        return acc;
+      }, [])
+    : [];
+
+  return removeDuplicates(namespaces);
+};

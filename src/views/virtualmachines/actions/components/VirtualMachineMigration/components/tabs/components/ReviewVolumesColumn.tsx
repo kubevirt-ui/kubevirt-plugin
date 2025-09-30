@@ -5,7 +5,7 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 
-import { getVolumeFromPVC } from '../../utils/utils';
+import { getVolumeFromPVC } from '../../../utils/utils';
 
 type ReviewVolumesColumnProps = {
   pvcsToMigrate: IoK8sApiCoreV1PersistentVolumeClaim[];
