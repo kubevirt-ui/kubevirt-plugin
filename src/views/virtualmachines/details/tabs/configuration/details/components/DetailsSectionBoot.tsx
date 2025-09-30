@@ -106,6 +106,7 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
                     )
                   : updateBootOrder(updatedVM)
               }
+              instanceTypeVM={instanceTypeVM}
               vm={vm}
               vmi={vmi}
             />
@@ -113,7 +114,7 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
         }
         className="DetailsSection-margin__bottom"
         data-test-id={`${vmName}-boot-order`}
-        descriptionData={<BootOrderSummary vm={vm} />}
+        descriptionData={<BootOrderSummary instanceTypeVM={instanceTypeVM} vm={vm} />}
         descriptionHeader={<SearchItem id="boot-order">{t('Boot order')}</SearchItem>}
         isEdit
       />
