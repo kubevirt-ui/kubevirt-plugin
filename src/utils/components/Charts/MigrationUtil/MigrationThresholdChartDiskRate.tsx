@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom-v5-compat';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useVMQueries from '@kubevirt-utils/hooks/useVMQueries';
+import useVMQuery from '@kubevirt-utils/hooks/useVMQuery';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -23,6 +23,7 @@ import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration
 import { tickLabels } from '../ChartLabels/styleOverrides';
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
+import { VMQueries } from '../utils/queries';
 import {
   addTimestampToTooltip,
   findMaxYValue,
@@ -30,7 +31,6 @@ import {
   formatMigrationThresholdDiskRateTooltipData,
   getPrometheusData,
   MILLISECONDS_MULTIPLIER,
-  queriesToLink,
   tickFormat,
   TICKS_COUNT,
 } from '../utils/utils';
@@ -43,8 +43,9 @@ const MigrationThresholdChartDiskRate: React.FC<MigrationThresholdChartDiskRateP
   vmi,
 }) => {
   const { t } = useKubevirtTranslation();
+
   const { currentTime, duration, timespan } = useDuration();
-  const queries = useVMQueries(vmi);
+  const { query, queryLink } = useVMQuery(vmi, VMQueries.MIGRATION_DISK_TRANSFER_RATE);
   const { height, ref, width } = useResponsiveCharts();
 
   const [diskRate] = useFleetPrometheusPoll({
@@ -52,7 +53,7 @@ const MigrationThresholdChartDiskRate: React.FC<MigrationThresholdChartDiskRateP
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     endTime: currentTime,
     namespace: getNamespace(vmi),
-    query: queries?.MIGRATION_DISK_TRANSFER_RATE,
+    query,
     timespan,
   });
 
@@ -64,11 +65,11 @@ const MigrationThresholdChartDiskRate: React.FC<MigrationThresholdChartDiskRateP
 
   const isReady = !isEmpty(chartDataProcessed);
   const yMax = findMaxYValue(chartDataProcessed);
-  const linkToMetrics = queriesToLink(queries.MIGRATION_DISK_TRANSFER_RATE);
+
   return (
-    <ComponentReady isReady={isReady} linkToMetrics={linkToMetrics}>
+    <ComponentReady isReady={isReady} linkToMetrics={queryLink}>
       <div className="util-threshold-chart" ref={ref}>
-        <Link to={linkToMetrics}>
+        <Link to={queryLink}>
           <Chart
             containerComponent={
               <ChartVoronoiContainer

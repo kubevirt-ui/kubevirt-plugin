@@ -4,7 +4,7 @@ import xbytes from 'xbytes';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { tickLabels } from '@kubevirt-utils/components/Charts/ChartLabels/styleOverrides';
-import useVMQueries from '@kubevirt-utils/hooks/useVMQueries';
+import useVMQuery from '@kubevirt-utils/hooks/useVMQuery';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -25,13 +25,13 @@ import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration
 
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
+import { VMQueries } from '../utils/queries';
 import {
   addTimestampToTooltip,
   findMaxYValue,
   formatStorageTotalReadWriteThresholdTooltipData,
   getNumberOfDigitsAfterDecimalPoint,
   MILLISECONDS_MULTIPLIER,
-  queriesToLink,
   tickFormat,
   TICKS_COUNT,
 } from '../utils/utils';
@@ -44,8 +44,7 @@ const StorageTotalReadWriteThresholdChart: React.FC<StorageTotalReadWriteThresho
   vmi,
 }) => {
   const { currentTime, duration, timespan } = useDuration();
-
-  const queries = useVMQueries(vmi);
+  const { query, queryLink } = useVMQuery(vmi, VMQueries.FILESYSTEM_USAGE_TOTAL);
 
   const { height, ref, width } = useResponsiveCharts();
 
@@ -54,7 +53,7 @@ const StorageTotalReadWriteThresholdChart: React.FC<StorageTotalReadWriteThresho
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     endTime: currentTime,
     namespace: getNamespace(vmi),
-    query: queries?.FILESYSTEM_TOTAL_USAGE,
+    query,
     timespan,
   });
 
@@ -68,11 +67,10 @@ const StorageTotalReadWriteThresholdChart: React.FC<StorageTotalReadWriteThresho
   const thresholdData = storageWriteData?.map(([x]) => {
     return { x: new Date(x * MILLISECONDS_MULTIPLIER), y: yMax };
   });
-  const linkToMetrics = queriesToLink(queries.FILESYSTEM_TOTAL_USAGE);
   return (
-    <ComponentReady isReady={!isEmpty(chartData)} linkToMetrics={linkToMetrics}>
+    <ComponentReady isReady={!isEmpty(chartData)} linkToMetrics={queryLink}>
       <div className="util-threshold-chart" ref={ref}>
-        <Link to={linkToMetrics}>
+        <Link to={queryLink}>
           <Chart
             containerComponent={
               <ChartVoronoiContainer
