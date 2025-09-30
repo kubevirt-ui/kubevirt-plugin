@@ -66,9 +66,6 @@ export const sortBootOrder = (a: BootableDeviceType, b: BootableDeviceType) => {
 
   return 0;
 };
-export const hasBootOrderOnVM = (vm: V1VirtualMachine) =>
-  getDisks(vm).some((disk) => disk.bootOrder);
-
 export const getBootableSortedDevices = ({
   instanceTypeVM,
   vm,
@@ -76,7 +73,7 @@ export const getBootableSortedDevices = ({
   instanceTypeVM: V1VirtualMachine;
   vm: V1VirtualMachine;
 }): BootableDeviceType[] | undefined => {
-  const disks = getDisks(hasBootOrderOnVM(vm) ? vm : instanceTypeVM || vm);
+  const disks = getDisks(instanceTypeVM || vm);
   const interfaces = getInterfaces(vm);
   return transformDevices(disks, interfaces)?.toSorted(sortBootOrder);
 };
