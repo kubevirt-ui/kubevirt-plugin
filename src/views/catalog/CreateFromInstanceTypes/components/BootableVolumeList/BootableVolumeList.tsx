@@ -42,6 +42,7 @@ type BootableVolumeListProps = {
   preferencesData: V1beta1VirtualMachineClusterPreference[];
   selectedBootableVolumeState?: [BootableVolume, (selectedVolume: BootableVolume) => void];
   userPreferencesData: V1beta1VirtualMachinePreference[];
+  userPreferencesLoaded?: boolean;
 };
 
 const BootableVolumeList: FC<BootableVolumeListProps> = ({
@@ -52,6 +53,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
   preferencesData,
   selectedBootableVolumeState,
   userPreferencesData,
+  userPreferencesLoaded,
 }) => {
   const { t } = useKubevirtTranslation();
   const isAdmin = useIsAdmin();
@@ -112,7 +114,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
     }
   }, [isAdmin, volumeListNamespace, setVolumeListNamespace]);
 
-  const isVolumesLoaded = loaded && loadedColumns;
+  const isVolumesLoaded = loaded && loadedColumns && userPreferencesLoaded;
   const isEmptyVolumes = isEmpty(bootableVolumes);
   const displayVolumes = isVolumesLoaded && !isEmptyVolumes;
 
