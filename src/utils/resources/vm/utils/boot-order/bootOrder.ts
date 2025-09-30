@@ -1,4 +1,5 @@
-import { V1Disk, V1Interface } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1Disk, V1Interface, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { getDisks, getInterfaces } from '@kubevirt-utils/resources/vm';
 import { getPrintableDiskDrive } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
 
 /**
@@ -48,4 +49,34 @@ export const transformDevices = (
   }));
 
   return [...transformedDisks, ...transformedNics];
+};
+
+export const sortBootOrder = (a: BootableDeviceType, b: BootableDeviceType) => {
+  if (a.value.bootOrder && b.value.bootOrder) {
+    return a.value.bootOrder - b.value.bootOrder;
+  }
+
+  if (a.value.bootOrder) {
+    return -1;
+  }
+
+  if (b.value.bootOrder) {
+    return 1;
+  }
+
+  return 0;
+};
+export const hasBootOrderOnVM = (vm: V1VirtualMachine) =>
+  getDisks(vm).some((disk) => disk.bootOrder);
+
+export const getBootableSortedDevices = ({
+  instanceTypeVM,
+  vm,
+}: {
+  instanceTypeVM: V1VirtualMachine;
+  vm: V1VirtualMachine;
+}): BootableDeviceType[] | undefined => {
+  const disks = getDisks(hasBootOrderOnVM(vm) ? vm : instanceTypeVM || vm);
+  const interfaces = getInterfaces(vm);
+  return transformDevices(disks, interfaces)?.toSorted(sortBootOrder);
 };

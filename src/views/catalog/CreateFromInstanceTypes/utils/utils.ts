@@ -216,7 +216,15 @@ export const generateVM: GenerateVMCallback = ({
           domain: {
             devices: {
               autoattachPodInterface: false,
-              disks: [],
+              disks: [
+                {
+                  bootOrder: 1,
+                  disk: {
+                    bus: InterfaceTypes.VIRTIO,
+                  },
+                  name: ROOTDISK,
+                },
+              ],
               interfaces: [defaultInterface],
             },
           },
