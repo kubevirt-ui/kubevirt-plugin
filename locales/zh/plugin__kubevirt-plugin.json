@@ -171,6 +171,7 @@
   "An error occurred": "发生错误",
   "An error occurred during the cloning process": "克隆过程中出现错误",
   "An error occurred during the upload process": "上传过程中出现错误",
+  "An existing MigPlan for these namespaces was found.": "An existing MigPlan for these namespaces was found.",
   "An existing MigPlan for this namespace was found. ": "找到用于此命名空间的现有 MigPlan。",
   "An InstanceType must be selected": "必须选择一个 InstanceType",
   "An OpenShift project is an alternative representation of a Kubernetes namespace.": "OpenShift 项目是 Kubernetes 命名空间的一个替代表示。",

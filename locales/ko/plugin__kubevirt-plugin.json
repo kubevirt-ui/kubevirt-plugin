@@ -171,6 +171,7 @@
   "An error occurred": "오류가 발생했습니다",
   "An error occurred during the cloning process": "복제 프로세스 중 오류가 발생했습니다.",
   "An error occurred during the upload process": "업로드 프로세스 중 오류 발생",
+  "An existing MigPlan for these namespaces was found.": "An existing MigPlan for these namespaces was found.",
   "An existing MigPlan for this namespace was found. ": "이 네임스페이스의 기존 MigPlan이 발견되었습니다. ",
   "An InstanceType must be selected": "InstanceType을 선택해야 합니다.",
   "An OpenShift project is an alternative representation of a Kubernetes namespace.": "OpenShift 프로젝트는 Kubernetes 네임스페이스의 대체 표현입니다.",
