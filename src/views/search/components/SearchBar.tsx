@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import debounce from 'lodash/debounce';
 
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -39,8 +39,6 @@ const SearchBar: FC<SearchBarProps> = ({ onFilterChange }) => {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchSuggestBoxOpen, setIsSearchSuggestBoxOpen] = useState(false);
-  const [isSearchInProgress, setIsSearchInProgress] = useState(false);
-  const [searchSuggestResult, setSearchSuggestResult] = useState<SearchSuggestResult>();
 
   const searchInputRef = useRef<HTMLInputElement>();
   const searchSuggestBoxRef = useRef<HTMLDivElement>();
@@ -49,17 +47,23 @@ const SearchBar: FC<SearchBarProps> = ({ onFilterChange }) => {
   const navigateToSearchResults = useNavigateToSearchResults(onFilterChange);
   const { saveSearch, urlSearchQuery } = useSavedSearchData();
 
+  const searchSuggestResult: SearchSuggestResult | undefined = useMemo(() => {
+    if (!searchQuery) {
+      return undefined;
+    }
+    return vmSuggestions;
+  }, [searchQuery, vmSuggestions]);
+
   useEffect(() => {
     if (searchQuery) {
       setIsSearchSuggestBoxOpen(true);
-      setIsSearchInProgress(!vmSuggestionsLoaded);
-      setSearchSuggestResult(vmSuggestions);
     } else {
       setIsSearchSuggestBoxOpen(false);
-      setIsSearchInProgress(false);
-      setSearchSuggestResult(undefined);
     }
-  }, [searchQuery, vmSuggestions, vmSuggestionsLoaded]);
+  }, [searchQuery]);
+  const isSearchInProgress = useMemo(() => {
+    return searchQuery ? !vmSuggestionsLoaded : false;
+  }, [searchQuery, vmSuggestionsLoaded]);
 
   const onSearchInputChange = debounce<SearchInputProps['onChange']>((_, value) => {
     setSearchQuery(value);
