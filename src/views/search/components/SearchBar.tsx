@@ -69,6 +69,16 @@ const SearchBar: FC<SearchBarProps> = ({ onFilterChange }) => {
     setSearchQuery('');
   };
 
+  const onEnterKeyDown = () => {
+    if (isSearchSuggestBoxOpen && searchSuggestResult?.resources.length > 0) {
+      navigateToSearchResults({ name: searchQuery });
+      setIsSearchSuggestBoxOpen(false);
+    }
+    if (!isSearchSuggestBoxOpen) {
+      setIsSearchSuggestBoxOpen(true);
+    }
+  };
+
   const showSearchModal = useCallback(
     (prefillInputs?: AdvancedSearchInputs) => {
       createModal(({ isOpen, onClose }) => (
@@ -121,6 +131,17 @@ const SearchBar: FC<SearchBarProps> = ({ onFilterChange }) => {
         }
         trigger={
           <SearchInput
+            onKeyDown={(e) => {
+              if (!searchQuery) {
+                return;
+              }
+              if (e.key === 'Enter') {
+                onEnterKeyDown();
+              }
+              if (e.key === 'Escape') {
+                setIsSearchSuggestBoxOpen(false);
+              }
+            }}
             data-test="vm-search-input"
             id="vm-search-input"
             onChange={onSearchInputChange}

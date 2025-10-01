@@ -26,7 +26,7 @@ const RelatedSuggestions: FC<RelatedSuggestions> = ({
 
   return (
     <>
-      <Divider />
+      <Divider className="pf-v6-u-px-md" />
       <PanelMainBody>
         <Stack hasGutter>
           <StackItem>
