@@ -52,21 +52,21 @@ export const transformDevices = (
 };
 
 export const sortBootOrder = (a: BootableDeviceType, b: BootableDeviceType) => {
-  if (a.value.bootOrder && b.value.bootOrder) {
+  if (a?.value?.bootOrder && b?.value?.bootOrder) {
     return a.value.bootOrder - b.value.bootOrder;
   }
 
-  if (a.value.bootOrder) {
+  if (a?.value?.bootOrder) {
     return -1;
   }
 
-  if (b.value.bootOrder) {
+  if (b?.value?.bootOrder) {
     return 1;
   }
 
   return 0;
 };
-export const getBootableSortedDevices = ({
+export const getSortedBootableDevices = ({
   instanceTypeVM,
   vm,
 }: {
