@@ -5,14 +5,14 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import { V1Devices, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { updateCloudInitRHELSubscription } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
 import { applyCloudDriveCloudInitVolume } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
-import { DEFAULT_NAMESPACE, ROOTDISK } from '@kubevirt-utils/constants/constants';
+import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
 import {
   LABEL_USED_TEMPLATE_NAME,
   LABEL_USED_TEMPLATE_NAMESPACE,
   replaceTemplateVM,
 } from '@kubevirt-utils/resources/template';
-import { getDisks, getInterfaces } from '@kubevirt-utils/resources/vm';
+import { getBootDisk, getDisks, getInterfaces } from '@kubevirt-utils/resources/vm';
 import {
   DEFAULT_NETWORK_INTERFACE,
   UDN_BINDING_NAME,
@@ -101,9 +101,9 @@ export const quickCreateVM: QuickCreateVMType = async ({
     if (!isEmpty(templateArchitecture) && enableMultiArchBootImageImport) {
       draftVM.spec.template.spec.architecture = templateArchitecture;
     }
-    const rootDisk = getDisks(draftVM)?.find((disk) => disk.name === ROOTDISK);
-    if (rootDisk && !rootDisk.bootOrder) {
-      rootDisk.bootOrder = 1;
+    const bootDisk = getBootDisk(draftVM);
+    if (bootDisk && !bootDisk.bootOrder) {
+      bootDisk.bootOrder = 1;
     }
   });
 

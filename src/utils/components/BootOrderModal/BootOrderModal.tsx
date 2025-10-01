@@ -7,7 +7,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import {
   BootableDeviceType,
   DeviceType,
-  getBootableSortedDevices,
+  getSortedBootableDevices,
 } from '@kubevirt-utils/resources/vm/utils/boot-order/bootOrder';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 
@@ -26,11 +26,11 @@ const BootOrderModal: FC<{
   vmi?: V1VirtualMachineInstance;
 }> = ({ instanceTypeVM, isOpen, onClose, onSubmit, vm, vmi }) => {
   const { t } = useKubevirtTranslation();
-  const bootableSortedDevices = getBootableSortedDevices({ instanceTypeVM, vm });
+  const sortedBootableDevices = getSortedBootableDevices({ instanceTypeVM, vm });
 
-  const [devices, setDevices] = useState<BootableDeviceType[]>(bootableSortedDevices);
+  const [devices, setDevices] = useState<BootableDeviceType[]>(sortedBootableDevices);
   const [isEditMode, setIsEditMode] = useState(
-    bootableSortedDevices.some((device) => !!device.value.bootOrder),
+    sortedBootableDevices.some((device) => !!device.value.bootOrder),
   );
 
   const updatedVirtualMachine = produce<V1VirtualMachine>(vm, (draftVM) => {
