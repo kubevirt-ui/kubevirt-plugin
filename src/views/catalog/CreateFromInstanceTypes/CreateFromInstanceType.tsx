@@ -59,13 +59,7 @@ const CreateFromInstanceType: FC<CreateFromInstanceTypeProps> = ({ currentTab })
     cluster,
   );
 
-  if (
-    !instanceTypesAndPreferencesData?.loaded ||
-    !loaded ||
-    !userPreferencesLoaded ||
-    !loadedFavorites ||
-    !favorites
-  ) {
+  if (!instanceTypesAndPreferencesData?.loaded || !loaded || !loadedFavorites) {
     return (
       <Bullseye className="create-vm-instance-type-section__page-loader">
         <Loading size="lg" />
@@ -102,6 +96,7 @@ const CreateFromInstanceType: FC<CreateFromInstanceTypeProps> = ({ currentTab })
                     favorites={[favorites as [], updaterFavorites]}
                     preferencesData={instanceTypesAndPreferencesData.preferences}
                     userPreferencesData={userPreferences}
+                    userPreferencesLoaded={userPreferencesLoaded}
                   />
                 </SectionListItem>
 
