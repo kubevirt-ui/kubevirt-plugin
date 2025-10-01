@@ -10,6 +10,7 @@ import './HelpTextIcon.scss';
 type HelpTextIconProps = {
   bodyContent: ReactNode;
   className?: string;
+  footerContent?: ReactNode;
   headerContent?: ReactNode;
   helpIconClassName?: string;
   onClick?: MouseEventHandler<HTMLSpanElement>;
@@ -20,6 +21,7 @@ type HelpTextIconProps = {
 const HelpTextIcon: FC<HelpTextIconProps> = ({
   bodyContent,
   className = 'help-text-icon__popover',
+  footerContent,
   headerContent,
   helpIconClassName = '',
   onClick,
@@ -30,6 +32,7 @@ const HelpTextIcon: FC<HelpTextIconProps> = ({
     aria-label={'Help'}
     bodyContent={bodyContent}
     className={className}
+    footerContent={footerContent}
     headerContent={headerContent}
     position={position}
   >

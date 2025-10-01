@@ -1,18 +1,13 @@
 import React, { FC, useCallback, useEffect } from 'react';
-import { Trans } from 'react-i18next';
-import { Link } from 'react-router-dom-v5-compat';
 import { uniq } from 'lodash';
 
 import {
   V1beta1StorageSpecAccessModesEnum,
   V1beta1StorageSpecVolumeModeEnum,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ClaimPropertySets } from '@kubevirt-utils/types/storage';
 import { FormGroup, Radio } from '@patternfly/react-core';
-
-import HelpTextIcon from '../HelpTextIcon/HelpTextIcon';
 
 import RecommendationLabel from './RecommendationLabel';
 import { getAccessModesForVolume, VOLUME_MODE_RADIO_OPTIONS } from './utils';
@@ -41,6 +36,7 @@ export const VolumeMode: FC<VolumeModeProps> = ({
         Object.values(V1beta1StorageSpecVolumeModeEnum).some((key) => key === mode),
       ),
   );
+  const recommendedVolumeMode = recommendedVolumeModes?.[0];
 
   const setBothModes = useCallback(
     (mode) => {
@@ -52,40 +48,20 @@ export const VolumeMode: FC<VolumeModeProps> = ({
   );
 
   useEffect(() => {
-    if (volumeMode || !recommendedVolumeModes?.[0]) {
+    if (volumeMode || !recommendedVolumeMode) {
       return;
     }
-    const mostRecommended = recommendedVolumeModes[0];
-    setBothModes(mostRecommended);
-  }, [volumeMode, recommendedVolumeModes, setBothModes]);
+    setBothModes(recommendedVolumeMode);
+  }, [volumeMode, recommendedVolumeMode, setBothModes]);
 
   return (
-    <FormGroup
-      labelHelp={
-        <HelpTextIcon
-          bodyContent={
-            <Trans ns="plugin__kubevirt-plugin" t={t}>
-              Learn more about{' '}
-              <Link target="_blank" to={documentationURL.STORAGE_PROFILES}>
-                StorageProfile
-              </Link>
-              .
-            </Trans>
-          }
-        />
-      }
-      isStack
-      label={t('Volume Mode')}
-    >
+    <FormGroup isStack label={t('Volume Mode')}>
       {VOLUME_MODE_RADIO_OPTIONS.map(({ label, value }) => (
         <Radio
           label={
             <div className="ApplyStorageProfileSettings--labelWithGap">
               {label}
-              <RecommendationLabel
-                priority={recommendedVolumeModes.findIndex((it) => it === value)}
-                recommendationCount={recommendedVolumeModes.length}
-              />
+              {recommendedVolumeMode === value && <RecommendationLabel />}
             </div>
           }
           onChange={(_event, checked) => {
