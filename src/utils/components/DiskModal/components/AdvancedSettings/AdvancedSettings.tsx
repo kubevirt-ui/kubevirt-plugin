@@ -32,45 +32,49 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({ showApplyStorageProfileSe
 
   const isLunType = diskType === diskTypes.lun;
   return (
-    <ExpandableSection toggleText={t('Advanced settings')}>
-      <Stack hasGutter>
-        {showApplyStorageProfileSettings && <ApplyStorageProfileSettings />}
-        <StackItem>
-          <Split hasGutter>
-            <Controller
-              render={({ field: { onChange, value } }) => (
-                <Checkbox
-                  id="sharable-disk"
-                  isChecked={value || isLunType}
-                  isDisabled={lunReservation || isLunType}
-                  label={t('Share this disk between multiple VirtualMachines')}
-                  onChange={(_event, checked) => onChange(checked)}
-                />
-              )}
-              control={control}
-              name={SHARABLE_FIELD}
-            />
-            <HelpTextIcon bodyContent={t('Allows concurrent access by multiple VirtualMachines')} />
-          </Split>
-        </StackItem>
-        <StackItem>
-          <Split hasGutter>
-            <Checkbox
-              id="lun-reservation"
-              isChecked={disk?.lun?.reservation}
-              isDisabled={sharable || !isLunType || !featureEnabled}
-              label={t('Set SCSI reservation for disk')}
-              onChange={(_event, checked) => setValue(LUN_RESERVATION_FIELD, checked)}
-            />
-            <HelpTextIcon
-              bodyContent={t(
-                'The disk must be attached to the VirtualMachine as a SCSI LUN for this option to work. It should only be used for cluster-aware applications',
-              )}
-            />
-          </Split>
-        </StackItem>
-      </Stack>
-    </ExpandableSection>
+    <Stack hasGutter>
+      {showApplyStorageProfileSettings && <ApplyStorageProfileSettings />}
+      <ExpandableSection isIndented toggleText={t('Advanced settings')}>
+        <Stack hasGutter>
+          <StackItem>
+            <Split hasGutter>
+              <Controller
+                render={({ field: { onChange, value } }) => (
+                  <Checkbox
+                    id="sharable-disk"
+                    isChecked={value || isLunType}
+                    isDisabled={lunReservation || isLunType}
+                    label={t('Share this disk between multiple VirtualMachines')}
+                    onChange={(_event, checked) => onChange(checked)}
+                  />
+                )}
+                control={control}
+                name={SHARABLE_FIELD}
+              />
+              <HelpTextIcon
+                bodyContent={t('Allows concurrent access by multiple VirtualMachines')}
+              />
+            </Split>
+          </StackItem>
+          <StackItem>
+            <Split hasGutter>
+              <Checkbox
+                id="lun-reservation"
+                isChecked={disk?.lun?.reservation}
+                isDisabled={sharable || !isLunType || !featureEnabled}
+                label={t('Set SCSI reservation for disk')}
+                onChange={(_event, checked) => setValue(LUN_RESERVATION_FIELD, checked)}
+              />
+              <HelpTextIcon
+                bodyContent={t(
+                  'The disk must be attached to the VirtualMachine as a SCSI LUN for this option to work. It should only be used for cluster-aware applications',
+                )}
+              />
+            </Split>
+          </StackItem>
+        </Stack>
+      </ExpandableSection>
+    </Stack>
   );
 };
 

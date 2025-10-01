@@ -9,7 +9,10 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useStorageProfileClaimPropertySets from '@kubevirt-utils/hooks/useStorageProfileClaimPropertySets';
 import { Flex, FlexItem, Skeleton } from '@patternfly/react-core';
 
+import ExpandSectionWithCustomToggle from '../ExpandSectionWithCustomToggle/ExpandSectionWithCustomToggle';
+
 import AccessMode from './AccessMode';
+import StorageProfilePopoverHelpIcon from './StorageProfilePopoverHelpIcon';
 import VolumeMode from './VolumeMode';
 
 import './ApplyStorageProfileSettings.scss';
@@ -47,32 +50,36 @@ const ApplyStorageProfileSettings: FC<ApplyStorageProfileSettingsProps> = ({
     setVolumeMode(undefined);
   });
 
-  if (!loaded) {
-    return <Skeleton screenreaderText={t('Loading StorageProfile')} />;
-  }
-
   if (loaded && error) {
     return <ErrorAlert error={error} />;
   }
 
   return (
-    <Flex
-      className="ApplyStorageProfileSettings--volume-access-section"
-      spaceItems={{ default: 'spaceItems3xl' }}
+    <ExpandSectionWithCustomToggle
+      customContent={<StorageProfilePopoverHelpIcon />}
+      id="configure-storage-profile"
+      isIndented
+      toggleContent={t('Configure Storage profile')}
     >
-      <FlexItem>
-        <VolumeMode
-          claimPropertySets={claimPropertySets ?? []}
-          {...{ setAccessMode, setVolumeMode, volumeMode }}
-        />
-      </FlexItem>
-      <FlexItem>
-        <AccessMode
-          claimPropertySets={claimPropertySets ?? []}
-          {...{ accessMode, setAccessMode, volumeMode }}
-        />
-      </FlexItem>
-    </Flex>
+      {loaded ? (
+        <Flex spaceItems={{ default: 'spaceItems3xl' }}>
+          <FlexItem>
+            <VolumeMode
+              claimPropertySets={claimPropertySets ?? []}
+              {...{ setAccessMode, setVolumeMode, volumeMode }}
+            />
+          </FlexItem>
+          <FlexItem>
+            <AccessMode
+              claimPropertySets={claimPropertySets ?? []}
+              {...{ accessMode, setAccessMode, volumeMode }}
+            />
+          </FlexItem>
+        </Flex>
+      ) : (
+        <Skeleton screenreaderText={t('Loading StorageProfile')} />
+      )}
+    </ExpandSectionWithCustomToggle>
   );
 };
 
