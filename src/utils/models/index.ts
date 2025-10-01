@@ -53,3 +53,15 @@ export const OperatorGroupModel: K8sModel = {
   namespaced: true,
   plural: 'operatorgroups',
 };
+
+export const ClusterManagementAddOnModel: K8sModel = {
+  abbr: 'CMA',
+  apiGroup: 'addon.open-cluster-management.io',
+  apiVersion: 'v1alpha1',
+  crd: true,
+  kind: 'ClusterManagementAddOn',
+  label: 'ClusterManagementAddOn',
+  labelPlural: 'ClusterManagementAddOns',
+  namespaced: true,
+  plural: 'clustermanagementaddons',
+};
