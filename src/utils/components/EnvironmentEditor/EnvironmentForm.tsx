@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo } from 'react';
+import React, { FC, useEffect } from 'react';
 import { useImmer } from 'use-immer';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -13,6 +13,7 @@ import EnvironmentFormActions from './components/EnvironmentFormActions';
 import EnvironmentFormSkeleton from './components/EnvironmentFormSkeleton';
 import EnvironmentFormTitle from './components/EnvironmentFormTitle';
 import useEnvironments from './hooks/useEnvironments';
+import useEnvironmentSelectOptions from './hooks/useEnvironmentSelectOptions';
 
 import './EnvironmentForm.scss';
 
@@ -42,9 +43,9 @@ const EnvironmentForm: FC<EnvironmentFormProps> = ({ onEditChange, updateVM, vm 
     setFormError(null);
   }, [setFormError, setTemporaryVM, vm]);
 
-  const environmentNamesSelected = useMemo(
-    () => environments.map((env) => env.name),
-    [environments],
+  const { loaded, loadError, selectOptions } = useEnvironmentSelectOptions(
+    getNamespace(vm),
+    environments,
   );
 
   if (isEmpty(vm)) return <EnvironmentFormSkeleton />;
@@ -77,13 +78,14 @@ const EnvironmentForm: FC<EnvironmentFormProps> = ({ onEditChange, updateVM, vm 
           <EnvironmentEditor
             diskName={environment.diskName}
             environmentName={environment.name}
-            environmentNamesSelected={environmentNamesSelected}
             id={index}
             key={environment.name}
             kind={environment.kind}
-            namespace={getNamespace(vm)}
+            loaded={loaded}
+            loadError={loadError}
             onChange={onEnvironmentChange}
             onRemove={onEnvironmentRemove}
+            selectOptions={selectOptions}
             serial={environment?.serial}
           />
         ))}
