@@ -7,7 +7,6 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { Alert, AlertVariant } from '@patternfly/react-core';
 
 import { EnvironmentKind, MapKindToAbbr } from '../constants';
-import useEnvironmentsResources from '../hooks/useEnvironmentsResources';
 import {
   getEnvironmentOptionKind,
   getEnvironmentOptionName,
@@ -17,31 +16,25 @@ import {
 type EnvironmentSelectResourceProps = {
   diskName: string;
   environmentName?: string;
-  environmentNamesSelected: string[];
   kind?: EnvironmentKind;
-  namespace: string;
+  loaded: boolean;
+  loadError: any;
   onChange: (diskName: string, name: string, serial: string, kind: EnvironmentKind) => void;
+  selectOptions: EnhancedSelectOptionProps[];
   serial: string;
 };
 
 const EnvironmentSelectResource: FC<EnvironmentSelectResourceProps> = ({
   diskName,
   environmentName,
-  environmentNamesSelected,
   kind,
-  namespace,
+  loaded,
+  loadError,
   onChange,
+  selectOptions,
   serial,
 }) => {
   const { t } = useKubevirtTranslation();
-
-  const {
-    configMaps,
-    error: loadError,
-    loaded,
-    secrets,
-    serviceAccounts,
-  } = useEnvironmentsResources(namespace);
 
   if (!loaded) return <Loading />;
 
@@ -63,50 +56,15 @@ const EnvironmentSelectResource: FC<EnvironmentSelectResourceProps> = ({
 
   const selectedValue = getEnvironmentOptionValue(environmentName, kind);
 
-  const getEnhancedSelectOptionProps = (
-    optionName: string,
-    optionKind: EnvironmentKind,
-  ): EnhancedSelectOptionProps => ({
-    children: (
-      <>
-        <span className="sr-only">{optionKind}</span>
-        <span className={`co-m-resource-icon co-m-resource-${optionKind}`}>
-          {MapKindToAbbr[optionKind]}
-        </span>
-        {optionName}
-      </>
-    ),
-    isDisabled: environmentNamesSelected?.includes(optionName),
-    key: optionName,
-    value: getEnvironmentOptionValue(optionName, optionKind),
-    valueForFilter: optionName,
-  });
-
   return (
     <InlineFilterSelect
-      options={[
-        ...secrets.map((secret) => ({
-          group: t('Secrets'),
-          ...getEnhancedSelectOptionProps(secret.metadata.name, EnvironmentKind.secret),
-        })),
-        ...configMaps.map((configMap) => ({
-          group: t('Config Maps'),
-          ...getEnhancedSelectOptionProps(configMap.metadata.name, EnvironmentKind.configMap),
-        })),
-        ...serviceAccounts.map((serviceAccount) => ({
-          group: t('Service Accounts'),
-          ...getEnhancedSelectOptionProps(
-            serviceAccount.metadata.name,
-            EnvironmentKind.serviceAccount,
-          ),
-        })),
-      ]}
       toggleProps={{
         children: environmentName ?? t('Select a resource'),
         icon: kind ? (
           <span className={`co-m-resource-icon co-m-resource-${kind}`}>{MapKindToAbbr[kind]}</span>
         ) : null,
       }}
+      options={selectOptions}
       selected={selectedValue}
       selectProps={{ 'aria-labelledby': 'environment-name-header' }}
       setSelected={onSelect}

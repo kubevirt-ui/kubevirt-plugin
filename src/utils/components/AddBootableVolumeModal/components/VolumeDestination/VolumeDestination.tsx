@@ -37,39 +37,6 @@ const VolumeDestination: FC<VolumeDestinationProps> = ({
 
   return (
     <>
-      <Grid hasGutter span={12}>
-        <GridItem>
-          <StorageClassSelect
-            setShowSCAlert={setShowSCAlert}
-            setStorageClassName={setBootableVolumeField('storageClassName')}
-            storageClass={storageClassName}
-          />
-        </GridItem>
-        <GridItem>
-          <ApplyStorageProfileSettings
-            {...{ accessMode, storageClassName, volumeMode }}
-            setAccessMode={setBootableVolumeField('accessMode')}
-            setVolumeMode={setBootableVolumeField('volumeMode')}
-          />
-        </GridItem>
-        <GridItem>
-          <CapacityInput
-            helperText={
-              isSnapshotSourceType && t('Disk size will be determined by the volume snapshot size')
-            }
-            isDisabled={isSnapshotSourceType}
-            label={t('Disk size')}
-            onChange={setBootableVolumeField('size')}
-            size={size}
-          />
-        </GridItem>
-        {showSCAlert && (
-          <GridItem span={12}>
-            <DefaultStorageClassAlert />
-          </GridItem>
-        )}
-      </Grid>
-
       <FormGroup isRequired label={t('Volume name')}>
         <TextInput
           id="name"
@@ -86,6 +53,39 @@ const VolumeDestination: FC<VolumeDestinationProps> = ({
           selectedProject={bootableVolumeNamespace}
         />
       </FormGroup>
+
+      <Grid hasGutter span={12}>
+        <GridItem>
+          <CapacityInput
+            helperText={
+              isSnapshotSourceType && t('Disk size will be determined by the volume snapshot size')
+            }
+            isDisabled={isSnapshotSourceType}
+            label={t('Disk size')}
+            onChange={setBootableVolumeField('size')}
+            size={size}
+          />
+        </GridItem>
+        <GridItem>
+          <StorageClassSelect
+            setShowSCAlert={setShowSCAlert}
+            setStorageClassName={setBootableVolumeField('storageClassName')}
+            storageClass={storageClassName}
+          />
+        </GridItem>
+        <GridItem>
+          <ApplyStorageProfileSettings
+            {...{ accessMode, storageClassName, volumeMode }}
+            setAccessMode={setBootableVolumeField('accessMode')}
+            setVolumeMode={setBootableVolumeField('volumeMode')}
+          />
+        </GridItem>
+        {showSCAlert && (
+          <GridItem span={12}>
+            <DefaultStorageClassAlert />
+          </GridItem>
+        )}
+      </Grid>
     </>
   );
 };
