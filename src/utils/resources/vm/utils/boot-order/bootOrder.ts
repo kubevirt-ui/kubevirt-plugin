@@ -1,7 +1,10 @@
+import unionBy from 'lodash/unionBy';
+
 import { V1Disk, V1Interface, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { CLOUDINITDISK } from '@kubevirt-utils/constants/constants';
 import { getDisks, getInterfaces } from '@kubevirt-utils/resources/vm';
 import { getPrintableDiskDrive } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
+
 /**
  * @date 3/20/2022 - 11:34:56 AM
  *
@@ -73,9 +76,11 @@ export const getSortedBootableDevices = ({
   instanceTypeVM: V1VirtualMachine;
   vm: V1VirtualMachine;
 }): BootableDeviceType[] | undefined => {
-  const disks = getDisks(instanceTypeVM || vm);
+  const filteredInstanceTypeVMDisks = getDisks(instanceTypeVM || vm)?.filter(
+    (disk) => disk?.name !== CLOUDINITDISK,
+  );
+  const vmDisks = getDisks(vm);
+  const mergedDisks = unionBy(filteredInstanceTypeVMDisks, vmDisks, 'name');
   const interfaces = getInterfaces(vm);
-  return transformDevices(disks, interfaces)
-    ?.filter((disk) => disk?.value?.name !== CLOUDINITDISK)
-    ?.toSorted(sortBootOrder);
+  return transformDevices(mergedDisks, interfaces)?.toSorted(sortBootOrder);
 };
