@@ -71,6 +71,7 @@ import useFiltersFromURL from './hooks/useFiltersFromURL';
 import useVirtualMachineColumns from './hooks/useVirtualMachineColumns';
 import { useVMListFilters } from './hooks/useVMListFilters/useVMListFilters';
 import useVMMetrics from './hooks/useVMMetrics';
+import { VM_FILTER_OPTIONS, VMI_FILTER_OPTIONS } from './utils/constants';
 import { filterVMsByClusterAndNamespace } from './utils/utils';
 import { getListPageBodySize, ListPageBodySize } from './listPageBodySize';
 
@@ -107,12 +108,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
       namespace,
       namespaced: true,
     },
-    {
-      labels: 'metadata.labels',
-      name: 'metadata.name',
-      'rowFilter-os': 'spec.template.metadata.annotations.vm\\.kubevirt\\.io/os',
-      'rowFilter-status': 'status.printableStatus',
-    },
+    VM_FILTER_OPTIONS,
     searchQueries?.vmQueries,
   );
 
@@ -127,10 +123,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
       namespace,
       namespaced: true,
     },
-    {
-      ip: 'status.interfaces',
-      'rowFilter-node': 'status.nodeName',
-    },
+    VMI_FILTER_OPTIONS,
     searchQueries?.vmiQueries,
   );
 
