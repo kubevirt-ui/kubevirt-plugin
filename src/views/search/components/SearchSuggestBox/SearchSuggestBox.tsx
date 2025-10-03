@@ -26,7 +26,6 @@ import {
 
 import RelatedSuggestions from './components/RelatedSuggestions';
 import SearchSuggestBoxFooter from './components/SearchSuggestBoxFooter';
-import SearchSuggestBoxHeader from './components/SearchSuggestBoxHeader';
 
 export type SearchSuggestBoxProps = {
   isSearchInProgress: boolean;
@@ -57,12 +56,6 @@ const SearchSuggestBox: FC<SearchSuggestBoxProps> = ({
   return (
     <Panel>
       <div data-test="search-bar-results">
-        {hasResourcesToSuggest && (
-          <SearchSuggestBoxHeader
-            navigateToSearchResults={navigateToSearchResults}
-            searchQuery={searchQuery}
-          />
-        )}
         <PanelMain>
           {isSearchInProgress && (
             <EmptyState
@@ -130,6 +123,8 @@ const SearchSuggestBox: FC<SearchSuggestBoxProps> = ({
             onAdvancedSearchClick={() => {
               showSearchModal({ name: searchQuery });
             }}
+            navigateToSearchResults={navigateToSearchResults}
+            searchQuery={searchQuery}
           />
         )}
       </div>
