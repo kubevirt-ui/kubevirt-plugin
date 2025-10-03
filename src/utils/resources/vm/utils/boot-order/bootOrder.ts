@@ -1,7 +1,7 @@
 import { V1Disk, V1Interface, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { CLOUDINITDISK } from '@kubevirt-utils/constants/constants';
 import { getDisks, getInterfaces } from '@kubevirt-utils/resources/vm';
 import { getPrintableDiskDrive } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
-
 /**
  * @date 3/20/2022 - 11:34:56 AM
  *
@@ -75,5 +75,7 @@ export const getSortedBootableDevices = ({
 }): BootableDeviceType[] | undefined => {
   const disks = getDisks(instanceTypeVM || vm);
   const interfaces = getInterfaces(vm);
-  return transformDevices(disks, interfaces)?.toSorted(sortBootOrder);
+  return transformDevices(disks, interfaces)
+    ?.filter((disk) => disk?.value?.name !== CLOUDINITDISK)
+    ?.toSorted(sortBootOrder);
 };
