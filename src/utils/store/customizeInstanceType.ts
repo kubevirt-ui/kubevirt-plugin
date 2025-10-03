@@ -1,8 +1,9 @@
 import produce from 'immer';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { effect, signal } from '@preact/signals-react';
+
+import { isEmpty } from '../utils/utils';
 
 import {
   getCustomizeInstanceTypeSessionStorage,
@@ -39,22 +40,44 @@ export const clearCustomizeInstanceType = () => {
 export const updateCustomizeInstanceType: UpdateCustomizeInstanceType = (
   updateValues,
 ): V1VirtualMachine => {
-  let vm = vmSignal.value;
+  // Handle null/undefined signal value
+  if (!vmSignal.value) {
+    return undefined;
+  }
+
+  // Create a deep copy for each update to prevent reference mutation
+  let vm = produce(vmSignal.value, (draft) => draft);
 
   updateValues.forEach(({ data, merge = false, path }) => {
-    //replace complete vm obj
-    if (isEmpty(path)) {
+    // Replace complete vm obj when path is undefined (no path property)
+    if (path === undefined) {
       vm = data;
+      return;
+    }
+
+    // Skip update when path is empty string
+    if (path === '') {
       return;
     }
 
     vm = produce(vm, (vmDraft) => {
       const pathParts = typeof path === 'string' ? path.split('.') : path;
+      // Filter out empty strings to prevent corruption
+      const validPathParts = pathParts.filter((part) => part !== '');
+
+      if (validPathParts.length === 0) {
+        return;
+      }
+
       let obj = vmDraft;
 
-      pathParts.forEach((part: string, index: number) => {
-        if (index < pathParts.length - 1) {
-          obj = obj?.[part] ? obj[part] : Object.assign(obj, { [part]: {} })[part];
+      validPathParts.forEach((part: string, index: number) => {
+        if (index < validPathParts.length - 1) {
+          // Safe object navigation without Object.assign
+          if (!obj[part]) {
+            obj[part] = {};
+          }
+          obj = obj[part];
           return;
         }
 
