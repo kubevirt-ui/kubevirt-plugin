@@ -11,6 +11,7 @@ import { Content, GridItem, NumberInput } from '@patternfly/react-core';
 type CPUComponentInputProps = {
   cpu: V1CPU;
   cpuComponent: CPUComponent;
+  cpuLimits?: Record<string, number>;
   isDisabled: boolean;
   setCPU: Dispatch<SetStateAction<V1CPU>>;
 };
@@ -18,9 +19,19 @@ type CPUComponentInputProps = {
 const CPUComponentInput: FC<CPUComponentInputProps> = ({
   cpu,
   cpuComponent,
+  cpuLimits,
   isDisabled,
   setCPU,
 }) => {
+  // Get minimum value from validation rules
+  const minValue = cpuLimits?.[cpuComponent] || 1;
+
+  const updateCPU = (newValue: number) => {
+    if (newValue >= minValue) {
+      setCPU(getUpdatedCPU(cpu, newValue, cpuComponent));
+    }
+  };
+
   return (
     <>
       <GridItem span={3}>
@@ -31,14 +42,17 @@ const CPUComponentInput: FC<CPUComponentInputProps> = ({
       <GridItem span={9}>
         <NumberInput
           onChange={(e: ChangeEvent<HTMLInputElement>) => {
-            const newNumber = +e?.target?.value;
-            setCPU(getUpdatedCPU(cpu, newNumber, cpuComponent));
+            updateCPU(+e?.target?.value);
+          }}
+          onMinus={() => {
+            updateCPU(+cpu?.[cpuComponent] - 1);
+          }}
+          onPlus={() => {
+            updateCPU(+cpu?.[cpuComponent] + 1);
           }}
           inputName="cpu-sockets-input"
           isDisabled={isDisabled}
-          min={1}
-          onMinus={() => setCPU(getUpdatedCPU(cpu, +cpu?.[cpuComponent] - 1, cpuComponent))}
-          onPlus={() => setCPU(getUpdatedCPU(cpu, +cpu?.[cpuComponent] + 1, cpuComponent))}
+          min={minValue}
           value={cpu?.[cpuComponent]}
           widthChars={1}
         />
