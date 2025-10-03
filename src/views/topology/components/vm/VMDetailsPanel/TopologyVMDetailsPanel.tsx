@@ -16,7 +16,6 @@ const TopologyVMDetailsPanel: FC<TopologyVMDetailsPanelProps> = observer(({ vmNo
   const vmData = vmNode.getData();
   const vm = vmData.resource as V1VirtualMachine;
   const { vmi } = vmData?.data;
-
   return (
     <div className="overview__sidebar-pane-body resource-overview__body">
       <Grid hasGutter>

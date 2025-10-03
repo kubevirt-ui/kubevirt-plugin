@@ -20,10 +20,11 @@ type VirtualMachinePendingChangesAlertProps = {
 };
 
 const VirtualMachinePendingChangesAlert: FC<VirtualMachinePendingChangesAlertProps> = ({
+  instanceTypeExpandedSpec,
   vm,
   vmi,
 }) => {
-  const pendingChanges = usePendingChanges(vm, vmi);
+  const pendingChanges = usePendingChanges(vm, vmi, instanceTypeExpandedSpec);
   const { t } = useKubevirtTranslation();
 
   const pendingChangesNICsTab = getPendingChangesByTab(

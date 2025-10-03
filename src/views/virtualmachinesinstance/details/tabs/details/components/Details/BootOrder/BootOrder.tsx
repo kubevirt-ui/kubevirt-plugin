@@ -1,28 +1,20 @@
-import * as React from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { V1Disk, V1Interface } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import BootableDevicesList from '@kubevirt-utils/components/BootOrder/BootableDevicesList';
-import { transformDevices } from '@kubevirt-utils/resources/vm/utils/boot-order/bootOrder';
+import {
+  sortBootOrder,
+  transformDevices,
+} from '@kubevirt-utils/resources/vm/utils/boot-order/bootOrder';
 
 type BootOrderProps = {
   disks: V1Disk[];
   interfaces: V1Interface[];
 };
 
-const BootOrder: React.FC<BootOrderProps> = ({ disks, interfaces }) => {
-  const transformedDevices = React.useMemo(
-    () =>
-      transformDevices(disks, interfaces)?.sort((a, b) => {
-        if (a.value.bootOrder && b.value.bootOrder) {
-          return a.value.bootOrder - b.value.bootOrder;
-        } else if (a.value.bootOrder) {
-          return -1;
-        } else if (b.value.bootOrder) {
-          return 1;
-        } else {
-          return 0;
-        }
-      }),
+const BootOrder: FC<BootOrderProps> = ({ disks, interfaces }) => {
+  const transformedDevices = useMemo(
+    () => transformDevices(disks, interfaces)?.toSorted(sortBootOrder),
     [disks, interfaces],
   );
 
