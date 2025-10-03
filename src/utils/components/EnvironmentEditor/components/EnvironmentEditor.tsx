@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 
+import { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, ButtonVariant, Grid, GridItem, TextInput, Tooltip } from '@patternfly/react-core';
 import { MinusCircleIcon } from '@patternfly/react-icons';
@@ -13,24 +14,26 @@ import './EnvironmentEditor.scss';
 type EnvironmentEditorProps = {
   diskName: string;
   environmentName?: string;
-  environmentNamesSelected: string[];
   id: number;
   kind?: EnvironmentKind;
-  namespace: string;
+  loaded: boolean;
+  loadError: any;
   onChange: (diskName: string, name: string, serial: string, kind: EnvironmentKind) => void;
   onRemove?: (diskName: string) => void;
+  selectOptions: EnhancedSelectOptionProps[];
   serial?: string;
 };
 
 const EnvironmentEditor: FC<EnvironmentEditorProps> = ({
   diskName,
   environmentName,
-  environmentNamesSelected,
   id,
   kind,
-  namespace,
+  loaded,
+  loadError,
   onChange,
   onRemove,
+  selectOptions,
   serial,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -41,10 +44,11 @@ const EnvironmentEditor: FC<EnvironmentEditorProps> = ({
         <EnvironmentSelectResource
           diskName={diskName}
           environmentName={environmentName}
-          environmentNamesSelected={environmentNamesSelected}
           kind={kind}
-          namespace={namespace}
+          loaded={loaded}
+          loadError={loadError}
           onChange={onChange}
+          selectOptions={selectOptions}
           serial={serial}
         />
       </GridItem>
