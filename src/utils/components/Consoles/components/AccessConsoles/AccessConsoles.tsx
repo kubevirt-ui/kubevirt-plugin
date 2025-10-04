@@ -19,6 +19,7 @@ import { PasteIcon } from '@patternfly/react-icons';
 import { ConsoleState, isConsoleType, VNC_CONSOLE_TYPE } from '../utils/ConsoleConsts';
 
 import { AccessConsolesProps, typeMap } from './utils/accessConsoles';
+import VncSettingsMenu from './VncSettingsMenu';
 
 import './access-consoles.scss';
 
@@ -114,6 +115,7 @@ export const AccessConsoles: FC<AccessConsolesProps> = ({
           ))}
         </DropdownList>
       </Dropdown>
+      {actions.vncSettings && <VncSettingsMenu {...actions.vncSettings} />}
       <Button
         className="vnc-actions-disconnect-button"
         isDisabled={state !== connected || !actions.disconnect}
