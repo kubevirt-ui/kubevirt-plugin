@@ -25,6 +25,9 @@ const UserInstancetypeRow: FC<RowProps<V1beta1VirtualMachineClusterInstancetype>
       />
       <RedHatLabel obj={it} />
     </TableData>
+    <TableData activeColumnIDs={activeColumnIDs} id="cluster">
+      {it?.cluster}
+    </TableData>
     <TableData activeColumnIDs={activeColumnIDs} id="namespace">
       {getNamespace(it)}
     </TableData>

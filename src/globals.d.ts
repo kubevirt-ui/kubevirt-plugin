@@ -18,6 +18,16 @@ declare module '@kubevirt-ui/kubevirt-api/kubevirt' {
     export default content;
   }
 
+  interface V1beta1VirtualMachineClusterInstancetype
+    extends kubevirtUITypes.V1beta1VirtualMachineClusterInstancetype {
+    cluster?: string;
+  }
+
+  interface V1beta1VirtualMachineInstancetype
+    extends kubevirtUITypes.V1beta1VirtualMachineInstancetype {
+    cluster?: string;
+  }
+
   interface V1beta1VirtualMachineSnapshot extends kubevirtUITypes.V1beta1VirtualMachineSnapshot {
     cluster?: string;
   }

@@ -9,6 +9,7 @@ import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { Spinner } from '@patternfly/react-core';
 import { useFleetClusterNames, useHubClusterName } from '@stolostron/multicluster-sdk';
 
@@ -22,13 +23,16 @@ import './ClusterProjectDropdown.scss';
 type ClusterProjectDropdownProps = {
   includeAllClusters?: boolean;
   includeAllProjects?: boolean;
+  showProjectDropdown?: boolean;
 };
 
 const ClusterProjectDropdown: FC<ClusterProjectDropdownProps> = ({
   includeAllClusters,
   includeAllProjects,
+  showProjectDropdown = true,
 }) => {
   const { t } = useKubevirtTranslation();
+  const isACMPage = useIsACMPage();
   const cluster = useClusterParam();
   const namespace = useNamespaceParam();
   const navigate = useNavigate();
@@ -69,16 +73,19 @@ const ClusterProjectDropdown: FC<ClusterProjectDropdownProps> = ({
   }, [cluster, hubClusterName, hubClusterNameLoaded, includeAllClusters, onClusterChange]);
 
   useEffect(() => {
-    if (!includeAllProjects && cluster && isEmpty(namespace) && projectLoaded) {
+    if (
+      !includeAllProjects &&
+      cluster &&
+      isEmpty(namespace) &&
+      projectLoaded &&
+      showProjectDropdown
+    ) {
       const defaultProject = projects.find((project) => project === DEFAULT_NAMESPACE);
       onProjectChange(defaultProject || projects?.[0]);
     }
   }, [cluster, includeAllProjects, namespace, onProjectChange, projectLoaded, projects]);
 
-  if (
-    !location.pathname.startsWith('/k8s/cluster/') &&
-    !location.pathname.startsWith('/k8s/all-clusters')
-  ) {
+  if (!isACMPage) {
     return null;
   }
 
@@ -97,19 +104,23 @@ const ClusterProjectDropdown: FC<ClusterProjectDropdownProps> = ({
           <Spinner size="sm" />
         )}
       </div>
-      {t('Projects')}:
-      <div className="project-dropdown">
-        {projectLoaded ? (
-          <ProjectDropdown
-            cluster={cluster}
-            includeAllProjects={includeAllProjects}
-            onChange={onProjectChange}
-            selectedProject={namespace}
-          />
-        ) : (
-          <Spinner size="sm" />
-        )}
-      </div>
+      {showProjectDropdown && (
+        <>
+          {t('Projects')}:
+          <div className="project-dropdown">
+            {projectLoaded ? (
+              <ProjectDropdown
+                cluster={cluster}
+                includeAllProjects={includeAllProjects}
+                onChange={onProjectChange}
+                selectedProject={namespace}
+              />
+            ) : (
+              <Spinner size="sm" />
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 };
