@@ -79,7 +79,6 @@ export const getFleetResourceRoute: ResourceRouteHandler = ({
   const { group, kind, version } = model;
   switch (kind) {
     case 'VirtualMachine':
-    case 'VirtualMachineInstance':
       return `/k8s/cluster/${cluster}/ns/${namespace}/${group}~${version}~VirtualMachine/${name}`;
     default:
       return null;
