@@ -8,7 +8,8 @@ import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
-import { Action, k8sDelete, useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
+import { kubevirtK8sDelete } from '@multicluster/k8sRequests';
+import { Action, useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 type UseUserInstancetypeActionsProviderValues = [Action[], boolean];
 
@@ -47,7 +48,8 @@ const useUserInstancetypeActionsProvider: UseUserInstancetypeActionsProvider = (
             return (
               <DeleteModal
                 onDeleteSubmit={() =>
-                  k8sDelete({
+                  kubevirtK8sDelete({
+                    cluster: instanceType?.cluster,
                     model: VirtualMachineInstancetypeModel,
                     resource: instanceType,
                   })

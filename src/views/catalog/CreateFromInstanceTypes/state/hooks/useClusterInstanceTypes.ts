@@ -1,7 +1,7 @@
 import { VirtualMachineClusterInstancetypeModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { Selector } from '@openshift-console/dynamic-plugin-sdk';
 
 type UseClusterInstanceTypes = (
@@ -11,7 +11,7 @@ type UseClusterInstanceTypes = (
 
 const useClusterInstanceTypes: UseClusterInstanceTypes = (fieldSelector, selector) => {
   const cluster = useClusterParam();
-  const [instanceTypes, loaded, loadError] = useK8sWatchData<
+  const [instanceTypes, loaded, loadError] = useKubevirtWatchResource<
     V1beta1VirtualMachineClusterInstancetype[]
   >({
     cluster,

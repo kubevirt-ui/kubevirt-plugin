@@ -6,6 +6,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
 import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
 import { columnSorting } from '@kubevirt-utils/utils/utils';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 import { sortable } from '@patternfly/react-table';
 
@@ -24,6 +26,8 @@ type UseClusterInstancetypeListColumns = (
 
 const useClusterInstancetypeListColumns: UseClusterInstancetypeListColumns = (pagination, data) => {
   const { t } = useKubevirtTranslation();
+  const isACMPage = useIsACMPage();
+  const cluster = useClusterParam();
 
   const sorting = useCallback(
     (direction, path) => columnSorting(data, direction, pagination, path),
@@ -43,6 +47,16 @@ const useClusterInstancetypeListColumns: UseClusterInstancetypeListColumns = (pa
         title: t('Name'),
         transforms: [sortable],
       },
+      ...(isACMPage && !cluster
+        ? [
+            {
+              id: 'cluster',
+              sort: (_, direction) => sorting(direction, 'cluster'),
+              title: t('Cluster'),
+              transforms: [sortable],
+            },
+          ]
+        : []),
       {
         id: 'cpu',
         sort: (_, direction) => sorting(direction, 'spec.cpu.guest'),
@@ -65,7 +79,7 @@ const useClusterInstancetypeListColumns: UseClusterInstancetypeListColumns = (pa
         title: '',
       },
     ],
-    [t, sorting, sortingMemory],
+    [t, isACMPage, sorting, sortingMemory],
   );
 
   const [activeColumns, , loadedColumns] =

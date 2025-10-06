@@ -7,8 +7,13 @@ import { VirtualMachineModel } from '../views/dashboard-extensions/utils';
 
 import { KUBEVIRT_VM_PATH } from './constants';
 
-export const isACMPath = (pathname: string): boolean =>
-  pathname.startsWith('/k8s/cluster') || pathname.startsWith('/k8s/all-clusters');
+export const isACMPath = (pathname: string): boolean => {
+  if (pathname.startsWith('/k8s/all-clusters')) return true;
+
+  const clusterName = pathname.split('/')?.[3] || '';
+
+  return pathname.startsWith('/k8s/cluster') && !clusterName.includes('~');
+};
 
 export const getACMVMURL = (cluster: string, namespace: string, name: string): string =>
   `/k8s/cluster/${cluster}/ns/${namespace}/${KUBEVIRT_VM_PATH}/${name}`;
@@ -80,6 +85,10 @@ export const getFleetResourceRoute: ResourceRouteHandler = ({
   switch (kind) {
     case 'VirtualMachine':
       return `/k8s/cluster/${cluster}/ns/${namespace}/${group}~${version}~VirtualMachine/${name}`;
+    case 'VirtualMachineClusterInstancetype':
+      return `/k8s/cluster/${cluster}/${group}~${version}~${kind}/${name}`;
+    case 'VirtualMachineInstancetype':
+      return `/k8s/cluster/${cluster}/ns/${namespace}/${group}~${version}~${kind}/${name}`;
     default:
       return null;
   }
