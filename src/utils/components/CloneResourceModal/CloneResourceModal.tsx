@@ -4,7 +4,8 @@ import produce from 'immer';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
-import { k8sCreate, K8sModel, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
+import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 import { FormGroup, TextInput } from '@patternfly/react-core';
 
 import TabModal from '../TabModal/TabModal';
@@ -35,7 +36,8 @@ const CloneResourceModal: FC<CloneResourceModalProps> = ({
       if (namespace) draftObject.metadata.namespace = namespace;
     });
 
-    return k8sCreate({
+    return kubevirtK8sCreate({
+      cluster: object?.cluster,
       data: newObject,
       model,
     });

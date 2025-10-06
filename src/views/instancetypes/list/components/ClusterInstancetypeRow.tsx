@@ -24,6 +24,9 @@ const ClusterInstancetypeRow: FC<RowProps<V1beta1VirtualMachineClusterInstancety
       />
       <RedHatLabel obj={it} />
     </TableData>
+    <TableData activeColumnIDs={activeColumnIDs} id="cluster">
+      {it?.cluster}
+    </TableData>
     <TableData activeColumnIDs={activeColumnIDs} id="cpu">
       {it?.spec?.cpu?.guest}
     </TableData>
