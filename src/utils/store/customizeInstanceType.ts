@@ -1,6 +1,7 @@
 import produce from 'immer';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { effect, signal } from '@preact/signals-react';
 
 import { isEmpty } from '../utils/utils';
@@ -68,20 +69,14 @@ export const updateCustomizeInstanceType: UpdateCustomizeInstanceType = (
       if (validPathParts.length === 0) {
         return;
       }
-
+      ensurePath(vmDraft, validPathParts.join('.'));
       let obj = vmDraft;
-
-      validPathParts.forEach((part: string, index: number) => {
+      validPathParts.forEach((part, index) => {
         if (index < validPathParts.length - 1) {
-          // Safe object navigation without Object.assign
-          if (!obj[part]) {
-            obj[part] = {};
-          }
           obj = obj[part];
-          return;
+        } else {
+          obj[part] = merge ? mergeData(obj[part], data) : data;
         }
-
-        obj[part] = merge ? mergeData(obj[part], data) : data;
       });
     });
   });
