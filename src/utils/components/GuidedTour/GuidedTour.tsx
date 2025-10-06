@@ -3,7 +3,6 @@ import Joyride, { ACTIONS, CallBackProps, EVENTS } from 'react-joyride';
 import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { useSignals } from '@preact/signals-react/runtime';
 
 import TourPopover from './components/TourPopover/TourPopover';
 import {
@@ -16,7 +15,6 @@ import {
 } from './utils/constants';
 
 const GuidedTour: FC = () => {
-  useSignals();
   const location = useLocation();
   const navigate = useNavigate();
 
