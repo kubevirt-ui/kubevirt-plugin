@@ -6,6 +6,7 @@ import {
 } from '@kubevirt-utils/components/GuidedTour/utils/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
+import { USER_TAB_IDS } from '@overview/SettingsTab/search/constants';
 import { Stack, Switch } from '@patternfly/react-core';
 
 import ExpandSection from '../../../ExpandSection/ExpandSection';
@@ -19,6 +20,7 @@ const GettingStartedSection: FC = () => {
   return (
     <ExpandSection
       dataTestID="settings-user-getting-started"
+      searchItemId={USER_TAB_IDS.gettingStarted}
       toggleText={t('Getting started resources')}
     >
       <Stack hasGutter>

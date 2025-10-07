@@ -76,7 +76,7 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
 
   return (
     <>
-      <nav className="pf-v6-c-tabs pf-m-page-insets">
+      <nav className="pf-v6-c-tabs pf-m-page-insets pf-v6-u-flex-shrink-0">
         <ul className="pf-v6-c-tabs__list">
           {allPages.map((item) => {
             if (item?.isHidden) return null;

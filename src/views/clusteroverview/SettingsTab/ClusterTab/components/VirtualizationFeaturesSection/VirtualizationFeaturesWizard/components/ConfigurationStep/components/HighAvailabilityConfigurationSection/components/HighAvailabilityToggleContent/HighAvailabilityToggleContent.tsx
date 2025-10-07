@@ -41,7 +41,7 @@ const HighAvailabilityToggleContent: FC<HighAvailabilityToggleContentProps> = ({
   useEffect(() => {
     if (farToBeInstalled && nhcToBeInstalled) setSwitchState(true);
     else setSwitchState(false);
-  }, [farToBeInstalled, nhcToBeInstalled, setSwitchState]);
+  }, [farToBeInstalled, nhcToBeInstalled]);
 
   const bothAlternativeOptionsChecked = Object.values(alternativeCheckedMap).every(
     (checked) => checked,

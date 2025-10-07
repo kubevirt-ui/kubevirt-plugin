@@ -1,8 +1,8 @@
 import { VirtualMachineInstancetypeModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1VirtualMachineInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import { isAllNamespaces } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { Selector } from '@openshift-console/dynamic-plugin-sdk';
 
 type UseVirtualMachineInstanceTypes = (params?: {
@@ -19,7 +19,9 @@ const useVirtualMachineInstanceTypes: UseVirtualMachineInstanceTypes = ({
   const cluster = useClusterParam();
   const isAllNamespace = isAllNamespaces(namespace);
 
-  const [instanceTypes, loaded, loadError] = useK8sWatchData<V1beta1VirtualMachineInstancetype[]>({
+  const [instanceTypes, loaded, loadError] = useKubevirtWatchResource<
+    V1beta1VirtualMachineInstancetype[]
+  >({
     cluster,
     fieldSelector,
     groupVersionKind: VirtualMachineInstancetypeModelGroupVersionKind,

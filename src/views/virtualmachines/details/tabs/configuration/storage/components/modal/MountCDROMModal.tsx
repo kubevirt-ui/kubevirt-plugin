@@ -1,16 +1,21 @@
 import React, { FC } from 'react';
 import { FormProvider } from 'react-hook-form';
+import { Trans } from 'react-i18next';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import DiskSourceUploadPVC from '@kubevirt-utils/components/DiskModal/components/DiskSourceSelect/components/DiskSourceUploadPVC/DiskSourceUploadPVC';
 import UploadModeSelector from '@kubevirt-utils/components/DiskModal/components/UploadModeSelector/UploadModeSelector';
 import { UPLOAD_FILENAME_FIELD } from '@kubevirt-utils/components/DiskModal/components/utils/constants';
 import {
+  SELECT_ISO_FIELD_ID,
   UPLOAD_MODE_SELECT,
   UPLOAD_MODE_UPLOAD,
 } from '@kubevirt-utils/components/DiskModal/utils/constants';
-import { mountISOToCDROM } from '@kubevirt-utils/components/DiskModal/utils/helpers';
-import { isHotPluggableEnabled } from '@kubevirt-utils/components/DiskModal/utils/helpers';
+import {
+  convertDataVolumeToTemplate,
+  isHotPluggableEnabled,
+  mountISOToCDROM,
+} from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import { uploadDataVolume } from '@kubevirt-utils/components/DiskModal/utils/submit';
 import { VolumeTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
@@ -25,7 +30,6 @@ import {
   ButtonVariant,
   Content,
   ContentVariants,
-  Form,
   FormGroup,
   Stack,
   StackItem,
@@ -33,9 +37,7 @@ import {
 
 import { useISOOptions } from './hooks/useISOOptions';
 import { useMountCDROMForm } from './hooks/useMountCDROMForm';
-import { buildDiskState, convertDataVolumeToTemplate } from './utils';
-
-const SELECT_ISO_FIELD_ID = 'select-iso';
+import { buildDiskState } from './utils';
 
 type MountCDROMModalProps = {
   cdromName: string;
@@ -54,7 +56,6 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const vmNamespace = getNamespace(vm);
-
   const {
     handleClearUpload,
     handleFileUpload,
@@ -103,6 +104,8 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
       } else {
         diskState.dataVolumeTemplate = convertDataVolumeToTemplate(uploadedDataVolume);
       }
+    } else if (selectedISO) {
+      delete diskState.dataVolumeTemplate;
     }
 
     const updatedVM = await mountISOToCDROM(vm, diskState, isHotPluggable);
@@ -126,61 +129,64 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
         isDisabled={!isFormValid}
         isOpen={isOpen}
         onSubmit={handleModalSubmit}
+        shouldWrapInForm
         submitBtnText={t('Save')}
         submitBtnVariant={ButtonVariant.primary}
       >
-        <Form>
-          <Stack hasGutter>
-            <StackItem>
-              <p>{t('Mount ISO to the Virtual Machine')}</p>
-            </StackItem>
-            <StackItem>
-              <FormGroup
-                fieldId={SELECT_ISO_FIELD_ID}
-                isRequired={uploadMode !== UPLOAD_MODE_UPLOAD}
-                label={t('Select ISO')}
-              >
-                <InlineFilterSelect
-                  setSelected={(e) => {
-                    handleISOSelection(e);
-                    setValue(UPLOAD_FILENAME_FIELD, '');
-                  }}
-                  toggleProps={{
-                    isDisabled: isUploading,
-                    isFullWidth: true,
-                    placeholder: t('Select or upload a new ISO file to the cluster'),
-                  }}
-                  options={isoOptions}
-                  selected={selectedISO}
-                />
-              </FormGroup>
-            </StackItem>
-            <StackItem>
-              <DiskSourceUploadPVC
-                handleClearUpload={() => {
-                  handleClearUpload();
+        <Stack hasGutter>
+          <StackItem>
+            <p>
+              <Trans t={t}>
+                Mount ISO to <strong>{{ cdromName }}</strong>
+              </Trans>
+            </p>
+          </StackItem>
+          <StackItem>
+            <FormGroup
+              fieldId={SELECT_ISO_FIELD_ID}
+              isRequired={uploadMode !== UPLOAD_MODE_UPLOAD}
+              label={t('Select ISO')}
+            >
+              <InlineFilterSelect
+                setSelected={(e) => {
+                  handleISOSelection(e);
                   setValue(UPLOAD_FILENAME_FIELD, '');
                 }}
-                handleUpload={handleFileUpload}
-                isRequired={uploadMode !== UPLOAD_MODE_SELECT}
-                key={uploadMode}
-                label={t('Upload ISO')}
-                relevantUpload={upload}
-              >
-                <Content component={ContentVariants.small}>
-                  {t('ISO file must be in the same project as the Virtual Machine')}
-                </Content>
-                {uploadMode === UPLOAD_MODE_UPLOAD && (
-                  <UploadModeSelector
-                    isDisabled={isUploading}
-                    onUploadModeChange={handleUploadTypeChange}
-                    uploadMode={uploadType}
-                  />
-                )}
-              </DiskSourceUploadPVC>
-            </StackItem>
-          </Stack>
-        </Form>
+                toggleProps={{
+                  isDisabled: isUploading,
+                  isFullWidth: true,
+                  placeholder: t('Select or upload a new ISO file to the cluster'),
+                }}
+                options={isoOptions}
+                selected={selectedISO}
+              />
+            </FormGroup>
+          </StackItem>
+          <StackItem>
+            <DiskSourceUploadPVC
+              handleClearUpload={() => {
+                handleClearUpload();
+                setValue(UPLOAD_FILENAME_FIELD, '');
+              }}
+              handleUpload={handleFileUpload}
+              isRequired={uploadMode !== UPLOAD_MODE_SELECT}
+              key={uploadMode}
+              label={t('Upload ISO')}
+              relevantUpload={upload}
+            >
+              <Content component={ContentVariants.small}>
+                {t('ISO file must be in the same project as the Virtual Machine')}
+              </Content>
+              {uploadMode === UPLOAD_MODE_UPLOAD && (
+                <UploadModeSelector
+                  isDisabled={isUploading}
+                  onUploadModeChange={handleUploadTypeChange}
+                  uploadMode={uploadType}
+                />
+              )}
+            </DiskSourceUploadPVC>
+          </StackItem>
+        </Stack>
       </TabModal>
     </FormProvider>
   );

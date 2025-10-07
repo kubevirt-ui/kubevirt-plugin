@@ -1,3 +1,4 @@
+import * as ipaddr from 'ipaddr.js';
 import { animals, colors, NumberDictionary, uniqueNamesGenerator } from 'unique-names-generator';
 
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
@@ -175,6 +176,10 @@ export const generatePrettyName = (prefix?: string): string => {
   })}`;
 };
 
+export const generateUploadDiskName = (diskName: string, prefix: string): string => {
+  return `${diskName}-${generatePrettyName(prefix)}`;
+};
+
 const DOCKER_PREFIX = 'docker://';
 
 export const appendDockerPrefix = (image: string) => {
@@ -217,17 +222,18 @@ export const sortByDirection = (
 export const compareWithDirection = (direction: SortByDirection, a: any, b: any) =>
   sortByDirection(universalComparator, direction)(a, b);
 
-export const ipv6Regex =
-  /^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^::1$|^::$|^(?:[0-9a-fA-F]{1,4}:)*::(?:[0-9a-fA-F]{1,4}:)*[0-9a-fA-F]{1,4}$|^(?:[0-9a-fA-F]{1,4}:)*::[0-9a-fA-F]{1,4}$|^[0-9a-fA-F]{1,4}::(?:[0-9a-fA-F]{1,4}:)*[0-9a-fA-F]{1,4}$/;
+/**
+ * Link-local address prefix (fe80::/10)
+ * @see https://www.rfc-editor.org/rfc/rfc4291#section-2.5.6
+ */
+export const IPV6_LINK_LOCAL_CIDR = 'fe80::/10';
 
-export const isIPv6 = (ip: string): boolean => {
-  if (isEmpty(ip)) return false;
-
-  ip = ip?.trim();
-  return ipv6Regex.test(ip);
+export const isIPV6LinkLocal = (ip: string): boolean => {
+  if (!ipaddr.IPv6.isValid(ip)) {
+    return false;
+  }
+  return ipaddr.parse(ip).match(ipaddr.parseCIDR(IPV6_LINK_LOCAL_CIDR));
 };
 
-export const removeIPV6 = (ipAddress: IPAddress[]) => {
-  const ipAddressWithoutIPv6 = ipAddress.filter((item) => !isIPv6(item.ip));
-  return ipAddressWithoutIPv6;
-};
+export const removeLinkLocalIPV6 = (ipAddress: IPAddress[]) =>
+  ipAddress.filter((item) => !isIPV6LinkLocal(item?.ip?.trim()));

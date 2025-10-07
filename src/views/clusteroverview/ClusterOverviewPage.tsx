@@ -1,10 +1,11 @@
 import React, { FC, useMemo } from 'react';
 import { Helmet } from 'react-helmet';
 
+import HorizontalNavbar from '@kubevirt-utils/components/HorizontalNavbar/HorizontalNavbar';
+import { NavPageKubevirt } from '@kubevirt-utils/components/HorizontalNavbar/utils/utils';
 import { useForceProjectSelection } from '@kubevirt-utils/hooks/useForceProjectSelection';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { HorizontalNav, NavPage } from '@openshift-console/dynamic-plugin-sdk';
 import { VIRTUALIZATION_PATHS } from '@virtualmachines/tree/utils/constants';
 
 import GuidedTour from '../../utils/components/GuidedTour/GuidedTour';
@@ -22,8 +23,8 @@ const ClusterOverviewPage: FC = () => {
 
   useForceProjectSelection([VIRTUALIZATION_PATHS.OVERVIEW]);
 
-  const overviewTabs: NavPage[] = useMemo(() => {
-    const adminPages: NavPage[] = [
+  const overviewTabs: NavPageKubevirt[] = useMemo(() => {
+    const adminPages: NavPageKubevirt[] = [
       {
         component: TopConsumersTab,
         href: 'top-consumers',
@@ -48,6 +49,24 @@ const ClusterOverviewPage: FC = () => {
         href: 'settings',
         name: t('Settings'),
       },
+      {
+        component: SettingsTab,
+        href: 'settings/cluster',
+        isHidden: true,
+        name: 'settings/cluster',
+      },
+      {
+        component: SettingsTab,
+        href: 'settings/user',
+        isHidden: true,
+        name: 'settings/user',
+      },
+      {
+        component: SettingsTab,
+        href: 'settings/features',
+        isHidden: true,
+        name: 'settings/features',
+      },
     ];
   }, [isAdmin, t]);
 
@@ -58,7 +77,7 @@ const ClusterOverviewPage: FC = () => {
       </Helmet>
       <WelcomeModal />
       <ClusterOverviewPageHeader />
-      <HorizontalNav pages={overviewTabs} />
+      <HorizontalNavbar loaded={true} pages={overviewTabs} />
       <GuidedTour />
     </>
   );

@@ -7,6 +7,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
 import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
 import { columnSorting } from '@kubevirt-utils/utils/utils';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { TableColumn, useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { sortable } from '@patternfly/react-table';
 
@@ -25,6 +27,8 @@ type UseUserInstancetypeListColumns = (
 
 const useUserInstancetypeListColumns: UseUserInstancetypeListColumns = (pagination, data) => {
   const { t } = useKubevirtTranslation();
+  const isACMPage = useIsACMPage();
+  const cluster = useClusterParam();
   const [activeNamespace] = useActiveNamespace();
 
   const sorting = useCallback(
@@ -44,6 +48,16 @@ const useUserInstancetypeListColumns: UseUserInstancetypeListColumns = (paginati
       title: t('Name'),
       transforms: [sortable],
     },
+    ...(isACMPage && !cluster
+      ? [
+          {
+            id: 'cluster',
+            sort: (_, direction) => sorting(direction, 'cluster'),
+            title: t('Cluster'),
+            transforms: [sortable],
+          },
+        ]
+      : []),
     ...(activeNamespace === ALL_NAMESPACES_SESSION_KEY
       ? [
           {

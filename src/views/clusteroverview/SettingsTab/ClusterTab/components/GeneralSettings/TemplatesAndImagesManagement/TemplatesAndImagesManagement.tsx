@@ -8,6 +8,7 @@ import AutomaticImagesDownload from '@overview/SettingsTab/ClusterTab/components
 import BootableVolumeProjectSection from '@overview/SettingsTab/ClusterTab/components/GeneralSettings/TemplatesAndImagesManagement/components/BootableVolumeProjectSection/BootableVolumeProjectSection';
 import TemplatesProjectSection from '@overview/SettingsTab/ClusterTab/components/GeneralSettings/TemplatesAndImagesManagement/components/TemplatesProjectSection/TemplatesProjectSection';
 import ExpandSection from '@overview/SettingsTab/ExpandSection/ExpandSection';
+import { CLUSTER_TAB_IDS } from '@overview/SettingsTab/search/constants';
 import { Stack, StackItem } from '@patternfly/react-core';
 
 type TemplatesAndImagesManagementProps = {
@@ -26,7 +27,10 @@ const TemplatesAndImagesManagement: FC<TemplatesAndImagesManagementProps> = ({
   });
 
   return (
-    <ExpandSection toggleText={t('Templates and images management')}>
+    <ExpandSection
+      searchItemId={CLUSTER_TAB_IDS.templatesManagement}
+      toggleText={t('Templates and images management')}
+    >
       <Stack hasGutter>
         <StackItem>
           <AutomaticImagesDownload

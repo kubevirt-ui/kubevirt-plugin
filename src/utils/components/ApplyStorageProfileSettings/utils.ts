@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-shadow */
-import { TFunction } from 'react-i18next';
 import { uniq } from 'lodash';
 
 import {
@@ -9,54 +7,14 @@ import {
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ClaimPropertySets } from '@kubevirt-utils/types/storage';
 
-export const tooltipForOtherRecommended = (priority: number, t: TFunction): string => {
-  switch (priority) {
-    case 1:
-      return t('The 2nd most suggested option in StorageProfile.');
-    case 2:
-      return t('The 3rd most suggested option in StorageProfile.');
-    default:
-      return t('The {{priority}}th most suggested option in StorageProfile.', {
-        priority: priority + 1,
-      });
-  }
-};
-
-export const fromPriorityToLabels = (
-  priority: number,
-  recommendationCount: number,
-  t: TFunction,
-): { className?: string; label: string; tooltip: string } => {
-  if (priority === 0) {
-    return {
-      className: 'pf-m-success',
-      label: t('Highly recommended'),
-      tooltip: t('The most suggested StorageProfile option.'),
-    };
-  }
-
-  if (priority > 0 && priority < recommendationCount) {
-    return {
-      label: t('Recommended'),
-      tooltip: tooltipForOtherRecommended(priority, t),
-    };
-  }
-
-  return {
-    className: 'pf-m-warning',
-    label: t('Not recommended'),
-    tooltip: t('We suggest using another option.'),
-  };
-};
-
 export const ACCESS_MODE_RADIO_OPTIONS = [
-  {
-    label: t('Single user (RWO)'),
-    value: V1beta1StorageSpecAccessModesEnum.ReadWriteOnce,
-  },
   {
     label: t('Shared access (RWX)'),
     value: V1beta1StorageSpecAccessModesEnum.ReadWriteMany,
+  },
+  {
+    label: t('Single user (RWO)'),
+    value: V1beta1StorageSpecAccessModesEnum.ReadWriteOnce,
   },
   {
     label: t('Read only (ROX)'),
@@ -66,12 +24,12 @@ export const ACCESS_MODE_RADIO_OPTIONS = [
 
 export const VOLUME_MODE_RADIO_OPTIONS = [
   {
-    label: t('Filesystem'),
-    value: V1beta1StorageSpecVolumeModeEnum.Filesystem,
-  },
-  {
     label: t('Block'),
     value: V1beta1StorageSpecVolumeModeEnum.Block,
+  },
+  {
+    label: t('Filesystem'),
+    value: V1beta1StorageSpecVolumeModeEnum.Filesystem,
   },
 ];
 

@@ -13,9 +13,11 @@ import { PageSection, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
 import { isRunning } from '@virtualmachines/utils';
 
+import ConfigurationSearch from '../../../../../utils/components/ConfigurationSearch/ConfigurationSearch';
 import { getNamespace } from '../../../../cdi-upload-provider/utils/selectors';
 
-import VirtualMachineConfigurationTabSearch from './search/VirtualMachineConfigurationTabSearch';
+import { createConfigurationSearchURL } from './search/utils/utils';
+import { getSearchItems } from './utils/search';
 import { getInnerTabFromPath, getTabs, includesConfigurationPath } from './utils/utils';
 
 import './virtual-machine-configuration-tab.scss';
@@ -52,9 +54,14 @@ const VirtualMachineConfigurationTab: FC<NavPageComponentProps> = ({
     innerTab && setActiveTabKey(innerTab);
   }, [location.pathname, t]);
 
+  const searchItems = useMemo(() => getSearchItems(vm), [vm]);
+
   return (
     <PageSection className="VirtualMachineConfigurationTab">
-      <VirtualMachineConfigurationTabSearch vm={vm} />
+      <ConfigurationSearch
+        createSearchURL={createConfigurationSearchURL}
+        searchItems={searchItems}
+      />
       <div className="VirtualMachineConfigurationTab--body">
         <Tabs activeKey={activeTabKey} className="VirtualMachineConfigurationTab--main" isVertical>
           {tabs.map(({ Component, name, title }) => (

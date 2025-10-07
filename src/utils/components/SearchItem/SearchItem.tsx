@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
-import { useLocation } from 'react-router-dom-v5-compat';
 import classNames from 'classnames';
+
+import { useIsHighlighted } from './useIsHighlighted';
 
 import './search-item.scss';
 
@@ -9,11 +10,9 @@ type SearchItemProps = {
 };
 
 const SearchItem: FC<SearchItemProps> = ({ children, id }) => {
-  const location = useLocation();
+  const isHighlighted = useIsHighlighted(id);
 
-  const isColored = location?.hash?.toLowerCase().endsWith(id.toLowerCase());
-
-  return <div className={classNames({ isColored })}>{children}</div>;
+  return <span className={classNames({ isHighlighted })}>{children}</span>;
 };
 
 export default SearchItem;

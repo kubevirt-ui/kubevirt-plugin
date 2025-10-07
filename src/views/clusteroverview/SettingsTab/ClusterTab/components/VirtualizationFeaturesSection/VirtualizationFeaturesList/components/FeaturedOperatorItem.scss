@@ -1,5 +1,7 @@
 .featured-operator-item {
-  padding-left: var(--pf-t--global--spacer--lg);
+  &__link-button {
+    margin-left: -0.5rem;
+  }
 
   &__icon-container {
     margin-inline-start: auto;

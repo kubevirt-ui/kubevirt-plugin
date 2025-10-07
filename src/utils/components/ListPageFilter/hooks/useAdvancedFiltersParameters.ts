@@ -12,11 +12,10 @@ export const useAdvancedFiltersParameters = (advancedFilters: RowFilter[]) => {
   const advancedFiltersObject = useMemo(() => {
     const filters = advancedFilters.reduce<Record<string, FilterInfo>>(
       (acc, { filterGroupName, type }) => {
-        const queryKey = getRowFilterQueryKey(type);
-        const query = queryParams.get(queryKey);
+        const query = queryParams.get(getRowFilterQueryKey(type));
 
         if (query) {
-          acc[queryKey] = {
+          acc[type] = {
             filterGroupName,
             query,
           };

@@ -13,6 +13,8 @@ import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMac
 import useDefaultStorageClass from '@kubevirt-utils/hooks/useDefaultStorage/useDefaultStorageClass';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { DescriptionList } from '@patternfly/react-core';
 
 import DiskSize from './DiskSize';
@@ -23,6 +25,8 @@ import './details-right-grid.scss';
 
 const DetailsRightGrid: FC = () => {
   const { t } = useKubevirtTranslation();
+  const isACMPage = useIsACMPage();
+  const cluster = useClusterParam();
   const { createModal } = useModal();
   const [{ clusterDefaultStorageClass, sortedStorageClasses, virtDefaultStorageClass }, loaded] =
     useDefaultStorageClass();
@@ -54,6 +58,9 @@ const DetailsRightGrid: FC = () => {
 
   return (
     <DescriptionList isHorizontal>
+      {isACMPage && (
+        <VirtualMachineDescriptionItem descriptionData={cluster} descriptionHeader={t('Cluster')} />
+      )}
       <VirtualMachineDescriptionItem
         descriptionData={isChangingNamespace ? <Loading /> : vmNamespaceTarget}
         descriptionHeader={t('Project')}

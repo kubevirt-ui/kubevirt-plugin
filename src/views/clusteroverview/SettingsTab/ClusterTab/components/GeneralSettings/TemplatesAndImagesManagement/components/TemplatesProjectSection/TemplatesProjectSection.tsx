@@ -4,6 +4,7 @@ import { Trans } from 'react-i18next';
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { CLUSTER_TAB_IDS } from '@overview/SettingsTab/search/constants';
 
 import GeneralSettingsProject from '../../../shared/GeneralSettingsProject';
 
@@ -42,6 +43,7 @@ const TemplatesProjectSection: FC<TemplatesProjectSectionProps> = ({
       namespace={OPENSHIFT}
       onChange={updateHCOCommonTemplatesNamespace}
       projectsData={projectsData}
+      searchItemId={CLUSTER_TAB_IDS.templatesProject}
       toggleText={t('Template project')}
     />
   );

@@ -21,7 +21,10 @@ import {
   VirtualMachineConfigurationTabInner,
   VirtualMachineDetailsTab,
 } from '@kubevirt-utils/constants/tabs-constants';
-import { getInstanceTypeNameFromAnnotation } from '@kubevirt-utils/resources/instancetype/helper';
+import {
+  getInstanceTypeNameFromAnnotation,
+  isInstanceTypeVM,
+} from '@kubevirt-utils/resources/instancetype/helper';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import {
   getAffinity,
@@ -301,7 +304,7 @@ export const getChangedDedicatedResources = (
   vmi: V1VirtualMachineInstance,
   currentSelection: boolean,
 ): boolean => {
-  if (isEmpty(vm) || isEmpty(vmi)) {
+  if (isEmpty(vm) || isEmpty(vmi) || isInstanceTypeVM(vm)) {
     return false;
   }
   const vmDedicatedResources = getCPU(vm)?.dedicatedCpuPlacement || false;

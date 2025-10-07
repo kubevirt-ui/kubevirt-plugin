@@ -23,6 +23,7 @@ type GeneralSettingsProjectProps = {
     handleLoading: (value: boolean) => void,
   ) => void;
   projectsData: [projects: K8sResourceCommon[], loaded: boolean, error: any];
+  searchItemId?: string;
   toggleText: string;
 };
 
@@ -33,6 +34,7 @@ const GeneralSettingsProject: FC<GeneralSettingsProjectProps> = ({
   namespace,
   onChange,
   projectsData,
+  searchItemId,
   toggleText,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -56,7 +58,11 @@ const GeneralSettingsProject: FC<GeneralSettingsProjectProps> = ({
   };
 
   return (
-    <ExpandSection className="project-tab__main" toggleText={toggleText}>
+    <ExpandSection
+      className="project-tab__main"
+      searchItemId={searchItemId}
+      toggleText={toggleText}
+    >
       <Content className="project-tab__main--help" component={ContentVariants.small}>
         {description}
       </Content>

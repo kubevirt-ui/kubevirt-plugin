@@ -18,7 +18,7 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTolerations } from '@kubevirt-utils/resources/vm';
 import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
-import { Form, ModalVariant, Stack, StackItem } from '@patternfly/react-core';
+import { ModalVariant, Stack, StackItem } from '@patternfly/react-core';
 
 import { TolerationLabel } from './utils/constants';
 import { getNodeTaintQualifier } from './utils/helpers';
@@ -102,7 +102,7 @@ const TolerationsModal: React.FC<TolerationsModalProps> = ({
           <TolerationModalDescriptionText />
         </StackItem>
         <StackItem>
-          <Form>
+          <div className="pf-c-form">
             <LabelsList
               addRowText={t('Add toleration')}
               emptyStateAddRowText={t('Add toleration to specify qualifying Nodes')}
@@ -130,7 +130,7 @@ const TolerationsModal: React.FC<TolerationsModalProps> = ({
                 qualifiedNodes={tolerationsLabels?.length === 0 ? nodes : qualifiedNodes}
               />
             )}
-          </Form>
+          </div>
         </StackItem>
       </Stack>
     </TabModal>

@@ -21,6 +21,10 @@ export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
   VirtualMachineSearchResults: './views/virtualmachines/search/VirtualMachineSearchResults.tsx',
 };
 
+const CLUSTER_INSTANCETYPE_PATH =
+  'instancetype.kubevirt.io~v1beta1~VirtualMachineClusterInstancetype';
+const INSTANCETYPE_PATH = 'instancetype.kubevirt.io~v1beta1~VirtualMachineInstancetype';
+
 export const extensions: EncodedExtension[] = [
   {
     flags: {
@@ -73,6 +77,25 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.navigation/href',
   } as EncodedExtension<HrefNavItem>,
+
+  {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC_ACM'],
+    },
+    properties: {
+      dataAttributes: {
+        'data-border': 'no-border',
+        'data-class': 'kv-plugin-virt-perspective-element',
+        'data-quickstart-id': 'qs-nav-instancetype',
+        'data-test-id': 'instancetype-nav-item',
+      },
+      href: `/k8s/all-clusters/${CLUSTER_INSTANCETYPE_PATH}`,
+      id: 'instancetype-virt-perspective',
+      name: '%plugin__kubevirt-plugin~InstanceTypes%',
+      perspective: 'fleet-virtualization-perspective',
+    },
+    type: 'console.navigation/href',
+  } as EncodedExtension<HrefNavItem>,
   {
     flags: {
       required: ['KUBEVIRT_DYNAMIC_ACM'],
@@ -100,7 +123,28 @@ export const extensions: EncodedExtension[] = [
       ],
     },
     type: 'console.page/route',
-  },
+  } as EncodedExtension<RoutePage>,
+  {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC_ACM'],
+    },
+    properties: {
+      component: {
+        $codeRef: 'InstanceTypePage',
+      },
+      path: [
+        `/k8s/cluster/:cluster/ns/:ns/${CLUSTER_INSTANCETYPE_PATH}/:name`,
+        `/k8s/cluster/:cluster/ns/:ns/${CLUSTER_INSTANCETYPE_PATH}`,
+        `/k8s/cluster/:cluster/${CLUSTER_INSTANCETYPE_PATH}`,
+        `/k8s/all-clusters/${CLUSTER_INSTANCETYPE_PATH}`,
+        `/k8s/cluster/:cluster/ns/:ns/${INSTANCETYPE_PATH}/:name`,
+        `/k8s/cluster/:cluster/ns/:ns/${INSTANCETYPE_PATH}`,
+        `/k8s/cluster/:cluster/all-namespaces/${INSTANCETYPE_PATH}`,
+        `/k8s/all-clusters/all-namespaces/${INSTANCETYPE_PATH}`,
+      ],
+    },
+    type: 'console.page/route',
+  } as EncodedExtension<RoutePage>,
   {
     properties: {
       component: { $codeRef: 'VirtualMachineSearchResults' },
@@ -158,8 +202,20 @@ export const extensions: EncodedExtension[] = [
     properties: {
       handler: { $codeRef: 'urls.getFleetResourceRoute' },
       model: {
-        group: 'kubevirt.io',
-        kind: 'VirtualMachineInstance',
+        group: 'instancetype.kubevirt.io',
+        kind: 'VirtualMachineClusterInstancetype',
+        version: 'v1beta1',
+      },
+    },
+    type: 'acm.resource/route',
+  } as EncodedExtension<ResourceRoute>,
+  {
+    properties: {
+      handler: { $codeRef: 'urls.getFleetResourceRoute' },
+      model: {
+        group: 'instancetype.kubevirt.io',
+        kind: 'VirtualMachineInstancetype',
+        version: 'v1beta1',
       },
     },
     type: 'acm.resource/route',

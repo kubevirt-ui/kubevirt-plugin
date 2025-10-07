@@ -1,7 +1,9 @@
-import React, { FC, ReactNode, useEffect, useState } from 'react';
+import React, { FC, ReactNode, useEffect } from 'react';
 import classNames from 'classnames';
 
 import { ExpandableSection } from '@patternfly/react-core';
+
+import useIsExpandedAndHighlighted from './hooks/useIsExpandedAndHighlighted';
 
 import './ExpandSection.scss';
 
@@ -10,6 +12,7 @@ type ExpandSectionProps = {
   dataTestID?: string;
   isDisabled?: boolean;
   isIndented?: boolean;
+  searchItemId?: string;
   toggleContent?: ReactNode;
   toggleText?: string;
 };
@@ -20,10 +23,11 @@ const ExpandSection: FC<ExpandSectionProps> = ({
   dataTestID,
   isDisabled = false,
   isIndented = true,
+  searchItemId,
   toggleContent = null,
   toggleText = '',
 }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const { isExpanded, isHighlighted, setIsExpanded } = useIsExpandedAndHighlighted(searchItemId);
 
   useEffect(() => {
     if (isDisabled) setIsExpanded(false);
@@ -33,7 +37,11 @@ const ExpandSection: FC<ExpandSectionProps> = ({
 
   return (
     <ExpandableSection
-      className={classNames(className, { 'expand-section__disabled': isDisabled }, 'ExpandSection')}
+      className={classNames(
+        className,
+        { 'expand-section__disabled': isDisabled, isHighlighted },
+        'ExpandSection',
+      )}
       data-test-id={dataTestID}
       isExpanded={isExpanded}
       isIndented={isIndented}

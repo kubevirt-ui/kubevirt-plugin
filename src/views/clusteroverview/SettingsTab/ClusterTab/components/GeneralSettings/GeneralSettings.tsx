@@ -4,6 +4,7 @@ import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfigurat
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import TemplatesAndImagesManagement from '@overview/SettingsTab/ClusterTab/components/GeneralSettings/TemplatesAndImagesManagement/TemplatesAndImagesManagement';
 import VMActionsConfirmation from '@overview/SettingsTab/ClusterTab/components/GeneralSettings/VMActionsConfirmation/VMActionsConfirmation';
+import { CLUSTER_TAB_IDS } from '@overview/SettingsTab/search/constants';
 import { Stack, StackItem } from '@patternfly/react-core';
 
 import ExpandSection from '../../../ExpandSection/ExpandSection';
@@ -21,7 +22,10 @@ const GeneralSettings: FC<GeneralSettingsProps> = ({ hyperConvergeConfiguration,
   const { t } = useKubevirtTranslation();
 
   return (
-    <ExpandSection toggleText={t('General settings')}>
+    <ExpandSection
+      searchItemId={CLUSTER_TAB_IDS.generalSettings}
+      toggleText={t('General settings')}
+    >
       <Stack hasGutter>
         <StackItem isFilled>
           <LiveMigrationSection hyperConvergeConfiguration={hyperConvergeConfiguration} />

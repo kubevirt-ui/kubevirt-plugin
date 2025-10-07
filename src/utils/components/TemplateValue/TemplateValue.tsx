@@ -12,12 +12,12 @@ type TemplateNameTableDataProps = {
 const TemplateNameTableData: React.FC<TemplateNameTableDataProps> = ({ children, value }) => {
   const { t } = useKubevirtTranslation();
   return (
-    <div className="template-value">
+    <span className="template-value">
       {children || value}
       {isTemplateParameter(value) && (
         <div className="template-parameter">{t('Template parameter')}</div>
       )}
-    </div>
+    </span>
   );
 };
 

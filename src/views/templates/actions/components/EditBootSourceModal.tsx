@@ -66,63 +66,61 @@ const EditBootSourceModal: FC<EditBootSourceModalProps> = ({
   const popoverRef = useRef<HTMLButtonElement>(null);
 
   return (
-    <>
-      <TabModal<K8sResourceCommon>
-        headerText={t('Edit boot source reference')}
-        isOpen={isOpen}
-        obj={obj}
-        onClose={onClose}
-        onSubmit={onSubmit}
+    <TabModal<K8sResourceCommon>
+      headerText={t('Edit boot source reference')}
+      isOpen={isOpen}
+      obj={obj}
+      onClose={onClose}
+      onSubmit={onSubmit}
+    >
+      <Alert
+        className="margin-bottom-md"
+        isInline
+        title={t('Warning')}
+        variant={AlertVariant.warning}
       >
-        <Alert
-          className="margin-bottom-md"
-          isInline
-          title={t('Warning')}
-          variant={AlertVariant.warning}
-        >
-          <Trans ns="plugin__kubevirt-plugin">
-            Editing the DataSource will affect{' '}
-            <Button isInline ref={popoverRef} variant={ButtonVariant.link}>
-              all templates
-            </Button>{' '}
-            that are currently using this DataSource.
-          </Trans>
-        </Alert>
-        <Popover
-          bodyContent={(affectedTemplates || []).map((template) => (
-            <ResourceLink
-              groupVersionKind={modelToGroupVersionKind(TemplateModel)}
-              key={template.metadata.uid}
-              linkTo={false}
-              name={template.metadata.name}
-              namespace={template.metadata.namespace}
-            />
-          ))}
-          headerContent={t('Affected templates')}
-          triggerRef={popoverRef}
-        />
+        <Trans ns="plugin__kubevirt-plugin">
+          Editing the DataSource will affect{' '}
+          <Button isInline ref={popoverRef} variant={ButtonVariant.link}>
+            all templates
+          </Button>{' '}
+          that are currently using this DataSource.
+        </Trans>
+      </Alert>
+      <Popover
+        bodyContent={(affectedTemplates || []).map((template) => (
+          <ResourceLink
+            groupVersionKind={modelToGroupVersionKind(TemplateModel)}
+            key={template.metadata.uid}
+            linkTo={false}
+            name={template.metadata.name}
+            namespace={template.metadata.namespace}
+          />
+        ))}
+        headerContent={t('Affected templates')}
+        triggerRef={popoverRef}
+      />
 
-        <Form>
-          <FormGroup fieldId="boot-source-type" isRequired>
-            {loading ? (
-              <SelectSourceSkeleton />
-            ) : (
-              <SelectSource
-                sourceOptions={[
-                  SOURCE_TYPES.pvcSource,
-                  SOURCE_TYPES.registrySource,
-                  SOURCE_TYPES.httpSource,
-                ]}
-                onSourceChange={setBootSource}
-                source={bootSource}
-                sourceLabel={t('Boot source type')}
-                withSize
-              />
-            )}
-          </FormGroup>
-        </Form>
-      </TabModal>
-    </>
+      <Form>
+        <FormGroup fieldId="boot-source-type" isRequired>
+          {loading ? (
+            <SelectSourceSkeleton />
+          ) : (
+            <SelectSource
+              sourceOptions={[
+                SOURCE_TYPES.pvcSource,
+                SOURCE_TYPES.registrySource,
+                SOURCE_TYPES.httpSource,
+              ]}
+              onSourceChange={setBootSource}
+              source={bootSource}
+              sourceLabel={t('Boot source type')}
+              withSize
+            />
+          )}
+        </FormGroup>
+      </Form>
+    </TabModal>
   );
 };
 

@@ -1,12 +1,14 @@
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
+import ConfigurationSearch from '@kubevirt-utils/components/ConfigurationSearch/ConfigurationSearch';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { PageSection, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
-import VirtualMachineConfigurationTabSearch from '@virtualmachines/details/tabs/configuration/search/VirtualMachineConfigurationTabSearch';
+import { createConfigurationSearchURL } from '@virtualmachines/details/tabs/configuration/search/utils/utils';
+import { getSearchItems } from '@virtualmachines/details/tabs/configuration/utils/search';
 import {
   getInnerTabFromPath,
   includesConfigurationPath,
@@ -44,13 +46,18 @@ const CustomizeInstanceTypeConfigurationTab: FC = () => {
     innerTab && setActiveTabKey(innerTab);
   }, [location.pathname, t]);
 
+  const searchItems = useMemo(() => getSearchItems(vm), [vm]);
+
   if (!vm) {
     return <Loading />;
   }
 
   return (
     <PageSection className="ConfigurationTab">
-      <VirtualMachineConfigurationTabSearch vm={vm} />
+      <ConfigurationSearch
+        createSearchURL={createConfigurationSearchURL}
+        searchItems={searchItems}
+      />
       <div className="ConfigurationTab--body">
         <Tabs activeKey={activeTabKey} className="ConfigurationTab--main" isVertical>
           {tabs.map(({ Component, name, title }) => (

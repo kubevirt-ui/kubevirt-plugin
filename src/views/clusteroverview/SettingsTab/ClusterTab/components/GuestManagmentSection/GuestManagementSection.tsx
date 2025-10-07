@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { CLUSTER_TAB_IDS } from '@overview/SettingsTab/search/constants';
 import { Stack, StackItem } from '@patternfly/react-core';
 
 import ExpandSection from '../../../ExpandSection/ExpandSection';
@@ -21,7 +22,10 @@ const GuestManagementSection: FC<GuestManagementSectionProps> = ({
   const { t } = useKubevirtTranslation();
 
   return (
-    <ExpandSection toggleText={t('Guest management')}>
+    <ExpandSection
+      searchItemId={CLUSTER_TAB_IDS.guestManagement}
+      toggleText={t('Guest management')}
+    >
       <Stack hasGutter>
         <StackItem isFilled>
           <GuestSystemLogsAccess

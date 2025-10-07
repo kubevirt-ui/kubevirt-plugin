@@ -7,6 +7,7 @@ import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
+import { CLUSTER_TAB_IDS } from '@overview/SettingsTab/search/constants';
 import {
   Alert,
   AlertVariant,
@@ -57,8 +58,11 @@ const PersistentReservationSection: FC<PersistentReservationSectionProps> = ({
   };
 
   return (
-    <ExpandSection toggleText={t('SCSI persistent reservation')}>
-      <Split className="settings-tab--indented">
+    <ExpandSection
+      searchItemId={CLUSTER_TAB_IDS.persistentReservation}
+      toggleText={t('SCSI persistent reservation')}
+    >
+      <Split>
         <SplitItem isFilled>
           {t('Enable persistent reservation')}{' '}
           <HelpTextIcon

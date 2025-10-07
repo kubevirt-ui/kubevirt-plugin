@@ -15,6 +15,8 @@ import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import {
   Alert,
   AlertVariant,
@@ -46,6 +48,8 @@ type TemplatesCatalogDrawerCreateFormProps = {
 export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFormProps> = memo(
   ({ authorizedSSHKey, namespace, onCancel, subscriptionData }) => {
     const { t } = useKubevirtTranslation();
+    const isACMPage = useIsACMPage();
+    const cluster = useClusterParam();
 
     const { isBootSourceAvailable, templateLoadingError } = useDrawerContext();
     const [__, vmsNotSupported] = useNamespaceUDN(namespace);
@@ -118,6 +122,16 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
                     />
                   </DescriptionList>
                 </SplitItem>
+                {isACMPage && (
+                  <SplitItem>
+                    <DescriptionList>
+                      <VirtualMachineDescriptionItem
+                        descriptionData={cluster}
+                        descriptionHeader={t('Cluster')}
+                      />
+                    </DescriptionList>
+                  </SplitItem>
+                )}
                 <AuthorizedSSHKey authorizedSSHKey={authorizedSSHKey} namespace={namespace} />
               </Split>
             </StackItem>

@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { USER_TAB_IDS } from '@overview/SettingsTab/search/constants';
 import { Stack } from '@patternfly/react-core';
 
 import ExpandSection from '../../../ExpandSection/ExpandSection';
@@ -12,7 +13,11 @@ const ManageSSHKeySection: FC = () => {
   const { t } = useKubevirtTranslation();
 
   return (
-    <ExpandSection dataTestID="settings-user-ssh-key" toggleText={t('Manage SSH keys')}>
+    <ExpandSection
+      dataTestID="settings-user-ssh-key"
+      searchItemId={USER_TAB_IDS.sshKeys}
+      toggleText={t('Manage SSH keys')}
+    >
       <Stack hasGutter>
         <MutedTextSpan
           text={t(
