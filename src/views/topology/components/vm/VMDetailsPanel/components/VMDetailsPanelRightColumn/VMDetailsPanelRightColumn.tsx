@@ -21,11 +21,12 @@ import VMUserCredentialsDetailsItem from './components/VMUserCredentialsDetailsI
 import VMWorkloadProfileDetailsItem from './components/VMWorkloadProfileDetailsItem';
 
 export type VMResourceListProps = {
+  instanceTypeVM?: V1VirtualMachine;
   vm?: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
 
-const VMDetailsPanelRightColumn: FC<VMResourceListProps> = ({ vm, vmi }) => {
+const VMDetailsPanelRightColumn: FC<VMResourceListProps> = ({ instanceTypeVM, vm, vmi }) => {
   const { pods } = useVMIAndPodsForVM(getName(vm), getNamespace(vm));
   const launcherPod = getVMIPod(vmi, pods);
   const vmHasS390xArchitecture = hasS390xArchitecture(vm);
@@ -37,7 +38,7 @@ const VMDetailsPanelRightColumn: FC<VMResourceListProps> = ({ vm, vmi }) => {
     >
       <VMStatusDetailsItem vm={vm} vmi={vmi} />
       <VMPodDetailsItem pods={pods} vmi={vmi} />
-      <VMBootOrderDetailsItem vm={vm} vmi={vmi} />
+      <VMBootOrderDetailsItem instanceTypeVM={instanceTypeVM} vm={vm} vmi={vmi} />
       <VMIPAddressesDetailsItem launcherPod={launcherPod} vmi={vmi} />
       <VMHostnameDetailsItem vm={vm} vmi={vmi} />
       <VMTimezoneDetailsItem vmi={vmi} />
