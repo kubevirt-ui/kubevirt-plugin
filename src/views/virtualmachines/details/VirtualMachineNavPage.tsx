@@ -16,6 +16,7 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { getVMURL } from '@multicluster/urls';
 import { DocumentTitle } from '@openshift-console/dynamic-plugin-sdk';
+import { useSignals } from '@preact/signals-react/runtime';
 
 import { useVirtualMachineTabs } from './hooks/useVirtualMachineTabs';
 import VirtualMachineNavPageTitle from './VirtualMachineNavPageTitle';
@@ -23,6 +24,7 @@ import VirtualMachineNavPageTitle from './VirtualMachineNavPageTitle';
 import './virtual-machine-page.scss';
 
 const VirtualMachineNavPage: FC = () => {
+  useSignals();
   const {
     cluster,
     name,
