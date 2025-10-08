@@ -5,12 +5,11 @@ import CreateResourceDefaultPage from '@kubevirt-utils/components/CreateResource
 import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
-import { ListPageHeader, OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
+import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import { Divider } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
-import SearchBar from '@search/components/SearchBar';
 import VirtualMachineNavPage from '@virtualmachines/details/VirtualMachineNavPage';
-import VirtualMachinesCreateButton from '@virtualmachines/list/components/VirtualMachinesCreateButton/VirtualMachinesCreateButton';
+import VirtualMachinesListPageHeader from '@virtualmachines/list/components/VirtualMachinesListPageHeader';
 import VirtualMachinesList from '@virtualmachines/list/VirtualMachinesList';
 import { useTreeViewData } from '@virtualmachines/tree/hooks/useTreeViewData';
 import VirtualMachineTreeView from '@virtualmachines/tree/VirtualMachineTreeView';
@@ -47,12 +46,7 @@ const VirtualMachineNavigator: FC = () => {
         />
       ) : (
         <>
-          <ListPageHeader title={t('VirtualMachines')}>
-            <SearchBar onFilterChange={onFilterChange} />
-            <div>
-              <VirtualMachinesCreateButton namespace={namespace} />
-            </div>
-          </ListPageHeader>
+          <VirtualMachinesListPageHeader namespace={namespace} onFilterChange={onFilterChange} />
           <Divider />
           <VirtualMachineTreeView onFilterChange={onFilterChange} {...treeProps}>
             {isVirtualMachineListPage ? (
