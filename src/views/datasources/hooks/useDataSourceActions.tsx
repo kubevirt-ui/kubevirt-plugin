@@ -16,7 +16,9 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { VolumeSnapshotModel } from '@kubevirt-utils/models';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import { Action, k8sGet, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sGet, kubevirtK8sPatch } from '@multicluster/k8sRequests';
+import { Action } from '@openshift-console/dynamic-plugin-sdk';
 import { Split, SplitItem } from '@patternfly/react-core';
 
 import DeleteDataSourceModal from '../actions/DeleteDataSourceModal/DeleteDataSourceModal';
@@ -40,7 +42,7 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataS
   const lazyLoadDataImportCron = useCallback(() => {
     if (dataImportCronName && !dataImportCron && !isOwnedBySSP) {
       setIsLoading(true);
-      k8sGet<V1beta1DataImportCron>({
+      kubevirtK8sGet<V1beta1DataImportCron>({
         model: DataImportCronModel,
         name: dataImportCronName,
         ns: dataSource?.metadata?.namespace,
@@ -58,7 +60,7 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataS
           createModal(({ isOpen, onClose }) => (
             <LabelsModal
               onLabelsSubmit={(labels) =>
-                k8sPatch({
+                kubevirtK8sPatch({
                   data: [
                     {
                       op: 'replace',
@@ -84,7 +86,7 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataS
           createModal(({ isOpen, onClose }) => (
             <AnnotationsModal
               onSubmit={(updatedAnnotations) =>
-                k8sPatch({
+                kubevirtK8sPatch({
                   data: [
                     {
                       op: 'replace',
@@ -110,6 +112,7 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataS
           if (isEmpty(dataSource?.spec?.source?.snapshot?.name)) {
             createModal(({ isOpen, onClose }) => (
               <ExportModal
+                cluster={getCluster(dataSource)}
                 isOpen={isOpen}
                 namespace={dataSource?.spec?.source?.pvc?.namespace}
                 onClose={onClose}
@@ -120,7 +123,7 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataS
             return;
           }
 
-          const volumeSnapshot = await k8sGet<VolumeSnapshotKind>({
+          const volumeSnapshot = await kubevirtK8sGet<VolumeSnapshotKind>({
             model: VolumeSnapshotModel,
             name: dataSource?.spec?.source?.snapshot?.name,
             ns: dataSource?.spec?.source?.snapshot?.namespace,
@@ -128,6 +131,7 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (dataS
 
           createModal(({ isOpen, onClose }) => (
             <ExportModal
+              cluster={getCluster(dataSource)}
               isOpen={isOpen}
               namespace={dataSource?.spec?.source?.snapshot?.namespace}
               onClose={onClose}

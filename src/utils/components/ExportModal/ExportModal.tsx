@@ -2,11 +2,11 @@ import React, { FC, useState } from 'react';
 
 import { IoK8sApiCoreV1Pod } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import { modelToGroupVersionKind, PodModel } from '@kubevirt-utils/models';
 import { createUserPasswordSecret } from '@kubevirt-utils/resources/secret/utils';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
   AlertVariant,
@@ -26,6 +26,7 @@ import ViewPodLogLink from './ViewPodLogLink';
 import './export-modal.scss';
 
 type ExportModalProps = {
+  cluster: string;
   isOpen: boolean;
   namespace: string;
   onClose: () => void;
@@ -33,7 +34,14 @@ type ExportModalProps = {
   vmName?: string;
 };
 
-const ExportModal: FC<ExportModalProps> = ({ isOpen, namespace, onClose, pvcName, vmName }) => {
+const ExportModal: FC<ExportModalProps> = ({
+  cluster,
+  isOpen,
+  namespace,
+  onClose,
+  pvcName,
+  vmName,
+}) => {
   const { t } = useKubevirtTranslation();
 
   const [registryName, setRegistryName] = useState(() => `registry-${getRandomChars()}`);
@@ -43,14 +51,15 @@ const ExportModal: FC<ExportModalProps> = ({ isOpen, namespace, onClose, pvcName
 
   const [createdPod, setCreatedPod] = useState<IoK8sApiCoreV1Pod>();
 
-  const [uploadPod] = useK8sWatchResource<IoK8sApiCoreV1Pod>(
+  const [uploadPod] = useKubevirtWatchResource<IoK8sApiCoreV1Pod>(
     createdPod
       ? {
+          cluster,
           groupVersionKind: modelToGroupVersionKind(PodModel),
           name: getName(createdPod),
           namespace: getNamespace(createdPod),
         }
-      : null,
+      : {},
   );
 
   const uploadInProgress = exportInProgress(uploadPod || createdPod);
@@ -61,13 +70,14 @@ const ExportModal: FC<ExportModalProps> = ({ isOpen, namespace, onClose, pvcName
         const secretName = `registry-secret-${getRandomChars()}`;
 
         try {
-          await createServiceAccount(namespace);
+          await createServiceAccount(cluster, namespace);
         } catch (error) {
           if (error.code !== ALREADY_CREATED_ERROR_CODE) throw error;
         }
 
-        await createUserPasswordSecret({ namespace, password, secretName, username });
+        await createUserPasswordSecret({ cluster, namespace, password, secretName, username });
         const pod = await createUploaderPod({
+          cluster,
           destination,
           namespace,
           secretName,

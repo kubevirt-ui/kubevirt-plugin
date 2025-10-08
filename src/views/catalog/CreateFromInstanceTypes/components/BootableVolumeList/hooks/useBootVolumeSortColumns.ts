@@ -16,6 +16,7 @@ import {
 import { getVolumeSnapshotStorageClass } from '@kubevirt-utils/resources/bootableresources/selectors';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import {
+  ClusterNamespacedResourceMap,
   getName,
   getNamespace,
   NamespacedResourceMap,
@@ -31,13 +32,13 @@ type UseBootVolumeSortColumns = (
   volumeFavorites: string[],
   clusterPreferencesMap: ResourceMap<V1beta1VirtualMachineClusterPreference>,
   userPreferencesMap: NamespacedResourceMap<V1beta1VirtualMachinePreference>,
-  pvcSources: NamespacedResourceMap<IoK8sApiCoreV1PersistentVolumeClaim>,
+  pvcSources: ClusterNamespacedResourceMap<IoK8sApiCoreV1PersistentVolumeClaim>,
   volumeSnapshotSources: {
     [datSourceName: string]: VolumeSnapshotKind;
   },
   pagination: PaginationState,
   includeNamespaceColumn: boolean,
-  dvSources: NamespacedResourceMap<V1beta1DataVolume>,
+  dvSources: ClusterNamespacedResourceMap<V1beta1DataVolume>,
 ) => {
   getSortType: (columnIndex: number) => ThSortType;
   sortedData: BootableVolume[];

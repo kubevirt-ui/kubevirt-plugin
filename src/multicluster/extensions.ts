@@ -40,9 +40,6 @@ export const extensions: EncodedExtension[] = [
     type: 'console.perspective',
   },
   {
-    flags: {
-      required: ['KUBEVIRT_DYNAMIC_ACM'],
-    },
     properties: {
       dataAttributes: {
         'data-border': 'no-border',
@@ -58,11 +55,7 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.navigation/href',
   } as EncodedExtension<HrefNavItem>,
-
   {
-    flags: {
-      required: ['KUBEVIRT_DYNAMIC_ACM'],
-    },
     properties: {
       dataAttributes: {
         'data-border': 'no-border',
@@ -79,9 +72,6 @@ export const extensions: EncodedExtension[] = [
   } as EncodedExtension<HrefNavItem>,
 
   {
-    flags: {
-      required: ['KUBEVIRT_DYNAMIC_ACM'],
-    },
     properties: {
       dataAttributes: {
         'data-border': 'no-border',
@@ -92,6 +82,29 @@ export const extensions: EncodedExtension[] = [
       href: `/k8s/all-clusters/${CLUSTER_INSTANCETYPE_PATH}`,
       id: 'instancetype-virt-perspective',
       name: '%plugin__kubevirt-plugin~InstanceTypes%',
+      perspective: 'fleet-virtualization-perspective',
+    },
+    type: 'console.navigation/href',
+  } as EncodedExtension<HrefNavItem>,
+  {
+    properties: {
+      id: 'VirtualizationSeparator',
+      insertAfter: 'instancetype-virt-perspective',
+      perspective: 'fleet-virtualization-perspective',
+    },
+    type: 'console.navigation/separator',
+  },
+  {
+    properties: {
+      dataAttributes: {
+        'data-border': 'no-border',
+        'data-class': 'kv-plugin-virt-perspective-element',
+        'data-quickstart-id': 'qs-nav-bootablevolumes',
+        'data-test-id': 'bootablevolumes-nav-item',
+      },
+      href: `/k8s/all-clusters/all-namespaces/bootablevolumes`,
+      id: 'bootablevolumes-virt-perspective',
+      name: '%plugin__kubevirt-plugin~Bootable volumes%',
       perspective: 'fleet-virtualization-perspective',
     },
     type: 'console.navigation/href',
@@ -141,6 +154,22 @@ export const extensions: EncodedExtension[] = [
         `/k8s/cluster/:cluster/ns/:ns/${INSTANCETYPE_PATH}`,
         `/k8s/cluster/:cluster/all-namespaces/${INSTANCETYPE_PATH}`,
         `/k8s/all-clusters/all-namespaces/${INSTANCETYPE_PATH}`,
+      ],
+    },
+    type: 'console.page/route',
+  } as EncodedExtension<RoutePage>,
+  {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC_ACM'],
+    },
+    properties: {
+      component: {
+        $codeRef: 'BootableVolumesList',
+      },
+      path: [
+        `/k8s/cluster/:cluster/ns/:ns/bootablevolumes`,
+        `/k8s/cluster/:cluster/all-namespaces/bootablevolumes`,
+        `/k8s/all-clusters/all-namespaces/bootablevolumes`,
       ],
     },
     type: 'console.page/route',

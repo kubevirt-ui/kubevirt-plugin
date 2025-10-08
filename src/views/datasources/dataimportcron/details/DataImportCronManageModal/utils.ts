@@ -8,7 +8,7 @@ import {
 } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { DATA_SOURCE_CRONJOB_LABEL } from '@kubevirt-utils/resources/template';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
-import { k8sCreate, k8sDelete, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
+import { kubevirtK8sCreate, kubevirtK8sDelete, kubevirtK8sPatch } from '@multicluster/k8sRequests';
 
 export const onDataImportCronManageSubmit = async ({
   data: { allowAutoUpdate, importsToKeep, schedule, url },
@@ -36,7 +36,7 @@ export const onDataImportCronManageSubmit = async ({
         delete labels[DATA_SOURCE_CRONJOB_LABEL];
       }
     });
-    await k8sPatch({
+    await kubevirtK8sPatch({
       data: [
         {
           op: 'replace',
@@ -80,7 +80,7 @@ export const onDataImportCronManageSubmit = async ({
 
   // first we need to validate the changes with a dry run
   try {
-    await k8sCreate<V1beta1DataImportCron>({
+    await kubevirtK8sCreate<V1beta1DataImportCron>({
       data: produce(updatedDataImportCron, (dic) => {
         dic.metadata.name = `${dataImportCron?.metadata?.name}-dry-run`;
       }),
@@ -94,7 +94,7 @@ export const onDataImportCronManageSubmit = async ({
     return Promise.reject(e);
   }
   try {
-    await k8sDelete({
+    await kubevirtK8sDelete({
       model: DataImportCronModel,
       name: dataImportCron?.metadata?.name,
       ns: dataImportCron?.metadata?.namespace,
@@ -104,7 +104,7 @@ export const onDataImportCronManageSubmit = async ({
   } catch (e) {}
 
   try {
-    return await k8sCreate<V1beta1DataImportCron>({
+    return await kubevirtK8sCreate<V1beta1DataImportCron>({
       data: updatedDataImportCron,
       model: DataImportCronModel,
     });

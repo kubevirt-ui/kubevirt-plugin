@@ -3,6 +3,7 @@ import { useCallback, useMemo } from 'react';
 import { DataSourceModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
+import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
 import {
@@ -11,11 +12,9 @@ import {
   ARCHITECTURE_TITLE,
 } from '@kubevirt-utils/utils/architecture';
 import { columnSorting } from '@kubevirt-utils/utils/utils';
-import {
-  K8sResourceCommon,
-  TableColumn,
-  useActiveNamespace,
-} from '@openshift-console/dynamic-plugin-sdk';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import useIsACMPage from '@multicluster/useIsACMPage';
+import { K8sResourceCommon, TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 import { sortable } from '@patternfly/react-table';
 
 import { BootableResource } from '../../utils/types';
@@ -27,7 +26,10 @@ const useBootableVolumesColumns = (
   preferences: V1beta1VirtualMachineClusterPreference[],
 ): [TableColumn<K8sResourceCommon>[], TableColumn<K8sResourceCommon>[], boolean] => {
   const { t } = useKubevirtTranslation();
-  const [namespace] = useActiveNamespace();
+  const cluster = useClusterParam();
+  const isACMPage = useIsACMPage();
+  const namespace = useActiveNamespace();
+
   const { endIndex, startIndex } = pagination;
 
   const sorting = useCallback(
@@ -44,6 +46,17 @@ const useBootableVolumesColumns = (
         title: t('Name'),
         transforms: [sortable],
       },
+      ...(isACMPage && !cluster
+        ? [
+            {
+              id: 'cluster',
+              props: { className: 'pf-m-width-20' },
+              sort: (_, direction) => sorting(direction, 'metadata.cluster'),
+              title: t('Cluster'),
+              transforms: [sortable],
+            },
+          ]
+        : []),
       {
         id: ARCHITECTURE_ID,
         props: { className: 'pf-m-width-10' },
@@ -115,7 +128,7 @@ const useBootableVolumesColumns = (
         title: '',
       },
     ],
-    [t, sorting, startIndex, endIndex, preferences, namespace],
+    [t, isACMPage, cluster, namespace, sorting, startIndex, endIndex, preferences],
   );
 
   const [activeColumns, , loaded] = useKubevirtUserSettingsTableColumns<K8sResourceCommon>({

@@ -8,6 +8,7 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { deleteDVAndRelatedResources } from '@kubevirt-utils/resources/bootableresources/helpers';
 import { asAccessReview, getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { Action, K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 
 import { BootableResource } from '../../utils/types';
@@ -52,6 +53,7 @@ const useBootableVolumesActions: BootableVolumesActionsProps = (source, preferen
       cta: () =>
         createModal(({ isOpen, onClose }) => (
           <ExportModal
+            cluster={getCluster(source)}
             isOpen={isOpen}
             namespace={getNamespace(source)}
             onClose={onClose}

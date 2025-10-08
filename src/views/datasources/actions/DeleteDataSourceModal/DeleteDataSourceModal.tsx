@@ -13,7 +13,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { deleteDVAndRelatedResources } from '@kubevirt-utils/resources/bootableresources/helpers';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import { k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
+import { kubevirtK8sDelete } from '@multicluster/k8sRequests';
 import { ButtonVariant, Checkbox, Stack, StackItem } from '@patternfly/react-core';
 
 import useUnderlyingPVC from './hooks/useUnderlyingPVC';
@@ -38,14 +38,14 @@ const DeleteDataSourceModal: FC<DeleteDataSourceModalProps> = ({
 
   const onDelete = async () => {
     try {
-      await k8sDelete({
+      await kubevirtK8sDelete({
         model: DataImportCronModel,
         resource: dataImportCron,
       });
     } catch (e) {
       kubevirtConsole.log(e?.message);
     } finally {
-      await k8sDelete({
+      await kubevirtK8sDelete({
         model: DataSourceModel,
         resource: dataSource,
       });

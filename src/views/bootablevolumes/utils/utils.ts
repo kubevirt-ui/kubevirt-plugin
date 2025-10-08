@@ -9,6 +9,7 @@ import { isBootableVolumePVCKind } from '@kubevirt-utils/resources/bootableresou
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { ANNOTATIONS, OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 
 import { BootableResource, BootableVolumeMetadata } from './types';
@@ -22,7 +23,9 @@ export const getPreferenceReadableOS = (
 ): string => {
   const preferenceLabelValue = getSourcePreferenceLabelValue(obj); // preference name
   const preferenceObject = preferences?.find(
-    (preference) => preference?.metadata?.name === preferenceLabelValue,
+    (preference) =>
+      preference?.metadata?.name === preferenceLabelValue &&
+      getCluster(preference) === getCluster(obj),
   );
 
   return preferenceObject?.metadata?.annotations?.[ANNOTATIONS.displayName] || NO_DATA_DASH;

@@ -1,7 +1,7 @@
 import { IoK8sApiCoreV1Pod } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { PodModel, RoleBindingModel, RoleModel, ServiceAccountModel } from '@kubevirt-utils/models';
 import { getRandomChars, isEmpty, isUpstream } from '@kubevirt-utils/utils/utils';
-import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
+import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 
 import {
   DOWNSTREAM_UPLOADER_IMAGE,
@@ -12,16 +12,17 @@ import {
   UPSTREAM_UPLOADER_IMAGE,
 } from './constants';
 
-export const createServiceAccount = async (namespace: string) => {
+export const createServiceAccount = async (cluster: string, namespace: string) => {
   await Promise.all([
-    k8sCreate({ data: serviceAccount, model: ServiceAccountModel, ns: namespace }),
-    k8sCreate({ data: role, model: RoleModel, ns: namespace }),
+    kubevirtK8sCreate({ cluster, data: serviceAccount, model: ServiceAccountModel, ns: namespace }),
+    kubevirtK8sCreate({ cluster, data: role, model: RoleModel, ns: namespace }),
   ]);
 
-  return k8sCreate({ data: roleBinding, model: RoleBindingModel, ns: namespace });
+  return kubevirtK8sCreate({ cluster, data: roleBinding, model: RoleBindingModel, ns: namespace });
 };
 
 type CreateUploaderPodType = (input: {
+  cluster: string;
   destination: string;
   namespace: string;
   secretName: string;
@@ -30,13 +31,15 @@ type CreateUploaderPodType = (input: {
 }) => Promise<IoK8sApiCoreV1Pod>;
 
 export const createUploaderPod: CreateUploaderPodType = ({
+  cluster,
   destination,
   namespace,
   secretName,
   vmName,
   volumeName,
 }) =>
-  k8sCreate({
+  kubevirtK8sCreate({
+    cluster,
     data: {
       apiVersion: 'v1',
       kind: 'Pod',
