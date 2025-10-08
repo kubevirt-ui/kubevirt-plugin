@@ -12,11 +12,12 @@ import { updateBootOrder } from '@virtualmachines/details/tabs/configuration/det
 import '../../../TopologyVMDetailsPanel.scss';
 
 type VMBootOrderDetailsItemProps = {
+  instanceTypeVM: V1VirtualMachine;
   vm: V1VirtualMachine;
   vmi: V1VirtualMachineInstance;
 };
 
-const VMBootOrderDetailsItem: FC<VMBootOrderDetailsItemProps> = ({ vm, vmi }) => {
+const VMBootOrderDetailsItem: FC<VMBootOrderDetailsItemProps> = ({ instanceTypeVM, vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
@@ -26,6 +27,7 @@ const VMBootOrderDetailsItem: FC<VMBootOrderDetailsItemProps> = ({ vm, vmi }) =>
         createModal((props) => (
           <BootOrderModal
             {...props}
+            instanceTypeVM={instanceTypeVM}
             onSubmit={(updatedVM: V1VirtualMachine) => updateBootOrder(updatedVM)}
             vm={vm}
             vmi={vmi}
@@ -34,7 +36,7 @@ const VMBootOrderDetailsItem: FC<VMBootOrderDetailsItemProps> = ({ vm, vmi }) =>
       }
       className="topology-vm-details-panel__item"
       data-test-id={`${getName(vm)}-boot-order`}
-      descriptionData={<BootOrderSummary vm={vm} />}
+      descriptionData={<BootOrderSummary instanceTypeVM={instanceTypeVM} vm={vm} />}
       descriptionHeader={t('Boot order')}
       isEdit
     />

@@ -1,4 +1,8 @@
-import { V1Disk, V1Interface } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import unionBy from 'lodash/unionBy';
+
+import { V1Disk, V1Interface, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { CLOUDINITDISK } from '@kubevirt-utils/constants/constants';
+import { getDisks, getInterfaces } from '@kubevirt-utils/resources/vm';
 import { getPrintableDiskDrive } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
 
 /**
@@ -48,4 +52,35 @@ export const transformDevices = (
   }));
 
   return [...transformedDisks, ...transformedNics];
+};
+
+export const sortBootOrder = (a: BootableDeviceType, b: BootableDeviceType) => {
+  if (a?.value?.bootOrder && b?.value?.bootOrder) {
+    return a.value.bootOrder - b.value.bootOrder;
+  }
+
+  if (a?.value?.bootOrder) {
+    return -1;
+  }
+
+  if (b?.value?.bootOrder) {
+    return 1;
+  }
+
+  return 0;
+};
+export const getSortedBootableDevices = ({
+  instanceTypeVM,
+  vm,
+}: {
+  instanceTypeVM: V1VirtualMachine;
+  vm: V1VirtualMachine;
+}): BootableDeviceType[] | undefined => {
+  const filteredInstanceTypeVMDisks = getDisks(instanceTypeVM || vm)?.filter(
+    (disk) => disk?.name !== CLOUDINITDISK,
+  );
+  const vmDisks = getDisks(vm);
+  const mergedDisks = unionBy(filteredInstanceTypeVMDisks, vmDisks, 'name');
+  const interfaces = getInterfaces(vm);
+  return transformDevices(mergedDisks, interfaces)?.toSorted(sortBootOrder);
 };
