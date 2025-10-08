@@ -5,9 +5,12 @@ import { V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui/kubevirt-
 import RedHatLabel from '@kubevirt-utils/components/RedHatLabel/RedHatLabel';
 import { VENDOR_LABEL } from '@kubevirt-utils/constants/constants';
 import { getLabel } from '@kubevirt-utils/resources/shared';
+import { getName } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
-import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
+import { FleetResourceLink } from '@stolostron/multicluster-sdk';
 
 import ClusterInstancetypeActions from '../../actions/ClusterInstancetypeActions';
 
@@ -17,10 +20,11 @@ const ClusterInstancetypeRow: FC<RowProps<V1beta1VirtualMachineClusterInstancety
 }) => (
   <>
     <TableData activeColumnIDs={activeColumnIDs} id="name">
-      <ResourceLink
+      <FleetResourceLink
+        cluster={getCluster(it)}
         groupVersionKind={VirtualMachineClusterInstancetypeModelGroupVersionKind}
         inline
-        name={it?.metadata?.name}
+        name={getName(it)}
       />
       <RedHatLabel obj={it} />
     </TableData>
