@@ -1,21 +1,14 @@
 import React, { FC, useState } from 'react';
 
 import HyperConvergedModel from '@kubevirt-ui/kubevirt-api/console/models/HyperConvergedModel';
-import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
+import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
 import { FEATURE_HCO_PERSISTENT_RESERVATION } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { CLUSTER_TAB_IDS } from '@overview/SettingsTab/search/constants';
-import {
-  Alert,
-  AlertVariant,
-  PopoverPosition,
-  Split,
-  SplitItem,
-  Switch,
-} from '@patternfly/react-core';
+import { Alert, AlertVariant } from '@patternfly/react-core';
 
 import ExpandSection from '../../../ExpandSection/ExpandSection';
 
@@ -62,27 +55,16 @@ const PersistentReservationSection: FC<PersistentReservationSectionProps> = ({
       searchItemId={CLUSTER_TAB_IDS.persistentReservation}
       toggleText={t('SCSI persistent reservation')}
     >
-      <Split>
-        <SplitItem isFilled>
-          {t('Enable persistent reservation')}{' '}
-          <HelpTextIcon
-            bodyContent={t(
-              'The SCSI reservation for disk makes the disk attached to the VirtualMachine as a SCSI LUN. This option should only be used for cluster-aware applications',
-            )}
-            position={PopoverPosition.bottom}
-          />
-        </SplitItem>
-        {hyperLoaded && (
-          <SplitItem>
-            <Switch
-              className={isLoading && 'kv-cursor--loading'}
-              id="persistent-reservation-section"
-              isChecked={persistentReservation}
-              onChange={(_, checked: boolean) => onChange(checked)}
-            />
-          </SplitItem>
+      <SectionWithSwitch
+        helpTextIconContent={t(
+          'The SCSI reservation for disk makes the disk attached to the VirtualMachine as a SCSI LUN. This option should only be used for cluster-aware applications',
         )}
-      </Split>
+        isDisabled={!hyperLoaded}
+        isLoading={isLoading}
+        switchIsOn={persistentReservation}
+        title={t('Enable persistent reservation')}
+        turnOnSwitch={onChange}
+      />
       {error && (
         <Alert isInline title={t('Error')} variant={AlertVariant.danger}>
           {error}

@@ -42,7 +42,7 @@ describe('Test Virtualization Overview page', () => {
   });
 
   it('download virtctl popover works', () => {
-    cy.get('a.cluster-overview-header__virtctl-link').click();
+    cy.get('[data-test-id="virtctl-download-link"]').click();
     cy.contains('Download virtctl for Linux for x86_64').should('exist');
   });
 

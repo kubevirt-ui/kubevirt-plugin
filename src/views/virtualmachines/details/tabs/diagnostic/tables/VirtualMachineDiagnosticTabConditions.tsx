@@ -1,6 +1,5 @@
 import React, { FC, useEffect, useMemo, useState } from 'react';
 
-import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -8,13 +7,15 @@ import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import { columnSorting, isEmpty } from '@kubevirt-utils/utils/utils';
 import { ListPageBody, useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
-import { Bullseye, Flex, FlexItem, Pagination, Title } from '@patternfly/react-core';
+import { Bullseye, Flex, FlexItem, Pagination } from '@patternfly/react-core';
 import { Table, Th, Thead, Tr } from '@patternfly/react-table';
 
 import useDiagnosticConditionsTableColumns from '../hooks/useDiagnosticConditionsTableColumns';
 import useDiagnosticFilter from '../hooks/useDiagnosticFilter';
 import { VirtualizationStatusCondition } from '../utils/types';
 import VirtualMachineDiagnosticTabRow from '../VirtualMachineDiagnosticTabRow';
+
+import VirtualMachineDiagnosticTabTableTitle from './components/VirtualMachineDiagnosticTabTableTitle';
 
 type VirtualMachineDiagnosticTabConditionsProps = {
   conditions: VirtualizationStatusCondition[];
@@ -60,16 +61,12 @@ const VirtualMachineDiagnosticTabConditions: FC<VirtualMachineDiagnosticTabCondi
   return (
     <>
       <ListPageBody>
-        <Title className="VirtualMachineDiagnosticTab--header" headingLevel="h2">
-          {t('Status conditions')}{' '}
-          <HelpTextIcon
-            bodyContent={t(
-              'Conditions provide a standard mechanism for status reporting. Conditions are reported for all aspects of a VM.',
-            )}
-            helpIconClassName="VirtualMachineDiagnosticTab--HelpTextIcon"
-          />
-        </Title>
-
+        <VirtualMachineDiagnosticTabTableTitle
+          helpContent={t(
+            'Conditions provide a standard mechanism for status reporting. Conditions are reported for all aspects of a VM.',
+          )}
+          title={t('Status conditions')}
+        />
         <Flex justifyContent={{ default: 'justifyContentSpaceBetween' }}>
           <FlexItem>
             <ListPageFilter
