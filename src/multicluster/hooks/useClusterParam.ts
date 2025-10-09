@@ -1,9 +1,14 @@
-import { useParams } from 'react-router-dom-v5-compat';
+import { useMatch } from 'react-router-dom-v5-compat';
+
+import useIsACMPage from '@multicluster/useIsACMPage';
 
 const useClusterParam = () => {
-  const { cluster } = useParams<{ cluster?: string }>();
+  const isACMPage = useIsACMPage();
+  const pathMatch = useMatch('/k8s/cluster/:cluster/*');
 
-  return cluster;
+  if (!isACMPage) return null;
+
+  return pathMatch?.params?.cluster;
 };
 
 export default useClusterParam;

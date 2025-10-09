@@ -1,3 +1,5 @@
+import { matchPath } from 'react-router-dom-v5-compat';
+
 import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { isAllNamespaces } from '@kubevirt-utils/utils/utils';
@@ -10,9 +12,9 @@ import { KUBEVIRT_VM_PATH } from './constants';
 export const isACMPath = (pathname: string): boolean => {
   if (pathname.startsWith('/k8s/all-clusters')) return true;
 
-  const clusterName = pathname.split('/')?.[3] || '';
+  const clusterMatch = matchPath('/k8s/cluster/:cluster/*', pathname);
 
-  return pathname.startsWith('/k8s/cluster') && !clusterName.includes('~');
+  return clusterMatch !== null && !clusterMatch?.params?.cluster?.includes('~');
 };
 
 export const getACMVMURL = (cluster: string, namespace: string, name: string): string =>
