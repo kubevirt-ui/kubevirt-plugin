@@ -25,8 +25,6 @@ import {
 } from './utils/constants';
 import { createBootableVolume } from './utils/utils';
 
-import './AddBootableVolumeModal.scss';
-
 type AddBootableVolumeModalProps = {
   isOpen: boolean;
   onClose: () => void;
@@ -146,7 +144,7 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
           {t('Volume metadata')}{' '}
           <HelpTextIcon
             bodyContent={t('Set the volume metadata to use the volume as a bootable image.')}
-            helpIconClassName="add-bootable-volume-modal__title-help-text-icon"
+            helpIconClassName="pf-v6-u-ml-xs"
             position={PopoverPosition.right}
           />
         </Title>

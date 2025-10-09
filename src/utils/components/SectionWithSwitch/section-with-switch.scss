@@ -1,10 +1,9 @@
 .section-with-switch {
-  margin-bottom: var(--pf-t--global--spacer--md);
   justify-content: space-between;
   display: inline-flex;
   width: 100%;
   &__help-text-popover {
-    margin-left: var(--pf-t--global--spacer--xs);
+    margin-left: var(--pf-t--global--spacer--sm);
   }
   &__text {
     display: inline-flex;

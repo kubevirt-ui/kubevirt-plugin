@@ -33,7 +33,7 @@ const StorageProfilePopoverHelpIcon: FC = () => {
         </Button>
       }
       headerContent={t('Storage profile')}
-      helpIconClassName="pf-v6-u-ml-sm"
+      helpIconClassName="pf-v6-u-ml-xs"
       position={PopoverPosition.right}
     />
   );

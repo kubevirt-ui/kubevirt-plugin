@@ -5,8 +5,6 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import HelpTextTooltipContent from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/VirtualizationFeaturesWizard/components/HelpTextTooltipContent/HelpTextTooltipContent';
 import { PopoverPosition } from '@patternfly/react-core';
 
-import './UseAlternativeOptionHelpIcon.scss';
-
 const UseAlternativeOptionHelpIcon: FC = () => {
   const { t } = useKubevirtTranslation();
 
@@ -20,7 +18,7 @@ const UseAlternativeOptionHelpIcon: FC = () => {
           titleText={t('Use an alternative')}
         />
       }
-      helpIconClassName="use-alternative-option-help-icon"
+      helpIconClassName="pf-v6-u-ml-md"
       position={PopoverPosition.right}
     />
   );
