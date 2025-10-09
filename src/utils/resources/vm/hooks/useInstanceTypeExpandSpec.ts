@@ -43,7 +43,13 @@ const useInstanceTypeExpandSpec: UseInstanceTypeExpandSpec = (vm) => {
         setLoadingExpandedSpec(false);
       }
     };
-    !isEmpty(innerVM) && isExpandableSpec && fetch();
+
+    if (!isEmpty(innerVM) && isExpandableSpec) {
+      fetch();
+    } else {
+      setInstanceTypeExpandedSpec(undefined);
+      setErrorExpandedSpec(undefined);
+    }
   }, [namespace, name, isExpandableSpec, url, urlLoaded, innerVM]);
 
   return [instanceTypeExpandedSpec, loadingExpandedSpec, errorExpandedSpec];
