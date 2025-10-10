@@ -14,7 +14,7 @@ import {
 
 import VMStatusItem from './VMStatusItem';
 
-type statusItemData = {
+type StatusItemData = {
   count: number;
   id: string;
   statuses: Record<string, number>;
@@ -37,7 +37,7 @@ const VMAdditionalStatuses: FC<VMAdditionalStatusesProps> = ({
     otherStatuses: false,
   });
 
-  const getStatusItems = (): statusItemData[] => [
+  const getStatusItems = (): StatusItemData[] => [
     {
       count: otherStatusesCount,
       id: 'otherStatuses',
