@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@kubevirt-ui/vnc-keymaps": "file:../vnc-keymaps/kubevirt-ui-vnc-keymaps-v0.0.1.tgz",
     "@kubev2v/types": "^0.0.22",
     "@novnc/novnc": "^1.5.0",
     "@patternfly/quickstarts": "6.1.0",
