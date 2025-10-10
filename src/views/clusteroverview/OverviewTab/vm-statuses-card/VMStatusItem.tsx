@@ -5,8 +5,10 @@ import {
   getACMMListPathWithRowFilters,
   getVMListPathWithRowFilters,
 } from '@kubevirt-utils/resources/vm/utils/utils';
+import { VM_STATUS } from '@kubevirt-utils/resources/vm/utils/vmStatus';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useIsACMPage from '@multicluster/useIsACMPage';
+import { ERROR } from '@overview/OverviewTab/vm-statuses-card/utils/constants';
 import { GridItem } from '@patternfly/react-core';
 
 import { vmStatusIcon } from './utils/utils';
@@ -17,27 +19,33 @@ type VMStatusItemProps = {
   count: number;
   namespace?: string;
   onFilterChange?: () => void;
-  status: string;
+  showIcon?: boolean;
+  statusArray: typeof ERROR[] | VM_STATUS[];
+  statusLabel: string;
 };
 
 const VMStatusItem: React.FC<VMStatusItemProps> = ({
   count,
   namespace,
   onFilterChange,
-  status,
+  showIcon = true,
+  statusArray,
+  statusLabel,
 }) => {
-  const Icon = vmStatusIcon[status];
+  const Icon = vmStatusIcon[statusLabel];
   const cluster = useClusterParam();
   const isACMPage = useIsACMPage();
   const path = isACMPage
-    ? getACMMListPathWithRowFilters(cluster, namespace, { status })
-    : getVMListPathWithRowFilters(namespace, { status });
+    ? getACMMListPathWithRowFilters(cluster, namespace, { status: statusArray.join(',') })
+    : getVMListPathWithRowFilters(namespace, { status: statusArray.join(',') });
 
   return (
     <GridItem className="vm-statuses-card__grid-item" span={3}>
       <div className="vm-statuses-card__status-item">
         <div className="vm-statuses-card__status-item--count">
-          <span className="vm-statuses-card__status-item--icon">{Icon && <Icon />}</span>
+          <span className="vm-statuses-card__status-item--icon">
+            {Icon && showIcon && <Icon />}
+          </span>
           <span className="vm-statuses-card__status-item--value">
             <Link
               onClick={() => {
@@ -49,7 +57,7 @@ const VMStatusItem: React.FC<VMStatusItemProps> = ({
             </Link>
           </span>
         </div>
-        <div className="vm-statuses-card__status-item--status">{status}</div>
+        <div className="vm-statuses-card__status-item--status">{statusLabel}</div>
       </div>
     </GridItem>
   );

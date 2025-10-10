@@ -7,7 +7,9 @@ import { VENDOR_LABEL } from '@kubevirt-utils/constants/constants';
 import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
-import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
+import { FleetResourceLink } from '@stolostron/multicluster-sdk';
 
 import UserInstancetypeActions from '../../actions/UserInstancetypeActions';
 
@@ -17,7 +19,8 @@ const UserInstancetypeRow: FC<RowProps<V1beta1VirtualMachineClusterInstancetype>
 }) => (
   <>
     <TableData activeColumnIDs={activeColumnIDs} id="name">
-      <ResourceLink
+      <FleetResourceLink
+        cluster={getCluster(it)}
         groupVersionKind={VirtualMachineInstancetypeModelGroupVersionKind}
         inline
         name={getName(it)}

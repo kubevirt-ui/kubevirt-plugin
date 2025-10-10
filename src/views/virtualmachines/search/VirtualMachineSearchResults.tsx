@@ -5,15 +5,10 @@ import { ExposedFilterFunctions } from '@kubevirt-utils/components/ListPageFilte
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
-import {
-  ListPageHeader,
-  OnFilterChange,
-  useActiveNamespace,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { OnFilterChange, useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { Divider } from '@patternfly/react-core';
-import SearchBar from '@search/components/SearchBar';
 import { useHideNamespaceBar } from '@virtualmachines/hooks/useHideNamespaceBar';
-import VirtualMachinesCreateButton from '@virtualmachines/list/components/VirtualMachinesCreateButton/VirtualMachinesCreateButton';
+import VirtualMachinesListPageHeader from '@virtualmachines/list/components/VirtualMachinesListPageHeader';
 import VirtualMachinesList from '@virtualmachines/list/VirtualMachinesList';
 
 import useVMSearchQueries from './hooks/useVMSearchQueries';
@@ -38,12 +33,7 @@ const VirtualMachineSearchResults: FC = () => {
   return useMemo(
     () => (
       <>
-        <ListPageHeader title={t('VirtualMachines')}>
-          <SearchBar onFilterChange={onFilterChange} />
-          <div>
-            <VirtualMachinesCreateButton namespace={namespace} />
-          </div>
-        </ListPageHeader>
+        <VirtualMachinesListPageHeader namespace={namespace} onFilterChange={onFilterChange} />
         <Divider />
         <VirtualMachinesList
           cluster={cluster}
