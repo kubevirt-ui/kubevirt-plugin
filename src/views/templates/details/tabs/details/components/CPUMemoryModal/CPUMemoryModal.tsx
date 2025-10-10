@@ -4,6 +4,7 @@ import produce from 'immer';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1CPU } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import CPUInput from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/CPUInput';
+import { getCPULimitsFromTemplate } from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/utils/utils';
 import MemoryInput from '@kubevirt-utils/components/CPUMemoryModal/components/MemoryInput/MemoryInput';
 import { getMemorySize } from '@kubevirt-utils/components/CPUMemoryModal/utils/CpuMemoryUtils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -78,6 +79,8 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({ isOpen, onClose, onSubmit, te
   const { defaultCPU, defaultMemory } = getDefaultCPUMemoryValues(template);
   const { defaultMemorySize, defaultMemoryUnit } = defaultMemory;
 
+  const cpuLimits = getCPULimitsFromTemplate(template);
+
   useEffect(() => {
     if (vm?.metadata) {
       const { size: memSize, unit: memUnit } = getMemorySize(getMemory(vm));
@@ -98,7 +101,12 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({ isOpen, onClose, onSubmit, te
       <ModalHeader title={t('Edit CPU | Memory')} />
       <ModalBody>
         <div className="inputs">
-          <CPUInput currentCPU={defaultCPU} setUserEnteredCPU={setCPU} userEnteredCPU={cpu} />
+          <CPUInput
+            cpuLimits={cpuLimits}
+            currentCPU={defaultCPU}
+            setUserEnteredCPU={setCPU}
+            userEnteredCPU={cpu}
+          />
           <MemoryInput
             memory={memory}
             memoryUnit={memoryUnit}
