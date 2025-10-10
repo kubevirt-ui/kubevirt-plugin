@@ -29,10 +29,10 @@ export const getKubevirtBaseAPIPath = async (cluster?: string) => {
 export const kubevirtK8sPatch = async <R extends K8sResourceCommon>(
   options: FleetK8sPatchOptions<R>,
 ): Promise<R> => {
-  if (options?.cluster) {
+  if (options?.cluster || options?.resource?.cluster) {
     const object = await fleetK8sPatch<R>(options);
 
-    if (object) object.cluster = options?.cluster;
+    if (object) object.cluster = options?.cluster || options?.resource?.cluster;
     return object;
   }
 

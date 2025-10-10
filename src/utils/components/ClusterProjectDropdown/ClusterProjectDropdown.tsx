@@ -10,12 +10,13 @@ import useProjects from '@kubevirt-utils/hooks/useProjects';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useIsACMPage from '@multicluster/useIsACMPage';
-import { Spinner } from '@patternfly/react-core';
+import { Skeleton } from '@patternfly/react-core';
 import { useFleetClusterNames, useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import InlineFilterSelect from '../FilterSelect/InlineFilterSelect';
 import ProjectDropdown from '../ProjectDropdown/ProjectDropdown';
 
+import { SKELETON_HEIGHT, SKELETON_WIDTH } from './constants';
 import { getClusterOptions } from './utils';
 
 import './ClusterProjectDropdown.scss';
@@ -101,7 +102,7 @@ const ClusterProjectDropdown: FC<ClusterProjectDropdownProps> = ({
             toggleProps={{ isFullWidth: true }}
           />
         ) : (
-          <Spinner size="sm" />
+          <Skeleton height={SKELETON_HEIGHT} width={SKELETON_WIDTH} />
         )}
       </div>
       {showProjectDropdown && (
@@ -112,11 +113,12 @@ const ClusterProjectDropdown: FC<ClusterProjectDropdownProps> = ({
               <ProjectDropdown
                 cluster={cluster}
                 includeAllProjects={includeAllProjects}
+                isDisabled={!cluster}
                 onChange={onProjectChange}
                 selectedProject={namespace}
               />
             ) : (
-              <Spinner size="sm" />
+              <Skeleton height={SKELETON_HEIGHT} width={SKELETON_WIDTH} />
             )}
           </div>
         </>

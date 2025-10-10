@@ -2,6 +2,7 @@ import React, { FC, useState } from 'react';
 import { useParams } from 'react-router-dom-v5-compat';
 
 import useClusterPreferences from '@catalog/CreateFromInstanceTypes/state/hooks/useClusterPreferences';
+import ClusterProjectDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterProjectDropdown';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { PageTitles } from '@kubevirt-utils/constants/page-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -32,7 +33,7 @@ import useBootableVolumesFilters from './hooks/useBootableVolumesFilters';
 import '@kubevirt-utils/styles/list-managment-group.scss';
 
 const BootableVolumesList: FC = () => {
-  const { ns: namespace } = useParams<{ ns: string }>();
+  const { ns: namespace } = useParams<{ cluster: string; ns: string }>();
   const { t } = useKubevirtTranslation();
 
   const { bootableVolumes, dataImportCrons, error, loaded } = useBootableVolumes(namespace);
@@ -65,6 +66,7 @@ const BootableVolumesList: FC = () => {
   return (
     <>
       <DocumentTitle>{PageTitles.BootableVolumes}</DocumentTitle>
+      <ClusterProjectDropdown includeAllClusters includeAllProjects />
       <ListPageHeader title={PageTitles.BootableVolumes}>
         <BootableVolumeAddButton namespace={namespace} />
       </ListPageHeader>

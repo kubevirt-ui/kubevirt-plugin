@@ -18,14 +18,14 @@ import {
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
 import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
+import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import {
-  convertResourceArrayToMap,
+  convertResourceArrayToMapWithCluster,
   getReadyOrCloningOrUploadingDataSources,
 } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { Operator } from '@openshift-console/dynamic-plugin-sdk';
 
 type UseBootableVolumes = (namespace?: string) => UseBootableVolumesValues;
@@ -34,7 +34,9 @@ const useBootableVolumes: UseBootableVolumes = (namespace) => {
   const projectsNamespace = namespace === ALL_PROJECTS ? null : namespace;
   const cluster = useClusterParam();
 
-  const [dataSources, loadedDataSources, dataSourcesError] = useK8sWatchData<V1beta1DataSource[]>({
+  const [dataSources, loadedDataSources, dataSourcesError] = useKubevirtWatchResource<
+    V1beta1DataSource[]
+  >({
     cluster,
     groupVersionKind: DataSourceModelGroupVersionKind,
     isList: true,
@@ -44,7 +46,7 @@ const useBootableVolumes: UseBootableVolumes = (namespace) => {
     },
   });
 
-  const [dataImportCrons, loadedDataImportCrons, dataImportCronsError] = useK8sWatchData<
+  const [dataImportCrons, loadedDataImportCrons, dataImportCronsError] = useKubevirtWatchResource<
     V1beta1DataImportCron[]
   >({
     cluster,
@@ -54,14 +56,16 @@ const useBootableVolumes: UseBootableVolumes = (namespace) => {
   });
 
   // getting all pvcs since there could be a case where a DS has the label and it's underlying PVC does not
-  const [pvcs, loadedPVCs, loadErrorPVCs] = useK8sWatchData<IoK8sApiCoreV1PersistentVolumeClaim[]>({
+  const [pvcs, loadedPVCs, loadErrorPVCs] = useKubevirtWatchResource<
+    IoK8sApiCoreV1PersistentVolumeClaim[]
+  >({
     cluster,
     groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
     isList: true,
     namespace: projectsNamespace,
   });
 
-  const [dvs, loadedDVs, loadErrorDVs] = useK8sWatchData<V1beta1DataVolume[]>({
+  const [dvs, loadedDVs, loadErrorDVs] = useKubevirtWatchResource<V1beta1DataVolume[]>({
     cluster,
     groupVersionKind: modelToGroupVersionKind(DataVolumeModel),
     isList: true,
@@ -69,7 +73,7 @@ const useBootableVolumes: UseBootableVolumes = (namespace) => {
   });
 
   // getting volumesnapshot as this can also be a source of DS
-  const [volumeSnapshots] = useK8sWatchData<VolumeSnapshotKind[]>({
+  const [volumeSnapshots] = useKubevirtWatchResource<VolumeSnapshotKind[]>({
     cluster,
     groupVersionKind: modelToGroupVersionKind(VolumeSnapshotModel),
     isList: true,
@@ -90,8 +94,8 @@ const useBootableVolumes: UseBootableVolumes = (namespace) => {
     () => getReadyOrCloningOrUploadingDataSources(dataSources, dataImportCrons),
     [dataSources, dataImportCrons],
   );
-  const pvcSources = useMemo(() => convertResourceArrayToMap(pvcs, true), [pvcs]);
-  const dvSources = useMemo(() => convertResourceArrayToMap(dvs, true), [dvs]);
+  const pvcSources = useMemo(() => convertResourceArrayToMapWithCluster(pvcs, true), [pvcs]);
+  const dvSources = useMemo(() => convertResourceArrayToMapWithCluster(dvs, true), [dvs]);
 
   const bootableVolumes: BootableVolume[] = useMemo(() => {
     const dataSourceVolumes =

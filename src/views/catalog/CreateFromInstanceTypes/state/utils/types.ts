@@ -15,7 +15,7 @@ import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/ty
 import { SSHSecretDetails } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import { SysprepData } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
-import { NamespacedResourceMap } from '@kubevirt-utils/resources/shared';
+import { ClusterNamespacedResourceMap } from '@kubevirt-utils/resources/shared';
 
 export type InstanceTypes = (
   | V1beta1VirtualMachineClusterInstancetype
@@ -33,10 +33,10 @@ export type UseInstanceTypeAndPreferencesValues = {
 export type UseBootableVolumesValues = {
   bootableVolumes: BootableVolume[];
   dataImportCrons: V1beta1DataImportCron[];
-  dvSources: NamespacedResourceMap<V1beta1DataVolume>;
+  dvSources: ClusterNamespacedResourceMap<V1beta1DataVolume>;
   error: Error;
   loaded: boolean;
-  pvcSources: NamespacedResourceMap<IoK8sApiCoreV1PersistentVolumeClaim>;
+  pvcSources: ClusterNamespacedResourceMap<IoK8sApiCoreV1PersistentVolumeClaim>;
   volumeSnapshotSources: { [dataSourceName: string]: VolumeSnapshotKind };
 };
 

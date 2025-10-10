@@ -10,6 +10,7 @@ import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 type ProjectDropdownProps = {
   cluster?: string;
   includeAllProjects?: boolean;
+  isDisabled?: boolean;
   onChange: (project: string) => void;
   selectedProject: string;
 };
@@ -17,6 +18,7 @@ type ProjectDropdownProps = {
 const ProjectDropdown: FC<ProjectDropdownProps> = ({
   cluster,
   includeAllProjects = true,
+  isDisabled = false,
   onChange,
   selectedProject,
 }) => {
@@ -33,7 +35,7 @@ const ProjectDropdown: FC<ProjectDropdownProps> = ({
         options={getProjectOptions(includeAllProjects, projects)}
         selected={selectedProject || ALL_PROJECTS}
         setSelected={onChange}
-        toggleProps={{ isFullWidth: true }}
+        toggleProps={{ isDisabled, isFullWidth: true }}
       />
     </div>
   );

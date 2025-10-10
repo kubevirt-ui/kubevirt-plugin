@@ -8,9 +8,10 @@ import {
   V1beta1DataVolume,
 } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import { getDataSourcePVCSource } from '@kubevirt-utils/resources/bootableresources/selectors';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
 
 type UseUnderlyingPVC = (dataSource: V1beta1DataSource) => {
   dv: V1beta1DataVolume;
@@ -22,16 +23,18 @@ const useUnderlyingPVC: UseUnderlyingPVC = (dataSource) => {
   const dataSourcePVC = getDataSourcePVCSource(dataSource);
   const { name, namespace } = dataSourcePVC || {};
 
-  const [pvc] = useK8sWatchResource<IoK8sApiCoreV1PersistentVolumeClaim>(
+  const [pvc] = useKubevirtWatchResource<IoK8sApiCoreV1PersistentVolumeClaim>(
     dataSourcePVC && {
+      cluster: getCluster(dataSource),
       groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
       name,
       namespace,
     },
   );
 
-  const [dv] = useK8sWatchResource<V1beta1DataVolume>(
+  const [dv] = useKubevirtWatchResource<V1beta1DataVolume>(
     dataSourcePVC && {
+      cluster: getCluster(dataSource),
       groupVersionKind: modelToGroupVersionKind(DataVolumeModel),
       name,
       namespace,
