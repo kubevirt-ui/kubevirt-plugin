@@ -7,6 +7,7 @@ import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMac
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import {
   Button,
   ButtonVariant,
@@ -46,6 +47,7 @@ const MigrationPolicyDetailsSection: FC<MigrationPolicyDetailsSectionProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+  const isACMPage = useIsACMPage();
   const hasOwnPropertySpec = (key: string) => key in (mp?.spec || {});
 
   return (
@@ -72,6 +74,13 @@ const MigrationPolicyDetailsSection: FC<MigrationPolicyDetailsSectionProps> = ({
               isPopover
               moreInfoURL={documentationURL.NAME}
             />
+
+            {isACMPage && (
+              <VirtualMachineDescriptionItem
+                descriptionData={mp?.cluster}
+                descriptionHeader={t('Cluster')}
+              />
+            )}
             <VirtualMachineDescriptionItem
               descriptionData={mp?.metadata?.annotations?.description}
               descriptionHeader={t('Description')}

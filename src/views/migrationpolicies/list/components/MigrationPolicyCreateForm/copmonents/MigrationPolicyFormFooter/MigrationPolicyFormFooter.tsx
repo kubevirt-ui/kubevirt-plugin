@@ -1,10 +1,12 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
+import { useMigrationPoliciesPageBaseURL } from 'src/views/migrationpolicies/hooks/useMigrationPoliciesPageBaseURL';
 
 import MigrationPolicyModel from '@kubevirt-ui/kubevirt-api/console/models/MigrationPolicyModel';
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 import {
   ActionList,
   ActionListItem,
@@ -16,8 +18,6 @@ import {
   StackItem,
 } from '@patternfly/react-core';
 
-import { migrationPoliciesPageBaseURL } from '../../../../utils/constants';
-
 type MigrationPolicyFormFooterProps = {
   migrationPolicy: V1alpha1MigrationPolicy;
 };
@@ -27,6 +27,9 @@ const MigrationPolicyFormFooter: React.FC<MigrationPolicyFormFooterProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
+  const cluster = useClusterParam();
+
+  const migrationPoliciesBaseURL = useMigrationPoliciesPageBaseURL();
 
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [error, setError] = React.useState(undefined);
@@ -37,8 +40,8 @@ const MigrationPolicyFormFooter: React.FC<MigrationPolicyFormFooterProps> = ({
     setIsSubmitting(true);
     setError(undefined);
 
-    k8sCreate({ data: migrationPolicy, model: MigrationPolicyModel })
-      .then(() => navigate(`${migrationPoliciesPageBaseURL}/${migrationPolicyName}`))
+    kubevirtK8sCreate({ cluster, data: migrationPolicy, model: MigrationPolicyModel })
+      .then(() => navigate(`${migrationPoliciesBaseURL}/${migrationPolicyName}`))
       .catch(setError)
       .finally(() => setIsSubmitting(false));
   };
