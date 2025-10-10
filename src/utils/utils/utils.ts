@@ -32,6 +32,9 @@ export const getNamespacePathSegment = (namespace: string) =>
 export const isEmpty = (obj) =>
   [Array, Object].includes((obj || {}).constructor) && !Object.entries(obj || {}).length;
 
+export const sumObjectValues = (obj: Record<string, number | undefined>): number =>
+  Object.values(obj).reduce((acc, val) => acc + (val || 0), 0);
+
 export const get = (obj: unknown, path: string | string[], defaultValue = undefined) => {
   const travel = (regexp: RegExp) =>
     String.prototype.split

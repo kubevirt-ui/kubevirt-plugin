@@ -4,8 +4,11 @@ import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevir
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VM_STATUS } from '@kubevirt-utils/resources/vm/utils/vmStatus';
 import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
-import { ERROR } from '@overview/OverviewTab/vm-statuses-card/utils/constants';
-import { getVMStatuses } from '@overview/OverviewTab/vm-statuses-card/utils/utils';
+import { ERROR, OTHER } from '@overview/OverviewTab/vm-statuses-card/utils/constants';
+import {
+  getOtherStatuses,
+  getVMStatuses,
+} from '@overview/OverviewTab/vm-statuses-card/utils/utils';
 import VMStatusItem from '@overview/OverviewTab/vm-statuses-card/VMStatusItem';
 import {
   Card,
@@ -41,13 +44,13 @@ const VirtualMachineListSummary: FC<VirtualMachineListSummaryProps> = ({
   const { t } = useKubevirtTranslation();
   const [isExpanded, setIsExpanded] = useState<boolean>(true);
 
-  const { primaryStatuses } = getVMStatuses(vms || []);
-
+  const { otherStatusesCount, primaryStatuses } = getVMStatuses(vms || []);
+  const OTHER_STATUSES = getOtherStatuses();
   const { cpuRequested, cpuUsage, memoryCapacity, memoryUsage, storageCapacity, storageUsage } =
     useVMTotalsMetrics(vmis);
 
-  const onStatusChange = (status: 'Error' | VM_STATUS) => () =>
-    onFilterChange(VirtualMachineRowFilterType.Status, { selected: [status] });
+  const onStatusChange = (statusArray: typeof ERROR[] | VM_STATUS[]) => () =>
+    onFilterChange(VirtualMachineRowFilterType.Status, { selected: statusArray });
 
   return (
     <ExpandableSection
@@ -66,26 +69,30 @@ const VirtualMachineListSummary: FC<VirtualMachineListSummaryProps> = ({
               <VMStatusItem
                 count={primaryStatuses.Error}
                 namespace={namespace}
-                onFilterChange={onStatusChange(ERROR)}
-                status={ERROR}
+                onFilterChange={onStatusChange([ERROR])}
+                statusArray={[ERROR]}
+                statusLabel={ERROR}
               />
               <VMStatusItem
                 count={primaryStatuses.Running}
                 namespace={namespace}
-                onFilterChange={onStatusChange(VM_STATUS.Running)}
-                status={VM_STATUS.Running}
+                onFilterChange={onStatusChange([VM_STATUS.Running])}
+                statusArray={[VM_STATUS.Running]}
+                statusLabel={VM_STATUS.Running}
               />
               <VMStatusItem
                 count={primaryStatuses.Stopped}
                 namespace={namespace}
-                onFilterChange={onStatusChange(VM_STATUS.Stopped)}
-                status={VM_STATUS.Stopped}
+                onFilterChange={onStatusChange([VM_STATUS.Stopped])}
+                statusArray={[VM_STATUS.Stopped]}
+                statusLabel={VM_STATUS.Stopped}
               />
               <VMStatusItem
-                count={primaryStatuses.Paused}
+                count={otherStatusesCount}
                 namespace={namespace}
-                onFilterChange={onStatusChange(VM_STATUS.Paused)}
-                status={VM_STATUS.Paused}
+                onFilterChange={onStatusChange(OTHER_STATUSES)}
+                statusArray={OTHER_STATUSES}
+                statusLabel={OTHER}
               />
             </Grid>
           </FlexItem>

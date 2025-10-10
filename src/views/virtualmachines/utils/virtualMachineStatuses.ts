@@ -21,6 +21,7 @@ import {
 
 // https://github.com/kubevirt/api/blob/9689e71fe2bed9e7da5f165760bbbf6981cc1087/core/v1/types.go#L1277
 export const printableVMStatus = {
+  Deleting: 'Deleting',
   Migrating: 'Migrating',
   Paused: 'Paused',
   Provisioning: 'Provisioning',
