@@ -11,7 +11,7 @@ import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
 import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { universalComparator } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { UseMulticlusterNamespacesReturnType } from '@multicluster/hooks/useMulticlusterProjects';
+import { UseMulticlusterNamespacesReturn } from '@multicluster/hooks/useMulticlusterNamespaces';
 import {
   getACMVMListURL,
   getVMListNamespacesURL,
@@ -279,7 +279,7 @@ export const createMultiClusterTreeViewData = (
   vms: V1VirtualMachine[],
   pathname: string,
   foldersEnabled: boolean,
-  projectsByClusters: UseMulticlusterNamespacesReturnType[0],
+  projectsByClusters: UseMulticlusterNamespacesReturn['namespacesByCluster'],
   queryParams?: string,
   clusterNames?: string[],
 ): TreeViewDataItem[] => {

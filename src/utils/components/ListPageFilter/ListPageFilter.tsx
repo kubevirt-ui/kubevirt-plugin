@@ -10,9 +10,11 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Toolbar, ToolbarContent, ToolbarToggleGroup } from '@patternfly/react-core';
 import { FilterIcon } from '@patternfly/react-icons';
+import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 import ColumnManagement from '../ColumnManagementModal/ColumnManagement';
 
+import CheckboxSelectFilter from './components/CheckboxSelectFilter';
 import RowFilters from './components/RowFilters';
 import TextFiltersToolbarItem from './components/TextFiltersToolbarItem';
 import useListPageFiltersMethods from './hooks/useListPageFiltersMethods';
@@ -25,6 +27,7 @@ type ListPageFilterProps = {
   className?: string;
   columnLayout?: ColumnLayout;
   data?: K8sResourceCommon[];
+  filtersWithSelect?: RowFilter[];
   hideColumnManagement?: boolean;
   hideLabelFilter?: boolean;
   hideNameLabelFilters?: boolean;
@@ -39,6 +42,7 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
   className,
   columnLayout,
   data,
+  filtersWithSelect = [],
   hideColumnManagement,
   hideLabelFilter,
   hideNameLabelFilters,
@@ -124,6 +128,15 @@ const ListPageFilter: FC<ListPageFilterProps> = ({
             selectedRowFilters={selectedRowFilters}
             updateRowFilterSelected={updateRowFilterSelected}
           />
+          {filtersWithSelect.map((filter) => (
+            <CheckboxSelectFilter
+              allValues={filter.items}
+              applyFilters={applyTextFilters}
+              categoryName={filter.filterGroupName}
+              filterType={filter.type as VirtualMachineRowFilterType}
+              key={filter.type}
+            />
+          ))}
           <TextFiltersToolbarItem
             applyTextFilters={applyTextFilters}
             applyTextFiltersWithDebounce={applyTextFiltersWithDebounce}
