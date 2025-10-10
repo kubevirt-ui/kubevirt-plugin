@@ -1,17 +1,18 @@
 import React, { FC, useEffect, useMemo, useState } from 'react';
 
-import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import { columnSorting } from '@kubevirt-utils/utils/utils';
 import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
-import { Flex, FlexItem, Pagination, Title } from '@patternfly/react-core';
+import { Flex, FlexItem, Pagination } from '@patternfly/react-core';
 import { Table, Th, Thead, Tr } from '@patternfly/react-table';
 
 import useDiagnosticVolumeStatusTableColumns from '../hooks/useDiagnosticVolumeStatusTableColumns';
 import { VirtualizationVolumeSnapshotStatus } from '../utils/types';
 import VirtualMachineDiagnosticTabRow from '../VirtualMachineDiagnosticTabRow';
+
+import VirtualMachineDiagnosticTabTableTitle from './components/VirtualMachineDiagnosticTabTableTitle';
 
 type VirtualMachineDiagnosticTabVolumeStatusProps = {
   volumeSnapshotStatuses: VirtualizationVolumeSnapshotStatus[];
@@ -48,15 +49,12 @@ const VirtualMachineDiagnosticTabVolumeStatus: FC<VirtualMachineDiagnosticTabVol
       <ListPageBody>
         <Flex justifyContent={{ default: 'justifyContentSpaceBetween' }}>
           <FlexItem>
-            <Title className="VirtualMachineDiagnosticTab--header" headingLevel="h2">
-              {t('Volume snapshot status')}{' '}
-              <HelpTextIcon
-                bodyContent={t(
-                  'Volume Snapshot Status is a mechanism for reporting if a volume can be snapshotted or not.',
-                )}
-                helpIconClassName="VirtualMachineDiagnosticTab--HelpTextIcon"
-              />
-            </Title>
+            <VirtualMachineDiagnosticTabTableTitle
+              helpContent={t(
+                'Volume Snapshot Status is a mechanism for reporting if a volume can be snapshotted or not.',
+              )}
+              title={t('Volume snapshot status')}
+            />
           </FlexItem>
           <FlexItem>
             <Pagination

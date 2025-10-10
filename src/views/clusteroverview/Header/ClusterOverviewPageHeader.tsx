@@ -9,8 +9,6 @@ import { clusterBasePath } from '@kubevirt-utils/utils/utils';
 import { useFlag } from '@openshift-console/dynamic-plugin-sdk';
 import { PageSection, Title } from '@patternfly/react-core';
 
-import './ClusterOverviewPageHeader.scss';
-
 type ClusterOverviewPageHeaderProps = {
   children?: React.ReactNode;
 };
@@ -28,17 +26,14 @@ const ClusterOverviewPageHeader: React.FC<ClusterOverviewPageHeaderProps> = ({ c
         <span>
           {hasConsoleTools && (
             <>
-              <Link
-                className="cluster-overview-header__virtctl-link"
-                to={clusterBasePath.concat('command-line-tools')}
-              >
+              <Link to={clusterBasePath.concat('command-line-tools')}>
                 {t('Download the virtctl command-line utility')}
               </Link>{' '}
               <HelpTextIcon
                 bodyContent={t(
                   'The virtctl client is a supplemental command-line utility for managing virtualization resources from the command line.',
                 )}
-                helpIconClassName="cluster-overview-header__virtctl-link--help-icon"
+                helpIconClassName="pf-v6-u-ml-xs"
               />
             </>
           )}

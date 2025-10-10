@@ -8,13 +8,11 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getName } from '@kubevirt-utils/resources/shared';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { CLUSTER_TAB_IDS } from '@overview/SettingsTab/search/constants';
-import { Divider } from '@patternfly/react-core';
+import { Divider, Stack } from '@patternfly/react-core';
 
 import ExpandSection from '../../../../../../ExpandSection/ExpandSection';
 
 import { AUTOMATIC_IMAGE_DOWNLOAD_ANNOTATION } from './utils/consts';
-
-import './automatic-images-download.scss';
 
 type AutomaticImagesDownloadProps = {
   hyperConvergeConfiguration: [hyperConvergeConfig: HyperConverged, loaded: boolean, error: any];
@@ -86,38 +84,40 @@ const AutomaticImagesDownload: FC<AutomaticImagesDownloadProps> = ({
       searchItemId={CLUSTER_TAB_IDS.automaticImagesDownload}
       toggleText={t('Automatic images download')}
     >
-      <SectionWithSwitch
-        helpTextIconContent={t('Enable automatic images download and update')}
-        id="auto-image-download"
-        isDisabled={!loaded || !isAdmin}
-        isLoading={isLoading}
-        newBadge={newBadge}
-        switchIsOn={Boolean(isEnabledAutomaticImagesDownload)}
-        title={t('Automatic images download')}
-        turnOnSwitch={onChangeAutomaticImagesDownload}
-      />
-      {isEnabledAutomaticImagesDownload && (
-        <>
-          <Divider className="AutomaticImagesDownload--divider" />
-          {(bootSources || []).map((bootSource, index) => {
-            const name = getName(bootSource);
-            return (
-              <SectionWithSwitch
-                switchIsOn={
-                  bootSource.metadata.annotations[AUTOMATIC_IMAGE_DOWNLOAD_ANNOTATION] !== 'false'
-                }
-                id={`${name}-auto-image-download-switch`}
-                inlineCheckbox
-                isLoading={index === imageLoadingIndex}
-                key={name}
-                newBadge={newBadge}
-                title={name}
-                turnOnSwitch={(checked) => onChangeDataImportCronTemplate(checked, index)}
-              />
-            );
-          })}
-        </>
-      )}
+      <Stack hasGutter>
+        <SectionWithSwitch
+          helpTextIconContent={t('Enable automatic images download and update')}
+          id="auto-image-download"
+          isDisabled={!loaded || !isAdmin}
+          isLoading={isLoading}
+          newBadge={newBadge}
+          switchIsOn={Boolean(isEnabledAutomaticImagesDownload)}
+          title={t('Automatic images download')}
+          turnOnSwitch={onChangeAutomaticImagesDownload}
+        />
+        {isEnabledAutomaticImagesDownload && (
+          <>
+            <Divider />
+            {(bootSources || []).map((bootSource, index) => {
+              const name = getName(bootSource);
+              return (
+                <SectionWithSwitch
+                  switchIsOn={
+                    bootSource.metadata.annotations[AUTOMATIC_IMAGE_DOWNLOAD_ANNOTATION] !== 'false'
+                  }
+                  id={`${name}-auto-image-download-switch`}
+                  inlineCheckbox
+                  isLoading={index === imageLoadingIndex}
+                  key={name}
+                  newBadge={newBadge}
+                  title={name}
+                  turnOnSwitch={(checked) => onChangeDataImportCronTemplate(checked, index)}
+                />
+              );
+            })}
+          </>
+        )}
+      </Stack>
     </ExpandSection>
   );
 };
