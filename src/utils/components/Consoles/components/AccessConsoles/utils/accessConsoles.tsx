@@ -9,6 +9,11 @@ import {
 } from '../../utils/ConsoleConsts';
 import { ConsoleType } from '../../utils/types';
 
+export type VncSettings = {
+  setShared?: (shared: boolean) => void;
+  shared?: boolean;
+};
+
 export type AccessConsolesActions = {
   connect?: () => void;
   disconnect?: () => void;
@@ -16,6 +21,7 @@ export type AccessConsolesActions = {
   sendCtrlAlt2?: () => void;
   sendCtrlAltDel?: () => void;
   sendPaste?: (shouldFocusOnConsole?: boolean) => Promise<void>;
+  vncSettings?: VncSettings;
 };
 
 export type AccessConsolesProps = {

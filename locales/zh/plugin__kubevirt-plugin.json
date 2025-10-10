@@ -365,6 +365,7 @@
   "Confirm requested VirtualMachine actions before executing them": "在执行它们前确认请求的 VirtualMachine 操作",
   "Confirm VirtualMachine actions": "确认 VirtualMachine 操作",
   "Connect": "连接",
+  "Connect in shared mode": "Connect in shared mode",
   "Connect with any viewer application for following protocols": "为以下协议与任何 viewer 应用程序连接",
   "Connecting": "连接",
   "Console": "控制台",

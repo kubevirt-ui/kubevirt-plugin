@@ -370,6 +370,7 @@
   "Confirm requested VirtualMachine actions before executing them": "Confirme las acciones solicitadas de VirtualMachine antes de ejecutarlas.",
   "Confirm VirtualMachine actions": "Confirmar acciones de VirtualMachine",
   "Connect": "Conectar",
+  "Connect in shared mode": "Connect in shared mode",
   "Connect with any viewer application for following protocols": "Conéctese con cualquier aplicación de visualización en relación con los siguientes protocolos",
   "Connecting": "Conectando",
   "Console": "Consola",

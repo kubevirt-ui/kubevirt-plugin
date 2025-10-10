@@ -365,6 +365,7 @@
   "Confirm requested VirtualMachine actions before executing them": "실행하기 전에 요청된 VirtualMachine 작업 확인",
   "Confirm VirtualMachine actions": "VirtualMachine 작업 확인",
   "Connect": "연결",
+  "Connect in shared mode": "Connect in shared mode",
   "Connect with any viewer application for following protocols": "다음 프로토콜을 위해 뷰어 애플리케이션에 연결",
   "Connecting": "연결 중",
   "Console": "콘솔",
