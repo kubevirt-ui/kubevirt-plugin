@@ -6,7 +6,7 @@ import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal'
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
+import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 import {
   Button,
   ButtonVariant,
@@ -39,7 +39,7 @@ const MigrationPolicyVirtualMachineLabels: React.FC<MigrationPolicyVirtualMachin
             createModal(({ isOpen, onClose }) => (
               <LabelsModal
                 onLabelsSubmit={(labels) =>
-                  k8sUpdate({
+                  kubevirtK8sUpdate({
                     data: ensureMigrationPolicyMatchLabels(mp, labels, 'namespaceSelector'),
                     model: MigrationPolicyModel,
                   })
