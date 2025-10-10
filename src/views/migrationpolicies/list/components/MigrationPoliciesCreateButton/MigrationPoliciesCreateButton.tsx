@@ -4,20 +4,24 @@ import { useNavigate } from 'react-router-dom-v5-compat';
 import { MigrationPolicyModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import MigrationPolicyModel from '@kubevirt-ui/kubevirt-api/console/models/MigrationPolicyModel';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  K8sVerb,
-  ListPageCreateDropdown,
-  useAccessReview,
-} from '@openshift-console/dynamic-plugin-sdk';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import { K8sVerb, ListPageCreateDropdown } from '@openshift-console/dynamic-plugin-sdk';
 import { Button, Tooltip } from '@patternfly/react-core';
+import { useFleetAccessReview, useHubClusterName } from '@stolostron/multicluster-sdk';
 
-import { createItems, migrationPoliciesPageBaseURL } from '../../utils/constants';
+import { useMigrationPoliciesPageBaseURL } from '../../../hooks/useMigrationPoliciesPageBaseURL';
+import { createItems } from '../../utils/constants';
 
 const MigrationPoliciesCreateButton: FC = () => {
   const { t } = useKubevirtTranslation();
+  const cluster = useClusterParam();
+  const [hubClusterName] = useHubClusterName();
   const navigate = useNavigate();
 
-  const [canCreateMigrationPolicy] = useAccessReview({
+  const migrationPoliciesBaseURL = useMigrationPoliciesPageBaseURL();
+
+  const [canCreateMigrationPolicy] = useFleetAccessReview({
+    cluster: cluster || hubClusterName,
     group: MigrationPolicyModel.apiGroup,
     resource: MigrationPolicyModel.plural,
     verb: 'create' as K8sVerb,
@@ -25,8 +29,8 @@ const MigrationPoliciesCreateButton: FC = () => {
 
   const onCreate = (type: string) => {
     return type === 'form'
-      ? navigate(`${migrationPoliciesPageBaseURL}/form`)
-      : navigate(`${migrationPoliciesPageBaseURL}/~new`);
+      ? navigate(`${migrationPoliciesBaseURL}/form`)
+      : navigate(`${migrationPoliciesBaseURL}/~new`);
   };
 
   if (!canCreateMigrationPolicy) {
