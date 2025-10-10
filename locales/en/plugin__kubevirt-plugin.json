@@ -169,6 +169,7 @@
   "An error occurred": "An error occurred",
   "An error occurred during the cloning process": "An error occurred during the cloning process",
   "An error occurred during the upload process": "An error occurred during the upload process",
+  "An existing MigPlan for these namespaces was found.": "An existing MigPlan for these namespaces was found.",
   "An existing MigPlan for this namespace was found. ": "An existing MigPlan for this namespace was found. ",
   "An InstanceType must be selected": "An InstanceType must be selected",
   "An OpenShift project is an alternative representation of a Kubernetes namespace.": "An OpenShift project is an alternative representation of a Kubernetes namespace.",

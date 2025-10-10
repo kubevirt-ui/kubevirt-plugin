@@ -8,36 +8,34 @@ import Loading from '@kubevirt-utils/components/Loading/Loading';
 import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
 import useDefaultStorageClass from '@kubevirt-utils/hooks/useDefaultStorage/useDefaultStorageClass';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  modelToGroupVersionKind,
-  modelToRef,
-  PersistentVolumeClaimModel,
-} from '@kubevirt-utils/models';
+import { modelToRef } from '@kubevirt-utils/models';
 import {
   DEFAULT_MIGRATION_NAMESPACE,
   MigPlanModel,
 } from '@kubevirt-utils/resources/migrations/constants';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { isEmpty, removeDuplicates } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
-import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
   AlertVariant,
+  List,
+  ListItem,
   Modal,
   ModalBody,
   Wizard,
   WizardHeader,
   WizardStep,
 } from '@patternfly/react-core';
+import useMigrationNamespacesPVCs from '@virtualmachines/actions/components/VirtualMachineMigration/hooks/useMigrationNamespacesPVCs';
+import VirtualMachineMigrationDestinationTab from '@virtualmachines/actions/components/VirtualMachineMigration/tabs/VirtualMachineMigrationDestinationTab';
+import VirtualMachineMigrationDetails from '@virtualmachines/actions/components/VirtualMachineMigration/tabs/VirtualMachineMigrationDetails';
+import VirtualMachineMigrationReviewTab from '@virtualmachines/actions/components/VirtualMachineMigration/tabs/VirtualMachineMigrationReviewTab';
 
 import useCreateEmptyMigPlan from './hooks/useCreateEmptyMigPlan';
-import useExistingMigrationPlan from './hooks/useExistingMigrationPlan';
+import useExistingMigPlanConflicts from './hooks/useExistingMigPlanConflicts';
 import useMigrationState from './hooks/useMigrationState';
-import VirtualMachineMigrationDestinationTab from './tabs/VirtualMachineMigrationDestinationTab';
-import VirtualMachineMigrationDetails from './tabs/VirtualMachineMigrationDetails';
-import VirtualMachineMigrationReviewTab from './tabs/VirtualMachineMigrationReviewTab';
 import { entireVMSelected, getMigratableVMPVCs } from './utils/utils';
 import VirtualMachineMigrationStatus from './VirtualMachineMigrationStatus';
 
@@ -55,17 +53,17 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
   vms,
 }) => {
   const { t } = useKubevirtTranslation();
+  const vmNamespaces = removeDuplicates(vms?.map((vm) => getNamespace(vm)));
 
-  const migrationNamespace = getNamespace(vms?.[0]);
   const cluster = getCluster(vms?.[0]);
   const [selectedStorageClass, setSelectedStorageClass] = useState('');
 
   const [currentMigPlanCreation, migPlanCreationLoaded, migPlanCreationError] =
-    useCreateEmptyMigPlan(migrationNamespace, cluster);
+    useCreateEmptyMigPlan(vmNamespaces, cluster);
 
-  const [existingMigPlan, migrationPlansLoaded] = useExistingMigrationPlan(
+  const { migPlansLoaded, namespaceConflicts } = useExistingMigPlanConflicts(
     currentMigPlanCreation,
-    migrationNamespace,
+    vmNamespaces,
     cluster,
   );
 
@@ -73,18 +71,11 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
     null,
   );
 
-  const [namespacePVCs, loaded, loadingError] = useK8sWatchData<
-    IoK8sApiCoreV1PersistentVolumeClaim[]
-  >({
-    cluster,
-    groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
-    isList: true,
-    namespace: migrationNamespace,
-  });
+  const [pvcsInNamespaces, loaded, loadError] = useMigrationNamespacesPVCs(vmNamespaces);
 
   const vmsPVCs = useMemo(
-    () => vms.map((vm) => getMigratableVMPVCs(vm, namespacePVCs)).flat(),
-    [vms, namespacePVCs],
+    () => vms.map((vm) => getMigratableVMPVCs(vm, pvcsInNamespaces)).flat(),
+    [vms, pvcsInNamespaces],
   );
 
   const [{ clusterDefaultStorageClass, sortedStorageClasses }, scLoaded] =
@@ -108,7 +99,7 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
   const { migMigration, migrationError, migrationLoading, migrationStarted, onSubmit } =
     useMigrationState(
       currentMigPlanCreation,
-      namespacePVCs,
+      pvcsInNamespaces,
       pvcsToMigrate,
       destinationStorageClass,
     );
@@ -130,7 +121,8 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
       });
   }, [onClose, migrationStarted, currentMigPlanCreation]);
 
-  const disableForExistingMigPlan = !isEmpty(existingMigPlan) || !migrationPlansLoaded;
+  const disableForExistingMigPlan = !isEmpty(namespaceConflicts) || !migPlansLoaded;
+
   return (
     <Modal
       className="virtual-machine-migration-modal"
@@ -139,7 +131,7 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
       variant="large"
     >
       <ModalBody>
-        <StateHandler error={loadingError || migPlanCreationError} hasData loaded>
+        <StateHandler error={loadError || migPlanCreationError} hasData loaded>
           {migrationStarted ? (
             <VirtualMachineMigrationStatus
               migMigration={migMigration}
@@ -170,11 +162,22 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
                 id="wizard-migration-details"
                 name={t('Migration details')}
               >
-                {!isEmpty(existingMigPlan) && (
+                {!isEmpty(namespaceConflicts) && (
                   <Alert
-                    title={t('An existing MigPlan for this namespace was found. ')}
+                    title={
+                      namespaceConflicts.length === 1
+                        ? t('An existing MigPlan for this namespace was found. ')
+                        : t('An existing MigPlan for these namespaces was found.')
+                    }
                     variant={AlertVariant.danger}
                   >
+                    {namespaceConflicts.length > 1 && (
+                      <List className="pf-v6-u-my-sm">
+                        {namespaceConflicts.map((ns) => (
+                          <ListItem key={ns}>{ns}</ListItem>
+                        ))}
+                      </List>
+                    )}
                     <Trans ns="plugin__kubevirt-plugin" t={t}>
                       Click{' '}
                       <Link
@@ -188,7 +191,7 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
                   </Alert>
                 )}
 
-                {isEmpty(existingMigPlan) && loaded && scLoaded && (
+                {isEmpty(namespaceConflicts) && loaded && scLoaded && (
                   <VirtualMachineMigrationDetails
                     pvcs={vmsPVCs}
                     selectedPVCs={selectedPVCs}
