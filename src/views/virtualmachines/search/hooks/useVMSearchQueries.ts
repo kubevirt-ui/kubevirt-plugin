@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom-v5-compat';
 
 import { STATIC_SEARCH_FILTERS } from '@kubevirt-utils/components/ListPageFilter/constants';
+import { getRowFilterQueryKey } from '@search/utils/query';
 import { AdvancedSearchFilter } from '@stolostron/multicluster-sdk';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
@@ -15,11 +16,15 @@ const useVMSearchQueries = (): VMSearchQueries => {
 
   const vmName = searchParams.get(STATIC_SEARCH_FILTERS.name);
 
-  const ip = searchParams.get(VirtualMachineRowFilterType.IP);
-  const project = searchParams.get(VirtualMachineRowFilterType.Project);
-  const clusters = searchParams.get(VirtualMachineRowFilterType.Cluster);
-  const createdFrom = searchParams.get(VirtualMachineRowFilterType.DateCreatedFrom);
-  const createdTo = searchParams.get(VirtualMachineRowFilterType.DateCreatedTo);
+  const ip = searchParams.get(getRowFilterQueryKey(VirtualMachineRowFilterType.IP));
+  const project = searchParams.get(getRowFilterQueryKey(VirtualMachineRowFilterType.Project));
+  const clusters = searchParams.get(getRowFilterQueryKey(VirtualMachineRowFilterType.Cluster));
+  const createdFrom = searchParams.get(
+    getRowFilterQueryKey(VirtualMachineRowFilterType.DateCreatedFrom),
+  );
+  const createdTo = searchParams.get(
+    getRowFilterQueryKey(VirtualMachineRowFilterType.DateCreatedTo),
+  );
 
   return useMemo(() => {
     const queries: VMSearchQueries = {
