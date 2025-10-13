@@ -6,6 +6,7 @@ import { extensions as utilsExtensions } from './src/utils/extension';
 import { extensions as CDIUploadProviderExtensions } from './src/views/cdi-upload-provider/extensions';
 import { extensions as CheckupsExtensions } from './src/views/checkups/extensions';
 import { extensions as dashboardExtensionsExtensions } from './src/views/dashboard-extensions/extensions';
+import { extensions as StorageClassExtensions } from './src/views/storageclasses/extensions';
 import { extensions as StorageMigrationExtensions } from './src/views/storagemigrations/extensions';
 import { extensions as TopologyExtensions } from './src/views/topology/extensions';
 import { extensions as VirtualMachinesExtensions } from './src/views/virtualmachines/extensions';
@@ -17,6 +18,7 @@ const extensions: EncodedExtension[] = [
   ...utilsExtensions,
   ...VirtualMachinesExtensions,
   ...CDIUploadProviderExtensions,
+  ...StorageClassExtensions,
   ...StorageMigrationExtensions,
   ...TopologyExtensions,
   ...MulticlusterExtensions,
