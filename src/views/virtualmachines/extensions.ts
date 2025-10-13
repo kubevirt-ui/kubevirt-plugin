@@ -12,8 +12,6 @@ export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
     './views/virtualmachines/details/tabs/diagnostic/VirtualMachineLogViewer/VirtualMachineLogViewerStandAlone/VirtualMachineLogViewerStandAlone.tsx',
   Navigator: './views/virtualmachines/navigator/VirtualMachineNavigator.tsx',
   useServiceActionsProvider: './utils/components/ServicesList/useServiceActionsProvider.ts',
-  useVirtualMachineActionsProvider:
-    './views/virtualmachines/actions/hooks/useVirtualMachineActionsProvider.ts',
   VirtualMachineSearchResults: './views/virtualmachines/search/VirtualMachineSearchResults.tsx',
 };
 
@@ -29,20 +27,6 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.page/route/standalone',
   } as EncodedExtension<StandaloneRoutePage>,
-
-  {
-    properties: {
-      model: {
-        group: 'kubevirt.io',
-        kind: 'VirtualMachine',
-        version: 'v1',
-      },
-      provider: {
-        $codeRef: 'useVirtualMachineActionsProvider',
-      },
-    },
-    type: 'console.action/resource-provider',
-  } as EncodedExtension<ResourceActionProvider>,
 
   {
     properties: {

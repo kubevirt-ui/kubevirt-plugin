@@ -140,7 +140,7 @@ const VirtualMachineRowLayout: FC<
       </TableData>
       <ACMExtentionsTableData activeColumnIDs={activeColumnIDs} vm={obj} />
       <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="">
-        <VirtualMachineActions actions={actions} data-test="row-action" isKebabToggle />
+        <VirtualMachineActions actions={actions} data-test="row-action" isKebabToggle vm={obj} />
       </TableData>
     </>
   );
