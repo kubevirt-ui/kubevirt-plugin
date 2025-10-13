@@ -6,3 +6,12 @@
 .saved-searches-dropdown-menu {
   max-width: 260px;
 }
+
+.advanced-search-icon {
+  transform: scale(1.25);
+  transform-origin: center;
+
+  &.isLarge {
+    transform: scale(1.5);
+  }
+}

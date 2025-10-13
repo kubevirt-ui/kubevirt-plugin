@@ -9,7 +9,7 @@ import {
   Flex,
   PanelFooter,
 } from '@patternfly/react-core';
-import SlidersHIcon from '@patternfly/react-icons/dist/esm/icons/sliders-h-icon';
+import AdvancedSearchIcon from '@search/components/AdvancedSearchIcon';
 
 import { SearchSuggestBoxProps } from '../SearchSuggestBox';
 
@@ -40,7 +40,7 @@ const SearchSuggestBoxFooter: FC<SearchSuggestBoxFooterProps> = ({
           </Button>
           <Button
             data-test="results-advanced-search"
-            icon={<SlidersHIcon />}
+            icon={<AdvancedSearchIcon />}
             iconPosition="end"
             onClick={onAdvancedSearchClick}
             variant={ButtonVariant.secondary}

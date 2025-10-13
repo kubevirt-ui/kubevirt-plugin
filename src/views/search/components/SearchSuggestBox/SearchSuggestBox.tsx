@@ -15,7 +15,6 @@ import {
   Stack,
   StackItem,
 } from '@patternfly/react-core';
-import SlidersHIcon from '@patternfly/react-icons/dist/esm/icons/sliders-h-icon';
 import { FleetResourceLink } from '@stolostron/multicluster-sdk';
 
 import {
@@ -23,6 +22,7 @@ import {
   AdvancedSearchQueryInputs,
   SearchSuggestResult,
 } from '../../utils/types';
+import AdvancedSearchIcon from '../AdvancedSearchIcon';
 
 import RelatedSuggestions from './components/RelatedSuggestions';
 import SearchSuggestBoxFooter from './components/SearchSuggestBoxFooter';
@@ -95,7 +95,7 @@ const SearchSuggestBox: FC<SearchSuggestBoxProps> = ({
                               showSearchModal();
                             }}
                             data-test="try-advanced-search"
-                            icon={<SlidersHIcon />}
+                            icon={<AdvancedSearchIcon />}
                             iconPosition="end"
                             isInline
                             variant={ButtonVariant.link}
