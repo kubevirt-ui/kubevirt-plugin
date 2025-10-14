@@ -7,6 +7,7 @@ import { CLUSTER_TAB_IDS } from '@overview/SettingsTab/search/constants';
 import { Button, Skeleton, Stack, StackItem } from '@patternfly/react-core';
 
 import {
+  CLUSTER_OBSERVABILITY_OPERATOR_NAME,
   NETOBSERV_OPERATOR_NAME,
   NMSTATE_OPERATOR_NAME,
   NODE_HEALTH_OPERATOR_NAME,
@@ -59,6 +60,13 @@ const VirtualizationFeaturesSection: FC = () => {
       toggleContent={t('Virtualization features')}
     >
       <Stack hasGutter>
+        <StackItem isFilled>
+          <FeaturedOperatorItem
+            isNew
+            operatorName={CLUSTER_OBSERVABILITY_OPERATOR_NAME}
+            title={t('Cluster observability (COO)')}
+          />
+        </StackItem>
         <StackItem isFilled>
           <FeaturedOperatorItem
             operatorName={NETOBSERV_OPERATOR_NAME}

@@ -3,6 +3,7 @@ import React, { FC, useEffect } from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
+  CLUSTER_OBSERVABILITY_OPERATOR_NAME,
   DESCHEDULER_OPERATOR_NAME,
   NETOBSERV_OPERATOR_NAME,
   NMSTATE_OPERATOR_NAME,
@@ -31,6 +32,12 @@ const SummaryStepContent: FC = () => {
         <Title headingLevel="h1" size={TitleSizes.lg}>
           {t('Summary')}
         </Title>
+      </StackItem>
+      <StackItem>
+        <FeatureSummaryItem
+          operatorLabel={t('Cluster observability')}
+          operatorName={CLUSTER_OBSERVABILITY_OPERATOR_NAME}
+        />
       </StackItem>
       <StackItem>
         <FeatureSummaryItem
