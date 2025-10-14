@@ -6,6 +6,7 @@ import {
   DESCHEDULER_OPERATOR_NAME,
   NETOBSERV_OPERATOR_NAME,
   NMSTATE_OPERATOR_NAME,
+  OPENSHIFT_LOGGING_OPERATOR_NAME,
 } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/constants';
 import { useVirtualizationFeaturesContext } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/VirtualizationFeaturesContext/VirtualizationFeaturesContext';
 import FeatureSummaryItem from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/VirtualizationFeaturesWizard/components/SummaryStep/components/FeatureSummaryItem/FeatureSummaryItem';
@@ -36,6 +37,12 @@ const SummaryStepContent: FC = () => {
         <FeatureSummaryItem
           operatorLabel={t('Network observability')}
           operatorName={NETOBSERV_OPERATOR_NAME}
+        />
+      </StackItem>
+      <StackItem>
+        <FeatureSummaryItem
+          operatorLabel={t('OpenShift logging')}
+          operatorName={OPENSHIFT_LOGGING_OPERATOR_NAME}
         />
       </StackItem>
       <StackItem>

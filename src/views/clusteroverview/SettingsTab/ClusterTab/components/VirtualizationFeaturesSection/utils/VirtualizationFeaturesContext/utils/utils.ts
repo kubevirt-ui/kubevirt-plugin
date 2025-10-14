@@ -9,6 +9,7 @@ import {
   NETOBSERV_OPERATOR_NAME,
   NMSTATE_OPERATOR_NAME,
   NODE_HEALTH_OPERATOR_NAME,
+  OPENSHIFT_LOGGING_OPERATOR_NAME,
   operatorPackageNames,
 } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/constants';
 import {
@@ -114,6 +115,7 @@ export const defaultVirtFeatureOperatorItemsMap = {
   [NETOBSERV_OPERATOR_NAME]: defaultOperatorData,
   [NMSTATE_OPERATOR_NAME]: defaultOperatorData,
   [NODE_HEALTH_OPERATOR_NAME]: defaultOperatorData,
+  [OPENSHIFT_LOGGING_OPERATOR_NAME]: defaultOperatorData,
 };
 
 export const getPackageUID = (pkg: PackageManifestKind) =>

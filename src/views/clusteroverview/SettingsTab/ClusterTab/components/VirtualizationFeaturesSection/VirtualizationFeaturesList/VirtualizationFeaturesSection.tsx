@@ -10,6 +10,7 @@ import {
   NETOBSERV_OPERATOR_NAME,
   NMSTATE_OPERATOR_NAME,
   NODE_HEALTH_OPERATOR_NAME,
+  OPENSHIFT_LOGGING_OPERATOR_NAME,
 } from '../utils/constants';
 import {
   useVirtualizationFeaturesContext,
@@ -63,6 +64,12 @@ const VirtualizationFeaturesSection: FC = () => {
           <FeaturedOperatorItem
             operatorName={NETOBSERV_OPERATOR_NAME}
             title={t('Network observability')}
+          />
+        </StackItem>
+        <StackItem isFilled>
+          <FeaturedOperatorItem
+            operatorName={OPENSHIFT_LOGGING_OPERATOR_NAME}
+            title={t('OpenShift logging')}
           />
         </StackItem>
         <StackItem isFilled>

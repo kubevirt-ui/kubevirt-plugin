@@ -4,6 +4,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import {
   NETOBSERV_OPERATOR_NAME,
   NMSTATE_OPERATOR_NAME,
+  OPENSHIFT_LOGGING_OPERATOR_NAME,
 } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/constants';
 import ConfigurationStepHeader from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/VirtualizationFeaturesWizard/components/ConfigurationStep/components/ConfigurationStepHeader/ConfigurationStepHeader';
 import LoadBalanceConfigurationSection from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/VirtualizationFeaturesWizard/components/ConfigurationStep/components/LoadBalanceConfigurationSection/LoadBalanceConfigurationSection';
@@ -27,6 +28,14 @@ const ConfigurationStepContent: FC = () => {
           description={t('Network flows collector and monitoring solution.')}
           operatorName={NETOBSERV_OPERATOR_NAME}
           title={t('Network observability')}
+        />
+      </StackItem>
+      <hr />
+      <StackItem className="feature-wizard-configuration-step__item-container">
+        <VirtFeatureConfigurationItem
+          description={t('Centralized logging solution.')} // TODO Update description
+          operatorName={OPENSHIFT_LOGGING_OPERATOR_NAME}
+          title={t('OpenShift logging')}
         />
       </StackItem>
       <hr />
