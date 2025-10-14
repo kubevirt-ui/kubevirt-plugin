@@ -2,9 +2,10 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { ConfigMapModel } from '@kubevirt-ui/kubevirt-api/console';
 import { DEFAULT_OPERATOR_NAMESPACE } from '@kubevirt-utils/utils/utils';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 
-import { FEATURES_CONFIG_MAP_NAME, featuresConfigMapInitialState } from './constants';
+import { FEATURES_CONFIG_MAP_NAME, featuresConfigMapInitialState, UI_FEATURES } from './constants';
 import { applyMissingFeatures, createFeaturesConfigMap } from './createFeaturesConfigMap';
 import { UseFeaturesValues } from './types';
 import useFeaturesConfigMap from './useFeaturesConfigMap';
@@ -14,7 +15,15 @@ type UseFeatures = (featureName: string) => UseFeaturesValues;
 export const useFeatures: UseFeatures = (featureName) => {
   const [createError, setCreateError] = useState(null);
   const [createInProgress, setCreateInProgress] = useState(false);
-  const { featuresConfigMapData, isAdmin } = useFeaturesConfigMap(!createError);
+
+  const isUIFeature = UI_FEATURES.includes(featureName);
+  const cluster = useClusterParam();
+
+  const { featuresConfigMapData, isAdmin } = useFeaturesConfigMap(
+    isUIFeature ? null : cluster,
+    !createError,
+  );
+
   const [featureConfigMap, loaded, loadError] = featuresConfigMapData;
   const [featureEnabled, setFeatureEnabled] = useState(null);
   const [loading, setLoading] = useState(true);
