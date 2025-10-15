@@ -11,34 +11,36 @@ import './section-with-switch.scss';
 
 type SectionWithSwitchProps = {
   externalLink?: string;
-  helpTextIconContent?: FC;
+  helpTextIconContent?: ReactNode;
   id?: string;
   inlineCheckbox?: boolean;
   isDisabled?: boolean;
   isLoading?: boolean;
   maxWidth?: string;
   newBadge?: boolean;
+  popoverClassName?: string;
   switchIsOn: boolean;
   title?: ReactNode;
   turnOnSwitch: (checked: boolean) => void;
 };
+
 const SectionWithSwitch: FC<SectionWithSwitchProps> = ({
   children,
   externalLink,
-  helpTextIconContent,
+  helpTextIconContent = '',
   id,
   inlineCheckbox,
   isDisabled,
   isLoading,
   maxWidth,
   newBadge = false,
+  popoverClassName,
   switchIsOn,
   title,
   turnOnSwitch,
 }) => {
   const Wrapper = inlineCheckbox ? 'div' : Split;
 
-  const PopoverContent = helpTextIconContent;
   return (
     <Wrapper className="section-with-switch" hasGutter id={id} style={{ maxWidth }}>
       <div
@@ -51,7 +53,8 @@ const SectionWithSwitch: FC<SectionWithSwitchProps> = ({
         {helpTextIconContent && (
           <SplitItem isFilled>
             <HelpTextIcon
-              bodyContent={<PopoverContent />}
+              bodyContent={helpTextIconContent}
+              className={popoverClassName}
               helpIconClassName="section-with-switch__help-text-popover"
               position={PopoverPosition.right}
             />

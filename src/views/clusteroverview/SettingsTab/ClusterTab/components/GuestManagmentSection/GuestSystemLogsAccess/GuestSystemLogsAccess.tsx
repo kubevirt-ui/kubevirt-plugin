@@ -1,21 +1,13 @@
 import React, { FC, useEffect, useState } from 'react';
 
 import HyperConvergedModel from '@kubevirt-ui/kubevirt-api/console/models/HyperConvergedModel';
-import NewBadge from '@kubevirt-utils/components/badges/NewBadge/NewBadge';
-import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
+import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
 import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
-import {
-  Alert,
-  AlertVariant,
-  PopoverPosition,
-  Split,
-  SplitItem,
-  Switch,
-} from '@patternfly/react-core';
+import { Alert, AlertVariant } from '@patternfly/react-core';
 
 import './guest-system-logs-access.scss';
 
@@ -70,28 +62,17 @@ const GuestSystemLogsAccess: FC<GuestSystemLogsAccessProps> = ({
 
   return (
     <>
-      <Split className="settings-tab--indented">
-        <SplitItem isFilled>
-          {t('Enable guest system log access')}{' '}
-          <HelpTextIcon
-            bodyContent={t(
-              "Enables access to the VirtualMachine's guest system log. Wait a few seconds for logging to start before viewing the log.",
-            )}
-            position={PopoverPosition.bottom}
-          />
-          {newBadge && <NewBadge />}
-        </SplitItem>
-        {hyperLoaded && (
-          <SplitItem>
-            <Switch
-              className={isLoading && 'kv-cursor--loading'}
-              id="guest-system-log-access"
-              isChecked={isChecked}
-              onChange={(_, checked: boolean) => onChange(checked)}
-            />
-          </SplitItem>
+      <SectionWithSwitch
+        helpTextIconContent={t(
+          "Enables access to the VirtualMachine's guest system log. Wait a few seconds for logging to start before viewing the log.",
         )}
-      </Split>
+        isDisabled={!hyperLoaded}
+        isLoading={isLoading}
+        newBadge={newBadge}
+        switchIsOn={isChecked}
+        title={t('Enable guest system log access')}
+        turnOnSwitch={onChange}
+      />
       {error && (
         <Alert
           className="GuestSystemLogsAccess--alert"

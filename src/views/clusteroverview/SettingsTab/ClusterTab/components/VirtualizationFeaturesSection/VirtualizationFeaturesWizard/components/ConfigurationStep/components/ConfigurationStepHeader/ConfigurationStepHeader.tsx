@@ -5,8 +5,6 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import HelpTextTooltipContent from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/VirtualizationFeaturesWizard/components/HelpTextTooltipContent/HelpTextTooltipContent';
 import { PopoverPosition, Title, TitleSizes } from '@patternfly/react-core';
 
-import './ConfigurationStepHeader.scss';
-
 const ConfigurationStepHeader: FC = ({}) => {
   const { t } = useKubevirtTranslation();
 
@@ -22,7 +20,7 @@ const ConfigurationStepHeader: FC = ({}) => {
             titleText={t('Configuration')}
           />
         }
-        helpIconClassName="configuration-step-header__icon"
+        helpIconClassName="pf-v6-u-ml-sm"
         position={PopoverPosition.right}
       />
     </Title>

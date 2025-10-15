@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { ReactNode } from 'react';
 
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { PASST_UDN_NETWORK, TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
@@ -16,7 +16,7 @@ type Feature = {
   error?: Error;
   externalLink: string;
   featureEnabled: boolean;
-  helpPopoverContent?: FC;
+  helpPopoverContent?: ReactNode;
   id: string;
   label: string;
   loading: boolean;

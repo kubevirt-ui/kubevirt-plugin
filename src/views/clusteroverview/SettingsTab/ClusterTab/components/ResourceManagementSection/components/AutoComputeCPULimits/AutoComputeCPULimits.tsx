@@ -1,9 +1,9 @@
 import React, { FC, useState } from 'react';
 
-import NewBadge from '@kubevirt-utils/components/badges/NewBadge/NewBadge';
+import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Alert, AlertVariant, Split, SplitItem, Switch } from '@patternfly/react-core';
+import { Alert, AlertVariant } from '@patternfly/react-core';
 
 import { AUTO_RESOURCE_LIMITS_FEATURE_GATE } from './utils/constants';
 import { updateAutoResourceLimitsFeatureGate } from './utils/utils';
@@ -36,20 +36,14 @@ const AutoComputeCPULimits: FC<AutoComputeCPULimitsProps> = ({
 
   return (
     <>
-      <Split className="settings-tab--indented">
-        <SplitItem isFilled>
-          {t('Auto-compute CPU and memory limits')} {newBadge && <NewBadge />}
-        </SplitItem>
-        <SplitItem>
-          <Switch
-            className={isLoading && 'kv-cursor--loading'}
-            id="auto-compute-cpu-limits"
-            isChecked={featureEnabled}
-            isDisabled={!hcoLoaded}
-            onChange={(_, checked: boolean) => onFeatureChange(checked)}
-          />
-        </SplitItem>
-      </Split>
+      <SectionWithSwitch
+        isDisabled={!hcoLoaded}
+        isLoading={isLoading}
+        newBadge={newBadge}
+        switchIsOn={featureEnabled}
+        title={t('Auto-compute CPU and memory limits')}
+        turnOnSwitch={onFeatureChange}
+      />
       {error && (
         <Alert
           className="autocompute-cpu-limits__error-alert"
