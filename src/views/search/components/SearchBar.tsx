@@ -14,7 +14,6 @@ import {
   SearchInputProps,
   Tooltip,
 } from '@patternfly/react-core';
-import SlidersHIcon from '@patternfly/react-icons/dist/esm/icons/sliders-h-icon';
 import { SearchSuggestResult } from '@search/utils/types';
 import { useVirtualMachineSearchSuggestions } from '@virtualmachines/search/hooks/useVirtualMachineSearchSuggestions';
 
@@ -24,6 +23,7 @@ import { AdvancedSearchInputs } from '../utils/types';
 
 import AdvancedSearchModal from './AdvancedSearchModal/AdvancedSearchModal';
 import SearchSuggestBox from './SearchSuggestBox/SearchSuggestBox';
+import AdvancedSearchIcon from './AdvancedSearchIcon';
 import SavedSearchesDropdown from './SavedSearchesDropdown';
 import SaveSearchModal from './SaveSearchModal';
 
@@ -169,7 +169,7 @@ const SearchBar: FC<SearchBarProps> = ({ onFilterChange }) => {
             showSearchModal();
           }}
           data-test="vm-advanced-search"
-          icon={<SlidersHIcon />}
+          icon={<AdvancedSearchIcon isLarge />}
           variant="control"
         />
       </Tooltip>
