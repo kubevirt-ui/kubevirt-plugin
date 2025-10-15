@@ -13,7 +13,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { useMetalLBOperatorInstalled } from '@kubevirt-utils/hooks/useMetalLBOperatorInstalled/useMetalLBOperatorInstalled';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
-import { TextInput } from '@patternfly/react-core';
+import { Stack, TextInput } from '@patternfly/react-core';
 
 import ExpandSection from '../../../../ExpandSection/ExpandSection';
 
@@ -57,47 +57,49 @@ const SSHConfiguration: FC<SSHConfigurationProps> = ({ newBadge }) => {
 
   return (
     <ExpandSection toggleText={t('SSH configurations')}>
-      <SectionWithSwitch
-        helpTextIconContent={t(
-          'Enable the creation of LoadBalancer services for SSH connections to VirtualMachines. A load balancer must be configured',
-        )}
-        switchIsOn={
-          featureConfigMap?.data?.[LOAD_BALANCER_ENABLED] === 'true' || hasMetalLBInstalled
-        }
-        id="load-balancer-feature"
-        isDisabled={!loaded || !isAdmin || hasMetalLBInstalled}
-        isLoading={loadBalancerIsLoading}
-        newBadge={newBadge}
-        title={t('SSH over LoadBalancer service')}
-        turnOnSwitch={(checked) => onChange(checked.toString(), LOAD_BALANCER_ENABLED)}
-      />
-      <SectionWithSwitch
-        helpTextIconContent={t(
-          'Allow the creation of NodePort services for SSH connections to VirtualMachines. An address of a publicly available Node must be provided.',
-        )}
-        switchIsOn={
-          featureConfigMap?.data?.[NODE_PORT_ENABLED] === 'true' &&
-          !isEmpty(featureConfigMap?.data?.[NODE_PORT_ADDRESS])
-        }
-        id="node-port-feature"
-        isDisabled={!loaded || !isAdmin || isEmpty(featureConfigMap?.data?.[NODE_PORT_ADDRESS])}
-        isLoading={nodePortIsLoading}
-        newBadge={newBadge}
-        title={t('SSH over NodePort service')}
-        turnOnSwitch={(checked) => onChange(checked.toString(), NODE_PORT_ENABLED)}
-      />
-      <TextInput
-        onChange={(_event, value: string) => {
-          setUrl(value);
-          onTextChange(value, NODE_PORT_ADDRESS);
-        }}
-        className="pf-v6-u-mr-md"
-        id="node-address"
-        isRequired
-        name="node-address"
-        placeholder={t('Enter node address')}
-        value={url ?? featureConfigMap?.data?.[NODE_PORT_ADDRESS]}
-      />
+      <Stack hasGutter>
+        <SectionWithSwitch
+          helpTextIconContent={t(
+            'Enable the creation of LoadBalancer services for SSH connections to VirtualMachines. A load balancer must be configured',
+          )}
+          switchIsOn={
+            featureConfigMap?.data?.[LOAD_BALANCER_ENABLED] === 'true' || hasMetalLBInstalled
+          }
+          id="load-balancer-feature"
+          isDisabled={!loaded || !isAdmin || hasMetalLBInstalled}
+          isLoading={loadBalancerIsLoading}
+          newBadge={newBadge}
+          title={t('SSH over LoadBalancer service')}
+          turnOnSwitch={(checked) => onChange(checked.toString(), LOAD_BALANCER_ENABLED)}
+        />
+        <SectionWithSwitch
+          helpTextIconContent={t(
+            'Allow the creation of NodePort services for SSH connections to VirtualMachines. An address of a publicly available Node must be provided.',
+          )}
+          switchIsOn={
+            featureConfigMap?.data?.[NODE_PORT_ENABLED] === 'true' &&
+            !isEmpty(featureConfigMap?.data?.[NODE_PORT_ADDRESS])
+          }
+          id="node-port-feature"
+          isDisabled={!loaded || !isAdmin || isEmpty(featureConfigMap?.data?.[NODE_PORT_ADDRESS])}
+          isLoading={nodePortIsLoading}
+          newBadge={newBadge}
+          title={t('SSH over NodePort service')}
+          turnOnSwitch={(checked) => onChange(checked.toString(), NODE_PORT_ENABLED)}
+        />
+        <TextInput
+          onChange={(_event, value: string) => {
+            setUrl(value);
+            onTextChange(value, NODE_PORT_ADDRESS);
+          }}
+          className="pf-v6-u-mr-md"
+          id="node-address"
+          isRequired
+          name="node-address"
+          placeholder={t('Enter node address')}
+          value={url ?? featureConfigMap?.data?.[NODE_PORT_ADDRESS]}
+        />
+      </Stack>
     </ExpandSection>
   );
 };
