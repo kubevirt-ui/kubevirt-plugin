@@ -293,7 +293,9 @@ export const createMultiClusterTreeViewData = (
     ?.map((clusterName) => {
       const clusterVMs = vmsPerCluster[clusterName] ?? [];
 
-      const clusterProjects = projectsByClusters[clusterName]?.map((project) => getName(project));
+      const clusterProjects = projectsByClusters[clusterName]
+        ?.map((project) => getName(project))
+        ?.sort((a, b) => a.localeCompare(b));
 
       const projectMap = buildProjectMap(
         clusterVMs,
