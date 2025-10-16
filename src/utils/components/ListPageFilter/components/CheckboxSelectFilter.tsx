@@ -34,8 +34,7 @@ const CheckboxSelectFilter: FC<CheckboxSelectFilterProps> = ({
     [allValues, selectedValues],
   );
 
-  const applyFilters = (values?: string[]) =>
-    applyFiltersProp(getRowFilterQueryKey(filterType), values);
+  const applyFilters = (values?: string[]) => applyFiltersProp(filterType, values);
 
   const onSelect: SelectProps['onSelect'] = (_event, value: string) => {
     if (selectedValues.includes(value)) {

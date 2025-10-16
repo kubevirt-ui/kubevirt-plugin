@@ -6,7 +6,6 @@ import { useApplyFiltersWithQuery } from '@kubevirt-utils/components/ListPageFil
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { OnFilterChange, RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { Toolbar, ToolbarContent } from '@patternfly/react-core';
-import { getRowFilterQueryKey } from '@search/utils/query';
 import { ListPageBodySize } from '@virtualmachines/list/listPageBodySize';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils/constants';
 
@@ -47,7 +46,7 @@ const VirtualMachineFilterToolbar: FC<VirtualMachineFilterToolbarProps> = ({
     applyFiltersWithQuery(VirtualMachineRowFilterType.Labels);
 
     [...filtersWithSelect, ...hiddenFilters].forEach(
-      (filter) => filter && applyFiltersWithQuery(getRowFilterQueryKey(filter.type)),
+      (filter) => filter && applyFiltersWithQuery(filter.type),
     );
   };
 
