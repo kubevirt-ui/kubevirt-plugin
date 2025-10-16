@@ -6,6 +6,7 @@ import {
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils/constants';
 
@@ -24,6 +25,7 @@ import { getSchedulingFilter } from '../../utils/filters/getSchedulingFilter';
 import { getStatusFilter } from '../../utils/filters/getStatusFilter';
 import { useVirtualMachineInstanceMapper } from '../useVirtualMachineInstanceMapper';
 
+import { useClusterFilter } from './useClusterFilter';
 import { useNodesFilter } from './useNodesFilter';
 import { useProjectFilter } from './useProjectFilter';
 import { useStorageClassFilter } from './useStorageClassFilter';
@@ -38,7 +40,7 @@ export const useVMListFilters = (
   vmimMapper: VMIMMapper;
 } => {
   const vmiMapper = useVirtualMachineInstanceMapper();
-
+  const isACMPage = useIsACMPage();
   const vmimMapper: VMIMMapper = useMemo(() => getLatestMigrationForEachVM(vmims), [vmims]);
 
   const [vms] = useKubevirtWatchResource<V1VirtualMachine[]>({
@@ -47,6 +49,7 @@ export const useVMListFilters = (
     limit: OBJECTS_FETCHING_LIMIT,
   });
 
+  const clusterFilter = useClusterFilter();
   const projectFilter = useProjectFilter();
   const statusFilter = getStatusFilter();
   const osFilters = getOSFilter();
@@ -64,16 +67,20 @@ export const useVMListFilters = (
   const ipFilter = getIPFilter(vmiMapper);
   const nadFilter = getNADsFilter();
 
+  const filtersWithSelect = [
+    projectFilter,
+    statusFilter,
+    osFilters,
+    storageClassFilter,
+    hwDevicesFilter,
+    schedulingFilter,
+    nodesFilter,
+  ];
+
+  if (isACMPage) filtersWithSelect.unshift(clusterFilter);
+
   return {
-    filtersWithSelect: [
-      projectFilter,
-      statusFilter,
-      osFilters,
-      storageClassFilter,
-      hwDevicesFilter,
-      schedulingFilter,
-      nodesFilter,
-    ],
+    filtersWithSelect,
     hiddenFilters: [
       descriptionFilter,
       cpuFilter,
