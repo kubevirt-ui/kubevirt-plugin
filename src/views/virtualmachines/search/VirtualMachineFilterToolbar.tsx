@@ -53,6 +53,9 @@ const VirtualMachineFilterToolbar: FC<VirtualMachineFilterToolbarProps> = ({
   if (!loaded) return null;
 
   const filterSettings = {
+    [VirtualMachineRowFilterType.Cluster]: {
+      showAllBadge: true,
+    },
     [VirtualMachineRowFilterType.HWDevices]: {
       filterGroupNameShortcut: t('HW devices'),
     },
