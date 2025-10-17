@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 
+import ClusterProjectDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterProjectDropdown';
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -21,6 +22,7 @@ const MigrationPoliciesEmptyState: FC = () => {
 
   return (
     <>
+      <ClusterProjectDropdown includeAllClusters showProjectDropdown={false} />
       <ListPageHeader title={t('MigrationPolicies')} />
 
       <ListPageBody>

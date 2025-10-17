@@ -6,10 +6,11 @@ import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { k8sCreate, k8sDelete, k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import { kubevirtK8sCreate, kubevirtK8sDelete, kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 import { FormGroup, TextInput } from '@patternfly/react-core';
 
-import { migrationPoliciesPageBaseURL } from '../../list/utils/constants';
+import { useMigrationPoliciesPageBaseURL } from '../../hooks/useMigrationPoliciesPageBaseURL';
 import MigrationPolicyConfigurations from '../MigrationPolicyConfigurations/MigrationPolicyConfigurations';
 
 import { EditMigrationPolicyInitialState } from './utils/constants';
@@ -28,6 +29,8 @@ const MigrationPolicyEditModal: FC<MigrationPolicyEditModalProps> = ({ isOpen, m
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const location = useLocation();
+  const cluster = useClusterParam();
+  const migrationPoliciesBaseURL = useMigrationPoliciesPageBaseURL();
   const [state, setState] = useState<EditMigrationPolicyInitialState>(
     extractEditMigrationPolicyInitialValues(mp),
   );
@@ -50,18 +53,23 @@ const MigrationPolicyEditModal: FC<MigrationPolicyEditModalProps> = ({ isOpen, m
 
   const onSubmit = (updatedMP: V1alpha1MigrationPolicy) => {
     if (updatedMP?.metadata?.name !== mp?.metadata?.name) {
-      return k8sCreate({ data: updatedMP, model: MigrationPolicyModel }).then(() => {
-        return k8sDelete({ model: MigrationPolicyModel, resource: mp }).then(() => {
-          if (lastPolicyPathElement === mp?.metadata?.name) {
-            // if we were on MigrationPolicy details page, stay there and just update the data
-            navigate(`${migrationPoliciesPageBaseURL}/${updatedMP?.metadata?.name}`);
-          } else {
-            navigate(migrationPoliciesPageBaseURL); // MigrationPolicies list
-          }
-        });
-      });
+      return kubevirtK8sCreate({ cluster, data: updatedMP, model: MigrationPolicyModel }).then(
+        () => {
+          return kubevirtK8sDelete({ cluster, model: MigrationPolicyModel, resource: mp }).then(
+            () => {
+              if (lastPolicyPathElement === mp?.metadata?.name) {
+                // if we were on MigrationPolicy details page, stay there and just update the data
+                navigate(`${migrationPoliciesBaseURL}/${updatedMP?.metadata?.name}`);
+              } else {
+                navigate(migrationPoliciesBaseURL); // MigrationPolicies list
+              }
+            },
+          );
+        },
+      );
     }
-    return k8sUpdate({
+    return kubevirtK8sUpdate({
+      cluster,
       data: updatedMP,
       model: MigrationPolicyModel,
     });
