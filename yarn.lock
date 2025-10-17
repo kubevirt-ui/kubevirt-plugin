@@ -1218,10 +1218,10 @@
   resolved "https://registry.yarnpkg.com/@novnc/novnc/-/novnc-1.5.0.tgz#7df3e4aca48eaa7c0d6f690e7dee89480232e2f1"
   integrity sha512-4yGHOtUCnEJUCsgEt/L78eeJu00kthurLBWXFiaXfonNx0pzbs6R/3gJb1byZe6iAE8V9MF0syQb0xIL8MSOtQ==
 
-"@openshift-console/dynamic-plugin-sdk-internal@4.19.0-prerelease.2":
-  version "4.19.0-prerelease.2"
-  resolved "https://registry.yarnpkg.com/@openshift-console/dynamic-plugin-sdk-internal/-/dynamic-plugin-sdk-internal-4.19.0-prerelease.2.tgz#7b30b9987d601a0ca4bded2992b0e6a57c4440a1"
-  integrity sha512-IqjaAgOBnaAXB8ff7JWFoI+0gD30Nr/84CAGO60dCe1kGkgefWD7ABdraULEjrce3V/ZDifZgO00yscMOa80Eg==
+"@openshift-console/dynamic-plugin-sdk-internal@4.19.0":
+  version "4.19.0"
+  resolved "https://registry.yarnpkg.com/@openshift-console/dynamic-plugin-sdk-internal/-/dynamic-plugin-sdk-internal-4.19.0.tgz#df9ec5191d002f57250064c40bda6b8f0528bad9"
+  integrity sha512-OnC/2CV/oejtOzXQujYk/0JGSPuFjR6F51KsKKPelX9KqF+A2G2GW/yESR3n/FkGMtXxl6ZCUXUBCDMLXVRH/g==
   dependencies:
     "@patternfly/react-topology" "^6.2.0"
     immutable "3.x"
@@ -1234,10 +1234,10 @@
     redux "4.0.1"
     redux-thunk "2.4.0"
 
-"@openshift-console/dynamic-plugin-sdk-webpack@4.19.0-prerelease.2":
-  version "4.19.0-prerelease.2"
-  resolved "https://registry.yarnpkg.com/@openshift-console/dynamic-plugin-sdk-webpack/-/dynamic-plugin-sdk-webpack-4.19.0-prerelease.2.tgz#ad790b0270a331fb93731c11e4d40c3e369b81e3"
-  integrity sha512-1EtkPsZoIIgmxpkkAlJWHs6baG2GZ0uHdKbELoQHkXO/wbbdoUVMMdHzHiw6KwJciVJcc8THXfNQa4h/Gv3T/Q==
+"@openshift-console/dynamic-plugin-sdk-webpack@4.19.0":
+  version "4.19.0"
+  resolved "https://registry.yarnpkg.com/@openshift-console/dynamic-plugin-sdk-webpack/-/dynamic-plugin-sdk-webpack-4.19.0.tgz#6a0171702d9089f6cbe6cb74665ea855bb42af7e"
+  integrity sha512-a4zxkrEe4qhKir5R21OK/wJVCn8Gzm/y3smLxRDi/BjHFgcnNQKEgCMP4IhvTlT0NRJQ4Q9AmPT1WXBlV3ip3g==
   dependencies:
     "@openshift/dynamic-plugin-sdk-webpack" "^4.0.2"
     ajv "^6.12.3"
@@ -1250,10 +1250,10 @@
     semver "6.x"
     webpack "^5.75.0"
 
-"@openshift-console/dynamic-plugin-sdk@4.19.0-prerelease.2":
-  version "4.19.0-prerelease.2"
-  resolved "https://registry.yarnpkg.com/@openshift-console/dynamic-plugin-sdk/-/dynamic-plugin-sdk-4.19.0-prerelease.2.tgz#80691484cb1842ec05d4439a16303d6ccfcf1263"
-  integrity sha512-esjzQZMqJTt8ceepSdPWd9s8kKTRJAqcLfMtbfvIIuLWNDk+0OeopiG5k25DXBSe9L8zlOpkmJKogi5aJJl+FA==
+"@openshift-console/dynamic-plugin-sdk@4.19.0":
+  version "4.19.0"
+  resolved "https://registry.yarnpkg.com/@openshift-console/dynamic-plugin-sdk/-/dynamic-plugin-sdk-4.19.0.tgz#c9b6c1338b14c174520bff827f4e2be5ab2290a4"
+  integrity sha512-v1pNt2eDCyXwRZX+66QDnaYtrwbLapRMtCQql65pgePsE5/5aoOSGIsTjIB812j+oagAB1yk4r7OUlopA2F8kw==
   dependencies:
     "@patternfly/react-topology" "^6.2.0"
     classnames "2.x"

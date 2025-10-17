@@ -1,24 +1,30 @@
 import React, { FC, memo } from 'react';
 
-import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
+import LazyActionMenu from '@kubevirt-utils/components/LazyActionMenu/LazyActionMenu';
+import { VirtualMachineModelRef } from '@kubevirt-utils/models';
+import { ActionMenuVariant } from '@openshift-console/dynamic-plugin-sdk/lib/api/internal-types';
 
 import './VirtualMachineActions.scss';
 
 type VirtualMachinesInstanceActionsProps = {
-  actions: ActionDropdownItemType[];
+  actions?: ActionDropdownItemType[];
   isKebabToggle?: boolean;
+  vm: V1VirtualMachine;
 };
 
 const VirtualMachineActions: FC<VirtualMachinesInstanceActionsProps> = ({
   actions,
   isKebabToggle,
+  vm,
 }) => (
-  <ActionsDropdown
-    actions={actions}
-    className="VirtualMachineActions"
-    id="virtual-machine-actions"
-    isKebabToggle={isKebabToggle}
+  <LazyActionMenu
+    context={{ [VirtualMachineModelRef]: vm }}
+    isMulticluster={true}
+    key={vm?.metadata?.name}
+    localActions={actions}
+    variant={isKebabToggle ? ActionMenuVariant.KEBAB : ActionMenuVariant.DROPDOWN}
   />
 );
 
