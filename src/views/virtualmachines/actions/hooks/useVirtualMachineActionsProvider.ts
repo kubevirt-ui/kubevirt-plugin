@@ -105,9 +105,13 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
         : VirtualMachineActionFactory.pause(vm, createModal, confirmVMActionsEnabled);
 
     return [
-      startOrStop,
-      VirtualMachineActionFactory.restart(vm, createModal, confirmVMActionsEnabled),
-      pauseOrUnpause,
+      VirtualMachineActionFactory.controlActions([
+        startOrStop,
+        pauseOrUnpause,
+        VirtualMachineActionFactory.restart(vm, createModal, confirmVMActionsEnabled),
+        VirtualMachineActionFactory.reset(vm, createModal, confirmVMActionsEnabled),
+      ]),
+
       VirtualMachineActionFactory.openConsole(vm),
       VirtualMachineActionFactory.clone(vm, createModal),
       VirtualMachineActionFactory.snapshot(vm, createModal),
