@@ -106,7 +106,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
 
     return [
       startOrStop,
-      VirtualMachineActionFactory.restart(vm, createModal, confirmVMActionsEnabled),
+
       pauseOrUnpause,
       VirtualMachineActionFactory.clone(vm, createModal),
       VirtualMachineActionFactory.snapshot(vm, createModal),
@@ -114,6 +114,10 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
       VirtualMachineActionFactory.copySSHCommand(vm, virtctlCommand),
       treeViewFoldersEnabled && VirtualMachineActionFactory.moveToFolder(vm, createModal),
       VirtualMachineActionFactory.editLabels(vm, createModal),
+      VirtualMachineActionFactory.controlActions([
+        VirtualMachineActionFactory.restart(vm, createModal, confirmVMActionsEnabled),
+        VirtualMachineActionFactory.reset(vm, createModal, confirmVMActionsEnabled),
+      ]),
       VirtualMachineActionFactory.delete(vm, createModal),
       ...otherACMActions,
     ].filter(Boolean);
