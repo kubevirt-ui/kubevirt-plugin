@@ -52,10 +52,16 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
     <Bullseye className="console-overview">
       <div className="link">
         <Button
+          onClick={(e) => {
+            e.preventDefault();
+            actions?.disconnect?.();
+            window.open(getConsoleStandaloneURL(vmNamespace, vmName, vmCluster));
+          }}
+          component="a"
+          href={getConsoleStandaloneURL(vmNamespace, vmName, vmCluster)}
           icon={<ExternalLinkAltIcon className="icon" />}
           iconPosition="end"
           isDisabled={!enableConsole}
-          onClick={() => window.open(getConsoleStandaloneURL(vmNamespace, vmName, vmCluster))}
           variant={ButtonVariant.link}
         >
           {t('Open web console')}
