@@ -9,12 +9,19 @@ import CPUComponentInput from './components/CPUComponentInput';
 
 type CPUTopologyInputProps = {
   cpu: V1CPU;
+  cpuLimits: Record<string, number>;
   hide: boolean;
   isDisabled: boolean;
   setCPU: Dispatch<SetStateAction<V1CPU>>;
 };
 
-const CPUTopologyInput: FC<CPUTopologyInputProps> = ({ cpu, hide, isDisabled, setCPU }) => {
+const CPUTopologyInput: FC<CPUTopologyInputProps> = ({
+  cpu,
+  cpuLimits,
+  hide,
+  isDisabled,
+  setCPU,
+}) => {
   if (hide) return null;
 
   return (
@@ -22,18 +29,21 @@ const CPUTopologyInput: FC<CPUTopologyInputProps> = ({ cpu, hide, isDisabled, se
       <CPUComponentInput
         cpu={cpu}
         cpuComponent={CPUComponent.cores}
+        cpuLimits={cpuLimits}
         isDisabled={isDisabled}
         setCPU={setCPU}
       />
       <CPUComponentInput
         cpu={cpu}
         cpuComponent={CPUComponent.sockets}
+        cpuLimits={cpuLimits}
         isDisabled={isDisabled}
         setCPU={setCPU}
       />
       <CPUComponentInput
         cpu={cpu}
         cpuComponent={CPUComponent.threads}
+        cpuLimits={cpuLimits}
         isDisabled={isDisabled}
         setCPU={setCPU}
       />
