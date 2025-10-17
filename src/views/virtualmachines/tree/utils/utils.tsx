@@ -9,6 +9,7 @@ import {
 import { ALL_NAMESPACES_SESSION_KEY, ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
 import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { universalComparator } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { UseMulticlusterNamespacesReturnType } from '@multicluster/hooks/useMulticlusterProjects';
 import {
@@ -289,13 +290,13 @@ export const createMultiClusterTreeViewData = (
   const treeViewDataMap: Record<string, TreeViewDataItem> = {};
 
   const treeWithClusters = clusterNames
-    ?.sort((a, b) => a.localeCompare(b))
+    ?.sort((a, b) => universalComparator(a, b))
     ?.map((clusterName) => {
       const clusterVMs = vmsPerCluster[clusterName] ?? [];
 
       const clusterProjects = projectsByClusters[clusterName]
         ?.map((project) => getName(project))
-        ?.sort((a, b) => a.localeCompare(b));
+        ?.sort((a, b) => universalComparator(a, b));
 
       const projectMap = buildProjectMap(
         clusterVMs,
