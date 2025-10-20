@@ -16,7 +16,7 @@ const useContainerWidth = (containerRef: MutableRefObject<HTMLElement>) => {
       }
     };
 
-    const resizeObserver = new ResizeObserver(debounce(updateWidth));
+    const resizeObserver = new ResizeObserver(debounce(updateWidth, 50));
 
     resizeObserver.observe(container);
 

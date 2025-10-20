@@ -17,6 +17,8 @@ import { ChartDonutUtilization } from '@patternfly/react-charts/victory';
 import { useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
+import { UtilizationBlock } from '../UtilizationBlock';
+
 type MemoryUtilProps = {
   vmi: V1VirtualMachineInstance;
 };
@@ -42,40 +44,31 @@ const MemoryUtil: FC<MemoryUtilProps> = ({ vmi }) => {
   const isReady = !isEmpty(memory) && !Number.isNaN(percentageMemoryUsed);
 
   return (
-    <div className="util">
-      <div className="util-upper">
-        <div className="util-title">{t('Memory')}</div>
-        <div className="util-summary" data-test-id="util-summary-memory">
-          <div className="util-summary-value">
-            {xbytes(memoryUsed || 0, { fixed: 0, iec: true })}
-          </div>
-          <div className="util-summary-text pf-v6-u-text-color-subtle">
-            <div>{t('Used of ')}</div>
-            <div>{`${memory?.size} ${memory?.unit}B`}</div>
-          </div>
-        </div>
-      </div>
-      <div className="util-chart">
-        <ComponentReady isReady={isReady}>
-          <ChartDonutUtilization
-            data={{
-              x: t('Memory used'),
-              y: Number(percentageMemoryUsed?.toFixed(2)),
-            }}
-            labels={({ datum }) =>
-              datum.x ? `${datum.x}: ${xbytes(memoryUsed || 0, { iec: true })}` : null
-            }
-            animate
-            constrainToVisibleArea
-            style={{ labels: { fontSize: 20 } }}
-            subTitle={t('Used')}
-            subTitleComponent={<SubTitleChartLabel y={135} />}
-            title={`${Number(percentageMemoryUsed?.toFixed(2))}%`}
-            titleComponent={<TitleChartLabel />}
-          />
-        </ComponentReady>
-      </div>
-    </div>
+    <UtilizationBlock
+      dataTestId="util-summary-memory"
+      title={t('Memory')}
+      usageValue={xbytes(memoryUsed || 0, { fixed: 0, iec: true })}
+      usedOfTotalText={t('Used of {{ total }}', { total: `${memory?.size} ${memory?.unit}B` })}
+    >
+      <ComponentReady isReady={isReady}>
+        <ChartDonutUtilization
+          data={{
+            x: t('Memory used'),
+            y: Number(percentageMemoryUsed?.toFixed(2)),
+          }}
+          labels={({ datum }) =>
+            datum.x ? `${datum.x}: ${xbytes(memoryUsed || 0, { iec: true })}` : null
+          }
+          animate
+          constrainToVisibleArea
+          style={{ labels: { fontSize: 20 } }}
+          subTitle={t('Used')}
+          subTitleComponent={<SubTitleChartLabel y={135} />}
+          title={`${Number(percentageMemoryUsed?.toFixed(2))}%`}
+          titleComponent={<TitleChartLabel />}
+        />
+      </ComponentReady>
+    </UtilizationBlock>
   );
 };
 
