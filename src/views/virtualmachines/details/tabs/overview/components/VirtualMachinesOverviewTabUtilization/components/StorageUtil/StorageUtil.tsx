@@ -10,6 +10,8 @@ import { useGuestOS } from '@kubevirt-utils/resources/vmi';
 import { removeDuplicatesByName } from '@kubevirt-utils/utils/utils';
 import { ChartDonutUtilization } from '@patternfly/react-charts/victory';
 
+import { UtilizationBlock } from '../UtilizationBlock';
+
 type StorageUtilProps = {
   vmi: V1VirtualMachineInstance;
 };
@@ -34,40 +36,33 @@ const StorageUtil: FC<StorageUtilProps> = ({ vmi }) => {
   const isReady = !Number.isNaN(usedPercentage) && loaded;
 
   return (
-    <div className="util">
-      <div className="util-upper">
-        <div className="util-title">{t('Storage')}</div>
-        <div className="util-summary" data-test-id="util-summary-storage">
-          <div className="util-summary-value">
-            {xbytes(usedBytes || 0, { fixed: 2, iec: true })}
-          </div>
-          <div className="util-summary-text pf-v6-u-text-color-subtle">
-            <div>{t('Used of ')}</div>
-            <div>{xbytes(totalBytes || 0, { fixed: 2, iec: true })}</div>
-          </div>
-        </div>
-      </div>
-      <div className="util-chart">
-        <ComponentReady isReady={isReady}>
-          <ChartDonutUtilization
-            data={{
-              x: t('Storage used'),
-              y: usedPercentage,
-            }}
-            labels={({ datum }) =>
-              datum.x ? `${datum.x}: ${xbytes(usedBytes || 0, { fixed: 2, iec: true })}` : null
-            }
-            animate
-            constrainToVisibleArea
-            style={{ labels: { fontSize: 20 } }}
-            subTitle={t('Used')}
-            subTitleComponent={<SubTitleChartLabel y={135} />}
-            title={`${usedPercentage.toFixed(2) || 0}%`}
-            titleComponent={<TitleChartLabel />}
-          />
-        </ComponentReady>
-      </div>
-    </div>
+    <UtilizationBlock
+      usedOfTotalText={t('Used of {{ total }}', {
+        total: xbytes(totalBytes || 0, { fixed: 2, iec: true }),
+      })}
+      dataTestId="util-summary-storage"
+      title={t('Storage')}
+      usageValue={xbytes(usedBytes || 0, { fixed: 2, iec: true })}
+    >
+      <ComponentReady isReady={isReady}>
+        <ChartDonutUtilization
+          data={{
+            x: t('Storage used'),
+            y: usedPercentage,
+          }}
+          labels={({ datum }) =>
+            datum.x ? `${datum.x}: ${xbytes(usedBytes || 0, { fixed: 2, iec: true })}` : null
+          }
+          animate
+          constrainToVisibleArea
+          style={{ labels: { fontSize: 20 } }}
+          subTitle={t('Used')}
+          subTitleComponent={<SubTitleChartLabel y={135} />}
+          title={`${usedPercentage.toFixed(2) || 0}%`}
+          titleComponent={<TitleChartLabel />}
+        />
+      </ComponentReady>
+    </UtilizationBlock>
   );
 };
 

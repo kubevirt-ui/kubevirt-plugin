@@ -9,11 +9,12 @@ const VirtualMachinesOverviewTabFilesystemTitle = () => {
 
   return (
     <CardTitle className="pf-v6-u-text-color-subtle">
-      {t('File systems')}{' '}
+      {t('File systems')}
       <HelpTextIcon
         bodyContent={t(
           'The following information regarding how the disks are partitioned is provided by the guest agent.',
         )}
+        helpIconClassName="pf-v6-u-ml-xs"
         position={PopoverPosition.right}
       />
     </CardTitle>

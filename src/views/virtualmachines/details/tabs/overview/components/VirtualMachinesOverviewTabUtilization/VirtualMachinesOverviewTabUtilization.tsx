@@ -3,17 +3,16 @@ import { Trans } from 'react-i18next';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/ComponentReady';
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Card,
   CardBody,
   CardTitle,
-  DescriptionListTermHelpText,
-  DescriptionListTermHelpTextButton,
   Divider,
+  Flex,
   Grid,
   GridItem,
-  Popover,
   PopoverPosition,
 } from '@patternfly/react-core';
 import { isRunning } from '@virtualmachines/utils';
@@ -22,6 +21,7 @@ import CPUUtil from './components/CPUUtil/CPUUtil';
 import MemoryUtil from './components/MemoryUtil/MemoryUtil';
 import NetworkUtil from './components/NetworkUtil/NetworkUtil';
 import StorageUtil from './components/StorageUtil/StorageUtil';
+import TimeDropdown from './components/TimeDropdown';
 import UtilizationThresholdCharts from './components/UtilizationThresholdCharts';
 
 import './virtual-machines-overview-tab-utilization.scss';
@@ -39,25 +39,24 @@ const VirtualMachinesOverviewTabUtilization: FC<VirtualMachinesOverviewTabUtiliz
 
   return (
     <Card className="VirtualMachinesOverviewTabUtilization--main">
-      <div className="title">
-        <CardTitle className="pf-v6-u-text-color-subtle">
-          <DescriptionListTermHelpText>
-            <Popover
+      <CardTitle className="pf-v6-u-text-color-subtle">
+        <Flex justifyContent={{ default: 'justifyContentSpaceBetween' }}>
+          <div>
+            {t('Utilization')}
+            <HelpTextIcon
               bodyContent={
                 <Trans ns="plugin__kubevirt-plugin" t={t}>
                   <div>Donuts chart represent current values.</div>
                   <div>Sparkline charts represent data over time</div>
                 </Trans>
               }
-              position={PopoverPosition?.right}
-            >
-              <DescriptionListTermHelpTextButton>
-                {t('Utilization')}
-              </DescriptionListTermHelpTextButton>
-            </Popover>
-          </DescriptionListTermHelpText>
-        </CardTitle>
-      </div>
+              helpIconClassName="pf-v6-u-ml-xs"
+              position={PopoverPosition.right}
+            />
+          </div>
+          <TimeDropdown />
+        </Flex>
+      </CardTitle>
       <Divider />
       <CardBody isFilled>
         <ComponentReady isReady={isRunning(vm)} text={t('VirtualMachine is not running')}>
@@ -74,7 +73,9 @@ const VirtualMachinesOverviewTabUtilization: FC<VirtualMachinesOverviewTabUtiliz
             <GridItem span={3}>
               <NetworkUtil vmi={vmi} />
             </GridItem>
-            <UtilizationThresholdCharts vmi={vmi} />
+            <GridItem className="pf-v6-u-pl-md" span={12}>
+              <UtilizationThresholdCharts vmi={vmi} />
+            </GridItem>
           </Grid>
         </ComponentReady>
       </CardBody>

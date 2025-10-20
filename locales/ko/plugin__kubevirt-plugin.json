@@ -1652,7 +1652,7 @@
   "Use volume already available on the cluster": "클러스터에서 이미 사용 가능한 볼륨 사용",
   "Used": "사용됨",
   "Used bytes": "사용된 바이트",
-  "Used of ": "사용됨 ",
+  "Used of {{ total }}": "Used of {{ total }}",
   "User": "사용자",
   "User credentials": "사용자 인증 정보",
   "User has no accessible namespaces for VirtualMachines": "사용자에게 VirtualMachines에 대해 액세스 가능한 네임스페이스가 없습니다.",

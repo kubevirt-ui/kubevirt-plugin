@@ -1660,7 +1660,7 @@
   "Use volume already available on the cluster": "Utilizar el volumen ya disponible en el clúster",
   "Used": "Usado",
   "Used bytes": "Bytes usados",
-  "Used of ": "Usado de ",
+  "Used of {{ total }}": "Used of {{ total }}",
   "User": "Usuario",
   "User credentials": "Credenciales de usuario",
   "User has no accessible namespaces for VirtualMachines": "El usuario no tiene espacios de nombre accesibles para VirtualMachines.",
