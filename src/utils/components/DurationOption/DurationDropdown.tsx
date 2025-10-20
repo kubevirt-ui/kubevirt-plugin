@@ -1,6 +1,7 @@
 import React, { FC, useState } from 'react';
 
 import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Select, SelectList, SelectOption } from '@patternfly/react-core';
 
 import SelectToggle from '../toggles/SelectToggle';
@@ -11,6 +12,8 @@ export type DurationDropdownProps = {
 };
 
 const DurationDropdown: FC<DurationDropdownProps> = ({ selectedDuration, selectHandler }) => {
+  const { t } = useKubevirtTranslation();
+
   const [isOpen, setIsOpen] = useState(false);
 
   const onSelect = (_, durationOption: string) => {
@@ -20,7 +23,7 @@ const DurationDropdown: FC<DurationDropdownProps> = ({ selectedDuration, selectH
 
   const onToggle = () => setIsOpen((prevIsOpen) => !prevIsOpen);
 
-  const selected = DurationOption.fromString(selectedDuration)?.getDropdownLabel();
+  const selected = t(DurationOption.fromString(selectedDuration)?.getDropdownLabel());
   return (
     <Select
       data-test-id="duration-select-dropdown"
@@ -45,7 +48,7 @@ const DurationDropdown: FC<DurationDropdownProps> = ({ selectedDuration, selectH
 
             return (
               <SelectOption data-test-id={durationValue} key={durationValue} value={dropdownLabel}>
-                {dropdownLabel}
+                {t(dropdownLabel)}
               </SelectOption>
             );
           })}

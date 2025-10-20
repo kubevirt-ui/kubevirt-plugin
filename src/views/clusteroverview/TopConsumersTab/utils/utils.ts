@@ -1,4 +1,4 @@
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { TFunction } from 'react-i18next';
 
 import {
   humanizeBinaryBytes,
@@ -55,7 +55,7 @@ export const getHumanizedValue = (value, metric) => {
 export const getTopConsumerCardID = (rowNumber, cardNumber) =>
   `topConsumerCard-${rowNumber}-${cardNumber}`;
 
-export const TOP_AMOUNT_SELECT_OPTIONS = [
+export const getTopAmountSelectOptions = (t: TFunction) => [
   {
     key: 'top-5',
     value: t('Show top 5'),
