@@ -15,7 +15,7 @@ import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
 import { getVMIPod } from '@kubevirt-utils/resources/vmi';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
-import { Form, FormGroup, SelectOption } from '@patternfly/react-core';
+import { Form, FormGroup, SelectOption, Stack } from '@patternfly/react-core';
 import { isRunning } from '@virtualmachines/utils';
 
 import MultusNetwork from './Components/MultusNetwork';
@@ -79,7 +79,7 @@ const DesktopViewer: FC<DesktopViewerProps> = ({
     (!vmiLoaded && !vmi);
 
   return (
-    <>
+    <Stack hasGutter>
       <Form className="kv-vm-consoles__rdp-actions" isHorizontal>
         <FormGroup fieldId="network-dropdown" label={t('Network interface')}>
           <FormPFSelect
@@ -101,7 +101,7 @@ const DesktopViewer: FC<DesktopViewerProps> = ({
         />
       )}
       {networkType === MULTUS && <MultusNetwork selectedNetwork={selectedNetwork} vmi={vmi} />}
-    </>
+    </Stack>
   );
 };
 

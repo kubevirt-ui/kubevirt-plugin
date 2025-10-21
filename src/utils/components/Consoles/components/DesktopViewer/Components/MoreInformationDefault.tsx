@@ -4,7 +4,7 @@ import { Trans } from 'react-i18next';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { DescriptionList } from '@patternfly/react-core';
+import { Content, DescriptionList } from '@patternfly/react-core';
 
 import { MoreInformationDefaultProps } from '../utils/types';
 
@@ -15,18 +15,20 @@ const MoreInformationDefault: React.FC<MoreInformationDefaultProps> = ({ textMor
   return (
     <>
       {textMoreInfoContent || (
-        <Trans ns="plugin__kubevirt-plugin" t={t}>
-          <p>
-            Clicking &quot;Launch Remote Viewer&quot; will download a .vv file and launch{' '}
-            <i>Remote Viewer</i>
-          </p>
-          <p>
-            <i>Remote Viewer</i> is available for most operating systems. To install it, search for
-            it in GNOME Software or run the following:
-          </p>
-        </Trans>
+        <Content>
+          <Trans ns="plugin__kubevirt-plugin" t={t}>
+            <p>
+              Clicking &quot;Launch Remote Viewer&quot; will download a .vv file and launch{' '}
+              <i>Remote Viewer</i>
+            </p>
+            <p>
+              <i>Remote Viewer</i> is available for most operating systems. To install it, search
+              for it in GNOME Software or run the following:
+            </p>
+          </Trans>
+        </Content>
       )}
-      <DescriptionList isHorizontal>
+      <DescriptionList className="pf-v6-u-mt-md" isHorizontal>
         <Detail title={'RHEL, CentOS'} value={'sudo yum install virt-viewer'} />
         <Detail title={'Fedora'} value={'sudo dnf install virt-viewer'} />
         <Detail title={'Ubuntu, Debian'} value={'sudo apt-get install virt-viewer'} />
