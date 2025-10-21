@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { DescriptionList, Title } from '@patternfly/react-core';
+import { Content, DescriptionList } from '@patternfly/react-core';
 
 import { ManualConnectionProps } from '../utils/types';
 
@@ -33,12 +33,12 @@ const ManualConnection: React.FunctionComponent<ManualConnectionProps> = ({
   const rdpAddress = rdp && rdp?.address !== address ? rdp?.address : null;
 
   return (
-    <div className="pf-v6-c-console__manual-connection">
-      <Title headingLevel="h2" size="3xl">
-        {textManualConnection || t('Manual Connection')}
-      </Title>
-      <p>{msg}</p>
-      <DescriptionList>
+    <div>
+      <Content>
+        <h2>{textManualConnection || t('Manual Connection')}</h2>
+        <p>{msg}</p>
+      </Content>
+      <DescriptionList className="pf-v6-u-mt-md">
         {address && <Detail title={textAddress || t('Address')} value={address} />}
         {!address && spice && (
           <Detail title={textSpiceAddress || t('SPICE Address')} value={spice?.address} />

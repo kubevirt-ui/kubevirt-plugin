@@ -2,7 +2,7 @@ import React from 'react';
 import { Trans } from 'react-i18next';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Button, ExpandableSection } from '@patternfly/react-core';
+import { Button, Content, ExpandableSection, Flex, Stack } from '@patternfly/react-core';
 
 import { RDP_CONSOLE_TYPE, SPICE_CONSOLE_TYPE, VNC_CONSOLE_TYPE } from '../../utils/ConsoleConsts';
 import {
@@ -53,21 +53,15 @@ const RemoteViewer: React.FC<RemoteViewerProps> = ({
   };
 
   return (
-    <div className="pf-v6-c-console__remote-viewer">
-      <div className="pf-v6-c-console__remote-viewer-launch">
-        <Button
-          className="pf-v6-c-console__remote-viewer-launch-vv"
-          isDisabled={!console}
-          onClick={onClickVV}
-        >
+    <Stack hasGutter>
+      <Flex spaceItems={{ default: 'spaceItemsSm' }}>
+        <Button isDisabled={!console} onClick={onClickVV}>
           {textConnectWithRemoteViewer || t('Launch Remote Viewer')}
         </Button>
         {!!rdp && (
-          <Button className="pf-v6-c-console__remote-viewer-launch-rdp" onClick={onClickRDP}>
-            {textConnectWithRDP || t('Launch Remote Desktop')}
-          </Button>
+          <Button onClick={onClickRDP}>{textConnectWithRDP || t('Launch Remote Desktop')}</Button>
         )}
-      </div>
+      </Flex>
       {!!console && (
         <ExpandableSection
           isExpanded={isExpandedDefault}
@@ -84,25 +78,30 @@ const RemoteViewer: React.FC<RemoteViewerProps> = ({
           toggleText={textMoreRDPInfo || t('Remote Desktop Details')}
         >
           {textMoreRDPInfoContent ?? (
-            <Trans ns="plugin__kubevirt-plugin" t={t}>
-              <p>
-                Clicking &quot;Launch Remote Desktop&quot; will download an .rdp file and launch{' '}
-                <i>Remote Desktop Viewer</i>.
-              </p>
-              <p>
-                Since the RDP is native Windows protocol, the best experience is achieved when used
-                on Windows-based desktop.
-              </p>
-              <p>
-                For other operating systems, the <i>Remote Viewer</i> is recommended. If RDP needs
-                to be accessed anyway, the <a href="https://www.remmina.org/wp/">Remmina</a> client
-                is available.
-              </p>
-            </Trans>
+            <Content>
+              <Trans ns="plugin__kubevirt-plugin" t={t}>
+                <p>
+                  Clicking &quot;Launch Remote Desktop&quot; will download an .rdp file and launch{' '}
+                  <i>Remote Desktop Viewer</i>.
+                </p>
+                <p>
+                  Since the RDP is native Windows protocol, the best experience is achieved when
+                  used on Windows-based desktop.
+                </p>
+                <p>
+                  For other operating systems, the <i>Remote Viewer</i> is recommended. If RDP needs
+                  to be accessed anyway, the{' '}
+                  <a href="https://www.remmina.org/" rel="noopener noreferrer" target="_blank">
+                    Remmina
+                  </a>{' '}
+                  client is available.
+                </p>
+              </Trans>
+            </Content>
           )}
         </ExpandableSection>
       )}
-    </div>
+    </Stack>
   );
 };
 
