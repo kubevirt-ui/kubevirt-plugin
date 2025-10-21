@@ -33,6 +33,8 @@ import { KUBEVIRT_APISERVER_PROXY } from '@kubevirt-utils/hooks/useFeatures/cons
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
+import useListClusters from '@kubevirt-utils/hooks/useListClusters';
+import useListNamespaces from '@kubevirt-utils/hooks/useListNamespaces';
 import {
   paginationDefaultValues,
   paginationInitialState,
@@ -53,7 +55,7 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Flex, Pagination } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
-import { VMSearchQueries } from '@virtualmachines/search/hooks/useVMSearchQueries';
+import useVMSearchQueries from '@virtualmachines/search/hooks/useVMSearchQueries';
 import VirtualMachineFilterToolbar from '@virtualmachines/search/VirtualMachineFilterToolbar';
 import { vmsSignal } from '@virtualmachines/tree/utils/signals';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
@@ -81,15 +83,18 @@ import './VirtualMachinesList.scss';
 type VirtualMachinesListProps = {
   allVMsLoaded?: boolean;
   cluster?: string;
+  isSearchResultsPage?: boolean;
   kind: string;
   namespace: string;
-  searchQueries?: VMSearchQueries;
 } & RefAttributes<ExposedFilterFunctions | null>;
 
 const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref) => {
   const { t } = useKubevirtTranslation();
-  const { allVMsLoaded, cluster, kind, namespace, searchQueries } = props;
-  const isSearchResultsPage = !isEmpty(searchQueries);
+  const clusters = useListClusters();
+  const namespaces = useListNamespaces();
+  const { allVMsLoaded, cluster, isSearchResultsPage = false, kind, namespace } = props;
+
+  const searchQueries = useVMSearchQueries();
 
   const catalogURL = getCatalogURL(cluster, namespace || DEFAULT_NAMESPACE);
   const { loading: loadingFeatureProxy } = useFeatures(KUBEVIRT_APISERVER_PROXY);
@@ -200,8 +205,8 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
   const isAllVMsSelected = filteredVMs?.length === existingSelectedVMs.length;
 
   const allVMs = useMemo(
-    () => filterVMsByClusterAndNamespace(vmsSignal.value, namespace, cluster),
-    [vmsSignal.value, namespace, cluster],
+    () => filterVMsByClusterAndNamespace(vmsSignal.value, namespaces, clusters),
+    [vmsSignal.value, namespaces, clusters],
   );
 
   const hasNoVMs = isEmpty(allVMs);
@@ -211,12 +216,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
     <>
       <DocumentTitle>{PageTitles.VirtualMachines}</DocumentTitle>
       {!isSearchResultsPage && (
-        <VirtualMachineListSummary
-          namespace={namespace}
-          onFilterChange={onFilterChange}
-          vmis={vmis}
-          vms={allVMs}
-        />
+        <VirtualMachineListSummary onFilterChange={onFilterChange} vmis={vmis} vms={vmsToShow} />
       )}
       <ListPageBody>
         <div className="vm-listpagebody" ref={listPageBodyRef}>

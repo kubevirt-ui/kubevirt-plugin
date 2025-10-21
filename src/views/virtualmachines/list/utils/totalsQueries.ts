@@ -8,30 +8,25 @@ export const VMTotalsQueries = {
   TOTAL_STORAGE_USAGE: 'TOTAL_STORAGE_USAGE',
 };
 
-const getSumBy = (isAllNamespaces: boolean, cluster?: string, allClusters = false) => {
-  if (allClusters || isAllNamespaces) return 'sum';
+export const getVMTotalsQueries = (
+  namespaces: string[],
+  clusters?: string[],
+  allClusters = false,
+) => {
+  const isAllNamespaces = isEmpty(namespaces);
 
-  if (cluster) return 'sum by (namespace, cluster)';
+  const clusterFilter = isEmpty(clusters) ? '' : `cluster=~'${clusters.join('|')}'`;
 
-  return 'sum by (namespace)';
-};
-
-export const getVMTotalsQueries = (namespace: string, cluster?: string, allClusters = false) => {
-  const isAllNamespaces = isEmpty(namespace);
-
-  const clusterFilter = cluster ? `cluster='${cluster}'` : '';
-
-  const filterByNamespace = isAllNamespaces
+  const filters = isAllNamespaces
     ? `{${clusterFilter}}`
-    : `{namespace='${namespace}',${clusterFilter}}`;
+    : `{namespace=~'${namespaces.join('|')}',${clusterFilter}}`;
 
-  const duration = cluster || allClusters ? '15m' : '30s';
-  const sumBy = getSumBy(isAllNamespaces, cluster, allClusters);
+  const duration = clusters || allClusters ? '15m' : '30s';
 
   return {
-    [VMTotalsQueries.TOTAL_CPU_USAGE]: `${sumBy}(rate(kubevirt_vmi_cpu_usage_seconds_total${filterByNamespace}[${duration}]))`,
-    [VMTotalsQueries.TOTAL_MEMORY_USAGE]: `${sumBy}(kubevirt_vmi_memory_used_bytes${filterByNamespace})`,
-    [VMTotalsQueries.TOTAL_STORAGE_CAPACITY]: `${sumBy}(max(kubevirt_vmi_filesystem_capacity_bytes${filterByNamespace}) by (namespace, name, disk_name, cluster))`,
-    [VMTotalsQueries.TOTAL_STORAGE_USAGE]: `${sumBy}(max(kubevirt_vmi_filesystem_used_bytes${filterByNamespace}) by (namespace, name, disk_name, cluster))`,
+    [VMTotalsQueries.TOTAL_CPU_USAGE]: `sum(rate(kubevirt_vmi_cpu_usage_seconds_total${filters}[${duration}]))`,
+    [VMTotalsQueries.TOTAL_MEMORY_USAGE]: `sum(kubevirt_vmi_memory_used_bytes${filters})`,
+    [VMTotalsQueries.TOTAL_STORAGE_CAPACITY]: `sum(max(kubevirt_vmi_filesystem_capacity_bytes${filters}) by (namespace, name, disk_name, cluster))`,
+    [VMTotalsQueries.TOTAL_STORAGE_USAGE]: `sum(max(kubevirt_vmi_filesystem_used_bytes${filters}) by (namespace, name, disk_name, cluster))`,
   };
 };

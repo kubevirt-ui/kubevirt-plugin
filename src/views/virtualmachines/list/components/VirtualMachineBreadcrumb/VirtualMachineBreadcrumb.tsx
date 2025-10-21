@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getVMListNamespacesURL } from '@multicluster/urls';
+import { getVMListURL } from '@multicluster/urls';
 import { Breadcrumb, BreadcrumbItem, Button, ButtonVariant } from '@patternfly/react-core';
 
 type VirtualMachineBreadcrumbProps = {
@@ -20,7 +20,7 @@ export const VirtualMachineBreadcrumb: FC<VirtualMachineBreadcrumbProps> = React
         <BreadcrumbItem>
           <Button
             isInline
-            onClick={() => navigate(getVMListNamespacesURL(cluster, namespace))}
+            onClick={() => navigate(getVMListURL(cluster, namespace))}
             variant={ButtonVariant.link}
           >
             {t('VirtualMachines')}

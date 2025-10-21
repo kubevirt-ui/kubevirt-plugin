@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -15,6 +15,7 @@ import {
 } from '@patternfly/react-core';
 
 import useFilteredTreeView from '../hooks/useFilteredTreeView';
+import useSelectedRowFilterTreeItems from '../hooks/useSelectedRowFilterTreeItems';
 import useTreeViewItemActions from '../hooks/useTreeViewItemActions';
 
 import TreeViewRightClickActionMenu from './TreeViewRightClickActionMenu/TreeViewRightClickActionMenu';
@@ -45,6 +46,13 @@ const TreeViewContent: FC<TreeViewContentProps> = ({
   const { t } = useKubevirtTranslation();
   const [showAll, setShowAll] = useState<boolean>();
   const filteredTreeData = useFilteredTreeView(treeData);
+
+  const selectedRowFilterTreeItems = useSelectedRowFilterTreeItems(filteredTreeData);
+
+  const allSelectedTreeItems = useMemo(
+    () => [...selectedRowFilterTreeItems, selectedTreeItem],
+    [selectedRowFilterTreeItems, selectedTreeItem],
+  );
 
   const { addListeners, hideMenu, triggerElement } = useTreeViewItemActions(treeData);
 
@@ -84,7 +92,7 @@ const TreeViewContent: FC<TreeViewContentProps> = ({
           />
         ) : (
           <TreeView
-            activeItems={[selectedTreeItem]}
+            activeItems={allSelectedTreeItems}
             allExpanded={showAll}
             data={filteredTreeData}
             hasBadges={loaded}

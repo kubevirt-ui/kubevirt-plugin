@@ -29,14 +29,12 @@ import SummaryTitle from './components/SummaryTitle';
 import './VirtualMachineListSummary.scss';
 
 type VirtualMachineListSummaryProps = {
-  namespace: string;
   onFilterChange?: OnFilterChange;
   vmis: V1VirtualMachineInstance[];
   vms: V1VirtualMachine[];
 };
 
 const VirtualMachineListSummary: FC<VirtualMachineListSummaryProps> = ({
-  namespace,
   onFilterChange,
   vmis,
   vms,
@@ -68,28 +66,24 @@ const VirtualMachineListSummary: FC<VirtualMachineListSummaryProps> = ({
             <Grid hasGutter>
               <VMStatusItem
                 count={primaryStatuses.Error}
-                namespace={namespace}
                 onFilterChange={onStatusChange([ERROR])}
                 statusArray={[ERROR]}
                 statusLabel={ERROR}
               />
               <VMStatusItem
                 count={primaryStatuses.Running}
-                namespace={namespace}
                 onFilterChange={onStatusChange([VM_STATUS.Running])}
                 statusArray={[VM_STATUS.Running]}
                 statusLabel={VM_STATUS.Running}
               />
               <VMStatusItem
                 count={primaryStatuses.Stopped}
-                namespace={namespace}
                 onFilterChange={onStatusChange([VM_STATUS.Stopped])}
                 statusArray={[VM_STATUS.Stopped]}
                 statusLabel={VM_STATUS.Stopped}
               />
               <VMStatusItem
                 count={otherStatusesCount}
-                namespace={namespace}
                 onFilterChange={onStatusChange(OTHER_STATUSES)}
                 statusArray={OTHER_STATUSES}
                 statusLabel={OTHER}

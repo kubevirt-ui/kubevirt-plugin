@@ -1,4 +1,5 @@
 import { Fragment } from 'react';
+import { Location } from 'react-router-dom-v5-compat';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getVMStatus } from '@kubevirt-utils/resources/shared';
@@ -76,4 +77,13 @@ export const getVMStatuses = (vms: V1VirtualMachine[]): StatusCounts => {
     otherStatusesCount,
     primaryStatuses,
   };
+};
+
+export const getVMStatusesPath = (
+  location: Location,
+  statusArray: typeof ERROR[] | VM_STATUS[],
+) => {
+  const queryParams = new URLSearchParams(location.search);
+  queryParams.set('status', statusArray.join(','));
+  return `${location.pathname}?${queryParams.toString()}`;
 };
