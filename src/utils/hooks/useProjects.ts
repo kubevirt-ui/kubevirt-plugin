@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui/kubevirt-api/console';
 import { getName } from '@kubevirt-utils/resources/shared';
+import { universalComparator } from '@kubevirt-utils/utils/utils';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -15,7 +16,7 @@ const useProjects: UseProjects = (cluster) => {
   });
 
   const projectsNames = useMemo(
-    () => projectsData?.map(getName).sort((a, b) => a.localeCompare(b)),
+    () => projectsData?.map(getName).sort((a, b) => universalComparator(a, b)),
     [projectsData],
   );
 

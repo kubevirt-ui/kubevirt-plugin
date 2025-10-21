@@ -10,14 +10,18 @@ export const VMListQueries = {
   NETWORK_TOTAL_USAGE: 'NETWORK_TOTAL_USAGE',
 };
 
-export const getVMListQueries = (namespace: string, cluster?: string, allClusters = false) => {
-  const namespaceFilter = isEmpty(namespace) ? '' : `namespace='${namespace}'`;
+export const getVMListQueries = (
+  namespaces: string[],
+  clusters?: string[],
+  allClusters = false,
+) => {
+  const namespacesFilter = isEmpty(namespaces) ? '' : `namespace=~'${namespaces.join('|')}'`;
 
-  const clusterFilter = cluster ? `cluster='${cluster}'` : '';
+  const clustersFilter = isEmpty(clusters) ? '' : `cluster=~'${clusters.join('|')}'`;
 
-  const filters = [namespaceFilter, clusterFilter].filter((filter) => filter.length > 0).join(',');
+  const filters = [namespacesFilter, clustersFilter].filter(Boolean).join(',');
 
-  const duration = cluster || allClusters ? '15m' : '30s';
+  const duration = clusters || allClusters ? '15m' : '30s';
   return {
     [VMListQueries.CPU_REQUESTED]: `kube_pod_resource_request{resource='cpu',${filters}}`,
     [VMListQueries.CPU_USAGE]: `rate(kubevirt_vmi_cpu_usage_seconds_total{${filters}}[${duration}])`,

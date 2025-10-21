@@ -5,7 +5,9 @@ import {
   V1VirtualMachine,
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { useClusterFilter } from '@kubevirt-utils/hooks/useClusterFilter';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
+import { useProjectFilter } from '@kubevirt-utils/hooks/useProjectFilter';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils/constants';
@@ -25,9 +27,7 @@ import { getSchedulingFilter } from '../../utils/filters/getSchedulingFilter';
 import { getStatusFilter } from '../../utils/filters/getStatusFilter';
 import { useVirtualMachineInstanceMapper } from '../useVirtualMachineInstanceMapper';
 
-import { useClusterFilter } from './useClusterFilter';
 import { useNodesFilter } from './useNodesFilter';
-import { useProjectFilter } from './useProjectFilter';
 import { useStorageClassFilter } from './useStorageClassFilter';
 
 export const useVMListFilters = (

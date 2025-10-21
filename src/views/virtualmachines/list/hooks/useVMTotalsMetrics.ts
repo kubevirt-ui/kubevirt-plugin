@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import useListClusters from '@kubevirt-utils/hooks/useListClusters';
+import useListNamespaces from '@kubevirt-utils/hooks/useListNamespaces';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
@@ -17,16 +19,18 @@ import {
 import { getVMTotalsQueries, VMTotalsQueries } from '../utils/totalsQueries';
 
 const useVMTotalsMetrics = (vmis: V1VirtualMachineInstance[]) => {
-  const namespace = useNamespaceParam();
-
   const cluster = useClusterParam();
+  const namespace = useNamespaceParam();
+  const clusters = useListClusters();
+  const namespaces = useListNamespaces();
+
   const isAllClustersPage = useIsAllClustersPage();
 
   const currentTime = useMemo<number>(() => Date.now(), []);
 
   const queries = useMemo(
-    () => getVMTotalsQueries(namespace, isAllClustersPage ? undefined : cluster, isAllClustersPage),
-    [namespace, cluster, isAllClustersPage],
+    () => getVMTotalsQueries(namespaces, clusters, isAllClustersPage),
+    [namespaces, clusters, isAllClustersPage],
   );
 
   const prometheusPollProps = {

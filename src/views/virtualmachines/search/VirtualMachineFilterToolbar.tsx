@@ -4,10 +4,13 @@ import AdvancedFiltersToolbarItem from '@kubevirt-utils/components/ListPageFilte
 import CheckboxSelectFilter from '@kubevirt-utils/components/ListPageFilter/components/CheckboxSelectFilter';
 import { useApplyFiltersWithQuery } from '@kubevirt-utils/components/ListPageFilter/hooks/useApplyFiltersWithQuery';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { OnFilterChange, RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { Toolbar, ToolbarContent } from '@patternfly/react-core';
 import { ListPageBodySize } from '@virtualmachines/list/listPageBodySize';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils/constants';
+
+import { ACM_FILTERS_SHOWN_VM_LIST, FILTERS_SHOWN_VM_LIST } from './constants';
 
 type VirtualMachineFilterToolbarProps = {
   className?: string;
@@ -29,6 +32,9 @@ const VirtualMachineFilterToolbar: FC<VirtualMachineFilterToolbarProps> = ({
   onFilterChange,
 }) => {
   const { t } = useKubevirtTranslation();
+  const isACMPage = useIsACMPage();
+
+  const filtersShown = isACMPage ? ACM_FILTERS_SHOWN_VM_LIST : FILTERS_SHOWN_VM_LIST;
 
   const [toolbarIsExpanded, setToolbarIsExpanded] = useState(false);
 
@@ -87,8 +93,7 @@ const VirtualMachineFilterToolbar: FC<VirtualMachineFilterToolbarProps> = ({
         {filtersWithSelect.map((filter) => {
           if (
             !isSearchResultsPage &&
-            filter.type !== VirtualMachineRowFilterType.Status &&
-            filter.type !== VirtualMachineRowFilterType.OS
+            !filtersShown.includes(filter.type as VirtualMachineRowFilterType)
           ) {
             return null;
           }
