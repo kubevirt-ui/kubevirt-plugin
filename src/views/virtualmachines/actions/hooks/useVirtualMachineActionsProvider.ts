@@ -16,7 +16,12 @@ import {
   FEATURE_KUBEVIRT_CROSS_CLUSTER_MIGRATION,
 } from '@multicluster/constants';
 import useACMExtensionActions from '@multicluster/hooks/useACMExtensionActions/useACMExtensionActions';
-import { useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  isResourceActionProvider,
+  ResourceActionProvider,
+  useK8sModel,
+  useResolvedExtensions,
+} from '@openshift-console/dynamic-plugin-sdk';
 
 import { printableVMStatus } from '../../utils';
 import { VirtualMachineActionFactory } from '../VirtualMachineActionFactory';
@@ -41,6 +46,19 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
   const { featureEnabled: crossClusterMigrationFlagEnabled } = useFeatures(
     FEATURE_KUBEVIRT_CROSS_CLUSTER_MIGRATION,
   );
+
+  const [virtualMachineActionExtensions] =
+    useResolvedExtensions<ResourceActionProvider>(isResourceActionProvider);
+
+  const externalPluginsVirtualMachineActionsProviders = virtualMachineActionExtensions?.filter(
+    (extension) =>
+      extension.pluginName !== 'kubevirt-plugin' &&
+      extension.properties.model.kind === 'VirtualMachine',
+  );
+
+  const externalPluginsVirtualMachineActions = externalPluginsVirtualMachineActionsProviders
+    ?.map((extension) => extension.properties.provider(vm)?.[0])
+    ?.flat();
 
   const crossClusterMigrationEnabled = mtvInstalled && crossClusterMigrationFlagEnabled;
 
@@ -116,6 +134,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
       VirtualMachineActionFactory.editLabels(vm, createModal),
       VirtualMachineActionFactory.delete(vm, createModal),
       ...otherACMActions,
+      ...externalPluginsVirtualMachineActions,
     ].filter(Boolean);
   }, [
     vm,
@@ -129,6 +148,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
     acmActions,
     mtvInstalled,
     crossClusterMigrationEnabled,
+    externalPluginsVirtualMachineActions,
   ]);
 
   return useMemo(

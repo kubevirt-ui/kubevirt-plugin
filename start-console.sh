@@ -62,6 +62,13 @@ for arg in "$@"; do
     INITIAL_PORT=$((INITIAL_PORT + 1))
 done
 
+
+    running_podman_linux="$running_podman_linux,console-demo-plugin=http://localhost:9002"
+    running_podman="$running_podman,console-demo-plugin=http://host.containers.internal:9002"
+    running_docker="$running_docker,console-demo-plugin=http://host.docker.internal:9002"
+
+echo "running_podman_linux: $running_podman_linux"
+
 CONSOLE_IMAGE=${CONSOLE_IMAGE:-"quay.io/openshift/origin-console:latest"}
 CONSOLE_PORT=${CONSOLE_PORT:-9000}
 
