@@ -9,7 +9,7 @@ import RemoteViewer from './RemoteViewer';
 const useStyles = createUseStyles({
   consoleDesktopViewer: {
     display: 'grid',
-    gap: 'var(--pf-t-global--spacer--md)',
+    gap: 'var(--pf-t--global--spacer--md)',
     gridArea: 'main',
     gridTemplateColumns: 'repeat(auto-fit, minmax(20rem, 1fr))',
   },
