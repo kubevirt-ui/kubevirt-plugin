@@ -1654,7 +1654,7 @@
   "Use volume already available on the cluster": "クラスターですでに利用可能なボリュームを使用する",
   "Used": "使用済み",
   "Used bytes": "使用中のバイト数",
-  "Used of ": "使用中 / ",
+  "Used of {{ total }}": "Used of {{ total }}",
   "User": "User",
   "User credentials": "ユーザーの認証情報",
   "User has no accessible namespaces for VirtualMachines": "ユーザーに VirtualMachine のアクセス可能な namespace がありません",

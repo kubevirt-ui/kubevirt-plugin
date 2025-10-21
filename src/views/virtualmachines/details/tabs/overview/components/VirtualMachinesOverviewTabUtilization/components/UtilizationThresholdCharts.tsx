@@ -5,19 +5,14 @@ import CPUThresholdChart from '@kubevirt-utils/components/Charts/CPUUtil/CPUThre
 import MemoryThresholdChart from '@kubevirt-utils/components/Charts/MemoryUtil/MemoryThresholdChart';
 import NetworkThresholdChart from '@kubevirt-utils/components/Charts/NetworkUtil/NetworkThresholdChart';
 import StorageTotalReadWriteThresholdChart from '@kubevirt-utils/components/Charts/StorageUtil/StorageTotalReadWriteThresholdChart';
-import { GridItem } from '@patternfly/react-core';
-
-import TimeDropdown from './TimeDropdown';
+import { Grid, GridItem } from '@patternfly/react-core';
 
 type UtilizationThresholdChartsProps = {
   vmi: V1VirtualMachineInstance;
 };
 const UtilizationThresholdCharts: React.FC<UtilizationThresholdChartsProps> = ({ vmi }) => {
   return (
-    <>
-      <GridItem span={12}>
-        <TimeDropdown />
-      </GridItem>
+    <Grid>
       <GridItem span={3}>
         <CPUThresholdChart vmi={vmi} />
       </GridItem>
@@ -30,7 +25,7 @@ const UtilizationThresholdCharts: React.FC<UtilizationThresholdChartsProps> = ({
       <GridItem span={3}>
         <NetworkThresholdChart vmi={vmi} />
       </GridItem>
-    </>
+    </Grid>
   );
 };
 

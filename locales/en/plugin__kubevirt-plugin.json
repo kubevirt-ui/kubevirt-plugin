@@ -1654,7 +1654,7 @@
   "Use volume already available on the cluster": "Use volume already available on the cluster",
   "Used": "Used",
   "Used bytes": "Used bytes",
-  "Used of ": "Used of ",
+  "Used of {{ total }}": "Used of {{ total }}",
   "User": "User",
   "User credentials": "User credentials",
   "User has no accessible namespaces for VirtualMachines": "User has no accessible namespaces for VirtualMachines",
