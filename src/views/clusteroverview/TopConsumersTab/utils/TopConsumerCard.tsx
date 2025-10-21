@@ -66,7 +66,7 @@ const TopConsumerCard: FC<TopConsumersMetricCard> = ({
             toggleProps={{ id: 'kv-top-consumers-card-metric-select' }}
           >
             {TopConsumerMetric.getAll().map((metric) => (
-              <SelectOption key={metric?.getValue()} value={t(metric?.getDropdownLabel())}>
+              <SelectOption key={metric?.getValue()} value={metric?.getDropdownLabel()}>
                 {t(metric?.getDropdownLabel())}
               </SelectOption>
             ))}
@@ -79,7 +79,7 @@ const TopConsumerCard: FC<TopConsumersMetricCard> = ({
             toggleProps={{ id: 'kv-top-consumers-card-scope-select' }}
           >
             {TopConsumerScope.getAll().map((scope) => (
-              <SelectOption key={scope?.getValue()} value={t(scope?.getDropdownLabel())}>
+              <SelectOption key={scope?.getValue()} value={scope?.getDropdownLabel()}>
                 {t(scope?.getDropdownLabel())}
               </SelectOption>
             ))}
