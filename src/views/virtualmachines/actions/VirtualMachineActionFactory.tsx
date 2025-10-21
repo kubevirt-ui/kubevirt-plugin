@@ -19,11 +19,12 @@ import {
   MigMigration,
   MigMigrationModel,
 } from '@kubevirt-utils/resources/migrations/constants';
-import { asAccessReview, getNamespace } from '@kubevirt-utils/resources/shared';
+import { asAccessReview, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
+import { getConsoleStandaloneURL } from '@multicluster/urls';
 import { Patch } from '@openshift-console/dynamic-plugin-sdk';
 import { CopyIcon } from '@patternfly/react-icons';
 import ComputeMigrationModal from '@virtualmachines/actions/components/VirtualMachineComputeMigration/ComputeMigrationModal';
@@ -260,6 +261,21 @@ export const VirtualMachineActionFactory = {
         )),
       id: 'vm-action-move-to-folder',
       label: t('Move to folder'),
+    };
+  },
+  openConsole: (vm: V1VirtualMachine): ActionDropdownItemType => {
+    const vmCluster = getCluster(vm);
+    const vmNamespace = getNamespace(vm);
+    const vmName = getName(vm);
+
+    return {
+      cta: () => window.open(getConsoleStandaloneURL(vmNamespace, vmName, vmCluster)),
+      description: isRunning(vm)
+        ? t('Open console in new tab')
+        : t('The VirtualMachine is not running'),
+      disabled: !isRunning(vm),
+      id: 'vm-action-open-console',
+      label: t('Open Console'),
     };
   },
   pause: (
