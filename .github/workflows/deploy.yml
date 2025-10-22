@@ -22,6 +22,10 @@ jobs:
           - linux/arm64
           - linux/s390x
     steps:
+      - name: Prepare
+        run: |
+          platform=${{ matrix.platform }}
+          echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
@@ -52,8 +56,23 @@ jobs:
           GITHUB_TOKEN: "${{ secrets.BOT_PAT }}"
         with:
           platforms: ${{ matrix.platform }}
-          push: true
           tags: ${{env.REGISTRY_IMAGE}}:${{env.VERSION_TAG}}
+          labels: ${{ steps.meta.outputs.labels }}
+          outputs: type=image,push-by-digest=true,name-canonical=true,push=true
+
+      - name: Export digest
+        run: |
+          mkdir -p ${{ runner.temp }}/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "${{ runner.temp }}/digests/${digest#sha256:}"
+
+      - name: Upload digest
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-${{ env.PLATFORM_PAIR }}
+          path: ${{ runner.temp }}/digests/*
+          if-no-files-found: error
+          retention-days: 1
 
   merge:
     runs-on: ubuntu-latest
