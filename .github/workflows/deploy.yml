@@ -50,13 +50,13 @@ jobs:
           password: ${{ secrets.QUAY_PASS }}
 
       - name: Build and push
-        id: docker_build
+        id: build
         uses: docker/build-push-action@v6
         env:
           GITHUB_TOKEN: "${{ secrets.BOT_PAT }}"
         with:
           platforms: ${{ matrix.platform }}
-          tags: ${{env.REGISTRY_IMAGE}}:${{env.VERSION_TAG}}
+          tags: ${{env.REGISTRY_IMAGE}}
           labels: ${{ steps.meta.outputs.labels }}
           outputs: type=image,push-by-digest=true,name-canonical=true,push=true
 
