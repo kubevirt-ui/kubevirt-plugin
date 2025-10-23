@@ -25,7 +25,7 @@ import NameFormField from './components/NameFormField';
 import NetworkInterfaceMACAddressInput from './components/NetworkInterfaceMacAddressInput';
 import NetworkInterfaceModelSelect from './components/NetworkInterfaceModelSelect';
 import NetworkInterfaceNetworkSelect from './components/NetworkInterfaceNetworkSelect/NetworkInterfaceNetworkSelect';
-import NetworkInterfacePasst from './components/NetworkInterfacePasst';
+import NetworkInterfacePasst from './components/NetworkInterfacePasstSelect/NetworkInterfacePasst';
 import { interfaceModelType } from './utils/constants';
 import { getNetworkName } from './utils/helpers';
 
@@ -144,7 +144,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
         className="NetworkInterfaceModal__advanced"
         isExpanded={isExpanded}
         onToggle={(_, expand) => setIsExpanded(expand)}
-        toggleText={t('Advanced')}
+        toggleText={t('Advanced Settings')}
       >
         <NetworkInterfacePasst
           interfaceType={interfaceType}
