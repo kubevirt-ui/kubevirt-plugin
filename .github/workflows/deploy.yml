@@ -1,7 +1,7 @@
 name: DEPLOY
 env:
   VERSION_TAG: ${{github.ref_name == 'main' && 'latest' || github.ref_name}}
-  REGISTRY_IMAGE: quay.io/kubevirt-ui/kubevirt-plugin
+  REGISTRY_IMAGE: kubevirt-ui/kubevirt-plugin
 on:
   push:
     branches:
@@ -12,7 +12,6 @@ on:
 jobs:
   build:
     name: build
-    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -103,7 +102,11 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY_IMAGE }}
-          tags: ${{env.VERSION_TAG}}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
 
       - name: Create manifest list and push
         working-directory: ${{ runner.temp }}/digests
