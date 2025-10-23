@@ -1,7 +1,7 @@
 name: DEPLOY
 env:
   VERSION_TAG: ${{github.ref_name == 'main' && 'latest' || github.ref_name}}
-  REGISTRY_IMAGE: kubevirt-ui/kubevirt-plugin
+  REGISTRY_IMAGE: quay.io/kubevirt-ui/kubevirt-plugin
 on:
   push:
     branches:
