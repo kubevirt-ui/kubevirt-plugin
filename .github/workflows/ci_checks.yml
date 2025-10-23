@@ -19,8 +19,10 @@ jobs:
       - name: Setup Yarn
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'yarn'
+          node-version: "22"
+          cache: "yarn"
+      - name: Enable Corepack
+        run: corepack enable
       - run: yarn install --frozen-lockfile
 
       - name: Check i18n
@@ -44,8 +46,8 @@ jobs:
       - name: Setup Yarn
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'yarn'
+          node-version: "22"
+          cache: "yarn"
       - run: yarn install --frozen-lockfile
 
       - name: Lint
@@ -64,8 +66,8 @@ jobs:
       - name: Setup Yarn
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'yarn'
+          node-version: "22"
+          cache: "yarn"
       - run: yarn install --frozen-lockfile
 
       - name: Run Unit Tests

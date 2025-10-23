@@ -124,8 +124,7 @@
     "typescript": "5.7.x",
     "webpack": "5.96.1",
     "webpack-cli": "5.1.4",
-    "webpack-dev-server": "^5.1.0",
-    "yarn": "^1.22.18"
+    "webpack-dev-server": "^5.1.0"
   },
   "engines": {
     "node": ">=18.20.5",
@@ -139,7 +138,6 @@
     ]
   },
   "name": "kubevirt-plugin",
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
   "private": true,
   "resolutions": {
     "@types/react": "^17.0.40",
@@ -147,7 +145,7 @@
     "delaunator": "4.0.1"
   },
   "scripts": {
-    "build": "yarn clean && NODE_ENV=production NODE_OPTIONS=--max-old-space-size=8192 yarn ts-node node_modules/.bin/webpack",
+    "build": "yarn clean && NODE_ENV=production NODE_OPTIONS=--max-old-space-size=6000 yarn ts-node node_modules/.bin/webpack --progress",
     "check-types": "tsc",
     "clean": "rm -rf dist",
     "cypress-generate": "cd cypress && marge -o ./gui-test-screenshots/ -f cypress-report -t 'Kubevirt Cypress Test Results' -p 'Kubevirt Test Results' --showPassed false --assetsDir ./gui-test-screenshots/cypress/assets ./gui-test-screenshots/cypress.json",

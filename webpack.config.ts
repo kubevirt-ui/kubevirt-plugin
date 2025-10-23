@@ -26,6 +26,12 @@ const isProd = process.env.NODE_ENV === 'production';
 const KUBEVIRT_PLUGIN_PORT = process.env.PORT || process.env.KUBEVIRT_PLUGIN_PORT || 9001;
 
 const config: Configuration = {
+  cache: {
+    buildDependencies: {
+      config: [__filename],
+    },
+    type: 'filesystem',
+  },
   context: path.resolve(__dirname, 'src'),
   devServer: {
     // Allow bridge running in a container to connect to the plugin dev server.
@@ -155,7 +161,7 @@ const config: Configuration = {
           semantic: true,
           syntactic: true,
         },
-        memoryLimit: 4096,
+        memoryLimit: 2048,
       },
     }),
     new ProvidePlugin({

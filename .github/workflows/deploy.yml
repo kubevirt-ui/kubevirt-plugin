@@ -39,7 +39,7 @@ jobs:
       - name: Login to Quay.io
         uses: docker/login-action@v3
         env:
-          GITHUB_TOKEN: "${{ secrets.BOT_PAT }}"
+          GITHUB_TOKEN: '${{ secrets.BOT_PAT }}'
         with:
           registry: quay.io
           username: ${{ secrets.QUAY_USERNAME }}
@@ -49,7 +49,7 @@ jobs:
         id: docker_build
         uses: docker/build-push-action@v6
         env:
-          GITHUB_TOKEN: "${{ secrets.BOT_PAT }}"
+          GITHUB_TOKEN: '${{ secrets.BOT_PAT }}'
         with:
           platforms: ${{ matrix.platform }}
           push: true
@@ -70,7 +70,7 @@ jobs:
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         env:
-          GITHUB_TOKEN: "${{ secrets.BOT_PAT }}"
+          GITHUB_TOKEN: '${{ secrets.BOT_PAT }}'
         with:
           registry: quay.io
           username: ${{ secrets.QUAY_USERNAME }}
