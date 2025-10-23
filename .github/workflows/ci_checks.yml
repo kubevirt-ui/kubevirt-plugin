@@ -19,9 +19,9 @@ jobs:
       - name: Setup Yarn
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'yarn'
-      - run: yarn install --frozen-lockfile
+          node-version: "22"
+          cache: "yarn"
+      - run: yarn install --immutable
 
       - name: Check i18n
         shell: bash
@@ -44,9 +44,9 @@ jobs:
       - name: Setup Yarn
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'yarn'
-      - run: yarn install --frozen-lockfile
+          node-version: "22"
+          cache: "yarn"
+      - run: yarn install --immutable
 
       - name: Lint
         run: yarn lint
@@ -64,9 +64,9 @@ jobs:
       - name: Setup Yarn
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'yarn'
-      - run: yarn install --frozen-lockfile
+          node-version: "22"
+          cache: "yarn"
+      - run: yarn install --immutable
 
       - name: Run Unit Tests
         run: yarn test-cov
