@@ -7,5 +7,21 @@
     .form-group-margin {
       margin-bottom: var(--pf-t--global--spacer--lg);
     }
+
+    .pf-v6-c-expandable-section__toggle {
+      margin-bottom: var(--pf-t--global--spacer--lg);
+    }
+
+    .pf-v6-c-form__group-control {
+      display: flex;
+    }
+
+    button.pf-v6-c-menu-toggle {
+      margin-right: var(--pf-t--global--spacer--200);
+    }
+
+    .pf-v6-l-split__item {
+      width: var(--pf-t--global--spacer--300);
+    }
   }
 }

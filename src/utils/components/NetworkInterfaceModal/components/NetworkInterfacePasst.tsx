@@ -48,7 +48,7 @@ const NetworkInterfacePasst: FC<NetworkInterfacePasstProps> = ({
 
   return (
     <Split hasGutter>
-      <FormGroup className="form-group-margin" fieldId="passt-checkbox">
+      <FormGroup className="form-group-margin" fieldId="passt-checkbox" label={t('Binding')}>
         <Select
           toggle={SelectToggle({
             'data-test-id': 'source-type-select',
