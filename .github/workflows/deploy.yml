@@ -54,7 +54,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           tags: |
             ${{ env.REGISTRY_IMAGE }}
-            ${{ env.REGISTRY_IMAGE }}:${{ env.VERSION_TAG }}-${{ matrix.platform }}
+            ${{ env.REGISTRY_IMAGE }}:${{ env.VERSION_TAG }}-${{ env.PLATFORM_PAIR }}
           push: true
           outputs: type=image,push-by-digest=true,name-canonical=true,push=true
 
