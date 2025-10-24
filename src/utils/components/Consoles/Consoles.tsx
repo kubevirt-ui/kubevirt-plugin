@@ -16,6 +16,7 @@ import {
 } from './components/utils/ConsoleConsts';
 import { ConsoleComponentState, ConsoleType } from './components/utils/types';
 import HideConsole from './components/vnc-console/HideConsole';
+import SessionAlreadyInUseModal from './components/vnc-console/SessionAlreadyInUseModal';
 import VncConnect from './components/vnc-console/VncConnect';
 import VncConsole from './components/vnc-console/VncConsole';
 
@@ -54,7 +55,11 @@ const Consoles: FC<ConsolesProps> = ({
   }
 
   const isConnected = state === ConsoleState.connected;
-  const showConnect = state === ConsoleState.disconnected || state === ConsoleState.connecting;
+  const showConnect = [
+    ConsoleState.connecting,
+    ConsoleState.disconnected,
+    ConsoleState.session_already_in_use,
+  ].includes(state);
 
   return (
     <Stack>
@@ -106,6 +111,15 @@ const Consoles: FC<ConsolesProps> = ({
           <DesktopViewer vmCluster={vmCluster} vmName={vmName} vmNamespace={vmNamespace} />
         )}
       </StackItem>
+      <SessionAlreadyInUseModal
+        setConsoleState={(consoleState: ConsoleState) =>
+          setState((prev) =>
+            prev.type !== VNC_CONSOLE_TYPE ? prev : { ...prev, state: consoleState },
+          )
+        }
+        connect={actions.connect}
+        isOpen={type === VNC_CONSOLE_TYPE && state === ConsoleState.session_already_in_use}
+      />
     </Stack>
   );
 };
