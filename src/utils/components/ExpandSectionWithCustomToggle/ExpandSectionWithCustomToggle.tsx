@@ -24,7 +24,9 @@ type ExpandSectionWithCustomToggleProps = {
   expandSectionClassName?: string;
   helpTextContent?: ReactNode;
   id: string;
+  isExpanded?: boolean;
   isIndented?: boolean;
+  onToggle?: (isExpanded: boolean) => void;
   searchItemId?: string;
   toggleClassname?: string;
   toggleContent: ReactNode;
@@ -37,19 +39,24 @@ const ExpandSectionWithCustomToggle: FC<ExpandSectionWithCustomToggleProps> = ({
   expandSectionClassName = '',
   helpTextContent,
   id,
+  isExpanded: controlledIsExpanded,
   isIndented = false,
+  onToggle: controlledOnToggle,
   searchItemId,
   toggleClassname = '',
   toggleContent,
 }) => {
-  const { isExpanded, isHighlighted, setIsExpanded } = useIsExpandedAndHighlighted(searchItemId);
+  const {
+    isExpanded: internalIsExpanded,
+    isHighlighted,
+    setIsExpanded,
+  } = useIsExpandedAndHighlighted(searchItemId);
+
+  const isExpanded = controlledIsExpanded ?? internalIsExpanded;
+  const onToggle = controlledOnToggle ?? setIsExpanded;
 
   const toggleID = `${id}--toggle`;
   const contentID = `${id}--content`;
-
-  const onToggle = (expanded: boolean) => {
-    setIsExpanded(expanded);
-  };
 
   return (
     <Stack className={classNames('expand-section-custom-toggle', className)}>
