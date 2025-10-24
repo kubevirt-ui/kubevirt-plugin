@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import React, { FC, MouseEvent, useState } from 'react';
 
+import { KeyboardLayout } from '@kubevirt-ui/vnc-keymaps';
 import DropdownToggle from '@kubevirt-utils/components/toggles/DropdownToggle';
 import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -18,7 +19,8 @@ import { PasteIcon } from '@patternfly/react-icons';
 
 import { ConsoleState, isConsoleType, VNC_CONSOLE_TYPE } from '../utils/ConsoleConsts';
 
-import { AccessConsolesProps, typeMap } from './utils/accessConsoles';
+import { AccessConsolesProps, typeMap, useFavoriteKeymaps } from './utils/accessConsoles';
+import { VncKeymapDropdown } from './VncKeymapDropdown';
 
 import './access-consoles.scss';
 
@@ -34,6 +36,8 @@ export const AccessConsoles: FC<AccessConsolesProps> = ({
   const [isOpenSelectType, setIsOpenSelectType] = useState<boolean>(false);
   const [isOpenSendKey, setIsOpenSendKey] = useState<boolean>(false);
   const { t } = useKubevirtTranslation();
+  const { defaultKeyboard, favoriteKeymaps, updateFavorite } = useFavoriteKeymaps();
+  const [selectedKeyboard, setSelectedKeyboard] = useState<KeyboardLayout>(defaultKeyboard);
 
   const customButtons = [
     {
@@ -49,22 +53,36 @@ export const AccessConsoles: FC<AccessConsolesProps> = ({
       text: 'Ctrl + Alt + 2',
     },
   ];
-
   return (
     <>
-      <Button
-        icon={
-          <>
-            <PasteIcon /> {t('Paste to console')}
-          </>
-        }
-        onClick={(e: MouseEvent<HTMLButtonElement>) => {
-          actions.sendPaste(true);
-          e.currentTarget.blur();
-        }}
-        className="vnc-paste-button"
-        variant={ButtonVariant.link}
-      />
+      {type === VNC_CONSOLE_TYPE && (
+        <VncKeymapDropdown
+          actions={actions}
+          {...{ favoriteKeymaps, selectedKeyboard, setSelectedKeyboard, updateFavorite }}
+        />
+      )}
+      {type !== VNC_CONSOLE_TYPE && (
+        <Button
+          icon={
+            <>
+              <PasteIcon /> {t('Paste to console')}
+            </>
+          }
+          onClick={
+            actions.sendPaste
+              ? (e: MouseEvent<HTMLButtonElement>) => {
+                  e?.currentTarget?.blur();
+                  actions
+                    .sendPaste({ shouldFocusOnConsole: true })
+                    // eslint-disable-next-line no-console
+                    .catch((err) => console.error('Failed to paste into Serial console', err));
+                }
+              : undefined
+          }
+          className="vnc-paste-button"
+          variant={ButtonVariant.link}
+        />
+      )}
       <Select
         onSelect={(_, selection: string) => {
           isConsoleType(selection) && setType(selection);
