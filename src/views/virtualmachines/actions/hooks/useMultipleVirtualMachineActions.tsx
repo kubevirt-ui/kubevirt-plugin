@@ -51,7 +51,7 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms)
       );
     }
 
-    if (namespaces.size === 1 && mtcInstalled) {
+    if (mtcInstalled) {
       migrationActions.push(BulkVirtualMachineActionFactory.migrateStorage(vms, createModal));
     }
 

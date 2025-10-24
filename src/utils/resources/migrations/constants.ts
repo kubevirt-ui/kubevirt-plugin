@@ -36,6 +36,7 @@ export type PersistentVolumesMigPlan = {
 export type MigPlan = K8sResourceCommon & {
   spec: {
     [key: string]: any;
+    namespaces?: string[];
     persistentVolumes?: PersistentVolumesMigPlan[];
   };
   status?: { conditions: K8sResourceCondition[]; suffix: string };
