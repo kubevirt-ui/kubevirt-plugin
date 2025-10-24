@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
+import LazyActionMenu from '@kubevirt-utils/components/LazyActionMenu/LazyActionMenu';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, modelToRef, StorageClassModel } from '@kubevirt-utils/models';
 import { MigPlan, MigPlanModel } from '@kubevirt-utils/resources/migrations/constants';
@@ -11,7 +12,6 @@ import {
   TableData,
   Timestamp,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { LazyActionMenu } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { Progress } from '@patternfly/react-core';
 
 import { MigPlanMap } from '../constants';
