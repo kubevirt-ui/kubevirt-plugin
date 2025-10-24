@@ -1,11 +1,9 @@
 import { matchPath } from 'react-router-dom-v5-compat';
 
 import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
-import { getResourceUrl } from '@kubevirt-utils/resources/shared';
+import { getSingleClusterVMListURL } from '@kubevirt-utils/resources/vm/utils/urls';
 import { isAllNamespaces } from '@kubevirt-utils/utils/utils';
 import { ResourceRouteHandler } from '@stolostron/multicluster-sdk';
-
-import { VirtualMachineModel } from '../views/dashboard-extensions/utils';
 
 import { KUBEVIRT_VM_PATH } from './constants';
 
@@ -23,16 +21,20 @@ export const getACMVMURL = (cluster: string, namespace: string, name: string): s
 export const getACMVMListURL = (cluster?: string, namespace?: string): string => {
   if (namespace) return getACMVMListNamespacesURL(cluster, namespace);
 
-  return cluster
-    ? `/k8s/cluster/${cluster}/all-namespaces/${KUBEVIRT_VM_PATH}`
-    : `/k8s/all-clusters/all-namespaces/${KUBEVIRT_VM_PATH}`;
+  const baseVMListURL = `/k8s/all-clusters/all-namespaces/${KUBEVIRT_VM_PATH}`;
+  return `${baseVMListURL}${cluster ? `?rowFilter-cluster=${cluster}` : ''}`;
 };
 
 export const getACMVMSearchURL = (): string =>
   `/k8s/all-clusters/all-namespaces/${KUBEVIRT_VM_PATH}/search`;
 
-export const getACMVMListNamespacesURL = (cluster: string, namespace: string): string =>
-  `/k8s/cluster/${cluster}/ns/${namespace}/${KUBEVIRT_VM_PATH}`;
+export const getACMVMListNamespacesURL = (cluster: string, namespace: string): string => {
+  const vmListClusterURL = getACMVMListURL(cluster);
+
+  return `${vmListClusterURL}${
+    vmListClusterURL?.includes('?') ? '&' : '?'
+  }rowFilter-project=${namespace}`;
+};
 
 export const getCatalogURL = (cluster: string, namespace?: string): string => {
   const namespacePath = isAllNamespaces(namespace) ? ALL_NAMESPACES : `ns/${namespace}`;
@@ -53,29 +55,10 @@ export const getConsoleStandaloneURL = (
 };
 
 export const getVMURL = (cluster: string, namespace: string, name: string): string =>
-  cluster
-    ? getACMVMURL(cluster, namespace, name)
-    : getResourceUrl({
-        activeNamespace: namespace,
-        model: VirtualMachineModel,
-        resource: { metadata: { name, namespace } },
-      });
+  cluster ? getACMVMURL(cluster, namespace, name) : getSingleClusterVMListURL(namespace);
 
 export const getVMListURL = (cluster?: string, namespace?: string) =>
-  cluster
-    ? getACMVMListURL(cluster, namespace)
-    : getResourceUrl({
-        activeNamespace: namespace,
-        model: VirtualMachineModel,
-      });
-
-export const getVMListNamespacesURL = (cluster: string, namespace: string): string =>
-  cluster
-    ? getACMVMListNamespacesURL(cluster, namespace)
-    : getResourceUrl({
-        activeNamespace: namespace,
-        model: VirtualMachineModel,
-      });
+  cluster ? getACMVMListURL(cluster, namespace) : getSingleClusterVMListURL(namespace);
 
 export const getFleetResourceRoute: ResourceRouteHandler = ({
   cluster,

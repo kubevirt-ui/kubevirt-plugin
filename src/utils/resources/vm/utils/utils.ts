@@ -1,12 +1,12 @@
 import { V1CPU } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { isAllNamespaces, isEmpty } from '@kubevirt-utils/utils/utils';
-import { getACMVMListURL, getVMListNamespacesURL, getVMListURL } from '@multicluster/urls';
+import { getACMVMListURL, getVMListURL } from '@multicluster/urls';
 import { getRowFilterQueryKey } from '@search/utils/query';
 
 export const getVMListPath = (namespace: string, params: string, cluster?: string) => {
   const vmListURL = isAllNamespaces(namespace)
     ? getVMListURL(cluster)
-    : getVMListNamespacesURL(cluster, namespace);
+    : getVMListURL(cluster, namespace);
   return `${vmListURL}?${params}`;
 };
 
@@ -20,7 +20,7 @@ const getRowFiltersString = (rowFilters: Record<string, string>) =>
 export const getVMListPathWithRowFilters = (
   namespace: string,
   rowFilters: Record<string, string>,
-) => `${getVMListNamespacesURL(null, namespace)}?${getRowFiltersString(rowFilters)}`;
+) => `${getVMListURL(null, namespace)}?${getRowFiltersString(rowFilters)}`;
 
 export const getACMMListPathWithRowFilters = (
   cluster: string,

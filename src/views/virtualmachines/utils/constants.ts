@@ -1,3 +1,8 @@
+import {
+  CLUSTER_LIST_FILTER_TYPE,
+  PROJECT_LIST_FILTER_TYPE,
+} from '@kubevirt-utils/utils/constants';
+
 export const OBJECTS_FETCHING_LIMIT = 10000;
 
 export const booleanTextIds = {
@@ -7,7 +12,7 @@ export const booleanTextIds = {
 
 export enum VirtualMachineRowFilterType {
   Architecture = 'architecture',
-  Cluster = 'cluster',
+  Cluster = CLUSTER_LIST_FILTER_TYPE,
   CPU = 'cpu',
   DateCreatedFrom = 'dateCreatedFrom',
   DateCreatedTo = 'dateCreatedTo',
@@ -20,7 +25,7 @@ export enum VirtualMachineRowFilterType {
   Name = 'name',
   Node = 'node',
   OS = 'os',
-  Project = 'project',
+  Project = PROJECT_LIST_FILTER_TYPE,
   Scheduling = 'scheduling',
   Status = 'status',
   StorageClass = 'storageClass',

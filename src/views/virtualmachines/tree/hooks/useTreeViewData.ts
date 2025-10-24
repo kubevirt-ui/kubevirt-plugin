@@ -20,8 +20,13 @@ import useMulticlusterNamespaces from '@multicluster/hooks/useMulticlusterProjec
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
 import { TreeViewDataItem } from '@patternfly/react-core';
+import { getRowFilterQueryKey } from '@search/utils/query';
 import { useFleetClusterNames } from '@stolostron/multicluster-sdk';
-import { getLatestMigrationForEachVM, OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
+import {
+  getLatestMigrationForEachVM,
+  OBJECTS_FETCHING_LIMIT,
+  VirtualMachineRowFilterType,
+} from '@virtualmachines/utils';
 
 import { vmimMapperSignal, vmsSignal } from '../utils/signals';
 import { createMultiClusterTreeViewData, createSingleClusterTreeViewData } from '../utils/utils';
@@ -42,8 +47,11 @@ export const useTreeViewData = (): UseTreeViewData => {
 
   const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
   const [projectNames, projectNamesLoaded, projectNamesError] = useProjects();
-  const [namespacesByCluster, multiclusterNamespacesLoaded, multiclusterNamespacesError] =
-    useMulticlusterNamespaces();
+  const {
+    error: multiclusterNamespacesError,
+    loaded: multiclusterNamespacesLoaded,
+    namespacesByCluster,
+  } = useMulticlusterNamespaces();
 
   const loadVMsPerNamespace = !isACMTreeView && projectNamesLoaded && !isAdmin;
 
@@ -124,13 +132,18 @@ export const useTreeViewData = (): UseTreeViewData => {
   const treeData = useMemo(() => {
     if (!loaded) return [];
 
+    const filtersQueryParams = new URLSearchParams(location.search);
+
+    filtersQueryParams.delete(getRowFilterQueryKey(VirtualMachineRowFilterType.Cluster));
+    filtersQueryParams.delete(getRowFilterQueryKey(VirtualMachineRowFilterType.Project));
+
     if (isACMTreeView) {
       return createMultiClusterTreeViewData(
         sortedMemoizedVMs,
         location.pathname,
         treeViewFoldersEnabled,
         namespacesByCluster,
-        location.search,
+        filtersQueryParams.toString(),
         clusterNames,
       );
     }
@@ -141,7 +154,7 @@ export const useTreeViewData = (): UseTreeViewData => {
       isAdmin,
       location.pathname,
       treeViewFoldersEnabled,
-      location.search,
+      filtersQueryParams.toString(),
     );
   }, [
     loaded,

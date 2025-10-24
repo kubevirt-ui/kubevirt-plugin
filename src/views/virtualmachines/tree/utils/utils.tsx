@@ -12,13 +12,7 @@ import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/share
 import { universalComparator } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { UseMulticlusterNamespacesReturnType } from '@multicluster/hooks/useMulticlusterProjects';
-import {
-  getACMVMListURL,
-  getVMListNamespacesURL,
-  getVMListURL,
-  getVMURL,
-  isACMPath,
-} from '@multicluster/urls';
+import { getACMVMListURL, getVMListURL, getVMURL, isACMPath } from '@multicluster/urls';
 import { TreeViewDataItem } from '@patternfly/react-core';
 import {
   ClusterIcon,
@@ -44,6 +38,19 @@ export const treeDataMap = signal<Record<string, TreeViewDataItemWithHref>>(null
 export interface TreeViewDataItemWithHref extends TreeViewDataItem {
   href?: string;
 }
+
+const vmListURLWithFilters = (
+  cluster?: string,
+  namespace?: string,
+  filtersQueryParams?: string,
+) => {
+  const baseURL = getVMListURL(cluster, namespace);
+
+  if (!filtersQueryParams) return baseURL;
+
+  const sepearator = baseURL.includes('?') ? '&' : '?';
+  return `${baseURL}${sepearator}${filtersQueryParams}`;
+};
 
 const buildProjectMap = (
   vms: V1VirtualMachine[],
@@ -106,7 +113,7 @@ const createFolderTreeItems = (
   project: string,
   currentPageVMName: string,
   treeViewDataMap: Record<string, TreeViewDataItemWithHref>,
-  queryParams?: string,
+  filtersQueryParams?: string,
   cluster?: string,
 ): TreeViewDataItemWithHref[] =>
   Object.entries(folders).map(([folder, vmItems]) => {
@@ -116,11 +123,13 @@ const createFolderTreeItems = (
     const folderExpanded =
       currentPageVMName && vmItems.some((item) => (item.name as string) === currentPageVMName);
 
+    const urlWithFilters = vmListURLWithFilters(cluster, project, filtersQueryParams);
+
     const folderTreeItem: TreeViewDataItemWithHref = {
       children: vmItems,
       defaultExpanded: folderExpanded,
       expandedIcon: <FolderOpenIcon />,
-      href: `${getVMListNamespacesURL(cluster, project)}${queryParams || ''}`,
+      href: urlWithFilters,
       icon: <FolderIcon />,
       id: folderTreeItemID,
       name: folder,
@@ -139,7 +148,7 @@ const createProjectTreeItem = (
   currentPageVMName: string,
   currentPageNamespace: string,
   treeViewDataMap: Record<string, TreeViewDataItemWithHref>,
-  queryParams?: string,
+  filtersQueryParams?: string,
   cluster?: string,
   clusterSelected = true,
 ): TreeViewDataItemWithHref => {
@@ -148,7 +157,7 @@ const createProjectTreeItem = (
     project,
     currentPageVMName,
     treeViewDataMap,
-    queryParams,
+    filtersQueryParams,
     cluster,
   );
 
@@ -158,6 +167,8 @@ const createProjectTreeItem = (
 
   const projectChildren = [...sortProjectFolders, ...(projectMap[project]?.ungrouped || [])];
 
+  const urlWithFilters = vmListURLWithFilters(cluster, project, filtersQueryParams);
+
   const projectTreeItemID = `${PROJECT_SELECTOR_PREFIX}/${
     cluster ?? SINGLE_CLUSTER_KEY
   }/${project}`;
@@ -165,7 +176,7 @@ const createProjectTreeItem = (
     children: projectChildren,
     customBadgeContent: projectMap[project]?.count || '0',
     defaultExpanded: currentPageNamespace === project && clusterSelected,
-    href: `${getVMListNamespacesURL(cluster, project)}${queryParams || ''}`,
+    href: urlWithFilters,
     icon: <ProjectDiagramIcon />,
     id: projectTreeItemID,
     name: project,
@@ -182,7 +193,7 @@ const createAllNamespacesTreeItem = (
   treeViewData: TreeViewDataItemWithHref[],
   treeViewDataMap: Record<string, TreeViewDataItemWithHref>,
   projectMap: Record<string, any>,
-  queryParams?: string,
+  filtersQueryParams?: string,
   cluster?: string,
 ): TreeViewDataItemWithHref => {
   const allVMsCount = Object.keys(projectMap).reduce((acc, ns) => {
@@ -190,11 +201,13 @@ const createAllNamespacesTreeItem = (
     return acc;
   }, 0);
 
+  const urlWithFilters = vmListURLWithFilters(cluster, null, filtersQueryParams);
+
   const allNamespacesTreeItem: TreeViewDataItemWithHref = {
     children: treeViewData,
     customBadgeContent: allVMsCount || '0',
     defaultExpanded: true,
-    href: `${getVMListURL(cluster)}${queryParams || ''}`,
+    href: urlWithFilters,
     icon: <ProjectDiagramIcon />,
     id: ALL_NAMESPACES_SESSION_KEY,
     name: ALL_PROJECTS,
@@ -232,7 +245,7 @@ export const createSingleClusterTreeViewData = (
   isAdmin: boolean,
   pathname: string,
   foldersEnabled: boolean,
-  queryParams: string,
+  filtersQueryParams: string,
 ): TreeViewDataItem[] => {
   const { currentVMTab, vmName, vmNamespace } = getVMInfoFromPathname(pathname);
 
@@ -249,11 +262,18 @@ export const createSingleClusterTreeViewData = (
   );
 
   const treeViewData = projectsToShow.map((project) =>
-    createProjectTreeItem(project, projectMap, vmName, vmNamespace, treeViewDataMap, queryParams),
+    createProjectTreeItem(
+      project,
+      projectMap,
+      vmName,
+      vmNamespace,
+      treeViewDataMap,
+      filtersQueryParams,
+    ),
   );
 
   const allNamespacesTreeItem = isAdmin
-    ? createAllNamespacesTreeItem(treeViewData, treeViewDataMap, projectMap, queryParams)
+    ? createAllNamespacesTreeItem(treeViewData, treeViewDataMap, projectMap, filtersQueryParams)
     : null;
 
   treeDataMap.value = treeViewDataMap;
@@ -279,8 +299,8 @@ export const createMultiClusterTreeViewData = (
   vms: V1VirtualMachine[],
   pathname: string,
   foldersEnabled: boolean,
-  projectsByClusters: UseMulticlusterNamespacesReturnType[0],
-  queryParams?: string,
+  projectsByClusters: UseMulticlusterNamespacesReturnType['namespacesByCluster'],
+  filtersQueryParams?: string,
   clusterNames?: string[],
 ): TreeViewDataItem[] => {
   const { currentVMTab, vmCluster, vmName, vmNamespace } = getVMInfoFromPathname(pathname);
@@ -315,7 +335,7 @@ export const createMultiClusterTreeViewData = (
           vmName,
           vmNamespace,
           treeViewDataMap,
-          queryParams,
+          filtersQueryParams,
           clusterName,
           clusterSelected,
         ),
@@ -437,4 +457,9 @@ export const getAllTreeViewFolderItems = (treeData: TreeViewDataItem[]): TreeVie
 export const getAllTreeViewProjectItems = (treeData: TreeViewDataItem[]): TreeViewDataItem[] =>
   getAllTreeViewItems(treeData).filter((treeItem) =>
     treeItem.id.startsWith(PROJECT_SELECTOR_PREFIX),
+  );
+
+export const getAllTreeViewClusterItems = (treeData: TreeViewDataItem[]): TreeViewDataItem[] =>
+  getAllTreeViewItems(treeData).filter((treeItem) =>
+    treeItem.id.startsWith(CLUSTER_SELECTOR_PREFIX),
   );
