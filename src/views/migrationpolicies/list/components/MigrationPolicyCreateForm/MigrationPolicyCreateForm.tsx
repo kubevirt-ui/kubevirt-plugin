@@ -1,5 +1,6 @@
 import React, { FC, useMemo, useState } from 'react';
 
+import ClusterProjectDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterProjectDropdown';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { DocumentTitle } from '@openshift-console/dynamic-plugin-sdk';
@@ -33,6 +34,7 @@ const MigrationPolicyCreateForm: FC = () => {
   return (
     <div className="migration-policy__form kv-m-pane__form">
       <DocumentTitle>{t('Create MigrationPolicy')}</DocumentTitle>
+      <ClusterProjectDropdown showProjectDropdown={false} />
       <MigrationPolicyCreateFormHeader />
       <Form className="migration-policy__form-body">
         <FormGroup fieldId="create-description">

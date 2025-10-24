@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 
 import { MigrationPolicyModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import ClusterProjectDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterProjectDropdown';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useMigrationPolicies from '@kubevirt-utils/hooks/useMigrationPolicies';
@@ -42,6 +43,7 @@ const MigrationPoliciesList: FC<ListPageProps> = ({
 
   return (
     <>
+      <ClusterProjectDropdown includeAllClusters showProjectDropdown={false} />
       <ListPageHeader title={showTitle && t('MigrationPolicies')}>
         <MigrationPoliciesCreateButton />
       </ListPageHeader>
