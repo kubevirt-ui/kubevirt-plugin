@@ -23,6 +23,7 @@ export enum VMActionType {
   AddVolume = 'addvolume',
   Pause = 'pause',
   RemoveVolume = 'removevolume',
+  Reset = 'reset',
   Restart = 'restart',
   Start = 'start',
   Stop = 'stop',
@@ -72,6 +73,8 @@ export const stopVM = async (vm: V1VirtualMachine, body?: V1StopOptions) =>
   VMActionRequest(vm, VMActionType.Stop, VirtualMachineModel, body);
 export const restartVM = async (vm: V1VirtualMachine) =>
   VMActionRequest(vm, VMActionType.Restart, VirtualMachineModel);
+export const resetVM = async (vm: V1VirtualMachine) =>
+  VMActionRequest(vm, VMActionType.Reset, VirtualMachineInstanceModel);
 export const pauseVM = async (vm: V1VirtualMachine) =>
   VMActionRequest(vm, VMActionType.Pause, VirtualMachineInstanceModel);
 export const unpauseVM = async (vm: V1VirtualMachine) =>
