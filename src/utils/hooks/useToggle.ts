@@ -10,7 +10,7 @@ export const useToggle: UseToggle = (key = '', defaultValue) => {
     // Retrieve initial value from localStorage (if available)
     const storedValue = localStorage.getItem(key);
     const parsedValue = storedValue && JSON.parse(storedValue);
-    return defaultValue !== undefined ? defaultValue : parsedValue ?? false;
+    return parsedValue !== null ? parsedValue : defaultValue ?? false;
   });
 
   // Update localStorage on toggle change

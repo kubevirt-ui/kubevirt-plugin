@@ -1,6 +1,7 @@
-import React, { FC, ReactNode, useState } from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useToggle } from '@kubevirt-utils/hooks/useToggle';
 import {
   Card,
   CardBody,
@@ -20,14 +21,14 @@ type GettingStartedGridProps = {
 
 export const GettingStartedGrid: FC<GettingStartedGridProps> = ({ children }) => {
   const { t } = useKubevirtTranslation();
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useToggle('virtualization-getting-started-resources', true);
 
   const title = t('Getting started resources');
   const titleTooltip = t(
     'Use our collection of resources to help you get started with virtualization.',
   );
 
-  const onExpand = () => setIsExpanded((expanded) => !expanded);
+  const onExpand = () => setIsExpanded(!isExpanded);
 
   return (
     <Card
