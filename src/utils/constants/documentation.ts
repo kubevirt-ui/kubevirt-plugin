@@ -1,14 +1,18 @@
 import pluginMetadata from '../../../plugin-metadata';
 
-export const REDHAT_BASE_URL = 'https://www.redhat.com';
-export const RH_ACCESS_URL = 'https://access.redhat.com';
-export const K8_DOC_OBJ_URL = 'https://kubernetes.io/docs/concepts/overview/working-with-objects';
-export const KV_UG_URL = 'https://kubevirt.io';
-export const RH_DOC_URL = 'https://docs.redhat.com/documentation';
-export const REDHAT_DOC_URL = `${RH_DOC_URL}/openshift_container_platform/latest`;
 export const PLUGIN_VERSION = pluginMetadata.version;
 
+const REDHAT_BASE_URL = 'https://www.redhat.com';
+const RH_ACCESS_URL = 'https://access.redhat.com';
+const K8_DOC_OBJ_URL = 'https://kubernetes.io/docs/concepts/overview/working-with-objects';
+const K8S_PERSISTENT_VOLUMES_URL =
+  'https://kubernetes.io/docs/concepts/storage/persistent-volumes/';
+const KV_UG_URL = 'https://kubevirt.io';
+const RH_DOC_URL = 'https://docs.redhat.com/documentation';
+const REDHAT_DOC_URL = `${RH_DOC_URL}/openshift_container_platform/latest`;
+
 export const documentationURL = {
+  ACCESS_MODE: `${K8S_PERSISTENT_VOLUMES_URL}/#access-modes`,
   ANNOTATIONS: `${K8_DOC_OBJ_URL}/annotations/`,
   AUTOCOMPUTE_CPU_LIMITS: `${KV_UG_URL}/user-guide/virtual_machines/resources_requests_and_limits/`,
   CDI_UPLOAD_SUPPORTED_TYPES: `${REDHAT_DOC_URL}/html/virtualization/storage#virt-cdi-supported-operations-matrix_virt-preparing-cdi-scratch-space`,
@@ -59,4 +63,5 @@ export const documentationURL = {
   VIRTCTL_CLI: `${REDHAT_DOC_URL}/html/virtualization/getting-started#virt-using-the-cli-tools`,
   VIRTUALIZATION_BLOG: `https://cloud.redhat.com/learn/topics/virtualization/`,
   VIRTUALIZATION_WHAT_YOU_CAN_DO: `${REDHAT_DOC_URL}/html/virtualization/about#virt-what-you-can-do-with-virt_about-virt`,
+  VOLUME_MODE: `${K8S_PERSISTENT_VOLUMES_URL}/#volume-mode`,
 };
