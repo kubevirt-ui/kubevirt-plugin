@@ -4,7 +4,7 @@ import ApplyStorageProfileSettings from '@kubevirt-utils/components/ApplyStorage
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
 import ProjectDropdown from '@kubevirt-utils/components/ProjectDropdown/ProjectDropdown';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { FormGroup, Grid, GridItem, TextInput } from '@patternfly/react-core';
+import { ExpandableSection, FormGroup, Grid, GridItem, TextInput } from '@patternfly/react-core';
 
 import { AddBootableVolumeState, SetBootableVolumeFieldType } from '../../utils/constants';
 
@@ -74,11 +74,13 @@ const VolumeDestination: FC<VolumeDestinationProps> = ({
           />
         </GridItem>
         <GridItem>
-          <ApplyStorageProfileSettings
-            {...{ accessMode, storageClassName, volumeMode }}
-            setAccessMode={setBootableVolumeField('accessMode')}
-            setVolumeMode={setBootableVolumeField('volumeMode')}
-          />
+          <ExpandableSection isIndented toggleText={t('Advanced settings')}>
+            <ApplyStorageProfileSettings
+              {...{ accessMode, storageClassName, volumeMode }}
+              setAccessMode={setBootableVolumeField('accessMode')}
+              setVolumeMode={setBootableVolumeField('volumeMode')}
+            />
+          </ExpandableSection>
         </GridItem>
         {showSCAlert && (
           <GridItem span={12}>
