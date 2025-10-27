@@ -132,10 +132,11 @@
     "npm": "^9.5.0 || >=10.5.2"
   },
   "lint-staged": {
-    "*.{js,ts,tsx,jsx,json}": [
-      "eslint . --fix",
-      "prettier --write .",
-      "yarn i18n"
+    "*.{js,ts,tsx,jsx}": [
+      "eslint --fix"
+    ],
+    "!(*.js|*.jsx|*.ts|*.tsx)": [
+      "prettier --write --ignore-unknown"
     ]
   },
   "name": "kubevirt-plugin",
@@ -155,7 +156,8 @@
     "cypress-postreport": "yarn cypress-merge && yarn cypress-generate",
     "dev": "yarn clean && NODE_ENV=development NODE_OPTIONS=--max-old-space-size=8192 yarn ts-node node_modules/.bin/webpack serve --progress",
     "export-pos": "./i18n-scripts/export-pos.sh",
-    "i18n": "i18next && node ./i18n-scripts/set-english-defaults.js && ./i18n-scripts/replace-br.sh",
+    "i18n": "i18next --silent && node ./i18n-scripts/set-english-defaults.js && ./i18n-scripts/replace-br.sh",
+    "i18n:verbose": "i18next && node ./i18n-scripts/set-english-defaults.js && ./i18n-scripts/replace-br.sh",
     "i18n-dummy-locale": "node ./i18n-scripts/dummy-locale.js",
     "i18n-to-po": "node ./i18n-scripts/i18n-to-po.js",
     "lint": "eslint . --color && prettier . --ignore-unknown --check",
