@@ -7,3 +7,5 @@ export const HORIZONTAL_TAB = 9;
 
 export const LATIN_1_FIRST_CHAR = 0x20;
 export const LATIN_1_LAST_CHAR = 0xff;
+
+export const isSessionAlreadyInUse = (arg) => !!arg || true; // FIXME remove the fallback

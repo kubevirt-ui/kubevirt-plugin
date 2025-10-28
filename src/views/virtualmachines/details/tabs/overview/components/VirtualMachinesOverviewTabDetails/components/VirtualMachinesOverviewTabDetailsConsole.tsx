@@ -38,8 +38,11 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
   const enableConsole = isVMRunning && !isHeadlessMode && canConnectConsole;
   const showConnect =
     !enableConsole || // connect component is also empty state here
-    state === ConsoleState.disconnected ||
-    state === ConsoleState.connecting;
+    [
+      ConsoleState.connecting,
+      ConsoleState.disconnected,
+      ConsoleState.session_already_in_use,
+    ].includes(state);
 
   if (!apiPathLoaded)
     return (
@@ -83,6 +86,7 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
             isConnecting={state === ConsoleState.connecting}
             isDisabled={!enableConsole}
             isHeadlessMode={isHeadlessMode}
+            isSessionAlreadyInUse={state === ConsoleState.session_already_in_use}
           />
         </div>
       )}
