@@ -5,13 +5,15 @@ import {
   V1Volume,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getName } from '@kubevirt-utils/resources/shared';
+import { getLabel, getName } from '@kubevirt-utils/resources/shared';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ProgressVariant } from '@patternfly/react-core';
 
 import { MigMigrationStatuses } from '../../../../../../utils/resources/migrations/constants';
+
+import { ALREADY_MIGRATED_PVC_LALBEL } from './constants';
 
 export const entireVMSelected = (selectedPVCs: IoK8sApiCoreV1PersistentVolumeClaim[]) =>
   selectedPVCs === null;
@@ -71,6 +73,9 @@ export const getMigratableVMPVCs = (
 ): IoK8sApiCoreV1PersistentVolumeClaim[] => {
   return getVolumes(vm)?.reduce((acc, volume) => {
     const pvc = getVolumePVC(volume, pvcs);
+
+    if (!isEmpty(getLabel(pvc, ALREADY_MIGRATED_PVC_LALBEL))) return acc;
+
     if (!isEmpty(pvc)) {
       acc.push(pvc);
     }
