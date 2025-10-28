@@ -19,6 +19,12 @@ export const SOURCE_TYPES = {
   uploadSource: 'upload',
 };
 
+export const SOURCE_TYPE_LABELS = {
+  [SOURCE_TYPES.httpSource]: 'URL (creates PVC)',
+  [SOURCE_TYPES.pvcSource]: 'PVC (clone PVC)',
+  [SOURCE_TYPES.registrySource]: 'Registry (ContainerDisk)',
+};
+
 export type SOURCE_OPTIONS_IDS =
   | typeof SOURCE_TYPES.httpSource
   | typeof SOURCE_TYPES.pvcSource
