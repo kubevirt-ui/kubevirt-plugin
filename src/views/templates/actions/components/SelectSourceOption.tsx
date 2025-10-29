@@ -8,7 +8,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { FormGroup, SelectOption } from '@patternfly/react-core';
 import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 
-import { SOURCE_OPTIONS_IDS, SOURCE_TYPES } from '../../utils/constants';
+import { SOURCE_OPTIONS_IDS, SOURCE_TYPE_LABELS, SOURCE_TYPES } from '../../utils/constants';
 
 const getSourceOption = (source: SOURCE_OPTIONS_IDS, ns: string, t: TFunction) => {
   switch (source) {
@@ -101,12 +101,10 @@ const SelectSourceOption: FC<SelectSourceOptionProps> = ({
     >
       <FormPFSelect
         onSelect={onSelect}
-        placeholder={t('Select boot source')}
         selected={selectedSource}
+        selectedLabel={selectedSource ? t(SOURCE_TYPE_LABELS[selectedSource]) : undefined}
+        toggleProps={{ placeholder: t('Select boot source type') }}
       >
-        <SelectOption isDisabled key={0} value="Select a title">
-          {t('Select a title')}
-        </SelectOption>
         {options.map((option) => getSourceOption(option, ns, t))}
       </FormPFSelect>
     </FormGroup>
