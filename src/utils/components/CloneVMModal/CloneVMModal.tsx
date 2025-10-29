@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
 import {
@@ -23,7 +23,7 @@ import SnapshotContentConfigurationSummary from './components/SnapshotContentCon
 import StartClonedVMCheckbox from './components/StartClonedVMCheckbox/StartClonedVMCheckbox';
 import useCloneVMModal from './hooks/useCloneVMModal';
 import { CLONING_STATUSES } from './utils/constants';
-import { cloneVM, runVM, vmExists } from './utils/helpers';
+import { cloneVM, vmExists } from './utils/helpers';
 
 type CloneVMModalProps = {
   headerText?: string;
@@ -42,13 +42,6 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
     `${name}${isVM(source) ? '-clone-' : '-'}${getRandomChars()}`.substring(0, MAX_K8S_NAME_LENGTH),
   );
 
-  const vmUseRunning = useMemo(
-    () =>
-      (source as V1VirtualMachine)?.spec?.running !== undefined &&
-      (source as V1VirtualMachine)?.spec?.running !== null,
-    [source],
-  );
-
   const [startCloneVM, setStartCloneVM] = useState(false);
 
   const [initialCloneRequest, setInitialCloneRequest] = useState<V1beta1VirtualMachineClone>();
@@ -60,7 +53,7 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
       throw new Error(t('VirtualMachine with this name already exists'));
     }
 
-    const request = await cloneVM(source, cloneName, namespace);
+    const request = await cloneVM(source, cloneName, namespace, startCloneVM);
 
     setInitialCloneRequest(request);
   };
@@ -73,12 +66,10 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
 
   useEffect(() => {
     if (cloneRequest?.status?.phase === CLONING_STATUSES.SUCCEEDED) {
-      startCloneVM && runVM(cloneName, namespace, getCluster(source), vmUseRunning);
-
       navigate(getVMURL(cloneRequest?.cluster, namespace, cloneName));
       onClose();
     }
-  }, [cloneRequest, startCloneVM, cloneName, namespace, onClose, navigate, vmUseRunning, source]);
+  }, [cloneRequest, cloneName, namespace, onClose, navigate, source]);
 
   return (
     <TabModal

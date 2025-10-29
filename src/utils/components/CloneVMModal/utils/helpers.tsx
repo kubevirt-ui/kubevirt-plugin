@@ -12,7 +12,7 @@ import { RUNSTRATEGY_ALWAYS } from '@kubevirt-utils/constants/constants';
 import { MAX_K8S_NAME_LENGTH } from '@kubevirt-utils/utils/constants';
 import { isVM } from '@kubevirt-utils/utils/typeGuards';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
-import { kubevirtK8sCreate, kubevirtK8sGet, kubevirtK8sPatch } from '@multicluster/k8sRequests';
+import { kubevirtK8sCreate, kubevirtK8sGet } from '@multicluster/k8sRequests';
 
 const cloneVMToVM: V1beta1VirtualMachineClone = {
   apiVersion: `${VirtualMachineCloneModel.apiGroup}/${VirtualMachineCloneModel.apiVersion}`,
@@ -38,6 +38,7 @@ export const cloneVM = (
   source: V1beta1VirtualMachineSnapshot | V1VirtualMachine,
   newVMName: string,
   namespace: string,
+  startVM?: boolean,
 ) => {
   const cloningRequest = produce(cloneVMToVM, (draftCloneData) => {
     draftCloneData.spec.source = {
@@ -58,19 +59,13 @@ export const cloneVM = (
     if (draftCloneData.metadata.name.endsWith('-')) {
       draftCloneData.metadata.name = draftCloneData.metadata.name.slice(0, -1);
     }
-  });
 
-  return kubevirtK8sCreate<V1beta1VirtualMachineClone>({
-    cluster: source?.cluster,
-    data: cloningRequest,
-    model: VirtualMachineCloneModel,
-  });
-};
+    if (startVM) {
+      const vmUseRunning =
+        (source as V1VirtualMachine)?.spec?.running !== undefined &&
+        (source as V1VirtualMachine)?.spec?.running !== null;
 
-export const runVM = (vmName: string, vmNamespace: string, cluster?: string, useRunning = false) =>
-  kubevirtK8sPatch({
-    data: [
-      useRunning
+      const patchForRunning = vmUseRunning
         ? {
             op: 'replace',
             path: '/spec/running',
@@ -80,16 +75,18 @@ export const runVM = (vmName: string, vmNamespace: string, cluster?: string, use
             op: 'replace',
             path: '/spec/runStrategy',
             value: RUNSTRATEGY_ALWAYS,
-          },
-    ],
-    model: VirtualMachineModel,
-    resource: {
-      apiVersion: VirtualMachineModel.apiVersion,
-      cluster,
-      kind: VirtualMachineModel.kind,
-      metadata: { name: vmName, namespace: vmNamespace },
-    },
+          };
+
+      draftCloneData.spec.patches = [JSON.stringify(patchForRunning)];
+    }
   });
+
+  return kubevirtK8sCreate<V1beta1VirtualMachineClone>({
+    cluster: source?.cluster,
+    data: cloningRequest,
+    model: VirtualMachineCloneModel,
+  });
+};
 
 export const vmExists = (vmName: string, vmNamespace: string, cluster?: string) =>
   kubevirtK8sGet<V1VirtualMachine>({

@@ -85,7 +85,6 @@ const ActionsDropdown: FC<ActionsDropdownProps> = ({
             </MenuContent>
           </Menu>
         }
-        appendTo={containerRef.current}
         isVisible={isOpen}
         placement="bottom-end"
         triggerRef={toggleRef}

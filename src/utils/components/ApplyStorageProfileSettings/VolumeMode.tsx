@@ -1,13 +1,17 @@
 import React, { FC, useCallback, useEffect } from 'react';
+import { Trans } from 'react-i18next';
 import { uniq } from 'lodash';
 
 import {
   V1beta1StorageSpecAccessModesEnum,
   V1beta1StorageSpecVolumeModeEnum,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ClaimPropertySets } from '@kubevirt-utils/types/storage';
 import { FormGroup, Radio } from '@patternfly/react-core';
+
+import HelpTextIcon from '../HelpTextIcon/HelpTextIcon';
 
 import RecommendationLabel from './RecommendationLabel';
 import { getAccessModesForVolume, VOLUME_MODE_RADIO_OPTIONS } from './utils';
@@ -55,7 +59,23 @@ export const VolumeMode: FC<VolumeModeProps> = ({
   }, [volumeMode, recommendedVolumeMode, setBothModes]);
 
   return (
-    <FormGroup isStack label={t('Volume Mode')}>
+    <FormGroup
+      labelHelp={
+        <HelpTextIcon
+          bodyContent={
+            <Trans ns="plugin__kubevirt-plugin" t={t}>
+              Learn more about{' '}
+              <a href={documentationURL.VOLUME_MODE} rel="noopener noreferrer" target="_blank">
+                volume modes
+              </a>
+              .
+            </Trans>
+          }
+        />
+      }
+      isStack
+      label={t('Volume Mode')}
+    >
       {VOLUME_MODE_RADIO_OPTIONS.map(({ label, value }) => (
         <Radio
           label={

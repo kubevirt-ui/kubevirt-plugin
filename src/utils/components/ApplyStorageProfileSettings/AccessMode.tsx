@@ -1,12 +1,16 @@
 import React, { FC } from 'react';
+import { Trans } from 'react-i18next';
 
 import {
   V1beta1StorageSpecAccessModesEnum,
   V1beta1StorageSpecVolumeModeEnum,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ClaimPropertySets } from '@kubevirt-utils/types/storage';
 import { FormGroup, Radio } from '@patternfly/react-core';
+
+import HelpTextIcon from '../HelpTextIcon/HelpTextIcon';
 
 import RecommendationLabel from './RecommendationLabel';
 import { ACCESS_MODE_RADIO_OPTIONS, getAccessModesForVolume } from './utils';
@@ -31,7 +35,23 @@ export const AccessMode: FC<AccessModeProps> = ({
   const accessModeForVolume = getAccessModesForVolume(claimPropertySets, volumeMode)?.[0];
 
   return (
-    <FormGroup isStack label={t('Access Mode')}>
+    <FormGroup
+      labelHelp={
+        <HelpTextIcon
+          bodyContent={
+            <Trans ns="plugin__kubevirt-plugin" t={t}>
+              Learn more about{' '}
+              <a href={documentationURL.ACCESS_MODE} rel="noopener noreferrer" target="_blank">
+                access modes
+              </a>
+              .
+            </Trans>
+          }
+        />
+      }
+      isStack
+      label={t('Access Mode')}
+    >
       {ACCESS_MODE_RADIO_OPTIONS.map(({ label, value }) => (
         <Radio
           label={

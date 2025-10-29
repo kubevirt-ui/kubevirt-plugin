@@ -51,7 +51,7 @@ import {
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { Flex, Pagination } from '@patternfly/react-core';
+import { Flex, PageBreadcrumb, PageSection, Pagination } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
 import { VMSearchQueries } from '@virtualmachines/search/hooks/useVMSearchQueries';
 import VirtualMachineFilterToolbar from '@virtualmachines/search/VirtualMachineFilterToolbar';
@@ -59,6 +59,7 @@ import { vmsSignal } from '@virtualmachines/tree/utils/signals';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 import { getVMIFromMapper, getVMIMFromMapper } from '@virtualmachines/utils/mappers';
 
+import { VirtualMachineBreadcrumb } from './components/VirtualMachineBreadcrumb/VirtualMachineBreadcrumb';
 import VirtualMachineBulkActionButton from './components/VirtualMachineBulkActionButton';
 import VirtualMachineEmptyState from './components/VirtualMachineEmptyState/VirtualMachineEmptyState';
 import VirtualMachineListSummary from './components/VirtualMachineListSummary/VirtualMachineListSummary';
@@ -211,12 +212,19 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
     <>
       <DocumentTitle>{PageTitles.VirtualMachines}</DocumentTitle>
       {!isSearchResultsPage && (
-        <VirtualMachineListSummary
-          namespace={namespace}
-          onFilterChange={onFilterChange}
-          vmis={vmis}
-          vms={allVMs}
-        />
+        <>
+          <PageBreadcrumb>
+            <VirtualMachineBreadcrumb cluster={cluster} namespace={namespace} />
+          </PageBreadcrumb>
+          <PageSection>
+            <VirtualMachineListSummary
+              namespace={namespace}
+              onFilterChange={onFilterChange}
+              vmis={vmis}
+              vms={allVMs}
+            />
+          </PageSection>
+        </>
       )}
       <ListPageBody>
         <div className="vm-listpagebody" ref={listPageBodyRef}>

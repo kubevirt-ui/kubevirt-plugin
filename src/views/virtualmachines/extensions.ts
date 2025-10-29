@@ -11,6 +11,7 @@ export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
   LogsStandAlone:
     './views/virtualmachines/details/tabs/diagnostic/VirtualMachineLogViewer/VirtualMachineLogViewerStandAlone/VirtualMachineLogViewerStandAlone.tsx',
   Navigator: './views/virtualmachines/navigator/VirtualMachineNavigator.tsx',
+  useServiceActionsProvider: './utils/components/ServicesList/useServiceActionsProvider.ts',
   useVirtualMachineActionsProvider:
     './views/virtualmachines/actions/hooks/useVirtualMachineActionsProvider.ts',
   VirtualMachineSearchResults: './views/virtualmachines/search/VirtualMachineSearchResults.tsx',
@@ -38,6 +39,20 @@ export const extensions: EncodedExtension[] = [
       },
       provider: {
         $codeRef: 'useVirtualMachineActionsProvider',
+      },
+    },
+    type: 'console.action/resource-provider',
+  } as EncodedExtension<ResourceActionProvider>,
+
+  {
+    properties: {
+      model: {
+        group: 'core',
+        kind: 'Service',
+        version: 'v1',
+      },
+      provider: {
+        $codeRef: 'useServiceActionsProvider',
       },
     },
     type: 'console.action/resource-provider',
