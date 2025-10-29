@@ -1,4 +1,19 @@
-# Ignore artifacts:
+# Ignore artifacts (keep in sync with eslint):
 dist/
 node_modules/
 i18n-scripts/
+yarn.lock
+/coverage
+/gui-test-screenshots
+cypress/gui-test-screenshots
+cypress/cypress-a11y-report.json
+/locales
+
+# Ignore anything that eslint will look at since eslint also applies prettier.
+#
+**/*.js
+**/*.jsx
+**/*.cjs
+**/*.mjs
+**/*.ts
+**/*.tsx
