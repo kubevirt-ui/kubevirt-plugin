@@ -23,6 +23,7 @@ import {
   ResourceMap,
 } from '@kubevirt-utils/resources/shared';
 import { DESCRIPTION_ANNOTATION } from '@kubevirt-utils/resources/vm';
+import { getArchitecture } from '@kubevirt-utils/utils/architecture';
 import { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
 
 import { getOSFromDefaultPreference } from '../../VMDetailsSection/utils/utils';
@@ -66,6 +67,7 @@ const useBootVolumeSortColumns: UseBootVolumeSortColumns = (
 
     return [
       getName(bootableVolume),
+      getArchitecture(bootableVolume),
       ...(includeNamespaceColumn ? [getNamespace(bootableVolume)] : []),
       getOSFromDefaultPreference(bootableVolume, clusterPreferencesMap, userPreferencesMap),
       pvcSource?.spec?.storageClassName || getVolumeSnapshotStorageClass(volumeSnapshotSource),
