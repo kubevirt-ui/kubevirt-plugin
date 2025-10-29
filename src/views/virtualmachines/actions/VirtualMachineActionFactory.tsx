@@ -43,7 +43,15 @@ import {
 
 import ConfirmVMActionModal from './components/ConfirmVMActionModal/ConfirmVMActionModal';
 import DeleteVMModal from './components/DeleteVMModal/DeleteVMModal';
-import { cancelMigration, pauseVM, restartVM, startVM, stopVM, unpauseVM } from './actions';
+import {
+  cancelMigration,
+  pauseVM,
+  resetVM,
+  restartVM,
+  startVM,
+  stopVM,
+  unpauseVM,
+} from './actions';
 
 const {
   Migrating,
@@ -120,6 +128,12 @@ export const VirtualMachineActionFactory = {
       label: t('Clone'),
     };
   },
+  controlActions: (controlActions): ActionDropdownItemType => ({
+    cta: () => null, // follow migrationActions
+    id: 'control-menu',
+    label: 'Control',
+    options: controlActions,
+  }),
   copySSHCommand: (vm: V1VirtualMachine, command: string): ActionDropdownItemType => {
     return {
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
@@ -302,6 +316,35 @@ export const VirtualMachineActionFactory = {
       label: t('Pause'),
     };
   },
+  reset: (
+    vm: V1VirtualMachine,
+    createModal: (modal: ModalComponent) => void,
+    confirmVMActions: boolean,
+  ): ActionDropdownItemType => {
+    return {
+      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
+      cta: () =>
+        confirmVMActions
+          ? createModal(({ isOpen, onClose }) => (
+              <ConfirmVMActionModal
+                checkToConfirmMessage={t(
+                  'A Virtual Machine reset is a hard power cycle and may cause data loss or corruption. Only use this action if the VM is completely unresponsive.',
+                )}
+                action={resetVM}
+                actionType="Reset"
+                isOpen={isOpen}
+                onClose={onClose}
+                severityVariant="warning"
+                vm={vm}
+              />
+            ))
+          : resetVM(vm),
+      description: 'Force reboot',
+      disabled: vm?.status?.printableStatus !== Running,
+      id: 'vm-action-reset',
+      label: t('Reset'),
+    };
+  },
   restart: (
     vm: V1VirtualMachine,
     createModal: (modal: ModalComponent) => void,
@@ -321,6 +364,7 @@ export const VirtualMachineActionFactory = {
               />
             ))
           : restartVM(vm),
+      description: 'Shut down and restart gracefully',
       disabled:
         [Migrating, Provisioning, Stopped, Stopping, Terminating, Unknown].includes(
           vm?.status?.printableStatus,
