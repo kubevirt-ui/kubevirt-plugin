@@ -34,7 +34,7 @@ export const useVirtualizationFeatures: UseVirtualizationFeatures = () => {
   const validNamespace = getValidNamespace(activeNamespace);
 
   const updateInstallRequests = useCallback((updates: OperatorsToInstall) => {
-    setOperatorsToInstall({ ...operatorsToInstall, ...updates });
+    setOperatorsToInstall((prev) => ({ ...prev, ...updates }));
   }, []);
 
   const operatorResources = useOperatorResources();
