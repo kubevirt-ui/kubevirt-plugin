@@ -7,7 +7,8 @@ import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
-import { Action, k8sDelete, useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
+import { kubevirtK8sDelete } from '@multicluster/k8sRequests';
+import { Action, useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 import MigrationPolicyEditModal from '../../components/MigrationPolicyEditModal/MigrationPolicyEditModal';
 
@@ -41,11 +42,13 @@ const useMigrationPoliciesActionsProvider: UseMigrationPoliciesActionsProvider =
           createModal(({ isOpen, onClose }) => {
             return (
               <DeleteModal
+                onDeleteSubmit={() =>
+                  kubevirtK8sDelete({ model: MigrationPolicyModel, resource: mp })
+                }
                 headerText={t('Delete MigrationPolicy?')}
                 isOpen={isOpen}
                 obj={mp}
                 onClose={onClose}
-                onDeleteSubmit={() => k8sDelete({ model: MigrationPolicyModel, resource: mp })}
               />
             );
           }),

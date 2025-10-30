@@ -42,8 +42,11 @@ export const useTreeViewData = (): UseTreeViewData => {
 
   const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
   const [projectNames, projectNamesLoaded, projectNamesError] = useProjects();
-  const [namespacesByCluster, multiclusterNamespacesLoaded, multiclusterNamespacesError] =
-    useMulticlusterNamespaces();
+  const {
+    error: multiclusterNamespacesError,
+    loaded: multiclusterNamespacesLoaded,
+    namespacesByCluster,
+  } = useMulticlusterNamespaces();
 
   const loadVMsPerNamespace = !isACMTreeView && projectNamesLoaded && !isAdmin;
 

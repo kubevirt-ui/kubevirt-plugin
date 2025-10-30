@@ -4,6 +4,7 @@ import { MigrationPolicyModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useListClusters from '@kubevirt-utils/hooks/useListClusters';
 import useMigrationPolicies from '@kubevirt-utils/hooks/useMigrationPolicies';
 import { ListPageProps } from '@kubevirt-utils/utils/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -17,6 +18,7 @@ import {
 import MigrationPoliciesCreateButton from './components/MigrationPoliciesCreateButton/MigrationPoliciesCreateButton';
 import MigrationPoliciesEmptyState from './components/MigrationPoliciesEmptyState/MigrationPoliciesEmptyState';
 import MigrationPoliciesRow from './components/MigrationPoliciesRow/MigrationPoliciesRow';
+import useMigrationPoliciesFilters from './hooks/useMigrationPoliciesFilters';
 import useMigrationPoliciesListColumns from './hooks/useMigrationPoliciesListColumns';
 
 const MigrationPoliciesList: FC<ListPageProps> = ({
@@ -29,14 +31,19 @@ const MigrationPoliciesList: FC<ListPageProps> = ({
   showTitle,
 }) => {
   const { t } = useKubevirtTranslation();
+  const selectedClusters = useListClusters();
+
   const [mps, loaded, loadError] = useMigrationPolicies(fieldSelector, selector);
 
   const [columns, activeColumns, loadedColumns] = useMigrationPoliciesListColumns();
-  const [unfilteredData, data, onFilterChange] = useListPageFilter(mps, null, {
+
+  const filters = useMigrationPoliciesFilters();
+
+  const [unfilteredData, data, onFilterChange] = useListPageFilter(mps, filters, {
     name: { selected: [nameFilter] },
   });
 
-  if (loaded && isEmpty(unfilteredData)) {
+  if (loaded && isEmpty(unfilteredData) && isEmpty(selectedClusters)) {
     return <MigrationPoliciesEmptyState />;
   }
 
@@ -59,10 +66,11 @@ const MigrationPoliciesList: FC<ListPageProps> = ({
             type: t('MigrationPolicy'),
           }}
           data={unfilteredData}
+          filtersWithSelect={filters}
           hideColumnManagement={hideColumnManagement}
           hideLabelFilter={hideTextFilter}
           hideNameLabelFilters={hideNameLabelFilters}
-          loaded={loaded && loadedColumns}
+          loaded={loadedColumns}
           onFilterChange={onFilterChange}
         />
         <VirtualizedTable<V1alpha1MigrationPolicy>
