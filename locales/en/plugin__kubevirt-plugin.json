@@ -1077,6 +1077,7 @@
   "Not installed": "Not installed",
   "Not migratable": "Not migratable",
   "Not started yet": "Not started yet",
+  "Not supported with primary user-defined networks": "Not supported with primary user-defined networks",
   "Note that for Node field expressions, entering a full path is required in the \"Key\" field (e.g. \"metadata.name: value\").": "Note that for Node field expressions, entering a full path is required in the \"Key\" field (e.g. \"metadata.name: value\").",
   "O series": "O series",
   "Off": "Off",
