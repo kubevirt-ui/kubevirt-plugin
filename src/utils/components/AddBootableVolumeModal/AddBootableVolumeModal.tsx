@@ -99,12 +99,18 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
         }
         onClose();
       }}
-      onSubmit={createBootableVolume({
-        bootableVolume,
-        onCreateVolume,
-        sourceType,
-        uploadData,
-      })}
+      onSubmit={(dataSource) => {
+        if (sourceType === DROPDOWN_FORM_SELECTION.UPLOAD_VOLUME) {
+          document.getElementById('source-details-section').scrollIntoView();
+        }
+
+        return createBootableVolume({
+          bootableVolume,
+          onCreateVolume,
+          sourceType,
+          uploadData,
+        })(dataSource);
+      }}
       headerText={t('Add volume')}
       isDisabled={!isFormValid}
       isOpen={isOpen}
@@ -119,7 +125,9 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
           resetDiskSize={resetDiskSize}
           setFormSelection={setSourceType}
         />
-        <Title headingLevel="h5">{t('Source details')}</Title>
+        <Title headingLevel="h5" id="source-details-section">
+          {t('Source details')}
+        </Title>
         <VolumeSource
           bootableVolume={bootableVolume}
           setBootableVolumeField={setBootableVolumeField}
