@@ -15,6 +15,7 @@ import {
   Title,
 } from '@patternfly/react-core';
 
+import { CHECKUP_URLS } from '../../utils/constants';
 import CheckupsStorageActions from '../components/CheckupsStorageActions';
 
 type CheckupsStorageDetailsPageHeaderProps = {
@@ -37,7 +38,7 @@ const CheckupsStorageDetailsPageHeader: FC<CheckupsStorageDetailsPageHeaderProps
           <BreadcrumbItem>
             <Button
               isInline
-              onClick={() => navigate(`/k8s/ns/${namespace}/checkups/storage`)}
+              onClick={() => navigate(`/k8s/ns/${namespace}/checkups/${CHECKUP_URLS.STORAGE}`)}
               variant={ButtonVariant.link}
             >
               {t('Storage checkup')}

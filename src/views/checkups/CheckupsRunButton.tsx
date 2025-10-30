@@ -1,4 +1,4 @@
-import React, { FC, useCallback } from 'react';
+import React, { FC, useCallback, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 import classNames from 'classnames';
 
@@ -9,7 +9,10 @@ import { Button, ButtonVariant } from '@patternfly/react-core';
 import { createURL } from '@virtualmachines/details/tabs/overview/utils/utils';
 
 import useCheckupsNetworkPermissions from './network/hooks/useCheckupsNetworkPermissions';
+import useCheckupsSelfValidationPermissions from './self-validation/components/hooks/useCheckupsSelfValidationPermissions';
 import { useCheckupsStoragePermissions } from './storage/components/hooks/useCheckupsStoragePermissions';
+import { CHECKUP_URLS } from './utils/constants';
+import { getCheckUpTabs } from './utils/getCheckUpsTabs';
 import { trimLastHistoryPath } from './utils/utils';
 
 const CheckupsRunButton: FC = () => {
@@ -17,42 +20,53 @@ const CheckupsRunButton: FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useKubevirtTranslation();
+
   const { isPermitted: isCreateNetworkPermitted } = useCheckupsNetworkPermissions();
   const { isPermitted: isCreateStoragePermitted } = useCheckupsStoragePermissions();
+  const { isPermitted: isCreateSelfValidationPermitted } = useCheckupsSelfValidationPermissions();
 
-  const createItems = {
-    network: (
-      <div
-        className={classNames({ 'CheckupsRunButton--item__disabled': !isCreateNetworkPermitted })}
-      >
-        {t('Network latency')}
-      </div>
-    ),
-    storage: (
-      <div
-        className={classNames({ 'CheckupsRunButton--item__disabled': !isCreateStoragePermitted })}
-      >
-        {t('Storage')}
-      </div>
-    ),
-  };
+  const tabs = useMemo(() => getCheckUpTabs(t), [t]);
+
+  const getPermissionForTab = useCallback(
+    (url: string) => {
+      switch (url) {
+        case CHECKUP_URLS.NETWORK:
+          return isCreateNetworkPermitted;
+        case CHECKUP_URLS.STORAGE:
+          return isCreateStoragePermitted;
+        case CHECKUP_URLS.SELF_VALIDATION:
+          return isCreateSelfValidationPermitted;
+        default:
+          return false;
+      }
+    },
+    [isCreateNetworkPermitted, isCreateStoragePermitted, isCreateSelfValidationPermitted],
+  );
+
+  const createItems = useMemo(() => {
+    const items: Record<string, React.ReactNode> = {};
+
+    tabs.forEach((tab) => {
+      const isPermitted = getPermissionForTab(tab.url);
+
+      items[tab.url] = (
+        <div className={classNames({ 'CheckupsRunButton--item__disabled': !isPermitted })}>
+          {tab.title}
+        </div>
+      );
+    });
+
+    return items;
+  }, [tabs, getPermissionForTab]);
 
   const onCreate = useCallback(
     (type: string) => {
-      switch (type) {
-        case 'network':
-          return (
-            isCreateNetworkPermitted &&
-            navigate(createURL('network/form', trimLastHistoryPath(location.pathname)))
-          );
-        case 'storage':
-          return (
-            isCreateStoragePermitted &&
-            navigate(createURL('storage/form', trimLastHistoryPath(location.pathname)))
-          );
+      const isPermitted = getPermissionForTab(type);
+      if (isPermitted) {
+        navigate(createURL(`${type}/form`, trimLastHistoryPath(location.pathname)));
       }
     },
-    [isCreateNetworkPermitted, navigate, location, isCreateStoragePermitted],
+    [getPermissionForTab, navigate, location],
   );
 
   return (

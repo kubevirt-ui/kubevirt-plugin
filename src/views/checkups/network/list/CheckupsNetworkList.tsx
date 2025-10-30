@@ -32,7 +32,7 @@ const CheckupsNetworkList = () => {
 
   const { nads } = useNADsData(namespace);
   const { isPermitted, loading: loadingPermissions } = useCheckupsNetworkPermissions();
-  const { configMaps, error, jobs, loading } = useCheckupsNetworkData();
+  const { configMaps, error, jobs, loaded } = useCheckupsNetworkData();
 
   const { onPaginationChange, pagination } = usePagination();
   const [unfilterData, dataFilters, onFilterChange, filters] =
@@ -40,7 +40,7 @@ const CheckupsNetworkList = () => {
 
   const nadsInNamespace = !isEmpty(nads.filter((nad) => nad.metadata.namespace === namespace));
 
-  if (isEmpty(configMaps) && loading && !loadingPermissions && loadedColumns) {
+  if (isEmpty(configMaps) && loaded && !loadingPermissions && loadedColumns) {
     return (
       <CheckupsNetworkListEmptyState isPermitted={isPermitted} nadsInNamespace={nadsInNamespace} />
     );
@@ -70,10 +70,10 @@ const CheckupsNetworkList = () => {
             });
           }}
           data={unfilterData}
-          loaded={loading && !loadingPermissions && loadedColumns}
+          loaded={loaded && !loadingPermissions && loadedColumns}
           rowFilters={filters}
         />
-        {!isEmpty(dataFilters) && loading && !loadingPermissions && (
+        {!isEmpty(dataFilters) && loaded && !loadingPermissions && (
           <Pagination
             onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
               onPaginationChange({ endIndex, page, perPage, startIndex })
@@ -100,7 +100,7 @@ const CheckupsNetworkList = () => {
         }}
         columns={activeColumns}
         data={dataFilters}
-        loaded={loading && !loadingPermissions && loadedColumns}
+        loaded={loaded && !loadingPermissions && loadedColumns}
         loadError={error}
         Row={CheckupsNetworkListRow}
         unfilteredData={unfilterData}
