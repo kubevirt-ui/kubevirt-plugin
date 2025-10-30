@@ -4,6 +4,8 @@ import { MigrationPolicyModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 import { sortable } from '@patternfly/react-table';
 
@@ -13,6 +15,8 @@ const useMigrationPoliciesListColumns = (): [
   boolean,
 ] => {
   const { t } = useKubevirtTranslation();
+  const isACMPage = useIsACMPage();
+  const cluster = useClusterParam();
 
   const columns: TableColumn<V1alpha1MigrationPolicy>[] = useMemo(
     () => [
@@ -23,6 +27,17 @@ const useMigrationPoliciesListColumns = (): [
         title: t('Name'),
         transforms: [sortable],
       },
+      ...(isACMPage && !cluster
+        ? [
+            {
+              id: 'cluster',
+              props: { className: 'pf-m-width-10' },
+              sort: 'cluster',
+              title: t('Cluster'),
+              transforms: [sortable],
+            },
+          ]
+        : []),
       {
         id: 'bandwidth',
         props: { className: 'pf-m-width-10' },

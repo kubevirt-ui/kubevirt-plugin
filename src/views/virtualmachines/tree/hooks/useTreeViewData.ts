@@ -16,7 +16,7 @@ import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchReso
 import useProjects from '@kubevirt-utils/hooks/useProjects';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { universalComparator } from '@kubevirt-utils/utils/utils';
-import useMulticlusterNamespaces from '@multicluster/hooks/useMulticlusterProjects';
+import useMulticlusterNamespaces from '@multicluster/hooks/useMulticlusterNamespaces';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
 import { TreeViewDataItem } from '@patternfly/react-core';
@@ -42,8 +42,11 @@ export const useTreeViewData = (): UseTreeViewData => {
 
   const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
   const [projectNames, projectNamesLoaded, projectNamesError] = useProjects();
-  const [namespacesByCluster, multiclusterNamespacesLoaded, multiclusterNamespacesError] =
-    useMulticlusterNamespaces();
+  const {
+    error: multiclusterNamespacesError,
+    loaded: multiclusterNamespacesLoaded,
+    namespacesByCluster,
+  } = useMulticlusterNamespaces();
 
   const loadVMsPerNamespace = !isACMTreeView && projectNamesLoaded && !isAdmin;
 
