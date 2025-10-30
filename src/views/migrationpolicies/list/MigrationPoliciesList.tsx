@@ -4,8 +4,8 @@ import { MigrationPolicyModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useListClusters from '@kubevirt-utils/hooks/useListClusters';
 import useMigrationPolicies from '@kubevirt-utils/hooks/useMigrationPolicies';
+import useSelectedRowFilterClusters from '@kubevirt-utils/hooks/useSelectedRowFilterClusters';
 import { ListPageProps } from '@kubevirt-utils/utils/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
@@ -31,7 +31,7 @@ const MigrationPoliciesList: FC<ListPageProps> = ({
   showTitle,
 }) => {
   const { t } = useKubevirtTranslation();
-  const selectedClusters = useListClusters();
+  const filteredClusters = useSelectedRowFilterClusters();
 
   const [mps, loaded, loadError] = useMigrationPolicies(fieldSelector, selector);
 
@@ -43,7 +43,7 @@ const MigrationPoliciesList: FC<ListPageProps> = ({
     name: { selected: [nameFilter] },
   });
 
-  if (loaded && isEmpty(unfilteredData) && isEmpty(selectedClusters)) {
+  if (loaded && isEmpty(unfilteredData) && isEmpty(filteredClusters)) {
     return <MigrationPoliciesEmptyState />;
   }
 

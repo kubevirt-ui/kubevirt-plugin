@@ -1,9 +1,10 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import useClusterInstanceTypes from '@catalog/CreateFromInstanceTypes/state/hooks/useClusterInstanceTypes';
 import { VirtualMachineClusterInstancetypeModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
+import { useClusterFilter } from '@kubevirt-utils/hooks/useClusterFilter';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
@@ -32,9 +33,16 @@ const ClusterInstancetypeList: FC<ListPageProps> = ({
   const [instanceTypes, loaded, loadError] = useClusterInstanceTypes(fieldSelector, selector);
 
   const { onPaginationChange, pagination } = usePagination();
-  const [unfilteredData, data, onFilterChange] = useListPageFilter(instanceTypes, null, {
-    name: { selected: [nameFilter] },
-  });
+
+  const clusterFilter = useClusterFilter();
+  const filtersWithSelect = useMemo(() => [clusterFilter], [clusterFilter]);
+  const [unfilteredData, data, onFilterChange] = useListPageFilter(
+    instanceTypes,
+    filtersWithSelect,
+    {
+      name: { selected: [nameFilter] },
+    },
+  );
   const [columns, activeColumns, loadedColumns] = useClusterInstancetypeListColumns(
     pagination,
     data,
@@ -64,10 +72,11 @@ const ClusterInstancetypeList: FC<ListPageProps> = ({
             });
           }}
           data={unfilteredData}
+          filtersWithSelect={filtersWithSelect}
           hideColumnManagement={hideColumnManagement}
           hideLabelFilter={hideTextFilter}
           hideNameLabelFilters={hideNameLabelFilters}
-          loaded={loaded && loadedColumns}
+          loaded={loadedColumns}
         />
         <Pagination
           onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
