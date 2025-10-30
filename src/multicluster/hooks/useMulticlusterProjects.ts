@@ -1,15 +1,20 @@
+import { useMemo } from 'react';
+
 import { modelToGroupVersionKind, NamespaceModel } from '@kubevirt-utils/models';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { useFleetSearchPoll } from '@stolostron/multicluster-sdk';
 
-export type UseMulticlusterNamespacesReturnType = [
-  projectsByCluster: Record<string, K8sResourceCommon[]>,
-  loaded: boolean,
-  error: any,
-];
+export type UseMulticlusterNamespacesReturn = {
+  allNamespaces: K8sResourceCommon[];
+  error: any;
+  loaded: boolean;
+  namespacesByCluster: Record<string, K8sResourceCommon[]>;
+};
 
-const useMulticlusterNamespaces = (): UseMulticlusterNamespacesReturnType => {
+const useMulticlusterNamespaces = (
+  selectedClusters?: string[],
+): UseMulticlusterNamespacesReturn => {
   const isACMTreeView = useIsACMPage();
 
   const [namespaces, namespacesLoaded, namespacesError] = useFleetSearchPoll<K8sResourceCommon[]>(
@@ -19,19 +24,32 @@ const useMulticlusterNamespaces = (): UseMulticlusterNamespacesReturnType => {
           isList: true,
         }
       : {},
+    selectedClusters ? [{ property: 'cluster', values: selectedClusters }] : undefined,
   );
 
-  const namespacesByCluster = namespaces?.reduce((acc, project) => {
-    const cluster = getCluster(project);
+  const namespacesByCluster = useMemo(
+    () =>
+      namespaces?.reduce((acc, project) => {
+        const cluster = getCluster(project);
 
-    if (!(cluster in acc)) acc[cluster] = [];
+        if (!(cluster in acc)) acc[cluster] = [];
 
-    acc[cluster].push(project);
+        acc[cluster].push(project);
 
-    return acc;
-  }, {} as Record<string, K8sResourceCommon[]>);
+        return acc;
+      }, {} as Record<string, K8sResourceCommon[]>),
+    [namespaces],
+  );
 
-  return [namespacesByCluster, namespacesLoaded, namespacesError];
+  return useMemo(
+    () => ({
+      allNamespaces: namespaces,
+      error: namespacesError,
+      loaded: namespacesLoaded,
+      namespacesByCluster,
+    }),
+    [namespaces, namespacesLoaded, namespacesError, namespacesByCluster],
+  );
 };
 
 export default useMulticlusterNamespaces;

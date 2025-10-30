@@ -53,9 +53,7 @@ const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({
   );
 
   return (
-    <DetailsPageTitle
-      breadcrumb={<VirtualMachineBreadcrumb cluster={cluster} namespace={namespace} />}
-    >
+    <DetailsPageTitle breadcrumb={<VirtualMachineBreadcrumb />}>
       <PaneHeading>
         <Title headingLevel="h1">
           <Split hasGutter>

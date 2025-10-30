@@ -13,14 +13,12 @@ import VirtualMachineUsage from './components/VirtualMachineUsage';
 import './VirtualMachineListSummary.scss';
 
 type VirtualMachineListSummaryProps = {
-  namespace: string;
   onFilterChange?: OnFilterChange;
   vmis: V1VirtualMachineInstance[];
   vms: V1VirtualMachine[];
 };
 
 const VirtualMachineListSummary: FC<VirtualMachineListSummaryProps> = ({
-  namespace,
   onFilterChange,
   vmis,
   vms,
@@ -38,7 +36,6 @@ const VirtualMachineListSummary: FC<VirtualMachineListSummaryProps> = ({
             <div className="pf-v6-u-w-100">
               <VirtualMachineStatuses
                 className="pf-v6-u-w-75 pf-v6-u-mx-auto"
-                namespace={namespace}
                 onFilterChange={onFilterChange}
                 vms={vms}
               />
@@ -56,11 +53,7 @@ const VirtualMachineListSummary: FC<VirtualMachineListSummaryProps> = ({
             <Title className="vm-list-summary__title" headingLevel="h5">
               {t('Virtual Machines ({{count}})', { count: vmsCount })}
             </Title>
-            <VirtualMachineStatuses
-              namespace={namespace}
-              onFilterChange={onFilterChange}
-              vms={vms}
-            />
+            <VirtualMachineStatuses onFilterChange={onFilterChange} vms={vms} />
           </FlexItem>
           <Divider
             orientation={{

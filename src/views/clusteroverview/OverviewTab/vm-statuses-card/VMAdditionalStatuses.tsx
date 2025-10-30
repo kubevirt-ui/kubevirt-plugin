@@ -22,13 +22,11 @@ type StatusItemData = {
 };
 
 type VMAdditionalStatusesProps = {
-  activeNamespace: string;
   otherStatuses: Record<string, number>;
   otherStatusesCount: number;
 };
 
 const VMAdditionalStatuses: FC<VMAdditionalStatusesProps> = ({
-  activeNamespace,
   otherStatuses,
   otherStatusesCount,
 }) => {
@@ -62,7 +60,6 @@ const VMAdditionalStatuses: FC<VMAdditionalStatusesProps> = ({
         <VMStatusItem
           count={count}
           key={state}
-          namespace={activeNamespace}
           showIcon={false}
           statusArray={[state as VM_STATUS]}
           statusLabel={state}

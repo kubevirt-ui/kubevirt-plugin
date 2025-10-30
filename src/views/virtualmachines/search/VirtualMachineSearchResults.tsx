@@ -11,13 +11,9 @@ import { useHideNamespaceBar } from '@virtualmachines/hooks/useHideNamespaceBar'
 import VirtualMachinesListPageHeader from '@virtualmachines/list/components/VirtualMachinesListPageHeader';
 import VirtualMachinesList from '@virtualmachines/list/VirtualMachinesList';
 
-import useVMSearchQueries from './hooks/useVMSearchQueries';
-
 const VirtualMachineSearchResults: FC = () => {
   const { t } = useKubevirtTranslation();
   const [activeNamespace] = useActiveNamespace();
-
-  const vmSearchQueries = useVMSearchQueries();
 
   const { cluster } = useParams<{ cluster?: string }>();
   const namespace = activeNamespace === ALL_NAMESPACES_SESSION_KEY ? null : activeNamespace;
@@ -37,14 +33,14 @@ const VirtualMachineSearchResults: FC = () => {
         <Divider />
         <VirtualMachinesList
           cluster={cluster}
+          isSearchResultsPage
           kind={VirtualMachineModelRef}
           namespace={namespace}
           ref={vmListRef}
-          searchQueries={vmSearchQueries}
         />
       </>
     ),
-    [cluster, namespace, onFilterChange, t, vmSearchQueries],
+    [cluster, namespace, onFilterChange, t],
   );
 };
 

@@ -44,38 +44,26 @@ const VMStatusesCard: FC = () => {
       </CardHeader>
       <div className="vm-statuses-card__body">
         <Grid hasGutter>
-          <VMStatusItem
-            count={primaryStatuses.Error}
-            namespace={activeNamespace}
-            statusArray={[ERROR]}
-            statusLabel={ERROR}
-          />
+          <VMStatusItem count={primaryStatuses.Error} statusArray={[ERROR]} statusLabel={ERROR} />
           <VMStatusItem
             count={primaryStatuses.Running}
-            namespace={activeNamespace}
             statusArray={[VM_STATUS.Running]}
             statusLabel={VM_STATUS.Running}
           />
           <VMStatusItem
             count={primaryStatuses.Stopped}
-            namespace={activeNamespace}
             statusArray={[VM_STATUS.Stopped]}
             statusLabel={VM_STATUS.Stopped}
           />
           <VMStatusItem
             count={otherStatusesCount}
-            namespace={activeNamespace}
             statusArray={OTHER_STATUSES}
             statusLabel={t(OTHER)}
           />
         </Grid>
       </div>
       <Divider />
-      <VMAdditionalStatuses
-        activeNamespace={activeNamespace}
-        otherStatuses={otherStatuses}
-        otherStatusesCount={otherStatusesCount}
-      />
+      <VMAdditionalStatuses otherStatuses={otherStatuses} otherStatusesCount={otherStatusesCount} />
     </Card>
   );
 };

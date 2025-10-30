@@ -5,7 +5,7 @@ import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import { getCatalogURL, getVMListNamespacesURL } from '@multicluster/urls';
+import { getCatalogURL, getVMListURL } from '@multicluster/urls';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { ListPageCreateDropdown } from '@openshift-console/dynamic-plugin-sdk';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
@@ -46,9 +46,7 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
         case 'instanceType':
           return navigate(catalogURL);
         default:
-          return navigate(
-            `${getVMListNamespacesURL(cluster, namespace || DEFAULT_NAMESPACE)}/~new`,
-          );
+          return navigate(`${getVMListURL(cluster, namespace || DEFAULT_NAMESPACE)}/~new`);
       }
     },
     [catalogURL, navigate, namespace, cluster],

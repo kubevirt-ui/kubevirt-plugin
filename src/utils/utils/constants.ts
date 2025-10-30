@@ -38,3 +38,11 @@ export const numberOperatorInfo: Record<
     text: t('Less than'),
   },
 };
+
+export const CLUSTER_LIST_FILTER_TYPE = 'cluster';
+export const PROJECT_LIST_FILTER_TYPE = 'project';
+
+export const ROW_FILTERS_PREFIX = 'rowFilter-';
+
+export const CLUSTER_LIST_FILTER_PARAM = `${ROW_FILTERS_PREFIX}${CLUSTER_LIST_FILTER_TYPE}`;
+export const PROJECT_LIST_FILTER_PARAM = `${ROW_FILTERS_PREFIX}${PROJECT_LIST_FILTER_TYPE}`;
