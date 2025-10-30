@@ -20,9 +20,7 @@ const useVirtualMachineInstanceTypes: UseVirtualMachineInstanceTypes = ({
   selector,
 }) => {
   const clusterParam = useClusterParam();
-
   const multiclusterFilters = useListMulticlusterFilters();
-
   const isAllNamespace = isAllNamespaces(namespace);
 
   const [instanceTypes, loaded, loadError] = useKubevirtWatchResource<
