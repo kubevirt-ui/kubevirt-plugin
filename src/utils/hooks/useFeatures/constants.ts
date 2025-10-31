@@ -21,6 +21,7 @@ export const NODE_PORT_ENABLED = 'nodePortEnabled';
 export const DISABLED_GUEST_SYSTEM_LOGS_ACCESS = 'disabledGuestSystemLogsAccess';
 export const CONFIRM_VM_ACTIONS = 'confirmVMActions';
 
+export const ADVANCED_CDROM_FEATURES = 'advancedCDROMFeatures';
 export const TREE_VIEW_FOLDERS = 'treeViewFolders';
 export const PASST_UDN_NETWORK = 'passtUDNNetwork';
 
@@ -38,6 +39,7 @@ export const UI_FEATURES = [
 
 export const featuresConfigMapInitialState: IoK8sApiCoreV1ConfigMap = {
   data: {
+    [ADVANCED_CDROM_FEATURES]: 'false',
     [AUTOMATIC_SUBSCRIPTION_ACTIVATION_KEY]: '',
     [AUTOMATIC_SUBSCRIPTION_ORGANIZATION_ID]: '',
     [CONFIRM_VM_ACTIONS]: 'false',
