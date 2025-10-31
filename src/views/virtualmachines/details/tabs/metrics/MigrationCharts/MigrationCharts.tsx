@@ -1,8 +1,10 @@
 import React from 'react';
+import { Trans } from 'react-i18next';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import MigrationThresholdChart from '@kubevirt-utils/components/Charts/MigrationUtil/MigrationThresholdChart';
 import MigrationThresholdChartDiskRate from '@kubevirt-utils/components/Charts/MigrationUtil/MigrationThresholdChartDiskRate';
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Card,
@@ -10,6 +12,7 @@ import {
   CardTitle,
   Grid,
   GridItem,
+  PopoverPosition,
   Stack,
   StackItem,
 } from '@patternfly/react-core';
@@ -29,7 +32,19 @@ const MigrationCharts: React.FC<MigrationChartsProps> = ({ vmi }) => {
         <Grid>
           <GridItem span={6}>
             <Card>
-              <CardTitle>{t('Migration chart')}</CardTitle>
+              <CardTitle>
+                {t('Migration chart')}
+                <HelpTextIcon
+                  bodyContent={
+                    <Trans ns="plugin__kubevirt-plugin" t={t}>
+                      Displays real-time metrics of the live migration process, such as memory
+                      transfer and downtime.
+                    </Trans>
+                  }
+                  helpIconClassName="pf-v6-u-ml-xs"
+                  position={PopoverPosition.right}
+                />
+              </CardTitle>
               <CardBody>
                 <MigrationThresholdChart vmi={vmi} />
               </CardBody>
@@ -37,7 +52,19 @@ const MigrationCharts: React.FC<MigrationChartsProps> = ({ vmi }) => {
           </GridItem>
           <GridItem span={6}>
             <Card>
-              <CardTitle>{t('KV data transfer rate')}</CardTitle>
+              <CardTitle>
+                {t('KV data transfer rate')}
+                <HelpTextIcon
+                  bodyContent={
+                    <Trans ns="plugin__kubevirt-plugin" t={t}>
+                      Shows the data throughput (MB/s) during the live migration between source and
+                      destination nodes.
+                    </Trans>
+                  }
+                  helpIconClassName="pf-v6-u-ml-xs"
+                  position={PopoverPosition.right}
+                />
+              </CardTitle>
               <CardBody>
                 <MigrationThresholdChartDiskRate vmi={vmi} />
               </CardBody>
