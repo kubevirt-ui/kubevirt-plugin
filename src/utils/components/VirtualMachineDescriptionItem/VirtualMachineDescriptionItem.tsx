@@ -1,4 +1,4 @@
-import React, { FC, ReactNode } from 'react';
+import React, { FC, ReactNode, useMemo } from 'react';
 
 import { DescriptionItemHeader } from '@kubevirt-utils/components/DescriptionItem/DescriptionItemHeader';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
@@ -60,18 +60,32 @@ const VirtualMachineDescriptionItem: FC<VirtualMachineDescriptionItemProps> = ({
   const { t } = useKubevirtTranslation();
   const NotAvailable = <MutedTextSpan text={t('Not available')} />;
 
-  const description = (
-    <>
-      <EditButtonWithTooltip
-        isEditable={!isDisabled}
-        onEditClick={onEditClick}
-        testId={testId}
-        tooltipContent={messageOnDisabled}
-      >
-        {descriptionData ?? NotAvailable}
-      </EditButtonWithTooltip>
-      {additionalContent}
-    </>
+  const description = useMemo(
+    () =>
+      isEdit && !showEditOnTitle ? (
+        <>
+          <EditButtonWithTooltip
+            isEditable={!isDisabled}
+            onEditClick={onEditClick}
+            testId={testId}
+            tooltipContent={messageOnDisabled}
+          >
+            {descriptionData ?? NotAvailable}
+          </EditButtonWithTooltip>
+          {additionalContent}
+        </>
+      ) : (
+        descriptionData
+      ),
+    [
+      descriptionData,
+      isDisabled,
+      onEditClick,
+      messageOnDisabled,
+      testId,
+      additionalContent,
+      showEditOnTitle,
+    ],
   );
 
   return (
@@ -115,7 +129,7 @@ const VirtualMachineDescriptionItem: FC<VirtualMachineDescriptionItemProps> = ({
 
       <DescriptionListDescription data-test-id={testId}>
         {subTitle && <div className="pf-v6-c-description-list__text pf-v6-u-my-sm">{subTitle}</div>}
-        {isEdit && !showEditOnTitle ? description : descriptionData}
+        {description}
       </DescriptionListDescription>
     </DescriptionListGroup>
   );

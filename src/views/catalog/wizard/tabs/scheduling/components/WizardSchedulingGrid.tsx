@@ -137,6 +137,12 @@ const WizardSchedulingGrid: FC<WizardSchedulingGridProps> = ({ updateVM, vm }) =
           />
 
           <WizardDescriptionItem
+            description={
+              <ShowEvictionStrategy
+                cluster={getCluster(vm)}
+                evictionStrategy={getEvictionStrategy(vm)}
+              />
+            }
             onEditClick={() =>
               createModal(({ isOpen, onClose }) => (
                 <EvictionStrategyModal
@@ -148,7 +154,6 @@ const WizardSchedulingGrid: FC<WizardSchedulingGridProps> = ({ updateVM, vm }) =
                 />
               ))
             }
-            description={<ShowEvictionStrategy evictionStrategy={getEvictionStrategy(vm)} />}
             isEdit
             testId="eviction-strategy"
             title={t('Eviction strategy')}

@@ -17,6 +17,7 @@ import useUserPreferences from '@kubevirt-utils/hooks/useUserPreferences';
 type UsePreferenceSelectOptions = (
   namespace: string,
   setBootableVolumeField: SetBootableVolumeFieldType,
+  cluster: string,
 ) => {
   preferenceSelectOptions: EnhancedSelectOptionProps[];
   preferencesLoaded: boolean;
@@ -25,11 +26,17 @@ type UsePreferenceSelectOptions = (
 const usePreferenceSelectOptions: UsePreferenceSelectOptions = (
   namespace,
   setBootableVolumeField,
+  cluster,
 ) => {
   const { t } = useKubevirtTranslation();
 
-  const [preferences, preferencesLoaded] = useClusterPreferences();
-  const [userPreferences = [], userPreferencesLoaded] = useUserPreferences(namespace);
+  const [preferences, preferencesLoaded] = useClusterPreferences(null, null, cluster);
+  const [userPreferences = [], userPreferencesLoaded] = useUserPreferences(
+    namespace,
+    null,
+    null,
+    cluster,
+  );
 
   const preferenceSelectOptions = useMemo(() => {
     const preferenceOptions: EnhancedSelectOptionProps[] = getResourceDropdownOptions({

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, memo } from 'react';
 
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -23,4 +23,4 @@ const SchedulingTab: FC<ConfigurationInnerTabProps> = ({ instanceTypeVM, vm, vmi
   </SidebarEditor>
 );
 
-export default SchedulingTab;
+export default memo(SchedulingTab);

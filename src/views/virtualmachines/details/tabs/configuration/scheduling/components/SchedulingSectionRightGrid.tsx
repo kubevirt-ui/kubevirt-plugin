@@ -1,4 +1,4 @@
-import React, { FC, useCallback } from 'react';
+import React, { FC, useCallback, useMemo } from 'react';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -11,6 +11,7 @@ import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMac
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isExpandableSpecVM } from '@kubevirt-utils/resources/instancetype/helper';
 import { getEvictionStrategy } from '@kubevirt-utils/resources/vm';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
 
@@ -47,6 +48,26 @@ const SchedulingSectionRightGrid: FC<SchedulingSectionRightGridProps> = ({
     [onUpdateVM],
   );
 
+  const onEditEvictionStrategy = useCallback(() => {
+    createModal(({ isOpen, onClose }) => (
+      <EvictionStrategyModal
+        headerText={t('Eviction strategy')}
+        isOpen={isOpen}
+        onClose={onClose}
+        onSubmit={onSubmit}
+        vm={vm}
+        vmi={vmi}
+      />
+    ));
+  }, [createModal, onSubmit, vm, vmi]);
+
+  const evictionStrategy = useMemo(
+    () => (
+      <ShowEvictionStrategy cluster={getCluster(vm)} evictionStrategy={getEvictionStrategy(vm)} />
+    ),
+    [vm],
+  );
+
   return (
     <GridItem span={5}>
       <DescriptionList>
@@ -78,21 +99,10 @@ const SchedulingSectionRightGrid: FC<SchedulingSectionRightGridProps> = ({
           descriptionHeader={
             <SearchItem id="eviction-strategy">{t('Eviction strategy')}</SearchItem>
           }
-          onEditClick={() =>
-            createModal(({ isOpen, onClose }) => (
-              <EvictionStrategyModal
-                headerText={t('Eviction strategy')}
-                isOpen={isOpen}
-                onClose={onClose}
-                onSubmit={onSubmit}
-                vm={vm}
-                vmi={vmi}
-              />
-            ))
-          }
           data-test-id="eviction-strategy"
-          descriptionData={<ShowEvictionStrategy evictionStrategy={getEvictionStrategy(vm)} />}
+          descriptionData={evictionStrategy}
           isEdit={canUpdateVM}
+          onEditClick={onEditEvictionStrategy}
         />
       </DescriptionList>
     </GridItem>
