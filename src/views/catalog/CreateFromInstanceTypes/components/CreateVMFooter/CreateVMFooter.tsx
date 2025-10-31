@@ -52,6 +52,7 @@ const CreateVMFooter: FC = () => {
   const cluster = useClusterParam();
   const namespace = useActiveNamespace();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loadingBtnName, setIsLoadingBtnName] = useState('');
   const [error, setError] = useState<any | Error>(null);
   const { createModal } = useModal();
   const [_, driversImageLoading] = useDriversImage();
@@ -70,8 +71,8 @@ const CreateVMFooter: FC = () => {
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
+    setIsLoadingBtnName('Submit');
     setError(null);
-
     logITFlowEvent(CREATE_VM_BUTTON_CLICKED, generatedVM);
 
     if (
@@ -112,20 +113,22 @@ const CreateVMFooter: FC = () => {
         }
 
         if (!isUDNManagedNamespace) createHeadlessService(createdVM);
-
         navigate(getVMURL(cluster, vmNamespaceTarget, getName(createdVM)));
-
         logITFlowEvent(CREATE_VM_SUCCEEDED, createdVM);
       })
       .catch((err) => {
         setError(err);
         logITFlowEvent(CREATE_VM_FAILED, null, { vmName: vmName });
       })
-      .finally(() => setIsSubmitting(false));
+      .finally(() => {
+        setIsSubmitting(false);
+        setIsLoadingBtnName('true');
+      });
   };
 
   const handleCustomize = async () => {
     setIsSubmitting(true);
+    setIsLoadingBtnName('Custom');
     setError(null);
 
     try {
@@ -143,6 +146,7 @@ const CreateVMFooter: FC = () => {
       setError(err);
     } finally {
       setIsSubmitting(false);
+      setIsLoadingBtnName('');
     }
   };
 
@@ -169,6 +173,7 @@ const CreateVMFooter: FC = () => {
               createModal((props) => <YamlAndCLIViewerModal vm={generatedVM} {...props} />);
             }}
             isLoading={isSubmitting || driversImageLoading}
+            loadingBtnName={loadingBtnName}
             onCreate={handleSubmit}
             onCustomize={handleCustomize}
           />
