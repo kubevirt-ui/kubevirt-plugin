@@ -3,6 +3,7 @@ import { matchPath } from 'react-router-dom-v5-compat';
 import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { isAllNamespaces } from '@kubevirt-utils/utils/utils';
+import { ExtensionK8sModel, K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 import { ResourceRouteHandler } from '@stolostron/multicluster-sdk';
 
 import { VirtualMachineModel } from '../views/dashboard-extensions/utils';
@@ -76,6 +77,51 @@ export const getVMListNamespacesURL = (cluster: string, namespace: string): stri
         activeNamespace: namespace,
         model: VirtualMachineModel,
       });
+
+export const getMulticlusterSearchURL = (
+  model: K8sModel,
+  name: string,
+  namespace: string,
+  cluster: string,
+): string => {
+  const urlSearch = new URLSearchParams();
+  urlSearch.set('cluster', cluster);
+  urlSearch.set('kind', model.kind);
+  urlSearch.set('apiversion', `${model.apiGroup || 'core'}/${model.apiVersion}`);
+  urlSearch.set('namespace', namespace);
+  urlSearch.set('name', name);
+  return `/multicloud/search/resources?${urlSearch.toString()}`;
+};
+
+export type GetFleetResourceRouteProps = (input: {
+  cluster: string;
+  model: K8sModel;
+  name: string;
+  namespace: string;
+}) => string;
+
+export const getFleetResourceRoute: GetFleetResourceRouteProps = ({
+  cluster,
+  model,
+  name,
+  namespace,
+}) => {
+  const extensionModel = {
+    group: model.apiGroup,
+    kind: model.kind,
+    version: model.apiVersion,
+  } as ExtensionK8sModel;
+
+  return model.namespaced
+    ? getFleetNamespacedResourceRoute({
+        cluster,
+        model: extensionModel,
+        name,
+        namespace,
+        resource: null,
+      })
+    : getFleetClusterResourceRoute({ cluster, model: extensionModel, name, resource: null });
+};
 
 export const getFleetNamespacedResourceRoute: ResourceRouteHandler = ({
   cluster,

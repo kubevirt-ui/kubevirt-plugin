@@ -2,7 +2,6 @@ import React, { FC, useState } from 'react';
 import { useParams } from 'react-router-dom-v5-compat';
 
 import useClusterPreferences from '@catalog/CreateFromInstanceTypes/state/hooks/useClusterPreferences';
-import ClusterProjectDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterProjectDropdown';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { PageTitles } from '@kubevirt-utils/constants/page-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -10,6 +9,8 @@ import {
   paginationDefaultValues,
   paginationInitialState,
 } from '@kubevirt-utils/hooks/usePagination/utils/constants';
+import useSelectedRowFilterClusters from '@kubevirt-utils/hooks/useSelectedRowFilterClusters';
+import useSelectedRowFilterProjects from '@kubevirt-utils/hooks/useSelectedRowFilterProjects';
 import { DataSourceModelRef } from '@kubevirt-utils/models';
 import useBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useBootableVolumes';
 import useHideDeprecatedBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useHideDeprecatedBootableVolumes';
@@ -35,12 +36,16 @@ import '@kubevirt-utils/styles/list-managment-group.scss';
 const BootableVolumesList: FC = () => {
   const { ns: namespace } = useParams<{ cluster: string; ns: string }>();
   const { t } = useKubevirtTranslation();
-
+  const filteredClusters = useSelectedRowFilterClusters();
+  const filteredNamespaces = useSelectedRowFilterProjects();
   const { bootableVolumes, dataImportCrons, error, loaded } = useBootableVolumes(namespace);
   const [preferences] = useClusterPreferences();
 
-  const rowFilters = useBootableVolumesFilters();
-  const [data, filteredData, onFilterChange] = useListPageFilter(bootableVolumes, rowFilters);
+  const { filtersWithSelect, rowFilters } = useBootableVolumesFilters(bootableVolumes);
+  const [data, filteredData, onFilterChange] = useListPageFilter(bootableVolumes, [
+    ...filtersWithSelect,
+    ...rowFilters,
+  ]);
   const [pagination, setPagination] = useState(paginationInitialState);
   const [columns, activeColumns, loadedColumns] = useBootableVolumesColumns(
     pagination,
@@ -59,14 +64,18 @@ const BootableVolumesList: FC = () => {
     }));
   };
 
-  if (loaded && isEmpty(bootableVolumes)) {
+  if (
+    loaded &&
+    isEmpty(bootableVolumes) &&
+    isEmpty(filteredClusters) &&
+    isEmpty(filteredNamespaces)
+  ) {
     return <BootableVolumesEmptyState namespace={namespace} />;
   }
 
   return (
     <>
       <DocumentTitle>{PageTitles.BootableVolumes}</DocumentTitle>
-      <ClusterProjectDropdown includeAllClusters includeAllProjects />
       <ListPageHeader title={PageTitles.BootableVolumes}>
         <BootableVolumeAddButton namespace={namespace} />
       </ListPageHeader>
@@ -97,7 +106,8 @@ const BootableVolumesList: FC = () => {
                 }));
               }}
               data={data}
-              loaded={loaded && loadedColumns}
+              filtersWithSelect={filtersWithSelect}
+              loaded={loadedColumns}
               rowFilters={rowFilters}
             />
             {!isEmpty(filteredData) && (

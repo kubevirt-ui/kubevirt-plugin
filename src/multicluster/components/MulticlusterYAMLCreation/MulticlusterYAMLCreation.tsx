@@ -7,10 +7,10 @@ import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
-import { modelToRef } from '@kubevirt-utils/models';
 import { getName } from '@kubevirt-utils/resources/shared';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
+import { getFleetResourceRoute, getMulticlusterSearchURL } from '@multicluster/urls';
 import { ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
 
 import useModelFromParam from './hooks/useModelFromParam';
@@ -39,10 +39,16 @@ const MulticlusterYAMLCreation: FC = () => {
         ns: namespace,
       });
 
+      const kubevirtURL = getFleetResourceRoute({
+        cluster,
+        model,
+        name: getName(createdResource),
+        namespace,
+      });
+
       navigate(
-        `/k8s/cluster/${cluster}/${
-          namespace && model.namespaced ? `ns/${namespace}/` : ''
-        }${modelToRef(model)}/${getName(createdResource)}`,
+        kubevirtURL ||
+          getMulticlusterSearchURL(model, getName(createdResource), namespace, cluster),
       );
     } catch (apiError) {
       setError(apiError);
@@ -53,7 +59,7 @@ const MulticlusterYAMLCreation: FC = () => {
 
   return (
     <>
-      <ClusterProjectDropdown includeAllClusters={false} showProjectDropdown={false} />
+      <ClusterProjectDropdown includeAllClusters={false} showProjectDropdown={model?.namespaced} />
       <ResourceYAMLEditor
         create
         header={t('Create {{kind}}', { kind: model.kind })}

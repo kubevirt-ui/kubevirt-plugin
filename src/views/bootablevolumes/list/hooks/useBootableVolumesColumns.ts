@@ -57,13 +57,6 @@ const useBootableVolumesColumns = (
             },
           ]
         : []),
-      {
-        id: ARCHITECTURE_ID,
-        props: { className: 'pf-m-width-10' },
-        sort: (_, direction) => sorting(direction, `metadata.labels.[${ARCHITECTURE_LABEL}]`),
-        title: ARCHITECTURE_TITLE,
-        transforms: [sortable],
-      },
       ...(namespace === ALL_NAMESPACES_SESSION_KEY
         ? [
             {
@@ -75,6 +68,13 @@ const useBootableVolumesColumns = (
             },
           ]
         : []),
+      {
+        id: ARCHITECTURE_ID,
+        props: { className: 'pf-m-width-10' },
+        sort: (_, direction) => sorting(direction, `metadata.labels.[${ARCHITECTURE_LABEL}]`),
+        title: ARCHITECTURE_TITLE,
+        transforms: [sortable],
+      },
       {
         id: 'os',
         props: { className: 'pf-m-width-15' },

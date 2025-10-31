@@ -2,7 +2,10 @@ import { PersistentVolumeClaimModel, VolumeSnapshotModel } from '@kubevirt-ui/ku
 import DataImportCronModel from '@kubevirt-ui/kubevirt-api/console/models/DataImportCronModel';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import VirtualMachineClusterPreferenceModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineClusterPreferenceModel';
-import { K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
+import useListClusters from '@kubevirt-utils/hooks/useListClusters';
+import useListNamespaces from '@kubevirt-utils/hooks/useListNamespaces';
+import { K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
+import { useFleetAccessReview, useHubClusterName } from '@stolostron/multicluster-sdk';
 
 type UseCanCreateBootableVolume = (namespace: string) => {
   canCreateDS: boolean;
@@ -13,34 +16,46 @@ type UseCanCreateBootableVolume = (namespace: string) => {
 };
 
 const useCanCreateBootableVolume: UseCanCreateBootableVolume = (namespace) => {
-  const [canCreatePVC, loadingPVC] = useAccessReview({
+  const selectedClusters = useListClusters();
+  const selectedNamespaces = useListNamespaces();
+  const [hubClusterName] = useHubClusterName();
+
+  const clusterToVerifyAccess = selectedClusters?.[0] || hubClusterName;
+  const namespaceToVerifyAccess = selectedNamespaces?.[0] || namespace;
+
+  const [canCreatePVC, loadingPVC] = useFleetAccessReview({
+    cluster: clusterToVerifyAccess,
     group: PersistentVolumeClaimModel.apiGroup,
-    namespace: namespace,
+    namespace: namespaceToVerifyAccess,
     resource: PersistentVolumeClaimModel.plural,
     verb: 'create' as K8sVerb,
   });
-  const [canCreateSnapshots, loadingShapshots] = useAccessReview({
+  const [canCreateSnapshots, loadingShapshots] = useFleetAccessReview({
+    cluster: clusterToVerifyAccess,
     group: VolumeSnapshotModel.apiGroup,
-    namespace: namespace,
+    namespace: namespaceToVerifyAccess,
     resource: VolumeSnapshotModel.plural,
     verb: 'create' as K8sVerb,
   });
 
-  const [canCreateDS, loadingDS] = useAccessReview({
+  const [canCreateDS, loadingDS] = useFleetAccessReview({
+    cluster: clusterToVerifyAccess,
     group: DataSourceModel.apiGroup,
-    namespace: namespace,
+    namespace: namespaceToVerifyAccess,
     resource: DataSourceModel.plural,
     verb: 'create' as K8sVerb,
   });
 
-  const [canCreateDIC, loadingDIC] = useAccessReview({
+  const [canCreateDIC, loadingDIC] = useFleetAccessReview({
+    cluster: clusterToVerifyAccess,
     group: DataImportCronModel.apiGroup,
-    namespace: namespace,
+    namespace: namespaceToVerifyAccess,
     resource: DataImportCronModel.plural,
     verb: 'create' as K8sVerb,
   });
 
-  const [canListInstanceTypesPreference, loadingInstanceTypesPreference] = useAccessReview({
+  const [canListInstanceTypesPreference, loadingInstanceTypesPreference] = useFleetAccessReview({
+    cluster: clusterToVerifyAccess,
     group: VirtualMachineClusterPreferenceModel.apiGroup,
     resource: VirtualMachineClusterPreferenceModel.plural,
     verb: 'list' as K8sVerb,
