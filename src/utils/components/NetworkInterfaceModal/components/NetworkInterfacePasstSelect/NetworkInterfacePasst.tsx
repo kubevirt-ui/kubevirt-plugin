@@ -1,15 +1,14 @@
 import React, { FC, useCallback, useState } from 'react';
-import { Link } from 'react-router-dom-v5-compat';
 
+import NetworkInterfacePasstHelperPopover from '@kubevirt-utils/components/NetworkInterfaceModal/components/NetworkInterfacePasstSelect/NetworkInterfacePasstHelperPopover';
 import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
 import { interfaceTypesProxy } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import usePasstFeatureFlag from '@overview/SettingsTab/PreviewFeaturesTab/hooks/usePasstFeatureFlag';
-import { FormGroup, Popover, Select, SelectOption, Split, SplitItem } from '@patternfly/react-core';
-import { HelpIcon } from '@patternfly/react-icons';
+import { FormGroup, Select, SelectOption } from '@patternfly/react-core';
 
-import { getPASSTSelectableOptions } from '../utils/helpers';
+import { getPASSTSelectableOptions } from '../../utils/helpers';
 
 type NetworkInterfacePasstProps = {
   interfaceType: string;
@@ -47,8 +46,17 @@ const NetworkInterfacePasst: FC<NetworkInterfacePasstProps> = ({
   if (!isNamespaceManagedByUDN) return null;
 
   return (
-    <Split hasGutter>
-      <FormGroup className="form-group-margin" fieldId="passt-checkbox">
+    <FormGroup
+      labelHelp={
+        passtFeatureFlag.featureEnabled && (
+          <NetworkInterfacePasstHelperPopover namespace={namespace} />
+        )
+      }
+      className="form-group-margin"
+      fieldId="passt-checkbox"
+      label={t('Binding')}
+    >
+      <div data-test-id="network-attachment-definition-select">
         <Select
           toggle={SelectToggle({
             'data-test-id': 'source-type-select',
@@ -68,28 +76,8 @@ const NetworkInterfacePasst: FC<NetworkInterfacePasstProps> = ({
             </SelectOption>
           ))}
         </Select>
-        <SplitItem>
-          {!passtFeatureFlag.featureEnabled && (
-            <Popover
-              bodyContent={() => (
-                <div>
-                  {t(
-                    'To enable this feature, you need to enable the Passt feature flag in the cluster settings.',
-                  )}
-
-                  <Link to={`/k8s/ns/${namespace}/virtualization-overview/settings`}>
-                    {t('Go to cluster settings')}
-                  </Link>
-                </div>
-              )}
-              aria-label={'Help'}
-            >
-              <HelpIcon />
-            </Popover>
-          )}
-        </SplitItem>
-      </FormGroup>
-    </Split>
+      </div>
+    </FormGroup>
   );
 };
 
