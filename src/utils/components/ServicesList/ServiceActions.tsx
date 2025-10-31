@@ -4,7 +4,8 @@ import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { modelToRef, ServiceModel } from '@kubevirt-utils/models';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { ActionMenuVariant } from '@openshift-console/dynamic-plugin-sdk/lib/api/internal-types';
-import { LazyActionMenu } from '@openshift-console/dynamic-plugin-sdk-internal';
+
+import LazyActionMenu from '../LazyActionMenu/LazyActionMenu';
 
 type ServiceActionsProps = {
   service: IoK8sApiCoreV1Service;
