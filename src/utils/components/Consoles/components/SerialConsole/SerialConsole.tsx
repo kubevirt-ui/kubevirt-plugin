@@ -6,6 +6,7 @@ import { IDisposable, Terminal } from '@xterm/xterm';
 
 import { INSECURE, SECURE } from '../../utils/constants';
 import { isConnectionEncrypted, readFromClipboard } from '../../utils/utils';
+import { PasteParams } from '../AccessConsoles/utils/accessConsoles';
 import { ConsoleState, SERIAL_CONSOLE_TYPE, WS, WSS } from '../utils/ConsoleConsts';
 import { ConsoleComponentState } from '../utils/types';
 
@@ -113,7 +114,8 @@ const SerialConsole: FC<SerialConsoleConnectorProps> = ({ basePath, setState }) 
         actions: {
           connect,
           disconnect,
-          sendPaste: async (shouldFocusOnConsole: boolean) => {
+          sendPaste: async (params: PasteParams) => {
+            const { shouldFocusOnConsole = true } = params;
             const text = await readFromClipboard();
             if (typeof text === 'string') {
               xtermRef.current?.paste(text);
