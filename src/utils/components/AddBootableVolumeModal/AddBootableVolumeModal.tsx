@@ -7,9 +7,11 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { UPLOAD_STATUS } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useListClusters from '@kubevirt-utils/hooks/useListClusters';
 import { getValidNamespace, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { Form, PopoverPosition, Title } from '@patternfly/react-core';
+import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import SchedulingSettings from './components/SchedulingSettings';
 import SourceTypeSelection from './components/SourceTypeSelection/SourceTypeSelection';
@@ -39,9 +41,12 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
   const { t } = useKubevirtTranslation();
   const [activeNamespace] = useActiveNamespace();
   const namespace = getValidNamespace(activeNamespace);
+  const clusters = useListClusters();
+  const [hubClusterName] = useHubClusterName();
 
   const [bootableVolume, setBootableVolume] = useState<AddBootableVolumeState>({
     ...initialBootableVolumeState,
+    bootableVolumeCluster: clusters?.[0] || hubClusterName,
     bootableVolumeNamespace: namespace,
   });
 
@@ -49,7 +54,7 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
     DROPDOWN_FORM_SELECTION.UPLOAD_VOLUME,
   );
 
-  const { upload, uploadData } = useCDIUpload();
+  const { upload, uploadData } = useCDIUpload(bootableVolume?.bootableVolumeCluster);
 
   const { labels } = bootableVolume || {};
 
