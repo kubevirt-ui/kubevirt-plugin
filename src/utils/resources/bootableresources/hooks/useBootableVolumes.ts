@@ -19,6 +19,8 @@ import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/k
 import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
 import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
+import useListClusters from '@kubevirt-utils/hooks/useListClusters';
+import useListNamespaces from '@kubevirt-utils/hooks/useListNamespaces';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import {
   convertResourceArrayToMapWithCluster,
@@ -33,18 +35,24 @@ type UseBootableVolumes = (namespace?: string) => UseBootableVolumesValues;
 const useBootableVolumes: UseBootableVolumes = (namespace) => {
   const projectsNamespace = namespace === ALL_PROJECTS ? null : namespace;
   const cluster = useClusterParam();
+  const selectedClusters = useListClusters();
+  const selectedNamespaces = useListNamespaces();
+
+  const multiclusterFilters = useMemo(() => [
+    ...(isEmpty(selectedClusters) ? [] : [{property: 'cluster', values: selectedClusters}]),
+    ...(isEmpty(selectedNamespaces) ? [] : [{property: 'namespace', values: selectedNamespaces}]),
+  ], [selectedClusters, selectedNamespaces]);
 
   const [dataSources, loadedDataSources, dataSourcesError] = useKubevirtWatchResource<
     V1beta1DataSource[]
   >({
-    cluster,
     groupVersionKind: DataSourceModelGroupVersionKind,
     isList: true,
     namespace: projectsNamespace,
     selector: {
       matchExpressions: [{ key: DEFAULT_PREFERENCE_LABEL, operator: Operator.Exists }],
     },
-  });
+  }, null, multiclusterFilters);
 
   const [dataImportCrons, loadedDataImportCrons, dataImportCronsError] = useKubevirtWatchResource<
     V1beta1DataImportCron[]
@@ -53,7 +61,7 @@ const useBootableVolumes: UseBootableVolumes = (namespace) => {
     groupVersionKind: modelToGroupVersionKind(DataImportCronModel),
     isList: true,
     namespace: projectsNamespace,
-  });
+  }, null, multiclusterFilters);
 
   // getting all pvcs since there could be a case where a DS has the label and it's underlying PVC does not
   const [pvcs, loadedPVCs, loadErrorPVCs] = useKubevirtWatchResource<
@@ -63,14 +71,14 @@ const useBootableVolumes: UseBootableVolumes = (namespace) => {
     groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
     isList: true,
     namespace: projectsNamespace,
-  });
+  }, null, multiclusterFilters);
 
   const [dvs, loadedDVs, loadErrorDVs] = useKubevirtWatchResource<V1beta1DataVolume[]>({
     cluster,
     groupVersionKind: modelToGroupVersionKind(DataVolumeModel),
     isList: true,
     namespace: projectsNamespace,
-  });
+  }, null, multiclusterFilters);
 
   // getting volumesnapshot as this can also be a source of DS
   const [volumeSnapshots] = useKubevirtWatchResource<VolumeSnapshotKind[]>({
@@ -78,7 +86,7 @@ const useBootableVolumes: UseBootableVolumes = (namespace) => {
     groupVersionKind: modelToGroupVersionKind(VolumeSnapshotModel),
     isList: true,
     namespace: projectsNamespace,
-  });
+  }, null, multiclusterFilters);
 
   const error = useMemo(
     () => dataSourcesError || loadErrorDVs || loadErrorPVCs || dataImportCronsError,

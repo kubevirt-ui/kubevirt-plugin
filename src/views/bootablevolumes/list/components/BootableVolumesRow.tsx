@@ -98,7 +98,7 @@ const BootableVolumesRow: FC<
         </TableText>
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-15" id="preference">
-        {getSourcePreferenceLabelValue(obj)}
+        {getSourcePreferenceLabelValue(obj) || NO_DATA_DASH}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="">
         {isBootableVolumePVCKind(obj) ? (
