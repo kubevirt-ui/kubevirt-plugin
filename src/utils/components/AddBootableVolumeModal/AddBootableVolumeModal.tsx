@@ -127,13 +127,13 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
     >
       {t('Add a new bootable volume to the cluster.')}
 
-      {isACMPage && (
-        <ClusterSelect
-          bootableVolume={bootableVolume}
-          setBootableVolumeField={setBootableVolumeField}
-        />
-      )}
       <Form className="pf-v6-u-mt-md">
+        {isACMPage && (
+          <ClusterSelect
+            bootableVolume={bootableVolume}
+            setBootableVolumeField={setBootableVolumeField}
+          />
+        )}
         <SourceTypeSelection
           formSelection={sourceType}
           namespace={namespace}

@@ -81,14 +81,14 @@ const BootableVolumesRow: FC<
       <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-20" id="cluster">
         {getCluster(obj)}
       </TableData>
-      <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-10" id={ARCHITECTURE_ID}>
-        <ArchitectureLabel architecture={getArchitecture(obj)} />
-      </TableData>
       {namespace === ALL_NAMESPACES_SESSION_KEY && (
         <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-20" id="namespace">
           <FleetResourceLink cluster={cluster} kind="Namespace" name={bootableVolumeNamespace} />
         </TableData>
       )}
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-10" id={ARCHITECTURE_ID}>
+        <ArchitectureLabel architecture={getArchitecture(obj)} />
+      </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-15" id="os">
         {getPreferenceReadableOS(obj, clusterPreferences)}
       </TableData>
@@ -98,7 +98,7 @@ const BootableVolumesRow: FC<
         </TableText>
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-15" id="preference">
-        {getSourcePreferenceLabelValue(obj)}
+        {getSourcePreferenceLabelValue(obj) || NO_DATA_DASH}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="">
         {isBootableVolumePVCKind(obj) ? (
