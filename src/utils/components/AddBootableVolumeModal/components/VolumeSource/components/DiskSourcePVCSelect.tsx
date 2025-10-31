@@ -9,6 +9,7 @@ import DiskSourcePVCSelectName from './DiskSourcePVCSelectName';
 import DiskSourcePVCSelectNamespace from './DiskSourcePVCSelectNamespace';
 
 type DiskSourcePVCSelectProps = {
+  cluster?: string;
   pvcNameSelected: string;
   pvcNamespaceSelected: string;
   selectPVCName: (value: string) => void;
@@ -17,14 +18,15 @@ type DiskSourcePVCSelectProps = {
 };
 
 const DiskSourcePVCSelect: FC<DiskSourcePVCSelectProps> = ({
+  cluster,
   pvcNameSelected,
   pvcNamespaceSelected,
   selectPVCName,
   selectPVCNamespace,
   setDiskSize,
 }) => {
-  const [projectsNames, projectNamesLoaded] = useProjects();
-  const [pvcs, pvcsLoaded] = usePVCs(pvcNamespaceSelected);
+  const [projectsNames, projectNamesLoaded] = useProjects(cluster);
+  const [pvcs, pvcsLoaded] = usePVCs(pvcNamespaceSelected, cluster);
 
   const onSelectProject = useCallback(
     (newProject) => {

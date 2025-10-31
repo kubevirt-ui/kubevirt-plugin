@@ -18,6 +18,7 @@ import useSnapshots from './useSnapshots';
 import './select-snapshot.scss';
 
 type SelectSnapshotProps = {
+  cluster?: string;
   selectSnapshotName: (value: string) => void;
   selectSnapshotNamespace?: (value: string) => void;
   setDiskSize?: (size: string) => void;
@@ -26,6 +27,7 @@ type SelectSnapshotProps = {
 };
 
 const SelectSnapshot: FC<SelectSnapshotProps> = ({
+  cluster,
   selectSnapshotName,
   selectSnapshotNamespace,
   setDiskSize,
@@ -34,7 +36,7 @@ const SelectSnapshot: FC<SelectSnapshotProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const { projectsLoaded, projectsNames, snapshots, snapshotsLoaded } =
-    useSnapshots(snapshotNamespaceSelected);
+    useSnapshots(snapshotNamespaceSelected, cluster);
 
   const onSelectProject = useCallback(
     (newProject) => {

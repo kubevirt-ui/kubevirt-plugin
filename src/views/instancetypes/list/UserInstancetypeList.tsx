@@ -1,11 +1,15 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { VirtualMachineInstancetypeModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1VirtualMachineInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
+import { useClusterFilter } from '@kubevirt-utils/hooks/useClusterFilter';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useListClusters from '@kubevirt-utils/hooks/useListClusters';
+import useListNamespaces from '@kubevirt-utils/hooks/useListNamespaces';
 import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
+import { useProjectFilter } from '@kubevirt-utils/hooks/useProjectFilter';
 import { ListPageProps } from '@kubevirt-utils/utils/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
@@ -38,19 +42,26 @@ const UserInstancetypeList: FC<UserInstancetypeListProps> = ({
   namespace,
 }) => {
   const { t } = useKubevirtTranslation();
+  const selectedClusters = useListClusters()
+  const selectedNamespaces = useListNamespaces()
 
   const { onPaginationChange, pagination } = usePagination();
+
+  const clusterFilter = useClusterFilter();
+  const projectFilter = useProjectFilter();
+  
+  const filtersWithSelect = useMemo(() => [clusterFilter, projectFilter], [clusterFilter, projectFilter]);
 
   const [unfilteredData, data, onFilterChange] = useListPageFilter<
     V1beta1VirtualMachineInstancetype,
     V1beta1VirtualMachineInstancetype
-  >(instanceTypes, null, {
+  >(instanceTypes, filtersWithSelect, {
     name: { selected: [nameFilter] },
   });
 
   const [columns, activeColumns, loadedColumns] = useUserInstancetypeListColumns(pagination, data);
 
-  if (loaded && isEmpty(unfilteredData)) {
+  if (loaded && isEmpty(unfilteredData) && isEmpty(selectedClusters) && isEmpty(selectedNamespaces)) {
     return <UserInstancetypeEmptyState namespace={namespace} />;
   }
 
@@ -78,10 +89,11 @@ const UserInstancetypeList: FC<UserInstancetypeListProps> = ({
             });
           }}
           data={unfilteredData}
+          filtersWithSelect={filtersWithSelect}
           hideColumnManagement={hideColumnManagement}
           hideLabelFilter={hideTextFilter}
           hideNameLabelFilters={hideNameLabelFilters}
-          loaded={loaded && loadedColumns}
+          loaded={loadedColumns}
         />
         {!isEmpty(data) && (
           <Pagination

@@ -1,7 +1,6 @@
 import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 
-import ClusterProjectDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterProjectDropdown';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ListPageBody, ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -24,7 +23,6 @@ const BootableVolumesEmptyState: FC<BootableVolumesEmptyStateProps> = ({ namespa
 
   return (
     <>
-      <ClusterProjectDropdown includeAllClusters includeAllProjects />
       <ListPageHeader title={t('Bootable volumes')} />
 
       <ListPageBody>

@@ -2,8 +2,9 @@ import { useMemo } from 'react';
 
 import { PersistentVolumeClaimModel } from '@kubevirt-ui/kubevirt-api/console';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
-import useHcoWorkloadArchitectures from '@kubevirt-utils/hooks/useHcoWorkloadArchitectures';
+import { useClusterFilter } from '@kubevirt-utils/hooks/useClusterFilter';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useProjectFilter } from '@kubevirt-utils/hooks/useProjectFilter';
 import {
   ISO,
   SHOW_DEPRECATED_BOOTABLE_VOLUMES,
@@ -13,6 +14,7 @@ import {
   isBootableVolumeISO,
   isDeprecated,
 } from '@kubevirt-utils/resources/bootableresources/helpers';
+import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { OS_NAMES } from '@kubevirt-utils/resources/template';
 import {
@@ -26,19 +28,17 @@ import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { BootableResource } from '../../utils/types';
 import { getPreferenceOSType } from '../../utils/utils';
 
-const useBootableVolumesFilters = (): RowFilter<BootableResource>[] => {
+const useBootableVolumesFilters = (bootableVolumes: BootableVolume[]): {filtersWithSelect: RowFilter<BootableResource>[], rowFilters: RowFilter<BootableResource>[]} => {
   const { t } = useKubevirtTranslation();
-  const workloadsArchitectures = useHcoWorkloadArchitectures();
-  const workloadsArchitecturesItems = useMemo(
-    () =>
-      workloadsArchitectures.map((arch) => ({
-        id: arch,
-        title: arch,
-      })),
-    [workloadsArchitectures],
-  );
+  const clusterFilter = useClusterFilter();
+  const projectFilter = useProjectFilter();
+  
+  const workloadsArchitectures = useMemo(() => Array.from(new Set(bootableVolumes.map(bootableVolume => getArchitecture(bootableVolume)))), [bootableVolumes]);
+  const workloadsArchitecturesItems = useMemo(() => workloadsArchitectures.map(arch => ({ id: arch, title: arch })), [workloadsArchitectures]);
 
-  return [
+  const filtersWithSelect = useMemo(() => [clusterFilter, projectFilter], [clusterFilter, projectFilter]);
+
+  const rowFilters = useMemo(() =>  [
     {
       filter: (availableResourceNames, obj) =>
         availableResourceNames?.selected?.length === 0 ? !isDeprecated(getName(obj)) : true,
@@ -98,7 +98,9 @@ const useBootableVolumesFilters = (): RowFilter<BootableResource>[] => {
       reducer: (obj) => isBootableVolumeISO(obj) && ISO,
       type: ISO,
     },
-  ];
+  ], [t, workloadsArchitecturesItems]);
+
+  return {filtersWithSelect, rowFilters};
 };
 
 export default useBootableVolumesFilters;

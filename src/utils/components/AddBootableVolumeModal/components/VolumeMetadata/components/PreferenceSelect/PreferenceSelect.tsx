@@ -31,10 +31,11 @@ const PreferenceSelect: FC<PreferenceSelectProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const { bootableVolumeNamespace, labels } = bootableVolume;
+  const { bootableVolumeCluster, bootableVolumeNamespace, labels } = bootableVolume;
   const { preferenceSelectOptions, preferencesLoaded } = usePreferenceSelectOptions(
     bootableVolumeNamespace,
     setBootableVolumeField,
+    bootableVolumeCluster,
   );
 
   const handleSelect = (value: string) => {

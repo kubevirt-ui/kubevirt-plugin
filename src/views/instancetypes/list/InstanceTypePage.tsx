@@ -6,7 +6,6 @@ import useVirtualMachineInstanceTypes from '@catalog/CreateFromInstanceTypes/sta
 import VirtualMachineClusterInstancetypeModel, {
   VirtualMachineClusterInstancetypeModelRef,
 } from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineClusterInstancetypeModel';
-import ClusterProjectDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterProjectDropdown';
 import { PageTitles } from '@kubevirt-utils/constants/page-constants';
 import useIsSearchPage from '@kubevirt-utils/hooks/useIsSearchPage';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -78,11 +77,6 @@ const InstanceTypePage: FC<ListPageProps> = (props) => {
     <>
       <DocumentTitle>{pageTitle}</DocumentTitle>
 
-      <ClusterProjectDropdown
-        includeAllClusters
-        includeAllProjects
-        showProjectDropdown={activeTabKey === USER_INSTANCETYPE_TAB_INDEX}
-      />
       <div
         className={classNames({
           'list-header-spacer': activeTabKey === CLUSTER_INSTANCETYPE_TAB_INDEX,

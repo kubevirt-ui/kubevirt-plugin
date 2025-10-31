@@ -4,7 +4,9 @@ import { HyperConvergedModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/c
 import { V1LabelSelector } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1MigrationConfiguration } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+
+import useKubevirtWatchResource from './useKubevirtWatchResource/useKubevirtWatchResource';
 
 export type HyperConverged = K8sResourceCommon & {
   spec: {
@@ -48,16 +50,17 @@ const getHyperConvergedObject = (hyperConverged): HyperConverged => {
   return hyperConverged;
 };
 
-type UseHyperConvergeConfigurationType = () => [
+type UseHyperConvergeConfigurationType = (cluster?: string) => [
   hyperConvergeConfig: HyperConverged,
   loaded: boolean,
   error: any,
 ];
 
-const useHyperConvergeConfiguration: UseHyperConvergeConfigurationType = () => {
-  const [hyperConvergeData, hyperConvergeDataLoaded, hyperConvergeDataError] = useK8sWatchResource<
+const useHyperConvergeConfiguration: UseHyperConvergeConfigurationType = (cluster) => {
+  const [hyperConvergeData, hyperConvergeDataLoaded, hyperConvergeDataError] = useKubevirtWatchResource<
     HyperConverged[]
   >({
+    cluster,
     groupVersionKind: HyperConvergedModelGroupVersionKind,
     isList: true,
   });
