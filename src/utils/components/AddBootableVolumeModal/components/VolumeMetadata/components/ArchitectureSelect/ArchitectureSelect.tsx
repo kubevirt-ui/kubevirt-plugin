@@ -21,7 +21,7 @@ const ArchitectureSelect: FC<ArchitectureSelectProps> = ({
   setBootableVolumeField,
 }) => {
   const { t } = useKubevirtTranslation();
-  const workloadArchitectures = useHcoWorkloadArchitectures();
+  const workloadArchitectures = useHcoWorkloadArchitectures(bootableVolumeState?.bootableVolumeCluster);
 
   if (isEmpty(workloadArchitectures)) return null;
 
