@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, memo } from 'react';
 
 import { modelToGroupVersionKind, NodeModel } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
@@ -60,4 +60,4 @@ const SchedulingSection: FC<SchedulingSectionProps> = ({ instanceTypeVM, onSubmi
   );
 };
 
-export default SchedulingSection;
+export default memo(SchedulingSection);

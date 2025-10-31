@@ -17,11 +17,12 @@ type PVCSourceProps = {
 
 const PVCSource: FC<PVCSourceProps> = ({ bootableVolume, setBootableVolumeField }) => {
   const { t } = useKubevirtTranslation();
-  const { pvcName, pvcNamespace } = bootableVolume || {};
+  const { bootableVolumeCluster, pvcName, pvcNamespace } = bootableVolume || {};
 
   return (
     <>
       <DiskSourcePVCSelect
+        cluster={bootableVolumeCluster}
         pvcNameSelected={pvcName}
         pvcNamespaceSelected={pvcNamespace}
         selectPVCName={setBootableVolumeField('pvcName')}

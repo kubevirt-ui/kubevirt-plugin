@@ -12,9 +12,10 @@ type SnapshotSourceProps = {
 };
 
 const SnapshotSource: FC<SnapshotSourceProps> = ({ bootableVolume, setBootableVolumeField }) => {
-  const { snapshotName, snapshotNamespace } = bootableVolume || {};
+  const { bootableVolumeCluster, snapshotName, snapshotNamespace } = bootableVolume || {};
   return (
     <SelectSnapshot
+      cluster={bootableVolumeCluster}
       selectSnapshotName={setBootableVolumeField('snapshotName')}
       selectSnapshotNamespace={setBootableVolumeField('snapshotNamespace')}
       setDiskSize={setBootableVolumeField('size')}

@@ -6,6 +6,7 @@ import ShowEvictionStrategy from '@kubevirt-utils/components/EvictionStrategy/Sh
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getCluster } from '@multicluster/helpers/selectors';
 
 import EvictionStrategyModal from './EvictionStrategyModal';
 
@@ -30,7 +31,9 @@ const EvictionStrategy: React.FC<TemplateSchedulingGridProps> = ({
 
   return (
     <VirtualMachineDescriptionItem
-      descriptionData={<ShowEvictionStrategy evictionStrategy={strategy} />}
+      descriptionData={
+        <ShowEvictionStrategy cluster={getCluster(template)} evictionStrategy={strategy} />
+      }
       descriptionHeader={t('Eviction strategy')}
       isEdit={editable}
       onEditClick={onEditClick}
