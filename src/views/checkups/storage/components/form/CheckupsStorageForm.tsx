@@ -73,11 +73,13 @@ const CheckupsStorageForm = () => {
                 value={timeOut}
               />
             </FormGroup>
-            <CheckupImageField
-              checkupImage={checkupImage}
-              checkupImageLoaded={checkupImageLoaded}
-              checkupImageLoadError={checkupImageLoadError}
-            />
+            {checkupImageLoadError && (
+              <CheckupImageField
+                checkupImage={checkupImage}
+                checkupImageLoaded={checkupImageLoaded}
+                checkupImageLoadError={checkupImageLoadError}
+              />
+            )}
             <CheckupsStorageFormActions checkupImage={checkupImage} name={name} timeOut={timeOut} />
           </FormSection>
         </Form>

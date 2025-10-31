@@ -11,7 +11,7 @@ import CheckupsNetworkDetailsPageSection from './CheckupsNetworkDetailsPageSecti
 
 const CheckupsNetworkDetailsTab: FC = () => {
   const { vmName } = useParams<{ vmName: string }>();
-  const { configMaps, error, jobs, loading } = useCheckupsNetworkData();
+  const { configMaps, error, jobs, loaded } = useCheckupsNetworkData();
 
   const configMap = configMaps.find((cm) => cm.metadata.name === vmName);
   const jobMatches = getJobByName(jobs, configMap?.metadata?.name);
@@ -23,7 +23,7 @@ const CheckupsNetworkDetailsTab: FC = () => {
         <Divider />
       </PageSection>
       <PageSection>
-        <CheckupsDetailsPageHistory error={error} jobs={jobMatches} loading={loading} />
+        <CheckupsDetailsPageHistory error={error} jobs={jobMatches} loaded={loaded} />
       </PageSection>
     </>
   );

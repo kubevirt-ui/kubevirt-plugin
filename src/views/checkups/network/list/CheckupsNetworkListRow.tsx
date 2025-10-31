@@ -6,8 +6,8 @@ import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { ResourceLink, TableData, Timestamp } from '@openshift-console/dynamic-plugin-sdk';
 import { createURL } from '@virtualmachines/details/tabs/overview/utils/utils';
 
-import CheckupsNetworkStatusIcon from '../../CheckupsNetworkStatusIcon';
-import { STATUS_COMPILATION_TIME_STAMP, STATUS_START_TIME_STAMP } from '../../utils/utils';
+import CheckupsNetworkStatusIcon from '../../CheckupsStatusIcon';
+import { STATUS_COMPLETION_TIME_STAMP, STATUS_START_TIME_STAMP } from '../../utils/utils';
 import CheckupsNetworkActions from '../components/CheckupsNetworkActions';
 import {
   CONFIG_PARAM_NAD_NAME,
@@ -82,7 +82,7 @@ const CheckupsNetworkListRow = ({
         <Timestamp timestamp={configMap?.data?.[STATUS_START_TIME_STAMP]} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="complete-time">
-        <Timestamp timestamp={configMap?.data?.[STATUS_COMPILATION_TIME_STAMP]} />
+        <Timestamp timestamp={configMap?.data?.[STATUS_COMPLETION_TIME_STAMP]} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="">
         <CheckupsNetworkActions

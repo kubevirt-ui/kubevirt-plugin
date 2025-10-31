@@ -23,10 +23,21 @@ const useCheckupsNetworkDetailsPageHistoryColumns: UseCheckupsNetworkDetailsPage
         transforms: [sortable],
       },
       {
+        id: 'start-time',
+        sort: 'status.startTime',
+        title: t('Start time'),
+        transforms: [sortable],
+      },
+      {
         id: 'complete-time',
         sort: 'status.completionTime',
         title: t('Complete time'),
         transforms: [sortable],
+      },
+      {
+        id: '',
+        props: { className: 'pf-v6-c-table__action' },
+        title: '',
       },
     ];
 
