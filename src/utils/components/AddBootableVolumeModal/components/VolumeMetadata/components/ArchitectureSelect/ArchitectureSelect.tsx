@@ -31,7 +31,7 @@ const ArchitectureSelect: FC<ArchitectureSelectProps> = ({
     <>
       <FormGroup label={ARCHITECTURE_TITLE}>
         <FormPFSelect
-          closeOnSelect={false}
+          closeOnSelect={true}
           selected={architectures}
           selectedLabel={architectures?.join(', ') ?? t('Select architecture')}
           toggleProps={{ isFullWidth: true }}
