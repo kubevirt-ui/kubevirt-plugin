@@ -1,4 +1,4 @@
-import { ServiceModel } from '@kubevirt-ui/kubevirt-api/console';
+import { modelToGroupVersionKind, ServiceModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getServicesForVmi } from '@kubevirt-utils/resources/vmi';
@@ -12,8 +12,8 @@ export type UseSSHServiceReturnType = [service: IoK8sApiCoreV1Service, loaded: b
 const useSSHService = (vm: V1VirtualMachine): UseSSHServiceReturnType => {
   const watchServiceResources = {
     cluster: getCluster(vm),
+    groupVersionKind: modelToGroupVersionKind(ServiceModel),
     isList: true,
-    kind: ServiceModel.kind,
     namespace: vm?.metadata?.namespace,
   };
 
