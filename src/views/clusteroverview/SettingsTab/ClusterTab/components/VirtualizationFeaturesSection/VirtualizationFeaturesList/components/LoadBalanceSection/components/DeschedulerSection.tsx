@@ -1,36 +1,57 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useRef } from 'react';
+import { Link } from 'react-router-dom-v5-compat';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { KUBE_DESCHEDULER_URL } from '@kubevirt-utils/resources/descheduler/constants';
 import useKubeDescheduler from '@kubevirt-utils/resources/descheduler/hooks/useKubeDescheduler';
-import { getDeviationThreshold } from '@kubevirt-utils/resources/descheduler/selectors';
-import { DeviationThreshold } from '@kubevirt-utils/resources/descheduler/types';
+import {
+  DeschedulerProfile,
+  DeviationThreshold,
+} from '@kubevirt-utils/resources/descheduler/types';
 import { updateDeviationThreshold } from '@kubevirt-utils/resources/descheduler/utils';
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import { Radio, Split, SplitItem, Stack, StackItem } from '@patternfly/react-core';
+import { Flex, Stack, StackItem, Tooltip } from '@patternfly/react-core';
+import { SimpleSelect } from '@patternfly/react-templates';
+
+import { useDeviationThresholdSelectOptions } from '../hooks/useDeviationThresholdSelectOptions';
+
+import DeschedulerThresholdHelp from './DeschedulerThresholdHelp';
 
 import './DeschedulerSection.scss';
 
 const DeschedulerSection: FC = () => {
   const { t } = useKubevirtTranslation();
   const { descheduler, deschedulerLoaded } = useKubeDescheduler();
-  const [selectedLevel, setSelectedLevel] = useState<DeviationThreshold>(
-    getDeviationThreshold(descheduler) || DeviationThreshold.Medium,
-  );
 
-  const handleDeviationThresholdChange = (selectedThreshold: DeviationThreshold) => {
-    setSelectedLevel(selectedThreshold);
+  const deviationThresholdSelectOptions = useDeviationThresholdSelectOptions(descheduler);
+
+  const handleDeviationThresholdChange = (_event, selectedThreshold: DeviationThreshold) => {
     updateDeviationThreshold(descheduler, selectedThreshold).catch((err) =>
       kubevirtConsole.error(err),
     );
   };
 
-  const isDisabled = !deschedulerLoaded || isEmpty(descheduler);
+  const hasDescheduler = deschedulerLoaded && !isEmpty(descheduler);
+  const hasKubeVirtProfile = [
+    DeschedulerProfile.KubeVirtRelieveAndMigrate,
+    DeschedulerProfile.DevKubeVirtRelieveAndMigrate,
+  ].some((profile) => descheduler?.spec?.profiles?.includes(profile));
+
+  const tooltipRef = useRef<HTMLSpanElement>(null);
 
   return (
     <div className="descheduler-section">
       <Stack hasGutter>
         <StackItem>
-          <h3 className="descheduler-section__header">{t('Kube Descheduler')}</h3>
+          <Flex>
+            <h3 className="descheduler-section__header">
+              {hasDescheduler ? (
+                <Link to={KUBE_DESCHEDULER_URL}>{t('Kube Descheduler')}</Link>
+              ) : (
+                t('Kube Descheduler')
+              )}
+            </h3>
+          </Flex>
         </StackItem>
         <StackItem>
           {t(
@@ -39,38 +60,29 @@ const DeschedulerSection: FC = () => {
         </StackItem>
         <StackItem>{t('You can set a target balance level to guide the process.')}</StackItem>
         <StackItem>
-          <Split className="descheduler-section__radio-group" hasGutter>
-            <SplitItem isFilled>
-              <Radio
-                id={DeviationThreshold.Low}
-                isChecked={selectedLevel === DeviationThreshold.Low}
-                isDisabled={isDisabled}
-                label={t('Low')}
-                name="descheduler-balance-level-selection"
-                onChange={() => handleDeviationThresholdChange(DeviationThreshold.Low)}
-              />
-            </SplitItem>
-            <SplitItem isFilled>
-              <Radio
-                id={DeviationThreshold.Medium}
-                isChecked={selectedLevel === DeviationThreshold.Medium}
-                isDisabled={isDisabled}
-                label={t('Medium')}
-                name="descheduler-balance-level-selection"
-                onChange={() => handleDeviationThresholdChange(DeviationThreshold.Medium)}
-              />
-            </SplitItem>
-            <SplitItem>
-              <Radio
-                id={DeviationThreshold.High}
-                isChecked={selectedLevel === DeviationThreshold.High}
-                isDisabled={isDisabled}
-                label={t('High')}
-                name="descheduler-balance-level-selection"
-                onChange={() => handleDeviationThresholdChange(DeviationThreshold.High)}
-              />
-            </SplitItem>
-          </Split>
+          <span ref={tooltipRef}>
+            <SimpleSelect
+              initialOptions={deviationThresholdSelectOptions}
+              isDisabled={!hasDescheduler || !hasKubeVirtProfile}
+              onSelect={handleDeviationThresholdChange}
+              placeholder={t('Select threshold')}
+            />
+          </span>
+          {(!hasDescheduler || !hasKubeVirtProfile) && (
+            <Tooltip
+              content={
+                !hasDescheduler
+                  ? t(
+                      'Create a Kube Descheduler with KubeVirtRelieveAndMigrate profile to use this feature.',
+                    )
+                  : t(
+                      'Use KubeVirtRelieveAndMigrate profile in the Kube Descheduler to use this feature.',
+                    )
+              }
+              triggerRef={tooltipRef}
+            />
+          )}
+          <DeschedulerThresholdHelp />
         </StackItem>
       </Stack>
     </div>
