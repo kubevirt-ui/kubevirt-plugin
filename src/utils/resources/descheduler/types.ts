@@ -49,6 +49,11 @@ export enum DeschedulerMode {
   Predictive = 'Predictive',
 }
 
+export enum DeschedulerProfile {
+  DevKubeVirtRelieveAndMigrate = 'DevKubeVirtRelieveAndMigrate',
+  KubeVirtRelieveAndMigrate = 'KubeVirtRelieveAndMigrate',
+}
+
 export type KubeDescheduler = K8sResourceCommon & {
   spec: {
     deschedulingIntervalSeconds: number;
@@ -60,6 +65,6 @@ export type KubeDescheduler = K8sResourceCommon & {
       devEnableSoftTainter?: boolean;
       devLowNodeUtilizationThresholds?: LowNodeUtilizationThreshold;
     };
-    profiles: ['DevKubeVirtRelieveAndMigrate'];
+    profiles: DeschedulerProfile[];
   };
 };
