@@ -79,7 +79,10 @@ const ConsoleOverVirtctl: FC<ConsoleOverVirtctlProps> = ({ vm }) => {
         {isNamespaceManagedByUDN && !usesPasst ? (
           <VirtctlDisabled namespace={getNamespace(vm)} />
         ) : (
-          <VirtctlSSHCommandClipboardCopy vm={vm} />
+          <VirtctlSSHCommandClipboardCopy
+            isNamespaceManagedByUDN={isNamespaceManagedByUDN}
+            vm={vm}
+          />
         )}
       </DescriptionListDescription>
     </DescriptionListGroup>

@@ -9,16 +9,26 @@ import { ClipboardCopy } from '@patternfly/react-core';
 import { getConsoleVirtctlCommand } from '../utils';
 
 type VirtctlSSHCommandClipboardCopyProps = {
+  isNamespaceManagedByUDN: boolean;
   vm: V1VirtualMachine;
 };
 
-const VirtctlSSHCommandClipboardCopy: FC<VirtctlSSHCommandClipboardCopyProps> = ({ vm }) => {
+const VirtctlSSHCommandClipboardCopy: FC<VirtctlSSHCommandClipboardCopyProps> = ({
+  isNamespaceManagedByUDN,
+  vm,
+}) => {
   const { t } = useKubevirtTranslation();
 
   const sshSecretNotConfigured = isEmpty(getVMSSHSecretName(vm));
 
   if (sshSecretNotConfigured) {
-    return <div className="pf-v6-u-font-size-xs">{t('SSH secret not configured')}</div>;
+    return (
+      <div className="pf-v6-u-font-size-xs">
+        {isNamespaceManagedByUDN
+          ? t('Not supported with primary user-defined networks')
+          : t('SSH secret not configured')}
+      </div>
+    );
   }
 
   return (
