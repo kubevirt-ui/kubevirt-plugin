@@ -387,6 +387,7 @@
   "CPUs": "CPUs",
   "CPUs = sockets x threads x cores.": "CPUs = sockets x threads x cores.",
   "Create": "Create",
+  "Create {{kind}}": "Create {{kind}}",
   "create a bootable volume automatically by using pipelines": "create a bootable volume automatically by using pipelines",
   "Create a copy of the VirtualMachine from snapshot": "Create a copy of the VirtualMachine from snapshot",
   "Create a disk with no contents.": "Create a disk with no contents.",

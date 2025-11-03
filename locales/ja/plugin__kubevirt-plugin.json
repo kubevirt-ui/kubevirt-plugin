@@ -387,6 +387,7 @@
   "CPUs": "CPU",
   "CPUs = sockets x threads x cores.": "CPU = ソケット x スレッド x コア。",
   "Create": "作成",
+  "Create {{kind}}": "Create {{kind}}",
   "create a bootable volume automatically by using pipelines": "パイプラインを使用してブート可能なボリュームを自動的に作成する",
   "Create a copy of the VirtualMachine from snapshot": "スナップショットから VirtualMachine のコピーを作成する",
   "Create a disk with no contents.": "内容のないディスクを作成します。",
