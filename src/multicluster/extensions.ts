@@ -16,6 +16,8 @@ export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
   ConsoleStandAlone: './utils/components/Consoles/ConsoleStandAlone.tsx',
   CrossClusterMigration:
     './multicluster/components/CrossClusterMigration/CrossClusterMigration.tsx',
+  MulticlusterYAMLCreation:
+    './multicluster/components/MulticlusterYAMLCreation/MulticlusterYAMLCreation.tsx',
   Navigator: './views/virtualmachines/navigator/VirtualMachineNavigator.tsx',
   urls: './multicluster/urls.ts',
   VirtualMachineSearchResults: './views/virtualmachines/search/VirtualMachineSearchResults.tsx',
@@ -130,7 +132,6 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'acm.virtualmachine/action',
   } as EncodedExtension<ACMVirtualMachineActionExtension>,
-
   {
     properties: {
       component: {
@@ -141,6 +142,15 @@ export const extensions: EncodedExtension[] = [
         '/k8s/cluster/:cluster/ns/:ns/catalog',
         '/k8s/cluster/:cluster/all-namespaces/catalog',
       ],
+    },
+    type: 'console.page/route',
+  } as EncodedExtension<RoutePage>,
+  {
+    properties: {
+      component: {
+        $codeRef: 'MulticlusterYAMLCreation',
+      },
+      path: [`/k8s/cluster/:cluster/ns/:ns/${KUBEVIRT_VM_PATH}/~new`],
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
