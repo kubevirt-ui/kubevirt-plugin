@@ -26,6 +26,7 @@ export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
 const CLUSTER_INSTANCETYPE_PATH =
   'instancetype.kubevirt.io~v1beta1~VirtualMachineClusterInstancetype';
 const INSTANCETYPE_PATH = 'instancetype.kubevirt.io~v1beta1~VirtualMachineInstancetype';
+const MIGRATION_POLICY_PATH = 'migrations.kubevirt.io~v1alpha1~MigrationPolicy';
 
 export const extensions: EncodedExtension[] = [
   {
@@ -107,6 +108,21 @@ export const extensions: EncodedExtension[] = [
       href: `/k8s/all-clusters/all-namespaces/bootablevolumes`,
       id: 'bootablevolumes-virt-perspective',
       name: '%plugin__kubevirt-plugin~Bootable volumes%',
+      perspective: 'fleet-virtualization-perspective',
+    },
+    type: 'console.navigation/href',
+  } as EncodedExtension<HrefNavItem>,
+  {
+    properties: {
+      dataAttributes: {
+        'data-border': 'no-border',
+        'data-class': 'kv-plugin-virt-perspective-element',
+        'data-quickstart-id': 'qs-nav-migrationpolicies',
+        'data-test-id': 'migrationpolicies-nav-item',
+      },
+      href: `/k8s/all-clusters/${MIGRATION_POLICY_PATH}`,
+      id: 'migrationpolicies-virt-perspective',
+      name: '%plugin__kubevirt-plugin~MigrationPolicies%',
       perspective: 'fleet-virtualization-perspective',
     },
     type: 'console.navigation/href',
@@ -229,17 +245,57 @@ export const extensions: EncodedExtension[] = [
   } as EncodedExtension<RoutePage>,
   {
     properties: {
-      handler: { $codeRef: 'urls.getFleetResourceRoute' },
+      component: {
+        $codeRef: 'MigrationPoliciesList',
+      },
+      path: [
+        `/k8s/all-clusters/${MIGRATION_POLICY_PATH}`,
+        `/k8s/cluster/:cluster/${MIGRATION_POLICY_PATH}`,
+      ],
+    },
+    type: 'console.page/route',
+  } as EncodedExtension<RoutePage>,
+  {
+    properties: {
+      component: {
+        $codeRef: 'MigrationPolicyPage',
+      },
+      path: [`/k8s/cluster/:cluster/${MIGRATION_POLICY_PATH}/:name`],
+    },
+    type: 'console.page/route',
+  } as EncodedExtension<RoutePage>,
+  {
+    properties: {
+      component: {
+        $codeRef: 'MigrationPolicyCreateForm',
+      },
+      path: [`/k8s/cluster/:cluster/${MIGRATION_POLICY_PATH}/form`],
+    },
+    type: 'console.page/route',
+  } as EncodedExtension<RoutePage>,
+  {
+    properties: {
+      component: {
+        $codeRef: 'MulticlusterYAMLCreation',
+      },
+      path: [`/k8s/cluster/:cluster/${MIGRATION_POLICY_PATH}/~new`],
+    },
+    type: 'console.page/route',
+  } as EncodedExtension<RoutePage>,
+  {
+    properties: {
+      handler: { $codeRef: 'urls.getFleetNamespacedResourceRoute' },
       model: {
         group: 'kubevirt.io',
         kind: 'VirtualMachine',
+        version: 'v1',
       },
     },
     type: 'acm.resource/route',
   } as EncodedExtension<ResourceRoute>,
   {
     properties: {
-      handler: { $codeRef: 'urls.getFleetResourceRoute' },
+      handler: { $codeRef: 'urls.getFleetClusterResourceRoute' },
       model: {
         group: 'instancetype.kubevirt.io',
         kind: 'VirtualMachineClusterInstancetype',
@@ -250,11 +306,22 @@ export const extensions: EncodedExtension[] = [
   } as EncodedExtension<ResourceRoute>,
   {
     properties: {
-      handler: { $codeRef: 'urls.getFleetResourceRoute' },
+      handler: { $codeRef: 'urls.getFleetNamespacedResourceRoute' },
       model: {
         group: 'instancetype.kubevirt.io',
         kind: 'VirtualMachineInstancetype',
         version: 'v1beta1',
+      },
+    },
+    type: 'acm.resource/route',
+  } as EncodedExtension<ResourceRoute>,
+  {
+    properties: {
+      handler: { $codeRef: 'urls.getFleetClusterResourceRoute' },
+      model: {
+        group: 'migrations.kubevirt.io',
+        kind: 'MigrationPolicy',
+        version: 'v1alpha1',
       },
     },
     type: 'acm.resource/route',
