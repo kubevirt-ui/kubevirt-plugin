@@ -2,6 +2,7 @@ import {
   V1beta1DataVolumeSourcePVC,
   V1Disk,
   V1VirtualMachine,
+  V1Volume,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   DataVolumeModelGroupVersionKind,
@@ -67,4 +68,15 @@ export const getEjectedCDROMDrives = (diskDevices: DiskRawData[], vmDisks: V1Dis
     volume: disk,
   }));
   return mappedEjectedCDROMDrives;
+};
+
+export const isStorageVolume = (volume: V1Volume) => {
+  return Boolean(
+    volume.dataVolume ||
+      volume.persistentVolumeClaim ||
+      volume.containerDisk ||
+      volume.emptyDisk ||
+      volume.cloudInitNoCloud ||
+      volume.cloudInitConfigDrive,
+  );
 };
