@@ -8,7 +8,23 @@ import { isConnectionEncrypted } from '../../utils/utils';
 import { ConsoleState, VNC_CONSOLE_TYPE, WS, WSS } from '../utils/ConsoleConsts';
 import { ConsoleComponentState } from '../utils/types';
 
-import { sendCtrlAlt1, sendCtrlAlt2, sendPasteCMD } from './actions';
+import {
+  sendCtrlAlt1,
+  sendCtrlAlt2,
+  sendF1,
+  sendF10,
+  sendF11,
+  sendF12,
+  sendF2,
+  sendF3,
+  sendF4,
+  sendF5,
+  sendF6,
+  sendF7,
+  sendF8,
+  sendF9,
+  sendPasteCMD,
+} from './actions';
 
 import './vnc-console.scss';
 
@@ -84,6 +100,18 @@ export const VncConsole: FC<VncConsoleProps> = ({
         sendCtrlAlt1: sendCtrlAlt1.bind(rfbInst),
         sendCtrlAlt2: sendCtrlAlt2.bind(rfbInst),
         sendCtrlAltDel: rfbInst.sendCtrlAltDel?.bind(rfbInst),
+        sendF1: sendF1.bind(rfbInst),
+        sendF10: sendF10.bind(rfbInst),
+        sendF11: sendF11.bind(rfbInst),
+        sendF12: sendF12.bind(rfbInst),
+        sendF2: sendF2.bind(rfbInst),
+        sendF3: sendF3.bind(rfbInst),
+        sendF4: sendF4.bind(rfbInst),
+        sendF5: sendF5.bind(rfbInst),
+        sendF6: sendF6.bind(rfbInst),
+        sendF7: sendF7.bind(rfbInst),
+        sendF8: sendF8.bind(rfbInst),
+        sendF9: sendF9.bind(rfbInst),
         sendPaste: sendPasteCMD.bind(rfbInst),
       },
     }));

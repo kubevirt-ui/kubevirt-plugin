@@ -15,6 +15,18 @@ export type AccessConsolesActions = {
   sendCtrlAlt1?: () => void;
   sendCtrlAlt2?: () => void;
   sendCtrlAltDel?: () => void;
+  sendF1?: () => void;
+  sendF10?: () => void;
+  sendF11?: () => void;
+  sendF12?: () => void;
+  sendF2?: () => void;
+  sendF3?: () => void;
+  sendF4?: () => void;
+  sendF5?: () => void;
+  sendF6?: () => void;
+  sendF7?: () => void;
+  sendF8?: () => void;
+  sendF9?: () => void;
   sendPaste?: (shouldFocusOnConsole?: boolean) => Promise<void>;
 };
 

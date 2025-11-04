@@ -67,3 +67,26 @@ export async function sendPasteCMD(shouldFocusOnConsole?: boolean) {
     this.focus();
   }
 }
+
+function createSendKeyFunction(keyTable: number, keyCode: string) {
+  return function () {
+    if (this._rfbConnectionState !== 'connected' || this._viewOnly) {
+      return;
+    }
+    this.sendKey(keyTable, keyCode, true);
+    this.sendKey(keyTable, keyCode, false);
+  };
+}
+
+export const sendF1 = createSendKeyFunction(KeyTable.XK_F1, 'F1');
+export const sendF2 = createSendKeyFunction(KeyTable.XK_F2, 'F2');
+export const sendF3 = createSendKeyFunction(KeyTable.XK_F3, 'F3');
+export const sendF4 = createSendKeyFunction(KeyTable.XK_F4, 'F4');
+export const sendF5 = createSendKeyFunction(KeyTable.XK_F5, 'F5');
+export const sendF6 = createSendKeyFunction(KeyTable.XK_F6, 'F6');
+export const sendF7 = createSendKeyFunction(KeyTable.XK_F7, 'F7');
+export const sendF8 = createSendKeyFunction(KeyTable.XK_F8, 'F8');
+export const sendF9 = createSendKeyFunction(KeyTable.XK_F9, 'F9');
+export const sendF10 = createSendKeyFunction(KeyTable.XK_F10, 'F10');
+export const sendF11 = createSendKeyFunction(KeyTable.XK_F11, 'F11');
+export const sendF12 = createSendKeyFunction(KeyTable.XK_F12, 'F12');
