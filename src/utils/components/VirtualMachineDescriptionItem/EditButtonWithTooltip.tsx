@@ -1,4 +1,4 @@
-import React, { FC, PropsWithChildren, ReactNode, SyntheticEvent } from 'react';
+import React, { FC, memo, PropsWithChildren, ReactNode, SyntheticEvent } from 'react';
 
 import { Button, ButtonVariant, Tooltip } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
@@ -47,4 +47,4 @@ const EditButtonWithTooltip: FC<EditButtonWithTooltipProps> = ({
   return <EditButton />;
 };
 
-export default EditButtonWithTooltip;
+export default memo(EditButtonWithTooltip);

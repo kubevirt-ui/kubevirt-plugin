@@ -21,7 +21,10 @@ const useK8sWatchData = <T>(resource: FleetWatchK8sResource | null): WatchK8sRes
     useFleet ? null : resource,
   );
 
-  const defaultData: T = useMemo(() => (resource?.isList ? ([] as T) : undefined), [resource]);
+  const defaultData: T = useMemo(
+    () => (resource?.isList ? ([] as T) : undefined),
+    [resource?.isList],
+  );
 
   if (!resource || isEmpty(resource) || isEmpty(resource?.groupVersionKind))
     return [undefined, true, undefined];

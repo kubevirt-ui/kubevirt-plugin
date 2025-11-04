@@ -36,8 +36,11 @@ export const InstanceTypeDrilldownSelect: FC<InstanceTypeMenuItemsProps> = ({
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const { bootableVolumeNamespace, labels } = bootableVolume;
-  const { allInstanceTypes } = useInstanceTypesAndPreferences(bootableVolumeNamespace);
+  const { bootableVolumeCluster, bootableVolumeNamespace, labels } = bootableVolume;
+  const { allInstanceTypes } = useInstanceTypesAndPreferences(
+    bootableVolumeNamespace,
+    bootableVolumeCluster,
+  );
   const menuItems = useMemo(() => getInstanceTypeMenuItems(allInstanceTypes), [allInstanceTypes]);
 
   const selectedInstanceType = labels?.[DEFAULT_INSTANCETYPE_LABEL];

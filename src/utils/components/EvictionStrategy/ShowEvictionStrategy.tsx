@@ -1,21 +1,18 @@
-import React, { FC } from 'react';
+import React, { FC, memo } from 'react';
 
-import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
-
-import { EVICTION_STRATEGY_DEFAULT } from './constants';
+import useHCOEvictionStrategy from './useHCOEvictionStrategy';
 
 type ShowEvictionStrategyProps = {
+  cluster?: string;
   evictionStrategy: string;
 };
 
-const ShowEvictionStrategy: FC<ShowEvictionStrategyProps> = ({ evictionStrategy }) => {
-  const [hyperConverge, hyperLoaded, hyperLoadingError] = useHyperConvergeConfiguration();
+const ShowEvictionStrategy: FC<ShowEvictionStrategyProps> = ({ cluster, evictionStrategy }) => {
+  const HCOEvictionStrategy = useHCOEvictionStrategy(cluster);
 
   if (evictionStrategy) return <>{evictionStrategy}</>;
 
-  if (hyperLoaded && !hyperLoadingError && !hyperConverge) return <>{EVICTION_STRATEGY_DEFAULT}</>;
-
-  return <>{hyperConverge?.spec?.evictionStrategy}</>;
+  return <>{HCOEvictionStrategy}</>;
 };
 
-export default ShowEvictionStrategy;
+export default memo(ShowEvictionStrategy);
