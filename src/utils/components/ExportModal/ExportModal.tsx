@@ -20,7 +20,12 @@ import TabModal from '../TabModal/TabModal';
 
 import { ALREADY_CREATED_ERROR_CODE } from './constants';
 import ShowProgress from './ShowProgress';
-import { createServiceAccount, createUploaderPod, exportInProgress } from './utils';
+import {
+  createServiceAccount,
+  createUploaderPod,
+  exportInProgress,
+  exportSucceeded,
+} from './utils';
 import ViewPodLogLink from './ViewPodLogLink';
 
 import './export-modal.scss';
@@ -63,10 +68,15 @@ const ExportModal: FC<ExportModalProps> = ({
   );
 
   const uploadInProgress = exportInProgress(uploadPod || createdPod);
+  const isUploadSucceeded = exportSucceeded(uploadPod || createdPod);
 
   return (
     <TabModal
       onSubmit={async () => {
+        if (isUploadSucceeded) {
+          return onClose();
+        }
+
         const secretName = `registry-secret-${getRandomChars()}`;
 
         try {
@@ -94,7 +104,8 @@ const ExportModal: FC<ExportModalProps> = ({
       isLoading={uploadInProgress}
       isOpen={isOpen}
       onClose={onClose}
-      submitBtnText={t('Upload')}
+      shouldWrapInForm
+      submitBtnText={isUploadSucceeded ? t('Close') : t('Upload')}
     >
       <Stack className="kv-exportmodal" hasGutter>
         <Alert
@@ -108,6 +119,7 @@ const ExportModal: FC<ExportModalProps> = ({
           <FormGroup fieldId="registryName" isRequired label={t('Name')}>
             <TextInput
               id="registryName"
+              isDisabled={uploadInProgress}
               onChange={(_, value: string) => setRegistryName(value)}
               type="text"
               value={registryName}
@@ -118,6 +130,7 @@ const ExportModal: FC<ExportModalProps> = ({
           <FormGroup fieldId="destination" isRequired label={t('Destination')}>
             <TextInput
               id="destination"
+              isDisabled={uploadInProgress}
               onChange={(_, value: string) => setDestination(value)}
               type="text"
               value={destination}
@@ -128,6 +141,7 @@ const ExportModal: FC<ExportModalProps> = ({
           <FormGroup fieldId="username" isRequired label={t('Username')}>
             <TextInput
               id="username"
+              isDisabled={uploadInProgress}
               onChange={(_, value: string) => setUsername(value)}
               type="text"
               value={username}
@@ -138,6 +152,7 @@ const ExportModal: FC<ExportModalProps> = ({
           <FormGroup fieldId="password" isRequired label={t('Password')}>
             <TextInput
               id="password"
+              isDisabled={uploadInProgress}
               onChange={(_, value: string) => setPassword(value)}
               type="password"
               value={password}
