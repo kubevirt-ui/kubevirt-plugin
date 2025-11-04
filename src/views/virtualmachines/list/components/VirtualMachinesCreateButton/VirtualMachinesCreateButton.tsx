@@ -4,8 +4,9 @@ import { useNavigate } from 'react-router-dom-v5-compat';
 import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getVMListPath } from '@kubevirt-utils/resources/vm';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import { getCatalogURL, getVMListNamespacesURL } from '@multicluster/urls';
+import { getACMVMListURL, getCatalogURL } from '@multicluster/urls';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { ListPageCreateDropdown } from '@openshift-console/dynamic-plugin-sdk';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
@@ -23,7 +24,9 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
   const navigate = useNavigate();
   const [hubClusterName] = useHubClusterName();
   const isACMPage = useIsACMPage();
-  const cluster = useClusterParam();
+  const clusterParam = useClusterParam();
+  const cluster = clusterParam || hubClusterName;
+  const selectedNamespace = namespace || DEFAULT_NAMESPACE;
 
   const createItems = {
     instanceType: t('From InstanceType'),
@@ -33,8 +36,7 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
   };
 
   const catalogURL = useMemo(
-    () =>
-      getCatalogURL(isACMPage ? cluster || hubClusterName : null, namespace || DEFAULT_NAMESPACE),
+    () => getCatalogURL(isACMPage ? cluster : null, selectedNamespace),
     [namespace, cluster],
   );
 
@@ -47,7 +49,9 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
           return navigate(catalogURL);
         default:
           return navigate(
-            `${getVMListNamespacesURL(cluster, namespace || DEFAULT_NAMESPACE)}/~new`,
+            isACMPage
+              ? `${getACMVMListURL(cluster, selectedNamespace)}/~new`
+              : `${getVMListPath(selectedNamespace)}/~new`,
           );
       }
     },
