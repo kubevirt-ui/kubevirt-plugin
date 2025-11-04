@@ -19,7 +19,7 @@ import './checkups-storage-details-page.scss';
 const CheckupsStorageDetailsPage = () => {
   const { vmName } = useParams<{ vmName: string }>();
   const { t } = useKubevirtTranslation();
-  const { configMaps, error, jobs, loading } = useCheckupsStorageData();
+  const { configMaps, error, jobs, loaded } = useCheckupsStorageData();
   const [activeTabKey, setActiveTabKey] = useState<number>(0);
 
   const configMap = configMaps.find((cm) => cm.metadata.name === vmName);
@@ -51,7 +51,7 @@ const CheckupsStorageDetailsPage = () => {
               <Divider />
             </PageSection>
             <PageSection>
-              <CheckupsDetailsPageHistory error={error} jobs={jobMatches} loading={loading} />
+              <CheckupsDetailsPageHistory error={error} jobs={jobMatches} loaded={loaded} />
             </PageSection>
           </Tab>
           <Tab eventKey={1} title={<TabTitleText>{t('YAML')}</TabTitleText>}>

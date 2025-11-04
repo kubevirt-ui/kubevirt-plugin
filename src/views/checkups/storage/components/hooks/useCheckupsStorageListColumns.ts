@@ -7,7 +7,7 @@ import { sortable, SortByDirection } from '@patternfly/react-table';
 
 import {
   columnsSorting,
-  STATUS_COMPILATION_TIME_STAMP,
+  STATUS_COMPLETION_TIME_STAMP,
   STATUS_FAILURE_REASON,
   STATUS_START_TIME_STAMP,
   STATUS_SUCCEEDED,
@@ -62,7 +62,7 @@ const useCheckupsStorageListColumns = (): [
     {
       id: 'complete-time',
       sort: (data: IoK8sApiCoreV1ConfigMap[], sortDirection: SortByDirection) =>
-        columnsSorting(data, sortDirection, STATUS_COMPILATION_TIME_STAMP),
+        columnsSorting(data, sortDirection, STATUS_COMPLETION_TIME_STAMP),
       title: t('Completion time'),
       transforms: [sortable],
     },

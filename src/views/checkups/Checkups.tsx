@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, MouseEvent, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
 import { PageTitles } from '@kubevirt-utils/constants/page-constants';
@@ -7,8 +7,7 @@ import { DocumentTitle, ListPageHeader } from '@openshift-console/dynamic-plugin
 import { Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 import { createURL } from '@virtualmachines/details/tabs/overview/utils/utils';
 
-import CheckupsNetworkList from './network/list/CheckupsNetworkList';
-import CheckupsStorageList from './storage/list/CheckupsStorageList';
+import { getCheckUpTabs } from './utils/getCheckUpsTabs';
 import { trimLastHistoryPath } from './utils/utils';
 import CheckupsRunButton from './CheckupsRunButton';
 
@@ -18,15 +17,23 @@ const CheckupsList: FC = () => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const [activeTabKey, setActiveTabKey] = useState<number | string>(
-    location?.pathname.endsWith('storage') ? 1 : 0,
-  );
+
+  const tabs = useMemo(() => getCheckUpTabs(t), [t]);
+
+  const getInitialTabKey = () => {
+    const currentPath = location?.pathname;
+    const activeTab = tabs.find((tab) => currentPath.includes(`/${tab.url}`));
+    return activeTab?.eventKey ?? 0;
+  };
+
+  const [activeTabKey, setActiveTabKey] = useState<number | string>(getInitialTabKey);
 
   useEffect(() => {
-    navigate(
-      createURL(activeTabKey === 0 ? 'network' : 'storage', trimLastHistoryPath(location.pathname)),
-    );
-  }, [activeTabKey, location.pathname, navigate]);
+    const selectedTab = tabs.find((tab) => tab.eventKey === activeTabKey);
+    if (selectedTab) {
+      navigate(createURL(selectedTab.url, trimLastHistoryPath(location.pathname)));
+    }
+  }, [activeTabKey, tabs, navigate, location.pathname]);
 
   return (
     <>
@@ -35,18 +42,17 @@ const CheckupsList: FC = () => {
         <CheckupsRunButton />
       </ListPageHeader>
       <Tabs
-        onSelect={(_, tabIndex: number | string) => {
+        onSelect={(_: MouseEvent, tabIndex: number | string) => {
           setActiveTabKey(tabIndex);
         }}
         activeKey={activeTabKey}
         className="co-horizontal-nav"
       >
-        <Tab eventKey={0} title={<TabTitleText>{t('Network latency')}</TabTitleText>}>
-          <CheckupsNetworkList />
-        </Tab>
-        <Tab eventKey={1} title={<TabTitleText>{t('Storage')}</TabTitleText>}>
-          <CheckupsStorageList />
-        </Tab>
+        {tabs.map(({ component, eventKey, title }) => (
+          <Tab eventKey={eventKey} key={eventKey} title={<TabTitleText>{title}</TabTitleText>}>
+            {activeTabKey === eventKey && component}
+          </Tab>
+        ))}
       </Tabs>
     </>
   );

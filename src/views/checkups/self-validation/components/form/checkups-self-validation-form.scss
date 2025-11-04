@@ -1,0 +1,9 @@
+.CheckupsSelfValidationForm {
+  &--main {
+    padding: 20px;
+
+    .form-group-spacing {
+      margin-bottom: var(--pf-t--global--spacer--sm);
+    }
+  }
+}
