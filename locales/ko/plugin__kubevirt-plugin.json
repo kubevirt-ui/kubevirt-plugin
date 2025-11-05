@@ -390,6 +390,7 @@
   "CPUs": "CPU",
   "CPUs = sockets x threads x cores.": "CPU = 소켓 x 스레드 x 코어.",
   "Create": "만들기",
+  "Create {{kind}}": "Create {{kind}}",
   "create a bootable volume automatically by using pipelines": "파이프라인을 사용하여 자동으로 부팅 가능한 볼륨 생성",
   "Create a copy of the VirtualMachine from snapshot": "스냅샷에서 VirtualMachine 사본을 생성",
   "Create a disk with no contents.": "내용이 없는 디스크를 만듭니다.",

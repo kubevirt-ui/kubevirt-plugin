@@ -390,6 +390,7 @@
   "CPUs": "CPU",
   "CPUs = sockets x threads x cores.": "CPU = 插槽 x 线程 x 内核。",
   "Create": "创建",
+  "Create {{kind}}": "Create {{kind}}",
   "create a bootable volume automatically by using pipelines": "使用管道自动创建可引导卷",
   "Create a copy of the VirtualMachine from snapshot": "从快照创建 VirtualMachine 的副本",
   "Create a disk with no contents.": "创建一个没有内容的磁盘。",
