@@ -49,6 +49,7 @@ const MemoryDensity: FC<MemoryDensityProps> = ({ hyperConvergeConfiguration, new
   return (
     <ExpandSection searchItemId={CLUSTER_TAB_IDS.memoryDensity} toggleText={t('Memory density')}>
       <SectionWithSwitch
+        dataTestID="memory-density"
         helpTextIconContent={t('Configures the VM workloads to use swap for higher density')}
         id="memory-density-feature"
         isDisabled={!hyperLoaded || !isAdmin}

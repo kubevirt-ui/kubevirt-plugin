@@ -27,6 +27,7 @@ const VMActionsConfirmation: FC<VMActionsConfirmationProps> = ({ newBadge }) => 
       toggleText={t('VirtualMachine actions confirmation')}
     >
       <SectionWithSwitch
+        dataTestID="confirm-vm-actions"
         helpTextIconContent={t('Confirm requested VirtualMachine actions before executing them')}
         id="confirm-vm-actions"
         isDisabled={!isAdmin}

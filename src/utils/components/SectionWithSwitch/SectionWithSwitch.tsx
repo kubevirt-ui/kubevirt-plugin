@@ -10,6 +10,7 @@ import ExternalLink from '../ExternalLink/ExternalLink';
 import './section-with-switch.scss';
 
 type SectionWithSwitchProps = {
+  dataTestID?: string;
   externalLink?: string;
   helpTextIconContent?: ReactNode;
   id?: string;
@@ -26,6 +27,7 @@ type SectionWithSwitchProps = {
 
 const SectionWithSwitch: FC<SectionWithSwitchProps> = ({
   children,
+  dataTestID,
   externalLink,
   helpTextIconContent = '',
   id,
@@ -66,6 +68,7 @@ const SectionWithSwitch: FC<SectionWithSwitchProps> = ({
         {children}{' '}
         <Switch
           className={isLoading && 'kv-cursor--loading'}
+          data-test-id={dataTestID}
           isChecked={switchIsOn}
           isDisabled={isDisabled}
           onChange={(_, checked: boolean) => turnOnSwitch(checked)}
