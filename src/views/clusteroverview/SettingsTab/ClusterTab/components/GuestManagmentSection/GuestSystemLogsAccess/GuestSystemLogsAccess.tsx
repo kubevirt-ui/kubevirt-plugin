@@ -63,10 +63,10 @@ const GuestSystemLogsAccess: FC<GuestSystemLogsAccessProps> = ({
   return (
     <>
       <SectionWithSwitch
-        dataTestID="guest-system-log"
         helpTextIconContent={t(
           "Enables access to the VirtualMachine's guest system log. Wait a few seconds for logging to start before viewing the log.",
         )}
+        dataTestID="guest-system-log"
         isDisabled={!hyperLoaded}
         isLoading={isLoading}
         newBadge={newBadge}

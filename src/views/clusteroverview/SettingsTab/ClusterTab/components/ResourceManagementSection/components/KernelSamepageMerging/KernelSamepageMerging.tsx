@@ -60,10 +60,10 @@ const KernelSamepageMerging: FC<KernelSamepageMergingProps> = ({
   return (
     <>
       <SectionWithSwitch
-        dataTestID="kernel-samepage-merging"
         helpTextIconContent={t(
           'KSM is a memory-saving deduplication feature designed to fit more VirtualMachines into physical memory by sharing the data common between them. It is specifically effective for similar VirtualMachines. KSM should only be used with trusted workloads. Turning this feature on enables it for all nodes in the cluster.',
         )}
+        dataTestID="kernel-samepage-merging"
         isDisabled={!hyperLoaded}
         isLoading={isLoading}
         newBadge={newBadge}
