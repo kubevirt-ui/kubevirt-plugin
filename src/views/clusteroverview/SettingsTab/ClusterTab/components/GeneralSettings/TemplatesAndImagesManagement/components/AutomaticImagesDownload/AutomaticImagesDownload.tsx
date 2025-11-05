@@ -103,10 +103,10 @@ const AutomaticImagesDownload: FC<AutomaticImagesDownloadProps> = ({
               const name = getName(bootSource);
               return (
                 <SectionWithSwitch
-                  dataTestID={`${name}-auto-image-download-switch`}
                   switchIsOn={
                     bootSource.metadata.annotations[AUTOMATIC_IMAGE_DOWNLOAD_ANNOTATION] !== 'false'
                   }
+                  dataTestID={`${name}-auto-image-download-switch`}
                   id={`${name}-auto-image-download-switch`}
                   inlineCheckbox
                   isLoading={index === imageLoadingIndex}

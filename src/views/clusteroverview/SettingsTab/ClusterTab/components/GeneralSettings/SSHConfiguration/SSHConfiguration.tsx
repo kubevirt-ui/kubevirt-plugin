@@ -63,13 +63,13 @@ const SSHConfiguration: FC<SSHConfigurationProps> = ({ newBadge }) => {
     >
       <Stack hasGutter>
         <SectionWithSwitch
-          dataTestID="load-balancer"
           helpTextIconContent={t(
             'Enable the creation of LoadBalancer services for SSH connections to VirtualMachines. A load balancer must be configured',
           )}
           switchIsOn={
             featureConfigMap?.data?.[LOAD_BALANCER_ENABLED] === 'true' || hasMetalLBInstalled
           }
+          dataTestID="load-balancer"
           id="load-balancer-feature"
           isDisabled={!loaded || !isAdmin || hasMetalLBInstalled}
           isLoading={loadBalancerIsLoading}
@@ -78,7 +78,6 @@ const SSHConfiguration: FC<SSHConfigurationProps> = ({ newBadge }) => {
           turnOnSwitch={(checked) => onChange(checked.toString(), LOAD_BALANCER_ENABLED)}
         />
         <SectionWithSwitch
-          dataTestID="node-port"
           helpTextIconContent={t(
             'Allow the creation of NodePort services for SSH connections to VirtualMachines. An address of a publicly available Node must be provided.',
           )}
@@ -86,6 +85,7 @@ const SSHConfiguration: FC<SSHConfigurationProps> = ({ newBadge }) => {
             featureConfigMap?.data?.[NODE_PORT_ENABLED] === 'true' &&
             !isEmpty(featureConfigMap?.data?.[NODE_PORT_ADDRESS])
           }
+          dataTestID="node-port"
           id="node-port-feature"
           isDisabled={!loaded || !isAdmin || isEmpty(featureConfigMap?.data?.[NODE_PORT_ADDRESS])}
           isLoading={nodePortIsLoading}
