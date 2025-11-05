@@ -133,7 +133,8 @@
   },
   "lint-staged": {
     "*.{js,ts,tsx,jsx}": [
-      "eslint --fix"
+      "eslint --fix",
+      "prettier --write --ignore-unknown"
     ],
     "!(*.js|*.jsx|*.ts|*.tsx)": [
       "prettier --write --ignore-unknown"
