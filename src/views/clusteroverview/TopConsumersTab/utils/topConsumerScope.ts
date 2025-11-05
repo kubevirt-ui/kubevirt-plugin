@@ -44,7 +44,12 @@ export class TopConsumerScope extends TopConsumerScopeObjectEnum<string> {
 
   static fromString = (source: string): TopConsumerScope => TopConsumerScope.stringMapper[source];
 
-  static getAll = () => TopConsumerScope.all;
+  static getAll = (isAllNamespaces?: boolean) => {
+    if (isAllNamespaces || isAllNamespaces === undefined) {
+      return TopConsumerScope.all;
+    }
+    return [TopConsumerScope.VM, TopConsumerScope.NODE];
+  };
 
   private static readonly stringMapper = TopConsumerScope.all.reduce(
     (accumulator, scope: TopConsumerScope) => ({
