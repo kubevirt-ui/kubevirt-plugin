@@ -37,6 +37,7 @@ const AutoComputeCPULimits: FC<AutoComputeCPULimitsProps> = ({
   return (
     <>
       <SectionWithSwitch
+        dataTestID="auto-compute"
         isDisabled={!hcoLoaded}
         isLoading={isLoading}
         newBadge={newBadge}

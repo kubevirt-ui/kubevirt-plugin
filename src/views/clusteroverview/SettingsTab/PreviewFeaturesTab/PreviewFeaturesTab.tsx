@@ -34,9 +34,9 @@ const PreviewFeaturesTab: FC = () => {
         {features.map((feature) => (
           <StackItem isFilled key={feature.id}>
             <SectionWithSwitch
+              dataTestID={feature.id}
               externalLink={feature.externalLink}
               helpTextIconContent={feature?.helpPopoverContent}
-              id={feature.id}
               isDisabled={!feature.canEdit}
               isLoading={feature.loading}
               maxWidth="350px"
