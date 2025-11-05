@@ -132,6 +132,9 @@
     "npm": "^9.5.0 || >=10.5.2"
   },
   "lint-staged": {
+    "src/**/*.{js,ts,tsx,jsx,json}": [
+      "yarn i18n"
+    ],
     "*.{js,ts,tsx,jsx}": [
       "eslint --fix"
     ],
