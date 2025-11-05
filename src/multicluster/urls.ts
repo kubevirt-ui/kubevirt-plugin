@@ -77,21 +77,19 @@ export const getVMListNamespacesURL = (cluster: string, namespace: string): stri
         model: VirtualMachineModel,
       });
 
-export const getFleetResourceRoute: ResourceRouteHandler = ({
+export const getFleetNamespacedResourceRoute: ResourceRouteHandler = ({
   cluster,
   model,
   name,
   namespace,
 }) => {
   const { group, kind, version } = model;
-  switch (kind) {
-    case 'VirtualMachine':
-      return `/k8s/cluster/${cluster}/ns/${namespace}/${group}~${version}~VirtualMachine/${name}`;
-    case 'VirtualMachineClusterInstancetype':
-      return `/k8s/cluster/${cluster}/${group}~${version}~${kind}/${name}`;
-    case 'VirtualMachineInstancetype':
-      return `/k8s/cluster/${cluster}/ns/${namespace}/${group}~${version}~${kind}/${name}`;
-    default:
-      return null;
-  }
+
+  return `/k8s/cluster/${cluster}/ns/${namespace}/${group}~${version}~${kind}/${name}`;
+};
+
+export const getFleetClusterResourceRoute: ResourceRouteHandler = ({ cluster, model, name }) => {
+  const { group, kind, version } = model;
+
+  return `/k8s/cluster/${cluster}/${group}~${version}~${kind}/${name}`;
 };
