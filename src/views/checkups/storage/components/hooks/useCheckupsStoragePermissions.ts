@@ -14,8 +14,11 @@ import {
   IoK8sApiRbacV1ClusterRoleBinding,
 } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
+import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
+import useListClusters from '@kubevirt-utils/hooks/useListClusters';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { useActiveNamespace, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
+import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import {
   STORAGE_CHECKUP_ROLE,
@@ -25,39 +28,46 @@ import {
 
 export const useCheckupsStoragePermissions = () => {
   const [namespace] = useActiveNamespace();
+  const selectedClusters = useListClusters();
+  const [hubClusterName] = useHubClusterName();
+  const cluster = selectedClusters?.[0] || hubClusterName;
   const isAllNamespace = namespace === ALL_NAMESPACES_SESSION_KEY;
 
-  const [serviceAccounts, loadingServiceAccounts] = useK8sWatchResource<
+  const [serviceAccounts, loadingServiceAccounts] = useKubevirtWatchResource<
     IoK8sApiCoreV1ServiceAccount[]
   >(
     !isAllNamespace && {
+      cluster,
       groupVersionKind: modelToGroupVersionKind(ServiceAccountModel),
       isList: true,
       namespace,
     },
   );
 
-  const [roles, loadingRoles] = useK8sWatchResource<IoK8sApiRbacV1ClusterRole[]>(
+  const [roles, loadingRoles] = useKubevirtWatchResource<IoK8sApiRbacV1ClusterRole[]>(
     !isAllNamespace && {
+      cluster,
       groupVersionKind: modelToGroupVersionKind(RoleModel),
       isList: true,
       namespace,
     },
   );
 
-  const [clusterRoleBinding, loadedClusterRoleBinding] = useK8sWatchResource<
+  const [clusterRoleBinding, loadedClusterRoleBinding] = useKubevirtWatchResource<
     IoK8sApiRbacV1ClusterRoleBinding[]
   >(
     !isAllNamespace && {
+      cluster,
       groupVersionKind: modelToGroupVersionKind(ClusterRoleBindingModel),
       isList: true,
     },
   );
 
-  const [roleBinding, loadingRolesBinding] = useK8sWatchResource<
+  const [roleBinding, loadingRolesBinding] = useKubevirtWatchResource<
     IoK8sApiRbacV1ClusterRoleBinding[]
   >(
     !isAllNamespace && {
+      cluster,
       groupVersionKind: modelToGroupVersionKind(RoleBindingModel),
       isList: true,
       namespace,
