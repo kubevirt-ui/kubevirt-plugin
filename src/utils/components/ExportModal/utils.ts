@@ -133,4 +133,8 @@ export const createUploaderPod: CreateUploaderPodType = ({
 export const exportFailed = (pod: IoK8sApiCoreV1Pod) =>
   [UPLOAD_STATUSES.FAILED, UPLOAD_STATUSES.UNKNOWN].includes(pod?.status?.phase as UPLOAD_STATUSES);
 
-export const exportInProgress = (pod: IoK8sApiCoreV1Pod) => !isEmpty(pod) && !exportFailed(pod);
+export const exportSucceeded = (pod: IoK8sApiCoreV1Pod) =>
+  [UPLOAD_STATUSES.SUCCEEDED].includes(pod?.status?.phase as UPLOAD_STATUSES);
+
+export const exportInProgress = (pod: IoK8sApiCoreV1Pod) =>
+  !isEmpty(pod) && !exportFailed(pod) && !exportSucceeded(pod);
