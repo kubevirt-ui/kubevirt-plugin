@@ -86,6 +86,7 @@ const AutomaticImagesDownload: FC<AutomaticImagesDownloadProps> = ({
     >
       <Stack hasGutter>
         <SectionWithSwitch
+          dataTestID="auto-image-download"
           helpTextIconContent={t('Enable automatic images download and update')}
           id="auto-image-download"
           isDisabled={!loaded || !isAdmin}
@@ -105,6 +106,7 @@ const AutomaticImagesDownload: FC<AutomaticImagesDownloadProps> = ({
                   switchIsOn={
                     bootSource.metadata.annotations[AUTOMATIC_IMAGE_DOWNLOAD_ANNOTATION] !== 'false'
                   }
+                  dataTestID={`${name}-auto-image-download-switch`}
                   id={`${name}-auto-image-download-switch`}
                   inlineCheckbox
                   isLoading={index === imageLoadingIndex}

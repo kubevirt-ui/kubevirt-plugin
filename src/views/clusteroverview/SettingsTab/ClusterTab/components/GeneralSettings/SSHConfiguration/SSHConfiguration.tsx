@@ -69,6 +69,7 @@ const SSHConfiguration: FC<SSHConfigurationProps> = ({ newBadge }) => {
           switchIsOn={
             featureConfigMap?.data?.[LOAD_BALANCER_ENABLED] === 'true' || hasMetalLBInstalled
           }
+          dataTestID="load-balancer"
           id="load-balancer-feature"
           isDisabled={!loaded || !isAdmin || hasMetalLBInstalled}
           isLoading={loadBalancerIsLoading}
@@ -84,6 +85,7 @@ const SSHConfiguration: FC<SSHConfigurationProps> = ({ newBadge }) => {
             featureConfigMap?.data?.[NODE_PORT_ENABLED] === 'true' &&
             !isEmpty(featureConfigMap?.data?.[NODE_PORT_ADDRESS])
           }
+          dataTestID="node-port"
           id="node-port-feature"
           isDisabled={!loaded || !isAdmin || isEmpty(featureConfigMap?.data?.[NODE_PORT_ADDRESS])}
           isLoading={nodePortIsLoading}
