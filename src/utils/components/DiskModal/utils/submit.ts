@@ -136,7 +136,7 @@ export const submit = async ({ data, editDiskName, onSubmit, pvc, vm }: SubmitIn
 
   const isInitialBootDisk = getBootDisk(vm)?.name === editDiskName;
 
-  if (data.volume.dataVolume) {
+  if (isCreatingDisk && data.volume.dataVolume && data.dataVolumeTemplate?.metadata) {
     const newDataVolumeName = createDataVolumeName(vm, data.disk.name);
     data.volume.dataVolume.name = newDataVolumeName;
     data.dataVolumeTemplate.metadata.name = newDataVolumeName;
