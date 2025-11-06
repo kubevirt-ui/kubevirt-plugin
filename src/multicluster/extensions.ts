@@ -23,6 +23,7 @@ export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
   VirtualMachineSearchResults: './views/virtualmachines/search/VirtualMachineSearchResults.tsx',
 };
 
+const DATA_VOLUME_PATH = 'cdi.kubevirt.io~v1beta1~DataVolume';
 const CLUSTER_INSTANCETYPE_PATH =
   'instancetype.kubevirt.io~v1beta1~VirtualMachineClusterInstancetype';
 const INSTANCETYPE_PATH = 'instancetype.kubevirt.io~v1beta1~VirtualMachineInstancetype';
@@ -279,6 +280,15 @@ export const extensions: EncodedExtension[] = [
         $codeRef: 'MulticlusterYAMLCreation',
       },
       path: [`/k8s/cluster/:cluster/${MIGRATION_POLICY_PATH}/~new`],
+    },
+    type: 'console.page/route',
+  } as EncodedExtension<RoutePage>,
+  {
+    properties: {
+      component: {
+        $codeRef: 'MulticlusterYAMLCreation',
+      },
+      path: [`/k8s/cluster/:cluster/ns/:ns/${DATA_VOLUME_PATH}/~new`],
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
