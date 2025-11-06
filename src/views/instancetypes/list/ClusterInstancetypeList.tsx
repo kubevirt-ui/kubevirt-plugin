@@ -9,6 +9,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import { ListPageProps } from '@kubevirt-utils/utils/types';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import {
   ListPageBody,
   useListPageFilter,
@@ -35,7 +36,12 @@ const ClusterInstancetypeList: FC<ListPageProps> = ({
   const { onPaginationChange, pagination } = usePagination();
 
   const clusterFilter = useClusterFilter();
-  const filtersWithSelect = useMemo(() => [clusterFilter], [clusterFilter]);
+  const isACMPage = useIsACMPage();
+
+  const filtersWithSelect = useMemo(
+    () => (isACMPage ? [clusterFilter] : []),
+    [clusterFilter, isACMPage],
+  );
   const [unfilteredData, data, onFilterChange] = useListPageFilter(
     instanceTypes,
     filtersWithSelect,
