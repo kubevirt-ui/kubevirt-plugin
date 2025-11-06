@@ -119,10 +119,10 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
 
   const [pagination, setPagination] = useState(paginationInitialState);
 
-  const [unfilterData, dataFilters, onFilterChange] = useListPageFilter<
-    V1VirtualMachine,
-    V1VirtualMachine
-  >(vms, [...filters, ...searchFilters]);
+  const [__, filteredData, onFilterChange] = useListPageFilter<V1VirtualMachine, V1VirtualMachine>(
+    vms,
+    [...filters, ...searchFilters],
+  );
 
   // Allow using folder filters from the tree view
   useImperativeHandle(
@@ -135,10 +135,10 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
 
   const selectedFilters = useSelectedFilters(filters, searchFilters);
 
-  const [unfilteredData, data] = useMemo(() => {
-    if (!featureEnabled || isProxyPodAlive === false) return [unfilterData, dataFilters];
+  const filteredVMs = useMemo(() => {
+    if (!featureEnabled || isProxyPodAlive === false) return filteredData;
 
-    const matchedVMS = vms?.filter(
+    const matchedVMS = filteredData?.filter(
       ({ metadata: { name, namespace: ns }, status: { printableStatus = '' } = {} }) => {
         return (
           vmiMapper?.mapper?.[ns]?.[name] ||
@@ -146,8 +146,8 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
         );
       },
     );
-    return [matchedVMS, matchedVMS];
-  }, [featureEnabled, isProxyPodAlive, unfilterData, dataFilters, vms, vmiMapper?.mapper, query]);
+    return matchedVMS;
+  }, [featureEnabled, isProxyPodAlive, filteredData, vmiMapper?.mapper, query]);
 
   const onPageChange = ({ endIndex, page, perPage, startIndex }) => {
     setPagination(() => ({
@@ -161,16 +161,16 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
   const [columns, activeColumns, loadedColumns] = useVirtualMachineColumns(
     namespace,
     pagination,
-    data,
+    filteredVMs,
   );
 
   const loaded = vmLoaded && vmiLoaded && vmimsLoaded && !loadingFeatureProxy && loadedColumns;
 
   const vmsFilteredWithProxy = isProxyPodAlive && selectedFilters.length > 0;
 
-  const noVMs = isEmpty(unfilteredData) && !vmsFilteredWithProxy;
+  const noVMs = isEmpty(vms) && !vmsFilteredWithProxy;
 
-  const allVMsSelected = data?.length === selectedVMs.value.length;
+  const allVMsSelected = filteredVMs?.length === selectedVMs.value.length;
 
   if (loaded && noVMs) {
     return (
@@ -178,7 +178,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
         <VirtualMachineListSummary
           namespace={namespace}
           onFilterChange={onFilterChange}
-          vms={data}
+          vms={vms}
         />
         <VirtualMachineEmptyState catalogURL={catalogURL} namespace={namespace} />
       </>
@@ -188,12 +188,16 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
   return (
     /* All of this table and components should be replaced to our own fitted components */
     <>
-      <VirtualMachineListSummary namespace={namespace} onFilterChange={onFilterChange} vms={data} />
+      <VirtualMachineListSummary
+        namespace={namespace}
+        onFilterChange={onFilterChange}
+        vms={filteredVMs}
+      />
       <div className="vm-list-page-header">
         <ListPageHeader title={t('VirtualMachines')}>
           <Flex>
             <FlexItem>
-              <VirtualMachineBulkActionButton vms={data} />
+              <VirtualMachineBulkActionButton vms={filteredVMs} />
             </FlexItem>
             <FlexItem>
               <VirtualMachinesCreateButton namespace={namespace} />
@@ -224,12 +228,12 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
                   startIndex: 0,
                 }));
               }}
-              data={unfilteredData}
+              data={vms}
               loaded={loaded}
               rowFilters={filters}
               searchFilters={searchFilters}
             />
-            {!isEmpty(dataFilters) && (
+            {!isEmpty(filteredData) && (
               <Pagination
                 onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
                   onPageChange({ endIndex, page, perPage, startIndex })
@@ -239,7 +243,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
                 }
                 className="list-managment-group__pagination"
                 isLastFullPageShown
-                itemCount={data?.length}
+                itemCount={filteredVMs?.length}
                 page={pagination?.page}
                 perPage={pagination?.perPage}
                 perPageOptions={paginationDefaultValues}
@@ -251,7 +255,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
               <div className="pf-u-text-align-center">{t('No VirtualMachines found')}</div>
             )}
             onSelect={(_, selected, index) => {
-              if (index === -1) allVMsSelected ? deselectAll() : selectAll(data);
+              if (index === -1) allVMsSelected ? deselectAll() : selectAll(filteredVMs);
             }}
             rowData={{
               getVmi: (ns: string, name: string) => vmiMapper?.mapper?.[ns]?.[name],
@@ -260,11 +264,11 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
             }}
             allRowsSelected={allVMsSelected}
             columns={activeColumns}
-            data={data}
+            data={filteredVMs}
             loaded={loaded}
             loadError={loadError}
             Row={VirtualMachineRow}
-            unfilteredData={unfilteredData}
+            unfilteredData={vms}
           />
         </div>
       </ListPageBody>
