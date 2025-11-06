@@ -4,8 +4,9 @@ import { IoK8sApiRbacV1ClusterRoleBinding } from '@kubevirt-ui/kubevirt-api/kube
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
+import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import {
   Button,
   ButtonVariant,
@@ -35,7 +36,8 @@ const CheckupsStorageListEmptyState: FC<CheckupsStorageListEmptyStateProps> = ({
   loadingPermissions,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [namespace] = useActiveNamespace();
+  const namespace = useActiveNamespace();
+  const cluster = useClusterParam();
   const [isLoading, setIsLoading] = useState<boolean>();
 
   return (
@@ -64,6 +66,7 @@ const CheckupsStorageListEmptyState: FC<CheckupsStorageListEmptyStateProps> = ({
               try {
                 await installOrRemoveCheckupsStoragePermissions(
                   namespace,
+                  cluster,
                   isPermitted,
                   clusterRoleBinding,
                 );

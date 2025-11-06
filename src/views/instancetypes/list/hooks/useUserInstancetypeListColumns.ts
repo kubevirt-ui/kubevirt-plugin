@@ -3,13 +3,14 @@ import { useCallback } from 'react';
 import { VirtualMachineInstancetypeModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1VirtualMachineInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
+import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
 import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
 import { columnSorting } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useIsACMPage from '@multicluster/useIsACMPage';
-import { TableColumn, useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
+import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 import { sortable } from '@patternfly/react-table';
 
 import { sortInstanceTypeByMemory } from './utils';
@@ -29,7 +30,7 @@ const useUserInstancetypeListColumns: UseUserInstancetypeListColumns = (paginati
   const { t } = useKubevirtTranslation();
   const isACMPage = useIsACMPage();
   const cluster = useClusterParam();
-  const [activeNamespace] = useActiveNamespace();
+  const activeNamespace = useActiveNamespace();
 
   const sorting = useCallback(
     (direction, path) => columnSorting(data, direction, pagination, path),

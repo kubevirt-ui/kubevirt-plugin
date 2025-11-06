@@ -1,14 +1,15 @@
 import React, { FC, useMemo } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
+import { useNavigate } from 'react-router-dom-v5-compat';
 
-import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
+import useListClusters from '@kubevirt-utils/hooks/useListClusters';
+import useListNamespaces from '@kubevirt-utils/hooks/useListNamespaces';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { Button, ButtonVariant, Tooltip } from '@patternfly/react-core';
-import { createURL } from '@virtualmachines/details/tabs/overview/utils/utils';
+import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import { CHECKUP_URLS } from '../../utils/constants';
-import { trimLastHistoryPath } from '../../utils/utils';
 
 import {
   getActionState,
@@ -19,9 +20,15 @@ import { useAllRunningSelfValidationJobs } from './hooks/useAllRunningSelfValida
 import useCheckupsSelfValidationPermissions from './hooks/useCheckupsSelfValidationPermissions';
 
 const SelfValidationCheckupRunButton: FC = () => {
-  const [namespace] = useActiveNamespace();
   const navigate = useNavigate();
-  const location = useLocation();
+  const isACMpage = useIsACMPage();
+  const [hubClusterName] = useHubClusterName();
+  const clusterParam = useListClusters();
+  const namespaces = useListNamespaces();
+  const namespace = namespaces?.[0];
+
+  const cluster = clusterParam?.[0] || hubClusterName;
+
   const { t } = useKubevirtTranslation();
 
   const { isPermitted: isCreateSelfValidationPermitted } = useCheckupsSelfValidationPermissions();
@@ -42,7 +49,7 @@ const SelfValidationCheckupRunButton: FC = () => {
   );
 
   const isDisabled = useMemo(() => {
-    if (ALL_NAMESPACES_SESSION_KEY === namespace) {
+    if (isEmpty(namespace)) {
       return true;
     }
     if (!jobsLoaded || jobsError) {
@@ -52,10 +59,15 @@ const SelfValidationCheckupRunButton: FC = () => {
   }, [namespace, selfValidationActionState, jobsLoaded, jobsError]);
 
   const handleRunCheckup = () => {
-    if (isDisabled || !selfValidationActionState?.isEnabled) return;
+    if (!namespace || isDisabled || !selfValidationActionState?.isEnabled) return;
 
-    const basePath = trimLastHistoryPath(location.pathname);
-    navigate(createURL(`${CHECKUP_URLS.SELF_VALIDATION}/form`, basePath));
+    if (isACMpage) {
+      navigate(
+        `/k8s/cluster/${cluster}/ns/${namespace}/checkups/${CHECKUP_URLS.SELF_VALIDATION}/form`,
+      );
+    } else {
+      navigate(`/k8s/ns/${namespace}/checkups/${CHECKUP_URLS.SELF_VALIDATION}/form`);
+    }
   };
 
   const showTooltip =
@@ -79,6 +91,7 @@ const SelfValidationCheckupRunButton: FC = () => {
       <Tooltip
         content={
           <RunningCheckupWarningDescription
+            configMapCluster={selfValidationActionState.configMapInfo.cluster}
             configMapName={selfValidationActionState.configMapInfo.name}
             configMapNamespace={selfValidationActionState.configMapInfo.namespace}
           />

@@ -3,15 +3,14 @@ import React from 'react';
 import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import useNADsData from '@kubevirt-utils/components/NetworkInterfaceModal/components/hooks/useNADsData';
+import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
+import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import {
-  ListPageBody,
-  useActiveNamespace,
-  VirtualizedTable,
-} from '@openshift-console/dynamic-plugin-sdk';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import { ListPageBody, VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination } from '@patternfly/react-core';
 
 import { getJobByName } from '../../utils/utils';
@@ -28,9 +27,11 @@ import '@kubevirt-utils/styles/list-managment-group.scss';
 const CheckupsNetworkList = () => {
   const { t } = useKubevirtTranslation();
   const [columns, activeColumns, loadedColumns] = useCheckupsNetworkCheckupsListColumns();
-  const [namespace] = useActiveNamespace();
+  const namespace = useActiveNamespace();
+  const validNamespace = namespace === ALL_NAMESPACES_SESSION_KEY ? null : namespace;
+  const cluster = useClusterParam();
 
-  const { nads } = useNADsData(namespace);
+  const { nads } = useNADsData(validNamespace, cluster);
   const { isPermitted, loading: loadingPermissions } = useCheckupsNetworkPermissions();
   const { configMaps, error, jobs, loaded } = useCheckupsNetworkData();
 

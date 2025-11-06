@@ -35,7 +35,9 @@ const MigrationPolicyCreateForm: FC = (): JSX.Element => {
   return (
     <div className="migration-policy__form kv-m-pane__form">
       <DocumentTitle>{t('Create MigrationPolicy')}</DocumentTitle>
-      {isACMPage && <ClusterProjectDropdown showProjectDropdown={false} />}
+      {isACMPage && (
+        <ClusterProjectDropdown includeAllClusters={false} showProjectDropdown={false} />
+      )}
       <MigrationPolicyCreateFormHeader />
       <Form className="migration-policy__form-body">
         <FormGroup fieldId="create-description">

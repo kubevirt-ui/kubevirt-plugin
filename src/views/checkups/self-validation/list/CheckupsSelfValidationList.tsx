@@ -1,15 +1,12 @@
 import React, { FC, useCallback, useMemo } from 'react';
 
 import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import {
-  ListPageBody,
-  ListPageFilter,
-  VirtualizedTable,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { ListPageBody, VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination } from '@patternfly/react-core';
 import { SortByDirection } from '@patternfly/react-table';
 

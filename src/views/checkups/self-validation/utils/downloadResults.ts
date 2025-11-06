@@ -5,7 +5,8 @@ import { saveAs } from 'file-saver';
 import { ConfigMapModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import { k8sGet, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sGet, kubevirtK8sPatch } from '@multicluster/k8sRequests';
 
 import { CONFIGMAP_NAME, extractConfigMapBaseName } from '../../utils/utils';
 
@@ -80,6 +81,7 @@ const getDetailedResultsData = (configMap: IoK8sApiCoreV1ConfigMap): DetailedRes
 const waitForDetailedResultsConfigMap = async (
   resultsConfigMapName: string,
   namespace: string,
+  cluster: string,
   timeoutMs: number = DEFAULT_DOWNLOAD_TIMEOUT_MS,
   pollIntervalMs: number = DEFAULT_POLL_INTERVAL_MS,
 ): Promise<IoK8sApiCoreV1ConfigMap | null> => {
@@ -87,7 +89,8 @@ const waitForDetailedResultsConfigMap = async (
 
   while (Date.now() - startTime < timeoutMs) {
     try {
-      const resultsConfigMap = await k8sGet({
+      const resultsConfigMap = await kubevirtK8sGet({
+        cluster,
         model: ConfigMapModel,
         name: resultsConfigMapName,
         ns: namespace,
@@ -222,7 +225,8 @@ const tryDownloadExistingResults = async (
 
   // Health check failed (non-certificate error), remove stale data from configmap
   try {
-    await k8sPatch({
+    await kubevirtK8sPatch({
+      cluster: getCluster(resultsConfigMap),
       data: [
         {
           op: 'remove',
@@ -259,6 +263,7 @@ const createAndWaitForResults = async (
   const configMap = await waitForDetailedResultsConfigMap(
     resultsConfigMapName,
     validatedParams.namespace,
+    validatedParams.cluster,
     DEFAULT_DOWNLOAD_TIMEOUT_MS,
   );
 
@@ -274,9 +279,11 @@ const createAndWaitForResults = async (
 const getResultsConfigMap = async (
   resultsConfigMapName: string,
   namespace: string,
+  cluster: string,
 ): Promise<IoK8sApiCoreV1ConfigMap | null> => {
   try {
-    return await k8sGet({
+    return await kubevirtK8sGet({
+      cluster,
       model: ConfigMapModel,
       name: resultsConfigMapName,
       ns: namespace,
@@ -320,6 +327,8 @@ const validateJobAndGetConfigMapName = (
 const validateJobParametersForResults = (
   job: IoK8sApiBatchV1Job,
 ): { error: boolean } | ValidatedJobParameters => {
+  const cluster = getCluster(job);
+
   const namespace = job?.metadata?.namespace;
   if (!namespace) {
     kubevirtConsole.error(`Job namespace is required: ${job}`);
@@ -384,6 +393,7 @@ const validateJobParametersForResults = (
   return {
     baseName,
     checkupImage,
+    cluster,
     isDryRun,
     namespace,
     originalJobName,
@@ -452,7 +462,7 @@ export const downloadResults = async (
 
   try {
     // Try to get existing ConfigMap
-    const resultsConfigMap = await getResultsConfigMap(configMapName, namespace);
+    const resultsConfigMap = await getResultsConfigMap(configMapName, namespace, getCluster(job));
 
     // Process existing results if found
     if (resultsConfigMap) {

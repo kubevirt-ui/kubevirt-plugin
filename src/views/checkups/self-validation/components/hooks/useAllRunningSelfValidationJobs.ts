@@ -1,7 +1,9 @@
 import { useMemo } from 'react';
 
 import { IoK8sApiBatchV1Job } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { Operator, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import { Operator } from '@openshift-console/dynamic-plugin-sdk';
 
 import { createJobWatchConfig } from '../../../utils/utils';
 import {
@@ -19,18 +21,20 @@ export const useAllRunningSelfValidationJobs = (): [
   loaded: boolean,
   error: Error,
 ] => {
+  const cluster = useClusterParam();
+
   const jobWatchConfig = useMemo(
     () =>
-      createJobWatchConfig(SELF_VALIDATION_LABEL_VALUE, undefined, [
+      createJobWatchConfig(SELF_VALIDATION_LABEL_VALUE, undefined, cluster, [
         {
           key: SELF_VALIDATION_RESULTS_ONLY_LABEL,
           operator: Operator.DoesNotExist,
         },
       ]),
-    [],
+    [cluster],
   );
 
-  const [jobs, loaded, error] = useK8sWatchResource<IoK8sApiBatchV1Job[]>(jobWatchConfig);
+  const [jobs, loaded, error] = useKubevirtWatchResource<IoK8sApiBatchV1Job[]>(jobWatchConfig);
 
   const runningJobs = useMemo(() => {
     if (!jobs || !Array.isArray(jobs)) {

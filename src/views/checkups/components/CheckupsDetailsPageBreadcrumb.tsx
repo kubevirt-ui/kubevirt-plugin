@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
+import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { Breadcrumb, BreadcrumbItem, Button, ButtonVariant } from '@patternfly/react-core';
 
 import { CHECKUP_URLS } from '../utils/constants';
@@ -18,11 +18,7 @@ const CheckupsDetailsPageBreadcrumb: FC<CheckupsDetailsPageBreadcrumbProps> = ({
   parentLabel,
 }) => {
   const navigate = useNavigate();
-  const [namespace] = useActiveNamespace();
-
-  if (!namespace) {
-    return null;
-  }
+  const namespace = useActiveNamespace();
 
   return (
     <Breadcrumb>

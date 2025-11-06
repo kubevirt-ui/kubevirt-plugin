@@ -2,6 +2,8 @@ import React, { FC, useCallback } from 'react';
 import { useParams } from 'react-router-dom-v5-compat';
 
 import { IoK8sApiBatchV1Job } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { Divider, PageSection } from '@patternfly/react-core';
 import { SortByDirection } from '@patternfly/react-table';
 
@@ -27,8 +29,9 @@ const CheckupsSelfValidationDetailsTab: FC = () => {
     isLoading: isLoadingResults,
     results,
   } = useJobResults({
+    cluster: getCluster(configMap),
     job: currentJob,
-    namespace: configMap?.metadata?.namespace || '',
+    namespace: getNamespace(configMap) || '',
   });
 
   const isJobRunning = currentJob && !currentJob.status?.succeeded && !currentJob.status?.failed;
@@ -42,9 +45,10 @@ const CheckupsSelfValidationDetailsTab: FC = () => {
     loading: isProgressLoading,
     progress,
   } = useProgressTracking({
+    cluster: getCluster(configMap),
     enabled: isJobRunning,
     job: currentJob,
-    namespace: configMap?.metadata?.namespace || '',
+    namespace: getNamespace(configMap) || '',
   });
 
   const renderCustomActions = useCallback(

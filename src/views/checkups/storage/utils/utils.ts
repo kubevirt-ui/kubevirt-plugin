@@ -12,7 +12,8 @@ import {
   IoK8sApiRbacV1ClusterRoleBinding,
 } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import { k8sCreate, k8sDelete, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sCreate, kubevirtK8sDelete, kubevirtK8sPatch } from '@multicluster/k8sRequests';
 
 import {
   CONFIGMAP_NAME,
@@ -155,16 +156,19 @@ const storageCheckupJob = (
 
 export const createStorageCheckup = async (
   namespace: string,
+  cluster: string,
   timeOut: string,
   name: string,
   checkupImage: string,
 ): Promise<IoK8sApiBatchV1Job> => {
-  await k8sCreate({
+  await kubevirtK8sCreate({
+    cluster,
     data: storageCheckupConfigMap(namespace, timeOut, name),
     model: ConfigMapModel,
   });
 
-  return k8sCreate({
+  return kubevirtK8sCreate({
+    cluster,
     data: storageCheckupJob(name, namespace, checkupImage),
     model: JobModel,
   });
@@ -172,22 +176,33 @@ export const createStorageCheckup = async (
 
 const installPermissions = async (
   namespace: string,
+  cluster: string,
   clusterRoleBinding: IoK8sApiRbacV1ClusterRoleBinding,
 ): Promise<void> => {
   await Promise.allSettled([
-    k8sCreate({ data: serviceAccountResource(namespace), model: ServiceAccountModel }),
-    k8sCreate({ data: storageCheckupRole(namespace), model: RoleModel }),
+    kubevirtK8sCreate({
+      cluster,
+      data: serviceAccountResource(namespace),
+      model: ServiceAccountModel,
+    }),
+    kubevirtK8sCreate({ cluster, data: storageCheckupRole(namespace), model: RoleModel }),
   ]);
-  await k8sCreate({ data: storageCheckupRoleBinding(namespace), model: RoleBindingModel });
+  await kubevirtK8sCreate({
+    cluster,
+    data: storageCheckupRoleBinding(namespace),
+    model: RoleBindingModel,
+  });
   try {
-    await k8sCreate({
+    await kubevirtK8sCreate({
+      cluster,
       data: storageClusterRoleBinding(namespace),
       model: ClusterRoleBindingModel,
     });
   } catch (e) {
     const subjectsExist = clusterRoleBinding?.subjects;
     try {
-      await k8sPatch({
+      await kubevirtK8sPatch({
+        cluster,
         data: [
           {
             op: 'add',
@@ -208,15 +223,25 @@ const installPermissions = async (
 
 const removePermissions = async (
   namespace: string,
+  cluster: string,
   clusterRoleBinding: IoK8sApiRbacV1ClusterRoleBinding,
 ): Promise<void> => {
   try {
     await Promise.allSettled([
-      k8sDelete({ model: ServiceAccountModel, resource: serviceAccountResource(namespace) }),
-      k8sDelete({ model: RoleModel, resource: storageCheckupRole(namespace) }),
+      kubevirtK8sDelete({
+        cluster,
+        model: ServiceAccountModel,
+        resource: serviceAccountResource(namespace),
+      }),
+      kubevirtK8sDelete({ cluster, model: RoleModel, resource: storageCheckupRole(namespace) }),
     ]);
-    await k8sDelete({ model: RoleBindingModel, resource: storageCheckupRoleBinding(namespace) });
-    await k8sPatch({
+    await kubevirtK8sDelete({
+      cluster,
+      model: RoleBindingModel,
+      resource: storageCheckupRoleBinding(namespace),
+    });
+    await kubevirtK8sPatch({
+      cluster,
       data: [
         {
           op: 'replace',
@@ -236,13 +261,14 @@ const removePermissions = async (
 
 export const installOrRemoveCheckupsStoragePermissions = (
   namespace: string,
+  cluster: string,
   isPermitted: boolean,
   clusterRoleBinding: IoK8sApiRbacV1ClusterRoleBinding,
 ): Promise<void> => {
   try {
     return isPermitted
-      ? removePermissions(namespace, clusterRoleBinding)
-      : installPermissions(namespace, clusterRoleBinding);
+      ? removePermissions(namespace, cluster, clusterRoleBinding)
+      : installPermissions(namespace, cluster, clusterRoleBinding);
   } catch (error) {
     return error;
   }
@@ -253,9 +279,9 @@ export const deleteStorageCheckup = async (
   jobs: IoK8sApiBatchV1Job[],
 ) => {
   try {
-    await k8sDelete({ model: ConfigMapModel, resource });
+    await kubevirtK8sDelete({ cluster: getCluster(resource), model: ConfigMapModel, resource });
     for (const job of jobs) {
-      await k8sDelete({ model: JobModel, resource: job });
+      await kubevirtK8sDelete({ cluster: getCluster(job), model: JobModel, resource: job });
     }
   } catch (e) {
     kubevirtConsole.log(e?.message);
@@ -267,7 +293,8 @@ export const rerunStorageCheckup = async (
   checkupImage: string,
 ): Promise<IoK8sApiBatchV1Job> => {
   const isSucceeded = resource?.data?.[STATUS_SUCCEEDED] === 'true';
-  await k8sPatch<IoK8sApiCoreV1ConfigMap>({
+  await kubevirtK8sPatch<IoK8sApiCoreV1ConfigMap>({
+    cluster: getCluster(resource),
     data: [
       { op: 'remove', path: `/data/${STATUS_COMPLETION_TIME_STAMP}` },
       { op: 'remove', path: `/data/${STATUS_SUCCEEDED}` },
@@ -293,7 +320,8 @@ export const rerunStorageCheckup = async (
     resource,
   });
 
-  return k8sCreate({
+  return kubevirtK8sCreate({
+    cluster: getCluster(resource),
     data: storageCheckupJob(resource.metadata.name, resource.metadata.namespace, checkupImage),
     model: JobModel,
   });

@@ -11,7 +11,10 @@ import {
   IoK8sApiRbacV1ClusterRole,
   IoK8sApiRbacV1ClusterRoleBinding,
 } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { useActiveNamespace, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
+import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
+import useListClusters from '@kubevirt-utils/hooks/useListClusters';
+import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import { findObjectByName } from '../../utils/utils';
 import {
@@ -21,24 +24,30 @@ import {
 } from '../utils/utils';
 
 const useCheckupsNetworkPermissions = (): { isPermitted: boolean; loading: boolean } => {
-  const [namespace] = useActiveNamespace();
+  const namespace = useActiveNamespace();
+  const selectedClusters = useListClusters();
+  const [hubClusterName] = useHubClusterName();
+  const cluster = selectedClusters?.[0] || hubClusterName;
 
-  const [serviceAccounts, loadingServiceAccounts] = useK8sWatchResource<
+  const [serviceAccounts, serviceAccountsLoaded] = useKubevirtWatchResource<
     IoK8sApiCoreV1ServiceAccount[]
   >({
+    cluster,
     groupVersionKind: modelToGroupVersionKind(ServiceAccountModel),
     isList: true,
     namespace,
   });
 
-  const [roles, loadingRoles] = useK8sWatchResource<IoK8sApiRbacV1ClusterRole[]>({
+  const [roles, rolesLoaded] = useKubevirtWatchResource<IoK8sApiRbacV1ClusterRole[]>({
+    cluster,
     groupVersionKind: modelToGroupVersionKind(ClusterRoleModel),
     isList: true,
   });
 
-  const [roleBinding, loadingRolesBinding] = useK8sWatchResource<
+  const [roleBinding, rolesLoadedBinding] = useKubevirtWatchResource<
     IoK8sApiRbacV1ClusterRoleBinding[]
   >({
+    cluster,
     groupVersionKind: modelToGroupVersionKind(ClusterRoleBindingModel),
     isList: true,
   });
@@ -75,7 +84,7 @@ const useCheckupsNetworkPermissions = (): { isPermitted: boolean; loading: boole
         isLatencyRoleBinding &&
         isConfigMapRoleBinding,
     ),
-    loading: !loadingServiceAccounts && !loadingRoles && !loadingRolesBinding,
+    loading: !serviceAccountsLoaded && !rolesLoaded && !rolesLoadedBinding,
   };
 };
 

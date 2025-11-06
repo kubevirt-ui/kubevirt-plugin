@@ -1,8 +1,10 @@
 import React, { FC, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
+import ClusterProjectDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterProjectDropdown';
 import { PageTitles } from '@kubevirt-utils/constants/page-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import {
   DocumentTitle,
   HorizontalNav,
@@ -18,11 +20,14 @@ const CheckupsList: FC = () => {
   const { t } = useKubevirtTranslation();
   const location = useLocation();
   const navigate = useNavigate();
+  const isACMpage = useIsACMPage();
 
   const pages = useMemo(() => getCheckUpTabs(t), [t]);
 
   // Redirect to default tab if URL is just /checkups
   useEffect(() => {
+    if (isACMpage) return;
+
     const normalizedPath = location.pathname.endsWith('/')
       ? location.pathname.slice(0, -1)
       : location.pathname;
@@ -33,11 +38,12 @@ const CheckupsList: FC = () => {
         navigate(`${normalizedPath}/${defaultTab.href}`, { replace: true });
       }
     }
-  }, [location.pathname, pages, navigate]);
+  }, [location.pathname, pages, navigate, isACMpage]);
 
   return (
     <>
       <DocumentTitle>{PageTitles.Checkups}</DocumentTitle>
+      <ClusterProjectDropdown includeAllClusters={false} includeAllProjects={false} />
       <ListPageHeader title={PageTitles.Checkups}>
         <CheckupsRunButton />
       </ListPageHeader>

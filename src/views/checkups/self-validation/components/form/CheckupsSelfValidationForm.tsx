@@ -3,6 +3,7 @@ import CheckupImageField from 'src/views/checkups/components/CheckupImageField';
 
 import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import CheckboxSelect from '@kubevirt-utils/components/CheckboxSelect/CheckboxSelect';
+import ClusterProjectDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterProjectDropdown';
 import { getDefaultStorageClass } from '@kubevirt-utils/components/DiskModal/components/StorageClassAndPreallocation/utils/helpers';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useRelatedImage from '@kubevirt-utils/hooks/useRelatedImage';
@@ -125,80 +126,83 @@ const CheckupsSelfValidationForm = () => {
   }, [selectedTestSuites, t]);
 
   return (
-    <Grid>
-      <GridItem span={6}>
-        <Form className={'CheckupsSelfValidationForm--main'}>
-          <FormSection title={t('Run self validation checkup')} titleElement="h1">
-            <Alert
-              isInline
-              title={t('WARNING: This checkup may put the cluster under stress')}
-              variant={AlertVariant.warning}
-            >
-              {t(
-                'This checkup can take up to 3 hours to complete. It should not be used in production environments as it may impact cluster performance.',
+    <>
+      <ClusterProjectDropdown includeAllClusters={false} includeAllProjects={false} />
+      <Grid>
+        <GridItem span={6}>
+          <Form className={'CheckupsSelfValidationForm--main'}>
+            <FormSection title={t('Run self validation checkup')} titleElement="h1">
+              <Alert
+                isInline
+                title={t('WARNING: This checkup may put the cluster under stress')}
+                variant={AlertVariant.warning}
+              >
+                {t(
+                  'This checkup can take up to 3 hours to complete. It should not be used in production environments as it may impact cluster performance.',
+                )}
+              </Alert>
+
+              <FormGroup fieldId="name" isRequired label={t('Name')}>
+                <TextInput
+                  id="name"
+                  isRequired
+                  name="name"
+                  onChange={(_event, value) => setName(value)}
+                  value={name}
+                />
+              </FormGroup>
+
+              {checkupImageLoadError && (
+                <CheckupImageField
+                  checkupImage={checkupImage}
+                  checkupImageLoaded={checkupImageLoaded}
+                  checkupImageLoadError={checkupImageLoadError}
+                />
               )}
-            </Alert>
 
-            <FormGroup fieldId="name" isRequired label={t('Name')}>
-              <TextInput
-                id="name"
-                isRequired
-                name="name"
-                onChange={(_event, value) => setName(value)}
-                value={name}
+              <FormGroup fieldId="test-suites" isRequired label={t('Test suites')}>
+                <CheckboxSelect
+                  options={TEST_SUITE_OPTIONS.map((option) => ({
+                    children: option.label,
+                    isSelected: selectedTestSuites.includes(option.value),
+                    value: option.value,
+                  }))}
+                  onSelect={handleTestSuiteSelect}
+                  selectedValues={selectedTestSuites}
+                  toggleTitle={testSuitesToggleTitle}
+                />
+              </FormGroup>
+              <AdvancedSettings
+                defaultSC={defaultSC}
+                handleStorageCapabilitySelect={handleStorageCapabilitySelect}
+                isDryRun={isDryRun}
+                pvcSize={pvcSize}
+                setIsDryRun={setIsDryRun}
+                setPvcSize={setPvcSize}
+                setStorageClass={setStorageClass}
+                setTestSkips={setTestSkips}
+                storageCapabilities={storageCapabilities}
+                storageClass={storageClass}
+                storageClasses={storageClasses}
+                storageClassesLoaded={storageClassesLoaded}
+                testSkips={testSkips}
               />
-            </FormGroup>
 
-            {checkupImageLoadError && (
-              <CheckupImageField
+              <CheckupsSelfValidationFormActions
                 checkupImage={checkupImage}
-                checkupImageLoaded={checkupImageLoaded}
-                checkupImageLoadError={checkupImageLoadError}
+                isDryRun={isDryRun}
+                name={name}
+                pvcSize={pvcSize}
+                selectedTestSuites={selectedTestSuites}
+                storageCapabilities={storageCapabilities}
+                storageClass={storageClass || defaultSC?.metadata?.name}
+                testSkips={testSkips}
               />
-            )}
-
-            <FormGroup fieldId="test-suites" isRequired label={t('Test suites')}>
-              <CheckboxSelect
-                options={TEST_SUITE_OPTIONS.map((option) => ({
-                  children: option.label,
-                  isSelected: selectedTestSuites.includes(option.value),
-                  value: option.value,
-                }))}
-                onSelect={handleTestSuiteSelect}
-                selectedValues={selectedTestSuites}
-                toggleTitle={testSuitesToggleTitle}
-              />
-            </FormGroup>
-            <AdvancedSettings
-              defaultSC={defaultSC}
-              handleStorageCapabilitySelect={handleStorageCapabilitySelect}
-              isDryRun={isDryRun}
-              pvcSize={pvcSize}
-              setIsDryRun={setIsDryRun}
-              setPvcSize={setPvcSize}
-              setStorageClass={setStorageClass}
-              setTestSkips={setTestSkips}
-              storageCapabilities={storageCapabilities}
-              storageClass={storageClass}
-              storageClasses={storageClasses}
-              storageClassesLoaded={storageClassesLoaded}
-              testSkips={testSkips}
-            />
-
-            <CheckupsSelfValidationFormActions
-              checkupImage={checkupImage}
-              isDryRun={isDryRun}
-              name={name}
-              pvcSize={pvcSize}
-              selectedTestSuites={selectedTestSuites}
-              storageCapabilities={storageCapabilities}
-              storageClass={storageClass || defaultSC?.metadata?.name}
-              testSkips={testSkips}
-            />
-          </FormSection>
-        </Form>
-      </GridItem>
-    </Grid>
+            </FormSection>
+          </Form>
+        </GridItem>
+      </Grid>
+    </>
   );
 };
 

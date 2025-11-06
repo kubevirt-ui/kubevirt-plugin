@@ -8,6 +8,7 @@ import { getOverallProgress } from '../utils/progressTracker';
 import type { OverallProgress } from '../utils/types';
 
 type UseProgressTrackingProps = {
+  cluster: string;
   enabled: boolean;
   job: IoK8sApiBatchV1Job;
   namespace: string;
@@ -23,6 +24,7 @@ type UseProgressTrackingResult = {
  * Hook to track real-time progress of test suites using watch instead of polling
  */
 export const useProgressTracking = ({
+  cluster,
   enabled,
   job,
   namespace,
@@ -34,13 +36,14 @@ export const useProgressTracking = ({
     () =>
       enabled && jobName
         ? {
+            cluster,
             groupVersionKind: modelToGroupVersionKind(JobModel),
             isList: false,
             name: jobName,
             namespace,
           }
         : null,
-    [enabled, jobName, namespace],
+    [enabled, jobName, namespace, cluster],
   );
 
   // Only watch when resource is valid - useK8sWatchData handles null by returning [undefined, true, undefined]

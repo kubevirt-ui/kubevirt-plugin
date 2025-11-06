@@ -2,9 +2,16 @@ import React, { FC, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
+import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  getNetworkCheckupURL,
+  getStorageCheckupURL,
+} from '@kubevirt-utils/resources/checkups/urls';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { Button, ButtonVariant } from '@patternfly/react-core';
+import { useHubClusterName } from '@stolostron/multicluster-sdk';
 import { createURL } from '@virtualmachines/details/tabs/overview/utils/utils';
 
 import useCheckupsNetworkPermissions from './network/hooks/useCheckupsNetworkPermissions';
@@ -14,9 +21,12 @@ import { CHECKUP_URLS } from './utils/constants';
 import { getCurrentCheckupType, trimLastHistoryPath } from './utils/utils';
 
 const CheckupsRunButton: FC = () => {
-  const [namespace] = useActiveNamespace();
+  const namespace = useActiveNamespace();
+  const isACMpage = useIsACMPage();
   const navigate = useNavigate();
   const location = useLocation();
+  const cluster = useClusterParam();
+  const [hubClusterName] = useHubClusterName();
   const { t } = useKubevirtTranslation();
 
   const { isPermitted: isCreateNetworkPermitted } = useCheckupsNetworkPermissions();
@@ -51,10 +61,18 @@ const CheckupsRunButton: FC = () => {
     const basePath = trimLastHistoryPath(location.pathname);
     switch (currentCheckupType) {
       case CHECKUP_URLS.NETWORK:
-        navigate(createURL(`${CHECKUP_URLS.NETWORK}/form`, basePath));
+        navigate(
+          isACMpage
+            ? getNetworkCheckupURL('form', namespace, cluster || hubClusterName)
+            : createURL(`${CHECKUP_URLS.NETWORK}/form`, basePath),
+        );
         break;
       case CHECKUP_URLS.STORAGE:
-        navigate(createURL(`${CHECKUP_URLS.STORAGE}/form`, basePath));
+        navigate(
+          isACMpage
+            ? getStorageCheckupURL('form', namespace, cluster || hubClusterName)
+            : createURL(`${CHECKUP_URLS.STORAGE}/form`, basePath),
+        );
         break;
       // Self-validation is handled by SelfValidationCheckupRunButton
     }

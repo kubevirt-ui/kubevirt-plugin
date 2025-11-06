@@ -3,12 +3,13 @@ import { useNavigate } from 'react-router-dom-v5-compat';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getSelfValidationCheckupURL } from '@kubevirt-utils/resources/checkups/urls';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { ActionGroup, Button, ButtonVariant, Tooltip } from '@patternfly/react-core';
 
-import { CHECKUP_URLS } from '../../../utils/constants';
 import { createSelfValidationCheckup } from '../../utils';
 import {
   getActionState,
@@ -43,8 +44,10 @@ const CheckupsSelfValidationFormActions: FC<CheckupsSelfValidationFormActionsPro
 }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
-  const [namespace] = useActiveNamespace();
+  const namespace = useActiveNamespace();
   const { createModal } = useModal();
+  const cluster = useClusterParam();
+
   const [error, setError] = useState<ReactNode>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -83,6 +86,7 @@ const CheckupsSelfValidationFormActions: FC<CheckupsSelfValidationFormActionsPro
     try {
       await createSelfValidationCheckup({
         checkupImage,
+        cluster,
         isDryRun,
         name,
         namespace,
@@ -92,7 +96,7 @@ const CheckupsSelfValidationFormActions: FC<CheckupsSelfValidationFormActionsPro
         storageClass,
         testSkips,
       });
-      navigate(`/k8s/ns/${namespace}/checkups/${CHECKUP_URLS.SELF_VALIDATION}/${name}`);
+      navigate(getSelfValidationCheckupURL(name, namespace, cluster));
     } catch (e) {
       kubevirtConsole.error(e);
       setError(e?.message);
@@ -133,6 +137,7 @@ const CheckupsSelfValidationFormActions: FC<CheckupsSelfValidationFormActionsPro
           <Tooltip
             content={
               <RunningCheckupWarningDescription
+                configMapCluster={selfValidationActionState.configMapInfo.cluster}
                 configMapName={selfValidationActionState.configMapInfo.name}
                 configMapNamespace={selfValidationActionState.configMapInfo.namespace}
               />

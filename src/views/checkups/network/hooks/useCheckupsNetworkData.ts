@@ -3,16 +3,20 @@ import { useMemo } from 'react';
 import { ConfigMapModel, modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
-import { useActiveNamespace, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
+import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 
 import { createJobWatchConfig, KUBEVIRT_VM_LATENCY_LABEL } from '../../utils/utils';
 import { KUBEVIRT_VM_LATENCY_LABEL_VALUE } from '../utils/utils';
 
 const useCheckupsNetworkData = () => {
-  const [namespace] = useActiveNamespace();
+  const namespace = useActiveNamespace();
+  const cluster = useClusterParam();
 
   const configMapWatchConfig = useMemo(
     () => ({
+      cluster,
       groupVersionKind: modelToGroupVersionKind(ConfigMapModel),
       isList: true,
       ...(namespace !== ALL_NAMESPACES_SESSION_KEY && { namespace, namespaced: true }),
@@ -22,19 +26,20 @@ const useCheckupsNetworkData = () => {
         },
       },
     }),
-    [namespace],
+    [namespace, cluster],
   );
 
   const jobWatchConfig = useMemo(
-    () => createJobWatchConfig(KUBEVIRT_VM_LATENCY_LABEL_VALUE, namespace),
-    [namespace],
+    () => createJobWatchConfig(KUBEVIRT_VM_LATENCY_LABEL_VALUE, namespace, cluster),
+    [namespace, cluster],
   );
 
   const [configMaps, configMapsLoaded, loadErrorConfigMaps] =
-    useK8sWatchResource<IoK8sApiCoreV1ConfigMap[]>(configMapWatchConfig);
+    useKubevirtWatchResource<IoK8sApiCoreV1ConfigMap[]>(configMapWatchConfig);
 
   const [jobs, jobsLoaded, loadErrorJobs] =
-    useK8sWatchResource<IoK8sApiBatchV1Job[]>(jobWatchConfig);
+    useKubevirtWatchResource<IoK8sApiBatchV1Job[]>(jobWatchConfig);
+
   return {
     configMaps,
     error: loadErrorConfigMaps || loadErrorJobs,

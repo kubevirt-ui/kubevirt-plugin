@@ -236,6 +236,7 @@ export type JobResults = {
 export type ValidatedJobParameters = {
   baseName: string;
   checkupImage: string;
+  cluster: string;
   isDryRun: boolean;
   namespace: string;
   originalJobName: string;
