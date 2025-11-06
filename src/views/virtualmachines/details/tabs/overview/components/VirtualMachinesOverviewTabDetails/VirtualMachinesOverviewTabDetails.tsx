@@ -6,6 +6,7 @@ import {
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceGuestAgentInfo,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import ArchitectureLabel from '@kubevirt-utils/components/ArchitectureLabel/ArchitectureLabel';
 import NUMABadge from '@kubevirt-utils/components/badges/NUMABadge/NUMABadge';
 import CPUMemory from '@kubevirt-utils/components/CPUMemory/CPUMemory';
 import GuestAgentIsRequiredText from '@kubevirt-utils/components/GuestAgentIsRequiredText/GuestAgentIsRequiredText';
@@ -17,7 +18,11 @@ import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind } from '@kubevirt-utils/models';
 import { getLabel, getName, getVMStatus } from '@kubevirt-utils/resources/shared';
-import { getInstanceTypeMatcher, hasNUMAConfiguration } from '@kubevirt-utils/resources/vm';
+import {
+  getArchitecture,
+  getInstanceTypeMatcher,
+  hasNUMAConfiguration,
+} from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getOSNameFromGuestAgent } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -123,8 +128,13 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
             <GridItem span={5}>
               <DescriptionList isHorizontal>
                 <VirtualMachineDescriptionItem
+                  descriptionData={
+                    <Flex spaceItems={{ default: 'spaceItemsSm' }}>
+                      <span>{getName(vm)}</span>
+                      <ArchitectureLabel architecture={getArchitecture(vm)} />
+                    </Flex>
+                  }
                   data-test-id="virtual-machine-overview-details-name"
-                  descriptionData={getName(vm)}
                   descriptionHeader={t('Name')}
                 />
                 {cluster && (
