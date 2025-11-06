@@ -12,6 +12,7 @@ import useSelectedRowFilterClusters from '@kubevirt-utils/hooks/useSelectedRowFi
 import useSelectedRowFilterProjects from '@kubevirt-utils/hooks/useSelectedRowFilterProjects';
 import { ListPageProps } from '@kubevirt-utils/utils/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import {
   ListPageBody,
   useListPageFilter,
@@ -49,10 +50,11 @@ const UserInstancetypeList: FC<UserInstancetypeListProps> = ({
 
   const clusterFilter = useClusterFilter();
   const projectFilter = useProjectFilter();
+  const isACMPage = useIsACMPage();
 
   const filtersWithSelect = useMemo(
-    () => [clusterFilter, projectFilter],
-    [clusterFilter, projectFilter],
+    () => (isACMPage ? [clusterFilter, projectFilter] : []),
+    [clusterFilter, projectFilter, isACMPage],
   );
 
   const [unfilteredData, data, onFilterChange] = useListPageFilter<

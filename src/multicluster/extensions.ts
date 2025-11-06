@@ -297,28 +297,6 @@ export const extensions: EncodedExtension[] = [
     properties: {
       handler: { $codeRef: 'urls.getFleetClusterResourceRoute' },
       model: {
-        group: 'instancetype.kubevirt.io',
-        kind: 'VirtualMachineClusterInstancetype',
-        version: 'v1beta1',
-      },
-    },
-    type: 'acm.resource/route',
-  } as EncodedExtension<ResourceRoute>,
-  {
-    properties: {
-      handler: { $codeRef: 'urls.getFleetNamespacedResourceRoute' },
-      model: {
-        group: 'instancetype.kubevirt.io',
-        kind: 'VirtualMachineInstancetype',
-        version: 'v1beta1',
-      },
-    },
-    type: 'acm.resource/route',
-  } as EncodedExtension<ResourceRoute>,
-  {
-    properties: {
-      handler: { $codeRef: 'urls.getFleetClusterResourceRoute' },
-      model: {
         group: 'migrations.kubevirt.io',
         kind: 'MigrationPolicy',
         version: 'v1alpha1',
