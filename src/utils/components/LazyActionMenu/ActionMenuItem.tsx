@@ -8,7 +8,6 @@ import { Action } from '@openshift-console/dynamic-plugin-sdk';
 import { impersonateStateToProps } from '@openshift-console/dynamic-plugin-sdk/lib/app/core/reducers/coreSelectors';
 import { ImpersonateKind } from '@openshift-console/dynamic-plugin-sdk/lib/app/redux-types';
 import { MenuItem, Tooltip } from '@patternfly/react-core';
-import { css } from '@patternfly/react-styles';
 
 import { CheckAccess } from './LazyActionMenu';
 import { useCheckAccess } from './overrides';
@@ -28,7 +27,6 @@ const ActionItem: FC<ActionMenuItemProps & { isAllowed: boolean }> = ({
   const { cta, description, disabled, icon, label } = action;
   const { external, href } = cta as { external?: boolean; href: string };
   const isDisabled = !isAllowed || disabled;
-  const classes = css({ 'pf-m-disabled': isDisabled });
   const navigate = useNavigate();
 
   const handleClick = useCallback(
@@ -47,7 +45,6 @@ const ActionItem: FC<ActionMenuItemProps & { isAllowed: boolean }> = ({
 
   const props = {
     autoFocus,
-    className: classes,
     'data-test-action': label,
     description,
     icon,
