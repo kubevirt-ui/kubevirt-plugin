@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
+import { isValidTemplateIconUrl, OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 const bsd = require('./svg/bsd.svg') as string;
@@ -27,6 +27,9 @@ const iconMap = {
 
 export const getTemplateOSIcon = (template: K8sResourceCommon): string => {
   const icon = template?.metadata?.annotations?.iconClass;
+  if (isValidTemplateIconUrl(icon)) {
+    return icon;
+  }
   return iconMap[icon] || iconMap['icon-other'];
 };
 

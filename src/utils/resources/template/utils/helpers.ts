@@ -76,3 +76,25 @@ export const bootDiskSourceIsRegistry = (template: V1Template) => {
   const vmObject: V1VirtualMachine = getTemplateVirtualMachineObject(template);
   return vmBootDiskSourceIsRegistry(vmObject);
 };
+
+export const isValidTemplateIconUrl = (url: string): boolean => {
+  if (!url) return false;
+
+  // Allow relative paths starting with /
+  if (/^\/[^/]/.test(url)) {
+    return true;
+  }
+
+  // For absolute URLs, validate using URL.canParse and check protocol
+  if (URL.canParse(url)) {
+    try {
+      const parsedUrl = new URL(url);
+      // Only allow http, https protocols (block javascript:, data:, vbscript:, etc.)
+      return ['http:', 'https:'].includes(parsedUrl.protocol);
+    } catch {
+      return false;
+    }
+  }
+
+  return false;
+};
