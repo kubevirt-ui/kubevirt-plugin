@@ -1,10 +1,12 @@
 import React from 'react';
 
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
+import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Bullseye, Card, Grid, GridItem } from '@patternfly/react-core';
 
+import { METRICS } from '../utils/constants';
 import useMetricChartData from '../utils/hooks/useMetricChartData';
 import { ChartCardProps } from '../utils/types';
 import { getCurrentValue } from '../utils/utils';
@@ -18,9 +20,29 @@ const ChartCard: React.FC<ChartCardProps> = ({ metric }) => {
   const metricChartData = useMetricChartData(metric);
   const { chartData, isReady, numberOfTicks, unit } = metricChartData;
   const currentValue = getCurrentValue(chartData);
-  const chartLabel = t("Last {{numOfDays}} days' trend", { numOfDays: numberOfTicks });
+  const chartLabel =
+    metric === METRICS.OVERCOMMIT_RATIO
+      ? ''
+      : t("Last {{numOfDays}} days' trend", { numOfDays: numberOfTicks });
   const metricLabel = unit && isReady ? `${metric} (${unit})` : metric;
-  const metricValue = currentValue && !isNaN(currentValue) ? currentValue?.toLocaleString() : 0;
+
+  const [hyperConverge] = useHyperConvergeConfiguration();
+  const targetOvercommitRatio =
+    hyperConverge?.spec?.higherWorkloadDensity?.memoryOvercommitPercentage || 100;
+
+  const getFormattedMetricValue = () => {
+    if (!currentValue || isNaN(currentValue))
+      return metric === METRICS.OVERCOMMIT_RATIO ? `0% / ${targetOvercommitRatio}%` : '0';
+
+    if (metric === METRICS.OVERCOMMIT_RATIO) {
+      const currentRatio = Math.round(currentValue);
+      return `${currentRatio}% / ${targetOvercommitRatio}%`;
+    }
+
+    return currentValue.toLocaleString();
+  };
+
+  const metricValue = getFormattedMetricValue();
 
   return (
     <Card className="metric-chart-card">
@@ -36,7 +58,11 @@ const ChartCard: React.FC<ChartCardProps> = ({ metric }) => {
             <span>
               <div className="metric-chart-card__chart--label">{chartLabel}</div>
               <div className="metric-chart-card__chart--chart">
-                <MetricChart metric={metric} metricChartData={metricChartData} />
+                <MetricChart
+                  metric={metric}
+                  metricChartData={metricChartData}
+                  targetValue={targetOvercommitRatio}
+                />
               </div>
             </span>
           ) : (
