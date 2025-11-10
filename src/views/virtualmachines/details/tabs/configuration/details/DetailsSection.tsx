@@ -33,7 +33,6 @@ import {
   hasNUMAConfiguration,
 } from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, Grid, GridItem, Switch, Title } from '@patternfly/react-core';
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
@@ -96,9 +95,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
   const isExpandableSpec = isExpandableSpecVM(vm);
   const deletionProtectionEnabled = isDeletionProtectionEnabled(vm);
 
-  const loadingInstanceType = isExpandableSpec && isEmpty(instanceTypeVM);
-
-  if (!vm || loadingInstanceType) {
+  if (!vm) {
     return <Loading />;
   }
 

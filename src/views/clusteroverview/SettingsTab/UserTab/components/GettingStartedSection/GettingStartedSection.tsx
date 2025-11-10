@@ -3,6 +3,7 @@ import React, { FC } from 'react';
 import {
   runningTourSignal,
   startTour,
+  stopTour,
 } from '@kubevirt-utils/components/GuidedTour/utils/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
@@ -38,7 +39,7 @@ const GettingStartedSection: FC = () => {
           data-test-id="guided-tour"
           isChecked={run}
           label={t('Guided tour')}
-          onChange={!run && startTour}
+          onChange={run ? stopTour : startTour}
         />
       </Stack>
     </ExpandSection>

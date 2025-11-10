@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/constants';
 import useDeepCompareMemoize from '@kubevirt-utils/hooks/useDeepCompareMemoize/useDeepCompareMemoize';
 import { isExpandableSpecVM } from '@kubevirt-utils/resources/instancetype/helper';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
@@ -44,7 +45,7 @@ const useInstanceTypeExpandSpec: UseInstanceTypeExpandSpec = (vm) => {
       }
     };
 
-    if (!isEmpty(innerVM) && isExpandableSpec) {
+    if (!isEmpty(innerVM) && isExpandableSpec && !runningTourSignal.value) {
       fetch();
     } else {
       setInstanceTypeExpandedSpec(undefined);
