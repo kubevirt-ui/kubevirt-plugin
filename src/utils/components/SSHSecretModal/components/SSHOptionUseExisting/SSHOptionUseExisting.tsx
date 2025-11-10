@@ -58,15 +58,15 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
   const [selectedProject, setSelectedProject] = useState<string>(
     localNSProject || namespace || sshDetails?.sshSecretNamespace,
   );
-  const [projects] = useProjects(cluster);
+  const [userProjects] = useProjects(cluster, true);
 
   useEffect(
     () =>
       !selectedProject &&
       setSelectedProject(
-        localNSProject || namespace || sshDetails?.sshSecretNamespace || projects?.[0],
+        localNSProject || namespace || sshDetails?.sshSecretNamespace || userProjects?.[0],
       ),
-    [namespace, localNSProject, projects, selectedProject, sshDetails?.sshSecretNamespace],
+    [namespace, localNSProject, userProjects, selectedProject, sshDetails?.sshSecretNamespace],
   );
 
   const onSelectProject = useCallback(
@@ -101,7 +101,7 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
     ? selectedProject !== namespace
     : selectedProject !== sshDetails?.sshSecretNamespace;
 
-  if (isEmpty(projects)) return <Bullseye>{t('No SSH keys found')}</Bullseye>;
+  if (isEmpty(userProjects)) return <Bullseye>{t('No SSH keys found')}</Bullseye>;
 
   return (
     <>
@@ -116,7 +116,7 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
         <GridItem span={6}>
           <FormGroup fieldId="project" label={t('Project')}>
             <InlineFilterSelect
-              options={projects.map((project) => ({
+              options={userProjects.map((project) => ({
                 children: project,
                 groupVersionKind: modelToGroupVersionKind(ProjectModel),
                 value: project,
