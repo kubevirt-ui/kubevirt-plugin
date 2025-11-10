@@ -8,6 +8,7 @@ import {
 } from '@kubevirt-utils/components/GuidedTour/utils/constants';
 import { ALL_NAMESPACES_SESSION_KEY, ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
+import { isSystemNamespace } from '@kubevirt-utils/resources/namespace/helper';
 import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { universalComparator } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -35,8 +36,6 @@ import {
   CLUSTER_SELECTOR_PREFIX,
   FOLDER_SELECTOR_PREFIX,
   PROJECT_SELECTOR_PREFIX,
-  SYSTEM_NAMESPACES,
-  SYSTEM_NAMESPACES_PREFIX,
   VM_FOLDER_LABEL,
 } from './constants';
 
@@ -401,13 +400,6 @@ export const filterNamespaceItems = (
         .length > 0
     );
   }
-};
-
-export const isSystemNamespace = (projectName: string) => {
-  const startsWithNamespace = SYSTEM_NAMESPACES_PREFIX.some((ns) => projectName.startsWith(ns));
-  const isNamespace = SYSTEM_NAMESPACES.includes(projectName);
-
-  return startsWithNamespace || isNamespace;
 };
 
 export const getAllTreeViewItems = (treeData: TreeViewDataItem[]) => {
