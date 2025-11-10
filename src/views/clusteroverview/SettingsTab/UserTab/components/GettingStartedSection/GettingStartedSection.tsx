@@ -4,7 +4,7 @@ import {
   runningTourSignal,
   startTour,
   stopTour,
-} from '@kubevirt-utils/components/GuidedTour/utils/constants';
+} from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { Stack, Switch } from '@patternfly/react-core';
