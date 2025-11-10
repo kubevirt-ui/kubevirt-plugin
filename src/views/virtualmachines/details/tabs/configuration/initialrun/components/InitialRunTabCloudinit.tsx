@@ -6,6 +6,7 @@ import CloudinitModal from '@kubevirt-utils/components/CloudinitModal/CloudinitM
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
+import useHideCredentials from '@kubevirt-utils/hooks/useHideCredentials/useHideCredentials';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 type InitialRunTabCloudInitProps = {
@@ -23,6 +24,9 @@ const InitialRunTabCloudinit: FC<InitialRunTabCloudInitProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+  const { shouldHideCredentials } = useHideCredentials();
+
+  const canEdit = canUpdateVM && !shouldHideCredentials;
 
   return (
     <VirtualMachineDescriptionItem
@@ -33,7 +37,7 @@ const InitialRunTabCloudinit: FC<InitialRunTabCloudInitProps> = ({
       }
       descriptionData={<CloudInitDescription vm={vm} />}
       descriptionHeader={<SearchItem id="cloud-init">{t('Cloud-init')}</SearchItem>}
-      isEdit={canUpdateVM}
+      isEdit={canEdit}
       showEditOnTitle
     />
   );

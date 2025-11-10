@@ -20,6 +20,7 @@ export const NODE_PORT_ADDRESS = 'nodePortAddress';
 export const NODE_PORT_ENABLED = 'nodePortEnabled';
 export const DISABLED_GUEST_SYSTEM_LOGS_ACCESS = 'disabledGuestSystemLogsAccess';
 export const CONFIRM_VM_ACTIONS = 'confirmVMActions';
+export const HIDE_CREDENTIALS_NON_PRIVILEGED = 'hideCredentialsNonPrivileged';
 
 export const TREE_VIEW_FOLDERS = 'treeViewFolders';
 export const PASST_UDN_NETWORK = 'passtUDNNetwork';
@@ -42,6 +43,7 @@ export const featuresConfigMapInitialState: IoK8sApiCoreV1ConfigMap = {
     [AUTOMATIC_SUBSCRIPTION_ORGANIZATION_ID]: '',
     [CONFIRM_VM_ACTIONS]: 'false',
     [DISABLED_GUEST_SYSTEM_LOGS_ACCESS]: 'false',
+    [HIDE_CREDENTIALS_NON_PRIVILEGED]: 'false',
     [KUBEVIRT_APISERVER_PROXY]: 'true',
     [LOAD_BALANCER_ENABLED]: 'false',
     [NODE_PORT_ADDRESS]: '',

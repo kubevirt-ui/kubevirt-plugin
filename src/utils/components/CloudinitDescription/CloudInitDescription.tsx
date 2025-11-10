@@ -6,6 +6,7 @@ import {
   getCloudInitData,
   getCloudInitVolume,
 } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
+import useHideCredentials from '@kubevirt-utils/hooks/useHideCredentials/useHideCredentials';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { DescriptionList, Stack, StackItem } from '@patternfly/react-core';
@@ -16,8 +17,12 @@ import CloudInitInfoHelper from './CloudinitInfoHelper';
 
 export const CloudInitDescription: FC<{ vm: V1VirtualMachine }> = ({ vm }) => {
   const { t } = useKubevirtTranslation();
+  const { shouldHideCredentials } = useHideCredentials();
   const cloudInitData = getCloudInitData(getCloudInitVolume(vm));
   const userData = convertYAMLUserDataObject(cloudInitData?.userData);
+
+  const maskedUsername = '******';
+  const displayUsername = shouldHideCredentials ? maskedUsername : userData?.user || NO_DATA_DASH;
 
   return (
     <Stack hasGutter>
@@ -27,7 +32,7 @@ export const CloudInitDescription: FC<{ vm: V1VirtualMachine }> = ({ vm }) => {
       <StackItem>
         <DescriptionList columnModifier={{ lg: '1Col', xl: '3Col' }} isCompact>
           <VirtualMachineDescriptionItem
-            descriptionData={userData?.user || NO_DATA_DASH}
+            descriptionData={displayUsername}
             descriptionHeader={t('User')}
           />
           <VirtualMachineDescriptionItem
