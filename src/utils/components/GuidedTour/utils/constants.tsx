@@ -27,6 +27,7 @@ export const startTour = () => {
   if (stepIndexSignal.value >= 6) stepIndexSignal.value = 0;
   runningTourSignal.value = true;
 };
+
 export const stopTour = () => {
   runningTourSignal.value = false;
 };
@@ -105,7 +106,7 @@ export const tourSteps: Step[] = [
     },
     disableBeacon: true,
     placement: 'bottom',
-    target: '#VirtualMachineConfigurationTabSearch-autocomplete-search',
+    target: '#ConfigurationSearch-autocomplete-search',
     title: t('Search for configurable items'),
   },
   {
