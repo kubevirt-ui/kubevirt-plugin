@@ -27,6 +27,7 @@ import {
   ProjectDiagramIcon,
 } from '@patternfly/react-icons';
 import { signal } from '@preact/signals-react';
+import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 import { statusIcon } from '../icons/utils';
 
@@ -165,7 +166,7 @@ const createProjectTreeItem = (
     children: projectChildren,
     customBadgeContent: projectMap[project]?.count || '0',
     defaultExpanded: currentPageNamespace === project && clusterSelected,
-    href: `${getVMListNamespacesURL(cluster, project)}${queryParams || ''}`,
+    href: `${getVMListNamespacesURL(cluster, project)}${removeFolderLabelQuery(queryParams) || ''}`,
     icon: <ProjectDiagramIcon />,
     id: projectTreeItemID,
     name: project,
@@ -194,7 +195,7 @@ const createAllNamespacesTreeItem = (
     children: treeViewData,
     customBadgeContent: allVMsCount || '0',
     defaultExpanded: true,
-    href: `${getVMListURL(cluster)}${queryParams || ''}`,
+    href: `${getVMListURL(cluster)}${removeFolderLabelQuery(queryParams) || ''}`,
     icon: <ProjectDiagramIcon />,
     id: ALL_NAMESPACES_SESSION_KEY,
     name: ALL_PROJECTS,
@@ -438,3 +439,24 @@ export const getAllTreeViewProjectItems = (treeData: TreeViewDataItem[]): TreeVi
   getAllTreeViewItems(treeData).filter((treeItem) =>
     treeItem.id.startsWith(PROJECT_SELECTOR_PREFIX),
   );
+
+const removeFolderLabelQuery = (query: string) => {
+  const queryParams = new URLSearchParams(query);
+
+  const labelFilters = queryParams.get(VirtualMachineRowFilterType.Labels)?.split(',') ?? [];
+  if (!labelFilters.some((label) => label.startsWith(VM_FOLDER_LABEL))) {
+    return query;
+  }
+
+  const labelFiltersWithoutFolder = labelFilters.filter(
+    (label) => !label.startsWith(VM_FOLDER_LABEL),
+  );
+
+  if (isEmpty(labelFiltersWithoutFolder)) {
+    queryParams.delete(VirtualMachineRowFilterType.Labels);
+  } else {
+    queryParams.set(VirtualMachineRowFilterType.Labels, labelFiltersWithoutFolder.join(','));
+  }
+
+  return queryParams.size > 0 ? `?${queryParams.toString()}` : '';
+};
