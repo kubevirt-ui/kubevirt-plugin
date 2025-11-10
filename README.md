@@ -32,11 +32,11 @@ Click the Create button at the bottom then click on the link in the alert that p
 
 ### Option 1 (recommended):
 
-Open two terminals and navigate to the kubevirt-plugin directory in both of them. The first terminal will run a containerized instance of console and the second will run the kubevirt-plugin. In case you are using Openshift, make sure to set the environment variable `BRIDGE_BRANDING=openshift` in both terminals before starting.
+Open two terminals and navigate to the kubevirt-plugin directory in both of them. The first terminal will run a containerized instance of console and the second will run the kubevirt-plugin. In case you are using Openshift, make sure to set the environment variable `BRIDGE_BRANDING=openshift` in both terminals before starting. Set environment variable `PROXY_ENV=local` if you are running `kubevirt-apiserver-proxy` locally.
 
 In the first terminal:
 
-1. Log into the OpenShift cluster you are using.
+1. Log into the OpenShift cluster you are using with `oc login` command.
 2. Run `yarn start-console` OR `./start-console.sh` OR `./start-console-auth-mode.sh`.
 
 In the second terminal:

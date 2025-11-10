@@ -36,12 +36,31 @@ EOF
     echo "Route '$ROUTE_NAME' created successfully with host: ${HOSTNAME}"
 fi
 
+# Determine endpoint based on PROXY_ENV environment variable
+if [ "${PROXY_ENV:-production}" = "local" ]; then
+    echo "Using local proxy..."
+
+    # Determine endpoint based on container runtime and OS
+    if command -v podman >/dev/null; then
+        if [ "$(uname -s)" = "Linux" ]; then
+            ENDPOINT="http://localhost:8080"
+        else
+            ENDPOINT="http://host.containers.internal:8080"
+        fi
+    else
+        ENDPOINT="http://host.docker.internal:8080"
+    fi
+else
+    echo "Using cluster route proxy..."
+    ENDPOINT="https://${HOSTNAME}"
+fi
+
 export BRIDGE_PLUGIN_PROXY=$(
     cat <<END | jq -c .
 {"services":[
     {
         "consoleAPIPath":"/api/proxy/plugin/kubevirt-plugin/kubevirt-apiserver-proxy/",
-        "endpoint":"https://${HOSTNAME}",
+        "endpoint":"${ENDPOINT}",
         "authorize":true
     }
 ]}
