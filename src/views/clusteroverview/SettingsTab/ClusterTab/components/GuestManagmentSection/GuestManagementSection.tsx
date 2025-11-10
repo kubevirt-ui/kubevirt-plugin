@@ -9,6 +9,7 @@ import ExpandSection from '../../../ExpandSection/ExpandSection';
 
 import AutomaticSubscriptionRHELGuests from './AutomaticSubscriptionRHELGuests/AutomaticSubscriptionRHELGuests';
 import GuestSystemLogsAccess from './GuestSystemLogsAccess/GuestSystemLogsAccess';
+import HideCredentials from './HideCredentials/HideCredentials';
 
 type GuestManagementSectionProps = {
   hyperConvergeConfiguration: [hyperConvergeConfig: HyperConverged, loaded: boolean, error: any];
@@ -32,6 +33,9 @@ const GuestManagementSection: FC<GuestManagementSectionProps> = ({
             hyperConvergeConfiguration={hyperConvergeConfiguration}
             newBadge={newBadge}
           />
+        </StackItem>
+        <StackItem isFilled>
+          <HideCredentials newBadge={newBadge} />
         </StackItem>
         <StackItem isFilled>
           <AutomaticSubscriptionRHELGuests newBadge={newBadge} />
