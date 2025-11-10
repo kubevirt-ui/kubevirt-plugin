@@ -49,9 +49,9 @@ const VirtualMachineNavigator: FC = () => {
           <VirtualMachinesListPageHeader namespace={namespace} onFilterChange={onFilterChange} />
           <Divider />
           <VirtualMachineTreeView onFilterChange={onFilterChange} {...treeProps}>
+            <GuidedTour />
             {isVirtualMachineListPage ? (
               <>
-                <GuidedTour />
                 <VirtualMachinesList
                   allVMsLoaded={treeProps.loaded}
                   cluster={cluster}

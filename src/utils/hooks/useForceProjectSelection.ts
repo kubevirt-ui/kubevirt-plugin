@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
+import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/constants';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -20,6 +21,7 @@ export const useForceProjectSelection = (
 
   useEffect(() => {
     if (!enabled) return;
+    if (runningTourSignal.value) return;
 
     // Check if the current path includes ALL_NAMESPACES_PATH and any of the pathConditions
     const shouldRedirect = pathConditions.some(
