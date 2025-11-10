@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
-import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/constants';
+import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { isEmpty } from '@kubevirt-utils/utils/utils';

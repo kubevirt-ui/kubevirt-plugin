@@ -21,10 +21,8 @@ import {
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ColumnManagement from '@kubevirt-utils/components/ColumnManagementModal/ColumnManagement';
-import {
-  runningTourSignal,
-  tourGuideVM,
-} from '@kubevirt-utils/components/GuidedTour/utils/constants';
+import { tourGuideVM } from '@kubevirt-utils/components/GuidedTour/utils/constants';
+import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
 import { ExposedFilterFunctions } from '@kubevirt-utils/components/ListPageFilter/types';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { PageTitles } from '@kubevirt-utils/constants/page-constants';

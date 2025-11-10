@@ -6,14 +6,14 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useSignals } from '@preact/signals-react/runtime';
 
 import TourPopover from './components/TourPopover/TourPopover';
+import { tourSteps } from './utils/constants';
 import {
   nextStep,
   prevStep,
   runningTourSignal,
   stepIndexSignal,
   stopTour,
-  tourSteps,
-} from './utils/constants';
+} from './utils/guidedTourSignals';
 
 const GuidedTour: FC = () => {
   useSignals();
@@ -50,6 +50,7 @@ const GuidedTour: FC = () => {
 
             return;
           }
+
           if (action === ACTIONS.NEXT) {
             if (stepIndexSignal.value === size - 1) {
               stopTour();
