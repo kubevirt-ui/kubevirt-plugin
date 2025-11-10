@@ -1,5 +1,6 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 
+import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import SecretSelectionRadioGroup from '@kubevirt-utils/components/SSHSecretModal/components/SecretSelectionRadioGroup';
 import SSHKeyUpload from '@kubevirt-utils/components/SSHSecretModal/components/SSHKeyUpload/SSHKeyUpload';
 import {
@@ -9,7 +10,7 @@ import {
 } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { Alert, AlertVariant, Checkbox, Grid, GridItem } from '@patternfly/react-core';
+import { Checkbox, Grid, GridItem } from '@patternfly/react-core';
 
 import SSHOptionUseExisting from '../SSHOptionUseExisting/SSHOptionUseExisting';
 
@@ -94,11 +95,7 @@ const SSHSecretModalBody: FC<SSHSecretModalBodyProps> = ({
           isDisabled={isUserTab}
         />
       )}
-      {secretsLoadError && (
-        <Alert title={t('Error')} variant={AlertVariant.danger}>
-          {secretsLoadError}
-        </Alert>
-      )}
+      {secretsLoadError && <ErrorAlert error={secretsLoadError} />}
     </Grid>
   );
 };
