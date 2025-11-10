@@ -2,10 +2,8 @@ import React, { FC, useMemo } from 'react';
 import { useParams } from 'react-router-dom-v5-compat';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import {
-  runningTourSignal,
-  tourGuideVM,
-} from '@kubevirt-utils/components/GuidedTour/utils/constants';
+import { tourGuideVM } from '@kubevirt-utils/components/GuidedTour/utils/constants';
+import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
 import HorizontalNavbar from '@kubevirt-utils/components/HorizontalNavbar/HorizontalNavbar';
 import { SidebarEditorProvider } from '@kubevirt-utils/components/SidebarEditor/SidebarEditorContext';
 import { getResourceDetailsTitle } from '@kubevirt-utils/constants/page-constants';
