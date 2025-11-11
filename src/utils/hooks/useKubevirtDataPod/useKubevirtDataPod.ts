@@ -54,7 +54,7 @@ const useKubevirtDataPod: UseKubevirtDataPod = <T extends K8sResourceCommon | K8
       },
       share: true,
     },
-    shouldConnect && Boolean(resourceVersion),
+    shouldConnect && Boolean(resourceVersion) && !isEmpty(watchOptionsMemoized.groupVersionKind),
   );
   useEffect(() => {
     const fetch = async () => {
