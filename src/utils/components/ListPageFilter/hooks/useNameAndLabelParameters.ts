@@ -15,19 +15,15 @@ export const useNameAndLabelParameters = () => {
     const nameQuery = queryParams.get(VirtualMachineRowFilterType.Name);
     const labelsQuery = queryParams.get(VirtualMachineRowFilterType.Labels);
 
-    if (nameQuery) {
-      filters[VirtualMachineRowFilterType.Name] = {
-        filterGroupName: STATIC_SEARCH_FILTERS_LABELS.name,
-        query: nameQuery,
-      };
-    }
+    filters[VirtualMachineRowFilterType.Name] = {
+      filterGroupName: STATIC_SEARCH_FILTERS_LABELS.name,
+      query: nameQuery,
+    };
 
-    if (labelsQuery) {
-      filters[VirtualMachineRowFilterType.Labels] = {
-        filterGroupName: STATIC_SEARCH_FILTERS_LABELS.labels,
-        query: labelsQuery,
-      };
-    }
+    filters[VirtualMachineRowFilterType.Labels] = {
+      filterGroupName: STATIC_SEARCH_FILTERS_LABELS.labels,
+      query: labelsQuery,
+    };
 
     return filters;
   }, [queryParams]);

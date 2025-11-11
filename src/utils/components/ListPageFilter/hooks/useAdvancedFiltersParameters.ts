@@ -14,12 +14,10 @@ export const useAdvancedFiltersParameters = (advancedFilters: RowFilter[]) => {
       (acc, { filterGroupName, type }) => {
         const query = queryParams.get(getRowFilterQueryKey(type));
 
-        if (query) {
-          acc[type] = {
-            filterGroupName,
-            query,
-          };
-        }
+        acc[type] = {
+          filterGroupName,
+          query,
+        };
 
         return acc;
       },
