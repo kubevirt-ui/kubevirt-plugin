@@ -1,10 +1,11 @@
 import { useMemo } from 'react';
 
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
+import { isSystemNamespace } from '@kubevirt-utils/resources/namespace/helper';
 import { TreeViewDataItem } from '@patternfly/react-core';
 
 import { HIDE, PROJECT_SELECTOR_PREFIX, SHOW, SHOW_EMPTY_PROJECTS_KEY } from '../utils/constants';
-import { filterNamespaceItems, isSystemNamespace } from '../utils/utils';
+import { filterNamespaceItems } from '../utils/utils';
 
 type UseFilteredTreeView = (treeData: TreeViewDataItem[]) => TreeViewDataItem[];
 
