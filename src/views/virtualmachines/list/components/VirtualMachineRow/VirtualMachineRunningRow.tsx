@@ -7,7 +7,8 @@ import {
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, NodeModel } from '@kubevirt-utils/models';
-import { getVMIIPAddressesWithName } from '@kubevirt-utils/resources/vmi';
+import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
+import { getVMIIPAddressesWithName, getVMINodeName } from '@kubevirt-utils/resources/vmi';
 import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { RowProps } from '@openshift-console/dynamic-plugin-sdk';
@@ -31,18 +32,21 @@ const VirtualMachineRunningRow: FC<
   const { t } = useKubevirtTranslation();
 
   const ipAddresses = getVMIIPAddressesWithName(vmi);
+  const nodeName = getVMINodeName(vmi);
 
   return (
     <VirtualMachineRowLayout
       rowData={{
         ips: <FirstItemListPopover headerContent={t('IP addresses')} items={ipAddresses} />,
-        node: (
+        node: nodeName ? (
           <MulticlusterResourceLink
             cluster={getCluster(obj)}
             groupVersionKind={modelToGroupVersionKind(NodeModel)}
-            name={vmi?.status?.nodeName}
+            name={nodeName}
             truncate
           />
+        ) : (
+          NO_DATA_DASH
         ),
         pvcMapper,
         status,
