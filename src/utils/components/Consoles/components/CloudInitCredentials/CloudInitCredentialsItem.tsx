@@ -1,5 +1,6 @@
 import React, { FC, useState } from 'react';
 
+import useHideCredentials from '@kubevirt-utils/hooks/useHideCredentials/useHideCredentials';
 import { Button, Flex, FlexItem, Tooltip } from '@patternfly/react-core';
 import { EyeIcon, EyeSlashIcon } from '@patternfly/react-icons';
 
@@ -21,6 +22,7 @@ const CloudInitCredentialsItem: FC<CloudInitCredentialsItemProps> = ({
   showCredentialText,
 }) => {
   const [isCredentialsVisible, setIsCredentialsVisible] = useState(false);
+  const { shouldHideCredentials } = useHideCredentials();
 
   return (
     <>
@@ -30,14 +32,16 @@ const CloudInitCredentialsItem: FC<CloudInitCredentialsItemProps> = ({
           clipboardText={credentials}
           isCredentialsVisible={isCredentialsVisible}
         />
-        <Tooltip content={isCredentialsVisible ? hideCredentialText : showCredentialText}>
-          <Button
-            data-test={buttonDataTest}
-            icon={isCredentialsVisible ? <EyeSlashIcon /> : <EyeIcon />}
-            onClick={() => setIsCredentialsVisible(!isCredentialsVisible)}
-            variant="plain"
-          />
-        </Tooltip>
+        {!shouldHideCredentials && (
+          <Tooltip content={isCredentialsVisible ? hideCredentialText : showCredentialText}>
+            <Button
+              data-test={buttonDataTest}
+              icon={isCredentialsVisible ? <EyeSlashIcon /> : <EyeIcon />}
+              onClick={() => setIsCredentialsVisible(!isCredentialsVisible)}
+              variant="plain"
+            />
+          </Tooltip>
+        )}
       </Flex>
     </>
   );
