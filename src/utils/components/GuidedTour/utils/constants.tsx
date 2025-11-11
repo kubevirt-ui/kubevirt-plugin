@@ -4,36 +4,11 @@ import { Step } from 'react-joyride';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { RUNSTRATEGY_ALWAYS } from '@kubevirt-utils/constants/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { signal } from '@preact/signals-react';
 import { TREE_VIEW_PANEL_ID } from '@virtualmachines/tree/utils/constants';
 
 import AddVolumeContent from '../components/AddVolumeContent/AddVolumeContent';
 import EndTourContent from '../components/EndTourContent/EndTourContent';
 import NewStepTitle from '../components/NewStepTitle/NewStepTitle';
-
-export const runningTourSignal = signal(false);
-export const stepIndexSignal = signal(0);
-
-export const nextStep = () => {
-  stepIndexSignal.value++;
-};
-export const prevStep = () => {
-  if (stepIndexSignal.value > 0) {
-    --stepIndexSignal.value;
-  }
-};
-
-export const startTour = () => {
-  if (stepIndexSignal.value >= 6) stepIndexSignal.value = 0;
-  runningTourSignal.value = true;
-};
-export const stopTour = () => {
-  runningTourSignal.value = false;
-};
-
-export const resetTour = () => {
-  stepIndexSignal.value = 0;
-};
 
 export const tourSteps: Step[] = [
   {
@@ -105,7 +80,7 @@ export const tourSteps: Step[] = [
     },
     disableBeacon: true,
     placement: 'bottom',
-    target: '#VirtualMachineConfigurationTabSearch-autocomplete-search',
+    target: '#ConfigurationSearch-autocomplete-search',
     title: t('Search for configurable items'),
   },
   {

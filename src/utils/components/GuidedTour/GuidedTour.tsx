@@ -3,18 +3,21 @@ import Joyride, { ACTIONS, CallBackProps, EVENTS } from 'react-joyride';
 import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { useSignals } from '@preact/signals-react/runtime';
 
 import TourPopover from './components/TourPopover/TourPopover';
+import { tourSteps } from './utils/constants';
 import {
   nextStep,
   prevStep,
   runningTourSignal,
   stepIndexSignal,
   stopTour,
-  tourSteps,
-} from './utils/constants';
+} from './utils/guidedTourSignals';
 
 const GuidedTour: FC = () => {
+  useSignals();
+
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -38,18 +41,26 @@ const GuidedTour: FC = () => {
         }
 
         if (type === EVENTS.STEP_AFTER) {
+          if (index !== stepIndexSignal.value) {
+            return;
+          }
+
           if (action === ACTIONS.PREV) {
             prevStep();
 
             return;
           }
+
           if (action === ACTIONS.NEXT) {
-            if (index === size - 1) {
+            if (stepIndexSignal.value === size - 1) {
               stopTour();
               return;
             }
-            nextStep();
-            return;
+
+            if (stepIndexSignal.value < tourSteps.length - 1) {
+              nextStep();
+              return;
+            }
           }
         }
       }}
