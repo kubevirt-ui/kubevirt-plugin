@@ -169,7 +169,10 @@ export const getSearchTextPlaceholder = (
   );
 };
 
-export const getFilterLabels = (query?: string, filterType?: VirtualMachineRowFilterType) => {
+export const getFilterLabels = (
+  query?: null | string,
+  filterType?: VirtualMachineRowFilterType,
+) => {
   if (!query) {
     return [];
   }

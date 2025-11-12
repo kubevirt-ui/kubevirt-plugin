@@ -20,5 +20,5 @@ export type ExposedFilterFunctions = {
 
 export type FilterInfo = {
   filterGroupName: string;
-  query: string;
+  query: null | string;
 };
