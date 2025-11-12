@@ -112,7 +112,7 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
         id="favorites"
         modifier="fitContent"
       />
-      <TableData activeColumnIDs={activeColumnIDs} id="name" width={20}>
+      <TableData activeColumnIDs={activeColumnIDs} id="name" width={15}>
         <Flex alignItems={{ default: 'alignItemsCenter' }} columnGap={{ default: 'columnGapXs' }}>
           <img alt="os-icon" className="bootable-volume-row-icon" src={icon} />
           <FlexItem>
@@ -133,7 +133,7 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
           {bootVolumeNamespace}
         </TableData>
       )}
-      <TableData activeColumnIDs={activeColumnIDs} id="operating-system" width={20}>
+      <TableData activeColumnIDs={activeColumnIDs} id="operating-system" width={15}>
         {getAnnotation(preference, PREFERENCE_DISPLAY_NAME_KEY, NO_DATA_DASH)}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="storage-class" width={15}>
@@ -141,10 +141,10 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
           pvcSource?.spec?.storageClassName ||
           NO_DATA_DASH}
       </TableData>
-      <TableData activeColumnIDs={activeColumnIDs} id="size">
+      <TableData activeColumnIDs={activeColumnIDs} id="size" width={10}>
         {sizeData}
       </TableData>
-      <TableData activeColumnIDs={activeColumnIDs} id={ANNOTATIONS.description} width={30}>
+      <TableData activeColumnIDs={activeColumnIDs} id={ANNOTATIONS.description} width={20}>
         <TableText wrapModifier={WrapModifier.truncate}>
           {getAnnotation(bootableVolume, ANNOTATIONS.description, NO_DATA_DASH)}
         </TableText>
