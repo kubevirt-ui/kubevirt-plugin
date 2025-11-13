@@ -3,38 +3,50 @@ import * as React from 'react';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import {
+  ClusterNamespacedResourceMap,
+  getResourceFromClusterMap,
+} from '@kubevirt-utils/resources/shared';
 import { getTemplateBootSourceType } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import { getVMBootSourceLabel } from '@kubevirt-utils/resources/vm/utils/source';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { Badge, Label, Split, SplitItem } from '@patternfly/react-core';
 
 import './VirtualMachineTemplatesSource.scss';
 
 type VirtualMachineTemplatesSourceProps = {
-  availableDatasources: Record<string, V1beta1DataSource>;
+  availableDataSources: ClusterNamespacedResourceMap<V1beta1DataSource>;
   availableTemplatesUID: Set<string>;
-  cloneInProgressDatasources: Record<string, V1beta1DataSource>;
+  cloneInProgressDataSources: ClusterNamespacedResourceMap<V1beta1DataSource>;
   template: V1Template;
 };
 
 const VirtualMachineTemplatesSource: React.FC<VirtualMachineTemplatesSourceProps> = ({
-  availableDatasources,
+  availableDataSources,
   availableTemplatesUID,
-  cloneInProgressDatasources,
+  cloneInProgressDataSources,
   template,
 }) => {
   const { t } = useKubevirtTranslation();
   const bootSource = getTemplateBootSourceType(template);
-  const dataSource =
-    availableDatasources?.[
-      `${bootSource?.source?.sourceRef?.namespace}-${bootSource?.source?.sourceRef?.name}`
-    ];
+  const dataSource = getResourceFromClusterMap(
+    availableDataSources,
+    getCluster(template),
+    bootSource?.source?.sourceRef?.namespace,
+    bootSource?.source?.sourceRef?.name,
+  );
   const bootSourceLabel = getVMBootSourceLabel(bootSource?.type, dataSource);
   const isBootSourceAvailable = availableTemplatesUID.has(template?.metadata?.uid);
 
-  const isCloningSource =
-    !!cloneInProgressDatasources?.[
-      `${bootSource?.source?.sourceRef?.namespace}-${bootSource?.source?.sourceRef?.name}`
-    ];
+  const isCloningSource = !isEmpty(
+    getResourceFromClusterMap(
+      cloneInProgressDataSources,
+      getCluster(template),
+      bootSource?.source?.sourceRef?.namespace,
+      bootSource?.source?.sourceRef?.name,
+    ),
+  );
 
   return (
     <Split hasGutter>

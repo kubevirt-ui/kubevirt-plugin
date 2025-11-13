@@ -13,6 +13,10 @@ declare module '@kubevirt-ui/kubevirt-api/kubevirt' {
     cluster?: string;
   }
 
+  interface V1beta1DataSource extends kubevirtUITypes.V1beta1DataSource {
+    cluster?: string;
+  }
+
   declare module '*.scss' {
     const content: { [className: string]: string };
     export default content;

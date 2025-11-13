@@ -29,7 +29,7 @@ const TemplatesCatalog: FC<TemplatesCatalogProps> = ({ currentTab }) => {
   const [selectedTemplate, setSelectedTemplate] = useState<undefined | V1Template>(undefined);
 
   const [filters, onFilterChange, clearAll] = useTemplatesFilters();
-  const { availableDatasources, availableTemplatesUID, bootSourcesLoaded, loaded, templates } =
+  const { availableDataSources, availableTemplatesUID, bootSourcesLoaded, loaded, templates } =
     useTemplatesWithAvailableSource({
       namespace: filters.namespace,
       onlyAvailable: filters.onlyAvailable,
@@ -63,7 +63,7 @@ const TemplatesCatalog: FC<TemplatesCatalogProps> = ({ currentTab }) => {
                       setSelectedTemplate(template);
                       logTemplateFlowEvent(TEMPLATE_SELECTED, template);
                     }}
-                    availableDatasources={availableDatasources}
+                    availableDatasources={availableDataSources}
                     availableTemplatesUID={availableTemplatesUID}
                     bootSourcesLoaded={bootSourcesLoaded}
                     filters={filters}

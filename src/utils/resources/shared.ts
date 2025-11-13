@@ -438,6 +438,15 @@ export function convertResourceArrayToMapWithCluster<
   );
 }
 
+export const getResourceFromClusterMap = <A extends K8sResourceCommon = K8sResourceCommon>(
+  clusterMap: ClusterNamespacedResourceMap<A> | ClusterResourceMap<A>,
+  cluster: string,
+  namespace: string,
+  name: string,
+): A => {
+  return clusterMap?.[cluster || SINGLE_CLUSTER_KEY]?.[namespace]?.[name];
+};
+
 /**
  * function to get all V1beta1DataSource objects with condition type 'Ready'and status to be 'True'
  * @param {V1beta1DataSource[]} dataSources list of DataSources to be filtered

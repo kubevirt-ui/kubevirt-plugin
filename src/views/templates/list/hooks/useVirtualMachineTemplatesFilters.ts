@@ -1,8 +1,10 @@
 import { useMemo } from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { useClusterFilter } from '@kubevirt-utils/hooks/useClusterFilter';
 import useHcoWorkloadArchitectures from '@kubevirt-utils/hooks/useHcoWorkloadArchitectures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useProjectFilter } from '@kubevirt-utils/hooks/useProjectFilter';
 import {
   getTemplateOS,
   HIDE_DEPRECATED_TEMPLATES,
@@ -18,6 +20,7 @@ import {
 } from '@kubevirt-utils/utils/architecture';
 import { ItemsToFilterProps } from '@kubevirt-utils/utils/types';
 import { getItemNameWithOther, includeFilter } from '@kubevirt-utils/utils/utils';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
 import { getTemplateProviderName } from '../../utils/selectors';
@@ -43,7 +46,7 @@ const useTemplateProviders = (): ItemsToFilterProps[] => {
 
 const useVirtualMachineTemplatesFilters = (
   availableTemplatesUID: Set<string>,
-): RowFilter<V1Template>[] => {
+): { filters: RowFilter<V1Template>[]; filtersWithSelect: RowFilter<V1Template>[] } => {
   const { t } = useKubevirtTranslation();
   const providers = useTemplateProviders();
   const workloadsArchitectures = useHcoWorkloadArchitectures();
@@ -56,70 +59,89 @@ const useVirtualMachineTemplatesFilters = (
     [workloadsArchitectures],
   );
 
-  return [
-    {
-      filter: (availableResourceNames, obj) =>
-        availableResourceNames?.selected?.length === 0 || !isDeprecatedTemplate(obj),
-      filterGroupName: ' ',
-      items: [
-        {
-          id: HIDE_DEPRECATED_TEMPLATES_KEY,
-          title: t('Hide deprecated templates'),
-        },
-      ],
-      reducer: (obj) => isDeprecatedTemplate(obj) && HIDE_DEPRECATED_TEMPLATES_KEY,
-      type: HIDE_DEPRECATED_TEMPLATES,
-    },
-    {
-      filter: (availableArchitectures, obj) =>
-        includeFilter(availableArchitectures, workloadsArchitecturesItems, getArchitecture(obj)),
-      filterGroupName: ARCHITECTURE_TITLE,
-      items: workloadsArchitecturesItems,
-      reducer: (obj) => getItemNameWithOther(getArchitecture(obj), workloadsArchitecturesItems),
-      type: ARCHITECTURE_ID,
-    },
-    {
-      filter: ({ selected }, obj) => selected?.length === 0 || isDefaultVariantTemplate(obj),
-      filterGroupName: t('Type'),
-      items: [
-        {
-          id: 'is-default',
-          title: t('Default templates'),
-        },
-      ],
-      reducer: (obj) => (isDefaultVariantTemplate(obj) ? 'is-default' : ''),
-      type: 'is-default-template',
-    },
-    {
-      filter: ({ selected }, obj) =>
-        selected?.length === 0 || availableTemplatesUID.has(obj.metadata.uid),
-      filterGroupName: t('Boot source'),
-      items: [
-        {
-          id: 'available',
-          title: t('Boot source available'),
-        },
-      ],
-      reducer: (obj) => (availableTemplatesUID.has(obj.metadata.uid) ? 'available' : ''),
-      type: 'boot-source-available',
-    },
-    {
-      filter: (availableTemplateProviders, obj) =>
-        includeFilter(availableTemplateProviders, providers, getTemplateProviderName(obj)),
-      filterGroupName: t('Template provider'),
-      items: providers,
-      reducer: (obj) => getItemNameWithOther(getTemplateProviderName(obj), providers),
-      type: 'template-provider',
-    },
-    {
-      filter: (availableOsNames, obj) =>
-        includeFilter(availableOsNames, OS_NAMES, getTemplateOS(obj)),
-      filterGroupName: t('Operating system'),
-      items: OS_NAMES,
-      reducer: (obj) => getItemNameWithOther(getTemplateOS(obj), OS_NAMES),
-      type: 'osName',
-    },
-  ];
+  const isACMPage = useIsACMPage();
+  const clusterFilter = useClusterFilter();
+  const projectFilter = useProjectFilter();
+
+  const filtersWithSelect = useMemo(
+    () => (isACMPage ? [clusterFilter, projectFilter] : []),
+    [isACMPage, clusterFilter, projectFilter],
+  );
+
+  const filters = useMemo(
+    () => [
+      {
+        filter: (availableResourceNames, obj) =>
+          availableResourceNames?.selected?.length === 0 || !isDeprecatedTemplate(obj),
+        filterGroupName: ' ',
+        items: [
+          {
+            id: HIDE_DEPRECATED_TEMPLATES_KEY,
+            title: t('Hide deprecated templates'),
+          },
+        ],
+        reducer: (obj) => isDeprecatedTemplate(obj) && HIDE_DEPRECATED_TEMPLATES_KEY,
+        type: HIDE_DEPRECATED_TEMPLATES,
+      },
+      {
+        filter: (availableArchitectures, obj) =>
+          includeFilter(availableArchitectures, workloadsArchitecturesItems, getArchitecture(obj)),
+        filterGroupName: ARCHITECTURE_TITLE,
+        items: workloadsArchitecturesItems,
+        reducer: (obj) => getItemNameWithOther(getArchitecture(obj), workloadsArchitecturesItems),
+        type: ARCHITECTURE_ID,
+      },
+      {
+        filter: ({ selected }, obj) => selected?.length === 0 || isDefaultVariantTemplate(obj),
+        filterGroupName: t('Type'),
+        items: [
+          {
+            id: 'is-default',
+            title: t('Default templates'),
+          },
+        ],
+        reducer: (obj) => (isDefaultVariantTemplate(obj) ? 'is-default' : ''),
+        type: 'is-default-template',
+      },
+      {
+        filter: ({ selected }, obj) =>
+          selected?.length === 0 || availableTemplatesUID.has(obj.metadata.uid),
+        filterGroupName: t('Boot source'),
+        items: [
+          {
+            id: 'available',
+            title: t('Boot source available'),
+          },
+        ],
+        reducer: (obj) => (availableTemplatesUID.has(obj.metadata.uid) ? 'available' : ''),
+        type: 'boot-source-available',
+      },
+      {
+        filter: (availableTemplateProviders, obj) =>
+          includeFilter(availableTemplateProviders, providers, getTemplateProviderName(obj)),
+        filterGroupName: t('Template provider'),
+        items: providers,
+        reducer: (obj) => getItemNameWithOther(getTemplateProviderName(obj), providers),
+        type: 'template-provider',
+      },
+      {
+        filter: (availableOsNames, obj) =>
+          includeFilter(availableOsNames, OS_NAMES, getTemplateOS(obj)),
+        filterGroupName: t('Operating system'),
+        items: OS_NAMES,
+        reducer: (obj) => getItemNameWithOther(getTemplateOS(obj), OS_NAMES),
+        type: 'osName',
+      },
+    ],
+    [availableTemplatesUID, providers, workloadsArchitecturesItems, t],
+  );
+
+  return useMemo(() => {
+    return {
+      filters,
+      filtersWithSelect,
+    };
+  }, [filters, filtersWithSelect]);
 };
 
 export default useVirtualMachineTemplatesFilters;
