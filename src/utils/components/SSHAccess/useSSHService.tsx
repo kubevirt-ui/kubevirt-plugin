@@ -1,6 +1,7 @@
 import { modelToGroupVersionKind, ServiceModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getServicesForVmi } from '@kubevirt-utils/resources/vmi';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
@@ -14,7 +15,7 @@ const useSSHService = (vm: V1VirtualMachine): UseSSHServiceReturnType => {
     cluster: getCluster(vm),
     groupVersionKind: modelToGroupVersionKind(ServiceModel),
     isList: true,
-    namespace: vm?.metadata?.namespace,
+    namespace: getNamespace(vm),
   };
 
   const [services, servicesLoaded, servicesError] = useK8sWatchData<IoK8sApiCoreV1Service[]>(

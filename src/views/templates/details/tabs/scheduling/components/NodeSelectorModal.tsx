@@ -18,7 +18,8 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { Form } from '@patternfly/react-core';
 
 type NodeSelectorModalProps = {
@@ -42,7 +43,8 @@ const NodeSelectorModal: React.FC<NodeSelectorModalProps> = ({
     onEntityDelete: onLabelDelete,
   } = useIDEntities<IDLabel>(nodeSelectorToIDLabels(getNodeSelector(template)));
 
-  const [nodes, nodesLoaded] = useK8sWatchResource<IoK8sApiCoreV1Node[]>({
+  const [nodes, nodesLoaded] = useK8sWatchData<IoK8sApiCoreV1Node[]>({
+    cluster: getCluster(template),
     groupVersionKind: modelToGroupVersionKind(NodeModel),
     isList: true,
   });
