@@ -14,6 +14,7 @@
     "paths": {
       "@catalog/*": ["src/views/catalog/*"],
       "@images/*": ["./images/*"],
+      "@kubevirt-extensions/*": ["src/extensions/*"],
       "@kubevirt-utils": ["src/utils"],
       "@kubevirt-utils/*": ["src/utils/*"],
       "@multicluster/*": ["src/multicluster/*"],
