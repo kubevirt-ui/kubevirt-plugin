@@ -16,18 +16,13 @@ import {
   getResourceVersion,
   registerResourceVersion,
 } from './utils/utils';
-import useKubevirtDataPodFilters from './useKubevirtDataPodFilters';
-
-type UseKubevirtDataPod = <T extends K8sResourceCommon | K8sResourceCommon[]>(
-  watchOptions: WatchK8sResource,
-  filterOptions?: { [key: string]: string },
-) => [T, boolean, Error];
+import useKubevirtDataPodFilters, { KubevirtDataPodFilters } from './useKubevirtDataPodFilters';
 
 const nullResponse: [undefined, boolean, Error] = [undefined, false, null];
 
-const useKubevirtDataPod: UseKubevirtDataPod = <T extends K8sResourceCommon | K8sResourceCommon[]>(
+const useKubevirtDataPod = <T extends K8sResourceCommon | K8sResourceCommon[]>(
   watchOptions: WatchK8sResource,
-  filterOptions?: { [key: string]: string },
+  filterOptions?: KubevirtDataPodFilters,
 ) => {
   const [data, setData] = useState<T>((<unknown>[]) as T);
   const [loaded, setLoaded] = useState<boolean>(false);
