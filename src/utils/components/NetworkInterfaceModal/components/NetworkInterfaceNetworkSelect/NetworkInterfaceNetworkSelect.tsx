@@ -10,7 +10,7 @@ import React, {
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
-import Loading from '@kubevirt-utils/components/Loading/Loading';
+import { showErrorText } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/constants';
 import SelectTypeahead, {
   SelectTypeaheadOptionProps,
 } from '@kubevirt-utils/components/SelectTypeahead/SelectTypeahead';
@@ -199,35 +199,28 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
       labelHelp={<NetworkSelectHelperPopover />}
     >
       <div data-test-id="network-attachment-definition-select">
-        {hasPodNetwork && !loaded ? (
-          <Loading />
-        ) : (
-          <SelectTypeahead
-            addOption={(value) =>
-              setCreatedNetworkOptions((prev) => [
-                ...prev.filter((option) => option.value !== value),
-                createNewNetworkOption(value),
-              ])
-            }
-            canCreate
-            dataTestId="select-nad"
-            getCreateAction={getCreateNetworkOption}
-            isFullWidth
-            key={selectedFirstOnLoad ? 'select-nad-with-preselect' : 'select-nad-without-preselect'}
-            options={networkOptions}
-            placeholder={t('Select a NetworkAttachmentDefinition')}
-            selectedValue={networkName}
-            setSelectedValue={handleChange}
-          />
-        )}
+        <SelectTypeahead
+          addOption={(value) =>
+            setCreatedNetworkOptions((prev) => [
+              ...prev.filter((option) => option.value !== value),
+              createNewNetworkOption(value),
+            ])
+          }
+          canCreate
+          dataTestId="select-nad"
+          getCreateAction={getCreateNetworkOption}
+          isFullWidth
+          key={selectedFirstOnLoad ? 'select-nad-with-preselect' : 'select-nad-without-preselect'}
+          options={networkOptions}
+          placeholder={t('Select a NetworkAttachmentDefinition')}
+          selectedValue={networkName}
+          setSelectedValue={handleChange}
+        />
       </div>
-      {loaded && validated === ValidatedOptions.error && (
-        <FormGroupHelperText validated={validated}>
-          {t(
-            'No NetworkAttachmentDefinitions available. Contact your system administrator for additional support.',
-          )}
-        </FormGroupHelperText>
-      )}
+      {hasPodNetwork ||
+        (loaded && validated === ValidatedOptions.error && (
+          <FormGroupHelperText validated={validated}>{showErrorText}</FormGroupHelperText>
+        ))}
     </FormGroup>
   );
 };
