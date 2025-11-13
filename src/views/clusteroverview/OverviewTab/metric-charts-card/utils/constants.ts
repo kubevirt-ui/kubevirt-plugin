@@ -4,4 +4,5 @@ export enum METRICS {
   VCPU_USAGE = 'vCPU usage',
   MEMORY = 'Memory',
   STORAGE = 'Storage',
+  OVERCOMMIT_RATIO = 'Overcommit ratio',
 }

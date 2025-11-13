@@ -1,5 +1,6 @@
 import { timestampFor } from '@kubevirt-utils/components/Timestamp/utils/datetime';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { ChartThemeColor } from '@patternfly/react-charts/victory';
 
 import { ChartData, ChartPoint } from './hooks/types';
 import { METRICS } from './constants';
@@ -7,6 +8,7 @@ import { METRICS } from './constants';
 export const getCurrentValue = (chartData: ChartData) => chartData?.[chartData?.length - 1]?.y;
 
 export const labelUnits: { [key: string]: string } = {
+  [METRICS.OVERCOMMIT_RATIO]: t('%'),
   [METRICS.VCPU_USAGE]: t('vCPU'),
   [METRICS.VM]: t('VMs'),
 };
@@ -36,3 +38,12 @@ export const formatPopoverLabel =
       false,
     )}\n ${datum?.y?.toLocaleString()} ${displayUnit}`;
   };
+
+export const getOvercommitThemeColor = (currentRatio: number, targetValue: number) => {
+  if (currentRatio >= targetValue) return ChartThemeColor.orange;
+  if (currentRatio >= targetValue * 0.8) return ChartThemeColor.yellow;
+  return ChartThemeColor.green;
+};
+
+export const formatOvercommitLabel = ({ datum }) =>
+  datum.x === 'Current' ? `${datum.x}: ${datum.y}%` : null;

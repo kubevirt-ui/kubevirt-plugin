@@ -4,4 +4,8 @@ export type ChartCardProps = {
   metric: string;
 };
 
-export type MetricChartProps = { metric: string; metricChartData: MetricChartData };
+export type MetricChartProps = {
+  metric: string;
+  metricChartData: MetricChartData;
+  targetValue?: number;
+};
