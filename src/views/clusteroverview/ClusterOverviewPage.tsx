@@ -10,6 +10,7 @@ import { useSignals } from '@preact/signals-react/runtime';
 import { VIRTUALIZATION_PATHS } from '@virtualmachines/tree/utils/constants';
 
 import GuidedTour from '../../utils/components/GuidedTour/GuidedTour';
+import usePreserveTabDisplay from '../../utils/hooks/usePreserveTabDisplay';
 import WelcomeModal from '../welcome/WelcomeModal';
 
 import ClusterOverviewPageHeader from './Header/ClusterOverviewPageHeader';
@@ -25,6 +26,10 @@ const ClusterOverviewPage: FC = () => {
   useSignals();
 
   useForceProjectSelection([VIRTUALIZATION_PATHS.OVERVIEW]);
+  usePreserveTabDisplay({
+    basePath: VIRTUALIZATION_PATHS.OVERVIEW,
+    storageKey: 'lastVirtualizationOverviewTab',
+  });
 
   const overviewTabs: NavPageKubevirt[] = useMemo(() => {
     const adminPages: NavPageKubevirt[] = [
