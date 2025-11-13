@@ -34,10 +34,7 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
 
   const dynamicPluginPages = useDynamicPages(VirtualMachineModel);
 
-  const allPages = useMemo(
-    () => [...pages, ...(dynamicPluginPages || [])] as NavPageKubevirt[],
-    [pages, dynamicPluginPages],
-  );
+  const allPages = useMemo(() => [...pages, ...dynamicPluginPages], [pages, dynamicPluginPages]);
 
   const paths = allPages.map((page) => page.href);
 
@@ -51,7 +48,7 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
       ) || defaultPage;
 
     setActiveItem(initialActiveTab?.name?.toLowerCase());
-  }, [allPages, location?.pathname]);
+  }, [allPages, location?.pathname, basePath]);
 
   const [activeItem, setActiveItem] = useState<number | string>();
 

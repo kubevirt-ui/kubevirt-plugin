@@ -11,12 +11,12 @@ import { getCluster } from '@multicluster/helpers/selectors';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { useResolvedExtensions } from '@openshift-console/dynamic-plugin-sdk';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
-
-import { ACMVirtualMachineActionExtension } from './constants';
 import {
-  buildACMVirtualMachineActionsFromExtensions,
-  isACMVirtualMachineActionExtension,
-} from './utils';
+  ACMVirtualMachineAction,
+  isACMVirtualMachineAction,
+} from '@kubevirt-extensions/acm.virtualmachine';
+
+import { buildACMVirtualMachineActionsFromExtensions } from './utils';
 
 const useACMExtensionActions = (vm): ActionDropdownItemType[] => {
   const { createModal } = useModal();
@@ -26,7 +26,7 @@ const useACMExtensionActions = (vm): ActionDropdownItemType[] => {
   const [provider, providerLoaded] = useProviderByClusterName(getCluster(vm) ?? hubClusterName);
 
   const [virtualMachineActionExtensions, virtualMachineActionExtensionsResolved] =
-    useResolvedExtensions<ACMVirtualMachineActionExtension>(isACMVirtualMachineActionExtension);
+    useResolvedExtensions<ACMVirtualMachineAction>(isACMVirtualMachineAction);
 
   return useMemo(() => {
     if (!isACMPage || !virtualMachineActionExtensionsResolved) return [];
