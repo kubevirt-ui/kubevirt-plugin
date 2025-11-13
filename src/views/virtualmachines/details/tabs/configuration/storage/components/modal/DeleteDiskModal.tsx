@@ -12,7 +12,9 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { buildOwnerReference, compareOwnerReferences } from '@kubevirt-utils/resources/shared';
 import { getDataVolumeTemplates, getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
-import { k8sDelete, K8sResourceCommon, k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
+import { k8sDelete, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { ButtonVariant, Checkbox, Stack, StackItem } from '@patternfly/react-core';
 
 import { updateDisks } from '../../../details/utils/utils';
@@ -88,7 +90,8 @@ const DeleteDiskModal: FC<DeleteDiskModalProps> = ({
         );
         const updatedResourceVolume = { ...volumeResource };
         updatedResourceVolume.metadata.ownerReferences = updatedVolumeOwnerReferences;
-        return k8sUpdate({
+        return kubevirtK8sUpdate({
+          cluster: getCluster(vm),
           data: updatedResourceVolume,
           model: volumeResourceModel,
           name: updatedResourceVolume?.metadata?.name,

@@ -14,7 +14,8 @@ import Tolerations from '@kubevirt-utils/components/Tolerations/Tolerations';
 import TolerationsModal from '@kubevirt-utils/components/TolerationsModal/TolerationsModal';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
 
 import Affinity from './Affinity';
@@ -43,7 +44,8 @@ const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
     (updatedVM: V1VirtualMachine) =>
       onUpdateVM
         ? onUpdateVM(updatedVM)
-        : k8sUpdate({
+        : kubevirtK8sUpdate({
+            cluster: getCluster(vm),
             data: updatedVM,
             model: VirtualMachineModel,
             name: updatedVM?.metadata?.name,
