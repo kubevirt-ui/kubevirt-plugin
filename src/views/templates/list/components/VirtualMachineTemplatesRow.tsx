@@ -1,14 +1,25 @@
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
-import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import {
+  modelToGroupVersionKind,
+  TemplateModel,
+  V1Template,
+} from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import ArchitectureLabel from '@kubevirt-utils/components/ArchitectureLabel/ArchitectureLabel';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { ClusterNamespacedResourceMap } from '@kubevirt-utils/resources/shared';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
+import { getName } from '@kubevirt-utils/resources/shared';
 import { isDeprecatedTemplate } from '@kubevirt-utils/resources/template';
 import { ARCHITECTURE_ID, getArchitecture } from '@kubevirt-utils/utils/architecture';
+import { ManagedClusterModel } from '@multicluster/constants';
+import { getCluster } from '@multicluster/helpers/selectors';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 import { Label } from '@patternfly/react-core';
+import { FleetResourceLink } from '@stolostron/multicluster-sdk';
 
 import VirtualMachineTemplatesActions from '../../actions/VirtualMachineTemplatesActions';
 import { getWorkloadProfile } from '../../utils/selectors';
@@ -20,47 +31,63 @@ const VirtualMachineTemplatesRow: React.FC<
   RowProps<
     V1Template,
     {
-      availableDatasources: Record<string, V1beta1DataSource>;
+      availableDataSources: ClusterNamespacedResourceMap<V1beta1DataSource>;
       availableTemplatesUID: Set<string>;
-      cloneInProgressDatasources: Record<string, V1beta1DataSource>;
+      cloneInProgressDataSources: ClusterNamespacedResourceMap<V1beta1DataSource>;
     }
   >
 > = ({
   activeColumnIDs,
   obj,
-  rowData: { availableDatasources, availableTemplatesUID, cloneInProgressDatasources },
+  rowData: { availableDataSources, availableTemplatesUID, cloneInProgressDataSources },
 }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
+  const isACMPage = useIsACMPage();
+
+  const namespace = getNamespace(obj);
+  const cluster = getCluster(obj);
+  const name = getName(obj);
 
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-20" id="name">
-        <ResourceLink
+        <FleetResourceLink
           onClick={() =>
-            navigate(`/k8s/ns/${obj.metadata.namespace}/templates/${obj.metadata.name}`)
+            navigate(
+              isACMPage
+                ? `/k8s/cluster/${cluster}/ns/${namespace}/templates/${name}`
+                : `/k8s/ns/${namespace}/templates/${name}`,
+            )
           }
+          cluster={cluster}
           kind={TemplateModel.kind}
-          name={obj.metadata.name}
-          namespace={obj.metadata.namespace}
+          name={name}
+          namespace={namespace}
         />
 
         {isDeprecatedTemplate(obj) && <Label isCompact>{t('Deprecated')}</Label>}
+      </TableData>
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-10" id="cluster">
+        <ResourceLink
+          groupVersionKind={modelToGroupVersionKind(ManagedClusterModel)}
+          name={cluster}
+        />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-10" id={ARCHITECTURE_ID}>
         <ArchitectureLabel architecture={getArchitecture(obj)} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="namespace">
-        <ResourceLink kind="Namespace" name={obj.metadata.namespace} />
+        <FleetResourceLink cluster={cluster} kind="Namespace" name={namespace} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-15" id="workload">
         {t(getWorkloadProfile(obj))}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-30" id="availability">
         <VirtualMachineTemplatesSource
-          availableDatasources={availableDatasources}
+          availableDataSources={availableDataSources}
           availableTemplatesUID={availableTemplatesUID}
-          cloneInProgressDatasources={cloneInProgressDatasources}
+          cloneInProgressDataSources={cloneInProgressDataSources}
           template={obj}
         />
       </TableData>
