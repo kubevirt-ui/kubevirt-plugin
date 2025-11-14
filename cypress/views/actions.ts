@@ -7,6 +7,7 @@ export const FSTOP = 'vm-action-force-stop';
 export const PAUSE = 'vm-action-pause';
 export const UNPAUSE = 'vm-action-unpause';
 export const CLONE = 'vm-action-clone';
+export const CONTROL_MENU = 'control-menu';
 export const MIGRATE_MENU = '[data-test-id="migration-menu"]';
 export const MIGRATE_COMPUTE = 'vm-action-migrate';
 export const MIGRATE_STORAGE = '[data-test-id="vm-migrate-storage"]';
@@ -29,25 +30,14 @@ export const providerInput = 'input#provider';
 export const getRow = (name: string, within: VoidFunction) =>
   cy.byTestRows('resource-row').contains(name).parents('tr').within(within);
 
-export const deleteRow = (name: string) => {
-  getRow(name, () => cy.get(sel.actionsBtn).click());
-  cy.contains(sel.dropDownItem, 'Delete').click();
-  cy.get(tabModal).within(() => {
-    cy.checkTitle('Delete');
-    cy.contains('strong', name).should('exist');
-    cy.byButtonText('Delete').click();
-  });
-};
+const getActionRoot = (vmName: string, onList = true) =>
+  onList
+    ? getRow(vmName, () => cy.get(sel.actionsBtn).click())
+    : cy.byButtonText('Actions').click();
 
 export const action = {
   clone: (vmName: string, newName = '', startOnClone = false, onList = true) => {
-    if (onList) {
-      getRow(vmName, () => cy.get(sel.actionsBtn).click());
-    } else {
-      cy.byButtonText('Actions').click();
-    }
-    cy.wait(1000);
-    cy.byLegacyTestID(CLONE).click();
+    getActionRoot(vmName, onList).byLegacyTestID(CLONE).click();
     cy.get(tabModal).within(() => {
       if (newName) {
         cy.get(nameInput).clear().type(newName);
@@ -59,89 +49,75 @@ export const action = {
     });
   },
   cloneTemplate: (tName) => {
-    getRow(tName, () => cy.get(sel.actionsBtn).click());
-    cy.contains('Clone').click();
+    getRow(tName, () => cy.get(sel.actionsBtn).click())
+      .contains('Clone')
+      .click();
   },
   delete: (vmName: string, onList = true) => {
-    if (onList) {
-      getRow(vmName, () => cy.get(sel.actionsBtn).click());
-    } else {
-      cy.byButtonText('Actions').click();
-    }
-    cy.byLegacyTestID(DELETE).click();
-    cy.byButtonText('Delete').click();
+    getActionRoot(vmName, onList).byLegacyTestID(DELETE).click();
   },
   deleteTemplate: (tName) => {
-    getRow(tName, () => cy.get(sel.actionsBtn).click());
-    cy.contains('Delete').click();
-    cy.byButtonText('Delete').click();
+    getRow(tName, () => cy.get(sel.actionsBtn).click())
+      .contains('Delete')
+      .click();
   },
   EditTemplateBS: (tName) => {
-    getRow(tName, () => cy.get(sel.actionsBtn).click());
-    cy.contains('Edit boot source').click();
+    getRow(tName, () => cy.get(sel.actionsBtn).click())
+      .contains('Edit boot source')
+      .click();
   },
   EditTemplateBSR: (tName) => {
-    getRow(tName, () => cy.get(sel.actionsBtn).click());
-    cy.contains('Edit boot source reference').click();
+    getRow(tName, () => cy.get(sel.actionsBtn).click())
+      .contains('Edit boot source reference')
+      .click();
   },
   fstop: (vmName: string, onList = true) => {
-    if (onList) {
-      getRow(vmName, () => cy.get(sel.actionsBtn).click());
-    } else {
-      cy.byButtonText('Actions').click();
-    }
-    cy.byLegacyTestID(FSTOP).click();
+    getActionRoot(vmName, onList)
+      .byLegacyTestID(CONTROL_MENU)
+      .trigger('mouseover')
+      .byLegacyTestID(FSTOP)
+      .click();
   },
   migrate: (vmName: string, onList = true) => {
-    if (onList) {
-      getRow(vmName, () => cy.get(sel.actionsBtn).click());
-    } else {
-      cy.byButtonText('Actions').click();
-    }
-    cy.byButtonText('Migration').click();
-    cy.wait(500);
-    cy.byLegacyTestID(MIGRATE_COMPUTE).click();
+    getActionRoot(vmName, onList)
+      .byButtonText('Migration')
+      .trigger('mouseover')
+      .byLegacyTestID(MIGRATE_COMPUTE)
+      .click();
   },
   pause: (vmName: string, onList = true) => {
-    if (onList) {
-      getRow(vmName, () => cy.get(sel.actionsBtn).click());
-    } else {
-      cy.byButtonText('Actions').click();
-    }
-    cy.byLegacyTestID(PAUSE).click();
+    getActionRoot(vmName, onList)
+      .byLegacyTestID(CONTROL_MENU)
+      .trigger('mouseover')
+      .byLegacyTestID(PAUSE)
+      .click();
   },
   restart: (vmName: string, onList = true) => {
-    if (onList) {
-      getRow(vmName, () => cy.get(sel.actionsBtn).click());
-    } else {
-      cy.byButtonText('Actions').click();
-    }
-    cy.wait(3000);
-    cy.byLegacyTestID(RESTART).click();
+    getActionRoot(vmName, onList)
+      .byLegacyTestID(CONTROL_MENU)
+      .trigger('mouseover')
+      .byLegacyTestID(RESTART)
+      .click();
   },
   start: (vmName: string, onList = true) => {
-    if (onList) {
-      getRow(vmName, () => cy.get(sel.actionsBtn).click());
-    } else {
-      cy.byButtonText('Actions').click();
-    }
-    cy.byLegacyTestID(START).click();
+    getActionRoot(vmName, onList)
+      .byLegacyTestID(CONTROL_MENU)
+      .trigger('mouseover')
+      .byLegacyTestID(START)
+      .click();
   },
   stop: (vmName: string, onList = true) => {
-    if (onList) {
-      getRow(vmName, () => cy.get(sel.actionsBtn).click());
-    } else {
-      cy.byButtonText('Actions').click();
-    }
-    cy.wait(5000);
-    cy.byLegacyTestID(STOP).click();
+    getActionRoot(vmName, onList)
+      .byLegacyTestID(CONTROL_MENU)
+      .trigger('mouseover')
+      .byLegacyTestID(STOP)
+      .click();
   },
   unpause: (vmName: string, onList = true) => {
-    if (onList) {
-      getRow(vmName, () => cy.get(sel.actionsBtn).click());
-    } else {
-      cy.byButtonText('Actions').click();
-    }
-    cy.byLegacyTestID(UNPAUSE).click();
+    getActionRoot(vmName, onList)
+      .byLegacyTestID(CONTROL_MENU)
+      .trigger('mouseover')
+      .byLegacyTestID(UNPAUSE)
+      .click();
   },
 };

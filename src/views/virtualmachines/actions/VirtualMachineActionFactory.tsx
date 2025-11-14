@@ -43,7 +43,15 @@ import {
 
 import ConfirmVMActionModal from './components/ConfirmVMActionModal/ConfirmVMActionModal';
 import DeleteVMModal from './components/DeleteVMModal/DeleteVMModal';
-import { cancelMigration, pauseVM, restartVM, startVM, stopVM, unpauseVM } from './actions';
+import {
+  cancelMigration,
+  pauseVM,
+  resetVM,
+  restartVM,
+  startVM,
+  stopVM,
+  unpauseVM,
+} from './actions';
 
 const {
   Migrating,
@@ -120,6 +128,12 @@ export const VirtualMachineActionFactory = {
       label: t('Clone'),
     };
   },
+  controlActions: (controlActions: ActionDropdownItemType[]): ActionDropdownItemType => ({
+    cta: () => null, // follow migrationActions
+    id: 'control-menu',
+    label: t('Control'),
+    options: controlActions,
+  }),
   copySSHCommand: (vm: V1VirtualMachine, command: string): ActionDropdownItemType => {
     return {
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
@@ -297,9 +311,38 @@ export const VirtualMachineActionFactory = {
               />
             ))
           : pauseVM(vm),
-      disabled: vm?.status?.printableStatus !== Running || isSnapshotting(vm) || isRestoring(vm),
+      disabled: !isRunning(vm) || isSnapshotting(vm) || isRestoring(vm),
       id: 'vm-action-pause',
       label: t('Pause'),
+    };
+  },
+  reset: (
+    vm: V1VirtualMachine,
+    createModal: (modal: ModalComponent) => void,
+    confirmVMActions: boolean,
+  ): ActionDropdownItemType => {
+    return {
+      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
+      cta: () =>
+        confirmVMActions
+          ? createModal(({ isOpen, onClose }) => (
+              <ConfirmVMActionModal
+                checkToConfirmMessage={t(
+                  'A VM reset is a hard power cycle and might cause data loss or corruption. Only reset if the VM is completely unresponsive.',
+                )}
+                action={resetVM}
+                actionType="Reset"
+                isOpen={isOpen}
+                onClose={onClose}
+                severityVariant="warning"
+                vm={vm}
+              />
+            ))
+          : resetVM(vm),
+      description: t('Hard power cycle on the VM'),
+      disabled: !isRunning(vm) || isSnapshotting(vm) || isRestoring(vm),
+      id: 'vm-action-reset',
+      label: t('Reset'),
     };
   },
   restart: (
@@ -321,6 +364,7 @@ export const VirtualMachineActionFactory = {
               />
             ))
           : restartVM(vm),
+      description: t('Shut down and reboot the VM'),
       disabled:
         [Migrating, Provisioning, Stopped, Stopping, Terminating, Unknown].includes(
           vm?.status?.printableStatus,

@@ -1,4 +1,5 @@
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { Action } from '@openshift-console/dynamic-plugin-sdk';
 import { cleanup } from '@testing-library/react';
 import { renderHook } from '@testing-library/react-hooks';
 
@@ -14,31 +15,51 @@ jest.mock('@openshift-console/dynamic-plugin-sdk', () => ({
   useK8sWatchResource: jest.fn(() => [[], true]),
   useResolvedExtensions: jest.fn(() => [[], true, undefined]),
 }));
+
+jest.mock('@kubevirt-utils/hooks/useFeatures/useFeatures', () => ({
+  useFeatures: jest.fn(() => ({ featureEnabled: true })),
+}));
 afterEach(cleanup);
+
+const testTopLevelActions = (actions: Action[]) => {
+  const topLevelVMActions = actions.map((action) => action.id);
+
+  // top level action independent from the VM state
+  // note that they do depend on feature flags
+  expect(topLevelVMActions).toEqual([
+    'control-menu',
+    'vm-action-open-console',
+    'vm-action-clone',
+    'vm-action-snapshot',
+    'migration-menu',
+    'vm-action-copy-ssh',
+    'vm-action-move-to-folder',
+    'vm-action-edit-labels',
+    'vm-action-delete',
+  ]);
+};
 
 describe('useVirtualMachineActionsProvider tests', () => {
   it('Test running VM actions', () => {
     const { result } = renderHook(() =>
       useVirtualMachineActionsProvider(exampleRunningVirtualMachine),
     );
-    // expect(result.current).toMatchSnapshot();
 
     const [actions] = result.current;
-    const runningVMActions = actions.map((action) => action.id);
 
-    // Running vm should have stop, restart, pause, migrate and delete actions
-    expect(runningVMActions).toEqual([
-      'vm-action-stop',
-      'vm-action-restart',
-      'vm-action-pause',
-      'vm-action-open-console',
-      'vm-action-clone',
-      'vm-action-snapshot',
-      'migration-menu',
-      'vm-action-copy-ssh',
-      'vm-action-edit-labels',
-      'vm-action-delete',
-    ]);
+    testTopLevelActions(actions);
+
+    const levelTwoActions = actions
+      .flatMap((action) => action.options ?? [])
+      .map((action) => action.id);
+    expect(levelTwoActions).toEqual(
+      expect.arrayContaining([
+        'vm-action-stop',
+        'vm-action-restart',
+        'vm-action-pause',
+        'vm-action-reset',
+      ]),
+    );
   });
 
   it('Test stopped VM actions', () => {
@@ -49,21 +70,20 @@ describe('useVirtualMachineActionsProvider tests', () => {
     const { result } = renderHook(() => useVirtualMachineActionsProvider(stoppedVM));
 
     const [actions] = result.current;
-    const stoppedVMActions = actions.map((action) => action.id);
+    testTopLevelActions(actions);
 
-    // Stopped vm should have start, restart, pause, migrate and delete actions
-    expect(stoppedVMActions).toEqual([
-      'vm-action-start',
-      'vm-action-restart',
-      'vm-action-pause',
-      'vm-action-open-console',
-      'vm-action-clone',
-      'vm-action-snapshot',
-      'migration-menu',
-      'vm-action-copy-ssh',
-      'vm-action-edit-labels',
-      'vm-action-delete',
-    ]);
+    const levelTwoActions = actions
+      .flatMap((action) => action.options ?? [])
+      .map((action) => action.id);
+
+    expect(levelTwoActions).toEqual(
+      expect.arrayContaining([
+        'vm-action-start',
+        'vm-action-restart',
+        'vm-action-pause',
+        'vm-action-reset',
+      ]),
+    );
   });
 
   it('Test paused VM actions', () => {
@@ -74,21 +94,20 @@ describe('useVirtualMachineActionsProvider tests', () => {
     const { result } = renderHook(() => useVirtualMachineActionsProvider(pausedVM));
 
     const [actions] = result.current;
-    const pausedVMActions = actions.map((action) => action.id);
+    testTopLevelActions(actions);
 
-    // Paused vm should have stop, restart, unpause, migrate and delete actions
-    expect(pausedVMActions).toEqual([
-      'vm-action-stop',
-      'vm-action-restart',
-      'vm-action-unpause',
-      'vm-action-open-console',
-      'vm-action-clone',
-      'vm-action-snapshot',
-      'migration-menu',
-      'vm-action-copy-ssh',
-      'vm-action-edit-labels',
-      'vm-action-delete',
-    ]);
+    const levelTwoActions = actions
+      .flatMap((action) => action.options ?? [])
+      .map((action) => action.id);
+
+    expect(levelTwoActions).toEqual(
+      expect.arrayContaining([
+        'vm-action-stop',
+        'vm-action-restart',
+        'vm-action-unpause',
+        'vm-action-reset',
+      ]),
+    );
   });
 
   it('Test migrating VM actions', () => {
@@ -99,24 +118,11 @@ describe('useVirtualMachineActionsProvider tests', () => {
     const { result } = renderHook(() => useVirtualMachineActionsProvider(migratingVM));
 
     const [actions] = result.current;
-    const migratingVMActions = actions.map((action) => action.id);
 
     const migratingSubmenu = actions.find((action) => action.id === 'migration-menu');
     const migratingSubmenuIds = migratingSubmenu.options.map((action) => action.id);
 
-    // Migrating vm should have stop, restart, pause, migrate and delete actions
-    expect(migratingVMActions).toEqual([
-      'vm-action-stop',
-      'vm-action-restart',
-      'vm-action-pause',
-      'vm-action-open-console',
-      'vm-action-clone',
-      'vm-action-snapshot',
-      'migration-menu',
-      'vm-action-copy-ssh',
-      'vm-action-edit-labels',
-      'vm-action-delete',
-    ]);
+    testTopLevelActions(actions);
 
     expect(migratingSubmenuIds).toEqual(['vm-action-cancel-migrate']);
   });

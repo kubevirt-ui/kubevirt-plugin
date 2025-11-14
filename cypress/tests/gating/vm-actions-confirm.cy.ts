@@ -1,4 +1,5 @@
 import { Example } from '../../utils/const/string';
+import { action, CONTROL_MENU, RESTART } from '../../views/actions';
 import { tab } from '../../views/tab';
 
 describe('Test VM actions confirm', () => {
@@ -19,9 +20,8 @@ describe('Test VM actions confirm', () => {
   });
 
   it('verify confirm message on VM actions', () => {
-    // confirm message appears for restart
-    cy.get('.kv-actions-dropdown').click();
-    cy.get('[data-test-id="vm-action-restart"]').click();
+    action.restart(undefined, false);
+
     cy.contains('.pf-v6-c-modal-box__title-text', 'Restart VirtualMachine?').should('be.visible');
     cy.contains('.pf-v6-c-button__text', 'Restart').click();
   });
