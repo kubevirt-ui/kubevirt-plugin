@@ -22,6 +22,7 @@ import useStatusActionButtons from './useStatusActionButtons';
 
 type ActionButtonsProps = {
   isLoading?: boolean;
+  loadingBtnName: string;
   onCreate: () => void;
   onCustomize: () => void;
   onViewYAML: () => void;
@@ -29,6 +30,7 @@ type ActionButtonsProps = {
 
 const ActionButtons: FC<ActionButtonsProps> = ({
   isLoading = false,
+  loadingBtnName,
   onCreate,
   onCustomize,
   onViewYAML,
@@ -49,7 +51,6 @@ const ActionButtons: FC<ActionButtonsProps> = ({
 
   const { disableButtonTooltipContent, isCreationDisabled, isViewYAMLDisabled } =
     useStatusActionButtons(isLoading);
-
   return (
     <Split hasGutter>
       <SplitItem>
@@ -60,7 +61,7 @@ const ActionButtons: FC<ActionButtonsProps> = ({
         >
           <Button
             isAriaDisabled={isCreationDisabled}
-            isLoading={isLoading}
+            isLoading={loadingBtnName === 'Submit' && isLoading}
             onClick={onCreate}
             variant={ButtonVariant.primary}
           >
@@ -76,7 +77,7 @@ const ActionButtons: FC<ActionButtonsProps> = ({
         >
           <Button
             isDisabled={isCreationDisabled}
-            isLoading={isLoading}
+            isLoading={loadingBtnName === 'Custom' && isLoading}
             onClick={onCustomize}
             variant={ButtonVariant.secondary}
           >
