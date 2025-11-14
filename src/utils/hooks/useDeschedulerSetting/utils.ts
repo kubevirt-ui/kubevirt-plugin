@@ -11,7 +11,8 @@ import {
   DESCHEDULER_PREFER_NO_EVICTION_ANNOTATION,
 } from '@kubevirt-utils/resources/vmi';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
-import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 
 export const isDeschedulerEnabled = (annotations: { [key: string]: string }): boolean => {
   const preferNoEvictionAnnotationExists = annotations?.[DESCHEDULER_PREFER_NO_EVICTION_ANNOTATION];
@@ -42,7 +43,8 @@ export const updateDeschedulerForVM = (
     updateVMDeschedulerSetting(vmDraft, settingChecked),
   );
 
-  return k8sUpdate({
+  return kubevirtK8sUpdate({
+    cluster: getCluster(vm),
     data: updatedVM,
     model: VirtualMachineModel,
     name: getName(updatedVM),
@@ -59,7 +61,8 @@ export const updateDeschedulerForTemplate = (
     updateVMDeschedulerSetting(draftVM, settingChecked);
   });
 
-  return k8sUpdate({
+  return kubevirtK8sUpdate({
+    cluster: getCluster(template),
     data: updatedTemplate,
     model: TemplateModel,
     name: getName(updatedTemplate),

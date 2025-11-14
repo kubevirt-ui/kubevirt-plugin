@@ -10,9 +10,10 @@ import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isExpandableSpecVM } from '@kubevirt-utils/resources/instancetype/helper';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getEvictionStrategy } from '@kubevirt-utils/resources/vm';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
+import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
 
 import DedicatedResources from './DedicatedResources';
@@ -39,11 +40,12 @@ const SchedulingSectionRightGrid: FC<SchedulingSectionRightGridProps> = ({
     (updatedVM: V1VirtualMachine) =>
       onUpdateVM
         ? onUpdateVM(updatedVM)
-        : k8sUpdate({
+        : kubevirtK8sUpdate({
+            cluster: getCluster(vm),
             data: updatedVM,
             model: VirtualMachineModel,
-            name: updatedVM?.metadata?.name,
-            ns: updatedVM?.metadata?.namespace,
+            name: getName(updatedVM),
+            ns: getNamespace(updatedVM),
           }),
     [onUpdateVM],
   );

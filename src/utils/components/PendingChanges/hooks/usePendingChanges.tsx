@@ -31,9 +31,12 @@ import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConverg
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { isExpandableSpecVM } from '@kubevirt-utils/resources/instancetype/helper';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCPU, getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { k8sUpdate, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
+import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 import { updatedInstanceType } from '@virtualmachines/details/tabs/configuration/details/utils/utils';
 import { isRunning } from '@virtualmachines/utils';
 
@@ -70,14 +73,16 @@ export const usePendingChanges = (
   instanceTypeExpandedSpec: V1VirtualMachine,
 ): PendingChange[] => {
   const { t } = useKubevirtTranslation();
+  const cluster = getCluster(vm);
 
   const navigate = useNavigate();
   const { createModal } = useModal();
   const [authorizedSSHKeys, updateAuthorizedSSHKeys] = useKubevirtUserSettings('ssh');
 
-  const [hyperConverge, hyperLoaded, hyperLoadingError] = useHyperConvergeConfiguration();
+  const [hyperConverge, hyperLoaded, hyperLoadingError] = useHyperConvergeConfiguration(cluster);
 
-  const [nodes, nodesLoaded] = useK8sWatchResource<IoK8sApiCoreV1Node[]>({
+  const [nodes, nodesLoaded] = useK8sWatchData<IoK8sApiCoreV1Node[]>({
+    cluster,
     groupVersionKind: modelToGroupVersionKind(NodeModel),
     isList: true,
   });
@@ -124,11 +129,12 @@ export const usePendingChanges = (
   const modifiedGuestSystemAccessLog = getChangedGuestSystemAccessLog(vm, vmi);
 
   const onSubmit = (updatedVM: V1VirtualMachine) =>
-    k8sUpdate({
+    kubevirtK8sUpdate({
+      cluster,
       data: updatedVM,
       model: VirtualMachineModel,
       name: updatedVM?.metadata?.name,
-      ns: updatedVM?.metadata?.namespace,
+      ns: getNamespace(updatedVM),
     });
 
   const createProps = (tab: VirtualMachineDetailsTab, additionalAction?: () => void) => {
