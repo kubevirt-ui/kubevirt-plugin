@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 
-import VirtualMachineInstanceModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstanceModel';
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm';
+import { getVMIPod } from '@kubevirt-utils/resources/vmi/utils/pod';
+import { getVMILabelForServiceSelector } from '@kubevirt-utils/resources/vmi/utils/services';
+import { getCluster } from '@multicluster/helpers/selectors';
 import {
   Alert,
   AlertVariant,
@@ -20,10 +22,9 @@ import {
   StackItem,
 } from '@patternfly/react-core';
 
-import { SERVICE_TYPES } from '../constants';
+import { SERVICE_TYPES, VM_LABEL_AS_SSH_SERVICE_SELECTOR } from '../constants';
 import useSSHCommand, { isLoadBalancerBonded } from '../useSSHCommand';
-import { addSSHSelectorLabelToVM } from '../utils';
-import { createSSHService, deleteSSHService } from '../utils';
+import { addSSHSelectorLabelToVM, createSSHService, deleteSSHService } from '../utils';
 
 import SSHServiceSelect from './SSHServiceSelect';
 import SSHServiceStateIcon from './SSHServiceState';
@@ -45,15 +46,8 @@ const SSHCommand: React.FC<SSHCommandProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error>();
 
-  const [vmi] = useK8sWatchResource<V1VirtualMachineInstance>({
-    groupVersionKind: {
-      group: VirtualMachineInstanceModel.apiGroup,
-      kind: VirtualMachineInstanceModel.kind,
-      version: VirtualMachineInstanceModel.apiVersion,
-    },
-    name: vm?.metadata?.name,
-    namespace: vm?.metadata?.namespace,
-  });
+  const { pods, vmi } = useVMIAndPodsForVM(getName(vm), getNamespace(vm), getCluster(vm));
+  const pod = getVMIPod(vmi, pods);
 
   const onSSHChange = async (newServiceType: SERVICE_TYPES) => {
     setLoading(true);
@@ -65,9 +59,16 @@ const SSHCommand: React.FC<SSHCommandProps> = ({
       }
 
       if (newServiceType && newServiceType !== SERVICE_TYPES.NONE) {
-        await addSSHSelectorLabelToVM(vm, vmi, vm?.metadata?.name);
+        // Get label selector from pod if available (prefers vmi.kubevirt.io/id)
+        const labelSelector = pod
+          ? getVMILabelForServiceSelector(pod, vm)
+          : {
+              labelKey: VM_LABEL_AS_SSH_SERVICE_SELECTOR,
+              labelValue: getName(vm),
+            };
+        await addSSHSelectorLabelToVM(vm, vmi, labelSelector);
 
-        const newService = await createSSHService(vm, newServiceType);
+        const newService = await createSSHService(vm, newServiceType, pod);
         setSSHService(newService);
       }
     } catch (apiError) {

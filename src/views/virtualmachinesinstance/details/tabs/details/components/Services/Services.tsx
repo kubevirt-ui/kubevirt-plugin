@@ -4,7 +4,9 @@ import { modelToGroupVersionKind, ServiceModel } from '@kubevirt-ui/kubevirt-api
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import ServicesList from '@kubevirt-utils/components/ServicesList/ServicesList';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { usePods } from '@kubevirt-utils/hooks/usePods';
 import { getServicesForVmi } from '@kubevirt-utils/resources/vmi';
+import { getVMIPod } from '@kubevirt-utils/resources/vmi/utils/pod';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Icon, Title } from '@patternfly/react-core';
 import { LinkIcon } from '@patternfly/react-icons';
@@ -18,7 +20,9 @@ const Services = ({ pathname, vmi }) => {
     namespace: vmi?.metadata?.namespace,
   });
 
-  const data = getServicesForVmi(services, vmi);
+  const [pods] = usePods(vmi?.metadata?.namespace);
+  const pod = getVMIPod(vmi, pods);
+  const data = getServicesForVmi(services, pod, undefined, vmi);
 
   return (
     <div>

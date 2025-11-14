@@ -8,6 +8,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm';
 import { getServicesForVmi } from '@kubevirt-utils/resources/vmi';
+import { getVMIPod } from '@kubevirt-utils/resources/vmi/utils/pod';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { Card, CardBody, CardTitle, Divider } from '@patternfly/react-core';
@@ -24,12 +25,10 @@ const VirtualMachinesOverviewTabService: FC<VirtualMachinesOverviewTabServicePro
     namespace: vm?.metadata?.namespace,
   });
 
-  const { vmi } = useVMIAndPodsForVM(getName(vm), getNamespace(vm), getCluster(vm));
+  const { pods, vmi } = useVMIAndPodsForVM(getName(vm), getNamespace(vm), getCluster(vm));
 
-  const data = getServicesForVmi(
-    services,
-    vmi?.metadata?.labels || vm?.spec?.template?.metadata?.labels,
-  );
+  const pod = getVMIPod(vmi, pods);
+  const data = getServicesForVmi(services, pod, vm, vmi);
 
   return (
     <Card>

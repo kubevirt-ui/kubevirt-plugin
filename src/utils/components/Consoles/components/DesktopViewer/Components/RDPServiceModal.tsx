@@ -5,6 +5,8 @@ import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { usePods } from '@kubevirt-utils/hooks/usePods';
+import { getVMIPod } from '@kubevirt-utils/resources/vmi/utils/pod';
 import {
   Alert,
   AlertVariant,
@@ -25,7 +27,10 @@ type RDPServiceModalProps = {
 
 const RDPServiceModal: FC<RDPServiceModalProps> = ({ isOpen, onClose, vm, vmi }) => {
   const { t } = useKubevirtTranslation();
-  const [isChecked, setChecked] = useState<boolean>(false);
+  const [isChecked, setIsChecked] = useState<boolean>(false);
+
+  const [pods] = usePods(vmi?.metadata?.namespace);
+  const pod = getVMIPod(vmi, pods);
 
   return (
     <TabModal
@@ -34,7 +39,7 @@ const RDPServiceModal: FC<RDPServiceModalProps> = ({ isOpen, onClose, vm, vmi })
       isOpen={isOpen}
       modalVariant={ModalVariant.medium}
       onClose={onClose}
-      onSubmit={() => createRDPService(vm, vmi)}
+      onSubmit={() => createRDPService(vm, vmi, pod)}
     >
       <Stack hasGutter>
         <StackItem>
@@ -44,7 +49,7 @@ const RDPServiceModal: FC<RDPServiceModalProps> = ({ isOpen, onClose, vm, vmi })
             id="rdp-service-checkbox"
             isChecked={isChecked}
             label={t('Expose RDP Service')}
-            onChange={(_event, val) => setChecked(val)}
+            onChange={(_event, val) => setIsChecked(val)}
           />
         </StackItem>
         <StackItem>
