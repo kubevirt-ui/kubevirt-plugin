@@ -65,3 +65,23 @@ export const ClusterManagementAddOnModel: K8sModel = {
   namespaced: true,
   plural: 'clustermanagementaddons',
 };
+
+export const VirtualMachineSubresourcesModel: K8sModel = {
+  abbr: 'VM',
+  apiGroup: 'subresources.kubevirt.io',
+  apiVersion: 'v1',
+  kind: 'VirtualMachine',
+  label: 'VirtualMachine',
+  labelPlural: 'VirtualMachines',
+  plural: 'virtualmachines',
+};
+
+export const VirtualMachineInstanceSubresourcesModel: K8sModel = {
+  abbr: 'VMI',
+  apiGroup: 'subresources.kubevirt.io',
+  apiVersion: 'v1',
+  kind: 'VirtualMachineInstance',
+  label: 'VirtualMachineInstance',
+  labelPlural: 'VirtualMachineInstances',
+  plural: 'virtualmachineinstances',
+};

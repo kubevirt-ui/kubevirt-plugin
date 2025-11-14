@@ -15,6 +15,10 @@ import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalPr
 import SnapshotModal from '@kubevirt-utils/components/SnapshotModal/SnapshotModal';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
+  VirtualMachineInstanceSubresourcesModel,
+  VirtualMachineSubresourcesModel,
+} from '@kubevirt-utils/models';
+import {
   DEFAULT_MIGRATION_NAMESPACE,
   MigMigration,
   MigMigrationModel,
@@ -268,7 +272,7 @@ export const VirtualMachineActionFactory = {
     confirmVMActions: boolean,
   ): ActionDropdownItemType => {
     return {
-      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
+      accessReview: asAccessReview(VirtualMachineSubresourcesModel, vm, 'update', 'restart'),
       cta: () =>
         confirmVMActions
           ? createModal(({ isOpen, onClose }) => (
@@ -292,7 +296,7 @@ export const VirtualMachineActionFactory = {
     confirmVMActions: boolean,
   ): ActionDropdownItemType => {
     return {
-      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
+      accessReview: asAccessReview(VirtualMachineInstanceSubresourcesModel, vm, 'update', 'pause'),
       cta: () =>
         confirmVMActions
           ? createModal(({ isOpen, onClose }) => (
@@ -328,7 +332,7 @@ export const VirtualMachineActionFactory = {
   },
   start: (vm: V1VirtualMachine): ActionDropdownItemType => {
     return {
-      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
+      accessReview: asAccessReview(VirtualMachineSubresourcesModel, vm, 'update', 'start'),
       cta: () => startVM(vm),
       disabled:
         [
@@ -353,7 +357,7 @@ export const VirtualMachineActionFactory = {
     confirmVMActions: boolean,
   ): ActionDropdownItemType => {
     return {
-      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
+      accessReview: asAccessReview(VirtualMachineSubresourcesModel, vm, 'update', 'stop'),
       cta: () =>
         confirmVMActions
           ? createModal(({ isOpen, onClose }) => (
@@ -378,7 +382,12 @@ export const VirtualMachineActionFactory = {
   },
   unpause: (vm: V1VirtualMachine): ActionDropdownItemType => {
     return {
-      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
+      accessReview: asAccessReview(
+        VirtualMachineInstanceSubresourcesModel,
+        vm,
+        'update',
+        'unpause',
+      ),
       cta: () => unpauseVM(vm),
       disabled: vm?.status?.printableStatus !== Paused,
       id: 'vm-action-unpause',
