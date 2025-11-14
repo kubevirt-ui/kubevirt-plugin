@@ -6,6 +6,7 @@ import { extensions as utilsExtensions } from './src/utils/extension';
 import { extensions as CDIUploadProviderExtensions } from './src/views/cdi-upload-provider/extensions';
 import { extensions as CheckupsExtensions } from './src/views/checkups/extensions';
 import { extensions as dashboardExtensionsExtensions } from './src/views/dashboard-extensions/extensions';
+import { extensions as QuotasExtensions } from './src/views/quotas/extensions';
 import { extensions as StorageClassExtensions } from './src/views/storageclasses/extensions';
 import { extensions as StorageMigrationExtensions } from './src/views/storagemigrations/extensions';
 import { extensions as TopologyExtensions } from './src/views/topology/extensions';
@@ -18,6 +19,7 @@ const extensions: EncodedExtension[] = [
   ...utilsExtensions,
   ...VirtualMachinesExtensions,
   ...CDIUploadProviderExtensions,
+  ...QuotasExtensions,
   ...StorageClassExtensions,
   ...StorageMigrationExtensions,
   ...TopologyExtensions,

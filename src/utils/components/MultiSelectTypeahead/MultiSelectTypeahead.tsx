@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, SetStateAction, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { getSelectDataTestProps } from '@kubevirt-utils/utils/selectDataTest';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -11,7 +11,7 @@ type MultiSelectTypeaheadProps = {
   initialInputValue?: string;
   selectedResourceNames: string[];
   selectPlaceholder?: string;
-  setSelectedResourceNames: Dispatch<SetStateAction<string[]>>;
+  setSelectedResourceNames: (resourceNames: string[]) => void;
 };
 
 const MultiSelectTypeahead: FC<MultiSelectTypeaheadProps> = ({

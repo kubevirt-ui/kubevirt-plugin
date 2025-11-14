@@ -6,6 +6,7 @@ import { exposedModules as utilsExposedModules } from './src/utils/extension';
 import { exposedModules as CDIUploadProviderExposedModules } from './src/views/cdi-upload-provider/extensions';
 import { exposedModules as CheckupsExposedModules } from './src/views/checkups/extensions';
 import { exposedModules as dashboardExtensionsExposedModules } from './src/views/dashboard-extensions/extensions';
+import { exposedModules as QuotasExposedModules } from './src/views/quotas/extensions';
 import { exposedModules as StorageClassExposedModules } from './src/views/storageclasses/extensions';
 import { exposedModules as StorageMigrationExposedModules } from './src/views/storagemigrations/extensions';
 import { exposedModules as TopologyExposedModules } from './src/views/topology/extensions';
@@ -23,6 +24,7 @@ const metadata: ConsolePluginBuildMetadata = {
     ...utilsExposedModules,
     ...VirtualMachinesExposedModules,
     ...CDIUploadProviderExposedModules,
+    ...QuotasExposedModules,
     ...StorageClassExposedModules,
     ...StorageMigrationExposedModules,
     ...TopologyExposedModules,

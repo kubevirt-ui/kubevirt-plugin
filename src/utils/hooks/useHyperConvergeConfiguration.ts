@@ -6,14 +6,20 @@ import { V1MigrationConfiguration } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { ResourceCountingType } from '@overview/SettingsTab/ClusterTab/components/ResourceManagementSection/components/ApplicationAwareQuota/types';
 
 import useDeepCompareMemoize from './useDeepCompareMemoize/useDeepCompareMemoize';
 
 export type HyperConverged = K8sResourceCommon & {
   spec: {
+    applicationAwareConfig?: {
+      allowApplicationAwareClusterResourceQuota?: boolean;
+      vmiCalcConfigName?: ResourceCountingType;
+    };
     commonBootImageNamespace?: string;
     commonTemplatesNamespace?: string;
     dataImportCronTemplates: K8sResourceCommon[];
+    enableApplicationAwareQuota?: boolean;
     enableCommonBootImageImport?: boolean;
     evictionStrategy?: string;
     featureGates: {
