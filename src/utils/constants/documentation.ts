@@ -23,6 +23,7 @@ export const documentationURL = {
   CRON_INFO: `${REDHAT_BASE_URL}/sysadmin/automate-linux-tasks-cron`,
   DATA_FOUNDATION_OPERATOR: `${RH_DOC_URL}/red_hat_openshift_data_foundation/latest/html-single/red_hat_openshift_data_foundation_architecture/index`,
   DATAVOLUME_PREALLOCATIONS: `${REDHAT_DOC_URL}/html/virtualization/storage#virt-using-preallocation-for-datavolumes`,
+  DECLARATIVE_HOTPLUG_VOLUMES: `${KV_UG_URL}/user-guide/storage/hotplug_volumes/#enabling-hotplug-volume-support`,
   DESCHEDULER: `${KV_UG_URL}/user-guide/operations/node_assignment/#node-balancing-with-descheduler`,
   DEV_PREVIEW: `${RH_ACCESS_URL}/support/offerings/devpreview`,
   DYNAMIC_SSH_KEY_INJECTION: `${REDHAT_DOC_URL}/html/virtualization/managing-vms#virt-accessing-vm-ssh`,
