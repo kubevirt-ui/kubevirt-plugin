@@ -10,6 +10,7 @@ import {
 } from '@kubevirt-utils/components/DiskModal/utils/constants';
 import {
   convertDataVolumeToTemplate,
+  isDeclarativeHotplugVolumesEnabled,
   isHotPluggableEnabled,
 } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
@@ -49,6 +50,8 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
   const vmNamespace = getNamespace(vm);
 
   const isHotPluggable = isHotPluggableEnabled(featureGates);
+  const isDeclarativeHotplugVolumesFeatureGateEnabled =
+    isDeclarativeHotplugVolumesEnabled(featureGates);
   const { isoOptions } = useISOOptions(vmNamespace);
 
   const {
@@ -91,9 +94,12 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
     }
   }, [uploadEnabled, setValue]);
 
-  const hasValidSelection = selectedISO || hasUploadFile;
+  const isISORequired = !uploadEnabled && !isDeclarativeHotplugVolumesFeatureGateEnabled;
+  const hasValidSelection = selectedISO || (uploadEnabled && hasUploadFile);
   const hasNoSelection = !selectedISO && !uploadEnabled;
-  const isFormValid = !hasFormErrors && Boolean(hasValidSelection || hasNoSelection);
+  const isFormValid = Boolean(
+    !hasFormErrors && (hasValidSelection || (hasNoSelection && !isISORequired)),
+  );
 
   const handleModalSubmit = async () => {
     const data = getValues();
@@ -172,7 +178,11 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
             )}
             <div className="pf-v6-c-form">
               <DiskNameInput isDisabled={isUploading} />
-              <FormGroup fieldId={SELECT_ISO_FIELD_ID} label={t('Select ISO')}>
+              <FormGroup
+                fieldId={SELECT_ISO_FIELD_ID}
+                isRequired={isISORequired}
+                label={t('Select ISO')}
+              >
                 <InlineFilterSelect
                   setSelected={(e) => {
                     handleISOSelection(e);
