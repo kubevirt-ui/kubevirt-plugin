@@ -1,12 +1,8 @@
-import { modelToGroupVersionKind } from '@kubevirt-utils/models';
-import { MigPlanModel } from '@kubevirt-utils/resources/migrations/constants';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
+import { FLAG_STORAGE_MIGRATION_ENABLED } from '@kubevirt-utils/flags/consts';
+import { useFlag } from '@openshift-console/dynamic-plugin-sdk';
 
 const useIsMTCInstalled = () => {
-  const [migPlan] = useK8sModel(modelToGroupVersionKind(MigPlanModel));
-
-  return !isEmpty(migPlan);
+  return useFlag(FLAG_STORAGE_MIGRATION_ENABLED);
 };
 
 export default useIsMTCInstalled;

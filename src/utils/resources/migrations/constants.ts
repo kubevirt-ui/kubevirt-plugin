@@ -53,6 +53,18 @@ export const MigPlanModel: K8sModel = {
   plural: 'migplans',
 };
 
+export const MigrationControllerModel: K8sModel = {
+  abbr: 'MC',
+  apiGroup: 'migration.openshift.io',
+  apiVersion: 'v1alpha1',
+  crd: true,
+  kind: 'MigrationController',
+  label: 'MigrationController',
+  labelPlural: 'MigrationControllers',
+  namespaced: true,
+  plural: 'migrationcontrollers',
+};
+
 export type MigMigration = K8sResourceCommon & {
   spec: {
     canceled?: boolean;
