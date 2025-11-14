@@ -11,10 +11,13 @@ import {
 const useK8sWatchData = <T>(resource: FleetWatchK8sResource | null): WatchK8sResult<T> => {
   const [hubClusterName] = useHubClusterName();
 
+  // multicluster sdk doesn't support limit as console sdk does
+  const requestWithNoLimit = resource ? { ...resource, limit: undefined } : null;
+
   const useFleet = resource?.cluster && resource?.cluster !== hubClusterName;
 
   const [fleetData, fleetLoaded, fleetError] = useFleetK8sWatchResource<T>(
-    useFleet ? resource : null,
+    useFleet ? requestWithNoLimit : null,
   );
 
   const [k8sWatchData, k8sWatchLoaded, k8sWatchError] = useK8sWatchResource<T>(

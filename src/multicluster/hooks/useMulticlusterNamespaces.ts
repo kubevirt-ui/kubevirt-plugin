@@ -3,7 +3,8 @@ import { useMemo } from 'react';
 import { modelToGroupVersionKind, NamespaceModel } from '@kubevirt-utils/models';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useIsACMPage from '@multicluster/useIsACMPage';
-import { useFleetSearchPoll } from '@stolostron/multicluster-sdk';
+
+import useKubevirtSearchPoll from './useKubevirtSearchPoll';
 
 export type UseMulticlusterNamespacesReturn = {
   allNamespaces: K8sResourceCommon[];
@@ -17,7 +18,9 @@ const useMulticlusterNamespaces = (
 ): UseMulticlusterNamespacesReturn => {
   const isACMTreeView = useIsACMPage();
 
-  const [namespaces, namespacesLoaded, namespacesError] = useFleetSearchPoll<K8sResourceCommon[]>(
+  const [namespaces, namespacesLoaded, namespacesError] = useKubevirtSearchPoll<
+    K8sResourceCommon[]
+  >(
     isACMTreeView
       ? {
           groupVersionKind: modelToGroupVersionKind(NamespaceModel),
