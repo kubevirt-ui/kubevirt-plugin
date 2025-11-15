@@ -10,7 +10,6 @@ import React, {
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
-import Loading from '@kubevirt-utils/components/Loading/Loading';
 import SelectTypeahead, {
   SelectTypeaheadOptionProps,
 } from '@kubevirt-utils/components/SelectTypeahead/SelectTypeahead';
@@ -199,8 +198,14 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
       labelHelp={<NetworkSelectHelperPopover />}
     >
       <div data-test-id="network-attachment-definition-select">
-        {hasPodNetwork && !loaded ? (
-          <Loading />
+        {hasPodNetwork ? (
+          <FormGroupHelperText validated={validated}>
+            <div className="pf-v6-u-text-color-status-danger">
+              {t(
+                'No NetworkAttachmentDefinitions available. Contact your system administrator for additional support.',
+              )}
+            </div>
+          </FormGroupHelperText>
         ) : (
           <SelectTypeahead
             addOption={(value) =>
