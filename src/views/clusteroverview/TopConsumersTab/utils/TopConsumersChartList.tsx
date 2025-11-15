@@ -2,7 +2,11 @@ import React, { FC, useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { TopConsumersData } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/types';
-import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  PrometheusEndpoint,
+  useActiveNamespace,
+  usePrometheusPoll,
+} from '@openshift-console/dynamic-plugin-sdk';
 import { CardBody } from '@patternfly/react-core';
 
 import {
@@ -31,6 +35,7 @@ export const TopConsumersChartList: FC<TopConsumersChartListProps> = ({
   scope,
 }) => {
   const { t } = useKubevirtTranslation();
+  const [activeNamespace] = useActiveNamespace();
   const duration = useMemo(
     () => localStorageData?.[TOP_CONSUMERS_DURATION_KEY],
     [localStorageData],
@@ -47,7 +52,13 @@ export const TopConsumersChartList: FC<TopConsumersChartListProps> = ({
   const [query] = usePrometheusPoll({
     endpoint: PrometheusEndpoint.QUERY,
     endTime: Date.now(),
-    query: getTopConsumerQuery(metric?.getValue(), scope?.getValue(), numItemsToShow, duration),
+    query: getTopConsumerQuery(
+      metric?.getValue(),
+      scope?.getValue(),
+      numItemsToShow,
+      duration,
+      activeNamespace,
+    ),
   });
   const numQueryResults = query?.data?.result?.length;
 
