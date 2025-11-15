@@ -129,6 +129,21 @@ export const extensions: EncodedExtension[] = [
     type: 'console.navigation/href',
   } as EncodedExtension<HrefNavItem>,
   {
+    properties: {
+      dataAttributes: {
+        'data-border': 'no-border',
+        'data-class': 'kv-plugin-virt-perspective-element',
+        'data-quickstart-id': 'qs-nav-checkups',
+        'data-test-id': 'checkups-nav-item',
+      },
+      href: `/k8s/all-clusters/all-namespaces/checkups`,
+      id: 'checkups-virt-perspective',
+      name: '%plugin__kubevirt-plugin~Checkups%',
+      perspective: 'fleet-virtualization-perspective',
+    },
+    type: 'console.navigation/href',
+  } as EncodedExtension<HrefNavItem>,
+  {
     flags: {
       required: ['KUBEVIRT_DYNAMIC_ACM'],
     },
@@ -303,6 +318,16 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'acm.resource/route',
   } as EncodedExtension<ResourceRoute>,
+
+  {
+    properties: {
+      component: {
+        $codeRef: 'Checkups',
+      },
+      path: ['/k8s/all-clusters/all-namespaces/checkups'],
+    },
+    type: 'console.page/route',
+  } as EncodedExtension<RoutePage>,
   {
     properties: {
       handler: { $codeRef: 'urls.getFleetClusterResourceRoute' },

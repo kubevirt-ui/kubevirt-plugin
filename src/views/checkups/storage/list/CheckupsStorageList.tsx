@@ -5,6 +5,8 @@ import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFi
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
+import useSelectedRowFilterClusters from '@kubevirt-utils/hooks/useSelectedRowFilterClusters';
+import useSelectedRowFilterProjects from '@kubevirt-utils/hooks/useSelectedRowFilterProjects';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ListPageBody, VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination } from '@patternfly/react-core';
@@ -20,6 +22,8 @@ import CheckupsStorageListRow from './CheckupsStorageListRow';
 
 const CheckupsStorageList = () => {
   const { t } = useKubevirtTranslation();
+  const clusters = useSelectedRowFilterClusters();
+  const projects = useSelectedRowFilterProjects();
   const [columns, activeColumns, loadedColumns] = useCheckupsStorageListColumns();
 
   const {
@@ -31,10 +35,17 @@ const CheckupsStorageList = () => {
   const { configMaps, error, jobs, loading } = useCheckupsStorageData();
 
   const { onPaginationChange, pagination } = usePagination();
-  const [unfilterData, dataFilters, onFilterChange, filters] =
+  const [unfilterData, dataFilters, onFilterChange, filters, filtersWithSelect] =
     useCheckupsStorageListFilters(configMaps);
 
-  if (isEmpty(configMaps) && loading && !loadingPermissions && loadedColumns) {
+  if (
+    isEmpty(configMaps) &&
+    loading &&
+    !loadingPermissions &&
+    loadedColumns &&
+    isEmpty(clusters) &&
+    isEmpty(projects)
+  ) {
     return (
       <CheckupsStorageListEmptyState
         clusterRoleBinding={clusterRoleBinding}
@@ -69,6 +80,7 @@ const CheckupsStorageList = () => {
             });
           }}
           data={unfilterData}
+          filtersWithSelect={filtersWithSelect}
           loaded={loading && !loadingPermissions && loadedColumns}
           rowFilters={filters}
         />
