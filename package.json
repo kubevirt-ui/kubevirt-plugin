@@ -30,7 +30,7 @@
     "immer": "^9.0.12",
     "ipaddr.js": "2.2.0",
     "js-abbreviation-number": "^1.4.0",
-    "js-yaml": "^4.1.0",
+    "js-yaml": "^4.1.1",
     "lodash": "^4.17.21",
     "mochawesome-report-generator": "^6.2.0",
     "murmurhash-js": "1.0.0",
