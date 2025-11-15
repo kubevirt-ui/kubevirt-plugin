@@ -1,9 +1,9 @@
 import React from 'react';
+import classNames from 'classnames';
 
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { modelToGroupVersionKind, NamespaceModel, ServiceModel } from '@kubevirt-utils/models';
 import { ResourceLink, TableData } from '@openshift-console/dynamic-plugin-sdk';
-import { css } from '@patternfly/react-styles';
 
 import { LabelList } from '../Labels/LabelList';
 
@@ -31,7 +31,7 @@ const ServiceTableRow = ({ activeColumnIDs, obj }: ServiceTableRowProps) => {
       </TableData>
       <TableData
         activeColumnIDs={activeColumnIDs}
-        className={css(tableColumnClasses[1], 'co-break-word')}
+        className={classNames(tableColumnClasses[1], 'co-break-word')}
         id="namespace"
       >
         <ResourceLink

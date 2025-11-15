@@ -1,10 +1,10 @@
 import React, { FC } from 'react';
 import { TooltipRenderProps } from 'react-joyride';
+import classNames from 'classnames';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, ButtonVariant, Split, SplitItem } from '@patternfly/react-core';
 import { CloseIcon } from '@patternfly/react-icons';
-import { css } from '@patternfly/react-styles';
 import popoverStyles from '@patternfly/react-styles/css/components/Popover/popover';
 
 import EndTourFooter from '../EndTourFooter/EndTourFooter';
@@ -22,7 +22,7 @@ const TourPopover: FC<TooltipRenderProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   return (
-    <div className={css(popoverStyles.popover, 'kv-tour-popover')}>
+    <div className={classNames(popoverStyles.popover, 'kv-tour-popover')}>
       <Split>
         {step.title && <SplitItem className="kv-tour-popover__header">{step.title}</SplitItem>}
         <SplitItem isFilled />
@@ -35,7 +35,7 @@ const TourPopover: FC<TooltipRenderProps> = ({
           />
         </SplitItem>
       </Split>
-      <div className={css(popoverStyles.popoverContent)}>{step.content}</div>
+      <div className={classNames(popoverStyles.popoverContent)}>{step.content}</div>
       <Split className="kv-tour-popover__buttons-footer" hasGutter>
         <SplitItem className="kv-tour-popover__step-counter">
           {t('Step {{current}}/{{size}}', { current: index + 1, size })}

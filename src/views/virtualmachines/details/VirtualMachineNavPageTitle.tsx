@@ -82,7 +82,7 @@ const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({
             <>
               <VMActionsIconBar vm={vm} />
               <SplitItem>
-                <VirtualMachineActions actions={actions} />
+                <VirtualMachineActions actions={actions} vm={vm} />
               </SplitItem>
             </>
           )}
