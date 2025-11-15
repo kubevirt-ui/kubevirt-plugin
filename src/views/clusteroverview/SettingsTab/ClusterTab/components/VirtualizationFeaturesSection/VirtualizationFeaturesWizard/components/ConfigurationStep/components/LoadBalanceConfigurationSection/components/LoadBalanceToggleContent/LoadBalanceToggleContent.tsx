@@ -1,6 +1,7 @@
 import React, { FC, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { DESCHEDULER_OPERATORS_URL } from '@kubevirt-utils/resources/descheduler/constants';
 import { DESCHEDULER_OPERATOR_NAME } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/constants';
 import { isInstalled } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/utils';
 import { useVirtualizationFeaturesContext } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/VirtualizationFeaturesContext/VirtualizationFeaturesContext';
@@ -34,7 +35,11 @@ const LoadBalanceToggleContent: FC<LoadBalanceToggleContentProps> = ({ alternati
     <Split className="load-balance-toggle-content" hasGutter>
       {deschedulerInstalled && operatorHubURL && (
         <SplitItem className="load-balance-toggle-content__hub-link">
-          <a href={operatorHubURL}>
+          <a
+            href={deschedulerInstalled ? DESCHEDULER_OPERATORS_URL : operatorHubURL}
+            rel="noreferrer"
+            target="_blank"
+          >
             {t('Manage')}
             <ExternalLinkAltIcon className="load-balance-toggle-content__link-icon" />
           </a>
