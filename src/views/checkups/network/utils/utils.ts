@@ -22,9 +22,10 @@ import {
 
 import {
   CONFIGMAP_NAME,
+  CONFIGMAP_NAMESPACE,
   generateWithNumbers,
   KUBEVIRT_VM_LATENCY_LABEL,
-  STATUS_COMPILATION_TIME_STAMP,
+  STATUS_COMPLETION_TIME_STAMP,
   STATUS_FAILURE_REASON,
   STATUS_START_TIME_STAMP,
   STATUS_SUCCEEDED,
@@ -35,7 +36,6 @@ export const KIAGNOSE_CONFIGMAP_ACCESS = 'kiagnose-configmap-access';
 export const VM_LATENCY_CHECKUP_SA = 'vm-latency-checkup-sa';
 export const KUBEVIRT_VM_LATENCY_CHECKER = 'kubevirt-vm-latency-checker';
 export const KUBEVIRT_VM_LATENCY_LABEL_VALUE = 'kubevirt-vm-latency';
-export const CONFIGMAP_NAMESPACE = 'CONFIGMAP_NAMESPACE';
 
 export const STATUS_AVG_LATENCY_NANO = 'status.result.avgLatencyNanoSec';
 export const STATUS_MAX_LATENCY_NANO = 'status.result.maxLatencyNanoSec';
@@ -298,7 +298,7 @@ export const rerunNetworkCheckup = async (
   const isSucceeded = resource?.data?.[STATUS_SUCCEEDED] === 'true';
   await k8sPatch<IoK8sApiCoreV1ConfigMap>({
     data: [
-      { op: 'remove', path: `/data/${STATUS_COMPILATION_TIME_STAMP}` },
+      { op: 'remove', path: `/data/${STATUS_COMPLETION_TIME_STAMP}` },
       { op: 'remove', path: `/data/${STATUS_SUCCEEDED}` },
       { op: 'remove', path: `/data/${STATUS_FAILURE_REASON}` },
       { op: 'remove', path: `/data/${STATUS_START_TIME_STAMP}` },

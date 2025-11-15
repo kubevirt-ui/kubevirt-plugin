@@ -28,13 +28,13 @@ const CheckupsStorageList = () => {
     isPermittedToInstall,
     loading: loadingPermissions,
   } = useCheckupsStoragePermissions();
-  const { configMaps, error, jobs, loading } = useCheckupsStorageData();
+  const { configMaps, error, jobs, loaded } = useCheckupsStorageData();
 
   const { onPaginationChange, pagination } = usePagination();
   const [unfilterData, dataFilters, onFilterChange, filters] =
     useCheckupsStorageListFilters(configMaps);
 
-  if (isEmpty(configMaps) && loading && !loadingPermissions && loadedColumns) {
+  if (isEmpty(configMaps) && loaded && !loadingPermissions && loadedColumns) {
     return (
       <CheckupsStorageListEmptyState
         clusterRoleBinding={clusterRoleBinding}
@@ -69,10 +69,10 @@ const CheckupsStorageList = () => {
             });
           }}
           data={unfilterData}
-          loaded={loading && !loadingPermissions && loadedColumns}
+          loaded={loaded && !loadingPermissions && loadedColumns}
           rowFilters={filters}
         />
-        {!isEmpty(dataFilters) && loading && !loadingPermissions && (
+        {!isEmpty(dataFilters) && loaded && !loadingPermissions && (
           <Pagination
             onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
               onPaginationChange({ endIndex, page, perPage, startIndex })
@@ -99,7 +99,7 @@ const CheckupsStorageList = () => {
         }}
         columns={activeColumns}
         data={dataFilters}
-        loaded={loading && !loadingPermissions && loadedColumns}
+        loaded={loaded && !loadingPermissions && loadedColumns}
         loadError={error}
         Row={CheckupsStorageListRow}
         unfilteredData={unfilterData}

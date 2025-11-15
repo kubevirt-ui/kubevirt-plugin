@@ -13,10 +13,17 @@
   }
 }
 
-.CheckupsNetworkStatusIcon {
+.CheckupsStatusIcon {
   &--main {
+    display: inline-flex;
+    align-items: center;
+
     .pf-v6-c-icon {
       margin-right: var(--pf-t--global--spacer--xs);
     }
   }
+}
+
+.CheckupsSelfValidationTestSuiteCard {
+  margin-bottom: 0;
 }

@@ -17,7 +17,7 @@ import { k8sCreate, k8sDelete, k8sPatch } from '@openshift-console/dynamic-plugi
 import {
   generateWithNumbers,
   KUBEVIRT_VM_LATENCY_LABEL,
-  STATUS_COMPILATION_TIME_STAMP,
+  STATUS_COMPLETION_TIME_STAMP,
   STATUS_FAILURE_REASON,
   STATUS_START_TIME_STAMP,
   STATUS_SUCCEEDED,
@@ -267,7 +267,7 @@ export const rerunStorageCheckup = async (
   const isSucceeded = resource?.data?.[STATUS_SUCCEEDED] === 'true';
   await k8sPatch<IoK8sApiCoreV1ConfigMap>({
     data: [
-      { op: 'remove', path: `/data/${STATUS_COMPILATION_TIME_STAMP}` },
+      { op: 'remove', path: `/data/${STATUS_COMPLETION_TIME_STAMP}` },
       { op: 'remove', path: `/data/${STATUS_SUCCEEDED}` },
       { op: 'remove', path: `/data/${STATUS_FAILURE_REASON}` },
       { op: 'remove', path: `/data/${STATUS_START_TIME_STAMP}` },

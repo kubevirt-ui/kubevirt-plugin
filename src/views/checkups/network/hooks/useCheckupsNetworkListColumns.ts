@@ -7,7 +7,7 @@ import { sortable } from '@patternfly/react-table';
 
 import {
   columnsSorting,
-  STATUS_COMPILATION_TIME_STAMP,
+  STATUS_COMPLETION_TIME_STAMP,
   STATUS_START_TIME_STAMP,
   STATUS_SUCCEEDED,
 } from '../../utils/utils';
@@ -99,7 +99,7 @@ const useCheckupsNetworkCheckupsListColumns = (): [
       additional: true,
       id: 'complete-time',
       sort: (data, sortDirection) =>
-        columnsSorting(data, sortDirection, STATUS_COMPILATION_TIME_STAMP),
+        columnsSorting(data, sortDirection, STATUS_COMPLETION_TIME_STAMP),
       title: t('Complete time'),
       transforms: [sortable],
     },
