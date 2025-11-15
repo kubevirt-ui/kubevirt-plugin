@@ -1,9 +1,12 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { modelToRef, TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useSelectedRowFilterClusters from '@kubevirt-utils/hooks/useSelectedRowFilterClusters';
+import useSelectedRowFilterProjects from '@kubevirt-utils/hooks/useSelectedRowFilterProjects';
+import { ClusterNamespacedResourceMap } from '@kubevirt-utils/resources/shared';
 import { ListPageProps } from '@kubevirt-utils/utils/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
@@ -30,16 +33,20 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
   hideNameLabelFilters,
   hideTextFilter,
   nameFilter,
-  namespace,
   selector,
   showTitle,
 }) => {
+  const selectedClusters = useSelectedRowFilterClusters();
+  const selectedProjects = useSelectedRowFilterProjects();
+
+  const namespace = selectedProjects.length === 1 ? selectedProjects?.[0] : undefined;
+
   const { t } = useKubevirtTranslation();
   const {
-    availableDatasources,
+    availableDataSources,
     availableTemplatesUID,
     bootSourcesLoaded,
-    cloneInProgressDatasources,
+    cloneInProgressDataSources,
     error,
     loaded,
     templates,
@@ -50,8 +57,15 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
     onlyDefault: false,
     selector,
   });
-  const filters = useVirtualMachineTemplatesFilters(availableTemplatesUID);
-  const [data, filteredData, onFilterChange] = useListPageFilter(templates, filters, {
+
+  const { filters, filtersWithSelect } = useVirtualMachineTemplatesFilters(availableTemplatesUID);
+
+  const allFilters = useMemo(
+    () => [...filters, ...filtersWithSelect],
+    [filters, filtersWithSelect],
+  );
+
+  const [data, filteredData, onFilterChange] = useListPageFilter(templates, allFilters, {
     name: { selected: [nameFilter] },
   });
 
@@ -61,14 +75,14 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
 
   useHideDeprecatedTemplates(onFilterChange);
 
-  if (templatesLoaded && isEmpty(data)) {
-    return <VirtualMachineTemplatesEmptyState namespace={namespace} />;
+  if (templatesLoaded && isEmpty(data) && isEmpty(selectedClusters) && isEmpty(selectedProjects)) {
+    return <VirtualMachineTemplatesEmptyState />;
   }
 
   return (
     <>
       <ListPageHeader title={!(showTitle === false) && t('VirtualMachine Templates')}>
-        <VirtualMachineTemplatesCreateButton namespace={namespace} />
+        <VirtualMachineTemplatesCreateButton />
       </ListPageHeader>
       <ListPageBody>
         <Stack hasGutter>
@@ -88,19 +102,20 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
                 type: t('Template'),
               }}
               data={data}
+              filtersWithSelect={filtersWithSelect}
               hideColumnManagement={hideColumnManagement}
               hideLabelFilter={hideTextFilter}
               hideNameLabelFilters={hideNameLabelFilters}
-              loaded={templatesLoaded && loadedColumns}
+              loaded={loadedColumns}
               onFilterChange={onFilterChange}
               rowFilters={filters}
             />
             <VirtualizedTable<
               K8sResourceCommon,
               {
-                availableDatasources: Record<string, V1beta1DataSource>;
+                availableDataSources: ClusterNamespacedResourceMap<V1beta1DataSource>;
                 availableTemplatesUID: Set<string>;
-                cloneInProgressDatasources: Record<string, V1beta1DataSource>;
+                cloneInProgressDataSources: ClusterNamespacedResourceMap<V1beta1DataSource>;
               }
             >
               EmptyMsg={() => (
@@ -113,7 +128,7 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
               loaded={templatesLoaded && loadedColumns}
               loadError={error}
               Row={VirtualMachineTemplatesRow}
-              rowData={{ availableDatasources, availableTemplatesUID, cloneInProgressDatasources }}
+              rowData={{ availableDataSources, availableTemplatesUID, cloneInProgressDataSources }}
               unfilteredData={data}
             />
           </StackItem>
