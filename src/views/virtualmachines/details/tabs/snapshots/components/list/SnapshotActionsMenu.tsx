@@ -16,11 +16,16 @@ import { ButtonVariant, Dropdown, DropdownItem, DropdownList } from '@patternfly
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 
 type SnapshotActionsMenuProps = {
+  isCloneDisabled: boolean;
   isRestoreDisabled: boolean;
   snapshot: V1beta1VirtualMachineSnapshot;
 };
 
-const SnapshotActionsMenu: FC<SnapshotActionsMenuProps> = ({ isRestoreDisabled, snapshot }) => {
+const SnapshotActionsMenu: FC<SnapshotActionsMenuProps> = ({
+  isCloneDisabled,
+  isRestoreDisabled,
+  snapshot,
+}) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -90,7 +95,7 @@ const SnapshotActionsMenu: FC<SnapshotActionsMenuProps> = ({ isRestoreDisabled, 
       <DropdownList>
         <DropdownItem
           description={t('Create a copy of the VirtualMachine from snapshot')}
-          isDisabled={!canClone}
+          isDisabled={!canClone || isCloneDisabled}
           key="snapshot-clone"
           onClick={onClone}
         >
