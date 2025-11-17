@@ -7,11 +7,16 @@ type ItemsToSort = {
 };
 
 export const toArray = <T>(value: T | T[]): T[] => {
-  if (value) {
-    return Array.isArray(value) ? value : [value];
+  if (!value) {
+    return [];
   }
-  return [];
+  return Array.isArray(value) ? value : [value];
 };
+
+const mapIdToIndex = (ids: string[], currentItems: ItemsToSort[]) =>
+  ids
+    .map((id) => currentItems.findIndex((other) => other.id === id))
+    .filter((index) => index !== -1);
 
 export const itemDependsOnItem = <T extends ItemsToSort>(item: T, other: T): boolean => {
   if (!item.insertBefore && !item.insertAfter) {
@@ -30,21 +35,11 @@ export const findIndexForItem = <T extends ItemsToSort>(item: T, currentItems: T
   const beforeIds = toArray(insertBefore);
   const afterIds = toArray(insertAfter);
 
-  for (const id of beforeIds) {
-    const index = currentItems.findIndex((other) => other.id === id);
-    if (index >= 0) {
-      return index;
-    }
-  }
-
-  for (const id of afterIds) {
-    const index = currentItems.findIndex((other) => other.id === id);
-    if (index >= 0) {
-      return index + 1;
-    }
-  }
-
-  return -1;
+  const [firstMatch = -1] = [
+    ...mapIdToIndex(beforeIds, currentItems),
+    ...mapIdToIndex(afterIds, currentItems).map((index) => index + 1),
+  ];
+  return firstMatch;
 };
 
 export const insertItem = <T extends ItemsToSort>(item: T, currentItems: T[]): void => {
