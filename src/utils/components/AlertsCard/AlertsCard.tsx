@@ -60,6 +60,7 @@ const AlertsCard: FC<AlertsCardProps> = ({ className, isOverviewPage = false, so
                 {isAdmin && (
                   <Link
                     className="alerts-card__view-all-link"
+                    id="alerts-card-view-all-link"
                     to={getAlertsPath(perspective, null, ALL_VIRT_ALERTS_URL_PARAMS)}
                   >
                     {t('View all')}

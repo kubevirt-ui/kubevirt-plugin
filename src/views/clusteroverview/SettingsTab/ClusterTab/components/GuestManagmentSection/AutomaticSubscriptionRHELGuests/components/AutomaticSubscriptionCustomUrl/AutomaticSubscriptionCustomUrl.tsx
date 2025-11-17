@@ -69,6 +69,7 @@ const AutomaticSubscriptionCustomUrl: FC<AutomaticSubscriptionCustomUrlProps> = 
                 debounceUpdateCustomUrl(value);
               }}
               className="AutomaticSubscriptionCustomUrl--input"
+              id="custom-url-input"
               value={inputValue}
             />
           </Flex>

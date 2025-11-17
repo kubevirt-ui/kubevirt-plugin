@@ -82,6 +82,7 @@ const AutomaticSubscriptionRHELGuests: FC<AutomaticSubscriptionRHELGuestsProps> 
                       toggleFeature(val);
                     }
                   }}
+                  dataTestID={AUTOMATIC_UPDATE_FEATURE_NAME}
                   id={AUTOMATIC_UPDATE_FEATURE_NAME}
                   isDisabled={isInitialLoad}
                   isLoading={loading}

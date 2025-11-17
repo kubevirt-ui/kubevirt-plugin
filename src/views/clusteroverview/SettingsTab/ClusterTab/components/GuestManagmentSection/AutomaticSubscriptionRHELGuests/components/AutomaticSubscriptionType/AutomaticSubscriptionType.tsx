@@ -27,6 +27,7 @@ const AutomaticSubscriptionType: FC<AutomaticSubscriptionTypeProps> = ({
         }}
         selected={selected.value}
         selectedLabel={selected.title}
+        toggleProps={{ id: 'subscription-type-dropdown' }}
       >
         {selectItems.map((item) => (
           <SelectOption key={item.value} value={item.value}>

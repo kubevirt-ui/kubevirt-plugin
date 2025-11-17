@@ -58,6 +58,7 @@ const VMStatusItem: React.FC<VMStatusItemProps> = ({
               onClick={() => {
                 onFilterChange?.();
               }}
+              id={`count-vm-status-${statusLabel}`}
               to={path}
             >
               {count.toString()}

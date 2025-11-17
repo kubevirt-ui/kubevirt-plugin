@@ -32,7 +32,9 @@ const RunningVMsChartLegendLabel: React.FC<RunningVMsChartLegendLabelProps> = ({
     <>
       <i className="fas fa-square kv-running-vms-card__legend-label--color" style={iconStyle} />
       <span className="kv-running-vms-card__legend-label--count">{item.vmCount}</span>{' '}
-      <Link to={linkPath}>{linkText}</Link>
+      <Link id="link-to-vm-list" to={linkPath}>
+        {linkText}
+      </Link>
     </>
   );
 };
