@@ -129,7 +129,7 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
         <ArchitectureLabel architecture={getArchitecture(bootableVolume)} />
       </TableData>
       {volumeListNamespace === ALL_PROJECTS && (
-        <TableData activeColumnIDs={activeColumnIDs} id="namespace" width={20}>
+        <TableData activeColumnIDs={activeColumnIDs} id="namespace" width={15}>
           {bootVolumeNamespace}
         </TableData>
       )}
@@ -144,7 +144,7 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
       <TableData activeColumnIDs={activeColumnIDs} id="size" width={10}>
         {sizeData}
       </TableData>
-      <TableData activeColumnIDs={activeColumnIDs} id={ANNOTATIONS.description} width={20}>
+      <TableData activeColumnIDs={activeColumnIDs} id={ANNOTATIONS.description} width={15}>
         <TableText wrapModifier={WrapModifier.truncate}>
           {getAnnotation(bootableVolume, ANNOTATIONS.description, NO_DATA_DASH)}
         </TableText>
