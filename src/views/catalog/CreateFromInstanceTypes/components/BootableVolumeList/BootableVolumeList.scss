@@ -24,3 +24,13 @@
   width: var(--pf-t--global--spacer--xl);
   vertical-align: bottom;
 }
+
+.BootableVolumeList-table {
+  th {
+    .pf-v6-c-table__text {
+      overflow: visible;
+      text-overflow: clip;
+      white-space: normal;
+    }
+  }
+}
