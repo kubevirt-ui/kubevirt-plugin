@@ -24,7 +24,8 @@ const SnapshotRow: React.FC<
 > = ({ activeColumnIDs, obj: snapshot, rowData: { isVMRunning, restores } }) => {
   const relevantRestore: V1beta1VirtualMachineRestore = restores?.[snapshot?.metadata?.name];
   const isRestoreDisabled = isVMRunning || snapshot?.status?.phase !== snapshotStatuses.Succeeded;
-  const readyCondition = snapshot?.status?.conditions?.find(({ type }) => type === 'Ready');
+  const isCloneDisabled = !snapshot?.status?.readyToUse;
+  const displayPhase = snapshot?.status?.phase;
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} id="name">
@@ -39,7 +40,7 @@ const SnapshotRow: React.FC<
         <Timestamp timestamp={snapshot?.metadata?.creationTimestamp} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="status">
-        <SnapshotStatusIcon phase={readyCondition?.reason || readyCondition?.status} />
+        <SnapshotStatusIcon phase={displayPhase} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="last-restored">
         <Timestamp timestamp={relevantRestore?.status?.restoreTime} />
@@ -48,7 +49,11 @@ const SnapshotRow: React.FC<
         <IndicationLabelList snapshot={snapshot} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="">
-        <SnapshotActionsMenu isRestoreDisabled={isRestoreDisabled} snapshot={snapshot} />
+        <SnapshotActionsMenu
+          isCloneDisabled={isCloneDisabled}
+          isRestoreDisabled={isRestoreDisabled}
+          snapshot={snapshot}
+        />
       </TableData>
     </>
   );
