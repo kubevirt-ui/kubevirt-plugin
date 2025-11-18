@@ -1,5 +1,7 @@
 import React, { FC } from 'react';
 
+import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
+import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import DiskListTitle from '@kubevirt-utils/components/DiskListTitle/DiskListTitle';
 import DiskSourceSelect from '@kubevirt-utils/components/DiskModal/components/DiskSourceSelect/DiskSourceSelect';
@@ -7,14 +9,17 @@ import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
 import { SourceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import WindowsDrivers from '@kubevirt-utils/components/WindowsDrivers/WindowsDrivers';
+import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import useDisksTableData from '@kubevirt-utils/resources/vm/hooks/disk/useDisksTableData';
 import useProvisioningPercentage from '@kubevirt-utils/resources/vm/hooks/useProvisioningPercentage';
+import { K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import {
   ListPageFilter,
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Flex, FlexItem } from '@patternfly/react-core';
+import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 import { updateDisks } from '@virtualmachines/details/tabs/configuration/details/utils/utils';
 
 import useDiskColumns from '../../hooks/useDiskColumns';
@@ -35,8 +40,19 @@ const DiskList: FC<DiskListProps> = ({ customize = false, onDiskUpdate, vm, vmi 
   const { createModal } = useModal();
   const columns = useDiskColumns();
   const [disks, sourcesLoaded, loadError] = useDisksTableData(vm, vmi);
+  const instanceTypeVMStore = useInstanceTypeVMStore();
   const filters = useDisksFilters();
   const [data, filteredData, onFilterChange] = useListPageFilter(disks, filters);
+
+  const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
+  const [canUpdate] = useFleetAccessReview(accessReview || {});
+
+  const [canCreateDataVolume] = useAccessReview({
+    group: VirtualMachineModel.apiGroup,
+    namespace: instanceTypeVMStore?.vmNamespaceTarget,
+    resource: VirtualMachineModel.plural,
+    verb: 'create' as K8sVerb,
+  });
 
   const { percentages: provisioningPercentages } = useProvisioningPercentage(vm);
 
@@ -57,6 +73,8 @@ const DiskList: FC<DiskListProps> = ({ customize = false, onDiskUpdate, vm, vmi 
             />
           ));
         }}
+        canCreateDataVolume={canCreateDataVolume}
+        canUpdate={canUpdate}
       />
       <Flex>
         <FlexItem>
