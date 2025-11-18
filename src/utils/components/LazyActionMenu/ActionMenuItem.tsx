@@ -45,7 +45,7 @@ const ActionItem: FC<ActionMenuItemProps & { isAllowed: boolean }> = ({
 
   const props = {
     autoFocus,
-    'data-test-action': label,
+    'data-test-action': action.id,
     description,
     icon,
     isDisabled,
