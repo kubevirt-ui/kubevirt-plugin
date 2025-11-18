@@ -9,9 +9,11 @@ import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMac
 import VMSSHSecretModal from '@kubevirt-utils/components/VMSSHSecretModal/VMSSHSecretModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
-import { asAccessReview } from '@kubevirt-utils/resources/shared';
+import { asAccessReview, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
-import { k8sUpdate, K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
+import { K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
 import { Stack } from '@patternfly/react-core';
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 
@@ -33,7 +35,10 @@ const SSHTabAuthorizedSSHKey: FC<SSHTabAuthorizedSSHKeyProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const [authorizedSSHKeys, updateAuthorizedSSHKeys, loaded] = useKubevirtUserSettings('ssh');
+  const [authorizedSSHKeys, updateAuthorizedSSHKeys, loaded] = useKubevirtUserSettings(
+    'ssh',
+    getCluster(vm),
+  );
   const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
   const [canUpdateVM] = useFleetAccessReview(accessReview || {});
   const secretName = useMemo(() => getVMSSHSecretName(vm), [vm]);
@@ -44,11 +49,12 @@ const SSHTabAuthorizedSSHKey: FC<SSHTabAuthorizedSSHKeyProps> = ({
   const onSubmit = (updatedVM: V1VirtualMachine) =>
     onUpdateVM
       ? onUpdateVM(updatedVM)
-      : k8sUpdate({
+      : kubevirtK8sUpdate({
+          cluster: getCluster(vm),
           data: updatedVM,
           model: VirtualMachineModel,
-          name: updatedVM?.metadata?.name,
-          ns: updatedVM?.metadata?.namespace,
+          name: getName(updatedVM),
+          ns: getNamespace(updatedVM),
         });
 
   return (

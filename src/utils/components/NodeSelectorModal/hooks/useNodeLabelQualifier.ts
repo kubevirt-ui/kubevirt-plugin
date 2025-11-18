@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useEffect, useState } from 'react';
 
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -10,9 +10,9 @@ export const useNodeLabelQualifier = <T extends IDLabel = IDLabel>(
   isNodesLoaded: boolean,
   constraints: T[],
 ): IoK8sApiCoreV1Node[] => {
-  const [qualifiedNodes, setQualifiedNodes] = React.useState([]);
+  const [qualifiedNodes, setQualifiedNodes] = useState([]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const filteredConstraints = constraints.filter(({ key }) => !!key);
     if (!isEmpty(filteredConstraints) && isNodesLoaded) {
       const suitableNodes = [];

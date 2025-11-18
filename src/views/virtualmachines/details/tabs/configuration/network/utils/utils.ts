@@ -20,7 +20,8 @@ import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/networ
 import { getVMIInterfaces, getVMIStatusInterfaces } from '@kubevirt-utils/resources/vmi';
 import { isNetworkInterfaceState } from '@kubevirt-utils/utils/typeGuards';
 import { ensurePath, kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 import { isRunning, isStopped } from '@virtualmachines/utils';
 
 import { ABSENT } from './constants';
@@ -136,7 +137,8 @@ export const setNetworkInterfaceState = (
     ifaceToUpdate.state = desiredState;
   });
 
-  return k8sUpdate({
+  return kubevirtK8sUpdate({
+    cluster: getCluster(vm),
     data: updatedVM,
     model: VirtualMachineModel,
   }).catch((error) => kubevirtConsole.error(error));
