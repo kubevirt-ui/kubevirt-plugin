@@ -10,7 +10,6 @@ export const CLONE = 'vm-action-clone';
 export const CONTROL_MENU = 'control-menu';
 export const MIGRATE_MENU = '[data-test-id="migration-menu"]';
 export const MIGRATE_COMPUTE = 'vm-action-migrate';
-export const MIGRATE_STORAGE = '[data-test-id="vm-migrate-storage"]';
 export const BULK_MIGRATE = '[data-test-id="vms-bulk-migrate-storage"]';
 export const SNAPSHOT = 'vm-action-snapshot';
 export const CANCEL = 'vm-action-cancel-migrate';
@@ -37,7 +36,7 @@ const getActionRoot = (vmName: string, onList = true) =>
 
 export const action = {
   clone: (vmName: string, newName = '', startOnClone = false, onList = true) => {
-    getActionRoot(vmName, onList).byLegacyTestID(CLONE).click();
+    getActionRoot(vmName, onList).byTestActionID(CLONE).click();
     cy.get(tabModal).within(() => {
       if (newName) {
         cy.get(nameInput).clear().type(newName);
@@ -54,7 +53,7 @@ export const action = {
       .click();
   },
   delete: (vmName: string, onList = true) => {
-    getActionRoot(vmName, onList).byLegacyTestID(DELETE).click();
+    getActionRoot(vmName, onList).byTestActionID(DELETE).click();
   },
   deleteTemplate: (tName) => {
     getRow(tName, () => cy.get(sel.actionsBtn).click())
@@ -73,51 +72,51 @@ export const action = {
   },
   fstop: (vmName: string, onList = true) => {
     getActionRoot(vmName, onList)
-      .byLegacyTestID(CONTROL_MENU)
+      .byTestActionID(CONTROL_MENU)
       .trigger('mouseover')
-      .byLegacyTestID(FSTOP)
+      .byTestActionID(FSTOP)
       .click();
   },
   migrate: (vmName: string, onList = true) => {
     getActionRoot(vmName, onList)
       .byButtonText('Migration')
       .trigger('mouseover')
-      .byLegacyTestID(MIGRATE_COMPUTE)
+      .byTestActionID(MIGRATE_COMPUTE)
       .click();
   },
   pause: (vmName: string, onList = true) => {
     getActionRoot(vmName, onList)
-      .byLegacyTestID(CONTROL_MENU)
+      .byTestActionID(CONTROL_MENU)
       .trigger('mouseover')
-      .byLegacyTestID(PAUSE)
+      .byTestActionID(PAUSE)
       .click();
   },
   restart: (vmName: string, onList = true) => {
     getActionRoot(vmName, onList)
-      .byLegacyTestID(CONTROL_MENU)
+      .byTestActionID(CONTROL_MENU)
       .trigger('mouseover')
-      .byLegacyTestID(RESTART)
+      .byTestActionID(RESTART)
       .click();
   },
   start: (vmName: string, onList = true) => {
     getActionRoot(vmName, onList)
-      .byLegacyTestID(CONTROL_MENU)
+      .byTestActionID(CONTROL_MENU)
       .trigger('mouseover')
-      .byLegacyTestID(START)
+      .byTestActionID(START)
       .click();
   },
   stop: (vmName: string, onList = true) => {
     getActionRoot(vmName, onList)
-      .byLegacyTestID(CONTROL_MENU)
+      .byTestActionID(CONTROL_MENU)
       .trigger('mouseover')
-      .byLegacyTestID(STOP)
+      .byTestActionID(STOP)
       .click();
   },
   unpause: (vmName: string, onList = true) => {
     getActionRoot(vmName, onList)
-      .byLegacyTestID(CONTROL_MENU)
+      .byTestActionID(CONTROL_MENU)
       .trigger('mouseover')
-      .byLegacyTestID(UNPAUSE)
+      .byTestActionID(UNPAUSE)
       .click();
   },
 };
