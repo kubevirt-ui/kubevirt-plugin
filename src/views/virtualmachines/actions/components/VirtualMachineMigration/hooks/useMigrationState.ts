@@ -1,41 +1,35 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
+import { getCluster } from '@multicluster/helpers/selectors';
 
-import { MigMigration, MigPlan } from '../../../../../../utils/resources/migrations/constants';
+import { SelectedMigration } from '../utils/constants';
 import { migrateVMs } from '../utils/migrateVMs';
 
 type UseMigrationState = (
-  migPlan: MigPlan,
-  namespacePVCs: IoK8sApiCoreV1PersistentVolumeClaim[],
-  pvcsToMigrate: IoK8sApiCoreV1PersistentVolumeClaim[],
+  selectedMigrations: SelectedMigration[],
   destinationStorageClass: string,
 ) => {
-  migMigration?: MigMigration;
   migrationError: Error;
   migrationLoading: boolean;
+  migrationPlan?: MultiNamespaceVirtualMachineStorageMigrationPlan;
   migrationStarted: boolean;
   onSubmit: () => Promise<void>;
 };
 
-const useMigrationState: UseMigrationState = (
-  migPlan,
-  namespacePVCs,
-  pvcsToMigrate,
-  destinationStorageClass,
-) => {
+const useMigrationState: UseMigrationState = (selectedMigrations, destinationStorageClass) => {
   const [migrationError, setMigrationError] = useState<Error | null>(null);
   const [migrationLoading, setMigrationLoading] = useState(false);
   const [migrationStarted, setMigrationStarted] = useState(false);
-  const [migMigration, setMigMigration] = useState<MigMigration>(null);
+  const [migrationPlan, setMigrationPlan] =
+    useState<MultiNamespaceVirtualMachineStorageMigrationPlan>(null);
+  const cluster = getCluster(selectedMigrations?.[0]?.pvc);
 
-  const onSubmit = async () => {
+  const onSubmit = useCallback(async () => {
     setMigrationLoading(true);
     setMigrationError(null);
     try {
-      setMigMigration(
-        await migrateVMs(migPlan, namespacePVCs, pvcsToMigrate, destinationStorageClass),
-      );
+      setMigrationPlan(await migrateVMs(selectedMigrations, destinationStorageClass, cluster));
 
       setMigrationStarted(true);
     } catch (apiError) {
@@ -43,9 +37,9 @@ const useMigrationState: UseMigrationState = (
     }
 
     setMigrationLoading(false);
-  };
+  }, [selectedMigrations, destinationStorageClass, cluster]);
 
-  return { migMigration, migrationError, migrationLoading, migrationStarted, onSubmit };
+  return { migrationError, migrationLoading, migrationPlan, migrationStarted, onSubmit };
 };
 
 export default useMigrationState;

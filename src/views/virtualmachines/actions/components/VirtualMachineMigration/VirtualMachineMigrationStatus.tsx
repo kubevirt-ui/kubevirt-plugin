@@ -1,9 +1,15 @@
-import React, { FC, useState } from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router-dom-v5-compat';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { modelToRef } from '@kubevirt-utils/models';
+import {
+  modelToRef,
+  MultiNamespaceVirtualMachineStorageMigrationPlanModel,
+} from '@kubevirt-utils/models';
+import { MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
+import { STATUS_COMPLETED } from '@kubevirt-utils/resources/migrations/constants';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { Timestamp } from '@openshift-console/dynamic-plugin-sdk';
 import {
   ActionList,
@@ -17,46 +23,29 @@ import {
 } from '@patternfly/react-core';
 import { CloseIcon } from '@patternfly/react-icons';
 
-import {
-  DEFAULT_MIGRATION_NAMESPACE,
-  MigMigration,
-  MigMigrationStatuses,
-  MigPlanModel,
-} from '../../../../../utils/resources/migrations/constants';
-
 import useProgressMigration from './hooks/useProgressMigration';
-import { getMigMigrationStatusLabel } from './utils/utils';
-import VirtualMachineMigrationRollback from './VirtualMachineMigrationRollback';
+import { getStorageMigrationStatusLabel } from './utils/utils';
 
 type VirtualMachineMigrationStatusProps = {
-  migMigration: MigMigration;
   onClose: () => void;
+  storageMigrationPlan: MultiNamespaceVirtualMachineStorageMigrationPlan;
 };
 
 const VirtualMachineMigrationStatus: FC<VirtualMachineMigrationStatusProps> = ({
-  migMigration,
   onClose,
+  storageMigrationPlan,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [rollbacking, setRollbacking] = useState(false);
 
   const {
     completedMigrationTimestamp,
     creationTimestamp,
     error: fetchingError,
     status,
-  } = useProgressMigration(migMigration);
+    watchStorageMigrationPlan,
+  } = useProgressMigration(storageMigrationPlan);
 
-  const migrationCompleted = status === MigMigrationStatuses.Completed;
-
-  if (rollbacking)
-    return (
-      <VirtualMachineMigrationRollback
-        migMigration={migMigration}
-        onClose={onClose}
-        onContinue={() => setRollbacking(false)}
-      />
-    );
+  const migrationCompleted = status === STATUS_COMPLETED;
 
   return (
     <div className="pf-v6-c-wizard migration-status">
@@ -79,7 +68,9 @@ const VirtualMachineMigrationStatus: FC<VirtualMachineMigrationStatusProps> = ({
 
       <DescriptionList className="migration-status__body">
         <DescriptionListGroup>
-          <DescriptionListTerm>{getMigMigrationStatusLabel(status)}</DescriptionListTerm>
+          <DescriptionListTerm>
+            {getStorageMigrationStatusLabel(watchStorageMigrationPlan)}
+          </DescriptionListTerm>
         </DescriptionListGroup>
 
         <DescriptionListGroup>
@@ -106,17 +97,12 @@ const VirtualMachineMigrationStatus: FC<VirtualMachineMigrationStatusProps> = ({
       </DescriptionList>
 
       <ActionList>
-        <ActionListItem>
-          {!migrationCompleted && (
-            <Button onClick={() => setRollbacking(true)} variant={ButtonVariant.secondary}>
-              {t('Stop')}
-            </Button>
-          )}
-        </ActionListItem>
         <ActionListItem className="migration-status__view-report">
           <Link
+            to={`/k8s/ns/${getNamespace(storageMigrationPlan)}/${modelToRef(
+              MultiNamespaceVirtualMachineStorageMigrationPlanModel,
+            )}`}
             onClick={onClose}
-            to={`/k8s/ns/${DEFAULT_MIGRATION_NAMESPACE}/${modelToRef(MigPlanModel)}`}
           >
             {t('View storage migrations')}
           </Link>

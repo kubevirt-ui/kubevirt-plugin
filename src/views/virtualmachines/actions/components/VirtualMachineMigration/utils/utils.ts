@@ -5,18 +5,15 @@ import {
   V1Volume,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getLabel, getName } from '@kubevirt-utils/resources/shared';
+import { MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
+import { isMigrationCompleted } from '@kubevirt-utils/resources/migrations/utils';
+import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { ProgressVariant } from '@patternfly/react-core';
 
-import { MigMigrationStatuses } from '../../../../../../utils/resources/migrations/constants';
-
-import { ALREADY_MIGRATED_PVC_LALBEL } from './constants';
-
-export const entireVMSelected = (selectedPVCs: IoK8sApiCoreV1PersistentVolumeClaim[]) =>
-  selectedPVCs === null;
+import { ALREADY_MIGRATED_PVC_LALBEL, SelectedMigration } from './constants';
+import { createSelectedMigration, getTableDiskData } from './diskData';
 
 export const getVolumeFromPVC = (
   volumes: V1Volume[],
@@ -43,21 +40,19 @@ export const getMigrationStatusLabel = (vmim: V1VirtualMachineInstanceMigration)
   return t('In progress');
 };
 
-export const getMigMigrationStatusLabel = (migMigrationStatus: string): string => {
-  if (migMigrationStatus === MigMigrationStatuses.Failed) return t('Failed');
-  if (MigMigrationStatuses.Completed === migMigrationStatus)
-    return t('Migration completed successfully');
+export const getStorageMigrationStatusLabel = (
+  storageMigrationPlan: MultiNamespaceVirtualMachineStorageMigrationPlan,
+): string => {
+  if (
+    storageMigrationPlan?.status?.namespaces?.some(
+      (namespaceStatus) => namespaceStatus?.failedMigrations?.length > 0,
+    )
+  )
+    return t('Failed');
+
+  if (isMigrationCompleted(storageMigrationPlan)) return t('Migration completed successfully');
 
   return t('In progress');
-};
-
-export const getProgressVariantByMigMigrationStatus = (
-  migMigrationStatus: string,
-): ProgressVariant => {
-  if (migMigrationStatus === MigMigrationStatuses.Failed) return ProgressVariant.danger;
-  if (migMigrationStatus === MigMigrationStatuses.Completed) return ProgressVariant.success;
-
-  return null;
 };
 
 export const getVolumePVC = (volume: V1Volume, pvcs: IoK8sApiCoreV1PersistentVolumeClaim[]) =>
@@ -71,8 +66,9 @@ export const getMigratableVMPVCs = (
   vm: V1VirtualMachine,
   pvcs: IoK8sApiCoreV1PersistentVolumeClaim[],
 ): IoK8sApiCoreV1PersistentVolumeClaim[] => {
+  const namespacePVCs = pvcs.filter((pvc) => getNamespace(pvc) === getNamespace(vm));
   return getVolumes(vm)?.reduce((acc, volume) => {
-    const pvc = getVolumePVC(volume, pvcs);
+    const pvc = getVolumePVC(volume, namespacePVCs);
 
     if (!isEmpty(getLabel(pvc, ALREADY_MIGRATED_PVC_LALBEL))) return acc;
 
@@ -89,3 +85,12 @@ export const getAllVolumesCount = (vms: V1VirtualMachine[]) =>
     acc = acc + getVolumes(vm).length;
     return acc;
   }, 0);
+
+export const getAllSelectedMigrations = (
+  vms: V1VirtualMachine[],
+  pvcs: IoK8sApiCoreV1PersistentVolumeClaim[],
+): SelectedMigration[] => {
+  return (getTableDiskData(vms, pvcs) || [])
+    .filter((diskData) => diskData.isSelectable)
+    .map((diskData) => createSelectedMigration(diskData));
+};

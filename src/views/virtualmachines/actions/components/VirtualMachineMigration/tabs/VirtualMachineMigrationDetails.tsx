@@ -1,5 +1,6 @@
-import React, { Dispatch, FC, SetStateAction, useMemo } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import { Trans } from 'react-i18next';
+import { Updater } from 'use-immer';
 
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -21,7 +22,9 @@ import {
   Title,
 } from '@patternfly/react-core';
 
-import { entireVMSelected, getAllVolumesCount } from '../utils/utils';
+import { SelectedMigration } from '../utils/constants';
+import { getAllVolumesCount } from '../utils/utils';
+import { getAllSelectedMigrations } from '../utils/utils';
 
 import SelectedStorageTooltip from './components/SelectedStorageTooltip';
 import SelectMigrationDisksTable from './components/SelectMigrationDisksTable';
@@ -29,29 +32,27 @@ import SelectMigrationDisksTable from './components/SelectMigrationDisksTable';
 type VirtualMachineMigrationDetailsProps = {
   pvcs: IoK8sApiCoreV1PersistentVolumeClaim[];
   selectedPVCs: IoK8sApiCoreV1PersistentVolumeClaim[];
-  setSelectedPVCs: Dispatch<SetStateAction<IoK8sApiCoreV1PersistentVolumeClaim[]>>;
+  setSelectedMigrations: Updater<SelectedMigration[]>;
   vms: V1VirtualMachine[];
 };
 
 const VirtualMachineMigrationDetails: FC<VirtualMachineMigrationDetailsProps> = ({
   pvcs,
   selectedPVCs,
-  setSelectedPVCs,
+  setSelectedMigrations,
   vms,
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const allVolumes = entireVMSelected(selectedPVCs);
+  const [allPVCsSelected, setAllPVCsSelected] = useState(true);
 
   const volumesCount = useMemo(() => getAllVolumesCount(vms), [vms]);
 
-  const storageClasses = Array.from(new Set(pvcs?.map((pvc) => pvc.spec.storageClassName)));
-
-  const pvcsToMigrate = allVolumes ? pvcs : selectedPVCs;
+  const storageClasses = Array.from(new Set(pvcs?.map((pvc) => pvc?.spec?.storageClassName)));
 
   const totalAmount = humanizeBinaryBytes(
-    pvcsToMigrate?.reduce((acc, pvc) => {
-      acc += convertToBaseValue(pvc.spec?.resources?.requests?.storage);
+    selectedPVCs?.reduce((acc, pvc) => {
+      acc += convertToBaseValue(pvc?.spec?.resources?.requests?.storage);
       return acc;
     }, 0),
   )?.string;
@@ -92,28 +93,34 @@ const VirtualMachineMigrationDetails: FC<VirtualMachineMigrationDetailsProps> = 
       </StackItem>
       <StackItem>
         <Radio
+          onChange={() => {
+            setAllPVCsSelected(true);
+            setSelectedMigrations(getAllSelectedMigrations(vms, pvcs));
+          }}
           id="all-volumes"
-          isChecked={allVolumes}
+          isChecked={allPVCsSelected}
           isDisabled={isEmpty(pvcs)}
           label={t('The entire VirtualMachine')}
           name="volumes"
-          onChange={() => setSelectedPVCs(null)}
         />
         <Radio
+          onChange={() => {
+            setAllPVCsSelected(false);
+            setSelectedMigrations([]);
+          }}
           id="selected-volumes"
-          isChecked={!allVolumes}
+          isChecked={!allPVCsSelected}
           isDisabled={isEmpty(pvcs)}
           label={t('Selected volumes')}
           name="volumes"
-          onChange={() => setSelectedPVCs([])}
         />
       </StackItem>
-      {!allVolumes && (
+      {!allPVCsSelected && (
         <StackItem>
           <SelectMigrationDisksTable
             pvcs={pvcs}
             selectedPVCs={selectedPVCs}
-            setSelectedPVCs={setSelectedPVCs}
+            setSelectedMigrations={setSelectedMigrations}
             vms={vms}
           />
         </StackItem>

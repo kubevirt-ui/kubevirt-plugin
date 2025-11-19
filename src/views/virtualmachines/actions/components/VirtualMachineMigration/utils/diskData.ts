@@ -1,12 +1,14 @@
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine, V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getPrintableDiskDrive } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
 import { convertToBaseValue, humanizeBinaryBytes } from '@kubevirt-utils/utils/humanize.js';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
-import { getVolumePVC } from '../../utils/utils';
+import { SelectedMigration } from './constants';
+import { getVolumePVC } from './utils';
 
 export type MigrationDisksTableData = {
   drive: string;
@@ -54,5 +56,19 @@ export const getTableDiskData = (
     return [];
   }
 
-  return vms.map((vm) => getVMDiskdata(vm, pvcs)).flat();
+  return vms
+    .map((vm) =>
+      getVMDiskdata(
+        vm,
+        pvcs?.filter((pvc) => getNamespace(pvc) === getNamespace(vm)),
+      ),
+    )
+    .flat();
 };
+
+export const createSelectedMigration = (diskData: MigrationDisksTableData): SelectedMigration => ({
+  pvc: diskData.pvc,
+  vmName: getName(diskData.vm),
+  vmNamespace: getNamespace(diskData.vm),
+  volumeName: diskData.name,
+});

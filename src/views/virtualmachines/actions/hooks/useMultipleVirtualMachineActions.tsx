@@ -18,7 +18,6 @@ import { VMIMMapper } from '@virtualmachines/utils/mappers';
 
 import { BulkVirtualMachineActionFactory } from '../BulkVirtualMachineActionFactory';
 
-import useIsMTCInstalled from './useIsMTCInstalled';
 import useIsMTVInstalled from './useIsMTVInstalled';
 import { someVMIsMigrating } from './utils';
 
@@ -44,8 +43,6 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms,
     getCluster(vms?.[0]) ?? hubClusterName,
   );
 
-  const mtcInstalled = useIsMTCInstalled();
-
   return useMemo(() => {
     const namespaces = new Set(vms?.map((vm) => getNamespace(vm)));
     const clusters = new Set(vms?.map((vm) => getCluster(vm)));
@@ -57,7 +54,7 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms,
     const migrateStorage = BulkVirtualMachineActionFactory.migrateStorage(vms, createModal);
 
     const migrationActions =
-      namespaces.size === 1 && mtcInstalled ? [migrateCompute, migrateStorage] : [migrateCompute];
+      clusters.size === 1 ? [migrateCompute, migrateStorage] : [migrateCompute];
 
     if (clusters.size === 1 && namespaces.size === 1 && crossClusterMigrationEnabled) {
       migrationActions.unshift(
@@ -110,7 +107,6 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms,
   }, [
     confirmVMActionsEnabled,
     createModal,
-    mtcInstalled,
     crossClusterMigrationEnabled,
     provider,
     providerLoaded,
