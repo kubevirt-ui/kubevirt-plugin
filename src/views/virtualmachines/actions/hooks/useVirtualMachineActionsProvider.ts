@@ -21,9 +21,7 @@ import { useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 import { printableVMStatus } from '../../utils';
 import { VirtualMachineActionFactory } from '../VirtualMachineActionFactory';
 
-import useIsMTCInstalled from './useIsMTCInstalled';
 import useIsMTVInstalled from './useIsMTVInstalled';
-import useCurrentStorageMigration from './useStorageMigrations';
 
 type UseVirtualMachineActionsProvider = (
   vm: V1VirtualMachine,
@@ -36,15 +34,12 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
 
   const virtctlCommand = getConsoleVirtctlCommand(vm);
 
-  const mtcInstalled = useIsMTCInstalled();
   const mtvInstalled = useIsMTVInstalled();
   const { featureEnabled: crossClusterMigrationFlagEnabled } = useFeatures(
     FEATURE_KUBEVIRT_CROSS_CLUSTER_MIGRATION,
   );
 
   const crossClusterMigrationEnabled = mtvInstalled && crossClusterMigrationFlagEnabled;
-
-  const [currentStorageMigration, currentStorageMigrationLoaded] = useCurrentStorageMigration(vm);
 
   const acmActions = useACMExtensionActions(vm);
 
@@ -84,20 +79,15 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
 
     const migrateStorage = VirtualMachineActionFactory.migrateStorage(vm, createModal);
 
-    const startMigrationActions = mtcInstalled
-      ? [migrateCompute, migrateStorage]
-      : [migrateCompute];
+    const startMigrationActions = [migrateCompute, migrateStorage];
 
     if (crossClusterMigration && mtvInstalled && crossClusterMigrationEnabled) {
       startMigrationActions.unshift(crossClusterMigration);
     }
 
-    const cancelMigration = currentStorageMigration
-      ? VirtualMachineActionFactory.cancelStorageMigration(currentStorageMigration)
-      : VirtualMachineActionFactory.cancelComputeMigration(vm, vmim);
-
-    const migrationActions =
-      isComputeMigration || currentStorageMigration ? [cancelMigration] : startMigrationActions;
+    const migrationActions = isComputeMigration
+      ? [VirtualMachineActionFactory.cancelComputeMigration(vm, vmim)]
+      : startMigrationActions;
 
     const pauseOrUnpause =
       printableStatus === Paused
@@ -126,20 +116,15 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
     vm,
     vmim,
     createModal,
-    currentStorageMigration,
     confirmVMActionsEnabled,
     virtctlCommand,
     treeViewFoldersEnabled,
-    mtcInstalled,
     acmActions,
     mtvInstalled,
     crossClusterMigrationEnabled,
   ]);
 
-  return useMemo(
-    () => [actions, !inFlight && currentStorageMigrationLoaded, undefined],
-    [actions, inFlight, currentStorageMigrationLoaded],
-  );
+  return useMemo(() => [actions, !inFlight, undefined], [actions, inFlight]);
 };
 
 export default useVirtualMachineActionsProvider;
