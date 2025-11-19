@@ -51,7 +51,8 @@ const CreateVMFooter: FC = () => {
   const navigate = useNavigate();
   const cluster = useClusterParam();
   const namespace = useActiveNamespace();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCreateLoading, setIsCreateLoading] = useState(false);
+  const [isCustomizeLoading, setIsCustomizeLoading] = useState(false);
   const [error, setError] = useState<any | Error>(null);
   const { createModal } = useModal();
   const [_, driversImageLoading] = useDriversImage();
@@ -69,9 +70,9 @@ const CreateVMFooter: FC = () => {
   const generatedVM = useGeneratedVM();
 
   const handleSubmit = async () => {
-    setIsSubmitting(true);
-    setError(null);
+    setIsCreateLoading(true);
 
+    setError(null);
     logITFlowEvent(CREATE_VM_BUTTON_CLICKED, generatedVM);
 
     if (
@@ -112,20 +113,21 @@ const CreateVMFooter: FC = () => {
         }
 
         if (!isUDNManagedNamespace) createHeadlessService(createdVM);
-
         navigate(getVMURL(cluster, vmNamespaceTarget, getName(createdVM)));
-
         logITFlowEvent(CREATE_VM_SUCCEEDED, createdVM);
       })
       .catch((err) => {
         setError(err);
         logITFlowEvent(CREATE_VM_FAILED, null, { vmName: vmName });
       })
-      .finally(() => setIsSubmitting(false));
+      .finally(() => {
+        setIsCreateLoading(false);
+      });
   };
 
   const handleCustomize = async () => {
-    setIsSubmitting(true);
+    setIsCustomizeLoading(true);
+
     setError(null);
 
     try {
@@ -142,7 +144,7 @@ const CreateVMFooter: FC = () => {
     } catch (err) {
       setError(err);
     } finally {
-      setIsSubmitting(false);
+      setIsCustomizeLoading(false);
     }
   };
 
@@ -168,7 +170,8 @@ const CreateVMFooter: FC = () => {
               logITFlowEvent(VIEW_YAML_AND_CLI_CLICKED, null, { vmName: vmName });
               createModal((props) => <YamlAndCLIViewerModal vm={generatedVM} {...props} />);
             }}
-            isLoading={isSubmitting || driversImageLoading}
+            isCreateLoading={isCreateLoading || driversImageLoading}
+            isCustomizeLoading={isCustomizeLoading || driversImageLoading}
             onCreate={handleSubmit}
             onCustomize={handleCustomize}
           />
