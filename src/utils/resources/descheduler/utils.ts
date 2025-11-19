@@ -1,13 +1,17 @@
 import produce from 'immer';
 
 import KubeDeschedulerModel from '@kubevirt-ui/kubevirt-api/console/models/KubeDeschedulerModel';
-import { KUBE_DESCHEDULER_NAMESPACE } from '@kubevirt-utils/resources/descheduler/constants';
+import {
+  KUBE_DESCHEDULER_NAME,
+  KUBE_DESCHEDULER_NAMESPACE,
+} from '@kubevirt-utils/resources/descheduler/constants';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 
 import {
   ActualUtilizationProfile,
   DeschedulerMode,
+  DeschedulerProfile,
   DeviationThreshold,
   KubeDescheduler,
 } from './types';
@@ -16,7 +20,7 @@ export const defaultDescheduler: KubeDescheduler = {
   apiVersion: 'operator.openshift.io/v1',
   kind: 'KubeDescheduler',
   metadata: {
-    name: 'cluster',
+    name: KUBE_DESCHEDULER_NAME,
     namespace: KUBE_DESCHEDULER_NAMESPACE,
   },
   spec: {
@@ -28,7 +32,7 @@ export const defaultDescheduler: KubeDescheduler = {
       devDeviationThresholds: DeviationThreshold.AsymmetricLow,
       devEnableSoftTainter: true,
     },
-    profiles: ['DevKubeVirtRelieveAndMigrate'],
+    profiles: [DeschedulerProfile.KubeVirtRelieveAndMigrate],
   },
 };
 
@@ -37,13 +41,16 @@ export const updateDeviationThreshold = (
   newThreshold: DeviationThreshold,
 ) => {
   const updatedDescheduler = produce(descheduler, (tempDescheduler) => {
-    tempDescheduler.spec.profileCustomizations = { devDeviationThresholds: newThreshold };
+    tempDescheduler.spec.profileCustomizations = {
+      ...tempDescheduler.spec.profileCustomizations,
+      devDeviationThresholds: newThreshold,
+    };
     return tempDescheduler;
   });
 
   return k8sUpdate({
     data: updatedDescheduler,
-    model: KubeDeschedulerModel,
+    model: { ...KubeDeschedulerModel, namespaced: true },
     name: getName(updatedDescheduler),
     ns: getNamespace(updatedDescheduler),
   });
