@@ -2,16 +2,20 @@ import {
   k8sCreate,
   k8sDelete,
   k8sGet,
+  k8sListItems,
   k8sPatch,
   k8sUpdate,
 } from '@openshift-console/dynamic-plugin-sdk';
 import {
+  Fleet,
   fleetK8sCreate,
   FleetK8sCreateUpdateOptions,
   fleetK8sDelete,
   FleetK8sDeleteOptions,
   fleetK8sGet,
   FleetK8sGetOptions,
+  fleetK8sListItems,
+  FleetK8sListOptions,
   fleetK8sPatch,
   FleetK8sPatchOptions,
   fleetK8sUpdate,
@@ -91,4 +95,16 @@ export const kubevirtK8sCreate = async <R extends K8sResourceCommon>(
   }
 
   return k8sCreate(options);
+};
+
+export const kubevirtK8sListItems = async <R extends K8sResourceCommon>(
+  options: Fleet<FleetK8sListOptions>,
+): Promise<R[]> => {
+  if (options?.cluster) {
+    const object = await fleetK8sListItems<R>(options);
+
+    return object;
+  }
+
+  return k8sListItems<R>(options);
 };
