@@ -10,6 +10,7 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useProviderByClusterName from '@multicluster/components/CrossClusterMigration/hooks/useProviderByClusterName';
 import { FEATURE_KUBEVIRT_CROSS_CLUSTER_MIGRATION } from '@multicluster/constants';
 import { getCluster } from '@multicluster/helpers/selectors';
+import { isDeletionProtectionEnabled } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
 import { isPaused, isRunning, isStopped } from '@virtualmachines/utils';
 
 import { BulkVirtualMachineActionFactory } from '../BulkVirtualMachineActionFactory';
@@ -55,6 +56,10 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms)
       migrationActions.push(BulkVirtualMachineActionFactory.migrateStorage(vms, createModal));
     }
 
+    const hasRunningVM = vms?.some(isRunning);
+    const hasProtectedVM = vms?.some(isDeletionProtectionEnabled);
+    const isDeleteDisabled = hasRunningVM || hasProtectedVM;
+
     const actions: ActionDropdownItemType[] = [
       BulkVirtualMachineActionFactory.start(vms),
       BulkVirtualMachineActionFactory.stop(vms, createModal, confirmVMActionsEnabled),
@@ -68,7 +73,7 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms)
         ? [BulkVirtualMachineActionFactory.moveToFolder(vms, createModal)]
         : []),
       BulkVirtualMachineActionFactory.editLabels(vms, createModal),
-      BulkVirtualMachineActionFactory.delete(vms, createModal),
+      BulkVirtualMachineActionFactory.delete(vms, createModal, isDeleteDisabled),
     ];
 
     if (vms.every(isStopped)) {
