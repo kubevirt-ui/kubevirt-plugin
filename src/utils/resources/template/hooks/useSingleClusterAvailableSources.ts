@@ -1,9 +1,14 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import { PersistentVolumeClaimModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import {
+  convertResourceArrayToMapWithCluster,
+  getName,
+  getNamespace,
+} from '@kubevirt-utils/resources/shared';
 import { BOOT_SOURCE } from '@kubevirt-utils/resources/template';
 import {
   getTemplateBootSourceType,
@@ -26,7 +31,7 @@ type UniqueSourceType = {
  * @param templatesLoaded - whether the templates are loaded
  * @returns availablePVCs and availableDatasources, both Sets of strings representing the available sources. `{namespace-name}`
  */
-export const useAvailableDataSourcesAndPVCs = (
+export const useSingleClusterAvailableSources = (
   templates: V1Template[],
   templatesLoaded: boolean,
 ) => {
@@ -82,33 +87,36 @@ export const useAvailableDataSourcesAndPVCs = (
     (watchResource) => watchResource.loaded || watchResource.loadError,
   );
 
-  const { availableDatasources, cloneInProgressDatasources } = Object.values(
-    watchDataSources,
-  ).reduce(
-    (acc, { data: dataSource }) => {
-      if (isDataSourceReady(dataSource as V1beta1DataSource)) {
-        acc.availableDatasources[
-          `${dataSource?.metadata?.namespace}-${dataSource?.metadata?.name}`
-        ] = dataSource;
-        return acc;
-      }
+  const { availableDataSources, cloneInProgressDataSources } = useMemo(
+    () =>
+      Object.values(watchDataSources).reduce(
+        (acc, { data: dataSource }) => {
+          if (isDataSourceReady(dataSource as V1beta1DataSource)) {
+            acc.availableDataSources[`${getNamespace(dataSource)}-${getName(dataSource)}`] =
+              dataSource;
+            return acc;
+          }
 
-      if (isDataSourceCloning(dataSource)) {
-        acc.cloneInProgressDatasources[
-          `${dataSource?.metadata?.namespace}-${dataSource?.metadata?.name}`
-        ] = dataSource;
-        return acc;
-      }
-      return acc;
-    },
-    { availableDatasources: {}, cloneInProgressDatasources: {} },
+          if (isDataSourceCloning(dataSource)) {
+            acc.cloneInProgressDataSources[`${getNamespace(dataSource)}-${getName(dataSource)}`] =
+              dataSource;
+            return acc;
+          }
+          return acc;
+        },
+        { availableDataSources: {}, cloneInProgressDataSources: {} },
+      ),
+    [watchDataSources],
   );
 
-  const availablePVCs = new Set(
-    Object.values(watchPVCs).map(
-      ({ data: pvc }) => `${pvc?.metadata?.namespace}-${pvc?.metadata?.name}`,
-    ),
+  const availablePVCs = useMemo(
+    () =>
+      convertResourceArrayToMapWithCluster<IoK8sApiCoreV1PersistentVolumeClaim>(
+        Object.values(watchPVCs).map(({ data: pvc }) => pvc),
+        true,
+      ),
+    [watchPVCs],
   );
 
-  return { availableDatasources, availablePVCs, cloneInProgressDatasources, loaded };
+  return { availableDataSources, availablePVCs, cloneInProgressDataSources, loaded };
 };

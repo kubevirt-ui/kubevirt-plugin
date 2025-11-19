@@ -2,15 +2,16 @@ import * as React from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { getResourceFromClusterMap } from '@kubevirt-utils/resources/shared';
 import {
   BOOT_SOURCE,
   isDefaultVariantTemplate,
   useVmTemplates,
 } from '@kubevirt-utils/resources/template';
+import { useSingleClusterAvailableSources } from '@kubevirt-utils/resources/template/hooks/useSingleClusterAvailableSources';
 import { getTemplateBootSourceType } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
+import { getCluster } from '@multicluster/helpers/selectors';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-
-import { useAvailableDataSourcesAndPVCs } from './useAvailableDataSourcesAndPVCs';
 
 type useTemplatesWithAvailableSourceProps = {
   namespace?: string;
@@ -26,13 +27,13 @@ export const useTemplatesWithAvailableSource = ({
   const cluster = useClusterParam();
   const { loaded, loadError, templates } = useVmTemplates(namespace, cluster);
   const {
-    availableDatasources,
+    availableDataSources,
     availablePVCs,
     loaded: bootSourcesLoaded,
-  } = useAvailableDataSourcesAndPVCs(templates, loaded);
+  } = useSingleClusterAvailableSources(templates, loaded);
 
   const availableTemplates = React.useMemo(() => {
-    const isReady = loaded && availableDatasources && availablePVCs;
+    const isReady = loaded && availableDataSources && availablePVCs;
     const temps =
       isReady &&
       templates.reduce((acc, template) => {
@@ -41,7 +42,7 @@ export const useTemplatesWithAvailableSource = ({
         // data sources
         if (bootSource.type === BOOT_SOURCE.DATA_SOURCE) {
           const ds = bootSource?.source?.sourceRef;
-          if (availableDatasources[`${ds.namespace}-${ds.name}`]) {
+          if (availableDataSources[`${ds.namespace}-${ds.name}`]) {
             acc.push(template);
           }
           return acc;
@@ -50,7 +51,9 @@ export const useTemplatesWithAvailableSource = ({
         // pvcs
         if (bootSource.type === BOOT_SOURCE.PVC) {
           const pvc = bootSource?.source?.pvc;
-          if (availablePVCs.has(`${pvc.namespace}-${pvc.name}`)) {
+          if (
+            getResourceFromClusterMap(availablePVCs, getCluster(template), pvc.namespace, pvc.name)
+          ) {
             acc.push(template);
           }
           return acc;
@@ -63,7 +66,7 @@ export const useTemplatesWithAvailableSource = ({
       }, [] as V1Template[]);
 
     return temps || [];
-  }, [availableDatasources, availablePVCs, loaded, templates]);
+  }, [availableDataSources, availablePVCs, loaded, templates]);
 
   const filteredTemplates = React.useMemo(() => {
     return (onlyAvailable ? availableTemplates : templates).filter((template) =>
@@ -77,7 +80,7 @@ export const useTemplatesWithAvailableSource = ({
   );
 
   return {
-    availableDatasources,
+    availableDataSources,
     availableTemplatesUID,
     bootSourcesLoaded,
     error: loadError,
@@ -87,7 +90,7 @@ export const useTemplatesWithAvailableSource = ({
 };
 
 type useTemplatesWithAvailableSourceValues = {
-  availableDatasources: Record<string, V1beta1DataSource>;
+  availableDataSources: Record<string, V1beta1DataSource>;
   availableTemplatesUID: Set<string>;
   bootSourcesLoaded: boolean;
   error: any;

@@ -5,10 +5,11 @@ import { CLUSTER_LIST_FILTER_TYPE } from '@kubevirt-utils/utils/constants';
 import { isEmpty, universalComparator } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
-import { useFleetClusterNames } from '@stolostron/multicluster-sdk';
+import { useFleetClusterNames, useHubClusterName } from '@stolostron/multicluster-sdk';
 
 export const useClusterFilter = <R extends K8sResourceCommon>(): RowFilter<R> => {
   const [clusters] = useFleetClusterNames();
+  const [hubClusterName] = useHubClusterName();
 
   return useMemo(
     () => ({
@@ -17,7 +18,10 @@ export const useClusterFilter = <R extends K8sResourceCommon>(): RowFilter<R> =>
           return true;
         }
 
-        return input.selected.some((cluster) => cluster === getCluster(obj));
+        return input.selected.some((cluster) => {
+          const isHubCluster = cluster === hubClusterName && isEmpty(getCluster(obj));
+          return cluster === getCluster(obj) || isHubCluster;
+        });
       },
       filterGroupName: t('Cluster'),
       isMatch: () => true,

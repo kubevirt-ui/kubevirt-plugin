@@ -16,13 +16,7 @@ import { PficonTemplateIcon } from '@patternfly/react-icons';
 
 import VirtualMachineTemplatesCreateButton from '../VirtualMachineTemplatesCreateButton/VirtualMachineTemplatesCreateButton';
 
-type VirtualMachineTemplatesEmptyStateProps = {
-  namespace: string;
-};
-
-const VirtualMachineTemplatesEmptyState: FC<VirtualMachineTemplatesEmptyStateProps> = ({
-  namespace,
-}) => {
+const VirtualMachineTemplatesEmptyState: FC = () => {
   const { t } = useKubevirtTranslation();
 
   return (
@@ -42,7 +36,7 @@ const VirtualMachineTemplatesEmptyState: FC<VirtualMachineTemplatesEmptyStatePro
           </EmptyStateBody>
           <EmptyStateFooter>
             <EmptyStateActions>
-              <VirtualMachineTemplatesCreateButton namespace={namespace} />
+              <VirtualMachineTemplatesCreateButton />
             </EmptyStateActions>
             <br />
             <EmptyStateActions>

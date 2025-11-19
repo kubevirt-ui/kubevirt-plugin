@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useMemo } from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
@@ -35,12 +35,12 @@ export const useVmTemplates = (namespace?: string, cluster?: string): useVmTempl
     },
   });
 
-  const templates = React.useMemo(
+  const templates = useMemo(
     () => (isAdmin ? allTemplates : allowedTemplates),
     [allTemplates, allowedTemplates, isAdmin],
   );
 
-  const memoizedTemplates = React.useMemo(
+  const memoizedTemplates = useMemo(
     () => (namespace ? templates.filter((t) => t.metadata.namespace === namespace) : templates),
     [namespace, templates],
   );
