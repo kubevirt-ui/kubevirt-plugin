@@ -20,10 +20,13 @@ import {
 
 export const getInstanceTypeModelFromMatcher = (
   instanceTypeMatcher: V1InstancetypeMatcher,
-): K8sModel =>
-  instanceTypeMatcher.kind.includes('cluster')
+): K8sModel => {
+  if (isEmpty(instanceTypeMatcher?.kind)) return VirtualMachineClusterInstancetypeModel;
+
+  return instanceTypeMatcher.kind.includes('cluster')
     ? VirtualMachineClusterInstancetypeModel
     : VirtualMachineInstancetypeModel;
+};
 
 export const isExpandableSpecVM = (vm: V1VirtualMachine | V1VirtualMachineInstance): boolean =>
   isVM(vm)
