@@ -11,6 +11,7 @@ import { getCluster } from '@multicluster/helpers/selectors';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { useResolvedExtensions } from '@openshift-console/dynamic-plugin-sdk';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
+import { isRunning } from '@virtualmachines/utils';
 
 import { ACMVirtualMachineActionExtension } from './constants';
 import {
@@ -40,6 +41,10 @@ const useACMExtensionActions = (vm): ActionDropdownItemType[] => {
         crossClusterMigration.properties.description = t(
           'Cross-cluster migration is not supported on this cluster.',
         );
+      }
+      if (!isRunning(vm)) {
+        crossClusterMigration.properties.isDisabled = true;
+        crossClusterMigration.properties.description = t('The VirtualMachine is not running');
       }
     });
 
