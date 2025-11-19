@@ -6,7 +6,7 @@ import { getPrintableDiskDrive } from '@kubevirt-utils/resources/vm/utils/disk/s
 import { convertToBaseValue, humanizeBinaryBytes } from '@kubevirt-utils/utils/humanize.js';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
-import { getVolumePVC } from '../../utils/utils';
+import { getVolumePVC } from '../../../utils/utils';
 
 export type MigrationDisksTableData = {
   drive: string;

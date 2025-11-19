@@ -5,11 +5,12 @@ import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdo
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { CONFIRM_VM_ACTIONS, TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
-import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useProviderByClusterName from '@multicluster/components/CrossClusterMigration/hooks/useProviderByClusterName';
 import { FEATURE_KUBEVIRT_CROSS_CLUSTER_MIGRATION } from '@multicluster/constants';
 import { getCluster } from '@multicluster/helpers/selectors';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import { isSameCluster, isSameNamespace } from '@virtualmachines/actions/utils';
 import { isPaused, isRunning, isStopped } from '@virtualmachines/utils';
 
 import { BulkVirtualMachineActionFactory } from '../BulkVirtualMachineActionFactory';
@@ -22,6 +23,7 @@ type UseMultipleVirtualMachineActions = (vms: V1VirtualMachine[]) => ActionDropd
 
 const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms) => {
   const { createModal } = useModal();
+  const currentCluster = useClusterParam();
   const { featureEnabled: confirmVMActionsEnabled } = useFeatures(CONFIRM_VM_ACTIONS);
   const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
   const mtvInstalled = useIsMTVInstalled();
@@ -36,12 +38,13 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms)
   const mtcInstalled = useIsMTCInstalled();
 
   return useMemo(() => {
-    const namespaces = new Set(vms?.map((vm) => getNamespace(vm)));
-    const clusters = new Set(vms?.map((vm) => getCluster(vm)));
+    const vmsInSingleNamespace = isSameNamespace(vms);
+    const vmsOnSingleCluster = isSameCluster(vms);
+    const onTargetCluster = currentCluster === getCluster(vms?.[0]);
 
     const migrationActions = [];
 
-    if (clusters.size === 1 && namespaces.size === 1 && crossClusterMigrationEnabled) {
+    if (vmsOnSingleCluster && vmsInSingleNamespace && crossClusterMigrationEnabled) {
       migrationActions.push(
         BulkVirtualMachineActionFactory.crossClusterMigration(
           vms,
@@ -51,8 +54,14 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms)
       );
     }
 
-    if (namespaces.size === 1 && mtcInstalled) {
-      migrationActions.push(BulkVirtualMachineActionFactory.migrateStorage(vms, createModal));
+    if (mtcInstalled) {
+      migrationActions.push(
+        BulkVirtualMachineActionFactory.migrateStorage(
+          vms,
+          createModal,
+          !vmsOnSingleCluster || !onTargetCluster,
+        ),
+      );
     }
 
     const actions: ActionDropdownItemType[] = [

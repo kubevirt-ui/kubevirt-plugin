@@ -15,7 +15,7 @@ import {
 } from '@patternfly/react-core';
 import { Table, Tbody, Td, Tr } from '@patternfly/react-table';
 
-import { getAllVolumesCount } from '../utils/utils';
+import { getAllVolumesCount } from '../../utils/utils';
 
 import ReviewVolumesColumn from './components/ReviewVolumesColumn';
 

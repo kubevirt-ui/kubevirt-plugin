@@ -4,6 +4,12 @@ import { Link } from 'react-router-dom-v5-compat';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToRef } from '@kubevirt-utils/models';
+import {
+  DEFAULT_MIGRATION_NAMESPACE,
+  MigMigration,
+  MigMigrationStatuses,
+  MigPlanModel,
+} from '@kubevirt-utils/resources/migrations/constants';
 import { Timestamp } from '@openshift-console/dynamic-plugin-sdk';
 import {
   ActionList,
@@ -17,15 +23,9 @@ import {
 } from '@patternfly/react-core';
 import { CloseIcon } from '@patternfly/react-icons';
 
-import {
-  DEFAULT_MIGRATION_NAMESPACE,
-  MigMigration,
-  MigMigrationStatuses,
-  MigPlanModel,
-} from '../../../../../utils/resources/migrations/constants';
+import useProgressMigration from '../hooks/useProgressMigration';
+import { getMigMigrationStatusLabel } from '../utils/utils';
 
-import useProgressMigration from './hooks/useProgressMigration';
-import { getMigMigrationStatusLabel } from './utils/utils';
 import VirtualMachineMigrationRollback from './VirtualMachineMigrationRollback';
 
 type VirtualMachineMigrationStatusProps = {

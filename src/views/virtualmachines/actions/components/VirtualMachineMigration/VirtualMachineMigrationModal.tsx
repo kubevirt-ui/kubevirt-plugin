@@ -1,45 +1,26 @@
 import React, { FC, useCallback, useMemo, useState } from 'react';
-import { Trans } from 'react-i18next';
-import { Link } from 'react-router-dom-v5-compat';
 
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import Loading from '@kubevirt-utils/components/Loading/Loading';
 import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
 import useDefaultStorageClass from '@kubevirt-utils/hooks/useDefaultStorage/useDefaultStorageClass';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  modelToGroupVersionKind,
-  modelToRef,
-  PersistentVolumeClaimModel,
-} from '@kubevirt-utils/models';
-import {
-  DEFAULT_MIGRATION_NAMESPACE,
-  MigPlanModel,
-} from '@kubevirt-utils/resources/migrations/constants';
+import { MigPlanModel } from '@kubevirt-utils/resources/migrations/constants';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { isEmpty, removeDuplicates } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
-import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
-import {
-  Alert,
-  AlertVariant,
-  Modal,
-  ModalBody,
-  Wizard,
-  WizardHeader,
-  WizardStep,
-} from '@patternfly/react-core';
+import { Modal, ModalBody, Wizard, WizardHeader, WizardStep } from '@patternfly/react-core';
+import VirtualMachineMigrationDestinationTab from '@virtualmachines/actions/components/VirtualMachineMigration/components/tabs/VirtualMachineMigrationDestinationTab';
+import VirtualMachineMigrationReviewTab from '@virtualmachines/actions/components/VirtualMachineMigration/components/tabs/VirtualMachineMigrationReviewTab';
+import VMMigrationNamespaceConflictsAlert from '@virtualmachines/actions/components/VirtualMachineMigration/components/VMMigrationNamespaceConflictsAlert';
+import useMigrationNamespacesPVCs from '@virtualmachines/actions/components/VirtualMachineMigration/hooks/useMigrationNamespacesPVCs';
 
+import VirtualMachineMigrationStatus from './components/VirtualMachineMigrationStatus';
 import useCreateEmptyMigPlan from './hooks/useCreateEmptyMigPlan';
-import useExistingMigrationPlan from './hooks/useExistingMigrationPlan';
+import useExistingMigPlanConflicts from './hooks/useExistingMigPlanConflicts';
 import useMigrationState from './hooks/useMigrationState';
-import VirtualMachineMigrationDestinationTab from './tabs/VirtualMachineMigrationDestinationTab';
-import VirtualMachineMigrationDetails from './tabs/VirtualMachineMigrationDetails';
-import VirtualMachineMigrationReviewTab from './tabs/VirtualMachineMigrationReviewTab';
 import { entireVMSelected, getMigratableVMPVCs } from './utils/utils';
-import VirtualMachineMigrationStatus from './VirtualMachineMigrationStatus';
 
 import './virtual-machine-migration-modal.scss';
 
@@ -55,17 +36,18 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
   vms,
 }) => {
   const { t } = useKubevirtTranslation();
+  const vmNamespaces = removeDuplicates(vms?.map((vm) => getNamespace(vm)));
+  const vmClusters = removeDuplicates(vms?.map((vm) => getCluster(vm)));
 
-  const migrationNamespace = getNamespace(vms?.[0]);
   const cluster = getCluster(vms?.[0]);
   const [selectedStorageClass, setSelectedStorageClass] = useState('');
 
   const [currentMigPlanCreation, migPlanCreationLoaded, migPlanCreationError] =
-    useCreateEmptyMigPlan(migrationNamespace, cluster);
+    useCreateEmptyMigPlan(vmNamespaces, cluster);
 
-  const [existingMigPlan, migrationPlansLoaded] = useExistingMigrationPlan(
+  const { migPlansLoaded, migPlansLoadError, namespaceConflicts } = useExistingMigPlanConflicts(
     currentMigPlanCreation,
-    migrationNamespace,
+    vmNamespaces,
     cluster,
   );
 
@@ -73,18 +55,11 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
     null,
   );
 
-  const [namespacePVCs, loaded, loadingError] = useK8sWatchData<
-    IoK8sApiCoreV1PersistentVolumeClaim[]
-  >({
-    cluster,
-    groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
-    isList: true,
-    namespace: migrationNamespace,
-  });
+  const [pvcsInNamespaces, loaded, pvcsLoadError] = useMigrationNamespacesPVCs(vmNamespaces);
 
   const vmsPVCs = useMemo(
-    () => vms.map((vm) => getMigratableVMPVCs(vm, namespacePVCs)).flat(),
-    [vms, namespacePVCs],
+    () => vms.map((vm) => getMigratableVMPVCs(vm, pvcsInNamespaces)).flat(),
+    [vms, pvcsInNamespaces],
   );
 
   const [{ clusterDefaultStorageClass, sortedStorageClasses }, scLoaded] =
@@ -108,7 +83,7 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
   const { migMigration, migrationError, migrationLoading, migrationStarted, onSubmit } =
     useMigrationState(
       currentMigPlanCreation,
-      namespacePVCs,
+      pvcsInNamespaces,
       pvcsToMigrate,
       destinationStorageClass,
     );
@@ -130,7 +105,10 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
       });
   }, [onClose, migrationStarted, currentMigPlanCreation]);
 
-  const disableForExistingMigPlan = !isEmpty(existingMigPlan) || !migrationPlansLoaded;
+  // TODO Does the cluster the VMs are on have to be the same as the cluster passed to create the migplan?
+  const disableForExistingMigPlan =
+    !isEmpty(namespaceConflicts) || vmClusters.length > 1 || !migPlansLoaded;
+
   return (
     <Modal
       className="virtual-machine-migration-modal"
@@ -139,7 +117,11 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
       variant="large"
     >
       <ModalBody>
-        <StateHandler error={loadingError || migPlanCreationError} hasData loaded>
+        <StateHandler
+          error={pvcsLoadError || migPlansLoadError || migPlanCreationError}
+          hasData
+          loaded
+        >
           {migrationStarted ? (
             <VirtualMachineMigrationStatus
               migMigration={migMigration}
@@ -170,34 +152,16 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
                 id="wizard-migration-details"
                 name={t('Migration details')}
               >
-                {!isEmpty(existingMigPlan) && (
-                  <Alert
-                    title={t('An existing MigPlan for this namespace was found. ')}
-                    variant={AlertVariant.danger}
-                  >
-                    <Trans ns="plugin__kubevirt-plugin" t={t}>
-                      Click{' '}
-                      <Link
-                        onClick={onClose}
-                        to={`/k8s/ns/${DEFAULT_MIGRATION_NAMESPACE}/${modelToRef(MigPlanModel)}`}
-                      >
-                        {t('Storage Migrations')}
-                      </Link>{' '}
-                      to review and delete existing MigPlans.
-                    </Trans>
-                  </Alert>
-                )}
-
-                {isEmpty(existingMigPlan) && loaded && scLoaded && (
-                  <VirtualMachineMigrationDetails
-                    pvcs={vmsPVCs}
-                    selectedPVCs={selectedPVCs}
-                    setSelectedPVCs={setSelectedPVCs}
-                    vms={vms}
-                  />
-                )}
-
-                {(!loaded || !scLoaded) && <Loading />}
+                <VMMigrationNamespaceConflictsAlert
+                  loaded={loaded}
+                  namespaceConflicts={namespaceConflicts}
+                  onClose={onClose}
+                  scLoaded={scLoaded}
+                  selectedPVCs={selectedPVCs}
+                  setSelectedPVCs={setSelectedPVCs}
+                  vms={vms}
+                  vmsPVCs={vmsPVCs}
+                />
               </WizardStep>
               <WizardStep id="wizard-migrate-destination" name={t('Destination StorageClass')}>
                 <VirtualMachineMigrationDestinationTab

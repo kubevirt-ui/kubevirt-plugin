@@ -240,3 +240,5 @@ export const isIPV6LinkLocal = (ip: string): boolean => {
 
 export const removeLinkLocalIPV6 = (ipAddress: IPAddress[]) =>
   ipAddress.filter((item) => !isIPV6LinkLocal(item?.ip?.trim()));
+
+export const removeDuplicates = (array: any[]) => Array.from(new Set(array));
