@@ -16,13 +16,9 @@ import SnapshotModal from '@kubevirt-utils/components/SnapshotModal/SnapshotModa
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   VirtualMachineInstanceSubresourcesModel,
+  VirtualMachineStorageMigrationPlanModel,
   VirtualMachineSubresourcesModel,
 } from '@kubevirt-utils/models';
-import {
-  DEFAULT_MIGRATION_NAMESPACE,
-  MigMigration,
-  MigMigrationModel,
-} from '@kubevirt-utils/resources/migrations/constants';
 import { asAccessReview, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
 import { getMigratableVolumeSnapshotStatuses } from '@kubevirt-utils/resources/vm/utils/snapshotStatuses';
@@ -30,7 +26,6 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { getConsoleStandaloneURL } from '@multicluster/urls';
-import { Patch } from '@openshift-console/dynamic-plugin-sdk';
 import { CopyIcon } from '@patternfly/react-icons';
 import ComputeMigrationModal from '@virtualmachines/actions/components/VirtualMachineComputeMigration/ComputeMigrationModal';
 import VirtualMachineMigrateModal from '@virtualmachines/actions/components/VirtualMachineMigration/VirtualMachineMigrationModal';
@@ -88,34 +83,6 @@ export const VirtualMachineActionFactory = {
       disabled: !vmim || !!vmim?.metadata?.deletionTimestamp,
       id: 'vm-action-cancel-migrate',
       label: t('Cancel compute migration'),
-    };
-  },
-  cancelStorageMigration: (currentStorageMigration: MigMigration): ActionDropdownItemType => {
-    const canceled =
-      currentStorageMigration?.spec?.rollback || currentStorageMigration?.spec?.canceled;
-
-    const patch: Patch[] = [{ op: 'replace', path: '/spec/rollback', value: true }];
-
-    if (currentStorageMigration?.spec?.migrateState)
-      patch.push({ op: 'remove', path: '/spec/migrateState' });
-
-    return {
-      accessReview: {
-        cluster: getCluster(currentStorageMigration),
-        group: MigMigrationModel.apiGroup,
-        namespace: DEFAULT_MIGRATION_NAMESPACE,
-        resource: MigMigrationModel.plural,
-        verb: 'patch',
-      },
-      cta: () =>
-        kubevirtK8sPatch({
-          data: patch,
-          model: MigMigrationModel,
-          resource: currentStorageMigration,
-        }),
-      disabled: canceled,
-      id: 'vm-action-cancel-storage-migrate',
-      label: canceled ? t('Cancelling storage migration') : t('Cancel storage migration'),
     };
   },
   clone: (
@@ -242,7 +209,7 @@ export const VirtualMachineActionFactory = {
     createModal: (modal: ModalComponent) => void,
   ): ActionDropdownItemType => {
     return {
-      accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
+      accessReview: asAccessReview(VirtualMachineStorageMigrationPlanModel, vm, 'create'),
       cta: () => createModal((props) => <VirtualMachineMigrateModal vms={[vm]} {...props} />),
       description: t('Migrate VirtualMachine storage to a different StorageClass'),
       id: 'vm-migrate-storage',

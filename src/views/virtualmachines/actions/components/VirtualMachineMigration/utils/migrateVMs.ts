@@ -1,114 +1,90 @@
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import groupBy from 'lodash/groupBy';
+
 import {
-  DEFAULT_MIGRATION_NAMESPACE,
-  MigMigration,
-  MigMigrationModel,
-  MigPlan,
-  MigPlanModel,
+  MultiNamespaceVirtualMachineStorageMigrationModel,
+  MultiNamespaceVirtualMachineStorageMigrationPlanModel,
+} from '@kubevirt-utils/models';
+import {
+  MultiNamespaceVirtualMachineStorageMigration,
+  MultiNamespaceVirtualMachineStorageMigrationPlan,
 } from '@kubevirt-utils/resources/migrations/constants';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
-import { getCluster } from '@multicluster/helpers/selectors';
-import { kubevirtK8sCreate, kubevirtK8sGet, kubevirtK8sPatch } from '@multicluster/k8sRequests';
+import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 
-export const getEmptyMigPlan = (namespace: string): MigPlan => ({
-  apiVersion: `${MigPlanModel.apiGroup}/${MigPlanModel.apiVersion}`,
-  kind: MigPlanModel.kind,
+import { SelectedMigration } from './constants';
+
+export const getEmptyMigPlan = (
+  namespace: string,
+): MultiNamespaceVirtualMachineStorageMigrationPlan => ({
+  apiVersion: `${MultiNamespaceVirtualMachineStorageMigrationPlanModel.apiGroup}/${MultiNamespaceVirtualMachineStorageMigrationPlanModel.apiVersion}`,
+  kind: MultiNamespaceVirtualMachineStorageMigrationPlanModel.kind,
   metadata: {
     name: `migplan-${getRandomChars()}`,
-    namespace: DEFAULT_MIGRATION_NAMESPACE,
+    namespace,
   },
   spec: {
-    destMigClusterRef: {
-      name: 'host',
-      namespace: DEFAULT_MIGRATION_NAMESPACE,
-    },
-    liveMigrate: true,
-    namespaces: [namespace],
-    srcMigClusterRef: {
-      name: 'host',
-      namespace: DEFAULT_MIGRATION_NAMESPACE,
-    },
+    namespaces: [],
   },
 });
 
-const getEmptyMigMigration = (migPlan: MigPlan): MigMigration => ({
-  apiVersion: `${MigMigrationModel.apiGroup}/${MigMigrationModel.apiVersion}`,
-  kind: MigMigrationModel.kind,
+export const getMigration = (
+  migrationPlan: MultiNamespaceVirtualMachineStorageMigrationPlan,
+): MultiNamespaceVirtualMachineStorageMigration => ({
+  apiVersion: `${MultiNamespaceVirtualMachineStorageMigrationModel.apiGroup}/${MultiNamespaceVirtualMachineStorageMigrationModel.apiVersion}`,
+  kind: MultiNamespaceVirtualMachineStorageMigrationModel.kind,
   metadata: {
-    name: `migmigration-${migPlan?.status?.suffix || getRandomChars()}`,
-    namespace: DEFAULT_MIGRATION_NAMESPACE,
+    name: `migration-${getName(migrationPlan) || getRandomChars()}`,
+    namespace: getNamespace(migrationPlan),
   },
   spec: {
-    canceled: false,
-    migPlanRef: {
-      name: getName(migPlan),
-      namespace: getNamespace(migPlan),
+    multiNamespaceVirtualMachineStorageMigrationPlanRef: {
+      name: getName(migrationPlan),
     },
-    migrateState: true,
-    quiescePods: true,
-    stage: false,
   },
 });
 
 export const migrateVMs = async (
-  migPlan: MigPlan,
-  namespacePVCs: IoK8sApiCoreV1PersistentVolumeClaim[],
-  selectedPVCs: IoK8sApiCoreV1PersistentVolumeClaim[],
+  selectedMigrations: SelectedMigration[],
   destinationStorageClass: string,
+  cluster: string,
 ) => {
-  const cluster = getCluster(migPlan);
-  const migPlanWithStatus = await kubevirtK8sGet<MigPlan>({
+  const migrationPlan = getEmptyMigPlan(getNamespace(selectedMigrations?.[0].pvc));
+
+  const migrationsPerNamespace = groupBy(selectedMigrations, 'vmNamespace');
+
+  Object.entries(migrationsPerNamespace).forEach(([namespace, migrations]) => {
+    const namespaceMigrations = { name: namespace, virtualMachines: [] };
+
+    migrations.forEach((migration) => {
+      namespaceMigrations.virtualMachines.push({
+        name: migration.vmName,
+        targetMigrationPVCs: [
+          {
+            destinationPVC: {
+              storageClassName: destinationStorageClass,
+            },
+            volumeName: migration.volumeName,
+          },
+        ],
+      });
+    });
+
+    migrationPlan.spec.namespaces.push(namespaceMigrations);
+  });
+
+  const createdMigrationPlan =
+    await kubevirtK8sCreate<MultiNamespaceVirtualMachineStorageMigrationPlan>({
+      cluster,
+      data: migrationPlan,
+      model: MultiNamespaceVirtualMachineStorageMigrationPlanModel,
+    });
+
+  await kubevirtK8sCreate<MultiNamespaceVirtualMachineStorageMigration>({
     cluster,
-    model: MigPlanModel,
-    name: getName(migPlan),
-    ns: getNamespace(migPlan),
+    data: getMigration(migrationPlan),
+    model: MultiNamespaceVirtualMachineStorageMigrationModel,
   });
 
-  const suffix = migPlanWithStatus.status?.suffix || getRandomChars();
-
-  const persistentVolumes = namespacePVCs.map((pvc) => {
-    const pvcOriginalName = getName(pvc);
-
-    const pvcNewName = `${pvcOriginalName.replace(/-mig-[\d\w]+/, '')}-mig-${suffix}`;
-
-    return {
-      capacity: pvc.status.capacity?.storage,
-      name: pvc.spec.volumeName,
-      proposedCapacity: '0',
-      pvc: {
-        accessModes: ['Auto'],
-        hasReference: true,
-        name: `${pvcOriginalName}:${pvcNewName}`,
-        namespace: getNamespace(pvc),
-        ownerType: 'VirtualMachine',
-        volumeMode: 'Auto',
-      },
-      selection: {
-        action: selectedPVCs.find((selectedPVC) => getName(selectedPVC) === pvcOriginalName)
-          ? 'copy'
-          : 'skip',
-        copyMethod: 'block',
-        storageClass: destinationStorageClass,
-      },
-      storageClass: pvc.spec.storageClassName,
-      supported: {
-        actions: ['skip', 'copy'],
-        copyMethods: ['filesystem', 'block', 'snapshot'],
-      },
-    };
-  });
-
-  await kubevirtK8sPatch<MigPlan>({
-    cluster,
-    data: [{ op: 'replace', path: '/spec/persistentVolumes', value: persistentVolumes }],
-    model: MigPlanModel,
-    resource: migPlanWithStatus,
-  });
-
-  return kubevirtK8sCreate({
-    cluster,
-    data: getEmptyMigMigration(migPlanWithStatus),
-    model: MigMigrationModel,
-  });
+  return createdMigrationPlan;
 };
