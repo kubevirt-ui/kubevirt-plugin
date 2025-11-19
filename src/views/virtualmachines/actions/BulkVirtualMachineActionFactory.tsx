@@ -37,6 +37,7 @@ export const BulkVirtualMachineActionFactory = {
   delete: (
     vms: V1VirtualMachine[],
     createModal: (modal: ModalComponent) => void,
+    isDisabled: boolean,
   ): ActionDropdownItemType => ({
     cta: () =>
       createModal(({ isOpen, onClose }) => (
@@ -48,7 +49,7 @@ export const BulkVirtualMachineActionFactory = {
           vms={vms}
         />
       )),
-    disabled: isEmpty(vms),
+    disabled: isEmpty(vms) || isDisabled,
     id: ACTIONS_ID.DELETE,
     label: t('Delete'),
   }),
