@@ -1,7 +1,7 @@
 import { modelToGroupVersionKind, NamespaceModel } from '@kubevirt-utils/models';
 import { getCluster } from '@multicluster/helpers/selectors';
+import useKubevirtSearchPoll from '@multicluster/hooks/useKubevirtSearchPoll';
 import useIsACMPage from '@multicluster/useIsACMPage';
-import { useFleetSearchPoll } from '@stolostron/multicluster-sdk';
 
 export type UseMulticlusterNamespacesReturnType = [
   projectsByCluster: Record<string, K8sResourceCommon[]>,
@@ -12,7 +12,9 @@ export type UseMulticlusterNamespacesReturnType = [
 const useMulticlusterNamespaces = (): UseMulticlusterNamespacesReturnType => {
   const isACMTreeView = useIsACMPage();
 
-  const [namespaces, namespacesLoaded, namespacesError] = useFleetSearchPoll<K8sResourceCommon[]>(
+  const [namespaces, namespacesLoaded, namespacesError] = useKubevirtSearchPoll<
+    K8sResourceCommon[]
+  >(
     isACMTreeView
       ? {
           groupVersionKind: modelToGroupVersionKind(NamespaceModel),
