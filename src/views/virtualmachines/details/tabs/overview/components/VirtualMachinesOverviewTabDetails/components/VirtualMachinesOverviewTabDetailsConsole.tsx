@@ -6,6 +6,7 @@ import {
 } from '@kubevirt-utils/components/Consoles/components/utils/ConsoleConsts';
 import { ConsoleComponentState } from '@kubevirt-utils/components/Consoles/components/utils/types';
 import HideConsole from '@kubevirt-utils/components/Consoles/components/vnc-console/HideConsole';
+import { isConnectableState } from '@kubevirt-utils/components/Consoles/components/vnc-console/utils/util';
 import VncConsole from '@kubevirt-utils/components/Consoles/components/vnc-console/VncConsole';
 import { getConsoleBasePath } from '@kubevirt-utils/components/Consoles/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -38,8 +39,7 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
   const enableConsole = isVMRunning && !isHeadlessMode && canConnectConsole;
   const showConnect =
     !enableConsole || // connect component is also empty state here
-    state === ConsoleState.disconnected ||
-    state === ConsoleState.connecting;
+    isConnectableState(state);
 
   if (!apiPathLoaded)
     return (
@@ -83,6 +83,7 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
             isConnecting={state === ConsoleState.connecting}
             isDisabled={!enableConsole}
             isHeadlessMode={isHeadlessMode}
+            isSessionAlreadyInUse={state === ConsoleState.session_already_in_use}
           />
         </div>
       )}

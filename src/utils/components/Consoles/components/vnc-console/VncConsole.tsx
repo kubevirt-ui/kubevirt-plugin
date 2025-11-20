@@ -8,6 +8,7 @@ import { isConnectionEncrypted } from '../../utils/utils';
 import { ConsoleState, VNC_CONSOLE_TYPE, WS, WSS } from '../utils/ConsoleConsts';
 import { ConsoleComponentState } from '../utils/types';
 
+import { isSessionAlreadyInUse } from './utils/util';
 import {
   sendCtrlAlt1,
   sendCtrlAlt2,
@@ -28,7 +29,7 @@ import {
 
 import './vnc-console.scss';
 
-const { connected, connecting, disconnected } = ConsoleState;
+const { connected, connecting, disconnected, session_already_in_use } = ConsoleState;
 
 export type VncConsoleProps = {
   basePath: string;
@@ -54,13 +55,16 @@ export const VncConsole: FC<VncConsoleProps> = ({
     [setState],
   );
 
-  const postDisconnectCleanup = useCallback(() => {
-    rfbRef.current = null;
-    setVncState((prev) => ({
-      actions: { connect: prev.actions.connect, disconnect: prev.actions.disconnect },
-      state: disconnected,
-    }));
-  }, [setVncState]);
+  const postDisconnectCleanup = useCallback(
+    (sessionAlreadyInUse?: boolean) => {
+      rfbRef.current = null;
+      setVncState((prev) => ({
+        actions: { connect: prev.actions.connect, disconnect: prev.actions.disconnect },
+        state: sessionAlreadyInUse ? session_already_in_use : disconnected,
+      }));
+    },
+    [setVncState],
+  );
 
   const disconnect = useCallback(() => {
     if (!rfbRef.current) {
@@ -70,52 +74,59 @@ export const VncConsole: FC<VncConsoleProps> = ({
     postDisconnectCleanup();
   }, [postDisconnectCleanup]);
 
-  const connect = useCallback(() => {
-    setVncState(() => ({ state: connecting }));
-    const sessionID = ++sessionRef.current;
+  const connect = useCallback(
+    (preserveSession = true) => {
+      setVncState(() => ({ state: connecting }));
+      const sessionID = ++sessionRef.current;
 
-    const isEncrypted = isConnectionEncrypted();
-    const path = `${basePath}/vnc`;
-    const port = window.location.port || (isEncrypted ? SECURE : INSECURE);
-    const url = `${isEncrypted ? WSS : WS}://${window.location.hostname}:${port}${path}`;
-    const rfbInst = new RFBCreate(staticRenderLocationRef.current, url);
-    rfbInst.addEventListener(
-      'connect',
-      () => sessionID === sessionRef.current && setVncState(() => ({ state: connected })),
-    );
-    rfbInst.addEventListener('disconnect', () => {
-      // prevent disconnect for old session to interact with current connection attempt
-      sessionID === sessionRef.current && postDisconnectCleanup();
-    });
-    rfbInst.viewOnly = viewOnly;
-    rfbInst.scaleViewport = scaleViewport;
+      const isEncrypted = isConnectionEncrypted();
+      const path = `${basePath}/vnc`;
+      const port = window.location.port || (isEncrypted ? SECURE : INSECURE);
+      const url = `${isEncrypted ? WSS : WS}://${
+        window.location.hostname
+      }:${port}${path}?preserveSession=${Boolean(preserveSession).toString()}`;
+      const rfbInst = new RFBCreate(staticRenderLocationRef.current, url);
+      rfbInst.addEventListener(
+        'connect',
+        () => sessionID === sessionRef.current && setVncState(() => ({ state: connected })),
+      );
+      rfbInst.addEventListener('disconnect', (args) => {
+        // prevent disconnect for old session to interact with current connection attempt
+        if (sessionID === sessionRef.current) {
+          postDisconnectCleanup(isSessionAlreadyInUse(args));
+        }
+      });
+      rfbInst.viewOnly = viewOnly;
+      rfbInst.scaleViewport = scaleViewport;
 
-    rfbRef.current = rfbInst;
+      rfbRef.current = rfbInst;
 
-    setVncState((prev) => ({
-      actions: {
-        // get methods that are not bound to rfb instance (i.e. connect())
-        // those are initialized during initial loading with useEffect
-        ...prev.actions,
-        sendCtrlAlt1: sendCtrlAlt1.bind(rfbInst),
-        sendCtrlAlt2: sendCtrlAlt2.bind(rfbInst),
-        sendCtrlAltDel: rfbInst.sendCtrlAltDel?.bind(rfbInst),
-        sendF1: sendF1.bind(rfbInst),
-        sendF10: sendF10.bind(rfbInst),
-        sendF11: sendF11.bind(rfbInst),
-        sendF12: sendF12.bind(rfbInst),
-        sendF2: sendF2.bind(rfbInst),
-        sendF3: sendF3.bind(rfbInst),
-        sendF4: sendF4.bind(rfbInst),
-        sendF5: sendF5.bind(rfbInst),
-        sendF6: sendF6.bind(rfbInst),
-        sendF7: sendF7.bind(rfbInst),
-        sendF8: sendF8.bind(rfbInst),
-        sendF9: sendF9.bind(rfbInst),
-        sendPaste: sendPasteCMD.bind(rfbInst),
-      },
-    }));
-  }, [basePath, viewOnly, scaleViewport, setVncState, postDisconnectCleanup]);
+      setVncState((prev) => ({
+        actions: {
+          // get methods that are not bound to rfb instance (i.e. connect())
+          // those are initialized during initial loading with useEffect
+          ...prev.actions,
+          sendCtrlAlt1: sendCtrlAlt1.bind(rfbInst),
+          sendCtrlAlt2: sendCtrlAlt2.bind(rfbInst),
+          sendCtrlAltDel: rfbInst.sendCtrlAltDel?.bind(rfbInst),
+          sendF1: sendF1.bind(rfbInst),
+          sendF10: sendF10.bind(rfbInst),
+          sendF11: sendF11.bind(rfbInst),
+          sendF12: sendF12.bind(rfbInst),
+          sendF2: sendF2.bind(rfbInst),
+          sendF3: sendF3.bind(rfbInst),
+          sendF4: sendF4.bind(rfbInst),
+          sendF5: sendF5.bind(rfbInst),
+          sendF6: sendF6.bind(rfbInst),
+          sendF7: sendF7.bind(rfbInst),
+          sendF8: sendF8.bind(rfbInst),
+          sendF9: sendF9.bind(rfbInst),
+          sendPaste: sendPasteCMD.bind(rfbInst),
+        },
+      }));
+    },
+    [basePath, viewOnly, scaleViewport, setVncState, postDisconnectCleanup],
+  );
 
   // auto-connect only on first load
   useEffect(() => {
