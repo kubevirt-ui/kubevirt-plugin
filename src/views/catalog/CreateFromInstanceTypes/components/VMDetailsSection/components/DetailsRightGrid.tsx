@@ -3,13 +3,13 @@ import React, { FC } from 'react';
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { instanceTypeActionType } from '@catalog/CreateFromInstanceTypes/state/utils/types';
 import { useIsWindowsBootableVolume } from '@catalog/CreateFromInstanceTypes/utils/utils';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SSHSecretModal from '@kubevirt-utils/components/SSHSecretModal/SSHSecretModal';
 import { initialSysprepData } from '@kubevirt-utils/components/SSHSecretModal/utils/constants';
 import { SSHSecretDetails } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import useDefaultStorageClass from '@kubevirt-utils/hooks/useDefaultStorage/useDefaultStorageClass';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
@@ -58,18 +58,13 @@ const DetailsRightGrid: FC = () => {
 
   return (
     <DescriptionList isHorizontal>
-      {isACMPage && (
-        <VirtualMachineDescriptionItem descriptionData={cluster} descriptionHeader={t('Cluster')} />
-      )}
-      <VirtualMachineDescriptionItem
+      {isACMPage && <DescriptionItem descriptionData={cluster} descriptionHeader={t('Cluster')} />}
+      <DescriptionItem
         descriptionData={isChangingNamespace ? <Loading /> : vmNamespaceTarget}
         descriptionHeader={t('Project')}
       />
-      <VirtualMachineDescriptionItem
-        descriptionData={<DiskSize />}
-        descriptionHeader={t('Disk size')}
-      />
-      <VirtualMachineDescriptionItem
+      <DescriptionItem descriptionData={<DiskSize />} descriptionHeader={t('Disk size')} />
+      <DescriptionItem
         descriptionData={
           loaded ? (
             <InlineFilterSelect
@@ -94,7 +89,7 @@ const DetailsRightGrid: FC = () => {
         <SysprepDescriptionItem />
       ) : (
         <>
-          <VirtualMachineDescriptionItem
+          <DescriptionItem
             descriptionData={
               isChangingNamespace ? (
                 <Loading />

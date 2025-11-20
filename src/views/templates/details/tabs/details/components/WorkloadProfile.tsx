@@ -3,8 +3,8 @@ import { getWorkloadProfile } from 'src/views/templates/utils/selectors';
 
 import { TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import WorkloadProfileModal from '@kubevirt-utils/components/WorkloadProfileModal/WorkloadProfileModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -62,7 +62,7 @@ const WorkloadProfile: React.FC<TemplateDetailsGridProps> = ({ editable, templat
     ));
 
   return (
-    <VirtualMachineDescriptionItem
+    <DescriptionItem
       descriptionData={workload}
       descriptionHeader={t('Workload profile')}
       isEdit={editable}

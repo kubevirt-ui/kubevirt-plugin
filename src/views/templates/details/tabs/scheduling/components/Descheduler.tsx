@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import useDeschedulerSetting from '@kubevirt-utils/hooks/useDeschedulerSetting/useDeschedulerSetting';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -19,7 +19,7 @@ const Descheduler: FC<DeschedulerProps> = ({ template }) => {
 
   return (
     <>
-      <VirtualMachineDescriptionItem
+      <DescriptionItem
         bodyContent={
           <>
             {t(

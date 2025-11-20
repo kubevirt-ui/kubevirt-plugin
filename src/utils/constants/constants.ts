@@ -21,6 +21,8 @@ export const RUNSTRATEGY_HALTED = 'Halted';
 export const RUNSTRATEGY_MANUAL = 'Manual';
 export const RUNSTRATEGY_RERUNONFAILURE = 'RerunOnFailure';
 
+export const SPACE_SYMBOL = ' ';
+
 export enum K8S_OPS {
   ADD = 'add',
   REMOVE = 'remove',

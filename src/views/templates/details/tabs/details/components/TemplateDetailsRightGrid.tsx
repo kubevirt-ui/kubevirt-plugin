@@ -7,8 +7,8 @@ import { getTemplateProviderName } from 'src/views/templates/utils/selectors';
 import { TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import AdditionalResources from '@kubevirt-utils/components/AdditionalResources/AdditionalResources';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import HardwareDevices from '@kubevirt-utils/components/HardwareDevices/HardwareDevices';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   getTemplateSupportLevel,
@@ -42,15 +42,12 @@ const TemplateDetailsRightGrid: React.FC<TemplateDetailsGridProps> = ({ template
     <DescriptionList>
       <BootOrderItem template={template} />
       <BootSource template={template} />
-      <VirtualMachineDescriptionItem
-        descriptionData={providerContent}
-        descriptionHeader={t('Provider')}
-      />
-      <VirtualMachineDescriptionItem
+      <DescriptionItem descriptionData={providerContent} descriptionHeader={t('Provider')} />
+      <DescriptionItem
         descriptionData={getTemplateSupportLevel(template) || NO_DATA_DASH}
         descriptionHeader={t('Support')}
       />
-      <VirtualMachineDescriptionItem
+      <DescriptionItem
         descriptionData={
           <HardwareDevices
             canEdit={isTemplateEditable}

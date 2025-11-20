@@ -7,8 +7,8 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, AlertVariant, DescriptionList, Stack, StackItem } from '@patternfly/react-core';
 
+import DescriptionItem from '../DescriptionItem/DescriptionItem';
 import Loading from '../Loading/Loading';
-import VirtualMachineDescriptionItem from '../VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 
 export const SysprepDescription: FC<{
   error?: Error;
@@ -36,7 +36,7 @@ export const SysprepDescription: FC<{
       </StackItem>
       <StackItem>
         <DescriptionList columnModifier={{ lg: '1Col', xl: '2Col' }} isCompact>
-          <VirtualMachineDescriptionItem
+          <DescriptionItem
             descriptionData={
               isEmpty(selectedSysprepName) ? (
                 t('Not available')

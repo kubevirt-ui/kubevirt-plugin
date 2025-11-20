@@ -4,9 +4,9 @@ import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { CloudInitDescription } from '@kubevirt-utils/components/CloudinitDescription/CloudInitDescription';
 import CloudinitModal from '@kubevirt-utils/components/CloudinitModal/CloudinitModal';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   getTemplateVirtualMachineObject,
@@ -65,7 +65,7 @@ const TemplateScriptsPage: FC<TemplateScriptsPageProps> = ({ obj: template }) =>
     <PageSection>
       <SidebarEditor<V1Template> onResourceUpdate={onSubmitTemplate} resource={template}>
         <DescriptionList className="template-scripts-tab__description-list">
-          <VirtualMachineDescriptionItem
+          <DescriptionItem
             descriptionHeader={
               <Flex className="vm-description-item__title">
                 <FlexItem>

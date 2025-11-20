@@ -6,13 +6,13 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import AffinityModal from '@kubevirt-utils/components/AffinityModal/AffinityModal';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import NodeSelectorDetailItem from '@kubevirt-utils/components/NodeSelectorDetailItem/NodeSelectorDetailItem';
 import NodeSelectorModal from '@kubevirt-utils/components/NodeSelectorModal/NodeSelectorModal';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import Tolerations from '@kubevirt-utils/components/Tolerations/Tolerations';
 import TolerationsModal from '@kubevirt-utils/components/TolerationsModal/TolerationsModal';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
@@ -57,7 +57,7 @@ const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
   return (
     <GridItem span={5}>
       <DescriptionList>
-        <VirtualMachineDescriptionItem
+        <DescriptionItem
           descriptionData={
             <NodeSelectorDetailItem nodeSelector={vm?.spec?.template?.spec?.nodeSelector} />
           }
@@ -77,7 +77,7 @@ const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
           descriptionHeader={<SearchItem id="node-selector">{t('Node selector')}</SearchItem>}
           isEdit={canUpdateVM}
         />
-        <VirtualMachineDescriptionItem
+        <DescriptionItem
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <TolerationsModal
@@ -96,7 +96,7 @@ const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
           descriptionHeader={<SearchItem id="tolerations">{t('Tolerations')}</SearchItem>}
           isEdit={canUpdateVM}
         />
-        <VirtualMachineDescriptionItem
+        <DescriptionItem
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <AffinityModal
@@ -114,7 +114,7 @@ const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
           descriptionHeader={<SearchItem id="affinity">{t('Affinity rules')}</SearchItem>}
           isEdit={canUpdateVM}
         />
-        <VirtualMachineDescriptionItem
+        <DescriptionItem
           bodyContent={<DeschedulerPopover />}
           data-test-id="descheduler"
           descriptionData={<Descheduler vm={vm} />}

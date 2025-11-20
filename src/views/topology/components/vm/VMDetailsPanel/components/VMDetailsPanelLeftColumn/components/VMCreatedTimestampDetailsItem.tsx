@@ -1,8 +1,8 @@
 import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { timestampFor } from '@kubevirt-utils/components/Timestamp/utils/datetime';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getCreationTimestamp } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -23,7 +23,7 @@ const VMCreatedTimestampDetailsItem: FC<VMCreatedTimestampDetailsItemProps> = ({
   const timestampPluralized = pluralize(timestamp['value'], timestamp['time']);
 
   return (
-    <VirtualMachineDescriptionItem
+    <DescriptionItem
       descriptionData={
         timestamp !== NO_DATA_DASH ? (
           <>

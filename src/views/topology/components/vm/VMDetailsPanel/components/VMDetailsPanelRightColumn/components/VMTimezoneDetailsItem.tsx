@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { useGuestOS } from '@kubevirt-utils/resources/vmi';
@@ -17,7 +17,7 @@ const VMTimezoneDetailsItem: FC<VMTimezoneDetailsItemProps> = ({ vmi }) => {
   const [guestAgentData] = useGuestOS(vmi);
 
   return (
-    <VirtualMachineDescriptionItem
+    <DescriptionItem
       className="topology-vm-details-panel__item"
       data-test-id="virtual-machine-overview-details-timezone"
       descriptionData={guestAgentData?.timezone?.split(',')[0] || NO_DATA_DASH}

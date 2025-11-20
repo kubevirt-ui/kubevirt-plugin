@@ -3,8 +3,8 @@ import { useVirtualMachineTemplatesCPUMemory } from 'src/views/templates/list/ho
 
 import CPUDescription from '@kubevirt-utils/components/CPUDescription/CPUDescription';
 import { CpuMemHelperTextResources } from '@kubevirt-utils/components/CPUDescription/utils/utils';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { TemplateModel, V1Template } from '@kubevirt-utils/models';
 import { getTemplateVirtualMachineCPU } from '@kubevirt-utils/resources/template';
@@ -44,7 +44,7 @@ const CPUMemory: FC<CPUMemoryProps> = ({ editable, template }) => {
     ));
 
   return (
-    <VirtualMachineDescriptionItem
+    <DescriptionItem
       bodyContent={
         <CPUDescription
           cpu={getTemplateVirtualMachineCPU(template)}

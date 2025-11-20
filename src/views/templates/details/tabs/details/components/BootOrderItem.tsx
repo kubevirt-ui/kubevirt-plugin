@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom-v5-compat';
 import BootOrder from 'src/views/virtualmachinesinstance/details/tabs/details/components/Details/BootOrder/BootOrder';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateDisks, getTemplateInterfaces } from '@kubevirt-utils/resources/template';
 
@@ -19,7 +19,7 @@ const BootOrderItem: React.FC<BootOrderProps> = ({ template }) => {
   const disksTabLink = `/k8s/ns/${template.metadata.namespace}/templates/${template.metadata.name}/disks`;
 
   return (
-    <VirtualMachineDescriptionItem
+    <DescriptionItem
       bodyContent={
         <Trans ns="plugin__kubevirt-plugin">
           You can edit the boot order in the <Link to={disksTabLink}>{t('Disks tab')}</Link>

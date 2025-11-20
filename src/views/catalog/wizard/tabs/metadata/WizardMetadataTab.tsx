@@ -67,7 +67,7 @@ const WizardMetadataTab: WizardTab = ({ loaded, updateVM, vm }) => {
                 )}
                 helperPopover={{
                   content: t(
-                    'Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects',
+                    'Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects.',
                   ),
                   header: t('Annotations'),
                 }}

@@ -7,7 +7,7 @@ import { isHeadlessMode } from '@kubevirt-utils/resources/vm';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { Flex, FlexItem, Switch } from '@patternfly/react-core';
 
-import VirtualMachineDescriptionItem from '../VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
+import DescriptionItem from '../DescriptionItem/DescriptionItem';
 
 type HardwareDevicesHeadlessModeProps = {
   onSubmit: (vm: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
@@ -35,7 +35,7 @@ const HardwareDevicesHeadlessMode: FC<HardwareDevicesHeadlessModeProps> = ({ onS
 
   return (
     <>
-      <VirtualMachineDescriptionItem
+      <DescriptionItem
         bodyContent={t(
           'Whether to attach the default graphics device or not. VNC will not be available if checked',
         )}

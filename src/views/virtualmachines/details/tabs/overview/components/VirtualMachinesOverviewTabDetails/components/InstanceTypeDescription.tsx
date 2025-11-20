@@ -2,8 +2,8 @@ import React, { FC } from 'react';
 
 import { ControllerRevisionModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   getInstanceTypeRevisionName,
@@ -27,7 +27,7 @@ const InstanceTypeDescription: FC<InstanceTypeDescriptionProps> = ({ vm }) => {
 
   return (
     <>
-      <VirtualMachineDescriptionItem
+      <DescriptionItem
         bodyContent={t(
           'A ControllerRevision resource is cloned from the InstanceType when creating the VirtualMachine',
         )}
@@ -48,7 +48,7 @@ const InstanceTypeDescription: FC<InstanceTypeDescriptionProps> = ({ vm }) => {
         descriptionHeader={t('InstanceType')}
         isPopover
       />
-      <VirtualMachineDescriptionItem
+      <DescriptionItem
         bodyContent={t(
           'A ControllerRevision resource is cloned from the Preference when creating the VirtualMachine',
         )}

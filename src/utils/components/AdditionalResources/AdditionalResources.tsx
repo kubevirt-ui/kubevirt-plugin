@@ -6,7 +6,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
-import VirtualMachineDescriptionItem from '../VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
+import DescriptionItem from '../DescriptionItem/DescriptionItem';
 
 type AdditionalResourcesProps = {
   template: V1Template;
@@ -22,7 +22,7 @@ const AdditionalResources: React.FC<AdditionalResourcesProps> = ({ template }) =
   if (isEmpty(additionalResources)) return null;
 
   return (
-    <VirtualMachineDescriptionItem
+    <DescriptionItem
       descriptionData={
         <ul>
           {additionalResources.map((object) => (
