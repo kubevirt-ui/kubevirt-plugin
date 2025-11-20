@@ -1,6 +1,7 @@
 import React, { FC, useState } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import {
@@ -37,15 +38,30 @@ const ComputeMigrationModal: FC<ComputeMigrationModalProps> = ({ isOpen, onClose
   );
 
   const [selectedNode, setSelectedNode] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<Error>(null);
 
   const handleNodeSelection = (changedNode: string) => {
     changedNode === selectedNode ? setSelectedNode('') : setSelectedNode(changedNode);
   };
 
-  const initiateMigration = () => {
-    migrateVM(vm).catch((err) => kubevirtConsole.error(err));
-    onClose();
+  const initiateMigration = async () => {
+    setError(null);
+
+    try {
+      setLoading(true);
+      await migrateVM(vm, migrationOption === MigrationOptions.MANUAL ? selectedNode : undefined);
+      onClose();
+    } catch (err) {
+      setError(err);
+      kubevirtConsole.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const isMigrateDisabled =
+    loading || (migrationOption === MigrationOptions.MANUAL && !selectedNode);
 
   return (
     <Modal
@@ -69,6 +85,11 @@ const ComputeMigrationModal: FC<ComputeMigrationModalProps> = ({ isOpen, onClose
       </ModalHeader>
       <ModalBody>
         <Stack hasGutter>
+          {error && (
+            <StackItem>
+              <ErrorAlert error={error} />
+            </StackItem>
+          )}
           <StackItem>
             <MigrationOptionRadioGroup
               migrationOption={migrationOption}
@@ -89,7 +110,9 @@ const ComputeMigrationModal: FC<ComputeMigrationModalProps> = ({ isOpen, onClose
         </Stack>
       </ModalBody>
       <ModalFooter>
-        <Button onClick={() => initiateMigration()}>{t('Migrate VirtualMachine')}</Button>
+        <Button isDisabled={isMigrateDisabled} isLoading={loading} onClick={initiateMigration}>
+          {t('Migrate VirtualMachine')}
+        </Button>
         <Button onClick={onClose} size="sm" variant={ButtonVariant.link}>
           {t('Cancel')}
         </Button>

@@ -12,3 +12,7 @@ export const isNodeReady = (node: IoK8sApiCoreV1Node): boolean => {
 };
 
 export const nodeStatus = (node: IoK8sApiCoreV1Node) => (isNodeReady(node) ? 'Ready' : 'Not Ready');
+
+export const isNodeSchedulable = (node: IoK8sApiCoreV1Node): boolean => {
+  return !node?.spec?.unschedulable;
+};
