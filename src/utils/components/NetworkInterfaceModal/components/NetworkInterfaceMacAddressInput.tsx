@@ -33,7 +33,7 @@ const NetworkInterfaceMacAddressInput: FC<NetworkInterfaceMacAddressInputProps> 
 
   const validated = nameError ? ValidatedOptions.error : ValidatedOptions.default;
   return (
-    <FormGroup fieldId="mac-address" label={t('MAC address')}>
+    <FormGroup className="form-group-margin" fieldId="mac-address" label={t('MAC address')}>
       <TextInput
         id="mac-address"
         isDisabled={isDisabled}
