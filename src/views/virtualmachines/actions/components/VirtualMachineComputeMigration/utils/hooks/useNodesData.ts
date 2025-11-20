@@ -1,7 +1,7 @@
 import { modelToGroupVersionKind, NodeModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { nodeStatus } from '@kubevirt-utils/resources/node/utils/utils';
+import { isNodeSchedulable, nodeStatus } from '@kubevirt-utils/resources/node/utils/utils';
 import { getName } from '@kubevirt-utils/resources/shared';
 import useNode from '@kubevirt-utils/resources/vm/hooks/useNode';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
@@ -25,7 +25,9 @@ const useNodesData: UseNodesData = (vm) => {
   const { metricsData, metricsLoaded } = useNodesMetrics();
   const vmiNodeName = useNode(vm);
 
-  const filteredNodes = nodes?.filter((node) => getName(node) !== vmiNodeName);
+  const filteredNodes = nodes?.filter(
+    (node) => getName(node) !== vmiNodeName && isNodeSchedulable(node),
+  );
 
   const nodesData = (filteredNodes || [])?.reduce((acc, node) => {
     const nodeName = getName(node);
