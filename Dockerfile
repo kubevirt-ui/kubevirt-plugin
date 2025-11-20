@@ -2,8 +2,8 @@
 #       a specific version tag. Container build errors have come up when
 #       the `:latest` is updated.
 #
-# Image info: https://catalog.redhat.com/software/containers/ubi9/nodejs-18/62e8e7ed22d1d3c2dfe2ca01
-FROM registry.access.redhat.com/ubi9/nodejs-18:9.6-1749709214 AS builder
+# Image info: https://catalog.redhat.com/en/software/containers/ubi9/nodejs-22/66431d1785c5c3a31edd24f1
+FROM registry.access.redhat.com/ubi9/nodejs-22:9.7-1764636141 AS builder
 USER root
 RUN command -v yarn || npm i -g yarn
 
@@ -12,9 +12,10 @@ WORKDIR /opt/app-root/src
 ENV NODE_OPTIONS=--max-old-space-size=8192
 ENV YARN_NETWORK_TIMEOUT 1200000
 ENV HUSKY=0
-RUN yarn install --frozen-lockfile && yarn build
+RUN yarn install --frozen-lockfile --ignore-scripts  && yarn build
 
-FROM registry.access.redhat.com/ubi8/nginx-120
+# Image info: https://catalog.redhat.com/en/software/containers/ubi9/nginx-124/657b066b6c1bc124a1d7ff39
+FROM registry.access.redhat.com/ubi9/nginx-124:9.7-1764620487
 
 COPY --from=builder /opt/app-root/src/dist /usr/share/nginx/html
 USER 1001
