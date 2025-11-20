@@ -4,7 +4,7 @@ import { V1GPU, V1HostDevice } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { DescriptionList, Stack, StackItem } from '@patternfly/react-core';
 
-import VirtualMachineDescriptionItem from '../VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
+import DescriptionItem from '../DescriptionItem/DescriptionItem';
 
 import './hardware-devices-table.scss';
 
@@ -20,7 +20,7 @@ const HardwareDevicesTable: React.FC<HardwareDevicesTableProps> = ({ devices }) 
 
   return (
     <DescriptionList className="hardware-devices-table" columnModifier={{ default: '2Col' }}>
-      <VirtualMachineDescriptionItem
+      <DescriptionItem
         descriptionData={
           <Stack>
             {devices.map((device: { deviceName: string; index: number; name: string }) => (
@@ -32,7 +32,7 @@ const HardwareDevicesTable: React.FC<HardwareDevicesTableProps> = ({ devices }) 
         }
         descriptionHeader={t('Name')}
       />
-      <VirtualMachineDescriptionItem
+      <DescriptionItem
         descriptionData={
           <Stack>
             {devices.map((device) => (

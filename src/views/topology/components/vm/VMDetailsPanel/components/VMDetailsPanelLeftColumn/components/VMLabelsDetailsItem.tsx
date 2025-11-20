@@ -1,10 +1,10 @@
 import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getLabels, getName } from '@kubevirt-utils/resources/shared';
@@ -22,9 +22,9 @@ const VMLabelsDetailsItem: FC<VMLabelsDetailsItemProps> = ({ vm }) => {
   const { createModal } = useModal();
 
   return (
-    <VirtualMachineDescriptionItem
+    <DescriptionItem
       bodyContent={t(
-        'Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. ',
+        'Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services.',
       )}
       onEditClick={() =>
         createModal(({ isOpen, onClose }) => (

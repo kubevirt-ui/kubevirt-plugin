@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 
 import { NamespaceModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getNamespace, getUID } from '@kubevirt-utils/resources/shared';
 import { getGroupVersionKindForModel, ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
@@ -20,7 +20,7 @@ const VMNamespaceDetailsItem: FC<VMNamespaceDetailsItemProps> = ({ vm }) => {
   if (!vmNamespace) return null;
 
   return (
-    <VirtualMachineDescriptionItem
+    <DescriptionItem
       descriptionData={
         <ResourceLink
           groupVersionKind={getGroupVersionKindForModel(NamespaceModel)}

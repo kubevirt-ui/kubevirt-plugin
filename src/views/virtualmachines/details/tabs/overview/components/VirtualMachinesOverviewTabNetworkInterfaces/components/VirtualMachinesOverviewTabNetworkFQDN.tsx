@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   ClipboardCopy,
@@ -28,7 +28,7 @@ const VirtualMachinesOverviewTabNetworkFQDN: FC<VirtualMachinesOverviewTabNetwor
     <>
       <Divider />
       <DescriptionList isHorizontal>
-        <VirtualMachineDescriptionItem
+        <DescriptionItem
           descriptionData={
             <ClipboardCopy
               clickTip={t('Copied')}

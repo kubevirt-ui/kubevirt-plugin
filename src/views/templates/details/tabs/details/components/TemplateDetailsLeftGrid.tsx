@@ -1,9 +1,15 @@
 import React, { FC } from 'react';
 
+import { TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
+import DescriptionItemAnnotations from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemAnnotations';
+import DescriptionItemCreatedAt from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemCreatedAt';
+import DescriptionItemDescription from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemDescription';
+import DescriptionItemLabels from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemLabels';
+import DescriptionItemName from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemName';
+import DescriptionItemNamespace from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemNamespace';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import OwnerDetailsItem from '@kubevirt-utils/components/OwnerDetailsItem/OwnerDetailsItem';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { getMachineType } from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -14,15 +20,9 @@ import useEditTemplateAccessReview from '../../../hooks/useIsTemplateEditable';
 import { TemplateDetailsGridProps } from '../TemplateDetailsPage';
 
 import BootMethod from './BootMethod/BootMethod';
-import Annotations from './Annotations';
 import BaseTemplate from './BaseTemplate';
 import CPUMemory from './CPUMemory';
-import CreatedAt from './CreatedAt';
-import Description from './Description';
 import DisplayName from './DisplayName';
-import Labels from './Labels';
-import Name from './Name';
-import Namespace from './Namespace';
 import WorkloadProfile from './WorkloadProfile';
 
 const TemplateDetailsLeftGrid: FC<TemplateDetailsGridProps> = ({ template }) => {
@@ -32,19 +32,31 @@ const TemplateDetailsLeftGrid: FC<TemplateDetailsGridProps> = ({ template }) => 
 
   return (
     <DescriptionList>
-      <Name name={getName(template)} />
-      <Namespace namespace={getNamespace(template)} />
-      <Labels editable={isTemplateEditable} template={template} />
-      <Annotations editable={isTemplateEditable} template={template} />
+      <DescriptionItemName model={TemplateModel} resource={template} />
+      <DescriptionItemNamespace model={TemplateModel} resource={template} />
+      <DescriptionItemLabels
+        editable={isTemplateEditable}
+        model={TemplateModel}
+        resource={template}
+      />
+      <DescriptionItemAnnotations
+        editable={isTemplateEditable}
+        model={TemplateModel}
+        resource={template}
+      />
       <DisplayName editable={isTemplateEditable} template={template} />
-      <Description editable={isTemplateEditable} template={template} />
-      <VirtualMachineDescriptionItem
+      <DescriptionItemDescription
+        editable={isTemplateEditable}
+        model={TemplateModel}
+        resource={template}
+      />
+      <DescriptionItem
         descriptionData={getOperatingSystemName(template)}
         descriptionHeader={t('Operating system')}
       />
       <WorkloadProfile editable={isTemplateEditable} template={template} />
       <CPUMemory editable={isTemplateEditable} template={template} />
-      <VirtualMachineDescriptionItem
+      <DescriptionItem
         bodyContent={t('The QEMU machine type.')}
         descriptionData={machineType}
         descriptionHeader={t('Machine type')}
@@ -52,7 +64,7 @@ const TemplateDetailsLeftGrid: FC<TemplateDetailsGridProps> = ({ template }) => 
       />
       <BootMethod editable={isTemplateEditable} template={template} />
       <BaseTemplate template={template} />
-      <CreatedAt template={template} />
+      <DescriptionItemCreatedAt model={TemplateModel} resource={template} />
       <OwnerDetailsItem obj={template} />
     </DescriptionList>
   );

@@ -7,6 +7,7 @@ import NUMABadge from '@kubevirt-utils/components/badges/NUMABadge/NUMABadge';
 import CPUDescription from '@kubevirt-utils/components/CPUDescription/CPUDescription';
 import CPUMemory from '@kubevirt-utils/components/CPUMemory/CPUMemory';
 import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CPUMemoryModal';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { DescriptionModal } from '@kubevirt-utils/components/DescriptionModal/DescriptionModal';
 import HeadlessMode from '@kubevirt-utils/components/HeadlessMode/HeadlessMode';
 import HostnameModal from '@kubevirt-utils/components/HostnameModal/HostnameModal';
@@ -15,7 +16,6 @@ import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import WorkloadProfileModal from '@kubevirt-utils/components/WorkloadProfileModal/WorkloadProfileModal';
 import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
@@ -107,7 +107,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
       <Grid>
         <GridItem span={5}>
           <DescriptionList>
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={
                 getAnnotation(vm, DESCRIPTION_ANNOTATION) || <MutedTextSpan text={t('None')} />
               }
@@ -126,7 +126,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
               isEdit
             />
             {!getInstanceTypeMatcher(vm) && (
-              <VirtualMachineDescriptionItem
+              <DescriptionItem
                 descriptionData={
                   vmWorkload ? (
                     WORKLOADS_LABELS[vmWorkload] || vmWorkload
@@ -151,7 +151,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
                 isEdit
               />
             )}
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionHeader={
                 <SearchItem id="cpu-memory">
                   {isExpandableSpec ? t('InstanceType') : t('CPU | Memory')}
@@ -188,13 +188,13 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
               isEdit={canUpdateVM}
               isPopover
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               bodyContent={t('The QEMU machine type.')}
               descriptionData={getMachineType(vm) || NO_DATA_DASH}
               descriptionHeader={t('Machine type')}
               isPopover
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               onEditClick={() =>
                 createModal(({ isOpen, onClose }) => (
                   <HostnameModal
@@ -211,7 +211,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
               descriptionHeader={<SearchItem id="hostname">{t('Hostname')}</SearchItem>}
               isEdit
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               bodyContent={t(
                 'Whether to attach the default graphics device or not. VNC will not be available if checked.',
               )}
@@ -226,7 +226,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
               descriptionHeader={<SearchItem id="headless-mode">{t('Headless mode')}</SearchItem>}
               isPopover
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               bodyContent={t(
                 'Applying the start/pause mode to this Virtual Machine will cause it to partially reboot and pause.',
               )}
@@ -247,7 +247,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
               data-test-id="guest-system-log-access"
               isPopover
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               bodyContent={t(
                 'Applying deletion protection to this VM will prevent deletion through the web console.',
               )}

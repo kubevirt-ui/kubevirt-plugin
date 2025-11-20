@@ -3,9 +3,9 @@ import React, { FC } from 'react';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { CloudInitDescription } from '@kubevirt-utils/components/CloudinitDescription/CloudInitDescription';
 import CloudinitModal from '@kubevirt-utils/components/CloudinitModal/CloudinitModal';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import useHideCredentials from '@kubevirt-utils/hooks/useHideCredentials/useHideCredentials';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
@@ -29,7 +29,7 @@ const InitialRunTabCloudinit: FC<InitialRunTabCloudInitProps> = ({
   const canEdit = canUpdateVM && !shouldHideCredentials;
 
   return (
-    <VirtualMachineDescriptionItem
+    <DescriptionItem
       onEditClick={() =>
         createModal(({ isOpen, onClose }) => (
           <CloudinitModal isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vm={vm} vmi={vmi} />

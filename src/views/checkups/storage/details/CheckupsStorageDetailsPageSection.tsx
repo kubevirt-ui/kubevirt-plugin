@@ -7,7 +7,7 @@ import {
   StorageClassModel,
 } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { ResourceLink, Timestamp } from '@openshift-console/dynamic-plugin-sdk';
@@ -58,21 +58,21 @@ const CheckupsStorageDetailsPageSection: FC<CheckupsStorageDetailsPageSectionPro
       <Grid>
         <GridItem span={6}>
           <DescriptionList>
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={configMap?.metadata?.name}
               descriptionHeader={t('Name')}
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={<CheckupsNetworkStatusIcon configMap={configMap} job={job} />}
               descriptionHeader={t('Status')}
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={
                 <Timestamp timestamp={configMap?.data?.[STATUS_START_TIME_STAMP] || NO_DATA_DASH} />
               }
               descriptionHeader={t('Start time')}
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={
                 configMap?.data?.[STORAGE_CHECKUP_DEFAULT_STORAGE_CLASS] ? (
                   <ResourceLink
@@ -85,37 +85,37 @@ const CheckupsStorageDetailsPageSection: FC<CheckupsStorageDetailsPageSectionPro
               }
               descriptionHeader={t('Default storage class')}
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={configMap?.data?.[STORAGE_CHECKUPS_PVC_BOUND] || none}
               descriptionHeader={t('PVC bound')}
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={configMap?.data?.[STORAGE_CHECKUPS_WITH_SMART_CLONE] || none}
               descriptionHeader={t('StorageProfiles with smart clone support (CSI/snapshot)')}
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={configMap?.data?.[STORAGE_CHECKUPS_WITH_CLAIM_PROPERTY_SETS] || none}
               descriptionHeader={t('StorageProfiles with spec claimPropertySets')}
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={configMap?.data?.[STORAGE_CHECKUPS_MISSING_VOLUME_SNAP_SHOT] || none}
               descriptionHeader={t('Storage missing VolumeSnapshotClass')}
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={
                 configMap?.data?.[STORAGE_CHECKUPS_WITH_NON_RBD_STORAGE_CLASS] || none
               }
               descriptionHeader={t('VirtualMachine with non-virt RBD StorageClass')}
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={configMap?.data?.[STORAGE_CHECKUPS_BOOT_GOLDEN_IMAGE] || none}
               descriptionHeader={t('VirtualMachine boot from golden image')}
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={configMap?.data?.[STORAGE_CHECKUP_LIVE_MIGRATION] || none}
               descriptionHeader={t('VirtualMachine live migration')}
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={configMap?.data?.[STORAGE_CHECKUP_TIMEOUT]}
               descriptionHeader={t('Timeout')}
             />
@@ -123,7 +123,7 @@ const CheckupsStorageDetailsPageSection: FC<CheckupsStorageDetailsPageSectionPro
         </GridItem>
         <GridItem span={6}>
           <DescriptionList>
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={
                 <ResourceLink
                   groupVersionKind={modelToGroupVersionKind(NamespaceModel)}
@@ -132,11 +132,11 @@ const CheckupsStorageDetailsPageSection: FC<CheckupsStorageDetailsPageSectionPro
               }
               descriptionHeader={t('Namespace')}
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={configMap?.data?.[STATUS_FAILURE_REASON] || none}
               descriptionHeader={t('Failure reason')}
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={
                 <Timestamp
                   timestamp={configMap?.data?.[STATUS_COMPILATION_TIME_STAMP] || NO_DATA_DASH}
@@ -144,41 +144,41 @@ const CheckupsStorageDetailsPageSection: FC<CheckupsStorageDetailsPageSectionPro
               }
               descriptionHeader={t('Complete time')}
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={
                 configMap?.data?.[STORAGE_CHECKUPS_WITH_EMPTY_CLAIM_PROPERTY_SETS] || none
               }
               descriptionHeader={t('Storage class with empty claimPropertySets')}
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={configMap?.data?.[STORAGE_CHECKUPS_STORAGE_WITH_RWX] || none}
               descriptionHeader={t('Storage with ReadWriteMany')}
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={
                 configMap?.data?.[STORAGE_CHECKUPS_GOLDEN_IMAGE_NOT_UP_TO_DATE] || none
               }
               descriptionHeader={t('Golden image not up to date')}
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={
                 configMap?.data?.[STORAGE_CHECKUPS_GOLDEN_IMAGE_NO_DATA_SOURCE] || none
               }
               descriptionHeader={t('Golden image no DataSource')}
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={configMap?.data?.[STORAGE_CHECKUPS_UNSET_EFS_STORAGE_CLASS] || none}
               descriptionHeader={t('VirtualMachine with unset EFS StorageClass')}
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={configMap?.data?.[STORAGE_CHECKUPS_VM_VOLUME_CLONE] || none}
               descriptionHeader={t('VirtualMachine volume clone')}
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={configMap?.data?.[STORAGE_CHECKUPS_VM_HOT_PLUG_VOLUME] || none}
               descriptionHeader={t('VirtualMachine hotplug volume')}
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={
                 <ResourceLink
                   groupVersionKind={modelToGroupVersionKind(JobModel)}

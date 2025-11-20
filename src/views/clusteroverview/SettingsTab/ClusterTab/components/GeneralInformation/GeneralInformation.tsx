@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { OverviewDetailItem } from '@openshift-console/plugin-shared';
@@ -62,7 +62,7 @@ const GeneralInformation: FC<GeneralInformationProps> = ({
       <Divider orientation={{ default: 'vertical' }} />
       <SplitItem>
         <DescriptionList>
-          <VirtualMachineDescriptionItem
+          <DescriptionItem
             descriptionData={
               loaded ? (
                 <ExternalLink href={operatorLink}>{updateChannel}</ExternalLink>

@@ -3,11 +3,11 @@ import React, { FC, useCallback, useMemo } from 'react';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import DedicatedResourcesModal from '@kubevirt-utils/components/DedicatedResourcesModal/DedicatedResourcesModal';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import EvictionStrategyModal from '@kubevirt-utils/components/EvictionStrategy/EvictionStrategyModal';
 import ShowEvictionStrategy from '@kubevirt-utils/components/EvictionStrategy/ShowEvictionStrategy';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isExpandableSpecVM } from '@kubevirt-utils/resources/instancetype/helper';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
@@ -73,7 +73,7 @@ const SchedulingSectionRightGrid: FC<SchedulingSectionRightGridProps> = ({
   return (
     <GridItem span={5}>
       <DescriptionList>
-        <VirtualMachineDescriptionItem
+        <DescriptionItem
           descriptionHeader={
             <SearchItem id="dedicated-resources">{t('Dedicated resources')}</SearchItem>
           }
@@ -97,7 +97,7 @@ const SchedulingSectionRightGrid: FC<SchedulingSectionRightGridProps> = ({
           isDisabled={isExpandableSpecVM(vm)}
           isEdit={canUpdateVM}
         />
-        <VirtualMachineDescriptionItem
+        <DescriptionItem
           descriptionHeader={
             <SearchItem id="eviction-strategy">{t('Eviction strategy')}</SearchItem>
           }

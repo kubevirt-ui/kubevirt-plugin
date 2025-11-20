@@ -6,6 +6,7 @@ import {
   instanceTypeActionType,
   SysprepConfigMapData,
 } from '@catalog/CreateFromInstanceTypes/state/utils/types';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { initialSSHCredentials } from '@kubevirt-utils/components/SSHSecretModal/utils/constants';
 import useSysprepConfigMaps from '@kubevirt-utils/components/SysprepModal/hooks/useConfigMaps';
@@ -15,7 +16,6 @@ import {
   UNATTEND,
 } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
 import { SysprepModal } from '@kubevirt-utils/components/SysprepModal/SysprepModal';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ConfigMapModel, modelToGroupVersionKind } from '@kubevirt-utils/models';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
@@ -100,7 +100,7 @@ const SysprepDescriptionItem: FC = () => {
     );
 
   return (
-    <VirtualMachineDescriptionItem
+    <DescriptionItem
       onEditClick={() =>
         createModal((modalProps) => (
           <SysprepModal

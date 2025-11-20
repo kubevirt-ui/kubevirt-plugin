@@ -1,9 +1,9 @@
 import React, { FC } from 'react';
 
 import useTemplateSecrets from '@catalog/templatescatalog/components/TemplatesCatalogDrawer/hooks/useTemplateSecrets/useTemplateSecrets';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SSHSecretModal from '@kubevirt-utils/components/SSHSecretModal/SSHSecretModal';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { DescriptionList, HelperText, HelperTextItem, SplitItem } from '@patternfly/react-core';
 
@@ -20,7 +20,7 @@ const AuthorizedSSHKey: FC<AuthorizedSSHKeyProps> = ({ authorizedSSHKey, namespa
   return (
     <SplitItem>
       <DescriptionList>
-        <VirtualMachineDescriptionItem
+        <DescriptionItem
           onEditClick={() =>
             createModal((modalProps) => (
               <SSHSecretModal

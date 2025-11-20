@@ -3,7 +3,7 @@ import React, { FC } from 'react';
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import CPUDescription from '@kubevirt-utils/components/CPUDescription/CPUDescription';
 import { CpuMemHelperTextResources } from '@kubevirt-utils/components/CPUDescription/utils/utils';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { vCPUCount } from '@kubevirt-utils/resources/template/utils';
 import { getCPU, getMemory } from '@kubevirt-utils/resources/vm';
@@ -20,7 +20,7 @@ const CPUMemory: FC<TolerationsProps> = ({ vmi }) => {
   const memory = readableSizeUnit(getMemory(vmi));
 
   return (
-    <VirtualMachineDescriptionItem
+    <DescriptionItem
       bodyContent={
         <CPUDescription cpu={getCPU(vmi)} helperTextResource={CpuMemHelperTextResources.VMI} />
       }

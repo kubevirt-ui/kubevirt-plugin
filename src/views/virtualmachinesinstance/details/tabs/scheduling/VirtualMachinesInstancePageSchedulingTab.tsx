@@ -1,8 +1,8 @@
 import React, { FC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import NodeSelectorDetailItem from '@kubevirt-utils/components/NodeSelectorDetailItem/NodeSelectorDetailItem';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { DescriptionList, Grid, GridItem, PageSection } from '@patternfly/react-core';
 
@@ -26,19 +26,19 @@ const VirtualMachinesInstancePageSchedulingTab: FC<
       <Grid hasGutter>
         <GridItem span={6}>
           <DescriptionList>
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={<NodeSelectorDetailItem nodeSelector={vmi?.spec?.nodeSelector} />}
               descriptionHeader={t('Node selector')}
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={<Tolerations vmi={vmi} />}
               descriptionHeader={t('Tolerations')}
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={<Affinity vmi={vmi} />}
               descriptionHeader={t('Affinity rules')}
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={<Descheduler vmi={vmi} />}
               descriptionHeader={t('Descheduler')}
             />
@@ -46,11 +46,11 @@ const VirtualMachinesInstancePageSchedulingTab: FC<
         </GridItem>
         <GridItem span={6}>
           <DescriptionList>
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={<DedicatedResources vmi={vmi} />}
               descriptionHeader={t('Dedicated resources')}
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={<EvictionStrategy vmi={vmi} />}
               descriptionHeader={t('Eviction strategy')}
             />
