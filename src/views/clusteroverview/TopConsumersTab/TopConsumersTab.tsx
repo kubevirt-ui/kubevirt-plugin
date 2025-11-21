@@ -33,7 +33,10 @@ const TopConsumersTab: FC = () => {
           actions={{
             actions: (
               <>
-                <Link to="/monitoring/dashboards/grafana-dashboard-kubevirt-top-consumers?period=4h">
+                <Link
+                  id="view-virtualization-dashboard"
+                  to="/monitoring/dashboards/grafana-dashboard-kubevirt-top-consumers?period=4h"
+                >
                   {t('View virtualization dashboard')}
                 </Link>
                 <div className="kv-top-consumers-card__dropdown--duration">

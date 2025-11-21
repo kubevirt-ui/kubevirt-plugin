@@ -64,6 +64,7 @@ const HighAvailabilityToggleContent: FC<HighAvailabilityToggleContentProps> = ({
           <InstalledIconWithTooltip />
         ) : (
           <SwitchWithTooltip
+            dataTestID="high-availability"
             disabledTooltipContent={getDisabledSwitchTooltipMsg(nhcInstalled, farInstalled)}
             onSwitchChange={handleSwitchChange}
             switchState={switchState}

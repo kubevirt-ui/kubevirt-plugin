@@ -63,6 +63,7 @@ const AutomaticSubscriptionForm: FC<RHELAutomaticSubscriptionFormProps> = ({
                   setActivationKey(val);
                   update({ activationKey: val });
                 }}
+                id="activation-key-input"
                 isDisabled={!canEdit}
                 value={activationKey}
               />
@@ -71,6 +72,7 @@ const AutomaticSubscriptionForm: FC<RHELAutomaticSubscriptionFormProps> = ({
               <Button
                 component="a"
                 href={ACTIVATION_KEYS_URL}
+                id="create-activation-key-link"
                 target="_blank"
                 variant={ButtonVariant.link}
               >
@@ -91,6 +93,7 @@ const AutomaticSubscriptionForm: FC<RHELAutomaticSubscriptionFormProps> = ({
                   setOrganizationID(val);
                   update({ organizationID: val });
                 }}
+                id="organization-id-input"
                 isDisabled={!canEdit}
                 value={organizationID}
               />

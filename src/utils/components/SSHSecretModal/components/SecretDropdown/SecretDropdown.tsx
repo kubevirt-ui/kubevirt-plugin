@@ -65,6 +65,7 @@ const SecretDropdown: FC<SecretDropdownProps> = ({
         const name = getName(secret);
         return { children: name, value: name };
       })}
+      data-test-id="select-secret"
       selected={secretName}
       setSelected={onSelect}
       toggleProps={{ isFullWidth: true, placeholder: t('Select secret') }}
