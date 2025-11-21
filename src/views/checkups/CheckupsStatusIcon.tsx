@@ -3,30 +3,34 @@ import React, { FC } from 'react';
 import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { Icon as PFIcon } from '@patternfly/react-core';
+import { Icon as PFIcon, Spinner } from '@patternfly/react-core';
 import { CheckCircleIcon, ExclamationCircleIcon, SyncAltIcon } from '@patternfly/react-icons';
 
-import { getConfigMapStatus, getJobStatus, NetworkCheckupsStatus } from './utils/utils';
+import { CheckupsStatus, getConfigMapStatus, getJobStatus } from './utils/utils';
 
 import './checkups.scss';
 
-type CheckupsNetworkStatusIconProps = {
+type CheckupsStatusIconProps = {
   configMap?: IoK8sApiCoreV1ConfigMap;
-  job: IoK8sApiBatchV1Job;
+  job?: IoK8sApiBatchV1Job;
   onlyJob?: boolean;
 };
 
-const CheckupsNetworkStatusIcon: FC<CheckupsNetworkStatusIconProps> = ({
-  configMap,
-  job,
-  onlyJob = false,
-}) => {
+const CheckupsStatusIcon: FC<CheckupsStatusIconProps> = ({ configMap, job, onlyJob = false }) => {
   const { t } = useKubevirtTranslation();
-  const statusJob = getJobStatus(job);
-  const statusConfigMap = getConfigMapStatus(configMap, statusJob);
+  const jobStatus = getJobStatus(job);
+  const configMapStatus = getConfigMapStatus(configMap, jobStatus);
 
   const Icon = {
-    [NetworkCheckupsStatus.Done]: (
+    [CheckupsStatus.Deleting]: (
+      <>
+        <PFIcon>
+          <Spinner size="sm" />
+        </PFIcon>
+        {t('Deleting')}
+      </>
+    ),
+    [CheckupsStatus.Done]: (
       <>
         <PFIcon status="success">
           <CheckCircleIcon />
@@ -34,7 +38,7 @@ const CheckupsNetworkStatusIcon: FC<CheckupsNetworkStatusIconProps> = ({
         {t('Succeeded')}
       </>
     ),
-    [NetworkCheckupsStatus.Failed]: (
+    [CheckupsStatus.Failed]: (
       <>
         <PFIcon status="danger">
           <ExclamationCircleIcon />
@@ -42,7 +46,7 @@ const CheckupsNetworkStatusIcon: FC<CheckupsNetworkStatusIconProps> = ({
         {t('Failed')}
       </>
     ),
-    [NetworkCheckupsStatus.Running]: (
+    [CheckupsStatus.Running]: (
       <>
         <PFIcon>
           <SyncAltIcon />
@@ -55,10 +59,8 @@ const CheckupsNetworkStatusIcon: FC<CheckupsNetworkStatusIconProps> = ({
   if (!configMap && !job) return <>{NO_DATA_DASH}</>;
 
   return (
-    <div className="CheckupsNetworkStatusIcon--main">
-      {Icon[onlyJob ? statusJob : statusConfigMap]}
-    </div>
+    <span className="CheckupsStatusIcon--main">{Icon[onlyJob ? jobStatus : configMapStatus]}</span>
   );
 };
 
-export default CheckupsNetworkStatusIcon;
+export default CheckupsStatusIcon;

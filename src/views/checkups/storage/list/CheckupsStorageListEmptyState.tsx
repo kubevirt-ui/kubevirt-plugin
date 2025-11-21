@@ -1,5 +1,4 @@
 import React, { FC, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
 import { IoK8sApiRbacV1ClusterRoleBinding } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
@@ -16,8 +15,7 @@ import {
   EmptyStateFooter,
   EmptyStateVariant,
 } from '@patternfly/react-core';
-import { StorageDomainIcon } from '@patternfly/react-icons';
-import { createURL } from '@virtualmachines/details/tabs/overview/utils/utils';
+import { SearchIcon } from '@patternfly/react-icons';
 
 import { installOrRemoveCheckupsStoragePermissions } from '../utils/utils';
 
@@ -37,31 +35,22 @@ const CheckupsStorageListEmptyState: FC<CheckupsStorageListEmptyStateProps> = ({
   loadingPermissions,
 }) => {
   const { t } = useKubevirtTranslation();
-  const navigate = useNavigate();
-  const location = useLocation();
   const [namespace] = useActiveNamespace();
   const [isLoading, setIsLoading] = useState<boolean>();
 
   return (
     <EmptyState
       headingLevel="h4"
-      icon={StorageDomainIcon}
+      icon={SearchIcon}
       titleText={<>{t('No storage checkups found')}</>}
       variant={EmptyStateVariant.lg}
     >
       <EmptyStateBody>
-        {t('To get started, install permissions and then run a checkup')}
+        {isPermitted
+          ? t('To get started, run a storage checkup')
+          : t('To get started, install permissions and then run a checkup')}
       </EmptyStateBody>
-
       <EmptyStateFooter>
-        <EmptyStateActions>
-          <Button
-            isDisabled={!isPermitted || isLoading || namespace === ALL_NAMESPACES_SESSION_KEY}
-            onClick={() => navigate(createURL('form', location.pathname))}
-          >
-            {t('Run checkup')}
-          </Button>
-        </EmptyStateActions>
         <EmptyStateActions>
           <Button
             isDisabled={

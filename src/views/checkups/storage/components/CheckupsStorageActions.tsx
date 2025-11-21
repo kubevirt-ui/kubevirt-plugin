@@ -7,10 +7,12 @@ import DropdownToggle from '@kubevirt-utils/components/toggles/DropdownToggle';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
 
 import DeleteCheckupModal from '../../components/DeleteCheckupModal';
-import { getCheckupImageFromNewestJob, STATUS_SUCCEEDED } from '../../utils/utils';
+import { CHECKUP_URLS } from '../../utils/constants';
+import { getCheckupImageFromNewestJob } from '../../utils/utils';
 import { deleteStorageCheckup, rerunStorageCheckup } from '../utils/utils';
 
 const CheckupsStorageActions = ({
@@ -39,12 +41,26 @@ const CheckupsStorageActions = ({
   const deleteCheckup = () => {
     setIsActionsOpen(false);
     deleteStorageCheckup(configMap, jobs);
-    navigate(`/k8s/ns/${getNamespace(configMap)}/checkups/storage`);
+    navigate(`/k8s/ns/${getNamespace(configMap)}/checkups/${CHECKUP_URLS.STORAGE}`);
   };
 
   return (
     <Dropdown isOpen={isActionsOpen} onOpenChange={setIsActionsOpen} toggle={Toggle}>
       <DropdownList>
+        <DropdownItem
+          onClick={async () => {
+            setIsActionsOpen(false);
+            try {
+              await rerunStorageCheckup(configMap, checkupImage);
+            } catch (error) {
+              kubevirtConsole.log('Failed to rerun checkup:', error);
+            }
+          }}
+          isDisabled={!checkupImage}
+          key="rerun"
+        >
+          {t('Rerun')}
+        </DropdownItem>
         <DropdownItem
           onClick={() =>
             createModal((props) => (
@@ -59,16 +75,6 @@ const CheckupsStorageActions = ({
           key="delete"
         >
           {t('Delete')}
-        </DropdownItem>
-        <DropdownItem
-          onClick={() => {
-            setIsActionsOpen(false);
-            return rerunStorageCheckup(configMap, checkupImage);
-          }}
-          isDisabled={configMap?.data?.[STATUS_SUCCEEDED] === undefined || !checkupImage}
-          key="rerun"
-        >
-          {t('Rerun')}
         </DropdownItem>
       </DropdownList>
     </Dropdown>

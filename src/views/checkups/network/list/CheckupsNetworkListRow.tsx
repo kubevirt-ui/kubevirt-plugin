@@ -1,13 +1,19 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router-dom-v5-compat';
 
 import { modelToGroupVersionKind, NamespaceModel } from '@kubevirt-ui/kubevirt-api/console';
+import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { ResourceLink, TableData, Timestamp } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  ResourceLink,
+  RowProps,
+  TableData,
+  Timestamp,
+} from '@openshift-console/dynamic-plugin-sdk';
 import { createURL } from '@virtualmachines/details/tabs/overview/utils/utils';
 
-import CheckupsNetworkStatusIcon from '../../CheckupsNetworkStatusIcon';
-import { STATUS_COMPILATION_TIME_STAMP, STATUS_START_TIME_STAMP } from '../../utils/utils';
+import CheckupsStatusIcon from '../../CheckupsStatusIcon';
+import { STATUS_COMPLETION_TIME_STAMP, STATUS_START_TIME_STAMP } from '../../utils/utils';
 import CheckupsNetworkActions from '../components/CheckupsNetworkActions';
 import {
   CONFIG_PARAM_NAD_NAME,
@@ -20,15 +26,20 @@ import {
   STATUS_TARGET_NODE,
 } from '../utils/utils';
 
-const CheckupsNetworkListRow = ({
+type CheckupsNetworkRowData = {
+  getJobByName: (configMapName: string) => IoK8sApiBatchV1Job[];
+};
+
+type CheckupsNetworkListRowProps = RowProps<IoK8sApiCoreV1ConfigMap, CheckupsNetworkRowData>;
+
+const CheckupsNetworkListRow: FC<CheckupsNetworkListRowProps> = ({
   activeColumnIDs,
   obj: configMap,
   rowData: { getJobByName },
-}: {
-  activeColumnIDs: any;
-  obj: any;
-  rowData: { getJobByName?: any };
 }) => {
+  const jobs = getJobByName(configMap?.metadata?.name);
+  const job = jobs?.[0];
+
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} id="name">
@@ -51,10 +62,7 @@ const CheckupsNetworkListRow = ({
         {configMap?.data?.[CONFIG_PARAM_NAD_NAME] || NO_DATA_DASH}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="status">
-        <CheckupsNetworkStatusIcon
-          configMap={configMap}
-          job={getJobByName(configMap?.metadata?.name)?.[0]}
-        />
+        <CheckupsStatusIcon configMap={configMap} job={job} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="latency">
         {configMap?.data?.[STATUS_MAX_LATENCY_NANO] || NO_DATA_DASH}
@@ -82,14 +90,10 @@ const CheckupsNetworkListRow = ({
         <Timestamp timestamp={configMap?.data?.[STATUS_START_TIME_STAMP]} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="complete-time">
-        <Timestamp timestamp={configMap?.data?.[STATUS_COMPILATION_TIME_STAMP]} />
+        <Timestamp timestamp={configMap?.data?.[STATUS_COMPLETION_TIME_STAMP]} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="">
-        <CheckupsNetworkActions
-          configMap={configMap}
-          isKebab
-          jobs={getJobByName(configMap?.metadata?.name)}
-        />
+        <CheckupsNetworkActions configMap={configMap} isKebab jobs={jobs} />
       </TableData>
     </>
   );

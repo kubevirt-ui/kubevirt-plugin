@@ -1,0 +1,43 @@
+.co-file-dropzone.co-file-dropzone__flex {
+  height: 100%;
+}
+
+.checkups-self-validation-details-page {
+  .co-section-heading {
+    margin-bottom: var(--pf-v6-global--spacer--md);
+  }
+  &--yaml {
+    height: 100%;
+  }
+}
+
+.details-page-header-title {
+  align-items: center;
+  display: flex;
+  gap: var(--pf-v6-global--spacer--sm);
+}
+
+.center-content {
+  padding: 2rem;
+  text-align: center;
+}
+
+.center-content-error {
+  color: var(--pf-t--global--icon--color--status--danger--default);
+  padding: 2rem;
+  text-align: center;
+}
+
+.test-results-section {
+  margin-top: var(--pf-t--global--spacer--lg);
+}
+
+.test-results-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-t--global--spacer--md);
+}
+
+.summary-card {
+  margin-bottom: var(--pf-t--global--spacer--md);
+}
