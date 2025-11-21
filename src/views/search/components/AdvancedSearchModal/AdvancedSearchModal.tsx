@@ -124,7 +124,7 @@ const AdvancedSearchModal: FC<AdvancedSearchModalProps> = ({
           {t('Search')}
         </Button>
         <Button onClick={resetForm} variant={ButtonVariant.secondary}>
-          {t('Reset')}
+          {t('Clear all')}
         </Button>
       </ModalFooter>
     </Modal>
