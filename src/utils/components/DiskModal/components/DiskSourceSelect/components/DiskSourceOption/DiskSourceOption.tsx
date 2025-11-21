@@ -9,8 +9,20 @@ type DiskSourceOptionProps = {
   onSelect: (value: SourceTypes) => void;
 } & DiskSourceOptionGroupItem;
 
-const DiskSourceOption: FC<DiskSourceOptionProps> = ({ description, id, label, onSelect }) => (
-  <SelectOption description={description} itemId={id} key={id} onClick={() => onSelect(id)}>
+const DiskSourceOption: FC<DiskSourceOptionProps> = ({
+  description,
+  id,
+  isDisabled,
+  label,
+  onSelect,
+}) => (
+  <SelectOption
+    description={description}
+    isDisabled={isDisabled}
+    itemId={id}
+    key={id}
+    onClick={() => onSelect(id)}
+  >
     {label}
   </SelectOption>
 );
