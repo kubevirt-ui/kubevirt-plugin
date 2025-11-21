@@ -77,6 +77,18 @@ export const bootDiskSourceIsRegistry = (template: V1Template) => {
   return vmBootDiskSourceIsRegistry(vmObject);
 };
 
+const canParseUrl = (url: string): boolean => {
+  if (URL?.canParse) {
+    return URL.canParse(url);
+  }
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 export const isValidTemplateIconUrl = (url: string): boolean => {
   if (!url) return false;
 
@@ -85,8 +97,8 @@ export const isValidTemplateIconUrl = (url: string): boolean => {
     return true;
   }
 
-  // For absolute URLs, validate using URL.canParse and check protocol
-  if (URL.canParse(url)) {
+  // For absolute URLs, validate using canParseUrl helper and check protocol
+  if (canParseUrl(url)) {
     try {
       const parsedUrl = new URL(url);
       // Only allow http, https protocols (block javascript:, data:, vbscript:, etc.)
