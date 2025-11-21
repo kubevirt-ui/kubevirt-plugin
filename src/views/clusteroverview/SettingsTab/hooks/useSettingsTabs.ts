@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
-import { getTabs, SETTINGS_TABS, SETTINGS_TABS_ARRAY } from '../tabs';
+import { getTabs } from '../tabs';
 
 export const useSettingsTabs = () => {
   const { t } = useKubevirtTranslation();
@@ -12,22 +12,33 @@ export const useSettingsTabs = () => {
   const location = useLocation();
   const isAdmin = useIsAdmin();
 
+  const tabs = useMemo(() => getTabs(isAdmin, t).filter((tab) => tab.isEnabled), [isAdmin, t]);
+
   const getActiveTabFromURL = useCallback(() => {
-    for (const tab of SETTINGS_TABS_ARRAY) {
-      const regex = new RegExp(`/settings/${tab}/?$`);
-      if (regex.test(location.pathname)) {
-        if (tab === SETTINGS_TABS.CLUSTER && !isAdmin) {
-          return SETTINGS_TABS.USER;
-        }
-        return tab;
-      }
+    // Check if pathname is exactly /settings (should redirect to first tab)
+    const isExactSettingsPath = /\/settings\/?$/.test(location.pathname);
+    if (isExactSettingsPath) {
+      return null; // Signal that we need to redirect
     }
-    return isAdmin ? SETTINGS_TABS.CLUSTER : SETTINGS_TABS.USER;
-  }, [isAdmin, location.pathname]);
 
-  const [activeTab, setActiveTab] = useState<string>(getActiveTabFromURL());
+    // Check if current pathname matches a valid enabled tab
+    const matchedTab = tabs.find((tab) => {
+      const tabRegex = new RegExp(`/settings/${tab.name}/?$`);
+      return tabRegex.test(location.pathname);
+    });
 
-  const tabs = useMemo(() => getTabs(isAdmin, t), [isAdmin, t]);
+    if (matchedTab) {
+      return matchedTab.name;
+    }
+
+    // Invalid tab path - return null to trigger redirect
+    return null;
+  }, [location.pathname, tabs]);
+
+  const [activeTab, setActiveTab] = useState<string>(() => {
+    const tabFromURL = getActiveTabFromURL();
+    return tabFromURL || tabs[0].name;
+  });
 
   const redirectTab = useCallback(
     (name: string) => {
@@ -41,8 +52,13 @@ export const useSettingsTabs = () => {
 
   useEffect(() => {
     const tabFromURL = getActiveTabFromURL();
-    setActiveTab(tabFromURL);
-  }, [getActiveTabFromURL]);
+
+    if (tabFromURL) {
+      setActiveTab(tabFromURL);
+    } else {
+      redirectTab(tabs[0].name);
+    }
+  }, [getActiveTabFromURL, redirectTab, tabs]);
 
   return { activeTab, redirectTab, tabs };
 };
