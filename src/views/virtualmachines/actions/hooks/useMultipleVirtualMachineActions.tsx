@@ -5,7 +5,6 @@ import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdo
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { CONFIRM_VM_ACTIONS, TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
-import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useProviderByClusterName from '@multicluster/components/CrossClusterMigration/hooks/useProviderByClusterName';
 import { FEATURE_KUBEVIRT_CROSS_CLUSTER_MIGRATION } from '@multicluster/constants';
@@ -14,9 +13,9 @@ import { isDeletionProtectionEnabled } from '@virtualmachines/details/tabs/confi
 import { isPaused, isRunning, isStopped } from '@virtualmachines/utils';
 
 import { BulkVirtualMachineActionFactory } from '../BulkVirtualMachineActionFactory';
+import { isSameCluster, isSameNamespace } from '../utils';
 
 import { ACTIONS_ID } from './constants';
-import useIsMTCInstalled from './useIsMTCInstalled';
 import useIsMTVInstalled from './useIsMTVInstalled';
 
 type UseMultipleVirtualMachineActions = (vms: V1VirtualMachine[]) => ActionDropdownItemType[];
@@ -34,15 +33,10 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms)
 
   const [provider, providerLoaded] = useProviderByClusterName(getCluster(vms?.[0]));
 
-  const mtcInstalled = useIsMTCInstalled();
-
   return useMemo(() => {
-    const namespaces = new Set(vms?.map((vm) => getNamespace(vm)));
-    const clusters = new Set(vms?.map((vm) => getCluster(vm)));
-
     const migrationActions = [];
 
-    if (clusters.size === 1 && namespaces.size === 1 && crossClusterMigrationEnabled) {
+    if (isSameCluster(vms) && isSameNamespace(vms) && crossClusterMigrationEnabled) {
       migrationActions.push(
         BulkVirtualMachineActionFactory.crossClusterMigration(
           vms,
@@ -52,9 +46,8 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms)
       );
     }
 
-    if (namespaces.size === 1 && mtcInstalled) {
+    if (isSameCluster(vms))
       migrationActions.push(BulkVirtualMachineActionFactory.migrateStorage(vms, createModal));
-    }
 
     const hasRunningVM = vms?.some(isRunning);
     const hasProtectedVM = vms?.some(isDeletionProtectionEnabled);
@@ -92,7 +85,6 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms)
   }, [
     confirmVMActionsEnabled,
     createModal,
-    mtcInstalled,
     crossClusterMigrationEnabled,
     provider,
     providerLoaded,
