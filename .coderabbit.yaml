@@ -1,0 +1,9 @@
+reviews:
+  profile: chill
+  high_level_summary: true
+  auto_review:
+    auto_incremental_review: false
+    enabled: true
+    drafts: false
+  sequence_diagrams: false
+  poem: false
