@@ -2,8 +2,8 @@ import React, { FC } from 'react';
 
 import { modelToGroupVersionKind, TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getLabel } from '@kubevirt-utils/resources/shared';
 import { LABEL_USED_TEMPLATE_NAMESPACE } from '@kubevirt-utils/resources/template';
@@ -22,7 +22,7 @@ const TemplateDescription: FC<TemplateDescriptionProps> = ({ vm }) => {
   const None = <MutedTextSpan text={t('None')} />;
 
   return (
-    <VirtualMachineDescriptionItem
+    <DescriptionItem
       descriptionData={
         templateName && templateNamespace ? (
           <MulticlusterResourceLink

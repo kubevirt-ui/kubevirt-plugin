@@ -1,8 +1,8 @@
 import React, { FC, useCallback } from 'react';
 
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { getBootloaderTitleFromVM } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/utils';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { TemplateModel, V1Template } from '@kubevirt-utils/models';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
@@ -44,7 +44,7 @@ const BootMethod: FC<BootMethodProps> = ({ editable, template }) => {
     ));
 
   return (
-    <VirtualMachineDescriptionItem
+    <DescriptionItem
       descriptionData={firmwareBootloaderTitle}
       descriptionHeader={t('Boot mode')}
       isEdit={editable}

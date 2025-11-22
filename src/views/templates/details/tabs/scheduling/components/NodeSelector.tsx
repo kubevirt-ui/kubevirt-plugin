@@ -2,9 +2,9 @@ import React, { FC } from 'react';
 import { TemplateSchedulingGridProps } from 'src/views/templates/details/tabs/scheduling/components/TemplateSchedulingLeftGrid';
 import { getNodeSelector } from 'src/views/templates/utils/selectors';
 
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import NodeSelectorDetailItem from '@kubevirt-utils/components/NodeSelectorDetailItem/NodeSelectorDetailItem';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import NodeSelectorModal from './NodeSelectorModal';
@@ -24,7 +24,7 @@ const NodeSelector: FC<TemplateSchedulingGridProps> = ({ editable, onSubmit, tem
     ));
 
   return (
-    <VirtualMachineDescriptionItem
+    <DescriptionItem
       descriptionData={<NodeSelectorDetailItem nodeSelector={getNodeSelector(template)} />}
       descriptionHeader={t('Node selector')}
       isEdit={editable}

@@ -2,9 +2,9 @@ import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotations } from '@kubevirt-utils/resources/shared';
@@ -22,9 +22,9 @@ const VMAnnotationsDetailsItem: FC<VMAnnotationsDetailsItemProps> = ({ vm }) => 
   const { createModal } = useModal();
 
   return (
-    <VirtualMachineDescriptionItem
+    <DescriptionItem
       bodyContent={t(
-        'Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects. ',
+        'Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects.',
       )}
       onEditClick={() =>
         createModal(({ isOpen, onClose }) => (

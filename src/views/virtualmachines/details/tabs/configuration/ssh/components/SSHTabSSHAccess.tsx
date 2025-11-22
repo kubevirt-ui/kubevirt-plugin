@@ -1,10 +1,10 @@
 import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import SSHAccess from '@kubevirt-utils/components/SSHAccess/SSHAccess';
 import useSSHService from '@kubevirt-utils/components/SSHAccess/useSSHService';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 type SSHTabSSHAccessProps = {
@@ -17,7 +17,7 @@ const SSHTabSSHAccess: FC<SSHTabSSHAccessProps> = ({ isCustomizeInstanceType, vm
   const [sshService, sshServiceLoaded] = useSSHService(vm);
 
   return (
-    <VirtualMachineDescriptionItem
+    <DescriptionItem
       descriptionData={
         <SSHAccess
           isCustomizeInstanceType={isCustomizeInstanceType}

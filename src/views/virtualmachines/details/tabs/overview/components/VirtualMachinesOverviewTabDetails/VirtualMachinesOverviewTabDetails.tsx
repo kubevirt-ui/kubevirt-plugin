@@ -9,9 +9,9 @@ import {
 import ArchitectureLabel from '@kubevirt-utils/components/ArchitectureLabel/ArchitectureLabel';
 import NUMABadge from '@kubevirt-utils/components/badges/NUMABadge/NUMABadge';
 import CPUMemory from '@kubevirt-utils/components/CPUMemory/CPUMemory';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import GuestAgentIsRequiredText from '@kubevirt-utils/components/GuestAgentIsRequiredText/GuestAgentIsRequiredText';
 import { timestampFor } from '@kubevirt-utils/components/Timestamp/utils/datetime';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
@@ -127,7 +127,7 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
           <Grid>
             <GridItem span={5}>
               <DescriptionList isHorizontal>
-                <VirtualMachineDescriptionItem
+                <DescriptionItem
                   descriptionData={
                     <Flex spaceItems={{ default: 'spaceItemsSm' }}>
                       <span>{getName(vm)}</span>
@@ -138,7 +138,7 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
                   descriptionHeader={t('Name')}
                 />
                 {cluster && (
-                  <VirtualMachineDescriptionItem
+                  <DescriptionItem
                     descriptionData={
                       <MulticlusterResourceLink
                         groupVersionKind={modelToGroupVersionKind(ManagedClusterModel)}
@@ -151,13 +151,13 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
                   />
                 )}
                 {treeViewFoldersEnabled && (
-                  <VirtualMachineDescriptionItem
+                  <DescriptionItem
                     data-test-id="virtual-machine-overview-details-folder"
                     descriptionData={getLabel(vm, VM_FOLDER_LABEL) || NO_DATA_DASH}
                     descriptionHeader={t('Folder')}
                   />
                 )}
-                <VirtualMachineDescriptionItem
+                <DescriptionItem
                   descriptionData={
                     <Split hasGutter isWrappable>
                       <SplitItem>
@@ -172,7 +172,7 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
                   data-test-id="virtual-machine-overview-details-status"
                   descriptionHeader={t('Status')}
                 />
-                <VirtualMachineDescriptionItem
+                <DescriptionItem
                   descriptionData={
                     timestamp !== NO_DATA_DASH ? (
                       <>
@@ -186,12 +186,12 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
                   data-test-id="virtual-machine-overview-details-created"
                   descriptionHeader={t('Created')}
                 />
-                <VirtualMachineDescriptionItem
+                <DescriptionItem
                   data-test-id="virtual-machine-overview-details-os"
                   descriptionData={osName ?? fallback}
                   descriptionHeader={t('Operating system')}
                 />
-                <VirtualMachineDescriptionItem
+                <DescriptionItem
                   descriptionData={
                     <Flex>
                       <CPUMemory vm={cpuMemoryVM || vm} vmi={vmi} />
@@ -200,7 +200,7 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
                   }
                   descriptionHeader={t('CPU | Memory')}
                 />
-                <VirtualMachineDescriptionItem
+                <DescriptionItem
                   data-test-id="virtual-machine-overview-details-timezone"
                   descriptionData={guestAgentData?.timezone?.split(',')[0] || NO_DATA_DASH}
                   descriptionHeader={t('Time zone')}
@@ -210,7 +210,7 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
                 ) : (
                   <TemplateDescription vm={vm} />
                 )}
-                <VirtualMachineDescriptionItem
+                <DescriptionItem
                   data-test-id="virtual-machine-overview-details-host"
                   descriptionData={hostname ?? fallback}
                   descriptionHeader={t('Hostname')}

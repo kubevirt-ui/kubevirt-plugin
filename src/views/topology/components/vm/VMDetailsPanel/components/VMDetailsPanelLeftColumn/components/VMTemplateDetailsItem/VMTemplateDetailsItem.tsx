@@ -2,8 +2,8 @@ import React, { FC } from 'react';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getLabel } from '@kubevirt-utils/resources/shared';
 import {
@@ -43,7 +43,7 @@ const VMTemplateDetailsItem: FC<VMDetailsItemTemplateProps> = ({ vm }) => {
     !templateName || !templateNamespace || (loadedTemplates && !template) || errorTemplates;
 
   return (
-    <VirtualMachineDescriptionItem
+    <DescriptionItem
       descriptionData={
         notAvailable ? (
           <MutedTextSpan text={t('Not available')} />

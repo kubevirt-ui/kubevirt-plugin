@@ -2,9 +2,9 @@ import React from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { instanceTypeActionType } from '@catalog/CreateFromInstanceTypes/state/utils/types';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { DynamicSSHKeyInjection } from '@kubevirt-utils/components/DynamicSSHKeyInjection/DynamicSSHKeyInjection';
 import DynamicSSHKeyInjectionHelpTextIcon from '@kubevirt-utils/components/DynamicSSHKeyInjection/DynamicSSHKeyInjectionHelpTextIcon';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import { dataSourceHasDynamicSSHLabel } from '../utils/utils';
@@ -17,7 +17,7 @@ const DynamicSSHKeyInjectionInstanceType = () => {
   const isDisabled = !sshSecretCredentials?.sshSecretName || !hasDynamicSSHLabel;
 
   return (
-    <VirtualMachineDescriptionItem
+    <DescriptionItem
       descriptionData={
         <DynamicSSHKeyInjection
           onSubmit={(checked: boolean) => {

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { DescriptionModal } from '@kubevirt-utils/components/DescriptionModal/DescriptionModal';
 import { HARDWARE_DEVICE_TYPE } from '@kubevirt-utils/components/HardwareDevices/utils/constants';
 import HeadlessMode from '@kubevirt-utils/components/HeadlessMode/HeadlessMode';
@@ -11,7 +12,6 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import MoveVMToFolderModal from '@kubevirt-utils/components/MoveVMToFolderModal/MoveVMToFolderModal';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import {
   DISABLED_GUEST_SYSTEM_LOGS_ACCESS,
   TREE_VIEW_FOLDERS,
@@ -76,7 +76,7 @@ const CustomizeInstanceTypeDetailsTab = () => {
       <Grid>
         <GridItem span={5}>
           <DescriptionList>
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={
                 getAnnotation(vm, DESCRIPTION_ANNOTATION) || <MutedTextSpan text={t('None')} />
               }
@@ -104,7 +104,7 @@ const CustomizeInstanceTypeDetailsTab = () => {
               isEdit
             />
             {treeViewFoldersEnabled && (
-              <VirtualMachineDescriptionItem
+              <DescriptionItem
                 onEditClick={() =>
                   createModal(({ isOpen, onClose }) => (
                     <MoveVMToFolderModal
@@ -130,7 +130,7 @@ const CustomizeInstanceTypeDetailsTab = () => {
                 isEdit
               />
             )}
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               onEditClick={() =>
                 createModal(({ isOpen, onClose }) => (
                   <HostnameModal
@@ -155,7 +155,7 @@ const CustomizeInstanceTypeDetailsTab = () => {
               descriptionHeader={<SearchItem id="hostname">{t('Hostname')}</SearchItem>}
               isEdit
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               bodyContent={t(
                 'Whether to attach the default graphics device or not. VNC will not be available if checked.',
               )}
@@ -179,7 +179,7 @@ const CustomizeInstanceTypeDetailsTab = () => {
               descriptionHeader={<SearchItem id="headless-mode">{t('Headless mode')}</SearchItem>}
               isPopover
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               bodyContent={t(
                 'Applying the start/pause mode to this Virtual Machine will cause it to partially reboot and pause.',
               )}
@@ -205,7 +205,7 @@ const CustomizeInstanceTypeDetailsTab = () => {
               data-test-id="guest-system-log-access"
               isPopover
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               bodyContent={t(
                 'Applying deletion protection to this VM will prevent deletion through the web console.',
               )}

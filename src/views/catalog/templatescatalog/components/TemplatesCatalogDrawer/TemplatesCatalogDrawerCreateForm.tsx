@@ -2,8 +2,8 @@ import React, { FC, memo } from 'react';
 
 import { DRAWER_FORM_ID } from '@catalog/templatescatalog/utils/consts';
 import { NOT_SUPPORTED_VM_ERROR } from '@catalog/utils/constants';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import FolderSelect from '@kubevirt-utils/components/FolderSelect/FolderSelect';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { validateVMName } from '@kubevirt-utils/components/VMNameValidationHelperText/utils/utils';
 import VMNameValidationHelperText from '@kubevirt-utils/components/VMNameValidationHelperText/VMNameValidationHelperText';
 import {
@@ -116,19 +116,13 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
                 )}
                 <SplitItem>
                   <DescriptionList>
-                    <VirtualMachineDescriptionItem
-                      descriptionData={namespace}
-                      descriptionHeader={t('Project')}
-                    />
+                    <DescriptionItem descriptionData={namespace} descriptionHeader={t('Project')} />
                   </DescriptionList>
                 </SplitItem>
                 {isACMPage && (
                   <SplitItem>
                     <DescriptionList>
-                      <VirtualMachineDescriptionItem
-                        descriptionData={cluster}
-                        descriptionHeader={t('Cluster')}
-                      />
+                      <DescriptionItem descriptionData={cluster} descriptionHeader={t('Cluster')} />
                     </DescriptionList>
                   </SplitItem>
                 )}

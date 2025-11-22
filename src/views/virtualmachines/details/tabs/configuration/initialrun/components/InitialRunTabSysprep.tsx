@@ -3,6 +3,7 @@ import React, { FC } from 'react';
 import { ConfigMapModel, modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import WindowsLabel from '@kubevirt-utils/components/Labels/WindowsLabel';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
@@ -13,7 +14,6 @@ import {
 } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
 import { SysprepDescription } from '@kubevirt-utils/components/SysprepModal/SysprepDescription';
 import { SysprepModal } from '@kubevirt-utils/components/SysprepModal/SysprepModal';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { UpdateCustomizeInstanceType } from '@kubevirt-utils/store/customizeInstanceType';
@@ -56,7 +56,7 @@ const InitialRunTabSysprep: FC<InitialRunTabSysprepProps> = ({ canUpdateVM, onSu
     createSysprepConfigMap(unattended, autounattend, externalSysprepConfig, vm, onSubmit);
 
   return (
-    <VirtualMachineDescriptionItem
+    <DescriptionItem
       descriptionData={
         <SysprepDescription
           error={sysprepLoadError}

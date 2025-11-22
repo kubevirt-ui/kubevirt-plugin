@@ -4,8 +4,8 @@ import {
   V1beta1DataImportCron,
   V1beta1DataSource,
 } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   ClipboardCopy,
@@ -38,22 +38,22 @@ export const DataImportCronManageDetails: React.FC<DataImportCronManageDetailsPr
   const isOwnedBySSP = isDataResourceOwnedBySSP(dataImportCron);
 
   return (
-    <VirtualMachineDescriptionItem
+    <DescriptionItem
       descriptionData={
         <DescriptionList className="kv-dataimportcron-managed-details">
-          <VirtualMachineDescriptionItem
+          <DescriptionItem
             descriptionData={isAutoUpdated ? t('On') : t('Off')}
             descriptionHeader={t('Automatic updates')}
           />
-          <VirtualMachineDescriptionItem
+          <DescriptionItem
             descriptionData={source ?? <MutedTextSpan text={t('Not available')} />}
             descriptionHeader={t('Source')}
           />
-          <VirtualMachineDescriptionItem
+          <DescriptionItem
             descriptionData={importsToKeep}
             descriptionHeader={t('Retain revisions')}
           />
-          <VirtualMachineDescriptionItem
+          <DescriptionItem
             descriptionData={
               <DescriptionList isHorizontal>
                 <DescriptionListGroup>

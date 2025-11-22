@@ -8,7 +8,7 @@ import {
   NodeModel,
 } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
@@ -57,15 +57,15 @@ const CheckupsNetworkDetailsPageSection: FC<CheckupsNetworkDetailsPageSectionPro
       <Grid>
         <GridItem span={6}>
           <DescriptionList>
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={configMap?.metadata?.name}
               descriptionHeader={t('Name')}
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={<CheckupsNetworkStatusIcon configMap={configMap} job={job} />}
               descriptionHeader={t('Status')}
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={
                 <ResourceLink
                   groupVersionKind={modelToGroupVersionKind(NamespaceModel)}
@@ -74,7 +74,7 @@ const CheckupsNetworkDetailsPageSection: FC<CheckupsNetworkDetailsPageSectionPro
               }
               descriptionHeader={t('Namespace')}
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={
                 configMap?.data?.[STATUS_AVG_LATENCY_NANO]
                   ? t('{{time}} Nanoseconds', {
@@ -84,7 +84,7 @@ const CheckupsNetworkDetailsPageSection: FC<CheckupsNetworkDetailsPageSectionPro
               }
               descriptionHeader={t('Average latency')}
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={
                 configMap?.data?.[STATUS_MAX_LATENCY_NANO]
                   ? t('{{time}} Nanoseconds', {
@@ -94,11 +94,11 @@ const CheckupsNetworkDetailsPageSection: FC<CheckupsNetworkDetailsPageSectionPro
               }
               descriptionHeader={t('Maximum latency')}
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={configMap?.data?.[STATUS_START_TIME_STAMP] || NO_DATA_DASH}
               descriptionHeader={t('Start time')}
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={configMap?.data?.[STATUS_COMPILATION_TIME_STAMP] || NO_DATA_DASH}
               descriptionHeader={t('Complete time')}
             />
@@ -106,7 +106,7 @@ const CheckupsNetworkDetailsPageSection: FC<CheckupsNetworkDetailsPageSectionPro
         </GridItem>
         <GridItem span={6}>
           <DescriptionList>
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={
                 <ResourceLink
                   groupVersionKind={NetworkAttachmentDefinitionModelGroupVersionKind}
@@ -116,17 +116,17 @@ const CheckupsNetworkDetailsPageSection: FC<CheckupsNetworkDetailsPageSectionPro
               }
               descriptionHeader={t('NetworkAttachmentDefinition')}
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={configMap?.data?.[STATUS_FAILURE_REASON] || t('None')}
               descriptionHeader={t('Failure reason')}
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={t('{{time}} seconds', {
                 time: configMap?.data?.[CONFIG_PARAM_SAMPLE_DURATION],
               })}
               descriptionHeader={t('Measurement duration')}
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={
                 configMap?.data?.[STATUS_MIN_LATENCY_NANO]
                   ? t('{{time}} Nanoseconds', {
@@ -136,7 +136,7 @@ const CheckupsNetworkDetailsPageSection: FC<CheckupsNetworkDetailsPageSectionPro
               }
               descriptionHeader={t('Minimum latency')}
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={
                 sourceNode ? (
                   <ResourceLink
@@ -149,7 +149,7 @@ const CheckupsNetworkDetailsPageSection: FC<CheckupsNetworkDetailsPageSectionPro
               }
               descriptionHeader={t('Source node')}
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={
                 targetNode ? (
                   <ResourceLink
@@ -162,7 +162,7 @@ const CheckupsNetworkDetailsPageSection: FC<CheckupsNetworkDetailsPageSectionPro
               }
               descriptionHeader={t('Target node')}
             />
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={
                 <ResourceLink
                   groupVersionKind={modelToGroupVersionKind(JobModel)}

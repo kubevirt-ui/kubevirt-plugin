@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { getVMTemplateBaseName } from 'src/views/templates/utils/selectors';
 
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, TemplateModel, V1Template } from '@kubevirt-utils/models';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
@@ -16,7 +16,7 @@ const BaseTemplate: React.FC<BaseTemplateProps> = ({ template }) => {
   const baseTemplate = getVMTemplateBaseName(template);
 
   return (
-    <VirtualMachineDescriptionItem
+    <DescriptionItem
       descriptionData={
         baseTemplate ? (
           <ResourceLink

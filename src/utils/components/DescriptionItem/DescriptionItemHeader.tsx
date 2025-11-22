@@ -40,6 +40,7 @@ export const DescriptionItemHeader: FC<DescriptionItemHeaderProps> = ({
             {bodyContent}
             {moreInfoURL && (
               <>
+                {' '}
                 {t('More info: ')}
                 <a href={moreInfoURL}>{moreInfoURL}</a>
               </>

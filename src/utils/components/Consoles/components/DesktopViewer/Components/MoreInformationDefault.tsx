@@ -1,7 +1,7 @@
 import React from 'react';
 import { Trans } from 'react-i18next';
 
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Content, DescriptionList } from '@patternfly/react-core';
@@ -32,7 +32,7 @@ const MoreInformationDefault: React.FC<MoreInformationDefaultProps> = ({ textMor
         <Detail title={'RHEL, CentOS'} value={'sudo yum install virt-viewer'} />
         <Detail title={'Fedora'} value={'sudo dnf install virt-viewer'} />
         <Detail title={'Ubuntu, Debian'} value={'sudo apt-get install virt-viewer'} />
-        <VirtualMachineDescriptionItem
+        <DescriptionItem
           descriptionData={
             <div>
               {t('Download the MSI from ')}
