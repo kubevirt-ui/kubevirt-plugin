@@ -75,6 +75,12 @@ const ClusterOverviewPage: FC = () => {
         isHidden: true,
         name: 'settings/features',
       },
+      {
+        component: SettingsTab,
+        href: 'settings/*',
+        isHidden: true,
+        name: 'settings/*',
+      },
     ];
   }, [isAdmin, t]);
 
