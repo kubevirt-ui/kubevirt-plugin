@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+
 import {
   ConfigMapModel,
   JobModel,
@@ -13,34 +15,44 @@ import { KUBEVIRT_VM_LATENCY_LABEL_VALUE } from '../utils/utils';
 const useCheckupsNetworkData = () => {
   const [namespace] = useActiveNamespace();
 
-  const [configMaps, loadingConfigMap, loadErrorConfigMaps] = useK8sWatchResource<
-    IoK8sApiCoreV1ConfigMap[]
-  >({
-    groupVersionKind: modelToGroupVersionKind(ConfigMapModel),
-    isList: true,
-    ...(namespace !== ALL_NAMESPACES_SESSION_KEY && { namespace, namespaced: true }),
-    selector: {
-      matchLabels: {
-        [KUBEVIRT_VM_LATENCY_LABEL]: KUBEVIRT_VM_LATENCY_LABEL_VALUE,
+  const configMapWatchConfig = useMemo(
+    () => ({
+      groupVersionKind: modelToGroupVersionKind(ConfigMapModel),
+      isList: true,
+      ...(namespace !== ALL_NAMESPACES_SESSION_KEY && { namespace, namespaced: true }),
+      selector: {
+        matchLabels: {
+          [KUBEVIRT_VM_LATENCY_LABEL]: KUBEVIRT_VM_LATENCY_LABEL_VALUE,
+        },
       },
-    },
-  });
+    }),
+    [namespace],
+  );
 
-  const [jobs, loadingJobs, loadErrorJobs] = useK8sWatchResource<IoK8sApiBatchV1Job[]>({
-    groupVersionKind: modelToGroupVersionKind(JobModel),
-    isList: true,
-    ...(namespace !== ALL_NAMESPACES_SESSION_KEY && { namespace, namespaced: true }),
-    selector: {
-      matchLabels: {
-        [KUBEVIRT_VM_LATENCY_LABEL]: KUBEVIRT_VM_LATENCY_LABEL_VALUE,
+  const jobWatchConfig = useMemo(
+    () => ({
+      groupVersionKind: modelToGroupVersionKind(JobModel),
+      isList: true,
+      ...(namespace !== ALL_NAMESPACES_SESSION_KEY && { namespace, namespaced: true }),
+      selector: {
+        matchLabels: {
+          [KUBEVIRT_VM_LATENCY_LABEL]: KUBEVIRT_VM_LATENCY_LABEL_VALUE,
+        },
       },
-    },
-  });
+    }),
+    [namespace],
+  );
+
+  const [configMaps, configMapLoaded, loadErrorConfigMaps] =
+    useK8sWatchResource<IoK8sApiCoreV1ConfigMap[]>(configMapWatchConfig);
+
+  const [jobs, jobsLoaded, loadErrorJobs] =
+    useK8sWatchResource<IoK8sApiBatchV1Job[]>(jobWatchConfig);
   return {
     configMaps,
     error: loadErrorConfigMaps || loadErrorJobs,
     jobs,
-    loading: loadingConfigMap && loadingJobs,
+    loaded: configMapLoaded && jobsLoaded,
   };
 };
 

@@ -6,6 +6,10 @@ export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
   Checkups: './views/checkups/Checkups.tsx',
   CheckupsNetworkDetailsPage: './views/checkups/network/details/CheckupsNetworkDetailsPage.tsx',
   CheckupsNetworkForm: './views/checkups/network/components/form/CheckupsNetworkForm.tsx',
+  CheckupsSelfValidationDetailsPage:
+    './views/checkups/self-validation/details/CheckupsSelfValidationDetailsPage.tsx',
+  CheckupsSelfValidationForm:
+    './views/checkups/self-validation/components/form/CheckupsSelfValidationForm.tsx',
   CheckupsStorageDetailsPage: './views/checkups/storage/details/CheckupsStorageDetailsPage.tsx',
   CheckupsStorageForm: './views/checkups/storage/components/form/CheckupsStorageForm.tsx',
 };
@@ -49,7 +53,7 @@ export const extensions: EncodedExtension[] = [
       component: {
         $codeRef: 'CheckupsNetworkDetailsPage',
       },
-      path: ['/k8s/ns/:ns/checkups/network/:vmName'],
+      path: ['/k8s/ns/:ns/checkups/network/:checkupName'],
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
@@ -73,7 +77,31 @@ export const extensions: EncodedExtension[] = [
       component: {
         $codeRef: 'CheckupsStorageDetailsPage',
       },
-      path: ['/k8s/ns/:ns/checkups/storage/:vmName'],
+      path: ['/k8s/ns/:ns/checkups/storage/:checkupName'],
+    },
+    type: 'console.page/route',
+  } as EncodedExtension<RoutePage>,
+  {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC'],
+    },
+    properties: {
+      component: {
+        $codeRef: 'CheckupsSelfValidationForm',
+      },
+      path: ['/k8s/ns/:ns/checkups/self-validation/form'],
+    },
+    type: 'console.page/route',
+  } as EncodedExtension<RoutePage>,
+  {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC'],
+    },
+    properties: {
+      component: {
+        $codeRef: 'CheckupsSelfValidationDetailsPage',
+      },
+      path: ['/k8s/ns/:ns/checkups/self-validation/:checkupName'],
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
