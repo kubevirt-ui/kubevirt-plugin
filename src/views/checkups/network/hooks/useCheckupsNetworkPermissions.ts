@@ -11,7 +11,10 @@ import {
   IoK8sApiRbacV1ClusterRole,
   IoK8sApiRbacV1ClusterRoleBinding,
 } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { useActiveNamespace, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
+import useListClusters from '@kubevirt-utils/hooks/useListClusters';
+import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
+import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import { findObjectByName } from '../../utils/utils';
 import {
@@ -22,23 +25,29 @@ import {
 
 const useCheckupsNetworkPermissions = (): { isPermitted: boolean; loading: boolean } => {
   const [namespace] = useActiveNamespace();
+  const selectedClusters = useListClusters();
+  const [hubClusterName] = useHubClusterName();
+  const cluster = selectedClusters?.[0] || hubClusterName;
 
-  const [serviceAccounts, loadingServiceAccounts] = useK8sWatchResource<
+  const [serviceAccounts, loadingServiceAccounts] = useKubevirtWatchResource<
     IoK8sApiCoreV1ServiceAccount[]
   >({
+    cluster,
     groupVersionKind: modelToGroupVersionKind(ServiceAccountModel),
     isList: true,
     namespace,
   });
 
-  const [roles, loadingRoles] = useK8sWatchResource<IoK8sApiRbacV1ClusterRole[]>({
+  const [roles, loadingRoles] = useKubevirtWatchResource<IoK8sApiRbacV1ClusterRole[]>({
+    cluster,
     groupVersionKind: modelToGroupVersionKind(ClusterRoleModel),
     isList: true,
   });
 
-  const [roleBinding, loadingRolesBinding] = useK8sWatchResource<
+  const [roleBinding, loadingRolesBinding] = useKubevirtWatchResource<
     IoK8sApiRbacV1ClusterRoleBinding[]
   >({
+    cluster,
     groupVersionKind: modelToGroupVersionKind(ClusterRoleBindingModel),
     isList: true,
   });
