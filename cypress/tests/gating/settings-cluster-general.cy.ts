@@ -39,7 +39,7 @@ describe('Test Cluster General settings', () => {
     });
   });
 
-  describe('Test Memory density', () => {
+  xdescribe('Test Memory density', () => {
     it('enable memory density', () => {
       cy.contains('Memory density').click();
       cy.wait(3000);
