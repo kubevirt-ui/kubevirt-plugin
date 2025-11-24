@@ -8,8 +8,8 @@ import {
   VirtualMachineInstanceModelGroupVersionKind,
 } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import OwnerDetailsItem from '@kubevirt-utils/components/OwnerDetailsItem/OwnerDetailsItem';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
@@ -49,9 +49,9 @@ const VirtualMachinesOverviewTabGeneral: FC<VirtualMachinesOverviewTabGeneralPro
         <Divider />
         <CardBody isFilled>
           <DescriptionList isHorizontal>
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               bodyContent={t(
-                'Namespace defines the space within which each name must be unique. An empty namespace is equivalent to the "default" namespace, but "default" is the canonical representation. Not all objects are required to be scoped to a namespace - the value of this field for those objects will be empty. Must be a DNS_LABEL. Cannot be updated. ',
+                'Namespace defines the space within which each name must be unique. An empty namespace is equivalent to the "default" namespace, but "default" is the canonical representation. Not all objects are required to be scoped to a namespace - the value of this field for those objects will be empty. Must be a DNS_LABEL. Cannot be updated.',
               )}
               descriptionData={
                 <FleetResourceLink
@@ -66,7 +66,7 @@ const VirtualMachinesOverviewTabGeneral: FC<VirtualMachinesOverviewTabGeneralPro
               moreInfoURL={documentationURL.NAMESPACE_DOC}
             />
             {canGetNode && (
-              <VirtualMachineDescriptionItem
+              <DescriptionItem
                 descriptionData={
                   vmi?.status?.nodeName ? (
                     <FleetResourceLink
@@ -81,7 +81,7 @@ const VirtualMachinesOverviewTabGeneral: FC<VirtualMachinesOverviewTabGeneralPro
                 descriptionHeader={t('Node')}
               />
             )}
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={
                 vmi?.metadata?.name ? (
                   <FleetResourceLink
@@ -97,7 +97,7 @@ const VirtualMachinesOverviewTabGeneral: FC<VirtualMachinesOverviewTabGeneralPro
               descriptionHeader={t('VirtualMachineInstance')}
             />
 
-            <VirtualMachineDescriptionItem
+            <DescriptionItem
               descriptionData={
                 pod?.metadata?.name ? (
                   <FleetResourceLink

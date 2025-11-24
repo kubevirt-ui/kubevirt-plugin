@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   getOperatingSystem,
@@ -22,7 +22,7 @@ const VMOperatingSystemDetailsItem: FC<VMOperatingSystemDetailsItemProps> = ({ v
   const operatingSystem = getOSNameFromGuestAgent(guestAgentInfo);
 
   return (
-    <VirtualMachineDescriptionItem
+    <DescriptionItem
       className="topology-vm-details-panel__item"
       descriptionData={operatingSystem || os}
       descriptionHeader={<span id="operating-system">{t('Operating system')}</span>}

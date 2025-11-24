@@ -3,6 +3,7 @@ import produce from 'immer';
 
 import { SecretModel, TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import LinuxLabel from '@kubevirt-utils/components/Labels/LinuxLabel';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
@@ -12,7 +13,6 @@ import {
   SecretSelectionOption,
   SSHSecretDetails,
 } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { createSSHSecret, getInitialSSHDetails } from '@kubevirt-utils/resources/secret/utils';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
@@ -98,7 +98,7 @@ const SSHKey: FC<SSHKeyProps> = ({ template }) => {
   };
 
   return (
-    <VirtualMachineDescriptionItem
+    <DescriptionItem
       descriptionData={
         <Stack hasGutter>
           <div data-test="ssh-popover">

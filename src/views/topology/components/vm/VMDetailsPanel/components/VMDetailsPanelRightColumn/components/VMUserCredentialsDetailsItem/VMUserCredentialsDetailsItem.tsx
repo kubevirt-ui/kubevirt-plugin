@@ -1,9 +1,9 @@
 import React, { FC } from 'react';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import useSSHCommand from '@kubevirt-utils/components/SSHAccess/useSSHCommand';
 import useSSHService from '@kubevirt-utils/components/SSHAccess/useSSHService';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ClipboardCopy } from '@patternfly/react-core';
 import { isVMIReady } from '@topology/utils/selectors/selectors';
@@ -47,7 +47,7 @@ const VMUserCredentialsDetailsItem: FC<VMUserCredentialsDetailsItemProps> = ({ v
   );
 
   return (
-    <VirtualMachineDescriptionItem
+    <DescriptionItem
       className="topology-vm-details-panel__item"
       descriptionData={content}
       descriptionHeader={<span id="user-credentials">{t('User credentials')}</span>}

@@ -16,9 +16,9 @@ import { PencilAltIcon } from '@patternfly/react-icons';
 
 import EditButtonWithTooltip from './EditButtonWithTooltip';
 
-import './VirtualMachineDescriptionItem.scss';
+import './DescriptionItem.scss';
 
-type VirtualMachineDescriptionItemProps = {
+type DescriptionItemProps = {
   additionalContent?: ReactNode;
   bodyContent?: ReactNode;
   breadcrumb?: string;
@@ -38,7 +38,7 @@ type VirtualMachineDescriptionItemProps = {
   subTitle?: string;
 };
 
-const VirtualMachineDescriptionItem: FC<VirtualMachineDescriptionItemProps> = ({
+const DescriptionItem: FC<DescriptionItemProps> = ({
   additionalContent,
   bodyContent,
   breadcrumb,
@@ -135,4 +135,4 @@ const VirtualMachineDescriptionItem: FC<VirtualMachineDescriptionItemProps> = ({
   );
 };
 
-export default VirtualMachineDescriptionItem;
+export default DescriptionItem;

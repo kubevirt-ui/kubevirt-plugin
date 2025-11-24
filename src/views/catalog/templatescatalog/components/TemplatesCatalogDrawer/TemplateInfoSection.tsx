@@ -9,8 +9,8 @@ import CPUDescription from '@kubevirt-utils/components/CPUDescription/CPUDescrip
 import { CpuMemHelperTextResources } from '@kubevirt-utils/components/CPUDescription/utils/utils';
 import CPUMemory from '@kubevirt-utils/components/CPUMemory/CPUMemory';
 import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CPUMemoryModal';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { WORKLOADS_LABELS } from '@kubevirt-utils/resources/template/utils/constants';
@@ -56,21 +56,18 @@ export const TemplateInfoSection: FC = memo(() => {
       toggleText={t('Template info')}
     >
       <DescriptionList>
-        <VirtualMachineDescriptionItem
-          descriptionData={displayName}
-          descriptionHeader={t('Operating system')}
-        />
-        <VirtualMachineDescriptionItem
+        <DescriptionItem descriptionData={displayName} descriptionHeader={t('Operating system')} />
+        <DescriptionItem
           descriptionData={`${WORKLOADS_LABELS[workload] ?? t('Other')} ${
             isDefaultTemplate && t('(default)')
           }`}
           descriptionHeader={t('Workload type')}
         />
-        <VirtualMachineDescriptionItem
+        <DescriptionItem
           descriptionData={<TemplateExpandableDescription description={description} />}
           descriptionHeader={t('Description')}
         />
-        <VirtualMachineDescriptionItem
+        <DescriptionItem
           descriptionData={
             documentationUrl ? (
               <Button
@@ -91,7 +88,7 @@ export const TemplateInfoSection: FC = memo(() => {
           descriptionHeader={t('Documentation')}
         />
         <AdditionalResources template={template} />
-        <VirtualMachineDescriptionItem
+        <DescriptionItem
           bodyContent={
             <CPUDescription
               cpu={getCPU(vm)}
@@ -115,13 +112,13 @@ export const TemplateInfoSection: FC = memo(() => {
           isEdit
           isPopover
         />
-        <VirtualMachineDescriptionItem
+        <DescriptionItem
           descriptionData={
             <WizardOverviewNetworksTable interfaces={interfaces} networks={networks} />
           }
           descriptionHeader={t('Network interfaces ({{networks}})', { networks: networks?.length })}
         />
-        <VirtualMachineDescriptionItem
+        <DescriptionItem
           descriptionData={<WizardOverviewDisksTable vm={vm} />}
           descriptionHeader={t('Disks ({{disks}})', { disks: disks?.length })}
         />

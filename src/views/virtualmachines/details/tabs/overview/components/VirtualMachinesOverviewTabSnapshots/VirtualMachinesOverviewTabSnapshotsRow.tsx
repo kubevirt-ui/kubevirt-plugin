@@ -4,11 +4,11 @@ import {
   V1beta1VirtualMachineSnapshot,
   V1VirtualMachine,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import RestoreModal from '@kubevirt-utils/components/SnapshotModal/RestoreModal';
 import { timestampFor } from '@kubevirt-utils/components/Timestamp/utils/datetime';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   DescriptionList,
@@ -60,7 +60,7 @@ const VirtualMachinesOverviewTabSnapshotsRow: FC<VirtualMachinesOverviewTabSnaps
           <Popover
             bodyContent={
               <DescriptionList isHorizontal>
-                <VirtualMachineDescriptionItem
+                <DescriptionItem
                   descriptionData={
                     <>
                       <Icon />
@@ -69,11 +69,8 @@ const VirtualMachinesOverviewTabSnapshotsRow: FC<VirtualMachinesOverviewTabSnaps
                   }
                   descriptionHeader={t('Status')}
                 />
-                <VirtualMachineDescriptionItem
-                  descriptionData={timestamp}
-                  descriptionHeader={t('Created')}
-                />
-                <VirtualMachineDescriptionItem
+                <DescriptionItem descriptionData={timestamp} descriptionHeader={t('Created')} />
+                <DescriptionItem
                   descriptionData={<IndicationLabelList snapshot={snapshot} />}
                   descriptionHeader={t('Indications')}
                 />

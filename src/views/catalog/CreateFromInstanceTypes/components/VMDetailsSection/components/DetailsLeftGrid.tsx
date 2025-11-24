@@ -6,8 +6,8 @@ import {
   UseInstanceTypeAndPreferencesValues,
 } from '@catalog/CreateFromInstanceTypes/state/utils/types';
 import { V1beta1VirtualMachinePreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import FolderSelect from '@kubevirt-utils/components/FolderSelect/FolderSelect';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { validateVMName } from '@kubevirt-utils/components/VMNameValidationHelperText/utils/utils';
 import VMNameValidationHelperText from '@kubevirt-utils/components/VMNameValidationHelperText/VMNameValidationHelperText';
 import { TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
@@ -60,7 +60,7 @@ const DetailsLeftGrid: FC<DetailsLeftGridProps> = ({
 
   return (
     <DescriptionList isHorizontal>
-      <VirtualMachineDescriptionItem
+      <DescriptionItem
         descriptionData={
           <>
             <TextInput
@@ -84,7 +84,7 @@ const DetailsLeftGrid: FC<DetailsLeftGridProps> = ({
         descriptionHeader={t('Name')}
       />
       {treeViewFoldersEnabled && (
-        <VirtualMachineDescriptionItem
+        <DescriptionItem
           descriptionData={
             <FolderSelect
               setSelectedFolder={(newFolder) => {
@@ -101,18 +101,15 @@ const DetailsLeftGrid: FC<DetailsLeftGridProps> = ({
           descriptionHeader={t('Folder')}
         />
       )}
-      <VirtualMachineDescriptionItem
+      <DescriptionItem
         descriptionData={operatingSystem}
         descriptionHeader={t('Operating system')}
       />
-      <VirtualMachineDescriptionItem
+      <DescriptionItem
         descriptionData={selectedInstanceType?.name}
         descriptionHeader={t('InstanceType')}
       />
-      <VirtualMachineDescriptionItem
-        descriptionData={cpuMemoryString}
-        descriptionHeader={t('CPU | Memory')}
-      />
+      <DescriptionItem descriptionData={cpuMemoryString} descriptionHeader={t('CPU | Memory')} />
     </DescriptionList>
   );
 };

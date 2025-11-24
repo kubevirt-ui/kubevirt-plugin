@@ -11,7 +11,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { DescriptionList, Stack, StackItem } from '@patternfly/react-core';
 
-import VirtualMachineDescriptionItem from '../VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
+import DescriptionItem from '../DescriptionItem/DescriptionItem';
 
 import CloudInitInfoHelper from './CloudinitInfoHelper';
 
@@ -31,15 +31,12 @@ export const CloudInitDescription: FC<{ vm: V1VirtualMachine }> = ({ vm }) => {
       </StackItem>
       <StackItem>
         <DescriptionList columnModifier={{ lg: '1Col', xl: '3Col' }} isCompact>
-          <VirtualMachineDescriptionItem
-            descriptionData={displayUsername}
-            descriptionHeader={t('User')}
-          />
-          <VirtualMachineDescriptionItem
+          <DescriptionItem descriptionData={displayUsername} descriptionHeader={t('User')} />
+          <DescriptionItem
             descriptionData={userData?.password?.toString().replace(/./g, '*') || NO_DATA_DASH}
             descriptionHeader={t('Password')}
           />
-          <VirtualMachineDescriptionItem
+          <DescriptionItem
             descriptionData={cloudInitData?.networkData ? t('Custom') : t('Default')}
             descriptionHeader={t('Network data')}
           />

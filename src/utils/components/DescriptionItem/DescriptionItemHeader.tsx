@@ -1,5 +1,6 @@
 import React, { FC, ReactNode } from 'react';
 
+import { SPACE_SYMBOL } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Breadcrumb,
@@ -40,6 +41,7 @@ export const DescriptionItemHeader: FC<DescriptionItemHeaderProps> = ({
             {bodyContent}
             {moreInfoURL && (
               <>
+                {SPACE_SYMBOL}
                 {t('More info: ')}
                 <a href={moreInfoURL}>{moreInfoURL}</a>
               </>

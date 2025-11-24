@@ -2,8 +2,8 @@ import React from 'react';
 import { TemplateSchedulingGridProps } from 'src/views/templates/details/tabs/scheduling/components/TemplateSchedulingLeftGrid';
 import { getAffinity } from 'src/views/templates/utils/selectors';
 
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAffinityRules } from '@kubevirt-utils/resources/vmi';
 
@@ -27,7 +27,7 @@ const AffinityRules: React.FC<TemplateSchedulingGridProps> = ({ editable, onSubm
     ));
 
   return (
-    <VirtualMachineDescriptionItem
+    <DescriptionItem
       descriptionData={rulesCount}
       descriptionHeader={t('Affinity rules')}
       isEdit={editable}

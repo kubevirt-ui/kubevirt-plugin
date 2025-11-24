@@ -56,7 +56,7 @@ export const getLabels = (
 export const getAnnotations = (
   entity: K8sResourceCommon,
   defaultValue?: { [key: string]: string },
-): { [key: string]: string } => entity?.metadata.annotations || defaultValue;
+): { [key: string]: string } => entity?.metadata?.annotations || defaultValue;
 
 /**
  * function for getting an entity's annotation

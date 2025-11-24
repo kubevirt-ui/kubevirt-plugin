@@ -5,12 +5,12 @@ import classNames from 'classnames';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import BootOrderSummary from '@kubevirt-utils/components/BootOrder/BootOrderSummary';
 import BootOrderModal from '@kubevirt-utils/components/BootOrderModal/BootOrderModal';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import FirmwareBootloaderModal from '@kubevirt-utils/components/FirmwareBootloaderModal/FirmwareBootloaderModal';
 import { BootMode } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/constants';
 import { getBootloaderTitleFromVM } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/utils';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
-import VirtualMachineDescriptionItem from '@kubevirt-utils/components/VirtualMachineDescriptionItem/VirtualMachineDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useToggle } from '@kubevirt-utils/hooks/useToggle';
 import { getName } from '@kubevirt-utils/resources/shared';
@@ -58,7 +58,7 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
       onToggle={(_event, val) => setIsExpanded(val)}
       toggleContent={<SearchItem id="boot-management">{t('Boot management')}</SearchItem>}
     >
-      <VirtualMachineDescriptionItem
+      <DescriptionItem
         descriptionData={
           <div className={classNames({ 'pf-v6-u-text-color-subtle': !canUpdateVM })}>
             {getBootloaderTitleFromVM(instanceTypeVM || vm, preferredBootmode)}
@@ -85,7 +85,7 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
         descriptionHeader={<SearchItem id="boot-mode">{t('Boot mode')}</SearchItem>}
         isEdit={canUpdateVM}
       />
-      <VirtualMachineDescriptionItem
+      <DescriptionItem
         onEditClick={() =>
           createModal((props) => (
             <BootOrderModal
@@ -118,7 +118,7 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
         descriptionHeader={<SearchItem id="boot-order">{t('Boot order')}</SearchItem>}
         isEdit
       />
-      <VirtualMachineDescriptionItem
+      <DescriptionItem
         bodyContent={t(
           'Applying the start/pause mode to this Virtual Machine will cause it to partially reboot and pause.',
         )}
