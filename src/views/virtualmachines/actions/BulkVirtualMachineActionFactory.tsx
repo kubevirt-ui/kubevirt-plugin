@@ -7,7 +7,12 @@ import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal'
 import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import MoveBulkVMToFolderModal from '@kubevirt-utils/components/MoveVMToFolderModal/MoveBulkVMsToFolderModal';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getLabels, getNamespace } from '@kubevirt-utils/resources/shared';
+import {
+  VirtualMachineInstanceSubresourcesModel,
+  VirtualMachineSubresourcesModel,
+} from '@kubevirt-utils/models';
+import { asBulkAccessReview, getLabels, getNamespace } from '@kubevirt-utils/resources/shared';
+import { haveSameNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import CrossClusterMigration from '@multicluster/components/CrossClusterMigration/CrossClusterMigration';
 import { CROSS_CLUSTER_MIGRATION_ACTION_ID } from '@multicluster/constants';
@@ -18,7 +23,7 @@ import ConfirmMultipleVMActionsModal from './components/ConfirmMultipleVMActions
 import VirtualMachineMigrateModal from './components/VirtualMachineMigration/VirtualMachineMigrationModal';
 import { ACTIONS_ID } from './hooks/constants';
 import { deleteVM, pauseVM, restartVM, startVM, stopVM, unpauseVM } from './actions';
-import { getCommonLabels, getLabelsDiffPatch, isSameNamespace } from './utils';
+import { getCommonLabels, getLabelsDiffPatch } from './utils';
 
 export const BulkVirtualMachineActionFactory = {
   crossClusterMigration: (
@@ -39,6 +44,7 @@ export const BulkVirtualMachineActionFactory = {
     createModal: (modal: ModalComponent) => void,
     isDisabled: boolean,
   ): ActionDropdownItemType => ({
+    accessReview: asBulkAccessReview(VirtualMachineModel, vms, 'delete'),
     cta: () =>
       createModal(({ isOpen, onClose }) => (
         <ConfirmMultipleVMActionsModal
@@ -57,6 +63,7 @@ export const BulkVirtualMachineActionFactory = {
     vms: V1VirtualMachine[],
     createModal: (modal: ModalComponent) => void,
   ): ActionDropdownItemType => ({
+    accessReview: asBulkAccessReview(VirtualMachineModel, vms, 'patch'),
     cta: () => {
       const commonLabels = getCommonLabels(vms);
 
@@ -104,6 +111,7 @@ export const BulkVirtualMachineActionFactory = {
     vms: V1VirtualMachine[],
     createModal: (modal: ModalComponent) => void,
   ): ActionDropdownItemType => ({
+    accessReview: asBulkAccessReview(VirtualMachineModel, vms, 'patch'),
     cta: () =>
       createModal(({ isOpen, onClose }) => (
         <MoveBulkVMToFolderModal
@@ -131,7 +139,7 @@ export const BulkVirtualMachineActionFactory = {
           vms={vms}
         />
       )),
-    disabled: !isSameNamespace(vms) || isEmpty(vms),
+    disabled: !haveSameNamespace(vms) || isEmpty(vms),
     id: ACTIONS_ID.MOVE_TO_FOLDER,
     label: t('Move to folder'),
   }),
@@ -140,6 +148,7 @@ export const BulkVirtualMachineActionFactory = {
     createModal: (modal: ModalComponent) => void,
     confirmVMActionsEnabled: boolean,
   ): ActionDropdownItemType => ({
+    accessReview: asBulkAccessReview(VirtualMachineInstanceSubresourcesModel, vms, 'patch'),
     cta: () =>
       confirmVMActionsEnabled
         ? createModal(({ isOpen, onClose }) => (
@@ -161,6 +170,7 @@ export const BulkVirtualMachineActionFactory = {
     createModal: (modal: ModalComponent) => void,
     confirmVMActionsEnabled: boolean,
   ): ActionDropdownItemType => ({
+    accessReview: asBulkAccessReview(VirtualMachineSubresourcesModel, vms, 'update', 'restart'),
     cta: () =>
       confirmVMActionsEnabled
         ? createModal(({ isOpen, onClose }) => (
@@ -178,6 +188,7 @@ export const BulkVirtualMachineActionFactory = {
     label: t('Restart'),
   }),
   start: (vms: V1VirtualMachine[]): ActionDropdownItemType => ({
+    accessReview: asBulkAccessReview(VirtualMachineSubresourcesModel, vms, 'update', 'start'),
     cta: () => vms.forEach(startVM),
     disabled: isEmpty(vms),
     id: ACTIONS_ID.START,
@@ -188,6 +199,7 @@ export const BulkVirtualMachineActionFactory = {
     createModal: (modal: ModalComponent) => void,
     confirmVMActionsEnabled: boolean,
   ): ActionDropdownItemType => ({
+    accessReview: asBulkAccessReview(VirtualMachineSubresourcesModel, vms, 'update', 'stop'),
     cta: () => {
       confirmVMActionsEnabled
         ? createModal(({ isOpen, onClose }) => (
@@ -206,6 +218,12 @@ export const BulkVirtualMachineActionFactory = {
     label: t('Stop'),
   }),
   unpause: (vms: V1VirtualMachine[]): ActionDropdownItemType => ({
+    accessReview: asBulkAccessReview(
+      VirtualMachineInstanceSubresourcesModel,
+      vms,
+      'update',
+      'unpause',
+    ),
     cta: () => vms.forEach(unpauseVM),
     disabled: isEmpty(vms),
     id: ACTIONS_ID.UNPAUSE,
