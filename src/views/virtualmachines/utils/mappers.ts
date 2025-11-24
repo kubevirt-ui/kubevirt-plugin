@@ -31,7 +31,7 @@ export const getVMIMFromMapper = (
   name: string,
   namespace: string,
   cluster?: string,
-) => VMIMMapper?.mapper?.[cluster || SINGLE_CLUSTER_KEY]?.[namespace]?.[name];
+) => VMIMMapper?.[cluster || SINGLE_CLUSTER_KEY]?.[namespace]?.[name];
 
 export type PVCMapper = {
   [cluster in string]: {
