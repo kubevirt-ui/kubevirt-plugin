@@ -26,12 +26,14 @@ const DefaultRightClickActionMenu: FC<DefaultRightClickActionMenuProps> = ({
   const vms = getVMsTrigger(triggerElement);
   const [vmims] = useVirtualMachineInstanceMigrations(cluster, namespace);
   const vmimMapper = useVirtualMachineInstanceMigrationMapper(vmims);
-  const actions = useMultipleVirtualMachineActions(vms, vmimMapper);
+  const baseActions = useMultipleVirtualMachineActions(vms, vmimMapper);
 
   const navigate = useNavigate();
 
-  if (prefix === PROJECT_SELECTOR_PREFIX)
-    actions.unshift(getCreateVMAction(navigate, namespace, cluster));
+  const actions =
+    prefix === PROJECT_SELECTOR_PREFIX
+      ? [getCreateVMAction(navigate, namespace, cluster), ...baseActions]
+      : baseActions;
 
   const getNestedLevel = () => {
     if (prefix === FOLDER_SELECTOR_PREFIX) {
