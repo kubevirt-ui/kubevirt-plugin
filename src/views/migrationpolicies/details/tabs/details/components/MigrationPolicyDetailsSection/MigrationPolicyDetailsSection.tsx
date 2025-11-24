@@ -143,7 +143,7 @@ const MigrationPolicyDetailsSection: FC<MigrationPolicyDetailsSectionProps> = ({
                         ? getCompletionTimeoutText(mp?.spec?.completionTimeoutPerGiB)
                         : NO_DATA_DASH
                     }
-                    descriptionHeader={t('Completion timeout')}
+                    descriptionHeader={t('CompletionTimeoutPerGiB')}
                     isPopover
                     moreInfoURL={documentationURL.MIGRATION_CONFIGURATION}
                   />
@@ -159,7 +159,7 @@ const MigrationPolicyDetailsSection: FC<MigrationPolicyDetailsSectionProps> = ({
                       Map of string keys and values that can be used to organize and categorize
                       (scope and select) objects. May match selectors of replication controllers and
                       services. More info:
-                    </Trans>{' '}
+                    </Trans>
                     <a href={documentationURL.LABELS}>{documentationURL.LABELS}</a>
                   </>
                 }
