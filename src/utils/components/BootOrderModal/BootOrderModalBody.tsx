@@ -45,12 +45,7 @@ export const BootOrderModalBody: React.FC<{
 
   const onDrop = (source, dest) => {
     if (dest) {
-      const newBootableDevices = reorder(devices, source.index, dest.index).map(
-        (device, index) => ({
-          ...device,
-          value: { ...device.value, bootOrder: index + 1 },
-        }),
-      );
+      const newBootableDevices = reorder(devices, source.index, dest.index);
       onChange(newBootableDevices);
 
       return true; // Signal that this is a valid drop and not to animate the item returning home.
@@ -87,56 +82,54 @@ export const BootOrderModalBody: React.FC<{
           title={t('No resource selected')}
         />
       ) : (
-        <>
-          <DragDrop onDrop={onDrop}>
-            <Droppable hasNoWrapper>
-              <DataList aria-label="draggable data list example">
-                {devices.map(({ type, value }, index) => (
-                  <Draggable hasNoWrapper key={value.name}>
-                    <DataListItem aria-labelledby={value.name} ref={React.createRef()}>
-                      <DataListItemRow>
-                        <DataListControl>
-                          <DataListDragButton
-                            aria-describedby="Press space or enter to begin dragging, and use the arrow keys to navigate up or down. Press enter to confirm the drag, or any other key to cancel the drag operation."
-                            aria-label="Reorder"
-                            aria-labelledby={value.name}
-                            aria-pressed="false"
-                          />
-                        </DataListControl>
-                        <DataListItemCells
-                          dataListCells={[
-                            <DataListCell key={value.name}>
-                              <Split>
-                                <SplitItem isFilled>
-                                  <span id={value.name}>{value.name}</span>
-                                  {type === DeviceType.NIC && <span>{t(' (NIC)')}</span>}
-                                  <span className="pf-v6-u-ml-sm">
-                                    <DeviceTypeIcon type={type as DeviceType} />
-                                  </span>
-                                </SplitItem>
-                                <SplitItem>
-                                  {index !== devices.length - 1 && (
-                                    <Button
-                                      className="kubevirt-boot-order__delete-btn"
-                                      icon={<MinusCircleIcon />}
-                                      id={`${value.name}-delete-btn`}
-                                      onClick={() => onDelete(value.name)}
-                                      variant={ButtonVariant.link}
-                                    />
-                                  )}
-                                </SplitItem>
-                              </Split>
-                            </DataListCell>,
-                          ]}
+        <DragDrop onDrop={onDrop}>
+          <Droppable hasNoWrapper>
+            <DataList aria-label="draggable data list example">
+              {devices.map(({ type, value }, index) => (
+                <Draggable hasNoWrapper key={value.name}>
+                  <DataListItem aria-labelledby={value.name} ref={React.createRef()}>
+                    <DataListItemRow>
+                      <DataListControl>
+                        <DataListDragButton
+                          aria-describedby="Press space or enter to begin dragging, and use the arrow keys to navigate up or down. Press enter to confirm the drag, or any other key to cancel the drag operation."
+                          aria-label="Reorder"
+                          aria-labelledby={value.name}
+                          aria-pressed="false"
                         />
-                      </DataListItemRow>
-                    </DataListItem>
-                  </Draggable>
-                ))}
-              </DataList>
-            </Droppable>
-          </DragDrop>
-        </>
+                      </DataListControl>
+                      <DataListItemCells
+                        dataListCells={[
+                          <DataListCell key={value.name}>
+                            <Split>
+                              <SplitItem isFilled>
+                                <span id={value.name}>{value.name}</span>
+
+                                <span className="pf-v6-u-ml-sm">
+                                  <DeviceTypeIcon type={type as DeviceType} />
+                                </span>
+                              </SplitItem>
+                              <SplitItem>
+                                {index !== devices.length - 1 && (
+                                  <Button
+                                    className="kubevirt-boot-order__delete-btn"
+                                    icon={<MinusCircleIcon />}
+                                    id={`${value.name}-delete-btn`}
+                                    onClick={() => onDelete(value.name)}
+                                    variant={ButtonVariant.link}
+                                  />
+                                )}
+                              </SplitItem>
+                            </Split>
+                          </DataListCell>,
+                        ]}
+                      />
+                    </DataListItemRow>
+                  </DataListItem>
+                </Draggable>
+              ))}
+            </DataList>
+          </Droppable>
+        </DragDrop>
       )}
     </>
   );
