@@ -2,6 +2,8 @@ import React, { FC, useState } from 'react';
 
 import ExpandSectionWithCustomToggle from '@kubevirt-utils/components/ExpandSectionWithCustomToggle/ExpandSectionWithCustomToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import DeschedulerSection from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/VirtualizationFeaturesList/components/LoadBalanceSection/components/DeschedulerSection';
 import LoadBalanceToggleContent from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/VirtualizationFeaturesWizard/components/ConfigurationStep/components/LoadBalanceConfigurationSection/components/LoadBalanceToggleContent/LoadBalanceToggleContent';
 import HelpTextTooltipContent from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/VirtualizationFeaturesWizard/components/HelpTextTooltipContent/HelpTextTooltipContent';
@@ -17,14 +19,20 @@ const LoadBalanceConfigurationSection: FC = () => {
 
   return (
     <ExpandSectionWithCustomToggle
-      helpTextContent={
-        <HelpTextTooltipContent
-          bodyText={t(
-            'Load Aware Descheduler balances VM distribution across the cluster Nodes based on CPU utilization and Node CPU pressure',
-          )}
-          titleText={t('Load balance')}
+      helpTextContent={(hide) => (
+        <LightspeedSimplePopoverContent
+          content={
+            <HelpTextTooltipContent
+              bodyText={t(
+                'Load Aware Descheduler balances VM distribution across the cluster Nodes based on CPU utilization and Node CPU pressure',
+              )}
+              titleText={t('Load balance')}
+            />
+          }
+          hide={hide}
+          promptType={OLSPromptType.LOAD_BALANCE}
         />
-      }
+      )}
       className="load-balance-configuration-section"
       customContent={<LoadBalanceToggleContent alternativeChecked={alternativeChecked} />}
       id="load-balance-configuration-section"

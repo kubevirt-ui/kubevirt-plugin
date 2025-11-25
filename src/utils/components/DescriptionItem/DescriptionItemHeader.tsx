@@ -1,10 +1,8 @@
 import React, { FC, ReactNode } from 'react';
 
-import { SPACE_SYMBOL } from '@kubevirt-utils/constants/constants';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import DescriptionItemPopoverContent from '@kubevirt-utils/components/DescriptionItem/DescriptionItemPopoverContent';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import {
-  Breadcrumb,
-  BreadcrumbItem,
   DescriptionListTerm,
   DescriptionListTermHelpTextButton,
   Popover,
@@ -20,6 +18,8 @@ type DescriptionItemHeaderProps = {
   label?: ReactNode;
   maxWidth?: string;
   moreInfoURL?: string;
+  olsObj?: K8sResourceCommon;
+  promptType?: OLSPromptType;
 };
 
 export const DescriptionItemHeader: FC<DescriptionItemHeaderProps> = ({
@@ -30,33 +30,22 @@ export const DescriptionItemHeader: FC<DescriptionItemHeaderProps> = ({
   label,
   maxWidth,
   moreInfoURL,
+  olsObj,
+  promptType,
 }) => {
-  const { t } = useKubevirtTranslation();
-
   if (isPopover && bodyContent) {
     return (
       <Popover
-        bodyContent={
-          <>
-            {bodyContent}
-            {moreInfoURL && (
-              <>
-                {SPACE_SYMBOL}
-                {t('More info: ')}
-                <a href={moreInfoURL}>{moreInfoURL}</a>
-              </>
-            )}
-            {breadcrumb && (
-              <div className="margin-top">
-                <Breadcrumb>
-                  {breadcrumb.split('.').map((item) => (
-                    <BreadcrumbItem key={item}>{item}</BreadcrumbItem>
-                  ))}
-                </Breadcrumb>
-              </div>
-            )}
-          </>
-        }
+        bodyContent={(hide) => (
+          <DescriptionItemPopoverContent
+            bodyContent={bodyContent}
+            breadcrumb={breadcrumb}
+            hide={hide}
+            moreInfoURL={moreInfoURL}
+            olsObj={olsObj}
+            promptType={promptType}
+          />
+        )}
         hasAutoWidth
         headerContent={descriptionHeader}
         maxWidth={maxWidth || '30rem'}

@@ -7,6 +7,7 @@ import { getName, getNamespace, getVMStatus } from '@kubevirt-utils/resources/sh
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import LightspeedCard from '@lightspeed/components/LightspeedCard';
 import LightspeedHelpButton from '@lightspeed/components/LightspeedHelpButton';
+import { getOLSPrompt, OLSPromptType } from '@lightspeed/utils/prompts';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { getVMURL } from '@multicluster/urls';
 import { Content, Popover, PopoverPosition, Split, SplitItem } from '@patternfly/react-core';
@@ -36,9 +37,7 @@ const VirtualMachineOverviewStatus: FC<VirtualMachineOverviewStatusProps> = ({ c
               })}
             </Content>
             {isErrorStatus && (
-              <LightspeedCard
-                prompt={`Provide a very concise explanation for why a VirtualMachine would have a status of ${vmPrintableStatus}. Don't provide troubleshooting steps and don't add phrases indicating that this response is intended to brief.`}
-              />
+              <LightspeedCard prompt={getOLSPrompt(OLSPromptType.VM_STATUS_CONCISE, { vm })} />
             )}
             <br />
             <Split>
@@ -54,13 +53,10 @@ const VirtualMachineOverviewStatus: FC<VirtualMachineOverviewStatusProps> = ({ c
               <SplitItem isFilled />
               <SplitItem>
                 <LightspeedHelpButton
-                  prompt={
-                    isErrorStatus
-                      ? `Provide a detailed explanation for why a VirtualMachine would have a status of ${vmPrintableStatus} and provide troubleshooting steps for how to fix it.`
-                      : `Provide a detailed explanation for why a VirtualMachine would have a status of ${vmPrintableStatus}.`
-                  }
                   isTroubleshootContext={isErrorStatus}
+                  obj={vm}
                   onClick={hide}
+                  promptType={OLSPromptType.VM_STATUS}
                 />
               </SplitItem>
             </Split>

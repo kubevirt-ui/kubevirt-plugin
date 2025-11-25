@@ -9,6 +9,8 @@ import {
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ClaimPropertySets } from '@kubevirt-utils/types/storage';
+import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { FormGroup, Radio } from '@patternfly/react-core';
 
 import HelpTextIcon from '../HelpTextIcon/HelpTextIcon';
@@ -62,15 +64,21 @@ export const VolumeMode: FC<VolumeModeProps> = ({
     <FormGroup
       labelHelp={
         <HelpTextIcon
-          bodyContent={
-            <Trans ns="plugin__kubevirt-plugin" t={t}>
-              Learn more about{' '}
-              <a href={documentationURL.VOLUME_MODE} rel="noopener noreferrer" target="_blank">
-                volume modes
-              </a>
-              .
-            </Trans>
-          }
+          bodyContent={(hide) => (
+            <LightspeedSimplePopoverContent
+              content={
+                <Trans ns="plugin__kubevirt-plugin" t={t}>
+                  Learn more about{' '}
+                  <a href={documentationURL.VOLUME_MODE} rel="noopener noreferrer" target="_blank">
+                    volume modes
+                  </a>
+                  .
+                </Trans>
+              }
+              hide={hide}
+              promptType={OLSPromptType.VOLUME_MODE}
+            />
+          )}
         />
       }
       isStack

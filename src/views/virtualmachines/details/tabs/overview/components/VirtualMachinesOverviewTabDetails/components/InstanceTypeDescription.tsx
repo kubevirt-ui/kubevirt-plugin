@@ -11,6 +11,7 @@ import {
 } from '@kubevirt-utils/resources/instancetype/selectors';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getInstanceTypeMatcher, getPreferenceMatcher } from '@kubevirt-utils/resources/vm';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 import { getCluster } from '@multicluster/helpers/selectors';
 
@@ -68,6 +69,8 @@ const InstanceTypeDescription: FC<InstanceTypeDescriptionProps> = ({ vm }) => {
         data-test-id="virtual-machine-overview-details-preference"
         descriptionHeader={t('Preference')}
         isPopover
+        olsObj={vm}
+        promptType={OLSPromptType.PREFERENCE}
       />
     </>
   );

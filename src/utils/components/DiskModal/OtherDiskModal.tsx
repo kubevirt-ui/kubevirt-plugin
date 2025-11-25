@@ -69,7 +69,10 @@ const OtherDiskModal: FC<V1SubDiskModalProps> = ({
         <DiskTypeSelect isVMRunning={isVMRunning} />
         <DiskInterfaceSelect isVMRunning={isVMRunning} />
         {showApplyStorageProfileSettings && <StorageClassAndPreallocation vm={vm} />}
-        <AdvancedSettings showApplyStorageProfileSettings={showApplyStorageProfileSettings} />
+        <AdvancedSettings
+          olsObj={pvc}
+          showApplyStorageProfileSettings={showApplyStorageProfileSettings}
+        />
       </TabModal>
     </FormProvider>
   );

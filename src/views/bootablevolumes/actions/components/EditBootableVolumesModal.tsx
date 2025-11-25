@@ -11,16 +11,17 @@ import {
 } from '@catalog/CreateFromInstanceTypes/utils/constants';
 import { VirtualMachineClusterPreferenceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
+import PreferencePopoverContent from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/PreferenceSelect/PreferencePopoverContent';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
-import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { convertResourceArrayToMap } from '@kubevirt-utils/resources/shared';
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
+import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import {
   FormGroup,
@@ -132,17 +133,13 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
           <>
             {t('Preference')}{' '}
             <HelpTextIcon
-              bodyContent={
-                <>
-                  {t(
-                    'The preferred VirtualMachine attribute values required to run a given workload.',
-                  )}{' '}
-                  <ExternalLink
-                    href={documentationURL.INSTANCE_TYPES_USER_GUIDE}
-                    text={t('Read more')}
-                  />
-                </>
-              }
+              bodyContent={(hide) => (
+                <LightspeedSimplePopoverContent
+                  content={<PreferencePopoverContent />}
+                  hide={hide}
+                  promptType={OLSPromptType.PREFERENCE}
+                />
+              )}
               position={PopoverPosition.right}
             />
           </>

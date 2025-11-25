@@ -8,6 +8,8 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { V1Template } from '@kubevirt-utils/models';
 import { getTemplateVirtualMachineCPU, updateTemplate } from '@kubevirt-utils/resources/template';
+import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 
 import CPUMemoryModal from './CPUMemoryModal/CPUMemoryModal';
 
@@ -33,12 +35,19 @@ const CPUMemory: FC<CPUMemoryProps> = ({ editable, template }) => {
 
   return (
     <DescriptionItem
-      bodyContent={
-        <CPUDescription
-          cpu={getTemplateVirtualMachineCPU(template)}
-          helperTextResource={CpuMemHelperTextResources.Template}
+      bodyContent={(hide) => (
+        <LightspeedSimplePopoverContent
+          content={
+            <CPUDescription
+              cpu={getTemplateVirtualMachineCPU(template)}
+              helperTextResource={CpuMemHelperTextResources.Template}
+            />
+          }
+          hide={hide}
+          obj={template}
+          promptType={OLSPromptType.CPU_MEMORY}
         />
-      }
+      )}
       descriptionData={CPUMemData}
       descriptionHeader={t('CPU | Memory')}
       isEdit={editable}

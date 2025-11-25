@@ -14,6 +14,8 @@ import NodeSelectorModal from '@kubevirt-utils/components/NodeSelectorModal/Node
 import TolerationsModal from '@kubevirt-utils/components/TolerationsModal/TolerationsModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getEvictionStrategy } from '@kubevirt-utils/resources/vm';
+import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { DescriptionList, Grid, GridItem } from '@patternfly/react-core';
@@ -106,7 +108,14 @@ const WizardSchedulingGrid: FC<WizardSchedulingGridProps> = ({ updateVM, vm }) =
 
           <WizardDescriptionItem
             helperPopover={{
-              content: <DeschedulerPopover />,
+              content: (hide) => (
+                <LightspeedSimplePopoverContent
+                  content={<DeschedulerPopover />}
+                  hide={hide}
+                  obj={vm}
+                  promptType={OLSPromptType.DESCHEDULER}
+                />
+              ),
               header: t('Descheduler'),
             }}
             description={<Descheduler vm={vm} />}

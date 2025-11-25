@@ -4,6 +4,8 @@ import classNames from 'classnames';
 
 import OwnerReferences from '@kubevirt-utils/components/OwnerReferences/OwnerReferences';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Breadcrumb,
@@ -27,21 +29,28 @@ const OwnerDetailsItem: React.FC<OwnerDetailsItemProps> = ({ className, obj }) =
     <DescriptionListGroup className={classNames('topology-resource-summary__item', className)}>
       <DescriptionListTermHelpText>
         <Popover
-          bodyContent={
-            <Trans ns="plugin__kubevirt-plugin">
-              <div>
-                List of objects depended by this object. If ALL objects in the list have been
-                deleted, this object will be garbage collected. If this object is managed by a
-                controller, then an entry in this list will point to this controller, with the
-                controller field set to true. There cannot be more than one managing controller.
-              </div>
-              <Breadcrumb className="margin-top">
-                <BreadcrumbItem>{{ kind: obj?.kind }}</BreadcrumbItem>
-                <BreadcrumbItem>metadata</BreadcrumbItem>
-                <BreadcrumbItem>ownerReferences</BreadcrumbItem>
-              </Breadcrumb>
-            </Trans>
-          }
+          bodyContent={(hide) => (
+            <LightspeedSimplePopoverContent
+              content={
+                <Trans ns="plugin__kubevirt-plugin">
+                  <div>
+                    List of objects depended by this object. If ALL objects in the list have been
+                    deleted, this object will be garbage collected. If this object is managed by a
+                    controller, then an entry in this list will point to this controller, with the
+                    controller field set to true. There cannot be more than one managing controller.
+                  </div>
+                  <Breadcrumb className="margin-top">
+                    <BreadcrumbItem>{{ kind: obj?.kind }}</BreadcrumbItem>
+                    <BreadcrumbItem>metadata</BreadcrumbItem>
+                    <BreadcrumbItem>ownerReferences</BreadcrumbItem>
+                  </Breadcrumb>
+                </Trans>
+              }
+              hide={hide}
+              obj={obj}
+              promptType={OLSPromptType.OWNER}
+            />
+          )}
           hasAutoWidth
           headerContent={t('Owner')}
           maxWidth="30rem"

@@ -15,6 +15,7 @@ import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/templ
 import { getMachineType } from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getOperatingSystemName } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { DescriptionList } from '@patternfly/react-core';
 
 import useEditTemplateAccessReview from '../../../hooks/useIsTemplateEditable';
@@ -63,6 +64,8 @@ const TemplateDetailsLeftGrid: FC<TemplateDetailsGridProps> = ({ template }) => 
         descriptionData={machineType}
         descriptionHeader={t('Machine type')}
         isPopover
+        olsObj={template}
+        promptType={OLSPromptType.MACHINE_TYPE}
       />
       <BootMethod editable={isTemplateEditable} template={template} />
       <BaseTemplate template={template} />

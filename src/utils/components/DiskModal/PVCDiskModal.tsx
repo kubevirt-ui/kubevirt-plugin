@@ -71,7 +71,7 @@ const PVCDiskModal: FC<V1SubDiskModalProps> = ({
         {isCreated && <ExpandPVC pvc={pvc} />}
         <DiskTypeSelect isVMRunning={isVMRunning} />
         <DiskInterfaceSelect isVMRunning={isVMRunning} />
-        <AdvancedSettings />
+        <AdvancedSettings olsObj={pvc} />
       </TabModal>
     </FormProvider>
   );

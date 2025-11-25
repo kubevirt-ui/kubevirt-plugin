@@ -5,6 +5,7 @@ import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NamespaceModel } from '@kubevirt-utils/models';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { getGroupVersionKindForModel, K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 import { FleetResourceLink } from '@stolostron/multicluster-sdk';
@@ -42,6 +43,8 @@ const DescriptionItemNamespace: FC<DescriptionItemNamespaceProps> = ({
       descriptionHeader={t('Namespace')}
       isPopover
       moreInfoURL={documentationURL.NAMESPACE_DOC}
+      olsObj={resource}
+      promptType={OLSPromptType.NAMESPACE}
     />
   );
 };
