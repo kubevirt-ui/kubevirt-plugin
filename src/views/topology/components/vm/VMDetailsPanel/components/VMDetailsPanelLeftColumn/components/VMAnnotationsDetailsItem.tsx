@@ -8,10 +8,28 @@ import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotations } from '@kubevirt-utils/resources/shared';
+import LightspeedHelpButton from '@lightspeed/components/LightspeedHelpButton';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { updateAnnotation } from '@virtualmachines/details/tabs/configuration/details/utils/utils';
 import MetadataTabAnnotations from '@virtualmachines/details/tabs/configuration/metadata/components/MetadataTabAnnotations/MetadataTabAnnotations';
 
 import '../../../TopologyVMDetailsPanel.scss';
+
+const BodyContent: FC<{ hide: any }> = ({ hide }) => {
+  const { t } = useKubevirtTranslation();
+
+  return (
+    <>
+      <div>
+        {t(
+          'Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects.',
+        )}
+      </div>
+      <br />
+      <LightspeedHelpButton onClick={hide} promptType={OLSPromptType.ANNOTATIONS} />
+    </>
+  );
+};
 
 type VMAnnotationsDetailsItemProps = {
   vm: V1VirtualMachine;
@@ -23,9 +41,6 @@ const VMAnnotationsDetailsItem: FC<VMAnnotationsDetailsItemProps> = ({ vm }) => 
 
   return (
     <DescriptionItem
-      bodyContent={t(
-        'Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects.',
-      )}
       onEditClick={() =>
         createModal(({ isOpen, onClose }) => (
           <AnnotationsModal
@@ -36,6 +51,7 @@ const VMAnnotationsDetailsItem: FC<VMAnnotationsDetailsItemProps> = ({ vm }) => 
           />
         ))
       }
+      bodyContent={BodyContent}
       breadcrumb="VirtualMachine.metadata.annotations"
       className="topology-vm-details-panel__item"
       descriptionData={<MetadataTabAnnotations annotations={getAnnotations(vm)} />}

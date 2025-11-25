@@ -8,6 +8,7 @@ import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { DescriptionList, Grid, PageSection, Title } from '@patternfly/react-core';
 
 import { updateAnnotation, updateLabels } from '../details/utils/utils';
@@ -29,7 +30,7 @@ const MetadataTab: FC<ConfigurationInnerTabProps> = ({ vm }) => {
         <DescriptionList>
           <DescriptionItem
             bodyContent={t(
-              'Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services.',
+              'Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. ',
             )}
             onEditClick={() =>
               createModal(({ isOpen, onClose }) => (
@@ -49,6 +50,7 @@ const MetadataTab: FC<ConfigurationInnerTabProps> = ({ vm }) => {
             isEdit
             isPopover
             moreInfoURL={documentationURL.LABELS}
+            promptType={OLSPromptType.LABELS}
             showEditOnTitle
           />
           <DescriptionItem
@@ -71,6 +73,7 @@ const MetadataTab: FC<ConfigurationInnerTabProps> = ({ vm }) => {
             isEdit
             isPopover
             moreInfoURL={documentationURL.ANNOTATIONS}
+            promptType={OLSPromptType.ANNOTATIONS}
           />
         </DescriptionList>
       </Grid>

@@ -5,6 +5,8 @@ import { CONFIRM_VM_ACTIONS } from '@kubevirt-utils/hooks/useFeatures/constants'
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import ExpandSection from '@overview/SettingsTab/ExpandSection/ExpandSection';
 import { CLUSTER_TAB_IDS } from '@overview/SettingsTab/search/constants';
 
@@ -27,8 +29,14 @@ const VMActionsConfirmation: FC<VMActionsConfirmationProps> = ({ newBadge }) => 
       toggleText={t('VirtualMachine actions confirmation')}
     >
       <SectionWithSwitch
+        helpTextIconContent={(hide) => (
+          <LightspeedSimplePopoverContent
+            content={t('Confirm requested VirtualMachine actions before executing them')}
+            hide={hide}
+            promptType={OLSPromptType.CONFIRM_VM_ACTIONS}
+          />
+        )}
         dataTestID="confirm-vm-actions"
-        helpTextIconContent={t('Confirm requested VirtualMachine actions before executing them')}
         id="confirm-vm-actions"
         isDisabled={!isAdmin}
         isLoading={loading}

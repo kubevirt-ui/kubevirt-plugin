@@ -32,6 +32,8 @@ import {
   VM_WORKLOAD_ANNOTATION,
 } from '@kubevirt-utils/resources/vm';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
+import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { getCatalogURL } from '@multicluster/urls';
 import { DescriptionList, Grid, GridItem, Switch } from '@patternfly/react-core';
@@ -130,7 +132,13 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
 
           <WizardDescriptionItem
             helperPopover={{
-              content: t('Namespace of the VirtualMachine'),
+              content: (hide) => (
+                <LightspeedSimplePopoverContent
+                  content={t('Namespace of the VirtualMachine')}
+                  hide={hide}
+                  promptType={OLSPromptType.NAMESPACE}
+                />
+              ),
               header: t('Namespace'),
             }}
             description={vm?.metadata?.namespace}
@@ -209,10 +217,16 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
               memory: readableSizeUnit(memory),
             })}
             helperPopover={{
-              content: (
-                <CPUDescription
-                  cpu={getCPU(vm)}
-                  helperTextResource={CpuMemHelperTextResources.FutureVM}
+              content: (hide) => (
+                <LightspeedSimplePopoverContent
+                  content={
+                    <CPUDescription
+                      cpu={getCPU(vm)}
+                      helperTextResource={CpuMemHelperTextResources.FutureVM}
+                    />
+                  }
+                  hide={hide}
+                  promptType={OLSPromptType.CPU_MEMORY}
                 />
               ),
               header: t('CPU | Memory'),
@@ -230,7 +244,13 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
 
           <WizardDescriptionItem
             helperPopover={{
-              content: t('The QEMU machine type.'),
+              content: (hide) => (
+                <LightspeedSimplePopoverContent
+                  content={t('The QEMU machine type.')}
+                  hide={hide}
+                  promptType={OLSPromptType.MACHINE_TYPE}
+                />
+              ),
               header: t('Machine type'),
             }}
             className="wizard-overview-description-left-column"
@@ -358,11 +378,19 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
               />
             }
             helperPopover={{
-              content: isDisabledGuestSystemLogs
-                ? t('Guest system logs disabled at cluster')
-                : t(
-                    'Enables access to the VirtualMachine guest system log. Wait a few seconds for logging to start before viewing the log.',
-                  ),
+              content: (hide) => (
+                <LightspeedSimplePopoverContent
+                  content={
+                    isDisabledGuestSystemLogs
+                      ? t('Guest system logs disabled at cluster')
+                      : t(
+                          'Enables access to the VirtualMachine guest system log. Wait a few seconds for logging to start before viewing the log.',
+                        )
+                  }
+                  hide={hide}
+                  promptType={OLSPromptType.GUEST_SYSTEM_LOG_ACCESS}
+                />
+              ),
               header: t('Guest system log access'),
             }}
             testId="guest-system-log-access"
@@ -399,8 +427,14 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
               />
             }
             helperPopover={{
-              content: t(
-                'Applying deletion protection to this VM will prevent deletion through the web console.',
+              content: (hide) => (
+                <LightspeedSimplePopoverContent
+                  content={t(
+                    'Applying deletion protection to this VM will prevent deletion through the web console.',
+                  )}
+                  hide={hide}
+                  promptType={OLSPromptType.DELETION_PROTECTION}
+                />
               ),
               header: t('Deletion protection'),
             }}

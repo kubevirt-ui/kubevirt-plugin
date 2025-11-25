@@ -901,6 +901,7 @@
   "Manual Connection": "Manual Connection",
   "Map of string keys and values that can be used to organize and categorize (scope and select) objects": "Map of string keys and values that can be used to organize and categorize (scope and select) objects",
   "Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services.": "Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services.",
+  "Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. ": "Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. ",
   "Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. More info:": "Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. More info:",
   "Masquerade": "Masquerade",
   "Match label": "Match label",

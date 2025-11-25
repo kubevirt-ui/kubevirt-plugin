@@ -1,8 +1,9 @@
 import { action } from 'typesafe-actions';
 
-import { ChatEntry, Tool } from '@lightspeed/hooks/useLightspeedActions/utils/types';
+import { Attachment, ChatEntry, Tool } from '@lightspeed/hooks/useLightspeedActions/utils/types';
 
 export enum OLSActionType {
+  AttachmentSet = 'attachmentSet',
   ChatHistoryPush = 'chatHistoryPush',
   ChatHistoryUpdateByID = 'chatHistoryUpdateByID',
   ChatHistoryUpdateTool = 'chatHistoryUpdateTool',
@@ -26,5 +27,8 @@ export const updateChatHistoryByID = (id: string, entry: Partial<ChatEntry>) =>
 
 export const updateChatHistoryTool = (id: string, toolID: string, tool: Partial<Tool>) =>
   action(OLSActionType.ChatHistoryUpdateTool, { id, tool, toolID });
+
+export const setAttachment = (attachment: Attachment) =>
+  action(OLSActionType.AttachmentSet, attachment);
 
 export const setConversationID = (id: string) => action(OLSActionType.SetConversationID, { id });

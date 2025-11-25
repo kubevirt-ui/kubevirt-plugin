@@ -4,17 +4,19 @@ import {
   closeOLSDrawer,
   openOLSDrawer,
   pushChatHistory,
+  setAttachment,
   setConversationID,
   setQuery,
   updateChatHistoryByID,
   updateChatHistoryTool,
 } from '@lightspeed/hooks/useLightspeedActions/utils/lightspeedActions';
-import { ChatEntry, Tool } from '@lightspeed/hooks/useLightspeedActions/utils/types';
+import { Attachment, ChatEntry, Tool } from '@lightspeed/hooks/useLightspeedActions/utils/types';
 
 type UseLightspeedActions = () => {
   closeOLSDrawer: () => void;
   openOLSDrawer: () => void;
   pushChatHistory: (entry: ChatEntry) => void;
+  setAttachment: (attachment: Attachment) => void;
   setConversationID: (id: string) => void;
   setQuery: (query: string) => void;
   updateChatHistoryByID: (id: string, entry: Partial<ChatEntry>) => void;
@@ -28,6 +30,7 @@ const useLightspeedActions: UseLightspeedActions = () => {
     closeOLSDrawer: () => dispatch(closeOLSDrawer()),
     openOLSDrawer: () => dispatch(openOLSDrawer()),
     pushChatHistory: (entry: ChatEntry) => dispatch(pushChatHistory(entry)),
+    setAttachment: (attachment: Attachment) => dispatch(setAttachment(attachment)),
     setConversationID: (id: string) => dispatch(setConversationID(id)),
     setQuery: (query: string) => dispatch(setQuery(query)),
     updateChatHistoryByID: (id: string, entry: Partial<ChatEntry>) =>
