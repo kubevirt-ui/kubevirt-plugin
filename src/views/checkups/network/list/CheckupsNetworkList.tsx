@@ -6,6 +6,8 @@ import useNADsData from '@kubevirt-utils/components/NetworkInterfaceModal/compon
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
+import useSelectedRowFilterClusters from '@kubevirt-utils/hooks/useSelectedRowFilterClusters';
+import useSelectedRowFilterProjects from '@kubevirt-utils/hooks/useSelectedRowFilterProjects';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   ListPageBody,
@@ -27,6 +29,8 @@ import '@kubevirt-utils/styles/list-managment-group.scss';
 
 const CheckupsNetworkList = () => {
   const { t } = useKubevirtTranslation();
+  const clusters = useSelectedRowFilterClusters();
+  const projects = useSelectedRowFilterProjects();
   const [columns, activeColumns, loadedColumns] = useCheckupsNetworkCheckupsListColumns();
   const [namespace] = useActiveNamespace();
 
@@ -35,12 +39,19 @@ const CheckupsNetworkList = () => {
   const { configMaps, error, jobs, loading } = useCheckupsNetworkData();
 
   const { onPaginationChange, pagination } = usePagination();
-  const [unfilterData, dataFilters, onFilterChange, filters] =
+  const [unfilterData, dataFilters, onFilterChange, filters, filtersWithSelect] =
     useCheckupsNetworkFilters(configMaps);
 
   const nadsInNamespace = !isEmpty(nads.filter((nad) => nad.metadata.namespace === namespace));
 
-  if (isEmpty(configMaps) && loading && !loadingPermissions && loadedColumns) {
+  if (
+    isEmpty(configMaps) &&
+    loading &&
+    !loadingPermissions &&
+    loadedColumns &&
+    isEmpty(clusters) &&
+    isEmpty(projects)
+  ) {
     return (
       <CheckupsNetworkListEmptyState isPermitted={isPermitted} nadsInNamespace={nadsInNamespace} />
     );
@@ -70,6 +81,7 @@ const CheckupsNetworkList = () => {
             });
           }}
           data={unfilterData}
+          filtersWithSelect={filtersWithSelect}
           loaded={loading && !loadingPermissions && loadedColumns}
           rowFilters={filters}
         />
