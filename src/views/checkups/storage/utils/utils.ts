@@ -15,9 +15,11 @@ import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, k8sDelete, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 
 import {
+  CONFIGMAP_NAME,
+  CONFIGMAP_NAMESPACE,
   generateWithNumbers,
   KUBEVIRT_VM_LATENCY_LABEL,
-  STATUS_COMPILATION_TIME_STAMP,
+  STATUS_COMPLETION_TIME_STAMP,
   STATUS_FAILURE_REASON,
   STATUS_START_TIME_STAMP,
   STATUS_SUCCEEDED,
@@ -135,8 +137,8 @@ const storageCheckupJob = (
           containers: [
             {
               env: [
-                { name: 'CONFIGMAP_NAMESPACE', value: namespace },
-                { name: 'CONFIGMAP_NAME', value: name },
+                { name: CONFIGMAP_NAMESPACE, value: namespace },
+                { name: CONFIGMAP_NAME, value: name },
               ],
               image: checkupImage,
               imagePullPolicy: 'Always',
@@ -267,7 +269,7 @@ export const rerunStorageCheckup = async (
   const isSucceeded = resource?.data?.[STATUS_SUCCEEDED] === 'true';
   await k8sPatch<IoK8sApiCoreV1ConfigMap>({
     data: [
-      { op: 'remove', path: `/data/${STATUS_COMPILATION_TIME_STAMP}` },
+      { op: 'remove', path: `/data/${STATUS_COMPLETION_TIME_STAMP}` },
       { op: 'remove', path: `/data/${STATUS_SUCCEEDED}` },
       { op: 'remove', path: `/data/${STATUS_FAILURE_REASON}` },
       { op: 'remove', path: `/data/${STATUS_START_TIME_STAMP}` },

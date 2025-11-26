@@ -1,5 +1,5 @@
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { Action } from '@openshift-console/dynamic-plugin-sdk';
+import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import { cleanup } from '@testing-library/react';
 import { renderHook } from '@testing-library/react-hooks';
 
@@ -21,7 +21,7 @@ jest.mock('@kubevirt-utils/hooks/useFeatures/useFeatures', () => ({
 }));
 afterEach(cleanup);
 
-const testTopLevelActions = (actions: Action[]) => {
+const testTopLevelActions = (actions: ActionDropdownItemType[]) => {
   const topLevelVMActions = actions.map((action) => action.id);
 
   // top level action independent from the VM state

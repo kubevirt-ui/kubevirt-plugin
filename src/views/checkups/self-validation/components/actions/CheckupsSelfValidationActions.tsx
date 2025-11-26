@@ -1,0 +1,76 @@
+import React, { FC, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom-v5-compat';
+
+import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
+import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+
+import { isJobRunning } from '../../utils';
+import { useAllRunningSelfValidationJobs } from '../hooks/useAllRunningSelfValidationJobs';
+
+import { CheckupsSelfValidationActionFactory } from './CheckupsSelfValidationActionFactory';
+
+type CheckupsSelfValidationActionsProps = {
+  configMap: IoK8sApiCoreV1ConfigMap;
+  isKebab?: boolean;
+  jobs: IoK8sApiBatchV1Job[];
+};
+
+const CheckupsSelfValidationActions: FC<CheckupsSelfValidationActionsProps> = ({
+  configMap,
+  isKebab = false,
+  jobs,
+}) => {
+  const navigate = useNavigate();
+  const { createModal } = useModal();
+  const [clusterRunningJobs] = useAllRunningSelfValidationJobs();
+
+  const thisCheckupJobNames = useMemo(() => new Set(jobs.map((job) => job.metadata.name)), [jobs]);
+
+  const otherRunningJobs = useMemo(
+    () => (clusterRunningJobs || []).filter((job) => !thisCheckupJobNames.has(job.metadata.name)),
+    [clusterRunningJobs, thisCheckupJobNames],
+  );
+
+  const hasOtherRunningJobs = otherRunningJobs.length > 0;
+  const hasCurrentCheckupRunningJobs = useMemo(() => jobs.some((job) => isJobRunning(job)), [jobs]);
+
+  const actions = useMemo(
+    () => [
+      CheckupsSelfValidationActionFactory.rerun({
+        configMap,
+        createModal,
+        hasCurrentCheckupRunningJobs,
+        hasOtherRunningJobs,
+        jobs,
+        navigate: (path: string) => navigate(path),
+        otherRunningJobs,
+      }),
+      CheckupsSelfValidationActionFactory.delete({
+        configMap,
+        createModal,
+        jobs,
+        navigate: (path: string) => navigate(path),
+      }),
+    ],
+    [
+      configMap,
+      createModal,
+      jobs,
+      navigate,
+      otherRunningJobs,
+      hasOtherRunningJobs,
+      hasCurrentCheckupRunningJobs,
+    ],
+  );
+
+  return (
+    <ActionsDropdown
+      actions={actions}
+      id="checkups-self-validation-actions"
+      isKebabToggle={isKebab}
+    />
+  );
+};
+
+export default CheckupsSelfValidationActions;

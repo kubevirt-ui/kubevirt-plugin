@@ -1,0 +1,40 @@
+.CheckupsSelfValidationForm {
+  &--main {
+    padding: 20px;
+
+    .form-group-spacing {
+      margin-bottom: var(--pf-t--global--spacer--md);
+      &.storage-capabilities {
+        .pf-v6-c-menu-toggle {
+          min-width: 220px;
+        }
+      }
+    }
+
+    .pf-v6-c-switch__toggle {
+      align-self: center;
+    }
+
+    .pf-v6-c-menu-toggle {
+      min-width: 180px;
+    }
+
+    .pf-v6-c-switch__label {
+      .pf-v6-c-form__label-text {
+        color: var(--pf-t--global--text--color--regular);
+      }
+    }
+
+    // Fix tooltip wrapper breaking flex layout in form actions
+    .pf-v6-c-form__actions {
+      > div[style*='display: contents'] {
+        display: inline-flex !important;
+        align-items: center;
+
+        > span {
+          display: inline-flex;
+        }
+      }
+    }
+  }
+}

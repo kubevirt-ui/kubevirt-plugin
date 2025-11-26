@@ -26,6 +26,7 @@ const ActionsDropdown: FC<ActionsDropdownProps> = ({
   actions = [],
   className,
   disabledTooltip,
+  id,
   isDisabled,
   isKebabToggle,
   onLazyClick,
@@ -59,7 +60,7 @@ const ActionsDropdown: FC<ActionsDropdownProps> = ({
 
   if (isDisabled)
     return (
-      <div className={classNames('kv-actions-dropdown', className)} ref={containerRef}>
+      <div className={classNames('kv-actions-dropdown', className)} id={id} ref={containerRef}>
         <Tooltip content={disabledTooltip}>
           <span> {Toggle(toggleRef)}</span>
         </Tooltip>
@@ -70,6 +71,7 @@ const ActionsDropdown: FC<ActionsDropdownProps> = ({
     <div
       className={classNames('kv-actions-dropdown', className)}
       data-test="actions-dropdown"
+      id={id}
       ref={containerRef}
     >
       {Toggle(toggleRef)}

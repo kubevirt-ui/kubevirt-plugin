@@ -10,7 +10,7 @@ import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
 
 import DeleteCheckupModal from '../../components/DeleteCheckupModal';
-import { getCheckupImageFromNewestJob, STATUS_SUCCEEDED } from '../../utils/utils';
+import { getCheckupImageFromNewestJob } from '../../utils/utils';
 import { deleteNetworkCheckup, rerunNetworkCheckup } from '../utils/utils';
 
 type CheckupsNetworkActionsProps = {
@@ -46,6 +46,16 @@ const CheckupsNetworkActions: FC<CheckupsNetworkActionsProps> = ({
     <Dropdown isOpen={isActionsOpen} onOpenChange={setIsActionsOpen} toggle={Toggle}>
       <DropdownList>
         <DropdownItem
+          onClick={() => {
+            setIsActionsOpen(false);
+            return rerunNetworkCheckup(configMap, checkupImage);
+          }}
+          isDisabled={!checkupImage}
+          key="rerun"
+        >
+          {t('Rerun')}
+        </DropdownItem>
+        <DropdownItem
           onClick={() =>
             createModal((props) => (
               <DeleteCheckupModal
@@ -59,16 +69,6 @@ const CheckupsNetworkActions: FC<CheckupsNetworkActionsProps> = ({
           key="delete"
         >
           {t('Delete')}
-        </DropdownItem>
-        <DropdownItem
-          onClick={() => {
-            setIsActionsOpen(false);
-            return rerunNetworkCheckup(configMap, checkupImage);
-          }}
-          isDisabled={configMap?.data?.[STATUS_SUCCEEDED] === undefined || !checkupImage}
-          key="rerun"
-        >
-          {t('Rerun')}
         </DropdownItem>
       </DropdownList>
     </Dropdown>

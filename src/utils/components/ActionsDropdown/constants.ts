@@ -1,7 +1,10 @@
+import { ReactNode } from 'react';
+
 import { Action } from '@openshift-console/dynamic-plugin-sdk';
 import { FleetAccessReviewResourceAttributes } from '@stolostron/multicluster-sdk';
 
-export type ActionDropdownItemType = Action & {
+export type ActionDropdownItemType = Omit<Action, 'description'> & {
   accessReview?: FleetAccessReviewResourceAttributes;
-  options?: Action[];
+  description?: ReactNode | string;
+  options?: ActionDropdownItemType[];
 };

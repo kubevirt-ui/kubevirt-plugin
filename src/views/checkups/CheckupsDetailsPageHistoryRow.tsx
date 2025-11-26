@@ -1,8 +1,7 @@
-import React, { FC } from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import { JobModel, modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiBatchV1Job } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import {
   ResourceLink,
   RowProps,
@@ -10,11 +9,15 @@ import {
   Timestamp,
 } from '@openshift-console/dynamic-plugin-sdk';
 
-import CheckupsNetworkStatusIcon from './CheckupsNetworkStatusIcon';
+import CheckupsStatusIcon from './CheckupsStatusIcon';
 
-const CheckupsNetworkDetailsPageHistoryRow: FC<
-  RowProps<IoK8sApiBatchV1Job, { job: IoK8sApiBatchV1Job }>
-> = ({ activeColumnIDs, obj: job }) => {
+export type CheckupsDetailsPageHistoryRowData = {
+  customActions?: (job: IoK8sApiBatchV1Job) => ReactNode;
+};
+
+const CheckupsDetailsPageHistoryRow: FC<
+  RowProps<IoK8sApiBatchV1Job, CheckupsDetailsPageHistoryRowData>
+> = ({ activeColumnIDs, obj: job, rowData }) => {
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} id="job">
@@ -25,13 +28,19 @@ const CheckupsNetworkDetailsPageHistoryRow: FC<
         />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="status">
-        <CheckupsNetworkStatusIcon job={job} onlyJob={true} />
+        <CheckupsStatusIcon job={job} onlyJob={true} />
+      </TableData>
+      <TableData activeColumnIDs={activeColumnIDs} id="start-time">
+        <Timestamp timestamp={job?.status?.startTime} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="complete-time">
-        <Timestamp timestamp={job?.status?.completionTime || NO_DATA_DASH} />
+        <Timestamp timestamp={job?.status?.completionTime} />
+      </TableData>
+      <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="">
+        {rowData?.customActions?.(job) || null}
       </TableData>
     </>
   );
 };
 
-export default CheckupsNetworkDetailsPageHistoryRow;
+export default CheckupsDetailsPageHistoryRow;

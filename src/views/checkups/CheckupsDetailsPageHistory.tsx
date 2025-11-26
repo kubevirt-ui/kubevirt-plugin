@@ -1,26 +1,33 @@
-import React, { FC } from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import { IoK8sApiBatchV1Job } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
 import { Bullseye, Title } from '@patternfly/react-core';
+import { SortByDirection } from '@patternfly/react-table';
 
-import useCheckupsNetworkDetailsPageHistoryColumns from './network/details/hooks/useCheckupsNetworkDetailsPageHistoryColumns';
-import CheckupsNetworkDetailsPageHistoryRow from './CheckupsDetailsPageHistoryRow';
+import useCheckupsDetailsPageHistoryColumns from './hooks/useCheckupsDetailsPageHistoryColumns';
+import CheckupsDetailsPageHistoryRow from './CheckupsDetailsPageHistoryRow';
 
-type CheckupsNetworkDetailsPageHistoryProps = {
+type CheckupsDetailsPageHistoryProps = {
+  customActions?: (job: IoK8sApiBatchV1Job) => ReactNode;
   error: Error;
   jobs: IoK8sApiBatchV1Job[];
-  loading: boolean;
+  loaded: boolean;
+  sortColumnIndex?: number;
+  sortDirection?: SortByDirection.asc | SortByDirection.desc;
 };
 
-const CheckupsNetworkDetailsPageHistory: FC<CheckupsNetworkDetailsPageHistoryProps> = ({
+const CheckupsDetailsPageHistory: FC<CheckupsDetailsPageHistoryProps> = ({
+  customActions,
   error,
   jobs,
-  loading,
+  loaded,
+  sortColumnIndex,
+  sortDirection,
 }) => {
   const { t } = useKubevirtTranslation();
-  const columns = useCheckupsNetworkDetailsPageHistoryColumns();
+  const columns = useCheckupsDetailsPageHistoryColumns();
 
   return (
     <>
@@ -35,14 +42,16 @@ const CheckupsNetworkDetailsPageHistory: FC<CheckupsNetworkDetailsPageHistoryPro
         )}
         columns={columns}
         data={jobs}
-        loaded={loading}
+        loaded={loaded}
         loadError={error}
-        Row={CheckupsNetworkDetailsPageHistoryRow}
-        rowData={jobs}
+        Row={CheckupsDetailsPageHistoryRow}
+        rowData={{ customActions }}
         unfilteredData={jobs}
+        {...(typeof sortColumnIndex === 'number' ? { sortColumnIndex } : {})}
+        {...(sortDirection ? { sortDirection } : {})}
       />
     </>
   );
 };
 
-export default CheckupsNetworkDetailsPageHistory;
+export default CheckupsDetailsPageHistory;

@@ -71,18 +71,26 @@ export const useCheckAccess = (
 };
 
 export const createLocalMenuOptions = (actions: ActionDropdownItemType[]): MenuOption[] =>
-  actions?.map((action) =>
-    action.options?.length > 0
+  actions?.map((action) => {
+    // Normalize description: MenuOption expects description?: string, but ActionDropdownItemType allows ReactNode | string
+    // Only include description if it's a string
+    const { description, ...restAction } = action;
+    const normalizedAction = {
+      ...restAction,
+      ...(typeof description === 'string' ? { description } : {}),
+    };
+
+    return action.options?.length > 0
       ? {
-          ...action,
+          ...normalizedAction,
           children: createLocalMenuOptions(action.options),
           // action groups should have no attached direct actions
           cta: undefined,
           // default to submenus
           submenu: true,
         }
-      : action,
-  ) ?? [];
+      : normalizedAction;
+  }) ?? [];
 
 /**
  * Merge duplicated options that exist on the same level.
