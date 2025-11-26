@@ -32,7 +32,7 @@ const UnsupportedVolumesAlert: React.FC<UnsupportedVolumesAlertProps> = ({
             <Stack>
               {unsupportedVolumes?.map((vol) => (
                 <StackItem key={vol.name}>
-                  <strong>{vol.name}</strong> - {vol.reason}
+                  <span className="pf-v6-u-font-weight-bold">{vol.name}</span> - {vol.reason}
                 </StackItem>
               ))}
             </Stack>

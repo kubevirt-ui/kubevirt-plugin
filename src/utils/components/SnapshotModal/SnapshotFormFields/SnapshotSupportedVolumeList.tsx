@@ -1,19 +1,19 @@
-import * as React from 'react';
+import React, { FC, ReactNode, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { ExpandableSection, FormGroup, Stack, StackItem } from '@patternfly/react-core';
+import { Alert, ExpandableSection, FormGroup } from '@patternfly/react-core';
 
 type SupportedSnapshotVolumesListProps = {
-  supportedVolumes: any[];
+  children: ReactNode;
+  volumesCount: number;
 };
 
-const SnapshotSupportedVolumeList: React.FC<SupportedSnapshotVolumesListProps> = ({
-  supportedVolumes,
+const SnapshotSupportedVolumeList: FC<SupportedSnapshotVolumesListProps> = ({
+  children,
+  volumesCount,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [isExpanded, setIsExpanded] = React.useState<boolean>(false);
-  const volumesCount = !isEmpty(supportedVolumes) ? supportedVolumes?.length : 0;
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const volumeCountMsg = t('Disks included in this snapshot ({{volumes}})', {
     volumes: volumesCount,
   });
@@ -23,17 +23,14 @@ const SnapshotSupportedVolumeList: React.FC<SupportedSnapshotVolumesListProps> =
       {volumesCount > 0 ? (
         <ExpandableSection
           isExpanded={isExpanded}
+          isIndented
           onClick={() => setIsExpanded((prev) => !prev)}
           toggleText={volumeCountMsg}
         >
-          <Stack>
-            {supportedVolumes?.map((vol) => (
-              <StackItem key={vol.name}>{vol.name}</StackItem>
-            ))}
-          </Stack>
+          {children}
         </ExpandableSection>
       ) : (
-        <b>{volumeCountMsg}</b>
+        <Alert isInline isPlain title={t('No disks included in this snapshot')} variant="warning" />
       )}
     </FormGroup>
   );

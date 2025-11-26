@@ -6,6 +6,8 @@ import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdo
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
 import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import MoveBulkVMToFolderModal from '@kubevirt-utils/components/MoveVMToFolderModal/MoveBulkVMsToFolderModal';
+import BulkSnapshotModal from '@kubevirt-utils/components/SnapshotModal/BulkSnapshotModal';
+import SnapshotModal from '@kubevirt-utils/components/SnapshotModal/SnapshotModal';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getLabels, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -176,6 +178,22 @@ export const BulkVirtualMachineActionFactory = {
     disabled: isEmpty(vms),
     id: ACTIONS_ID.RESTART,
     label: t('Restart'),
+  }),
+  snapshot: (
+    vms: V1VirtualMachine[],
+    createModal: (modal: ModalComponent) => void,
+  ): ActionDropdownItemType => ({
+    cta: () =>
+      createModal((props) =>
+        vms.length === 1 ? (
+          <SnapshotModal vm={vms[0]} {...props} />
+        ) : (
+          <BulkSnapshotModal vms={vms} {...props} />
+        ),
+      ),
+    disabled: isEmpty(vms),
+    id: ACTIONS_ID.SNAPSHOT,
+    label: t('Take snapshot'),
   }),
   start: (vms: V1VirtualMachine[]): ActionDropdownItemType => ({
     cta: () => vms.forEach(startVM),
