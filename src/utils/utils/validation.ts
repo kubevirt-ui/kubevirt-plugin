@@ -19,9 +19,9 @@ const maxNameLengthErrorMsg = (t: TFunction) =>
 
 // IsDNS1123Label tests for a string that conforms to the definition of a label in
 // DNS (RFC 1123).
-export const isDNS1123Label = (value: string): boolean => !getDNS1120LabelError(value);
+export const isDNS1123Label = (value: string): boolean => !getDNS1123LabelError(value);
 
-export const getDNS1120LabelError = (value: string): ((t: TFunction) => string) => {
+export const getDNS1123LabelError = (value: string): ((t: TFunction) => string) => {
   if (value?.length > DNS1123LabelMaxLength) {
     return maxNameLengthErrorMsg;
   }

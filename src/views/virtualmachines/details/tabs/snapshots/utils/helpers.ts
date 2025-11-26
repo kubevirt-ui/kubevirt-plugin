@@ -8,17 +8,45 @@ import {
   V1VolumeSnapshotStatus,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getName } from '@kubevirt-utils/resources/shared';
+import { getVolumeSnapshotStatuses } from '@kubevirt-utils/resources/vm';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 export const getVolumeSnapshotStatusesPartition = (
-  volumeSnaoshotStatuses: V1VolumeSnapshotStatus[],
+  volumeSnapshotStatuses: V1VolumeSnapshotStatus[],
 ) => {
-  const supportedVolumes = volumeSnaoshotStatuses?.filter((status) => status?.enabled);
-  const unsupportedVolumes = volumeSnaoshotStatuses?.filter((status) => !status?.enabled);
+  const supportedVolumes = volumeSnapshotStatuses?.filter((status) => status?.enabled);
+  const unsupportedVolumes = volumeSnapshotStatuses?.filter((status) => !status?.enabled);
   return {
     supportedVolumes,
     unsupportedVolumes,
   };
 };
+
+export const getVolumeSnapshotStatusesPartitionPerVM = (vms: V1VirtualMachine[]) =>
+  vms.reduce<{
+    supportedVolumes: Record<string, V1VolumeSnapshotStatus[]>;
+    unsupportedVolumes: Record<string, V1VolumeSnapshotStatus[]>;
+  }>(
+    (acc, vm) => {
+      const volumeSnapshotStatuses = getVolumeSnapshotStatuses(vm);
+      const { supportedVolumes, unsupportedVolumes } =
+        getVolumeSnapshotStatusesPartition(volumeSnapshotStatuses);
+      const vmName = getName(vm);
+
+      return {
+        supportedVolumes: {
+          ...acc.supportedVolumes,
+          ...(!isEmpty(supportedVolumes) && { [vmName]: supportedVolumes }),
+        },
+        unsupportedVolumes: {
+          ...acc.unsupportedVolumes,
+          ...(!isEmpty(unsupportedVolumes) && { [vmName]: unsupportedVolumes }),
+        },
+      };
+    },
+    { supportedVolumes: {}, unsupportedVolumes: {} },
+  );
 
 export const validateSnapshotDeadline = (deadline: string): string => {
   if (deadline?.length > 0) {

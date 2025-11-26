@@ -66,6 +66,7 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms)
       BulkVirtualMachineActionFactory.restart(vms, createModal, confirmVMActionsEnabled),
       BulkVirtualMachineActionFactory.pause(vms, createModal, confirmVMActionsEnabled),
       BulkVirtualMachineActionFactory.unpause(vms),
+      BulkVirtualMachineActionFactory.snapshot(vms, createModal),
       ...(migrationActions.length > 0
         ? [{ cta: null, id: 'bulk-migration-actions', label: 'Migrate', options: migrationActions }]
         : []),
