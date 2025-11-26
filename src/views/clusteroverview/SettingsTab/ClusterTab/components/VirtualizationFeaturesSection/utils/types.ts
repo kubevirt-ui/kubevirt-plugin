@@ -1,5 +1,6 @@
 export type VirtualizationFeatureOperators =
   | 'cluster-kube-descheduler-operator'
+  | 'cluster-logging'
   | 'fence-agents-remediation'
   | 'kubernetes-nmstate-operator'
   | 'netobserv-operator'
