@@ -1546,6 +1546,7 @@
   "The upload process will continue after you close the modal.": "The upload process will continue after you close the modal.",
   "The virtctl client is a supplemental command-line utility for managing virtualization resources from the command line.": "The virtctl client is a supplemental command-line utility for managing virtualization resources from the command line.",
   "The VirtualMachine cannot be deleted if Deletion Protection is enabled to safeguard from accidental deletion. You can disable Deletion Protection at any time.": "The VirtualMachine cannot be deleted if Deletion Protection is enabled to safeguard from accidental deletion. You can disable Deletion Protection at any time.",
+  "The VirtualMachine is not running": "The VirtualMachine is not running",
   "The VirtualMachine is running": "The VirtualMachine is running",
   "The VirtualMachine will be bridged to the selected network, ideal for L2 devices": "The VirtualMachine will be bridged to the selected network, ideal for L2 devices",
   "The VirtualMachine will have": "The VirtualMachine will have",

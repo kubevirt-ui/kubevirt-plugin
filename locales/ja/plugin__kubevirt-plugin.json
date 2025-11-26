@@ -1546,6 +1546,7 @@
   "The upload process will continue after you close the modal.": "アップロードプロセスはモーダルを閉じた後も続行されます。",
   "The virtctl client is a supplemental command-line utility for managing virtualization resources from the command line.": "virtctl クライアントは、コマンドラインから仮想化リソースを管理するための補助的なコマンドラインユーティリティーです。",
   "The VirtualMachine cannot be deleted if Deletion Protection is enabled to safeguard from accidental deletion. You can disable Deletion Protection at any time.": "誤って削除されないように削除保護が有効になっている場合は、VirtualMachine を削除できません。削除保護はいつでも無効化できます。",
+  "The VirtualMachine is not running": "The VirtualMachine is not running",
   "The VirtualMachine is running": "VirtualMachine は実行中です",
   "The VirtualMachine will be bridged to the selected network, ideal for L2 devices": "VirtualMachine は選択されたネットワークにブリッジされます。これは L2 デバイスに最適です",
   "The VirtualMachine will have": "VirtualMachine には以下が提供されます",
