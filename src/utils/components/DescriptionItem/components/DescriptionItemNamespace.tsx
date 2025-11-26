@@ -5,6 +5,7 @@ import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NamespaceModel } from '@kubevirt-utils/models';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import {
   getGroupVersionKindForModel,
   K8sModel,
@@ -42,6 +43,7 @@ const DescriptionItemNamespace: FC<DescriptionItemNamespaceProps> = ({
       descriptionHeader={t('Namespace')}
       isPopover
       moreInfoURL={documentationURL.NAMESPACE_DOC}
+      promptType={OLSPromptType.NAMESPACE}
     />
   );
 };

@@ -12,6 +12,8 @@ import useFeaturesConfigMap from '@kubevirt-utils/hooks/useFeatures/useFeaturesC
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useMetalLBOperatorInstalled } from '@kubevirt-utils/hooks/useMetalLBOperatorInstalled/useMetalLBOperatorInstalled';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { CLUSTER_TAB_IDS } from '@overview/SettingsTab/search/constants';
 import { Stack, TextInput } from '@patternfly/react-core';
@@ -63,8 +65,14 @@ const SSHConfiguration: FC<SSHConfigurationProps> = ({ newBadge }) => {
     >
       <Stack hasGutter>
         <SectionWithSwitch
-          helpTextIconContent={t(
-            'Enable the creation of LoadBalancer services for SSH connections to VirtualMachines. A load balancer must be configured',
+          helpTextIconContent={(hide) => (
+            <LightspeedSimplePopoverContent
+              content={t(
+                'Enable the creation of LoadBalancer services for SSH connections to VirtualMachines. A load balancer must be configured',
+              )}
+              hide={hide}
+              promptType={OLSPromptType.SSH_OVER_LOADBALANCER_SERVICE}
+            />
           )}
           switchIsOn={
             featureConfigMap?.data?.[LOAD_BALANCER_ENABLED] === 'true' || hasMetalLBInstalled
@@ -78,8 +86,14 @@ const SSHConfiguration: FC<SSHConfigurationProps> = ({ newBadge }) => {
           turnOnSwitch={(checked) => onChange(checked.toString(), LOAD_BALANCER_ENABLED)}
         />
         <SectionWithSwitch
-          helpTextIconContent={t(
-            'Allow the creation of NodePort services for SSH connections to VirtualMachines. An address of a publicly available Node must be provided.',
+          helpTextIconContent={(hide) => (
+            <LightspeedSimplePopoverContent
+              content={t(
+                'Allow the creation of NodePort services for SSH connections to VirtualMachines. An address of a publicly available Node must be provided.',
+              )}
+              hide={hide}
+              promptType={OLSPromptType.SSH_OVER_NODEPORT_SERVICE}
+            />
           )}
           switchIsOn={
             featureConfigMap?.data?.[NODE_PORT_ENABLED] === 'true' &&

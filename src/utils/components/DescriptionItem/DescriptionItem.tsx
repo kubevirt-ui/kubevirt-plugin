@@ -3,6 +3,7 @@ import React, { FC, ReactNode, useMemo } from 'react';
 import { DescriptionItemHeader } from '@kubevirt-utils/components/DescriptionItem/DescriptionItemHeader';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import {
   Button,
   ButtonVariant,
@@ -34,6 +35,7 @@ type DescriptionItemProps = {
   messageOnDisabled?: string;
   moreInfoURL?: string;
   onEditClick?: () => void;
+  promptType?: OLSPromptType;
   showEditOnTitle?: boolean;
   subTitle?: string;
 };
@@ -54,6 +56,7 @@ const DescriptionItem: FC<DescriptionItemProps> = ({
   messageOnDisabled,
   moreInfoURL,
   onEditClick,
+  promptType,
   showEditOnTitle,
   subTitle,
 }) => {
@@ -105,6 +108,7 @@ const DescriptionItem: FC<DescriptionItemProps> = ({
                 isPopover={isPopover}
                 label={label}
                 moreInfoURL={moreInfoURL}
+                promptType={promptType}
               />
             </FlexItem>
           )}

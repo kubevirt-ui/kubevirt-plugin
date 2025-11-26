@@ -8,6 +8,7 @@ import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getLabels, getName } from '@kubevirt-utils/resources/shared';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { updateLabels } from '@virtualmachines/details/tabs/configuration/details/utils/utils';
 import MetadataTabLabels from '@virtualmachines/details/tabs/configuration/metadata/components/MetadataTabLabels/MetadataTabLabels';
 
@@ -45,6 +46,7 @@ const VMLabelsDetailsItem: FC<VMLabelsDetailsItemProps> = ({ vm }) => {
       isEdit
       isPopover
       moreInfoURL={documentationURL.LABELS}
+      promptType={OLSPromptType.LABELS}
       showEditOnTitle
     />
   );

@@ -6,6 +6,7 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotations } from '@kubevirt-utils/resources/shared';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { K8sModel, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 
 type DescriptionItemAnnotationsProps = {
@@ -64,6 +65,7 @@ const DescriptionItemAnnotations: FC<DescriptionItemAnnotationsProps> = ({
       isPopover
       moreInfoURL={documentationURL.ANNOTATIONS}
       onEditClick={onEditClick}
+      promptType={OLSPromptType.ANNOTATIONS}
     />
   );
 };

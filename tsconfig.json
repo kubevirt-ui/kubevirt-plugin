@@ -16,6 +16,7 @@
       "@images/*": ["./images/*"],
       "@kubevirt-utils": ["src/utils"],
       "@kubevirt-utils/*": ["src/utils/*"],
+      "@lightspeed/*": ["src/views/lightspeed/*"],
       "@multicluster/*": ["src/multicluster/*"],
       "@overview/*": ["src/views/clusteroverview/*"],
       "@search/*": ["src/views/search/*"],
