@@ -216,6 +216,25 @@ export const asAccessReview = (
   };
 };
 
+export const asBulkAccessReview = (
+  model: K8sModel,
+  resources: K8sResourceCommon[],
+  verb: K8sVerb,
+  subresource?: string,
+): FleetAccessReviewResourceAttributes => {
+  if (isEmpty(resources)) {
+    return null;
+  }
+  return {
+    cluster: haveSameCluster(resources) ? getCluster(resources?.[0]) : undefined,
+    group: model.apiGroup,
+    namespace: haveSameNamespace(resources) ? getNamespace(resources?.[0]) : undefined,
+    resource: model.plural,
+    subresource,
+    verb,
+  };
+};
+
 /**
  * Provides apiVersion for a k8s model.
  * @param model k8s model
@@ -495,3 +514,21 @@ export const getStatusPhase = <T = string>(entity: K8sResourceKind): T => entity
  */
 export const getCreationTimestamp = (entity: K8sResourceCommon): string =>
   entity?.metadata?.creationTimestamp;
+
+export const haveSameNamespace = (resources: K8sResourceCommon[]) =>
+  haveSamePropValue(resources, getNamespace);
+
+export const haveSameCluster = (resources: K8sResourceCommon[]) =>
+  haveSamePropValue(resources, getCluster);
+
+export const haveSamePropValue = (
+  resources: K8sResourceCommon[],
+  getPropValue: (resource: K8sResourceCommon) => string,
+) => {
+  if (resources.length <= 1) {
+    return true;
+  }
+
+  const value = getPropValue(resources[0]);
+  return resources.every((resource) => getPropValue(resource) === value);
+};
