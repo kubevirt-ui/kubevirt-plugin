@@ -1,0 +1,14 @@
+.memory-density-slider {
+  .pf-v6-c-slider__value .pf-v6-c-form-control {
+    width: 70px;
+    min-width: 70px;
+    max-width: 70px;
+  }
+
+  .pf-v6-c-slider__value input[type='number'] {
+    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+}
