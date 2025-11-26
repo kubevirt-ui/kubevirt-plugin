@@ -38,7 +38,7 @@ export type VncConsoleProps = {
   viewOnly?: boolean;
 };
 
-export const VncConsole: FC<VncConsoleProps> = ({
+const VncConsole: FC<VncConsoleProps> = ({
   basePath,
   scaleViewport = true,
   setState,
