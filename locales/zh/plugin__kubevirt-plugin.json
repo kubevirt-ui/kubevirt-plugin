@@ -1546,6 +1546,7 @@
   "The upload process will continue after you close the modal.": "上传过程会在关闭模态后继续。",
   "The virtctl client is a supplemental command-line utility for managing virtualization resources from the command line.": "virtctl 客户端是用于管理 OpenShift Virtualization 资源的命令行实用程序。",
   "The VirtualMachine cannot be deleted if Deletion Protection is enabled to safeguard from accidental deletion. You can disable Deletion Protection at any time.": "如果启用了 Deletion Protection 来防止意外删除的情况，VirtualMachine 将无法被删除。您可以随时禁用删除保护。",
+  "The VirtualMachine is not running": "The VirtualMachine is not running",
   "The VirtualMachine is running": "VirtualMachine 正在运行",
   "The VirtualMachine will be bridged to the selected network, ideal for L2 devices": "虚拟机将被桥接到所选网络，适用于 L2 设备",
   "The VirtualMachine will have": "VirtualMachine 将有",

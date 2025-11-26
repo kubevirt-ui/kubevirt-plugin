@@ -1554,6 +1554,7 @@
   "The upload process will continue after you close the modal.": "El proceso de carga continuará después de cerrar el modal.",
   "The virtctl client is a supplemental command-line utility for managing virtualization resources from the command line.": "El cliente virtctl es una utilidad de línea de comandos complementaria para administrar recursos de virtualización desde la línea de comandos.",
   "The VirtualMachine cannot be deleted if Deletion Protection is enabled to safeguard from accidental deletion. You can disable Deletion Protection at any time.": "La VirtualMachine no se puede eliminar si la protección contra borrado está habilitada a fin de evitar el borrado accidental. Puede deshabilitarla en cualquier momento.",
+  "The VirtualMachine is not running": "The VirtualMachine is not running",
   "The VirtualMachine is running": "La VirtualMachine se está ejecutando",
   "The VirtualMachine will be bridged to the selected network, ideal for L2 devices": "La VirtualMachine se conectará a la red seleccionada, ideal para dispositivos L2.",
   "The VirtualMachine will have": "La VirtualMachine tendrá",
