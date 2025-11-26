@@ -1,0 +1,23 @@
+reviews:
+  profile: chill
+  high_level_summary: true
+  auto_review:
+    auto_incremental_review: true
+    enabled: true
+    drafts: false
+  sequence_diagrams: false
+  poem: false
+  path_filters:
+    - '!locales'
+  collapse_walkthrough: true
+
+knowledge_base:
+  code_guidelines:
+    enabled: true
+    filePatterns:
+      - '**/CODING_STANDARDS.md'
+
+chat:
+  integrations:
+    jira:
+      usage: enabled
