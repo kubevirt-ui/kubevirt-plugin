@@ -49,7 +49,7 @@ const ExpandSection: FC<ExpandSectionProps> = ({
       toggleContent={toggleContent}
       toggleText={toggleText}
     >
-      {children}
+      {isExpanded && children}
     </ExpandableSection>
   );
 };

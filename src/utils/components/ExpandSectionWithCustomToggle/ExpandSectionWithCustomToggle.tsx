@@ -93,6 +93,7 @@ const ExpandSectionWithCustomToggle: FC<ExpandSectionWithCustomToggleProps> = ({
           )}
         </Split>
       </StackItem>
+
       <StackItem>
         <ExpandableSection
           className={classNames(
@@ -106,7 +107,7 @@ const ExpandSectionWithCustomToggle: FC<ExpandSectionWithCustomToggleProps> = ({
           isIndented={isIndented}
           toggleId={toggleID}
         >
-          {children}
+          {isExpanded && children}
         </ExpandableSection>
       </StackItem>
     </Stack>
