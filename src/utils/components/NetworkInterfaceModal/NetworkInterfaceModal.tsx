@@ -1,4 +1,4 @@
-import React, { FC, ReactNode, useCallback, useEffect, useState } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -42,9 +42,7 @@ type NetworkInterfaceModalOnSubmit = {
 
 type NetworkInterfaceModalProps = {
   fixedName?: boolean;
-  Header?: ReactNode;
   headerText: string;
-  isEdit?: boolean;
   isOpen: boolean;
   namespace?: string;
   nicPresentation?: NetworkPresentation;
@@ -81,7 +79,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
   const [interfaceMACAddress, setInterfaceMACAddress] = useState(iface?.macAddress);
   const [macError, setMacError] = useState<boolean>(false);
   const [interfaceLinkState, setInterfaceLinkState] = useState<NetworkInterfaceState>(
-    !network ? NetworkInterfaceState.UP : getConfigInterfaceStateFromVM(vm, nicName),
+    network ? getConfigInterfaceStateFromVM(vm, nicName) : NetworkInterfaceState.UP,
   );
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -93,19 +91,14 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
   const isValid = nicName && networkName && !networkSelectError && !macError;
 
   const onSubmitModal = useCallback(() => {
-    return (
-      onSubmit &&
-      onSubmit({
-        interfaceLinkState: isLinkStateEditable(interfaceLinkState)
-          ? interfaceLinkState
-          : undefined,
-        interfaceMACAddress,
-        interfaceModel,
-        interfaceType,
-        networkName,
-        nicName,
-      })
-    );
+    return onSubmit?.({
+      interfaceLinkState: isLinkStateEditable(interfaceLinkState) ? interfaceLinkState : undefined,
+      interfaceMACAddress,
+      interfaceModel,
+      interfaceType,
+      networkName,
+      nicName,
+    });
   }, [
     nicName,
     networkName,
@@ -135,6 +128,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
         isEditing={Boolean(network) && Boolean(iface)}
         namespace={namespace || getNamespace(vm)}
         networkName={networkName}
+        nicName={nicName}
         setInterfaceType={setInterfaceType}
         setNetworkName={setNetworkName}
         setSubmitDisabled={setNetworkSelectError}
