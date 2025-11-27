@@ -13,9 +13,9 @@ import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { ResourceLink, Timestamp } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, Grid, GridItem, Title } from '@patternfly/react-core';
 
-import CheckupsNetworkStatusIcon from '../../CheckupsNetworkStatusIcon';
+import CheckupsStatusIcon from '../../CheckupsStatusIcon';
 import {
-  STATUS_COMPILATION_TIME_STAMP,
+  STATUS_COMPLETION_TIME_STAMP,
   STATUS_FAILURE_REASON,
   STATUS_START_TIME_STAMP,
 } from '../../utils/utils';
@@ -63,7 +63,7 @@ const CheckupsStorageDetailsPageSection: FC<CheckupsStorageDetailsPageSectionPro
               descriptionHeader={t('Name')}
             />
             <DescriptionItem
-              descriptionData={<CheckupsNetworkStatusIcon configMap={configMap} job={job} />}
+              descriptionData={<CheckupsStatusIcon configMap={configMap} job={job} />}
               descriptionHeader={t('Status')}
             />
             <DescriptionItem
@@ -139,7 +139,7 @@ const CheckupsStorageDetailsPageSection: FC<CheckupsStorageDetailsPageSectionPro
             <DescriptionItem
               descriptionData={
                 <Timestamp
-                  timestamp={configMap?.data?.[STATUS_COMPILATION_TIME_STAMP] || NO_DATA_DASH}
+                  timestamp={configMap?.data?.[STATUS_COMPLETION_TIME_STAMP] || NO_DATA_DASH}
                 />
               }
               descriptionHeader={t('Complete time')}

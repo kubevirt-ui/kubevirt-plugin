@@ -1,10 +1,10 @@
 import { ComponentClass } from 'react';
 
-import { Action } from '@openshift-console/dynamic-plugin-sdk';
+import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import { SVGIconProps } from '@patternfly/react-icons/dist/js/createIcon';
 
 export type VMActionIconDetails = {
-  action: Action;
+  action: ActionDropdownItemType;
   Icon: ComponentClass<SVGIconProps, any>;
   iconClassname?: string;
   isDisabled?: boolean;
