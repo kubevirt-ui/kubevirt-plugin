@@ -113,7 +113,7 @@ const ComputeMigrationModal: FC<ComputeMigrationModalProps> = ({ isOpen, onClose
         <Button isDisabled={isMigrateDisabled} isLoading={loading} onClick={initiateMigration}>
           {t('Migrate VirtualMachine')}
         </Button>
-        <Button onClick={onClose} size="sm" variant={ButtonVariant.link}>
+        <Button onClick={onClose} variant={ButtonVariant.link}>
           {t('Cancel')}
         </Button>
       </ModalFooter>

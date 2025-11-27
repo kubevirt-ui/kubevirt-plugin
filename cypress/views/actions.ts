@@ -10,7 +10,7 @@ export const CLONE = 'vm-action-clone';
 export const CONTROL_MENU = 'control-menu';
 export const MIGRATE_MENU = '[data-test-id="migration-menu"]';
 export const MIGRATE_COMPUTE = 'vm-action-migrate';
-export const BULK_MIGRATE = '[data-test-id="vms-bulk-migrate-storage"]';
+export const BULK_MIGRATE = '[data-test-id="selected-vms-action-migrate-storage"]';
 export const SNAPSHOT = 'vm-action-snapshot';
 export const CANCEL = 'vm-action-cancel-migrate';
 export const DELETE = 'vm-action-delete';

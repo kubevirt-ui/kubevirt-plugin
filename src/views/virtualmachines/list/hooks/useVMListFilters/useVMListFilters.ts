@@ -1,17 +1,11 @@
-import { useMemo } from 'react';
-
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
-import {
-  V1VirtualMachine,
-  V1VirtualMachineInstanceMigration,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils/constants';
 
-import { PVCMapper, VMIMapper, VMIMMapper } from '../../../utils/mappers';
-import { getLatestMigrationForEachVM } from '../../../utils/utils';
+import { PVCMapper, VMIMapper } from '../../../utils/mappers';
 import { getArchitectureFilter } from '../../utils/filters/getArchitectureFilter';
 import { getCPUFilter } from '../../utils/filters/getCPUFilter';
 import { getDateFilter } from '../../utils/filters/getDateFilter';
@@ -23,7 +17,6 @@ import { getNADsFilter } from '../../utils/filters/getNADsFilter';
 import { getOSFilter } from '../../utils/filters/getOSFilter';
 import { getSchedulingFilter } from '../../utils/filters/getSchedulingFilter';
 import { getStatusFilter } from '../../utils/filters/getStatusFilter';
-import { useVirtualMachineInstanceMapper } from '../useVirtualMachineInstanceMapper';
 
 import { useClusterFilter } from './useClusterFilter';
 import { useNodesFilter } from './useNodesFilter';
@@ -31,17 +24,13 @@ import { useProjectFilter } from './useProjectFilter';
 import { useStorageClassFilter } from './useStorageClassFilter';
 
 export const useVMListFilters = (
-  vmims: V1VirtualMachineInstanceMigration[],
+  vmiMapper: VMIMapper,
   pvcMapper: PVCMapper,
 ): {
   filtersWithSelect: RowFilter<V1VirtualMachine>[];
   hiddenFilters: RowFilter<V1VirtualMachine>[];
-  vmiMapper: VMIMapper;
-  vmimMapper: VMIMMapper;
 } => {
-  const vmiMapper = useVirtualMachineInstanceMapper();
   const isACMPage = useIsACMPage();
-  const vmimMapper: VMIMMapper = useMemo(() => getLatestMigrationForEachVM(vmims), [vmims]);
 
   const [vms] = useKubevirtWatchResource<V1VirtualMachine[]>({
     groupVersionKind: VirtualMachineModelGroupVersionKind,
@@ -91,7 +80,5 @@ export const useVMListFilters = (
       ipFilter,
       nadFilter,
     ],
-    vmiMapper,
-    vmimMapper,
   };
 };

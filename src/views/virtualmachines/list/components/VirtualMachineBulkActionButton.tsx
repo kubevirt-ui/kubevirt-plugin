@@ -5,19 +5,24 @@ import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsD
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useMultipleVirtualMachineActions from '@virtualmachines/actions/hooks/useMultipleVirtualMachineActions';
+import { VMIMMapper } from '@virtualmachines/utils/mappers';
 
 import useExistingSelectedVMs from '../hooks/useExistingSelectedVMs';
 
 type VirtualMachineBulkActionButtonProps = {
+  vmimMapper: VMIMMapper;
   vms: V1VirtualMachine[];
 };
 
-const VirtualMachineBulkActionButton: FC<VirtualMachineBulkActionButtonProps> = ({ vms }) => {
+const VirtualMachineBulkActionButton: FC<VirtualMachineBulkActionButtonProps> = ({
+  vmimMapper,
+  vms,
+}) => {
   const { t } = useKubevirtTranslation();
 
   const selectedVirtualMachines = useExistingSelectedVMs(vms);
 
-  const actions = useMultipleVirtualMachineActions(selectedVirtualMachines);
+  const actions = useMultipleVirtualMachineActions(selectedVirtualMachines, vmimMapper);
 
   return (
     <ActionsDropdown
