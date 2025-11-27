@@ -9,19 +9,25 @@ import { sortByDirection, universalComparator } from '@kubevirt-utils/utils/util
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { SortByDirection } from '@patternfly/react-table';
 
+import { CHECKUP_URLS } from './constants';
+
 export const KUBEVIRT_VM_LATENCY_LABEL = 'kiagnose/checkup-type';
 export const STATUS_TIMEOUT = 'spec.timeout';
 export const STATUS_START_TIME_STAMP = 'status.startTimestamp';
 export const STATUS_FAILURE_REASON = 'status.failureReason';
 export const STATUS_SUCCEEDED = 'status.succeeded';
-export const STATUS_COMPILATION_TIME_STAMP = 'status.completionTimestamp';
+export const STATUS_COMPLETION_TIME_STAMP = 'status.completionTimestamp';
 export const CONFIGMAP_NAME = 'CONFIGMAP_NAME';
+export const CONFIGMAP_NAMESPACE = 'CONFIGMAP_NAMESPACE';
+export const CREATE_RESULTS_RESOURCES = 'CREATE_RESULTS_RESOURCES';
 
 export const generateWithNumbers = (name: string): string =>
   `${name}-${Math.floor(Math.random() * 10000)}`;
 
-export const findObjectByName = <T extends K8sResourceCommon>(arr: T[], name: string): T =>
-  (arr || []).find((obj) => obj?.metadata?.name === name);
+export const findObjectByName = <T extends K8sResourceCommon>(
+  arr: T[],
+  name: string,
+): T | undefined => (arr || []).find((obj) => obj?.metadata?.name === name);
 
 export const columnsSorting = (
   data: IoK8sApiCoreV1ConfigMap[],
@@ -29,7 +35,7 @@ export const columnsSorting = (
   field: string,
   alternativeField = '',
 ) =>
-  data.sort((a, b) => {
+  data.toSorted((a, b) => {
     const aParam = a?.data?.[field] || a?.data?.[alternativeField];
     const bParam = b?.data?.[field] || b?.data?.[alternativeField];
 
@@ -40,57 +46,72 @@ export const trimLastHistoryPath = (pathName: Location['pathname']): string => {
   return pathName.endsWith('checkups') ? pathName : pathName.replace(/\/[^\/]*$/, '');
 };
 
-const getJobContainers = (job: IoK8sApiBatchV1Job): IoK8sApiCoreV1Container[] =>
+export const getJobContainers = (job: IoK8sApiBatchV1Job): IoK8sApiCoreV1Container[] =>
   job?.spec?.template?.spec?.containers;
 
 export const getJobByName = (
   jobs: IoK8sApiBatchV1Job[],
   configMapName: string,
+  exactMatch = true,
 ): IoK8sApiBatchV1Job[] =>
   (jobs || [])
-    ?.filter((job) => {
-      const envs = getJobContainers(job)
-        ?.map((containers) => containers?.env)
-        .flat();
-      const name = envs?.find((env) => env?.name == CONFIGMAP_NAME)?.value;
-      return name === configMapName && job;
+    .filter((job) => {
+      const configMapInfo = extractConfigMapName(job);
+      if (!configMapInfo) {
+        return false;
+      }
+
+      if (exactMatch) {
+        // For exact match, compare with the full CONFIGMAP_NAME value (including -<number>-results suffix)
+        return configMapInfo.fullName === configMapName;
+      } else {
+        // For non-exact match, compare with the base name (without -<number>-results suffix)
+        return configMapInfo.name === configMapName;
+      }
     })
     .sort((a, b) =>
       new Date(a.metadata.creationTimestamp) < new Date(b.metadata.creationTimestamp) ? 1 : -1,
     );
 
-export enum NetworkCheckupsStatus {
+export enum CheckupsStatus {
+  'Deleting' = 'deleting',
   'Done' = 'done',
   'Failed' = 'failed',
+  'Pending' = 'pending',
   'Running' = 'running',
 }
 
-export const getJobStatus = (job: IoK8sApiBatchV1Job): NetworkCheckupsStatus => {
-  if (job?.status?.succeeded === 1) return NetworkCheckupsStatus.Done;
+export const getJobStatus = (job?: IoK8sApiBatchV1Job): CheckupsStatus => {
+  if (!job) return CheckupsStatus.Pending;
 
-  if (job?.status?.active === 1) return NetworkCheckupsStatus.Running;
+  const { status } = job;
+  if (!status) return CheckupsStatus.Pending;
 
-  if (job?.status?.succeeded === 0 || job?.status?.failed === 1)
-    return NetworkCheckupsStatus.Failed;
+  if (status.succeeded && status.succeeded > 0) return CheckupsStatus.Done;
+  if (status.failed && status.failed > 0) return CheckupsStatus.Failed;
+  if (status.active && status.active > 0) return CheckupsStatus.Running;
+  if (status.terminating && status.terminating > 0) return CheckupsStatus.Deleting;
+
+  return CheckupsStatus.Pending;
 };
 
 export const getConfigMapStatus = (
-  configMap: IoK8sApiCoreV1ConfigMap,
-  jobStatus: NetworkCheckupsStatus,
-): NetworkCheckupsStatus => {
-  if (configMap?.data?.[STATUS_SUCCEEDED] === 'true') return NetworkCheckupsStatus.Done;
+  configMap: IoK8sApiCoreV1ConfigMap | undefined,
+  jobStatus: CheckupsStatus,
+): CheckupsStatus => {
+  if (configMap?.data?.[STATUS_SUCCEEDED] === 'true') return CheckupsStatus.Done;
 
-  if (configMap?.data?.[STATUS_SUCCEEDED] === 'false' || jobStatus === NetworkCheckupsStatus.Failed)
-    return NetworkCheckupsStatus.Failed;
+  if (configMap?.data?.[STATUS_SUCCEEDED] === 'false' || jobStatus === CheckupsStatus.Failed)
+    return CheckupsStatus.Failed;
 
-  if (configMap?.data?.[STATUS_SUCCEEDED] === undefined && jobStatus === NetworkCheckupsStatus.Done)
-    return NetworkCheckupsStatus.Failed;
+  if (configMap?.data?.[STATUS_SUCCEEDED] === undefined && jobStatus === CheckupsStatus.Done)
+    return CheckupsStatus.Failed;
 
-  if (
-    configMap?.data?.[STATUS_SUCCEEDED] === undefined &&
-    jobStatus === NetworkCheckupsStatus.Running
-  )
-    return NetworkCheckupsStatus.Running;
+  if (configMap?.data?.[STATUS_SUCCEEDED] === undefined && jobStatus === CheckupsStatus.Running)
+    return CheckupsStatus.Running;
+
+  // Default to Running if no other conditions match
+  return CheckupsStatus.Running;
 };
 
 export const getCheckupImageFromNewestJob = (jobs: IoK8sApiBatchV1Job[]): string => {
@@ -99,5 +120,59 @@ export const getCheckupImageFromNewestJob = (jobs: IoK8sApiBatchV1Job[]): string
       ?.filter((it) => it?.metadata?.creationTimestamp)
       .sort((a, b) => b.metadata.creationTimestamp.localeCompare(a.metadata.creationTimestamp)) ??
     [];
-  return newestJob?.spec?.template?.spec?.containers?.[0]?.image;
+  return getJobContainers(newestJob)?.[0]?.image;
+};
+
+/**
+ * Extracts the ConfigMap name and namespace from a Job's environment variables.
+ *
+ * The Job's CONFIGMAP_NAME env var contains the results ConfigMap name, which follows
+ * the pattern: `<baseName>-<number>-results` (e.g., "my-checkup-1234-results").
+ * The `-results` suffix is added when creating the self validation job (see `selfValidationJob`
+ * function), where the job name (with random number) is combined with "-results" to form
+ * the results ConfigMap name.
+ * This function extracts both the full name and the base name (without `-<number>-results` suffix).
+ *
+ * @param job - The Kubernetes Job to extract ConfigMap info from
+ * @returns An object with the full name, base name, and namespace, or null if not found
+ */
+export const extractConfigMapName = (
+  job: IoK8sApiBatchV1Job,
+): { fullName: string; name: string; namespace: string } | null => {
+  const containers = getJobContainers(job);
+  const envs = containers?.[0]?.env;
+  const configMapEnv = envs?.find((env) => env?.name === CONFIGMAP_NAME);
+  const configMapName = configMapEnv?.value;
+
+  if (!configMapName || !job.metadata?.namespace) {
+    return null;
+  }
+
+  const baseName = configMapName.replace(/-\d+-results$/, '');
+
+  return {
+    fullName: configMapName,
+    name: baseName,
+    namespace: job.metadata.namespace,
+  };
+};
+
+/**
+ * Determines the current checkup type from the URL pathname
+ * @param pathname - The current location pathname
+ * @returns The checkup type ('network' | 'storage' | 'self-validation') or null if not found
+ */
+export const getCurrentCheckupType = (
+  pathname: string,
+): 'network' | 'self-validation' | 'storage' | null => {
+  if (pathname.includes(`/${CHECKUP_URLS.NETWORK}`)) {
+    return CHECKUP_URLS.NETWORK as 'network';
+  }
+  if (pathname.includes(`/${CHECKUP_URLS.STORAGE}`)) {
+    return CHECKUP_URLS.STORAGE as 'storage';
+  }
+  if (pathname.includes(`/${CHECKUP_URLS.SELF_VALIDATION}`)) {
+    return CHECKUP_URLS.SELF_VALIDATION as 'self-validation';
+  }
+  return null;
 };

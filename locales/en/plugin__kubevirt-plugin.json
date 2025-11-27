@@ -504,6 +504,7 @@
   "Delete VirtualMachineInstancetype?": "Delete VirtualMachineInstancetype?",
   "Delete VirtualMachinePreference?": "Delete VirtualMachinePreference?",
   "Delete VirtualMachineSnapshot?": "Delete VirtualMachineSnapshot?",
+  "Deleting": "Deleting",
   "Deleting a network interface is supported only on VirtualMachines that were created in versions greater than 4.13.": "Deleting a network interface is supported only on VirtualMachines that were created in versions greater than 4.13.",
   "Deletion protection": "Deletion protection",
   "Deprecated": "Deprecated",
