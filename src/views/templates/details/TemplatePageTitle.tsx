@@ -6,9 +6,15 @@ import DetailsPageTitle from '@kubevirt-utils/components/DetailsPageTitle/Detail
 import PaneHeading from '@kubevirt-utils/components/PaneHeading/PaneHeading';
 import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
+import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useLastNamespacePath } from '@kubevirt-utils/hooks/useLastNamespacePath';
-import { isDeprecatedTemplate } from '@kubevirt-utils/resources/template';
+import {
+  getACMTemplateListURL,
+  getTemplateListURL,
+  isDeprecatedTemplate,
+} from '@kubevirt-utils/resources/template';
+import useIsACMPage from '@multicluster/useIsACMPage';
+import { useLastNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -33,7 +39,8 @@ const TemplatePageTitle: FC<TemplatePageTitleTitleProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const lastNamespacePath = useLastNamespacePath();
+  const [lastNamespace] = useLastNamespace();
+  const isACMPage = useIsACMPage();
   const { hasEditPermission, isCommonTemplate } = useEditTemplateAccessReview(template);
 
   const isSidebarEditorDisplayed = !location.pathname.includes(
@@ -46,8 +53,16 @@ const TemplatePageTitle: FC<TemplatePageTitleTitleProps> = ({ template }) => {
         <Breadcrumb>
           <BreadcrumbItem>
             <Button
+              onClick={() =>
+                navigate(
+                  isACMPage
+                    ? getACMTemplateListURL()
+                    : getTemplateListURL(
+                        lastNamespace === ALL_NAMESPACES_SESSION_KEY ? undefined : lastNamespace,
+                      ),
+                )
+              }
               isInline
-              onClick={() => navigate(`/k8s/${lastNamespacePath}/templates`)}
               variant={ButtonVariant.link}
             >
               {t('Templates')}

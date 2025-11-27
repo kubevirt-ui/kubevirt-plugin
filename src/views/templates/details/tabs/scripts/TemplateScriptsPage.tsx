@@ -1,6 +1,6 @@
 import React, { FC, useCallback } from 'react';
 
-import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { CloudInitDescription } from '@kubevirt-utils/components/CloudinitDescription/CloudInitDescription';
 import CloudinitModal from '@kubevirt-utils/components/CloudinitModal/CloudinitModal';
@@ -11,8 +11,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import {
   getTemplateVirtualMachineObject,
   replaceTemplateVM,
+  updateTemplate,
 } from '@kubevirt-utils/resources/template';
-import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Button,
   ButtonVariant,
@@ -43,27 +43,16 @@ const TemplateScriptsPage: FC<TemplateScriptsPageProps> = ({ obj: template }) =>
 
   const { createModal } = useModal();
 
-  const onSubmitTemplate = useCallback(
-    (updatedTemplate: V1Template) =>
-      k8sUpdate({
-        data: updatedTemplate,
-        model: TemplateModel,
-        name: updatedTemplate?.metadata?.name,
-        ns: updatedTemplate?.metadata?.namespace,
-      }),
-    [],
-  );
-
   const onUpdate = useCallback(
     async (updatedVM: V1VirtualMachine) => {
-      await onSubmitTemplate(replaceTemplateVM(template, updatedVM));
+      await updateTemplate(replaceTemplateVM(template, updatedVM));
     },
-    [onSubmitTemplate, template],
+    [template],
   );
 
   return (
     <PageSection>
-      <SidebarEditor<V1Template> onResourceUpdate={onSubmitTemplate} resource={template}>
+      <SidebarEditor<V1Template> onResourceUpdate={updateTemplate} resource={template}>
         <DescriptionList className="template-scripts-tab__description-list">
           <DescriptionItem
             descriptionHeader={

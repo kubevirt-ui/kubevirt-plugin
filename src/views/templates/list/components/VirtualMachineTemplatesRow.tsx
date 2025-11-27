@@ -12,7 +12,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { ClusterNamespacedResourceMap } from '@kubevirt-utils/resources/shared';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { isDeprecatedTemplate } from '@kubevirt-utils/resources/template';
+import { getTemplateURL, isDeprecatedTemplate } from '@kubevirt-utils/resources/template';
 import { ARCHITECTURE_ID, getArchitecture } from '@kubevirt-utils/utils/architecture';
 import { ManagedClusterModel } from '@multicluster/constants';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -58,11 +58,9 @@ const VirtualMachineTemplatesRow: React.FC<
     <>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-20" id="name">
         <Link
-          to={
-            isACMPage
-              ? `/k8s/cluster/${cluster}/ns/${namespace}/templates/${name}`
-              : `/k8s/ns/${namespace}/templates/${name}`
-          }
+          data-test={name}
+          data-test-id={name}
+          to={getTemplateURL(name, namespace, isACMPage ? cluster : undefined)}
         >
           <ResourceIcon groupVersionKind={modelToGroupVersionKind(TemplateModel)} />
           {name}

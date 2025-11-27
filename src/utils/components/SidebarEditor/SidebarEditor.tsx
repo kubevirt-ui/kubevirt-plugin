@@ -81,11 +81,14 @@ const SidebarEditor = <Resource extends K8sResourceCommon>({
     setEditableYAML(resourceYAML);
   };
 
+  const childrenComponent = useMemo(() => {
+    if (children instanceof Function) return children(editedResource ?? resource);
+    return children;
+  }, [children, editedResource, resource]);
+
   return (
     <Sidebar className="sidebar-editor" hasGutter hasNoBackground isPanelRight>
-      <SidebarContent>
-        {children instanceof Function ? children(editedResource ?? resource) : children}
-      </SidebarContent>
+      <SidebarContent>{childrenComponent}</SidebarContent>
       {showEditor && (
         <SidebarPanel
           className="sidebar-editor__panel"

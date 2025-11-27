@@ -121,7 +121,11 @@ const CloneTemplateModal: FC<CloneTemplateModalProps> = ({
         />
       </FormGroup>
       <FormGroup fieldId="namespace" label={t('Template project')}>
-        <SelectProject selectedProject={selectedProject} setSelectedProject={setSelectedProject} />
+        <SelectProject
+          cluster={getCluster(obj)}
+          selectedProject={selectedProject}
+          setSelectedProject={setSelectedProject}
+        />
         <FormGroupHelperText>{t('Project name to clone the template to')}</FormGroupHelperText>
       </FormGroup>
       <FormGroup fieldId="display-name" label={t('Template display name')}>

@@ -1,20 +1,20 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 import produce from 'immer';
 import { ANNOTATIONS } from 'src/views/templates/utils/constants';
 
-import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { updateTemplate } from '@kubevirt-utils/resources/template';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
-import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 
 import { TemplateDetailsGridProps } from '../TemplateDetailsPage';
 
 import DisplayNameModal from './DisplayNameModal';
 
-const DisplayName: React.FC<TemplateDetailsGridProps> = ({ editable, template }) => {
+const DisplayName: FC<TemplateDetailsGridProps> = ({ editable, template }) => {
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
   const displayName = template?.metadata?.annotations?.[ANNOTATIONS.displayName];
@@ -31,12 +31,7 @@ const DisplayName: React.FC<TemplateDetailsGridProps> = ({ editable, template })
       return templateDraft;
     });
 
-    return k8sUpdate({
-      data: updatedTemplate,
-      model: TemplateModel,
-      name: updatedTemplate?.metadata?.name,
-      ns: updatedTemplate?.metadata?.namespace,
-    });
+    return updateTemplate(updatedTemplate);
   };
 
   const onEditClick = () =>

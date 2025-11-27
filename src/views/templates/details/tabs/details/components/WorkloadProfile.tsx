@@ -13,7 +13,8 @@ import {
   WORKLOADS,
 } from '@kubevirt-utils/resources/template';
 import { getWorkload } from '@kubevirt-utils/resources/vm';
-import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 
 import { TemplateDetailsGridProps } from '../TemplateDetailsPage';
 
@@ -29,7 +30,8 @@ const WorkloadProfile: React.FC<TemplateDetailsGridProps> = ({ editable, templat
     const hasWorkload = getWorkload(template?.objects?.[vmObjectIndex]);
     const workloadPath = `/objects/${vmObjectIndex}/spec/template/metadata/annotations/vm.kubevirt.io~1workload`;
 
-    return k8sPatch({
+    return kubevirtK8sPatch({
+      cluster: getCluster(template),
       data: [
         {
           op: hasWorkload ? 'replace' : 'add',
