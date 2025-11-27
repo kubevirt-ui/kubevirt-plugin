@@ -7,9 +7,12 @@ import {
   createNetwork,
 } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getName } from '@kubevirt-utils/resources/shared';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
-import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 
 import { produceTemplateNetwork } from '../../utils';
 
@@ -64,11 +67,12 @@ const TemplatesEditNetworkInterfaceModal: FC<TemplatesEditNetworkInterfaceModalP
         ];
       });
 
-      return k8sUpdate({
+      return kubevirtK8sUpdate({
+        cluster: getCluster(template),
         data: updatedTemplate,
         model: TemplateModel,
-        name: updatedTemplate?.metadata?.name,
-        ns: updatedTemplate?.metadata?.namespace,
+        name: getName(updatedTemplate),
+        ns: getNamespace(updatedTemplate),
       });
     };
 

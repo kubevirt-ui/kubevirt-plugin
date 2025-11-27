@@ -1,11 +1,13 @@
 import produce from 'immer';
 
-import { TemplateParameter, V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { TemplateModel, TemplateParameter, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { getAnnotation } from '@kubevirt-utils/resources/shared';
+import { getAnnotation, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { vmBootDiskSourceIsRegistry } from '@kubevirt-utils/resources/vm/utils/source';
 import { generatePrettyName } from '@kubevirt-utils/utils/utils';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 
 import { ANNOTATIONS } from './annotations';
 import {
@@ -109,4 +111,14 @@ export const isValidTemplateIconUrl = (url: string): boolean => {
   }
 
   return false;
+};
+
+export const updateTemplate = (template: V1Template) => {
+  return kubevirtK8sUpdate({
+    cluster: getCluster(template),
+    data: template,
+    model: TemplateModel,
+    name: getName(template),
+    ns: getNamespace(template),
+  });
 };

@@ -4,6 +4,7 @@ import { modelToRef, TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import useSelectedRowFilterClusters from '@kubevirt-utils/hooks/useSelectedRowFilterClusters';
 import useSelectedRowFilterProjects from '@kubevirt-utils/hooks/useSelectedRowFilterProjects';
 import { ClusterNamespacedResourceMap } from '@kubevirt-utils/resources/shared';
@@ -38,8 +39,7 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
 }) => {
   const selectedClusters = useSelectedRowFilterClusters();
   const selectedProjects = useSelectedRowFilterProjects();
-
-  const namespace = selectedProjects.length === 1 ? selectedProjects?.[0] : undefined;
+  const namespaceParam = useNamespaceParam();
 
   const { t } = useKubevirtTranslation();
   const {
@@ -52,7 +52,7 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
     templates,
   } = useTemplatesWithAvailableSource({
     fieldSelector,
-    namespace,
+    namespace: namespaceParam,
     onlyAvailable: false,
     onlyDefault: false,
     selector,
@@ -69,7 +69,7 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
     name: { selected: [nameFilter] },
   });
 
-  const [columns, activeColumns, loadedColumns] = useVirtualMachineTemplatesColumns(namespace);
+  const [columns, activeColumns, loadedColumns] = useVirtualMachineTemplatesColumns(namespaceParam);
 
   const templatesLoaded = loaded && bootSourcesLoaded;
 

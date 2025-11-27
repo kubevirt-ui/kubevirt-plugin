@@ -1,10 +1,10 @@
-import React, { FC, useCallback } from 'react';
+import React, { FC } from 'react';
 
-import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
+import { updateTemplate } from '@kubevirt-utils/resources/template';
 import { Button, PageSection, Stack, StackItem, Title } from '@patternfly/react-core';
 
 import useEditTemplateAccessReview from '../../hooks/useIsTemplateEditable';
@@ -22,20 +22,9 @@ const TemplateNetwork: FC<TemplateNetworkProps> = ({ obj: template }) => {
   const { isTemplateEditable } = useEditTemplateAccessReview(template);
   const actionText = t('Add network interface');
 
-  const onSubmitTemplate = useCallback(
-    (updatedTemplate: V1Template) =>
-      k8sUpdate({
-        data: updatedTemplate,
-        model: TemplateModel,
-        name: updatedTemplate?.metadata?.name,
-        ns: updatedTemplate?.metadata?.namespace,
-      }),
-    [],
-  );
-
   return (
     <PageSection>
-      <SidebarEditor<V1Template> onResourceUpdate={onSubmitTemplate} resource={template}>
+      <SidebarEditor<V1Template> onResourceUpdate={updateTemplate} resource={template}>
         <Stack hasGutter>
           <Title headingLevel="h2">{t('Network interfaces')}</Title>
           <StackItem>

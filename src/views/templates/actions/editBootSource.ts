@@ -42,8 +42,11 @@ export const createDataVolume = (
   name: string,
   namespace: string,
   bootSource: V1beta1DataVolumeSpec,
+  cluster?: string,
 ): V1beta1DataVolume => {
   return produce(DATA_VOLUME, (draftDataVolume) => {
+    if (cluster) draftDataVolume.cluster = cluster;
+
     draftDataVolume.metadata = {
       ...draftDataVolume.metadata,
       name,

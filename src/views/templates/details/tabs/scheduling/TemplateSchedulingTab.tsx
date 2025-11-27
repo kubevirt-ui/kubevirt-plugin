@@ -1,9 +1,9 @@
-import React, { FC, useCallback } from 'react';
+import React, { FC } from 'react';
 
-import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
+import { updateTemplate } from '@kubevirt-utils/resources/template/utils';
 import { Grid, GridItem, PageSection, Title } from '@patternfly/react-core';
 
 import useEditTemplateAccessReview from '../../hooks/useIsTemplateEditable';
@@ -21,20 +21,9 @@ const TemplateSchedulingTab: FC<TemplateSchedulingTabProps> = ({ obj: template }
   const { isTemplateEditable } = useEditTemplateAccessReview(template);
   const { t } = useKubevirtTranslation();
 
-  const onSubmitTemplate = useCallback(
-    (updatedTemplate: V1Template) =>
-      k8sUpdate({
-        data: updatedTemplate,
-        model: TemplateModel,
-        name: updatedTemplate?.metadata?.name,
-        ns: updatedTemplate?.metadata?.namespace,
-      }),
-    [],
-  );
-
   return (
     <PageSection>
-      <SidebarEditor<V1Template> onResourceUpdate={onSubmitTemplate} resource={template}>
+      <SidebarEditor<V1Template> onResourceUpdate={updateTemplate} resource={template}>
         {(resource) => (
           <>
             <Title headingLevel="h2">{t('Scheduling and resource requirements')}</Title>

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
@@ -12,13 +12,18 @@ import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useLastNamespacePath } from '@kubevirt-utils/hooks/useLastNamespacePath';
-import { asAccessReview } from '@kubevirt-utils/resources/shared';
+import { asAccessReview, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import {
-  Action,
-  k8sDelete,
-  k8sPatch,
-  useAccessReview,
-} from '@openshift-console/dynamic-plugin-sdk';
+  getACMTemplateListURL,
+  getTemplateListURL,
+  getTemplateURL,
+} from '@kubevirt-utils/resources/template/utils';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sDelete, kubevirtK8sPatch } from '@multicluster/k8sRequests';
+import useIsACMPage from '@multicluster/useIsACMPage';
+import { Action } from '@openshift-console/dynamic-plugin-sdk';
+import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
+import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import useEditTemplateAccessReview from '../../details/hooks/useIsTemplateEditable';
 import {
@@ -45,39 +50,53 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
   const { hasEditPermission, isCommonTemplate } = useEditTemplateAccessReview(template);
   const { createModal } = useModal();
   const navigate = useNavigate();
-  const [bootDataSource, setBootDataSource] = React.useState<V1beta1DataSource>();
-  const [loadingBootSource, setLoadingBootSource] = React.useState(true);
+  const [bootDataSource, setBootDataSource] = useState<V1beta1DataSource>();
+  const [loadingBootSource, setLoadingBootSource] = useState(true);
   const editableBootSource = hasEditableBootSource(bootDataSource);
   const lastNamespacePath = useLastNamespacePath();
+  const [hubClusterName] = useHubClusterName();
+  const cluster = getCluster(template) || hubClusterName;
+  const isACMPage = useIsACMPage();
+  const baseTemplatePage = getTemplateURL(
+    getName(template),
+    getNamespace(template),
+    isACMPage ? cluster : undefined,
+  );
 
-  const [canDeleteTemplate] = useAccessReview({
-    namespace: template?.metadata?.namespace,
+  const [canDeleteTemplate] = useFleetAccessReview({
+    cluster,
+    namespace: getNamespace(template),
     resource: TemplateModel.plural,
     verb: 'delete',
   });
 
-  const [canWriteToDataSourceNs] = useAccessReview(
+  const [canWriteToDataSourceNs] = useFleetAccessReview(
     asAccessReview(
       DataVolumeModel,
       createDataVolume(
         bootDataSource?.spec?.source?.pvc?.name,
         bootDataSource?.spec?.source?.pvc?.namespace,
         {},
+        cluster,
       ),
       'create',
     ),
   );
 
-  const goToTemplatePage = React.useCallback(
-    (clonedTemplate: V1Template) => {
+  const goToTemplatePage = useCallback(
+    (currentTemplate: V1Template) => {
       navigate(
-        `/k8s/ns/${clonedTemplate.metadata.namespace}/templates/${clonedTemplate.metadata.name}`,
+        getTemplateURL(
+          getName(currentTemplate),
+          getNamespace(currentTemplate),
+          isACMPage ? cluster : undefined,
+        ),
       );
     },
-    [navigate],
+    [navigate, isACMPage, cluster],
   );
 
-  const onLazyActions = React.useCallback(async () => {
+  const onLazyActions = useCallback(async () => {
     if (!bootDataSource) {
       const dataSource = await getBootDataSource(template);
       setBootDataSource(dataSource);
@@ -86,18 +105,19 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
   }, [bootDataSource, template]);
 
   const onDelete = async () => {
-    await k8sDelete({
+    await kubevirtK8sDelete({
+      cluster,
       model: TemplateModel,
       resource: template,
-    }).then(() => navigate(`/k8s/${lastNamespacePath}/templates`));
+    }).then(() =>
+      navigate(isACMPage ? getACMTemplateListURL() : getTemplateListURL(lastNamespacePath)),
+    );
   };
 
   const actions = [
     {
       accessReview: asAccessReview(TemplateModel, template, 'patch'),
-      cta: () =>
-        // lead to the template details page
-        navigate(`/k8s/ns/${template.metadata.namespace}/templates/${template.metadata.name}`),
+      cta: () => goToTemplatePage(template),
       id: EDIT_TEMPLATE_ID,
       label: t('Edit'),
     },
@@ -117,10 +137,7 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
     },
     {
       accessReview: asAccessReview(TemplateModel, template, 'patch'),
-      cta: () =>
-        navigate(
-          `/k8s/ns/${template.metadata.namespace}/templates/${template.metadata.name}/disks`,
-        ),
+      cta: () => navigate(`${baseTemplatePage}/disks`),
       description:
         (isCommonTemplate && t('Red Hat template cannot be edited')) ||
         (!hasEditPermission && t(NO_EDIT_TEMPLATE_PERMISSIONS)),
@@ -156,7 +173,8 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
         createModal(({ isOpen, onClose }) => (
           <LabelsModal
             onLabelsSubmit={(labels) =>
-              k8sPatch({
+              kubevirtK8sPatch({
+                cluster,
                 data: [
                   {
                     op: 'replace',
@@ -186,7 +204,8 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
         createModal(({ isOpen, onClose }) => (
           <AnnotationsModal
             onSubmit={(updatedAnnotations) =>
-              k8sPatch({
+              kubevirtK8sPatch({
+                cluster,
                 data: [
                   {
                     op: 'replace',
