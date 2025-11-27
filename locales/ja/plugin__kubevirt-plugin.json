@@ -504,6 +504,7 @@
   "Delete VirtualMachineInstancetype?": "VirtualMachineInstancetype を削除しますか?",
   "Delete VirtualMachinePreference?": "VirtualMachinePreference を削除しますか?",
   "Delete VirtualMachineSnapshot?": "VirtualMachineSnapshot を削除しますか?",
+  "Deleting": "Deleting",
   "Deleting a network interface is supported only on VirtualMachines that were created in versions greater than 4.13.": "ネットワークインターフェイスの削除は、バージョン 4.13 以降で作成された VirtualMachine でのみサポートされています。",
   "Deletion protection": "削除保護",
   "Deprecated": "非推奨機能",

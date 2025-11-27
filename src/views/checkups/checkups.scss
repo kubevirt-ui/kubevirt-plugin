@@ -13,10 +13,18 @@
   }
 }
 
-.CheckupsNetworkStatusIcon {
+.CheckupsStatusIcon {
   &--main {
+    display: inline-flex;
+    align-items: center;
+
     .pf-v6-c-icon {
       margin-right: var(--pf-t--global--spacer--xs);
     }
   }
+}
+// Make tab content scrollable when there are many checkups
+.pf-v6-c-tab-content {
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
 }

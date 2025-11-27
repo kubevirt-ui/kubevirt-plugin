@@ -1,28 +1,39 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { Link } from 'react-router-dom-v5-compat';
 
 import { modelToGroupVersionKind, NamespaceModel } from '@kubevirt-ui/kubevirt-api/console';
+import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { ResourceLink, TableData, Timestamp } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  ResourceLink,
+  RowProps,
+  TableData,
+  Timestamp,
+} from '@openshift-console/dynamic-plugin-sdk';
 import { createURL } from '@virtualmachines/details/tabs/overview/utils/utils';
 
-import CheckupsNetworkStatusIcon from '../../CheckupsNetworkStatusIcon';
+import CheckupsStatusIcon from '../../CheckupsStatusIcon';
 import {
-  STATUS_COMPILATION_TIME_STAMP,
+  STATUS_COMPLETION_TIME_STAMP,
   STATUS_FAILURE_REASON,
   STATUS_START_TIME_STAMP,
 } from '../../utils/utils';
 import CheckupsStorageActions from '../components/CheckupsStorageActions';
 
-const CheckupsStorageListRow = ({
+type CheckupsStorageRowData = {
+  getJobByName: (configMapName: string) => IoK8sApiBatchV1Job[];
+};
+
+type CheckupsStorageListRowProps = RowProps<IoK8sApiCoreV1ConfigMap, CheckupsStorageRowData>;
+
+const CheckupsStorageListRow: FC<CheckupsStorageListRowProps> = ({
   activeColumnIDs,
   obj: configMap,
   rowData: { getJobByName },
-}: {
-  activeColumnIDs: any;
-  obj: any;
-  rowData: { getJobByName?: any };
 }) => {
+  const jobs = getJobByName(configMap?.metadata?.name);
+  const job = jobs?.[0];
+
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} id="name">
@@ -42,10 +53,7 @@ const CheckupsStorageListRow = ({
         />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="status">
-        <CheckupsNetworkStatusIcon
-          configMap={configMap}
-          job={getJobByName(configMap?.metadata?.name)?.[0]}
-        />
+        <CheckupsStatusIcon configMap={configMap} job={job} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="failure">
         {configMap?.data?.[STATUS_FAILURE_REASON] || NO_DATA_DASH}
@@ -54,14 +62,10 @@ const CheckupsStorageListRow = ({
         <Timestamp timestamp={configMap?.data?.[STATUS_START_TIME_STAMP]} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="complete-time">
-        <Timestamp timestamp={configMap?.data?.[STATUS_COMPILATION_TIME_STAMP]} />
+        <Timestamp timestamp={configMap?.data?.[STATUS_COMPLETION_TIME_STAMP]} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="">
-        <CheckupsStorageActions
-          configMap={configMap}
-          isKebab
-          jobs={getJobByName(configMap?.metadata?.name)}
-        />
+        <CheckupsStorageActions configMap={configMap} isKebab jobs={jobs} />
       </TableData>
     </>
   );
