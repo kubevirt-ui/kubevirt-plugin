@@ -10,16 +10,11 @@ import React, {
 } from 'react';
 
 import {
-  VirtualMachineInstanceMigrationModelGroupVersionKind,
   VirtualMachineInstanceModelGroupVersionKind,
   VirtualMachineModelGroupVersionKind,
   VirtualMachineModelRef,
 } from '@kubevirt-ui/kubevirt-api/console';
-import {
-  V1VirtualMachine,
-  V1VirtualMachineInstance,
-  V1VirtualMachineInstanceMigration,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ColumnManagement from '@kubevirt-utils/components/ColumnManagementModal/ColumnManagement';
 import { tourGuideVM } from '@kubevirt-utils/components/GuidedTour/utils/constants';
 import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
@@ -39,6 +34,8 @@ import { usePVCMapper } from '@kubevirt-utils/hooks/usePVCMapper';
 import useQuery from '@kubevirt-utils/hooks/useQuery';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getName } from '@kubevirt-utils/resources/shared';
+import useVirtualMachineInstanceMigrationMapper from '@kubevirt-utils/resources/vmim/hooks/useVirtualMachineInstanceMigrationMapper';
+import useVirtualMachineInstanceMigrations from '@kubevirt-utils/resources/vmim/hooks/useVirtualMachineInstanceMigrations';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { getCatalogURL } from '@multicluster/urls';
@@ -68,6 +65,7 @@ import { TEXT_FILTER_LABELS_ID } from './hooks/constants';
 import useExistingSelectedVMs from './hooks/useExistingSelectedVMs';
 import useFiltersFromURL from './hooks/useFiltersFromURL';
 import useVirtualMachineColumns from './hooks/useVirtualMachineColumns';
+import { useVirtualMachineInstanceMapper } from './hooks/useVirtualMachineInstanceMapper';
 import { useVMListFilters } from './hooks/useVMListFilters/useVMListFilters';
 import useVMMetrics from './hooks/useVMMetrics';
 import { VM_FILTER_OPTIONS, VMI_FILTER_OPTIONS } from './utils/constants';
@@ -126,21 +124,13 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
     searchQueries?.vmiQueries,
   );
 
+  const [vmims, vmimsLoaded] = useVirtualMachineInstanceMigrations(cluster, namespace);
+
+  const vmiMapper = useVirtualMachineInstanceMapper();
+  const vmimMapper = useVirtualMachineInstanceMigrationMapper(vmims);
   const pvcMapper = usePVCMapper(namespace, cluster);
 
-  const [vmims, vmimsLoaded] = useKubevirtWatchResource<V1VirtualMachineInstanceMigration[]>({
-    cluster,
-    groupVersionKind: VirtualMachineInstanceMigrationModelGroupVersionKind,
-    isList: true,
-    limit: OBJECTS_FETCHING_LIMIT,
-    namespace,
-    namespaced: true,
-  });
-
-  const { filtersWithSelect, hiddenFilters, vmiMapper, vmimMapper } = useVMListFilters(
-    vmims,
-    pvcMapper,
-  );
+  const { filtersWithSelect, hiddenFilters } = useVMListFilters(vmiMapper, pvcMapper);
 
   const filtersFromURL = useFiltersFromURL([...filtersWithSelect, ...hiddenFilters]);
 
@@ -251,7 +241,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
               <div className="list-managment-group">
                 <VirtualMachineSelection pagination={pagination} vms={filteredVMs} />
                 <Flex flexWrap={{ default: 'nowrap' }}>
-                  <VirtualMachineBulkActionButton vms={filteredVMs} />
+                  <VirtualMachineBulkActionButton vmimMapper={vmimMapper} vms={filteredVMs} />
                   <ColumnManagement
                     columnLayout={{
                       columns: columns?.map(({ additional, id, title }) => ({

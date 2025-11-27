@@ -1,5 +1,6 @@
 import React from 'react';
 
+import VirtualMachineInstanceMigrationModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstanceMigrationModel';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
@@ -11,13 +12,14 @@ import { getLabels, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import CrossClusterMigration from '@multicluster/components/CrossClusterMigration/CrossClusterMigration';
 import { CROSS_CLUSTER_MIGRATION_ACTION_ID } from '@multicluster/constants';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
 import ConfirmMultipleVMActionsModal from './components/ConfirmMultipleVMActionsModal/ConfirmMultipleVMActionsModal';
 import VirtualMachineMigrateModal from './components/VirtualMachineMigration/VirtualMachineMigrationModal';
 import { ACTIONS_ID } from './hooks/constants';
-import { deleteVM, pauseVM, restartVM, startVM, stopVM, unpauseVM } from './actions';
+import { deleteVM, migrateVM, pauseVM, restartVM, startVM, stopVM, unpauseVM } from './actions';
 import { getCommonLabels, getLabelsDiffPatch, isSameNamespace } from './utils';
 
 export const BulkVirtualMachineActionFactory = {
@@ -84,6 +86,32 @@ export const BulkVirtualMachineActionFactory = {
     id: ACTIONS_ID.EDIT_LABELS,
     label: t('Edit labels'),
   }),
+  migrateCompute: (
+    vms: V1VirtualMachine[],
+    createModal: (modal: ModalComponent) => void,
+  ): ActionDropdownItemType => ({
+    accessReview: {
+      cluster: getCluster(vms?.[0]),
+      group: VirtualMachineInstanceMigrationModel.apiGroup,
+      namespace: getNamespace(vms?.[0]),
+      resource: VirtualMachineInstanceMigrationModel.plural,
+      verb: 'create',
+    },
+    cta: () =>
+      createModal(({ isOpen, onClose }) => (
+        <ConfirmMultipleVMActionsModal
+          action={migrateVM}
+          actionType="Migrate"
+          isOpen={isOpen}
+          onClose={onClose}
+          vms={vms}
+        />
+      )),
+    description: t('Migrate VirtualMachines to a different Node'),
+    disabled: isEmpty(vms),
+    id: ACTIONS_ID.BULK_MIGRATE_COMPUTE,
+    label: t('Compute'),
+  }),
   migrateStorage: (
     vms: V1VirtualMachine[],
     createModal: (modal: ModalComponent) => void,
@@ -96,8 +124,8 @@ export const BulkVirtualMachineActionFactory = {
     },
     cta: () => createModal((props) => <VirtualMachineMigrateModal vms={vms} {...props} />),
     description: t('Migrate VirtualMachine storage to a different StorageClass'),
-    id: 'vms-bulk-migrate-storage',
-    label: t('Migrate storage'),
+    id: ACTIONS_ID.BULK_MIGRATE_STORAGE,
+    label: t('Storage'),
   }),
 
   moveToFolder: (

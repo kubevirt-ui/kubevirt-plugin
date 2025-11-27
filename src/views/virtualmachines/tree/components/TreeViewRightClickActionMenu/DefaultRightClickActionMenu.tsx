@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom-v5-compat';
 import classNames from 'classnames';
 
 import ActionDropdownItem from '@kubevirt-utils/components/ActionDropdownItem/ActionDropdownItem';
+import useVirtualMachineInstanceMigrationMapper from '@kubevirt-utils/resources/vmim/hooks/useVirtualMachineInstanceMigrationMapper';
+import useVirtualMachineInstanceMigrations from '@kubevirt-utils/resources/vmim/hooks/useVirtualMachineInstanceMigrations';
 import { Menu, MenuContent, MenuList, Popper } from '@patternfly/react-core';
 import useMultipleVirtualMachineActions from '@virtualmachines/actions/hooks/useMultipleVirtualMachineActions';
 import {
@@ -25,7 +27,9 @@ const DefaultRightClickActionMenu: FC<DefaultRightClickActionMenuProps> = ({
   const { cluster, namespace, prefix } = getElementComponentsFromID(triggerElement);
 
   const vms = getVMsTrigger(triggerElement);
-  const actions = useMultipleVirtualMachineActions(vms);
+  const [vmims] = useVirtualMachineInstanceMigrations(cluster, namespace);
+  const vmimMapper = useVirtualMachineInstanceMigrationMapper(vmims);
+  const actions = useMultipleVirtualMachineActions(vms, vmimMapper);
 
   const navigate = useNavigate();
 
