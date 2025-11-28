@@ -1,7 +1,8 @@
 import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
 import { V1Interface, V1Network, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 
 export type PatchItem<T> = {
   op: 'add' | 'remove' | 'replace' | 'test';
@@ -67,8 +68,25 @@ export const updateNetwork = ({
   currentValue: V1Network;
   index: number;
   nextValue: V1Network;
-}): PatchItem<V1Network>[] =>
-  mergeAndUpdateAtIndex({ currentValue, index, nextValue, path: NETWORK_PATH });
+}): PatchItem<V1Network>[] => {
+  const replaceValue: V1Network = { ...currentValue, ...nextValue };
+
+  if (!nextValue.pod) delete replaceValue.pod;
+  if (!nextValue.multus) delete replaceValue.multus;
+
+  return [
+    {
+      op: 'test',
+      path: `${NETWORK_PATH}/${index}`,
+      value: currentValue,
+    },
+    {
+      op: 'replace',
+      path: `${NETWORK_PATH}/${index}`,
+      value: replaceValue,
+    },
+  ];
+};
 
 export const updateInterface = ({
   currentValue,
@@ -78,31 +96,26 @@ export const updateInterface = ({
   currentValue: V1Interface;
   index: number;
   nextValue: V1Interface;
-}): PatchItem<V1Interface>[] =>
-  mergeAndUpdateAtIndex({ currentValue, index, nextValue, path: INTERFACE_PATH });
+}): PatchItem<V1Interface>[] => {
+  const replaceValue: V1Interface = { ...currentValue, ...nextValue };
 
-export const mergeAndUpdateAtIndex = <T>({
-  currentValue,
-  index,
-  nextValue,
-  path,
-}: {
-  currentValue: T;
-  index: number;
-  nextValue: T;
-  path: string;
-}): PatchItem<T>[] => [
-  {
-    op: 'test',
-    path: `${path}/${index}`,
-    value: currentValue,
-  },
-  {
-    op: 'replace',
-    path: `${path}/${index}`,
-    value: { ...currentValue, ...nextValue },
-  },
-];
+  if (!nextValue.bridge) delete replaceValue.bridge;
+  if (!nextValue.masquerade) delete replaceValue.masquerade;
+  if (!nextValue.sriov) delete replaceValue.sriov;
+
+  return [
+    {
+      op: 'test',
+      path: `${INTERFACE_PATH}/${index}`,
+      value: currentValue,
+    },
+    {
+      op: 'replace',
+      path: `${INTERFACE_PATH}/${index}`,
+      value: replaceValue,
+    },
+  ];
+};
 
 export const removeNetwork = ({
   index,
@@ -142,7 +155,8 @@ export const removeAtIndex = <T>({
 ];
 
 export const patchVM = (vm: V1VirtualMachine, items: PatchItem<unknown>[]) =>
-  k8sPatch({
+  kubevirtK8sPatch({
+    cluster: getCluster(vm),
     data: items,
     model: VirtualMachineModel,
     resource: vm,
