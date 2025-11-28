@@ -6,6 +6,8 @@ import {
   ARCHITECTURE_LABEL,
   ARCHITECTURE_TITLE,
 } from '@kubevirt-utils/utils/architecture';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { K8sResourceCommon, TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 import { sortable } from '@patternfly/react-table';
 
@@ -13,6 +15,8 @@ const useVirtualMachineTemplatesColumns = (
   namespace: string,
 ): [TableColumn<K8sResourceCommon>[], TableColumn<K8sResourceCommon>[], boolean] => {
   const { t } = useKubevirtTranslation();
+  const isACMPage = useIsACMPage();
+  const clusterParam = useClusterParam();
 
   const columns = [
     {
@@ -22,6 +26,17 @@ const useVirtualMachineTemplatesColumns = (
       title: t('Name'),
       transforms: [sortable],
     },
+    ...(isACMPage && !clusterParam
+      ? [
+          {
+            id: 'cluster',
+            props: { className: 'pf-m-width-10' },
+            sort: 'cluster',
+            title: t('Cluster'),
+            transforms: [sortable],
+          },
+        ]
+      : []),
     {
       id: ARCHITECTURE_ID,
       props: { className: 'pf-m-width-10' },

@@ -1,5 +1,6 @@
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 
 import { isCommonVMTemplate } from '../../utils/utils';
 
@@ -20,14 +21,16 @@ const useEditTemplateAccessReview = (
   isTemplateEditable: boolean;
 } => {
   const isCommonTemplate = isCommonVMTemplate(template);
-  const [canUpdateTemplate, canUpdateLoading] = useAccessReview({
+  const [canUpdateTemplate, canUpdateLoading] = useFleetAccessReview({
+    cluster: getCluster(template),
     group: TemplateModel.apiGroup,
     namespace: template?.metadata?.namespace,
     resource: TemplateModel.plural,
     verb: 'update',
   });
 
-  const [canPatchTemplate, canPatchLoading] = useAccessReview({
+  const [canPatchTemplate, canPatchLoading] = useFleetAccessReview({
+    cluster: getCluster(template),
     group: TemplateModel.apiGroup,
     namespace: template?.metadata?.namespace,
     resource: TemplateModel.plural,

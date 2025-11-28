@@ -2,13 +2,13 @@ import React, { FC, MouseEventHandler, useCallback, useEffect, useState } from '
 import { useNavigate } from 'react-router-dom-v5-compat';
 import { useImmer } from 'use-immer';
 
-import { TemplateModel, TemplateParameter, V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { TemplateParameter, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { updateTemplate } from '@kubevirt-utils/resources/template';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import {
   ActionGroup,
   Alert,
@@ -65,10 +65,7 @@ const TemplateParametersPage: FC<TemplateParametersPageProps> = ({ obj: template
     event.preventDefault();
     setLoading(true);
     try {
-      await k8sUpdate({
-        data: editableTemplate,
-        model: TemplateModel,
-      });
+      await updateTemplate(editableTemplate);
       setSuccess(true);
     } catch (apiError) {
       setError(apiError);

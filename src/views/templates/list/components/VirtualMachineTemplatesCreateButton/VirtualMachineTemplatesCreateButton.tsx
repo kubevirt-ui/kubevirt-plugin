@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
-import { modelToRef, TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
+import { TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useListClusters from '@kubevirt-utils/hooks/useListClusters';
@@ -33,7 +33,7 @@ const VirtualMachineTemplatesCreateButton: FC = () => {
       onClick={() => {
         navigate(
           isACMPage
-            ? `/k8s/cluster/${cluster}/ns/${namespace}/${modelToRef(TemplateModel)}/~new`
+            ? `/k8s/cluster/${cluster}/ns/${namespace}/templates/~new`
             : `/k8s/ns/${namespace}/templates/~new`,
         );
       }}

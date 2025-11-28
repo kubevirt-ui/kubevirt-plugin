@@ -1,10 +1,9 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import BootOrderItem from 'src/views/templates/details/tabs/details/components/BootOrderItem';
 import BootSource from 'src/views/templates/details/tabs/details/components/BootSource';
 import { TemplateDetailsGridProps } from 'src/views/templates/details/tabs/details/TemplateDetailsPage';
 import { getTemplateProviderName } from 'src/views/templates/utils/selectors';
 
-import { TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import AdditionalResources from '@kubevirt-utils/components/AdditionalResources/AdditionalResources';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
@@ -14,9 +13,9 @@ import {
   getTemplateSupportLevel,
   getTemplateVirtualMachineObject,
   replaceTemplateVM,
+  updateTemplate,
 } from '@kubevirt-utils/resources/template';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList } from '@patternfly/react-core';
 
 import useEditTemplateAccessReview from '../../../hooks/useIsTemplateEditable';
@@ -29,14 +28,12 @@ const TemplateDetailsRightGrid: React.FC<TemplateDetailsGridProps> = ({ template
     ? getTemplateProviderName(template)?.trim()
     : t('Not available');
 
-  const onSubmit = async (updatedVM: V1VirtualMachine) => {
-    await k8sUpdate({
-      data: replaceTemplateVM(template, updatedVM),
-      model: TemplateModel,
-      name: template?.metadata?.name,
-      ns: template?.metadata?.namespace,
-    });
-  };
+  const onSubmit = useCallback(
+    async (updatedVM: V1VirtualMachine) => {
+      await updateTemplate(replaceTemplateVM(template, updatedVM));
+    },
+    [template],
+  );
 
   return (
     <DescriptionList>

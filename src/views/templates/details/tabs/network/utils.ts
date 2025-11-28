@@ -11,7 +11,8 @@ import {
 import { getInterface } from '@kubevirt-utils/resources/vm';
 import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 
 export const produceTemplateNetwork = (
   template: V1Template,
@@ -37,7 +38,8 @@ export const setTemplateNetworkInterfaceState = (
     interfaceToUpdate.state = desiredState;
   });
 
-  return k8sUpdate({
+  return kubevirtK8sUpdate({
+    cluster: getCluster(template),
     data: updatedTemplate,
     model: TemplateModel,
   }).catch((error) => kubevirtConsole.error(error));

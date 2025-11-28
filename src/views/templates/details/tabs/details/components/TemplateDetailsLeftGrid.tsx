@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 
 import { TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
 import DescriptionItemAnnotations from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemAnnotations';
+import DescriptionItemCluster from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemCluster';
 import DescriptionItemCreatedAt from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemCreatedAt';
 import DescriptionItemDescription from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemDescription';
 import DescriptionItemLabels from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemLabels';
@@ -33,6 +34,7 @@ const TemplateDetailsLeftGrid: FC<TemplateDetailsGridProps> = ({ template }) => 
   return (
     <DescriptionList>
       <DescriptionItemName model={TemplateModel} resource={template} />
+      <DescriptionItemCluster resource={template} />
       <DescriptionItemNamespace model={TemplateModel} resource={template} />
       <DescriptionItemLabels
         editable={isTemplateEditable}
