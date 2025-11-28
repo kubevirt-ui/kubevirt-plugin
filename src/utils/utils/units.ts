@@ -70,9 +70,9 @@ export const readableSizeUnit = (combinedStr: string): string => {
   return !value ? combinedStr : `${value} ${toIECUnit(unit)}`;
 };
 
-const extractUnitFromQuantityString = (quantityString: string): null | string => {
+const extractUnitFromQuantityString = (quantityString?: string): null | string => {
   const unitRegex = /[a-zA-Z]+$/; // Matches alphabetic characters at the end of the string
-  const match = quantityString.match(unitRegex);
+  const match = quantityString?.match(unitRegex);
   return match ? match[0] : null;
 };
 
