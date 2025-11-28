@@ -2,7 +2,7 @@ import React from 'react';
 import { TFunction } from 'react-i18next';
 
 import { interfaceTypesProxy } from '@kubevirt-utils/resources/vm/utils/network/constants';
-import { getDNS1120LabelError } from '@kubevirt-utils/utils/validation';
+import { getDNS1123LabelError } from '@kubevirt-utils/utils/validation';
 import { HelperText, HelperTextItem, Label, SelectOptionProps } from '@patternfly/react-core';
 import { InfoIcon } from '@patternfly/react-icons';
 
@@ -39,7 +39,7 @@ export const getCreateNetworkOption = (input: string, t: TFunction): SelectOptio
     // both namespace and NAD name are DNS labels
     input
       .split('/')
-      .map((part) => getDNS1120LabelError(part))
+      .map((part) => getDNS1123LabelError(part))
       .find((getMsg) => getMsg);
   if (getErrorMsg) {
     return {

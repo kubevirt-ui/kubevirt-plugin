@@ -495,3 +495,7 @@ export const getStatusPhase = <T = string>(entity: K8sResourceKind): T => entity
  */
 export const getCreationTimestamp = (entity: K8sResourceCommon): string =>
   entity?.metadata?.creationTimestamp;
+
+export const getLongestNameLength = (resources: K8sResourceCommon[]): number => {
+  return Math.max(...(resources || []).map((resource) => getName(resource)?.length ?? 0));
+};
