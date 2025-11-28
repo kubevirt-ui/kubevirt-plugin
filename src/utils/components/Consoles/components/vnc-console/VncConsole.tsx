@@ -2,6 +2,7 @@
 import React, { Dispatch, FC, memo, useCallback, useEffect, useRef } from 'react';
 
 import RFBCreate from '@novnc/novnc/lib/rfb';
+import { initLogging } from '@novnc/novnc/lib/util/logging';
 
 import { INSECURE, SECURE } from '../../utils/constants';
 import { isConnectionEncrypted } from '../../utils/utils';
@@ -86,16 +87,33 @@ export const VncConsole: FC<VncConsoleProps> = ({
         window.location.hostname
       }:${port}${path}?preserveSession=${Boolean(preserveSession).toString()}`;
       const rfbInst = new RFBCreate(staticRenderLocationRef.current, url);
-      rfbInst.addEventListener(
-        'connect',
-        () => sessionID === sessionRef.current && setVncState(() => ({ state: connected })),
-      );
+      rfbInst.addEventListener('connect', (args) => {
+        console.log('vnc connect', args);
+        sessionID === sessionRef.current && setVncState(() => ({ state: connected }));
+      });
       rfbInst.addEventListener('disconnect', (args) => {
+        console.log(`vnc disconnect ${args}`, args);
         // prevent disconnect for old session to interact with current connection attempt
         if (sessionID === sessionRef.current) {
           postDisconnectCleanup(isSessionAlreadyInUse(args));
         }
       });
+
+      const rfbOnClose = rfbInst._socketClose.bind(rfbInst);
+      rfbInst._sock.on('close', (args) => {
+        console.log(`vnc onclose ${args}`, args);
+        rfbOnClose(args);
+        if (args.code === 1006) {
+          setVncState(() => ({ state: ConsoleState.session_already_in_use }));
+        }
+      });
+      // other errors
+      rfbInst._sock.on('error', (args) => console.log(`vnc onerror ${args}`, args));
+      window.addEventListener('unhandledrejection', (args) => console.log('vnc window', args));
+      rfbInst.addEventListener('serververification', (args) => console.log('vnc server', args));
+      rfbInst.addEventListener('credentialsrequired', (args) => console.log('vnc cred', args));
+      rfbInst.addEventListener('securityfailure', (args) => console.log('vnc sec', args));
+
       rfbInst.viewOnly = viewOnly;
       rfbInst.scaleViewport = scaleViewport;
 
@@ -131,6 +149,7 @@ export const VncConsole: FC<VncConsoleProps> = ({
   // auto-connect only on first load
   useEffect(() => {
     if (!rfbRef.current) {
+      initLogging('debug');
       connect();
       setVncState((prev) => ({
         actions: {
