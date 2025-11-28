@@ -354,6 +354,7 @@
   "Completed": "Terminado",
   "Completion time": "Hora de finalización",
   "Completion timeout": "Tiempo de espera de finalización",
+  "CompletionTimeoutPerGiB": "CompletionTimeoutPerGiB",
   "CompletionTimeoutPerGiB is the maximum number of seconds per GiB a migration is allowed to take. If a live-migration takes longer to migrate than this value multiplied by the size of the VMI, the migration will be cancelled, unless AllowPostCopy is true. Defaults to 800.": "CompletionTimeoutPerGiB es la cantidad máxima de segundos por GiB que puede tomar una migración. Si una migración en vivo tarda más en migrar que este valor multiplicado por el tamaño de la VMI, la migración se cancela, a menos que AllowPostCopy sea true (verdadero). El valor predeterminado es 800.",
   "Compute": "Calcular",
   "Compute compatibility": "Compatibilidad de cálculos",

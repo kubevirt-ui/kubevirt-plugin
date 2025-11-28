@@ -349,6 +349,7 @@
   "Completed": "完了済み",
   "Completion time": "完了時刻",
   "Completion timeout": "完了タイムアウト",
+  "CompletionTimeoutPerGiB": "CompletionTimeoutPerGiB",
   "CompletionTimeoutPerGiB is the maximum number of seconds per GiB a migration is allowed to take. If a live-migration takes longer to migrate than this value multiplied by the size of the VMI, the migration will be cancelled, unless AllowPostCopy is true. Defaults to 800.": "CompletionTimeoutPerGiB は、移行に許可される GiB あたりの最大秒数です。ライブマイグレーションの移行に、この値に VMI のサイズを掛けた値よりも長い時間がかかる場合、AllowPostCopy が true でない限り、移行はキャンセルされます。デフォルトは 800 です。",
   "Compute": "コンピュート",
   "Compute compatibility": "コンピュートの互換性",
