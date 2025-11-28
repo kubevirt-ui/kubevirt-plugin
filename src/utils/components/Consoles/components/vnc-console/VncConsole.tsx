@@ -2,10 +2,11 @@
 import React, { Dispatch, FC, memo, useCallback, useEffect, useRef } from 'react';
 
 import RFBCreate from '@novnc/novnc/lib/rfb';
+import { consoleFetchText } from '@openshift-console/dynamic-plugin-sdk';
 
 import { INSECURE, SECURE } from '../../utils/constants';
 import { isConnectionEncrypted } from '../../utils/utils';
-import { ConsoleState, VNC_CONSOLE_TYPE, WS, WSS } from '../utils/ConsoleConsts';
+import { ConsoleState, HTTP, HTTPS, VNC_CONSOLE_TYPE, WS, WSS } from '../utils/ConsoleConsts';
 import { ConsoleComponentState } from '../utils/types';
 
 import { isSessionAlreadyInUse } from './utils/util';
@@ -37,6 +38,21 @@ export type VncConsoleProps = {
   setState: Dispatch<React.SetStateAction<ConsoleComponentState>>;
   viewOnly?: boolean;
 };
+
+const buildUrl = ({
+  hostname,
+  path,
+  port,
+  preserveSession,
+  protocol,
+}: {
+  hostname: string;
+  path: string;
+  port: string;
+  preserveSession: boolean;
+  protocol: string;
+}): string =>
+  `${protocol}://${hostname}:${port}${path}?preserveSession=${Boolean(preserveSession).toString()}`;
 
 export const VncConsole: FC<VncConsoleProps> = ({
   basePath,
@@ -75,27 +91,64 @@ export const VncConsole: FC<VncConsoleProps> = ({
   }, [postDisconnectCleanup]);
 
   const connect = useCallback(
-    (preserveSession = true) => {
+    (preserveSession: boolean = true) => {
+      let abnormalDisconnect = false;
       setVncState(() => ({ state: connecting }));
       const sessionID = ++sessionRef.current;
+      // prevent disconnect for old session to interact with current connection attempt
+      const isMySession = () => sessionID === sessionRef.current;
 
       const isEncrypted = isConnectionEncrypted();
       const path = `${basePath}/vnc`;
       const port = window.location.port || (isEncrypted ? SECURE : INSECURE);
-      const url = `${isEncrypted ? WSS : WS}://${
-        window.location.hostname
-      }:${port}${path}?preserveSession=${Boolean(preserveSession).toString()}`;
+      const url = buildUrl({
+        hostname: window.location.hostname,
+        path,
+        port,
+        preserveSession,
+        protocol: isEncrypted ? WSS : WS,
+      });
       const rfbInst = new RFBCreate(staticRenderLocationRef.current, url);
       rfbInst.addEventListener(
         'connect',
-        () => sessionID === sessionRef.current && setVncState(() => ({ state: connected })),
+        () => isMySession() && setVncState(() => ({ state: connected })),
       );
-      rfbInst.addEventListener('disconnect', (args) => {
-        // prevent disconnect for old session to interact with current connection attempt
-        if (sessionID === sessionRef.current) {
-          postDisconnectCleanup(isSessionAlreadyInUse(args));
+      rfbInst.addEventListener('disconnect', () => {
+        if (isMySession() && !abnormalDisconnect) {
+          postDisconnectCleanup(false);
         }
       });
+
+      // noVNC's public API (disconnect event) does not expose error codes.
+      // To detect specific WebSocket close codes we need to add our own callback.
+      // The original callback will be called inside the wrapper.
+      // Note that clean-up is not affected (will be performed by rfb as before).
+      const rfbSocketClose = rfbInst._socketClose.bind(rfbInst);
+      rfbInst._sock.on('close', (args) => {
+        // 1006 code === connection was closed abnormally
+        // triggered by 5xx HTTP server error
+        abnormalDisconnect = args.code === 1006;
+        rfbSocketClose(args);
+
+        if (!abnormalDisconnect) {
+          //continue standard disconnect flow
+          return;
+        }
+        // try HTTP request to the same url as websockets
+        // if it fails with specific error message then VNC is in use
+        consoleFetchText(
+          buildUrl({
+            hostname: window.location.hostname,
+            path,
+            port,
+            preserveSession,
+            protocol: isEncrypted ? HTTPS : HTTP,
+          }),
+        )
+          .then(() => isMySession() && postDisconnectCleanup(false))
+          .catch((error) => isMySession() && postDisconnectCleanup(isSessionAlreadyInUse(error)));
+      });
+
       rfbInst.viewOnly = viewOnly;
       rfbInst.scaleViewport = scaleViewport;
 
