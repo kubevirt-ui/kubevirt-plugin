@@ -1,4 +1,5 @@
 {
+  " (NIC)": " (NIC)",
   " {{sockets}} sockets, {{threads}} threads, and {{cores}} cores.": " {{sockets}} 소켓, {{threads}} 스레드 및 {{cores}} 코어.",
   " Adding hot plugged disk": " 핫 플러그 디스크 추가",
   " in namespace <2>{{objNamespace}}</2>?": " 네임스페이스 <2>{{objNamespace}}</2>에 있습니까?",
@@ -1580,6 +1581,7 @@
   "This field is required": "이 필드는 필수입니다",
   "This interface is currently hot-unplugged until the VirtualMachine is migrated": "이 인터페이스는 VirtualMachine가 마이그레이션될 때까지 현재 핫 언플러그 상태입니다.",
   "This is a CD-ROM boot source": "CD-ROM 부팅 소스입니다",
+  "This is a network interface (NIC)": "This is a network interface (NIC)",
   "This is an ISO file": "ISO 파일입니다",
   "This key will override the SSH key secret set on the template": "이 키는 템플릿에 설정된 SSH 키 시크릿을 재정의합니다.",
   "This Persistent Volume Claim will be created using a DataVolume through Containerized Data Importer (CDI)": "이 영구 볼륨 클레임은 CDI (Containerized Data Importer)를 통해 DataVolume을 사용하여 생성됩니다.",

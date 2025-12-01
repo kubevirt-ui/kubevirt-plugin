@@ -1,4 +1,5 @@
 {
+  " (NIC)": " (NIC)",
   " {{sockets}} sockets, {{threads}} threads, and {{cores}} cores.": " {{sockets}} ソケット、{{threads}} スレッド、{{cores}} コア。",
   " Adding hot plugged disk": " ホットプラグディスクの追加",
   " in namespace <2>{{objNamespace}}</2>?": " namespace <2>{{objNamespace}}</2> にありますか?",
@@ -1580,6 +1581,7 @@
   "This field is required": "このフィールドは必須です",
   "This interface is currently hot-unplugged until the VirtualMachine is migrated": "このインターフェイスは、VirtualMachine が移行されるまでホットアンプラグされています",
   "This is a CD-ROM boot source": "これは CD-ROM ブートソースです",
+  "This is a network interface (NIC)": "This is a network interface (NIC)",
   "This is an ISO file": "これは ISO ファイルです",
   "This key will override the SSH key secret set on the template": "このキーはテンプレートに設定された SSH キーシークレットをオーバーライドします",
   "This Persistent Volume Claim will be created using a DataVolume through Containerized Data Importer (CDI)": "この永続ボリューム要求は、Containerized Data Importer (CDI) で DataVolume を使用して作成されます",
