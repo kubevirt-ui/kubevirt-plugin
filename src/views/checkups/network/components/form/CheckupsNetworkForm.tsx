@@ -75,11 +75,13 @@ const CheckupsNetworkForm = () => {
               setNodeSource={setNodeSource}
               setNodeTarget={setNodeTarget}
             />
-            <CheckupImageField
-              checkupImage={checkupImage}
-              checkupImageLoaded={checkupImageLoaded}
-              checkupImageLoadError={checkupImageLoadError}
-            />
+            {checkupImageLoadError && (
+              <CheckupImageField
+                checkupImage={checkupImage}
+                checkupImageLoaded={checkupImageLoaded}
+                checkupImageLoadError={checkupImageLoadError}
+              />
+            )}
             <CheckupsNetworkFormActions
               checkupImage={checkupImage}
               desiredLatency={desiredLatency}

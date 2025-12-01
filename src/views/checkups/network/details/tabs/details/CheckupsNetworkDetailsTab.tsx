@@ -10,10 +10,10 @@ import useCheckupsNetworkData from '../../../hooks/useCheckupsNetworkData';
 import CheckupsNetworkDetailsPageSection from './CheckupsNetworkDetailsPageSection';
 
 const CheckupsNetworkDetailsTab: FC = () => {
-  const { vmName } = useParams<{ vmName: string }>();
-  const { configMaps, error, jobs, loading } = useCheckupsNetworkData();
+  const { checkupName } = useParams<{ checkupName: string }>();
+  const { configMaps, error, jobs, loaded } = useCheckupsNetworkData();
 
-  const configMap = configMaps.find((cm) => cm.metadata.name === vmName);
+  const configMap = configMaps.find((cm) => cm.metadata.name === checkupName);
   const jobMatches = getJobByName(jobs, configMap?.metadata?.name);
 
   return (
@@ -23,7 +23,7 @@ const CheckupsNetworkDetailsTab: FC = () => {
         <Divider />
       </PageSection>
       <PageSection>
-        <CheckupsDetailsPageHistory error={error} jobs={jobMatches} loading={loading} />
+        <CheckupsDetailsPageHistory error={error} jobs={jobMatches} loaded={loaded} />
       </PageSection>
     </>
   );
