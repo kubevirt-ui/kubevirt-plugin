@@ -44,15 +44,15 @@ const MemoryDensity: FC<MemoryDensityProps> = ({ hyperConvergeConfiguration, new
 
   const currentOvercommit = getCurrentOvercommit(hyperConverge);
 
-  const { appliedRatio, isLoading: isLoadingRatio } = useAppliedOvercommitRatio();
+  useEffect(() => {
+    setIsSwitchOn(currentOvercommit > MEMORY_OVERCOMMIT_STARTING_VALUE);
+  }, [currentOvercommit]);
+
+  const { appliedRatio, isLoading: isLoadingRatio } = useAppliedOvercommitRatio(isSwitchOn);
   const { hasChanged, inputValue, isLoading, onSave, onSliderChange } = useMemoryDensityValue({
     currentOvercommit,
     hyperConverge,
   });
-
-  useEffect(() => {
-    setIsSwitchOn(currentOvercommit > MEMORY_OVERCOMMIT_STARTING_VALUE);
-  }, [currentOvercommit]);
 
   const handleToggleSwitch = (checked: boolean) => {
     if (checked) {

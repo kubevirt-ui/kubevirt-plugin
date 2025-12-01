@@ -1,10 +1,10 @@
-import React, { FC, useState } from 'react';
+import React, { FC, ReactNode, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ExpandableSection } from '@patternfly/react-core';
 
 type CurrentMemoryDensityProps = {
-  children: React.ReactNode;
+  children: ReactNode;
   currentOvercommit: number;
   isLoading: boolean;
 };
@@ -25,7 +25,7 @@ const CurrentMemoryDensity: FC<CurrentMemoryDensityProps> = ({
       onToggle={(_event, expanded) => !isLoading && setIsExpanded(expanded)}
       toggleText={t('Current memory density: {{percentage}}%', { percentage: currentOvercommit })}
     >
-      {children}
+      {isExpanded && children}
     </ExpandableSection>
   );
 };
