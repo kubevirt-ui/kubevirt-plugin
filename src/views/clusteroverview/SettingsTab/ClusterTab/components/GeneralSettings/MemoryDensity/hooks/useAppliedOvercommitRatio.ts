@@ -3,8 +3,10 @@ import { useMemo } from 'react';
 import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
 import { SETTINGS_TAB_QUERIES } from '@overview/SettingsTab/utils/queries';
 
-const useAppliedOvercommitRatio = (): { appliedRatio: null | number; isLoading: boolean } => {
-  const query = SETTINGS_TAB_QUERIES.MEMORY_DENSITY_APPLIED_RATIO;
+const useAppliedOvercommitRatio = (
+  enabled: boolean = true,
+): { appliedRatio: null | number; isLoading: boolean } => {
+  const query = enabled ? SETTINGS_TAB_QUERIES.MEMORY_DENSITY_APPLIED_RATIO : null;
 
   const [data, loaded] = usePrometheusPoll({
     endpoint: PrometheusEndpoint.QUERY,

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { Dispatch, FC, SetStateAction } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, Content, ContentVariants, Slider, StackItem } from '@patternfly/react-core';
@@ -31,7 +31,7 @@ const MemoryDensitySlider: FC<MemoryDensitySliderProps> = ({
     _event,
     value: number,
     sliderInputValue?: number,
-    setLocalInputValue?: React.Dispatch<React.SetStateAction<number>>,
+    setLocalInputValue?: Dispatch<SetStateAction<number>>,
   ) => {
     if (sliderInputValue === undefined) {
       onSliderChange(value);
