@@ -5,17 +5,17 @@ import { LabelGroup } from '@patternfly/react-core';
 import IndicationLabel from './IndicationLabel';
 
 const IndicationLabelList = ({ snapshot }) => {
-  const indications = snapshot?.status?.indications || [];
+  const indications = snapshot?.status?.sourceIndications || [];
 
   if (indications.length === 0) {
     return <>-</>;
   }
   return (
     <LabelGroup>
-      {indications.map((indication) => (
+      {indications.map((indicationObject) => (
         <IndicationLabel
-          indication={indication}
-          key={`${snapshot?.metadata?.name}-${indication}`}
+          indicationObject={indicationObject}
+          key={`${snapshot?.metadata?.name}-${indicationObject.indication}`}
         />
       ))}
     </LabelGroup>
