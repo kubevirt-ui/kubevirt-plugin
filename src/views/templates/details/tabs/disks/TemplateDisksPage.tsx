@@ -1,6 +1,6 @@
 import React, { FC, useCallback } from 'react';
 
-import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import DiskListTitle from '@kubevirt-utils/components/DiskListTitle/DiskListTitle';
 import DiskSourceSelect from '@kubevirt-utils/components/DiskModal/components/DiskSourceSelect/DiskSourceSelect';
@@ -8,9 +8,8 @@ import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
 import { SourceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
-import { replaceTemplateVM } from '@kubevirt-utils/resources/template';
+import { replaceTemplateVM, updateTemplate } from '@kubevirt-utils/resources/template';
 import {
-  k8sUpdate,
   ListPageFilter,
   useListPageFilter,
   VirtualizedTable,
@@ -39,27 +38,16 @@ const TemplateDisksPage: FC<TemplateDisksPageProps> = ({ obj: template }) => {
 
   const { isTemplateEditable } = useEditTemplateAccessReview(template);
 
-  const onSubmitTemplate = useCallback(
-    (updatedTemplate: V1Template) =>
-      k8sUpdate({
-        data: updatedTemplate,
-        model: TemplateModel,
-        name: updatedTemplate?.metadata?.name,
-        ns: updatedTemplate?.metadata?.namespace,
-      }),
-    [],
-  );
-
   const onUpdate = useCallback(
     async (updatedVM: V1VirtualMachine) => {
-      await onSubmitTemplate(replaceTemplateVM(template, updatedVM));
+      await updateTemplate(replaceTemplateVM(template, updatedVM));
     },
-    [onSubmitTemplate, template],
+    [template],
   );
 
   return (
     <PageSection>
-      <SidebarEditor<V1Template> onResourceUpdate={onSubmitTemplate} resource={template}>
+      <SidebarEditor<V1Template> onResourceUpdate={updateTemplate} resource={template}>
         <Stack hasGutter>
           <DiskListTitle />
           {isTemplateEditable && (

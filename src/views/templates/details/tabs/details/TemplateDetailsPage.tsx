@@ -1,9 +1,9 @@
-import React, { FC, useCallback } from 'react';
+import React, { FC } from 'react';
 
-import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
+import { updateTemplate } from '@kubevirt-utils/resources/template';
 import { Grid, GridItem, PageSection, Title } from '@patternfly/react-core';
 
 import TemplateDetailsLeftGrid from './components/TemplateDetailsLeftGrid';
@@ -25,20 +25,9 @@ type TemplateDetailsPageProps = {
 const TemplateDetailsPage: FC<TemplateDetailsPageProps> = ({ obj: template }) => {
   const { t } = useKubevirtTranslation();
 
-  const onSubmitTemplate = useCallback(
-    (updatedTemplate: V1Template) =>
-      k8sUpdate({
-        data: updatedTemplate,
-        model: TemplateModel,
-        name: updatedTemplate?.metadata?.name,
-        ns: updatedTemplate?.metadata?.namespace,
-      }),
-    [],
-  );
-
   return (
     <PageSection>
-      <SidebarEditor<V1Template> onResourceUpdate={onSubmitTemplate} resource={template}>
+      <SidebarEditor<V1Template> onResourceUpdate={updateTemplate} resource={template}>
         {(resource) => (
           <>
             <Title headingLevel="h2">{t('Template details')}</Title>

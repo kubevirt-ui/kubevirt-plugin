@@ -28,7 +28,6 @@ const CLUSTER_INSTANCETYPE_PATH =
   'instancetype.kubevirt.io~v1beta1~VirtualMachineClusterInstancetype';
 const INSTANCETYPE_PATH = 'instancetype.kubevirt.io~v1beta1~VirtualMachineInstancetype';
 const MIGRATION_POLICY_PATH = 'migrations.kubevirt.io~v1alpha1~MigrationPolicy';
-const TEMPLATE_PATH = 'template.openshift.io~v1~Template';
 
 export const extensions: EncodedExtension[] = [
   {
@@ -84,7 +83,7 @@ export const extensions: EncodedExtension[] = [
         'data-quickstart-id': 'qs-nav-templates',
         'data-test-id': 'templates-nav-item',
       },
-      href: `/k8s/all-clusters/all-namespaces/${TEMPLATE_PATH}`,
+      href: `/k8s/all-clusters/all-namespaces/templates`,
       id: 'templates-virt-perspective',
       name: '%plugin__kubevirt-plugin~Templates%',
       perspective: 'fleet-virtualization-perspective',
@@ -257,10 +256,19 @@ export const extensions: EncodedExtension[] = [
         $codeRef: 'VirtualMachineTemplatesList',
       },
       path: [
-        `/k8s/all-clusters/all-namespaces/${TEMPLATE_PATH}`,
-        `/k8s/cluster/:cluster/ns/:ns/${TEMPLATE_PATH}`,
-        `/k8s/cluster/:cluster/all-namespaces/${TEMPLATE_PATH}`,
+        `/k8s/all-clusters/all-namespaces/templates`,
+        `/k8s/cluster/:cluster/ns/:ns/templates`,
+        `/k8s/cluster/:cluster/all-namespaces/templates`,
       ],
+    },
+    type: 'console.page/route',
+  } as EncodedExtension<RoutePage>,
+  {
+    properties: {
+      component: {
+        $codeRef: 'TemplateNavPage',
+      },
+      path: [`/k8s/cluster/:cluster/ns/:ns/templates/:name`],
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
@@ -272,7 +280,7 @@ export const extensions: EncodedExtension[] = [
       },
       path: [
         `/k8s/cluster/:cluster/ns/:ns/${KUBEVIRT_VM_PATH}/~new`,
-        `/k8s/cluster/:cluster/ns/:ns/${TEMPLATE_PATH}/~new`,
+        `/k8s/cluster/:cluster/ns/:ns/templates/~new`,
       ],
     },
     type: 'console.page/route',

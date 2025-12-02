@@ -1,4 +1,4 @@
-import React, { FC, useCallback } from 'react';
+import React, { FC } from 'react';
 import { useVirtualMachineTemplatesCPUMemory } from 'src/views/templates/list/hooks/useVirtualMachineTemplatesCPUMemory';
 
 import CPUDescription from '@kubevirt-utils/components/CPUDescription/CPUDescription';
@@ -6,9 +6,8 @@ import { CpuMemHelperTextResources } from '@kubevirt-utils/components/CPUDescrip
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { TemplateModel, V1Template } from '@kubevirt-utils/models';
-import { getTemplateVirtualMachineCPU } from '@kubevirt-utils/resources/template';
-import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
+import { V1Template } from '@kubevirt-utils/models';
+import { getTemplateVirtualMachineCPU, updateTemplate } from '@kubevirt-utils/resources/template';
 
 import CPUMemoryModal from './CPUMemoryModal/CPUMemoryModal';
 
@@ -22,23 +21,12 @@ const CPUMemory: FC<CPUMemoryProps> = ({ editable, template }) => {
   const CPUMemData = useVirtualMachineTemplatesCPUMemory(template);
   const { createModal } = useModal();
 
-  const onSubmitCPU = useCallback(
-    (updatedTemplate: V1Template) =>
-      k8sUpdate({
-        data: updatedTemplate,
-        model: TemplateModel,
-        name: updatedTemplate?.metadata?.name,
-        ns: updatedTemplate?.metadata?.namespace,
-      }),
-    [],
-  );
-
   const onEditClick = () =>
     createModal(({ isOpen, onClose }) => (
       <CPUMemoryModal
         isOpen={isOpen}
         onClose={onClose}
-        onSubmit={onSubmitCPU}
+        onSubmit={updateTemplate}
         template={template}
       />
     ));

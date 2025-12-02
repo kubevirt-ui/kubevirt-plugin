@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
+import { Link } from 'react-router-dom-v5-compat';
 
 import {
   modelToGroupVersionKind,
@@ -12,14 +12,19 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { ClusterNamespacedResourceMap } from '@kubevirt-utils/resources/shared';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { isDeprecatedTemplate } from '@kubevirt-utils/resources/template';
+import { getTemplateURL, isDeprecatedTemplate } from '@kubevirt-utils/resources/template';
 import { ARCHITECTURE_ID, getArchitecture } from '@kubevirt-utils/utils/architecture';
 import { ManagedClusterModel } from '@multicluster/constants';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useIsACMPage from '@multicluster/useIsACMPage';
-import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  ResourceIcon,
+  ResourceLink,
+  RowProps,
+  TableData,
+} from '@openshift-console/dynamic-plugin-sdk';
 import { Label } from '@patternfly/react-core';
-import { FleetResourceLink } from '@stolostron/multicluster-sdk';
+import { FleetResourceLink, useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import VirtualMachineTemplatesActions from '../../actions/VirtualMachineTemplatesActions';
 import { getWorkloadProfile } from '../../utils/selectors';
@@ -42,29 +47,24 @@ const VirtualMachineTemplatesRow: React.FC<
   rowData: { availableDataSources, availableTemplatesUID, cloneInProgressDataSources },
 }) => {
   const { t } = useKubevirtTranslation();
-  const navigate = useNavigate();
   const isACMPage = useIsACMPage();
+  const [hubClusterName] = useHubClusterName();
 
   const namespace = getNamespace(obj);
-  const cluster = getCluster(obj);
+  const cluster = getCluster(obj) || hubClusterName;
   const name = getName(obj);
 
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-20" id="name">
-        <FleetResourceLink
-          onClick={() =>
-            navigate(
-              isACMPage
-                ? `/k8s/cluster/${cluster}/ns/${namespace}/templates/${name}`
-                : `/k8s/ns/${namespace}/templates/${name}`,
-            )
-          }
-          cluster={cluster}
-          kind={TemplateModel.kind}
-          name={name}
-          namespace={namespace}
-        />
+        <Link
+          data-test={name}
+          data-test-id={name}
+          to={getTemplateURL(name, namespace, isACMPage ? cluster : undefined)}
+        >
+          <ResourceIcon groupVersionKind={modelToGroupVersionKind(TemplateModel)} />
+          {name}
+        </Link>
 
         {isDeprecatedTemplate(obj) && <Label isCompact>{t('Deprecated')}</Label>}
       </TableData>

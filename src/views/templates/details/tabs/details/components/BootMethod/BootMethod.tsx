@@ -1,12 +1,14 @@
-import React, { FC, useCallback } from 'react';
+import React, { FC } from 'react';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { getBootloaderTitleFromVM } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/utils';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { TemplateModel, V1Template } from '@kubevirt-utils/models';
-import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
-import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
+import { V1Template } from '@kubevirt-utils/models';
+import {
+  getTemplateVirtualMachineObject,
+  updateTemplate,
+} from '@kubevirt-utils/resources/template';
 
 import TemplateBootloaderModal from './TemplateBootloaderModal';
 
@@ -22,23 +24,12 @@ const BootMethod: FC<BootMethodProps> = ({ editable, template }) => {
   const firmwareBootloaderTitle = getBootloaderTitleFromVM(
     getTemplateVirtualMachineObject(template),
   );
-  const onSubmit = useCallback(
-    (updatedTemplate: V1Template) =>
-      k8sUpdate({
-        data: updatedTemplate,
-        model: TemplateModel,
-        name: updatedTemplate?.metadata?.name,
-        ns: updatedTemplate?.metadata?.namespace,
-      }),
-    [],
-  );
-
   const onEditClick = () =>
     createModal(({ isOpen, onClose }) => (
       <TemplateBootloaderModal
         isOpen={isOpen}
         onClose={onClose}
-        onSubmit={onSubmit}
+        onSubmit={updateTemplate}
         template={template}
       />
     ));

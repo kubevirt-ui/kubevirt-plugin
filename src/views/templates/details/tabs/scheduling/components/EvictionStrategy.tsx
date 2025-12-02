@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { TemplateSchedulingGridProps } from 'src/views/templates/details/tabs/scheduling/components/TemplateSchedulingLeftGrid';
 import { getEvictionStrategy } from 'src/views/templates/utils/selectors';
 
@@ -18,22 +18,24 @@ const EvictionStrategy: React.FC<TemplateSchedulingGridProps> = ({
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
   const strategy = getEvictionStrategy(template) || t('No eviction strategy');
+  const cluster = getCluster(template);
 
-  const onEditClick = () =>
-    createModal(({ isOpen, onClose }) => (
-      <EvictionStrategyModal
-        isOpen={isOpen}
-        onClose={onClose}
-        onSubmit={onSubmit}
-        template={template}
-      />
-    ));
+  const onEditClick = useCallback(
+    () =>
+      createModal(({ isOpen, onClose }) => (
+        <EvictionStrategyModal
+          isOpen={isOpen}
+          onClose={onClose}
+          onSubmit={onSubmit}
+          template={template}
+        />
+      )),
+    [createModal, onSubmit, template],
+  );
 
   return (
     <DescriptionItem
-      descriptionData={
-        <ShowEvictionStrategy cluster={getCluster(template)} evictionStrategy={strategy} />
-      }
+      descriptionData={<ShowEvictionStrategy cluster={cluster} evictionStrategy={strategy} />}
       descriptionHeader={t('Eviction strategy')}
       isEdit={editable}
       onEditClick={onEditClick}

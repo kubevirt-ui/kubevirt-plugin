@@ -10,12 +10,15 @@ import {
   removeSysprepConfig,
   UNATTEND,
 } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
+import { getName } from '@kubevirt-utils/resources/shared';
 import {
   getTemplateVirtualMachineObject,
   replaceTemplateVM,
 } from '@kubevirt-utils/resources/template';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
-import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 
 export const getTemplateSysprepObject = (
   template: V1Template,
@@ -80,11 +83,12 @@ export const updateTemplateWithSysprep = async (
 
   const updatedTemplate = replaceTemplateVM(template, newVM);
 
-  await k8sUpdate({
+  await kubevirtK8sUpdate({
+    cluster: getCluster(template),
     data: updatedTemplate,
     model: TemplateModel,
-    name: template?.metadata?.name,
-    ns: template?.metadata?.namespace,
+    name: getName(updatedTemplate),
+    ns: getNamespace(updatedTemplate),
   });
 };
 

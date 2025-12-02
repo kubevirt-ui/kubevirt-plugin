@@ -1,17 +1,19 @@
 import React, { FC, useCallback, useState } from 'react';
 import produce from 'immer';
 
-import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
+import {
+  getTemplateVirtualMachineObject,
+  updateTemplate,
+} from '@kubevirt-utils/resources/template';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
 import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
-import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { ButtonVariant, Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
 import { getConfigInterfaceStateFromVM } from '@virtualmachines/details/tabs/configuration/network/utils/utils';
 
@@ -63,12 +65,7 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
         vm.spec.template.spec.domain.devices.interfaces.filter(({ name }) => name !== nicName);
     });
 
-    return k8sUpdate({
-      data: updatedTemplate,
-      model: TemplateModel,
-      name: updatedTemplate?.metadata?.name,
-      ns: updatedTemplate?.metadata?.namespace,
-    });
+    return updateTemplate(updatedTemplate);
   }, [nicName, template]);
 
   const onDeleteModalToggle = () => {

@@ -5,8 +5,12 @@ import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import CloneTemplateModal from '@kubevirt-utils/components/CloneTemplateModal/CloneTemplateModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getTemplateProviderName } from '@kubevirt-utils/resources/template';
+import { getName } from '@kubevirt-utils/resources/shared';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
+import { getTemplateProviderName, getTemplateURL } from '@kubevirt-utils/resources/template';
 import { getOperatingSystemName } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
+import { getCluster } from '@multicluster/helpers/selectors';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { Alert, AlertVariant, Button, ButtonVariant } from '@patternfly/react-core';
 
 type CommonTemplateAlertProps = {
@@ -19,11 +23,16 @@ const CommonTemplateAlert: FC<CommonTemplateAlertProps> = ({ template }) => {
   const providerName = getTemplateProviderName(template);
   const { createModal } = useModal();
   const navigate = useNavigate();
+  const isACMPage = useIsACMPage();
 
   const goToTemplatePage = React.useCallback(
     (clonedTemplate: V1Template) => {
       navigate(
-        `/k8s/ns/${clonedTemplate.metadata.namespace}/templates/${clonedTemplate.metadata.name}`,
+        getTemplateURL(
+          getName(clonedTemplate),
+          getNamespace(clonedTemplate),
+          isACMPage ? getCluster(clonedTemplate) : undefined,
+        ),
       );
     },
     [navigate],
