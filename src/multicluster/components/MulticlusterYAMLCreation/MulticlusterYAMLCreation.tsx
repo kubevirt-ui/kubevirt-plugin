@@ -11,7 +11,7 @@ import { getName } from '@kubevirt-utils/resources/shared';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 import { getFleetResourceRoute, getMulticlusterSearchURL } from '@multicluster/urls';
-import { ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
+import { K8sResourceKind, ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
 
 import useModelFromParam from './hooks/useModelFromParam';
 import useYAMLTemplateExtension from './hooks/useYAMLTemplateExtension';
@@ -63,7 +63,7 @@ const MulticlusterYAMLCreation: FC = () => {
       <ResourceYAMLEditor
         create
         header={t('Create {{kind}}', { kind: model.kind })}
-        initialResource={resourceYAMLTemplate}
+        initialResource={load(resourceYAMLTemplate || '') as K8sResourceKind}
         onSave={onSave}
       />
       {error && <ErrorAlert error={error} />}
