@@ -15,6 +15,7 @@ import { CROSS_CLUSTER_MIGRATION_ACTION_ID } from '@multicluster/constants';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
+import { isRunning } from '@virtualmachines/utils';
 
 import ConfirmMultipleVMActionsModal from './components/ConfirmMultipleVMActionsModal/ConfirmMultipleVMActionsModal';
 import VirtualMachineMigrateModal from './components/VirtualMachineMigration/VirtualMachineMigrationModal';
@@ -27,15 +28,23 @@ export const BulkVirtualMachineActionFactory = {
     vms: V1VirtualMachine[],
     createModal: (modal: ModalComponent) => void,
     isDisabled: boolean,
-  ): ActionDropdownItemType => ({
-    cta: () =>
-      createModal(({ isOpen, onClose }) => (
-        <CrossClusterMigration close={onClose} isOpen={isOpen} resources={vms} />
-      )),
-    disabled: isEmpty(vms) || isDisabled,
-    id: CROSS_CLUSTER_MIGRATION_ACTION_ID,
-    label: t('Cross-cluster migration'),
-  }),
+  ): ActionDropdownItemType => {
+    const allRunning = vms?.every(isRunning);
+
+    return {
+      cta: () =>
+        createModal(({ isOpen, onClose }) => (
+          <CrossClusterMigration close={onClose} isOpen={isOpen} resources={vms} />
+        )),
+      disabled: isEmpty(vms) || isDisabled || !allRunning,
+      disabledTooltip: !allRunning
+        ? t('All VirtualMachines must be running')
+        : t('Cross-cluster migration is not supported on this cluster.'),
+
+      id: CROSS_CLUSTER_MIGRATION_ACTION_ID,
+      label: t('Cross-cluster migration'),
+    };
+  },
   delete: (
     vms: V1VirtualMachine[],
     createModal: (modal: ModalComponent) => void,
