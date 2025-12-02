@@ -159,6 +159,7 @@
   "All search results found for \"{{searchQuery}}\"": "\"{{searchQuery}}\"에 대한 모든 검색 결과",
   "All sources selected": "모든 소스 선택",
   "All templates": "모든 템플릿",
+  "All VirtualMachines must be running": "All VirtualMachines must be running",
   "Allocating resources": "리소스 할당 중",
   "Allocating resources, please wait for upload to start.": "리소스 할당 중. 업로드가 시작될 때까지 기다려 주세요.",
   "Allow automatic update": "자동 업데이트 허용",
