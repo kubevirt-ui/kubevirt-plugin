@@ -109,7 +109,7 @@ export const BootOrderModalBody: React.FC<{
                               <Split>
                                 <SplitItem isFilled>
                                   <span id={value.name}>{value.name}</span>
-
+                                  {type === DeviceType.NIC && <span>{t(' (NIC)')}</span>}
                                   <span className="pf-v6-u-ml-sm">
                                     <DeviceTypeIcon type={type as DeviceType} />
                                   </span>

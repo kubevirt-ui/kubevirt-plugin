@@ -1,4 +1,5 @@
 {
+  " (NIC)": " (NIC)",
   " {{sockets}} sockets, {{threads}} threads, and {{cores}} cores.": " {{sockets}} 套接字、{{threads}} 线程和 {{cores}} 内核。",
   " Adding hot plugged disk": " 添加热插磁盘",
   " in namespace <2>{{objNamespace}}</2>?": " 在命名空间 <2>{{objNamespace}}</2> 中？",
@@ -1581,6 +1582,7 @@
   "This field is required": "这个字段是必需的",
   "This interface is currently hot-unplugged until the VirtualMachine is migrated": "这个接口当前是热拔的，直到 VirtualMachine 被迁移为止",
   "This is a CD-ROM boot source": "这是一个 CD-ROM 引导源",
+  "This is a network interface (NIC)": "This is a network interface (NIC)",
   "This is an ISO file": "这是一个 ISO 文件",
   "This key will override the SSH key secret set on the template": "此密钥将覆盖模板上设置的 SSH 密钥 secret",
   "This Persistent Volume Claim will be created using a DataVolume through Containerized Data Importer (CDI)": "此持久性卷声明将使用一个 DataVolume 通过 Containerized Data Importer（CDI）创建",

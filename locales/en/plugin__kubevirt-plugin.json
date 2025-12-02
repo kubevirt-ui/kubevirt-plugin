@@ -1,4 +1,5 @@
 {
+  " (NIC)": " (NIC)",
   " {{sockets}} sockets, {{threads}} threads, and {{cores}} cores.": " {{sockets}} sockets, {{threads}} threads, and {{cores}} cores.",
   " Adding hot plugged disk": " Adding hot plugged disk",
   " in namespace <2>{{objNamespace}}</2>?": " in namespace <2>{{objNamespace}}</2>?",
@@ -1581,6 +1582,7 @@
   "This field is required": "This field is required",
   "This interface is currently hot-unplugged until the VirtualMachine is migrated": "This interface is currently hot-unplugged until the VirtualMachine is migrated",
   "This is a CD-ROM boot source": "This is a CD-ROM boot source",
+  "This is a network interface (NIC)": "This is a network interface (NIC)",
   "This is an ISO file": "This is an ISO file",
   "This key will override the SSH key secret set on the template": "This key will override the SSH key secret set on the template",
   "This Persistent Volume Claim will be created using a DataVolume through Containerized Data Importer (CDI)": "This Persistent Volume Claim will be created using a DataVolume through Containerized Data Importer (CDI)",

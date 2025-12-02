@@ -1,4 +1,5 @@
 {
+  " (NIC)": " (NIC)",
   " {{sockets}} sockets, {{threads}} threads, and {{cores}} cores.": " {{sockets}} sockets, {{threads}} hilos y {{cores}} núcleos.",
   " Adding hot plugged disk": " Agregar disco conectado en caliente",
   " in namespace <2>{{objNamespace}}</2>?": " en el espacio de nombre <2>{{objNamespace}}</2>?",
@@ -1589,6 +1590,7 @@
   "This field is required": "Este campo es obligatorio",
   "This interface is currently hot-unplugged until the VirtualMachine is migrated": "Esta interfaz está actualmente desconectada en caliente hasta que se migre la VirtualMachine.",
   "This is a CD-ROM boot source": "Esta es una fuente de arranque en CD-ROM.",
+  "This is a network interface (NIC)": "This is a network interface (NIC)",
   "This is an ISO file": "Este es un archivo ISO.",
   "This key will override the SSH key secret set on the template": "Esta clave anulará el secreto de la clave SSH establecido en la plantilla.",
   "This Persistent Volume Claim will be created using a DataVolume through Containerized Data Importer (CDI)": "Esta reclamación de volumen persistente se creará utilizando un volumen de datos a través del importador de datos en contenedores (CDI).",
