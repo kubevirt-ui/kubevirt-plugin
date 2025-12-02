@@ -10,6 +10,7 @@ import {
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
+import AutoAttachedNetworkEmptyState from '@virtualmachines/details/tabs/configuration/network/components/list/AutoAttachedNetworkEmptyState';
 
 import useNetworkRowFilters from '../../hooks/useNetworkRowFilters';
 
@@ -25,11 +26,8 @@ const NetworkInterfaceList: React.FC<NetworkInterfaceListProps> = ({ onUpdateVM,
   const interfaces = getInterfaces(vm);
   const filters = useNetworkRowFilters();
 
-  const networkInterfacesData = getNetworkInterfaceRowData(
-    networks,
-    interfaces,
-    hasAutoAttachedPodNetwork(vm),
-  );
+  const autoattachPodInterface = hasAutoAttachedPodNetwork(vm);
+  const networkInterfacesData = getNetworkInterfaceRowData(networks, interfaces);
   const [data, filteredData, onFilterChange] = useListPageFilter(networkInterfacesData, filters);
 
   const columns = useNetworkColumns();
@@ -39,6 +37,7 @@ const NetworkInterfaceList: React.FC<NetworkInterfaceListProps> = ({ onUpdateVM,
       <VirtualizedTable
         columns={columns}
         data={filteredData}
+        EmptyMsg={() => <AutoAttachedNetworkEmptyState isAutoAttached={autoattachPodInterface} />}
         loaded
         loadError={false}
         Row={NetworkInterfaceRow}
