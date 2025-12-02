@@ -1,6 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom-v5-compat';
 
+import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
+
 type UsePreserveTabDisplayProps = {
   basePath: string;
   storageKey: string;
@@ -15,6 +17,8 @@ export const usePreserveTabDisplay = ({ basePath, storageKey }: UsePreserveTabDi
   const isInitialMount = useRef(true);
 
   useEffect(() => {
+    if (runningTourSignal.value) return;
+
     const extractPathSegmentRegex = new RegExp(`${basePath}/(.+)`);
     const match = location.pathname.match(extractPathSegmentRegex);
     const currentTab = match?.[1] || '';

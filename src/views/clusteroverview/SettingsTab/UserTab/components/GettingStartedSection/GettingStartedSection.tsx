@@ -1,10 +1,7 @@
 import React, { FC } from 'react';
 
-import {
-  runningTourSignal,
-  startTour,
-  stopTour,
-} from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
+import useTour from '@kubevirt-utils/components/GuidedTour/hooks/useTour';
+import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { USER_TAB_IDS } from '@overview/SettingsTab/search/constants';
@@ -18,6 +15,8 @@ const GettingStartedSection: FC = () => {
   const { t } = useKubevirtTranslation();
   const [quickStarts, setQuickStarts] = useKubevirtUserSettings('quickStart');
   const run = runningTourSignal.value;
+  const { startTour, stopTour } = useTour();
+
   return (
     <ExpandSection
       dataTestID="settings-user-getting-started"
