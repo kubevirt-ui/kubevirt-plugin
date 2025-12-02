@@ -21,7 +21,7 @@ type DiskSourceSelectProps = {
 
 const DiskSourceSelect: FC<DiskSourceSelectProps> = ({
   canCreateDataVolume,
-  canUpdate,
+  canUpdate = true,
   className,
   onSelect,
 }) => {
