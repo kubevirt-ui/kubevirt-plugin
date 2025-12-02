@@ -6,21 +6,17 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useSignals } from '@preact/signals-react/runtime';
 
 import TourPopover from './components/TourPopover/TourPopover';
+import useTour from './hooks/useTour';
 import { tourSteps } from './utils/constants';
-import {
-  nextStep,
-  prevStep,
-  resetTour,
-  runningTourSignal,
-  stepIndexSignal,
-  stopTour,
-} from './utils/guidedTourSignals';
+import { nextStep, prevStep, runningTourSignal, stepIndexSignal } from './utils/guidedTourSignals';
 
 const GuidedTour: FC = () => {
   useSignals();
 
   const location = useLocation();
   const navigate = useNavigate();
+
+  const { stopTour } = useTour();
 
   return (
     <Joyride
@@ -32,12 +28,17 @@ const GuidedTour: FC = () => {
           document.querySelector(step.target)?.scrollIntoView();
         }
 
-        if (!isEmpty(route) && location.pathname !== route) {
+        if (!isEmpty(route) && location.pathname !== route && runningTourSignal.value) {
           navigate(route);
         }
 
         if (action === ACTIONS.CLOSE) {
           stopTour();
+
+          if (stepIndexSignal.value === size - 1) {
+            nextStep();
+          }
+
           return;
         }
 
@@ -53,13 +54,13 @@ const GuidedTour: FC = () => {
           }
 
           if (action === ACTIONS.NEXT) {
-            if (stepIndexSignal.value === size - 1) {
-              stopTour();
-              resetTour();
+            if (stepIndexSignal.value < size - 1) {
+              nextStep();
               return;
             }
 
-            if (stepIndexSignal.value < tourSteps.length - 1) {
+            if (stepIndexSignal.value === size - 1) {
+              stopTour();
               nextStep();
               return;
             }

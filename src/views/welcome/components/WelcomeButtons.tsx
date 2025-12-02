@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
-import { startTour } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
+import useTour from '@kubevirt-utils/components/GuidedTour/hooks/useTour';
 import { ALL_NAMESPACES, ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
@@ -18,6 +18,8 @@ const WelcomeButtons: FC<WelcomeButtonsProps> = ({ onClose }) => {
   const navigate = useNavigate();
   const namespace =
     activeNamespace === ALL_NAMESPACES_SESSION_KEY ? ALL_NAMESPACES : `ns/${activeNamespace}`;
+
+  const { startTour } = useTour();
 
   return (
     <Split hasGutter>
