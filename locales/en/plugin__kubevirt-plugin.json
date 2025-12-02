@@ -1564,6 +1564,7 @@
   "This user is not allowed to edit this boot source": "This user is not allowed to edit this boot source",
   "This VirtualMachine has": "This VirtualMachine has",
   "This VirtualMachine is down. Please start it to access its console.": "This VirtualMachine is down. Please start it to access its console.",
+  "This VM is using auto attached Pod Network. To disable it, set spec.template.spec.domain.devices.autoattachPodInterface to false.": "This VM is using auto attached Pod Network. To disable it, set spec.template.spec.domain.devices.autoattachPodInterface to false.",
   "This will create a cloned copy of the Volume in the destination project.": "This will create a cloned copy of the Volume in the destination project.",
   "Threads": "Threads",
   "Time axis": "Time axis",

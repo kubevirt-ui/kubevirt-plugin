@@ -1564,6 +1564,7 @@
   "This user is not allowed to edit this boot source": "이 사용자는 이 부팅 소스를 편집할 수 없습니다",
   "This VirtualMachine has": "이 VirtualMachine에는 다음이 있습니다",
   "This VirtualMachine is down. Please start it to access its console.": "이 VirtualMachine은 중지 상태입니다. 콘솔에 액세스하려면 시작합니다.",
+  "This VM is using auto attached Pod Network. To disable it, set spec.template.spec.domain.devices.autoattachPodInterface to false.": "This VM is using auto attached Pod Network. To disable it, set spec.template.spec.domain.devices.autoattachPodInterface to false.",
   "This will create a cloned copy of the Volume in the destination project.": "대상 프로젝트에서 볼륨의 복제본이 생성됩니다.",
   "Threads": "스레드",
   "Time axis": "시간축",
