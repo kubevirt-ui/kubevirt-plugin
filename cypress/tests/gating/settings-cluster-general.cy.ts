@@ -1,6 +1,8 @@
 import { CNV_NS, SECOND } from '../../utils/const/index';
 import { tab } from '../../views/tab';
 
+const MEMORY_DENSITY_VALUE = '400';
+
 describe('Test Cluster General settings', () => {
   before(() => {
     cy.beforeSpec();
@@ -19,7 +21,7 @@ describe('Test Cluster General settings', () => {
     it('set live migration limits', () => {
       cy.contains('General settings').click();
       cy.contains('Live migration').click();
-      cy.wait(3000);
+      cy.wait(3 * SECOND);
       cy.get('input[name="parallelMigrationsPerCluster"]').clear().type('4');
       cy.get('input[name="parallelOutboundMigrationsPerNode"]').clear().type('1');
       cy.contains('Set live migration network').click();
@@ -39,23 +41,31 @@ describe('Test Cluster General settings', () => {
     });
   });
 
-  xdescribe('Test Memory density', () => {
-    it('enable memory density', () => {
+  describe('Test Memory density', () => {
+    it('set memory density', () => {
       cy.contains('Memory density').click();
-      cy.wait(3000);
-      cy.get('[id="memory-density-feature"]').find('input[type="checkbox"]').check({ force: true });
+      cy.wait(3 * SECOND);
+      cy.get('[data-test-id="memory-density"]').check({ force: true });
       cy.wait(10 * SECOND);
+      cy.contains('Current memory density').click();
+      cy.wait(SECOND);
+      cy.get('[data-test-id="memory-density-slider"]')
+        .find('input[type="number"]')
+        .dblclick()
+        .clear()
+        .type(MEMORY_DENSITY_VALUE);
+      cy.contains('Requested memory density').click();
+      cy.get('[data-test-id="memory-density-save-button"]').click({ force: true });
     });
 
     it('verify higherWorkloadDensity in HCO', () => {
       const percentage = '.spec.higherWorkloadDensity.memoryOvercommitPercentage';
-      cy.checkHCOSpec(percentage, '150', true);
+      cy.checkHCOSpec(percentage, MEMORY_DENSITY_VALUE, true);
     });
 
     it('disable memory density', () => {
-      cy.get('[id="memory-density-feature"]')
-        .find('input[type="checkbox"]')
-        .uncheck({ force: true });
+      cy.get('[data-test-id="memory-density"]').uncheck({ force: true });
+      cy.get('[data-test-id="memory-density-disable-confirm-button"]').click({ force: true });
       cy.wait(10 * SECOND);
     });
 
