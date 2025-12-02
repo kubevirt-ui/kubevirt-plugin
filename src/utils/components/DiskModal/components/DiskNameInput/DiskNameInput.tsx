@@ -5,7 +5,7 @@ import { debounce } from 'lodash';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getValueByPath } from '@kubevirt-utils/utils/utils';
-import { getDNS1120LabelError } from '@kubevirt-utils/utils/validation';
+import { getDNS1123LabelError } from '@kubevirt-utils/utils/validation';
 import { FormGroup, TextInput, ValidatedOptions } from '@patternfly/react-core';
 
 import { V1DiskFormState } from '../../utils/types';
@@ -25,7 +25,7 @@ const DiskNameInput: FC<{ isDisabled?: boolean }> = ({ isDisabled }) => {
   const registered = register(fieldToRegister, {
     required: true,
     shouldUnregister: true,
-    validate: (value) => getDNS1120LabelError(value)?.(t),
+    validate: (value) => getDNS1123LabelError(value)?.(t),
   });
 
   const validationError = getValueByPath(errors, fieldToRegister);

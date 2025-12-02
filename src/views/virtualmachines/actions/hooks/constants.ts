@@ -6,7 +6,8 @@ export const ACTIONS_ID = {
   MOVE_TO_FOLDER: 'selected-vms-action-move-to-folder',
   PAUSE: 'selected-vms-action-pause',
   RESTART: 'selected-vms-action-restart',
+  SNAPSHOT: 'selected-vms-action-snapshot',
   START: 'selected-vms-action-start',
   STOP: 'selected-vms-action-stop',
   UNPAUSE: 'selected-vms-action-unpause',
-};
+} as const;
