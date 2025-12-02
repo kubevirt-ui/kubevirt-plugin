@@ -26,7 +26,7 @@ const AppliedMemory: FC<AppliedMemoryProps> = ({
   return (
     <StackItem>
       <Content>
-        {t('Memory density applied to:')}{' '}
+        {t('Memory density applied:')}{' '}
         {isLoadingRatio ? <Skeleton width="80px" /> : <strong>{getAppliedMemoryMessage()}</strong>}
       </Content>
       <Content className="pf-v6-u-text-color-subtle" component={ContentVariants.small}>
