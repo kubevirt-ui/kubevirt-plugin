@@ -159,6 +159,7 @@
   "All search results found for \"{{searchQuery}}\"": "All search results found for \"{{searchQuery}}\"",
   "All sources selected": "All sources selected",
   "All templates": "All templates",
+  "All VirtualMachines must be running": "All VirtualMachines must be running",
   "Allocating resources": "Allocating resources",
   "Allocating resources, please wait for upload to start.": "Allocating resources, please wait for upload to start.",
   "Allow automatic update": "Allow automatic update",
