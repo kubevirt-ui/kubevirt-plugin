@@ -7,7 +7,6 @@ import {
   FeatureFlagHookProvider,
   RoutePage,
   StandaloneRoutePage,
-  TelemetryListener,
 } from '@openshift-console/dynamic-plugin-sdk';
 import type { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plugin-sdk-webpack';
 
@@ -18,7 +17,6 @@ export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
   icons: './utils/icons.tsx',
   kubevirtFlags: './utils/flags',
   modalProvider: './utils/components/ModalProvider/ModalProvider.tsx',
-  telemetry: 'src/utils/extensions/telemetry/telemetry.ts',
 };
 
 export const extensions: EncodedExtension[] = [
@@ -86,15 +84,6 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.page/route/standalone',
   } as EncodedExtension<StandaloneRoutePage>,
-
-  {
-    properties: {
-      listener: {
-        $codeRef: 'telemetry.eventMonitor',
-      },
-    },
-    type: 'console.telemetry/listener',
-  } as EncodedExtension<TelemetryListener>,
 
   {
     properties: { handler: { $codeRef: 'kubevirtFlags.useStorageMigrationEnabled' } },
