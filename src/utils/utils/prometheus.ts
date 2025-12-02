@@ -1,6 +1,6 @@
 import { murmur3 } from 'murmurhash-js';
 
-import { KUBEVIRT } from '@kubevirt-utils/constants/constants';
+import { CNV_OBSERVABILITY, KUBEVIRT, NONE } from '@kubevirt-utils/constants/constants';
 import { MONITORING_SALT, OPERATOR_LABEL_KEY } from '@kubevirt-utils/constants/prometheus';
 import { Group } from '@kubevirt-utils/types/prometheus';
 import { Alert, PrometheusLabels, PrometheusRule } from '@openshift-console/dynamic-plugin-sdk';
@@ -24,7 +24,9 @@ export const labelsToParams = (labels: PrometheusLabels): string => {
 };
 
 export const isKubeVirtAlert = (alert: Alert): boolean =>
-  alert?.labels?.[OPERATOR_LABEL_KEY] === KUBEVIRT;
+  alert?.labels?.[OPERATOR_LABEL_KEY] === KUBEVIRT &&
+  alert?.labels?.operator_health_impact !== NONE &&
+  alert?.labels?.kubernetes_operator_component !== CNV_OBSERVABILITY;
 
 export const inNamespace = (namespace: string, alert: Alert): boolean =>
   alert?.labels?.namespace === namespace;
