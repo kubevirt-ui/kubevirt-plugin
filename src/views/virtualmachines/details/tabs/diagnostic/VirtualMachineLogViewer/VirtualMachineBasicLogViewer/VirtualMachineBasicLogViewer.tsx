@@ -39,7 +39,11 @@ const VirtualMachineBasicLogViewer: FC<VirtualMachineBasicLogViewerProps> = ({
         <Toolbar>
           <ToolbarContent>
             <ToolbarItem>
-              <LogViewerSearch minSearchChars={3} placeholder="Search..." />
+              <LogViewerSearch
+                data-test="search-input"
+                minSearchChars={3}
+                placeholder="Search..."
+              />
             </ToolbarItem>
             <ToolbarItem align={{ default: 'alignEnd' }}>
               <Checkbox
@@ -54,6 +58,7 @@ const VirtualMachineBasicLogViewer: FC<VirtualMachineBasicLogViewerProps> = ({
                 <ToolbarItem variant="separator" />
                 <ToolbarItem>
                   <ExternalLink
+                    dataTestID="open-logs-in-new-window"
                     href={`/k8s/ns/${vmi?.metadata?.namespace}/kubevirt.io~v1~VirtualMachine/${vmi?.metadata?.name}/diagnostics/logs/standalone`}
                   >
                     {t('Open logs in a new window')}
