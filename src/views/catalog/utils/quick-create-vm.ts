@@ -2,7 +2,7 @@ import produce from 'immer';
 
 import { ProcessedTemplatesModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import { V1Devices, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { updateCloudInitRHELSubscription } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
 import { applyCloudDriveCloudInitVolume } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
@@ -12,7 +12,7 @@ import {
   LABEL_USED_TEMPLATE_NAMESPACE,
   replaceTemplateVM,
 } from '@kubevirt-utils/resources/template';
-import { getInterfaces } from '@kubevirt-utils/resources/vm';
+import { getBootDisk, getDevices, getInterfaces } from '@kubevirt-utils/resources/vm';
 import {
   DEFAULT_NETWORK_INTERFACE,
   UDN_BINDING_NAME,
@@ -68,9 +68,7 @@ export const quickCreateVM: QuickCreateVMType = async ({
     draftVM.metadata.labels[LABEL_USED_TEMPLATE_NAMESPACE] = template.metadata.namespace;
 
     if (isDisabledGuestSystemLogs) {
-      const devices = (<unknown>draftVM.spec.template.spec.domain.devices) as V1Devices & {
-        logSerialConsole: boolean;
-      };
+      const devices = getDevices(draftVM);
       devices.logSerialConsole = false;
       draftVM.spec.template.spec.domain.devices = devices;
     }
@@ -87,6 +85,11 @@ export const quickCreateVM: QuickCreateVMType = async ({
     if (isUDNManagedNamespace && defaultInterface) {
       delete defaultInterface.masquerade;
       defaultInterface.binding = { name: UDN_BINDING_NAME };
+    }
+
+    const bootDisk = getBootDisk(draftVM);
+    if (bootDisk && !bootDisk.bootOrder) {
+      bootDisk.bootOrder = 1;
     }
   });
 

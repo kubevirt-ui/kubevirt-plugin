@@ -69,6 +69,7 @@ import { PendingChange } from '../utils/types';
 export const usePendingChanges = (
   vm: V1VirtualMachine,
   vmi: V1VirtualMachineInstance,
+  instanceTypeExpandedSpec: V1VirtualMachine,
 ): PendingChange[] => {
   const { t } = useKubevirtTranslation();
 
@@ -167,7 +168,14 @@ export const usePendingChanges = (
       handleAction: () => {
         navigate(getTabURL(vm, VirtualMachineDetailsTab.Details));
         createModal(({ isOpen, onClose }) => (
-          <BootOrderModal isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vm={vm} vmi={vmi} />
+          <BootOrderModal
+            instanceTypeVM={instanceTypeExpandedSpec}
+            isOpen={isOpen}
+            onClose={onClose}
+            onSubmit={onSubmit}
+            vm={vm}
+            vmi={vmi}
+          />
         ));
       },
       hasPendingChange: bootOrderChanged,

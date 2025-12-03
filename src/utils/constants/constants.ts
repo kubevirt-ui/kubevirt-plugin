@@ -10,6 +10,7 @@ export const OPENSHIFT_MULTUS_NS = 'openshift-multus';
 export const VENDOR_LABEL = 'instancetype.kubevirt.io/vendor';
 
 export const ROOTDISK = 'rootdisk';
+export const CLOUDINITDISK = 'cloudinitdisk';
 
 export const KUBEVIRT_HYPERCONVERGED = 'kubevirt-hyperconverged';
 export const OPENSHIFT_CNV = 'openshift-cnv';
