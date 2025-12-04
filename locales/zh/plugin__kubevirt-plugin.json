@@ -788,6 +788,7 @@
   "Internal FQDN": "内部 FQDN",
   "Invalid certificate, please visit the following URL and approve it": "无效的证书，请访问以下 URL 并批准它",
   "Invalid character: {{invalidCharacter}}": "无效的字符：{{invalidCharacter}}",
+  "Invalid IP address. No VirtualMachines will be found.": "Invalid IP address. No VirtualMachines will be found.",
   "Invalid MAC address format": "无效的 MAC 地址格式",
   "Inventory": "库存",
   "IOPS total: {{input}}": "IOPS 总计：{{input}}",

@@ -788,6 +788,7 @@
   "Internal FQDN": "내부 FQDN",
   "Invalid certificate, please visit the following URL and approve it": "유효하지 않은 인증서입니다. 다음 URL을 방문하여 승인해 주세요.",
   "Invalid character: {{invalidCharacter}}": "잘못된 문자: {{invalidCharacter}}",
+  "Invalid IP address. No VirtualMachines will be found.": "Invalid IP address. No VirtualMachines will be found.",
   "Invalid MAC address format": "잘못된 MAC 주소 형식",
   "Inventory": "인벤토리",
   "IOPS total: {{input}}": "총 IOPS: {{input}}",
