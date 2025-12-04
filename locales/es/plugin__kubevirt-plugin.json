@@ -796,6 +796,7 @@
   "Internal FQDN": "FQDN interno",
   "Invalid certificate, please visit the following URL and approve it": "Certificado no válido, visite la siguiente URL y apruébelo.",
   "Invalid character: {{invalidCharacter}}": "Carácter no válido: {{invalidCharacter}}",
+  "Invalid IP address. No VirtualMachines will be found.": "Invalid IP address. No VirtualMachines will be found.",
   "Invalid MAC address format": "Formato de dirección MAC no válido",
   "Inventory": "Inventario",
   "IOPS total: {{input}}": "IOPS totales: {{input}}",

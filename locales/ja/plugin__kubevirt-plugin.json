@@ -788,6 +788,7 @@
   "Internal FQDN": "内部 FQDN",
   "Invalid certificate, please visit the following URL and approve it": "証明書が無効です。次の URL にアクセスして承認してください",
   "Invalid character: {{invalidCharacter}}": "無効な文字: {{invalidCharacter}}",
+  "Invalid IP address. No VirtualMachines will be found.": "Invalid IP address. No VirtualMachines will be found.",
   "Invalid MAC address format": "無効な MAC アドレス形式",
   "Inventory": "インベントリー",
   "IOPS total: {{input}}": "IOPS 合計: {{input}}",
