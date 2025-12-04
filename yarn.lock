@@ -1218,11 +1218,12 @@
   resolved "https://registry.yarnpkg.com/@novnc/novnc/-/novnc-1.5.0.tgz#7df3e4aca48eaa7c0d6f690e7dee89480232e2f1"
   integrity sha512-4yGHOtUCnEJUCsgEt/L78eeJu00kthurLBWXFiaXfonNx0pzbs6R/3gJb1byZe6iAE8V9MF0syQb0xIL8MSOtQ==
 
-"@openshift-console/dynamic-plugin-sdk-internal@4.20.0":
-  version "4.20.0"
-  resolved "https://registry.yarnpkg.com/@openshift-console/dynamic-plugin-sdk-internal/-/dynamic-plugin-sdk-internal-4.20.0.tgz#938702cf6e79dbf732dddb98a24c22680a0b049c"
-  integrity sha512-QEV0XiydJBA33gtVz1g92HLTvG1n99igQ3FR+UBr+ufzl3DvW0hwXH+EZgskff3WBVnEHWlOAI2SGy8ujdfdjg==
+"@openshift-console/dynamic-plugin-sdk-internal@4.21.0-prerelease.1":
+  version "4.21.0-prerelease.1"
+  resolved "https://registry.yarnpkg.com/@openshift-console/dynamic-plugin-sdk-internal/-/dynamic-plugin-sdk-internal-4.21.0-prerelease.1.tgz#a16c849f0ab9470de22b74fce68d259f07f758b7"
+  integrity sha512-uCre2yb1BVJ7jiI6A0vq4PQoYk8Hm0JheTf5GKos7/N6kGv4kFK4+Kb0sxOErYu/m7xnwlgxgG2s3cDUSejbAQ==
   dependencies:
+    "@openshift/dynamic-plugin-sdk" "^5.0.1"
     "@patternfly/react-topology" "^6.2.0"
     immutable "3.x"
     react "^17.0.1"
@@ -1231,15 +1232,15 @@
     react-router "5.3.x"
     react-router-dom "5.3.x"
     react-router-dom-v5-compat "^6.11.2"
-    redux "4.0.1"
+    redux "^4.0.4"
     redux-thunk "2.4.0"
 
-"@openshift-console/dynamic-plugin-sdk-webpack@4.20.0":
-  version "4.20.0"
-  resolved "https://registry.yarnpkg.com/@openshift-console/dynamic-plugin-sdk-webpack/-/dynamic-plugin-sdk-webpack-4.20.0.tgz#5b42772625bf44fc3faf76ecf94b5223ed3e6644"
-  integrity sha512-cTpBy8Jz2C65Qy/3fXIRv8IehvKRkms8rMcjz0KGo7DRoaDPnSyMXi5gH0BIA01nr5U6sBncNSbaD/3PXaZaig==
+"@openshift-console/dynamic-plugin-sdk-webpack@4.21.0-prerelease.1":
+  version "4.21.0-prerelease.1"
+  resolved "https://registry.yarnpkg.com/@openshift-console/dynamic-plugin-sdk-webpack/-/dynamic-plugin-sdk-webpack-4.21.0-prerelease.1.tgz#24b461744e62b723c603fc2429b73b85b67ecbb1"
+  integrity sha512-9zi0g8q2TBjCadyR3FatwzT+AShsaFYEx/fqxq+682G68b+vHx8qoGiOCbpTkleYoJ9tiegEMD1tuIooHb2ICw==
   dependencies:
-    "@openshift/dynamic-plugin-sdk-webpack" "^4.0.2"
+    "@openshift/dynamic-plugin-sdk-webpack" "^4.1.0"
     ajv "^6.12.3"
     chalk "2.4.x"
     comment-json "4.x"
@@ -1250,11 +1251,12 @@
     semver "6.x"
     webpack "^5.75.0"
 
-"@openshift-console/dynamic-plugin-sdk@4.20.0":
-  version "4.20.0"
-  resolved "https://registry.yarnpkg.com/@openshift-console/dynamic-plugin-sdk/-/dynamic-plugin-sdk-4.20.0.tgz#f5e6aaa147f02f651e3e6a734a1fb55555bad56a"
-  integrity sha512-Rf6XfWweXccmz10UpBT0tJTXBDf6jqRaiwQjzXGJ4W+ewVh5BQwxXIeBwzxjuAr3Bt972MhIqksHrlh54moERA==
+"@openshift-console/dynamic-plugin-sdk@4.21.0-prerelease.1":
+  version "4.21.0-prerelease.1"
+  resolved "https://registry.yarnpkg.com/@openshift-console/dynamic-plugin-sdk/-/dynamic-plugin-sdk-4.21.0-prerelease.1.tgz#becaf6676853d444357be90dfefd0007be4969f8"
+  integrity sha512-qHyICIK4GJUCjChO61NWIQbDwcuiNwFnqY10+2Vl66MK+kmmehkpW7YBz45B1OEis/SwloQP+triIC/oZnBvtg==
   dependencies:
+    "@openshift/dynamic-plugin-sdk" "^5.0.1"
     "@patternfly/react-topology" "^6.2.0"
     immutable "3.x"
     lodash "^4.17.21"
@@ -1264,7 +1266,7 @@
     react-router "5.3.x"
     react-router-dom "5.3.x"
     react-router-dom-v5-compat "^6.11.2"
-    redux "4.0.1"
+    redux "^4.0.4"
     redux-thunk "2.4.0"
     reselect "4.x"
     typesafe-actions "^4.2.1"
@@ -1279,13 +1281,23 @@
     sanitize-html "^2.3.2"
     showdown "1.8.6"
 
-"@openshift/dynamic-plugin-sdk-webpack@^4.0.2":
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/@openshift/dynamic-plugin-sdk-webpack/-/dynamic-plugin-sdk-webpack-4.0.2.tgz#0304911c9c27ecff7ba5d2df5ca24f781fd445ec"
-  integrity sha512-zgRLt9WM63aGYygrQEtd8QtWoP5zYWr67kzlRKzGcHeRbWDgiHnY7FOiDUM04bYeb4lL6qv3iErEnrtvVpyh0Q==
+"@openshift/dynamic-plugin-sdk-webpack@^4.1.0":
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/@openshift/dynamic-plugin-sdk-webpack/-/dynamic-plugin-sdk-webpack-4.1.0.tgz#eb62ee18d975431411b78da15c9774d95dbe1fa7"
+  integrity sha512-Pkq6R+fkoE0llgv9WJBcotViAPywrzDkpWK0HSTmrVyfEuWS5cuZUs8ono6L5w9BqDBRXm3ceEuUAZA/Zrar1w==
   dependencies:
     lodash "^4.17.21"
     semver "^7.3.7"
+    yup "^0.32.11"
+
+"@openshift/dynamic-plugin-sdk@^5.0.1":
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@openshift/dynamic-plugin-sdk/-/dynamic-plugin-sdk-5.0.1.tgz#3487afe57d07a28b9aba393e643d86ca13a3735c"
+  integrity sha512-+azUBN6FgcDmlcWMzG0bthcRUJC1u12wf9xa2aJGFbC/uTiOXwjrkcQ7LW/PyK5Em7wDhwaUdapaeOgh8I6Kjg==
+  dependencies:
+    lodash "^4.17.21"
+    semver "^7.3.7"
+    uuid "^8.3.2"
     yup "^0.32.11"
 
 "@patternfly/quickstarts@6.1.0":
@@ -9463,15 +9475,7 @@ redux-thunk@2.4.0:
   resolved "https://registry.yarnpkg.com/redux-thunk/-/redux-thunk-2.4.0.tgz#ac89e1d6b9bdb9ee49ce69a69071be41bbd82d67"
   integrity sha512-/y6ZKQNU/0u8Bm7ROLq9Pt/7lU93cT0IucYMrubo89ENjxPa7i8pqLKu6V4X7/TvYovQ6x01unTeyeZ9lgXiTA==
 
-redux@4.0.1:
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/redux/-/redux-4.0.1.tgz#436cae6cc40fbe4727689d7c8fae44808f1bfef5"
-  integrity sha512-R7bAtSkk7nY6O/OYMVR9RiBI+XghjF9rlbl5806HJbQph0LJVHZrU5oaO4q70eUKiqMRqm4y07KLTlMZ2BlVmg==
-  dependencies:
-    loose-envify "^1.4.0"
-    symbol-observable "^1.2.0"
-
-redux@^4.0.0:
+redux@^4.0.0, redux@^4.0.4:
   version "4.2.1"
   resolved "https://registry.yarnpkg.com/redux/-/redux-4.2.1.tgz#c08f4306826c49b5e9dc901dee0452ea8fce6197"
   integrity sha512-LAUYz4lc+Do8/g7aeRa8JkyDErK6ekstQaqWQrNRW//MY1TvCEpMtpTWvlQ+FPbWCx+Xixu/6SHt5N0HR+SB4w==
