@@ -1,12 +1,12 @@
 import React, { FC, Suspense, useState } from 'react';
-import { dump, load } from 'js-yaml';
+import { load } from 'js-yaml';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { updateCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
+import { K8sResourceKind, ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, AlertVariant, Bullseye } from '@patternfly/react-core';
 
 import './CustomizeInstanceTypeYamlTab.scss';
@@ -46,7 +46,7 @@ const CustomizeInstanceTypeYamlTab: FC = () => {
       }
     >
       <div className="yaml-body">
-        <ResourceYAMLEditor initialResource={dump(vm)} onSave={onSave} />
+        <ResourceYAMLEditor initialResource={vm as K8sResourceKind} onSave={onSave} />
       </div>
       {error && (
         <div className="yaml-alert">

@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
+import { K8sResourceKind, ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
 
 import './CreateResourceDefaultPage.scss';
 
@@ -17,7 +17,13 @@ const CreateResourceDefaultPage: FC<CreateResourceDefaultPageProps> = ({
   header,
   initialResource,
 }) => {
-  return <ResourceYAMLEditor create header={header} initialResource={initialResource} />;
+  return (
+    <ResourceYAMLEditor
+      create
+      header={header}
+      initialResource={initialResource as K8sResourceKind}
+    />
+  );
 };
 
 export default CreateResourceDefaultPage;

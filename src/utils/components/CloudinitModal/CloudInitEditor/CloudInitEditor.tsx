@@ -1,9 +1,8 @@
 import React, { FC, useLayoutEffect, useRef, useState } from 'react';
-import { dump } from 'js-yaml';
 
 import { V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
+import { K8sResourceKind, ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, AlertActionCloseButton, AlertVariant, Divider } from '@patternfly/react-core';
 
 import { getCloudInitData } from '../utils/cloudinit-utils';
@@ -40,7 +39,10 @@ export const _CloudInitEditor: FC<CloudInitEditorProps> = ({ cloudInitVolume, on
     <div className="yaml-container">
       <div className="cloud-init-editor" ref={yamlEditorRef}>
         {editorHeight && (
-          <ResourceYAMLEditor initialResource={dump(cloudInitData || '')} onSave={onSaveClick} />
+          <ResourceYAMLEditor
+            initialResource={(cloudInitData || {}) as K8sResourceKind}
+            onSave={onSaveClick}
+          />
         )}
       </div>
       {saved && (
