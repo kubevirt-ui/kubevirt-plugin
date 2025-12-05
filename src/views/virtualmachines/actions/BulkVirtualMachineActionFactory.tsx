@@ -23,7 +23,7 @@ import ConfirmMultipleVMActionsModal from './components/ConfirmMultipleVMActions
 import VirtualMachineMigrateModal from './components/VirtualMachineMigration/VirtualMachineMigrationModal';
 import { ACTIONS_ID } from './hooks/constants';
 import { deleteVM, migrateVM, pauseVM, restartVM, startVM, stopVM, unpauseVM } from './actions';
-import { getCommonLabels, getLabelsDiffPatch, isSameNamespace } from './utils';
+import { getCommonLabels, getLabelsDiffPatch, isSameCluster, isSameNamespace } from './utils';
 
 export const BulkVirtualMachineActionFactory = {
   crossClusterMigration: (
@@ -170,7 +170,7 @@ export const BulkVirtualMachineActionFactory = {
           vms={vms}
         />
       )),
-    disabled: !isSameNamespace(vms) || isEmpty(vms),
+    disabled: !isSameCluster(vms) || !isSameNamespace(vms) || isEmpty(vms),
     id: ACTIONS_ID.MOVE_TO_FOLDER,
     label: t('Move to folder'),
   }),

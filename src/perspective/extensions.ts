@@ -194,9 +194,6 @@ const migrationSection = [
     type: 'console.navigation/section',
   } as EncodedExtension<NavSection>,
   {
-    flags: {
-      required: ['STORAGE_MIGRATION_ENABLED'],
-    },
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-storagemigrations-virt-perspective',
