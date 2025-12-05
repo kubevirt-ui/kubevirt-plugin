@@ -24,7 +24,7 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk/lib/api/internal-types';
 import { impersonateStateToProps } from '@openshift-console/dynamic-plugin-sdk/lib/app/core/reducers/coreSelectors';
 import { ImpersonateKind } from '@openshift-console/dynamic-plugin-sdk/lib/app/redux-types';
-import { MenuList, MenuToggle, Select, SelectPopperProps } from '@patternfly/react-core';
+import { MenuList, MenuToggle, Select, SelectPopperProps, Tooltip } from '@patternfly/react-core';
 import { EllipsisVIcon } from '@patternfly/react-icons';
 
 import ActionMenuContent from './ActionMenuContent';
@@ -34,6 +34,7 @@ export type CheckAccess = typeof defaultCheckAccess;
 
 export type ExtendedLazyActionMenuProps = LazyActionMenuProps & {
   checkAccessDelegate?: CheckAccess;
+  disabledTooltip?: string;
   localOptions?: MenuOption[];
 };
 
@@ -89,6 +90,7 @@ const LazyFetch = connect(impersonateStateToProps)(LazyFetchInternal);
 const LazyActionMenu: FC<ExtendedLazyActionMenuProps> = ({
   checkAccessDelegate = defaultCheckAccess,
   context,
+  disabledTooltip,
   isDisabled,
   label,
   localOptions = [],
@@ -111,7 +113,7 @@ const LazyActionMenu: FC<ExtendedLazyActionMenuProps> = ({
     [localOptions, remoteOptions],
   );
 
-  return (
+  const menu = (
     <>
       {initActionLoader && (
         <LazyFetch
@@ -155,6 +157,13 @@ const LazyActionMenu: FC<ExtendedLazyActionMenuProps> = ({
         </MenuList>
       </Select>
     </>
+  );
+  return isDisabled && disabledTooltip ? (
+    <Tooltip content={disabledTooltip} position="left">
+      <div>{menu}</div>
+    </Tooltip>
+  ) : (
+    menu
   );
 };
 
