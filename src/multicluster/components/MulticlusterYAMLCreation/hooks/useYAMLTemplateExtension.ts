@@ -1,3 +1,5 @@
+import { load } from 'js-yaml';
+
 import {
   isYAMLTemplate,
   K8sModel,
@@ -14,8 +16,13 @@ const useYAMLTemplateExtension = (model: K8sModel) => {
   )?.properties?.template as (() => string) | string;
 
   return {
-    resourceYAMLTemplate:
-      typeof resourceYAMLTemplate === 'function' ? resourceYAMLTemplate?.() : resourceYAMLTemplate,
+    resourceYAMLTemplate: resourceYAMLTemplate
+      ? load(
+          typeof resourceYAMLTemplate === 'function'
+            ? resourceYAMLTemplate()
+            : resourceYAMLTemplate,
+        )
+      : undefined,
     yamlExtensionsResolved,
   };
 };

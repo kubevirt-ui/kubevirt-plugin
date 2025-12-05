@@ -6,11 +6,7 @@ import './CreateResourceDefaultPage.scss';
 
 type CreateResourceDefaultPageProps = {
   header: string;
-  initialResource:
-    | {
-        [key: string]: any;
-      }
-    | string;
+  initialResource: K8sResourceCommon;
 };
 
 const CreateResourceDefaultPage: FC<CreateResourceDefaultPageProps> = ({
