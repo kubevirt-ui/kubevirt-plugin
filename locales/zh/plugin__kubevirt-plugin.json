@@ -353,6 +353,7 @@
   "Completion time": "完成时间",
   "Completion timeout": "完成超时",
   "CompletionTimeoutPerGiB is the maximum number of seconds per GiB a migration is allowed to take. If a live-migration takes longer to migrate than this value multiplied by the size of the VMI, the migration will be cancelled, unless AllowPostCopy is true. Defaults to 800.": "CompletionTimeoutPerGiB 是允许一个迁移的每 GiB 使用的最大秒数。如果实时迁移的迁移时间超过这个值乘以 VMI 的大小，则迁移会被取消，除非 AllowPostCopy 为 true。默认为800。",
+  "CompletionTimeoutPerGiB is the maximum number of seconds per GiB a migration is allowed to take. If a live-migration takes longer to migrate than this value multiplied by the size of the VMI, the migration will be cancelled, unless AllowPostCopy is true. Defaults to 800. For more info: ": "CompletionTimeoutPerGiB is the maximum number of seconds per GiB a migration is allowed to take. If a live-migration takes longer to migrate than this value multiplied by the size of the VMI, the migration will be cancelled, unless AllowPostCopy is true. Defaults to 800. For more info: ",
   "Compute": "计算",
   "Compute compatibility": "计算兼容性",
   "Compute-intensive applications": "计算密集型应用程序",
