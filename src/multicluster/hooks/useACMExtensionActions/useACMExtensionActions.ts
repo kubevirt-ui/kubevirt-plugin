@@ -1,6 +1,10 @@
 import { useMemo } from 'react';
 import produce from 'immer';
 
+import {
+  ACMVirtualMachineAction,
+  isACMVirtualMachineAction,
+} from '@kubevirt-extensions/acm.virtualmachine';
 import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -13,11 +17,7 @@ import { useResolvedExtensions } from '@openshift-console/dynamic-plugin-sdk';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 import { isRunning } from '@virtualmachines/utils';
 
-import { ACMVirtualMachineActionExtension } from './constants';
-import {
-  buildACMVirtualMachineActionsFromExtensions,
-  isACMVirtualMachineActionExtension,
-} from './utils';
+import { buildACMVirtualMachineActionsFromExtensions } from './utils';
 
 const useACMExtensionActions = (vm): ActionDropdownItemType[] => {
   const { createModal } = useModal();
@@ -27,7 +27,7 @@ const useACMExtensionActions = (vm): ActionDropdownItemType[] => {
   const [provider, providerLoaded] = useProviderByClusterName(getCluster(vm) ?? hubClusterName);
 
   const [virtualMachineActionExtensions, virtualMachineActionExtensionsResolved] =
-    useResolvedExtensions<ACMVirtualMachineActionExtension>(isACMVirtualMachineActionExtension);
+    useResolvedExtensions<ACMVirtualMachineAction>(isACMVirtualMachineAction);
 
   return useMemo(() => {
     if (!isACMPage || !virtualMachineActionExtensionsResolved) return [];

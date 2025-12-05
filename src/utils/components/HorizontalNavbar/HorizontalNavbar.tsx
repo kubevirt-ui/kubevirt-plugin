@@ -29,17 +29,15 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
   vm,
 }) => {
   const location = useLocation();
-
   const params = useParams();
 
-  const dynamicPluginPages = useDynamicPages(VirtualMachineModel);
+  const vmCreated = false; // TODO check URL, we can use useMatch hook
 
-  const allPages = useMemo(
-    () => [...pages, ...(dynamicPluginPages || [])] as NavPageKubevirt[],
-    [pages, dynamicPluginPages],
-  );
+  const dynamicPluginPages = useDynamicPages(VirtualMachineModel, vm, vmCreated);
 
-  const paths = allPages.map((page) => page.href);
+  const allPages = useMemo(() => [...pages, ...dynamicPluginPages], [pages, dynamicPluginPages]);
+
+  const paths = useMemo(() => allPages.map((page) => page.href), [allPages]);
 
   useEffect(() => {
     const defaultPage = allPages.find(({ href }) => isEmpty(href));
@@ -51,7 +49,7 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
       ) || defaultPage;
 
     setActiveItem(initialActiveTab?.name?.toLowerCase());
-  }, [allPages, location?.pathname]);
+  }, [allPages, location?.pathname, basePath]);
 
   const [activeItem, setActiveItem] = useState<number | string>();
 

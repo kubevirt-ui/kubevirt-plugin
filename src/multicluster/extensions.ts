@@ -1,3 +1,4 @@
+import { ACMVirtualMachineAction } from '@kubevirt-extensions/acm.virtualmachine';
 import { EncodedExtension } from '@openshift/dynamic-plugin-sdk-webpack';
 import {
   FeatureFlagHookProvider,
@@ -8,7 +9,6 @@ import {
 import type { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plugin-sdk-webpack';
 import { ResourceRoute } from '@stolostron/multicluster-sdk';
 
-import { ACMVirtualMachineActionExtension } from './hooks/useACMExtensionActions/constants';
 import { CROSS_CLUSTER_MIGRATION_ACTION_ID, KUBEVIRT_VM_PATH } from './constants';
 
 export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
@@ -236,7 +236,7 @@ export const extensions: EncodedExtension[] = [
       title: '%plugin__kubevirt-plugin~Cross cluster migration%',
     },
     type: 'acm.virtualmachine/action',
-  } as EncodedExtension<ACMVirtualMachineActionExtension>,
+  } as EncodedExtension<ACMVirtualMachineAction>,
   {
     properties: {
       component: {
