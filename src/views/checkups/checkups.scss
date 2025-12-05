@@ -1,18 +1,3 @@
-.CheckupsRunButton {
-  &--main {
-    button {
-      color: var(--pf-t--global--text--color--on-disabled);
-      background-color: var(--pf-t--global--background--color--disabled--default);
-    }
-  }
-  &--item {
-    &__disabled {
-      cursor: default;
-      color: var(--pf-t--global--text--color--disabled);
-    }
-  }
-}
-
 .CheckupsStatusIcon {
   &--main {
     display: inline-flex;

@@ -1,3 +1,31 @@
 .kv-actions-dropdown-submenu {
   width: max-content;
 }
+
+// When item is disabled but has a clickable link in description,
+// use pf-m-disabled for visual styling but override pointer events to allow description clicks
+.kv-action-dropdown-item--disabled-with-link.pf-m-disabled {
+  .pf-v6-c-menu__item-main {
+    pointer-events: none;
+  }
+
+  .pf-v6-c-menu__item-description {
+    a {
+      pointer-events: auto;
+      cursor: pointer;
+      opacity: 1;
+
+      &:hover {
+        text-decoration: underline;
+      }
+
+      &:focus,
+      &:focus-visible {
+        outline: 2px solid var(--pf-v6-global--primary-color--100);
+        outline-offset: 2px;
+        box-shadow: 0 0 0 2px var(--pf-v6-global--BackgroundColor--100),
+          0 0 0 4px var(--pf-v6-global--primary-color--100);
+      }
+    }
+  }
+}
