@@ -10,6 +10,7 @@ import { ConsoleState, HTTP, HTTPS, VNC_CONSOLE_TYPE, WS, WSS } from '../utils/C
 import { ConsoleComponentState } from '../utils/types';
 
 import { isSessionAlreadyInUse } from './utils/util';
+import { RFB } from './utils/VncConsoleTypes';
 import {
   sendCtrlAlt1,
   sendCtrlAlt2,
@@ -60,7 +61,7 @@ export const VncConsole: FC<VncConsoleProps> = ({
   setState,
   viewOnly = false,
 }) => {
-  const rfbRef = useRef<RFBCreate>(null);
+  const rfbRef = useRef<RFB>(null);
   const staticRenderLocationRef = useRef(null);
   const sessionRef = useRef(0);
   const setVncState = useCallback(
@@ -108,7 +109,7 @@ export const VncConsole: FC<VncConsoleProps> = ({
         preserveSession,
         protocol: isEncrypted ? WSS : WS,
       });
-      const rfbInst = new RFBCreate(staticRenderLocationRef.current, url);
+      const rfbInst: RFB = new RFBCreate(staticRenderLocationRef.current, url);
       rfbInst.addEventListener(
         'connect',
         () => isMySession() && setVncState(() => ({ state: connected })),
