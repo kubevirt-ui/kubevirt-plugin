@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
@@ -9,16 +9,22 @@ import { getAnnotations } from '@kubevirt-utils/resources/shared';
 import { K8sModel, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 
 type DescriptionItemAnnotationsProps = {
+  className?: string;
+  descriptionHeaderWrapper?: (children: string) => ReactNode;
   editable?: boolean;
   label?: string;
   model: K8sModel;
+  onAnnotationsSubmit?: (annotations: { [key: string]: string }) => Promise<any>;
   resource: K8sResourceCommon;
 };
 
 const DescriptionItemAnnotations: FC<DescriptionItemAnnotationsProps> = ({
+  className,
+  descriptionHeaderWrapper,
   editable = true,
   label,
   model,
+  onAnnotationsSubmit,
   resource,
 }) => {
   const { createModal } = useModal();
@@ -28,7 +34,7 @@ const DescriptionItemAnnotations: FC<DescriptionItemAnnotationsProps> = ({
     annotationsCount,
   });
 
-  const onAnnotationsSubmit = (updatedAnnotations: { [key: string]: string }) =>
+  const onAnnotationsSubmitInternal = (updatedAnnotations: { [key: string]: string }) =>
     k8sPatch({
       data: [
         {
@@ -47,9 +53,12 @@ const DescriptionItemAnnotations: FC<DescriptionItemAnnotationsProps> = ({
         isOpen={isOpen}
         obj={resource}
         onClose={onClose}
-        onSubmit={onAnnotationsSubmit}
+        onSubmit={onAnnotationsSubmit ?? onAnnotationsSubmitInternal}
       />
     ));
+
+  const annotationsHeader = t('Annotations');
+  const descriptionHeader = descriptionHeaderWrapper?.(annotationsHeader) ?? annotationsHeader;
 
   return (
     <DescriptionItem
@@ -58,8 +67,9 @@ const DescriptionItemAnnotations: FC<DescriptionItemAnnotationsProps> = ({
         'Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects.',
       )}
       breadcrumb={`${label ?? model.label}.metadata.annotations`}
+      className={className}
       descriptionData={annotationsText}
-      descriptionHeader={t('Annotations')}
+      descriptionHeader={descriptionHeader}
       isEdit={editable}
       isPopover
       moreInfoURL={documentationURL.ANNOTATIONS}

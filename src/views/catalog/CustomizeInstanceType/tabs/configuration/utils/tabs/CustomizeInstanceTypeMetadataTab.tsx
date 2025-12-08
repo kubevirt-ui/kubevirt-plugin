@@ -1,21 +1,15 @@
 import React from 'react';
 
-import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
-import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
-import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
+import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
+import DescriptionItemAnnotations from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemAnnotations';
+import DescriptionItemLabels from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemLabels';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
-import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
-import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getName } from '@kubevirt-utils/resources/shared';
 import { updateCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { DescriptionList, Grid, PageSection, Title } from '@patternfly/react-core';
-import MetadataTabAnnotations from '@virtualmachines/details/tabs/configuration/metadata/components/MetadataTabAnnotations/MetadataTabAnnotations';
-import MetadataTabLabels from '@virtualmachines/details/tabs/configuration/metadata/components/MetadataTabLabels/MetadataTabLabels';
 
 const CustomizeInstanceTypeMetadataTab = () => {
-  const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
   const vm = vmSignal.value;
 
@@ -40,50 +34,19 @@ const CustomizeInstanceTypeMetadataTab = () => {
       </Title>
       <Grid span={6}>
         <DescriptionList>
-          <DescriptionItem
-            bodyContent={t(
-              'Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services.',
-            )}
-            onEditClick={() =>
-              createModal(({ isOpen, onClose }) => (
-                <LabelsModal
-                  isOpen={isOpen}
-                  obj={vm}
-                  onClose={onClose}
-                  onLabelsSubmit={(labels) => updateMetadata(labels, 'labels')}
-                />
-              ))
-            }
-            breadcrumb="VirtualMachine.metadata.labels"
-            data-test-id={`${getName(vm)}-labels`}
-            descriptionData={<MetadataTabLabels labels={vm?.metadata?.labels} />}
-            descriptionHeader={<SearchItem id="labels">{t('Labels')}</SearchItem>}
-            editOnTitleJustify
-            isEdit
-            isPopover
-            moreInfoURL={documentationURL.LABELS}
-            showEditOnTitle
+          <DescriptionItemLabels
+            descriptionHeaderWrapper={(children) => <SearchItem id="labels">{children}</SearchItem>}
+            model={VirtualMachineModel}
+            onLabelsSubmit={(labels) => updateMetadata(labels, 'labels')}
+            resource={vm}
           />
-          <DescriptionItem
-            bodyContent={t(
-              'Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects.',
+          <DescriptionItemAnnotations
+            descriptionHeaderWrapper={(children) => (
+              <SearchItem id="metadata">{children}</SearchItem>
             )}
-            onEditClick={() =>
-              createModal(({ isOpen, onClose }) => (
-                <AnnotationsModal
-                  isOpen={isOpen}
-                  obj={vm}
-                  onClose={onClose}
-                  onSubmit={(annotations) => updateMetadata(annotations, 'annotations')}
-                />
-              ))
-            }
-            breadcrumb="VirtualMachine.metadata.annotations"
-            descriptionData={<MetadataTabAnnotations annotations={vm?.metadata?.annotations} />}
-            descriptionHeader={<SearchItem id="metadata">{t('Annotations')}</SearchItem>}
-            isEdit
-            isPopover
-            moreInfoURL={documentationURL.ANNOTATIONS}
+            model={VirtualMachineModel}
+            onAnnotationsSubmit={(annotations) => updateMetadata(annotations, 'annotations')}
+            resource={vm}
           />
         </DescriptionList>
       </Grid>

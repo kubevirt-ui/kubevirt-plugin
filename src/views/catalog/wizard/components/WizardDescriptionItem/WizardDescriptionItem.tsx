@@ -1,4 +1,5 @@
 import React, { FC, ReactNode } from 'react';
+import classNames from 'classnames';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -33,6 +34,8 @@ type WizardDescriptionItemProps = {
   isDisabled?: boolean;
   /** is the description group editable */
   isEdit?: boolean;
+  /** flag indicating if the description item is a label editor */
+  isLabelEditor?: boolean;
   label?: ReactNode;
   /** onClick callback for the edit button */
   onEditClick?: () => void;
@@ -55,6 +58,7 @@ export const WizardDescriptionItem: FC<WizardDescriptionItemProps> = React.memo(
     helpTextIcon,
     isDisabled,
     isEdit,
+    isLabelEditor = false,
     label,
     onEditClick,
     onTitleClick,
@@ -135,7 +139,9 @@ export const WizardDescriptionItem: FC<WizardDescriptionItemProps> = React.memo(
           </DescriptionListDescription>
         ) : (
           <div data-test-id={testId}>
-            <DescriptionListDescription>
+            <DescriptionListDescription
+              className={classNames({ 'co-editable-label-group': isLabelEditor })}
+            >
               {description ?? (
                 <span className="pf-v6-u-text-color-subtle">{t('Not available')}</span>
               )}

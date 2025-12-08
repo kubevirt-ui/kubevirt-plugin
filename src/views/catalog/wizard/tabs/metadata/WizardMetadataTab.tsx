@@ -55,6 +55,7 @@ const WizardMetadataTab: WizardTab = ({ loaded, updateVM, vm }) => {
                 }
                 isDisabled={!loaded}
                 isEdit
+                isLabelEditor
                 showEditOnTitle
                 testId="wizard-metadata-labels"
                 title={t('Labels')}
