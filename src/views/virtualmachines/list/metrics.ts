@@ -1,12 +1,13 @@
 import xbytes from 'xbytes';
 
+import { V1CPU } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getMemorySize } from '@kubevirt-utils/components/CPUMemoryModal/utils/CpuMemoryUtils';
+import { getVCPUCount } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { signal } from '@preact/signals-core';
 
 export type MetricsType = {
   [key in string]: {
-    cpuRequested?: number;
     cpuUsage?: number;
     memoryRequested?: number;
     memoryUsage?: number;
@@ -40,18 +41,14 @@ export const setVMCPUUsage = (vmName: string, vmNamespace: string, cpuUsage: num
   vmMetrics.cpuUsage = cpuUsage;
 };
 
-export const setVMCPURequested = (vmName: string, vmNamespace: string, cpuRequested: number) => {
-  const vmMetrics = getVMMetrics(vmName, vmNamespace);
-  vmMetrics.cpuRequested = cpuRequested;
-};
+export const getCPUUsagePercentage = (vmName: string, vmNamespace: string, vmiCPU: V1CPU) => {
+  const { cpuUsage } = getVMMetrics(vmName, vmNamespace);
 
-export const getCPUUsagePercentage = (vmName: string, vmNamespace: string) => {
-  const { cpuRequested, cpuUsage } = getVMMetrics(vmName, vmNamespace);
+  if (isEmpty(cpuUsage)) return;
 
-  if (isEmpty(cpuRequested) || isEmpty(cpuUsage)) return;
+  const cpuRequested = getVCPUCount(vmiCPU);
 
-  const percentage = (cpuUsage * 100) / cpuRequested;
-  return percentage;
+  return (cpuUsage * 100) / cpuRequested;
 };
 
 export const getMemoryUsagePercentage = (

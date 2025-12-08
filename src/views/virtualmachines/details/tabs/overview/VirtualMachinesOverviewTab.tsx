@@ -46,7 +46,7 @@ const VirtualMachinesOverviewTab: FC<NavPageComponentProps> = ({
               />
             </GridItem>
             <GridItem>
-              <VirtualMachinesOverviewTabUtilization pods={pods} vm={vm} vmi={vmi} />
+              <VirtualMachinesOverviewTabUtilization vm={vm} vmi={vmi} />
             </GridItem>
           </Grid>
         </GridItem>

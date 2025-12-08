@@ -2,8 +2,9 @@ import xbytes from 'xbytes';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getMemorySize } from '@kubevirt-utils/components/CPUMemoryModal/utils/CpuMemoryUtils';
-import { getMemory } from '@kubevirt-utils/resources/vm';
+import { getCPU, getMemory, getVCPUCount } from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
+import { humanizeCpuCores } from '@kubevirt-utils/utils/humanize.js';
 import { PrometheusResponse } from '@openshift-console/dynamic-plugin-sdk';
 import { METRICS } from '@overview/OverviewTab/metric-charts-card/utils/constants';
 import {
@@ -44,4 +45,10 @@ export const getMemoryCapacityText = (vmis: V1VirtualMachineInstance[]) => {
 export const getMetricText = (response: PrometheusResponse, metric: string) => {
   const bytes = getRawNumber(response);
   return getValueWithUnitText(bytes, metric);
+};
+
+export const getCpuRequestedText = (vmis: V1VirtualMachineInstance[]) => {
+  const totalCPU = vmis.map((vmi) => getCPU(vmi)).reduce((acc, cpu) => acc + getVCPUCount(cpu), 0);
+
+  return humanizeCpuCores(totalCPU).string;
 };

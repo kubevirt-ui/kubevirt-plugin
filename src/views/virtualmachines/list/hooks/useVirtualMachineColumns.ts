@@ -123,7 +123,7 @@ const useVirtualMachineColumns = (
       {
         additional: true,
         id: 'cpu-usage',
-        sort: (_, direction) => sortingUsingFunction(direction, sortByCPUUsage),
+        sort: (_, direction) => sortingUsingFunctionWithMapper(direction, sortByCPUUsage),
         title: t('CPU'),
         transforms: [sortable],
       },
