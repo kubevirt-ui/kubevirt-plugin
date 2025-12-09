@@ -22,10 +22,25 @@ import { isRunning } from '@virtualmachines/utils';
 import ConfirmMultipleVMActionsModal from './components/ConfirmMultipleVMActionsModal/ConfirmMultipleVMActionsModal';
 import VirtualMachineMigrateModal from './components/VirtualMachineMigration/VirtualMachineMigrationModal';
 import { ACTIONS_ID } from './hooks/constants';
-import { deleteVM, migrateVM, pauseVM, restartVM, startVM, stopVM, unpauseVM } from './actions';
+import {
+  deleteVM,
+  migrateVM,
+  pauseVM,
+  resetVM,
+  restartVM,
+  startVM,
+  stopVM,
+  unpauseVM,
+} from './actions';
 import { getCommonLabels, getLabelsDiffPatch, isSameNamespace } from './utils';
 
 export const BulkVirtualMachineActionFactory = {
+  controlActions: (controlActions: ActionDropdownItemType[]): ActionDropdownItemType => ({
+    cta: null,
+    id: 'bulk-control-menu',
+    label: t('Control'),
+    options: controlActions,
+  }),
   crossClusterMigration: (
     vms: V1VirtualMachine[],
     createModal: (modal: ModalComponent) => void,
@@ -59,6 +74,7 @@ export const BulkVirtualMachineActionFactory = {
           actionType="Delete"
           isOpen={isOpen}
           onClose={onClose}
+          severityVariant="danger"
           vms={vms}
         />
       )),
@@ -123,6 +139,7 @@ export const BulkVirtualMachineActionFactory = {
     id: ACTIONS_ID.BULK_MIGRATE_COMPUTE,
     label: t('Compute'),
   }),
+
   migrateStorage: (
     vms: V1VirtualMachine[],
     createModal: (modal: ModalComponent) => void,
@@ -138,7 +155,6 @@ export const BulkVirtualMachineActionFactory = {
     id: ACTIONS_ID.BULK_MIGRATE_STORAGE,
     label: t('Storage'),
   }),
-
   moveToFolder: (
     vms: V1VirtualMachine[],
     createModal: (modal: ModalComponent) => void,
@@ -194,6 +210,32 @@ export const BulkVirtualMachineActionFactory = {
     disabled: isEmpty(vms),
     id: ACTIONS_ID.PAUSE,
     label: t('Pause'),
+  }),
+  reset: (
+    vms: V1VirtualMachine[],
+    createModal: (modal: ModalComponent) => void,
+    confirmVMActionsEnabled: boolean,
+  ): ActionDropdownItemType => ({
+    cta: () =>
+      confirmVMActionsEnabled
+        ? createModal(({ isOpen, onClose }) => (
+            <ConfirmMultipleVMActionsModal
+              checkToConfirmMessage={t(
+                'A VM reset is a hard power cycle and might cause data loss or corruption. Only reset if the VM is completely unresponsive.',
+              )}
+              action={resetVM}
+              actionType="Reset"
+              isOpen={isOpen}
+              onClose={onClose}
+              severityVariant="warning"
+              vms={vms}
+            />
+          ))
+        : vms.forEach(resetVM),
+    description: t('Hard power cycle on the VMs'),
+    disabled: isEmpty(vms),
+    id: ACTIONS_ID.RESET,
+    label: t('Reset'),
   }),
   restart: (
     vms: V1VirtualMachine[],

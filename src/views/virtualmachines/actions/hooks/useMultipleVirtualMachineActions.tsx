@@ -18,7 +18,6 @@ import { VMIMMapper } from '@virtualmachines/utils/mappers';
 
 import { BulkVirtualMachineActionFactory } from '../BulkVirtualMachineActionFactory';
 
-import { ACTIONS_ID } from './constants';
 import useIsMTCInstalled from './useIsMTCInstalled';
 import useIsMTVInstalled from './useIsMTVInstalled';
 import { someVMIsMigrating } from './utils';
@@ -76,11 +75,18 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms,
     const isDeleteDisabled = hasRunningVM || hasProtectedVM;
 
     const actions: ActionDropdownItemType[] = [
-      BulkVirtualMachineActionFactory.start(vms),
-      BulkVirtualMachineActionFactory.stop(vms, createModal, confirmVMActionsEnabled),
-      BulkVirtualMachineActionFactory.restart(vms, createModal, confirmVMActionsEnabled),
-      BulkVirtualMachineActionFactory.pause(vms, createModal, confirmVMActionsEnabled),
-      BulkVirtualMachineActionFactory.unpause(vms),
+      BulkVirtualMachineActionFactory.controlActions(
+        [
+          !vms.every(isRunning) && BulkVirtualMachineActionFactory.start(vms),
+          !vms.every(isStopped) &&
+            BulkVirtualMachineActionFactory.stop(vms, createModal, confirmVMActionsEnabled),
+          !vms.every(isPaused) &&
+            BulkVirtualMachineActionFactory.pause(vms, createModal, confirmVMActionsEnabled),
+          BulkVirtualMachineActionFactory.unpause(vms),
+          BulkVirtualMachineActionFactory.restart(vms, createModal, confirmVMActionsEnabled),
+          BulkVirtualMachineActionFactory.reset(vms, createModal, confirmVMActionsEnabled),
+        ].filter(Boolean),
+      ),
       BulkVirtualMachineActionFactory.snapshot(vms, createModal),
       ...(migrationActions.length > 0
         ? [
@@ -99,18 +105,6 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms,
       BulkVirtualMachineActionFactory.editLabels(vms, createModal),
       BulkVirtualMachineActionFactory.delete(vms, createModal, isDeleteDisabled),
     ];
-
-    if (vms.every(isStopped)) {
-      return actions.filter((action) => action.id !== ACTIONS_ID.STOP);
-    }
-
-    if (vms.every(isRunning)) {
-      return actions.filter((action) => action.id !== ACTIONS_ID.START);
-    }
-
-    if (vms.every(isPaused)) {
-      return actions.filter((action) => action.id !== ACTIONS_ID.PAUSE);
-    }
 
     return actions;
   }, [
