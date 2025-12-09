@@ -3,12 +3,14 @@ import {
   FeatureFlagHookProvider,
   HrefNavItem,
   NavSection,
+  ResourceActionProvider,
   RoutePage,
 } from '@openshift-console/dynamic-plugin-sdk';
 import type { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plugin-sdk-webpack';
 
 export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
   StorageMigrationList: './views/storagemigrations/list/StorageMigrationList.tsx',
+  useStorageMigrationActions: './views/storagemigrations/actions/useStorageMigrationActions.tsx',
 };
 
 export const extensions: EncodedExtension[] = [
@@ -48,6 +50,22 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.navigation/section',
   } as EncodedExtension<NavSection>,
+  {
+    flags: {
+      required: ['STORAGE_MIGRATION_ENABLED'],
+    },
+    properties: {
+      model: {
+        group: 'migration.openshift.io',
+        kind: 'MigPlan',
+        version: 'v1alpha1',
+      },
+      provider: {
+        $codeRef: 'useStorageMigrationActions',
+      },
+    },
+    type: 'console.action/resource-provider',
+  } as EncodedExtension<ResourceActionProvider>,
   {
     flags: {
       required: ['STORAGE_MIGRATION_ENABLED'],
