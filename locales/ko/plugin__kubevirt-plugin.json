@@ -1348,7 +1348,7 @@
   "Select different Node": "다른 노드 선택",
   "Select InstanceType": "InstanceType 선택",
   "Select ISO": "ISO 선택",
-  "Select multiple VirtualMachines to perform an action for all of them": "모든 작업에 대해 작업을 수행하려면 여러 VirtualMachines를 선택합니다.",
+  "Select multiple VirtualMachines to perform an action for all of them": "Select multiple VirtualMachines to perform an action for all of them",
   "Select NetwrokAttachmentDefinition": "NetwrokAttachmentDefinition 선택",
   "Select node": "노드 선택",
   "Select nodes": "노드 선택",
