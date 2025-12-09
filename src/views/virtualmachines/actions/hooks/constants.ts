@@ -5,6 +5,7 @@ export const ACTIONS_ID = {
   EDIT_LABELS: 'selected-vms-action-edit-labels',
   MOVE_TO_FOLDER: 'selected-vms-action-move-to-folder',
   PAUSE: 'selected-vms-action-pause',
+  RESET: 'selected-vms-action-reset',
   RESTART: 'selected-vms-action-restart',
   SNAPSHOT: 'selected-vms-action-snapshot',
   START: 'selected-vms-action-start',
