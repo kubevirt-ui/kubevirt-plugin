@@ -1109,7 +1109,7 @@
   "Removing Resources": "Eliminando recursos",
   "Request sent": "Solicitud enviada",
   "Requested": "Solicitado",
-  "Requested of ": "Solicitado de",
+  "Requested of {{cpuRequested}}": "Requested of {{cpuRequested}}",
   "Required": "Requerido",
   "Required parameters": "Parámetros requeridos",
   "Required when automatic update is enabled": "Se requiere cuando la actualización automática está habilitada.",

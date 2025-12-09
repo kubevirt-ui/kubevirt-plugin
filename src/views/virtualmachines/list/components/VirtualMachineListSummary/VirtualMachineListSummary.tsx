@@ -44,7 +44,7 @@ const VirtualMachineListSummary: FC<VirtualMachineListSummaryProps> = ({
   const { primaryStatuses } = getVMStatuses(vms || []);
 
   const { cpuRequested, cpuUsage, memoryCapacity, memoryUsage, storageCapacity, storageUsage } =
-    useVMTotalsMetrics(vms, vmis);
+    useVMTotalsMetrics(vmis);
 
   const onStatusChange = (status: 'Error' | VM_STATUS) => () =>
     onFilterChange(VirtualMachineRowFilterType.Status, { selected: [status] });

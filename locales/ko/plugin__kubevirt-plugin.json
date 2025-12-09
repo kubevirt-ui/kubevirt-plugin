@@ -1105,7 +1105,7 @@
   "Removing Resources": "리소스 제거 중",
   "Request sent": "요청 전송됨",
   "Requested": "요청됨",
-  "Requested of ": "요청됨",
+  "Requested of {{cpuRequested}}": "Requested of {{cpuRequested}}",
   "Required": "필수 항목",
   "Required parameters": "필수 매개 변수",
   "Required when automatic update is enabled": "자동 업데이트가 활성화된 경우 필수 사항",

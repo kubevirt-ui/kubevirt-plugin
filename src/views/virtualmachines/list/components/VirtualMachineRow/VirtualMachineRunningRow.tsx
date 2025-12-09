@@ -7,7 +7,6 @@ import {
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, NodeModel } from '@kubevirt-utils/models';
-import { getMemory } from '@kubevirt-utils/resources/vm';
 import { getVMIIPAddressesWithName } from '@kubevirt-utils/resources/vmi';
 import { ResourceLink, RowProps } from '@openshift-console/dynamic-plugin-sdk';
 import { PVCMapper } from '@virtualmachines/utils/mappers';
@@ -43,8 +42,8 @@ const VirtualMachineRunningRow: FC<
         ),
         pvcMapper,
         status,
+        vmi,
         vmim,
-        vmiMemory: getMemory(vmi),
       }}
       activeColumnIDs={activeColumnIDs}
       index={index}
