@@ -92,6 +92,7 @@ const useStorageMigrationActions: ExtensionHook<Action[], MigPlan> = (migPlan) =
               obj={migPlan}
               onClose={onClose}
               onDeleteSubmit={deleteMigPlan}
+              redirectUrl="/k8s/storagemigrations"
             />
           )),
         disabled: false,
