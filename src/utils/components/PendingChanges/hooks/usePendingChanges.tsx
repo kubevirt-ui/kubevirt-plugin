@@ -31,7 +31,7 @@ import {
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
-import { isInstanceTypeVM } from '@kubevirt-utils/resources/instancetype/helper';
+import { isExpandableSpecVM } from '@kubevirt-utils/resources/instancetype/helper';
 import { getCPU, getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
 import { DESCHEDULER_EVICT_LABEL } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -143,7 +143,7 @@ export const usePendingChanges = (
           <CPUMemoryModal isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vm={vm} />
         ));
       },
-      hasPendingChange: !isInstanceTypeVM(vm) && cpuMemoryChanged && restartRequired(vm),
+      hasPendingChange: !isExpandableSpecVM(vm) && cpuMemoryChanged && restartRequired(vm),
       label: t('CPU | Memory'),
       tabLabel: VirtualMachineDetailsTabLabel.Details,
     },
@@ -159,7 +159,7 @@ export const usePendingChanges = (
           />
         ));
       },
-      hasPendingChange: isInstanceTypeVM(vm) && instanceTypeChanged && restartRequired(vm),
+      hasPendingChange: isExpandableSpecVM(vm) && instanceTypeChanged && restartRequired(vm),
       label: t('InstanceType'),
       tabLabel: VirtualMachineDetailsTabLabel.Details,
     },
