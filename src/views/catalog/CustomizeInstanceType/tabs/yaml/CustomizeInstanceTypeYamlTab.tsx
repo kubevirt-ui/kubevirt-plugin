@@ -1,5 +1,5 @@
 import React, { FC, Suspense, useState } from 'react';
-import { dump, load } from 'js-yaml';
+import { load } from 'js-yaml';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -46,7 +46,7 @@ const CustomizeInstanceTypeYamlTab: FC = () => {
       }
     >
       <div className="yaml-body">
-        <ResourceYAMLEditor initialResource={dump(vm)} onSave={onSave} />
+        <ResourceYAMLEditor initialResource={vm} onSave={onSave} />
       </div>
       {error && (
         <div className="yaml-alert">

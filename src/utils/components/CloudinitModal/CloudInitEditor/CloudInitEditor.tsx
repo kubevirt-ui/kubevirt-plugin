@@ -1,5 +1,4 @@
 import React, { FC, useLayoutEffect, useRef, useState } from 'react';
-import { dump } from 'js-yaml';
 
 import { V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -40,7 +39,10 @@ export const _CloudInitEditor: FC<CloudInitEditorProps> = ({ cloudInitVolume, on
     <div className="yaml-container">
       <div className="cloud-init-editor" ref={yamlEditorRef}>
         {editorHeight && (
-          <ResourceYAMLEditor initialResource={dump(cloudInitData || '')} onSave={onSaveClick} />
+          <ResourceYAMLEditor
+            initialResource={cloudInitData as K8sResourceCommon}
+            onSave={onSaveClick}
+          />
         )}
       </div>
       {saved && (
