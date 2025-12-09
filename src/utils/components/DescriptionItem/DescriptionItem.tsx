@@ -1,4 +1,5 @@
 import React, { FC, ReactNode, useMemo } from 'react';
+import classNames from 'classnames';
 
 import { DescriptionItemHeader } from '@kubevirt-utils/components/DescriptionItem/DescriptionItemHeader';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
@@ -26,9 +27,9 @@ type DescriptionItemProps = {
   'data-test-id'?: string;
   descriptionData: any;
   descriptionHeader?: ReactNode;
-  editOnTitleJustify?: boolean;
   isDisabled?: boolean;
   isEdit?: boolean;
+  isLabelEditor?: boolean;
   isPopover?: boolean;
   label?: ReactNode;
   messageOnDisabled?: string;
@@ -46,9 +47,9 @@ const DescriptionItem: FC<DescriptionItemProps> = ({
   'data-test-id': testId,
   descriptionData,
   descriptionHeader,
-  editOnTitleJustify = false,
   isDisabled,
   isEdit,
+  isLabelEditor = false,
   isPopover,
   label,
   messageOnDisabled,
@@ -93,8 +94,9 @@ const DescriptionItem: FC<DescriptionItemProps> = ({
       <DescriptionListTermHelpText>
         <Flex
           justifyContent={{
-            default: editOnTitleJustify ? 'justifyContentSpaceBetween' : 'justifyContentFlexStart',
+            default: isLabelEditor ? 'justifyContentSpaceBetween' : 'justifyContentFlexStart',
           }}
+          className={classNames({ 'pf-v6-u-w-100': isLabelEditor })}
         >
           {(bodyContent || breadcrumb || descriptionHeader || label || moreInfoURL) && (
             <FlexItem>
@@ -127,7 +129,10 @@ const DescriptionItem: FC<DescriptionItemProps> = ({
         </Flex>
       </DescriptionListTermHelpText>
 
-      <DescriptionListDescription data-test-id={testId}>
+      <DescriptionListDescription
+        className={classNames({ 'co-editable-label-group': isLabelEditor })}
+        data-test-id={testId}
+      >
         {subTitle && <div className="pf-v6-c-description-list__text pf-v6-u-my-sm">{subTitle}</div>}
         {description}
       </DescriptionListDescription>

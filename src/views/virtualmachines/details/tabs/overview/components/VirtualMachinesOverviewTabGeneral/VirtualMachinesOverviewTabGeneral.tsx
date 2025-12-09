@@ -2,15 +2,15 @@ import React, { FC } from 'react';
 
 import {
   modelToGroupVersionKind,
-  NamespaceModel,
   NodeModel,
   PodModel,
   VirtualMachineInstanceModelGroupVersionKind,
 } from '@kubevirt-ui/kubevirt-api/console';
+import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import DescriptionItemNamespace from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemNamespace';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import OwnerDetailsItem from '@kubevirt-utils/components/OwnerDetailsItem/OwnerDetailsItem';
-import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -49,22 +49,7 @@ const VirtualMachinesOverviewTabGeneral: FC<VirtualMachinesOverviewTabGeneralPro
         <Divider />
         <CardBody isFilled>
           <DescriptionList isHorizontal>
-            <DescriptionItem
-              bodyContent={t(
-                'Namespace defines the space within which each name must be unique. An empty namespace is equivalent to the "default" namespace, but "default" is the canonical representation. Not all objects are required to be scoped to a namespace - the value of this field for those objects will be empty. Must be a DNS_LABEL. Cannot be updated.',
-              )}
-              descriptionData={
-                <FleetResourceLink
-                  cluster={getCluster(vm)}
-                  groupVersionKind={modelToGroupVersionKind(NamespaceModel)}
-                  name={getNamespace(vm)}
-                />
-              }
-              breadcrumb="VirtualMachine.metadata.namespace"
-              descriptionHeader={t('Namespace')}
-              isPopover
-              moreInfoURL={documentationURL.NAMESPACE_DOC}
-            />
+            <DescriptionItemNamespace model={VirtualMachineModel} resource={vm} />
             {canGetNode && (
               <DescriptionItem
                 descriptionData={

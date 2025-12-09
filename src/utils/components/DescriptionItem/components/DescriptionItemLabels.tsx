@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
@@ -10,22 +10,28 @@ import { getLabels, getName } from '@kubevirt-utils/resources/shared';
 import { K8sModel, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 
 type DescriptionItemLabelsProps = {
+  className?: string;
+  descriptionHeaderWrapper?: (children: string) => ReactNode;
   editable?: boolean;
   label?: string;
   model: K8sModel;
+  onLabelsSubmit?: (labels: { [key: string]: string }) => Promise<any>;
   resource: K8sResourceCommon;
 };
 
 const DescriptionItemLabels: FC<DescriptionItemLabelsProps> = ({
+  className,
+  descriptionHeaderWrapper,
   editable = true,
   label,
   model,
+  onLabelsSubmit,
   resource,
 }) => {
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
 
-  const onLabelsSubmit = (labels: { [key: string]: string }) =>
+  const onLabelsSubmitInternal = (labels: { [key: string]: string }) =>
     k8sPatch({
       data: [
         {
@@ -44,9 +50,12 @@ const DescriptionItemLabels: FC<DescriptionItemLabelsProps> = ({
         isOpen={isOpen}
         obj={resource}
         onClose={onClose}
-        onLabelsSubmit={onLabelsSubmit}
+        onLabelsSubmit={onLabelsSubmit ?? onLabelsSubmitInternal}
       />
     ));
+
+  const labelsHeader = t('Labels');
+  const descriptionHeader = descriptionHeaderWrapper?.(labelsHeader) ?? labelsHeader;
 
   return (
     <DescriptionItem
@@ -55,10 +64,12 @@ const DescriptionItemLabels: FC<DescriptionItemLabelsProps> = ({
         'Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services.',
       )}
       breadcrumb={`${label ?? model.label}.metadata.labels`}
+      className={className}
       data-test-id={`${getName(resource)}-labels`}
       descriptionData={<MetadataLabels labels={getLabels(resource)} model={model} />}
-      descriptionHeader={t('Labels')}
+      descriptionHeader={descriptionHeader}
       isEdit={editable}
+      isLabelEditor
       isPopover
       moreInfoURL={documentationURL.LABELS}
       onEditClick={onEditClick}
