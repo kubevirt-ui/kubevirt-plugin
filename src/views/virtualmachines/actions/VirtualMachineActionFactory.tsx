@@ -25,6 +25,7 @@ import {
 } from '@kubevirt-utils/resources/migrations/constants';
 import { asAccessReview, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
+import { getMigratableVolumeSnapshotStatuses } from '@kubevirt-utils/resources/vm/utils/snapshotStatuses';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
@@ -121,13 +122,18 @@ export const VirtualMachineActionFactory = {
     vm: V1VirtualMachine,
     createModal: (modal: ModalComponent) => void,
   ): ActionDropdownItemType => {
+    const migratableDisks = getMigratableVolumeSnapshotStatuses(vm);
+    const noMigratableDisks = migratableDisks?.length === 0;
+
     return {
       accessReview: asAccessReview(VirtualMachineCloneModel, vm, 'create'),
       cta: () =>
         createModal(({ isOpen, onClose }) => (
           <CloneVMModal isOpen={isOpen} onClose={onClose} source={vm} />
         )),
-      disabledTooltip: t(`You don't have permission to perform this action`),
+      description: noMigratableDisks && t('No migratable disks found'),
+      disabled: noMigratableDisks,
+      disabledTooltip: !noMigratableDisks && t(`You don't have permission to perform this action`),
       id: 'vm-action-clone',
       label: t('Clone'),
     };
