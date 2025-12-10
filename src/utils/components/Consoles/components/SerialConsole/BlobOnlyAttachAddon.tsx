@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /** Contains significant parts of https://github.com/xtermjs/xterm.js/blob/c4b707e9ca8ba8e27cecb859fe80ccebeca7375a/addons/addon-attach/src/AttachAddon.ts
  *  Original comments and copyrights retained below.
  */
@@ -10,6 +9,7 @@
  * Implements the attach method, that attaches the terminal to a WebSocket stream.
  */
 
+import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import type { IDisposable, ITerminalAddon, Terminal } from '@xterm/xterm';
 
 interface IAttachOptions {
@@ -42,7 +42,7 @@ export class BlobOnlyAttachAddon implements ITerminalAddon {
       case WebSocket.CONNECTING:
         throw new Error('Attach addon was loaded before socket was open');
       case WebSocket.CLOSING:
-        console.warn('Attach addon socket is closing');
+        kubevirtConsole.warn('Attach addon socket is closing');
         return false;
       case WebSocket.CLOSED:
         throw new Error('Attach addon socket is closed');

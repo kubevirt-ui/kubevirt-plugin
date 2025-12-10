@@ -1168,6 +1168,11 @@
   resolved "https://registry.yarnpkg.com/@kubev2v/types/-/types-0.0.22.tgz#582091a79cdb159be7789dcd62a2632542592c60"
   integrity sha512-1s2RhE9zPf2esJzcy0KCbcso4SJE2Mp9ObV3We0c8KCGvp8i42xCxBIV9vMDiM14ZRlCUMo7gGB9GdZvexDURg==
 
+"@kubevirt-ui-ext/vnc-keymaps@1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@kubevirt-ui-ext/vnc-keymaps/-/vnc-keymaps-1.0.4.tgz#fcf7fea780ed64fda6682ec8908d7bec0db5e7f4"
+  integrity sha512-IY5ba6LVVcRfOZITCVnB8yQaqP4kfKi6arpPxBAetBU9J1rfm4IRE43bnSYlnJGpGw58ku789jy92bze0Yvb2g==
+
 "@kubevirt-ui/kubevirt-api@^1.4.0":
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/@kubevirt-ui/kubevirt-api/-/kubevirt-api-1.4.0.tgz#f2df900203195b405770bad784b95d04e9633fb7"

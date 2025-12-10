@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import React, { FC, MouseEvent, useRef, useState } from 'react';
 
+import { KeyboardLayout } from '@kubevirt-ui-ext/vnc-keymaps';
 import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';
 import { useClickOutside } from '@kubevirt-utils/hooks/useClickOutside/useClickOutside';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import {
   Button,
   ButtonVariant,
@@ -23,7 +25,8 @@ import { HelpIcon, PasteIcon } from '@patternfly/react-icons';
 
 import { ConsoleState, isConsoleType, VNC_CONSOLE_TYPE } from '../utils/ConsoleConsts';
 
-import { AccessConsolesProps, typeMap } from './utils/accessConsoles';
+import { AccessConsolesProps, typeMap, useFavoriteKeymaps } from './utils/accessConsoles';
+import { VncKeymapDropdown } from './VncKeymapDropdown';
 
 import './access-consoles.scss';
 
@@ -41,6 +44,8 @@ export const AccessConsoles: FC<AccessConsolesProps> = ({
   const { t } = useKubevirtTranslation();
   const menuRef = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
+  const { defaultKeyboard, favoriteKeymaps, updateFavorite } = useFavoriteKeymaps();
+  const [selectedKeyboard, setSelectedKeyboard] = useState<KeyboardLayout>(defaultKeyboard);
 
   useClickOutside([menuRef, toggleRef], () => setIsOpenSendKey(false));
 
@@ -67,7 +72,6 @@ export const AccessConsoles: FC<AccessConsolesProps> = ({
       text: 'Ctrl + Alt + 2',
     },
   ];
-
   const functionKeyItems = [
     { onClick: () => actions.sendF1?.(), text: 'F1' },
     { onClick: () => actions.sendF2?.(), text: 'F2' },
@@ -85,19 +89,36 @@ export const AccessConsoles: FC<AccessConsolesProps> = ({
 
   return (
     <>
-      <Button
-        icon={
-          <>
-            <PasteIcon /> {t('Paste to console')}
-          </>
-        }
-        onClick={(e: MouseEvent<HTMLButtonElement>) => {
-          actions.sendPaste(true);
-          e.currentTarget.blur();
-        }}
-        className="vnc-paste-button"
-        variant={ButtonVariant.link}
-      />
+      {type === VNC_CONSOLE_TYPE && (
+        <VncKeymapDropdown
+          actions={actions}
+          {...{ favoriteKeymaps, selectedKeyboard, setSelectedKeyboard, updateFavorite }}
+        />
+      )}
+      {type !== VNC_CONSOLE_TYPE && (
+        <Button
+          icon={
+            <>
+              <PasteIcon /> {t('Paste to console')}
+            </>
+          }
+          onClick={
+            actions.sendPaste
+              ? (e: MouseEvent<HTMLButtonElement>) => {
+                  e?.currentTarget?.blur();
+                  actions
+                    .sendPaste({ shouldFocusOnConsole: true })
+                    .catch((err) =>
+                      kubevirtConsole.error('Failed to paste into Serial console', err),
+                    );
+                }
+              : undefined
+          }
+          className="vnc-paste-button"
+          isDisabled={!actions.sendPaste}
+          variant={ButtonVariant.link}
+        />
+      )}
       <Select
         onSelect={(_, selection: string) => {
           isConsoleType(selection) && setType(selection);
