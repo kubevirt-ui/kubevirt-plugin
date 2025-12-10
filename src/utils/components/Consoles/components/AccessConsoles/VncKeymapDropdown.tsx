@@ -3,6 +3,7 @@ import React, { Dispatch, MouseEvent, Ref, SetStateAction, useState } from 'reac
 import { isKeyboardLayout, KeyboardLayout, KeyMapDef, keyMaps } from '@kubevirt-ui-ext/vnc-keymaps';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import {
   Divider,
   Dropdown,
@@ -35,11 +36,17 @@ export const VncKeymapDropdown = ({
   const { createModal } = useModal();
   const typeInLabel = t('Paste to console');
 
+  const getRegularLayouts = () =>
+    Object.entries(keyMaps)
+      // en_us has special treatment
+      .filter(([value]) => value !== EN_US)
+      .sort(([, a], [, b]) => a.description.localeCompare(b.description));
+
   return (
     <Dropdown
       onActionClick={(event, value) => {
         event.stopPropagation();
-        updateFavorite(value);
+        isKeyboardLayout(value) && updateFavorite(value);
       }}
       onSelect={(_event, value?: number | string) => {
         isKeyboardLayout(value) && setSelectedKeyboard(value);
@@ -59,8 +66,9 @@ export const VncKeymapDropdown = ({
                           selectedKeyboard,
                           shouldFocusOnConsole: true,
                         })
-                        // eslint-disable-next-line no-console
-                        .catch((err) => console.error('Failed to paste into VNC console', err));
+                        .catch((err) =>
+                          kubevirtConsole.error('Failed to paste into VNC console', err),
+                        );
                     }
                   : undefined
               }
@@ -112,19 +120,16 @@ export const VncKeymapDropdown = ({
         </DropdownGroup>
         <Divider component="li" />
         <DropdownGroup>
-          {Object.entries(keyMaps)
-            .filter(([value]) => value !== EN_US)
-            .sort(([, a], [, b]) => a.description.localeCompare(b.description))
-            .map(([value, def]) => (
-              <DropdownItem
-                description={value}
-                isFavorited={favoriteKeymaps.includes(value as KeyboardLayout)}
-                key={value}
-                value={value}
-              >
-                {def.description}
-              </DropdownItem>
-            ))}
+          {getRegularLayouts().map(([value, def]) => (
+            <DropdownItem
+              description={value}
+              isFavorited={favoriteKeymaps.includes(value as KeyboardLayout)}
+              key={value}
+              value={value}
+            >
+              {def.description}
+            </DropdownItem>
+          ))}
         </DropdownGroup>
       </DropdownList>
     </Dropdown>

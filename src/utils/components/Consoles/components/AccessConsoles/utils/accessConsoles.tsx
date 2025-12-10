@@ -84,7 +84,6 @@ export const useFavoriteKeymaps = (): {
       }
 
       setLocalStorageValue(filteredFavoriteKeymaps.filter((keymap) => keymap !== value));
-      return;
     },
   };
 };

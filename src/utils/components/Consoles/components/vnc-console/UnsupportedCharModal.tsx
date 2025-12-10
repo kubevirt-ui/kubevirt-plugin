@@ -3,23 +3,30 @@ import React, { FC } from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Button,
-  List,
-  ListItem,
+  Label,
+  LabelGroup,
   Modal,
   ModalBody,
   ModalFooter,
   ModalHeader,
 } from '@patternfly/react-core';
 
-type UnsupportedCharModal = {
+import { toUnicodeFormat } from './utils/util';
+
+export type UnsupportedCharModalProps = {
   isOpen: boolean;
   onClose: () => void;
   unsupportedChars: string[];
 };
 
-const UnsupportedCharModal: FC<UnsupportedCharModal> = ({ isOpen, onClose, unsupportedChars }) => {
+const MAX_VISIBLE_UNSUPPORTED_CHARS = 10;
+
+const UnsupportedCharModal: FC<UnsupportedCharModalProps> = ({
+  isOpen,
+  onClose,
+  unsupportedChars,
+}) => {
   const { t } = useKubevirtTranslation();
-  const maxChars = 10;
   const unsupportedCharCount = unsupportedChars.length;
   return (
     <Modal isOpen={isOpen} onClose={onClose} position="top" variant={'small'}>
@@ -28,12 +35,13 @@ const UnsupportedCharModal: FC<UnsupportedCharModal> = ({ isOpen, onClose, unsup
         {t('Found {{count}} characters not supported by the selected keyboard layout:', {
           count: unsupportedCharCount,
         })}
-        <List>
-          {unsupportedChars.slice(0, maxChars).map((char) => (
-            <ListItem key={char}>{`'${char}' (0x${char.codePointAt(0).toString(16)})`}</ListItem>
+        <LabelGroup numLabels={MAX_VISIBLE_UNSUPPORTED_CHARS}>
+          {unsupportedChars.map((char) => (
+            <Label key={char} variant="outline">{`${char} (${toUnicodeFormat(
+              char.codePointAt(0),
+            )})`}</Label>
           ))}
-          {unsupportedCharCount > maxChars && <ListItem>...</ListItem>}
-        </List>
+        </LabelGroup>
       </ModalBody>
       <ModalFooter>
         <Button key="cancel" onClick={onClose} variant="link">

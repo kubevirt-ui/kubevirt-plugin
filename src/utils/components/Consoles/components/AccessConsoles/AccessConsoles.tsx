@@ -5,6 +5,7 @@ import { KeyboardLayout } from '@kubevirt-ui-ext/vnc-keymaps';
 import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';
 import { useClickOutside } from '@kubevirt-utils/hooks/useClickOutside/useClickOutside';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import {
   Button,
   ButtonVariant,
@@ -107,12 +108,14 @@ export const AccessConsoles: FC<AccessConsolesProps> = ({
                   e?.currentTarget?.blur();
                   actions
                     .sendPaste({ shouldFocusOnConsole: true })
-                    // eslint-disable-next-line no-console
-                    .catch((err) => console.error('Failed to paste into Serial console', err));
+                    .catch((err) =>
+                      kubevirtConsole.error('Failed to paste into Serial console', err),
+                    );
                 }
               : undefined
           }
           className="vnc-paste-button"
+          isDisabled={!actions.sendPaste}
           variant={ButtonVariant.link}
         />
       )}
