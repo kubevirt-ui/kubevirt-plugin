@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FC, ReactNode, useMemo } from 'react';
 
 import useQuery from '@kubevirt-utils/hooks/useQuery';
 import { SelectProps, ToolbarFilter } from '@patternfly/react-core';
@@ -10,17 +10,23 @@ import CheckboxSelect from '../../CheckboxSelect/CheckboxSelect';
 type CheckboxSelectFilterProps = {
   allValues: { id: string; title: string }[];
   applyFilters: (type: string, value?: string[]) => void;
+  badgeNumber?: number;
   categoryName: string;
   filterType: VirtualMachineRowFilterType;
+  isToggleDisabled?: boolean;
   showAllBadge?: boolean;
+  tooltipContent?: ReactNode;
 };
 
 const CheckboxSelectFilter: FC<CheckboxSelectFilterProps> = ({
   allValues,
   applyFilters: applyFiltersProp,
+  badgeNumber,
   categoryName,
   filterType,
+  isToggleDisabled = false,
   showAllBadge,
+  tooltipContent,
 }) => {
   const queryParams = useQuery();
 
@@ -64,10 +70,13 @@ const CheckboxSelectFilter: FC<CheckboxSelectFilterProps> = ({
           isSelected: selectedValues.includes(value),
           value,
         }))}
+        badgeNumber={badgeNumber}
+        isToggleDisabled={isToggleDisabled}
         onSelect={onSelect}
         selectedValues={selectedValues}
         showAllBadge={showAllBadge}
         toggleTitle={categoryName}
+        tooltipContent={tooltipContent}
       />
     </ToolbarFilter>
   );

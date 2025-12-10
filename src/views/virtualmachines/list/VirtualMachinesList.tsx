@@ -46,22 +46,20 @@ import {
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { Flex, PageBreadcrumb, PageSection, Pagination } from '@patternfly/react-core';
+import { Flex, PageSection, Pagination } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
-import { VMSearchQueries } from '@virtualmachines/search/hooks/useVMSearchQueries';
+import useVMSearchQueries from '@virtualmachines/search/hooks/useVMSearchQueries';
 import VirtualMachineFilterToolbar from '@virtualmachines/search/VirtualMachineFilterToolbar';
 import { vmsSignal } from '@virtualmachines/tree/utils/signals';
-import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
+import { OBJECTS_FETCHING_LIMIT, VirtualMachineRowFilterType } from '@virtualmachines/utils';
 import { getVMIFromMapper, getVMIMFromMapper } from '@virtualmachines/utils/mappers';
 
-import { VirtualMachineBreadcrumb } from './components/VirtualMachineBreadcrumb/VirtualMachineBreadcrumb';
 import VirtualMachineBulkActionButton from './components/VirtualMachineBulkActionButton';
 import VirtualMachineEmptyState from './components/VirtualMachineEmptyState/VirtualMachineEmptyState';
 import VirtualMachineListSummary from './components/VirtualMachineListSummary/VirtualMachineListSummary';
 import VirtualMachineRow from './components/VirtualMachineRow/VirtualMachineRow';
 import VirtualMachineSearchResultsHeader from './components/VirtualMachineSearchResultsHeader';
 import VirtualMachineSelection from './components/VirtualMachineSelection/VirtualMachineSelection';
-import { TEXT_FILTER_LABELS_ID } from './hooks/constants';
 import useExistingSelectedVMs from './hooks/useExistingSelectedVMs';
 import useFiltersFromURL from './hooks/useFiltersFromURL';
 import useVirtualMachineColumns from './hooks/useVirtualMachineColumns';
@@ -78,15 +76,16 @@ import './VirtualMachinesList.scss';
 type VirtualMachinesListProps = {
   allVMsLoaded?: boolean;
   cluster?: string;
+  isSearchResultsPage?: boolean;
   kind: string;
   namespace: string;
-  searchQueries?: VMSearchQueries;
 } & RefAttributes<ExposedFilterFunctions | null>;
 
 const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref) => {
   const { t } = useKubevirtTranslation();
-  const { allVMsLoaded, cluster, kind, namespace, searchQueries } = props;
-  const isSearchResultsPage = !isEmpty(searchQueries);
+  const { allVMsLoaded, cluster, isSearchResultsPage = false, kind, namespace } = props;
+
+  const searchQueries = useVMSearchQueries();
 
   const catalogURL = getCatalogURL(cluster, namespace || DEFAULT_NAMESPACE);
   const { loading: loadingFeatureProxy } = useFeatures(KUBEVIRT_APISERVER_PROXY);
@@ -145,7 +144,9 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
   // Used for removing folder filter
   // only passing filtersFromURL to useListPageFilter hook's staticFilters doesn't work, because label filter is hardcoded in the hook as a dynamic filter
   useEffect(() => {
-    onFilterChange?.(TEXT_FILTER_LABELS_ID, filtersFromURL[TEXT_FILTER_LABELS_ID]);
+    Object.values(VirtualMachineRowFilterType).forEach((filterType) => {
+      onFilterChange?.(filterType, filtersFromURL[filterType]);
+    });
   }, [query]);
 
   // Allow using folder filters from the tree view
@@ -188,31 +189,23 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
   const existingSelectedVMs = useExistingSelectedVMs(filteredVMs);
   const isAllVMsSelected = filteredVMs?.length === existingSelectedVMs.length;
 
-  const allVMs = useMemo(
-    () => filterVMsByClusterAndNamespace(vmsSignal.value, namespace, cluster),
+  const hasNoVMs = useMemo(
+    () => isEmpty(filterVMsByClusterAndNamespace(vmsSignal.value, namespace, cluster)),
     [vmsSignal.value, namespace, cluster],
   );
-
-  const hasNoVMs = isEmpty(allVMs);
 
   return (
     /* All of this table and components should be replaced to our own fitted components */
     <>
       <DocumentTitle>{PageTitles.VirtualMachines}</DocumentTitle>
       {!isSearchResultsPage && (
-        <>
-          <PageBreadcrumb>
-            <VirtualMachineBreadcrumb cluster={cluster} namespace={namespace} />
-          </PageBreadcrumb>
-          <PageSection>
-            <VirtualMachineListSummary
-              namespace={namespace}
-              onFilterChange={onFilterChange}
-              vmis={vmis}
-              vms={allVMs}
-            />
-          </PageSection>
-        </>
+        <PageSection>
+          <VirtualMachineListSummary
+            onFilterChange={onFilterChange}
+            vmis={vmis}
+            vms={filteredVMs}
+          />
+        </PageSection>
       )}
       <ListPageBody>
         <div className="vm-listpagebody" ref={listPageBodyRef}>

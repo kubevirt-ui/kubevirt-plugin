@@ -1,3 +1,4 @@
+import { ROW_FILTERS_PREFIX } from '@kubevirt-utils/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
@@ -70,4 +71,4 @@ export const generateQueryParams = (searchInputs: AdvancedSearchQueryInputs) => 
 export const getRowFilterQueryKey = (fieldKey: string) =>
   skipRowFilterPrefix.has(fieldKey as VirtualMachineRowFilterType)
     ? fieldKey
-    : `rowFilter-${fieldKey}`;
+    : `${ROW_FILTERS_PREFIX}${fieldKey}`;

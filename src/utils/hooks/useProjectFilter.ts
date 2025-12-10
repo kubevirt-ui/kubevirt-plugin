@@ -9,10 +9,10 @@ import useMulticlusterNamespaces from '@multicluster/hooks/useMulticlusterNamesp
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
-import useSelectedRowFilterClusters from './useSelectedRowFilterClusters';
+import useListClusters from './useListClusters';
 
 export const useProjectFilter = <R extends K8sResourceCommon>(): RowFilter<R> => {
-  const allClustersSelected = useSelectedRowFilterClusters();
+  const allClustersSelected = useListClusters();
   const isACMPage = useIsACMPage();
 
   const [projects] = useProjects();

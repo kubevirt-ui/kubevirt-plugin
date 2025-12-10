@@ -14,14 +14,12 @@ import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 type VirtualMachineStatusesProps = {
   className?: string;
-  namespace: string;
   onFilterChange?: OnFilterChange;
   vms: V1VirtualMachine[];
 };
 
 const VirtualMachineStatuses: FC<VirtualMachineStatusesProps> = ({
   className,
-  namespace,
   onFilterChange,
   vms,
 }) => {
@@ -40,7 +38,6 @@ const VirtualMachineStatuses: FC<VirtualMachineStatusesProps> = ({
       <VMStatusItem
         count={primaryStatuses.Error}
         isFlexItem
-        namespace={namespace}
         onFilterChange={onStatusChange([ERROR])}
         statusArray={[ERROR]}
         statusLabel={ERROR}
@@ -48,7 +45,6 @@ const VirtualMachineStatuses: FC<VirtualMachineStatusesProps> = ({
       <VMStatusItem
         count={primaryStatuses.Running}
         isFlexItem
-        namespace={namespace}
         onFilterChange={onStatusChange([VM_STATUS.Running])}
         statusArray={[VM_STATUS.Running]}
         statusLabel={VM_STATUS.Running}
@@ -56,7 +52,6 @@ const VirtualMachineStatuses: FC<VirtualMachineStatusesProps> = ({
       <VMStatusItem
         count={primaryStatuses.Stopped}
         isFlexItem
-        namespace={namespace}
         onFilterChange={onStatusChange([VM_STATUS.Stopped])}
         statusArray={[VM_STATUS.Stopped]}
         statusLabel={VM_STATUS.Stopped}
@@ -64,7 +59,6 @@ const VirtualMachineStatuses: FC<VirtualMachineStatusesProps> = ({
       <VMStatusItem
         count={otherStatusesCount}
         isFlexItem
-        namespace={namespace}
         onFilterChange={onStatusChange(OTHER_STATUSES)}
         statusArray={OTHER_STATUSES}
         statusLabel={OTHER}

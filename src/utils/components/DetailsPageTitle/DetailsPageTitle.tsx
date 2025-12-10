@@ -5,7 +5,7 @@ import { PageBreadcrumb, PageGroup, PageSection } from '@patternfly/react-core';
 import './details-page-title.scss';
 
 type DetailsPageTitleProps = {
-  breadcrumb: ReactNode;
+  breadcrumb?: ReactNode;
 };
 
 const DetailsPageTitle: FC<DetailsPageTitleProps> = ({ breadcrumb, children }) => (

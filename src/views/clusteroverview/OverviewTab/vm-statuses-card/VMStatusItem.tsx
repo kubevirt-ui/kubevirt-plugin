@@ -1,16 +1,11 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom-v5-compat';
 
-import {
-  getACMMListPathWithRowFilters,
-  getVMListPathWithRowFilters,
-} from '@kubevirt-utils/resources/vm/utils/utils';
 import { VM_STATUS } from '@kubevirt-utils/resources/vm/utils/vmStatus';
-import useClusterParam from '@multicluster/hooks/useClusterParam';
-import useIsACMPage from '@multicluster/useIsACMPage';
 import { ERROR } from '@overview/OverviewTab/vm-statuses-card/utils/constants';
 import { FlexItem, GridItem } from '@patternfly/react-core';
 
+import useVMStatusesPath from './hooks/useVMStatusesPath';
 import { vmStatusIcon } from './utils/utils';
 
 import './VMStatusesCard.scss';
@@ -21,7 +16,7 @@ type VMStatusItemProps = {
   namespace?: string;
   onFilterChange?: () => void;
   showIcon?: boolean;
-  statusArray: typeof ERROR[] | VM_STATUS[];
+  statusArray: (typeof ERROR | VM_STATUS)[];
   statusLabel: string;
 };
 
@@ -35,11 +30,7 @@ const VMStatusItem: React.FC<VMStatusItemProps> = ({
   statusLabel,
 }) => {
   const Icon = vmStatusIcon[statusLabel];
-  const cluster = useClusterParam();
-  const isACMPage = useIsACMPage();
-  const path = isACMPage
-    ? getACMMListPathWithRowFilters(cluster, namespace, { status: statusArray.join(',') })
-    : getVMListPathWithRowFilters(namespace, { status: statusArray.join(',') });
+  const path = useVMStatusesPath(namespace, statusArray);
 
   const Component = isFlexItem ? FlexItem : GridItem;
 
