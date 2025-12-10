@@ -17,3 +17,4 @@ cypress/cypress-a11y-report.json
 **/*.mjs
 **/*.ts
 **/*.tsx
+**/*.md
