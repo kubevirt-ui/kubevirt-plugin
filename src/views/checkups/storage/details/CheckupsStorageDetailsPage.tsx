@@ -1,65 +1,34 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useParams } from 'react-router-dom-v5-compat';
 
-import DetailsPageBody from '@kubevirt-utils/components/DetailsPageBody/DetailsPageBody';
-import Loading from '@kubevirt-utils/components/Loading/Loading';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
-import { Bullseye, Divider, PageSection, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
+import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
+import { HorizontalNav } from '@openshift-console/dynamic-plugin-sdk';
 
-import CheckupsDetailsPageHistory from '../../CheckupsDetailsPageHistory';
+import CheckupsNotFound from '../../components/CheckupsNotFound';
 import { getJobByName } from '../../utils/utils';
 import useCheckupsStorageData from '../components/hooks/useCheckupsStorageData';
 
+import { useCheckupsStorageTabs } from './hooks/useCheckupsStorageTabs';
 import CheckupsStorageDetailsPageHeader from './CheckupsStorageDetailsPageHeader';
-import CheckupsStorageDetailsPageSection from './CheckupsStorageDetailsPageSection';
 
 import './checkups-storage-details-page.scss';
 
 const CheckupsStorageDetailsPage = () => {
-  const { vmName } = useParams<{ vmName: string }>();
-  const { t } = useKubevirtTranslation();
+  const { checkupName } = useParams<{ checkupName: string }>();
   const { configMaps, error, jobs, loaded } = useCheckupsStorageData();
-  const [activeTabKey, setActiveTabKey] = useState<number>(0);
 
-  const configMap = configMaps.find((cm) => cm.metadata.name === vmName);
+  const configMap = configMaps?.find((cm) => cm.metadata.name === checkupName);
   const jobMatches = getJobByName(jobs, configMap?.metadata?.name);
 
-  if (!configMap)
-    return (
-      <Bullseye>
-        <Loading />
-      </Bullseye>
-    );
+  const pages = useCheckupsStorageTabs();
+  const notFound = !configMap && loaded;
 
   return (
-    <>
+    <StateHandler error={error} hasData={!!configMap} loaded={loaded} withBullseye>
       <CheckupsStorageDetailsPageHeader configMap={configMap} jobs={jobMatches} />
-      <DetailsPageBody>
-        <Tabs
-          onSelect={(_, tabIndex: number) => {
-            setActiveTabKey(tabIndex);
-          }}
-          activeKey={activeTabKey}
-          className="co-horizontal-nav"
-        >
-          <Tab eventKey={0} title={<TabTitleText>{t('Details')}</TabTitleText>}>
-            <PageSection>
-              <CheckupsStorageDetailsPageSection configMap={configMap} job={jobMatches?.[0]} />
-            </PageSection>
-            <PageSection>
-              <Divider />
-            </PageSection>
-            <PageSection>
-              <CheckupsDetailsPageHistory error={error} jobs={jobMatches} loaded={loaded} />
-            </PageSection>
-          </Tab>
-          <Tab eventKey={1} title={<TabTitleText>{t('YAML')}</TabTitleText>}>
-            <ResourceYAMLEditor initialResource={configMap} />
-          </Tab>
-        </Tabs>
-      </DetailsPageBody>
-    </>
+      {configMap && <HorizontalNav pages={pages} />}
+      {notFound && <CheckupsNotFound />}
+    </StateHandler>
   );
 };
 

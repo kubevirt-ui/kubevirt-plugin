@@ -11,7 +11,7 @@ import CheckupsDetailsPageHistoryRow from './CheckupsDetailsPageHistoryRow';
 
 type CheckupsDetailsPageHistoryProps = {
   customActions?: (job: IoK8sApiBatchV1Job) => ReactNode;
-  error: Error;
+  error: Error | null | undefined;
   jobs: IoK8sApiBatchV1Job[];
   loaded: boolean;
   sortColumnIndex?: number;
@@ -43,7 +43,7 @@ const CheckupsDetailsPageHistory: FC<CheckupsDetailsPageHistoryProps> = ({
         columns={columns}
         data={jobs}
         loaded={loaded}
-        loadError={error}
+        loadError={error || undefined}
         Row={CheckupsDetailsPageHistoryRow}
         rowData={{ customActions }}
         unfilteredData={jobs}

@@ -1,32 +1,39 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
 import { PageTitles } from '@kubevirt-utils/constants/page-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { DocumentTitle, ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
-import { Tab, Tabs, TabTitleText } from '@patternfly/react-core';
-import { createURL } from '@virtualmachines/details/tabs/overview/utils/utils';
+import {
+  DocumentTitle,
+  HorizontalNav,
+  ListPageHeader,
+} from '@openshift-console/dynamic-plugin-sdk';
 
-import CheckupsNetworkList from './network/list/CheckupsNetworkList';
-import CheckupsStorageList from './storage/list/CheckupsStorageList';
-import { trimLastHistoryPath } from './utils/utils';
+import { getCheckUpTabs } from './utils/getCheckUpsTabs';
 import CheckupsRunButton from './CheckupsRunButton';
 
 import './checkups.scss';
 
 const CheckupsList: FC = () => {
   const { t } = useKubevirtTranslation();
-  const navigate = useNavigate();
   const location = useLocation();
-  const [activeTabKey, setActiveTabKey] = useState<number | string>(
-    location?.pathname.endsWith('storage') ? 1 : 0,
-  );
+  const navigate = useNavigate();
 
+  const pages = useMemo(() => getCheckUpTabs(t), [t]);
+
+  // Redirect to default tab if URL is just /checkups
   useEffect(() => {
-    navigate(
-      createURL(activeTabKey === 0 ? 'network' : 'storage', trimLastHistoryPath(location.pathname)),
-    );
-  }, [activeTabKey, location.pathname, navigate]);
+    const normalizedPath = location.pathname.endsWith('/')
+      ? location.pathname.slice(0, -1)
+      : location.pathname;
+
+    if (normalizedPath.endsWith('/checkups')) {
+      const defaultTab = pages[0];
+      if (defaultTab?.href) {
+        navigate(`${normalizedPath}/${defaultTab.href}`, { replace: true });
+      }
+    }
+  }, [location.pathname, pages, navigate]);
 
   return (
     <>
@@ -34,20 +41,7 @@ const CheckupsList: FC = () => {
       <ListPageHeader title={PageTitles.Checkups}>
         <CheckupsRunButton />
       </ListPageHeader>
-      <Tabs
-        onSelect={(_, tabIndex: number | string) => {
-          setActiveTabKey(tabIndex);
-        }}
-        activeKey={activeTabKey}
-        className="co-horizontal-nav"
-      >
-        <Tab eventKey={0} title={<TabTitleText>{t('Network latency')}</TabTitleText>}>
-          <CheckupsNetworkList />
-        </Tab>
-        <Tab eventKey={1} title={<TabTitleText>{t('Storage')}</TabTitleText>}>
-          <CheckupsStorageList />
-        </Tab>
-      </Tabs>
+      <HorizontalNav pages={pages} />
     </>
   );
 };

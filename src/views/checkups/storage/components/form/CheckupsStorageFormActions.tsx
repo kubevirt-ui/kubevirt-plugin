@@ -6,6 +6,7 @@ import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { ActionGroup, Alert, AlertVariant, Button, ButtonVariant } from '@patternfly/react-core';
 
+import { CHECKUP_URLS } from '../../../utils/constants';
 import { createStorageCheckup } from '../../utils/utils';
 
 type CheckupsStorageFormActionsProps = {
@@ -32,7 +33,7 @@ const CheckupsStorageFormActions: FC<CheckupsStorageFormActionsProps> = ({
             setError(null);
             try {
               await createStorageCheckup(namespace, timeOut, name, checkupImage);
-              navigate(`/k8s/ns/${namespace}/checkups/storage`);
+              navigate(`/k8s/ns/${namespace}/checkups/${CHECKUP_URLS.STORAGE}`);
             } catch (e) {
               kubevirtConsole.log(e);
               setError(e?.message);
