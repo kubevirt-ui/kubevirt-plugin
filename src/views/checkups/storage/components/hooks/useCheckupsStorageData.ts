@@ -1,11 +1,7 @@
 import { useMemo } from 'react';
-import { KUBEVIRT_VM_LATENCY_LABEL } from 'src/views/checkups/utils/utils';
+import { createJobWatchConfig, KUBEVIRT_VM_LATENCY_LABEL } from 'src/views/checkups/utils/utils';
 
-import {
-  ConfigMapModel,
-  JobModel,
-  modelToGroupVersionKind,
-} from '@kubevirt-ui/kubevirt-api/console';
+import { ConfigMapModel, modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useActiveNamespace, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
@@ -30,16 +26,7 @@ const useCheckupsStorageData = () => {
   );
 
   const jobWatchConfig = useMemo(
-    () => ({
-      groupVersionKind: modelToGroupVersionKind(JobModel),
-      isList: true,
-      ...(namespace !== ALL_NAMESPACES_SESSION_KEY && { namespace, namespaced: true }),
-      selector: {
-        matchLabels: {
-          [KUBEVIRT_VM_LATENCY_LABEL]: KUBEVIRT_STORAGE_LABEL_VALUE,
-        },
-      },
-    }),
+    () => createJobWatchConfig(KUBEVIRT_STORAGE_LABEL_VALUE, namespace),
     [namespace],
   );
 

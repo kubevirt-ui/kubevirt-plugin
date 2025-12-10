@@ -1,12 +1,14 @@
 import { Location } from 'react-router-dom-v5-compat';
 
+import { JobModel, modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import {
   IoK8sApiBatchV1Job,
   IoK8sApiCoreV1ConfigMap,
   IoK8sApiCoreV1Container,
 } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { sortByDirection, universalComparator } from '@kubevirt-utils/utils/utils';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { K8sResourceCommon, Operator } from '@openshift-console/dynamic-plugin-sdk';
 import { SortByDirection } from '@patternfly/react-table';
 
 import { CHECKUP_URLS } from './constants';
@@ -20,6 +22,29 @@ export const STATUS_COMPLETION_TIME_STAMP = 'status.completionTimestamp';
 export const CONFIGMAP_NAME = 'CONFIGMAP_NAME';
 export const CONFIGMAP_NAMESPACE = 'CONFIGMAP_NAMESPACE';
 export const CREATE_RESULTS_RESOURCES = 'CREATE_RESULTS_RESOURCES';
+
+/**
+ * Creates a watch configuration for Kubernetes Jobs used in checkups.
+ * @param labelValue - The value for the KUBEVIRT_VM_LATENCY_LABEL match label
+ * @param namespace - Optional namespace. If provided and not ALL_NAMESPACES_SESSION_KEY, filters to that namespace
+ * @param matchExpressions - Optional array of match expressions to add to the selector
+ * @returns A watch configuration object for useK8sWatchResource
+ */
+export const createJobWatchConfig = (
+  labelValue: string,
+  namespace?: string,
+  matchExpressions?: Array<{ key: string; operator: Operator }>,
+) => ({
+  groupVersionKind: modelToGroupVersionKind(JobModel),
+  isList: true,
+  ...(namespace && namespace !== ALL_NAMESPACES_SESSION_KEY && { namespace, namespaced: true }),
+  selector: {
+    ...(matchExpressions && { matchExpressions }),
+    matchLabels: {
+      [KUBEVIRT_VM_LATENCY_LABEL]: labelValue,
+    },
+  },
+});
 
 export const generateWithNumbers = (name: string): string =>
   `${name}-${Math.floor(Math.random() * 10000)}`;
@@ -124,6 +149,21 @@ export const getCheckupImageFromNewestJob = (jobs: IoK8sApiBatchV1Job[]): string
 };
 
 /**
+ * Extracts the base name from a results ConfigMap name.
+ * ConfigMap names follow the pattern: `<baseName>-<number>-results` (e.g., "my-checkup-1234-results").
+ * This function removes the `-<number>-results` suffix to get the base name.
+ * If the pattern doesn't match, it falls back to removing just the `-results` suffix.
+ *
+ * @param configMapName - The full ConfigMap name (e.g., "my-checkup-1234-results")
+ * @returns The base name without the suffix (e.g., "my-checkup")
+ */
+export const extractConfigMapBaseName = (configMapName: string): string => {
+  const baseNameRegex = /^(.+)-\d+-results$/;
+  const baseNameMatch = baseNameRegex.exec(configMapName);
+  return baseNameMatch ? baseNameMatch[1] : configMapName.replace(/-results$/, '');
+};
+
+/**
  * Extracts the ConfigMap name and namespace from a Job's environment variables.
  *
  * The Job's CONFIGMAP_NAME env var contains the results ConfigMap name, which follows
@@ -148,7 +188,7 @@ export const extractConfigMapName = (
     return null;
   }
 
-  const baseName = configMapName.replace(/-\d+-results$/, '');
+  const baseName = extractConfigMapBaseName(configMapName);
 
   return {
     fullName: configMapName,

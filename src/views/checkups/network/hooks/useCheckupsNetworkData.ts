@@ -1,15 +1,11 @@
 import { useMemo } from 'react';
 
-import {
-  ConfigMapModel,
-  JobModel,
-  modelToGroupVersionKind,
-} from '@kubevirt-ui/kubevirt-api/console';
+import { ConfigMapModel, modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useActiveNamespace, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
-import { KUBEVIRT_VM_LATENCY_LABEL } from '../../utils/utils';
+import { createJobWatchConfig, KUBEVIRT_VM_LATENCY_LABEL } from '../../utils/utils';
 import { KUBEVIRT_VM_LATENCY_LABEL_VALUE } from '../utils/utils';
 
 const useCheckupsNetworkData = () => {
@@ -30,16 +26,7 @@ const useCheckupsNetworkData = () => {
   );
 
   const jobWatchConfig = useMemo(
-    () => ({
-      groupVersionKind: modelToGroupVersionKind(JobModel),
-      isList: true,
-      ...(namespace !== ALL_NAMESPACES_SESSION_KEY && { namespace, namespaced: true }),
-      selector: {
-        matchLabels: {
-          [KUBEVIRT_VM_LATENCY_LABEL]: KUBEVIRT_VM_LATENCY_LABEL_VALUE,
-        },
-      },
-    }),
+    () => createJobWatchConfig(KUBEVIRT_VM_LATENCY_LABEL_VALUE, namespace),
     [namespace],
   );
 

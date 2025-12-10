@@ -1,0 +1,73 @@
+// Shared styles for progress components
+.progress-card {
+  margin-bottom: var(--pf-t--global--spacer--sm);
+}
+
+.progress-card-header-title {
+  align-items: center;
+  display: flex;
+  gap: var(--pf-t--global--spacer--sm);
+  margin-bottom: var(--pf-t--global--spacer--md);
+}
+
+.progress-card-body-no-padding {
+  padding-bottom: 0;
+}
+
+.progress-card-spacing {
+  margin-bottom: var(--pf-t--global--spacer--sm);
+}
+
+.progress-card-spacing-md {
+  margin-bottom: var(--pf-t--global--spacer--md);
+}
+
+.progress-card-margin-top {
+  margin-top: var(--pf-t--global--spacer--md);
+}
+
+// Common flex layout patterns
+.flex-center {
+  align-items: center;
+  display: flex;
+  gap: var(--pf-t--global--spacer--sm);
+}
+
+.flex-center-gap-xs {
+  align-items: center;
+  display: flex;
+  gap: var(--pf-t--global--spacer--xs);
+  justify-content: center;
+}
+
+.flex-end {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-t--global--spacer--md);
+}
+
+// Overall progress card specific
+.overall-progress-card {
+  margin-bottom: var(--pf-t--global--spacer--lg);
+}
+
+// Loading state
+.loading-container {
+  align-items: center;
+  display: flex;
+  gap: var(--pf-t--global--spacer--sm);
+}
+
+// Icon colors
+.icon-color-skipped {
+  color: var(--pf-t--global--icon--color--subtle);
+}
+
+.icon-color-in-progress {
+  color: var(--pf-t--global--icon--color--status--info--default);
+}
