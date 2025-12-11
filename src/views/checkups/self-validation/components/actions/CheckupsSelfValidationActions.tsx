@@ -38,34 +38,40 @@ const CheckupsSelfValidationActions: FC<CheckupsSelfValidationActionsProps> = ({
   const hasOtherRunningJobs = otherRunningJobs.length > 0;
   const hasCurrentCheckupRunningJobs = useMemo(() => jobs.some((job) => isJobRunning(job)), [jobs]);
 
-  const actions = useMemo(
-    () => [
-      CheckupsSelfValidationActionFactory.rerun({
-        configMap,
-        createModal,
-        hasCurrentCheckupRunningJobs,
-        hasOtherRunningJobs,
-        jobs,
-        navigate: (path: string) => navigate(path),
-        otherRunningJobs,
-      }),
-      CheckupsSelfValidationActionFactory.delete({
-        configMap,
-        createModal,
-        jobs,
-        navigate: (path: string) => navigate(path),
-      }),
-    ],
-    [
+  const actions = useMemo(() => {
+    const rerunAction = CheckupsSelfValidationActionFactory.rerun({
+      configMap,
+      createModal,
+      hasCurrentCheckupRunningJobs,
+      hasOtherRunningJobs,
+      jobs,
+      navigate: (path: string) => navigate(path),
+      otherRunningJobs,
+    });
+
+    const goToAction = CheckupsSelfValidationActionFactory.goToRunningCheckup({
+      hasOtherRunningJobs,
+      navigate: (path: string) => navigate(path),
+      otherRunningJobs,
+    });
+
+    const deleteAction = CheckupsSelfValidationActionFactory.delete({
       configMap,
       createModal,
       jobs,
-      navigate,
-      otherRunningJobs,
-      hasOtherRunningJobs,
-      hasCurrentCheckupRunningJobs,
-    ],
-  );
+      navigate: (path: string) => navigate(path),
+    });
+
+    return [rerunAction, goToAction, deleteAction].filter(Boolean);
+  }, [
+    configMap,
+    createModal,
+    jobs,
+    navigate,
+    otherRunningJobs,
+    hasOtherRunningJobs,
+    hasCurrentCheckupRunningJobs,
+  ]);
 
   return (
     <ActionsDropdown

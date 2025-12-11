@@ -1149,6 +1149,7 @@
   "Open Console": "コンソールを開く",
   "Open console in new tab": "Open console in new tab",
   "Open logs in a new window": "新しいウィンドウでログを開く",
+  "Open running checkup": "Open running checkup",
   "Open web console": "Web コンソールを開く",
   "Opens a specific port on all Nodes in the cluster. If the Node is publicly accessible, any traffic sent to this port is forwarded to the Service.": "クラスター内のすべてのノードで特定のポートを開きます。ノードがパブリックアクセス可能な場合、このポートに送信されたトラフィックはすべてサービスに転送されます。",
   "OpenShift Container Platform uses nmstate to report on and configure the state of the node network.": "OpenShift Container Platform は nmstate を使用して、ノードネットワークの状態を報告し、これを設定します。",

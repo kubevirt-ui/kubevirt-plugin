@@ -1,47 +1,48 @@
 import React, { FC } from 'react';
 import { Link } from 'react-router-dom-v5-compat';
+import { CHECKUP_URLS } from 'src/views/checkups/utils/constants';
 
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 import { createURL } from '@virtualmachines/details/tabs/overview/utils/utils';
 
+import './running-checkup-warning-description.scss';
+
 type RunningCheckupWarningDescriptionProps = {
   configMapName: string;
   configMapNamespace: string;
+  maxWidth?: string;
+  showTitle?: boolean;
 };
 
 const RunningCheckupWarningDescription: FC<RunningCheckupWarningDescriptionProps> = ({
   configMapName,
   configMapNamespace,
-}) => (
-  <span style={{ alignItems: 'center', display: 'inline-flex', gap: '0.25rem', maxWidth: '100%' }}>
-    <span>{t('Self validation already running')}</span>{' '}
-    <Link
-      onClick={(e) => {
-        e.stopPropagation();
-      }}
-      style={{
-        alignItems: 'center',
-        display: 'inline-flex',
-        gap: '0.25rem',
-        textDecoration: 'none',
-      }}
-      className="co-resource-item__resource-name"
-      to={createURL(`self-validation/${configMapName}`, `/k8s/ns/${configMapNamespace}/checkups`)}
-    >
-      <span
-        style={{
-          maxWidth: '50px',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
+  maxWidth = '50px',
+  showTitle = true,
+}) => {
+  const linkTo = createURL(
+    `${CHECKUP_URLS.SELF_VALIDATION}/${configMapName}`,
+    `/k8s/ns/${configMapNamespace}/checkups`,
+  );
+
+  return (
+    <span className="running-checkup-warning">
+      {showTitle && <span>{t('Self validation already running')}</span>}
+      <Link
+        onClick={(e) => {
+          e.stopPropagation();
         }}
+        className="running-checkup-warning__link co-resource-item__resource-name"
+        to={linkTo}
       >
-        {configMapName}
-      </span>
-      <ExternalLinkAltIcon style={{ flexShrink: 0 }} />
-    </Link>
-  </span>
-);
+        <span className="running-checkup-warning__name" style={{ maxWidth: maxWidth }}>
+          {configMapName}
+        </span>
+        <ExternalLinkAltIcon className="running-checkup-warning__icon" />
+      </Link>
+    </span>
+  );
+};
 
 export default RunningCheckupWarningDescription;
