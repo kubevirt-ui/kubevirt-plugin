@@ -12,6 +12,8 @@ import { Toolbar, ToolbarContent } from '@patternfly/react-core';
 import { ListPageBodySize } from '@virtualmachines/list/listPageBodySize';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils/constants';
 
+import NameFilter from './components/NameFilter';
+import useNameFilter from './hooks/useNameFilter';
 import { ACM_FILTERS_SHOWN_VM_LIST, FILTERS_SHOWN_VM_LIST } from './constants';
 import { getTooltipContent } from './utils';
 
@@ -52,8 +54,10 @@ const VirtualMachineFilterToolbar: FC<VirtualMachineFilterToolbarProps> = ({
   const applyFilters: OnFilterChange = (type, input) => onFilterChange?.(type, input);
   const applyFiltersWithQuery = useApplyFiltersWithQuery(applyFilters);
 
+  const nameFilter = useNameFilter(applyFiltersWithQuery);
+
   const clearAll = () => {
-    applyFiltersWithQuery(VirtualMachineRowFilterType.Name);
+    nameFilter.onDelete();
     applyFiltersWithQuery(VirtualMachineRowFilterType.Labels);
 
     [...filtersWithSelect, ...hiddenFilters].forEach(
@@ -129,6 +133,7 @@ const VirtualMachineFilterToolbar: FC<VirtualMachineFilterToolbarProps> = ({
             />
           );
         })}
+        <NameFilter {...nameFilter} />
         <AdvancedFiltersToolbarItem
           advancedFilters={hiddenFilters}
           applyFilters={applyFiltersWithQuery}
