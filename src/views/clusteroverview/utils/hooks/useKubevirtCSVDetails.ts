@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
-import { CatalogSourceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console/models/CatalogSourceModel';
-import ClusterServiceVersionModel from '@kubevirt-ui/kubevirt-api/console/models/ClusterServiceVersionModel';
+import { CatalogSourceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
+import { ClusterServiceVersionModel } from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtClusterServiceVersion } from '@kubevirt-utils/hooks/useKubevirtClusterServiceVersion';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 

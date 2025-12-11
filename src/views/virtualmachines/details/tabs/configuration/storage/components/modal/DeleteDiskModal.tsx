@@ -1,6 +1,6 @@
 import React, { FC, useMemo, useState } from 'react';
 
-import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
+import { DataVolumeModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine, V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import {

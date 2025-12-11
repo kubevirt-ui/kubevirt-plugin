@@ -1,4 +1,4 @@
-import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
+import { DataSourceModel } from '@kubevirt-ui/kubevirt-api/console';
 import {
   V1DataVolumeTemplateSpec,
   V1VirtualMachine,

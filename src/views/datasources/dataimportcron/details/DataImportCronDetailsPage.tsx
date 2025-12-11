@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { V1beta1DataImportCron } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { V1beta1DataImportCron } from '@kubevirt-ui/kubevirt-api/containerized-data-importer';
 import {
   ConditionsTable,
   K8sResourceCondition,

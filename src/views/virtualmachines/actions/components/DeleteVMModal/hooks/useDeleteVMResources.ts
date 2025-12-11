@@ -3,11 +3,11 @@ import {
   PersistentVolumeClaimModel,
   SecretModel,
 } from '@kubevirt-ui/kubevirt-api/console';
-import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
-import VirtualMachineSnapshotModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineSnapshotModel';
-import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { DataVolumeModel } from '@kubevirt-ui/kubevirt-api/console';
+import { VirtualMachineSnapshotModel } from '@kubevirt-ui/kubevirt-api/console';
+import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer';
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
+import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import {
   V1beta1VirtualMachineSnapshot,
   V1VirtualMachine,

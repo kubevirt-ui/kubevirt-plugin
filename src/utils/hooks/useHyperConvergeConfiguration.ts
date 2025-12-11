@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { HyperConvergedModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
-import { V1LabelSelector } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { V1LabelSelector } from '@kubevirt-ui/kubevirt-api/containerized-data-importer';
 import { V1MigrationConfiguration } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { DEFAULT_OPERATOR_NAMESPACE, isEmpty } from '@kubevirt-utils/utils/utils';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';

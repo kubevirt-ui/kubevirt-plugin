@@ -1,7 +1,7 @@
 import React, { FC, useCallback, useState } from 'react';
 
-import VirtualMachineCloneModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineCloneModel';
-import VirtualMachineSnapshotModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineSnapshotModel';
+import { VirtualMachineCloneModel } from '@kubevirt-ui/kubevirt-api/console';
+import { VirtualMachineSnapshotModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1VirtualMachineSnapshot } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import CloneVMModal from '@kubevirt-utils/components/CloneVMModal/CloneVMModal';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';

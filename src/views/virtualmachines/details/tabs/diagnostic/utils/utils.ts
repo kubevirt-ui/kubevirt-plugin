@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 
 import { DataVolumeModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
-import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer';
 import {
   V1VirtualMachine,
   V1VirtualMachineCondition,

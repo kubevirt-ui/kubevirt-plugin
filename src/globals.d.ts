@@ -1,9 +1,11 @@
-import kubevirtUITypes from '@kubevirt-ui/kubevirt-api';
 import type { V1Template as OriginalV1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { V1beta1DataVolume as OriginalV1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer';
+import { IoK8sApiCoreV1Pod as OriginalIoK8sApiCoreV1Pod } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import * as kubevirtUITypes from '@kubevirt-ui/kubevirt-api/kubevirt';
 import type { K8sResourceCommon as OriginalK8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
-declare module '@kubevirt-ui/kubevirt-api/containerized-data-importer/models' {
-  interface V1beta1DataVolume extends kubevirtUITypes.V1beta1DataVolume {
+declare module '@kubevirt-ui/kubevirt-api/containerized-data-importer' {
+  interface V1beta1DataVolume extends OriginalV1beta1DataVolume {
     cluster?: string;
   }
 }
@@ -54,7 +56,7 @@ declare module '@kubevirt-ui/kubevirt-api/kubevirt' {
 }
 
 declare module '@kubevirt-ui/kubevirt-api/kubernetes' {
-  interface IoK8sApiCoreV1Pod extends kubevirtUITypes.IoK8sApiCoreV1Pod {
+  interface IoK8sApiCoreV1Pod extends OriginalIoK8sApiCoreV1Pod {
     cluster?: string;
   }
 }

@@ -3,7 +3,7 @@ import produce from 'immer';
 import { getTolerations } from 'src/views/templates/utils/selectors';
 
 import { modelToGroupVersionKind, NodeModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
+import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import {
   K8sIoApiCoreV1Toleration,
   K8sIoApiCoreV1TolerationEffectEnum,

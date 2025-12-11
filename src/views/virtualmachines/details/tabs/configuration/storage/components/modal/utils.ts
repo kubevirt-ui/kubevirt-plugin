@@ -1,9 +1,9 @@
 import produce from 'immer';
-import { WritableDraft } from 'immer/dist/internal';
+import { Draft } from 'immer';
 
 import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
-import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
-import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { DataVolumeModel } from '@kubevirt-ui/kubevirt-api/console';
+import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer';
 import {
   V1beta1StorageSpec,
   V1Disk,
@@ -81,7 +81,7 @@ export const createBootableVolumeFromDisk = async (
   return bootableVolumes?.[0];
 };
 
-const addDiskToVM = (draftVM: WritableDraft<V1VirtualMachine>, diskToPersist: V1Disk) => {
+const addDiskToVM = (draftVM: Draft<V1VirtualMachine>, diskToPersist: V1Disk) => {
   const disks = getDisks(draftVM) || [];
 
   if (isEmpty(diskToPersist) || disks.find((disk) => disk.name === diskToPersist.name)) return;
@@ -91,10 +91,7 @@ const addDiskToVM = (draftVM: WritableDraft<V1VirtualMachine>, diskToPersist: V1
   draftVM.spec.template.spec.domain.devices.disks = disks;
 };
 
-const addDataVolumeToVM = async (
-  draftVM: WritableDraft<V1VirtualMachine>,
-  dataVolumeName: string,
-) => {
+const addDataVolumeToVM = async (draftVM: Draft<V1VirtualMachine>, dataVolumeName: string) => {
   const dataVolumeTemplates = getDataVolumeTemplates(draftVM);
 
   if (dataVolumeTemplates.find((dataVolume) => dataVolume.metadata.name === dataVolumeName)) return;

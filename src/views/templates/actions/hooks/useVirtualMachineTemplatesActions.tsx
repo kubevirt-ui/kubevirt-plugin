@@ -2,8 +2,8 @@ import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
-import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { DataVolumeModel } from '@kubevirt-ui/kubevirt-api/console';
+import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer';
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import CloneTemplateModal from '@kubevirt-utils/components/CloneTemplateModal/CloneTemplateModal';
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';

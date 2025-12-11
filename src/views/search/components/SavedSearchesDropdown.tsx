@@ -12,7 +12,7 @@ import {
   Spinner,
 } from '@patternfly/react-core';
 import { TrashIcon } from '@patternfly/react-icons';
-import { ExclamationCircleIcon } from '@patternfly/react-icons/dist/esm/icons/exclamation-circle-icon';
+import { ExclamationCircleIcon } from '@patternfly/react-icons';
 import { useSavedSearchData } from '@search/hooks/useSavedSearchData';
 
 const SavedSearchesDropdown: FC = () => {

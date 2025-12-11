@@ -4,7 +4,7 @@ import {
   modelToGroupVersionKind,
   PersistentVolumeClaimModel,
 } from '@kubevirt-ui/kubevirt-api/console';
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
+import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils/constants';
 import { convertIntoPVCMapper } from '@virtualmachines/utils/mappers';
 

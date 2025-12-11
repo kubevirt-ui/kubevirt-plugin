@@ -1,5 +1,5 @@
 import produce from 'immer';
-import { WritableDraft } from 'immer/dist/internal';
+import { Draft } from 'immer';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
@@ -11,7 +11,7 @@ import { ensurePath } from '@kubevirt-utils/utils/utils';
 
 export const produceVMNetworks = (
   vm: V1VirtualMachine,
-  updateNetwork: (vmDraft: WritableDraft<V1VirtualMachine>) => void,
+  updateNetwork: (vmDraft: Draft<V1VirtualMachine>) => void,
 ) => {
   return produce(vm, (draftVM) => {
     ensurePath(draftVM, ['spec.template.spec.domain.devices']);
@@ -27,7 +27,7 @@ export const produceVMNetworks = (
 
 export const produceVMDisks = (
   vm: V1VirtualMachine,
-  updateDisks: (vmDraft: WritableDraft<V1VirtualMachine>) => void,
+  updateDisks: (vmDraft: Draft<V1VirtualMachine>) => void,
 ) => {
   return produce(vm, (draftVM) => {
     ensurePath(draftVM, ['spec.template.spec.domain.devices']);
@@ -45,7 +45,7 @@ export const produceVMDisks = (
 
 export const produceVMDevices = (
   vm: V1VirtualMachine,
-  updateDevices: (vmDraft: WritableDraft<V1VirtualMachine>) => void,
+  updateDevices: (vmDraft: Draft<V1VirtualMachine>) => void,
 ) => {
   return produce(vm, (draftVM) => {
     ensurePath(draftVM, ['spec.template.spec.domain.devices']);

@@ -1,6 +1,6 @@
 import React, { Dispatch, FC, SetStateAction, useCallback, useEffect, useMemo } from 'react';
 
-import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
+import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import {
   getDefaultStorageClass,
   getSCSelectOptions,

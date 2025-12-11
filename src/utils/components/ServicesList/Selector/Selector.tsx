@@ -4,7 +4,7 @@ import * as _ from 'lodash-es';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Selector as SelectorKind } from '@openshift-console/dynamic-plugin-sdk';
-import { SearchIcon } from '@patternfly/react-icons/dist/esm/icons/search-icon';
+import { SearchIcon } from '@patternfly/react-icons';
 
 import { selectorToString } from './utils';
 

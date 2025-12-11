@@ -1,5 +1,5 @@
 import { modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
-import StorageProfileModel from '@kubevirt-ui/kubevirt-api/console/models/StorageProfileModel';
+import { StorageProfileModel } from '@kubevirt-ui/kubevirt-api/console';
 import { ClaimPropertySets, StorageProfile } from '@kubevirt-utils/types/storage';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 

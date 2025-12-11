@@ -1,5 +1,5 @@
 import { generateCloudInitPassword } from '@catalog/CreateFromInstanceTypes/utils/utils';
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
+import { VirtualMachineModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { isUpstream } from '@kubevirt-utils/utils/utils';
 

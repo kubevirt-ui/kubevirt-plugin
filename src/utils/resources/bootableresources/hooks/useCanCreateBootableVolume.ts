@@ -1,7 +1,7 @@
 import { PersistentVolumeClaimModel, VolumeSnapshotModel } from '@kubevirt-ui/kubevirt-api/console';
-import DataImportCronModel from '@kubevirt-ui/kubevirt-api/console/models/DataImportCronModel';
-import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
-import VirtualMachineClusterPreferenceModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineClusterPreferenceModel';
+import { DataImportCronModel } from '@kubevirt-ui/kubevirt-api/console';
+import { DataSourceModel } from '@kubevirt-ui/kubevirt-api/console';
+import { VirtualMachineClusterPreferenceModel } from '@kubevirt-ui/kubevirt-api/console';
 import useListClusters from '@kubevirt-utils/hooks/useListClusters';
 import useListNamespaces from '@kubevirt-utils/hooks/useListNamespaces';
 import { K8sVerb } from '@openshift-console/dynamic-plugin-sdk';

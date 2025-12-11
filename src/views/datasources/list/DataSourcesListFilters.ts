@@ -1,4 +1,4 @@
-import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 

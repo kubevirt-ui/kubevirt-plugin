@@ -1,4 +1,4 @@
-import KubeDeschedulerModel from '@kubevirt-ui/kubevirt-api/console/models/KubeDeschedulerModel';
+import { KubeDeschedulerModel } from '@kubevirt-ui/kubevirt-api/console';
 import { modelToGroupVersionKind } from '@kubevirt-utils/models';
 import { KubeDescheduler } from '@kubevirt-utils/resources/descheduler/types';
 import { defaultDescheduler } from '@kubevirt-utils/resources/descheduler/utils';

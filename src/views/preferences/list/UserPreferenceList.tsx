@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { VirtualMachinePreferenceModelRef } from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachinePreferenceModel';
+import { VirtualMachinePreferenceModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1VirtualMachinePreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';

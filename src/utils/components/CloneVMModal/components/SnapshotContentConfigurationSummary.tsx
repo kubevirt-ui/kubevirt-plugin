@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
 import { modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
-import VirtualMachineSnapshotContentModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineSnapshotContentModel';
+import { VirtualMachineSnapshotContentModel } from '@kubevirt-ui/kubevirt-api/console';
 import {
   V1beta1VirtualMachineSnapshot,
   V1beta1VirtualMachineSnapshotContent,

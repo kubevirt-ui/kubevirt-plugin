@@ -1,12 +1,12 @@
 import produce from 'immer';
 
 import { PersistentVolumeClaimModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
-import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
+import { DataSourceModel } from '@kubevirt-ui/kubevirt-api/console';
+import { DataVolumeModel } from '@kubevirt-ui/kubevirt-api/console';
 import {
   V1beta1DataSource,
   V1beta1DataVolume,
-} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+} from '@kubevirt-ui/kubevirt-api/containerized-data-importer';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import {
   V1beta1DataVolumeSourceHTTP,

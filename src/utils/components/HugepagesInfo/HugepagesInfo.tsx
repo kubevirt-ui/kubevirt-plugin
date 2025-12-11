@@ -3,7 +3,7 @@ import React, { FC, MouseEventHandler } from 'react';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, Flex, Stack } from '@patternfly/react-core';
-import ExternalLinkAltIcon from '@patternfly/react-icons/dist/esm/icons/external-link-alt-icon';
+import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 
 import HelpTextIcon from '../HelpTextIcon/HelpTextIcon';
 

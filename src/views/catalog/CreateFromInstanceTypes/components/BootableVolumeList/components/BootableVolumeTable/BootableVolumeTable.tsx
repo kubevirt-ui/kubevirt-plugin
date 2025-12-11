@@ -4,7 +4,7 @@ import {
   InstanceTypeVMStore,
   UseBootableVolumesValues,
 } from '@catalog/CreateFromInstanceTypes/state/utils/types';
-import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer';
 import {
   V1beta1VirtualMachineClusterPreference,
   V1beta1VirtualMachinePreference,

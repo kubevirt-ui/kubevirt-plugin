@@ -1,9 +1,6 @@
 import { useMemo } from 'react';
 
-import {
-  V1VirtualMachine,
-  V1VirtualMachineInstance,
-} from '@kubevirt-ui/kubevirt-api/kubevirt/models';
+import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getUtilizationQueries } from '@kubevirt-utils/components/Charts/utils/queries';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
