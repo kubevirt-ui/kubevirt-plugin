@@ -1,19 +1,14 @@
 import React, { ComponentType } from 'react';
 
+import { ACMVirtualMachineAction } from '@kubevirt-extensions/acm.virtualmachine';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import { Extension, ResolvedExtension } from '@openshift-console/dynamic-plugin-sdk/lib/types';
-
-import { ACMVirtualMachineActionExtension } from './constants';
-
-export const isACMVirtualMachineActionExtension = (
-  e: Extension,
-): e is ACMVirtualMachineActionExtension => e.type === 'acm.virtualmachine/action';
+import { ResolvedExtension } from '@openshift-console/dynamic-plugin-sdk/lib/types';
 
 export function buildACMVirtualMachineActionsFromExtensions(
   virtualMachine: V1VirtualMachine,
-  actionExtensions: ResolvedExtension<ACMVirtualMachineActionExtension>[],
+  actionExtensions: ResolvedExtension<ACMVirtualMachineAction>[],
   createModal: (modal: ModalComponent) => void,
   hubClusterName: string,
 ): ActionDropdownItemType[] {

@@ -5,6 +5,7 @@ import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { isCatalogURL } from '@multicluster/urls';
 
 import StateHandler from '../StateHandler/StateHandler';
 
@@ -29,17 +30,15 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
   vm,
 }) => {
   const location = useLocation();
-
   const params = useParams();
 
-  const dynamicPluginPages = useDynamicPages(VirtualMachineModel);
+  const vmCreated = !isCatalogURL(location.pathname);
 
-  const allPages = useMemo(
-    () => [...pages, ...(dynamicPluginPages || [])] as NavPageKubevirt[],
-    [pages, dynamicPluginPages],
-  );
+  const dynamicPluginPages = useDynamicPages(VirtualMachineModel, vm, vmCreated);
 
-  const paths = allPages.map((page) => page.href);
+  const allPages = useMemo(() => [...pages, ...dynamicPluginPages], [pages, dynamicPluginPages]);
+
+  const paths = useMemo(() => allPages.map((page) => page.href), [allPages]);
 
   useEffect(() => {
     const defaultPage = allPages.find(({ href }) => isEmpty(href));
@@ -51,7 +50,7 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
       ) || defaultPage;
 
     setActiveItem(initialActiveTab?.name?.toLowerCase());
-  }, [allPages, location?.pathname]);
+  }, [allPages, location?.pathname, basePath]);
 
   const [activeItem, setActiveItem] = useState<number | string>();
 
