@@ -11,7 +11,11 @@ import DeleteCheckupModal from '../../../components/DeleteCheckupModal';
 import { CHECKUP_URLS } from '../../../utils/constants';
 import { deleteSelfValidationCheckup } from '../../utils';
 
-import { createRerunAction } from './CheckupsSelfValidationSharedActionFactory';
+import { getConfigMapInfo } from './CheckupsSelfValidationActionsUtils';
+import {
+  createGoToRunningCheckupAction,
+  createRerunAction,
+} from './CheckupsSelfValidationSharedActionFactory';
 
 type CheckupsSelfValidationActionFactoryParams = {
   configMap: IoK8sApiCoreV1ConfigMap;
@@ -52,6 +56,27 @@ export const CheckupsSelfValidationActionFactory = {
       id: 'checkup-action-delete',
       label: t('Delete'),
     };
+  },
+  goToRunningCheckup: ({
+    hasOtherRunningJobs = false,
+    navigate,
+    otherRunningJobs = [],
+  }: {
+    hasOtherRunningJobs?: boolean;
+    navigate: (path: string) => void;
+    otherRunningJobs?: IoK8sApiBatchV1Job[];
+  }): ActionDropdownItemType | null => {
+    if (!hasOtherRunningJobs || !otherRunningJobs?.length) {
+      return null;
+    }
+
+    const configMapInfo = getConfigMapInfo(otherRunningJobs);
+
+    return createGoToRunningCheckupAction({
+      configMapInfo,
+      navigate,
+      t,
+    });
   },
   rerun: ({
     configMap,

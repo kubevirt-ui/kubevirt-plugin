@@ -17,6 +17,16 @@ export type ActionState = {
 };
 
 /**
+ * Extracts configMapInfo from the first job in otherRunningJobs
+ */
+export const getConfigMapInfo = (
+  otherRunningJobs: IoK8sApiBatchV1Job[],
+): ActionState['configMapInfo'] => {
+  const firstOtherRunningJob = otherRunningJobs?.[0];
+  return firstOtherRunningJob ? extractConfigMapName(firstOtherRunningJob) : null;
+};
+
+/**
  * Calculates the state for run mode action
  */
 export const getRunModeState = (

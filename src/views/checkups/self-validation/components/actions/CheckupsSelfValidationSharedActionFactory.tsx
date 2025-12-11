@@ -1,26 +1,17 @@
 import React, { ReactNode } from 'react';
+import { CHECKUP_URLS } from 'src/views/checkups/utils/constants';
 
 import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
+import { createURL } from '@virtualmachines/details/tabs/overview/utils/utils';
 
 import RerunCheckupModal from '../../../components/RerunCheckupModal';
 import { isJobRunning, rerunSelfValidationCheckup } from '../../utils';
 
 import { ActionState, getRerunModeState } from './CheckupsSelfValidationActionsUtils';
 import RunningCheckupWarningDescription from './RunningCheckupWarningDescription';
-
-const getActionDescription = (
-  showWarning: boolean,
-  configMapInfo: ActionState['configMapInfo'],
-): ReactNode | undefined =>
-  showWarning && configMapInfo ? (
-    <RunningCheckupWarningDescription
-      configMapName={configMapInfo.name}
-      configMapNamespace={configMapInfo.namespace}
-    />
-  ) : undefined;
 
 type TranslationFunction = (key: string, options?: Record<string, unknown>) => string;
 
@@ -43,7 +34,7 @@ export const createRerunAction = ({
   otherRunningJobs = [],
   t,
 }: RerunActionParams): ActionDropdownItemType => {
-  const { configMapInfo, isEnabled, showWarning } = getRerunModeState(
+  const { isEnabled } = getRerunModeState(
     hasOtherRunningJobs,
     hasCurrentCheckupRunningJobs,
     otherRunningJobs,
@@ -69,10 +60,6 @@ export const createRerunAction = ({
     }
   };
 
-  //TODO: Uncomment description after the next part is merged
-  // @ts-expect-error - description will be used after next part is merged
-  const description = getActionDescription(showWarning, configMapInfo);
-
   const handleRerunAction = () => {
     const runningJobs = jobs.filter((job) => isJobRunning(job));
     if (runningJobs.length > 0) {
@@ -96,9 +83,49 @@ export const createRerunAction = ({
 
   return {
     cta: handleRerunAction,
-    // description,
+    description: !isEnabled ? t('Self validation already running') : undefined,
     disabled: !isEnabled,
     id: 'checkup-rerun-self-validation',
     label: t('Rerun'),
+  };
+};
+
+type GoToRunningCheckupActionParams = {
+  configMapInfo: ActionState['configMapInfo'];
+  navigate: (path: string) => void;
+  t: TranslationFunction;
+};
+
+export const createGoToRunningCheckupAction = ({
+  configMapInfo,
+  navigate,
+  t,
+}: GoToRunningCheckupActionParams): ActionDropdownItemType | null => {
+  if (!configMapInfo) {
+    return null;
+  }
+
+  const handleGoToRunningCheckup = () => {
+    const path = createURL(
+      `${CHECKUP_URLS.SELF_VALIDATION}/${configMapInfo.name}`,
+      `/k8s/ns/${configMapInfo.namespace}/checkups`,
+    );
+    navigate(path);
+  };
+
+  const description = (
+    <RunningCheckupWarningDescription
+      configMapName={configMapInfo.name}
+      configMapNamespace={configMapInfo.namespace}
+      maxWidth="150px"
+      showTitle={false}
+    />
+  );
+
+  return {
+    cta: handleGoToRunningCheckup,
+    description: description as ReactNode as string,
+    id: 'checkup-goto-running-self-validation',
+    label: t('Open running checkup'),
   };
 };

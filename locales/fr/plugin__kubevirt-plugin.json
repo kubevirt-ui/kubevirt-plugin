@@ -1169,6 +1169,7 @@
   "Open Console": "Ouvrir la console",
   "Open console in new tab": "Open console in new tab",
   "Open logs in a new window": "Ouvrir les journaux dans une nouvelle fenêtre",
+  "Open running checkup": "Open running checkup",
   "Open web console": "Ouvrir la console Web",
   "Opens a specific port on all Nodes in the cluster. If the Node is publicly accessible, any traffic sent to this port is forwarded to the Service.": "Ouvre un port spécifique sur tous les nœuds du cluster. Si le nœud est accessible au public, tout trafic envoyé vers ce port est transmis au service.",
   "OpenShift Container Platform uses nmstate to report on and configure the state of the node network.": "OpenShift Container Platform utilise nmstate pour signaler et configurer l'état du réseau de nœuds.",

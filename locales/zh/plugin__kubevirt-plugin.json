@@ -1154,6 +1154,7 @@
   "Open Console": "打开控制台",
   "Open console in new tab": "Open console in new tab",
   "Open logs in a new window": "在一个新窗口中打开日志",
+  "Open running checkup": "Open running checkup",
   "Open web console": "打开 web 控制台",
   "Opens a specific port on all Nodes in the cluster. If the Node is publicly accessible, any traffic sent to this port is forwarded to the Service.": "在集群的所有节点上打开一个特定端口。如果节点是可以被公开访问的，发送到此端口的任何流量都会被转发到该服务。",
   "OpenShift Container Platform uses nmstate to report on and configure the state of the node network.": "OpenShift Container Platform 使用 nmstate 来报告并配置节点网络的状态。",
