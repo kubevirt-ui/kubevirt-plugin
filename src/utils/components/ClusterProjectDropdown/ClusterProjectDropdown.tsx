@@ -1,130 +1,137 @@
-import { FC, useCallback, useEffect } from 'react';
-import React from 'react';
+import React, { FC, JSX, memo, useCallback, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
+import ClusterDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterDropdown';
+import NamespaceDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/NamespaceDropdown';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { ALL_CLUSTERS_KEY, ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import useClusterParam from '@multicluster/hooks/useClusterParam';
+import useActiveClusterParam from '@multicluster/hooks/useActiveClusterParam';
 import useIsACMPage from '@multicluster/useIsACMPage';
-import { Skeleton } from '@patternfly/react-core';
-import { useFleetClusterNames, useHubClusterName } from '@stolostron/multicluster-sdk';
-
-import InlineFilterSelect from '../FilterSelect/InlineFilterSelect';
-import ProjectDropdown from '../ProjectDropdown/ProjectDropdown';
-
-import { SKELETON_HEIGHT, SKELETON_WIDTH } from './constants';
-import { getClusterOptions } from './utils';
+import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import './ClusterProjectDropdown.scss';
 
 type ClusterProjectDropdownProps = {
   includeAllClusters?: boolean;
   includeAllProjects?: boolean;
+  showClusterDropdown?: boolean;
   showProjectDropdown?: boolean;
 };
 
-const ClusterProjectDropdown: FC<ClusterProjectDropdownProps> = ({
-  includeAllClusters,
-  includeAllProjects,
-  showProjectDropdown = true,
-}) => {
-  const { t } = useKubevirtTranslation();
-  const isACMPage = useIsACMPage();
-  const cluster = useClusterParam();
-  const namespace = useNamespaceParam();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [hubClusterName, hubClusterNameLoaded] = useHubClusterName();
-  const [projects, projectLoaded] = useProjects(cluster || hubClusterName);
+const ClusterProjectDropdown: FC<ClusterProjectDropdownProps> = memo(
+  ({
+    includeAllClusters,
+    includeAllProjects,
+    showClusterDropdown = true,
+    showProjectDropdown = true,
+  }): JSX.Element | null => {
+    const { t } = useKubevirtTranslation();
+    const isACMPage = useIsACMPage();
+    const cluster = useActiveClusterParam();
+    const namespace = useNamespaceParam();
+    const navigate = useNavigate();
+    const location = useLocation();
+    const [hubClusterName, hubClusterNameLoaded] = useHubClusterName();
+    const [projects, projectLoaded] = useProjects(cluster || hubClusterName);
 
-  const [clusterNames, clustersLoaded] = useFleetClusterNames();
+    const onClusterChange = useCallback(
+      (newCluster: string) => {
+        const clusterReplaceKey =
+          newCluster === ALL_CLUSTERS_KEY ? '/all-clusters/' : `/cluster/${newCluster}/`;
+        let newPathname = location.pathname
+          .replace(`/cluster/${cluster}/`, clusterReplaceKey)
+          .replace('/all-clusters/', clusterReplaceKey);
 
-  const onClusterChange = useCallback(
-    (newCluster: string) => {
-      const clusterReplaceKey =
-        newCluster === ALL_CLUSTERS_KEY ? '/all-clusters/' : `/cluster/${newCluster}/`;
-      const newPathname = location.pathname
-        .replace(`/cluster/${cluster}/`, clusterReplaceKey)
-        .replace('/all-clusters/', clusterReplaceKey);
-      navigate(newPathname);
-    },
-    [location.pathname, cluster, navigate],
-  );
+        // Reset project to "all projects" when cluster changes
+        if (namespace) {
+          newPathname = newPathname.replace(`/ns/${namespace}/`, '/all-namespaces/');
+        }
 
-  const onProjectChange = useCallback(
-    (newProject: string) => {
-      const projectReplaceKey =
-        newProject === ALL_PROJECTS ? '/all-namespaces/' : `/ns/${newProject}/`;
-      const newPathname = location.pathname
-        .replace(`/ns/${namespace}/`, projectReplaceKey)
-        .replace('/all-namespaces/', projectReplaceKey);
-      navigate(newPathname);
-    },
-    [location.pathname, namespace, navigate],
-  );
+        navigate(newPathname);
+      },
+      [location.pathname, cluster, namespace, navigate],
+    );
 
-  useEffect(() => {
-    if (!includeAllClusters && isEmpty(cluster) && hubClusterNameLoaded) {
-      onClusterChange(hubClusterName);
+    const onProjectChange = useCallback(
+      (newProject: string) => {
+        const projectReplaceKey =
+          newProject === ALL_PROJECTS ? '/all-namespaces/' : `/ns/${newProject}/`;
+        const newPathname = location.pathname
+          .replace(`/ns/${namespace}/`, projectReplaceKey)
+          .replace('/all-namespaces/', projectReplaceKey);
+        navigate(newPathname);
+      },
+      [location.pathname, namespace, navigate],
+    );
+
+    useEffect(() => {
+      if (!includeAllClusters && isEmpty(cluster) && hubClusterNameLoaded) {
+        onClusterChange(hubClusterName);
+      }
+    }, [cluster, hubClusterName, hubClusterNameLoaded, includeAllClusters, onClusterChange]);
+
+    useEffect(() => {
+      if (
+        !includeAllProjects &&
+        cluster &&
+        isEmpty(namespace) &&
+        projectLoaded &&
+        showProjectDropdown
+      ) {
+        const defaultProject = projects?.find((project) => project === DEFAULT_NAMESPACE);
+        const selectedProject = defaultProject || projects?.[0] || ALL_PROJECTS;
+        if (selectedProject) {
+          onProjectChange(selectedProject);
+        }
+      }
+    }, [
+      cluster,
+      includeAllProjects,
+      namespace,
+      onProjectChange,
+      projectLoaded,
+      projects,
+      showProjectDropdown,
+    ]);
+
+    if (!isACMPage) {
+      return null;
     }
-  }, [cluster, hubClusterName, hubClusterNameLoaded, includeAllClusters, onClusterChange]);
 
-  useEffect(() => {
-    if (
-      !includeAllProjects &&
-      cluster &&
-      isEmpty(namespace) &&
-      projectLoaded &&
-      showProjectDropdown
-    ) {
-      const defaultProject = projects.find((project) => project === DEFAULT_NAMESPACE);
-      onProjectChange(defaultProject || projects?.[0]);
-    }
-  }, [cluster, includeAllProjects, namespace, onProjectChange, projectLoaded, projects]);
-
-  if (!isACMPage) {
-    return null;
-  }
-
-  return (
-    <div className="cluster-project-dropdown">
-      {t('Clusters')}:
-      <div className="cluster-dropdown">
-        {clustersLoaded ? (
-          <InlineFilterSelect
-            options={getClusterOptions(includeAllClusters, clusterNames)}
-            selected={cluster || ALL_CLUSTERS_KEY}
-            setSelected={onClusterChange}
-            toggleProps={{ isFullWidth: true }}
-          />
-        ) : (
-          <Skeleton height={SKELETON_HEIGHT} width={SKELETON_WIDTH} />
+    return (
+      <div className="cluster-project-dropdown">
+        {showClusterDropdown && (
+          <div className="cluster-project-dropdown__cluster">
+            {t('Cluster')}:
+            <ClusterDropdown
+              bookmarkCluster={hubClusterName}
+              includeAllClusters={includeAllClusters}
+              onChange={onClusterChange}
+              selectedCluster={cluster || ALL_CLUSTERS_KEY}
+            />
+          </div>
+        )}
+        {showProjectDropdown && (
+          <div className="cluster-project-dropdown__project">
+            {t('Project')}:
+            <NamespaceDropdown
+              cluster={cluster}
+              disabled={!cluster || cluster === ALL_CLUSTERS_KEY}
+              includeAllProjects={includeAllProjects}
+              onChange={onProjectChange}
+              selectedProject={namespace || ALL_PROJECTS}
+            />
+          </div>
         )}
       </div>
-      {showProjectDropdown && (
-        <>
-          {t('Projects')}:
-          <div className="project-dropdown">
-            {projectLoaded ? (
-              <ProjectDropdown
-                cluster={cluster}
-                includeAllProjects={includeAllProjects}
-                isDisabled={!cluster}
-                onChange={onProjectChange}
-                selectedProject={namespace}
-              />
-            ) : (
-              <Skeleton height={SKELETON_HEIGHT} width={SKELETON_WIDTH} />
-            )}
-          </div>
-        </>
-      )}
-    </div>
-  );
-};
+    );
+  },
+);
+
+ClusterProjectDropdown.displayName = 'ClusterProjectDropdown';
 
 export default ClusterProjectDropdown;

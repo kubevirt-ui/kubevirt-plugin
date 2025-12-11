@@ -1,8 +1,9 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { FC, JSX, useMemo, useState } from 'react';
 
 import ClusterProjectDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterProjectDropdown';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { DocumentTitle } from '@openshift-console/dynamic-plugin-sdk';
 import { Form, FormGroup, TextInput } from '@patternfly/react-core';
 
@@ -17,16 +18,16 @@ import { initialMigrationPolicyState, produceMigrationPolicy } from './utils/uti
 import './MigrationPolicyCreateForm.scss';
 import '@kubevirt-utils/styles/forms.scss';
 
-const MigrationPolicyCreateForm: FC = () => {
+const MigrationPolicyCreateForm: FC = (): JSX.Element => {
   const { t } = useKubevirtTranslation();
-
+  const isACMPage = useIsACMPage();
   const [state, setState] = useState(initialMigrationPolicyState);
 
-  const setStateField = (field: string) => (value: any) => {
-    const isvaluefunction = typeof value === 'function';
+  const setStateField = (field: string) => (value: unknown) => {
+    const isValueFunction = typeof value === 'function';
     setState((prevState) => ({
       ...prevState,
-      [field]: isvaluefunction ? value(prevState?.[field]) : value,
+      [field]: isValueFunction ? (value as (prev: unknown) => unknown)(prevState?.[field]) : value,
     }));
   };
   const migrationPolicy = useMemo(() => produceMigrationPolicy(state), [state]);
@@ -34,7 +35,7 @@ const MigrationPolicyCreateForm: FC = () => {
   return (
     <div className="migration-policy__form kv-m-pane__form">
       <DocumentTitle>{t('Create MigrationPolicy')}</DocumentTitle>
-      <ClusterProjectDropdown showProjectDropdown={false} />
+      {isACMPage && <ClusterProjectDropdown showProjectDropdown={false} />}
       <MigrationPolicyCreateFormHeader />
       <Form className="migration-policy__form-body">
         <FormGroup fieldId="create-description">
