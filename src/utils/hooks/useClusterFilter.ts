@@ -33,6 +33,6 @@ export const useClusterFilter = <R extends K8sResourceCommon>(): RowFilter<R> =>
         })),
       type: CLUSTER_LIST_FILTER_TYPE,
     }),
-    [clusters],
+    [clusters, hubClusterName],
   );
 };

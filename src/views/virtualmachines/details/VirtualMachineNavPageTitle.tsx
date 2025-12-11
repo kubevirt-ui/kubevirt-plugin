@@ -20,7 +20,6 @@ import useVirtualMachineActionsProvider from '@virtualmachines/actions/hooks/use
 import VirtualMachinePendingChangesAlert from '@virtualmachines/details/VirtualMachinePendingChangesAlert/VirtualMachinePendingChangesAlert';
 import VMNotMigratableLabel from '@virtualmachines/list/components/VMNotMigratableLabel/VMNotMigratableLabel';
 
-import VirtualMachineBreadcrumb from '../list/components/VirtualMachineBreadcrumb/VirtualMachineBreadcrumb';
 import { getVMStatusIcon, isRunning } from '../utils';
 
 import { vmTabsWithYAML } from './utils/constants';
@@ -53,9 +52,7 @@ const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({
   );
 
   return (
-    <DetailsPageTitle
-      breadcrumb={<VirtualMachineBreadcrumb cluster={cluster} namespace={namespace} />}
-    >
+    <DetailsPageTitle>
       <PaneHeading>
         <Title headingLevel="h1">
           <Split hasGutter>

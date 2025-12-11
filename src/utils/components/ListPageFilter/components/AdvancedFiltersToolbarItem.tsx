@@ -5,7 +5,7 @@ import { ToolbarFilter, ToolbarItem } from '@patternfly/react-core';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 import { useAdvancedFiltersParameters } from '../hooks/useAdvancedFiltersParameters';
-import { useNameAndLabelParameters } from '../hooks/useNameAndLabelParameters';
+import { useLabelParameter } from '../hooks/useNameAndLabelParameters';
 import { ApplyTextFilters } from '../types';
 import { getFilterLabels } from '../utils';
 
@@ -19,10 +19,10 @@ const AdvancedFiltersToolbarItem: FC<AdvancedFiltersToolbarItemProps> = ({
   applyFilters,
 }) => {
   const advancedFiltersObject = useAdvancedFiltersParameters(advancedFilters);
-  const nameAndLabelFiltersObject = useNameAndLabelParameters();
+  const labelFiltersObject = useLabelParameter();
   const filtersObject = {
     ...advancedFiltersObject,
-    ...nameAndLabelFiltersObject,
+    ...labelFiltersObject,
   };
 
   const removeFilter = (filterType: string) => applyFilters(filterType, null);

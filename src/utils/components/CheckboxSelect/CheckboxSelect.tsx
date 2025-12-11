@@ -11,22 +11,29 @@ import {
   SelectOption,
   SelectOptionProps,
   SelectProps,
+  Tooltip,
 } from '@patternfly/react-core';
 
 type CheckboxSelectProps = {
+  badgeNumber?: number;
+  isToggleDisabled?: boolean;
   onSelect?: SelectProps['onSelect'];
   options?: SelectOptionProps[];
   selectedValues: any[];
   showAllBadge?: boolean;
   toggleTitle?: ReactNode;
+  tooltipContent?: ReactNode;
 };
 
 const CheckboxSelect: FC<CheckboxSelectProps> = ({
+  badgeNumber,
+  isToggleDisabled = false,
   onSelect,
   options,
   selectedValues,
   showAllBadge,
   toggleTitle,
+  tooltipContent,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { t } = useKubevirtTranslation();
@@ -37,20 +44,33 @@ const CheckboxSelect: FC<CheckboxSelectProps> = ({
 
   const hasSelectedValues = !isEmpty(selectedValues);
 
-  const toggle = (toggleRef: Ref<MenuToggleElement>) => (
-    <MenuToggle
-      badge={
-        showAllBadge || hasSelectedValues ? (
-          <Badge isRead>{selectedValues.length || t('All')}</Badge>
-        ) : null
-      }
-      isExpanded={isOpen}
-      onClick={onToggleClick}
-      ref={toggleRef}
-    >
-      {toggleTitle}
-    </MenuToggle>
-  );
+  const toggle = (toggleRef: Ref<MenuToggleElement>) => {
+    const menuToggle = (
+      <MenuToggle
+        badge={
+          badgeNumber || hasSelectedValues || showAllBadge ? (
+            <Badge isRead>{badgeNumber || selectedValues.length || t('All')}</Badge>
+          ) : null
+        }
+        isDisabled={isToggleDisabled}
+        isExpanded={isOpen}
+        onClick={onToggleClick}
+        ref={toggleRef}
+      >
+        {toggleTitle}
+      </MenuToggle>
+    );
+
+    if (isToggleDisabled && tooltipContent) {
+      return (
+        <Tooltip content={tooltipContent}>
+          <div>{menuToggle}</div>
+        </Tooltip>
+      );
+    }
+
+    return menuToggle;
+  };
 
   return (
     <Select

@@ -10,7 +10,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useProjects from '@kubevirt-utils/hooks/useProjects';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import { getVMListNamespacesURL } from '@multicluster/urls';
+import { getVMListURL } from '@multicluster/urls';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import { useLastNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
@@ -59,7 +59,7 @@ const useSelectNamespaceBasedOnPrivileges = ({
         const preferredProject = projectNames.includes(DEFAULT_NAMESPACE)
           ? DEFAULT_NAMESPACE
           : projectNames[0];
-        navigate(getVMListNamespacesURL(null, preferredProject));
+        navigate(getVMListURL(null, preferredProject));
         return;
       }
     }
@@ -77,7 +77,7 @@ const useSelectNamespaceBasedOnPrivileges = ({
       if (treeItem) {
         setSelected(treeItem);
         setLastNamespace(firstProject);
-        navigate(getVMListNamespacesURL(null, firstProject));
+        navigate(getVMListURL(null, firstProject));
         return true;
       }
     };
@@ -88,7 +88,7 @@ const useSelectNamespaceBasedOnPrivileges = ({
         if (treeItem) {
           setSelected(treeItem);
           setLastNamespace(DEFAULT_NAMESPACE);
-          navigate(getVMListNamespacesURL(cluster, DEFAULT_NAMESPACE));
+          navigate(getVMListURL(cluster, DEFAULT_NAMESPACE));
           return true;
         }
       }
@@ -98,7 +98,7 @@ const useSelectNamespaceBasedOnPrivileges = ({
         if (treeItem) {
           setSelected(treeItem);
           setLastNamespace(OPENSHIFT_OS_IMAGES_NS);
-          navigate(getVMListNamespacesURL(null, OPENSHIFT_OS_IMAGES_NS));
+          navigate(getVMListURL(null, OPENSHIFT_OS_IMAGES_NS));
           return true;
         }
       }
@@ -157,6 +157,7 @@ const useSelectNamespaceBasedOnPrivileges = ({
     t,
     setSelected,
     setAlertMessage,
+    isACMPage,
   ]);
 
   return {
