@@ -9,6 +9,17 @@
   padding: 0.5rem;
   width: 100%;
 
+  &__cluster,
+  &__project {
+    display: flex;
+    gap: var(--pf-t--global--spacer--sm);
+    align-items: center;
+  }
+
+  &__cluster-dropdown {
+    min-width: 200px;
+  }
+
   & .pf-v6-c-menu-toggle {
     border: none;
   }
