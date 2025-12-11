@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
 

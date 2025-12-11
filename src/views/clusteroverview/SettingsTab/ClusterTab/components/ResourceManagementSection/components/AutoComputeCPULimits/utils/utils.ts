@@ -1,4 +1,4 @@
-import HyperConvergedModel from '@kubevirt-ui/kubevirt-api/console/models/HyperConvergedModel';
+import { HyperConvergedModel } from '@kubevirt-ui/kubevirt-api/console';
 import { K8S_OPS } from '@kubevirt-utils/constants/constants';
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';

@@ -1,6 +1,6 @@
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import VirtualMachineRestoreModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineRestoreModel';
-import VirtualMachineSnapshotModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineSnapshotModel';
+import { VirtualMachineModel } from '@kubevirt-ui/kubevirt-api/console';
+import { VirtualMachineRestoreModel } from '@kubevirt-ui/kubevirt-api/console';
+import { VirtualMachineSnapshotModel } from '@kubevirt-ui/kubevirt-api/console';
 import {
   V1beta1VirtualMachineRestore,
   V1beta1VirtualMachineSnapshot,

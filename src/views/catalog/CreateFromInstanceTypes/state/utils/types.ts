@@ -3,7 +3,7 @@ import { Dispatch } from 'react';
 import {
   V1beta1DataImportCron,
   V1beta1DataVolume,
-} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+} from '@kubevirt-ui/kubevirt-api/containerized-data-importer';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import {
   V1beta1VirtualMachineClusterInstancetype,

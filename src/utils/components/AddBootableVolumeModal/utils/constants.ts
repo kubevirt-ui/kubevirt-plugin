@@ -1,11 +1,11 @@
-import DataImportCronModel from '@kubevirt-ui/kubevirt-api/console/models/DataImportCronModel';
-import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
-import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
+import { DataImportCronModel } from '@kubevirt-ui/kubevirt-api/console';
+import { DataSourceModel } from '@kubevirt-ui/kubevirt-api/console';
+import { DataVolumeModel } from '@kubevirt-ui/kubevirt-api/console';
 import {
   V1beta1DataImportCron,
   V1beta1DataSource,
   V1beta1DataVolume,
-} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+} from '@kubevirt-ui/kubevirt-api/containerized-data-importer';
 import {
   V1beta1StorageSpecAccessModesEnum,
   V1beta1StorageSpecVolumeModeEnum,

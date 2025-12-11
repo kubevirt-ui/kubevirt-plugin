@@ -1,4 +1,4 @@
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt/models';
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 
 import { createDataVolumeName } from './helpers';
 

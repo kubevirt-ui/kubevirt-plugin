@@ -1,8 +1,8 @@
 import { saveAs } from 'file-saver';
 
 import { ServiceModel } from '@kubevirt-ui/kubevirt-api/console';
-import VirtualMachineInstanceModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstanceModel';
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
+import { VirtualMachineInstanceModel } from '@kubevirt-ui/kubevirt-api/console';
+import { VirtualMachineModel } from '@kubevirt-ui/kubevirt-api/console';
 import {
   IoK8sApiCoreV1Pod,
   IoK8sApiCoreV1Service,

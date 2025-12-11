@@ -1,4 +1,4 @@
-import VirtualMachineInstanceModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstanceModel';
+import { VirtualMachineInstanceModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1Pod } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';

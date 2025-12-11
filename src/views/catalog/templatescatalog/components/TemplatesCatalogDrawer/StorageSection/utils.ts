@@ -1,6 +1,6 @@
 import { produceVMDisks } from '@catalog/utils/WizardVMContext';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
+import { DataVolumeModel } from '@kubevirt-ui/kubevirt-api/console';
 import {
   V1beta1DataVolumeSpec,
   V1ContainerDiskSource,

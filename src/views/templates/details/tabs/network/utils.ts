@@ -1,5 +1,5 @@
 import produce from 'immer';
-import { WritableDraft } from 'immer/dist/internal';
+import { Draft } from 'immer';
 
 import { produceVMNetworks } from '@catalog/utils/WizardVMContext';
 import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
@@ -16,7 +16,7 @@ import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 
 export const produceTemplateNetwork = (
   template: V1Template,
-  updateNetwork: (vmDraft: WritableDraft<V1VirtualMachine>) => void,
+  updateNetwork: (vmDraft: Draft<V1VirtualMachine>) => void,
 ) => {
   const vm = getTemplateVirtualMachineObject(template);
   const updatedVM = produceVMNetworks(vm, updateNetwork);

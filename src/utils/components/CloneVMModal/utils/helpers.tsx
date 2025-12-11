@@ -1,8 +1,8 @@
 import produce from 'immer';
 
-import VirtualMachineCloneModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineCloneModel';
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import VirtualMachineSnapshotModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineSnapshotModel';
+import { VirtualMachineCloneModel } from '@kubevirt-ui/kubevirt-api/console';
+import { VirtualMachineModel } from '@kubevirt-ui/kubevirt-api/console';
+import { VirtualMachineSnapshotModel } from '@kubevirt-ui/kubevirt-api/console';
 import {
   V1beta1VirtualMachineClone,
   V1beta1VirtualMachineSnapshot,

@@ -1,7 +1,7 @@
 import xbytes from 'xbytes';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { V1CPU } from '@kubevirt-ui/kubevirt-api/kubevirt/models/V1CPU';
+import { V1CPU } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getMemorySize } from '@kubevirt-utils/components/CPUMemoryModal/utils/CpuMemoryUtils';
 import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';

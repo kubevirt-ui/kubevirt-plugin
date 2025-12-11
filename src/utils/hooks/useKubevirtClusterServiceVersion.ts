@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { SubscriptionModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console/models/SubscriptionModel';
+import { SubscriptionModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { KUBEVIRT_HYPERCONVERGED } from '@kubevirt-utils/constants/constants';
 import { ClusterServiceVersionModelGroupVersionKind } from '@kubevirt-utils/models';
 import { DEFAULT_OPERATOR_NAMESPACE } from '@kubevirt-utils/utils/utils';

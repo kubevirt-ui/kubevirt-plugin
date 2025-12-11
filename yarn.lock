@@ -1173,10 +1173,9 @@
   resolved "https://registry.yarnpkg.com/@kubevirt-ui-ext/vnc-keymaps/-/vnc-keymaps-1.0.4.tgz#fcf7fea780ed64fda6682ec8908d7bec0db5e7f4"
   integrity sha512-IY5ba6LVVcRfOZITCVnB8yQaqP4kfKi6arpPxBAetBU9J1rfm4IRE43bnSYlnJGpGw58ku789jy92bze0Yvb2g==
 
-"@kubevirt-ui/kubevirt-api@^1.4.0":
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/@kubevirt-ui/kubevirt-api/-/kubevirt-api-1.4.0.tgz#f2df900203195b405770bad784b95d04e9633fb7"
-  integrity sha512-NLAmeyDCpIP+RmkZQ1yOYrIj8Cm/yKzOmCiZ7epPs8CtVQ5amp1esiJ7e38oFTfWmsQhjFP28hrpy2CZGrta8A==
+"@kubevirt-ui/kubevirt-api@file:../kubevirt-api/kubevirt-ui-kubevirt-api-1.5.0.tgz":
+  version "1.5.0"
+  resolved "file:../kubevirt-api/kubevirt-ui-kubevirt-api-1.5.0.tgz#d40da9430483e6a983bf15ed22273834c847f15d"
 
 "@leichtgewicht/ip-codec@^2.0.1":
   version "2.0.5"

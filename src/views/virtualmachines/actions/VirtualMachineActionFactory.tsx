@@ -1,9 +1,9 @@
 import React from 'react';
 
-import VirtualMachineCloneModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineCloneModel';
-import VirtualMachineInstanceMigrationModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstanceMigrationModel';
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import VirtualMachineSnapshotModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineSnapshotModel';
+import { VirtualMachineCloneModel } from '@kubevirt-ui/kubevirt-api/console';
+import { VirtualMachineInstanceMigrationModel } from '@kubevirt-ui/kubevirt-api/console';
+import { VirtualMachineModel } from '@kubevirt-ui/kubevirt-api/console';
+import { VirtualMachineSnapshotModel } from '@kubevirt-ui/kubevirt-api/console';
 import {
   V1VirtualMachine,
   V1VirtualMachineInstanceMigration,

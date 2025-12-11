@@ -2,8 +2,7 @@ import React, { Dispatch, FC, SetStateAction } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, ButtonVariant, Tooltip } from '@patternfly/react-core';
-import AngleDoubleDownIcon from '@patternfly/react-icons/dist/esm/icons/angle-double-down-icon';
-import AngleDoubleUpIcon from '@patternfly/react-icons/dist/esm/icons/angle-double-up-icon';
+import { AngleDoubleDownIcon, AngleDoubleUpIcon } from '@patternfly/react-icons';
 
 type TreeViewCollapseExpandProps = {
   setShowAll: Dispatch<SetStateAction<boolean>>;

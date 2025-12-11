@@ -6,7 +6,7 @@ import {
   PodModel,
   VirtualMachineInstanceModelGroupVersionKind,
 } from '@kubevirt-ui/kubevirt-api/console';
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
+import { VirtualMachineModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import DescriptionItemNamespace from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemNamespace';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';

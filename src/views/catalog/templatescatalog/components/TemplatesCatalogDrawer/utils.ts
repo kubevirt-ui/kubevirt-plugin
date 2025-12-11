@@ -4,8 +4,8 @@ import { Updater } from 'use-immer';
 import { NAME_INPUT_FIELD } from '@catalog/templatescatalog/utils/consts';
 import { TabsData } from '@catalog/utils/WizardVMContext/utils/tabs-data';
 import { TemplateParameter, V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
-import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { DataVolumeModel } from '@kubevirt-ui/kubevirt-api/console';
+import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer';
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine, V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
@@ -108,7 +108,7 @@ export const getUploadDataVolume = (
   namespace: string,
   storage?: string,
   cluster?: string,
-): V1beta1DataVolume => ({
+): V1beta1DataVolume & { cluster?: string } => ({
   apiVersion: `${DataVolumeModel.apiGroup}/${DataVolumeModel.apiVersion}`,
   cluster,
   kind: DataVolumeModel.kind,

@@ -1,13 +1,13 @@
 import produce from 'immer';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
-import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
+import { DataSourceModel } from '@kubevirt-ui/kubevirt-api/console';
+import { DataVolumeModel } from '@kubevirt-ui/kubevirt-api/console';
 import {
   V1beta1DataSource,
   V1beta1DataVolume,
   V1beta1DataVolumeSpec,
-} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+} from '@kubevirt-ui/kubevirt-api/containerized-data-importer';
 import { V1DataVolumeTemplateSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { DEFAULT_NAMESPACE, ROOTDISK } from '@kubevirt-utils/constants/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -27,7 +27,7 @@ import { k8sCreate, k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
 import { appendDockerPrefix } from './components/utils';
 import { MAXIMUM_TIMES_PVC_NOT_DELETED, TIMEOUT_PVC_GETS_DELETED_INTERVAL } from './constants';
 
-const DATA_VOLUME: V1beta1DataVolume = {
+const DATA_VOLUME: V1beta1DataVolume & { cluster?: string } = {
   apiVersion: `${DataVolumeModel.apiGroup}/${DataVolumeModel.apiVersion}`,
   kind: DataVolumeModel.kind,
   metadata: {

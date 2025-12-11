@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { VirtualMachineRestoreModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
-import VirtualMachineSnapshotModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineSnapshotModel';
+import { VirtualMachineSnapshotModel } from '@kubevirt-ui/kubevirt-api/console';
 import {
   V1beta1VirtualMachineRestore,
   V1beta1VirtualMachineSnapshot,
