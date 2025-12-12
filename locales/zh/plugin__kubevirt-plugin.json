@@ -1772,6 +1772,7 @@
   "Used": "使用了",
   "Used bytes": "使用的字节",
   "Used of {{ total }}": "Used of {{ total }}",
+  "Used of {{value}}": "Used of {{value}}",
   "User": "用户",
   "User credentials": "用户凭证",
   "User has no accessible namespaces for VirtualMachines": "用户没有 VirtualMachines 可访问的命名空间",

@@ -1,9 +1,11 @@
+import { ComponentClass, FC } from 'react';
+
+import { GreenRunningIcon } from '@kubevirt-utils/icons/GreenRunningIcon';
 import {
   ExclamationCircleIcon,
   InProgressIcon,
   OffIcon,
   PausedIcon,
-  SyncAltIcon,
   UnknownIcon,
 } from '@patternfly/react-icons';
 
@@ -30,11 +32,11 @@ const iconHandler = {
   },
 };
 
-const iconMapper: { [key: string]: React.ComponentClass<any, any> } = {
+const iconMapper: { [key: string]: ComponentClass<any, any> | FC } = {
   error: ExclamationCircleIcon,
   failed: ExclamationCircleIcon,
   paused: PausedIcon,
-  running: SyncAltIcon,
+  running: GreenRunningIcon,
   stopped: OffIcon,
   unknown: UnknownIcon,
 };

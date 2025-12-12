@@ -1790,6 +1790,7 @@
   "Used": "Usado",
   "Used bytes": "Bytes usados",
   "Used of {{ total }}": "Used of {{ total }}",
+  "Used of {{value}}": "Used of {{value}}",
   "User": "Usuario",
   "User credentials": "Credenciales de usuario",
   "User has no accessible namespaces for VirtualMachines": "El usuario no tiene espacios de nombre accesibles para VirtualMachines.",
