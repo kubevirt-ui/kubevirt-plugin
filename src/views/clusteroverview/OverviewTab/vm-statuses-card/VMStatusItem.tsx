@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom-v5-compat';
 
 import { VM_STATUS } from '@kubevirt-utils/resources/vm/utils/vmStatus';
 import { ERROR } from '@overview/OverviewTab/vm-statuses-card/utils/constants';
-import { FlexItem, GridItem } from '@patternfly/react-core';
+import { GridItem } from '@patternfly/react-core';
 
 import useVMStatusesPath from './hooks/useVMStatusesPath';
 import { vmStatusIcon } from './utils/utils';
@@ -12,7 +12,6 @@ import './VMStatusesCard.scss';
 
 type VMStatusItemProps = {
   count: number;
-  isFlexItem?: boolean;
   namespace?: string;
   onFilterChange?: () => void;
   showIcon?: boolean;
@@ -22,7 +21,6 @@ type VMStatusItemProps = {
 
 const VMStatusItem: React.FC<VMStatusItemProps> = ({
   count,
-  isFlexItem = false,
   namespace,
   onFilterChange,
   showIcon = true,
@@ -32,13 +30,8 @@ const VMStatusItem: React.FC<VMStatusItemProps> = ({
   const Icon = vmStatusIcon[statusLabel];
   const path = useVMStatusesPath(namespace, statusArray);
 
-  const Component = isFlexItem ? FlexItem : GridItem;
-
   return (
-    <Component
-      className={isFlexItem ? null : 'vm-statuses-card__grid-item'}
-      span={isFlexItem ? null : 3}
-    >
+    <GridItem className="vm-statuses-card__grid-item" span={3}>
       <div className="vm-statuses-card__status-item">
         <div className="vm-statuses-card__status-item--count">
           <span className="vm-statuses-card__status-item--icon">
@@ -58,7 +51,7 @@ const VMStatusItem: React.FC<VMStatusItemProps> = ({
         </div>
         <div className="vm-statuses-card__status-item--status">{statusLabel}</div>
       </div>
-    </Component>
+    </GridItem>
   );
 };
 

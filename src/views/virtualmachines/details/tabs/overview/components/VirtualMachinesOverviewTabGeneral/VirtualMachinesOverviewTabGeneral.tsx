@@ -15,6 +15,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getVMIPod } from '@kubevirt-utils/resources/vmi';
+import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
+import { ManagedClusterModel } from '@multicluster/constants';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { K8sResourceCommon, K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
 import { Card, CardBody, CardTitle, DescriptionList, Divider } from '@patternfly/react-core';
@@ -34,8 +36,9 @@ const VirtualMachinesOverviewTabGeneral: FC<VirtualMachinesOverviewTabGeneralPro
   vmi,
 }) => {
   const { t } = useKubevirtTranslation();
+  const cluster = getCluster(vm);
   const [canGetNode] = useFleetAccessReview({
-    cluster: getCluster(vm),
+    cluster,
     namespace: vm?.metadata?.namespace,
     resource: NodeModel.plural,
     verb: 'get' as K8sVerb,
@@ -49,6 +52,20 @@ const VirtualMachinesOverviewTabGeneral: FC<VirtualMachinesOverviewTabGeneralPro
         <Divider />
         <CardBody isFilled>
           <DescriptionList isHorizontal>
+            {cluster && (
+              <DescriptionItem
+                descriptionData={
+                  <MulticlusterResourceLink
+                    cluster={cluster}
+                    groupVersionKind={modelToGroupVersionKind(ManagedClusterModel)}
+                    name={cluster}
+                    truncate
+                  />
+                }
+                data-test-id="virtual-machine-overview-general-cluster"
+                descriptionHeader={t('Cluster')}
+              />
+            )}
             <DescriptionItemNamespace model={VirtualMachineModel} resource={vm} />
             {canGetNode && (
               <DescriptionItem

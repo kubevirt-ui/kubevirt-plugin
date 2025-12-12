@@ -2,9 +2,10 @@ import React, { FC } from 'react';
 
 import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { GreenRunningIcon } from '@kubevirt-utils/icons/GreenRunningIcon';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { Icon as PFIcon, Spinner } from '@patternfly/react-core';
-import { CheckCircleIcon, ExclamationCircleIcon, SyncAltIcon } from '@patternfly/react-icons';
+import { CheckCircleIcon, ExclamationCircleIcon } from '@patternfly/react-icons';
 
 import { CheckupsStatus, getConfigMapStatus, getJobStatus } from './utils/utils';
 
@@ -48,9 +49,7 @@ const CheckupsStatusIcon: FC<CheckupsStatusIconProps> = ({ configMap, job, onlyJ
     ),
     [CheckupsStatus.Running]: (
       <>
-        <PFIcon>
-          <SyncAltIcon />
-        </PFIcon>
+        <GreenRunningIcon />
         {t('Running')}
       </>
     ),

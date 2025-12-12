@@ -16,7 +16,6 @@ import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constan
 import { TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { modelToGroupVersionKind } from '@kubevirt-utils/models';
 import { getLabel, getName, getVMStatus } from '@kubevirt-utils/resources/shared';
 import {
   getArchitecture,
@@ -26,9 +25,6 @@ import {
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getOSNameFromGuestAgent } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
-import { ManagedClusterModel } from '@multicluster/constants';
-import { getCluster } from '@multicluster/helpers/selectors';
 import { Timestamp } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Card,
@@ -107,7 +103,6 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
   }, [loaded, error, guestAgentDataLoaded, guestAgentData, vmi]);
 
   const vmPrintableStatus = getVMStatus(vm);
-  const cluster = getCluster(vm);
 
   return (
     <div className="VirtualMachinesOverviewTabDetails--details">
@@ -137,19 +132,6 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
                   data-test-id="virtual-machine-overview-details-name"
                   descriptionHeader={t('Name')}
                 />
-                {cluster && (
-                  <DescriptionItem
-                    descriptionData={
-                      <MulticlusterResourceLink
-                        groupVersionKind={modelToGroupVersionKind(ManagedClusterModel)}
-                        name={cluster}
-                        truncate
-                      />
-                    }
-                    data-test-id="virtual-machine-overview-details-cluster"
-                    descriptionHeader={t('Cluster')}
-                  />
-                )}
                 {treeViewFoldersEnabled && (
                   <DescriptionItem
                     data-test-id="virtual-machine-overview-details-folder"

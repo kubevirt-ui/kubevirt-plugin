@@ -1777,6 +1777,7 @@
   "Used": "使用済み",
   "Used bytes": "使用中のバイト数",
   "Used of {{ total }}": "Used of {{ total }}",
+  "Used of {{value}}": "Used of {{value}}",
   "User": "User",
   "User credentials": "ユーザーの認証情報",
   "User has no accessible namespaces for VirtualMachines": "ユーザーに VirtualMachine のアクセス可能な namespace がありません",

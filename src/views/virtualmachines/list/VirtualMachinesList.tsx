@@ -200,11 +200,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
       <DocumentTitle>{PageTitles.VirtualMachines}</DocumentTitle>
       {!isSearchResultsPage && (
         <PageSection>
-          <VirtualMachineListSummary
-            onFilterChange={onFilterChange}
-            vmis={vmis}
-            vms={filteredVMs}
-          />
+          <VirtualMachineListSummary vmis={vmis} vms={filteredVMs} />
         </PageSection>
       )}
       <ListPageBody>

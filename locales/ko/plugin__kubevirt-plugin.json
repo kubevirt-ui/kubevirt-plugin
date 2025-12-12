@@ -1777,6 +1777,7 @@
   "Used": "사용됨",
   "Used bytes": "사용된 바이트",
   "Used of {{ total }}": "Used of {{ total }}",
+  "Used of {{value}}": "Used of {{value}}",
   "User": "사용자",
   "User credentials": "사용자 인증 정보",
   "User has no accessible namespaces for VirtualMachines": "사용자에게 VirtualMachines에 대해 액세스 가능한 네임스페이스가 없습니다.",

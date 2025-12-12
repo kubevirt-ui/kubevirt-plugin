@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Flex, FlexItem, Title } from '@patternfly/react-core';
+import { Card, CardBody, CardTitle, Flex } from '@patternfly/react-core';
 import useVMTotalsMetrics from '@virtualmachines/list/hooks/useVMTotalsMetrics';
 
 import VirtualMachineUsageItem from '../../VirtualMachineUsageItem/VirtualMachineUsageItem';
@@ -17,31 +17,31 @@ const VirtualMachineUsage: FC<VirtualMachineUsageProps> = ({ vmis }) => {
     useVMTotalsMetrics(vmis);
 
   return (
-    <FlexItem className="pf-v6-u-ml-md" grow={{ default: 'grow' }}>
-      <Title className="vm-list-summary__title" headingLevel="h5">
-        {t('Usage')}
-      </Title>
-      <Flex
-        justifyContent={{ default: 'justifyContentSpaceBetween' }}
-        spaceItems={{ default: 'spaceItemsSm' }}
-      >
-        <VirtualMachineUsageItem
-          capacityText={`Requested of ${cpuRequested}`}
-          metricName="CPU"
-          usageText={cpuUsage}
-        />
-        <VirtualMachineUsageItem
-          capacityText={`Used of ${memoryCapacity}`}
-          metricName="Memory"
-          usageText={memoryUsage}
-        />
-        <VirtualMachineUsageItem
-          capacityText={`Used of ${storageCapacity}`}
-          metricName="Storage"
-          usageText={storageUsage}
-        />
-      </Flex>
-    </FlexItem>
+    <Card>
+      <CardTitle>{t('Usage')}</CardTitle>
+      <CardBody>
+        <Flex
+          justifyContent={{ default: 'justifyContentSpaceBetween' }}
+          spaceItems={{ default: 'spaceItems3xl' }}
+        >
+          <VirtualMachineUsageItem
+            capacityText={t('Requested of {{cpuRequested}}', { cpuRequested })}
+            metricName={t('CPU')}
+            usageText={cpuUsage}
+          />
+          <VirtualMachineUsageItem
+            capacityText={t('Used of {{value}}', { value: memoryCapacity })}
+            metricName={t('Memory')}
+            usageText={memoryUsage}
+          />
+          <VirtualMachineUsageItem
+            capacityText={t('Used of {{value}}', { value: storageCapacity })}
+            metricName={t('Storage')}
+            usageText={storageUsage}
+          />
+        </Flex>
+      </CardBody>
+    </Card>
   );
 };
 
