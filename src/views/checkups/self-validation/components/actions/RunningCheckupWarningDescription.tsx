@@ -12,6 +12,7 @@ type RunningCheckupWarningDescriptionProps = {
   configMapName: string;
   configMapNamespace: string;
   maxWidth?: string;
+  preventLink?: boolean;
   showTitle?: boolean;
 };
 
@@ -19,6 +20,7 @@ const RunningCheckupWarningDescription: FC<RunningCheckupWarningDescriptionProps
   configMapName,
   configMapNamespace,
   maxWidth = '50px',
+  preventLink = false,
   showTitle = true,
 }) => {
   const linkTo = createURL(
@@ -31,10 +33,10 @@ const RunningCheckupWarningDescription: FC<RunningCheckupWarningDescriptionProps
       {showTitle && <span>{t('Self validation already running')}</span>}
       <Link
         onClick={(e) => {
-          e.stopPropagation();
+          !preventLink && e.stopPropagation();
         }}
         className="running-checkup-warning__link co-resource-item__resource-name"
-        to={linkTo}
+        to={preventLink ? null : linkTo}
       >
         <span className="running-checkup-warning__name" style={{ maxWidth: maxWidth }}>
           {configMapName}
