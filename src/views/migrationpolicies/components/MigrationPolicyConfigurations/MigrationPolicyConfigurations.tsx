@@ -1,6 +1,15 @@
 import React from 'react';
 
-import { Button, ButtonVariant, Form, FormGroup, Split, SplitItem } from '@patternfly/react-core';
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
+import {
+  Button,
+  ButtonVariant,
+  Form,
+  FormGroup,
+  Split,
+  SplitItem,
+  Title,
+} from '@patternfly/react-core';
 import { MinusCircleIcon } from '@patternfly/react-icons';
 
 import { InitialMigrationPolicyState } from '../../list/components/MigrationPolicyCreateForm/utils/utils';
@@ -41,11 +50,31 @@ const MigrationPolicyConfigurations: React.FC<MigrationPolicyConfigurationsProps
         state={state}
       />
       {hasConfigSelected && (
-        <Form isHorizontal>
+        <Form className="migration-configuration-dropdown" isHorizontal>
           {Object.entries(options).map(
-            ([key, { component: Component, label }]) =>
+            ([key, { component: Component, label, labelHelp = null }]) =>
               key in state && (
                 <FormGroup
+                  labelHelp={
+                    labelHelp && (
+                      <HelpTextIcon
+                        bodyContent={
+                          <>
+                            <Title
+                              className="pf-v6-c-popover__header-title pf-v6-u-mb-sm"
+                              headingLevel="h6"
+                            >
+                              {label}
+                            </Title>
+                            {labelHelp.helpText}
+                            <a href={labelHelp.helpInfo} rel="noopener noreferrer" target="_blank">
+                              {labelHelp.helpInfo}
+                            </a>
+                          </>
+                        }
+                      />
+                    )
+                  }
                   data-test-id={`${key}-selected`}
                   fieldId={key}
                   hasNoPaddingTop

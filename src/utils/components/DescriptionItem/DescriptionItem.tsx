@@ -25,7 +25,7 @@ type DescriptionItemProps = {
   breadcrumb?: string;
   className?: string;
   'data-test-id'?: string;
-  descriptionData: any;
+  descriptionData?: any;
   descriptionHeader?: ReactNode;
   isDisabled?: boolean;
   isEdit?: boolean;
