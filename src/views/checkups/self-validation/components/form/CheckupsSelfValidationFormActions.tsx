@@ -2,6 +2,7 @@ import React, { FC, ReactNode, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
+import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
@@ -16,6 +17,8 @@ import {
 import RunningCheckupWarningDescription from '../actions/RunningCheckupWarningDescription';
 import { useAllRunningSelfValidationJobs } from '../hooks/useAllRunningSelfValidationJobs';
 import useCheckupsSelfValidationPermissions from '../hooks/useCheckupsSelfValidationPermissions';
+
+import HeavyLoadCheckupConfirmationModal from './HeavyLoadCheckupConfirmationModal';
 
 type CheckupsSelfValidationFormActionsProps = {
   checkupImage: string;
@@ -41,6 +44,7 @@ const CheckupsSelfValidationFormActions: FC<CheckupsSelfValidationFormActionsPro
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const [namespace] = useActiveNamespace();
+  const { createModal } = useModal();
   const [error, setError] = useState<ReactNode>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -73,7 +77,7 @@ const CheckupsSelfValidationFormActions: FC<CheckupsSelfValidationFormActionsPro
     selfValidationActionState?.showWarning &&
     selfValidationActionState?.configMapInfo;
 
-  const handleRun = async () => {
+  const executeRun = async () => {
     setError(null);
     setIsSubmitting(true);
     try {
@@ -97,11 +101,24 @@ const CheckupsSelfValidationFormActions: FC<CheckupsSelfValidationFormActionsPro
     }
   };
 
+  const handleOpenConfirmation = () => {
+    createModal(({ isOpen, onClose }) => (
+      <HeavyLoadCheckupConfirmationModal
+        onConfirm={() => {
+          onClose();
+          executeRun();
+        }}
+        isOpen={isOpen}
+        onClose={onClose}
+      />
+    ));
+  };
+
   const runButton = (
     <Button
       isDisabled={isSubmitDisabled}
       isLoading={isSubmitting}
-      onClick={handleRun}
+      onClick={handleOpenConfirmation}
       variant={ButtonVariant.primary}
     >
       {t('Run')}
