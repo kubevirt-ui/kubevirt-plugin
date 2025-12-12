@@ -8,8 +8,14 @@ import {
 } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { sortByDirection, universalComparator } from '@kubevirt-utils/utils/utils';
-import { K8sResourceCommon, Operator } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import {
+  K8sResourceCommon,
+  Operator,
+  WatchK8sResource,
+} from '@openshift-console/dynamic-plugin-sdk';
 import { SortByDirection } from '@patternfly/react-table';
+import { Fleet } from '@stolostron/multicluster-sdk';
 
 import { CHECKUP_URLS } from './constants';
 
@@ -33,8 +39,10 @@ export const CREATE_RESULTS_RESOURCES = 'CREATE_RESULTS_RESOURCES';
 export const createJobWatchConfig = (
   labelValue: string,
   namespace?: string,
+  cluster?: string,
   matchExpressions?: Array<{ key: string; operator: Operator }>,
-) => ({
+): Fleet<WatchK8sResource> => ({
+  cluster,
   groupVersionKind: modelToGroupVersionKind(JobModel),
   isList: true,
   ...(namespace && namespace !== ALL_NAMESPACES_SESSION_KEY && { namespace, namespaced: true }),
@@ -178,7 +186,7 @@ export const extractConfigMapBaseName = (configMapName: string): string => {
  */
 export const extractConfigMapName = (
   job: IoK8sApiBatchV1Job,
-): { fullName: string; name: string; namespace: string } | null => {
+): { cluster: string; fullName: string; name: string; namespace: string } | null => {
   const containers = getJobContainers(job);
   const envs = containers?.[0]?.env;
   const configMapEnv = envs?.find((env) => env?.name === CONFIGMAP_NAME);
@@ -191,6 +199,7 @@ export const extractConfigMapName = (
   const baseName = extractConfigMapBaseName(configMapName);
 
   return {
+    cluster: getCluster(job),
     fullName: configMapName,
     name: baseName,
     namespace: job.metadata.namespace,

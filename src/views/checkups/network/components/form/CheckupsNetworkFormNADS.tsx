@@ -2,8 +2,9 @@ import React, { Dispatch, FC, MouseEvent, SetStateAction } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import useNADsData from '@kubevirt-utils/components/NetworkInterfaceModal/components/hooks/useNADsData';
+import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { FormGroup, SelectOption } from '@patternfly/react-core';
 
 type CheckupsNetworkFormNADSProps = {
@@ -15,8 +16,9 @@ const CheckupsNetworkFormNADS: FC<CheckupsNetworkFormNADSProps> = ({
   setSelectedNAD,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [namespace] = useActiveNamespace();
-  const { nads } = useNADsData(namespace);
+  const namespace = useActiveNamespace();
+  const cluster = useClusterParam();
+  const { nads } = useNADsData(namespace, cluster);
 
   const nadsItems = (nads || [])
     ?.filter((nad) => nad?.metadata?.namespace === namespace)

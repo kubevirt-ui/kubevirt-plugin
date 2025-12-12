@@ -2,13 +2,13 @@ import React from 'react';
 
 import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
+import { trimLastHistoryPath } from '@kubevirt-utils/components/HorizontalNavbar/utils/utils';
 import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
 import DeleteCheckupModal from '../../../components/DeleteCheckupModal';
-import { CHECKUP_URLS } from '../../../utils/constants';
 import { deleteSelfValidationCheckup } from '../../utils';
 
 import { getConfigMapInfo } from './CheckupsSelfValidationActionsUtils';
@@ -39,7 +39,10 @@ export const CheckupsSelfValidationActionFactory = {
       deleteSelfValidationCheckup(configMap, jobs).catch((err) => {
         kubevirtConsole.error('Failed to delete self-validation checkup:', err);
       });
-      navigate(`/k8s/ns/${getNamespace(configMap)}/checkups/${CHECKUP_URLS.SELF_VALIDATION}`);
+
+      const newPath = trimLastHistoryPath(location.pathname, [getName(configMap)]);
+
+      navigate(newPath);
     };
 
     return {

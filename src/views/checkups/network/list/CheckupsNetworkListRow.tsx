@@ -3,14 +3,15 @@ import { Link } from 'react-router-dom-v5-compat';
 
 import { modelToGroupVersionKind, NamespaceModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { getNetworkCheckupURL } from '@kubevirt-utils/resources/checkups/urls';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import {
-  ResourceLink,
-  RowProps,
-  TableData,
-  Timestamp,
-} from '@openshift-console/dynamic-plugin-sdk';
-import { createURL } from '@virtualmachines/details/tabs/overview/utils/utils';
+import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
+import { ManagedClusterModel } from '@multicluster/constants';
+import { getCluster } from '@multicluster/helpers/selectors';
+import useIsACMPage from '@multicluster/useIsACMPage';
+import { RowProps, TableData, Timestamp } from '@openshift-console/dynamic-plugin-sdk';
+import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import CheckupsStatusIcon from '../../CheckupsStatusIcon';
 import { STATUS_COMPLETION_TIME_STAMP, STATUS_START_TIME_STAMP } from '../../utils/utils';
@@ -37,25 +38,32 @@ const CheckupsNetworkListRow: FC<CheckupsNetworkListRowProps> = ({
   obj: configMap,
   rowData: { getJobByName },
 }) => {
+  const isACMPage = useIsACMPage();
+  const [hubClusterName] = useHubClusterName();
+  const cluster = getCluster(configMap) || hubClusterName;
+  const namespace = getNamespace(configMap);
+  const name = getName(configMap);
   const jobs = getJobByName(configMap?.metadata?.name);
   const job = jobs?.[0];
 
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} id="name">
-        <Link
-          to={createURL(
-            `network/${configMap?.metadata?.name}`,
-            `/k8s/ns/${configMap?.metadata?.namespace}/checkups`,
-          )}
-        >
-          {configMap?.metadata?.name}
+        <Link to={getNetworkCheckupURL(name, namespace, isACMPage ? cluster : undefined)}>
+          {name}
         </Link>
       </TableData>
+      <TableData activeColumnIDs={activeColumnIDs} id="cluster">
+        <MulticlusterResourceLink
+          groupVersionKind={modelToGroupVersionKind(ManagedClusterModel)}
+          name={cluster}
+        />
+      </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="namespace">
-        <ResourceLink
+        <MulticlusterResourceLink
+          cluster={cluster}
           groupVersionKind={modelToGroupVersionKind(NamespaceModel)}
-          name={configMap?.metadata?.namespace}
+          name={namespace}
         />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="nad">

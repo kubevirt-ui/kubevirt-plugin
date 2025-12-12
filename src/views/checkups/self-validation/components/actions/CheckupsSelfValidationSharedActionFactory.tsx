@@ -1,11 +1,10 @@
 import React, { ReactNode } from 'react';
-import { CHECKUP_URLS } from 'src/views/checkups/utils/constants';
 
 import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import { getSelfValidationCheckupURL } from '@kubevirt-utils/resources/checkups/urls';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import { createURL } from '@virtualmachines/details/tabs/overview/utils/utils';
 
 import RerunCheckupModal from '../../../components/RerunCheckupModal';
 import { isJobRunning, rerunSelfValidationCheckup } from '../../utils';
@@ -106,15 +105,17 @@ export const createGoToRunningCheckupAction = ({
   }
 
   const handleGoToRunningCheckup = () => {
-    const path = createURL(
-      `${CHECKUP_URLS.SELF_VALIDATION}/${configMapInfo.name}`,
-      `/k8s/ns/${configMapInfo.namespace}/checkups`,
+    const path = getSelfValidationCheckupURL(
+      configMapInfo.name,
+      configMapInfo.namespace,
+      configMapInfo.cluster,
     );
     navigate(path);
   };
 
   const description = (
     <RunningCheckupWarningDescription
+      configMapCluster={configMapInfo.cluster}
       configMapName={configMapInfo.name}
       configMapNamespace={configMapInfo.namespace}
       maxWidth="150px"

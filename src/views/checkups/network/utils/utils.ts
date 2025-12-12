@@ -13,12 +13,8 @@ import {
   IoK8sApiRbacV1ClusterRoleBinding,
 } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import {
-  k8sCreate,
-  k8sDelete,
-  k8sPatch,
-  K8sResourceCommon,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sCreate, kubevirtK8sDelete, kubevirtK8sPatch } from '@multicluster/k8sRequests';
 
 import {
   CONFIGMAP_NAME,
@@ -115,47 +111,57 @@ const latencyCheckerClusterBinding = (namespace: string) => ({
   ],
 });
 
-const installPromises = (namespace) => [
-  k8sCreate<IoK8sApiCoreV1ServiceAccount>({
+const installPromises = (namespace, cluster) => [
+  kubevirtK8sCreate<IoK8sApiCoreV1ServiceAccount>({
+    cluster,
     data: serviceAccountResource(namespace),
     model: ServiceAccountModel,
   }),
-  k8sCreate<IoK8sApiRbacV1ClusterRole>({
+  kubevirtK8sCreate<IoK8sApiRbacV1ClusterRole>({
+    cluster,
     data: latencyCheckerClusterRole,
     model: ClusterRoleModel,
   }),
-  k8sCreate<IoK8sApiRbacV1ClusterRoleBinding>({
+  kubevirtK8sCreate<IoK8sApiRbacV1ClusterRoleBinding>({
+    cluster,
     data: latencyCheckerClusterBinding(namespace),
     model: ClusterRoleBindingModel,
   }),
-  k8sCreate<IoK8sApiRbacV1ClusterRole>({
+  kubevirtK8sCreate<IoK8sApiRbacV1ClusterRole>({
+    cluster,
     data: configMapClusterRole,
     model: ClusterRoleModel,
   }),
-  k8sCreate<IoK8sApiRbacV1ClusterRoleBinding>({
+  kubevirtK8sCreate<IoK8sApiRbacV1ClusterRoleBinding>({
+    cluster,
     data: configMapClusterBinding(namespace),
     model: ClusterRoleBindingModel,
   }),
 ];
 
-const removePromises = (namespace: string) => [
-  k8sDelete<IoK8sApiRbacV1ClusterRole>({
+const removePromises = (namespace: string, cluster: string) => [
+  kubevirtK8sDelete<IoK8sApiCoreV1ServiceAccount>({
+    cluster,
     model: ServiceAccountModel,
     resource: serviceAccountResource(namespace),
   }),
-  k8sDelete<IoK8sApiRbacV1ClusterRole>({
+  kubevirtK8sDelete<IoK8sApiRbacV1ClusterRole>({
+    cluster,
     model: ClusterRoleModel,
     resource: latencyCheckerClusterRole,
   }),
-  k8sDelete<IoK8sApiRbacV1ClusterRoleBinding>({
+  kubevirtK8sDelete<IoK8sApiRbacV1ClusterRoleBinding>({
+    cluster,
     model: ClusterRoleBindingModel,
     resource: latencyCheckerClusterBinding(namespace),
   }),
-  k8sDelete<IoK8sApiRbacV1ClusterRole>({
+  kubevirtK8sDelete<IoK8sApiRbacV1ClusterRole>({
+    cluster,
     model: ClusterRoleModel,
     resource: configMapClusterRole,
   }),
-  k8sDelete<IoK8sApiRbacV1ClusterRoleBinding>({
+  kubevirtK8sDelete<IoK8sApiRbacV1ClusterRoleBinding>({
+    cluster,
     model: ClusterRoleBindingModel,
     resource: configMapClusterBinding(namespace),
   }),
@@ -172,10 +178,11 @@ const runPromises = <T>(promises: Promise<T>[]): Promise<Awaited<T>[]> => {
 
 export const installOrRemoveCheckupsNetworkPermissions = (
   namespace: string,
+  cluster: string,
   remove?: boolean,
 ): Promise<Awaited<IoK8sApiRbacV1ClusterRole | IoK8sApiRbacV1ClusterRoleBinding>[]> => {
   return runPromises<IoK8sApiRbacV1ClusterRole | IoK8sApiRbacV1ClusterRoleBinding>(
-    remove ? removePromises(namespace) : installPromises(namespace),
+    remove ? removePromises(namespace, cluster) : installPromises(namespace, cluster),
   );
 };
 
@@ -184,6 +191,7 @@ export const findObjectByName = (arr: K8sResourceCommon[], name: string) =>
 
 type CreateNetworkCheckupType = (arg: {
   checkupImage: string;
+  cluster: string;
   desiredLatency: string;
   name: string;
   namespace: string;
@@ -196,9 +204,11 @@ type CreateNetworkCheckupType = (arg: {
 const createJob = (
   name: string,
   namespace: string,
+  cluster: null | string | undefined,
   checkupImage: string,
 ): Promise<IoK8sApiBatchV1Job> =>
-  k8sCreate({
+  kubevirtK8sCreate<IoK8sApiBatchV1Job>({
+    cluster,
     data: {
       metadata: {
         labels: { [KUBEVIRT_VM_LATENCY_LABEL]: KUBEVIRT_VM_LATENCY_LABEL_VALUE },
@@ -241,6 +251,7 @@ const createJob = (
 
 export const createNetworkCheckup: CreateNetworkCheckupType = async ({
   checkupImage,
+  cluster,
   desiredLatency,
   name,
   namespace,
@@ -249,7 +260,8 @@ export const createNetworkCheckup: CreateNetworkCheckupType = async ({
   sampleDuration,
   selectedNAD,
 }) => {
-  await k8sCreate<IoK8sApiCoreV1ConfigMap>({
+  await kubevirtK8sCreate<IoK8sApiCoreV1ConfigMap>({
+    cluster,
     data: {
       data: {
         [CONFIG_PARAM_MAX_DESIRED_LATENCY]: desiredLatency,
@@ -268,7 +280,7 @@ export const createNetworkCheckup: CreateNetworkCheckupType = async ({
     },
     model: ConfigMapModel,
   });
-  return await createJob(name, namespace, checkupImage);
+  return await createJob(name, namespace, cluster, checkupImage);
 };
 
 export const deleteNetworkCheckup = async (
@@ -276,12 +288,14 @@ export const deleteNetworkCheckup = async (
   jobs: IoK8sApiBatchV1Job[],
 ) => {
   try {
-    await k8sDelete({
+    await kubevirtK8sDelete({
+      cluster: getCluster(configMap),
       model: ConfigMapModel,
       resource: configMap,
     });
     jobs.map((job) =>
-      k8sDelete({
+      kubevirtK8sDelete({
+        cluster: getCluster(job),
         model: JobModel,
         resource: job,
       }),
@@ -296,7 +310,8 @@ export const rerunNetworkCheckup = async (
   checkupImage: string,
 ): Promise<IoK8sApiBatchV1Job> => {
   const isSucceeded = resource?.data?.[STATUS_SUCCEEDED] === 'true';
-  await k8sPatch<IoK8sApiCoreV1ConfigMap>({
+  await kubevirtK8sPatch<IoK8sApiCoreV1ConfigMap>({
+    cluster: getCluster(resource),
     data: [
       { op: 'remove', path: `/data/${STATUS_COMPLETION_TIME_STAMP}` },
       { op: 'remove', path: `/data/${STATUS_SUCCEEDED}` },
@@ -315,5 +330,10 @@ export const rerunNetworkCheckup = async (
     resource,
   });
 
-  return createJob(resource.metadata.name, resource.metadata.namespace, checkupImage);
+  return createJob(
+    resource.metadata.name,
+    resource.metadata.namespace,
+    getCluster(resource),
+    checkupImage,
+  );
 };

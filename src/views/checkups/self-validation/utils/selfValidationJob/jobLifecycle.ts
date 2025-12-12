@@ -5,7 +5,8 @@ import {
 } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import { k8sCreate, k8sDelete, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sCreate, kubevirtK8sDelete, kubevirtK8sPatch } from '@multicluster/k8sRequests';
 
 import { STATUS_COMPLETION_TIME_STAMP, STATUS_START_TIME_STAMP } from '../../../utils/utils';
 import {
@@ -29,6 +30,7 @@ import { selfValidationConfigMap, selfValidationJob, selfValidationPVC } from '.
 
 export type CreateSelfValidationCheckupOptions = {
   checkupImage: string;
+  cluster: string;
   isDryRun: boolean;
   name: string;
   namespace: string;
@@ -49,6 +51,7 @@ export type CreateSelfValidationCheckupOptions = {
  */
 const createJobWithPVC = async (
   jobData: IoK8sApiBatchV1Job,
+  cluster: string,
   namespace: string,
   pvcSize: string,
   storageClass?: string,
@@ -56,7 +59,8 @@ const createJobWithPVC = async (
   const jobName = jobData.metadata.name;
 
   // Create PVC first
-  await k8sCreate({
+  await kubevirtK8sCreate({
+    cluster,
     data: selfValidationPVC(jobName, namespace, pvcSize, storageClass),
     model: PersistentVolumeClaimModel,
   });
@@ -64,7 +68,8 @@ const createJobWithPVC = async (
   let job: IoK8sApiBatchV1Job;
   try {
     // Create Job and capture its UID
-    job = await k8sCreate<IoK8sApiBatchV1Job>({
+    job = await kubevirtK8sCreate<IoK8sApiBatchV1Job>({
+      cluster,
       data: jobData,
       model: JobModel,
     });
@@ -72,7 +77,8 @@ const createJobWithPVC = async (
     kubevirtConsole.error('Failed to create self-validation Job, cleaning up PVC:', error);
     // Attempt to clean up the PVC on failure (best-effort, ignore errors)
     try {
-      await k8sDelete({
+      await kubevirtK8sDelete({
+        cluster,
         model: PersistentVolumeClaimModel,
         resource: { metadata: { name: jobName, namespace } },
       });
@@ -85,7 +91,7 @@ const createJobWithPVC = async (
   // Best-effort: add owner reference so PVC is GC'd with the Job
   if (job.metadata?.uid) {
     try {
-      await addOwnerReference(PersistentVolumeClaimModel, jobName, namespace, {
+      await addOwnerReference(PersistentVolumeClaimModel, jobName, namespace, cluster, {
         apiVersion: 'batch/v1',
         kind: 'Job',
         name: jobName,
@@ -110,6 +116,7 @@ const createJobWithPVC = async (
  */
 export const createSelfValidationCheckup = async ({
   checkupImage,
+  cluster,
   isDryRun,
   name,
   namespace,
@@ -130,7 +137,8 @@ export const createSelfValidationCheckup = async ({
     testSkips,
   });
 
-  await k8sCreate({
+  await kubevirtK8sCreate({
+    cluster,
     data: selfValidationConfigMap(
       namespace,
       name,
@@ -145,7 +153,7 @@ export const createSelfValidationCheckup = async ({
     model: ConfigMapModel,
   });
 
-  return createJobWithPVC(jobData, namespace, pvcSize, storageClass);
+  return createJobWithPVC(jobData, cluster, namespace, pvcSize, storageClass);
 };
 
 /**
@@ -159,7 +167,8 @@ export const deleteSelfValidationJob = async (job: IoK8sApiBatchV1Job): Promise<
   const namespace = job.metadata.namespace;
 
   // Delete the job (errors propagate to caller)
-  await k8sDelete({
+  await kubevirtK8sDelete({
+    cluster: getCluster(job),
     model: JobModel,
     resource: job,
   });
@@ -167,7 +176,8 @@ export const deleteSelfValidationJob = async (job: IoK8sApiBatchV1Job): Promise<
   // Delete the job's results ConfigMap (best-effort, errors are logged but not thrown)
   const resultsConfigMapName = getResultsConfigMapName(jobName);
   try {
-    await k8sDelete({
+    await kubevirtK8sDelete({
+      cluster: getCluster(job),
       model: ConfigMapModel,
       resource: {
         metadata: {
@@ -193,6 +203,7 @@ export const rerunSelfValidationCheckup = async (
   configMap: IoK8sApiCoreV1ConfigMap,
   jobs: IoK8sApiBatchV1Job[],
 ): Promise<IoK8sApiBatchV1Job> => {
+  const cluster = getCluster(configMap);
   const { name, namespace } = configMap.metadata;
 
   // Extract specs from ConfigMap
@@ -252,7 +263,8 @@ export const rerunSelfValidationCheckup = async (
   });
 
   try {
-    await k8sPatch({
+    await kubevirtK8sPatch({
+      cluster,
       data: patchOperations,
       model: ConfigMapModel,
       resource: { metadata: { name, namespace } },
@@ -273,7 +285,7 @@ export const rerunSelfValidationCheckup = async (
     testSkips,
   });
 
-  return createJobWithPVC(jobData, namespace, pvcSize, storageClass);
+  return createJobWithPVC(jobData, cluster, namespace, pvcSize, storageClass);
 };
 
 /**
@@ -299,7 +311,8 @@ export const deleteSelfValidationCheckup = async (
 
   // Finally, delete the tracking ConfigMap
   try {
-    await k8sDelete({
+    await kubevirtK8sDelete({
+      cluster: getCluster(configMap),
       model: ConfigMapModel,
       resource: configMap,
     });

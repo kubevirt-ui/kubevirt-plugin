@@ -1,5 +1,6 @@
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import { K8sModel, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
+import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
+import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 /**
  * Generates a timestamp string in format YYYYMMDD-HHMMSS
@@ -28,6 +29,7 @@ export const addOwnerReference = async (
   model: K8sModel,
   resourceName: string,
   namespace: string,
+  cluster: string,
   owner: {
     apiVersion: string;
     kind: string;
@@ -36,7 +38,8 @@ export const addOwnerReference = async (
   },
 ): Promise<void> => {
   try {
-    await k8sPatch({
+    await kubevirtK8sPatch({
+      cluster,
       data: [
         {
           op: 'add',

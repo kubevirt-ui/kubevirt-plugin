@@ -1,14 +1,14 @@
 import React, { FC } from 'react';
 import { Link } from 'react-router-dom-v5-compat';
-import { CHECKUP_URLS } from 'src/views/checkups/utils/constants';
 
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getSelfValidationCheckupURL } from '@kubevirt-utils/resources/checkups/urls';
 import { ExternalLinkAltIcon } from '@patternfly/react-icons';
-import { createURL } from '@virtualmachines/details/tabs/overview/utils/utils';
 
 import './running-checkup-warning-description.scss';
 
 type RunningCheckupWarningDescriptionProps = {
+  configMapCluster: string;
   configMapName: string;
   configMapNamespace: string;
   maxWidth?: string;
@@ -17,16 +17,14 @@ type RunningCheckupWarningDescriptionProps = {
 };
 
 const RunningCheckupWarningDescription: FC<RunningCheckupWarningDescriptionProps> = ({
+  configMapCluster,
   configMapName,
   configMapNamespace,
   maxWidth = '50px',
   preventLink = false,
   showTitle = true,
 }) => {
-  const linkTo = createURL(
-    `${CHECKUP_URLS.SELF_VALIDATION}/${configMapName}`,
-    `/k8s/ns/${configMapNamespace}/checkups`,
-  );
+  const linkTo = getSelfValidationCheckupURL(configMapName, configMapNamespace, configMapCluster);
 
   return (
     <span className="running-checkup-warning">

@@ -10,6 +10,7 @@ import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useActiveClusterParam from '@multicluster/hooks/useActiveClusterParam';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
@@ -24,7 +25,7 @@ type ClusterProjectDropdownProps = {
 
 const ClusterProjectDropdown: FC<ClusterProjectDropdownProps> = memo(
   ({
-    includeAllClusters,
+    includeAllClusters = true,
     includeAllProjects,
     showClusterDropdown = true,
     showProjectDropdown = true,
@@ -32,6 +33,7 @@ const ClusterProjectDropdown: FC<ClusterProjectDropdownProps> = memo(
     const { t } = useKubevirtTranslation();
     const isACMPage = useIsACMPage();
     const cluster = useActiveClusterParam();
+    const selectedCluster = useClusterParam();
     const namespace = useNamespaceParam();
     const navigate = useNavigate();
     const location = useLocation();
@@ -69,19 +71,19 @@ const ClusterProjectDropdown: FC<ClusterProjectDropdownProps> = memo(
     );
 
     useEffect(() => {
-      if (!includeAllClusters && isEmpty(cluster) && hubClusterNameLoaded) {
+      if (!isACMPage) return;
+      if (includeAllClusters) return;
+
+      if (isEmpty(selectedCluster) && hubClusterNameLoaded) {
         onClusterChange(hubClusterName);
       }
     }, [cluster, hubClusterName, hubClusterNameLoaded, includeAllClusters, onClusterChange]);
 
     useEffect(() => {
-      if (
-        !includeAllProjects &&
-        cluster &&
-        isEmpty(namespace) &&
-        projectLoaded &&
-        showProjectDropdown
-      ) {
+      if (!isACMPage) return;
+      if (includeAllProjects) return;
+
+      if (cluster && isEmpty(namespace) && projectLoaded && showProjectDropdown) {
         const defaultProject = projects?.find((project) => project === DEFAULT_NAMESPACE);
         const selectedProject = defaultProject || projects?.[0] || ALL_PROJECTS;
         if (selectedProject) {

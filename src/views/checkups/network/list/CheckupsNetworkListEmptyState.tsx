@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
+import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import {
   Button,
   ButtonVariant,
@@ -21,7 +22,8 @@ import './checkups-network-list-empty-state.scss';
 
 const CheckupsNetworkListEmptyState = ({ isPermitted, nadsInNamespace }) => {
   const { t } = useKubevirtTranslation();
-  const [namespace] = useActiveNamespace();
+  const namespace = useActiveNamespace();
+  const cluster = useClusterParam();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   return (
@@ -42,7 +44,7 @@ const CheckupsNetworkListEmptyState = ({ isPermitted, nadsInNamespace }) => {
           <Button
             onClick={async () => {
               setIsLoading(true);
-              await installOrRemoveCheckupsNetworkPermissions(namespace, isPermitted);
+              await installOrRemoveCheckupsNetworkPermissions(namespace, cluster, isPermitted);
               setIsLoading(false);
             }}
             isDisabled={!nadsInNamespace || isLoading}

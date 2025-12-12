@@ -1,6 +1,6 @@
 import { JobModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiBatchV1Job } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { k8sCreate, k8sGet } from '@openshift-console/dynamic-plugin-sdk';
+import { kubevirtK8sCreate, kubevirtK8sGet } from '@multicluster/k8sRequests';
 
 import { type ValidatedJobParameters } from '../constants';
 
@@ -19,6 +19,7 @@ export const createResultsResourcesJob = async (
   const {
     baseName,
     checkupImage,
+    cluster,
     isDryRun,
     namespace,
     pvcName,
@@ -49,7 +50,8 @@ export const createResultsResourcesJob = async (
   // Create the job (no PVC creation needed - reusing existing one)
   // Handle idempotency: if job already exists (409), fetch and return it
   try {
-    const job = await k8sCreate<IoK8sApiBatchV1Job>({
+    const job = await kubevirtK8sCreate<IoK8sApiBatchV1Job>({
+      cluster,
       data: jobData,
       model: JobModel,
     });
@@ -57,7 +59,8 @@ export const createResultsResourcesJob = async (
   } catch (error: any) {
     // If job already exists (409), fetch and return the existing job
     if (error?.response?.status === 409 || error?.code === 409) {
-      const existingJob = await k8sGet<IoK8sApiBatchV1Job>({
+      const existingJob = await kubevirtK8sGet<IoK8sApiBatchV1Job>({
+        cluster,
         model: JobModel,
         name: resultsJobName,
         ns: namespace,

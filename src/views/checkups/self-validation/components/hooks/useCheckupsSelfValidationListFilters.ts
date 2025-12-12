@@ -19,7 +19,9 @@ type UseCheckupsSelfValidationFilters = (
 
 const useCheckupsSelfValidationListFilters: UseCheckupsSelfValidationFilters = (data) => {
   const { t } = useKubevirtTranslation();
+
   const filters = getCheckupsSelfValidationListFilters(t);
+
   const [unfilteredData, filteredData, onFilterChange] = useListPageFilter<
     IoK8sApiCoreV1ConfigMap,
     IoK8sApiCoreV1ConfigMap

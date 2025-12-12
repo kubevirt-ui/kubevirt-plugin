@@ -11,7 +11,7 @@ export type SelfValidationActionMode =
   typeof SELF_VALIDATION_ACTION_MODE[keyof typeof SELF_VALIDATION_ACTION_MODE];
 
 export type ActionState = {
-  configMapInfo: { name: string; namespace: string } | null;
+  configMapInfo: { cluster: string; name: string; namespace: string } | null;
   isEnabled: boolean;
   showWarning: boolean;
 };

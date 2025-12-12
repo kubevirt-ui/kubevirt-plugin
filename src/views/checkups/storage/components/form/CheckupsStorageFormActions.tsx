@@ -1,9 +1,10 @@
 import React, { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
+import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { ActionGroup, Alert, AlertVariant, Button, ButtonVariant } from '@patternfly/react-core';
 
 import { CHECKUP_URLS } from '../../../utils/constants';
@@ -22,7 +23,8 @@ const CheckupsStorageFormActions: FC<CheckupsStorageFormActionsProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
-  const [namespace] = useActiveNamespace();
+  const namespace = useActiveNamespace();
+  const cluster = useClusterParam();
   const [error, setError] = useState<string>(null);
 
   return (
@@ -32,7 +34,7 @@ const CheckupsStorageFormActions: FC<CheckupsStorageFormActionsProps> = ({
           onClick={async () => {
             setError(null);
             try {
-              await createStorageCheckup(namespace, timeOut, name, checkupImage);
+              await createStorageCheckup(namespace, cluster, timeOut, name, checkupImage);
               navigate(`/k8s/ns/${namespace}/checkups/${CHECKUP_URLS.STORAGE}`);
             } catch (e) {
               kubevirtConsole.log(e);

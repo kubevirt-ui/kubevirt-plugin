@@ -1,9 +1,11 @@
 import React, { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
+import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { ActionGroup, Alert, AlertVariant, Button, ButtonVariant } from '@patternfly/react-core';
 
 import { createNetworkCheckup } from '../../utils/utils';
@@ -31,7 +33,9 @@ const CheckupsNetworkFormActions: FC<CheckupsNetworkFormActionsProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
-  const [namespace] = useActiveNamespace();
+  const isACMPage = useIsACMPage();
+  const namespace = useActiveNamespace();
+  const cluster = useClusterParam();
   const [error, setError] = useState<string>(null);
   const shouldDisableNodes = isNodesChecked ? nodeSource && nodeTarget : true;
   const isSubmitDisabled = !name || !selectedNAD || !shouldDisableNodes || !checkupImage;
@@ -45,6 +49,7 @@ const CheckupsNetworkFormActions: FC<CheckupsNetworkFormActionsProps> = ({
             try {
               await createNetworkCheckup({
                 checkupImage,
+                cluster,
                 desiredLatency,
                 name,
                 namespace,
@@ -53,7 +58,11 @@ const CheckupsNetworkFormActions: FC<CheckupsNetworkFormActionsProps> = ({
                 sampleDuration,
                 selectedNAD,
               });
-              navigate(`/k8s/ns/${namespace}/checkups`);
+              navigate(
+                isACMPage
+                  ? `/k8s/cluster/${cluster}/ns/${namespace}/checkups`
+                  : `/k8s/ns/${namespace}/checkups`,
+              );
             } catch (e) {
               kubevirtConsole.log(e);
               setError(e?.message);

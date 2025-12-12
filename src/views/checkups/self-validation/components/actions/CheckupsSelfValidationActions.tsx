@@ -4,6 +4,9 @@ import { useNavigate } from 'react-router-dom-v5-compat';
 import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
+import { getName } from '@kubevirt-utils/resources/shared';
+import { getCluster } from '@multicluster/helpers/selectors';
 
 import { isJobRunning } from '../../utils';
 import { useAllRunningSelfValidationJobs } from '../hooks/useAllRunningSelfValidationJobs';
@@ -26,12 +29,16 @@ const CheckupsSelfValidationActions: FC<CheckupsSelfValidationActionsProps> = ({
   const [clusterRunningJobs] = useAllRunningSelfValidationJobs();
 
   const thisCheckupJobNames = useMemo(
-    () => new Set(jobs.map((job) => job?.metadata?.name)),
+    () => new Set(jobs.map((job) => `${getCluster(job) || SINGLE_CLUSTER_KEY}-${getName(job)}`)),
     [jobs],
   );
 
   const otherRunningJobs = useMemo(
-    () => (clusterRunningJobs || []).filter((job) => !thisCheckupJobNames.has(job?.metadata?.name)),
+    () =>
+      (clusterRunningJobs || []).filter(
+        (job) =>
+          !thisCheckupJobNames.has(`${getCluster(job) || SINGLE_CLUSTER_KEY}-${getName(job)}`),
+      ),
     [clusterRunningJobs, thisCheckupJobNames],
   );
 

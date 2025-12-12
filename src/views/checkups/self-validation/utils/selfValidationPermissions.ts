@@ -10,14 +10,12 @@ import {
 import { IoK8sApiRbacV1ClusterRoleBinding } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import {
-  checkAccess,
-  k8sCreate,
-  k8sDelete,
-  k8sGet,
-  K8sModel,
-  k8sPatch,
-  K8sResourceCommon,
-} from '@openshift-console/dynamic-plugin-sdk';
+  kubevirtK8sCreate,
+  kubevirtK8sDelete,
+  kubevirtK8sGet,
+  kubevirtK8sPatch,
+} from '@multicluster/k8sRequests';
+import { checkAccess, K8sModel, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 import {
   SELF_VALIDATION_CLUSTER_ROLE_BINDING,
@@ -101,19 +99,19 @@ const handleDeleteError = (
  */
 const getOrCreateResource = async (
   getOptions: { model: K8sModel; name: string; ns?: string },
-  createOptions: { data: K8sResourceCommon; model: K8sModel },
+  createOptions: { cluster: string; data: K8sResourceCommon; model: K8sModel },
   resourceKind: string,
   t: TFunction,
 ): Promise<null | string> => {
   try {
-    await k8sGet(getOptions);
+    await kubevirtK8sGet(getOptions);
     // Resource exists, no need to create
     return null;
   } catch (error) {
     // Only create if resource doesn't exist (404)
     if (isErrorStatusCode(error, 404)) {
       try {
-        await k8sCreate(createOptions);
+        await kubevirtK8sCreate(createOptions);
         return null;
       } catch (createError) {
         const errorMessage = getFailedToModifyMessage(t, resourceKind);
@@ -170,6 +168,7 @@ const selfValidationClusterRoleBinding = (namespace: string): IoK8sApiRbacV1Clus
 
 export const installPermissions = async (
   namespace: string,
+  cluster: string,
   t: TFunction,
 ): Promise<PermissionOperationResult> => {
   // Create ServiceAccount, Role, and RoleBinding if they don't exist
@@ -181,6 +180,7 @@ export const installPermissions = async (
         ns: namespace,
       },
       {
+        cluster,
         data: serviceAccountResource(namespace),
         model: ServiceAccountModel,
       },
@@ -194,6 +194,7 @@ export const installPermissions = async (
         ns: namespace,
       },
       {
+        cluster,
         data: selfValidationRole(namespace),
         model: RoleModel,
       },
@@ -207,6 +208,7 @@ export const installPermissions = async (
         ns: namespace,
       },
       {
+        cluster,
         data: selfValidationRoleBinding(namespace),
         model: RoleBindingModel,
       },
@@ -245,7 +247,7 @@ export const installPermissions = async (
 
   // Create or update ClusterRoleBinding
   try {
-    const existingClusterRoleBinding = await k8sGet({
+    const existingClusterRoleBinding = await kubevirtK8sGet({
       model: ClusterRoleBindingModel,
       name: SELF_VALIDATION_CLUSTER_ROLE_BINDING,
     });
@@ -266,7 +268,8 @@ export const installPermissions = async (
         { kind: ServiceAccountModel.kind, name: SELF_VALIDATION_SA, namespace },
       ];
 
-      await k8sPatch({
+      await kubevirtK8sPatch({
+        cluster,
         data: [
           { op: 'test', path: '/subjects', value: crb.subjects || [] },
           { op: 'replace', path: '/subjects', value: updatedSubjects },
@@ -279,7 +282,8 @@ export const installPermissions = async (
     // If k8sGet fails, ClusterRoleBinding doesn't exist, try to create it
     if (isErrorStatusCode(clusterRoleBindingError, 404)) {
       try {
-        await k8sCreate({
+        await kubevirtK8sCreate({
+          cluster,
           data: selfValidationClusterRoleBinding(namespace),
           model: ClusterRoleBindingModel,
         });
@@ -320,10 +324,12 @@ export const installPermissions = async (
 
 export const uninstallPermissions = async (
   namespace: string,
+  cluster: string,
   t: TFunction,
 ): Promise<PermissionOperationResult> => {
   try {
-    const existingClusterRoleBinding = await k8sGet({
+    const existingClusterRoleBinding = await kubevirtK8sGet({
+      cluster,
       model: ClusterRoleBindingModel,
       name: SELF_VALIDATION_CLUSTER_ROLE_BINDING,
     });
@@ -341,13 +347,15 @@ export const uninstallPermissions = async (
 
     if (updatedSubjects.length === 0) {
       // If no subjects left, delete the entire ClusterRoleBinding
-      await k8sDelete({
+      await kubevirtK8sDelete({
+        cluster,
         model: ClusterRoleBindingModel,
         resource: { metadata: { name: SELF_VALIDATION_CLUSTER_ROLE_BINDING } },
       });
     } else {
       // Update the ClusterRoleBinding with the remaining subjects
-      await k8sPatch({
+      await kubevirtK8sPatch({
+        cluster,
         data: [
           { op: 'test', path: '/subjects', value: crb.subjects || [] },
           { op: 'replace', path: '/subjects', value: updatedSubjects },
@@ -362,7 +370,8 @@ export const uninstallPermissions = async (
   }
 
   try {
-    await k8sDelete({
+    await kubevirtK8sDelete({
+      cluster,
       model: RoleBindingModel,
       resource: { metadata: { name: SELF_VALIDATION_ROLE, namespace } },
     });
@@ -372,7 +381,8 @@ export const uninstallPermissions = async (
   }
 
   try {
-    await k8sDelete({
+    await kubevirtK8sDelete({
+      cluster,
       model: RoleModel,
       resource: { metadata: { name: SELF_VALIDATION_ROLE, namespace } },
     });
@@ -382,7 +392,8 @@ export const uninstallPermissions = async (
   }
 
   try {
-    await k8sDelete({
+    await kubevirtK8sDelete({
+      cluster,
       model: ServiceAccountModel,
       resource: { metadata: { name: SELF_VALIDATION_SA, namespace } },
     });

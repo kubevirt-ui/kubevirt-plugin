@@ -4,12 +4,13 @@ import { ConfigMapModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import { k8sGet } from '@openshift-console/dynamic-plugin-sdk';
+import { kubevirtK8sGet } from '@multicluster/k8sRequests';
 
 import { CONFIGMAP_NAME, getJobContainers } from '../../../utils/utils';
 import { JobResults, parseResults } from '../../utils';
 
 type UseJobResultsProps = {
+  cluster: string;
   job: IoK8sApiBatchV1Job | null;
   namespace: string;
 };
@@ -41,15 +42,17 @@ const determineResultsConfigMapName = (job: IoK8sApiBatchV1Job): string => {
 const readResultsConfigMap = async (
   configMapName: string,
   namespace: string,
+  cluster: string,
 ): Promise<IoK8sApiCoreV1ConfigMap> => {
   try {
-    const configMap = await k8sGet({
+    const configMap = await kubevirtK8sGet<IoK8sApiCoreV1ConfigMap>({
+      cluster,
       model: ConfigMapModel,
       name: configMapName,
       ns: namespace,
     });
 
-    return configMap as IoK8sApiCoreV1ConfigMap;
+    return configMap;
   } catch (error) {
     kubevirtConsole.warn('Could not read ConfigMap:', error);
     throw new Error(
@@ -60,7 +63,11 @@ const readResultsConfigMap = async (
   }
 };
 
-export const useJobResults = ({ job, namespace }: UseJobResultsProps): UseJobResultsResult => {
+export const useJobResults = ({
+  cluster,
+  job,
+  namespace,
+}: UseJobResultsProps): UseJobResultsResult => {
   const { t } = useKubevirtTranslation();
   const [results, setResults] = useState<JobResults | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -82,7 +89,7 @@ export const useJobResults = ({ job, namespace }: UseJobResultsProps): UseJobRes
 
       try {
         const configMapName = determineResultsConfigMapName(job);
-        const resultsConfigMap = await readResultsConfigMap(configMapName, namespace);
+        const resultsConfigMap = await readResultsConfigMap(configMapName, namespace, cluster);
 
         if (canceled) return;
 
@@ -124,7 +131,7 @@ export const useJobResults = ({ job, namespace }: UseJobResultsProps): UseJobRes
     return () => {
       canceled = true;
     };
-  }, [job, namespace, t]);
+  }, [job, namespace, cluster, t]);
 
   return { error, isLoading, results };
 };

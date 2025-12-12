@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 import { sortable, SortByDirection } from '@patternfly/react-table';
 
@@ -19,6 +20,7 @@ const useCheckupsSelfValidationListColumns = (
   jobs: IoK8sApiBatchV1Job[],
 ): [TableColumn<IoK8sApiCoreV1ConfigMap>[], TableColumn<IoK8sApiCoreV1ConfigMap>[], boolean] => {
   const { t } = useKubevirtTranslation();
+  const isACMPage = useIsACMPage();
 
   const jobsByConfigMapName = useMemo(() => groupJobsByConfigMapName(jobs), [jobs]);
 
@@ -30,6 +32,16 @@ const useCheckupsSelfValidationListColumns = (
         title: t('Name'),
         transforms: [sortable],
       },
+      ...(isACMPage
+        ? [
+            {
+              id: 'cluster',
+              sort: 'cluster',
+              title: t('Cluster'),
+              transforms: [sortable],
+            },
+          ]
+        : []),
       {
         id: 'namespace',
         sort: 'metadata.namespace',

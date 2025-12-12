@@ -4,8 +4,9 @@ import { IoK8sApiRbacV1ClusterRoleBinding } from '@kubevirt-ui/kubevirt-api/kube
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
+import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import {
   Alert,
   AlertVariant,
@@ -39,7 +40,8 @@ const CheckupsSelfValidationListEmptyState: FC<CheckupsSelfValidationListEmptySt
   loadingPermissions,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [namespace] = useActiveNamespace();
+  const namespace = useActiveNamespace();
+  const cluster = useClusterParam();
   const [isLoading, setIsLoading] = useState<boolean>();
   const [error, setError] = useState<null | string>(null);
   const [runningSelfValidationJobs] = useAllRunningSelfValidationJobs();
@@ -93,8 +95,8 @@ const CheckupsSelfValidationListEmptyState: FC<CheckupsSelfValidationListEmptySt
               setError(null);
               setIsLoading(true);
               const result = isPermitted
-                ? await removeSelfValidationPermissions(namespace, t)
-                : await installSelfValidationPermissions(namespace, t);
+                ? await removeSelfValidationPermissions(namespace, cluster, t)
+                : await installSelfValidationPermissions(namespace, cluster, t);
               if (!result.success && result.error) {
                 setError(result.error);
               }

@@ -3,7 +3,9 @@ import { Link } from 'react-router-dom-v5-compat';
 import { extractConfigMapName } from 'src/views/checkups/utils/utils';
 
 import { IoK8sApiBatchV1Job } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { createURL } from '@virtualmachines/details/tabs/overview/utils/utils';
+import { getSelfValidationCheckupURL } from '@kubevirt-utils/resources/checkups/urls';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getCluster } from '@multicluster/helpers/selectors';
 
 export const getRunningCheckupErrorMessage = (
   t: (key: string) => string,
@@ -12,17 +14,14 @@ export const getRunningCheckupErrorMessage = (
 ): ReactElement => {
   const jobLinks = runningJobs.flatMap((job, index) => {
     const configMapInfo = extractConfigMapName(job);
-    const jobName = job?.metadata?.name || t('Unknown');
-    const key = job?.metadata?.name ?? `job-${index}`;
+
+    const jobName = getName(job) || t('Unknown');
+    const key = getName(job) ?? `job-${index}`;
+    const cluster = getCluster(job);
+    const url = getSelfValidationCheckupURL(getName(job), getNamespace(job), cluster);
+
     const linkElement = configMapInfo ? (
-      <Link
-        to={createURL(
-          `self-validation/${configMapInfo.name}`,
-          `/k8s/ns/${configMapInfo.namespace}/checkups`,
-        )}
-        key={key}
-        onClick={() => onClose?.()}
-      >
+      <Link key={key} onClick={() => onClose?.()} to={url}>
         <strong>{configMapInfo.name}</strong>
       </Link>
     ) : (
