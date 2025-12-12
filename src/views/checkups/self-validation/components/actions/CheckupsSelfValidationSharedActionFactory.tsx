@@ -118,6 +118,7 @@ export const createGoToRunningCheckupAction = ({
       configMapName={configMapInfo.name}
       configMapNamespace={configMapInfo.namespace}
       maxWidth="150px"
+      preventLink={true}
       showTitle={false}
     />
   );
