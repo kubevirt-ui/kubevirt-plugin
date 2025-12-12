@@ -1,5 +1,5 @@
-import VirtualMachineClusterInstancetypeModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineClusterInstancetypeModel';
-import VirtualMachineInstancetypeModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstancetypeModel';
+import { VirtualMachineClusterInstancetypeModel } from '@kubevirt-ui/kubevirt-api/console';
+import { VirtualMachineInstancetypeModel } from '@kubevirt-ui/kubevirt-api/console';
 import {
   V1InstancetypeMatcher,
   V1VirtualMachine,

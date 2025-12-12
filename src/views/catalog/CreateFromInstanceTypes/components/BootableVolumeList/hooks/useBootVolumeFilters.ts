@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
+import { DataSourceModel } from '@kubevirt-ui/kubevirt-api/console';
 import useHcoWorkloadArchitectures from '@kubevirt-utils/hooks/useHcoWorkloadArchitectures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {

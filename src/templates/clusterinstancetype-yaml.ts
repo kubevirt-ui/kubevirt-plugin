@@ -1,4 +1,4 @@
-import VirtualMachineClusterInstancetypeModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineClusterInstancetypeModel';
+import { VirtualMachineClusterInstancetypeModel } from '@kubevirt-ui/kubevirt-api/console';
 
 export const defaultVirtualMachineClusterInstancetypeYamlTemplate = `
 apiVersion: ${VirtualMachineClusterInstancetypeModel.apiGroup}/${VirtualMachineClusterInstancetypeModel.apiVersion}

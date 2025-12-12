@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom-v5-compat';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useVMListURL from '@multicluster/hooks/useVMListURL';
 import { Button, Flex, Title } from '@patternfly/react-core';
-import { AngleLeftIcon } from '@patternfly/react-icons/dist/esm/icons/angle-left-icon';
+import { AngleLeftIcon } from '@patternfly/react-icons';
 
 const VirtualMachineSearchResultsHeader: FC = () => {
   const navigate = useNavigate();

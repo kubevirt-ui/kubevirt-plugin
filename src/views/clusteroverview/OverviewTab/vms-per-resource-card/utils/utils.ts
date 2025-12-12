@@ -1,5 +1,5 @@
 import { TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
-import VirtualMachineClusterInstancetypeModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineClusterInstancetypeModel';
+import { VirtualMachineClusterInstancetypeModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { instanceTypeSeriesNameMapper } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/constants';
 import { getInstanceTypePrefix } from '@kubevirt-utils/resources/bootableresources/helpers';

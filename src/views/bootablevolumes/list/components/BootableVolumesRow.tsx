@@ -1,11 +1,11 @@
 import React, { FC, useMemo } from 'react';
 import DataSourceActions from 'src/views/datasources/actions/DataSourceActions';
 
-import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
+import { DataSourceModel } from '@kubevirt-ui/kubevirt-api/console';
 import {
   V1beta1DataImportCron,
   V1beta1DataSource,
-} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+} from '@kubevirt-ui/kubevirt-api/containerized-data-importer';
 import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ArchitectureLabel from '@kubevirt-utils/components/ArchitectureLabel/ArchitectureLabel';
 import DeprecatedBadge from '@kubevirt-utils/components/badges/DeprecatedBadge/DeprecatedBadge';

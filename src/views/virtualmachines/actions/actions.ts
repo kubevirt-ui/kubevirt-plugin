@@ -1,6 +1,6 @@
-import VirtualMachineInstanceMigrationModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstanceMigrationModel';
-import VirtualMachineInstanceModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstanceModel';
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
+import { VirtualMachineInstanceMigrationModel } from '@kubevirt-ui/kubevirt-api/console';
+import { VirtualMachineInstanceModel } from '@kubevirt-ui/kubevirt-api/console';
+import { VirtualMachineModel } from '@kubevirt-ui/kubevirt-api/console';
 import {
   V1AddVolumeOptions,
   V1RemoveVolumeOptions,

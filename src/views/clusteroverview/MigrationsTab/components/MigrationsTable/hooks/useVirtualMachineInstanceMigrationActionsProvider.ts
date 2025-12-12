@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react';
 
-import VirtualMachineInstanceMigrationModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstanceMigrationModel';
+import { VirtualMachineInstanceMigrationModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachineInstanceMigration } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';

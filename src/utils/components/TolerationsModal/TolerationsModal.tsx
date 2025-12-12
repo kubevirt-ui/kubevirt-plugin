@@ -2,7 +2,7 @@ import * as React from 'react';
 import produce from 'immer';
 
 import { NodeModel } from '@kubevirt-ui/kubevirt-api/console';
-import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
+import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import {
   K8sIoApiCoreV1Toleration,
   K8sIoApiCoreV1TolerationEffectEnum,

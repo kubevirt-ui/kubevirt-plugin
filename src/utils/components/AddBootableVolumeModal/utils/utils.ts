@@ -1,13 +1,13 @@
 import produce from 'immer';
 
 import { DEFAULT_INSTANCETYPE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
-import DataImportCronModel from '@kubevirt-ui/kubevirt-api/console/models/DataImportCronModel';
-import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
-import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
+import { DataImportCronModel } from '@kubevirt-ui/kubevirt-api/console';
+import { DataSourceModel } from '@kubevirt-ui/kubevirt-api/console';
+import { DataVolumeModel } from '@kubevirt-ui/kubevirt-api/console';
 import {
   V1beta1DataImportCron,
   V1beta1DataSource,
-} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+} from '@kubevirt-ui/kubevirt-api/containerized-data-importer';
 import { V1beta1DataVolumeSource } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { OPENSHIFT_CNV } from '@kubevirt-utils/constants/constants';
 import { UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';

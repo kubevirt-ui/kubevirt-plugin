@@ -5,7 +5,7 @@ import {
   VirtualMachineClusterInstancetypeModelGroupVersionKind,
   VirtualMachineInstancetypeModelGroupVersionKind,
 } from '@kubevirt-ui/kubevirt-api/console';
-import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer';
 import { hasUserInstanceType } from '@kubevirt-utils/resources/bootableresources/helpers';
 import { getLabel, getNamespace } from '@kubevirt-utils/resources/shared';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';

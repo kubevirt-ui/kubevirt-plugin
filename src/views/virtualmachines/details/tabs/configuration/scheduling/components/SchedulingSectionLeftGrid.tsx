@@ -2,8 +2,8 @@ import React, { FC, useCallback } from 'react';
 
 import Descheduler from '@catalog/wizard/tabs/scheduling/components/Descheduler';
 import DeschedulerPopover from '@catalog/wizard/tabs/scheduling/components/DeschedulerPopover';
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
+import { VirtualMachineModel } from '@kubevirt-ui/kubevirt-api/console';
+import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import AffinityModal from '@kubevirt-utils/components/AffinityModal/AffinityModal';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';

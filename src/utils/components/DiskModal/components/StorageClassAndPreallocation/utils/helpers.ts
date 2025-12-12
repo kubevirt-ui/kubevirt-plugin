@@ -1,5 +1,5 @@
 import { modelToGroupVersionKind, StorageClassModel } from '@kubevirt-ui/kubevirt-api/console';
-import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
+import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
 import { DEFAULT_STORAGE_CLASS_ANNOTATION } from '@kubevirt-utils/hooks/useDefaultStorage/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';

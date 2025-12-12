@@ -1,5 +1,5 @@
-import VirtualMachineClusterPreferenceModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineClusterPreferenceModel';
-import VirtualMachinePreferenceModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachinePreferenceModel';
+import { VirtualMachineClusterPreferenceModel } from '@kubevirt-ui/kubevirt-api/console';
+import { VirtualMachinePreferenceModel } from '@kubevirt-ui/kubevirt-api/console';
 import {
   V1beta1VirtualMachinePreference,
   V1PreferenceMatcher,

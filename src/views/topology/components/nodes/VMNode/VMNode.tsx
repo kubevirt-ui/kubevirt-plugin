@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import { TopologyDataObject } from '@openshift-console/dynamic-plugin-sdk/lib/extensions/topology-types';
 import { BaseNode } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { Tooltip } from '@patternfly/react-core';
-import { VirtualMachineIcon } from '@patternfly/react-icons/dist/esm/icons/virtual-machine-icon';
+import { VirtualMachineIcon } from '@patternfly/react-icons';
 import {
   Node,
   NodeModel,

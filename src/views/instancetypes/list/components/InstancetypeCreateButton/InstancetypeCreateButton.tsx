@@ -2,9 +2,10 @@ import React, { FC } from 'react';
 import { useLocation } from 'react-router-dom-v5-compat';
 
 import { VirtualMachineInstancetypeModelRef } from '@kubevirt-ui/kubevirt-api/console';
-import VirtualMachineClusterInstancetypeModel, {
+import {
+  VirtualMachineClusterInstancetypeModel,
   VirtualMachineClusterInstancetypeModelRef,
-} from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineClusterInstancetypeModel';
+} from '@kubevirt-ui/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ListPageCreate } from '@openshift-console/dynamic-plugin-sdk';
 

@@ -1,6 +1,6 @@
 import produce from 'immer';
 
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
+import { VirtualMachineModel } from '@kubevirt-ui/kubevirt-api/console';
 import {
   V1Network,
   V1VirtualMachine,

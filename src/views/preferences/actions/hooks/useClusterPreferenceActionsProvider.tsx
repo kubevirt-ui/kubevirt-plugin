@@ -1,8 +1,9 @@
 import React, { useMemo } from 'react';
 
-import VirtualMachineClusterPreferenceModel, {
+import {
+  VirtualMachineClusterPreferenceModel,
   VirtualMachineClusterPreferenceModelRef,
-} from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineClusterPreferenceModel';
+} from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import CloneResourceModal from '@kubevirt-utils/components/CloneResourceModal/CloneResourceModal';
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';

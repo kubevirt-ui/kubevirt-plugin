@@ -1,4 +1,4 @@
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
+import { VirtualMachineModel } from '@kubevirt-ui/kubevirt-api/console';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { getACMVMListURL } from '@multicluster/urls';
 import useIsACMPage from '@multicluster/useIsACMPage';

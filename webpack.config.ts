@@ -57,7 +57,7 @@ const config: Configuration = {
   module: {
     rules: [
       {
-        exclude: /node_modules\/(?!(@kubevirt-ui)\/kubevirt-api).*/,
+        exclude: /node_modules\/.*/,
         test: /\.(jsx?|tsx?)$/,
         use: [
           {

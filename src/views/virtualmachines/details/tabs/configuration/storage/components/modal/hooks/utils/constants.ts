@@ -4,7 +4,7 @@ import {
   SecretModel,
   ServiceAccountModel,
 } from '@kubevirt-ui/kubevirt-api/console';
-import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
+import { DataVolumeModel } from '@kubevirt-ui/kubevirt-api/console';
 import { VolumeTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 
 export const mapVolumeTypeToK8sModel = {

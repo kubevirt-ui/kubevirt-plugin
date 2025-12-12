@@ -1,5 +1,5 @@
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
+import { VirtualMachineModel } from '@kubevirt-ui/kubevirt-api/console';
 import { V1Disk, V1Network, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getAnnotation, getLabel } from '@kubevirt-utils/resources/shared';
 import { getCPU } from '@kubevirt-utils/resources/vm';

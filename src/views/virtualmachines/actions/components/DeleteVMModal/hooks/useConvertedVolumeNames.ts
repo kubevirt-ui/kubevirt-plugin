@@ -1,5 +1,5 @@
 import { CDIConfigModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
-import { V1beta1CDIConfig } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { V1beta1CDIConfig } from '@kubevirt-ui/kubevirt-api/containerized-data-importer';
 import { V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
