@@ -754,6 +754,7 @@
   "Have the thresholds be based on the average utilization": "しきい値は平均使用率に基づいて設定します",
   "Headless mode": "ヘッドレスモード",
   "Healthy": "正常",
+  "Heavy load checkups": "Heavy load checkups",
   "Help": "ヘルプ",
   "Hide": "非表示",
   "Hide deprecated templates": "非推奨のテンプレートを非表示にする",

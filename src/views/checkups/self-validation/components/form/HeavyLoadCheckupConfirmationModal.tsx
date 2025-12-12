@@ -39,7 +39,7 @@ const HeavyLoadCheckupConfirmationModal: FC<HeavyLoadCheckupConfirmationModalPro
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} variant="small">
-      <ModalHeader title="Heavy load checkups" titleIconVariant="warning" />
+      <ModalHeader title={t('Heavy load checkups')} titleIconVariant="warning" />
       <ModalBody>
         <Stack hasGutter>
           <StackItem>
