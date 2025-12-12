@@ -16,6 +16,7 @@ import useSSHService from '@kubevirt-utils/components/SSHAccess/useSSHService';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getMachineType } from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, Grid, GridItem, Icon, Title } from '@patternfly/react-core';
 import { LinkIcon } from '@patternfly/react-icons';
@@ -78,6 +79,8 @@ const Details: React.FC<DetailsProps> = ({ pathname, vmi }) => {
               descriptionData={getMachineType(vm) || NO_DATA_DASH}
               descriptionHeader={t('Machine type')}
               isPopover
+              olsObj={vmi}
+              promptType={OLSPromptType.MACHINE_TYPE}
             />
             <DescriptionItemCreatedAt model={VirtualMachineInstanceModel} resource={vmi} />
             <OwnerDetailsItem obj={vmi} />

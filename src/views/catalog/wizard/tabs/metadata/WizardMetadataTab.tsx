@@ -9,6 +9,9 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
+import LightspeedHelpButton from '@lightspeed/components/LightspeedHelpButton';
+import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { DescriptionList, PageSection, pluralize } from '@patternfly/react-core';
 
 import { WizardDescriptionItem } from '../../components/WizardDescriptionItem';
@@ -34,8 +37,15 @@ const WizardMetadataTab: WizardTab = ({ loaded, updateVM, vm }) => {
                   <MetadataLabels labels={resource?.metadata?.labels} model={VirtualMachineModel} />
                 }
                 helperPopover={{
-                  content: t(
-                    'Map of string keys and values that can be used to organize and categorize (scope and select) objects',
+                  content: (hide) => (
+                    <LightspeedSimplePopoverContent
+                      content={t(
+                        'Map of string keys and values that can be used to organize and categorize (scope and select) objects',
+                      )}
+                      hide={hide}
+                      obj={vm}
+                      promptType={OLSPromptType.LABELS}
+                    />
                   ),
                   header: t('Labels'),
                 }}
@@ -67,8 +77,18 @@ const WizardMetadataTab: WizardTab = ({ loaded, updateVM, vm }) => {
                   'annotation',
                 )}
                 helperPopover={{
-                  content: t(
-                    'Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects.',
+                  content: (hide) => (
+                    <>
+                      {t(
+                        'Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects.',
+                      )}
+                      <br />
+                      <LightspeedHelpButton
+                        obj={vm}
+                        onClick={hide}
+                        promptType={OLSPromptType.ANNOTATIONS}
+                      />
+                    </>
                   ),
                   header: t('Annotations'),
                 }}

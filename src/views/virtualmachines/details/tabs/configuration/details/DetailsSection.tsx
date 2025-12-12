@@ -33,6 +33,7 @@ import {
   hasNUMAConfiguration,
 } from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, Grid, GridItem, Switch, Title } from '@patternfly/react-core';
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
@@ -187,12 +188,16 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
               descriptionData={<CPUMemory vm={cpuMemoryVM || vm} vmi={vmi} />}
               isEdit={canUpdateVM}
               isPopover
+              olsObj={vm}
+              promptType={OLSPromptType.CPU_MEMORY}
             />
             <DescriptionItem
               bodyContent={t('The QEMU machine type.')}
               descriptionData={getMachineType(vm) || NO_DATA_DASH}
               descriptionHeader={t('Machine type')}
               isPopover
+              olsObj={vm}
+              promptType={OLSPromptType.MACHINE_TYPE}
             />
             <DescriptionItem
               onEditClick={() =>
@@ -225,6 +230,8 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
               data-test-id={`${vmName}-headless`}
               descriptionHeader={<SearchItem id="headless-mode">{t('Headless mode')}</SearchItem>}
               isPopover
+              olsObj={vm}
+              promptType={OLSPromptType.HEADLESS_MODE}
             />
             <DescriptionItem
               bodyContent={t(
@@ -246,6 +253,8 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
               }
               data-test-id="guest-system-log-access"
               isPopover
+              olsObj={vm}
+              promptType={OLSPromptType.GUEST_SYSTEM_LOG_ACCESS}
             />
             <DescriptionItem
               bodyContent={t(
@@ -280,6 +289,8 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
               }
               data-test-id="deletion-protection"
               isPopover
+              olsObj={vm}
+              promptType={OLSPromptType.DELETION_PROTECTION}
             />
           </DescriptionList>
         </GridItem>

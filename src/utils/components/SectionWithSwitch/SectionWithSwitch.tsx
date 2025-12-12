@@ -12,7 +12,7 @@ import './section-with-switch.scss';
 type SectionWithSwitchProps = {
   dataTestID?: string;
   externalLink?: string;
-  helpTextIconContent?: ReactNode;
+  helpTextIconContent?: ((hide: () => void) => ReactNode) | ReactNode;
   id?: string;
   inlineCheckbox?: boolean;
   isDisabled?: boolean;

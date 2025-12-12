@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import {
@@ -22,7 +22,7 @@ type Feature = {
   error?: Error;
   externalLink: string;
   featureEnabled: boolean;
-  helpPopoverContent?: ReactNode;
+  helpPopoverContent?: (hide) => ReactNode;
   id: string;
   label: string;
   loading: boolean;
@@ -62,7 +62,7 @@ const usePreviewFeaturesData: UsePreviewFeaturesData = () => {
     },
     {
       externalLink: null,
-      helpPopoverContent: PasstPopoverContent,
+      helpPopoverContent: (hide) => <PasstPopoverContent hide={hide} />,
       id: PASST_UDN_NETWORK,
       label: t('Enable Passt binding for primary user-defined networks'),
       ...passtFeatureFlag,

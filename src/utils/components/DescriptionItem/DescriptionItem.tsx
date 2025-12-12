@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import { DescriptionItemHeader } from '@kubevirt-utils/components/DescriptionItem/DescriptionItemHeader';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import {
   Button,
   ButtonVariant,
@@ -34,7 +35,9 @@ type DescriptionItemProps = {
   label?: ReactNode;
   messageOnDisabled?: string;
   moreInfoURL?: string;
+  olsObj?: K8sResourceCommon;
   onEditClick?: () => void;
+  promptType?: OLSPromptType;
   showEditOnTitle?: boolean;
   subTitle?: string;
 };
@@ -54,7 +57,9 @@ const DescriptionItem: FC<DescriptionItemProps> = ({
   label,
   messageOnDisabled,
   moreInfoURL,
+  olsObj,
   onEditClick,
+  promptType,
   showEditOnTitle,
   subTitle,
 }) => {
@@ -107,6 +112,8 @@ const DescriptionItem: FC<DescriptionItemProps> = ({
                 isPopover={isPopover}
                 label={label}
                 moreInfoURL={moreInfoURL}
+                olsObj={olsObj}
+                promptType={promptType}
               />
             </FlexItem>
           )}

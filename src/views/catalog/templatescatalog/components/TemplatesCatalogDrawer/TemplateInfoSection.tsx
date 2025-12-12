@@ -24,6 +24,7 @@ import {
   isDefaultVariantTemplate,
 } from '@kubevirt-utils/resources/template/utils/selectors';
 import { getCPU, getDisks } from '@kubevirt-utils/resources/vm';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Button, ButtonVariant, DescriptionList, ExpandableSection } from '@patternfly/react-core';
 import { ExternalLinkSquareAltIcon } from '@patternfly/react-icons';
 
@@ -111,6 +112,8 @@ export const TemplateInfoSection: FC = memo(() => {
           descriptionHeader={t('CPU | Memory')}
           isEdit
           isPopover
+          olsObj={vm}
+          promptType={OLSPromptType.CPU_MEMORY}
         />
         <DescriptionItem
           descriptionData={

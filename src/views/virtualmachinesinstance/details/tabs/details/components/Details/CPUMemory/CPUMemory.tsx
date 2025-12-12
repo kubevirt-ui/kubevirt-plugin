@@ -8,6 +8,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { vCPUCount } from '@kubevirt-utils/resources/template/utils';
 import { getCPU, getMemory } from '@kubevirt-utils/resources/vm';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 
 type TolerationsProps = {
   vmi: V1VirtualMachineInstance;
@@ -27,6 +28,8 @@ const CPUMemory: FC<TolerationsProps> = ({ vmi }) => {
       descriptionData={t('{{cpu}} CPU | {{memory}} Memory', { cpu, memory })}
       descriptionHeader={t('CPU | Memory')}
       isPopover
+      olsObj={vmi}
+      promptType={OLSPromptType.CPU_MEMORY}
     />
   );
 };

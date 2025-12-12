@@ -6,6 +6,8 @@ import PaneHeading from '@kubevirt-utils/components/PaneHeading/PaneHeading';
 import { FLAG_CONSOLE_CLI_DOWNLOAD } from '@kubevirt-utils/flags/consts';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { clusterBasePath } from '@kubevirt-utils/utils/utils';
+import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { useFlag } from '@openshift-console/dynamic-plugin-sdk';
 import { PageSection, Title } from '@patternfly/react-core';
 
@@ -33,8 +35,14 @@ const ClusterOverviewPageHeader: React.FC<ClusterOverviewPageHeaderProps> = ({ c
                 {t('Download the virtctl command-line utility')}
               </Link>{' '}
               <HelpTextIcon
-                bodyContent={t(
-                  'The virtctl client is a supplemental command-line utility for managing virtualization resources from the command line.',
+                bodyContent={(hide) => (
+                  <LightspeedSimplePopoverContent
+                    content={t(
+                      'The virtctl client is a supplemental command-line utility for managing virtualization resources from the command line.',
+                    )}
+                    hide={hide}
+                    promptType={OLSPromptType.VIRTCTL}
+                  />
                 )}
                 helpIconClassName="pf-v6-u-ml-xs"
               />

@@ -22,6 +22,7 @@ import { getPreferredBootmode } from '@kubevirt-utils/resources/preference/helpe
 import { asAccessReview, getAnnotation, getLabel, getName } from '@kubevirt-utils/resources/shared';
 import { DESCRIPTION_ANNOTATION, getDevices, getHostname } from '@kubevirt-utils/resources/vm';
 import { updateCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, Grid, GridItem, Switch, Title } from '@patternfly/react-core';
 import DeletionProtectionModal from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/DeletionProtectionModal';
@@ -178,6 +179,8 @@ const CustomizeInstanceTypeDetailsTab = () => {
               data-test-id={`${vmName}-headless`}
               descriptionHeader={<SearchItem id="headless-mode">{t('Headless mode')}</SearchItem>}
               isPopover
+              olsObj={vm}
+              promptType={OLSPromptType.HEADLESS_MODE}
             />
             <DescriptionItem
               bodyContent={t(
@@ -204,6 +207,8 @@ const CustomizeInstanceTypeDetailsTab = () => {
               }
               data-test-id="guest-system-log-access"
               isPopover
+              olsObj={vm}
+              promptType={OLSPromptType.GUEST_SYSTEM_LOG_ACCESS}
             />
             <DescriptionItem
               bodyContent={t(
@@ -243,6 +248,8 @@ const CustomizeInstanceTypeDetailsTab = () => {
               }
               data-test-id="deletion-protection"
               isPopover
+              olsObj={vm}
+              promptType={OLSPromptType.DELETION_PROTECTION}
             />
           </DescriptionList>
         </GridItem>

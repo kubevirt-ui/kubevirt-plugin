@@ -5,6 +5,8 @@ import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/Sect
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { CLUSTER_TAB_IDS } from '@overview/SettingsTab/search/constants';
 import {
   Button,
@@ -95,8 +97,15 @@ const MemoryDensity: FC<MemoryDensityProps> = ({ hyperConvergeConfiguration, new
         <Stack hasGutter>
           <StackItem>
             <SectionWithSwitch
+              helpTextIconContent={(hide) => (
+                <LightspeedSimplePopoverContent
+                  content={t('Configures the VM workloads to use swap for higher density')}
+                  hide={hide}
+                  obj={hyperConvergeConfiguration?.[0]}
+                  promptType={OLSPromptType.ENABLE_MEMORY_DENSITY}
+                />
+              )}
               dataTestID="memory-density"
-              helpTextIconContent={t('Configures the VM workloads to use swap for higher density')}
               id="memory-density-feature"
               isDisabled={isLoading}
               isLoading={isLoading}

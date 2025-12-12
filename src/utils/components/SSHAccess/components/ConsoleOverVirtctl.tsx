@@ -9,6 +9,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
 import { getInterfaces, PASST_BINDING_NAME } from '@kubevirt-utils/resources/vm';
+import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import {
   Content,
   DescriptionListDescription,
@@ -41,32 +43,39 @@ const ConsoleOverVirtctl: FC<ConsoleOverVirtctlProps> = ({ vm }) => {
         <Content className="pf-v6-u-disabled-color-100" component="p">
           {t('SSH using virtctl')}{' '}
           <Popover
-            bodyContent={
-              <>
-                <br />
-                <Trans t={t}>
-                  <div>
-                    Open an SSH connection with the VM using the cluster API server. You must be
-                    able to access the API server and have virtctl command line tool installed.
-                  </div>
-                  <br />
-                  <div>
-                    For more details, see{' '}
-                    <ExternalLink href={documentationURL.VIRTCTL_CLI}>
-                      Installing virtctl
-                    </ExternalLink>{' '}
-                    in Getting started with OpenShift Virtualization.
-                  </div>
-                </Trans>
-                <br />
-                <Grid>
-                  <GridItem span={2}>{t('Example: ')}</GridItem>
-                  <GridItem id="ssh-using-virtctl--example" span={10}>
-                    {getConsoleVirtctlCommand(vm)}
-                  </GridItem>
-                </Grid>
-              </>
-            }
+            bodyContent={(hide) => (
+              <LightspeedSimplePopoverContent
+                content={
+                  <>
+                    <br />
+                    <Trans t={t}>
+                      <div>
+                        Open an SSH connection with the VM using the cluster API server. You must be
+                        able to access the API server and have virtctl command line tool installed.
+                      </div>
+                      <br />
+                      <div>
+                        For more details, see{' '}
+                        <ExternalLink href={documentationURL.VIRTCTL_CLI}>
+                          Installing virtctl
+                        </ExternalLink>{' '}
+                        in Getting started with OpenShift Virtualization.
+                      </div>
+                    </Trans>
+                    <br />
+                    <Grid>
+                      <GridItem span={2}>{t('Example: ')}</GridItem>
+                      <GridItem id="ssh-using-virtctl--example" span={10}>
+                        {getConsoleVirtctlCommand(vm)}
+                      </GridItem>
+                    </Grid>
+                  </>
+                }
+                hide={hide}
+                obj={vm}
+                promptType={OLSPromptType.SSH_USING_VIRTCTL}
+              />
+            )}
             aria-label="Help"
             className="virtctl-popover"
             position="right"

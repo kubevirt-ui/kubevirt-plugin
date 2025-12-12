@@ -44,3 +44,11 @@ export enum ARCHITECTURES {
   ARM64 = 'arm64',
   S390X = 's390x',
 }
+
+export enum HTTP_METHODS {
+  DELETE = 'DELETE',
+  GET = 'GET',
+  PATCH = 'PATCH',
+  POST = 'POST',
+  PUT = 'PUT',
+}

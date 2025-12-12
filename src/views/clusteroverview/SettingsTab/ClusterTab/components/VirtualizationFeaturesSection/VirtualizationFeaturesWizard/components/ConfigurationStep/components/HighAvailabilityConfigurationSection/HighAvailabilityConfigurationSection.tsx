@@ -2,6 +2,8 @@ import React, { FC, useState } from 'react';
 
 import ExpandSectionWithCustomToggle from '@kubevirt-utils/components/ExpandSectionWithCustomToggle/ExpandSectionWithCustomToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import {
   FENCE_AGENTS_OPERATOR_NAME,
   NODE_HEALTH_OPERATOR_NAME,
@@ -27,15 +29,21 @@ const HighAvailabilityConfigurationSection: FC = () => {
       customContent={
         <HighAvailabilityToggleContent alternativeCheckedMap={alternativeCheckedMap} />
       }
-      helpTextContent={
-        <HelpTextTooltipContent
-          bodyText={t(
-            "The feature's availability is dependent on two required operators to be installed and enabled.",
-          )}
-          linkURL="https://access.redhat.com/articles/7057929"
-          titleText={t('High availability')}
+      helpTextContent={(hide) => (
+        <LightspeedSimplePopoverContent
+          content={
+            <HelpTextTooltipContent
+              bodyText={t(
+                "The feature's availability is dependent on two required operators to be installed and enabled.",
+              )}
+              linkURL="https://access.redhat.com/articles/7057929"
+              titleText={t('High availability')}
+            />
+          }
+          hide={hide}
+          promptType={OLSPromptType.HIGH_AVAILABILITY_FEATURE}
         />
-      }
+      )}
       expandSectionClassName="high-availability-configuration-section__expand-section"
       id="high-availability-configuration-section"
       isIndented

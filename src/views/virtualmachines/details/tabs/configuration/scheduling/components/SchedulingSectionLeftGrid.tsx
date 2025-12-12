@@ -14,6 +14,7 @@ import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import Tolerations from '@kubevirt-utils/components/Tolerations/Tolerations';
 import TolerationsModal from '@kubevirt-utils/components/TolerationsModal/TolerationsModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
@@ -120,6 +121,8 @@ const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
           descriptionData={<Descheduler vm={vm} />}
           descriptionHeader={<SearchItem id="descheduler">{t('Descheduler')}</SearchItem>}
           isPopover
+          olsObj={vm}
+          promptType={OLSPromptType.DESCHEDULER}
         />
       </DescriptionList>
     </GridItem>

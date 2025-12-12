@@ -8,7 +8,11 @@ export type ConsoleFetchResponse<R> = {
   loaded: boolean;
 };
 
-const useConsoleFetch = <R>(url: string, initialValue?: R): ConsoleFetchResponse<R> => {
+const useConsoleFetch = <R>(
+  url: string,
+  timeout: number,
+  initialValue?: R,
+): ConsoleFetchResponse<R> => {
   const [data, setData] = useState<R | undefined>(initialValue);
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -18,7 +22,7 @@ const useConsoleFetch = <R>(url: string, initialValue?: R): ConsoleFetchResponse
 
     const fetchData = async () => {
       try {
-        const response = await consoleFetch(url);
+        const response = await consoleFetch(url, initialValue, timeout);
         setData(await response.json());
       } catch (e) {
         setError(e);

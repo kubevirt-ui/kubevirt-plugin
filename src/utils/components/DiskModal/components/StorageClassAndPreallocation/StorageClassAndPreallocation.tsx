@@ -24,7 +24,7 @@ const StorageClassAndPreallocation: FC<StorageClassAndPreallocationProps> = ({ v
         setShowSCAlert={setShowSCAlert}
       />
       {showSCAlert && <DefaultStorageClassAlert />}
-      <EnablePreallocationCheckbox />
+      <EnablePreallocationCheckbox vm={vm} />
     </>
   );
 };
