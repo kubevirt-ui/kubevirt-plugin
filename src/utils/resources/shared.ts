@@ -9,6 +9,7 @@ import { TemplateModel } from '@kubevirt-utils/models';
 import { getCluster } from '@multicluster/helpers/selectors';
 import {
   K8sModel,
+  K8sResourceCondition,
   K8sResourceKind,
   K8sVerb,
   Operator,
@@ -135,7 +136,8 @@ export const isConditionStatusTrue = (condition: V1beta1Condition): boolean =>
  * @param entity - entity to get condition from
  * @returns array of conditions
  */
-export const getStatusConditions = (entity): V1beta1Condition[] => entity?.status?.conditions ?? [];
+export const getStatusConditions = (entity): K8sResourceCondition[] =>
+  entity?.status?.conditions ?? [];
 
 /**
  * A selector for a resource's conditions based on type
@@ -143,7 +145,7 @@ export const getStatusConditions = (entity): V1beta1Condition[] => entity?.statu
  * @param type - type of the condition
  * @returns condition based on type
  */
-export const getStatusConditionsByType = (entity, type: string): V1beta1Condition =>
+export const getStatusConditionsByType = (entity, type: string): K8sResourceCondition =>
   getStatusConditions(entity)?.find((condition) => condition?.type === type);
 
 /**

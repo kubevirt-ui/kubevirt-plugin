@@ -32,7 +32,7 @@ import {
   stopVM,
   unpauseVM,
 } from './actions';
-import { getCommonLabels, getLabelsDiffPatch, isSameNamespace } from './utils';
+import { getCommonLabels, getLabelsDiffPatch, isSameCluster, isSameNamespace } from './utils';
 
 export const BulkVirtualMachineActionFactory = {
   controlActions: (controlActions: ActionDropdownItemType[]): ActionDropdownItemType => ({
@@ -186,7 +186,7 @@ export const BulkVirtualMachineActionFactory = {
           vms={vms}
         />
       )),
-    disabled: !isSameNamespace(vms) || isEmpty(vms),
+    disabled: !isSameCluster(vms) || !isSameNamespace(vms) || isEmpty(vms),
     id: ACTIONS_ID.MOVE_TO_FOLDER,
     label: t('Move to folder'),
   }),
