@@ -754,6 +754,7 @@
   "Have the thresholds be based on the average utilization": "평균 사용률을 기준으로 임계값을 설정합니다.",
   "Headless mode": "헤드리스 모드",
   "Healthy": "상태 양호",
+  "Heavy load checkups": "Heavy load checkups",
   "Help": "도움말",
   "Hide": "숨기기",
   "Hide deprecated templates": "더 이상 사용되지 않는 템플릿 숨기기",
