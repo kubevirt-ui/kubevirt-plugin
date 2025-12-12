@@ -4,6 +4,7 @@ import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ObjectMetadata } from '@openshift-console/dynamic-plugin-sdk';
 import {
+  CLUSTER_OBSERVABILITY_OPERATOR_NAME,
   DESCHEDULER_OPERATOR_NAME,
   FENCE_AGENTS_OPERATOR_NAME,
   NETOBSERV_OPERATOR_NAME,
@@ -109,6 +110,7 @@ const defaultOperatorData: OperatorDetails = {
 };
 
 export const defaultVirtFeatureOperatorItemsMap = {
+  [CLUSTER_OBSERVABILITY_OPERATOR_NAME]: defaultOperatorData,
   [DESCHEDULER_OPERATOR_NAME]: defaultOperatorData,
   [FENCE_AGENTS_OPERATOR_NAME]: defaultOperatorData,
   [NETOBSERV_OPERATOR_NAME]: defaultOperatorData,

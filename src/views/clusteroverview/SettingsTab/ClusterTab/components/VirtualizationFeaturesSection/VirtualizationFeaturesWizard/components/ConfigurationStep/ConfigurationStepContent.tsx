@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
+  CLUSTER_OBSERVABILITY_OPERATOR_NAME,
   NETOBSERV_OPERATOR_NAME,
   NMSTATE_OPERATOR_NAME,
 } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/constants';
@@ -22,6 +23,16 @@ const ConfigurationStepContent: FC = () => {
       <StackItem>
         <ConfigurationStepHeader />
       </StackItem>
+      <StackItem className="feature-wizard-configuration-step__item-container">
+        <VirtFeatureConfigurationItem
+          description={t(
+            'Delivers real-time, in-depth metrics and a fully functional Cluster Health Dashboard.',
+          )}
+          operatorName={CLUSTER_OBSERVABILITY_OPERATOR_NAME}
+          title={t('Cluster observability')}
+        />
+      </StackItem>
+      <hr />
       <StackItem className="feature-wizard-configuration-step__item-container">
         <VirtFeatureConfigurationItem
           description={t('Network flows collector and monitoring solution.')}
