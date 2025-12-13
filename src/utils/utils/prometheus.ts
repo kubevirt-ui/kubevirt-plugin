@@ -5,6 +5,16 @@ import { MONITORING_SALT, OPERATOR_LABEL_KEY } from '@kubevirt-utils/constants/p
 import { Group } from '@kubevirt-utils/types/prometheus';
 import { Alert, PrometheusLabels, PrometheusRule } from '@openshift-console/dynamic-plugin-sdk';
 
+/**
+ * Escapes special characters in PromQL label values for use in exact match filters.
+ * Escapes backslashes and double quotes to prevent PromQL injection issues.
+ *
+ * @param v - The label value to escape
+ * @returns The escaped label value safe for use in PromQL queries like `label="${escapedValue}"`
+ */
+export const escapePromLabelValue = (v: string): string =>
+  v.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+
 export const generateAlertId = (group: Group, rule: PrometheusRule): string => {
   const key = [
     group?.file,

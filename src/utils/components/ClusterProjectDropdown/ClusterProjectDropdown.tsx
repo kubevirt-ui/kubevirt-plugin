@@ -5,6 +5,7 @@ import ClusterDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/C
 import NamespaceDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/NamespaceDropdown';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { ALL_CLUSTERS_KEY, ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
+import { useClusterCNVInstalled } from '@kubevirt-utils/hooks/useAlerts/utils/useClusterCNVInstalled';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
@@ -12,21 +13,27 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useActiveClusterParam from '@multicluster/hooks/useActiveClusterParam';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useIsACMPage from '@multicluster/useIsACMPage';
-import { useHubClusterName } from '@stolostron/multicluster-sdk';
+import { useFleetClusterNames, useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import './ClusterProjectDropdown.scss';
 
 type ClusterProjectDropdownProps = {
+  disabledClusters?: string[];
+  disabledItemTooltip?: string;
   includeAllClusters?: boolean;
   includeAllProjects?: boolean;
+  onlyCNVClusters?: boolean;
   showClusterDropdown?: boolean;
   showProjectDropdown?: boolean;
 };
 
 const ClusterProjectDropdown: FC<ClusterProjectDropdownProps> = memo(
   ({
-    includeAllClusters = true,
+    disabledClusters,
+    disabledItemTooltip,
+    includeAllClusters,
     includeAllProjects,
+    onlyCNVClusters = false,
     showClusterDropdown = true,
     showProjectDropdown = true,
   }): JSX.Element | null => {
@@ -39,6 +46,8 @@ const ClusterProjectDropdown: FC<ClusterProjectDropdownProps> = memo(
     const location = useLocation();
     const [hubClusterName, hubClusterNameLoaded] = useHubClusterName();
     const [projects, projectLoaded] = useProjects(cluster || hubClusterName);
+    const { cnvNotInstalledClusters, loaded: cnvLoaded } = useClusterCNVInstalled();
+    const [clusterNames, clustersLoaded] = useFleetClusterNames();
 
     const onClusterChange = useCallback(
       (newCluster: string) => {
@@ -100,6 +109,58 @@ const ClusterProjectDropdown: FC<ClusterProjectDropdownProps> = memo(
       showProjectDropdown,
     ]);
 
+    // Redirect if current cluster is disabled
+    useEffect(() => {
+      if (
+        !clustersLoaded ||
+        !cluster ||
+        cluster === ALL_CLUSTERS_KEY ||
+        !disabledClusters ||
+        disabledClusters.length === 0
+      ) {
+        return;
+      }
+
+      const isCurrentClusterDisabled = disabledClusters.includes(cluster);
+      if (!isCurrentClusterDisabled) {
+        return;
+      }
+
+      // Find first enabled cluster
+      const omittedSet = new Set(onlyCNVClusters && cnvLoaded ? cnvNotInstalledClusters : []);
+      const disabledSet = new Set(disabledClusters);
+
+      // If includeAllClusters is true, prefer "all clusters"
+      if (includeAllClusters) {
+        onClusterChange(ALL_CLUSTERS_KEY);
+        return;
+      }
+
+      // Otherwise, find first enabled cluster
+      const enabledCluster = clusterNames?.find(
+        (name) => !omittedSet.has(name) && !disabledSet.has(name),
+      );
+
+      if (enabledCluster) {
+        onClusterChange(enabledCluster);
+      } else if (hubClusterNameLoaded && hubClusterName) {
+        // Fallback to hub cluster if no enabled cluster found
+        onClusterChange(hubClusterName);
+      }
+    }, [
+      cluster,
+      clustersLoaded,
+      clusterNames,
+      cnvLoaded,
+      cnvNotInstalledClusters,
+      disabledClusters,
+      hubClusterName,
+      hubClusterNameLoaded,
+      includeAllClusters,
+      onlyCNVClusters,
+      onClusterChange,
+    ]);
+
     if (!isACMPage) {
       return null;
     }
@@ -111,7 +172,10 @@ const ClusterProjectDropdown: FC<ClusterProjectDropdownProps> = memo(
             {t('Cluster')}:
             <ClusterDropdown
               bookmarkCluster={hubClusterName}
+              disabledClusters={disabledClusters}
+              disabledItemTooltip={disabledItemTooltip}
               includeAllClusters={includeAllClusters}
+              omittedClusters={onlyCNVClusters && cnvLoaded ? cnvNotInstalledClusters : undefined}
               onChange={onClusterChange}
               selectedCluster={cluster || ALL_CLUSTERS_KEY}
             />

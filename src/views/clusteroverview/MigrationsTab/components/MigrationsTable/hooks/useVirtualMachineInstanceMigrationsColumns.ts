@@ -3,14 +3,10 @@ import {
   VirtualMachineInstanceMigrationModelRef,
 } from '@kubevirt-ui/kubevirt-api/console';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
+import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
-import {
-  K8sVerb,
-  TableColumn,
-  useAccessReview,
-  useActiveNamespace,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { K8sVerb, TableColumn, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { sortable } from '@patternfly/react-table';
 
 import { MigrationTableDataLayout } from '../utils/utils';
@@ -20,7 +16,7 @@ const useVirtualMachineInstanceMigrationsColumns = (): [
   TableColumn<MigrationTableDataLayout>[],
 ] => {
   const { t } = useKubevirtTranslation();
-  const [activeNamespace] = useActiveNamespace();
+  const activeNamespace = useActiveNamespace();
   const [canGetNode] = useAccessReview({
     resource: NodeModel.plural,
     verb: 'get' as K8sVerb,

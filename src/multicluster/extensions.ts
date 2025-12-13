@@ -48,6 +48,22 @@ export const extensions: EncodedExtension[] = [
       dataAttributes: {
         'data-border': 'no-border',
         'data-class': 'kv-plugin-virt-perspective-element',
+        'data-quickstart-id': 'qs-nav-virtualization-overview',
+        'data-test-id': 'virtualization-overview-nav-item',
+      },
+      href: '/k8s/all-clusters/all-namespaces/virtualization-overview',
+      id: 'overview-virt-perspective',
+      insertBefore: 'virtualization-catalog-virt-perspective',
+      name: '%plugin__kubevirt-plugin~Overview%',
+      perspective: 'fleet-virtualization-perspective',
+    },
+    type: 'console.navigation/href',
+  } as EncodedExtension<HrefNavItem>,
+  {
+    properties: {
+      dataAttributes: {
+        'data-border': 'no-border',
+        'data-class': 'kv-plugin-virt-perspective-element',
         'data-quickstart-id': 'qs-nav-virtualization-catalog',
         'data-test-id': 'virtualization-catalog-nav-item',
       },
@@ -252,6 +268,22 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'acm.virtualmachine/action',
   } as EncodedExtension<ACMVirtualMachineAction>,
+  {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC_ACM'],
+    },
+    properties: {
+      component: {
+        $codeRef: 'ClusterOverviewPage',
+      },
+      path: [
+        '/k8s/all-clusters/all-namespaces/virtualization-overview',
+        '/k8s/cluster/:cluster/ns/:ns/virtualization-overview',
+        '/k8s/cluster/:cluster/all-namespaces/virtualization-overview',
+      ],
+    },
+    type: 'console.page/route',
+  } as EncodedExtension<RoutePage>,
   {
     properties: {
       component: {

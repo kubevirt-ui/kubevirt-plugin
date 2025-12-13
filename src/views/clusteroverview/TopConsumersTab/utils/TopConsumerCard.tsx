@@ -2,12 +2,12 @@ import React, { FC, useMemo } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
+import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   SetTopConsumerData,
   TopConsumersData,
 } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/types';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { SelectOption } from '@patternfly/react-core';
 
 import { TopConsumerMetric } from './topConsumerMetric';
@@ -28,7 +28,7 @@ const TopConsumerCard: FC<TopConsumersMetricCard> = ({
   setLocalStorageData,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [activeNamespace] = useActiveNamespace();
+  const activeNamespace = useActiveNamespace();
   const isAllNamespaces = activeNamespace === ALL_NAMESPACES_SESSION_KEY;
 
   const metricKey = useMemo(

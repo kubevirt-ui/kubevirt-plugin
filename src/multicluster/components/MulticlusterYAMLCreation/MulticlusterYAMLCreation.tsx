@@ -11,6 +11,7 @@ import { getName } from '@kubevirt-utils/resources/shared';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 import { getFleetResourceRoute, getMulticlusterSearchURL } from '@multicluster/urls';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
 
 import useModelFromParam from './hooks/useModelFromParam';
@@ -19,7 +20,7 @@ import useYAMLTemplateExtension from './hooks/useYAMLTemplateExtension';
 const MulticlusterYAMLCreation: FC = () => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
-
+  const isACMPage = useIsACMPage();
   const [model, loading] = useModelFromParam();
   const { resourceYAMLTemplate, yamlExtensionsResolved } = useYAMLTemplateExtension(model);
 
@@ -59,7 +60,12 @@ const MulticlusterYAMLCreation: FC = () => {
 
   return (
     <>
-      <ClusterProjectDropdown includeAllClusters={false} showProjectDropdown={model?.namespaced} />
+      {isACMPage && (
+        <ClusterProjectDropdown
+          includeAllClusters={false}
+          showProjectDropdown={model?.namespaced}
+        />
+      )}
       <ResourceYAMLEditor
         create
         header={t('Create {{kind}}', { kind: model.kind })}

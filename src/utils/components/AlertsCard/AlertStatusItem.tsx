@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom-v5-compat';
 
 import { AlertType, SimplifiedAlert } from '@kubevirt-utils/components/AlertsCard/utils/types';
 import { alertIcon } from '@kubevirt-utils/components/AlertsCard/utils/utils';
-import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import './AlertStatusItem.scss';
@@ -15,7 +14,7 @@ type AlertStatusItemProps = {
 
 const AlertStatusItem: React.FC<AlertStatusItemProps> = ({ alertDetails, alertType }) => {
   const { t } = useKubevirtTranslation();
-  const { alertName, description, isVMAlert, link, time } = alertDetails;
+  const { alertName, description, isVMAlert, link, time: _time } = alertDetails;
   const Icon = alertIcon[alertType];
 
   return (
@@ -35,7 +34,8 @@ const AlertStatusItem: React.FC<AlertStatusItemProps> = ({ alertDetails, alertTy
                   {t('VM')}
                 </span>
               )}
-              <Timestamp className="alert-item__timestamp" hideIcon timestamp={time} />
+              {/* For now we are not showing the timestamp as it is not available in the alert data
+              <Timestamp className="alert-item__timestamp" hideIcon timestamp={time} />  */}
             </span>
           </div>
           <div className="alert-name">{alertName}</div>

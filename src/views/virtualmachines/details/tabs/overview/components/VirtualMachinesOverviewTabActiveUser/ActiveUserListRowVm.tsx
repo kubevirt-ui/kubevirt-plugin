@@ -4,15 +4,15 @@ import { V1VirtualMachineInstanceGuestOSUser } from '@kubevirt-ui/kubevirt-api/k
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { fromNow } from '@kubevirt-utils/components/Timestamp/utils/datetime';
 import {
-  MILLISECONDS_TO_SECONDS_MULTIPLIER,
   NO_DATA_DASH,
+  SECONDS_TO_MILLISECONDS_MULTIPLIER,
 } from '@kubevirt-utils/resources/vm/utils/constants';
 import { RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 
 type ActiveUserListRowProps = RowProps<V1VirtualMachineInstanceGuestOSUser, { kind: string }>;
 
 const ActiveUserListRowVm: React.FC<ActiveUserListRowProps> = ({ activeColumnIDs, obj }) => {
-  const time = obj?.loginTime * MILLISECONDS_TO_SECONDS_MULTIPLIER;
+  const time = obj?.loginTime * SECONDS_TO_MILLISECONDS_MULTIPLIER;
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} id="userName">

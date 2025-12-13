@@ -1,3 +1,4 @@
+import { ALL_CLUSTERS_KEY, ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
 import { Perspective, ResolvedExtension } from '@openshift-console/dynamic-plugin-sdk';
 
 import virtualizationIcon from './virtualization-icon';
@@ -9,7 +10,7 @@ export const icon: ResolvedExtension<Perspective>['properties']['icon'] = {
 };
 
 export const getLandingPageURL: ResolvedExtension<Perspective>['properties']['landingPageURL'] =
-  () => `/k8s/all-namespaces/virtualization-overview`;
+  () => `/k8s/${ALL_NAMESPACES}/virtualization-overview`;
 
 export const getVirtualizationLandingPageURL: ResolvedExtension<Perspective>['properties']['landingPageURL'] =
   () => `/k8s/virtualization-landing`;
@@ -18,4 +19,4 @@ export const getImportRedirectURL: ResolvedExtension<Perspective>['properties'][
   (namespace: string) => `/k8s/ns/${namespace}/virtualization-overview`;
 
 export const getACMLandingPageURL: ResolvedExtension<Perspective>['properties']['landingPageURL'] =
-  () => `/k8s/all-clusters/all-namespaces/kubevirt.io~v1~VirtualMachine`;
+  () => `/k8s/${ALL_CLUSTERS_KEY}/${ALL_NAMESPACES}/virtualization-overview`;
