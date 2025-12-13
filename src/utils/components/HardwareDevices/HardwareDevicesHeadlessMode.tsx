@@ -5,6 +5,7 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isHeadlessMode } from '@kubevirt-utils/resources/vm';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Flex, FlexItem, Switch } from '@patternfly/react-core';
 
 import DescriptionItem from '../DescriptionItem/DescriptionItem';
@@ -56,6 +57,8 @@ const HardwareDevicesHeadlessMode: FC<HardwareDevicesHeadlessModeProps> = ({ onS
         breadcrumb="VirtualMachine.spec.template.devices.autoattachGraphicsDevice"
         descriptionHeader={t('Headless mode')}
         isPopover
+        olsObj={vm}
+        promptType={OLSPromptType.HEADLESS_MODE}
       />
     </>
   );

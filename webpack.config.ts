@@ -161,7 +161,12 @@ const config: Configuration = {
     new ProvidePlugin({
       process: 'process/browser',
     }),
-    new DefinePlugin({ 'process.env': JSON.stringify({ NODE_ENV: process.env.NODE_ENV }) }),
+    new DefinePlugin({
+      'process.env': JSON.stringify({ NODE_ENV: process.env.NODE_ENV }),
+      'process.env.OLS_API_BASE_URL': JSON.stringify({
+        OLS_API_BASE_URL: process.env.OLS_API_BASE_URL,
+      }),
+    }),
   ],
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx'],

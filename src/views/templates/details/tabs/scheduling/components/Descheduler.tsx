@@ -5,6 +5,7 @@ import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import useDeschedulerSetting from '@kubevirt-utils/hooks/useDeschedulerSetting/useDeschedulerSetting';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { V1Template } from '@kubevirt-utils/models';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Button, ButtonVariant, Switch } from '@patternfly/react-core';
 import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 
@@ -50,6 +51,8 @@ const Descheduler: FC<DeschedulerProps> = ({ template }) => {
         }
         descriptionHeader={t('Descheduler')}
         isPopover
+        olsObj={template}
+        promptType={OLSPromptType.DESCHEDULER}
       />
     </>
   );

@@ -13,6 +13,8 @@ import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFi
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { FormGroup, PopoverPosition } from '@patternfly/react-core';
 
 import { getSelectedKeyByLabel } from './utils/utils';
@@ -70,7 +72,13 @@ const PreferenceSelect: FC<PreferenceSelectProps> = ({
         <>
           {t('Preference')}{' '}
           <HelpTextIcon
-            bodyContent={<PreferencePopoverContent />}
+            bodyContent={(hide) => (
+              <LightspeedSimplePopoverContent
+                content={<PreferencePopoverContent />}
+                hide={hide}
+                promptType={OLSPromptType.PREFERENCE}
+              />
+            )}
             position={PopoverPosition.right}
           />
         </>

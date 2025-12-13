@@ -6,6 +6,8 @@ import { FEATURE_HCO_PERSISTENT_RESERVATION } from '@kubevirt-utils/hooks/useFea
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { CLUSTER_TAB_IDS } from '@overview/SettingsTab/search/constants';
 import { Alert, AlertVariant } from '@patternfly/react-core';
@@ -56,8 +58,15 @@ const PersistentReservationSection: FC<PersistentReservationSectionProps> = ({
       toggleText={t('SCSI persistent reservation')}
     >
       <SectionWithSwitch
-        helpTextIconContent={t(
-          'The SCSI reservation for disk makes the disk attached to the VirtualMachine as a SCSI LUN. This option should only be used for cluster-aware applications',
+        helpTextIconContent={(hide) => (
+          <LightspeedSimplePopoverContent
+            content={t(
+              'The SCSI reservation for disk makes the disk attached to the VirtualMachine as a SCSI LUN. This option should only be used for cluster-aware applications',
+            )}
+            hide={hide}
+            obj={hyperConvergeConfiguration?.[0]}
+            promptType={OLSPromptType.ENABLE_PERSISTENT_RESERVATION}
+          />
         )}
         dataTestID="persistent-reservation"
         isDisabled={!hyperLoaded}

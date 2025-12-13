@@ -5,6 +5,8 @@ import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/Sect
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, AlertVariant } from '@patternfly/react-core';
 
@@ -60,8 +62,15 @@ const KernelSamepageMerging: FC<KernelSamepageMergingProps> = ({
   return (
     <>
       <SectionWithSwitch
-        helpTextIconContent={t(
-          'KSM is a memory-saving deduplication feature designed to fit more VirtualMachines into physical memory by sharing the data common between them. It is specifically effective for similar VirtualMachines. KSM should only be used with trusted workloads. Turning this feature on enables it for all nodes in the cluster.',
+        helpTextIconContent={(hide) => (
+          <LightspeedSimplePopoverContent
+            content={t(
+              'KSM is a memory-saving deduplication feature designed to fit more VirtualMachines into physical memory by sharing the data common between them. It is specifically effective for similar VirtualMachines. KSM should only be used with trusted workloads. Turning this feature on enables it for all nodes in the cluster.',
+            )}
+            hide={hide}
+            obj={hyperConvergeConfiguration?.[0]}
+            promptType={OLSPromptType.KERNEL_SAMEPAGE_MERGING}
+          />
         )}
         dataTestID="kernel-samepage-merging"
         isDisabled={!hyperLoaded}

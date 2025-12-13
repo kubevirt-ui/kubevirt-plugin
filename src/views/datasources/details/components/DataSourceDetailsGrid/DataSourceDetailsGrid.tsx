@@ -13,6 +13,7 @@ import DescriptionItemNamespace from '@kubevirt-utils/components/DescriptionItem
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import OwnerDetailsItem from '@kubevirt-utils/components/OwnerDetailsItem/OwnerDetailsItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, Grid, GridItem } from '@patternfly/react-core';
 
@@ -75,6 +76,8 @@ export const DataSourceDetailsGrid: React.FC<DataSourceDetailsGridProps> = ({ da
             descriptionData={<DataSourcePreferenceLink dataSource={dataSource} />}
             descriptionHeader={t('Preference')}
             isPopover
+            olsObj={dataSource}
+            promptType={OLSPromptType.PREFERENCE}
           />
         </DescriptionList>
       </GridItem>

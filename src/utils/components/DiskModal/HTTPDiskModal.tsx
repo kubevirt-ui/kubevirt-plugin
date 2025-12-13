@@ -71,7 +71,7 @@ const HTTPDiskModal: FC<V1SubDiskModalProps> = ({
         <DiskTypeSelect isVMRunning={isVMRunning} />
         <DiskInterfaceSelect isVMRunning={isVMRunning} />
         {!isCreated && <StorageClassAndPreallocation vm={vm} />}
-        <AdvancedSettings showApplyStorageProfileSettings={!isCreated} />
+        <AdvancedSettings olsObj={pvc} showApplyStorageProfileSettings={!isCreated} />
       </TabModal>
     </FormProvider>
   );

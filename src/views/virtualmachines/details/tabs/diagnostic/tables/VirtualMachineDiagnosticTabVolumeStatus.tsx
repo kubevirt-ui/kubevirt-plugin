@@ -4,6 +4,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import { columnSorting } from '@kubevirt-utils/utils/utils';
+import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 import { Flex, FlexItem, Pagination } from '@patternfly/react-core';
 import { Table, Th, Thead, Tr } from '@patternfly/react-table';
@@ -50,8 +52,14 @@ const VirtualMachineDiagnosticTabVolumeStatus: FC<VirtualMachineDiagnosticTabVol
         <Flex justifyContent={{ default: 'justifyContentSpaceBetween' }}>
           <FlexItem>
             <VirtualMachineDiagnosticTabTableTitle
-              helpContent={t(
-                'Volume Snapshot Status is a mechanism for reporting if a volume can be snapshotted or not.',
+              helpContent={(hide) => (
+                <LightspeedSimplePopoverContent
+                  content={t(
+                    'Volume Snapshot Status is a mechanism for reporting if a volume can be snapshotted or not.',
+                  )}
+                  hide={hide}
+                  promptType={OLSPromptType.VOLUME_SNAPSHOT_STATUS}
+                />
               )}
               title={t('Volume snapshot status')}
             />

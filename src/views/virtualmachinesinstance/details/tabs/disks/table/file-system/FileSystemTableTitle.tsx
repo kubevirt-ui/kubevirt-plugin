@@ -2,6 +2,8 @@ import React from 'react';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Flex, FlexItem, PopoverPosition, Title } from '@patternfly/react-core';
 
 const FileSystemTableTitle = () => {
@@ -14,8 +16,14 @@ const FileSystemTableTitle = () => {
       </FlexItem>
       <FlexItem>
         <HelpTextIcon
-          bodyContent={t(
-            'The following information regarding how the disks are partitioned is provided by the guest agent.',
+          bodyContent={(hide) => (
+            <LightspeedSimplePopoverContent
+              content={t(
+                'The following information regarding how the disks are partitioned is provided by the guest agent.',
+              )}
+              hide={hide}
+              promptType={OLSPromptType.FILE_SYSTEMS}
+            />
           )}
           position={PopoverPosition.right}
         />

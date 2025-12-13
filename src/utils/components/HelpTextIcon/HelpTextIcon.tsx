@@ -7,7 +7,7 @@ import { HelpIcon } from '@patternfly/react-icons';
 import './HelpTextIcon.scss';
 
 type HelpTextIconProps = {
-  bodyContent: ReactNode;
+  bodyContent: ((hide: () => void) => ReactNode) | ReactNode;
   className?: string;
   footerContent?: ReactNode;
   headerContent?: ReactNode;

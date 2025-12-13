@@ -8,6 +8,8 @@ import {
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ClaimPropertySets } from '@kubevirt-utils/types/storage';
+import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { FormGroup, Radio } from '@patternfly/react-core';
 
 import HelpTextIcon from '../HelpTextIcon/HelpTextIcon';
@@ -38,15 +40,21 @@ export const AccessMode: FC<AccessModeProps> = ({
     <FormGroup
       labelHelp={
         <HelpTextIcon
-          bodyContent={
-            <Trans ns="plugin__kubevirt-plugin" t={t}>
-              Learn more about{' '}
-              <a href={documentationURL.ACCESS_MODE} rel="noopener noreferrer" target="_blank">
-                access modes
-              </a>
-              .
-            </Trans>
-          }
+          bodyContent={(hide) => (
+            <LightspeedSimplePopoverContent
+              content={
+                <Trans ns="plugin__kubevirt-plugin" t={t}>
+                  Learn more about{' '}
+                  <a href={documentationURL.ACCESS_MODE} rel="noopener noreferrer" target="_blank">
+                    access modes
+                  </a>
+                  .
+                </Trans>
+              }
+              hide={hide}
+              promptType={OLSPromptType.ACCESS_MODE}
+            />
+          )}
         />
       }
       isStack
