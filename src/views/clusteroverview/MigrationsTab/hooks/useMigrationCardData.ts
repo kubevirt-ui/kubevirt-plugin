@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+
 import {
   VirtualMachineInstanceMigrationModelGroupVersionKind,
   VirtualMachineInstanceModelGroupVersionKind,
@@ -7,14 +9,15 @@ import {
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
+import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import useMigrationPolicies from '@kubevirt-utils/hooks/useMigrationPolicies';
+import useActiveClusterParam from '@multicluster/hooks/useActiveClusterParam';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import {
   OnFilterChange,
   RowFilter,
-  useK8sWatchResource,
   useListPageFilter,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 
 import useHyperConvergedMigrations from '../components/MigrationsLimitionsPopover/hooks/useHyperConvergedMigrations';
 import {
@@ -28,9 +31,9 @@ import {
 } from '../components/MigrationsTable/utils/utils';
 
 export type UseMigrationCardDataAndFiltersValues = {
-  filters: RowFilter<any>[];
+  filters: RowFilter<MigrationTableDataLayout>[];
   loaded: boolean;
-  loadErrors: any;
+  loadErrors: Error | unknown;
   migrationsTableFilteredData: MigrationTableDataLayout[];
   migrationsTableUnfilteredData: MigrationTableDataLayout[];
   onFilterChange: OnFilterChange;
@@ -41,22 +44,38 @@ type UseMigrationCardDataAndFilters = (duration: string) => UseMigrationCardData
 
 const useMigrationCardDataAndFilters: UseMigrationCardDataAndFilters = (duration: string) => {
   const migrationsDefaultConfigurations = useHyperConvergedMigrations();
-  const [activeNamespace] = useActiveNamespace();
-  const namespace = activeNamespace !== ALL_NAMESPACES_SESSION_KEY ? activeNamespace : null;
+  const activeNamespace = useActiveNamespace();
+  const cluster = useActiveClusterParam();
+  const namespace = useMemo(
+    () => (activeNamespace !== ALL_NAMESPACES_SESSION_KEY ? activeNamespace : undefined),
+    [activeNamespace],
+  );
 
-  const [vmims, vmimsLoaded, vmimsErrors] = useK8sWatchResource<
-    V1VirtualMachineInstanceMigration[]
-  >({
-    groupVersionKind: VirtualMachineInstanceMigrationModelGroupVersionKind,
-    isList: true,
-    namespace,
-  });
+  const [vmims, vmimsLoaded, vmimsErrors] = useK8sWatchData<V1VirtualMachineInstanceMigration[]>(
+    useMemo(
+      () => ({
+        cluster,
+        groupVersionKind: VirtualMachineInstanceMigrationModelGroupVersionKind,
+        isList: true,
+        namespace,
+        namespaced: Boolean(namespace),
+      }),
+      [cluster, namespace],
+    ),
+  );
 
-  const [vmis, vmisLoaded, vmisErrors] = useK8sWatchResource<V1VirtualMachineInstance[]>({
-    groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
-    isList: true,
-    namespace,
-  });
+  const [vmis, vmisLoaded, vmisErrors] = useK8sWatchData<V1VirtualMachineInstance[]>(
+    useMemo(
+      () => ({
+        cluster,
+        groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
+        isList: true,
+        namespace,
+        namespaced: Boolean(namespace),
+      }),
+      [cluster, namespace],
+    ),
+  );
 
   const [mps] = useMigrationPolicies();
 

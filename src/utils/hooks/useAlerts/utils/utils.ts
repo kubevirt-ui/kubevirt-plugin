@@ -1,4 +1,4 @@
-import { Group, PrometheusRulesResponse } from '@kubevirt-utils/types/prometheus';
+import { Group } from '@kubevirt-utils/types/prometheus';
 import { generateAlertId } from '@kubevirt-utils/utils/prometheus';
 import {
   Alert,
@@ -13,24 +13,6 @@ import {
 
 export const addAlertIdToRule = (group: Group, rule: PrometheusRule): Rule => {
   return { ...rule, id: generateAlertId(group, rule) };
-};
-
-export const getAlertsAndRules = (
-  data: PrometheusRulesResponse['data'],
-): { alerts: Alert[]; rules: Rule[] } => {
-  // Flatten the rules data to make it easier to work with, discard non-alerting rules since those
-  // are the only ones we will be using and add a unique ID to each rule.
-  const groups = data?.groups as Group[];
-  const rules = groups?.flatMap((group) =>
-    group?.rules
-      ?.filter((rule) => rule?.type === 'alerting')
-      ?.map((rule) => addAlertIdToRule(group, rule)),
-  );
-
-  // Add rule object to each alert
-  const alerts = rules?.flatMap((rule) => rule?.alerts?.map((alert) => ({ rule, ...alert })));
-
-  return { alerts, rules };
 };
 
 export const isSilenced = (alert: Alert | PrometheusAlert, silence: Silence): boolean =>
@@ -51,7 +33,7 @@ const getSilencesForRule = (alert: Alert, activeSilences: Silence[]): Silence[] 
     alert?.rule?.alerts?.some((ruleAlert) => isSilenced(ruleAlert, silence)),
   );
 
-const setRuleAlertsState = (alert: Alert) =>
+const setRuleAlertsState = (alert: Alert): void =>
   alert?.rule?.alerts?.forEach((ruleAlert) => {
     if (alert?.silencedBy?.some((silence) => isSilenced(ruleAlert, silence))) {
       ruleAlert.state = AlertStates.Silenced;
@@ -60,7 +42,7 @@ const setRuleAlertsState = (alert: Alert) =>
 
 const alertIsSilenced = (alert: Alert): boolean => alert?.silencedBy?.length > 0;
 
-const allRuleAlertsAreSilenced = (alert): boolean =>
+const allRuleAlertsAreSilenced = (alert: Alert): boolean =>
   alert?.rule?.alerts?.every((rulesAlert) => rulesAlert.state === AlertStates.Silenced);
 
 /**
@@ -69,7 +51,7 @@ const allRuleAlertsAreSilenced = (alert): boolean =>
  * @param alerts All alerts in the cluster
  * @param silences All silences in the cluster
  */
-export const silenceFiringAlerts = (alerts: Alert[], silences): Alert[] => {
+export const silenceFiringAlerts = (alerts: Alert[], silences: Silence[]): Alert[] => {
   const activeSilences = silences?.filter(
     (silence) => silence?.status?.state === SilenceStates.Active,
   );

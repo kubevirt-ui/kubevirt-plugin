@@ -18,6 +18,7 @@ type HorizontalNavbarProps = {
   instanceTypeExpandedSpec?: V1VirtualMachine;
   loaded: boolean;
   pages: NavPageKubevirt[];
+  routesClassName?: string;
   vm?: V1VirtualMachine;
 };
 
@@ -27,6 +28,7 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
   instanceTypeExpandedSpec,
   loaded,
   pages,
+  routesClassName,
   vm,
 }) => {
   const location = useLocation();
@@ -105,7 +107,9 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
           })}
         </ul>
       </nav>
-      <Routes>{RoutesComponents}</Routes>
+      <div className={routesClassName || 'horizontal-navbar__routes'}>
+        <Routes>{RoutesComponents}</Routes>
+      </div>
     </>
   );
 };

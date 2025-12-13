@@ -8,15 +8,19 @@ import { Alert } from '@openshift-console/dynamic-plugin-sdk';
 
 import { AlertResource } from '../../status-card/utils/utils';
 
-type UseSimplifiedAlerts = () => SimplifiedAlerts;
+type UseSimplifiedAlerts = () => {
+  alerts: SimplifiedAlerts;
+  error: Error | unknown;
+  loaded: boolean;
+};
 
 const getAlertURL = (alert: Alert) =>
   `${AlertResource.plural}/${alert?.rule?.id}?${labelsToParams(alert.labels)}`;
 
 const useSimplifiedAlerts: UseSimplifiedAlerts = () => {
-  const [alerts] = useKubevirtAlerts();
+  const [alerts, loaded, error] = useKubevirtAlerts();
 
-  return React.useMemo(() => {
+  const simplifiedAlerts = React.useMemo(() => {
     // eslint-disable-next-line perfectionist/sort-objects
     const data = { critical: [], warning: [], info: [] };
     return (
@@ -36,6 +40,8 @@ const useSimplifiedAlerts: UseSimplifiedAlerts = () => {
       }, data) || data
     );
   }, [alerts]);
+
+  return { alerts: simplifiedAlerts, error, loaded };
 };
 
 export default useSimplifiedAlerts;

@@ -2,6 +2,8 @@ import * as React from 'react';
 
 import DurationDropdown from '@kubevirt-utils/components/DurationOption/DurationDropdown';
 import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
+import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
+import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -37,9 +39,9 @@ const MigrationsTab: React.FC = () => {
 
   const migrationCardDataAndFilters = useMigrationCardDataAndFilters(duration);
 
-  const { onFilterChange, vmims } = migrationCardDataAndFilters || {};
+  const { loaded, loadErrors, onFilterChange, vmims } = migrationCardDataAndFilters || {};
 
-  const filteredVMIMS = getFilteredDurationVMIMS(vmims, duration);
+  const filteredVMIMS = getFilteredDurationVMIMS(vmims ?? [], duration);
 
   const onDurationSelect = (value: string) =>
     setDuration(DurationOption.fromDropdownLabel(value)?.toString());
@@ -64,7 +66,13 @@ const MigrationsTab: React.FC = () => {
           <CardTitle>{t('VirtualMachineInstanceMigrations information')} </CardTitle>
         </CardHeader>
         <CardBody className="kv-monitoring-card__body">
-          {!isEmpty(filteredVMIMS) ? (
+          {loadErrors && <ErrorAlert error={loadErrors} />}
+          {!loaded && !loadErrors && (
+            <Bullseye>
+              <LoadingEmptyState />
+            </Bullseye>
+          )}
+          {loaded && !loadErrors && !isEmpty(filteredVMIMS) && (
             <Grid>
               <GridItem className="kv-monitoring-card__graph-separator" span={6}>
                 <CardHeader
@@ -93,7 +101,8 @@ const MigrationsTab: React.FC = () => {
                 <MigrationTable tableData={migrationCardDataAndFilters} />
               </GridItem>
             </Grid>
-          ) : (
+          )}
+          {loaded && !loadErrors && isEmpty(filteredVMIMS) && (
             <Bullseye>
               <MigrationEmptyState />
             </Bullseye>

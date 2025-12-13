@@ -1,0 +1,27 @@
+.cluster-overview-page {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - var(--pf-v6-c-page__main-section--PaddingTop, 0px));
+  overflow: hidden;
+
+  &__header {
+    flex-shrink: 0;
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  &__routes {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+}

@@ -11,7 +11,10 @@ import { useFleetClusterNames } from '@stolostron/multicluster-sdk';
 type ClusterDropdownProps = {
   bookmarkCluster?: string;
   disabled?: boolean;
+  disabledClusters?: string[];
+  disabledItemTooltip?: string;
   includeAllClusters?: boolean;
+  omittedClusters?: string[];
   onChange: (cluster: string) => void;
   selectedCluster: string;
 };
@@ -19,13 +22,24 @@ type ClusterDropdownProps = {
 const ClusterDropdown: FC<ClusterDropdownProps> = ({
   bookmarkCluster,
   disabled = false,
+  disabledClusters,
+  disabledItemTooltip,
   includeAllClusters = true,
+  omittedClusters,
   onChange,
   selectedCluster,
 }): JSX.Element => {
   const { t } = useKubevirtTranslation();
   const [clusterNames, clustersLoaded] = useFleetClusterNames();
   const [bookmarks, updateBookmarks, bookmarksLoaded] = useConsoleClusterBookmarks(bookmarkCluster);
+
+  const isItemDisabled = useMemo(() => {
+    if (!disabledClusters || disabledClusters.length === 0) {
+      return undefined;
+    }
+    const disabledSet = new Set(disabledClusters);
+    return (key: string) => disabledSet.has(key);
+  }, [disabledClusters]);
 
   const config: DropdownConfig = useMemo(
     () => ({
@@ -59,11 +73,14 @@ const ClusterDropdown: FC<ClusterDropdownProps> = ({
       }}
       config={config}
       disabled={disabled}
+      disabledItemTooltip={disabledItemTooltip}
       extractKey={(name) => name}
       extractTitle={(name) => name}
       includeAllItems={includeAllClusters}
+      isItemDisabled={isItemDisabled}
       items={clusterNames || null}
       itemsLoaded={clustersLoaded}
+      omittedItems={omittedClusters}
       onChange={onChange}
       selectedItem={selectedCluster}
     />
