@@ -4,6 +4,7 @@ import CheckupImageField from 'src/views/checkups/components/CheckupImageField';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useRelatedImage from '@kubevirt-utils/hooks/useRelatedImage';
 import { generatePrettyName } from '@kubevirt-utils/utils/utils';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import {
   Button,
   ButtonVariant,
@@ -26,11 +27,13 @@ import './checkups-storage-form.scss';
 
 const CheckupsStorageForm = () => {
   const { t } = useKubevirtTranslation();
+  const cluster = useClusterParam();
   const [name, setName] = useState<string>(generatePrettyName('kubevirt-storage-checkup'));
   const [timeOut, setTimeOut] = useState<string>('10');
-  const [checkupImage, checkupImageLoaded, checkupImageLoadError] = useRelatedImage(
-    storageCheckupImageSettings,
-  );
+  const [checkupImage, checkupImageLoaded, checkupImageLoadError] = useRelatedImage({
+    ...storageCheckupImageSettings,
+    cluster,
+  });
 
   return (
     <Grid>

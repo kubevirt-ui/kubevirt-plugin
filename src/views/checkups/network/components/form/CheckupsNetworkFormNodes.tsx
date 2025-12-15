@@ -6,7 +6,8 @@ import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFi
 import { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import {
   Button,
   ButtonVariant,
@@ -38,8 +39,10 @@ const CheckupsNetworkFormNodes = ({
   setNodeTarget,
 }) => {
   const { t } = useKubevirtTranslation();
+  const cluster = useClusterParam();
 
-  const [nodes] = useK8sWatchResource<IoK8sApiCoreV1Node[]>({
+  const [nodes] = useK8sWatchData<IoK8sApiCoreV1Node[]>({
+    cluster,
     groupVersionKind: modelToGroupVersionKind(NodeModel),
     isList: true,
   });
