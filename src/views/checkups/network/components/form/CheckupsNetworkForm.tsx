@@ -4,6 +4,7 @@ import CheckupImageField from 'src/views/checkups/components/CheckupImageField';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useRelatedImage from '@kubevirt-utils/hooks/useRelatedImage';
 import { generatePrettyName } from '@kubevirt-utils/utils/utils';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { Form, FormGroup, FormSection, Grid, GridItem, TextInput } from '@patternfly/react-core';
 
 import { networkCheckupImageSettings } from '../../utils/const';
@@ -17,9 +18,11 @@ import './checkups-network-form.scss';
 
 const CheckupsNetworkForm = () => {
   const { t } = useKubevirtTranslation();
-  const [checkupImage, checkupImageLoaded, checkupImageLoadError] = useRelatedImage(
-    networkCheckupImageSettings,
-  );
+  const cluster = useClusterParam();
+  const [checkupImage, checkupImageLoaded, checkupImageLoadError] = useRelatedImage({
+    ...networkCheckupImageSettings,
+    cluster,
+  });
   const [isDesiredLatency, setIsDesiredLatency] = useState<boolean>(false);
   const [isNodesChecked, setIsNodesChecked] = useState<boolean>(false);
 

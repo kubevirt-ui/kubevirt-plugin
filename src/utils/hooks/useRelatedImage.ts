@@ -1,13 +1,15 @@
 import { useKubevirtClusterServiceVersion } from './useKubevirtClusterServiceVersion';
 
 const useRelatedImage = ({
+  cluster,
   fallback,
   name,
 }: {
+  cluster?: string;
   fallback: string;
   name: string;
 }): [string | undefined, boolean, Error] => {
-  const { installedCSV, loaded, loadErrors } = useKubevirtClusterServiceVersion();
+  const { installedCSV, loaded, loadErrors } = useKubevirtClusterServiceVersion(cluster);
   if (!loaded || loadErrors) {
     return [undefined, loaded, loadErrors];
   }

@@ -9,7 +9,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useRelatedImage from '@kubevirt-utils/hooks/useRelatedImage';
 import { modelToGroupVersionKind, StorageClassModel } from '@kubevirt-utils/models';
 import { generatePrettyName, isEmpty } from '@kubevirt-utils/utils/utils';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import {
   Alert,
   AlertVariant,
@@ -37,6 +38,7 @@ import './checkups-self-validation-form.scss';
 
 const CheckupsSelfValidationForm = () => {
   const { t } = useKubevirtTranslation();
+  const cluster = useClusterParam();
   const [name, setName] = useState<string>(generatePrettyName(SELF_VALIDATION_NAME));
   const [checkupImage, checkupImageLoaded, checkupImageLoadError] = useRelatedImage(
     selfValidationCheckupImageSettings,
@@ -59,9 +61,8 @@ const CheckupsSelfValidationForm = () => {
     setPvcSize(defaultPvcSize);
   }, [defaultPvcSize]);
 
-  const [storageClasses, storageClassesLoaded] = useK8sWatchResource<
-    IoK8sApiStorageV1StorageClass[]
-  >({
+  const [storageClasses, storageClassesLoaded] = useK8sWatchData<IoK8sApiStorageV1StorageClass[]>({
+    cluster,
     groupVersionKind: modelToGroupVersionKind(StorageClassModel),
     isList: true,
   });
