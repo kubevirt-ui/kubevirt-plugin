@@ -12,7 +12,7 @@ import {
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { getCPU, getMemory } from '@kubevirt-utils/resources/vm';
+import { getMemory } from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
@@ -28,7 +28,7 @@ import { VMStatusConditionLabelList } from '../VMStatusConditionLabel';
 
 import CPUPercentage from './components/CPUPercentage';
 import MemoryPercentage from './components/MemoryPercentage';
-import NetworkUsage from './components/NetworkUsage';
+import NetworkPercentage from './components/NetworkPercentage';
 
 import './virtual-machine-row-layout.scss';
 
@@ -96,10 +96,10 @@ const VirtualMachineRowLayout: FC<
         <MemoryPercentage vm={obj} vmiMemory={getMemory(vmi)} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="cpu-usage">
-        <CPUPercentage vm={obj} vmiCPU={getCPU(vmi)} />
+        <CPUPercentage vm={obj} vmi={vmi} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="network-usage">
-        <NetworkUsage vm={obj} />
+        <NetworkPercentage vm={obj} vmi={vmi} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="deletion-protection">
         {getDeletionProtectionPrintableStatus(obj)}
