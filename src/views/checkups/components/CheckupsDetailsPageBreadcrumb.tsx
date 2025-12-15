@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { Breadcrumb, BreadcrumbItem, Button, ButtonVariant } from '@patternfly/react-core';
 
 import { CHECKUP_URLS } from '../utils/constants';
@@ -19,13 +20,20 @@ const CheckupsDetailsPageBreadcrumb: FC<CheckupsDetailsPageBreadcrumbProps> = ({
 }) => {
   const navigate = useNavigate();
   const namespace = useActiveNamespace();
+  const cluster = useClusterParam();
 
   return (
     <Breadcrumb>
       <BreadcrumbItem>
         <Button
+          onClick={() =>
+            navigate(
+              cluster
+                ? `/k8s/cluster/${cluster}/ns/${namespace}/checkups/${checkupType}`
+                : `/k8s/ns/${namespace}/checkups/${checkupType}`,
+            )
+          }
           isInline
-          onClick={() => navigate(`/k8s/ns/${namespace}/checkups/${checkupType}`)}
           variant={ButtonVariant.link}
         >
           {parentLabel}

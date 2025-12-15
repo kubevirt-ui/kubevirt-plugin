@@ -373,6 +373,55 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
+
+  {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC'],
+    },
+    properties: {
+      component: {
+        $codeRef: 'CheckupsNetworkForm',
+      },
+      path: ['/k8s/cluster/:cluster/ns/:ns/checkups/network/form'],
+    },
+    type: 'console.page/route',
+  } as EncodedExtension<RoutePage>,
+  {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC'],
+    },
+    properties: {
+      component: {
+        $codeRef: 'CheckupsNetworkDetailsPage',
+      },
+      path: ['/k8s/cluster/:cluster/ns/:ns/checkups/network/:checkupName'],
+    },
+    type: 'console.page/route',
+  } as EncodedExtension<RoutePage>,
+  {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC'],
+    },
+    properties: {
+      component: {
+        $codeRef: 'CheckupsStorageForm',
+      },
+      path: ['/k8s/cluster/:cluster/ns/:ns/checkups/storage/form'],
+    },
+    type: 'console.page/route',
+  } as EncodedExtension<RoutePage>,
+  {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC'],
+    },
+    properties: {
+      component: {
+        $codeRef: 'CheckupsStorageDetailsPage',
+      },
+      path: ['/k8s/cluster/:cluster/ns/:ns/checkups/storage/:checkupName'],
+    },
+    type: 'console.page/route',
+  } as EncodedExtension<RoutePage>,
   {
     flags: {
       required: ['KUBEVIRT_DYNAMIC'],
