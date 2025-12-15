@@ -1,24 +1,18 @@
 import React from 'react';
-import { useParams } from 'react-router-dom-v5-compat';
 
 import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
 import { HorizontalNav } from '@openshift-console/dynamic-plugin-sdk';
 
 import CheckupsNotFound from '../../components/CheckupsNotFound';
-import { getJobByName } from '../../utils/utils';
-import useCheckupsSelfValidationData from '../components/hooks/useCheckupsSelfValidationData';
 
 import { useCheckupsSelfValidationTabs } from './hooks/useCheckupsSelfValidationTabs';
+import useWatchCheckupData from './hooks/useWatchCheckupData';
 import CheckupsSelfValidationDetailsPageHeader from './CheckupsSelfValidationDetailsPageHeader';
 
 import './checkups-self-validation-details-page.scss';
 
 const CheckupsSelfValidationDetailsPage = () => {
-  const { checkupName } = useParams<{ checkupName: string }>();
-  const { configMaps, error, jobs, loaded } = useCheckupsSelfValidationData();
-
-  const configMap = configMaps?.find((cm) => cm.metadata.name === checkupName);
-  const jobMatches = configMap ? getJobByName(jobs, configMap.metadata.name, false) : [];
+  const { configMap, error, jobMatches, loaded } = useWatchCheckupData();
 
   const pages = useCheckupsSelfValidationTabs();
   const notFound = !configMap && loaded;

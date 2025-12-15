@@ -7,7 +7,10 @@ import DropdownToggle from '@kubevirt-utils/components/toggles/DropdownToggle';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getCluster } from '@multicluster/helpers/selectors';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
+import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import DeleteCheckupModal from '../../components/DeleteCheckupModal';
 import { getCheckupImageFromNewestJob } from '../../utils/utils';
@@ -27,7 +30,10 @@ const CheckupsNetworkActions: FC<CheckupsNetworkActionsProps> = ({
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const { createModal } = useModal();
+  const isACMPage = useIsACMPage();
   const [isActionsOpen, setIsActionsOpen] = useState<boolean>(false);
+  const [hubClusterName] = useHubClusterName();
+  const cluster = getCluster(configMap) || hubClusterName;
 
   const checkupImage = getCheckupImageFromNewestJob(jobs);
 
@@ -39,7 +45,13 @@ const CheckupsNetworkActions: FC<CheckupsNetworkActionsProps> = ({
   const deleteCheckup = () => {
     setIsActionsOpen(false);
     deleteNetworkCheckup(configMap, jobs);
-    navigate(`/k8s/ns/${configMap?.metadata?.namespace}/checkups`);
+    const namespace = getNamespace(configMap);
+
+    navigate(
+      isACMPage
+        ? `/k8s/cluster/${cluster}/ns/${namespace}/checkups`
+        : `/k8s/ns/${namespace}/checkups`,
+    );
   };
 
   return (
