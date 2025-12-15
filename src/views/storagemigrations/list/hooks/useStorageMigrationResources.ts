@@ -1,56 +1,34 @@
+import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import {
-  DEFAULT_MIGRATION_NAMESPACE,
-  DirectVolumeMigration,
-  DirectVolumeMigrationModel,
-  MigMigration,
-  MigMigrationModel,
-  MigPlan,
-  MigPlanModel,
-} from '@kubevirt-utils/resources/migrations/constants';
-import {
-  getGroupVersionKindForModel,
-  useK8sWatchResource,
-} from '@openshift-console/dynamic-plugin-sdk';
+  modelToGroupVersionKind,
+  MultiNamespaceVirtualMachineStorageMigrationPlanModel,
+} from '@kubevirt-utils/models';
+import { MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 type UseStorageMigrationResources = () => {
-  directVolumeMigrations: DirectVolumeMigration[];
   loaded: boolean;
   loadError: any;
-  migMigrations: MigMigration[];
-  migPlans: MigPlan[];
+  storageMigPlans: MultiNamespaceVirtualMachineStorageMigrationPlan[];
 };
 
 const useStorageMigrationResources: UseStorageMigrationResources = () => {
-  const [migPlans, plansLoaded, plansError] = useK8sWatchResource<MigPlan[]>({
-    groupVersionKind: getGroupVersionKindForModel(MigPlanModel),
+  const namespace = useNamespaceParam();
+  const [storageMigPlans, plansLoaded, plansError] = useK8sWatchData<
+    MultiNamespaceVirtualMachineStorageMigrationPlan[]
+  >({
+    groupVersionKind: modelToGroupVersionKind(
+      MultiNamespaceVirtualMachineStorageMigrationPlanModel,
+    ),
     isList: true,
-    namespace: DEFAULT_MIGRATION_NAMESPACE,
-    namespaced: true,
-  });
-
-  const storageMigPlans =
-    migPlans?.filter((plan) => plan?.spec?.persistentVolumes?.length > 0) ?? [];
-
-  const [migMigrations, migrationsLoaded, migrationsError] = useK8sWatchResource<MigMigration[]>({
-    groupVersionKind: getGroupVersionKindForModel(MigMigrationModel),
-    isList: true,
-    namespace: DEFAULT_MIGRATION_NAMESPACE,
-    namespaced: true,
-  });
-
-  const [directVolumeMigrations, dvLoaded, dvError] = useK8sWatchResource<DirectVolumeMigration[]>({
-    groupVersionKind: getGroupVersionKindForModel(DirectVolumeMigrationModel),
-    isList: true,
-    namespace: DEFAULT_MIGRATION_NAMESPACE,
+    namespace,
     namespaced: true,
   });
 
   return {
-    directVolumeMigrations,
-    loaded: plansLoaded && migrationsLoaded && dvLoaded,
-    loadError: plansError || migrationsError || dvError,
-    migMigrations,
-    migPlans: storageMigPlans,
+    loaded: plansLoaded,
+    loadError: plansError,
+    storageMigPlans,
   };
 };
 

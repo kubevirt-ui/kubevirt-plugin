@@ -84,9 +84,4 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.page/route/standalone',
   } as EncodedExtension<StandaloneRoutePage>,
-
-  {
-    properties: { handler: { $codeRef: 'kubevirtFlags.useStorageMigrationEnabled' } },
-    type: 'console.flag/hookProvider',
-  } as EncodedExtension<FeatureFlagHookProvider>,
 ];

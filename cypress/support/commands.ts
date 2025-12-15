@@ -10,6 +10,10 @@ declare global {
       checkHCOSpec(spec: string, matchString: string, include: boolean): void;
       checkVMISpec(vmName: string, spec: string, matchString: string, include: boolean): void;
       checkVMSpec(vmName: string, spec: string, matchString: string, include: boolean): void;
+      containsExactMatch(
+        matchString: string,
+        options?: Partial<Loggable & Timeoutable & Withinable & Shadow>,
+      ): Chainable;
       deleteVM(vmName: string[]): void;
       patchVM(vmName: string, status: string): void;
       startVM(vmName: string[]): void;
@@ -18,6 +22,10 @@ declare global {
     }
   }
 }
+
+Cypress.Commands.add('containsExactMatch', (matchString: string, options) =>
+  cy.contains(new RegExp(`^${matchString}$`), options),
+);
 
 Cypress.Commands.add('checkHCOSpec', (spec: string, matchString: string, include: boolean) => {
   cy.exec(

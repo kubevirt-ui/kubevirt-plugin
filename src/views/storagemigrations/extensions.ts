@@ -1,14 +1,11 @@
 import { EncodedExtension } from '@openshift/dynamic-plugin-sdk-webpack';
-import {
-  FeatureFlagHookProvider,
-  NavSection,
-  ResourceActionProvider,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { FeatureFlagHookProvider, NavSection } from '@openshift-console/dynamic-plugin-sdk';
 import type { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plugin-sdk-webpack';
 
 export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
   StorageMigrationList: './views/storagemigrations/list/StorageMigrationList.tsx',
-  useStorageMigrationActions: './views/storagemigrations/actions/useStorageMigrationActions.tsx',
+  useStorageMigrationActionsProvider:
+    './views/storagemigrations/actions/useStorageMigrationActions.tsx',
 };
 
 export const extensions: EncodedExtension[] = [
@@ -36,18 +33,15 @@ export const extensions: EncodedExtension[] = [
     properties: {
       component: { $codeRef: 'StorageMigrationList' },
       model: {
-        group: 'migration.openshift.io',
-        kind: 'MigPlan',
+        group: 'migrations.kubevirt.io',
+        kind: 'MultiNamespaceVirtualMachineStorageMigrationPlan',
         version: 'v1alpha1',
       },
+      prefixNamespaced: true,
     },
     type: 'console.page/resource/list',
   },
-
   {
-    flags: {
-      required: ['STORAGE_MIGRATION_ENABLED'],
-    },
     properties: {
       dataAttributes: {
         'data-quickstart-id': 'qs-nav-storagemigrations',
@@ -55,8 +49,8 @@ export const extensions: EncodedExtension[] = [
       },
       id: 'storagemigrations',
       model: {
-        group: 'migration.openshift.io',
-        kind: 'MigPlan',
+        group: 'migrations.kubevirt.io',
+        kind: 'MultiNamespaceVirtualMachineStorageMigrationPlan',
         version: 'v1alpha1',
       },
       name: '%plugin__kubevirt-plugin~Storage migrations%',
@@ -64,20 +58,18 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.navigation/resource-ns',
   },
+
   {
-    flags: {
-      required: ['STORAGE_MIGRATION_ENABLED'],
-    },
     properties: {
       model: {
-        group: 'migration.openshift.io',
-        kind: 'MigPlan',
+        group: 'migrations.kubevirt.io',
+        kind: 'MultiNamespaceVirtualMachineStorageMigrationPlan',
         version: 'v1alpha1',
       },
       provider: {
-        $codeRef: 'useStorageMigrationActions',
+        $codeRef: 'useStorageMigrationActionsProvider',
       },
     },
     type: 'console.action/resource-provider',
-  } as EncodedExtension<ResourceActionProvider>,
+  },
 ];
