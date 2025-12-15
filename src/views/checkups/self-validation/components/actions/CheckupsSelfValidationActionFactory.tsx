@@ -40,7 +40,11 @@ export const CheckupsSelfValidationActionFactory = {
         kubevirtConsole.error('Failed to delete self-validation checkup:', err);
       });
 
-      const newPath = trimLastHistoryPath(location.pathname, [getName(configMap)]);
+      const newPath = trimLastHistoryPath(location.pathname, [
+        getName(configMap),
+        `${getName(configMap)}/`,
+        `${getName(configMap)}/yaml`,
+      ]);
 
       navigate(newPath);
     };
