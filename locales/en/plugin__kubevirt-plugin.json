@@ -1666,6 +1666,7 @@
   "This user is not allowed to edit this boot source": "This user is not allowed to edit this boot source",
   "This VirtualMachine has": "This VirtualMachine has",
   "This VirtualMachine is down. Please start it to access its console.": "This VirtualMachine is down. Please start it to access its console.",
+  "This VM is using auto attached Pod Network. To disable it, set spec.template.spec.domain.devices.autoattachPodInterface to false.": "This VM is using auto attached Pod Network. To disable it, set spec.template.spec.domain.devices.autoattachPodInterface to false.",
   "This will create a cloned copy of the Volume in the destination project.": "This will create a cloned copy of the Volume in the destination project.",
   "Threads": "Threads",
   "Thresholds signify the distance from the average node utilization (formatted as below:above). An Asymmetric deviation threshold will force all nodes below the average to be considered as underutilized to help rebalancing overutilized outliers.": "Thresholds signify the distance from the average node utilization (formatted as below:above). An Asymmetric deviation threshold will force all nodes below the average to be considered as underutilized to help rebalancing overutilized outliers.",

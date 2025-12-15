@@ -19,10 +19,16 @@ import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
 import { getNetworks, POD_NETWORK } from '@kubevirt-utils/resources/vm';
 import { interfaceTypesProxy } from '@kubevirt-utils/resources/vm/utils/network/constants';
+import { hasAutoAttachedPodNetwork } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { FormGroup, Label, ValidatedOptions } from '@patternfly/react-core';
 
-import { getNadType, isPodNetworkName, podNetworkExists } from '../../utils/helpers';
+import {
+  getNadType,
+  hasExplicitlyDefinedPodNetwork,
+  isPodNetworkName,
+  podNetworkExists,
+} from '../../utils/helpers';
 import useNADsData from '../hooks/useNADsData';
 
 import NetworkSelectHelperPopover from './components/NetworkSelectHelperPopover/NetworkSelectHelperPopover';
@@ -225,6 +231,13 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
         <FormGroupHelperText validated={validated}>
           {t(
             'No NetworkAttachmentDefinitions available. Contact your system administrator for additional support.',
+          )}
+        </FormGroupHelperText>
+      )}
+      {!hasExplicitlyDefinedPodNetwork(vm) && hasAutoAttachedPodNetwork(vm) && (
+        <FormGroupHelperText validated={ValidatedOptions.warning}>
+          {t(
+            'This VM is using auto attached Pod Network. To disable it, set spec.template.spec.domain.devices.autoattachPodInterface to false.',
           )}
         </FormGroupHelperText>
       )}
