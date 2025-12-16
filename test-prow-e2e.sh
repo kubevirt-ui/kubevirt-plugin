@@ -142,23 +142,26 @@ export BRIDGE_BASE_ADDRESS
 # https://docs.cypress.io/guides/guides/continuous-integration.html#Colors
 export NO_COLOR=1
 
-# export namespace for upstream test
+# Export namespace for upstream test
 export CYPRESS_CNV_NS='kubevirt-hyperconverged'
 export CYPRESS_OS_IMAGES_NS='kubevirt-os-images'
 export CYPRESS_TEST_NS='auto-test-ns'
 export CYPRESS_TEST_SECRET_NAME='auto-test-secret'
 
-# setup cluster
+# Setup cluster
 bash test-setup.sh
 
 # Install dependencies.
-yarn install --frozen-lockfile
+npm ci
 
 # Add mochawesome-report-generator
-yarn add global mochawesome-report-generator --ignore-engines
+npm install -g mochawesome-report-generator --force
 
 # Run tests.
-yarn run test-cypress-headless --spec="tests/gating.cy.ts"
+npm run test-cypress-headless --spec="tests/gating.cy.ts"
 
 # Generate Cypress report.
-yarn run cypress-postreport
+npm run cypress-postreport
+
+# Clean up
+bash test-cleanup.sh

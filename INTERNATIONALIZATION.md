@@ -16,7 +16,7 @@ after files are generated.
 To generate and update text files:
 
 ```
-yarn i18n
+npm run i18n
 ```
 
 This command launches the [code parser](https://github.com/i18next/i18next-parser), generates JSON files containing English key:value pairs for all internationalized strings, and consolidates any English JSON files with identical names to avoid namespace conflicts in i18next.

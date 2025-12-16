@@ -17,20 +17,20 @@ You also have to [configure it with your Memsource login info](https://github.co
 
 Once your login info is configured, you should be able to log in by running `source ~/.memsourcerc`.
 
-Example CLI usage for upload script: `yarn memsource-upload -v 4.8 -s 200`
+Example CLI usage for upload script: `npm run memsource-upload -v 4.8 -s 200`
 * -v is the current OpenShift version
 * -s is the current sprint number
 
-Example CLI usage for download script: `yarn memsource-download -p 6sB6qwpbRkGCeBQq4hUyK1`
+Example CLI usage for download script: `npm run memsource-download -p 6sB6qwpbRkGCeBQq4hUyK1`
 * -p is the project ID in Memsource. The project ID can be obtained from the Memsource project URL (it's the series of numbers and letters after /show/, i.e. https://cloud.memsource.com/web/project2/show/FBfZeTEWPYaC4VXhgrW0R2).
 
 ## Build
-`build-i18n.sh` runs as part of the general `yarn i18n` command workflow. This script
+`build-i18n.sh` runs as part of the general `npm run i18n` command workflow. This script
 runs the i18next parser across the entire codebase and generates json files based on
 the marked keys in the application.
 
 ## English Defaults
-`set-english-defaults.js` runs as part of the general `yarn i18n` command workflow.
+`set-english-defaults.js` runs as part of the general `npm run i18n` command workflow.
 This script programmatically adds values for each new key in a json file after the parser is run.
 The goal of this script was to save developers time and minimize errors, as it saves developers
 from having to manually edit json files most of the time. In some cases, such as complex pluralization,

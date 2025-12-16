@@ -37,9 +37,9 @@ if [[ "$1" == "--start-console" ]]; then
 
   # Get the remaining arguments as plugins (optional)
   PLUGINS="$@"
-  
-  # Run the yarn command with plugins and env vars
-  BRIDGE_BRANDING="$BRIDGE_BRANDING" CONSOLE_IMAGE="$CONSOLE_IMAGE" yarn start-console "$PLUGINS" &
+
+  # Start Console on port 9000 (by default) with plugins
+  BRIDGE_BRANDING="$BRIDGE_BRANDING" CONSOLE_IMAGE="$CONSOLE_IMAGE" npm run start-console "$PLUGINS" &
 
   # Open the console URL in the browser
   echo "Login successful. Opening console URL: $CONSOLE_URL"

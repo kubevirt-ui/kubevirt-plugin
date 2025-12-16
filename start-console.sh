@@ -48,11 +48,11 @@ for arg in "$@"; do
 
     if [ "$arg" = "monitoring-plugin" ]; then
         cd web
-        npm install
-        PORT=$INITIAL_PORT npm start --port=$INITIAL_PORT &
+        npm ci
+        PORT=$INITIAL_PORT npm run start --port=$INITIAL_PORT &
     else
-        yarn
-        PORT=$INITIAL_PORT yarn start --port="$INITIAL_PORT" &
+        npm ci
+        PORT=$INITIAL_PORT npm run start --port="$INITIAL_PORT" &
     fi
 
     running_podman_linux="$running_podman_linux,$arg=http://localhost:$INITIAL_PORT"

@@ -126,8 +126,7 @@
     "typescript": "5.7.x",
     "webpack": "5.96.1",
     "webpack-cli": "5.1.4",
-    "webpack-dev-server": "^5.1.0",
-    "yarn": "^1.22.18"
+    "webpack-dev-server": "^5.1.0"
   },
   "engines": {
     "npm": ">=10.9.4",
@@ -135,7 +134,7 @@
   },
   "lint-staged": {
     "src/**/*.{js,ts,tsx,jsx,json}": [
-      "yarn i18n"
+      "npm run i18n"
     ],
     "*.{js,ts,tsx,jsx}": [
       "eslint --fix"
@@ -145,21 +144,23 @@
     ]
   },
   "name": "kubevirt-plugin",
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
-  "private": true,
-  "resolutions": {
+  "overrides": {
     "@types/react": "^17.0.40",
     "@types/react-dom": "^17.0.0",
+    "eslint": "^8.57.1",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
     "delaunator": "4.0.1"
   },
+  "private": true,
   "scripts": {
-    "build": "yarn clean && NODE_ENV=production NODE_OPTIONS=--max-old-space-size=8192 yarn ts-node node_modules/.bin/webpack",
+    "build": "npm run clean && NODE_ENV=production NODE_OPTIONS=--max-old-space-size=8192 npm run ts-node node_modules/.bin/webpack",
     "check-types": "tsc",
     "clean": "rm -rf dist",
     "cypress-generate": "cd cypress && marge -o ./gui-test-screenshots/ -f cypress-report -t 'Kubevirt Cypress Test Results' -p 'Kubevirt Test Results' --showPassed false --assetsDir ./gui-test-screenshots/cypress/assets ./gui-test-screenshots/cypress.json",
     "cypress-merge": "cd cypress && mochawesome-merge ./gui-test-screenshots/cypress_report*.json > ./gui-test-screenshots/cypress.json",
-    "cypress-postreport": "yarn cypress-merge && yarn cypress-generate",
-    "dev": "yarn clean && NODE_ENV=development NODE_OPTIONS=--max-old-space-size=8192 yarn ts-node node_modules/.bin/webpack serve --progress",
+    "cypress-postreport": "npm run cypress-merge && npm run cypress-generate",
+    "dev": "npm run clean && NODE_ENV=development NODE_OPTIONS=--max-old-space-size=8192 npm run ts-node node_modules/.bin/webpack serve --progress",
     "export-pos": "./i18n-scripts/export-pos.sh",
     "i18n": "i18next --silent && node ./i18n-scripts/set-english-defaults.js && ./i18n-scripts/replace-br.sh",
     "i18n:verbose": "i18next && node ./i18n-scripts/set-english-defaults.js && ./i18n-scripts/replace-br.sh",
@@ -173,7 +174,7 @@
     "po-to-i18n": "node ./i18n-scripts/po-to-i18n.js",
     "postinstall": "cp node_modules/@openshift-console/dynamic-plugin-sdk/docs/console-extensions.md .",
     "prepare": "husky install",
-    "start": "yarn ts-node node_modules/.bin/webpack serve",
+    "start": "npm run ts-node node_modules/.bin/webpack serve",
     "start-console": "./start-console.sh",
     "start-console-with-monitoring": "./start-console.sh monitoring-plugin",
     "start-console-with-networking": "./start-console.sh networking-console-plugin",
