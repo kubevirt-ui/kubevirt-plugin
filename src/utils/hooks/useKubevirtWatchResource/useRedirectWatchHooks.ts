@@ -1,10 +1,9 @@
 import { useMemo } from 'react';
 
-import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import useKubevirtSearchPoll from '@multicluster/hooks/useKubevirtSearchPoll';
 import useIsACMPage from '@multicluster/useIsACMPage';
-import { WatchK8sResource } from '@openshift-console/dynamic-plugin-sdk';
+import { K8sResourceCommon, WatchK8sResource } from '@openshift-console/dynamic-plugin-sdk';
 import { AdvancedSearchFilter } from '@stolostron/multicluster-sdk';
 
 import useKubevirtDataPod from '../useKubevirtDataPod/useKubevirtDataPod';
@@ -20,13 +19,23 @@ const useRedirectWatchHooks = <T extends K8sResourceCommon | K8sResourceCommon[]
 ): Result<T> => {
   const isACMTreeView = useIsACMPage();
 
-  const useMulticlusterSearch = isACMTreeView && isEmpty(watchOptions?.cluster);
+  const useMulticlusterSearch = useMemo(() => {
+    if (!isACMTreeView || !watchOptions) return false;
+    const cluster = watchOptions.cluster;
+    return cluster === undefined || cluster === '';
+  }, [isACMTreeView, watchOptions]);
 
   const usePod = shouldUseProxyPod && !isACMTreeView;
 
+  const multiSearchWatchOptions = useMemo(
+    () => (!usePod && useMulticlusterSearch ? watchOptions : null),
+    [usePod, useMulticlusterSearch, watchOptions],
+  );
+
   const k8sWatch = useK8sWatchData<T>(!usePod && !useMulticlusterSearch ? watchOptions : null);
+
   const [multiSearchData, multiSearchLoaded, multiSearchError] = useKubevirtSearchPoll<T>(
-    !usePod && useMulticlusterSearch && watchOptions,
+    multiSearchWatchOptions,
     searchQueries,
   );
 

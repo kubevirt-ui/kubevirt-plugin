@@ -1,11 +1,14 @@
 import React, { FC, useMemo } from 'react';
 import { Helmet } from 'react-helmet';
 
+import ClusterProjectDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterProjectDropdown';
 import HorizontalNavbar from '@kubevirt-utils/components/HorizontalNavbar/HorizontalNavbar';
 import { NavPageKubevirt } from '@kubevirt-utils/components/HorizontalNavbar/utils/utils';
+import { useClusterObservabilityDisabled } from '@kubevirt-utils/hooks/useAlerts/utils/useClusterObservabilityDisabled';
 import { useForceProjectSelection } from '@kubevirt-utils/hooks/useForceProjectSelection';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { useSignals } from '@preact/signals-react/runtime';
 import { VIRTUALIZATION_PATHS } from '@virtualmachines/tree/utils/constants';
 
@@ -19,10 +22,17 @@ import OverviewTab from './OverviewTab/OverviewTab';
 import SettingsTab from './SettingsTab/SettingsTab';
 import TopConsumersTab from './TopConsumersTab/TopConsumersTab';
 
+import './ClusterOverviewPage.scss';
+
 const ClusterOverviewPage: FC = () => {
   const { t } = useKubevirtTranslation();
   const isAdmin = useIsAdmin();
-
+  const isACMPage = useIsACMPage();
+  const {
+    disabledClusters,
+    error: observabilityError,
+    loaded: observabilityLoaded,
+  } = useClusterObservabilityDisabled(true);
   useSignals();
 
   useForceProjectSelection([VIRTUALIZATION_PATHS.OVERVIEW]);
@@ -40,18 +50,7 @@ const ClusterOverviewPage: FC = () => {
       },
     ];
 
-    return [
-      {
-        component: OverviewTab,
-        href: '',
-        name: t('Overview'),
-      },
-      ...(isAdmin ? [...adminPages] : []),
-      {
-        component: MigrationsTab,
-        href: 'migrations',
-        name: t('Migrations'),
-      },
+    const settingsPages: NavPageKubevirt[] = [
       {
         component: SettingsTab,
         href: 'settings',
@@ -82,16 +81,51 @@ const ClusterOverviewPage: FC = () => {
         name: 'settings/*',
       },
     ];
-  }, [isAdmin, t]);
+    return [
+      {
+        component: OverviewTab,
+        href: '',
+        name: t('Overview'),
+      },
+      ...(isAdmin ? [...adminPages] : []),
+      {
+        component: MigrationsTab,
+        href: 'migrations',
+        name: t('Migrations'),
+      },
+      ...(!isACMPage ? [...settingsPages] : []),
+    ];
+  }, [isAdmin, t, isACMPage]);
 
   return (
     <>
+      {isACMPage && (
+        <ClusterProjectDropdown
+          disabledClusters={
+            observabilityLoaded && !observabilityError ? disabledClusters : undefined
+          }
+          disabledItemTooltip={t('Observability is disabled for this cluster')}
+          includeAllClusters={true}
+          includeAllProjects={true}
+          onlyCNVClusters={true}
+        />
+      )}
       <Helmet>
         <title>{t('Virtualization')}</title>
       </Helmet>
       <WelcomeModal />
-      <ClusterOverviewPageHeader />
-      <HorizontalNavbar loaded={true} pages={overviewTabs} />
+      <div className="cluster-overview-page">
+        <div className="cluster-overview-page__header">
+          <ClusterOverviewPageHeader />
+        </div>
+        <div className="cluster-overview-page__content">
+          <HorizontalNavbar
+            loaded={true}
+            pages={overviewTabs}
+            routesClassName="cluster-overview-page__routes"
+          />
+        </div>
+      </div>
       <GuidedTour />
     </>
   );

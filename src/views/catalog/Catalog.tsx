@@ -17,7 +17,13 @@ const Catalog: FC = (): JSX.Element => {
   return (
     <WizardVMContextProvider>
       <DocumentTitle>{PageTitles.Catalog}</DocumentTitle>
-      {isACMPage && <ClusterProjectDropdown includeAllClusters={false} includeAllProjects={true} />}
+      {isACMPage && (
+        <ClusterProjectDropdown
+          includeAllClusters={false}
+          includeAllProjects={true}
+          onlyCNVClusters={true}
+        />
+      )}
       <Routes>
         <Route Component={Wizard} path={'template/review/*'} />
         <Route Component={CustomizeInstanceTypeVirtualMachine} path={`review/*`} />

@@ -1144,6 +1144,7 @@
   "Not supported with primary user-defined networks": "Not supported with primary user-defined networks",
   "Note that for Node field expressions, entering a full path is required in the \"Key\" field (e.g. \"metadata.name: value\").": "Note that for Node field expressions, entering a full path is required in the \"Key\" field (e.g. \"metadata.name: value\").",
   "O series": "O series",
+  "Observability is disabled for this cluster": "Observability is disabled for this cluster",
   "Off": "Off",
   "OFF": "OFF",
   "Okay, got it!": "Okay, got it!",

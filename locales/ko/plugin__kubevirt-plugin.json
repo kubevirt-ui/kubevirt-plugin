@@ -1140,6 +1140,7 @@
   "Not supported with primary user-defined networks": "Not supported with primary user-defined networks",
   "Note that for Node field expressions, entering a full path is required in the \"Key\" field (e.g. \"metadata.name: value\").": "노드 필드 표현식의 경우 \"Key\" 필드에 전체 경로를 입력해야 합니다. (예: \"metadata.name: value\")",
   "O series": "O 시리즈",
+  "Observability is disabled for this cluster": "Observability is disabled for this cluster",
   "Off": "OFF",
   "OFF": "OFF",
   "Okay, got it!": "알겠습니다!",

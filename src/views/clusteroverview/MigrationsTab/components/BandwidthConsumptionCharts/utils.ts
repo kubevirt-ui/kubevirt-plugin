@@ -6,7 +6,8 @@ import {
   timeFormatter,
 } from '@kubevirt-utils/components/Timestamp/utils/datetime';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
-import { MILLISECONDS_TO_SECONDS_MULTIPLIER } from '@kubevirt-utils/resources/vm/utils/constants';
+import { SECONDS_TO_MILLISECONDS_MULTIPLIER } from '@kubevirt-utils/resources/vm/utils/constants';
+import { escapePromLabelValue } from '@kubevirt-utils/utils/prometheus';
 import { multipliers } from '@kubevirt-utils/utils/unitConstants';
 import { PrometheusValue } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -20,12 +21,16 @@ export const mapPrometheusValues = (
     return {
       idx,
       name,
-      x: new Date(x * MILLISECONDS_TO_SECONDS_MULTIPLIER),
+      x: new Date(x * SECONDS_TO_MILLISECONDS_MULTIPLIER),
       y: Number(y),
     };
   });
 
-export const formatTimestamp = (timespan: number, time: any, dropLine = false): string => {
+export const formatTimestamp = (
+  timespan: number,
+  time: Date | number,
+  dropLine = false,
+): string => {
   if (timespan > DurationOption.getMilliseconds('1d')) {
     return `${dateFormatterNoYear.format(time)}${dropLine ? '\n' : ' '}${timeFormatter.format(
       time,
@@ -34,9 +39,20 @@ export const formatTimestamp = (timespan: number, time: any, dropLine = false): 
   return timeFormatter.format(time);
 };
 
+type DatumProp = {
+  datum: {
+    idx: number;
+    x: Date | number;
+  };
+};
+
 export const getLabel =
-  (timespan: number, chartData: ChartDataObject[], formatIEC = false) =>
-  (prop: { datum: any }) => {
+  (
+    timespan: number,
+    chartData: ChartDataObject[],
+    formatIEC = false,
+  ): ((prop: DatumProp) => string) =>
+  (prop: DatumProp): string => {
     const datum = prop?.datum;
     const data = chartData?.[datum?.idx];
     const dataYValue = formatIEC
@@ -51,8 +67,8 @@ export const getLabel =
     return `${timestamp}\n${dataYValue} ${data?.name}`;
   };
 
-export const getTickValuesAxisY = (maxValue: number, normalize = multipliers.Gi) => {
-  const tickValues = [];
+export const getTickValuesAxisY = (maxValue: number, normalize = multipliers.Gi): number[] => {
+  const tickValues: number[] = [];
 
   const normalizedMaxValue = Math.ceil(maxValue / normalize);
   const gridLineSpacer = Math.ceil(normalizedMaxValue / GRID_LINES) || 1;
@@ -73,10 +89,26 @@ export const getDomainY = (maxValue: number, normalize = multipliers.Gi): [numbe
   return [tickValues?.[0], tickValues?.[GRID_LINES]];
 };
 
-export const getBaseQuery = (duration: string, activeNamespace: string) => {
+export const getBaseQuery = (
+  duration: string,
+  activeNamespace: string,
+  cluster?: string,
+  hubClusterName?: string,
+): string => {
   const namespacedQuery = activeNamespace !== ALL_NAMESPACES_SESSION_KEY;
+  // Add cluster filter only for non-hub clusters (per useFleetPrometheusPoll documentation)
+  const trimmedCluster = cluster?.trim();
+  const clusterFilter =
+    trimmedCluster && trimmedCluster !== '' && trimmedCluster !== hubClusterName
+      ? `cluster="${escapePromLabelValue(trimmedCluster)}"`
+      : '';
+  const namespaceFilter = namespacedQuery
+    ? `namespace="${escapePromLabelValue(activeNamespace)}"`
+    : '';
+  const filters = [namespaceFilter, clusterFilter].filter(Boolean).join(',');
+  const filterString = filters ? `{${filters}}` : '';
 
-  return `(sum_over_time(kubevirt_vmi_migration_data_processed_bytes${
-    namespacedQuery ? `{namespace='${activeNamespace}'}` : ''
-  }[${duration}]))${namespacedQuery ? ' BY (namespace)' : ''}`;
+  return `(sum_over_time(kubevirt_vmi_migration_data_processed_bytes${filterString}[${duration}]))${
+    namespacedQuery ? ' BY (namespace)' : ''
+  }`;
 };

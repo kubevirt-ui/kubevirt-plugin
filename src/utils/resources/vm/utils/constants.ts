@@ -2,7 +2,7 @@ import { V1Interface, V1Network } from '@kubevirt-ui/kubevirt-api/kubevirt';
 
 export const NO_DATA_DASH = '-';
 
-export const MILLISECONDS_TO_SECONDS_MULTIPLIER = 1000;
+export const SECONDS_TO_MILLISECONDS_MULTIPLIER = 1000;
 
 export const PATHS_TO_HIGHLIGHT = {
   DEFAULT: ['spec.template.spec.domain.devices.disks', 'spec.template.spec.volumes'],
@@ -26,7 +26,7 @@ export const PATHS_TO_HIGHLIGHT = {
   SCRIPTS_TAB: ['spec.template.spec.volumes', 'spec.template.spec.accessCredentials'],
 };
 
-export const MIGRATION__PROMETHEUS_DELAY = 15 * MILLISECONDS_TO_SECONDS_MULTIPLIER;
+export const MIGRATION__PROMETHEUS_DELAY = 15 * SECONDS_TO_MILLISECONDS_MULTIPLIER;
 
 export const DEFAULT_NETWORK_INTERFACE: V1Interface = { masquerade: {}, name: 'default' };
 
