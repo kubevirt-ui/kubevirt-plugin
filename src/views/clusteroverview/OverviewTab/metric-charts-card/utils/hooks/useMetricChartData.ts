@@ -2,9 +2,11 @@ import { useMemo } from 'react';
 
 import { getPrometheusData } from '@kubevirt-utils/components/Charts/utils/utils';
 import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
-import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
-import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
+import { ALL_CLUSTERS_KEY, ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
+import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
+import useActiveClusterParam from '@multicluster/hooks/useActiveClusterParam';
+import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
+import { useFleetPrometheusPoll, useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import { getMetricQuery } from '../metricQueries';
 
@@ -20,8 +22,10 @@ import {
 export type MetricChartData = {
   chartData: ChartData;
   domain: ChartDomain;
+  error: Error | unknown;
   isReady: boolean;
   largestValue: number;
+  loaded: boolean;
   numberOfTicks: number;
   unit: string;
 };
@@ -29,16 +33,24 @@ export type MetricChartData = {
 type UseMetricChartData = (metric: string) => MetricChartData;
 
 const useMetricChartData: UseMetricChartData = (metric) => {
-  const [activeNamespace] = useActiveNamespace();
+  const activeNamespace = useActiveNamespace();
+  const cluster = useActiveClusterParam();
+  const [hubClusterName] = useHubClusterName();
   const currentTime = useMemo(() => Date.now(), []);
   const timespan = DurationOption.getMilliseconds(DurationOption.ONE_WEEK.toString());
 
-  const [queryData] = usePrometheusPoll({
+  const [queryData, loaded, error] = useFleetPrometheusPoll({
     endpoint: PrometheusEndpoint.QUERY_RANGE,
     endTime: currentTime,
-    namespace: activeNamespace === ALL_NAMESPACES_SESSION_KEY ? null : activeNamespace,
-    query: getMetricQuery(metric, activeNamespace),
+    namespace: activeNamespace === ALL_NAMESPACES_SESSION_KEY ? undefined : activeNamespace,
+    query: getMetricQuery(
+      metric,
+      activeNamespace,
+      cluster === ALL_CLUSTERS_KEY ? undefined : cluster,
+      cluster === ALL_CLUSTERS_KEY ? undefined : hubClusterName,
+    ),
     timespan,
+    ...(cluster === ALL_CLUSTERS_KEY ? { allClusters: true } : { cluster }),
   });
 
   const rawData = getPrometheusData(queryData);
@@ -56,8 +68,10 @@ const useMetricChartData: UseMetricChartData = (metric) => {
   return {
     chartData: formattedData,
     domain,
+    error,
     isReady: formattedData?.length > 1,
     largestValue,
+    loaded,
     numberOfTicks: numberOfTicks?.length,
     unit,
   };

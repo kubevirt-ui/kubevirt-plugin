@@ -1,6 +1,8 @@
 export type DropdownOption = {
+  disabled?: boolean;
   key: string;
   title: string;
+  tooltip?: string;
 };
 
 export type DropdownBookmarks = {

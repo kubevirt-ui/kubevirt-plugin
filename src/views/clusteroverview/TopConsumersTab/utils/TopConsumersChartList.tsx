@@ -1,13 +1,13 @@
 import React, { FC, useMemo } from 'react';
 
+import { ALL_CLUSTERS_KEY } from '@kubevirt-utils/hooks/constants';
+import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { TopConsumersData } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/types';
-import {
-  PrometheusEndpoint,
-  useActiveNamespace,
-  usePrometheusPoll,
-} from '@openshift-console/dynamic-plugin-sdk';
+import useActiveClusterParam from '@multicluster/hooks/useActiveClusterParam';
+import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import { CardBody } from '@patternfly/react-core';
+import { useFleetPrometheusPoll, useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import {
   SHOW_TOP_5_ITEMS,
@@ -35,7 +35,9 @@ export const TopConsumersChartList: FC<TopConsumersChartListProps> = ({
   scope,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [activeNamespace] = useActiveNamespace();
+  const activeNamespace = useActiveNamespace();
+  const cluster = useActiveClusterParam();
+  const [hubClusterName] = useHubClusterName();
   const duration = useMemo(
     () => localStorageData?.[TOP_CONSUMERS_DURATION_KEY],
     [localStorageData],
@@ -49,7 +51,7 @@ export const TopConsumersChartList: FC<TopConsumersChartListProps> = ({
     [numItemsLabel],
   );
 
-  const [query] = usePrometheusPoll({
+  const [query] = useFleetPrometheusPoll({
     endpoint: PrometheusEndpoint.QUERY,
     endTime: Date.now(),
     query: getTopConsumerQuery(
@@ -58,7 +60,10 @@ export const TopConsumersChartList: FC<TopConsumersChartListProps> = ({
       numItemsToShow,
       duration,
       activeNamespace,
+      cluster === ALL_CLUSTERS_KEY ? undefined : cluster,
+      hubClusterName,
     ),
+    ...(cluster === ALL_CLUSTERS_KEY ? { allClusters: true } : { cluster }),
   });
   const numQueryResults = query?.data?.result?.length;
 

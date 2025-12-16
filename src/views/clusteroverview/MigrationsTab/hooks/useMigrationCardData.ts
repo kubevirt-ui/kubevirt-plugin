@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+
 import {
   VirtualMachineInstanceMigrationModelGroupVersionKind,
   VirtualMachineInstanceModelGroupVersionKind,
@@ -6,15 +8,18 @@ import {
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
+import { ALL_CLUSTERS_KEY, ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
+import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
+import { useClusterObservabilityDisabled } from '@kubevirt-utils/hooks/useAlerts/utils/useClusterObservabilityDisabled';
+import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useMigrationPolicies from '@kubevirt-utils/hooks/useMigrationPolicies';
+import useActiveClusterParam from '@multicluster/hooks/useActiveClusterParam';
 import {
   OnFilterChange,
   RowFilter,
-  useK8sWatchResource,
   useListPageFilter,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
+import { AdvancedSearchFilter } from '@stolostron/multicluster-sdk';
 
 import useHyperConvergedMigrations from '../components/MigrationsLimitionsPopover/hooks/useHyperConvergedMigrations';
 import {
@@ -28,9 +33,9 @@ import {
 } from '../components/MigrationsTable/utils/utils';
 
 export type UseMigrationCardDataAndFiltersValues = {
-  filters: RowFilter<any>[];
+  filters: RowFilter<MigrationTableDataLayout>[];
   loaded: boolean;
-  loadErrors: any;
+  loadErrors: Error | unknown;
   migrationsTableFilteredData: MigrationTableDataLayout[];
   migrationsTableUnfilteredData: MigrationTableDataLayout[];
   onFilterChange: OnFilterChange;
@@ -41,22 +46,59 @@ type UseMigrationCardDataAndFilters = (duration: string) => UseMigrationCardData
 
 const useMigrationCardDataAndFilters: UseMigrationCardDataAndFilters = (duration: string) => {
   const migrationsDefaultConfigurations = useHyperConvergedMigrations();
-  const [activeNamespace] = useActiveNamespace();
-  const namespace = activeNamespace !== ALL_NAMESPACES_SESSION_KEY ? activeNamespace : null;
+  const activeNamespace = useActiveNamespace();
+  const cluster = useActiveClusterParam();
+  const namespace = useMemo(
+    () => (activeNamespace !== ALL_NAMESPACES_SESSION_KEY ? activeNamespace : undefined),
+    [activeNamespace],
+  );
 
-  const [vmims, vmimsLoaded, vmimsErrors] = useK8sWatchResource<
+  const {
+    enabledClusters,
+    error: observabilityError,
+    loaded: observabilityLoaded,
+  } = useClusterObservabilityDisabled(true);
+
+  const normalizedCluster = cluster === ALL_CLUSTERS_KEY ? undefined : cluster;
+
+  const searchQueries = useMemo<AdvancedSearchFilter | undefined>(() => {
+    if (cluster === ALL_CLUSTERS_KEY && observabilityLoaded) {
+      return [{ property: 'cluster', values: enabledClusters }];
+    }
+    return undefined;
+  }, [cluster, enabledClusters, observabilityLoaded]);
+
+  const [vmims, vmimsLoaded, vmimsErrors] = useKubevirtWatchResource<
     V1VirtualMachineInstanceMigration[]
-  >({
-    groupVersionKind: VirtualMachineInstanceMigrationModelGroupVersionKind,
-    isList: true,
-    namespace,
-  });
+  >(
+    useMemo(
+      () => ({
+        cluster: normalizedCluster,
+        groupVersionKind: VirtualMachineInstanceMigrationModelGroupVersionKind,
+        isList: true,
+        namespace,
+        namespaced: Boolean(namespace),
+      }),
+      [normalizedCluster, namespace],
+    ),
+    undefined,
+    searchQueries,
+  );
 
-  const [vmis, vmisLoaded, vmisErrors] = useK8sWatchResource<V1VirtualMachineInstance[]>({
-    groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
-    isList: true,
-    namespace,
-  });
+  const [vmis, vmisLoaded, vmisErrors] = useKubevirtWatchResource<V1VirtualMachineInstance[]>(
+    useMemo(
+      () => ({
+        cluster: normalizedCluster,
+        groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
+        isList: true,
+        namespace,
+        namespaced: Boolean(namespace),
+      }),
+      [normalizedCluster, namespace],
+    ),
+    undefined,
+    searchQueries,
+  );
 
   const [mps] = useMigrationPolicies();
 
@@ -78,7 +120,7 @@ const useMigrationCardDataAndFilters: UseMigrationCardDataAndFilters = (duration
   return {
     filters,
     loaded: vmimsLoaded && vmisLoaded,
-    loadErrors: vmimsErrors || vmisErrors,
+    loadErrors: observabilityError || vmimsErrors || vmisErrors,
     migrationsTableFilteredData: data,
     migrationsTableUnfilteredData: unfilteredData,
     onFilterChange,

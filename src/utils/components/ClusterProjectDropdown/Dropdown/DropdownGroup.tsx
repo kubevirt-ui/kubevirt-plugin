@@ -1,7 +1,7 @@
 import React, { FC, JSX } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Divider, MenuGroup, MenuItem, MenuList } from '@patternfly/react-core';
+import { Divider, MenuGroup, MenuItem, MenuList, TooltipPosition } from '@patternfly/react-core';
 
 import { DropdownConfig, DropdownOption } from './types';
 
@@ -32,8 +32,21 @@ const DropdownGroup: FC<DropdownGroupProps> = ({
         <MenuList>
           {options.map((option) => {
             const isFavorite = !!favorites?.[option.key];
+            // Use isAriaDisabled instead of isDisabled when tooltip is present
+            // This allows tooltips to work on disabled items (isDisabled sets pointer-events: none)
+            const hasTooltip = !!option.tooltip;
             return (
               <MenuItem
+                tooltipProps={
+                  option.tooltip
+                    ? {
+                        content: option.tooltip,
+                        position: TooltipPosition.left,
+                      }
+                    : undefined
+                }
+                isAriaDisabled={option.disabled && hasTooltip}
+                isDisabled={option.disabled && !hasTooltip}
                 isFavorited={isFavorite}
                 isSelected={selectedKey === option.key}
                 itemId={option.key}

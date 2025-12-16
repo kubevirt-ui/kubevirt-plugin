@@ -3,9 +3,11 @@ import xbytes from 'xbytes';
 
 import useResponsiveCharts from '@kubevirt-utils/components/Charts/hooks/useResponsiveCharts';
 import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
+import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
+import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { Divider, Grid } from '@patternfly/react-core';
+import { Bullseye, Divider, Grid } from '@patternfly/react-core';
 
 import MigrationsTimeAxis from './components/MigrationsTimeAxis';
 import MigrationsUtilizationChart from './components/MigrationsUtilizationChart';
@@ -24,8 +26,35 @@ const BandwidthConsumptionCharts: React.FC<BandwidthConsumptionChartsProps> = ({
   const domainX: [number, number] = [currentTime - timespan, currentTime];
   const { ref } = useResponsiveCharts();
 
-  const { bandwidthConsumed, maxBandwidthConsumed, maxMigrationCount, migrationsCount } =
-    useMigrationChartsData(duration, currentTime, timespan);
+  const {
+    bandwidthConsumed,
+    bandwidthLoaded,
+    countLoaded,
+    errorBandwidth,
+    errorCount,
+    maxBandwidthConsumed,
+    maxMigrationCount,
+    migrationsCount,
+  } = useMigrationChartsData(duration, currentTime, timespan);
+
+  const isLoading = !bandwidthLoaded || !countLoaded;
+  const hasError = !!errorBandwidth || !!errorCount;
+
+  if (isLoading && !hasError) {
+    return (
+      <Bullseye>
+        <LoadingEmptyState />
+      </Bullseye>
+    );
+  }
+
+  if (hasError) {
+    return (
+      <Bullseye>
+        <ErrorAlert error={errorBandwidth || errorCount} />
+      </Bullseye>
+    );
+  }
 
   return (
     <Grid ref={ref}>

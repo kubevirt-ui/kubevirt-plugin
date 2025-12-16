@@ -1,4 +1,4 @@
-import React, { JSX, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import fuzzysearch from 'fuzzysearch';
 
 import { useClickOutside } from '@kubevirt-utils/hooks/useClickOutside/useClickOutside';
@@ -27,7 +27,10 @@ type DropdownProps<T> = DropdownBookmarksProps &
   DropdownDataFetchingProps<T> & {
     config: DropdownConfig;
     disabled?: boolean;
+    disabledItemTooltip?: string;
     includeAllItems?: boolean;
+    isItemDisabled?: (key: string) => boolean;
+    omittedItems?: string[];
     onChange: (item: string) => void;
     selectedItem: string;
   };
@@ -36,14 +39,17 @@ const Dropdown = <T,>({
   bookmarks,
   config,
   disabled = false,
+  disabledItemTooltip,
   extractKey,
   extractTitle,
   includeAllItems = true,
+  isItemDisabled,
   items,
   itemsLoaded,
+  omittedItems,
   onChange,
   selectedItem,
-}: DropdownProps<T>): JSX.Element => {
+}: DropdownProps<T>) => {
   const menuRef = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
   const filterRef = useRef<HTMLInputElement>(null);
@@ -61,15 +67,34 @@ const Dropdown = <T,>({
   const optionItems = useMemo(() => {
     if (!items || !itemsLoaded) return [];
 
-    const mappedItems = items.map((item) => ({
-      key: extractKey(item),
-      title: extractTitle(item),
-    }));
+    // Filter out omitted items
+    const omittedSet = omittedItems ? new Set(omittedItems) : new Set();
+    const filteredItems = items.filter((item) => {
+      const key = extractKey(item);
+      return !omittedSet.has(key);
+    });
+
+    const mappedItems = filteredItems.map((item) => {
+      const key = extractKey(item);
+      const isDisabled = isItemDisabled?.(key) ?? false;
+      return {
+        disabled: isDisabled,
+        key,
+        title: extractTitle(item),
+        tooltip: isDisabled && disabledItemTooltip ? disabledItemTooltip : undefined,
+      };
+    });
 
     mappedItems.sort((a, b) => a.title.localeCompare(b.title));
 
     if (includeAllItems) {
-      mappedItems.unshift({ key: config.allItemsKey, title: allItemsTitle });
+      const allItemsDisabled = isItemDisabled?.(config.allItemsKey) ?? false;
+      mappedItems.unshift({
+        disabled: allItemsDisabled,
+        key: config.allItemsKey,
+        title: allItemsTitle,
+        tooltip: allItemsDisabled && disabledItemTooltip ? disabledItemTooltip : undefined,
+      });
     }
 
     return mappedItems;
@@ -79,22 +104,25 @@ const Dropdown = <T,>({
     includeAllItems,
     allItemsTitle,
     config.allItemsKey,
+    disabledItemTooltip,
     extractKey,
     extractTitle,
+    isItemDisabled,
+    omittedItems,
   ]);
 
-  // Revert to first item if selected item is not in the list
+  // Revert to first enabled item if selected item is not in the list
   useEffect(() => {
     if (!itemsLoaded || !optionItems.length) return;
 
     if (selectedItem && !optionItems.some((item) => item.key === selectedItem)) {
-      // Revert to the first item in the list
-      const firstItem = optionItems[0]?.key;
-      if (firstItem) {
-        onChange(firstItem);
+      const firstEnabledItem =
+        optionItems.find((item) => !item.disabled)?.key ?? optionItems[0]?.key;
+      if (firstEnabledItem) {
+        onChange(firstEnabledItem);
       }
     }
-  }, [itemsLoaded, optionItems, selectedItem]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [itemsLoaded, optionItems, selectedItem, onChange]);
 
   const { filteredFavorites, filteredOptions } = useMemo(() => {
     const favorites: DropdownOption[] = [];

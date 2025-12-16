@@ -1,6 +1,10 @@
 import { matchPath } from 'react-router-dom-v5-compat';
 
-import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
+import {
+  ALL_CLUSTERS_KEY,
+  ALL_NAMESPACES,
+  ALL_NAMESPACES_SESSION_KEY,
+} from '@kubevirt-utils/hooks/constants';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { isAllNamespaces } from '@kubevirt-utils/utils/utils';
 import { ExtensionK8sModel, K8sModel } from '@openshift-console/dynamic-plugin-sdk';
@@ -22,15 +26,20 @@ export const getACMVMURL = (cluster: string, namespace: string, name: string): s
   `/k8s/cluster/${cluster}/ns/${namespace}/${KUBEVIRT_VM_PATH}/${name}`;
 
 export const getACMVMListURL = (cluster?: string, namespace?: string): string => {
-  if (namespace) return getACMVMListNamespacesURL(cluster, namespace);
+  if (namespace && namespace !== ALL_NAMESPACES_SESSION_KEY) {
+    if (!cluster || cluster === ALL_CLUSTERS_KEY) {
+      return `/k8s/${ALL_CLUSTERS_KEY}/ns/${namespace}/${KUBEVIRT_VM_PATH}`;
+    }
+    return getACMVMListNamespacesURL(cluster, namespace);
+  }
 
-  return cluster
-    ? `/k8s/cluster/${cluster}/all-namespaces/${KUBEVIRT_VM_PATH}`
-    : `/k8s/all-clusters/all-namespaces/${KUBEVIRT_VM_PATH}`;
+  return cluster && cluster !== ALL_CLUSTERS_KEY
+    ? `/k8s/cluster/${cluster}/${ALL_NAMESPACES}/${KUBEVIRT_VM_PATH}`
+    : `/k8s/${ALL_CLUSTERS_KEY}/${ALL_NAMESPACES}/${KUBEVIRT_VM_PATH}`;
 };
 
 export const getACMVMSearchURL = (): string =>
-  `/k8s/all-clusters/all-namespaces/${KUBEVIRT_VM_PATH}/search`;
+  `/k8s/${ALL_CLUSTERS_KEY}/${ALL_NAMESPACES}/${KUBEVIRT_VM_PATH}/search`;
 
 export const getACMVMListNamespacesURL = (cluster: string, namespace: string): string =>
   `/k8s/cluster/${cluster}/ns/${namespace}/${KUBEVIRT_VM_PATH}`;
@@ -38,7 +47,7 @@ export const getACMVMListNamespacesURL = (cluster: string, namespace: string): s
 // based on dns1123LabelRegexp
 const catalogWithNs = new RegExp('/ns/[-a-z0-9]+/catalog');
 
-export const isCatalogURL = (path: string = '') =>
+export const isCatalogURL = (path: string = ''): boolean =>
   path.includes(`${ALL_NAMESPACES}/catalog`) || catalogWithNs.test(path);
 
 export const getCatalogURL = (cluster: string, namespace?: string): string => {
@@ -68,7 +77,7 @@ export const getVMURL = (cluster: string, namespace: string, name: string): stri
         resource: { metadata: { name, namespace } },
       });
 
-export const getVMListURL = (cluster?: string, namespace?: string) =>
+export const getVMListURL = (cluster?: string, namespace?: string): string =>
   cluster
     ? getACMVMListURL(cluster, namespace)
     : getResourceUrl({
