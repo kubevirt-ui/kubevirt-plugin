@@ -1,12 +1,6 @@
 import React, { FC } from 'react';
 
-import {
-  FOLDER_SELECTOR_PREFIX,
-  PROJECT_SELECTOR_PREFIX,
-} from '@virtualmachines/tree/utils/constants';
-
-import DefaultRightClickActionMenu from './DefaultRightClickActionMenu';
-import VMRightClickActionMenu from './VMRightClickActionMenu';
+import { getActionMenuComponent } from './utils';
 
 type TreeViewRightClickActionMenuProps = {
   hideMenu: () => void;
@@ -19,11 +13,7 @@ const TreeViewRightClickActionMenu: FC<TreeViewRightClickActionMenuProps> = ({
 }) => {
   if (!triggerElement) return null;
 
-  const ActionMenu =
-    triggerElement.id?.startsWith(PROJECT_SELECTOR_PREFIX) ||
-    triggerElement.id?.startsWith(FOLDER_SELECTOR_PREFIX)
-      ? DefaultRightClickActionMenu
-      : VMRightClickActionMenu;
+  const ActionMenu = getActionMenuComponent(triggerElement);
 
   return (
     <>

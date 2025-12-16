@@ -413,12 +413,7 @@ export const getAllTreeViewVMItems = (treeData: TreeViewDataItem[]): TreeViewDat
 export const getAllRightClickableTreeViewItems = (
   treeData: TreeViewDataItem[],
 ): TreeViewDataItem[] =>
-  getAllTreeViewItems(treeData).filter(
-    (treeItem) =>
-      !treeItem.id.startsWith(CLUSTER_SELECTOR_PREFIX) &&
-      !treeItem.id.startsWith(ALL_CLUSTERS_ID) &&
-      treeItem.id !== ALL_NAMESPACES_SESSION_KEY,
-  );
+  getAllTreeViewItems(treeData).filter((treeItem) => !treeItem.id.startsWith(ALL_CLUSTERS_ID));
 
 export const getAllTreeViewFolderItems = (treeData: TreeViewDataItem[]): TreeViewDataItem[] =>
   getAllTreeViewItems(treeData)?.filter((treeItem) =>
