@@ -46,9 +46,7 @@ type PromptData = {
   vm?: V1VirtualMachine;
 };
 
-type GetOLSPrompt = (promptType: OLSPromptType, data?: PromptData) => string;
-
-export const getOLSPrompt: GetOLSPrompt = (promptType, data) => {
+export const getOLSPrompt = (promptType: OLSPromptType, data?: PromptData): string => {
   const vm = data?.vm;
   const vmPrintableStatus = getVMStatus(vm);
   const isErrorStatus = isErrorPrintableStatus(vmPrintableStatus);
@@ -115,7 +113,7 @@ export const getOLSPrompt: GetOLSPrompt = (promptType, data) => {
     [OLSPromptType.SSH_OVER_NODEPORT_SERVICE]:
       'Provide a detailed explanation of NodePort services for SSH connections in OpenShift Virtualization.',
     [OLSPromptType.SSH_USING_VIRTCTL]:
-      'Provide a detail explanation with examples of connecting to a VirtualMachine via the command line using SSH through virtctl.',
+      'Provide a detailed explanation with examples of connecting to a VirtualMachine via the command line using SSH through virtctl.',
     [OLSPromptType.STATUS_CONDITIONS]:
       'Provide a detailed explanation of VirtualMachine status conditions in OpenShift Virtualization.',
     [OLSPromptType.VIRTCTL]:
@@ -123,7 +121,7 @@ export const getOLSPrompt: GetOLSPrompt = (promptType, data) => {
     [OLSPromptType.VM_STATUS]: `Provide a detailed explanation for why a VirtualMachine would have a status of ${vmPrintableStatus}${
       isErrorStatus ? 'and provide troubleshooting steps for how to fix it' : ''
     }.`,
-    [OLSPromptType.VM_STATUS_CONCISE]: `Provide a very concise explanation for why a VirtualMachine would have a status of ${vmPrintableStatus}. Don't provide troubleshooting steps and don't add phrases indicating that this response is intended to brief.`,
+    [OLSPromptType.VM_STATUS_CONCISE]: `Provide a very concise explanation for why a VirtualMachine would have a status of ${vmPrintableStatus}. Don't provide troubleshooting steps and don't add phrases indicating that this response is intended to brief. Attempt to limit the response to no more than two sentences`,
     [OLSPromptType.VOLUME_MODE]:
       'Provide a detailed explanation of volume modes in the context of OpenShift Virtualization storage.',
     [OLSPromptType.VOLUME_SNAPSHOT_STATUS]:
