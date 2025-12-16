@@ -39,7 +39,7 @@ if [[ "$1" == "--start-console" ]]; then
   PLUGINS="$@"
 
   # Start Console on port 9000 (by default) with plugins
-  BRIDGE_BRANDING="$BRIDGE_BRANDING" CONSOLE_IMAGE="$CONSOLE_IMAGE" npm run start-console "$PLUGINS" &
+  BRIDGE_BRANDING="$BRIDGE_BRANDING" CONSOLE_IMAGE="$CONSOLE_IMAGE" npm run start-console -- "$PLUGINS" &
 
   # Open the console URL in the browser
   echo "Login successful. Opening console URL: $CONSOLE_URL"

@@ -30,17 +30,17 @@ do
 done
 
 # Run tests.
-npm_script="test-cypress-headless"
+npm_script_args=""
 
 if [ -n "${gui-}" ]; then
-  npm_script="test-cypress"
+  npm_script_args="test-cypress"
 fi
 
 if [ -n "${spec-}" ]; then
-  npm_script="$npm_script --spec '$spec'"
+  npm_script_args="$npm_script_args --spec '$spec'"
 fi
 
-npm run $npm_script
+npm run test-cypress-headless -- $npm_script_args
 
 # Generate Cypress report.
 npm run cypress-postreport

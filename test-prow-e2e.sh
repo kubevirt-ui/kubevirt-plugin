@@ -158,7 +158,7 @@ npm ci
 npm install -g mochawesome-report-generator --force
 
 # Run tests.
-npm run test-cypress-headless --spec="tests/gating.cy.ts"
+npm run test-cypress-headless -- --spec="tests/gating.cy.ts"
 
 # Generate Cypress report.
 npm run cypress-postreport
