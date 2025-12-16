@@ -2,16 +2,16 @@ import {
   modelToGroupVersionKind,
   PersistentVolumeClaimModel,
   SecretModel,
-} from '@kubevirt-ui/kubevirt-api/console';
-import { DataVolumeModel } from '@kubevirt-ui/kubevirt-api/console';
-import { VirtualMachineSnapshotModel } from '@kubevirt-ui/kubevirt-api/console';
-import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer';
-import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
+} from '@kubevirt-ui-ext/kubevirt-api/console';
+import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { VirtualMachineSnapshotModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
   V1beta1VirtualMachineSnapshot,
   V1VirtualMachine,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { getRootDiskSecretRef, getVolumes } from '@kubevirt-utils/resources/vm';
 import { getCluster } from '@multicluster/helpers/selectors';

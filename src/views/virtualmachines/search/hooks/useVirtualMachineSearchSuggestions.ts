@@ -3,8 +3,8 @@ import { useMemo } from 'react';
 import {
   VirtualMachineInstanceModelGroupVersionKind,
   VirtualMachineModelGroupVersionKind,
-} from '@kubevirt-ui/kubevirt-api/console';
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import { getAnnotation, getLabels, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVMIIPAddresses } from '@kubevirt-utils/resources/vmi/utils/ips';

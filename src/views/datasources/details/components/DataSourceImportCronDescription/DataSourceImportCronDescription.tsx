@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { DataImportCronModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
-import { V1beta1DataImportCron } from '@kubevirt-ui/kubevirt-api/containerized-data-importer';
+import { DataImportCronModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1beta1DataImportCron } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ResourceLink, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';

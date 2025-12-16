@@ -1,8 +1,8 @@
 import React, { FC, useCallback, useMemo } from 'react';
 import { Updater } from 'use-immer';
 
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getName, getNamespace, getUID } from '@kubevirt-utils/resources/shared';
 import { Table, Th, Thead, Tr } from '@patternfly/react-table';
 

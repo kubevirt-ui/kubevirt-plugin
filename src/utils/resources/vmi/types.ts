@@ -2,7 +2,7 @@ import {
   V1Interface,
   V1Network,
   V1VirtualMachineInstanceNetworkInterface,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
 export type VMINetworkPresentation = {
   iface?: V1Interface;

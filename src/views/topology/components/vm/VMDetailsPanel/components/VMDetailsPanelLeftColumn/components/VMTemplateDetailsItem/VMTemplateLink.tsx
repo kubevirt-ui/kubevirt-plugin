@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { Link } from 'react-router-dom-v5-compat';
 
-import { TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
+import { TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { getGroupVersionKindForModel, ResourceIcon } from '@openshift-console/dynamic-plugin-sdk';
 
 import { VIRTUALMACHINES_TEMPLATES_BASE_URL } from '../../../../../../../../dashboard-extensions/utils';

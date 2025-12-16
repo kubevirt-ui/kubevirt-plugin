@@ -1,6 +1,6 @@
 import React, { FC, MouseEvent, useState } from 'react';
 
-import { V1PermittedHostDevices } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1PermittedHostDevices } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';

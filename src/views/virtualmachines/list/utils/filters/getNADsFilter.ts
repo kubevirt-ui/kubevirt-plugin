@@ -1,4 +1,4 @@
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getNetworks } from '@kubevirt-utils/resources/vm/utils/selectors';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';

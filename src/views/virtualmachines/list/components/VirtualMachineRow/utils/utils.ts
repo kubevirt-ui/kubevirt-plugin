@@ -1,4 +1,4 @@
-import { V1VirtualMachineCondition } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachineCondition } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
 const isLiveMigratableCondition = (condition: V1VirtualMachineCondition) =>
   condition?.type === 'LiveMigratable' && condition?.status === 'True';

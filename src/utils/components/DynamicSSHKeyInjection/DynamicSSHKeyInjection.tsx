@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useState } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getIsDynamicSSHInjectionEnabled } from '@kubevirt-utils/resources/vm';
 import { Switch } from '@patternfly/react-core';
 

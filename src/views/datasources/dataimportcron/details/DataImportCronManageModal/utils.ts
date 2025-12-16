@@ -1,11 +1,11 @@
 import produce from 'immer';
 
-import { DataImportCronModel } from '@kubevirt-ui/kubevirt-api/console';
-import { DataSourceModel } from '@kubevirt-ui/kubevirt-api/console';
+import { DataImportCronModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   V1beta1DataImportCron,
   V1beta1DataSource,
-} from '@kubevirt-ui/kubevirt-api/containerized-data-importer';
+} from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { DATA_SOURCE_CRONJOB_LABEL } from '@kubevirt-utils/resources/template';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sCreate, kubevirtK8sDelete, kubevirtK8sPatch } from '@multicluster/k8sRequests';

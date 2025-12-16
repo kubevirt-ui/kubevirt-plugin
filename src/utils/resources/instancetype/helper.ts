@@ -1,10 +1,10 @@
-import { VirtualMachineClusterInstancetypeModel } from '@kubevirt-ui/kubevirt-api/console';
-import { VirtualMachineInstancetypeModel } from '@kubevirt-ui/kubevirt-api/console';
+import { VirtualMachineClusterInstancetypeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { VirtualMachineInstancetypeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   V1InstancetypeMatcher,
   V1VirtualMachine,
   V1VirtualMachineInstance,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isVM } from '@kubevirt-utils/utils/typeGuards';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';

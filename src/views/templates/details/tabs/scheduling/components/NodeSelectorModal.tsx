@@ -2,8 +2,12 @@ import * as React from 'react';
 import produce from 'immer';
 import { getNodeSelector } from 'src/views/templates/utils/selectors';
 
-import { modelToGroupVersionKind, NodeModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import {
+  modelToGroupVersionKind,
+  NodeModel,
+  V1Template,
+} from '@kubevirt-ui-ext/kubevirt-api/console';
+import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import LabelsList from '@kubevirt-utils/components/NodeSelectorModal/components/LabelList';
 import LabelRow from '@kubevirt-utils/components/NodeSelectorModal/components/LabelRow';
 import NodeCheckerAlert from '@kubevirt-utils/components/NodeSelectorModal/components/NodeCheckerAlert';

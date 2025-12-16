@@ -6,7 +6,7 @@ import {
   VirtualMachineClusterPreferenceModelGroupVersionKind,
   VirtualMachineClusterPreferenceModelRef,
   VirtualMachinePreferenceModelRef,
-} from '@kubevirt-ui/kubevirt-api/console';
+} from '@kubevirt-ui-ext/kubevirt-api/console';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import useIsSearchPage from '@kubevirt-utils/hooks/useIsSearchPage';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

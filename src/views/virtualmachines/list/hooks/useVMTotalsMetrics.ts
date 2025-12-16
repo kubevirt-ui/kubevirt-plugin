@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import useListClusters from '@kubevirt-utils/hooks/useListClusters';
 import useListNamespaces from '@kubevirt-utils/hooks/useListNamespaces';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';

@@ -1,5 +1,5 @@
-import { MigrationPolicyModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
-import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { MigrationPolicyModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Selector } from '@openshift-console/dynamic-plugin-sdk';
 

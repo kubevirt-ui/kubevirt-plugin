@@ -1,6 +1,6 @@
 import { FC, HTMLProps, MouseEventHandler } from 'react';
 
-import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { RFBCreate } from '@novnc/novnc/lib/rfb';
 
 export type VncConsoleActionsProps = {

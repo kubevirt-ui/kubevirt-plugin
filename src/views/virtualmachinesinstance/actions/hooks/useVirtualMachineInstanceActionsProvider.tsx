@@ -1,8 +1,8 @@
 import * as React from 'react';
 
-import { VirtualMachineInstanceModelRef } from '@kubevirt-ui/kubevirt-api/console';
-import { VirtualMachineInstanceModel } from '@kubevirt-ui/kubevirt-api/console';
-import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { VirtualMachineInstanceModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { VirtualMachineInstanceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';

@@ -1,4 +1,4 @@
-import { VirtualMachineClusterPreferenceModel } from '@kubevirt-ui/kubevirt-api/console';
+import { VirtualMachineClusterPreferenceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 
 export const defaultVirtualMachineClusterPreferenceYamlTemplate = `
 apiVersion: ${VirtualMachineClusterPreferenceModel.apiGroup}/${VirtualMachineClusterPreferenceModel.apiVersion}

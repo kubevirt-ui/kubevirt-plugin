@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { V1CPU } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { TemplateModel, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { getCPU, getMemory } from '@kubevirt-utils/resources/vm';
 import { k8sGet } from '@openshift-console/dynamic-plugin-sdk';

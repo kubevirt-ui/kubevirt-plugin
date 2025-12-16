@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
-import { PersistentVolumeClaimModel } from '@kubevirt-ui/kubevirt-api/console';
-import { DataSourceModel } from '@kubevirt-ui/kubevirt-api/console';
+import { PersistentVolumeClaimModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useClusterFilter } from '@kubevirt-utils/hooks/useClusterFilter';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useProjectFilter } from '@kubevirt-utils/hooks/useProjectFilter';

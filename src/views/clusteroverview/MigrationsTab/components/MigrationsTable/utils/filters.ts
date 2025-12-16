@@ -1,4 +1,4 @@
-import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';

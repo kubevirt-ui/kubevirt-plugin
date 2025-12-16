@@ -1,11 +1,11 @@
 import React, { FC, useMemo } from 'react';
 import { Trans } from 'react-i18next';
 
-import { VirtualMachineRestoreModel } from '@kubevirt-ui/kubevirt-api/console';
+import { VirtualMachineRestoreModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   V1beta1VirtualMachineRestore,
   V1beta1VirtualMachineSnapshot,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getCluster } from '@multicluster/helpers/selectors';

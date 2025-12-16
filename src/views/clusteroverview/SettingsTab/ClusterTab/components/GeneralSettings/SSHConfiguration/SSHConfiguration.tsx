@@ -1,7 +1,7 @@
 import React, { FC, useCallback, useState } from 'react';
 import { useDebounceCallback } from 'src/views/clusteroverview/utils/hooks/useDebounceCallback';
 
-import { ConfigMapModel } from '@kubevirt-ui/kubevirt-api/console';
+import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
 import {
   LOAD_BALANCER_ENABLED,

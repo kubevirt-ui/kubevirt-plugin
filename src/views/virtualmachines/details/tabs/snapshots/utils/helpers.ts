@@ -1,12 +1,12 @@
-import { VirtualMachineModel } from '@kubevirt-ui/kubevirt-api/console';
-import { VirtualMachineRestoreModel } from '@kubevirt-ui/kubevirt-api/console';
-import { VirtualMachineSnapshotModel } from '@kubevirt-ui/kubevirt-api/console';
+import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { VirtualMachineRestoreModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { VirtualMachineSnapshotModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   V1beta1VirtualMachineRestore,
   V1beta1VirtualMachineSnapshot,
   V1VirtualMachine,
   V1VolumeSnapshotStatus,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { getVolumeSnapshotStatuses } from '@kubevirt-utils/resources/vm';

@@ -2,8 +2,8 @@ import React, { FC, useCallback, useState } from 'react';
 
 import useRegistryCredentials from '@catalog/utils/useRegistryCredentials/useRegistryCredentials';
 import { produceVMDisks, useWizardVMContext } from '@catalog/utils/WizardVMContext';
-import { DataVolumeModel } from '@kubevirt-ui/kubevirt-api/console';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
 import {

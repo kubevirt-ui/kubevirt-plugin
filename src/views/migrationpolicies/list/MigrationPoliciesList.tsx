@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
-import { MigrationPolicyModelRef } from '@kubevirt-ui/kubevirt-api/console';
-import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { MigrationPolicyModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useMigrationPolicies from '@kubevirt-utils/hooks/useMigrationPolicies';

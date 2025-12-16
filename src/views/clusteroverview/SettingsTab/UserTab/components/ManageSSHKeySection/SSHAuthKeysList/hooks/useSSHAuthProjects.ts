@@ -4,7 +4,7 @@ import {
   modelToGroupVersionKind,
   ProjectModel,
   SecretModel,
-} from '@kubevirt-ui/kubevirt-api/console';
+} from '@kubevirt-ui-ext/kubevirt-api/console';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {

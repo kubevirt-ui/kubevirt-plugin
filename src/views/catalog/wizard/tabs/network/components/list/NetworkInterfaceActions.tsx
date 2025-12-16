@@ -2,7 +2,7 @@ import React, { FC, useCallback, useState } from 'react';
 
 import { produceVMNetworks, useWizardVMContext } from '@catalog/utils/WizardVMContext';
 import { setInterfaceLinkState } from '@catalog/wizard/tabs/network/utils/utils';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';

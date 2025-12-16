@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { VirtualMachinePreferenceModel } from '@kubevirt-ui/kubevirt-api/console';
-import { V1beta1VirtualMachinePreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { VirtualMachinePreferenceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1beta1VirtualMachinePreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import CloneResourceModal from '@kubevirt-utils/components/CloneResourceModal/CloneResourceModal';
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';

@@ -1,7 +1,7 @@
 import {
   V1beta1StorageSpecAccessModesEnum,
   V1beta1StorageSpecVolumeModeEnum,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
 export const initialAccessModes: V1beta1StorageSpecAccessModesEnum[] = [
   V1beta1StorageSpecAccessModesEnum.ReadWriteMany,

@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react';
 
-import { PersistentVolumeClaimModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { DataSourceModel } from '@kubevirt-ui/kubevirt-api/console';
-import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer';
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { PersistentVolumeClaimModel, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
   convertResourceArrayToMapWithCluster,
   getName,

@@ -1,6 +1,6 @@
 import { ComponentClass, FC } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ErrorIcon } from '@kubevirt-utils/components/ErrorIcon/ErrorIcon';
 import { GreenRunningIcon } from '@kubevirt-utils/icons/GreenRunningIcon';
 import {

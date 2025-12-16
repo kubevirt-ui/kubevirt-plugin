@@ -2,7 +2,7 @@ import { useState } from 'react';
 import produce from 'immer';
 
 import useRegistryCredentials from '@catalog/utils/useRegistryCredentials/useRegistryCredentials';
-import { V1Devices, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1Devices, V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { SecretSelectionOption } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import { logTemplateFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
 import {

@@ -1,4 +1,4 @@
-import { V1Disk } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1Disk } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   CONTAINER_EPHERMAL,
   DYNAMIC,

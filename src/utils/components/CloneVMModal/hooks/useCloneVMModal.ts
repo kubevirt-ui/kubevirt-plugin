@@ -1,6 +1,6 @@
-import { modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
-import { VirtualMachineCloneModel } from '@kubevirt-ui/kubevirt-api/console';
-import { V1beta1VirtualMachineClone } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { VirtualMachineCloneModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1beta1VirtualMachineClone } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 type UseCloneVMModal = (

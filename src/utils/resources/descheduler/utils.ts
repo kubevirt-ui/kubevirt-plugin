@@ -1,6 +1,6 @@
 import produce from 'immer';
 
-import { KubeDeschedulerModel } from '@kubevirt-ui/kubevirt-api/console';
+import { KubeDeschedulerModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   KUBE_DESCHEDULER_NAME,
   KUBE_DESCHEDULER_NAMESPACE,

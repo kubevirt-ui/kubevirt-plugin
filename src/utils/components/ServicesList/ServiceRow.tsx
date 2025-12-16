@@ -1,7 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 
-import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { modelToGroupVersionKind, NamespaceModel, ServiceModel } from '@kubevirt-utils/models';
 import { ResourceLink, TableData } from '@openshift-console/dynamic-plugin-sdk';
 

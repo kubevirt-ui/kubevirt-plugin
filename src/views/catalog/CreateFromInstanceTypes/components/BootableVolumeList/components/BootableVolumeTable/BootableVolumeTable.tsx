@@ -4,11 +4,11 @@ import {
   InstanceTypeVMStore,
   UseBootableVolumesValues,
 } from '@catalog/CreateFromInstanceTypes/state/utils/types';
-import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer';
+import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import {
   V1beta1VirtualMachineClusterPreference,
   V1beta1VirtualMachinePreference,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { UserSettingFavorites } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/types';
 import {
   getBootableVolumePVCSource,

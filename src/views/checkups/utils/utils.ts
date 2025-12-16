@@ -1,11 +1,11 @@
 import { Location } from 'react-router-dom-v5-compat';
 
-import { JobModel, modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
+import { JobModel, modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   IoK8sApiBatchV1Job,
   IoK8sApiCoreV1ConfigMap,
   IoK8sApiCoreV1Container,
-} from '@kubevirt-ui/kubevirt-api/kubernetes';
+} from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { sortByDirection, universalComparator } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';

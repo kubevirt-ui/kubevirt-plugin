@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom-v5-compat';
 
-import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
+import { VirtualMachineModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm';
 import { getVMIPod } from '@kubevirt-utils/resources/vmi';
 

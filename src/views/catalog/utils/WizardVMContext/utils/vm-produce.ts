@@ -1,7 +1,7 @@
 import produce from 'immer';
 import { Draft } from 'immer';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   generateSysprepConfigMapName,
   sysprepDisk,

@@ -1,4 +1,4 @@
-import { V1Disk } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1Disk } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { InterfaceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 

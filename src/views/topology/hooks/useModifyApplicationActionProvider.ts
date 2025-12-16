@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { VirtualMachineModel } from '@kubevirt-ui/kubevirt-api/console';
+import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { Action, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { getModifyApplicationAction } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { GraphElement } from '@patternfly/react-topology';

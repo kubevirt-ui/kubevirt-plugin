@@ -2,7 +2,7 @@ import {
   IoK8sApiBatchV1Job,
   IoK8sApiCoreV1ConfigMap,
   IoK8sApiCoreV1PersistentVolumeClaim,
-} from '@kubevirt-ui/kubevirt-api/kubernetes';
+} from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 
 import {
   CONFIGMAP_NAME,

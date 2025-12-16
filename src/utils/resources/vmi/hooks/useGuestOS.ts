@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import {
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceGuestAgentInfo,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import useGuestAgentURL from '@multicluster/hooks/useGuestAgentURL';
 import { consoleFetch } from '@openshift-console/dynamic-plugin-sdk';
 

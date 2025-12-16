@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom-v5-compat';
 
-import { VirtualMachineModel } from '@kubevirt-ui/kubevirt-api/console';
+import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   AdapterDataType,
   getGroupVersionKindForResource,

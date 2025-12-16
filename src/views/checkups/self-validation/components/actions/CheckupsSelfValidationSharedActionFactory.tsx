@@ -1,6 +1,9 @@
 import React, { ReactNode } from 'react';
 
-import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import {
+  IoK8sApiBatchV1Job,
+  IoK8sApiCoreV1ConfigMap,
+} from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { getSelfValidationCheckupURL } from '@kubevirt-utils/resources/checkups/urls';

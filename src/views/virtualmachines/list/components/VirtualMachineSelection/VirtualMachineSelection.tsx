@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
 import { BulkSelect } from '@patternfly/react-component-groups/dist/dynamic/BulkSelect';
 import { FlexItem } from '@patternfly/react-core';

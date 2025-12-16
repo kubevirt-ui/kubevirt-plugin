@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom-v5-compat';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { FilterValue, RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { getRowFilterQueryKey } from '@search/utils/query';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';

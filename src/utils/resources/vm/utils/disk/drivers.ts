@@ -1,7 +1,7 @@
 import produce from 'immer';
 
-import { ConfigMapModel } from '@kubevirt-ui/kubevirt-api/console';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { InterfaceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import { ensurePath, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { k8sGet } from '@openshift-console/dynamic-plugin-sdk';

@@ -1,11 +1,11 @@
 import React, { useCallback, useMemo, useState } from 'react';
 
-import { DataImportCronModel } from '@kubevirt-ui/kubevirt-api/console';
-import { DataSourceModel } from '@kubevirt-ui/kubevirt-api/console';
+import { DataImportCronModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   V1beta1DataImportCron,
   V1beta1DataSource,
-} from '@kubevirt-ui/kubevirt-api/containerized-data-importer';
+} from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import ExportModal from '@kubevirt-utils/components/ExportModal/ExportModal';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';

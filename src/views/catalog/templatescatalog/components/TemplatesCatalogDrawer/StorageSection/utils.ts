@@ -1,12 +1,12 @@
 import { produceVMDisks } from '@catalog/utils/WizardVMContext';
-import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { DataVolumeModel } from '@kubevirt-ui/kubevirt-api/console';
+import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   V1beta1DataVolumeSpec,
   V1ContainerDiskSource,
   V1DataVolumeTemplateSpec,
   V1VirtualMachine,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ROOTDISK } from '@kubevirt-utils/constants/constants';
 import { CDI_BIND_REQUESTED_ANNOTATION } from '@kubevirt-utils/hooks/useCDIUpload/consts';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { SimplifiedAlerts } from '@kubevirt-utils/components/AlertsCard/utils/types';
 import { createAlertKey } from '@kubevirt-utils/components/AlertsCard/utils/utils';
 import { KUBEVIRT } from '@kubevirt-utils/constants/constants';

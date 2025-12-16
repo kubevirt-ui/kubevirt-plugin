@@ -1,7 +1,7 @@
 import React, { FC, MouseEvent, useMemo, useState } from 'react';
 import produce from 'immer';
 
-import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { BootModeTitles } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/constants';
 import { BootloaderOptionValue } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/types';
 import {

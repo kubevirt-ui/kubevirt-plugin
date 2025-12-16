@@ -1,8 +1,8 @@
 import produce from 'immer';
 import { Draft } from 'immer';
 
-import { DataVolumeModel } from '@kubevirt-ui/kubevirt-api/console';
-import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer';
+import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import {
   V1AddVolumeOptions,
   V1DataVolumeTemplateSpec,
@@ -11,7 +11,7 @@ import {
   V1VirtualMachine,
   V1VirtualMachineInstance,
   V1Volume,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   buildOwnerReference,

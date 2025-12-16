@@ -4,8 +4,8 @@ import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils
 import {
   VirtualMachineClusterPreferenceModelGroupVersionKind,
   VirtualMachinePreferenceModelGroupVersionKind,
-} from '@kubevirt-ui/kubevirt-api/console';
-import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer';
+} from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { hasUserPreference } from '@kubevirt-utils/resources/bootableresources/helpers';
 import { getLabel, getNamespace } from '@kubevirt-utils/resources/shared';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';

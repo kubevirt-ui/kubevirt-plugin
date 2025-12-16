@@ -1,12 +1,12 @@
 import { useMemo } from 'react';
 
-import { VirtualMachineRestoreModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
-import { VirtualMachineSnapshotModel } from '@kubevirt-ui/kubevirt-api/console';
+import { VirtualMachineRestoreModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { VirtualMachineSnapshotModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   V1beta1VirtualMachineRestore,
   V1beta1VirtualMachineSnapshot,
   V1VirtualMachine,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { useFleetK8sWatchResource } from '@stolostron/multicluster-sdk';

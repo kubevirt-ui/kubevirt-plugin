@@ -1,4 +1,4 @@
-import { V1GPU, V1HostDevice } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1GPU, V1HostDevice } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { generatePrettyName, isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { HARDWARE_DEVICE_TYPE, HardwareDeviceModalRow } from './constants';

@@ -1,4 +1,4 @@
-import { V1GPU, V1HostDevice } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1GPU, V1HostDevice } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 

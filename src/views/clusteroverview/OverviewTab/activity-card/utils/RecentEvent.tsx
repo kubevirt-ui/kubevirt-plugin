@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { EventModel } from '@kubevirt-ui/kubevirt-api/console';
+import { EventModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { FirehoseResult, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { EventKind } from '@openshift-console/dynamic-plugin-sdk/lib/api/internal-types';
 import { RecentEventsBody } from '@openshift-console/dynamic-plugin-sdk-internal';

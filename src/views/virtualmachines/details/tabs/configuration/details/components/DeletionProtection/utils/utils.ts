@@ -1,4 +1,4 @@
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getLabel, getLabels } from '@kubevirt-utils/resources/shared';
 import { updateLabels } from '@virtualmachines/details/tabs/configuration/details/utils/utils';

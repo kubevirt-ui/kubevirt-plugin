@@ -1,6 +1,6 @@
 import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
-export * from '@kubevirt-ui/kubevirt-api/console';
+export * from '@kubevirt-ui-ext/kubevirt-api/console';
 
 export const UploadTokenRequestModel: K8sModel = {
   abbr: 'utr',

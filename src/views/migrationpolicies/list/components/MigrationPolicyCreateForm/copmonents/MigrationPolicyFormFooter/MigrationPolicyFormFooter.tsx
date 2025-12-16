@@ -2,8 +2,8 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 import { useMigrationPoliciesPageBaseURL } from 'src/views/migrationpolicies/hooks/useMigrationPoliciesPageBaseURL';
 
-import { MigrationPolicyModel } from '@kubevirt-ui/kubevirt-api/console';
-import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { MigrationPolicyModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';

@@ -4,7 +4,7 @@ import { UseBootableVolumesValues } from '@catalog/CreateFromInstanceTypes/state
 import {
   V1beta1VirtualMachineClusterPreference,
   V1beta1VirtualMachinePreference,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { UserSettingFavorites } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/types';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';

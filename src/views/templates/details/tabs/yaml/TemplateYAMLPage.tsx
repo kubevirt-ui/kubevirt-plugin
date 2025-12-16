@@ -1,7 +1,7 @@
 import React, { FC, Suspense, useCallback, useState } from 'react';
 import { load } from 'js-yaml';
 
-import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { getName } from '@kubevirt-utils/resources/shared';

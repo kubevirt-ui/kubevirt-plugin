@@ -1,4 +1,4 @@
-import { TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
+import { TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 
 export const defaultVMTemplateYamlTemplate = `
 apiVersion: ${TemplateModel.apiGroup}/${TemplateModel.apiVersion}

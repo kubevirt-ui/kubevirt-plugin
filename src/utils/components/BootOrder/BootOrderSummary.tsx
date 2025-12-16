@@ -1,6 +1,6 @@
 import React, { FC, useMemo } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import BootableDevicesList from '@kubevirt-utils/components/BootOrder/BootableDevicesList';
 import { getSortedBootableDevices } from '@kubevirt-utils/resources/vm/utils/boot-order/bootOrder';
 

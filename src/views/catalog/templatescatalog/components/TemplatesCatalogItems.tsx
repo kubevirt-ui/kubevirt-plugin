@@ -1,7 +1,7 @@
 import React, { useMemo, VFC } from 'react';
 
-import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer';
+import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
 import { Gallery, StackItem } from '@patternfly/react-core';
 

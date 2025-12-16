@@ -1,9 +1,9 @@
-import { VirtualMachineClusterPreferenceModel } from '@kubevirt-ui/kubevirt-api/console';
-import { VirtualMachinePreferenceModel } from '@kubevirt-ui/kubevirt-api/console';
+import { VirtualMachineClusterPreferenceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { VirtualMachinePreferenceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   V1beta1VirtualMachinePreference,
   V1PreferenceMatcher,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { BootMode } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/constants';
 import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 

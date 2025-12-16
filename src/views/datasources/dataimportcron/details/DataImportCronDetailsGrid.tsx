@@ -1,11 +1,11 @@
 import React from 'react';
 
-import { DataSourceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
-import { DataImportCronModel } from '@kubevirt-ui/kubevirt-api/console';
+import { DataSourceModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { DataImportCronModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   V1beta1DataImportCron,
   V1beta1DataSource,
-} from '@kubevirt-ui/kubevirt-api/containerized-data-importer';
+} from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import DescriptionItemAnnotations from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemAnnotations';
 import DescriptionItemCreatedAt from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemCreatedAt';
 import DescriptionItemLabels from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemLabels';

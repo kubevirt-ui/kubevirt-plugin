@@ -6,7 +6,7 @@ import {
   V1Network,
   V1VirtualMachine,
   V1VirtualMachineInstance,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import WithPermissionTooltip from '@kubevirt-utils/components/WithPermissionTooltip/WithPermissionTooltip';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

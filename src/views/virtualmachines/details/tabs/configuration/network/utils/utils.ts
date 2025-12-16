@@ -1,12 +1,12 @@
 import produce from 'immer';
 
-import { VirtualMachineModel } from '@kubevirt-ui/kubevirt-api/console';
+import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   V1Network,
   V1VirtualMachine,
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceNetworkInterface,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getInterface, getInterfaces } from '@kubevirt-utils/resources/vm';
 import { DEFAULT_NETWORK_INTERFACE } from '@kubevirt-utils/resources/vm/utils/constants';
 import { interfaceTypesProxy } from '@kubevirt-utils/resources/vm/utils/network/constants';

@@ -5,7 +5,7 @@ import {
   modelToGroupVersionKind,
   TemplateModel,
   V1Template,
-} from '@kubevirt-ui/kubevirt-api/console';
+} from '@kubevirt-ui-ext/kubevirt-api/console';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { SidebarEditorProvider } from '@kubevirt-utils/components/SidebarEditor/SidebarEditorContext';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';

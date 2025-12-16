@@ -1,13 +1,13 @@
 import produce from 'immer';
 
-import { VirtualMachineCloneModel } from '@kubevirt-ui/kubevirt-api/console';
-import { VirtualMachineModel } from '@kubevirt-ui/kubevirt-api/console';
-import { VirtualMachineSnapshotModel } from '@kubevirt-ui/kubevirt-api/console';
+import { VirtualMachineCloneModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { VirtualMachineSnapshotModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   V1beta1VirtualMachineClone,
   V1beta1VirtualMachineSnapshot,
   V1VirtualMachine,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { RUNSTRATEGY_ALWAYS } from '@kubevirt-utils/constants/constants';
 import { MAX_K8S_NAME_LENGTH } from '@kubevirt-utils/utils/constants';
 import { isVM } from '@kubevirt-utils/utils/typeGuards';

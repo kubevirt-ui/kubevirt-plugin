@@ -1,5 +1,5 @@
-import { JobModel } from '@kubevirt-ui/kubevirt-api/console';
-import { IoK8sApiBatchV1Job } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { JobModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { k8sList } from '@openshift-console/dynamic-plugin-sdk';
 

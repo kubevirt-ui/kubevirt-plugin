@@ -4,8 +4,8 @@ import {
   modelToGroupVersionKind,
   PersistentVolumeClaimModel,
   V1Template,
-} from '@kubevirt-ui/kubevirt-api/console';
-import { V1beta1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1beta1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useK8sWatchResources, WatchK8sResource } from '@openshift-console/dynamic-plugin-sdk';
 
 import { getPVCNamespace } from '../utils/selectors';

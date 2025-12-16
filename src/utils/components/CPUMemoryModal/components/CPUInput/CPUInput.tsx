@@ -1,6 +1,6 @@
 import React, { Dispatch, FC, SetStateAction, useState } from 'react';
 
-import { V1CPU } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import VCPUInput from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/components/vCPUInput/VCPUInput';
 import {
   convertTopologyToVCPUs,

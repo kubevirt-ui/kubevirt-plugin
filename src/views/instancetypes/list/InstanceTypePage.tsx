@@ -6,7 +6,7 @@ import useVirtualMachineInstanceTypes from '@catalog/CreateFromInstanceTypes/sta
 import {
   VirtualMachineClusterInstancetypeModel,
   VirtualMachineClusterInstancetypeModelRef,
-} from '@kubevirt-ui/kubevirt-api/console';
+} from '@kubevirt-ui-ext/kubevirt-api/console';
 import { PageTitles } from '@kubevirt-utils/constants/page-constants';
 import useIsSearchPage from '@kubevirt-utils/hooks/useIsSearchPage';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

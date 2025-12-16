@@ -1,6 +1,6 @@
 import React, { FC, JSX, useMemo } from 'react';
 
-import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui/kubevirt-api/console';
+import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import { getProjectOptions } from '@kubevirt-utils/components/ProjectDropdown/utils/utils';
 import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { V1Devices } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1Devices } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { getChangedGuestSystemAccessLog } from '@kubevirt-utils/components/PendingChanges/utils/helpers';
 import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeatures/constants';

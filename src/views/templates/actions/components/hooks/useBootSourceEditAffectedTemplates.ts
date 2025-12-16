@@ -4,7 +4,7 @@ import {
   modelToGroupVersionKind,
   TemplateModel,
   V1Template,
-} from '@kubevirt-ui/kubevirt-api/console';
+} from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   getTemplateParameterValue,
   TEMPLATE_DATA_SOURCE_NAME_PARAMETER,

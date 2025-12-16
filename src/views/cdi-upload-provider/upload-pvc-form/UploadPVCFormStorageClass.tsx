@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { StorageClassModel } from '@kubevirt-ui/kubevirt-api/console';
+import { StorageClassModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { getSCSelectOptions } from '@kubevirt-utils/components/DiskModal/components/StorageClassAndPreallocation/utils/helpers';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

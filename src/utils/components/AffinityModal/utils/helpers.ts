@@ -1,4 +1,4 @@
-import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
   K8sIoApiCoreV1Affinity,
   K8sIoApiCoreV1NodeAffinity,
@@ -10,7 +10,7 @@ import {
   K8sIoApiCoreV1PodAntiAffinity,
   K8sIoApiCoreV1PreferredSchedulingTerm,
   K8sIoApiCoreV1WeightedPodAffinityTerm,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Operator } from '@openshift-console/dynamic-plugin-sdk';

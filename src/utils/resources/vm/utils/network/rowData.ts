@@ -1,4 +1,4 @@
-import { V1Interface, V1Network } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1Interface, V1Network } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
 import { NetworkPresentation } from './constants';
 

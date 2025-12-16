@@ -1,4 +1,4 @@
-import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   getTemplateVirtualMachineObject,
   replaceTemplateVM,

@@ -1,4 +1,4 @@
-import { DataVolumeModel } from '@kubevirt-ui/kubevirt-api/console';
+import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 
 export const defaultBootableVolumeYamlTemplate = `
 apiVersion: ${DataVolumeModel.apiGroup}/${DataVolumeModel.apiVersion}

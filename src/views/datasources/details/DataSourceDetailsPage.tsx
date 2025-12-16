@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer';
+import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import {
   ConditionsTable,
   K8sResourceCondition,

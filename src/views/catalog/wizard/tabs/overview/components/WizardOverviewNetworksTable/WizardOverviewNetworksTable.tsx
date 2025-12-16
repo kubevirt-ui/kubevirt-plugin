@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { WizardDescriptionItem } from '@catalog/wizard/components/WizardDescriptionItem';
-import { V1Interface, V1Network } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1Interface, V1Network } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   BRIDGE,

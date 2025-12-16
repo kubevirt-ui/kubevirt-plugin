@@ -3,12 +3,12 @@ import {
   modelToGroupVersionKind,
   SecretModel,
   ServiceAccountModel,
-} from '@kubevirt-ui/kubevirt-api/console';
+} from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   IoK8sApiCoreV1ConfigMap,
   IoK8sApiCoreV1Secret,
   IoK8sApiCoreV1ServiceAccount,
-} from '@kubevirt-ui/kubevirt-api/kubernetes';
+} from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 

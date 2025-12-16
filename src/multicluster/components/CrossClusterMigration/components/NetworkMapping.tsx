@@ -1,7 +1,7 @@
 import React, { FC, useMemo } from 'react';
 
 import { V1beta1NetworkMap } from '@kubev2v/types';
-import { NetworkAttachmentDefinitionModel } from '@kubevirt-ui/kubevirt-api/console';
+import { NetworkAttachmentDefinitionModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import { NetworkAttachmentDefinition } from '@kubevirt-utils/components/NetworkInterfaceModal/components/hooks/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

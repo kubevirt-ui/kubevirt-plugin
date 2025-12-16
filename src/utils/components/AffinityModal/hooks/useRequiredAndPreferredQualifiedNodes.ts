@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 
 import { intersectionWith, unionWith } from '../utils/helpers';
 import { AffinityCondition, AffinityRowData, AffinityType } from '../utils/types';

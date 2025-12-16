@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { TemplateModel, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import NetworkInterfaceModal from '@kubevirt-utils/components/NetworkInterfaceModal/NetworkInterfaceModal';
 import {
   createInterface,

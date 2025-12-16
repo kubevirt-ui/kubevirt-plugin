@@ -1,6 +1,6 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
 
-import { V1CPU } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import CPUTopologyHelperText from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/components/CPUTopologyInput/components/TotalCPUHelperText/CPUTopologyHelperText';
 import { CPUComponent } from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/utils/utils';
 import { Grid } from '@patternfly/react-core';

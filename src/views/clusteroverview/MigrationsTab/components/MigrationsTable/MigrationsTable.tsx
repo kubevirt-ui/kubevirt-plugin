@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { VirtualMachineInstanceMigrationModelRef } from '@kubevirt-ui/kubevirt-api/console';
+import { VirtualMachineInstanceMigrationModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ListPageBody, VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';

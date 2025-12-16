@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import SSHAccess from '@kubevirt-utils/components/SSHAccess/SSHAccess';

@@ -1,4 +1,4 @@
-import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { getNodeConditions } from '@kubevirt-utils/resources/node/utils/selectors';
 
 import { NodeStatus } from './types';

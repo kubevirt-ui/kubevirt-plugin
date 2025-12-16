@@ -8,7 +8,7 @@ import {
   getSSHSecretCopy,
   sshSecretExistsInNamespace,
 } from '@catalog/templatescatalog/components/TemplatesCatalogDrawer/utils';
-import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import useSecretsData from '@kubevirt-utils/components/SSHSecretModal/hooks/useSecretsData';
 import {

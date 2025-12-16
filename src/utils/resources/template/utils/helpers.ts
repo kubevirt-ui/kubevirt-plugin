@@ -1,8 +1,12 @@
 import produce from 'immer';
 
-import { TemplateModel, TemplateParameter, V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { VirtualMachineModel } from '@kubevirt-ui/kubevirt-api/console';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  TemplateModel,
+  TemplateParameter,
+  V1Template,
+} from '@kubevirt-ui-ext/kubevirt-api/console';
+import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getAnnotation, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { vmBootDiskSourceIsRegistry } from '@kubevirt-utils/resources/vm/utils/source';
 import { generatePrettyName } from '@kubevirt-utils/utils/utils';

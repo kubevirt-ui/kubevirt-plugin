@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { V1PciHostDevice } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1PciHostDevice } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { HorizontalNav } from '@openshift-console/dynamic-plugin-sdk';
 import {

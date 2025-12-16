@@ -1,6 +1,6 @@
 import React, { FC, useMemo, useState } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ListPageBody, TableColumn, VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
 import { SearchInput } from '@patternfly/react-core';

@@ -5,10 +5,10 @@ import {
   DEFAULT_INSTANCETYPE_LABEL,
   DEFAULT_PREFERENCE_LABEL,
 } from '@catalog/CreateFromInstanceTypes/utils/constants';
-import { DataSourceModel } from '@kubevirt-ui/kubevirt-api/console';
-import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer';
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import VolumeDestination from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeDestination/VolumeDestination';
 import VolumeMetadata from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/VolumeMetadata';
 import {

@@ -2,7 +2,7 @@ import React, { FC, Fragment, Suspense, useState } from 'react';
 import { Trans } from 'react-i18next';
 import RandExp from 'randexp';
 
-import { V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1Volume } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Loading } from '@patternfly/quickstarts';

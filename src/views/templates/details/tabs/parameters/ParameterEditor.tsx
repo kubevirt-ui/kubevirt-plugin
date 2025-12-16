@@ -1,6 +1,6 @@
 import React, { FC, useState } from 'react';
 
-import { TemplateParameter } from '@kubevirt-ui/kubevirt-api/console';
+import { TemplateParameter } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Checkbox, ExpandableSection, FormGroup, TextInput } from '@patternfly/react-core';
 

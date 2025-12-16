@@ -1,5 +1,5 @@
-import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { NODE_PORT_ADDRESS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { getCloudInitCredentials } from '@kubevirt-utils/resources/vmi';
 import { getSSHNodePort } from '@kubevirt-utils/utils/utils';

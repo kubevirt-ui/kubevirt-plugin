@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { V1VirtualMachineCondition } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachineCondition } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import PendingChangesBreadcrumb from '@kubevirt-utils/components/PendingChanges/PendingChangesBreadcrumb/PendingChangesBreadcrumb';
 import { getPendingChangesByTab } from '@kubevirt-utils/components/PendingChanges/utils/helpers';
 import { PendingChange } from '@kubevirt-utils/components/PendingChanges/utils/types';

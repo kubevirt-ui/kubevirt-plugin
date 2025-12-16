@@ -3,7 +3,7 @@ import {
   V1Devices,
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceNetworkInterface,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 /**
  * A selector for the virtual machine instance's volumes
  * @param {V1VirtualMachineInstance} vmi the virtual machine instance

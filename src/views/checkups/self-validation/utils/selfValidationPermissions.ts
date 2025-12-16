@@ -6,8 +6,8 @@ import {
   RoleBindingModel,
   RoleModel,
   ServiceAccountModel,
-} from '@kubevirt-ui/kubevirt-api/console';
-import { IoK8sApiRbacV1ClusterRoleBinding } from '@kubevirt-ui/kubevirt-api/kubernetes';
+} from '@kubevirt-ui-ext/kubevirt-api/console';
+import { IoK8sApiRbacV1ClusterRoleBinding } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import {
   kubevirtK8sCreate,

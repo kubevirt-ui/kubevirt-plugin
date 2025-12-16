@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import produce from 'immer';
 
-import { ConfigMapModel } from '@kubevirt-ui/kubevirt-api/console';
+import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   AUTOMATIC_SUBSCRIPTION_ACTIVATION_KEY,
   AUTOMATIC_SUBSCRIPTION_CUSTOM_URL,

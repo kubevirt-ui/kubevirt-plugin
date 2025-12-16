@@ -3,7 +3,7 @@ import React, { FC } from 'react';
 import {
   V1VirtualMachine,
   V1VirtualMachineInstanceGuestAgentInfo,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
 import { Card, CardBody, Divider } from '@patternfly/react-core';

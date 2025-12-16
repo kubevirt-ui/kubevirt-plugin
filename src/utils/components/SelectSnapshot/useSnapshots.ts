@@ -4,7 +4,7 @@ import {
   modelToGroupVersionKind,
   ProjectModel,
   VolumeSnapshotModel,
-} from '@kubevirt-ui/kubevirt-api/console';
+} from '@kubevirt-ui-ext/kubevirt-api/console';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 

@@ -1,4 +1,4 @@
-import { V1beta1VirtualMachineRestore } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1VirtualMachineRestore } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
 export const getVmRestoreTime = (restore: V1beta1VirtualMachineRestore) =>
   restore?.status?.restoreTime;

@@ -5,8 +5,8 @@ import {
   modelToGroupVersionKind,
   TemplateModel,
   V1Template,
-} from '@kubevirt-ui/kubevirt-api/console';
-import { V1beta1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1beta1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   TEMPLATE_TYPE_BASE,

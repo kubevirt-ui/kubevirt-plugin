@@ -1,4 +1,4 @@
-import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FilterValue, RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 

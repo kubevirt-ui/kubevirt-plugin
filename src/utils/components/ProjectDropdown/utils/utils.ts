@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui/kubevirt-api/console';
+import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
 import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import { getName } from '@kubevirt-utils/resources/shared';

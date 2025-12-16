@@ -1,6 +1,6 @@
 import { generateCloudInitPassword } from '@catalog/CreateFromInstanceTypes/utils/utils';
-import { VirtualMachineModel } from '@kubevirt-ui/kubevirt-api/console';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isUpstream } from '@kubevirt-utils/utils/utils';
 
 const osType = isUpstream ? 'fedora' : 'rhel10';

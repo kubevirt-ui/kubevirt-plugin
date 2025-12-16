@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import useAllCurrentClusters from '@kubevirt-utils/hooks/useAllCurrentClusters';
 import useAllCurrentNamespaces from '@kubevirt-utils/hooks/useAllCurrentNamespaces';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

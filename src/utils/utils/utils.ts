@@ -1,7 +1,7 @@
 import * as ipaddr from 'ipaddr.js';
 import { animals, colors, NumberDictionary, uniqueNamesGenerator } from 'unique-names-generator';
 
-import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
   DEFAULT_NAMESPACE,
   KUBEVIRT_HYPERCONVERGED,

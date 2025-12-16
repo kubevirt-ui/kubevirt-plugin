@@ -1,8 +1,8 @@
-import { VirtualMachinePreferenceModel } from '@kubevirt-ui/kubevirt-api/console';
+import { VirtualMachinePreferenceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   V1beta1VirtualMachinePreference,
   V1VirtualMachine,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { modelToGroupVersionKind } from '@kubevirt-utils/models';
 import { getPreferenceModelFromMatcher } from '@kubevirt-utils/resources/preference/helper';
 import { getNamespace } from '@kubevirt-utils/resources/shared';

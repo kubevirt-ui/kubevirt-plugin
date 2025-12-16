@@ -5,7 +5,7 @@ import {
   instanceTypeActionType,
   UseInstanceTypeAndPreferencesValues,
 } from '@catalog/CreateFromInstanceTypes/state/utils/types';
-import { V1beta1VirtualMachinePreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1VirtualMachinePreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import FolderSelect from '@kubevirt-utils/components/FolderSelect/FolderSelect';
 import { validateVMName } from '@kubevirt-utils/components/VMNameValidationHelperText/utils/utils';

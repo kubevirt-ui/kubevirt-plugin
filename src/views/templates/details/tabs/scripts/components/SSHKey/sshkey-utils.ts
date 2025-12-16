@@ -1,5 +1,5 @@
-import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { VirtualMachineModel } from '@kubevirt-ui/kubevirt-api/console';
+import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { addSecretToVM } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { getAccessCredentials } from '@kubevirt-utils/resources/vm';

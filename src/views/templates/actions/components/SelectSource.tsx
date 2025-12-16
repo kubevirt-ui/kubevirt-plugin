@@ -1,6 +1,6 @@
 import React, { FC, ReactNode } from 'react';
 
-import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/containerized-data-importer';
+import { V1beta1DataVolumeSpec } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
 import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/utils/constants';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';

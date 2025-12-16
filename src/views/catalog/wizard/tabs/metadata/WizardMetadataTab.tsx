@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { WizardTab } from '@catalog/wizard/tabs';
-import { VirtualMachineModel } from '@kubevirt-ui/kubevirt-api/console';
+import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
 import MetadataLabels from '@kubevirt-utils/components/MetadataLabels/MetadataLabels';

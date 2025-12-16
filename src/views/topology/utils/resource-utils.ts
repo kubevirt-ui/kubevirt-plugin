@@ -1,8 +1,8 @@
 import {
   DeploymentConfigModel,
   ReplicationControllerModel,
-} from '@kubevirt-ui/kubevirt-api/console';
-import { IoK8sApiCoreV1Pod } from '@kubevirt-ui/kubevirt-api/kubernetes';
+} from '@kubevirt-ui-ext/kubevirt-api/console';
+import { IoK8sApiCoreV1Pod } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
 import { get, pick } from '@kubevirt-utils/utils/utils';
 import {

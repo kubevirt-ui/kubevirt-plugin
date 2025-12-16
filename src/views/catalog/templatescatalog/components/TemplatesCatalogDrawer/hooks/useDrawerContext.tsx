@@ -10,8 +10,8 @@ import React, {
 import produce from 'immer';
 import { Updater, useImmer } from 'use-immer';
 
-import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { V1beta1DataVolumeSpec, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1beta1DataVolumeSpec, V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { SSHSecretDetails } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import {
   ROOTDISK,

@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useState } from 'react';
 
-import { HyperConvergedModel } from '@kubevirt-ui/kubevirt-api/console';
+import { HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
 import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';

@@ -3,11 +3,11 @@ import { Updater } from 'use-immer';
 
 import { NAME_INPUT_FIELD } from '@catalog/templatescatalog/utils/consts';
 import { TabsData } from '@catalog/utils/WizardVMContext/utils/tabs-data';
-import { TemplateParameter, V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { DataVolumeModel } from '@kubevirt-ui/kubevirt-api/console';
-import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer';
-import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { V1VirtualMachine, V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { TemplateParameter, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { V1VirtualMachine, V1Volume } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   DEFAULT_CDROM_DISK_SIZE,
   DEFAULT_DISK_SIZE,

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { IoK8sApiBatchV1Job } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { Operator } from '@openshift-console/dynamic-plugin-sdk';

@@ -8,7 +8,10 @@ import React, {
 } from 'react';
 
 import { useDrawerContext } from '@catalog/templatescatalog/components/TemplatesCatalogDrawer/hooks/useDrawerContext';
-import { V1beta1DataVolumeSpec, V1ContainerDiskSource } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import {
+  V1beta1DataVolumeSpec,
+  V1ContainerDiskSource,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
 import { getIsMinusDisabled } from '@kubevirt-utils/components/CapacityInput/utils';
 import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';

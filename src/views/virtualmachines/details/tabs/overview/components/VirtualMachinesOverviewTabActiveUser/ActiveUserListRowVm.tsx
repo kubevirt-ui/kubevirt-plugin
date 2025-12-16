@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { V1VirtualMachineInstanceGuestOSUser } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachineInstanceGuestOSUser } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { fromNow } from '@kubevirt-utils/components/Timestamp/utils/datetime';
 import {

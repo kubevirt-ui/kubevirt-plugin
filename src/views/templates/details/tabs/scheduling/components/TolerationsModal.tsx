@@ -2,13 +2,17 @@ import * as React from 'react';
 import produce from 'immer';
 import { getTolerations } from 'src/views/templates/utils/selectors';
 
-import { modelToGroupVersionKind, NodeModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import {
+  modelToGroupVersionKind,
+  NodeModel,
+  V1Template,
+} from '@kubevirt-ui-ext/kubevirt-api/console';
+import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
   K8sIoApiCoreV1Toleration,
   K8sIoApiCoreV1TolerationEffectEnum,
   K8sIoApiCoreV1TolerationOperatorEnum,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import LabelsList from '@kubevirt-utils/components/NodeSelectorModal/components/LabelList';
 import NodeCheckerAlert from '@kubevirt-utils/components/NodeSelectorModal/components/NodeCheckerAlert';
 import { useIDEntities } from '@kubevirt-utils/components/NodeSelectorModal/hooks/useIDEntities';

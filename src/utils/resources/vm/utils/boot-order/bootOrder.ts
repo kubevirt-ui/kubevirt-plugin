@@ -1,6 +1,6 @@
 import unionBy from 'lodash/unionBy';
 
-import { V1Disk, V1Interface, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1Disk, V1Interface, V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { CLOUDINITDISK } from '@kubevirt-utils/constants/constants';
 import { getDisks, getInterfaces } from '@kubevirt-utils/resources/vm';
 import { getPrintableDiskDrive } from '@kubevirt-utils/resources/vm/utils/disk/selectors';

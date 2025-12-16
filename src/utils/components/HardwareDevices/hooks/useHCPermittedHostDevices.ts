@@ -1,7 +1,7 @@
 import {
   V1KubeVirtConfiguration,
   V1PermittedHostDevices,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import useKubevirtHyperconvergeConfiguration from '@kubevirt-utils/hooks/useKubevirtHyperconvergeConfiguration.ts';
 
 type UseHCPermittedHostDevicesType = () => {

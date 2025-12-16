@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
-import { VirtualMachineModel } from '@kubevirt-ui/kubevirt-api/console';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DescriptionItemAnnotations from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemAnnotations';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { updateAnnotation } from '@virtualmachines/details/tabs/configuration/details/utils/utils';

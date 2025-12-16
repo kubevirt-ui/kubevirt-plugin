@@ -1,5 +1,5 @@
 import { IoK8sApiCoreV1NodeCondition } from '@kubev2v/types';
-import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 
 /**
  * A selector for the Node's conditions

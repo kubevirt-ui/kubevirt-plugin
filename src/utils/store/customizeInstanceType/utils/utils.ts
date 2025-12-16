@@ -1,4 +1,4 @@
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
 import { CUSTOMIZE_INSTANCE_TYPE_SESSION_STORAGE_KEY } from './const';

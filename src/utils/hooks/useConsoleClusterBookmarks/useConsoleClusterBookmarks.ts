@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import { ConfigMapModel } from '@kubevirt-ui/kubevirt-api/console';
-import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import useConsoleUserSettingsConfigMap, {
   CONSOLE_USER_SETTINGS_NAMESPACE,
 } from '@kubevirt-utils/hooks/useConsoleUserSettingsConfigMap/useConsoleUserSettingsConfigMap';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Step } from 'react-joyride';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { RUNSTRATEGY_ALWAYS } from '@kubevirt-utils/constants/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { TREE_VIEW_PANEL_ID } from '@virtualmachines/tree/utils/constants';

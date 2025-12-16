@@ -1,7 +1,7 @@
-import { VirtualMachineClusterInstancetypeModel } from '@kubevirt-ui/kubevirt-api/console';
-import { VirtualMachineClusterPreferenceModel } from '@kubevirt-ui/kubevirt-api/console';
-import { VirtualMachineInstancetypeModel } from '@kubevirt-ui/kubevirt-api/console';
-import { VirtualMachinePreferenceModel } from '@kubevirt-ui/kubevirt-api/console';
+import { VirtualMachineClusterInstancetypeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { VirtualMachineClusterPreferenceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { VirtualMachineInstancetypeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { VirtualMachinePreferenceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   K8sVerb,
   SetFeatureFlag,

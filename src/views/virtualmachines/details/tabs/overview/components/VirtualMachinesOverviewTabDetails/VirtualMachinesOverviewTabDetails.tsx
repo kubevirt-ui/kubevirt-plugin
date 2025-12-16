@@ -5,7 +5,7 @@ import {
   V1VirtualMachine,
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceGuestAgentInfo,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ArchitectureLabel from '@kubevirt-utils/components/ArchitectureLabel/ArchitectureLabel';
 import NUMABadge from '@kubevirt-utils/components/badges/NUMABadge/NUMABadge';
 import CPUMemory from '@kubevirt-utils/components/CPUMemory/CPUMemory';

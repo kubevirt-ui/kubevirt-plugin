@@ -5,7 +5,7 @@ import {
   V1DataVolumeTemplateSpec,
   V1VirtualMachine,
   V1Volume,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { CDROM_DEVICE_NAME } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import {

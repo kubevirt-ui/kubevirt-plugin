@@ -1,6 +1,6 @@
 import React, { FC, memo } from 'react';
 
-import { V1VirtualMachineCondition } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachineCondition } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { Label, LabelGroup, Popover, PopoverPosition } from '@patternfly/react-core';
 
 export const VMStatusConditionLabel: FC<V1VirtualMachineCondition> = memo((condition) => {

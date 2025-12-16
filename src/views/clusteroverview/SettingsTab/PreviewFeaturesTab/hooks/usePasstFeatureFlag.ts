@@ -1,4 +1,4 @@
-import { HyperConvergedModel } from '@kubevirt-ui/kubevirt-api/console';
+import { HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { getAnnotation, getAnnotations } from '@kubevirt-utils/resources/shared';

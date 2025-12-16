@@ -2,7 +2,7 @@ import * as React from 'react';
 import produce from 'immer';
 import { getAffinity } from 'src/views/templates/utils/selectors';
 
-import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import AffinityEditModal from '@kubevirt-utils/components/AffinityModal/components/AffinityEditModal/AffinityEditModal';
 import AffinityEmptyState from '@kubevirt-utils/components/AffinityModal/components/AffinityEmptyState';
 import AffinityList from '@kubevirt-utils/components/AffinityModal/components/AffinityList/AffinityList';

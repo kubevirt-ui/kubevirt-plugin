@@ -3,8 +3,8 @@ import React, { FC } from 'react';
 import {
   VirtualMachineClusterInstancetypeModelGroupVersionKind,
   VirtualMachineInstancetypeModelGroupVersionKind,
-} from '@kubevirt-ui/kubevirt-api/console';
-import { VirtualMachineClusterInstancetypeModel } from '@kubevirt-ui/kubevirt-api/console';
+} from '@kubevirt-ui-ext/kubevirt-api/console';
+import { VirtualMachineClusterInstancetypeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';

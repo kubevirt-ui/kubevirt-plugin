@@ -1,4 +1,4 @@
-import { TemplateParameter } from '@kubevirt-ui/kubevirt-api/console';
+import { TemplateParameter } from '@kubevirt-ui-ext/kubevirt-api/console';
 
 import { PARAMETER_VALUE_TYPES } from './constants';
 

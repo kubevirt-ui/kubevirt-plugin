@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { Operator } from '@openshift-console/dynamic-plugin-sdk-internal/lib/api/common-types';

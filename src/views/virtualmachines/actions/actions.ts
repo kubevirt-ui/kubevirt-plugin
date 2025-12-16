@@ -1,13 +1,13 @@
-import { VirtualMachineInstanceMigrationModel } from '@kubevirt-ui/kubevirt-api/console';
-import { VirtualMachineInstanceModel } from '@kubevirt-ui/kubevirt-api/console';
-import { VirtualMachineModel } from '@kubevirt-ui/kubevirt-api/console';
+import { VirtualMachineInstanceMigrationModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { VirtualMachineInstanceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   V1AddVolumeOptions,
   V1RemoveVolumeOptions,
   V1StopOptions,
   V1VirtualMachine,
   V1VirtualMachineInstanceMigration,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import {

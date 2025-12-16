@@ -2,7 +2,7 @@ import React, { FC, Suspense, useState } from 'react';
 import { dump } from 'js-yaml';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Modal, ModalBody, ModalHeader, ModalVariant, Tab, Tabs } from '@patternfly/react-core';

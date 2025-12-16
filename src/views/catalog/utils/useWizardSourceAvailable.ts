@@ -3,7 +3,7 @@ import * as React from 'react';
 import {
   V1beta1DataVolumeSourcePVC,
   V1beta1DataVolumeSourceRef,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { BOOT_SOURCE } from '@kubevirt-utils/resources/template';
 import {
   getDataSource,

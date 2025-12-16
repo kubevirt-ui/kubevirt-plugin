@@ -1,7 +1,7 @@
 import React, { ComponentType } from 'react';
 
 import { ACMVirtualMachineAction } from '@kubevirt-extensions/acm.virtualmachine';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { ResolvedExtension } from '@openshift-console/dynamic-plugin-sdk/lib/types';

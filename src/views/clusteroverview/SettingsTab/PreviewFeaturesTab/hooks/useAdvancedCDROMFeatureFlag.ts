@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { HyperConvergedModel } from '@kubevirt-ui/kubevirt-api/console';
+import { HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { K8S_OPS } from '@kubevirt-utils/constants/constants';
 import useHyperConvergeConfiguration, {
   HyperConverged,

@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
 
 import useMigrationPoliciesActionsProvider from '../hooks/useMigrationPoliciesActionsProvider';
