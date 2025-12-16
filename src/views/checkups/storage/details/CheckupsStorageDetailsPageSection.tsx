@@ -9,8 +9,11 @@ import {
 import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { ResourceLink, Timestamp } from '@openshift-console/dynamic-plugin-sdk';
+import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { Timestamp } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, Grid, GridItem, Title } from '@patternfly/react-core';
 
 import CheckupsStatusIcon from '../../CheckupsStatusIcon';
@@ -75,7 +78,8 @@ const CheckupsStorageDetailsPageSection: FC<CheckupsStorageDetailsPageSectionPro
             <DescriptionItem
               descriptionData={
                 configMap?.data?.[STORAGE_CHECKUP_DEFAULT_STORAGE_CLASS] ? (
-                  <ResourceLink
+                  <MulticlusterResourceLink
+                    cluster={getCluster(configMap)}
                     groupVersionKind={modelToGroupVersionKind(StorageClassModel)}
                     name={configMap?.data?.[STORAGE_CHECKUP_DEFAULT_STORAGE_CLASS]}
                   />
@@ -125,9 +129,10 @@ const CheckupsStorageDetailsPageSection: FC<CheckupsStorageDetailsPageSectionPro
           <DescriptionList>
             <DescriptionItem
               descriptionData={
-                <ResourceLink
+                <MulticlusterResourceLink
+                  cluster={getCluster(configMap)}
                   groupVersionKind={modelToGroupVersionKind(NamespaceModel)}
-                  name={configMap?.metadata?.namespace}
+                  name={getNamespace(configMap)}
                 />
               }
               descriptionHeader={t('Namespace')}
@@ -180,10 +185,11 @@ const CheckupsStorageDetailsPageSection: FC<CheckupsStorageDetailsPageSectionPro
             />
             <DescriptionItem
               descriptionData={
-                <ResourceLink
+                <MulticlusterResourceLink
+                  cluster={getCluster(job)}
                   groupVersionKind={modelToGroupVersionKind(JobModel)}
-                  name={job?.metadata?.name}
-                  namespace={job?.metadata?.namespace}
+                  name={getName(job)}
+                  namespace={getNamespace(job)}
                 />
               }
               descriptionHeader={t('Job')}

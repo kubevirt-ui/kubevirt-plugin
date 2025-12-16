@@ -6,7 +6,9 @@ import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevi
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { ResourceLink, Timestamp } from '@openshift-console/dynamic-plugin-sdk';
+import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { Timestamp } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, Grid, GridItem } from '@patternfly/react-core';
 
 import { STATUS_COMPLETION_TIME_STAMP, STATUS_START_TIME_STAMP } from '../../../../../utils/utils';
@@ -56,7 +58,8 @@ const CheckupsSelfValidationDetailsDescriptionList: FC<
         <DescriptionList>
           <DescriptionItem
             descriptionData={
-              <ResourceLink
+              <MulticlusterResourceLink
+                cluster={getCluster(configMap)}
                 groupVersionKind={modelToGroupVersionKind(NamespaceModel)}
                 name={configMap?.metadata?.namespace}
               />
