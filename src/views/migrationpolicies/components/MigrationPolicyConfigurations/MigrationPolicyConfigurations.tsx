@@ -1,6 +1,15 @@
 import React from 'react';
 
-import { Button, ButtonVariant, Form, FormGroup, Split, SplitItem } from '@patternfly/react-core';
+import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
+import {
+  Button,
+  ButtonVariant,
+  Form,
+  FormGroup,
+  Split,
+  SplitItem,
+  Title,
+} from '@patternfly/react-core';
 import { MinusCircleIcon } from '@patternfly/react-icons';
 
 import { InitialMigrationPolicyState } from '../../list/components/MigrationPolicyCreateForm/utils/utils';
@@ -41,9 +50,9 @@ const MigrationPolicyConfigurations: React.FC<MigrationPolicyConfigurationsProps
         state={state}
       />
       {hasConfigSelected && (
-        <Form isHorizontal>
+        <Form className="migration-configuration-dropdown" isHorizontal>
           {Object.entries(options).map(
-            ([key, { component: Component, label }]) =>
+            ([key, { component: Component, label, labelHelp = null }]) =>
               key in state && (
                 <FormGroup
                   data-test-id={`${key}-selected`}
@@ -52,6 +61,20 @@ const MigrationPolicyConfigurations: React.FC<MigrationPolicyConfigurationsProps
                   key={key}
                   label={label}
                 >
+                  labelHelp && (
+                  <FormGroupHelperText>
+                    <Title
+                      className="pf-v6-c-popover__header-title pf-v6-u-mb-sm"
+                      headingLevel="h6"
+                    >
+                      {label}
+                    </Title>
+                    {labelHelp.helpText}
+                    <a href={labelHelp.helpInfo} rel="noopener noreferrer" target="_blank">
+                      {labelHelp.helpInfo}
+                    </a>
+                  </FormGroupHelperText>
+                  )
                   <Split>
                     <SplitItem>
                       <Component setState={setStateField(key)} state={state?.[key]} />
@@ -65,11 +88,10 @@ const MigrationPolicyConfigurations: React.FC<MigrationPolicyConfigurationsProps
                             return newState;
                           })
                         }
+                        icon={<MinusCircleIcon />}
                         isInline
                         variant={ButtonVariant.plain}
-                      >
-                        <MinusCircleIcon />
-                      </Button>
+                      />
                     </SplitItem>
                   </Split>
                 </FormGroup>
