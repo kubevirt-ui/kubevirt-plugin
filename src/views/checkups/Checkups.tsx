@@ -26,8 +26,6 @@ const CheckupsList: FC = () => {
 
   // Redirect to default tab if URL is just /checkups
   useEffect(() => {
-    if (isACMpage) return;
-
     const normalizedPath = location.pathname.endsWith('/')
       ? location.pathname.slice(0, -1)
       : location.pathname;

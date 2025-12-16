@@ -10,8 +10,10 @@ import {
 import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
+import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { DescriptionList, Grid, GridItem, PageSection, Title } from '@patternfly/react-core';
 
 import CheckupsStatusIcon from '../../../../CheckupsStatusIcon';
@@ -67,9 +69,10 @@ const CheckupsNetworkDetailsPageSection: FC<CheckupsNetworkDetailsPageSectionPro
             />
             <DescriptionItem
               descriptionData={
-                <ResourceLink
+                <MulticlusterResourceLink
+                  cluster={getCluster(configMap)}
                   groupVersionKind={modelToGroupVersionKind(NamespaceModel)}
-                  name={configMap?.metadata?.namespace}
+                  name={getNamespace(configMap)}
                 />
               }
               descriptionHeader={t('Namespace')}
@@ -108,7 +111,8 @@ const CheckupsNetworkDetailsPageSection: FC<CheckupsNetworkDetailsPageSectionPro
           <DescriptionList>
             <DescriptionItem
               descriptionData={
-                <ResourceLink
+                <MulticlusterResourceLink
+                  cluster={getCluster(configMap)}
                   groupVersionKind={NetworkAttachmentDefinitionModelGroupVersionKind}
                   name={configMap?.data?.[CONFIG_PARAM_NAD_NAME]}
                   namespace={configMap?.data?.[CONFIG_PARAM_NAD_NAMESPACE]}
@@ -139,7 +143,8 @@ const CheckupsNetworkDetailsPageSection: FC<CheckupsNetworkDetailsPageSectionPro
             <DescriptionItem
               descriptionData={
                 sourceNode ? (
-                  <ResourceLink
+                  <MulticlusterResourceLink
+                    cluster={getCluster(configMap)}
                     groupVersionKind={modelToGroupVersionKind(NodeModel)}
                     name={sourceNode}
                   />
@@ -152,7 +157,8 @@ const CheckupsNetworkDetailsPageSection: FC<CheckupsNetworkDetailsPageSectionPro
             <DescriptionItem
               descriptionData={
                 targetNode ? (
-                  <ResourceLink
+                  <MulticlusterResourceLink
+                    cluster={getCluster(configMap)}
                     groupVersionKind={modelToGroupVersionKind(NodeModel)}
                     name={targetNode}
                   />
@@ -164,10 +170,11 @@ const CheckupsNetworkDetailsPageSection: FC<CheckupsNetworkDetailsPageSectionPro
             />
             <DescriptionItem
               descriptionData={
-                <ResourceLink
+                <MulticlusterResourceLink
+                  cluster={getCluster(job)}
                   groupVersionKind={modelToGroupVersionKind(JobModel)}
-                  name={job?.metadata?.name}
-                  namespace={job?.metadata?.namespace}
+                  name={getName(job)}
+                  namespace={getNamespace(job)}
                 />
               }
               descriptionHeader={t('Job')}

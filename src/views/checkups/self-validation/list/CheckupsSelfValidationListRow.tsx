@@ -15,7 +15,7 @@ import { ManagedClusterModel } from '@multicluster/constants';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import useIsACMPage from '@multicluster/useIsACMPage';
-import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
+import { RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import CheckupsStatusIcon from '../../CheckupsStatusIcon';
@@ -118,7 +118,8 @@ const CheckupsSelfValidationListRow: FC<CheckupsSelfValidationListRowProps> = ({
         />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="namespace">
-        <ResourceLink
+        <MulticlusterResourceLink
+          cluster={cluster}
           groupVersionKind={modelToGroupVersionKind(NamespaceModel)}
           name={configMap?.metadata?.namespace}
         />
