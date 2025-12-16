@@ -26,18 +26,20 @@ import SelectCluster from './components/SelectCluster';
 
 type CreateProjectModalProps = {
   createdProject?: (value: K8sResourceCommon) => void;
+  initialCluster?: string;
   isOpen: boolean;
   onClose: () => void;
 };
 
 const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
   createdProject,
+  initialCluster,
   isOpen,
   onClose,
 }) => {
   const { t } = useKubevirtTranslation();
   const [name, setName] = useState<string>();
-  const [cluster, setCluster] = useState<string>();
+  const [cluster, setCluster] = useState<string>(initialCluster);
   const [description, setDescription] = useState<string>();
   const [displayName, setDisplayName] = useState<string>();
 

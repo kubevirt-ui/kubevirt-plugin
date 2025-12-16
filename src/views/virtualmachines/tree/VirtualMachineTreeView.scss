@@ -57,14 +57,6 @@
     }
   }
 
-  &__header-section {
-    margin: var(--pf-t--global--spacer--sm) 0;
-  }
-
-  &__title {
-    align-self: baseline;
-  }
-
   &__expand {
     padding: 0 var(--pf-t--global--spacer--xs) 0 var(--pf-t--global--spacer--xs);
     margin-right: calc(var(--pf-t--global--spacer--xs) * 2.5);
@@ -78,15 +70,6 @@
 
 .right-click-action-menu {
   min-width: 0 !important;
-  margin-left: 2.5rem;
-}
-
-.right-click-action-menu--nested-1 {
-  margin-left: 3.5rem;
-}
-
-.right-click-action-menu--nested-2 {
-  margin-left: 4.5rem;
 }
 
 .vms-tree-view-body {

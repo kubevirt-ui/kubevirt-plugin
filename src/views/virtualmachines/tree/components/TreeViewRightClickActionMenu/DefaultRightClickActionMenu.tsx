@@ -1,18 +1,15 @@
 import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
-import classNames from 'classnames';
 
-import ActionDropdownItem from '@kubevirt-utils/components/ActionDropdownItem/ActionDropdownItem';
 import useVirtualMachineInstanceMigrationMapper from '@kubevirt-utils/resources/vmim/hooks/useVirtualMachineInstanceMigrationMapper';
 import useVirtualMachineInstanceMigrations from '@kubevirt-utils/resources/vmim/hooks/useVirtualMachineInstanceMigrations';
-import { Menu, MenuContent, MenuList, Popper } from '@patternfly/react-core';
 import useMultipleVirtualMachineActions from '@virtualmachines/actions/hooks/useMultipleVirtualMachineActions';
 import {
   FOLDER_SELECTOR_PREFIX,
   PROJECT_SELECTOR_PREFIX,
 } from '@virtualmachines/tree/utils/constants';
 
-import { MENU_DISTANCE } from './constants';
+import RightClickActionMenu from './RightClickActionMenu';
 import { getCreateVMAction, getElementComponentsFromID, getVMsTrigger } from './utils';
 
 type DefaultRightClickActionMenuProps = {
@@ -36,27 +33,20 @@ const DefaultRightClickActionMenu: FC<DefaultRightClickActionMenuProps> = ({
   if (prefix === PROJECT_SELECTOR_PREFIX)
     actions.unshift(getCreateVMAction(navigate, namespace, cluster));
 
+  const getNestedLevel = () => {
+    if (prefix === FOLDER_SELECTOR_PREFIX) {
+      return cluster ? 3 : 2;
+    }
+    return cluster ? 2 : 1;
+  };
+
+  const nestedLevel = getNestedLevel();
+
   return (
-    <Popper
-      popper={
-        <Menu
-          className={classNames(
-            'right-click-action-menu',
-            prefix === FOLDER_SELECTOR_PREFIX ? 'right-click-action-menu--nested-1' : '',
-          )}
-          containsFlyout
-        >
-          <MenuContent>
-            <MenuList>
-              {actions?.map((action) => (
-                <ActionDropdownItem action={action} key={action?.id} setIsOpen={hideMenu} />
-              ))}
-            </MenuList>
-          </MenuContent>
-        </Menu>
-      }
-      distance={MENU_DISTANCE}
-      isVisible
+    <RightClickActionMenu
+      actions={actions}
+      hideMenu={hideMenu}
+      nestedLevel={nestedLevel}
       triggerRef={() => triggerElement.children.item(0) as HTMLElement}
     />
   );

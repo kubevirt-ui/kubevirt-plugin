@@ -1,13 +1,23 @@
 import { NavigateFunction } from 'react-router-dom-v5-compat';
 
 import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
+import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
 import { getLabel, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { getCatalogURL } from '@multicluster/urls';
-import { FOLDER_SELECTOR_PREFIX, VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
+import {
+  CLUSTER_SELECTOR_PREFIX,
+  FOLDER_SELECTOR_PREFIX,
+  PROJECT_SELECTOR_PREFIX,
+  VM_FOLDER_LABEL,
+} from '@virtualmachines/tree/utils/constants';
 import { vmsSignal } from '@virtualmachines/tree/utils/signals';
+
+import ClusterRightClickActionMenu from './ClusterRightClickActionMenu';
+import DefaultRightClickActionMenu from './DefaultRightClickActionMenu';
+import VMRightClickActionMenu from './VMRightClickActionMenu';
 
 export const getCreateVMAction = (
   navigate: NavigateFunction,
@@ -57,4 +67,16 @@ export const getVMsTrigger = (triggerElement: HTMLElement | null) => {
     return namespaceVMs?.filter((resource) => getLabel(resource, VM_FOLDER_LABEL) === folderName);
 
   return namespaceVMs;
+};
+
+export const getActionMenuComponent = (triggerElement: HTMLElement | null) => {
+  const { prefix } = getElementComponentsFromID(triggerElement);
+
+  if (prefix === CLUSTER_SELECTOR_PREFIX || triggerElement?.id === ALL_NAMESPACES_SESSION_KEY) {
+    return ClusterRightClickActionMenu;
+  }
+  if (prefix === PROJECT_SELECTOR_PREFIX || prefix === FOLDER_SELECTOR_PREFIX) {
+    return DefaultRightClickActionMenu;
+  }
+  return VMRightClickActionMenu;
 };
