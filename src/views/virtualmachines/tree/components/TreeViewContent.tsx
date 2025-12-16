@@ -38,7 +38,7 @@ const TreeViewContent: FC<TreeViewContentProps> = ({
   treeData,
 }) => {
   const { t } = useKubevirtTranslation();
-  const filteredTreeData = useFilteredTreeView(treeData);
+  const { filteredTreeData, onSearch } = useFilteredTreeView(treeData);
 
   const { addListeners, hideMenu, triggerElement } = useTreeViewItemActions(treeData);
 
@@ -59,7 +59,7 @@ const TreeViewContent: FC<TreeViewContentProps> = ({
   return (
     <>
       {!isSmallScreen && panelToggleButton}
-      <TreeViewToolbar />
+      <TreeViewToolbar onSearch={onSearch} />
       <DrawerPanelBody className="vms-tree-view-body">
         {isEmpty(filteredTreeData) ? (
           <EmptyState
