@@ -1,3 +1,9 @@
 .kv-migration-policy__label-vm {
-  color: var(--pf-global--link--Color);
+  color: var(--pf-t--global--text--color--link--default);
+}
+.migration-configuration-dropdown.pf-v6-c-form.pf-m-horizontal .pf-v6-c-form__group-control {
+  grid-column: 3;
+}
+.migration-configuration-dropdown.pf-v6-c-form.pf-m-horizontal .pf-v6-c-form__group-label {
+  width: var(--pf-t--global--breakpoint--200);
 }

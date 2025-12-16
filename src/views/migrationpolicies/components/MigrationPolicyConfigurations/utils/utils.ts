@@ -1,3 +1,4 @@
+import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { BinaryUnit } from '@kubevirt-utils/utils/units';
 
@@ -30,6 +31,12 @@ export const getMigrationPolicyConfigurationOptions = (): MigrationPolicyConfigu
       defaultValue: 0,
       description: t('(In seconds)'),
       label: t('Completion timeout'),
+      labelHelp: {
+        helpInfo: documentationURL.MIGRATION_CONFIGURATION,
+        helpText: t(
+          'CompletionTimeoutPerGiB is the maximum number of seconds per GiB a migration is allowed to take. If a live-migration takes longer to migrate than this value multiplied by the size of the VMI, the migration will be cancelled, unless AllowPostCopy is true. Defaults to 800. For more info: ',
+        ),
+      },
     },
   };
 };

@@ -8,5 +8,9 @@ export type MigrationPolicyConfigurationOption = {
     defaultValue: MigrationPolicyStateDispatch;
     description?: string;
     label: string;
+    labelHelp?: {
+      helpInfo?: string;
+      helpText?: string;
+    };
   };
 };

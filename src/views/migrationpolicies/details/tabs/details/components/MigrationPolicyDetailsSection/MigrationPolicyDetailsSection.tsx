@@ -161,7 +161,7 @@ const MigrationPolicyDetailsSection: FC<MigrationPolicyDetailsSectionProps> = ({
                       Map of string keys and values that can be used to organize and categorize
                       (scope and select) objects. May match selectors of replication controllers and
                       services. More info:
-                    </Trans>{' '}
+                    </Trans>
                     <a href={documentationURL.LABELS}>{documentationURL.LABELS}</a>
                   </>
                 }
