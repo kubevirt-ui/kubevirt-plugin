@@ -129,7 +129,7 @@
     "webpack-dev-server": "^5.1.0"
   },
   "engines": {
-    "npm": ">=10.9.4",
+    "npm": ">=10.9.0",
     "node": ">=22.0.0"
   },
   "lint-staged": {
