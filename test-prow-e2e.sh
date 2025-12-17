@@ -159,6 +159,3 @@ npm run test-cypress-headless -- --spec="tests/gating.cy.ts"
 
 # Generate Cypress report.
 npm run cypress-postreport
-
-# Clean up
-bash test-cleanup.sh
