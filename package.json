@@ -168,6 +168,7 @@
     "i18n-to-po": "node ./i18n-scripts/i18n-to-po.js",
     "lint": "eslint . --color && prettier . --ignore-unknown --check --ignore-path .prettierignorecode",
     "lint:fix": "eslint . --color --fix && prettier . --ignore-unknown --write --ignore-path .prettierignorecode",
+    "lint-staged": "lint-staged",
     "memsource-download": "./i18n-scripts/memsource-download.sh",
     "memsource-upload": "./i18n-scripts/memsource-upload.sh",
     "oc-login-start-console": "./oc-login-start-console.sh",
