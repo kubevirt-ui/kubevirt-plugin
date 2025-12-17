@@ -3,6 +3,11 @@
   width: 100%;
 }
 
+// Prevent the page header title from wrapping
+[data-ouia-component-id='PageHeader-title'] {
+  white-space: nowrap;
+}
+
 .saved-searches-dropdown-menu {
   max-width: 260px;
 }
