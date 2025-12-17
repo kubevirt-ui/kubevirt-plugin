@@ -353,10 +353,20 @@ export const createMultiClusterTreeViewData = (
   return clusterTreeItem;
 };
 
+// searches for clusters, projects and folders
 export const filterItems = (item: TreeViewDataItem, input: string) => {
-  if ((item.name as string).toLowerCase().includes(input.toLowerCase())) {
+  if (isTreeViewVMItem(item)) {
+    return false;
+  }
+
+  if (
+    (item.name as string).toLowerCase().includes(input.toLowerCase()) &&
+    item.id !== ALL_NAMESPACES_SESSION_KEY &&
+    item.id !== ALL_CLUSTERS_ID
+  ) {
     return true;
   }
+
   if (item.children) {
     return (
       (item.children = item.children
@@ -407,8 +417,10 @@ export const getAllTreeViewItems = (treeData: TreeViewDataItem[]) => {
     ?.flat();
 };
 
+const isTreeViewVMItem = (item: TreeViewDataItem) => !item.children;
+
 export const getAllTreeViewVMItems = (treeData: TreeViewDataItem[]): TreeViewDataItem[] =>
-  getAllTreeViewItems(treeData).filter((treeItem) => !treeItem.children);
+  getAllTreeViewItems(treeData).filter(isTreeViewVMItem);
 
 export const getAllRightClickableTreeViewItems = (
   treeData: TreeViewDataItem[],
