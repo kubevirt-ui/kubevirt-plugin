@@ -21,4 +21,4 @@ oc delete VirtualMachineInstancetype example -n ${TEST_NS} --ignore-not-found --
 oc delete VirtualMachineClusterPreference example --ignore-not-found --wait=false
 oc delete VirtualMachinePreference example -n ${TEST_NS} --ignore-not-found --wait=false
 oc delete MigrationPolicy example --ignore-not-found --wait=false
-oc delete migplan --all -n ${TEST_NS} --ignore-not-found --wait=false
+oc delete migplan --all -n ${TEST_NS} --ignore-not-found --wait=false || true
