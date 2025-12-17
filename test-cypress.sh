@@ -18,9 +18,6 @@ bash test-setup-downstream.sh
 # Install dependencies.
 npm ci
 
-# Add mochawesome-report-generator
-npm install -g mochawesome-report-generator --force
-
 while getopts g:s: flag
 do
   case "${flag}" in

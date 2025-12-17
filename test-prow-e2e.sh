@@ -154,9 +154,6 @@ bash test-setup.sh
 # Install dependencies.
 npm ci
 
-# Add mochawesome-report-generator
-npm install -g mochawesome-report-generator --force
-
 # Run tests.
 npm run test-cypress-headless -- --spec="tests/gating.cy.ts"
 
