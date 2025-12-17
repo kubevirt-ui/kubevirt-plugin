@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 
 import { V1InstancetypeMatcher, V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import CPUMemory from '@kubevirt-utils/components/CPUMemory/CPUMemory';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import GuestAgentIsRequiredText from '@kubevirt-utils/components/GuestAgentIsRequiredText/GuestAgentIsRequiredText';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { CLOUDINITDISK } from '@kubevirt-utils/constants/constants';
@@ -24,7 +25,7 @@ import {
 import { useGuestOS } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { Alert, AlertVariant, Content, ContentVariants, FormGroup } from '@patternfly/react-core';
+import { Alert, AlertVariant, DescriptionList, FormGroup } from '@patternfly/react-core';
 
 import InstanceTypeConfiguration from './InstanceTypeConfiguration';
 
@@ -50,57 +51,54 @@ const ConfigurationSummary: FC<ConfigurationSummaryProps> = ({ vm }) => {
 
   const interfaces = getInterfaces(vm);
 
+  const notAvailableText = <MutedTextSpan text={t('Not available')} />;
+
   return (
     <>
       <FormGroup fieldId="configuration" hasNoPaddingTop label={t('Configuration')}>
-        <Content className="pf-v6-u-text-color-subtle" component={ContentVariants.dt}>
-          {t('Operating system')}
-        </Content>
-
-        <Content component={ContentVariants.dd}>
-          {getOperatingSystemName(vm) || getOperatingSystem(vm) || osName}
-        </Content>
-
-        {itMatcher ? (
-          <InstanceTypeConfiguration vm={vm} />
-        ) : (
-          <>
-            <Content className="pf-v6-u-text-color-subtle" component={ContentVariants.dt}>
-              {t('Flavor')}
-            </Content>
-            <Content component={ContentVariants.dd}>
-              <CPUMemory vm={vm} vmi={vmi} />
-            </Content>
-            <Content className="pf-v6-u-text-color-subtle" component={ContentVariants.dt}>
-              {t('Workload profile')}
-            </Content>
-            <Content component={ContentVariants.dd}>
-              {getAnnotation(vm?.spec?.template, VM_WORKLOAD_ANNOTATION) || (
-                <MutedTextSpan text={t('Not available')} />
-              )}
-            </Content>
-          </>
-        )}
-        <Content className="pf-v6-u-text-color-subtle" component={ContentVariants.dt}>
-          {t('NICs')}
-        </Content>
-        <Content component={ContentVariants.dd}>
-          {(interfaces || [])?.map(({ model, name }) => (
-            <div key={name}>{model ? `${name} - ${model}` : name}</div>
-          ))}
-          {isEmpty(interfaces) && <span className="pf-v6-u-text-color-subtle">None</span>}
-        </Content>
-        <Content className="pf-v6-u-text-color-subtle" component={ContentVariants.dt}>
-          {t('Disks')}
-        </Content>
-        <Content component={ContentVariants.dd}>
-          {migratableDisks?.map((disk) => (
-            <div key={disk.name}>{disk.name}</div>
-          ))}
-        </Content>
+        <DescriptionList>
+          <DescriptionItem
+            descriptionData={getOperatingSystemName(vm) || getOperatingSystem(vm) || osName}
+            descriptionHeader={t('Operating system')}
+          />
+          {itMatcher ? (
+            <InstanceTypeConfiguration vm={vm} />
+          ) : (
+            <>
+              <DescriptionItem
+                descriptionData={<CPUMemory vm={vm} vmi={vmi} />}
+                descriptionHeader={t('Flavor')}
+              />
+              <DescriptionItem
+                descriptionData={
+                  getAnnotation(vm?.spec?.template, VM_WORKLOAD_ANNOTATION) || notAvailableText
+                }
+                descriptionHeader={t('Workload profile')}
+              />
+            </>
+          )}
+          <DescriptionItem
+            descriptionData={
+              isEmpty(interfaces)
+                ? notAvailableText
+                : interfaces.map(({ model, name }) => (
+                    <div key={name}>{model ? `${name} - ${model}` : name}</div>
+                  ))
+            }
+            descriptionHeader={t('NICs')}
+          />
+          <DescriptionItem
+            descriptionData={
+              isEmpty(migratableDisks)
+                ? notAvailableText
+                : migratableDisks.map((disk) => <div key={disk.name}>{disk.name}</div>)
+            }
+            descriptionHeader={t('Disks')}
+          />
+        </DescriptionList>
       </FormGroup>
-      {nonMigratableDisks?.length !== 0 && (
-        <Alert title={t('Some disks are not migratable')} variant={AlertVariant.warning}>
+      {!isEmpty(nonMigratableDisks) && (
+        <Alert isInline title={t('Some disks are not migratable')} variant={AlertVariant.warning}>
           {nonMigratableDisks?.map((disk) => (
             <div key={disk.name}>{disk.reason}</div>
           ))}

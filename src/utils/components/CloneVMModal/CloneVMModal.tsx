@@ -74,13 +74,12 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
   return (
     <TabModal
       closeOnSubmit={false}
-      formClassName="pf-v6-u-w-75-on-md pf-v6-u-w-66-on-lg pf-v6-u-m-auto"
       headerText={headerText ?? t('Clone {{sourceKind}}', { sourceKind: source.kind })}
       isDisabled={Boolean(initialCloneRequest)}
       isHorizontal
       isLoading={Boolean(initialCloneRequest)}
       isOpen={isOpen}
-      modalVariant={ModalVariant.large}
+      modalVariant={ModalVariant.medium}
       obj={source}
       onClose={onClose}
       onSubmit={sendCloneRequest}
