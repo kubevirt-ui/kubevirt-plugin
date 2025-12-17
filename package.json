@@ -70,9 +70,9 @@
   "devDependencies": {
     "@cypress/webpack-preprocessor": "^6.0.2",
     "@kubevirt-ui/kubevirt-api": "^1.4.0",
-    "@openshift-console/dynamic-plugin-sdk": "4.20.0",
-    "@openshift-console/dynamic-plugin-sdk-internal": "4.20.0",
-    "@openshift-console/dynamic-plugin-sdk-webpack": "4.20.0",
+    "@openshift-console/dynamic-plugin-sdk": "4.21.0-prerelease.1",
+    "@openshift-console/dynamic-plugin-sdk-internal": "4.21.0-prerelease.1",
+    "@openshift-console/dynamic-plugin-sdk-webpack": "4.21.0-prerelease.1",
     "@openshift-console/plugin-shared": "^0.0.3",
     "@testing-library/jest-dom": "^5.16.1",
     "@testing-library/react": "^12.1.2",
