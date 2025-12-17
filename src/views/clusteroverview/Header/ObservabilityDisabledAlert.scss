@@ -1,0 +1,26 @@
+.observability-disabled-alert {
+  margin: 0 var(--pf-t--global--spacer--lg);
+  .pf-v6-c-alert__description {
+    grid-area: icon;
+    margin-left: var(--pf-t--global--spacer--lg);
+    line-height: 0;
+  }
+
+  &--multiple {
+    .pf-v6-c-alert__icon {
+      margin-top: var(--pf-t--global--spacer--xs);
+    }
+    .pf-v6-c-alert__description {
+      line-height: unset;
+    }
+  }
+
+  .pf-v6-c-label {
+    cursor: pointer;
+    margin-right: var(--pf-t--global--spacer--xs);
+  }
+
+  &__link {
+    margin-left: var(--pf-t--global--spacer--sm);
+  }
+}

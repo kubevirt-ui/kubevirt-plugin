@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import fuzzysearch from 'fuzzysearch';
 
 import { useClickOutside } from '@kubevirt-utils/hooks/useClickOutside/useClickOutside';
-import { Menu, MenuContent, Popper } from '@patternfly/react-core';
+import { Menu, MenuContent, Popper, Tooltip } from '@patternfly/react-core';
 
 import DropdownGroup from './DropdownGroup';
 import DropdownMenuToggle from './DropdownMenuToggle';
@@ -28,6 +28,7 @@ type DropdownProps<T> = DropdownBookmarksProps &
     config: DropdownConfig;
     disabled?: boolean;
     disabledItemTooltip?: string;
+    disabledTooltip?: string;
     includeAllItems?: boolean;
     isItemDisabled?: (key: string) => boolean;
     omittedItems?: string[];
@@ -40,6 +41,7 @@ const Dropdown = <T,>({
   config,
   disabled = false,
   disabledItemTooltip,
+  disabledTooltip,
   extractKey,
   extractTitle,
   includeAllItems = true,
@@ -182,7 +184,7 @@ const Dropdown = <T,>({
     [bookmarks.bookmarks, onSetFavorite],
   );
 
-  return (
+  const dropdown = (
     <div className={config.cssPrefix}>
       <DropdownMenuToggle
         config={config}
@@ -239,6 +241,12 @@ const Dropdown = <T,>({
         triggerRef={toggleRef}
       />
     </div>
+  );
+
+  return disabled && disabledTooltip ? (
+    <Tooltip content={disabledTooltip}>{dropdown}</Tooltip>
+  ) : (
+    dropdown
   );
 };
 

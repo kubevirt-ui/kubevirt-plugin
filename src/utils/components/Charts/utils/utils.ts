@@ -21,6 +21,7 @@ import { humanizeSeconds } from '../../../utils/humanize';
 export const SINGLE_VM_DURATION = 'SINGLE_VM_DURATION';
 export const TICKS_COUNT = 100;
 export const MILLISECONDS_MULTIPLIER = 1000;
+export const MS_PER_DAY = 24 * 60 * 60 * MILLISECONDS_MULTIPLIER;
 export const AVG_LABEL = t('Average');
 export const MAX_LABEL = t('Maximum');
 

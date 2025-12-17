@@ -13,15 +13,8 @@ type DropdownMenuToggleProps = {
   toggleRef: React.RefObject<HTMLButtonElement>;
 };
 
-const DropdownMenuToggle: FC<DropdownMenuToggleProps> = ({
-  config,
-  disabled = false,
-  isOpen,
-  onToggle,
-  title,
-  toggleRef,
-}): JSX.Element => {
-  return (
+const DropdownMenuToggle: FC<DropdownMenuToggleProps> = React.memo(
+  ({ config, disabled = false, isOpen, onToggle, title, toggleRef }): JSX.Element => (
     <MenuToggle
       aria-label={title}
       data-test={`${config.dataTestId}-toggle`}
@@ -32,7 +25,7 @@ const DropdownMenuToggle: FC<DropdownMenuToggleProps> = ({
     >
       {title}
     </MenuToggle>
-  );
-};
+  ),
+);
 
 export default DropdownMenuToggle;

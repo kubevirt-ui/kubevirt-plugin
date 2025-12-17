@@ -14,9 +14,9 @@ import { ChartData, ChartDomain } from './types';
 import {
   findUnit,
   formatLargestValue,
+  getDaySpan,
   getFormattedData,
   getLargestValue,
-  getNumberOfTicks,
 } from './utils';
 
 export type MetricChartData = {
@@ -58,12 +58,19 @@ const useMetricChartData: UseMetricChartData = (metric) => {
   const unit = findUnit(metric, largestRawValue);
   const formattedData = getFormattedData(rawData, metric, unit);
   const largestValue = formatLargestValue(metric, largestRawValue, unit);
-  const numberOfTicks = getNumberOfTicks(formattedData);
 
-  const domain: ChartDomain = {
-    x: [formattedData?.[0]?.x, formattedData?.[formattedData?.length - 1]?.x],
-    y: [0, largestValue],
-  };
+  const domain: ChartDomain = useMemo(
+    () => ({
+      x:
+        formattedData?.length > 0
+          ? [formattedData[0]?.x, formattedData[formattedData.length - 1]?.x]
+          : [undefined, undefined],
+      y: [0, largestValue],
+    }),
+    [formattedData, largestValue],
+  );
+
+  const daySpan = useMemo(() => getDaySpan(domain.x[0], domain.x[1]), [domain]);
 
   return {
     chartData: formattedData,
@@ -72,7 +79,7 @@ const useMetricChartData: UseMetricChartData = (metric) => {
     isReady: formattedData?.length > 1,
     largestValue,
     loaded,
-    numberOfTicks: numberOfTicks?.length,
+    numberOfTicks: daySpan,
     unit,
   };
 };

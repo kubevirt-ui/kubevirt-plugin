@@ -10,6 +10,7 @@ const K8S_PERSISTENT_VOLUMES_URL =
 const KV_UG_URL = 'https://kubevirt.io';
 const RH_DOC_URL = 'https://docs.redhat.com/documentation';
 const REDHAT_DOC_URL = `${RH_DOC_URL}/openshift_container_platform/latest`;
+const RHACM_DOC_URL = `${RH_DOC_URL}/red_hat_advanced_cluster_management_for_kubernetes`;
 
 export const documentationURL = {
   ACCESS_MODE: `${K8S_PERSISTENT_VOLUMES_URL}/#access-modes`,
@@ -52,6 +53,7 @@ export const documentationURL = {
   PASST: `${KV_UG_URL}/user-guide/network/net_binding_plugins/passt/#vm-passt-network-interface`,
   PROJECTS: 'https://docs.okd.io/latest/applications/projects/working-with-projects.html',
   REDHAT_BLOG: `${REDHAT_BASE_URL}/blog/channel/red-hat-openshift`,
+  RHACM: RHACM_DOC_URL,
   SNAPSHOT: `${REDHAT_DOC_URL}/html/storage/using-container-storage-interface-csi#persistent-storage-csi-snapshots`,
   STORAGE_PROFILES: `${REDHAT_DOC_URL}/html/virtualization/storage#virt-configuring-storage-profile`,
   SUPPORT_URL: `${RH_ACCESS_URL}/articles/4234591`,

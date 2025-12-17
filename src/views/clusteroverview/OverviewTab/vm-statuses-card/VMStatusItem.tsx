@@ -12,6 +12,7 @@ import './VMStatusesCard.scss';
 
 type VMStatusItemProps = {
   count: number;
+  enabledClusters?: string[];
   namespace?: string;
   onFilterChange?: () => void;
   showIcon?: boolean;
@@ -21,6 +22,7 @@ type VMStatusItemProps = {
 
 const VMStatusItem: React.FC<VMStatusItemProps> = ({
   count,
+  enabledClusters,
   namespace,
   onFilterChange,
   showIcon = true,
@@ -28,7 +30,7 @@ const VMStatusItem: React.FC<VMStatusItemProps> = ({
   statusLabel,
 }) => {
   const Icon = vmStatusIcon[statusLabel];
-  const path = useVMStatusesPath(namespace, statusArray);
+  const path = useVMStatusesPath(namespace, statusArray, enabledClusters);
 
   return (
     <GridItem className="vm-statuses-card__grid-item" span={3}>

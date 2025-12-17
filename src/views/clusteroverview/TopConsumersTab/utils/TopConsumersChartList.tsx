@@ -1,5 +1,6 @@
 import React, { FC, useMemo } from 'react';
 
+import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';
 import { ALL_CLUSTERS_KEY } from '@kubevirt-utils/hooks/constants';
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -51,7 +52,7 @@ export const TopConsumersChartList: FC<TopConsumersChartListProps> = ({
     [numItemsLabel],
   );
 
-  const [query] = useFleetPrometheusPoll({
+  const [query, loaded] = useFleetPrometheusPoll({
     endpoint: PrometheusEndpoint.QUERY,
     endTime: Date.now(),
     query: getTopConsumerQuery(
@@ -66,6 +67,7 @@ export const TopConsumersChartList: FC<TopConsumersChartListProps> = ({
     ...(cluster === ALL_CLUSTERS_KEY ? { allClusters: true } : { cluster }),
   });
   const numQueryResults = query?.data?.result?.length;
+  const isLoading = !loaded;
 
   const ChartList = React.useMemo(() => {
     const numLinesToShow = numQueryResults >= numItemsToShow ? numItemsToShow : numQueryResults;
@@ -92,18 +94,22 @@ export const TopConsumersChartList: FC<TopConsumersChartListProps> = ({
     return charts;
   }, [query, metric, scope, numItemsToShow, numQueryResults]);
 
-  const showNoDataMessage = numQueryResults === 0;
+  const showNoDataMessage = loaded && numQueryResults === 0;
+
+  const renderTopConsumersContent = () => {
+    if (isLoading) {
+      return <LoadingEmptyState />;
+    }
+    if (showNoDataMessage) {
+      return <NoDataAvailableMessage isVCPU={metric === TopConsumerMetric.VCPU_WAIT} />;
+    }
+    return ChartList;
+  };
 
   return (
     <CardBody className="kv-top-consumers-card__chart-list-container">
       <div className="kv-top-consumers-card__metric-title">{t(metric?.getChartLabel())}</div>
-      <div className="kv-top-consumers-card__chart-list-body">
-        {showNoDataMessage ? (
-          <NoDataAvailableMessage isVCPU={metric === TopConsumerMetric.VCPU_WAIT} />
-        ) : (
-          ChartList
-        )}
-      </div>
+      <div className="kv-top-consumers-card__chart-list-body">{renderTopConsumersContent()}</div>
     </CardBody>
   );
 };
