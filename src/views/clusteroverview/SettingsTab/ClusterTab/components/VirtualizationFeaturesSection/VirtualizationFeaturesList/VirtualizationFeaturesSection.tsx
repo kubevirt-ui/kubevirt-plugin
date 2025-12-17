@@ -10,7 +10,6 @@ import {
   CLUSTER_OBSERVABILITY_OPERATOR_NAME,
   NETOBSERV_OPERATOR_NAME,
   NMSTATE_OPERATOR_NAME,
-  NODE_HEALTH_OPERATOR_NAME,
 } from '../utils/constants';
 import {
   useVirtualizationFeaturesContext,
@@ -19,6 +18,7 @@ import {
 import VirtualizationFeaturesWizard from '../VirtualizationFeaturesWizard/VirtualizationFeaturesWizard';
 
 import FeaturedOperatorItem from './components/FeaturedOperatorItem';
+import HighAvailabilitySection from './components/HighAvailabilitySection/HighAvailabilitySection';
 import LoadBalanceSection from './components/LoadBalanceSection/LoadBalanceSection';
 
 import './VirtualizationFeaturesSection.scss';
@@ -80,10 +80,7 @@ const VirtualizationFeaturesSection: FC = () => {
           />
         </StackItem>
         <StackItem isFilled>
-          <FeaturedOperatorItem
-            operatorName={NODE_HEALTH_OPERATOR_NAME}
-            title={t('High availability')}
-          />
+          <HighAvailabilitySection />
         </StackItem>
         <StackItem isFilled>
           <LoadBalanceSection />
