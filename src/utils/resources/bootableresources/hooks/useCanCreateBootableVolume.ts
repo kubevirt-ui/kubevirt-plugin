@@ -5,10 +5,10 @@ import {
 import { DataImportCronModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineClusterPreferenceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import useListClusters from '@kubevirt-utils/hooks/useListClusters';
 import useListNamespaces from '@kubevirt-utils/hooks/useListNamespaces';
+import useSelectedCluster from '@kubevirt-utils/hooks/useSelectedCluster';
 import { K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
-import { useFleetAccessReview, useHubClusterName } from '@stolostron/multicluster-sdk';
+import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 
 type UseCanCreateBootableVolume = (namespace: string) => {
   canCreateDS: boolean;
@@ -19,11 +19,9 @@ type UseCanCreateBootableVolume = (namespace: string) => {
 };
 
 const useCanCreateBootableVolume: UseCanCreateBootableVolume = (namespace) => {
-  const selectedClusters = useListClusters();
   const selectedNamespaces = useListNamespaces();
-  const [hubClusterName] = useHubClusterName();
 
-  const clusterToVerifyAccess = selectedClusters?.[0] || hubClusterName;
+  const clusterToVerifyAccess = useSelectedCluster();
   const namespaceToVerifyAccess = selectedNamespaces?.[0] || namespace;
 
   const [canCreatePVC, loadingPVC] = useFleetAccessReview({

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
-import { useMigrationPoliciesPageBaseURL } from 'src/views/migrationpolicies/hooks/useMigrationPoliciesPageBaseURL';
+import { getMigrationPolicyURL } from 'src/views/migrationpolicies/utils/utils';
 
 import { MigrationPolicyModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -29,8 +29,6 @@ const MigrationPolicyFormFooter: React.FC<MigrationPolicyFormFooterProps> = ({
   const navigate = useNavigate();
   const cluster = useClusterParam();
 
-  const migrationPoliciesBaseURL = useMigrationPoliciesPageBaseURL();
-
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [error, setError] = React.useState(undefined);
   const migrationPolicyName = migrationPolicy?.metadata?.name;
@@ -41,7 +39,7 @@ const MigrationPolicyFormFooter: React.FC<MigrationPolicyFormFooterProps> = ({
     setError(undefined);
 
     kubevirtK8sCreate({ cluster, data: migrationPolicy, model: MigrationPolicyModel })
-      .then(() => navigate(`${migrationPoliciesBaseURL}/${migrationPolicyName}`))
+      .then(() => navigate(getMigrationPolicyURL(migrationPolicyName, cluster)))
       .catch(setError)
       .finally(() => setIsSubmitting(false));
   };

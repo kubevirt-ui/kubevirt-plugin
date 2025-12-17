@@ -13,8 +13,7 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
-import useListClusters from '@kubevirt-utils/hooks/useListClusters';
-import { useHubClusterName } from '@stolostron/multicluster-sdk';
+import useSelectedCluster from '@kubevirt-utils/hooks/useSelectedCluster';
 
 import { findObjectByName } from '../../utils/utils';
 import {
@@ -25,9 +24,7 @@ import {
 
 const useCheckupsNetworkPermissions = (): { isPermitted: boolean; loading: boolean } => {
   const namespace = useActiveNamespace();
-  const selectedClusters = useListClusters();
-  const [hubClusterName] = useHubClusterName();
-  const cluster = selectedClusters?.[0] || hubClusterName;
+  const cluster = useSelectedCluster();
 
   const [serviceAccounts, serviceAccountsLoaded] = useKubevirtWatchResource<
     IoK8sApiCoreV1ServiceAccount[]

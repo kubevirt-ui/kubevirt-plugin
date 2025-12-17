@@ -8,8 +8,7 @@ import {
 import { IoK8sApiRbacV1ClusterRoleBinding } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
-import useListClusters from '@kubevirt-utils/hooks/useListClusters';
-import { useHubClusterName } from '@stolostron/multicluster-sdk';
+import useSelectedCluster from '@kubevirt-utils/hooks/useSelectedCluster';
 import { checkAccess } from '@stolostron/multicluster-sdk/lib/internal/checkAccess';
 
 import { SELF_VALIDATION_CLUSTER_ROLE_BINDING, SELF_VALIDATION_SA } from '../../utils';
@@ -18,9 +17,7 @@ const useCheckupsSelfValidationPermissions = () => {
   const namespace = useActiveNamespace();
   const [canCreateClusterRoleBinding, setCanCreateClusterRoleBinding] = useState<boolean>(false);
   const [checkingPermissions, setCheckingPermissions] = useState<boolean>(true);
-  const selectedClusters = useListClusters();
-  const [hubClusterName] = useHubClusterName();
-  const cluster = selectedClusters?.[0] || hubClusterName;
+  const cluster = useSelectedCluster();
 
   const [clusterRoleBindings, loadedClusterRoleBinding] = useKubevirtWatchResource<
     IoK8sApiRbacV1ClusterRoleBinding[]

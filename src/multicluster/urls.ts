@@ -135,7 +135,7 @@ export const getFleetResourceRoute: GetFleetResourceRouteProps = ({
         namespace,
         resource: null,
       })
-    : getFleetClusterResourceRoute({ cluster, model: extensionModel, name, resource: null });
+    : getFleetClusterResourceRoute({ cluster, model: extensionModel, name });
 };
 
 export const getFleetNamespacedResourceRoute: ResourceRouteHandler = ({
@@ -149,8 +149,26 @@ export const getFleetNamespacedResourceRoute: ResourceRouteHandler = ({
   return `/k8s/cluster/${cluster}/ns/${namespace}/${group}~${version}~${kind}/${name}`;
 };
 
-export const getFleetClusterResourceRoute: ResourceRouteHandler = ({ cluster, model, name }) => {
+type GetClusterResourceRouteProps = (input: {
+  cluster?: string;
+  model: ExtensionK8sModel;
+  name: string;
+}) => string;
+
+export const getFleetClusterResourceRoute: GetClusterResourceRouteProps = ({
+  cluster,
+  model,
+  name,
+}) => {
   const { group, kind, version } = model;
 
   return `/k8s/cluster/${cluster}/${group}~${version}~${kind}/${name}`;
+};
+
+export const getClusterResourceRoute: GetClusterResourceRouteProps = ({ cluster, model, name }) => {
+  const { group, kind, version } = model;
+
+  return cluster
+    ? getFleetClusterResourceRoute({ cluster, model, name })
+    : `/k8s/cluster/${group}~${version}~${kind}/${name}`;
 };

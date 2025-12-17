@@ -1,15 +1,14 @@
-import useListClusters from '@kubevirt-utils/hooks/useListClusters';
 import { MigrationPolicyModelRef } from '@kubevirt-utils/models';
 import { CLUSTER_LIST_FILTER_PARAM } from '@kubevirt-utils/utils/constants';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
-export const useMigrationPoliciesPageBaseURL = () => {
-  const clusters = useListClusters();
+export const useMigrationPoliciesListURL = () => {
   const isACMPage = useIsACMPage();
   const [hubClusterName] = useHubClusterName();
-
-  const cluster = clusters?.[0] || hubClusterName;
+  const clusterParam = useClusterParam();
+  const cluster = clusterParam || hubClusterName;
 
   if (isACMPage) {
     return `/k8s/all-clusters/${MigrationPolicyModelRef}?${CLUSTER_LIST_FILTER_PARAM}=${cluster}`;
