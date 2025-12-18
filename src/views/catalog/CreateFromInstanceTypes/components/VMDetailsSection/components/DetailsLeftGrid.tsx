@@ -15,6 +15,7 @@ import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { convertResourceArrayToMap } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { DescriptionList, TextInput } from '@patternfly/react-core';
 
 import { getCPUAndMemoryFromDefaultInstanceType, getOSFromDefaultPreference } from '../utils/utils';
@@ -29,6 +30,7 @@ const DetailsLeftGrid: FC<DetailsLeftGridProps> = ({
   userPreferencesData,
 }) => {
   const { t } = useKubevirtTranslation();
+  const cluster = useClusterParam();
   const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
 
   const { instanceTypeVMState, setInstanceTypeVMState, vmNamespaceTarget } =
@@ -93,6 +95,7 @@ const DetailsLeftGrid: FC<DetailsLeftGridProps> = ({
                   type: instanceTypeActionType.setFolder,
                 });
               }}
+              cluster={cluster}
               isFullWidth
               namespace={vmNamespaceTarget}
               selectedFolder={folder}

@@ -2,7 +2,10 @@ import * as React from 'react';
 
 import { PersistentVolumeClaimModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
+import { getCluster } from '@multicluster/helpers/selectors';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
+import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 import {
   DiskPresentation,
@@ -16,10 +19,11 @@ const useDisksTableDisks: UseDisksTableDisks = (vmi) => {
   const vmiDisks = vmi?.spec?.domain?.devices?.disks;
   const vmiVolumes = vmi?.spec?.volumes;
 
-  const [pvcs, loaded, loadingError] = useK8sWatchResource<K8sResourceCommon[]>({
+  const [pvcs, loaded, loadingError] = useK8sWatchData<K8sResourceCommon[]>({
+    cluster: getCluster(vmi),
     isList: true,
     kind: PersistentVolumeClaimModel.kind,
-    namespace: vmi?.metadata?.namespace,
+    namespace: getNamespace(vmi),
     namespaced: true,
   });
 

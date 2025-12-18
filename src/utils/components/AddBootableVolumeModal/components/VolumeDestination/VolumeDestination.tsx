@@ -68,6 +68,7 @@ const VolumeDestination: FC<VolumeDestinationProps> = ({
         </GridItem>
         <GridItem>
           <StorageClassSelect
+            cluster={bootableVolumeCluster}
             setShowSCAlert={setShowSCAlert}
             setStorageClassName={setBootableVolumeField('storageClassName')}
             storageClass={storageClassName}

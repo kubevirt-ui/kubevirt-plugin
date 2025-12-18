@@ -4,18 +4,21 @@ import { modelToGroupVersionKind, ServiceModel } from '@kubevirt-ui-ext/kubevirt
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import ServicesList from '@kubevirt-utils/components/ServicesList/ServicesList';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getServicesForVmi } from '@kubevirt-utils/resources/vmi';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { Icon, Title } from '@patternfly/react-core';
 import { LinkIcon } from '@patternfly/react-icons';
 
 const Services = ({ pathname, vmi }) => {
   const { t } = useKubevirtTranslation();
 
-  const [services, loaded, loadError] = useK8sWatchResource<IoK8sApiCoreV1Service[]>({
+  const [services, loaded, loadError] = useK8sWatchData<IoK8sApiCoreV1Service[]>({
+    cluster: getCluster(vmi),
     groupVersionKind: modelToGroupVersionKind(ServiceModel),
     isList: true,
-    namespace: vmi?.metadata?.namespace,
+    namespace: getNamespace(vmi),
   });
 
   const data = getServicesForVmi(services, vmi);

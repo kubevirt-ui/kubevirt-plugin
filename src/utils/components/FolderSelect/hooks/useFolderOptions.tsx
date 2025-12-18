@@ -4,18 +4,20 @@ import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-utils/models';
 import { getLabel } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { SelectOptionProps } from '@patternfly/react-core';
 import { FolderIcon } from '@patternfly/react-icons';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
 type UseFolderOptions = (
   namespace: string,
+  cluster?: string,
 ) => [SelectOptionProps[], Dispatch<SetStateAction<SelectOptionProps[]>>];
 
-const useFolderOptions: UseFolderOptions = (namespace) => {
+const useFolderOptions: UseFolderOptions = (namespace, cluster) => {
   const [folders, setFolders] = useState<SelectOptionProps[]>();
-  const [vms] = useK8sWatchResource<V1VirtualMachine[]>({
+  const [vms] = useK8sWatchData<V1VirtualMachine[]>({
+    cluster,
     groupVersionKind: VirtualMachineModelGroupVersionKind,
     isList: true,
     namespace,

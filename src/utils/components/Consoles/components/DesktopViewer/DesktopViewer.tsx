@@ -13,8 +13,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
 import { getVMIPod } from '@kubevirt-utils/resources/vmi';
+import { getCluster } from '@multicluster/helpers/selectors';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Form, FormGroup, SelectOption, Stack } from '@patternfly/react-core';
 import { isRunning } from '@virtualmachines/utils';
 
@@ -41,7 +41,8 @@ const DesktopViewer: FC<DesktopViewerProps> = ({
   const networks = getVmRdpNetworks(vm, vmi);
   const [selectedNetwork, setSelectedNetwork] = useState<Network>(getDefaultNetwork(networks));
 
-  const [pods, podsLoaded] = useK8sWatchResource<IoK8sApiCoreV1Pod[]>({
+  const [pods, podsLoaded] = useK8sWatchData<IoK8sApiCoreV1Pod[]>({
+    cluster: getCluster(vm),
     groupVersionKind: modelToGroupVersionKind(PodModel),
     isList: true,
     namespace: getNamespace(vm),
@@ -49,7 +50,8 @@ const DesktopViewer: FC<DesktopViewerProps> = ({
 
   const vmPod = useMemo(() => getVMIPod(vmi, pods), [vmi, pods]);
 
-  const [services, servicesLoaded] = useK8sWatchResource<IoK8sApiCoreV1Service[]>({
+  const [services, servicesLoaded] = useK8sWatchData<IoK8sApiCoreV1Service[]>({
+    cluster: getCluster(vm),
     groupVersionKind: modelToGroupVersionKind(ServiceModel),
     isList: true,
     namespace: getNamespace(vm),

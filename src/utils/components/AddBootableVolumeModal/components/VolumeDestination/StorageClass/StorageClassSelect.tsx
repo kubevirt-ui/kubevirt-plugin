@@ -11,11 +11,12 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { modelToGroupVersionKind, StorageClassModel } from '@kubevirt-utils/models';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { FormGroup } from '@patternfly/react-core';
 
 type StorageClassSelectProps = {
   checkSC?: (selectedSC: string) => boolean;
+  cluster?: string;
   setShowSCAlert: Dispatch<SetStateAction<boolean>>;
   setStorageClassName: (value: string) => void;
   setStorageClassProvisioner?: Dispatch<SetStateAction<string>>;
@@ -24,6 +25,7 @@ type StorageClassSelectProps = {
 
 const StorageClassSelect: FC<StorageClassSelectProps> = ({
   checkSC,
+  cluster,
   setShowSCAlert,
   setStorageClassName,
   setStorageClassProvisioner,
@@ -31,7 +33,8 @@ const StorageClassSelect: FC<StorageClassSelectProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const [storageClasses, loaded] = useK8sWatchResource<IoK8sApiStorageV1StorageClass[]>({
+  const [storageClasses, loaded] = useK8sWatchData<IoK8sApiStorageV1StorageClass[]>({
+    cluster,
     groupVersionKind: modelToGroupVersionKind(StorageClassModel),
     isList: true,
   });

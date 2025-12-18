@@ -108,6 +108,7 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
                         setSelectedFolder={(newFolder) => {
                           onChangeFolder(newFolder);
                         }}
+                        cluster={cluster}
                         namespace={namespace}
                         selectedFolder={folder}
                       />

@@ -14,10 +14,13 @@ import OwnerDetailsItem from '@kubevirt-utils/components/OwnerDetailsItem/OwnerD
 import SSHAccess from '@kubevirt-utils/components/SSHAccess/SSHAccess';
 import useSSHService from '@kubevirt-utils/components/SSHAccess/useSSHService';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
+import { getName } from '@kubevirt-utils/resources/shared';
 import { getMachineType } from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { DescriptionList, Grid, GridItem, Icon, Title } from '@patternfly/react-core';
 import { LinkIcon } from '@patternfly/react-icons';
 
@@ -43,10 +46,11 @@ type DetailsProps = {
 const Details: React.FC<DetailsProps> = ({ pathname, vmi }) => {
   const { t } = useKubevirtTranslation();
   const [guestAgentData, loadedGuestAgent] = useGuestOS(vmi);
-  const [vm] = useK8sWatchResource<V1VirtualMachine>({
+  const [vm] = useK8sWatchData<V1VirtualMachine>({
+    cluster: getCluster(vmi),
     groupVersionKind: VirtualMachineModelGroupVersionKind,
-    name: vmi?.metadata?.name,
-    namespace: vmi?.metadata?.namespace,
+    name: getName(vmi),
+    namespace: getNamespace(vmi),
   });
   const [sshService, sshServiceLoaded] = useSSHService(vm);
 
