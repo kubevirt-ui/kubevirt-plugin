@@ -1,5 +1,5 @@
-import VirtualMachineInstanceModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstanceModel';
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
+import { VirtualMachineInstanceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
 import { VMActionRequest, VMActionType } from '../actions';

@@ -1,9 +1,9 @@
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
+import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   V1beta1VirtualMachineClusterInstancetype,
   V1beta1VirtualMachineInstancetype,
   V1VirtualMachine,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { WORKLOADS } from '@kubevirt-utils/resources/template';
 import {

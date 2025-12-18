@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { getWorkloadProfile } from 'src/views/templates/utils/selectors';
 
-import { TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
+import { TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import WorkloadProfileModal from '@kubevirt-utils/components/WorkloadProfileModal/WorkloadProfileModal';

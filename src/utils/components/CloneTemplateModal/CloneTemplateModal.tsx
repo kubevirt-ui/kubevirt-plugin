@@ -2,7 +2,7 @@ import React, { FC, useState } from 'react';
 import produce from 'immer';
 import { LABELS } from 'src/views/templates/utils/constants';
 
-import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { TemplateModel, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {

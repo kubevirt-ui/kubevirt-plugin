@@ -6,7 +6,7 @@ import { CREATE_VM_TAB } from '@catalog/CreateVMHorizontalNav/constants';
 import {
   V1beta1VirtualMachineClusterPreference,
   V1beta1VirtualMachinePreference,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import ProjectDropdown from '@kubevirt-utils/components/ProjectDropdown/ProjectDropdown';
 import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';

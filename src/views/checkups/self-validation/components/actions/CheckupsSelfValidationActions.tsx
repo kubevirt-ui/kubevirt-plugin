@@ -1,7 +1,10 @@
 import React, { FC, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
-import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import {
+  IoK8sApiBatchV1Job,
+  IoK8sApiCoreV1ConfigMap,
+} from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';

@@ -1,5 +1,5 @@
-import ClusterServiceVersionModel from '@kubevirt-ui/kubevirt-api/console/models/ClusterServiceVersionModel';
-import KubeDeschedulerModel from '@kubevirt-ui/kubevirt-api/console/models/KubeDeschedulerModel';
+import { ClusterServiceVersionModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { KubeDeschedulerModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { modelToRef } from '@kubevirt-utils/models';
 
 export const KUBE_DESCHEDULER_NAMESPACE = 'openshift-kube-descheduler-operator';

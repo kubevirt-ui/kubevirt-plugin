@@ -3,7 +3,7 @@ import {
   V1MigrationConfiguration,
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceMigration,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
 
 export type MigrationTableDataLayout = {

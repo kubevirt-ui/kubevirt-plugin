@@ -1,8 +1,11 @@
 import { useMemo } from 'react';
 import { useParams } from 'react-router-dom-v5-compat';
 
-import { ConfigMapModel, modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
-import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { ConfigMapModel, modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
+import {
+  IoK8sApiBatchV1Job,
+  IoK8sApiCoreV1ConfigMap,
+} from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import { getName } from '@kubevirt-utils/resources/shared';

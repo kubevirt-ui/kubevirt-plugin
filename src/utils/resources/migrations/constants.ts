@@ -1,7 +1,7 @@
 import {
   V1beta1StorageSpecAccessModesEnum,
   V1beta1StorageSpecVolumeModeEnum,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { K8sResourceCommon, K8sResourceCondition } from '@openshift-console/dynamic-plugin-sdk';
 
 export type MigrationStatus = {

@@ -4,7 +4,7 @@ import {
   modelToGroupVersionKind,
   NamespaceModel,
   VolumeSnapshotModel,
-} from '@kubevirt-ui/kubevirt-api/console';
+} from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { FormGroup } from '@patternfly/react-core';

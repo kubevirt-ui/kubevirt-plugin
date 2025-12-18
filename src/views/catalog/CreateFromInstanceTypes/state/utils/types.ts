@@ -3,14 +3,14 @@ import { Dispatch } from 'react';
 import {
   V1beta1DataImportCron,
   V1beta1DataVolume,
-} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
+} from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
   V1beta1VirtualMachineClusterInstancetype,
   V1beta1VirtualMachineClusterPreference,
   V1beta1VirtualMachineInstancetype,
   V1VirtualMachine,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
 import { SSHSecretDetails } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import { SysprepData } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';

@@ -2,8 +2,8 @@ import * as React from 'react';
 import format from 'date-fns/format';
 import { VMStatusConditionLabelList } from 'src/views/virtualmachines/list/components/VMStatusConditionLabel';
 
-import { NodeModel } from '@kubevirt-ui/kubevirt-api/console';
-import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { NodeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 import { GlobeAmericasIcon } from '@patternfly/react-icons';
 

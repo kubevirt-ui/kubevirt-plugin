@@ -1,6 +1,6 @@
 import React, { FC, useState } from 'react';
 
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';

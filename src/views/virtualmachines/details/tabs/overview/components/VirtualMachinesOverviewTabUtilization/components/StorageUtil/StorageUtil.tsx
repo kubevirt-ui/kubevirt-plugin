@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import xbytes from 'xbytes';
 
-import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import SubTitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/SubTitleChartLabel';
 import TitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/TitleChartLabel';
 import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/ComponentReady';

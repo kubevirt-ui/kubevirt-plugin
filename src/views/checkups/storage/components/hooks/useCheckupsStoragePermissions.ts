@@ -7,13 +7,13 @@ import {
   RoleBindingModel,
   RoleModel,
   ServiceAccountModel,
-} from '@kubevirt-ui/kubevirt-api/console';
+} from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   IoK8sApiCoreV1ServiceAccount,
   IoK8sApiRbacV1ClusterRoleBinding,
   IoK8sApiRbacV1Role,
   IoK8sApiRbacV1RoleBinding,
-} from '@kubevirt-ui/kubevirt-api/kubernetes';
+} from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';

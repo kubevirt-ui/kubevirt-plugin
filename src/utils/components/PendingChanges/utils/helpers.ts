@@ -1,13 +1,13 @@
 import differenceWith from 'lodash/differenceWith';
 import isEqual from 'lodash/isEqual';
 
-import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
+import { VirtualMachineModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   V1Devices,
   V1VirtualMachine,
   V1VirtualMachineInstance,
   V1Volume,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   convertYAMLToNetworkDataObject,
   convertYAMLUserDataObject,

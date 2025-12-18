@@ -3,7 +3,7 @@ import * as React from 'react';
 import {
   modelToGroupVersionKind,
   PersistentVolumeClaimModel,
-} from '@kubevirt-ui/kubevirt-api/console';
+} from '@kubevirt-ui-ext/kubevirt-api/console';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getHumanizedSize } from '@kubevirt-utils/utils/units';
 import { TableData } from '@openshift-console/dynamic-plugin-sdk';

@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 
 import { produceVMSysprep, useWizardVMContext } from '@catalog/utils/WizardVMContext';
 import { WizardDescriptionItem } from '@catalog/wizard/components/WizardDescriptionItem';
-import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import WindowsLabel from '@kubevirt-utils/components/Labels/WindowsLabel';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import {

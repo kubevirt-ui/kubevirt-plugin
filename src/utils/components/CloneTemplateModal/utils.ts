@@ -1,10 +1,10 @@
-import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
+import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   V1beta1DataVolume,
   V1beta1DataVolumeSpec,
-} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
-import { V1beta1DataVolumeSourcePVC } from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { V1beta1DataVolumeSourcePVC } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ROOTDISK } from '@kubevirt-utils/constants/constants';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { getDataVolumeTemplates, getVolumes } from '@kubevirt-utils/resources/vm';

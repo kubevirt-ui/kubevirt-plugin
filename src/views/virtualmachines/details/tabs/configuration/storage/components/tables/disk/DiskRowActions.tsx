@@ -4,7 +4,7 @@ import {
   V1VirtualMachine,
   V1VirtualMachineInstance,
   V1Volume,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
 import {
   isDeclarativeHotplugVolumesEnabled,

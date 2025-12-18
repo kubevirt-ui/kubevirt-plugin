@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
 
-import { MigrationPolicyModelRef } from '@kubevirt-ui/kubevirt-api/console';
-import MigrationPolicyModel from '@kubevirt-ui/kubevirt-api/console/models/MigrationPolicyModel';
-import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { MigrationPolicyModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { MigrationPolicyModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

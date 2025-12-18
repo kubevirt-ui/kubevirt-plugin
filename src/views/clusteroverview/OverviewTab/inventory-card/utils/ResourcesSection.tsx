@@ -1,8 +1,8 @@
 import React, { FC, useMemo } from 'react';
 
-import { NodeModel, TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
-import NetworkAttachmentDefinitionModel from '@kubevirt-ui/kubevirt-api/console/models/NetworkAttachmentDefinitionModel';
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
+import { NodeModel, TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { NetworkAttachmentDefinitionModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { getAllowedResourceData } from '@kubevirt-utils/resources/shared';
 import { K8sResourceCommon, WatchK8sResults } from '@openshift-console/dynamic-plugin-sdk';
 import { ResourceInventoryItem } from '@openshift-console/dynamic-plugin-sdk-internal';

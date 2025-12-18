@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
-import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import DetailsPageTitle from '@kubevirt-utils/components/DetailsPageTitle/DetailsPageTitle';
 import PaneHeading from '@kubevirt-utils/components/PaneHeading/PaneHeading';
 import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';

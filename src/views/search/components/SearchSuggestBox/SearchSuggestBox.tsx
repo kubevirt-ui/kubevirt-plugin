@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
+import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { MAX_SUGGESTIONS } from '@kubevirt-utils/components/ListPageFilter/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {

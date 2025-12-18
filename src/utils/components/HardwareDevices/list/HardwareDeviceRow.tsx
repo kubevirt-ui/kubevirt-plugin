@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { V1GPU, V1HostDevice } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1GPU, V1HostDevice } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 import { Button, ButtonVariant } from '@patternfly/react-core';
 import { MinusCircleIcon } from '@patternfly/react-icons';

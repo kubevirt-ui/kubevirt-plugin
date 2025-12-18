@@ -1,8 +1,8 @@
 import React, { FC, useEffect, useState } from 'react';
 import produce from 'immer';
 
-import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { V1CPU } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import CPUInput from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/CPUInput';
 import { getCPULimitsFromTemplate } from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/utils/utils';
 import MemoryInput from '@kubevirt-utils/components/CPUMemoryModal/components/MemoryInput/MemoryInput';

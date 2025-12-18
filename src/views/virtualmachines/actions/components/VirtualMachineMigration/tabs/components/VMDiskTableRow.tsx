@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { Td, Tr } from '@patternfly/react-table';

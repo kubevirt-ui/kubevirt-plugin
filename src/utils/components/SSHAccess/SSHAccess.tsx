@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
-import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { DescriptionList } from '@patternfly/react-core';
 
 import ConsoleOverVirtctl from './components/ConsoleOverVirtctl';

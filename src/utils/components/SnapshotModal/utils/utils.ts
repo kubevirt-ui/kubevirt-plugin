@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { buildOwnerReference, getName } from '@kubevirt-utils/resources/shared';
 import { MAX_K8S_NAME_LENGTH } from '@kubevirt-utils/utils/constants';
 import { deadlineUnits } from '@virtualmachines/details/tabs/snapshots/utils/consts';

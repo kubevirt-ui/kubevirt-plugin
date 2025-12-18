@@ -1,5 +1,5 @@
-import { TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
-import VirtualMachineClusterInstancetypeModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineClusterInstancetypeModel';
+import { TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { VirtualMachineClusterInstancetypeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 export const UNCATEGORIZED_VM = 'UNCATEGORIZED_VM';

@@ -1,6 +1,6 @@
 import { WizardVMContextType } from '@catalog/utils/WizardVMContext';
-import { SecretModel } from '@kubevirt-ui/kubevirt-api/console';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { SecretModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { generateSSHKeySecret } from '@kubevirt-utils/resources/secret/utils';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 

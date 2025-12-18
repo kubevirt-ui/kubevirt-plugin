@@ -1,7 +1,7 @@
 import {
   V1beta1DataImportCron,
   V1beta1DataSource,
-} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+} from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { getLabel } from '@kubevirt-utils/resources/shared';
 
 const DATA_SOURCE_CRONJOB_LABEL = 'cdi.kubevirt.io/dataImportCron';

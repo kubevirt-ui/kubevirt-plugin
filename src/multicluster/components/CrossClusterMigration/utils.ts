@@ -10,7 +10,7 @@ import {
   V1beta1StorageMap,
   V1beta1StorageMapSpecMap,
 } from '@kubev2v/types';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { NetworkAttachmentDefinition } from '@kubevirt-utils/components/NetworkInterfaceModal/components/hooks/types';
 import { getName, getNamespace, getUID } from '@kubevirt-utils/resources/shared';
 import { getNetworks, getVolumes } from '@kubevirt-utils/resources/vm';

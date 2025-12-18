@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { useIsWindowsBootableVolume } from '@catalog/CreateFromInstanceTypes/utils/utils';
-import { ConfigMapModel } from '@kubevirt-ui/kubevirt-api/console';
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { SecretSelectionOption } from '@kubevirt-utils/components/SSHSecretModal/utils/types';

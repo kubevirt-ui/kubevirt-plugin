@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { ProcessedTemplatesModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { ProcessedTemplatesModel, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';

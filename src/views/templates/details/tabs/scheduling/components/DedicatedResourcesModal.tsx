@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom-v5-compat';
 import produce from 'immer';
 import { isDedicatedCPUPlacement } from 'src/views/templates/utils/utils';
 
-import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
   cpuManagerLabel,
   cpuManagerLabelKey,

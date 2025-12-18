@@ -1,8 +1,8 @@
-import { modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
+import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   V1beta1VirtualMachineInstancetype,
   V1InstancetypeMatcher,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getInstanceTypeModelFromMatcher } from '@kubevirt-utils/resources/instancetype/helper';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';

@@ -3,7 +3,7 @@ import { Trans } from 'react-i18next';
 import { Link } from 'react-router-dom-v5-compat';
 import BootOrder from 'src/views/virtualmachinesinstance/details/tabs/details/components/Details/BootOrder/BootOrder';
 
-import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateDisks, getTemplateInterfaces } from '@kubevirt-utils/resources/template';

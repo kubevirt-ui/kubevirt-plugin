@@ -1,5 +1,5 @@
-import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { createVMFlowTypes } from '@kubevirt-utils/extensions/telemetry/utils/constants';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';

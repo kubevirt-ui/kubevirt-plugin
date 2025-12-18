@@ -1,7 +1,10 @@
 import { TFunction } from 'react-i18next';
 import { JSON_SCHEMA, load } from 'js-yaml';
 
-import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import {
+  IoK8sApiBatchV1Job,
+  IoK8sApiCoreV1ConfigMap,
+} from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { FilterValue, RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 

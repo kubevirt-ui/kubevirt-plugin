@@ -1,6 +1,6 @@
 import { Params } from 'react-router-dom-v5-compat';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
 export type NavPageComponentProps = {
   instanceTypeExpandedSpec?: V1VirtualMachine;

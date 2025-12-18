@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Trans } from 'react-i18next';
 
-import { ProjectRequestModel } from '@kubevirt-ui/kubevirt-api/console';
+import { ProjectRequestModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';

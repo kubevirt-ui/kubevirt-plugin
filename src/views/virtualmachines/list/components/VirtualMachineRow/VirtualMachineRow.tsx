@@ -4,7 +4,7 @@ import {
   V1VirtualMachine,
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceMigration,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { RowProps } from '@openshift-console/dynamic-plugin-sdk';

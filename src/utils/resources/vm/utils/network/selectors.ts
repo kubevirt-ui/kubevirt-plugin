@@ -1,4 +1,4 @@
-import { V1Interface, V1Network, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1Interface, V1Network, V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getAutoAttachPodInterface, getInterfaces } from '@kubevirt-utils/resources/vm';
 import { isNetworkInterfaceState } from '@kubevirt-utils/utils/typeGuards';
 

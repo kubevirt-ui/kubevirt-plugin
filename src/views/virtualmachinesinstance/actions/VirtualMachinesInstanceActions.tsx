@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { VirtualMachineInstanceModelRef } from '@kubevirt-ui/kubevirt-api/console';
-import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { VirtualMachineInstanceModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import LazyActionMenu from '@kubevirt-utils/components/LazyActionMenu/LazyActionMenu';
 import { ActionMenuVariant } from '@openshift-console/dynamic-plugin-sdk/lib/api/internal-types';
 

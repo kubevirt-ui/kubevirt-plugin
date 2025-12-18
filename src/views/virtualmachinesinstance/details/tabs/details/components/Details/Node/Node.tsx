@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { NodeModel } from '@kubevirt-ui/kubevirt-api/console';
+import { NodeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 

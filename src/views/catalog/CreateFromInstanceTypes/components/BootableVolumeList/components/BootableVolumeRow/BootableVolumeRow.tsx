@@ -9,8 +9,8 @@ import {
   V1beta1DataImportCron,
   V1beta1DataSource,
   V1beta1DataVolume,
-} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
+} from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import ArchitectureLabel from '@kubevirt-utils/components/ArchitectureLabel/ArchitectureLabel';
 import DeprecatedBadge from '@kubevirt-utils/components/badges/DeprecatedBadge/DeprecatedBadge';
 import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';

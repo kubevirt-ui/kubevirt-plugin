@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { usePods } from '@kubevirt-utils/hooks/usePods';
 import { getVMIPod } from '@kubevirt-utils/resources/vmi';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';

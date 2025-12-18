@@ -1,8 +1,8 @@
 import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 
-import MigrationPolicyModel from '@kubevirt-ui/kubevirt-api/console/models/MigrationPolicyModel';
-import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { MigrationPolicyModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DescriptionItemName from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemName';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';

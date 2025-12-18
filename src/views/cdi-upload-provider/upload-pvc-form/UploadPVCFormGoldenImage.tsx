@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
-import { PersistentVolumeClaimModel } from '@kubevirt-ui/kubevirt-api/console';
-import { V1beta1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { PersistentVolumeClaimModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1beta1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import {

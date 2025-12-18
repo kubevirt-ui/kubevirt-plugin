@@ -1,10 +1,10 @@
 import { PREFERENCE_DISPLAY_NAME_KEY } from '@catalog/CreateFromInstanceTypes/utils/constants';
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
   V1beta1VirtualMachineClusterInstancetype,
   V1beta1VirtualMachineClusterPreference,
   V1beta1VirtualMachinePreference,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { DYNAMIC_CREDENTIALS_SUPPORT } from '@kubevirt-utils/components/DynamicSSHKeyInjection/constants/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getPreference } from '@kubevirt-utils/resources/bootableresources/helpers';

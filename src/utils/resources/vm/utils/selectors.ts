@@ -14,7 +14,7 @@ import {
   V1VirtualMachineCondition,
   V1VirtualMachineInstance,
   V1Volume,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { DYNAMIC_CREDENTIALS_SUPPORT } from '@kubevirt-utils/components/DynamicSSHKeyInjection/constants/constants';
 import { ROOTDISK } from '@kubevirt-utils/constants/constants';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';

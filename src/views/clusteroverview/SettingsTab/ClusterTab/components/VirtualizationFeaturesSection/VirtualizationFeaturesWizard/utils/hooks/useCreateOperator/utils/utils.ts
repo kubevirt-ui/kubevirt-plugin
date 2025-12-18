@@ -1,4 +1,4 @@
-import { NamespaceModel } from '@kubevirt-ui/kubevirt-api/console';
+import { NamespaceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   ConsoleOperatorConfigModel,
   OperatorGroupModel,

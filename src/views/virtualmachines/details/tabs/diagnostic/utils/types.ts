@@ -1,5 +1,5 @@
-import { V1VirtualMachineCondition } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { V1VolumeSnapshotStatus } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachineCondition } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { V1VolumeSnapshotStatus } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
 export interface VirtualizationVolumeSnapshotStatus extends V1VolumeSnapshotStatus {
   id?: string;

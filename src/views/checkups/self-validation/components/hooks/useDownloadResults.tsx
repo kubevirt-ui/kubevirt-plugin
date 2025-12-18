@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 
-import { IoK8sApiBatchV1Job } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 

@@ -1,13 +1,13 @@
 import produce from 'immer';
 
-import { PersistentVolumeClaimModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
-import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
+import { PersistentVolumeClaimModel, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   V1beta1DataSource,
   V1beta1DataVolume,
-} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
+} from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
   V1beta1DataVolumeSourceHTTP,
   V1beta1DataVolumeSourcePVC,
@@ -16,7 +16,7 @@ import {
   V1beta1DataVolumeSourceSnapshot,
   V1beta1PersistentVolumeClaim,
   V1ContainerDiskSource,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getBootDisk, getVolumes } from '@kubevirt-utils/resources/vm';
 import { getVMBootSourceType } from '@kubevirt-utils/resources/vm/utils/source';
 import { kubevirtK8sGet } from '@multicluster/k8sRequests';

@@ -4,8 +4,8 @@ import {
   ClusterRoleBindingModel,
   modelToGroupVersionKind,
   ServiceAccountModel,
-} from '@kubevirt-ui/kubevirt-api/console';
-import { IoK8sApiRbacV1ClusterRoleBinding } from '@kubevirt-ui/kubevirt-api/kubernetes';
+} from '@kubevirt-ui-ext/kubevirt-api/console';
+import { IoK8sApiRbacV1ClusterRoleBinding } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useListClusters from '@kubevirt-utils/hooks/useListClusters';

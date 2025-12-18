@@ -1,5 +1,5 @@
 import { RegistryCredentials } from '@catalog/utils/useRegistryCredentials/utils/types';
-import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { SSHSecretDetails } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
 import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template';

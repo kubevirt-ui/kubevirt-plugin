@@ -1,7 +1,7 @@
 import * as React from 'react';
 
-import { MigrationPolicyModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
-import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { MigrationPolicyModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getCluster } from '@multicluster/helpers/selectors';

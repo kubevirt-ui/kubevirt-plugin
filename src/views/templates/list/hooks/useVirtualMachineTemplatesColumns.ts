@@ -1,4 +1,4 @@
-import { modelToRef, TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
+import { modelToRef, TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
 import {

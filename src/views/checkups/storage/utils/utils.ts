@@ -5,12 +5,12 @@ import {
   RoleBindingModel,
   RoleModel,
   ServiceAccountModel,
-} from '@kubevirt-ui/kubevirt-api/console';
+} from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   IoK8sApiBatchV1Job,
   IoK8sApiCoreV1ConfigMap,
   IoK8sApiRbacV1ClusterRoleBinding,
-} from '@kubevirt-ui/kubevirt-api/kubernetes';
+} from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sCreate, kubevirtK8sDelete, kubevirtK8sPatch } from '@multicluster/k8sRequests';

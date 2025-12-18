@@ -1,10 +1,10 @@
 import React, { FC, useState } from 'react';
 
-import VirtualMachineSnapshotModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineSnapshotModel';
+import { VirtualMachineSnapshotModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   V1beta1VirtualMachineSnapshot,
   V1VirtualMachine,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   generateSnapshot,
   generateSnapshotSuffix,

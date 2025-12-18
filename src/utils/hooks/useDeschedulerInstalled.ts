@@ -1,4 +1,4 @@
-import { KubeDeschedulerModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
+import { KubeDeschedulerModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 

@@ -1,8 +1,8 @@
 import produce from 'immer';
 
-import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
-import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { PersistentVolumeClaimModel, UploadTokenRequestModel } from '@kubevirt-utils/models';
 import {
   buildOwnerReference,

@@ -1,7 +1,7 @@
 import {
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceGuestAgentInfo,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
 export const isGuestAgentConnected = (vmi: V1VirtualMachineInstance): boolean =>
   vmi?.status?.conditions?.some(

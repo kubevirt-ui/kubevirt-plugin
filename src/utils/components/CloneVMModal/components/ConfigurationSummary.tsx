@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { V1InstancetypeMatcher, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1InstancetypeMatcher, V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import CPUMemory from '@kubevirt-utils/components/CPUMemory/CPUMemory';
 import GuestAgentIsRequiredText from '@kubevirt-utils/components/GuestAgentIsRequiredText/GuestAgentIsRequiredText';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';

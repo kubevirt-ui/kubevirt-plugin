@@ -2,7 +2,7 @@ import React, { ReactElement } from 'react';
 import { Link } from 'react-router-dom-v5-compat';
 import { extractConfigMapName } from 'src/views/checkups/utils/utils';
 
-import { IoK8sApiBatchV1Job } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { getSelfValidationCheckupURL } from '@kubevirt-utils/resources/checkups/urls';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';

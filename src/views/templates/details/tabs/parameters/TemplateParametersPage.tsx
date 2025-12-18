@@ -2,7 +2,7 @@ import React, { FC, MouseEventHandler, useCallback, useEffect, useState } from '
 import { useNavigate } from 'react-router-dom-v5-compat';
 import { useImmer } from 'use-immer';
 
-import { TemplateParameter, V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { TemplateParameter, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';

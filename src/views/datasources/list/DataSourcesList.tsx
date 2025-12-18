@@ -1,8 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
-import { DataSourceModelRef } from '@kubevirt-ui/kubevirt-api/console';
-import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { DataSourceModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

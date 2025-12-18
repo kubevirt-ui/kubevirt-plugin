@@ -3,7 +3,7 @@ import {
   V1Disk,
   V1VirtualMachine,
   V1Volume,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   DataVolumeModelGroupVersionKind,
   modelToGroupVersionKind,

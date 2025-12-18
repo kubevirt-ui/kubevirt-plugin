@@ -1,7 +1,7 @@
 import produce from 'immer';
 import { migrationPolicySpecKeys } from 'src/views/migrationpolicies/utils/constants';
 
-import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { DESCRIPTION_ANNOTATION } from '@kubevirt-utils/resources/vm';
 import { toQuantity } from '@kubevirt-utils/utils/units';
 

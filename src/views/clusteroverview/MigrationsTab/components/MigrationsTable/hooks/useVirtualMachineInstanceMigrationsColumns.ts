@@ -1,7 +1,7 @@
 import {
   NodeModel,
   VirtualMachineInstanceMigrationModelRef,
-} from '@kubevirt-ui/kubevirt-api/console';
+} from '@kubevirt-ui-ext/kubevirt-api/console';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

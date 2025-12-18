@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Updater, useImmer } from 'use-immer';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
 import { getSessionStorageTabsData, getSessionStorageVM } from './utils/session';
 import { TabsData } from './utils/tabs-data';

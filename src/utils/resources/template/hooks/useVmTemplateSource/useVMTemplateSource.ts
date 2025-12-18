@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   V1beta1DataVolumeSourcePVC,
   V1beta1DataVolumeSourceRef,
   V1beta1PersistentVolumeClaim,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 

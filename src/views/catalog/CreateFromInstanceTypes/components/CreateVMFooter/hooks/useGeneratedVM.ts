@@ -5,7 +5,7 @@ import {
   generateVM,
   useIsWindowsBootableVolume,
 } from '@catalog/CreateFromInstanceTypes/utils/utils';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';

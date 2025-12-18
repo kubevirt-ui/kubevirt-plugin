@@ -1,6 +1,6 @@
 import produce from 'immer';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { effect, signal } from '@preact/signals-react';
 

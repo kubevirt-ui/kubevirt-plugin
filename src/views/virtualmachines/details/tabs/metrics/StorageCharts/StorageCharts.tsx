@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import StorageIOPSTotalThresholdChart from '@kubevirt-utils/components/Charts/StorageUtil/StorageIOPSTotalThresholdChart';
 import StorageReadLatencyAvgMaxChart from '@kubevirt-utils/components/Charts/StorageUtil/StorageReadLatencyAvgMaxChart';
 import StorageReadLatencyPerDriveChart from '@kubevirt-utils/components/Charts/StorageUtil/StorageReadLatencyPerDriveChart';

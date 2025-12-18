@@ -3,8 +3,8 @@ import { useMemo } from 'react';
 import {
   modelToGroupVersionKind,
   PersistentVolumeClaimModel,
-} from '@kubevirt-ui/kubevirt-api/console';
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
+} from '@kubevirt-ui-ext/kubevirt-api/console';
+import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 type UsePVCs = (

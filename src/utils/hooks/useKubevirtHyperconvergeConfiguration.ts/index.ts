@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { V1KubeVirtConfiguration } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1KubeVirtConfiguration } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { DEFAULT_OPERATOR_NAMESPACE } from '@kubevirt-utils/utils/utils';
 import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 

@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { V1CPU } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { formatVCPUsAsSockets } from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { parseCPU } from '@kubevirt-utils/resources/template/utils';

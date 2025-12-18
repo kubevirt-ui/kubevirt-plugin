@@ -6,23 +6,24 @@ import {
 import {
   modelToGroupVersionKind,
   PersistentVolumeClaimModel,
-} from '@kubevirt-ui/kubevirt-api/console';
-import DataSourceModel, {
+} from '@kubevirt-ui-ext/kubevirt-api/console';
+import {
+  DataSourceModel,
   DataSourceModelGroupVersionKind,
-} from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
-import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
-import VirtualMachineInstancetypeModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstancetypeModel';
-import VirtualMachinePreferenceModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachinePreferenceModel';
+} from '@kubevirt-ui-ext/kubevirt-api/console';
+import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { VirtualMachineInstancetypeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { VirtualMachinePreferenceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   V1beta1DataImportCron,
   V1beta1DataSource,
   V1beta1DataVolume,
-} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
+} from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
   V1beta1VirtualMachineClusterPreference,
   V1beta1VirtualMachinePreference,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   getDataSourcePVCName,
   getDataSourcePVCNamespace,

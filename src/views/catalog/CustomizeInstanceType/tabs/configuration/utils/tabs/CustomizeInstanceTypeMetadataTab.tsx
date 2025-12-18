@@ -1,6 +1,6 @@
 import React from 'react';
 
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
+import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import DescriptionItemAnnotations from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemAnnotations';
 import DescriptionItemLabels from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemLabels';
 import Loading from '@kubevirt-utils/components/Loading/Loading';

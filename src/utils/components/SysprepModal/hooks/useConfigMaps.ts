@@ -1,5 +1,5 @@
-import { ConfigMapModel, modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
-import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { ConfigMapModel, modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useK8sWatchResource, WatchK8sResult } from '@openshift-console/dynamic-plugin-sdk';
 

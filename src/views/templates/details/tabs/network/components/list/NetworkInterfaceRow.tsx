@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { FC } from 'react';
 
-import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import NetworkIcon from '@kubevirt-utils/components/NetworkIcons/NetworkIcon';
 import TemplateValue from '@kubevirt-utils/components/TemplateValue/TemplateValue';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

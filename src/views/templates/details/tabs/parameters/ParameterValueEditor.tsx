@@ -1,6 +1,6 @@
 import React, { FC, MouseEvent } from 'react';
 
-import { TemplateParameter } from '@kubevirt-ui/kubevirt-api/console';
+import { TemplateParameter } from '@kubevirt-ui-ext/kubevirt-api/console';
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, SelectOption, TextInput } from '@patternfly/react-core';

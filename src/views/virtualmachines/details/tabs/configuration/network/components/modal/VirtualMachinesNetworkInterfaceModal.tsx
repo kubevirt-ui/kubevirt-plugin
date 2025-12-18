@@ -5,7 +5,7 @@ import {
   V1Network,
   V1VirtualMachine,
   V1VirtualMachineInstance,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import NetworkInterfaceModal from '@kubevirt-utils/components/NetworkInterfaceModal/NetworkInterfaceModal';
 import {
   createInterface,

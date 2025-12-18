@@ -1,9 +1,9 @@
 import React, { FC, useMemo } from 'react';
 import produce from 'immer';
 
-import { NodeModel } from '@kubevirt-ui/kubevirt-api/console';
-import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { NodeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getNodeSelector } from '@kubevirt-utils/resources/vm';

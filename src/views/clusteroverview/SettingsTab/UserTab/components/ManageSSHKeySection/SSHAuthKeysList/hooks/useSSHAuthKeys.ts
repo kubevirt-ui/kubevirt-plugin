@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { SecretModel } from '@kubevirt-ui/kubevirt-api/console';
+import { SecretModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sGet, useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';

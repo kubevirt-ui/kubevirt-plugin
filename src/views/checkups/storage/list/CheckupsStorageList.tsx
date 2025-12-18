@@ -1,6 +1,9 @@
 import React from 'react';
 
-import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import {
+  IoK8sApiBatchV1Job,
+  IoK8sApiCoreV1ConfigMap,
+} from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';

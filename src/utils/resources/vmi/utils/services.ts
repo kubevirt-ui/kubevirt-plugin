@@ -1,4 +1,4 @@
-import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
+import { IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 
 export const getServicesForVmi = (
   services: IoK8sApiCoreV1Service[],

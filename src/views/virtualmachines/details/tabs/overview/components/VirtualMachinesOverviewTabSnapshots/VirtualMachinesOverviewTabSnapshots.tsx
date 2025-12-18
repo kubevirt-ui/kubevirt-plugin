@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom-v5-compat';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SnapshotModal from '@kubevirt-utils/components/SnapshotModal/SnapshotModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

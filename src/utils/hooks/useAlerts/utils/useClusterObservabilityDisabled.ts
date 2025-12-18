@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
+import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import { getLabel, getName } from '@kubevirt-utils/resources/shared';
 import { ManagedClusterModel } from '@multicluster/constants';

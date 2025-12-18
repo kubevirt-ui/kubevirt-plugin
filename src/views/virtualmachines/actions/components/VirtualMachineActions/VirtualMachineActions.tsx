@@ -1,6 +1,6 @@
 import React, { FC, memo, useMemo } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import LazyActionMenu from '@kubevirt-utils/components/LazyActionMenu/LazyActionMenu';
 import {

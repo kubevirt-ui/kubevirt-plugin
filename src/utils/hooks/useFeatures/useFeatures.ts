@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { ConfigMapModel } from '@kubevirt-ui/kubevirt-api/console';
+import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DEFAULT_OPERATOR_NAMESPACE } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';

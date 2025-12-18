@@ -1,6 +1,6 @@
 import { Canceler } from 'axios';
 
-import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 
 import { UPLOAD_STATUS } from './consts';
 

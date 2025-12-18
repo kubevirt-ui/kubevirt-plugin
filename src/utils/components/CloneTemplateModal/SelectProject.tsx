@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui/kubevirt-api/console';
+import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
 

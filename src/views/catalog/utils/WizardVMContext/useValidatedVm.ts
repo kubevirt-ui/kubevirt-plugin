@@ -1,15 +1,15 @@
 import * as React from 'react';
 import produce from 'immer';
-import { WritableDraft } from 'immer/dist/internal';
+import { Draft } from 'immer';
 import { useImmer } from 'use-immer';
 
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 
 export type UpdateValidatedVM = (
-  updateVM: ((vmDraft: WritableDraft<V1VirtualMachine>) => void) | V1VirtualMachine,
+  updateVM: ((vmDraft: Draft<V1VirtualMachine>) => void) | V1VirtualMachine,
 ) => Promise<void>;
 
 type UseValidatedVMValues = {
@@ -24,9 +24,7 @@ export const useValidatedVM = (initialVM: V1VirtualMachine): UseValidatedVMValue
   const [loaded, setLoaded] = React.useState<boolean>(true);
   const [error, setError] = React.useState<any>();
 
-  const updateVM = (
-    updatedVM: ((vmDraft: WritableDraft<V1VirtualMachine>) => void) | V1VirtualMachine,
-  ) => {
+  const updateVM = (updatedVM: ((vmDraft: Draft<V1VirtualMachine>) => void) | V1VirtualMachine) => {
     setLoaded(false);
     setError(undefined);
 

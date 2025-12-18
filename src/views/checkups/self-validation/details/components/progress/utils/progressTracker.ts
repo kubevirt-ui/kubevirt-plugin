@@ -1,4 +1,4 @@
-import { IoK8sApiBatchV1Job } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
 import {

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useClusterFilter } from '@kubevirt-utils/hooks/useClusterFilter';
 import useHcoWorkloadArchitectures from '@kubevirt-utils/hooks/useHcoWorkloadArchitectures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

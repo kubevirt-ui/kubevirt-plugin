@@ -1,4 +1,4 @@
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { EjectIcon, PauseIcon, PlayIcon, RedoIcon, SquareIcon } from '@patternfly/react-icons';
 import { VMActionIconDetails } from '@virtualmachines/actions/components/VMActionsIconBar/utils/types';

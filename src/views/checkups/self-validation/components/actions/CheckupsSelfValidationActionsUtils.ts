@@ -1,4 +1,4 @@
-import { IoK8sApiBatchV1Job } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 
 import { extractConfigMapName } from '../../../utils/utils';
 

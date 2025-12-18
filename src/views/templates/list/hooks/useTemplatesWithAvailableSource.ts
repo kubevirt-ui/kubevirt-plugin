@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 
-import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { TemplateModel, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useListClusters from '@kubevirt-utils/hooks/useListClusters';
 import useListMulticlusterFilters from '@kubevirt-utils/hooks/useListMulticlusterFilters';

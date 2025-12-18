@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { useLocation } from 'react-router-dom-v5-compat';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DetailsPageTitle from '@kubevirt-utils/components/DetailsPageTitle/DetailsPageTitle';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import PaneHeading from '@kubevirt-utils/components/PaneHeading/PaneHeading';

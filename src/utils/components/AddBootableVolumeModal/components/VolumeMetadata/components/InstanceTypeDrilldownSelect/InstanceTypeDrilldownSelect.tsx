@@ -5,7 +5,7 @@ import {
   DEFAULT_INSTANCETYPE_KIND_LABEL,
   DEFAULT_INSTANCETYPE_LABEL,
 } from '@catalog/CreateFromInstanceTypes/utils/constants';
-import VirtualMachineClusterInstancetypeModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineClusterInstancetypeModel';
+import { VirtualMachineClusterInstancetypeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   AddBootableVolumeState,
   SetBootableVolumeFieldType,

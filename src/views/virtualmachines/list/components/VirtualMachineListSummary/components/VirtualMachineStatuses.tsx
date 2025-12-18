@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VM_STATUS } from '@kubevirt-utils/resources/vm/utils/vmStatus';
 import { ERROR, OTHER } from '@overview/OverviewTab/vm-statuses-card/utils/constants';

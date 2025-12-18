@@ -1,6 +1,6 @@
 import { load } from 'js-yaml';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   getCloudInitData,
   getCloudInitVolume,

@@ -1,7 +1,7 @@
 import produce from 'immer';
 
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { SecretModel, V1Template } from '@kubevirt-utils/models';
 import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
 import { getTemplateOS, OS_NAME_TYPES } from '@kubevirt-utils/resources/template';

@@ -1,15 +1,15 @@
-import DataImportCronModel from '@kubevirt-ui/kubevirt-api/console/models/DataImportCronModel';
-import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
-import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
+import { DataImportCronModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   V1beta1DataImportCron,
   V1beta1DataSource,
   V1beta1DataVolume,
-} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+} from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import {
   V1beta1StorageSpecAccessModesEnum,
   V1beta1StorageSpecVolumeModeEnum,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/utils/constants';
 import { OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
 import { CDI_BIND_REQUESTED_ANNOTATION } from '@kubevirt-utils/hooks/useCDIUpload/consts';

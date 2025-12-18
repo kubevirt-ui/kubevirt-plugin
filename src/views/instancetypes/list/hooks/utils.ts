@@ -3,7 +3,7 @@ import { parseSize } from 'xbytes';
 import {
   V1beta1VirtualMachineClusterInstancetype,
   V1beta1VirtualMachineInstancetype,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { columnSortingCompare } from '@kubevirt-utils/utils/utils';
 
 const compareMemory = (

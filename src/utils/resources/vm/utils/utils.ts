@@ -1,4 +1,4 @@
-import { V1CPU } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isAllNamespaces, isEmpty } from '@kubevirt-utils/utils/utils';
 import { getACMVMListURL, getVMListNamespacesURL, getVMListURL } from '@multicluster/urls';
 import { getRowFilterQueryKey } from '@search/utils/query';

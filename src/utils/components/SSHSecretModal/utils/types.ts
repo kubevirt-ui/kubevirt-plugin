@@ -1,4 +1,4 @@
-import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 
 export enum SecretSelectionOption {
   addNew = 'addNew',

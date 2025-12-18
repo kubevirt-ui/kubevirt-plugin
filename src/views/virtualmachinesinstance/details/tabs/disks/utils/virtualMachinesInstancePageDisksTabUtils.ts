@@ -1,4 +1,4 @@
-import { V1beta1PersistentVolumeClaim, V1Disk } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1PersistentVolumeClaim, V1Disk } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
 export type DiskPresentation = {

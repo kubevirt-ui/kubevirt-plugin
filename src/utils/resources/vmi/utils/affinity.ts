@@ -7,7 +7,7 @@ import {
   K8sIoApiCoreV1PodAntiAffinity,
   K8sIoApiCoreV1PreferredSchedulingTerm,
   K8sIoApiCoreV1WeightedPodAffinityTerm,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
 /**
  * AffinityCondition enum

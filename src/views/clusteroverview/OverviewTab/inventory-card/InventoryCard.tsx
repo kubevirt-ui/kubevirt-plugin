@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
+import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAllowedResourceData } from '@kubevirt-utils/resources/shared';

@@ -1,6 +1,6 @@
 import { FieldError, FieldErrorsImpl } from 'react-hook-form';
 
-import { V1beta1DataVolumeSourceRef, V1Disk } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1DataVolumeSourceRef, V1Disk } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
 import { V1DiskFormState } from '../../utils/types';
 

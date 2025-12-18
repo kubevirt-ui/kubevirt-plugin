@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { V1GPU, V1HostDevice } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1GPU, V1HostDevice } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
 
 import useHardwareDevicesColumns from './hooks/useHardwareDevicesColumns';

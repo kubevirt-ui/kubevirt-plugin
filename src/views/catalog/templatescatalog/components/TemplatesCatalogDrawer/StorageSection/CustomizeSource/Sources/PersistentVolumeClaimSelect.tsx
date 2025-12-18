@@ -4,8 +4,8 @@ import {
   modelToGroupVersionKind,
   PersistentVolumeClaimModel,
   ProjectModel,
-} from '@kubevirt-ui/kubevirt-api/console';
-import { V1beta1DataVolumeSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1beta1DataVolumeSpec } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

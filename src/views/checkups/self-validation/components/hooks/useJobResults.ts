@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
 
-import { ConfigMapModel } from '@kubevirt-ui/kubevirt-api/console';
-import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import {
+  IoK8sApiBatchV1Job,
+  IoK8sApiCoreV1ConfigMap,
+} from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sGet } from '@multicluster/k8sRequests';

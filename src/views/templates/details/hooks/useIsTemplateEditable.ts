@@ -1,4 +1,4 @@
-import { TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { TemplateModel, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 

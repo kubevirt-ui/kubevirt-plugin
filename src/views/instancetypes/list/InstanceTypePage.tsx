@@ -3,9 +3,10 @@ import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 import classNames from 'classnames';
 
 import useVirtualMachineInstanceTypes from '@catalog/CreateFromInstanceTypes/state/hooks/useVirtualMachineInstanceTypes';
-import VirtualMachineClusterInstancetypeModel, {
+import {
+  VirtualMachineClusterInstancetypeModel,
   VirtualMachineClusterInstancetypeModelRef,
-} from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineClusterInstancetypeModel';
+} from '@kubevirt-ui-ext/kubevirt-api/console';
 import { PageTitles } from '@kubevirt-utils/constants/page-constants';
 import useIsSearchPage from '@kubevirt-utils/hooks/useIsSearchPage';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
 
-import { VirtualMachineClusterPreferenceModelRef } from '@kubevirt-ui/kubevirt-api/console';
-import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { VirtualMachineClusterPreferenceModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
 import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';

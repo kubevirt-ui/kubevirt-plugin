@@ -1,7 +1,7 @@
 import React from 'react';
 import { TFunction } from 'react-i18next';
 
-import { V1Interface, V1Network, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1Interface, V1Network, V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import TechPreviewBadge from '@kubevirt-utils/components/TechPreviewBadge/TechPreviewBadge';
 import { getInterface, getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
 import {

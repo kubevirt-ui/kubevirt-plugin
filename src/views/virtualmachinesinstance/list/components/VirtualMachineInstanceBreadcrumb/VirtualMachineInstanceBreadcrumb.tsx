@@ -1,7 +1,7 @@
 import React, { FC, memo } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
-import { VirtualMachineInstanceModelRef } from '@kubevirt-ui/kubevirt-api/console';
+import { VirtualMachineInstanceModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useLastNamespacePath } from '@kubevirt-utils/hooks/useLastNamespacePath';
 import { Breadcrumb, BreadcrumbItem, Button, ButtonVariant } from '@patternfly/react-core';

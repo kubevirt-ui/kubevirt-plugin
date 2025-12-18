@@ -4,11 +4,11 @@ import { useLocation } from 'react-router-dom-v5-compat';
 import {
   VirtualMachineInstanceMigrationModelGroupVersionKind,
   VirtualMachineModelGroupVersionKind,
-} from '@kubevirt-ui/kubevirt-api/console';
+} from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   V1VirtualMachine,
   V1VirtualMachineInstanceMigration,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';

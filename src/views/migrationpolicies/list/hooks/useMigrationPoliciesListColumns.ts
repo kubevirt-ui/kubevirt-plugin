@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
-import { MigrationPolicyModelRef } from '@kubevirt-ui/kubevirt-api/console';
-import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { MigrationPolicyModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
 import useClusterParam from '@multicluster/hooks/useClusterParam';

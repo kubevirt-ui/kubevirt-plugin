@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { WizardDescriptionItem } from '@catalog/wizard/components/WizardDescriptionItem';
 import useWizardDisksTableData from '@catalog/wizard/tabs/disks/hooks/useWizardDisksTableData';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { DescriptionList, Stack, StackItem } from '@patternfly/react-core';

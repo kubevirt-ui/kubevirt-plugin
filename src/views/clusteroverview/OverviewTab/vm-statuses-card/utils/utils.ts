@@ -1,6 +1,6 @@
 import { Fragment } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { GreenRunningIcon } from '@kubevirt-utils/icons/GreenRunningIcon';
 import { getVMStatus } from '@kubevirt-utils/resources/shared';
 import { VM_ERROR_STATUSES, VM_STATUS } from '@kubevirt-utils/resources/vm/utils/vmStatus';

@@ -1,7 +1,7 @@
 import React, { FC, useState } from 'react';
 import classNames from 'classnames';
 
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Card, ExpandableSection, Flex, Title } from '@patternfly/react-core';
 

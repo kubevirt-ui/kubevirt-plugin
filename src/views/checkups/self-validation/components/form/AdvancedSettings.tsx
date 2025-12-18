@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 
-import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
+import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
 import CheckboxSelect from '@kubevirt-utils/components/CheckboxSelect/CheckboxSelect';
 import {

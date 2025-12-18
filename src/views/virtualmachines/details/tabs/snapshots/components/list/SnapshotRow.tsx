@@ -1,10 +1,10 @@
 import * as React from 'react';
 
-import { VirtualMachineSnapshotModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
+import { VirtualMachineSnapshotModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   V1beta1VirtualMachineRestore,
   V1beta1VirtualMachineSnapshot,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 import { getCluster } from '@multicluster/helpers/selectors';

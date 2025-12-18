@@ -1,4 +1,4 @@
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 
 export const getVMNamesByNamespace = (vms: V1VirtualMachine[]): { [key: string]: string[] } =>

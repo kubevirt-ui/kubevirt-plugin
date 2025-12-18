@@ -1,12 +1,12 @@
 import { v4 as uuidv4 } from 'uuid';
 
-import { DataVolumeModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
-import { V1beta1DataVolume } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { DataVolumeModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import {
   V1VirtualMachine,
   V1VirtualMachineCondition,
   V1VolumeSnapshotStatus,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { WatchK8sResults } from '@openshift-console/dynamic-plugin-sdk';
 

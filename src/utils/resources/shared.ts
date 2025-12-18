@@ -1,9 +1,9 @@
-import { modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
+import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   V1beta1DataImportCron,
   V1beta1DataSource,
-} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
-import { V1beta1Condition, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { V1beta1Condition, V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { TemplateModel } from '@kubevirt-utils/models';
 import { getCluster } from '@multicluster/helpers/selectors';

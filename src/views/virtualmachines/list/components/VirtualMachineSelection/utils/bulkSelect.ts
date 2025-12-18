@@ -1,4 +1,4 @@
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { BulkSelectValue } from '@patternfly/react-component-groups/dist/dynamic/BulkSelect';
 import { deselectAll, selectAll } from '@virtualmachines/list/selectedVMs';
 

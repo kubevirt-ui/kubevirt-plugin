@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom-v5-compat';
 
-import { DataImportCronModelRef } from '@kubevirt-ui/kubevirt-api/console';
-import { V1beta1DataImportCron } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { DataImportCronModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1beta1DataImportCron } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import DetailsPageTitle from '@kubevirt-utils/components/DetailsPageTitle/DetailsPageTitle';
 import PaneHeading from '@kubevirt-utils/components/PaneHeading/PaneHeading';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';

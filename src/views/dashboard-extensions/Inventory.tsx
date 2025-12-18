@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { StatusGroupMapper } from '@openshift-console/dynamic-plugin-sdk';
 import { OffIcon } from '@patternfly/react-icons';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils/constants';

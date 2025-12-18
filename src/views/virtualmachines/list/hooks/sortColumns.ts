@@ -1,4 +1,4 @@
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getCPU, getMemory } from '@kubevirt-utils/resources/vm';
 import { columnSortingCompare, isEmpty } from '@kubevirt-utils/utils/utils';
 import { SortByDirection } from '@patternfly/react-table';

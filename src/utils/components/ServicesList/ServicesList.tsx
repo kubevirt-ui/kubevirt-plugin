@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import * as _ from 'lodash-es';
 
-import { IoK8sApiCoreV1Service } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
 
 import { getColumns } from './columns';

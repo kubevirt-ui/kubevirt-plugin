@@ -1,4 +1,4 @@
-import ClusterServiceVersionModel from '@kubevirt-ui/kubevirt-api/console/models/ClusterServiceVersionModel';
+import { ClusterServiceVersionModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   OperatorGroupModel,
   PackageManifestModel,

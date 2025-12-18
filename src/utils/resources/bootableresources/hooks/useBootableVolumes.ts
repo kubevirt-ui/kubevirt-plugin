@@ -7,15 +7,15 @@ import {
   modelToGroupVersionKind,
   PersistentVolumeClaimModel,
   VolumeSnapshotModel,
-} from '@kubevirt-ui/kubevirt-api/console';
-import DataImportCronModel from '@kubevirt-ui/kubevirt-api/console/models/DataImportCronModel';
-import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
+} from '@kubevirt-ui-ext/kubevirt-api/console';
+import { DataImportCronModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   V1beta1DataImportCron,
   V1beta1DataSource,
   V1beta1DataVolume,
-} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
+} from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
 import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';

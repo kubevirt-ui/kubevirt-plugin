@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { TemplateModel } from '@kubevirt-ui/kubevirt-api/console';
+import { TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import DescriptionItemAnnotations from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemAnnotations';
 import DescriptionItemCluster from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemCluster';
 import DescriptionItemCreatedAt from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemCreatedAt';

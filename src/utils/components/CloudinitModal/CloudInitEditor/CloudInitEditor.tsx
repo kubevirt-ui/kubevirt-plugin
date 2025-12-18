@@ -1,6 +1,6 @@
 import React, { FC, useLayoutEffect, useRef, useState } from 'react';
 
-import { V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1Volume } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, AlertActionCloseButton, AlertVariant, Divider } from '@patternfly/react-core';

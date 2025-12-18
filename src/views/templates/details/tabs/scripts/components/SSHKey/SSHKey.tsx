@@ -1,8 +1,8 @@
 import React, { FC, useMemo } from 'react';
 import produce from 'immer';
 
-import { SecretModel, TemplateModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { SecretModel, TemplateModel, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import LinuxLabel from '@kubevirt-utils/components/Labels/LinuxLabel';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';

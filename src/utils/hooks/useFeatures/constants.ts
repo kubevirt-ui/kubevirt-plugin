@@ -1,9 +1,9 @@
-import { ConfigMapModel, GroupModel, RoleModel } from '@kubevirt-ui/kubevirt-api/console';
+import { ConfigMapModel, GroupModel, RoleModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   IoK8sApiCoreV1ConfigMap,
   IoK8sApiRbacV1Role,
   IoK8sApiRbacV1RoleBinding,
-} from '@kubevirt-ui/kubevirt-api/kubernetes';
+} from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { DEFAULT_OPERATOR_NAMESPACE } from '@kubevirt-utils/utils/utils';
 import { FEATURE_KUBEVIRT_CROSS_CLUSTER_MIGRATION } from '@multicluster/constants';
 import { K8sVerb } from '@openshift-console/dynamic-plugin-sdk';

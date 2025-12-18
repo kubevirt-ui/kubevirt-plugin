@@ -1,14 +1,14 @@
 import produce from 'immer';
 
-import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
   V1CloudInitConfigDriveSource,
   V1CloudInitNoCloudSource,
   V1SSHPublicKeyAccessCredentialPropagationMethod,
   V1VirtualMachine,
   V1Volume,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   convertUserDataObjectToYAML,
   convertYAMLUserDataObject,

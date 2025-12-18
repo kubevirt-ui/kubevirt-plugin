@@ -1,5 +1,5 @@
-import { JobModel } from '@kubevirt-ui/kubevirt-api/console';
-import { IoK8sApiBatchV1Job } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { JobModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { kubevirtK8sCreate, kubevirtK8sGet } from '@multicluster/k8sRequests';
 
 import { type ValidatedJobParameters } from '../constants';

@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 
-import { MigrationPolicyModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
+import { MigrationPolicyModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';

@@ -6,7 +6,7 @@ import {
   NodeModel,
   VirtualMachineInstanceMigrationModelGroupVersionKind,
   VirtualMachineModelGroupVersionKind,
-} from '@kubevirt-ui/kubevirt-api/console';
+} from '@kubevirt-ui-ext/kubevirt-api/console';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';

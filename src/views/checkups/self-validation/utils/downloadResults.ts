@@ -2,8 +2,11 @@ import { TFunction } from 'react-i18next';
 import axios from 'axios';
 import { saveAs } from 'file-saver';
 
-import { ConfigMapModel } from '@kubevirt-ui/kubevirt-api/console';
-import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import {
+  IoK8sApiBatchV1Job,
+  IoK8sApiCoreV1ConfigMap,
+} from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sGet, kubevirtK8sPatch } from '@multicluster/k8sRequests';

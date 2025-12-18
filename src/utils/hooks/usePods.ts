@@ -1,4 +1,4 @@
-import { modelToGroupVersionKind, PodModel } from '@kubevirt-ui/kubevirt-api/console';
+import { modelToGroupVersionKind, PodModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 /**

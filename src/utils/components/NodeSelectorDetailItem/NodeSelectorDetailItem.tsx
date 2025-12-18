@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { V1VirtualMachineInstanceSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachineInstanceSpec } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 

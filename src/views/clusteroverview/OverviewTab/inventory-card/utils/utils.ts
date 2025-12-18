@@ -1,7 +1,7 @@
 import * as React from 'react';
 
-import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { KUBEVIRT_OS_IMAGES_NS, OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
 import { GreenRunningIcon } from '@kubevirt-utils/icons/GreenRunningIcon';
 import { getVMStatus } from '@kubevirt-utils/resources/shared';

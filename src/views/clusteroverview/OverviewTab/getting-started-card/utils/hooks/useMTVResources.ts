@@ -1,4 +1,4 @@
-import { modelToGroupVersionKind, RouteModel } from '@kubevirt-ui/kubevirt-api/console';
+import { modelToGroupVersionKind, RouteModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   K8sResourceCommon,
   useK8sWatchResources,

@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { isRunning } from 'src/views/virtualmachines/utils';
 
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   getRunningVMMissingDisksFromVMI,
   getRunningVMMissingVolumesFromVMI,

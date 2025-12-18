@@ -1,6 +1,6 @@
 import produce from 'immer';
 
-import { V1alpha1MigrationPolicy } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { BinaryUnit } from '@kubevirt-utils/utils/unitConstants';
 import { generatePrettyName, isEmpty } from '@kubevirt-utils/utils/utils';
 

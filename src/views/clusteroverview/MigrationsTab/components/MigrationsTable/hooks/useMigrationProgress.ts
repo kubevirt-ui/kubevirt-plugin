@@ -1,4 +1,4 @@
-import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import useMigrationPercentage from '@kubevirt-utils/resources/vm/hooks/useMigrationPercentage';
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
 import { ProgressVariant } from '@patternfly/react-core';

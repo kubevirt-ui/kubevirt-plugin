@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
 import { setSessionStorageTabsData, setSessionStorageVM } from './utils/session';
 import { TabsData } from './utils/tabs-data';

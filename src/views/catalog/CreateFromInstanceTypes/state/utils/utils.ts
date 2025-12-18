@@ -1,5 +1,5 @@
-import { SecretModel } from '@kubevirt-ui/kubevirt-api/console';
-import { IoK8sApiCoreV1Secret } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { SecretModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { initialSSHCredentials } from '@kubevirt-utils/components/SSHSecretModal/utils/constants';
 import {
   SecretSelectionOption,

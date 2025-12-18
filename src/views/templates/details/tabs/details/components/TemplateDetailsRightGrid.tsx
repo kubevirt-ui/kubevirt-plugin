@@ -4,7 +4,7 @@ import BootSource from 'src/views/templates/details/tabs/details/components/Boot
 import { TemplateDetailsGridProps } from 'src/views/templates/details/tabs/details/TemplateDetailsPage';
 import { getTemplateProviderName } from 'src/views/templates/utils/selectors';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import AdditionalResources from '@kubevirt-utils/components/AdditionalResources/AdditionalResources';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import HardwareDevices from '@kubevirt-utils/components/HardwareDevices/HardwareDevices';

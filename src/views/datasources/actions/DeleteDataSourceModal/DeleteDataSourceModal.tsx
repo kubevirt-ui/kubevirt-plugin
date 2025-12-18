@@ -1,12 +1,12 @@
 import React, { FC, useState } from 'react';
 import { Trans } from 'react-i18next';
 
-import DataImportCronModel from '@kubevirt-ui/kubevirt-api/console/models/DataImportCronModel';
-import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
+import { DataImportCronModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   V1beta1DataImportCron,
   V1beta1DataSource,
-} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+} from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

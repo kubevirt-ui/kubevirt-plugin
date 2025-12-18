@@ -1,4 +1,4 @@
-import { V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1Volume } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { EMPTY_DISK_IMAGE_PATTERNS } from './constants';

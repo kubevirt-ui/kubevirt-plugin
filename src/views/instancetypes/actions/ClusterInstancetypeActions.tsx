@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
 
 import useClusterInstancetypeActionsProvider from './hooks/useClusterInstancetypeActionsProvider';

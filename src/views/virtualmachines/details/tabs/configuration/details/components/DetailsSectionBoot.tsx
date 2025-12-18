@@ -2,7 +2,7 @@ import React, { FC, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom-v5-compat';
 import classNames from 'classnames';
 
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import BootOrderSummary from '@kubevirt-utils/components/BootOrder/BootOrderSummary';
 import BootOrderModal from '@kubevirt-utils/components/BootOrderModal/BootOrderModal';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';

@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 import { Updater } from 'use-immer';
 
 import { V1beta1NetworkMap, V1beta1Plan, V1beta1StorageMap } from '@kubev2v/types';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTargetProviderName } from '@kubevirt-utils/resources/plan/selectors';
 import { getCluster } from '@multicluster/helpers/selectors';

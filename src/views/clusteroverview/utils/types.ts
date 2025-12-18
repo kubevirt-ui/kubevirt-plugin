@@ -1,4 +1,4 @@
-import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { K8sResourceCommon, Selector } from '@openshift-console/dynamic-plugin-sdk';
 
 export type Descriptor<T = any> = {

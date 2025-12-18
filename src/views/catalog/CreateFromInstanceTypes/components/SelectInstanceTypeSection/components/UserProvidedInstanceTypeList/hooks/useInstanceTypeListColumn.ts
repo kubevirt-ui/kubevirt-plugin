@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 
-import { V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
 import { columnSorting } from '@kubevirt-utils/utils/utils';

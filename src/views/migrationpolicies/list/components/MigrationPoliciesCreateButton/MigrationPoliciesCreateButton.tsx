@@ -1,8 +1,8 @@
 import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
-import { MigrationPolicyModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
-import MigrationPolicyModel from '@kubevirt-ui/kubevirt-api/console/models/MigrationPolicyModel';
+import { MigrationPolicyModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { MigrationPolicyModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useListClusters from '@kubevirt-utils/hooks/useListClusters';
 import { K8sVerb, ListPageCreateDropdown } from '@openshift-console/dynamic-plugin-sdk';

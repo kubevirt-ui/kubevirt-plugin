@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
 
-import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
   ADVANCED_CDROM_FEATURES,
   PASST_UDN_NETWORK,

@@ -5,11 +5,11 @@ import {
   modelToGroupVersionKind,
   TemplateModel,
   V1Template,
-} from '@kubevirt-ui/kubevirt-api/console';
+} from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   V1beta1DataSource,
   V1beta1DataVolumeSpec,
-} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+} from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { K8sResourceCommon, ResourceLink } from '@openshift-console/dynamic-plugin-sdk';

@@ -1,7 +1,10 @@
 import React, { FC, useCallback } from 'react';
 
-import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { V1beta1DataVolumeSpec, V1ContainerDiskSource } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import {
+  V1beta1DataVolumeSpec,
+  V1ContainerDiskSource,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ROOTDISK } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateImportURLs } from '@kubevirt-utils/resources/template';

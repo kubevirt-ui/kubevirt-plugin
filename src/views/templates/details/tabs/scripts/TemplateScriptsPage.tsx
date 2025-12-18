@@ -1,7 +1,7 @@
 import React, { FC, useCallback } from 'react';
 
-import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { CloudInitDescription } from '@kubevirt-utils/components/CloudinitDescription/CloudInitDescription';
 import CloudinitModal from '@kubevirt-utils/components/CloudinitModal/CloudinitModal';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';

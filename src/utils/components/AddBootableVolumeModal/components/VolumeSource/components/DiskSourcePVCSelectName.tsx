@@ -3,7 +3,7 @@ import React, { Dispatch, FC, SetStateAction } from 'react';
 import {
   modelToGroupVersionKind,
   PersistentVolumeClaimModel,
-} from '@kubevirt-ui/kubevirt-api/console';
+} from '@kubevirt-ui-ext/kubevirt-api/console';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

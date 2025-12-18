@@ -2,8 +2,8 @@ import { DEFAULT_PREFERENCE_KIND_LABEL } from '@catalog/CreateFromInstanceTypes/
 import {
   VirtualMachineClusterPreferenceModelGroupVersionKind,
   VirtualMachinePreferenceModelGroupVersionKind,
-} from '@kubevirt-ui/kubevirt-api/console';
-import VirtualMachineClusterPreferenceModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineClusterPreferenceModel';
+} from '@kubevirt-ui-ext/kubevirt-api/console';
+import { VirtualMachineClusterPreferenceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { K8sGroupVersionKind, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';

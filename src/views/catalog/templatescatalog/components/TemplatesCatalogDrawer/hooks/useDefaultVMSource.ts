@@ -4,7 +4,7 @@ import {
   V1beta1DataVolumeSpec,
   V1ContainerDiskSource,
   V1VirtualMachine,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import { ROOTDISK } from '@kubevirt-utils/constants/constants';
 

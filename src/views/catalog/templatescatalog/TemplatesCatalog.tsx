@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom-v5-compat';
 import { CREATE_VM_TAB } from '@catalog/CreateVMHorizontalNav/constants';
 import useHideDeprecatedTemplateTiles from '@catalog/templatescatalog/hooks/useHideDeprecatedTemplateTiles';
 import { clearSessionStorageVM } from '@catalog/utils/WizardVMContext';
-import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { logTemplateFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
 import { TEMPLATE_SELECTED } from '@kubevirt-utils/extensions/telemetry/utils/constants';

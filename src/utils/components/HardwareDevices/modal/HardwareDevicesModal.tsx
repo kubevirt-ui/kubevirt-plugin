@@ -6,7 +6,7 @@ import {
   V1HostDevice,
   V1VirtualMachine,
   V1VirtualMachineInstance,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { generatePrettyName, isEmpty } from '@kubevirt-utils/utils/utils';

@@ -3,7 +3,7 @@ import React, { FC, useState } from 'react';
 import {
   V1beta1VirtualMachineSnapshot,
   V1VirtualMachine,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import RestoreModal from '@kubevirt-utils/components/SnapshotModal/RestoreModal';

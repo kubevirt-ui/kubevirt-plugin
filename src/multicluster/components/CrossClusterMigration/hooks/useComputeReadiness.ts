@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
-import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { modelToGroupVersionKind, NodeModel } from '@kubevirt-utils/models';
 import { getArchitecture } from '@kubevirt-utils/resources/vm/utils/selectors';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';

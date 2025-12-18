@@ -5,7 +5,7 @@ import {
   removeSSHKeyObject,
   updateSSHKeyObject,
 } from '@catalog/wizard/tabs/scripts/components/sshkey-utils';
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import {
   SecretSelectionOption,

@@ -4,7 +4,7 @@ import Descheduler from 'src/views/templates/details/tabs/scheduling/components/
 import NodeSelector from 'src/views/templates/details/tabs/scheduling/components/NodeSelector';
 import Tolerations from 'src/views/templates/details/tabs/scheduling/components/Tolerations';
 
-import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { updateTemplate } from '@kubevirt-utils/resources/template';
 import { DescriptionList } from '@patternfly/react-core';
 

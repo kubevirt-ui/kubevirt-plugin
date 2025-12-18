@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { formatQuantityString, quantityToString, toQuantity } from '@kubevirt-utils/utils/units';

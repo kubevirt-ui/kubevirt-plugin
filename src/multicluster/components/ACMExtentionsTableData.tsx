@@ -1,7 +1,7 @@
 import { ComponentType, FC } from 'react';
 import React from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt/models';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import useACMExtensionColumns from '@multicluster/hooks/useACMExtensionColumns/useACMExtensionColumns';
 import { TableData } from '@openshift-console/dynamic-plugin-sdk';
 

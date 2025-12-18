@@ -5,7 +5,7 @@ import { isDataImportCronAutoUpdated } from 'src/views/datasources/utils';
 import {
   V1beta1DataImportCron,
   V1beta1DataSource,
-} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+} from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { FormTextInput } from '@kubevirt-utils/components/FormTextInput/FormTextInput';

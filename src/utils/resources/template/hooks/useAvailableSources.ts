@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { convertResourceArrayToMapWithCluster } from '@kubevirt-utils/resources/shared';
 import { useSingleClusterAvailableSources } from '@kubevirt-utils/resources/template/hooks/useSingleClusterAvailableSources';
 import useMulticlusterAvailableSources from '@multicluster/hooks/useMulticlusterAvailableSources';

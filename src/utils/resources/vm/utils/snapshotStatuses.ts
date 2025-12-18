@@ -1,4 +1,4 @@
-import { V1VirtualMachine, V1VolumeSnapshotStatus } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine, V1VolumeSnapshotStatus } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
 import { getVolumeSnapshotStatuses } from './selectors';
 

@@ -1,6 +1,6 @@
-import { ConfigMapModel } from '@kubevirt-ui/kubevirt-api/console';
-import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
-import { V1Disk, V1VirtualMachine, V1Volume } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { V1Disk, V1VirtualMachine, V1Volume } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 

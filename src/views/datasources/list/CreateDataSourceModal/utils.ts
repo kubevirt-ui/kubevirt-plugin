@@ -1,11 +1,11 @@
 import produce from 'immer';
 
-import DataImportCronModel from '@kubevirt-ui/kubevirt-api/console/models/DataImportCronModel';
-import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSourceModel';
+import { DataImportCronModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   V1beta1DataImportCron,
   V1beta1DataSource,
-} from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
+} from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { CDI_BIND_REQUESTED_ANNOTATION } from '@kubevirt-utils/hooks/useCDIUpload/consts';
 import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
 import { DATA_SOURCE_CRONJOB_LABEL } from '@kubevirt-utils/resources/template';

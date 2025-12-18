@@ -1,5 +1,5 @@
-import { DeploymentModel, modelToGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
-import { IoK8sApiAppsV1Deployment } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { DeploymentModel, modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { IoK8sApiAppsV1Deployment } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';

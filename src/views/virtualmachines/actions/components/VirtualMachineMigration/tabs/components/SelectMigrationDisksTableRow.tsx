@@ -1,6 +1,6 @@
 import React, { FC, useState } from 'react';
 
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { Table, TableGridBreakpoint, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';

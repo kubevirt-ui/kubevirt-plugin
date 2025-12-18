@@ -1,4 +1,4 @@
-import MigrationPolicyModel from '@kubevirt-ui/kubevirt-api/console/models/MigrationPolicyModel';
+import { MigrationPolicyModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 
 export const defaultMigrationPolicyYamlTemplate = `
 apiVersion: ${MigrationPolicyModel.apiGroup}/${MigrationPolicyModel.apiVersion}

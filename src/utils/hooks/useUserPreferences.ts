@@ -1,5 +1,5 @@
-import { VirtualMachinePreferenceModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
-import { V1beta1VirtualMachinePreference } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { VirtualMachinePreferenceModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1beta1VirtualMachinePreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { Selector } from '@openshift-console/dynamic-plugin-sdk';

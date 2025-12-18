@@ -1,6 +1,6 @@
 import React, { FC, useMemo } from 'react';
 
-import VirtualMachineClusterInstancetypeModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineClusterInstancetypeModel';
+import { VirtualMachineClusterInstancetypeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { MenuItem } from '@patternfly/react-core';

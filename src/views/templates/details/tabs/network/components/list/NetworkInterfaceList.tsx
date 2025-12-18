@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
+import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import useNetworkColumns from '@kubevirt-utils/hooks/useNetworkColums';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';

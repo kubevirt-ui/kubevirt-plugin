@@ -1,6 +1,9 @@
 import React, { FC } from 'react';
 
-import { IoK8sApiBatchV1Job, IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
+import {
+  IoK8sApiBatchV1Job,
+  IoK8sApiCoreV1ConfigMap,
+} from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { GreenRunningIcon } from '@kubevirt-utils/icons/GreenRunningIcon';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';

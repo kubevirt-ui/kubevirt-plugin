@@ -13,8 +13,8 @@ import {
   VirtualMachineInstanceModelGroupVersionKind,
   VirtualMachineModelGroupVersionKind,
   VirtualMachineModelRef,
-} from '@kubevirt-ui/kubevirt-api/console';
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ColumnManagement from '@kubevirt-utils/components/ColumnManagementModal/ColumnManagement';
 import { tourGuideVM } from '@kubevirt-utils/components/GuidedTour/utils/constants';
 import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';

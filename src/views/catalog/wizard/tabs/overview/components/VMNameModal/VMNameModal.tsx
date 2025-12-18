@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import produce from 'immer';
 
-import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import {
   isValidVMName,

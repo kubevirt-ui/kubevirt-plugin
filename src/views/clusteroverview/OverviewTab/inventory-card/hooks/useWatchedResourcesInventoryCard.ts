@@ -2,13 +2,15 @@ import {
   modelToGroupVersionKind,
   NodeModel,
   TemplateModel,
-} from '@kubevirt-ui/kubevirt-api/console';
-import NetworkAttachmentDefinitionModel, {
+} from '@kubevirt-ui-ext/kubevirt-api/console';
+import {
+  NetworkAttachmentDefinitionModel,
   NetworkAttachmentDefinitionModelGroupVersionKind,
-} from '@kubevirt-ui/kubevirt-api/console/models/NetworkAttachmentDefinitionModel';
-import VirtualMachineModel, {
+} from '@kubevirt-ui-ext/kubevirt-api/console';
+import {
+  VirtualMachineModel,
   VirtualMachineModelGroupVersionKind,
-} from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
+} from '@kubevirt-ui-ext/kubevirt-api/console';
 import { getAllowedResources, getAllowedTemplateResources } from '@kubevirt-utils/resources/shared';
 import { TEMPLATE_TYPE_LABEL } from '@kubevirt-utils/resources/template';
 
