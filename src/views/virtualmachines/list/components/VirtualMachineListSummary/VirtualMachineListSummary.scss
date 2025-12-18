@@ -9,5 +9,13 @@
     &-toggle {
       color: var(--pf-t--global--text--color--regular);
     }
+
+    &-content {
+      max-width: 1800px;
+
+      .pf-v6-c-card {
+        flex-grow: 1;
+      }
+    }
   }
 }
