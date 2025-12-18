@@ -1,19 +1,21 @@
-import React, { FC, JSX, memo, useCallback, useEffect } from 'react';
+import React, { FC, JSX, memo, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
 import ClusterDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterDropdown';
 import NamespaceDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/NamespaceDropdown';
-import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { ALL_CLUSTERS_KEY, ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import { useClusterCNVInstalled } from '@kubevirt-utils/hooks/useAlerts/utils/useClusterCNVInstalled';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useActiveClusterParam from '@multicluster/hooks/useActiveClusterParam';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { useFleetClusterNames, useHubClusterName } from '@stolostron/multicluster-sdk';
+
+import { useDisabledClusterRedirect } from './hooks/useDisabledClusterRedirect';
+import { useInitialClusterSelection } from './hooks/useInitialClusterSelection';
+import { useInitialProjectSelection } from './hooks/useInitialProjectSelection';
 
 import './ClusterProjectDropdown.scss';
 
@@ -79,108 +81,40 @@ const ClusterProjectDropdown: FC<ClusterProjectDropdownProps> = memo(
       [location.pathname, namespace, navigate],
     );
 
-    useEffect(() => {
-      if (!isACMPage) return;
-      if (includeAllClusters) return;
-
-      if (isEmpty(selectedCluster) && hubClusterNameLoaded) {
-        onClusterChange(hubClusterName);
-      }
-    }, [
-      isACMPage,
-      cluster,
+    useInitialClusterSelection({
       hubClusterName,
       hubClusterNameLoaded,
       includeAllClusters,
-      onClusterChange,
-    ]);
-
-    useEffect(() => {
-      if (!isACMPage) return;
-      if (includeAllProjects) return;
-
-      if (cluster && isEmpty(namespace) && projectLoaded && showProjectDropdown) {
-        const defaultProject = projects?.find((project) => project === DEFAULT_NAMESPACE);
-        const selectedProject = defaultProject || projects?.[0] || ALL_PROJECTS;
-        if (selectedProject) {
-          onProjectChange(selectedProject);
-        }
-      }
-    }, [
       isACMPage,
+      onClusterChange,
+      selectedCluster,
+    });
+
+    useInitialProjectSelection({
       cluster,
       includeAllProjects,
+      isACMPage,
       namespace,
       onProjectChange,
       projectLoaded,
       projects,
       showProjectDropdown,
-    ]);
+    });
 
-    // Redirect if current cluster is disabled
-    useEffect(() => {
-      if (!isACMPage) return;
-      if (
-        !clustersLoaded ||
-        !cluster ||
-        cluster === ALL_CLUSTERS_KEY ||
-        !disabledClusters ||
-        disabledClusters.length === 0
-      ) {
-        return;
-      }
-
-      const isCurrentClusterDisabled = disabledClusters.includes(cluster);
-      if (!isCurrentClusterDisabled) {
-        return;
-      }
-
-      // Find first enabled cluster
-      const omittedSet = new Set(onlyCNVClusters && cnvLoaded ? cnvNotInstalledClusters : []);
-      const disabledSet = new Set(disabledClusters);
-
-      // If includeAllClusters is true, prefer "all clusters"
-      if (includeAllClusters) {
-        onClusterChange(ALL_CLUSTERS_KEY);
-        return;
-      }
-
-      // Otherwise, find first enabled cluster
-      const enabledCluster = clusterNames?.find(
-        (name) => !omittedSet.has(name) && !disabledSet.has(name),
-      );
-
-      const redirectTo = (next: string | undefined): void => {
-        if (next && next !== cluster) {
-          onClusterChange(next);
-        }
-      };
-
-      if (enabledCluster) {
-        redirectTo(enabledCluster);
-      } else if (
-        hubClusterNameLoaded &&
-        hubClusterName &&
-        !omittedSet.has(hubClusterName) &&
-        !disabledSet.has(hubClusterName)
-      ) {
-        // Fallback to hub cluster only if it is enabled and not CNV-omitted
-        redirectTo(hubClusterName);
-      }
-    }, [
-      isACMPage,
+    useDisabledClusterRedirect({
       cluster,
-      clustersLoaded,
       clusterNames,
+      clustersLoaded,
       cnvLoaded,
       cnvNotInstalledClusters,
       disabledClusters,
       hubClusterName,
       hubClusterNameLoaded,
       includeAllClusters,
-      onlyCNVClusters,
+      isACMPage,
       onClusterChange,
-    ]);
+      onlyCNVClusters,
+    });
 
     if (!isACMPage) {
       return null;
@@ -208,6 +142,7 @@ const ClusterProjectDropdown: FC<ClusterProjectDropdownProps> = memo(
             <NamespaceDropdown
               cluster={cluster}
               disabled={!cluster || cluster === ALL_CLUSTERS_KEY}
+              disabledTooltip={t('Project can be selected only at a cluster level')}
               includeAllProjects={includeAllProjects}
               onChange={onProjectChange}
               selectedProject={namespace || ALL_PROJECTS}

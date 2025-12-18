@@ -4,10 +4,12 @@ import { Helmet } from 'react-helmet';
 import ClusterProjectDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterProjectDropdown';
 import HorizontalNavbar from '@kubevirt-utils/components/HorizontalNavbar/HorizontalNavbar';
 import { NavPageKubevirt } from '@kubevirt-utils/components/HorizontalNavbar/utils/utils';
+import { ALL_CLUSTERS_KEY } from '@kubevirt-utils/hooks/constants';
 import { useClusterObservabilityDisabled } from '@kubevirt-utils/hooks/useAlerts/utils/useClusterObservabilityDisabled';
 import { useForceProjectSelection } from '@kubevirt-utils/hooks/useForceProjectSelection';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useActiveClusterParam from '@multicluster/hooks/useActiveClusterParam';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { useSignals } from '@preact/signals-react/runtime';
 import { VIRTUALIZATION_PATHS } from '@virtualmachines/tree/utils/constants';
@@ -17,6 +19,7 @@ import usePreserveTabDisplay from '../../utils/hooks/usePreserveTabDisplay';
 import WelcomeModal from '../welcome/WelcomeModal';
 
 import ClusterOverviewPageHeader from './Header/ClusterOverviewPageHeader';
+import ObservabilityDisabledAlert from './Header/ObservabilityDisabledAlert';
 import MigrationsTab from './MigrationsTab/MigrationsTab';
 import OverviewTab from './OverviewTab/OverviewTab';
 import SettingsTab from './SettingsTab/SettingsTab';
@@ -28,6 +31,7 @@ const ClusterOverviewPage: FC = () => {
   const { t } = useKubevirtTranslation();
   const isAdmin = useIsAdmin();
   const isACMPage = useIsACMPage();
+  const cluster = useActiveClusterParam();
   const {
     disabledClusters,
     error: observabilityError,
@@ -117,6 +121,13 @@ const ClusterOverviewPage: FC = () => {
       <div className="cluster-overview-page">
         <div className="cluster-overview-page__header">
           <ClusterOverviewPageHeader />
+          {isACMPage &&
+            cluster === ALL_CLUSTERS_KEY &&
+            observabilityLoaded &&
+            !observabilityError &&
+            disabledClusters.length > 0 && (
+              <ObservabilityDisabledAlert disabledClusters={disabledClusters} />
+            )}
         </div>
         <div className="cluster-overview-page__content">
           <HorizontalNavbar

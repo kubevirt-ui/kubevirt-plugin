@@ -14,6 +14,7 @@ import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 type NamespaceDropdownProps = {
   cluster?: string;
   disabled?: boolean;
+  disabledTooltip?: string;
   includeAllProjects?: boolean;
   onChange: (project: string) => void;
   selectedProject: string;
@@ -22,6 +23,7 @@ type NamespaceDropdownProps = {
 const NamespaceDropdown: FC<NamespaceDropdownProps> = ({
   cluster,
   disabled = false,
+  disabledTooltip,
   includeAllProjects = true,
   onChange,
   selectedProject,
@@ -69,6 +71,7 @@ const NamespaceDropdown: FC<NamespaceDropdownProps> = ({
       }}
       config={config}
       disabled={disabled}
+      disabledTooltip={disabledTooltip}
       extractKey={(proj) => getName(proj)}
       extractTitle={(proj) => getName(proj)}
       includeAllItems={includeAllProjects}

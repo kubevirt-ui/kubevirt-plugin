@@ -90,24 +90,28 @@ const VMStatusesCard: FC = () => {
             <Grid hasGutter>
               <VMStatusItem
                 count={primaryStatuses.Error}
+                enabledClusters={enabledClusters}
                 namespace={activeNamespace}
                 statusArray={[ERROR]}
                 statusLabel={ERROR}
               />
               <VMStatusItem
                 count={primaryStatuses.Running}
+                enabledClusters={enabledClusters}
                 namespace={activeNamespace}
                 statusArray={[VM_STATUS.Running]}
                 statusLabel={VM_STATUS.Running}
               />
               <VMStatusItem
                 count={primaryStatuses.Stopped}
+                enabledClusters={enabledClusters}
                 namespace={activeNamespace}
                 statusArray={[VM_STATUS.Stopped]}
                 statusLabel={VM_STATUS.Stopped}
               />
               <VMStatusItem
                 count={otherStatusesCount}
+                enabledClusters={enabledClusters}
                 namespace={activeNamespace}
                 statusArray={OTHER_STATUSES}
                 statusLabel={t(OTHER)}
@@ -117,6 +121,7 @@ const VMStatusesCard: FC = () => {
           <Divider />
           <VMAdditionalStatuses
             activeNamespace={activeNamespace}
+            enabledClusters={enabledClusters}
             otherStatuses={otherStatuses}
             otherStatusesCount={otherStatusesCount}
           />
