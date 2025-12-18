@@ -16,17 +16,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Setup Yarn
+      - name: Setup Node
         uses: actions/setup-node@v6
         with:
           node-version: '22'
-          cache: 'yarn'
-      - run: yarn install --frozen-lockfile --ignore-scripts
+      - run: npm ci --ignore-scripts
 
       - name: Check i18n
         shell: bash
         run: |
-          yarn i18n
+          npm run i18n
           GIT_STATUS="$(git status --short --untracked-files locales)"
           if [ -n "$GIT_STATUS" ]; then
             echo "i18n files are not up to date. Commit them to fix."
@@ -41,21 +40,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Setup Yarn
+      - name: Setup Node
         uses: actions/setup-node@v6
         with:
           node-version: '22'
-          cache: 'yarn'
-      - run: yarn install --frozen-lockfile --ignore-scripts
+      - run: npm ci --ignore-scripts
 
       - name: Lint
-        run: yarn lint:fix
+        run: npm run lint:fix
 
       - name: Check File Changes
         run: git diff --name-only --exit-code && echo "No changes after linting."
 
       - name: Build
-        run: yarn build
+        run: npm run build
 
   unit-test:
     name: unit-test
@@ -64,15 +62,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Setup Yarn
+      - name: Setup Node
         uses: actions/setup-node@v6
         with:
           node-version: '22'
-          cache: 'yarn'
-      - run: yarn install --frozen-lockfile --ignore-scripts
+      - run: npm ci --ignore-scripts
 
       - name: Run Unit Tests
-        run: yarn test-cov
+        run: npm run test-cov
 
       - name: Coverage Upload
         uses: codecov/codecov-action@v2

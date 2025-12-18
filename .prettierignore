@@ -1,11 +1,10 @@
 # Ignore artifacts (keep in sync with eslint):
 dist/
 node_modules/
+package-lock.json
 i18n-scripts/
-yarn.lock
 /coverage
 /gui-test-screenshots
 cypress/gui-test-screenshots
 cypress/cypress-a11y-report.json
 /locales
-
