@@ -36,6 +36,7 @@ export enum PERSPECTIVES {
   ACM = 'acm',
   ADMIN = 'admin',
   DEVELOPER = 'dev',
+  FLEET_VIRTUALIZATION = 'fleet-virtualization-perspective',
   VIRTUALIZATION = 'virtualization-perspective',
 }
 
