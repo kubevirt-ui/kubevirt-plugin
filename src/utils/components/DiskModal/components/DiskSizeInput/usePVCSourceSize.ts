@@ -9,16 +9,19 @@ import {
   PersistentVolumeClaimModel,
 } from '@kubevirt-utils/models';
 import { getPVCSize } from '@kubevirt-utils/resources/bootableresources/selectors';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 const usePVCSourceSize = (
   dataSourceRef: V1beta1DataVolumeSourceRef,
   pvcClaimName: string,
   pvcClaimNamespace: string,
 ): [pvcSize: string, loaded: boolean, error: any] => {
-  const [dataSource, dsLoaded, dsError] = useK8sWatchResource<V1beta1DataSource>(
+  const cluster = useClusterParam();
+  const [dataSource, dsLoaded, dsError] = useK8sWatchData<V1beta1DataSource>(
     dataSourceRef
       ? {
+          cluster,
           groupVersionKind: DataSourceModelGroupVersionKind,
           name: dataSourceRef?.name,
           namespace: dataSourceRef?.namespace,
@@ -28,6 +31,7 @@ const usePVCSourceSize = (
 
   const pvcWatchResource = pvcClaimName
     ? {
+        cluster,
         groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
         name: pvcClaimName,
         namespace: pvcClaimNamespace,
@@ -35,13 +39,14 @@ const usePVCSourceSize = (
     : null;
   const dataSourcePVCWatchRequest = dataSource?.spec?.source?.pvc?.name
     ? {
+        cluster,
         groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
         name: dataSource.spec.source.pvc.name,
         namespace: dataSource.spec.source.pvc.namespace,
       }
     : null;
 
-  const [pvc, loaded, error] = useK8sWatchResource<IoK8sApiCoreV1PersistentVolumeClaim>(
+  const [pvc, loaded, error] = useK8sWatchData<IoK8sApiCoreV1PersistentVolumeClaim>(
     pvcWatchResource || dataSourcePVCWatchRequest,
   );
 

@@ -18,7 +18,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { Button, ButtonVariant, Flex, FlexItem, Title } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
 
@@ -51,9 +52,10 @@ const SysPrepItem: FC<SysPrepItemProps> = ({ template }) => {
   const externalSysprepSelected = isEmpty(sysPrepObject) && currentVMSysprepName;
 
   const [externalSysprepConfig, sysprepLoaded, sysprepLoadError] =
-    useK8sWatchResource<IoK8sApiCoreV1ConfigMap>(
+    useK8sWatchData<IoK8sApiCoreV1ConfigMap>(
       externalSysprepSelected
         ? {
+            cluster: getCluster(template),
             groupVersionKind: modelToGroupVersionKind(ConfigMapModel),
             name: externalSysprepSelected,
             namespace,

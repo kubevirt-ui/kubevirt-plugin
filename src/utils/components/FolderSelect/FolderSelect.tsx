@@ -9,19 +9,21 @@ import { createNewFolderOption, getCreateNewFolderOption } from './utils/options
 import { getToggleStatus } from './utils/validation';
 
 type FoldersSelectProps = {
+  cluster?: string;
   isFullWidth?: boolean;
   namespace: string;
   selectedFolder: string;
   setSelectedFolder: (newFolder: string) => void;
 };
 const FolderSelect: FC<FoldersSelectProps> = ({
+  cluster,
   isFullWidth = false,
   namespace,
   selectedFolder,
   setSelectedFolder,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [folderOptions, setFolderOptions] = useFolderOptions(namespace);
+  const [folderOptions, setFolderOptions] = useFolderOptions(namespace, cluster);
 
   return (
     <SelectTypeahead

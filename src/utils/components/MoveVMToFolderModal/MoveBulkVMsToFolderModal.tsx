@@ -5,6 +5,7 @@ import FolderSelect from '@kubevirt-utils/components/FolderSelect/FolderSelect';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { Popover, PopoverPosition, Stack, StackItem } from '@patternfly/react-core';
 
 import useRemoveFolderQuery from './hooks/useRemoveFolderQuery';
@@ -61,6 +62,7 @@ const MoveBulkVMToFolderModal: FC<MoveBulkVMToFolderModalProps> = ({
         </StackItem>
         <StackItem>
           <FolderSelect
+            cluster={getCluster(vms?.[0])}
             isFullWidth
             namespace={namespace}
             selectedFolder={folderName}
