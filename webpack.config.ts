@@ -61,10 +61,9 @@ const config: Configuration = {
         test: /\.(jsx?|tsx?)$/,
         use: [
           {
-            loader: 'ts-loader',
+            loader: 'esbuild-loader',
             options: {
-              configFile: path.resolve(__dirname, 'tsconfig.json'),
-              transpileOnly: true,
+              tsconfig: path.resolve(__dirname, 'tsconfig.json'),
             },
           },
         ],
@@ -137,7 +136,7 @@ const config: Configuration = {
   },
   output: {
     chunkFilename: isProd ? '[name]-chunk-[chunkhash].min.js' : '[name]-chunk.js',
-    filename: isProd ? '[name]-bundle-[hash].min.js' : '[name]-bundle.js',
+    filename: isProd ? '[name]-bundle-[chunkhash].min.js' : '[name]-bundle.js',
     path: path.resolve(__dirname, 'dist'),
   },
   plugins: [
@@ -172,6 +171,9 @@ const config: Configuration = {
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
     modules: [path.join(__dirname, 'node_modules')],
     plugins: [new TsconfigPathsPlugin()],
+  },
+  watchOptions: {
+    ignored: '**/node_modules',
   },
 };
 
