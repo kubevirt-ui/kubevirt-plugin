@@ -8,7 +8,9 @@ import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getLabels, getName } from '@kubevirt-utils/resources/shared';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
-import { K8sModel, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
+import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 type DescriptionItemLabelsProps = {
   className?: string;
@@ -33,7 +35,8 @@ const DescriptionItemLabels: FC<DescriptionItemLabelsProps> = ({
   const { t } = useKubevirtTranslation();
 
   const onLabelsSubmitInternal = (labels: { [key: string]: string }) =>
-    k8sPatch({
+    kubevirtK8sPatch({
+      cluster: getCluster(resource),
       data: [
         {
           op: 'replace',
@@ -64,10 +67,12 @@ const DescriptionItemLabels: FC<DescriptionItemLabelsProps> = ({
       bodyContent={t(
         'Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services.',
       )}
+      descriptionData={
+        <MetadataLabels cluster={getCluster(resource)} labels={getLabels(resource)} model={model} />
+      }
       breadcrumb={`${label ?? model.label}.metadata.labels`}
       className={className}
       data-test-id={`${getName(resource)}-labels`}
-      descriptionData={<MetadataLabels labels={getLabels(resource)} model={model} />}
       descriptionHeader={descriptionHeader}
       isEdit={editable}
       isLabelEditor

@@ -1,20 +1,21 @@
 import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
-import { modelToRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 import { Label, LabelGroup } from '@patternfly/react-core';
 
+import { getSearchLabelHREF } from '../Labels/utils';
+
 type MetadataLabelsProps = {
+  cluster?: string;
   labels?: { [key: string]: string };
   model: K8sModel;
 };
 
-const MetadataLabels: FC<MetadataLabelsProps> = ({ labels, model }) => {
+const MetadataLabels: FC<MetadataLabelsProps> = ({ cluster, labels, model }) => {
   const { t } = useKubevirtTranslation();
-  const modelRef = modelToRef(model);
   const navigate = useNavigate();
 
   const labelsKeys = Object.keys(labels || {});
@@ -33,7 +34,7 @@ const MetadataLabels: FC<MetadataLabelsProps> = ({ labels, model }) => {
             className="co-label"
             isClickable
             key={key}
-            onClick={() => navigate(`/search?kind=${modelRef}&q=${encodeURIComponent(labelText)}`)}
+            onClick={() => navigate(getSearchLabelHREF(model.kind, key, labels[key], cluster))}
           >
             {labelText}
           </Label>

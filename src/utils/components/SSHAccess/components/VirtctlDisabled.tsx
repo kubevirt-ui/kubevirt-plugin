@@ -7,16 +7,17 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { NetworkAttachmentDefinitionModelGroupVersionKind } from '@kubevirt-utils/models';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
-import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
+import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 import usePasstFeatureFlag from '@overview/SettingsTab/PreviewFeaturesTab/hooks/usePasstFeatureFlag';
 import { Content, Popover } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
 
 type VirtctlDisabledProps = {
+  cluster?: string;
   namespace: string;
 };
 
-const VirtctlDisabled: FC<VirtctlDisabledProps> = ({ namespace }) => {
+const VirtctlDisabled: FC<VirtctlDisabledProps> = ({ cluster, namespace }) => {
   const { t } = useKubevirtTranslation();
 
   const [, , nad] = useNamespaceUDN(namespace);
@@ -48,7 +49,8 @@ const VirtctlDisabled: FC<VirtctlDisabledProps> = ({ namespace }) => {
   return (
     <>
       {t("Virtctl is disabled for this namespace as it's managed by")}{' '}
-      <ResourceLink
+      <MulticlusterResourceLink
+        cluster={cluster}
         groupVersionKind={NetworkAttachmentDefinitionModelGroupVersionKind}
         inline
         name={getName(nad)}

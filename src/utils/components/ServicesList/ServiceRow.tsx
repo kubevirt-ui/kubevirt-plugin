@@ -3,7 +3,10 @@ import classNames from 'classnames';
 
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { modelToGroupVersionKind, NamespaceModel, ServiceModel } from '@kubevirt-utils/models';
-import { ResourceLink, TableData } from '@openshift-console/dynamic-plugin-sdk';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { TableData } from '@openshift-console/dynamic-plugin-sdk';
 
 import { LabelList } from '../Labels/LabelList';
 
@@ -18,15 +21,17 @@ type ServiceTableRowProps = {
 };
 
 const ServiceTableRow = ({ activeColumnIDs, obj }: ServiceTableRowProps) => {
+  const cluster = getCluster(obj);
   if (!obj) return null;
 
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} className={tableColumnClasses[0]} id="name">
-        <ResourceLink
+        <MulticlusterResourceLink
+          cluster={cluster}
           groupVersionKind={modelToGroupVersionKind(ServiceModel)}
-          name={obj?.metadata.name}
-          namespace={obj?.metadata.namespace}
+          name={getName(obj)}
+          namespace={getNamespace(obj)}
         />
       </TableData>
       <TableData
@@ -34,13 +39,15 @@ const ServiceTableRow = ({ activeColumnIDs, obj }: ServiceTableRowProps) => {
         className={classNames(tableColumnClasses[1], 'co-break-word')}
         id="namespace"
       >
-        <ResourceLink
+        <MulticlusterResourceLink
+          cluster={cluster}
           groupVersionKind={modelToGroupVersionKind(NamespaceModel)}
-          name={obj?.metadata.namespace}
+          name={getNamespace(obj)}
         />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className={tableColumnClasses[2]} id="labels">
         <LabelList
+          cluster={cluster}
           groupVersionKind={modelToGroupVersionKind(ServiceModel)}
           labels={obj?.metadata.labels}
         />

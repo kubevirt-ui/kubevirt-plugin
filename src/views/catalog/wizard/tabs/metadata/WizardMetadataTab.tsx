@@ -12,6 +12,7 @@ import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants
 import LightspeedHelpButton from '@lightspeed/components/LightspeedHelpButton';
 import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { DescriptionList, PageSection, pluralize } from '@patternfly/react-core';
 
 import { WizardDescriptionItem } from '../../components/WizardDescriptionItem';
@@ -34,7 +35,11 @@ const WizardMetadataTab: WizardTab = ({ loaded, updateVM, vm }) => {
             <DescriptionList className="wizard-metadata-tab__description-list">
               <WizardDescriptionItem
                 description={
-                  <MetadataLabels labels={resource?.metadata?.labels} model={VirtualMachineModel} />
+                  <MetadataLabels
+                    cluster={getCluster(resource)}
+                    labels={resource?.metadata?.labels}
+                    model={VirtualMachineModel}
+                  />
                 }
                 helperPopover={{
                   content: (hide) => (

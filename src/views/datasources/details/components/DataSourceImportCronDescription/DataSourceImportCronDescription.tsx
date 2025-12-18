@@ -4,7 +4,10 @@ import { DataImportCronModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-a
 import { V1beta1DataImportCron } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { ResourceLink, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 type DataSourceImportCronDescriptionProps = {
   dataImportCronName: string;
@@ -16,7 +19,9 @@ const DataSourceImportCronDescription: React.FC<DataSourceImportCronDescriptionP
   namespace,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [dataImportCron] = useK8sWatchResource<V1beta1DataImportCron>({
+  const cluster = useClusterParam();
+  const [dataImportCron] = useK8sWatchData<V1beta1DataImportCron>({
+    cluster,
     groupVersionKind: DataImportCronModelGroupVersionKind,
     name: dataImportCronName,
     namespace: namespace,
@@ -30,10 +35,11 @@ const DataSourceImportCronDescription: React.FC<DataSourceImportCronDescriptionP
         'The DataImportCron polls disk images and imports them as PersistentVolumeClaims. You can configure the image source and other settings on the DataImportCron details page.',
       )}
       descriptionData={
-        <ResourceLink
+        <MulticlusterResourceLink
+          cluster={cluster}
           groupVersionKind={DataImportCronModelGroupVersionKind}
-          name={dataImportCron?.metadata?.name}
-          namespace={dataImportCron?.metadata?.namespace}
+          name={getName(dataImportCron)}
+          namespace={getNamespace(dataImportCron)}
         />
       }
       descriptionHeader={t('DataImportCron')}

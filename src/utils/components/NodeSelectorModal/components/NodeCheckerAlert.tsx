@@ -4,7 +4,10 @@ import { modelToGroupVersionKind, NodeModel } from '@kubevirt-ui-ext/kubevirt-ap
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { GreenCheckCircleIcon, ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
+import { getName, getUID } from '@kubevirt-utils/resources/shared';
+import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { GreenCheckCircleIcon } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
   AlertVariant,
@@ -84,13 +87,14 @@ const NodeCheckerAlert: React.FC<NodeCheckerAlertProps> = ({
           bodyContent={
             <>
               {nodes?.map((node) => {
-                const isPreferred = preferredQualifiedNodesNames?.includes(node.metadata.name);
+                const isPreferred = preferredQualifiedNodesNames?.includes(getName(node));
                 return (
-                  <Flex key={node.metadata.uid}>
+                  <Flex key={getUID(node)}>
                     <FlexItem spacer={{ default: 'spacerXs' }}>
-                      <ResourceLink
+                      <MulticlusterResourceLink
+                        cluster={getCluster(node)}
                         groupVersionKind={modelToGroupVersionKind(NodeModel)}
-                        name={node.metadata.name}
+                        name={getName(node)}
                       />
                     </FlexItem>
                     {isPreferred && (

@@ -9,12 +9,14 @@ import {
   cpuManagerLabelKey,
   cpuManagerLabelValue,
 } from '@kubevirt-utils/components/DedicatedResourcesModal/utils/constants';
+import { getDedicatedResourcesSearchHREF } from '@kubevirt-utils/components/DedicatedResourcesModal/utils/utils';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, NodeModel, V1Template } from '@kubevirt-utils/models';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { ResourceLink, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
@@ -41,6 +43,7 @@ const DedicatedResourcesModal: FC<DedicatedResourcesModalProps> = ({
   template,
 }) => {
   const { t } = useKubevirtTranslation();
+  const cluster = getCluster(template);
   const [checked, setChecked] = useState<boolean>(isDedicatedCPUPlacement(template));
   const [nodes, nodesLoaded, loadError] = useK8sWatchResource<IoK8sApiCoreV1Node[]>({
     groupVersionKind: modelToGroupVersionKind(NodeModel),
@@ -81,10 +84,7 @@ const DedicatedResourcesModal: FC<DedicatedResourcesModalProps> = ({
               {t('Available only on Nodes with labels')}{' '}
               <Label className="pf-v6-u-ml-xs" color="purple" variant="outline">
                 {!isEmpty(nodes) ? (
-                  <Link
-                    target="_blank"
-                    to={`/search?kind=${NodeModel.kind}&q=${encodeURIComponent(cpuManagerLabel)}`}
-                  >
+                  <Link target="_blank" to={getDedicatedResourcesSearchHREF(cluster)}>
                     {cpuManagerLabel}
                   </Link>
                 ) : (

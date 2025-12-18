@@ -2,11 +2,12 @@ import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
+import { getCluster } from '@multicluster/helpers/selectors';
 import {
   getGroupVersionKindForResource,
   K8sResourceCommon,
   OwnerReference,
-  ResourceLink,
 } from '@openshift-console/dynamic-plugin-sdk';
 
 type OwnerReferencesProps = {
@@ -17,7 +18,8 @@ const OwnerReferences: FC<OwnerReferencesProps> = ({ obj }) => {
   const { t } = useKubevirtTranslation();
   const ownerReferences = (obj?.metadata?.ownerReferences || [])?.map(
     (ownerRef: OwnerReference) => (
-      <ResourceLink
+      <MulticlusterResourceLink
+        cluster={getCluster(obj)}
         groupVersionKind={getGroupVersionKindForResource(ownerRef)}
         key={ownerRef?.uid}
         name={ownerRef?.name}

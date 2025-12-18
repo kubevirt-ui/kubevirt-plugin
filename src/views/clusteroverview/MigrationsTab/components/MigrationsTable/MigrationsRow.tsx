@@ -16,12 +16,9 @@ import {
   getMigrationTargetNode,
 } from '@kubevirt-utils/resources/vmim/selectors';
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
-import {
-  GenericStatus,
-  ResourceLink,
-  RowProps,
-  TableData,
-} from '@openshift-console/dynamic-plugin-sdk';
+import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { GenericStatus, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 import { Progress, ProgressMeasureLocation, Tooltip } from '@patternfly/react-core';
 
 import MigrationPolicyTooltip from './components/MigrationPolicyTooltip/MigrationPolicyTooltip';
@@ -32,7 +29,7 @@ import MigrationActionsDropdown from './MigrationActionsDropdown';
 
 const MigrationsRow: FC<RowProps<MigrationTableDataLayout>> = ({ activeColumnIDs, obj }) => {
   const { vmim, vmiObj } = obj;
-
+  const cluster = getCluster(vmiObj);
   const sourceNode = getMigrationSourceNode(vmim);
   const targetNode = getMigrationTargetNode(vmim);
   const migrationPhase = getMigrationPhase(vmim);
@@ -44,7 +41,8 @@ const MigrationsRow: FC<RowProps<MigrationTableDataLayout>> = ({ activeColumnIDs
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} id="vm-name">
-        <ResourceLink
+        <MulticlusterResourceLink
+          cluster={cluster}
           groupVersionKind={VirtualMachineModelGroupVersionKind}
           name={getName(vmiObj)}
           namespace={getNamespace(vmiObj)}
@@ -55,7 +53,8 @@ const MigrationsRow: FC<RowProps<MigrationTableDataLayout>> = ({ activeColumnIDs
         className="pf-m-width-10 vm-column"
         id="namespace"
       >
-        <ResourceLink
+        <MulticlusterResourceLink
+          cluster={cluster}
           groupVersionKind={modelToGroupVersionKind(NamespaceModel)}
           name={getNamespace(vmiObj)}
         />
@@ -79,14 +78,22 @@ const MigrationsRow: FC<RowProps<MigrationTableDataLayout>> = ({ activeColumnIDs
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="source">
         {sourceNode ? (
-          <ResourceLink groupVersionKind={modelToGroupVersionKind(NodeModel)} name={sourceNode} />
+          <MulticlusterResourceLink
+            cluster={cluster}
+            groupVersionKind={modelToGroupVersionKind(NodeModel)}
+            name={sourceNode}
+          />
         ) : (
           NO_DATA_DASH
         )}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="target">
         {targetNode ? (
-          <ResourceLink groupVersionKind={modelToGroupVersionKind(NodeModel)} name={targetNode} />
+          <MulticlusterResourceLink
+            cluster={cluster}
+            groupVersionKind={modelToGroupVersionKind(NodeModel)}
+            name={targetNode}
+          />
         ) : (
           NO_DATA_DASH
         )}
@@ -95,7 +102,8 @@ const MigrationsRow: FC<RowProps<MigrationTableDataLayout>> = ({ activeColumnIDs
         <MigrationPolicyTooltip obj={obj} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="vmim-name">
-        <ResourceLink
+        <MulticlusterResourceLink
+          cluster={cluster}
           groupVersionKind={VirtualMachineInstanceMigrationModelGroupVersionKind}
           name={getName(vmim)}
           namespace={getNamespace(vmim)}

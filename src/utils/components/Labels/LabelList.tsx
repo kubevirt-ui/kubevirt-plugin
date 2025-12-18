@@ -7,19 +7,21 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { K8sGroupVersionKind } from '@openshift-console/dynamic-plugin-sdk';
 import { Label as PfLabel, LabelGroup as PfLabelGroup } from '@patternfly/react-core';
 
+import { getSearchLabelHREF } from './utils';
+
 export type LabelProps = {
+  cluster?: string;
   expand: boolean;
   groupVersionKind: K8sGroupVersionKind;
   name: string;
   value: string;
 };
 
-export const Label: FC<LabelProps> = ({ expand, groupVersionKind, name, value }) => {
+export const Label: FC<LabelProps> = ({ cluster, expand, groupVersionKind, name, value }) => {
   const navigate = useNavigate();
 
-  const href = `/search?kind=${groupVersionKind.kind}&q=${
-    value ? encodeURIComponent(`${name}=${value}`) : name
-  }`;
+  const href = getSearchLabelHREF(groupVersionKind.kind, name, value, cluster);
+
   const kindOf = `co-m-${groupVersionKind.kind.toLowerCase()}`;
   const labelClass = classNames(kindOf, { 'co-m-expand': expand }, 'co-label');
 
@@ -35,16 +37,29 @@ export const Label: FC<LabelProps> = ({ expand, groupVersionKind, name, value })
 };
 
 type LabelListProps = {
+  cluster?: string;
   expand?: boolean;
   groupVersionKind: K8sGroupVersionKind;
   labels: { [key: string]: string };
 };
 
-export const LabelList: FC<LabelListProps> = ({ expand = true, groupVersionKind, labels }) => {
+export const LabelList: FC<LabelListProps> = ({
+  cluster,
+  expand = true,
+  groupVersionKind,
+  labels,
+}) => {
   const { t } = useKubevirtTranslation();
 
   const list = Object.entries(labels || {}).map(([key, label]) => (
-    <Label expand={expand} groupVersionKind={groupVersionKind} key={key} name={key} value={label} />
+    <Label
+      cluster={cluster}
+      expand={expand}
+      groupVersionKind={groupVersionKind}
+      key={key}
+      name={key}
+      value={label}
+    />
   ));
 
   return (

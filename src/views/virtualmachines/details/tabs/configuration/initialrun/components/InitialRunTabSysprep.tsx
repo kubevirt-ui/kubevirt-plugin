@@ -59,6 +59,7 @@ const InitialRunTabSysprep: FC<InitialRunTabSysprepProps> = ({ canUpdateVM, onSu
     <DescriptionItem
       descriptionData={
         <SysprepDescription
+          cluster={cluster}
           error={sysprepLoadError}
           loaded={sysprepLoaded}
           selectedSysprepName={currentVMSysprepName}

@@ -4,13 +4,17 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { modelToGroupVersionKind, PersistentVolumeClaimModel } from '@kubevirt-utils/models';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
-import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
+import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import { RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 import { Flex, FlexItem, Label } from '@patternfly/react-core';
 
 import DiskRowActions from './DiskRowActions';
 
 const DiskRow: React.FC<RowProps<DiskRowDataLayout>> = ({ activeColumnIDs, obj }) => {
   const { t } = useKubevirtTranslation();
+  const cluster = useClusterParam();
+
   const isPVCSource = !['Container (Ephemeral)', 'Other', 'PVC (auto import)', 'URL'].includes(
     obj?.source,
   );
@@ -37,7 +41,8 @@ const DiskRow: React.FC<RowProps<DiskRowDataLayout>> = ({ activeColumnIDs, obj }
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="source">
         {isPVCSource ? (
-          <ResourceLink
+          <MulticlusterResourceLink
+            cluster={cluster}
             groupVersionKind={modelToGroupVersionKind(PersistentVolumeClaimModel)}
             name={obj?.source}
             namespace={obj?.namespace}
