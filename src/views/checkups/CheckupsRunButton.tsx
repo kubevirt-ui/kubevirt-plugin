@@ -10,7 +10,7 @@ import {
 } from '@kubevirt-utils/resources/checkups/urls';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useIsACMPage from '@multicluster/useIsACMPage';
-import { Button, ButtonVariant } from '@patternfly/react-core';
+import { Button, ButtonVariant, Tooltip } from '@patternfly/react-core';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 import { createURL } from '@virtualmachines/details/tabs/overview/utils/utils';
 
@@ -18,7 +18,7 @@ import useCheckupsNetworkPermissions from './network/hooks/useCheckupsNetworkPer
 import SelfValidationCheckupRunButton from './self-validation/components/SelfValidationCheckupRunButton';
 import { useCheckupsStoragePermissions } from './storage/components/hooks/useCheckupsStoragePermissions';
 import { CHECKUP_URLS } from './utils/constants';
-import { getCurrentCheckupType, trimLastHistoryPath } from './utils/utils';
+import { getCurrentCheckupType, getSelectProjectText, trimLastHistoryPath } from './utils/utils';
 
 const CheckupsRunButton: FC = () => {
   const namespace = useActiveNamespace();
@@ -37,8 +37,10 @@ const CheckupsRunButton: FC = () => {
     [location.pathname],
   );
 
+  const isAllNamespaces = namespace === ALL_NAMESPACES_SESSION_KEY;
+
   const isDisabled = useMemo(() => {
-    if (ALL_NAMESPACES_SESSION_KEY === namespace) {
+    if (isAllNamespaces) {
       return true;
     }
 
@@ -82,7 +84,7 @@ const CheckupsRunButton: FC = () => {
     return <SelfValidationCheckupRunButton />;
   }
 
-  return (
+  const button = (
     <Button
       id="checkups-run-button"
       isDisabled={isDisabled}
@@ -92,6 +94,16 @@ const CheckupsRunButton: FC = () => {
       {t('Run checkup')}
     </Button>
   );
+
+  if (isAllNamespaces) {
+    return (
+      <Tooltip content={getSelectProjectText(t)}>
+        <span>{button}</span>
+      </Tooltip>
+    );
+  }
+
+  return button;
 };
 
 export default CheckupsRunButton;

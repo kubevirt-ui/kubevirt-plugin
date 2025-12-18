@@ -1,25 +1,13 @@
 import React, { FC, useMemo, useState } from 'react';
 
 import { IoK8sApiRbacV1ClusterRoleBinding } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
-import { documentationURL } from '@kubevirt-utils/constants/documentation';
-import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import {
-  Alert,
-  AlertVariant,
-  Button,
-  ButtonVariant,
-  EmptyState,
-  EmptyStateActions,
-  EmptyStateBody,
-  EmptyStateFooter,
-  EmptyStateVariant,
-} from '@patternfly/react-core';
-import { SearchIcon } from '@patternfly/react-icons';
+import { Alert, AlertVariant, EmptyStateActions } from '@patternfly/react-core';
 
+import CheckupsEmptyState from '../../components/CheckupsEmptyState/CheckupsEmptyState';
+import { CHECKUP_URLS } from '../../utils/constants';
 import { useAllRunningSelfValidationJobs } from '../components/hooks/useAllRunningSelfValidationJobs';
 import { installSelfValidationPermissions, removeSelfValidationPermissions } from '../utils';
 import { getRunningCheckupErrorMessage } from '../utils/selfValidationMessages';
@@ -52,70 +40,48 @@ const CheckupsSelfValidationListEmptyState: FC<CheckupsSelfValidationListEmptySt
   );
 
   return (
-    <EmptyState
-      headingLevel="h4"
-      icon={SearchIcon}
-      titleText={<>{t('No self validation checkups found')}</>}
-      variant={EmptyStateVariant.lg}
-    >
-      <EmptyStateBody>
-        {isPermitted
-          ? t('To get started, run a self validation checkup')
-          : t('To get started, install permissions and then run a checkup')}
-      </EmptyStateBody>
-
-      <EmptyStateFooter>
-        {error && (
-          <EmptyStateActions>
-            <Alert isInline title={t('Error')} variant={AlertVariant.danger}>
-              {error}
-            </Alert>
-          </EmptyStateActions>
-        )}
-        {hasRunningSelfValidationJobs && isPermitted && (
-          <EmptyStateActions>
-            <Alert
-              isInline
-              title={t('You can only run a single self validation checkup at a time.')}
-              variant={AlertVariant.danger}
-            >
-              {getRunningCheckupErrorMessage(t, runningSelfValidationJobs || [])}
-            </Alert>
-          </EmptyStateActions>
-        )}
-        <EmptyStateActions>
-          <Button
-            isDisabled={
-              isLoading ||
-              loadingPermissions ||
-              namespace === ALL_NAMESPACES_SESSION_KEY ||
-              !isPermittedToInstall
-            }
-            onClick={async () => {
-              setError(null);
-              setIsLoading(true);
-              const result = isPermitted
-                ? await removeSelfValidationPermissions(namespace, cluster, t)
-                : await installSelfValidationPermissions(namespace, cluster, t);
-              if (!result.success && result.error) {
-                setError(result.error);
-              }
-              setIsLoading(false);
-            }}
-            isLoading={isLoading || loadingPermissions}
-            variant={isLoading ? ButtonVariant.plain : ButtonVariant.secondary}
-          >
-            {!isLoading && isPermitted ? t('Remove permissions') : t('Install permissions')}
-          </Button>
-        </EmptyStateActions>
-        <EmptyStateActions className="empty-state-secondary-action">
-          <ExternalLink
-            href={documentationURL.CHECKUPS}
-            text={t('Learn more about self validation checkups')}
-          />
-        </EmptyStateActions>
-      </EmptyStateFooter>
-    </EmptyState>
+    <CheckupsEmptyState
+      permissionsButtonProps={{
+        isDisabled: !isPermittedToInstall,
+        onClick: async () => {
+          setError(null);
+          setIsLoading(true);
+          const result = isPermitted
+            ? await removeSelfValidationPermissions(namespace, cluster, t)
+            : await installSelfValidationPermissions(namespace, cluster, t);
+          if (!result.success && result.error) {
+            setError(result.error);
+          }
+          setIsLoading(false);
+        },
+      }}
+      topFooterActions={
+        <>
+          {error && (
+            <EmptyStateActions>
+              <Alert isInline title={t('Error')} variant={AlertVariant.danger}>
+                {error}
+              </Alert>
+            </EmptyStateActions>
+          )}
+          {hasRunningSelfValidationJobs && isPermitted && (
+            <EmptyStateActions>
+              <Alert
+                isInline
+                title={t('You can only run a single self validation checkup at a time.')}
+                variant={AlertVariant.danger}
+              >
+                {getRunningCheckupErrorMessage(t, runningSelfValidationJobs || [])}
+              </Alert>
+            </EmptyStateActions>
+          )}
+        </>
+      }
+      checkupType={CHECKUP_URLS.SELF_VALIDATION}
+      isLoading={isLoading || loadingPermissions}
+      isPermitted={isPermitted}
+      namespace={namespace}
+    />
   );
 };
 

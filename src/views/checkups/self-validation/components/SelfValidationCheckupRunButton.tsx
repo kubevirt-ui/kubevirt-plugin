@@ -10,6 +10,7 @@ import { Button, ButtonVariant, Tooltip } from '@patternfly/react-core';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import { CHECKUP_URLS } from '../../utils/constants';
+import { getSelectProjectText } from '../../utils/utils';
 
 import {
   getActionState,
@@ -26,6 +27,7 @@ const SelfValidationCheckupRunButton: FC = () => {
   const clusterParam = useListClusters();
   const namespaces = useListNamespaces();
   const namespace = namespaces?.[0];
+  const isAllNamespaces = isEmpty(namespace);
 
   const cluster = clusterParam?.[0] || hubClusterName;
 
@@ -49,7 +51,7 @@ const SelfValidationCheckupRunButton: FC = () => {
   );
 
   const isDisabled = useMemo(() => {
-    if (isEmpty(namespace)) {
+    if (isAllNamespaces) {
       return true;
     }
     if (!jobsLoaded || jobsError) {
@@ -70,11 +72,6 @@ const SelfValidationCheckupRunButton: FC = () => {
     }
   };
 
-  const showTooltip =
-    isDisabled &&
-    selfValidationActionState?.showWarning &&
-    selfValidationActionState?.configMapInfo;
-
   const button = (
     <Button
       id="checkups-run-button"
@@ -86,7 +83,20 @@ const SelfValidationCheckupRunButton: FC = () => {
     </Button>
   );
 
-  if (showTooltip && selfValidationActionState?.configMapInfo) {
+  if (isAllNamespaces) {
+    return (
+      <Tooltip content={getSelectProjectText(t)}>
+        <span>{button}</span>
+      </Tooltip>
+    );
+  }
+
+  const showRunningCheckupTooltip =
+    isDisabled &&
+    selfValidationActionState?.showWarning &&
+    selfValidationActionState?.configMapInfo;
+
+  if (showRunningCheckupTooltip) {
     return (
       <Tooltip
         content={
