@@ -4,18 +4,20 @@ import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-d
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
+import useKubevirtWatchResources from '@multicluster/hooks/useKubevirtWatchResources';
 
 import { getPVCAndDVWatches } from './utils';
 
 const useDisksSources = (vm: V1VirtualMachine) => {
   const { dvWatches, pvcWatches } = useMemo(() => getPVCAndDVWatches(vm), [vm]);
 
-  const pvcWatchesResult = useK8sWatchResources<{
+  const pvcWatchesResult = useKubevirtWatchResources<{
     [key: string]: IoK8sApiCoreV1PersistentVolumeClaim;
   }>(pvcWatches);
 
-  const dvWatchesResult = useK8sWatchResources<{ [key: string]: V1beta1DataVolume }>(dvWatches);
+  const dvWatchesResult = useKubevirtWatchResources<{ [key: string]: V1beta1DataVolume }>(
+    dvWatches,
+  );
 
   const dvs = useMemo(
     () =>

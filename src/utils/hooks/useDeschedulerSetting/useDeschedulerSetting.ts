@@ -12,6 +12,7 @@ import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { getVMTemplateAnnotations } from '@kubevirt-utils/resources/vm';
 import { isVM } from '@kubevirt-utils/utils/typeGuards';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { isLiveMigratable } from '@virtualmachines/utils';
 
 type UseDeschedulerSetting = (obj: V1Template | V1VirtualMachine) => {
@@ -24,7 +25,7 @@ const useDeschedulerSetting: UseDeschedulerSetting = (obj) => {
   const isAdmin = useIsAdmin();
   const isVMObj = isVM(obj);
   const isMigratable = isVMObj ? isLiveMigratable(obj) : true;
-  const isDeschedulerInstalled = useDeschedulerInstalled();
+  const isDeschedulerInstalled = useDeschedulerInstalled(getCluster(obj));
 
   const vm = isVM(obj) ? obj : getTemplateVirtualMachineObject(obj);
   const annotations = getVMTemplateAnnotations(vm);

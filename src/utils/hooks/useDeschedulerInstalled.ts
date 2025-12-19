@@ -1,6 +1,7 @@
 import { KubeDeschedulerModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 /**
  * A Hook that checks if Kube Descheduler operator is installed.
@@ -8,8 +9,10 @@ import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
  */
 
 // check if the Descheduler is installed
-export const useDeschedulerInstalled = (): boolean => {
-  const [resourceList] = useK8sWatchResource<any>({
+export const useDeschedulerInstalled = (cluster?: string): boolean => {
+  const clusterParam = useClusterParam();
+  const [resourceList] = useK8sWatchData<any>({
+    cluster: cluster || clusterParam,
     groupVersionKind: KubeDeschedulerModelGroupVersionKind,
     isList: false,
   });
