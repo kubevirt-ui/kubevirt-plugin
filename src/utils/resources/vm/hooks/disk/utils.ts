@@ -12,12 +12,15 @@ import {
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { DiskRawData } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { getCluster } from '@multicluster/helpers/selectors';
 
 import { getDataVolumeTemplates, getVolumes } from '../../utils';
 
 const PersistentVolumeClaimGroupVersionKind = modelToGroupVersionKind(PersistentVolumeClaimModel);
 
 export const getPVCAndDVWatches = (vm: V1VirtualMachine) => {
+  const cluster = getCluster(vm);
+
   const pvcSources = getDataVolumeTemplates(vm)?.map((dataVolume) => ({
     name: getName(dataVolume),
     namespace: getNamespace(vm),
@@ -37,6 +40,7 @@ export const getPVCAndDVWatches = (vm: V1VirtualMachine) => {
     .filter((pvcSource) => !isEmpty(pvcSource))
     .reduce((acc, pvcSource) => {
       acc[`${pvcSource.name}-${pvcSource.namespace}`] = {
+        cluster,
         groupVersionKind: PersistentVolumeClaimGroupVersionKind,
         name: pvcSource.name,
         namespace: pvcSource.namespace,
@@ -49,6 +53,7 @@ export const getPVCAndDVWatches = (vm: V1VirtualMachine) => {
     .filter((pvcSource) => !isEmpty(pvcSource))
     .reduce((acc, pvcSource) => {
       acc[`${pvcSource.name}-${pvcSource.namespace}`] = {
+        cluster,
         groupVersionKind: DataVolumeModelGroupVersionKind,
         name: pvcSource.name,
         namespace: pvcSource.namespace,

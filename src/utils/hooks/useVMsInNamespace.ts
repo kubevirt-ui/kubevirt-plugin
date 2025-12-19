@@ -1,9 +1,12 @@
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-utils/models';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
-const useVMsInNamespace = (namespace?: string) => {
-  const [vms] = useK8sWatchResource<V1VirtualMachine[]>({
+const useVMsInNamespace = (namespace?: string, cluster?: string) => {
+  const clusterParam = useClusterParam();
+  const [vms] = useK8sWatchData<V1VirtualMachine[]>({
+    cluster: cluster || clusterParam,
     groupVersionKind: VirtualMachineModelGroupVersionKind,
     isList: true,
     namespace,

@@ -8,7 +8,8 @@ import {
   V1VolumeSnapshotStatus,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
-import { WatchK8sResults } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { FleetWatchK8sResults } from '@stolostron/multicluster-sdk';
 
 import {
   VirtualizationDataVolumeStatus,
@@ -61,7 +62,7 @@ export const conditionsTransformer = (
 };
 
 export const buildDVStatus = (
-  data: WatchK8sResults<{ [name: string]: V1beta1DataVolume }>,
+  data: FleetWatchK8sResults<{ [name: string]: V1beta1DataVolume }>,
 ): VirtualizationDataVolumeStatus[] => {
   const elements = Object.values(data).map((dv) => dv.data);
   return elements.map((element) => {
@@ -88,6 +89,7 @@ export const buildDataVolumeResources = (vm: V1VirtualMachine) =>
     getDataVolumesNames(vm)?.map((name) => [
       name,
       {
+        cluster: getCluster(vm),
         groupVersionKind: DataVolumeModelGroupVersionKind,
         name,
         namespace: vm?.metadata?.namespace,
