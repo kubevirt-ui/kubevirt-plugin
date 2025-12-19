@@ -12,8 +12,8 @@ module.exports = (on, config) => {
         rules: [
           {
             exclude: /node_modules/,
+            loader: 'esbuild-loader',
             test: /\.ts$/,
-            use: 'ts-loader',
           },
         ],
       },
