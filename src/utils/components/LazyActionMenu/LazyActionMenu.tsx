@@ -5,10 +5,12 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import { connect } from 'react-redux';
 
+import { useClickOutside } from '@kubevirt-utils/hooks/useClickOutside/useClickOutside';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import {
@@ -24,7 +26,7 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk/lib/api/internal-types';
 import { impersonateStateToProps } from '@openshift-console/dynamic-plugin-sdk/lib/app/core/reducers/coreSelectors';
 import { ImpersonateKind } from '@openshift-console/dynamic-plugin-sdk/lib/app/redux-types';
-import { MenuList, MenuToggle, Select, SelectPopperProps, Tooltip } from '@patternfly/react-core';
+import { Menu, MenuContent, MenuList, MenuToggle, Popper, Tooltip } from '@patternfly/react-core';
 import { EllipsisVIcon } from '@patternfly/react-icons';
 
 import ActionMenuContent from './ActionMenuContent';
@@ -100,6 +102,11 @@ const LazyActionMenu: FC<ExtendedLazyActionMenuProps> = ({
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [initActionLoader, setInitActionLoader] = useState<boolean>(false);
   const [remoteOptions, setRemoteOptions] = useState<MenuOption[]>();
+  const menuRef = useRef<HTMLDivElement>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+
+  useClickOutside([menuRef, toggleRef], () => setIsOpen(false));
+
   const isKebabVariant = variant === ActionMenuVariant.KEBAB;
   const toggleLabel = label || t('Actions');
 
@@ -113,6 +120,24 @@ const LazyActionMenu: FC<ExtendedLazyActionMenuProps> = ({
     [localOptions, remoteOptions],
   );
 
+  const toggle = (
+    <MenuToggle
+      aria-expanded={isOpen}
+      aria-haspopup="true"
+      aria-label={toggleLabel}
+      data-test-id={isKebabVariant ? 'kebab-button' : 'actions-menu-button'}
+      isDisabled={isDisabled}
+      isExpanded={isOpen}
+      onClick={onToggleClick}
+      onFocus={onToggleHover}
+      onMouseOver={onToggleHover}
+      ref={toggleRef}
+      variant={variant}
+    >
+      {isKebabVariant ? <EllipsisVIcon /> : toggleLabel}
+    </MenuToggle>
+  );
+
   const menu = (
     <>
       {initActionLoader && (
@@ -123,41 +148,28 @@ const LazyActionMenu: FC<ExtendedLazyActionMenuProps> = ({
           setRemoteOptions={setRemoteOptions}
         />
       )}
-
-      <Select
-        toggle={(toggleRef) => (
-          <MenuToggle
-            aria-expanded={isOpen}
-            aria-haspopup="true"
-            aria-label={toggleLabel}
-            data-test-id={isKebabVariant ? 'kebab-button' : 'actions-menu-button'}
-            isDisabled={isDisabled}
-            isExpanded={isOpen}
-            onClick={onToggleClick}
-            onFocus={onToggleHover}
-            onMouseOver={onToggleHover}
-            ref={toggleRef}
-            variant={variant}
-          >
-            {isKebabVariant ? <EllipsisVIcon /> : toggleLabel}
-          </MenuToggle>
-        )}
-        containsFlyout
-        isOpen={isOpen}
-        onOpenChange={setIsOpen}
-        onSelect={hideMenu}
-        popperProps={{ placement: 'bottom-end' } as SelectPopperProps}
-      >
-        <MenuList>
-          <ActionMenuContent
-            checkAccess={checkAccessDelegate}
-            onClick={hideMenu}
-            options={mergedOptions}
-          />
-        </MenuList>
-      </Select>
+      {toggle}
+      <Popper
+        popper={
+          <Menu containsFlyout ref={menuRef}>
+            <MenuContent>
+              <MenuList>
+                <ActionMenuContent
+                  checkAccess={checkAccessDelegate}
+                  onClick={hideMenu}
+                  options={mergedOptions}
+                />
+              </MenuList>
+            </MenuContent>
+          </Menu>
+        }
+        isVisible={isOpen}
+        placement="bottom-end"
+        triggerRef={toggleRef}
+      />
     </>
   );
+
   return isDisabled && disabledTooltip ? (
     <Tooltip content={disabledTooltip} position="left">
       <div>{menu}</div>
