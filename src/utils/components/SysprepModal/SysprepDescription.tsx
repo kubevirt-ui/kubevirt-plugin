@@ -4,17 +4,18 @@ import { ConfigMapModel, modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevi
 import SysprepInfo from '@kubevirt-utils/components/SysprepModal/SysprepInfo';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
+import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 import { Alert, AlertVariant, DescriptionList, Stack, StackItem } from '@patternfly/react-core';
 
 import DescriptionItem from '../DescriptionItem/DescriptionItem';
 import Loading from '../Loading/Loading';
 
 export const SysprepDescription: FC<{
+  cluster?: string;
   error?: Error;
   loaded?: boolean;
   selectedSysprepName?: string;
-}> = ({ error, loaded, selectedSysprepName }) => {
+}> = ({ cluster, error, loaded, selectedSysprepName }) => {
   const { t } = useKubevirtTranslation();
 
   if (error) {
@@ -41,7 +42,8 @@ export const SysprepDescription: FC<{
               isEmpty(selectedSysprepName) ? (
                 t('Not available')
               ) : (
-                <ResourceLink
+                <MulticlusterResourceLink
+                  cluster={cluster}
                   groupVersionKind={modelToGroupVersionKind(ConfigMapModel)}
                   linkTo={false}
                   name={selectedSysprepName}

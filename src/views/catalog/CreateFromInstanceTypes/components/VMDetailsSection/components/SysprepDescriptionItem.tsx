@@ -18,12 +18,14 @@ import {
 import { SysprepModal } from '@kubevirt-utils/components/SysprepModal/SysprepModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ConfigMapModel, modelToGroupVersionKind } from '@kubevirt-utils/models';
-import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
+import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { Loading } from '@patternfly/quickstarts';
 
 const SysprepDescriptionItem: FC = () => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+  const cluster = useClusterParam();
 
   const { instanceTypeVMState, isChangingNamespace, setInstanceTypeVMState, vmNamespaceTarget } =
     useInstanceTypeVMStore();
@@ -90,7 +92,8 @@ const SysprepDescriptionItem: FC = () => {
 
   const sysprepDescription =
     autounattend || unattended ? (
-      <ResourceLink
+      <MulticlusterResourceLink
+        cluster={cluster}
         groupVersionKind={modelToGroupVersionKind(ConfigMapModel)}
         linkTo={false}
         name={currentSysprepName}

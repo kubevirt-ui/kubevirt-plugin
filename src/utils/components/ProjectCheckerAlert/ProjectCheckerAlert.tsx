@@ -3,7 +3,10 @@ import React, { FC } from 'react';
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { K8sResourceKind, ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
+import { getName } from '@kubevirt-utils/resources/shared';
+import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { K8sResourceKind } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
   AlertVariant,
@@ -57,9 +60,10 @@ const ProjectCheckerAlert: FC<ProjectCheckerAlertProps> = ({
               {qualifiedProjects?.map((project) => (
                 <Flex key={project.metadata.uid}>
                   <FlexItem spacer={{ default: 'spacerXs' }}>
-                    <ResourceLink
+                    <MulticlusterResourceLink
+                      cluster={getCluster(project)}
                       groupVersionKind={modelToGroupVersionKind(ProjectModel)}
-                      name={project.metadata.name}
+                      name={getName(project)}
                     />
                   </FlexItem>
                 </Flex>

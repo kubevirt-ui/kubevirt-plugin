@@ -11,6 +11,7 @@ import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN
 import { getInterfaces, PASST_BINDING_NAME } from '@kubevirt-utils/resources/vm';
 import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
+import { getCluster } from '@multicluster/helpers/selectors';
 import {
   Content,
   DescriptionListDescription,
@@ -86,7 +87,7 @@ const ConsoleOverVirtctl: FC<ConsoleOverVirtctlProps> = ({ vm }) => {
       </DescriptionListTerm>
       <DescriptionListDescription>
         {isNamespaceManagedByUDN && !usesPasst ? (
-          <VirtctlDisabled namespace={getNamespace(vm)} />
+          <VirtctlDisabled cluster={getCluster(vm)} namespace={getNamespace(vm)} />
         ) : (
           <VirtctlSSHCommandClipboardCopy
             isNamespaceManagedByUDN={isNamespaceManagedByUDN}

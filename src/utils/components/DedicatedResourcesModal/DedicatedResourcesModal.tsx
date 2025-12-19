@@ -4,14 +4,18 @@ import produce from 'immer';
 
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { getDedicatedResourcesSearchHREF } from '@kubevirt-utils/components/DedicatedResourcesModal/utils/utils';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, NodeModel } from '@kubevirt-utils/models';
+import { getName, getUID } from '@kubevirt-utils/resources/shared';
 import { getCPU } from '@kubevirt-utils/resources/vm';
 import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
-import { ResourceLink, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
+import { getCluster } from '@multicluster/helpers/selectors';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import {
   Alert,
   AlertVariant,
@@ -43,9 +47,11 @@ const DedicatedResourcesModal: FC<DedicatedResourcesModalProps> = ({
   vmi,
 }) => {
   const { t } = useKubevirtTranslation();
+  const cluster = getCluster(vm);
   const [checked, setChecked] = useState<boolean>(!!getCPU(vm)?.dedicatedCpuPlacement);
 
-  const [nodes, loaded, loadError] = useK8sWatchResource<IoK8sApiCoreV1Node[]>({
+  const [nodes, loaded, loadError] = useK8sWatchData<IoK8sApiCoreV1Node[]>({
+    cluster: cluster,
     groupVersionKind: modelToGroupVersionKind(NodeModel),
     isList: true,
   });
@@ -84,10 +90,7 @@ const DedicatedResourcesModal: FC<DedicatedResourcesModalProps> = ({
               {t('Available only on Nodes with labels')}{' '}
               <Label className="pf-v6-u-ml-xs" color="purple" variant="outline">
                 {!isEmpty(nodes) ? (
-                  <Link
-                    target="_blank"
-                    to={`/search?kind=${NodeModel.kind}&q=${encodeURIComponent(cpuManagerLabel)}`}
-                  >
+                  <Link target="_blank" to={getDedicatedResourcesSearchHREF(cluster)}>
                     {cpuManagerLabel}
                   </Link>
                 ) : (
@@ -122,10 +125,11 @@ const DedicatedResourcesModal: FC<DedicatedResourcesModalProps> = ({
                 bodyContent={
                   <>
                     {qualifiedNodes?.map((node) => (
-                      <ResourceLink
+                      <MulticlusterResourceLink
+                        cluster={getCluster(node)}
                         groupVersionKind={modelToGroupVersionKind(NodeModel)}
-                        key={node.metadata.uid}
-                        name={node.metadata.name}
+                        key={getUID(node)}
+                        name={getName(node)}
                       />
                     ))}
                   </>

@@ -4,7 +4,8 @@ import { MigrationPolicyModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
+import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { Tooltip } from '@patternfly/react-core';
 
 import { MigrationTableDataLayout } from '../../utils/utils';
@@ -85,7 +86,8 @@ const MigrationPolicyTooltip: React.FC<MigrationPolicyTooltipProps> = ({ obj }) 
       }
     >
       {obj?.vmiObj?.status?.migrationState?.migrationPolicyName ? (
-        <ResourceLink
+        <MulticlusterResourceLink
+          cluster={getCluster(obj?.vmiObj)}
           groupVersionKind={MigrationPolicyModelGroupVersionKind}
           name={obj?.vmiObj?.status?.migrationState?.migrationPolicyName}
         />
