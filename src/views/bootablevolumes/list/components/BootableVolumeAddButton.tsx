@@ -6,11 +6,10 @@ import AddBootableVolumeModal from '@kubevirt-utils/components/AddBootableVolume
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useListClusters from '@kubevirt-utils/hooks/useListClusters';
+import useSelectedCluster from '@kubevirt-utils/hooks/useSelectedCluster';
 import useCanCreateBootableVolume from '@kubevirt-utils/resources/bootableresources/hooks/useCanCreateBootableVolume';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { ListPageCreateDropdown } from '@openshift-console/dynamic-plugin-sdk';
-import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 type BootableVolumeAddButtonProps = {
   buttonText?: string;
@@ -22,9 +21,7 @@ const BootableVolumeAddButton: FC<BootableVolumeAddButtonProps> = ({ buttonText,
   const { createModal } = useModal();
   const navigate = useNavigate();
   const isACMPage = useIsACMPage();
-  const clusters = useListClusters();
-  const [hubClusterName] = useHubClusterName();
-  const selectedCluster = clusters?.[0] || hubClusterName;
+  const selectedCluster = useSelectedCluster();
   const selectedNamespace = namespace || DEFAULT_NAMESPACE;
 
   const { canCreateDS, canCreatePVC, canListInstanceTypesPreference } =

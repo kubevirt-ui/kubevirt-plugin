@@ -4,19 +4,18 @@ import { useNavigate } from 'react-router-dom-v5-compat';
 import { TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useListClusters from '@kubevirt-utils/hooks/useListClusters';
 import useListNamespaces from '@kubevirt-utils/hooks/useListNamespaces';
+import useSelectedCluster from '@kubevirt-utils/hooks/useSelectedCluster';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { Button } from '@patternfly/react-core';
-import { useFleetAccessReview, useHubClusterName } from '@stolostron/multicluster-sdk';
+import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 
 const VirtualMachineTemplatesCreateButton: FC = () => {
   const { t } = useKubevirtTranslation();
-  const [hubClusterName] = useHubClusterName();
-  const selectedClusters = useListClusters();
+  const selectedCluster = useSelectedCluster();
   const selectedNamespaces = useListNamespaces();
   const navigate = useNavigate();
-  const cluster = selectedClusters?.[0] || hubClusterName;
+  const cluster = selectedCluster;
   const namespace = selectedNamespaces?.[0] || DEFAULT_NAMESPACE;
   const isACMPage = useIsACMPage();
 

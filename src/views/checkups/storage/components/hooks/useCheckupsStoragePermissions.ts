@@ -17,9 +17,8 @@ import {
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
-import useListClusters from '@kubevirt-utils/hooks/useListClusters';
+import useSelectedCluster from '@kubevirt-utils/hooks/useSelectedCluster';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import {
   STORAGE_CHECKUP_ROLE,
@@ -29,9 +28,7 @@ import {
 
 export const useCheckupsStoragePermissions = () => {
   const namespace = useActiveNamespace();
-  const selectedClusters = useListClusters();
-  const [hubClusterName] = useHubClusterName();
-  const cluster = selectedClusters?.[0] || hubClusterName;
+  const cluster = useSelectedCluster();
   const isAllNamespace = namespace === ALL_NAMESPACES_SESSION_KEY;
 
   const [serviceAccounts, serviceAccountsLoaded] = useKubevirtWatchResource<

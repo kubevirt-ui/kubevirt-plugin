@@ -7,12 +7,11 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { UPLOAD_STATUS } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useListClusters from '@kubevirt-utils/hooks/useListClusters';
+import useSelectedCluster from '@kubevirt-utils/hooks/useSelectedCluster';
 import { getValidNamespace, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { Form, PopoverPosition, Title } from '@patternfly/react-core';
-import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import SchedulingSettings from './components/SchedulingSettings';
 import SourceTypeSelection from './components/SourceTypeSelection/SourceTypeSelection';
@@ -43,13 +42,12 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
   const { t } = useKubevirtTranslation();
   const [activeNamespace] = useActiveNamespace();
   const namespace = getValidNamespace(activeNamespace);
-  const clusters = useListClusters();
-  const [hubClusterName] = useHubClusterName();
   const isACMPage = useIsACMPage();
+  const selectedCluster = useSelectedCluster();
 
   const [bootableVolume, setBootableVolume] = useState<AddBootableVolumeState>({
     ...initialBootableVolumeState,
-    bootableVolumeCluster: clusters?.[0] || hubClusterName,
+    bootableVolumeCluster: selectedCluster,
     bootableVolumeNamespace: namespace,
   });
 

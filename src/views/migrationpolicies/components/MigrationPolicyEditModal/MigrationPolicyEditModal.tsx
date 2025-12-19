@@ -6,11 +6,13 @@ import { V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt'
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getName } from '@kubevirt-utils/resources/shared';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { kubevirtK8sCreate, kubevirtK8sDelete, kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 import { FormGroup, TextInput } from '@patternfly/react-core';
 
-import { useMigrationPoliciesPageBaseURL } from '../../hooks/useMigrationPoliciesPageBaseURL';
+import { useMigrationPoliciesListURL } from '../../hooks/useMigrationPoliciesListURL';
+import { getMigrationPolicyURL } from '../../utils/utils';
 import MigrationPolicyConfigurations from '../MigrationPolicyConfigurations/MigrationPolicyConfigurations';
 
 import { EditMigrationPolicyInitialState } from './utils/constants';
@@ -30,7 +32,7 @@ const MigrationPolicyEditModal: FC<MigrationPolicyEditModalProps> = ({ isOpen, m
   const navigate = useNavigate();
   const location = useLocation();
   const cluster = useClusterParam();
-  const migrationPoliciesBaseURL = useMigrationPoliciesPageBaseURL();
+  const migrationPoliciesBaseURL = useMigrationPoliciesListURL();
   const [state, setState] = useState<EditMigrationPolicyInitialState>(
     extractEditMigrationPolicyInitialValues(mp),
   );
@@ -59,7 +61,7 @@ const MigrationPolicyEditModal: FC<MigrationPolicyEditModalProps> = ({ isOpen, m
             () => {
               if (lastPolicyPathElement === mp?.metadata?.name) {
                 // if we were on MigrationPolicy details page, stay there and just update the data
-                navigate(`${migrationPoliciesBaseURL}/${updatedMP?.metadata?.name}`);
+                navigate(getMigrationPolicyURL(getName(updatedMP), cluster));
               } else {
                 navigate(migrationPoliciesBaseURL); // MigrationPolicies list
               }

@@ -1,21 +1,20 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom-v5-compat';
+import { useMigrationPoliciesListURL } from 'src/views/migrationpolicies/hooks/useMigrationPoliciesListURL';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Breadcrumb, BreadcrumbItem } from '@patternfly/react-core';
-
-import { useMigrationPoliciesPageBaseURL } from '../../../hooks/useMigrationPoliciesPageBaseURL';
 
 import './MigrationPolicyBreadcrumb.scss';
 
 export const MigrationPolicyBreadcrumb: React.FC = () => {
   const { t } = useKubevirtTranslation();
-  const migrationPoliciesBaseURL = useMigrationPoliciesPageBaseURL();
+  const migrationPoliciesClusterListPage = useMigrationPoliciesListURL();
 
   return (
     <Breadcrumb>
       <BreadcrumbItem>
-        <Link to={migrationPoliciesBaseURL}>{t('MigrationPolicies')}</Link>
+        <Link to={migrationPoliciesClusterListPage}>{t('MigrationPolicies')}</Link>
       </BreadcrumbItem>
       <BreadcrumbItem>{t('MigrationPolicy details')}</BreadcrumbItem>
     </Breadcrumb>
