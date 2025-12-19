@@ -22,7 +22,7 @@ const VirtualMachineUsage: FC<VirtualMachineUsageProps> = ({ vmis }) => {
       <CardBody>
         <Flex
           justifyContent={{ default: 'justifyContentSpaceBetween' }}
-          spaceItems={{ default: 'spaceItems3xl' }}
+          spaceItems={{ default: 'spaceItems2xl' }}
         >
           <VirtualMachineUsageItem
             capacityText={t('Requested of {{cpuRequested}}', { cpuRequested })}

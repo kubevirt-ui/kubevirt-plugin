@@ -35,7 +35,8 @@ const VirtualMachineListSummary: FC<VirtualMachineListSummaryProps> = ({ vmis, v
       >
         <Flex
           alignItems={{ default: 'alignItemsStretch' }}
-          spaceItems={{ default: 'spaceItemsMd' }}
+          className="vm-list-summary__expand-section-content"
+          gap={{ default: 'gapMd' }}
         >
           <ClusterInfo vms={vms} />
           <VirtualMachineStatuses vms={vms} />

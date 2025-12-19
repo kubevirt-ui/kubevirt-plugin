@@ -179,20 +179,13 @@ const createProjectTreeItem = (
 const createAllNamespacesTreeItem = (
   treeViewData: TreeViewDataItemWithHref[],
   treeViewDataMap: Record<string, TreeViewDataItemWithHref>,
-  projectMap: Record<string, any>,
   queryParams?: string,
-  cluster?: string,
 ): TreeViewDataItemWithHref => {
-  const allVMsCount = Object.keys(projectMap).reduce((acc, ns) => {
-    acc += projectMap[ns]?.count;
-    return acc;
-  }, 0);
-
   const allNamespacesTreeItem: TreeViewDataItemWithHref = {
     children: treeViewData,
-    customBadgeContent: allVMsCount || '0',
     defaultExpanded: true,
-    href: `${getVMListURL(cluster)}${removeFolderLabelQuery(queryParams) || ''}`,
+    hasBadge: false,
+    href: `${getVMListURL()}${removeFolderLabelQuery(queryParams) || ''}`,
     icon: <ProjectDiagramIcon />,
     id: ALL_NAMESPACES_SESSION_KEY,
     name: ALL_PROJECTS,
@@ -251,7 +244,7 @@ export const createSingleClusterTreeViewData = (
   );
 
   const allNamespacesTreeItem = isAdmin
-    ? createAllNamespacesTreeItem(treeViewData, treeViewDataMap, projectMap, queryParams)
+    ? createAllNamespacesTreeItem(treeViewData, treeViewDataMap, queryParams)
     : null;
 
   treeDataMap.value = treeViewDataMap;

@@ -1,14 +1,16 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import useAllCurrentClusters from '@kubevirt-utils/hooks/useAllCurrentClusters';
-import useAllCurrentNamespaces from '@kubevirt-utils/hooks/useAllCurrentNamespaces';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { Card, CardBody, Flex } from '@patternfly/react-core';
+import {
+  getClustersWithVMsCount,
+  getNamespacesWithVMsCount,
+} from '@virtualmachines/list/utils/utils';
 
 import ResourceCount from './ResourceCount';
 import ResourceTitle from './ResourceTitle';
@@ -23,15 +25,23 @@ const ClusterInfo: FC<ClusterInfoProps> = ({ vms }) => {
   const isAllClustersPage = useIsAllClustersPage();
   const isACMPage = useIsACMPage();
 
-  const clusters = useAllCurrentClusters();
-  const namespaces = useAllCurrentNamespaces(clusters);
-
   const cluster = useClusterParam();
   const namespace = useNamespaceParam();
 
+  const clustersWithVMsCount = useMemo(() => getClustersWithVMsCount(vms), [vms]);
+  const namespacesWithVMsCount = useMemo(
+    () => getNamespacesWithVMsCount(vms, isAllClustersPage),
+    [vms, isAllClustersPage],
+  );
+
   const clusterTitle = <ResourceTitle name={cluster} title={t('Cluster')} />;
   const projectTitle = <ResourceTitle name={namespace} title={t('Project')} />;
-  const namespacesCount = <ResourceCount count={namespaces.length} label={t('Projects')} />;
+  const namespacesCountElement = (
+    <ResourceCount
+      count={namespacesWithVMsCount}
+      label={namespacesWithVMsCount === 1 ? t('Project') : t('Projects')}
+    />
+  );
 
   return (
     <Card>
@@ -40,14 +50,17 @@ const ClusterInfo: FC<ClusterInfoProps> = ({ vms }) => {
           {isAllClustersPage && (
             <>
               <ResourceTitle title={t('All clusters')} />
-              <ResourceCount count={clusters.length} label={t('Clusters')} />
-              {namespacesCount}
+              <ResourceCount
+                count={clustersWithVMsCount}
+                label={clustersWithVMsCount === 1 ? t('Cluster') : t('Clusters')}
+              />
+              {namespacesCountElement}
             </>
           )}
           {cluster && !namespace && (
             <>
               {clusterTitle}
-              {namespacesCount}
+              {namespacesCountElement}
             </>
           )}
           {cluster && namespace && (
@@ -59,11 +72,10 @@ const ClusterInfo: FC<ClusterInfoProps> = ({ vms }) => {
           {!isACMPage && !namespace && (
             <>
               <ResourceTitle title={t('All projects')} />
-              {namespacesCount}
+              {namespacesCountElement}
             </>
           )}
           {!isACMPage && namespace && projectTitle}
-          <ResourceCount count={vms.length} label={t('Virtual Machines')} />
         </Flex>
       </CardBody>
     </Card>
