@@ -13,3 +13,7 @@
   max-height: calc(100vh - 200px);
   overflow-y: auto;
 }
+
+.checkups-empty-state {
+  --pf-v6-c-empty-state__footer--RowGap: 2.5rem;
+}

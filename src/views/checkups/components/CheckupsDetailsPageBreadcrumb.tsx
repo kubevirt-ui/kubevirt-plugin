@@ -5,10 +5,10 @@ import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { Breadcrumb, BreadcrumbItem, Button, ButtonVariant } from '@patternfly/react-core';
 
-import { CHECKUP_URLS } from '../utils/constants';
+import { CheckupType } from '../utils/types';
 
 type CheckupsDetailsPageBreadcrumbProps = {
-  checkupType: typeof CHECKUP_URLS[keyof typeof CHECKUP_URLS];
+  checkupType: CheckupType;
   detailsLabel: string;
   parentLabel: string;
 };

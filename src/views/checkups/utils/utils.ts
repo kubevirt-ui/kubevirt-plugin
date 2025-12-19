@@ -1,3 +1,4 @@
+import { TFunction } from 'react-i18next';
 import { Location } from 'react-router-dom-v5-compat';
 
 import { JobModel, modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -18,6 +19,7 @@ import { SortByDirection } from '@patternfly/react-table';
 import { Fleet } from '@stolostron/multicluster-sdk';
 
 import { CHECKUP_URLS } from './constants';
+import { CheckupType } from './types';
 
 export const KUBEVIRT_VM_LATENCY_LABEL = 'kiagnose/checkup-type';
 export const STATUS_TIMEOUT = 'spec.timeout';
@@ -211,17 +213,18 @@ export const extractConfigMapName = (
  * @param pathname - The current location pathname
  * @returns The checkup type ('network' | 'storage' | 'self-validation') or null if not found
  */
-export const getCurrentCheckupType = (
-  pathname: string,
-): 'network' | 'self-validation' | 'storage' | null => {
+export const getCurrentCheckupType = (pathname: string): CheckupType | null => {
   if (pathname.includes(`/${CHECKUP_URLS.NETWORK}`)) {
-    return CHECKUP_URLS.NETWORK as 'network';
+    return CHECKUP_URLS.NETWORK;
   }
   if (pathname.includes(`/${CHECKUP_URLS.STORAGE}`)) {
-    return CHECKUP_URLS.STORAGE as 'storage';
+    return CHECKUP_URLS.STORAGE;
   }
   if (pathname.includes(`/${CHECKUP_URLS.SELF_VALIDATION}`)) {
-    return CHECKUP_URLS.SELF_VALIDATION as 'self-validation';
+    return CHECKUP_URLS.SELF_VALIDATION;
   }
   return null;
 };
+
+export const getSelectProjectText = (t: TFunction) =>
+  t('Select a specific project in order to run a checkup');

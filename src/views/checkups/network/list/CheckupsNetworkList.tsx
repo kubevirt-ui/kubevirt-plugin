@@ -5,14 +5,10 @@ import {
   IoK8sApiCoreV1ConfigMap,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
-import useNADsData from '@kubevirt-utils/components/NetworkInterfaceModal/components/hooks/useNADsData';
-import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
-import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { ListPageBody, VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination } from '@patternfly/react-core';
 
@@ -30,11 +26,7 @@ import '@kubevirt-utils/styles/list-managment-group.scss';
 const CheckupsNetworkList = () => {
   const { t } = useKubevirtTranslation();
   const [columns, activeColumns, loadedColumns] = useCheckupsNetworkCheckupsListColumns();
-  const namespace = useActiveNamespace();
-  const validNamespace = namespace === ALL_NAMESPACES_SESSION_KEY ? null : namespace;
-  const cluster = useClusterParam();
 
-  const { nads } = useNADsData(validNamespace, cluster);
   const { isPermitted, loading: loadingPermissions } = useCheckupsNetworkPermissions();
   const { configMaps, error, jobs, loaded } = useCheckupsNetworkData();
 
@@ -42,12 +34,8 @@ const CheckupsNetworkList = () => {
   const [unfilterData, dataFilters, onFilterChange, filters] =
     useCheckupsNetworkFilters(configMaps);
 
-  const nadsInNamespace = !isEmpty(nads.filter((nad) => nad.metadata.namespace === namespace));
-
   if (isEmpty(configMaps) && loaded && !loadingPermissions && loadedColumns) {
-    return (
-      <CheckupsNetworkListEmptyState isPermitted={isPermitted} nadsInNamespace={nadsInNamespace} />
-    );
+    return <CheckupsNetworkListEmptyState isPermitted={isPermitted} />;
   }
 
   return (
