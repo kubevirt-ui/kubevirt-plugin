@@ -1,4 +1,5 @@
 import produce from 'immer';
+import isEqual from 'lodash/isEqual';
 import { create } from 'zustand';
 
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
@@ -66,6 +67,18 @@ const getInitialState = (prefillInputs: AdvancedSearchInputs = {}): AdvancedSear
   return baseState;
 };
 
+const isStateEmpty = (state: AdvancedSearchState): boolean => {
+  const initialState = getInitialState();
+  const { dateOption, isValidDate, labelInputText, ...currentQueryInputs } = state;
+  const {
+    dateOption: dateOptionInit,
+    isValidDate: isValidDateInit,
+    labelInputText: labelInputTextInit,
+    ...initialQueryInputs
+  } = initialState;
+  return isEqual(currentQueryInputs, initialQueryInputs);
+};
+
 const useAdvancedSearchStore = create<AdvancedSearchStore>()((set, get) => ({
   actions: {
     getSearchQueryInputs: () => {
@@ -110,4 +123,4 @@ export const useAdvancedSearchField = <K extends keyof AdvancedSearchState>(fiel
   });
 
 export const useIsSearchDisabled = () =>
-  useAdvancedSearchStore((store) => !store.state.isValidDate);
+  useAdvancedSearchStore((store) => !store.state.isValidDate || isStateEmpty(store.state));
