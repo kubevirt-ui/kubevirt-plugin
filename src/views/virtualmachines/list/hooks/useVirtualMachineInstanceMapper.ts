@@ -8,7 +8,7 @@ import { getCluster } from '@multicluster/helpers/selectors';
 import { VMIMapper } from '@virtualmachines/utils/mappers';
 
 export const useVirtualMachineInstanceMapper = () => {
-  const [vmis] = useKubevirtWatchResource<V1VirtualMachineInstance[]>({
+  const [vmis, vmisLoaded] = useKubevirtWatchResource<V1VirtualMachineInstance[]>({
     groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
     isList: true,
   });
@@ -39,5 +39,5 @@ export const useVirtualMachineInstanceMapper = () => {
     );
   }, [vmis]);
 
-  return vmiMapper;
+  return { vmiMapper, vmisLoaded };
 };

@@ -10,11 +10,10 @@ import React, {
 } from 'react';
 
 import {
-  VirtualMachineInstanceModelGroupVersionKind,
   VirtualMachineModelGroupVersionKind,
   VirtualMachineModelRef,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ColumnManagement from '@kubevirt-utils/components/ColumnManagementModal/ColumnManagement';
 import { tourGuideVM } from '@kubevirt-utils/components/GuidedTour/utils/constants';
 import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
@@ -66,7 +65,7 @@ import useVirtualMachineColumns from './hooks/useVirtualMachineColumns';
 import { useVirtualMachineInstanceMapper } from './hooks/useVirtualMachineInstanceMapper';
 import { useVMListFilters } from './hooks/useVMListFilters/useVMListFilters';
 import useVMMetrics from './hooks/useVMMetrics';
-import { VM_FILTER_OPTIONS, VMI_FILTER_OPTIONS } from './utils/constants';
+import { VM_FILTER_OPTIONS } from './utils/constants';
 import { filterVMsByClusterAndNamespace } from './utils/utils';
 import { getListPageBodySize, ListPageBodySize } from './listPageBodySize';
 
@@ -110,22 +109,9 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
 
   const vmsToShow = useMemo(() => (runningTourSignal.value ? [tourGuideVM] : vms), [vms]);
 
-  const [vmis, vmisLoaded] = useKubevirtWatchResource<V1VirtualMachineInstance[]>(
-    {
-      cluster,
-      groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
-      isList: true,
-      limit: OBJECTS_FETCHING_LIMIT,
-      namespace,
-      namespaced: true,
-    },
-    VMI_FILTER_OPTIONS,
-    searchQueries?.vmiQueries,
-  );
-
   const [vmims, vmimsLoaded] = useVirtualMachineInstanceMigrations(cluster, namespace);
 
-  const vmiMapper = useVirtualMachineInstanceMapper();
+  const { vmiMapper, vmisLoaded } = useVirtualMachineInstanceMapper();
   const vmimMapper = useVirtualMachineInstanceMigrationMapper(vmims);
   const pvcMapper = usePVCMapper(namespace, cluster);
 
@@ -139,6 +125,11 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
     vmsToShow,
     [...filtersWithSelect, ...hiddenFilters],
     filtersFromURL,
+  );
+
+  const filteredVMIs = useMemo(
+    () => filteredVMs?.map((vm) => getVMIFromMapper(vmiMapper, vm)).filter(Boolean),
+    [filteredVMs, vmiMapper],
   );
 
   // Used for removing folder filter
@@ -200,7 +191,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
       <DocumentTitle>{PageTitles.VirtualMachines}</DocumentTitle>
       {!isSearchResultsPage && (
         <PageSection>
-          <VirtualMachineListSummary vmis={vmis} vms={filteredVMs} />
+          <VirtualMachineListSummary vmis={filteredVMIs} vms={filteredVMs} />
         </PageSection>
       )}
       <ListPageBody>

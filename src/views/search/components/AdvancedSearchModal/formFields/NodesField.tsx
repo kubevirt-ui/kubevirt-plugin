@@ -13,7 +13,7 @@ const NodesField: FC = () => {
   const { t } = useKubevirtTranslation();
   const { setValue, value } = useAdvancedSearchField(VirtualMachineRowFilterType.Node);
 
-  const vmiMapper = useVirtualMachineInstanceMapper();
+  const { vmiMapper } = useVirtualMachineInstanceMapper();
   const nodesFilter = useNodesFilter(vmiMapper);
 
   const allNodes = nodesFilter.items.map((node) => node.id);
