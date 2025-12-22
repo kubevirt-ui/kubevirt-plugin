@@ -23,8 +23,14 @@ export type VMIMMapper = {
   };
 };
 
-export const getVMIFromMapper = (VMIMapper: VMIMapper, vm: V1VirtualMachine) =>
-  VMIMapper?.mapper?.[getCluster(vm) || SINGLE_CLUSTER_KEY]?.[getNamespace(vm)]?.[getName(vm)];
+export const getVMIFromMapper = (
+  VMIMapper: VMIMapper,
+  vm: V1VirtualMachine,
+  hubClusterName?: string,
+) =>
+  VMIMapper?.mapper?.[getCluster(vm) || hubClusterName || SINGLE_CLUSTER_KEY]?.[getNamespace(vm)]?.[
+    getName(vm)
+  ];
 
 export const getVMIMFromMapper = (
   VMIMMapper: VMIMMapper,
