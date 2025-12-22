@@ -51,8 +51,8 @@ const CreateFromInstanceType: FC<CreateFromInstanceTypeProps> = ({ currentTab })
 
   useEffect(() => {
     const targetNS = getValidNamespace(namespace);
-    setVMNamespaceTarget(authorizedSSHKeys?.[targetNS], targetNS);
-  }, [authorizedSSHKeys, namespace, setVMNamespaceTarget]);
+    setVMNamespaceTarget(authorizedSSHKeys?.[targetNS], targetNS, cluster);
+  }, [authorizedSSHKeys, namespace, setVMNamespaceTarget, cluster]);
 
   const [favorites = [], updaterFavorites, loadedFavorites] = useKubevirtUserSettings(
     'favoriteBootableVolumes',

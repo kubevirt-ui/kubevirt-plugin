@@ -10,6 +10,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getLabel } from '@kubevirt-utils/resources/shared';
 import { getCPU, getMemory, VM_TEMPLATE_ANNOTATION } from '@kubevirt-utils/resources/vm';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import {
   Alert,
   AlertVariant,
@@ -45,6 +46,7 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
   vm,
 }) => {
   const { t } = useKubevirtTranslation();
+  const cluster = useClusterParam();
 
   const [updateInProcess, setUpdateInProcess] = useState<boolean>(false);
   const [updateError, setUpdateError] = useState<string>();
@@ -61,6 +63,7 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
   } = useTemplateDefaultCpuMemory(
     vm?.metadata?.labels?.['vm.kubevirt.io/template'],
     vm?.metadata?.labels?.['vm.kubevirt.io/template.namespace'] || templateNamespace,
+    cluster,
   );
   const { defaultCpu, defaultMemory } = templateDefaultsData || {};
 

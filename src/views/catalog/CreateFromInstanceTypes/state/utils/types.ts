@@ -93,7 +93,7 @@ export type InstanceTypeVMStoreState = {
 };
 
 export type InstanceTypeVMStoreActions = {
-  applySSHFromSettings: (sshSecretName: string, targetNamespace: string) => void;
+  applySSHFromSettings: (sshSecretName: string, targetNamespace: string, cluster?: string) => void;
   onSelectCreatedVolume: (
     selectedVolume: BootableVolume,
     pvcSource?: IoK8sApiCoreV1PersistentVolumeClaim,
@@ -107,7 +107,7 @@ export type InstanceTypeVMStoreActions = {
   setSelectedStorageClass: (storageClass: string) => void;
   setStartVM: (checked: boolean) => void;
   setVM: (vm: V1VirtualMachine) => Promise<void>;
-  setVMNamespaceTarget: (sshSecretName: string, targetNamespace: string) => void;
+  setVMNamespaceTarget: (sshSecretName: string, targetNamespace: string, cluster?: string) => void;
   setVolumeListNamespace: (namespace: string) => void;
 };
 

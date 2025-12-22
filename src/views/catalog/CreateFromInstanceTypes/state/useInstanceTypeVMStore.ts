@@ -23,8 +23,8 @@ import { getSSHCredentials } from './utils/utils';
 export const useInstanceTypeVMStore = create<InstanceTypeVMStore>()((set, get) => {
   return {
     ...instanceTypeVMStoreInitialState,
-    applySSHFromSettings: async (sshSecretName, targetNamespace) => {
-      const sshSecretCredentials = await getSSHCredentials(sshSecretName, targetNamespace);
+    applySSHFromSettings: async (sshSecretName, targetNamespace, cluster) => {
+      const sshSecretCredentials = await getSSHCredentials(sshSecretName, targetNamespace, cluster);
 
       set(
         produce<InstanceTypeVMStore>((currentStore) => {
@@ -95,9 +95,9 @@ export const useInstanceTypeVMStore = create<InstanceTypeVMStore>()((set, get) =
       });
       set({ vm });
     },
-    setVMNamespaceTarget: (sshSecretName, targetNamespace) => {
+    setVMNamespaceTarget: (sshSecretName, targetNamespace, cluster) => {
       get().setIsChangingNamespace();
-      get().applySSHFromSettings(sshSecretName, targetNamespace);
+      get().applySSHFromSettings(sshSecretName, targetNamespace, cluster);
     },
     setVolumeListNamespace: (namespace) => {
       set({ volumeListNamespace: namespace });

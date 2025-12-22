@@ -7,15 +7,17 @@ import {
 } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import { decodeSecret } from '@kubevirt-utils/resources/secret/utils';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { k8sGet } from '@openshift-console/dynamic-plugin-sdk';
+import { kubevirtK8sGet } from '@multicluster/k8sRequests';
 
 export const getSSHCredentials = (
   sshSecretName: string,
   sshSecretNamespace: string,
+  sshSecretCluster?: string,
 ): Promise<SSHSecretDetails> | SSHSecretDetails => {
   if (isEmpty(sshSecretName)) return initialSSHCredentials;
 
-  return k8sGet<IoK8sApiCoreV1Secret>({
+  return kubevirtK8sGet<IoK8sApiCoreV1Secret>({
+    cluster: sshSecretCluster,
     model: SecretModel,
     name: sshSecretName,
     ns: sshSecretNamespace,
