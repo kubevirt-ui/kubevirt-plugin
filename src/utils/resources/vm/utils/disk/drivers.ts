@@ -4,7 +4,8 @@ import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { InterfaceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import { ensurePath, kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import { k8sGet } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtK8sGet } from '@multicluster/k8sRequests';
 
 import {
   DEFAULT_WINDOWS_DRIVERS_DISK_IMAGE,
@@ -14,11 +15,12 @@ import {
   WINDOWS_DRIVERS_DISK,
 } from './constants';
 
-const getVirtioWinConfigMap = async (): Promise<any> => {
+const getVirtioWinConfigMap = async (cluster?: string): Promise<any> => {
   let lastException = undefined;
   for (const namespace of VIRTIO_WIN_CONFIG_MAP_NAMESPACES) {
     try {
-      const configMap = await k8sGet({
+      const configMap = await kubevirtK8sGet({
+        cluster,
         model: ConfigMapModel,
         name: VIRTIO_WIN_CONFIG_MAP_NAME,
         ns: namespace,
@@ -39,10 +41,10 @@ const getVirtioWinConfigMap = async (): Promise<any> => {
   throw lastException;
 };
 
-export const getDriversImage = async (): Promise<string> => {
+export const getDriversImage = async (cluster?: string): Promise<string> => {
   const driversImage = DEFAULT_WINDOWS_DRIVERS_DISK_IMAGE;
   try {
-    const configMap = await getVirtioWinConfigMap();
+    const configMap = await getVirtioWinConfigMap(cluster);
     if (configMap?.data?.[VIRTIO_WIN_IMAGE]) return configMap.data[VIRTIO_WIN_IMAGE];
   } catch (error) {
     kubevirtConsole.error(error);
@@ -77,7 +79,7 @@ export const addWinDriverVolume = (vm: V1VirtualMachine, driverImage: string): V
 };
 
 export const mountWinDriversToVM = async (vm: V1VirtualMachine): Promise<V1VirtualMachine> => {
-  const driversImage = await getDriversImage();
+  const driversImage = await getDriversImage(getCluster(vm));
 
   return addWinDriverVolume(vm, driversImage);
 };
