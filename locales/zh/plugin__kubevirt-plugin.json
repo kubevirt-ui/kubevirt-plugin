@@ -96,6 +96,7 @@
   "A list of matching Nodes will be provided on label input below.": "在下面的标签输入中将提供匹配的节点列表。",
   "a lowercase RFC 1123 label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character": "一个小写的 RFC 1123 标签只能包含小写字母数字字符或 '-'，且必须以字母数字字符开头和结尾",
   "A Project name must consist of lower case alphanumeric characters or ', and must start and end with an alphanumeric character (e.g. 'my-name' or '123-abc'). You must create a Namespace to be able to create projects that begin with 'openshift-', 'kubernetes-', or 'kube-'.": "项目名称必须包含小写字母数字字符或 '，且必须以字母数字字符开头和结尾（如 'my-name' 或 '123-abc'）。您必须创建一个命名空间，才能创建以 'openshift-'、'kubernetes-' 或 'kube-' 开头的项目。",
+  "A saved search with this name already exists. Please choose a different name.": "A saved search with this name already exists. Please choose a different name.",
   "A unique name for the storage claim within the project": "项目中的存储声明的一个唯一名称",
   "A unique namespace for the storage claim within the project": "项目中的存储声明的一个唯一命名空间",
   "A valid URL should start with \"http://\" OR \"https://\" .": "有效 URL 应该以 \"http://\" 或 \"https://\" 开头。",
