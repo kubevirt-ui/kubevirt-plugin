@@ -1,5 +1,6 @@
 import React, { FC, useMemo, useState } from 'react';
 
+import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { ModalComponentProps } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -11,7 +12,9 @@ import {
   ModalFooter,
   ModalHeader,
   TextInput,
+  ValidatedOptions,
 } from '@patternfly/react-core';
+import { useSavedSearchData } from '@search/hooks/useSavedSearchData';
 
 type SaveSearchInputs = {
   description: string;
@@ -24,6 +27,8 @@ type SaveSearchModalProps = Pick<ModalComponentProps, 'isOpen' | 'onClose'> & {
 
 const SaveSearchModal: FC<SaveSearchModalProps> = ({ isOpen, onClose, onSubmit }) => {
   const { t } = useKubevirtTranslation();
+
+  const { searches } = useSavedSearchData();
 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -39,6 +44,8 @@ const SaveSearchModal: FC<SaveSearchModalProps> = ({ isOpen, onClose, onSubmit }
       name,
     });
   };
+
+  const invalidName = searches?.some((search) => search.name === name);
 
   return (
     <Modal
@@ -58,6 +65,12 @@ const SaveSearchModal: FC<SaveSearchModalProps> = ({ isOpen, onClose, onSubmit }
               type="text"
               value={name}
             />
+
+            {invalidName && (
+              <FormGroupHelperText validated={ValidatedOptions.error}>
+                {t('A saved search with this name already exists. Please choose a different name.')}
+              </FormGroupHelperText>
+            )}
           </FormGroup>
           <FormGroup label={t('Description')}>
             <TextInput
@@ -72,7 +85,7 @@ const SaveSearchModal: FC<SaveSearchModalProps> = ({ isOpen, onClose, onSubmit }
       <ModalFooter>
         <Button
           data-test="save-button"
-          isDisabled={isEmptyForm}
+          isDisabled={isEmptyForm || invalidName}
           onClick={submitForm}
           variant="primary"
         >
