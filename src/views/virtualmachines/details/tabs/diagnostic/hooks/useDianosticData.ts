@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
+import useKubevirtWatchResources from '@multicluster/hooks/useKubevirtWatchResources';
 
 import {
   VirtualizationDataVolumeStatus,
@@ -23,7 +23,7 @@ type UseDiagnosticData = (vm: V1VirtualMachine) => {
 };
 
 const useDiagnosticData: UseDiagnosticData = (vm) => {
-  const dataVolumesData = useK8sWatchResources<{ [name: string]: V1beta1DataVolume }>(
+  const dataVolumesData = useKubevirtWatchResources<{ [name: string]: V1beta1DataVolume }>(
     buildDataVolumeResources(vm),
   );
 

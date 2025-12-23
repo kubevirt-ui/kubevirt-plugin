@@ -9,7 +9,9 @@ import {
 import { NetworkAttachmentDefinitionModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { TEMPLATE_TYPE_LABEL } from '@kubevirt-utils/resources/template';
-import { K8sResourceCommon, useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import useKubevirtWatchResources from '@multicluster/hooks/useKubevirtWatchResources';
+import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 
 type UseResourcesQuantities = () => {
@@ -22,6 +24,8 @@ type UseResourcesQuantities = () => {
 
 const useResourcesQuantities: UseResourcesQuantities = () => {
   const [activeNamespace] = useActiveNamespace();
+  const cluster = useClusterParam();
+
   const namespace = React.useMemo(
     () => (activeNamespace === ALL_NAMESPACES_SESSION_KEY ? null : activeNamespace),
     [activeNamespace],
@@ -29,23 +33,27 @@ const useResourcesQuantities: UseResourcesQuantities = () => {
 
   const watchedResources = {
     nads: {
+      cluster,
       groupVersionKind: NetworkAttachmentDefinitionModelGroupVersionKind,
       isList: true,
       namespace,
       namespaced: !!namespace,
     },
     nodes: {
+      cluster,
       groupVersionKind: modelToGroupVersionKind(NodeModel),
       isList: true,
       namespaced: false,
     },
     vms: {
+      cluster,
       groupVersionKind: VirtualMachineModelGroupVersionKind,
       isList: true,
       namespace,
       namespaced: !!namespace,
     },
     vmTemplates: {
+      cluster,
       groupVersionKind: modelToGroupVersionKind(TemplateModel),
       isList: true,
       namespace,
@@ -61,7 +69,9 @@ const useResourcesQuantities: UseResourcesQuantities = () => {
     },
   };
 
-  const resources = useK8sWatchResources<{ [key: string]: K8sResourceCommon[] }>(watchedResources);
+  const resources = useKubevirtWatchResources<{ [key: string]: K8sResourceCommon[] }>(
+    watchedResources,
+  );
 
   return useMemo(() => {
     return Object.entries(resources).reduce(
