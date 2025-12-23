@@ -17,7 +17,7 @@ import {
 import { useHideNamespaceBar } from '../hooks/useHideNamespaceBar';
 
 import TreeViewContent from './components/TreeViewContent';
-import useSelectNamespaceBasedOnPrivileges from './hooks/useSelectNamespaceBasedOnPrivileges';
+import useAutoSelectTreeViewItem from './hooks/useAutoSelectTreeViewItem';
 import { UseTreeViewData } from './hooks/useTreeViewData';
 import {
   CLOSED_DRAWER_SIZE,
@@ -50,7 +50,7 @@ const VirtualMachineTreeView: FC<VirtualMachineTreeViewProps> = ({
   const [drawerWidth, setDrawerWidth] = useLocalStorage(TREE_VIEW_LAST_WIDTH, OPEN_DRAWER_SIZE);
   const [drawerOpen, setDrawerOpen] = useLocalStorage(SHOW_TREE_VIEW, SHOW);
 
-  const { alertMessage, onSelect, selected } = useSelectNamespaceBasedOnPrivileges({
+  const { alertMessage, onSelect, selected } = useAutoSelectTreeViewItem({
     dataMap: treeDataMap.value,
     onFilterChange,
   });

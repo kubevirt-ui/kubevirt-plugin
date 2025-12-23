@@ -20,21 +20,18 @@ import {
   PROJECT_SELECTOR_PREFIX,
   VM_FOLDER_LABEL,
 } from '../utils/constants';
-import { TreeViewDataItemWithHref } from '../utils/utils';
+import { getVMTreeViewItemID, TreeViewDataItemWithHref } from '../utils/utils';
 import { getVMInfoFromPathname } from '../utils/utils';
 
 import { ALL_NAMESPACES_PATH } from './constants';
 import useTreeViewSelect from './useTreeViewSelect';
 
-type UseSelectNamespaceBasedOnPrivilegesProps = {
+type UseAutoSelectTreeViewItemProps = {
   dataMap: Record<string, TreeViewDataItemWithHref>;
   onFilterChange?: OnFilterChange;
 };
 
-const useSelectNamespaceBasedOnPrivileges = ({
-  dataMap,
-  onFilterChange,
-}: UseSelectNamespaceBasedOnPrivilegesProps) => {
+const useAutoSelectTreeViewItem = ({ dataMap, onFilterChange }: UseAutoSelectTreeViewItemProps) => {
   const [selected, onSelect, setSelected] = useTreeViewSelect(onFilterChange);
 
   const { t } = useKubevirtTranslation();
@@ -51,6 +48,15 @@ const useSelectNamespaceBasedOnPrivileges = ({
   const cluster = useClusterParam();
   const { ns } = useParams<{ ns: string }>();
 
+  // Select VM tree view item based on path
+  useEffect(() => {
+    const { vmCluster, vmName, vmNamespace } = getVMInfoFromPathname(location.pathname);
+    if (vmName && vmNamespace) {
+      setSelected(dataMap?.[getVMTreeViewItemID(vmName, vmNamespace, vmCluster)]);
+    }
+  }, [location.pathname, dataMap, setSelected]);
+
+  // Select namespace based on privileges
   useEffect(() => {
     if (isACMPage || runningTourSignal.value) return;
 
@@ -167,4 +173,4 @@ const useSelectNamespaceBasedOnPrivileges = ({
   };
 };
 
-export default useSelectNamespaceBasedOnPrivileges;
+export default useAutoSelectTreeViewItem;

@@ -43,6 +43,9 @@ export interface TreeViewDataItemWithHref extends TreeViewDataItem {
   href?: string;
 }
 
+export const getVMTreeViewItemID = (vmName: string, vmNamespace: string, vmCluster: string) =>
+  `${vmCluster || SINGLE_CLUSTER_KEY}/${vmNamespace}/${vmName}`;
+
 const buildProjectMap = (
   vms: V1VirtualMachine[],
   currentPageVMName: string,
@@ -66,7 +69,7 @@ const buildProjectMap = (
     const vmName = getName(vm);
     const vmCluster = getCluster(vm);
     const folder = foldersEnabled ? getLabel(vm, VM_FOLDER_LABEL) : null;
-    const vmTreeItemID = `${vmCluster || SINGLE_CLUSTER_KEY}/${vmNamespace}/${vmName}`;
+    const vmTreeItemID = getVMTreeViewItemID(vmName, vmNamespace, vmCluster);
     const VMStatusIcon = statusIcon[vm?.status?.printableStatus];
 
     const vmTreeItem: TreeViewDataItemWithHref = {
