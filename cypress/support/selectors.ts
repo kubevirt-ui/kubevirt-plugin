@@ -52,7 +52,7 @@ Cypress.Commands.add('byTestOperandLink', (selector: string) =>
 Cypress.Commands.add('byTestRows', (selector: string) => cy.get(`[data-test-rows="${selector}"]`));
 
 Cypress.Commands.add('byTestActionID', (selector: string) =>
-  cy.get(`[data-test-action="${selector}"]:not(.pf-m-disabled)`),
+  cy.get(`[data-test-id="${selector}"]:not(.pf-m-disabled)`),
 );
 Cypress.Commands.add('byTestOperatorRow', (selector: string, options?: object) =>
   cy.get(`[data-test-operator-row="${selector}"]`, options),

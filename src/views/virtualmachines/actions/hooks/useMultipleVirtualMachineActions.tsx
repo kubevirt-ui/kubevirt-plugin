@@ -90,7 +90,7 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms,
             {
               cta: null,
               disabled: hasMigratingVM,
-              id: 'bulk-migration-actions',
+              id: 'migration-menu',
               label: t('Migration'),
               options: migrationActions,
             },

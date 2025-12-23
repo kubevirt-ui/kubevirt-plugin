@@ -200,7 +200,7 @@ export const VirtualMachineActionFactory = {
       cta: () => createModal((props) => <ComputeMigrationModal {...props} vm={vm} />),
       description: t('Migrate VirtualMachine to a different Node'),
       disabled: !isLiveMigratable(vm),
-      id: 'vm-action-migrate',
+      id: 'vm-action-migrate-compute',
       label: t('Compute'),
     };
   },
@@ -212,7 +212,7 @@ export const VirtualMachineActionFactory = {
       accessReview: asAccessReview(VirtualMachineStorageMigrationPlanModel, vm, 'create'),
       cta: () => createModal((props) => <VirtualMachineMigrateModal vms={[vm]} {...props} />),
       description: t('Migrate VirtualMachine storage to a different StorageClass'),
-      id: 'vm-migrate-storage',
+      id: 'vm-action-migrate-storage',
       label: t('Storage'),
     };
   },
