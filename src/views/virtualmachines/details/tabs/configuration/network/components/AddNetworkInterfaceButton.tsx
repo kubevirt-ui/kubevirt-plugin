@@ -8,9 +8,7 @@ import {
   V1VirtualMachineInstance,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import WithPermissionTooltip from '@kubevirt-utils/components/WithPermissionTooltip/WithPermissionTooltip';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import usePermissions from '@kubevirt-utils/hooks/usePermissions/usePermissions';
 import { ListPageCreateButton } from '@openshift-console/dynamic-plugin-sdk';
 
 import VirtualMachinesNetworkInterfaceModal from './modal/VirtualMachinesNetworkInterfaceModal';
@@ -31,33 +29,27 @@ const AddNetworkInterfaceButton: FC<AddNetworkInterfaceButtonProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const { capabilitiesData } = usePermissions();
-  const isAddNetworkDisabled = !capabilitiesData?.attacheNetworks?.allowed;
+
   const actionText = t('Add network interface');
 
   return (
-    <WithPermissionTooltip allowed={!isAddNetworkDisabled}>
-      <ListPageCreateButton
-        className={classNames('add-network-interface-button pf-v6-u-mb-md', {
-          isDisabled: isAddNetworkDisabled,
-        })}
-        onClick={() =>
-          !isAddNetworkDisabled &&
-          createModal(({ isOpen, onClose }) => (
-            <VirtualMachinesNetworkInterfaceModal
-              headerText={actionText}
-              isOpen={isOpen}
-              onAddNetworkInterface={onAddNetworkInterface}
-              onClose={onClose}
-              vm={vm}
-              vmi={vmi}
-            />
-          ))
-        }
-      >
-        {actionText}
-      </ListPageCreateButton>
-    </WithPermissionTooltip>
+    <ListPageCreateButton
+      onClick={() =>
+        createModal(({ isOpen, onClose }) => (
+          <VirtualMachinesNetworkInterfaceModal
+            headerText={actionText}
+            isOpen={isOpen}
+            onAddNetworkInterface={onAddNetworkInterface}
+            onClose={onClose}
+            vm={vm}
+            vmi={vmi}
+          />
+        ))
+      }
+      className={classNames('add-network-interface-button pf-v6-u-mb-md')}
+    >
+      {actionText}
+    </ListPageCreateButton>
   );
 };
 
