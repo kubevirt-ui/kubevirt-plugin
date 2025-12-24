@@ -317,8 +317,8 @@ export const createMultiClusterTreeViewData = (
 
       const clusterTreeItem: TreeViewDataItemWithHref = {
         children: treeViewData,
+        customBadgeContent: clusterVMs?.length || 0,
         defaultExpanded: clusterSelected,
-        hasBadge: false,
         href: getACMVMListURL(clusterName),
         icon: <ClusterIcon />,
         id: `${CLUSTER_SELECTOR_PREFIX}/${clusterName}`,
