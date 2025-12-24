@@ -4,6 +4,7 @@ import produce from 'immer';
 
 import { V1CPU, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import CPUInput from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/CPUInput';
+import { getCPULimitsFromVM } from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/utils/utils';
 import MemoryInput from '@kubevirt-utils/components/CPUMemoryModal/components/MemoryInput/MemoryInput';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -63,6 +64,8 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
     vm?.metadata?.labels?.['vm.kubevirt.io/template.namespace'] || templateNamespace,
   );
   const { defaultCpu, defaultMemory } = templateDefaultsData || {};
+
+  const cpuLimits = getCPULimitsFromVM(vm);
   const { size: defaultMemorySize, unit: defaultMemoryUnit } = defaultMemory || {};
 
   const templateName = getLabel(vm, VM_TEMPLATE_ANNOTATION);
@@ -113,7 +116,12 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
           variant={AlertVariant.info}
         />
         <div className="inputs">
-          <CPUInput currentCPU={getCPU(vm)} setUserEnteredCPU={setCPU} userEnteredCPU={cpu} />
+          <CPUInput
+            cpuLimits={cpuLimits}
+            currentCPU={getCPU(vm)}
+            setUserEnteredCPU={setCPU}
+            userEnteredCPU={cpu}
+          />
           <MemoryInput
             memory={memory}
             memoryUnit={memoryUnit}
