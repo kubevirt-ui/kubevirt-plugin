@@ -53,7 +53,7 @@ const SubMenuContent: FC<GroupMenuContentProps & { checkAccess: CheckAccess }> =
         </MenuContent>
       </Menu>
     }
-    data-test-action={option.id}
+    data-test-id={option.id}
   >
     {option.label}
   </MenuItem>

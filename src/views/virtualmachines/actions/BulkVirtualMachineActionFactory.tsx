@@ -37,7 +37,7 @@ import { getCommonLabels, getLabelsDiffPatch, isSameCluster, isSameNamespace } f
 export const BulkVirtualMachineActionFactory = {
   controlActions: (controlActions: ActionDropdownItemType[]): ActionDropdownItemType => ({
     cta: null,
-    id: 'bulk-control-menu',
+    id: 'control-menu',
     label: t('Control'),
     options: controlActions,
   }),
