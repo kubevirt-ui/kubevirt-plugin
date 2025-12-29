@@ -40,5 +40,7 @@ export const getVMListQueries = (
     [VMListQueries.CPU_USAGE]: `rate(kubevirt_vmi_cpu_usage_seconds_total{${filters}}[${duration}])`,
     [VMListQueries.MEMORY_USAGE]: `kubevirt_vmi_memory_used_bytes{${filters}}`,
     [VMListQueries.NETWORK_TOTAL_USAGE]: `rate(kubevirt_vmi_network_transmit_bytes_total{${filters}}[${duration}]) + rate(kubevirt_vmi_network_receive_bytes_total{${filters}}[${duration}])`,
+    [VMListQueries.STORAGE_CAPACITY]: `max(kubevirt_vmi_filesystem_capacity_bytes{${filters}}) by (namespace, name, disk_name, cluster)`,
+    [VMListQueries.STORAGE_USAGE]: `max(kubevirt_vmi_filesystem_used_bytes{${filters}}) by (namespace, name, disk_name, cluster)`,
   };
 };

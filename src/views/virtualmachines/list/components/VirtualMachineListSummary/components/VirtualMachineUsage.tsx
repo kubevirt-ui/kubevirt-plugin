@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Card, CardBody, CardTitle, Flex } from '@patternfly/react-core';
 import useVMTotalsMetrics from '@virtualmachines/list/hooks/useVMTotalsMetrics';
@@ -9,12 +9,13 @@ import VirtualMachineUsageItem from '../../VirtualMachineUsageItem/VirtualMachin
 
 type VirtualMachineUsageProps = {
   vmis: V1VirtualMachineInstance[];
+  vms: V1VirtualMachine[];
 };
 
-const VirtualMachineUsage: FC<VirtualMachineUsageProps> = ({ vmis }) => {
+const VirtualMachineUsage: FC<VirtualMachineUsageProps> = ({ vmis, vms }) => {
   const { t } = useKubevirtTranslation();
   const { cpuRequested, cpuUsage, memoryCapacity, memoryUsage, storageCapacity, storageUsage } =
-    useVMTotalsMetrics(vmis);
+    useVMTotalsMetrics({ vmis, vms });
 
   return (
     <Card>

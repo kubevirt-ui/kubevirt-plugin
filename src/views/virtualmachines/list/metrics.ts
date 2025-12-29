@@ -8,16 +8,22 @@ import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVCPUCount } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
+import { PrometheusResponse } from '@openshift-console/dynamic-plugin-sdk';
 import { signal } from '@preact/signals-core';
 
-export type MetricsType = {
-  [key in string]: {
-    cpuUsage?: number;
-    memoryRequested?: number;
-    memoryUsage?: number;
-    networkUsage?: number;
-  };
+type MetricsObject = {
+  cpuUsage?: number;
+  memoryUsage?: number;
+  networkUsage?: number;
+  storageCapacity?: number;
+  storageUsage?: number;
 };
+
+export type MetricsType = {
+  [key in string]: MetricsObject;
+};
+
+export type Metric = keyof MetricsObject;
 
 export const vmsMetrics = signal<MetricsType>({});
 
@@ -25,10 +31,8 @@ export const getVMMetrics = (vm: V1VirtualMachine) => {
   const cluster = getCluster(vm) || SINGLE_CLUSTER_KEY;
   const namespace = getNamespace(vm);
   const name = getName(vm);
-  const vmMetrics = vmsMetrics.value?.[`${cluster}-${namespace}-${name}`];
-  if (isEmpty(vmMetrics)) vmsMetrics.value[`${cluster}-${namespace}-${name}`] = {};
 
-  return vmsMetrics.value?.[`${cluster}-${namespace}-${name}`];
+  return getVMMetricsWithParams(name, namespace, cluster);
 };
 
 export const getVMMetricsWithParams = (
@@ -42,35 +46,26 @@ export const getVMMetricsWithParams = (
   return vmsMetrics.value?.[`${cluster}-${namespace}-${name}`];
 };
 
-export const setVMMemoryUsage = (
+const setMetricValue = (
   name: string,
   namespace: string,
   cluster = SINGLE_CLUSTER_KEY,
-  memoryUsage: number,
+  metric: Metric,
+  value: number,
 ) => {
   const vmMetrics = getVMMetricsWithParams(name, namespace, cluster);
-
-  vmMetrics.memoryUsage = memoryUsage;
+  vmMetrics[metric] = value;
 };
 
-export const setVMNetworkUsage = (
-  name: string,
-  namespace: string,
-  cluster = SINGLE_CLUSTER_KEY,
-  networkUsage: number,
-) => {
-  const vmMetrics = getVMMetricsWithParams(name, namespace, cluster);
-  vmMetrics.networkUsage = networkUsage;
-};
+export const setMetricFromResponse = (response: PrometheusResponse, metric: Metric) => {
+  response?.data?.result?.forEach((result) => {
+    const vmName = result?.metric?.name;
+    const vmNamespace = result?.metric?.namespace;
+    const vmCluster = result?.metric?.cluster;
+    const value = parseFloat(result?.value?.[1]);
 
-export const setVMCPUUsage = (
-  name: string,
-  namespace: string,
-  cluster = SINGLE_CLUSTER_KEY,
-  cpuUsage: number,
-) => {
-  const vmMetrics = getVMMetricsWithParams(name, namespace, cluster);
-  vmMetrics.cpuUsage = cpuUsage;
+    setMetricValue(vmName, vmNamespace, vmCluster, metric, value);
+  });
 };
 
 export const getCPUUsagePercentage = (vm: V1VirtualMachine, vmiCPU: V1CPU) => {
