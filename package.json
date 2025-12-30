@@ -3,7 +3,7 @@
     "@kubev2v/types": "^0.0.22",
     "@kubevirt-ui-ext/kubevirt-api": "1.5.1",
     "@kubevirt-ui-ext/vnc-keymaps": "1.0.4",
-    "@novnc/novnc": "^1.5.0",
+    "@novnc/novnc": "1.4.0",
     "@patternfly/quickstarts": "6.1.0",
     "@patternfly/react-catalog-view-extension": "^6.1.0",
     "@patternfly/react-charts": "^8.2.2",
