@@ -11,7 +11,10 @@ type BootOrderSummaryProps = {
 
 const BootOrderSummary: FC<BootOrderSummaryProps> = ({ instanceTypeVM, vm }) => {
   const transformedDevices = useMemo(
-    () => getSortedBootableDevices({ instanceTypeVM, vm }),
+    () =>
+      getSortedBootableDevices({ instanceTypeVM, vm }).filter(
+        (device) => device.value.bootOrder !== undefined,
+      ),
     [vm, instanceTypeVM],
   );
 
