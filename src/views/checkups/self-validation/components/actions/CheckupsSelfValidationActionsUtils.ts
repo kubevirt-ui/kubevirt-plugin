@@ -8,7 +8,7 @@ export const SELF_VALIDATION_ACTION_MODE = {
 } as const;
 
 export type SelfValidationActionMode =
-  typeof SELF_VALIDATION_ACTION_MODE[keyof typeof SELF_VALIDATION_ACTION_MODE];
+  (typeof SELF_VALIDATION_ACTION_MODE)[keyof typeof SELF_VALIDATION_ACTION_MODE];
 
 export type ActionState = {
   configMapInfo: { cluster: string; name: string; namespace: string } | null;

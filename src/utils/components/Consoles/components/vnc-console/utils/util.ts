@@ -42,7 +42,7 @@ export const SCAN_CODE_NAMES = [
   F11,
   F12,
 ] as const;
-export type ScanCodeName = typeof SCAN_CODE_NAMES[number];
+export type ScanCodeName = (typeof SCAN_CODE_NAMES)[number];
 
 const VNC_IN_USE_ERROR_TEXT = 'Active VNC connection. Request denied.';
 

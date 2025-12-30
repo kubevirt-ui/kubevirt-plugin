@@ -11,7 +11,7 @@ export const SETTINGS_TABS = {
   USER: 'user',
 } as const;
 
-export type SettingsTab = typeof SETTINGS_TABS[keyof typeof SETTINGS_TABS];
+export type SettingsTab = (typeof SETTINGS_TABS)[keyof typeof SETTINGS_TABS];
 
 export const SETTINGS_TABS_ARRAY: SettingsTab[] = Object.values(SETTINGS_TABS);
 

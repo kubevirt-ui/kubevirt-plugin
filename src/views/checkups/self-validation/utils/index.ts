@@ -8,6 +8,10 @@ export type {
   ValidatedJobParameters,
 } from './constants';
 export * from './constants';
+export { downloadResults, getDefaultErrorMessage, validateDownloadInputs } from './downloadResults';
+
+// Download results utilities
+export type { DownloadInputValidationResult, DownloadResultsReturn } from './downloadResults';
 
 // Job lifecycle and helpers
 export {
@@ -30,17 +34,15 @@ export {
   selfValidationJob,
   selfValidationPVC,
 } from './selfValidationJob';
-
 // Messages and UI helpers
 export { getRunningCheckupErrorMessage } from './selfValidationMessages';
-
-// RBAC permissions
-export type { PermissionOperationResult } from './selfValidationPermissions';
 export {
   installPermissions as installSelfValidationPermissions,
   uninstallPermissions as removeSelfValidationPermissions,
 } from './selfValidationPermissions';
 
+// RBAC permissions
+export type { PermissionOperationResult } from './selfValidationPermissions';
 // Results parsing and status
 export {
   formatGoDuration,
@@ -54,7 +56,3 @@ export {
   parseFailedTest,
   parseResults,
 } from './selfValidationResults';
-
-// Download results utilities
-export type { DownloadInputValidationResult, DownloadResultsReturn } from './downloadResults';
-export { downloadResults, getDefaultErrorMessage, validateDownloadInputs } from './downloadResults';
