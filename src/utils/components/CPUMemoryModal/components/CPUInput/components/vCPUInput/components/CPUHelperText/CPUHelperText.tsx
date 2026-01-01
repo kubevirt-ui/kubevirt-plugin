@@ -3,6 +3,7 @@ import React, { FC } from 'react';
 import { V1CPU } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { formatVCPUsAsSockets } from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { parseCPU } from '@kubevirt-utils/resources/template/utils';
 
 import './CPUHelperText.scss';
 
@@ -16,11 +17,14 @@ const CPUHelperText: FC<CPUHelperTextProps> = ({ cpu, hide }) => {
 
   if (hide) return null;
 
+  const formattedCPU = formatVCPUsAsSockets(cpu);
+
   return (
     <div id="cpu-helper-text">
-      {t('Topology will be set to {{sockets}} socket, 1 core, 1 thread', {
-        sockets: formatVCPUsAsSockets(cpu)?.sockets,
-      })}
+      {t(
+        'Topology will be set to {{sockets}} socket, {{cores}} core, {{threads}} thread',
+        parseCPU(formattedCPU),
+      )}
     </div>
   );
 };

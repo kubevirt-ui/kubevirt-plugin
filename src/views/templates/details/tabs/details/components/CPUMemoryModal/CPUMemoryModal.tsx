@@ -4,6 +4,7 @@ import produce from 'immer';
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1CPU } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import CPUInput from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/CPUInput';
+import { getCPULimitsFromVM } from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/utils/utils';
 import MemoryInput from '@kubevirt-utils/components/CPUMemoryModal/components/MemoryInput/MemoryInput';
 import { getMemorySize } from '@kubevirt-utils/components/CPUMemoryModal/utils/CpuMemoryUtils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -38,6 +39,8 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({ isOpen, onClose, onSubmit, te
   const [updateInProcess, setUpdateInProcess] = useState<boolean>(false);
   const [updateError, setUpdateError] = useState<string>();
 
+  const cpuLimits = getCPULimitsFromVM(vm);
+
   const handleSubmit = async () => {
     setUpdateInProcess(true);
     setUpdateError(null);
@@ -51,7 +54,7 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({ isOpen, onClose, onSubmit, te
       ]);
 
       draftVM.spec.template.spec.domain.cpu = cpu;
-      draftVM.spec.template.spec.domain.memory.guest = `${memory}${memoryUnit}`;
+      draftVM.spec.template.spec.domain.memory.guest = `${memory}${memoryUnit ?? ''}`;
     });
 
     try {
@@ -113,7 +116,12 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({ isOpen, onClose, onSubmit, te
       width="650px"
     >
       <div className="inputs">
-        <CPUInput currentCPU={defaultCPU} setUserEnteredCPU={setCPU} userEnteredCPU={cpu} />
+        <CPUInput
+          cpuLimits={cpuLimits}
+          currentCPU={defaultCPU}
+          setUserEnteredCPU={setCPU}
+          userEnteredCPU={cpu}
+        />
         <MemoryInput
           memory={memory}
           memoryUnit={memoryUnit}

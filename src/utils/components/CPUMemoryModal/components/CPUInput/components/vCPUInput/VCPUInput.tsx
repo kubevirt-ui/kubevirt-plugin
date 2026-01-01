@@ -2,7 +2,9 @@ import React, { ChangeEvent, Dispatch, FC, SetStateAction } from 'react';
 
 import { V1CPU } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
+  convertTopologyToVCPUs,
   CPUComponent,
+  DEFAULT_CPU_COMPONENT_VALUE,
   getUpdatedCPU,
 } from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -42,8 +44,8 @@ const VCPUInput: FC<vCPUInputProps> = ({ cpu, isDisabled, setCPU }) => {
           }
           inputName="cpu-input"
           isDisabled={isDisabled}
-          min={1}
-          value={cpu?.sockets}
+          min={DEFAULT_CPU_COMPONENT_VALUE}
+          value={convertTopologyToVCPUs(cpu)}
         />
       </GridItem>
     </Grid>
