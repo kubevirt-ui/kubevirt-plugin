@@ -22,7 +22,7 @@ export const InstanceTypeSizes = [
   '8xlarge1gi',
 ] as const;
 
-export type InstanceTypeSize = typeof InstanceTypeSizes[number];
+export type InstanceTypeSize = (typeof InstanceTypeSizes)[number];
 
 export type InstanceTypeSeries =
   | 'cx1'

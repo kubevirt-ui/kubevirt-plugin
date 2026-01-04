@@ -8,4 +8,4 @@ export type TabConfig = {
   name: string;
 };
 
-export type CheckupType = typeof CHECKUP_URLS[keyof typeof CHECKUP_URLS];
+export type CheckupType = (typeof CHECKUP_URLS)[keyof typeof CHECKUP_URLS];

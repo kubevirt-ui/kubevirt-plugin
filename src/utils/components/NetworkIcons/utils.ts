@@ -18,7 +18,7 @@ export const interfaceStateIcons = {
 
 export const getNetworkInterfaceStateIcon = (
   interfaceState: NetworkInterfaceState,
-): typeof interfaceStateIcons[keyof typeof interfaceStateIcons] =>
+): (typeof interfaceStateIcons)[keyof typeof interfaceStateIcons] =>
   interfaceStateIcons[interfaceState] ?? LinkStateNoDataIcon;
 
 export const describeNetworkState = (t: TFunction, state: NetworkInterfaceState) => {
