@@ -11,9 +11,10 @@ import {
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { getUtilizationQueries } from '@kubevirt-utils/components/Charts/utils/queries';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { getCPU, getMemory } from '@kubevirt-utils/resources/vm';
+import { getMemory } from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import ACMExtentionsTableData from '@multicluster/components/ACMExtentionsTableData';
@@ -26,6 +27,7 @@ import { Checkbox } from '@patternfly/react-core';
 import VirtualMachineActions from '@virtualmachines/actions/components/VirtualMachineActions/VirtualMachineActions';
 import useVirtualMachineActionsProvider from '@virtualmachines/actions/hooks/useVirtualMachineActionsProvider';
 import { getDeletionProtectionPrintableStatus } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
+import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 import { filterConditions } from '@virtualmachines/list/components/VirtualMachineRow/utils/utils';
 import { deselectVM, isVMSelected, selectVM } from '@virtualmachines/list/selectedVMs';
 import { getVirtualMachineStorageClasses, PVCMapper } from '@virtualmachines/utils/mappers';
@@ -34,7 +36,7 @@ import { VMStatusConditionLabelList } from '../VMStatusConditionLabel';
 
 import CPUPercentage from './components/CPUPercentage';
 import MemoryPercentage from './components/MemoryPercentage';
-import NetworkUsage from './components/NetworkUsage';
+import NetworkPercentage from './components/NetworkPercentage';
 
 import './virtual-machine-row-layout.scss';
 
@@ -54,7 +56,8 @@ const VirtualMachineRowLayout: FC<
   // TODO: investigate using the index prop
   index;
   const selected = isVMSelected(obj);
-
+  const { duration } = useDuration();
+  const queries = useMemo(() => getUtilizationQueries({ duration, obj: vmi }), [vmi, duration]);
   const vmName = useMemo(() => getName(obj), [obj]);
   const vmNamespace = useMemo(() => getNamespace(obj), [obj]);
   const clusterParam = useClusterParam();
@@ -118,10 +121,10 @@ const VirtualMachineRowLayout: FC<
         <MemoryPercentage vm={obj} vmiMemory={getMemory(vmi)} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="cpu-usage">
-        <CPUPercentage vm={obj} vmiCPU={getCPU(vmi)} />
+        <CPUPercentage queries={queries} vm={obj} vmi={vmi} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="network-usage">
-        <NetworkUsage vm={obj} />
+        <NetworkPercentage queries={queries} vm={obj} vmi={vmi} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="deletion-protection">
         {getDeletionProtectionPrintableStatus(obj)}
