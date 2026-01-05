@@ -54,12 +54,12 @@ const CreateFromInstanceType: FC<CreateFromInstanceTypeProps> = ({ currentTab })
     setVMNamespaceTarget(authorizedSSHKeys?.[targetNS], targetNS, cluster);
   }, [authorizedSSHKeys, namespace, setVMNamespaceTarget, cluster]);
 
-  const [favorites = [], updaterFavorites, loadedFavorites] = useKubevirtUserSettings(
+  const [favorites = [], updaterFavorites] = useKubevirtUserSettings(
     'favoriteBootableVolumes',
     cluster,
   );
 
-  if (!instanceTypesAndPreferencesData?.loaded || !loaded || !loadedFavorites) {
+  if (!instanceTypesAndPreferencesData?.loaded || !loaded) {
     return (
       <Bullseye className="create-vm-instance-type-section__page-loader">
         <Loading size="lg" />
