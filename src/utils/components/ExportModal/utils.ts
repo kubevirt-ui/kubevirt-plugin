@@ -109,6 +109,10 @@ export const createUploaderPod: CreateUploaderPodType = ({
                 memory: '3Gi',
               },
             },
+            securityContext: {
+              allowPrivilegeEscalation: false,
+              capabilities: { drop: ['ALL'] },
+            },
             volumeMounts: [
               {
                 mountPath: '/tmp',
@@ -118,6 +122,12 @@ export const createUploaderPod: CreateUploaderPodType = ({
           },
         ],
         restartPolicy: 'Never',
+        securityContext: {
+          runAsNonRoot: true,
+          seccompProfile: {
+            type: 'RuntimeDefault',
+          },
+        },
         serviceAccountName: 'kubevirt-disk-uploader',
         volumes: [
           {
