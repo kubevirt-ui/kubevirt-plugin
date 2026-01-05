@@ -3,13 +3,12 @@ import React, { FC } from 'react';
 import {
   modelToGroupVersionKind,
   NamespaceModel,
-  NodeModel,
   VirtualMachineInstanceMigrationModelGroupVersionKind,
   VirtualMachineModelGroupVersionKind,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
+import NodeLink from '@kubevirt-utils/components/NodeLink/NodeLink';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import {
   getMigrationPhase,
   getMigrationSourceNode,
@@ -77,26 +76,10 @@ const MigrationsRow: FC<RowProps<MigrationTableDataLayout>> = ({ activeColumnIDs
         />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="source">
-        {sourceNode ? (
-          <MulticlusterResourceLink
-            cluster={cluster}
-            groupVersionKind={modelToGroupVersionKind(NodeModel)}
-            name={sourceNode}
-          />
-        ) : (
-          NO_DATA_DASH
-        )}
+        <NodeLink cluster={cluster} nodeName={sourceNode} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="target">
-        {targetNode ? (
-          <MulticlusterResourceLink
-            cluster={cluster}
-            groupVersionKind={modelToGroupVersionKind(NodeModel)}
-            name={targetNode}
-          />
-        ) : (
-          NO_DATA_DASH
-        )}
+        <NodeLink cluster={cluster} nodeName={targetNode} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="migration-policy">
         <MigrationPolicyTooltip obj={obj} />
