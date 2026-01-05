@@ -4,6 +4,7 @@ import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import { getLabel, getName } from '@kubevirt-utils/resources/shared';
 import { ManagedClusterModel } from '@multicluster/constants';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
@@ -33,6 +34,7 @@ export const useClusterObservabilityDisabled = (
   error: Error | unknown;
   loaded: boolean;
 } => {
+  const isACMPage = useIsACMPage();
   const [hubClusterName] = useHubClusterName();
 
   const [managedClusterData, loaded, loadError] = useKubevirtWatchResource<
@@ -46,7 +48,7 @@ export const useClusterObservabilityDisabled = (
   const { cnvInstalledClusters, loaded: cnvLoaded } = useClusterCNVInstalled();
 
   const { disabledClusters, enabledClusters: rawEnabledClusters } = useMemo(() => {
-    if (!managedClusterData) {
+    if (!isACMPage || !managedClusterData) {
       return { disabledClusters: [], enabledClusters: [] };
     }
 
@@ -79,7 +81,7 @@ export const useClusterObservabilityDisabled = (
     });
 
     return { disabledClusters: disabled, enabledClusters: enabled };
-  }, [managedClusterData]);
+  }, [isACMPage, managedClusterData]);
 
   const enabledClusters = useMemo(() => {
     if (!onlyCNVClusters || !cnvLoaded) {
@@ -87,6 +89,16 @@ export const useClusterObservabilityDisabled = (
     }
     return rawEnabledClusters.filter((clusterName) => cnvInstalledClusters.includes(clusterName));
   }, [onlyCNVClusters, cnvLoaded, rawEnabledClusters, cnvInstalledClusters]);
+
+  // For non-ACM pages, return loaded=true immediately to avoid blocking consumers
+  if (!isACMPage) {
+    return {
+      disabledClusters: [],
+      enabledClusters: [],
+      error: undefined,
+      loaded: true,
+    };
+  }
 
   return {
     disabledClusters,

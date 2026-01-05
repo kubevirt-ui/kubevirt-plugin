@@ -68,6 +68,7 @@ const VMStatusesCard: FC = () => {
   const { otherStatuses, otherStatusesCount, primaryStatuses } = getVMStatuses(vms || []);
 
   const displayError = observabilityError || error;
+  const isLoaded = loaded && observabilityLoaded;
 
   return (
     <Card className="vm-statuses-card" data-test-id="vm-statuses-card">
@@ -79,12 +80,12 @@ const VMStatusesCard: FC = () => {
           <ErrorAlert error={displayError} />
         </CardBody>
       )}
-      {!loaded && !displayError && (
+      {!isLoaded && !displayError && (
         <CardBody>
           <LoadingEmptyState />
         </CardBody>
       )}
-      {loaded && (
+      {isLoaded && (
         <>
           <div className="vm-statuses-card__body">
             <Grid hasGutter>

@@ -119,7 +119,7 @@ const useMigrationCardDataAndFilters: UseMigrationCardDataAndFilters = (duration
 
   return {
     filters,
-    loaded: vmimsLoaded && vmisLoaded,
+    loaded: vmimsLoaded && vmisLoaded && observabilityLoaded,
     loadErrors: observabilityError || vmimsErrors || vmisErrors,
     migrationsTableFilteredData: data,
     migrationsTableUnfilteredData: unfilteredData,
