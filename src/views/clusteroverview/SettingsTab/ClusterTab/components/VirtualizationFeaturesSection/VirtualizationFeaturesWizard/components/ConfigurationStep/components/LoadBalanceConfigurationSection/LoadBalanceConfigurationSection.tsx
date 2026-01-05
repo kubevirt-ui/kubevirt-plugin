@@ -4,6 +4,9 @@ import ExpandSectionWithCustomToggle from '@kubevirt-utils/components/ExpandSect
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
+import { DESCHEDULER_OPERATOR_NAME } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/constants';
+import { isInstalled } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/utils';
+import { useVirtualizationFeaturesContext } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/VirtualizationFeaturesContext/VirtualizationFeaturesContext';
 import DeschedulerSection from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/VirtualizationFeaturesList/components/LoadBalanceSection/components/DeschedulerSection';
 import LoadBalanceToggleContent from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/VirtualizationFeaturesWizard/components/ConfigurationStep/components/LoadBalanceConfigurationSection/components/LoadBalanceToggleContent/LoadBalanceToggleContent';
 import HelpTextTooltipContent from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/VirtualizationFeaturesWizard/components/HelpTextTooltipContent/HelpTextTooltipContent';
@@ -16,6 +19,10 @@ import './LoadBalanceConfigurationSection.scss';
 const LoadBalanceConfigurationSection: FC = () => {
   const { t } = useKubevirtTranslation();
   const [alternativeChecked, setAlternativeChecked] = useState<boolean>(false);
+
+  const { operatorDetailsMap } = useVirtualizationFeaturesContext();
+  const { installState } = operatorDetailsMap?.[DESCHEDULER_OPERATOR_NAME] || {};
+  const isOperatorInstalled = isInstalled(installState);
 
   return (
     <ExpandSectionWithCustomToggle
@@ -48,7 +55,7 @@ const LoadBalanceConfigurationSection: FC = () => {
           />
         </StackItem>
         <StackItem>
-          <DeschedulerSection />
+          <DeschedulerSection isOperatorInstalled={isOperatorInstalled} />
         </StackItem>
       </Stack>
     </ExpandSectionWithCustomToggle>
