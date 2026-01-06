@@ -1,6 +1,8 @@
 import { useDispatch } from 'react-redux';
 
 import {
+  attachmentsClear,
+  clearContextEvents,
   closeOLSDrawer,
   openOLSDrawer,
   pushChatHistory,
@@ -13,6 +15,8 @@ import {
 import { Attachment, ChatEntry, Tool } from '@lightspeed/hooks/useLightspeedActions/utils/types';
 
 type UseLightspeedActions = () => {
+  clearAttachments: () => void;
+  clearContextEvents: () => void;
   closeOLSDrawer: () => void;
   openOLSDrawer: () => void;
   pushChatHistory: (entry: ChatEntry) => void;
@@ -27,6 +31,8 @@ const useLightspeedActions: UseLightspeedActions = () => {
   const dispatch = useDispatch();
 
   return {
+    clearAttachments: () => dispatch(attachmentsClear()),
+    clearContextEvents: () => dispatch(clearContextEvents()),
     closeOLSDrawer: () => dispatch(closeOLSDrawer()),
     openOLSDrawer: () => dispatch(openOLSDrawer()),
     pushChatHistory: (entry: ChatEntry) => dispatch(pushChatHistory(entry)),

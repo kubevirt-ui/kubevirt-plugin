@@ -2,7 +2,9 @@ import { dump as dumpYAML } from 'js-yaml';
 
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import { OLS_SUBMIT_BUTTON_ELEMENT_CLASS, OLSAttachmentTypes } from '@lightspeed/utils/constants';
+import { DEFAULT_MAX_EVENTS, OLS_SUBMIT_BUTTON_ELEMENT_CLASS } from '@lightspeed/utils/constants';
+import { OLSAttachment, OLSAttachmentTypes } from '@lightspeed/utils/types';
+import { EventKind } from '@openshift-console/dynamic-plugin-sdk/lib/api/internal-types';
 
 const getPromptSubmitButton = (): HTMLButtonElement =>
   document.getElementsByClassName(OLS_SUBMIT_BUTTON_ELEMENT_CLASS)[0] as HTMLButtonElement;
@@ -30,19 +32,35 @@ export const clickOLSPromptSubmitButton = () => {
   });
 };
 
-export const asOLSAttachment = (obj: K8sResourceCommon) => {
+const asYAML = (input: any) => {
   try {
-    const yaml = dumpYAML(obj, { lineWidth: -1 }).trim();
-
-    return {
-      attachmentType: OLSAttachmentTypes.YAML,
-      kind: obj?.kind,
-      name: getName(obj),
-      namespace: getNamespace(obj),
-      ownerName: null,
-      value: yaml,
-    };
+    return dumpYAML(input, { lineWidth: -1 }).trim();
   } catch (e) {
-    kubevirtConsole.error('**** error converting YAML: ', e);
+    kubevirtConsole.error('Error converting YAML: ', e);
   }
+};
+
+export const asOLSYAMLAttachment = (obj: K8sResourceCommon): OLSAttachment => ({
+  attachmentType: OLSAttachmentTypes.YAML,
+  kind: obj?.kind,
+  name: getName(obj),
+  namespace: getNamespace(obj),
+  ownerName: null,
+  value: asYAML(obj),
+});
+
+export const asOLSEventsAttachment = (
+  obj: K8sResourceCommon,
+  events: EventKind[],
+): OLSAttachment => {
+  const numEvents = Math.min(events.length, DEFAULT_MAX_EVENTS);
+
+  return {
+    attachmentType: OLSAttachmentTypes.Events,
+    kind: obj?.kind,
+    name: getName(obj),
+    namespace: getNamespace(obj),
+    ownerName: null,
+    value: asYAML(events.slice(-numEvents)),
+  };
 };

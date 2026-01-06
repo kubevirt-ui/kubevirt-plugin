@@ -3,15 +3,21 @@ import { action } from 'typesafe-actions';
 import { Attachment, ChatEntry, Tool } from '@lightspeed/hooks/useLightspeedActions/utils/types';
 
 export enum OLSActionType {
+  AttachmentsClear = 'attachmentsClear',
   AttachmentSet = 'attachmentSet',
   ChatHistoryPush = 'chatHistoryPush',
   ChatHistoryUpdateByID = 'chatHistoryUpdateByID',
   ChatHistoryUpdateTool = 'chatHistoryUpdateTool',
+  ClearContextEvents = 'clearContextEvents',
   CloseOLS = 'closeOLS',
   OpenOLS = 'openOLS',
   SetConversationID = 'setConversationID',
   SetQuery = 'setQuery',
 }
+
+export const attachmentsClear = () => action(OLSActionType.AttachmentsClear);
+
+export const clearContextEvents = () => action(OLSActionType.ClearContextEvents);
 
 export const closeOLSDrawer = () => action(OLSActionType.CloseOLS);
 
