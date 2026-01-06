@@ -4,7 +4,6 @@ import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-a
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ModalComponentProps } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import {
   Button,
@@ -16,7 +15,7 @@ import {
   ModalFooter,
   ModalHeader,
 } from '@patternfly/react-core';
-import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils/constants';
+import { useAccessibleResources } from '@virtualmachines/search/hooks/useAccessibleResources';
 
 import { AdvancedSearchInputs, AdvancedSearchQueryInputs } from '../../utils/types';
 
@@ -55,12 +54,9 @@ const AdvancedSearchModal: FC<AdvancedSearchModalProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const [vms] = useKubevirtWatchResource<V1VirtualMachine[]>({
-    groupVersionKind: VirtualMachineModelGroupVersionKind,
-    isList: true,
-    limit: OBJECTS_FETCHING_LIMIT,
-    namespaced: true,
-  });
+  const { resources: vms } = useAccessibleResources<V1VirtualMachine>(
+    VirtualMachineModelGroupVersionKind,
+  );
 
   const isACMPage = useIsACMPage();
 

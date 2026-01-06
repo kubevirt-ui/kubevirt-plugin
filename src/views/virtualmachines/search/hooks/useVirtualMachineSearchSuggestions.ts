@@ -5,12 +5,13 @@ import {
   VirtualMachineModelGroupVersionKind,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import { getAnnotation, getLabels, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVMIIPAddresses } from '@kubevirt-utils/resources/vmi/utils/ips';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { SearchSuggestResult } from '@search/utils/types';
-import { compareCIDR, OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
+import { compareCIDR } from '@virtualmachines/utils';
+
+import { useAccessibleResources } from './useAccessibleResources';
 
 type UseVirtualMachineSearchSuggestions = (
   searchQuery: string,
@@ -19,19 +20,12 @@ type UseVirtualMachineSearchSuggestions = (
 export const useVirtualMachineSearchSuggestions: UseVirtualMachineSearchSuggestions = (
   searchQuery,
 ) => {
-  const [vms, vmsLoaded] = useKubevirtWatchResource<V1VirtualMachine[]>({
-    groupVersionKind: VirtualMachineModelGroupVersionKind,
-    isList: true,
-    limit: OBJECTS_FETCHING_LIMIT,
-    namespaced: true,
-  });
-
-  const [vmis, vmisLoaded] = useKubevirtWatchResource<V1VirtualMachineInstance[]>({
-    groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
-    isList: true,
-    limit: OBJECTS_FETCHING_LIMIT,
-    namespaced: true,
-  });
+  const { loaded: vmsLoaded, resources: vms } = useAccessibleResources<V1VirtualMachine>(
+    VirtualMachineModelGroupVersionKind,
+  );
+  const { loaded: vmisLoaded, resources: vmis } = useAccessibleResources<V1VirtualMachineInstance>(
+    VirtualMachineInstanceModelGroupVersionKind,
+  );
 
   const vmsToSuggest = useMemo<V1VirtualMachine[]>(
     () =>
