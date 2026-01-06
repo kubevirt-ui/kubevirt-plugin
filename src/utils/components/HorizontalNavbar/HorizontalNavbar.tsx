@@ -12,6 +12,8 @@ import StateHandler from '../StateHandler/StateHandler';
 import useDynamicPages from './utils/useDynamicPages';
 import { NavPageKubevirt, trimLastHistoryPath } from './utils/utils';
 
+import './HorizontalNavbar.scss';
+
 type HorizontalNavbarProps = {
   basePath?: string;
   error?: any;
@@ -107,7 +109,7 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
           })}
         </ul>
       </nav>
-      <div className={routesClassName || 'horizontal-navbar__routes'}>
+      <div className={classNames('horizontal-navbar__routes', routesClassName)}>
         <Routes>{RoutesComponents}</Routes>
       </div>
     </>
