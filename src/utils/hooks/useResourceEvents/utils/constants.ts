@@ -1,0 +1,2 @@
+export const EVENTS_MAX_MESSAGES = 500;
+export const EVENTS_FLUSH_INTERVAL = 500;
