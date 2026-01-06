@@ -49,7 +49,7 @@ const LoadBalanceSection: FC = () => {
       isIndented
       toggleContent={t('Load balance')}
     >
-      <DeschedulerSection />
+      <DeschedulerSection isOperatorInstalled={isOperatorInstalled} />
     </ExpandSectionWithCustomToggle>
   );
 };
