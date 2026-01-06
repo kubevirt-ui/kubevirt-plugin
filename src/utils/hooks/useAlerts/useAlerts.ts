@@ -103,7 +103,7 @@ const useAlerts: UseAlerts = () => {
   return {
     alerts: allAlerts,
     error: observabilityError || (isACMPage ? metricError : singleClusterAlerts.error),
-    loaded: isACMPage ? metricLoaded : singleClusterAlerts.loaded,
+    loaded: isACMPage ? metricLoaded && observabilityLoaded : singleClusterAlerts.loaded,
   };
 };
 
