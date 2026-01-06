@@ -9,6 +9,7 @@ import { extensions as dashboardExtensionsExtensions } from './src/views/dashboa
 import { extensions as StorageClassExtensions } from './src/views/storageclasses/extensions';
 import { extensions as StorageMigrationExtensions } from './src/views/storagemigrations/extensions';
 import { extensions as TopologyExtensions } from './src/views/topology/extensions';
+import { extensions as VirtualMachineInstanceMigrationsExtensions } from './src/views/virtualmachineinstancemigrations/extensions';
 import { extensions as VirtualMachinesExtensions } from './src/views/virtualmachines/extensions';
 
 const extensions: EncodedExtension[] = [
@@ -22,6 +23,7 @@ const extensions: EncodedExtension[] = [
   ...StorageMigrationExtensions,
   ...TopologyExtensions,
   ...MulticlusterExtensions,
+  ...VirtualMachineInstanceMigrationsExtensions,
   {
     properties: {
       flag: 'KUBEVIRT_CDI',

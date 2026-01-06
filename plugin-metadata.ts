@@ -9,6 +9,7 @@ import { exposedModules as dashboardExtensionsExposedModules } from './src/views
 import { exposedModules as StorageClassExposedModules } from './src/views/storageclasses/extensions';
 import { exposedModules as StorageMigrationExposedModules } from './src/views/storagemigrations/extensions';
 import { exposedModules as TopologyExposedModules } from './src/views/topology/extensions';
+import { exposedModules as VirtualMachineInstanceMigrationsExposedModules } from './src/views/virtualmachineinstancemigrations/extensions';
 import { exposedModules as VirtualMachinesExposedModules } from './src/views/virtualmachines/extensions';
 
 const metadata: ConsolePluginBuildMetadata = {
@@ -27,6 +28,7 @@ const metadata: ConsolePluginBuildMetadata = {
     ...StorageMigrationExposedModules,
     ...TopologyExposedModules,
     ...MulticlusterExposedModules,
+    ...VirtualMachineInstanceMigrationsExposedModules,
     BootableVolumesList: './views/bootablevolumes/list/BootableVolumesList.tsx',
     Catalog: './views/catalog/Catalog.tsx',
     ClusterOverviewPage: './views/clusteroverview/ClusterOverviewPage.tsx',
