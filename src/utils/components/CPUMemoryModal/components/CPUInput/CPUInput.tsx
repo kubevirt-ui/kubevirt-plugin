@@ -6,6 +6,8 @@ import {
   convertTopologyToVCPUs,
   CPUInputType,
   formatVCPUsAsSockets,
+  getInitialCPUInputType,
+  isSimpleCPUTopology,
 } from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, ButtonVariant, Popover, Radio, Title, TitleSizes } from '@patternfly/react-core';
@@ -17,16 +19,24 @@ import CPUHelperText from './components/vCPUInput/components/CPUHelperText/CPUHe
 import './CPUInput.scss';
 
 type CPUInputProps = {
+  cpuLimits: Record<string, number>;
   currentCPU: V1CPU;
   setUserEnteredCPU: Dispatch<SetStateAction<V1CPU>>;
   userEnteredCPU: V1CPU;
 };
 
-const CPUInput: FC<CPUInputProps> = ({ currentCPU, setUserEnteredCPU, userEnteredCPU }) => {
+const CPUInput: FC<CPUInputProps> = ({
+  cpuLimits,
+  currentCPU,
+  setUserEnteredCPU,
+  userEnteredCPU,
+}) => {
   const { t } = useKubevirtTranslation();
   const [selectedRadioOption, setSelectedRadioOption] = useState<CPUInputType>(
-    CPUInputType.editVCPU,
+    getInitialCPUInputType(userEnteredCPU),
   );
+
+  const isComplexTopology = !isSimpleCPUTopology(userEnteredCPU);
 
   const radioInputName = 'cpu-input-type';
 
@@ -52,15 +62,18 @@ const CPUInput: FC<CPUInputProps> = ({ currentCPU, setUserEnteredCPU, userEntere
         body={
           <VCPUInput
             cpu={formatVCPUsAsSockets(userEnteredCPU)}
-            isDisabled={selectedRadioOption !== CPUInputType.editVCPU}
+            isDisabled={selectedRadioOption !== CPUInputType.editVCPU || isComplexTopology}
             setCPU={setUserEnteredCPU}
           />
         }
         onClick={() => {
-          setSelectedRadioOption(CPUInputType.editVCPU);
+          if (!isComplexTopology) {
+            setSelectedRadioOption(CPUInputType.editVCPU);
+          }
         }}
         id={CPUInputType.editVCPU}
         isChecked={selectedRadioOption === CPUInputType.editVCPU}
+        isDisabled={isComplexTopology}
         isLabelWrapped
         name={radioInputName}
       />
@@ -72,6 +85,7 @@ const CPUInput: FC<CPUInputProps> = ({ currentCPU, setUserEnteredCPU, userEntere
         body={
           <CPUTopologyInput
             cpu={userEnteredCPU}
+            cpuLimits={cpuLimits}
             hide={selectedRadioOption !== CPUInputType.editTopologyManually}
             isDisabled={selectedRadioOption !== CPUInputType.editTopologyManually}
             setCPU={setUserEnteredCPU}
