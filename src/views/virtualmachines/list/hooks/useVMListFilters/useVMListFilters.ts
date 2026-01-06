@@ -1,11 +1,10 @@
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useClusterFilter } from '@kubevirt-utils/hooks/useClusterFilter';
-import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import { useProjectFilter } from '@kubevirt-utils/hooks/useProjectFilter';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
-import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils/constants';
+import { useAccessibleResources } from '@virtualmachines/search/hooks/useAccessibleResources';
 
 import { PVCMapper, VMIMapper } from '../../../utils/mappers';
 import { getArchitectureFilter } from '../../utils/filters/getArchitectureFilter';
@@ -32,11 +31,9 @@ export const useVMListFilters = (
 } => {
   const isACMPage = useIsACMPage();
 
-  const [vms] = useKubevirtWatchResource<V1VirtualMachine[]>({
-    groupVersionKind: VirtualMachineModelGroupVersionKind,
-    isList: true,
-    limit: OBJECTS_FETCHING_LIMIT,
-  });
+  const { resources: vms } = useAccessibleResources<V1VirtualMachine>(
+    VirtualMachineModelGroupVersionKind,
+  );
 
   const clusterFilter = useClusterFilter();
   const projectFilter = useProjectFilter();

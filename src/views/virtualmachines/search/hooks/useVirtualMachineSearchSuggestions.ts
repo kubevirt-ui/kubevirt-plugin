@@ -1,13 +1,17 @@
 import { useMemo } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  VirtualMachineInstanceModelGroupVersionKind,
+  VirtualMachineModelGroupVersionKind,
+} from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getAnnotation, getLabels, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVMIIPAddresses } from '@kubevirt-utils/resources/vmi/utils/ips';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { SearchSuggestResult } from '@search/utils/types';
 import { compareCIDR } from '@virtualmachines/utils';
 
-import { useAccessibleVMIs, useAccessibleVMs } from './useAccessibleVMs';
+import { useAccessibleResources } from './useAccessibleResources';
 
 type UseVirtualMachineSearchSuggestions = (
   searchQuery: string,
@@ -16,8 +20,12 @@ type UseVirtualMachineSearchSuggestions = (
 export const useVirtualMachineSearchSuggestions: UseVirtualMachineSearchSuggestions = (
   searchQuery,
 ) => {
-  const { vms, vmsLoaded } = useAccessibleVMs();
-  const { vmis, vmisLoaded } = useAccessibleVMIs();
+  const { loaded: vmsLoaded, resources: vms } = useAccessibleResources<V1VirtualMachine>(
+    VirtualMachineModelGroupVersionKind,
+  );
+  const { loaded: vmisLoaded, resources: vmis } = useAccessibleResources<V1VirtualMachineInstance>(
+    VirtualMachineInstanceModelGroupVersionKind,
+  );
 
   const vmsToSuggest = useMemo<V1VirtualMachine[]>(
     () =>
