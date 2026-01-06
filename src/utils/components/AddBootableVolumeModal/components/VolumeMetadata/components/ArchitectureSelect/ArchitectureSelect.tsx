@@ -5,11 +5,12 @@ import {
   SetBootableVolumeFieldType,
 } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/constants';
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import useHcoWorkloadArchitectures from '@kubevirt-utils/hooks/useHcoWorkloadArchitectures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ARCHITECTURE_TITLE } from '@kubevirt-utils/utils/architecture';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { Alert, AlertVariant, FormGroup, SelectOption } from '@patternfly/react-core';
+import { FormGroup, PopoverPosition, SelectOption } from '@patternfly/react-core';
 
 type ArchitectureSelectProps = {
   bootableVolumeState: AddBootableVolumeState;
@@ -31,11 +32,23 @@ const ArchitectureSelect: FC<ArchitectureSelectProps> = ({
 
   return (
     <>
-      <FormGroup label={ARCHITECTURE_TITLE}>
+      <FormGroup
+        labelHelp={
+          <HelpTextIcon
+            bodyContent={t(
+              'The architecture type will be added as a suffix to the bootable volume name.',
+            )}
+            position={PopoverPosition.right}
+          />
+        }
+        label={t(ARCHITECTURE_TITLE)}
+      >
         <FormPFSelect
+          selectedLabel={
+            architectures?.length ? architectures.join(', ') : t('Select architecture')
+          }
           closeOnSelect={true}
           selected={architectures}
-          selectedLabel={architectures?.join(', ') ?? t('Select architecture')}
           toggleProps={{ isFullWidth: true }}
         >
           {workloadArchitectures.map((arch: string) => (
@@ -57,16 +70,6 @@ const ArchitectureSelect: FC<ArchitectureSelectProps> = ({
           ))}
         </FormPFSelect>
       </FormGroup>
-      {!isEmpty(architectures) && (
-        <Alert
-          title={t(
-            'Every selected architecture will create a DataSource resource with the selected architecture added as suffix to the bootable volume name.',
-          )}
-          isInline
-          isPlain
-          variant={AlertVariant.info}
-        />
-      )}
     </>
   );
 };
