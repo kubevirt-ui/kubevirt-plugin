@@ -20,6 +20,7 @@ export const getStatusClass = (vmStatus: string) => {
     case printableVMStatus.Terminating:
       return 'kubevirt-m-terminating';
     case printableVMStatus.Migrating:
+    case printableVMStatus.WaitingForReceiver:
     case printableVMStatus.Running:
       return 'kubevirt-m-running';
     case printableVMStatus.Stopped:

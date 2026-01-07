@@ -31,6 +31,7 @@ export const printableVMStatus = {
   Stopping: 'Stopping',
   Terminating: 'Terminating',
   Unknown: 'Unknown',
+  WaitingForReceiver: 'WaitingForReceiver',
   WaitingForVolumeBinding: 'WaitingForVolumeBinding',
 };
 
@@ -57,6 +58,7 @@ export const getVMStatusIcon = (status: string): ComponentClass | FC => {
     case printableVMStatus.Starting:
     case printableVMStatus.Stopping:
     case printableVMStatus.Terminating:
+    case printableVMStatus.WaitingForReceiver:
       return InProgressIcon;
     case printableVMStatus.Running:
       return GreenRunningIcon;

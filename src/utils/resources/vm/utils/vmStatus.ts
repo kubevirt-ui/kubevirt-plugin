@@ -16,6 +16,7 @@ export enum VM_STATUS {
   Stopping = 'Stopping',
   Terminating = 'Terminating',
   Unknown = 'Unknown',
+  WaitingForReceiver = 'WaitingForReceiver',
   WaitingForVolumeBinding = 'WaitingForVolumeBinding',
 }
 
