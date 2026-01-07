@@ -3,9 +3,8 @@ import React, { FC } from 'react';
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
 
-import useVirtualMachineTemplatesActions, {
-  EDIT_TEMPLATE_ID,
-} from './hooks/useVirtualMachineTemplatesActions';
+import useVirtualMachineTemplatesActions from './hooks/useVirtualMachineTemplatesActions';
+import { EDIT_TEMPLATE_ID } from './constants';
 
 type VirtualMachineTemplatesActionsProps = { isKebabToggle?: boolean; template: V1Template };
 
