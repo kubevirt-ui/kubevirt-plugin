@@ -15,7 +15,7 @@ RUN npm ci --ignore-scripts
 RUN npm run build
 
 # Image info: https://catalog.redhat.com/en/software/containers/ubi9/nginx-124/657b066b6c1bc124a1d7ff39
-FROM registry.access.redhat.com/ubi9/nginx-124:9.7-1764620487
+FROM registry.access.redhat.com/ubi9/nginx-124:9.7-1767745334
 
 COPY --from=builder /opt/app-root/src/dist /usr/share/nginx/html
 USER 1001
