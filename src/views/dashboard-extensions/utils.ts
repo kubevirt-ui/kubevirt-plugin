@@ -36,6 +36,7 @@ export const printableVmStatus = {
   Stopping: 'Stopping',
   Terminating: 'Terminating',
   Unknown: 'Unknown',
+  WaitingForReceiver: 'WaitingForReceiver',
   WaitingForVolumeBinding: 'WaitingForVolumeBinding',
 };
 
@@ -76,6 +77,7 @@ export const printableStatusToLabel = {
   [printableVmStatus.Stopping]: VMStatusSimpleLabel.Stopping,
   [printableVmStatus.Terminating]: VMStatusSimpleLabel.Deleting,
   [printableVmStatus.Unknown]: StatusSimpleLabel.Other,
+  [printableVmStatus.WaitingForReceiver]: VMStatusSimpleLabel.Migrating,
   [printableVmStatus.WaitingForVolumeBinding]: VMStatusSimpleLabel.Starting,
 };
 
