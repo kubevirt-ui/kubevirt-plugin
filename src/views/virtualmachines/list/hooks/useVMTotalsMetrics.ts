@@ -8,7 +8,7 @@ import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
 import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import { METRICS } from '@overview/OverviewTab/metric-charts-card/utils/constants';
-import { useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';
+import { useFleetPrometheusPoll, useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import {
   getCpuRequestedText,
@@ -23,14 +23,15 @@ const useVMTotalsMetrics = (vmis: V1VirtualMachineInstance[]) => {
   const namespace = useNamespaceParam();
   const clusters = useListClusters();
   const namespaces = useListNamespaces();
+  const [hubClusterName] = useHubClusterName();
 
   const isAllClustersPage = useIsAllClustersPage();
 
   const currentTime = useMemo<number>(() => Date.now(), []);
 
   const queries = useMemo(
-    () => getVMTotalsQueries(namespaces, clusters, isAllClustersPage),
-    [namespaces, clusters, isAllClustersPage],
+    () => getVMTotalsQueries(namespaces, clusters, isAllClustersPage, hubClusterName),
+    [namespaces, clusters, isAllClustersPage, hubClusterName],
   );
 
   const prometheusPollProps = {

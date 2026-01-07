@@ -12,10 +12,12 @@ export const getVMTotalsQueries = (
   namespaces: string[],
   clusters?: string[],
   allClusters = false,
+  hubClusterName?: string,
 ) => {
   const isAllNamespaces = isEmpty(namespaces);
 
-  const clusterFilter = isEmpty(clusters) ? '' : `cluster=~'${clusters.join('|')}'`;
+  const filteredClusters = clusters?.filter((c) => c !== hubClusterName);
+  const clusterFilter = isEmpty(filteredClusters) ? '' : `cluster=~'${filteredClusters.join('|')}'`;
 
   const filters = isAllNamespaces
     ? `{${clusterFilter}}`
