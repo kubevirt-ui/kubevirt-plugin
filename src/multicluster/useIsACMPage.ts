@@ -19,7 +19,8 @@ const useIsACMPage = ({ activePerspectiveSync = true }: UseIsACMPageOptions = {}
     if (
       activePerspectiveSync &&
       isACMPathResult &&
-      activePerspective !== PERSPECTIVES.FLEET_VIRTUALIZATION
+      activePerspective !== PERSPECTIVES.FLEET_VIRTUALIZATION &&
+      setActivePerspective !== undefined
     ) {
       setActivePerspective(PERSPECTIVES.FLEET_VIRTUALIZATION);
     }
