@@ -52,10 +52,11 @@ export const getDiskRowDataLayout = (
       storageClass: dataVolumeTemplate?.spec?.storage?.storageClassName || NO_DATA_DASH,
     };
 
-    const dataSourceSize = getPVCSize(pvc) || getDataVolumeSize(dataVolume);
-    const dataVolumeCustomSize = dataVolumeTemplate?.spec?.storage?.resources?.requests?.storage;
+    const pvcSize = getPVCSize(pvc);
+    const dataVolumeSize = getDataVolumeSize(dataVolume);
+    const dataVolumeTemplateSize = dataVolumeTemplate?.spec?.storage?.resources?.requests?.storage;
 
-    const size = getHumanizedSize(dataVolumeCustomSize || dataSourceSize);
+    const size = getHumanizedSize(pvcSize || dataVolumeSize || dataVolumeTemplateSize);
 
     diskRowDataObject.size = size.value === 0 ? NO_DATA_DASH : size.string;
 
