@@ -141,7 +141,6 @@ export const useTreeViewData = (): UseTreeViewData => {
     return createSingleClusterTreeViewData(
       projectNames,
       sortedMemoizedVMs,
-      isAdmin,
       location.pathname,
       treeViewFoldersEnabled,
       location.search,
@@ -151,7 +150,6 @@ export const useTreeViewData = (): UseTreeViewData => {
     isACMTreeView,
     projectNames,
     sortedMemoizedVMs,
-    isAdmin,
     location.pathname,
     treeViewFoldersEnabled,
     clusterNames,

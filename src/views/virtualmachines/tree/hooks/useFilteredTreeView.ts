@@ -1,5 +1,6 @@
 import { ChangeEvent, useCallback, useMemo, useState } from 'react';
 
+import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 import { isSystemNamespace } from '@kubevirt-utils/resources/namespace/helper';
 import { TreeViewDataItem } from '@patternfly/react-core';
@@ -13,6 +14,7 @@ type UseFilteredTreeView = (treeData: TreeViewDataItem[]) => {
 };
 
 const useFilteredTreeView: UseFilteredTreeView = (treeData) => {
+  const isAdmin = useIsAdmin();
   const [showEmptyProjects] = useLocalStorage(SHOW_EMPTY_PROJECTS_KEY, HIDE);
   const [filteredItems, setFilteredItems] = useState<TreeViewDataItem[]>();
 
@@ -35,16 +37,23 @@ const useFilteredTreeView: UseFilteredTreeView = (treeData) => {
   const filteredTreeData = useMemo(() => {
     const items = filteredItems ?? treeData;
 
-    const hasNonSystemNamespaces = items
-      .filter((item) => item.id?.startsWith(PROJECT_SELECTOR_PREFIX))
-      .some((item) => !isSystemNamespace(item.name as string));
+    const nonAdminItems =
+      items
+        .filter((item) => item.id?.startsWith(PROJECT_SELECTOR_PREFIX))
+        .some((item) => !isSystemNamespace(item.name as string)) ||
+      items
+        .flatMap((item) => item.children || [])
+        .filter((child) => child.id?.startsWith(PROJECT_SELECTOR_PREFIX))
+        .some((child) => !isSystemNamespace(child.name as string));
+
+    const hasNonSystemNamespaces = isAdmin ? false : nonAdminItems;
 
     return items
       .map((opt) => Object.assign({}, opt))
       .filter((item) =>
         filterNamespaceItems(item, showEmptyProjects === SHOW, hasNonSystemNamespaces),
       );
-  }, [filteredItems, treeData, showEmptyProjects]);
+  }, [filteredItems, treeData, showEmptyProjects, isAdmin]);
 
   return { filteredTreeData, onSearch };
 };

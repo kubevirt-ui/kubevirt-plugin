@@ -4,7 +4,7 @@ import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdo
 import CreateProjectModal from '@kubevirt-utils/components/CreateProjectModal/CreateProjectModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { NamespaceModel } from '@kubevirt-utils/models';
+import { ProjectRequestModel } from '@kubevirt-utils/models';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -17,8 +17,8 @@ const useClusterActions = (cluster?: string) => {
     () => [
       {
         accessReview: {
-          group: NamespaceModel.apiGroup,
-          resource: NamespaceModel.plural,
+          group: ProjectRequestModel.apiGroup,
+          resource: ProjectRequestModel.plural,
           verb: 'create',
         },
         cta: () =>
