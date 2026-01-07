@@ -11,7 +11,7 @@ import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal'
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useLastNamespacePath } from '@kubevirt-utils/hooks/useLastNamespacePath';
+import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import { asAccessReview, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import {
   getACMTemplateListURL,
@@ -31,6 +31,7 @@ import {
   NO_EDIT_TEMPLATE_PERMISSIONS,
 } from '../../utils/constants';
 import EditBootSourceModal from '../components/EditBootSourceModal';
+import { EDIT_TEMPLATE_ID } from '../constants';
 import {
   createDataVolume,
   getBootDataSource,
@@ -38,12 +39,11 @@ import {
   hasEditableBootSource,
 } from '../editBootSource';
 
-type useVirtualMachineTemplatesActionsProps = (
+type UseVirtualMachineTemplatesActions = (
   template: V1Template,
 ) => [actions: Action[], onLazyActions: () => void];
 
-export const EDIT_TEMPLATE_ID = 'edit-template';
-const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps = (
+const useVirtualMachineTemplatesActions: UseVirtualMachineTemplatesActions = (
   template: V1Template,
 ) => {
   const { t } = useKubevirtTranslation();
@@ -53,7 +53,7 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
   const [bootDataSource, setBootDataSource] = useState<V1beta1DataSource>();
   const [loadingBootSource, setLoadingBootSource] = useState(true);
   const editableBootSource = hasEditableBootSource(bootDataSource);
-  const lastNamespacePath = useLastNamespacePath();
+  const namespace = useNamespaceParam();
   const [hubClusterName] = useHubClusterName();
   const cluster = getCluster(template) || hubClusterName;
   const isACMPage = useIsACMPage();
@@ -109,9 +109,7 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
       cluster,
       model: TemplateModel,
       resource: template,
-    }).then(() =>
-      navigate(isACMPage ? getACMTemplateListURL() : getTemplateListURL(lastNamespacePath)),
-    );
+    }).then(() => navigate(isACMPage ? getACMTemplateListURL() : getTemplateListURL(namespace)));
   };
 
   const actions = [
@@ -239,6 +237,7 @@ const useVirtualMachineTemplatesActions: useVirtualMachineTemplatesActionsProps 
             obj={template}
             onClose={onClose}
             onDeleteSubmit={onDelete}
+            shouldRedirect={false}
           />
         )),
       description:
