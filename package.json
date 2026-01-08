@@ -17,7 +17,7 @@
     "@patternfly/react-tokens": "6.2.2",
     "@patternfly/react-topology": "6.2.0",
     "@preact/signals-react": "^2.0.1",
-    "@stolostron/multicluster-sdk": "^0.8.0",
+    "@stolostron/multicluster-sdk": "^0.8.1",
     "@xterm/addon-clipboard": "^0.1.0",
     "@xterm/addon-fit": "^0.10.0",
     "@xterm/xterm": "^5.5.0",
