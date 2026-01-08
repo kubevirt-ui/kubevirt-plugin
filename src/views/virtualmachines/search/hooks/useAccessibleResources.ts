@@ -16,6 +16,7 @@ type UseAccessibleResources<T> = {
 
 export const useAccessibleResources = <T>(
   groupVersionKind: K8sGroupVersionKind,
+  cluster?: string,
 ): UseAccessibleResources<T> => {
   const isAdmin = useIsAdmin();
   const isACMPage = useIsACMPage();
@@ -27,6 +28,7 @@ export const useAccessibleResources = <T>(
   const [allResources, allResourcesLoaded] = useKubevirtWatchResource<T[]>(
     shouldFetchClusterWide
       ? {
+          cluster,
           groupVersionKind,
           isList: true,
           limit: OBJECTS_FETCHING_LIMIT,
