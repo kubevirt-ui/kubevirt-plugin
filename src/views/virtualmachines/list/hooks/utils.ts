@@ -36,9 +36,8 @@ export const getVMListQueries = (
 
   const duration = clusters || allClusters ? '15m' : '30s';
   return {
-    [VMListQueries.CPU_REQUESTED]: `kube_pod_resource_request{resource='cpu',${filters}}`,
-    [VMListQueries.CPU_USAGE]: `rate(kubevirt_vmi_cpu_usage_seconds_total{${filters}}[${duration}])`,
-    [VMListQueries.MEMORY_USAGE]: `kubevirt_vmi_memory_used_bytes{${filters}}`,
-    [VMListQueries.NETWORK_TOTAL_USAGE]: `rate(kubevirt_vmi_network_transmit_bytes_total{${filters}}[${duration}]) + rate(kubevirt_vmi_network_receive_bytes_total{${filters}}[${duration}])`,
+    [VMListQueries.CPU_USAGE]: `sum(rate(kubevirt_vmi_cpu_usage_seconds_total{${filters}}[${duration}])) BY (name, namespace, cluster)`,
+    [VMListQueries.MEMORY_USAGE]: `sum(kubevirt_vmi_memory_used_bytes{${filters}}) BY (name, namespace, cluster)`,
+    [VMListQueries.NETWORK_TOTAL_USAGE]: `sum(rate(kubevirt_vmi_network_transmit_bytes_total{${filters}}[${duration}]) + rate(kubevirt_vmi_network_receive_bytes_total{${filters}}[${duration}])) BY (name, namespace, cluster)`,
   };
 };
