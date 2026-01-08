@@ -4,7 +4,6 @@ import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 import ClusterProjectDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterProjectDropdown';
 import { PageTitles } from '@kubevirt-utils/constants/page-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useIsACMPage from '@multicluster/useIsACMPage';
 import {
   DocumentTitle,
   HorizontalNav,
@@ -20,23 +19,25 @@ const CheckupsList: FC = () => {
   const { t } = useKubevirtTranslation();
   const location = useLocation();
   const navigate = useNavigate();
-  const isACMpage = useIsACMPage();
 
   const pages = useMemo(() => getCheckUpTabs(t), [t]);
 
-  // Redirect to default tab if URL is just /checkups
+  // Remove trailing slash and redirect to default tab if URL is just /checkups
   useEffect(() => {
-    const normalizedPath = location.pathname.endsWith('/')
-      ? location.pathname.slice(0, -1)
-      : location.pathname;
+    // Remove trailing slash if present
+    if (location.pathname.endsWith('/')) {
+      navigate(location.pathname.slice(0, -1), { replace: true });
+      return;
+    }
 
-    if (normalizedPath.endsWith('/checkups')) {
+    // Redirect to default tab if URL is just /checkups
+    if (location.pathname.endsWith('/checkups')) {
       const defaultTab = pages[0];
       if (defaultTab?.href) {
-        navigate(`${normalizedPath}/${defaultTab.href}`, { replace: true });
+        navigate(`${location.pathname}/${defaultTab.href}`, { replace: true });
       }
     }
-  }, [location.pathname, pages, navigate, isACMpage]);
+  }, [location.pathname, pages, navigate]);
 
   return (
     <>
