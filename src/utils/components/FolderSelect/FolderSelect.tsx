@@ -27,12 +27,13 @@ const FolderSelect: FC<FoldersSelectProps> = ({
 
   return (
     <SelectTypeahead
-      addOption={(input) =>
+      addOption={(input) => {
         setFolderOptions((prev) => [
           ...(prev ?? []).filter((opt) => opt.value !== input),
           createNewFolderOption(input),
-        ])
-      }
+        ]);
+        return true;
+      }}
       canCreate
       dataTestId="vm-folder-select"
       getCreateAction={getCreateNewFolderOption}

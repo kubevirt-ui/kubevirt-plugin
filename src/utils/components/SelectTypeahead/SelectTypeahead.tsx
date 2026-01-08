@@ -39,7 +39,7 @@ export type SelectTypeaheadOptionProps = {
 };
 
 type SelectTypeaheadProps = {
-  addOption?: (value: string) => void;
+  addOption?: (value: string) => boolean;
   canCreate?: boolean;
   dataTestId?: string;
   getCreateAction?: (value: string, t: TFunction) => SelectOptionProps;
@@ -167,8 +167,9 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
     if (!value) return;
 
     if (value === createActionId) {
-      addOption(inputValue);
-      selectOption({ value: inputValue });
+      if (addOption?.(inputValue)) {
+        selectOption({ value: inputValue });
+      }
       return;
     }
 
