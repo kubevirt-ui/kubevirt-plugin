@@ -40,7 +40,7 @@ const VirtualMachineListSummary: FC<VirtualMachineListSummaryProps> = ({ vmis, v
         >
           <ClusterInfo vms={vms} />
           <VirtualMachineStatuses vms={vms} />
-          <VirtualMachineUsage vmis={vmis} />
+          <VirtualMachineUsage vmis={vmis} vms={vms} />
         </Flex>
       </ExpandableSection>
     </Card>

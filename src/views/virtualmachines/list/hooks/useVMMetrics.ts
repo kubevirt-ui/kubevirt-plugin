@@ -7,7 +7,7 @@ import useVMListQueries from '@multicluster/hooks/useVMListQueries';
 import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import { useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';
 
-import { setVMCPUUsage, setVMMemoryUsage, setVMNetworkUsage } from '../metrics';
+import { Metric, setMetricFromResponse } from '../metrics';
 
 import { VMListQueries } from './constants';
 
@@ -35,7 +35,7 @@ const useVMMetrics = () => {
 
   const [networkTotalResponse] = useFleetPrometheusPoll({
     ...prometheusPollProps,
-    query: queries?.NETWORK_TOTAL_USAGE,
+    query: queries?.[VMListQueries.NETWORK_TOTAL_USAGE],
   });
 
   const [cpuUsageResponse] = useFleetPrometheusPoll({
@@ -43,38 +43,35 @@ const useVMMetrics = () => {
     query: queries?.[VMListQueries.CPU_USAGE],
   });
 
-  useEffect(() => {
-    networkTotalResponse?.data?.result?.forEach((result) => {
-      const vmName = result?.metric?.name;
-      const vmNamespace = result?.metric?.namespace;
-      const vmCluster = result?.metric?.cluster;
-      const memoryUsage = parseFloat(result?.value?.[1]);
+  const [storageUsageResponse] = useFleetPrometheusPoll({
+    ...prometheusPollProps,
+    query: queries?.[VMListQueries.STORAGE_USAGE],
+  });
 
-      setVMNetworkUsage(vmName, vmNamespace, vmCluster, memoryUsage);
-    });
+  const [storageCapacityResponse] = useFleetPrometheusPoll({
+    ...prometheusPollProps,
+    query: queries?.[VMListQueries.STORAGE_CAPACITY],
+  });
+
+  useEffect(() => {
+    setMetricFromResponse(networkTotalResponse, Metric.networkUsage);
   }, [networkTotalResponse]);
 
   useEffect(() => {
-    memoryUsageResponse?.data?.result?.forEach((result) => {
-      const vmName = result?.metric?.name;
-      const vmNamespace = result?.metric?.namespace;
-      const vmCluster = result?.metric?.cluster;
-      const memoryUsage = parseFloat(result?.value?.[1]);
-
-      setVMMemoryUsage(vmName, vmNamespace, vmCluster, memoryUsage);
-    });
+    setMetricFromResponse(memoryUsageResponse, Metric.memoryUsage);
   }, [memoryUsageResponse]);
 
   useEffect(() => {
-    cpuUsageResponse?.data?.result?.forEach((result) => {
-      const vmName = result?.metric?.name;
-      const vmNamespace = result?.metric?.namespace;
-      const vmCluster = result?.metric?.cluster;
-      const cpuUsage = parseFloat(result?.value?.[1]);
-
-      setVMCPUUsage(vmName, vmNamespace, vmCluster, cpuUsage);
-    });
+    setMetricFromResponse(cpuUsageResponse, Metric.cpuUsage);
   }, [cpuUsageResponse]);
+
+  useEffect(() => {
+    setMetricFromResponse(storageUsageResponse, Metric.storageUsage);
+  }, [storageUsageResponse]);
+
+  useEffect(() => {
+    setMetricFromResponse(storageCapacityResponse, Metric.storageCapacity);
+  }, [storageCapacityResponse]);
 };
 
 export default useVMMetrics;

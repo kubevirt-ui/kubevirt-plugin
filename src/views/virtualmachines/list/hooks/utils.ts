@@ -23,21 +23,19 @@ export const getVMNamesFromPodsNames = (pods: IoK8sApiCoreV1Pod[]) => {
   }, {});
 };
 
-export const getVMListQueries = (
-  namespaces: string[],
-  clusters?: string[],
-  allClusters = false,
-) => {
+export const getVMListQueries = (namespaces: string[], clusters?: string[]) => {
   const namespacesFilter = isEmpty(namespaces) ? '' : `namespace=~'${namespaces.join('|')}'`;
 
   const clustersFilter = isEmpty(clusters) ? '' : `cluster=~'${clusters.join('|')}'`;
 
   const filters = [namespacesFilter, clustersFilter].filter(Boolean).join(',');
 
-  const duration = clusters || allClusters ? '15m' : '30s';
+  const duration = '15m';
   return {
     [VMListQueries.CPU_USAGE]: `sum(rate(kubevirt_vmi_cpu_usage_seconds_total{${filters}}[${duration}])) BY (name, namespace, cluster)`,
     [VMListQueries.MEMORY_USAGE]: `sum(kubevirt_vmi_memory_used_bytes{${filters}}) BY (name, namespace, cluster)`,
     [VMListQueries.NETWORK_TOTAL_USAGE]: `sum(rate(kubevirt_vmi_network_transmit_bytes_total{${filters}}[${duration}]) + rate(kubevirt_vmi_network_receive_bytes_total{${filters}}[${duration}])) BY (name, namespace, cluster)`,
+    [VMListQueries.STORAGE_CAPACITY]: `sum(max(kubevirt_vmi_filesystem_capacity_bytes{${filters}}) BY (name, namespace, disk_name, cluster)) BY (name, namespace, cluster)`,
+    [VMListQueries.STORAGE_USAGE]: `sum(max(kubevirt_vmi_filesystem_used_bytes{${filters}}) BY (name, namespace, disk_name, cluster)) BY (name, namespace, cluster)`,
   };
 };
