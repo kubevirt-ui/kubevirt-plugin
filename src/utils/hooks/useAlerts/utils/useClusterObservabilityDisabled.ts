@@ -9,6 +9,9 @@ import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import { useClusterCNVInstalled } from './useClusterCNVInstalled';
+import { getMCONotInstalledTooltip, useMCOInstalled } from './useMCOInstalled';
+
+export { getMCONotInstalledTooltip };
 
 type K8sResourceList = K8sResourceCommon & {
   items: K8sResourceCommon[];
@@ -33,6 +36,7 @@ export const useClusterObservabilityDisabled = (
   enabledClusters: string[];
   error: Error | unknown;
   loaded: boolean;
+  mcoInstalled: boolean;
 } => {
   const isACMPage = useIsACMPage();
   const [hubClusterName] = useHubClusterName();
@@ -46,10 +50,15 @@ export const useClusterObservabilityDisabled = (
   });
 
   const { cnvInstalledClusters, loaded: cnvLoaded } = useClusterCNVInstalled();
+  const { loaded: mcoLoaded, mcoInstalled } = useMCOInstalled();
 
-  const { disabledClusters, enabledClusters: rawEnabledClusters } = useMemo(() => {
+  const {
+    allClusterNames,
+    disabledClusters,
+    enabledClusters: rawEnabledClusters,
+  } = useMemo(() => {
     if (!isACMPage || !managedClusterData) {
-      return { disabledClusters: [], enabledClusters: [] };
+      return { allClusterNames: [], disabledClusters: [], enabledClusters: [] };
     }
 
     let clusters: K8sResourceCommon[];
@@ -62,9 +71,10 @@ export const useClusterObservabilityDisabled = (
     }
 
     if (clusters.length === 0) {
-      return { disabledClusters: [], enabledClusters: [] };
+      return { allClusterNames: [], disabledClusters: [], enabledClusters: [] };
     }
 
+    const all: string[] = [];
     const disabled: string[] = [];
     const enabled: string[] = [];
 
@@ -72,6 +82,7 @@ export const useClusterObservabilityDisabled = (
       const clusterName = getName(mc);
       if (!clusterName) return;
 
+      all.push(clusterName);
       const observabilityDisabled = getLabel(mc, 'observability') === 'disabled';
       if (observabilityDisabled) {
         disabled.push(clusterName);
@@ -80,15 +91,46 @@ export const useClusterObservabilityDisabled = (
       }
     });
 
-    return { disabledClusters: disabled, enabledClusters: enabled };
+    return { allClusterNames: all, disabledClusters: disabled, enabledClusters: enabled };
   }, [isACMPage, managedClusterData]);
+
+  // When MCO is not installed, only the hub cluster should be enabled
+  // All spoke clusters should be disabled
+  const enabledClustersWithMCO = useMemo(() => {
+    if (!mcoLoaded) {
+      return rawEnabledClusters;
+    }
+
+    if (!mcoInstalled) {
+      // When MCO is not installed, only the hub cluster is enabled
+      return hubClusterName ? [hubClusterName] : [];
+    }
+
+    return rawEnabledClusters;
+  }, [mcoLoaded, mcoInstalled, rawEnabledClusters, hubClusterName]);
+
+  // When MCO is not installed, all clusters except hub are disabled
+  const disabledClustersWithMCO = useMemo(() => {
+    if (!mcoLoaded) {
+      return disabledClusters;
+    }
+
+    if (!mcoInstalled) {
+      // All clusters except hub are disabled when MCO is not installed
+      return allClusterNames.filter((name) => name !== hubClusterName);
+    }
+
+    return disabledClusters;
+  }, [mcoLoaded, mcoInstalled, disabledClusters, allClusterNames, hubClusterName]);
 
   const enabledClusters = useMemo(() => {
     if (!onlyCNVClusters || !cnvLoaded) {
-      return rawEnabledClusters;
+      return enabledClustersWithMCO;
     }
-    return rawEnabledClusters.filter((clusterName) => cnvInstalledClusters.includes(clusterName));
-  }, [onlyCNVClusters, cnvLoaded, rawEnabledClusters, cnvInstalledClusters]);
+    return enabledClustersWithMCO.filter((clusterName) =>
+      cnvInstalledClusters.includes(clusterName),
+    );
+  }, [onlyCNVClusters, cnvLoaded, enabledClustersWithMCO, cnvInstalledClusters]);
 
   // For non-ACM pages, return loaded=true immediately to avoid blocking consumers
   if (!isACMPage) {
@@ -97,13 +139,17 @@ export const useClusterObservabilityDisabled = (
       enabledClusters: [],
       error: undefined,
       loaded: true,
+      mcoInstalled: true,
     };
   }
 
+  const allLoaded = onlyCNVClusters ? loaded && cnvLoaded && mcoLoaded : loaded && mcoLoaded;
+
   return {
-    disabledClusters,
+    disabledClusters: disabledClustersWithMCO,
     enabledClusters,
     error: loadError,
-    loaded: onlyCNVClusters ? loaded && cnvLoaded : loaded,
+    loaded: allLoaded,
+    mcoInstalled,
   };
 };

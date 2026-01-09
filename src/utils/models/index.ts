@@ -135,3 +135,15 @@ export const MultiNamespaceVirtualMachineStorageMigrationModel: K8sModel = {
   namespaced: true,
   plural: 'multinamespacevirtualmachinestoragemigrations',
 };
+
+export const MultiClusterObservabilityModel: K8sModel = {
+  abbr: 'MCO',
+  apiGroup: 'observability.open-cluster-management.io',
+  apiVersion: 'v1beta2',
+  crd: true,
+  kind: 'MultiClusterObservability',
+  label: 'MultiClusterObservability',
+  labelPlural: 'MultiClusterObservabilities',
+  namespaced: false,
+  plural: 'multiclusterobservabilities',
+};

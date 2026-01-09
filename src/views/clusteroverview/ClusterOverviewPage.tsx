@@ -4,8 +4,12 @@ import { Helmet } from 'react-helmet';
 import ClusterProjectDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterProjectDropdown';
 import HorizontalNavbar from '@kubevirt-utils/components/HorizontalNavbar/HorizontalNavbar';
 import { NavPageKubevirt } from '@kubevirt-utils/components/HorizontalNavbar/utils/utils';
+import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';
 import { ALL_CLUSTERS_KEY } from '@kubevirt-utils/hooks/constants';
-import { useClusterObservabilityDisabled } from '@kubevirt-utils/hooks/useAlerts/utils/useClusterObservabilityDisabled';
+import {
+  getMCONotInstalledTooltip,
+  useClusterObservabilityDisabled,
+} from '@kubevirt-utils/hooks/useAlerts/utils/useClusterObservabilityDisabled';
 import { useForceProjectSelection } from '@kubevirt-utils/hooks/useForceProjectSelection';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -36,14 +40,31 @@ const ClusterOverviewPage: FC = () => {
     disabledClusters,
     error: observabilityError,
     loaded: observabilityLoaded,
+    mcoInstalled,
   } = useClusterObservabilityDisabled(true);
   useSignals();
+
+  // When MCO is not installed, also disable "All clusters" option
+  const disabledClustersWithAllClusters = useMemo(() => {
+    if (!observabilityLoaded || observabilityError) {
+      return undefined;
+    }
+
+    if (!mcoInstalled) {
+      // Include ALL_CLUSTERS_KEY to disable "All clusters" option when MCO is not installed
+      return [ALL_CLUSTERS_KEY, ...disabledClusters];
+    }
+
+    return disabledClusters;
+  }, [observabilityLoaded, observabilityError, mcoInstalled, disabledClusters]);
 
   useForceProjectSelection([VIRTUALIZATION_PATHS.OVERVIEW]);
   usePreserveTabDisplay({
     basePath: VIRTUALIZATION_PATHS.OVERVIEW,
     storageKey: 'lastVirtualizationOverviewTab',
   });
+
+  const isLoadingMCOCheck = isACMPage && !observabilityLoaded;
 
   const overviewTabs: NavPageKubevirt[] = useMemo(() => {
     const adminPages: NavPageKubevirt[] = [
@@ -101,14 +122,27 @@ const ClusterOverviewPage: FC = () => {
     ];
   }, [isAdmin, t, isACMPage]);
 
+  if (isLoadingMCOCheck) {
+    return (
+      <>
+        <Helmet>
+          <title>{t('Virtualization')}</title>
+        </Helmet>
+        <LoadingEmptyState />
+      </>
+    );
+  }
+
   return (
     <>
       {isACMPage && (
         <ClusterProjectDropdown
-          disabledClusters={
-            observabilityLoaded && !observabilityError ? disabledClusters : undefined
+          disabledItemTooltip={
+            !mcoInstalled
+              ? getMCONotInstalledTooltip(t)
+              : t('Observability is disabled for this cluster')
           }
-          disabledItemTooltip={t('Observability is disabled for this cluster')}
+          disabledClusters={disabledClustersWithAllClusters}
           includeAllClusters={true}
           includeAllProjects={true}
           onlyCNVClusters={true}
