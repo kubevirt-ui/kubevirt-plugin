@@ -28,7 +28,7 @@ const MigrationPoliciesList: FC<ListPageProps> = ({
   hideTextFilter,
   nameFilter,
   selector,
-  showTitle,
+  showTitle = true,
 }) => {
   const { t } = useKubevirtTranslation();
   const filteredClusters = useSelectedRowFilterClusters();

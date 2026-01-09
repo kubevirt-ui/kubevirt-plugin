@@ -8,7 +8,7 @@ type UsePreserveTabDisplayProps = {
   storageKey: string;
 };
 
-export const usePreserveTabDisplay = ({ basePath, storageKey }: UsePreserveTabDisplayProps) => {
+const usePreserveTabDisplay = ({ basePath, storageKey }: UsePreserveTabDisplayProps) => {
   const { ns: namespace } = useParams<{ ns: string }>();
   const location = useLocation();
   const navigate = useNavigate();
