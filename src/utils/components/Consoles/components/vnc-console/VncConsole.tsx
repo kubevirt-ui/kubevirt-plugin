@@ -1,7 +1,8 @@
-/* eslint-disable no-console */
 import React, { Dispatch, FC, memo, useCallback, useEffect, useRef } from 'react';
+import { partition } from 'lodash';
 
 import RFBCreate from '@novnc/novnc/lib/rfb';
+import { initLogging } from '@novnc/novnc/lib/util/logging';
 import { consoleFetchText } from '@openshift-console/dynamic-plugin-sdk';
 
 import { INSECURE, SECURE } from '../../utils/constants';
@@ -9,6 +10,7 @@ import { isConnectionEncrypted } from '../../utils/utils';
 import { ConsoleState, HTTP, HTTPS, VNC_CONSOLE_TYPE, WS, WSS } from '../utils/ConsoleConsts';
 import { ConsoleComponentState } from '../utils/types';
 
+import { VncLogLevel } from './utils/constants';
 import { isSessionAlreadyInUse } from './utils/util';
 import { RFB } from './utils/VncConsoleTypes';
 import {
@@ -28,6 +30,7 @@ import {
   sendF9,
   sendPasteCMD,
 } from './actions';
+import vncLogger from './VncLogger';
 
 import './vnc-console.scss';
 
@@ -38,6 +41,13 @@ export type VncConsoleProps = {
   scaleViewport?: boolean;
   setState: Dispatch<React.SetStateAction<ConsoleComponentState>>;
   viewOnly?: boolean;
+  vncLogLevel?: VncLogLevel;
+};
+
+type RfbSession = {
+  rfb: RFB;
+  sessionID: number;
+  testUrl: string;
 };
 
 const buildUrl = ({
@@ -60,8 +70,9 @@ export const VncConsole: FC<VncConsoleProps> = ({
   scaleViewport = true,
   setState,
   viewOnly = false,
+  vncLogLevel = false,
 }) => {
-  const rfbRef = useRef<RFB>(null);
+  const rfbRefs = useRef<RfbSession[]>([]);
   const staticRenderLocationRef = useRef(null);
   const sessionRef = useRef(0);
   const setVncState = useCallback(
@@ -72,9 +83,24 @@ export const VncConsole: FC<VncConsoleProps> = ({
     [setState],
   );
 
-  const postDisconnectCleanup = useCallback(
-    (sessionAlreadyInUse?: boolean) => {
-      rfbRef.current = null;
+  // render should be called once
+  vncLogger.log(vncLogLevel, `[VncConsole] render. Active session ${sessionRef.current}.`);
+
+  const notifyParentAboutDisconnect = useCallback(
+    (targetSession: number, sourceLabel: string, sessionAlreadyInUse?: boolean) => {
+      if (targetSession !== sessionRef.current) {
+        vncLogger.log(
+          vncLogLevel,
+          `[VncConsole][${sourceLabel}] notifyParentAboutDisconnect. Session already closed. Target session ${targetSession}, active session ${sessionRef.current}.`,
+          rfbRefs.current,
+        );
+        return;
+      }
+      vncLogger.log(
+        vncLogLevel,
+        `[VncConsole][${sourceLabel}] notifyParentAboutDisconnect. Target session ${targetSession}, active session ${sessionRef.current}, inUse=${sessionAlreadyInUse}.`,
+        rfbRefs.current,
+      );
       setVncState((prev) => ({
         actions: { connect: prev.actions.connect, disconnect: prev.actions.disconnect },
         state: sessionAlreadyInUse ? session_already_in_use : disconnected,
@@ -83,17 +109,62 @@ export const VncConsole: FC<VncConsoleProps> = ({
     [setVncState],
   );
 
-  const disconnect = useCallback(() => {
-    if (!rfbRef.current) {
-      return;
-    }
-    rfbRef.current.disconnect();
-    postDisconnectCleanup();
-  }, [postDisconnectCleanup]);
+  const disconnect = useCallback(
+    ({
+      sessionID = sessionRef.current,
+      sourceLabel = 'action',
+    }: { sessionAlreadyInUse?: boolean; sessionID?: number; sourceLabel?: string } = {}) => {
+      vncLogger.log(
+        vncLogLevel,
+        `[VncConsole] disconnect from ${sourceLabel}. Target session ${sessionID}, active session ${sessionRef.current}.`,
+        rfbRefs.current,
+      );
+      const [targetAndOlderSessions, newerSessions] = partition(
+        rfbRefs.current ?? [],
+        (it) => sessionID < 0 || it.sessionID <= sessionID,
+      );
+      rfbRefs.current = newerSessions;
+      targetAndOlderSessions.forEach(
+        ({ rfb }) => rfb._rfbConnectionState !== 'disconnected' && rfb?.disconnect(),
+      );
+      if (newerSessions.length || targetAndOlderSessions.length > 1) {
+        vncLogger.log(
+          vncLogLevel,
+          `[VncConsole] disconnect from ${sourceLabel}. Closed [${targetAndOlderSessions.length}] orphaned sessions starting with sessionID=${sessionID}, active session ${sessionRef.current}.`,
+          rfbRefs.current,
+        );
+        // skip notification - target session already closed
+        return;
+      }
+      const current = targetAndOlderSessions.find((it) => it.sessionID === sessionID);
+      const { testUrl } = current ?? {};
+      if (!testUrl) {
+        // synchronous cleanup
+        notifyParentAboutDisconnect(sessionID, sourceLabel);
+        return;
+      }
+
+      // try HTTP request to the same url as websockets
+      // the goal is to trigger an error and parse the message
+      // if it fails with specific error message then VNC is in use
+      // note that the test call is expected to fail
+      // however under some conditions it may connect successfully
+      // in both cases we need asynchronous cleanup
+      consoleFetchText(testUrl)
+        .then(() => notifyParentAboutDisconnect(sessionID, `${sourceLabel}-unexpected-success`))
+        .catch((error) =>
+          notifyParentAboutDisconnect(
+            sessionID,
+            `${sourceLabel}-error-triggered`,
+            isSessionAlreadyInUse(error),
+          ),
+        );
+    },
+    [notifyParentAboutDisconnect],
+  );
 
   const connect = useCallback(
     (preserveSession: boolean = true) => {
-      let abnormalDisconnect = false;
       setVncState(() => ({ state: connecting }));
       const sessionID = ++sessionRef.current;
       // prevent disconnect for old session to interact with current connection attempt
@@ -102,23 +173,25 @@ export const VncConsole: FC<VncConsoleProps> = ({
       const isEncrypted = isConnectionEncrypted();
       const path = `${basePath}/vnc`;
       const port = window.location.port || (isEncrypted ? SECURE : INSECURE);
-      const url = buildUrl({
+      const connectUrl = buildUrl({
         hostname: window.location.hostname,
         path,
         port,
         preserveSession,
         protocol: isEncrypted ? WSS : WS,
       });
-      const rfbInst: RFB = new RFBCreate(staticRenderLocationRef.current, url);
-      rfbInst.addEventListener(
-        'connect',
-        () => isMySession() && setVncState(() => ({ state: connected })),
-      );
-      rfbInst.addEventListener('disconnect', () => {
-        if (isMySession() && !abnormalDisconnect) {
-          postDisconnectCleanup(false);
-        }
+      const rfbInst: RFB = new RFBCreate(staticRenderLocationRef.current, connectUrl);
+      rfbInst.addEventListener('connect', () => {
+        vncLogger.log(
+          vncLogLevel,
+          `[VncConsole] connect id=${sessionID} currentId=${sessionRef.current}`,
+          rfbRefs.current,
+        );
+        isMySession() && setVncState(() => ({ state: connected }));
       });
+      rfbInst.addEventListener('disconnect', () =>
+        disconnect({ sessionID, sourceLabel: 'disconnectEvent' }),
+      );
 
       // noVNC's public API (disconnect event) does not expose error codes.
       // To detect specific WebSocket close codes we need to add our own callback.
@@ -126,34 +199,49 @@ export const VncConsole: FC<VncConsoleProps> = ({
       // Note that clean-up is not affected (will be performed by rfb as before).
       const rfbSocketClose = rfbInst._socketClose.bind(rfbInst);
       rfbInst._sock.on('close', (args) => {
-        // 1006 code === connection was closed abnormally
+        // 1006 code === connection was closed abnormally (according to the WS protocol)
         // triggered by 5xx HTTP server error
-        abnormalDisconnect = args.code === 1006;
-        rfbSocketClose(args);
+        // kubevirt API server is not closing the connection gracefully
+        // so "standard" disconnect will also trigger this code
+        const abnormalDisconnect = args.code === 1006;
 
-        if (!abnormalDisconnect) {
-          //continue standard disconnect flow
-          return;
+        const testUrl = buildUrl({
+          hostname: window.location.hostname,
+          path,
+          port,
+          // always test with preserveSession turned on
+          // otherwise the test will steal the connection
+          preserveSession: true,
+          // we need to test with http protocol due to bug:
+          // https://github.com/kubevirt/kubevirt/issues/16273
+          protocol: isEncrypted ? HTTPS : HTTP,
+        });
+        if (abnormalDisconnect) {
+          vncLogger.log(
+            vncLogLevel,
+            `[VncConsole] abnormal disconnect id=${sessionID} currentId=${sessionRef.current}`,
+            args,
+            rfbRefs.current,
+          );
+          // tag the session by adding a testUrl
+          // that information can be later retrieved in the disconnect even handler
+          rfbRefs.current =
+            rfbRefs.current?.map(
+              (it): RfbSession => ({
+                ...it,
+                testUrl: it.sessionID === sessionID ? testUrl : it.testUrl,
+              }),
+            ) ?? [];
         }
-        // try HTTP request to the same url as websockets
-        // if it fails with specific error message then VNC is in use
-        consoleFetchText(
-          buildUrl({
-            hostname: window.location.hostname,
-            path,
-            port,
-            preserveSession,
-            protocol: isEncrypted ? HTTPS : HTTP,
-          }),
-        )
-          .then(() => isMySession() && postDisconnectCleanup(false))
-          .catch((error) => isMySession() && postDisconnectCleanup(isSessionAlreadyInUse(error)));
+        // continue standard disconnect flow
+        // wait for the disconnect event being triggered
+        rfbSocketClose(args);
       });
 
       rfbInst.viewOnly = viewOnly;
       rfbInst.scaleViewport = scaleViewport;
 
-      rfbRef.current = rfbInst;
+      rfbRefs.current = [{ rfb: rfbInst, sessionID, testUrl: undefined }, ...rfbRefs.current];
 
       setVncState((prev) => ({
         actions: {
@@ -179,12 +267,17 @@ export const VncConsole: FC<VncConsoleProps> = ({
         },
       }));
     },
-    [basePath, viewOnly, scaleViewport, setVncState, postDisconnectCleanup],
+    [basePath, viewOnly, scaleViewport, setVncState, disconnect],
   );
 
   // auto-connect only on first load
   useEffect(() => {
-    if (!rfbRef.current) {
+    if (!rfbRefs.current?.length) {
+      vncLogLevel && initLogging(vncLogLevel);
+      vncLogger.log(
+        vncLogLevel,
+        `[VncConsole] auto-connect. Active session ${sessionRef.current}.`,
+      );
       connect();
       setVncState((prev) => ({
         actions: {
@@ -196,7 +289,11 @@ export const VncConsole: FC<VncConsoleProps> = ({
         },
       }));
     }
-    return () => disconnect();
+    // assumption: the parent keeps the object tree stable
+    // and prevents re-creating this component (the render is called once)
+    // Thanks to that the the cleanup is launched only when the parent is unmounted
+    // At this point we don't notify the parent and can just close all sessions
+    return () => disconnect({ sessionID: -1, sourceLabel: 'useEffect' });
   });
 
   return <div className={'vnc-container'} ref={staticRenderLocationRef} />;

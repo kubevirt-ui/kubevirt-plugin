@@ -1,9 +1,13 @@
 import React, { FC, useMemo } from 'react';
 
 import VmNotRunning from '@kubevirt-utils/components/Consoles/components/VmNotRunning';
+import {
+  isVncLogLevel,
+  KUBEVIRT_UI_VNC_LOG_LEVEL_LABEL,
+} from '@kubevirt-utils/components/Consoles/components/vnc-console/utils/constants';
 import Consoles from '@kubevirt-utils/components/Consoles/Consoles';
 import { getConsoleBasePath } from '@kubevirt-utils/components/Consoles/utils/utils';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isHeadlessMode } from '@kubevirt-utils/resources/vm';
 import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
 import { isWindows } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
@@ -37,7 +41,7 @@ const VirtualMachineConsolePage: FC<NavPageComponentProps> = ({ obj: vm }) => {
           <Spinner />
         </Bullseye>
       );
-
+    const logLevelLabel = getLabel(vm, KUBEVIRT_UI_VNC_LOG_LEVEL_LABEL);
     return (
       <PageSection className="virtual-machine-console-page-section" hasBodyWrapper={false}>
         <Consoles
@@ -53,6 +57,7 @@ const VirtualMachineConsolePage: FC<NavPageComponentProps> = ({ obj: vm }) => {
           vmCluster={cluster}
           vmName={name}
           vmNamespace={namespace}
+          vncLogLevel={isVncLogLevel(logLevelLabel) ? logLevelLabel : false}
         />
       </PageSection>
     );

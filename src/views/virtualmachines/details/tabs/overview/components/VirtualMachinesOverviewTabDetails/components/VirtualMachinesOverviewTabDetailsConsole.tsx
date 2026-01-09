@@ -6,6 +6,7 @@ import {
 } from '@kubevirt-utils/components/Consoles/components/utils/ConsoleConsts';
 import { ConsoleComponentState } from '@kubevirt-utils/components/Consoles/components/utils/types';
 import HideConsole from '@kubevirt-utils/components/Consoles/components/vnc-console/HideConsole';
+import { VncLogLevel } from '@kubevirt-utils/components/Consoles/components/vnc-console/utils/constants';
 import { isConnectableState } from '@kubevirt-utils/components/Consoles/components/vnc-console/utils/util';
 import VncConsole from '@kubevirt-utils/components/Consoles/components/vnc-console/VncConsole';
 import { getConsoleBasePath } from '@kubevirt-utils/components/Consoles/utils/utils';
@@ -24,11 +25,20 @@ type VirtualMachinesOverviewTabDetailsConsoleProps = {
   vmCluster?: string;
   vmName: string;
   vmNamespace: string;
+  vncLogLevel?: VncLogLevel;
 };
 
 const VirtualMachinesOverviewTabDetailsConsole: FC<
   VirtualMachinesOverviewTabDetailsConsoleProps
-> = ({ canConnectConsole, isHeadlessMode, isVMRunning, vmCluster, vmName, vmNamespace }) => {
+> = ({
+  canConnectConsole,
+  isHeadlessMode,
+  isVMRunning,
+  vmCluster,
+  vmName,
+  vmNamespace,
+  vncLogLevel,
+}) => {
   const { t } = useKubevirtTranslation();
   const [apiPath, apiPathLoaded] = useK8sBaseAPIPath(vmCluster);
   const [{ actions, state }, setState] = useState<ConsoleComponentState>({
@@ -73,6 +83,7 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
             basePath={getConsoleBasePath({ apiPath, name: vmName, namespace: vmNamespace })}
             setState={setState}
             viewOnly
+            vncLogLevel={vncLogLevel}
           />
         </HideConsole>
       )}

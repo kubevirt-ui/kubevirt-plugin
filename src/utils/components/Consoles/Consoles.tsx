@@ -17,6 +17,7 @@ import {
 import { ConsoleComponentState, ConsoleType } from './components/utils/types';
 import HideConsole from './components/vnc-console/HideConsole';
 import SessionAlreadyInUseModal from './components/vnc-console/SessionAlreadyInUseModal';
+import { VncLogLevel } from './components/vnc-console/utils/constants';
 import { isConnectableState } from './components/vnc-console/utils/util';
 import VncConnect from './components/vnc-console/VncConnect';
 import VncConsole from './components/vnc-console/VncConsole';
@@ -33,6 +34,7 @@ type ConsolesProps = {
   vmCluster?: string;
   vmName: string;
   vmNamespace: string;
+  vncLogLevel?: VncLogLevel;
 };
 
 const Consoles: FC<ConsolesProps> = ({
@@ -43,6 +45,7 @@ const Consoles: FC<ConsolesProps> = ({
   vmCluster,
   vmName,
   vmNamespace,
+  vncLogLevel,
 }) => {
   const { t } = useKubevirtTranslation();
   const [{ actions, state, type }, setState] = useState<ConsoleComponentState>({
@@ -90,7 +93,7 @@ const Consoles: FC<ConsolesProps> = ({
         )}
         {type === VNC_CONSOLE_TYPE && (
           <HideConsole isHidden={!isConnected}>
-            <VncConsole basePath={path} setState={setState} />
+            <VncConsole basePath={path} setState={setState} vncLogLevel={vncLogLevel} />
           </HideConsole>
         )}
         {type === SERIAL_CONSOLE_TYPE && showConnect && (
