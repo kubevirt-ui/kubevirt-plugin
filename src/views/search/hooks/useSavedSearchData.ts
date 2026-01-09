@@ -2,6 +2,7 @@ import { useCallback, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
+import useVMSearchURL from '@multicluster/hooks/useVMSearchURL';
 import { validSearchQueryParams } from '@search/utils/constants';
 
 type SavedSearchData = {
@@ -28,6 +29,7 @@ type UseSavedSearchData = () => SavedSearchDataResult;
 export const useSavedSearchData: UseSavedSearchData = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const searchPageURL = useVMSearchURL();
 
   const urlSearchQuery = useMemo(() => {
     const allParams = new URLSearchParams(location.search);
@@ -59,10 +61,10 @@ export const useSavedSearchData: UseSavedSearchData = () => {
       const query = savedSearches?.[name]?.query;
 
       if (query) {
-        navigate(`${location.pathname}?${query}${location.hash}`, { replace: true });
+        navigate(`${searchPageURL}?${query}${location.hash}`, { replace: true });
       }
     },
-    [savedSearches, navigate, location.pathname, location.hash],
+    [savedSearches, navigate, searchPageURL, location.hash],
   );
 
   const deleteSearch = useCallback<SavedSearchDataResult['deleteSearch']>(
