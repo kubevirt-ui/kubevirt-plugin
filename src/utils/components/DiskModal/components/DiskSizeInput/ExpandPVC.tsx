@@ -4,12 +4,13 @@ import { useFormContext } from 'react-hook-form';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getPVCSize } from '@kubevirt-utils/resources/bootableresources/selectors';
 import { formatQuantityString, quantityToString, toQuantity } from '@kubevirt-utils/utils/units';
 
 import { V1DiskFormState } from '../../utils/types';
 import { EXPAND_PVC_SIZE } from '../utils/constants';
 
-import { getMinSizes, getPVCStorageForInput } from './utils';
+import { getMinSizes } from './utils';
 
 type ExpandPVCProps = { pvc: IoK8sApiCoreV1PersistentVolumeClaim };
 
@@ -19,7 +20,7 @@ const ExpandPVC: FC<ExpandPVCProps> = ({ pvc }) => {
   const diskState = watch();
 
   const expandPVCSize = diskState.expandPVCSize;
-  const pvcStorage = formatQuantityString(getPVCStorageForInput(pvc));
+  const pvcStorage = formatQuantityString(getPVCSize(pvc));
   if (!pvcStorage) {
     return null;
   }
