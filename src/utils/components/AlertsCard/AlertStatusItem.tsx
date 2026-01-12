@@ -5,7 +5,6 @@ import { AlertType, SimplifiedAlert } from '@kubevirt-utils/components/AlertsCar
 import { alertIcon } from '@kubevirt-utils/components/AlertsCard/utils/utils';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useIsACMPage from '@multicluster/useIsACMPage';
 
 import './AlertStatusItem.scss';
 
@@ -16,9 +15,11 @@ type AlertStatusItemProps = {
 
 const AlertStatusItem: React.FC<AlertStatusItemProps> = ({ alertDetails, alertType }) => {
   const { t } = useKubevirtTranslation();
-  const isACMPage = useIsACMPage();
   const { alertName, description, isVMAlert, link, time } = alertDetails;
   const Icon = alertIcon[alertType];
+
+  const linkText =
+    alertType === AlertType.critical ? t('View alert') : t('View {{alertType}}', { alertType });
 
   return (
     <div className="alert-item">
@@ -37,20 +38,14 @@ const AlertStatusItem: React.FC<AlertStatusItemProps> = ({ alertDetails, alertTy
                   {t('VM')}
                 </span>
               )}
-              {!isACMPage && (
-                <Timestamp className="alert-item__timestamp" hideIcon timestamp={time} />
-              )}
+              <Timestamp className="alert-item__timestamp" hideIcon timestamp={time} />
             </span>
           </div>
           <div className="alert-name">{alertName}</div>
           <span className="alert-item__text co-break-word">{description}</span>
         </div>
         <div className="alert-item__more">
-          <Link to={link}>
-            {alertType === AlertType.critical
-              ? t('View alert')
-              : t('View {{alertType}}', { alertType })}
-          </Link>
+          <Link to={link}>{linkText}</Link>
         </div>
       </div>
     </div>
