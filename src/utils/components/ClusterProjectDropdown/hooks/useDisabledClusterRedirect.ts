@@ -33,14 +33,7 @@ export const useDisabledClusterRedirect = ({
 }: UseDisabledClusterRedirectProps): void => {
   useEffect(() => {
     if (!isACMPage) return;
-    if (
-      !clustersLoaded ||
-      !clusterNames ||
-      !cluster ||
-      cluster === ALL_CLUSTERS_KEY ||
-      !disabledClusters ||
-      disabledClusters.length === 0
-    ) {
+    if (!clustersLoaded || !clusterNames || !cluster || !disabledClusters) {
       return;
     }
 
@@ -53,9 +46,17 @@ export const useDisabledClusterRedirect = ({
     const omittedSet = new Set(onlyCNVClusters && cnvLoaded ? cnvNotInstalledClusters : []);
     const disabledSet = new Set(disabledClusters);
 
-    // If includeAllClusters is true, prefer "all clusters"
-    if (includeAllClusters) {
-      onClusterChange(ALL_CLUSTERS_KEY);
+    const redirectTo = (next: string | undefined): void => {
+      if (next && next !== cluster) {
+        onClusterChange(next);
+      }
+    };
+
+    const isAllClustersDisabled = disabledSet.has(ALL_CLUSTERS_KEY);
+    const shouldRedirectToAllClusters =
+      includeAllClusters && !isAllClustersDisabled && cluster !== ALL_CLUSTERS_KEY;
+    if (shouldRedirectToAllClusters) {
+      redirectTo(ALL_CLUSTERS_KEY);
       return;
     }
 
@@ -63,12 +64,6 @@ export const useDisabledClusterRedirect = ({
     const enabledCluster = clusterNames?.find(
       (name) => !omittedSet.has(name) && !disabledSet.has(name),
     );
-
-    const redirectTo = (next: string | undefined): void => {
-      if (next && next !== cluster) {
-        onClusterChange(next);
-      }
-    };
 
     if (enabledCluster) {
       redirectTo(enabledCluster);
