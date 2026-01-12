@@ -1,5 +1,5 @@
 import React, { FC, Suspense, useState } from 'react';
-import { load } from 'js-yaml';
+import { dump, load } from 'js-yaml';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -17,8 +17,12 @@ const CustomizeInstanceTypeYamlTab: FC = () => {
 
   const vm = vmSignal.value;
 
-  if (!vm) {
-    return <Loading />;
+  if (isEmpty(vm)) {
+    return (
+      <Bullseye>
+        <Loading />
+      </Bullseye>
+    );
   }
 
   const onSave = async (yaml: string) => {
@@ -30,12 +34,8 @@ const CustomizeInstanceTypeYamlTab: FC = () => {
     }
   };
 
-  if (isEmpty(vm))
-    return (
-      <Bullseye>
-        <Loading />
-      </Bullseye>
-    );
+  // Parse the VM object to a YAML string and back to remove undefined values
+  const parsedVM = load(dump(vm)) as V1VirtualMachine;
 
   return (
     <Suspense
@@ -46,7 +46,7 @@ const CustomizeInstanceTypeYamlTab: FC = () => {
       }
     >
       <div className="yaml-body">
-        <ResourceYAMLEditor initialResource={vm} onSave={onSave} />
+        <ResourceYAMLEditor initialResource={parsedVM} onSave={onSave} />
       </div>
       {error && (
         <div className="yaml-alert">
