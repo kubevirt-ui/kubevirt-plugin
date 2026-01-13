@@ -66,7 +66,7 @@ export const getPVCAndDVWatches = (vm: V1VirtualMachine) => {
 };
 
 export const getEjectedCDROMDrives = (diskDevices: DiskRawData[], vmDisks: V1Disk[]) => {
-  const diskDevicesSet = new Set(diskDevices.map((obj) => obj.disk.name));
+  const diskDevicesSet = new Set(diskDevices.map((obj) => obj.disk?.name).filter(Boolean));
   const ejectedCDROMDrives = (vmDisks || []).filter((obj) => !diskDevicesSet.has(obj.name));
   const mappedEjectedCDROMDrives = ejectedCDROMDrives.map((disk) => ({
     disk,
