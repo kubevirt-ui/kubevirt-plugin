@@ -35,12 +35,19 @@ const BootOrderModal: FC<{
 
   const updatedVirtualMachine = produce<V1VirtualMachine>(vm, (draftVM) => {
     ensurePath(draftVM, ['spec.template.spec.domain.devices']);
+    const updatedDevices = devices.map((device, index) => ({
+      ...device,
+      value: {
+        ...device.value,
+        bootOrder: index + 1,
+      },
+    }));
 
-    draftVM.spec.template.spec.domain.devices.disks = devices
+    draftVM.spec.template.spec.domain.devices.disks = updatedDevices
       .filter((source) => source.type === DeviceType.DISK)
       .map((source) => source.value);
 
-    draftVM.spec.template.spec.domain.devices.interfaces = devices
+    draftVM.spec.template.spec.domain.devices.interfaces = updatedDevices
       .filter((source) => source.type === DeviceType.NIC)
       .map((source) => source.value);
   });
