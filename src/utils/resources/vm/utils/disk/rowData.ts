@@ -38,10 +38,13 @@ export const getDiskRowDataLayout = (
     // eslint-disable-next-line require-jsdoc
     const volumeSource = Object.keys(volume).find((key) => key !== 'name');
 
+    const isDiskConfigured = disk && (disk.disk || disk.cdrom || disk.lun);
+
     const diskRowDataObject: DiskRowDataLayout = {
-      drive: isEmpty(disk) ? NO_DATA_DASH : getPrintableDiskDrive(disk),
+      drive: isEmpty(disk) || !isDiskConfigured ? NO_DATA_DASH : getPrintableDiskDrive(disk),
       hasDataVolume: Boolean(dataVolume),
-      interface: isEmpty(disk) ? NO_DATA_DASH : getPrintableDiskInterface(disk),
+      interface:
+        isEmpty(disk) || !isDiskConfigured ? NO_DATA_DASH : getPrintableDiskInterface(disk),
       isBootDisk: disk?.name === bootDisk?.name,
       isEnvDisk: !!volume?.configMap || !!volume?.secret || !!volume?.serviceAccount,
       metadata: { name: volume?.name },
@@ -70,6 +73,10 @@ export const getDiskRowDataLayout = (
 
     if (volumeSource === VolumeTypes.CONTAINER_DISK) {
       diskRowDataObject.source = CONTAINER_EPHERMAL;
+      diskRowDataObject.size = DYNAMIC;
+    }
+
+    if (volume.cloudInitNoCloud || volume.cloudInitConfigDrive) {
       diskRowDataObject.size = DYNAMIC;
     }
 
