@@ -1,6 +1,6 @@
+import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import DropdownEnum from '@kubevirt-utils/utils/dropdownEnum';
 import { ObjectEnum } from '@kubevirt-utils/utils/ObjectEnum';
-
 export const ONE_SECOND = 1000;
 export const ONE_MINUTE = 60 * ONE_SECOND;
 export const FIVE_MIN = 5 * ONE_MINUTE;
@@ -33,43 +33,43 @@ const getDurationMilliseconds = (duration) => mapperDuration?.[duration] || mapp
 
 class DurationOption extends DropdownEnum<string> {
   static readonly FIFTEEN_MIN = new DurationOption('15m', {
-    dropdownLabel: 'Last 15 minutes',
+    dropdownLabel: t('Last 15 minutes'),
   });
 
   static readonly FIVE_MIN = new DurationOption('5m', {
-    dropdownLabel: 'Last 5 minutes',
+    dropdownLabel: t('Last 5 minutes'),
   });
 
   static readonly ONE_DAY = new DurationOption('1d', {
-    dropdownLabel: 'Last 1 day',
+    dropdownLabel: t('Last 1 day'),
   });
 
   static readonly ONE_HOUR = new DurationOption('1h', {
-    dropdownLabel: 'Last 1 hour',
+    dropdownLabel: t('Last 1 hour'),
   });
 
   static readonly ONE_WEEK = new DurationOption('1w', {
-    dropdownLabel: 'Last 1 week',
+    dropdownLabel: t('Last 1 week'),
   });
 
   static readonly SIX_HOURS = new DurationOption('6h', {
-    dropdownLabel: 'Last 6 hours',
+    dropdownLabel: t('Last 6 hours'),
   });
 
   static readonly THIRTY_MIN = new DurationOption('30m', {
-    dropdownLabel: 'Last 30 minutes',
+    dropdownLabel: t('Last 30 minutes'),
   });
 
   static readonly THREE_HOURS = new DurationOption('3h', {
-    dropdownLabel: 'Last 3 hours',
+    dropdownLabel: t('Last 3 hours'),
   });
 
   static readonly TWELVE_HOURS = new DurationOption('12h', {
-    dropdownLabel: 'Last 12 hours',
+    dropdownLabel: t('Last 12 hours'),
   });
 
   static readonly TWO_DAYS = new DurationOption('2d', {
-    dropdownLabel: 'Last 2 day',
+    dropdownLabel: t('Last 2 days'),
   });
 
   private static readonly all = Object.freeze(
