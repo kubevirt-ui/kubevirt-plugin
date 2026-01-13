@@ -26,6 +26,7 @@ const HideCredentials: FC<HideCredentialsProps> = ({ newBadge = false }) => {
         helpTextIconContent={t(
           'When enabled, non-privileged users cannot view VM credentials set via cloud-init',
         )}
+        dataTestID="hide-credentials"
         isDisabled={!canEdit}
         isLoading={loading}
         newBadge={newBadge}
