@@ -1,0 +1,10 @@
+.physical-networks-table {
+  &__action-list {
+    margin: var(--pf-t--global--spacer--md) 0 var(--pf-t--global--spacer--sm);
+    justify-content: space-between;
+  }
+
+  &__search-input {
+    width: 350px;
+  }
+}
