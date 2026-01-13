@@ -29,7 +29,7 @@ const DeleteCheckupModal: FC<DeleteCheckupModalProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   return (
-    <Modal isOpen={isOpen} onClose={onClose} variant={ModalVariant.medium}>
+    <Modal isOpen={isOpen} onClose={onClose} position="top" variant={ModalVariant.medium}>
       <ModalHeader title={t('Delete checkup')} titleIconVariant="warning" />
       <ModalBody>
         <ConfirmActionMessage obj={{ metadata: { name, namespace } }} />
