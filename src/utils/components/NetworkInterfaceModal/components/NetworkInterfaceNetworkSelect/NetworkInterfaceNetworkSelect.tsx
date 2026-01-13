@@ -14,7 +14,6 @@ import SelectTypeahead, {
   SelectTypeaheadOptionProps,
 } from '@kubevirt-utils/components/SelectTypeahead/SelectTypeahead';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
 import { getNetworks, POD_NETWORK } from '@kubevirt-utils/resources/vm';
 import { interfaceTypesProxy } from '@kubevirt-utils/resources/vm/utils/network/constants';
@@ -25,6 +24,8 @@ import { FormGroup, Label, ValidatedOptions } from '@patternfly/react-core';
 import {
   getNadType,
   hasExplicitlyDefinedPodNetwork,
+  isNADUsedInVM,
+  isOvnOverlayNad,
   isPodNetworkName,
   podNetworkExists,
 } from '../../utils/helpers';
@@ -75,12 +76,11 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
     [vm],
   );
 
-  const filteredNADs = nads
-    ?.filter((nad) => !currentlyUsedNADsNames?.includes(`${getNamespace(nad)}/${getName(nad)}`))
-    .filter(
-      (nad) =>
-        getNamespace(nad) !== vmiNamespace || !currentlyUsedNADsNames?.includes(getName(nad)),
-    );
+  const filteredNADs = nads?.filter((nad) => {
+    const isNADInUse = isNADUsedInVM(nad, currentlyUsedNADsNames, vmiNamespace);
+
+    return !isNADInUse || !isOvnOverlayNad(nad);
+  });
 
   const hasPodNetwork = useMemo(() => podNetworkExists(vm), [vm]);
   const hasNads = useMemo(() => filteredNADs?.length > 0, [filteredNADs]);
