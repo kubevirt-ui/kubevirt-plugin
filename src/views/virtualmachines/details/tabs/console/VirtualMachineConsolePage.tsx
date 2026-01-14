@@ -1,10 +1,8 @@
 import React, { FC, useMemo } from 'react';
 
 import VmNotRunning from '@kubevirt-utils/components/Consoles/components/VmNotRunning';
-import {
-  isVncLogLevel,
-  KUBEVIRT_UI_VNC_LOG_LEVEL_LABEL,
-} from '@kubevirt-utils/components/Consoles/components/vnc-console/utils/constants';
+import { KUBEVIRT_UI_VNC_LOG_LEVEL_LABEL } from '@kubevirt-utils/components/Consoles/components/vnc-console/utils/constants';
+import { isVncLogLevel } from '@kubevirt-utils/components/Consoles/components/vnc-console/utils/util';
 import Consoles from '@kubevirt-utils/components/Consoles/Consoles';
 import { getConsoleBasePath } from '@kubevirt-utils/components/Consoles/utils/utils';
 import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
@@ -61,7 +59,7 @@ const VirtualMachineConsolePage: FC<NavPageComponentProps> = ({ obj: vm }) => {
         />
       </PageSection>
     );
-  }, [apiPath, cluster, loading, name, namespace, notRunning, vmi]);
+  }, [apiPath, cluster, loading, name, namespace, notRunning, vmi, vm]);
 };
 
 export default VirtualMachineConsolePage;

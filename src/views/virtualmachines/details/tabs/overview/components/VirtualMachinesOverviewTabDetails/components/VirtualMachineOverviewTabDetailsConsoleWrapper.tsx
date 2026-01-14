@@ -1,10 +1,8 @@
 import React, { FC } from 'react';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import {
-  isVncLogLevel,
-  KUBEVIRT_UI_VNC_LOG_LEVEL_LABEL,
-} from '@kubevirt-utils/components/Consoles/components/vnc-console/utils/constants';
+import { KUBEVIRT_UI_VNC_LOG_LEVEL_LABEL } from '@kubevirt-utils/components/Consoles/components/vnc-console/utils/constants';
+import { isVncLogLevel } from '@kubevirt-utils/components/Consoles/components/vnc-console/utils/util';
 import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isHeadlessMode } from '@kubevirt-utils/resources/vm';
 import { getCluster } from '@multicluster/helpers/selectors';

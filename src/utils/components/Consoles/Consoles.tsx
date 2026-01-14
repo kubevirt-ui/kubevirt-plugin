@@ -17,8 +17,8 @@ import {
 import { ConsoleComponentState, ConsoleType } from './components/utils/types';
 import HideConsole from './components/vnc-console/HideConsole';
 import SessionAlreadyInUseModal from './components/vnc-console/SessionAlreadyInUseModal';
-import { VncLogLevel } from './components/vnc-console/utils/constants';
 import { isConnectableState } from './components/vnc-console/utils/util';
+import { VncLogLevel } from './components/vnc-console/utils/VncConsoleTypes';
 import VncConnect from './components/vnc-console/VncConnect';
 import VncConsole from './components/vnc-console/VncConsole';
 

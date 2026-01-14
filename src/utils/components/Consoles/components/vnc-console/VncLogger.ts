@@ -1,14 +1,15 @@
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
-import { VncLogLevel } from './utils/constants';
+import { DEBUG, INFO } from './utils/constants';
+import { VncLogLevel } from './utils/VncConsoleTypes';
 
 export type VncLoggerType = {
-  log: (logLevel: VncLogLevel, ...args: any[]) => void;
+  log: (logLevel: VncLogLevel, ...args: unknown[]) => void;
 };
 
 const logger: VncLoggerType = {
   log: (logLevel, ...args) => {
-    if (logLevel && ['debug', 'info'].includes(logLevel)) {
+    if (logLevel && [DEBUG, INFO].includes(logLevel)) {
       kubevirtConsole.log(...args);
     }
   },

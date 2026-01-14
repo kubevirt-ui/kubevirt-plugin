@@ -27,17 +27,17 @@ import {
   F8,
   F9,
   ONE,
-  ScanCodeName,
   TWO,
-  typeAndWait,
-} from './utils/util';
-import { RFB } from './utils/VncConsoleTypes';
+} from './utils/constants';
+import { typeAndWait } from './utils/util';
+import { RFB, ScanCodeName } from './utils/VncConsoleTypes';
 import UnsupportedCharModal from './UnsupportedCharModal';
 
 const canExecuteCommands = (rfb: RFB): boolean =>
   rfb._rfbConnectionState === 'connected' && !rfb._viewOnly;
 
-function sendCtrlAltPlusKey(rfb: RFB, keysym: number, code: ScanCodeName) {
+// eslint-disable-next-line require-jsdoc
+function sendCtrlAltPlusKey(rfb: RFB, keysym: number, code: ScanCodeName): void {
   if (!canExecuteCommands(rfb)) {
     return;
   }
@@ -49,14 +49,22 @@ function sendCtrlAltPlusKey(rfb: RFB, keysym: number, code: ScanCodeName) {
   rfb.sendKey(KeyTable.XK_Control_L, CONTROL_L, false);
 }
 
+// eslint-disable-next-line require-jsdoc
 export function sendCtrlAlt1() {
   sendCtrlAltPlusKey(this, KeyTable.XK_1, ONE);
 }
 
+// eslint-disable-next-line require-jsdoc
 export function sendCtrlAlt2() {
   sendCtrlAltPlusKey(this, KeyTable.XK_2, TWO);
 }
 
+/**
+ * Type in char-by-char text retrieved from clipboard.
+ * Open a modal if unsupported chars are detected.
+ * @param params required for VNC (will do early return if missing)
+ * @returns void
+ */
 export async function sendPasteCMD(params?: PasteParams) {
   const { createModal, selectedKeyboard, shouldFocusOnConsole = true } = params ?? {};
   if (!createModal || !selectedKeyboard) {
@@ -115,6 +123,7 @@ export async function sendPasteCMD(params?: PasteParams) {
   }
 }
 
+// eslint-disable-next-line require-jsdoc
 function createSendKeyFunction(keysym: number, scanCode: ScanCodeName) {
   return function () {
     if (!canExecuteCommands(this)) {

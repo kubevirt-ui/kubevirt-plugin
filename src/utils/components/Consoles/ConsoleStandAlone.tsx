@@ -14,10 +14,8 @@ import { Bullseye, Spinner } from '@patternfly/react-core';
 import ErrorAlert from '../ErrorAlert/ErrorAlert';
 import { ModalProvider, useModalValue } from '../ModalProvider/ModalProvider';
 
-import {
-  isVncLogLevel,
-  KUBEVIRT_UI_VNC_LOG_LEVEL_LABEL,
-} from './components/vnc-console/utils/constants';
+import { KUBEVIRT_UI_VNC_LOG_LEVEL_LABEL } from './components/vnc-console/utils/constants';
+import { isVncLogLevel } from './components/vnc-console/utils/util';
 import { getConsoleBasePath } from './utils/utils';
 import Consoles from './Consoles';
 

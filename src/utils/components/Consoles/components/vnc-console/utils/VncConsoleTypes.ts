@@ -1,7 +1,8 @@
-import { FC, HTMLProps, MouseEventHandler } from 'react';
+import { Dispatch, MouseEventHandler, SetStateAction } from 'react';
 
-import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { RFBCreate } from '@novnc/novnc/lib/rfb';
+import { ConsoleComponentState } from '../../utils/types';
+
+import { SCAN_CODE_NAMES, VNC_LOG_LEVELS } from './constants';
 
 export type VncConsoleActionsProps = {
   /** VNC console additional send keys elements */
@@ -14,17 +15,6 @@ export type VncConsoleActionsProps = {
 export type CustomConnectComponentProps = {
   connect: () => void;
   isConnecting: boolean;
-};
-
-export type VncConsoleProps = HTMLProps<HTMLDivElement> & {
-  /** A custom component to replace th default connect button screen */
-  CustomConnectComponent?: FC<CustomConnectComponentProps>;
-  /** Should console render alt tabs */
-  hasGPU?: boolean;
-  onConnect?: (rfb: RFBCreate) => void;
-  scaleViewport?: boolean;
-  viewOnly?: boolean;
-  vmi: V1VirtualMachineInstance;
 };
 
 // noVNC provides no type definitions
@@ -41,3 +31,20 @@ export type RFB = {
   sendKey: (keysym: number, code: string, down: boolean) => void;
   viewOnly: boolean;
 };
+
+export type VncConsoleProps = {
+  basePath: string;
+  scaleViewport?: boolean;
+  setState: Dispatch<SetStateAction<ConsoleComponentState>>;
+  viewOnly?: boolean;
+  vncLogLevel?: VncLogLevel;
+};
+
+export type RfbSession = {
+  rfb: RFB;
+  sessionID: number;
+  testUrl?: string;
+};
+
+export type ScanCodeName = (typeof SCAN_CODE_NAMES)[number];
+export type VncLogLevel = (typeof VNC_LOG_LEVELS)[number] | false;

@@ -6,8 +6,8 @@ import {
 } from '@kubevirt-utils/components/Consoles/components/utils/ConsoleConsts';
 import { ConsoleComponentState } from '@kubevirt-utils/components/Consoles/components/utils/types';
 import HideConsole from '@kubevirt-utils/components/Consoles/components/vnc-console/HideConsole';
-import { VncLogLevel } from '@kubevirt-utils/components/Consoles/components/vnc-console/utils/constants';
 import { isConnectableState } from '@kubevirt-utils/components/Consoles/components/vnc-console/utils/util';
+import { VncLogLevel } from '@kubevirt-utils/components/Consoles/components/vnc-console/utils/VncConsoleTypes';
 import VncConsole from '@kubevirt-utils/components/Consoles/components/vnc-console/VncConsole';
 import { getConsoleBasePath } from '@kubevirt-utils/components/Consoles/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
