@@ -44,6 +44,21 @@
     display: inline-block;
   }
 
+  &__title {
+    display: flex;
+    align-items: center;
+
+    .alert-name {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+  }
+
+  &__vm-details {
+    font-size: var(--pf-t--global--font--size--sm);
+    margin-top: var(--pf-t--global--spacer--xs);
+  }
+
   .alert-item:first-of-type {
     padding-top: var(--pf-v6-c-card--first-child--PaddingBlockStart);
   }

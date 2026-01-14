@@ -168,6 +168,37 @@ export const AlertResource: MonitoringResource = {
   plural: '/monitoring/alerts',
 };
 
+/**
+ * Build alert URL filtered by alertname
+ * Uses alertname filter instead of rule ID since IDs from MCO don't match spoke cluster IDs
+ */
+export const getAlertFilterURL = (alertName: string): string => {
+  const params = new URLSearchParams();
+  params.set('name', alertName);
+  return `${AlertResource.plural}?${params.toString()}`;
+};
+
+/**
+ * Build external URL for spoke cluster alerts
+ * Navigates to the spoke cluster's monitoring console filtered by alertname
+ */
+export const getExternalAlertURL = (
+  alertName: string,
+  clusterConsoleURL: string | undefined,
+): string | undefined => {
+  if (!clusterConsoleURL || !alertName) {
+    return undefined;
+  }
+
+  const alertPath = getAlertFilterURL(alertName);
+
+  const baseURL = clusterConsoleURL.endsWith('/')
+    ? clusterConsoleURL.slice(0, -1)
+    : clusterConsoleURL;
+
+  return `${baseURL}${alertPath}`;
+};
+
 export const labelsToParams = (labels: PrometheusLabels) =>
   Object.entries(labels)
     .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)

@@ -89,4 +89,32 @@
   &__nonadmin-popover {
     text-align: center;
   }
+
+  &__cluster-toggle {
+    padding-left: var(--pf-t--global--spacer--lg);
+    padding-right: var(--pf-t--global--spacer--lg);
+
+    &--text {
+      font-weight: var(--pf-t--global--font--weight--body--default);
+    }
+
+    &--label {
+      margin-left: var(--pf-t--global--spacer--sm);
+    }
+  }
+
+  &__cluster-content {
+    margin-top: var(--pf-t--global--spacer--sm);
+    padding: 0;
+  }
+  &__cluster-accordion {
+    row-gap: 0;
+    .pf-v6-c-accordion__item {
+      border-block-end: none !important;
+      &.pf-m-expanded {
+        border: none;
+        border-radius: 0;
+      }
+    }
+  }
 }

@@ -9,6 +9,8 @@ export const FEATURE_KUBEVIRT_CROSS_CLUSTER_MIGRATION = 'kubevirtCrossClusterMig
 
 export const CROSS_CLUSTER_MIGRATION_ACTION_ID = 'cross-cluster-migration';
 
+export const CONSOLE_URL_CLAIM = 'consoleurl.cluster.open-cluster-management.io';
+
 export const ManagedClusterModel: K8sModel = {
   abbr: 'MC',
   apiGroup: 'cluster.open-cluster-management.io',

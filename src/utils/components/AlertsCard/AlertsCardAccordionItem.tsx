@@ -1,8 +1,10 @@
 import React from 'react';
 
 import AlertStatusItem from '@kubevirt-utils/components/AlertsCard/AlertStatusItem';
-import { AlertType } from '@kubevirt-utils/components/AlertsCard/utils/types';
+import { AlertType, SimplifiedAlert } from '@kubevirt-utils/components/AlertsCard/utils/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import {
   AccordionContent,
   AccordionItem,
@@ -11,11 +13,14 @@ import {
   Label,
 } from '@patternfly/react-core';
 
+import AlertsClusterAccordion from './AlertsClusterAccordion';
+import AlertStatusItemACM from './AlertStatusItemACM';
+
 import './AlertsCard.scss';
 
 type AlertsCardAccordionItemProps = {
   alertOpen: AlertType;
-  alerts: any;
+  alerts: SimplifiedAlert[];
   alertType: AlertType;
   handleDrawerToggleClick: (alertType: AlertType) => void;
 };
@@ -27,11 +32,29 @@ const AlertsCardAccordionItem: React.FC<AlertsCardAccordionItemProps> = ({
   handleDrawerToggleClick,
 }) => {
   const { t } = useKubevirtTranslation();
+  const isACMPage = useIsACMPage();
+  const isAllClustersPage = useIsAllClustersPage();
 
   const alertTitle = {
     [AlertType.critical]: t('Critical'),
     [AlertType.info]: t('Info'),
     [AlertType.warning]: t('Warnings'),
+  };
+
+  const renderAlerts = () => {
+    if (isAllClustersPage) {
+      return <AlertsClusterAccordion alerts={alerts} alertType={alertType} />;
+    }
+
+    return alerts?.map((alert) => (
+      <div className="content" key={alert?.key}>
+        {isACMPage ? (
+          <AlertStatusItemACM alertDetails={alert} alertType={alertType} />
+        ) : (
+          <AlertStatusItem alertDetails={alert} alertType={alertType} />
+        )}
+      </div>
+    ));
   };
 
   return (
@@ -52,11 +75,7 @@ const AlertsCardAccordionItem: React.FC<AlertsCardAccordionItemProps> = ({
       </AccordionToggle>
       <AccordionContent id={alertType} key={alertType}>
         <Divider />
-        {alerts?.map((alert) => (
-          <div className="content" key={alert?.key}>
-            <AlertStatusItem alertDetails={alert} alertType={alertType} />
-          </div>
-        ))}
+        {renderAlerts()}
       </AccordionContent>
     </AccordionItem>
   );

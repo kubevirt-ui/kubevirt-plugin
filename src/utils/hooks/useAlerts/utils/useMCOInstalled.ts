@@ -8,7 +8,9 @@ import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 export const getMCONotInstalledTooltip = (t: TFunction): string =>
-  t('Multicluster observability is not installed on the hub cluster');
+  t(
+    'Multicluster observability is not available. Install it on the hub cluster to enable monitoring across clusters.',
+  );
 
 type UseMCOInstalledResult = {
   error: Error | unknown;
