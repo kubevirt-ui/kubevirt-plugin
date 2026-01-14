@@ -23,7 +23,8 @@ const getRowFiltersString = (rowFilters: Record<string, string>) =>
 export const getVMListPathWithRowFilters = (
   namespace: string,
   rowFilters: Record<string, string>,
-) => `${getVMListURL(null, namespace)}?${getRowFiltersString(rowFilters)}`;
+  cluster?: string,
+) => `${getVMListURL(cluster, namespace)}?${getRowFiltersString(rowFilters)}`;
 
 export const getACMMListPathWithRowFilters = (
   cluster: string,

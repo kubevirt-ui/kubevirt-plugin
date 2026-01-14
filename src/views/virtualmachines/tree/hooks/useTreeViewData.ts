@@ -9,9 +9,11 @@ import {
   V1VirtualMachine,
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { ALL_CLUSTERS } from '@kubevirt-utils/hooks/constants';
 import { TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
 import { getName } from '@kubevirt-utils/resources/shared';
@@ -33,6 +35,7 @@ export type UseTreeViewData = {
 };
 
 export const useTreeViewData = (): UseTreeViewData => {
+  const { t } = useKubevirtTranslation();
   const isAdmin = useIsAdmin();
   const location = useLocation();
 
@@ -133,6 +136,7 @@ export const useTreeViewData = (): UseTreeViewData => {
         location.pathname,
         treeViewFoldersEnabled,
         namespacesByCluster,
+        t(ALL_CLUSTERS),
         location.search,
         clusterNames,
       );
@@ -155,6 +159,7 @@ export const useTreeViewData = (): UseTreeViewData => {
     clusterNames,
     namespacesByCluster,
     location.search,
+    t,
   ]);
 
   return useMemo(

@@ -276,6 +276,7 @@ export const createMultiClusterTreeViewData = (
   pathname: string,
   foldersEnabled: boolean,
   projectsByClusters: UseMulticlusterNamespacesReturn['namespacesByCluster'],
+  allClustersLabel: string,
   queryParams?: string,
   clusterNames?: string[],
 ): TreeViewDataItem[] => {
@@ -334,21 +335,20 @@ export const createMultiClusterTreeViewData = (
       return clusterTreeItem;
     });
 
+  const allClustersTreeItem: TreeViewDataItemWithHref = {
+    children: treeWithClusters,
+    defaultExpanded: true,
+    hasBadge: false,
+    href: getACMVMListURL(),
+    icon: <ClusterIcon />,
+    id: ALL_CLUSTERS_ID,
+    name: allClustersLabel,
+  };
+
+  treeViewDataMap[ALL_CLUSTERS_ID] = allClustersTreeItem;
   treeDataMap.value = treeViewDataMap;
 
-  const clusterTreeItem: TreeViewDataItemWithHref[] = [
-    {
-      children: treeWithClusters,
-      defaultExpanded: true,
-      hasBadge: false,
-      href: getACMVMListURL(),
-      icon: <ClusterIcon />,
-      id: ALL_CLUSTERS_ID,
-      name: 'All clusters',
-    },
-  ];
-
-  return clusterTreeItem;
+  return [allClustersTreeItem];
 };
 
 // searches for clusters, projects and folders

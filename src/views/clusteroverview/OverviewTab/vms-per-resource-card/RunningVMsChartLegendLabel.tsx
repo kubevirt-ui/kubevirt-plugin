@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Link } from 'react-router-dom-v5-compat';
 
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
+import useActiveClusterParam from '@multicluster/hooks/useActiveClusterParam';
 
 import { getInstanceTypeSeriesLabel, getLinkPath } from './utils/utils';
 
@@ -24,8 +25,9 @@ type RunningVMsChartLegendLabelProps = {
 
 const RunningVMsChartLegendLabel: React.FC<RunningVMsChartLegendLabelProps> = ({ item }) => {
   const activeNamespace = useActiveNamespace();
+  const cluster = useActiveClusterParam();
   const iconStyle = { color: item.color };
-  const linkPath = getLinkPath(item, activeNamespace);
+  const linkPath = getLinkPath(item, activeNamespace, cluster);
   const linkText = item?.isInstanceType ? getInstanceTypeSeriesLabel(item.name) : item?.name;
 
   return (
