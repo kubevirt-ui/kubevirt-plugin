@@ -199,6 +199,7 @@ export const extensions: EncodedExtension[] = [
         `/k8s/cluster/:cluster/all-namespaces/${KUBEVIRT_VM_PATH}`,
         `/k8s/all-clusters/all-namespaces/${KUBEVIRT_VM_PATH}`,
       ],
+      perspective: 'fleet-virtualization-perspective',
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
@@ -220,6 +221,7 @@ export const extensions: EncodedExtension[] = [
         `/k8s/cluster/:cluster/all-namespaces/${INSTANCETYPE_PATH}`,
         `/k8s/all-clusters/all-namespaces/${INSTANCETYPE_PATH}`,
       ],
+      perspective: 'fleet-virtualization-perspective',
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
@@ -236,13 +238,18 @@ export const extensions: EncodedExtension[] = [
         `/k8s/cluster/:cluster/all-namespaces/bootablevolumes`,
         `/k8s/all-clusters/all-namespaces/bootablevolumes`,
       ],
+      perspective: 'fleet-virtualization-perspective',
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
   {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC_ACM'],
+    },
     properties: {
       component: { $codeRef: 'VirtualMachineSearchResults' },
       path: [`/k8s/all-clusters/all-namespaces/${KUBEVIRT_VM_PATH}/search`],
+      perspective: 'fleet-virtualization-perspective',
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
@@ -281,10 +288,14 @@ export const extensions: EncodedExtension[] = [
         '/k8s/cluster/:cluster/ns/:ns/virtualization-overview',
         '/k8s/cluster/:cluster/all-namespaces/virtualization-overview',
       ],
+      perspective: 'fleet-virtualization-perspective',
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
   {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC_ACM'],
+    },
     properties: {
       component: {
         $codeRef: 'Catalog',
@@ -294,10 +305,14 @@ export const extensions: EncodedExtension[] = [
         '/k8s/cluster/:cluster/ns/:ns/catalog',
         '/k8s/cluster/:cluster/all-namespaces/catalog',
       ],
+      perspective: 'fleet-virtualization-perspective',
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
   {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC_ACM'],
+    },
     properties: {
       component: {
         $codeRef: 'VirtualMachineTemplatesList',
@@ -307,20 +322,28 @@ export const extensions: EncodedExtension[] = [
         `/k8s/cluster/:cluster/ns/:ns/templates`,
         `/k8s/cluster/:cluster/all-namespaces/templates`,
       ],
+      perspective: 'fleet-virtualization-perspective',
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
   {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC_ACM'],
+    },
     properties: {
       component: {
         $codeRef: 'TemplateNavPage',
       },
       path: [`/k8s/cluster/:cluster/ns/:ns/templates/:name`],
+      perspective: 'fleet-virtualization-perspective',
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
 
   {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC_ACM'],
+    },
     properties: {
       component: {
         $codeRef: 'MulticlusterYAMLCreation',
@@ -329,10 +352,14 @@ export const extensions: EncodedExtension[] = [
         `/k8s/cluster/:cluster/ns/:ns/${KUBEVIRT_VM_PATH}/~new`,
         `/k8s/cluster/:cluster/ns/:ns/templates/~new`,
       ],
+      perspective: 'fleet-virtualization-perspective',
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
   {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC_ACM'],
+    },
     properties: {
       component: {
         $codeRef: 'MigrationPoliciesList',
@@ -341,42 +368,59 @@ export const extensions: EncodedExtension[] = [
         `/k8s/all-clusters/${MIGRATION_POLICY_PATH}`,
         `/k8s/cluster/:cluster/${MIGRATION_POLICY_PATH}`,
       ],
+      perspective: 'fleet-virtualization-perspective',
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
   {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC_ACM'],
+    },
     properties: {
       component: {
         $codeRef: 'MigrationPolicyPage',
       },
       path: [`/k8s/cluster/:cluster/${MIGRATION_POLICY_PATH}/:name`],
+      perspective: 'fleet-virtualization-perspective',
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
   {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC_ACM'],
+    },
     properties: {
       component: {
         $codeRef: 'MigrationPolicyCreateForm',
       },
       path: [`/k8s/cluster/:cluster/${MIGRATION_POLICY_PATH}/form`],
+      perspective: 'fleet-virtualization-perspective',
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
   {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC_ACM'],
+    },
     properties: {
       component: {
         $codeRef: 'MulticlusterYAMLCreation',
       },
       path: [`/k8s/cluster/:cluster/${MIGRATION_POLICY_PATH}/~new`],
+      perspective: 'fleet-virtualization-perspective',
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
   {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC_ACM'],
+    },
     properties: {
       component: {
         $codeRef: 'MulticlusterYAMLCreation',
       },
       path: [`/k8s/cluster/:cluster/ns/:ns/${DATA_VOLUME_PATH}/~new`],
+      perspective: 'fleet-virtualization-perspective',
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
@@ -393,6 +437,9 @@ export const extensions: EncodedExtension[] = [
   } as EncodedExtension<ResourceRoute>,
 
   {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC_ACM'],
+    },
     properties: {
       component: {
         $codeRef: 'Checkups',
@@ -402,79 +449,86 @@ export const extensions: EncodedExtension[] = [
         '/k8s/cluster/:cluster/all-namespaces/checkups',
         '/k8s/cluster/:cluster/ns/:ns/checkups',
       ],
+      perspective: 'fleet-virtualization-perspective',
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
 
   {
     flags: {
-      required: ['KUBEVIRT_DYNAMIC'],
+      required: ['KUBEVIRT_DYNAMIC_ACM'],
     },
     properties: {
       component: {
         $codeRef: 'CheckupsNetworkForm',
       },
       path: ['/k8s/cluster/:cluster/ns/:ns/checkups/network/form'],
+      perspective: 'fleet-virtualization-perspective',
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
   {
     flags: {
-      required: ['KUBEVIRT_DYNAMIC'],
+      required: ['KUBEVIRT_DYNAMIC_ACM'],
     },
     properties: {
       component: {
         $codeRef: 'CheckupsNetworkDetailsPage',
       },
       path: ['/k8s/cluster/:cluster/ns/:ns/checkups/network/:checkupName'],
+      perspective: 'fleet-virtualization-perspective',
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
   {
     flags: {
-      required: ['KUBEVIRT_DYNAMIC'],
+      required: ['KUBEVIRT_DYNAMIC_ACM'],
     },
     properties: {
       component: {
         $codeRef: 'CheckupsStorageForm',
       },
       path: ['/k8s/cluster/:cluster/ns/:ns/checkups/storage/form'],
+      perspective: 'fleet-virtualization-perspective',
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
   {
     flags: {
-      required: ['KUBEVIRT_DYNAMIC'],
+      required: ['KUBEVIRT_DYNAMIC_ACM'],
     },
     properties: {
       component: {
         $codeRef: 'CheckupsStorageDetailsPage',
       },
       path: ['/k8s/cluster/:cluster/ns/:ns/checkups/storage/:checkupName'],
+      perspective: 'fleet-virtualization-perspective',
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
   {
     flags: {
-      required: ['KUBEVIRT_DYNAMIC'],
+      required: ['KUBEVIRT_DYNAMIC_ACM'],
     },
     properties: {
       component: {
         $codeRef: 'CheckupsSelfValidationForm',
       },
       path: ['/k8s/cluster/:cluster/ns/:ns/checkups/self-validation/form'],
+      perspective: 'fleet-virtualization-perspective',
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
   {
     flags: {
-      required: ['KUBEVIRT_DYNAMIC'],
+      required: ['KUBEVIRT_DYNAMIC_ACM'],
     },
     properties: {
       component: {
         $codeRef: 'CheckupsSelfValidationDetailsPage',
       },
       path: ['/k8s/cluster/:cluster/ns/:ns/checkups/self-validation/:checkupName'],
+      perspective: 'fleet-virtualization-perspective',
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
