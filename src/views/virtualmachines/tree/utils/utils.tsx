@@ -4,7 +4,8 @@ import { isEmpty } from 'lodash';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { tourGuideVM } from '@kubevirt-utils/components/GuidedTour/utils/constants';
 import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
-import { ALL_NAMESPACES_SESSION_KEY, ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
+import { ALL_NAMESPACES_SESSION_KEY, LOCAL_CLUSTER } from '@kubevirt-utils/hooks/constants';
+import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
 import { isSystemNamespace } from '@kubevirt-utils/resources/namespace/helper';
 import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
@@ -191,7 +192,7 @@ const createAllNamespacesTreeItem = (
     href: `${getVMListURL()}${removeFolderLabelQuery(queryParams) || ''}`,
     icon: <ProjectDiagramIcon />,
     id: ALL_NAMESPACES_SESSION_KEY,
-    name: ALL_PROJECTS,
+    name: t(LOCAL_CLUSTER),
   };
   if (!treeViewDataMap[ALL_NAMESPACES_SESSION_KEY]) {
     treeViewDataMap[ALL_NAMESPACES_SESSION_KEY] = allNamespacesTreeItem;
@@ -223,7 +224,6 @@ export const getVMInfoFromPathname = (pathname: string) => {
 export const createSingleClusterTreeViewData = (
   projectNames: string[],
   vms: V1VirtualMachine[],
-  isAdmin: boolean,
   pathname: string,
   foldersEnabled: boolean,
   queryParams: string,
@@ -246,9 +246,11 @@ export const createSingleClusterTreeViewData = (
     createProjectTreeItem(project, projectMap, vmName, vmNamespace, treeViewDataMap, queryParams),
   );
 
-  const allNamespacesTreeItem = isAdmin
-    ? createAllNamespacesTreeItem(treeViewData, treeViewDataMap, queryParams)
-    : null;
+  const allNamespacesTreeItem = createAllNamespacesTreeItem(
+    treeViewData,
+    treeViewDataMap,
+    queryParams,
+  );
 
   treeDataMap.value = treeViewDataMap;
 
