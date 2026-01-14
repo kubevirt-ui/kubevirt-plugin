@@ -28,8 +28,11 @@ import { isStopped } from '@virtualmachines/utils';
 
 import { NetworkAttachmentDefinition } from '../components/hooks/types';
 
+export const hasExplicitlyDefinedPodNetwork = (vm: V1VirtualMachine): boolean =>
+  !!getNetworks(vm)?.find(isPodNetwork);
+
 export const podNetworkExists = (vm: V1VirtualMachine): boolean =>
-  !!vm?.spec?.template?.spec?.networks?.find(isPodNetwork) || hasAutoAttachedPodNetwork(vm);
+  hasExplicitlyDefinedPodNetwork(vm) || hasAutoAttachedPodNetwork(vm);
 
 export const isPodNetworkName = (networkName: string): boolean => networkName === POD_NETWORK;
 

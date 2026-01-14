@@ -1564,6 +1564,7 @@
   "This user is not allowed to edit this boot source": "不允许此用户编辑这个引导源",
   "This VirtualMachine has": "此 VirtualMachine 具有",
   "This VirtualMachine is down. Please start it to access its console.": "此 VirtualMachine 已下线。请启动它以访问其控制台。",
+  "This VM is using auto attached Pod Network. To disable it, set spec.template.spec.domain.devices.autoattachPodInterface to false.": "This VM is using auto attached Pod Network. To disable it, set spec.template.spec.domain.devices.autoattachPodInterface to false.",
   "This will create a cloned copy of the Volume in the destination project.": "这将在目标项目中创建卷的克隆副本。",
   "Threads": "线程",
   "Time axis": "时间轴",

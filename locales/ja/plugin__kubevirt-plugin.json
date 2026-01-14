@@ -1564,6 +1564,7 @@
   "This user is not allowed to edit this boot source": "このユーザーはこのブートソースを編集できません",
   "This VirtualMachine has": "この VirtualMachine には以下があります",
   "This VirtualMachine is down. Please start it to access its console.": "この VirtualMachine はダウンしています。コンソールにアクセスするには起動してください。",
+  "This VM is using auto attached Pod Network. To disable it, set spec.template.spec.domain.devices.autoattachPodInterface to false.": "This VM is using auto attached Pod Network. To disable it, set spec.template.spec.domain.devices.autoattachPodInterface to false.",
   "This will create a cloned copy of the Volume in the destination project.": "これにより、移行先プロジェクトにボリュームのクローンコピーが作成されます。",
   "Threads": "スレッド",
   "Time axis": "時間軸",
