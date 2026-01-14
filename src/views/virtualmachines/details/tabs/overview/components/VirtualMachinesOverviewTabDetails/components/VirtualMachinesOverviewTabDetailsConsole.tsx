@@ -58,6 +58,7 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
       </Bullseye>
     );
 
+  const vncBasePath = getConsoleBasePath({ apiPath, name: vmName, namespace: vmNamespace });
   return (
     <Bullseye className="console-overview">
       <div className="link">
@@ -80,7 +81,9 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
       {enableConsole && (
         <HideConsole isHidden={state !== ConsoleState.connected}>
           <VncConsole
-            basePath={getConsoleBasePath({ apiPath, name: vmName, namespace: vmNamespace })}
+            basePath={vncBasePath}
+            // force re-create on change
+            key={`vnc-${vncBasePath}-${vncLogLevel}`}
             setState={setState}
             viewOnly
             vncLogLevel={vncLogLevel}

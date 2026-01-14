@@ -93,7 +93,13 @@ const Consoles: FC<ConsolesProps> = ({
         )}
         {type === VNC_CONSOLE_TYPE && (
           <HideConsole isHidden={!isConnected}>
-            <VncConsole basePath={path} setState={setState} vncLogLevel={vncLogLevel} />
+            <VncConsole
+              basePath={path}
+              // force re-create on change
+              key={`vnc-${path}-${vncLogLevel}`}
+              setState={setState}
+              vncLogLevel={vncLogLevel}
+            />
           </HideConsole>
         )}
         {type === SERIAL_CONSOLE_TYPE && showConnect && (
