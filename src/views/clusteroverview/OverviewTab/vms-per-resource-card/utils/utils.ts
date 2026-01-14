@@ -111,12 +111,16 @@ export const getFilterKey = (resourceItem: RunningVMsChartLegendLabelItem) => {
   return resourceItem.isInstanceType ? INSTANCETYPE_FILTER_KEY : TEMPLATE_FILTER_KEY;
 };
 
-export const getLinkPath = (resourceItem: RunningVMsChartLegendLabelItem, namespace: string) => {
+export const getLinkPath = (
+  resourceItem: RunningVMsChartLegendLabelItem,
+  namespace: string,
+  cluster?: string,
+) => {
   const filterKey = getFilterKey(resourceItem);
   const filters =
     resourceItem?.type === UNCATEGORIZED_VM
       ? { instanceType: 'No+InstanceType', template: 'None' }
       : { [filterKey]: getInstanceTypePrefix(resourceItem.name) };
 
-  return getVMListPathWithRowFilters(namespace, filters);
+  return getVMListPathWithRowFilters(namespace, filters, cluster);
 };

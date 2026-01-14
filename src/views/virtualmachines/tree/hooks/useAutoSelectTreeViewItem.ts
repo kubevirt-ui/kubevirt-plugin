@@ -13,6 +13,11 @@ import useIsACMPage from '@multicluster/useIsACMPage';
 import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import { useLastNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 
+import {
+  ALL_CLUSTERS_ID,
+  CLUSTER_SELECTOR_PREFIX,
+  PROJECT_SELECTOR_PREFIX,
+} from '../utils/constants';
 import { getVMTreeViewItemID, TreeViewDataItemWithHref } from '../utils/utils';
 import { getVMInfoFromPathname } from '../utils/utils';
 
@@ -47,6 +52,32 @@ const useAutoSelectTreeViewItem = ({ dataMap, onFilterChange }: UseAutoSelectTre
       setSelected(dataMap?.[getVMTreeViewItemID(vmName, vmNamespace, vmCluster)]);
     }
   }, [location.pathname, dataMap, setSelected]);
+
+  // Select cluster or project tree view item when on ACM page (only when not viewing a specific VM)
+  useEffect(() => {
+    if (!isACMPage) return;
+
+    const { vmName, vmNamespace } = getVMInfoFromPathname(location.pathname);
+    if (vmName && vmNamespace) return;
+
+    // If filtering by a specific project, select the project tree item
+    if (ns && cluster) {
+      const projectTreeItemId = `${PROJECT_SELECTOR_PREFIX}/${cluster}/${ns}`;
+      const projectTreeItem = dataMap?.[projectTreeItemId];
+      if (projectTreeItem && selected?.id !== projectTreeItemId) {
+        setSelected(projectTreeItem);
+      }
+      return;
+    }
+
+    // Otherwise, select the cluster tree item
+    const clusterTreeItemId = cluster ? `${CLUSTER_SELECTOR_PREFIX}/${cluster}` : ALL_CLUSTERS_ID;
+
+    const clusterTreeItem = dataMap?.[clusterTreeItemId];
+    if (clusterTreeItem && selected?.id !== clusterTreeItemId) {
+      setSelected(clusterTreeItem);
+    }
+  }, [cluster, dataMap, isACMPage, location.pathname, ns, selected?.id, setSelected]);
 
   // Select namespace based on privileges
   useEffect(() => {
