@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
 import ClusterDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterDropdown';
 import NamespaceDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/NamespaceDropdown';
+import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { ALL_CLUSTERS_KEY, ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import { useClusterCNVInstalled } from '@kubevirt-utils/hooks/useAlerts/utils/useClusterCNVInstalled';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -59,9 +60,12 @@ const ClusterProjectDropdown: FC<ClusterProjectDropdownProps> = memo(
           .replace(`/cluster/${cluster}/`, clusterReplaceKey)
           .replace('/all-clusters/', clusterReplaceKey);
 
-        // Reset project to "all projects" when cluster changes
+        // Reset project to "all projects" or default project when cluster changes
         if (namespace) {
-          newPathname = newPathname.replace(`/ns/${namespace}/`, '/all-namespaces/');
+          newPathname = newPathname.replace(
+            `/ns/${namespace}/`,
+            includeAllProjects ? '/all-namespaces/' : `/ns/${DEFAULT_NAMESPACE}/`,
+          );
         }
 
         navigate(newPathname);

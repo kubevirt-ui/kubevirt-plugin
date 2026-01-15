@@ -63,6 +63,7 @@ const MulticlusterYAMLCreation: FC = () => {
       {isACMPage && (
         <ClusterProjectDropdown
           includeAllClusters={false}
+          includeAllProjects={false}
           showProjectDropdown={model?.namespaced}
         />
       )}
