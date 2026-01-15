@@ -15,9 +15,6 @@ import {
   sendCtrlAlt1,
   sendCtrlAlt2,
   sendF1,
-  sendF10,
-  sendF11,
-  sendF12,
   sendF2,
   sendF3,
   sendF4,
@@ -26,6 +23,9 @@ import {
   sendF7,
   sendF8,
   sendF9,
+  sendF10,
+  sendF11,
+  sendF12,
   sendPasteCMD,
 } from './actions';
 import vncLogger from './VncLogger';

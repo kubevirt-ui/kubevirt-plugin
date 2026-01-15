@@ -51,6 +51,7 @@
       }
     ],
     "perfectionist/sort-imports": "off",
+    "perfectionist/sort-named-imports": "off",
     "prettier/prettier": [
       "error",
       {
