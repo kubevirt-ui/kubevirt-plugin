@@ -38,6 +38,10 @@ export const BRIDGE = 'bridge';
 export const MASQUERADE = 'masquerade';
 export const SRIOV = 'sriov';
 
+// NAD config types
+export const NAD_TYPE_OVN_K8S_CNI_OVERLAY = 'ovn-k8s-cni-overlay';
+export const NAD_TYPE_CNV_BRIDGE = 'cnv-bridge';
+
 export const POD_NETWORK = 'POD_NETWORK';
 
 export enum UPDATE_STRATEGIES {
