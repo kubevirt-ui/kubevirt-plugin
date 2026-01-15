@@ -1,11 +1,7 @@
 import { ComponentClass } from 'react';
 
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  InstanceTypeSeries,
-  InstanceTypeSize,
-  InstanceTypeSizes,
-} from '@kubevirt-utils/resources/instancetype/types';
+import { InstanceTypeSeries } from '@kubevirt-utils/resources/instancetype/types';
 import {
   MemoryIcon,
   MicrochipIcon,
@@ -15,8 +11,6 @@ import {
   RedhatIcon,
   RegistryIcon,
   ServerGroupIcon,
-  ServerIcon,
-  TrendUpIcon,
   UserIcon,
 } from '@patternfly/react-icons';
 
@@ -46,101 +40,38 @@ export const initialMenuItems: InstanceTypesMenuItemsData = {
 };
 
 export const instanceTypeSeriesNameMapper: {
-  [key in 'server' | InstanceTypeSeries]: {
+  [key in InstanceTypeSeries]: {
     disabled?: boolean;
     Icon: ComponentClass;
-    possibleSizes?: InstanceTypeSize[];
     seriesLabel: string;
   };
 } = {
   cx1: {
     Icon: RegistryIcon,
-    possibleSizes: [
-      'medium',
-      'large',
-      'xlarge',
-      '2xlarge',
-      '4xlarge',
-      '8xlarge',
-      'medium1gi',
-      'large1gi',
-      'xlarge1gi',
-      '2xlarge1gi',
-      '4xlarge1gi',
-      '8xlarge1gi',
-    ],
     seriesLabel: t('CX series'),
   },
-  gn1: {
+  d1: {
     Icon: MicrochipIcon,
-    possibleSizes: ['xlarge', '2xlarge', '4xlarge', '8xlarge'],
-    seriesLabel: t('GN series'),
-  },
-  highperformance: {
-    disabled: true,
-    Icon: TrendUpIcon,
-    seriesLabel: t('HP series'),
+    seriesLabel: t('D series'),
   },
   m1: {
     Icon: MemoryIcon,
-    possibleSizes: [
-      'large',
-      'xlarge',
-      '2xlarge',
-      '4xlarge',
-      '8xlarge',
-      'large1gi',
-      'xlarge1gi',
-      '2xlarge1gi',
-      '4xlarge1gi',
-      '8xlarge1gi',
-    ],
     seriesLabel: t('M series'),
   },
   n1: {
     Icon: NetworkIcon,
-    possibleSizes: ['medium', 'large', 'xlarge', '2xlarge', '4xlarge', '8xlarge'],
     seriesLabel: t('N series'),
   },
   o1: {
     Icon: ModuleIcon,
-    possibleSizes: [
-      'nano',
-      'micro',
-      'small',
-      'medium',
-      'large',
-      'xlarge',
-      '2xlarge',
-      '4xlarge',
-      '8xlarge',
-    ],
     seriesLabel: t('O series'),
   },
   rt1: {
     Icon: OutlinedClockIcon,
-    possibleSizes: [...InstanceTypeSizes],
     seriesLabel: t('RT series'),
-  },
-  server: {
-    disabled: true,
-    Icon: ServerIcon,
-    seriesLabel: t('S series'),
   },
   u1: {
     Icon: ServerGroupIcon,
-    possibleSizes: [
-      'nano',
-      'micro',
-      'small',
-      'medium',
-      '2xmedium',
-      'large',
-      'xlarge',
-      '2xlarge',
-      '4xlarge',
-      '8xlarge',
-    ],
     seriesLabel: t('U series'),
   },
 };

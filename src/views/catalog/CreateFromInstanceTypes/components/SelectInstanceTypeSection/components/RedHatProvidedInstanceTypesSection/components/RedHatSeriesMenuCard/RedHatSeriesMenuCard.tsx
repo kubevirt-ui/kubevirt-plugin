@@ -5,7 +5,11 @@ import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/u
 import RedHatInstanceTypeSeriesSizesMenuItems from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/components/RedHatInstanceTypeSeriesMenu/RedHatInstanceTypeSeriesSizesMenuItems';
 import { instanceTypeSeriesNameMapper } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/constants';
 import { RedHatInstanceTypeSeries } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/types';
-import { seriesHasHugepagesVariant } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/utils';
+import {
+  getSeriesLabel,
+  getSeriesSymbol,
+  seriesHasHugepagesVariant,
+} from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/utils';
 import HugepagesInfo from '@kubevirt-utils/components/HugepagesInfo/HugepagesInfo';
 import { useClickOutside } from '@kubevirt-utils/hooks/useClickOutside/useClickOutside';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -49,8 +53,7 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({
     instanceTypeVMState: { selectedInstanceType },
   } = useInstanceTypeVMStore();
 
-  const { classAnnotation, classDisplayNameAnnotation, descriptionAnnotation, seriesName, sizes } =
-    rhSeriesItem;
+  const { classDisplayNameAnnotation, descriptionAnnotation, seriesName, sizes } = rhSeriesItem;
 
   const { Icon, seriesLabel } = instanceTypeSeriesNameMapper[seriesName] || {};
 
@@ -84,6 +87,8 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({
     });
   }, [selectedInstanceType, seriesName, sizes, t]);
 
+  const defaultSeriesLabel = useMemo(() => getSeriesLabel(seriesName, t), [seriesName, t]);
+
   const card = (
     <Card
       className={classNames(
@@ -94,7 +99,9 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({
       ref={cardRef}
     >
       <Flex alignItems={{ default: 'alignItemsCenter' }} direction={{ default: 'column' }}>
-        <div className="instance-type-series-menu-card__card-icon">{Icon && <Icon />}</div>
+        <div className="instance-type-series-menu-card__card-icon">
+          {Icon ? <Icon /> : getSeriesSymbol(seriesName)}
+        </div>
         <CardHeader className="instance-type-series-menu-card__card-title">
           {classDisplayNameAnnotation}
         </CardHeader>
@@ -107,7 +114,7 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({
             ref={toggleRef}
             variant="link"
           >
-            {seriesLabel || classAnnotation}
+            {seriesLabel || defaultSeriesLabel}
           </Button>
           <div className="instance-type-series-menu-card__card-selected-option">
             {isSelectedMenu && selectedITLabel}
