@@ -135,20 +135,22 @@ export const getNADRole = (nad: NetworkAttachmentDefinition): string => {
   return config?.role;
 };
 
+export const getNadFullName = ({ name, namespace }: { name: string; namespace: string }) =>
+  `${namespace}/${name}`;
+
+export const getNameAndNs = (nad: NetworkAttachmentDefinition) => ({
+  name: getName(nad) ?? '',
+  namespace: getNamespace(nad) ?? '',
+});
+
+export const isNadFullName = (name: string) => name?.split('/').length === 2;
+
 export const isNADUsedInVM = (
   nad: NetworkAttachmentDefinition,
   currentlyUsedNADsNames: string[],
-  vmiNamespace: string,
 ): boolean => {
-  const nadShortName = getName(nad);
-  const nadNamespace = getNamespace(nad);
-  const nadFullName = `${nadNamespace}/${nadShortName}`;
-  const isInSameNamespace = nadNamespace === vmiNamespace;
-
-  return (
-    currentlyUsedNADsNames?.includes(nadFullName) ||
-    (isInSameNamespace && currentlyUsedNADsNames?.includes(nadShortName))
-  );
+  const nadFullName = getNadFullName(getNameAndNs(nad));
+  return currentlyUsedNADsNames.includes(nadFullName);
 };
 
 export const isOvnOverlayNad = (nad: NetworkAttachmentDefinition): boolean => {

@@ -1,3 +1,5 @@
+import partition from 'lodash/partition';
+
 import { NetworkAttachmentDefinitionModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { NetworkAttachmentDefinition } from '@kubevirt-utils/components/NetworkInterfaceModal/components/hooks/types';
 import {
@@ -30,13 +32,15 @@ export const resources = {
   },
 };
 
-export const filterUDNNads = (nads: NetworkAttachmentDefinition[]) =>
-  nads?.filter(
+export const filterUDNNads = (nads: NetworkAttachmentDefinition[]) => {
+  const [regular, primary] = partition(
+    nads ?? [],
     (nad) =>
       getLabel(nad, UDN_LABEL) === undefined ||
       getNADRole(nad) === UserDefinedNetworkRole.secondary,
   );
-
+  return { primary, regular };
+};
 export const watchResourceIfAllowed = (
   resourceWatch: WatchK8sResource,
   isAllowed: boolean,
