@@ -118,7 +118,7 @@ export const disconnect = ({
   );
   rfbRefs.current = newerSessions;
   targetAndOlderSessions.forEach(
-    ({ rfb }) => rfb._rfbConnectionState !== 'disconnected' && rfb?.disconnect(),
+    ({ rfb }) => rfb?._rfbConnectionState !== 'disconnected' && rfb?.disconnect(),
   );
   if (newerSessions.length || targetAndOlderSessions.length > 1) {
     log(
@@ -127,7 +127,7 @@ export const disconnect = ({
     // skip notification - target session already closed
     return;
   }
-  const current = targetAndOlderSessions.find((it) => it.sessionID === sessionID);
+  const current = targetAndOlderSessions.find((session) => session.sessionID === sessionID);
   const { testUrl } = current ?? {};
   if (!testUrl) {
     // synchronous cleanup

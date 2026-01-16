@@ -8,7 +8,7 @@ import { isConnectionEncrypted } from '../../utils/utils';
 import { ConsoleState, HTTP, HTTPS, VNC_CONSOLE_TYPE, WS, WSS } from '../utils/ConsoleConsts';
 import { ConsoleComponentState } from '../utils/types';
 
-import { ALL_SESSIONS } from './utils/constants';
+import { ALL_SESSIONS, AUTO_CONNECT, USER_CONNECT } from './utils/constants';
 import * as utils from './utils/util';
 import { RFB, RfbSession, VncConsoleProps } from './utils/VncConsoleTypes';
 import {
@@ -58,7 +58,7 @@ export const VncConsole: FC<VncConsoleProps> = ({
   const disconnect = ({ sessionID = sessionRef.current, sourceLabel = 'action' } = {}) =>
     utils.disconnect({ log, rfbRefs, sessionID, sessionRef, setVncState, sourceLabel });
 
-  const connect = (preserveSession: boolean = true) => {
+  const connect = (sourceLabel: string, preserveSession: boolean = true): void => {
     setVncState(() => ({ state: connecting }));
     const sessionID = ++sessionRef.current;
     // prevent disconnect for old session to interact with current connection attempt
@@ -76,7 +76,7 @@ export const VncConsole: FC<VncConsoleProps> = ({
     });
     const rfbInst: RFB = new RFBCreate(staticRenderLocationRef.current, connectUrl);
     rfbInst.addEventListener('connect', () => {
-      log(`[VncConsole] connect id=${sessionID} currentId=${sessionRef.current}`);
+      log(`[VncConsole][${sourceLabel}] connect id=${sessionID} currentId=${sessionRef.current}`);
       isMySession() && setVncState(() => ({ state: connected }));
     });
     rfbInst.addEventListener('disconnect', () =>
@@ -94,6 +94,8 @@ export const VncConsole: FC<VncConsoleProps> = ({
       // kubevirt API server is not closing the connection gracefully
       // so "standard" disconnect will also trigger this code
       const abnormalDisconnect = args.code === 1006;
+      const isConnecting = rfbInst?._rfbConnectionState === 'connecting';
+      const isUserConnect = sourceLabel === USER_CONNECT;
 
       const testUrl = utils.buildUrl({
         hostname: window.location.hostname,
@@ -106,7 +108,7 @@ export const VncConsole: FC<VncConsoleProps> = ({
         // https://github.com/kubevirt/kubevirt/issues/16273
         protocol: isEncrypted ? HTTPS : HTTP,
       });
-      if (abnormalDisconnect) {
+      if (abnormalDisconnect && isConnecting && isUserConnect) {
         log(
           `[VncConsole] abnormal disconnect id=${sessionID} currentId=${sessionRef.current}`,
           args,
@@ -115,9 +117,9 @@ export const VncConsole: FC<VncConsoleProps> = ({
         // that information can be later retrieved in the disconnect even handler
         rfbRefs.current =
           rfbRefs.current?.map(
-            (it): RfbSession => ({
-              ...it,
-              testUrl: it.sessionID === sessionID ? testUrl : it.testUrl,
+            (session): RfbSession => ({
+              ...session,
+              testUrl: session.sessionID === sessionID ? testUrl : session.testUrl,
             }),
           ) ?? [];
       }
@@ -158,20 +160,24 @@ export const VncConsole: FC<VncConsoleProps> = ({
 
   // auto-connect only on first load
   useEffect(() => {
-    if (!rfbRefs.current?.length) {
-      vncLogLevel && initLogging(vncLogLevel);
-      log(`[VncConsole] auto-connect. Active session ${sessionRef.current}.`);
-      connect();
-      setVncState((prev) => ({
-        actions: {
-          // keep the methods bound during connect()
-          ...prev.actions,
-          // add stable methods (semi-constant)
-          connect,
-          disconnect,
-        },
-      }));
+    if (rfbRefs.current?.length) {
+      log(`[VncConsole] Session queue dirty on initialization.`, rfbRefs.current);
+      return;
     }
+
+    vncLogLevel && initLogging(vncLogLevel);
+    log(`[VncConsole] auto-connect. Active session ${sessionRef.current}.`);
+    connect(AUTO_CONNECT);
+    const userConnect = (preserveSession?: boolean) => connect(USER_CONNECT, preserveSession);
+    setVncState((prev) => ({
+      actions: {
+        // keep the methods bound during connect()
+        ...prev.actions,
+        // add stable methods (semi-constant)
+        connect: userConnect,
+        disconnect,
+      },
+    }));
     // assumption: the parent keeps the object tree stable
     // and prevents re-creating this component (the render is called once)
     // Thanks to that the the cleanup is launched only when the parent is unmounted

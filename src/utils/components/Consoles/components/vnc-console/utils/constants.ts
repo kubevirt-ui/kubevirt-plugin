@@ -1,3 +1,6 @@
+export const USER_CONNECT = 'user_connect';
+export const AUTO_CONNECT = 'auto_connect';
+
 // follow the levels used by noVNC
 // falsy value means no logging
 // https://github.com/novnc/noVNC/blob/6d0a9746657b085c11309dc5356083fcbb018526/core/util/logging.js#L32
