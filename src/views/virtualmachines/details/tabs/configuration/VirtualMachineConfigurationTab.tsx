@@ -1,10 +1,10 @@
-import React, { FC, useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom-v5-compat';
-import { useLocation } from 'react-router-dom-v5-compat';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
 import useInstanceTypesAndPreferences from '@catalog/CreateFromInstanceTypes/state/hooks/useInstanceTypesAndPreferences';
 import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
 import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -15,7 +15,7 @@ import { isRunning } from '@virtualmachines/utils';
 import { getNamespace } from '../../../../cdi-upload-provider/utils/selectors';
 
 import VirtualMachineConfigurationTabSearch from './search/VirtualMachineConfigurationTabSearch';
-import { getInnerTabFromPath, includesConfigurationPath, tabs } from './utils/utils';
+import { getInnerTabFromPath, getTabs, includesConfigurationPath } from './utils/utils';
 
 import './virtual-machine-configuration-tab.scss';
 
@@ -23,8 +23,10 @@ const VirtualMachineConfigurationTab: FC<NavPageComponentProps> = ({
   instanceTypeExpandedSpec,
   obj: vm,
 }) => {
+  const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const location = useLocation();
+  const tabs = useMemo(() => getTabs(t), [t]);
 
   const { vmi } = useVMI(getName(vm), getNamespace(vm), getCluster(vm), isRunning(vm));
   const { allInstanceTypes } = useInstanceTypesAndPreferences();
@@ -45,9 +47,9 @@ const VirtualMachineConfigurationTab: FC<NavPageComponentProps> = ({
   );
 
   useEffect(() => {
-    const innerTab = getInnerTabFromPath(location.pathname);
+    const innerTab = getInnerTabFromPath(location.pathname, t);
     innerTab && setActiveTabKey(innerTab);
-  }, [location.pathname]);
+  }, [location.pathname, t]);
 
   return (
     <PageSection className="VirtualMachineConfigurationTab">

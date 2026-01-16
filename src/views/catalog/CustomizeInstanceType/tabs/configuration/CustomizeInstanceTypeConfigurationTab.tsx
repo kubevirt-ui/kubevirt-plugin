@@ -1,8 +1,9 @@
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { PageSection, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 import VirtualMachineConfigurationTabSearch from '@virtualmachines/details/tabs/configuration/search/VirtualMachineConfigurationTabSearch';
@@ -11,11 +12,12 @@ import {
   includesConfigurationPath,
 } from '@virtualmachines/details/tabs/configuration/utils/utils';
 
-import { tabs } from './utils/constants';
+import { getTabs } from './utils/constants';
 
 import './CustomizeInstanceTypeConfigurationTab.scss';
 
 const CustomizeInstanceTypeConfigurationTab: FC = () => {
+  const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const [activeTabKey, setActiveTabKey] = useState<number | string>(
@@ -23,6 +25,7 @@ const CustomizeInstanceTypeConfigurationTab: FC = () => {
   );
 
   const vm = vmSignal.value;
+  const tabs = useMemo(() => getTabs(t), [t]);
 
   const redirectTab = useCallback(
     (name: string) => {
@@ -37,9 +40,9 @@ const CustomizeInstanceTypeConfigurationTab: FC = () => {
   );
 
   useEffect(() => {
-    const innerTab = getInnerTabFromPath(location.pathname);
+    const innerTab = getInnerTabFromPath(location.pathname, t);
     innerTab && setActiveTabKey(innerTab);
-  }, [location.pathname]);
+  }, [location.pathname, t]);
 
   if (!vm) {
     return <Loading />;
