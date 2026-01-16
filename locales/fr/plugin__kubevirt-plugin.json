@@ -1429,6 +1429,8 @@
   "Select Project": "Sélectionner un projet",
   "Select project...": "Select project...",
   "Select secret": "Sélectionner un secret",
+  "Select series": "Select series",
+  "Select size": "Select size",
   "Select source node": "Sélectionner le nœud source",
   "Select storage class": "Sélectionnez la classe de stockage",
   "Select StorageClass": "Sélectionner l’objet StorageClass",

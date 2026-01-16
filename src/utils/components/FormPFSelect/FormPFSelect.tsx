@@ -4,6 +4,8 @@ import { MenuToggleProps, Select, SelectList, SelectProps } from '@patternfly/re
 
 import SelectToggle from '../toggles/SelectToggle';
 
+import './FormPFSelect.scss';
+
 type FormPFSelectProps = Omit<SelectProps, 'isOpen' | 'toggle'> & {
   closeOnSelect?: boolean;
   isDisabled?: boolean;
@@ -58,7 +60,7 @@ const FormPFSelect: FC<FormPFSelectProps> = ({
       selected={selected}
       {...props}
     >
-      <SelectList>{children}</SelectList>
+      <SelectList className="FormPFSelect-list">{children}</SelectList>
     </Select>
   );
 };

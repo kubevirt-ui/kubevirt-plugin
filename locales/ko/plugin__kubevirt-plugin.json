@@ -1414,6 +1414,8 @@
   "Select Project": "프로젝트 선택",
   "Select project...": "Select project...",
   "Select secret": "시크릿 선택",
+  "Select series": "Select series",
+  "Select size": "Select size",
   "Select source node": "소스 노드 선택",
   "Select storage class": "스토리지 클래스 선택",
   "Select StorageClass": "스토리지 클래스 선택",
