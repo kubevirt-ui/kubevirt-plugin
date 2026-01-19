@@ -1,6 +1,6 @@
+import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import DropdownEnum from '@kubevirt-utils/utils/dropdownEnum';
 import { ObjectEnum } from '@kubevirt-utils/utils/ObjectEnum';
-
 type TopConsumerMetricData = {
   chartLabel: string;
   dropdownLabel: string;
@@ -22,43 +22,43 @@ abstract class TopConsumerMetricObjectEnum<T> extends DropdownEnum<T> {
 
 export class TopConsumerMetric extends TopConsumerMetricObjectEnum<string> {
   static readonly CPU = new TopConsumerMetric('cpu', {
-    chartLabel: 'CPU',
-    dropdownLabel: 'By CPU',
+    chartLabel: t('CPU'),
+    dropdownLabel: t('By CPU'),
   });
 
   static readonly MEMORY = new TopConsumerMetric('memory', {
-    chartLabel: 'Memory',
-    dropdownLabel: 'By memory',
+    chartLabel: t('Memory'),
+    dropdownLabel: t('By memory'),
   });
 
   static readonly MEMORY_SWAP_TRAFFIC = new TopConsumerMetric('memory-swap-traffic', {
-    chartLabel: 'Memory swap traffic',
-    dropdownLabel: 'By memory swap traffic',
+    chartLabel: t('Memory swap traffic'),
+    dropdownLabel: t('By memory swap traffic'),
   });
 
   static readonly STORAGE_IOPS = new TopConsumerMetric('storage-iops', {
-    chartLabel: 'Storage IOPS',
-    dropdownLabel: 'By IOPS',
+    chartLabel: t('Storage IOPS'),
+    dropdownLabel: t('By IOPS'),
   });
 
   static readonly STORAGE_READ_LATENCY = new TopConsumerMetric('storage-read-latency', {
-    chartLabel: 'Storage read latency',
-    dropdownLabel: 'By read latency',
+    chartLabel: t('Storage read latency'),
+    dropdownLabel: t('By read latency'),
   });
 
   static readonly STORAGE_THROUGHPUT = new TopConsumerMetric('storage-throughput', {
-    chartLabel: 'Storage throughput',
-    dropdownLabel: 'By throughput',
+    chartLabel: t('Storage throughput'),
+    dropdownLabel: t('By throughput'),
   });
 
   static readonly STORAGE_WRITE_LATENCY = new TopConsumerMetric('storage-write-latency', {
-    chartLabel: 'Storage write latency',
-    dropdownLabel: 'By write latency',
+    chartLabel: t('Storage write latency'),
+    dropdownLabel: t('By write latency'),
   });
 
   static readonly VCPU_WAIT = new TopConsumerMetric('vcpu-wait', {
-    chartLabel: 'vCPU wait',
-    dropdownLabel: 'By vCPU wait',
+    chartLabel: t('vCPU wait'),
+    dropdownLabel: t('By vCPU wait'),
   });
 
   private static readonly all = Object.freeze(
