@@ -17,7 +17,8 @@ import { CROSS_CLUSTER_MIGRATION_ACTION_ID } from '@multicluster/constants';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
-import { isRunning } from '@virtualmachines/utils';
+
+import { isRunning, printableVMStatus } from '../utils';
 
 import ConfirmMultipleVMActionsModal from './components/ConfirmMultipleVMActionsModal/ConfirmMultipleVMActionsModal';
 import VirtualMachineMigrateModal from './components/VirtualMachineMigration/VirtualMachineMigrationModal';
@@ -33,6 +34,8 @@ import {
   unpauseVM,
 } from './actions';
 import { getCommonLabels, getLabelsDiffPatch, isSameCluster, isSameNamespace } from './utils';
+
+const { Stopped } = printableVMStatus;
 
 export const BulkVirtualMachineActionFactory = {
   controlActions: (controlActions: ActionDropdownItemType[]): ActionDropdownItemType => ({
@@ -207,7 +210,7 @@ export const BulkVirtualMachineActionFactory = {
             />
           ))
         : vms.forEach(pauseVM),
-    disabled: isEmpty(vms),
+    disabled: vms.every((vm) => vm.status?.printableStatus === Stopped),
     id: ACTIONS_ID.PAUSE,
     label: t('Pause'),
   }),
@@ -233,7 +236,7 @@ export const BulkVirtualMachineActionFactory = {
           ))
         : vms.forEach(resetVM),
     description: t('Hard power cycle on the VMs'),
-    disabled: isEmpty(vms),
+    disabled: vms.every((vm) => vm.status?.printableStatus === Stopped),
     id: ACTIONS_ID.RESET,
     label: t('Reset'),
   }),
@@ -254,7 +257,7 @@ export const BulkVirtualMachineActionFactory = {
             />
           ))
         : vms.forEach(restartVM),
-    disabled: isEmpty(vms),
+    disabled: vms.every((vm) => vm.status?.printableStatus === Stopped),
     id: ACTIONS_ID.RESTART,
     label: t('Restart'),
   }),
@@ -270,7 +273,7 @@ export const BulkVirtualMachineActionFactory = {
           <BulkSnapshotModal vms={vms} {...props} />
         ),
       ),
-    disabled: isEmpty(vms),
+    disabled: vms.every((vm) => vm.status?.printableStatus === Stopped),
     id: ACTIONS_ID.SNAPSHOT,
     label: t('Take snapshot'),
   }),
@@ -304,7 +307,7 @@ export const BulkVirtualMachineActionFactory = {
   }),
   unpause: (vms: V1VirtualMachine[]): ActionDropdownItemType => ({
     cta: () => vms.forEach(unpauseVM),
-    disabled: isEmpty(vms),
+    disabled: vms.every((vm) => vm.status?.printableStatus === Stopped),
     id: ACTIONS_ID.UNPAUSE,
     label: t('Unpause'),
   }),
