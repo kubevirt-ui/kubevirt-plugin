@@ -77,7 +77,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
   const logSerialConsole = vm?.spec?.template?.spec?.domain?.devices?.logSerialConsole;
   const [isCheckedGuestSystemAccessLog, setIsCheckedGuestSystemAccessLog] = useState<boolean>();
   const instanceType = useMemo(
-    () => allInstanceTypes.find((it) => it.metadata.name === vm?.spec?.instancetype?.name),
+    () => allInstanceTypes.find((it) => getName(it) === vm?.spec?.instancetype?.name),
     [allInstanceTypes, vm?.spec?.instancetype?.name],
   );
   useEffect(

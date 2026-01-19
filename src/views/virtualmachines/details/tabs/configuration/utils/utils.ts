@@ -42,7 +42,7 @@ export const getTabs = (t: TFunction) => [
   },
 ];
 
-export const getInnerTabs = (t: TFunction): { [key: string]: string } =>
+const getInnerTabs = (t: TFunction): { [key: string]: string } =>
   getTabs(t).reduce((acc, { name }) => {
     acc[name] = name;
     return acc;

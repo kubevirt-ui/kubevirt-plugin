@@ -32,7 +32,7 @@ const VirtualMachineConfigurationTab: FC<NavPageComponentProps> = ({
   const tabs = useMemo(() => getTabs(t), [t]);
 
   const { vmi } = useVMI(getName(vm), getNamespace(vm), getCluster(vm), isRunning(vm));
-  const { allInstanceTypes } = useInstanceTypesAndPreferences();
+  const { allInstanceTypes } = useInstanceTypesAndPreferences(getNamespace(vm), getCluster(vm));
   const [activeTabKey, setActiveTabKey] = useState<number | string>(
     VirtualMachineDetailsTab.Details,
   );
