@@ -12,11 +12,12 @@ import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   DescriptionList,
-  DescriptionListTermHelpText,
   DescriptionListTermHelpTextButton,
   Dropdown,
   DropdownItem,
   DropdownList,
+  Flex,
+  Icon,
   Popover,
   PopoverPosition,
 } from '@patternfly/react-core';
@@ -26,8 +27,6 @@ import IndicationLabelList from '../../../snapshots/components/IndicationLabel/I
 
 import SnapshotDeleteModal from './component/SnapshotDeleteModal';
 import { icon } from './utils/snapshotStatus';
-
-import './virtual-machines-overview-tab-snapshots.scss';
 
 type VirtualMachinesOverviewTabSnapshotsRowProps = {
   snapshot: V1beta1VirtualMachineSnapshot;
@@ -48,23 +47,30 @@ const VirtualMachinesOverviewTabSnapshotsRow: FC<VirtualMachinesOverviewTabSnaps
     false,
   );
 
-  const Icon = icon[snapshot?.status?.phase];
+  const StatusIcon = icon[snapshot?.status?.phase];
 
   const onToggle = () => setIsKebabOpen((prevIsOpen) => !prevIsOpen);
 
   return (
-    <div className="VirtualMachinesOverviewTabSnapshotsRow--main">
-      <div className="name">
-        <Icon />
-        <DescriptionListTermHelpText>
+    <Flex flexWrap={{ default: 'nowrap' }}>
+      <Flex
+        alignItems={{ default: 'alignItemsCenter' }}
+        flexWrap={{ default: 'nowrap' }}
+        grow={{ default: 'grow' }}
+        spaceItems={{ default: 'spaceItemsSm' }}
+      >
+        <Icon>
+          <StatusIcon />
+        </Icon>
+        <DescriptionList>
           <Popover
             bodyContent={
               <DescriptionList isHorizontal>
                 <DescriptionItem
                   descriptionData={
                     <>
-                      <Icon />
-                      <span className="icon-spacer">{snapshot?.status?.phase}</span>
+                      <StatusIcon />
+                      <span className="pf-v6-u-ml-xs">{snapshot?.status?.phase}</span>
                     </>
                   }
                   descriptionHeader={t('Status')}
@@ -79,13 +85,13 @@ const VirtualMachinesOverviewTabSnapshotsRow: FC<VirtualMachinesOverviewTabSnaps
             headerContent={snapshot?.metadata?.name}
             position={PopoverPosition.left}
           >
-            <DescriptionListTermHelpTextButton className="icon-spacer__offset">
+            <DescriptionListTermHelpTextButton>
               {snapshot?.metadata?.name}
             </DescriptionListTermHelpTextButton>
           </Popover>
-        </DescriptionListTermHelpText>
-        <span className="pf-v6-u-text-color-subtle timestamp">{`(${timestamp})`}</span>
-      </div>
+        </DescriptionList>
+        <span className="pf-v6-u-text-color-subtle">{`(${timestamp})`}</span>
+      </Flex>
       <Dropdown
         isOpen={isKebabOpen}
         onOpenChange={setIsKebabOpen}
@@ -111,7 +117,7 @@ const VirtualMachinesOverviewTabSnapshotsRow: FC<VirtualMachinesOverviewTabSnaps
           </DropdownItem>
         </DropdownList>
       </Dropdown>
-    </div>
+    </Flex>
   );
 };
 
