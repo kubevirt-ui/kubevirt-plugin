@@ -118,6 +118,18 @@ export const addDisk = (data: V1DiskFormState, vm: V1VirtualMachine) => {
   });
 };
 
+export const resizeVMDataVolumeTemplate = (data: V1DiskFormState, vm: V1VirtualMachine) => {
+  return produce(vm, (draftVM) => {
+    if (!draftVM?.spec?.dataVolumeTemplates) return;
+
+    const vmDataVolumeTemplate = draftVM.spec.dataVolumeTemplates.find(
+      (dv) => getName(dv) === getName(data.dataVolumeTemplate),
+    );
+    ensurePath(vmDataVolumeTemplate, ['spec.storage.resources.requests.storage']);
+    vmDataVolumeTemplate.spec.storage.resources.requests.storage = data.expandPVCSize;
+  });
+};
+
 type SubmitInput = {
   data: V1DiskFormState;
   editDiskName: string;
@@ -173,6 +185,13 @@ export const submit = async ({
       model: PersistentVolumeClaimModel,
       resource: pvc,
     });
+
+    if (data.dataVolumeTemplate) {
+      const resizedVM = resizeVMDataVolumeTemplate(data, newVM);
+      return shouldHotplug
+        ? (hotplugPromise(resizedVM, data) as Promise<any>)
+        : onSubmit(resizedVM, data);
+    }
   }
 
   return shouldHotplug ? (hotplugPromise(newVM, data) as Promise<any>) : onSubmit(newVM, data);
