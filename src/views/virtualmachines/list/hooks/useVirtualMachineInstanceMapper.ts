@@ -2,16 +2,15 @@ import { useMemo } from 'react';
 
 import { VirtualMachineInstanceModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
 import { getCluster } from '@multicluster/helpers/selectors';
+import { useAccessibleResources } from '@virtualmachines/search/hooks/useAccessibleResources';
 import { VMIMapper } from '@virtualmachines/utils/mappers';
 
 export const useVirtualMachineInstanceMapper = () => {
-  const [vmis, vmisLoaded] = useKubevirtWatchResource<V1VirtualMachineInstance[]>({
-    groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
-    isList: true,
-  });
+  const { loaded: vmisLoaded, resources: vmis } = useAccessibleResources<V1VirtualMachineInstance>(
+    VirtualMachineInstanceModelGroupVersionKind,
+  );
 
   const vmiMapper: VMIMapper = useMemo(() => {
     return (Array.isArray(vmis) ? vmis : [])?.reduce(
