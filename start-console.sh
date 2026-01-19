@@ -7,6 +7,7 @@ source ./route-console.sh
 plugins="
 monitoring-plugin=https://github.com/openshift/monitoring-plugin.git
 networking-console-plugin=https://github.com/openshift/networking-console-plugin.git
+nmstate-console-plugin=https://github.com/openshift/nmstate-console-plugin.git
 "
 
 # Plugin URLs per container runtime
@@ -22,6 +23,7 @@ get_plugin_url() {
 }
 
 INITIAL_PORT=9002
+BASE_DIR=$(pwd)
 
 for arg in "$@"; do
     plugin_url=$(get_plugin_url "$arg")
@@ -47,9 +49,13 @@ for arg in "$@"; do
     [ -n "$pid" ] && kill -9 "$pid"
 
     if [ "$arg" = "monitoring-plugin" ]; then
-        cd web
-        npm ci
-        PORT=$INITIAL_PORT npm run start -- --port=$INITIAL_PORT &
+        cd web 
+    fi
+
+    if [ -f yarn.lock ]; then
+        echo "Detected yarn.lock → using yarn to run $arg"
+        yarn install
+        PORT=$INITIAL_PORT yarn start --port="$INITIAL_PORT" &
     else
         npm ci
         PORT=$INITIAL_PORT npm run start -- --port="$INITIAL_PORT" &
@@ -60,6 +66,7 @@ for arg in "$@"; do
     running_docker="$running_docker,$arg=http://host.docker.internal:$INITIAL_PORT"
 
     INITIAL_PORT=$((INITIAL_PORT + 1))
+    cd "$BASE_DIR"
 done
 
 CONSOLE_IMAGE=${CONSOLE_IMAGE:-"quay.io/openshift/origin-console:latest"}
