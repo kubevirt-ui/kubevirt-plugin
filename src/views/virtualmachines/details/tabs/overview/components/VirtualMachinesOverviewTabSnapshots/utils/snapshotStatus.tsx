@@ -1,18 +1,8 @@
-import * as React from 'react';
-
 import {
-  CheckCircleIcon,
-  ExclamationCircleIcon,
-  InProgressIcon,
-  UnknownIcon,
-} from '@patternfly/react-icons';
-
-export const snapshotStatuses = {
-  Error: 'Error',
-  Failed: 'Failed',
-  Succeeded: 'Succeeded',
-  Unknown: 'Unknown',
-};
+  GreenCheckCircleIcon,
+  RedExclamationCircleIcon,
+} from '@openshift-console/dynamic-plugin-sdk';
+import { InProgressIcon, UnknownIcon } from '@patternfly/react-icons';
 
 const iconHandler = {
   get: (mapper: typeof iconMapper, prop: string) => {
@@ -23,9 +13,9 @@ const iconHandler = {
 };
 
 const iconMapper: { [key: string]: any } = {
-  error: ExclamationCircleIcon,
-  failed: ExclamationCircleIcon,
-  succeeded: () => <CheckCircleIcon color="green" />,
+  error: RedExclamationCircleIcon,
+  failed: RedExclamationCircleIcon,
+  succeeded: GreenCheckCircleIcon,
   unknown: UnknownIcon,
 };
 

@@ -15,6 +15,7 @@ import {
   CardFooter,
   CardTitle,
   Divider,
+  Flex,
   Label,
 } from '@patternfly/react-core';
 
@@ -22,8 +23,6 @@ import useSnapshotData from '../../../snapshots/hooks/useSnapshotData';
 import { createURL } from '../../utils/utils';
 
 import VirtualMachinesOverviewTabSnapshotsRow from './VirtualMachinesOverviewTabSnapshotsRow';
-
-import './virtual-machines-overview-tab-snapshots.scss';
 
 type VirtualMachinesOverviewTabSnapshotsProps = {
   vm: V1VirtualMachine;
@@ -38,23 +37,21 @@ const VirtualMachinesOverviewTabSnapshots: React.FC<VirtualMachinesOverviewTabSn
   const snapshotsTabLink = createURL('snapshots', location?.pathname);
 
   return (
-    <div
-      className="VirtualMachinesOverviewTabSnapshots--main"
-      data-test-id="virtual-machine-overview-snapshots"
-    >
+    <div data-test-id="virtual-machine-overview-snapshots">
       <Card>
-        <CardTitle className="pf-v6-u-text-color-subtle">
-          <Link to={snapshotsTabLink}>
-            {t('Snapshots ({{snapshots}})', { snapshots: snapshots.length || 0 })}
-          </Link>
-
-          <Button
-            isInline
-            onClick={() => createModal((props) => <SnapshotModal vm={vm} {...props} />)}
-            variant={ButtonVariant.link}
-          >
-            {t('Take snapshot')}
-          </Button>
+        <CardTitle>
+          <Flex justifyContent={{ default: 'justifyContentSpaceBetween' }}>
+            <Link to={snapshotsTabLink}>
+              {t('Snapshots ({{snapshots}})', { snapshots: snapshots.length || 0 })}
+            </Link>
+            <Button
+              isInline
+              onClick={() => createModal((props) => <SnapshotModal vm={vm} {...props} />)}
+              variant={ButtonVariant.link}
+            >
+              {t('Take snapshot')}
+            </Button>
+          </Flex>
         </CardTitle>
         <Divider />
         <CardBody isFilled>
