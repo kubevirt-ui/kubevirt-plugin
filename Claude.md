@@ -20,15 +20,6 @@ The **KubeVirt Plugin** is a dynamic plugin for the OpenShift Console that provi
 - **Cypress**: 14.3.x (E2E testing)
 - **Jest**: 29.7.0 (unit testing)
 
-### Repository Structure
-
-This is a monorepo containing multiple packages:
-
-- `kubevirt-plugin/` - Main plugin code (this directory)
-- `kubevirt-api/` - Generated API client libraries
-- `kubevirt-components/` - Shared React components library
-- `kubevirt-apiserver-proxy/` - Go proxy server for API requests
-
 ## Project Structure
 
 ### Key Directories
@@ -63,7 +54,7 @@ Contains the main feature implementations:
 - `checkups/` - Health checkups
 - `datasources/` - Data source management
 - `bootablevolumes/` - Bootable volume management
-- `search/` - Search functionality
+- `search/` - Advanced search (top bar in VirtualMachines list page)
 - `lightspeed/` - AI-assisted features
 
 ### Utils Directory (`src/utils/`)
@@ -125,7 +116,7 @@ import ClusterProjectDropdown from '@kubevirt-utils/components/ClusterProjectDro
 
 ### Folder Organization
 
-- **Folder Naming**: lowercase, kebab-case (e.g., `/components/main-header/`)
+- **Folder Naming**: PascalCase when the folder reflects the main component (e.g., `/components/ClusterProjectDropdown/`), otherwise lowercase
 - **Component Structure**:
   ```
   /components/my-component/
@@ -136,17 +127,16 @@ import ClusterProjectDropdown from '@kubevirt-utils/components/ClusterProjectDro
 
 ### Styling
 
-- **SCSS Files**: Extract styles into separate `.scss` files
-- **BEM Methodology**: Use BEM for class naming
-- **Project-Based Classes**: Use project-specific class names, don't rely on PatternFly class names
+- **Prefer PatternFly**: Use PatternFly properties and utility classes when possible
+- **SCSS Files**: Only create `.scss` files when PatternFly utilities are insufficient
+- **Project-Based Classes**: When custom styles are needed, use project-specific class names
 - **Avoid `!important`**: Only use when absolutely necessary
-- **Responsive Design**: Prefer relative units (%, em, rem) over absolute (px)
 
 ### TypeScript Conventions
 
 - **Prefer `type` over `interface`**: For defining object/function shapes
 - **Avoid `any`**: Use `unknown` and narrow types as needed
-- **Explicit Return Types**: Always define function return types explicitly
+- **Explicit Return Types**: Define explicit return types for non-component functions; `JSX.Element` can be inferred for components
 - **Export Types**: Add exported types to utility files
 
 ### Code Organization
@@ -222,7 +212,7 @@ export default MyComponent;
 ### Component Development
 
 1. Create component in appropriate directory (`src/utils/components/` for shared, `src/views/[feature]/components/` for feature-specific)
-2. Create corresponding `.scss` file
+2. Use PatternFly components and utility classes; only add `.scss` if custom styles are needed
 3. Use `useKubevirtTranslation` for i18n
 4. Extract logic to custom hooks if needed
 5. Write tests (Cypress for E2E, Jest for unit)
@@ -385,7 +375,6 @@ See `CODING_STANDARDS.md` for detailed guidelines.
 - **README.md** - Setup, deployment, and general information
 - **CODING_STANDARDS.md** - Detailed coding guidelines and best practices
 - **INTERNATIONALIZATION.md** - i18n documentation
-- **console-extensions.md** - Console extension API documentation (generated)
 
 ## Notes for AI Assistants
 
