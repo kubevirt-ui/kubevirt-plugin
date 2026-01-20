@@ -7,8 +7,11 @@ import {
   STATUS_COMPLETED,
   STATUS_IN_PROGRESS,
 } from '@kubevirt-utils/resources/migrations/constants';
-import { isMigrationCompleted } from '@kubevirt-utils/resources/migrations/utils';
-import { getName, getNamespace, getStatusConditionsByType } from '@kubevirt-utils/resources/shared';
+import {
+  getMigrationCompletedTimestamp,
+  isMigrationCompleted,
+} from '@kubevirt-utils/resources/migrations/utils';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
@@ -41,7 +44,7 @@ const useProgressMigration: UseProgressMigration = (storageMigrationPlan) => {
 
   return {
     completedMigrationTimestamp: migrationCompleted
-      ? getStatusConditionsByType(watchStorageMigrationPlan, STATUS_COMPLETED)?.lastTransitionTime
+      ? getMigrationCompletedTimestamp(watchStorageMigrationPlan)
       : null,
     creationTimestamp: storageMigrationPlan?.metadata?.creationTimestamp,
     error: storageMigrationPlanError,

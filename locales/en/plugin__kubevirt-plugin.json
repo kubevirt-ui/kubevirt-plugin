@@ -977,7 +977,6 @@
   "Migrate VirtualMachines": "Migrate VirtualMachines",
   "Migrate VirtualMachines storage": "Migrate VirtualMachines storage",
   "Migrate VirtualMachines to a different Node": "Migrate VirtualMachines to a different Node",
-  "Migrated at": "Migrated at",
   "Migrating {{migrationCount}} out of {{allCount}}": "Migrating {{migrationCount}} out of {{allCount}}",
   "Migration": "Migration",
   "Migration chart": "Migration chart",

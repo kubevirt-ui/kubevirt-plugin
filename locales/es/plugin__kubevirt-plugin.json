@@ -987,7 +987,6 @@
   "Migrate VirtualMachines": "Migrar VirtualMachines",
   "Migrate VirtualMachines storage": "Migrar almacenamiento de VirtualMachines",
   "Migrate VirtualMachines to a different Node": "Migrate VirtualMachines to a different Node",
-  "Migrated at": "Migrada en",
   "Migrating {{migrationCount}} out of {{allCount}}": "Migrando {{migrationCount}} de {{allCount}}",
   "Migration": "Migración",
   "Migration chart": "Gráfico de migración",

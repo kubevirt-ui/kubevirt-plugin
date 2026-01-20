@@ -87,7 +87,8 @@ const VirtualMachineMigrationStatus: FC<VirtualMachineMigrationStatusProps> = ({
 
             {migrationCompleted && (
               <>
-                {t('Migrated at')} <Timestamp timestamp={completedMigrationTimestamp} />{' '}
+                <br />
+                <Timestamp timestamp={completedMigrationTimestamp} />
               </>
             )}
 

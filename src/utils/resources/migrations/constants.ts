@@ -78,4 +78,5 @@ export type VirtualMachineStorageMigration = K8sResourceCommon & {
 
 export const STATUS_COMPLETED = 'Completed';
 
-export const STATUS_IN_PROGRESS = 'InProgress';
+export const STATUS_IN_PROGRESS = 'In Progress';
+export const STATUS_READY = 'Ready';
