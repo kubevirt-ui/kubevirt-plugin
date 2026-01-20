@@ -1,11 +1,12 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import HugepagesInfo from '@kubevirt-utils/components/HugepagesInfo/HugepagesInfo';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Divider } from '@patternfly/react-core';
 
 import { instanceTypeSeriesNameMapper } from '../../utils/constants';
 import { RedHatInstanceTypeSeries } from '../../utils/types';
-import { seriesHasHugepagesVariant } from '../../utils/utils';
+import { getSeriesLabel, seriesHasHugepagesVariant } from '../../utils/utils';
 import RedHatInstanceTypeSeriesSizesMenuItems from '../RedHatInstanceTypeSeriesMenu/RedHatInstanceTypeSeriesSizesMenuItems';
 
 import DrilldownMenuItem from './DrilldownMenuItem';
@@ -23,8 +24,11 @@ const DrilldownMenuItemWrapper: FC<DrilldownMenuItemWrapperProps> = ({
   selectedKind,
   series,
 }) => {
-  const { classAnnotation, seriesName, sizes } = series;
+  const { t } = useKubevirtTranslation();
+  const { seriesName, sizes } = series;
   const { disabled, Icon, seriesLabel } = instanceTypeSeriesNameMapper[seriesName] || {};
+
+  const defaultSeriesLabel = useMemo(() => getSeriesLabel(seriesName, t), [seriesName, t]);
 
   const getMenuItems = (isHugepages?: boolean) => (
     <RedHatInstanceTypeSeriesSizesMenuItems
@@ -42,7 +46,7 @@ const DrilldownMenuItemWrapper: FC<DrilldownMenuItemWrapperProps> = ({
       Icon={Icon && Icon}
       id={seriesName}
       key={seriesName}
-      label={seriesLabel || classAnnotation}
+      label={seriesLabel || defaultSeriesLabel}
     >
       {seriesHasHugepagesVariant(seriesName) ? (
         <>

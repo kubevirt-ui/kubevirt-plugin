@@ -1,3 +1,4 @@
+import { TFunction } from 'react-i18next';
 import { parseSize } from 'xbytes';
 
 import { V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -13,7 +14,6 @@ import {
   INSTANCETYPE_CLASS_ANNOTATION,
   INSTANCETYPE_CLASS_DISPLAY_NAME,
   INSTANCETYPE_DESCRIPTION_ANNOTATION,
-  instanceTypeSeriesNameMapper,
   REDHAT_COM,
 } from './constants';
 import { InstanceTypeSize, InstanceTypesMenuItemsData, RedHatInstanceTypeSeries } from './types';
@@ -48,27 +48,15 @@ const getRedHatInstanceTypeSeriesAndSize = (
   };
 };
 
-const hasRedHatSeriesSizeLabel = (instanceType: InstanceTypeUnion) => {
-  const [seriesName, sizeLabel = ''] = getName(instanceType).split('.');
-
-  const rhInstanceTypeSize = instanceTypeSeriesNameMapper[seriesName]?.possibleSizes?.find(
-    (size) => size === sizeLabel,
-  );
-
-  return !isEmpty(rhInstanceTypeSize);
-};
-
-export const isRedHatInstanceType = (instanceType: InstanceTypeUnion): boolean => {
-  if (getLabel(instanceType, VENDOR_LABEL) !== REDHAT_COM) return false;
-  return hasRedHatSeriesSizeLabel(instanceType);
-};
+export const isRedHatInstanceType = (instanceType: InstanceTypeUnion): boolean =>
+  getLabel(instanceType, VENDOR_LABEL) === REDHAT_COM;
 
 export const getInstanceTypeMenuItems = (
   instanceTypes: V1beta1VirtualMachineClusterInstancetype[],
 ): InstanceTypesMenuItemsData => {
   if (isEmpty(instanceTypes)) return initialMenuItems;
 
-  const itemsData = instanceTypes.reduce((acc, it) => {
+  const itemsData = instanceTypes.reduce<InstanceTypesMenuItemsData>((acc, it) => {
     if (!isRedHatInstanceType(it)) {
       !acc.userProvided.items.includes(getName(it)) && acc.userProvided.items.push(getName(it));
       return acc;
@@ -121,5 +109,11 @@ export const seriesHasHugepagesVariant = (seriesName: string): boolean =>
 
 export const is1GiInstanceType = (sizeLabel: string): boolean => sizeLabel.endsWith('1gi');
 
-export const getOppositeHugepagesInstanceType = (instanceTypeName: string, checked: boolean) =>
-  checked ? `${instanceTypeName}1gi` : `${instanceTypeName.replace(/1gi$/, '')}`;
+// Converts series name to symbol (e.g. cx1 -> CX, d1 -> D, etc.)
+export const getSeriesSymbol = (seriesName: string): string => {
+  const match = seriesName?.match(/^[a-zA-Z]+/);
+  return match ? match[0].toUpperCase() : '';
+};
+
+export const getSeriesLabel = (seriesName: string, t: TFunction): string =>
+  t('{{symbol}} series', { symbol: getSeriesSymbol(seriesName) });
