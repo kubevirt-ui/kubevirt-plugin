@@ -62,12 +62,14 @@ export const produceVMDevices = (
 
 export const produceVMSysprep = (vm: V1VirtualMachine, sysprepName?: string) => {
   return produceVMDisks(vm, (vmDraft) => {
+    const sysprepDiskToAdd = sysprepDisk();
+
     if (
       !vmDraft.spec.template.spec.domain.devices.disks?.find(
-        (disk) => disk.name === sysprepDisk.name,
+        (disk) => disk.name === sysprepDiskToAdd.name,
       )
     ) {
-      vmDraft.spec.template.spec.domain.devices.disks.push(sysprepDisk());
+      vmDraft.spec.template.spec.domain.devices.disks.push(sysprepDiskToAdd);
       vmDraft.spec.template.spec.volumes.push(
         sysprepVolume(sysprepName || generateSysprepConfigMapName()),
       );
