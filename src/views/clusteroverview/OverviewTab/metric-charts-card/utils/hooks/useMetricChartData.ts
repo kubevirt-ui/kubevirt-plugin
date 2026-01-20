@@ -76,7 +76,7 @@ const useMetricChartData: UseMetricChartData = (metric) => {
     chartData: formattedData,
     domain,
     error,
-    isReady: formattedData?.length > 1,
+    isReady: formattedData?.length > 0,
     largestValue,
     loaded,
     numberOfTicks: daySpan,
