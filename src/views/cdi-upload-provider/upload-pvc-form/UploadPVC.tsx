@@ -1,4 +1,4 @@
-import React, { FC, FormEvent, useContext, useEffect, useMemo, useState } from 'react';
+import React, { FC, FormEvent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useNavigate } from 'react-router-dom-v5-compat';
 import axios from 'axios';
@@ -186,6 +186,10 @@ const UploadPVCPage: FC = () => {
     }
   }, [errorTemplates, errorPvcs]);
 
+  const onCancel = useCallback(() => {
+    navigate(resourcePath(PersistentVolumeClaimModel));
+  }, [navigate]);
+
   return (
     <>
       <Helmet>
@@ -250,7 +254,7 @@ const UploadPVCPage: FC = () => {
               >
                 {t('Upload')}
               </Button>
-              <Button onClick={() => navigate(-1)} type="button" variant={ButtonVariant.secondary}>
+              <Button onClick={onCancel} type="button" variant={ButtonVariant.secondary}>
                 {t('Cancel')}
               </Button>
             </ActionGroup>
@@ -272,7 +276,7 @@ const UploadPVCPage: FC = () => {
         dataVolume={dvObj}
         isAllocating={isAllocating}
         isSubmitting={isSubmitting}
-        onCancelClick={() => navigate(resourcePath(PersistentVolumeClaimModel))}
+        onCancelClick={onCancel}
       />
     </>
   );
