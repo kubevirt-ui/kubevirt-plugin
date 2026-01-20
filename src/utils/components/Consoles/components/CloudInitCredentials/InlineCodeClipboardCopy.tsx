@@ -4,7 +4,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { ClipboardCopy } from '@patternfly/react-core';
 
 import { writeToClipboard } from '../../utils/utils';
-import { LINE_FEED } from '../vnc-console/utils/util';
+import { LINE_FEED } from '../vnc-console/utils/constants';
 
 type InlineCodeClipboardCopyProps = {
   clipboardText: string;

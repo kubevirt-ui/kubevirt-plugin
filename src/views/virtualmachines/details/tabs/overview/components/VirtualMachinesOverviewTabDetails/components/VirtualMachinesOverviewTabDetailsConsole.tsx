@@ -6,6 +6,8 @@ import {
 } from '@kubevirt-utils/components/Consoles/components/utils/ConsoleConsts';
 import { ConsoleComponentState } from '@kubevirt-utils/components/Consoles/components/utils/types';
 import HideConsole from '@kubevirt-utils/components/Consoles/components/vnc-console/HideConsole';
+import { isConnectableState } from '@kubevirt-utils/components/Consoles/components/vnc-console/utils/util';
+import { VncLogLevel } from '@kubevirt-utils/components/Consoles/components/vnc-console/utils/VncConsoleTypes';
 import VncConsole from '@kubevirt-utils/components/Consoles/components/vnc-console/VncConsole';
 import { getConsoleBasePath } from '@kubevirt-utils/components/Consoles/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -23,11 +25,20 @@ type VirtualMachinesOverviewTabDetailsConsoleProps = {
   vmCluster?: string;
   vmName: string;
   vmNamespace: string;
+  vncLogLevel?: VncLogLevel;
 };
 
 const VirtualMachinesOverviewTabDetailsConsole: FC<
   VirtualMachinesOverviewTabDetailsConsoleProps
-> = ({ canConnectConsole, isHeadlessMode, isVMRunning, vmCluster, vmName, vmNamespace }) => {
+> = ({
+  canConnectConsole,
+  isHeadlessMode,
+  isVMRunning,
+  vmCluster,
+  vmName,
+  vmNamespace,
+  vncLogLevel,
+}) => {
   const { t } = useKubevirtTranslation();
   const [apiPath, apiPathLoaded] = useK8sBaseAPIPath(vmCluster);
   const [{ actions, state }, setState] = useState<ConsoleComponentState>({
@@ -38,8 +49,7 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
   const enableConsole = isVMRunning && !isHeadlessMode && canConnectConsole;
   const showConnect =
     !enableConsole || // connect component is also empty state here
-    state === ConsoleState.disconnected ||
-    state === ConsoleState.connecting;
+    isConnectableState(state);
 
   if (!apiPathLoaded)
     return (
@@ -48,14 +58,21 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
       </Bullseye>
     );
 
+  const vncBasePath = getConsoleBasePath({ apiPath, name: vmName, namespace: vmNamespace });
   return (
     <Bullseye className="console-overview">
       <div className="link">
         <Button
+          onClick={(e) => {
+            e.preventDefault();
+            actions?.disconnect?.();
+            window.open(getConsoleStandaloneURL(vmNamespace, vmName, vmCluster));
+          }}
+          component="a"
+          href={getConsoleStandaloneURL(vmNamespace, vmName, vmCluster)}
           icon={<ExternalLinkAltIcon className="icon" />}
           iconPosition="end"
           isDisabled={!enableConsole}
-          onClick={() => window.open(getConsoleStandaloneURL(vmNamespace, vmName, vmCluster))}
           variant={ButtonVariant.link}
         >
           {t('Open web console')}
@@ -64,9 +81,12 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
       {enableConsole && (
         <HideConsole isHidden={state !== ConsoleState.connected}>
           <VncConsole
-            basePath={getConsoleBasePath({ apiPath, name: vmName, namespace: vmNamespace })}
+            basePath={vncBasePath}
+            // force re-create on change
+            key={`vnc-${vncBasePath}-${vncLogLevel}`}
             setState={setState}
             viewOnly
+            vncLogLevel={vncLogLevel}
           />
         </HideConsole>
       )}
@@ -77,6 +97,7 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
             isConnecting={state === ConsoleState.connecting}
             isDisabled={!enableConsole}
             isHeadlessMode={isHeadlessMode}
+            isSessionAlreadyInUse={state === ConsoleState.session_already_in_use}
           />
         </div>
       )}
