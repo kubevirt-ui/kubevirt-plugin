@@ -12,8 +12,8 @@ describe('Test Cluster General settings', () => {
 
   describe('Check installed version appears', () => {
     it('check version', () => {
-      cy.get('[data-test="detail-item-value"]').contains('4');
-      cy.get('[data-test="detail-item-value"]').contains('Up to date');
+      cy.get('[data-test-id="general-information-installed-version"]').contains('4');
+      cy.get('[data-test-id="general-information-update-status"]').contains('Up to date');
     });
   });
 
