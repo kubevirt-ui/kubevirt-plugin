@@ -118,7 +118,7 @@ import ClusterProjectDropdown from '@kubevirt-utils/components/ClusterProjectDro
 
 ### Folder Organization
 
-- **Folder Naming**: Use lowercase, kebab-case (e.g., `/components/main-header/`) *(Per CNV UI Best Practices)*
+- **Folder Naming**: PascalCase when the folder reflects the main component (e.g., `/components/ClusterProjectDropdown/`), otherwise lowercase
 - **Component Structure**:
   ```text
   /components/my-component/
@@ -129,23 +129,19 @@ import ClusterProjectDropdown from '@kubevirt-utils/components/ClusterProjectDro
 
 ### Styling
 
-*Per CNV UI Best Practices document:*
-
-- **Prefer SCSS**: Use SCSS for styling to leverage nesting, variables, and mixins for maintainable styles
-- **Extract Styles**: Extract styling into SCSS files (`my-component-name.scss`) rather than embedding in components
+- **Prefer PatternFly**: Always prefer using PatternFly (PF) styling and utility classes first
+- **SCSS When Needed**: Use SCSS only when PatternFly utilities are insufficient
 - **Project-Based Classes**: Use project-specific class names as anchors; don't rely on PatternFly class names (they change between versions)
-- **BEM Methodology**: Follow BEM for consistent and predictable class naming
-- **Responsive Design**: Use relative units (%, em, rem) over absolute units (px)
+- **BEM Methodology**: Follow BEM for consistent and predictable class naming *(Per CNV UI Best Practices)*
+- **Responsive Design**: Use relative units (%, em, rem) over absolute units (px) *(Per CNV UI Best Practices)*
 - **Avoid `!important`**: Only use when absolutely necessary
 
 ### TypeScript Conventions
 
-*Per CNV UI Best Practices document:*
-
-- **Prefer `type` over `interface`**: For defining object/function shapes
-- **Avoid `any`**: Use `unknown` and narrow types as needed
-- **Explicit Return Types**: Always explicitly define return types for functions rather than relying on TypeScript to infer them
-- **Export Types**: If a type is exported, add it to a utility file
+- **Prefer `type` over `interface`**: For defining object/function shapes *(Per CNV UI Best Practices)*
+- **Avoid `any`**: Use `unknown` and narrow types as needed *(Per CNV UI Best Practices)*
+- **Explicit Return Types**: Define explicit return types for non-component functions; `JSX.Element` can be inferred for components
+- **Export Types**: If a type is exported, add it to a utility file *(Per CNV UI Best Practices)*
 
 ### Function Development
 
@@ -254,7 +250,7 @@ export default MyComponent;
 ### Component Development
 
 1. Create component in appropriate directory (`src/utils/components/` for shared, `src/views/[feature]/components/` for feature-specific)
-2. Create corresponding SCSS file for styles (`my-component-name.scss`)
+2. Use PatternFly components and utility classes; only add `.scss` if custom styles are needed
 3. Use `useKubevirtTranslation` for i18n
 4. Extract logic to custom hooks if needed
 5. Write unit tests with Jest
