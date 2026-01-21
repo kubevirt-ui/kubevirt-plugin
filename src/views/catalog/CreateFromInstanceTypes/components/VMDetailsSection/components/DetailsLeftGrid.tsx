@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import {
@@ -32,6 +32,7 @@ const DetailsLeftGrid: FC<DetailsLeftGridProps> = ({
   const { t } = useKubevirtTranslation();
   const cluster = useClusterParam();
   const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
+  const [vmNameTouched, setVmNameTouched] = useState(false);
 
   const { instanceTypeVMState, setInstanceTypeVMState, vmNamespaceTarget } =
     useInstanceTypeVMStore();
@@ -76,14 +77,16 @@ const DetailsLeftGrid: FC<DetailsLeftGridProps> = ({
               data-test-id="instancetypes-vm-name-input"
               isRequired
               name="vmname"
+              onBlur={() => setVmNameTouched(true)}
               type="text"
-              validated={vmNameValidated}
+              validated={vmNameTouched ? vmNameValidated : undefined}
               value={vmName}
             />
-            <VMNameValidationHelperText vmName={vmName} />
+            <VMNameValidationHelperText touched={vmNameTouched} vmName={vmName} />
           </>
         }
         descriptionHeader={t('Name')}
+        isRequired
       />
       {treeViewFoldersEnabled && (
         <DescriptionItem
