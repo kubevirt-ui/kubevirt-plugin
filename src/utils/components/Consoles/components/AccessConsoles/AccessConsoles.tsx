@@ -97,11 +97,6 @@ export const AccessConsoles: FC<AccessConsolesProps> = ({
       )}
       {type !== VNC_CONSOLE_TYPE && (
         <Button
-          icon={
-            <>
-              <PasteIcon /> {t('Paste to console')}
-            </>
-          }
           onClick={
             actions.sendPaste
               ? (e: MouseEvent<HTMLButtonElement>) => {
@@ -115,9 +110,12 @@ export const AccessConsoles: FC<AccessConsolesProps> = ({
               : undefined
           }
           className="vnc-paste-button"
+          icon={<PasteIcon />}
           isDisabled={!actions.sendPaste}
           variant={ButtonVariant.link}
-        />
+        >
+          {t('Paste to console')}
+        </Button>
       )}
       <Select
         onSelect={(_, selection: string) => {
