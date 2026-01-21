@@ -4,7 +4,6 @@ import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/Descript
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { OverviewDetailItem } from '@openshift-console/plugin-shared';
 import {
   Alert,
   AlertVariant,
@@ -31,6 +30,7 @@ type GeneralInformationProps = {
   updateChannel: string;
   version: string;
 };
+
 const GeneralInformation: FC<GeneralInformationProps> = ({
   catalogSourceMissing,
   kubevirtSubscription,
@@ -42,22 +42,32 @@ const GeneralInformation: FC<GeneralInformationProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
+  const getUpdateStatusContent = () => {
+    if (!loaded) return <Skeleton />;
+    if (catalogSourceMissing) return <SourceMissingStatus />;
+    return <SubscriptionStatus operatorLink={operatorLink} subscription={kubevirtSubscription} />;
+  };
+
   return (
     <Split className="general-tab" hasGutter>
       <SplitItem>
-        <OverviewDetailItem isLoading={!loaded} title={t('Installed version')}>
-          {version}
-        </OverviewDetailItem>
+        <DescriptionList>
+          <DescriptionItem
+            data-test-id="general-information-installed-version"
+            descriptionData={loaded ? version : <Skeleton />}
+            descriptionHeader={t('Installed version')}
+          />
+        </DescriptionList>
       </SplitItem>
-      <Divider className="general-tab__divider" orientation={{ default: 'vertical' }} />
+      <Divider orientation={{ default: 'vertical' }} />
       <SplitItem>
-        <OverviewDetailItem isLoading={!loaded} title={t('Update status')}>
-          {catalogSourceMissing ? (
-            <SourceMissingStatus />
-          ) : (
-            <SubscriptionStatus operatorLink={operatorLink} subscription={kubevirtSubscription} />
-          )}
-        </OverviewDetailItem>
+        <DescriptionList>
+          <DescriptionItem
+            data-test-id="general-information-update-status"
+            descriptionData={getUpdateStatusContent()}
+            descriptionHeader={t('Update status')}
+          />
+        </DescriptionList>
       </SplitItem>
       <Divider orientation={{ default: 'vertical' }} />
       <SplitItem>

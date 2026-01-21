@@ -19,7 +19,6 @@ export const descrText = '.pf-v6-c-description-list__text';
 export const tagsInput = 'input#tags-input';
 export const labelText = '.pf-v6-c-label__text';
 export const labelContent = '.pf-v6-c-label__content';
-export const itemValue = '[data-test="detail-item-value"]';
 export const actionsBtn = 'button.pf-v6-c-menu-toggle.pf-m-plain';
 export const submitButton = 'button[type=submit]';
 export const resourceTitle = '[data-test-id="resource-title"]';
