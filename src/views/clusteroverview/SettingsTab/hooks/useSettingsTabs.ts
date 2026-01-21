@@ -41,11 +41,11 @@ export const useSettingsTabs = () => {
   });
 
   const redirectTab = useCallback(
-    (name: string) => {
+    (name: string, replace = false) => {
       setActiveTab(name);
       const basePath = location.pathname.replace(/\/settings.*$/, '/settings');
       const redirectPath = `${basePath}/${name}`;
-      navigate(redirectPath);
+      navigate(redirectPath, { replace });
     },
     [location.pathname, navigate],
   );
@@ -56,7 +56,7 @@ export const useSettingsTabs = () => {
     if (tabFromURL) {
       setActiveTab(tabFromURL);
     } else {
-      redirectTab(tabs[0].name);
+      redirectTab(tabs[0].name, true);
     }
   }, [getActiveTabFromURL, redirectTab, tabs]);
 
