@@ -8,23 +8,25 @@ The **KubeVirt Plugin** is a dynamic plugin for the OpenShift Console that provi
 
 ### Technology Stack
 
-- **React**: 17.0.2 (functional components with hooks)
-- **TypeScript**: 5.7.x (strict typing, prefer `type` over `interface`)
-- **PatternFly React**: 6.2.x (UI component library)
-- **OpenShift Console Dynamic Plugin SDK**: 4.20.0 (plugin framework)
-- **React Router**: v5.3.x (with v6 compat layer via `react-router-dom-v5-compat`)
-- **React Hook Form**: 7.31.2 (form management)
-- **Zustand**: 4.3.7 (state management)
-- **React i18next**: 11.18.6 (internationalization)
-- **Webpack**: 5.96.1 (bundling)
-- **Cypress**: 14.3.x (E2E testing)
-- **Jest**: 29.7.0 (unit testing)
+Key technologies used (see `package.json` for current versions):
+
+- **React** - UI framework (functional components with hooks)
+- **TypeScript** - Strict typing (prefer `type` over `interface`)
+- **PatternFly React** - UI component library
+- **OpenShift Console Dynamic Plugin SDK** - Plugin framework (with fleet wrappers where needed)
+- **React Router** - v5 with v6 compat layer (`react-router-dom-v5-compat`)
+- **React Hook Form** - Form management
+- **Zustand** - State management
+- **React i18next** - Internationalization
+- **Webpack** - Bundling
+- **Cypress** - E2E testing
+- **Jest** - Unit testing
 
 ## Project Structure
 
 ### Key Directories
 
-```
+```text
 kubevirt-plugin/
 ├── src/
 │   ├── views/              # Main feature views (catalog, VMs, templates, etc.)
@@ -116,9 +118,9 @@ import ClusterProjectDropdown from '@kubevirt-utils/components/ClusterProjectDro
 
 ### Folder Organization
 
-- **Folder Naming**: PascalCase when the folder reflects the main component (e.g., `/components/ClusterProjectDropdown/`), otherwise lowercase
+- **Folder Naming**: Use lowercase, kebab-case (e.g., `/components/main-header/`) *(Per CNV UI Best Practices)*
 - **Component Structure**:
-  ```
+  ```text
   /components/my-component/
   ├── components/      # Sub-components
   ├── utils/          # Component-specific utilities
@@ -127,30 +129,70 @@ import ClusterProjectDropdown from '@kubevirt-utils/components/ClusterProjectDro
 
 ### Styling
 
-- **Prefer PatternFly**: Use PatternFly properties and utility classes when possible
-- **SCSS Files**: Only create `.scss` files when PatternFly utilities are insufficient
-- **Project-Based Classes**: When custom styles are needed, use project-specific class names
+*Per CNV UI Best Practices document:*
+
+- **Prefer SCSS**: Use SCSS for styling to leverage nesting, variables, and mixins for maintainable styles
+- **Extract Styles**: Extract styling into SCSS files (`my-component-name.scss`) rather than embedding in components
+- **Project-Based Classes**: Use project-specific class names as anchors; don't rely on PatternFly class names (they change between versions)
+- **BEM Methodology**: Follow BEM for consistent and predictable class naming
+- **Responsive Design**: Use relative units (%, em, rem) over absolute units (px)
 - **Avoid `!important`**: Only use when absolutely necessary
 
 ### TypeScript Conventions
 
+*Per CNV UI Best Practices document:*
+
 - **Prefer `type` over `interface`**: For defining object/function shapes
 - **Avoid `any`**: Use `unknown` and narrow types as needed
-- **Explicit Return Types**: Define explicit return types for non-component functions; `JSX.Element` can be inferred for components
-- **Export Types**: Add exported types to utility files
+- **Explicit Return Types**: Always explicitly define return types for functions rather than relying on TypeScript to infer them
+- **Export Types**: If a type is exported, add it to a utility file
+
+### Function Development
+
+*Per CNV UI Best Practices document:*
+
+- **Keep functions short**: Focus on one action per function
+- **Red → Green → Refactor**:
+  1. Write a failing (**red**) solution
+  2. Implement a working (**green**) solution
+  3. Refactor for readability and performance
+- **Descriptive Names**: Use descriptive names for variables, functions, and components. Avoid abbreviations unless widely recognized (e.g., use `fetchUserData` instead of `getData`)
 
 ### Code Organization
 
-- **Logic Separation**: Extract logic from components into custom hooks or utility files
+- **Logic Separation**: Extract logic from components into custom hooks or utility files (easier to unit test)
 - **File Length**: Keep files under 150 lines when possible
 - **Function Length**: Functions should have a single responsibility
 - **Comments**: Write self-explanatory code; use comments sparingly for unusual decisions
+- **Avoid Circular Dependencies**: Use index files cautiously to prevent circular dependencies *(Per CNV UI Best Practices)*
+
+### Global/Store State
+
+*Per CNV UI Best Practices document:*
+
+- **Keep Minimal**: Keep the global state minimal and straightforward
+- **PR Approval**: Obtain approval in the PR to add new values to prevent bloating
 
 ### Hooks Patterns
 
 - **Dependencies**: Always specify dependencies in `useEffect` (use `[]` for no dependencies)
 - **Logic Only**: Hooks should contain logic, not return JSX
 - **Custom Hooks**: Extract reusable logic into custom hooks (easier to unit test)
+
+### Performance Optimization
+
+*Per CNV UI Best Practices document:*
+
+- **Memoization**: Use React's memoization tools (`React.memo`, `useMemo`, `useCallback`) to avoid unnecessary re-renders
+- **Lazy Loading**: Lazy load components with `React.lazy` and `Suspense`
+
+### Constants
+
+*Per CNV UI Best Practices document:*
+
+- **Naming**: Define constants with uppercase and underscore-separated naming (e.g., `API_URL`)
+- **Location**: Define constants in utility files
+- **Avoid Magic Numbers**: Avoid hardcoded values and define them as constants for easy adjustments and readability
 
 ### Example Component Structure
 
@@ -212,10 +254,10 @@ export default MyComponent;
 ### Component Development
 
 1. Create component in appropriate directory (`src/utils/components/` for shared, `src/views/[feature]/components/` for feature-specific)
-2. Use PatternFly components and utility classes; only add `.scss` if custom styles are needed
+2. Create corresponding SCSS file for styles (`my-component-name.scss`)
 3. Use `useKubevirtTranslation` for i18n
 4. Extract logic to custom hooks if needed
-5. Write tests (Cypress for E2E, Jest for unit)
+5. Write unit tests with Jest
 
 ### Internationalization
 
@@ -241,10 +283,9 @@ Run `npm run i18n` to update translation files after adding/changing messages.
 
 ### Testing
 
+- **Unit Tests**: Jest tests alongside components (`npm run test`)
 - **E2E Tests**: Cypress tests in `cypress/tests/`
-- **Unit Tests**: Jest tests alongside components
-- **Test Commands**:
-  - `npm run test` - Run Jest tests
+  - **Note for AI Assistants**: E2E tests require a running OpenShift cluster with KubeVirt. Do not attempt to run Cypress tests without proper backend infrastructure.
   - `npm run test-cypress` - Open Cypress UI
   - `npm run test-cypress-headless` - Run Cypress headless
 
@@ -289,9 +330,20 @@ Run `npm run i18n` to update translation files after adding/changing messages.
 
 ### Code Review
 
-- No merges without review
-- Smaller, dedicated PRs preferred
-- Include PR description with links, Jira tickets, screenshots/videos
+*Per CNV UI Best Practices document:*
+
+- **Peer Reviews**: Encourage peer code reviews to ensure consistency, catch errors, and improve code quality
+- **No Merges Without Review**: All PRs must be reviewed before merging
+
+### Version Control
+
+*Per CNV UI Best Practices document:*
+
+- **Meaningful Commits**: Use meaningful commit messages and avoid committing broken code
+- **Commit Often**: Always commit often to ensure proper tracking of changes (can be squashed)
+- **Smaller PRs**: Use smaller, dedicated PRs instead of one extensive PR - facilitates review, QE verification, and tracking
+- **PR Description**: Add a main PR comment explaining referenced links, Jira, docs, use cases, and current/required state
+- **Visual Changes**: When there are visual changes, add videos and/or screenshots
 
 See `CODING_STANDARDS.md` for detailed guidelines.
 
@@ -316,11 +368,12 @@ See `CODING_STANDARDS.md` for detailed guidelines.
 
 **Option 3**: Manual Console setup (see README.md)
 
-### Hot Reloading
+### Development Ports
 
-- Webpack dev server provides hot module replacement
 - Plugin runs on `http://localhost:9001`
 - Console typically runs on `http://localhost:9000`
+
+**Note for AI Assistants**: Local development requires access to an OpenShift cluster. Do not attempt to run the full development flow without proper cluster access.
 
 ### Environment Variables
 
@@ -375,6 +428,35 @@ See `CODING_STANDARDS.md` for detailed guidelines.
 - **README.md** - Setup, deployment, and general information
 - **CODING_STANDARDS.md** - Detailed coding guidelines and best practices
 - **INTERNATIONALIZATION.md** - i18n documentation
+
+## PR Template
+
+*Per CNV UI Best Practices document:*
+
+When creating a Pull Request, use this template:
+
+```markdown
+## 📝 Description
+
+> Add a brief description
+
+## 🔗 Links
+
+> Add JIRA, Docs, and other PR/Issue links
+
+## 👥 CC://
+
+> @tag as needed
+
+## 📹 Demo
+
+> Please add a video or an image of the behavior/changes, preferably before and after
+```
+
+**PR Guidelines:**
+- Keep your PR as small as possible
+- Limit your PR to one type (feature, refactoring, CI, or bugfix)
+- PRs that add new external dependencies might take longer to review
 
 ## Notes for AI Assistants
 
