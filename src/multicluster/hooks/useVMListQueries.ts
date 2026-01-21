@@ -12,7 +12,7 @@ const useVMListQueries = () => {
   const isAllClustersPage = useIsAllClustersPage();
 
   const queries = useMemo(
-    () => getVMListQueries(namespace, isAllClustersPage ? undefined : cluster, isAllClustersPage),
+    () => getVMListQueries(namespace, isAllClustersPage ? undefined : cluster),
     [namespace, cluster, isAllClustersPage],
   );
 
