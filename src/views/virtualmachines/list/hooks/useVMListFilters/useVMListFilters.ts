@@ -36,7 +36,7 @@ export const useVMListFilters = (
   );
 
   const clusterFilter = useClusterFilter();
-  const projectFilter = useProjectFilter();
+  const projectFilter = useProjectFilter<V1VirtualMachine>();
   const statusFilter = getStatusFilter();
   const osFilters = getOSFilter();
   const storageClassFilter = useStorageClassFilter(vms, pvcMapper);
