@@ -76,7 +76,7 @@ export const VncKeymapDropdown = ({
               key={typeInLabel}
             >
               <PasteIcon />
-              {typeInLabel}
+              <span className="pf-v6-u-ml-sm">{typeInLabel}</span>
             </MenuToggleAction>,
           ]}
           className="vnc-paste-button"
@@ -94,7 +94,7 @@ export const VncKeymapDropdown = ({
       selected={selectedKeyboard}
       shouldFocusToggleOnSelect
     >
-      <DropdownList>
+      <DropdownList className="vnc-keymap-dropdown-list">
         {favoriteKeymaps.length > 0 && (
           <>
             <DropdownGroup>
