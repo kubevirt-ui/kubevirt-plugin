@@ -10,11 +10,14 @@ import {
 
 import './DescriptionItem.scss';
 
+const ASTERISK = '*';
+
 type DescriptionItemHeaderProps = {
   bodyContent: ReactNode;
   breadcrumb?: string;
   descriptionHeader: ReactNode;
   isPopover: boolean;
+  isRequired?: boolean;
   label?: ReactNode;
   maxWidth?: string;
   moreInfoURL?: string;
@@ -27,12 +30,19 @@ export const DescriptionItemHeader: FC<DescriptionItemHeaderProps> = ({
   breadcrumb,
   descriptionHeader,
   isPopover,
+  isRequired = false,
   label,
   maxWidth,
   moreInfoURL,
   olsObj,
   promptType,
 }) => {
+  const requiredIndicator = isRequired && (
+    <span aria-hidden="true" className="DescriptionItemHeader--required">
+      {ASTERISK}
+    </span>
+  );
+
   if (isPopover && bodyContent) {
     return (
       <Popover
@@ -50,7 +60,10 @@ export const DescriptionItemHeader: FC<DescriptionItemHeaderProps> = ({
         headerContent={descriptionHeader}
         maxWidth={maxWidth || '30rem'}
       >
-        <DescriptionListTermHelpTextButton>{descriptionHeader}</DescriptionListTermHelpTextButton>
+        <DescriptionListTermHelpTextButton>
+          {descriptionHeader}
+          {requiredIndicator}
+        </DescriptionListTermHelpTextButton>
       </Popover>
     );
   }
@@ -58,6 +71,7 @@ export const DescriptionItemHeader: FC<DescriptionItemHeaderProps> = ({
   return (
     <DescriptionListTerm className="DescriptionItemHeader--list-term">
       {descriptionHeader}
+      {requiredIndicator}
       <span className="pf-v6-u-ml-xs">{label}</span>
     </DescriptionListTerm>
   );

@@ -1,4 +1,4 @@
-import React, { FC, memo } from 'react';
+import React, { FC, memo, useState } from 'react';
 
 import { DRAWER_FORM_ID } from '@catalog/templatescatalog/utils/consts';
 import { NOT_SUPPORTED_VM_ERROR } from '@catalog/utils/constants';
@@ -50,6 +50,7 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
     const { t } = useKubevirtTranslation();
     const isACMPage = useIsACMPage();
     const cluster = useClusterParam();
+    const [vmNameTouched, setVmNameTouched] = useState(false);
 
     const { isBootSourceAvailable, templateLoadingError } = useDrawerContext();
     const [__, vmsNotSupported] = useNamespaceUDN(namespace);
@@ -93,13 +94,14 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
                       isDisabled={Boolean(templateLoadingError)}
                       isRequired
                       name="vmname"
+                      onBlur={() => setVmNameTouched(true)}
                       onChange={(_, value: string) => onVMNameChange(value)}
                       type="text"
-                      validated={vmNameValidated}
+                      validated={vmNameTouched ? vmNameValidated : undefined}
                       value={nameField}
                     />
                   </FormGroup>
-                  <VMNameValidationHelperText vmName={nameField} />
+                  <VMNameValidationHelperText touched={vmNameTouched} vmName={nameField} />
                 </SplitItem>
                 {treeViewFoldersEnabled && (
                   <SplitItem>

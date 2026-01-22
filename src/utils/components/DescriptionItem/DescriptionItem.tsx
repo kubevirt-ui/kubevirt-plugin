@@ -32,6 +32,7 @@ type DescriptionItemProps = {
   isEdit?: boolean;
   isLabelEditor?: boolean;
   isPopover?: boolean;
+  isRequired?: boolean;
   label?: ReactNode;
   messageOnDisabled?: string;
   moreInfoURL?: string;
@@ -54,6 +55,7 @@ const DescriptionItem: FC<DescriptionItemProps> = ({
   isEdit,
   isLabelEditor = false,
   isPopover,
+  isRequired = false,
   label,
   messageOnDisabled,
   moreInfoURL,
@@ -103,13 +105,19 @@ const DescriptionItem: FC<DescriptionItemProps> = ({
           }}
           className={classNames({ 'pf-v6-u-w-100': isLabelEditor })}
         >
-          {(bodyContent || breadcrumb || descriptionHeader || label || moreInfoURL) && (
+          {(bodyContent ||
+            breadcrumb ||
+            descriptionHeader ||
+            isRequired ||
+            label ||
+            moreInfoURL) && (
             <FlexItem>
               <DescriptionItemHeader
                 bodyContent={bodyContent}
                 breadcrumb={breadcrumb}
                 descriptionHeader={descriptionHeader}
                 isPopover={isPopover}
+                isRequired={isRequired}
                 label={label}
                 moreInfoURL={moreInfoURL}
                 olsObj={olsObj}
