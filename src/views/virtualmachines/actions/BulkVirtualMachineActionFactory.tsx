@@ -10,7 +10,12 @@ import MoveBulkVMToFolderModal from '@kubevirt-utils/components/MoveVMToFolderMo
 import BulkSnapshotModal from '@kubevirt-utils/components/SnapshotModal/BulkSnapshotModal';
 import SnapshotModal from '@kubevirt-utils/components/SnapshotModal/SnapshotModal';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getLabels, getNamespace } from '@kubevirt-utils/resources/shared';
+import {
+  getLabels,
+  getNamespace,
+  haveSameCluster,
+  haveSameNamespace,
+} from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import CrossClusterMigration from '@multicluster/components/CrossClusterMigration/CrossClusterMigration';
 import { CROSS_CLUSTER_MIGRATION_ACTION_ID } from '@multicluster/constants';
@@ -33,7 +38,7 @@ import {
   stopVM,
   unpauseVM,
 } from './actions';
-import { getCommonLabels, getLabelsDiffPatch, isSameCluster, isSameNamespace } from './utils';
+import { getCommonLabels, getLabelsDiffPatch } from './utils';
 
 const { Stopped } = printableVMStatus;
 
@@ -189,7 +194,7 @@ export const BulkVirtualMachineActionFactory = {
           vms={vms}
         />
       )),
-    disabled: !isSameCluster(vms) || !isSameNamespace(vms) || isEmpty(vms),
+    disabled: !haveSameCluster(vms) || !haveSameNamespace(vms) || isEmpty(vms),
     id: ACTIONS_ID.MOVE_TO_FOLDER,
     label: t('Move to folder'),
   }),

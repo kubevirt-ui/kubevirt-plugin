@@ -6,7 +6,7 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import { CONFIRM_VM_ACTIONS, TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getNamespace } from '@kubevirt-utils/resources/shared';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useProviderByClusterName from '@multicluster/components/CrossClusterMigration/hooks/useProviderByClusterName';
 import { FEATURE_KUBEVIRT_CROSS_CLUSTER_MIGRATION } from '@multicluster/constants';
@@ -14,11 +14,12 @@ import { getCluster } from '@multicluster/helpers/selectors';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 import { isDeletionProtectionEnabled } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
 import { isLiveMigratable, isPaused, isRunning, isStopped } from '@virtualmachines/utils';
-import { VMIMMapper } from '@virtualmachines/utils/mappers';
+import { getVMIMFromMapper, VMIMMapper } from '@virtualmachines/utils/mappers';
 
 import { BulkVirtualMachineActionFactory } from '../BulkVirtualMachineActionFactory';
 
 import useIsMTVInstalled from './useIsMTVInstalled';
+import useVirtualMachineActionsProvider from './useVirtualMachineActionsProvider';
 import { someVMIsMigrating } from './utils';
 
 type UseMultipleVirtualMachineActions = (
@@ -43,7 +44,17 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms,
     getCluster(vms?.[0]) ?? hubClusterName,
   );
 
+  const singleVM = vms?.[0];
+  const [singleVMActions] = useVirtualMachineActionsProvider(
+    singleVM,
+    getVMIMFromMapper(vmimMapper, getName(singleVM), getNamespace(singleVM), getCluster(singleVM)),
+  );
+
   return useMemo(() => {
+    if (vms.length === 1) {
+      return singleVMActions;
+    }
+
     const namespaces = new Set(vms?.map((vm) => getNamespace(vm)));
     const clusters = new Set(vms?.map((vm) => getCluster(vm)));
 
@@ -113,6 +124,7 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms,
     treeViewFoldersEnabled,
     vms,
     vmimMapper,
+    singleVMActions,
   ]);
 };
 

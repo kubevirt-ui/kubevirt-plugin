@@ -1,10 +1,9 @@
 import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { getAnnotation, getLabels, getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getAnnotation, getLabels, getName } from '@kubevirt-utils/resources/shared';
 import { getDataVolumeTemplates, getVolumes } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { getCluster } from '@multicluster/helpers/selectors';
 import { k8sDelete, Patch } from '@openshift-console/dynamic-plugin-sdk';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
@@ -167,18 +166,4 @@ export const getLabelsDiffPatch = (
   patchArray.push(...labelsPatchDelete);
 
   return patchArray;
-};
-
-export const isSameNamespace = (vms: V1VirtualMachine[]) => {
-  if (vms.length <= 1) return true;
-
-  const namespace = getNamespace(vms?.[0]);
-  return vms.every((vm) => getNamespace(vm) === namespace);
-};
-
-export const isSameCluster = (vms: V1VirtualMachine[]) => {
-  if (vms.length <= 1) return true;
-
-  const cluster = getCluster(vms?.[0]);
-  return vms.every((vm) => getCluster(vm) === cluster);
 };

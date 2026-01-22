@@ -501,3 +501,19 @@ export const getCreationTimestamp = (entity: K8sResourceCommon): string =>
 export const getLongestNameLength = (resources: K8sResourceCommon[]): number => {
   return Math.max(...(resources || []).map((resource) => getName(resource)?.length ?? 0));
 };
+
+export const haveSameNamespace = (resources: K8sResourceCommon[]) =>
+  haveSamePropValue(resources, getNamespace);
+
+export const haveSameCluster = (resources: K8sResourceCommon[]) =>
+  haveSamePropValue(resources, getCluster);
+
+export const haveSamePropValue = (
+  resources: K8sResourceCommon[],
+  getPropValue: (resource: K8sResourceCommon) => string,
+) => {
+  if (resources.length <= 1) return true;
+
+  const value = getPropValue(resources[0]);
+  return resources.every((resource) => getPropValue(resource) === value);
+};
