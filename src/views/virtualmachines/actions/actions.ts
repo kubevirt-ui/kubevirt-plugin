@@ -34,12 +34,12 @@ export const VMActionRequest = async (
   vm: V1VirtualMachine,
   action: VMActionType,
   model: K8sModel,
+  safe = true,
   body?: V1AddVolumeOptions | V1RemoveVolumeOptions | V1StopOptions,
 ) => {
   const {
     metadata: { name, namespace },
   } = vm;
-
   try {
     const k8sAPIPath = await getKubevirtBaseAPIPath(getCluster(vm));
     // TODO: when this bz resolves https://bugzilla.redhat.com/show_bug.cgi?id=2056656
@@ -62,27 +62,32 @@ export const VMActionRequest = async (
 
     return response.text();
   } catch (error) {
-    kubevirtConsole.error(error);
-    return;
+    if (safe) {
+      kubevirtConsole.error(error);
+      return;
+    }
+
+    kubevirtConsole.error(error?.message);
+    throw new Error(error?.message || `Failed to ${action} VirtualMachine ${name}`);
   }
 };
 
-export const startVM = async (vm: V1VirtualMachine) =>
-  VMActionRequest(vm, VMActionType.Start, VirtualMachineModel);
-export const stopVM = async (vm: V1VirtualMachine, body?: V1StopOptions) =>
-  VMActionRequest(vm, VMActionType.Stop, VirtualMachineModel, body);
-export const restartVM = async (vm: V1VirtualMachine) =>
-  VMActionRequest(vm, VMActionType.Restart, VirtualMachineModel);
-export const resetVM = async (vm: V1VirtualMachine) =>
-  VMActionRequest(vm, VMActionType.Reset, VirtualMachineInstanceModel);
-export const pauseVM = async (vm: V1VirtualMachine) =>
-  VMActionRequest(vm, VMActionType.Pause, VirtualMachineInstanceModel);
-export const unpauseVM = async (vm: V1VirtualMachine) =>
-  VMActionRequest(vm, VMActionType.Unpause, VirtualMachineInstanceModel);
+export const startVM = async (vm: V1VirtualMachine, safe = true) =>
+  VMActionRequest(vm, VMActionType.Start, VirtualMachineModel, safe);
+export const stopVM = async (vm: V1VirtualMachine, safe = true, body?: V1StopOptions) =>
+  VMActionRequest(vm, VMActionType.Stop, VirtualMachineModel, safe, body);
+export const restartVM = async (vm: V1VirtualMachine, safe = true) =>
+  VMActionRequest(vm, VMActionType.Restart, VirtualMachineModel, safe);
+export const resetVM = async (vm: V1VirtualMachine, safe = true) =>
+  VMActionRequest(vm, VMActionType.Reset, VirtualMachineInstanceModel, safe);
+export const pauseVM = async (vm: V1VirtualMachine, safe = true) =>
+  VMActionRequest(vm, VMActionType.Pause, VirtualMachineInstanceModel, safe);
+export const unpauseVM = async (vm: V1VirtualMachine, safe = true) =>
+  VMActionRequest(vm, VMActionType.Unpause, VirtualMachineInstanceModel, safe);
 export const addPersistentVolume = async (vm: V1VirtualMachine, body: V1AddVolumeOptions) =>
-  VMActionRequest(vm, VMActionType.AddVolume, VirtualMachineModel, body);
+  VMActionRequest(vm, VMActionType.AddVolume, VirtualMachineModel, true, body);
 export const removeVolume = async (vm: V1VirtualMachine, body: V1RemoveVolumeOptions) =>
-  VMActionRequest(vm, VMActionType.RemoveVolume, VirtualMachineModel, body);
+  VMActionRequest(vm, VMActionType.RemoveVolume, VirtualMachineModel, true, body);
 export const migrateVM = async (vm: V1VirtualMachine, node?: string) => {
   const { name, namespace } = vm?.metadata;
   const migrationData: V1VirtualMachineInstanceMigration = {

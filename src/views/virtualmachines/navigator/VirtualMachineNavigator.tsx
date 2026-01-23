@@ -4,6 +4,7 @@ import { useLocation, useParams } from 'react-router-dom-v5-compat';
 import CreateResourceDefaultPage from '@kubevirt-utils/components/CreateResourceDefaultPage/CreateResourceDefaultPage';
 import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import ToastNotifications from '@kubevirt-utils/hooks/useToastNotifications/ToastNotifications';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
 import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import { Divider } from '@patternfly/react-core';
@@ -38,35 +39,39 @@ const VirtualMachineNavigator: FC = () => {
   }, []);
 
   return useMemo(
-    () =>
-      location.pathname.endsWith(`${VirtualMachineModelRef}/~new`) ? (
-        <CreateResourceDefaultPage
-          header={t('Create VirtualMachine')}
-          initialResource={defaultVMYamlTemplate()}
-        />
-      ) : (
-        <>
-          <VirtualMachinesListPageHeader namespace={namespace} onFilterChange={onFilterChange} />
-          <Divider />
-          <VirtualMachineTreeView onFilterChange={onFilterChange} {...treeProps}>
-            <GuidedTour />
-            {isVirtualMachineListPage ? (
-              <>
-                <VirtualMachinesList
-                  allVMsLoaded={treeProps.loaded}
-                  cluster={cluster}
-                  kind={VirtualMachineModelRef}
-                  namespace={namespace}
-                  ref={vmListRef}
-                />
-              </>
-            ) : (
-              <VirtualMachineNavPage />
-            )}
-          </VirtualMachineTreeView>
-        </>
-      ),
-    [isVirtualMachineListPage, cluster, location.pathname, namespace, t, treeProps],
+    () => (
+      <>
+        <ToastNotifications />
+        {location.pathname.endsWith(`${VirtualMachineModelRef}/~new`) ? (
+          <CreateResourceDefaultPage
+            header={t('Create VirtualMachine')}
+            initialResource={defaultVMYamlTemplate()}
+          />
+        ) : (
+          <>
+            <VirtualMachinesListPageHeader namespace={namespace} onFilterChange={onFilterChange} />
+            <Divider />
+            <VirtualMachineTreeView onFilterChange={onFilterChange} {...treeProps}>
+              <GuidedTour />
+              {isVirtualMachineListPage ? (
+                <>
+                  <VirtualMachinesList
+                    allVMsLoaded={treeProps.loaded}
+                    cluster={cluster}
+                    kind={VirtualMachineModelRef}
+                    namespace={namespace}
+                    ref={vmListRef}
+                  />
+                </>
+              ) : (
+                <VirtualMachineNavPage />
+              )}
+            </VirtualMachineTreeView>
+          </>
+        )}
+      </>
+    ),
+    [isVirtualMachineListPage, cluster, location.pathname, namespace, onFilterChange, t, treeProps],
   );
 };
 

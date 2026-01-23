@@ -52,6 +52,7 @@ import {
   stopVM,
   unpauseVM,
 } from './actions';
+import { wrapVMActionWithToast } from './utils';
 
 const {
   Migrating,
@@ -176,10 +177,11 @@ export const VirtualMachineActionFactory = {
   forceStop: (vm: V1VirtualMachine): ActionDropdownItemType => {
     return {
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
-      cta: () =>
-        stopVM(vm, {
+      cta: wrapVMActionWithToast(() =>
+        stopVM(vm, false, {
           gracePeriod: 0,
         }),
+      ),
       disabled: [Migrating, Provisioning, Stopped, Unknown].includes(vm?.status?.printableStatus),
       id: 'vm-action-force-stop',
       label: t('Force stop'),
@@ -274,20 +276,22 @@ export const VirtualMachineActionFactory = {
     createModal: (modal: ModalComponent) => void,
     confirmVMActions: boolean,
   ): ActionDropdownItemType => {
+    const pauseActionWithToast = wrapVMActionWithToast(() => pauseVM(vm, false));
+
     return {
       accessReview: asAccessReview(VirtualMachineInstanceSubresourcesModel, vm, 'update', 'pause'),
       cta: () =>
         confirmVMActions
           ? createModal(({ isOpen, onClose }) => (
               <ConfirmVMActionModal
-                action={pauseVM}
+                action={pauseActionWithToast}
                 actionType="Pause"
                 isOpen={isOpen}
                 onClose={onClose}
                 vm={vm}
               />
             ))
-          : pauseVM(vm),
+          : pauseActionWithToast(),
       disabled: !isRunning(vm) || isSnapshotting(vm) || isRestoring(vm),
       id: 'vm-action-pause',
       label: t('Pause'),
@@ -298,6 +302,7 @@ export const VirtualMachineActionFactory = {
     createModal: (modal: ModalComponent) => void,
     confirmVMActions: boolean,
   ): ActionDropdownItemType => {
+    const resetActionWithToast = wrapVMActionWithToast(() => resetVM(vm, false));
     return {
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
       cta: () =>
@@ -307,7 +312,7 @@ export const VirtualMachineActionFactory = {
                 checkToConfirmMessage={t(
                   'A VM reset is a hard power cycle and might cause data loss or corruption. Only reset if the VM is completely unresponsive.',
                 )}
-                action={resetVM}
+                action={resetActionWithToast}
                 actionType="Reset"
                 isOpen={isOpen}
                 onClose={onClose}
@@ -315,7 +320,7 @@ export const VirtualMachineActionFactory = {
                 vm={vm}
               />
             ))
-          : resetVM(vm),
+          : resetActionWithToast(),
       description: t('Hard power cycle on the VM'),
       disabled: !isRunning(vm) || isSnapshotting(vm) || isRestoring(vm),
       id: 'vm-action-reset',
@@ -327,20 +332,21 @@ export const VirtualMachineActionFactory = {
     createModal: (modal: ModalComponent) => void,
     confirmVMActions: boolean,
   ): ActionDropdownItemType => {
+    const restartActionWithToast = wrapVMActionWithToast(() => restartVM(vm, false));
     return {
       accessReview: asAccessReview(VirtualMachineSubresourcesModel, vm, 'update', 'restart'),
       cta: () =>
         confirmVMActions
           ? createModal(({ isOpen, onClose }) => (
               <ConfirmVMActionModal
-                action={restartVM}
+                action={restartActionWithToast}
                 actionType="Restart"
                 isOpen={isOpen}
                 onClose={onClose}
                 vm={vm}
               />
             ))
-          : restartVM(vm),
+          : restartActionWithToast(),
       description: t('Shut down and reboot the VM'),
       disabled:
         [Migrating, Provisioning, Stopped, Stopping, Terminating, Unknown].includes(
@@ -364,9 +370,10 @@ export const VirtualMachineActionFactory = {
     };
   },
   start: (vm: V1VirtualMachine): ActionDropdownItemType => {
+    const startActionWithToast = wrapVMActionWithToast(() => startVM(vm, false));
     return {
       accessReview: asAccessReview(VirtualMachineSubresourcesModel, vm, 'update', 'start'),
-      cta: () => startVM(vm),
+      cta: startActionWithToast,
       disabled:
         [
           Migrating,
@@ -389,20 +396,21 @@ export const VirtualMachineActionFactory = {
     createModal: (modal: ModalComponent) => void,
     confirmVMActions: boolean,
   ): ActionDropdownItemType => {
+    const stopActionWithToast = wrapVMActionWithToast(() => stopVM(vm, false));
     return {
       accessReview: asAccessReview(VirtualMachineSubresourcesModel, vm, 'update', 'stop'),
       cta: () =>
         confirmVMActions
           ? createModal(({ isOpen, onClose }) => (
               <ConfirmVMActionModal
-                action={stopVM}
+                action={stopActionWithToast}
                 actionType="Stop"
                 isOpen={isOpen}
                 onClose={onClose}
                 vm={vm}
               />
             ))
-          : stopVM(vm),
+          : stopActionWithToast(),
       disabled:
         [Provisioning, Stopped, Stopping, Terminating, Unknown].includes(
           vm?.status?.printableStatus,
@@ -414,6 +422,7 @@ export const VirtualMachineActionFactory = {
     };
   },
   unpause: (vm: V1VirtualMachine): ActionDropdownItemType => {
+    const unpauseActionWithToast = wrapVMActionWithToast(() => unpauseVM(vm, false));
     return {
       accessReview: asAccessReview(
         VirtualMachineInstanceSubresourcesModel,
@@ -421,7 +430,7 @@ export const VirtualMachineActionFactory = {
         'update',
         'unpause',
       ),
-      cta: () => unpauseVM(vm),
+      cta: unpauseActionWithToast,
       disabled: vm?.status?.printableStatus !== Paused,
       id: 'vm-action-unpause',
       label: t('Unpause'),

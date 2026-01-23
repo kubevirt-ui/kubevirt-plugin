@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom-v5-compat';
 import { ExposedFilterFunctions } from '@kubevirt-utils/components/ListPageFilter/types';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import ToastNotifications from '@kubevirt-utils/hooks/useToastNotifications/ToastNotifications';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
 import { OnFilterChange, useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { Divider } from '@patternfly/react-core';
@@ -29,6 +30,7 @@ const VirtualMachineSearchResults: FC = () => {
   return useMemo(
     () => (
       <>
+        <ToastNotifications />
         <VirtualMachinesListPageHeader namespace={namespace} onFilterChange={onFilterChange} />
         <Divider />
         <VirtualMachinesList
