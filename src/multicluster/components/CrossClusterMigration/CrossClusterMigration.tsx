@@ -20,6 +20,7 @@ const CrossClusterMigration: FC<{
       className="virtual-machine-migration-modal"
       id="virtual-machine-migration-modal"
       isOpen={isOpen}
+      onClose={close}
       variant="large"
     >
       <ModalBody>
