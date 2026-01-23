@@ -21,51 +21,63 @@ describe('actions.ts tests', () => {
     const action = VMActionType.Start;
 
     // This should be rejected by the mock
-    const failedResponse = VMActionRequest(
-      exampleRunningVirtualMachine,
+    const failedResponse = VMActionRequest({
       action,
-      VirtualMachineModel,
-    );
+      model: VirtualMachineModel,
+      vm: exampleRunningVirtualMachine,
+    });
     kubevirtConsole.log(failedResponse);
 
     // Test to check a VMActionRequest works with 'start' action
-    const response = VMActionRequest(exampleRunningVirtualMachine, action, VirtualMachineModel);
+    const response = VMActionRequest({
+      action,
+      model: VirtualMachineModel,
+      vm: exampleRunningVirtualMachine,
+    });
     expect(response).resolves.toBe('success');
   });
 
   test('test VMActionRequest stop action', async () => {
     const action = VMActionType.Stop;
     // Test to check a VMActionRequest works with 'stop' action
-    const response = VMActionRequest(exampleRunningVirtualMachine, action, VirtualMachineModel);
+    const response = VMActionRequest({
+      action,
+      model: VirtualMachineModel,
+      vm: exampleRunningVirtualMachine,
+    });
     expect(response).resolves.toBe('success');
   });
 
   test('test VMActionRequest restart action', async () => {
     const action = VMActionType.Restart;
     // Test to check a VMActionRequest works with 'restart' action
-    const response = VMActionRequest(exampleRunningVirtualMachine, action, VirtualMachineModel);
+    const response = VMActionRequest({
+      action,
+      model: VirtualMachineModel,
+      vm: exampleRunningVirtualMachine,
+    });
     expect(response).resolves.toBe('success');
   });
 
   test('test VMActionRequest pause action', async () => {
     const action = VMActionType.Pause;
     // Test to check a VMActionRequest works with 'pause' action
-    const response = VMActionRequest(
-      exampleRunningVirtualMachine,
+    const response = VMActionRequest({
       action,
-      VirtualMachineInstanceModel,
-    );
+      model: VirtualMachineInstanceModel,
+      vm: exampleRunningVirtualMachine,
+    });
     expect(response).resolves.toBe('success');
   });
 
   test('test VMActionRequest unpause action', async () => {
     const action = VMActionType.Unpause;
     // Test to check a VMActionRequest works with 'unpause' action
-    const response = VMActionRequest(
-      exampleRunningVirtualMachine,
+    const response = VMActionRequest({
       action,
-      VirtualMachineInstanceModel,
-    );
+      model: VirtualMachineInstanceModel,
+      vm: exampleRunningVirtualMachine,
+    });
     expect(response).resolves.toBe('success');
   });
 });

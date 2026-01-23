@@ -8,7 +8,7 @@ import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import ConfirmVMActionBaseModal from '../ConfirmMultipleVMActionsModal/components/ConfirmVMActionBaseModal';
 
 type ConfirmVMActionModalProps = {
-  action: (vm: V1VirtualMachine) => Promise<string>;
+  action: (vm: V1VirtualMachine) => Promise<string | void>;
   actionType: string;
   checkToConfirmMessage?: string;
   isOpen: boolean;

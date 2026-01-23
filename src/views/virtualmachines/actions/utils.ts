@@ -1,8 +1,10 @@
 import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { ToastService } from '@kubevirt-utils/hooks/useToastNotifications/toastNotificationsSignals';
 import { getAnnotation, getLabels, getName } from '@kubevirt-utils/resources/shared';
 import { getDataVolumeTemplates, getVolumes } from '@kubevirt-utils/resources/vm';
+import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sDelete, Patch } from '@openshift-console/dynamic-plugin-sdk';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
@@ -166,4 +168,25 @@ export const getLabelsDiffPatch = (
   patchArray.push(...labelsPatchDelete);
 
   return patchArray;
+};
+
+/**
+ * Wraps a VM action function with error handling and toast notifications.
+ * This function automatically shows error toasts when actions fail.
+ *
+ * @param action - The VM action function to wrap (e.g., startVM, stopVM)
+ * @returns A promise that resolves when the action succeeds, or create a toast with the error
+ */
+export const wrapVMActionWithToast = <T>(action: () => Promise<T>): (() => Promise<T | void>) => {
+  return async (): Promise<T | void> => {
+    try {
+      return await action();
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error) || 'Unknown error occurred';
+
+      ToastService.warning(errorMessage);
+      kubevirtConsole.error(error);
+    }
+  };
 };

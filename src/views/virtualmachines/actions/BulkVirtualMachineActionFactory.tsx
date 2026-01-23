@@ -38,7 +38,7 @@ import {
   stopVM,
   unpauseVM,
 } from './actions';
-import { getCommonLabels, getLabelsDiffPatch } from './utils';
+import { getCommonLabels, getLabelsDiffPatch, wrapVMActionWithToast } from './utils';
 
 const { Stopped } = printableVMStatus;
 
@@ -202,70 +202,85 @@ export const BulkVirtualMachineActionFactory = {
     vms: V1VirtualMachine[],
     createModal: (modal: ModalComponent) => void,
     confirmVMActionsEnabled: boolean,
-  ): ActionDropdownItemType => ({
-    cta: () =>
-      confirmVMActionsEnabled
-        ? createModal(({ isOpen, onClose }) => (
-            <ConfirmMultipleVMActionsModal
-              action={pauseVM}
-              actionType="Pause"
-              isOpen={isOpen}
-              onClose={onClose}
-              vms={vms}
-            />
-          ))
-        : vms.forEach(pauseVM),
-    disabled: vms.every((vm) => vm.status?.printableStatus === Stopped),
-    id: ACTIONS_ID.PAUSE,
-    label: t('Pause'),
-  }),
+  ): ActionDropdownItemType => {
+    const pauseActionWithToast = (vm: V1VirtualMachine) =>
+      wrapVMActionWithToast(() => pauseVM(vm, false))();
+
+    return {
+      cta: () =>
+        confirmVMActionsEnabled
+          ? createModal(({ isOpen, onClose }) => (
+              <ConfirmMultipleVMActionsModal
+                action={pauseActionWithToast}
+                actionType="Pause"
+                isOpen={isOpen}
+                onClose={onClose}
+                vms={vms}
+              />
+            ))
+          : vms.forEach(pauseActionWithToast),
+      disabled: vms.every((vm) => vm.status?.printableStatus === Stopped),
+      id: ACTIONS_ID.PAUSE,
+      label: t('Pause'),
+    };
+  },
   reset: (
     vms: V1VirtualMachine[],
     createModal: (modal: ModalComponent) => void,
     confirmVMActionsEnabled: boolean,
-  ): ActionDropdownItemType => ({
-    cta: () =>
-      confirmVMActionsEnabled
-        ? createModal(({ isOpen, onClose }) => (
-            <ConfirmMultipleVMActionsModal
-              checkToConfirmMessage={t(
-                'A VM reset is a hard power cycle and might cause data loss or corruption. Only reset if the VM is completely unresponsive.',
-              )}
-              action={resetVM}
-              actionType="Reset"
-              isOpen={isOpen}
-              onClose={onClose}
-              severityVariant="warning"
-              vms={vms}
-            />
-          ))
-        : vms.forEach(resetVM),
-    description: t('Hard power cycle on the VMs'),
-    disabled: vms.every((vm) => vm.status?.printableStatus === Stopped),
-    id: ACTIONS_ID.RESET,
-    label: t('Reset'),
-  }),
+  ): ActionDropdownItemType => {
+    const resetActionWithToast = (vm: V1VirtualMachine) =>
+      wrapVMActionWithToast(() => resetVM(vm, false))();
+
+    return {
+      cta: () =>
+        confirmVMActionsEnabled
+          ? createModal(({ isOpen, onClose }) => (
+              <ConfirmMultipleVMActionsModal
+                checkToConfirmMessage={t(
+                  'A VM reset is a hard power cycle and might cause data loss or corruption. Only reset if the VM is completely unresponsive.',
+                )}
+                action={resetActionWithToast}
+                actionType="Reset"
+                isOpen={isOpen}
+                onClose={onClose}
+                severityVariant="warning"
+                vms={vms}
+              />
+            ))
+          : vms.forEach(resetActionWithToast),
+      description: t('Hard power cycle on the VMs'),
+      disabled: vms.every((vm) => vm.status?.printableStatus === Stopped),
+      id: ACTIONS_ID.RESET,
+      label: t('Reset'),
+    };
+  },
   restart: (
     vms: V1VirtualMachine[],
     createModal: (modal: ModalComponent) => void,
     confirmVMActionsEnabled: boolean,
-  ): ActionDropdownItemType => ({
-    cta: () =>
-      confirmVMActionsEnabled
-        ? createModal(({ isOpen, onClose }) => (
-            <ConfirmMultipleVMActionsModal
-              action={restartVM}
-              actionType="Restart"
-              isOpen={isOpen}
-              onClose={onClose}
-              vms={vms}
-            />
-          ))
-        : vms.forEach(restartVM),
-    disabled: vms.every((vm) => vm.status?.printableStatus === Stopped),
-    id: ACTIONS_ID.RESTART,
-    label: t('Restart'),
-  }),
+  ): ActionDropdownItemType => {
+    const restartActionWithToast = (vm: V1VirtualMachine) =>
+      wrapVMActionWithToast(() => restartVM(vm, false))();
+
+    return {
+      cta: () =>
+        confirmVMActionsEnabled
+          ? createModal(({ isOpen, onClose }) => (
+              <ConfirmMultipleVMActionsModal
+                action={restartActionWithToast}
+                actionType="Restart"
+                isOpen={isOpen}
+                onClose={onClose}
+                vms={vms}
+              />
+            ))
+          : vms.forEach(restartActionWithToast),
+      disabled: vms.every((vm) => vm.status?.printableStatus === Stopped),
+      id: ACTIONS_ID.RESTART,
+      label: t('Restart'),
+    };
+  },
   snapshot: (
     vms: V1VirtualMachine[],
     createModal: (modal: ModalComponent) => void,
@@ -282,38 +297,52 @@ export const BulkVirtualMachineActionFactory = {
     id: ACTIONS_ID.SNAPSHOT,
     label: t('Take snapshot'),
   }),
-  start: (vms: V1VirtualMachine[]): ActionDropdownItemType => ({
-    cta: () => vms.forEach(startVM),
-    disabled: isEmpty(vms),
-    id: ACTIONS_ID.START,
-    label: t('Start'),
-  }),
+  start: (vms: V1VirtualMachine[]): ActionDropdownItemType => {
+    const startActionWithToast = (vm: V1VirtualMachine) =>
+      wrapVMActionWithToast(() => startVM(vm, false))();
+
+    return {
+      cta: () => vms.forEach(startActionWithToast),
+      disabled: isEmpty(vms),
+      id: ACTIONS_ID.START,
+      label: t('Start'),
+    };
+  },
   stop: (
     vms: V1VirtualMachine[],
     createModal: (modal: ModalComponent) => void,
     confirmVMActionsEnabled: boolean,
-  ): ActionDropdownItemType => ({
-    cta: () => {
-      confirmVMActionsEnabled
-        ? createModal(({ isOpen, onClose }) => (
-            <ConfirmMultipleVMActionsModal
-              action={stopVM}
-              actionType="Stop"
-              isOpen={isOpen}
-              onClose={onClose}
-              vms={vms}
-            />
-          ))
-        : vms.forEach((vm) => stopVM(vm));
-    },
-    disabled: isEmpty(vms),
-    id: ACTIONS_ID.STOP,
-    label: t('Stop'),
-  }),
-  unpause: (vms: V1VirtualMachine[]): ActionDropdownItemType => ({
-    cta: () => vms.forEach(unpauseVM),
-    disabled: vms.every((vm) => vm.status?.printableStatus === Stopped),
-    id: ACTIONS_ID.UNPAUSE,
-    label: t('Unpause'),
-  }),
+  ): ActionDropdownItemType => {
+    const stopActionWithToast = (vm: V1VirtualMachine) =>
+      wrapVMActionWithToast(() => stopVM(vm, false))();
+
+    return {
+      cta: () =>
+        confirmVMActionsEnabled
+          ? createModal(({ isOpen, onClose }) => (
+              <ConfirmMultipleVMActionsModal
+                action={stopActionWithToast}
+                actionType="Stop"
+                isOpen={isOpen}
+                onClose={onClose}
+                vms={vms}
+              />
+            ))
+          : vms.forEach(stopActionWithToast),
+      disabled: isEmpty(vms),
+      id: ACTIONS_ID.STOP,
+      label: t('Stop'),
+    };
+  },
+  unpause: (vms: V1VirtualMachine[]): ActionDropdownItemType => {
+    const unpauseActionWithToast = (vm: V1VirtualMachine) =>
+      wrapVMActionWithToast(() => unpauseVM(vm, false))();
+
+    return {
+      cta: () => vms.forEach(unpauseActionWithToast),
+      disabled: vms.every((vm) => vm.status?.printableStatus === Stopped),
+      id: ACTIONS_ID.UNPAUSE,
+      label: t('Unpause'),
+    };
+  },
 };
