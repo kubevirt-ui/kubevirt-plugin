@@ -16,6 +16,9 @@ import {
 } from './components/utils/ConsoleConsts';
 import { ConsoleComponentState, ConsoleType } from './components/utils/types';
 import HideConsole from './components/vnc-console/HideConsole';
+import SessionAlreadyInUseModal from './components/vnc-console/SessionAlreadyInUseModal';
+import { isConnectableState } from './components/vnc-console/utils/util';
+import { VncLogLevel } from './components/vnc-console/utils/VncConsoleTypes';
 import VncConnect from './components/vnc-console/VncConnect';
 import VncConsole from './components/vnc-console/VncConsole';
 
@@ -31,6 +34,7 @@ type ConsolesProps = {
   vmCluster?: string;
   vmName: string;
   vmNamespace: string;
+  vncLogLevel?: VncLogLevel;
 };
 
 const Consoles: FC<ConsolesProps> = ({
@@ -41,6 +45,7 @@ const Consoles: FC<ConsolesProps> = ({
   vmCluster,
   vmName,
   vmNamespace,
+  vncLogLevel,
 }) => {
   const { t } = useKubevirtTranslation();
   const [{ actions, state, type }, setState] = useState<ConsoleComponentState>({
@@ -54,7 +59,7 @@ const Consoles: FC<ConsolesProps> = ({
   }
 
   const isConnected = state === ConsoleState.connected;
-  const showConnect = state === ConsoleState.disconnected || state === ConsoleState.connecting;
+  const showConnect = isConnectableState(state);
 
   return (
     <Stack>
@@ -88,7 +93,13 @@ const Consoles: FC<ConsolesProps> = ({
         )}
         {type === VNC_CONSOLE_TYPE && (
           <HideConsole isHidden={!isConnected}>
-            <VncConsole basePath={path} setState={setState} />
+            <VncConsole
+              basePath={path}
+              // force re-create on change
+              key={`vnc-${path}-${vncLogLevel}`}
+              setState={setState}
+              vncLogLevel={vncLogLevel}
+            />
           </HideConsole>
         )}
         {type === SERIAL_CONSOLE_TYPE && showConnect && (
@@ -106,6 +117,15 @@ const Consoles: FC<ConsolesProps> = ({
           <DesktopViewer vmCluster={vmCluster} vmName={vmName} vmNamespace={vmNamespace} />
         )}
       </StackItem>
+      <SessionAlreadyInUseModal
+        setConsoleState={(consoleState: ConsoleState) =>
+          setState((prev) =>
+            prev.type !== VNC_CONSOLE_TYPE ? prev : { ...prev, state: consoleState },
+          )
+        }
+        connect={actions.connect}
+        isOpen={type === VNC_CONSOLE_TYPE && state === ConsoleState.session_already_in_use}
+      />
     </Stack>
   );
 };

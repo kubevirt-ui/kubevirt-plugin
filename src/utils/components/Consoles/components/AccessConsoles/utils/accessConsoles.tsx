@@ -15,7 +15,11 @@ export type AccessConsolesActions = {
   sendCtrlAlt1?: () => void;
   sendCtrlAlt2?: () => void;
   sendCtrlAltDel?: () => void;
-  sendPaste?: (shouldFocusOnConsole?: boolean) => Promise<void>;
+  sendPaste?: (params?: PasteParams) => Promise<void>;
+};
+
+export type PasteParams = {
+  shouldFocusOnConsole?: boolean;
 };
 
 export type AccessConsolesProps = {

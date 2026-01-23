@@ -211,7 +211,7 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
             <GridItem span={5}>
               <div className="right-column">
                 <div className="title">{t('VNC console')}</div>
-                <VirtualMachinesOverviewTabDetailsConsoleWrapper vmi={vmi} />
+                <VirtualMachinesOverviewTabDetailsConsoleWrapper vm={vm} vmi={vmi} />
               </div>
             </GridItem>
           </Grid>

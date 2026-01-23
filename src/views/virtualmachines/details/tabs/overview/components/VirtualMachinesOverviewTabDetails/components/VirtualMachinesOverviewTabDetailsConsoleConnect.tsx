@@ -3,19 +3,20 @@ import cn from 'classnames';
 
 import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Icon } from '@patternfly/react-core';
-import { PlayIcon } from '@patternfly/react-icons';
+import { Icon, Tooltip } from '@patternfly/react-core';
+import { LockIcon, PlayIcon } from '@patternfly/react-icons';
 
 type VirtualMachinesOverviewTabDetailsConsoleConnectProps = {
   connect?: () => void;
   isConnecting?: boolean;
   isDisabled?: boolean;
   isHeadlessMode?: boolean;
+  isSessionAlreadyInUse?: boolean;
 };
 
 const VirtualMachinesOverviewTabDetailsConsoleConnect: FC<
   VirtualMachinesOverviewTabDetailsConsoleConnectProps
-> = ({ connect, isConnecting, isDisabled, isHeadlessMode }) => {
+> = ({ connect, isConnecting, isDisabled, isHeadlessMode, isSessionAlreadyInUse }) => {
   const { t } = useKubevirtTranslation();
 
   return (
@@ -25,7 +26,13 @@ const VirtualMachinesOverviewTabDetailsConsoleConnect: FC<
         <div className={cn('vnc-grey-background', isDisabled && 'disabled')}>
           {!isDisabled && (
             <Icon onClick={connect} size="md">
-              <PlayIcon />
+              {isSessionAlreadyInUse ? (
+                <Tooltip content={t('VNC session already in use')}>
+                  <LockIcon />
+                </Tooltip>
+              ) : (
+                <PlayIcon />
+              )}
             </Icon>
           )}
           {isHeadlessMode && t('Console is disabled in headless mode')}

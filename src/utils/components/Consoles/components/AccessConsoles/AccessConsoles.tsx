@@ -4,6 +4,7 @@ import React, { FC, MouseEvent, useState } from 'react';
 import DropdownToggle from '@kubevirt-utils/components/toggles/DropdownToggle';
 import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import {
   Button,
   ButtonVariant,
@@ -53,18 +54,24 @@ export const AccessConsoles: FC<AccessConsolesProps> = ({
   return (
     <>
       <Button
-        icon={
-          <>
-            <PasteIcon /> {t('Paste to console')}
-          </>
+        onClick={
+          actions.sendPaste
+            ? (e: MouseEvent<HTMLButtonElement>) => {
+                e?.currentTarget?.blur();
+                actions
+                  .sendPaste({ shouldFocusOnConsole: true })
+                  .catch((err) => kubevirtConsole.error('Failed to paste into console', err));
+              }
+            : undefined
         }
-        onClick={(e: MouseEvent<HTMLButtonElement>) => {
-          actions.sendPaste(true);
-          e.currentTarget.blur();
-        }}
         className="vnc-paste-button"
+        icon={<PasteIcon />}
+        isDisabled={!actions.sendPaste}
         variant={ButtonVariant.link}
-      />
+      >
+        {t('Paste to console')}
+      </Button>
+
       <Select
         onSelect={(_, selection: string) => {
           isConsoleType(selection) && setType(selection);
