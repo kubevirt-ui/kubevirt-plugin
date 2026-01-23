@@ -29,7 +29,7 @@ export const emptyMsg = '#no-templates-msg';
 export const row = '[data-test-rows="resource-row"]';
 export const dropDownItem = '.pf-v6-c-dropdown__menu-item';
 export const menuToggleText = '.pf-v6-c-menu-toggle__text';
-export const vmStatusTop = '.pf-m-compact.vm-resource-label';
+export const vmStatusTop = '.vm-resource-label';
 export const menuItemMain = '.pf-v6-c-menu__item-main';
 export const gridItem = '.pf-v6-l-grid';
 export const mastheadLogo = '[data-test="masthead-logo"]';
