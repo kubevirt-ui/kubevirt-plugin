@@ -264,12 +264,11 @@ export const sshSecretExistsInNamespace = (
   targetNamespace: string,
   secretName: string,
 ): boolean => {
-  const { projectsWithSecrets, secretsLoaded } = secretsData;
+  const { projectsWithSecrets } = secretsData;
   const originalSecret = getSecretByNameAndNS(secretName, templateNamespace, projectsWithSecrets);
   const targetSecret = getSecretByNameAndNS(secretName, targetNamespace, projectsWithSecrets);
 
   return (
-    secretsLoaded &&
     getName(originalSecret) === getName(targetSecret) &&
     getSecretEncodedSSHKey(originalSecret) === getSecretEncodedSSHKey(targetSecret)
   );

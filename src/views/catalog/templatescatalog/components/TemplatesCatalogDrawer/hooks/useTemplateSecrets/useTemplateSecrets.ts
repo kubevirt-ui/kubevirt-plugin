@@ -28,6 +28,7 @@ type UseTemplateSecrets = (
   cluster?: string,
 ) => {
   copyTemplateSecretToTargetNS: boolean;
+  loaded: boolean;
   onSSHChange: (details: SSHSecretDetails) => Promise<void>;
   overwriteTemplateSSHKey: boolean;
   sshDetails: SSHSecretDetails;
@@ -117,6 +118,7 @@ const useTemplateSecrets: UseTemplateSecrets = (
 
   return {
     copyTemplateSecretToTargetNS,
+    loaded: secretsData?.secretsLoaded,
     onSSHChange,
     overwriteTemplateSSHKey: !isEmpty(namespaceDefaultSecretName) && !isEmpty(templateSecretName),
     sshDetails,
