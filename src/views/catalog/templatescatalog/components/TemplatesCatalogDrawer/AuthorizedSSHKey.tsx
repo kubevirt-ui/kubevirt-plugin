@@ -5,6 +5,7 @@ import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/Descript
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SSHSecretModal from '@kubevirt-utils/components/SSHSecretModal/SSHSecretModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { DescriptionList, HelperText, HelperTextItem, SplitItem } from '@patternfly/react-core';
 
 type AuthorizedSSHKeyProps = {
@@ -14,8 +15,9 @@ type AuthorizedSSHKeyProps = {
 const AuthorizedSSHKey: FC<AuthorizedSSHKeyProps> = ({ authorizedSSHKey, namespace }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const { copyTemplateSecretToTargetNS, onSSHChange, overwriteTemplateSSHKey, sshDetails } =
-    useTemplateSecrets(authorizedSSHKey, namespace);
+  const cluster = useClusterParam();
+  const { copyTemplateSecretToTargetNS, loaded, onSSHChange, overwriteTemplateSSHKey, sshDetails } =
+    useTemplateSecrets(authorizedSSHKey, namespace, cluster);
 
   return (
     <SplitItem>
@@ -42,7 +44,7 @@ const AuthorizedSSHKey: FC<AuthorizedSSHKeyProps> = ({ authorizedSSHKey, namespa
             </HelperTextItem>
           </HelperText>
         )}
-        {copyTemplateSecretToTargetNS && (
+        {copyTemplateSecretToTargetNS && loaded && (
           <HelperText>
             <HelperTextItem variant="warning">
               {t('This Secret will be copied to the destination project')}
