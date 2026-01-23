@@ -55,6 +55,7 @@ const CrossClusterMigrationWizard: FC<{
             'Choose the target location for your VirtualMachines, then adjust your migration plan if necessary',
           )}
           closeButtonAriaLabel={t('Close header')}
+          isCloseHidden={true}
           onClose={close}
           title={t('Migrate VirtualMachines')}
         />
