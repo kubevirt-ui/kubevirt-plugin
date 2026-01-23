@@ -37,6 +37,7 @@ export type VncConsoleProps = {
   scaleViewport?: boolean;
   setState: Dispatch<SetStateAction<ConsoleComponentState>>;
   viewOnly?: boolean;
+  vncAutoconnect?: boolean;
   vncLogLevel?: VncLogLevel;
 };
 

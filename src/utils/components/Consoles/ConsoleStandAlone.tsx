@@ -14,7 +14,10 @@ import { Bullseye, Spinner } from '@patternfly/react-core';
 import ErrorAlert from '../ErrorAlert/ErrorAlert';
 import { ModalProvider, useModalValue } from '../ModalProvider/ModalProvider';
 
-import { KUBEVIRT_UI_VNC_LOG_LEVEL_LABEL } from './components/vnc-console/utils/constants';
+import {
+  KUBEVIRT_UI_VNC_AUTOCONNECT_LABEL,
+  KUBEVIRT_UI_VNC_LOG_LEVEL_LABEL,
+} from './components/vnc-console/utils/constants';
 import { isVncLogLevel } from './components/vnc-console/utils/util';
 import { getConsoleBasePath } from './utils/utils';
 import Consoles from './Consoles';
@@ -44,6 +47,7 @@ const ConsoleStandAlone: FC = () => {
       </Bullseye>
     );
   const logLevelLabel = vm && getLabel(vm, KUBEVIRT_UI_VNC_LOG_LEVEL_LABEL);
+  const autoconnectLabel = vm && getLabel(vm, KUBEVIRT_UI_VNC_AUTOCONNECT_LABEL);
   return (
     <ModalProvider value={value}>
       <Consoles
@@ -56,6 +60,7 @@ const ConsoleStandAlone: FC = () => {
         vmCluster={cluster}
         vmName={name}
         vmNamespace={ns}
+        vncAutoconnect={autoconnectLabel !== 'false'}
         vncLogLevel={isVncLogLevel(logLevelLabel) ? logLevelLabel : false}
       />
     </ModalProvider>

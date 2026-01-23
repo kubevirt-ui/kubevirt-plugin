@@ -34,6 +34,7 @@ type ConsolesProps = {
   vmCluster?: string;
   vmName: string;
   vmNamespace: string;
+  vncAutoconnect?: boolean;
   vncLogLevel?: VncLogLevel;
 };
 
@@ -45,6 +46,7 @@ const Consoles: FC<ConsolesProps> = ({
   vmCluster,
   vmName,
   vmNamespace,
+  vncAutoconnect = true,
   vncLogLevel,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -96,8 +98,9 @@ const Consoles: FC<ConsolesProps> = ({
             <VncConsole
               basePath={path}
               // force re-create on change
-              key={`vnc-${path}-${vncLogLevel}`}
+              key={`vnc-${path}-${vncLogLevel}-${vncAutoconnect}`}
               setState={setState}
+              vncAutoconnect={vncAutoconnect}
               vncLogLevel={vncLogLevel}
             />
           </HideConsole>
