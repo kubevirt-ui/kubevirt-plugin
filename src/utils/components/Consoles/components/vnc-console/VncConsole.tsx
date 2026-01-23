@@ -1,14 +1,14 @@
 import React, { FC, memo, useEffect, useRef } from 'react';
 
 import RFBCreate from '@novnc/novnc/lib/rfb';
-import { initLogging } from '@novnc/novnc/lib/util/logging';
+import { getLogging, initLogging } from '@novnc/novnc/lib/util/logging';
 
 import { INSECURE, SECURE } from '../../utils/constants';
 import { isConnectionEncrypted } from '../../utils/utils';
 import { ConsoleState, HTTP, HTTPS, VNC_CONSOLE_TYPE, WS, WSS } from '../utils/ConsoleConsts';
 import { ConsoleComponentState } from '../utils/types';
 
-import { ALL_SESSIONS, AUTO_CONNECT, USER_CONNECT } from './utils/constants';
+import { ALL_SESSIONS, AUTO_CONNECT, USER_CONNECT, WARN } from './utils/constants';
 import * as utils from './utils/util';
 import { RFB, RfbSession, VncConsoleProps } from './utils/VncConsoleTypes';
 import {
@@ -165,7 +165,9 @@ export const VncConsole: FC<VncConsoleProps> = ({
       return;
     }
 
-    vncLogLevel && initLogging(vncLogLevel);
+    if (getLogging() !== vncLogLevel) {
+      initLogging(vncLogLevel || WARN);
+    }
     log(`[VncConsole] auto-connect. Active session ${sessionRef.current}.`);
     connect(AUTO_CONNECT);
     const userConnect = (preserveSession?: boolean) => connect(USER_CONNECT, preserveSession);
