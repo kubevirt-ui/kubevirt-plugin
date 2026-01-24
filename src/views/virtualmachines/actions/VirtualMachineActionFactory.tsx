@@ -1,4 +1,5 @@
 import React from 'react';
+import { TFunction } from 'react-i18next';
 
 import { VirtualMachineCloneModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineInstanceMigrationModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -13,7 +14,6 @@ import CloneVMModal from '@kubevirt-utils/components/CloneVMModal/CloneVMModal';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
 import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SnapshotModal from '@kubevirt-utils/components/SnapshotModal/SnapshotModal';
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   VirtualMachineInstanceSubresourcesModel,
   VirtualMachineStorageMigrationPlanModel,
@@ -22,6 +22,7 @@ import {
 import { asAccessReview, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
 import { getMigratableVolumeSnapshotStatuses } from '@kubevirt-utils/resources/vm/utils/snapshotStatuses';
+import { getNoPermissionTooltipContent } from '@kubevirt-utils/utils/utils';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
@@ -65,7 +66,7 @@ const {
   Unknown,
 } = printableVMStatus;
 
-export const VirtualMachineActionFactory = {
+export const createVirtualMachineActionFactory = (t: TFunction) => ({
   cancelComputeMigration: (
     vm: V1VirtualMachine,
     vmim: V1VirtualMachineInstanceMigration,
@@ -100,7 +101,7 @@ export const VirtualMachineActionFactory = {
         )),
       description: noMigratableDisks && t('No migratable disks found'),
       disabled: noMigratableDisks,
-      disabledTooltip: !noMigratableDisks && t(`You don't have permission to perform this action`),
+      disabledTooltip: !noMigratableDisks && getNoPermissionTooltipContent(t),
       id: 'vm-action-clone',
       label: t('Clone'),
     };
@@ -189,6 +190,8 @@ export const VirtualMachineActionFactory = {
     vm: V1VirtualMachine,
     createModal: (modal: ModalComponent) => void,
   ): ActionDropdownItemType => {
+    const liveMigratable = isLiveMigratable(vm);
+
     return {
       accessReview: {
         cluster: getCluster(vm),
@@ -199,7 +202,10 @@ export const VirtualMachineActionFactory = {
       },
       cta: () => createModal((props) => <ComputeMigrationModal {...props} vm={vm} />),
       description: t('Migrate VirtualMachine to a different Node'),
-      disabled: !isLiveMigratable(vm),
+      disabled: !liveMigratable,
+      disabledTooltip: liveMigratable
+        ? getNoPermissionTooltipContent(t)
+        : t('The VirtualMachine is not running or is not live migratable'),
       id: 'vm-action-migrate-compute',
       label: t('Compute'),
     };
@@ -207,11 +213,18 @@ export const VirtualMachineActionFactory = {
   migrateStorage: (
     vm: V1VirtualMachine,
     createModal: (modal: ModalComponent) => void,
+    storageMigrationEnabled: boolean,
   ): ActionDropdownItemType => {
     return {
       accessReview: asAccessReview(VirtualMachineStorageMigrationPlanModel, vm, 'create'),
       cta: () => createModal((props) => <VirtualMachineMigrateModal vms={[vm]} {...props} />),
       description: t('Migrate VirtualMachine storage to a different StorageClass'),
+      disabled: !storageMigrationEnabled,
+      disabledTooltip: storageMigrationEnabled
+        ? getNoPermissionTooltipContent(t)
+        : t(
+            'MTC Operator must be installed and a MigrationController must be created to enable storage migration',
+          ),
       id: 'vm-action-migrate-storage',
       label: t('Storage'),
     };
@@ -219,7 +232,7 @@ export const VirtualMachineActionFactory = {
   migrationActions: (migrationActions): ActionDropdownItemType => ({
     cta: () => null, // Required to avoid breaking actions in the topology view
     id: 'migration-menu',
-    label: 'Migration',
+    label: t('Migration'),
     options: migrationActions,
   }),
   moveToFolder: (
@@ -427,4 +440,4 @@ export const VirtualMachineActionFactory = {
       label: t('Unpause'),
     };
   },
-};
+});

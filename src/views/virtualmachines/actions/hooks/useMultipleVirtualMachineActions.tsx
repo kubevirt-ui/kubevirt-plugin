@@ -16,9 +16,10 @@ import { isDeletionProtectionEnabled } from '@virtualmachines/details/tabs/confi
 import { isLiveMigratable, isPaused, isRunning, isStopped } from '@virtualmachines/utils';
 import { getVMIMFromMapper, VMIMMapper } from '@virtualmachines/utils/mappers';
 
-import { BulkVirtualMachineActionFactory } from '../BulkVirtualMachineActionFactory';
+import { createBulkVirtualMachineActionFactory } from '../BulkVirtualMachineActionFactory';
 
 import useIsMTVInstalled from './useIsMTVInstalled';
+import useIsStorageMigrationEnabled from './useIsStorageMigrationEnabled';
 import useVirtualMachineActionsProvider from './useVirtualMachineActionsProvider';
 import { someVMIsMigrating } from './utils';
 
@@ -40,6 +41,8 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms,
   );
   const crossClusterMigrationEnabled = mtvInstalled && crossClusterMigrationFlagEnabled;
 
+  const storageMigrationEnabled = useIsStorageMigrationEnabled();
+
   const [provider, providerLoaded] = useProviderByClusterName(
     getCluster(vms?.[0]) ?? hubClusterName,
   );
@@ -49,6 +52,8 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms,
     singleVM,
     getVMIMFromMapper(vmimMapper, getName(singleVM), getNamespace(singleVM), getCluster(singleVM)),
   );
+
+  const BulkVirtualMachineActionFactory = createBulkVirtualMachineActionFactory(t);
 
   return useMemo(() => {
     if (vms.length === 1) {
@@ -62,7 +67,11 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms,
       vms.filter(isLiveMigratable),
       createModal,
     );
-    const migrateStorage = BulkVirtualMachineActionFactory.migrateStorage(vms, createModal);
+    const migrateStorage = BulkVirtualMachineActionFactory.migrateStorage(
+      vms,
+      createModal,
+      storageMigrationEnabled,
+    );
 
     const migrationActions =
       clusters.size === 1 ? [migrateCompute, migrateStorage] : [migrateCompute];
@@ -121,10 +130,12 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms,
     crossClusterMigrationEnabled,
     provider,
     providerLoaded,
+    storageMigrationEnabled,
     treeViewFoldersEnabled,
     vms,
     vmimMapper,
     singleVMActions,
+    BulkVirtualMachineActionFactory,
   ]);
 };
 

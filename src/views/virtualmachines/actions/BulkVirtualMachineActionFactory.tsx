@@ -1,4 +1,5 @@
 import React from 'react';
+import { TFunction } from 'react-i18next';
 
 import { VirtualMachineInstanceMigrationModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -9,13 +10,13 @@ import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalPr
 import MoveBulkVMToFolderModal from '@kubevirt-utils/components/MoveVMToFolderModal/MoveBulkVMsToFolderModal';
 import BulkSnapshotModal from '@kubevirt-utils/components/SnapshotModal/BulkSnapshotModal';
 import SnapshotModal from '@kubevirt-utils/components/SnapshotModal/SnapshotModal';
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   getLabels,
   getNamespace,
   haveSameCluster,
   haveSameNamespace,
 } from '@kubevirt-utils/resources/shared';
+import { getNoPermissionTooltipContent } from '@kubevirt-utils/utils/utils';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import CrossClusterMigration from '@multicluster/components/CrossClusterMigration/CrossClusterMigration';
 import { CROSS_CLUSTER_MIGRATION_ACTION_ID } from '@multicluster/constants';
@@ -42,7 +43,7 @@ import { getCommonLabels, getLabelsDiffPatch } from './utils';
 
 const { Stopped } = printableVMStatus;
 
-export const BulkVirtualMachineActionFactory = {
+export const createBulkVirtualMachineActionFactory = (t: TFunction) => ({
   controlActions: (controlActions: ActionDropdownItemType[]): ActionDropdownItemType => ({
     cta: null,
     id: 'control-menu',
@@ -144,6 +145,9 @@ export const BulkVirtualMachineActionFactory = {
       )),
     description: t('Migrate VirtualMachines to a different Node'),
     disabled: isEmpty(vms),
+    disabledTooltip: isEmpty(vms)
+      ? t('No live migratable VirtualMachines selected')
+      : getNoPermissionTooltipContent(t),
     id: ACTIONS_ID.BULK_MIGRATE_COMPUTE,
     label: t('Compute'),
   }),
@@ -151,6 +155,7 @@ export const BulkVirtualMachineActionFactory = {
   migrateStorage: (
     vms: V1VirtualMachine[],
     createModal: (modal: ModalComponent) => void,
+    storageMigrationEnabled: boolean,
   ): ActionDropdownItemType => ({
     accessReview: {
       group: VirtualMachineModel.apiGroup,
@@ -160,6 +165,12 @@ export const BulkVirtualMachineActionFactory = {
     },
     cta: () => createModal((props) => <VirtualMachineMigrateModal vms={vms} {...props} />),
     description: t('Migrate VirtualMachine storage to a different StorageClass'),
+    disabled: !storageMigrationEnabled,
+    disabledTooltip: storageMigrationEnabled
+      ? getNoPermissionTooltipContent(t)
+      : t(
+          'MTC Operator must be installed and a MigrationController must be created to enable storage migration',
+        ),
     id: ACTIONS_ID.BULK_MIGRATE_STORAGE,
     label: t('Storage'),
   }),
@@ -316,4 +327,4 @@ export const BulkVirtualMachineActionFactory = {
     id: ACTIONS_ID.UNPAUSE,
     label: t('Unpause'),
   }),
-};
+});

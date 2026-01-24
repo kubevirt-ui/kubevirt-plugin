@@ -1,9 +1,10 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
 
 import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePermissions from '@kubevirt-utils/hooks/usePermissions/usePermissions';
 import useCanCreateBootableVolume from '@kubevirt-utils/resources/bootableresources/hooks/useCanCreateBootableVolume';
+import { getNoPermissionTooltipContent } from '@kubevirt-utils/utils/utils';
 import { Divider, FormGroup, SelectGroup } from '@patternfly/react-core';
 import { Select, SelectOption } from '@patternfly/react-core';
 
@@ -22,6 +23,7 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
   resetDiskSize,
   setFormSelection,
 }) => {
+  const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const { canCreateDS, canCreatePVC, canCreateSnapshots, loading } =
     useCanCreateBootableVolume(namespace);
@@ -76,7 +78,7 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
             isDisabled={!canUploadImage}
             value={DROPDOWN_FORM_SELECTION.UPLOAD_VOLUME}
             {...(!canUploadImage && {
-              description: t("You don't have permission to perform this action"),
+              description: getNoPermissionTooltipContent(t),
             })}
             data-test-id="upload-volume"
           >
