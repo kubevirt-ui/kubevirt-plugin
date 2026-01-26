@@ -5,6 +5,7 @@ import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdo
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { CONFIRM_VM_ACTIONS, TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useProviderByClusterName from '@multicluster/components/CrossClusterMigration/hooks/useProviderByClusterName';
@@ -14,7 +15,7 @@ import { useHubClusterName } from '@stolostron/multicluster-sdk';
 import { isDeletionProtectionEnabled } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
 import { isPaused, isRunning, isStopped } from '@virtualmachines/utils';
 
-import { BulkVirtualMachineActionFactory } from '../BulkVirtualMachineActionFactory';
+import { createBulkVirtualMachineActionFactory } from '../BulkVirtualMachineActionFactory';
 
 import { ACTIONS_ID } from './constants';
 import useIsMTCInstalled from './useIsMTCInstalled';
@@ -23,6 +24,7 @@ import useIsMTVInstalled from './useIsMTVInstalled';
 type UseMultipleVirtualMachineActions = (vms: V1VirtualMachine[]) => ActionDropdownItemType[];
 
 const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms) => {
+  const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const { featureEnabled: confirmVMActionsEnabled } = useFeatures(CONFIRM_VM_ACTIONS);
   const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
@@ -40,6 +42,8 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms)
 
   const mtcInstalled = useIsMTCInstalled();
 
+  const BulkVirtualMachineActionFactory = createBulkVirtualMachineActionFactory(t);
+
   return useMemo(() => {
     const namespaces = new Set(vms?.map((vm) => getNamespace(vm)));
     const clusters = new Set(vms?.map((vm) => getCluster(vm)));
@@ -56,8 +60,10 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms)
       );
     }
 
-    if (namespaces.size === 1 && mtcInstalled) {
-      migrationActions.push(BulkVirtualMachineActionFactory.migrateStorage(vms, createModal));
+    if (namespaces.size === 1) {
+      migrationActions.push(
+        BulkVirtualMachineActionFactory.migrateStorage(vms, createModal, mtcInstalled),
+      );
     }
 
     const hasRunningVM = vms?.some(isRunning);
@@ -102,6 +108,7 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms)
     providerLoaded,
     treeViewFoldersEnabled,
     vms,
+    BulkVirtualMachineActionFactory,
   ]);
 };
 

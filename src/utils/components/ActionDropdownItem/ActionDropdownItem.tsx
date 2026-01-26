@@ -20,7 +20,7 @@ const ActionDropdownItem: FC<ActionDropdownItemProps> = ({ action, setIsOpen }) 
   const displayDisabledTooltip = isDisabled && action?.disabledTooltip;
 
   const handleClick = () => {
-    if (typeof action?.cta === 'function') {
+    if (typeof action?.cta === 'function' && !isDisabled) {
       action?.cta();
       setIsOpen(false);
     }
@@ -32,6 +32,8 @@ const ActionDropdownItem: FC<ActionDropdownItemProps> = ({ action, setIsOpen }) 
         position: TooltipPosition.left,
       }
     : null;
+
+  const useAriaDisabled = displayDisabledTooltip;
 
   return (
     <MenuItem
@@ -50,7 +52,8 @@ const ActionDropdownItem: FC<ActionDropdownItemProps> = ({ action, setIsOpen }) 
       }
       data-test-id={`${action?.id}`}
       description={action?.description}
-      isDisabled={isDisabled}
+      isAriaDisabled={useAriaDisabled ? isDisabled : undefined}
+      isDisabled={useAriaDisabled ? false : isDisabled}
       key={action?.id}
       onClick={handleClick}
       tooltipProps={tooltipProps}
