@@ -3,7 +3,7 @@
 #       the `:latest` is updated.
 #
 # Image info: https://catalog.redhat.com/en/software/containers/ubi9/nodejs-22/66431d1785c5c3a31edd24f1
-FROM registry.access.redhat.com/ubi9/nodejs-22:9.7-1766414965 AS builder
+FROM registry.access.redhat.com/ubi9/nodejs-22:9.7-1768870743 AS builder
 USER root
 
 COPY . /opt/app-root/src
