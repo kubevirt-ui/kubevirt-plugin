@@ -973,7 +973,6 @@
   "Migrate VirtualMachines": "迁移 VirtualMachines",
   "Migrate VirtualMachines storage": "迁移 VirtualMachines 存储",
   "Migrate VirtualMachines to a different Node": "Migrate VirtualMachines to a different Node",
-  "Migrated at": "迁移于",
   "Migrating {{migrationCount}} out of {{allCount}}": "迁移 {{allCount}}（共 {{migrationCount}}）",
   "Migration": "迁移",
   "Migration chart": "迁移图",

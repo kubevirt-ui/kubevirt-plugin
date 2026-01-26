@@ -973,7 +973,6 @@
   "Migrate VirtualMachines": "VirtualMachine の移行",
   "Migrate VirtualMachines storage": "VirtualMachine のストレージの移行",
   "Migrate VirtualMachines to a different Node": "Migrate VirtualMachines to a different Node",
-  "Migrated at": "移行日時",
   "Migrating {{migrationCount}} out of {{allCount}}": "{{migrationCount}} を {{allCount}} から移行しています",
   "Migration": "移行",
   "Migration chart": "移行チャート",

@@ -973,7 +973,6 @@
   "Migrate VirtualMachines": "VirtualMachines 마이그레이션",
   "Migrate VirtualMachines storage": "VirtualMachines 스토리지 마이그레이션",
   "Migrate VirtualMachines to a different Node": "Migrate VirtualMachines to a different Node",
-  "Migrated at": "마이그레이션 완료 시간",
   "Migrating {{migrationCount}} out of {{allCount}}": "{{allCount}}개 중 {{migrationCount}}개 마이그레이션 중",
   "Migration": "마이그레이션",
   "Migration chart": "마이그레이션 차트",
