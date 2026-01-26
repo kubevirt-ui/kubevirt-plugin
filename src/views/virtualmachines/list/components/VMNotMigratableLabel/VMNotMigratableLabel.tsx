@@ -19,13 +19,7 @@ const VMNotMigratableLabel: FC<VMNotMigratableLabelProps> = ({ vm }) => {
   if (!isRunning || isMigratable) return null;
 
   return (
-    <Label
-      className="migratable-label"
-      isCompact
-      key="not-migratable"
-      status="info"
-      variant="outline"
-    >
+    <Label className="migratable-label" key="not-migratable" status="info" variant="outline">
       {t('Not migratable')}
     </Label>
   );

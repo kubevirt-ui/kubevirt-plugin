@@ -60,7 +60,7 @@ const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({
               <span className="co-m-resource-icon co-m-resource-icon--lg">{t('VM')}</span>
               <span>{name} </span>
               {!isEmpty(vm) && (
-                <Label className="vm-resource-label" icon={<StatusIcon />} isCompact>
+                <Label className="vm-resource-label" icon={<StatusIcon />}>
                   {vm?.status?.printableStatus}
                 </Label>
               )}
