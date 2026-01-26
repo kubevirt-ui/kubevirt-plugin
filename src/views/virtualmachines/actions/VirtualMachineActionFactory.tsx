@@ -1,4 +1,5 @@
 import React from 'react';
+import { TFunction } from 'react-i18next';
 
 import VirtualMachineCloneModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineCloneModel';
 import VirtualMachineInstanceMigrationModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstanceMigrationModel';
@@ -13,7 +14,6 @@ import CloneVMModal from '@kubevirt-utils/components/CloneVMModal/CloneVMModal';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
 import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SnapshotModal from '@kubevirt-utils/components/SnapshotModal/SnapshotModal';
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   VirtualMachineInstanceSubresourcesModel,
   VirtualMachineSubresourcesModel,
@@ -25,7 +25,7 @@ import {
 } from '@kubevirt-utils/resources/migrations/constants';
 import { asAccessReview, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { getNoPermissionTooltipContent, isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { Patch } from '@openshift-console/dynamic-plugin-sdk';
@@ -60,7 +60,7 @@ const {
   Unknown,
 } = printableVMStatus;
 
-export const VirtualMachineActionFactory = {
+export const createVirtualMachineActionFactory = (t: TFunction) => ({
   cancelComputeMigration: (
     vm: V1VirtualMachine,
     vmim: V1VirtualMachineInstanceMigration,
@@ -118,7 +118,7 @@ export const VirtualMachineActionFactory = {
         createModal(({ isOpen, onClose }) => (
           <CloneVMModal isOpen={isOpen} onClose={onClose} source={vm} />
         )),
-      disabledTooltip: t(`You don't have permission to perform this action`),
+      disabledTooltip: getNoPermissionTooltipContent(t),
       id: 'vm-action-clone',
       label: t('Clone'),
     };
@@ -201,6 +201,8 @@ export const VirtualMachineActionFactory = {
     vm: V1VirtualMachine,
     createModal: (modal: ModalComponent) => void,
   ): ActionDropdownItemType => {
+    const liveMigratable = isLiveMigratable(vm);
+
     return {
       accessReview: {
         cluster: getCluster(vm),
@@ -211,7 +213,10 @@ export const VirtualMachineActionFactory = {
       },
       cta: () => createModal((props) => <ComputeMigrationModal {...props} vm={vm} />),
       description: t('Migrate VirtualMachine to a different Node'),
-      disabled: !isLiveMigratable(vm),
+      disabled: !liveMigratable,
+      disabledTooltip: liveMigratable
+        ? getNoPermissionTooltipContent(t)
+        : t('The VirtualMachine is not running or is not live migratable'),
       id: 'vm-action-migrate',
       label: t('Compute'),
     };
@@ -219,11 +224,18 @@ export const VirtualMachineActionFactory = {
   migrateStorage: (
     vm: V1VirtualMachine,
     createModal: (modal: ModalComponent) => void,
+    mtcInstalled: boolean,
   ): ActionDropdownItemType => {
     return {
       accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
       cta: () => createModal((props) => <VirtualMachineMigrateModal vms={[vm]} {...props} />),
       description: t('Migrate VirtualMachine storage to a different StorageClass'),
+      disabled: !mtcInstalled,
+      disabledTooltip: mtcInstalled
+        ? getNoPermissionTooltipContent(t)
+        : t(
+            'MTC Operator must be installed and a MigrationController must be created to enable storage migration',
+          ),
       id: 'vm-migrate-storage',
       label: t('Storage'),
     };
@@ -231,7 +243,7 @@ export const VirtualMachineActionFactory = {
   migrationActions: (migrationActions): ActionDropdownItemType => ({
     cta: () => null, // Required to avoid breaking actions in the topology view
     id: 'migration-menu',
-    label: 'Migration',
+    label: t('Migration'),
     options: migrationActions,
   }),
   moveToFolder: (
@@ -399,4 +411,4 @@ export const VirtualMachineActionFactory = {
       label: t('Unpause'),
     };
   },
-};
+});

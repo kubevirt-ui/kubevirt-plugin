@@ -235,3 +235,6 @@ export const removeIPV6 = (ipAddress: IPAddress[]) => {
   const ipAddressWithoutIPv6 = ipAddress.filter((item) => !isIPv6(item.ip));
   return ipAddressWithoutIPv6;
 };
+
+export const getNoPermissionTooltipContent = (t: (key: string) => string): string =>
+  t(`You don't have permission to perform this action`);

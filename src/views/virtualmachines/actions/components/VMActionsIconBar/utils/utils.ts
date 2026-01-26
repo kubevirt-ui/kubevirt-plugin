@@ -1,16 +1,21 @@
+import { TFunction } from 'react-i18next';
+
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { EjectIcon, PauseIcon, PlayIcon, RedoIcon, SquareIcon } from '@patternfly/react-icons';
 import { VMActionIconDetails } from '@virtualmachines/actions/components/VMActionsIconBar/utils/types';
-import { VirtualMachineActionFactory } from '@virtualmachines/actions/VirtualMachineActionFactory';
+import { createVirtualMachineActionFactory } from '@virtualmachines/actions/VirtualMachineActionFactory';
 import { isPaused, isRestoring, isSnapshotting } from '@virtualmachines/utils';
 
 export const getVMActionIconsDetails = (
   vm: V1VirtualMachine,
   confirmVMActions: boolean,
   createModal: (modal: ModalComponent) => void,
+  t: TFunction,
 ): VMActionIconDetails[] => {
   if (isSnapshotting(vm) || isRestoring(vm)) return [];
+
+  const VirtualMachineActionFactory = createVirtualMachineActionFactory(t);
 
   const startAction = VirtualMachineActionFactory.start(vm);
   const stopAction = VirtualMachineActionFactory.stop(vm, createModal, confirmVMActions);
