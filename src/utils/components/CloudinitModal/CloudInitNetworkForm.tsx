@@ -1,9 +1,11 @@
 import React, { FormEvent } from 'react';
 import { Trans } from 'react-i18next';
 
+import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Checkbox, Divider, FormGroup, TextInput } from '@patternfly/react-core';
+import { Checkbox, Divider, FormGroup, TextInput, ValidatedOptions } from '@patternfly/react-core';
+import { isValidIPv4Substring, isValidIPv6Substring } from '@search/utils/validation';
 
 import { CloudInitNetworkData } from './utils/cloudinit-utils';
 
@@ -80,15 +82,47 @@ export const CloudinitNetworkForm: React.FC<CloudinitNetworkFormProps> = ({
           </FormGroup>
           <FormGroup
             className="kv-cloudint-advanced-tab--validation-text"
-            fieldId={'gateway'}
-            label={t('Gateway address')}
+            fieldId={'gateway4'}
+            label={t('IPv4 Gateway address')}
           >
             <TextInput
-              id={'gateway'}
+              validated={
+                !networkData?.gateway4 || isValidIPv4Substring(networkData?.gateway4)
+                  ? ValidatedOptions.default
+                  : ValidatedOptions.warning
+              }
+              id={'gateway4'}
               onChange={(_event, v) => updateNetworkField('gateway4', v)}
               type="text"
               value={networkData?.gateway4 || ''}
             />
+            {networkData?.gateway4 && !isValidIPv4Substring(networkData?.gateway4) && (
+              <FormGroupHelperText validated={ValidatedOptions.warning}>
+                {t('Invalid IPv4 address')}
+              </FormGroupHelperText>
+            )}
+          </FormGroup>
+          <FormGroup
+            className="kv-cloudint-advanced-tab--validation-text"
+            fieldId={'gateway6'}
+            label={t('IPv6 Gateway address')}
+          >
+            <TextInput
+              validated={
+                !networkData?.gateway6 || isValidIPv6Substring(networkData?.gateway6)
+                  ? ValidatedOptions.default
+                  : ValidatedOptions.warning
+              }
+              id={'gateway6'}
+              onChange={(_event, v) => updateNetworkField('gateway6', v)}
+              type="text"
+              value={networkData?.gateway6 || ''}
+            />
+            {networkData?.gateway6 && !isValidIPv6Substring(networkData?.gateway6) && (
+              <FormGroupHelperText validated={ValidatedOptions.warning}>
+                {t('Invalid IPv6 address')}
+              </FormGroupHelperText>
+            )}
           </FormGroup>
         </>
       )}
