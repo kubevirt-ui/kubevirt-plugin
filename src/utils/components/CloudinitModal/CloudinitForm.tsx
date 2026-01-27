@@ -127,6 +127,7 @@ const CloudinitForm: FC<CloudinitFormProps> = ({
             enableNetworkData={enableNetworkData}
             networkData={networkData}
             setEnableNetworkData={setEnableNetworkData}
+            setSubmitDisabled={setSubmitDisabled}
             updateNetworkField={updateNetworkField}
           />
         </Form>

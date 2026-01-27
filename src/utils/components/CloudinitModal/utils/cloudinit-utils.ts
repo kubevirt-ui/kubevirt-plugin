@@ -62,13 +62,15 @@ export const convertYAMLToNetworkDataObject = (networkData: string): CloudInitNe
 
     const addresses = Array.isArray(ips) ? ips?.join(',') : ips;
     const gateway4 = networkObj?.ethernets?.[name]?.gateway4;
+    const gateway6 = networkObj?.ethernets?.[name]?.gateway6;
 
-    const nonEmptyNetworkObj = !!addresses || !!name || !!gateway4;
+    const nonEmptyNetworkObj = !!addresses || !!name || !!gateway4 || !!gateway6;
 
     return (
       nonEmptyNetworkObj && {
         addresses,
         gateway4,
+        gateway6,
         name,
       }
     );
@@ -79,8 +81,9 @@ export const convertYAMLToNetworkDataObject = (networkData: string): CloudInitNe
 };
 
 export const convertNetworkDataObjectToYAML = (networkData: CloudInitNetworkData): string => {
-  const { addresses, gateway4, name } = networkData || {};
-  const hasValue = !isEmpty(name) || !isEmpty(addresses) || !isEmpty(gateway4);
+  const { addresses, gateway4, gateway6, name } = networkData || {};
+  const hasValue =
+    !isEmpty(name) || !isEmpty(addresses) || !isEmpty(gateway4) || !isEmpty(gateway6);
   try {
     return hasValue
       ? dump({
@@ -88,6 +91,7 @@ export const convertNetworkDataObjectToYAML = (networkData: CloudInitNetworkData
             [name || '']: {
               addresses: (addresses || '')?.replace(/\s/g, '').split(','),
               ...(gateway4 && { gateway4 }),
+              ...(gateway6 && { gateway6 }),
             },
           },
           version: 2,
@@ -189,7 +193,8 @@ export type CloudInitUserData = {
 
 export type CloudInitNetworkData = {
   addresses: string;
-  gateway4: string;
+  gateway4?: string;
+  gateway6?: string;
   name: string;
 };
 
@@ -197,7 +202,8 @@ type CloudInitNetwork = {
   ethernets: {
     [name: string]: {
       addresses: string[];
-      gateway4: string;
+      gateway4?: string;
+      gateway6?: string;
     };
   };
   version: number;
