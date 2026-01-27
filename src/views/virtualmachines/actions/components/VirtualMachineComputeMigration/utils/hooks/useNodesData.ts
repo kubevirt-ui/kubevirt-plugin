@@ -25,7 +25,7 @@ const useNodesData: UseNodesData = (vm) => {
       matchLabels: { 'node-role.kubernetes.io/worker': '' },
     },
   });
-  const { metricsData, metricsLoaded } = useNodesMetrics(cluster);
+  const { metricsData } = useNodesMetrics(cluster);
   const vmiNodeName = useNode(vm);
 
   const filteredNodes = nodes?.filter(
@@ -53,7 +53,7 @@ const useNodesData: UseNodesData = (vm) => {
     return acc;
   }, []);
 
-  return { nodes, nodesData, nodesDataLoaded: nodesLoaded && metricsLoaded };
+  return { nodes, nodesData, nodesDataLoaded: nodesLoaded };
 };
 
 export default useNodesData;
