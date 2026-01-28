@@ -5,6 +5,7 @@ import {
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
+import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
 
 export type MigrationTableDataLayout = {
   metadata: {
@@ -38,17 +39,18 @@ export const getMigrationsTableData = (
 ): MigrationTableDataLayout[] => {
   const filteredVMIMS = getFilteredDurationVMIMS(vmims, selectedDuration);
 
+  const vmiMap = new Map(
+    (vmis || []).map((vmi) => [`${vmi?.metadata?.namespace}/${vmi?.metadata?.name}`, vmi]),
+  );
+
+  const mpMap = new Map((mps || []).map((mp) => [mp?.metadata?.name, mp]));
+
   const migrationsData = (filteredVMIMS || []).map((vmim) => {
-    const vmiObj = (vmis || []).find(
-      (vmi) =>
-        vmi?.metadata?.name === vmim?.spec?.vmiName &&
-        vmi?.metadata?.namespace === vmim?.metadata?.namespace,
-    );
+    const vmiKey = `${vmim?.metadata?.namespace}/${vmim?.spec?.vmiName}`;
+    const vmiObj = vmiMap.get(vmiKey);
 
     const mpObj = vmiObj?.status?.migrationState?.migrationPolicyName
-      ? (mps || []).find(
-          (mp) => mp?.metadata?.name === vmiObj?.status?.migrationState?.migrationPolicyName,
-        )
+      ? mpMap.get(vmiObj.status.migrationState.migrationPolicyName)
       : null;
 
     return {
@@ -61,4 +63,44 @@ export const getMigrationsTableData = (
   });
 
   return migrationsData || [];
+};
+
+/**
+ * Clamps pagination state to ensure it stays within valid bounds when data length changes.
+ * Prevents showing empty pages when filtered data shrinks or becomes empty.
+ *
+ * @param currentPagination - The current pagination state
+ * @param dataLength - The current length of the filtered data array
+ * @returns Updated pagination state clamped to valid bounds, or the original state if valid
+ */
+export const getClampedPagination = (
+  currentPagination: PaginationState,
+  dataLength: number,
+): PaginationState => {
+  const { perPage, startIndex } = currentPagination;
+
+  if (startIndex >= dataLength && dataLength > 0) {
+    const lastStart = Math.floor(Math.max(0, dataLength - 1) / perPage) * perPage;
+    const newStartIndex = lastStart;
+    const newPage = Math.floor(newStartIndex / perPage) + 1;
+    const newEndIndex = Math.min(newStartIndex + perPage, dataLength);
+
+    return {
+      endIndex: newEndIndex,
+      page: newPage,
+      perPage,
+      startIndex: newStartIndex,
+    };
+  }
+
+  if (dataLength === 0) {
+    return {
+      endIndex: perPage,
+      page: 1,
+      perPage,
+      startIndex: 0,
+    };
+  }
+
+  return currentPagination;
 };

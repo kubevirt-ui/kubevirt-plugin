@@ -33,6 +33,7 @@ import {
 } from '../components/MigrationsTable/utils/utils';
 
 export type UseMigrationCardDataAndFiltersValues = {
+  filteredVMIMS: V1VirtualMachineInstanceMigration[];
   filters: RowFilter<MigrationTableDataLayout>[];
   loaded: boolean;
   loadErrors: Error | unknown;
@@ -102,22 +103,22 @@ const useMigrationCardDataAndFilters: UseMigrationCardDataAndFilters = (duration
 
   const [mps] = useMigrationPolicies();
 
-  const migrationsData = getMigrationsTableData(
-    vmims,
-    vmis,
-    mps,
-    migrationsDefaultConfigurations,
-    duration,
+  const migrationsData = useMemo(
+    () => getMigrationsTableData(vmims, vmis, mps, migrationsDefaultConfigurations, duration),
+    [vmims, vmis, mps, migrationsDefaultConfigurations, duration],
   );
 
-  const filters = [
-    ...getStatusFilter(),
-    ...getSourceNodeFilter(vmis),
-    ...getTargetNodeFilter(vmis),
-  ];
+  const filters = useMemo(
+    () => [...getStatusFilter(), ...getSourceNodeFilter(vmis), ...getTargetNodeFilter(vmis)],
+    [vmis],
+  );
+
   const [unfilteredData, data, onFilterChange] = useListPageFilter(migrationsData, filters);
 
+  const filteredVMIMS = useMemo(() => migrationsData.map((item) => item.vmim), [migrationsData]);
+
   return {
+    filteredVMIMS,
     filters,
     loaded: vmimsLoaded && vmisLoaded && observabilityLoaded,
     loadErrors: observabilityError || vmimsErrors || vmisErrors,
