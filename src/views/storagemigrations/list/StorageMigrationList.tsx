@@ -1,6 +1,11 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import {
+  paginationDefaultValues,
+  paginationInitialState,
+} from '@kubevirt-utils/hooks/usePagination/utils/constants';
+import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
 import {
   modelToRef,
   MultiNamespaceVirtualMachineStorageMigrationPlanModel,
@@ -13,6 +18,9 @@ import {
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
+import { Flex, FlexItem, Pagination } from '@patternfly/react-core';
+
+import { getClampedPagination } from '../../clusteroverview/MigrationsTab/components/MigrationsTable/utils/utils';
 
 import StorageMigrationRow from './components/StorageMigrationRow';
 import useStorageMigrationColumns from './hooks/useStorageMigrationColumns';
@@ -25,6 +33,41 @@ const StorageMigrationList: FC = () => {
 
   const [data, filteredData, onFilterChange] = useListPageFilter(storageMigPlans);
   const [columns, activeColumns] = useStorageMigrationColumns();
+  const [pagination, setPagination] = useState<PaginationState>(paginationInitialState);
+
+  const paginatedData = useMemo(
+    () => filteredData?.slice(pagination.startIndex, pagination.endIndex),
+    [filteredData, pagination.startIndex, pagination.endIndex],
+  );
+
+  const onPageChange = ({
+    endIndex,
+    page,
+    perPage,
+    startIndex,
+  }: {
+    endIndex: number;
+    page: number;
+    perPage: number;
+    startIndex: number;
+  }) => {
+    setPagination({ endIndex, page, perPage, startIndex });
+  };
+
+  const handleFilterChange = (...args: Parameters<typeof onFilterChange>) => {
+    onFilterChange?.(...args);
+    setPagination((prev) => ({
+      ...prev,
+      endIndex: prev.perPage,
+      page: 1,
+      startIndex: 0,
+    }));
+  };
+
+  useEffect(() => {
+    const length = filteredData?.length || 0;
+    setPagination((prev) => getClampedPagination(prev, length));
+  }, [filteredData?.length]);
 
   return (
     <>
@@ -43,8 +86,26 @@ const StorageMigrationList: FC = () => {
           }}
           data={data}
           loaded={loaded}
-          onFilterChange={onFilterChange}
+          onFilterChange={handleFilterChange}
         />
+        <Flex justifyContent={{ default: 'justifyContentFlexEnd' }}>
+          <FlexItem>
+            <Pagination
+              onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
+                onPageChange({ endIndex, page, perPage, startIndex })
+              }
+              onSetPage={(_e, page, perPage, startIndex, endIndex) =>
+                onPageChange({ endIndex, page, perPage, startIndex })
+              }
+              isCompact
+              isLastFullPageShown
+              itemCount={filteredData?.length || 0}
+              page={pagination.page}
+              perPage={pagination.perPage}
+              perPageOptions={paginationDefaultValues}
+            />
+          </FlexItem>
+        </Flex>
         <VirtualizedTable<MultiNamespaceVirtualMachineStorageMigrationPlan>
           EmptyMsg={() => (
             <div className="pf-v6-u-text-align-center" id="no-storagemigration-msg">
@@ -52,7 +113,7 @@ const StorageMigrationList: FC = () => {
             </div>
           )}
           columns={activeColumns}
-          data={filteredData}
+          data={paginatedData}
           loaded={loaded}
           loadError={loadError}
           Row={StorageMigrationRow}
