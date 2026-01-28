@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { humanizeBinaryBytes } from '@kubevirt-utils/utils/humanize.js';
 import { RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 import Status from '@openshift-console/dynamic-plugin-sdk/lib/app/components/status/Status';
@@ -18,6 +19,7 @@ const NodeRow: FC<NodeRowProps> = ({
   obj,
   rowData: { handleNodeSelection, selectedNode },
 }) => {
+  const { t } = useKubevirtTranslation();
   const { name, status, totalCPU, totalMemory, usedCPU, usedMemory } = obj;
   const { unit: usedMemoryUnits, value: usedMemoryValue } = humanizeBinaryBytes(
     usedMemory,
@@ -29,6 +31,9 @@ const NodeRow: FC<NodeRowProps> = ({
     'B',
     'GiB',
   );
+
+  const usedCPUString = `${parseFloat(usedCPU)?.toFixed(1)} cores / ${totalCPU} cores`;
+  const usedMemoryString = `${usedMemoryValue} ${usedMemoryUnits} / ${totalMemoryValue} ${totalMemoryUnits}`;
 
   return (
     <>
@@ -46,10 +51,10 @@ const NodeRow: FC<NodeRowProps> = ({
         <Status status={status} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="cpu">
-        {`${parseFloat(usedCPU)?.toFixed(1)} cores / ${totalCPU} cores`}
+        {totalCPU ? usedCPUString : t('N/A')}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="memory">
-        {`${usedMemoryValue} ${usedMemoryUnits} / ${totalMemoryValue} ${totalMemoryUnits}`}
+        {totalMemory ? usedMemoryString : t('N/A')}
       </TableData>
     </>
   );
