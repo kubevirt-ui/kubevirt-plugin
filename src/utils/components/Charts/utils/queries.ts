@@ -41,10 +41,10 @@ type GetUtilizationQueries = ({ duration, hubClusterName, nic, obj }: Utilizatio
 export const getUtilizationQueries: GetUtilizationQueries = ({ duration, hubClusterName, obj }) => {
   const { name, namespace } = obj?.metadata || {};
 
-  const clusterFilter =
-    !isEmpty(obj?.cluster) && obj?.cluster === hubClusterName ? `,cluster='${obj.cluster}'` : '';
+  const isManagedCluster = !isEmpty(obj?.cluster) && obj?.cluster !== hubClusterName;
+  const clusterFilter = isManagedCluster ? `,cluster='${obj.cluster}'` : '';
+  const sumByCluster = isManagedCluster ? ', cluster' : '';
 
-  const sumByCluster = !isEmpty(obj?.cluster) && obj?.cluster === hubClusterName ? ', cluster' : '';
   return {
     [VMQueries.CPU_USAGE]: `sum(rate(kubevirt_vmi_cpu_usage_seconds_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}])) BY (name, namespace${sumByCluster})`,
     [VMQueries.FILESYSTEM_READ_USAGE]: `sum(rate(kubevirt_vmi_storage_read_traffic_bytes_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}])) BY (name, namespace${sumByCluster})`,

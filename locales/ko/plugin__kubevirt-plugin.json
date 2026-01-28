@@ -674,6 +674,7 @@
   "Error": "오류",
   "Error checking for usages of this PVC.": "이 PVC의 사용을 확인하는 동안 오류가 발생했습니다.",
   "Error details": "오류 정보",
+  "Error loading data": "Error loading data",
   "Error loading progress": "Error loading progress",
   "Error loading results": "Error loading results",
   "Error loading the VirtualMachineSnapshotContent": "VirtualMachineSnapshotContent 로드 중 오류 발생",

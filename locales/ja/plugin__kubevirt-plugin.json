@@ -674,6 +674,7 @@
   "Error": "エラー",
   "Error checking for usages of this PVC.": "この PVC の使用状況を確認中にエラーが発生しました。",
   "Error details": "エラーの詳細",
+  "Error loading data": "Error loading data",
   "Error loading progress": "Error loading progress",
   "Error loading results": "Error loading results",
   "Error loading the VirtualMachineSnapshotContent": "VirtualMachineSnapshotContent のロード中にエラーが発生しました",

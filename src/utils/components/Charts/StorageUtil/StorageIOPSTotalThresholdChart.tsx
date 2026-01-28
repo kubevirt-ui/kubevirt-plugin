@@ -41,7 +41,7 @@ const StorageIOPSTotalThresholdChart: React.FC<StorageIOPSTotalThresholdChartPro
   const { query, queryLink } = useVMQuery(vmi, VMQueries.STORAGE_IOPS_TOTAL);
   const { height, ref, width } = useResponsiveCharts();
 
-  const [data] = useFleetPrometheusPoll({
+  const [data, loaded, error] = useFleetPrometheusPoll({
     cluster: getCluster(vmi),
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     endTime: currentTime,
@@ -50,6 +50,7 @@ const StorageIOPSTotalThresholdChart: React.FC<StorageIOPSTotalThresholdChartPro
     timespan,
   });
 
+  const isLoading = !loaded;
   const storageWriteData = data?.data?.result?.[0]?.values;
 
   const chartData = storageWriteData?.map(([x, y]) => {
@@ -58,7 +59,12 @@ const StorageIOPSTotalThresholdChart: React.FC<StorageIOPSTotalThresholdChartPro
   const yMax = findMaxYValue(chartData);
 
   return (
-    <ComponentReady isReady={!isEmpty(chartData)} linkToMetrics={queryLink}>
+    <ComponentReady
+      error={error}
+      isLoading={isLoading}
+      isReady={!isEmpty(chartData)}
+      linkToMetrics={queryLink}
+    >
       <div className="util-threshold-chart" ref={ref}>
         <Link to={queryLink}>
           <Chart
