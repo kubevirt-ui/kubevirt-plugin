@@ -39,6 +39,7 @@ export const VncConsole: FC<VncConsoleProps> = ({
   scaleViewport = true,
   setState,
   viewOnly = false,
+  vncAutoconnect = true,
   vncLogLevel = false,
 }) => {
   const rfbRefs = useRef<RfbSession[]>([]);
@@ -169,9 +170,11 @@ export const VncConsole: FC<VncConsoleProps> = ({
       initLogging(vncLogLevel || WARN);
     }
     log(`[VncConsole] auto-connect. Active session ${sessionRef.current}.`);
-    connect(AUTO_CONNECT);
+    vncAutoconnect && connect(AUTO_CONNECT);
+    const initialState = vncAutoconnect ? {} : { state: ConsoleState.disconnected };
     const userConnect = (preserveSession?: boolean) => connect(USER_CONNECT, preserveSession);
     setVncState((prev) => ({
+      ...initialState,
       actions: {
         // keep the methods bound during connect()
         ...prev.actions,
