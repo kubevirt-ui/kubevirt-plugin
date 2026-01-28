@@ -4,20 +4,25 @@ import { V1VirtualMachineCondition } from '@kubevirt-ui-ext/kubevirt-api/kubevir
 import { Label, LabelGroup, Popover, PopoverPosition } from '@patternfly/react-core';
 
 export const VMStatusConditionLabel: FC<V1VirtualMachineCondition> = memo((condition) => {
+  const bodyContentMessage = condition?.message ?? condition?.reason;
+
+  const InnerLabel = (
+    <Label color="grey" onClick={bodyContentMessage ? (e) => e.preventDefault() : undefined}>
+      {condition?.type}={condition?.status}
+    </Label>
+  );
+
+  if (!bodyContentMessage) {
+    return InnerLabel;
+  }
+
   return (
     <Popover
       aria-label="Condition Popover"
-      bodyContent={() => <div>{condition?.message ?? condition?.reason}</div>}
+      bodyContent={() => <div>{bodyContentMessage}</div>}
       position={PopoverPosition.top}
     >
-      <Label
-        onClick={(e) => {
-          e.preventDefault();
-        }}
-        color="grey"
-      >
-        {condition?.type}={condition?.status}
-      </Label>
+      {InnerLabel}
     </Popover>
   );
 });

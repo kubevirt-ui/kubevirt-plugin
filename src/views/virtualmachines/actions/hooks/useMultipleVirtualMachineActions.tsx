@@ -13,10 +13,10 @@ import { FEATURE_KUBEVIRT_CROSS_CLUSTER_MIGRATION } from '@multicluster/constant
 import { getCluster } from '@multicluster/helpers/selectors';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 import { isDeletionProtectionEnabled } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
-import { isLiveMigratable, isPaused, isRunning, isStopped } from '@virtualmachines/utils';
+import { isPaused, isRunning, isStopped } from '@virtualmachines/utils';
 import { getVMIMFromMapper, VMIMMapper } from '@virtualmachines/utils/mappers';
 
-import { BulkVirtualMachineActionFactory } from '../BulkVirtualMachineActionFactory';
+import { createBulkVirtualMachineActionFactory } from '../BulkVirtualMachineActionFactory';
 
 import useIsMTVInstalled from './useIsMTVInstalled';
 import useVirtualMachineActionsProvider from './useVirtualMachineActionsProvider';
@@ -50,6 +50,11 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms,
     getVMIMFromMapper(vmimMapper, getName(singleVM), getNamespace(singleVM), getCluster(singleVM)),
   );
 
+  const BulkVirtualMachineActionFactory = useMemo(
+    () => createBulkVirtualMachineActionFactory(t),
+    [t],
+  );
+
   return useMemo(() => {
     if (vms.length === 1) {
       return singleVMActions;
@@ -58,10 +63,7 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms,
     const namespaces = new Set(vms?.map((vm) => getNamespace(vm)));
     const clusters = new Set(vms?.map((vm) => getCluster(vm)));
 
-    const migrateCompute = BulkVirtualMachineActionFactory.migrateCompute(
-      vms.filter(isLiveMigratable),
-      createModal,
-    );
+    const migrateCompute = BulkVirtualMachineActionFactory.migrateCompute(vms, createModal);
     const migrateStorage = BulkVirtualMachineActionFactory.migrateStorage(vms, createModal);
 
     const migrationActions =
@@ -125,6 +127,7 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms,
     vms,
     vmimMapper,
     singleVMActions,
+    BulkVirtualMachineActionFactory,
   ]);
 };
 

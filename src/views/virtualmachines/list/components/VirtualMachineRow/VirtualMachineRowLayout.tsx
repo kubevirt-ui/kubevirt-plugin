@@ -103,7 +103,7 @@ const VirtualMachineRowLayout: FC<
         {status}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="conditions">
-        <VMStatusConditionLabelList conditions={filterConditions(obj?.status?.conditions)} />
+        <VMStatusConditionLabelList conditions={filterConditions(obj)} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="vm-column" id="node">
         {node}
