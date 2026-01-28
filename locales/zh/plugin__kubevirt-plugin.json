@@ -674,6 +674,7 @@
   "Error": "错误",
   "Error checking for usages of this PVC.": "检查此 PVC 的使用情况的错误。",
   "Error details": "错误详情",
+  "Error loading data": "Error loading data",
   "Error loading progress": "Error loading progress",
   "Error loading results": "Error loading results",
   "Error loading the VirtualMachineSnapshotContent": "加载 VirtualMachineSnapshotContent 时出错",

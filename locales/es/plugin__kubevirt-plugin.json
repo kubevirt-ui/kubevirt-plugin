@@ -684,6 +684,7 @@
   "Error": "Error",
   "Error checking for usages of this PVC.": "Error al momento de verificar los usos de esta PVC.",
   "Error details": "Error de detalles",
+  "Error loading data": "Error loading data",
   "Error loading progress": "Error loading progress",
   "Error loading results": "Error loading results",
   "Error loading the VirtualMachineSnapshotContent": "Error al momento de cargar VirtualMachineSnapshotContent",

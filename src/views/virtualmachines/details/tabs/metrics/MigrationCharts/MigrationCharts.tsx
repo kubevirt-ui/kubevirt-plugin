@@ -26,7 +26,7 @@ const MigrationCharts: React.FC<MigrationChartsProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
 
   return (
-    <Stack>
+    <Stack hasGutter>
       <StackItem>
         <Grid>
           <GridItem span={6}>

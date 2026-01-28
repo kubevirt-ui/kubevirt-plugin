@@ -7,28 +7,46 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { Bullseye } from '@patternfly/react-core';
 
 type ComponentReadyProps = React.PropsWithChildren<{
+  error?: Error | unknown;
+  isLoading?: boolean;
   isReady: boolean;
   linkToMetrics?: string;
-  spinner?: boolean;
   text?: string;
 }>;
 
 const ComponentReady: React.FC<ComponentReadyProps> = ({
   children,
+  error,
+  isLoading,
   isReady,
   linkToMetrics,
-  spinner,
   text,
 }) => {
   const { t } = useKubevirtTranslation();
+
+  if (error) {
+    return (
+      <Bullseye className="ComponentReady">
+        <MutedTextSpan text={t('Error loading data')} />
+      </Bullseye>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <Bullseye className="ComponentReady">
+        <Loading />
+      </Bullseye>
+    );
+  }
+
   const renderText = text || t('No data available');
   return isReady ? (
     <>{children}</>
   ) : (
     <Bullseye className="ComponentReady">
-      {!spinner && !linkToMetrics && <MutedTextSpan text={renderText} />}
-      {spinner && <Loading />}
-      {linkToMetrics && !spinner && <Link to={linkToMetrics}>{renderText}</Link>}
+      {!linkToMetrics && <MutedTextSpan text={renderText} />}
+      {linkToMetrics && <Link to={linkToMetrics}>{renderText}</Link>}
     </Bullseye>
   );
 };

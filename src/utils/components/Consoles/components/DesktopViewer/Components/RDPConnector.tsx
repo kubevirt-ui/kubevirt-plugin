@@ -14,7 +14,7 @@ const RDPConnector: React.FC<RDPConnectorProps> = ({
   vmi,
 }) => {
   return (
-    <ComponentReady isReady={!isLoading} spinner>
+    <ComponentReady isLoading={isLoading} isReady={!isLoading}>
       {rdpServiceAddressPort ? (
         <RDP rdp={rdpServiceAddressPort} />
       ) : (

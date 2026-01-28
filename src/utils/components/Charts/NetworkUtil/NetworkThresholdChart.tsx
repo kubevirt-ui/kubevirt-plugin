@@ -49,15 +49,19 @@ const NetworkThresholdChart: React.FC<NetworkThresholdChartProps> = ({ vmi }) =>
     timespan,
   };
 
-  const [networkIn] = useFleetPrometheusPoll({
+  const [networkIn, networkInLoaded, networkInError] = useFleetPrometheusPoll({
     ...prometheusProps,
     query: queries?.NETWORK_IN_USAGE,
   });
 
-  const [networkOut] = useFleetPrometheusPoll({
+  const [networkOut, networkOutLoaded, networkOutError] = useFleetPrometheusPoll({
     ...prometheusProps,
     query: queries?.NETWORK_OUT_USAGE,
   });
+
+  const isLoading = !networkInLoaded || !networkOutLoaded;
+
+  const error = networkInError || networkOutError;
 
   const networkInData = networkIn?.data?.result?.[0]?.values;
   const networkOutData = networkOut?.data?.result?.[0]?.values;
@@ -72,7 +76,7 @@ const NetworkThresholdChart: React.FC<NetworkThresholdChartProps> = ({ vmi }) =>
   const isReady = !isEmpty(chartDataOut) || !isEmpty(chartDataIn);
 
   return (
-    <ComponentReady isReady={isReady}>
+    <ComponentReady error={error} isLoading={isLoading} isReady={isReady}>
       <div className="util-threshold-chart" ref={ref}>
         <Link to={queriesToLink([queries?.NETWORK_IN_USAGE, queries?.NETWORK_OUT_USAGE])}>
           <Chart

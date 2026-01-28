@@ -60,20 +60,23 @@ const MigrationThresholdChart: React.FC<MigrationThresholdChartProps> = ({ vmi }
     timespan,
   };
 
-  const [migrationDataProcessed] = useFleetPrometheusPoll({
+  const [migrationDataProcessed, processedLoaded, processedError] = useFleetPrometheusPoll({
     ...prometheusProps,
     query: queries?.MIGRATION_DATA_PROCESSED,
   });
 
-  const [migrationDataRemaining] = useFleetPrometheusPoll({
+  const [migrationDataRemaining, remainingLoaded, remainingError] = useFleetPrometheusPoll({
     ...prometheusProps,
     query: queries?.MIGRATION_DATA_REMAINING,
   });
 
-  const [migrationDataDirtyRate] = useFleetPrometheusPoll({
+  const [migrationDataDirtyRate, dirtyRateLoaded, dirtyRateError] = useFleetPrometheusPoll({
     ...prometheusProps,
     query: queries?.MIGRATION_MEMORY_DIRTY_RATE,
   });
+
+  const isLoading = !processedLoaded || !remainingLoaded || !dirtyRateLoaded;
+  const error = processedError || remainingError || dirtyRateError;
 
   const dataProcessed = useMemo(
     () => getPrometheusData(migrationDataProcessed),
@@ -111,7 +114,12 @@ const MigrationThresholdChart: React.FC<MigrationThresholdChartProps> = ({ vmi }
       queries.MIGRATION_MEMORY_DIRTY_RATE,
     ]);
   return (
-    <ComponentReady isReady={isReady} linkToMetrics={linkToMetrics}>
+    <ComponentReady
+      error={error}
+      isLoading={isLoading}
+      isReady={isReady}
+      linkToMetrics={linkToMetrics}
+    >
       <div className="util-threshold-chart" ref={ref}>
         <Link to={linkToMetrics}>
           <Chart
