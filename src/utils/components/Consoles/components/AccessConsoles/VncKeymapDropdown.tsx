@@ -94,7 +94,7 @@ export const VncKeymapDropdown = ({
       selected={selectedKeyboard}
       shouldFocusToggleOnSelect
     >
-      <DropdownList className="vnc-keymap-dropdown-list">
+      <DropdownList>
         {favoriteKeymaps.length > 0 && (
           <>
             <DropdownGroup>
