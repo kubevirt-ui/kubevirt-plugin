@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import DurationDropdown from '@kubevirt-utils/components/DurationOption/DurationDropdown';
 import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
@@ -23,13 +23,12 @@ import MigrationEmptyState from './components/MigrationEmptyState/MigrationEmpty
 import MigrationsChartDonut from './components/MigrationsChartDonut/MigrationsChartDonut';
 import MigrationsLimitionsPopover from './components/MigrationsLimitionsPopover/MigrationsLimitionsPopover';
 import MigrationTable from './components/MigrationsTable/MigrationsTable';
-import { getFilteredDurationVMIMS } from './components/MigrationsTable/utils/utils';
 import useMigrationCardDataAndFilters from './hooks/useMigrationCardData';
 import { MIGRATIONS_DURATION_KEY } from './utils/constants';
 
 import './MigrationsTab.scss';
 
-const MigrationsTab: React.FC = () => {
+const MigrationsTab: FC = () => {
   const { t } = useKubevirtTranslation();
 
   const [duration, setDuration] = useLocalStorage(
@@ -39,9 +38,7 @@ const MigrationsTab: React.FC = () => {
 
   const migrationCardDataAndFilters = useMigrationCardDataAndFilters(duration);
 
-  const { loaded, loadErrors, onFilterChange, vmims } = migrationCardDataAndFilters || {};
-
-  const filteredVMIMS = getFilteredDurationVMIMS(vmims ?? [], duration);
+  const { filteredVMIMS, loaded, loadErrors, onFilterChange } = migrationCardDataAndFilters || {};
 
   const onDurationSelect = (value: string) =>
     setDuration(DurationOption.fromDropdownLabel(value)?.toString());
