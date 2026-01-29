@@ -35,6 +35,7 @@ const InitialRunTabCloudinit: FC<InitialRunTabCloudInitProps> = ({
           <CloudinitModal isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vm={vm} vmi={vmi} />
         ))
       }
+      data-test-id="cloud-init-button"
       descriptionData={<CloudInitDescription vm={vm} />}
       descriptionHeader={<SearchItem id="cloud-init">{t('Cloud-init')}</SearchItem>}
       isEdit={canEdit}

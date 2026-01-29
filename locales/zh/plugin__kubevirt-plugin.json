@@ -193,7 +193,6 @@
   "Another user is currently connected to this VM’s console. Connecting now will disconnect their session. Would you like to continue connecting and disconnect the existing user, or try connecting later?": "Another user is currently connected to this VM’s console. Connecting now will disconnect their session. Would you like to continue connecting and disconnect the existing user, or try connecting later?",
   "Any changes are lost upon reboot": "所有更改都会在重启后丢失",
   "Any time": "随时",
-  "Apply": "应用",
   "Apply optimized StorageProfile settings": "应用优化的存储配置集设置",
   "Apply rules": "应用规则",
   "Applying deletion protection to this VM will prevent deletion through the web console.": "将删除保护应用到此虚拟机将阻止通过 Web 控制台删除。",

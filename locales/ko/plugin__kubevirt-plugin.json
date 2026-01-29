@@ -193,7 +193,6 @@
   "Another user is currently connected to this VM’s console. Connecting now will disconnect their session. Would you like to continue connecting and disconnect the existing user, or try connecting later?": "Another user is currently connected to this VM’s console. Connecting now will disconnect their session. Would you like to continue connecting and disconnect the existing user, or try connecting later?",
   "Any changes are lost upon reboot": "재부팅 시 모든 변경 사항이 손실됨",
   "Any time": "언제든지",
-  "Apply": "적용",
   "Apply optimized StorageProfile settings": "최적화된 스토리지 프로파일 설정 적용",
   "Apply rules": "규칙 적용",
   "Applying deletion protection to this VM will prevent deletion through the web console.": "이 VM에 삭제 보호를 적용하면 웹 콘솔을 통해 삭제되지 않습니다.",

@@ -200,7 +200,6 @@
   "Another user is currently connected to this VM’s console. Connecting now will disconnect their session. Would you like to continue connecting and disconnect the existing user, or try connecting later?": "Another user is currently connected to this VM’s console. Connecting now will disconnect their session. Would you like to continue connecting and disconnect the existing user, or try connecting later?",
   "Any changes are lost upon reboot": "Toutes les modifications sont perdues au redémarrage",
   "Any time": "À tout moment",
-  "Apply": "Appliquer",
   "Apply optimized StorageProfile settings": "Appliquer les paramètres StorageProfile optimisés",
   "Apply rules": "Appliquer les règles",
   "Applying deletion protection to this VM will prevent deletion through the web console.": "L’application d’une protection contre la suppression à cette machine virtuelle empêchera la suppression via la console Web.",

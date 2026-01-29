@@ -193,7 +193,6 @@
   "Another user is currently connected to this VM’s console. Connecting now will disconnect their session. Would you like to continue connecting and disconnect the existing user, or try connecting later?": "Another user is currently connected to this VM’s console. Connecting now will disconnect their session. Would you like to continue connecting and disconnect the existing user, or try connecting later?",
   "Any changes are lost upon reboot": "リブートすると変更が失われます",
   "Any time": "いつでも",
-  "Apply": "適用",
   "Apply optimized StorageProfile settings": "最適化された StorageProfile 設定を適用します",
   "Apply rules": "ルールの適用",
   "Applying deletion protection to this VM will prevent deletion through the web console.": "この仮想マシンに削除保護を適用すると、Web コンソールからの削除が防止されます。",

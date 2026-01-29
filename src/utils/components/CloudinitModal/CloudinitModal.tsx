@@ -56,7 +56,7 @@ const CloudinitModal: FC<{
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={onSubmitModal}
-      submitBtnText={t('Apply')}
+      submitBtnText={t('Save')}
     >
       <Stack hasGutter>
         <StackItem>{vmi && <ModalPendingChangesAlert />}</StackItem>
