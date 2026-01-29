@@ -50,7 +50,7 @@ const MemoryThresholdChart: FC<MemoryThresholdChartProps> = ({ vmi }) => {
 
   const memory = getMemorySize(getMemory(vmi));
 
-  const [data] = useFleetPrometheusPoll({
+  const [data, loaded, error] = useFleetPrometheusPoll({
     cluster: getCluster(vmi),
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     endTime: currentTime,
@@ -59,6 +59,7 @@ const MemoryThresholdChart: FC<MemoryThresholdChartProps> = ({ vmi }) => {
     timespan,
   });
 
+  const isLoading = !loaded;
   const prometheusMemoryData = data?.data?.result?.[0]?.values;
   const memoryAvailableBytes = xbytes.parseSize(`${memory?.size} ${memory?.unit}B`);
 
@@ -76,7 +77,7 @@ const MemoryThresholdChart: FC<MemoryThresholdChartProps> = ({ vmi }) => {
   const yMax = findMaxYValue(thresholdLine);
 
   return (
-    <ComponentReady isReady={isReady} linkToMetrics={queryLink}>
+    <ComponentReady error={error} isLoading={isLoading} isReady={isReady} linkToMetrics={queryLink}>
       <div className="util-threshold-chart" ref={ref}>
         <Link to={queryLink}>
           <Chart

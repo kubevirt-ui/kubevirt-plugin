@@ -49,7 +49,7 @@ const StorageWriteLatencyAvgMaxChart: React.FC<StorageWriteLatencyAvgMaxChartPro
   );
   const { query: queryMax } = useVMQuery(vmi, VMQueries.STORAGE_WRITE_LATENCY_MAX);
 
-  const [avgData] = useFleetPrometheusPoll({
+  const [avgData, avgLoaded, avgError] = useFleetPrometheusPoll({
     cluster: getCluster(vmi),
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     endTime: currentTime,
@@ -58,7 +58,7 @@ const StorageWriteLatencyAvgMaxChart: React.FC<StorageWriteLatencyAvgMaxChartPro
     timespan,
   });
 
-  const [maxData] = useFleetPrometheusPoll({
+  const [maxData, maxLoaded, maxError] = useFleetPrometheusPoll({
     cluster: getCluster(vmi),
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     endTime: currentTime,
@@ -66,6 +66,9 @@ const StorageWriteLatencyAvgMaxChart: React.FC<StorageWriteLatencyAvgMaxChartPro
     query: queryMax,
     timespan,
   });
+
+  const isLoading = !avgLoaded || !maxLoaded;
+  const error = avgError || maxError;
 
   const avgLatencyData = avgData?.data?.result?.[0]?.values;
   const maxLatencyData = maxData?.data?.result?.[0]?.values;
@@ -94,6 +97,8 @@ const StorageWriteLatencyAvgMaxChart: React.FC<StorageWriteLatencyAvgMaxChartPro
 
   return (
     <ComponentReady
+      error={error}
+      isLoading={isLoading}
       isReady={!isEmpty(avgChartData) || !isEmpty(maxChartData)}
       linkToMetrics={queryLinkAvg}
     >

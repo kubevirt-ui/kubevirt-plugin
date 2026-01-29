@@ -14,7 +14,7 @@ const UtilizationCharts: FC<UtilizationChartsProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
 
   return (
-    <Grid>
+    <Grid hasGutter>
       <GridItem span={6}>
         <Card>
           <CardTitle>{t('Memory')}</CardTitle>

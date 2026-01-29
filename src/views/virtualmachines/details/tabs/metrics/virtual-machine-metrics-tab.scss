@@ -36,6 +36,7 @@
   &__charts {
     flex-grow: 1;
     .pf-v6-c-card {
+      height: 100%;
       margin: var(--pf-t--global--spacer--sm);
     }
     .pf-v6-c-expandable-section__toggle {
@@ -47,6 +48,7 @@
     }
     .pf-v6-c-expandable-section__content {
       margin-top: 0;
+      margin-bottom: var(--pf-t--global--spacer--sm);
     }
   }
 }
