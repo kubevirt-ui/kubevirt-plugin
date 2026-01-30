@@ -25,6 +25,7 @@ type VirtualMachinesOverviewTabDetailsConsoleProps = {
   vmCluster?: string;
   vmName: string;
   vmNamespace: string;
+  vncAutoconnect?: boolean;
   vncLogLevel?: VncLogLevel;
 };
 
@@ -37,6 +38,7 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
   vmCluster,
   vmName,
   vmNamespace,
+  vncAutoconnect = true,
   vncLogLevel,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -83,9 +85,10 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
           <VncConsole
             basePath={vncBasePath}
             // force re-create on change
-            key={`vnc-${vncBasePath}-${vncLogLevel}`}
+            key={`vnc-${vncBasePath}-${vncLogLevel}-${vncAutoconnect}`}
             setState={setState}
             viewOnly
+            vncAutoconnect={vncAutoconnect}
             vncLogLevel={vncLogLevel}
           />
         </HideConsole>

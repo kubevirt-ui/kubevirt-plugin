@@ -11,6 +11,7 @@ export const ERROR = 'error';
 export const VNC_LOG_LEVELS = [DEBUG, INFO, WARN, ERROR] as const;
 
 export const KUBEVIRT_UI_VNC_LOG_LEVEL_LABEL = 'kubevirt-ui/vnc-log-level';
+export const KUBEVIRT_UI_VNC_AUTOCONNECT_LABEL = 'kubevirt-ui/vnc-autoconnect';
 
 export const KEYBOARD_DELAY = 50;
 export const LINE_FEED = 10;

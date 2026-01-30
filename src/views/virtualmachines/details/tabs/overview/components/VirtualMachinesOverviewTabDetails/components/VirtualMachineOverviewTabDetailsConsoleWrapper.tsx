@@ -1,7 +1,10 @@
 import React, { FC } from 'react';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { KUBEVIRT_UI_VNC_LOG_LEVEL_LABEL } from '@kubevirt-utils/components/Consoles/components/vnc-console/utils/constants';
+import {
+  KUBEVIRT_UI_VNC_AUTOCONNECT_LABEL,
+  KUBEVIRT_UI_VNC_LOG_LEVEL_LABEL,
+} from '@kubevirt-utils/components/Consoles/components/vnc-console/utils/constants';
 import { isVncLogLevel } from '@kubevirt-utils/components/Consoles/components/vnc-console/utils/util';
 import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isHeadlessMode } from '@kubevirt-utils/resources/vm';
@@ -25,6 +28,7 @@ const VirtualMachinesOverviewTabDetailsConsoleWrapper: FC<{
   const headlesMode = isHeadlessMode(vmi);
   const runningVM = !!vmi;
   const logLevelLabel = getLabel(vm, KUBEVIRT_UI_VNC_LOG_LEVEL_LABEL);
+  const autoconnectLabel = vm && getLabel(vm, KUBEVIRT_UI_VNC_AUTOCONNECT_LABEL);
 
   return (
     <VirtualMachinesOverviewTabDetailsConsole
@@ -34,6 +38,7 @@ const VirtualMachinesOverviewTabDetailsConsoleWrapper: FC<{
       vmCluster={getCluster(vmi)}
       vmName={getName(vmi)}
       vmNamespace={getNamespace(vmi)}
+      vncAutoconnect={autoconnectLabel !== 'false'}
       vncLogLevel={isVncLogLevel(logLevelLabel) ? logLevelLabel : false}
     />
   );
