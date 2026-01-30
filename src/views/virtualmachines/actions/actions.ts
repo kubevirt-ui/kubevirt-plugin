@@ -30,16 +30,24 @@ export enum VMActionType {
   Unpause = 'unpause',
 }
 
-export const VMActionRequest = async (
-  vm: V1VirtualMachine,
-  action: VMActionType,
-  model: K8sModel,
-  body?: V1AddVolumeOptions | V1RemoveVolumeOptions | V1StopOptions,
-) => {
+export type VMActionRequestParams = {
+  action: VMActionType;
+  body?: V1AddVolumeOptions | V1RemoveVolumeOptions | V1StopOptions;
+  model: K8sModel;
+  safe?: boolean;
+  vm: V1VirtualMachine;
+};
+
+export const VMActionRequest = async ({
+  action,
+  body,
+  model,
+  safe = true,
+  vm,
+}: VMActionRequestParams): Promise<string | void> => {
   const {
     metadata: { name, namespace },
   } = vm;
-
   try {
     const k8sAPIPath = await getKubevirtBaseAPIPath(getCluster(vm));
     // TODO: when this bz resolves https://bugzilla.redhat.com/show_bug.cgi?id=2056656
@@ -62,27 +70,44 @@ export const VMActionRequest = async (
 
     return response.text();
   } catch (error) {
+    if (safe) {
+      kubevirtConsole.error(error);
+      return;
+    }
+
+    const message =
+      error instanceof Error ? error.message : `Failed to ${action} VirtualMachine ${name}`;
     kubevirtConsole.error(error);
-    return;
+    throw new Error(message);
   }
 };
 
-export const startVM = async (vm: V1VirtualMachine) =>
-  VMActionRequest(vm, VMActionType.Start, VirtualMachineModel);
-export const stopVM = async (vm: V1VirtualMachine, body?: V1StopOptions) =>
-  VMActionRequest(vm, VMActionType.Stop, VirtualMachineModel, body);
-export const restartVM = async (vm: V1VirtualMachine) =>
-  VMActionRequest(vm, VMActionType.Restart, VirtualMachineModel);
-export const resetVM = async (vm: V1VirtualMachine) =>
-  VMActionRequest(vm, VMActionType.Reset, VirtualMachineInstanceModel);
-export const pauseVM = async (vm: V1VirtualMachine) =>
-  VMActionRequest(vm, VMActionType.Pause, VirtualMachineInstanceModel);
-export const unpauseVM = async (vm: V1VirtualMachine) =>
-  VMActionRequest(vm, VMActionType.Unpause, VirtualMachineInstanceModel);
-export const addPersistentVolume = async (vm: V1VirtualMachine, body: V1AddVolumeOptions) =>
-  VMActionRequest(vm, VMActionType.AddVolume, VirtualMachineModel, body);
-export const removeVolume = async (vm: V1VirtualMachine, body: V1RemoveVolumeOptions) =>
-  VMActionRequest(vm, VMActionType.RemoveVolume, VirtualMachineModel, body);
+export const startVM = async (vm: V1VirtualMachine, safe = true): Promise<string | void> =>
+  VMActionRequest({ action: VMActionType.Start, model: VirtualMachineModel, safe, vm });
+export const stopVM = async (
+  vm: V1VirtualMachine,
+  safe = true,
+  body?: V1StopOptions,
+): Promise<string | void> =>
+  VMActionRequest({ action: VMActionType.Stop, body, model: VirtualMachineModel, safe, vm });
+export const restartVM = async (vm: V1VirtualMachine, safe = true): Promise<string | void> =>
+  VMActionRequest({ action: VMActionType.Restart, model: VirtualMachineModel, safe, vm });
+export const resetVM = async (vm: V1VirtualMachine, safe = true): Promise<string | void> =>
+  VMActionRequest({ action: VMActionType.Reset, model: VirtualMachineInstanceModel, safe, vm });
+export const pauseVM = async (vm: V1VirtualMachine, safe = true): Promise<string | void> =>
+  VMActionRequest({ action: VMActionType.Pause, model: VirtualMachineInstanceModel, safe, vm });
+export const unpauseVM = async (vm: V1VirtualMachine, safe = true): Promise<string | void> =>
+  VMActionRequest({ action: VMActionType.Unpause, model: VirtualMachineInstanceModel, safe, vm });
+export const addPersistentVolume = async (
+  vm: V1VirtualMachine,
+  body: V1AddVolumeOptions,
+): Promise<string | void> =>
+  VMActionRequest({ action: VMActionType.AddVolume, body, model: VirtualMachineModel, vm });
+export const removeVolume = async (
+  vm: V1VirtualMachine,
+  body: V1RemoveVolumeOptions,
+): Promise<string | void> =>
+  VMActionRequest({ action: VMActionType.RemoveVolume, body, model: VirtualMachineModel, vm });
 export const migrateVM = async (vm: V1VirtualMachine, node?: string) => {
   const { name, namespace } = vm?.metadata;
   const migrationData: V1VirtualMachineInstanceMigration = {
