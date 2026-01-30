@@ -1,6 +1,6 @@
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { BulkSelectValue } from '@patternfly/react-component-groups/dist/dynamic/BulkSelect';
-import { deselectAll, selectAll } from '@virtualmachines/list/selectedVMs';
+import { deselectAll, deselectVM, selectAll } from '@virtualmachines/list/selectedVMs';
 
 export const handleBulkSelect = (
   value: BulkSelectValue,
@@ -23,8 +23,6 @@ export const handleBulkSelect = (
   }
 
   if (value === BulkSelectValue.nonePage) {
-    const currentPageVMsSet = new Set(currentPageVMs);
-
-    selectAll(vms.filter((vm) => !currentPageVMsSet.has(vm)));
+    currentPageVMs.forEach(deselectVM);
   }
 };
