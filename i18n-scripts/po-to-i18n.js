@@ -1,6 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-const { gettextToI18next } = require('i18next-conv');
 const minimist = require('minimist');
 
 function save(target) {
@@ -9,7 +8,7 @@ function save(target) {
   };
 }
 
-function processFile(fileName, language) {
+function processFile(fileName, language, gettextToI18next) {
   if (fileName.includes('.DS_Store')) {
     return;
   }
@@ -26,14 +25,14 @@ function processFile(fileName, language) {
     .catch((e) => console.error(fileName, e));
 }
 
-function processDirectory(directory, language) {
+function processDirectory(directory, language, gettextToI18next) {
   if (fs.existsSync(directory)) {
     (async () => {
       try {
         const files = await fs.promises.readdir(directory);
         for (const file of files) {
           const filePath = path.join(directory, file);
-          processFile(filePath, language);
+          processFile(filePath, language, gettextToI18next);
         }
       } catch (e) {
         console.error(`Failed to processDirectory ${directory}:`, e);
@@ -56,10 +55,15 @@ const options = {
 
 const args = minimist(process.argv.slice(2), options);
 
-if (args.help) {
-  console.log(
-    "-h: help\n-l: language (i.e. 'ja')\n-d: directory to convert files in (i.e. './new-pos')",
-  );
-} else if (args.directory && args.language) {
-  processDirectory(args.directory, args.language);
+async function main() {
+  const { gettextToI18next } = await import('i18next-conv');
+  if (args.help) {
+    console.log(
+      "-h: help\n-l: language (i.e. 'ja')\n-d: directory to convert files in (i.e. './new-pos')",
+    );
+  } else if (args.directory && args.language) {
+    processDirectory(args.directory, args.language, gettextToI18next);
+  }
 }
+
+main().catch((e) => console.error(e));
