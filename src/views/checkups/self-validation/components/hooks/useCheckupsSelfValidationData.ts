@@ -61,7 +61,7 @@ const useCheckupsSelfValidationData = (): UseCheckupsSelfValidationDataResults =
     configMaps,
     error: loadErrorConfigMaps || loadErrorJobs,
     jobs,
-    loaded: areConfigMapsLoaded && areJobsLoaded,
+    loaded: (areConfigMapsLoaded || !!loadErrorConfigMaps) && (areJobsLoaded || !!loadErrorJobs),
   };
 };
 

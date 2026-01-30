@@ -56,7 +56,7 @@ const useWatchCheckupData = (): UseWatchCheckupDataResults => {
     configMap,
     error: configMapError || loadErrorJobs,
     jobMatches,
-    loaded: configMapLoaded && areJobsLoaded,
+    loaded: (configMapLoaded || !!configMapError) && (areJobsLoaded || !!loadErrorJobs),
   };
 };
 
