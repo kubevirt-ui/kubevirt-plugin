@@ -17,7 +17,9 @@ export const deselectVM = (vm: V1VirtualMachine) => {
   const vmIdentifier = { cluster: getCluster(vm), name: getName(vm), namespace: getNamespace(vm) };
   selectedVMs.value = selectedVMs.value.filter(
     (selectedVM) =>
-      selectedVM.name !== vmIdentifier.name || selectedVM.namespace !== vmIdentifier.namespace,
+      selectedVM.name !== vmIdentifier.name ||
+      selectedVM.namespace !== vmIdentifier.namespace ||
+      selectedVM.cluster !== vmIdentifier.cluster,
   );
 };
 
