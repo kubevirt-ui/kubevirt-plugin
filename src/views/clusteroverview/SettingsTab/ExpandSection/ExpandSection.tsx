@@ -10,6 +10,7 @@ import './ExpandSection.scss';
 type ExpandSectionProps = {
   className?: string;
   dataTestID?: string;
+  id?: string;
   isDisabled?: boolean;
   isIndented?: boolean;
   searchItemId?: string;
@@ -21,6 +22,7 @@ const ExpandSection: FC<ExpandSectionProps> = ({
   children,
   className,
   dataTestID,
+  id,
   isDisabled = false,
   isIndented = true,
   searchItemId,
@@ -43,6 +45,7 @@ const ExpandSection: FC<ExpandSectionProps> = ({
         'ExpandSection',
       )}
       data-test-id={dataTestID}
+      id={id}
       isExpanded={isExpanded}
       isIndented={isIndented}
       onToggle={(_event, expanded: boolean) => handleToggle(expanded)}
