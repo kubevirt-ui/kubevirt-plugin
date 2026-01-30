@@ -19,13 +19,12 @@ const useCheckupsSelfValidationPermissions = () => {
   const [checkingPermissions, setCheckingPermissions] = useState<boolean>(true);
   const cluster = useSelectedCluster();
 
-  const [clusterRoleBindings, loadedClusterRoleBinding] = useKubevirtWatchResource<
-    IoK8sApiRbacV1ClusterRoleBinding[]
-  >({
-    cluster,
-    groupVersionKind: modelToGroupVersionKind(ClusterRoleBindingModel),
-    isList: true,
-  });
+  const [clusterRoleBindings, loadedClusterRoleBinding, loadedClusterRoleBindingError] =
+    useKubevirtWatchResource<IoK8sApiRbacV1ClusterRoleBinding[]>({
+      cluster,
+      groupVersionKind: modelToGroupVersionKind(ClusterRoleBindingModel),
+      isList: true,
+    });
 
   const clusterRoleBinding = clusterRoleBindings?.find(
     (crb) => crb.metadata.name === SELF_VALIDATION_CLUSTER_ROLE_BINDING,
@@ -73,7 +72,7 @@ const useCheckupsSelfValidationPermissions = () => {
     clusterRoleBinding,
     isPermitted: !!isPermitted,
     isPermittedToInstall,
-    loading: !loadedClusterRoleBinding || checkingPermissions,
+    loading: (!loadedClusterRoleBinding && !loadedClusterRoleBindingError) || checkingPermissions,
   };
 };
 
