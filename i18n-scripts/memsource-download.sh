@@ -52,6 +52,9 @@ do
   fi
 done
 
+./i18n-scripts/replace-br.sh
+
+
 echo Creating commit
 git add locales
 git commit -m "chore(i18n): update translations
