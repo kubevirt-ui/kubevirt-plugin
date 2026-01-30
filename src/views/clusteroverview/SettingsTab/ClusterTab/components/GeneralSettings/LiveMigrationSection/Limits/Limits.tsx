@@ -32,10 +32,13 @@ const Limits = ({ hyperConverge }) => {
   useEffect(() => {
     if (hyperConverge) {
       const liveMigrationConfig = getLiveMigrationConfig(hyperConverge);
-      migrationPerCluster ??
+      if (migrationPerCluster == null) {
         setMigrationPerCluster(Number(liveMigrationConfig?.parallelMigrationsPerCluster) || 0);
-      migrationPerNode ??
+      }
+
+      if (migrationPerNode == null) {
         setMigrationPerNode(Number(liveMigrationConfig?.parallelOutboundMigrationsPerNode) || 0);
+      }
     }
   }, [hyperConverge, migrationPerCluster, migrationPerNode]);
 
@@ -45,6 +48,9 @@ const Limits = ({ hyperConverge }) => {
       <div className="live-migration-tab__number--container">
         <div className="live-migration-tab__number--cluster">
           <MigrationNumberInput
+            labelHelp={t(
+              'Maximum number of migrations running in parallel in the cluster. The format is a number',
+            )}
             inputName={MIGRATION_PER_CLUSTER}
             minValue={0}
             setValue={setMigrationPerCluster}
@@ -56,6 +62,7 @@ const Limits = ({ hyperConverge }) => {
         <div>
           <MigrationNumberInput
             inputName={MIGRATION_PER_NODE}
+            labelHelp={t('Maximum number of outbound migrations per node. The format is a number.')}
             minValue={0}
             setValue={setMigrationPerNode}
             title={t('Max. migrations per node')}
