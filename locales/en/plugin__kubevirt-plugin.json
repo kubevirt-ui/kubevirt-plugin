@@ -969,6 +969,8 @@
   "Maximum": "Maximum",
   "Maximum latency": "Maximum latency",
   "Maximum name length is {{ maxNameLength }} characters": "Maximum name length is {{ maxNameLength }} characters",
+  "Maximum number of migrations running in parallel in the cluster. The format is a number": "Maximum number of migrations running in parallel in the cluster. The format is a number",
+  "Maximum number of outbound migrations per node. The format is a number.": "Maximum number of outbound migrations per node. The format is a number.",
   "Measurement duration": "Measurement duration",
   "Mediated devices": "Mediated devices",
   "medium": "medium",

@@ -965,6 +965,8 @@
   "Maximum": "최대 크기",
   "Maximum latency": "최대 지연 시간",
   "Maximum name length is {{ maxNameLength }} characters": "최대 이름 길이는 {{ maxNameLength }} 자입니다.",
+  "Maximum number of migrations running in parallel in the cluster. The format is a number": "Maximum number of migrations running in parallel in the cluster. The format is a number",
+  "Maximum number of outbound migrations per node. The format is a number.": "Maximum number of outbound migrations per node. The format is a number.",
   "Measurement duration": "측정 기간",
   "Mediated devices": "매개 장치",
   "medium": "중간",

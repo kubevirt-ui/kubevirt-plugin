@@ -965,6 +965,8 @@
   "Maximum": "最大",
   "Maximum latency": "最大レイテンシー",
   "Maximum name length is {{ maxNameLength }} characters": "名前の最大長は {{ maxNameLength }} 文字です",
+  "Maximum number of migrations running in parallel in the cluster. The format is a number": "Maximum number of migrations running in parallel in the cluster. The format is a number",
+  "Maximum number of outbound migrations per node. The format is a number.": "Maximum number of outbound migrations per node. The format is a number.",
   "Measurement duration": "測定期間",
   "Mediated devices": "仲介デバイス",
   "medium": "中",
