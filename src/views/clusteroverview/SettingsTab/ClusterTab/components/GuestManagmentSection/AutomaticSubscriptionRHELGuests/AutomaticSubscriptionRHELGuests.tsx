@@ -6,6 +6,7 @@ import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/Sect
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useRHELAutomaticSubscription from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/useRHELAutomaticSubscription';
+import { CLUSTER_TAB_IDS } from '@overview/SettingsTab/search/constants';
 import { Stack, Title } from '@patternfly/react-core';
 
 import ExpandSection from '../../../../ExpandSection/ExpandSection';
@@ -57,6 +58,8 @@ const AutomaticSubscriptionRHELGuests: FC<AutomaticSubscriptionRHELGuestsProps> 
           {newBadge && <NewBadge />}
         </>
       }
+      id={CLUSTER_TAB_IDS.automaticSubscriptionRhel}
+      searchItemId={CLUSTER_TAB_IDS.automaticSubscriptionRhel}
     >
       <Stack hasGutter>
         <MutedTextSpan

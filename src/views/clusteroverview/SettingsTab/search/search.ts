@@ -21,10 +21,15 @@ export const getClusterTabIds: SearchItemGetter = () => [
   { id: CLUSTER_TAB_IDS.sshConfiguration, title: t('SSH configuration') },
   { id: CLUSTER_TAB_IDS.templatesManagement, title: t('Templates and images management') },
   { id: CLUSTER_TAB_IDS.automaticImagesDownload, title: t('Automatic images download') },
+  {
+    id: CLUSTER_TAB_IDS.automaticSubscriptionRhel,
+    title: t('Automatic subscription of new RHEL VirtualMachines'),
+  },
   { id: CLUSTER_TAB_IDS.bootableVolumesProject, title: t('Bootable volumes project') },
   { id: CLUSTER_TAB_IDS.templatesProject, title: t('Templates project') },
   { id: CLUSTER_TAB_IDS.vmActionsConfirmation, title: t('VirtualMachine actions confirmation') },
   { id: CLUSTER_TAB_IDS.guestManagement, title: t('Guest management') },
+  { id: CLUSTER_TAB_IDS.loadBalance, title: t('Load balance') },
   { id: CLUSTER_TAB_IDS.resourceManagement, title: t('Resource management') },
   { id: CLUSTER_TAB_IDS.persistentReservation, title: t('Persistent reservation') },
 ];

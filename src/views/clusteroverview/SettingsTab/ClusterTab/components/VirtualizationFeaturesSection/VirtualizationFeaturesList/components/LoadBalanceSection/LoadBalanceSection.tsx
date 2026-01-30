@@ -11,6 +11,7 @@ import {
 } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/utils';
 import { useVirtualizationFeaturesContext } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/VirtualizationFeaturesContext/VirtualizationFeaturesContext';
 import DeschedulerSection from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/VirtualizationFeaturesList/components/LoadBalanceSection/components/DeschedulerSection';
+import { CLUSTER_TAB_IDS } from '@overview/SettingsTab/search/constants';
 import { Button, Split, SplitItem } from '@patternfly/react-core';
 
 import IconSkeleton from '../icons/IconSkeleton/IconSkeleton';
@@ -45,8 +46,10 @@ const LoadBalanceSection: FC = () => {
           </SplitItem>
         </Split>
       }
-      id="load-balance-section"
+      id={CLUSTER_TAB_IDS.loadBalance}
       isIndented
+      searchItemId={CLUSTER_TAB_IDS.loadBalance}
+      toggleClassname="ExpandSection"
       toggleContent={t('Load balance')}
     >
       <DeschedulerSection isOperatorInstalled={isOperatorInstalled} />
