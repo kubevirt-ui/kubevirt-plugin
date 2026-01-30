@@ -1,35 +1,42 @@
 import React from 'react';
 import { Link } from 'react-router-dom-v5-compat';
 
-import Loading from '@kubevirt-utils/components/Loading/Loading';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
+import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Bullseye } from '@patternfly/react-core';
 
 type ComponentReadyProps = React.PropsWithChildren<{
+  error?: Error | unknown;
+  isLoading?: boolean;
   isReady: boolean;
   linkToMetrics?: string;
-  spinner?: boolean;
   text?: string;
 }>;
 
 const ComponentReady: React.FC<ComponentReadyProps> = ({
   children,
+  error,
+  isLoading,
   isReady,
   linkToMetrics,
-  spinner,
   text,
 }) => {
   const { t } = useKubevirtTranslation();
+
   const renderText = text || t('No data available');
-  return isReady ? (
-    <>{children}</>
-  ) : (
-    <Bullseye className="ComponentReady">
-      {!spinner && !linkToMetrics && <MutedTextSpan text={renderText} />}
-      {spinner && <Loading />}
-      {linkToMetrics && !spinner && <Link to={linkToMetrics}>{renderText}</Link>}
-    </Bullseye>
+
+  return (
+    <StateHandler error={error} hasData={isReady} loaded={!isLoading} withBullseye>
+      {isReady ? (
+        <>{children}</>
+      ) : (
+        <Bullseye className="ComponentReady">
+          {!linkToMetrics && <MutedTextSpan text={renderText} />}
+          {linkToMetrics && <Link to={linkToMetrics}>{renderText}</Link>}
+        </Bullseye>
+      )}
+    </StateHandler>
   );
 };
 

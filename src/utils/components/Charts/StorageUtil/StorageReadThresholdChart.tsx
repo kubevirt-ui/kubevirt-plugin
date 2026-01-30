@@ -39,7 +39,7 @@ const StorageReadThresholdChart: React.FC<StorageThresholdChartProps> = ({ vmi }
   const queries = useVMQueries(vmi);
   const { height, ref, width } = useResponsiveCharts();
 
-  const [data] = useFleetPrometheusPoll({
+  const [data, loaded, error] = useFleetPrometheusPoll({
     cluster: getCluster(vmi),
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     endTime: currentTime,
@@ -48,6 +48,7 @@ const StorageReadThresholdChart: React.FC<StorageThresholdChartProps> = ({ vmi }
     timespan,
   });
 
+  const isLoading = !loaded;
   const storageWriteData = data?.data?.result?.[0]?.values;
 
   const chartData = storageWriteData?.map(([x, y]) => {
@@ -55,7 +56,7 @@ const StorageReadThresholdChart: React.FC<StorageThresholdChartProps> = ({ vmi }
   });
 
   return (
-    <ComponentReady isReady={!isEmpty(chartData)}>
+    <ComponentReady error={error} isLoading={isLoading} isReady={!isEmpty(chartData)}>
       <div className="util-threshold-chart" ref={ref}>
         <Chart
           containerComponent={

@@ -18,7 +18,7 @@ const StorageCharts: React.FC<StorageChartsProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
 
   return (
-    <Grid>
+    <Grid hasGutter>
       <GridItem span={6}>
         <Card>
           <CardTitle>{t('Storage total read / write')}</CardTitle>

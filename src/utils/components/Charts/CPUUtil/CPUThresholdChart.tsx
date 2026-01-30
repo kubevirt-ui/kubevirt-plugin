@@ -52,12 +52,13 @@ const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ vmi }) => {
     timespan,
   };
 
-  const [dataCPUUsage] = useFleetPrometheusPoll({
+  const [dataCPUUsage, loaded, error] = useFleetPrometheusPoll({
     ...prometheusProps,
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     query,
   });
 
+  const isLoading = !loaded;
   const cpuUsage = dataCPUUsage?.data?.result?.[0]?.values;
   const cpu = getCPU(vmi);
   const cpuRequested = getVCPUCount(cpu);
@@ -85,7 +86,7 @@ const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ vmi }) => {
   const isReady = !isEmpty(chartData) && !isEmpty(thresholdData);
 
   return (
-    <ComponentReady isReady={isReady} linkToMetrics={queryLink}>
+    <ComponentReady error={error} isLoading={isLoading} isReady={isReady} linkToMetrics={queryLink}>
       <div className="util-threshold-chart" ref={ref}>
         <Link to={queryLink}>
           <Chart

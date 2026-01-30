@@ -48,7 +48,7 @@ const StorageTotalReadWriteThresholdChart: React.FC<StorageTotalReadWriteThresho
 
   const { height, ref, width } = useResponsiveCharts();
 
-  const [data] = useFleetPrometheusPoll({
+  const [data, loaded, error] = useFleetPrometheusPoll({
     cluster: getCluster(vmi),
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     endTime: currentTime,
@@ -57,6 +57,7 @@ const StorageTotalReadWriteThresholdChart: React.FC<StorageTotalReadWriteThresho
     timespan,
   });
 
+  const isLoading = !loaded;
   const storageWriteData = data?.data?.result?.[0]?.values;
 
   const chartData = storageWriteData?.map(([x, y]) => {
@@ -68,7 +69,12 @@ const StorageTotalReadWriteThresholdChart: React.FC<StorageTotalReadWriteThresho
     return { x: new Date(x * MILLISECONDS_MULTIPLIER), y: yMax };
   });
   return (
-    <ComponentReady isReady={!isEmpty(chartData)} linkToMetrics={queryLink}>
+    <ComponentReady
+      error={error}
+      isLoading={isLoading}
+      isReady={!isEmpty(chartData)}
+      linkToMetrics={queryLink}
+    >
       <div className="util-threshold-chart" ref={ref}>
         <Link to={queryLink}>
           <Chart

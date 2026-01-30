@@ -55,7 +55,7 @@ const StorageReadLatencyPerDriveChart: React.FC<StorageReadLatencyPerDriveChartP
   const { query, queryLink } = useVMQuery(vmi, VMQueries.STORAGE_READ_LATENCY_PER_DRIVE);
   const { height, ref, width } = useResponsiveCharts();
 
-  const [data] = useFleetPrometheusPoll({
+  const [data, loaded, error] = useFleetPrometheusPoll({
     cluster: getCluster(vmi),
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
     endTime: currentTime,
@@ -65,6 +65,8 @@ const StorageReadLatencyPerDriveChart: React.FC<StorageReadLatencyPerDriveChartP
   });
 
   const results = data?.data?.result || [];
+
+  const isLoading = !loaded;
 
   const chartDataSeries = results.map((result, index) => {
     const driveName = getDriveName(result.metric?.drive, index);
@@ -91,7 +93,12 @@ const StorageReadLatencyPerDriveChart: React.FC<StorageReadLatencyPerDriveChartP
   }));
 
   return (
-    <ComponentReady isReady={!isEmpty(allData)} linkToMetrics={queryLink}>
+    <ComponentReady
+      error={error}
+      isLoading={isLoading}
+      isReady={!isEmpty(allData)}
+      linkToMetrics={queryLink}
+    >
       <div className="util-threshold-chart" ref={ref}>
         <Link to={queryLink}>
           <Chart
