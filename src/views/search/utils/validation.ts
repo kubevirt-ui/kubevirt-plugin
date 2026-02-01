@@ -1,4 +1,4 @@
-const isValidIPv4Substring = (ip: string) => {
+export const isValidIPv4Substring = (ip: string) => {
   // Invalid characters || consecutive dots
   if (!/^[0-9.]*$/.test(ip) || /\.\./.test(ip)) {
     return false;
@@ -17,7 +17,7 @@ const isValidIPv4Substring = (ip: string) => {
     });
 };
 
-const isValidIPv6Substring = (ip: string) => {
+export const isValidIPv6Substring = (ip: string) => {
   // Invalid characters || more than 2 consecutive colons || more than one ::
   if (!/^[0-9a-fA-F:]*$/.test(ip) || /:::/.test(ip) || (ip.match(/::/g) ?? []).length > 1) {
     return false;
