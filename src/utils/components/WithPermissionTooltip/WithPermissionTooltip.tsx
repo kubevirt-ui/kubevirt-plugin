@@ -1,6 +1,7 @@
 import React, { FC, ReactElement, ReactNode } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getNoPermissionTooltipContent } from '@kubevirt-utils/utils/utils';
 import { TooltipPosition } from '@patternfly/react-core';
 
 import HidableTooltip from '../HidableTooltip/HidableTooltip';
@@ -20,7 +21,7 @@ const WithPermissionTooltip: FC<WithPermissionTooltipProps> = ({
 
   return (
     <HidableTooltip
-      content={title || t(`You don't have permission to perform this action`)}
+      content={title || getNoPermissionTooltipContent(t)}
       hidden={allowed}
       position={TooltipPosition.right}
     >
