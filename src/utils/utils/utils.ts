@@ -1,3 +1,4 @@
+import { TFunction } from 'react-i18next';
 import * as ipaddr from 'ipaddr.js';
 import { animals, colors, NumberDictionary, uniqueNamesGenerator } from 'unique-names-generator';
 
@@ -240,3 +241,6 @@ export const isIPV6LinkLocal = (ip: string): boolean => {
 
 export const removeLinkLocalIPV6 = (ipAddress: IPAddress[]) =>
   ipAddress.filter((item) => !isIPV6LinkLocal(item?.ip?.trim()));
+
+export const getNoPermissionTooltipContent = (t: TFunction) =>
+  t(`You don't have permission to perform this action`);

@@ -9,6 +9,7 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import { getConsoleVirtctlCommand } from '@kubevirt-utils/components/SSHAccess/utils';
 import { CONFIRM_VM_ACTIONS, TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
 import {
@@ -19,7 +20,7 @@ import useACMExtensionActions from '@multicluster/hooks/useACMExtensionActions/u
 import { useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 import { printableVMStatus } from '../../utils';
-import { VirtualMachineActionFactory } from '../VirtualMachineActionFactory';
+import { createVirtualMachineActionFactory } from '../VirtualMachineActionFactory';
 
 import useIsMTVInstalled from './useIsMTVInstalled';
 
@@ -29,6 +30,7 @@ type UseVirtualMachineActionsProvider = (
 ) => [ActionDropdownItemType[], boolean, any];
 
 const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, vmim) => {
+  const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const { featureEnabled: confirmVMActionsEnabled } = useFeatures(CONFIRM_VM_ACTIONS);
 
@@ -46,6 +48,8 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
   const [, inFlight] = useK8sModel(VirtualMachineModelRef);
 
   const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
+
+  const VirtualMachineActionFactory = useMemo(() => createVirtualMachineActionFactory(t), [t]);
 
   const actions: ActionDropdownItemType[] = useMemo(() => {
     const crossClusterMigration = acmActions.find(
@@ -122,6 +126,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
     acmActions,
     mtvInstalled,
     crossClusterMigrationEnabled,
+    VirtualMachineActionFactory,
   ]);
 
   return useMemo(() => [actions, !inFlight, undefined], [actions, inFlight]);

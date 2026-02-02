@@ -1,4 +1,5 @@
 import React from 'react';
+import { TFunction } from 'react-i18next';
 
 import { VirtualMachineInstanceMigrationModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -9,13 +10,13 @@ import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalPr
 import MoveBulkVMToFolderModal from '@kubevirt-utils/components/MoveVMToFolderModal/MoveBulkVMsToFolderModal';
 import BulkSnapshotModal from '@kubevirt-utils/components/SnapshotModal/BulkSnapshotModal';
 import SnapshotModal from '@kubevirt-utils/components/SnapshotModal/SnapshotModal';
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   getLabels,
   getNamespace,
   haveSameCluster,
   haveSameNamespace,
 } from '@kubevirt-utils/resources/shared';
+import { getNoPermissionTooltipContent } from '@kubevirt-utils/utils/utils';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import CrossClusterMigration from '@multicluster/components/CrossClusterMigration/CrossClusterMigration';
 import { CROSS_CLUSTER_MIGRATION_ACTION_ID } from '@multicluster/constants';
@@ -23,7 +24,7 @@ import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
-import { isRunning, printableVMStatus } from '../utils';
+import { isLiveMigratable, isRunning, printableVMStatus } from '../utils';
 
 import ConfirmMultipleVMActionsModal from './components/ConfirmMultipleVMActionsModal/ConfirmMultipleVMActionsModal';
 import VirtualMachineMigrateModal from './components/VirtualMachineMigration/VirtualMachineMigrationModal';
@@ -38,11 +39,14 @@ import {
   stopVM,
   unpauseVM,
 } from './actions';
+import { BulkVirtualMachineActionFactory } from './types';
 import { getCommonLabels, getLabelsDiffPatch } from './utils';
 
 const { Stopped } = printableVMStatus;
 
-export const BulkVirtualMachineActionFactory = {
+export const createBulkVirtualMachineActionFactory = (
+  t: TFunction,
+): BulkVirtualMachineActionFactory => ({
   controlActions: (controlActions: ActionDropdownItemType[]): ActionDropdownItemType => ({
     cta: null,
     id: 'control-menu',
@@ -124,29 +128,45 @@ export const BulkVirtualMachineActionFactory = {
   migrateCompute: (
     vms: V1VirtualMachine[],
     createModal: (modal: ModalComponent) => void,
-  ): ActionDropdownItemType => ({
-    accessReview: {
-      cluster: getCluster(vms?.[0]),
-      group: VirtualMachineInstanceMigrationModel.apiGroup,
-      namespace: getNamespace(vms?.[0]),
-      resource: VirtualMachineInstanceMigrationModel.plural,
-      verb: 'create',
-    },
-    cta: () =>
-      createModal(({ isOpen, onClose }) => (
-        <ConfirmMultipleVMActionsModal
-          action={migrateVM}
-          actionType="Migrate"
-          isOpen={isOpen}
-          onClose={onClose}
-          vms={vms}
-        />
-      )),
-    description: t('Migrate VirtualMachines to a different Node'),
-    disabled: isEmpty(vms),
-    id: ACTIONS_ID.BULK_MIGRATE_COMPUTE,
-    label: t('Compute'),
-  }),
+  ): ActionDropdownItemType => {
+    const migratableVMs = vms?.filter(isLiveMigratable) || [];
+    const nonMigratableVMs = vms?.filter((vm) => !isLiveMigratable(vm)) || [];
+    const hasNoMigratableVMs = isEmpty(migratableVMs);
+
+    return {
+      accessReview: {
+        cluster: getCluster(vms?.[0]),
+        group: VirtualMachineInstanceMigrationModel.apiGroup,
+        namespace: getNamespace(vms?.[0]),
+        resource: VirtualMachineInstanceMigrationModel.plural,
+        verb: 'create',
+      },
+      cta: () =>
+        createModal(({ isOpen, onClose }) => (
+          <ConfirmMultipleVMActionsModal
+            excludedVMsReason={
+              nonMigratableVMs.length > 1
+                ? t('are not eligible for live migration and will not be migrated.')
+                : t('is not eligible for live migration and will not be migrated.')
+            }
+            action={migrateVM}
+            actionType="Migrate"
+            excludedVMs={!isEmpty(nonMigratableVMs) ? nonMigratableVMs : undefined}
+            includedVMsDescription={t('will be migrated.')}
+            isOpen={isOpen}
+            onClose={onClose}
+            vms={migratableVMs}
+          />
+        )),
+      description: t('Migrate VirtualMachines to a different Node'),
+      disabled: hasNoMigratableVMs,
+      disabledTooltip: hasNoMigratableVMs
+        ? t('None of the selected VirtualMachines are eligible for live migration')
+        : getNoPermissionTooltipContent(t),
+      id: ACTIONS_ID.BULK_MIGRATE_COMPUTE,
+      label: t('Compute'),
+    };
+  },
 
   migrateStorage: (
     vms: V1VirtualMachine[],
@@ -160,6 +180,7 @@ export const BulkVirtualMachineActionFactory = {
     },
     cta: () => createModal((props) => <VirtualMachineMigrateModal vms={vms} {...props} />),
     description: t('Migrate VirtualMachine storage to a different StorageClass'),
+    disabledTooltip: getNoPermissionTooltipContent(t),
     id: ACTIONS_ID.BULK_MIGRATE_STORAGE,
     label: t('Storage'),
   }),
@@ -316,4 +337,4 @@ export const BulkVirtualMachineActionFactory = {
     id: ACTIONS_ID.UNPAUSE,
     label: t('Unpause'),
   }),
-};
+});
