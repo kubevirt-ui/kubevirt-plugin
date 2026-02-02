@@ -8,7 +8,6 @@ import {
   V1VirtualMachineInstance,
   V1Volume,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { V1Disk } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import {
   convertYAMLToNetworkDataObject,
   convertYAMLUserDataObject,
@@ -43,6 +42,7 @@ import {
   DESCHEDULER_EVICT_LABEL,
   getEvictionStrategy as getVMIEvictionStrategy,
 } from '@kubevirt-utils/resources/vmi';
+import { getVMIBootDisk } from '@kubevirt-utils/resources/vmi/utils/discs';
 import {
   getVMIBootLoader,
   getVMIDevices,
@@ -55,6 +55,7 @@ import { isPendingHotPlugNIC } from '@virtualmachines/details/tabs/configuration
 
 import {
   getAutoAttachPodInterface,
+  getBootDisk,
   getBootloader,
   getDisks,
   getNetworks,
@@ -97,17 +98,10 @@ export const checkBootOrderChanged = (
     return false;
   }
 
-  const getCleanDisk = (disk: V1Disk) => ({ bootOrder: disk?.bootOrder, name: disk?.name });
-  const sortDisks = (a: V1Disk, b: V1Disk) => (a?.name > b?.name ? 1 : -1);
-  const vmDisks = (vm?.spec?.template?.spec?.domain?.devices?.disks || [])
-    .map(getCleanDisk)
-    .sort(sortDisks);
-  const vmiDisks = (vmi?.spec?.domain?.devices?.disks || []).map(getCleanDisk).sort(sortDisks);
-  if (vmDisks?.length !== vmiDisks?.length) return true;
+  const vmBootDisk = getBootDisk(vm);
+  const vmiBootDisk = getVMIBootDisk(vmi);
 
-  const hasChanges = vmDisks?.some((val, idx) => !isEqualObject(val, vmiDisks[idx]));
-
-  return hasChanges;
+  return vmBootDisk?.name !== vmiBootDisk?.name;
 };
 
 export const checkBootModeChanged = (

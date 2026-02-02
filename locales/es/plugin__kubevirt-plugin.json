@@ -1123,6 +1123,7 @@
   "Resources": "Recursos",
   "Resources are being removed, please wait.": "Se están eliminando recursos, espere.",
   "Restart": "Reiniciar",
+  "Restart required": "Se requiere reiniciar.",
   "Restart the VirtualMachine to apply changes.": "Reinicie la VirtualMachine para aplicar los cambios.",
   "Restore": "Restaurar",
   "Restore default columns": "Restaurar columnas predeterminadas",

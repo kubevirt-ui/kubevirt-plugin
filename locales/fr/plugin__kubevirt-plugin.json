@@ -1123,6 +1123,7 @@
   "Resources": "Ressources",
   "Resources are being removed, please wait.": "Les ressources sont en cours de suppression. Veuillez patienter.",
   "Restart": "Redémarrage",
+  "Restart required": "Redémarrage requis",
   "Restart the VirtualMachine to apply changes.": "Redémarrez la machine virtuelle pour appliquer les modifications.",
   "Restore": "Restaurer",
   "Restore default columns": "Restaurer les colonnes par défaut",

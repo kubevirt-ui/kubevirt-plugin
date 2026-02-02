@@ -3,6 +3,7 @@ import React, { FC } from 'react';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { usePendingChanges } from '@kubevirt-utils/components/PendingChanges/hooks/usePendingChanges';
 import { PendingChangesAlert } from '@kubevirt-utils/components/PendingChanges/PendingChangesAlert/PendingChangesAlert';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getStatusConditionByType } from '@kubevirt-utils/resources/vm';
 import { VirtualMachineStatusConditionTypes } from '@kubevirt-utils/resources/vm/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -25,28 +26,35 @@ const VirtualMachinePendingChangesAlert: FC<VirtualMachinePendingChangesAlertPro
   vmi,
 }) => {
   const pendingChanges = usePendingChanges(vm, vmi, instanceTypeExpandedSpec);
+  const { t } = useKubevirtTranslation();
 
-  const hasPendingChanges = pendingChanges?.some((change) => change?.hasPendingChange);
-
-  if (!vmi || !isRunning(vm) || !hasPendingChanges) {
-    return null;
-  }
-
-  const { liveMigrationChanges, restartChanges } = splitPendingChanges(pendingChanges);
   const restartRequiredCondition = getStatusConditionByType(
     vm,
     VirtualMachineStatusConditionTypes.RestartRequired,
   );
 
+  const isRestartRequired = restartRequiredCondition?.status === 'True';
+  const hasPendingChanges = pendingChanges?.some((change) => change?.hasPendingChange);
+
+  if (!vmi || !isRunning(vm) || (!isRestartRequired && !hasPendingChanges)) {
+    return null;
+  }
+
+  const { liveMigrationChanges, restartChanges } = splitPendingChanges(pendingChanges);
+
   return (
-    <PendingChangesAlert isExpandable isWarning>
+    <PendingChangesAlert
+      isExpandable
+      isWarning
+      title={isRestartRequired ? t('Restart required') : undefined}
+    >
       <Stack hasGutter>
         {!isEmpty(liveMigrationChanges) && (
           <StackItem>
             <LiveMigratePendingChanges pendingChanges={liveMigrationChanges} />
           </StackItem>
         )}
-        {!isEmpty(restartChanges) && (
+        {(isRestartRequired || !isEmpty(restartChanges)) && (
           <StackItem>
             <RestartPendingChanges
               pendingChanges={restartChanges}

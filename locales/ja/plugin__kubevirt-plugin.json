@@ -1119,6 +1119,7 @@
   "Resources": "リソース",
   "Resources are being removed, please wait.": "リソースを削除中です。お待ちください。",
   "Restart": "再起動",
+  "Restart required": "再起動が必要です",
   "Restart the VirtualMachine to apply changes.": "変更を適用するには、VirtualMachine を再起動します。",
   "Restore": "復元",
   "Restore default columns": "デフォルト列の復元",
