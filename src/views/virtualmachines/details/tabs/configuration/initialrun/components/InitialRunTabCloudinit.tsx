@@ -26,7 +26,8 @@ const InitialRunTabCloudinit: FC<InitialRunTabCloudInitProps> = ({
   const { createModal } = useModal();
   const { shouldHideCredentials } = useHideCredentials();
 
-  const canEdit = canUpdateVM && !shouldHideCredentials;
+  const isCreating = !vm?.metadata?.uid;
+  const canEdit = canUpdateVM && (isCreating || !shouldHideCredentials);
 
   return (
     <DescriptionItem
