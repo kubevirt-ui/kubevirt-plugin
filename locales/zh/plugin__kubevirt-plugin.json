@@ -1119,6 +1119,7 @@
   "Resources": "资源",
   "Resources are being removed, please wait.": "资源将被移除，请等待。",
   "Restart": "重启",
+  "Restart required": "需要重启",
   "Restart the VirtualMachine to apply changes.": "重启 VirtualMachine 以应用更改。",
   "Restore": "恢复",
   "Restore default columns": "恢复默认列",

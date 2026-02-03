@@ -1119,6 +1119,7 @@
   "Resources": "Resources",
   "Resources are being removed, please wait.": "Resources are being removed, please wait.",
   "Restart": "Restart",
+  "Restart required": "Restart required",
   "Restart the VirtualMachine to apply changes.": "Restart the VirtualMachine to apply changes.",
   "Restore": "Restore",
   "Restore default columns": "Restore default columns",

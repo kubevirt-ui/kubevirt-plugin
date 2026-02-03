@@ -1119,6 +1119,7 @@
   "Resources": "리소스",
   "Resources are being removed, please wait.": "리소스를 제거하는 중입니다. 잠시만 기다려 주십시오.",
   "Restart": "재시작",
+  "Restart required": "재시작 필요",
   "Restart the VirtualMachine to apply changes.": "VirtualMachine을 다시 시작하여 변경 사항을 적용합니다.",
   "Restore": "복원",
   "Restore default columns": "기본 열 복원",
