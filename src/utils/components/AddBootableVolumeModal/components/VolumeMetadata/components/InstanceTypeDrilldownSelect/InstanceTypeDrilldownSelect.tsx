@@ -12,6 +12,7 @@ import {
 } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/constants';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { universalComparator } from '@kubevirt-utils/utils/utils';
 import { FormGroup, PopoverPosition } from '@patternfly/react-core';
 
 import ComposableDrilldownSelect from './components/ComposableDrilldownSelect/ComposableDrilldownSelect';
@@ -42,7 +43,9 @@ export const InstanceTypeDrilldownSelect: FC<InstanceTypeMenuItemsProps> = ({
     bootableVolumeCluster,
   );
   const menuItems = useMemo(() => getInstanceTypeMenuItems(allInstanceTypes), [allInstanceTypes]);
-
+  const sortedRedHatProvided = menuItems.redHatProvided.items.toSorted((a, b) =>
+    universalComparator(a.classDisplayNameAnnotation, b.classDisplayNameAnnotation),
+  );
   const selectedInstanceType = labels?.[DEFAULT_INSTANCETYPE_LABEL];
   const selectedInstanceTypeKind = labels?.[DEFAULT_INSTANCETYPE_KIND_LABEL];
 
@@ -100,7 +103,7 @@ export const InstanceTypeDrilldownSelect: FC<InstanceTypeMenuItemsProps> = ({
             }
             selected={selectedInstanceType}
             selectedKind={selectedInstanceTypeKind}
-            seriesList={menuItems.redHatProvided.items}
+            seriesList={sortedRedHatProvided}
           />
         </DrilldownMenuItem>
         <DrilldownMenuItem {...menuItems.userProvided}>

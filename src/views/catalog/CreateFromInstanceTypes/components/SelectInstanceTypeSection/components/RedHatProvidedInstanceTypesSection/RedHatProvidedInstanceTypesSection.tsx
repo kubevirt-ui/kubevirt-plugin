@@ -4,6 +4,7 @@ import RedHatSeriesMenuCard from '@catalog/CreateFromInstanceTypes/components/Se
 import useInstanceTypeCardMenuSection from '@catalog/CreateFromInstanceTypes/components/SelectInstanceTypeSection/hooks/useInstanceTypeCardMenuSection';
 import { instanceTypeSeriesNameMapper } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/constants';
 import { RedHatInstanceTypeMetadata } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/types';
+import { universalComparator } from '@kubevirt-utils/utils/utils';
 import { Flex } from '@patternfly/react-core';
 
 type RedHatProvidedInstanceTypesSectionProps = {
@@ -20,14 +21,18 @@ const RedHatProvidedInstanceTypesSection: FC<RedHatProvidedInstanceTypesSectionP
       gap={{ default: 'gapMd', lg: 'gapXl' }}
       justifyContent={{ default: 'justifyContentSpaceBetween' }}
     >
-      {redHatMenuItems.items.map((rhSeriesItem) => {
-        const seriesName = rhSeriesItem?.seriesName;
-        return (
-          !instanceTypeSeriesNameMapper[seriesName]?.disabled && (
-            <RedHatSeriesMenuCard key={seriesName} rhSeriesItem={rhSeriesItem} {...menuProps} />
-          )
-        );
-      })}
+      {redHatMenuItems.items
+        .toSorted((a, b) =>
+          universalComparator(a.classDisplayNameAnnotation, b.classDisplayNameAnnotation),
+        )
+        .map((rhSeriesItem) => {
+          const seriesName = rhSeriesItem?.seriesName;
+          return (
+            !instanceTypeSeriesNameMapper[seriesName]?.disabled && (
+              <RedHatSeriesMenuCard key={seriesName} rhSeriesItem={rhSeriesItem} {...menuProps} />
+            )
+          );
+        })}
     </Flex>
   );
 };
