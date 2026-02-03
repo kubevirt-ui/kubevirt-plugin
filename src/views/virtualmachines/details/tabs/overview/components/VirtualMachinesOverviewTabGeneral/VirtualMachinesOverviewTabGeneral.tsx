@@ -18,9 +18,10 @@ import { getVMIPod } from '@kubevirt-utils/resources/vmi';
 import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 import { ManagedClusterModel } from '@multicluster/constants';
 import { getCluster } from '@multicluster/helpers/selectors';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { K8sResourceCommon, K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
 import { Card, CardBody, CardTitle, DescriptionList, Divider } from '@patternfly/react-core';
-import { FleetResourceLink, useFleetAccessReview } from '@stolostron/multicluster-sdk';
+import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 
 import './virtual-machines-overview-tab-general.scss';
 
@@ -36,7 +37,10 @@ const VirtualMachinesOverviewTabGeneral: FC<VirtualMachinesOverviewTabGeneralPro
   vmi,
 }) => {
   const { t } = useKubevirtTranslation();
-  const cluster = getCluster(vm);
+
+  const clusterParam = useClusterParam();
+  const cluster = getCluster(vm) || clusterParam;
+
   const [canGetNode] = useFleetAccessReview({
     cluster,
     namespace: vm?.metadata?.namespace,
@@ -71,8 +75,8 @@ const VirtualMachinesOverviewTabGeneral: FC<VirtualMachinesOverviewTabGeneralPro
               <DescriptionItem
                 descriptionData={
                   vmi?.status?.nodeName ? (
-                    <FleetResourceLink
-                      cluster={getCluster(vmi)}
+                    <MulticlusterResourceLink
+                      cluster={cluster}
                       groupVersionKind={modelToGroupVersionKind(NodeModel)}
                       name={vmi?.status?.nodeName}
                     />
@@ -86,8 +90,8 @@ const VirtualMachinesOverviewTabGeneral: FC<VirtualMachinesOverviewTabGeneralPro
             <DescriptionItem
               descriptionData={
                 vmi?.metadata?.name ? (
-                  <FleetResourceLink
-                    cluster={getCluster(vmi)}
+                  <MulticlusterResourceLink
+                    cluster={cluster}
                     groupVersionKind={VirtualMachineInstanceModelGroupVersionKind}
                     name={getName(vmi)}
                     namespace={getNamespace(vmi)}
@@ -102,8 +106,8 @@ const VirtualMachinesOverviewTabGeneral: FC<VirtualMachinesOverviewTabGeneralPro
             <DescriptionItem
               descriptionData={
                 pod?.metadata?.name ? (
-                  <FleetResourceLink
-                    cluster={getCluster(pod)}
+                  <MulticlusterResourceLink
+                    cluster={cluster}
                     groupVersionKind={modelToGroupVersionKind(PodModel)}
                     name={getName(pod)}
                     namespace={getNamespace(pod)}

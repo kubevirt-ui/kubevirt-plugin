@@ -6,9 +6,10 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { NamespaceModel } from '@kubevirt-utils/models';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
+import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 import { getCluster } from '@multicluster/helpers/selectors';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { getGroupVersionKindForModel, K8sModel } from '@openshift-console/dynamic-plugin-sdk';
-import { FleetResourceLink } from '@stolostron/multicluster-sdk';
 
 type DescriptionItemNamespaceProps = {
   label?: string;
@@ -23,7 +24,8 @@ const DescriptionItemNamespace: FC<DescriptionItemNamespaceProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const cluster = getCluster(resource);
+  const clusterParam = useClusterParam();
+  const cluster = getCluster(resource) || clusterParam;
   const namespace = getNamespace(resource);
 
   return (
@@ -33,7 +35,7 @@ const DescriptionItemNamespace: FC<DescriptionItemNamespaceProps> = ({
         'Namespace defines the space within which each name must be unique. An empty namespace is equivalent to the "default" namespace, but "default" is the canonical representation. Not all objects are required to be scoped to a namespace - the value of this field for those objects will be empty. Must be a DNS_LABEL. Cannot be updated.',
       )}
       descriptionData={
-        <FleetResourceLink
+        <MulticlusterResourceLink
           cluster={cluster}
           groupVersionKind={getGroupVersionKindForModel(NamespaceModel)}
           name={namespace}
