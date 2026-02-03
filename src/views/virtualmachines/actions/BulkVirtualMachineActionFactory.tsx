@@ -42,7 +42,7 @@ import {
 import { BulkVirtualMachineActionFactory } from './types';
 import { getCommonLabels, getLabelsDiffPatch } from './utils';
 
-const { Stopped } = printableVMStatus;
+const { Paused, Stopped } = printableVMStatus;
 
 export const createBulkVirtualMachineActionFactory = (
   t: TFunction,
@@ -333,7 +333,7 @@ export const createBulkVirtualMachineActionFactory = (
   }),
   unpause: (vms: V1VirtualMachine[]): ActionDropdownItemType => ({
     cta: () => vms.forEach(unpauseVM),
-    disabled: vms.every((vm) => vm.status?.printableStatus === Stopped),
+    disabled: !vms.every((vm) => vm.status?.printableStatus === Paused),
     id: ACTIONS_ID.UNPAUSE,
     label: t('Unpause'),
   }),
