@@ -68,7 +68,7 @@ export const isCDROMMounted = (volume: V1Volume): boolean => {
 
 export const getCDROMStatus = (vm: V1VirtualMachine, vmi?: V1VirtualMachineInstance) => {
   const isVMRunning = isRunning(vm);
-  const disks = isVMRunning ? vmi?.spec?.domain?.devices?.disks : getDisks(vm) || [];
+  const disks = (isVMRunning ? vmi?.spec?.domain?.devices?.disks : getDisks(vm)) || [];
   const cdroms = disks.filter(isCDROMDisk);
   const volumes = isVMRunning ? vmi?.spec?.volumes : getVolumes(vm);
 
