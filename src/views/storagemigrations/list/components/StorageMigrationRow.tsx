@@ -16,10 +16,11 @@ import {
   getVolumeCountFromMigPlan,
 } from '@kubevirt-utils/resources/migrations/utils';
 import { getName, getNamespace, getResourceUrl } from '@kubevirt-utils/resources/shared';
+import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 import { getCluster } from '@multicluster/helpers/selectors';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { RowProps, TableData, Timestamp } from '@openshift-console/dynamic-plugin-sdk';
 import { Progress } from '@patternfly/react-core';
-import { FleetResourceLink } from '@stolostron/multicluster-sdk';
 
 import { getStorageClassesFromMigPlan } from '../utils';
 
@@ -30,7 +31,8 @@ type StorageMigrationRowProps = RowProps<MultiNamespaceVirtualMachineStorageMigr
 const StorageMigrationRow: FC<StorageMigrationRowProps> = ({ activeColumnIDs, obj }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
-  const cluster = getCluster(obj);
+  const clusterParam = useClusterParam();
+  const cluster = getCluster(obj) || clusterParam;
 
   const targetStorageClasses = getStorageClassesFromMigPlan(obj);
 
@@ -41,7 +43,7 @@ const StorageMigrationRow: FC<StorageMigrationRowProps> = ({ activeColumnIDs, ob
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-30" id="name">
-        <FleetResourceLink
+        <MulticlusterResourceLink
           groupVersionKind={modelToGroupVersionKind(
             MultiNamespaceVirtualMachineStorageMigrationPlanModel,
           )}
@@ -60,7 +62,7 @@ const StorageMigrationRow: FC<StorageMigrationRowProps> = ({ activeColumnIDs, ob
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="namespaces">
         {obj?.spec?.namespaces?.map((namespace) => (
-          <FleetResourceLink
+          <MulticlusterResourceLink
             cluster={cluster}
             groupVersionKind={modelToGroupVersionKind(NamespaceModel)}
             key={namespace.name}
@@ -73,7 +75,7 @@ const StorageMigrationRow: FC<StorageMigrationRowProps> = ({ activeColumnIDs, ob
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="targetsc">
         {targetStorageClasses?.map((storageClass) => (
-          <FleetResourceLink
+          <MulticlusterResourceLink
             cluster={cluster}
             groupVersionKind={modelToGroupVersionKind(StorageClassModel)}
             key={storageClass}

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom-v5-compat';
 
 import {
   modelToGroupVersionKind,
+  NamespaceModel,
   TemplateModel,
   V1Template,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -14,9 +15,10 @@ import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { getTemplateURL, isDeprecatedTemplate } from '@kubevirt-utils/resources/template';
 import { ARCHITECTURE_ID, getArchitecture } from '@kubevirt-utils/utils/architecture';
+import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 import { ManagedClusterModel } from '@multicluster/constants';
 import { getCluster } from '@multicluster/helpers/selectors';
-import useIsACMPage from '@multicluster/useIsACMPage';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import {
   ResourceIcon,
   ResourceLink,
@@ -24,7 +26,6 @@ import {
   TableData,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Label } from '@patternfly/react-core';
-import { FleetResourceLink, useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import VirtualMachineTemplatesActions from '../../actions/VirtualMachineTemplatesActions';
 import { getWorkloadProfile } from '../../utils/selectors';
@@ -47,21 +48,16 @@ const VirtualMachineTemplatesRow: React.FC<
   rowData: { availableDataSources, availableTemplatesUID, cloneInProgressDataSources },
 }) => {
   const { t } = useKubevirtTranslation();
-  const isACMPage = useIsACMPage();
-  const [hubClusterName] = useHubClusterName();
 
   const namespace = getNamespace(obj);
-  const cluster = getCluster(obj) || hubClusterName;
+  const clusterParam = useClusterParam();
+  const cluster = getCluster(obj) || clusterParam;
   const name = getName(obj);
 
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-20" id="name">
-        <Link
-          data-test={name}
-          data-test-id={name}
-          to={getTemplateURL(name, namespace, isACMPage ? cluster : undefined)}
-        >
+        <Link data-test={name} data-test-id={name} to={getTemplateURL(name, namespace, cluster)}>
           <ResourceIcon groupVersionKind={modelToGroupVersionKind(TemplateModel)} />
           {name}
         </Link>
@@ -78,7 +74,11 @@ const VirtualMachineTemplatesRow: React.FC<
         <ArchitectureLabel architecture={getArchitecture(obj)} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="namespace">
-        <FleetResourceLink cluster={cluster} kind="Namespace" name={namespace} />
+        <MulticlusterResourceLink
+          cluster={cluster}
+          groupVersionKind={modelToGroupVersionKind(NamespaceModel)}
+          name={namespace}
+        />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-15" id="workload">
         {t(getWorkloadProfile(obj))}

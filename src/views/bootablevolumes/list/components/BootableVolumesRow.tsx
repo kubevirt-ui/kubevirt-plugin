@@ -1,7 +1,11 @@
 import React, { FC, useMemo } from 'react';
 import DataSourceActions from 'src/views/datasources/actions/DataSourceActions';
 
-import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import {
+  DataSourceModel,
+  modelToGroupVersionKind,
+  NamespaceModel,
+} from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   V1beta1DataImportCron,
   V1beta1DataSource,
@@ -26,11 +30,18 @@ import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
 import { isDataSourceCloning } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { ARCHITECTURE_ID, getArchitecture } from '@kubevirt-utils/utils/architecture';
+import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
+import { ManagedClusterModel } from '@multicluster/constants';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { RowProps, TableData, useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import {
+  ResourceLink,
+  RowProps,
+  TableData,
+  useActiveNamespace,
+} from '@openshift-console/dynamic-plugin-sdk';
 import { Label } from '@patternfly/react-core';
 import { TableText, WrapModifier } from '@patternfly/react-table';
-import { FleetResourceLink } from '@stolostron/multicluster-sdk';
 
 import BootableVolumesActions from '../../actions/BootableVolumesActions';
 import { BootableResource } from '../../utils/types';
@@ -49,7 +60,8 @@ const BootableVolumesRow: FC<
 > = ({ activeColumnIDs, obj, rowData: { dataImportCrons, preferences } }) => {
   const { t } = useKubevirtTranslation();
   const [namespace] = useActiveNamespace();
-  const cluster = getCluster(obj);
+  const clusterParam = useClusterParam();
+  const cluster = getCluster(obj) || clusterParam;
 
   const clusterPreferences = useMemo(
     () => preferences.filter((preference) => getCluster(preference) === cluster),
@@ -67,7 +79,7 @@ const BootableVolumesRow: FC<
   return (
     <>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-20" id="name">
-        <FleetResourceLink
+        <MulticlusterResourceLink
           className="bootable-volume-row__name-link"
           cluster={cluster}
           groupVersionKind={getBootableVolumeGroupVersionKind(obj)}
@@ -79,11 +91,18 @@ const BootableVolumesRow: FC<
         {obj.kind === DataSourceModel.kind && isCloning && <Label>{t('Clone in progress')}</Label>}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-20" id="cluster">
-        {getCluster(obj)}
+        <ResourceLink
+          groupVersionKind={modelToGroupVersionKind(ManagedClusterModel)}
+          name={cluster}
+        />
       </TableData>
       {namespace === ALL_NAMESPACES_SESSION_KEY && (
         <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-20" id="namespace">
-          <FleetResourceLink cluster={cluster} kind="Namespace" name={bootableVolumeNamespace} />
+          <MulticlusterResourceLink
+            cluster={cluster}
+            groupVersionKind={modelToGroupVersionKind(NamespaceModel)}
+            name={bootableVolumeNamespace}
+          />
         </TableData>
       )}
       <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-10" id={ARCHITECTURE_ID}>
