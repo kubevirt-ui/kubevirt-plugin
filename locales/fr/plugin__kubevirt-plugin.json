@@ -527,7 +527,7 @@
   "Delete Data Volume: {{pvcName}}": "Supprimer le volume de données\u00a0: {{pvcName}}",
   "Delete DataImportCron?": "Supprimer DataImportCron ?",
   "Delete DataSource?": "Supprimer la source de données\u00a0?",
-  "Delete disk {{resourceName}} ({{kindAbbr}})": "Supprimer le disque{{resourceName}} ({{kindAbbr}} )",
+  "Delete disk": "Delete disk",
   "Delete job": "Supprimer le job",
   "Delete migration plan?": "Supprimer le plan de migration\u00a0?",
   "Delete MigrationPolicy?": "Supprimer la police de migration ?",

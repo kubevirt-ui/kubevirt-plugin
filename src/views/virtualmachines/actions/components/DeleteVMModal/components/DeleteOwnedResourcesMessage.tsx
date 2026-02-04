@@ -2,14 +2,14 @@ import React, { Dispatch, FC, SetStateAction } from 'react';
 
 import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { V1beta1VirtualMachineSnapshot } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { V1beta1VirtualMachineSnapshot, V1Volume } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Bullseye, StackItem } from '@patternfly/react-core';
 
-import { findPVCOwner } from '../utils/helpers';
+import { findPVCOwner, isResourceShared } from '../utils/helpers';
 
 import DeleteResourceCheckbox from './DeleteResourceCheckbox';
 
@@ -21,6 +21,7 @@ type DeleteOwnedResourcesMessageProps = {
   setVolumesToSave: Dispatch<
     SetStateAction<(IoK8sApiCoreV1PersistentVolumeClaim | V1beta1DataVolume)[]>
   >;
+  sharedVolumes: V1Volume[];
   snapshots: V1beta1VirtualMachineSnapshot[];
   snapshotsToSave: V1beta1VirtualMachineSnapshot[];
   volumesToSave: (IoK8sApiCoreV1PersistentVolumeClaim | V1beta1DataVolume)[];
@@ -32,6 +33,7 @@ const DeleteOwnedResourcesMessage: FC<DeleteOwnedResourcesMessageProps> = ({
   pvcs,
   setSnapshotsToSave,
   setVolumesToSave,
+  sharedVolumes,
   snapshots,
   snapshotsToSave,
   volumesToSave,
@@ -62,6 +64,7 @@ const DeleteOwnedResourcesMessage: FC<DeleteOwnedResourcesMessageProps> = ({
 
       {[...(dataVolumes || []), ...pvcsWithNoDataVolumes].map((resource) => (
         <DeleteResourceCheckbox
+          isShared={isResourceShared(sharedVolumes, resource)}
           key={`${resource.kind}-${getName(resource)}`}
           resource={resource}
           resourcesToSave={volumesToSave}

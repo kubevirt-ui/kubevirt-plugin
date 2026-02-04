@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+
 import {
   modelToGroupVersionKind,
   PersistentVolumeClaimModel,
@@ -13,7 +15,7 @@ import {
   V1VirtualMachine,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { getRootDiskSecretRef, getVolumes } from '@kubevirt-utils/resources/vm';
+import { getRootDiskSecretRef } from '@kubevirt-utils/resources/vm';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
@@ -31,7 +33,7 @@ type UseDeleteVMResources = (vm: V1VirtualMachine) => {
 const useDeleteVMResources: UseDeleteVMResources = (vm) => {
   const cluster = getCluster(vm);
   const { dvVolumesNames, isDataVolumeGarbageCollector, pvcVolumesNames } = useConvertedVolumeNames(
-    getVolumes(vm),
+    vm,
     cluster,
   );
   const namespace = vm?.metadata?.namespace;
@@ -45,7 +47,10 @@ const useDeleteVMResources: UseDeleteVMResources = (vm) => {
     namespaced: true,
   });
 
-  const filteredDataVolumes = dataVolumes?.filter((dv) => dvVolumesNames?.includes(getName(dv)));
+  const filteredDataVolumes = useMemo(
+    () => dataVolumes?.filter((dv) => dvVolumesNames?.includes(getName(dv))),
+    [dataVolumes, dvVolumesNames],
+  );
 
   const [pvcs, pvcsLoaded, pvcsLoadError] = useK8sWatchData<IoK8sApiCoreV1PersistentVolumeClaim[]>({
     cluster,
@@ -55,9 +60,13 @@ const useDeleteVMResources: UseDeleteVMResources = (vm) => {
     namespaced: true,
   });
 
-  const filteredPvcs = isDataVolumeGarbageCollector
-    ? pvcs?.filter((pvc) => [...dvVolumesNames, ...pvcVolumesNames].includes(getName(pvc)))
-    : [];
+  const filteredPvcs = useMemo(
+    () =>
+      isDataVolumeGarbageCollector
+        ? pvcs?.filter((pvc) => [...dvVolumesNames, ...pvcVolumesNames]?.includes(getName(pvc)))
+        : [],
+    [pvcs, dvVolumesNames, isDataVolumeGarbageCollector, pvcVolumesNames],
+  );
 
   const [snapshots, snapshotsLoaded, snapshotsLoadError] = useK8sWatchData<
     V1beta1VirtualMachineSnapshot[]
@@ -79,7 +88,10 @@ const useDeleteVMResources: UseDeleteVMResources = (vm) => {
   });
 
   const dvSecretRef = getRootDiskSecretRef(vm);
-  const filteredSecret = secrets?.find((secret) => getName(secret) === dvSecretRef);
+  const filteredSecret = useMemo(
+    () => secrets?.find((secret) => getName(secret) === dvSecretRef),
+    [secrets, dvSecretRef],
+  );
 
   return {
     dataVolumes: filteredDataVolumes,

@@ -57,11 +57,29 @@ export const getInterface = (vm: V1VirtualMachine, ifaceName: string): V1Interfa
 export const getDisks = (vm: V1VirtualMachine) => vm?.spec?.template?.spec?.domain?.devices?.disks;
 
 /**
+ * A selector for the virtual machine's shared disks
+ * @param {V1VirtualMachine} vm the virtual machine
+ * @returns the virtual machine shared disks
+ */
+export const getSharedDisks = (vm: V1VirtualMachine) =>
+  getDisks(vm)?.filter((disk) => disk.shareable);
+
+/**
  * A selector for the virtual machine's volumes
  * @param {V1VirtualMachine} vm the virtual machine
  * @returns the virtual machine volumes
  */
 export const getVolumes = (vm: V1VirtualMachine) => vm?.spec?.template?.spec?.volumes;
+
+/**
+ * A selector for the virtual machine's shared volume names
+ * @param {V1VirtualMachine} vm the virtual machine
+ * @returns the virtual machine shared volumes
+ */
+export const getSharedVolumes = (vm: V1VirtualMachine) => {
+  const sharedDisks = getSharedDisks(vm)?.map((disk) => disk.name);
+  return getVolumes(vm)?.filter((volume) => sharedDisks?.includes(volume.name));
+};
 
 /**
  * A selector for the virtual machine's GPUs

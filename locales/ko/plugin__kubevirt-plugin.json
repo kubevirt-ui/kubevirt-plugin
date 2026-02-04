@@ -518,7 +518,7 @@
   "Delete Data Volume: {{pvcName}}": "데이터 볼륨 삭제: {{pvcName}}",
   "Delete DataImportCron?": "DataImportCron을 삭제하시겠습니까?",
   "Delete DataSource?": "DataSource를 삭제하시겠습니까?",
-  "Delete disk {{resourceName}} ({{kindAbbr}})": "{{resourceName}} 디스크 삭제 ({{kindAbbr}})",
+  "Delete disk": "Delete disk",
   "Delete job": "작업 삭제",
   "Delete migration plan?": "마이그레이션 계획을 삭제하시겠습니까?",
   "Delete MigrationPolicy?": "MigrationPolicy를 삭제하시겠습니까?",
