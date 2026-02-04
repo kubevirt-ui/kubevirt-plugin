@@ -11,8 +11,66 @@ When reviewing code or implementing features, automatically consider all team pe
 
 ## 1. How This Works
 
-### Automatic Multi-Perspective Review
-When you ask for a code review or submit code for feedback, the AI will evaluate from multiple perspectives simultaneously, providing comprehensive feedback.
+### Automatic Trigger on Jira Tickets
+
+**CRITICAL**: When a user sends a Jira ticket URL (e.g., `https://issues.redhat.com/browse/CNV-XXXXX`), **START WORKING IMMEDIATELY**:
+
+1. **Fetch and analyze the ticket** - Understand requirements
+2. **Create todos with agent tracking** - Show both agents and tasks (see Section 11)
+3. **Run Developer Agent first** - Implement the fix/feature
+4. **Run remaining review agents** - UX, QE, Security, KubeVirt Expert
+5. **Ask to implement recommendations** - After each review phase
+
+Do NOT wait for user confirmation to start - begin immediately upon receiving a ticket.
+
+### Todo Format with Agent Tracking
+
+When working on a ticket, create todos that show:
+- Which agent is currently running (with status indicator)
+- Implementation tasks within each agent's scope
+- Overall progress across all agents
+
+Example todo structure:
+```
+## CNV-12345: [Ticket Title]
+
+### 🧑‍💻 Developer Agent [in_progress]
+- [ ] Analyze codebase and find root cause
+- [ ] Implement fix
+- [ ] Run linting and type checks
+
+### 🎨 UX Agent [pending]
+- [ ] Review accessibility
+- [ ] Check loading/error/empty states
+
+### 🧪 QE Agent [pending]
+- [ ] Identify edge cases
+- [ ] Suggest test coverage
+
+### 🔒 Security Agent [pending]
+- [ ] Review input validation
+- [ ] Check authorization
+
+### 🎯 KubeVirt Expert [pending]
+- [ ] Validate K8s patterns
+- [ ] Check API usage
+```
+
+### Agent Execution Flow
+
+1. **Developer Agent** (implements the fix):
+   - Analyzes the issue
+   - Explores codebase
+   - Implements the solution
+   - Runs quality checks
+
+2. **Review Agents** (run after implementation):
+   - UX Agent reviews accessibility and UX
+   - QE Agent identifies edge cases and tests
+   - Security Agent checks vulnerabilities
+   - KubeVirt Expert validates K8s patterns
+
+3. **Follow-Up**: After each agent, ask if user wants to implement that agent's recommendations
 
 ### Quick vs Deep Reviews
 - **Quick Review** (default): High-level feedback from all perspectives
@@ -236,4 +294,126 @@ For focused, thorough analysis from a single perspective, invoke a specific agen
 - [ ] Consider suggestions
 - [ ] Document decisions on declined nitpicks
 - [ ] Re-request review if major changes
-- [ ] **No merge without peer review approval**
+
+---
+
+## 11. Complete Ticket Workflow with Agent Tracking
+
+When a ticket URL is received, execute this complete workflow:
+
+### Step 1: Immediate Start
+Upon receiving a ticket URL:
+1. Fetch ticket details (summary, description, acceptance criteria)
+2. Create comprehensive todo list with all agents and tasks
+3. Begin Developer Agent immediately
+
+### Step 2: Todo Structure
+Use the TodoWrite tool to create structured tracking:
+
+```
+Todos:
+- id: "dev-agent", content: "🧑‍💻 Developer Agent", status: "in_progress"
+- id: "dev-1", content: "  └─ Analyze issue and find root cause", status: "in_progress"
+- id: "dev-2", content: "  └─ Implement fix", status: "pending"
+- id: "dev-3", content: "  └─ Run quality checks", status: "pending"
+- id: "ux-agent", content: "🎨 UX Agent", status: "pending"
+- id: "ux-1", content: "  └─ Review accessibility", status: "pending"
+- id: "ux-2", content: "  └─ Check UI states", status: "pending"
+- id: "qe-agent", content: "🧪 QE Agent", status: "pending"
+- id: "qe-1", content: "  └─ Identify edge cases", status: "pending"
+- id: "qe-2", content: "  └─ Suggest tests", status: "pending"
+- id: "security-agent", content: "🔒 Security Agent", status: "pending"
+- id: "security-1", content: "  └─ Review security", status: "pending"
+- id: "kubevirt-agent", content: "🎯 KubeVirt Expert", status: "pending"
+- id: "kubevirt-1", content: "  └─ Validate K8s patterns", status: "pending"
+```
+
+### Step 3: Execute Agents Sequentially
+
+**Developer Agent** (first - does implementation):
+- Update todo: `dev-agent` → in_progress
+- Analyze, implement, test
+- Update todos as subtasks complete
+- Mark `dev-agent` → completed
+
+**Review Agents** (after implementation):
+For each review agent (UX, QE, Security, KubeVirt):
+1. Update agent todo → in_progress
+2. Run the agent review
+3. Present findings with severity
+4. Ask: "Implement these recommendations? [Yes/Skip]"
+5. If Yes: implement and update subtask todos
+6. Mark agent todo → completed
+7. Move to next agent
+
+### Step 4: Post-Agent Prompt
+
+After each agent completes its review, ask:
+
+```
+[Agent Name] found:
+🔴 X blockers | 🟡 Y suggestions | 🟢 Z nitpicks
+
+Implement these recommendations?
+1. ✅ Yes, implement now
+2. ⏭️ Skip, continue to next agent
+3. 🛑 Stop here
+```
+
+### Example Complete Flow
+
+```
+User: https://issues.redhat.com/browse/CNV-78624
+
+AI: Starting work on CNV-78624...
+
+[Creates todos:]
+## CNV-78624: Bootable volume from YAML not in list
+
+🧑‍💻 Developer Agent [in_progress]
+  └─ Analyze issue [in_progress]
+  └─ Implement fix [pending]
+  └─ Run checks [pending]
+🎨 UX Agent [pending]
+🧪 QE Agent [pending]
+🔒 Security Agent [pending]
+🎯 KubeVirt Expert [pending]
+
+[Developer Agent runs...]
+Found root cause: YAML template creates DataVolume instead of DataSource.
+The list only queries DataSources with specific label.
+
+[Updates todos, implements fix...]
+
+Developer Agent complete! Moving to UX Agent...
+
+🎨 UX Agent [in_progress]
+Found: 0 blockers, 1 suggestion (add user guidance in YAML comments)
+
+Implement this recommendation?
+1. ✅ Yes
+2. ⏭️ Skip
+
+User: 1
+
+[Implements, continues to QE Agent...]
+
+...continues through all agents...
+
+All agents complete! Ready for PR.
+```
+
+### Step 5: Final Summary
+
+After all agents complete:
+```
+## CNV-78624 Complete!
+
+✅ Developer: Fixed YAML template (DataSource instead of DataVolume)
+✅ UX: Added helpful comments to YAML
+✅ QE: Added test for YAML creation flow  
+✅ Security: No issues found
+✅ KubeVirt: Validated resource patterns
+
+Ready for PR? [Yes/Review changes first]
+```
