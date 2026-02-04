@@ -1,0 +1,310 @@
+---
+description: Workflow for creating new React components
+alwaysApply: false
+---
+
+# Creating a New Component
+
+Invoke with: *"create a component"*, *"new component"*, *"build a component for"*
+
+Follow this comprehensive workflow when creating new components.
+
+---
+
+## 1. Planning Phase
+
+### Understand Requirements
+- What is the component's purpose?
+- What data does it need?
+- What actions can users perform?
+- What states does it have (loading, error, empty)?
+- How does it fit into the existing UI?
+
+### Identify Component Type
+- **Page Component**: Top-level route component
+- **Container Component**: Fetches data, manages state
+- **Presentational Component**: Pure UI, receives props
+- **Layout Component**: Structural wrapper
+- **Form Component**: User input handling
+- **Modal Component**: Overlay dialog
+- **List/Table Component**: Collection display
+
+### Check Existing Patterns
+- Look for similar components in codebase
+- Identify reusable hooks to use
+- Find existing utility functions
+- Check PatternFly for appropriate components
+
+---
+
+## 2. Folder Structure
+
+### Standard Component Structure
+```
+src/views/{feature}/components/{component-name}/
+├── ComponentName.tsx           # Main component
+├── component-name.scss         # Styles
+├── index.ts                    # Export barrel (optional)
+├── components/                 # Sub-components
+│   ├── SubComponent.tsx
+│   └── sub-component.scss
+├── hooks/                      # Component-specific hooks
+│   └── useComponentLogic.ts
+├── utils/                      # Component-specific utilities
+│   ├── helpers.ts
+│   └── constants.ts
+└── types/                      # Component-specific types
+    └── types.ts
+```
+
+### Naming Conventions
+- **Folder**: lowercase kebab-case (`vm-details-page`)
+- **Component file**: PascalCase (`VMDetailsPage.tsx`)
+- **SCSS file**: lowercase kebab-case (`vm-details-page.scss`)
+- **Hook files**: camelCase with use prefix (`useVMDetails.ts`)
+- **Util files**: camelCase (`vmHelpers.ts`)
+- **Type files**: camelCase (`types.ts`)
+
+---
+
+## 3. Component Implementation
+
+### Component Structure Order
+1. Imports (external, then internal, then styles)
+2. Type definitions
+3. Constants (if small, otherwise separate file)
+4. Component function
+5. Default export
+
+### Inside Component Function
+1. Translation hook
+2. Router hooks (if needed)
+3. Data fetching hooks
+4. Local state (useState)
+5. Derived/computed values (useMemo)
+6. Callbacks (useCallback)
+7. Effects (useEffect)
+8. Early returns (loading, error, empty)
+9. Main render
+
+### Props Guidelines
+- Define explicit prop types above component
+- Use descriptive prop names
+- Provide default values where appropriate
+- Document complex props with comments
+- Keep prop count manageable (< 10 ideally)
+
+### State Management
+- Prefer local state when possible
+- Lift state only when necessary
+- Use derived state over stored duplicates
+- Consider useReducer for complex state
+- Zustand for truly global state
+
+---
+
+## 4. Handling States
+
+### Loading State
+- Show loading indicator for async operations
+- Use skeleton loaders for content areas
+- Prevent user actions during critical loading
+- Consider partial loading for complex views
+
+### Error State
+- Display user-friendly error message
+- Explain what went wrong
+- Provide action to recover (retry, go back)
+- Log technical details for debugging
+- Don't lose user's work
+
+### Empty State
+- Explain why empty (no data, no permissions, etc.)
+- Guide user on what to do next
+- Provide call-to-action when appropriate
+- Use appropriate illustration/icon
+
+### Success State
+- Confirm action completed
+- Show what was done
+- Indicate next steps if any
+
+---
+
+## 5. Styling Guidelines
+
+### SCSS File Structure
+```scss
+.component-name {
+  // Layout
+  display: flex;
+  flex-direction: column;
+  
+  // Spacing (use PF variables)
+  padding: var(--pf-v6-global--spacer--md);
+  gap: var(--pf-v6-global--spacer--sm);
+  
+  // BEM Elements
+  &__header {
+    display: flex;
+    align-items: center;
+  }
+  
+  &__content {
+    flex: 1;
+  }
+  
+  &__footer {
+    margin-top: auto;
+  }
+  
+  // BEM Modifiers
+  &--loading {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+  
+  &--compact {
+    padding: var(--pf-v6-global--spacer--sm);
+  }
+}
+```
+
+### PatternFly Variables
+- Spacing: `--pf-v6-global--spacer--{xs|sm|md|lg|xl|2xl}`
+- Colors: `--pf-v6-global--Color--{100|200}`, `--pf-v6-global--primary-color--100`
+- Font sizes: `--pf-v6-global--FontSize--{xs|sm|md|lg|xl|2xl}`
+- Borders: `--pf-v6-global--BorderWidth--sm`, `--pf-v6-global--BorderColor--100`
+
+### Class Naming
+- Use project-specific prefix: `kv-` or component name
+- Follow BEM: block__element--modifier
+- Don't rely on PatternFly class names (they change)
+
+---
+
+## 6. Accessibility Requirements
+
+### Keyboard Navigation
+- All interactive elements focusable
+- Logical tab order
+- Focus visible on all elements
+- Keyboard shortcuts documented
+
+### ARIA
+- Labels for interactive elements without visible text
+- Roles for custom components
+- States (expanded, selected, disabled)
+- Live regions for dynamic updates
+
+### Forms
+- Labels associated with inputs
+- Error messages linked to fields
+- Required fields indicated
+- Help text provided
+
+---
+
+## 7. i18n Requirements
+
+### Translation Usage
+- Use `useKubevirtTranslation` hook
+- All user-visible strings wrapped with `t()`
+- Interpolation for dynamic values: `t('{{count}} items', { count })`
+- Pluralization when needed
+
+### What to Translate
+- Labels and headings
+- Button text
+- Error messages
+- Placeholder text
+- Tooltips and help text
+- Status messages
+
+### What NOT to Translate
+- Proper nouns (Kubernetes, KubeVirt)
+- Technical identifiers
+- Code values
+- API field names
+
+---
+
+## 8. Testing Considerations
+
+### Testable Design
+- Props for injecting dependencies
+- Callbacks instead of hardcoded actions
+- Minimal side effects in component
+- Logic extracted to hooks/utils
+
+### Test Coverage Goals
+- Renders without error
+- Displays correct data
+- Handles loading state
+- Handles error state
+- Handles empty state
+- User interactions work
+- Accessibility requirements met
+
+---
+
+## 9. Documentation
+
+### Component Documentation
+- Purpose and when to use
+- Required vs optional props
+- Usage examples
+- Known limitations
+
+### Code Comments
+- Complex logic explained
+- Non-obvious decisions documented
+- TODO items with context
+- Links to related issues/docs
+
+---
+
+## 10. Checklist Before Completing
+
+### Structure
+- [ ] Correct folder structure
+- [ ] Proper file naming
+- [ ] Imports organized
+
+### Code Quality
+- [ ] Follows single responsibility
+- [ ] Props typed explicitly
+- [ ] Return type defined
+- [ ] No `any` types
+- [ ] Logic extracted to hooks/utils
+- [ ] File under 150 lines
+
+### UI/UX
+- [ ] Loading state handled
+- [ ] Error state handled
+- [ ] Empty state handled
+- [ ] Uses PatternFly components
+- [ ] Follows console patterns
+
+### Accessibility
+- [ ] Keyboard navigable
+- [ ] ARIA labels present
+- [ ] Focus managed properly
+
+### i18n
+- [ ] Uses `useKubevirtTranslation`
+- [ ] All strings translated
+- [ ] `npm run i18n` run
+
+### Styling
+- [ ] SCSS file created
+- [ ] BEM naming used
+- [ ] PatternFly variables used
+- [ ] No `!important`
+
+### Final
+- [ ] Default export used
+- [ ] No console.log statements
+- [ ] No commented-out code
+- [ ] Linting passes
+- [ ] Types check

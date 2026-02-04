@@ -1,0 +1,298 @@
+---
+description: Common development commands for this project
+alwaysApply: true
+---
+
+# Common Commands
+
+Reference for all development, build, test, and utility commands.
+
+---
+
+## 1. Development
+
+### Start Development Environment
+```bash
+# Install dependencies (first time or after package.json changes)
+npm install
+
+# Start development server (runs on port 9001)
+npm run dev
+
+# Start OpenShift Console container (requires oc login first)
+npm run start-console
+
+# Full development setup
+npm install && npm run dev
+# Then in another terminal: npm run start-console
+```
+
+### Console Variants
+```bash
+npm run start-console                    # Standard console
+npm run start-console-with-monitoring    # With monitoring plugin
+npm run start-console-with-networking    # With networking plugin
+npm run start-console-with-nmstate       # With nmstate plugin
+```
+
+### Prerequisites
+- Node.js >= 22.0.0
+- npm >= 10.9.0
+- Docker (for console container)
+- `oc` CLI logged into cluster
+
+---
+
+## 2. Building
+
+### Production Build
+```bash
+# Full production build
+npm run build
+
+# Clean build artifacts
+npm run clean
+```
+
+### Build Outputs
+- Output directory: `dist/`
+- Plugin manifest: `dist/plugin-manifest.json`
+- Assets served from: `/api/plugins/kubevirt-plugin/`
+
+---
+
+## 3. Code Quality
+
+### Type Checking
+```bash
+# Run TypeScript compiler check
+npm run check-types
+```
+
+### Linting
+```bash
+# Check for linting errors
+npm run lint
+
+# Auto-fix linting errors
+npm run lint:fix
+```
+
+### Combined Quality Check
+```bash
+# Run all checks (recommended before commit)
+npm run check-types && npm run lint && npm test
+```
+
+---
+
+## 4. Testing
+
+### Unit Tests (Jest)
+```bash
+# Run all unit tests
+npm test
+
+# Run tests with coverage report
+npm run test-cov
+
+# Run specific test file
+npm test path/to/file.test.ts
+
+# Run tests in watch mode
+npm test -- --watch
+
+# Run tests matching pattern
+npm test -- --testNamePattern="VM"
+```
+
+### E2E Tests (Cypress)
+```bash
+# Open Cypress interactive UI
+npm run test-cypress
+
+# Run Cypress headless (for CI)
+npm run test-cypress-headless
+
+# Run in Docker with VNC
+npm run test-cypress-docker
+```
+
+### Cypress Reports
+```bash
+# Merge Cypress reports
+npm run cypress-merge
+
+# Generate HTML report
+npm run cypress-generate
+
+# Full report pipeline
+npm run cypress-postreport
+```
+
+---
+
+## 5. Internationalization (i18n)
+
+### Update Translations
+```bash
+# Extract strings and update translation files
+npm run i18n
+
+# Verbose output
+npm run i18n:verbose
+```
+
+### Translation Utilities
+```bash
+# Create dummy locale for testing
+npm run i18n-dummy-locale
+
+# Convert i18n to PO format
+npm run i18n-to-po
+
+# Convert PO to i18n format
+npm run po-to-i18n
+
+# Export PO files
+npm run export-pos
+```
+
+### Memsource Integration
+```bash
+# Upload to Memsource
+npm run memsource-upload
+
+# Download from Memsource
+npm run memsource-download
+```
+
+---
+
+## 6. Docker
+
+### Build Image
+```bash
+# Build Docker image
+docker build -t quay.io/kubevirt-ui/kubevirt-plugin:latest .
+
+# Build with specific tag
+docker build -t quay.io/kubevirt-ui/kubevirt-plugin:v1.0.0 .
+```
+
+### Run Container
+```bash
+# Run plugin container
+docker run -it --rm -d -p 9001:80 quay.io/kubevirt-ui/kubevirt-plugin:latest
+
+# Access at http://localhost:9001
+```
+
+### Push Image
+```bash
+# Push to registry
+docker push quay.io/kubevirt-ui/kubevirt-plugin:latest
+```
+
+---
+
+## 7. Cluster Deployment
+
+### Deploy Plugin
+```bash
+# Process and apply manifest
+oc process -f oc-manifest.yaml \
+  -p PLUGIN_NAME=kubevirt-plugin \
+  -p NAMESPACE=kubevirt-ui \
+  -p IMAGE=quay.io/kubevirt-ui/kubevirt-plugin:latest \
+  | oc create -f -
+```
+
+### Enable Plugin
+```bash
+# Patch console operator to enable plugin
+oc patch consoles.operator.openshift.io cluster \
+  --patch '{ "spec": { "plugins": ["kubevirt-plugin"] } }' --type=merge
+```
+
+### Verify Deployment
+```bash
+# Check plugin pods
+oc get pods -n kubevirt-ui
+
+# Check console plugins
+oc get consoleplugins
+```
+
+---
+
+## 8. Cluster Verification
+
+### Check Cluster Access
+```bash
+# Verify logged in
+oc whoami
+
+# Check current project
+oc project
+
+# Check cluster info
+oc cluster-info
+```
+
+### Check Permissions
+```bash
+# Check if you can list VMs
+oc auth can-i list virtualmachines
+
+# Check if you can create VMs
+oc auth can-i create virtualmachines
+```
+
+### Resource Queries
+```bash
+# List VMs in namespace
+oc get vm -n <namespace>
+
+# Get VM details
+oc get vm <name> -n <namespace> -o yaml
+
+# List VMIs
+oc get vmi -n <namespace>
+
+# Check DataVolumes
+oc get dv -n <namespace>
+```
+
+---
+
+## 9. Quick Reference
+
+### Daily Development
+```bash
+npm run dev                              # Start dev server
+npm run start-console                    # Start console
+npm run check-types && npm run lint      # Quick quality check
+```
+
+### Before Commit
+```bash
+npm run check-types && npm run lint && npm test
+npm run i18n                             # If strings changed
+```
+
+### Before PR
+```bash
+npm run check-types && npm run lint && npm test
+npm run i18n
+# Self-review changes
+# Add screenshots/video for UI changes
+```
+
+### Troubleshooting
+```bash
+npm run clean && npm install             # Clean reinstall
+rm -rf node_modules && npm install       # Full reinstall
+npm run check-types                      # Check for type errors
+npm run lint                             # Check for lint errors
+```

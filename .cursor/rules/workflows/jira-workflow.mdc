@@ -1,0 +1,260 @@
+---
+description: Workflow for working with Jira tickets using MCP
+alwaysApply: false
+---
+
+# Jira Workflow
+
+Invoke with: *"get my tickets"*, *"start working on CNV-XXX"*, *"what should I work on"*, *"show sprint issues"*
+
+This workflow uses the Jira MCP server to help you manage tickets and track work.
+
+---
+
+## 1. Available Jira Commands
+
+### Finding Tickets
+
+**Get My Assigned Tickets**
+```
+"Show my assigned tickets"
+"What tickets are assigned to me?"
+"Get my current work items"
+```
+→ Uses `jira_search` with JQL: `assignee = currentUser() AND status != Done`
+
+**Get Current Sprint Tickets**
+```
+"Show current sprint tickets"
+"What's in this sprint?"
+```
+→ Uses `jira_get_sprint_issues`
+
+**Search for Specific Tickets**
+```
+"Find tickets about VM migration"
+"Search for CNV issues with label 'ui'"
+"Find open bugs in CNV project"
+```
+→ Uses `jira_search` with appropriate JQL
+
+**Get Ticket Details**
+```
+"Get details for CNV-12345"
+"What is CNV-12345 about?"
+"Show me ticket CNV-12345"
+```
+→ Uses `jira_get_issue`
+
+---
+
+## 2. Starting Work on a Ticket
+
+### Full Workflow
+```
+"Start working on CNV-12345"
+```
+
+This will:
+1. Fetch ticket details (summary, description, acceptance criteria)
+2. Show you the requirements
+3. Transition ticket to "In Progress" (if applicable)
+4. Suggest where to start in the codebase
+
+### Understanding the Ticket
+
+When you start on a ticket, I will:
+- Summarize the requirements
+- Identify acceptance criteria
+- List related tickets (blockers, depends on)
+- Suggest relevant code areas to look at
+- Identify potential risks or questions
+
+---
+
+## 3. Common JQL Queries
+
+### By Status
+```jql
+# My in-progress work
+assignee = currentUser() AND status = "In Progress"
+
+# Ready for development
+status = "Ready for Dev" AND project = CNV
+
+# In code review
+status = "Code Review" AND assignee = currentUser()
+```
+
+### By Type
+```jql
+# Bugs only
+issuetype = Bug AND project = CNV AND status != Done
+
+# Stories assigned to me
+issuetype = Story AND assignee = currentUser()
+
+# Epics in current project
+issuetype = Epic AND project = CNV
+```
+
+### By Time
+```jql
+# Updated in last 7 days
+updated >= -7d AND assignee = currentUser()
+
+# Created this week
+created >= startOfWeek() AND project = CNV
+
+# Due soon
+duedate <= 7d AND duedate >= 0d
+```
+
+### By Label/Component
+```jql
+# UI-related tickets
+labels = ui AND project = CNV
+
+# Specific component
+component = "Virtual Machines" AND status != Done
+```
+
+---
+
+## 4. Updating Tickets
+
+### Add a Comment
+```
+"Add comment to CNV-12345: Started investigating the issue"
+"Comment on CNV-12345 with my findings"
+```
+→ Uses `jira_add_comment`
+
+### Update Status
+```
+"Move CNV-12345 to Code Review"
+"Transition CNV-12345 to Done"
+"Mark CNV-12345 as blocked"
+```
+→ Uses `jira_transition_issue`
+
+### Log Work
+```
+"Log 2 hours on CNV-12345"
+"Add worklog to CNV-12345: 1h 30m investigating"
+```
+→ Uses `jira_add_worklog`
+
+---
+
+## 5. Ticket Analysis
+
+When I fetch a ticket, I analyze:
+
+### Requirements Understanding
+- **Summary**: What is the high-level goal?
+- **Description**: Detailed requirements and context
+- **Acceptance Criteria**: What defines "done"?
+- **Attachments**: Mockups, designs, screenshots
+
+### Context
+- **Epic/Parent**: Larger feature this belongs to
+- **Related Issues**: Blockers, dependencies, related work
+- **Comments**: Discussion and clarifications
+- **History**: Previous attempts or related changes
+
+### Planning
+- **Affected Areas**: Which parts of codebase to modify
+- **Risks**: Potential challenges or unknowns
+- **Questions**: Things to clarify before starting
+- **Approach**: Suggested implementation strategy
+
+---
+
+## 6. Workflow Examples
+
+### Daily Standup Prep
+```
+"What did I work on yesterday and what's blocked?"
+```
+→ Searches for recently updated tickets and blocked items
+
+### Sprint Planning
+```
+"Show unassigned tickets in current sprint"
+"What's the priority order for my tickets?"
+```
+
+### Starting a New Feature
+```
+"Start working on CNV-12345"
+```
+→ Full ticket analysis and codebase suggestions
+
+### Completing Work
+```
+"I'm done with CNV-12345, prepare it for review"
+```
+→ Adds completion comment, transitions to Code Review
+
+### End of Day
+```
+"Update my tickets with today's progress"
+```
+→ Helps add comments to active tickets
+
+---
+
+## 7. Integration with Development
+
+### From Ticket to Code
+1. "Start working on CNV-12345"
+2. I fetch and analyze the ticket
+3. I suggest relevant files and components
+4. I help implement the feature
+5. I help write tests
+6. "Prepare PR for CNV-12345"
+7. I help create PR with ticket reference
+
+### Ticket in PR Description
+When creating PRs, I will:
+- Link to the Jira ticket
+- Reference ticket number in title
+- Include ticket summary in description
+- Follow PR template
+
+---
+
+## 8. Tips
+
+### Effective Queries
+- Be specific: "Show bugs assigned to me" vs "show issues"
+- Use project codes: "CNV-12345" not just "12345"
+- Specify status when relevant: "open bugs" vs "all bugs"
+
+### Staying Updated
+- Check ticket comments before starting work
+- Look at related tickets for context
+- Check if ticket was updated since you last looked
+
+### Communication
+- Add comments when starting/finishing work
+- Document blockers in ticket comments
+- Tag relevant people in comments when needed
+
+---
+
+## 9. MCP Tool Reference
+
+### Primary Tools Used
+| Tool | Purpose |
+|------|---------|
+| `jira_search` | Find tickets with JQL |
+| `jira_get_issue` | Get ticket details |
+| `jira_add_comment` | Add comments |
+| `jira_transition_issue` | Change status |
+| `jira_add_worklog` | Log time |
+| `jira_update_issue` | Update fields |
+
+### Tool Invocation
+Tools are called automatically when you make requests. You don't need to specify tool names - just describe what you want in natural language.

@@ -1,0 +1,379 @@
+---
+description: Debugging workflow and common issues
+alwaysApply: false
+---
+
+# Debugging Workflow
+
+Invoke with: *"help me debug"*, *"why isn't this working"*, *"troubleshoot"*
+
+## Approach
+
+Follow this systematic approach to identify and fix issues:
+1. **Reproduce** - Confirm the issue and identify exact steps
+2. **Isolate** - Narrow down where the problem occurs
+3. **Investigate** - Gather evidence and data
+4. **Hypothesize** - Form theories about the cause
+5. **Test** - Verify your hypothesis
+6. **Fix** - Implement the solution
+7. **Verify** - Confirm the fix works and doesn't break anything else
+
+---
+
+## 1. Identify the Problem Type
+
+### UI/Component Issues
+- Component not rendering at all
+- Component rendering incorrectly
+- Component not updating when expected
+- Styling/layout broken
+- Interactive elements not responding
+- Infinite re-renders
+- Performance issues (slow, laggy)
+
+### Data/State Issues
+- Data not loading
+- Data not updating
+- Stale data displayed
+- Wrong data displayed
+- State out of sync with UI
+- State not persisting
+- State not resetting
+
+### API/Network Issues
+- API calls failing
+- Wrong data returned
+- Slow responses
+- Timeout errors
+- Authentication errors
+- Permission errors
+- CORS errors
+
+### Build/Compile Issues
+- TypeScript errors
+- Webpack errors
+- Import/export errors
+- Circular dependencies
+- Missing dependencies
+
+---
+
+## 2. Browser DevTools Investigation
+
+### Console Tab
+- JavaScript errors (red)
+- React errors and warnings
+- Network errors
+- Custom console.log output
+- Stack traces for errors
+
+### Network Tab
+- HTTP status codes (4xx, 5xx errors)
+- Request/response payloads
+- Request headers (auth tokens)
+- Response times
+- WebSocket connections (K8s watches)
+- Failed requests
+
+### React DevTools
+- Component tree structure
+- Props passed to components
+- State values
+- Hooks state (useState, useEffect)
+- Component re-render highlighting
+- Profiler for performance
+
+### Elements Tab
+- Rendered HTML structure
+- Applied CSS styles
+- Computed styles
+- Class names applied
+- Event listeners attached
+
+### Application Tab
+- localStorage contents
+- sessionStorage contents
+- Cookies
+- Service workers
+
+---
+
+## 3. Common Issue Categories
+
+### Component Not Rendering
+
+**Possible Causes**
+- Conditional rendering evaluating to false
+- Parent component not rendering
+- Error in component causing crash
+- Missing key in list causing wrong items
+- Component unmounted unexpectedly
+
+**Investigation Steps**
+- Add console.log to confirm component function is called
+- Check conditional rendering logic
+- Look for React error boundary catches
+- Verify parent component renders
+- Check for errors in console
+
+### Component Not Updating
+
+**Possible Causes**
+- State mutation instead of new reference
+- Missing dependency in useEffect
+- Stale closure capturing old value
+- Memoization preventing update
+- Key prop not changing when it should
+
+**Investigation Steps**
+- Verify state is being set with new reference
+- Check useEffect dependencies
+- Log state values to confirm changes
+- Check React.memo conditions
+- Verify key props in lists
+
+### Data Not Loading
+
+**Possible Causes**
+- API call not being made
+- API call failing silently
+- Wrong endpoint/parameters
+- Loading state stuck
+- Error not being handled
+- Watch not configured correctly
+
+**Investigation Steps**
+- Check Network tab for request
+- Verify request parameters
+- Check response status and body
+- Log loading/error states
+- Verify useK8sWatchResource config
+
+### Infinite Re-renders
+
+**Possible Causes**
+- State updated in render without condition
+- useEffect with missing/wrong dependencies
+- Object/array created new each render in deps
+- Parent causing child re-renders
+
+**Investigation Steps**
+- Add console.log to identify re-rendering component
+- Check for state updates in render body
+- Review useEffect dependencies
+- Check for new object/array references
+- Use React DevTools Profiler
+
+### Styling Issues
+
+**Possible Causes**
+- CSS specificity conflicts
+- Wrong class name
+- PatternFly class overrides
+- Missing import of SCSS file
+- CSS-in-JS not applied
+- Responsive breakpoint issues
+
+**Investigation Steps**
+- Inspect element in DevTools
+- Check applied vs expected classes
+- Look for overriding styles
+- Verify SCSS file is imported
+- Check specificity of selectors
+
+---
+
+## 4. K8s/Console SDK Specific Issues
+
+### useK8sWatchResource Not Working
+
+**Check Configuration**
+- groupVersionKind is correct
+- namespaced: true with namespace prop
+- isList matches expected return type
+- Resource exists in cluster
+
+**Check Permissions**
+- User has get/list/watch permissions
+- Run: `oc auth can-i list virtualmachines`
+
+**Check Cluster**
+- Resource exists: `oc get <resource> -n <namespace>`
+- API available: `oc api-resources | grep <resource>`
+
+### Watch Updates Not Reflecting
+
+**Possible Causes**
+- WebSocket connection lost
+- Component unmounted
+- State update race condition
+- Optimistic update out of sync
+
+**Investigation Steps**
+- Check Network tab for WebSocket
+- Verify component still mounted
+- Check for stale closure issues
+- Log watch updates
+
+### API Mutations Failing
+
+**Common Errors**
+- 400: Invalid resource spec
+- 403: Permission denied
+- 404: Resource not found
+- 409: Conflict (resource changed)
+- 422: Validation failed
+
+**Investigation Steps**
+- Check exact error message
+- Verify resource spec is valid
+- Check RBAC permissions
+- Get fresh resource before update
+
+---
+
+## 5. TypeScript/Build Issues
+
+### Type Errors
+
+**Common Causes**
+- Missing type definitions
+- Wrong import path
+- Incompatible types
+- Null/undefined not handled
+- Generic type issues
+
+**Quick Fixes**
+- Check import statements
+- Add null checks with optional chaining
+- Verify type definitions exist
+- Check for @types packages
+
+### Circular Dependencies
+
+**Symptoms**
+- Webpack warning in build
+- Undefined imports at runtime
+- Strange initialization errors
+
+**Investigation**
+- Look for "Circular dependency" in build output
+- Check import chains between files
+- Use index files carefully
+
+### Module Not Found
+
+**Common Causes**
+- Wrong import path
+- Missing dependency
+- Case sensitivity (Linux vs Mac)
+- Missing type definitions
+
+**Fixes**
+- Verify file exists at path
+- Check package.json for dependency
+- Match exact case in imports
+- Install @types package if needed
+
+---
+
+## 6. Debugging Commands
+
+### Type Checking
+```bash
+npm run check-types           # Full type check
+```
+
+### Linting
+```bash
+npm run lint                  # Check for issues
+npm run lint:fix              # Auto-fix issues
+```
+
+### Testing
+```bash
+npm test                      # Run all tests
+npm test <path>               # Run specific test
+npm test -- --watch           # Watch mode
+npm run test-cov              # With coverage
+```
+
+### Building
+```bash
+npm run build                 # Production build (shows warnings)
+npm run dev                   # Dev server with hot reload
+```
+
+### Cluster Verification
+```bash
+oc whoami                     # Check logged in user
+oc auth can-i <verb> <resource>  # Check permissions
+oc get <resource> -n <ns>     # Verify resource exists
+oc describe <resource> <name> # Detailed resource info
+oc logs <pod>                 # Pod logs
+```
+
+---
+
+## 7. Debugging Strategies
+
+### Binary Search
+- Comment out half the code
+- If issue persists, problem is in remaining half
+- Repeat until isolated
+
+### Minimal Reproduction
+- Create simplest version that reproduces issue
+- Remove unrelated code
+- Helps identify essential conditions
+
+### Rubber Duck Debugging
+- Explain the problem out loud
+- Walk through code step by step
+- Often reveals assumptions
+
+### Git Bisect
+- Find commit that introduced issue
+- Binary search through commits
+- Helps identify what changed
+
+### Console Logging Strategy
+- Log at entry points
+- Log state before and after changes
+- Log conditional branches taken
+- Remove or guard logs before commit
+
+---
+
+## 8. When to Ask for Help
+
+**After You've Tried**
+- Reproduced the issue consistently
+- Isolated to specific component/function
+- Checked documentation
+- Searched for similar issues
+- Spent 30+ minutes investigating
+
+**Provide When Asking**
+- What you're trying to do
+- What you expected to happen
+- What actually happened
+- Steps to reproduce
+- What you've already tried
+- Relevant code snippets
+- Error messages/screenshots
+
+---
+
+## Quick Reference
+
+| Symptom | First Check |
+|---------|-------------|
+| White screen | Console for errors |
+| Not rendering | Conditional logic |
+| Not updating | State mutation/deps |
+| API failing | Network tab |
+| Type error | Import statements |
+| Style wrong | Element inspector |
+| Infinite loop | useEffect deps |
+| Slow performance | React Profiler |
