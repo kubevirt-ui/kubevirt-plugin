@@ -8,7 +8,7 @@ const image = isUpstream
   ? 'quay.io/containerdisks/fedora'
   : 'registry.redhat.io/rhel10/rhel-guest-image';
 
-export const defaultVMYamlTemplate = (): V1VirtualMachine => ({
+export const defaultVMYamlTemplate = (isIPv6SingleStack = false): V1VirtualMachine => ({
   apiVersion: `${VirtualMachineModel.apiGroup}/${VirtualMachineModel.apiVersion}`,
   kind: VirtualMachineModel.kind,
   metadata: {
@@ -43,6 +43,7 @@ export const defaultVMYamlTemplate = (): V1VirtualMachine => ({
             threads: 1,
           },
           devices: {
+            autoattachPodInterface: false,
             disks: [
               {
                 disk: {
@@ -57,13 +58,15 @@ export const defaultVMYamlTemplate = (): V1VirtualMachine => ({
                 name: 'cloudinitdisk',
               },
             ],
-            interfaces: [
-              {
-                masquerade: {},
-                model: 'virtio',
-                name: 'default',
-              },
-            ],
+            interfaces: isIPv6SingleStack
+              ? []
+              : [
+                  {
+                    masquerade: {},
+                    model: 'virtio',
+                    name: 'default',
+                  },
+                ],
             networkInterfaceMultiqueue: true,
             rng: {},
           },
@@ -72,12 +75,14 @@ export const defaultVMYamlTemplate = (): V1VirtualMachine => ({
           },
         },
         hostname: 'example',
-        networks: [
-          {
-            name: 'default',
-            pod: {},
-          },
-        ],
+        networks: isIPv6SingleStack
+          ? []
+          : [
+              {
+                name: 'default',
+                pod: {},
+              },
+            ],
         terminationGracePeriodSeconds: 180,
         volumes: [
           {

@@ -14,6 +14,7 @@ import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/
 import SelectTypeahead, {
   SelectTypeaheadOptionProps,
 } from '@kubevirt-utils/components/SelectTypeahead/SelectTypeahead';
+import useIsIPv6SingleStackCluster from '@kubevirt-utils/hooks/useIsIPv6SingleStackCluster';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
@@ -69,6 +70,7 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
   vm,
 }) => {
   const { t } = useKubevirtTranslation();
+  const isIPv6SingleStack = useIsIPv6SingleStackCluster(getCluster(vm));
   const vmiNamespace = vm?.metadata?.namespace || namespace;
   const { loaded, loadError, nads, primaryNADs } = useNADsData(vmiNamespace, getCluster(vm));
   const [isNamespaceManagedByUDN] = useNamespaceUDN(vmiNamespace);
@@ -114,8 +116,9 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
 
   const hasPodNetwork = useMemo(() => podNetworkExists(vm), [vm]);
   const hasNads = useMemo(() => filteredNADs?.length > 0, [filteredNADs]);
-  const isPodNetworkingOptionExists =
-    !hasPodNetwork || (isEditing && isPodNetworkName(editInitValueNetworkName));
+  const isPodNetworkingOptionExists = isIPv6SingleStack
+    ? false
+    : !hasPodNetwork || (isEditing && isPodNetworkName(editInitValueNetworkName));
 
   const canCreateNetworkInterface = useMemo(
     () => hasNads || !hasPodNetwork,

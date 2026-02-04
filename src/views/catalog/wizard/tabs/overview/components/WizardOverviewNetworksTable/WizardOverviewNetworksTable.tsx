@@ -12,6 +12,7 @@ import {
 import { getNetworkNameLabel } from '@kubevirt-utils/resources/vm/utils/network/network-columns';
 import { getNetworkInterfaceRowData } from '@kubevirt-utils/resources/vm/utils/network/rowData';
 import { getPrintableNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { DescriptionList, Stack, StackItem } from '@patternfly/react-core';
 
 export const interfacesTypes = {
@@ -27,6 +28,10 @@ export const WizardOverviewNetworksTable: React.FC<{
 }> = React.memo(({ interfaces = [], isInlineGrid, networks = [] }) => {
   const { t } = useKubevirtTranslation();
   const networkData = getNetworkInterfaceRowData(networks, interfaces);
+
+  if (isEmpty(networkData)) {
+    return <span className="pf-v6-u-text-color-subtle">{t('Not available')}</span>;
+  }
 
   return (
     <DescriptionList columnModifier={{ default: '3Col' }} isInlineGrid={isInlineGrid}>
