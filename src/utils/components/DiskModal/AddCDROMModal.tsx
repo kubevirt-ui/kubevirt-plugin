@@ -10,7 +10,6 @@ import {
 } from '@kubevirt-utils/components/DiskModal/utils/constants';
 import {
   convertDataVolumeToTemplate,
-  isDeclarativeHotplugVolumesEnabled,
   isHotPluggableEnabled,
 } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
@@ -50,8 +49,6 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
   const vmNamespace = getNamespace(vm);
 
   const isHotPluggable = isHotPluggableEnabled(featureGates);
-  const isDeclarativeHotplugVolumesFeatureGateEnabled =
-    isDeclarativeHotplugVolumesEnabled(featureGates);
   const { isoOptions } = useISOOptions(vmNamespace);
 
   const {
@@ -94,7 +91,7 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
     }
   }, [uploadEnabled, setValue]);
 
-  const isISORequired = !uploadEnabled && !isDeclarativeHotplugVolumesFeatureGateEnabled;
+  const isISORequired = !uploadEnabled;
   const hasValidSelection = selectedISO || (uploadEnabled && hasUploadFile);
   const hasNoSelection = !selectedISO && !uploadEnabled;
   const isFormValid = Boolean(

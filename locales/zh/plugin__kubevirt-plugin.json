@@ -641,7 +641,6 @@
   "Elapsed time since login": "登录后已经过的时间",
   "Empty disk (blank)": "空磁盘（空）",
   "Enable": "启用",
-  "Enable advanced CD-ROM features": "启用高级 CD-ROM 功能",
   "Enable auto updates for RHEL VirtualMachines": "为 RHEL VirtualMachines 启用自动更新",
   "Enable automatic images download and update": "启用自动镜像下载和更新",
   "Enable automatic subscription for Red Hat Enterprise Linux VirtualMachines.\n": "为 Red Hat Enterprise Linux VirtualMachines 启用自动订阅。\n",

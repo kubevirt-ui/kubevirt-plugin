@@ -652,7 +652,6 @@
   "Elapsed time since login": "Temps écoulé depuis la connexion",
   "Empty disk (blank)": "Disque vide (vierge)",
   "Enable": "Activer",
-  "Enable advanced CD-ROM features": "Activer les fonctionnalités avancées du lecteur CD-ROM",
   "Enable auto updates for RHEL VirtualMachines": "Activer les mises à jour automatiques pour les machines virtuelles RHEL",
   "Enable automatic images download and update": "Activer le téléchargement et la mise à jour automatiques des images",
   "Enable automatic subscription for Red Hat Enterprise Linux VirtualMachines.\n": "Activer l'abonnement automatique pour les machines virtuelles Red Hat Enterprise Linux.\n",

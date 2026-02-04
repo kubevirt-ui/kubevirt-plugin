@@ -641,7 +641,6 @@
   "Elapsed time since login": "ログインからの経過時間",
   "Empty disk (blank)": "空のディスク (空白)",
   "Enable": "有効にする",
-  "Enable advanced CD-ROM features": "高度な CD-ROM 機能を有効にする",
   "Enable auto updates for RHEL VirtualMachines": "RHEL VirtualMachine の自動更新を有効にする",
   "Enable automatic images download and update": "イメージの自動ダウンロードと更新を有効にします",
   "Enable automatic subscription for Red Hat Enterprise Linux VirtualMachines.\n": "Red Hat Enterprise Linux VirtualMachine の自動サブスクリプションを有効にします。\n",
