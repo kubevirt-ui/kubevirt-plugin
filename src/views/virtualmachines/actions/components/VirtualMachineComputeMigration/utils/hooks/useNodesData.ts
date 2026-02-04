@@ -4,7 +4,8 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { isNodeSchedulable, nodeStatus } from '@kubevirt-utils/resources/node/utils/utils';
 import { getName } from '@kubevirt-utils/resources/shared';
 import useNode from '@kubevirt-utils/resources/vm/hooks/useNode';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import useNodesMetrics from '@virtualmachines/actions/components/VirtualMachineComputeMigration/utils/hooks/useNodesMetrics/useNodesMetrics';
 import { NodeData } from '@virtualmachines/actions/components/VirtualMachineComputeMigration/utils/types';
 
@@ -15,14 +16,16 @@ type UseNodesData = (vm: V1VirtualMachine) => {
 };
 
 const useNodesData: UseNodesData = (vm) => {
-  const [nodes, nodesLoaded] = useK8sWatchResource<IoK8sApiCoreV1Node[]>({
+  const cluster = getCluster(vm);
+  const [nodes, nodesLoaded] = useK8sWatchData<IoK8sApiCoreV1Node[]>({
+    cluster,
     groupVersionKind: modelToGroupVersionKind(NodeModel),
     isList: true,
     selector: {
       matchLabels: { 'node-role.kubernetes.io/worker': '' },
     },
   });
-  const { metricsData, metricsLoaded } = useNodesMetrics();
+  const { metricsData, metricsLoaded } = useNodesMetrics(cluster);
   const vmiNodeName = useNode(vm);
 
   const filteredNodes = nodes?.filter(

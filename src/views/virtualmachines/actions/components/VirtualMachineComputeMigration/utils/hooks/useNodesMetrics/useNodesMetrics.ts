@@ -1,26 +1,34 @@
-import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
+import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
+import { useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';
 import { MetricsDataByNode } from '@virtualmachines/actions/components/VirtualMachineComputeMigration/utils/hooks/useNodesMetrics/utils/types';
 import { getDataByNode } from '@virtualmachines/actions/components/VirtualMachineComputeMigration/utils/hooks/useNodesMetrics/utils/utils';
 
-type UseNodesMetrics = () => { metricsData: MetricsDataByNode; metricsLoaded: boolean };
+type UseNodesMetrics = (cluster?: string) => {
+  metricsData: MetricsDataByNode;
+  metricsLoaded: boolean;
+};
 
-const useNodesMetrics: UseNodesMetrics = () => {
-  const [usedMemoryResult, usedMemoryLoaded] = usePrometheusPoll({
+const useNodesMetrics: UseNodesMetrics = (cluster) => {
+  const [usedMemoryResult, usedMemoryLoaded] = useFleetPrometheusPoll({
+    cluster,
     endpoint: PrometheusEndpoint.QUERY,
     query: 'sum by (instance) (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes)',
   });
 
-  const [totalMemoryResult, totalMemoryLoaded] = usePrometheusPoll({
+  const [totalMemoryResult, totalMemoryLoaded] = useFleetPrometheusPoll({
+    cluster,
     endpoint: PrometheusEndpoint.QUERY,
     query: 'sum by (instance) (node_memory_MemTotal_bytes)',
   });
 
-  const [usedCPUResult, usedCPULoaded] = usePrometheusPoll({
+  const [usedCPUResult, usedCPULoaded] = useFleetPrometheusPoll({
+    cluster,
     endpoint: PrometheusEndpoint.QUERY,
     query: 'sum by(instance) (instance:node_cpu:rate:sum)',
   });
 
-  const [totalCPUResult, totalCPULoaded] = usePrometheusPoll({
+  const [totalCPUResult, totalCPULoaded] = useFleetPrometheusPoll({
+    cluster,
     endpoint: PrometheusEndpoint.QUERY,
     query: 'sum by(instance) (instance:node_num_cpu:sum)',
   });
