@@ -299,7 +299,6 @@ export const createBulkVirtualMachineActionFactory = (
           <BulkSnapshotModal vms={vms} {...props} />
         ),
       ),
-    disabled: vms.every((vm) => vm.status?.printableStatus === Stopped),
     id: ACTIONS_ID.SNAPSHOT,
     label: t('Take snapshot'),
   }),
