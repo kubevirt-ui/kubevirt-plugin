@@ -326,7 +326,7 @@ export const getAllowedTemplateResources = (projectNames: string[]) => {
 };
 
 /**
- *
+ * function to get a resource's name
  * @param resource k8s resource
  * @returns resource's name
  */
@@ -334,12 +334,20 @@ export const getName = <A extends K8sResourceCommon = K8sResourceCommon>(resourc
   resource?.metadata?.name;
 
 /**
- *
+ * function to get a resource's namespace
  * @param resource k8s resource
  * @returns resource's namespace
  */
 export const getNamespace = <A extends K8sResourceCommon = K8sResourceCommon>(resource: A) =>
   resource?.metadata?.namespace;
+
+/**
+ * function to get a resource's kind
+ * @param resource k8s resource
+ * @returns {string} resource's kind
+ */
+export const getKind = <A extends K8sResourceCommon = K8sResourceCommon>(resource: A) =>
+  resource?.kind;
 
 /**
  * function to get a resource's UID
