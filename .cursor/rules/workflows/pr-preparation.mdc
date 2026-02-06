@@ -1,0 +1,343 @@
+---
+description: Checklist and workflow for preparing a PR
+alwaysApply: false
+---
+
+# PR Preparation Workflow
+
+Invoke with: *"prepare PR"*, *"ready for review"*, *"PR checklist"*, *"before I submit"*
+
+Follow this comprehensive workflow before creating a pull request.
+
+---
+
+## 1. Code Completion Check
+
+### Feature Complete
+- [ ] All acceptance criteria met
+- [ ] All user stories addressed
+- [ ] Edge cases handled
+- [ ] Error scenarios covered
+- [ ] Loading/empty states implemented
+
+### No Unfinished Work
+- [ ] No TODO comments without linked issues
+- [ ] No commented-out code
+- [ ] No console.log statements
+- [ ] No debug code left
+- [ ] No placeholder text/values
+- [ ] No hardcoded test data
+
+---
+
+## 2. Code Quality Checks
+
+### Run All Checks
+```bash
+npm run check-types && npm run lint && npm test
+```
+
+### TypeScript
+- [ ] No type errors
+- [ ] No implicit `any` types
+- [ ] Explicit return types on functions
+- [ ] Proper null/undefined handling
+
+### Linting
+- [ ] ESLint passes without errors
+- [ ] Minimize warnings (fix if simple)
+- [ ] Prettier formatting applied
+
+### Unit Tests
+- [ ] All existing tests pass
+- [ ] New tests added for new code
+- [ ] Edge cases tested
+- [ ] Error paths tested
+
+---
+
+## 3. i18n Verification
+
+### Run i18n
+```bash
+npm run i18n
+```
+
+### Translation Checklist
+- [ ] All user-facing strings use `t()` function
+- [ ] `npm run i18n` has been run
+- [ ] Translation file changes committed
+- [ ] No hardcoded strings in UI
+- [ ] Proper interpolation for dynamic values
+- [ ] Pluralization handled correctly
+
+---
+
+## 4. Self Code Review
+
+### Developer Perspective
+
+**Code Structure**
+- [ ] Single responsibility principle followed
+- [ ] No god functions/components
+- [ ] Logic extracted to appropriate hooks/utils
+- [ ] Files under 150 lines
+- [ ] Proper folder organization
+
+**Code Quality**
+- [ ] No code duplication
+- [ ] Descriptive naming
+- [ ] No magic numbers (use constants)
+- [ ] Clean imports (no unused)
+- [ ] Consistent patterns with codebase
+
+**Error Handling**
+- [ ] All async operations have error handling
+- [ ] Errors logged appropriately
+- [ ] User-friendly error messages
+- [ ] Recovery paths available
+
+**Performance**
+- [ ] No unnecessary re-renders
+- [ ] Appropriate memoization
+- [ ] No heavy operations in render
+- [ ] Large lists paginated/virtualized
+
+### UX Perspective
+
+**States**
+- [ ] Loading states visible
+- [ ] Error states informative
+- [ ] Empty states guide users
+- [ ] Success feedback provided
+
+**Accessibility**
+- [ ] Keyboard navigation works
+- [ ] Focus management correct
+- [ ] ARIA labels present
+- [ ] Color not sole indicator
+
+**Consistency**
+- [ ] PatternFly components used
+- [ ] Matches similar existing UI
+- [ ] Spacing/layout consistent
+- [ ] Terminology consistent
+
+### QE Perspective
+
+**Edge Cases**
+- [ ] Empty data handled
+- [ ] Null/undefined handled
+- [ ] Boundary values considered
+- [ ] Special characters handled
+
+**User Behavior**
+- [ ] Double-click prevention
+- [ ] Navigation during operation handled
+- [ ] Session timeout considered
+- [ ] Concurrent edits considered
+
+**Test Coverage**
+- [ ] New functionality tested
+- [ ] Edge cases have tests
+- [ ] Error paths tested
+- [ ] Integration points tested
+
+### Security Perspective
+
+**Input/Output**
+- [ ] User input validated
+- [ ] No XSS vulnerabilities
+- [ ] No sensitive data exposed
+- [ ] Error messages don't leak info
+
+**Authentication**
+- [ ] Permissions checked
+- [ ] No hardcoded secrets
+- [ ] Tokens handled securely
+
+---
+
+## 5. Visual Verification
+
+### Manual Testing
+- [ ] Feature works as expected
+- [ ] UI looks correct
+- [ ] Responsive on different sizes
+- [ ] Dark/light theme (if applicable)
+
+### Capture Demo
+- [ ] Screenshots for UI changes
+- [ ] Video for complex interactions
+- [ ] Before/after comparison if relevant
+- [ ] Error state demonstration
+
+---
+
+## 6. Commit Hygiene
+
+### Commit Structure
+- [ ] Meaningful commit messages
+- [ ] Logical, atomic commits
+- [ ] No broken commits in history
+- [ ] Can be squashed cleanly
+
+### Commit Message Format
+```
+<type>: <short summary>
+
+<longer description if needed>
+
+Fixes: CNV-XXXXX
+```
+
+**Types**
+- `feat`: New feature
+- `fix`: Bug fix
+- `refactor`: Code change that neither fixes nor adds
+- `style`: Formatting, missing semicolons, etc.
+- `test`: Adding/updating tests
+- `docs`: Documentation changes
+- `chore`: Maintenance tasks
+
+### Branch
+- [ ] Branch up-to-date with main
+- [ ] Conflicts resolved
+- [ ] Rebase if needed (not merge)
+
+---
+
+## 7. PR Description
+
+### Title
+- Clear, concise summary
+- Include ticket number if applicable
+- Use conventional format: `feat(scope): description`
+
+### Template
+```markdown
+## 📝 Description
+
+Brief description of what this PR does and why.
+
+### Changes
+- Added X component for Y functionality
+- Fixed Z issue with W
+- Updated Q to handle R
+
+## 🔗 Links
+
+- JIRA: [CNV-XXXXX](https://issues.redhat.com/browse/CNV-XXXXX)
+- Docs: [Link to docs if applicable]
+- Related PR: [Link if applicable]
+
+## 👥 CC://
+
+@reviewer1 @reviewer2 @domain-expert
+
+## 🧪 Testing
+
+### Manual Testing
+- [ ] Tested feature works correctly
+- [ ] Tested error scenarios
+- [ ] Tested on different screen sizes
+
+### Automated Testing
+- [ ] Unit tests pass
+- [ ] New tests added
+
+## 📹 Demo
+
+<!-- For UI changes, add screenshots or video -->
+
+### Before
+<!-- Screenshot/description of before state -->
+
+### After
+<!-- Screenshot/description of after state -->
+
+## ⚠️ Notes for Reviewers
+
+<!-- Any specific areas to focus on, known limitations, etc. -->
+```
+
+---
+
+## 8. Reviewer Selection
+
+### Who to Include
+- **Required**: At least one code owner
+- **Domain expert**: For KubeVirt-specific logic
+- **UX**: For significant UI changes
+- **QE**: For testability concerns
+- **Security**: For auth/sensitive data changes
+
+### How to Help Reviewers
+- Highlight complex areas needing attention
+- Explain non-obvious decisions
+- Link to relevant documentation
+- Point out areas you're uncertain about
+
+---
+
+## 9. Post-PR Actions
+
+### Respond to Feedback
+- Address all comments
+- Explain if you disagree
+- Mark resolved when fixed
+- Re-request review after changes
+
+### Monitor CI
+- Ensure all checks pass
+- Fix any failing tests
+- Address any new warnings
+
+### After Merge
+- Delete feature branch
+- Verify in staging/dev environment
+- Monitor for issues
+- Update JIRA ticket status
+
+---
+
+## 10. Final Checklist
+
+### Code
+- [ ] All checks pass (types, lint, test)
+- [ ] i18n updated
+- [ ] No debug code
+- [ ] Self-reviewed
+
+### PR
+- [ ] Descriptive title
+- [ ] Complete description
+- [ ] JIRA linked
+- [ ] Demo attached (if UI)
+- [ ] Reviewers assigned
+
+### Ready
+- [ ] Branch up-to-date
+- [ ] All commits meaningful
+- [ ] Ready for review
+
+---
+
+## Quick Commands Reference
+
+```bash
+# Full check
+npm run check-types && npm run lint && npm test
+
+# Fix lint issues
+npm run lint:fix
+
+# Update translations
+npm run i18n
+
+# Run specific test
+npm test path/to/file.test.ts
+
+# Type check only
+npm run check-types
+```

@@ -1,0 +1,477 @@
+---
+description: SCSS styling conventions
+globs: "**/*.scss"
+alwaysApply: false
+---
+
+# SCSS Styling Guidelines
+
+Styling conventions and patterns for this project.
+
+---
+
+## 1. File Organization
+
+### File Naming
+- Match component: `VMDetails.tsx` → `vm-details.scss`
+- Lowercase kebab-case
+- Place in same directory as component
+
+### File Structure
+```scss
+// 1. Variables (if component-specific)
+$vm-details-header-height: 60px;
+
+// 2. Main block
+.vm-details {
+  // Layout
+  // Spacing
+  // Typography
+  // Colors
+  
+  // 3. Elements (BEM)
+  &__header { }
+  &__content { }
+  &__footer { }
+  
+  // 4. Modifiers (BEM)
+  &--loading { }
+  &--compact { }
+  
+  // 5. States
+  &:hover { }
+  &:focus { }
+  
+  // 6. Responsive
+  @media (max-width: 768px) { }
+}
+```
+
+---
+
+## 2. BEM Methodology
+
+### Block
+- Component's root class
+- Lowercase kebab-case
+- Unique, descriptive name
+
+### Element
+- Child parts of block
+- Double underscore separator: `&__element`
+- Describes purpose, not appearance
+
+### Modifier
+- Variations of block/element
+- Double hyphen separator: `&--modifier`
+- Describes state or variant
+
+### Examples
+```scss
+// Block
+.vm-list {
+  display: flex;
+  flex-direction: column;
+  
+  // Elements
+  &__header {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  &__item {
+    padding: var(--pf-v6-global--spacer--md);
+    border-bottom: 1px solid var(--pf-v6-global--BorderColor--100);
+  }
+  
+  &__empty-state {
+    text-align: center;
+    padding: var(--pf-v6-global--spacer--xl);
+  }
+  
+  // Modifiers
+  &--compact {
+    .vm-list__item {
+      padding: var(--pf-v6-global--spacer--sm);
+    }
+  }
+  
+  &--loading {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+}
+```
+
+---
+
+## 3. PatternFly Variables
+
+### Spacing
+```scss
+// Standard spacers
+padding: var(--pf-v6-global--spacer--xs);   // 4px
+padding: var(--pf-v6-global--spacer--sm);   // 8px
+padding: var(--pf-v6-global--spacer--md);   // 16px
+padding: var(--pf-v6-global--spacer--lg);   // 24px
+padding: var(--pf-v6-global--spacer--xl);   // 32px
+padding: var(--pf-v6-global--spacer--2xl);  // 48px
+padding: var(--pf-v6-global--spacer--3xl);  // 64px
+```
+
+### Colors
+```scss
+// Text colors
+color: var(--pf-v6-global--Color--100);           // Primary text
+color: var(--pf-v6-global--Color--200);           // Secondary text
+
+// Status colors
+color: var(--pf-v6-global--success-color--100);   // Success/green
+color: var(--pf-v6-global--warning-color--100);   // Warning/yellow
+color: var(--pf-v6-global--danger-color--100);    // Danger/red
+color: var(--pf-v6-global--info-color--100);      // Info/blue
+
+// Background
+background-color: var(--pf-v6-global--BackgroundColor--100);
+background-color: var(--pf-v6-global--BackgroundColor--200);
+
+// Borders
+border-color: var(--pf-v6-global--BorderColor--100);
+border-color: var(--pf-v6-global--BorderColor--200);
+
+// Links
+color: var(--pf-v6-global--link--Color);
+color: var(--pf-v6-global--link--Color--hover);
+```
+
+### Typography
+```scss
+// Font sizes
+font-size: var(--pf-v6-global--FontSize--xs);    // 12px
+font-size: var(--pf-v6-global--FontSize--sm);    // 14px
+font-size: var(--pf-v6-global--FontSize--md);    // 16px
+font-size: var(--pf-v6-global--FontSize--lg);    // 18px
+font-size: var(--pf-v6-global--FontSize--xl);    // 20px
+font-size: var(--pf-v6-global--FontSize--2xl);   // 24px
+
+// Font weights
+font-weight: var(--pf-v6-global--FontWeight--normal);    // 400
+font-weight: var(--pf-v6-global--FontWeight--bold);      // 700
+
+// Line heights
+line-height: var(--pf-v6-global--LineHeight--sm);
+line-height: var(--pf-v6-global--LineHeight--md);
+```
+
+### Borders & Shadows
+```scss
+// Border widths
+border-width: var(--pf-v6-global--BorderWidth--sm);  // 1px
+border-width: var(--pf-v6-global--BorderWidth--md);  // 2px
+
+// Border radius
+border-radius: var(--pf-v6-global--BorderRadius--sm);
+border-radius: var(--pf-v6-global--BorderRadius--lg);
+
+// Box shadows
+box-shadow: var(--pf-v6-global--BoxShadow--sm);
+box-shadow: var(--pf-v6-global--BoxShadow--md);
+box-shadow: var(--pf-v6-global--BoxShadow--lg);
+```
+
+---
+
+## 4. Layout Patterns
+
+### Flexbox
+```scss
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-v6-global--spacer--md);
+  
+  &__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--pf-v6-global--spacer--sm);
+  }
+}
+```
+
+### Grid
+```scss
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--pf-v6-global--spacer--md);
+}
+```
+
+### Sticky Header
+```scss
+.page-with-sticky-header {
+  &__header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background-color: var(--pf-v6-global--BackgroundColor--100);
+  }
+  
+  &__content {
+    flex: 1;
+    overflow: auto;
+  }
+}
+```
+
+---
+
+## 5. State Styles
+
+### Loading State
+```scss
+.component {
+  &--loading {
+    opacity: 0.6;
+    pointer-events: none;
+    position: relative;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-color: rgba(255, 255, 255, 0.5);
+    }
+  }
+}
+```
+
+### Disabled State
+```scss
+.component {
+  &--disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+}
+```
+
+### Selected State
+```scss
+.list-item {
+  &--selected {
+    background-color: var(--pf-v6-global--BackgroundColor--200);
+    border-left: 3px solid var(--pf-v6-global--primary-color--100);
+  }
+}
+```
+
+### Hover State
+```scss
+.clickable-item {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background-color: var(--pf-v6-global--BackgroundColor--200);
+  }
+  
+  &:focus {
+    outline: 2px solid var(--pf-v6-global--primary-color--100);
+    outline-offset: 2px;
+  }
+}
+```
+
+---
+
+## 6. Responsive Design
+
+### Breakpoints
+```scss
+// Mobile first approach
+.component {
+  // Mobile styles (default)
+  padding: var(--pf-v6-global--spacer--sm);
+  
+  // Tablet and up
+  @media (min-width: 768px) {
+    padding: var(--pf-v6-global--spacer--md);
+  }
+  
+  // Desktop and up
+  @media (min-width: 1024px) {
+    padding: var(--pf-v6-global--spacer--lg);
+  }
+}
+```
+
+### Responsive Utilities
+```scss
+.hide-on-mobile {
+  @media (max-width: 767px) {
+    display: none;
+  }
+}
+
+.hide-on-desktop {
+  @media (min-width: 768px) {
+    display: none;
+  }
+}
+```
+
+---
+
+## 7. Best Practices
+
+### Do
+```scss
+// ✅ Use PatternFly variables
+padding: var(--pf-v6-global--spacer--md);
+
+// ✅ Use relative units
+font-size: 1rem;
+width: 100%;
+
+// ✅ Use project-specific class names
+.vm-list-item { }
+
+// ✅ Use gap for spacing in flex/grid
+display: flex;
+gap: var(--pf-v6-global--spacer--md);
+
+// ✅ Use logical properties
+margin-inline-start: var(--pf-v6-global--spacer--sm);
+padding-block: var(--pf-v6-global--spacer--md);
+```
+
+### Don't
+```scss
+// ❌ Don't use !important
+.my-class {
+  color: red !important;
+}
+
+// ❌ Don't target PatternFly classes
+.pf-v6-c-button { }
+
+// ❌ Don't use px for sizing
+padding: 16px;
+
+// ❌ Don't use hardcoded colors
+color: #333333;
+
+// ❌ Don't deeply nest (max 3 levels)
+.a {
+  .b {
+    .c {
+      .d { } // Too deep
+    }
+  }
+}
+
+// ❌ Don't use IDs for styling
+#my-component { }
+```
+
+---
+
+## 8. Component-Specific Patterns
+
+### Table Styling
+```scss
+.vm-table {
+  &__row {
+    &--clickable {
+      cursor: pointer;
+      
+      &:hover {
+        background-color: var(--pf-v6-global--BackgroundColor--200);
+      }
+    }
+  }
+  
+  &__cell {
+    &--status {
+      white-space: nowrap;
+    }
+    
+    &--actions {
+      text-align: right;
+    }
+  }
+}
+```
+
+### Card Styling
+```scss
+.vm-card {
+  border: 1px solid var(--pf-v6-global--BorderColor--100);
+  border-radius: var(--pf-v6-global--BorderRadius--sm);
+  background-color: var(--pf-v6-global--BackgroundColor--100);
+  
+  &__header {
+    padding: var(--pf-v6-global--spacer--md);
+    border-bottom: 1px solid var(--pf-v6-global--BorderColor--100);
+  }
+  
+  &__body {
+    padding: var(--pf-v6-global--spacer--md);
+  }
+  
+  &__footer {
+    padding: var(--pf-v6-global--spacer--md);
+    border-top: 1px solid var(--pf-v6-global--BorderColor--100);
+  }
+}
+```
+
+### Modal Styling
+```scss
+.vm-modal {
+  &__content {
+    padding: var(--pf-v6-global--spacer--lg);
+  }
+  
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--pf-v6-global--spacer--sm);
+  }
+}
+```
+
+---
+
+## 9. Dark Mode Support
+
+### Using CSS Variables
+```scss
+// PatternFly variables automatically adapt to dark mode
+// Just use the variables consistently
+.component {
+  background-color: var(--pf-v6-global--BackgroundColor--100);
+  color: var(--pf-v6-global--Color--100);
+  border-color: var(--pf-v6-global--BorderColor--100);
+}
+
+// Avoid hardcoded colors
+// ❌ color: #333;
+// ✅ color: var(--pf-v6-global--Color--100);
+```
+
+---
+
+## 10. Checklist
+
+- [ ] Uses PatternFly variables for spacing, colors, typography
+- [ ] Follows BEM naming convention
+- [ ] No `!important` usage
+- [ ] No PatternFly class targeting
+- [ ] No hardcoded colors or sizes
+- [ ] Maximum 3 levels of nesting
+- [ ] Responsive considerations included
+- [ ] Supports dark mode via CSS variables

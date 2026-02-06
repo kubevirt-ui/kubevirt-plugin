@@ -1,0 +1,319 @@
+---
+description: Internationalization (i18n) patterns
+globs: "locales/**,**/i18n*,**/*Translation*"
+alwaysApply: false
+---
+
+# i18n Guidelines
+
+Internationalization patterns and requirements for this project.
+
+---
+
+## 1. Overview
+
+### Translation System
+- Uses `react-i18next` for runtime translations
+- `i18next-parser` for extracting strings
+- Plugin namespace: `plugin__kubevirt-plugin`
+- Source language: English (en)
+
+### Translation Files
+- Location: `locales/{lang}/plugin__kubevirt-plugin.json`
+- Supported languages: en, es, fr, ja, ko, zh
+- English is the source; others are translations
+
+---
+
+## 2. Using Translations
+
+### Translation Hook
+```tsx
+import { useKubevirtTranslation } from '@kubevirt-plugin/utils/hooks/useKubevirtTranslation';
+
+const MyComponent: React.FC = () => {
+  const { t } = useKubevirtTranslation();
+
+  return (
+    <div>
+      <h1>{t('Virtual Machines')}</h1>
+      <p>{t('Manage your virtual machines')}</p>
+    </div>
+  );
+};
+```
+
+### Important
+- Always import from `@kubevirt-plugin/utils/hooks/useKubevirtTranslation`
+- Never hardcode user-facing strings
+- The `t` function returns the translated string
+
+---
+
+## 3. String Patterns
+
+### Simple Strings
+```tsx
+// Basic translation
+{t('Virtual Machines')}
+{t('Create VM')}
+{t('Delete')}
+```
+
+### Dynamic Values (Interpolation)
+```tsx
+// Single value
+{t('Hello, {{name}}', { name: userName })}
+
+// Multiple values
+{t('{{count}} of {{total}} VMs running', { count: running, total: total })}
+
+// With formatting
+{t('Created on {{date, datetime}}', { date: createdDate })}
+```
+
+### Pluralization
+```tsx
+// Automatic plural handling
+{t('{{count}} item', { count: itemCount })}
+// Requires entries in translation file:
+// "{{count}} item": "{{count}} item"
+// "{{count}} item_plural": "{{count}} items"
+
+// Or explicit
+{t('{{count}} virtual machine', { count: vmCount })}
+// "{{count}} virtual machine_plural": "{{count}} virtual machines"
+```
+
+### Nested Keys
+```tsx
+// For organization (use sparingly)
+{t('vm.status.running')}
+{t('vm.actions.delete')}
+```
+
+---
+
+## 4. Console Extensions
+
+### Extension Label Format
+For labels in plugin extension files, use the special format:
+
+```json
+{
+  "type": "console.navigation/href",
+  "properties": {
+    "name": "%plugin__kubevirt-plugin~Virtual Machines%",
+    "href": "/virtualization/vms"
+  }
+}
+```
+
+### Register in i18n
+Add a comment in `utils/i18n.ts` for the parser:
+
+```typescript
+// Console extension strings - these are used in plugin-extensions.ts
+// t('plugin__kubevirt-plugin~Virtual Machines')
+// t('plugin__kubevirt-plugin~Templates')
+// t('plugin__kubevirt-plugin~Catalog')
+```
+
+---
+
+## 5. What to Translate
+
+### Always Translate
+- Page titles and headings
+- Button labels
+- Form labels and placeholders
+- Error messages
+- Success messages
+- Tooltip text
+- Help text
+- Table headers
+- Empty state messages
+- Loading messages
+- Confirmation dialogs
+- Menu items
+- Tab labels
+
+### Never Translate
+- Proper nouns (Kubernetes, KubeVirt, OpenShift, PatternFly)
+- Technical identifiers (VM names, namespaces, resource names)
+- API field names
+- Code values and enums
+- URLs and paths
+- Log messages (internal)
+
+### Be Careful With
+- Mixed technical/user content
+- Formatted values (dates, numbers - use interpolation)
+- Dynamic content from API
+
+---
+
+## 6. Best Practices
+
+### String Quality
+- Use complete sentences when possible
+- Avoid string concatenation
+- Keep context in single string
+- Use interpolation for dynamic parts
+
+### Bad Patterns
+```tsx
+// ❌ Concatenation breaks translation
+{t('Delete') + ' ' + vmName}
+
+// ❌ Split strings lose context
+{t('Click')} {t('here')} {t('to continue')}
+
+// ❌ Hardcoded strings
+<Button>Delete</Button>
+```
+
+### Good Patterns
+```tsx
+// ✅ Single string with interpolation
+{t('Delete {{name}}', { name: vmName })}
+
+// ✅ Complete sentence
+{t('Click here to continue')}
+
+// ✅ Translated button
+<Button>{t('Delete')}</Button>
+```
+
+### Context for Translators
+```tsx
+// Add context when meaning is ambiguous
+// "Delete" could be verb or adjective
+{t('Delete', { context: 'button' })}  // Button action
+{t('Delete', { context: 'status' })}  // Status indicator
+```
+
+---
+
+## 7. Updating Translations
+
+### After Adding Strings
+```bash
+# Extract new strings to translation files
+npm run i18n
+```
+
+### What This Does
+1. Scans source files for `t()` calls
+2. Extracts strings to `locales/en/plugin__kubevirt-plugin.json`
+3. Syncs with other language files (adds missing keys)
+
+### Commit Translation Changes
+- Always commit translation file updates
+- Run `npm run i18n` before PR
+- lint-staged runs this automatically for src changes
+
+---
+
+## 8. Translation File Structure
+
+### File Format
+```json
+{
+  "Virtual Machines": "Virtual Machines",
+  "Create VM": "Create VM",
+  "{{count}} item": "{{count}} item",
+  "{{count}} item_plural": "{{count}} items",
+  "Hello, {{name}}": "Hello, {{name}}",
+  "vm.status.running": "Running"
+}
+```
+
+### Key = Value for English
+- English file has key equal to value
+- Translators provide translations for other languages
+- Keys should be the English text (not identifiers)
+
+---
+
+## 9. Testing Translations
+
+### Verify All Strings Translated
+```bash
+# Check for missing translations
+npm run i18n
+
+# Look for changes in translation files
+git diff locales/
+```
+
+### Manual Verification
+- Switch browser language
+- Check all visible text is translated
+- Verify interpolation works
+- Check pluralization
+
+### Dummy Locale
+```bash
+# Generate dummy locale for testing
+npm run i18n-dummy-locale
+```
+
+---
+
+## 10. Troubleshooting
+
+### String Not Translating
+- Check import is from `useKubevirtTranslation`
+- Verify string is in translation file
+- Run `npm run i18n` to extract
+- Check for typos in key
+
+### Interpolation Not Working
+- Check variable name matches: `{{name}}` and `{ name }`
+- Ensure value is passed to t function
+- Check for typos in variable name
+
+### Missing in Other Languages
+- English file is source of truth
+- Run `npm run i18n` to sync keys
+- Contact translation team for actual translations
+
+---
+
+## 11. Utilities
+
+### Translation Scripts
+```bash
+# Update translation files
+npm run i18n
+
+# Verbose output
+npm run i18n:verbose
+
+# Convert to PO format (for translators)
+npm run i18n-to-po
+
+# Convert from PO format
+npm run po-to-i18n
+
+# Export PO files
+npm run export-pos
+
+# Memsource integration
+npm run memsource-upload
+npm run memsource-download
+```
+
+---
+
+## 12. Checklist
+
+- [ ] All user-facing strings use `t()` function
+- [ ] Using `useKubevirtTranslation` hook
+- [ ] Dynamic values use interpolation `{{variable}}`
+- [ ] No string concatenation for translated text
+- [ ] Console extensions use `%plugin__...%` format
+- [ ] Extension strings registered in `utils/i18n.ts`
+- [ ] `npm run i18n` run before commit
+- [ ] Translation file changes committed
