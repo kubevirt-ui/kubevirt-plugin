@@ -1,0 +1,25 @@
+.list-error-state-root {
+  .pf-v6-c-empty-state__content {
+    width: 100%;
+  }
+
+  .pf-v6-c-empty-state__header .pf-v6-c-empty-state__title {
+    padding: 40px 20px;
+
+    h4 {
+      margin-bottom: 20px;
+    }
+
+    img {
+      margin: 10px;
+    }
+  }
+
+  .pf-v6-c-alert {
+    text-align: left;
+  }
+
+  .error-text-body {
+    color: var(--pf-t--global--text--color--status--danger--default);
+  }
+}

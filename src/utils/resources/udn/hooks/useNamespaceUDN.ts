@@ -2,13 +2,12 @@ import { useMemo } from 'react';
 
 import { parseNADConfig } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
 import { NetworkAttachmentDefinitionModelGroupVersionKind } from '@kubevirt-utils/models';
-import { UserDefinedNetworkRole } from '@kubevirt-utils/resources/udn/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { NetworkAttachmentDefinitionKind } from '@overview/OverviewTab/inventory-card/utils/types';
 
-import { LAYER3_TOPOLOGY, PrimaryTopologies } from '../constants';
+import { NADRole, NADTopology, PrimaryTopologies } from '../../nad/constants';
 
 const useNamespaceUDN = (
   namespace: string,
@@ -31,10 +30,7 @@ const useNamespaceUDN = (
       nads?.find((nad) => {
         const config = parseNADConfig(nad);
 
-        return (
-          PrimaryTopologies.includes(config.topology) &&
-          config.role === UserDefinedNetworkRole.primary
-        );
+        return PrimaryTopologies.includes(config?.topology) && config?.role === NADRole.primary;
       }),
     [nads],
   );
@@ -43,7 +39,7 @@ const useNamespaceUDN = (
 
   const vmsNotSupported = useMemo(() => {
     const config = parseNADConfig(udnNAD);
-    return config.topology === LAYER3_TOPOLOGY;
+    return config?.topology === NADTopology.layer3;
   }, [udnNAD]);
 
   return [isNamespaceManagedByUDN, vmsNotSupported, udnNAD];

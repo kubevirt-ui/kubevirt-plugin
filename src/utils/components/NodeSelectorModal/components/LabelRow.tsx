@@ -11,9 +11,10 @@ type LabelRowProps = {
   label: IDLabel;
   onChange: (label: IDLabel) => void;
   onDelete: (id: any) => void;
+  withKeyValueTitle?: boolean;
 };
 
-const LabelRow: FC<LabelRowProps> = ({ label, onChange, onDelete }) => {
+const LabelRow: FC<LabelRowProps> = ({ label, onChange, onDelete, withKeyValueTitle = true }) => {
   const { t } = useKubevirtTranslation();
   const { id, key, value } = label;
 
@@ -27,39 +28,56 @@ const LabelRow: FC<LabelRowProps> = ({ label, onChange, onDelete }) => {
     return onChange({ ...label, key: text });
   };
 
+  const keyInput = (
+    <TextInput
+      aria-label={t('selector key')}
+      id={`label-${id}-key-input`}
+      isRequired
+      onChange={(_event, newKey) => onChange({ ...label, key: newKey })}
+      onPaste={handlePasteLabelKey}
+      placeholder={t('Key')}
+      type="text"
+      value={key}
+    />
+  );
+
+  const valueInput = (
+    <TextInput
+      aria-label={t('selector value')}
+      id={`label-${id}-value-input`}
+      isRequired
+      onChange={(_event, newValue) => onChange({ ...label, value: newValue })}
+      placeholder={t('Value')}
+      type="text"
+      value={value}
+    />
+  );
+
   return (
     <>
       <GridItem span={6}>
-        <FormGroup fieldId={`label-${id}-key-input`} label={t('Key')}>
-          <TextInput
-            aria-label={t('selector key')}
-            id={`label-${id}-key-input`}
-            isRequired
-            onChange={(_event, newKey) => onChange({ ...label, key: newKey })}
-            onPaste={handlePasteLabelKey}
-            placeholder={t('Key')}
-            type="text"
-            value={key}
-          />
-        </FormGroup>
+        {withKeyValueTitle ? (
+          <FormGroup fieldId={`label-${id}-key-input`} label={t('Key')}>
+            {keyInput}
+          </FormGroup>
+        ) : (
+          keyInput
+        )}
       </GridItem>
       <GridItem span={5}>
-        <FormGroup fieldId={`label-${id}-value-input`} label={t('Value')}>
-          <TextInput
-            aria-label={t('selector value')}
-            id={`label-${id}-value-input`}
-            isRequired
-            onChange={(_event, newValue) => onChange({ ...label, value: newValue })}
-            placeholder={t('Value')}
-            type="text"
-            value={value}
-          />
-        </FormGroup>
+        {withKeyValueTitle ? (
+          <FormGroup fieldId={`label-${id}-value-input`} label={t('Value')}>
+            {valueInput}
+          </FormGroup>
+        ) : (
+          valueInput
+        )}
       </GridItem>
       <PlainIconButton
         fieldId={`label-${id}-delete-btn`}
         icon={<MinusCircleIcon />}
         onClick={() => onDelete(id)}
+        withKeyValueTitle={withKeyValueTitle}
       />
     </>
   );

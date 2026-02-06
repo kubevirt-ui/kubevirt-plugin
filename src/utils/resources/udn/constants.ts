@@ -1,7 +1,15 @@
-export const LAYER2_TOPOLOGY = 'layer2';
-export const LAYER3_TOPOLOGY = 'layer3';
-export const LOCALNET_TOPOLOGY = 'localnet';
-export const UDN_LABEL = 'k8s.ovn.org/user-defined-network';
+export enum UDNTopology {
+  Layer2 = 'Layer2',
+  Layer3 = 'Layer3',
+  Localnet = 'Localnet',
+}
 
-export const PrimaryTopologies = [LAYER2_TOPOLOGY, LAYER3_TOPOLOGY];
-export const SecondaryTopologies = [LOCALNET_TOPOLOGY];
+export enum UDNRole {
+  Primary = 'Primary',
+  Secondary = 'Secondary',
+}
+
+export const IPAM_MODE_DISABLED = 'Disabled';
+export const VLAN_MODE_ACCESS = 'Access';
+
+export const UDN_LABEL = 'k8s.ovn.org/user-defined-network';
