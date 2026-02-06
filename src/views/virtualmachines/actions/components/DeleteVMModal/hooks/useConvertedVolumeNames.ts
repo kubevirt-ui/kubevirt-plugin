@@ -1,10 +1,13 @@
+import { useMemo } from 'react';
+
 import { CDIConfigModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1CDIConfig } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { V1Volume } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { getVolumes } from '@kubevirt-utils/resources/vm';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 type UseConvertedVolumeNames = (
-  vmVolumes: V1Volume[],
+  vm: V1VirtualMachine,
   cluster: string,
 ) => {
   dvVolumesNames: string[];
@@ -12,7 +15,8 @@ type UseConvertedVolumeNames = (
   pvcVolumesNames: string[];
 };
 
-const useConvertedVolumeNames: UseConvertedVolumeNames = (vmVolumes, cluster) => {
+const useConvertedVolumeNames: UseConvertedVolumeNames = (vm, cluster) => {
+  const vmVolumes = useMemo(() => getVolumes(vm) || [], [vm]);
   const [cdiConfig] = useK8sWatchData<V1beta1CDIConfig>({
     cluster,
     groupVersionKind: CDIConfigModelGroupVersionKind,
@@ -22,13 +26,19 @@ const useConvertedVolumeNames: UseConvertedVolumeNames = (vmVolumes, cluster) =>
 
   const isDataVolumeGarbageCollector = cdiConfig?.spec?.dataVolumeTTLSeconds !== -1;
 
-  const dvVolumesNames = (vmVolumes || [])
-    .filter((volume) => volume?.dataVolume)
-    ?.map((volume) => volume?.dataVolume?.name);
+  const dvVolumesNames = useMemo(
+    () =>
+      vmVolumes.filter((volume) => volume?.dataVolume)?.map((volume) => volume?.dataVolume?.name),
+    [vmVolumes],
+  );
 
-  const pvcVolumesNames = (vmVolumes || [])
-    .filter((volume) => volume?.persistentVolumeClaim)
-    ?.map((volume) => volume?.persistentVolumeClaim?.claimName);
+  const pvcVolumesNames = useMemo(
+    () =>
+      vmVolumes
+        .filter((volume) => volume?.persistentVolumeClaim)
+        ?.map((volume) => volume?.persistentVolumeClaim?.claimName),
+    [vmVolumes],
+  );
 
   return {
     dvVolumesNames,
