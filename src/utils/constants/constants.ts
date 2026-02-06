@@ -14,6 +14,7 @@ export const GLOBAL_NAD_NAMESPACES = [
 ];
 
 export const VENDOR_LABEL = 'instancetype.kubevirt.io/vendor';
+export const PROJECT_NAME_LABEL_KEY = 'kubernetes.io/metadata.name';
 
 export const ROOTDISK = 'rootdisk';
 export const CLOUDINITDISK = 'cloudinitdisk';
@@ -30,6 +31,8 @@ export const RUNSTRATEGY_RERUNONFAILURE = 'RerunOnFailure';
 
 export const NONE = 'none';
 export const SPACE_SYMBOL = ' ';
+
+export const MAX_MTU = 65536;
 
 export enum K8S_OPS {
   ADD = 'add',

@@ -14,10 +14,13 @@ import {
 import AccessDenied from '../AccessDenied/AccessDenied';
 import Loading from '../Loading/Loading';
 
+import ListSkeleton from './ListSkeleton';
+
 type StateHandlerProps = {
   error?: any;
   hasData: boolean;
   loaded: boolean;
+  showSkeletonLoading?: boolean;
   withBullseye?: boolean;
 };
 
@@ -26,6 +29,7 @@ const StateHandler: FC<StateHandlerProps> = ({
   error,
   hasData,
   loaded,
+  showSkeletonLoading = false,
   withBullseye = false,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -57,13 +61,15 @@ const StateHandler: FC<StateHandlerProps> = ({
     );
   }
 
+  const LoadingComponent = showSkeletonLoading ? ListSkeleton : Loading;
+
   if (!loaded && !hasData) {
     return withBullseye ? (
       <Bullseye>
-        <Loading />
+        <LoadingComponent />
       </Bullseye>
     ) : (
-      <Loading />
+      <LoadingComponent />
     );
   }
 

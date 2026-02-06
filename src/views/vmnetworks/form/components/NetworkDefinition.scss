@@ -1,0 +1,6 @@
+.network-definition {
+  // Override _base.scss incorrect style
+  .pf-v6-c-form-control input[type='number'] {
+    max-width: none !important;
+  }
+}

@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, SetStateAction, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { getSelectDataTestProps } from '@kubevirt-utils/utils/selectDataTest';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -8,16 +8,18 @@ type MultiSelectTypeaheadProps = {
   allResourceNames: string[];
   'data-test'?: string;
   emptyValuePlaceholder?: string;
+  hasCheckboxes?: boolean;
   initialInputValue?: string;
   selectedResourceNames: string[];
   selectPlaceholder?: string;
-  setSelectedResourceNames: Dispatch<SetStateAction<string[]>>;
+  setSelectedResourceNames: (selected: string[]) => void;
 };
 
 const MultiSelectTypeahead: FC<MultiSelectTypeaheadProps> = ({
   allResourceNames,
   'data-test': dataTest,
   emptyValuePlaceholder = '',
+  hasCheckboxes,
   initialInputValue,
   selectedResourceNames,
   selectPlaceholder,
@@ -27,10 +29,12 @@ const MultiSelectTypeahead: FC<MultiSelectTypeaheadProps> = ({
     () =>
       allResourceNames.map((resourceName) => ({
         content: resourceName,
+        hasCheckbox: hasCheckboxes,
+        isSelected: selectedResourceNames.includes(resourceName),
         selected: selectedResourceNames.includes(resourceName),
         value: resourceName,
       })),
-    [selectedResourceNames, allResourceNames],
+    [allResourceNames, selectedResourceNames, hasCheckboxes],
   );
 
   return (
