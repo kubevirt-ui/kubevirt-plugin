@@ -1,4 +1,4 @@
-import React, { FC, memo, useState } from 'react';
+import React, { FC, memo, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom-v5-compat';
 
 import { updateVMCPUMemory } from '@catalog/templatescatalog/utils/helpers';
@@ -12,6 +12,7 @@ import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CPUMemoryM
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
+import useIsIPv6SingleStackCluster from '@kubevirt-utils/hooks/useIsIPv6SingleStackCluster';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { WORKLOADS_LABELS } from '@kubevirt-utils/resources/template/utils/constants';
 import {
@@ -24,8 +25,16 @@ import {
   isDefaultVariantTemplate,
 } from '@kubevirt-utils/resources/template/utils/selectors';
 import { getCPU, getDisks } from '@kubevirt-utils/resources/vm';
+import { isPodNetwork } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
-import { Button, ButtonVariant, DescriptionList, ExpandableSection } from '@patternfly/react-core';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import {
+  Alert,
+  Button,
+  ButtonVariant,
+  DescriptionList,
+  ExpandableSection,
+} from '@patternfly/react-core';
 import { ExternalLinkSquareAltIcon } from '@patternfly/react-icons';
 
 import { useDrawerContext } from './hooks/useDrawerContext';
@@ -33,6 +42,8 @@ import TemplateExpandableDescription from './TemplateExpandableDescription';
 
 export const TemplateInfoSection: FC = memo(() => {
   const { t } = useKubevirtTranslation();
+  const cluster = useClusterParam();
+  const isIPv6SingleStack = useIsIPv6SingleStackCluster(cluster);
   const { createModal } = useModal();
   const { setVM, template, vm } = useDrawerContext();
   const { ns } = useParams<{ ns: string }>();
@@ -48,6 +59,7 @@ export const TemplateInfoSection: FC = memo(() => {
   const disks = getDisks(vm);
   const isDefaultTemplate = isDefaultVariantTemplate(template);
   const [isTemplateInfoExpanded, setIsTemplateInfoExpanded] = useState(true);
+  const hasPodNetwork = useMemo(() => networks.some((n) => isPodNetwork(n)), [networks]);
 
   return (
     <ExpandableSection
@@ -121,6 +133,16 @@ export const TemplateInfoSection: FC = memo(() => {
           }
           descriptionHeader={t('Network interfaces ({{networks}})', { networks: networks?.length })}
         />
+        {isIPv6SingleStack && hasPodNetwork && (
+          <Alert
+            isInline
+            title={t("Can't use Pod networking in IPv6 single-stack cluster")}
+            variant="warning"
+          >
+            {networks.length === 1 &&
+              t('Click Customize VirtualMachine to add a different network interface')}
+          </Alert>
+        )}
         <DescriptionItem
           descriptionData={<WizardOverviewDisksTable vm={vm} />}
           descriptionHeader={t('Disks ({{disks}})', { disks: disks?.length })}
