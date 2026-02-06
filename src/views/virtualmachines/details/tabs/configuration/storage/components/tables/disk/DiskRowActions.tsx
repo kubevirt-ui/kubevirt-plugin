@@ -6,13 +6,9 @@ import {
   V1Volume,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
-import {
-  isDeclarativeHotplugVolumesEnabled,
-  produceVMDisks,
-} from '@kubevirt-utils/components/DiskModal/utils/helpers';
+import { produceVMDisks } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
-import useKubevirtHyperconvergeConfiguration from '@kubevirt-utils/hooks/useKubevirtHyperconvergeConfiguration.ts';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { getDataVolumeTemplates, getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
@@ -55,7 +51,6 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const { featureGates } = useKubevirtHyperconvergeConfiguration();
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { name: diskName, source: diskSource } = obj || {};
@@ -65,10 +60,6 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
 
   const vmDisk = getDisks(vm)?.find((disk) => disk.name === diskName);
   const isCDROM = vmDisk ? isCDROMDisk(vmDisk) : false;
-  const isDeclarativeHotplugVolumesFeatureGateEnabled = useMemo(
-    () => isDeclarativeHotplugVolumesEnabled(featureGates),
-    [featureGates],
-  );
 
   const { isCDROMMountedState, volume } = useMemo(() => {
     const vols = isVMRunning && !isCDROM ? vmi?.spec?.volumes : getVolumes(vm);
@@ -89,8 +80,6 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
       volume: vol,
     };
   }, [vm, vmi, isVMRunning, diskName, isCDROM]);
-
-  const isCDROMOperationsEnabled = isCDROM && isDeclarativeHotplugVolumesFeatureGateEnabled;
 
   const editBtnText = t('Edit');
   const deleteBtnText = t('Detach');
@@ -200,7 +189,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
         <DropdownItem key="disk-edit" onClick={() => onModalOpen(createEditDiskModal)}>
           {editBtnText}
         </DropdownItem>
-        {isCDROMOperationsEnabled && (
+        {isCDROM && (
           <DropdownItem key="cdrom" onClick={() => onModalOpen(createCDROMModal)}>
             {isCDROMMountedState ? t('Eject') : t('Mount')}
           </DropdownItem>
