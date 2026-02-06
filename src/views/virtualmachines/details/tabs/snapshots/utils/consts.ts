@@ -22,7 +22,6 @@ export const iconMapper = {
 // https://kubevirt.io/user-guide/operations/snapshot_restore_api/#snapshot-a-virtualmachine
 export enum deadlineUnits {
   Hours = 'h',
-  Miliseconds = 'ms',
   Minutes = 'm',
   Seconds = 's',
 }
