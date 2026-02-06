@@ -11,7 +11,13 @@ import {
   OPENSHIFT_OS_IMAGES_NS,
 } from '@kubevirt-utils/constants/constants';
 import { ALL_NAMESPACES, ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
-import { FilterValue, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { getLabels } from '@kubevirt-utils/resources/shared';
+import {
+  FilterValue,
+  K8sResourceCommon,
+  MatchExpression,
+  Operator,
+} from '@openshift-console/dynamic-plugin-sdk';
 import { k8sBasePath } from '@openshift-console/dynamic-plugin-sdk/lib/utils/k8s/k8s';
 import { SortByDirection } from '@patternfly/react-table';
 
@@ -244,3 +250,31 @@ export const removeLinkLocalIPV6 = (ipAddress: IPAddress[]) =>
 
 export const getNoPermissionTooltipContent = (t: TFunction) =>
   t(`You don't have permission to perform this action`);
+
+export const verifyMatchExpressions = (
+  resource: K8sResourceCommon,
+  matchExpressions: MatchExpression[],
+): boolean =>
+  matchExpressions?.every((expr) => {
+    switch (expr.operator) {
+      case Operator.Exists:
+        return getLabels(resource)?.[expr.key] !== undefined;
+      case Operator.DoesNotExist:
+        return getLabels(resource)?.[expr.key] === undefined;
+      case Operator.GreaterThan:
+        return parseInt(getLabels(resource)?.[expr.key], 10) > parseInt(expr?.values[0], 10);
+      case Operator.LessThan:
+        return parseInt(getLabels(resource)?.[expr.key], 10) < parseInt(expr?.values[0], 10);
+      case Operator.Equals:
+        return getLabels(resource)?.[expr.key] === expr?.values[0];
+      case Operator.NotEquals:
+      case Operator.NotEqual:
+        return getLabels(resource)?.[expr.key] !== expr?.values[0];
+      case Operator.In:
+        return expr.values.includes(getLabels(resource)?.[expr.key]);
+      case Operator.NotIn:
+        return !expr.values.includes(getLabels(resource)?.[expr.key]);
+      default:
+        return false;
+    }
+  });

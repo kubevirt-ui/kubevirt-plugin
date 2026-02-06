@@ -173,3 +173,16 @@ export const NodeNetworkConfigurationEnactmentModel: K8sModel = {
   namespaced: false,
   plural: 'nodenetworkconfigurationenactments',
 };
+
+export const NodeNetworkStateModel: K8sModel = {
+  abbr: 'NNS',
+  apiGroup: 'nmstate.io',
+  apiVersion: 'v1beta1',
+  crd: true,
+  id: 'NodeNetworkState',
+  kind: 'NodeNetworkState',
+  label: 'NodeNetworkState',
+  labelPlural: 'NodeNetworkStates',
+  namespaced: false,
+  plural: 'nodenetworkstates',
+};

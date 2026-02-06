@@ -12,6 +12,7 @@ import { exposedModules as StorageMigrationExposedModules } from './src/views/st
 import { exposedModules as TopologyExposedModules } from './src/views/topology/extensions';
 import { exposedModules as VirtualMachineInstanceMigrationsExposedModules } from './src/views/virtualmachineinstancemigrations/extensions';
 import { exposedModules as VirtualMachinesExposedModules } from './src/views/virtualmachines/extensions';
+import { exposedModules as VMNetworksExposedModules } from './src/views/vmnetworks/extensions';
 
 const metadata: ConsolePluginBuildMetadata = {
   dependencies: {
@@ -31,6 +32,7 @@ const metadata: ConsolePluginBuildMetadata = {
     ...MulticlusterExposedModules,
     ...VirtualMachineInstanceMigrationsExposedModules,
     ...PhysicalNetworksExposedModules,
+    ...VMNetworksExposedModules,
     BootableVolumesList: './views/bootablevolumes/list/BootableVolumesList.tsx',
     Catalog: './views/catalog/Catalog.tsx',
     ClusterOverviewPage: './views/clusteroverview/ClusterOverviewPage.tsx',
