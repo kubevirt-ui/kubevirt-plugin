@@ -1,7 +1,6 @@
-import React, { FC, useCallback, useMemo, useState } from 'react';
+import React, { FC, useCallback, useState } from 'react';
 
 import { InstanceTypeVMStoreActions } from '@catalog/CreateFromInstanceTypes/state/utils/types';
-import { DEFAULT_PREFERENCE_LABEL } from '@catalog/CreateFromInstanceTypes/utils/constants';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
@@ -19,6 +18,7 @@ import VolumeDestination from './components/VolumeDestination/VolumeDestination'
 import ClusterSelect from './components/VolumeMetadata/components/ClusterSelect';
 import VolumeMetadata from './components/VolumeMetadata/VolumeMetadata';
 import VolumeSource from './components/VolumeSource/VolumeSource';
+import { useAddBootableVolumeFormValidation } from './hooks/useAddBootableVolumeFormValidation';
 import {
   AddBootableVolumeState,
   DROPDOWN_FORM_SELECTION,
@@ -57,8 +57,6 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
 
   const { upload, uploadData } = useCDIUpload(bootableVolume?.bootableVolumeCluster);
 
-  const { labels } = bootableVolume || {};
-
   const setBootableVolumeField: SetBootableVolumeFieldType = useCallback(
     (key, fieldKey) => (value) =>
       setBootableVolume((prevState) => ({
@@ -70,21 +68,10 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
     [],
   );
 
-  const isRegistryFormValid = useMemo(() => {
-    if (sourceType !== DROPDOWN_FORM_SELECTION.USE_REGISTRY) return true;
-
-    const { registryCredentials, registryURL } = bootableVolume;
-    const { password, username } = registryCredentials || {};
-
-    const credentialsValid = (username && password) || (!username && !password);
-
-    return !!(registryURL && credentialsValid);
-  }, [sourceType, bootableVolume]);
-
-  const isFormValid = useMemo(() => {
-    const hasRequiredPreference = !!labels?.[DEFAULT_PREFERENCE_LABEL];
-    return hasRequiredPreference && isRegistryFormValid;
-  }, [labels, isRegistryFormValid]);
+  const isFormValid = useAddBootableVolumeFormValidation({
+    bootableVolume,
+    sourceType,
+  });
 
   const deleteLabel = useCallback((labelKey: string) => {
     setBootableVolume((prev) => {
