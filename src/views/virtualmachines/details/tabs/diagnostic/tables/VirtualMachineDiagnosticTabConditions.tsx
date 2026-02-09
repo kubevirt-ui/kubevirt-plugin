@@ -138,7 +138,7 @@ const VirtualMachineDiagnosticTabConditions: FC<VirtualMachineDiagnosticTabCondi
             />
             {activeColumns?.map(({ cell: { sort }, title }, index) => {
               return (
-                <Th key={title} sort={sort(index)}>
+                <Th key={title} modifier="nowrap" sort={sort(index)}>
                   {title}
                 </Th>
               );
