@@ -6,7 +6,7 @@ import { isVM } from '@kubevirt-utils/utils/typeGuards';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import AIExperienceIcon from '@lightspeed/components/AIExperienceIcon';
 import useLightspeedActions from '@lightspeed/hooks/useLightspeedActions/useLightspeedActions';
-import { DEFAULT_MAX_EVENTS } from '@lightspeed/utils/constants';
+import { DEFAULT_MAX_EVENTS, RESOURCE_EVENTS_TIMEOUT_MS } from '@lightspeed/utils/constants';
 import { getOLSPrompt, OLSPromptType } from '@lightspeed/utils/prompts';
 import {
   asOLSEventsAttachment,
@@ -15,10 +15,12 @@ import {
 } from '@lightspeed/utils/utils';
 import { Button, ButtonVariant, Skeleton } from '@patternfly/react-core';
 
+import './LightspeedHelpButton.scss';
+
 type LightspeedHelpButtonProps = {
   isTroubleshootContext?: boolean;
   obj?: K8sResourceCommon;
-  onClick?: () => void;
+  onClick: () => void;
   promptType: OLSPromptType;
 };
 
@@ -29,15 +31,23 @@ const LightspeedHelpButton: FC<LightspeedHelpButtonProps> = ({
   promptType,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { openOLSDrawer, setAttachment, setQuery } = useLightspeedActions();
-  const { events, loaded } = useResourceEvents(obj, DEFAULT_MAX_EVENTS, false);
+  const { clearAttachments, clearContextEvents, openOLSDrawer, setAttachment, setQuery } =
+    useLightspeedActions();
+  const { events, loaded } = useResourceEvents(
+    obj,
+    DEFAULT_MAX_EVENTS,
+    false,
+    RESOURCE_EVENTS_TIMEOUT_MS,
+  );
 
   const eventsAttachment = events && !isEmpty(events) ? asOLSEventsAttachment(obj, events) : null;
   const yamlAttachment = obj ? asOLSYAMLAttachment(obj) : null;
   const prompt = getOLSPrompt(promptType, isVM(obj) && { vm: obj });
 
   const handleClick = async () => {
-    onClick();
+    onClick?.();
+    clearAttachments();
+    clearContextEvents();
     openOLSDrawer();
 
     setQuery(prompt);
@@ -49,7 +59,7 @@ const LightspeedHelpButton: FC<LightspeedHelpButtonProps> = ({
   };
 
   return !loaded ? (
-    <Skeleton />
+    <Skeleton className="lightspeed-help-button-skeleton" />
   ) : (
     <Button className="pf-v6-u-py-0" onClick={() => handleClick()} variant={ButtonVariant.link}>
       <AIExperienceIcon />

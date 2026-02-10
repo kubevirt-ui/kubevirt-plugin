@@ -2,7 +2,7 @@ import React, { cloneElement, FC, isValidElement, ReactElement, ReactNode } from
 
 import { SPACE_SYMBOL } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import LightspeedHelpButton from '@lightspeed/components/LightspeedHelpButton';
+import LightspeedHelpButton from '@lightspeed/components/LightspeedHelpButton/LightspeedHelpButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { Breadcrumb, BreadcrumbItem, Split, SplitItem } from '@patternfly/react-core';
