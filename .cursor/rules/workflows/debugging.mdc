@@ -110,7 +110,7 @@ Follow this systematic approach to identify and fix issues:
 - Component unmounted unexpectedly
 
 **Investigation Steps**
-- Add console.log to confirm component function is called
+- Suggest exact `console.log` statements and where to add them; the user (or agent, when editing the file) adds them and checks the browser console to confirm the component runs
 - Check conditional rendering logic
 - Look for React error boundary catches
 - Verify parent component renders
@@ -175,7 +175,7 @@ Follow this systematic approach to identify and fix issues:
 - Responsive breakpoint issues
 
 **Investigation Steps**
-- Inspect element in DevTools
+- Inspect element in DevTools (the agent can use the **Chrome DevTools MCP** to open and navigate the app: e.g. list_pages, navigate_page, take_snapshot—similar to Cypress flows)
 - Check applied vs expected classes
 - Look for overriding styles
 - Verify SCSS file is imported
@@ -274,6 +274,14 @@ Follow this systematic approach to identify and fix issues:
 - Check package.json for dependency
 - Match exact case in imports
 - Install @types package if needed
+
+---
+
+## 5a. Safety and Environment
+
+**Cluster and namespace**
+- Use dedicated dev/test namespaces (e.g. by username: `radek`, `jdoe`) when automating or testing so bot traffic does not clash with human testing.
+- Do **not** run destructive or high-traffic automation against production. Prefer dev/test clusters when using agents or MCP with `oc` or browser automation.
 
 ---
 

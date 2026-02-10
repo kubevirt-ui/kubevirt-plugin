@@ -16,7 +16,8 @@ When you ask for a code review or submit code for feedback, the AI will evaluate
 
 ### Quick vs Deep Reviews
 - **Quick Review** (default): High-level feedback from all perspectives
-- **Deep Review**: Say "as [role]" for thorough analysis from one perspective
+- **Deep Review**: Invoke a single agent for thorough analysis, e.g. *"review:dev"*, *"review:ux"*, *"review:qe"*, *"review:security"*, *"review:kubevirt"*
+- **Choose agents**: You can scope the team review, e.g. *"team-review:all"*, *"team-review:dev,qe"*, or *"review:dev"* for one perspective
 
 ---
 
@@ -235,3 +236,4 @@ For focused, thorough analysis from a single perspective, invoke a specific agen
 - [ ] Consider suggestions
 - [ ] Document decisions on declined nitpicks
 - [ ] Re-request review if major changes
+- [ ] **No merge without peer review approval**

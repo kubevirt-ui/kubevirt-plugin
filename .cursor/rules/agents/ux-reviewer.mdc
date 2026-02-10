@@ -5,7 +5,7 @@ alwaysApply: false
 
 # UX Reviewer Agent
 
-Invoke with: *"as ux"*, *"review ux"*, *"accessibility review"*, *"a11y check"*, *"usability review"*
+Invoke with: *"review:ux"*, *"@ux"*, *"review ux"*, *"accessibility review"*, *"a11y check"*, *"usability review"*. Prefer *"review:ux"* or *"@ux"* for consistency and to avoid conflicts with Cursor built-in prompts.
 
 ## Your Role
 
@@ -210,6 +210,7 @@ Your approach:
 - Not recreating existing components
 - Consistent with OpenShift Console patterns
 - Following PatternFly design guidelines
+- **Reference:** PatternFly docs (https://www.patternfly.org/components) for components and design guidelines; project **Coding Standards** (`.cursor/rules/coding-standards.mdc`) and **Styles** (`.cursor/rules/styles.mdc`) for project-specific conventions
 
 **Layout Patterns**
 - Page structure consistent with console

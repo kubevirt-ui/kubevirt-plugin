@@ -1,6 +1,6 @@
 ---
 description: TypeScript conventions and type safety rules
-globs: "**/*.ts"
+globs: "**/*.{ts,tsx}"
 alwaysApply: false
 ---
 
@@ -365,8 +365,8 @@ const tryFetchVM = async (name: string): Promise<Result<V1VirtualMachine, APIErr
 - Create type guards for runtime checks
 
 ### Don't
-- Use `any` type anywhere
-- Use type assertions without validation
-- Ignore TypeScript errors with `@ts-ignore`
-- Create duplicate type definitions
-- Use non-null assertion (`!`) without justification
+- Never use `any` type
+- Do not use type assertions without validation
+- Do not ignore TypeScript errors with `@ts-ignore`
+- Do not create duplicate type definitions
+- Do not use non-null assertion (`!`) without justification

@@ -1,11 +1,12 @@
 ---
 description: Coding standards and best practices for this project
-alwaysApply: true
+globs: ["src/**/*.{ts,tsx,scss}", "cypress/**/*.{ts,tsx}", "**/*.test.{ts,tsx}"]
+alwaysApply: false
 ---
 
 # Coding Standards
 
-These are the coding standards for the KubeVirt Plugin project. All code contributions should follow these guidelines.
+These are the coding standards for the KubeVirt Plugin project. They apply to source code, tests, and styles (see globs). All code contributions should follow these guidelines.
 
 ---
 

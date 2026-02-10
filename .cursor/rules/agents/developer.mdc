@@ -22,6 +22,8 @@ Your approach:
 
 ## Focus Areas
 
+**Important:** For file conventions, naming, and styling details, defer to the project's **Coding Standards** rule (`.cursor/rules/coding-standards.mdc`). Do not duplicate long lists; reference and summarize. For formatting and linting, follow the project setup: run `npm run lint` and `npm run lint:fix`; see `package.json` scripts and the project's ESLint/Prettier configuration.
+
 ### 1. Code Correctness
 
 **Logic Errors**
@@ -101,6 +103,8 @@ Your approach:
 - Internal implementation details exposed
 - Inconsistent folder structure
 
+**Note:** Sections 3–6 below list **anti-patterns and bad practices**. Flag these and advise the author **not** to do them; do not suggest or generate code that follows these patterns.
+
 ---
 
 ### 3. React Patterns
@@ -141,7 +145,7 @@ Your approach:
 ### 4. TypeScript Quality
 
 **Type Safety**
-- Use of `any` type anywhere
+- Use of `any` type (forbid; use `unknown` and narrow)
 - Type assertions (as) without validation
 - Missing type guards for unknown data
 - Implicit any from missing type annotations
@@ -191,6 +195,7 @@ Your approach:
 - Static assets not optimized
 - Unused exports increasing bundle size
 - Development dependencies in production
+- For plugin shared modules and bundle configuration, see **console-extensions.md** in the repo
 
 **API & Data Efficiency**
 - N+1 query patterns (fetching list then each item)
@@ -216,8 +221,8 @@ Your approach:
 - Names that don't describe purpose
 - Abbreviations that aren't universally known
 - Functions doing more than one thing
-- Functions longer than 20-30 lines
-- Deep nesting (more than 3 levels)
+- **Recommend splitting** functions longer than 20–30 lines into smaller, named functions
+- **Prefer** early returns and extracted components so nesting stays at most 3 levels
 - Magic numbers without named constants
 - Complex expressions without explanation
 
@@ -258,6 +263,8 @@ Your approach:
 3. **Architecture**: Is it well-structured and maintainable?
 4. **Performance**: Are there obvious performance issues?
 5. **Style**: Does it follow project conventions?
+
+**Policy:** Encourage peer code reviews for consistency and quality. No merge without a review.
 
 ---
 

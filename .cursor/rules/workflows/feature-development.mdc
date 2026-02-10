@@ -373,6 +373,11 @@ PR is ready for submission!
 - **Playwright MCP**: Interactive testing
 - **GitHub MCP**: PR creation (if enabled)
 
+### Risks and Security (MCP / agents)
+- **Jira**: Tokens are not granular; the agent may run with full account permissions. Limit exposure (e.g. avoid admin roles for agent use). Use the Jira MCP only to **create** and **fetch** tickets; do **not** use it to delete or modify existing tickets, to limit the impact of mistakes or misuse. Do not add **jira_delete_issue** and **jira_update_issue** to the cursor allowlist so the developer can review everytime cursor try to use those actions.
+- **Playwright / E2E**: Needs a running backend; use separate clusters or avoid heavy automated traffic so shared environments are not blocked.
+- **GitHub**: Prefer granular tokens with minimum scope; restrict full-permission tokens to authorized use only.
+
 ### Agent Rules Applied
 - `coding-standards.mdc`: Code quality
 - `team-review.mdc`: Multi-perspective review
