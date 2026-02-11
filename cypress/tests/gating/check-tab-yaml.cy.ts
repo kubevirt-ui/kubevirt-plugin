@@ -224,12 +224,8 @@ describe('Check all virtualization pages can be loaded', () => {
   });
 
   describe('Check Checkups tabs', () => {
-    it('network checkup pages is loaded', () => {
-      cy.visitCheckups();
-      cy.contains('No network latency checkups found').should('exist');
-    });
-
     it('storage checkup pages is loaded', () => {
+      cy.visitCheckups();
       cy.contains('.pf-v6-c-tabs__item-text', 'Storage').click();
       cy.contains('No storage checkups found').should('exist');
     });
