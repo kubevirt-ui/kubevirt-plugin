@@ -26,7 +26,6 @@ This project includes Cursor AI rules that provide consistent coding assistance 
 | ------------------ | ------------------------------------------------------ |
 | `project-context`  | KubeVirt architecture, key concepts, project structure |
 | `coding-standards` | Code style, TypeScript patterns, React conventions     |
-| `common-commands`  | Build, test, lint, and development commands            |
 | `team-review`      | Multi-perspective agent (Developer, UX, QE, Security)  |
 
 ### File-Specific Rules (Activate When Relevant Files Open)
@@ -51,14 +50,16 @@ This project includes Cursor AI rules that provide consistent coding assistance 
 
 ### Workflows
 
-| Workflow              | Invoke With                 | Purpose                                  |
-| --------------------- | --------------------------- | ---------------------------------------- |
-| `new-component`       | _"create component"_        | Component creation with proper structure |
-| `pr-preparation`      | _"prepare PR"_              | Pre-PR checklist and description         |
-| `debugging`           | _"help debug"_              | Systematic debugging approach            |
-| `jira-workflow`       | _"my tickets"_, _"CNV-XXX"_ | Jira ticket management                   |
-| `playwright-testing`  | _"test in browser"_         | Interactive UI testing                   |
-| `feature-development` | _"full workflow"_           | End-to-end: Jira → Code → PR             |
+| Workflow              | Invoke With                     | Purpose                                  |
+| --------------------- | ------------------------------- | ---------------------------------------- |
+| `common-commands`     | _"how do I build"_              | Build, test, lint, deploy commands       |
+| `new-component`       | _"create component"_            | Component creation with proper structure |
+| `pr-preparation`      | _"prepare PR"_                  | Pre-PR checklist and description         |
+| `debugging`           | _"help debug"_                  | Systematic debugging approach            |
+| `jira-workflow`       | _"my tickets"_, _"search jira"_ | Jira search, update, comment             |
+| `ticket-workflow`     | _"CNV-XXX"_, Jira URL           | Full agent tracking for ticket work      |
+| `playwright-testing`  | _"test in browser"_             | Interactive UI testing                   |
+| `feature-development` | _"full workflow"_               | End-to-end: Jira → Code → PR             |
 
 ---
 
@@ -175,7 +176,6 @@ All rule files are in `.cursor/rules/`. Click to view each one.
 | ---------------- | ---------------------------------------------------------- | --------------------------------------------- |
 | Project Context  | [project-context.mdc](.cursor/rules/project-context.mdc)   | Architecture, key concepts, project structure |
 | Coding Standards | [coding-standards.mdc](.cursor/rules/coding-standards.mdc) | TypeScript, React, SCSS conventions           |
-| Common Commands  | [common-commands.mdc](.cursor/rules/common-commands.mdc)   | npm scripts, build, test, deploy              |
 | Team Review      | [team-review.mdc](.cursor/rules/team-review.mdc)           | Multi-perspective code review agent           |
 
 ### File-Specific Rules
@@ -200,28 +200,25 @@ All rule files are in `.cursor/rules/`. Click to view each one.
 
 ### Workflows
 
-| Workflow            | File                                                                                 | Purpose                    |
-| ------------------- | ------------------------------------------------------------------------------------ | -------------------------- |
-| New Component       | [workflows/new-component.mdc](.cursor/rules/workflows/new-component.mdc)             | Creating React components  |
-| PR Preparation      | [workflows/pr-preparation.mdc](.cursor/rules/workflows/pr-preparation.mdc)           | Pre-merge checklist        |
-| Debugging           | [workflows/debugging.mdc](.cursor/rules/workflows/debugging.mdc)                     | Systematic troubleshooting |
-| Jira Workflow       | [workflows/jira-workflow.mdc](.cursor/rules/workflows/jira-workflow.mdc)             | Ticket management          |
-| Playwright Testing  | [workflows/playwright-testing.mdc](.cursor/rules/workflows/playwright-testing.mdc)   | Interactive UI testing     |
-| Feature Development | [workflows/feature-development.mdc](.cursor/rules/workflows/feature-development.mdc) | End-to-end development     |
+| Workflow            | File                                                                                 | Purpose                      |
+| ------------------- | ------------------------------------------------------------------------------------ | ---------------------------- |
+| Common Commands     | [common-commands.mdc](.cursor/rules/common-commands.mdc)                             | Build, test, lint, deploy    |
+| New Component       | [workflows/new-component.mdc](.cursor/rules/workflows/new-component.mdc)             | Creating React components    |
+| PR Preparation      | [workflows/pr-preparation.mdc](.cursor/rules/workflows/pr-preparation.mdc)           | Pre-merge checklist          |
+| Debugging           | [workflows/debugging.mdc](.cursor/rules/workflows/debugging.mdc)                     | Systematic troubleshooting   |
+| Jira Workflow       | [workflows/jira-workflow.mdc](.cursor/rules/workflows/jira-workflow.mdc)             | Jira search, update, comment |
+| Ticket Workflow     | [workflows/ticket-workflow.mdc](.cursor/rules/workflows/ticket-workflow.mdc)         | Agent tracking for tickets   |
+| Playwright Testing  | [workflows/playwright-testing.mdc](.cursor/rules/workflows/playwright-testing.mdc)   | Interactive UI testing       |
+| Feature Development | [workflows/feature-development.mdc](.cursor/rules/workflows/feature-development.mdc) | End-to-end development       |
 
 ### File Structure
 
 ```
 .cursor/rules/
-├── project-context.mdc
-├── coding-standards.mdc
-├── common-commands.mdc
-├── team-review.mdc
-├── react-components.mdc
-├── typescript.mdc
-├── testing.mdc
-├── styles.mdc
-├── i18n.mdc
+├── project-context.mdc          # Always active
+├── coding-standards.mdc         # Always active
+├── common-commands.mdc          # On-demand
+├── team-review.mdc              # Always active
 ├── agents/
 │   ├── developer.mdc
 │   ├── ux-reviewer.mdc
@@ -233,6 +230,7 @@ All rule files are in `.cursor/rules/`. Click to view each one.
     ├── pr-preparation.mdc
     ├── debugging.mdc
     ├── jira-workflow.mdc
+    ├── ticket-workflow.mdc
     ├── playwright-testing.mdc
     └── feature-development.mdc
 ```
@@ -271,8 +269,8 @@ All rule files are in `.cursor/rules/`. Click to view each one.
 
 ## Documentation
 
-| Document                                         | Purpose                        |
-| ------------------------------------------------ | ------------------------------ |
-| [GETTING_STARTED_AI.md](./GETTING_STARTED_AI.md) | Comprehensive onboarding guide |
-| [CODING_STANDARDS.md](./CODING_STANDARDS.md)     | Team coding standards          |
-| [README.md](./README.md)                         | Project setup and development  |
+| Document                                                   | Purpose                        |
+| ---------------------------------------------------------- | ------------------------------ |
+| [GETTING_STARTED_AI.md](./GETTING_STARTED_AI.md)           | Comprehensive onboarding guide |
+| [coding-standards.mdc](.cursor/rules/coding-standards.mdc) | Team coding standards          |
+| [README.md](./README.md)                                   | Project setup and development  |

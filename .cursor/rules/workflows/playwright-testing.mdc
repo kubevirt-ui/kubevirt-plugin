@@ -293,7 +293,8 @@ When clicking or interacting, describe elements clearly:
 
 ### Local Development
 ```
-http://localhost:9000                     # Console home
+http://localhost:9000                     # Console UI (npm run start-console)
+http://localhost:9001                     # Plugin dev server (npm run dev)
 http://localhost:9000/virtualization     # Virtualization overview
 http://localhost:9000/virtualization/vms # VM list
 http://localhost:9000/catalog            # VM catalog
@@ -301,6 +302,7 @@ http://localhost:9000/catalog            # VM catalog
 
 ### Adjust for Your Environment
 Replace `localhost:9000` with your actual console URL if using a remote cluster.
+The plugin dev server (port 9001) is consumed by the console -- navigate via port 9000.
 
 ---
 

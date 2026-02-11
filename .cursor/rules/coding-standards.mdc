@@ -10,6 +10,13 @@ These are the coding standards for the KubeVirt Plugin project. They apply to so
 
 ---
 
+## General Goals
+
+- Aim for **maintainable, scalable, and readable code** while maintaining consistency.
+- Encourage contributions and ideas for continuous improvement.
+
+---
+
 ## 1. File Conventions
 
 ### File Extensions
@@ -43,17 +50,10 @@ These are the coding standards for the KubeVirt Plugin project. They apply to so
 /components/my-component/
 ├── MyComponent.tsx           # Main component
 ├── my-component.scss         # Styles
-├── index.ts                  # Optional barrel export
 ├── components/               # Sub-components
-│   ├── Header.tsx
-│   └── Footer.tsx
 ├── hooks/                    # Component-specific hooks
-│   └── useMyComponentData.ts
 ├── utils/                    # Component-specific utilities
-│   ├── helpers.ts
-│   └── constants.ts
 └── types/                    # Component-specific types
-    └── types.ts
 ```
 
 ### Component Rules
@@ -62,6 +62,7 @@ These are the coding standards for the KubeVirt Plugin project. They apply to so
 - Filename must match component name
 - Use functional components exclusively
 - Class components only for error boundaries (`componentDidCatch`)
+- Default export for components, named exports for utils/hooks/types
 
 ---
 
@@ -97,10 +98,12 @@ These are the coding standards for the KubeVirt Plugin project. They apply to so
 - Use `useMemo` for expensive calculations
 - Use `useCallback` for callbacks passed to memoized children
 - Don't over-memoize simple operations
+- Lazy load components with `React.lazy` and `Suspense`
 
-### Exports
-- Default export for components
-- Named exports for utilities, hooks, types
+### Logic Separation
+- Extract logic from components into custom hooks or utility files
+- Much easier to unit test a hook or utility function than a component
+- Avoid bloated components by delegating logic to external modules
 
 ---
 
@@ -111,7 +114,7 @@ These are the coding standards for the KubeVirt Plugin project. They apply to so
 - Use `interface` only when extending is needed
 
 ### Type Safety
-- **Never use `any`** - use `unknown` and narrow with type guards
+- **Never use `any`** -- use `unknown` and narrow with type guards
 - Always define explicit return types on functions
 - Use optional chaining (`?.`) for nullable access
 - Provide fallback values with nullish coalescing (`??`)
@@ -121,21 +124,26 @@ These are the coding standards for the KubeVirt Plugin project. They apply to so
 - Constants: UPPER_SNAKE_CASE (`DEFAULT_NAMESPACE`, `MAX_RETRIES`)
 - Functions/variables: camelCase (`getVMStatus`, `vmList`)
 - Components: PascalCase (`VMDetailsPage`)
+- Use descriptive names over abbreviations
 
 ### Type Organization
 - Component-specific types: in component's `types/` folder
 - Shared types: in `src/utils/types/`
 - Use existing types from `@kubevirt-ui/kubevirt-api`
 
+### Avoid Magic Numbers
+- Define as named constants in `constants.ts`
+- Include units in name: `POLL_INTERVAL_MS`, `MAX_RETRIES`
+
 ---
 
 ## 5. Styling Guidelines
 
 ### SCSS Usage
+- Prefer SCSS for styling (nesting, variables, mixins)
 - One SCSS file per component
-- Filename matches component: `VMDetails.tsx` → `vm-details.scss`
-- Place in same directory as component
-- Import at top of component file
+- Filename matches component: `VMDetails.tsx` -> `vm-details.scss`
+- Extract into separate files, don't embed styles in components
 
 ### BEM Methodology
 - **Block**: Component name (`.vm-details`)
@@ -155,48 +163,31 @@ These are the coding standards for the KubeVirt Plugin project. They apply to so
 
 ---
 
-## 6. Error Handling
-
-### Principles
-- Never swallow errors silently
-- Always provide meaningful error messages
-- Log errors for debugging
-- Show user-friendly messages in UI
-- Provide recovery paths when possible
-
-### Async Operations
-- Wrap in try/catch
-- Handle loading, success, and error states
-- Clean up on component unmount
-
----
-
-## 7. Code Quality
+## 6. Code Quality
 
 ### Comments
 - Avoid comments when possible; write self-documenting code
 - Use comments for non-obvious decisions
 - Include links to issues for workarounds
-- Document public APIs
 
-### Naming
-- Use descriptive names over abbreviations
-- Function names should describe action: `fetchVMData`, `handleSubmit`
-- Boolean variables: `isLoading`, `hasError`, `canEdit`
+### Global/Store State
+- Keep global state minimal and straightforward
+- Obtain approval in PR to add new values to prevent bloating
+- Use Zustand for truly global state
 
-### Magic Numbers
-- Define as named constants
-- Place in `constants.ts` file
-- Include units in name: `POLL_INTERVAL_MS`, `MAX_RETRIES`
+### Avoid Circular Dependencies
+- Use index files cautiously
+- Check import chains between files
 
-### Code Duplication
-- Extract repeated code to utilities
-- Create custom hooks for repeated logic patterns
-- Use generics for type-safe reusable functions
+### Error Handling
+- Never swallow errors silently
+- Always provide meaningful error messages
+- Handle loading, success, and error states
+- Clean up on component unmount
 
 ---
 
-## 8. Testing
+## 7. Testing
 
 ### Requirements
 - New features must have tests
@@ -207,16 +198,16 @@ These are the coding standards for the KubeVirt Plugin project. They apply to so
 - Jest for unit tests
 - React Testing Library for component tests
 - Cypress for E2E tests
+- Use `data-test` attributes for selectors
 
 ---
 
-## 9. Version Control
+## 8. Code Reviews and Version Control
 
 ### Commits
 - Meaningful commit messages
-- Small, focused commits
+- Small, focused commits -- can be squashed on merge
 - Don't commit broken code
-- Can be squashed on merge
 
 ### Pull Requests
 - Small, dedicated PRs over large ones
@@ -224,14 +215,33 @@ These are the coding standards for the KubeVirt Plugin project. They apply to so
 - Self-review before requesting review
 - No merge without peer review
 
+### PR Template
+```markdown
+## Description
+
+> Add a brief description
+
+## Links
+
+> Add JIRA, Docs, and other PR/Issue links
+
+## CC://
+
+> @tag as needed
+
+## Demo
+
+> Please add a video or an image of the behavior/changes, preferably before and after
+```
+
 ---
 
-## 10. Linting & Formatting
+## 9. Linting & Formatting
 
 ### Tools
 - ESLint with React and TypeScript plugins
 - Prettier for formatting
-- Husky for pre-commit hooks
+- Husky for pre-commit hooks -- don't skip it
 - lint-staged for staged file checking
 
 ### Commands
@@ -240,7 +250,17 @@ npm run lint          # Check for issues
 npm run lint:fix      # Auto-fix issues
 ```
 
-### Rules
-- Don't skip pre-commit hooks
-- Fix linting errors before committing
-- Configure editor for format-on-save
+---
+
+## 10. AI-Specific Guidance
+
+### When Generating Code
+- Always check for existing similar components before creating new ones
+- Reuse hooks from `src/utils/hooks/` and components from `src/utils/components/`
+- Match the patterns of neighboring files in the same directory
+- Run `npm run check-types` after making changes
+
+### When Reviewing Code
+- Verify all user-facing strings use `useKubevirtTranslation`
+- Check that loading, error, and empty states are handled
+- Ensure no `console.log` or debug code is left in

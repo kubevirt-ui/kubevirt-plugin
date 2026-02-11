@@ -58,47 +58,7 @@ Follow this systematic approach to identify and fix issues:
 
 ---
 
-## 2. Browser DevTools Investigation
-
-### Console Tab
-- JavaScript errors (red)
-- React errors and warnings
-- Network errors
-- Custom console.log output
-- Stack traces for errors
-
-### Network Tab
-- HTTP status codes (4xx, 5xx errors)
-- Request/response payloads
-- Request headers (auth tokens)
-- Response times
-- WebSocket connections (K8s watches)
-- Failed requests
-
-### React DevTools
-- Component tree structure
-- Props passed to components
-- State values
-- Hooks state (useState, useEffect)
-- Component re-render highlighting
-- Profiler for performance
-
-### Elements Tab
-- Rendered HTML structure
-- Applied CSS styles
-- Computed styles
-- Class names applied
-- Event listeners attached
-
-### Application Tab
-- localStorage contents
-- sessionStorage contents
-- Cookies
-- Service workers
-
----
-
-## 3. Common Issue Categories
+## 2. Common Issue Categories
 
 ### Component Not Rendering
 
@@ -183,7 +143,7 @@ Follow this systematic approach to identify and fix issues:
 
 ---
 
-## 4. K8s/Console SDK Specific Issues
+## 3. K8s/Console SDK Specific Issues
 
 ### useK8sWatchResource Not Working
 
@@ -232,7 +192,7 @@ Follow this systematic approach to identify and fix issues:
 
 ---
 
-## 5. TypeScript/Build Issues
+## 4. TypeScript/Build Issues
 
 ### Type Errors
 
@@ -323,7 +283,7 @@ oc logs <pod>                 # Pod logs
 
 ---
 
-## 7. Debugging Strategies
+## 6. Debugging Strategies
 
 ### Binary Search
 - Comment out half the code
@@ -353,7 +313,7 @@ oc logs <pod>                 # Pod logs
 
 ---
 
-## 8. When to Ask for Help
+## 7. When to Ask for Help
 
 **After You've Tried**
 - Reproduced the issue consistently

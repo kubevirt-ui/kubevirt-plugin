@@ -420,8 +420,8 @@ The AI should automatically follow project standards. If not:
 
 ### Documentation
 
-- `AI_README.md` - Quick reference
-- `CODING_STANDARDS.md` - Team standards
+- `GETTING_STARTED_AI.md` - This guide
+- `.cursor/rules/coding-standards.mdc` - Team coding standards
 - `README.md` - Project setup
 
 ### Team

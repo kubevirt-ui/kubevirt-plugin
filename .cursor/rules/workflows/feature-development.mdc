@@ -158,7 +158,7 @@ I will:
 "Add tests for this component"
 ```
 
-Following `testing.mdc`:
+Following project test patterns:
 - Create test file
 - Test happy path
 - Test error states
@@ -381,11 +381,12 @@ PR is ready for submission!
 ### Agent Rules Applied
 - `coding-standards.mdc`: Code quality
 - `team-review.mdc`: Multi-perspective review
-- `testing.mdc`: Test patterns
+- `ticket-workflow.mdc`: Agent tracking for tickets
 - `pr-preparation.mdc`: PR checklist
 
 ### Workflows Referenced
 - `new-component.mdc`: Creating components
 - `debugging.mdc`: When issues arise
-- `jira-workflow.mdc`: Ticket management
+- `jira-workflow.mdc`: Jira search, update, and comment operations
+- `ticket-workflow.mdc`: Agent tracking for ticket implementation
 - `playwright-testing.mdc`: Interactive testing

@@ -215,51 +215,30 @@ Fixes: CNV-XXXXX
 - Use conventional format: `feat(scope): description`
 
 ### Template
+
+Use the PR template defined in `coding-standards.mdc` (Section 8). The canonical format is:
+
 ```markdown
 ## 📝 Description
 
-Brief description of what this PR does and why.
-
-### Changes
-- Added X component for Y functionality
-- Fixed Z issue with W
-- Updated Q to handle R
+> Add a brief description
 
 ## 🔗 Links
 
-- JIRA: [CNV-XXXXX](https://issues.redhat.com/browse/CNV-XXXXX)
-- Docs: [Link to docs if applicable]
-- Related PR: [Link if applicable]
+> Add JIRA, Docs, and other PR/Issue links
 
 ## 👥 CC://
 
-@reviewer1 @reviewer2 @domain-expert
-
-## 🧪 Testing
-
-### Manual Testing
-- [ ] Tested feature works correctly
-- [ ] Tested error scenarios
-- [ ] Tested on different screen sizes
-
-### Automated Testing
-- [ ] Unit tests pass
-- [ ] New tests added
+> @tag as needed
 
 ## 📹 Demo
 
-<!-- For UI changes, add screenshots or video -->
-
-### Before
-<!-- Screenshot/description of before state -->
-
-### After
-<!-- Screenshot/description of after state -->
-
-## ⚠️ Notes for Reviewers
-
-<!-- Any specific areas to focus on, known limitations, etc. -->
+> Please add a video or an image of the behavior/changes, preferably before and after
 ```
+
+When generating PR descriptions, also include:
+- **Testing section**: Manual and automated testing performed
+- **Notes for reviewers**: Areas to focus on, known limitations
 
 ---
 

@@ -107,9 +107,9 @@ Your approach:
 
 ---
 
-### 3. React Patterns
+### 3. React Anti-Patterns to Catch
 
-**Hooks Best Practices**
+**Hooks Mistakes**
 - useEffect with missing or incorrect dependencies
 - Dependencies that change on every render (objects, arrays, functions)
 - Multiple useEffects that should be combined or separated
@@ -118,7 +118,7 @@ Your approach:
 - Missing cleanup functions for subscriptions
 - useEffect used when useMemo or event handler is appropriate
 
-**Memoization**
+**Memoization Issues**
 - Missing React.memo on components that receive stable props but parent re-renders
 - useMemo not used for expensive calculations
 - useCallback not used for functions passed to memoized children
@@ -126,7 +126,7 @@ Your approach:
 - Memoization broken by unstable dependencies
 - Missing key prop causing full re-renders
 
-**State Management**
+**State Management Issues**
 - useState for data that should be derived
 - Complex state that should use useReducer
 - Local state that should be lifted up
@@ -134,7 +134,7 @@ Your approach:
 - State not reset when it should be
 - Stale state from closures
 
-**Conditional Rendering**
+**Conditional Rendering Issues**
 - Short-circuit evaluation that renders falsy values (0, "")
 - Deeply nested ternaries that are hard to read
 - Missing loading and error states
@@ -164,15 +164,15 @@ Your approach:
 - Types defined inline that should be exported
 - Duplicate type definitions across files
 - Not using existing types from kubevirt-api
-- Overly complex generic types
-- Missing discriminated unions for state
-- Interface vs type inconsistency
+- Overly complex generic types -- prefer simple, readable types. If a generic requires more than 2 type parameters, consider splitting it
+- Missing discriminated unions for state -- when a value has multiple shapes depending on a field (e.g., `{ type: 'loading' }` vs `{ type: 'error', message: string }`), use a discriminated union so TypeScript can narrow correctly
+- Always use `type` over `interface` for object shapes (project convention). Use `interface` only when you need `extends` for inheritance
 
 **Type Correctness**
 - Types that don't match runtime behavior
 - Partial types used where full types expected
-- Wrong nullability (undefined vs null vs optional)
-- Enum vs union type choices
+- Wrong nullability: prefer `undefined` and optional (`?`) over `null`. Use `null` only when K8s API explicitly returns it. Never mix `null | undefined` on the same field
+- Enums: this project uses **string enums** for closed sets of values (e.g., status labels, filter types, action types). Prefer `enum` over union types for values that are iterated over or used as object keys. Prefer union types (`type Foo = 'a' | 'b'`) only for simple inline cases
 - Type widening issues
 
 ---
@@ -189,13 +189,11 @@ Your approach:
 - Missing Suspense boundaries
 
 **Bundle Size**
-- Importing entire libraries instead of specific modules
+- The following packages are provided by the console host at runtime via Module Federation and do **not** affect the plugin's bundle size: `react`, `react-i18next`, `react-redux`, `react-router`, `react-router-dom`, `react-router-dom-v5-compat`, `redux`, `redux-thunk`, `@patternfly/react-topology`, `@openshift-console/dynamic-plugin-sdk`, `@openshift-console/dynamic-plugin-sdk-internal`. Focus bundle size concerns on everything else. See the full list in `node_modules/@openshift-console/dynamic-plugin-sdk-webpack/lib/shared-modules/shared-modules-meta.js`
+- For `lodash` (which is CommonJS and does not tree-shake), prefer deep imports (`import debounce from 'lodash/debounce'`) over full imports (`import { debounce } from 'lodash'`). ESM packages like PatternFly tree-shake fine with Webpack 5, so named imports are okay there
 - Large dependencies that could be lighter alternatives
 - Missing code splitting for routes
-- Static assets not optimized
 - Unused exports increasing bundle size
-- Development dependencies in production
-- For plugin shared modules and bundle configuration, see **console-extensions.md** in the repo
 
 **API & Data Efficiency**
 - N+1 query patterns (fetching list then each item)

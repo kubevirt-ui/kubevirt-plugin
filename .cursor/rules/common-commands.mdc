@@ -1,9 +1,11 @@
 ---
 description: Common development commands for this project
-alwaysApply: true
+alwaysApply: false
 ---
 
 # Common Commands
+
+Invoke with: *"how do I build"*, *"run tests"*, *"deploy"*, *"docker"*, *"what commands"*, *"npm scripts"*
 
 Reference for all development, build, test, and utility commands.
 
@@ -13,18 +15,9 @@ Reference for all development, build, test, and utility commands.
 
 ### Start Development Environment
 ```bash
-# Install dependencies (first time or after package.json changes)
-npm install
-
-# Start development server (runs on port 9001)
-npm run dev
-
-# Start OpenShift Console container (requires oc login first)
-npm run start-console
-
-# Full development setup
-npm install && npm run dev
-# Then in another terminal: npm run start-console
+npm install              # Install dependencies
+npm run dev              # Start dev server (port 9001)
+npm run start-console    # Start console container (port 9000, requires oc login)
 ```
 
 ### Console Variants
@@ -45,42 +38,23 @@ npm run start-console-with-nmstate       # With nmstate plugin
 
 ## 2. Building
 
-### Production Build
 ```bash
-# Full production build
-npm run build
-
-# Clean build artifacts
-npm run clean
+npm run build            # Production build
+npm run clean            # Clean build artifacts (dist/)
 ```
-
-### Build Outputs
-- Output directory: `dist/`
-- Plugin manifest: `dist/plugin-manifest.json`
-- Assets served from: `/api/plugins/kubevirt-plugin/`
 
 ---
 
 ## 3. Code Quality
 
-### Type Checking
 ```bash
-# Run TypeScript compiler check
-npm run check-types
+npm run check-types      # TypeScript compiler check
+npm run lint             # ESLint + Prettier check
+npm run lint:fix         # Auto-fix linting errors
 ```
 
-### Linting
+### Combined Quality Check (recommended before commit)
 ```bash
-# Check for linting errors
-npm run lint
-
-# Auto-fix linting errors
-npm run lint:fix
-```
-
-### Combined Quality Check
-```bash
-# Run all checks (recommended before commit)
 npm run check-types && npm run lint && npm test
 ```
 
@@ -90,106 +64,53 @@ npm run check-types && npm run lint && npm test
 
 ### Unit Tests (Jest)
 ```bash
-# Run all unit tests
-npm test
-
-# Run tests with coverage report
-npm run test-cov
-
-# Run specific test file
-npm test path/to/file.test.ts
-
-# Run tests in watch mode
-npm test -- --watch
-
-# Run tests matching pattern
-npm test -- --testNamePattern="VM"
+npm test                             # Run all unit tests
+npm run test-cov                     # With coverage report
+npm test path/to/file.test.ts        # Run specific test file
+npm test -- --watch                  # Watch mode
+npm test -- --testNamePattern="VM"   # Run tests matching pattern
 ```
 
 ### E2E Tests (Cypress)
 ```bash
-# Open Cypress interactive UI
-npm run test-cypress
-
-# Run Cypress headless (for CI)
-npm run test-cypress-headless
-
-# Run in Docker with VNC
-npm run test-cypress-docker
+npm run test-cypress            # Open Cypress interactive UI
+npm run test-cypress-headless   # Run headless (CI)
+npm run test-cypress-docker     # Run in Docker with VNC
 ```
 
 ### Cypress Reports
 ```bash
-# Merge Cypress reports
-npm run cypress-merge
-
-# Generate HTML report
-npm run cypress-generate
-
-# Full report pipeline
-npm run cypress-postreport
+npm run cypress-merge        # Merge reports
+npm run cypress-generate     # Generate HTML report
+npm run cypress-postreport   # Full report pipeline
 ```
 
 ---
 
 ## 5. Internationalization (i18n)
 
-### Update Translations
 ```bash
-# Extract strings and update translation files
-npm run i18n
-
-# Verbose output
-npm run i18n:verbose
-```
-
-### Translation Utilities
-```bash
-# Create dummy locale for testing
-npm run i18n-dummy-locale
-
-# Convert i18n to PO format
-npm run i18n-to-po
-
-# Convert PO to i18n format
-npm run po-to-i18n
-
-# Export PO files
-npm run export-pos
-```
-
-### Memsource Integration
-```bash
-# Upload to Memsource
-npm run memsource-upload
-
-# Download from Memsource
-npm run memsource-download
+npm run i18n                 # Extract strings and update translations
+npm run i18n:verbose         # Verbose output
+npm run i18n-dummy-locale    # Create dummy locale for testing
+npm run i18n-to-po           # Convert i18n to PO format
+npm run po-to-i18n           # Convert PO to i18n format
+npm run export-pos           # Export PO files
+npm run memsource-upload     # Upload to Memsource
+npm run memsource-download   # Download from Memsource
 ```
 
 ---
 
 ## 6. Docker
 
-### Build Image
 ```bash
-# Build Docker image
+# Build image
 docker build -t quay.io/kubevirt-ui/kubevirt-plugin:latest .
 
-# Build with specific tag
-docker build -t quay.io/kubevirt-ui/kubevirt-plugin:v1.0.0 .
-```
-
-### Run Container
-```bash
 # Run plugin container
 docker run -it --rm -d -p 9001:80 quay.io/kubevirt-ui/kubevirt-plugin:latest
 
-# Access at http://localhost:9001
-```
-
-### Push Image
-```bash
 # Push to registry
 docker push quay.io/kubevirt-ui/kubevirt-plugin:latest
 ```
@@ -198,29 +119,20 @@ docker push quay.io/kubevirt-ui/kubevirt-plugin:latest
 
 ## 7. Cluster Deployment
 
-### Deploy Plugin
 ```bash
-# Process and apply manifest
+# Deploy plugin
 oc process -f oc-manifest.yaml \
   -p PLUGIN_NAME=kubevirt-plugin \
   -p NAMESPACE=kubevirt-ui \
   -p IMAGE=quay.io/kubevirt-ui/kubevirt-plugin:latest \
   | oc create -f -
-```
 
-### Enable Plugin
-```bash
-# Patch console operator to enable plugin
+# Enable plugin in console
 oc patch consoles.operator.openshift.io cluster \
   --patch '{ "spec": { "plugins": ["kubevirt-plugin"] } }' --type=merge
-```
 
-### Verify Deployment
-```bash
-# Check plugin pods
+# Verify
 oc get pods -n kubevirt-ui
-
-# Check console plugins
 oc get consoleplugins
 ```
 
@@ -228,40 +140,14 @@ oc get consoleplugins
 
 ## 8. Cluster Verification
 
-### Check Cluster Access
 ```bash
-# Verify logged in
-oc whoami
-
-# Check current project
-oc project
-
-# Check cluster info
-oc cluster-info
-```
-
-### Check Permissions
-```bash
-# Check if you can list VMs
-oc auth can-i list virtualmachines
-
-# Check if you can create VMs
-oc auth can-i create virtualmachines
-```
-
-### Resource Queries
-```bash
-# List VMs in namespace
-oc get vm -n <namespace>
-
-# Get VM details
-oc get vm <name> -n <namespace> -o yaml
-
-# List VMIs
-oc get vmi -n <namespace>
-
-# Check DataVolumes
-oc get dv -n <namespace>
+oc whoami                                  # Verify logged in
+oc project                                 # Check current project
+oc auth can-i list virtualmachines         # Check permissions
+oc get vm -n <namespace>                   # List VMs
+oc get vm <name> -n <namespace> -o yaml    # Get VM details
+oc get vmi -n <namespace>                  # List VMIs
+oc get dv -n <namespace>                   # Check DataVolumes
 ```
 
 ---
@@ -270,8 +156,8 @@ oc get dv -n <namespace>
 
 ### Daily Development
 ```bash
-npm run dev                              # Start dev server
-npm run start-console                    # Start console
+npm run dev                              # Start dev server (port 9001)
+npm run start-console                    # Start console (port 9000)
 npm run check-types && npm run lint      # Quick quality check
 ```
 
@@ -281,18 +167,8 @@ npm run check-types && npm run lint && npm test
 npm run i18n                             # If strings changed
 ```
 
-### Before PR
-```bash
-npm run check-types && npm run lint && npm test
-npm run i18n
-# Self-review changes
-# Add screenshots/video for UI changes
-```
-
 ### Troubleshooting
 ```bash
 npm run clean && npm install             # Clean reinstall
 rm -rf node_modules && npm install       # Full reinstall
-npm run check-types                      # Check for type errors
-npm run lint                             # Check for lint errors
 ```

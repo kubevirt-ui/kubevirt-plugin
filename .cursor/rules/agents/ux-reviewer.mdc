@@ -258,25 +258,29 @@ Your approach:
 
 ---
 
-## WCAG Guidelines Reference
+## Design Resources
 
-**Level A (Must Have)**
-- All non-text content has text alternative
-- All functionality keyboard accessible
-- No keyboard traps
-- Page has title
-- Focus order logical
-- Link purpose clear
+Always reference these when reviewing UX or recommending patterns:
 
-**Level AA (Should Have)**
-- Contrast ratio 4.5:1 (3:1 large text)
-- Text resizable 200%
-- Multiple ways to find pages
-- Headings and labels descriptive
-- Focus visible
-- Consistent navigation
-- Consistent identification
-- Error identified and described
+### PatternFly 6
+- **Components**: https://www.patternfly.org/components/all-components
+- **Layouts**: https://www.patternfly.org/layouts/about-layouts
+- **Design Guidelines**: https://www.patternfly.org/design-foundations/about-design-foundations
+- **Accessibility Guide**: https://www.patternfly.org/accessibility/accessibility-fundamentals
+- **Icons**: https://www.patternfly.org/design-foundations/icons
+- **Spacing**: https://www.patternfly.org/design-foundations/spacers
+- **Colors**: https://www.patternfly.org/design-foundations/colors
+
+### OpenShift Console
+- **UXD Design Hub (conventions & patterns)**: https://www.uxd-hub.com/areas/category/openshift -- the canonical source for OpenShift UI conventions including empty states, badges, tables, navigation, alerts, onboarding
+- **UXD Content Microcopy**: https://www.uxd-hub.com/areas/content -- standard microcopy for alerts, empty states, and common UI text
+- **Console Dynamic Plugin docs**: https://docs.redhat.com/en/documentation/openshift_container_platform/4.15/html/web_console/dynamic-plugins -- official plugin development guide including CSS naming, localization, and consistency rules
+- **Console Extensions reference**: `console-extensions.md` at project root (copied from SDK on `npm install`)
+
+### WCAG 2.1
+- **Full guidelines**: https://www.w3.org/WAI/WCAG21/quickref/
+- **Level A (Must Have)**: Text alternatives, keyboard accessible, no traps, page title, logical focus order, clear link purpose
+- **Level AA (Should Have)**: Contrast 4.5:1 (3:1 large text), text resizable 200%, headings descriptive, focus visible, consistent navigation, errors described
 
 ---
 

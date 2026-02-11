@@ -23,42 +23,24 @@ Your approach:
 
 ## Focus Areas
 
-### 1. KubeVirt Core Concepts
+### 1. KubeVirt Core Resources
 
 **VirtualMachine (VM)**
-- The declarative desired state definition
-- Persists across stops/starts
+- Declarative desired state definition, persists across stops/starts
 - Contains spec.template for VMI template
 - spec.running controls desired run state
 - spec.runStrategy for advanced run policies (Always, Halted, Manual, RerunOnFailure)
 
 **VirtualMachineInstance (VMI)**
-- The actual running VM instance
-- Created/deleted by virt-controller based on VM spec
+- Actual running VM instance, created/deleted by virt-controller
 - Contains runtime information (IP, node, phase)
 - Direct VMI creation bypasses VM lifecycle management
+- VM is like Deployment, VMI is like Pod
 
-**VM vs VMI Relationship**
-- VM is like a Deployment, VMI is like a Pod
-- VM.status reflects aggregate state
-- VMI.status contains runtime details
-- Check both for complete picture
-- VMI may not exist if VM is stopped
-
-**DataVolume & Storage**
-- DataVolume provisions PVCs via CDI
-- Handles cloning, importing, uploading
-- Check DataVolume.status.phase for completion
-- DataVolume creates and manages underlying PVC
-- Boot order and disk attachment configuration
-- DataSources (catalog sources for bootable volumes)
-
-**Templates**
-- Predefined VM configurations
-- Common templates vs custom templates
-- Template parameters and defaults
-- Template validation rules
-- Instance types and preferences
+**VirtualMachineInstanceMigration (VMIM)**
+- Represents a live migration of a running VMI between nodes
+- Created to initiate migration, tracked for progress
+- Check status and conditions for migration state
 
 **Networks**
 - Multus, NADs (NetworkAttachmentDefinition)
@@ -68,7 +50,138 @@ Your approach:
 
 ---
 
-### 2. Kubernetes Fundamentals
+### 2. Storage Resources
+
+**DataVolume**
+- Provisions PVCs via CDI (Containerized Data Importer)
+- Handles cloning, importing, uploading
+- Check DataVolume.status.phase for completion
+- Creates and manages underlying PVC
+
+**DataSource**
+- References a bootable disk image (PVC or VolumeSnapshot)
+- Labeled with `instancetype.kubevirt.io/default-preference` to appear in bootable volumes list
+- Can be managed by DataImportCron for automated updates
+- The bootable volumes UI queries DataSources, NOT DataVolumes
+
+**DataImportCron**
+- Periodic import from external registries
+- Manages a DataSource, creates DataVolumes on schedule
+- Handles garbage collection of old imports (`garbageCollect: Outdated`)
+- Has `spec.managedDataSource` linking to its DataSource
+- Owned by DataSource via ownerReferences
+
+**Bootable Volumes** (UI concept, not a CRD)
+- DataSources with label `instancetype.kubevirt.io/default-preference`
+- Must also have `instancetype.kubevirt.io/default-instancetype` label
+- Used in VM catalog for quick VM creation
+- See `src/views/bootablevolumes/` and `src/utils/resources/bootableresources/`
+
+**StorageProfile**
+- CDI resource providing storage class capabilities
+- Contains access modes, volume modes, clone strategies
+- Used to auto-populate storage settings when selecting a StorageClass
+
+**VolumeSnapshot**
+- Kubernetes snapshot of a PV
+- Used as a source for DataSources
+- Displayed in VM diagnostic information
+
+**CDIConfig**
+- CDI operator configuration
+- Provides upload proxy URL, DataVolume TTL settings
+- Feature flags for CDI functionality
+- Used for disk image upload workflow
+
+**UploadTokenRequest**
+- CDI resource for requesting upload tokens
+- Used in disk image upload workflow via CDI
+
+---
+
+### 3. Instance Types & Preferences
+
+**VirtualMachineClusterInstancetype / VirtualMachineInstancetype**
+- Defines compute resources (CPU, memory, GPU)
+- Cluster-scoped or namespaced variants
+- Referenced in VM specs via `spec.instancetype.name`
+- Used to standardize VM sizes (u1.small, u1.medium, u1.large)
+
+**VirtualMachineClusterPreference / VirtualMachinePreference**
+- Defines OS-specific settings (devices, features, firmware)
+- Cluster-scoped or namespaced variants
+- Referenced in VM specs via `spec.preference.name`
+- Controls boot device order, machine type, network interface model
+
+---
+
+### 4. Migration & Scheduling
+
+**MigrationPolicy**
+- Cluster-scoped, controls live migration behavior
+- Settings: bandwidth, auto-converge, post-copy, timeouts
+- Selected via label selectors matching VM labels
+- Displayed during VM migrations in progress popover
+
+**VirtualMachineStorageMigrationPlan / MultiNamespaceVirtualMachineStorageMigrationPlan**
+- Plans for migrating VM storage between StorageClasses
+- Single-namespace and multi-namespace variants
+
+**VirtualMachineStorageMigration / MultiNamespaceVirtualMachineStorageMigration**
+- Executes storage migration plans
+- Tracks progress of moving VM disks between StorageClasses
+
+---
+
+### 5. Snapshots & Backup
+
+**VirtualMachineSnapshot**
+- Captures VM state and disk snapshots
+- Online vs offline snapshots
+- Storage snapshot class requirements
+- Check snapshot status and conditions
+
+**VirtualMachineRestore**
+- Restores VM from a snapshot
+- Creates restore resources referencing snapshots
+- Check restore status for completion
+
+---
+
+### 6. Networking
+
+**NetworkAttachmentDefinition (NAD)**
+- Multus CRD for secondary network interfaces
+- Used in VM network configuration
+- Referenced in VM spec.template.spec.networks
+
+**NodeNetworkConfigurationPolicy (NNCP)**
+- nmstate resource for cluster-wide network config
+- Manages physical network interfaces, bridges, bonds
+- Used for VM networking infrastructure
+
+**NodeNetworkConfigurationEnactment (NNCE)**
+- Represents NNCP application on a specific node
+- Tracks policy enforcement status per node
+
+---
+
+### 7. Cluster Management
+
+**HyperConverged (HCO)**
+- Operator resource managing KubeVirt cluster configuration
+- Feature flags and cluster settings
+- Health monitoring and status
+- See `src/utils/hooks/useHyperConvergeConfiguration.ts`
+
+**Templates** (OpenShift)
+- Predefined VM configurations for popular OS types
+- Custom templates for organization standards
+- Define defaults, validations, parameters
+
+---
+
+### 8. Kubernetes Fundamentals
 
 **Resource Model**
 - Group, Version, Kind (GVK) identification
@@ -78,194 +191,101 @@ Your approach:
 - ResourceVersion for optimistic concurrency
 
 **Labels & Selectors**
-- Standard label conventions (app, component, version)
-- KubeVirt-specific labels (vm.kubevirt.io/*)
-- Label selectors for filtering and grouping
-- Annotation conventions for metadata
+- KubeVirt labels: `vm.kubevirt.io/*`, `kubevirt.io/*`
+- Instance type labels: `instancetype.kubevirt.io/default-instancetype`, `instancetype.kubevirt.io/default-preference`
+- DataSource cron label: `cdi.kubevirt.io/dataImportCron`
+- Use label selectors for filtering watches
 
 **Ownership & References**
 - OwnerReferences for garbage collection
-- Controller references
-- Cross-namespace references (limited)
+- DataImportCron owned by DataSource
+- DataVolume creates and owns PVC
 - Finalizers for cleanup operations
 
 **RBAC & Permissions**
 - Verbs: get, list, watch, create, update, patch, delete
 - Resource-level vs subresource permissions
 - Namespace-scoped vs cluster-scoped RBAC
-- Service account permissions
+- Check with: `oc auth can-i <verb> <resource>`
 
 ---
 
-### 3. Console SDK Integration
+### 9. Console SDK Integration
 
 **useK8sWatchResource Hook**
 - Proper GVK configuration
 - isList for collections vs single resource
 - Namespace scoping (namespaced: true + namespace prop)
+- Label selectors for filtering
 - Handling loaded and error states
-- Cluster-scoped resources (namespaced: false)
 
 **Watch Behavior**
-- Watches are WebSocket-based real-time updates
+- WebSocket-based real-time updates
 - Initial list + incremental updates
-- Reconnection handling built-in
 - Memory implications of large watches
-- Filtering with label/field selectors
+- Reconnection handling built-in
 
 **k8s Operations**
 - k8sCreate, k8sUpdate, k8sPatch, k8sDelete
 - Proper model references
 - Optimistic vs pessimistic updates
-- Handling conflicts (409 errors)
-- Dry-run validation
-
-**Console Extensions**
-- Navigation items and routes
-- Action providers and menu items
-- Status providers and badges
-- Dashboard cards and tabs
-- See **console-extensions.md** in the repo for plugin-specific extension types and shared-module configuration
+- Dry-run validation (`queryParams: { dryRun: 'All' }`)
+- Handling 409 conflicts
 
 ---
 
-### 4. VM Lifecycle Operations
+### 10. VM Lifecycle Operations
 
 **Power Operations**
-- Start: Sets spec.running=true or uses start virtctl
-- Stop: Sets spec.running=false (graceful) or stop virtctl
-- Restart: Stop + Start sequence, not atomic
+- Start: Sets spec.running=true
+- Stop: Sets spec.running=false (graceful)
+- Restart: Stop + Start sequence
 - Pause/Unpause: Freezes VMI without stopping
 - Force stop: Immediate termination, potential data loss
+
+**Status & Conditions**
+- PrintableStatus: Starting, Running, Stopping, Stopped, Paused, Migrating
+- Conditions: Ready, Paused, AgentConnected
+- VMI Phases: Pending, Scheduling, Scheduled, Running, Succeeded, Failed
+- Running != Ready (guest agent may not be installed)
 
 **Migration**
 - Live migration moves running VM between nodes
 - Requires shared storage and compatible nodes
-- Migration policies control behavior
-- Check migration status and conditions
-- Network and storage requirements
-
-**Snapshots & Restore**
-- VirtualMachineSnapshot captures VM state
-- VirtualMachineRestore creates VM from snapshot
-- Online vs offline snapshots
-- Storage snapshot class requirements
-- Snapshot content and status
-
-**Updates & Changes**
-- Some changes require VM restart
-- Live-updatable vs restart-required fields
-- Template changes vs instance changes
-- Rolling updates for VM pools
+- MigrationPolicy controls behavior
+- VMIM resource tracks migration state
 
 ---
 
-### 5. Status & Conditions
-
-**VM PrintableStatus**
-- User-friendly display status
-- Values: Starting, Running, Stopping, Stopped, Paused, Migrating, etc.
-- Derived from conditions and VMI state
-- May not reflect real-time state immediately
-
-**Conditions Pattern**
-- Type, Status, Reason, Message, LastTransitionTime
-- Multiple conditions can be true simultaneously
-- Common conditions: Ready, Paused, AgentConnected
-- Check conditions for detailed state
-
-**VMI Phases**
-- Pending: VMI accepted, not yet scheduled
-- Scheduling: Finding suitable node
-- Scheduled: Node assigned
-- Running: VM is executing
-- Succeeded/Failed: Terminated states
-
-**Ready vs Running**
-- Running means VM is executing
-- Ready means guest agent reports healthy
-- Guest agent may not be installed
-- Network/disk may not be ready even if running
-
----
-
-### 6. API & Types
-
-**KubeVirt API Types**
-- V1VirtualMachine - VM resource
-- V1VirtualMachineInstance - VMI resource
-- V1VirtualMachineInstanceMigration - Migration resource
-- V1VirtualMachineSnapshot - Snapshot resource
-- V1VirtualMachineRestore - Restore resource
-- V1DataVolume - Storage provisioning
-
-**Console API Types**
-- Import GVKs from @kubevirt-ui/kubevirt-api/console
-- VirtualMachineModelGroupVersionKind
-- VirtualMachineInstanceModelGroupVersionKind
-- DataVolumeModelGroupVersionKind
-
-**Type Sources**
-- @kubevirt-ui/kubevirt-api/kubevirt - KubeVirt types
-- @kubevirt-ui/kubevirt-api/console - Console integration
-- @openshift-console/dynamic-plugin-sdk - SDK types
-
----
-
-### 7. Common Patterns & Pitfalls
+### 11. Common Patterns & Pitfalls
 
 **Resource Fetching**
 - Always handle loading and error states
-- Check if resource exists before accessing properties
 - Use optional chaining for nested status fields
 - Consider empty/not-found states
+- Check if resource exists before accessing properties
 
 **State Synchronization**
 - K8s state is eventually consistent
 - Watch updates may be delayed
 - Optimistic UI updates with rollback on failure
-- Refresh after mutations if not watching
 
 **Namespace Handling**
 - Always pass namespace for namespaced resources
-- Active namespace from URL/context
 - All-namespaces queries for cluster views
 - RBAC varies by namespace
 
+**DataSource vs DataVolume Confusion**
+- Bootable volumes list queries DataSources, not DataVolumes
+- DataSources reference PVCs; DataVolumes provision PVCs
+- When creating bootable volumes, create DataSource (+ DataImportCron for registry sources)
+- Labels on the DataSource determine visibility in the bootable volumes list
+
 **Error Handling**
-- 404: Resource not found or no permission to view
+- 404: Resource not found or no permission
 - 403: Permission denied
 - 409: Conflict (resource modified)
 - 422: Validation error
-- 500: Server error
-
-**Performance Considerations**
-- Large VM lists need pagination
-- Avoid watching unnecessary resources
-- Use label selectors to filter watches
-- Consider polling for rarely-changed data
-
----
-
-### 8. OpenShift Integration
-
-**OpenShift Specifics**
-- Projects = Namespaces with extra metadata
-- Route objects for external access
-- OAuth and authentication integration
-- Monitoring and alerting integration
-
-**Console Integration**
-- Dynamic plugin architecture
-- Shared navigation and routing
-- Common UI components from PatternFly
-- Extension points for customization
-
-**Operator Patterns**
-- HyperConverged operator manages KubeVirt
-- Operator conditions and status
-- Feature gates and configuration
-- Version compatibility
 
 ---
 
@@ -276,7 +296,9 @@ Your approach:
 - [ ] Loading and error states managed
 - [ ] Status fields accessed safely (optional chaining)
 - [ ] VM vs VMI distinction correct
+- [ ] DataSource vs DataVolume distinction correct
 - [ ] Lifecycle operations follow patterns
+- [ ] Labels and selectors correct
 - [ ] RBAC implications considered
 - [ ] Error responses handled appropriately
 
