@@ -6,7 +6,7 @@ import RedHatLabel from '@kubevirt-utils/components/RedHatLabel/RedHatLabel';
 import { VENDOR_LABEL } from '@kubevirt-utils/constants/constants';
 import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { readableSizeUnit } from '@kubevirt-utils/utils/units';
+import { getHumanizedSize } from '@kubevirt-utils/utils/units';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 import { FleetResourceLink } from '@stolostron/multicluster-sdk';
@@ -38,7 +38,8 @@ const UserInstancetypeRow: FC<RowProps<V1beta1VirtualMachineClusterInstancetype>
       {it?.spec?.cpu?.guest}
     </TableData>
     <TableData activeColumnIDs={activeColumnIDs} id="memory">
-      {readableSizeUnit(it?.spec?.memory?.guest)}
+      {/* issues with  multicluster sdk where the guest is a number, not a string */}
+      {getHumanizedSize(it?.spec?.memory?.guest?.toString())?.string}
     </TableData>
     <TableData activeColumnIDs={activeColumnIDs} id="vendor">
       {getLabel(it, VENDOR_LABEL, NO_DATA_DASH)}
