@@ -40,6 +40,18 @@ export const DNSConfigModel: K8sModel = {
   plural: 'dnses',
 };
 
+export const NetworkConfigModel: K8sModel = {
+  abbr: 'NC',
+  apiGroup: 'config.openshift.io',
+  apiVersion: 'v1',
+  crd: false,
+  kind: 'Network',
+  label: 'Network',
+  labelPlural: 'Networks',
+  namespaced: false,
+  plural: 'networks',
+};
+
 export const OperatorGroupModel: K8sModel = {
   abbr: 'OG',
   apiGroup: 'operators.coreos.com',

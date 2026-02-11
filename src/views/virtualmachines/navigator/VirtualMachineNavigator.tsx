@@ -3,6 +3,7 @@ import { useLocation, useParams } from 'react-router-dom-v5-compat';
 
 import CreateResourceDefaultPage from '@kubevirt-utils/components/CreateResourceDefaultPage/CreateResourceDefaultPage';
 import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
+import useIsIPv6SingleStackCluster from '@kubevirt-utils/hooks/useIsIPv6SingleStackCluster';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
 import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
@@ -23,6 +24,7 @@ const VirtualMachineNavigator: FC = () => {
   const location = useLocation();
 
   const { cluster, ns: namespace } = useParams<{ cluster?: string; ns: string }>();
+  const isIPv6SingleStack = useIsIPv6SingleStackCluster(cluster);
 
   const isVirtualMachineListPage = useMemo(
     () =>
@@ -42,7 +44,7 @@ const VirtualMachineNavigator: FC = () => {
       location.pathname.endsWith(`${VirtualMachineModelRef}/~new`) ? (
         <CreateResourceDefaultPage
           header={t('Create VirtualMachine')}
-          initialResource={defaultVMYamlTemplate()}
+          initialResource={defaultVMYamlTemplate(isIPv6SingleStack)}
         />
       ) : (
         <>

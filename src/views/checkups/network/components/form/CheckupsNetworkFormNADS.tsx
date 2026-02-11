@@ -34,7 +34,7 @@ const CheckupsNetworkFormNADS: FC<CheckupsNetworkFormNADSProps> = ({
         toggleProps={{
           className: 'placeholder',
           isFullWidth: true,
-          placeholder: t('Select NetwrokAttachmentDefinition'),
+          placeholder: t('Select NetworkAttachmentDefinition'),
         }}
         onSelect={(_: MouseEvent, value: string) => setSelectedNAD(value)}
         selected={selectedNAD}

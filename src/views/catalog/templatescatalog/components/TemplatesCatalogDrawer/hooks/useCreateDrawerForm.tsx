@@ -35,6 +35,7 @@ import {
 import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
+import useIsIPv6SingleStackCluster from '@kubevirt-utils/hooks/useIsIPv6SingleStackCluster';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
 import {
@@ -52,11 +53,12 @@ import {
   LABEL_USED_TEMPLATE_NAMESPACE,
 } from '@kubevirt-utils/resources/template';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
-import { getInterfaces, getMemoryCPU } from '@kubevirt-utils/resources/vm';
+import { getInterfaces, getMemoryCPU, getNetworks } from '@kubevirt-utils/resources/vm';
 import {
   DEFAULT_NETWORK_INTERFACE,
   UDN_BINDING_NAME,
 } from '@kubevirt-utils/resources/vm/utils/constants';
+import { isPodNetwork } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { getArchitecture } from '@kubevirt-utils/utils/architecture';
 import {
   HEADLESS_SERVICE_LABEL,
@@ -90,6 +92,7 @@ const useCreateDrawerForm = (
   const { featureEnabled: isDisabledGuestSystemLogs } = useFeatures(
     DISABLED_GUEST_SYSTEM_LOGS_ACCESS,
   );
+  const isIPv6SingleStack = useIsIPv6SingleStackCluster(cluster);
 
   const navigate = useNavigate();
   const {
@@ -202,6 +205,7 @@ const useCreateDrawerForm = (
           cluster,
           enableMultiArchBootImageImport,
           isDisabledGuestSystemLogs,
+          isIPv6SingleStack,
           isUDNManagedNamespace,
           name: nameField,
           namespace,
@@ -295,6 +299,16 @@ const useCreateDrawerForm = (
         if (isUDNManagedNamespace && defaultInterface) {
           delete defaultInterface.masquerade;
           defaultInterface.binding = { name: UDN_BINDING_NAME };
+        }
+
+        if (isIPv6SingleStack) {
+          vmDraft.spec.template.spec.domain.devices.interfaces = getInterfaces(vmDraft)?.filter(
+            (iface) => iface.name !== DEFAULT_NETWORK_INTERFACE.name,
+          );
+          vmDraft.spec.template.spec.networks = getNetworks(vmDraft)?.filter(
+            (network) => !isPodNetwork(network),
+          );
+          vmDraft.spec.template.spec.domain.devices.autoattachPodInterface = false;
         }
 
         const templateArchitecture = getArchitecture(processedTemplate);

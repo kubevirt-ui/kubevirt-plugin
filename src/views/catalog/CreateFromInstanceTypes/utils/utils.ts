@@ -102,16 +102,19 @@ export const createPopulatedCloudInitYAML = (
 
   return convertUserDataObjectToYAML(cloudInitConfig, true);
 };
+
 type GenerateVMArgs = {
   autoUpdateEnabled?: boolean;
   cluster?: string;
   enableMultiArchBootImageImport?: boolean;
   instanceTypeState: InstanceTypeVMState;
+  isIPv6SingleStack?: boolean;
   isUDNManagedNamespace: boolean;
   startVM: boolean;
   subscriptionData: RHELAutomaticSubscriptionData;
   targetNamespace: string;
 };
+
 type GenerateVMCallback = (props: GenerateVMArgs) => V1VirtualMachine;
 
 export const generateVM: GenerateVMCallback = ({
@@ -119,6 +122,7 @@ export const generateVM: GenerateVMCallback = ({
   cluster,
   enableMultiArchBootImageImport,
   instanceTypeState,
+  isIPv6SingleStack,
   isUDNManagedNamespace,
   startVM,
   subscriptionData,
@@ -220,10 +224,10 @@ export const generateVM: GenerateVMCallback = ({
             devices: {
               autoattachPodInterface: false,
               disks: [],
-              interfaces: [defaultInterface],
+              interfaces: isIPv6SingleStack ? [] : [defaultInterface],
             },
           },
-          networks: [DEFAULT_NETWORK],
+          networks: isIPv6SingleStack ? [] : [DEFAULT_NETWORK],
           subdomain: HEADLESS_SERVICE_NAME,
           volumes: [
             {

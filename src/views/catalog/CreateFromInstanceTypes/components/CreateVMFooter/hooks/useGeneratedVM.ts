@@ -9,6 +9,7 @@ import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
+import useIsIPv6SingleStackCluster from '@kubevirt-utils/hooks/useIsIPv6SingleStackCluster';
 import useRHELAutomaticSubscription from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/useRHELAutomaticSubscription';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
 import { addWinDriverVolume } from '@kubevirt-utils/resources/vm/utils/disk/drivers';
@@ -28,9 +29,11 @@ const useGeneratedVM = () => {
 
   const namespace = useActiveNamespace();
   const [isUDNManagedNamespace] = useNamespaceUDN(getValidNamespace(namespace));
+  const isIPv6SingleStack = useIsIPv6SingleStackCluster(cluster);
   const [hyperConverge] = useHyperConvergeConfiguration();
   const enableMultiArchBootImageImport =
     hyperConverge?.spec?.featureGates?.enableMultiArchBootImageImport;
+
   const generatedVM = useMemo(
     () =>
       generateVM({
@@ -38,6 +41,7 @@ const useGeneratedVM = () => {
         cluster,
         enableMultiArchBootImageImport,
         instanceTypeState: instanceTypeVMState,
+        isIPv6SingleStack,
         isUDNManagedNamespace,
         startVM,
         subscriptionData,
@@ -48,6 +52,7 @@ const useGeneratedVM = () => {
       cluster,
       enableMultiArchBootImageImport,
       instanceTypeVMState,
+      isIPv6SingleStack,
       isUDNManagedNamespace,
       startVM,
       subscriptionData,
