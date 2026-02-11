@@ -7,9 +7,6 @@ import { CheckupType } from '../../utils/types';
 import { getSelectProjectText } from '../../utils/utils';
 
 export const getTitleText = (checkupType: CheckupType, t: TFunction) => {
-  if (checkupType === CHECKUP_URLS.NETWORK) {
-    return t('No network latency checkups found');
-  }
   if (checkupType === CHECKUP_URLS.STORAGE) {
     return t('No storage checkups found');
   }
@@ -19,9 +16,6 @@ export const getTitleText = (checkupType: CheckupType, t: TFunction) => {
 };
 
 const getRunCheckupText = (checkupType: CheckupType, t: TFunction) => {
-  if (checkupType === CHECKUP_URLS.NETWORK) {
-    return t('To get started, run a network latency checkup');
-  }
   if (checkupType === CHECKUP_URLS.STORAGE) {
     return t('To get started, run a storage checkup');
   }
@@ -45,17 +39,11 @@ export const getBodyText = (
   return getRunCheckupText(checkupType, t);
 };
 
-export const getDocumentationURL = (checkupType: CheckupType) => {
-  if (checkupType === CHECKUP_URLS.NETWORK) {
-    return documentationURL.CHECKUPS_LATENCY;
-  }
+export const getDocumentationURL = () => {
   return documentationURL.CHECKUPS;
 };
 
 export const getLearnMoreText = (checkupType: CheckupType, t: TFunction) => {
-  if (checkupType === CHECKUP_URLS.NETWORK) {
-    return t('Learn more about network latency checkups');
-  }
   if (checkupType === CHECKUP_URLS.STORAGE) {
     return t('Learn more about storage checkups');
   }

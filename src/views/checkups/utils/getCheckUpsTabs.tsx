@@ -1,6 +1,5 @@
 import { TFunction } from 'react-i18next';
 
-import CheckupsNetworkList from '../network/list/CheckupsNetworkList';
 import CheckupsSelfValidationList from '../self-validation/list/CheckupsSelfValidationList';
 import CheckupsStorageList from '../storage/list/CheckupsStorageList';
 
@@ -8,11 +7,6 @@ import { CHECKUP_URLS } from './constants';
 import { TabConfig } from './types';
 
 export const getCheckUpTabs = (t: TFunction): TabConfig[] => [
-  {
-    component: CheckupsNetworkList,
-    href: CHECKUP_URLS.NETWORK,
-    name: t('Network latency'),
-  },
   {
     component: CheckupsStorageList,
     href: CHECKUP_URLS.STORAGE,

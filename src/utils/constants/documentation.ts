@@ -18,7 +18,6 @@ export const documentationURL = {
   AUTOCOMPUTE_CPU_LIMITS: `${KV_UG_URL}/user-guide/virtual_machines/resources_requests_and_limits/`,
   CDI_UPLOAD_SUPPORTED_TYPES: `${REDHAT_DOC_URL}/html/virtualization/storage#virt-cdi-supported-operations-matrix_virt-preparing-cdi-scratch-space`,
   CHECKUPS: `${REDHAT_DOC_URL}/html/virtualization/monitoring#virt-running-cluster-checkups`,
-  CHECKUPS_LATENCY: `${REDHAT_DOC_URL}/html/virtualization/monitoring#virt-measuring-latency-vm-secondary-network_virt-running-cluster-checkups`,
   CLOUDINIT_INFO: 'https://cloudinit.readthedocs.io/en/latest/index.html',
   CREATING_VMS_FROM_TEMPLATES: `${REDHAT_DOC_URL}/html/virtualization/creating-a-virtual-machine#virt-creating-vms-from-templates`,
   CRON_INFO: `${REDHAT_BASE_URL}/sysadmin/automate-linux-tasks-cron`,

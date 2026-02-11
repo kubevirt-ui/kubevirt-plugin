@@ -214,9 +214,6 @@ export const extractConfigMapName = (
  * @returns The checkup type ('network' | 'storage' | 'self-validation') or null if not found
  */
 export const getCurrentCheckupType = (pathname: string): CheckupType | null => {
-  if (pathname.includes(`/${CHECKUP_URLS.NETWORK}`)) {
-    return CHECKUP_URLS.NETWORK;
-  }
   if (pathname.includes(`/${CHECKUP_URLS.STORAGE}`)) {
     return CHECKUP_URLS.STORAGE;
   }

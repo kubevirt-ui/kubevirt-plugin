@@ -4,17 +4,13 @@ import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  getNetworkCheckupURL,
-  getStorageCheckupURL,
-} from '@kubevirt-utils/resources/checkups/urls';
+import { getStorageCheckupURL } from '@kubevirt-utils/resources/checkups/urls';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { Button, ButtonVariant, Tooltip } from '@patternfly/react-core';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 import { createURL } from '@virtualmachines/details/tabs/overview/utils/utils';
 
-import useCheckupsNetworkPermissions from './network/hooks/useCheckupsNetworkPermissions';
 import SelfValidationCheckupRunButton from './self-validation/components/SelfValidationCheckupRunButton';
 import { useCheckupsStoragePermissions } from './storage/components/hooks/useCheckupsStoragePermissions';
 import { CHECKUP_URLS } from './utils/constants';
@@ -29,7 +25,6 @@ const CheckupsRunButton: FC = () => {
   const [hubClusterName] = useHubClusterName();
   const { t } = useKubevirtTranslation();
 
-  const { isPermitted: isCreateNetworkPermitted } = useCheckupsNetworkPermissions();
   const { isPermitted: isCreateStoragePermitted } = useCheckupsStoragePermissions();
 
   const currentCheckupType = useMemo(
@@ -45,8 +40,6 @@ const CheckupsRunButton: FC = () => {
     }
 
     switch (currentCheckupType) {
-      case CHECKUP_URLS.NETWORK:
-        return !isCreateNetworkPermitted;
       case CHECKUP_URLS.STORAGE:
         return !isCreateStoragePermitted;
       case CHECKUP_URLS.SELF_VALIDATION:
@@ -55,20 +48,13 @@ const CheckupsRunButton: FC = () => {
       default:
         return true;
     }
-  }, [namespace, currentCheckupType, isCreateNetworkPermitted, isCreateStoragePermitted]);
+  }, [namespace, currentCheckupType, isCreateStoragePermitted]);
 
   const handleRunCheckup = () => {
     if (isDisabled || !currentCheckupType) return;
 
     const basePath = trimLastHistoryPath(location.pathname);
     switch (currentCheckupType) {
-      case CHECKUP_URLS.NETWORK:
-        navigate(
-          isACMpage
-            ? getNetworkCheckupURL('form', namespace, cluster || hubClusterName)
-            : createURL(`${CHECKUP_URLS.NETWORK}/form`, basePath),
-        );
-        break;
       case CHECKUP_URLS.STORAGE:
         navigate(
           isACMpage

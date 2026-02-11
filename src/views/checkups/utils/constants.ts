@@ -1,5 +1,4 @@
 export const CHECKUP_URLS = {
-  NETWORK: 'network',
   SELF_VALIDATION: 'self-validation',
   STORAGE: 'storage',
 } as const;
