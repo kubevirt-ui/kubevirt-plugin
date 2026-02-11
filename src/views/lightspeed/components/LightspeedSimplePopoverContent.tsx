@@ -1,6 +1,6 @@
 import React, { FC, ReactNode } from 'react';
 
-import LightspeedHelpButton from '@lightspeed/components/LightspeedHelpButton';
+import LightspeedHelpButton from '@lightspeed/components/LightspeedHelpButton/LightspeedHelpButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 
 type LightspeedSimplePopoverContentProps = {

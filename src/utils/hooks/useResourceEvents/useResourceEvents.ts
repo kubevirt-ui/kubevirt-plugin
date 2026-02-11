@@ -17,6 +17,7 @@ type UseResourceEvents = (
   obj: K8sResourceCommon,
   maxEvents?: number,
   keepSocketOpen?: boolean,
+  timeout?: number,
 ) => {
   error: Error;
   events: EventKind[];
@@ -27,6 +28,7 @@ const useResourceEvents: UseResourceEvents = (
   obj,
   maxEvents = EVENTS_MAX_MESSAGES,
   keepSocketOpen = true,
+  timeout,
 ) => {
   const { t } = useKubevirtTranslation();
   const [sortedEvents, setSortedEvents] = useState<EventKind[]>([]);
@@ -35,6 +37,7 @@ const useResourceEvents: UseResourceEvents = (
 
   const namespace = getNamespace(obj);
   const ws = useRef(null);
+  const timeoutId = useRef<null | ReturnType<typeof setTimeout>>(null);
   const fieldSelector = getFieldSelector(obj);
 
   // Handle websocket setup and teardown when dependent props change
@@ -66,6 +69,12 @@ const useResourceEvents: UseResourceEvents = (
 
     ws.current = new WSFactory(webSocketID, webSocketOptions)
       .onbulkmessage((messages: EventMessage[]) => {
+        // Clear timeout since events arrived
+        if (timeoutId.current) {
+          clearTimeout(timeoutId.current);
+          timeoutId.current = null;
+        }
+
         // Make one update to state per batch of events.
         setSortedEvents((currentSortedEvents): EventKind[] => {
           const topEvents = currentSortedEvents.slice(0, maxEvents - 1);
@@ -99,8 +108,26 @@ const useResourceEvents: UseResourceEvents = (
       .onopen(() => {
         setError(null);
         setLoaded(false);
+
+        if (timeoutId.current) {
+          clearTimeout(timeoutId.current);
+          timeoutId.current = null;
+        }
+
+        if (timeout) {
+          timeoutId.current = setTimeout(() => {
+            setLoaded(true);
+            ws.current?.destroy();
+            timeoutId.current = null;
+          }, timeout);
+        }
       })
       .onclose((event) => {
+        if (timeoutId.current) {
+          clearTimeout(timeoutId.current);
+          timeoutId.current = null;
+        }
+
         if (event?.wasClean === false) {
           const errorMessage = t('Connection did not close cleanly.');
           setError(new Error(event.reason || errorMessage));
@@ -109,6 +136,11 @@ const useResourceEvents: UseResourceEvents = (
         setLoaded(true);
       })
       .onerror(() => {
+        if (timeoutId.current) {
+          clearTimeout(timeoutId.current);
+          timeoutId.current = null;
+        }
+
         const errorMessage = t('An error occurred.');
         setError(new Error(errorMessage));
         kubevirtConsole.error(errorMessage);
@@ -118,9 +150,13 @@ const useResourceEvents: UseResourceEvents = (
       });
 
     return () => {
+      if (timeoutId.current) {
+        clearTimeout(timeoutId.current);
+        timeoutId.current = null;
+      }
       ws.current?.destroy();
     };
-  }, [namespace, fieldSelector, t, maxEvents, keepSocketOpen]);
+  }, [namespace, fieldSelector, t, maxEvents, keepSocketOpen, timeout]);
 
   return { error, events: sortedEvents, loaded };
 };

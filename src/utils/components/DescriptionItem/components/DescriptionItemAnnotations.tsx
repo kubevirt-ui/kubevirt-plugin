@@ -6,7 +6,7 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotations } from '@kubevirt-utils/resources/shared';
-import LightspeedHelpButton from '@lightspeed/components/LightspeedHelpButton';
+import LightspeedHelpButton from '@lightspeed/components/LightspeedHelpButton/LightspeedHelpButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { K8sModel, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 

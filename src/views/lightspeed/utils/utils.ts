@@ -14,8 +14,22 @@ export const clickOLSPromptSubmitButton = () => {
   return new Promise((resolve) => {
     const existingButton = getPromptSubmitButton();
     if (existingButton) {
-      existingButton.click();
-      resolve(existingButton);
+      // When button already exists wait for React to finish re-rendering
+      // with updated Redux state before clicking. Using double requestAnimationFrame ensures
+      // we wait for React's commit phase to complete.
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          // Re-check button existence in case drawer was closed
+          const button = getPromptSubmitButton();
+          if (button) {
+            button.click();
+            resolve(button);
+          } else {
+            // Button was removed (drawer closed). Resolve silently
+            resolve(null);
+          }
+        });
+      });
       return;
     }
 

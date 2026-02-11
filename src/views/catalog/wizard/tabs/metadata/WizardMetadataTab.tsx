@@ -9,7 +9,7 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
-import LightspeedHelpButton from '@lightspeed/components/LightspeedHelpButton';
+import LightspeedHelpButton from '@lightspeed/components/LightspeedHelpButton/LightspeedHelpButton';
 import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { getCluster } from '@multicluster/helpers/selectors';
