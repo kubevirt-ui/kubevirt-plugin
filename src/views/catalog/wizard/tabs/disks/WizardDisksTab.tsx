@@ -36,8 +36,8 @@ const WizardDisksTab: WizardTab = ({ tabsData, updateTabsData, updateVM, vm }) =
   const [data, filteredData, onFilterChange] = useListPageFilter(disks, filters);
   const { decodedRegistryCredentials, updateRegistryCredentials } = useRegistryCredentials();
 
-  const handleSubmit = (newVM: V1VirtualMachine, diskFormState: V1DiskFormState) => {
-    const { registryCredentials } = diskFormState;
+  const handleSubmit = (newVM: V1VirtualMachine, diskFormState?: V1DiskFormState) => {
+    const registryCredentials = diskFormState?.registryCredentials;
     !isEmpty(registryCredentials) && updateRegistryCredentials(registryCredentials);
     return updateVM(newVM);
   };
@@ -76,6 +76,7 @@ const WizardDisksTab: WizardTab = ({ tabsData, updateTabsData, updateVM, vm }) =
                 />
               ));
             }}
+            canCreateDataVolume
           />
           <Flex>
             <FlexItem>

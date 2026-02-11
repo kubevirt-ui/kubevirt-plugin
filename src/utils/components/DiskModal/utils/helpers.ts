@@ -34,26 +34,35 @@ import { SourceTypes, V1DiskFormState } from './types';
 export const getEmptyVMDataVolumeResource = (
   vm: V1VirtualMachine,
   createOwnerReference?: boolean,
-): V1beta1DataVolume => ({
-  apiVersion: `${DataVolumeModel.apiGroup}/${DataVolumeModel.apiVersion}`,
-  kind: DataVolumeModel.kind,
-  metadata: {
-    name: '',
-    namespace: vm?.metadata?.namespace,
-    ...(createOwnerReference ?? vm?.metadata?.uid
-      ? { ownerReferences: [buildOwnerReference(vm, { blockOwnerDeletion: false })] }
-      : {}),
-  },
-  spec: {
-    storage: {
-      resources: {
-        requests: {
-          storage: '',
+): V1beta1DataVolume => {
+  // Only set ownerReference if explicitly requested AND the VM exists in the cluster
+  // (has a resourceVersion, which indicates it's been persisted)
+  // Setting ownerReference to a non-existent VM causes immediate garbage collection
+  const shouldSetOwnerRef =
+    createOwnerReference === true && vm?.metadata?.uid && vm?.metadata?.resourceVersion;
+
+  return {
+    apiVersion: `${DataVolumeModel.apiGroup}/${DataVolumeModel.apiVersion}`,
+    cluster: getCluster(vm),
+    kind: DataVolumeModel.kind,
+    metadata: {
+      name: '',
+      namespace: vm?.metadata?.namespace,
+      ...(shouldSetOwnerRef
+        ? { ownerReferences: [buildOwnerReference(vm, { blockOwnerDeletion: false })] }
+        : {}),
+    },
+    spec: {
+      storage: {
+        resources: {
+          requests: {
+            storage: '',
+          },
         },
       },
     },
-  },
-});
+  };
+};
 
 export const getRemoveHotplugPromise = (vm: V1VirtualMachine, diskName: string) => {
   const bodyRequestRemoveVolume: V1RemoveVolumeOptions = {
@@ -118,7 +127,7 @@ const getDataVolumeHotplugPromise = (
     data: resultDataVolume,
     model: DataVolumeModel,
     ns: getNamespace(resultDataVolume),
-  }).then(() => addPersistentVolume(vm, bodyRequestAddVolume)) as Promise<void>;
+  }).then(() => addPersistentVolume(vm, bodyRequestAddVolume));
 };
 
 const getPersistentVolumeClaimHotplugPromise = (
@@ -314,11 +323,32 @@ export const ejectISOFromCDROM = (vm: V1VirtualMachine, cdromName: string): V1Vi
       );
     }
 
-    // Remove the volume entry
+    // Remove the volume entry - empty CD-ROM means disk exists but no volume
     draftVM.spec.template.spec.volumes = (draftVM.spec.template.spec.volumes || []).filter(
       (volume) => volume.name !== cdromName,
     );
   });
+};
+
+/**
+ * Creates a shallow copy of the form data with a mutable dataVolumeTemplate.spec.source.
+ * Needed for fire-and-forget uploads where uploadDataVolume attempts to delete
+ * source.upload on a possibly frozen react-hook-form object.
+ * @param data The disk form state to convert into a mutable copy
+ */
+export const createMutableUploadData = (data: V1DiskFormState): V1DiskFormState => {
+  if (!data.dataVolumeTemplate) return data;
+
+  return {
+    ...data,
+    dataVolumeTemplate: {
+      ...data.dataVolumeTemplate,
+      spec: {
+        ...data.dataVolumeTemplate.spec,
+        source: { ...data.dataVolumeTemplate.spec?.source },
+      },
+    },
+  };
 };
 
 export const isDeclarativeHotplugVolumesEnabled = (featureGates: string[]) => {
@@ -345,7 +375,7 @@ export const convertDataVolumeToTemplate = (
     source: dataVolume.spec?.source,
     sourceRef: dataVolume.spec?.sourceRef,
     storage: {
-      accessModes: dataVolume.spec.storage?.accessModes?.map((mode) => mode as any),
+      accessModes: dataVolume.spec.storage?.accessModes,
       resources: dataVolume.spec.storage?.resources,
     },
   },

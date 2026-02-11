@@ -44,7 +44,7 @@ export const useCDIUpload = (clusterInput?: string): UseCDIUploadValues => {
     const newUpload: DataUpload = {
       cancelUpload: () => {
         cancelSource.cancel();
-        setUpload({ ...newUpload, uploadStatus: UPLOAD_STATUS.CANCELED });
+        setUpload((prev) => ({ ...prev, uploadStatus: UPLOAD_STATUS.CANCELED }));
         return killUploadPVC(name, namespace, cluster);
       },
       fileName: file?.name,
@@ -67,7 +67,7 @@ export const useCDIUpload = (clusterInput?: string): UseCDIUploadValues => {
     try {
       await axios.get(getUploadURL(uploadProxyURL));
     } catch (catchError) {
-      if (catchError?.response?.data === undefined) {
+      if (!catchError?.response) {
         return Promise.reject({
           href: getUploadURL(uploadProxyURL),
           message: t('Invalid certificate, please visit the following URL and approve it'),
@@ -82,10 +82,10 @@ export const useCDIUpload = (clusterInput?: string): UseCDIUploadValues => {
       }
 
       // allocating
-      setUpload({
-        ...newUpload,
+      setUpload((prev) => ({
+        ...prev,
         uploadStatus: UPLOAD_STATUS.ALLOCATING,
-      });
+      }));
       const { token } = await createUploadPVC(dataVolume);
 
       // uploading
@@ -101,30 +101,31 @@ export const useCDIUpload = (clusterInput?: string): UseCDIUploadValues => {
         },
         method: 'POST',
         onUploadProgress: (e) => {
-          setUpload({
-            ...newUpload,
-            progress: Math.floor((e.loaded / file.size) * 100),
+          const progress = file.size > 0 ? Math.floor((e.loaded / file.size) * 100) : 0;
+          setUpload((prev) => ({
+            ...prev,
+            progress,
             uploadStatus: UPLOAD_STATUS.UPLOADING,
-          });
+          }));
         },
         url: getUploadURL(uploadProxyURL),
       });
 
       // finished uploading
-      setUpload({
-        ...newUpload,
+      setUpload((prev) => ({
+        ...prev,
         progress: 100,
         uploadStatus: UPLOAD_STATUS.SUCCESS,
-      });
+      }));
     } catch (e) {
       // if cancelled, 'not found' is a case where the user clicked cancel while allocating
       const isCanceled = axios.isCancel(e) || e?.message.includes('not found');
 
-      setUpload({
-        ...newUpload,
+      setUpload((prev) => ({
+        ...prev,
         uploadError: !isCanceled && { message: `${e?.message}: ${e?.response?.data}` },
         uploadStatus: isCanceled ? UPLOAD_STATUS.CANCELED : UPLOAD_STATUS.ERROR,
-      });
+      }));
       return Promise.reject(isCanceled ? { message: t('Upload cancelled') } : e);
     }
   };

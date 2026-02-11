@@ -49,7 +49,7 @@ export type V1DiskFormState = {
   storageClassProvisioner?: string;
   storageProfileSettingsApplied?: boolean;
   uploadFile?: { file: File; filename: string };
-  volume: V1Volume;
+  volume?: V1Volume;
 };
 
 export type DefaultFormValues = Partial<V1DiskFormState>;
@@ -66,6 +66,7 @@ export type V1DiskModalProps = {
     diskFormState?: V1DiskFormState,
   ) => Promise<V1VirtualMachine | void>;
   onUploadedDataVolume?: (dataVolume: V1beta1DataVolume) => void;
+  onUploadStarted?: (uploadPromise: Promise<unknown>) => void;
   vm: V1VirtualMachine;
 };
 

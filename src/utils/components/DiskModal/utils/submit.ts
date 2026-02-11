@@ -22,11 +22,12 @@ import { getDataVolumeTemplateSize } from '../components/utils/selectors';
 import { DEFAULT_DISK_SIZE, UPLOAD_SUFFIX } from './constants';
 import {
   createDataVolumeName,
+  createMutableUploadData,
   getEmptyVMDataVolumeResource,
   hotplugPromise,
   produceVMDisks,
 } from './helpers';
-import { V1DiskFormState } from './types';
+import { V1DiskFormState, V1DiskModalProps } from './types';
 
 const applyDiskAsBootable = (vm: V1VirtualMachine, diskName: string): V1VirtualMachine => {
   return produce(vm, (draftVM) => {
@@ -68,23 +69,32 @@ export const reorderBootDisk = (
   return isBootDisk ? applyDiskAsBootable(vm, diskName) : removeDiskAsBootable(vm, diskName);
 };
 
+const UPLOAD_SIZE_BUFFER_FACTOR = 1.1; // 10% buffer for filesystem overhead
+const BYTES_PER_GIB = 1024 * 1024 * 1024;
+
+const getUploadFileSizeWithBuffer = (data: V1DiskFormState): null | string => {
+  const fileSize = data?.uploadFile?.file?.size;
+  if (!fileSize) return null;
+  const sizeInGi = Math.ceil((fileSize * UPLOAD_SIZE_BUFFER_FACTOR) / BYTES_PER_GIB);
+  return `${Math.max(sizeInGi, 1)}Gi`;
+};
+
 export const uploadDataVolume = async (
   vm: V1VirtualMachine,
   uploadData: ({ dataVolume, file }: UploadDataProps) => Promise<void>,
   data: V1DiskFormState,
+  dvName?: string,
 ): Promise<V1beta1DataVolume> => {
   const dataVolume = getEmptyVMDataVolumeResource(vm);
+  const file = data?.uploadFile?.file;
 
-  dataVolume.metadata.name = generateUploadDiskName(data.disk.name, UPLOAD_SUFFIX);
-
+  dataVolume.metadata.name = dvName || generateUploadDiskName(data.disk.name, UPLOAD_SUFFIX);
   dataVolume.spec.source = { upload: {} };
   dataVolume.spec.storage.resources.requests.storage =
-    getDataVolumeTemplateSize(data) || DEFAULT_DISK_SIZE;
+    getUploadFileSizeWithBuffer(data) || getDataVolumeTemplateSize(data) || DEFAULT_DISK_SIZE;
 
-  await uploadData({
-    dataVolume,
-    file: data?.uploadFile?.file,
-  });
+  await uploadData({ dataVolume, file });
+
   if (data?.dataVolumeTemplate?.spec?.source?.upload) {
     delete data.dataVolumeTemplate.spec.source.upload;
   }
@@ -188,11 +198,122 @@ export const submit = async ({
 
     if (data.dataVolumeTemplate) {
       const resizedVM = resizeVMDataVolumeTemplate(data, newVM);
-      return shouldHotplug
-        ? (hotplugPromise(resizedVM, data) as Promise<any>)
-        : onSubmit(resizedVM, data);
+      return shouldHotplug ? hotplugPromise(resizedVM, data) : onSubmit(resizedVM, data);
     }
   }
 
-  return shouldHotplug ? (hotplugPromise(newVM, data) as Promise<any>) : onSubmit(newVM, data);
+  return shouldHotplug ? hotplugPromise(newVM, data) : onSubmit(newVM, data);
+};
+
+type SubmitCDROMInput = {
+  isHotPluggable: boolean;
+  onSubmit: V1DiskModalProps['onSubmit'];
+  onUploadedDataVolume?: V1DiskModalProps['onUploadedDataVolume'];
+  onUploadStarted?: V1DiskModalProps['onUploadStarted'];
+  selectedISO: string;
+  uploadData: ({ dataVolume, file }: UploadDataProps) => Promise<void>;
+  uploadEnabled: boolean;
+  vm: V1VirtualMachine;
+};
+
+const produceExistingISOData = (
+  data: V1DiskFormState,
+  selectedISO: string,
+  isHotPluggable: boolean,
+): V1DiskFormState =>
+  produce(data, (draft) => {
+    draft.volume.persistentVolumeClaim = {
+      claimName: selectedISO,
+      ...(isHotPluggable && { hotpluggable: true }),
+    };
+    delete draft.volume.dataVolume;
+    delete draft.dataVolumeTemplate;
+  });
+
+const produceEmptyDriveData = (data: V1DiskFormState): V1DiskFormState =>
+  produce(data, (draft) => {
+    delete draft.dataVolumeTemplate;
+    delete draft.volume;
+  });
+
+export const submitCDROM = async (
+  data: V1DiskFormState,
+  {
+    isHotPluggable,
+    onSubmit,
+    onUploadedDataVolume,
+    onUploadStarted,
+    selectedISO,
+    uploadData,
+    uploadEnabled,
+    vm,
+  }: SubmitCDROMInput,
+): Promise<V1VirtualMachine | void> => {
+  const uploadISO = uploadEnabled && data?.uploadFile?.file;
+  const vmIsRunning = isRunning(vm);
+
+  const finalize = (producedData: V1DiskFormState) => {
+    const vmWithDisk = addDisk(producedData, vm);
+    const updatedVM = reorderBootDisk(
+      vmWithDisk,
+      producedData.disk.name,
+      producedData.isBootSource,
+      false,
+    );
+    return onSubmit(updatedVM);
+  };
+
+  if (selectedISO) {
+    return finalize(produceExistingISOData(data, selectedISO, isHotPluggable));
+  }
+
+  if (uploadISO) {
+    const dvName = generateUploadDiskName(data.disk.name, UPLOAD_SUFFIX);
+    const diskName = data.disk.name;
+    const file = data?.uploadFile?.file;
+
+    // Create mutable data with captured file reference (file ref must survive modal close)
+    const mutableData = {
+      ...createMutableUploadData(data),
+      uploadFile: { file, filename: file?.name },
+    };
+
+    const uploadPromise = uploadDataVolume(vm, uploadData, mutableData, dvName);
+
+    if (vmIsRunning) {
+      const fullPromise = uploadPromise.then(async (uploaded) => {
+        onUploadedDataVolume?.(uploaded);
+
+        const dataWithVolume = produce(data, (draft) => {
+          draft.volume.dataVolume = { hotpluggable: isHotPluggable, name: dvName };
+          delete draft.volume.persistentVolumeClaim;
+          delete draft.dataVolumeTemplate;
+        });
+
+        const vmWithDisk = addDisk(dataWithVolume, vm);
+        const updatedVM = reorderBootDisk(vmWithDisk, diskName, data.isBootSource, false);
+        await onSubmit(updatedVM);
+      });
+
+      onUploadStarted?.(fullPromise);
+
+      return Promise.resolve();
+    }
+
+    const fullPromise = uploadPromise.then((uploaded) => {
+      onUploadedDataVolume?.(uploaded);
+    });
+
+    onUploadStarted?.(fullPromise);
+
+    const dataWithVolume = produce(data, (draft) => {
+      draft.volume.persistentVolumeClaim = { claimName: dvName };
+      delete draft.volume.dataVolume;
+      delete draft.dataVolumeTemplate;
+    });
+
+    return finalize(dataWithVolume);
+  }
+
+  return finalize(produceEmptyDriveData(data));
 };
