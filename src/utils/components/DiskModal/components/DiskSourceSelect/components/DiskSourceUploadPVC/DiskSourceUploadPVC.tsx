@@ -50,7 +50,7 @@ const DiskSourceUploadPVC: FC<DiskSourceUploadPVCProps> = ({
           <FormGroup
             fieldId={diskSourceUploadFieldID}
             isRequired={isRequired}
-            label={label || t('Upload data')}
+            label={label ?? t('Upload data')}
           >
             <FileUpload
               onClearClick={() => {
