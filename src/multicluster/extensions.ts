@@ -167,7 +167,7 @@ export const extensions: EncodedExtension[] = [
         'data-quickstart-id': 'qs-nav-checkups',
         'data-test-id': 'checkups-nav-item',
       },
-      href: `/k8s/all-clusters/all-namespaces/checkups/network`,
+      href: `/k8s/all-clusters/all-namespaces/checkups/storage`,
       id: 'checkups-virt-perspective',
       name: '%plugin__kubevirt-plugin~Checkups%',
       perspective: 'fleet-virtualization-perspective',
@@ -454,32 +454,6 @@ export const extensions: EncodedExtension[] = [
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
 
-  {
-    flags: {
-      required: ['KUBEVIRT_DYNAMIC_ACM'],
-    },
-    properties: {
-      component: {
-        $codeRef: 'CheckupsNetworkForm',
-      },
-      path: ['/k8s/cluster/:cluster/ns/:ns/checkups/network/form'],
-      perspective: 'fleet-virtualization-perspective',
-    },
-    type: 'console.page/route',
-  } as EncodedExtension<RoutePage>,
-  {
-    flags: {
-      required: ['KUBEVIRT_DYNAMIC_ACM'],
-    },
-    properties: {
-      component: {
-        $codeRef: 'CheckupsNetworkDetailsPage',
-      },
-      path: ['/k8s/cluster/:cluster/ns/:ns/checkups/network/:checkupName'],
-      perspective: 'fleet-virtualization-perspective',
-    },
-    type: 'console.page/route',
-  } as EncodedExtension<RoutePage>,
   {
     flags: {
       required: ['KUBEVIRT_DYNAMIC_ACM'],

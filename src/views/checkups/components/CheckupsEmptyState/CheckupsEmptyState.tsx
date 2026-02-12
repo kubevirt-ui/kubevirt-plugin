@@ -73,10 +73,7 @@ const CheckupsEmptyState: FC<CheckupsEmptyState> = ({
         )}
         {bottomFooterActions}
         <EmptyStateActions>
-          <ExternalLink
-            href={getDocumentationURL(checkupType)}
-            text={getLearnMoreText(checkupType, t)}
-          />
+          <ExternalLink href={getDocumentationURL()} text={getLearnMoreText(checkupType, t)} />
         </EmptyStateActions>
       </EmptyStateFooter>
     </EmptyState>

@@ -4,8 +4,6 @@ import type { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plug
 
 export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
   Checkups: './views/checkups/Checkups.tsx',
-  CheckupsNetworkDetailsPage: './views/checkups/network/details/CheckupsNetworkDetailsPage.tsx',
-  CheckupsNetworkForm: './views/checkups/network/components/form/CheckupsNetworkForm.tsx',
   CheckupsSelfValidationDetailsPage:
     './views/checkups/self-validation/details/CheckupsSelfValidationDetailsPage.tsx',
   CheckupsSelfValidationForm:
@@ -33,30 +31,6 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.navigation/href',
   } as EncodedExtension<HrefNavItem>,
-  {
-    flags: {
-      required: ['KUBEVIRT_DYNAMIC'],
-    },
-    properties: {
-      component: {
-        $codeRef: 'CheckupsNetworkForm',
-      },
-      path: ['/k8s/ns/:ns/checkups/network/form'],
-    },
-    type: 'console.page/route',
-  } as EncodedExtension<RoutePage>,
-  {
-    flags: {
-      required: ['KUBEVIRT_DYNAMIC'],
-    },
-    properties: {
-      component: {
-        $codeRef: 'CheckupsNetworkDetailsPage',
-      },
-      path: ['/k8s/ns/:ns/checkups/network/:checkupName'],
-    },
-    type: 'console.page/route',
-  } as EncodedExtension<RoutePage>,
   {
     flags: {
       required: ['KUBEVIRT_DYNAMIC'],
