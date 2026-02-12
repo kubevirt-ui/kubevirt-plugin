@@ -326,8 +326,9 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
       variant="typeahead"
     >
       <SelectList id={`select-typeahead-listbox-${randomIdSuffix}`}>
-        {selectOptions?.map(
-          ({ label, optionProps: { children, ...otherOptionProps }, value }, index) => (
+        {selectOptions?.map(({ label, optionProps, value }, index) => {
+          const { children, ...otherOptionProps } = optionProps ?? {};
+          return (
             <SelectOption
               {...otherOptionProps}
               id={createItemId(value)}
@@ -337,8 +338,8 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
             >
               {children ?? label ?? value}
             </SelectOption>
-          ),
-        )}
+          );
+        })}
       </SelectList>
     </Select>
   );

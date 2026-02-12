@@ -60,9 +60,13 @@ const ActionsDropdown: FC<ActionsDropdownProps> = ({
   if (isDisabled)
     return (
       <div className={classNames('kv-actions-dropdown', className)} ref={containerRef}>
-        <Tooltip content={disabledTooltip}>
-          <span> {Toggle(toggleRef)}</span>
-        </Tooltip>
+        {disabledTooltip ? (
+          <Tooltip content={disabledTooltip}>
+            <span>{Toggle(toggleRef)}</span>
+          </Tooltip>
+        ) : (
+          <span>{Toggle(toggleRef)}</span>
+        )}
       </div>
     );
 

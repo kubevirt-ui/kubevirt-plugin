@@ -3,6 +3,7 @@ import { TFunction } from 'react-i18next';
 
 import { V1Interface, V1Network, V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import TechPreviewBadge from '@kubevirt-utils/components/TechPreviewBadge/TechPreviewBadge';
+import { NetworkAttachmentDefinitionConfig } from '@kubevirt-utils/resources/nad/types';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getInterface, getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
 import {
@@ -108,14 +109,14 @@ export const createInterface = ({
 
 type NADTypes = NetworkAttachmentDefinition | NetworkAttachmentDefinitionKind;
 
-export const parseNADConfig = (nad?: NADTypes): Record<string, any> => {
-  if (!nad?.spec?.config) return {};
+export const parseNADConfig = (nad?: NADTypes): NetworkAttachmentDefinitionConfig | null => {
+  if (!nad?.spec?.config) return null;
 
   try {
     return JSON.parse(nad.spec.config);
   } catch (e) {
     kubevirtConsole.log('Cannot parse NAD config: ', e);
-    return {};
+    return null;
   }
 };
 

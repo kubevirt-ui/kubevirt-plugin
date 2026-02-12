@@ -22,8 +22,8 @@ export const eventMonitor = (eventType: string, properties?: any) => {
 
 export const logEventWithName = (
   key: string,
-  vm?: V1VirtualMachine,
   properties?: Record<string, any>,
+  vm?: V1VirtualMachine,
 ) => {
   eventMonitor(key, {
     ...properties,
@@ -35,7 +35,7 @@ export const logITFlowEvent = (
   key: string,
   vm?: V1VirtualMachine,
   properties?: Record<string, any>,
-) => logEventWithName(key, vm, { ...properties, flow: createVMFlowTypes.InstanceTypes });
+) => logEventWithName(key, { ...properties, flow: createVMFlowTypes.InstanceTypes }, vm);
 
 export const logTemplateFlowEvent = (
   key: string,
@@ -47,3 +47,9 @@ export const logTemplateFlowEvent = (
     flow: createVMFlowTypes.Template,
     templateName: getName(template),
   });
+
+export const logCreationFailed = (eventName: string, error: any) => {
+  logEventWithName(eventName, {
+    errorMessage: error?.message || 'Unknown error',
+  });
+};

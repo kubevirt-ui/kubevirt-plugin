@@ -40,6 +40,7 @@ export const documentationURL = {
   MTV_OPERATOR: `${RH_DOC_URL}/migration_toolkit_for_virtualization/latest/html/installing_and_using_the_migration_toolkit_for_virtualization/index`,
   NAME: `${K8_DOC_OBJ_URL}/names`,
   NAMESPACE_DOC: `${K8_DOC_OBJ_URL}/namespaces/`,
+  NETWORKING: `${REDHAT_DOC_URL}/html/virtualization/networking`,
   NMSTATE_OPERATOR: `${REDHAT_DOC_URL}/html-single/networking/index#k8s-nmstate-about-the-k8s-nmstate-operator`,
   NODEPORTS: `${REDHAT_DOC_URL}/html/networking/configuring-ingress-cluster-traffic#nw-using-nodeport_configuring-ingress-cluster-traffic-nodeport`,
   NON_VCPU_LINK: `${REDHAT_DOC_URL}/html/virtualization/monitoring#virt-querying-metrics_virt-prometheus-queries`,
