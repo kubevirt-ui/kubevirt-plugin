@@ -127,6 +127,7 @@ export const CustomizeSource: FC<CustomizeSourceProps> = ({ template }) => {
 
       <SelectSource
         data-test-id="disk-boot-source"
+        diskSource={!!diskSource}
         httpSourceHelperURL={httpSourceHelperURL}
         onFileSelected={setDiskFile}
         onSourceChange={onDiskSourceChange}
@@ -136,7 +137,6 @@ export const CustomizeSource: FC<CustomizeSourceProps> = ({ template }) => {
         sourceLabel={t('Disk source')}
         sourceOptions={DISK_SOURCES_WITH_DEFAULT}
         sourcePopOver={<SelectDiskSourcePopOver />}
-        withSize={diskSource && !('image' in diskSource)}
       />
       <StorageClassSelect
         onStorageClassChange={onStorageClassChange}
