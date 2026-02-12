@@ -48,6 +48,7 @@ import {
 
 export type SelectSourceProps = {
   'data-test-id': string;
+  diskSource?: boolean;
   httpSourceHelperURL?: string;
   onFileSelected: (file: File | string) => void;
   onSourceChange: (customSource: V1beta1DataVolumeSpec | V1ContainerDiskSource) => void;
@@ -57,11 +58,11 @@ export type SelectSourceProps = {
   sourceLabel: ReactNode | string;
   sourceOptions: SOURCE_OPTIONS_IDS[];
   sourcePopOver?: ReactElement<any, JSXElementConstructor<any> | string>;
-  withSize?: boolean;
 };
 
 export const SelectSource: FC<SelectSourceProps> = ({
   'data-test-id': testId,
+  diskSource = false,
   httpSourceHelperURL,
   onFileSelected,
   onSourceChange,
@@ -71,7 +72,6 @@ export const SelectSource: FC<SelectSourceProps> = ({
   sourceLabel,
   sourceOptions,
   sourcePopOver,
-  withSize = false,
 }) => {
   const { t } = useKubevirtTranslation();
   const initialDiskSource = useRef(selectedSource);
@@ -83,7 +83,7 @@ export const SelectSource: FC<SelectSourceProps> = ({
     getTemplateVirtualMachineObject(originalTemplate),
   );
 
-  const minDiskValue = getMinDiskSize(templateDiskSize, volumeQuantity);
+  const minDiskValue = diskSource ? getMinDiskSize(templateDiskSize, volumeQuantity) : undefined;
   const isMinusDisabled = getIsMinusDisabled(minDiskValue, volumeQuantity);
 
   const pvcNameSelected = (selectedSource as V1beta1DataVolumeSpec)?.source?.pvc?.name;
@@ -105,15 +105,17 @@ export const SelectSource: FC<SelectSourceProps> = ({
     onSourceChange(newSource);
   };
 
+  const sourceType = getSourceTypeFromDiskSource(selectedSource);
+
   const selectedSourceType =
     selectedSource === initialDiskSource.current && sourceOptions.includes(DEFAULT_SOURCE)
       ? DEFAULT_SOURCE
-      : getSourceTypeFromDiskSource(selectedSource);
+      : sourceType;
 
-  const showSizeInput =
-    withSize ||
-    selectedSourceType === HTTP_SOURCE_NAME ||
-    selectedSourceType === UPLOAD_SOURCE_NAME;
+  const cdSourceWithSizeInput = [HTTP_SOURCE_NAME, UPLOAD_SOURCE_NAME].includes(sourceType);
+  const diskSourceWithSizeInput = sourceType !== CONTAINER_DISK_SOURCE_NAME;
+
+  const showSizeInput = diskSource ? diskSourceWithSizeInput : cdSourceWithSizeInput;
 
   const onSourceTypeChange = (selection: SOURCE_OPTIONS_IDS) => {
     const newVolume = showSizeInput ? volumeQuantity : null;
@@ -206,7 +208,7 @@ export const SelectSource: FC<SelectSourceProps> = ({
         />
       )}
 
-      {showSizeInput && selectedSourceType !== CONTAINER_DISK_SOURCE_NAME && (
+      {showSizeInput && (
         <CapacityInput
           isMinusDisabled={isMinusDisabled}
           label={t('Disk size')}
