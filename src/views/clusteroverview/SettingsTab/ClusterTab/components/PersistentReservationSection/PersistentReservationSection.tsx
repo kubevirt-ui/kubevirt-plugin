@@ -30,6 +30,7 @@ const PersistentReservationSection: FC<PersistentReservationSectionProps> = ({
   const { toggleFeature } = useFeatures(FEATURE_HCO_PERSISTENT_RESERVATION);
 
   const onChange = async (checked: boolean) => {
+    if (!hyperConverge) return;
     setIsLoading(true);
     try {
       await k8sPatch<HyperConverged>({
@@ -69,7 +70,7 @@ const PersistentReservationSection: FC<PersistentReservationSectionProps> = ({
           />
         )}
         dataTestID="persistent-reservation"
-        isDisabled={!hyperLoaded}
+        isDisabled={!hyperLoaded || !hyperConverge}
         isLoading={isLoading}
         switchIsOn={persistentReservation}
         title={t('Enable persistent reservation')}
