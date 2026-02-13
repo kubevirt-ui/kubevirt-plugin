@@ -1,0 +1,372 @@
+---
+description: TypeScript conventions and type safety rules
+globs: "**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# TypeScript Guidelines
+
+TypeScript conventions and best practices for this project.
+
+---
+
+## 1. Type vs Interface
+
+### Prefer Type
+- For object shapes
+- For union types
+- For function signatures
+- For mapped/conditional types
+
+### Use Interface When
+- Extending is explicitly needed
+- Declaration merging required
+- Library compatibility requires it
+
+### Examples
+```typescript
+// ✅ Preferred - type
+type VMConfig = {
+  name: string;
+  namespace: string;
+  cpu: number;
+  memory: string;
+};
+
+// ✅ Union types
+type VMStatus = 'Running' | 'Stopped' | 'Paused' | 'Unknown';
+
+// ✅ Function type
+type VMActionHandler = (vm: V1VirtualMachine) => Promise<void>;
+```
+
+---
+
+## 2. Type Safety
+
+### Never Use `any`
+- Compromises type safety
+- Hides bugs until runtime
+- Makes refactoring dangerous
+
+### Alternatives to `any`
+- `unknown` - for truly unknown data, then narrow
+- Proper type definitions
+- Generic types
+- Type guards
+
+### Type Narrowing
+```typescript
+// Type guard function
+const isVirtualMachine = (obj: unknown): obj is V1VirtualMachine => {
+  return (
+    typeof obj === 'object' &&
+    obj !== null &&
+    'kind' in obj &&
+    obj.kind === 'VirtualMachine'
+  );
+};
+
+// Usage
+const handleData = (data: unknown): void => {
+  if (isVirtualMachine(data)) {
+    // data is now typed as V1VirtualMachine
+    console.log(data.metadata?.name);
+  }
+};
+```
+
+### Non-Null Assertions
+- Avoid `!` operator when possible
+- Use optional chaining `?.` instead
+- Add explicit null checks
+
+---
+
+## 3. Function Signatures
+
+### Explicit Return Types
+- Always define return type
+- Prevents accidental changes
+- Self-documenting
+- Better IDE support
+
+### Parameter Guidelines
+- Use descriptive parameter names
+- Required parameters first
+- Optional parameters last
+- Use object parameter for 3+ params
+
+### Function Types
+```typescript
+// ✅ Explicit return type
+const getVMStatus = (vm: V1VirtualMachine): VMStatus => {
+  return vm.status?.printableStatus ?? 'Unknown';
+};
+
+// ✅ Async function
+const fetchVM = async (name: string, namespace: string): Promise<V1VirtualMachine> => {
+  // implementation
+};
+
+// ✅ Object parameter for many args
+type FetchOptions = {
+  name: string;
+  namespace: string;
+  includeStatus?: boolean;
+  timeout?: number;
+};
+
+const fetchVMWithOptions = async (options: FetchOptions): Promise<V1VirtualMachine> => {
+  // implementation
+};
+```
+
+---
+
+## 4. Null & Undefined Handling
+
+### Optional Chaining
+```typescript
+// ✅ Safe nested access
+const vmName = vm?.metadata?.name;
+const cpuCount = vm?.spec?.template?.spec?.domain?.cpu?.cores;
+```
+
+### Nullish Coalescing
+```typescript
+// ✅ Provide defaults
+const name = vm?.metadata?.name ?? 'Unknown';
+const replicas = deployment?.spec?.replicas ?? 1;
+```
+
+### Optional Properties
+```typescript
+type VMOptions = {
+  name: string;              // Required
+  namespace: string;         // Required
+  description?: string;      // Optional
+  labels?: Record<string, string>;  // Optional
+};
+```
+
+### Handling Arrays
+```typescript
+// ✅ Safe array access
+const firstVM = vms?.[0];
+const conditions = vm?.status?.conditions ?? [];
+const hasCondition = conditions.some(c => c.type === 'Ready');
+```
+
+---
+
+## 5. Generics
+
+### When to Use
+- Reusable functions with varying types
+- Type-safe collections
+- Wrapper types
+
+### Constraints
+```typescript
+// ✅ Constrained generic
+const getResourceName = <T extends { metadata?: { name?: string } }>(
+  resource: T
+): string => {
+  return resource.metadata?.name ?? 'Unknown';
+};
+```
+
+### Common Patterns
+```typescript
+// ✅ Generic hook
+const useK8sResource = <T>(config: WatchConfig): [T | undefined, boolean, Error | undefined] => {
+  // implementation
+};
+
+// ✅ Generic utility
+const filterByLabel = <T extends { metadata?: { labels?: Record<string, string> } }>(
+  resources: T[],
+  labelKey: string,
+  labelValue: string
+): T[] => {
+  return resources.filter(r => r.metadata?.labels?.[labelKey] === labelValue);
+};
+```
+
+---
+
+## 6. Constants & Enums
+
+### Constants
+```typescript
+// ✅ Named constants
+export const DEFAULT_NAMESPACE = 'default';
+export const VM_STATUS_RUNNING = 'Running';
+export const POLL_INTERVAL_MS = 5000;
+export const MAX_VM_NAME_LENGTH = 63;
+```
+
+### Constant Objects
+```typescript
+// ✅ As const for literal types
+export const VM_STATUSES = {
+  Running: 'Running',
+  Stopped: 'Stopped',
+  Paused: 'Paused',
+} as const;
+
+type VMStatusValue = typeof VM_STATUSES[keyof typeof VM_STATUSES];
+```
+
+### Union Types vs Enums
+```typescript
+// ✅ Prefer union types
+type VMAction = 'start' | 'stop' | 'restart' | 'pause';
+
+// ❌ Avoid enums (bundle size, complexity)
+enum VMAction {
+  Start = 'start',
+  Stop = 'stop',
+}
+```
+
+---
+
+## 7. Type Organization
+
+### Component-Specific Types
+- In component's `types/` folder or `types.ts` file
+- Export if used by other components
+
+### Shared Types
+- In `src/utils/types/`
+- Organized by domain (vm, storage, network)
+
+### API Types
+- Use `@kubevirt-ui/kubevirt-api`
+- Don't redefine existing types
+
+### Type Files
+```typescript
+// types.ts
+export type VMListProps = {
+  namespace: string;
+  onSelect: (vm: V1VirtualMachine) => void;
+};
+
+export type VMFilter = {
+  status?: VMStatus[];
+  labels?: Record<string, string>;
+};
+
+export type VMSortField = 'name' | 'status' | 'created';
+```
+
+---
+
+## 8. KubeVirt API Types
+
+### Import Patterns
+```typescript
+// KubeVirt resource types
+import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+
+// Console SDK models
+import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
+```
+
+### Common Types
+- `V1VirtualMachine` - VM resource
+- `V1VirtualMachineInstance` - Running VM
+- `V1DataVolume` - Storage provisioning
+- `V1Template` - VM template
+
+### Status Types
+```typescript
+// Access status safely
+const status = vm?.status?.printableStatus;
+const conditions = vm?.status?.conditions ?? [];
+const phase = vmi?.status?.phase;
+```
+
+---
+
+## 9. Utility Types
+
+### Built-in Utility Types
+```typescript
+// Partial - all optional
+type PartialVM = Partial<V1VirtualMachine>;
+
+// Required - all required
+type RequiredConfig = Required<VMConfig>;
+
+// Pick - subset of properties
+type VMIdentifier = Pick<V1VirtualMachine, 'metadata'>;
+
+// Omit - exclude properties
+type VMWithoutStatus = Omit<V1VirtualMachine, 'status'>;
+
+// Record - key-value mapping
+type LabelMap = Record<string, string>;
+```
+
+### Custom Utility Types
+```typescript
+// Nullable
+type Nullable<T> = T | null;
+
+// Maybe (null or undefined)
+type Maybe<T> = T | null | undefined;
+
+// DeepPartial
+type DeepPartial<T> = {
+  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
+};
+```
+
+---
+
+## 10. Error Handling Types
+
+### Error Types
+```typescript
+type APIError = {
+  code: number;
+  message: string;
+  details?: string;
+};
+
+type Result<T, E = Error> =
+  | { success: true; data: T }
+  | { success: false; error: E };
+```
+
+### Async Return Types
+```typescript
+// Clear async signatures
+const fetchVM = async (name: string): Promise<V1VirtualMachine> => { ... };
+
+// With error handling
+const tryFetchVM = async (name: string): Promise<Result<V1VirtualMachine, APIError>> => { ... };
+```
+
+---
+
+## 11. Best Practices Summary
+
+### Do
+- Define explicit return types
+- Use `type` over `interface`
+- Use `unknown` instead of `any`
+- Use optional chaining and nullish coalescing
+- Import from `@kubevirt-ui/kubevirt-api`
+- Create type guards for runtime checks
+
+### Don't
+- Never use `any` type
+- Do not use type assertions without validation
+- Do not ignore TypeScript errors with `@ts-ignore`
+- Do not create duplicate type definitions
+- Do not use non-null assertion (`!`) without justification

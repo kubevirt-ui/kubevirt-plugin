@@ -1,0 +1,223 @@
+---
+description: KubeVirt Plugin project context and architecture
+alwaysApply: true
+---
+
+# KubeVirt Plugin for OpenShift Console
+
+This is the OpenShift Console dynamic plugin for KubeVirt virtualization management.
+
+---
+
+## 1. What Is This Project
+
+### Purpose
+- Provides a web UI for managing Virtual Machines on OpenShift/Kubernetes
+- Integrates with OpenShift Console as a dynamic plugin
+- Enables VM lifecycle management, monitoring, and configuration
+
+### Technology Stack
+- **React 17** - UI framework
+- **TypeScript 5.7** - Type-safe JavaScript
+- **PatternFly 6** - Red Hat design system components
+- **OpenShift Console SDK** - Plugin integration framework
+- **Zustand** - Lightweight state management
+- **Webpack 5** - Module bundler
+- **Jest** - Unit testing
+- **Cypress** - E2E testing
+
+### Plugin Architecture
+- Dynamic plugin loaded at runtime by OpenShift Console
+- Uses Webpack Module Federation
+- Registers extensions for navigation, pages, actions
+- Shares dependencies with console host
+
+---
+
+## 2. Key Domain Concepts
+
+### VirtualMachine (VM)
+- Kubernetes Custom Resource defining VM desired state
+- Persists across stop/start cycles
+- Contains template for creating VMI
+- Managed by virt-controller
+
+### VirtualMachineInstance (VMI)
+- Represents a running VM
+- Created when VM starts, deleted when stops
+- Contains runtime information (IP, node, phase)
+- Analogous to Pod for Deployment
+
+### DataVolume
+- Provisions storage for VM disks
+- Managed by CDI (Containerized Data Importer)
+- Handles cloning, importing, uploading images
+- Creates and manages PVCs
+
+### Templates
+- Predefined VM configurations
+- Common templates for popular OS types
+- Custom templates for organization standards
+- Define defaults, validations, parameters
+
+### Instance Types & Preferences
+- Instance types define compute resources (CPU, memory)
+- Preferences define OS-specific settings
+- Separate concerns from VM definition
+- Enable standardization across VMs
+
+---
+
+## 3. Project Structure
+
+```
+kubevirt-plugin/
+├── src/
+│   ├── views/                    # Main UI views
+│   │   ├── virtualmachines/      # VM list, details, actions
+│   │   ├── templates/            # Template management
+│   │   ├── catalog/              # VM creation wizard
+│   │   ├── clusteroverview/      # Dashboard overview
+│   │   ├── checkups/             # Health checkups
+│   │   ├── migrationpolicies/    # Migration policies
+│   │   ├── bootablevolumes/      # Bootable volume sources
+│   │   ├── datasources/          # Data source management
+│   │   ├── instancetypes/        # Instance type management
+│   │   └── ...
+│   ├── utils/                    # Shared utilities
+│   │   ├── hooks/                # Custom React hooks
+│   │   ├── components/           # Shared components
+│   │   ├── resources/            # K8s resource utilities
+│   │   └── types/                # Shared TypeScript types
+│   ├── templates/                # VM template definitions
+│   ├── perspective/              # Virtualization perspective
+│   └── extensions/               # Console extension definitions
+├── cypress/                      # E2E tests
+│   ├── tests/                    # Test files
+│   ├── views/                    # Page object selectors
+│   └── support/                  # Test utilities
+├── locales/                      # i18n translations
+│   ├── en/                       # English (source)
+│   └── .../                      # Other languages
+├── __mocks__/                    # Jest mocks
+└── plugin-extensions.ts          # Plugin extension registration
+```
+
+---
+
+## 4. Key Files & Entry Points
+
+### Plugin Definition
+- `plugin-extensions.ts` - Registers all console extensions
+- `console-extensions.md` - Documentation of available extensions
+
+### Main Views
+- `src/views/virtualmachines/` - VM management UI
+- `src/views/catalog/` - VM creation wizard
+- `src/views/templates/` - Template management
+
+### Shared Code
+- `src/utils/hooks/` - Reusable React hooks
+- `src/utils/components/` - Shared UI components
+- `src/utils/resources/` - K8s resource utilities
+
+### Configuration
+- `package.json` - Dependencies and scripts
+- `tsconfig.json` - TypeScript configuration
+- `webpack.config.ts` - Build configuration
+
+---
+
+## 5. Key Dependencies
+
+### Console Integration
+- `@openshift-console/dynamic-plugin-sdk` - Main SDK
+- `@openshift-console/dynamic-plugin-sdk-webpack` - Build tools
+
+### KubeVirt Types
+- `@kubevirt-ui/kubevirt-api` - TypeScript types for KubeVirt resources
+- `@kubevirt-ui-ext/vnc-keymaps` - VNC keyboard mappings
+
+### UI Components
+- `@patternfly/react-core` - Core components
+- `@patternfly/react-table` - Table components
+- `@patternfly/react-topology` - Topology visualization
+- `@patternfly/react-charts` - Charts and graphs
+
+### State & Data
+- `zustand` - State management
+- `react-hook-form` - Form handling
+- `axios` - HTTP client
+
+---
+
+## 6. Development Workflow
+
+### Local Development
+```bash
+npm install                    # Install dependencies
+npm run dev                    # Start dev server (port 9001)
+npm run start-console          # Start console container
+```
+
+### Building
+```bash
+npm run build                  # Production build
+npm run check-types            # TypeScript validation
+npm run lint                   # Lint check
+```
+
+### Testing
+```bash
+npm test                       # Unit tests
+npm run test-cypress           # E2E tests (interactive)
+npm run test-cypress-headless  # E2E tests (CI)
+```
+
+---
+
+## 7. Console SDK Patterns
+
+### Watching Resources
+```typescript
+const [vms, loaded, error] = useK8sWatchResource<V1VirtualMachine[]>({
+  groupVersionKind: VirtualMachineModelGroupVersionKind,
+  isList: true,
+  namespaced: true,
+  namespace,
+});
+```
+
+### Resource Operations
+```typescript
+import { k8sCreate, k8sUpdate, k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
+```
+
+### Navigation
+```typescript
+import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
+```
+
+---
+
+## 8. Conventions
+
+### i18n
+- Use `useKubevirtTranslation` hook
+- All user-facing strings must be translated
+- Run `npm run i18n` after adding strings
+
+### Styling
+- Use PatternFly components and variables
+- SCSS with BEM methodology
+- Don't rely on PatternFly class names
+
+### Error Handling
+- Always handle loading, error, empty states
+- Provide user-friendly error messages
+- Log errors for debugging
+
+### Testing
+- Unit tests for hooks and utilities
+- E2E tests for critical user flows
+- Use `data-test` attributes for selectors

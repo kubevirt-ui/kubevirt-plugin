@@ -1,0 +1,132 @@
+---
+description: Workflow for working with Jira tickets using MCP
+alwaysApply: false
+---
+
+# Jira Workflow
+
+Invoke with: *"get my tickets"*, *"show sprint issues"*, *"update ticket"*, *"search jira"*
+
+This workflow covers Jira MCP operations. For the full development workflow (ticket to PR), see `feature-development.mdc`.
+
+---
+
+## 1. Finding Tickets
+
+**Get My Assigned Tickets**
+```
+"Show my assigned tickets"
+```
+→ Uses `jira_search` with JQL: `assignee = currentUser() AND status != Done`
+
+**Get Current Sprint Tickets**
+```
+"Show current sprint tickets"
+```
+→ Uses `jira_get_sprint_issues`
+
+**Search for Specific Tickets**
+```
+"Find open bugs in CNV project"
+```
+→ Uses `jira_search` with appropriate JQL
+
+**Get Ticket Details**
+```
+"Get details for CNV-12345"
+```
+→ Uses `jira_get_issue`
+
+---
+
+## 2. Common JQL Queries
+
+### By Status
+```jql
+assignee = currentUser() AND status = "In Progress"
+status = "Ready for Dev" AND project = CNV
+status = "Code Review" AND assignee = currentUser()
+```
+
+### By Type
+```jql
+issuetype = Bug AND project = CNV AND status != Done
+issuetype = Story AND assignee = currentUser()
+issuetype = Epic AND project = CNV
+```
+
+### By Time
+```jql
+updated >= -7d AND assignee = currentUser()
+created >= startOfWeek() AND project = CNV
+duedate <= 7d AND duedate >= 0d
+```
+
+### By Label/Component
+```jql
+labels = ui AND project = CNV
+component = "Virtual Machines" AND status != Done
+```
+
+---
+
+## 3. Updating Tickets
+
+**Add a Comment**
+```
+"Add comment to CNV-12345: Started investigating the issue"
+```
+→ Uses `jira_add_comment`
+
+**Update Status**
+```
+"Move CNV-12345 to Code Review"
+"Mark CNV-12345 as blocked"
+```
+→ Uses `jira_transition_issue`
+
+**Log Work**
+```
+"Log 2 hours on CNV-12345"
+```
+→ Uses `jira_add_worklog`
+
+---
+
+## 4. Ticket Analysis
+
+When fetching a ticket, analyze:
+
+- **Summary**: High-level goal
+- **Description**: Detailed requirements and context
+- **Acceptance Criteria**: What defines "done"
+- **Related Issues**: Blockers, dependencies, related work
+- **Comments**: Discussion and clarifications
+- **Affected Areas**: Which parts of codebase to modify
+- **Risks**: Potential challenges or unknowns
+
+---
+
+## 5. MCP Tool Reference
+
+| Tool | Purpose |
+|------|---------|
+| `jira_search` | Find tickets with JQL |
+| `jira_get_issue` | Get ticket details |
+| `jira_add_comment` | Add comments |
+| `jira_transition_issue` | Change status |
+| `jira_add_worklog` | Log time |
+| `jira_update_issue` | Update fields |
+| `jira_get_sprint_issues` | Get sprint issues |
+
+Tools are called automatically when you make requests. Just describe what you want in natural language.
+
+---
+
+## 6. Tips
+
+- Be specific: "Show bugs assigned to me" vs "show issues"
+- Use project codes: "CNV-12345" not just "12345"
+- Check ticket comments before starting work
+- Add comments when starting/finishing work
+- Document blockers in ticket comments

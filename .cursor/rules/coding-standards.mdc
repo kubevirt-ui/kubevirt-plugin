@@ -1,0 +1,266 @@
+---
+description: Coding standards and best practices for this project
+globs: ["src/**/*.{ts,tsx,scss}", "cypress/**/*.{ts,tsx}", "**/*.test.{ts,tsx}"]
+alwaysApply: false
+---
+
+# Coding Standards
+
+These are the coding standards for the KubeVirt Plugin project. They apply to source code, tests, and styles (see globs). All code contributions should follow these guidelines.
+
+---
+
+## General Goals
+
+- Aim for **maintainable, scalable, and readable code** while maintaining consistency.
+- Encourage contributions and ideas for continuous improvement.
+
+---
+
+## 1. File Conventions
+
+### File Extensions
+- **Components**: `.tsx` for all React components
+- **Logic/Utilities**: `.ts` for non-component files (hooks, utils, types, constants)
+- **Styles**: `.scss` for component styles
+- **Tests**: `.test.ts` or `.test.tsx` for unit tests
+
+### File Naming
+- **Component files**: PascalCase matching component name (`VMDetailsPage.tsx`)
+- **Non-component files**: camelCase (`vmUtils.ts`, `useVMData.ts`)
+- **SCSS files**: kebab-case matching component (`vm-details-page.scss`)
+- **Type files**: camelCase (`types.ts`, `vmTypes.ts`)
+- **Constant files**: camelCase (`constants.ts`)
+
+### Folder Naming
+- Always lowercase kebab-case
+- Examples: `/components/vm-details/`, `/hooks/use-vm-data/`
+
+### File Size Limits
+- Maximum **150 lines** per file
+- If exceeding, split into smaller modules
+- One component per file, no nested component definitions
+
+---
+
+## 2. Component Structure
+
+### Folder Organization
+```
+/components/my-component/
+├── MyComponent.tsx           # Main component
+├── my-component.scss         # Styles
+├── components/               # Sub-components
+├── hooks/                    # Component-specific hooks
+├── utils/                    # Component-specific utilities
+└── types/                    # Component-specific types
+```
+
+### Component Rules
+- One component per file
+- No nested component definitions inside other components
+- Filename must match component name
+- Use functional components exclusively
+- Class components only for error boundaries (`componentDidCatch`)
+- Default export for components, named exports for utils/hooks/types
+
+---
+
+## 3. React Patterns
+
+### Component Function Order
+1. Imports (external, then internal, then styles)
+2. Type definitions (props, local types)
+3. Constants (small ones; large go to separate file)
+4. Component function
+5. Default export
+
+### Inside Component Order
+1. Translation hook (`useKubevirtTranslation`)
+2. Router hooks (`useParams`, `useNavigate`)
+3. Data fetching hooks (`useK8sWatchResource`)
+4. Local state (`useState`)
+5. Derived values (`useMemo`)
+6. Callbacks (`useCallback`)
+7. Effects (`useEffect`)
+8. Early returns (loading, error, empty states)
+9. Main JSX return
+
+### Hooks Best Practices
+- Always specify dependencies in `useEffect`
+- Empty array `[]` for mount-only effects
+- Hooks contain logic only, never return JSX
+- Extract complex logic to custom hooks
+- Follow the `use` prefix convention
+
+### Memoization
+- Use `React.memo` for components with stable props but re-rendering parents
+- Use `useMemo` for expensive calculations
+- Use `useCallback` for callbacks passed to memoized children
+- Don't over-memoize simple operations
+- Lazy load components with `React.lazy` and `Suspense`
+
+### Logic Separation
+- Extract logic from components into custom hooks or utility files
+- Much easier to unit test a hook or utility function than a component
+- Avoid bloated components by delegating logic to external modules
+
+---
+
+## 4. TypeScript Standards
+
+### Type vs Interface
+- Prefer `type` over `interface` for object shapes
+- Use `interface` only when extending is needed
+
+### Type Safety
+- **Never use `any`** -- use `unknown` and narrow with type guards
+- Always define explicit return types on functions
+- Use optional chaining (`?.`) for nullable access
+- Provide fallback values with nullish coalescing (`??`)
+
+### Naming Conventions
+- Types: PascalCase (`VMConfig`, `UserAction`)
+- Constants: UPPER_SNAKE_CASE (`DEFAULT_NAMESPACE`, `MAX_RETRIES`)
+- Functions/variables: camelCase (`getVMStatus`, `vmList`)
+- Components: PascalCase (`VMDetailsPage`)
+- Use descriptive names over abbreviations
+
+### Type Organization
+- Component-specific types: in component's `types/` folder
+- Shared types: in `src/utils/types/`
+- Use existing types from `@kubevirt-ui/kubevirt-api`
+
+### Avoid Magic Numbers
+- Define as named constants in `constants.ts`
+- Include units in name: `POLL_INTERVAL_MS`, `MAX_RETRIES`
+
+---
+
+## 5. Styling Guidelines
+
+### SCSS Usage
+- Prefer SCSS for styling (nesting, variables, mixins)
+- One SCSS file per component
+- Filename matches component: `VMDetails.tsx` -> `vm-details.scss`
+- Extract into separate files, don't embed styles in components
+
+### BEM Methodology
+- **Block**: Component name (`.vm-details`)
+- **Element**: Child parts (`&__header`, `&__content`)
+- **Modifier**: Variations (`&--loading`, `&--compact`)
+
+### PatternFly Integration
+- Use PatternFly variables for spacing, colors, typography
+- Don't target PatternFly class names directly in selectors
+- Add project-specific class names as anchors
+- Classes change between PF versions
+
+### Rules
+- No `!important` unless absolutely necessary
+- Use relative units (rem, %, em) over absolute (px)
+- Use CSS variables for theming support
+
+---
+
+## 6. Code Quality
+
+### Comments
+- Avoid comments when possible; write self-documenting code
+- Use comments for non-obvious decisions
+- Include links to issues for workarounds
+
+### Global/Store State
+- Keep global state minimal and straightforward
+- Obtain approval in PR to add new values to prevent bloating
+- Use Zustand for truly global state
+
+### Avoid Circular Dependencies
+- Use index files cautiously
+- Check import chains between files
+
+### Error Handling
+- Never swallow errors silently
+- Always provide meaningful error messages
+- Handle loading, success, and error states
+- Clean up on component unmount
+
+---
+
+## 7. Testing
+
+### Requirements
+- New features must have tests
+- Bug fixes should include regression tests
+- Aim for behavior testing over implementation testing
+
+### Tools
+- Jest for unit tests
+- React Testing Library for component tests
+- Cypress for E2E tests
+- Use `data-test` attributes for selectors
+
+---
+
+## 8. Code Reviews and Version Control
+
+### Commits
+- Meaningful commit messages
+- Small, focused commits -- can be squashed on merge
+- Don't commit broken code
+
+### Pull Requests
+- Small, dedicated PRs over large ones
+- Include description, JIRA link, screenshots/video
+- Self-review before requesting review
+- No merge without peer review
+
+### PR Template
+```markdown
+## Description
+
+> Add a brief description
+
+## Links
+
+> Add JIRA, Docs, and other PR/Issue links
+
+## CC://
+
+> @tag as needed
+
+## Demo
+
+> Please add a video or an image of the behavior/changes, preferably before and after
+```
+
+---
+
+## 9. Linting & Formatting
+
+### Tools
+- ESLint with React and TypeScript plugins
+- Prettier for formatting
+- Husky for pre-commit hooks -- don't skip it
+- lint-staged for staged file checking
+
+### Commands
+```bash
+npm run lint          # Check for issues
+npm run lint:fix      # Auto-fix issues
+```
+
+---
+
+## 10. AI-Specific Guidance
+
+### When Generating Code
+- Always check for existing similar components before creating new ones
+- Reuse hooks from `src/utils/hooks/` and components from `src/utils/components/`
+- Match the patterns of neighboring files in the same directory
+- Run `npm run check-types` after making changes
+
+### When Reviewing Code
+- Verify all user-facing strings use `useKubevirtTranslation`
+- Check that loading, error, and empty states are handled
+- Ensure no `console.log` or debug code is left in

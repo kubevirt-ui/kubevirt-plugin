@@ -1,0 +1,392 @@
+---
+description: End-to-end feature development workflow from Jira to PR
+alwaysApply: false
+---
+
+# Feature Development Workflow
+
+Invoke with: *"start a new feature"*, *"work on CNV-XXX end to end"*, *"full development workflow"*
+
+This is the complete workflow from picking up a Jira ticket to submitting a PR.
+
+---
+
+## 1. Workflow Overview
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  1. PICK UP TICKET                                          │
+│  "Start working on CNV-12345"                               │
+│  → Fetch ticket, understand requirements, plan approach     │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│  2. PLAN IMPLEMENTATION                                     │
+│  "Help me plan the implementation"                          │
+│  → Identify files to modify, components to create           │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│  3. IMPLEMENT                                               │
+│  "Create the component", "Add the feature"                  │
+│  → Write code following project standards                   │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│  4. TEST                                                    │
+│  "Test my changes", "Add unit tests"                        │
+│  → Unit tests, interactive testing with Playwright          │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│  5. REVIEW                                                  │
+│  "Review my code"                                           │
+│  → Multi-perspective review (dev, UX, QE, security)         │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│  6. PREPARE PR                                              │
+│  "Prepare this for PR"                                      │
+│  → Quality checks, PR description, update Jira              │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 2. Phase 1: Pick Up Ticket
+
+### Get the Ticket
+```
+"Start working on CNV-12345"
+```
+
+I will:
+1. **Fetch ticket details** from Jira
+2. **Summarize requirements** - what needs to be built
+3. **Identify acceptance criteria** - definition of done
+4. **Check dependencies** - blockers, related tickets
+5. **Transition ticket** to "In Progress"
+
+### Understand the Context
+```
+"What's the context for CNV-12345?"
+```
+
+I will look at:
+- Epic/parent story
+- Related tickets
+- Previous comments and discussions
+- Attached mockups or designs
+
+### Ask Clarifying Questions
+If requirements are unclear, I'll suggest questions to ask the PM/designer before starting.
+
+---
+
+## 3. Phase 2: Plan Implementation
+
+### Identify Code Changes
+```
+"Help me plan how to implement this"
+```
+
+I will:
+1. **Find relevant existing code** - similar components, utilities
+2. **Identify files to modify** - which components are affected
+3. **Suggest new files needed** - new components, hooks, utils
+4. **Recommend approach** - how to structure the solution
+
+### Create Implementation Plan
+```
+"Create a plan for implementing CNV-12345"
+```
+
+Output:
+- [ ] Step 1: Create/modify X
+- [ ] Step 2: Create/modify Y
+- [ ] Step 3: Add tests for Z
+- [ ] Step 4: Update translations
+- [ ] Step 5: Verify in browser
+
+### Consider Architecture
+I'll consider:
+- Does this fit existing patterns?
+- Should this be a reusable component?
+- What's the impact on other features?
+- Are there performance implications?
+
+---
+
+## 4. Phase 3: Implement
+
+### Create Components
+```
+"Create the component for this feature"
+```
+
+Following `new-component.mdc` workflow:
+- Proper folder structure
+- TypeScript types
+- SCSS styles with BEM
+- Translation support
+- Accessibility requirements
+
+### Modify Existing Code
+```
+"Update the VM list to add the new column"
+```
+
+I will:
+- Find the relevant file
+- Make minimal, focused changes
+- Follow existing patterns
+- Update types as needed
+
+### Agent Perspectives During Implementation
+
+**As Developer**: Ensure code quality, patterns, performance
+**As UX**: Consider loading/error/empty states, accessibility
+**As QE**: Think about edge cases while coding
+**As Security**: Handle input validation, auth checks
+
+---
+
+## 5. Phase 4: Test
+
+### Unit Tests
+```
+"Add tests for this component"
+```
+
+Following project test patterns:
+- Create test file
+- Test happy path
+- Test error states
+- Test edge cases
+
+### Interactive Testing
+```
+"Test my changes in the browser"
+```
+
+Using Playwright MCP:
+1. Navigate to the affected page
+2. Verify new functionality works
+3. Check loading/error states
+4. Verify accessibility
+
+### Run All Tests
+```
+"Run tests to make sure nothing broke"
+```
+
+```bash
+npm run check-types && npm run lint && npm test
+```
+
+---
+
+## 6. Phase 5: Review
+
+### Self-Review
+```
+"Review my changes"
+```
+
+Using `team-review.mdc`:
+- **Developer perspective**: Code quality, patterns
+- **UX perspective**: Accessibility, states
+- **QE perspective**: Edge cases, test coverage
+- **Security perspective**: Input handling, auth
+
+### Deep-Dive Reviews
+```
+"As QE, what am I missing?"
+"As UX, review the accessibility"
+```
+
+### Fix Issues
+Address any blockers or suggestions before moving on.
+
+---
+
+## 7. Phase 6: Prepare PR
+
+### Pre-PR Checks
+```
+"Is this ready for PR?"
+```
+
+Following `pr-preparation.mdc`:
+- [ ] All checks pass (types, lint, test)
+- [ ] i18n updated (`npm run i18n`)
+- [ ] No debug code
+- [ ] Self-reviewed
+
+### Create PR Description
+```
+"Create the PR description for CNV-12345"
+```
+
+Generated PR:
+```markdown
+## 📝 Description
+[Summary from ticket + implementation notes]
+
+## 🔗 Links
+- JIRA: [CNV-12345](https://issues.redhat.com/browse/CNV-12345)
+
+## 👥 CC://
+@suggested-reviewers
+
+## 📹 Demo
+[Screenshots/video of changes]
+```
+
+### Update Jira
+```
+"Update Jira that this is ready for review"
+```
+
+- Add comment with PR link
+- Transition to "Code Review"
+
+---
+
+## 8. Quick Reference Commands
+
+### Starting Work
+```
+"Start working on CNV-12345"
+"What should I work on?"
+"Show my assigned tickets"
+```
+
+### During Development
+```
+"Help me implement this"
+"Create a component for X"
+"Add error handling here"
+"What's the pattern for Y?"
+```
+
+### Testing
+```
+"Add tests for this"
+"Test this in the browser"
+"Run all checks"
+```
+
+### Reviewing
+```
+"Review my code"
+"As [role], check this"
+"What am I missing?"
+```
+
+### Finishing Up
+```
+"Prepare this for PR"
+"Create PR description"
+"Update Jira with progress"
+```
+
+---
+
+## 9. Example Session
+
+```
+Developer: "I need to work on CNV-12345"
+
+AI: Let me fetch that ticket...
+[Fetches from Jira]
+
+Ticket: CNV-12345 - Add bulk delete action to VM list
+- Add checkbox selection to VM list
+- Add "Delete Selected" button
+- Show confirmation modal with selected VMs
+- Handle partial failures
+
+Acceptance Criteria:
+- Users can select multiple VMs
+- Bulk delete shows confirmation
+- Error handling for partial failures
+
+Related: CNV-12340 (bulk actions epic)
+
+Should I plan the implementation?
+
+Developer: "Yes, plan it"
+
+AI: Here's my implementation plan:
+
+1. Modify VMList component to add selection
+   - Add checkbox column
+   - Track selected VMs in state
+
+2. Create BulkDeleteModal component
+   - List selected VMs
+   - Confirmation button
+   - Handle delete API calls
+
+3. Add bulk delete action handler
+   - Use existing delete API
+   - Handle partial failures
+   - Show success/error feedback
+
+4. Add tests
+   - Selection functionality
+   - Modal behavior
+   - Error handling
+
+5. Verify accessibility
+   - Checkbox labels
+   - Modal focus management
+
+Ready to start implementing?
+
+Developer: "Yes, start with the selection"
+
+AI: [Creates/modifies code following standards]
+
+...development continues...
+
+Developer: "I'm done, prepare for PR"
+
+AI: Let me run checks and prepare the PR...
+
+[Runs npm run check-types && npm run lint && npm test]
+✅ All checks pass
+
+[Creates PR description]
+[Updates Jira with PR link]
+
+PR is ready for submission!
+```
+
+---
+
+## 10. Integration Points
+
+### MCP Servers Used
+- **Jira MCP**: Ticket management, status updates
+- **Playwright MCP**: Interactive testing
+- **GitHub MCP**: PR creation (if enabled)
+
+### Risks and Security (MCP / agents)
+- **Jira**: Tokens are not granular; the agent may run with full account permissions. Limit exposure (e.g. avoid admin roles for agent use). Use the Jira MCP only to **create** and **fetch** tickets; do **not** use it to delete or modify existing tickets, to limit the impact of mistakes or misuse. Do not add **jira_delete_issue** and **jira_update_issue** to the cursor allowlist so the developer can review everytime cursor try to use those actions.
+- **Playwright / E2E**: Needs a running backend; use separate clusters or avoid heavy automated traffic so shared environments are not blocked.
+- **GitHub**: Prefer granular tokens with minimum scope; restrict full-permission tokens to authorized use only.
+
+### Agent Rules Applied
+- `coding-standards.mdc`: Code quality
+- `team-review.mdc`: Multi-perspective review
+- `ticket-workflow.mdc`: Agent tracking for tickets
+- `pr-preparation.mdc`: PR checklist
+
+### Workflows Referenced
+- `new-component.mdc`: Creating components
+- `debugging.mdc`: When issues arise
+- `jira-workflow.mdc`: Jira search, update, and comment operations
+- `ticket-workflow.mdc`: Agent tracking for ticket implementation
+- `playwright-testing.mdc`: Interactive testing

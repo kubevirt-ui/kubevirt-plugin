@@ -1,0 +1,174 @@
+---
+description: Common development commands for this project
+alwaysApply: false
+---
+
+# Common Commands
+
+Invoke with: *"how do I build"*, *"run tests"*, *"deploy"*, *"docker"*, *"what commands"*, *"npm scripts"*
+
+Reference for all development, build, test, and utility commands.
+
+---
+
+## 1. Development
+
+### Start Development Environment
+```bash
+npm install              # Install dependencies
+npm run dev              # Start dev server (port 9001)
+npm run start-console    # Start console container (port 9000, requires oc login)
+```
+
+### Console Variants
+```bash
+npm run start-console                    # Standard console
+npm run start-console-with-monitoring    # With monitoring plugin
+npm run start-console-with-networking    # With networking plugin
+npm run start-console-with-nmstate       # With nmstate plugin
+```
+
+### Prerequisites
+- Node.js >= 22.0.0
+- npm >= 10.9.0
+- Docker (for console container)
+- `oc` CLI logged into cluster
+
+---
+
+## 2. Building
+
+```bash
+npm run build            # Production build
+npm run clean            # Clean build artifacts (dist/)
+```
+
+---
+
+## 3. Code Quality
+
+```bash
+npm run check-types      # TypeScript compiler check
+npm run lint             # ESLint + Prettier check
+npm run lint:fix         # Auto-fix linting errors
+```
+
+### Combined Quality Check (recommended before commit)
+```bash
+npm run check-types && npm run lint && npm test
+```
+
+---
+
+## 4. Testing
+
+### Unit Tests (Jest)
+```bash
+npm test                             # Run all unit tests
+npm run test-cov                     # With coverage report
+npm test path/to/file.test.ts        # Run specific test file
+npm test -- --watch                  # Watch mode
+npm test -- --testNamePattern="VM"   # Run tests matching pattern
+```
+
+### E2E Tests (Cypress)
+```bash
+npm run test-cypress            # Open Cypress interactive UI
+npm run test-cypress-headless   # Run headless (CI)
+npm run test-cypress-docker     # Run in Docker with VNC
+```
+
+### Cypress Reports
+```bash
+npm run cypress-merge        # Merge reports
+npm run cypress-generate     # Generate HTML report
+npm run cypress-postreport   # Full report pipeline
+```
+
+---
+
+## 5. Internationalization (i18n)
+
+```bash
+npm run i18n                 # Extract strings and update translations
+npm run i18n:verbose         # Verbose output
+npm run i18n-dummy-locale    # Create dummy locale for testing
+npm run i18n-to-po           # Convert i18n to PO format
+npm run po-to-i18n           # Convert PO to i18n format
+npm run export-pos           # Export PO files
+npm run memsource-upload     # Upload to Memsource
+npm run memsource-download   # Download from Memsource
+```
+
+---
+
+## 6. Docker
+
+```bash
+# Build image
+docker build -t quay.io/kubevirt-ui/kubevirt-plugin:latest .
+
+# Run plugin container
+docker run -it --rm -d -p 9001:80 quay.io/kubevirt-ui/kubevirt-plugin:latest
+
+# Push to registry
+docker push quay.io/kubevirt-ui/kubevirt-plugin:latest
+```
+
+---
+
+## 7. Cluster Deployment
+
+```bash
+# Deploy plugin
+oc process -f oc-manifest.yaml \
+  -p PLUGIN_NAME=kubevirt-plugin \
+  -p NAMESPACE=kubevirt-ui \
+  -p IMAGE=quay.io/kubevirt-ui/kubevirt-plugin:latest \
+  | oc create -f -
+
+# Enable plugin in console
+oc patch consoles.operator.openshift.io cluster \
+  --patch '{ "spec": { "plugins": ["kubevirt-plugin"] } }' --type=merge
+
+# Verify
+oc get pods -n kubevirt-ui
+oc get consoleplugins
+```
+
+---
+
+## 8. Cluster Verification
+
+```bash
+oc whoami                                  # Verify logged in
+oc project                                 # Check current project
+oc auth can-i list virtualmachines         # Check permissions
+oc get vm -n <namespace>                   # List VMs
+oc get vm <name> -n <namespace> -o yaml    # Get VM details
+oc get vmi -n <namespace>                  # List VMIs
+oc get dv -n <namespace>                   # Check DataVolumes
+```
+
+---
+
+## 9. Quick Reference
+
+### Daily Development
+```bash
+npm run dev                              # Start dev server (port 9001)
+npm run start-console                    # Start console (port 9000)
+npm run check-types && npm run lint      # Quick quality check
+```
+
+### Before Commit
+```bash
+npm run check-types && npm run lint && npm test
+npm run i18n                             # If strings changed
+```
+
+### Troubleshooting
+```bash
+npm run clean && npm install             # Clean reinstall
+rm -rf node_modules && npm install       # Full reinstall
+```

@@ -1,0 +1,303 @@
+---
+description: React component patterns and conventions
+globs: "**/*.tsx"
+alwaysApply: false
+---
+
+# React Component Guidelines
+
+Patterns and conventions for React components in this project.
+
+---
+
+## 1. Component Types
+
+### Page Components
+- Top-level route components
+- Handle data fetching and state
+- Compose container and presentational components
+- Located in `src/views/<feature>/`
+
+### Container Components
+- Fetch data and manage state
+- Pass data down to presentational components
+- Handle side effects
+- Contain business logic
+
+### Presentational Components
+- Pure UI rendering
+- Receive data via props
+- Minimal internal state (UI state only)
+- Highly reusable
+
+### Modal Components
+- Self-contained dialogs
+- Handle own open/close state or receive from parent
+- Focus management required
+- Accessible keyboard handling
+
+### Form Components
+- Use react-hook-form
+- Validation and error display
+- Loading/submitting states
+- Accessible labels and errors
+
+---
+
+## 2. File Structure
+
+### Component Directory
+```
+/components/vm-details/
+├── VMDetails.tsx              # Main component
+├── vm-details.scss            # Styles
+├── index.ts                   # Barrel export (optional)
+├── components/                # Sub-components
+│   ├── VMDetailsHeader.tsx
+│   ├── VMDetailsContent.tsx
+│   └── vm-details-header.scss
+├── hooks/                     # Component-specific hooks
+│   └── useVMDetails.ts
+├── utils/                     # Component-specific utilities
+│   ├── helpers.ts
+│   └── constants.ts
+└── types/                     # Component-specific types
+    └── types.ts
+```
+
+### Naming Conventions
+- **Component file**: PascalCase matching component (`VMDetails.tsx`)
+- **SCSS file**: kebab-case matching component (`vm-details.scss`)
+- **Hook files**: camelCase with use prefix (`useVMDetails.ts`)
+- **Utility files**: camelCase (`helpers.ts`, `constants.ts`)
+- **Type files**: camelCase (`types.ts`)
+
+---
+
+## 3. Component Structure
+
+### Import Order
+1. React and external libraries
+2. OpenShift Console SDK
+3. PatternFly components
+4. Internal utilities and hooks
+5. Internal components
+6. Types
+7. Styles (last)
+
+### Component Function Order
+1. **Translation hook**: `useKubevirtTranslation()`
+2. **Router hooks**: `useParams()`, `useNavigate()`, `useLocation()`
+3. **Data hooks**: `useK8sWatchResource()`, custom data hooks
+4. **Local state**: `useState()` declarations
+5. **Derived values**: `useMemo()` computations
+6. **Callbacks**: `useCallback()` functions
+7. **Effects**: `useEffect()` side effects
+8. **Early returns**: Loading, error, empty states
+9. **Main render**: Primary JSX return
+
+---
+
+## 4. Props Guidelines
+
+### Type Definitions
+- Define props type above component
+- Use descriptive, self-documenting names
+- Document complex props with comments
+- Export types if used elsewhere
+
+### Props Best Practices
+- Keep prop count manageable (< 10)
+- Use object props for related data
+- Provide default values where sensible
+- Avoid prop drilling (use context if > 2-3 levels)
+
+### Callback Props
+- Prefix with `on`: `onClick`, `onSubmit`, `onChange`
+- Pass minimal needed data to callbacks
+- Memoize with `useCallback` when passed to memoized children
+
+---
+
+## 5. State Management
+
+### Local State (`useState`)
+- UI state (open/closed, selected, expanded)
+- Form input values
+- Component-specific temporary data
+
+### Derived State (`useMemo`)
+- Computed from props or other state
+- Filtering, sorting, transforming
+- Expensive calculations
+
+### When to Lift State
+- Multiple components need same state
+- State affects sibling components
+- State needs to persist across renders
+
+### Global State (Zustand)
+- App-wide settings
+- User preferences
+- Cross-page state
+- Requires PR approval to add
+
+---
+
+## 6. Hooks Usage
+
+### useEffect Rules
+- Always specify dependencies
+- Empty array `[]` for mount-only
+- Return cleanup function when needed
+- Avoid object/array literals in deps
+
+### useMemo Rules
+- For expensive calculations
+- For values in useEffect deps
+- For props to memoized children
+- Don't overuse for simple operations
+
+### useCallback Rules
+- For functions passed to memoized children
+- For functions in useEffect deps
+- For event handlers passed to lists
+
+### Custom Hooks
+- Extract reusable logic
+- Prefix with `use`
+- Single responsibility
+- Return consistent shape
+
+---
+
+## 7. Conditional Rendering
+
+### Safe Patterns
+```tsx
+// Boolean check (safe)
+{items.length > 0 && <List items={items} />}
+
+// Ternary (clear)
+{isLoading ? <Loading /> : <Content />}
+
+// Multiple conditions
+{isLoading && <Loading />}
+{error && <Error error={error} />}
+{data && <Content data={data} />}
+```
+
+### Avoid
+```tsx
+// Unsafe - renders 0 if empty
+{items.length && <List items={items} />}
+
+// Deeply nested ternaries
+{a ? (b ? <X /> : <Y />) : (c ? <Z /> : <W />)}
+```
+
+---
+
+## 8. State Handling UI
+
+### Loading State
+- Show spinner or skeleton
+- Disable interactions
+- Maintain layout stability
+
+### Error State
+- User-friendly message
+- What went wrong
+- How to recover
+- Retry action if applicable
+
+### Empty State
+- Explain why empty
+- Guide next steps
+- Call-to-action when appropriate
+
+### Success State
+- Confirm action completed
+- Show result summary
+- Clear next steps
+
+---
+
+## 9. Performance
+
+### React.memo
+- Components receiving stable props
+- Expensive render trees
+- List items with stable data
+
+### Lazy Loading
+- Route-level code splitting
+- Large optional components
+- Heavy visualizations
+
+### Avoiding Re-renders
+- Stable callback references
+- Memoized computed values
+- Proper key props in lists
+
+---
+
+## 10. Accessibility
+
+### Required
+- All interactive elements keyboard accessible
+- ARIA labels on buttons without text
+- Focus management in modals
+- Form labels associated with inputs
+
+### Best Practices
+- Logical tab order
+- Visible focus indicators
+- Screen reader announcements for dynamic content
+- Color not sole indicator
+
+---
+
+## 11. PatternFly Integration
+
+### Component Usage
+- Use PatternFly as base components
+- Add project-specific class names
+- Follow PatternFly patterns and guidelines
+
+### Imports
+```tsx
+import { Button, Modal, Alert } from '@patternfly/react-core';
+import { Table, Thead, Tr, Th, Tbody, Td } from '@patternfly/react-table';
+```
+
+### Class Names
+- Don't rely on PatternFly class names in SCSS
+- They change between versions
+- Use project-specific classes as anchors
+
+---
+
+## 12. i18n Requirements
+
+### All User-Facing Strings
+```tsx
+const { t } = useKubevirtTranslation();
+
+return <h1>{t('Virtual Machines')}</h1>;
+```
+
+### Dynamic Values
+```tsx
+{t('{{count}} VMs running', { count: vmCount })}
+```
+
+### What to Translate
+- Labels, headings, button text
+- Error messages, help text
+- Tooltips, placeholders
+
+### What NOT to Translate
+- Proper nouns (Kubernetes, KubeVirt)
+- Technical identifiers
+- API field names

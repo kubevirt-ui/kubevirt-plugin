@@ -14,3 +14,6 @@ scripts/ca.crt
 scripts/console-client-secret
 *.json-*
 *.env
+
+# Personal Cursor rules (not shared with team)
+.cursor/rules/personal-*.mdc

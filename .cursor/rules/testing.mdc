@@ -1,0 +1,502 @@
+---
+description: Testing patterns for Jest unit tests and Cypress E2E
+globs: "**/*.test.ts,**/*.test.tsx,**/*.spec.ts,cypress/**/*.ts"
+alwaysApply: false
+---
+
+# Testing Guidelines
+
+Testing patterns, conventions, and best practices for this project.
+
+---
+
+## 1. Testing Strategy
+
+### Test Pyramid
+- **Unit Tests** (Jest): Hooks, utilities, pure functions
+- **Component Tests** (Jest + RTL): React components
+- **E2E Tests** (Cypress): Critical user flows
+
+### What to Test
+- New features and functionality
+- Bug fixes (regression tests)
+- Edge cases and error handling
+- Critical user paths
+
+### What Not to Test
+- Third-party library internals
+- Implementation details
+- Static markup without logic
+
+---
+
+## 2. Jest Unit Tests
+
+### File Organization
+- Test file next to source: `utils.ts` → `utils.test.ts`
+- Or in `__tests__` folder
+- Match source file name with `.test.ts` suffix
+
+### Test Structure
+```typescript
+import { functionToTest } from './utils';
+
+describe('functionToTest', () => {
+  // Setup shared across tests
+  beforeEach(() => {
+    // Reset state, mocks, etc.
+  });
+
+  afterEach(() => {
+    // Cleanup
+  });
+
+  describe('when given valid input', () => {
+    it('should return expected result', () => {
+      const result = functionToTest('valid');
+      expect(result).toBe('expected');
+    });
+  });
+
+  describe('when given invalid input', () => {
+    it('should throw an error', () => {
+      expect(() => functionToTest(null)).toThrow();
+    });
+  });
+
+  describe('edge cases', () => {
+    it('should handle empty array', () => {
+      expect(functionToTest([])).toEqual([]);
+    });
+
+    it('should handle undefined', () => {
+      expect(functionToTest(undefined)).toBeUndefined();
+    });
+  });
+});
+```
+
+### Naming Conventions
+- `describe` blocks: function/module name
+- Nested `describe`: scenario or context
+- `it` blocks: "should [expected behavior]"
+
+---
+
+## 3. Component Testing
+
+### React Testing Library
+```typescript
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+import MyComponent from './MyComponent';
+
+describe('MyComponent', () => {
+  it('should render the title', () => {
+    render(<MyComponent title="Test Title" />);
+    
+    expect(screen.getByText('Test Title')).toBeInTheDocument();
+  });
+
+  it('should call onClick when button is clicked', async () => {
+    const handleClick = jest.fn();
+    render(<MyComponent onClick={handleClick} />);
+    
+    await userEvent.click(screen.getByRole('button', { name: /submit/i }));
+    
+    expect(handleClick).toHaveBeenCalledTimes(1);
+  });
+
+  it('should display error message on validation failure', async () => {
+    render(<MyComponent />);
+    
+    await userEvent.click(screen.getByRole('button', { name: /submit/i }));
+    
+    expect(screen.getByText(/field is required/i)).toBeInTheDocument();
+  });
+});
+```
+
+### Query Priority
+1. `getByRole` - Most accessible
+2. `getByLabelText` - Form inputs
+3. `getByText` - Non-interactive content
+4. `getByTestId` - Last resort
+
+### User Events
+```typescript
+import userEvent from '@testing-library/user-event';
+
+// Click
+await userEvent.click(element);
+
+// Type
+await userEvent.type(input, 'text to type');
+
+// Clear and type
+await userEvent.clear(input);
+await userEvent.type(input, 'new value');
+
+// Select option
+await userEvent.selectOptions(select, 'option-value');
+
+// Tab navigation
+await userEvent.tab();
+```
+
+---
+
+## 4. Testing Hooks
+
+### Custom Hook Testing
+```typescript
+import { renderHook, act, waitFor } from '@testing-library/react';
+
+import { useMyHook } from './useMyHook';
+
+describe('useMyHook', () => {
+  it('should return initial state', () => {
+    const { result } = renderHook(() => useMyHook());
+    
+    expect(result.current.value).toBe(0);
+    expect(result.current.isLoading).toBe(false);
+  });
+
+  it('should update value when increment is called', () => {
+    const { result } = renderHook(() => useMyHook());
+    
+    act(() => {
+      result.current.increment();
+    });
+    
+    expect(result.current.value).toBe(1);
+  });
+
+  it('should handle async operations', async () => {
+    const { result } = renderHook(() => useMyHook());
+    
+    act(() => {
+      result.current.fetchData();
+    });
+    
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
+    
+    expect(result.current.data).toBeDefined();
+  });
+});
+```
+
+---
+
+## 5. Mocking
+
+### Mocking Modules
+```typescript
+// Mock entire module
+jest.mock('@kubevirt-plugin/utils/api', () => ({
+  fetchVM: jest.fn(),
+}));
+
+import { fetchVM } from '@kubevirt-plugin/utils/api';
+
+beforeEach(() => {
+  (fetchVM as jest.Mock).mockReset();
+});
+
+it('should handle API response', async () => {
+  (fetchVM as jest.Mock).mockResolvedValue({ name: 'test-vm' });
+  
+  // test code
+});
+```
+
+### Mocking Console SDK
+```typescript
+// __mocks__/k8s.ts
+export const useK8sWatchResource = jest.fn(() => [[], true, null]);
+
+// In test
+import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+
+jest.mock('@openshift-console/dynamic-plugin-sdk');
+
+(useK8sWatchResource as jest.Mock).mockReturnValue([
+  [mockVM],
+  true,  // loaded
+  null   // error
+]);
+```
+
+### Mock Data
+```typescript
+// Create mock factories
+const createMockVM = (overrides = {}): V1VirtualMachine => ({
+  apiVersion: 'kubevirt.io/v1',
+  kind: 'VirtualMachine',
+  metadata: {
+    name: 'test-vm',
+    namespace: 'default',
+  },
+  spec: {
+    running: false,
+    template: {
+      spec: {
+        domain: {
+          devices: {},
+          resources: {},
+        },
+      },
+    },
+  },
+  ...overrides,
+});
+```
+
+---
+
+## 6. Testing Async Code
+
+### Waiting for State Updates
+```typescript
+import { waitFor, screen } from '@testing-library/react';
+
+it('should load data', async () => {
+  render(<MyComponent />);
+  
+  // Wait for loading to finish
+  await waitFor(() => {
+    expect(screen.queryByText(/loading/i)).not.toBeInTheDocument();
+  });
+  
+  // Assert on loaded content
+  expect(screen.getByText('Data loaded')).toBeInTheDocument();
+});
+```
+
+### Testing Promises
+```typescript
+it('should handle async operation', async () => {
+  const promise = myAsyncFunction();
+  
+  await expect(promise).resolves.toEqual({ success: true });
+});
+
+it('should handle rejected promise', async () => {
+  const promise = myFailingFunction();
+  
+  await expect(promise).rejects.toThrow('Error message');
+});
+```
+
+---
+
+## 7. Cypress E2E Tests
+
+### Test Structure
+```typescript
+describe('VM List', () => {
+  before(() => {
+    cy.login();
+  });
+
+  beforeEach(() => {
+    cy.visit('/virtualization/vms');
+  });
+
+  it('should display list of VMs', () => {
+    cy.get('[data-test="vm-list"]').should('be.visible');
+    cy.get('[data-test="vm-row"]').should('have.length.gt', 0);
+  });
+
+  it('should navigate to VM details', () => {
+    cy.get('[data-test="vm-row"]').first().click();
+    cy.url().should('include', '/virtualmachines/');
+  });
+
+  it('should create a new VM', () => {
+    cy.get('[data-test="create-vm-button"]').click();
+    cy.get('[data-test="vm-name-input"]').type('test-vm');
+    cy.get('[data-test="submit-button"]').click();
+    
+    cy.get('[data-test="success-alert"]').should('be.visible');
+  });
+});
+```
+
+### Selectors
+```typescript
+// Use data-test attributes
+cy.get('[data-test="vm-list"]');
+cy.get('[data-test="create-button"]');
+
+// Find by role
+cy.get('button').contains('Create');
+
+// Check existing selectors in cypress/views/
+import { listView } from '../views/selector';
+cy.get(listView.createButton);
+```
+
+### Commands
+```typescript
+// Custom commands in cypress/support/commands.ts
+Cypress.Commands.add('login', () => {
+  // Login logic
+});
+
+Cypress.Commands.add('createVM', (name: string) => {
+  // VM creation logic
+});
+
+// Usage
+cy.login();
+cy.createVM('my-vm');
+```
+
+### Waiting
+```typescript
+// Wait for element
+cy.get('[data-test="vm-list"]', { timeout: 10000 }).should('be.visible');
+
+// Wait for network
+cy.intercept('GET', '/api/vms').as('getVMs');
+cy.wait('@getVMs');
+
+// Wait for condition
+cy.get('[data-test="status"]').should('contain', 'Running');
+```
+
+---
+
+## 8. Test Coverage
+
+### Running Coverage
+```bash
+npm run test-cov
+```
+
+### Coverage Goals
+- Aim for meaningful coverage, not 100%
+- Focus on business logic
+- Cover error paths
+- Cover edge cases
+
+### What to Cover
+- Public API of modules
+- All branches (if/else, switch)
+- Error handling paths
+- User interactions
+
+---
+
+## 9. Best Practices
+
+### Test Behavior, Not Implementation
+```typescript
+// ❌ Testing implementation
+expect(component.state.isOpen).toBe(true);
+
+// ✅ Testing behavior
+expect(screen.getByRole('dialog')).toBeVisible();
+```
+
+### Keep Tests Independent
+```typescript
+// ❌ Tests depend on each other
+it('should create item', () => { /* creates item */ });
+it('should delete created item', () => { /* deletes item from previous test */ });
+
+// ✅ Each test is independent
+it('should delete item', () => {
+  // Setup: create item
+  // Action: delete item
+  // Assert: item is deleted
+});
+```
+
+### Clear Test Names
+```typescript
+// ❌ Vague names
+it('works correctly', () => {});
+it('test 1', () => {});
+
+// ✅ Descriptive names
+it('should display error when form is submitted with empty required field', () => {});
+it('should disable submit button while form is submitting', () => {});
+```
+
+### Arrange-Act-Assert
+```typescript
+it('should increment counter when button is clicked', () => {
+  // Arrange
+  render(<Counter initialValue={0} />);
+  
+  // Act
+  userEvent.click(screen.getByRole('button', { name: /increment/i }));
+  
+  // Assert
+  expect(screen.getByText('1')).toBeInTheDocument();
+});
+```
+
+---
+
+## 10. Running Tests
+
+### Commands
+```bash
+# Run all unit tests
+npm test
+
+# Run with coverage
+npm run test-cov
+
+# Run specific file
+npm test path/to/file.test.ts
+
+# Run in watch mode
+npm test -- --watch
+
+# Run matching pattern
+npm test -- --testNamePattern="VM"
+
+# Open Cypress
+npm run test-cypress
+
+# Cypress headless
+npm run test-cypress-headless
+```
+
+---
+
+## 11. Checklist
+
+### Unit Test Checklist
+- [ ] Tests behavior, not implementation
+- [ ] Covers happy path
+- [ ] Covers error cases
+- [ ] Covers edge cases
+- [ ] Uses meaningful assertions
+- [ ] Independent (no test order dependency)
+- [ ] Properly mocks dependencies
+- [ ] Cleans up after itself
+
+### Component Test Checklist
+- [ ] Tests render correctly
+- [ ] Tests user interactions
+- [ ] Tests loading state
+- [ ] Tests error state
+- [ ] Tests empty state
+- [ ] Uses accessible queries
+- [ ] Uses userEvent for interactions
+- [ ] Waits for async operations properly
+
+### E2E Test Checklist
+- [ ] Uses data-test selectors
+- [ ] Tests critical user flows
+- [ ] Handles loading and timing
+- [ ] Cleans up test data
+- [ ] Runs in CI/CD pipeline

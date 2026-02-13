@@ -1,0 +1,344 @@
+---
+description: Interactive testing with Playwright MCP server
+alwaysApply: false
+---
+
+# Playwright Testing Workflow
+
+Invoke with: *"test the UI"*, *"check this page"*, *"navigate to..."*, *"verify the form works"*
+
+This workflow uses the Playwright MCP server for interactive browser testing and debugging.
+
+---
+
+## 1. What Playwright MCP Does
+
+### Interactive Browser Control
+- Navigate to pages
+- Click buttons and links
+- Fill forms
+- Take screenshots
+- Capture accessibility snapshots
+- Verify UI behavior
+
+### Use Cases
+- Manually verify changes during development
+- Debug UI issues interactively
+- Check accessibility
+- Validate user flows
+- Test forms and interactions
+
+---
+
+## 2. Getting Started
+
+### Prerequisites
+- Development server running: `npm run dev` (port 9001)
+- Console running: `npm run start-console` (port 9000)
+- Or a deployed environment URL
+
+### Basic Navigation
+```
+"Navigate to http://localhost:9000/virtualization/vms"
+"Open the VM list page"
+"Go to the VM creation wizard"
+```
+→ Uses `browser_navigate`
+
+### Taking Snapshots
+```
+"Take a snapshot of the current page"
+"Show me what's on the page"
+"Capture the current state"
+```
+→ Uses `browser_snapshot` (accessibility tree, better than screenshot)
+
+### Screenshots
+```
+"Take a screenshot"
+"Screenshot this page"
+```
+→ Uses `browser_take_screenshot`
+
+---
+
+## 3. Common Testing Flows
+
+### Verify a Page Loads
+```
+"Navigate to the VM list and verify it shows VMs"
+```
+1. Navigate to URL
+2. Take snapshot
+3. Verify expected content visible
+
+### Test a Button/Action
+```
+"Click the Create VM button and check what happens"
+```
+1. Navigate to page
+2. Take snapshot to see elements
+3. Click button
+4. Take snapshot to verify result
+
+### Fill a Form
+```
+"Fill out the VM name field with 'test-vm'"
+"Complete the VM creation form with test data"
+```
+→ Uses `browser_fill_form` or `browser_type`
+
+### Test Navigation
+```
+"Click on the first VM in the list and verify the details page"
+```
+1. Navigate to list
+2. Click on item
+3. Verify navigation occurred
+4. Verify details displayed
+
+---
+
+## 4. Available Browser Actions
+
+### Navigation
+| Command | What It Does |
+|---------|--------------|
+| `browser_navigate` | Go to a URL |
+| `browser_navigate_back` | Go back |
+| `browser_tabs` | Manage browser tabs |
+
+### Interaction
+| Command | What It Does |
+|---------|--------------|
+| `browser_click` | Click on element |
+| `browser_type` | Type text |
+| `browser_fill_form` | Fill form fields |
+| `browser_select_option` | Select dropdown option |
+| `browser_hover` | Hover over element |
+| `browser_press_key` | Press keyboard key |
+| `browser_drag` | Drag and drop |
+| `browser_file_upload` | Upload a file |
+
+### Inspection
+| Command | What It Does |
+|---------|--------------|
+| `browser_snapshot` | Accessibility tree (recommended) |
+| `browser_take_screenshot` | Visual screenshot |
+| `browser_console_messages` | Get console logs |
+| `browser_network_requests` | See network activity |
+
+### Waiting
+| Command | What It Does |
+|---------|--------------|
+| `browser_wait_for` | Wait for element/condition |
+
+### Dialogs
+| Command | What It Does |
+|---------|--------------|
+| `browser_handle_dialog` | Handle alert/confirm dialogs |
+
+---
+
+## 5. Accessibility Testing
+
+### Check Page Accessibility
+```
+"Take an accessibility snapshot and check for issues"
+"Is this page keyboard accessible?"
+"Check the accessibility of this form"
+```
+
+The snapshot reveals:
+- Element roles and names
+- ARIA attributes
+- Focusable elements
+- Interactive element labels
+
+### What to Look For
+- Buttons without accessible names
+- Images without alt text
+- Form inputs without labels
+- Missing landmarks
+- Focus order issues
+
+---
+
+## 6. Debugging UI Issues
+
+### Visual Verification
+```
+"The button isn't visible, take a screenshot to see the current state"
+"Show me what the page looks like after clicking Submit"
+```
+
+### Console Errors
+```
+"Check if there are any console errors"
+"Show me the JavaScript errors on this page"
+```
+→ Uses `browser_console_messages`
+
+### Network Issues
+```
+"Check if the API calls are failing"
+"Show me the network requests when I click Save"
+```
+→ Uses `browser_network_requests`
+
+### State Verification
+```
+"Take a snapshot and tell me if the loading spinner is showing"
+"Verify the error message appears after invalid input"
+```
+
+---
+
+## 7. Form Testing
+
+### Fill and Submit
+```
+"Fill the VM name with 'test-vm' and submit the form"
+```
+
+### Validation Testing
+```
+"Submit the form without filling required fields and check for errors"
+"Enter invalid email and verify validation message"
+```
+
+### Complex Forms
+```
+"Complete the entire VM creation wizard with test data"
+```
+1. Fill each step
+2. Navigate between steps
+3. Verify data persists
+4. Submit and verify success
+
+---
+
+## 8. Testing Modals
+
+### Open Modal
+```
+"Click Delete and verify the confirmation modal appears"
+```
+
+### Modal Interaction
+```
+"In the delete modal, click Cancel"
+"Fill the modal form and submit"
+```
+
+### Modal Accessibility
+```
+"Verify the modal traps focus correctly"
+"Check that Escape closes the modal"
+```
+
+---
+
+## 9. Testing Workflows
+
+### VM Creation Flow
+```
+1. "Navigate to the VM catalog"
+2. "Click on the Fedora template"
+3. "Fill in 'test-vm' for the name"
+4. "Click Create"
+5. "Verify success message appears"
+6. "Navigate to VM list and verify 'test-vm' exists"
+```
+
+### VM Actions
+```
+1. "Navigate to VM details for 'test-vm'"
+2. "Click the Start button"
+3. "Verify status changes to Starting"
+4. "Wait for status to show Running"
+```
+
+---
+
+## 10. Tips
+
+### Use Snapshots First
+Before clicking or interacting, take a snapshot to understand the page structure. Snapshots are faster and more informative than screenshots for automation.
+
+### Wait for Loading
+```
+"Wait for the page to finish loading, then take a snapshot"
+"After clicking, wait for the spinner to disappear"
+```
+
+### Element Selection
+When clicking or interacting, describe elements clearly:
+- "Click the button labeled 'Create VM'"
+- "Click the first row in the table"
+- "Click the Delete button in the actions menu"
+
+### Combine with Development
+```
+"I made changes to the VM form, let me test it"
+1. Ensure dev server is running
+2. Navigate to the form
+3. Test the changes interactively
+4. Verify everything works
+```
+
+---
+
+## 11. Common URLs
+
+### Local Development
+```
+http://localhost:9000                     # Console UI (npm run start-console)
+http://localhost:9001                     # Plugin dev server (npm run dev)
+http://localhost:9000/virtualization     # Virtualization overview
+http://localhost:9000/virtualization/vms # VM list
+http://localhost:9000/catalog            # VM catalog
+```
+
+### Adjust for Your Environment
+Replace `localhost:9000` with your actual console URL if using a remote cluster.
+The plugin dev server (port 9001) is consumed by the console -- navigate via port 9000.
+
+---
+
+## 12. Example Session
+
+```
+Developer: "I want to test the VM creation flow"
+
+AI: Let me navigate to the catalog and test it.
+[browser_navigate to VM catalog]
+[browser_snapshot]
+
+Here's the current page state. I can see:
+- Template cards for Fedora, RHEL, Windows
+- Filters on the left
+- Create button visible
+
+Developer: "Click on the Fedora template"
+
+AI: [browser_click on Fedora template]
+[browser_snapshot]
+
+The template details are now shown. I can see:
+- Template name and description
+- Customize VM button
+- Quick create option
+
+Developer: "Quick create a VM called 'test-vm'"
+
+AI: [browser_click on Quick Create]
+[browser_type 'test-vm' in name field]
+[browser_click Create]
+[browser_snapshot]
+
+VM creation initiated. The page shows:
+- Success message
+- Navigation to VM details
+- Status: Provisioning
+```

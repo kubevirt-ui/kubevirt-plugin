@@ -1,0 +1,129 @@
+---
+description: Complete ticket workflow with multi-agent tracking
+alwaysApply: false
+---
+
+# Ticket Workflow with Agent Tracking
+
+Invoke with: *"start working on CNV-XXX"*, *Jira ticket URL*, *"ticket workflow"*
+
+This workflow defines how to execute a complete Jira ticket from analysis to PR using agent tracking.
+
+---
+
+## 1. Workflow Steps
+
+When a ticket URL is received, execute immediately:
+
+1. **Fetch and analyze the ticket** - Understand requirements
+2. **Create todos with agent tracking** - Show both agents and tasks
+3. **Run Developer Agent first** - Implement the fix/feature
+4. **Run remaining review agents** - UX, QE, Security, KubeVirt Expert
+5. **Ask to implement recommendations** - After each review phase
+
+---
+
+## 2. Todo Structure
+
+Use the TodoWrite tool to create structured tracking:
+
+```
+Todos:
+- id: "dev-agent", content: "🧑‍💻 Developer Agent", status: "in_progress"
+- id: "dev-1", content: "  └─ Analyze issue and find root cause", status: "in_progress"
+- id: "dev-2", content: "  └─ Implement fix", status: "pending"
+- id: "dev-3", content: "  └─ Run quality checks", status: "pending"
+- id: "ux-agent", content: "🎨 UX Agent", status: "pending"
+- id: "ux-1", content: "  └─ Review accessibility", status: "pending"
+- id: "ux-2", content: "  └─ Check UI states", status: "pending"
+- id: "qe-agent", content: "🧪 QE Agent", status: "pending"
+- id: "qe-1", content: "  └─ Identify edge cases", status: "pending"
+- id: "qe-2", content: "  └─ Suggest tests", status: "pending"
+- id: "security-agent", content: "🔒 Security Agent", status: "pending"
+- id: "security-1", content: "  └─ Review security", status: "pending"
+- id: "kubevirt-agent", content: "🎯 KubeVirt Expert", status: "pending"
+- id: "kubevirt-1", content: "  └─ Validate K8s patterns", status: "pending"
+```
+
+---
+
+## 3. Agent Execution
+
+### Developer Agent (first - does implementation)
+- Update todo: `dev-agent` → in_progress
+- Analyze, implement, test
+- Update todos as subtasks complete
+- Mark `dev-agent` → completed
+
+### Review Agents (after implementation)
+For each review agent (UX, QE, Security, KubeVirt):
+1. Update agent todo → in_progress
+2. Run the agent review
+3. Present findings with severity
+4. Ask: "Implement these recommendations? [Yes/Skip]"
+5. If Yes: implement and update subtask todos
+6. Mark agent todo → completed
+7. Move to next agent
+
+---
+
+## 4. Post-Agent Prompt
+
+After each agent completes its review, ask:
+
+```
+[Agent Name] found:
+🔴 X blockers | 🟡 Y suggestions | 🟢 Z nitpicks
+
+Implement these recommendations?
+1. ✅ Yes, implement now
+2. ⏭️ Skip, continue to next agent
+3. 🛑 Stop here
+```
+
+---
+
+## 5. Final Summary
+
+After all agents complete:
+
+```
+## CNV-XXXXX Complete!
+
+✅ Developer: [summary of implementation]
+✅ UX: [summary of UX changes]
+✅ QE: [summary of test additions]
+✅ Security: [summary of findings]
+✅ KubeVirt: [summary of validation]
+
+Ready for PR? [Yes/Review changes first]
+```
+
+---
+
+## 6. Example Flow
+
+```
+User: https://issues.redhat.com/browse/CNV-78624
+
+AI: Starting work on CNV-78624...
+
+[Creates todos with all agents]
+[Developer Agent runs, finds root cause, implements fix]
+[Updates todos as subtasks complete]
+
+Developer Agent complete! Moving to UX Agent...
+
+🎨 UX Agent found:
+🔴 0 blockers | 🟡 1 suggestion | 🟢 0 nitpicks
+
+Implement this recommendation?
+1. ✅ Yes
+2. ⏭️ Skip
+
+User: 1
+
+[Implements, continues through remaining agents...]
+
+All agents complete! Ready for PR.
+```
