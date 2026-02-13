@@ -48,7 +48,7 @@ const VolumeSource: FC<VolumeSourceProps> = ({
       <PVCSource bootableVolume={bootableVolume} setBootableVolumeField={setBootableVolumeField} />
     ),
     [DROPDOWN_FORM_SELECTION.USE_HTTP]: (
-      <HTTPSource setBootableVolumeField={setBootableVolumeField} />
+      <HTTPSource bootableVolume={bootableVolume} setBootableVolumeField={setBootableVolumeField} />
     ),
     [DROPDOWN_FORM_SELECTION.USE_REGISTRY]: (
       <RegistrySource
