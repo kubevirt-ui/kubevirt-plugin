@@ -18,6 +18,7 @@ const DiskModal: FC<V1DiskModalProps> = ({
   onClose,
   onSubmit,
   onUploadedDataVolume,
+  onUploadStarted,
   vm,
 }) => {
   const diskVolume = getVolumes(vm)?.find((volume) => volume.name === editDiskName);
@@ -42,6 +43,7 @@ const DiskModal: FC<V1DiskModalProps> = ({
       onClose={onClose}
       onSubmit={onSubmit}
       onUploadedDataVolume={onUploadedDataVolume}
+      onUploadStarted={onUploadStarted}
       pvc={pvc}
       vm={vm}
     />
