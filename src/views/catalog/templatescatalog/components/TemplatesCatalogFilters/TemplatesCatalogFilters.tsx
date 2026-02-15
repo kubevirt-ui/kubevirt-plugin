@@ -101,7 +101,7 @@ export const TemplatesCatalogFilters: FC<{
         />
         <TemplatesCatalogFiltersGroup
           filters={Object.values(WORKLOADS).map((v) => ({
-            label: WORKLOADS_LABELS?.[v],
+            label: WORKLOADS_LABELS?.[v] || v,
             value: v,
           }))}
           groupKey="workload"

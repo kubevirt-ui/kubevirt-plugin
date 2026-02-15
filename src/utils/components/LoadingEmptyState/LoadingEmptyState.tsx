@@ -1,6 +1,6 @@
 import React, { ComponentType, FC, ReactNode } from 'react';
 
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { EmptyState, EmptyStateBody, Spinner } from '@patternfly/react-core';
 
 type LoadingEmptyStateProps = {
@@ -9,12 +9,15 @@ type LoadingEmptyStateProps = {
 };
 
 const LoadingEmptyState: FC<LoadingEmptyStateProps> = ({
-  bodyContents = t('Loading ...'),
+  bodyContents,
   iconComponent = Spinner,
 }) => {
+  const { t } = useKubevirtTranslation();
+  const defaultBodyContents = bodyContents ?? t('Loading ...');
+
   return (
     <EmptyState icon={iconComponent}>
-      <EmptyStateBody>{bodyContents}</EmptyStateBody>
+      <EmptyStateBody>{defaultBodyContents}</EmptyStateBody>
     </EmptyState>
   );
 };

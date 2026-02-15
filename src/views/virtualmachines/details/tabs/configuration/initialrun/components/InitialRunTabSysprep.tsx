@@ -14,7 +14,7 @@ import {
 } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
 import { SysprepDescription } from '@kubevirt-utils/components/SysprepModal/SysprepDescription';
 import { SysprepModal } from '@kubevirt-utils/components/SysprepModal/SysprepModal';
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { UpdateCustomizeInstanceType } from '@kubevirt-utils/store/customizeInstanceType';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -29,6 +29,7 @@ type InitialRunTabSysprepProps = {
   vm: V1VirtualMachine;
 };
 const InitialRunTabSysprep: FC<InitialRunTabSysprepProps> = ({ canUpdateVM, onSubmit, vm }) => {
+  const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const vmVolumes = getVolumes(vm);
   const cluster = getCluster(vm);

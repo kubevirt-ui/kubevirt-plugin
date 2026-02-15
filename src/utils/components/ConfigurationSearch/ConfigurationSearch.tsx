@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom-v5-compat';
 
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import useEventListener from '@kubevirt-utils/hooks/useEventListener';
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   Bullseye,
@@ -32,6 +32,7 @@ type ConfigurationSearchProps = {
 };
 
 const ConfigurationSearch: FC<ConfigurationSearchProps> = ({ createSearchURL, searchItems }) => {
+  const { t } = useKubevirtTranslation();
   const [value, setValue] = useState<string>('');
   const navigate = useNavigate();
   const location = useLocation();

@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualizationFeatureOperators } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/types';
 import { isInstalled } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/utils';
 import { useVirtualizationFeaturesContext } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/VirtualizationFeaturesContext/VirtualizationFeaturesContext';
@@ -27,6 +27,7 @@ const HighAvailabilityFeatureItem: FC<HighAvailabilityFeatureItemProps> = ({
   operatorName,
   setAlternativeChecked,
 }) => {
+  const { t } = useKubevirtTranslation();
   const { operatorDetailsMap, operatorsToInstall, updateInstallRequests } =
     useVirtualizationFeaturesContext();
 
