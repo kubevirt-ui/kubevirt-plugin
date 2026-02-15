@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { Link } from 'react-router-dom-v5-compat';
 
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getSelfValidationCheckupURL } from '@kubevirt-utils/resources/checkups/urls';
 import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 
@@ -24,6 +24,7 @@ const RunningCheckupWarningDescription: FC<RunningCheckupWarningDescriptionProps
   preventLink = false,
   showTitle = true,
 }) => {
+  const { t } = useKubevirtTranslation();
   const linkTo = getSelfValidationCheckupURL(configMapName, configMapNamespace, configMapCluster);
 
   return (

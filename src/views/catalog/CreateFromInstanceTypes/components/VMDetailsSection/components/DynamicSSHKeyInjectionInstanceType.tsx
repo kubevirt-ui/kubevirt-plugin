@@ -5,11 +5,12 @@ import { instanceTypeActionType } from '@catalog/CreateFromInstanceTypes/state/u
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { DynamicSSHKeyInjection } from '@kubevirt-utils/components/DynamicSSHKeyInjection/DynamicSSHKeyInjection';
 import DynamicSSHKeyInjectionHelpTextIcon from '@kubevirt-utils/components/DynamicSSHKeyInjection/DynamicSSHKeyInjectionHelpTextIcon';
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import { dataSourceHasDynamicSSHLabel } from '../utils/utils';
 
 const DynamicSSHKeyInjectionInstanceType = () => {
+  const { t } = useKubevirtTranslation();
   const { instanceTypeVMState, setInstanceTypeVMState } = useInstanceTypeVMStore();
   const { pvcSource, selectedBootableVolume, sshSecretCredentials } = instanceTypeVMState;
 

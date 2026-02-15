@@ -5,7 +5,7 @@ import { AlertType } from '@kubevirt-utils/components/AlertsCard/utils/types';
 import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';
 import { getAlertsPath } from '@kubevirt-utils/constants/prometheus';
 import useInfrastructureAlerts from '@kubevirt-utils/hooks/useInfrastructureAlerts/useInfrastructureAlerts';
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   useActivePerspective,
@@ -22,6 +22,7 @@ import { HEALTH_ALERTS_URL_PARAMS } from './utils/utils';
 import './KubevirtHealthPopup.scss';
 
 const KubevirtHealthPopup: FC = () => {
+  const { t } = useKubevirtTranslation();
   const { alerts, loaded, numberOfAlerts } = useInfrastructureAlerts();
   const [perspective] = useActivePerspective();
 

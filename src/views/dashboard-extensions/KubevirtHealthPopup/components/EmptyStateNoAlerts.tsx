@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { EmptyState } from '@patternfly/react-core';
 import { VirtualMachineIcon } from '@patternfly/react-icons';
 
@@ -9,6 +9,7 @@ type EmptyStateNoAlertsProps = {
 };
 
 const EmptyStateNoAlerts: FC<EmptyStateNoAlertsProps> = ({ classname }) => {
+  const { t } = useKubevirtTranslation();
   return (
     <EmptyState
       className={classname}
