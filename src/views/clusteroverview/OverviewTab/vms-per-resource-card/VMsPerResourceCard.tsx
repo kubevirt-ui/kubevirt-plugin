@@ -28,11 +28,12 @@ const VMsPerResourceCard = () => {
             <FormPFSelect
               onSelect={handleSelect}
               selected={vmResourceOption}
+              selectedLabel={t(vmResourceOption)}
               toggleProps={{ id: 'overview-vms-per-resource-card' }}
             >
               {vmsPerResourceOptions?.map((scope) => (
                 <SelectOption key={scope.type} value={scope.title}>
-                  {scope.title}
+                  {t(scope.title)}
                 </SelectOption>
               ))}
             </FormPFSelect>

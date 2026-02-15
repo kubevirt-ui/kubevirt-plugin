@@ -23,8 +23,6 @@ const Conditions: FC = () => {
 
   const condition = queryData?.data?.result?.[0]?.value?.[1];
 
-  const label = VALUE_TO_LABLE[condition];
-
   if (!loaded || !hyperLoaded)
     return (
       <StackItem>
@@ -33,6 +31,8 @@ const Conditions: FC = () => {
     );
 
   if (isEmpty(condition)) return null;
+
+  const label = VALUE_TO_LABLE[condition] ? t(VALUE_TO_LABLE[condition]) : condition;
 
   return (
     <>

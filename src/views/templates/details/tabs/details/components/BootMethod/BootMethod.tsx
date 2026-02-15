@@ -23,6 +23,8 @@ const BootMethod: FC<BootMethodProps> = ({ editable, template }) => {
 
   const firmwareBootloaderTitle = getBootloaderTitleFromVM(
     getTemplateVirtualMachineObject(template),
+    undefined,
+    t,
   );
   const onEditClick = () =>
     createModal(({ isOpen, onClose }) => (

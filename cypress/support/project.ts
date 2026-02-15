@@ -35,14 +35,20 @@ Cypress.Commands.add('switchProjectUsingTreeView', (projectName: string) => {
 });
 
 Cypress.Commands.add('switchProject', (projectName: string) => {
+  if (projectName == null || (typeof projectName === 'string' && !projectName.trim())) {
+    throw new Error(
+      'switchProject requires a project name. Set Cypress env TEST_NS (or the variable passed to switchProject).',
+    );
+  }
+  const name = typeof projectName === 'string' ? projectName : String(projectName);
   cy.get('body').then(($body) => {
     if ($body.find(TREEVIEW_ROOT_ID).length) {
-      cy.switchProjectUsingTreeView(projectName);
+      cy.switchProjectUsingTreeView(name);
       return;
     }
 
     cy.byLegacyTestID('namespace-bar-dropdown').contains('Project:').click();
     cy.byTestID('showSystemSwitch').check();
-    cy.byTestID('dropdown-menu-item-link').contains(projectName).click();
+    cy.byTestID('dropdown-menu-item-link').contains(name).click();
   });
 });

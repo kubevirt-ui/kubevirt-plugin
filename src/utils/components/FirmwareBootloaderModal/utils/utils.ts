@@ -1,3 +1,4 @@
+import { TFunction } from 'react-i18next';
 import { produce } from 'immer';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -44,10 +45,11 @@ export const getBootloaderFromVM = (
 export const getBootloaderTitleFromVM = (
   vm: V1VirtualMachine,
   defaultBootmode?: BootMode,
+  t?: TFunction,
 ): string => {
   const bootloader = getBootloaderFromVM(vm, defaultBootmode);
-
-  return BootModeTitles[bootloader];
+  const title = BootModeTitles[bootloader];
+  return t ? t(title) : title;
 };
 
 export const getBootloaderOptions = (vm: V1VirtualMachine): BootloaderOption[] => {

@@ -26,9 +26,9 @@ const DrilldownMenuItemWrapper: FC<DrilldownMenuItemWrapperProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const { seriesName, sizes } = series;
-  const { disabled, Icon, seriesLabel } = instanceTypeSeriesNameMapper[seriesName] || {};
+  const { disabled, Icon } = instanceTypeSeriesNameMapper[seriesName] || {};
 
-  const defaultSeriesLabel = useMemo(() => getSeriesLabel(seriesName, t), [seriesName, t]);
+  const seriesLabel = useMemo(() => getSeriesLabel(seriesName, t), [seriesName, t]);
 
   const getMenuItems = (isHugepages?: boolean) => (
     <RedHatInstanceTypeSeriesSizesMenuItems
@@ -42,12 +42,7 @@ const DrilldownMenuItemWrapper: FC<DrilldownMenuItemWrapperProps> = ({
   );
 
   return disabled ? null : (
-    <DrilldownMenuItem
-      Icon={Icon && Icon}
-      id={seriesName}
-      key={seriesName}
-      label={seriesLabel || defaultSeriesLabel}
-    >
+    <DrilldownMenuItem Icon={Icon && Icon} id={seriesName} key={seriesName} label={seriesLabel}>
       {seriesHasHugepagesVariant(seriesName) ? (
         <>
           <DrilldownMenuItem id={`${seriesName}-hugepages`} label={<HugepagesInfo />}>
