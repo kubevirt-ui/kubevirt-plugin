@@ -59,12 +59,12 @@ const FirmwareBootloaderModal: FC<FirmwareBootloaderModalProps> = ({
         <FormPFSelect
           onSelect={handleChange}
           selected={selectedFirmwareBootloader}
-          selectedLabel={BootModeTitles[selectedFirmwareBootloader]}
+          selectedLabel={t(BootModeTitles[selectedFirmwareBootloader])}
           toggleProps={{ isFullWidth: true }}
         >
           {bootloaderOptions.map(({ description, title, value }) => (
-            <SelectOption description={description} key={value} value={value}>
-              {title}
+            <SelectOption description={t(description)} key={value} value={value}>
+              {t(title)}
             </SelectOption>
           ))}
         </FormPFSelect>

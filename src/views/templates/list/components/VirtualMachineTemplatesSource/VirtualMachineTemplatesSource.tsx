@@ -36,6 +36,7 @@ const VirtualMachineTemplatesSource: React.FC<VirtualMachineTemplatesSourceProps
     bootSource?.source?.sourceRef?.namespace,
     bootSource?.source?.sourceRef?.name,
   );
+
   const bootSourceLabel = getVMBootSourceLabel(bootSource?.type, dataSource);
   const isBootSourceAvailable = availableTemplatesUID.has(template?.metadata?.uid);
 
@@ -51,7 +52,7 @@ const VirtualMachineTemplatesSource: React.FC<VirtualMachineTemplatesSourceProps
   return (
     <Split hasGutter>
       <SplitItem className="virtual-machine-templates-source__boot-source-label">
-        {bootSourceLabel}
+        {t(bootSourceLabel)}
       </SplitItem>
       {isBootSourceAvailable && (
         <SplitItem>
