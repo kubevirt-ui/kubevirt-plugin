@@ -1,10 +1,9 @@
 import React, { FC, useMemo } from 'react';
 
-import { NumberOperator } from '@kubevirt-utils/utils/constants';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { NumberOperator, numberOperatorInfo } from '@kubevirt-utils/utils/constants';
 import { getSelectDataTestProps } from '@kubevirt-utils/utils/selectDataTest';
 import { SimpleSelect, SimpleSelectOption } from '@patternfly/react-templates';
-
-import { numberOperatorSelectOptions } from './constants';
 
 type NumberOperatorSelectProps = {
   'data-test'?: string;
@@ -17,13 +16,16 @@ const NumberOperatorSelect: FC<NumberOperatorSelectProps> = ({
   onSelect,
   selected,
 }) => {
+  const { t } = useKubevirtTranslation();
+
   const initialOptions = useMemo<SimpleSelectOption[]>(
     () =>
-      numberOperatorSelectOptions.map((option) => ({
-        ...option,
-        selected: option.value === selected,
+      Object.keys(NumberOperator).map((operator) => ({
+        content: t(numberOperatorInfo[operator].text),
+        selected: operator === selected,
+        value: operator,
       })),
-    [selected],
+    [selected, t],
   );
 
   return (

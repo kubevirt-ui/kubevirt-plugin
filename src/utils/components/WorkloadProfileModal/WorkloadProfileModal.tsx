@@ -46,12 +46,12 @@ const WorkloadProfileModal: FC<WorkloadProfileModalProps> = ({
         <FormPFSelect
           onSelect={handleChange}
           selected={workload}
-          selectedLabel={WORKLOADS_LABELS[workload]}
+          selectedLabel={t(WORKLOADS_LABELS[workload])}
           toggleProps={{ isFullWidth: true }}
         >
           {Object.entries(WORKLOADS_LABELS).map(([key, value]) => (
             <SelectOption description={t(WORKLOADS_DESCRIPTIONS[key])} key={key} value={key}>
-              {value}
+              {t(value)}
             </SelectOption>
           ))}
         </FormPFSelect>

@@ -1,6 +1,5 @@
 import { ComponentClass } from 'react';
 
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { InstanceTypeSeries } from '@kubevirt-utils/resources/instancetype/types';
 import {
   MemoryIcon,
@@ -29,13 +28,13 @@ export const initialMenuItems: InstanceTypesMenuItemsData = {
     Icon: RedhatIcon,
     id: MENUS.redHatProvided,
     items: [],
-    label: t('Red Hat provided'),
+    label: 'Red Hat provided',
   },
   userProvided: {
     Icon: UserIcon,
     id: MENUS.userProvided,
     items: [],
-    label: t('User provided'),
+    label: 'User provided',
   },
 };
 
@@ -48,31 +47,31 @@ export const instanceTypeSeriesNameMapper: {
 } = {
   cx1: {
     Icon: RegistryIcon,
-    seriesLabel: t('CX series'),
+    seriesLabel: 'CX series',
   },
   d1: {
     Icon: MicrochipIcon,
-    seriesLabel: t('D series'),
+    seriesLabel: 'D series',
   },
   m1: {
     Icon: MemoryIcon,
-    seriesLabel: t('M series'),
+    seriesLabel: 'M series',
   },
   n1: {
     Icon: NetworkIcon,
-    seriesLabel: t('N series'),
+    seriesLabel: 'N series',
   },
   o1: {
     Icon: ModuleIcon,
-    seriesLabel: t('O series'),
+    seriesLabel: 'O series',
   },
   rt1: {
     Icon: OutlinedClockIcon,
-    seriesLabel: t('RT series'),
+    seriesLabel: 'RT series',
   },
   u1: {
     Icon: ServerGroupIcon,
-    seriesLabel: t('U series'),
+    seriesLabel: 'U series',
   },
 };
 

@@ -28,7 +28,7 @@ const DiskInterfaceSelect: FC<DiskInterfaceSelectProps> = ({ isVMRunning }) => {
 
   const diskInterface = disk?.[diskType]?.bus || InterfaceTypes.VIRTIO;
 
-  const selectedLabel = diskInterfaceOptions?.[diskInterface]?.label;
+  const selectedLabel = t(diskInterfaceOptions?.[diskInterface]?.label);
 
   const userHelpText = getInterfaceTypeHelperText(diskType, isVMRunning);
 
@@ -50,12 +50,12 @@ const DiskInterfaceSelect: FC<DiskInterfaceSelectProps> = ({ isVMRunning }) => {
             return (
               <SelectOption
                 data-test-id={`disk-interface-select-${id}`}
-                description={description}
+                description={t(description)}
                 isDisabled={isDisabled}
                 key={id}
                 value={id}
               >
-                {label}
+                {t(label)}
               </SelectOption>
             );
           })}

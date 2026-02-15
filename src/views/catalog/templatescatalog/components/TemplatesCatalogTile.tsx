@@ -95,10 +95,10 @@ export const TemplateTile: React.FC<TemplateTileProps> = React.memo(
                   <b>{t('Project')}</b> {template.metadata.namespace}
                 </StackItem>
                 <StackItem>
-                  <b>{t('Boot source')}</b> {getVMBootSourceLabel(bootSource?.type, dataSource)}
+                  <b>{t('Boot source')}</b> {t(getVMBootSourceLabel(bootSource?.type, dataSource))}
                 </StackItem>
                 <StackItem>
-                  <b>{t('Workload')}</b> {WORKLOADS_LABELS?.[workload] ?? t('Other')}
+                  <b>{t('Workload')}</b> {t(WORKLOADS_LABELS?.[workload]) ?? t('Other')}
                 </StackItem>
                 <StackItem>
                   <StackItem>
