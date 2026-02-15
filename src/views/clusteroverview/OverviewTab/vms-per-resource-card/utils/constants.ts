@@ -1,6 +1,5 @@
 import { TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineClusterInstancetypeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 export const UNCATEGORIZED_VM = 'UNCATEGORIZED_VM';
 export const UNCATEGORIZED_LABEL = 'Uncategorized';
@@ -10,15 +9,15 @@ export const INSTANCETYPE_FILTER_KEY = 'instanceType';
 
 export const vmsPerResourceOptions = [
   {
-    title: t('Show VirtualMachine per Templates'),
+    title: 'Show VirtualMachine per Templates',
     type: TemplateModel.kind,
   },
   {
-    title: t('Show VirtualMachine per InstanceTypes'),
+    title: 'Show VirtualMachine per InstanceTypes',
     type: VirtualMachineClusterInstancetypeModel.kind,
   },
   {
-    title: t('Show uncategorized VirtualMachines'),
+    title: 'Show uncategorized VirtualMachines',
     type: UNCATEGORIZED_VM,
   },
 ];

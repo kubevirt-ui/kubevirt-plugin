@@ -301,6 +301,11 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
           />
 
           <WizardDescriptionItem
+            description={
+              WORKLOADS_LABELS?.[workloadAnnotation]
+                ? t(WORKLOADS_LABELS[workloadAnnotation])
+                : t('Other')
+            }
             onEditClick={() =>
               createModal(({ isOpen, onClose }) => (
                 <WorkloadProfileModal
@@ -312,7 +317,6 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
               ))
             }
             className="wizard-overview-description-left-column"
-            description={WORKLOADS_LABELS?.[workloadAnnotation] ?? t('Other')}
             isEdit
             testId="wizard-overview-workload-profile"
             title={t('Workload profile')}

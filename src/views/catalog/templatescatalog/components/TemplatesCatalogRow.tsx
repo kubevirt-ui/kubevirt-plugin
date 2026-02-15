@@ -65,12 +65,12 @@ export const TemplatesCatalogRow: FC<
           <ArchitectureLabel architecture={getArchitecture(obj)} />
         </TableData>
         <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-10" id="workload">
-          {WORKLOADS_LABELS?.[workload]}
+          {WORKLOADS_LABELS?.[workload] ? t(WORKLOADS_LABELS[workload]) : undefined}
         </TableData>
         <TableData activeColumnIDs={activeColumnIDs} id="source">
           <TemplateRowAvailableSource
             isBootSourceAvailable={availableTemplatesUID.has(obj.metadata.uid)}
-            source={getVMBootSourceLabel(bootSource?.type, dataSource)}
+            source={t(getVMBootSourceLabel(bootSource?.type, dataSource))}
           />
         </TableData>
         <TableData activeColumnIDs={activeColumnIDs} className="pf-m-width-20" id="cpu">

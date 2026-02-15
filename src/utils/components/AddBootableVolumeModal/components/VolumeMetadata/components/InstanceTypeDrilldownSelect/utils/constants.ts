@@ -1,6 +1,5 @@
 import { ComponentClass } from 'react';
 
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { InstanceTypeSeries } from '@kubevirt-utils/resources/instancetype/types';
 import {
   MemoryIcon,
@@ -24,55 +23,49 @@ export const MENUS = {
   userProvided: 'userProvided',
 };
 
+// Note: labels are translated at render time in InstanceTypeDrilldownSelect.tsx
 export const initialMenuItems: InstanceTypesMenuItemsData = {
   redHatProvided: {
     Icon: RedhatIcon,
     id: MENUS.redHatProvided,
     items: [],
-    label: t('Red Hat provided'),
+    label: 'Red Hat provided',
   },
   userProvided: {
     Icon: UserIcon,
     id: MENUS.userProvided,
     items: [],
-    label: t('User provided'),
+    label: 'User provided',
   },
 };
 
+// Note: series labels are generated via getSeriesLabel() at render time using t('{{symbol}} series', { symbol })
 export const instanceTypeSeriesNameMapper: {
   [key in InstanceTypeSeries]: {
     disabled?: boolean;
     Icon: ComponentClass;
-    seriesLabel: string;
   };
 } = {
   cx1: {
     Icon: RegistryIcon,
-    seriesLabel: t('CX series'),
   },
   d1: {
     Icon: MicrochipIcon,
-    seriesLabel: t('D series'),
   },
   m1: {
     Icon: MemoryIcon,
-    seriesLabel: t('M series'),
   },
   n1: {
     Icon: NetworkIcon,
-    seriesLabel: t('N series'),
   },
   o1: {
     Icon: ModuleIcon,
-    seriesLabel: t('O series'),
   },
   rt1: {
     Icon: OutlinedClockIcon,
-    seriesLabel: t('RT series'),
   },
   u1: {
     Icon: ServerGroupIcon,
-    seriesLabel: t('U series'),
   },
 };
 
