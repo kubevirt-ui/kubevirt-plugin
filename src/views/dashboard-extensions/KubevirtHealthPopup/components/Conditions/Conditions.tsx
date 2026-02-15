@@ -23,7 +23,7 @@ const Conditions: FC = () => {
 
   const condition = queryData?.data?.result?.[0]?.value?.[1];
 
-  const label = VALUE_TO_LABLE[condition];
+  const label = t(VALUE_TO_LABLE[condition]);
 
   if (!loaded || !hyperLoaded)
     return (

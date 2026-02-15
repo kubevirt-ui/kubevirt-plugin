@@ -130,7 +130,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
               <DescriptionItem
                 descriptionData={
                   vmWorkload ? (
-                    WORKLOADS_LABELS[vmWorkload] || vmWorkload
+                    t(WORKLOADS_LABELS[vmWorkload]) || vmWorkload
                   ) : (
                     <MutedTextSpan text={t('Not available')} />
                   )

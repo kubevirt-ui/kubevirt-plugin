@@ -30,7 +30,7 @@ const VMWorkloadProfileDetailsItem: FC<VMWorkloadProfileDetailsItemProps> = ({ v
       <DescriptionItem
         descriptionData={
           vmWorkload ? (
-            WORKLOADS_LABELS[vmWorkload] || vmWorkload
+            t(WORKLOADS_LABELS[vmWorkload]) || vmWorkload
           ) : (
             <MutedTextSpan text={t('Not available')} />
           )
