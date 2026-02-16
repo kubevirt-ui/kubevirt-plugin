@@ -10,7 +10,7 @@ import {
   V1VirtualMachine,
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
+import { getRandomChars, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import {
   consoleFetch,
   k8sCreate,
@@ -18,7 +18,7 @@ import {
   K8sModel,
 } from '@openshift-console/dynamic-plugin-sdk';
 
-const generateRandomString = () => Math.random().toString(36).substring(2, 7);
+const MAX_K8S_NAME_LENGTH = 63;
 
 export enum VMActionType {
   AddInterface = 'addinterface',
@@ -89,11 +89,14 @@ export const removeVolume = async (vm: V1VirtualMachine, body: V1RemoveVolumeOpt
   VMActionRequest(vm, VMActionType.RemoveVolume, VirtualMachineModel, body);
 export const migrateVM = async (vm: V1VirtualMachine) => {
   const { name, namespace } = vm?.metadata;
+  const suffix = `-mig-${getRandomChars(4)}`;
+  const truncatedName = name.substring(0, MAX_K8S_NAME_LENGTH - suffix.length);
+
   const migrationData: V1VirtualMachineInstanceMigration = {
     apiVersion: 'kubevirt.io/v1',
     kind: 'VirtualMachineInstanceMigration',
     metadata: {
-      name: `${name}-migration-${generateRandomString()}`,
+      name: `${truncatedName}${suffix}`,
     },
     spec: {
       vmiName: name,
