@@ -2,6 +2,7 @@ import React, { FC, useEffect, useMemo, useState } from 'react';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { formatElapsedTime, getElapsedTimeInSeconds } from '@kubevirt-utils/utils/elapsedTime';
 import {
   GreenCheckCircleIcon,
   RedExclamationCircleIcon,
@@ -20,12 +21,7 @@ import { InProgressIcon } from '@patternfly/react-icons';
 
 import TestStatistics from '../../../components/shared/TestStatistics';
 
-import {
-  formatElapsedTime,
-  getElapsedTimeInSeconds,
-  getTestSuiteLabel,
-  getTotalSkippedTests,
-} from './utils/progressTracker';
+import { getTestSuiteLabel, getTotalSkippedTests } from './utils/progressTracker';
 import type { OverallProgress } from './utils/types';
 
 import './progress-components.scss';
@@ -62,7 +58,7 @@ const OverallProgressCard: FC<OverallProgressCardProps> = ({ progress: overallPr
     return () => clearInterval(intervalId);
   }, [isJobActive, overallProgress?.startTime]);
 
-  const elapsedTime = elapsedSeconds > 0 ? formatElapsedTime(elapsedSeconds) : null;
+  const elapsedTime = elapsedSeconds > 0 ? formatElapsedTime(t, elapsedSeconds) : null;
 
   const totalSkippedTests = useMemo(
     () => getTotalSkippedTests(overallProgress?.suites),
