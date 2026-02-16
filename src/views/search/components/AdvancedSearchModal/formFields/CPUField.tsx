@@ -1,11 +1,11 @@
 import React, { FC } from 'react';
 
+import NumberTextInput from '@kubevirt-utils/components/NumberTextInput/NumberTextInput';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, InputGroup, InputGroupItem } from '@patternfly/react-core';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 import NumberOperatorSelect from '../../../../../utils/components/NumberOperatorSelect/NumberOperatorSelect';
-import NumberInput from '../components/NumberInput';
 import { useAdvancedSearchField } from '../store/useAdvancedSearchStore';
 
 const CPUField: FC = () => {
@@ -23,7 +23,7 @@ const CPUField: FC = () => {
           selected={vCPU.operator}
         />
         <InputGroupItem isFill>
-          <NumberInput
+          <NumberTextInput
             data-test="adv-search-vcpu-value"
             setValue={(value) => setVCPU({ ...vCPU, value })}
             value={vCPU.value}

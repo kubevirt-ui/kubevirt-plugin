@@ -29,7 +29,7 @@ Internationalization patterns and requirements for this project.
 
 ### Translation Hook
 ```tsx
-import { useKubevirtTranslation } from '@kubevirt-plugin/utils/hooks/useKubevirtTranslation';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 const MyComponent: React.FC = () => {
   const { t } = useKubevirtTranslation();
@@ -44,7 +44,7 @@ const MyComponent: React.FC = () => {
 ```
 
 ### Important
-- Always import from `@kubevirt-plugin/utils/hooks/useKubevirtTranslation`
+- Always import from `@kubevirt-utils/hooks/useKubevirtTranslation`
 - Never hardcode user-facing strings
 - The `t` function returns the translated string
 

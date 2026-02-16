@@ -43,14 +43,18 @@ export const readableSizeUnit = (combinedStr: string): string => {
   return !value ? combinedStr : `${value} ${addByteSuffix(unit)}`;
 };
 
-export const getHumanizedSize = (size: string, bytesOption: 'withB' | 'withoutB' = 'withB') => {
+export const getHumanizedSize = (
+  size: string,
+  bytesOption: 'withB' | 'withoutB' = 'withB',
+  preferredUnit?: string,
+) => {
   const baseValue = convertToBaseValue(size);
 
   if (bytesOption === 'withoutB') {
-    return humanizeBinaryBytesWithoutB(baseValue);
+    return humanizeBinaryBytesWithoutB(baseValue, null, preferredUnit);
   }
 
-  return humanizeBinaryBytes(baseValue);
+  return humanizeBinaryBytes(baseValue, null, preferredUnit);
 };
 
 export const extractUnitFromQuantityString = (quantityString?: string) =>

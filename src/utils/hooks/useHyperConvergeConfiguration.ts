@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { HyperConvergedModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1LabelSelector } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { V1MigrationConfiguration } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { CalculationMethod } from '@kubevirt-utils/resources/quotas/types';
 import { DEFAULT_OPERATOR_NAMESPACE, isEmpty } from '@kubevirt-utils/utils/utils';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
@@ -11,9 +12,14 @@ import useDeepCompareMemoize from './useDeepCompareMemoize/useDeepCompareMemoize
 
 export type HyperConverged = K8sResourceCommon & {
   spec: {
+    applicationAwareConfig?: {
+      allowApplicationAwareClusterResourceQuota?: boolean;
+      vmiCalcConfigName?: CalculationMethod;
+    };
     commonBootImageNamespace?: string;
     commonTemplatesNamespace?: string;
     dataImportCronTemplates: K8sResourceCommon[];
+    enableApplicationAwareQuota?: boolean;
     enableCommonBootImageImport?: boolean;
     evictionStrategy?: string;
     featureGates: {

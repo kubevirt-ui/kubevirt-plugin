@@ -7,6 +7,7 @@ import { Stack, StackItem } from '@patternfly/react-core';
 
 import ExpandSection from '../../../ExpandSection/ExpandSection';
 
+import ApplicationAwareQuota from './components/ApplicationAwareQuota/ApplicationAwareQuota';
 import AutoComputeCPULimits from './components/AutoComputeCPULimits/AutoComputeCPULimits';
 import KernelSamepageMerging from './components/KernelSamepageMerging/KernelSamepageMerging';
 
@@ -35,6 +36,12 @@ const ResourceManagementSection: FC<ResourceManagementSectionProps> = ({
         </StackItem>
         <StackItem isFilled>
           <KernelSamepageMerging
+            hyperConvergeConfiguration={hyperConvergeConfiguration}
+            newBadge={newBadge}
+          />
+        </StackItem>
+        <StackItem isFilled>
+          <ApplicationAwareQuota
             hyperConvergeConfiguration={hyperConvergeConfiguration}
             newBadge={newBadge}
           />

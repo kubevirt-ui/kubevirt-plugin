@@ -186,3 +186,27 @@ export const NodeNetworkStateModel: K8sModel = {
   namespaced: false,
   plural: 'nodenetworkstates',
 };
+
+export const ApplicationAwareResourceQuotaModel: K8sModel = {
+  abbr: 'AAQ',
+  apiGroup: 'aaq.kubevirt.io',
+  apiVersion: 'v1alpha1',
+  crd: true,
+  kind: 'ApplicationAwareResourceQuota',
+  label: 'ApplicationAwareResourceQuota',
+  labelPlural: 'ApplicationAwareResourceQuotas',
+  namespaced: true,
+  plural: 'applicationawareresourcequotas',
+};
+
+export const ApplicationAwareClusterResourceQuotaModel: K8sModel = {
+  abbr: 'AACQ',
+  apiGroup: 'aaq.kubevirt.io',
+  apiVersion: 'v1alpha1',
+  crd: true,
+  kind: 'ApplicationAwareClusterResourceQuota',
+  label: 'ApplicationAwareClusterResourceQuota',
+  labelPlural: 'ApplicationAwareClusterResourceQuotas',
+  namespaced: false,
+  plural: 'applicationawareclusterresourcequotas',
+};

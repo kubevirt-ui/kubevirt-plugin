@@ -1,12 +1,12 @@
 import React, { FC } from 'react';
 
+import NumberTextInput from '@kubevirt-utils/components/NumberTextInput/NumberTextInput';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, InputGroup, InputGroupItem } from '@patternfly/react-core';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 import NumberOperatorSelect from '../../../../../utils/components/NumberOperatorSelect/NumberOperatorSelect';
 import MemoryUnitSelect from '../components/MemoryUnitSelect';
-import NumberInput from '../components/NumberInput';
 import { useAdvancedSearchField } from '../store/useAdvancedSearchStore';
 
 const MemoryField: FC = () => {
@@ -24,7 +24,7 @@ const MemoryField: FC = () => {
           selected={memory.operator}
         />
         <InputGroupItem isFill>
-          <NumberInput
+          <NumberTextInput
             data-test="adv-search-mem-value"
             setValue={(value) => setMemory({ ...memory, value })}
             value={memory.value}
