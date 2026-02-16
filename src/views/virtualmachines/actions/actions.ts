@@ -10,7 +10,6 @@ import {
   V1VirtualMachine,
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { MAX_K8S_NAME_LENGTH } from '@kubevirt-utils/utils/constants';
 import { getRandomChars, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import {
   consoleFetch,
@@ -18,6 +17,8 @@ import {
   k8sDelete,
   K8sModel,
 } from '@openshift-console/dynamic-plugin-sdk';
+
+const MAX_K8S_NAME_LENGTH = 63;
 
 export enum VMActionType {
   AddInterface = 'addinterface',
