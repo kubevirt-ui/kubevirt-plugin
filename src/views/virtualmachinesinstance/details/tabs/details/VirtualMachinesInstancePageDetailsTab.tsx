@@ -28,7 +28,7 @@ const VirtualMachinesInstancePageDetailsTab: FC<VirtualMachinesInstancePageDetai
         <Services pathname={location?.pathname} vmi={vmi} />
       </PageSection>
       <Divider />
-      <PageSection>
+      <PageSection id="logged-in-users">
         <ActiveUserList pathname={location?.pathname} vmi={vmi} />
       </PageSection>
     </div>
