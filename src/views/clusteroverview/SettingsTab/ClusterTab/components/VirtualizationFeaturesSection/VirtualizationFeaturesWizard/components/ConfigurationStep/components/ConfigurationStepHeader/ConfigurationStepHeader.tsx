@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import HelpTextTooltipContent from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/VirtualizationFeaturesWizard/components/HelpTextTooltipContent/HelpTextTooltipContent';
 import { PopoverPosition, Title, TitleSizes } from '@patternfly/react-core';
@@ -15,7 +15,7 @@ const ConfigurationStepHeader: FC = ({}) => {
       {t('Configuration')}
       <HelpTextIcon
         bodyContent={(hide) => (
-          <LightspeedSimplePopoverContent
+          <PopoverContentWithLightspeedButton
             content={
               <HelpTextTooltipContent
                 bodyText={t(

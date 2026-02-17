@@ -7,7 +7,7 @@ import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { diskTypes } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { getDiskDrive } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
-import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Checkbox, ExpandableSection, Split, Stack, StackItem } from '@patternfly/react-core';
 
@@ -58,7 +58,7 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({
             />
             <HelpTextIcon
               bodyContent={(hide) => (
-                <LightspeedSimplePopoverContent
+                <PopoverContentWithLightspeedButton
                   content={t('Allows concurrent access by multiple VirtualMachines')}
                   hide={hide}
                   obj={olsObj}
@@ -79,7 +79,7 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({
             />
             <HelpTextIcon
               bodyContent={(hide) => (
-                <LightspeedSimplePopoverContent
+                <PopoverContentWithLightspeedButton
                   content={t(
                     'The disk must be attached to the VirtualMachine as a SCSI LUN for this option to work. It should only be used for cluster-aware applications',
                   )}

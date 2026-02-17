@@ -4,9 +4,9 @@ import LightspeedPopoverContentFooter from '@lightspeed/components/LightspeedPop
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Stack, StackItem } from '@patternfly/react-core';
 
-import './LightspeedSimplePopoverContent.scss';
+import './PopoverContentWithLightspeedButton.scss';
 
-type LightspeedSimplePopoverContentProps = {
+type PopoverContentWithLightspeedButtonProps = {
   breadcrumb?: string;
   content: ReactNode;
   hide: () => void;
@@ -14,7 +14,7 @@ type LightspeedSimplePopoverContentProps = {
   promptType: OLSPromptType;
 };
 
-const LightspeedSimplePopoverContent: FC<LightspeedSimplePopoverContentProps> = ({
+const PopoverContentWithLightspeedButton: FC<PopoverContentWithLightspeedButtonProps> = ({
   breadcrumb,
   content,
   hide,
@@ -34,4 +34,4 @@ const LightspeedSimplePopoverContent: FC<LightspeedSimplePopoverContentProps> = 
   </Stack>
 );
 
-export default LightspeedSimplePopoverContent;
+export default PopoverContentWithLightspeedButton;

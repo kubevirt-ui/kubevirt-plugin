@@ -12,7 +12,7 @@ import useFeaturesConfigMap from '@kubevirt-utils/hooks/useFeatures/useFeaturesC
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useMetalLBOperatorInstalled } from '@kubevirt-utils/hooks/useMetalLBOperatorInstalled/useMetalLBOperatorInstalled';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { CLUSTER_TAB_IDS } from '@overview/SettingsTab/search/constants';
@@ -66,7 +66,7 @@ const SSHConfiguration: FC<SSHConfigurationProps> = ({ newBadge }) => {
       <Stack hasGutter>
         <SectionWithSwitch
           helpTextIconContent={(hide) => (
-            <LightspeedSimplePopoverContent
+            <PopoverContentWithLightspeedButton
               content={t(
                 'Enable the creation of LoadBalancer services for SSH connections to VirtualMachines. A load balancer must be configured',
               )}
@@ -87,7 +87,7 @@ const SSHConfiguration: FC<SSHConfigurationProps> = ({ newBadge }) => {
         />
         <SectionWithSwitch
           helpTextIconContent={(hide) => (
-            <LightspeedSimplePopoverContent
+            <PopoverContentWithLightspeedButton
               content={t(
                 'Allow the creation of NodePort services for SSH connections to VirtualMachines. An address of a publicly available Node must be provided.',
               )}

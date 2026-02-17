@@ -2,7 +2,7 @@ import React, { FC, useState } from 'react';
 
 import ExpandSectionWithCustomToggle from '@kubevirt-utils/components/ExpandSectionWithCustomToggle/ExpandSectionWithCustomToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { DESCHEDULER_OPERATOR_NAME } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/constants';
 import { isInstalled } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/utils';
@@ -27,7 +27,7 @@ const LoadBalanceConfigurationSection: FC = () => {
   return (
     <ExpandSectionWithCustomToggle
       helpTextContent={(hide) => (
-        <LightspeedSimplePopoverContent
+        <PopoverContentWithLightspeedButton
           content={
             <HelpTextTooltipContent
               bodyText={t(
