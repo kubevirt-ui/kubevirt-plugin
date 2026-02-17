@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom-v5-compat';
 
 import { MigrationPolicyModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -9,6 +9,7 @@ import { dateTimeFormatter } from '@kubevirt-utils/components/Timestamp/utils/da
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import useVirtualMachineInstanceMigration from '@kubevirt-utils/resources/vmi/hooks/useVirtualMachineInstanceMigration';
+import { formatElapsedTime, getElapsedTimeInSeconds } from '@kubevirt-utils/utils/elapsedTime';
 import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { Popover, PopoverPosition, Stack, StackItem } from '@patternfly/react-core';
@@ -23,27 +24,28 @@ const MigrationProgressPopover: React.FC<MigrationProgressPopoverProps> = ({ chi
   const { t } = useKubevirtTranslation();
   const vmim = useVirtualMachineInstanceMigration(vmi);
   const Icon = getMigrationPhaseIcon(vmim?.status?.phase);
-  const [seconds, setSeconds] = useState(0);
-  const [minutes, setMinutes] = useState(0);
+  const startTimestamp = vmi?.status?.migrationState?.startTimestamp;
+  const endTimestamp = vmi?.status?.migrationState?.endTimestamp;
+
+  const initialElapsedSeconds = useMemo(
+    () => getElapsedTimeInSeconds(startTimestamp),
+    [startTimestamp],
+  );
+
+  const [elapsedSeconds, setElapsedSeconds] = useState(initialElapsedSeconds);
 
   useEffect(() => {
-    if (vmi?.status?.migrationState?.startTimestamp) {
-      const interval = setInterval(() => {
-        setSeconds((sec) => {
-          if (sec + 1 === 60) {
-            setMinutes((min) => min + 1);
-            return 0;
-          }
-          return sec + 1;
-        });
-      }, 1000);
-      return () => clearInterval(interval);
-    }
-    if (vmi?.status?.migrationState?.endTimestamp) {
-      setSeconds(0);
-      setMinutes(0);
-    }
-  }, [vmi?.status?.migrationState?.endTimestamp, vmi?.status?.migrationState?.startTimestamp]);
+    setElapsedSeconds(initialElapsedSeconds);
+  }, [initialElapsedSeconds]);
+
+  useEffect(() => {
+    if (!startTimestamp || endTimestamp) return;
+
+    const interval = setInterval(() => {
+      setElapsedSeconds(getElapsedTimeInSeconds(startTimestamp));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [startTimestamp, endTimestamp]);
 
   return (
     <Popover
@@ -58,11 +60,7 @@ const MigrationProgressPopover: React.FC<MigrationProgressPopoverProps> = ({ chi
               dateTimeFormatter.format(new Date(vmi?.status?.migrationState?.startTimestamp))}
           </StackItem>
           <StackItem>
-            <b>{t('Elapsed time')}</b>{' '}
-            {t('{{minutes}}{{seconds}} seconds', {
-              minutes: minutes ? `${minutes} minutes, ` : null,
-              seconds,
-            })}
+            <b>{t('Elapsed time')}</b> {formatElapsedTime(t, elapsedSeconds)}
           </StackItem>
           <StackItem>
             <b>{t('Policy')}</b>{' '}
@@ -88,7 +86,7 @@ const MigrationProgressPopover: React.FC<MigrationProgressPopoverProps> = ({ chi
           </StackItem>
         </Stack>
       }
-      headerContent={'VirtualMachine migration'}
+      headerContent={t('VirtualMachine migration')}
       position={PopoverPosition.right}
     >
       <>{children}</>

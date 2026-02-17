@@ -175,21 +175,7 @@ export const getOverallProgress = (job: IoK8sApiBatchV1Job | null | undefined): 
   };
 };
 
-export const getElapsedTimeInSeconds = (startTime: string): number => {
-  if (!startTime) return 0;
-
-  // Parse the date and check if it's valid (not NaN)
-  const parsedTime = Date.parse(startTime);
-  if (isNaN(parsedTime)) return 0;
-
-  const now = Date.now();
-  const difference = now - parsedTime;
-
-  // If difference <= 0 return 0, otherwise return Math.floor(difference / 1000)
-  if (difference <= 0) return 0;
-
-  return Math.floor(difference / 1000);
-};
+export { formatElapsedTime, getElapsedTimeInSeconds } from '@kubevirt-utils/utils/elapsedTime';
 
 export const getTotalSkippedTests = (suites: TestSuiteProgress[]): number => {
   if (!suites) {
@@ -211,20 +197,6 @@ export const getTotalSkippedTests = (suites: TestSuiteProgress[]): number => {
   }
 
   return totalSkipped;
-};
-
-export const formatElapsedTime = (seconds: number): string => {
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const secs = seconds % 60;
-
-  if (hours > 0) {
-    return `${hours}h ${minutes}m ${secs}s`;
-  }
-  if (minutes > 0) {
-    return `${minutes}m ${secs}s`;
-  }
-  return `${secs}s`;
 };
 
 export const getTestSuiteLabel = (suiteName: string): string => {
