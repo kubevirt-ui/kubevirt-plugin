@@ -670,7 +670,6 @@
   "Enable folders in Virtual Machines tree view": "在虚拟机树视图中启用文件夹",
   "Enable guest system log access": "启用客户机系统日志访问",
   "Enable headless mode": "启用无头模式",
-  "Enable Kubevirt cross cluster migration": "启用 Kubevirt 跨集群迁移",
   "Enable load-aware descheduling": "启用负载感知的取消调度",
   "Enable Passt binding for primary user-defined networks": "为主用户定义的网络启用 Passt 绑定",
   "Enable Passt to SSH your VirtualMachine using virtctl": "使用 virtctl 启用 Passt 来 SSH 到您的 VirtualMachine",

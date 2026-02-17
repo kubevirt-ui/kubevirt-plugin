@@ -670,7 +670,6 @@
   "Enable folders in Virtual Machines tree view": "仮想マシンのツリービューでフォルダーを有効にする",
   "Enable guest system log access": "ゲストシステムログへのアクセスを有効にする",
   "Enable headless mode": "ヘッドレスモードを有効にする",
-  "Enable Kubevirt cross cluster migration": "Kubevirt のクラスター間移行を有効にする",
   "Enable load-aware descheduling": "負荷を考慮したスケジュールの解除を有効にします",
   "Enable Passt binding for primary user-defined networks": "プライマリーユーザー定義ネットワークの Passt バインディングの有効化",
   "Enable Passt to SSH your VirtualMachine using virtctl": "virtctl を使用して VirtualMachine に SSH 接続するために Passt を有効化します",
