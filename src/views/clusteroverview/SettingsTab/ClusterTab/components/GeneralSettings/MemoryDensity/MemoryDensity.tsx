@@ -5,7 +5,7 @@ import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/Sect
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { CLUSTER_TAB_IDS } from '@overview/SettingsTab/search/constants';
 import {
@@ -98,7 +98,7 @@ const MemoryDensity: FC<MemoryDensityProps> = ({ hyperConvergeConfiguration, new
           <StackItem>
             <SectionWithSwitch
               helpTextIconContent={(hide) => (
-                <LightspeedSimplePopoverContent
+                <PopoverContentWithLightspeedButton
                   content={t('Configures the VM workloads to use swap for higher density')}
                   hide={hide}
                   obj={hyperConvergeConfiguration?.[0]}

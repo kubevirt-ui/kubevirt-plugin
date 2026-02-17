@@ -3,7 +3,7 @@ import React, { FC } from 'react';
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Popover, PopoverPosition, Stack } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
@@ -13,7 +13,7 @@ const PreviewFeaturesPopover: FC = () => {
   return (
     <Popover
       bodyContent={(hide) => (
-        <LightspeedSimplePopoverContent
+        <PopoverContentWithLightspeedButton
           content={
             <Stack hasGutter>
               <p>

@@ -4,7 +4,7 @@ import classNames from 'classnames';
 
 import OwnerReferences from '@kubevirt-utils/components/OwnerReferences/OwnerReferences';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -30,7 +30,7 @@ const OwnerDetailsItem: React.FC<OwnerDetailsItemProps> = ({ className, obj }) =
       <DescriptionListTermHelpText>
         <Popover
           bodyContent={(hide) => (
-            <LightspeedSimplePopoverContent
+            <PopoverContentWithLightspeedButton
               content={
                 <Trans ns="plugin__kubevirt-plugin">
                   <div>

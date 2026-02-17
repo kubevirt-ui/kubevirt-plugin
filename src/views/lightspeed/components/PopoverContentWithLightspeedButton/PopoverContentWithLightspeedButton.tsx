@@ -6,16 +6,16 @@ import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { useFlag } from '@openshift-console/dynamic-plugin-sdk';
 import { Stack, StackItem } from '@patternfly/react-core';
 
-import './LightspeedSimplePopoverContent.scss';
+import './PopoverContentWithLightspeedButton.scss';
 
-type LightspeedSimplePopoverContentProps = {
+type PopoverContentWithLightspeedButtonProps = {
   content: ReactNode;
   hide: () => void;
   obj?: K8sResourceCommon;
   promptType: OLSPromptType;
 };
 
-const LightspeedSimplePopoverContent: FC<LightspeedSimplePopoverContentProps> = ({
+const PopoverContentWithLightspeedButton: FC<PopoverContentWithLightspeedButtonProps> = ({
   content,
   hide,
   obj,
@@ -40,4 +40,4 @@ const LightspeedSimplePopoverContent: FC<LightspeedSimplePopoverContentProps> = 
   );
 };
 
-export default LightspeedSimplePopoverContent;
+export default PopoverContentWithLightspeedButton;

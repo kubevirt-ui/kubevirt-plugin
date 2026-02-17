@@ -20,7 +20,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { convertResourceArrayToMap } from '@kubevirt-utils/resources/shared';
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
-import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -134,7 +134,7 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
             {t('Preference')}{' '}
             <HelpTextIcon
               bodyContent={(hide) => (
-                <LightspeedSimplePopoverContent
+                <PopoverContentWithLightspeedButton
                   content={<PreferencePopoverContent />}
                   hide={hide}
                   promptType={OLSPromptType.PREFERENCE}

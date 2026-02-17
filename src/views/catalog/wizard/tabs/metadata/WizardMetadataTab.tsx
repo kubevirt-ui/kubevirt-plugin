@@ -10,7 +10,7 @@ import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEdito
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
 import LightspeedHelpButton from '@lightspeed/components/LightspeedHelpButton/LightspeedHelpButton';
-import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { DescriptionList, PageSection, pluralize } from '@patternfly/react-core';
@@ -43,7 +43,7 @@ const WizardMetadataTab: WizardTab = ({ loaded, updateVM, vm }) => {
                 }
                 helperPopover={{
                   content: (hide) => (
-                    <LightspeedSimplePopoverContent
+                    <PopoverContentWithLightspeedButton
                       content={t(
                         'Map of string keys and values that can be used to organize and categorize (scope and select) objects',
                       )}
