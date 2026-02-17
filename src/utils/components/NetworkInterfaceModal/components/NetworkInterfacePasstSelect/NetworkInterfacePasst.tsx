@@ -63,7 +63,7 @@ const NetworkInterfacePasst: FC<NetworkInterfacePasstProps> = ({
             isExpanded: isOpen,
             isFullWidth: true,
             onClick: onToggle,
-            selected: selectedOption?.title,
+            selected: selectedOption?.title || t('Select a binding'),
           })}
           isOpen={isOpen}
           onOpenChange={setIsOpen}

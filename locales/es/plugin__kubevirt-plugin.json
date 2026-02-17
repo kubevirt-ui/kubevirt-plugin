@@ -1494,6 +1494,7 @@
   "See the <2>catalog tab</2> to quickly create a VirtualMachine from the available Templates.": "Consulte la <2>pestaña Plantillas</2> para crear rápidamente una VirtualMachine a partir de las plantillas disponibles.",
   "Select": "Seleccionar",
   "Select {{label}}": "Seleccionar {{label}}",
+  "Select a binding": "Select a binding",
   "Select a NetworkAttachmentDefinition": "Seleccionar una NetworkAttachmentDefinition",
   "Select a project for Red Hat bootable volumes. The default project is 'openshift-virtualization-os-images'": "Seleccione un proyecto para volúmenes de arranque de Red Hat. El proyecto predeterminado es \"openshift-virtualization-os-images\".",
   "Select a project for Red Hat templates. The default project is 'openshift'. If you want to store Red Hat templates in multiple projects, you must clone<br />the Red Hat template by selecting <3>Clone template</3> from the template action menu and then selecting another project for the cloned template.": "Seleccione un proyecto para las plantillas de Red Hat. El proyecto predeterminado es \"openshift\". Si desea almacenar plantillas de Red Hat en varios proyectos, debe clonar<br /> la plantilla de Red Hat. Para ello, seleccione <3>Clonar plantilla</3> en el menú de acciones de la plantilla y, luego, elija otro proyecto para la plantilla clonada.",
