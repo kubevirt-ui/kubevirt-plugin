@@ -31,6 +31,17 @@ export const optionsValueLabelMapper = {
   [DROPDOWN_FORM_SELECTION.USE_SNAPSHOT]: t('Volume snapshot'),
 };
 
+export const TLS_CERT_SOURCE_EXISTING = 'existing';
+export const TLS_CERT_SOURCE_NEW = 'new';
+
+export const TLS_CERT_FIELD_NAMES = {
+  tlsCertConfigMapName: 'tlsCertConfigMapName',
+  tlsCertificate: 'tlsCertificate',
+  tlsCertificateRequired: 'tlsCertificateRequired',
+  tlsCertProject: 'tlsCertProject',
+  tlsCertSource: 'tlsCertSource',
+} as const;
+
 export type AddBootableVolumeState = {
   accessMode?: V1beta1StorageSpecAccessModesEnum;
   annotations?: { [key: string]: string };
@@ -51,6 +62,11 @@ export type AddBootableVolumeState = {
   snapshotNamespace?: string;
   storageClassName?: string;
   storageClassProvisioner?: string;
+  tlsCertConfigMapName?: string;
+  tlsCertificate?: string;
+  tlsCertificateRequired?: boolean;
+  tlsCertProject?: string;
+  tlsCertSource?: typeof TLS_CERT_SOURCE_EXISTING | typeof TLS_CERT_SOURCE_NEW;
   uploadFile?: File | string;
   uploadFilename?: string;
   url?: string;
@@ -81,6 +97,11 @@ export const initialBootableVolumeState: AddBootableVolumeState = {
   snapshotNamespace: null,
   storageClassName: null,
   storageClassProvisioner: null,
+  tlsCertConfigMapName: null,
+  tlsCertificate: null,
+  tlsCertificateRequired: false,
+  tlsCertProject: null,
+  tlsCertSource: TLS_CERT_SOURCE_EXISTING,
   uploadFile: null,
   uploadFilename: null,
 };
@@ -134,3 +155,5 @@ export const emptyDataSource: V1beta1DataSource = {
   },
   spec: { source: {} },
 };
+
+export const TLS_CERT_CONFIGMAP_KEY = 'ca.pem';
