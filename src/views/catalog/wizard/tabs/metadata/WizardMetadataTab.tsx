@@ -9,7 +9,6 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
-import LightspeedHelpButton from '@lightspeed/components/LightspeedHelpButton/LightspeedHelpButton';
 import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -83,17 +82,14 @@ const WizardMetadataTab: WizardTab = ({ loaded, updateVM, vm }) => {
                 )}
                 helperPopover={{
                   content: (hide) => (
-                    <>
-                      {t(
+                    <LightspeedSimplePopoverContent
+                      content={t(
                         'Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects.',
                       )}
-                      <br />
-                      <LightspeedHelpButton
-                        obj={vm}
-                        onClick={hide}
-                        promptType={OLSPromptType.ANNOTATIONS}
-                      />
-                    </>
+                      hide={hide}
+                      obj={vm}
+                      promptType={OLSPromptType.ANNOTATIONS}
+                    />
                   ),
                   header: t('Annotations'),
                 }}
