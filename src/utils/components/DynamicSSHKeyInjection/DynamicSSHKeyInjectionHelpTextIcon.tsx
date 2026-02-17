@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { PopoverPosition } from '@patternfly/react-core';
 
@@ -17,7 +17,7 @@ const DynamicSSHKeyInjectionHelpTextIcon: FC<DynamicSSHKeyInjectionHelpTextIconP
   return (
     <HelpTextIcon
       bodyContent={(hide) => (
-        <LightspeedSimplePopoverContent
+        <PopoverContentWithLightspeedButton
           content={
             isDisabled
               ? t(

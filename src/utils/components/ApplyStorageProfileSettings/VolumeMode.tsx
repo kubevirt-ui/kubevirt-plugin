@@ -9,7 +9,7 @@ import {
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ClaimPropertySets } from '@kubevirt-utils/types/storage';
-import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { FormGroup, Radio } from '@patternfly/react-core';
 
@@ -65,7 +65,7 @@ export const VolumeMode: FC<VolumeModeProps> = ({
       labelHelp={
         <HelpTextIcon
           bodyContent={(hide) => (
-            <LightspeedSimplePopoverContent
+            <PopoverContentWithLightspeedButton
               content={
                 <Trans ns="plugin__kubevirt-plugin" t={t}>
                   Learn more about{' '}

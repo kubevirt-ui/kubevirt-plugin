@@ -2,7 +2,7 @@ import React, { cloneElement, FC, isValidElement, ReactElement, ReactNode } from
 
 import { SPACE_SYMBOL } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -26,7 +26,7 @@ const DescriptionItemPopoverContent: FC<DescriptionItemPopoverContentProps> = ({
   const { t } = useKubevirtTranslation();
 
   return (
-    <LightspeedSimplePopoverContent
+    <PopoverContentWithLightspeedButton
       content={
         <>
           {isValidElement(bodyContent) && cloneElement(bodyContent as ReactElement, { hide })}
