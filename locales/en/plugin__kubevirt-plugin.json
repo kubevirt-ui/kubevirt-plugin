@@ -637,7 +637,6 @@
   "Enable folders in Virtual Machines tree view": "Enable folders in Virtual Machines tree view",
   "Enable guest system log access": "Enable guest system log access",
   "Enable headless mode": "Enable headless mode",
-  "Enable Kubevirt cross cluster migration": "Enable Kubevirt cross cluster migration",
   "Enable load-aware descheduling": "Enable load-aware descheduling",
   "Enable Passt binding for primary user-defined networks": "Enable Passt binding for primary user-defined networks",
   "Enable Passt to SSH your VirtualMachine using virtctl": "Enable Passt to SSH your VirtualMachine using virtctl",
