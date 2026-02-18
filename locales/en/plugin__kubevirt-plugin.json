@@ -1484,6 +1484,7 @@
   "See the <2>catalog tab</2> to quickly create a VirtualMachine from the available Templates.": "See the <2>catalog tab</2> to quickly create a VirtualMachine from the available Templates.",
   "Select": "Select",
   "Select {{label}}": "Select {{label}}",
+  "Select a binding": "Select a binding",
   "Select a NetworkAttachmentDefinition": "Select a NetworkAttachmentDefinition",
   "Select a project for Red Hat bootable volumes. The default project is 'openshift-virtualization-os-images'": "Select a project for Red Hat bootable volumes. The default project is 'openshift-virtualization-os-images'",
   "Select a project for Red Hat templates. The default project is 'openshift'. If you want to store Red Hat templates in multiple projects, you must clone<br />the Red Hat template by selecting <3>Clone template</3> from the template action menu and then selecting another project for the cloned template.": "Select a project for Red Hat templates. The default project is 'openshift'. If you want to store Red Hat templates in multiple projects, you must clone<br />the Red Hat template by selecting <3>Clone template</3> from the template action menu and then selecting another project for the cloned template.",

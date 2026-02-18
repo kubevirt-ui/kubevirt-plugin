@@ -1481,6 +1481,7 @@
   "See the <2>catalog tab</2> to quickly create a VirtualMachine from the available Templates.": "利用可能なテンプレートから VirtualMachine をすばやく作成するには、<2>カタログタブ</2> を参照してください。",
   "Select": "選択",
   "Select {{label}}": "{{label}} の選択",
+  "Select a binding": "Select a binding",
   "Select a NetworkAttachmentDefinition": "NetworkAttachmentDefinition の選択",
   "Select a project for Red Hat bootable volumes. The default project is 'openshift-virtualization-os-images'": "Red Hat のブート可能なボリュームのプロジェクトを選択します。デフォルトのプロジェクトは 'openshift-virtualization-os-images' です",
   "Select a project for Red Hat templates. The default project is 'openshift'. If you want to store Red Hat templates in multiple projects, you must clone<br />the Red Hat template by selecting <3>Clone template</3> from the template action menu and then selecting another project for the cloned template.": "Red Hat テンプレートのプロジェクトを選択します。デフォルトのプロジェクトは 'openshift' です。Red Hat テンプレートを複数のプロジェクトに保存する場合は、<br />テンプレートアクションメニューから <3>テンプレートのクローン作成</3> を選択し、Red Hat テンプレートのクローンを作成してから、クローンを作成したテンプレートに対して別のプロジェクトを選択する必要があります。",

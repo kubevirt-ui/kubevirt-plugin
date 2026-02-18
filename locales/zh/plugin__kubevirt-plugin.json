@@ -1481,6 +1481,7 @@
   "See the <2>catalog tab</2> to quickly create a VirtualMachine from the available Templates.": "请参阅<2>目录标签页</2>以从可用模板中快速创建虚拟机。",
   "Select": "选择",
   "Select {{label}}": "选择 {{label}}",
+  "Select a binding": "Select a binding",
   "Select a NetworkAttachmentDefinition": "选择一个 NetworkAttachmentDefinitions",
   "Select a project for Red Hat bootable volumes. The default project is 'openshift-virtualization-os-images'": "为红帽可引导卷选择一个项目。默认项目为 'openshift-virtualization-os-images'",
   "Select a project for Red Hat templates. The default project is 'openshift'. If you want to store Red Hat templates in multiple projects, you must clone<br />the Red Hat template by selecting <3>Clone template</3> from the template action menu and then selecting another project for the cloned template.": "为红帽模板选择一个项目。默认项目为 'openshift'。如果要将红帽模板存储在多个项目中，需要克隆<br />红帽模板，方法是从模板操作菜单中选择 <3>Clone template</3>，然后为克隆的模板选择另外一个项目。",
