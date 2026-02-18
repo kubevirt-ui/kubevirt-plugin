@@ -682,7 +682,6 @@
   "Enable folders in Virtual Machines tree view": "Habilitar carpetas en la vista de árbol de máquinas virtuales",
   "Enable guest system log access": "Habilitar el acceso al registro del sistema huésped",
   "Enable headless mode": "Habilitar el modo sin cabeza",
-  "Enable Kubevirt cross cluster migration": "Habilitar la migración entre clústeres de Kubevirt",
   "Enable load-aware descheduling": "Habilitar la desprogramación consciente de la carga",
   "Enable Passt binding for primary user-defined networks": "Habilitar la vinculación de Passt para redes primarias definidas por el usuario",
   "Enable Passt to SSH your VirtualMachine using virtctl": "Habilitar Passt para acceder por SSH a su VirtualMachine mediante virtctl",

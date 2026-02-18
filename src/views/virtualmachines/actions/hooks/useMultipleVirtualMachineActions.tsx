@@ -9,7 +9,6 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useProviderByClusterName from '@multicluster/components/CrossClusterMigration/hooks/useProviderByClusterName';
-import { FEATURE_KUBEVIRT_CROSS_CLUSTER_MIGRATION } from '@multicluster/constants';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 import { isDeletionProtectionEnabled } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
@@ -34,11 +33,6 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms,
   const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
   const mtvInstalled = useIsMTVInstalled();
   const [hubClusterName] = useHubClusterName();
-
-  const { featureEnabled: crossClusterMigrationFlagEnabled } = useFeatures(
-    FEATURE_KUBEVIRT_CROSS_CLUSTER_MIGRATION,
-  );
-  const crossClusterMigrationEnabled = mtvInstalled && crossClusterMigrationFlagEnabled;
 
   const [provider, providerLoaded] = useProviderByClusterName(
     getCluster(vms?.[0]) ?? hubClusterName,
@@ -69,7 +63,7 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms,
     const migrationActions =
       clusters.size === 1 ? [migrateCompute, migrateStorage] : [migrateCompute];
 
-    if (clusters.size === 1 && namespaces.size === 1 && crossClusterMigrationEnabled) {
+    if (clusters.size === 1 && namespaces.size === 1 && mtvInstalled) {
       migrationActions.unshift(
         BulkVirtualMachineActionFactory.crossClusterMigration(
           vms,
@@ -120,7 +114,7 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms,
   }, [
     confirmVMActionsEnabled,
     createModal,
-    crossClusterMigrationEnabled,
+    mtvInstalled,
     provider,
     providerLoaded,
     treeViewFoldersEnabled,

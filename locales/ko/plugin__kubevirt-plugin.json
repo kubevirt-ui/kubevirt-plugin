@@ -671,7 +671,6 @@
   "Enable folders in Virtual Machines tree view": "가상 머신 트리 보기에서 폴더 활성화",
   "Enable guest system log access": "게스트 시스템 로그 액세스 활성화",
   "Enable headless mode": "헤드리스 모드 활성화",
-  "Enable Kubevirt cross cluster migration": "Kubevirt 교차 클러스터 마이그레이션 활성화",
   "Enable load-aware descheduling": "로드 인식 스케줄 해제 활성화",
   "Enable Passt binding for primary user-defined networks": "기본 사용자 정의 네트워크에 대해 Passt 바인딩 활성화",
   "Enable Passt to SSH your VirtualMachine using virtctl": "virtctl을 사용하여 VirtualMachine에 SSH로 접속할 수 있도록 Passt 활성화",
