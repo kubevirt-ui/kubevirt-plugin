@@ -35,7 +35,9 @@ export const resources = {
 export const filterUDNNads = (nads: NetworkAttachmentDefinition[]) => {
   const [regular, primary] = partition(
     nads ?? [],
-    (nad) => getLabel(nad, UDN_LABEL) === undefined || getNADRole(nad) === NADRole.secondary,
+    (nad) =>
+      getNADRole(nad) !== NADRole.primary &&
+      (getLabel(nad, UDN_LABEL) === undefined || getNADRole(nad) === NADRole.secondary),
   );
   return { primary, regular };
 };
