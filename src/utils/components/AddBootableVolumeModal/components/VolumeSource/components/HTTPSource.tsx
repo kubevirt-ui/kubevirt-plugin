@@ -3,13 +3,13 @@ import React, { FC } from 'react';
 import {
   AddBootableVolumeState,
   SetBootableVolumeFieldType,
+  TLS_CERT_FIELD_NAMES,
 } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/constants';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { FormTextInput } from '@kubevirt-utils/components/FormTextInput/FormTextInput';
+import { TLSCertificateSection } from '@kubevirt-utils/components/TLSCertificateSection';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup } from '@patternfly/react-core';
-
-import { TLSCertificateSection } from './TLSCertificate';
 
 type HTTPSourceProps = {
   bootableVolume: AddBootableVolumeState;
@@ -42,8 +42,27 @@ const HTTPSource: FC<HTTPSourceProps> = ({ bootableVolume, setBootableVolumeFiel
       </FormGroup>
 
       <TLSCertificateSection
-        bootableVolume={bootableVolume}
-        setBootableVolumeField={setBootableVolumeField}
+        onExistingCertificateChange={(certNamespace, configMapName) => {
+          setBootableVolumeField(TLS_CERT_FIELD_NAMES.tlsCertProject)(certNamespace);
+          setBootableVolumeField(TLS_CERT_FIELD_NAMES.tlsCertConfigMapName)(configMapName);
+          setBootableVolumeField(TLS_CERT_FIELD_NAMES.tlsCertificate)(null);
+        }}
+        onNewCertificateChange={(certificate) => {
+          setBootableVolumeField(TLS_CERT_FIELD_NAMES.tlsCertificate)(certificate);
+          setBootableVolumeField(TLS_CERT_FIELD_NAMES.tlsCertProject)(null);
+          setBootableVolumeField(TLS_CERT_FIELD_NAMES.tlsCertConfigMapName)(null);
+        }}
+        onRequiredChange={(required) =>
+          setBootableVolumeField(TLS_CERT_FIELD_NAMES.tlsCertificateRequired)(required)
+        }
+        onSourceChange={(source) =>
+          setBootableVolumeField(TLS_CERT_FIELD_NAMES.tlsCertSource)(source)
+        }
+        cluster={bootableVolume?.bootableVolumeCluster}
+        namespace={bootableVolume?.bootableVolumeNamespace}
+        tlsCertificate={bootableVolume?.tlsCertificate}
+        tlsCertificateRequired={bootableVolume?.tlsCertificateRequired}
+        tlsCertSource={bootableVolume?.tlsCertSource}
       />
     </>
   );

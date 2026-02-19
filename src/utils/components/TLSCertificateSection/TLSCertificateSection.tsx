@@ -1,12 +1,5 @@
-import React, { FC, useEffect } from 'react';
+import React, { FC } from 'react';
 
-import {
-  AddBootableVolumeState,
-  SetBootableVolumeFieldType,
-  TLS_CERT_FIELD_NAMES,
-  TLS_CERT_SOURCE_EXISTING,
-  TLS_CERT_SOURCE_NEW,
-} from '@kubevirt-utils/components/AddBootableVolumeModal/utils/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Checkbox,
@@ -18,27 +11,34 @@ import {
   StackItem,
 } from '@patternfly/react-core';
 
-import ExistingTLSCertificate from './ExistingTLSCertificate';
-import NewTLSCertificate from './NewTLSCertificate';
+import ExistingTLSCertificate from './components/ExistingTLSCertificate';
+import NewTLSCertificate from './components/NewTLSCertificate';
+import { TLS_CERT_SOURCE_EXISTING, TLS_CERT_SOURCE_NEW, TLSCertSourceType } from './constants';
 
 type TLSCertificateSectionProps = {
-  bootableVolume: AddBootableVolumeState;
-  setBootableVolumeField: SetBootableVolumeFieldType;
+  cluster?: string;
+  namespace: string;
+  onExistingCertificateChange: (namespace: string, configMapName: string) => void;
+  onNewCertificateChange: (certificate: string) => void;
+  onRequiredChange: (required: boolean) => void;
+  onSourceChange: (source: TLSCertSourceType) => void;
+  tlsCertificate?: string;
+  tlsCertificateRequired?: boolean;
+  tlsCertSource?: TLSCertSourceType;
 };
 
 const TLSCertificateSection: FC<TLSCertificateSectionProps> = ({
-  bootableVolume,
-  setBootableVolumeField,
+  cluster,
+  namespace,
+  onExistingCertificateChange,
+  onNewCertificateChange,
+  onRequiredChange,
+  onSourceChange,
+  tlsCertificate,
+  tlsCertificateRequired,
+  tlsCertSource,
 }) => {
   const { t } = useKubevirtTranslation();
-  const targetNamespace = bootableVolume?.bootableVolumeNamespace;
-  const { tlsCertificateRequired, tlsCertProject, tlsCertSource } = bootableVolume || {};
-
-  useEffect(() => {
-    if (!tlsCertProject && targetNamespace) {
-      setBootableVolumeField(TLS_CERT_FIELD_NAMES.tlsCertProject)(targetNamespace);
-    }
-  }, [targetNamespace, tlsCertProject, setBootableVolumeField]);
 
   const tlsRequired = !!tlsCertificateRequired;
   const useExisting = tlsCertSource === TLS_CERT_SOURCE_EXISTING;
@@ -53,11 +53,9 @@ const TLSCertificateSection: FC<TLSCertificateSectionProps> = ({
         <StackItem>
           <Checkbox
             onChange={(_event, checked) => {
-              setBootableVolumeField(TLS_CERT_FIELD_NAMES.tlsCertificateRequired)(checked);
+              onRequiredChange(checked);
               if (checked) {
-                setBootableVolumeField(TLS_CERT_FIELD_NAMES.tlsCertSource)(
-                  TLS_CERT_SOURCE_EXISTING,
-                );
+                onSourceChange(TLS_CERT_SOURCE_EXISTING);
               }
             }}
             id="tls-certificate-required"
@@ -73,10 +71,8 @@ const TLSCertificateSection: FC<TLSCertificateSectionProps> = ({
                   <FlexItem>
                     <Radio
                       onChange={() => {
-                        setBootableVolumeField(TLS_CERT_FIELD_NAMES.tlsCertSource)(
-                          TLS_CERT_SOURCE_EXISTING,
-                        );
-                        setBootableVolumeField(TLS_CERT_FIELD_NAMES.tlsCertificate)('');
+                        onSourceChange(TLS_CERT_SOURCE_EXISTING);
+                        onNewCertificateChange('');
                       }}
                       id="tls-use-existing"
                       isChecked={useExisting}
@@ -87,10 +83,8 @@ const TLSCertificateSection: FC<TLSCertificateSectionProps> = ({
                   <FlexItem>
                     <Radio
                       onChange={() => {
-                        setBootableVolumeField(TLS_CERT_FIELD_NAMES.tlsCertSource)(
-                          TLS_CERT_SOURCE_NEW,
-                        );
-                        setBootableVolumeField(TLS_CERT_FIELD_NAMES.tlsCertConfigMapName)('');
+                        onSourceChange(TLS_CERT_SOURCE_NEW);
+                        onExistingCertificateChange('', '');
                       }}
                       id="tls-add-new"
                       isChecked={!useExisting}
@@ -103,15 +97,16 @@ const TLSCertificateSection: FC<TLSCertificateSectionProps> = ({
               {useExisting ? (
                 <StackItem>
                   <ExistingTLSCertificate
-                    bootableVolume={bootableVolume}
-                    setBootableVolumeField={setBootableVolumeField}
+                    cluster={cluster}
+                    namespace={namespace}
+                    onChange={onExistingCertificateChange}
                   />
                 </StackItem>
               ) : (
                 <StackItem>
                   <NewTLSCertificate
-                    bootableVolume={bootableVolume}
-                    setBootableVolumeField={setBootableVolumeField}
+                    onChange={onNewCertificateChange}
+                    tlsCertificate={tlsCertificate}
                   />
                 </StackItem>
               )}

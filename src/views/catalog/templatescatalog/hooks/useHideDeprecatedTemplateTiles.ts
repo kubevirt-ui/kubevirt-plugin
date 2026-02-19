@@ -18,7 +18,7 @@ const useHideDeprecatedTemplateTiles: UseHideDeprecatedTemplateTiles = (
 
   // This is to select the 'Hide deprecated templates' filter by default
   useEffect(() => {
-    if (currentTab !== CREATE_VM_TAB.TEMPLATE) return null;
+    if (currentTab !== CREATE_VM_TAB.TEMPLATE) return;
 
     onFilterChange(CATALOG_FILTERS.HIDE_DEPRECATED_TEMPLATES, true);
 

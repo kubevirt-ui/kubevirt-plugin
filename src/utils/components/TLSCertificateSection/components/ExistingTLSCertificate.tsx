@@ -1,11 +1,5 @@
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 
-import { useTLSCertConfigMaps } from '@kubevirt-utils/components/AddBootableVolumeModal/hooks/useTLSCertConfigMaps';
-import {
-  AddBootableVolumeState,
-  SetBootableVolumeFieldType,
-  TLS_CERT_FIELD_NAMES,
-} from '@kubevirt-utils/components/AddBootableVolumeModal/utils/constants';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -13,22 +7,27 @@ import useProjects from '@kubevirt-utils/hooks/useProjects';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { Alert, Flex, FlexItem, FormGroup } from '@patternfly/react-core';
 
+import { useTLSCertConfigMaps } from '../hooks/useTLSCertConfigMaps';
+
 type ExistingTLSCertificateProps = {
-  bootableVolume: AddBootableVolumeState;
-  setBootableVolumeField: SetBootableVolumeFieldType;
+  cluster?: string;
+  namespace: string;
+  onChange: (namespace: string, configMapName: string) => void;
 };
 
 const ExistingTLSCertificate: FC<ExistingTLSCertificateProps> = ({
-  bootableVolume,
-  setBootableVolumeField,
+  cluster,
+  namespace,
+  onChange,
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const cluster = bootableVolume?.bootableVolumeCluster;
-  const tlsCertProject = bootableVolume?.tlsCertProject || bootableVolume?.bootableVolumeNamespace;
+  const [certProject, setCertProject] = useState(namespace);
+  const [selectedConfigMap, setSelectedConfigMap] = useState('');
+
   const [projectNames, projectsLoaded] = useProjects(cluster);
   const [tlsCertConfigMaps, certMapsLoaded, certMapsError] = useTLSCertConfigMaps(
-    tlsCertProject,
+    certProject,
     cluster,
   );
 
@@ -43,14 +42,15 @@ const ExistingTLSCertificate: FC<ExistingTLSCertificateProps> = ({
                 value: name,
               }))}
               setSelected={(name: string) => {
-                setBootableVolumeField(TLS_CERT_FIELD_NAMES.tlsCertProject)(name);
-                setBootableVolumeField(TLS_CERT_FIELD_NAMES.tlsCertConfigMapName)('');
+                setCertProject(name);
+                setSelectedConfigMap('');
+                onChange(name, '');
               }}
               toggleProps={{
                 isFullWidth: true,
                 placeholder: t('Select project...'),
               }}
-              selected={tlsCertProject || ''}
+              selected={certProject || ''}
             />
           ) : (
             <Loading />
@@ -68,14 +68,15 @@ const ExistingTLSCertificate: FC<ExistingTLSCertificateProps> = ({
                 const name = getName(cm);
                 return { children: name, value: name };
               })}
-              setSelected={(name: string) =>
-                setBootableVolumeField(TLS_CERT_FIELD_NAMES.tlsCertConfigMapName)(name)
-              }
+              setSelected={(name: string) => {
+                setSelectedConfigMap(name);
+                onChange(certProject, name);
+              }}
               toggleProps={{
                 isFullWidth: true,
                 placeholder: t('Select TLS certificate'),
               }}
-              selected={bootableVolume?.tlsCertConfigMapName || ''}
+              selected={selectedConfigMap || ''}
             />
           )}
           {!certMapsError && !certMapsLoaded && <Loading />}
