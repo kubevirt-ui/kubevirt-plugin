@@ -32,6 +32,8 @@ import { AngleDownIcon } from '@patternfly/react-icons';
 
 import { UseInstanceTypeCardMenuSectionValues } from '../../../../utils/types';
 
+import { renderMarkdownTooltip } from './utils';
+
 import './RedHatSeriesMenuCard.scss';
 
 type RedHatSeriesMenuCardProps = {
@@ -163,8 +165,14 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({
           </MenuContent>
         </Menu>
       }
+      trigger={
+        !isMenuExpanded ? (
+          <Tooltip content={renderMarkdownTooltip(descriptionAnnotation)}>{card}</Tooltip>
+        ) : (
+          card
+        )
+      }
       isVisible={isMenuExpanded}
-      trigger={!isMenuExpanded ? <Tooltip content={descriptionAnnotation}>{card}</Tooltip> : card}
       triggerRef={toggleRef}
     />
   );
