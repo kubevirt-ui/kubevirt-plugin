@@ -1,19 +1,18 @@
 import * as React from 'react';
+import { useMemo } from 'react';
 
-import {
-  V1VirtualMachineInstance,
-  V1VirtualMachineInstanceGuestOSUser,
-} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
+import { generateRows, useDataViewTableSort } from '@kubevirt-utils/hooks/useDataViewTableSort';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Bullseye, Icon, Title } from '@patternfly/react-core';
+import { DataViewTable } from '@patternfly/react-data-view';
 import { LinkIcon } from '@patternfly/react-icons';
 
 import useGuestOS from '../../../../hooks/useGuestOS';
 
-import useActiveUsersColumns from './hooks/useActiveUsersColumns';
-import ActiveUserListRow from './ActiveUserListRow';
+import { getActiveUserColumns, getActiveUserRowId } from './activeUserListDefinition';
 
 type ActiveUserListProps = {
   pathname: string;
@@ -22,12 +21,61 @@ type ActiveUserListProps = {
 
 const ActiveUserList: React.FC<ActiveUserListProps> = ({ pathname, vmi }) => {
   const { t } = useKubevirtTranslation();
-  const columns = useActiveUsersColumns();
-  const [{ userList = [] }, loaded, , isGuestAgentConnected] = useGuestOS(vmi);
+  const [{ userList = [] }, loaded, loadError, isGuestAgentConnected] = useGuestOS(vmi);
+
+  const columns = useMemo(() => getActiveUserColumns(t), [t]);
+  const { sortedData, tableColumns } = useDataViewTableSort(userList, columns, 'userName');
+
+  const rows = useMemo(
+    () => generateRows(sortedData, columns, undefined, getActiveUserRowId),
+    [sortedData, columns],
+  );
+
+  const renderContent = () => {
+    if (loadError) {
+      return (
+        <Bullseye>
+          <MutedTextSpan text={t('Error loading active users')} />
+        </Bullseye>
+      );
+    }
+
+    if (!loaded) {
+      return (
+        <Bullseye>
+          <MutedTextSpan text={t('Loading...')} />
+        </Bullseye>
+      );
+    }
+
+    if (!isGuestAgentConnected) {
+      return (
+        <Bullseye>
+          <MutedTextSpan text={t('Guest agent is required')} />
+        </Bullseye>
+      );
+    }
+
+    if (isEmpty(userList)) {
+      return (
+        <Bullseye>
+          <MutedTextSpan text={t('No active users')} />
+        </Bullseye>
+      );
+    }
+
+    return (
+      <DataViewTable aria-label={t('Active users table')} columns={tableColumns} rows={rows} />
+    );
+  };
 
   return (
     <div>
-      <a className="link-icon" href={`${pathname}#logged-in-users`}>
+      <a
+        aria-label={t('Navigate to logged-in users section')}
+        className="link-icon"
+        href={`${pathname}#logged-in-users`}
+      >
         <Icon size="sm">
           <LinkIcon />
         </Icon>
@@ -35,25 +83,7 @@ const ActiveUserList: React.FC<ActiveUserListProps> = ({ pathname, vmi }) => {
       <Title className="co-section-heading" headingLevel="h2">
         {t('Active users')}
       </Title>
-      {isGuestAgentConnected ? (
-        <VirtualizedTable<V1VirtualMachineInstanceGuestOSUser>
-          NoDataEmptyMsg={() => (
-            <Bullseye>
-              <MutedTextSpan text={t('No active users')} />
-            </Bullseye>
-          )}
-          columns={columns}
-          data={userList}
-          loaded={loaded}
-          loadError={false}
-          Row={ActiveUserListRow}
-          unfilteredData={userList}
-        />
-      ) : (
-        <Bullseye>
-          <MutedTextSpan text={t('Guest agent is required')} />
-        </Bullseye>
-      )}
+      {renderContent()}
     </div>
   );
 };

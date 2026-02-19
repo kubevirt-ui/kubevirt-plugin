@@ -1,16 +1,18 @@
-import * as React from 'react';
+import React, { useMemo } from 'react';
 
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import NodeCheckerAlert from '@kubevirt-utils/components/NodeSelectorModal/components/NodeCheckerAlert';
-import { VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
+import { generateRows, useDataViewTableSort } from '@kubevirt-utils/hooks/useDataViewTableSort';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Stack, StackItem } from '@patternfly/react-core';
+import { DataView, DataViewState, DataViewTable } from '@patternfly/react-data-view';
 
 import { AffinityRowData, AffinityType } from '../../utils/types';
 import AddAffinityRuleButton from '../AddAffinityRuleButton';
 import AffinityDescriptionText from '../AffinityDescriptionText';
 
-import AffinityRow from './components/AffinityRow';
-import useAffinityColumns from './hooks/useAffinityColumns';
+import { AffinityCallbacks, getAffinityColumns, getAffinityRowId } from './affinityTableDefinition';
 
 type AffinityListProps = {
   affinities: AffinityRowData[];
@@ -31,22 +33,44 @@ const AffinityList: React.FC<AffinityListProps> = ({
   preferredQualifiedNodes,
   qualifiedNodes,
 }) => {
-  const columns = useAffinityColumns();
+  const { t } = useKubevirtTranslation();
+
+  const columns = useMemo(() => getAffinityColumns(t), [t]);
+  const { sortedData, tableColumns } = useDataViewTableSort(affinities, columns, 'type');
+
+  const callbacks: AffinityCallbacks = useMemo(
+    () => ({ onDelete, onEdit, t }),
+    [onEdit, onDelete, t],
+  );
+  const rows = useMemo(
+    () => generateRows(sortedData, columns, callbacks, getAffinityRowId),
+    [sortedData, columns, callbacks],
+  );
+
+  const activeState = isEmpty(affinities) ? DataViewState.empty : undefined;
+
   return (
     <Stack hasGutter>
       <StackItem>
         <AffinityDescriptionText />
       </StackItem>
       <StackItem>
-        <VirtualizedTable<AffinityRowData>
-          columns={columns}
-          data={affinities || []}
-          loaded
-          loadError={false}
-          Row={AffinityRow}
-          rowData={{ onDelete, onEdit }}
-          unfilteredData={affinities || []}
-        />
+        <DataView activeState={activeState}>
+          <DataViewTable
+            bodyStates={{
+              [DataViewState.empty]: (
+                <tr>
+                  <td className="pf-v6-u-text-align-center" colSpan={columns.length}>
+                    {t('No affinity rules found')}
+                  </td>
+                </tr>
+              ),
+            }}
+            aria-label={t('Affinity rules table')}
+            columns={tableColumns}
+            rows={rows}
+          />
+        </DataView>
       </StackItem>
       <StackItem>
         <AddAffinityRuleButton isLinkButton onAffinityClickAdd={onAffinityClickAdd} />
@@ -63,4 +87,5 @@ const AffinityList: React.FC<AffinityListProps> = ({
     </Stack>
   );
 };
+
 export default AffinityList;

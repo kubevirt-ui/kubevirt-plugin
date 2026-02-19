@@ -1,12 +1,17 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { ListPageBody, VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
+import Loading from '@kubevirt-utils/components/Loading/Loading';
+import { generateRows, useDataViewTableSort } from '@kubevirt-utils/hooks/useDataViewTableSort';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
+import { Bullseye } from '@patternfly/react-core';
+import { DataViewTable } from '@patternfly/react-data-view';
 
 import useGuestOS from '../../../../hooks/useGuestOS';
-import useFileSystemTableColumns from '../../hooks/useFileSystemTableColumns';
 
-import FileSystemTableRow from './FileSystemTableRow';
+import { getFileSystemColumns, getFileSystemRowId } from './fileSystemTableDefinition';
 import FileSystemTableTitle from './FileSystemTableTitle';
 
 type FileSystemTableProps = {
@@ -14,21 +19,38 @@ type FileSystemTableProps = {
 };
 
 const FileSystemTable: FC<FileSystemTableProps> = ({ vmi }) => {
+  const { t } = useKubevirtTranslation();
   const [data, loaded, loadingError] = useGuestOS(vmi);
-  const columns = useFileSystemTableColumns();
   const fileSystems = data?.fsInfo?.disks || [];
+
+  const columns = useMemo(() => getFileSystemColumns(t), [t]);
+  const { sortedData, tableColumns } = useDataViewTableSort(fileSystems, columns, 'diskName');
+
+  const rows = useMemo(
+    () => generateRows(sortedData, columns, undefined, getFileSystemRowId),
+    [sortedData, columns],
+  );
+
+  if (!loaded) {
+    return (
+      <Bullseye>
+        <Loading />
+      </Bullseye>
+    );
+  }
+
+  if (loadingError) {
+    return <div className="pf-v6-u-text-align-center">{t('Error loading file systems')}</div>;
+  }
 
   return (
     <ListPageBody>
       <FileSystemTableTitle />
-      <VirtualizedTable
-        columns={columns}
-        data={fileSystems}
-        loaded={loaded}
-        loadError={loadingError}
-        Row={FileSystemTableRow}
-        unfilteredData={fileSystems}
-      />
+      {isEmpty(fileSystems) ? (
+        <div className="pf-v6-u-text-align-center">{t('No file systems found')}</div>
+      ) : (
+        <DataViewTable aria-label={t('File systems table')} columns={tableColumns} rows={rows} />
+      )}
     </ListPageBody>
   );
 };

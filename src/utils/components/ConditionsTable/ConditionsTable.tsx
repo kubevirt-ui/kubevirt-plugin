@@ -1,9 +1,12 @@
 import * as React from 'react';
+import { useMemo } from 'react';
 
-import { VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
+import { generateRows, useDataViewTableSort } from '@kubevirt-utils/hooks/useDataViewTableSort';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { DataViewTable } from '@patternfly/react-data-view';
 
-import { ConditionsTableRow } from './components/ConditionsTableRow';
-import useConditionsTableColumns from './components/useConditionsTableColumns';
+import { getConditionRowId, getConditionsColumns } from './conditionsTableDefinition';
 
 export enum K8sResourceConditionStatus {
   False = 'False',
@@ -24,18 +27,21 @@ export type ConditionsProps = {
 };
 
 export const ConditionsTable: React.FC<ConditionsProps> = ({ conditions }) => {
-  const columns = useConditionsTableColumns();
-  const mutatedConditions = React.useMemo(() => [...(conditions || [])], [conditions]);
+  const { t } = useKubevirtTranslation();
 
-  return (
-    <VirtualizedTable<K8sResourceCondition>
-      columns={columns}
-      data={mutatedConditions}
-      loaded
-      loadError={null}
-      Row={ConditionsTableRow}
-      unfilteredData={mutatedConditions}
-    />
+  const columns = useMemo(() => getConditionsColumns(t), [t]);
+  const { sortedData, tableColumns } = useDataViewTableSort(conditions, columns, 'type');
+
+  const rows = useMemo(
+    () => generateRows(sortedData, columns, undefined, getConditionRowId),
+    [sortedData, columns],
   );
+
+  if (isEmpty(conditions)) {
+    return <div className="pf-v6-u-text-align-center">{t('No conditions found')}</div>;
+  }
+
+  return <DataViewTable aria-label={t('Conditions table')} columns={tableColumns} rows={rows} />;
 };
+
 ConditionsTable.displayName = 'ConditionsTable';
