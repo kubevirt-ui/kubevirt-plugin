@@ -5,6 +5,8 @@ import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import {
+  Alert,
+  AlertVariant,
   Button,
   ButtonVariant,
   Modal,
@@ -96,6 +98,15 @@ const ComputeMigrationModal: FC<ComputeMigrationModalProps> = ({ isOpen, onClose
               setMigrationOption={setMigrationOption}
             />
           </StackItem>
+          {migrationOption === MigrationOptions.MANUAL && (
+            <StackItem>
+              <Alert isInline title={t('Manual node selection')} variant={AlertVariant.info}>
+                {t(
+                  'The listed nodes may not meet scheduling constraints such as node selectors, affinity rules, or topology constraints set on the VirtualMachine. Migrating to an unsuitable node will fail. It is your responsibility to ensure the selected node can run the workload.',
+                )}
+              </Alert>
+            </StackItem>
+          )}
           <StackItem className="compute-migration-modal__table-container">
             {migrationOption === MigrationOptions.MANUAL ? (
               <NodesTable
