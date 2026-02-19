@@ -27,6 +27,7 @@ import {
   getVirtualMachineDetailsTabLabel,
   VirtualMachineDetailsTab,
 } from '@kubevirt-utils/constants/tabs-constants';
+import useHideYamlTab from '@kubevirt-utils/hooks/useHideYamlTab';
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
@@ -78,6 +79,7 @@ export const usePendingChanges = (
   const navigate = useNavigate();
   const { createModal } = useModal();
   const [authorizedSSHKeys, updateAuthorizedSSHKeys] = useKubevirtUserSettings('ssh');
+  const { hideYamlTab } = useHideYamlTab();
 
   const [hyperConverge, hyperLoaded, hyperLoadingError] = useHyperConvergeConfiguration(cluster);
 
@@ -342,7 +344,14 @@ export const usePendingChanges = (
     {
       ...createProps(VirtualMachineDetailsTab.InitialRun, () =>
         createModal(({ isOpen, onClose }) => (
-          <CloudinitModal isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vm={vm} vmi={vmi} />
+          <CloudinitModal
+            hideYAMLEditor={hideYamlTab}
+            isOpen={isOpen}
+            onClose={onClose}
+            onSubmit={onSubmit}
+            vm={vm}
+            vmi={vmi}
+          />
         )),
       ),
       hasPendingChange: cloudInitChanged,

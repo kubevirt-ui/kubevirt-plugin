@@ -3,6 +3,7 @@ import * as React from 'react';
 import { DataImportCronModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1DataImportCron } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
+import useHideYamlTab, { removeYamlTabs } from '@kubevirt-utils/hooks/useHideYamlTab';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { HorizontalNav, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Bullseye } from '@patternfly/react-core';
@@ -25,20 +26,25 @@ const DataImportCronNavPage: React.FC<DataImportCronPageProps> = ({ name, namesp
     namespace,
   });
 
+  const { hideYamlTab } = useHideYamlTab();
   const pages = React.useMemo(
-    () => [
-      {
-        component: DataImportCronDetailsPage,
-        href: '',
-        name: t('Details'),
-      },
-      {
-        component: DataImportCronYAMLPage,
-        href: 'yaml',
-        name: t('YAML'),
-      },
-    ],
-    [t],
+    () =>
+      removeYamlTabs(
+        [
+          {
+            component: DataImportCronDetailsPage,
+            href: '',
+            name: t('Details'),
+          },
+          {
+            component: DataImportCronYAMLPage,
+            href: 'yaml',
+            name: t('YAML'),
+          },
+        ],
+        hideYamlTab,
+      ),
+    [t, hideYamlTab],
   );
 
   return (

@@ -1,8 +1,9 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 import { useParams } from 'react-router-dom-v5-compat';
 
 import { MigrationPolicyModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import useHideYamlTab, { removeYamlTabs } from '@kubevirt-utils/hooks/useHideYamlTab';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
@@ -24,10 +25,13 @@ const MigrationPolicyDetailsNav: FC = () => {
   });
 
   const pages = useMigrationPolicyTabs();
+  const { hideYamlTab } = useHideYamlTab();
+  const filteredPages = useMemo(() => removeYamlTabs(pages, hideYamlTab), [pages, hideYamlTab]);
+
   return (
     <>
       <MigrationPolicyDetailsNavTitle mp={mp} />
-      <HorizontalNav pages={pages} resource={mp} />
+      <HorizontalNav pages={filteredPages} resource={mp} />
     </>
   );
 };

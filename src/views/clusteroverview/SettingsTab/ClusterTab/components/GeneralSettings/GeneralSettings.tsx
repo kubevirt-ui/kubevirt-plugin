@@ -9,6 +9,7 @@ import { Stack, StackItem } from '@patternfly/react-core';
 
 import ExpandSection from '../../../ExpandSection/ExpandSection';
 
+import HideYamlTab from './HideYamlTab/HideYamlTab';
 import LiveMigrationSection from './LiveMigrationSection/LiveMigrationSection';
 import MemoryDensity from './MemoryDensity/MemoryDensity';
 import SSHConfiguration from './SSHConfiguration/SSHConfiguration';
@@ -47,6 +48,9 @@ const GeneralSettings: FC<GeneralSettingsProps> = ({ hyperConvergeConfiguration,
         </StackItem>
         <StackItem isFilled>
           <VMActionsConfirmation newBadge={newBadge} />
+        </StackItem>
+        <StackItem isFilled>
+          <HideYamlTab newBadge={newBadge} />
         </StackItem>
       </Stack>
     </ExpandSection>

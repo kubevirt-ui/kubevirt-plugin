@@ -4,6 +4,7 @@ export const CLUSTER_TAB_IDS = {
   bootableVolumesProject: 'bootable-volumes-project',
   generalSettings: 'general-settings',
   guestManagement: 'guest-management',
+  hideYamlTab: 'hide-yaml-tab',
   liveMigration: 'live-migration',
   loadBalance: 'load-balance',
   memoryDensity: 'memory-density',
@@ -33,6 +34,7 @@ export const SEARCH_ITEM_CHILDREN_TREE = {
     CLUSTER_TAB_IDS.sshConfiguration,
     CLUSTER_TAB_IDS.templatesManagement,
     CLUSTER_TAB_IDS.vmActionsConfirmation,
+    CLUSTER_TAB_IDS.hideYamlTab,
   ],
   [CLUSTER_TAB_IDS.guestManagement]: [CLUSTER_TAB_IDS.automaticSubscriptionRhel],
   [CLUSTER_TAB_IDS.templatesManagement]: [
