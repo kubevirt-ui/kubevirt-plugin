@@ -50,7 +50,6 @@ const NetworkUtil: React.FC<NetworkUtilProps> = ({ vmi }) => {
     query: queries?.NETWORK_OUT_USAGE,
   });
 
-  const networkInterfaceTotal = Number(networkTotal?.data?.result?.[0]?.value?.[1])?.toFixed(2);
   const networkInData = +networkIn?.data?.result?.[0]?.value?.[1];
   const networkOutData = +networkOut?.data?.result?.[0]?.value?.[1];
   const totalTransferred = xbytes(networkInData + networkOutData || 0, {
@@ -74,11 +73,7 @@ const NetworkUtil: React.FC<NetworkUtilProps> = ({ vmi }) => {
             <NetworkMetricsRow label={t('Out')} value={networkOutData} />
           </div>
         </ComponentReady>
-        <NetworkBreakdownPopover
-          networkInterfaceTotal={networkInterfaceTotal}
-          networkTotal={networkTotal}
-          vmi={vmi}
-        />
+        <NetworkBreakdownPopover networkTotal={networkTotal} vmi={vmi} />
       </Stack>
     </UtilizationBlock>
   );
