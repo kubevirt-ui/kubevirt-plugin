@@ -16,5 +16,7 @@ export enum NADRole {
   secondary = 'secondary',
 }
 
+export const PRIMARY_UDN_KUBEVIRT_BINDING = 'primary-udn-kubevirt-binding';
+
 export const PrimaryTopologies = [NADTopology.layer2, NADTopology.layer3];
 export const SecondaryTopologies = [NADTopology.localnet];
