@@ -8,17 +8,19 @@ import { interfaceTypesProxy } from '@kubevirt-utils/resources/vm/utils/network/
 import usePasstFeatureFlag from '@overview/SettingsTab/PreviewFeaturesTab/hooks/usePasstFeatureFlag';
 import { FormGroup, Select, SelectOption } from '@patternfly/react-core';
 
-import { getPASSTSelectableOptions } from '../../utils/helpers';
+import { getPASSTSelectableOptions, isPodNetworkName } from '../../utils/helpers';
 
 type NetworkInterfacePasstProps = {
   interfaceType: string;
   namespace: string;
+  networkName: string;
   setInterfaceType: (newValue: string) => void;
 };
 
 const NetworkInterfacePasst: FC<NetworkInterfacePasstProps> = ({
   interfaceType,
   namespace,
+  networkName,
   setInterfaceType,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -43,7 +45,7 @@ const NetworkInterfacePasst: FC<NetworkInterfacePasstProps> = ({
     [onToggle, setInterfaceType],
   );
 
-  if (!isNamespaceManagedByUDN) return null;
+  if (!isNamespaceManagedByUDN || !isPodNetworkName(networkName)) return null;
 
   return (
     <FormGroup

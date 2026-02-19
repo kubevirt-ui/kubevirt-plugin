@@ -149,6 +149,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
         <NetworkInterfacePasst
           interfaceType={interfaceType}
           namespace={getNamespace(vm)}
+          networkName={networkName}
           setInterfaceType={setInterfaceType}
         />
         <NetworkInterfaceMACAddressInput
