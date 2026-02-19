@@ -7,6 +7,7 @@ import CloudinitModal from '@kubevirt-utils/components/CloudinitModal/CloudinitM
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
+import useHideYamlTab from '@kubevirt-utils/hooks/useHideYamlTab';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   getTemplateVirtualMachineObject,
@@ -40,6 +41,7 @@ const TemplateScriptsPage: FC<TemplateScriptsPageProps> = ({ obj: template }) =>
   const { t } = useKubevirtTranslation();
   const { isTemplateEditable } = useEditTemplateAccessReview(template);
   const vm = getTemplateVirtualMachineObject(template);
+  const { hideYamlTab } = useHideYamlTab();
 
   const { createModal } = useModal();
 
@@ -65,6 +67,7 @@ const TemplateScriptsPage: FC<TemplateScriptsPageProps> = ({ obj: template }) =>
                     onClick={() =>
                       createModal(({ isOpen, onClose }) => (
                         <CloudinitModal
+                          hideYAMLEditor={hideYamlTab}
                           isOpen={isOpen}
                           onClose={onClose}
                           onSubmit={onUpdate}

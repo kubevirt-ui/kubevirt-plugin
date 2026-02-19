@@ -7,6 +7,7 @@ import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/Descript
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import useHideCredentials from '@kubevirt-utils/hooks/useHideCredentials/useHideCredentials';
+import useHideYamlTab from '@kubevirt-utils/hooks/useHideYamlTab';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 type InitialRunTabCloudInitProps = {
@@ -25,6 +26,7 @@ const InitialRunTabCloudinit: FC<InitialRunTabCloudInitProps> = ({
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const { shouldHideCredentials } = useHideCredentials();
+  const { hideYamlTab } = useHideYamlTab();
 
   const isCreating = !vm?.metadata?.uid;
   const canEdit = canUpdateVM && (isCreating || !shouldHideCredentials);
@@ -33,7 +35,14 @@ const InitialRunTabCloudinit: FC<InitialRunTabCloudInitProps> = ({
     <DescriptionItem
       onEditClick={() =>
         createModal(({ isOpen, onClose }) => (
-          <CloudinitModal isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vm={vm} vmi={vmi} />
+          <CloudinitModal
+            hideYAMLEditor={hideYamlTab}
+            isOpen={isOpen}
+            onClose={onClose}
+            onSubmit={onSubmit}
+            vm={vm}
+            vmi={vmi}
+          />
         ))
       }
       descriptionData={<CloudInitDescription vm={vm} />}

@@ -19,12 +19,13 @@ import CloudinitForm from './CloudinitForm';
 import './cloud-init.scss';
 
 const CloudinitModal: FC<{
+  hideYAMLEditor?: boolean;
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
   vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
-}> = ({ isOpen, onClose, onSubmit, vm, vmi }) => {
+}> = ({ hideYAMLEditor = false, isOpen, onClose, onSubmit, vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const { updatedVM, updateFromYAML, ...cloudInitHookValues } = useCloudInit(vm);
 
@@ -61,39 +62,41 @@ const CloudinitModal: FC<{
       <Stack hasGutter>
         <StackItem>{vmi && <ModalPendingChangesAlert />}</StackItem>
         <CloudInitInfoHelper />
-        <StackItem className="kv-cloudinit--radio">
-          <Split hasGutter>
-            <SplitItem>
-              <strong>{t('Configure via:')}</strong>
-            </SplitItem>
-            <SplitItem>
-              <Radio
-                onChange={() => {
-                  setShowEditor(false);
-                  setSubmitDisabled(false);
-                }}
-                aria-label={'form-radio'}
-                id="form-radio"
-                isChecked={!showEditor}
-                label={t('Form view')}
-                name={'form-radio'}
-              />
-            </SplitItem>
-            <SplitItem>
-              <Radio
-                onChange={() => {
-                  setShowEditor(true);
-                  setSubmitDisabled(true);
-                }}
-                aria-label={'editor-radio'}
-                id="editor-radio"
-                isChecked={showEditor}
-                label={t('Script')}
-                name={'editor-radio'}
-              />
-            </SplitItem>
-          </Split>
-        </StackItem>
+        {!hideYAMLEditor && (
+          <StackItem className="kv-cloudinit--radio">
+            <Split hasGutter>
+              <SplitItem>
+                <strong>{t('Configure via:')}</strong>
+              </SplitItem>
+              <SplitItem>
+                <Radio
+                  onChange={() => {
+                    setShowEditor(false);
+                    setSubmitDisabled(false);
+                  }}
+                  aria-label={t('Form view')}
+                  id="form-radio"
+                  isChecked={!showEditor}
+                  label={t('Form view')}
+                  name={'form-radio'}
+                />
+              </SplitItem>
+              <SplitItem>
+                <Radio
+                  onChange={() => {
+                    setShowEditor(true);
+                    setSubmitDisabled(true);
+                  }}
+                  aria-label={t('Script')}
+                  id="editor-radio"
+                  isChecked={showEditor}
+                  label={t('Script')}
+                  name={'editor-radio'}
+                />
+              </SplitItem>
+            </Split>
+          </StackItem>
+        )}
         <CloudinitForm
           onEditorSave={onEditorSave}
           setSubmitDisabled={setSubmitDisabled}
