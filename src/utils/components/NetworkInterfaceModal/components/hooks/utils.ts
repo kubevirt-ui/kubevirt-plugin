@@ -7,8 +7,8 @@ import {
   OPENSHIFT_MULTUS_NS,
   OPENSHIFT_SRIOV_NETWORK_OPERATOR_NS,
 } from '@kubevirt-utils/constants/constants';
-import { NADRole } from '@kubevirt-utils/resources/nad/constants';
-import { getLabel } from '@kubevirt-utils/resources/shared';
+import { NADRole, PRIMARY_UDN_KUBEVIRT_BINDING } from '@kubevirt-utils/resources/nad/constants';
+import { getLabel, getName } from '@kubevirt-utils/resources/shared';
 import { UDN_LABEL } from '@kubevirt-utils/resources/udn/constants';
 import { WatchK8sResource } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -33,8 +33,12 @@ export const resources = {
 };
 
 export const filterUDNNads = (nads: NetworkAttachmentDefinition[]) => {
+  const vmAvailableNADs = (nads ?? []).filter(
+    (nad) => getName(nad) !== PRIMARY_UDN_KUBEVIRT_BINDING,
+  );
+
   const [regular, primary] = partition(
-    nads ?? [],
+    vmAvailableNADs,
     (nad) =>
       getNADRole(nad) !== NADRole.primary &&
       (getLabel(nad, UDN_LABEL) === undefined || getNADRole(nad) === NADRole.secondary),
