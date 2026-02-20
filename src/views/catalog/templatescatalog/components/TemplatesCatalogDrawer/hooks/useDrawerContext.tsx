@@ -14,6 +14,10 @@ import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1DataVolumeSpec, V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { SSHSecretDetails } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import {
+  TLS_CERT_SOURCE_EXISTING,
+  TLSCertSourceType,
+} from '@kubevirt-utils/components/TLSCertificateSection';
+import {
   ROOTDISK,
   RUNSTRATEGY_HALTED,
   RUNSTRATEGY_MANUAL,
@@ -39,6 +43,14 @@ import { getDiskSource } from '../StorageSection/utils';
 import { initialValue } from './constants';
 import useDefaultVMSource from './useDefaultVMSource';
 
+export type TLSCertState = {
+  tlsCertConfigMapName: string;
+  tlsCertificate: string;
+  tlsCertificateRequired: boolean;
+  tlsCertProject: string;
+  tlsCertSource: TLSCertSourceType;
+};
+
 export type DrawerContext = {
   bootSourceLoaded: boolean;
   cdFile: File | string;
@@ -54,6 +66,7 @@ export type DrawerContext = {
   setSSHDetails: (details: SSHSecretDetails) => void;
   setStorageClassName: (scName: string) => void;
   setTemplate: Updater<V1Template>;
+  setTLSCertState: (state: Partial<TLSCertState>) => void;
   setVM?: (vm: V1VirtualMachine) => void;
   sshDetails: SSHSecretDetails;
   storageClassName: string;
@@ -61,6 +74,7 @@ export type DrawerContext = {
   template: V1Template;
   templateDataLoaded: boolean;
   templateLoadingError: Error;
+  tlsCertState: TLSCertState;
   uploadCDData?: ({ dataVolume, file }: UploadDataProps) => Promise<void>;
   uploadDiskData?: ({ dataVolume, file }: UploadDataProps) => Promise<void>;
   vm: V1VirtualMachine;
@@ -79,6 +93,19 @@ const useDrawer = (template: V1Template) => {
   const [storageClassName, setStorageClassName] = useState<string>(null);
 
   const [registryCredentials, setRegistryCredentials] = useState({ password: '', username: '' });
+
+  const [tlsCertState, setTLSCertStateRaw] = useState<TLSCertState>({
+    tlsCertConfigMapName: null,
+    tlsCertificate: null,
+    tlsCertificateRequired: false,
+    tlsCertProject: null,
+    tlsCertSource: TLS_CERT_SOURCE_EXISTING,
+  });
+
+  const setTLSCertState = useCallback(
+    (partial: Partial<TLSCertState>) => setTLSCertStateRaw((prev) => ({ ...prev, ...partial })),
+    [],
+  );
 
   const [templateWithGeneratedParams, loading, error] = useVMTemplateGeneratedParams(template);
   const [{ clusterDefaultStorageClass, virtDefaultStorageClass }] = useDefaultStorageClass();
@@ -137,6 +164,7 @@ const useDrawer = (template: V1Template) => {
     setSSHDetails,
     setStorageClassName,
     setTemplate: setCustomizedTemplate,
+    setTLSCertState,
     setVM,
     sshDetails,
     storageClassName,
@@ -147,6 +175,7 @@ const useDrawer = (template: V1Template) => {
     template: customizedTemplate || template,
     templateDataLoaded: !!templateWithGeneratedParams && !loading && bootSourceLoaded,
     templateLoadingError: error,
+    tlsCertState,
     uploadCDData,
     uploadDiskData,
     vm,

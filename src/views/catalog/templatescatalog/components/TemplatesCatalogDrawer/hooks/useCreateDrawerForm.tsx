@@ -18,6 +18,7 @@ import {
   addSecretToVM,
   applyCloudDriveCloudInitVolume,
 } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
+import { getOrCreateTLSCertConfigMapName } from '@kubevirt-utils/components/TLSCertificateSection';
 import { isValidVMName } from '@kubevirt-utils/components/VMNameValidationHelperText/utils/utils';
 import {
   RUNSTRATEGY_ALWAYS,
@@ -71,6 +72,7 @@ import { getLabels } from '@overview/OverviewTab/inventory-card/utils/flattenTem
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
+import { INSTALLATION_CDROM_NAME } from '../StorageSection/constants';
 import { allRequiredParametersAreFulfilled, hasValidSource, uploadFiles } from '../utils';
 
 import useCreateVMName from './useCreateVMName';
@@ -103,6 +105,7 @@ const useCreateDrawerForm = (
     storageClassName,
     storageClassRequired,
     template,
+    tlsCertState,
     uploadCDData,
     uploadDiskData,
     vm,
@@ -149,6 +152,11 @@ const useCreateDrawerForm = (
       });
     }
 
+    const certConfigMapName = await getOrCreateTLSCertConfigMapName(
+      { ...tlsCertState, cluster },
+      namespace,
+    );
+
     const templateToProcess = produce(template, (draftTemplate) => {
       const vmObject = getTemplateVirtualMachineObject(draftTemplate);
 
@@ -164,6 +172,14 @@ const useCreateDrawerForm = (
 
         if (addRegistrySecret)
           vmObject.spec.dataVolumeTemplates[0].spec.source.registry.secretRef = imageSecretName;
+
+        if (certConfigMapName) {
+          vmObject.spec.dataVolumeTemplates?.forEach((dvt) => {
+            if (dvt?.spec?.source?.http) {
+              dvt.spec.source.http.certConfigMap = certConfigMapName;
+            }
+          });
+        }
 
         if (!getLabels(vmObject.spec.template)) vmObject.spec.template.metadata.labels = {};
 
@@ -254,6 +270,11 @@ const useCreateDrawerForm = (
         },
       });
 
+      const certConfigMapNameForCD = await getOrCreateTLSCertConfigMapName(
+        { ...tlsCertState, cluster },
+        namespace,
+      );
+
       const vmObject = await uploadFiles({
         cdFile,
         cluster,
@@ -277,6 +298,16 @@ const useCreateDrawerForm = (
         const { cpu, memory } = getMemoryCPU(vm);
         vmDraft.spec.template.spec.domain.cpu.cores = cpu?.cores;
         vmDraft.spec.template.spec.domain.memory.guest = memory;
+
+        if (certConfigMapNameForCD) {
+          const cdromDataVolumeTemplate = vmDraft.spec.dataVolumeTemplates?.find((dvt) =>
+            getName(dvt).endsWith(INSTALLATION_CDROM_NAME),
+          );
+
+          if (cdromDataVolumeTemplate?.spec?.source?.http) {
+            cdromDataVolumeTemplate.spec.source.http.certConfigMap = certConfigMapNameForCD;
+          }
+        }
 
         if ('running' in vmDraft?.spec) {
           vmDraft.spec.runStrategy = vmDraft.spec.running ? RUNSTRATEGY_ALWAYS : RUNSTRATEGY_HALTED;
