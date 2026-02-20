@@ -9,7 +9,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
 import { getInterfaces, PASST_BINDING_NAME } from '@kubevirt-utils/resources/vm';
-import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { getCluster } from '@multicluster/helpers/selectors';
 import {
@@ -45,7 +45,7 @@ const ConsoleOverVirtctl: FC<ConsoleOverVirtctlProps> = ({ vm }) => {
           {t('SSH using virtctl')}{' '}
           <Popover
             bodyContent={(hide) => (
-              <LightspeedSimplePopoverContent
+              <PopoverContentWithLightspeedButton
                 content={
                   <>
                     <br />

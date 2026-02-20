@@ -7,3 +7,5 @@ export const getAPIURL = (path: string): string => {
 };
 
 export const QUERY_ENDPOINT = getAPIURL(`/v1/query`);
+
+export const DEFAULT_QUERY_TIMEOUT = 2000000;

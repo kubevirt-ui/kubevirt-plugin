@@ -6,7 +6,7 @@ import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfigurat
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
-import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { CLUSTER_TAB_IDS } from '@overview/SettingsTab/search/constants';
@@ -89,7 +89,7 @@ const AutomaticImagesDownload: FC<AutomaticImagesDownloadProps> = ({
       <Stack hasGutter>
         <SectionWithSwitch
           helpTextIconContent={(hide) => (
-            <LightspeedSimplePopoverContent
+            <PopoverContentWithLightspeedButton
               content={t('Enable automatic images download and update')}
               hide={hide}
               obj={hyperConvergeConfiguration?.[0]}

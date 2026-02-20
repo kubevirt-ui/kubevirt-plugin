@@ -8,7 +8,7 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { V1Template } from '@kubevirt-utils/models';
 import { getTemplateVirtualMachineCPU, updateTemplate } from '@kubevirt-utils/resources/template';
-import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 
 import CPUMemoryModal from './CPUMemoryModal/CPUMemoryModal';
@@ -36,7 +36,7 @@ const CPUMemory: FC<CPUMemoryProps> = ({ editable, template }) => {
   return (
     <DescriptionItem
       bodyContent={(hide) => (
-        <LightspeedSimplePopoverContent
+        <PopoverContentWithLightspeedButton
           content={
             <CPUDescription
               cpu={getTemplateVirtualMachineCPU(template)}
