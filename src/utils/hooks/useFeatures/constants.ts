@@ -22,7 +22,6 @@ export const CONFIRM_VM_ACTIONS = 'confirmVMActions';
 export const HIDE_CREDENTIALS_NON_PRIVILEGED = 'hideCredentialsNonPrivileged';
 export const HIDE_YAML_TAB = 'hideYamlTab';
 
-export const ADVANCED_CDROM_FEATURES = 'advancedCDROMFeatures';
 export const TREE_VIEW_FOLDERS = 'treeViewFolders';
 export const PASST_UDN_NETWORK = 'passtUDNNetwork';
 

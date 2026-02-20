@@ -665,7 +665,6 @@
   "Elapsed time since login": "로그인 이후 경과 시간",
   "Empty disk (blank)": "빈 디스크 (비어있음)",
   "Enable": "활성화",
-  "Enable advanced CD-ROM features": "고급 CD-ROM 기능 사용",
   "Enable auto updates for RHEL VirtualMachines": "RHEL VirtualMachine에 대한 자동 업데이트 활성화",
   "Enable automatic images download and update": "자동 이미지 다운로드 및 업데이트 활성화",
   "Enable automatic subscription for Red Hat Enterprise Linux VirtualMachines.\n": "Red Hat Enterprise Linux VirtualMachine에 대한 자동 서브스크립션을 활성화합니다.\n",

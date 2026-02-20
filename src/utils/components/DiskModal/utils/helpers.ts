@@ -321,20 +321,8 @@ export const ejectISOFromCDROM = (vm: V1VirtualMachine, cdromName: string): V1Vi
   });
 };
 
-export const isDeclarativeHotplugVolumesEnabled = (featureGates: string[]) => {
-  if (featureGates?.includes(HotPlugFeatures.DeclarativeHotplugVolumes)) {
-    return true;
-  }
-  return false;
-};
-
 export const isHotPluggableEnabled = (featureGates: string[]) => {
-  if (isDeclarativeHotplugVolumesEnabled(featureGates)) {
-    if (!featureGates?.includes(HotPlugFeatures.HotplugVolumes)) {
-      return true;
-    }
-  }
-  return false;
+  return !featureGates?.includes(HotPlugFeatures.HotplugVolumes);
 };
 
 export const convertDataVolumeToTemplate = (

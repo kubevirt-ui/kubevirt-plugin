@@ -1,18 +1,12 @@
 import React, { ReactNode } from 'react';
 
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import {
-  ADVANCED_CDROM_FEATURES,
-  PASST_UDN_NETWORK,
-  TREE_VIEW_FOLDERS,
-} from '@kubevirt-utils/hooks/useFeatures/constants';
+import { PASST_UDN_NETWORK, TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
-import AdvancedCDROMPopoverContent from '../AdvancedCDROMPopoverContent';
 import PasstPopoverContent from '../PasstPopoverContent';
 
-import useAdvancedCDROMFeatureFlag from './useAdvancedCDROMFeatureFlag';
 import usePasstFeatureFlag from './usePasstFeatureFlag';
 
 type Feature = {
@@ -39,7 +33,6 @@ const usePreviewFeaturesData: UsePreviewFeaturesData = () => {
   const { t } = useKubevirtTranslation();
   const treeViewFoldersFeature = useFeatures(TREE_VIEW_FOLDERS);
   const passtFeatureFlag = usePasstFeatureFlag();
-  const advancedCDROMFeature = useAdvancedCDROMFeatureFlag();
 
   const features = [
     {
@@ -54,13 +47,6 @@ const usePreviewFeaturesData: UsePreviewFeaturesData = () => {
       id: PASST_UDN_NETWORK,
       label: t('Enable Passt binding for primary user-defined networks'),
       ...passtFeatureFlag,
-    },
-    {
-      externalLink: null,
-      helpPopoverContent: AdvancedCDROMPopoverContent,
-      id: ADVANCED_CDROM_FEATURES,
-      label: t('Enable advanced CD-ROM features'),
-      ...advancedCDROMFeature,
     },
   ];
 
