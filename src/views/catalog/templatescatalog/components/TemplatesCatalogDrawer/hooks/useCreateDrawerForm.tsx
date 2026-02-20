@@ -18,6 +18,7 @@ import {
   addSecretToVM,
   applyCloudDriveCloudInitVolume,
 } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
+import { getOrCreateTLSCertConfigMapName } from '@kubevirt-utils/components/TLSCertificateSection';
 import { isValidVMName } from '@kubevirt-utils/components/VMNameValidationHelperText/utils/utils';
 import {
   RUNSTRATEGY_ALWAYS,
@@ -103,6 +104,7 @@ const useCreateDrawerForm = (
     storageClassName,
     storageClassRequired,
     template,
+    tlsCertState,
     uploadCDData,
     uploadDiskData,
     vm,
@@ -149,6 +151,11 @@ const useCreateDrawerForm = (
       });
     }
 
+    const certConfigMapName = await getOrCreateTLSCertConfigMapName(
+      { ...tlsCertState, cluster },
+      namespace,
+    );
+
     const templateToProcess = produce(template, (draftTemplate) => {
       const vmObject = getTemplateVirtualMachineObject(draftTemplate);
 
@@ -164,6 +171,14 @@ const useCreateDrawerForm = (
 
         if (addRegistrySecret)
           vmObject.spec.dataVolumeTemplates[0].spec.source.registry.secretRef = imageSecretName;
+
+        if (certConfigMapName) {
+          vmObject.spec.dataVolumeTemplates?.forEach((dvt) => {
+            if (dvt?.spec?.source?.http) {
+              dvt.spec.source.http.certConfigMap = certConfigMapName;
+            }
+          });
+        }
 
         if (!getLabels(vmObject.spec.template)) vmObject.spec.template.metadata.labels = {};
 
@@ -254,6 +269,11 @@ const useCreateDrawerForm = (
         },
       });
 
+      const certConfigMapName = await getOrCreateTLSCertConfigMapName(
+        { ...tlsCertState, cluster },
+        namespace,
+      );
+
       const vmObject = await uploadFiles({
         cdFile,
         cluster,
@@ -277,6 +297,14 @@ const useCreateDrawerForm = (
         const { cpu, memory } = getMemoryCPU(vm);
         vmDraft.spec.template.spec.domain.cpu.cores = cpu?.cores;
         vmDraft.spec.template.spec.domain.memory.guest = memory;
+
+        if (certConfigMapName) {
+          vmDraft.spec.dataVolumeTemplates?.forEach((dvt) => {
+            if (dvt?.spec?.source?.http) {
+              dvt.spec.source.http.certConfigMap = certConfigMapName;
+            }
+          });
+        }
 
         if ('running' in vmDraft?.spec) {
           vmDraft.spec.runStrategy = vmDraft.spec.running ? RUNSTRATEGY_ALWAYS : RUNSTRATEGY_HALTED;
