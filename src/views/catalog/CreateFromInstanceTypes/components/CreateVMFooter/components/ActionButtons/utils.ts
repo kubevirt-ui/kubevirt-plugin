@@ -23,7 +23,7 @@ export const getDisableButtonTooltipContent = (
   if (isEmpty(selectedInstanceType)) return t('An InstanceType must be selected');
   if (!isValidVmName) return t('VirtualMachine name not valid');
 
-  if (udnConfigurationIssue) return NOT_SUPPORTED_VM_ERROR.message;
+  if (udnConfigurationIssue) return t(NOT_SUPPORTED_VM_ERROR.message);
 
   if (!canCreate)
     return t(

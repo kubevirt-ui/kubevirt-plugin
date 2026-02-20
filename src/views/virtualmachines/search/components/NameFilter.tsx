@@ -4,6 +4,7 @@ import {
   STATIC_SEARCH_FILTERS_LABELS,
   STATIC_SEARCH_FILTERS_PLACEHOLDERS,
 } from '@kubevirt-utils/components/ListPageFilter/constants';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { SearchInput, SearchInputProps, ToolbarFilter } from '@patternfly/react-core';
 
 export type NameFilterProps = {
@@ -13,9 +14,11 @@ export type NameFilterProps = {
 };
 
 const NameFilter: FC<NameFilterProps> = ({ inputText, onDelete, onTextChange }) => {
+  const { t } = useKubevirtTranslation();
+
   return (
     <ToolbarFilter
-      categoryName={STATIC_SEARCH_FILTERS_LABELS.name}
+      categoryName={t(STATIC_SEARCH_FILTERS_LABELS.name)}
       deleteLabel={onDelete}
       deleteLabelGroup={onDelete}
       labels={inputText ? [inputText] : []}
@@ -23,7 +26,7 @@ const NameFilter: FC<NameFilterProps> = ({ inputText, onDelete, onTextChange }) 
       <SearchInput
         data-test="vm-filter-name-input"
         onChange={onTextChange}
-        placeholder={STATIC_SEARCH_FILTERS_PLACEHOLDERS.name}
+        placeholder={t(STATIC_SEARCH_FILTERS_PLACEHOLDERS.name)}
         value={inputText}
       />
     </ToolbarFilter>

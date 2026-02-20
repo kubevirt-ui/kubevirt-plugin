@@ -59,9 +59,9 @@ export const TemplateInfoSection: FC = memo(() => {
       <DescriptionList>
         <DescriptionItem descriptionData={displayName} descriptionHeader={t('Operating system')} />
         <DescriptionItem
-          descriptionData={`${WORKLOADS_LABELS[workload] ?? t('Other')} ${
-            isDefaultTemplate && t('(default)')
-          }`}
+          descriptionData={`${
+            WORKLOADS_LABELS[workload] ? t(WORKLOADS_LABELS[workload]) : t('Other')
+          }${isDefaultTemplate ? ` ${t('(default)')}` : ''}`}
           descriptionHeader={t('Workload type')}
         />
         <DescriptionItem

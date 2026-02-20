@@ -1,5 +1,4 @@
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 export const TEMPLATE_TYPE_LABEL = 'template.kubevirt.io/type';
 export const TEMPLATE_DEFAULT_VARIANT_LABEL = 'template.kubevirt.io/default-os-variant';
@@ -54,15 +53,15 @@ export enum WORKLOADS {
 }
 
 export const WORKLOADS_LABELS = {
-  [WORKLOADS.desktop]: t('Desktop'),
-  [WORKLOADS.highperformance]: t('High performance'),
-  [WORKLOADS.server]: t('Server'),
+  [WORKLOADS.desktop]: 'Desktop',
+  [WORKLOADS.highperformance]: 'High performance',
+  [WORKLOADS.server]: 'Server',
 };
 
 export const WORKLOADS_DESCRIPTIONS = {
-  [WORKLOADS.desktop]: t('Small scale consumption, recommended for using the graphical console'),
-  [WORKLOADS.highperformance]: t('Optimized for High resource consumption workloads'),
-  [WORKLOADS.server]: t('Balances performance, compatible with a broad range of workloads'),
+  [WORKLOADS.desktop]: 'Small scale consumption, recommended for using the graphical console',
+  [WORKLOADS.highperformance]: 'Optimized for High resource consumption workloads',
+  [WORKLOADS.server]: 'Balances performance, compatible with a broad range of workloads',
 };
 
 export const OS_NAME_LABELS = {
@@ -108,14 +107,14 @@ export enum BOOT_SOURCE {
 }
 
 export const BOOT_SOURCE_LABELS = {
-  [BOOT_SOURCE.CONTAINER_DISK]: t('Container disk'),
-  [BOOT_SOURCE.DATA_SOURCE]: t('PVC'),
-  [BOOT_SOURCE.DATA_SOURCE_AUTO_IMPORT]: t('PVC (auto import)'),
-  [BOOT_SOURCE.NONE]: t('No boot source'),
-  [BOOT_SOURCE.PVC]: t('PVC'),
-  [BOOT_SOURCE.REGISTRY]: t('Registry'),
-  [BOOT_SOURCE.SNAPSHOT]: t('Snapshot'),
-  [BOOT_SOURCE.URL]: t('URL'),
+  [BOOT_SOURCE.CONTAINER_DISK]: 'Container disk',
+  [BOOT_SOURCE.DATA_SOURCE]: 'PVC',
+  [BOOT_SOURCE.DATA_SOURCE_AUTO_IMPORT]: 'PVC (auto import)',
+  [BOOT_SOURCE.NONE]: 'No boot source',
+  [BOOT_SOURCE.PVC]: 'PVC',
+  [BOOT_SOURCE.REGISTRY]: 'Registry',
+  [BOOT_SOURCE.SNAPSHOT]: 'Snapshot',
+  [BOOT_SOURCE.URL]: 'URL',
 };
 
 export const OS_IMAGE_LINKS = {

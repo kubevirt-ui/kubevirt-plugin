@@ -96,7 +96,7 @@ export const InstanceTypeDrilldownSelect: FC<InstanceTypeMenuItemsProps> = ({
         scrollableMenuIDs={[MENUS.userProvided]}
         setIsOpen={setIsOpen}
       >
-        <DrilldownMenuItem {...menuItems.redHatProvided}>
+        <DrilldownMenuItem {...menuItems.redHatProvided} label={t(menuItems.redHatProvided.label)}>
           <RedHatInstanceTypeSeriesMenu
             onSelect={(value, keepMenuOpen) =>
               onSelect(VirtualMachineClusterInstancetypeModel.kind, value, keepMenuOpen)
@@ -106,7 +106,7 @@ export const InstanceTypeDrilldownSelect: FC<InstanceTypeMenuItemsProps> = ({
             seriesList={sortedRedHatProvided}
           />
         </DrilldownMenuItem>
-        <DrilldownMenuItem {...menuItems.userProvided}>
+        <DrilldownMenuItem {...menuItems.userProvided} label={t(menuItems.userProvided.label)}>
           <UserInstanceTypeMenu
             allInstanceTypes={allInstanceTypes}
             onSelect={onSelect}

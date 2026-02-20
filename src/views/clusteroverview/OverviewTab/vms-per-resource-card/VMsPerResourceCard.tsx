@@ -32,7 +32,7 @@ const VMsPerResourceCard = () => {
             >
               {vmsPerResourceOptions?.map((scope) => (
                 <SelectOption key={scope.type} value={scope.title}>
-                  {scope.title}
+                  {t(scope.title)}
                 </SelectOption>
               ))}
             </FormPFSelect>

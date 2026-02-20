@@ -1,8 +1,6 @@
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-
-export const OTHER = t('Other');
-export const CONTAINER_EPHERMAL = t('Container (Ephemeral)');
-export const DYNAMIC = t('Dynamic');
+export const OTHER = 'Other';
+export const CONTAINER_EPHERMAL = 'Container (Ephemeral)';
+export const DYNAMIC = 'Dynamic';
 
 export const DISKTYPE_SELECT_FIELDID = 'disk-type-select';
 export const STORAGECLASS_SELECT_FIELDID = 'storage-class-select';

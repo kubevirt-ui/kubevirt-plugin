@@ -43,11 +43,11 @@ const SSHServiceSelect: FC<SSHServiceSelectProps> = ({
     <FormPFSelect
       onSelect={handleChange}
       selected={sshServiceType}
-      selectedLabel={serviceTypeTitles[sshServiceType]}
+      selectedLabel={t(serviceTypeTitles[sshServiceType])}
       toggleProps={{ isDisabled: !sshServiceLoaded, isFullWidth: true }}
     >
       <SelectOption id={SERVICE_TYPES.NONE} value={SERVICE_TYPES.NONE}>
-        {serviceTypeTitles.None}
+        {t(serviceTypeTitles.None)}
       </SelectOption>
       <SelectOption
         description={t(
@@ -57,7 +57,7 @@ const SSHServiceSelect: FC<SSHServiceSelectProps> = ({
         isDisabled={!loadBalancerEnabled}
         value={SERVICE_TYPES.LOAD_BALANCER}
       >
-        {serviceTypeTitles.LoadBalancer}
+        {t(serviceTypeTitles.LoadBalancer)}
       </SelectOption>
       <SelectOption
         description={t(
@@ -74,7 +74,7 @@ const SSHServiceSelect: FC<SSHServiceSelectProps> = ({
           },
         })}
       >
-        {serviceTypeTitles.NodePort}
+        {t(serviceTypeTitles.NodePort)}
       </SelectOption>
     </FormPFSelect>
   );

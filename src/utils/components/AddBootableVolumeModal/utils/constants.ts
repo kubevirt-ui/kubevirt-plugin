@@ -13,7 +13,6 @@ import {
 import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/utils/constants';
 import { OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
 import { CDI_BIND_REQUESTED_ANNOTATION } from '@kubevirt-utils/hooks/useCDIUpload/consts';
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 export enum DROPDOWN_FORM_SELECTION {
   UPLOAD_VOLUME = 'volume',
@@ -24,11 +23,11 @@ export enum DROPDOWN_FORM_SELECTION {
 }
 
 export const optionsValueLabelMapper = {
-  [DROPDOWN_FORM_SELECTION.UPLOAD_VOLUME]: t('Volume'),
-  [DROPDOWN_FORM_SELECTION.USE_EXISTING_PVC]: t('Volume'),
-  [DROPDOWN_FORM_SELECTION.USE_HTTP]: t('URL'),
-  [DROPDOWN_FORM_SELECTION.USE_REGISTRY]: t('Registry'),
-  [DROPDOWN_FORM_SELECTION.USE_SNAPSHOT]: t('Volume snapshot'),
+  [DROPDOWN_FORM_SELECTION.UPLOAD_VOLUME]: 'Volume',
+  [DROPDOWN_FORM_SELECTION.USE_EXISTING_PVC]: 'Volume',
+  [DROPDOWN_FORM_SELECTION.USE_HTTP]: 'URL',
+  [DROPDOWN_FORM_SELECTION.USE_REGISTRY]: 'Registry',
+  [DROPDOWN_FORM_SELECTION.USE_SNAPSHOT]: 'Volume snapshot',
 };
 
 export const TLS_CERT_SOURCE_EXISTING = 'existing';
