@@ -1,11 +1,15 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { DEFAULT_OPERATOR_NAMESPACE } from '@kubevirt-utils/utils/utils';
+import { operatorNamespaceSignal } from '@kubevirt-utils/hooks/useOperatorNamespace/useOperatorNamespace';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 
-import { FEATURES_CONFIG_MAP_NAME, featuresConfigMapInitialState, UI_FEATURES } from './constants';
+import {
+  FEATURES_CONFIG_MAP_INITIAL_DATA,
+  FEATURES_CONFIG_MAP_NAME,
+  UI_FEATURES,
+} from './constants';
 import { applyMissingFeatures, createFeaturesConfigMap } from './createFeaturesConfigMap';
 import { UseFeaturesValues } from './types';
 import useFeaturesConfigMap from './useFeaturesConfigMap';
@@ -18,6 +22,7 @@ export const useFeatures: UseFeatures = (featureName) => {
 
   const isUIFeature = UI_FEATURES.includes(featureName);
   const cluster = useClusterParam();
+  const operatorNamespace = operatorNamespaceSignal.value;
 
   const { featuresConfigMapData, isAdmin } = useFeaturesConfigMap(
     isUIFeature ? null : cluster,
@@ -30,7 +35,7 @@ export const useFeatures: UseFeatures = (featureName) => {
   const [error, setError] = useState<Error>(null);
 
   useEffect(() => {
-    if (createError || createInProgress) {
+    if (createError || createInProgress || !operatorNamespace) {
       return;
     }
 
@@ -41,7 +46,7 @@ export const useFeatures: UseFeatures = (featureName) => {
       (async () => {
         try {
           await createFeaturesConfigMap();
-          setFeatureEnabled(featuresConfigMapInitialState.data[featureName] === 'true');
+          setFeatureEnabled(FEATURES_CONFIG_MAP_INITIAL_DATA[featureName] === 'true');
           setError(null);
           // eslint-disable-next-line @typescript-eslint/no-shadow
         } catch (createError) {
@@ -74,7 +79,7 @@ export const useFeatures: UseFeatures = (featureName) => {
           (async () => {
             try {
               await applyMissingFeatures(featureName, featureConfigMap);
-              setFeatureEnabled(featuresConfigMapInitialState.data[featureName] === 'true');
+              setFeatureEnabled(FEATURES_CONFIG_MAP_INITIAL_DATA[featureName] === 'true');
             } catch (updateError) {
               setError(updateError);
             }
@@ -95,10 +100,12 @@ export const useFeatures: UseFeatures = (featureName) => {
     featureEnabled,
     createError,
     createInProgress,
+    operatorNamespace,
   ]);
 
   const toggleFeature = useCallback(
     async (value: boolean) => {
+      if (!operatorNamespace) return;
       setLoading(true);
 
       try {
@@ -109,7 +116,7 @@ export const useFeatures: UseFeatures = (featureName) => {
             data: {},
             metadata: {
               name: FEATURES_CONFIG_MAP_NAME,
-              namespace: DEFAULT_OPERATOR_NAMESPACE,
+              namespace: operatorNamespace,
             },
           },
         });
@@ -122,7 +129,7 @@ export const useFeatures: UseFeatures = (featureName) => {
         setError(updateError);
       }
     },
-    [featureName],
+    [featureName, operatorNamespace],
   );
 
   return {

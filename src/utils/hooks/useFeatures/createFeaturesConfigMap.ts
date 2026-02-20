@@ -4,23 +4,31 @@ import {
   IoK8sApiRbacV1Role,
   IoK8sApiRbacV1RoleBinding,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { operatorNamespaceSignal } from '@kubevirt-utils/hooks/useOperatorNamespace/useOperatorNamespace';
 import { k8sCreate, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 
-import { featuresConfigMapInitialState, featuresRole, featuresRoleBinding } from './constants';
+import {
+  FEATURES_CONFIG_MAP_INITIAL_DATA,
+  getFeaturesConfigMapInitialState,
+  getFeaturesRole,
+  getFeaturesRoleBinding,
+} from './constants';
 
 export const createFeaturesConfigMap = async () => {
+  const namespace = operatorNamespaceSignal.value;
+
   await k8sCreate<IoK8sApiCoreV1ConfigMap>({
-    data: featuresConfigMapInitialState,
+    data: getFeaturesConfigMapInitialState(namespace),
     model: ConfigMapModel,
   });
 
   await k8sCreate<IoK8sApiRbacV1Role>({
-    data: featuresRole,
+    data: getFeaturesRole(namespace),
     model: RoleModel,
   });
 
   await k8sCreate<IoK8sApiRbacV1RoleBinding>({
-    data: featuresRoleBinding,
+    data: getFeaturesRoleBinding(namespace),
     model: RoleBindingModel,
   });
 };
@@ -34,7 +42,7 @@ export const applyMissingFeatures = async (
       {
         op: 'replace',
         path: `/data/${featureName}`,
-        value: featuresConfigMapInitialState.data[featureName],
+        value: FEATURES_CONFIG_MAP_INITIAL_DATA[featureName],
       },
     ],
     model: ConfigMapModel,
