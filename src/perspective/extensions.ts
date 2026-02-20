@@ -175,6 +175,25 @@ const virtualizationSection = [
     },
     type: 'console.navigation/href',
   } as EncodedExtension<HrefNavItem>,
+  {
+    flags: {
+      required: ['KUBEVIRT_QUOTAS'],
+    },
+    properties: {
+      dataAttributes: {
+        'data-class': 'kv-plugin-virt-perspective-element',
+        'data-quickstart-id': 'qs-nav-quotas',
+        'data-test-id': 'quotas-nav-item',
+      },
+      href: 'quotas',
+      id: 'quotas-virt-perspective',
+      insertAfter: 'virtualization-checkups-virt-perspective',
+      name: '%plugin__kubevirt-plugin~Quotas%',
+      perspective: 'virtualization-perspective',
+      prefixNamespaced: true,
+    },
+    type: 'console.navigation/href',
+  } as EncodedExtension<HrefNavItem>,
 ];
 
 const migrationSection = [

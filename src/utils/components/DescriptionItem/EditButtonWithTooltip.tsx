@@ -1,7 +1,8 @@
-import React, { FC, memo, PropsWithChildren, ReactNode, SyntheticEvent } from 'react';
+import React, { FC, memo, PropsWithChildren, ReactNode, useMemo } from 'react';
 
-import { Button, ButtonVariant, Tooltip } from '@patternfly/react-core';
-import { PencilAltIcon } from '@patternfly/react-icons';
+import { Tooltip } from '@patternfly/react-core';
+
+import EditButton from '../EditButton/EditButton';
 
 type EditButtonWithTooltipProps = PropsWithChildren<{
   isEditable: boolean;
@@ -17,34 +18,24 @@ const EditButtonWithTooltip: FC<EditButtonWithTooltipProps> = ({
   testId,
   tooltipContent,
 }) => {
-  const EditButton = () => (
-    <Button
-      onClick={(e: SyntheticEvent<HTMLButtonElement>) => {
-        e.stopPropagation();
-        onEditClick?.();
-      }}
-      data-test-id={testId}
-      icon={<PencilAltIcon />}
-      iconPosition="end"
-      isDisabled={!isEditable}
-      isInline
-      variant={ButtonVariant.link}
-    >
-      {children}
-    </Button>
+  const editButton = useMemo(
+    () => (
+      <EditButton isDisabled={!isEditable} isInline onClick={onEditClick} testId={testId}>
+        {children}
+      </EditButton>
+    ),
+    [onEditClick, testId, isEditable, children],
   );
 
   if (!isEditable && tooltipContent) {
     return (
       <Tooltip content={tooltipContent}>
-        <span>
-          <EditButton />
-        </span>
+        <span>{editButton}</span>
       </Tooltip>
     );
   }
 
-  return <EditButton />;
+  return editButton;
 };
 
 export default memo(EditButtonWithTooltip);

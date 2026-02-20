@@ -13,6 +13,7 @@ const REDHAT_DOC_URL = `${RH_DOC_URL}/openshift_container_platform/latest`;
 const RHACM_DOC_URL = `${RH_DOC_URL}/red_hat_advanced_cluster_management_for_kubernetes`;
 
 export const documentationURL = {
+  AAQ_OPERATOR: `${REDHAT_DOC_URL}/html-single/virtualization/index#virt-about-aaq-operator_virt-understanding-aaq-operator`,
   ACCESS_MODE: `${K8S_PERSISTENT_VOLUMES_URL}/#access-modes`,
   ANNOTATIONS: `${K8_DOC_OBJ_URL}/annotations/`,
   AUTOCOMPUTE_CPU_LIMITS: `${KV_UG_URL}/user-guide/virtual_machines/resources_requests_and_limits/`,

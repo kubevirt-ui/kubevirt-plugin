@@ -30,3 +30,5 @@ export const getDNS1123LabelError = (value: string): ((t: TFunction) => string) 
   }
   return undefined;
 };
+
+export const isDigitsOnly = (value: string): boolean => /^\d+$/.test(value);

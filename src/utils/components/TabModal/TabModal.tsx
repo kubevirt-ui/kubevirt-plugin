@@ -27,6 +27,7 @@ export type TabModalProps<T extends K8sResourceCommon = K8sResourceCommon> = {
   children: ReactNode;
   closeOnSubmit?: boolean;
   formClassName?: string;
+  headerDescription?: string;
   headerText: string;
   isDisabled?: boolean;
   isHorizontal?: boolean;
@@ -54,6 +55,7 @@ const TabModal: TabModalFC = memo(
     children,
     closeOnSubmit = true,
     formClassName,
+    headerDescription,
     headerText,
     isDisabled,
     isHorizontal,
@@ -114,7 +116,11 @@ const TabModal: TabModalFC = memo(
         position={positionTop ? 'top' : undefined}
         variant={modalVariant ?? ModalVariant.small}
       >
-        <ModalHeader title={headerText} titleIconVariant={titleIconVariant} />
+        <ModalHeader
+          description={headerDescription}
+          title={headerText}
+          titleIconVariant={titleIconVariant}
+        />
 
         <ModalBody>
           {shouldWrapInForm ? (
