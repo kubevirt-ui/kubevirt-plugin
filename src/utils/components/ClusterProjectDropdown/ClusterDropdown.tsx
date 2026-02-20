@@ -65,7 +65,7 @@ const ClusterDropdown: FC<ClusterDropdownProps> = ({
   );
 
   return (
-    <Dropdown<string>
+    <Dropdown
       bookmarks={{
         bookmarks: bookmarks || {},
         bookmarksLoaded,

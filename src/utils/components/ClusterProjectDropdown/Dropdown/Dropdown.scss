@@ -1,3 +1,26 @@
+// Fallback for PF 6.4.x two-star favorite rendering.
+// PF 6.4+ renders both OutlinedStarIcon and StarIcon inside a favorite Button,
+// relying on CSS to toggle visibility. If the host CSS is missing these rules,
+// both icons appear. This ensures only the correct one is shown.
+.pf-v6-c-button.pf-m-favorite {
+  .pf-v6-c-button__icon-favorited {
+    display: none;
+  }
+
+  &.pf-m-favorited .pf-v6-c-button__icon-favorite {
+    display: none;
+  }
+
+  &.pf-m-favorited .pf-v6-c-button__icon-favorited {
+    display: inline-flex;
+  }
+
+  .pf-v6-c-button__icon {
+    transition: none;
+    animation: none;
+  }
+}
+
 // Base dropdown styles
 %co-dropdown-base {
   &__menu {
