@@ -11,6 +11,10 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { V1beta1DataVolumeSource } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  TLS_CERT_CONFIGMAP_KEY,
+  TLS_CERT_SOURCE_EXISTING,
+} from '@kubevirt-utils/components/TLSCertificateSection';
 import { OPENSHIFT_CNV } from '@kubevirt-utils/constants/constants';
 import { UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { KUBEVIRT_ISO_LABEL } from '@kubevirt-utils/resources/bootableresources/constants';
@@ -28,9 +32,7 @@ import {
   DROPDOWN_FORM_SELECTION,
   emptySourceDataVolume,
   initialDataImportCron,
-  TLS_CERT_CONFIGMAP_KEY,
   TLS_CERT_FIELD_NAMES,
-  TLS_CERT_SOURCE_EXISTING,
 } from './constants';
 
 export const formatRegistryURL = (registryURL: string) =>

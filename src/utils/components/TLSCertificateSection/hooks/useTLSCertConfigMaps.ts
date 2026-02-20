@@ -4,7 +4,7 @@ import { ConfigMapModel, modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevi
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
-import { TLS_CERT_CONFIGMAP_KEY } from '../utils/constants';
+import { TLS_CERT_CONFIGMAP_KEY } from '../constants';
 
 export const useTLSCertConfigMaps = (
   namespace: string,

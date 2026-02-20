@@ -11,6 +11,10 @@ import {
   V1beta1StorageSpecVolumeModeEnum,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/utils/constants';
+import {
+  TLS_CERT_SOURCE_EXISTING,
+  TLS_CERT_SOURCE_NEW,
+} from '@kubevirt-utils/components/TLSCertificateSection';
 import { OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
 import { CDI_BIND_REQUESTED_ANNOTATION } from '@kubevirt-utils/hooks/useCDIUpload/consts';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -30,10 +34,6 @@ export const optionsValueLabelMapper = {
   [DROPDOWN_FORM_SELECTION.USE_REGISTRY]: t('Registry'),
   [DROPDOWN_FORM_SELECTION.USE_SNAPSHOT]: t('Volume snapshot'),
 };
-
-export const TLS_CERT_SOURCE_EXISTING = 'existing';
-export const TLS_CERT_SOURCE_NEW = 'new';
-
 export const TLS_CERT_FIELD_NAMES = {
   tlsCertConfigMapName: 'tlsCertConfigMapName',
   tlsCertificate: 'tlsCertificate',
@@ -155,5 +155,3 @@ export const emptyDataSource: V1beta1DataSource = {
   },
   spec: { source: {} },
 };
-
-export const TLS_CERT_CONFIGMAP_KEY = 'ca.pem';
