@@ -12,7 +12,12 @@ import {
   getDisks,
   getVolumes,
 } from '@kubevirt-utils/resources/vm';
-import { ensurePath, generateUploadDiskName, isEmpty } from '@kubevirt-utils/utils/utils';
+import {
+  ensurePath,
+  generateUploadDiskName,
+  isEmpty,
+  kubevirtConsole,
+} from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { isRunning } from '@virtualmachines/utils';
@@ -22,11 +27,12 @@ import { getDataVolumeTemplateSize } from '../components/utils/selectors';
 import { DEFAULT_DISK_SIZE, UPLOAD_SUFFIX } from './constants';
 import {
   createDataVolumeName,
+  createMutableUploadData,
   getEmptyVMDataVolumeResource,
   hotplugPromise,
   produceVMDisks,
 } from './helpers';
-import { V1DiskFormState } from './types';
+import { V1DiskFormState, V1DiskModalProps } from './types';
 
 const applyDiskAsBootable = (vm: V1VirtualMachine, diskName: string): V1VirtualMachine => {
   return produce(vm, (draftVM) => {
@@ -68,6 +74,13 @@ export const reorderBootDisk = (
   return isBootDisk ? applyDiskAsBootable(vm, diskName) : removeDiskAsBootable(vm, diskName);
 };
 
+const getUploadFileSizeWithBuffer = (data: V1DiskFormState): null | string => {
+  const fileSize = data?.uploadFile?.file?.size;
+  if (!fileSize) return null;
+  const sizeInGi = Math.ceil((fileSize * 1.1) / (1024 * 1024 * 1024));
+  return `${Math.max(sizeInGi, 1)}Gi`;
+};
+
 export const uploadDataVolume = async (
   vm: V1VirtualMachine,
   uploadData: ({ dataVolume, file }: UploadDataProps) => Promise<void>,
@@ -79,7 +92,7 @@ export const uploadDataVolume = async (
 
   dataVolume.spec.source = { upload: {} };
   dataVolume.spec.storage.resources.requests.storage =
-    getDataVolumeTemplateSize(data) || DEFAULT_DISK_SIZE;
+    getDataVolumeTemplateSize(data) || getUploadFileSizeWithBuffer(data) || DEFAULT_DISK_SIZE;
 
   await uploadData({
     dataVolume,
@@ -195,4 +208,98 @@ export const submit = async ({
   }
 
   return shouldHotplug ? (hotplugPromise(newVM, data) as Promise<any>) : onSubmit(newVM, data);
+};
+
+type SubmitCDROMInput = {
+  isHotPluggable: boolean;
+  onSubmit: V1DiskModalProps['onSubmit'];
+  onUploadedDataVolume?: V1DiskModalProps['onUploadedDataVolume'];
+  onUploadStarted?: V1DiskModalProps['onUploadStarted'];
+  selectedISO: string;
+  uploadData: ({ dataVolume, file }: UploadDataProps) => Promise<void>;
+  uploadEnabled: boolean;
+  vm: V1VirtualMachine;
+};
+
+const produceExistingISOData = (
+  data: V1DiskFormState,
+  selectedISO: string,
+  isHotPluggable: boolean,
+): V1DiskFormState =>
+  produce(data, (draft) => {
+    draft.volume.persistentVolumeClaim = {
+      claimName: selectedISO,
+      ...(isHotPluggable && { hotpluggable: true }),
+    };
+    delete draft.dataVolumeTemplate;
+  });
+
+const produceHotplugUploadISOData = (data: V1DiskFormState, dvName: string): V1DiskFormState =>
+  produce(data, (draft) => {
+    draft.dataVolumeTemplate.metadata.name = dvName;
+    draft.dataVolumeTemplate.spec.source = { upload: {} };
+    draft.volume.dataVolume = { hotpluggable: true, name: dvName };
+  });
+
+const produceUploadISOData = (data: V1DiskFormState, claimName: string): V1DiskFormState =>
+  produce(data, (draft) => {
+    draft.volume.persistentVolumeClaim = { claimName };
+    delete draft.dataVolumeTemplate;
+  });
+
+const produceEmptyDriveData = (data: V1DiskFormState): V1DiskFormState =>
+  produce(data, (draft) => {
+    delete draft.dataVolumeTemplate;
+    delete draft.volume;
+  });
+
+export const submitCDROM = async (
+  data: V1DiskFormState,
+  {
+    isHotPluggable,
+    onSubmit,
+    onUploadedDataVolume,
+    onUploadStarted,
+    selectedISO,
+    uploadData,
+    uploadEnabled,
+    vm,
+  }: SubmitCDROMInput,
+): Promise<V1VirtualMachine | void> => {
+  const uploadISO = uploadEnabled && data?.uploadFile?.file;
+
+  const finalize = (producedData: V1DiskFormState) => {
+    const vmWithDisk = addDisk(producedData, vm);
+    const updatedVM = reorderBootDisk(
+      vmWithDisk,
+      producedData.disk.name,
+      producedData.isBootSource,
+      false,
+    );
+    return onSubmit(updatedVM);
+  };
+
+  if (selectedISO) {
+    return finalize(produceExistingISOData(data, selectedISO, isHotPluggable));
+  }
+
+  if (uploadISO && isHotPluggable) {
+    const dvName = generateUploadDiskName(data.disk.name, UPLOAD_SUFFIX);
+    const mutableData = createMutableUploadData(data);
+    const uploadPromise = uploadDataVolume(vm, uploadData, mutableData);
+    uploadPromise
+      .then((uploaded) => onUploadedDataVolume?.(uploaded))
+      .catch((err) => kubevirtConsole.error('CD-ROM upload error:', err));
+    onUploadStarted?.(uploadPromise);
+    return finalize(produceHotplugUploadISOData(data, dvName));
+  }
+
+  if (uploadISO) {
+    const mutableData = createMutableUploadData(data);
+    const uploaded = await uploadDataVolume(vm, uploadData, mutableData);
+    onUploadedDataVolume?.(uploaded);
+    return finalize(produceUploadISOData(data, getName(uploaded)));
+  }
+
+  return finalize(produceEmptyDriveData(data));
 };

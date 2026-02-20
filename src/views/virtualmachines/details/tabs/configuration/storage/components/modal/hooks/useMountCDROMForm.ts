@@ -6,6 +6,7 @@ import {
   FORM_FIELD_UPLOAD_FILE,
   FORM_FIELD_UPLOAD_MODE,
   FORM_FIELD_UPLOAD_TYPE,
+  UPLOAD_MODE_EMPTY,
   UPLOAD_MODE_SELECT,
   UPLOAD_MODE_UPLOAD,
 } from '@kubevirt-utils/components/DiskModal/utils/constants';
@@ -14,7 +15,7 @@ import { VolumeTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 type MountCDROMFormState = {
   selectedISO?: string;
   uploadFile?: { file: File; filename: string };
-  uploadMode: '' | typeof UPLOAD_MODE_SELECT | typeof UPLOAD_MODE_UPLOAD;
+  uploadMode: '' | typeof UPLOAD_MODE_EMPTY | typeof UPLOAD_MODE_SELECT | typeof UPLOAD_MODE_UPLOAD;
   uploadType: VolumeTypes.DATA_VOLUME | VolumeTypes.PERSISTENT_VOLUME_CLAIM;
 };
 
@@ -58,6 +59,12 @@ export const useMountCDROMForm = () => {
     }
   };
 
+  const handleEmptyDriveSelection = () => {
+    setValue(FORM_FIELD_UPLOAD_MODE, UPLOAD_MODE_EMPTY);
+    setValue(FORM_FIELD_SELECTED_ISO, '');
+    handleClearUpload(false);
+  };
+
   const handleUploadTypeChange = (
     type: VolumeTypes.DATA_VOLUME | VolumeTypes.PERSISTENT_VOLUME_CLAIM,
   ) => {
@@ -68,6 +75,7 @@ export const useMountCDROMForm = () => {
 
   return {
     handleClearUpload,
+    handleEmptyDriveSelection,
     handleFileUpload,
     handleISOSelection,
     handleUploadTypeChange,

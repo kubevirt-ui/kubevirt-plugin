@@ -32,11 +32,18 @@ import './disklist.scss';
 type DiskListProps = {
   customize?: boolean;
   onDiskUpdate?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
+  onUploadStarted?: (uploadPromise: Promise<unknown>) => void;
   vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
 
-const DiskList: FC<DiskListProps> = ({ customize = false, onDiskUpdate, vm, vmi }) => {
+const DiskList: FC<DiskListProps> = ({
+  customize = false,
+  onDiskUpdate,
+  onUploadStarted,
+  vm,
+  vmi,
+}) => {
   const { createModal } = useModal();
   const columns = useDiskColumns();
   const [disks, sourcesLoaded, loadError] = useDisksTableData(vm, vmi);
@@ -69,6 +76,7 @@ const DiskList: FC<DiskListProps> = ({ customize = false, onDiskUpdate, vm, vmi 
               isOpen={isOpen}
               onClose={onClose}
               onSubmit={onSubmit}
+              onUploadStarted={onUploadStarted}
               vm={vm}
             />
           ));

@@ -321,6 +321,27 @@ export const ejectISOFromCDROM = (vm: V1VirtualMachine, cdromName: string): V1Vi
   });
 };
 
+/**
+ * Creates a shallow copy of the form data with a mutable dataVolumeTemplate.spec.source.
+ * Needed for fire-and-forget uploads where uploadDataVolume attempts to delete
+ * source.upload on a possibly frozen react-hook-form object.
+ * @param data The disk form state to convert into a mutable copy
+ */
+export const createMutableUploadData = (data: V1DiskFormState): V1DiskFormState => {
+  if (!data.dataVolumeTemplate) return data;
+
+  return {
+    ...data,
+    dataVolumeTemplate: {
+      ...data.dataVolumeTemplate,
+      spec: {
+        ...data.dataVolumeTemplate.spec,
+        source: { ...data.dataVolumeTemplate.spec?.source },
+      },
+    },
+  };
+};
+
 export const isDeclarativeHotplugVolumesEnabled = (featureGates: string[]) => {
   if (featureGates?.includes(HotPlugFeatures.DeclarativeHotplugVolumes)) {
     return true;
