@@ -8,17 +8,14 @@ import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { PrometheusResponse } from '@openshift-console/dynamic-plugin-sdk';
 import { Button, ButtonVariant, Content, ContentVariants, Popover } from '@patternfly/react-core';
 
+import { getInterfaceNetworkRate } from './utils';
+
 type NetworkBreakdownPopoverProps = {
-  networkInterfaceTotal: string;
   networkTotal: PrometheusResponse;
   vmi: V1VirtualMachineInstance;
 };
 
-const NetworkBreakdownPopover: React.FC<NetworkBreakdownPopoverProps> = ({
-  networkInterfaceTotal,
-  networkTotal,
-  vmi,
-}) => {
+const NetworkBreakdownPopover: React.FC<NetworkBreakdownPopoverProps> = ({ networkTotal, vmi }) => {
   const { t } = useKubevirtTranslation();
 
   const interfacesNames = useMemo(() => vmi?.spec?.domain?.devices?.interfaces, [vmi]);
@@ -38,17 +35,9 @@ const NetworkBreakdownPopover: React.FC<NetworkBreakdownPopoverProps> = ({
               >
                 {networkInterface?.name}
               </Link>
-              {networkInterface?.name === networkInterfaceTotal ? (
-                <div className="pf-v6-u-text-color-subtle">{`${networkInterfaceTotal} Bps`}</div>
-              ) : (
-                <div className="pf-v6-u-text-color-subtle">
-                  {networkTotal?.data?.result?.map(
-                    (name) =>
-                      name?.metric?.interface === networkInterface?.name &&
-                      `${Number(name?.value?.[1])?.toFixed(2)} Bps`,
-                  )}
-                </div>
-              )}
+              <div className="pf-v6-u-text-color-subtle">
+                {getInterfaceNetworkRate(networkTotal, networkInterface?.name)}
+              </div>
             </div>
           ))}
           {interfacesNames?.length > 5 && (
