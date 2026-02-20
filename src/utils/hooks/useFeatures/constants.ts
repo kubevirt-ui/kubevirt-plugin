@@ -4,7 +4,6 @@ import {
   IoK8sApiRbacV1Role,
   IoK8sApiRbacV1RoleBinding,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { DEFAULT_OPERATOR_NAMESPACE } from '@kubevirt-utils/utils/utils';
 import { K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
 
 export const AUTOMATIC_SUBSCRIPTION_ACTIVATION_KEY = 'automaticSubscriptionActivationKey';
@@ -34,31 +33,33 @@ export const FEATURE_HCO_PERSISTENT_RESERVATION = 'persistentReservationHCO';
 
 export const UI_FEATURES = [CONFIRM_VM_ACTIONS, TREE_VIEW_FOLDERS];
 
-export const featuresConfigMapInitialState: IoK8sApiCoreV1ConfigMap = {
-  data: {
-    [AUTOMATIC_SUBSCRIPTION_ACTIVATION_KEY]: '',
-    [AUTOMATIC_SUBSCRIPTION_ORGANIZATION_ID]: '',
-    [CONFIRM_VM_ACTIONS]: 'false',
-    [DISABLED_GUEST_SYSTEM_LOGS_ACCESS]: 'false',
-    [HIDE_CREDENTIALS_NON_PRIVILEGED]: 'false',
-    [HIDE_YAML_TAB]: 'false',
-    [KUBEVIRT_APISERVER_PROXY]: 'true',
-    [LOAD_BALANCER_ENABLED]: 'false',
-    [NODE_PORT_ADDRESS]: '',
-    [NODE_PORT_ENABLED]: 'false',
-    [PASST_UDN_NETWORK]: 'false',
-    [TREE_VIEW_FOLDERS]: 'false',
-  },
-  metadata: {
-    name: FEATURES_CONFIG_MAP_NAME,
-    namespace: DEFAULT_OPERATOR_NAMESPACE,
-  },
+export const FEATURES_CONFIG_MAP_INITIAL_DATA: Record<string, string> = {
+  [AUTOMATIC_SUBSCRIPTION_ACTIVATION_KEY]: '',
+  [AUTOMATIC_SUBSCRIPTION_ORGANIZATION_ID]: '',
+  [CONFIRM_VM_ACTIONS]: 'false',
+  [DISABLED_GUEST_SYSTEM_LOGS_ACCESS]: 'false',
+  [HIDE_CREDENTIALS_NON_PRIVILEGED]: 'false',
+  [HIDE_YAML_TAB]: 'false',
+  [KUBEVIRT_APISERVER_PROXY]: 'true',
+  [LOAD_BALANCER_ENABLED]: 'false',
+  [NODE_PORT_ADDRESS]: '',
+  [NODE_PORT_ENABLED]: 'false',
+  [PASST_UDN_NETWORK]: 'false',
+  [TREE_VIEW_FOLDERS]: 'false',
 };
 
-export const featuresRole: IoK8sApiRbacV1Role = {
+export const getFeaturesConfigMapInitialState = (namespace: string): IoK8sApiCoreV1ConfigMap => ({
+  data: FEATURES_CONFIG_MAP_INITIAL_DATA,
+  metadata: {
+    name: FEATURES_CONFIG_MAP_NAME,
+    namespace,
+  },
+});
+
+export const getFeaturesRole = (namespace: string): IoK8sApiRbacV1Role => ({
   metadata: {
     name: FEATURES_ROLE_NAME,
-    namespace: DEFAULT_OPERATOR_NAMESPACE,
+    namespace,
   },
   rules: [
     {
@@ -68,12 +69,12 @@ export const featuresRole: IoK8sApiRbacV1Role = {
       verbs: ['list', 'get', 'watch'] as K8sVerb[],
     },
   ],
-};
+});
 
-export const featuresRoleBinding: IoK8sApiRbacV1RoleBinding = {
+export const getFeaturesRoleBinding = (namespace: string): IoK8sApiRbacV1RoleBinding => ({
   metadata: {
     name: FEATURES_ROLE_BINDING_NAME,
-    namespace: DEFAULT_OPERATOR_NAMESPACE,
+    namespace,
   },
   roleRef: {
     apiGroup: RoleModel.apiGroup,
@@ -87,4 +88,4 @@ export const featuresRoleBinding: IoK8sApiRbacV1RoleBinding = {
       name: 'system:authenticated',
     },
   ],
-};
+});

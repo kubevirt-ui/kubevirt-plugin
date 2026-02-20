@@ -3,7 +3,8 @@ import { useMemo } from 'react';
 import { SubscriptionModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { KUBEVIRT_HYPERCONVERGED } from '@kubevirt-utils/constants/constants';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
-import { DEFAULT_OPERATOR_NAMESPACE } from '@kubevirt-utils/utils/utils';
+import { operatorNamespaceSignal } from '@kubevirt-utils/store/operatorNamespace';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { SubscriptionKind } from '@overview/utils/types';
 import { useFleetClusterNames } from '@stolostron/multicluster-sdk';
 
@@ -13,12 +14,15 @@ export const useClusterCNVInstalled = (): {
   loaded: boolean;
 } => {
   const [clusterNames, clustersLoaded] = useFleetClusterNames();
+  const operatorNamespace = operatorNamespaceSignal.value;
 
-  const [allSubscriptions, subscriptionsLoaded] = useKubevirtWatchResource<SubscriptionKind[]>({
-    groupVersionKind: SubscriptionModelGroupVersionKind,
-    isList: true,
-    namespace: DEFAULT_OPERATOR_NAMESPACE,
-  });
+  const [allSubscriptions, subscriptionsLoaded] = useKubevirtWatchResource<SubscriptionKind[]>(
+    operatorNamespace && {
+      groupVersionKind: SubscriptionModelGroupVersionKind,
+      isList: true,
+      namespace: operatorNamespace,
+    },
+  );
 
   const { cnvInstalledClusters, cnvNotInstalledClusters } = useMemo(() => {
     if (!clusterNames || !allSubscriptions) {
@@ -60,6 +64,6 @@ export const useClusterCNVInstalled = (): {
   return {
     cnvInstalledClusters,
     cnvNotInstalledClusters,
-    loaded: clustersLoaded && subscriptionsLoaded,
+    loaded: clustersLoaded && subscriptionsLoaded && !isEmpty(operatorNamespace),
   };
 };
