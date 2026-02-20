@@ -534,7 +534,7 @@
   "Delete Data Volume: {{pvcName}}": "データボリュームの削除: {{pvcName}}",
   "Delete DataImportCron?": "DataImportCron を削除しますか?",
   "Delete DataSource?": "DataSource を削除しますか?",
-  "Delete disk {{resourceName}} ({{kindAbbr}})": "ディスク {{resourceName}} ({{kindAbbr}}) の削除",
+  "Delete disk": "Delete disk",
   "Delete job": "ジョブの削除",
   "Delete migration plan?": "移行計画を削除しますか?",
   "Delete MigrationPolicy?": "MigrationPolicy を削除しますか?",

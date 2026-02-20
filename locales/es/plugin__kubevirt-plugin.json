@@ -543,7 +543,7 @@
   "Delete Data Volume: {{pvcName}}": "Eliminar volumen de datos: {{pvcName}}",
   "Delete DataImportCron?": "¿Desea eliminar DataImportCron?",
   "Delete DataSource?": "¿Desea eliminar DataSource?",
-  "Delete disk {{resourceName}} ({{kindAbbr}})": "Eliminar disco {{resourceName}} ({{kindAbbr}})",
+  "Delete disk": "Delete disk",
   "Delete job": "Eliminar tarea",
   "Delete migration plan?": "¿Desea eliminar el plan de migración?",
   "Delete MigrationPolicy?": "¿Desea eliminar MigrationPolicy?",

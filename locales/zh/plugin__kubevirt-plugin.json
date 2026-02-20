@@ -534,7 +534,7 @@
   "Delete Data Volume: {{pvcName}}": "删除数据卷：{{pvcName}}",
   "Delete DataImportCron?": "删除 DataImportCron?",
   "Delete DataSource?": "删除 DataSource?",
-  "Delete disk {{resourceName}} ({{kindAbbr}})": "删除磁盘 {{resourceName}} ({{kindAbbr}})",
+  "Delete disk": "Delete disk",
   "Delete job": "删除作业",
   "Delete migration plan?": "删除迁移计划？",
   "Delete MigrationPolicy?": "删除 MigrationPolicy？",

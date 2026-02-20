@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
 import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -14,6 +14,7 @@ import { GracePeriodInput } from '@kubevirt-utils/components/GracePeriodInput/Gr
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { buildOwnerReference, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getSharedVolumes } from '@kubevirt-utils/resources/vm';
 import { KUBEVIRT_VM_PATH } from '@multicluster/constants';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sDelete } from '@multicluster/k8sRequests';
@@ -24,6 +25,8 @@ import { deselectVM, isVMSelected } from '@virtualmachines/list/selectedVMs';
 
 import DeleteOwnedResourcesMessage from './components/DeleteOwnedResourcesMessage';
 import useDeleteVMResources from './hooks/useDeleteVMResources';
+import useSavePVCs from './hooks/useSavePVCs';
+import useSaveSharedDisks from './hooks/useSaveSharedDisks';
 import {
   deleteSecrets,
   removeDataVolumeTemplatesToVM,
@@ -55,6 +58,11 @@ const DeleteVMModal: FC<DeleteVMModalProps> = ({ isOpen, onClose, vm }) => {
   const [snapshotsToSave, setSnapshotsToSave] = useState<V1beta1VirtualMachineSnapshot[]>([]);
 
   const { dataVolumes, loaded, pvcs, secrets, snapshots } = useDeleteVMResources(vm);
+
+  const sharedVolumes = useMemo(() => getSharedVolumes(vm), [vm]);
+
+  useSaveSharedDisks(sharedVolumes, setVolumesToSave, dataVolumes);
+  useSavePVCs(setVolumesToSave, pvcs);
 
   const onDelete = async (updatedVM: V1VirtualMachine) => {
     const vmOwnerRef = buildOwnerReference(updatedVM);
@@ -122,6 +130,7 @@ const DeleteVMModal: FC<DeleteVMModalProps> = ({ isOpen, onClose, vm }) => {
           pvcs={pvcs}
           setSnapshotsToSave={setSnapshotsToSave}
           setVolumesToSave={setVolumesToSave}
+          sharedVolumes={sharedVolumes}
           snapshots={snapshots}
           snapshotsToSave={snapshotsToSave}
           volumesToSave={volumesToSave}

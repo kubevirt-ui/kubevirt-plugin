@@ -536,7 +536,7 @@
   "Delete Data Volume: {{pvcName}}": "Delete Data Volume: {{pvcName}}",
   "Delete DataImportCron?": "Delete DataImportCron?",
   "Delete DataSource?": "Delete DataSource?",
-  "Delete disk {{resourceName}} ({{kindAbbr}})": "Delete disk {{resourceName}} ({{kindAbbr}})",
+  "Delete disk": "Delete disk",
   "Delete job": "Delete job",
   "Delete migration plan?": "Delete migration plan?",
   "Delete MigrationPolicy?": "Delete MigrationPolicy?",

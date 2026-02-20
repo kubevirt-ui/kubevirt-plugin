@@ -8,6 +8,7 @@ import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-a
 import {
   V1beta1VirtualMachineSnapshot,
   V1VirtualMachine,
+  V1Volume,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { deleteSecret } from '@kubevirt-utils/resources/secret/utils';
 import { compareOwnerReferences, getName, getNamespace } from '@kubevirt-utils/resources/shared';
@@ -104,3 +105,31 @@ export const sameResource = (volumeA: K8sResourceCommon, volumeB: K8sResourceCom
   volumeA.kind === volumeB.kind &&
   getName(volumeA) === getName(volumeB) &&
   getNamespace(volumeA) === getNamespace(volumeB);
+
+export const getSharedDataVolumes = (
+  sharedVolumes: V1Volume[],
+  dataVolumes: V1beta1DataVolume[],
+) => {
+  const sharedDataVolumeNames = sharedVolumes
+    ?.map((volume) => volume?.dataVolume?.name)
+    ?.filter(Boolean);
+  return dataVolumes?.filter((dataVolume) => sharedDataVolumeNames?.includes(getName(dataVolume)));
+};
+
+export const isResourceShared = (sharedVolumes: V1Volume[], resource: K8sResourceCommon) => {
+  return sharedVolumes.some(
+    (volume) =>
+      volume?.dataVolume?.name === getName(resource) ||
+      volume?.persistentVolumeClaim?.claimName === getName(resource),
+  );
+};
+
+export const getResourceModel = (resource: K8sResourceCommon) => {
+  if (resource.kind === PersistentVolumeClaimModel.kind) {
+    return PersistentVolumeClaimModel;
+  }
+  if (resource.kind === VirtualMachineSnapshotModel.kind) {
+    return VirtualMachineSnapshotModel;
+  }
+  return DataVolumeModel;
+};
