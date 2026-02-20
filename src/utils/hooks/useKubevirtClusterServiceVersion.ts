@@ -2,8 +2,8 @@ import { useMemo } from 'react';
 
 import { SubscriptionModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { KUBEVIRT_HYPERCONVERGED } from '@kubevirt-utils/constants/constants';
+import { operatorNamespaceSignal } from '@kubevirt-utils/hooks/useOperatorNamespace/useOperatorNamespace';
 import { ClusterServiceVersionModelGroupVersionKind } from '@kubevirt-utils/models';
-import { DEFAULT_OPERATOR_NAMESPACE } from '@kubevirt-utils/utils/utils';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { ClusterServiceVersionKind, SubscriptionKind } from '@overview/utils/types';
 
@@ -15,14 +15,18 @@ type UseKubevirtClusterServiceVersion = (cluster?: string) => {
 };
 
 export const useKubevirtClusterServiceVersion: UseKubevirtClusterServiceVersion = (cluster) => {
+  const operatorNamespace = operatorNamespaceSignal.value;
+
   const [subscriptions, loadedSubscription, loadSubscriptionError] = useK8sWatchData<
     SubscriptionKind[]
-  >({
-    cluster,
-    groupVersionKind: SubscriptionModelGroupVersionKind,
-    isList: true,
-    namespace: DEFAULT_OPERATOR_NAMESPACE,
-  });
+  >(
+    operatorNamespace && {
+      cluster,
+      groupVersionKind: SubscriptionModelGroupVersionKind,
+      isList: true,
+      namespace: operatorNamespace,
+    },
+  );
 
   const subscription = useMemo(
     () => subscriptions?.find((sub) => sub?.spec?.name?.endsWith(KUBEVIRT_HYPERCONVERGED)),
