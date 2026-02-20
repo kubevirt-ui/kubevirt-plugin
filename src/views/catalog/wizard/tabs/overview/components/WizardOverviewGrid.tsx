@@ -312,7 +312,7 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
               ))
             }
             className="wizard-overview-description-left-column"
-            description={WORKLOADS_LABELS?.[workloadAnnotation] ?? t('Other')}
+            description={WORKLOADS_LABELS?.[workloadAnnotation] || t('Other')}
             isEdit
             testId="wizard-overview-workload-profile"
             title={t('Workload profile')}

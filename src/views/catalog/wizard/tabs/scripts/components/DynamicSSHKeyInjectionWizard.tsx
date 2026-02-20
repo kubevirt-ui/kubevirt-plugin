@@ -13,12 +13,13 @@ import {
   getCloudInitConfigDrive,
   getCloudInitPropagationMethod,
 } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getLabel } from '@kubevirt-utils/resources/shared';
 import { getAccessCredentials, getVMSSHSecretName, getVolumes } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 const DynamicSSHKeyInjectionWizard = () => {
+  const { t } = useKubevirtTranslation();
   const { updateVM, vm } = useWizardVMContext();
   const hasSSHKey = !isEmpty(getAccessCredentials(vm));
   const secretName = getVMSSHSecretName(vm);

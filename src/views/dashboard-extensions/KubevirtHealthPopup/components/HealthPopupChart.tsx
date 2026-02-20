@@ -3,7 +3,7 @@ import React, { FC, useMemo } from 'react';
 import SubTitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/SubTitleChartLabel';
 import TitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/TitleChartLabel';
 import { AlertsByHealthImpact } from '@kubevirt-utils/hooks/useInfrastructureAlerts/useInfrastructureAlerts';
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ChartDonut } from '@patternfly/react-charts/victory';
 
@@ -17,6 +17,7 @@ type HealthPopupChartProps = {
 };
 
 const HealthPopupChart: FC<HealthPopupChartProps> = ({ alerts, numberOfAlerts }) => {
+  const { t } = useKubevirtTranslation();
   const totalNumberAlerts = useMemo(
     () => Object.values(alerts)?.reduce((acc, alertType) => acc + (alertType?.length || 0), 0),
     [alerts],
