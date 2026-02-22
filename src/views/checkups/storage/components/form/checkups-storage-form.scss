@@ -1,14 +1,40 @@
 .CheckupsStorageForm {
   &--main {
     padding: 20px;
+
     &__nads {
       width: 100%;
       button {
         width: 100%;
       }
     }
+
     &__number-input {
       width: fit-content;
+    }
+
+    // Advanced settings section
+    .pf-v6-c-expandable-section {
+      .form-group-spacing {
+        margin-bottom: var(--pf-t--global--spacer--md);
+      }
+
+      input[type='number']:where(:not([class*='pf-v5-c-'], [class*='pf-v6-c-'])) {
+        max-width: 180px;
+        min-width: 180px;
+      }
+    }
+
+    // Fix tooltip wrapper breaking flex layout in form actions
+    .pf-v6-c-form__actions {
+      > div[style*='display: contents'] {
+        display: inline-flex !important;
+        align-items: center;
+
+        > span {
+          display: inline-flex;
+        }
+      }
     }
   }
 }
