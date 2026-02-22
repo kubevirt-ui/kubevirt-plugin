@@ -8,15 +8,19 @@ import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { ActionGroup, Alert, AlertVariant, Button, ButtonVariant } from '@patternfly/react-core';
 
 import { CHECKUP_URLS } from '../../../utils/constants';
-import { createStorageCheckup } from '../../utils/utils';
+import { createStorageCheckup, isNumOfVMsInvalid } from '../../utils/utils';
+
+import { StorageCheckupAdvancedSettings } from './AdvancedSettings';
 
 type CheckupsStorageFormActionsProps = {
+  advancedSettings: StorageCheckupAdvancedSettings;
   checkupImage: string;
   name: string;
   timeOut: string;
 };
 
 const CheckupsStorageFormActions: FC<CheckupsStorageFormActionsProps> = ({
+  advancedSettings,
   checkupImage,
   name,
   timeOut,
@@ -25,23 +29,41 @@ const CheckupsStorageFormActions: FC<CheckupsStorageFormActionsProps> = ({
   const navigate = useNavigate();
   const namespace = useActiveNamespace();
   const cluster = useClusterParam();
-  const [error, setError] = useState<string>(null);
+  const [error, setError] = useState<null | string>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   return (
     <>
       <ActionGroup>
         <Button
+          isDisabled={
+            isEmpty(name) ||
+            isEmpty(timeOut) ||
+            !checkupImage ||
+            isSubmitting ||
+            isNumOfVMsInvalid(advancedSettings.numOfVMs)
+          }
           onClick={async () => {
             setError(null);
+            setIsSubmitting(true);
             try {
-              await createStorageCheckup(namespace, cluster, timeOut, name, checkupImage);
+              await createStorageCheckup({
+                checkupImage,
+                cluster,
+                name,
+                namespace,
+                timeOut,
+                ...advancedSettings,
+              });
               navigate(`/k8s/ns/${namespace}/checkups/${CHECKUP_URLS.STORAGE}`);
             } catch (e) {
               kubevirtConsole.log(e);
               setError(e?.message);
+            } finally {
+              setIsSubmitting(false);
             }
           }}
-          isDisabled={isEmpty(name) || isEmpty(timeOut) || !checkupImage}
+          isLoading={isSubmitting}
           variant={ButtonVariant.primary}
         >
           {t('Run')}

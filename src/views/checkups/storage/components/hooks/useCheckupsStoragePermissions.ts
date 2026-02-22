@@ -24,7 +24,7 @@ import {
   STORAGE_CHECKUP_ROLE,
   STORAGE_CHECKUP_SA,
   STORAGE_CLUSTER_ROLE_BINDING,
-} from '../../utils/utils';
+} from '../../utils/consts';
 
 export const useCheckupsStoragePermissions = () => {
   const namespace = useActiveNamespace();

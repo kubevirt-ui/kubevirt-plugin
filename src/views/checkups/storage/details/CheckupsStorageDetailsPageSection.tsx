@@ -28,6 +28,10 @@ import {
 import {
   STORAGE_CHECKUP_DEFAULT_STORAGE_CLASS,
   STORAGE_CHECKUP_LIVE_MIGRATION,
+  STORAGE_CHECKUP_PARAM_NUM_OF_VMS,
+  STORAGE_CHECKUP_PARAM_SKIP_TEARDOWN,
+  STORAGE_CHECKUP_PARAM_STORAGE_CLASS,
+  STORAGE_CHECKUP_PARAM_VMI_TIMEOUT,
   STORAGE_CHECKUP_TIMEOUT,
   STORAGE_CHECKUPS_BOOT_GOLDEN_IMAGE,
   STORAGE_CHECKUPS_GOLDEN_IMAGE_NO_DATA_SOURCE,
@@ -42,7 +46,8 @@ import {
   STORAGE_CHECKUPS_WITH_EMPTY_CLAIM_PROPERTY_SETS,
   STORAGE_CHECKUPS_WITH_NON_RBD_STORAGE_CLASS,
   STORAGE_CHECKUPS_WITH_SMART_CLONE,
-} from '../utils/utils';
+} from '../utils/consts';
+import { getSkipTeardownLabel, parseMinutesValue, SkipTeardownOption } from '../utils/utils';
 
 type CheckupsStorageDetailsPageSectionProps = {
   configMap: IoK8sApiCoreV1ConfigMap;
@@ -55,6 +60,21 @@ const CheckupsStorageDetailsPageSection: FC<CheckupsStorageDetailsPageSectionPro
 }) => {
   const { t } = useKubevirtTranslation();
   const none = t('None');
+
+  const rawSkipTeardown = configMap?.data?.[STORAGE_CHECKUP_PARAM_SKIP_TEARDOWN] as
+    | SkipTeardownOption
+    | undefined;
+  const skipTeardownLabel = getSkipTeardownLabel(t, rawSkipTeardown ?? 'never');
+
+  const rawTimeout = configMap?.data?.[STORAGE_CHECKUP_TIMEOUT];
+  const timeoutDisplay = rawTimeout
+    ? t('{{count}} minutes', { count: parseMinutesValue(rawTimeout) })
+    : none;
+
+  const rawVmiTimeout = configMap?.data?.[STORAGE_CHECKUP_PARAM_VMI_TIMEOUT];
+  const vmiTimeoutDisplay = rawVmiTimeout
+    ? t('{{count}} minutes', { count: parseMinutesValue(rawVmiTimeout) })
+    : none;
 
   return (
     <>
@@ -80,17 +100,21 @@ const CheckupsStorageDetailsPageSection: FC<CheckupsStorageDetailsPageSectionPro
             />
             <DescriptionItem
               descriptionData={
+                configMap?.data?.[STORAGE_CHECKUP_PARAM_STORAGE_CLASS] ||
                 configMap?.data?.[STORAGE_CHECKUP_DEFAULT_STORAGE_CLASS] ? (
                   <MulticlusterResourceLink
+                    name={
+                      configMap?.data?.[STORAGE_CHECKUP_PARAM_STORAGE_CLASS] ||
+                      configMap?.data?.[STORAGE_CHECKUP_DEFAULT_STORAGE_CLASS]
+                    }
                     cluster={getCluster(configMap)}
                     groupVersionKind={modelToGroupVersionKind(StorageClassModel)}
-                    name={configMap?.data?.[STORAGE_CHECKUP_DEFAULT_STORAGE_CLASS]}
                   />
                 ) : (
                   none
                 )
               }
-              descriptionHeader={t('Default storage class')}
+              descriptionHeader={t('Storage class')}
             />
             <DescriptionItem
               descriptionData={configMap?.data?.[STORAGE_CHECKUPS_PVC_BOUND] || none}
@@ -122,9 +146,10 @@ const CheckupsStorageDetailsPageSection: FC<CheckupsStorageDetailsPageSectionPro
               descriptionData={configMap?.data?.[STORAGE_CHECKUP_LIVE_MIGRATION] || none}
               descriptionHeader={t('VirtualMachine live migration')}
             />
+            <DescriptionItem descriptionData={timeoutDisplay} descriptionHeader={t('Timeout')} />
             <DescriptionItem
-              descriptionData={configMap?.data?.[STORAGE_CHECKUP_TIMEOUT]}
-              descriptionHeader={t('Timeout')}
+              descriptionData={vmiTimeoutDisplay}
+              descriptionHeader={t('VMI timeout')}
             />
           </DescriptionList>
         </GridItem>
@@ -196,6 +221,14 @@ const CheckupsStorageDetailsPageSection: FC<CheckupsStorageDetailsPageSectionPro
                 />
               }
               descriptionHeader={t('Job')}
+            />
+            <DescriptionItem
+              descriptionData={configMap?.data?.[STORAGE_CHECKUP_PARAM_NUM_OF_VMS] || none}
+              descriptionHeader={t('Number of VMs')}
+            />
+            <DescriptionItem
+              descriptionData={skipTeardownLabel}
+              descriptionHeader={t('Skip teardown')}
             />
           </DescriptionList>
         </GridItem>

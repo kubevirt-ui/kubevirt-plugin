@@ -11,7 +11,7 @@ import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 
-import { KUBEVIRT_STORAGE_LABEL_VALUE } from '../../utils/utils';
+import { KUBEVIRT_STORAGE_LABEL_VALUE } from '../../utils/consts';
 
 const useCheckupsStorageData = () => {
   const namespace = useActiveNamespace();
