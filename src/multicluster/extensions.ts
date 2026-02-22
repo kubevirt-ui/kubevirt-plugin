@@ -231,6 +231,19 @@ export const extensions: EncodedExtension[] = [
     },
     properties: {
       component: {
+        $codeRef: 'BootableVolumeYAMLPage',
+      },
+      path: [`/k8s/cluster/:cluster/ns/:ns/bootablevolumes/~new`],
+      perspective: 'fleet-virtualization-perspective',
+    },
+    type: 'console.page/route',
+  } as EncodedExtension<RoutePage>,
+  {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC_ACM'],
+    },
+    properties: {
+      component: {
         $codeRef: 'BootableVolumesList',
       },
       path: [

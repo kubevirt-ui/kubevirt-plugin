@@ -203,7 +203,6 @@ describe('Check all virtualization pages can be loaded', () => {
       cy.get(sel.itemCreateBtn).click();
       cy.byButtonText(YAML).click();
       cy.get(sel.saveBtn).click();
-      cy.get(sel.breadcrumb).click();
       cy.byLegacyTestID(Example).should('exist');
     });
   });

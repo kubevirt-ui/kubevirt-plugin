@@ -23,6 +23,8 @@ import useListMulticlusterFilters from '@kubevirt-utils/hooks/useListMulticluste
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import {
   convertResourceArrayToMapWithCluster,
+  getName,
+  getNamespace,
   getReadyOrCloningOrUploadingDataSources,
 } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -120,12 +122,28 @@ const useBootableVolumes: UseBootableVolumes = (namespace) => {
   const pvcSources = useMemo(() => convertResourceArrayToMapWithCluster(pvcs, true), [pvcs]);
   const dvSources = useMemo(() => convertResourceArrayToMapWithCluster(dvs, true), [dvs]);
 
-  const bootableVolumes: BootableVolume[] = useMemo(() => {
-    const dataSourceVolumes =
-      loaded && !isEmpty(readyOrCloningDataSources) ? [...readyOrCloningDataSources] : [];
+  // DataSources being provisioned by a DataVolume that don't yet match the
+  // ready/cloning/uploading filters (e.g. freshly created DS before CDI
+  // updates its status conditions).
+  const provisioningDataSources = useMemo(() => {
+    if (!loaded || isEmpty(dataSources) || isEmpty(dvs)) return [];
 
-    return dataSourceVolumes;
-  }, [loaded, readyOrCloningDataSources]);
+    const readyOrCloningKeys = new Set(
+      readyOrCloningDataSources.map((ds) => `${getNamespace(ds)}/${getName(ds)}`),
+    );
+
+    return dataSources.filter((ds) => {
+      if (readyOrCloningKeys.has(`${getNamespace(ds)}/${getName(ds)}`)) return false;
+
+      return dvs.some((dv) => getName(dv) === getName(ds) && getNamespace(dv) === getNamespace(ds));
+    });
+  }, [loaded, dataSources, dvs, readyOrCloningDataSources]);
+
+  const bootableVolumes: BootableVolume[] = useMemo(() => {
+    if (!loaded) return [];
+
+    return [...readyOrCloningDataSources, ...provisioningDataSources];
+  }, [loaded, readyOrCloningDataSources, provisioningDataSources]);
 
   const volumeSnapshotSources = useMemo(
     () =>

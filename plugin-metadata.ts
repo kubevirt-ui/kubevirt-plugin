@@ -34,6 +34,7 @@ const metadata: ConsolePluginBuildMetadata = {
     ...PhysicalNetworksExposedModules,
     ...VMNetworksExposedModules,
     BootableVolumesList: './views/bootablevolumes/list/BootableVolumesList.tsx',
+    BootableVolumeYAMLPage: './views/bootablevolumes/list/components/BootableVolumeYAMLPage.tsx',
     Catalog: './views/catalog/Catalog.tsx',
     ClusterOverviewPage: './views/clusteroverview/ClusterOverviewPage.tsx',
     DataImportCronPage: './views/datasources/dataimportcron/details/DataImportCronPage.tsx',

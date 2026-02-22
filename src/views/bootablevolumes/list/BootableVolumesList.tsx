@@ -38,7 +38,8 @@ const BootableVolumesList: FC = () => {
   const { t } = useKubevirtTranslation();
   const filteredClusters = useSelectedRowFilterClusters();
   const filteredNamespaces = useSelectedRowFilterProjects();
-  const { bootableVolumes, dataImportCrons, error, loaded } = useBootableVolumes(namespace);
+  const { bootableVolumes, dataImportCrons, dvSources, error, loaded } =
+    useBootableVolumes(namespace);
   const [preferences] = useClusterPreferences();
 
   const { filtersWithSelect, rowFilters } = useBootableVolumesFilters(bootableVolumes);
@@ -136,6 +137,7 @@ const BootableVolumesList: FC = () => {
             )}
             rowData={{
               dataImportCrons,
+              dvSources,
               preferences,
             }}
             columns={activeColumns}

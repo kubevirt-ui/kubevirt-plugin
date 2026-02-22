@@ -447,6 +447,7 @@
   "Create a virtual machines network using this physical network": "Create a virtual machines network using this physical network",
   "Create a Windows bootable volume": "创建一个 Windows 可引导卷",
   "Create activation key": "创建激活码",
+  "Create bootable volume": "Create bootable volume",
   "Create DataSource": "创建数据源",
   "Create folder \"{{filterValue}}\"": "创建文件夹 \"{{filterValue}}\"",
   "Create MigrationPolicy": "创建 MigrationPolicy",

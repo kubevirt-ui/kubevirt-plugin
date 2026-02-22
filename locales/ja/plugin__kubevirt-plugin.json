@@ -447,6 +447,7 @@
   "Create a virtual machines network using this physical network": "Create a virtual machines network using this physical network",
   "Create a Windows bootable volume": "Windows のブート可能なボリュームの作成",
   "Create activation key": "アクティベーションキーの作成",
+  "Create bootable volume": "Create bootable volume",
   "Create DataSource": "DataSource の作成",
   "Create folder \"{{filterValue}}\"": "フォルダー \"{{filterValue}}\" の作成",
   "Create MigrationPolicy": "MigrationPolicy の作成",

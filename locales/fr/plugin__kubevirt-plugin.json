@@ -456,6 +456,7 @@
   "Create a virtual machines network using this physical network": "Create a virtual machines network using this physical network",
   "Create a Windows bootable volume": "Créer un volume de démarrage Windows",
   "Create activation key": "Créer une clé d'activation",
+  "Create bootable volume": "Create bootable volume",
   "Create DataSource": "Créer une source de données",
   "Create folder \"{{filterValue}}\"": "Créer un dossier \"{{filterValue}} \"",
   "Create MigrationPolicy": "Créer une politique de migration",
