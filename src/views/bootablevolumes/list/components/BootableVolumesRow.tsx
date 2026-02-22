@@ -9,6 +9,7 @@ import {
 import {
   V1beta1DataImportCron,
   V1beta1DataSource,
+  V1beta1DataVolume,
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ArchitectureLabel from '@kubevirt-utils/components/ArchitectureLabel/ArchitectureLabel';
@@ -22,12 +23,17 @@ import {
   isDeprecated,
 } from '@kubevirt-utils/resources/bootableresources/helpers';
 import {
+  ClusterNamespacedResourceMap,
   getName,
   getNamespace,
+  getResourceFromClusterMap,
   isDataImportCronProgressing,
 } from '@kubevirt-utils/resources/shared';
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
-import { isDataSourceCloning } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
+import {
+  isDataSourceCloning,
+  isDataSourceReady,
+} from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { ARCHITECTURE_ID, getArchitecture } from '@kubevirt-utils/utils/architecture';
 import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
@@ -54,10 +60,11 @@ const BootableVolumesRow: FC<
     BootableResource,
     {
       dataImportCrons: V1beta1DataImportCron[];
+      dvSources: ClusterNamespacedResourceMap<V1beta1DataVolume>;
       preferences: V1beta1VirtualMachineClusterPreference[];
     }
   >
-> = ({ activeColumnIDs, obj, rowData: { dataImportCrons, preferences } }) => {
+> = ({ activeColumnIDs, obj, rowData: { dataImportCrons, dvSources, preferences } }) => {
   const { t } = useKubevirtTranslation();
   const [namespace] = useActiveNamespace();
   const clusterParam = useClusterParam();
@@ -73,8 +80,14 @@ const BootableVolumesRow: FC<
 
   const dataImportCron = getDataImportCronFromDataSource(dataImportCrons, obj as V1beta1DataSource);
 
+  const isProvisioning =
+    !isDataSourceReady(obj as V1beta1DataSource) &&
+    !!getResourceFromClusterMap(dvSources, cluster, bootableVolumeNamespace, bootableVolumeName);
+
   const isCloning =
-    isDataSourceCloning(obj as V1beta1DataSource) || isDataImportCronProgressing(dataImportCron);
+    isDataSourceCloning(obj as V1beta1DataSource) ||
+    isDataImportCronProgressing(dataImportCron) ||
+    isProvisioning;
 
   return (
     <>

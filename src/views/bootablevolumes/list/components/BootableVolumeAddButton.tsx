@@ -1,7 +1,6 @@
 import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
-import { DataVolumeModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import AddBootableVolumeModal from '@kubevirt-utils/components/AddBootableVolumeModal/AddBootableVolumeModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
@@ -37,8 +36,8 @@ const BootableVolumeAddButton: FC<BootableVolumeAddButtonProps> = ({ buttonText,
       ? createModal((props) => <AddBootableVolumeModal {...props} />)
       : navigate(
           isACMPage
-            ? `/k8s/cluster/${selectedCluster}/ns/${selectedNamespace}/${DataVolumeModelRef}/~new`
-            : `/k8s/ns/${selectedNamespace}/${DataVolumeModelRef}/~new`,
+            ? `/k8s/cluster/${selectedCluster}/ns/${selectedNamespace}/bootablevolumes/~new`
+            : `/k8s/ns/${selectedNamespace}/bootablevolumes/~new`,
         );
   };
 

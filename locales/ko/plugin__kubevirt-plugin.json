@@ -447,6 +447,7 @@
   "Create a virtual machines network using this physical network": "Create a virtual machines network using this physical network",
   "Create a Windows bootable volume": "Windows 부팅 가능 볼륨 생성",
   "Create activation key": "활성화 키 생성",
+  "Create bootable volume": "Create bootable volume",
   "Create DataSource": "데이터 소스 생성",
   "Create folder \"{{filterValue}}\"": "\"{{filterValue}}\" 폴더 생성",
   "Create MigrationPolicy": "MigrationPolicy 생성",

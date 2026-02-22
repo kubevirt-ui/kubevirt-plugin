@@ -426,6 +426,15 @@ const extensions: EncodedExtension[] = [
   {
     properties: {
       component: {
+        $codeRef: 'BootableVolumeYAMLPage',
+      },
+      path: ['/k8s/ns/:ns/bootablevolumes/~new'],
+    },
+    type: 'console.page/route',
+  },
+  {
+    properties: {
+      component: {
         $codeRef: 'BootableVolumesList',
       },
       path: ['/k8s/ns/:ns/bootablevolumes', '/k8s/all-namespaces/bootablevolumes'],
