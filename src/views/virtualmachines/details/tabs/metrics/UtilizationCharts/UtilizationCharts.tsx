@@ -12,7 +12,7 @@ type UtilizationChartsProps = {
   vmi: V1VirtualMachineInstance;
 };
 
-const UtilizationCharts: FC<UtilizationChartsProps> = ({ pods, vmi }) => {
+const UtilizationCharts: FC<UtilizationChartsProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
 
   return (
@@ -29,7 +29,7 @@ const UtilizationCharts: FC<UtilizationChartsProps> = ({ pods, vmi }) => {
         <Card>
           <CardTitle>{t('CPU')}</CardTitle>
           <CardBody>
-            <CPUThresholdChart pods={pods} vmi={vmi} />
+            <CPUThresholdChart vmi={vmi} />
           </CardBody>
         </Card>
       </GridItem>

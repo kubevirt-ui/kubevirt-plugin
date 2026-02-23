@@ -2,13 +2,9 @@ import React, { FC, useMemo } from 'react';
 import { Link } from 'react-router-dom-v5-compat';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { getVMIPod } from '@kubevirt-utils/resources/vmi';
+import { getCPU, getVCPUCount } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import {
-  K8sResourceCommon,
-  PrometheusEndpoint,
-  usePrometheusPoll,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Chart,
   ChartArea,
@@ -26,35 +22,16 @@ import { tickLabels } from '../ChartLabels/styleOverrides';
 import ComponentReady from '../ComponentReady/ComponentReady';
 import useResponsiveCharts from '../hooks/useResponsiveCharts';
 import { getUtilizationQueries } from '../utils/queries';
-import {
-  findMaxYValue,
-  MILLISECONDS_MULTIPLIER,
-  queriesToLink,
-  tickFormat,
-  TICKS_COUNT,
-} from '../utils/utils';
+import { MILLISECONDS_MULTIPLIER, queriesToLink, tickFormat, TICKS_COUNT } from '../utils/utils';
 
 type CPUThresholdChartProps = {
-  pods: K8sResourceCommon[];
   vmi: V1VirtualMachineInstance;
 };
 
-const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ pods, vmi }) => {
-  const vmiPod = useMemo(() => getVMIPod(vmi, pods), [pods, vmi]);
+const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ vmi }) => {
   const { currentTime, duration, timespan } = useDuration();
   const { height, ref, width } = useResponsiveCharts();
-  const queries = useMemo(
-    () => getUtilizationQueries({ duration, launcherPodName: vmiPod?.metadata?.name, obj: vmi }),
-    [vmi, vmiPod, duration],
-  );
-
-  const [dataCPURequested] = usePrometheusPoll({
-    endpoint: PrometheusEndpoint?.QUERY_RANGE,
-    endTime: currentTime,
-    namespace: vmi?.metadata?.namespace,
-    query: queries.CPU_REQUESTED,
-    timespan,
-  });
+  const queries = useMemo(() => getUtilizationQueries({ duration, obj: vmi }), [vmi, duration]);
 
   const [dataCPUUsage] = usePrometheusPoll({
     endpoint: PrometheusEndpoint?.QUERY_RANGE,
@@ -65,19 +42,32 @@ const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ pods, vmi }) => {
   });
 
   const cpuUsage = dataCPUUsage?.data?.result?.[0]?.values;
-  const cpuRequested = dataCPURequested?.data?.result?.[0]?.values;
+  const cpu = getCPU(vmi);
+  const cpuRequested = getVCPUCount(cpu);
+
+  const showValuesInMillicores = cpuUsage?.some(([, y]) => Number(y) < 1);
 
   const chartData = cpuUsage?.map(([x, y]) => {
-    return { name: 'CPU usage', x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y) };
+    const value = Number(y);
+
+    return {
+      name: showValuesInMillicores ? 'CPU usage (m)' : 'CPU usage',
+      x: new Date(x * MILLISECONDS_MULTIPLIER),
+      y: showValuesInMillicores ? value * 1000 : value,
+    };
   });
 
-  const thresholdData = cpuRequested?.map(([x, y]) => {
-    return { name: 'CPU requested', x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y) };
-  });
+  const thresholdData = [
+    {
+      name: showValuesInMillicores ? 'CPU requested (m)' : 'CPU requested',
+      x: new Date(currentTime),
+      y: showValuesInMillicores ? cpuRequested * 1000 : cpuRequested,
+    },
+  ];
 
   const isReady = !isEmpty(chartData) && !isEmpty(thresholdData);
   const linkToMetrics = queriesToLink(queries?.CPU_USAGE);
-  const yMax = findMaxYValue(thresholdData);
+  const yMax = showValuesInMillicores ? cpuRequested * 1000 : cpuRequested;
   return (
     <ComponentReady isReady={isReady} linkToMetrics={linkToMetrics}>
       <div className="util-threshold-chart" ref={ref}>
@@ -86,7 +76,9 @@ const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ pods, vmi }) => {
             containerComponent={
               <ChartVoronoiContainer
                 labels={({ datum }) => {
-                  return `${datum?.name}: ${datum?.y?.toFixed(2)}'s`;
+                  return `${datum?.name}: ${datum?.y?.toFixed(2)}${
+                    showValuesInMillicores ? 'm' : ''
+                  }`;
                 }}
                 constrainToVisibleArea
               />
@@ -106,8 +98,10 @@ const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ pods, vmi }) => {
                 },
                 tickLabels,
               }}
+              tickFormat={(tick: number) =>
+                showValuesInMillicores ? `${tick?.toFixed(0)}m` : tick?.toFixed(2)
+              }
               dependentAxis
-              tickFormat={(tick: number) => tick?.toFixed(2)}
               tickValues={[0, yMax]}
             />
             <ChartAxis
