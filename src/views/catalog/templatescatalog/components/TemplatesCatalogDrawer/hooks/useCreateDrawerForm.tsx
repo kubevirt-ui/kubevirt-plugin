@@ -174,11 +174,13 @@ const useCreateDrawerForm = (
           vmObject.spec.dataVolumeTemplates[0].spec.source.registry.secretRef = imageSecretName;
 
         if (certConfigMapName) {
-          vmObject.spec.dataVolumeTemplates?.forEach((dvt) => {
-            if (dvt?.spec?.source?.http) {
-              dvt.spec.source.http.certConfigMap = certConfigMapName;
-            }
-          });
+          const cdromHTTPDataVolumeTemplate = vmObject.spec.dataVolumeTemplates?.find(
+            (dvt) => getName(dvt).endsWith(INSTALLATION_CDROM_NAME) && dvt?.spec?.source?.http,
+          );
+
+          if (cdromHTTPDataVolumeTemplate) {
+            cdromHTTPDataVolumeTemplate.spec.source.http.certConfigMap = certConfigMapName;
+          }
         }
 
         if (!getLabels(vmObject.spec.template)) vmObject.spec.template.metadata.labels = {};

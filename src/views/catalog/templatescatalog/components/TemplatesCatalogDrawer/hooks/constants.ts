@@ -1,6 +1,17 @@
-import { TLS_CERT_SOURCE_EXISTING } from '@kubevirt-utils/components/TLSCertificateSection';
+import {
+  TLS_CERT_SOURCE_EXISTING,
+  TLSCertSourceType,
+} from '@kubevirt-utils/components/TLSCertificateSection';
 
 import { DrawerContext } from './useDrawerContext';
+
+export type TLSCertState = {
+  tlsCertConfigMapName: string;
+  tlsCertificate: string;
+  tlsCertificateRequired: boolean;
+  tlsCertProject: string;
+  tlsCertSource: TLSCertSourceType;
+};
 
 export const initialValue: DrawerContext = {
   bootSourceLoaded: false,

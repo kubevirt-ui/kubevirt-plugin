@@ -13,10 +13,7 @@ import { Updater, useImmer } from 'use-immer';
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1DataVolumeSpec, V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { SSHSecretDetails } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
-import {
-  TLS_CERT_SOURCE_EXISTING,
-  TLSCertSourceType,
-} from '@kubevirt-utils/components/TLSCertificateSection';
+import { TLS_CERT_SOURCE_EXISTING } from '@kubevirt-utils/components/TLSCertificateSection';
 import {
   ROOTDISK,
   RUNSTRATEGY_HALTED,
@@ -40,16 +37,8 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { getDiskSource } from '../StorageSection/utils';
 
-import { initialValue } from './constants';
+import { initialValue, TLSCertState } from './constants';
 import useDefaultVMSource from './useDefaultVMSource';
-
-export type TLSCertState = {
-  tlsCertConfigMapName: string;
-  tlsCertificate: string;
-  tlsCertificateRequired: boolean;
-  tlsCertProject: string;
-  tlsCertSource: TLSCertSourceType;
-};
 
 export type DrawerContext = {
   bootSourceLoaded: boolean;
