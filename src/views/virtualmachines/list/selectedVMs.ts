@@ -21,7 +21,7 @@ export const deselectVM = (vm: V1VirtualMachine) => {
   );
 };
 
-export const selectAll = (vms: V1VirtualMachine[]) => {
+export const selectAllVMs = (vms: V1VirtualMachine[]) => {
   const vmIdentifiers = vms.map((vm) => ({
     cluster: getCluster(vm),
     name: getName(vm),
@@ -30,7 +30,7 @@ export const selectAll = (vms: V1VirtualMachine[]) => {
   selectedVMs.value = [...vmIdentifiers];
 };
 
-export const deselectAll = () => {
+export const deselectAllVMs = () => {
   selectedVMs.value = [];
 };
 
