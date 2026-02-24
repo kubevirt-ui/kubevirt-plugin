@@ -73,6 +73,7 @@ import { useVMListFilters } from './hooks/useVMListFilters/useVMListFilters';
 import useVMMetrics from './hooks/useVMMetrics';
 import { filterVMsByClusterAndNamespace } from './utils/utils';
 import { getListPageBodySize, ListPageBodySize } from './listPageBodySize';
+import { deselectAllVMs } from './selectedVMs';
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
 import './VirtualMachinesList.scss';
@@ -160,6 +161,10 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
     filtersFromURL,
   );
 
+  useEffect(() => {
+    deselectAllVMs();
+  }, [namespace, cluster, query]);
+
   // Used for removing folder filter
   // only passing filtersFromURL to useListPageFilter hook's staticFilters doesn't work, because label filter is hardcoded in the hook as a dynamic filter
   useEffect(() => {
@@ -234,6 +239,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
             <>
               <VirtualMachineFilterToolbar
                 onFilterChange={(...args) => {
+                  deselectAllVMs();
                   onFilterChange(...args);
                   setPagination((prevPagination) => ({
                     ...prevPagination,
