@@ -11,3 +11,43 @@
 .kubevirt-table--fixed-layout .pf-v6-c-table tr > * {
   height: auto;
 }
+
+.kubevirt-table--fixed-layout .pf-v6-c-table tbody > tr:first-child > * {
+  padding-block-start: 0;
+}
+
+.kubevirt-table--fixed-layout .pf-v6-c-table thead .pf-v6-c-table__check,
+.kubevirt-table--fixed-layout .pf-v6-c-table tbody .pf-v6-c-table__check {
+  width: 8.333%;
+}
+
+@media screen and (min-width: 768px) {
+  .kubevirt-table--fixed-layout .pf-v6-c-table thead .pf-v6-c-table__check,
+  .kubevirt-table--fixed-layout .pf-v6-c-table tbody .pf-v6-c-table__check {
+    width: 8.333%;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .kubevirt-table--fixed-layout .pf-v6-c-table thead .pf-v6-c-table__check,
+  .kubevirt-table--fixed-layout .pf-v6-c-table tbody .pf-v6-c-table__check {
+    width: 16.66%;
+  }
+}
+
+.kubevirt-table--fixed-layout .pf-v6-c-table thead .pf-v6-c-table__action,
+.kubevirt-table--fixed-layout .pf-v6-c-table tbody .pf-v6-c-table__action,
+.kubevirt-table--fixed-layout .pf-v5-c-table thead .pf-v5-c-table__action,
+.kubevirt-table--fixed-layout .pf-v5-c-table tbody .pf-v5-c-table__action {
+  padding-left: 0;
+  width: 5%;
+}
+
+@media screen and (max-width: 991px) {
+  .kubevirt-table--fixed-layout .pf-v6-c-table thead .pf-v6-c-table__action,
+  .kubevirt-table--fixed-layout .pf-v6-c-table tbody .pf-v6-c-table__action,
+  .kubevirt-table--fixed-layout .pf-v5-c-table thead .pf-v5-c-table__action,
+  .kubevirt-table--fixed-layout .pf-v5-c-table tbody .pf-v5-c-table__action {
+    width: 10%;
+  }
+}

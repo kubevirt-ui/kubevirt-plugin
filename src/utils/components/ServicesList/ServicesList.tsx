@@ -1,31 +1,34 @@
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import * as _ from 'lodash-es';
+import React, { FC, useMemo } from 'react';
 
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
+import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
-import { getColumns } from './columns';
-import ServiceRow from './ServiceRow';
+import { getServiceRowId, getServicesColumns } from './servicesTableDefinition';
 
 type ServicesListProps = {
   data: IoK8sApiCoreV1Service[];
   loaded: boolean;
-  loadError: any;
+  loadError: unknown;
 };
 
-const ServicesList = ({ data, loaded, loadError }: ServicesListProps) => {
-  const { t } = useTranslation();
+const ServicesList: FC<ServicesListProps> = ({ data, loaded, loadError }) => {
+  const { t } = useKubevirtTranslation();
+
+  const columns = useMemo(() => getServicesColumns(t), [t]);
 
   return (
-    <VirtualizedTable
-      columns={getColumns(t)}
+    <KubevirtTable
+      ariaLabel={t('Services table')}
+      columns={columns}
       data={data}
+      dataTest="services-list"
+      fixedLayout
+      getRowId={getServiceRowId}
+      initialSortKey="name"
       loaded={loaded}
       loadError={loadError}
-      NoDataEmptyMsg={() => t('No services found')}
-      Row={ServiceRow}
-      unfilteredData={data}
+      noDataEmptyText={t('No services found')}
     />
   );
 };
