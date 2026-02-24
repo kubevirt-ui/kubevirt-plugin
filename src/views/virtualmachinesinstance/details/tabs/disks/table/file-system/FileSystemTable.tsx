@@ -1,12 +1,12 @@
 import React, { FC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { ListPageBody, VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
+import FileSystemList from '@kubevirt-utils/components/FileSystemList/FileSystemList';
+import { FileSystemData } from '@kubevirt-utils/components/FileSystemList/fileSystemListDefinition';
+import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 
 import useGuestOS from '../../../../hooks/useGuestOS';
-import useFileSystemTableColumns from '../../hooks/useFileSystemTableColumns';
 
-import FileSystemTableRow from './FileSystemTableRow';
 import FileSystemTableTitle from './FileSystemTableTitle';
 
 type FileSystemTableProps = {
@@ -15,20 +15,12 @@ type FileSystemTableProps = {
 
 const FileSystemTable: FC<FileSystemTableProps> = ({ vmi }) => {
   const [data, loaded, loadingError] = useGuestOS(vmi);
-  const columns = useFileSystemTableColumns();
-  const fileSystems = data?.fsInfo?.disks || [];
+  const fileSystems: FileSystemData[] = data?.fsInfo?.disks ?? [];
 
   return (
     <ListPageBody>
       <FileSystemTableTitle />
-      <VirtualizedTable
-        columns={columns}
-        data={fileSystems}
-        loaded={loaded}
-        loadError={loadingError}
-        Row={FileSystemTableRow}
-        unfilteredData={fileSystems}
-      />
+      <FileSystemList data={fileSystems} loaded={loaded} loadError={loadingError} />
     </ListPageBody>
   );
 };
