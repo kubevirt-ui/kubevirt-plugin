@@ -240,6 +240,14 @@ export const getMemoryCPU = <T>(obj: T): { cpu: V1CPU; memory: string } => ({
 });
 
 /**
+ * A selector that returns the total vCPU count (sockets * cores * threads)
+ * @param {V1CPU} cpu the CPU spec
+ * @returns {number} the total vCPU count
+ */
+export const getVCPUCount = (cpu: V1CPU): number =>
+  (cpu?.sockets || 1) * (cpu?.cores || 1) * (cpu?.threads || 1);
+
+/**
  * A selector that returns the amount of CPU cores of the resource
  * @param {T} obj resource such as VM or VMI
  * @returns {number} the number of CPU cores

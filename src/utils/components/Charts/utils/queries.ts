@@ -1,7 +1,6 @@
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 enum VMQueries {
-  CPU_REQUESTED = 'CPU_REQUESTED',
   CPU_USAGE = 'CPU_USAGE',
   FILESYSTEM_READ_USAGE = 'FILESYSTEM_READ_USAGE',
   FILESYSTEM_USAGE_TOTAL = 'FILESYSTEM_TOTAL_USAGE',
@@ -24,23 +23,17 @@ enum VMQueries {
 
 type UtilizationQueriesArgs = {
   duration?: string;
-  launcherPodName?: string;
   nic?: string;
   obj: K8sResourceCommon;
 };
 
-type GetUtilizationQueries = ({ duration, launcherPodName, nic, obj }: UtilizationQueriesArgs) => {
+type GetUtilizationQueries = ({ duration, nic, obj }: UtilizationQueriesArgs) => {
   [key in VMQueries]: string;
 };
 
-export const getUtilizationQueries: GetUtilizationQueries = ({
-  duration,
-  launcherPodName,
-  obj,
-}) => {
+export const getUtilizationQueries: GetUtilizationQueries = ({ duration, obj }) => {
   const { name, namespace } = obj?.metadata || {};
   return {
-    [VMQueries.CPU_REQUESTED]: `sum(kube_pod_resource_request{resource='cpu',pod='${launcherPodName}',namespace='${namespace}'}) BY (name, namespace)`,
     [VMQueries.CPU_USAGE]: `sum(rate(kubevirt_vmi_cpu_usage_seconds_total{name='${name}',namespace='${namespace}'}[${duration}])) BY (name, namespace)`,
     [VMQueries.FILESYSTEM_READ_USAGE]: `sum(rate(kubevirt_vmi_storage_read_traffic_bytes_total{name='${name}',namespace='${namespace}'}[${duration}])) BY (name, namespace)`,
     [VMQueries.FILESYSTEM_USAGE_TOTAL]: `sum(rate(kubevirt_vmi_storage_read_traffic_bytes_total{name='${name}',namespace='${namespace}'}[${duration}]) + rate(kubevirt_vmi_storage_write_traffic_bytes_total{name='${name}',namespace='${namespace}'}[${duration}])) BY (name, namespace)`,

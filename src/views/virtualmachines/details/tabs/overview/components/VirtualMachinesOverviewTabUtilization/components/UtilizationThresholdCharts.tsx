@@ -5,23 +5,21 @@ import CPUThresholdChart from '@kubevirt-utils/components/Charts/CPUUtil/CPUThre
 import MemoryThresholdChart from '@kubevirt-utils/components/Charts/MemoryUtil/MemoryThresholdChart';
 import NetworkThresholdChart from '@kubevirt-utils/components/Charts/NetworkUtil/NetworkThresholdChart';
 import StorageTotalReadWriteThresholdChart from '@kubevirt-utils/components/Charts/StorageUtil/StorageTotalReadWriteThresholdChart';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { GridItem } from '@patternfly/react-core';
 
 import TimeDropdown from './TimeDropdown';
 
 type UtilizationThresholdChartsProps = {
-  pods: K8sResourceCommon[];
   vmi: V1VirtualMachineInstance;
 };
-const UtilizationThresholdCharts: React.FC<UtilizationThresholdChartsProps> = ({ pods, vmi }) => {
+const UtilizationThresholdCharts: React.FC<UtilizationThresholdChartsProps> = ({ vmi }) => {
   return (
     <>
       <GridItem span={12}>
         <TimeDropdown />
       </GridItem>
       <GridItem span={3}>
-        <CPUThresholdChart pods={pods} vmi={vmi} />
+        <CPUThresholdChart vmi={vmi} />
       </GridItem>
       <GridItem span={3}>
         <MemoryThresholdChart vmi={vmi} />
