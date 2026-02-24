@@ -1,54 +1,71 @@
-import React, { FC } from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import {
   V1VirtualMachine,
+  V1VirtualMachineInstance,
   V1VirtualMachineInstanceGuestAgentInfo,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import FileSystemList from '@kubevirt-utils/components/FileSystemList/FileSystemList';
+import { FileSystemData } from '@kubevirt-utils/components/FileSystemList/fileSystemListDefinition';
+import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
-import { Card, CardBody, Divider } from '@patternfly/react-core';
+import { isGuestAgentConnected } from '@kubevirt-utils/resources/vmi';
+import { Bullseye, Card, CardBody, Divider } from '@patternfly/react-core';
 import { isRunning } from '@virtualmachines/utils';
 
-import useFilesystemListColumns from '../../../configuration/storage/components/hooks/useFilesystemListColumns';
-
-import FilesystemRow from './VirtualMachinesOverviewTabFilesystemRow';
 import FilesystemListTitle from './VirtualMachinesOverviewTabFilesystemTitle';
 
 type VirtualMachinesOverviewTabFilesystemProps = {
   guestAgentData: V1VirtualMachineInstanceGuestAgentInfo;
   guestAgentDataLoaded: boolean;
+  guestAgentDataLoadError?: Error;
   vm: V1VirtualMachine;
+  vmi: V1VirtualMachineInstance;
 };
 
 const VirtualMachinesOverviewTabFilesystem: FC<VirtualMachinesOverviewTabFilesystemProps> = ({
   guestAgentData,
   guestAgentDataLoaded,
+  guestAgentDataLoadError,
   vm,
+  vmi,
 }) => {
   const { t } = useKubevirtTranslation();
   const isVMRunning = isRunning(vm);
-  const columns = useFilesystemListColumns();
-  const fileSystems = guestAgentData?.fsInfo?.disks || [];
+  const isConnected = vmi && isGuestAgentConnected(vmi);
+  const fileSystems: FileSystemData[] = guestAgentData?.fsInfo?.disks ?? [];
+
+  const renderContent = (): ReactNode => {
+    if (!isVMRunning) {
+      return (
+        <Bullseye data-test="overview-filesystem-not-running">
+          <MutedTextSpan text={t('VirtualMachine is not running')} />
+        </Bullseye>
+      );
+    }
+
+    if (!isConnected) {
+      return (
+        <Bullseye data-test="overview-filesystem-no-agent">
+          <MutedTextSpan text={t('Guest agent is required')} />
+        </Bullseye>
+      );
+    }
+
+    return (
+      <FileSystemList
+        data={fileSystems}
+        loaded={guestAgentDataLoaded}
+        loadError={guestAgentDataLoadError}
+      />
+    );
+  };
 
   return (
-    <Card>
+    <Card data-test="overview-filesystem-card">
       <FilesystemListTitle />
       <Divider />
-      <CardBody isFilled>
-        <VirtualizedTable
-          NoDataEmptyMsg={() =>
-            !guestAgentData && isVMRunning
-              ? t('Guest agent is required')
-              : t('VirtualMachine is not running')
-          }
-          columns={columns}
-          data={fileSystems}
-          loaded={guestAgentDataLoaded}
-          loadError={null}
-          Row={FilesystemRow}
-          unfilteredData={fileSystems}
-        />
-      </CardBody>
+      <CardBody isFilled>{renderContent()}</CardBody>
     </Card>
   );
 };

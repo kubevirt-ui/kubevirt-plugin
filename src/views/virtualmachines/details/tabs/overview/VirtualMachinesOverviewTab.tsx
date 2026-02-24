@@ -82,13 +82,16 @@ const VirtualMachinesOverviewTab: FC<NavPageComponentProps> = ({
           <VirtualMachinesOverviewTabFilesystem
             guestAgentData={guestAgentData}
             guestAgentDataLoaded={guestAgentDataLoaded}
+            guestAgentDataLoadError={guestAgentDataLoadError}
             vm={vm}
+            vmi={vmi}
           />
           <VirtualMachinesOverviewTabService vm={vm} />
           <VirtualMachinesOverviewTabActiveUser
             guestAgentData={guestAgentData}
             guestAgentDataLoaded={guestAgentDataLoaded}
             guestAgentDataLoadError={guestAgentDataLoadError}
+            vm={vm}
             vmi={vmi}
           />
         </Grid>
