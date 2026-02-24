@@ -4,10 +4,10 @@ import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { useDataViewTableSort } from '@kubevirt-utils/hooks/useDataViewTableSort/useDataViewTableSort';
 import { generateRows } from '@kubevirt-utils/hooks/useDataViewTableSort/utils';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { Bullseye } from '@patternfly/react-core';
+import { EmptyState, EmptyStateVariant } from '@patternfly/react-core';
 import { DataViewTable, DataViewTr } from '@patternfly/react-data-view';
 
-import ListSkeleton from '../StateHandler/ListSkeleton';
+import MutedTextSpan from '../MutedTextSpan/MutedTextSpan';
 import StateHandler from '../StateHandler/StateHandler';
 
 import './KubevirtTable.scss';
@@ -17,6 +17,7 @@ export type KubevirtTableProps<TData, TCallbacks = undefined> = {
   callbacks?: TCallbacks;
   columns: ColumnConfig<TData, TCallbacks>[];
   data: TData[];
+  dataTest?: string;
   fixedLayout?: boolean;
   getRowId?: (row: TData, index: number) => string;
   initialSortColumnIndex?: number;
@@ -24,11 +25,25 @@ export type KubevirtTableProps<TData, TCallbacks = undefined> = {
   initialSortKey?: string;
   loaded?: boolean;
   loadError?: unknown;
-  noDataEmptyMsg?: ReactNode;
-  noFilteredDataEmptyMsg?: ReactNode;
+  noDataMsg?: ReactNode;
+  noFilteredDataMsg?: ReactNode;
   onSelect?: (selected: TData[]) => void;
   selectedItems?: TData[];
   unfilteredData?: TData[];
+};
+
+const renderNoDataContent = (content: ReactNode): ReactNode => {
+  if (typeof content === 'string') {
+    return <EmptyState headingLevel="h4" titleText={content} variant={EmptyStateVariant.xs} />;
+  }
+  return content;
+};
+
+const renderNoFilteredDataContent = (content: ReactNode): ReactNode => {
+  if (typeof content === 'string') {
+    return <MutedTextSpan text={content} />;
+  }
+  return content;
 };
 
 const KubevirtTable = <TData, TCallbacks = undefined>({
@@ -36,6 +51,7 @@ const KubevirtTable = <TData, TCallbacks = undefined>({
   callbacks,
   columns,
   data,
+  dataTest,
   fixedLayout = false,
   getRowId,
   initialSortColumnIndex,
@@ -43,8 +59,8 @@ const KubevirtTable = <TData, TCallbacks = undefined>({
   initialSortKey,
   loaded = true,
   loadError,
-  noDataEmptyMsg,
-  noFilteredDataEmptyMsg,
+  noDataMsg,
+  noFilteredDataMsg,
   unfilteredData,
 }: KubevirtTableProps<TData, TCallbacks>): ReactElement => {
   const effectiveInitialSortKey = useMemo(() => {
@@ -70,65 +86,47 @@ const KubevirtTable = <TData, TCallbacks = undefined>({
   const isUnfilteredDataEmpty = isEmpty(unfilteredData ?? data);
   const isDataEmpty = isEmpty(data);
 
-  const renderEmptyState = (): ReactNode => {
-    if (!loaded) {
-      return (
-        <tr>
-          <td colSpan={visibleColumns.length}>
-            <Bullseye>
-              <ListSkeleton />
-            </Bullseye>
-          </td>
-        </tr>
-      );
-    }
+  const effectiveNoFilteredDataMsg = renderNoFilteredDataContent(noFilteredDataMsg);
 
-    if (loadError) {
+  const renderFilteredEmptyState = (): ReactNode => {
+    if (!isDataEmpty || isUnfilteredDataEmpty || !effectiveNoFilteredDataMsg) {
       return null;
     }
 
-    if (!isDataEmpty) {
-      return null;
-    }
-
-    if (isUnfilteredDataEmpty && noDataEmptyMsg) {
-      return (
-        <tr>
-          <td className="pf-v6-u-text-align-center" colSpan={visibleColumns.length}>
-            {noDataEmptyMsg}
-          </td>
-        </tr>
-      );
-    }
-
-    if (isDataEmpty && noFilteredDataEmptyMsg) {
-      return (
-        <tr>
-          <td className="pf-v6-u-text-align-center" colSpan={visibleColumns.length}>
-            {noFilteredDataEmptyMsg}
-          </td>
-        </tr>
-      );
-    }
-
-    return null;
+    return (
+      <tr>
+        <td className="pf-v6-u-text-align-center" colSpan={visibleColumns.length}>
+          {effectiveNoFilteredDataMsg}
+        </td>
+      </tr>
+    );
   };
 
-  const emptyState = renderEmptyState();
+  const filteredEmptyState = renderFilteredEmptyState();
 
   const table = (
     <DataViewTable
       aria-label={ariaLabel}
-      bodyStates={emptyState ? { empty: emptyState } : undefined}
+      bodyStates={filteredEmptyState ? { empty: filteredEmptyState } : undefined}
       columns={tableColumns}
-      rows={isDataEmpty && emptyState ? [] : rows}
+      rows={filteredEmptyState ? [] : rows}
     />
   );
 
+  const renderContent = (): ReactNode => {
+    if (isUnfilteredDataEmpty && noDataMsg) {
+      return renderNoDataContent(noDataMsg);
+    }
+
+    return fixedLayout ? <div className="kubevirt-table--fixed-layout">{table}</div> : table;
+  };
+
   return (
-    <StateHandler error={loadError} hasData={!isUnfilteredDataEmpty} loaded={loaded}>
-      {fixedLayout ? <div className="kubevirt-table--fixed-layout">{table}</div> : table}
-    </StateHandler>
+    <div data-test={dataTest}>
+      <StateHandler error={loadError} hasData={!isUnfilteredDataEmpty} loaded={loaded}>
+        {renderContent()}
+      </StateHandler>
+    </div>
   );
 };
 
