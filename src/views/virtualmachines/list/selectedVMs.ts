@@ -20,12 +20,12 @@ export const deselectVM = (vm: V1VirtualMachine) => {
   );
 };
 
-export const selectAll = (vms: V1VirtualMachine[]) => {
+export const selectAllVMs = (vms: V1VirtualMachine[]) => {
   const vmIdentifiers = vms.map((vm) => ({ name: getName(vm), namespace: getNamespace(vm) }));
   selectedVMs.value = [...vmIdentifiers];
 };
 
-export const deselectAll = () => {
+export const deselectAllVMs = () => {
   selectedVMs.value = [];
 };
 
