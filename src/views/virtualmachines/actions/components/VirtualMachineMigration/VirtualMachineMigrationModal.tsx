@@ -118,6 +118,9 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
   }, [onClose, migrationStarted, currentMigPlanCreation]);
 
   const disableForExistingMigPlan = !isEmpty(existingMigPlan) || !migrationPlansLoaded;
+  const isMigrateDestinationStepDisabled =
+    nothingSelected || disableForExistingMigPlan || !migPlanCreationLoaded || isEmpty(vmsPVCs);
+
   return (
     <Modal
       className="virtual-machine-migration-modal"
@@ -148,11 +151,7 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
             >
               <WizardStep
                 footer={{
-                  isNextDisabled:
-                    nothingSelected ||
-                    disableForExistingMigPlan ||
-                    !migPlanCreationLoaded ||
-                    isEmpty(vmsPVCs),
+                  isNextDisabled: isMigrateDestinationStepDisabled,
                 }}
                 id="wizard-migration-details"
                 name={t('Migration details')}
@@ -183,7 +182,11 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
 
                 {(!loaded || !scLoaded) && <Loading />}
               </WizardStep>
-              <WizardStep id="wizard-migrate-destination" name={t('Destination StorageClass')}>
+              <WizardStep
+                id="wizard-migrate-destination"
+                isDisabled={isMigrateDestinationStepDisabled}
+                name={t('Destination StorageClass')}
+              >
                 <VirtualMachineMigrationDestinationTab
                   defaultStorageClassName={defaultStorageClassName}
                   destinationStorageClass={destinationStorageClass}
@@ -199,6 +202,7 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
                   nextButtonText: t('Migrate VirtualMachine storage'),
                 }}
                 id="wizard-migrate-review"
+                isDisabled={isMigrateDestinationStepDisabled}
                 name={t('Review')}
               >
                 <VirtualMachineMigrationReviewTab
