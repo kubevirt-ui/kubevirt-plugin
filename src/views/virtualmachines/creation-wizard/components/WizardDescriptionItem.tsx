@@ -1,0 +1,159 @@
+import React, { FC, ReactNode } from 'react';
+import classNames from 'classnames';
+
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import {
+  Button,
+  ButtonVariant,
+  DescriptionListDescription,
+  DescriptionListGroup,
+  DescriptionListTerm,
+  DescriptionListTermHelpText,
+  DescriptionListTermHelpTextButton,
+  Flex,
+  FlexItem,
+  Popover,
+} from '@patternfly/react-core';
+import { PencilAltIcon } from '@patternfly/react-icons';
+
+type WizardDescriptionItemProps = {
+  /** additional className */
+  className?: string;
+  /** count of items in the description list */
+  count?: number | string;
+  /** description */
+  description?: ReactNode;
+  /** helper popover. the popover will not be available if onTitleClick is present */
+  helperPopover?: {
+    content: ReactNode;
+    header: ReactNode;
+  };
+  /** help text icon */
+  helpTextIcon?: ReactNode;
+  /** disabled state of the description group */
+  isDisabled?: boolean;
+  /** is the description group editable */
+  isEdit?: boolean;
+  /** flag indicating if the description item is a label editor */
+  isLabelEditor?: boolean;
+  label?: ReactNode;
+  /** onClick callback for the edit button */
+  onEditClick?: () => void;
+  /** onClick callback for the title */
+  onTitleClick?: () => void;
+  /** show edit button besides title */
+  showEditOnTitle?: boolean;
+  /** date-test-id of the description group */
+  testId?: string;
+  /** title */
+  title: string;
+};
+
+export const WizardDescriptionItem: FC<WizardDescriptionItemProps> = React.memo(
+  ({
+    className,
+    count,
+    description,
+    helperPopover,
+    helpTextIcon,
+    isDisabled,
+    isEdit,
+    isLabelEditor = false,
+    label,
+    onEditClick,
+    onTitleClick,
+    showEditOnTitle,
+    testId,
+    title,
+  }) => {
+    const { t } = useKubevirtTranslation();
+    const titleWithCount = title.concat(count != null ? ` (${count})` : '');
+    const dataTestID = testId ? `${testId}-edit` : `${title}-edit`;
+
+    const getItemHeader = () => {
+      if (onTitleClick)
+        return (
+          <Button
+            isDisabled={isDisabled}
+            isInline
+            onClick={onTitleClick}
+            variant={ButtonVariant.link}
+          >
+            <DescriptionListTerm>{titleWithCount}</DescriptionListTerm>
+          </Button>
+        );
+
+      if (helperPopover) {
+        return (
+          <Popover bodyContent={helperPopover?.content} headerContent={helperPopover?.header}>
+            <DescriptionListTermHelpTextButton> {title} </DescriptionListTermHelpTextButton>
+          </Popover>
+        );
+      }
+
+      return (
+        <DescriptionListTerm>
+          <span className="pf-v6-u-mr-sm">{titleWithCount}</span>
+          <span className="pf-v6-u-mr-sm">{label}</span>
+          <span>{helpTextIcon}</span>
+        </DescriptionListTerm>
+      );
+    };
+
+    return (
+      <DescriptionListGroup className={className}>
+        <DescriptionListTermHelpText>
+          <Flex
+            className="wizard-description-item__title"
+            justifyContent={{ default: 'justifyContentFlexStart' }}
+          >
+            <FlexItem>{getItemHeader()}</FlexItem>
+            {isEdit && showEditOnTitle && (
+              <FlexItem>
+                <Button
+                  data-test-id={dataTestID}
+                  icon={<PencilAltIcon />}
+                  iconPosition="end"
+                  isDisabled={isDisabled}
+                  isInline
+                  onClick={onEditClick}
+                  variant={ButtonVariant.link}
+                >
+                  {t('Edit')}
+                </Button>
+              </FlexItem>
+            )}
+          </Flex>
+        </DescriptionListTermHelpText>
+        {isEdit && !showEditOnTitle ? (
+          <DescriptionListDescription>
+            <Button
+              data-test-id={dataTestID}
+              icon={<PencilAltIcon />}
+              iconPosition="end"
+              isDisabled={isDisabled}
+              isInline
+              onClick={onEditClick}
+              variant={ButtonVariant.link}
+            >
+              {description ?? (
+                <span className="pf-v6-u-text-color-subtle">{t('Not available')}</span>
+              )}
+            </Button>
+          </DescriptionListDescription>
+        ) : (
+          <div data-test-id={dataTestID}>
+            <DescriptionListDescription
+              className={classNames({ 'co-editable-label-group': isLabelEditor })}
+            >
+              {description ?? (
+                <span className="pf-v6-u-text-color-subtle">{t('Not available')}</span>
+              )}
+            </DescriptionListDescription>
+          </div>
+        )}
+      </DescriptionListGroup>
+    );
+  },
+);
+WizardDescriptionItem.displayName = 'WizardDescriptionItem';

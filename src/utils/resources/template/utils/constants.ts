@@ -97,6 +97,12 @@ export const OS_NAMES = [
   },
 ];
 
+export const WORKLOAD_ITEMS = [
+  { id: WORKLOADS.desktop, title: WORKLOADS_LABELS.desktop },
+  { id: WORKLOADS.highperformance, title: WORKLOADS_LABELS.highperformance },
+  { id: WORKLOADS.server, title: WORKLOADS_LABELS.server },
+];
+
 export enum BOOT_SOURCE {
   CONTAINER_DISK = 'CONTAINER_DISK',
   DATA_SOURCE = 'DATA_SOURCE',

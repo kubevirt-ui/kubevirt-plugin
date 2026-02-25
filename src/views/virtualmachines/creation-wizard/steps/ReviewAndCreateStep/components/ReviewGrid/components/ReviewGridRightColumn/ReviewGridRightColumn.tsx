@@ -1,26 +1,34 @@
 import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
 import { ExpandableSection, Stack, StackItem } from '@patternfly/react-core';
-import DisksTable from '@virtualmachines/creation-wizard/steps/ReviewAndCreateStep/components/ReviewGrid/components/ReviewGridRightColumn/components/DisksTable';
-import HardwareDevicesTable from '@virtualmachines/creation-wizard/steps/ReviewAndCreateStep/components/ReviewGrid/components/ReviewGridRightColumn/components/HardwareDevicesTable';
-import NetworksTable from '@virtualmachines/creation-wizard/steps/ReviewAndCreateStep/components/ReviewGrid/components/ReviewGridRightColumn/components/NetworksTable';
+import DisksReviewTable from '@virtualmachines/creation-wizard/components/DisksReviewTable/DisksReviewTable';
+import useWizardDisksTableData from '@virtualmachines/creation-wizard/components/DisksReviewTable/hooks/useWizardDisksTableData/useWizardDisksTableData';
+import HardwareDevicesTable from '@virtualmachines/creation-wizard/components/HardwareDevicesTable';
+import NetworksReviewTable from '@virtualmachines/creation-wizard/components/NetworksReviewTable';
+import { wizardVMSignal } from '@virtualmachines/creation-wizard/state/vm-signal/vmStore';
 
 import './ReviewGridRightColumn.scss';
 
 const ReviewGridRightColumn: FC = () => {
   const { t } = useKubevirtTranslation();
 
+  const vm = wizardVMSignal.value;
+  const [disks] = useWizardDisksTableData(vm);
+  const interfaces = getInterfaces(vm);
+  const networks = getNetworks(vm);
+
   return (
     <Stack className="review-grid-right-column" hasGutter>
       <StackItem>
         <ExpandableSection isIndented toggleText={t('Storage')}>
-          <DisksTable />
+          <DisksReviewTable disks={disks} />
         </ExpandableSection>
       </StackItem>
       <StackItem>
         <ExpandableSection isIndented toggleText={t('Network')}>
-          <NetworksTable />
+          <NetworksReviewTable interfaces={interfaces} networks={networks} />
         </ExpandableSection>
       </StackItem>
       <StackItem>

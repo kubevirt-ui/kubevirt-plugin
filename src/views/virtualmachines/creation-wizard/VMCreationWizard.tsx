@@ -15,6 +15,7 @@ import BootSourceStep from '@virtualmachines/creation-wizard/steps/InstanceTypes
 import ComputeResourcesStep from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/ComputeResourcesStep/ComputeResourcesStep';
 import GuestOSStep from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/GuestOSStep/GuestOSStep';
 import ReviewAndCreateStep from '@virtualmachines/creation-wizard/steps/ReviewAndCreateStep/ReviewAndCreateStep';
+import TemplateStep from '@virtualmachines/creation-wizard/steps/TemplateStep/TemplateStep';
 import { VMCreationMethod } from '@virtualmachines/creation-wizard/utils/constants';
 import { getWizardFooterProps } from '@virtualmachines/creation-wizard/utils/utils';
 
@@ -51,6 +52,7 @@ const VMCreationWizard: FC = () => {
 
   const isInstanceTypeMethod = creationMethod === VMCreationMethod.INSTANCE_TYPE;
   const isCloneMethod = creationMethod === VMCreationMethod.CLONE;
+  const isTemplateMethod = creationMethod === VMCreationMethod.TEMPLATE;
 
   const vmListURL = getVMListURL(clusterParam, ns);
 
@@ -102,10 +104,11 @@ const VMCreationWizard: FC = () => {
       </WizardStep>
       <WizardStep
         footer={wizardFooterProps}
-        id="vm-creation-review-and-create-step"
-        name={t('Review and create')}
+        id="vm-creation-template-step"
+        isHidden={!isTemplateMethod}
+        name={t('Template')}
       >
-        <ReviewAndCreateStep />
+        <TemplateStep />
       </WizardStep>
       <WizardStep
         footer={wizardFooterProps}
@@ -113,6 +116,13 @@ const VMCreationWizard: FC = () => {
         name={t('Customization')}
       >
         <CustomizationStep />
+      </WizardStep>
+      <WizardStep
+        footer={wizardFooterProps}
+        id="vm-creation-review-and-create-step"
+        name={t('Review and create')}
+      >
+        <ReviewAndCreateStep />
       </WizardStep>
     </Wizard>
   );

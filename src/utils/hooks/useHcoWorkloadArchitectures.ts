@@ -2,7 +2,7 @@ import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConverg
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
-const useHcoWorkloadArchitectures = (cluster?: string) => {
+const useHcoWorkloadArchitectures = (cluster?: string): string[] => {
   const [hyperConverge] = useHyperConvergeConfiguration(cluster);
   const [hubClusterName] = useHubClusterName();
   const defaultWorkloadArchitectures =

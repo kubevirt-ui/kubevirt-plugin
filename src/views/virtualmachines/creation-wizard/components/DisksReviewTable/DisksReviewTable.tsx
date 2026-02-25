@@ -1,17 +1,18 @@
 import React, { FC, memo } from 'react';
 
-import { WizardDescriptionItem } from '@catalog/wizard/components/WizardDescriptionItem';
-import useWizardDisksTableData from '@catalog/wizard/tabs/disks/hooks/useWizardDisksTableData';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { DescriptionList, Stack, StackItem } from '@patternfly/react-core';
-import { wizardVMSignal } from '@virtualmachines/creation-wizard/state/vm-signal/vmStore';
+import { WizardDescriptionItem } from '@virtualmachines/creation-wizard/components/WizardDescriptionItem';
 
-const DisksTable: FC = memo(() => {
-  const vm = wizardVMSignal.value;
-  const [disks] = useWizardDisksTableData(vm);
+type DiskReviewTableProps = {
+  disks: DiskRowDataLayout[];
+};
 
+const DisksReviewTable: FC<DiskReviewTableProps> = memo(({ disks }) => {
   const { t } = useKubevirtTranslation();
+
   return (
     <DescriptionList columnModifier={{ default: '3Col' }}>
       <WizardDescriptionItem
@@ -48,4 +49,4 @@ const DisksTable: FC = memo(() => {
   );
 });
 
-export default DisksTable;
+export default DisksReviewTable;

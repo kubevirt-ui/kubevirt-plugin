@@ -1,0 +1,36 @@
+.template-catalog-drawer {
+  .pf-v6-c-modal-box__footer {
+    padding: 0;
+
+    .template-catalog-drawer-footer-section {
+      padding: var(--pf-v6-c-modal-box__footer--PaddingBlockStart) var(--pf-t--global--spacer--xl)
+        var(--pf-t--global--spacer--xl);
+      border-top: var(--pf-t--global--border--width--regular) solid
+        var(--pf-t--global--border--color--default);
+    }
+  }
+
+  .field-group {
+    margin-bottom: var(--pf-t--global--spacer--md);
+  }
+}
+.template-catalog-drawer-info {
+  flex: 1;
+}
+
+.template-catalog-drawer-footer-tooltip {
+  display: flex;
+  align-items: center;
+}
+
+.template-catalog-drawer-form-name {
+  max-width: 49%;
+}
+
+.template-catalog-drawer-description {
+  max-width: 300px;
+
+  #expandable-content {
+    padding-left: 0;
+  }
+}

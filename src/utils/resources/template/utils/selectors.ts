@@ -1,6 +1,11 @@
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1Disk, V1Network, V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  V1Disk,
+  V1Interface,
+  V1Network,
+  V1VirtualMachine,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getAnnotation, getLabel } from '@kubevirt-utils/resources/shared';
 import { getCPU } from '@kubevirt-utils/resources/vm';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -118,7 +123,7 @@ export const getTemplateNetworks = (template: V1Template): V1Network[] => {
  * A selector that returns the interfaces of a given template
  * @param {V1Template} template - template
  */
-export const getTemplateInterfaces = (template: V1Template): V1Network[] => {
+export const getTemplateInterfaces = (template: V1Template): V1Interface[] => {
   return (
     getTemplateVirtualMachineObject(template)?.spec?.template?.spec?.domain?.devices?.interfaces ??
     []

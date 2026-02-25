@@ -1,3 +1,4 @@
+import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
@@ -25,6 +26,7 @@ export type VMWizardState = {
   folder: string;
   instanceTypeFlowState: InstanceTypeFlowState;
   project: string;
+  selectedTemplate: V1Template;
   startVM: boolean;
 };
 
@@ -49,6 +51,7 @@ export type VMWizardActions = {
   setSelectedInstanceType: (instanceType: { name: string; namespace: string }) => void;
   setSelectedSeries: (series: string) => void;
   setSelectedSize: (size: string) => void;
+  setSelectedTemplate: (template: V1Template) => void;
   setStartVM: (startVM: boolean) => void;
   setVolumeListNamespace: (volumeListNamespace: string) => void;
 };
