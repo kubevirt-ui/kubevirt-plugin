@@ -38,7 +38,7 @@ import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 import { getCatalogURL, getVMURL } from '@multicluster/urls';
 import { Checkbox, Stack, StackItem } from '@patternfly/react-core';
 
-import { NOT_SUPPORTED_VM_ERROR } from '../../../utils/constants';
+import { getNotSupportedVMError } from '../../../utils/constants';
 
 import ActionButtons from './components/ActionButtons/ActionButtons';
 import YamlAndCLIViewerModal from './components/YamlAndCLIViewerModal/YamlAndCLIViewerModal';
@@ -153,7 +153,7 @@ const CreateVMFooter: FC = () => {
       <Stack hasGutter>
         {(error || vmsNotSupported) && (
           <StackItem>
-            <ErrorAlert error={error || NOT_SUPPORTED_VM_ERROR} />
+            <ErrorAlert error={error || getNotSupportedVMError(t)} />
           </StackItem>
         )}
         <StackItem>

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { CLUSTER_LIST_FILTER_TYPE } from '@kubevirt-utils/utils/constants';
 import { isEmpty, universalComparator } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -8,6 +8,7 @@ import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { useFleetClusterNames, useHubClusterName } from '@stolostron/multicluster-sdk';
 
 export const useClusterFilter = <R extends K8sResourceCommon>(): RowFilter<R> => {
+  const { t } = useKubevirtTranslation();
   const [clusters] = useFleetClusterNames();
   const [hubClusterName] = useHubClusterName();
 
@@ -33,6 +34,6 @@ export const useClusterFilter = <R extends K8sResourceCommon>(): RowFilter<R> =>
         })),
       type: CLUSTER_LIST_FILTER_TYPE,
     }),
-    [clusters, hubClusterName],
+    [clusters, hubClusterName, t],
   );
 };

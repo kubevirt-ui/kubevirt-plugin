@@ -1,3 +1,4 @@
+import { TFunction } from 'react-i18next';
 import { parseSize } from 'xbytes';
 
 import {
@@ -5,7 +6,6 @@ import {
   INSTANCETYPE_DESCRIPTION_ANNOTATION,
 } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/constants';
 import { isRedHatInstanceType } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/utils';
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   getInstanceTypeCPU,
   getInstanceTypeMemory,
@@ -19,7 +19,7 @@ import { getAnnotation, getName } from '@kubevirt-utils/resources/shared';
 
 import { InstanceTypeRecord, MappedInstanceTypes } from './types';
 
-export const getInstanceTypeSizePrettyDisplay = (it: InstanceTypeUnion): string => {
+export const getInstanceTypeSizePrettyDisplay = (t: TFunction, it: InstanceTypeUnion): string => {
   const name = getName(it)?.split('.').pop() ?? getName(it) ?? '';
   return `${name}: ${getInstanceTypeCPU(it)} ${t('CPUs')}, ${getInstanceTypeMemory(it)} ${t(
     'Memory',
@@ -44,6 +44,7 @@ export const getInstanceTypeSeriesAndSize = (
 };
 
 export const mappedInstanceTypesToSelectOptions = (
+  t: TFunction,
   instanceTypes: InstanceTypeUnion[],
 ): MappedInstanceTypes =>
   instanceTypes.reduce((acc, it) => {
@@ -60,7 +61,7 @@ export const mappedInstanceTypesToSelectOptions = (
           ...(acc?.[series]?.sizes || {}),
           [size]: {
             instanceType: it,
-            prettyDisplaySize: getInstanceTypeSizePrettyDisplay(it),
+            prettyDisplaySize: getInstanceTypeSizePrettyDisplay(t, it),
             series,
             seriesDisplayName: getInstanceTypeClassDisplayAnnotation(it),
             size,

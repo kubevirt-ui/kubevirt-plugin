@@ -102,7 +102,7 @@ const CapacityInput: FC<CapacityInputProps> = ({
       <FormGroupHelperText validated={validated}>
         {validated === ValidatedOptions.error && (
           <>
-            {t('Size cannot be')} {getErrorValue(value)}
+            {t('Size cannot be')} {getErrorValue(t, value)}
             {value > 0 && ` ${minValue} ${addByteSuffix(unit)}`}
           </>
         )}

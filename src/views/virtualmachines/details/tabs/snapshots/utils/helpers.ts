@@ -1,3 +1,5 @@
+import { TFunction } from 'react-i18next';
+
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineRestoreModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineSnapshotModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -7,7 +9,6 @@ import {
   V1VirtualMachine,
   V1VolumeSnapshotStatus,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { getVolumeSnapshotStatuses } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -48,7 +49,7 @@ export const getVolumeSnapshotStatusesPartitionPerVM = (vms: V1VirtualMachine[])
     { supportedVolumes: {}, unsupportedVolumes: {} },
   );
 
-export const validateSnapshotDeadline = (deadline: string): string => {
+export const validateSnapshotDeadline = (t: TFunction, deadline: string): string => {
   if (deadline?.length > 0) {
     if (!Number(deadline)) {
       return t('Deadline must be a number');

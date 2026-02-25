@@ -1,7 +1,7 @@
 import React, { FC, memo, useState } from 'react';
 
 import { DRAWER_FORM_ID } from '@catalog/templatescatalog/utils/consts';
-import { NOT_SUPPORTED_VM_ERROR } from '@catalog/utils/constants';
+import { getNotSupportedVMError } from '@catalog/utils/constants';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import FolderSelect from '@kubevirt-utils/components/FolderSelect/FolderSelect';
 import { validateVMName } from '@kubevirt-utils/components/VMNameValidationHelperText/utils/utils';
@@ -76,7 +76,7 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
 
     const vmNameValidated = validateVMName(nameField);
 
-    const vmsNotSupportedError = vmsNotSupported ? NOT_SUPPORTED_VM_ERROR : null;
+    const vmsNotSupportedError = vmsNotSupported ? getNotSupportedVMError(t) : null;
 
     const error = templateLoadingError || createError || vmsNotSupportedError;
     return (

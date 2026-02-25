@@ -25,7 +25,7 @@ const NetworkInterfaceMacAddressInput: FC<NetworkInterfaceMacAddressInputProps> 
 
   const handleNameChange = (value: string, event: FormEvent<HTMLInputElement>) => {
     event.preventDefault();
-    const error = validateMACAddress(value);
+    const error = validateMACAddress(t, value);
     setIsError(!!error);
     setNameError(error);
     setInterfaceMACAddress(value);

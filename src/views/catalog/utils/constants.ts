@@ -1,7 +1,7 @@
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { TFunction } from 'react-i18next';
 
-export const NOT_SUPPORTED_VM_ERROR = {
+export const getNotSupportedVMError = (t: TFunction) => ({
   message: t(
     'VirtualMachine creation is not supported due to incompatible UserDefinedNetwork configuration',
   ),
-};
+});

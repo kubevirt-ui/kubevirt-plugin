@@ -1,8 +1,8 @@
+import { TFunction } from 'react-i18next';
 import { NavigateFunction } from 'react-router-dom-v5-compat';
 
 import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
 import { getLabel, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -20,6 +20,7 @@ import DefaultRightClickActionMenu from './DefaultRightClickActionMenu';
 import VMRightClickActionMenu from './VMRightClickActionMenu';
 
 export const getCreateVMAction = (
+  t: TFunction,
   navigate: NavigateFunction,
   namespace: string,
   cluster?: string,

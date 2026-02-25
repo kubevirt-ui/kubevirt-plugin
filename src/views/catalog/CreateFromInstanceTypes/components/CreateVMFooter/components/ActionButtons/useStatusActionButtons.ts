@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
@@ -14,6 +15,7 @@ type UseStatusActionButtonsType = (isSubmitting: boolean) => {
   isViewYAMLDisabled: boolean;
 };
 const useStatusActionButtons: UseStatusActionButtonsType = (isSubmitting) => {
+  const { t } = useKubevirtTranslation();
   const instanceTypeVMStore = useInstanceTypeVMStore();
 
   const [_, vmsNotSupported] = useNamespaceUDN(instanceTypeVMStore?.vmNamespaceTarget);
@@ -30,8 +32,8 @@ const useStatusActionButtons: UseStatusActionButtonsType = (isSubmitting) => {
   });
 
   const disableButtonTooltipContent = useMemo(
-    () => getDisableButtonTooltipContent(instanceTypeVMStore, canCreateVM, vmsNotSupported),
-    [instanceTypeVMStore, canCreateVM, vmsNotSupported],
+    () => getDisableButtonTooltipContent(t, instanceTypeVMStore, canCreateVM, vmsNotSupported),
+    [t, instanceTypeVMStore, canCreateVM, vmsNotSupported],
   );
 
   const isCreationDisabled =

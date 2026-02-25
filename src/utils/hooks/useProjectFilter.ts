@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { PROJECT_LIST_FILTER_TYPE } from '@kubevirt-utils/utils/constants';
@@ -12,6 +12,7 @@ import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 import useListClusters from './useListClusters';
 
 export const useProjectFilter = <R extends K8sResourceCommon>(): RowFilter<R> => {
+  const { t } = useKubevirtTranslation();
   const allClustersSelected = useListClusters();
   const isACMPage = useIsACMPage();
 

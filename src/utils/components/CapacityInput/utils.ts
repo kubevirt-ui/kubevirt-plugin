@@ -1,4 +1,5 @@
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { TFunction } from 'react-i18next';
+
 import {
   BinaryUnit,
   binaryUnitsOrdered,
@@ -39,7 +40,7 @@ export const getUnitOptions = (unit: QuantityUnit) => {
   return options;
 };
 
-export const getErrorValue = (value: number) => {
+export const getErrorValue = (t: TFunction, value: number) => {
   if (value > 0) {
     return t('less than');
   }

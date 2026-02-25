@@ -1,6 +1,6 @@
+import { TFunction } from 'react-i18next';
 import * as fuzzy from 'fuzzysearch';
 
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { numberOperatorInfo } from '@kubevirt-utils/utils/constants';
 import {
   K8sResourceCommon,
@@ -154,6 +154,7 @@ export const getInitialSearchText = (
 ) => (searchFilterType !== STATIC_SEARCH_FILTERS.labels ? searchText[searchFilterType] : '');
 
 export const getSearchTextPlaceholder = (
+  t: TFunction,
   searchType: string,
   selectedSearchFilter: RowFilter,
   nameFilterPlaceholder: string,
