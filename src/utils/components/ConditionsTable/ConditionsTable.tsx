@@ -1,10 +1,8 @@
-import React, { useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
-import { useDataViewTableSort } from '@kubevirt-utils/hooks/useDataViewTableSort/useDataViewTableSort';
-import { generateRows } from '@kubevirt-utils/hooks/useDataViewTableSort/utils';
+import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { DataViewTable } from '@patternfly/react-data-view';
 
 import { getConditionRowId, getConditionsColumns } from './conditionsTableDefinition';
 
@@ -26,22 +24,24 @@ export type ConditionsProps = {
   conditions: K8sResourceCondition[];
 };
 
-export const ConditionsTable: React.FC<ConditionsProps> = ({ conditions }) => {
+export const ConditionsTable: FC<ConditionsProps> = ({ conditions }) => {
   const { t } = useKubevirtTranslation();
 
   const columns = useMemo(() => getConditionsColumns(t), [t]);
-  const { sortedData, tableColumns } = useDataViewTableSort(conditions, columns, 'type');
-
-  const rows = useMemo(
-    () => generateRows(sortedData, columns, undefined, getConditionRowId),
-    [sortedData, columns],
-  );
 
   if (isEmpty(conditions)) {
     return <div className="pf-v6-u-text-align-center">{t('No conditions found')}</div>;
   }
 
-  return <DataViewTable aria-label={t('Conditions table')} columns={tableColumns} rows={rows} />;
+  return (
+    <KubevirtTable
+      ariaLabel={t('Conditions table')}
+      columns={columns}
+      data={conditions}
+      getRowId={getConditionRowId}
+      initialSortKey="type"
+    />
+  );
 };
 
 ConditionsTable.displayName = 'ConditionsTable';
