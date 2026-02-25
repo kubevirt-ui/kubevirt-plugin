@@ -2,6 +2,7 @@ import React, {
   FC,
   forwardRef,
   RefAttributes,
+  useEffect,
   useImperativeHandle,
   useMemo,
   useState,
@@ -53,7 +54,7 @@ import VirtualMachinesCreateButton from './components/VirtualMachinesCreateButto
 import useSelectedFilters from './hooks/useSelectedFilters';
 import useVirtualMachineColumns from './hooks/useVirtualMachineColumns';
 import useVMMetrics from './hooks/useVMMetrics';
-import { deselectAll, selectAll, selectedVMs } from './selectedVMs';
+import { deselectAllVMs, selectAllVMs, selectedVMs } from './selectedVMs';
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
 import './VirtualMachinesList.scss';
@@ -123,6 +124,10 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
     vms,
     [...filters, ...searchFilters],
   );
+
+  useEffect(() => {
+    deselectAllVMs();
+  }, [namespace, query]);
 
   // Allow using folder filters from the tree view
   useImperativeHandle(
@@ -220,6 +225,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
                 type: t('VirtualMachine'),
               }}
               onFilterChange={(...args) => {
+                deselectAllVMs();
                 onFilterChange(...args);
                 setPagination((prevPagination) => ({
                   ...prevPagination,
@@ -254,8 +260,10 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef(({ kind, na
             EmptyMsg={() => (
               <div className="pf-u-text-align-center">{t('No VirtualMachines found')}</div>
             )}
-            onSelect={(_, selected, index) => {
-              if (index === -1) allVMsSelected ? deselectAll() : selectAll(filteredVMs);
+            onSelect={(_, _isSelected, rowIndex) => {
+              if (rowIndex === -1) {
+                allVMsSelected ? deselectAllVMs() : selectAllVMs(filteredVMs);
+              }
             }}
             rowData={{
               getVmi: (ns: string, name: string) => vmiMapper?.mapper?.[ns]?.[name],
