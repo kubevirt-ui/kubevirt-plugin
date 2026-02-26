@@ -262,18 +262,23 @@ const createHTTPDataSource = async (
       ns: namespace,
     });
   } catch (error) {
-    kubevirtK8sDelete({
-      cluster: bootableVolume.bootableVolumeCluster,
-      model: DataSourceModel,
-      resource: createdDS,
-    });
-    if (certConfigMapName) {
+    const cleanups: Promise<unknown>[] = [
       kubevirtK8sDelete({
         cluster: bootableVolume.bootableVolumeCluster,
-        model: ConfigMapModel,
-        resource: { metadata: { name: certConfigMapName, namespace } },
-      });
+        model: DataSourceModel,
+        resource: createdDS,
+      }),
+    ];
+    if (certConfigMapName) {
+      cleanups.push(
+        kubevirtK8sDelete({
+          cluster: bootableVolume.bootableVolumeCluster,
+          model: ConfigMapModel,
+          resource: { metadata: { name: certConfigMapName, namespace } },
+        }),
+      );
     }
+    await Promise.allSettled(cleanups);
     throw error;
   }
   return createdDS;

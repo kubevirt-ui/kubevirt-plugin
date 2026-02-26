@@ -87,8 +87,10 @@ const HTTPSource: FC<HTTPSourceProps> = ({ httpSourceHelperURL, onInputValueChan
         namespace={namespace}
         onRequiredChange={(required) => setTLSCertState({ tlsCertificateRequired: required })}
         onSourceChange={(source) => setTLSCertState({ tlsCertSource: source })}
+        tlsCertConfigMapName={tlsCertState.tlsCertConfigMapName}
         tlsCertificate={tlsCertState.tlsCertificate}
         tlsCertificateRequired={tlsCertState.tlsCertificateRequired}
+        tlsCertProject={tlsCertState.tlsCertProject}
         tlsCertSource={tlsCertState.tlsCertSource}
       />
     </>

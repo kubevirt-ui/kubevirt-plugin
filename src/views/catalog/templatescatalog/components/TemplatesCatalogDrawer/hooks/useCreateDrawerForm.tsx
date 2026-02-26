@@ -72,8 +72,12 @@ import { getLabels } from '@overview/OverviewTab/inventory-card/utils/flattenTem
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
-import { INSTALLATION_CDROM_NAME } from '../StorageSection/constants';
-import { allRequiredParametersAreFulfilled, hasValidSource, uploadFiles } from '../utils';
+import {
+  allRequiredParametersAreFulfilled,
+  applyCertConfigMapToCDRom,
+  hasValidSource,
+  uploadFiles,
+} from '../utils';
 
 import useCreateVMName from './useCreateVMName';
 import { useDrawerContext } from './useDrawerContext';
@@ -152,67 +156,58 @@ const useCreateDrawerForm = (
       });
     }
 
-    const certConfigMapName = await getOrCreateTLSCertConfigMapName(
-      { ...tlsCertState, cluster },
-      namespace,
-    );
-
-    const templateToProcess = produce(template, (draftTemplate) => {
-      const vmObject = getTemplateVirtualMachineObject(draftTemplate);
-
-      if (vm?.spec?.template) {
-        ensurePath(vmObject, [
-          'spec.template.spec.domain.cpu',
-          'spec.template.spec.domain.memory.guest',
-        ]);
-
-        const { cpu, memory } = getMemoryCPU(vm);
-        vmObject.spec.template.spec.domain.cpu.cores = cpu?.cores;
-        vmObject.spec.template.spec.domain.memory.guest = memory;
-
-        if (addRegistrySecret)
-          vmObject.spec.dataVolumeTemplates[0].spec.source.registry.secretRef = imageSecretName;
-
-        if (certConfigMapName) {
-          const cdromHTTPDataVolumeTemplate = vmObject.spec.dataVolumeTemplates?.find(
-            (dvt) => getName(dvt).endsWith(INSTALLATION_CDROM_NAME) && dvt?.spec?.source?.http,
-          );
-
-          if (cdromHTTPDataVolumeTemplate) {
-            cdromHTTPDataVolumeTemplate.spec.source.http.certConfigMap = certConfigMapName;
-          }
-        }
-
-        if (!getLabels(vmObject.spec.template)) vmObject.spec.template.metadata.labels = {};
-
-        if (!isUDNManagedNamespace)
-          vmObject.spec.template.metadata.labels[HEADLESS_SERVICE_LABEL] = HEADLESS_SERVICE_NAME;
-
-        const modifiedTemplateObjects = template?.objects?.map((obj) =>
-          obj.kind === VirtualMachineModel.kind ? vmObject : obj,
-        );
-
-        if ('running' in vmObject?.spec) {
-          vmObject.spec.runStrategy = vmObject.spec.running
-            ? RUNSTRATEGY_ALWAYS
-            : RUNSTRATEGY_HALTED;
-          delete vmObject.spec.running;
-        }
-
-        draftTemplate.objects = modifiedTemplateObjects;
-
-        if (sshDetails?.sshSecretName && sshDetails?.applyKeyToProject) {
-          updateAuthorizedSSHKeys({
-            ...authorizedSSHKeys,
-            [namespace]: sshDetails?.sshSecretName,
-          });
-        }
-      }
-    });
-
     logTemplateFlowEvent(CREATE_VM_BUTTON_CLICKED, template);
 
     try {
+      const certConfigMapName = await getOrCreateTLSCertConfigMapName(
+        { ...tlsCertState, cluster },
+        namespace,
+      );
+
+      const templateToProcess = produce(template, (draftTemplate) => {
+        const vmObject = getTemplateVirtualMachineObject(draftTemplate);
+
+        if (vm?.spec?.template) {
+          ensurePath(vmObject, [
+            'spec.template.spec.domain.cpu',
+            'spec.template.spec.domain.memory.guest',
+          ]);
+
+          const { cpu, memory } = getMemoryCPU(vm);
+          vmObject.spec.template.spec.domain.cpu.cores = cpu?.cores;
+          vmObject.spec.template.spec.domain.memory.guest = memory;
+
+          if (addRegistrySecret)
+            vmObject.spec.dataVolumeTemplates[0].spec.source.registry.secretRef = imageSecretName;
+
+          applyCertConfigMapToCDRom(vmObject, certConfigMapName);
+
+          if (!getLabels(vmObject.spec.template)) vmObject.spec.template.metadata.labels = {};
+
+          if (!isUDNManagedNamespace)
+            vmObject.spec.template.metadata.labels[HEADLESS_SERVICE_LABEL] = HEADLESS_SERVICE_NAME;
+
+          const modifiedTemplateObjects = template?.objects?.map((obj) =>
+            obj.kind === VirtualMachineModel.kind ? vmObject : obj,
+          );
+
+          if ('running' in vmObject?.spec) {
+            vmObject.spec.runStrategy = vmObject.spec.running
+              ? RUNSTRATEGY_ALWAYS
+              : RUNSTRATEGY_HALTED;
+            delete vmObject.spec.running;
+          }
+
+          draftTemplate.objects = modifiedTemplateObjects;
+
+          if (sshDetails?.sshSecretName && sshDetails?.applyKeyToProject) {
+            updateAuthorizedSSHKeys({
+              ...authorizedSSHKeys,
+              [namespace]: sshDetails?.sshSecretName,
+            });
+          }
+        }
+      });
       const quickCreatedVM = await quickCreateVM({
         models,
         overrides: {
@@ -248,7 +243,7 @@ const useCreateDrawerForm = (
       logTemplateFlowEvent(CREATE_VM_SUCCEEDED, templateToProcess);
     } catch (error) {
       setCreateError(error);
-      logTemplateFlowEvent(CREATE_VM_FAILED, templateToProcess);
+      logTemplateFlowEvent(CREATE_VM_FAILED, template);
     } finally {
       setIsQuickCreating(false);
     }
@@ -301,15 +296,7 @@ const useCreateDrawerForm = (
         vmDraft.spec.template.spec.domain.cpu.cores = cpu?.cores;
         vmDraft.spec.template.spec.domain.memory.guest = memory;
 
-        if (certConfigMapNameForCD) {
-          const cdromDataVolumeTemplate = vmDraft.spec.dataVolumeTemplates?.find((dvt) =>
-            getName(dvt).endsWith(INSTALLATION_CDROM_NAME),
-          );
-
-          if (cdromDataVolumeTemplate?.spec?.source?.http) {
-            cdromDataVolumeTemplate.spec.source.http.certConfigMap = certConfigMapNameForCD;
-          }
-        }
+        applyCertConfigMapToCDRom(vmDraft, certConfigMapNameForCD);
 
         if ('running' in vmDraft?.spec) {
           vmDraft.spec.runStrategy = vmDraft.spec.running ? RUNSTRATEGY_ALWAYS : RUNSTRATEGY_HALTED;

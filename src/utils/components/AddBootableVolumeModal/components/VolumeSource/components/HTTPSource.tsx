@@ -60,8 +60,10 @@ const HTTPSource: FC<HTTPSourceProps> = ({ bootableVolume, setBootableVolumeFiel
         }
         cluster={bootableVolume?.bootableVolumeCluster}
         namespace={bootableVolume?.bootableVolumeNamespace}
+        tlsCertConfigMapName={bootableVolume?.tlsCertConfigMapName}
         tlsCertificate={bootableVolume?.tlsCertificate}
         tlsCertificateRequired={bootableVolume?.tlsCertificateRequired}
+        tlsCertProject={bootableVolume?.tlsCertProject}
         tlsCertSource={bootableVolume?.tlsCertSource}
       />
     </>

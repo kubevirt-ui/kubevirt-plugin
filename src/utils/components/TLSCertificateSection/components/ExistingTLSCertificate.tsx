@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC } from 'react';
 
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -13,17 +13,21 @@ type ExistingTLSCertificateProps = {
   cluster?: string;
   namespace: string;
   onChange: (namespace: string, configMapName: string) => void;
+  selectedConfigMapName?: null | string;
+  selectedProject?: null | string;
 };
 
 const ExistingTLSCertificate: FC<ExistingTLSCertificateProps> = ({
   cluster,
   namespace,
   onChange,
+  selectedConfigMapName,
+  selectedProject,
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const [certProject, setCertProject] = useState(namespace);
-  const [selectedConfigMap, setSelectedConfigMap] = useState('');
+  const certProject = selectedProject || namespace;
+  const selectedConfigMap = selectedConfigMapName || '';
 
   const [projectNames, projectsLoaded] = useProjects(cluster);
   const [tlsCertConfigMaps, certMapsLoaded, certMapsError] = useTLSCertConfigMaps(
@@ -42,8 +46,6 @@ const ExistingTLSCertificate: FC<ExistingTLSCertificateProps> = ({
                 value: name,
               }))}
               setSelected={(name: string) => {
-                setCertProject(name);
-                setSelectedConfigMap('');
                 onChange(name, '');
               }}
               toggleProps={{
@@ -69,7 +71,6 @@ const ExistingTLSCertificate: FC<ExistingTLSCertificateProps> = ({
                 return { children: name, value: name };
               })}
               setSelected={(name: string) => {
-                setSelectedConfigMap(name);
                 onChange(certProject, name);
               }}
               toggleProps={{

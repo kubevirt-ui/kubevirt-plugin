@@ -15,7 +15,7 @@ export type TLSCertConfig = {
 };
 
 const createTLSCertConfigMap = async (
-  cluster: string,
+  cluster: string | undefined,
   namespace: string,
   name: string,
   tlsCertificate: string,
@@ -56,6 +56,9 @@ export const getOrCreateTLSCertConfigMapName = async (
     const trimmedName = tlsCertConfigMapName.trim();
     if (tlsCertProject === targetNamespace) {
       return trimmedName;
+    }
+    if (!tlsCertProject) {
+      return undefined;
     }
     const sourceConfigMap = await kubevirtK8sGet<IoK8sApiCoreV1ConfigMap>({
       cluster,

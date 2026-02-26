@@ -26,6 +26,21 @@ import { ensurePath, isEmpty, removeDockerPrefix } from '@kubevirt-utils/utils/u
 
 import { INSTALLATION_CDROM_NAME } from './StorageSection/constants';
 
+export const applyCertConfigMapToCDRom = (
+  vmObject: V1VirtualMachine,
+  certConfigMapName: string | undefined,
+) => {
+  if (!certConfigMapName) return;
+
+  const cdromDVTemplate = vmObject.spec?.dataVolumeTemplates?.find(
+    (dvt) => getName(dvt).endsWith(INSTALLATION_CDROM_NAME) && dvt?.spec?.source?.http,
+  );
+
+  if (cdromDVTemplate) {
+    cdromDVTemplate.spec.source.http.certConfigMap = certConfigMapName;
+  }
+};
+
 export const hasValidSource = (template: V1Template, originalTemplate: V1Template) => {
   const vm = getTemplateVirtualMachineObject(template);
 

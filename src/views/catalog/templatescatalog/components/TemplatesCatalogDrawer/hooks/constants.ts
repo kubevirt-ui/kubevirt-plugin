@@ -6,10 +6,10 @@ import {
 import { DrawerContext } from './useDrawerContext';
 
 export type TLSCertState = {
-  tlsCertConfigMapName: string;
-  tlsCertificate: string;
+  tlsCertConfigMapName: null | string;
+  tlsCertificate: null | string;
   tlsCertificateRequired: boolean;
-  tlsCertProject: string;
+  tlsCertProject: null | string;
   tlsCertSource: TLSCertSourceType;
 };
 
