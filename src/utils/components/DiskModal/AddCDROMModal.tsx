@@ -17,8 +17,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
+import { DECLARATIVE_HOTPLUG_VOLUMES_FEATURE_GATE } from '@overview/SettingsTab/ClusterTab/components/GeneralSettings/AdvancedCDROMFeatures/hooks/constants';
 import { FormGroup, Radio, Stack, StackItem } from '@patternfly/react-core';
-import { DECLARATIVE_HOTPLUG_VOLUMES_FEATURE_GATE } from '@virtualmachines/../clusteroverview/SettingsTab/PreviewFeaturesTab/hooks/constants';
 import { useISOOptions } from '@virtualmachines/details/tabs/configuration/storage/components/modal/hooks/useISOOptions';
 import { useMountCDROMForm } from '@virtualmachines/details/tabs/configuration/storage/components/modal/hooks/useMountCDROMForm';
 import { isRunning } from '@virtualmachines/utils';
