@@ -1,6 +1,7 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { K8sResourceCommon, RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -50,6 +51,7 @@ const TextFiltersToolbarItem: FC<TextFiltersToolbarItemProps> = ({
   setSearchInputText,
   textFilters,
 }) => {
+  const { t } = useKubevirtTranslation();
   const selectOptionKeys = Object.keys(selectOptionNames);
   const selectedSearchFilter = searchFilters?.find((f) => f.type === searchType);
 
@@ -102,6 +104,7 @@ const TextFiltersToolbarItem: FC<TextFiltersToolbarItemProps> = ({
                 applyTextFiltersWithDebounce(searchType, newSearchInput);
               }}
               placeholder={getSearchTextPlaceholder(
+                t,
                 searchType,
                 selectedSearchFilter,
                 nameFilterPlaceholder,

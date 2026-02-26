@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ValidatedOptions } from '@patternfly/react-core';
 
 import { getVMNameValidationMessage, validateVMName } from './utils/utils';
@@ -16,8 +17,9 @@ const VMNameValidationHelperText: FC<VMNameValidationHelperTextProps> = ({
   touched = true,
   vmName,
 }) => {
+  const { t } = useKubevirtTranslation();
   const vmNameValidated = validateVMName(vmName);
-  const vmNameValidationMessage = getVMNameValidationMessage(vmName, showDefaultHelperText);
+  const vmNameValidationMessage = getVMNameValidationMessage(t, vmName, showDefaultHelperText);
 
   const isEmptyString = !vmName?.trim();
   const shouldSuppressError = !touched && isEmptyString;

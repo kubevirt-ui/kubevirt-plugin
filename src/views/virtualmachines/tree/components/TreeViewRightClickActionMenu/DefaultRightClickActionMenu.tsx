@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useVirtualMachineInstanceMigrationMapper from '@kubevirt-utils/resources/vmim/hooks/useVirtualMachineInstanceMigrationMapper';
 import useVirtualMachineInstanceMigrations from '@kubevirt-utils/resources/vmim/hooks/useVirtualMachineInstanceMigrations';
 import useMultipleVirtualMachineActions from '@virtualmachines/actions/hooks/useMultipleVirtualMachineActions';
@@ -21,6 +22,7 @@ const DefaultRightClickActionMenu: FC<DefaultRightClickActionMenuProps> = ({
   hideMenu,
   triggerElement,
 }) => {
+  const { t } = useKubevirtTranslation();
   const { cluster, namespace, prefix } = getElementComponentsFromID(triggerElement);
 
   const vms = getVMsTrigger(triggerElement);
@@ -32,7 +34,7 @@ const DefaultRightClickActionMenu: FC<DefaultRightClickActionMenuProps> = ({
 
   const actions =
     prefix === PROJECT_SELECTOR_PREFIX
-      ? [getCreateVMAction(navigate, namespace, cluster), ...baseActions]
+      ? [getCreateVMAction(t, navigate, namespace, cluster), ...baseActions]
       : baseActions;
 
   const getNestedLevel = () => {

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 
 import { isRedHatInstanceType } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/utils';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { InstanceTypeUnion } from '@kubevirt-utils/resources/instancetype/types';
 import { getName } from '@kubevirt-utils/resources/shared';
 
@@ -18,11 +19,12 @@ type UseEditInstanceTypeProps = {
 };
 
 const useEditInstanceType = ({ allInstanceTypes, instanceType }: UseEditInstanceTypeProps) => {
+  const { t } = useKubevirtTranslation();
   const [redHatProvided, setRedHatProvided] = useState<boolean>(isRedHatInstanceType(instanceType));
 
   const mappedInstanceTypes = useMemo(
-    () => mappedInstanceTypesToSelectOptions(allInstanceTypes),
-    [allInstanceTypes],
+    () => mappedInstanceTypesToSelectOptions(t, allInstanceTypes),
+    [t, allInstanceTypes],
   );
 
   const userInstanceTypes = useMemo(

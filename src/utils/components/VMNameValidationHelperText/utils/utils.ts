@@ -1,4 +1,5 @@
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { TFunction } from 'react-i18next';
+
 import { MAX_K8S_NAME_LENGTH } from '@kubevirt-utils/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ValidatedOptions } from '@patternfly/react-core';
@@ -16,7 +17,11 @@ export const isValidVMName = (vmName: string): boolean => {
 export const validateVMName = (vmName: string): ValidatedOptions =>
   isValidVMName(vmName) ? ValidatedOptions.default : ValidatedOptions.error;
 
-export const getVMNameValidationMessage = (vmName: string, showDefaultMessage: boolean): string => {
+export const getVMNameValidationMessage = (
+  t: TFunction,
+  vmName: string,
+  showDefaultMessage: boolean,
+): string => {
   const nameMissing = isEmpty(vmName);
   const nameTooLong = vmNameLengthExceedsMaxLength(vmName);
 

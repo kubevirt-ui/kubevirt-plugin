@@ -7,6 +7,7 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -14,7 +15,7 @@ import { getCluster } from '@multicluster/helpers/selectors';
 import { isJobRunning } from '../../utils';
 import { useAllRunningSelfValidationJobs } from '../hooks/useAllRunningSelfValidationJobs';
 
-import { CheckupsSelfValidationActionFactory } from './CheckupsSelfValidationActionFactory';
+import { createCheckupsSelfValidationActionFactory } from './CheckupsSelfValidationActionFactory';
 
 type CheckupsSelfValidationActionsProps = {
   configMap: IoK8sApiCoreV1ConfigMap;
@@ -27,9 +28,15 @@ const CheckupsSelfValidationActions: FC<CheckupsSelfValidationActionsProps> = ({
   isKebab = false,
   jobs,
 }) => {
+  const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const { createModal } = useModal();
   const [clusterRunningJobs] = useAllRunningSelfValidationJobs();
+
+  const checkupsSelfValidationActionFactory = useMemo(
+    () => createCheckupsSelfValidationActionFactory(t),
+    [t],
+  );
 
   const thisCheckupJobNames = useMemo(
     () => new Set(jobs.map((job) => `${getCluster(job) || SINGLE_CLUSTER_KEY}-${getName(job)}`)),
@@ -49,7 +56,7 @@ const CheckupsSelfValidationActions: FC<CheckupsSelfValidationActionsProps> = ({
   const hasCurrentCheckupRunningJobs = useMemo(() => jobs.some((job) => isJobRunning(job)), [jobs]);
 
   const actions = useMemo(() => {
-    const rerunAction = CheckupsSelfValidationActionFactory.rerun({
+    const rerunAction = checkupsSelfValidationActionFactory.rerun({
       configMap,
       createModal,
       hasCurrentCheckupRunningJobs,
@@ -59,13 +66,13 @@ const CheckupsSelfValidationActions: FC<CheckupsSelfValidationActionsProps> = ({
       otherRunningJobs,
     });
 
-    const goToAction = CheckupsSelfValidationActionFactory.goToRunningCheckup({
+    const goToAction = checkupsSelfValidationActionFactory.goToRunningCheckup({
       hasOtherRunningJobs,
       navigate: (path: string) => navigate(path),
       otherRunningJobs,
     });
 
-    const deleteAction = CheckupsSelfValidationActionFactory.delete({
+    const deleteAction = checkupsSelfValidationActionFactory.delete({
       configMap,
       createModal,
       jobs,
@@ -74,6 +81,7 @@ const CheckupsSelfValidationActions: FC<CheckupsSelfValidationActionsProps> = ({
 
     return [rerunAction, goToAction, deleteAction].filter(Boolean);
   }, [
+    checkupsSelfValidationActionFactory,
     configMap,
     createModal,
     jobs,

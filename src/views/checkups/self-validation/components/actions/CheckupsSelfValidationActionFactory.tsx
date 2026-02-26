@@ -1,4 +1,5 @@
 import React from 'react';
+import { TFunction } from 'react-i18next';
 
 import {
   IoK8sApiBatchV1Job,
@@ -7,7 +8,6 @@ import {
 import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import { trimLastHistoryPath } from '@kubevirt-utils/components/HorizontalNavbar/utils/utils';
 import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
@@ -30,7 +30,19 @@ type CheckupsSelfValidationActionFactoryParams = {
   otherRunningJobs?: IoK8sApiBatchV1Job[];
 };
 
-export const CheckupsSelfValidationActionFactory = {
+export type CheckupsSelfValidationActionFactoryReturn = {
+  delete: (params: CheckupsSelfValidationActionFactoryParams) => ActionDropdownItemType;
+  goToRunningCheckup: (params: {
+    hasOtherRunningJobs?: boolean;
+    navigate: (path: string) => void;
+    otherRunningJobs?: IoK8sApiBatchV1Job[];
+  }) => ActionDropdownItemType | null;
+  rerun: (params: CheckupsSelfValidationActionFactoryParams) => ActionDropdownItemType;
+};
+
+export const createCheckupsSelfValidationActionFactory = (
+  t: TFunction,
+): CheckupsSelfValidationActionFactoryReturn => ({
   delete: ({
     configMap,
     createModal,
@@ -106,4 +118,4 @@ export const CheckupsSelfValidationActionFactory = {
       t,
     });
   },
-};
+});
