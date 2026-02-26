@@ -14,6 +14,7 @@ import { diskSourceUploadFieldID } from '../../utils/constants';
 import { DiskSourceUploadPVCProgress } from './DiskSourceUploadPVCProgress';
 
 type DiskSourceUploadPVCProps = {
+  acceptedFileTypes?: Record<string, string[]>;
   children?: React.ReactNode;
   handleClearUpload?: () => void;
   handleUpload?: () => void;
@@ -23,6 +24,7 @@ type DiskSourceUploadPVCProps = {
 };
 
 const DiskSourceUploadPVC: FC<DiskSourceUploadPVCProps> = ({
+  acceptedFileTypes,
   children,
   handleClearUpload,
   handleUpload,
@@ -38,6 +40,7 @@ const DiskSourceUploadPVC: FC<DiskSourceUploadPVCProps> = ({
     watch,
   } = useFormContext<V1DiskFormState>();
   const [isLoading, setIsLoading] = useState(false);
+  const [isFileRejected, setIsFileRejected] = useState(false);
 
   const uploadFilename = watch(UPLOAD_FILENAME_FIELD);
 
@@ -50,17 +53,28 @@ const DiskSourceUploadPVC: FC<DiskSourceUploadPVCProps> = ({
           <FormGroup
             fieldId={diskSourceUploadFieldID}
             isRequired={isRequired}
-            label={label || t('Upload data')}
+            label={label ?? t('Upload data')}
           >
             <FileUpload
+              dropzoneProps={
+                acceptedFileTypes
+                  ? {
+                      accept: acceptedFileTypes,
+                      onDropAccepted: () => setIsFileRejected(false),
+                      onDropRejected: () => setIsFileRejected(true),
+                    }
+                  : undefined
+              }
               onClearClick={() => {
                 onChange('');
                 setValue<FieldPath<V1DiskFormState>>(UPLOAD_FILENAME_FIELD, '');
+                setIsFileRejected(false);
                 handleClearUpload?.();
               }}
               onFileInputChange={(_, file: File) => {
                 onChange(file);
                 setValue<FieldPath<V1DiskFormState>>(UPLOAD_FILENAME_FIELD, file.name);
+                setIsFileRejected(false);
                 handleUpload?.();
               }}
               allowEditingUploadedText={false}
@@ -76,7 +90,12 @@ const DiskSourceUploadPVC: FC<DiskSourceUploadPVCProps> = ({
               onReadStarted={() => setIsLoading(true)}
               value={value}
             />
-            {error && (
+            {isFileRejected && (
+              <FormGroupHelperText validated={ValidatedOptions.error}>
+                {t('File type not supported. Supported types: .iso, .img, .qcow2, .gz, .xz')}
+              </FormGroupHelperText>
+            )}
+            {error && !isFileRejected && (
               <FormGroupHelperText validated={ValidatedOptions.error}>
                 {error?.file?.message || error?.message}
               </FormGroupHelperText>

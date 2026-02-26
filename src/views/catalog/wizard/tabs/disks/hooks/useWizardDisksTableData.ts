@@ -1,6 +1,10 @@
 import * as React from 'react';
 
-import { PersistentVolumeClaimModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import {
+  modelToGroupVersionKind,
+  PersistentVolumeClaimModel,
+} from '@kubevirt-ui-ext/kubevirt-api/console';
+import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -10,7 +14,7 @@ import {
   getVolumes,
 } from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { DiskRawData, DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
+import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import {
   getPrintableDiskDrive,
   getPrintableDiskInterface,
@@ -18,12 +22,11 @@ import {
 import { getHumanizedSize } from '@kubevirt-utils/utils/units';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 type UseDisksTableDisks = (
   vm: V1VirtualMachine,
   pvcNamespace?: string,
-) => [DiskRowDataLayout[], boolean, any];
+) => [DiskRowDataLayout[], boolean, Error | null];
 
 /**
  * A Hook for getting disks data for a VM
@@ -37,22 +40,19 @@ const useWizardDisksTableData: UseDisksTableDisks = (vm, pvcNamespace) => {
   const vmVolumes = getVolumes(vm);
   const vmDataVolumeTemplates = getDataVolumeTemplates(vm);
 
-  const [pvcs, loaded, loadingError] = useK8sWatchData<K8sResourceCommon[]>({
+  const [pvcs, loaded, loadingError] = useK8sWatchData<IoK8sApiCoreV1PersistentVolumeClaim[]>({
     cluster: getCluster(vm),
+    groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
     isList: true,
-    kind: PersistentVolumeClaimModel.kind,
     namespace: pvcNamespace ?? vm?.metadata?.namespace,
     namespaced: true,
   });
 
   const disks = React.useMemo(() => {
-    const diskDevices: DiskRawData[] = vmVolumes?.map((volume) => {
-      const disk = vmDisks?.find(({ name }) => name === volume?.name);
-      const pvc = pvcs?.find(
-        ({ metadata }) =>
-          metadata?.name === volume?.persistentVolumeClaim?.claimName ||
-          metadata?.name === volume?.dataVolume?.name,
-      );
+    const diskDevices = vmDisks?.map((disk) => {
+      const volume = vmVolumes?.find(({ name }) => name === disk?.name);
+      const pvcClaimName = volume?.persistentVolumeClaim?.claimName || volume?.dataVolume?.name;
+      const pvc = pvcs?.find(({ metadata }) => metadata?.name === pvcClaimName);
       const dataVolumeTemplate = vmDataVolumeTemplates?.find(
         ({ metadata }) => metadata?.name === volume?.dataVolume?.name,
       );
@@ -70,6 +70,15 @@ const useWizardDisksTableData: UseDisksTableDisks = (vm, pvcNamespace) => {
         if (device?.volume?.containerDisk) {
           return t('Container (Ephemeral)');
         }
+        if (device?.volume?.persistentVolumeClaim?.claimName) {
+          return device.volume.persistentVolumeClaim.claimName;
+        }
+        if (device?.volume?.dataVolume?.name) {
+          return device.volume.dataVolume.name;
+        }
+        if (!device?.volume && device?.disk?.cdrom) {
+          return t('Empty');
+        }
 
         const sourceName = device?.pvc?.metadata?.name || t('Other');
         return sourceName;
@@ -77,11 +86,13 @@ const useWizardDisksTableData: UseDisksTableDisks = (vm, pvcNamespace) => {
 
       const size =
         device?.dataVolumeTemplate?.spec?.storage?.resources?.requests?.storage ||
-        device?.dataVolumeTemplate?.spec?.pvc?.resources?.requests?.storage;
+        device?.dataVolumeTemplate?.spec?.pvc?.resources?.requests?.storage ||
+        device?.pvc?.spec?.resources?.requests?.storage;
 
       const storageClass =
         device?.dataVolumeTemplate?.spec?.storage?.storageClassName ||
         device?.dataVolumeTemplate?.spec?.pvc?.storageClassName ||
+        device?.pvc?.spec?.storageClassName ||
         NO_DATA_DASH;
 
       return {

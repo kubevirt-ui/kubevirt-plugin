@@ -74,7 +74,8 @@ export class PVCInitError extends Error {
   }
 }
 
-export const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+export const delay = (ms: number): Promise<void> =>
+  new Promise((resolve) => setTimeout(resolve, ms));
 
 export const getUploadProxyURL = (config: CDIConfig) => config?.status?.uploadProxyURL;
 
@@ -91,12 +92,16 @@ export const killUploadPVC = async (name: string, namespace: string, cluster?: s
 
 const waitForUploadReady = async (dataVolume: V1beta1DataVolume) => {
   let dv = dataVolume;
+  const dvName = getName(dataVolume);
+  const dvNamespace = getNamespace(dataVolume);
+  const dvCluster = getCluster(dataVolume);
+
   for (let i = 0; i < WAIT_FOR_UPLOAD_READY.COUNT; i++) {
     if (dv?.status?.phase === DV_UPLOAD_STATES.READY) {
       return true;
     }
     await delay(WAIT_FOR_UPLOAD_READY.INTERVAL_MS);
-    dv = await getDataVolume(getName(dataVolume), getNamespace(dataVolume), getCluster(dataVolume));
+    dv = await getDataVolume(dvName, dvNamespace, dvCluster);
   }
 
   throw new PVCInitError();
@@ -152,7 +157,6 @@ export const createUploadPVC = async (dataVolume: V1beta1DataVolume) => {
     });
     await waitForUploadReady(dv);
     const token = await createUploadToken(dvName, namespace, cluster);
-
     return { token };
   } catch (error) {
     if (error instanceof PVCInitError) {
@@ -195,6 +199,9 @@ export const addUploadDataVolumeOwnerReference = (
     .catch(() => Promise.resolve());
 };
 
-export const isUploadingDisk = (uploadStatus: UPLOAD_STATUS): boolean => {
-  return [UPLOAD_STATUS.ALLOCATING, UPLOAD_STATUS.UPLOADING].includes(uploadStatus);
+export const isUploadingDisk = (uploadStatus?: UPLOAD_STATUS): boolean => {
+  return (
+    uploadStatus != null &&
+    [UPLOAD_STATUS.ALLOCATING, UPLOAD_STATUS.UPLOADING].includes(uploadStatus)
+  );
 };
