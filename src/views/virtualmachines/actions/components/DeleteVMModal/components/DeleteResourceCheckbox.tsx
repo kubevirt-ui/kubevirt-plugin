@@ -1,44 +1,61 @@
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
-import { Checkbox, StackItem } from '@patternfly/react-core';
+import { K8sResourceCommon, ResourceIcon } from '@openshift-console/dynamic-plugin-sdk';
+import { Checkbox, Flex, FlexItem, Label, StackItem, Tooltip } from '@patternfly/react-core';
 
-import { sameResource } from '../utils/helpers';
+import { getResourceGroupVersionKind } from '../utils/helpers';
 
 type DeleteResourceCheckboxProps = {
+  isShareable?: boolean;
+  onToggle: () => void;
   resource: K8sResourceCommon;
-
-  resourcesToSave: K8sResourceCommon[];
-  setResourcesToSave: Dispatch<SetStateAction<K8sResourceCommon[]>>;
+  willDelete: boolean;
 };
 
 const DeleteResourceCheckbox: FC<DeleteResourceCheckboxProps> = ({
+  isShareable,
+  onToggle,
   resource,
-  resourcesToSave,
-  setResourcesToSave,
+  willDelete,
 }) => {
   const { t } = useKubevirtTranslation();
   const resourceName = getName(resource);
 
-  const saveResource = () => setResourcesToSave((prevVolumes) => [...prevVolumes, resource]);
-
-  const deleteResource = () =>
-    setResourcesToSave((prevVolumes) =>
-      prevVolumes.filter((volume) => !sameResource(volume, resource)),
-    );
-
   return (
     <StackItem>
       <Checkbox
-        label={t('Delete disk {{resourceName}} ({{kindAbbr}})', {
-          kindAbbr: resource.kind,
-          resourceName,
-        })}
+        label={
+          <Flex
+            alignItems={{ default: 'alignItemsFlexStart' }}
+            flexWrap={{ default: 'nowrap' }}
+            spaceItems={{ default: 'spaceItemsSm' }}
+          >
+            <FlexItem>
+              <ResourceIcon groupVersionKind={getResourceGroupVersionKind(resource)} />
+            </FlexItem>
+            <FlexItem>{resourceName}</FlexItem>
+            {isShareable && (
+              <FlexItem>
+                <Tooltip
+                  content={t(
+                    'This disk is shared. We recommend keeping it unless you are sure no other VMs need this data.',
+                  )}
+                >
+                  <span tabIndex={0}>
+                    <Label color="grey" isCompact variant="outline">
+                      {t('Shareable')}
+                    </Label>
+                  </span>
+                </Tooltip>
+              </FlexItem>
+            )}
+          </Flex>
+        }
         id={`${resource.kind}-${resourceName}`}
-        isChecked={!resourcesToSave.find((volume) => sameResource(volume, resource))}
-        onChange={(_, checked: boolean) => (checked ? deleteResource() : saveResource())}
+        isChecked={willDelete}
+        onChange={onToggle}
       />
     </StackItem>
   );
