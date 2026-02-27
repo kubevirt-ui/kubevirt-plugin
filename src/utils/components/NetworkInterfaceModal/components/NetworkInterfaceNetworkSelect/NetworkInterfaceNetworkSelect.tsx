@@ -23,7 +23,6 @@ import {
   POD_NETWORK,
 } from '@kubevirt-utils/resources/vm';
 import { interfaceTypesProxy } from '@kubevirt-utils/resources/vm/utils/network/constants';
-import { hasAutoAttachedPodNetwork } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { FormGroup, Label, ValidatedOptions } from '@patternfly/react-core';
 
@@ -31,7 +30,6 @@ import {
   getNadFullName,
   getNadType,
   getNameAndNs,
-  hasExplicitlyDefinedPodNetwork,
   isNadFullName,
   isNADUsedInVM,
   isOvnOverlayNad,
@@ -114,7 +112,7 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
 
   const hasPodNetwork = useMemo(() => podNetworkExists(vm), [vm]);
   const hasNads = useMemo(() => filteredNADs?.length > 0, [filteredNADs]);
-  const isPodNetworkingOptionExists =
+  const showPodNetworkingOption =
     !hasPodNetwork || (isEditing && isPodNetworkName(editInitValueNetworkName));
 
   const canCreateNetworkInterface = useMemo(
@@ -145,7 +143,7 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
       };
     });
 
-    if (isPodNetworkingOptionExists) {
+    if (showPodNetworkingOption) {
       options.unshift({
         label: podNetworkingText,
         optionProps: {
@@ -168,7 +166,7 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
       ),
     ];
   }, [
-    isPodNetworkingOptionExists,
+    showPodNetworkingOption,
     filteredNADs,
     podNetworkingText,
     vmiNamespace,
@@ -263,13 +261,6 @@ const NetworkInterfaceNetworkSelect: FC<NetworkInterfaceNetworkSelectProps> = ({
         <FormGroupHelperText validated={validated}>
           {t(
             'No NetworkAttachmentDefinitions available. Contact your system administrator for additional support.',
-          )}
-        </FormGroupHelperText>
-      )}
-      {!hasExplicitlyDefinedPodNetwork(vm) && hasAutoAttachedPodNetwork(vm) && (
-        <FormGroupHelperText validated={ValidatedOptions.warning}>
-          {t(
-            'This VM is using auto attached Pod Network. To disable it, set spec.template.spec.domain.devices.autoattachPodInterface to false.',
           )}
         </FormGroupHelperText>
       )}

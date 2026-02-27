@@ -5,6 +5,7 @@ export type SimpleNICPresentation = {
   configLinkState?: string;
   iface: { macAddress?: string; model?: string };
   interfaceName?: string;
+  isAutoAttached: boolean;
   isInterfaceEphemeral: boolean;
   isPending: boolean;
   isSRIOV: boolean;
