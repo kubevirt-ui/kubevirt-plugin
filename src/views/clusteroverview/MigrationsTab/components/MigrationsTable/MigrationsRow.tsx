@@ -25,7 +25,7 @@ import {
 import { Tooltip } from '@patternfly/react-core';
 
 import MigrationPolicyTooltip from './components/MigrationPolicyTooltip/MigrationPolicyTooltip';
-import { iconMapper } from './utils/statuses';
+import { getStatusIcon } from './utils/statuses';
 import { MigrationTableDataLayout } from './utils/utils';
 import MigrationActionsDropdown from './MigrationActionsDropdown';
 
@@ -36,7 +36,7 @@ const MigrationsRow: FC<RowProps<MigrationTableDataLayout>> = ({ activeColumnIDs
   const targetNode = getMigrationTargetNode(vmim);
   const migrationPhase = getMigrationPhase(vmim);
 
-  const StatusIcon = iconMapper?.[migrationPhase];
+  const StatusIcon = getStatusIcon(migrationPhase);
 
   return (
     <>
