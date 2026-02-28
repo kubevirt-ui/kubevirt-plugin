@@ -27,7 +27,7 @@ import { Progress, ProgressMeasureLocation, Tooltip } from '@patternfly/react-co
 import { getMigrationProgressVariant } from '@virtualmachines/details/tabs/metrics/utils/utils';
 
 import MigrationPolicyTooltip from './components/MigrationPolicyTooltip/MigrationPolicyTooltip';
-import { iconMapper } from './utils/statuses';
+import { getStatusIcon } from './utils/statuses';
 import { MigrationTableDataLayout } from './utils/utils';
 import MigrationActionsDropdown from './MigrationActionsDropdown';
 
@@ -41,7 +41,7 @@ const MigrationsRow: FC<RowProps<MigrationTableDataLayout>> = ({ activeColumnIDs
   const { isFailed, percentage } = useMigrationPercentage(vmiObj);
   const progressStatus = getMigrationProgressVariant(percentage, isFailed);
 
-  const StatusIcon = iconMapper?.[migrationPhase];
+  const StatusIcon = getStatusIcon(migrationPhase);
 
   return (
     <>
