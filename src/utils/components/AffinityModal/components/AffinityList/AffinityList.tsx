@@ -1,13 +1,10 @@
-import React, { useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import NodeCheckerAlert from '@kubevirt-utils/components/NodeSelectorModal/components/NodeCheckerAlert';
-import { useDataViewTableSort } from '@kubevirt-utils/hooks/useDataViewTableSort/useDataViewTableSort';
-import { generateRows } from '@kubevirt-utils/hooks/useDataViewTableSort/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Stack, StackItem } from '@patternfly/react-core';
-import { DataView as PFDataView, DataViewState, DataViewTable } from '@patternfly/react-data-view';
 
 import { AffinityRowData, AffinityType } from '../../utils/types';
 import AddAffinityRuleButton from '../AddAffinityRuleButton';
@@ -25,7 +22,7 @@ type AffinityListProps = {
   qualifiedNodes: IoK8sApiCoreV1Node[];
 };
 
-const AffinityList: React.FC<AffinityListProps> = ({
+const AffinityList: FC<AffinityListProps> = ({
   affinities,
   nodesLoaded,
   onAffinityClickAdd,
@@ -37,18 +34,10 @@ const AffinityList: React.FC<AffinityListProps> = ({
   const { t } = useKubevirtTranslation();
 
   const columns = useMemo(() => getAffinityColumns(t), [t]);
-  const { sortedData, tableColumns } = useDataViewTableSort(affinities, columns, 'type');
-
   const callbacks: AffinityCallbacks = useMemo(
     () => ({ onDelete, onEdit, t }),
     [onEdit, onDelete, t],
   );
-  const rows = useMemo(
-    () => generateRows(sortedData, columns, callbacks, getAffinityRowId),
-    [sortedData, columns, callbacks],
-  );
-
-  const activeState = isEmpty(affinities) ? DataViewState.empty : undefined;
 
   return (
     <Stack hasGutter>
@@ -56,22 +45,15 @@ const AffinityList: React.FC<AffinityListProps> = ({
         <AffinityDescriptionText />
       </StackItem>
       <StackItem>
-        <PFDataView activeState={activeState}>
-          <DataViewTable
-            bodyStates={{
-              [DataViewState.empty]: (
-                <tr>
-                  <td className="pf-v6-u-text-align-center" colSpan={columns.length}>
-                    {t('No affinity rules found')}
-                  </td>
-                </tr>
-              ),
-            }}
-            aria-label={t('Affinity rules table')}
-            columns={tableColumns}
-            rows={rows}
-          />
-        </PFDataView>
+        <KubevirtTable
+          ariaLabel={t('Affinity rules table')}
+          callbacks={callbacks}
+          columns={columns}
+          data={affinities}
+          getRowId={getAffinityRowId}
+          initialSortKey="type"
+          noDataEmptyMsg={t('No affinity rules found')}
+        />
       </StackItem>
       <StackItem>
         <AddAffinityRuleButton isLinkButton onAffinityClickAdd={onAffinityClickAdd} />

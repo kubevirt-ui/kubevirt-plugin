@@ -1,0 +1,13 @@
+.kubevirt-table--fixed-layout .pf-v6-c-table {
+  table-layout: fixed;
+}
+
+.kubevirt-table--fixed-layout .pf-v6-c-table tr {
+  display: table;
+  table-layout: fixed;
+  width: 100%;
+}
+
+.kubevirt-table--fixed-layout .pf-v6-c-table tr > * {
+  height: auto;
+}

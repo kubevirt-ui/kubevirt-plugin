@@ -4,41 +4,50 @@ import { universalComparator } from '@kubevirt-utils/utils/utils';
 import { DataViewTh, useDataViewSort } from '@patternfly/react-data-view';
 import { ThProps } from '@patternfly/react-table';
 
+import { useResponsiveColumns } from '../useResponsiveColumns/useResponsiveColumns';
+
 import { ColumnConfig } from './types';
 
 export const useDataViewTableSort = <TData, TCallbacks = undefined>(
   data: TData[],
   columns: ColumnConfig<TData, TCallbacks>[],
   initialSortKey?: string,
-): { sortedData: TData[]; tableColumns: DataViewTh[] } => {
+  initialSortDirection: 'asc' | 'desc' = 'asc',
+): {
+  sortedData: TData[];
+  tableColumns: DataViewTh[];
+  visibleColumns: ColumnConfig<TData, TCallbacks>[];
+} => {
+  const visibleColumns = useResponsiveColumns(columns);
+
   const { direction, onSort, sortBy } = useDataViewSort({
-    initialSort: { direction: 'asc', sortBy: initialSortKey ?? columns[0]?.key },
+    initialSort: { direction: initialSortDirection, sortBy: initialSortKey ?? columns[0]?.key },
   });
 
   const sortByIndex = useMemo(
-    () => columns.findIndex((col) => col.key === sortBy),
-    [sortBy, columns],
+    () => visibleColumns.findIndex((col) => col.key === sortBy),
+    [sortBy, visibleColumns],
   );
 
   const getSortParams = useCallback(
     (columnIndex: number): ThProps['sort'] | undefined => {
-      if (!columns[columnIndex]?.sortable) return undefined;
+      if (!visibleColumns[columnIndex]?.sortable) return undefined;
       return {
         columnIndex,
-        onSort: (_event, index, dir) => onSort(_event, columns[index].key, dir),
+        onSort: (_event, index, dir) => onSort(_event, visibleColumns[index].key, dir),
         sortBy: { defaultDirection: 'asc', direction, index: sortByIndex },
       };
     },
-    [columns, direction, onSort, sortByIndex],
+    [visibleColumns, direction, onSort, sortByIndex],
   );
 
   const tableColumns: DataViewTh[] = useMemo(
     () =>
-      columns.map((col, index) => ({
+      visibleColumns.map((col, index) => ({
         cell: col.label,
         props: { ...col.props, sort: getSortParams(index) },
       })),
-    [columns, getSortParams],
+    [visibleColumns, getSortParams],
   );
 
   const sortedData = useMemo(() => {
@@ -57,5 +66,5 @@ export const useDataViewTableSort = <TData, TCallbacks = undefined>(
     });
   }, [data, sortBy, direction, columns]);
 
-  return { sortedData, tableColumns };
+  return { sortedData, tableColumns, visibleColumns };
 };
