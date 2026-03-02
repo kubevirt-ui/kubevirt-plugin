@@ -43,6 +43,7 @@ export const defaultVMYamlTemplate = (): V1VirtualMachine => ({
             threads: 1,
           },
           devices: {
+            autoattachPodInterface: false,
             disks: [
               {
                 disk: {
