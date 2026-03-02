@@ -16,6 +16,7 @@ import {
   AlertVariant,
   Content,
   ContentVariants,
+  FormGroup,
   Radio,
   Stack,
   StackItem,
@@ -91,29 +92,31 @@ const VirtualMachineMigrationDetails: FC<VirtualMachineMigrationDetailsProps> = 
           )}
         </Content>
       </StackItem>
-      <StackItem>
-        <Radio
-          onChange={() => {
-            setAllPVCsSelected(true);
-            setSelectedMigrations(getAllSelectedMigrations(vms, pvcs));
-          }}
-          id="all-volumes"
-          isChecked={allPVCsSelected}
-          isDisabled={isEmpty(pvcs)}
-          label={t('The entire VirtualMachine')}
-          name="volumes"
-        />
-        <Radio
-          onChange={() => {
-            setAllPVCsSelected(false);
-            setSelectedMigrations([]);
-          }}
-          id="selected-volumes"
-          isChecked={!allPVCsSelected}
-          isDisabled={isEmpty(pvcs)}
-          label={t('Selected volumes')}
-          name="volumes"
-        />
+      <StackItem className="pf-v6-c-form">
+        <FormGroup hasNoPaddingTop isStack role="radiogroup">
+          <Radio
+            onChange={() => {
+              setAllPVCsSelected(true);
+              setSelectedMigrations(getAllSelectedMigrations(vms, pvcs));
+            }}
+            id="all-volumes"
+            isChecked={allPVCsSelected}
+            isDisabled={isEmpty(pvcs)}
+            label={t('The entire VirtualMachine')}
+            name="volumes"
+          />
+          <Radio
+            onChange={() => {
+              setAllPVCsSelected(false);
+              setSelectedMigrations([]);
+            }}
+            id="selected-volumes"
+            isChecked={!allPVCsSelected}
+            isDisabled={isEmpty(pvcs)}
+            label={t('Selected volumes')}
+            name="volumes"
+          />
+        </FormGroup>
       </StackItem>
       {!allPVCsSelected && (
         <StackItem>
