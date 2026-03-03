@@ -57,8 +57,10 @@ const AlertsCardAccordionItem: React.FC<AlertsCardAccordionItemProps> = ({
     ));
   };
 
+  const isExpanded = alertOpen === alertType;
+
   return (
-    <AccordionItem isExpanded={alertOpen === alertType}>
+    <AccordionItem isExpanded={isExpanded}>
       <AccordionToggle
         onClick={() => {
           handleDrawerToggleClick(alertType);
@@ -73,10 +75,12 @@ const AlertsCardAccordionItem: React.FC<AlertsCardAccordionItemProps> = ({
           </Label>
         </div>
       </AccordionToggle>
-      <AccordionContent id={alertType} key={alertType}>
-        <Divider />
-        {renderAlerts()}
-      </AccordionContent>
+      {isExpanded && (
+        <AccordionContent id={alertType} key={alertType}>
+          <Divider />
+          {renderAlerts()}
+        </AccordionContent>
+      )}
     </AccordionItem>
   );
 };

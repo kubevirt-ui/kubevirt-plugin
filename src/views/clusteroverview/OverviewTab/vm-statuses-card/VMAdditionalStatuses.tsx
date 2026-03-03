@@ -77,31 +77,36 @@ const VMAdditionalStatuses: FC<VMAdditionalStatusesProps> = ({
   return (
     <div className="vm-statuses-card__accordion">
       <Accordion>
-        {statusItems.map((item) => (
-          <AccordionItem isExpanded={expandedAccordions[item.id]} key={item.id}>
-            <AccordionToggle
-              className="vm-statuses-card__accordion-toggle"
-              id={`${item.id}-accordion-toggle`}
-              onClick={() => toggleAccordion(item.id)}
-            >
-              <span className="vm-statuses-card__accordion-toggle--text">{item.title}</span>
-              <Label
-                className="vm-statuses-card__accordion-toggle--label"
-                isCompact
-                key={`vm-status-accordion-toggle-label-${item.id}`}
+        {statusItems.map((item) => {
+          const isExpanded = expandedAccordions[item.id];
+          return (
+            <AccordionItem isExpanded={isExpanded} key={item.id}>
+              <AccordionToggle
+                className="vm-statuses-card__accordion-toggle"
+                id={`${item.id}-accordion-toggle`}
+                onClick={() => toggleAccordion(item.id)}
               >
-                {item.count}
-              </Label>
-            </AccordionToggle>
-            <Divider />
-            <AccordionContent
-              className="vm-statuses-card__accordion-content"
-              id={`${item.id}-accordion-content`}
-            >
-              <Grid hasGutter>{renderStatusItems(item.statuses)}</Grid>
-            </AccordionContent>
-          </AccordionItem>
-        ))}
+                <span className="vm-statuses-card__accordion-toggle--text">{item.title}</span>
+                <Label
+                  className="vm-statuses-card__accordion-toggle--label"
+                  isCompact
+                  key={`vm-status-accordion-toggle-label-${item.id}`}
+                >
+                  {item.count}
+                </Label>
+              </AccordionToggle>
+              <Divider />
+              {isExpanded && (
+                <AccordionContent
+                  className="vm-statuses-card__accordion-content"
+                  id={`${item.id}-accordion-content`}
+                >
+                  <Grid hasGutter>{renderStatusItems(item.statuses)}</Grid>
+                </AccordionContent>
+              )}
+            </AccordionItem>
+          );
+        })}
       </Accordion>
     </div>
   );
