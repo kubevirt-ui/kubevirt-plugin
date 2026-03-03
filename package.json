@@ -139,8 +139,7 @@
   "private": true,
   "resolutions": {
     "@types/react": "^17.0.40",
-    "@types/react-dom": "^17.0.0",
-    "lodash": "^4.17.23"
+    "@types/react-dom": "^17.0.0"
   },
   "scripts": {
     "build": "yarn clean && NODE_ENV=production NODE_OPTIONS=--max-old-space-size=8192 yarn ts-node node_modules/.bin/webpack",
