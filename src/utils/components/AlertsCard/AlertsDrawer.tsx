@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 
 import AlertsCardAccordionItem from '@kubevirt-utils/components/AlertsCard/AlertsCardAccordionItem';
 import { AlertType, SimplifiedAlerts } from '@kubevirt-utils/components/AlertsCard/utils/types';
@@ -19,19 +19,19 @@ type AlertsDrawerProps = {
   sortedAlerts: SimplifiedAlerts;
 };
 
-const AlertsDrawer: React.FC<AlertsDrawerProps> = ({ sortedAlerts }) => {
-  const [alertTypeOpen, setAlertTypeOpen] = React.useState<AlertType>(null);
+const AlertsDrawer: FC<AlertsDrawerProps> = ({ sortedAlerts }) => {
+  const [alertTypeOpen, setAlertTypeOpen] = useState<AlertType>(null);
 
-  const [titleOpen, setTitleOpen] = React.useState<boolean>(false);
-  const [defaultOpenCritical, setDefaultOpenCritical] = React.useState<boolean>(false);
+  const [titleOpen, setTitleOpen] = useState<boolean>(false);
+  const [defaultOpenCritical, setDefaultOpenCritical] = useState<boolean>(false);
 
-  const handleDrawerToggleClick = React.useCallback((alertType: AlertType): void => {
+  const handleDrawerToggleClick = useCallback((alertType: AlertType): void => {
     setAlertTypeOpen((alert) => (alert === alertType ? null : alertType));
   }, []);
   const alertsQuantity =
     Object.values(sortedAlerts)?.reduce((acc, category) => acc + category?.length, 0) || 0;
 
-  React.useEffect(() => {
+  useEffect(() => {
     //open critical alerts by default, if exists, only for the first time loading
     if (!defaultOpenCritical && !isEmpty(sortedAlerts?.critical)) {
       setTitleOpen(true);
@@ -92,17 +92,21 @@ const AlertsDrawer: React.FC<AlertsDrawerProps> = ({ sortedAlerts }) => {
                 })}
               </Flex>
             </AccordionToggle>
-            <AccordionContent id="toggle-main">
-              {Object.entries(sortedAlerts)?.map(([alertType, alerts]) => (
-                <AlertsCardAccordionItem
-                  alertOpen={alertTypeOpen}
-                  alerts={alerts}
-                  alertType={AlertType[alertType]}
-                  handleDrawerToggleClick={handleDrawerToggleClick}
-                  key={alertType}
-                />
-              ))}
-            </AccordionContent>
+            {titleOpen && (
+              <AccordionContent id="toggle-main">
+                <Accordion asDefinitionList isBordered>
+                  {Object.entries(sortedAlerts)?.map(([alertType, alerts]) => (
+                    <AlertsCardAccordionItem
+                      alertOpen={alertTypeOpen}
+                      alerts={alerts}
+                      alertType={AlertType[alertType]}
+                      handleDrawerToggleClick={handleDrawerToggleClick}
+                      key={alertType}
+                    />
+                  ))}
+                </Accordion>
+              </AccordionContent>
+            )}
           </AccordionItem>
         </Accordion>
       ) : null}
