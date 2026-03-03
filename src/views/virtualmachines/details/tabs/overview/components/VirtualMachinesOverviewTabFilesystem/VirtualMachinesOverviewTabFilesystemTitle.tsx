@@ -2,7 +2,7 @@ import React from 'react';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { CardTitle, PopoverPosition } from '@patternfly/react-core';
 
@@ -14,7 +14,7 @@ const VirtualMachinesOverviewTabFilesystemTitle = () => {
       {t('File systems')}
       <HelpTextIcon
         bodyContent={(hide) => (
-          <LightspeedSimplePopoverContent
+          <PopoverContentWithLightspeedButton
             content={t(
               'The following information regarding how the disks are partitioned is provided by the guest agent.',
             )}

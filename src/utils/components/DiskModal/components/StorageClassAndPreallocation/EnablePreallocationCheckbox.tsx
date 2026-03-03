@@ -7,7 +7,7 @@ import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Checkbox, Flex, FlexItem, FormGroup, PopoverPosition } from '@patternfly/react-core';
 
@@ -44,7 +44,7 @@ const EnablePreallocationCheckbox: FC<EnablePreallocationCheckboxProps> = ({ isD
         <FlexItem>
           <HelpTextIcon
             bodyContent={(hide) => (
-              <LightspeedSimplePopoverContent
+              <PopoverContentWithLightspeedButton
                 content={
                   <>
                     <Trans ns="plugin__kubevirt-plugin">

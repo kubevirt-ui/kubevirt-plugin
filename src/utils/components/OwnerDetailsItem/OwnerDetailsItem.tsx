@@ -4,12 +4,10 @@ import classNames from 'classnames';
 
 import OwnerReferences from '@kubevirt-utils/components/OwnerReferences/OwnerReferences';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import {
-  Breadcrumb,
-  BreadcrumbItem,
   DescriptionListDescription,
   DescriptionListGroup,
   DescriptionListTermHelpText,
@@ -30,7 +28,7 @@ const OwnerDetailsItem: React.FC<OwnerDetailsItemProps> = ({ className, obj }) =
       <DescriptionListTermHelpText>
         <Popover
           bodyContent={(hide) => (
-            <LightspeedSimplePopoverContent
+            <PopoverContentWithLightspeedButton
               content={
                 <Trans ns="plugin__kubevirt-plugin">
                   <div>
@@ -39,13 +37,9 @@ const OwnerDetailsItem: React.FC<OwnerDetailsItemProps> = ({ className, obj }) =
                     controller, then an entry in this list will point to this controller, with the
                     controller field set to true. There cannot be more than one managing controller.
                   </div>
-                  <Breadcrumb className="margin-top">
-                    <BreadcrumbItem>{{ kind: obj?.kind }}</BreadcrumbItem>
-                    <BreadcrumbItem>metadata</BreadcrumbItem>
-                    <BreadcrumbItem>ownerReferences</BreadcrumbItem>
-                  </Breadcrumb>
                 </Trans>
               }
+              breadcrumb={`${obj?.kind}.metadata.ownerReferences`}
               hide={hide}
               obj={obj}
               promptType={OLSPromptType.OWNER}

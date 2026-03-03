@@ -2,10 +2,9 @@ import React, { cloneElement, FC, isValidElement, ReactElement, ReactNode } from
 
 import { SPACE_SYMBOL } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import LightspeedHelpButton from '@lightspeed/components/LightspeedHelpButton/LightspeedHelpButton';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
-import { Breadcrumb, BreadcrumbItem, Split, SplitItem } from '@patternfly/react-core';
 
 type DescriptionItemPopoverContentProps = {
   bodyContent?: ReactNode;
@@ -27,33 +26,24 @@ const DescriptionItemPopoverContent: FC<DescriptionItemPopoverContentProps> = ({
   const { t } = useKubevirtTranslation();
 
   return (
-    <>
-      {isValidElement(bodyContent) && cloneElement(bodyContent as ReactElement, { hide })}
-      {moreInfoURL && (
+    <PopoverContentWithLightspeedButton
+      content={
         <>
-          {SPACE_SYMBOL}
-          {t('More info: ')}
-          <a href={moreInfoURL}>{moreInfoURL}</a>
+          {isValidElement(bodyContent) && cloneElement(bodyContent as ReactElement, { hide })}
+          {moreInfoURL && (
+            <>
+              {SPACE_SYMBOL}
+              {t('More info: ')}
+              <a href={moreInfoURL}>{moreInfoURL}</a>
+            </>
+          )}
         </>
-      )}
-      <Split className="pf-v6-u-mt-md">
-        <SplitItem>
-          {breadcrumb && (
-            <Breadcrumb>
-              {breadcrumb.split('.').map((item) => (
-                <BreadcrumbItem key={item}>{item}</BreadcrumbItem>
-              ))}
-            </Breadcrumb>
-          )}
-        </SplitItem>
-        <SplitItem isFilled />
-        <SplitItem>
-          {promptType && (
-            <LightspeedHelpButton obj={olsObj} onClick={hide} promptType={promptType} />
-          )}
-        </SplitItem>
-      </Split>
-    </>
+      }
+      breadcrumb={breadcrumb}
+      hide={hide}
+      obj={olsObj}
+      promptType={promptType}
+    />
   );
 };
 
