@@ -1,43 +1,69 @@
+import { useMemo } from 'react';
+
 import {
+  CDIConfigModelGroupVersionKind,
   modelToGroupVersionKind,
   PersistentVolumeClaimModel,
   SecretModel,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineSnapshotModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import {
+  V1beta1CDIConfig,
+  V1beta1DataVolume,
+} from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
   V1beta1VirtualMachineSnapshot,
   V1VirtualMachine,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { getName } from '@kubevirt-utils/resources/shared';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getRootDiskSecretRef, getVolumes } from '@kubevirt-utils/resources/vm';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
-import useConvertedVolumeNames from './useConvertedVolumeNames';
+import { findPVCOwner } from '../utils/helpers';
 
-type UseDeleteVMResources = (vm: V1VirtualMachine) => {
-  dataVolumes: V1beta1DataVolume[];
+type UseDeleteVMResourcesResult = {
   error: any;
   loaded: boolean;
-  pvcs: IoK8sApiCoreV1PersistentVolumeClaim[];
   secrets: IoK8sApiCoreV1Secret[];
   snapshots: V1beta1VirtualMachineSnapshot[];
+  volumes: (IoK8sApiCoreV1PersistentVolumeClaim | V1beta1DataVolume)[];
 };
 
-const useDeleteVMResources: UseDeleteVMResources = (vm) => {
+const useDeleteVMResources = (vm: V1VirtualMachine): UseDeleteVMResourcesResult => {
   const cluster = getCluster(vm);
-  const { dvVolumesNames, isDataVolumeGarbageCollector, pvcVolumesNames } = useConvertedVolumeNames(
-    getVolumes(vm),
-    cluster,
+  const namespace = getNamespace(vm);
+  const vmName = getName(vm);
+  const dvSecretRef = getRootDiskSecretRef(vm);
+
+  const vmVolumes = useMemo(() => getVolumes(vm) || [], [vm]);
+
+  const dvVolumeNames = useMemo(
+    () => vmVolumes.filter((volume) => volume?.dataVolume).map((volume) => volume.dataVolume.name),
+    [vmVolumes],
   );
-  const namespace = vm?.metadata?.namespace;
-  const [dataVolumes, dataVolumesLoaded, dataVolumesLoadError] = useK8sWatchData<
-    V1beta1DataVolume[]
-  >({
+
+  const pvcVolumeNames = useMemo(
+    () =>
+      vmVolumes
+        .filter((volume) => volume?.persistentVolumeClaim)
+        .map((volume) => volume.persistentVolumeClaim.claimName),
+    [vmVolumes],
+  );
+
+  const [cdiConfig, cdiLoaded] = useK8sWatchData<V1beta1CDIConfig>({
+    cluster,
+    groupVersionKind: CDIConfigModelGroupVersionKind,
+    isList: false,
+    namespaced: false,
+  });
+
+  const isGarbageCollectorEnabled = cdiLoaded && cdiConfig?.spec?.dataVolumeTTLSeconds !== -1;
+
+  const [allDataVolumes, dvLoaded, dvError] = useK8sWatchData<V1beta1DataVolume[]>({
     cluster,
     groupVersionKind: modelToGroupVersionKind(DataVolumeModel),
     isList: true,
@@ -45,9 +71,7 @@ const useDeleteVMResources: UseDeleteVMResources = (vm) => {
     namespaced: true,
   });
 
-  const filteredDataVolumes = dataVolumes?.filter((dv) => dvVolumesNames?.includes(getName(dv)));
-
-  const [pvcs, pvcsLoaded, pvcsLoadError] = useK8sWatchData<IoK8sApiCoreV1PersistentVolumeClaim[]>({
+  const [allPvcs, pvcsLoaded, pvcsError] = useK8sWatchData<IoK8sApiCoreV1PersistentVolumeClaim[]>({
     cluster,
     groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
     isList: true,
@@ -55,11 +79,7 @@ const useDeleteVMResources: UseDeleteVMResources = (vm) => {
     namespaced: true,
   });
 
-  const filteredPvcs = isDataVolumeGarbageCollector
-    ? pvcs?.filter((pvc) => [...dvVolumesNames, ...pvcVolumesNames].includes(getName(pvc)))
-    : [];
-
-  const [snapshots, snapshotsLoaded, snapshotsLoadError] = useK8sWatchData<
+  const [allSnapshots, snapshotsLoaded, snapshotsError] = useK8sWatchData<
     V1beta1VirtualMachineSnapshot[]
   >({
     cluster,
@@ -69,7 +89,7 @@ const useDeleteVMResources: UseDeleteVMResources = (vm) => {
     namespaced: true,
   });
 
-  const [secrets, secretsLoaded, secretsLoadError] = useK8sWatchData<IoK8sApiCoreV1Secret[]>({
+  const [allSecrets, secretsLoaded, secretsError] = useK8sWatchData<IoK8sApiCoreV1Secret[]>({
     cluster,
     groupVersionKind: modelToGroupVersionKind(SecretModel),
     isList: true,
@@ -78,20 +98,43 @@ const useDeleteVMResources: UseDeleteVMResources = (vm) => {
     optional: true,
   });
 
-  const dvSecretRef = getRootDiskSecretRef(vm);
-  const filteredSecret = secrets?.find((secret) => getName(secret) === dvSecretRef);
+  const dataVolumes = useMemo(
+    () => allDataVolumes?.filter((dv) => dvVolumeNames.includes(getName(dv))) ?? [],
+    [allDataVolumes, dvVolumeNames],
+  );
+
+  const volumes = useMemo(() => {
+    if (!isGarbageCollectorEnabled) return dataVolumes;
+
+    const allVolumeNames = [...dvVolumeNames, ...pvcVolumeNames];
+    const matchingPvcs = allPvcs?.filter((pvc) => allVolumeNames.includes(getName(pvc))) ?? [];
+    const standalonePvcs = matchingPvcs.filter((pvc) => !findPVCOwner(pvc, dataVolumes));
+
+    return [...dataVolumes, ...standalonePvcs];
+  }, [allPvcs, dataVolumes, dvVolumeNames, isGarbageCollectorEnabled, pvcVolumeNames]);
+
+  const snapshots = useMemo(
+    () =>
+      allSnapshots?.filter(
+        (snapshot) =>
+          snapshot?.metadata?.ownerReferences?.some(
+            (ownerReference) => ownerReference?.name === vmName,
+          ) || snapshot?.spec?.source?.name === vmName,
+      ) ?? [],
+    [allSnapshots, vmName],
+  );
+
+  const secrets = useMemo(() => {
+    const found = allSecrets?.find((secret) => getName(secret) === dvSecretRef);
+    return found ? [found] : [];
+  }, [allSecrets, dvSecretRef]);
 
   return {
-    dataVolumes: filteredDataVolumes,
-    error: snapshotsLoadError || dataVolumesLoadError || pvcsLoadError || secretsLoadError,
-    loaded: snapshotsLoaded && dataVolumesLoaded && pvcsLoaded && secretsLoaded,
-    pvcs: filteredPvcs,
-    secrets: filteredSecret ? [filteredSecret] : [],
-    snapshots: snapshots?.filter(
-      (snapshot) =>
-        snapshot?.metadata?.ownerReferences?.some((ref) => ref?.name === vm?.metadata?.name) ||
-        snapshot?.spec?.source?.name === vm?.metadata?.name,
-    ),
+    error: dvError || pvcsError || snapshotsError || secretsError,
+    loaded: cdiLoaded && dvLoaded && pvcsLoaded && snapshotsLoaded && secretsLoaded,
+    secrets,
+    snapshots,
+    volumes,
   };
 };
 
