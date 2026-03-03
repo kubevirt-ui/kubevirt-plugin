@@ -80,7 +80,7 @@ export const tourSteps: Step[] = [
     },
     disableBeacon: true,
     placement: 'bottom',
-    target: '#ConfigurationSearch-autocomplete-search',
+    target: '#VirtualMachineConfigurationTabSearch-autocomplete-search',
     title: t('Search for configurable items'),
   },
   {

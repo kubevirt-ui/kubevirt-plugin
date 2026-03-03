@@ -10,6 +10,7 @@ import { tourSteps } from './utils/constants';
 import {
   nextStep,
   prevStep,
+  resetTour,
   runningTourSignal,
   stepIndexSignal,
   stopTour,
@@ -54,6 +55,7 @@ const GuidedTour: FC = () => {
           if (action === ACTIONS.NEXT) {
             if (stepIndexSignal.value === size - 1) {
               stopTour();
+              resetTour();
               return;
             }
 
