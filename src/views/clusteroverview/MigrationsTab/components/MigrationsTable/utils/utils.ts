@@ -6,6 +6,7 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
 import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
+import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
 
 export type MigrationTableDataLayout = {
   metadata: {
@@ -16,18 +17,27 @@ export type MigrationTableDataLayout = {
   vmim: V1VirtualMachineInstanceMigration;
   vmiObj: V1VirtualMachineInstance;
 };
+const TERMINAL_VMIM_PHASES = new Set([vmimStatuses.Failed, vmimStatuses.Succeeded]);
+
 export const getFilteredDurationVMIMS = (
   vmims: V1VirtualMachineInstanceMigration[],
   selectedDuration: string,
 ): V1VirtualMachineInstanceMigration[] => {
-  const filteredVMIMS = (vmims || []).filter((vmim) => {
-    const vmimCreateDurationMs =
-      new Date().getTime() - new Date(vmim?.metadata?.creationTimestamp).getTime();
+  const durationMs = DurationOption.getMilliseconds(selectedDuration) ?? Infinity;
 
-    if (vmimCreateDurationMs < DurationOption?.getMilliseconds(selectedDuration)) return vmim;
+  return (vmims || []).filter((vmim) => {
+    const phase = vmim?.status?.phase;
+
+    // Always include active (non-terminal) migrations regardless of age —
+    // a Running/Scheduling migration started before the time window is still relevant.
+    if (!TERMINAL_VMIM_PHASES.has(phase)) return true;
+
+    const createdAt = Date.parse(vmim?.metadata?.creationTimestamp);
+    if (!Number.isFinite(createdAt)) return true;
+
+    const vmimCreateDurationMs = Date.now() - createdAt;
+    return vmimCreateDurationMs < durationMs;
   });
-
-  return filteredVMIMS;
 };
 
 export const getMigrationsTableData = (

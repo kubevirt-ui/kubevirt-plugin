@@ -9,7 +9,7 @@ import VirtualMachinesCreateButton from './VirtualMachinesCreateButton/VirtualMa
 
 type VirtualMachinesListPageHeaderProps = {
   namespace: string;
-  onFilterChange: OnFilterChange;
+  onFilterChange?: OnFilterChange;
 };
 
 const VirtualMachinesListPageHeader: FC<VirtualMachinesListPageHeaderProps> = ({
@@ -20,8 +20,12 @@ const VirtualMachinesListPageHeader: FC<VirtualMachinesListPageHeaderProps> = ({
 
   return (
     <ListPageHeader title={t('VirtualMachines')}>
-      <SearchBar onFilterChange={onFilterChange} />
-      <Divider orientation={{ default: 'vertical' }} />
+      {onFilterChange && (
+        <>
+          <SearchBar onFilterChange={onFilterChange} />
+          <Divider orientation={{ default: 'vertical' }} />
+        </>
+      )}
       <div>
         <VirtualMachinesCreateButton namespace={namespace} />
       </div>

@@ -6,7 +6,13 @@ import { getVMStatus } from '@kubevirt-utils/resources/shared';
 import { VM_ERROR_STATUSES, VM_STATUS } from '@kubevirt-utils/resources/vm/utils/vmStatus';
 import { sumObjectValues } from '@kubevirt-utils/utils/utils';
 import { RedExclamationCircleIcon } from '@openshift-console/dynamic-plugin-sdk';
-import { InProgressIcon, OffIcon, PausedIcon, UnknownIcon } from '@patternfly/react-icons';
+import {
+  ClockIcon,
+  InProgressIcon,
+  OffIcon,
+  PausedIcon,
+  UnknownIcon,
+} from '@patternfly/react-icons';
 import { printableVMStatus } from '@virtualmachines/utils';
 
 import { ERROR } from './constants';
@@ -20,6 +26,7 @@ export const vmStatusIcon = {
   Paused: PausedIcon,
   Provisioning: Fragment,
   Running: GreenRunningIcon,
+  Scheduling: ClockIcon,
   Starting: Fragment,
   Stopped: OffIcon,
   Stopping: Fragment,

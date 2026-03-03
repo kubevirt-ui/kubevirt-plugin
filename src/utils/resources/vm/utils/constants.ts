@@ -1,6 +1,6 @@
 import { V1Interface, V1Network } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
-export const NO_DATA_DASH = '-';
+export const NO_DATA_DASH = '—';
 
 export const SECONDS_TO_MILLISECONDS_MULTIPLIER = 1000;
 

@@ -1,0 +1,26 @@
+.cluster-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pf-t--global--spacer--md);
+  padding-top: var(--pf-t--global--spacer--sm);
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: var(--pf-t--global--spacer--xs);
+  }
+
+  &__swatch {
+    display: inline-block;
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 0.125rem;
+    flex-shrink: 0;
+  }
+
+  &__label {
+    font-size: var(--pf-t--global--font--size--sm);
+    color: var(--pf-t--global--text--color--regular);
+    white-space: nowrap;
+  }
+}

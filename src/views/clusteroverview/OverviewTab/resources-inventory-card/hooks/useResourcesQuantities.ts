@@ -76,11 +76,11 @@ const useResourcesQuantities: UseResourcesQuantities = () => {
   return useMemo(() => {
     return Object.entries(resources).reduce(
       (acc, [key, value]) => {
-        acc[key] = value?.data?.length;
+        acc[key] = value?.data?.length ?? 0;
         acc.loaded = acc.loaded && value?.loaded;
         return acc;
       },
-      { loaded: false as boolean, nads: 0, nodes: 0, vms: 0, vmTemplates: 0 },
+      { loaded: true as boolean, nads: 0, nodes: 0, vms: 0, vmTemplates: 0 },
     );
   }, [resources]);
 };

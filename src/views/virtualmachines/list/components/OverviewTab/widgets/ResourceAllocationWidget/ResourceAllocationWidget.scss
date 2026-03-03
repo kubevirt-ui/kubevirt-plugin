@@ -1,0 +1,52 @@
+.resource-allocation-widget {
+  overflow: hidden;
+
+  &__header {
+    display: flex;
+    align-items: baseline;
+    gap: var(--pf-t--global--spacer--sm);
+  }
+
+  &__subtitle {
+    font-weight: var(--pf-t--global--font--weight--body--default);
+    margin-bottom: 0;
+  }
+
+  &__graph {
+    margin-top: var(--pf-t--global--spacer--md);
+  }
+
+  &__graph-title {
+    font-size: var(--pf-t--global--font--size--md);
+    font-weight: var(--pf-t--global--font--weight--body--bold);
+    margin-bottom: var(--pf-t--global--spacer--sm);
+  }
+
+  &__chart {
+    min-height: 12.5rem;
+    width: 100%;
+    position: relative;
+    z-index: 1;
+    overflow: visible;
+  }
+
+  &__quota {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--pf-t--global--spacer--xs);
+    font-size: var(--pf-t--global--font--size--md);
+    margin-bottom: var(--pf-t--global--spacer--lg);
+
+    &-title {
+      font-weight: var(--pf-t--global--font--weight--body--bold);
+    }
+
+    &-value {
+      font-weight: var(--pf-t--global--font--weight--body--default);
+    }
+
+    &-label {
+      font-weight: var(--pf-t--global--font--weight--body--default);
+    }
+  }
+}

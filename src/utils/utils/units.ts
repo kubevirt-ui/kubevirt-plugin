@@ -12,6 +12,7 @@ import {
   decimalUnitsOrdered,
   decimalUnitsOrderedDescending,
   EXPONENTIAL_REGEX,
+  multipliers,
   NUMBER_REGEX,
   QuantityUnit,
   UNIT_REGEX,
@@ -198,4 +199,27 @@ export const formatQuantityString = (quantityString: string, convertBytesOnly: b
   }
 
   return quantityToString({ unit: decimalUnitsOrdered[decimalUnitIndex], value: decimalValue });
+};
+
+/**
+ * Strips the trailing 'B' suffix (e.g. "GiB" → "Gi") to match the multipliers table keys.
+ * @param {string} unit - the unit string, possibly ending with 'B'
+ * @returns {string} the multiplier key
+ */
+const toMultiplierKey = (unit: string): string => (unit === 'B' ? 'B' : unit.replace(/B$/, ''));
+
+/**
+ * Converts a numeric value from one unit to another using the multipliers table.
+ * Handles both with-B (GiB, MiB) and without-B (Gi, Mi) unit notations.
+ * @param {number} value - the numeric value to convert
+ * @param {string} fromUnit - source unit (e.g. "MiB", "Gi")
+ * @param {string} toUnit - target unit (e.g. "GiB", "Mi")
+ * @returns {number} the converted value, or the original if units are unknown or equal
+ */
+export const convertBinaryUnit = (value: number, fromUnit: string, toUnit: string): number => {
+  if (!fromUnit || !toUnit || fromUnit === toUnit) return value;
+  const from = multipliers[toMultiplierKey(fromUnit)];
+  const to = multipliers[toMultiplierKey(toUnit)];
+  if (from == null || to == null) return value;
+  return (value * from) / to;
 };

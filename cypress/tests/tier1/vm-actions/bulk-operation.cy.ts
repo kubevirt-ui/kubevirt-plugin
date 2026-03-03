@@ -3,7 +3,11 @@ import { VM_IT_CUST, VM_TMPL_CUST } from '../../../utils/const/testVM';
 import { BULK_MIGRATE, getRow } from '../../../views/actions';
 import { storageclassMigrate } from '../../../views/migrate-modal';
 import * as nav from '../../../views/selector';
-import { selectAllDropdownOption, selectDropdownToggle } from '../../../views/selector-common';
+import {
+  selectAllDropdownOption,
+  selectDropdownToggle,
+  vmListTab,
+} from '../../../views/selector-common';
 import { tab } from '../../../views/tab';
 import { waitForStatus } from '../../../views/vm-flow';
 
@@ -36,6 +40,7 @@ describe('Test bulk actions', () => {
     cy.clickVirtLink(nav.catalogNav);
     cy.wait(WAIT_TIME);
     cy.clickVirtLink(nav.vmNav);
+    cy.byTestID(vmListTab).should('be.visible').click();
 
     VM_NAMES.forEach((vmName) => waitForStatus(vmName, VM_STATUS.Stopped));
   });

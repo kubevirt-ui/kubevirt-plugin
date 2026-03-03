@@ -1,0 +1,36 @@
+.cluster-resources-card {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--pf-t--global--spacer--md);
+
+  &__tile {
+    flex: 0 0 calc(50% - var(--pf-t--global--spacer--md) / 2);
+
+    .cluster-resources-card__tile-body {
+      padding: var(--pf-t--global--spacer--md);
+    }
+
+    .cluster-resources-card__tile-split {
+      align-items: center;
+    }
+
+    &--placeholder {
+      visibility: hidden;
+    }
+
+    &-label {
+      font-family: var(--pf-t--global--font--family--heading);
+      font-size: var(--pf-t--global--font--size--lg);
+      font-weight: var(--pf-t--global--font--weight--heading--default);
+    }
+
+    &-count {
+      font-family: var(--pf-t--global--font--family--heading);
+      font-size: var(--pf-t--global--font--size--2xl);
+      color: var(--pf-t--global--text--color--brand--default);
+      display: flex;
+      justify-content: flex-end;
+    }
+  }
+}

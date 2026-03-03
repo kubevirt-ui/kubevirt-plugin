@@ -1,0 +1,76 @@
+.two-column-card {
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: var(--pf-t--global--spacer--xs);
+  }
+
+  &__layout {
+    display: grid;
+    grid-template-columns: var(--two-column-card--columns, 2fr 3fr);
+    min-height: 12.5rem;
+  }
+
+  &__left {
+    border-right: 1px solid var(--pf-t--global--border--color--default);
+    padding-right: var(--pf-t--global--spacer--lg);
+    margin-bottom: var(--pf-t--global--spacer--md);
+  }
+
+  &__right {
+    padding-left: var(--pf-t--global--spacer--lg);
+  }
+
+  &__severity {
+    &-row {
+      display: flex;
+      align-items: center;
+      gap: var(--pf-t--global--spacer--sm);
+      padding: var(--pf-t--global--spacer--xs) 0;
+    }
+
+    &-count {
+      font-family: var(--pf-t--global--font--family--heading);
+      font-size: var(--pf-t--global--font--size--2xl);
+      line-height: var(--pf-t--global--font--line-height--heading);
+      color: var(--pf-t--global--text--color--brand--default);
+    }
+
+    &-label {
+      font-size: var(--pf-t--global--font--size--body--default);
+      font-weight: var(--pf-t--global--font--weight--body--bold);
+      color: var(--pf-t--global--text--color--regular);
+    }
+
+    &-value {
+      font-size: var(--pf-t--global--font--size--body--default);
+      color: var(--pf-t--global--text--color--regular);
+      text-transform: capitalize;
+    }
+  }
+
+  &__skeleton-row {
+    display: flex;
+    align-items: center;
+    gap: var(--pf-t--global--spacer--md);
+    padding: var(--pf-t--global--spacer--sm) 0;
+  }
+
+  &__descheduler {
+    display: flex;
+    align-items: center;
+    gap: var(--pf-t--global--spacer--xs);
+    color: var(--pf-t--global--text--color--regular);
+
+    &-label {
+      font-size: var(--pf-t--global--font--size--body--default);
+      font-weight: var(--pf-t--global--font--weight--body--bold);
+      color: var(--pf-t--global--text--color--regular);
+    }
+
+    &-value {
+      font-size: var(--pf-t--global--font--size--body--default);
+      color: var(--pf-t--global--text--color--regular);
+    }
+  }
+}
