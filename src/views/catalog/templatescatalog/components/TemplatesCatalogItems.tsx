@@ -1,14 +1,19 @@
-import React, { useMemo, VFC } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
+import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getTemplateName } from '@kubevirt-utils/resources/template';
 import { Gallery, StackItem } from '@patternfly/react-core';
 
-import useTemplatesCatalogColumns from '../hooks/useTemplatesCatalogColumns';
+import {
+  getTemplateCatalogRowId,
+  getTemplatesCatalogColumns,
+} from '../templatesCatalogTableDefinition';
+import { TemplatesCatalogCallbacks } from '../types';
 import { TemplateFilters } from '../utils/types';
 
-import { TemplatesCatalogRow } from './TemplatesCatalogRow';
 import { TemplateTile } from './TemplatesCatalogTile';
 
 type TemplatesCatalogItemsProps = {
@@ -19,9 +24,10 @@ type TemplatesCatalogItemsProps = {
   loaded: boolean;
   onTemplateClick: (template: V1Template) => void;
   templates: V1Template[];
+  unfilteredTemplates: V1Template[];
 };
 
-export const TemplatesCatalogItems: VFC<TemplatesCatalogItemsProps> = ({
+export const TemplatesCatalogItems: FC<TemplatesCatalogItemsProps> = ({
   availableDatasources,
   availableTemplatesUID,
   bootSourcesLoaded,
@@ -29,27 +35,38 @@ export const TemplatesCatalogItems: VFC<TemplatesCatalogItemsProps> = ({
   loaded,
   onTemplateClick,
   templates,
+  unfilteredTemplates,
 }) => {
-  const columns = useTemplatesCatalogColumns();
+  const { t } = useKubevirtTranslation();
+  const columns = useMemo(() => getTemplatesCatalogColumns(t), [t]);
 
   const sortedTemplates = useMemo(
     () =>
-      templates.sort((a: V1Template, b: V1Template) =>
-        a?.metadata?.name?.localeCompare(b?.metadata?.name),
+      [...templates].sort((a: V1Template, b: V1Template) =>
+        (getTemplateName(a) ?? '').localeCompare(getTemplateName(b) ?? ''),
       ),
     [templates],
   );
 
+  const callbacks: TemplatesCatalogCallbacks = useMemo(
+    () => ({ availableDatasources, availableTemplatesUID, onTemplateClick }),
+    [availableDatasources, availableTemplatesUID, onTemplateClick],
+  );
+
   return filters?.isList ? (
     <div className="vm-catalog-table-container">
-      <VirtualizedTable
+      <KubevirtTable
+        ariaLabel={t('Templates catalog table')}
+        callbacks={callbacks}
         columns={columns}
         data={templates}
+        dataTest="templates-catalog-table"
+        fixedLayout
+        getRowId={getTemplateCatalogRowId}
+        initialSortKey="name"
         loaded={loaded && bootSourcesLoaded}
-        loadError={null}
-        Row={TemplatesCatalogRow}
-        rowData={{ availableDatasources, availableTemplatesUID, onTemplateClick }}
-        unfilteredData={templates}
+        noDataMsg={t('No templates found')}
+        unfilteredData={unfilteredTemplates}
       />
     </div>
   ) : (
@@ -60,7 +77,7 @@ export const TemplatesCatalogItems: VFC<TemplatesCatalogItemsProps> = ({
             availableDatasources={availableDatasources}
             availableTemplatesUID={availableTemplatesUID}
             bootSourcesLoaded={bootSourcesLoaded}
-            key={template?.metadata?.uid}
+            key={getTemplateCatalogRowId(template)}
             onClick={onTemplateClick}
             template={template}
           />
