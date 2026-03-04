@@ -12,6 +12,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { getNetworkInterface } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
+import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
 import {
   Alert,
   AlertVariant,
@@ -101,7 +102,7 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
   return (
     <Dropdown
       toggle={KebabToggle({
-        id: 'toggle-id-6',
+        id: `nic-actions-${nicName}`,
         isDisabled: interfaceState === NetworkInterfaceState.ABSENT || isInterfaceMissing,
         isExpanded: isDropdownOpen,
         onClick: onToggle,
@@ -109,7 +110,7 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
       isOpen={isDropdownOpen}
       onOpenChange={setIsDropdownOpen}
       onSelect={() => setIsDropdownOpen(false)}
-      popperProps={{ position: 'right' }}
+      popperProps={{ appendTo: getContentScrollableElement, position: 'right' }}
     >
       <DropdownList>
         {interfaceState === NetworkInterfaceState.DOWN && (

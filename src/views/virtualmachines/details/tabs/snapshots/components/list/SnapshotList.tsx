@@ -1,19 +1,17 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 
+import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  ListPageFilter,
-  useListPageFilter,
-  VirtualizedTable,
-} from '@openshift-console/dynamic-plugin-sdk';
-import { EmptyState, EmptyStateBody, EmptyStateVariant } from '@patternfly/react-core';
-import { SearchIcon } from '@patternfly/react-icons';
+import { ListPageFilter, useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
 
-import useSnapshotColumns from '../../hooks/useSnapshotColumns';
 import { UseSnapshotData } from '../../hooks/useSnapshotData';
 import { filters } from '../../utils/filters';
 
-import SnapshotRow from './SnapshotRow';
+import {
+  getSnapshotListColumns,
+  getSnapshotRowId,
+  SnapshotListCallbacks,
+} from './snapshotListDefinition';
 
 type SnapshotsListProps = UseSnapshotData & { isVMRunning?: boolean };
 
@@ -24,9 +22,17 @@ const SnapshotsList: FC<SnapshotsListProps> = ({
   restoresMap,
   snapshots,
 }) => {
-  const columns = useSnapshotColumns();
   const { t } = useKubevirtTranslation();
+  const columns = useMemo(() => getSnapshotListColumns(t), [t]);
   const [data, filteredData, onFilterChange] = useListPageFilter(snapshots, filters);
+
+  const callbacks: SnapshotListCallbacks = useMemo(
+    () => ({
+      isVMRunning: isVMRunning ?? false,
+      restores: restoresMap,
+    }),
+    [isVMRunning, restoresMap],
+  );
 
   return (
     <>
@@ -36,20 +42,19 @@ const SnapshotsList: FC<SnapshotsListProps> = ({
         onFilterChange={onFilterChange}
         rowFilters={filters}
       />
-      <VirtualizedTable
-        NoDataEmptyMsg={() => (
-          <>
-            <EmptyState icon={SearchIcon} variant={EmptyStateVariant.xs}>
-              <EmptyStateBody>{t('No snapshots found')}</EmptyStateBody>
-            </EmptyState>
-          </>
-        )}
+      <KubevirtTable
+        ariaLabel={t('Snapshots table')}
+        callbacks={callbacks}
         columns={columns}
         data={filteredData}
+        dataTest="vm-snapshot-list"
+        fixedLayout
+        getRowId={getSnapshotRowId}
+        initialSortKey="name"
         loaded={loaded}
         loadError={error}
-        Row={SnapshotRow}
-        rowData={{ isVMRunning, restores: restoresMap }}
+        noDataEmptyText={t('No snapshots found')}
+        noFilteredDataEmptyText={t('No results match the current filters')}
         unfilteredData={data}
       />
     </>
