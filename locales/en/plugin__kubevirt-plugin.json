@@ -1896,6 +1896,7 @@
   "This action will disconnect the {{vmsCount}} virtual machines from {{currentNetwork}} and reconnect them to {{newNetwork}}.": "This action will disconnect the {{vmsCount}} virtual machines from {{currentNetwork}} and reconnect them to {{newNetwork}}.",
   "This checkup can take up to 3 hours to complete. It should not be used in production environments as it may impact cluster performance.": "This checkup can take up to 3 hours to complete. It should not be used in production environments as it may impact cluster performance.",
   "This configuration is not editable after the network is created.": "This configuration is not editable after the network is created.",
+  "This disk is owned by VirtualMachine {{vmOwnerName}}. If that VirtualMachine is deleted, this disk will also be deleted.": "This disk is owned by VirtualMachine {{vmOwnerName}}. If that VirtualMachine is deleted, this disk will also be deleted.",
   "This disk is shared. We recommend keeping it unless you are sure no other VMs need this data.": "This disk is shared. We recommend keeping it unless you are sure no other VMs need this data.",
   "This field is required": "This field is required",
   "This interface is currently hot-unplugged until the VirtualMachine is migrated": "This interface is currently hot-unplugged until the VirtualMachine is migrated",
