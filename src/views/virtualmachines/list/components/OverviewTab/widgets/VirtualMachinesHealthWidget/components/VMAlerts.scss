@@ -1,0 +1,6 @@
+.vm-alerts {
+  &__count {
+    color: var(--pf-t--global--text--color--link--default);
+    margin-inline-start: var(--pf-t--global--spacer--sm);
+  }
+}

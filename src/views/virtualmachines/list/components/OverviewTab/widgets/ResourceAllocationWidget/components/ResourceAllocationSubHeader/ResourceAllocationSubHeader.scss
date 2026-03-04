@@ -1,0 +1,33 @@
+.resource-allocation-sub-header {
+  display: flex;
+  align-items: center;
+  gap: var(--pf-t--global--spacer--lg);
+  font-size: var(--pf-t--global--font--size--sm);
+  font-weight: var(--pf-t--global--font--weight--body--default);
+
+  &__all-clusters {
+    display: flex;
+    align-items: center;
+    gap: var(--pf-t--global--spacer--sm);
+  }
+
+  &__top-clusters {
+    display: flex;
+    align-items: center;
+    gap: var(--pf-t--global--spacer--sm);
+    white-space: nowrap;
+  }
+
+  &__select-toggle {
+    font-size: var(--pf-t--global--font--size--sm);
+  }
+
+  &__time-range {
+    white-space: nowrap;
+
+    &-label {
+      font-weight: var(--pf-t--global--font--weight--body--bold);
+      margin-right: var(--pf-t--global--spacer--sm);
+    }
+  }
+}

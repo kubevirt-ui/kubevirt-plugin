@@ -24,7 +24,6 @@ import { ClusterServiceVersionPhase } from '../../../utils/types';
 import BlueSyncIcon from './health-state-icons/BlueSyncIcon';
 import GrayUnknownIcon from './health-state-icons/GrayUnknownIcon';
 import { CLUSTER } from './constants';
-import { ClusterServiceVersionKind } from './types';
 
 export const NetworkAddonsConfigResource: WatchK8sResource = {
   groupVersionKind: modelToGroupVersionKind(NetworkAddonsConfigModel),
@@ -53,9 +52,10 @@ export const filterSubsystems = <E extends Extension>(
     return true;
   });
 
-const getHealthStatusFromCSV = (csv: ClusterServiceVersionKind) => {
-  const csvStatus = csv?.status?.phase;
-  switch (csvStatus) {
+export const getHealthStatusFromCSV = (
+  csvPhase: ClusterServiceVersionPhase | undefined,
+): { message: string; state: HealthState } => {
+  switch (csvPhase) {
     case ClusterServiceVersionPhase.CSVPhaseSucceeded:
       return {
         message: t('Available'),
@@ -81,7 +81,7 @@ export const getStorageOperatorHealthStatus = (operatorCSV, loaded, loadErrors) 
   if (!isEmpty(loadErrors) || !operatorCSV) {
     return { message: t('Not available'), state: HealthState.NOT_AVAILABLE };
   }
-  return getHealthStatusFromCSV(operatorCSV);
+  return getHealthStatusFromCSV(operatorCSV?.status?.phase);
 };
 
 export const getOverallStorageStatus = (lsoState, odfState, loaded, loadErrors) => {

@@ -25,7 +25,7 @@ const useDeschedulerSetting: UseDeschedulerSetting = (obj) => {
   const isAdmin = useIsAdmin();
   const isVMObj = isVM(obj);
   const isMigratable = isVMObj ? isLiveMigratable(obj) : true;
-  const isDeschedulerInstalled = useDeschedulerInstalled(getCluster(obj));
+  const { isDeschedulerInstalled } = useDeschedulerInstalled(getCluster(obj));
 
   const vm = isVM(obj) ? obj : getTemplateVirtualMachineObject(obj);
   const annotations = getVMTemplateAnnotations(vm);

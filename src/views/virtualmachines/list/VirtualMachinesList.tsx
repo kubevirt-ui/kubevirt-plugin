@@ -46,7 +46,7 @@ import {
   useListPageFilter,
   VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { Flex, PageSection, Pagination } from '@patternfly/react-core';
+import { Flex, Pagination } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 import { useAccessibleResources } from '@virtualmachines/search/hooks/useAccessibleResources';
@@ -58,7 +58,6 @@ import { getVMIFromMapper, getVMIMFromMapper } from '@virtualmachines/utils/mapp
 
 import VirtualMachineBulkActionButton from './components/VirtualMachineBulkActionButton';
 import VirtualMachineEmptyState from './components/VirtualMachineEmptyState/VirtualMachineEmptyState';
-import VirtualMachineListSummary from './components/VirtualMachineListSummary/VirtualMachineListSummary';
 import VirtualMachineRow from './components/VirtualMachineRow/VirtualMachineRow';
 import VirtualMachineSearchResultsHeader from './components/VirtualMachineSearchResultsHeader';
 import VirtualMachineSelection from './components/VirtualMachineSelection/VirtualMachineSelection';
@@ -151,14 +150,6 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
     filtersFromURL,
   );
 
-  const filteredVMIs = useMemo(
-    () =>
-      filteredVMs
-        ?.map((vm) => getVMIFromMapper(vmiMapper, vm, isACMPage ? hubClusterName : undefined))
-        .filter(Boolean),
-    [filteredVMs, vmiMapper],
-  );
-
   useEffect(() => {
     deselectAllVMs();
   }, [namespace, cluster]);
@@ -219,11 +210,6 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
     /* All of this table and components should be replaced to our own fitted components */
     <>
       <DocumentTitle>{PageTitles.VirtualMachines}</DocumentTitle>
-      {!isSearchResultsPage && (
-        <PageSection>
-          <VirtualMachineListSummary vmis={filteredVMIs} vms={filteredVMs} />
-        </PageSection>
-      )}
       <ListPageBody>
         <div className="vm-listpagebody" ref={listPageBodyRef}>
           {isSearchResultsPage && <VirtualMachineSearchResultsHeader />}

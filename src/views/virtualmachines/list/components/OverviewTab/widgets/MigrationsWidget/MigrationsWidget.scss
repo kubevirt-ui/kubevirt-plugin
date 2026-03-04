@@ -1,0 +1,15 @@
+.migrations-widget {
+  &__subheader {
+    --pf-v6-c-content--small--MarginBlockEnd: 0;
+    --pf-v6-c-content--MarginBlockEnd: 0;
+
+    color: var(--pf-t--global--text--color--subtle);
+    min-height: var(--pf-t--global--font--line-height--body);
+  }
+
+  &__body-grid {
+    .status-count-item__grid-item {
+      padding-inline-start: 0;
+    }
+  }
+}

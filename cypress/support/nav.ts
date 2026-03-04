@@ -2,6 +2,7 @@ import './selectors';
 
 import { MINUTE } from '../utils/const/index';
 import * as nav from '../views/selector';
+import { vmListTab } from '../views/selector-common';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -52,10 +53,12 @@ Cypress.Commands.add('visitCatalogVirt', () => {
 
 Cypress.Commands.add('visitVMs', () => {
   cy.clickVirtLink(nav.vmNav);
+  cy.byTestID(vmListTab).should('be.visible').click();
 });
 
 Cypress.Commands.add('visitVMsVirt', () => {
   cy.get(nav.vmNav, { timeout: 5 * MINUTE }).click();
+  cy.byTestID(vmListTab).should('be.visible').click();
 });
 
 Cypress.Commands.add('visitNAD', () => {

@@ -1,0 +1,21 @@
+.cluster-utilization-widget {
+  padding-bottom: var(--pf-t--global--spacer--sm);
+  &__subtitle {
+    font-weight: var(--pf-t--global--font--weight--heading--default);
+    font-size: var(--pf-t--global--font--size--body--lg);
+    line-height: var(--pf-t--global--font--line-height--body);
+    color: var(--pf-t--global--text--color--regular);
+    margin-bottom: var(--pf-t--global--spacer--md);
+
+    &-detail {
+      font-weight: var(--pf-t--global--font--weight--body--default);
+      font-size: var(--pf-t--global--font--size--body--sm);
+    }
+  }
+
+  &__charts {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pf-t--global--spacer--sm);
+  }
+}

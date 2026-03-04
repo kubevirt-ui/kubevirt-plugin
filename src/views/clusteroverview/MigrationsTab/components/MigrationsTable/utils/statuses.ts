@@ -3,16 +3,20 @@ import {
   GreenCheckCircleIcon,
   RedExclamationCircleIcon,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { InProgressIcon, PausedIcon } from '@patternfly/react-icons';
+import { ClockIcon, InProgressIcon, PausedIcon, UnknownIcon } from '@patternfly/react-icons';
 
-export const iconMapper = {
+const iconMapper = {
   Failed: RedExclamationCircleIcon,
   Paused: PausedIcon,
-  Pending: InProgressIcon,
+  Pending: ClockIcon,
   PreparingTarget: InProgressIcon,
   Running: GreenRunningIcon,
-  Scheduled: InProgressIcon,
-  Scheduling: InProgressIcon,
+  Scheduled: ClockIcon,
+  Scheduling: ClockIcon,
   Succeeded: GreenCheckCircleIcon,
+  Synchronizing: InProgressIcon,
   TargetReady: InProgressIcon,
+  WaitingForSync: InProgressIcon,
 };
+
+export const getStatusIcon = (phase: string) => iconMapper[phase] || UnknownIcon;

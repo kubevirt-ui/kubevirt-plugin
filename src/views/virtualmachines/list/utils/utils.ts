@@ -19,7 +19,7 @@ export const filterVMsByClusterAndNamespace = (
   });
 
 export const getClustersWithVMsCount = (vms: V1VirtualMachine[]): number =>
-  new Set(vms.map((vm) => getCluster(vm))).size;
+  new Set(vms.map((vm) => getCluster(vm)).filter(Boolean)).size;
 
 export const getNamespacesWithVMsCount = (
   vms: V1VirtualMachine[],

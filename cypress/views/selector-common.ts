@@ -35,6 +35,7 @@ export const gridItem = '.pf-v6-l-grid';
 export const mastheadLogo = '[data-test="masthead-logo"]';
 
 // VM list
+export const vmListTab = 'vm-list-tab';
 export const vmStatusOnList = 'td[data-label="status"]';
 export const vmNode = '#node';
 export const colManage = 'button[aria-label="Column management"]';

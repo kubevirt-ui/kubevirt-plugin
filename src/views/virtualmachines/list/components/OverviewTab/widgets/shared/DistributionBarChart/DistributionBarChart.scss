@@ -1,0 +1,13 @@
+.distribution-bar-chart {
+  &__title {
+    font-size: var(--pf-t--global--font--size--body--lg);
+    font-weight: var(--pf-t--global--font--weight--body--bold);
+    color: var(--pf-t--global--text--color--regular);
+    margin-bottom: var(--pf-t--global--spacer--xs);
+  }
+
+  &__chart {
+    min-height: 11.25rem;
+    width: 100%;
+  }
+}

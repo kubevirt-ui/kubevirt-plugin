@@ -1,0 +1,10 @@
+.health-card {
+  border-radius: var(--pf-t--global--border--radius--medium);
+  border-width: var(--pf-t--global--border--width--box--default);
+
+  &__header {
+    padding: var(--pf-t--global--spacer--md);
+    padding-bottom: 0;
+    margin-bottom: var(--pf-t--global--spacer--lg);
+  }
+}
