@@ -10,22 +10,21 @@ import { ApplicationAwareResourceQuota } from '@kubevirt-utils/resources/quotas/
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
-  ActionGroup,
   Button,
   Flex,
   Form,
   FormGroup,
   PageSection,
-  Stack,
   TextInput,
+  Tooltip,
 } from '@patternfly/react-core';
 
+import AdvancedConfigAlert from '../components/AdvancedConfigAlert';
 import StandardResourceQuotaAlert from '../components/StandardResourceQuotaAlert';
-import useIsDedicatedVirtualResources from '../hooks/useIsDedicatedVirtualResources';
 import { getQuotaListURL } from '../utils/url';
-import { getMainResourceKeys, getSpecLimits } from '../utils/utils';
+import { getAdditionalResourceKeys } from '../utils/utils';
 
-import QuotaFormResourceLimitInput from './components/QuotaFormResourceLimitInput';
+import QuotaFormResourceLimitFields from './components/QuotaFormResourceLimitFields';
 import useOnQuotaSubmit from './hooks/useOnQuotaSubmit';
 import useOnQuotaUpdate from './hooks/useOnQuotaUpdate';
 
@@ -39,12 +38,9 @@ const QuotaFormEditor: FC<QuotaFormEditorProps> = ({ formData, isEdit = false, o
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const namespace = useNamespaceParam();
-  const isDedicatedVirtualResources = useIsDedicatedVirtualResources();
   const [error, setError] = useState<Error | null>(null);
   const onQuotaSubmit = useOnQuotaSubmit(setError, isEdit);
   const { updateHardValue, updateMetadata } = useOnQuotaUpdate(formData, onChange);
-
-  const { cpu, memory, vmCount } = getMainResourceKeys(isDedicatedVirtualResources);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -62,16 +58,22 @@ const QuotaFormEditor: FC<QuotaFormEditorProps> = ({ formData, isEdit = false, o
 
   const quotaName = getName(formData) ?? '';
   const selectedNamespace = getNamespace(formData) || namespace;
+  const hasAdditionalResources = !isEmpty(getAdditionalResourceKeys(formData, 'fromSpec'));
 
-  const parseHardValue = (val: string): number => (isEmpty(val) ? NaN : parseInt(val));
-
-  const cpuLimit = parseHardValue(getSpecLimits(formData)?.[cpu]);
-  const memoryLimit = parseHardValue(getSpecLimits(formData)?.[memory]);
-  const vmCountLimit = parseHardValue(getSpecLimits(formData)?.[vmCount]);
+  const submitButton = (
+    <Button
+      isAriaDisabled={!quotaName?.trim() || hasAdditionalResources}
+      type="submit"
+      variant="primary"
+    >
+      {isEdit ? t('Save') : t('Create quota')}
+    </Button>
+  );
 
   return (
     <PageSection>
       <Form maxWidth="900px" onSubmit={handleSubmit}>
+        {hasAdditionalResources && <AdvancedConfigAlert isEdit={isEdit} quota={formData} />}
         <FormGroup fieldId="quota-name" isRequired label={t('Name')}>
           <TextInput
             id="quota-name"
@@ -100,54 +102,24 @@ const QuotaFormEditor: FC<QuotaFormEditorProps> = ({ formData, isEdit = false, o
             <StandardResourceQuotaAlert className="pf-v6-u-mt-md" namespace={selectedNamespace} />
           )}
         </FormGroup>
-        <Stack hasGutter>
-          <Flex justifyContent={{ default: 'justifyContentSpaceBetween' }}>
-            <QuotaFormResourceLimitInput
-              helpIconContent={t(
-                'The maximum number of virtual CPUs permitted for all VMs in this project.',
-              )}
-              placeholder={t('i.e., 8')}
-              resourceLimitLabel={t('vCPU allocation')}
-              setValue={(value) => updateHardValue(cpu, value)}
-              unitLabel={t('vCPU')}
-              value={cpuLimit}
-            />
-            <QuotaFormResourceLimitInput
-              helpIconContent={t(
-                'The maximum memory capacity measured in GiB permitted for all VMs in this project.',
-              )}
-              placeholder={t('i.e., 16')}
-              resourceLimitLabel={t('Memory allocation')}
-              setValue={(value) => updateHardValue(memory, value, 'Gi')}
-              unitLabel={t('GiB')}
-              value={memoryLimit}
-            />
-            <QuotaFormResourceLimitInput
-              helpIconContent={t(
-                'The maximum number of virtual machines that can exist in this project.',
-              )}
-              placeholder={t('i.e., 4')}
-              resourceLimitLabel={t('VM limits')}
-              setValue={(value) => updateHardValue(vmCount, value)}
-              unitLabel={t('VMs')}
-              value={vmCountLimit}
-            />
-          </Flex>
-          <FormGroupHelperText>
-            {t(
-              'Additional workload limits (such as pods) can be added later using advanced configuration',
-            )}
-          </FormGroupHelperText>
-        </Stack>
+        <QuotaFormResourceLimitFields formData={formData} updateHardValue={updateHardValue} />
         {error && <ErrorAlert error={error} />}
-        <ActionGroup>
-          <Button isDisabled={!quotaName?.trim()} type="submit" variant="primary">
-            {isEdit ? t('Save') : t('Create quota')}
-          </Button>
+        <Flex className="pf-v6-u-mt-lg" gap={{ default: 'gapMd' }}>
+          {hasAdditionalResources ? (
+            <Tooltip
+              content={t(
+                'Advanced configuration detected. Switch to the YAML view to review all settings and create this quota.',
+              )}
+            >
+              {submitButton}
+            </Tooltip>
+          ) : (
+            submitButton
+          )}
           <Button onClick={() => navigate(getQuotaListURL(namespace))} variant="secondary">
             {t('Cancel')}
           </Button>
-        </ActionGroup>
+        </Flex>
       </Form>
     </PageSection>
   );

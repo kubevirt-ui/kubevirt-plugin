@@ -2,10 +2,10 @@ import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConverg
 import { getAAQCalculationMethod } from '@kubevirt-utils/resources/hyperconverged/selectors';
 import { CalculationMethod } from '@kubevirt-utils/resources/quotas/types';
 
-const useIsDedicatedVirtualResources = () => {
+const useAAQCalculationMethod = (): CalculationMethod => {
   const [hyperConverge] = useHyperConvergeConfiguration();
 
-  return getAAQCalculationMethod(hyperConverge) === CalculationMethod.DedicatedVirtualResources;
+  return getAAQCalculationMethod(hyperConverge);
 };
 
-export default useIsDedicatedVirtualResources;
+export default useAAQCalculationMethod;

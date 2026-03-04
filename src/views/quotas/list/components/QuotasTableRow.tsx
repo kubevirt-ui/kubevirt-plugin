@@ -4,7 +4,7 @@ import QuotaActions from 'src/views/quotas/actions/QuotaActions';
 import { QUOTA_UNITS } from 'src/views/quotas/utils/constants';
 
 import { modelToGroupVersionKind, NamespaceModel } from '@kubevirt-utils/models';
-import { ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';
+import { ApplicationAwareQuota, CalculationMethod } from '@kubevirt-utils/resources/quotas/types';
 import { getCreationTimestamp, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import {
   ResourceLink,
@@ -13,7 +13,7 @@ import {
   Timestamp,
 } from '@openshift-console/dynamic-plugin-sdk';
 
-import useIsDedicatedVirtualResources from '../../hooks/useIsDedicatedVirtualResources';
+import useAAQCalculationMethod from '../../hooks/useAAQCalculationMethod';
 import { getQuotaDetailsURL } from '../../utils/url';
 import {
   getAdditionalResourceKeys,
@@ -27,10 +27,11 @@ import AdditionalQuotaPopover from './AdditionalQuotaPopover/AdditionalQuotaPopo
 import QuotaLimitBar from './QuotaLimitBar/QuotaLimitBar';
 
 const QuotasTableRow: FC<RowProps<ApplicationAwareQuota>> = ({ activeColumnIDs, obj: quota }) => {
-  const isDedicatedVirtualResources = useIsDedicatedVirtualResources();
+  const calculationMethod = useAAQCalculationMethod();
 
-  const mainKeys = getMainResourceKeys(isDedicatedVirtualResources);
-  const { cpu, memory, vmCount } = mainKeys;
+  const { cpu, memory, vmiCount } = getMainResourceKeys(
+    calculationMethod === CalculationMethod.DedicatedVirtualResources,
+  );
 
   const quotaStatus = getStatus(quota);
   const { hard, used } = quotaStatus ?? {};
@@ -62,8 +63,8 @@ const QuotasTableRow: FC<RowProps<ApplicationAwareQuota>> = ({ activeColumnIDs, 
       <TableData activeColumnIDs={activeColumnIDs} id={QuotaColumn.MEMORY}>
         <QuotaLimitBar hard={hard} resourceKey={memory} unit={QUOTA_UNITS.memory} used={used} />
       </TableData>
-      <TableData activeColumnIDs={activeColumnIDs} id={QuotaColumn.VM_COUNT}>
-        <QuotaLimitBar hard={hard} resourceKey={vmCount} unit={QUOTA_UNITS.vmCount} used={used} />
+      <TableData activeColumnIDs={activeColumnIDs} id={QuotaColumn.VMI_COUNT}>
+        <QuotaLimitBar hard={hard} resourceKey={vmiCount} unit={QUOTA_UNITS.vmiCount} used={used} />
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id={QuotaColumn.ADDITIONAL}>
         <AdditionalQuotaPopover
