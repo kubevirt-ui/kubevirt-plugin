@@ -45,12 +45,16 @@ const useEnvironmentsResources = (namespace: string): UseEnvironmentsResourcesTy
     namespaced: true,
   });
 
+  const secretsSettled = secretsLoaded || !!secretsError;
+  const configMapsSettled = configMapsLoaded || !!configMapsError;
+  const serviceAccountsSettled = serviceAccountsLoaded || !!serviceAccountsError;
+
   return {
-    configMaps,
-    error: secretsError || configMapsError || serviceAccountsError,
-    loaded: serviceAccountsLoaded && configMapsLoaded && secretsLoaded,
-    secrets,
-    serviceAccounts,
+    configMaps: configMapsError ? [] : configMaps,
+    error: secretsError && configMapsError && serviceAccountsError ? secretsError : undefined,
+    loaded: secretsSettled && configMapsSettled && serviceAccountsSettled,
+    secrets: secretsError ? [] : secrets,
+    serviceAccounts: serviceAccountsError ? [] : serviceAccounts,
   };
 };
 
