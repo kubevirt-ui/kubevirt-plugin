@@ -14,7 +14,7 @@ const sortUDNByMTU =
     return direction === 'asc' ? result : -result;
   };
 
-const useVMNetworkColumns = (): { id: string; title: string }[] => {
+const useVMNetworkColumns = (): [TableColumn<ClusterUserDefinedNetworkKind>[], boolean] => {
   const { t } = useKubevirtTranslation();
 
   const columns: TableColumn<ClusterUserDefinedNetworkKind>[] = useMemo(
@@ -56,13 +56,13 @@ const useVMNetworkColumns = (): { id: string; title: string }[] => {
     [t],
   );
 
-  const [activeColumns] = useActiveColumns<ClusterUserDefinedNetworkKind>({
+  const [activeColumns, userSettingsLoaded] = useActiveColumns<ClusterUserDefinedNetworkKind>({
     columnManagementID: 'VMNetworkList',
     columns,
     showNamespaceOverride: false,
   });
 
-  return activeColumns;
+  return [activeColumns, userSettingsLoaded];
 };
 
 export default useVMNetworkColumns;
