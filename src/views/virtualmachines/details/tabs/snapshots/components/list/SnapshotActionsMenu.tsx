@@ -10,6 +10,7 @@ import RestoreModal from '@kubevirt-utils/components/SnapshotModal/RestoreModal'
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sDelete } from '@multicluster/k8sRequests';
 import { ButtonVariant, Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
@@ -86,11 +87,15 @@ const SnapshotActionsMenu: FC<SnapshotActionsMenuProps> = ({
 
   return (
     <Dropdown
+      toggle={KebabToggle({
+        id: `snapshot-actions-${snapshot?.metadata?.name}`,
+        isExpanded: isDropdownOpen,
+        onClick: onToggle,
+      })}
       isOpen={isDropdownOpen}
       onOpenChange={setIsDropdownOpen}
       onSelect={() => setIsDropdownOpen(false)}
-      popperProps={{ position: 'right' }}
-      toggle={KebabToggle({ id: 'toggle-id-6', isExpanded: isDropdownOpen, onClick: onToggle })}
+      popperProps={{ appendTo: getContentScrollableElement, position: 'right' }}
     >
       <DropdownList>
         <DropdownItem
@@ -102,7 +107,7 @@ const SnapshotActionsMenu: FC<SnapshotActionsMenuProps> = ({
           {t('Create VirtualMachine')}
         </DropdownItem>
         <DropdownItem
-          description={t('Restore the VirtualMachine to this snapshot`s state')}
+          description={t("Restore the VirtualMachine to this snapshot's state")}
           isDisabled={isRestoreDisabled}
           key="snapshot-restore"
           onClick={onRestoreModalToggle}
