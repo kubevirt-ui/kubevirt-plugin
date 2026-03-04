@@ -139,8 +139,8 @@ const getPersistentVolumeClaimHotplugPromise = (
     disk: resultDisk,
     name: resultDisk.name,
     volumeSource: {
-      dataVolume: {
-        name: pvcName,
+      persistentVolumeClaim: {
+        claimName: pvcName,
       },
     },
   };
@@ -157,10 +157,6 @@ export const hotplugPromise = (vmObj: V1VirtualMachine, diskState: V1DiskFormSta
       diskState?.volume?.persistentVolumeClaim?.claimName,
       diskState.disk,
     );
-  }
-  if (diskSource === SourceTypes.UPLOAD) {
-    const pvcName = `${vmObj?.metadata?.name}-${diskState.disk.name}`;
-    return getPersistentVolumeClaimHotplugPromise(vmObj, pvcName, diskState.disk);
   }
 
   const dataVolume = produce(diskState.dataVolumeTemplate, (draftDataVolumeTemplate) => {
