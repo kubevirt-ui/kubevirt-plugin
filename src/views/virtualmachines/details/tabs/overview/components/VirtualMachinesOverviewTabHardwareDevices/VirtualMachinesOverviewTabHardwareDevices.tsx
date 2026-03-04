@@ -1,10 +1,10 @@
-import * as React from 'react';
+import React, { FC, useState } from 'react';
 
-import { V1GPU, V1HostDevice, V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import HardwareDevicesList from '@kubevirt-utils/components/HardwareDevices/list/HardwareDevicesList';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
 import { hasS390xArchitecture } from '@kubevirt-utils/resources/vm/utils/architecture';
-import { VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Card,
   CardBody,
@@ -15,24 +15,20 @@ import {
   TabTitleText,
 } from '@patternfly/react-core';
 
-import useHardwareDevicesColumns from './hooks/useHardwareDevicesColumns';
-import VirtualMachinesOverviewTabHardwareDevicesRow from './VirtualMachinesOverviewTabHardwareDevicesRow';
-
-import './virtual-machines-overview-tab-hardware-devices.scss';
 type VirtualMachinesOverviewTabHardwareDevicesProps = {
   vm: V1VirtualMachine;
 };
 
-const VirtualMachinesOverviewTabHardwareDevices: React.FC<
+const VirtualMachinesOverviewTabHardwareDevices: FC<
   VirtualMachinesOverviewTabHardwareDevicesProps
 > = ({ vm }) => {
   const { t } = useKubevirtTranslation();
-  const columns = useHardwareDevicesColumns();
-  const [activeTabKey, setActiveTabKey] = React.useState<number | string>(0);
+  const [activeTabKey, setActiveTabKey] = useState<number | string>(0);
+
   const hostDevices = getHostDevices(vm);
-  const hostDevicesCount = hostDevices?.length;
+  const hostDevicesCount = hostDevices?.length ?? 0;
   const gpus = getGPUDevices(vm);
-  const gpusCount = gpus?.length;
+  const gpusCount = gpus?.length ?? 0;
   const vmHasS390xArchitecture = hasS390xArchitecture(vm);
 
   const handleTabClick = (
@@ -43,52 +39,44 @@ const VirtualMachinesOverviewTabHardwareDevices: React.FC<
   };
 
   return (
-    <div className="VirtualMachinesOverviewTabHardware--main">
-      <Card>
-        <CardTitle className="pf-v6-u-text-color-subtle">
-          {t('Hardware devices ({{devices}})', { devices: hostDevicesCount + gpusCount })}
-        </CardTitle>
-        <Divider />
-        <CardBody isFilled>
-          <Tabs activeKey={activeTabKey} onSelect={handleTabClick}>
-            {!vmHasS390xArchitecture && (
-              <Tab
-                title={
-                  <TabTitleText>{t('GPU devices ({{gpusCount}})', { gpusCount })}</TabTitleText>
-                }
-                eventKey={0}
-              >
-                <VirtualizedTable<V1GPU>
-                  columns={columns}
-                  data={gpus}
-                  loaded
-                  loadError={false}
-                  Row={VirtualMachinesOverviewTabHardwareDevicesRow}
-                  unfilteredData={gpus}
-                />
-              </Tab>
-            )}
+    <Card data-test="overview-hardware-devices-card">
+      <CardTitle className="pf-v6-u-text-color-subtle">
+        {t('Hardware devices ({{devices}})', { devices: hostDevicesCount + gpusCount })}
+      </CardTitle>
+      <Divider />
+      <CardBody isFilled>
+        <Tabs activeKey={activeTabKey} onSelect={handleTabClick}>
+          {!vmHasS390xArchitecture && (
             <Tab
-              title={
-                <TabTitleText>
-                  {t('Host devices ({{hostDevicesCount}})', { hostDevicesCount })}
-                </TabTitleText>
-              }
-              eventKey={vmHasS390xArchitecture ? 0 : 1}
+              eventKey={0}
+              title={<TabTitleText>{t('GPU devices ({{gpusCount}})', { gpusCount })}</TabTitleText>}
             >
-              <VirtualizedTable<V1HostDevice>
-                columns={columns}
-                data={hostDevices}
-                loaded
-                loadError={false}
-                Row={VirtualMachinesOverviewTabHardwareDevicesRow}
-                unfilteredData={hostDevices}
+              <HardwareDevicesList
+                className="kubevirt-table--tabs-content kubevirt-table--in-card"
+                devices={gpus}
+                noDataMsg={t('No GPU devices found')}
+                showActions={false}
               />
             </Tab>
-          </Tabs>
-        </CardBody>
-      </Card>
-    </div>
+          )}
+          <Tab
+            title={
+              <TabTitleText>
+                {t('Host devices ({{hostDevicesCount}})', { hostDevicesCount })}
+              </TabTitleText>
+            }
+            eventKey={vmHasS390xArchitecture ? 0 : 1}
+          >
+            <HardwareDevicesList
+              className="kubevirt-table--tabs-content kubevirt-table--in-card"
+              devices={hostDevices}
+              noDataMsg={t('No host devices found')}
+              showActions={false}
+            />
+          </Tab>
+        </Tabs>
+      </CardBody>
+    </Card>
   );
 };
 

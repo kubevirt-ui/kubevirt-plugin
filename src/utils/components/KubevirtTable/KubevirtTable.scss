@@ -47,3 +47,29 @@
     width: 10%;
   }
 }
+
+.kubevirt-table--borderless {
+  .pf-v6-c-table tr {
+    border: none;
+  }
+
+  .pf-v6-c-table tbody > tr:last-child {
+    border-block-end: none;
+  }
+}
+
+.kubevirt-table--in-card {
+  overflow-x: auto;
+
+  .pf-v6-c-table tr {
+    border: none;
+  }
+
+  .pf-v6-c-table tbody > tr:last-child {
+    border-block-end: none;
+  }
+}
+
+.kubevirt-table--tabs-content {
+  padding-block-start: var(--pf-t--global--spacer--md);
+}
