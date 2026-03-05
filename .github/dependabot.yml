@@ -6,3 +6,10 @@ updates:
       interval: daily
     commit-message:
       prefix: 'build: '
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: 'ci: '
