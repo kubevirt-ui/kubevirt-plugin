@@ -3,7 +3,8 @@ import { useMemo } from 'react';
 import { HyperConvergedModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1LabelSelector } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { V1MigrationConfiguration } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { DEFAULT_OPERATOR_NAMESPACE, isEmpty } from '@kubevirt-utils/utils/utils';
+import { operatorNamespaceSignal } from '@kubevirt-utils/store/operatorNamespace';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -56,14 +57,20 @@ type UseHyperConvergeConfigurationType = (
 ) => [hyperConvergeConfig: HyperConverged, loaded: boolean, error: any];
 
 const useHyperConvergeConfiguration: UseHyperConvergeConfigurationType = (cluster) => {
+  const operatorNamespace = operatorNamespaceSignal.value;
+
   const [hyperConvergeData, hyperConvergeDataLoaded, hyperConvergeDataError] = useK8sWatchData<
     HyperConverged[]
-  >({
-    cluster,
-    groupVersionKind: HyperConvergedModelGroupVersionKind,
-    isList: true,
-    namespace: DEFAULT_OPERATOR_NAMESPACE,
-  });
+  >(
+    operatorNamespace && {
+      cluster,
+      groupVersionKind: HyperConvergedModelGroupVersionKind,
+      isList: true,
+      namespace: operatorNamespace,
+    },
+  );
+
+  const hcoLoaded = hyperConvergeDataLoaded && !isEmpty(operatorNamespace);
 
   const hyperConverge = useMemo(
     () => getHyperConvergedObject(hyperConvergeData),
@@ -72,7 +79,7 @@ const useHyperConvergeConfiguration: UseHyperConvergeConfigurationType = (cluste
 
   const memoizedHyperconvergedConfig = useDeepCompareMemoize(hyperConverge);
 
-  return [memoizedHyperconvergedConfig, hyperConvergeDataLoaded, hyperConvergeDataError];
+  return [memoizedHyperconvergedConfig, hcoLoaded, hyperConvergeDataError];
 };
 
 export default useHyperConvergeConfiguration;
