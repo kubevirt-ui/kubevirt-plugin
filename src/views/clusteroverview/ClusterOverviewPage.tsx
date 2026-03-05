@@ -5,6 +5,7 @@ import { useForceProjectSelection } from '@kubevirt-utils/hooks/useForceProjectS
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { HorizontalNav, NavPage } from '@openshift-console/dynamic-plugin-sdk';
+import { useSignals } from '@preact/signals-react/runtime';
 import { VIRTUALIZATION_PATHS } from '@virtualmachines/tree/utils/constants';
 
 import GuidedTour from '../../utils/components/GuidedTour/GuidedTour';
@@ -19,6 +20,8 @@ import TopConsumersTab from './TopConsumersTab/TopConsumersTab';
 const ClusterOverviewPage: FC = () => {
   const { t } = useKubevirtTranslation();
   const isAdmin = useIsAdmin();
+
+  useSignals();
 
   useForceProjectSelection([VIRTUALIZATION_PATHS.OVERVIEW]);
 

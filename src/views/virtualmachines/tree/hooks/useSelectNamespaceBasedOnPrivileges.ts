@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom-v5-compat';
 import { useNavigate, useSearchParams } from 'react-router-dom-v5-compat';
 
+import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
 import { DEFAULT_NAMESPACE, OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
 import { ALL_NAMESPACES, ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
@@ -51,7 +52,7 @@ const useSelectNamespaceBasedOnPrivileges = ({
   const { ns } = useParams<{ ns: string }>();
 
   useEffect(() => {
-    if (isACMPage) return;
+    if (isACMPage || runningTourSignal.value) return;
 
     if (!isAdmin && location.pathname.includes(ALL_NAMESPACES_PATH)) {
       if (projectNamesLoaded && !isEmpty(projectNames)) {
