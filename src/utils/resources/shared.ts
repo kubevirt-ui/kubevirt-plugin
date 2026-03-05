@@ -525,3 +525,6 @@ export const haveSamePropValue = (
   const value = getPropValue(resources[0]);
   return resources.every((resource) => getPropValue(resource) === value);
 };
+
+export const findOwnerRefByKind = (resource: K8sResourceCommon, kind: string): string | undefined =>
+  resource?.metadata?.ownerReferences?.find((ref) => ref.kind === kind)?.name;
