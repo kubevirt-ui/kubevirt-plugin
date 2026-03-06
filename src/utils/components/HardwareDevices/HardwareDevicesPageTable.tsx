@@ -1,17 +1,17 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 
+import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
 
-import MutedTextSpan from '../MutedTextSpan/MutedTextSpan';
-
-import useHardwareDevicesPageColumns from './list/hooks/useHardwareDevicesPageColumns ';
 import { HardwareDevicePageRow } from './utils/constants';
-import HardwareDevicesPageRow from './HardwareDevicesPageRow';
+import {
+  getHardwareDevicePageRowId,
+  getHardwareDevicesPageColumns,
+} from './hardwareDevicesPageDefinition';
 
 type HardwareDevicesPageTableProps = {
   devices: HardwareDevicePageRow[];
-  error: Error;
+  error?: Error;
   loaded: boolean;
 };
 
@@ -21,17 +21,20 @@ const HardwareDevicesPageTable: FC<HardwareDevicesPageTableProps> = ({
   loaded,
 }) => {
   const { t } = useKubevirtTranslation();
-  const columns = useHardwareDevicesPageColumns();
+
+  const columns = useMemo(() => getHardwareDevicesPageColumns(t), [t]);
 
   return (
-    <VirtualizedTable
+    <KubevirtTable
+      ariaLabel={t('Hardware devices page table')}
       columns={columns}
       data={devices}
-      EmptyMsg={() => <MutedTextSpan text={t('Not available')} />}
+      dataTest="hardware-devices-page-table"
+      fixedLayout
+      getRowId={getHardwareDevicePageRowId}
       loaded={loaded}
       loadError={error}
-      Row={HardwareDevicesPageRow}
-      unfilteredData={devices}
+      noDataEmptyText={t('No hardware devices found')}
     />
   );
 };
