@@ -1,0 +1,13 @@
+.storage-migration-plans-widget {
+  &__body {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+
+  &__body-grid {
+    .status-count-item__grid-item {
+      padding-inline-start: 0;
+    }
+  }
+}

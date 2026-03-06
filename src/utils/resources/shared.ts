@@ -22,6 +22,10 @@ import { isDataSourceReady } from '../../views/datasources/utils';
 
 import { isEmpty } from './../utils/utils';
 import { getDataImportCronFromDataSource } from './bootableresources/helpers';
+import type {
+  MultiNamespaceVirtualMachineStorageMigrationPlan,
+  StorageMigrationPlanNamespaceStatus,
+} from './migrations/constants';
 import {
   isDataSourceCloning,
   isDataSourceUploading,
@@ -497,6 +501,17 @@ export const getReadyOrCloningOrUploadingDataSources = (
  * @returns status phase for the entity
  */
 export const getStatusPhase = <T = string>(entity: K8sResourceKind): T => entity?.status?.phase;
+
+/**
+ * A selector for the status namespaces of a MultiNamespaceVirtualMachineStorageMigrationPlan.
+ * Each namespace status contains migration progress (completedMigrations, inProgressMigrations,
+ * failedMigrations, readyMigrations, etc.) per namespace in the plan.
+ * @param {MultiNamespaceVirtualMachineStorageMigrationPlan} plan - storage migration plan (migrations.kubevirt.io/v1alpha1)
+ * @returns status namespaces array, or undefined if status is not yet populated
+ */
+export const getStatusNamespaces = (
+  plan: MultiNamespaceVirtualMachineStorageMigrationPlan,
+): StorageMigrationPlanNamespaceStatus[] | undefined => plan?.status?.namespaces;
 
 /**
  * A selector for the entity's creation timestamp

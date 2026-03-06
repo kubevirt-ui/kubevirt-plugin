@@ -7,6 +7,11 @@
     margin-block-end: 0;
   }
 
+  &__update-available {
+    font-size: var(--pf-t--global--font--size--body--sm);
+    margin-top: var(--pf-t--global--spacer--sm);
+  }
+
   &__body-grid {
     display: grid;
 

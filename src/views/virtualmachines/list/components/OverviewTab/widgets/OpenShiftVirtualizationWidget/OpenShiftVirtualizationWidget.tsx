@@ -4,17 +4,17 @@ import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import useInfrastructureAlerts from '@kubevirt-utils/hooks/useInfrastructureAlerts/useInfrastructureAlerts';
 import { useKubevirtClusterServiceVersion } from '@kubevirt-utils/hooks/useKubevirtClusterServiceVersion';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  HealthState,
-  RedExclamationCircleIcon,
-  YellowExclamationTriangleIcon,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { HealthState } from '@openshift-console/dynamic-plugin-sdk';
 import { healthStateMapping } from '@overview/OverviewTab/status-card/utils/utils';
 import { Card, CardBody, CardHeader, CardTitle, Grid, Skeleton } from '@patternfly/react-core';
 
 import StatusCountItem from '../shared/StatusCountItem';
 
+import { getUpdateAvailableActions } from './getUpdateAvailableActions';
+import MultiClusterHealthStatus from './MultiClusterHealthStatus';
 import { useCNVHealth } from './useCNVHealth';
+import { useCNVUpdate } from './useCNVUpdate';
+import { getHealthStateToMessage, NBSP } from './utils';
 
 import './OpenShiftVirtualizationWidget.scss';
 
@@ -22,15 +22,6 @@ type OpenShiftVirtualizationWidgetProps = {
   cluster?: string;
   isAllClustersPage?: boolean;
 };
-
-const NBSP = '\u00A0';
-
-const getHealthStateToMessage = (t: (key: string) => string): Record<string, string> => ({
-  [HealthState.ERROR]: t('Error'),
-  [HealthState.NOT_AVAILABLE]: t('Not available'),
-  [HealthState.OK]: t('Available'),
-  [HealthState.WARNING]: t('Degraded'),
-});
 
 const OpenShiftVirtualizationWidget: FC<OpenShiftVirtualizationWidgetProps> = ({
   cluster,
@@ -52,6 +43,10 @@ const OpenShiftVirtualizationWidget: FC<OpenShiftVirtualizationWidgetProps> = ({
     healthState,
     loaded: healthLoaded,
   } = useCNVHealth(cluster, isAllClustersPage);
+  const { isSpokeCluster, operatorLink, operatorLinkExternal, updateAvailable } = useCNVUpdate(
+    cluster,
+    isAllClustersPage,
+  );
 
   const version = installedCSV?.spec?.version;
   const statusIcon = healthStateMapping[healthState]?.icon;
@@ -78,7 +73,14 @@ const OpenShiftVirtualizationWidget: FC<OpenShiftVirtualizationWidgetProps> = ({
       data-test="openshift-virtualization-widget"
       isCompact
     >
-      <CardHeader>
+      <CardHeader
+        actions={getUpdateAvailableActions({
+          isSpokeCluster,
+          operatorLink,
+          operatorLinkExternal,
+          updateAvailable,
+        })}
+      >
         <CardTitle>{t('OpenShift Virtualization')}</CardTitle>
       </CardHeader>
       <CardBody>
@@ -87,40 +89,13 @@ const OpenShiftVirtualizationWidget: FC<OpenShiftVirtualizationWidgetProps> = ({
         {!healthError && !csvError && (
           <Grid className="openshift-virtualization-widget__body-grid" hasGutter>
             {isAllClustersPage && (
-              <>
-                {[
-                  {
-                    clusters: criticalClusters,
-                    count: criticalCount,
-                    icon: <RedExclamationCircleIcon />,
-                    label: t('Clusters critical'),
-                  },
-                  {
-                    clusters: degradedClusters,
-                    count: degradedCount,
-                    icon: <YellowExclamationTriangleIcon />,
-                    label: t('Clusters degraded'),
-                  },
-                ].map(({ clusters, count, icon, label }) => (
-                  <StatusCountItem
-                    tooltip={
-                      clusters.length > 0 && (
-                        <div>
-                          {clusters.map((name) => (
-                            <div key={name}>{name}</div>
-                          ))}
-                        </div>
-                      )
-                    }
-                    count={count}
-                    icon={icon}
-                    isLoading={isLoading}
-                    key={label}
-                    label={label}
-                    span={6}
-                  />
-                ))}
-              </>
+              <MultiClusterHealthStatus
+                criticalClusters={criticalClusters}
+                criticalCount={criticalCount}
+                degradedClusters={degradedClusters}
+                degradedCount={degradedCount}
+                isLoading={isLoading}
+              />
             )}
             {!isAllClustersPage && (
               <>
