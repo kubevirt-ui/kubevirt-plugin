@@ -1,8 +1,6 @@
 import React, { FC, useMemo } from 'react';
 
-import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
-import useMigrationCardDataAndFilters from '@overview/MigrationsTab/hooks/useMigrationCardData';
 import {
   getClustersWithVMsCount,
   getNamespacesWithVMsCount,
@@ -15,7 +13,6 @@ import {
   OverviewSectionData,
 } from '../../types';
 import ClusterUtilizationWidget from '../ClusterUtilizationWidget/ClusterUtilizationWidget';
-import MigrationsWidget from '../MigrationsWidget/MigrationsWidget';
 import OpenShiftVirtualizationWidget from '../OpenShiftVirtualizationWidget/OpenShiftVirtualizationWidget';
 import OverviewSection from '../OverviewSection/OverviewSection';
 import OverviewSectionRow from '../OverviewSection/OverviewSectionRow';
@@ -26,12 +23,8 @@ import ClustersUtilizationCard from './components/ClustersUtilizationCard/Cluste
 import NodeLoadDistributionCard from './components/NodeLoadDistributionCard/NodeLoadDistributionCard';
 import useClusterUtilizationData from './hooks/useClusterUtilizationData';
 
-const MIGRATIONS_DURATION = DurationOption.ONE_DAY.toString();
-
 const ClusterStatusWidget: FC<OverviewSectionData> = ({ cluster, title, vms }) => {
   const isAllClustersPage = useIsAllClustersPage();
-  const { filteredVMIMS, loaded: migrationsLoaded } =
-    useMigrationCardDataAndFilters(MIGRATIONS_DURATION);
   const {
     cpuLoad,
     loaded: utilizationLoaded,
@@ -54,11 +47,6 @@ const ClusterStatusWidget: FC<OverviewSectionData> = ({ cluster, title, vms }) =
           isAllClustersPage={isAllClustersPage}
           projectsCount={namespacesWithVMsCount}
           vmsCount={vms?.length || 0}
-        />
-        <MigrationsWidget
-          isAllClustersPage={isAllClustersPage}
-          isLoading={!migrationsLoaded}
-          vmims={filteredVMIMS}
         />
       </OverviewSectionRow>
       {isAllClustersPage ? (

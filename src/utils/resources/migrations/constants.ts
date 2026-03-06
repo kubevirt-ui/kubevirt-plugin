@@ -23,6 +23,26 @@ export type VirtualMachinesMigrationSpec = {
     volumeName: string;
   }[];
 };
+
+export const STORAGE_MIGRATION_PHASE = {
+  COMPLETED: 'completedMigrations',
+  FAILED: 'failedMigrations',
+  IN_PROGRESS: 'inProgressMigrations',
+  INVALID: 'invalidMigrations',
+  READY: 'readyMigrations',
+} as const;
+
+export type StorageMigrationPlanNamespaceStatus = {
+  [STORAGE_MIGRATION_PHASE.COMPLETED]: MigrationStatus[];
+  [STORAGE_MIGRATION_PHASE.FAILED]: MigrationStatus[];
+  [STORAGE_MIGRATION_PHASE.IN_PROGRESS]: MigrationStatus[];
+  [STORAGE_MIGRATION_PHASE.INVALID]: MigrationStatus[];
+  [STORAGE_MIGRATION_PHASE.READY]: MigrationStatus[];
+  completedOutOf: number;
+  conditions: K8sResourceCondition[];
+  suffix: string;
+};
+
 export type MultiNamespaceVirtualMachineStorageMigrationPlan = K8sResourceCommon & {
   spec: {
     namespaces: {
@@ -31,16 +51,7 @@ export type MultiNamespaceVirtualMachineStorageMigrationPlan = K8sResourceCommon
     }[];
   };
   status?: {
-    namespaces: {
-      completedMigrations: MigrationStatus[];
-      completedOutOf: number;
-      conditions: K8sResourceCondition[];
-      failedMigrations: MigrationStatus[];
-      inProgressMigrations: MigrationStatus[];
-      invalidMigrations: MigrationStatus[];
-      readyMigrations: MigrationStatus[];
-      suffix: string;
-    }[];
+    namespaces: StorageMigrationPlanNamespaceStatus[];
   };
 };
 
@@ -48,16 +59,7 @@ export type VirtualMachineStorageMigrationPlan = K8sResourceCommon & {
   spec: {
     virtualMachines: VirtualMachinesMigrationSpec[];
   };
-  status?: {
-    completedMigrations: MigrationStatus[];
-    completedOutOf: number;
-    conditions: K8sResourceCondition[];
-    failedMigrations: MigrationStatus[];
-    inProgressMigrations: MigrationStatus[];
-    invalidMigrations: MigrationStatus[];
-    readyMigrations: MigrationStatus[];
-    suffix: string;
-  };
+  status?: StorageMigrationPlanNamespaceStatus;
 };
 
 export type MultiNamespaceVirtualMachineStorageMigration = K8sResourceCommon & {

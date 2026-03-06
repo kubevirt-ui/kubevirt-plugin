@@ -8,11 +8,13 @@ import {
   OverviewLevel,
   OverviewSectionConfig,
   SECTION_ID_CLUSTER_STATUS,
+  SECTION_ID_MIGRATION_STATUS,
   SECTION_ID_RESOURCE_ALLOCATION,
   SECTION_ID_VM_HEALTH,
 } from './types';
 import {
   ClusterStatusWidget,
+  MigrationStatusSection,
   ResourceAllocationSection,
   VirtualMachinesHealthWidget,
 } from './widgets';
@@ -24,6 +26,11 @@ const getSharedSections = (t: TFunction): OverviewSectionConfig[] => [
     title: t('Virtual machines health'),
   },
   {
+    Component: MigrationStatusSection,
+    id: SECTION_ID_MIGRATION_STATUS,
+    title: t('Migration status'),
+  },
+  {
     Component: ResourceAllocationSection,
     id: SECTION_ID_RESOURCE_ALLOCATION,
     title: t('Virtualization resource allocation & consumption'),
@@ -32,8 +39,8 @@ const getSharedSections = (t: TFunction): OverviewSectionConfig[] => [
 
 /**
  * Returns the appropriate overview configuration based on the current level.
- * Cluster and multi-cluster levels include the Cluster status section;
- * project level shows only health and resource allocation.
+ * Cluster and multi-cluster levels prepend the Cluster status section;
+ * project level shows only the shared sections.
  */
 export const getOverviewConfig = (level: OverviewLevel, t: TFunction): OverviewConfig => {
   const shared = getSharedSections(t);

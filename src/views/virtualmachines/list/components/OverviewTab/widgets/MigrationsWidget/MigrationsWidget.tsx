@@ -12,6 +12,7 @@ import ViewAllLink from '../shared/ViewAllLink';
 import './MigrationsWidget.scss';
 
 type MigrationsWidgetProps = {
+  cardTitle?: string;
   isAllClustersPage: boolean;
   isLoading?: boolean;
   onViewAll?: () => void;
@@ -19,6 +20,7 @@ type MigrationsWidgetProps = {
 };
 
 const MigrationsWidget: FC<MigrationsWidgetProps> = ({
+  cardTitle,
   isAllClustersPage,
   isLoading,
   onViewAll,
@@ -28,7 +30,8 @@ const MigrationsWidget: FC<MigrationsWidgetProps> = ({
 
   const statusCounts = useMemo(() => getMigrationStatusCounts(vmims), [vmims]);
 
-  const title = isAllClustersPage ? t('Cross cluster migrations') : t('Migrations');
+  const title =
+    cardTitle ?? (isAllClustersPage ? t('Cross cluster migrations') : t('Compute migrations'));
 
   return (
     <Card className="migrations-widget" data-test="migrations-widget" isCompact>

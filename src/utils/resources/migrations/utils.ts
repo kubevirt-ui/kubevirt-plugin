@@ -1,6 +1,11 @@
+import { getStatusNamespaces } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
-import { MultiNamespaceVirtualMachineStorageMigrationPlan, STATUS_READY } from './constants';
+import {
+  MultiNamespaceVirtualMachineStorageMigrationPlan,
+  STATUS_READY,
+  STORAGE_MIGRATION_PHASE,
+} from './constants';
 
 const getMigrationConditionTimestamp = (
   migration: MultiNamespaceVirtualMachineStorageMigrationPlan,
@@ -44,9 +49,14 @@ export const getVolumeCountFromMigPlan = (
 export const isMigrationCompleted = (
   migrationPlan: MultiNamespaceVirtualMachineStorageMigrationPlan,
 ) => {
-  return migrationPlan?.status?.namespaces?.every(
+  const statusNamespaces = getStatusNamespaces(migrationPlan);
+  const specNamespaces = migrationPlan?.spec?.namespaces;
+
+  if (!statusNamespaces?.length || statusNamespaces.length !== specNamespaces?.length) return false;
+
+  return statusNamespaces.every(
     (namespaceStatus, index) =>
-      namespaceStatus?.completedMigrations?.length ===
-      migrationPlan?.spec?.namespaces?.[index]?.virtualMachines?.length,
+      namespaceStatus?.[STORAGE_MIGRATION_PHASE.COMPLETED]?.length ===
+      specNamespaces[index]?.virtualMachines?.length,
   );
 };
