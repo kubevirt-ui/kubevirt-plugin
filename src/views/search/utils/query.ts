@@ -72,3 +72,11 @@ export const getRowFilterQueryKey = (fieldKey: string) =>
   skipRowFilterPrefix.has(fieldKey as VirtualMachineRowFilterType)
     ? fieldKey
     : `${ROW_FILTERS_PREFIX}${fieldKey}`;
+
+export const buildContextSearchInputs = (
+  cluster?: string,
+  namespace?: string,
+): AdvancedSearchQueryInputs => ({
+  ...(cluster && { [VirtualMachineRowFilterType.Cluster]: [cluster] }),
+  ...(namespace && { [VirtualMachineRowFilterType.Project]: [namespace] }),
+});

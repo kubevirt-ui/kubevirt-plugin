@@ -468,7 +468,7 @@ export const highlightMatchedTreeItems = (
     const copy = { ...item };
 
     if ((isProjectItem(copy) || isClusterItem(copy)) && nameMatchesSearch(copy, searchText)) {
-      copy.name = <b>{copy.name}</b>;
+      copy.name = <b className="pf-v6-u-font-weight-bold">{copy.name}</b>;
     }
 
     if (copy.children) {

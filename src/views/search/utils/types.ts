@@ -29,8 +29,14 @@ export type AdvancedSearchQueryInputs = Partial<{
   [VirtualMachineRowFilterType.StorageClass]: string[];
 }>;
 
+export type SearchSuggestResource = {
+  cluster?: string;
+  name: string;
+  namespace?: string;
+};
+
 export type SearchSuggestResult = {
-  resources: { cluster?: string; name: string; namespace?: string }[];
+  resources: SearchSuggestResource[];
   resourcesMatching: Record<
     | VirtualMachineRowFilterType.Description
     | VirtualMachineRowFilterType.IP

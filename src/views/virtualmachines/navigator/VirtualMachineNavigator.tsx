@@ -8,7 +8,6 @@ import { VirtualMachineModelRef } from '@kubevirt-utils/models';
 import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import { Divider, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
-import SearchBar from '@search/components/SearchBar';
 import VirtualMachineNavPage from '@virtualmachines/details/VirtualMachineNavPage';
 import VirtualMachinesListPageHeader from '@virtualmachines/list/components/VirtualMachinesListPageHeader';
 import VirtualMachinesList from '@virtualmachines/list/VirtualMachinesList';
@@ -63,6 +62,7 @@ const VirtualMachineNavigator: FC = () => {
             aria-label={t('Virtual machines tabs')}
             className="co-horizontal-nav vm-navigator-tabs"
             onSelect={handleTabSelect}
+            usePageInsets
           >
             <Tab
               eventKey={OVERVIEW_TAB_INDEX}
@@ -72,11 +72,8 @@ const VirtualMachineNavigator: FC = () => {
             </Tab>
             <Tab
               eventKey={VM_LIST_TAB_INDEX}
-              title={<TabTitleText data-test="vm-list-tab">{t('VirtualMachines')}</TabTitleText>}
+              title={<TabTitleText data-test="vm-list-tab">{t('Virtual machines')}</TabTitleText>}
             >
-              <div className="vm-search-bar-container">
-                <SearchBar onFilterChange={onFilterChange} />
-              </div>
               <VirtualMachinesList
                 allVMsLoaded={treeProps.loaded}
                 cluster={cluster}

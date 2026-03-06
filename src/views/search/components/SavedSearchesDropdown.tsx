@@ -99,6 +99,7 @@ const SavedSearchesDropdown: FC = () => {
       )}
       isOpen={open}
       onOpenChange={(isOpen: boolean) => setOpen(isOpen)}
+      popperProps={{ position: 'end' }}
     >
       {renderChildren()}
     </Dropdown>
