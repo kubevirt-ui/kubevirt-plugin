@@ -19,6 +19,7 @@ import {
   Dropdown,
   DropdownItem,
   DropdownList,
+  Tooltip,
 } from '@patternfly/react-core';
 import { CopyIcon } from '@patternfly/react-icons';
 import {
@@ -30,12 +31,14 @@ import { isRunning } from '@virtualmachines/utils';
 import VirtualMachinesEditNetworkInterfaceModal from '../modal/VirtualMachinesEditNetworkInterfaceModal';
 
 type NetworkInterfaceActionsProps = {
+  isAutoAttached?: boolean;
   nicName: string;
   nicPresentation: NetworkPresentation;
   vm: V1VirtualMachine;
 };
 
 const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
+  isAutoAttached,
   nicName,
   nicPresentation,
   vm,
@@ -98,7 +101,8 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
   };
 
   const onToggle = () => setIsDropdownOpen((prevIsOpen) => !prevIsOpen);
-  return (
+
+  const dropdown = (
     <Dropdown
       toggle={KebabToggle({
         id: 'toggle-id-6',
@@ -147,6 +151,18 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
         </DropdownItem>
       </DropdownList>
     </Dropdown>
+  );
+
+  return isAutoAttached ? (
+    <Tooltip
+      content={t(
+        'This interface is auto-attached and cannot be edited. Stop the virtual machine to detach it.',
+      )}
+    >
+      <span>{dropdown}</span>
+    </Tooltip>
+  ) : (
+    dropdown
   );
 };
 

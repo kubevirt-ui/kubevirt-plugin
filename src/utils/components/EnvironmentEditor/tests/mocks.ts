@@ -57,6 +57,7 @@ export const exampleVirtualMachineWithEnvironments: V1VirtualMachine = {
             threads: 1,
           },
           devices: {
+            autoattachPodInterface: false,
             disks: [
               {
                 bootOrder: 1,

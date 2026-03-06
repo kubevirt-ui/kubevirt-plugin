@@ -31,7 +31,7 @@ import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/networ
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { NetworkAttachmentDefinitionKind } from '@overview/OverviewTab/inventory-card/utils/types';
 import { ABSENT } from '@virtualmachines/details/tabs/configuration/network/utils/constants';
-import { isStopped } from '@virtualmachines/utils';
+import { isRunning, isStopped } from '@virtualmachines/utils';
 
 import { NetworkAttachmentDefinition } from '../components/hooks/types';
 
@@ -39,7 +39,7 @@ export const hasExplicitlyDefinedPodNetwork = (vm: V1VirtualMachine): boolean =>
   !!getNetworks(vm)?.find(isPodNetwork);
 
 export const podNetworkExists = (vm: V1VirtualMachine): boolean =>
-  hasExplicitlyDefinedPodNetwork(vm) || hasAutoAttachedPodNetwork(vm);
+  hasExplicitlyDefinedPodNetwork(vm) || (hasAutoAttachedPodNetwork(vm) && isRunning(vm));
 
 export const isPodNetworkName = (networkName: string): boolean => networkName === POD_NETWORK;
 

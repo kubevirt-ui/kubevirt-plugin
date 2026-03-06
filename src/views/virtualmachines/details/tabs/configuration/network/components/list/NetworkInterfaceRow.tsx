@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import AutoAttachedBadge from '@kubevirt-utils/components/badges/AutoAttachedBadge/AutoAttachedBadge';
 import EphemeralBadge from '@kubevirt-utils/components/badges/EphemeralBadge/EphemeralBadge';
 import PendingBadge from '@kubevirt-utils/components/badges/PendingBadge/PendingBadge';
 import NetworkIcon from '@kubevirt-utils/components/NetworkIcons/NetworkIcon';
@@ -34,6 +35,7 @@ const NetworkInterfaceRow: FC<
     configLinkState,
     iface,
     interfaceName,
+    isAutoAttached,
     isInterfaceEphemeral,
     isPending,
     isSRIOV,
@@ -52,6 +54,7 @@ const NetworkInterfaceRow: FC<
         {!nicName && interfaceName ? <Label>{interfaceName}</Label> : nicName || NO_DATA_DASH}
         {isPending && !isInterfaceEphemeral && <PendingBadge />}
         {isInterfaceEphemeral && <EphemeralBadge />}
+        {isAutoAttached && <AutoAttachedBadge />}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="model">
         {iface?.model || NO_DATA_DASH}
@@ -72,7 +75,12 @@ const NetworkInterfaceRow: FC<
         {iface?.macAddress || NO_DATA_DASH}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="">
-        <NetworkInterfaceActions nicName={nicName} nicPresentation={config} vm={vm} />
+        <NetworkInterfaceActions
+          isAutoAttached={isAutoAttached}
+          nicName={nicName}
+          nicPresentation={config}
+          vm={vm}
+        />
       </TableData>
     </>
   );

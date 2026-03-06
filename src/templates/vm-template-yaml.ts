@@ -43,6 +43,7 @@ objects:
               sockets: 1
               threads: 1
             devices:
+              autoattachPodInterface: false
               disks:
                 - disk:
                     bus: virtio
