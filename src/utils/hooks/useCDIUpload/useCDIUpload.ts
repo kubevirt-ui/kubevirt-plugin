@@ -34,6 +34,27 @@ export const useCDIUpload = (clusterInput?: string): UseCDIUploadValues => {
   const [upload, setUpload] = React.useState<DataUpload>();
   const uploadProxyURL = getUploadProxyURL(cdiConfig);
 
+  const checkUploadReady = React.useCallback(async (): Promise<void> => {
+    const noRouteFound = configError || !configLoaded || !uploadProxyURL;
+
+    if (noRouteFound) {
+      return Promise.reject({
+        message: t('No Upload URL found {{configError}}', { configError }),
+      });
+    }
+
+    try {
+      await axios.get(getUploadURL(uploadProxyURL));
+    } catch (catchError) {
+      if (!catchError?.response) {
+        return Promise.reject({
+          href: getUploadURL(uploadProxyURL),
+          message: t('Invalid certificate, please visit the following URL and approve it'),
+        });
+      }
+    }
+  }, [configError, configLoaded, uploadProxyURL, t]);
+
   const uploadData = async ({ dataVolume, file }: UploadDataProps) => {
     const { CancelToken } = axios;
     const cancelSource = CancelToken.source();
@@ -131,6 +152,7 @@ export const useCDIUpload = (clusterInput?: string): UseCDIUploadValues => {
   };
 
   return {
+    checkUploadReady,
     upload,
     uploadData,
   };
@@ -152,6 +174,7 @@ export type DataUpload = {
 };
 
 export type UseCDIUploadValues = {
+  checkUploadReady: () => Promise<void>;
   upload: DataUpload;
   uploadData: ({ dataVolume, file }: UploadDataProps) => Promise<void>;
 };
