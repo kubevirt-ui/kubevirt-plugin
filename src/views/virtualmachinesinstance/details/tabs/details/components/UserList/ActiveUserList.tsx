@@ -1,33 +1,42 @@
-import * as React from 'react';
+import React, { FC, ReactNode } from 'react';
 
-import {
-  V1VirtualMachineInstance,
-  V1VirtualMachineInstanceGuestOSUser,
-} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import ActiveUsersList from '@kubevirt-utils/components/ActiveUsersList/ActiveUsersList';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
 import { Bullseye, Icon, Title } from '@patternfly/react-core';
 import { LinkIcon } from '@patternfly/react-icons';
 
 import useGuestOS from '../../../../hooks/useGuestOS';
-
-import useActiveUsersColumns from './hooks/useActiveUsersColumns';
-import ActiveUserListRow from './ActiveUserListRow';
 
 type ActiveUserListProps = {
   pathname: string;
   vmi: V1VirtualMachineInstance;
 };
 
-const ActiveUserList: React.FC<ActiveUserListProps> = ({ pathname, vmi }) => {
+const ActiveUserList: FC<ActiveUserListProps> = ({ pathname, vmi }) => {
   const { t } = useKubevirtTranslation();
-  const columns = useActiveUsersColumns();
-  const [{ userList = [] }, loaded, , isGuestAgentConnected] = useGuestOS(vmi);
+  const [{ userList = [] }, loaded, loadError, isGuestAgentConnected] = useGuestOS(vmi);
+
+  const renderContent = (): ReactNode => {
+    if (!isGuestAgentConnected && loaded && !loadError) {
+      return (
+        <Bullseye data-test="active-users-no-agent">
+          <MutedTextSpan text={t('Guest agent is required')} />
+        </Bullseye>
+      );
+    }
+
+    return <ActiveUsersList data={userList} loaded={loaded} loadError={loadError} />;
+  };
 
   return (
-    <div>
-      <a className="link-icon" href={`${pathname}#logged-in-users`}>
+    <div id="logged-in-users">
+      <a
+        aria-label={t('Navigate to logged-in users section')}
+        className="link-icon"
+        href={`${pathname}#logged-in-users`}
+      >
         <Icon size="sm">
           <LinkIcon />
         </Icon>
@@ -35,25 +44,7 @@ const ActiveUserList: React.FC<ActiveUserListProps> = ({ pathname, vmi }) => {
       <Title className="co-section-heading" headingLevel="h2">
         {t('Active users')}
       </Title>
-      {isGuestAgentConnected ? (
-        <VirtualizedTable<V1VirtualMachineInstanceGuestOSUser>
-          NoDataEmptyMsg={() => (
-            <Bullseye>
-              <MutedTextSpan text={t('No active users')} />
-            </Bullseye>
-          )}
-          columns={columns}
-          data={userList}
-          loaded={loaded}
-          loadError={false}
-          Row={ActiveUserListRow}
-          unfilteredData={userList}
-        />
-      ) : (
-        <Bullseye>
-          <MutedTextSpan text={t('Guest agent is required')} />
-        </Bullseye>
-      )}
+      {renderContent()}
     </div>
   );
 };
