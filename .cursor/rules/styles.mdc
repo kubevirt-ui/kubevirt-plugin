@@ -6,7 +6,7 @@ alwaysApply: false
 
 # SCSS Styling Guidelines
 
-Styling conventions and patterns for this project.
+Styling conventions and patterns for SCSS files in this project.
 
 ---
 
@@ -80,19 +80,19 @@ $vm-details-header-height: 60px;
   }
   
   &__item {
-    padding: var(--pf-v6-global--spacer--md);
-    border-bottom: 1px solid var(--pf-v6-global--BorderColor--100);
+    padding: var(--pf-t--global--spacer--md);
+    border-bottom: 1px solid var(--pf-t--global--border--color--default);
   }
   
   &__empty-state {
     text-align: center;
-    padding: var(--pf-v6-global--spacer--xl);
+    padding: var(--pf-t--global--spacer--xl);
   }
   
   // Modifiers
   &--compact {
     .vm-list__item {
-      padding: var(--pf-v6-global--spacer--sm);
+      padding: var(--pf-t--global--spacer--sm);
     }
   }
   
@@ -107,203 +107,152 @@ $vm-details-header-height: 60px;
 
 ## 3. PatternFly Variables
 
+Use PatternFly tokens. All tokens use the `--pf-t` prefix. Full reference: https://www.patternfly.org/tokens/all-patternfly-tokens
+
 ### Spacing
 ```scss
 // Standard spacers
-padding: var(--pf-v6-global--spacer--xs);   // 4px
-padding: var(--pf-v6-global--spacer--sm);   // 8px
-padding: var(--pf-v6-global--spacer--md);   // 16px
-padding: var(--pf-v6-global--spacer--lg);   // 24px
-padding: var(--pf-v6-global--spacer--xl);   // 32px
-padding: var(--pf-v6-global--spacer--2xl);  // 48px
-padding: var(--pf-v6-global--spacer--3xl);  // 64px
+padding: var(--pf-t--global--spacer--xs);   // 0.25rem (4px)
+padding: var(--pf-t--global--spacer--sm);   // 0.5rem (8px)
+padding: var(--pf-t--global--spacer--md);   // 1rem (16px)
+padding: var(--pf-t--global--spacer--lg);   // 1.5rem (24px)
+padding: var(--pf-t--global--spacer--xl);   // 2rem (32px)
+padding: var(--pf-t--global--spacer--2xl);  // 3rem (48px)
+padding: var(--pf-t--global--spacer--3xl);  // 4rem (64px)
+padding: var(--pf-t--global--spacer--4xl);  // 5rem (80px)
+
+// Semantic gap tokens
+gap: var(--pf-t--global--spacer--gap--text-to-element--default);       // 0.5rem
+gap: var(--pf-t--global--spacer--gap--group--vertical);                // 0.5rem
+gap: var(--pf-t--global--spacer--gap--group--horizontal);              // 1rem
+gap: var(--pf-t--global--spacer--gap--action-to-action--default);      // 1rem
+gap: var(--pf-t--global--spacer--gap--group-to-group--vertical--default);  // 1.5rem
 ```
 
 ### Colors
 ```scss
 // Text colors
-color: var(--pf-v6-global--Color--100);           // Primary text
-color: var(--pf-v6-global--Color--200);           // Secondary text
+color: var(--pf-t--global--text--color--regular);       // Primary text
+color: var(--pf-t--global--text--color--subtle);         // Secondary text
+color: var(--pf-t--global--text--color--placeholder);    // Placeholder text
+color: var(--pf-t--global--text--color--disabled);       // Disabled text
+color: var(--pf-t--global--text--color--inverse);        // Text on inverse backgrounds
 
 // Status colors
-color: var(--pf-v6-global--success-color--100);   // Success/green
-color: var(--pf-v6-global--warning-color--100);   // Warning/yellow
-color: var(--pf-v6-global--danger-color--100);    // Danger/red
-color: var(--pf-v6-global--info-color--100);      // Info/blue
+color: var(--pf-t--global--color--status--success--default);   // Success/green
+color: var(--pf-t--global--color--status--warning--default);   // Warning/yellow
+color: var(--pf-t--global--color--status--danger--default);    // Danger/red
+color: var(--pf-t--global--color--status--info--default);      // Info/purple
+color: var(--pf-t--global--color--status--custom--default);    // Custom/teal
+
+// Brand
+color: var(--pf-t--global--color--brand--default);
 
 // Background
-background-color: var(--pf-v6-global--BackgroundColor--100);
-background-color: var(--pf-v6-global--BackgroundColor--200);
+background-color: var(--pf-t--global--background--color--primary--default);
+background-color: var(--pf-t--global--background--color--secondary--default);
+background-color: var(--pf-t--global--background--color--floating--default);
+background-color: var(--pf-t--global--background--color--disabled--default);
 
 // Borders
-border-color: var(--pf-v6-global--BorderColor--100);
-border-color: var(--pf-v6-global--BorderColor--200);
+border-color: var(--pf-t--global--border--color--default);
+border-color: var(--pf-t--global--border--color--hover);
 
 // Links
-color: var(--pf-v6-global--link--Color);
-color: var(--pf-v6-global--link--Color--hover);
+color: var(--pf-t--global--text--color--link--default);
+color: var(--pf-t--global--text--color--link--hover);
+color: var(--pf-t--global--text--color--link--visited);
 ```
 
 ### Typography
 ```scss
 // Font sizes
-font-size: var(--pf-v6-global--FontSize--xs);    // 12px
-font-size: var(--pf-v6-global--FontSize--sm);    // 14px
-font-size: var(--pf-v6-global--FontSize--md);    // 16px
-font-size: var(--pf-v6-global--FontSize--lg);    // 18px
-font-size: var(--pf-v6-global--FontSize--xl);    // 20px
-font-size: var(--pf-v6-global--FontSize--2xl);   // 24px
+font-size: var(--pf-t--global--font--size--xs);    // 0.75rem (12px)
+font-size: var(--pf-t--global--font--size--sm);    // 0.875rem (14px)
+font-size: var(--pf-t--global--font--size--md);    // 1rem (16px)
+font-size: var(--pf-t--global--font--size--lg);    // 1.125rem (18px)
+font-size: var(--pf-t--global--font--size--xl);    // 1.25rem (20px)
+font-size: var(--pf-t--global--font--size--2xl);   // 1.5rem (24px)
+
+// Body font sizes
+font-size: var(--pf-t--global--font--size--body--sm);        // 0.75rem (12px)
+font-size: var(--pf-t--global--font--size--body--default);   // 0.875rem (14px)
+font-size: var(--pf-t--global--font--size--body--lg);        // 1rem (16px)
+
+// Heading font sizes
+font-size: var(--pf-t--global--font--size--heading--h1);   // 1.5rem
+font-size: var(--pf-t--global--font--size--heading--h2);   // 1.25rem
+font-size: var(--pf-t--global--font--size--heading--h3);   // 1.125rem
 
 // Font weights
-font-weight: var(--pf-v6-global--FontWeight--normal);    // 400
-font-weight: var(--pf-v6-global--FontWeight--bold);      // 700
+font-weight: var(--pf-t--global--font--weight--body--default);     // 400
+font-weight: var(--pf-t--global--font--weight--body--bold);        // 500
+font-weight: var(--pf-t--global--font--weight--heading--default);  // 500
+font-weight: var(--pf-t--global--font--weight--heading--bold);     // 700
 
 // Line heights
-line-height: var(--pf-v6-global--LineHeight--sm);
-line-height: var(--pf-v6-global--LineHeight--md);
+line-height: var(--pf-t--global--font--line-height--heading);  // 1.3
+line-height: var(--pf-t--global--font--line-height--body);     // 1.5
+
+// Font families
+font-family: var(--pf-t--global--font--family--body);
+font-family: var(--pf-t--global--font--family--heading);
+font-family: var(--pf-t--global--font--family--mono);
 ```
 
 ### Borders & Shadows
 ```scss
 // Border widths
-border-width: var(--pf-v6-global--BorderWidth--sm);  // 1px
-border-width: var(--pf-v6-global--BorderWidth--md);  // 2px
+border-width: var(--pf-t--global--border--width--regular);       // 1px
+border-width: var(--pf-t--global--border--width--strong);        // 2px
+border-width: var(--pf-t--global--border--width--extra-strong);  // 3px
 
 // Border radius
-border-radius: var(--pf-v6-global--BorderRadius--sm);
-border-radius: var(--pf-v6-global--BorderRadius--lg);
+border-radius: var(--pf-t--global--border--radius--sharp);   // 0px
+border-radius: var(--pf-t--global--border--radius--tiny);    // 4px
+border-radius: var(--pf-t--global--border--radius--small);   // 6px
+border-radius: var(--pf-t--global--border--radius--medium);  // 16px
+border-radius: var(--pf-t--global--border--radius--large);   // 24px
+border-radius: var(--pf-t--global--border--radius--pill);    // 999px
 
-// Box shadows
-box-shadow: var(--pf-v6-global--BoxShadow--sm);
-box-shadow: var(--pf-v6-global--BoxShadow--md);
-box-shadow: var(--pf-v6-global--BoxShadow--lg);
+// Box shadows (composed from individual tokens)
+box-shadow:
+  var(--pf-t--global--box-shadow--X--sm--default)
+  var(--pf-t--global--box-shadow--Y--sm--default)
+  var(--pf-t--global--box-shadow--blur--sm)
+  var(--pf-t--global--box-shadow--spread--sm--default)
+  var(--pf-t--global--box-shadow--color--sm--default);
+```
+
+### Z-Index
+```scss
+z-index: var(--pf-t--global--z-index--xs);   // 100 - box shadows, hovered elements
+z-index: var(--pf-t--global--z-index--sm);   // 200 - menus, dropdowns
+z-index: var(--pf-t--global--z-index--md);   // 300 - sticky elements, banners
+z-index: var(--pf-t--global--z-index--lg);   // 400 - backdrop
+z-index: var(--pf-t--global--z-index--xl);   // 500 - modals
+z-index: var(--pf-t--global--z-index--2xl);  // 600 - toast alerts (topmost)
 ```
 
 ---
 
-## 4. Layout Patterns
-
-### Flexbox
-```scss
-.container {
-  display: flex;
-  flex-direction: column;
-  gap: var(--pf-v6-global--spacer--md);
-  
-  &__row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--pf-v6-global--spacer--sm);
-  }
-}
-```
-
-### Grid
-```scss
-.grid-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: var(--pf-v6-global--spacer--md);
-}
-```
-
-### Sticky Header
-```scss
-.page-with-sticky-header {
-  &__header {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background-color: var(--pf-v6-global--BackgroundColor--100);
-  }
-  
-  &__content {
-    flex: 1;
-    overflow: auto;
-  }
-}
-```
-
----
-
-## 5. State Styles
-
-### Loading State
-```scss
-.component {
-  &--loading {
-    opacity: 0.6;
-    pointer-events: none;
-    position: relative;
-    
-    &::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-color: rgba(255, 255, 255, 0.5);
-    }
-  }
-}
-```
-
-### Disabled State
-```scss
-.component {
-  &--disabled {
-    opacity: 0.5;
-    pointer-events: none;
-    cursor: not-allowed;
-  }
-}
-```
-
-### Selected State
-```scss
-.list-item {
-  &--selected {
-    background-color: var(--pf-v6-global--BackgroundColor--200);
-    border-left: 3px solid var(--pf-v6-global--primary-color--100);
-  }
-}
-```
-
-### Hover State
-```scss
-.clickable-item {
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  
-  &:hover {
-    background-color: var(--pf-v6-global--BackgroundColor--200);
-  }
-  
-  &:focus {
-    outline: 2px solid var(--pf-v6-global--primary-color--100);
-    outline-offset: 2px;
-  }
-}
-```
-
----
-
-## 6. Responsive Design
+## 4. Responsive Design
 
 ### Breakpoints
 ```scss
 // Mobile first approach
 .component {
   // Mobile styles (default)
-  padding: var(--pf-v6-global--spacer--sm);
+  padding: var(--pf-t--global--spacer--sm);
   
   // Tablet and up
   @media (min-width: 768px) {
-    padding: var(--pf-v6-global--spacer--md);
+    padding: var(--pf-t--global--spacer--md);
   }
   
   // Desktop and up
   @media (min-width: 1024px) {
-    padding: var(--pf-v6-global--spacer--lg);
+    padding: var(--pf-t--global--spacer--lg);
   }
 }
 ```
@@ -325,12 +274,12 @@ box-shadow: var(--pf-v6-global--BoxShadow--lg);
 
 ---
 
-## 7. Best Practices
+## 5. Best Practices
 
 ### Do
 ```scss
-// ✅ Use PatternFly variables
-padding: var(--pf-v6-global--spacer--md);
+// ✅ Use PatternFly tokens
+padding: var(--pf-t--global--spacer--md);
 
 // ✅ Use relative units
 font-size: 1rem;
@@ -341,11 +290,11 @@ width: 100%;
 
 // ✅ Use gap for spacing in flex/grid
 display: flex;
-gap: var(--pf-v6-global--spacer--md);
+gap: var(--pf-t--global--spacer--md);
 
 // ✅ Use logical properties
-margin-inline-start: var(--pf-v6-global--spacer--sm);
-padding-block: var(--pf-v6-global--spacer--md);
+margin-inline-start: var(--pf-t--global--spacer--sm);
+padding-block: var(--pf-t--global--spacer--md);
 ```
 
 ### Don't
@@ -375,99 +324,35 @@ color: #333333;
 
 // ❌ Don't use IDs for styling
 #my-component { }
+
+// ❌ Don't use old --pf-v6-global-- variables (use --pf-t--global-- tokens)
+padding: var(--pf-v6-global--spacer--md);
 ```
 
 ---
 
-## 8. Component-Specific Patterns
-
-### Table Styling
-```scss
-.vm-table {
-  &__row {
-    &--clickable {
-      cursor: pointer;
-      
-      &:hover {
-        background-color: var(--pf-v6-global--BackgroundColor--200);
-      }
-    }
-  }
-  
-  &__cell {
-    &--status {
-      white-space: nowrap;
-    }
-    
-    &--actions {
-      text-align: right;
-    }
-  }
-}
-```
-
-### Card Styling
-```scss
-.vm-card {
-  border: 1px solid var(--pf-v6-global--BorderColor--100);
-  border-radius: var(--pf-v6-global--BorderRadius--sm);
-  background-color: var(--pf-v6-global--BackgroundColor--100);
-  
-  &__header {
-    padding: var(--pf-v6-global--spacer--md);
-    border-bottom: 1px solid var(--pf-v6-global--BorderColor--100);
-  }
-  
-  &__body {
-    padding: var(--pf-v6-global--spacer--md);
-  }
-  
-  &__footer {
-    padding: var(--pf-v6-global--spacer--md);
-    border-top: 1px solid var(--pf-v6-global--BorderColor--100);
-  }
-}
-```
-
-### Modal Styling
-```scss
-.vm-modal {
-  &__content {
-    padding: var(--pf-v6-global--spacer--lg);
-  }
-  
-  &__actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: var(--pf-v6-global--spacer--sm);
-  }
-}
-```
-
----
-
-## 9. Dark Mode Support
+## 6. Dark Mode Support
 
 ### Using CSS Variables
 ```scss
-// PatternFly variables automatically adapt to dark mode
-// Just use the variables consistently
+// PatternFly tokens automatically adapt to dark mode
+// Just use the tokens consistently
 .component {
-  background-color: var(--pf-v6-global--BackgroundColor--100);
-  color: var(--pf-v6-global--Color--100);
-  border-color: var(--pf-v6-global--BorderColor--100);
+  background-color: var(--pf-t--global--background--color--primary--default);
+  color: var(--pf-t--global--text--color--regular);
+  border-color: var(--pf-t--global--border--color--default);
 }
 
 // Avoid hardcoded colors
 // ❌ color: #333;
-// ✅ color: var(--pf-v6-global--Color--100);
+// ✅ color: var(--pf-t--global--text--color--regular);
 ```
 
 ---
 
-## 10. Checklist
+## 7. Checklist
 
-- [ ] Uses PatternFly variables for spacing, colors, typography
+- [ ] Uses PatternFly `--pf-t--` tokens for spacing, colors, typography
 - [ ] Follows BEM naming convention
 - [ ] No `!important` usage
 - [ ] No PatternFly class targeting
