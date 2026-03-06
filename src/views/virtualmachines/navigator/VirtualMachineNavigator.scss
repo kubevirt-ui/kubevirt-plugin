@@ -5,13 +5,5 @@
   top: 0;
   z-index: var(--pf-t--global--z-index--md);
   background-color: var(--pf-t--global--background--color--primary--default);
-}
-
-.vm-search-bar-container {
-  position: sticky;
-  top: var(--vm-tabs-height, 2.8125rem);
-  z-index: var(--pf-t--global--z-index--sm);
-  background-color: var(--pf-t--global--background--color--primary--default);
-  padding: var(--pf-t--global--spacer--md) var(--pf-t--global--spacer--xs);
-  margin: 0 var(--pf-t--global--spacer--md);
+  padding-top: var(--pf-t--global--spacer--sm);
 }

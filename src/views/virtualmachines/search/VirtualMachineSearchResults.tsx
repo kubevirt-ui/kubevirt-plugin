@@ -29,7 +29,7 @@ const VirtualMachineSearchResults: FC = () => {
   return useMemo(
     () => (
       <>
-        <VirtualMachinesListPageHeader namespace={namespace} onFilterChange={onFilterChange} />
+        <VirtualMachinesListPageHeader namespace={namespace} />
         <Divider />
         <VirtualMachinesList
           cluster={cluster}

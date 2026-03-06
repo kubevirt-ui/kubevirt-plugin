@@ -4,6 +4,8 @@ import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-a
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ModalComponentProps } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import {
   Button,
@@ -15,6 +17,7 @@ import {
   ModalFooter,
   ModalHeader,
 } from '@patternfly/react-core';
+import { buildContextSearchInputs } from '@search/utils/query';
 import { useAccessibleResources } from '@virtualmachines/search/hooks/useAccessibleResources';
 
 import { AdvancedSearchInputs, AdvancedSearchQueryInputs } from '../../utils/types';
@@ -57,6 +60,13 @@ const AdvancedSearchModal: FC<AdvancedSearchModalProps> = ({
   const { resources: vms } = useAccessibleResources<V1VirtualMachine>(
     VirtualMachineModelGroupVersionKind,
   );
+  const namespace = useNamespaceParam();
+  const cluster = useClusterParam();
+
+  const prefillInputsWithClusterAndNamespace = {
+    ...prefillInputs,
+    ...buildContextSearchInputs(cluster, namespace),
+  };
 
   const isACMPage = useIsACMPage();
 
@@ -66,7 +76,7 @@ const AdvancedSearchModal: FC<AdvancedSearchModalProps> = ({
   // Initialize store with prefill inputs when component mounts
   const hasInitialized = useRef(false);
   if (!hasInitialized.current) {
-    initializeWithPrefill(prefillInputs);
+    initializeWithPrefill(prefillInputsWithClusterAndNamespace);
     hasInitialized.current = true;
   }
 

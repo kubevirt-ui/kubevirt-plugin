@@ -1,13 +1,16 @@
 import React, { FC } from 'react';
+import useIsAllClustersPage from 'src/multicluster/hooks/useIsAllClustersPage';
 
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { MAX_SUGGESTIONS } from '@kubevirt-utils/components/ListPageFilter/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   Button,
   ButtonVariant,
   EmptyState,
   EmptyStateBody,
+  Flex,
   Panel,
   PanelMain,
   PanelMainBody,
@@ -24,12 +27,15 @@ import {
 } from '../../utils/types';
 import AdvancedSearchIcon from '../AdvancedSearchIcon';
 
+import ClusterProjectInfo from './components/ClusterProjectInfo';
 import RelatedSuggestions from './components/RelatedSuggestions';
 import SearchSuggestBoxFooter from './components/SearchSuggestBoxFooter';
 
 export type SearchSuggestBoxProps = {
+  cluster?: string;
   isSearchInProgress: boolean;
   maxResourceLinks?: number;
+  namespace?: string;
   navigateToSearchResults: (searchInputs: AdvancedSearchQueryInputs) => void;
   searchQuery: string;
   searchSuggestResult?: SearchSuggestResult;
@@ -37,14 +43,18 @@ export type SearchSuggestBoxProps = {
 };
 
 const SearchSuggestBox: FC<SearchSuggestBoxProps> = ({
+  cluster,
   isSearchInProgress,
   maxResourceLinks = MAX_SUGGESTIONS,
+  namespace,
   navigateToSearchResults,
   searchQuery,
   searchSuggestResult,
   showSearchModal,
 }) => {
   const { t } = useKubevirtTranslation();
+
+  const isAllClusters = useIsAllClustersPage();
 
   const suggestResources = searchSuggestResult?.resources.slice(0, maxResourceLinks) ?? [];
   const hasResourcesToSuggest = suggestResources.length > 0;
@@ -72,13 +82,20 @@ const SearchSuggestBox: FC<SearchSuggestBoxProps> = ({
                   {hasResourcesToSuggest &&
                     suggestResources.map((resource, index) => (
                       <StackItem key={`${index}_${resource.name}`}>
-                        <FleetResourceLink
-                          cluster={resource.cluster}
-                          groupVersionKind={VirtualMachineModelGroupVersionKind}
-                          hideIcon
-                          name={resource.name}
-                          namespace={resource.namespace}
-                        />
+                        <Flex direction={{ default: 'column' }} gap={{ default: 'gapSm' }}>
+                          <FleetResourceLink
+                            cluster={resource.cluster}
+                            groupVersionKind={VirtualMachineModelGroupVersionKind}
+                            hideIcon
+                            name={resource.name}
+                            namespace={resource.namespace}
+                          />
+                          <ClusterProjectInfo
+                            isAllClusters={isAllClusters}
+                            isAllNamespaces={isEmpty(namespace)}
+                            resource={resource}
+                          />
+                        </Flex>
                       </StackItem>
                     ))}
                   {!hasResourcesToSuggest && (
@@ -123,6 +140,8 @@ const SearchSuggestBox: FC<SearchSuggestBoxProps> = ({
             onAdvancedSearchClick={() => {
               showSearchModal({ name: searchQuery });
             }}
+            cluster={cluster}
+            namespace={namespace}
             navigateToSearchResults={navigateToSearchResults}
             searchQuery={searchQuery}
           />

@@ -10,16 +10,21 @@ import {
   PanelFooter,
 } from '@patternfly/react-core';
 import AdvancedSearchIcon from '@search/components/AdvancedSearchIcon';
+import { buildContextSearchInputs } from '@search/utils/query';
 
 import { SearchSuggestBoxProps } from '../SearchSuggestBox';
 
 export type SearchSuggestBoxFooterProps = {
+  cluster?: string;
+  namespace?: string;
   navigateToSearchResults: SearchSuggestBoxProps['navigateToSearchResults'];
   onAdvancedSearchClick: ButtonProps['onClick'];
   searchQuery: SearchSuggestBoxProps['searchQuery'];
 };
 
 const SearchSuggestBoxFooter: FC<SearchSuggestBoxFooterProps> = ({
+  cluster,
+  namespace,
   navigateToSearchResults,
   onAdvancedSearchClick,
   searchQuery,
@@ -33,7 +38,10 @@ const SearchSuggestBoxFooter: FC<SearchSuggestBoxFooterProps> = ({
         <Flex>
           <Button
             onClick={() => {
-              navigateToSearchResults({ name: searchQuery });
+              navigateToSearchResults({
+                ...buildContextSearchInputs(cluster, namespace),
+                name: searchQuery,
+              });
             }}
           >
             {t('Search all')}

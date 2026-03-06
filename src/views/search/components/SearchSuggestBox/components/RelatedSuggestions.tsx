@@ -29,9 +29,7 @@ const RelatedSuggestions: FC<RelatedSuggestions> = ({
       <Divider className="pf-v6-u-px-md" />
       <PanelMainBody>
         <Stack hasGutter>
-          <StackItem>
-            <strong>{t('Related suggestions')}</strong>
-          </StackItem>
+          <StackItem className="pf-v6-u-font-weight-bold">{t('Related suggestions')}</StackItem>
           {Object.entries(searchSuggestResult.resourcesMatching)
             .filter(([, count]) => count > 0)
             .map(([field, count]) => (
