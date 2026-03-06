@@ -16,7 +16,7 @@ export const initialQuotaYaml: ApplicationAwareResourceQuota = {
 export const QUOTA_UNITS = {
   cpu: 'vCPU',
   memory: CAPACITY_UNITS.GiB,
-  vmCount: 'VMs',
+  vmiCount: 'VMIs',
 } as const;
 
 export const RESOURCE_KEYS = {

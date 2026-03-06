@@ -2,11 +2,11 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
 import { modelToRef } from '@kubevirt-utils/models';
 import { ApplicationAwareResourceQuotaModel } from '@kubevirt-utils/models';
-import { ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';
+import { ApplicationAwareQuota, CalculationMethod } from '@kubevirt-utils/resources/quotas/types';
 import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 import { sortable, SortByDirection } from '@patternfly/react-table';
 
-import useIsDedicatedVirtualResources from '../../hooks/useIsDedicatedVirtualResources';
+import useAAQCalculationMethod from '../../hooks/useAAQCalculationMethod';
 import { getMainResourceKeys, getQuotaNumbers, getStatus } from '../../utils/utils';
 import { QuotaColumn, QuotaScope } from '../constants';
 
@@ -31,9 +31,12 @@ const useQuotasColumns = (
   scope: QuotaScope,
 ): [TableColumn<ApplicationAwareQuota>[], TableColumn<ApplicationAwareQuota>[], boolean] => {
   const { t } = useKubevirtTranslation();
-  const isDedicatedVirtualResources = useIsDedicatedVirtualResources();
+  const calculationMethod = useAAQCalculationMethod();
+  const hasPodOverhead = calculationMethod === CalculationMethod.VmiPodUsage;
 
-  const { cpu, memory, vmCount } = getMainResourceKeys(isDedicatedVirtualResources);
+  const { cpu, memory, vmiCount } = getMainResourceKeys(
+    calculationMethod === CalculationMethod.DedicatedVirtualResources,
+  );
 
   const getNamespaceColumn = () => {
     if (scope === QuotaScope.CLUSTER) {
@@ -68,19 +71,19 @@ const useQuotasColumns = (
     {
       id: QuotaColumn.CPU,
       sort: sortByPercentage(cpu),
-      title: t('vCPU allocated'),
+      title: hasPodOverhead ? t('CPU allocated') : t('vCPU allocated'),
       transforms: [sortable],
     },
     {
       id: QuotaColumn.MEMORY,
       sort: sortByPercentage(memory),
-      title: t('Memory allocated'),
+      title: hasPodOverhead ? t('Memory allocated') : t('Virtual memory allocated'),
       transforms: [sortable],
     },
     {
-      id: QuotaColumn.VM_COUNT,
-      sort: sortByPercentage(vmCount),
-      title: t('VM limits'),
+      id: QuotaColumn.VMI_COUNT,
+      sort: sortByPercentage(vmiCount),
+      title: t('VMI limits'),
       transforms: [sortable],
     },
     {
