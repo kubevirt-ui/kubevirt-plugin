@@ -66,7 +66,7 @@ const TextFiltersToolbarItem: FC<TextFiltersToolbarItemProps> = ({
           applyTextFilters('name');
           searchType === STATIC_SEARCH_FILTERS.name && setSearchInputText('');
         }}
-        categoryName={STATIC_SEARCH_FILTERS_LABELS.name}
+        categoryName={t(STATIC_SEARCH_FILTERS_LABELS.name)}
         labels={getFilterLabels(textFilters.name)}
       >
         <InputGroup className="co-filter-group">
@@ -93,7 +93,7 @@ const TextFiltersToolbarItem: FC<TextFiltersToolbarItemProps> = ({
                 setSearchInputText('');
               }}
               data={data}
-              placeholder={STATIC_SEARCH_FILTERS_PLACEHOLDERS.labels}
+              placeholder={t(STATIC_SEARCH_FILTERS_PLACEHOLDERS.labels)}
               setTextValue={setSearchInputText}
               textValue={searchInputText}
             />
@@ -124,7 +124,7 @@ const TextFiltersToolbarItem: FC<TextFiltersToolbarItemProps> = ({
         deleteLabelGroup={() => {
           applyTextFilters(STATIC_SEARCH_FILTERS.labels);
         }}
-        categoryName={STATIC_SEARCH_FILTERS_LABELS.labels}
+        categoryName={t(STATIC_SEARCH_FILTERS_LABELS.labels)}
         labels={textFilters.labels ?? []}
       >
         <></>
