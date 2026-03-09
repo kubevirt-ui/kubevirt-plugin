@@ -1,4 +1,11 @@
-**/node_modules
-dist/
+node_modules/
+.cursor/
+.github/
+.husky/
+.vscode/
+
+coverage/
 cypress/
+dist/
+
 *.env

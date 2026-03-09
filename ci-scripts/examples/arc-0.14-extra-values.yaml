@@ -1,0 +1,29 @@
+# Example fragment for ARC Helm ≥ 0.14 (stable gha-runner-scale-set chart).
+# Merge via ARC_RUNNER_EXTRA_VALUES=/path/to/this/file.yaml (ci-scripts/arc/install-runner-scale-set.sh)
+#
+# Ref: https://github.blog/changelog/2026-03-19-actions-runner-controller-release-0-14-0/
+#
+# --- Multilabel (optional) ---
+# Prefer ARC_SCALE_SET_LABELS=kubevirt-plugin-ci,linux,x64 in the environment when using
+# ci-scripts/arc/install-runner-scale-set.sh. If you use this file instead, uncomment:
+#
+# scaleSetLabels:
+#   - kubevirt-plugin-ci
+#   - linux
+#
+# Workflows must then use:
+#   runs-on: [kubevirt-plugin-ci, linux]
+#
+# --- Labels / annotations on ARC-managed resources (0.14+) ---
+# Useful for OpenShift scheduling, cost tags, or policy selectors on listener pods / RBAC.
+#
+# resourceMeta:
+#   autoscalingListener:
+#     labels:
+#       kubernetes.io/os: linux
+#     annotations: {}
+#   listenerServiceAccount:
+#     labels: {}
+#     annotations: {}
+#
+# (See upstream chart values.yaml for the full resourceMeta schema.)
