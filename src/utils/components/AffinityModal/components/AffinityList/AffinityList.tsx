@@ -50,9 +50,10 @@ const AffinityList: FC<AffinityListProps> = ({
           callbacks={callbacks}
           columns={columns}
           data={affinities}
+          dataTest="affinity-list"
           getRowId={getAffinityRowId}
           initialSortKey="type"
-          noDataEmptyMsg={t('No affinity rules found')}
+          noDataMsg={t('No affinity rules found')}
         />
       </StackItem>
       <StackItem>
