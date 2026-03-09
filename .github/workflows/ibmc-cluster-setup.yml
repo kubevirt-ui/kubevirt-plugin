@@ -1,0 +1,223 @@
+name: IBM Cloud Hot Cluster Setup
+
+on:
+  workflow_dispatch:
+    inputs:
+      cluster_name:
+        description: 'Cluster name'
+        required: true
+        default: 'kubevirt-plugin-ci'
+        type: string
+      zone:
+        description: 'IBM Cloud classic infrastructure zone (e.g., dal10, wdc04, fra02)'
+        required: true
+        default: 'wdc04'
+        type: string
+      openshift_version:
+        description: 'OpenShift version'
+        required: true
+        default: '4.20_openshift'
+        type: string
+      worker_flavor:
+        description: 'Worker node flavor (bare metal: mb4c.4x32, mb4c.20x64; vpc: m3c.4x16, m3c.8x64)'
+        required: true
+        default: 'm3c.8x64'
+        type: string
+      worker_count:
+        description: 'Number of worker nodes (at least 2 so ingress is happy)'
+        required: true
+        default: '2'
+        type: string
+      kvm_emulation:
+        description: 'KVM emulation (true for vpc, false for bare metal)'
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+env:
+  CLUSTER_NAME: ${{ inputs.cluster_name || 'kubevirt-plugin-ci' }}
+
+jobs:
+  provision-cluster:
+    name: Provision OpenShift Cluster
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup IBM Cloud CLI
+        uses: IBM/actions-ibmcloud-cli@v1
+        with:
+          api_key: ${{ secrets.IBM_CLOUD_API_KEY }}
+          plugins: kubernetes-service, container-registry
+
+      - name: Check for existing cluster
+        id: check_cluster
+        run: |
+          if ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" &>/dev/null; then
+            echo "Cluster '${CLUSTER_NAME}' already exists"
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Cluster '${CLUSTER_NAME}' does not exist, will create"
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Verify zone and flavor
+        if: steps.check_cluster.outputs.exists == 'false'
+        env:
+          ZONE: ${{ inputs.zone }}
+          FLAVOR: ${{ inputs.worker_flavor }}
+        run: |
+          echo "Fetching classic infrastructure locations and flavors..."
+          LOCATIONS_JSON=$(
+            ibmcloud oc locations --provider classic --show-flavors --output json |\
+            jq '[.[] | select(.kind=="dc")]'
+          )
+
+          echo "Checking zone '${ZONE}' exists..."
+          ZONE_EXISTS=$(
+            echo "${LOCATIONS_JSON}" |\
+            jq -r --arg z "${ZONE}" \
+              '[.[] | select(.id == $z)] | length'
+          )
+          if [[ "${ZONE_EXISTS}" -ne 1 ]]; then
+            echo "ERROR: Zone '${ZONE}' not found in classic infrastructure locations."
+            echo ""
+            echo "Available zones:"
+            echo "${LOCATIONS_JSON}" | jq -r '.[].id' | sort
+            exit 1
+          fi
+          echo "Zone '${ZONE}' exists"
+
+          echo "Checking flavor '${FLAVOR}' is available in zone '${ZONE}'..."
+          FLAVOR_EXISTS=$(
+            echo "${LOCATIONS_JSON}" |\
+            jq -r --arg z "${ZONE}" --arg f "${FLAVOR}" \
+              '.[] | select(.id == $z) | .flavors | split(",") | any(index($f))'
+          )
+          if [[ "${FLAVOR_EXISTS}" == "false" ]]; then
+            echo "ERROR: Flavor '${FLAVOR}' is not available in zone '${ZONE}'."
+            echo ""
+            echo "Available flavors in '${ZONE}':"
+            echo "${LOCATIONS_JSON}" | jq -r --arg z "${ZONE}" '.[] | select(.id == $z) | .flavors[]? | .id' | sort
+            exit 2
+          fi
+          echo "Flavor '${FLAVOR}' is available in zone '${ZONE}'"
+
+      - name: Create ROKS cluster
+        if: steps.check_cluster.outputs.exists == 'false'
+        env:
+          ZONE: ${{ inputs.zone }}
+        run: |
+          echo "Looking up existing VLANs in zone '${ZONE}'..."
+          VLAN_JSON=$(ibmcloud oc vlan ls --zone "${ZONE}" --output json 2>/dev/null || echo "[]")
+          PRIVATE_VLAN=$(echo "${VLAN_JSON}" | jq -r '[.[] | select(.type == "private")] | first | .id // empty')
+          PUBLIC_VLAN=$(echo "${VLAN_JSON}" | jq -r '[.[] | select(.type == "public")] | first | .id // empty')
+
+          if [[ -n "${PRIVATE_VLAN}" ]]; then
+            echo "Reusing existing private VLAN: ${PRIVATE_VLAN}"
+            echo "Reusing existing public VLAN: ${PUBLIC_VLAN:-'(none)'}"
+          else
+            echo "No existing VLANs in zone, new VLANs will be created"
+          fi
+
+          echo "Creating cluster '${CLUSTER_NAME}' with ${{ inputs.worker_count }}x ${{ inputs.worker_flavor }} workers in zone ${ZONE}..."
+          ibmcloud oc cluster create classic \
+            --name "${CLUSTER_NAME}" \
+            --version "${{ inputs.openshift_version }}" \
+            --flavor "${{ inputs.worker_flavor }}" \
+            --workers "${{ inputs.worker_count }}" \
+            --zone "${ZONE}" \
+            --private-vlan "${PRIVATE_VLAN}" \
+            --public-vlan "${PUBLIC_VLAN}"
+
+      - name: Wait for cluster to be ready to use
+        run: |
+          ./ci-scripts/check-roks-cluster-state.sh
+
+      - name: Install oc client from cluster
+        run: |
+          INGRESS=$(ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" --json | jq -r '.ingressHostname')
+          curl -kLo oc.tar "https://downloads-openshift-console.${INGRESS}/amd64/linux/oc.tar"
+          tar -xvf oc.tar
+          sudo mv oc /usr/local/bin/
+          echo "oc version: $(oc version --client)"
+
+      - name: Configure kubeconfig
+        run: |
+          ibmcloud oc cluster config --cluster "${CLUSTER_NAME}" --admin
+          oc cluster-info
+          oc get nodes -o wide
+
+      - name: Install HCO
+        env:
+          KVM_EMULATION: ${{ inputs.kvm_emulation }}
+        run: |
+          ./ci-scripts/install-hco.sh
+
+      - name: Verify ARC secrets
+        run: |
+          HAS_APP=$([ -n "${{ secrets.ARC_GITHUB_APP_ID }}" ] && [ -n "${{ secrets.ARC_GITHUB_APP_INSTALL_ID }}" ] && [ -n "${{ secrets.ARC_GITHUB_APP_PRIVATE_KEY }}" ] && echo "yes" || echo "no")
+          HAS_PAT=$([ -n "${{ secrets.ARC_GITHUB_PAT }}" ] && echo "yes" || echo "no")
+          if [[ "$HAS_APP" != "yes" && "$HAS_PAT" != "yes" ]]; then
+            echo "::error::ARC authentication secrets are missing or empty."
+            echo "Configure either:"
+            echo "  - ARC_GITHUB_APP_ID, ARC_GITHUB_APP_INSTALL_ID, ARC_GITHUB_APP_PRIVATE_KEY (GitHub App), or"
+            echo "  - ARC_GITHUB_PAT (Personal Access Token)"
+            echo "in Settings → Secrets and variables → Actions for this repository (or its organization)."
+            exit 1
+          fi
+          echo "ARC secrets are present."
+
+      - name: Setup ARC runner image and dind mirror
+        id: build_runner
+        env:
+          OC_VERSION: '4.20'
+        run: |
+          ./ci-scripts/arc/setup-dind-mirror.sh
+          IMAGE_REF=$(./ci-scripts/arc/setup-runner-image.sh | grep '^IMAGE_REF=' | cut -d= -f2-)
+          echo "image_ref=${IMAGE_REF}" >> "$GITHUB_OUTPUT"
+
+      - name: Install ARC
+        env:
+          ARC_CONFIG_URL: 'https://github.com/${{ github.repository }}'
+          ARC_APP_ID: ${{ secrets.ARC_GITHUB_APP_ID }}
+          ARC_APP_INSTALL_ID: ${{ secrets.ARC_GITHUB_APP_INSTALL_ID }}
+          ARC_APP_PRIVATE_KEY: ${{ secrets.ARC_GITHUB_APP_PRIVATE_KEY }}
+          ARC_PAT: ${{ secrets.ARC_GITHUB_PAT }}
+          ARC_RUNNER_IMAGE: ${{ steps.build_runner.outputs.image_ref }}
+          # Pin with script default (0.14.0); set to "latest" in the workflow to float OCI tags.
+          ARC_VERSION: '0.14.0'
+        run: |
+          ./ci-scripts/arc/install-arc-controller.sh
+          ./ci-scripts/arc/install-runner-scale-set.sh
+
+      - name: Verify cluster health
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          ./ci-scripts/check-cluster-health.sh
+
+      - name: Setup summary
+        if: always()
+        run: |
+          echo "## Hot Cluster Setup Summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Parameter | Value |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|-----------|-------|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Cluster | \`${CLUSTER_NAME}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Zone | \`${{ inputs.zone }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| OpenShift | \`${{ inputs.openshift_version }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Worker Flavor | \`${{ inputs.worker_flavor }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Workers | \`${{ inputs.worker_count }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| KVM Emulation | \`${{ inputs.kvm_emulation }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          if oc cluster-info &>/dev/null; then
+            echo "Cluster is **healthy** and ready for CI." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Cluster setup **may have issues**. Check the logs." >> "$GITHUB_STEP_SUMMARY"
+          fi
