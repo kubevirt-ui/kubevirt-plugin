@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 
 import { V1KubeVirtConfiguration } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { DEFAULT_OPERATOR_NAMESPACE } from '@kubevirt-utils/utils/utils';
+import { operatorNamespaceSignal } from '@kubevirt-utils/store/operatorNamespace';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -21,12 +22,18 @@ const useKubevirtHyperconvergeConfiguration = (
   hcError: any;
   hcLoaded: boolean;
 } => {
-  const [hcConfig, hcLoaded, hcError] = useK8sWatchData<KubevirtHyperconverged>({
-    cluster,
-    groupVersionKind: KUBEVIRT_HC_GROUP_VERSION_KIND,
-    name: KUBEVIRT_HC_NAME,
-    namespace: DEFAULT_OPERATOR_NAMESPACE,
-  });
+  const operatorNamespace = operatorNamespaceSignal.value;
+
+  const [hcConfig, _hcLoaded, hcError] = useK8sWatchData<KubevirtHyperconverged>(
+    operatorNamespace && {
+      cluster,
+      groupVersionKind: KUBEVIRT_HC_GROUP_VERSION_KIND,
+      name: KUBEVIRT_HC_NAME,
+      namespace: operatorNamespace,
+    },
+  );
+
+  const hcLoaded = _hcLoaded && !isEmpty(operatorNamespace);
 
   const featureGates = useMemo(() => {
     return hcConfig?.spec?.configuration?.developerConfiguration?.featureGates;
