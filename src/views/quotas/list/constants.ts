@@ -5,7 +5,7 @@ export enum QuotaColumn {
   MEMORY = 'memory',
   NAME = 'name',
   NAMESPACE = 'namespace',
-  VM_COUNT = 'vmCount',
+  VMI_COUNT = 'vmiCount',
 }
 
 export enum QuotaScope {

@@ -40,23 +40,27 @@ export const getMainResourceKeys = (isDedicatedVirtualResources: boolean) => {
     memory: isDedicatedVirtualResources
       ? RESOURCE_KEYS.memoryRequestsVMI
       : RESOURCE_KEYS.memoryRequests,
-    vmCount: RESOURCE_KEYS.vmCount,
+    vmiCount: RESOURCE_KEYS.vmiCount,
   };
 };
 
 const getResourceKeyPriority = (key: string): number => {
   if (key.startsWith(RESOURCE_KEYS.cpuRequests)) return 0;
   if (key.startsWith(RESOURCE_KEYS.memoryRequests)) return 1;
-  if (key === RESOURCE_KEYS.vmCount) return 2;
+  if (key === RESOURCE_KEYS.vmiCount) return 2;
   return 3;
 };
 
-const getResourceKeys = (quota: ApplicationAwareQuota): string[] => {
+const getResourceKeysFromStatus = (quota: ApplicationAwareQuota): string[] => {
   return Object.keys(getStatus(quota)?.hard ?? {});
 };
 
+const getResourceKeysFromSpec = (quota: ApplicationAwareQuota): string[] => {
+  return Object.keys(getSpecLimits(quota) ?? {});
+};
+
 export const getSortedResourceKeys = (quota: ApplicationAwareQuota): string[] => {
-  const keys = getResourceKeys(quota);
+  const keys = getResourceKeysFromStatus(quota);
 
   return keys.sort((a, b) => {
     const priorityA = getResourceKeyPriority(a);
@@ -66,8 +70,13 @@ export const getSortedResourceKeys = (quota: ApplicationAwareQuota): string[] =>
   });
 };
 
-export const getAdditionalResourceKeys = (quota: ApplicationAwareQuota): string[] => {
-  return getResourceKeys(quota).filter((key) => getResourceKeyPriority(key) > 2);
+export const getAdditionalResourceKeys = (
+  quota: ApplicationAwareQuota,
+  variant: 'fromSpec' | 'fromStatus' = 'fromStatus',
+): string[] => {
+  const resourceKeys =
+    variant === 'fromSpec' ? getResourceKeysFromSpec(quota) : getResourceKeysFromStatus(quota);
+  return resourceKeys.filter((key) => getResourceKeyPriority(key) > 2);
 };
 
 export const getResourceKeyKind = (key: string): ResourceKeyKind => {
@@ -89,19 +98,19 @@ export const getResourceKeyKind = (key: string): ResourceKeyKind => {
 export const getResourceLabel = (key: string, t: TFunction): string => {
   const labels: Record<string, string> = {
     [RESOURCE_KEYS.configmaps]: t('ConfigMaps'),
-    [RESOURCE_KEYS.cpuLimits]: t('vCPU limits'),
-    [RESOURCE_KEYS.cpuLimitsVMI]: t('vCPU limits (VMs)'),
-    [RESOURCE_KEYS.cpuRequests]: t('vCPU requests'),
-    [RESOURCE_KEYS.cpuRequestsVMI]: t('vCPU requests (VMs)'),
+    [RESOURCE_KEYS.cpuLimits]: t('CPU limits'),
+    [RESOURCE_KEYS.cpuLimitsVMI]: t('vCPU limits'),
+    [RESOURCE_KEYS.cpuRequests]: t('CPU requests'),
+    [RESOURCE_KEYS.cpuRequestsVMI]: t('vCPU requests'),
     [RESOURCE_KEYS.datavolumes]: t('DataVolumes'),
     [RESOURCE_KEYS.ephemeralStorageLimits]: t('Ephemeral storage limits'),
     [RESOURCE_KEYS.ephemeralStorageRequests]: t('Ephemeral storage requests'),
     [RESOURCE_KEYS.gpuLimitsNvidia]: t('GPU limits (NVIDIA)'),
     [RESOURCE_KEYS.gpuRequestsNvidia]: t('GPU requests (NVIDIA)'),
     [RESOURCE_KEYS.memoryLimits]: t('Memory limits'),
-    [RESOURCE_KEYS.memoryLimitsVMI]: t('Memory limits (VMs)'),
+    [RESOURCE_KEYS.memoryLimitsVMI]: t('Virtual memory limits'),
     [RESOURCE_KEYS.memoryRequests]: t('Memory requests'),
-    [RESOURCE_KEYS.memoryRequestsVMI]: t('Memory requests (VMs)'),
+    [RESOURCE_KEYS.memoryRequestsVMI]: t('Virtual memory requests'),
     [RESOURCE_KEYS.persistentvolumeclaims]: t('PVCs'),
     [RESOURCE_KEYS.pods]: t('Pods'),
     [RESOURCE_KEYS.replicationcontrollers]: t('Replication controllers'),

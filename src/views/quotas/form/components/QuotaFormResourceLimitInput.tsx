@@ -1,31 +1,45 @@
 import React, { FC } from 'react';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
-import { Flex, FormGroup } from '@patternfly/react-core';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { Flex, FormGroup, Stack, StackItem } from '@patternfly/react-core';
 
 import NumberTextInput from '../../../../utils/components/NumberTextInput/NumberTextInput';
 
 type QuotaFormResourceLimitInputProps = {
-  helpIconContent: string;
   placeholder?: string;
+  resourceKey: string;
   resourceLimitLabel: string;
   setValue: (value: number) => void;
+  tooltipText: string;
   unitLabel: string;
   value: number;
 };
 
 const QuotaFormResourceLimitInput: FC<QuotaFormResourceLimitInputProps> = ({
-  helpIconContent,
   placeholder,
+  resourceKey,
   resourceLimitLabel,
   setValue,
+  tooltipText,
   unitLabel,
   value,
 }) => {
+  const { t } = useKubevirtTranslation();
+
   return (
     <FormGroup
+      labelHelp={
+        <HelpTextIcon
+          bodyContent={
+            <Stack hasGutter>
+              <StackItem>{tooltipText}</StackItem>
+              <StackItem>{t('Maps to {{resourceKey}}', { resourceKey })}</StackItem>
+            </Stack>
+          }
+        />
+      }
       label={resourceLimitLabel}
-      labelHelp={<HelpTextIcon bodyContent={helpIconContent} />}
     >
       <Flex
         alignItems={{ default: 'alignItemsCenter' }}
