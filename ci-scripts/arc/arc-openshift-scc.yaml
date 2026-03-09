@@ -1,0 +1,61 @@
+# OpenShift Security Context Constraint and ClusterRole for GitHub ARC runners.
+#
+# The runner container uses UID 1001 / GID 123 via Helm template.securityContext.
+# With containerMode.type=dind, the chart adds a privileged docker:dind sidecar that
+# must run as root and start dockerd — so this SCC allows privileged containers and
+# RunAsAny for UIDs (stricter MustRunAs/1001 would block the dind container).
+#
+# Ref: https://developers.redhat.com/articles/2025/02/17/how-securely-deploy-github-arc-openshift
+# ARC dind template: actions-runner-controller charts gha-runner-scale-set
+#
+---
+apiVersion: security.openshift.io/v1
+kind: SecurityContextConstraints
+metadata:
+  name: github-arc
+  annotations:
+    kubernetes.io/description: 'ARC runners: main container as UID 1001 (Helm), Docker-in-Docker privileged sidecar. RunAsAny required for dind root + runner 1001.'
+allowHostDirVolumePlugin: false
+allowHostIPC: false
+allowHostNetwork: false
+allowHostPID: false
+allowHostPorts: false
+allowPrivilegeEscalation: true
+allowPrivilegedContainer: true
+allowedCapabilities: null
+defaultAddCapabilities: null
+fsGroup:
+  type: RunAsAny
+groups: []
+priority: null
+readOnlyRootFilesystem: false
+runAsUser:
+  type: RunAsAny
+seLinuxContext:
+  type: MustRunAs
+supplementalGroups:
+  type: RunAsAny
+users: []
+volumes:
+  - configMap
+  - csi
+  - downwardAPI
+  - emptyDir
+  - ephemeral
+  - persistentVolumeClaim
+  - projected
+  - secret
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: system:openshift:scc:github-arc
+rules:
+  - apiGroups:
+      - security.openshift.io
+    resourceNames:
+      - github-arc
+    resources:
+      - securitycontextconstraints
+    verbs:
+      - use

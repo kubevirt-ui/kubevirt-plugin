@@ -48,7 +48,6 @@ describe('Cluster Test Preparation', () => {
     cy.login();
     cy.get(mastheadLogo).scrollIntoView();
     cy.switchToVirt();
-    cy.switchProject(TEST_NS);
   });
 
   it('configure public ssh key', () => {
