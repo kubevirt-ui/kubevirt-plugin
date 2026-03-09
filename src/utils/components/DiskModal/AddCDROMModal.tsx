@@ -40,7 +40,7 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
   vm,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { upload, uploadData } = useCDIUpload(getCluster(vm));
+  const { checkUploadReady, upload, uploadData } = useCDIUpload(getCluster(vm));
   const isVMRunning = isRunning(vm);
   const [hyperConvergeConfig] = useHyperConvergeConfiguration();
   const vmNamespace = getNamespace(vm);
@@ -110,8 +110,11 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
     onClose();
   };
 
-  const handleModalSubmit = () => {
+  const handleModalSubmit = async () => {
+    // For uploads, check certificate/config before proceeding
+    // This ensures the error is shown in the modal before it closes
     if (uploadEnabled && hasUploadFile) {
+      await checkUploadReady();
       isBackgroundUploadInProgress.current = true;
     }
     return submitCDROM(getValues(), {
@@ -199,7 +202,7 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
                           'application/*': ['.iso', '.img', '.qcow2', '.gz', '.xz'],
                         }}
                         label=""
-                        relevantUpload={upload}
+                        relevantUpload={isSubmitting ? undefined : upload}
                       />
                     </div>
                   )}
