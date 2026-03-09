@@ -1,0 +1,84 @@
+name: POC Hot ClusterE2E CI Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_spec:
+        description: 'Cypress test spec to run (passed to POC E2E Test 2)'
+        required: true
+        default: 'tests/gating.cy.ts'
+        type: string
+      cluster_name:
+        description: 'Cluster name'
+        required: true
+        default: 'kubevirt-plugin-ci'
+        type: string
+      skip_arc_runner_check:
+        description: 'Skip GitHub runner registration check (use when running from a fork without its own ARC runners)'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  CLUSTER_NAME: ${{ inputs.cluster_name || 'kubevirt-plugin-ci' }}
+
+jobs:
+  cluster-health-check:
+    name: Cluster Health Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup IBM Cloud CLI
+        uses: IBM/actions-ibmcloud-cli@v1
+        with:
+          api_key: ${{ secrets.IBM_CLOUD_API_KEY }}
+          plugins: kubernetes-service
+
+      - name: Install oc client from cluster
+        run: |
+          INGRESS=$(ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" --json | jq -r '.ingressHostname')
+          curl -kLo oc.tar "https://downloads-openshift-console.${INGRESS}/amd64/linux/oc.tar"
+          tar -xvf oc.tar
+          sudo mv oc /usr/local/bin/
+          echo "oc version: $(oc version --client)"
+
+      - name: Configure kubeconfig
+        run: |
+          ibmcloud oc cluster config --cluster "${CLUSTER_NAME}" --admin
+          oc cluster-info
+          oc get nodes -o wide
+
+      - name: Run health checks
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SKIP_ARC_GITHUB_CHECK: ${{ inputs.skip_arc_runner_check && 'true' || 'false' }}
+        run: |
+          ./ci-scripts/check-cluster-health.sh
+
+      - name: Health check summary
+        if: always()
+        run: |
+          echo "## Cluster Health Check" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          if [[ "${{ job.status }}" == "success" ]]; then
+            echo "All health checks **passed**. Invoking **POC Hot Cluster E2E CI Test 2** for Cypress." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Health checks **failed**. E2E workflow was not invoked." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+  run-e2e-tests:
+    name: Run E2E Tests
+    needs: cluster-health-check
+    if: needs.cluster-health-check.result == 'success'
+    uses: ./.github/workflows/poc-e2e-ci-test2.yml
+    with:
+      test_spec: ${{ inputs.test_spec }}
+    secrets: inherit

@@ -1,4 +1,7 @@
 **/node_modules
+.npm-cache
+.tmp
+.tmp-plugin-cert.*/
 npm-debug.log
 dist
 **/.env
@@ -14,6 +17,9 @@ scripts/ca.crt
 scripts/console-client-secret
 *.json-*
 *.env
+ci-scripts/_
+ci-scripts/_ci_tools
+ci-scripts/generated/
 
 # Personal Cursor rules (not shared with team)
 .cursor/rules/personal-*.mdc

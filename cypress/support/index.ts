@@ -22,6 +22,20 @@ Cypress.on('uncaught:exception', () => {
   return false;
 });
 
+// Pre-seed console user settings so guided tours are already marked completed before
+// any page JavaScript runs. This prevents the tour popup from appearing on every test,
+// even after Cypress clears localStorage between it() blocks.
+const CONSOLE_USER_SETTINGS_TOURS_DISMISSED = JSON.stringify({
+  'console.guidedTour': {
+    admin: { completed: true },
+    'virtualization-perspective': { completed: true },
+  },
+});
+
+Cypress.on('window:before:load', (win) => {
+  win.localStorage.setItem('console-user-settings', CONSOLE_USER_SETTINGS_TOURS_DISMISSED);
+});
+
 Cypress.Cookies.debug(true);
 
 // ignore fetch in command log

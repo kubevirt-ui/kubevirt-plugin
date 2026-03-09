@@ -1,0 +1,55 @@
+# gha-runner-scale-set Helm values fragment: runner pod template (OpenShift + dind).
+# Used by ci-scripts/arc/install-runner-scale-set.sh.
+#
+# With containerMode.type=dind, the chart merges this with docker:dind, initContainers,
+# DOCKER_HOST, and dind volume mounts. Only the container named "runner" is customized here.
+#
+# Nested overlay: dockerd's default overlay graph on the pod's overlayfs fails (EINVAL).
+# arc-dind-post-render.sh injects --storage-driver=vfs into the chart's dockerd args; re-run
+# install-runner-scale-set.sh after upgrading the post-renderer (ARC_USE_DIND_POST_RENDER=0 skips it).
+#
+# docker:dind: the upstream chart hardcodes image docker:dind (no Helm value). This repo expects
+#   setup-dind-mirror.sh to mirror docker:dind → internal ImageStream arc-docker-dind:dind and write
+#   ci-scripts/generated/arc-dind-replace.env; install-runner-scale-set.sh runs Helm with
+#   --post-renderer arc-dind-post-render.sh when that file exists (or ARC_DIND_INTERNAL_IMAGE).
+#   SKIP_DIND_MIRROR=1 is for clusters that replace dind via ImageContentSourcePolicy / other mirroring.
+#
+# Default image is upstream until ARC_RUNNER_IMAGE / --set overrides:
+#   --set template.spec.containers[0].image=<internal-registry>/...
+#
+# Ref: https://github.com/actions/actions-runner-controller/tree/master/charts/gha-runner-scale-set
+#
+# ARC 0.14+ (chart 0.14.0): multilabel via scaleSetLabels (see ARC_SCALE_SET_LABELS / examples/),
+# resourceMeta for listener/RBAC metadata, listener defaults to kubernetes.io/os: linux.
+# Experimental chart exposes runner.dind.container.image to avoid docker:dind post-rendering —
+# see HOT_CLUSTER_CI.md if you migrate off the stable chart.
+---
+template:
+  spec:
+    volumes:
+      - name: work
+        emptyDir: {}
+      - name: npm-cache
+        emptyDir: {}
+      - name: npm-tmp
+        emptyDir: {}
+    containers:
+      - name: runner
+        image: ghcr.io/actions/actions-runner:latest
+        command:
+          - '/home/runner/run.sh'
+        securityContext:
+          allowPrivilegeEscalation: true
+          capabilities:
+            drop:
+              - ALL
+          runAsNonRoot: true
+          runAsUser: 1001
+          runAsGroup: 123
+        volumeMounts:
+          - name: work
+            mountPath: '/home/runner/_work'
+          - name: npm-cache
+            mountPath: '/home/runner/.npm'
+          - name: npm-tmp
+            mountPath: '/home/runner/.tmp'
