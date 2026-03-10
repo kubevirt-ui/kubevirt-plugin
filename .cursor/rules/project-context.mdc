@@ -208,9 +208,11 @@ import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 - Run `npm run i18n` after adding strings
 
 ### Styling
-- Use PatternFly components and variables
+- Use PatternFly components and variables (tokens)
+- Prefer PatternFly components for layouts (Flex, Stack, Grid, Split, ...)
+- Use PatternFly utility classes
 - SCSS with BEM methodology
-- Don't rely on PatternFly class names
+- Don't rely on PatternFly class names in SCSS files
 
 ### Error Handling
 - Always handle loading, error, empty states

@@ -264,6 +264,7 @@ Patterns and conventions for React components in this project.
 - Use PatternFly as base components
 - Add project-specific class names
 - Follow PatternFly patterns and guidelines
+- Use PatternFly components for layouts (Flex, Stack, Grid, Split, ...)
 
 ### Imports
 ```tsx
@@ -275,6 +276,56 @@ import { Table, Thead, Tr, Th, Tbody, Td } from '@patternfly/react-table';
 - Don't rely on PatternFly class names in SCSS
 - They change between versions
 - Use project-specific classes as anchors
+
+### Utility Classes
+- Use PatternFly utility classes (`pf-v6-u-*`) for single-property styling
+- Prefer utility classes over creating new SCSS files for simple spacing/text adjustments
+- Multiple utility classes can be combined: `"pf-v6-u-text-color-subtle pf-v6-u-my-sm"`
+
+#### Commonly used in this project:
+
+**Margin** (`m` = all, `mt/mb/ml/mr` = single side, `mx/my` = axis):
+```tsx
+className="pf-v6-u-mb-md"    // margin-bottom medium
+className="pf-v6-u-mt-sm"    // margin-top small
+className="pf-v6-u-ml-xs"    // margin-left extra-small
+className="pf-v6-u-mr-sm"    // margin-right small
+className="pf-v6-u-my-md"    // margin top+bottom medium
+className="pf-v6-u-mx-lg"    // margin left+right large
+className="pf-v6-u-m-md"     // margin all sides medium
+```
+
+**Padding** (`p` = all, `pt/pb/pl/pr` = single side, `px/py` = axis):
+```tsx
+className="pf-v6-u-py-0"     // padding top+bottom zero
+className="pf-v6-u-px-md"    // padding left+right medium
+className="pf-v6-u-pl-lg"    // padding-left large
+className="pf-v6-u-pt-sm"    // padding-top small
+className="pf-v6-u-p-sm"     // padding all sides small
+```
+
+**Text color and alignment:**
+```tsx
+className="pf-v6-u-text-color-subtle"    // secondary/muted text
+className="pf-v6-u-text-color-regular"   // primary text
+className="pf-v6-u-text-align-center"    // centered text
+className="pf-v6-u-font-weight-bold"     // bold text
+className="pf-v6-u-font-size-xs"         // extra-small font
+className="pf-v6-u-font-size-xl"         // extra-large font
+```
+
+**Display and sizing:**
+```tsx
+className="pf-v6-u-display-none"             // hidden
+className="pf-v6-u-display-flex"             // flex container
+className="pf-v6-u-display-inline-on-md"     // inline at md+ breakpoint
+className="pf-v6-u-w-100"                    // width 100%
+className="pf-v6-u-w-25-on-xl"              // width 25% at xl breakpoint
+className="pf-v6-u-flex-shrink-0"            // prevent flex shrinking
+className="pf-v6-u-align-items-center"       // align items center
+```
+
+Sizes: `xs` (4px), `sm` (8px), `md` (16px), `lg` (24px), `xl` (32px), `2xl` (48px)
 
 ---
 

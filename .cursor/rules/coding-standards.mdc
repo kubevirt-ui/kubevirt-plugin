@@ -139,8 +139,14 @@ These are the coding standards for the KubeVirt Plugin project. They apply to so
 
 ## 5. Styling Guidelines
 
+### PatternFly components
+- Rely on default styles of PatternFly components
+- Use PatternFly components for layouts (Flex, Stack, Grid, Split, ...)
+- Use PatternFly utility classes
+
 ### SCSS Usage
-- Prefer SCSS for styling (nesting, variables, mixins)
+- Use SCSS when PatternFly components and utility classes are not sufficient
+- Use SCSS for styling (nesting, variables, mixins)
 - One SCSS file per component
 - Filename matches component: `VMDetails.tsx` -> `vm-details.scss`
 - Extract into separate files, don't embed styles in components
