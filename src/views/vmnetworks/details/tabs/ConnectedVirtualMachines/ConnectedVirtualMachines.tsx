@@ -1,81 +1,124 @@
-import React, { FC } from 'react';
+import React, { FC, useCallback, useMemo, useState } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
+import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import ListSkeleton from '@kubevirt-utils/components/StateHandler/ListSkeleton';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { VirtualMachineModel } from '@kubevirt-utils/models';
+import { asAccessReview, getName } from '@kubevirt-utils/resources/shared';
 import { ClusterUserDefinedNetworkKind } from '@kubevirt-utils/resources/udn/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   ListPageBody,
   ListPageFilter,
   useListPageFilter,
-  VirtualizedTable,
+  useModal,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { BulkSelect, BulkSelectValue } from '@patternfly/react-component-groups';
+import { Action } from '@openshift-console/dynamic-plugin-sdk/lib/extensions/actions';
 import { Flex } from '@patternfly/react-core';
 
 import useConnectedVMs from '../../../hooks/useConnectedVMs';
 
-import useVirtualMachineActions from './actions/hooks/useVirtualMachineActions';
-import useSelectedVMs from './hooks/useSelectedVMs';
-import useVirtualMachineColumns from './hooks/useVirtualMachineColumns';
-import ConnectedVirtualMachinesRow, {
-  ConnectedVirtualMachinesRowData,
-} from './ConnectedVirtualMachinesRow';
+import DisconnectVMModal, { DisconnectVMModalProps } from './actions/components/DisconnectVMModal';
+import MoveVMModal, { MoveVMModalProps } from './actions/components/MoveVMModal';
+import {
+  ConnectedVMsCallbacks,
+  getConnectedVMRowId,
+  getConnectedVMsColumns,
+} from './connectedVirtualMachinesDefinition';
 
 type ConnectedVirtualMachinesProps = {
   obj: ClusterUserDefinedNetworkKind;
 };
 
 const ConnectedVirtualMachines: FC<ConnectedVirtualMachinesProps> = ({ obj: vmNetwork }) => {
+  const { t } = useKubevirtTranslation();
+  const createModal = useModal();
   const [vms, loadedVMs, error] = useConnectedVMs(vmNetwork);
-  const [data, filteredData, onFilterChange] = useListPageFilter(vms);
+  const [unfilteredData, filteredData, onFilterChange] = useListPageFilter(vms);
+  const [selectedVMs, setSelectedVMs] = useState<V1VirtualMachine[]>([]);
 
-  const { isSelected, onSelect, selectedVMs, setSelectedVMs } = useSelectedVMs();
+  const vmNetworkName = getName(vmNetwork);
 
-  const [_, activeColumns, loadedColumns] = useVirtualMachineColumns();
+  const createActions = useCallback(
+    (vmList: V1VirtualMachine[]): Action[] => {
+      const isSingleVM = vmList.length === 1;
+      const vm = vmList[0];
 
-  const actions = useVirtualMachineActions(selectedVMs, vmNetwork);
+      return [
+        {
+          accessReview: isSingleVM ? asAccessReview(VirtualMachineModel, vm, 'patch') : undefined,
+          cta: () =>
+            createModal<DisconnectVMModalProps>(DisconnectVMModal, {
+              currentNetwork: vmNetworkName,
+              vms: vmList,
+            }),
+          id: 'disconnect-vm',
+          label: t('Disconnect virtual machine from network'),
+        },
+        {
+          accessReview: isSingleVM ? asAccessReview(VirtualMachineModel, vm, 'patch') : undefined,
+          cta: () =>
+            createModal<MoveVMModalProps>(MoveVMModal, {
+              currentNetwork: vmNetworkName,
+              vms: vmList,
+            }),
+          id: 'move-vm',
+          label: t('Move virtual machine to another network'),
+        },
+      ];
+    },
+    [createModal, vmNetworkName, t],
+  );
 
-  const loaded = loadedVMs && loadedColumns;
-  if (!loaded)
+  const bulkActions = useMemo(() => createActions(selectedVMs), [createActions, selectedVMs]);
+
+  const columns = useMemo(() => getConnectedVMsColumns(t), [t]);
+
+  const callbacks: ConnectedVMsCallbacks = useMemo(
+    () => ({
+      getActions: createActions,
+      vmNetwork,
+    }),
+    [createActions, vmNetwork],
+  );
+
+  if (!loadedVMs) {
     return (
       <ListPageBody>
         <ListSkeleton />
       </ListPageBody>
     );
+  }
 
   return (
     <ListPageBody>
       <Flex>
-        <BulkSelect
-          onSelect={(value) => {
-            if (value === BulkSelectValue.all || value === BulkSelectValue.page) {
-              setSelectedVMs(filteredData);
-            } else if (value === BulkSelectValue.none || value === BulkSelectValue.nonePage) {
-              setSelectedVMs([]);
-            }
-          }}
-          selectedCount={selectedVMs.length}
-          totalCount={filteredData.length}
+        <ListPageFilter data={unfilteredData} loaded={loadedVMs} onFilterChange={onFilterChange} />
+        <ActionsDropdown
+          actions={bulkActions}
+          id="vm-bulk-actions"
+          isDisabled={isEmpty(selectedVMs)}
         />
-        <ListPageFilter data={data} loaded={loaded} onFilterChange={onFilterChange} />
-        <ActionsDropdown actions={actions} id="vm-bulk-actions" isDisabled={isEmpty(selectedVMs)} />
       </Flex>
-      <VirtualizedTable<V1VirtualMachine>
-        rowData={
-          {
-            isSelected,
-            onSelect,
-            vmNetwork,
-          } as ConnectedVirtualMachinesRowData
-        }
-        columns={activeColumns}
+      <KubevirtTable<V1VirtualMachine, ConnectedVMsCallbacks>
+        ariaLabel={t('Connected virtual machines table')}
+        callbacks={callbacks}
+        columns={columns}
         data={filteredData}
-        loaded={loaded}
+        dataTest="connected-vms-table"
+        fixedLayout
+        getRowId={getConnectedVMRowId}
+        initialSortKey="name"
+        loaded={loadedVMs}
         loadError={error}
-        Row={ConnectedVirtualMachinesRow}
-        unfilteredData={data}
+        noDataMsg={t('No connected virtual machines found')}
+        noFilteredDataMsg={t('No virtual machines match the filter criteria')}
+        onSelect={setSelectedVMs}
+        selectable
+        selectedItems={selectedVMs}
+        unfilteredData={unfilteredData}
       />
     </ListPageBody>
   );

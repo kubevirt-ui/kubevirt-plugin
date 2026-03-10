@@ -1,14 +1,18 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 
+import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import ListSkeleton from '@kubevirt-utils/components/StateHandler/ListSkeleton';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ClusterUserDefinedNetworkKind } from '@kubevirt-utils/resources/udn/types';
-import { ListPageBody, VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
+import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 
 import { ProjectWithVMCount } from '../../types';
 
 import useProjectsWithVMCounts from './hooks/useProjectsWithVMCounts';
-import ConnectedProjectsRow from './ConnectedProjectsRow';
+import {
+  getConnectedProjectRowId,
+  getConnectedProjectsColumns,
+} from './connectedProjectsDefinition';
 
 type ConnectedProjectsProps = {
   obj: ClusterUserDefinedNetworkKind;
@@ -18,32 +22,29 @@ const ConnectedProjects: FC<ConnectedProjectsProps> = ({ obj }) => {
   const { t } = useKubevirtTranslation();
   const [projectsWithVMCounts, loaded, error] = useProjectsWithVMCounts(obj);
 
-  if (!loaded)
+  const columns = useMemo(() => getConnectedProjectsColumns(t), [t]);
+
+  if (!loaded) {
     return (
       <ListPageBody>
         <ListSkeleton />
       </ListPageBody>
     );
+  }
 
   return (
     <ListPageBody>
-      <VirtualizedTable<ProjectWithVMCount>
-        columns={[
-          {
-            id: 'name',
-            sort: 'projectName',
-            title: t('Name'),
-          },
-          {
-            id: 'connected-vms',
-            sort: 'vmCount',
-            title: t('Connected virtual machines'),
-          },
-        ]}
+      <KubevirtTable<ProjectWithVMCount>
+        ariaLabel={t('Connected projects table')}
+        columns={columns}
         data={projectsWithVMCounts}
+        dataTest="connected-projects-table"
+        fixedLayout
+        getRowId={getConnectedProjectRowId}
+        initialSortKey="name"
         loaded={loaded}
         loadError={error}
-        Row={ConnectedProjectsRow}
+        noDataMsg={t('No connected projects found')}
         unfilteredData={projectsWithVMCounts}
       />
     </ListPageBody>
