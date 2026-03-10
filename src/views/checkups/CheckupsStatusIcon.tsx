@@ -8,7 +8,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { GreenRunningIcon } from '@kubevirt-utils/icons/GreenRunningIcon';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { Icon as PFIcon, Spinner } from '@patternfly/react-core';
-import { CheckCircleIcon, ExclamationCircleIcon } from '@patternfly/react-icons';
+import { CheckCircleIcon, ExclamationCircleIcon, InProgressIcon } from '@patternfly/react-icons';
 
 import { CheckupsStatus, getConfigMapStatus, getJobStatus } from './utils/utils';
 
@@ -50,6 +50,14 @@ const CheckupsStatusIcon: FC<CheckupsStatusIconProps> = ({ configMap, job, onlyJ
         {t('Failed')}
       </>
     ),
+    [CheckupsStatus.Pending]: (
+      <>
+        <PFIcon status="info">
+          <InProgressIcon />
+        </PFIcon>
+        {t('Pending')}
+      </>
+    ),
     [CheckupsStatus.Running]: (
       <>
         <GreenRunningIcon />
@@ -60,8 +68,10 @@ const CheckupsStatusIcon: FC<CheckupsStatusIconProps> = ({ configMap, job, onlyJ
 
   if (!configMap && !job) return <>{NO_DATA_DASH}</>;
 
+  const status = onlyJob ? jobStatus : configMapStatus;
+
   return (
-    <span className="CheckupsStatusIcon--main">{Icon[onlyJob ? jobStatus : configMapStatus]}</span>
+    <span className="CheckupsStatusIcon--main">{Icon[status] ?? <span>{t('Unknown')}</span>}</span>
   );
 };
 

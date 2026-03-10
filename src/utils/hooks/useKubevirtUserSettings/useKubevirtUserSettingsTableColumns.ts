@@ -1,6 +1,7 @@
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 
+import { COLUMNS } from './utils/const';
 import useKubevirtUserSettings from './useKubevirtUserSettings';
 
 type UseKubevirtUserSettingsTableColumnsType = <T>(input: {
@@ -17,7 +18,7 @@ const useKubevirtUserSettingsTableColumns: UseKubevirtUserSettingsTableColumnsTy
   columnManagementID,
   columns,
 }) => {
-  const [userColumns, setUserColumns, loadedColumns, error] = useKubevirtUserSettings('columns');
+  const [userColumns, setUserColumns, loadedColumns, error] = useKubevirtUserSettings(COLUMNS);
 
   const setActiveColumns = (columnIds: string[]) => {
     setUserColumns?.({

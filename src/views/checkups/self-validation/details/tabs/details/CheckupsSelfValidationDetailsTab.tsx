@@ -4,9 +4,9 @@ import { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { Divider, PageSection } from '@patternfly/react-core';
-import { SortByDirection } from '@patternfly/react-table';
 
 import CheckupsDetailsPageHistory from '../../../../CheckupsDetailsPageHistory';
+import { CHECKUPS_COLUMN_KEYS } from '../../../../utils/constants';
 import CheckupsSelfValidationHistoryActions from '../../../components/actions/CheckupsSelfValidationHistoryActions';
 import useJobResults from '../../../components/hooks/useJobResults';
 import useProgressTracking from '../../components/progress/hooks/useProgressTracking';
@@ -78,11 +78,11 @@ const CheckupsSelfValidationDetailsTab: FC = () => {
       <PageSection>
         <CheckupsDetailsPageHistory
           customActions={renderCustomActions}
-          error={error as Error}
-          jobs={jobMatches}
+          error={error instanceof Error ? error : undefined}
+          initialSortDirection="desc"
+          initialSortKey={CHECKUPS_COLUMN_KEYS.START_TIME}
+          jobs={jobMatches ?? []}
           loaded={loaded && !isLoadingResults && !isProgressLoading}
-          sortColumnIndex={2} //start time
-          sortDirection={SortByDirection.desc}
         />
       </PageSection>
     </>

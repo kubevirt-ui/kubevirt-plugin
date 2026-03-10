@@ -29,7 +29,7 @@ const CheckupsStorageDetailsTab: FC = (): JSX.Element | null => {
         <Divider />
       </PageSection>
       <PageSection>
-        <CheckupsDetailsPageHistory error={error} jobs={jobMatches} loaded={loaded} />
+        <CheckupsDetailsPageHistory error={error} jobs={jobMatches ?? []} loaded={loaded} />
       </PageSection>
     </>
   );
