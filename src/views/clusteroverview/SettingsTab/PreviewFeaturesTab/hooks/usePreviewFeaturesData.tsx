@@ -4,10 +4,9 @@ import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernete
 import { PASST_UDN_NETWORK, TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import usePasstFeatureFlag from '@kubevirt-utils/hooks/usePasstFeatureFlag';
 
 import PasstPopoverContent from '../PasstPopoverContent';
-
-import usePasstFeatureFlag from './usePasstFeatureFlag';
 
 type Feature = {
   canEdit: boolean;

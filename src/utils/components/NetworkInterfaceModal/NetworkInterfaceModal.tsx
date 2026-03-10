@@ -5,6 +5,7 @@ import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import NetworkInterfaceLinkState from '@kubevirt-utils/components/NetworkInterfaceModal/components/NetworkInterfaceLinkState/NetworkInterfaceLinkState';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import usePasstFeatureFlag from '@kubevirt-utils/hooks/usePasstFeatureFlag';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import {
   interfaceTypesProxy,
@@ -14,7 +15,6 @@ import { getNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/netw
 import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
 import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
-import usePasstFeatureFlag from '@overview/SettingsTab/PreviewFeaturesTab/hooks/usePasstFeatureFlag';
 import { ExpandableSection } from '@patternfly/react-core';
 import {
   getConfigInterfaceStateFromVM,
@@ -31,11 +31,12 @@ import { getNetworkName } from './utils/helpers';
 
 import './NetworkInterfaceModal.scss';
 
-type NetworkInterfaceModalOnSubmit = {
+export type NetworkInterfaceModalOnSubmit = {
   interfaceLinkState?: NetworkInterfaceState;
   interfaceMACAddress: string;
   interfaceModel: string;
   interfaceType: string;
+  isLegacyPasst: boolean;
   networkName: string;
   nicName: string;
 };
@@ -70,7 +71,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
   const { t } = useKubevirtTranslation();
   const { iface = null, network = null } = nicPresentation;
 
-  const { featureEnabled: passtEnabled } = usePasstFeatureFlag();
+  const { featureEnabled: passtEnabled, isLegacyPasst } = usePasstFeatureFlag();
   const [nicName, setNicName] = useState(network?.name || generatePrettyName('nic'));
   const [interfaceModel, setInterfaceModel] = useState(iface?.model || interfaceModelType.VIRTIO);
   const [networkName, setNetworkName] = useState(getNetworkName(network));
@@ -102,6 +103,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
         interfaceMACAddress,
         interfaceModel,
         interfaceType,
+        isLegacyPasst,
         networkName,
         nicName,
       })
@@ -114,6 +116,7 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
     interfaceLinkState,
     interfaceType,
     onSubmit,
+    isLegacyPasst,
   ]);
 
   return (

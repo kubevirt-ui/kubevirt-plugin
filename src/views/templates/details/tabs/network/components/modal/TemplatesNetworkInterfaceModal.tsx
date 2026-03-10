@@ -35,6 +35,7 @@ const TemplatesNetworkInterfaceModal: FC<TemplatesNetworkInterfaceModalProps> = 
         interfaceMACAddress,
         interfaceModel,
         interfaceType,
+        isLegacyPasst,
         networkName,
         nicName,
       }) =>
@@ -45,6 +46,7 @@ const TemplatesNetworkInterfaceModal: FC<TemplatesNetworkInterfaceModalProps> = 
           interfaceMACAddress,
           interfaceModel,
           interfaceType,
+          isLegacyPasst,
           nicName,
         });
 

@@ -38,6 +38,7 @@ const TemplatesEditNetworkInterfaceModal: FC<TemplatesEditNetworkInterfaceModalP
       interfaceMACAddress,
       interfaceModel,
       interfaceType,
+      isLegacyPasst,
       networkName,
       nicName,
     }) =>
@@ -48,6 +49,7 @@ const TemplatesEditNetworkInterfaceModal: FC<TemplatesEditNetworkInterfaceModalP
         interfaceMACAddress,
         interfaceModel,
         interfaceType,
+        isLegacyPasst,
         nicName,
       });
 
