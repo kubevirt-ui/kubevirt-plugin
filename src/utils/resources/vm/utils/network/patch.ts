@@ -102,6 +102,8 @@ export const updateInterface = ({
   if (!nextValue.bridge) delete replaceValue.bridge;
   if (!nextValue.masquerade) delete replaceValue.masquerade;
   if (!nextValue.sriov) delete replaceValue.sriov;
+  if (!nextValue.binding) delete replaceValue.binding;
+  if (!nextValue.passtBinding) delete replaceValue.passtBinding;
 
   return [
     {

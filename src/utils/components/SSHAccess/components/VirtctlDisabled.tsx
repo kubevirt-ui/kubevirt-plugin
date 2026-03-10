@@ -4,13 +4,13 @@ import { Trans } from 'react-i18next';
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import usePasstFeatureFlag from '@kubevirt-utils/hooks/usePasstFeatureFlag';
 import { NetworkAttachmentDefinitionModelGroupVersionKind } from '@kubevirt-utils/models';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
 import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 import { Content, Popover } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
-import usePasstFeatureFlag from '@settings/tabs/PreviewFeaturesTab/hooks/usePasstFeatureFlag';
 
 type VirtctlDisabledProps = {
   cluster?: string;

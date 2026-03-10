@@ -5,11 +5,9 @@ import {
   V1beta1DataImportCron,
   V1beta1DataSource,
   V1beta1DataVolume,
-} from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import {
   V1beta1StorageSpecAccessModesEnum,
   V1beta1StorageSpecVolumeModeEnum,
-} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+} from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/utils/constants';
 import {
   TLS_CERT_SOURCE_EXISTING,

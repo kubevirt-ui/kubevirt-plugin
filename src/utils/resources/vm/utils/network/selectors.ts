@@ -18,6 +18,7 @@ export const hasAutoAttachedPodNetwork = (vm: V1VirtualMachine): boolean =>
 export const getNetworkInterfaceType = (iface: V1Interface): string => {
   if (iface?.binding?.name === UDN_BINDING_NAME) return UDN_BINDING_NAME;
   if (iface?.binding?.name === PASST_BINDING_NAME) return PASST_BINDING_NAME;
+  if (iface?.passtBinding) return PASST_BINDING_NAME;
 
   const drive = Object.keys(interfaceTypesProxy)?.find((ifaceType: string) => iface?.[ifaceType]);
   return drive ?? NO_DATA_DASH;

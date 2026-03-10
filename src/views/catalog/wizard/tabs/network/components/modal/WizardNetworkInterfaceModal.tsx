@@ -29,6 +29,7 @@ const WizardNetworkInterfaceModal: FC<WizardNetworkInterfaceModalProps> = ({
         interfaceMACAddress,
         interfaceModel,
         interfaceType,
+        isLegacyPasst,
         networkName,
         nicName,
       }) =>
@@ -39,6 +40,7 @@ const WizardNetworkInterfaceModal: FC<WizardNetworkInterfaceModalProps> = ({
           interfaceMACAddress,
           interfaceModel,
           interfaceType,
+          isLegacyPasst,
           nicName,
         });
 

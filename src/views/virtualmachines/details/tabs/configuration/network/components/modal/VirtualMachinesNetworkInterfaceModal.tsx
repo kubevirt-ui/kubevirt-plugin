@@ -43,6 +43,7 @@ const VirtualMachinesNetworkInterfaceModal: FC<VirtualMachinesNetworkInterfaceMo
         interfaceMACAddress,
         interfaceModel,
         interfaceType,
+        isLegacyPasst,
         networkName,
         nicName,
       }) =>
@@ -59,6 +60,7 @@ const VirtualMachinesNetworkInterfaceModal: FC<VirtualMachinesNetworkInterfaceMo
           interfaceMACAddress,
           interfaceModel,
           interfaceType,
+          isLegacyPasst,
           nicName,
         });
 

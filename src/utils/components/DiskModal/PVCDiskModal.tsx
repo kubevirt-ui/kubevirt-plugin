@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import { isHotPluggableEnabled } from '@kubevirt-utils/components/DiskModal/utils/helpers';
-import useKubevirtHyperconvergeConfiguration from '@kubevirt-utils/hooks/useKubevirtHyperconvergeConfiguration.ts';
+import useKubevirtHyperconvergeConfiguration from '@kubevirt-utils/hooks/useKubevirtHyperconvergeConfiguration';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { isRunning } from '@virtualmachines/utils';
