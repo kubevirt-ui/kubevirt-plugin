@@ -5,7 +5,10 @@ import {
   V1Volume,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
+import {
+  MultiNamespaceVirtualMachineStorageMigrationPlan,
+  STORAGE_MIGRATION_PHASE,
+} from '@kubevirt-utils/resources/migrations/constants';
 import { isMigrationCompleted } from '@kubevirt-utils/resources/migrations/utils';
 import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
@@ -45,7 +48,7 @@ export const getStorageMigrationStatusLabel = (
 ): string => {
   if (
     storageMigrationPlan?.status?.namespaces?.some(
-      (namespaceStatus) => namespaceStatus?.failedMigrations?.length > 0,
+      (namespaceStatus) => namespaceStatus?.[STORAGE_MIGRATION_PHASE.FAILED]?.length > 0,
     )
   )
     return t('Failed');
