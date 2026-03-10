@@ -48,6 +48,7 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Flex, Pagination } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
+import SearchBar from '@search/components/SearchBar';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 import { useAccessibleResources } from '@virtualmachines/search/hooks/useAccessibleResources';
 import useVMSearchQueries from '@virtualmachines/search/hooks/useVMSearchQueries';
@@ -135,6 +136,10 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
   const [vmims, vmimsLoaded] = useVirtualMachineInstanceMigrations(cluster, namespace);
 
   const { vmiMapper, vmisLoaded } = useVirtualMachineInstanceMapper();
+  const vmis = vmsToShow
+    ?.map((vm) => getVMIFromMapper(vmiMapper, vm, isACMPage ? hubClusterName : undefined))
+    .filter(Boolean);
+
   const vmimMapper = useVirtualMachineInstanceMigrationMapper(vmims);
   const pvcMapper = usePVCMapper(namespace, cluster);
 
@@ -217,6 +222,13 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
             <VirtualMachineEmptyState catalogURL={catalogURL} namespace={namespace} />
           ) : (
             <>
+              <SearchBar
+                onFilterChange={onFilterChange}
+                vmis={vmis}
+                vmisLoaded={vmisLoaded}
+                vms={vmsToShow}
+                vmsLoaded={vmsLoaded}
+              />
               <VirtualMachineFilterToolbar
                 onFilterChange={(...args) => {
                   deselectAllVMs();

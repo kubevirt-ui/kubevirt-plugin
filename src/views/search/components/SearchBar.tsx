@@ -1,10 +1,14 @@
 import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import { Button, InputGroup, InputGroupItem, Menu, Popper } from '@patternfly/react-core';
 import { VM_SEARCH_INPUT_ID } from '@search/utils/constants';
+import { buildContextSearchInputs } from '@search/utils/query';
 import { SearchSuggestResult } from '@search/utils/types';
 import { useVirtualMachineSearchSuggestions } from '@virtualmachines/search/hooks/useVirtualMachineSearchSuggestions';
 
@@ -22,11 +26,17 @@ import './search-bar.scss';
 
 type SearchBarProps = {
   onFilterChange: OnFilterChange;
+  vmis: V1VirtualMachineInstance[];
+  vmisLoaded: boolean;
+  vms: V1VirtualMachine[];
+  vmsLoaded: boolean;
 };
 
-const SearchBar: FC<SearchBarProps> = ({ onFilterChange }) => {
+const SearchBar: FC<SearchBarProps> = ({ onFilterChange, vmis, vmisLoaded, vms, vmsLoaded }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+  const namespace = useNamespaceParam();
+  const cluster = useClusterParam();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchSuggestBoxOpen, setIsSearchSuggestBoxOpen] = useState(false);
@@ -34,7 +44,13 @@ const SearchBar: FC<SearchBarProps> = ({ onFilterChange }) => {
   const searchInputRef = useRef<HTMLInputElement>();
   const searchSuggestBoxRef = useRef<HTMLDivElement>();
 
-  const [vmSuggestions, vmSuggestionsLoaded] = useVirtualMachineSearchSuggestions(searchQuery);
+  const [vmSuggestions, vmSuggestionsLoaded] = useVirtualMachineSearchSuggestions({
+    searchQuery,
+    vmis,
+    vmisLoaded,
+    vms,
+    vmsLoaded,
+  });
   const navigateToSearchResults = useNavigateToSearchResults(onFilterChange);
   const { saveSearch, urlSearchQuery } = useSavedSearchData();
 
@@ -59,7 +75,10 @@ const SearchBar: FC<SearchBarProps> = ({ onFilterChange }) => {
 
   const onEnterKeyDown = () => {
     if (isSearchSuggestBoxOpen && searchSuggestResult?.resources.length > 0) {
-      navigateToSearchResults({ name: searchQuery });
+      navigateToSearchResults({
+        ...buildContextSearchInputs(cluster, namespace),
+        name: searchQuery,
+      });
       setIsSearchSuggestBoxOpen(false);
     }
     if (!isSearchSuggestBoxOpen) {
@@ -98,7 +117,7 @@ const SearchBar: FC<SearchBarProps> = ({ onFilterChange }) => {
   }, [createModal, saveSearch, urlSearchQuery]);
 
   return (
-    <InputGroup className="vm-search-bar" data-test="vm-adv-search-toolbar">
+    <InputGroup className="pf-v6-u-mb-md" data-test="vm-adv-search-toolbar">
       <Popper
         popper={
           <Menu
@@ -109,7 +128,9 @@ const SearchBar: FC<SearchBarProps> = ({ onFilterChange }) => {
             role="dialog"
           >
             <SearchSuggestBox
+              cluster={cluster}
               isSearchInProgress={isSearchInProgress}
+              namespace={namespace}
               navigateToSearchResults={navigateToSearchResults}
               searchQuery={searchQuery}
               searchSuggestResult={searchSuggestResult}
