@@ -9,9 +9,10 @@
   }
 
   &__label {
-    font-size: var(--pf-t--global--font--size--md);
     font-family: var(--pf-t--global--font--family--heading);
+    font-size: var(--pf-t--global--font--size--heading--xs);
     font-weight: var(--pf-t--global--font--weight--heading--default);
+    line-height: var(--pf-t--global--font--line-height--heading);
     margin-bottom: var(--pf-t--global--spacer--xs);
     white-space: nowrap;
   }

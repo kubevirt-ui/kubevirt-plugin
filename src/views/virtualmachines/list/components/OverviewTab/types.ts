@@ -13,6 +13,7 @@ export type OverviewLevel =
 
 export const SECTION_ID_VM_HEALTH = 'vm-health';
 export const SECTION_ID_CLUSTER_STATUS = 'cluster-status';
+export const SECTION_ID_MIGRATION_STATUS = 'migration-status';
 export const SECTION_ID_RESOURCE_ALLOCATION = 'resource-allocation';
 
 export const GRID_THREE_EQUAL = '1fr 1fr 1fr';
