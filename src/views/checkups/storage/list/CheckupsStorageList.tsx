@@ -1,29 +1,38 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
-import {
-  IoK8sApiBatchV1Job,
-  IoK8sApiCoreV1ConfigMap,
-} from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
+import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
+import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
+import useKubevirtTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtTableColumns';
+import usePaginationWithFilters from '@kubevirt-utils/hooks/usePagination/usePaginationWithFilters';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { ListPageBody, VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
+import useIsACMPage from '@multicluster/useIsACMPage';
+import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination } from '@patternfly/react-core';
 
 import { getJobByName } from '../../utils/utils';
 import useCheckupsStorageData from '../components/hooks/useCheckupsStorageData';
-import useCheckupsStorageListColumns from '../components/hooks/useCheckupsStorageListColumns';
 import useCheckupsStorageListFilters from '../components/hooks/useCheckupsStorageListFilters';
 import { useCheckupsStoragePermissions } from '../components/hooks/useCheckupsStoragePermissions';
 
+import {
+  CheckupsStorageCallbacks,
+  getCheckupsStorageColumns,
+  getCheckupsStorageRowId,
+} from './checkupsStorageListDefinition';
 import CheckupsStorageListEmptyState from './CheckupsStorageListEmptyState';
-import CheckupsStorageListRow from './CheckupsStorageListRow';
+
+import '@kubevirt-utils/styles/list-managment-group.scss';
 
 const CheckupsStorageList = () => {
   const { t } = useKubevirtTranslation();
-  const [columns, activeColumns, loadedColumns] = useCheckupsStorageListColumns();
+  const namespace = useActiveNamespace();
+  const isACMPage = useIsACMPage();
+  const showNamespace = namespace === ALL_NAMESPACES_SESSION_KEY;
 
   const {
     clusterRoleBinding,
@@ -33,13 +42,50 @@ const CheckupsStorageList = () => {
   } = useCheckupsStoragePermissions();
   const { configMaps, error, jobs, loaded } = useCheckupsStorageData();
 
-  const { onPaginationChange, pagination } = usePagination();
-  const [unfilterData, dataFilters, onFilterChange, filters] =
-    useCheckupsStorageListFilters(configMaps);
+  const [unfilteredData, filteredData, onFilterChange, filters] = useCheckupsStorageListFilters(
+    configMaps || [],
+  );
+
+  const { handleFilterChange, handlePerPageSelect, handleSetPage, pagination } =
+    usePaginationWithFilters(filteredData?.length ?? 0, onFilterChange);
+
+  const columns = useMemo(
+    () => getCheckupsStorageColumns(t, isACMPage, showNamespace),
+    [t, isACMPage, showNamespace],
+  );
+
+  const { activeColumnKeys, loaded: loadedColumns } = useKubevirtTableColumns({
+    columnManagementID: 'checkups-storage',
+    columns,
+  });
+
+  const callbacks: CheckupsStorageCallbacks = useMemo(
+    () => ({
+      getJobByName: (configMapName: string): IoK8sApiBatchV1Job[] =>
+        getJobByName(jobs, configMapName),
+    }),
+    [jobs],
+  );
 
   const isLoaded = loaded && !loadingPermissions && loadedColumns;
 
-  if (isEmpty(configMaps) && isLoaded) {
+  const columnLayout = useMemo(
+    () => ({
+      columns: columns
+        .filter((col) => col.key !== 'actions')
+        .map(({ additional, key, label }) => ({
+          additional,
+          id: key,
+          title: label,
+        })),
+      id: 'checkups-storage',
+      selectedColumns: new Set(activeColumnKeys),
+      type: t('Checkups'),
+    }),
+    [columns, activeColumnKeys, t],
+  );
+
+  if (isEmpty(configMaps) && isLoaded && !error) {
     return (
       <CheckupsStorageListEmptyState
         clusterRoleBinding={clusterRoleBinding}
@@ -54,60 +100,39 @@ const CheckupsStorageList = () => {
     <ListPageBody>
       <div className="list-managment-group">
         <ListPageFilter
-          columnLayout={{
-            columns: columns?.map(({ additional, id, title }) => ({
-              additional,
-              id,
-              title,
-            })),
-            id: 'checkups-storage',
-            selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
-            type: t('Checkups'),
-          }}
-          onFilterChange={(...args) => {
-            onFilterChange(...args);
-            onPaginationChange({
-              ...pagination,
-              endIndex: pagination?.perPage,
-              page: 1,
-              startIndex: 0,
-            });
-          }}
-          data={unfilterData}
+          columnLayout={columnLayout}
+          data={unfilteredData}
           loaded={isLoaded}
+          onFilterChange={handleFilterChange}
           rowFilters={filters}
         />
-        {!isEmpty(dataFilters) && isLoaded && (
+        {!isEmpty(filteredData) && isLoaded && (
           <Pagination
-            onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
-              onPaginationChange({ endIndex, page, perPage, startIndex })
-            }
-            onSetPage={(_e, page, perPage, startIndex, endIndex) =>
-              onPaginationChange({ endIndex, page, perPage, startIndex })
-            }
             className="list-managment-group__pagination"
             isLastFullPageShown
-            itemCount={dataFilters?.length}
+            itemCount={filteredData?.length}
+            onPerPageSelect={handlePerPageSelect}
+            onSetPage={handleSetPage}
             page={pagination?.page}
             perPage={pagination?.perPage}
             perPageOptions={paginationDefaultValues}
           />
         )}
       </div>
-      <VirtualizedTable<IoK8sApiCoreV1ConfigMap>
-        EmptyMsg={() => (
-          <div className="pf-v6-u-text-align-center">{t('No storage checkups found')}</div>
-        )}
-        rowData={{
-          getJobByName: (configMapName: string): IoK8sApiBatchV1Job[] =>
-            getJobByName(jobs, configMapName),
-        }}
-        columns={activeColumns}
-        data={dataFilters}
+      <KubevirtTable
+        activeColumnKeys={activeColumnKeys}
+        ariaLabel={t('Storage checkups table')}
+        callbacks={callbacks}
+        columns={columns}
+        data={filteredData ?? []}
+        dataTest="checkups-storage-table"
+        fixedLayout
+        getRowId={getCheckupsStorageRowId}
         loaded={isLoaded}
         loadError={error}
-        Row={CheckupsStorageListRow}
-        unfilteredData={unfilterData}
+        noDataMsg={t('No storage checkups found')}
+        pagination={pagination}
+        unfilteredData={unfilteredData}
       />
     </ListPageBody>
   );

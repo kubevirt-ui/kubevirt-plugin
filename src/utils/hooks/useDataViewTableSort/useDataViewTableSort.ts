@@ -2,7 +2,7 @@ import { useCallback, useMemo } from 'react';
 
 import { universalComparator } from '@kubevirt-utils/utils/utils';
 import { DataViewTh, useDataViewSort } from '@patternfly/react-data-view';
-import { ThProps } from '@patternfly/react-table';
+import { SortByDirection, ThProps } from '@patternfly/react-table';
 
 import { useResponsiveColumns } from '../useResponsiveColumns/useResponsiveColumns';
 
@@ -52,8 +52,14 @@ export const useDataViewTableSort = <TData, TCallbacks = undefined>(
 
   const sortedData = useMemo(() => {
     const column = columns.find((col) => col.key === sortBy);
+    if (!direction) return data;
+
+    if (column?.sort) {
+      return column.sort([...data], direction as SortByDirection);
+    }
+
     const getValue = column?.getValue;
-    if (!getValue || !direction) return data;
+    if (!getValue) return data;
 
     return [...data].sort((a, b) => {
       const aVal = getValue(a);
