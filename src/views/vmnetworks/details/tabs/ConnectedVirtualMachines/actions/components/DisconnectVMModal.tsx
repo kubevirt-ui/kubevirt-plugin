@@ -5,7 +5,7 @@ import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, VirtualMachineModel } from '@kubevirt-utils/models';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getName, getNamespace, getUID } from '@kubevirt-utils/resources/shared';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Button,
@@ -78,7 +78,7 @@ const DisconnectVMModal: FC<DisconnectVMModalProps> = ({ closeModal, currentNetw
                   {vms.map((vm) => (
                     <ResourceLink
                       groupVersionKind={modelToGroupVersionKind(VirtualMachineModel)}
-                      key={getName(vm)}
+                      key={getUID(vm) ?? `${getNamespace(vm)}-${getName(vm)}`}
                       name={getName(vm)}
                       namespace={getNamespace(vm)}
                     />
