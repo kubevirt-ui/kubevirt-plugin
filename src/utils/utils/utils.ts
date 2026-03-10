@@ -86,6 +86,11 @@ export const getRandomChars = (len = 6): string => {
 
 export const addRandomSuffix = (str: string) => str.concat(`-${getRandomChars()}`);
 
+export const truncateToK8sName = (name: string, maxLength: number): string => {
+  if (name.length <= maxLength) return name;
+  return name.slice(0, maxLength).replace(/-$/, '');
+};
+
 export const SSH_PUBLIC_KEY_VALIDATION_REGEX =
   /^(ssh-(rsa|dss|ed25519)|sk-ssh-(rsa|ed25519)@openssh\.com|ecdsa-sha2-nistp(256|384|521))\s+[A-Za-z0-9+/=]+(?:\s+.+)?$/;
 
