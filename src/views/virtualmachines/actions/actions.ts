@@ -9,7 +9,7 @@ import {
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { MAX_K8S_NAME_LENGTH } from '@kubevirt-utils/utils/constants';
-import { getRandomChars, kubevirtConsole } from '@kubevirt-utils/utils/utils';
+import { getRandomChars, kubevirtConsole, truncateToK8sName } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import {
   getKubevirtBaseAPIPath,
@@ -85,7 +85,7 @@ export const removeVolume = async (vm: V1VirtualMachine, body: V1RemoveVolumeOpt
 export const migrateVM = async (vm: V1VirtualMachine, node?: string) => {
   const { name, namespace } = vm?.metadata;
   const suffix = `-mig-${getRandomChars(4)}`;
-  const truncatedName = name.substring(0, MAX_K8S_NAME_LENGTH - suffix.length);
+  const truncatedName = truncateToK8sName(name, MAX_K8S_NAME_LENGTH - suffix.length);
 
   const migrationData: V1VirtualMachineInstanceMigration = {
     apiVersion: 'kubevirt.io/v1',

@@ -12,6 +12,7 @@ import {
 } from '@kubevirt-utils/constants/constants';
 import { ALL_NAMESPACES, ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { getLabels } from '@kubevirt-utils/resources/shared';
+import { MAX_K8S_NAME_LENGTH } from '@kubevirt-utils/utils/constants';
 import {
   FilterValue,
   K8sResourceCommon,
@@ -86,7 +87,7 @@ export const getRandomChars = (len = 6): string => {
 
 export const addRandomSuffix = (str: string) => str.concat(`-${getRandomChars()}`);
 
-export const truncateToK8sName = (name: string, maxLength: number): string => {
+export const truncateToK8sName = (name: string, maxLength = MAX_K8S_NAME_LENGTH): string => {
   if (name.length <= maxLength) return name;
   return name.slice(0, maxLength).replace(/-$/, '');
 };

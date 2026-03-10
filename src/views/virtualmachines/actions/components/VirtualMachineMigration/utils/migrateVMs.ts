@@ -9,7 +9,6 @@ import {
   MultiNamespaceVirtualMachineStorageMigrationPlan,
 } from '@kubevirt-utils/resources/migrations/constants';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { MAX_K8S_NAME_LENGTH } from '@kubevirt-utils/utils/constants';
 import { getRandomChars, truncateToK8sName } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 
@@ -24,10 +23,7 @@ export const generateMigPlanName = (
 
   const vmPart = vmNames.length === 1 ? vmNames[0] : `${vmNames.length || 0}vms`;
 
-  return truncateToK8sName(
-    `${MIGPLAN_PREFIX}-${vmPart}-to-${destinationStorageClass}-${suffix}`,
-    MAX_K8S_NAME_LENGTH,
-  );
+  return truncateToK8sName(`${MIGPLAN_PREFIX}-${vmPart}-to-${destinationStorageClass}-${suffix}`);
 };
 
 export const getEmptyMigPlan = (
@@ -52,10 +48,7 @@ export const getMigration = (
   apiVersion: `${MultiNamespaceVirtualMachineStorageMigrationModel.apiGroup}/${MultiNamespaceVirtualMachineStorageMigrationModel.apiVersion}`,
   kind: MultiNamespaceVirtualMachineStorageMigrationModel.kind,
   metadata: {
-    name: truncateToK8sName(
-      `${MIGRATION_PREFIX}-${getName(migrationPlan) || getRandomChars()}`,
-      MAX_K8S_NAME_LENGTH,
-    ),
+    name: truncateToK8sName(`${MIGRATION_PREFIX}-${getName(migrationPlan) || getRandomChars()}`),
     namespace: getNamespace(migrationPlan),
   },
   spec: {
