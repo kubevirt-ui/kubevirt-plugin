@@ -71,3 +71,31 @@ export const getConfigInterfaceState = (
 
 export const isPodNetwork = (network: Partial<V1Network>): boolean =>
   Boolean(network?.pod) && typeof network.pod === 'object';
+
+/**
+ * Check if a network interface is SR-IOV type
+ * @param {V1VirtualMachine} vm the VirtualMachine
+ * @param {string} nicName the name of the network interface
+ * @returns {boolean} true if the interface is SR-IOV
+ */
+export const isSRIOVNetworkByVM = (vm: V1VirtualMachine, nicName: string): boolean => {
+  const iface = getNetworkInterface(vm, nicName);
+  if (!iface) return false;
+  return interfaceTypesProxy[getNetworkInterfaceType(iface)] === interfaceTypesProxy.sriov;
+};
+
+/**
+ * Get the configured interface state from a VM
+ * @param {V1VirtualMachine} vm the VirtualMachine
+ * @param {string} nicName the name of the network interface
+ * @returns {NetworkInterfaceState} the interface state
+ */
+export const getConfigInterfaceStateFromVM = (
+  vm: V1VirtualMachine,
+  nicName: string,
+): NetworkInterfaceState =>
+  getConfigInterfaceState(
+    getNetworkInterface(vm, nicName),
+    getNetworkInterfaceState(vm, nicName),
+    isSRIOVNetworkByVM(vm, nicName),
+  );
