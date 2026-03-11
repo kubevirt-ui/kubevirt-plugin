@@ -1,20 +1,30 @@
+import { useMemo } from 'react';
+
 import HyperConvergedModel from '@kubevirt-ui/kubevirt-api/console/models/HyperConvergedModel';
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
-import { getAnnotation, getAnnotations } from '@kubevirt-utils/resources/shared';
+import useKubevirtHyperconvergeConfiguration from '@kubevirt-utils/hooks/useKubevirtHyperconvergeConfiguration.ts';
+import { getAnnotations } from '@kubevirt-utils/resources/shared';
+import { PASST_BINDING_NAME } from '@kubevirt-utils/resources/vm/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sPatch, Patch } from '@openshift-console/dynamic-plugin-sdk';
 
 import { PASST_ANNOTATION } from './constants';
 
 const usePasstFeatureFlag = () => {
-  const [hyperConvergeConfiguration, hcoLoaded] = useHyperConvergeConfiguration();
+  const { hcConfig, hcLoaded } = useKubevirtHyperconvergeConfiguration();
+  const [hyperConvergeConfiguration] = useHyperConvergeConfiguration();
   const isAdmin = useIsAdmin();
+
+  const featureEnabled = useMemo(
+    () => Boolean(hcConfig?.spec?.configuration?.network?.binding?.[PASST_BINDING_NAME]),
+    [hcConfig],
+  );
 
   return {
     canEdit: isAdmin,
-    featureEnabled: getAnnotation(hyperConvergeConfiguration, PASST_ANNOTATION) === 'true',
-    loading: !hcoLoaded,
+    featureEnabled,
+    loading: !hcLoaded,
     toggleFeature: (val: boolean) => {
       const patch: Patch[] = [
         ...(isEmpty(getAnnotations(hyperConvergeConfiguration))
