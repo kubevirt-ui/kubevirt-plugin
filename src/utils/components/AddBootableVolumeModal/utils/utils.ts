@@ -370,7 +370,7 @@ export const createDataSourceWithImportCron: CreateDataSourceWithImportCronType 
   const { password, username } = registryCredentials || {};
   const addRegistrySecret = !!(username && password);
   const imageSecretName = addRegistrySecret
-    ? truncateToK8sName(`${bootableVolumeName}-registry-secret-${getRandomChars()}`)
+    ? truncateToK8sName(bootableVolumeName, `registry-secret-${getRandomChars()}`)
     : null;
 
   if (addRegistrySecret) {
@@ -390,8 +390,10 @@ export const createDataSourceWithImportCron: CreateDataSourceWithImportCronType 
   }
 
   const dataImportCronName = truncateToK8sName(
-    `${bootableVolumeName}-import-cron-${getRandomChars()}`,
+    bootableVolumeName,
+    `import-cron-${getRandomChars()}`,
   );
+
   const dataImportCron = produce(initialDataImportCron, (draft) => {
     draft.metadata.name = dataImportCronName;
     draft.metadata.namespace = targetNamespace;

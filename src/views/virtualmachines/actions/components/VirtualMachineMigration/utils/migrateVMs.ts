@@ -18,12 +18,11 @@ export const generateMigPlanName = (
   selectedMigrations: SelectedMigration[],
   destinationStorageClass: string,
 ): string => {
-  const suffix = getRandomChars();
   const vmNames = selectedMigrations.map((m) => m.vmName).filter(Boolean);
 
   const vmPart = vmNames.length === 1 ? vmNames[0] : `${vmNames.length || 0}vms`;
 
-  return truncateToK8sName(`${MIGPLAN_PREFIX}-${vmPart}-to-${destinationStorageClass}-${suffix}`);
+  return truncateToK8sName(`${MIGPLAN_PREFIX}-${vmPart}-to-${destinationStorageClass}`);
 };
 
 export const getEmptyMigPlan = (
@@ -48,7 +47,10 @@ export const getMigration = (
   apiVersion: `${MultiNamespaceVirtualMachineStorageMigrationModel.apiGroup}/${MultiNamespaceVirtualMachineStorageMigrationModel.apiVersion}`,
   kind: MultiNamespaceVirtualMachineStorageMigrationModel.kind,
   metadata: {
-    name: truncateToK8sName(`${MIGRATION_PREFIX}-${getName(migrationPlan) || getRandomChars()}`),
+    name: truncateToK8sName(
+      `${MIGRATION_PREFIX}-${getName(migrationPlan) || getRandomChars()}`,
+      '',
+    ),
     namespace: getNamespace(migrationPlan),
   },
   spec: {

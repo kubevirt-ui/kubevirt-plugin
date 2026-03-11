@@ -50,7 +50,7 @@ export const cloneVM = (
 
     draftCloneData.metadata.namespace = namespace;
 
-    draftCloneData.metadata.name = truncateToK8sName(`${newVMName}-${getRandomChars(6)}-cr`);
+    draftCloneData.metadata.name = truncateToK8sName(newVMName, `${getRandomChars(6)}-cr`);
 
     if (startVM) {
       const vmUseRunning =

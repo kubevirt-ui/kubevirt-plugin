@@ -87,9 +87,18 @@ export const getRandomChars = (len = 6): string => {
 
 export const addRandomSuffix = (str: string) => str.concat(`-${getRandomChars()}`);
 
-export const truncateToK8sName = (name: string, maxLength = MAX_K8S_NAME_LENGTH): string => {
-  if (name.length <= maxLength) return name;
-  return name.slice(0, maxLength).replace(/-$/, '');
+export const truncateToK8sName = (
+  name: string,
+  suffix: string = getRandomChars(),
+  maxLength = MAX_K8S_NAME_LENGTH,
+): string => {
+  const separator = suffix ? '-' : '';
+  const fullName = `${name}${separator}${suffix}`;
+  if (fullName.length <= maxLength) return fullName;
+
+  const availableLength = maxLength - suffix.length - separator.length;
+  const truncatedName = name.slice(0, Math.max(1, availableLength)).replace(/-$/, '');
+  return `${truncatedName}${separator}${suffix}`;
 };
 
 export const SSH_PUBLIC_KEY_VALIDATION_REGEX =

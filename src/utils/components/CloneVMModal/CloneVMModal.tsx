@@ -10,7 +10,7 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isVM } from '@kubevirt-utils/utils/typeGuards';
-import { getRandomChars, truncateToK8sName } from '@kubevirt-utils/utils/utils';
+import { truncateToK8sName } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { getVMURL } from '@multicluster/urls';
 import { ModalVariant } from '@patternfly/react-core';
@@ -38,7 +38,7 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
   const name = getName(source);
 
   const [cloneName, setCloneName] = useState(
-    truncateToK8sName(`${name}${isVM(source) ? '-clone-' : '-'}${getRandomChars()}`),
+    truncateToK8sName(isVM(source) ? `${name}-clone` : name),
   );
 
   const [startCloneVM, setStartCloneVM] = useState(false);
