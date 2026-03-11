@@ -3,8 +3,12 @@ import { useMemo } from 'react';
 import { HyperConvergedModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { V1LabelSelector } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1MigrationConfiguration } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { operatorNamespaceSignal } from '@kubevirt-utils/store/operatorNamespace';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
+import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+
+import useDeepCompareMemoize from './useDeepCompareMemoize/useDeepCompareMemoize';
 
 export type HyperConverged = K8sResourceCommon & {
   spec: {
@@ -48,26 +52,34 @@ const getHyperConvergedObject = (hyperConverged): HyperConverged => {
   return hyperConverged;
 };
 
-type UseHyperConvergeConfigurationType = () => [
-  hyperConvergeConfig: HyperConverged,
-  loaded: boolean,
-  error: any,
-];
+type UseHyperConvergeConfigurationType = (
+  cluster?: string,
+) => [hyperConvergeConfig: HyperConverged, loaded: boolean, error: any];
 
-const useHyperConvergeConfiguration: UseHyperConvergeConfigurationType = () => {
-  const [hyperConvergeData, hyperConvergeDataLoaded, hyperConvergeDataError] = useK8sWatchResource<
+const useHyperConvergeConfiguration: UseHyperConvergeConfigurationType = (cluster) => {
+  const operatorNamespace = operatorNamespaceSignal.value;
+
+  const [hyperConvergeData, hyperConvergeDataLoaded, hyperConvergeDataError] = useK8sWatchData<
     HyperConverged[]
-  >({
-    groupVersionKind: HyperConvergedModelGroupVersionKind,
-    isList: true,
-  });
+  >(
+    operatorNamespace && {
+      cluster,
+      groupVersionKind: HyperConvergedModelGroupVersionKind,
+      isList: true,
+      namespace: operatorNamespace,
+    },
+  );
+
+  const hcoLoaded = hyperConvergeDataLoaded && !isEmpty(operatorNamespace);
 
   const hyperConverge = useMemo(
     () => getHyperConvergedObject(hyperConvergeData),
     [hyperConvergeData],
   );
 
-  return [hyperConverge, hyperConvergeDataLoaded, hyperConvergeDataError];
+  const memoizedHyperconvergedConfig = useDeepCompareMemoize(hyperConverge);
+
+  return [memoizedHyperconvergedConfig, hcoLoaded, hyperConvergeDataError];
 };
 
 export default useHyperConvergeConfiguration;
