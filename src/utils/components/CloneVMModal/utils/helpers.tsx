@@ -9,9 +9,8 @@ import {
   V1VirtualMachine,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { RUNSTRATEGY_ALWAYS } from '@kubevirt-utils/constants/constants';
-import { MAX_K8S_NAME_LENGTH } from '@kubevirt-utils/utils/constants';
 import { isVM } from '@kubevirt-utils/utils/typeGuards';
-import { getRandomChars } from '@kubevirt-utils/utils/utils';
+import { getRandomChars, truncateToK8sName } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sCreate, kubevirtK8sGet } from '@multicluster/k8sRequests';
 
 const cloneVMToVM: V1beta1VirtualMachineClone = {
@@ -51,14 +50,7 @@ export const cloneVM = (
 
     draftCloneData.metadata.namespace = namespace;
 
-    draftCloneData.metadata.name = `${newVMName}-${getRandomChars(6)}-cr`.substring(
-      0,
-      MAX_K8S_NAME_LENGTH,
-    );
-
-    if (draftCloneData.metadata.name.endsWith('-')) {
-      draftCloneData.metadata.name = draftCloneData.metadata.name.slice(0, -1);
-    }
+    draftCloneData.metadata.name = truncateToK8sName(newVMName, `${getRandomChars(6)}-cr`);
 
     if (startVM) {
       const vmUseRunning =

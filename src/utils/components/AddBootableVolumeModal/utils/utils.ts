@@ -19,8 +19,12 @@ import { createUserPasswordSecret } from '@kubevirt-utils/resources/secret/utils
 import { buildOwnerReference, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { DATA_SOURCE_CRONJOB_LABEL } from '@kubevirt-utils/resources/template';
 import { ARCHITECTURE_LABEL } from '@kubevirt-utils/utils/architecture';
-import { MAX_K8S_NAME_LENGTH } from '@kubevirt-utils/utils/constants';
-import { appendDockerPrefix, getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
+import {
+  appendDockerPrefix,
+  getRandomChars,
+  isEmpty,
+  truncateToK8sName,
+} from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sCreate, kubevirtK8sDelete } from '@multicluster/k8sRequests';
 
 import {
@@ -366,7 +370,7 @@ export const createDataSourceWithImportCron: CreateDataSourceWithImportCronType 
   const { password, username } = registryCredentials || {};
   const addRegistrySecret = !!(username && password);
   const imageSecretName = addRegistrySecret
-    ? `${bootableVolumeName}-registry-secret-${getRandomChars()}`.substring(0, MAX_K8S_NAME_LENGTH)
+    ? truncateToK8sName(bootableVolumeName, `registry-secret-${getRandomChars()}`)
     : null;
 
   if (addRegistrySecret) {
@@ -385,7 +389,11 @@ export const createDataSourceWithImportCron: CreateDataSourceWithImportCronType 
     });
   }
 
-  const dataImportCronName = `${bootableVolumeName}-import-cron-${getRandomChars()}`;
+  const dataImportCronName = truncateToK8sName(
+    bootableVolumeName,
+    `import-cron-${getRandomChars()}`,
+  );
+
   const dataImportCron = produce(initialDataImportCron, (draft) => {
     draft.metadata.name = dataImportCronName;
     draft.metadata.namespace = targetNamespace;

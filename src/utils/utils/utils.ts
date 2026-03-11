@@ -12,6 +12,7 @@ import {
 } from '@kubevirt-utils/constants/constants';
 import { ALL_NAMESPACES, ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { getLabels } from '@kubevirt-utils/resources/shared';
+import { MAX_K8S_NAME_LENGTH } from '@kubevirt-utils/utils/constants';
 import {
   FilterValue,
   K8sResourceCommon,
@@ -85,6 +86,20 @@ export const getRandomChars = (len = 6): string => {
 };
 
 export const addRandomSuffix = (str: string) => str.concat(`-${getRandomChars()}`);
+
+export const truncateToK8sName = (
+  name: string,
+  suffix: string = getRandomChars(),
+  maxLength = MAX_K8S_NAME_LENGTH,
+): string => {
+  const separator = suffix ? '-' : '';
+  const fullName = `${name}${separator}${suffix}`;
+  if (fullName.length <= maxLength) return fullName;
+
+  const availableLength = maxLength - suffix.length - separator.length;
+  const truncatedName = name.slice(0, Math.max(1, availableLength)).replace(/-$/, '');
+  return `${truncatedName}${separator}${suffix}`;
+};
 
 export const SSH_PUBLIC_KEY_VALIDATION_REGEX =
   /^(ssh-(rsa|dss|ed25519)|sk-ssh-(rsa|ed25519)@openssh\.com|ecdsa-sha2-nistp(256|384|521))\s+[A-Za-z0-9+/=]+(?:\s+.+)?$/;

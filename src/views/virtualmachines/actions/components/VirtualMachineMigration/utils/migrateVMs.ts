@@ -9,18 +9,31 @@ import {
   MultiNamespaceVirtualMachineStorageMigrationPlan,
 } from '@kubevirt-utils/resources/migrations/constants';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { getRandomChars } from '@kubevirt-utils/utils/utils';
+import { getRandomChars, truncateToK8sName } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 
-import { SelectedMigration } from './constants';
+import { MIGPLAN_PREFIX, MIGRATION_PREFIX, SelectedMigration } from './constants';
+
+export const generateMigPlanName = (
+  selectedMigrations: SelectedMigration[],
+  destinationStorageClass: string,
+): string => {
+  const vmNames = selectedMigrations.map((m) => m.vmName).filter(Boolean);
+
+  const vmPart = vmNames.length === 1 ? vmNames[0] : `${vmNames.length || 0}vms`;
+
+  return truncateToK8sName(`${MIGPLAN_PREFIX}-${vmPart}-to-${destinationStorageClass}`);
+};
 
 export const getEmptyMigPlan = (
   namespace: string,
+  selectedMigrations: SelectedMigration[],
+  destinationStorageClass: string,
 ): MultiNamespaceVirtualMachineStorageMigrationPlan => ({
   apiVersion: `${MultiNamespaceVirtualMachineStorageMigrationPlanModel.apiGroup}/${MultiNamespaceVirtualMachineStorageMigrationPlanModel.apiVersion}`,
   kind: MultiNamespaceVirtualMachineStorageMigrationPlanModel.kind,
   metadata: {
-    name: `migplan-${getRandomChars()}`,
+    name: generateMigPlanName(selectedMigrations, destinationStorageClass),
     namespace,
   },
   spec: {
@@ -34,7 +47,10 @@ export const getMigration = (
   apiVersion: `${MultiNamespaceVirtualMachineStorageMigrationModel.apiGroup}/${MultiNamespaceVirtualMachineStorageMigrationModel.apiVersion}`,
   kind: MultiNamespaceVirtualMachineStorageMigrationModel.kind,
   metadata: {
-    name: `migration-${getName(migrationPlan) || getRandomChars()}`,
+    name: truncateToK8sName(
+      `${MIGRATION_PREFIX}-${getName(migrationPlan) || getRandomChars()}`,
+      '',
+    ),
     namespace: getNamespace(migrationPlan),
   },
   spec: {
@@ -49,7 +65,11 @@ export const migrateVMs = async (
   destinationStorageClass: string,
   cluster: string,
 ) => {
-  const migrationPlan = getEmptyMigPlan(getNamespace(selectedMigrations?.[0].pvc));
+  const migrationPlan = getEmptyMigPlan(
+    getNamespace(selectedMigrations?.[0].pvc),
+    selectedMigrations,
+    destinationStorageClass,
+  );
 
   const migrationsPerNamespace = groupBy(selectedMigrations, 'vmNamespace');
 
