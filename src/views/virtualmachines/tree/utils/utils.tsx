@@ -351,9 +351,17 @@ export const createMultiClusterTreeViewData = (
   return [allClustersTreeItem];
 };
 
+const isAllNamespacesItem = (item: TreeViewDataItem): boolean =>
+  item.id === ALL_NAMESPACES_SESSION_KEY;
+
+const isClusterItem = (item: TreeViewDataItem): boolean =>
+  item.id?.startsWith(CLUSTER_SELECTOR_PREFIX);
+
+const isVMItem = (item: TreeViewDataItem) => !item.children;
+
 // searches for clusters, projects and folders
 export const filterItems = (item: TreeViewDataItem, input: string) => {
-  if (isTreeViewVMItem(item)) {
+  if (isVMItem(item)) {
     return false;
   }
 
@@ -374,38 +382,26 @@ export const filterItems = (item: TreeViewDataItem, input: string) => {
   }
 };
 
-// Show projects that has VMs all the time.
-// Show / hide projects that has no VMs depending on a flag
-// hide system namespaces unless they contain VMs OR there are no non-system namespaces
-export const filterNamespaceItems = (
-  item: TreeViewDataItem,
-  showEmptyProjects: boolean,
-  hasNonSystemNamespaces: boolean = true,
-) => {
-  const hasVMs =
-    item.id !== ALL_NAMESPACES_SESSION_KEY &&
-    item.id !== ALL_CLUSTERS_ID &&
-    !item.id.startsWith(CLUSTER_SELECTOR_PREFIX) &&
-    item.children?.length > 0;
-  const projectName = item.name as string;
-
+// Show projects that have VMs all the time
+// Show / hide projects that have no VMs depending on showEmptyProjects flag
+// Hide system namespaces unless they contain VMs
+export const filterNamespaceItems = (item: TreeViewDataItem, showEmptyProjects: boolean) => {
   if (item.id.startsWith(PROJECT_SELECTOR_PREFIX)) {
-    const isSystemNS = isSystemNamespace(projectName);
-
+    const hasVMs = item.children?.length > 0;
     if (hasVMs) return true;
 
-    if (showEmptyProjects && !isSystemNS) return true;
+    const projectName = item.name as string;
+    if (isSystemNamespace(projectName)) return false;
 
-    if (showEmptyProjects && isSystemNS && !hasNonSystemNamespaces) return true;
+    return showEmptyProjects;
   }
 
   if (item.children) {
-    return (
-      (item.children = item.children
-        .map((opt) => Object.assign({}, opt))
-        .filter((child) => filterNamespaceItems(child, showEmptyProjects, hasNonSystemNamespaces)))
-        .length > 0
-    );
+    item.children = item.children
+      .map((opt) => Object.assign({}, opt))
+      .filter((child) => filterNamespaceItems(child, showEmptyProjects));
+
+    return item.children.length > 0 || isClusterItem(item) || isAllNamespacesItem(item);
   }
 };
 
@@ -415,10 +411,8 @@ export const getAllTreeViewItems = (treeData: TreeViewDataItem[]) => {
     ?.flat();
 };
 
-const isTreeViewVMItem = (item: TreeViewDataItem) => !item.children;
-
 export const getAllTreeViewVMItems = (treeData: TreeViewDataItem[]): TreeViewDataItem[] =>
-  getAllTreeViewItems(treeData).filter(isTreeViewVMItem);
+  getAllTreeViewItems(treeData).filter(isVMItem);
 
 export const getAllRightClickableTreeViewItems = (
   treeData: TreeViewDataItem[],
