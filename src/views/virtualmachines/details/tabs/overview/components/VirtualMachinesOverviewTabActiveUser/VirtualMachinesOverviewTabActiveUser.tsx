@@ -1,23 +1,22 @@
-import React, { FC } from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import {
+  V1VirtualMachine,
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceGuestAgentInfo,
-  V1VirtualMachineInstanceGuestOSUser,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import ActiveUsersTable from '@kubevirt-utils/components/ActiveUsersTable/ActiveUsersTable';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isGuestAgentConnected } from '@kubevirt-utils/resources/vmi';
-import { VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
 import { Bullseye, Card, CardBody, CardTitle, Divider } from '@patternfly/react-core';
-
-import useActiveUsersColumnsVm from './hooks/useActiveUsersColumnsVm';
-import ActiveUserListRowVm from './ActiveUserListRowVm';
+import { isRunning } from '@virtualmachines/utils';
 
 type VirtualMachinesOverviewTabActiveUserProps = {
   guestAgentData: V1VirtualMachineInstanceGuestAgentInfo;
   guestAgentDataLoaded: boolean;
-  guestAgentDataLoadError: Error;
+  guestAgentDataLoadError?: Error;
+  vm: V1VirtualMachine;
   vmi: V1VirtualMachineInstance;
 };
 
@@ -25,37 +24,52 @@ const VirtualMachinesOverviewTabActiveUser: FC<VirtualMachinesOverviewTabActiveU
   guestAgentData,
   guestAgentDataLoaded,
   guestAgentDataLoadError,
+  vm,
   vmi,
 }) => {
   const { t } = useKubevirtTranslation();
-  const columns = useActiveUsersColumnsVm();
-  const userList = guestAgentData?.userList || [];
-  const bodyTable =
-    vmi && isGuestAgentConnected(vmi) ? (
-      <VirtualizedTable<V1VirtualMachineInstanceGuestOSUser>
-        columns={columns}
+  const isVMRunning = isRunning(vm);
+  const userList = guestAgentData?.userList ?? [];
+  const isConnected = vmi && isGuestAgentConnected(vmi);
+
+  const renderContent = (): ReactNode => {
+    if (!isVMRunning) {
+      return (
+        <Bullseye data-test="overview-active-users-not-running">
+          <MutedTextSpan text={t('VirtualMachine is not running')} />
+        </Bullseye>
+      );
+    }
+
+    if (!isConnected) {
+      return (
+        <Bullseye data-test="overview-active-users-no-agent">
+          <MutedTextSpan text={t('Guest agent is required')} />
+        </Bullseye>
+      );
+    }
+
+    return (
+      <ActiveUsersTable
         data={userList}
         loaded={guestAgentDataLoaded}
         loadError={guestAgentDataLoadError}
-        NoDataEmptyMsg={() => <Bullseye>{t('No active users')}</Bullseye>}
-        Row={ActiveUserListRowVm}
-        unfilteredData={userList}
       />
-    ) : (
-      <Bullseye>
-        <MutedTextSpan
-          text={vmi ? t('Guest agent is required') : t('VirtualMachine is not running')}
-        />
-      </Bullseye>
     );
+  };
+
+  const showUserCount =
+    guestAgentDataLoaded && isConnected && !guestAgentDataLoadError && isVMRunning;
 
   return (
-    <Card>
+    <Card data-test="overview-active-users-card">
       <CardTitle className="pf-v6-u-text-color-subtle">
-        {t('Active users ({{users}})', { users: userList?.length })}
+        {showUserCount
+          ? t('Active users ({{users}})', { users: userList.length })
+          : t('Active users')}
       </CardTitle>
       <Divider />
-      <CardBody isFilled>{bodyTable}</CardBody>
+      <CardBody isFilled>{renderContent()}</CardBody>
     </Card>
   );
 };
