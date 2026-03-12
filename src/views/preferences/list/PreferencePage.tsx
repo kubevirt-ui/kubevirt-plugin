@@ -3,11 +3,13 @@ import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 import classNames from 'classnames';
 
 import {
+  VirtualMachineClusterPreferenceModel,
   VirtualMachineClusterPreferenceModelGroupVersionKind,
   VirtualMachineClusterPreferenceModelRef,
   VirtualMachinePreferenceModelRef,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
+import useIsCRDPage from '@kubevirt-utils/hooks/useIsCRDPage';
 import useIsSearchPage from '@kubevirt-utils/hooks/useIsSearchPage';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useUserPreferences from '@kubevirt-utils/hooks/useUserPreferences';
@@ -29,6 +31,7 @@ const PreferencePage: FC<ListPageProps> = (props) => {
   const activeNamespace = props?.namespace ?? ALL_NAMESPACES_SESSION_KEY;
 
   const isSearchPage = useIsSearchPage();
+  const isCRDPage = useIsCRDPage();
 
   const activeTabKey = useMemo(
     () =>
@@ -56,6 +59,14 @@ const PreferencePage: FC<ListPageProps> = (props) => {
 
     const kindSearched = searchParams.get('kind');
     return kindSearched === VirtualMachineClusterPreferenceModelRef ? (
+      <ClusterPreferenceList {...props} />
+    ) : (
+      <UserPreferenceList {...props} />
+    );
+  }
+
+  if (isCRDPage) {
+    return location?.pathname?.includes(VirtualMachineClusterPreferenceModel.plural) ? (
       <ClusterPreferenceList {...props} />
     ) : (
       <UserPreferenceList {...props} />
