@@ -11,9 +11,9 @@ import { k8sPatch, Patch } from '@openshift-console/dynamic-plugin-sdk';
 
 import { PASST_ANNOTATION } from './constants';
 
-const usePasstFeatureFlag = () => {
-  const { hcConfig, hcLoaded } = useKubevirtHyperconvergeConfiguration();
-  const [hyperConvergeConfiguration] = useHyperConvergeConfiguration();
+const usePasstFeatureFlag = (cluster?: string) => {
+  const { hcConfig, hcLoaded } = useKubevirtHyperconvergeConfiguration(cluster);
+  const [hyperConvergeConfiguration] = useHyperConvergeConfiguration(cluster);
   const isAdmin = useIsAdmin();
 
   const featureEnabled = useMemo(
