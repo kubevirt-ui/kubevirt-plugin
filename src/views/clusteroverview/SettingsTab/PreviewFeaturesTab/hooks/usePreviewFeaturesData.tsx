@@ -8,6 +8,7 @@ import {
 } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 
 import AdvancedCDROMPopoverContent from '../AdvancedCDROMPopoverContent';
 import PasstPopoverContent from '../PasstPopoverContent';
@@ -37,8 +38,9 @@ type UsePreviewFeaturesData = () => {
 
 const usePreviewFeaturesData: UsePreviewFeaturesData = () => {
   const { t } = useKubevirtTranslation();
+  const cluster = useClusterParam();
   const treeViewFoldersFeature = useFeatures(TREE_VIEW_FOLDERS);
-  const passtFeatureFlag = usePasstFeatureFlag();
+  const passtFeatureFlag = usePasstFeatureFlag(cluster);
   const advancedCDROMFeature = useAdvancedCDROMFeatureFlag();
 
   const features = [

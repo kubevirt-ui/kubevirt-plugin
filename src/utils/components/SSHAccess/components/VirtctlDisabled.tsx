@@ -21,7 +21,7 @@ const VirtctlDisabled: FC<VirtctlDisabledProps> = ({ cluster, namespace }) => {
   const { t } = useKubevirtTranslation();
 
   const [, , nad] = useNamespaceUDN(namespace);
-  const { featureEnabled: passtEnabled } = usePasstFeatureFlag();
+  const { featureEnabled: passtEnabled } = usePasstFeatureFlag(cluster);
 
   if (passtEnabled) {
     return (
