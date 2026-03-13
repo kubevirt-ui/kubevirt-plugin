@@ -1,26 +1,27 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DiskListTitle from '@kubevirt-utils/components/DiskListTitle/DiskListTitle';
+import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   ListPageBody,
   ListPageFilter,
   useListPageFilter,
-  VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
 
-import useDisksTableColumns from '../../hooks/useDisksTableColumns';
 import useDisksTableDisks from '../../hooks/useDisksTableDisks';
 import { filters } from '../../utils/virtualMachinesInstancePageDisksTabUtils';
 
-import DisksTableRow from './DisksTableRow';
+import { getVMIDiskRowId, getVMIDisksTableColumns } from './disksTableDefinition';
 
 type DisksTableProps = {
   vmi: V1VirtualMachineInstance;
 };
 
 const DisksTable: FC<DisksTableProps> = ({ vmi }) => {
-  const columns = useDisksTableColumns();
+  const { t } = useKubevirtTranslation();
+  const columns = useMemo(() => getVMIDisksTableColumns(t), [t]);
   const [disks, loaded, loadingError] = useDisksTableDisks(vmi);
   const [data, filteredData, onFilterChange] = useListPageFilter(disks, filters);
 
@@ -34,13 +35,19 @@ const DisksTable: FC<DisksTableProps> = ({ vmi }) => {
         onFilterChange={onFilterChange}
         rowFilters={filters}
       />
-      <VirtualizedTable
+      <KubevirtTable
+        ariaLabel={t('Disks table')}
         columns={columns}
         data={filteredData}
+        dataTest="vmi-disks-table"
+        fixedLayout
+        getRowId={getVMIDiskRowId}
+        initialSortKey="name"
         loaded={loaded}
         loadError={loadingError}
-        Row={DisksTableRow}
-        unfilteredData={disks}
+        noDataMsg={t('No disks found')}
+        noFilteredDataMsg={t('No results match the current filters')}
+        unfilteredData={data}
       />
     </ListPageBody>
   );
