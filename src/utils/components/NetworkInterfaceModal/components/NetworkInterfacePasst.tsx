@@ -5,6 +5,7 @@ import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
 import { interfaceTypesProxy } from '@kubevirt-utils/resources/vm/utils/network/constants';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import usePasstFeatureFlag from '@overview/SettingsTab/PreviewFeaturesTab/hooks/usePasstFeatureFlag';
 import { FormGroup, Popover, Select, SelectOption, Split, SplitItem } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
@@ -23,9 +24,10 @@ const NetworkInterfacePasst: FC<NetworkInterfacePasstProps> = ({
   setInterfaceType,
 }) => {
   const { t } = useKubevirtTranslation();
+  const cluster = useClusterParam();
   const [isOpen, setIsOpen] = useState(false);
   const options = getPASSTSelectableOptions(t);
-  const passtFeatureFlag = usePasstFeatureFlag();
+  const passtFeatureFlag = usePasstFeatureFlag(cluster);
   const [isNamespaceManagedByUDN] = useNamespaceUDN(namespace);
 
   const selectedType = interfaceType || interfaceTypesProxy.l2bridge;
