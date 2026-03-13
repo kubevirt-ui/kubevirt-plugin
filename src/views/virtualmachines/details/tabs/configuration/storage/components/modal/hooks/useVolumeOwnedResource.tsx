@@ -26,23 +26,26 @@ const useVolumeOwnedResource: UseVolumeOwnedResource = (vm, volume) => {
     namespaced: false,
   });
 
-  const updatedVolume = volume.dataVolume ? convertDataVolumeToPVC(volume, cdiConfig) : volume;
-  const volumeType = getVolumeType(updatedVolume);
-  const volumeResourceModel = mapVolumeTypeToK8sModel[volumeType];
+  const updatedVolume = volume?.dataVolume ? convertDataVolumeToPVC(volume, cdiConfig) : volume;
+  const volumeType = volume ? getVolumeType(updatedVolume) : null;
+  const volumeResourceModel = volumeType && mapVolumeTypeToK8sModel[volumeType];
   const volumeGroupVersionKind =
     volumeResourceModel && modelToGroupVersionKind(volumeResourceModel);
-  const volumeResourceName = getVolumeResourceName(volume);
-  const watchVolumeResource = {
-    groupVersionKind: volumeGroupVersionKind,
-    isList: false,
-    name: volumeResourceName,
-    namespace: vm.metadata.namespace,
-  };
+  const volumeResourceName = volume ? getVolumeResourceName(volume) : null;
+  const watchVolumeResource =
+    volumeGroupVersionKind && volumeResourceName && vm?.metadata?.namespace
+      ? {
+          groupVersionKind: volumeGroupVersionKind,
+          isList: false,
+          name: volumeResourceName,
+          namespace: vm.metadata.namespace,
+        }
+      : null;
   const [resource, loaded, error] = useK8sWatchResource<K8sResourceCommon>(
-    volumeGroupVersionKind && volumeResourceName && watchVolumeResource,
+    watchVolumeResource ?? null,
   );
 
-  if (!volumeResourceModel || !volumeResourceName) {
+  if (!volume || !volumeResourceModel || !volumeResourceName) {
     return {
       error: error || isCdiConfigError,
       loaded: true,
