@@ -155,7 +155,7 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
                 toggleProps={{
                   isDisabled: isUploading,
                   isFullWidth: true,
-                  placeholder: t('Select or upload a new ISO file to the cluster'),
+                  placeholder: t('Select ISO file'),
                 }}
                 options={isoOptions}
                 selected={selectedISO}
