@@ -8,6 +8,7 @@ import useDefaultStorageClass from '@kubevirt-utils/hooks/useDefaultStorage/useD
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { isDNS1123Label } from '@kubevirt-utils/utils/validation';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { Modal, ModalBody, Wizard, WizardHeader, WizardStep } from '@patternfly/react-core';
 
@@ -17,6 +18,7 @@ import VirtualMachineMigrationDestinationTab from './tabs/VirtualMachineMigratio
 import VirtualMachineMigrationDetails from './tabs/VirtualMachineMigrationDetails';
 import VirtualMachineMigrationReviewTab from './tabs/VirtualMachineMigrationReviewTab';
 import { SelectedMigration } from './utils/constants';
+import { generateMigPlanName } from './utils/migrateVMs';
 import { getAllSelectedMigrations } from './utils/utils';
 import VirtualMachineMigrationStatus from './VirtualMachineMigrationStatus';
 
@@ -37,6 +39,8 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
 
   const cluster = getCluster(vms?.[0]);
   const [selectedStorageClass, setSelectedStorageClass] = useState('');
+  const [migrationPlanName, setMigrationPlanName] = useState(() => generateMigPlanName(vms));
+  const [keepOriginalVolumes, setKeepOriginalVolumes] = useState(false);
 
   const [selectedMigrations, setSelectedMigrations] = useImmer<null | SelectedMigration[]>(null);
 
@@ -75,7 +79,12 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
   );
 
   const { migrationError, migrationLoading, migrationPlan, migrationStarted, onSubmit } =
-    useMigrationState(selectedMigrations, destinationStorageClass);
+    useMigrationState(
+      selectedMigrations,
+      destinationStorageClass,
+      migrationPlanName,
+      keepOriginalVolumes,
+    );
 
   const nothingSelected = isEmpty(selectedPVCs);
 
@@ -118,15 +127,18 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
             >
               <WizardStep
                 footer={{
-                  isNextDisabled: nothingSelected,
+                  isNextDisabled:
+                    nothingSelected || !migrationPlanName || !isDNS1123Label(migrationPlanName),
                 }}
                 id="wizard-migration-details"
                 name={t('Migration details')}
               >
                 {scLoaded && (
                   <VirtualMachineMigrationDetails
+                    migrationPlanName={migrationPlanName}
                     pvcs={migrationNamespacesPVCs || []}
                     selectedPVCs={selectedPVCs}
+                    setMigrationPlanName={setMigrationPlanName}
                     setSelectedMigrations={setSelectedMigrations}
                     vms={vms}
                   />
@@ -134,10 +146,15 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
 
                 {!scLoaded && <Loading />}
               </WizardStep>
-              <WizardStep id="wizard-migrate-destination" name={t('Destination StorageClass')}>
+              <WizardStep
+                id="wizard-migrate-destination"
+                name={t('Source and target storage class')}
+              >
                 <VirtualMachineMigrationDestinationTab
                   defaultStorageClassName={defaultStorageClassName}
                   destinationStorageClass={destinationStorageClass}
+                  keepOriginalVolumes={keepOriginalVolumes}
+                  setKeepOriginalVolumes={setKeepOriginalVolumes}
                   setSelectedStorageClass={setSelectedStorageClass}
                   sortedStorageClasses={sortedStorageClasses}
                   vmStorageClassNames={vmStorageClassNames}
@@ -155,7 +172,9 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
                 <VirtualMachineMigrationReviewTab
                   defaultStorageClassName={defaultStorageClassName}
                   destinationStorageClass={destinationStorageClass}
+                  keepOriginalVolumes={keepOriginalVolumes}
                   migrationError={migrationError}
+                  migrationPlanName={migrationPlanName}
                   pvcs={selectedPVCs}
                   vms={vms}
                   vmStorageClassNames={vmStorageClassNames}

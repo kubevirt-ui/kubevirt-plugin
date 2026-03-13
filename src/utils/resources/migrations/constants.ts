@@ -43,10 +43,19 @@ export type StorageMigrationPlanNamespaceStatus = {
   suffix: string;
 };
 
+export const STORAGE_MIGRATION_PLAN_RETENTION_POLICY = {
+  DELETE_SOURCE: 'deleteSource',
+  KEEP_SOURCE: 'keepSource',
+} as const;
+
+export type StorageMigrationPlanRetentionPolicy =
+  (typeof STORAGE_MIGRATION_PLAN_RETENTION_POLICY)[keyof typeof STORAGE_MIGRATION_PLAN_RETENTION_POLICY];
+
 export type MultiNamespaceVirtualMachineStorageMigrationPlan = K8sResourceCommon & {
   spec: {
     namespaces: {
       name: string;
+      retentionPolicy?: StorageMigrationPlanRetentionPolicy;
       virtualMachines: VirtualMachinesMigrationSpec[];
     }[];
   };
@@ -57,6 +66,7 @@ export type MultiNamespaceVirtualMachineStorageMigrationPlan = K8sResourceCommon
 
 export type VirtualMachineStorageMigrationPlan = K8sResourceCommon & {
   spec: {
+    retentionPolicy?: StorageMigrationPlanRetentionPolicy;
     virtualMachines: VirtualMachinesMigrationSpec[];
   };
   status?: StorageMigrationPlanNamespaceStatus;

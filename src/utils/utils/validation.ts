@@ -31,4 +31,11 @@ export const getDNS1123LabelError = (value: string): ((t: TFunction) => string) 
   return undefined;
 };
 
+export const sanitizeK8sResourceName = (value: string): string =>
+  value
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, '-')
+    .replace(/-{2,}/g, '-')
+    .slice(0, DNS1123LabelMaxLength);
+
 export const isDigitsOnly = (value: string): boolean => /^\d+$/.test(value);
