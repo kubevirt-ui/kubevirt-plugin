@@ -6,6 +6,7 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
+  MigrationStatus,
   MultiNamespaceVirtualMachineStorageMigrationPlan,
   STORAGE_MIGRATION_PHASE,
 } from '@kubevirt-utils/resources/migrations/constants';
@@ -14,6 +15,8 @@ import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/share
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { EmptyStateStatus } from '@patternfly/react-core';
+import { CheckCircleIcon, CogIcon, ExclamationCircleIcon } from '@patternfly/react-icons';
 
 import { ALREADY_MIGRATED_PVC_LALBEL, SelectedMigration } from './constants';
 import { createSelectedMigration, getTableDiskData } from './diskData';
@@ -96,4 +99,31 @@ export const getAllSelectedMigrations = (
   return (getTableDiskData(vms, pvcs) || [])
     .filter((diskData) => diskData.isSelectable)
     .map((diskData) => createSelectedMigration(diskData));
+};
+
+export const getFailedMigrations = (
+  plan: MultiNamespaceVirtualMachineStorageMigrationPlan,
+): MigrationStatus[] => plan?.status?.namespaces?.flatMap((ns) => ns?.failedMigrations ?? []) ?? [];
+
+export const getMigrationStatusProps = (
+  migrationCompleted: boolean,
+  hasFailed: boolean,
+): { heading: string; icon: typeof CheckCircleIcon; status: EmptyStateStatus } => {
+  if (migrationCompleted)
+    return {
+      heading: t('Storage migration completed'),
+      icon: CheckCircleIcon,
+      status: EmptyStateStatus.success,
+    };
+  if (hasFailed)
+    return {
+      heading: t('Storage migration failed'),
+      icon: ExclamationCircleIcon,
+      status: EmptyStateStatus.danger,
+    };
+  return {
+    heading: t('Storage migration in progress...'),
+    icon: CogIcon,
+    status: EmptyStateStatus.info,
+  };
 };

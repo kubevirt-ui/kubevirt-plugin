@@ -9,6 +9,8 @@ import { migrateVMs } from '../utils/migrateVMs';
 type UseMigrationState = (
   selectedMigrations: SelectedMigration[],
   destinationStorageClass: string,
+  migrationPlanName: string,
+  keepOriginalVolumes: boolean,
 ) => {
   migrationError: Error;
   migrationLoading: boolean;
@@ -17,7 +19,12 @@ type UseMigrationState = (
   onSubmit: () => Promise<void>;
 };
 
-const useMigrationState: UseMigrationState = (selectedMigrations, destinationStorageClass) => {
+const useMigrationState: UseMigrationState = (
+  selectedMigrations,
+  destinationStorageClass,
+  migrationPlanName,
+  keepOriginalVolumes,
+) => {
   const [migrationError, setMigrationError] = useState<Error | null>(null);
   const [migrationLoading, setMigrationLoading] = useState(false);
   const [migrationStarted, setMigrationStarted] = useState(false);
@@ -29,7 +36,15 @@ const useMigrationState: UseMigrationState = (selectedMigrations, destinationSto
     setMigrationLoading(true);
     setMigrationError(null);
     try {
-      setMigrationPlan(await migrateVMs(selectedMigrations, destinationStorageClass, cluster));
+      setMigrationPlan(
+        await migrateVMs({
+          cluster,
+          destinationStorageClass,
+          keepOriginalVolumes,
+          migrationPlanName,
+          selectedMigrations,
+        }),
+      );
 
       setMigrationStarted(true);
     } catch (apiError) {
@@ -37,7 +52,13 @@ const useMigrationState: UseMigrationState = (selectedMigrations, destinationSto
     }
 
     setMigrationLoading(false);
-  }, [selectedMigrations, destinationStorageClass, cluster]);
+  }, [
+    selectedMigrations,
+    destinationStorageClass,
+    cluster,
+    migrationPlanName,
+    keepOriginalVolumes,
+  ]);
 
   return { migrationError, migrationLoading, migrationPlan, migrationStarted, onSubmit };
 };

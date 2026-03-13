@@ -6,11 +6,27 @@ import { modelToGroupVersionKind, StorageClassModel } from '@kubevirt-utils/mode
 import { POPPER_CONTAINER_ID } from '@kubevirt-utils/utils/constants';
 import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import { Content, ContentVariants, Label, Stack, StackItem, Title } from '@patternfly/react-core';
+import {
+  Alert,
+  AlertVariant,
+  Button,
+  ButtonVariant,
+  Checkbox,
+  Content,
+  ContentVariants,
+  Label,
+  Popover,
+  Stack,
+  StackItem,
+  Title,
+} from '@patternfly/react-core';
+import { HelpIcon } from '@patternfly/react-icons';
 
 type VirtualMachineMigrationDestinationTabProps = {
   defaultStorageClassName: string;
   destinationStorageClass: string;
+  keepOriginalVolumes: boolean;
+  setKeepOriginalVolumes: Dispatch<SetStateAction<boolean>>;
   setSelectedStorageClass: Dispatch<SetStateAction<string>>;
   sortedStorageClasses: string[];
   vmStorageClassNames: string[];
@@ -21,6 +37,8 @@ const StorageClassModelGroupVersionKind = modelToGroupVersionKind(StorageClassMo
 const VirtualMachineMigrationDestinationTab: FC<VirtualMachineMigrationDestinationTabProps> = ({
   defaultStorageClassName,
   destinationStorageClass,
+  keepOriginalVolumes,
+  setKeepOriginalVolumes,
   setSelectedStorageClass,
   sortedStorageClasses,
   vmStorageClassNames,
@@ -31,12 +49,24 @@ const VirtualMachineMigrationDestinationTab: FC<VirtualMachineMigrationDestinati
   return (
     <Stack hasGutter>
       <StackItem>
-        <Title headingLevel="h2">{t('Destination StorageClass')}</Title>
-        <Content component={ContentVariants.p}>
-          {t('Select the destination storage for the VirtualMachine storage migration.')}
-        </Content>
+        <Title headingLevel="h2">{t('Source and target storage class')}</Title>
+        <Content component={ContentVariants.p}>{t('Source (current) storage class:')}</Content>
+        <div>
+          {vmStorageClassNames.map((scName) => (
+            <MulticlusterResourceLink
+              cluster={cluster}
+              groupVersionKind={StorageClassModelGroupVersionKind}
+              inline
+              key={scName}
+              name={scName}
+            />
+          ))}
+        </div>
       </StackItem>
       <StackItem>
+        <Content component={ContentVariants.p}>
+          {t('Select the target storage for the VirtualMachine storage migration.')}
+        </Content>
         <InlineFilterSelect
           options={sortedStorageClasses?.map((storageClass) => ({
             children: (
@@ -62,6 +92,36 @@ const VirtualMachineMigrationDestinationTab: FC<VirtualMachineMigrationDestinati
           toggleProps={{ isFullWidth: true, placeholder: t('Select StorageClass') }}
         />
       </StackItem>
+      <StackItem>
+        <Checkbox
+          label={
+            <>
+              {t('Keep original volumes at source after successful migration')}{' '}
+              <Popover
+                bodyContent={t(
+                  "The system is configured to decommission the source volumes once the migration is verified healthy to prevent 'zombie storage'. Check this if you want to manually verify and remove the old disks later.",
+                )}
+              >
+                <Button hasNoPadding icon={<HelpIcon />} variant={ButtonVariant.plain} />
+              </Popover>
+            </>
+          }
+          id="keep-original-volumes"
+          isChecked={keepOriginalVolumes}
+          onChange={(_, checked) => setKeepOriginalVolumes(checked)}
+        />
+      </StackItem>
+      {keepOriginalVolumes && (
+        <StackItem>
+          <Alert
+            title={t(
+              "If you keep these volumes, you'll need to manually decommission the disks after you've verified the migration",
+            )}
+            isInline
+            variant={AlertVariant.info}
+          />
+        </StackItem>
+      )}
     </Stack>
   );
 };
