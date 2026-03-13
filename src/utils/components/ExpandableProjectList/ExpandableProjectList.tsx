@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 
 import { modelToGroupVersionKind, NamespaceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -23,27 +23,56 @@ const ExpandableProjectList: FC<ExpandableProjectListProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const [expand, setExpand] = useState(false);
+  const isFirstRun = useRef(true);
 
-  if (!loaded) return <Skeleton />;
+  // Notify virtualized table to re-measure after expand/collapse so row overlap is avoided
+  useEffect(() => {
+    if (isFirstRun.current) {
+      isFirstRun.current = false;
+      return;
+    }
+    const id = requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        window.dispatchEvent(new Event('resize'));
+      });
+    });
+    return () => cancelAnimationFrame(id);
+  }, [expand]);
 
-  if (isEmpty(projectNames)) return <span>{emptyMessage ?? t('No projects matched')}</span>;
+  if (!loaded) {
+    return (
+      <div style={{ alignItems: 'center', display: 'flex', minHeight: '48px' }}>
+        <Skeleton />
+      </div>
+    );
+  }
 
-  return (
-    <>
-      {projectNames.slice(0, expand ? projectNames.length : maxItems).map((project) => (
-        <ResourceLink
-          groupVersionKind={modelToGroupVersionKind(NamespaceModel)}
-          key={project}
-          name={project}
-        />
-      ))}
-      {projectNames.length > maxItems && (
-        <Button onClick={() => setExpand(!expand)} variant={ButtonVariant.link}>
-          {expand ? t('Show less') : t('+{{num}} more', { num: projectNames.length - maxItems })}
-        </Button>
+  const cellContent = (
+    <div style={{ minHeight: '48px' }}>
+      {isEmpty(projectNames) ? (
+        <span>{emptyMessage ?? t('No projects matched')}</span>
+      ) : (
+        <>
+          {projectNames.slice(0, expand ? projectNames.length : maxItems).map((project) => (
+            <ResourceLink
+              groupVersionKind={modelToGroupVersionKind(NamespaceModel)}
+              key={project}
+              name={project}
+            />
+          ))}
+          {projectNames.length > maxItems && (
+            <Button onClick={() => setExpand(!expand)} variant={ButtonVariant.link}>
+              {expand
+                ? t('Show less')
+                : t('+{{num}} more', { num: projectNames.length - maxItems })}
+            </Button>
+          )}
+        </>
       )}
-    </>
+    </div>
   );
+
+  return cellContent;
 };
 
 export default ExpandableProjectList;
