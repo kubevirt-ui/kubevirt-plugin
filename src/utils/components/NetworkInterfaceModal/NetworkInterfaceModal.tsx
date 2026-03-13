@@ -13,6 +13,7 @@ import {
 import { getNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
 import { generatePrettyName } from '@kubevirt-utils/utils/utils';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import usePasstFeatureFlag from '@overview/SettingsTab/PreviewFeaturesTab/hooks/usePasstFeatureFlag';
 import { ExpandableSection, Form } from '@patternfly/react-core';
@@ -68,9 +69,10 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
   vm,
 }) => {
   const { t } = useKubevirtTranslation();
+  const cluster = useClusterParam();
   const { iface = null, network = null } = nicPresentation;
 
-  const { featureEnabled: passtEnabled } = usePasstFeatureFlag();
+  const { featureEnabled: passtEnabled } = usePasstFeatureFlag(cluster);
   const [nicName, setNicName] = useState(network?.name || generatePrettyName('nic'));
   const [interfaceModel, setInterfaceModel] = useState(iface?.model || interfaceModelType.VIRTIO);
   const [networkName, setNetworkName] = useState(getNetworkName(network));

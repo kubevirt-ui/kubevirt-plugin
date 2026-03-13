@@ -7,6 +7,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { NetworkAttachmentDefinitionModelGroupVersionKind } from '@kubevirt-utils/models';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import usePasstFeatureFlag from '@overview/SettingsTab/PreviewFeaturesTab/hooks/usePasstFeatureFlag';
 import { Content, Popover } from '@patternfly/react-core';
@@ -18,9 +19,10 @@ type VirtctlDisabledProps = {
 
 const VirtctlDisabled: FC<VirtctlDisabledProps> = ({ namespace }) => {
   const { t } = useKubevirtTranslation();
+  const cluster = useClusterParam();
 
   const [, , nad] = useNamespaceUDN(namespace);
-  const { featureEnabled: passtEnabled } = usePasstFeatureFlag();
+  const { featureEnabled: passtEnabled } = usePasstFeatureFlag(cluster);
 
   if (passtEnabled) {
     return (
