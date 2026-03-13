@@ -16,9 +16,9 @@ import { SSHSecretDetails } from '@kubevirt-utils/components/SSHSecretModal/util
 import { TLS_CERT_SOURCE_EXISTING } from '@kubevirt-utils/components/TLSCertificateSection';
 import {
   ROOTDISK,
+  RUNSTRATEGY_ALWAYS,
   RUNSTRATEGY_HALTED,
   RUNSTRATEGY_MANUAL,
-  RUNSTRATEGY_RERUNONFAILURE,
 } from '@kubevirt-utils/constants/constants';
 import {
   DataUpload,
@@ -132,7 +132,7 @@ const useDrawer = (template: V1Template) => {
         isEmpty(draftVM?.spec?.running) &&
         [RUNSTRATEGY_HALTED, RUNSTRATEGY_MANUAL].includes(draftVM?.spec?.runStrategy)
       )
-        draftVM.spec.runStrategy = RUNSTRATEGY_RERUNONFAILURE;
+        draftVM.spec.runStrategy = RUNSTRATEGY_ALWAYS;
     });
 
     setCustomizedTemplate(templateWithRunning);
