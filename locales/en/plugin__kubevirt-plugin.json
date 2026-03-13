@@ -1676,7 +1676,6 @@
   "Select multiple VirtualMachines to perform an action for all of them": "Select multiple VirtualMachines to perform an action for all of them",
   "Select node": "Select node",
   "Select Nodes that must have all the following expressions.": "Select Nodes that must have all the following expressions.",
-  "Select or upload a new ISO file to the cluster": "Select or upload a new ISO file to the cluster",
   "Select PersistentVolumeClaim": "Select PersistentVolumeClaim",
   "Select preference": "Select preference",
   "Select project": "Select project",
