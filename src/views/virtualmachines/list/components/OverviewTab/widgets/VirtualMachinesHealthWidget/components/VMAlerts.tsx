@@ -39,7 +39,7 @@ const VMAlerts: FC<VMAlertsProps> = ({ onViewAll }) => {
         className="health-card__header"
       >
         <CardTitle>
-          {t('Virtual machines alerts')}
+          {t('Virtual machine alerts')}
           {loaded && !error && <span className="vm-alerts__count">{totalAlerts}</span>}
         </CardTitle>
       </CardHeader>

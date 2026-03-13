@@ -1,6 +1,7 @@
 import { KubeDeschedulerModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   DESCHEDULER_ENABLED,
+  DESCHEDULER_NOT_ENABLED,
   DESCHEDULER_NOT_INSTALLED,
   DESCHEDULER_UNKNOWN,
 } from '@kubevirt-utils/hooks/constants';
@@ -15,6 +16,7 @@ import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 export type DeschedulerStatus =
   | typeof DESCHEDULER_ENABLED
+  | typeof DESCHEDULER_NOT_ENABLED
   | typeof DESCHEDULER_NOT_INSTALLED
   | typeof DESCHEDULER_UNKNOWN;
 

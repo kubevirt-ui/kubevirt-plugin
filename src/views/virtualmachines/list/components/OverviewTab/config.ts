@@ -23,17 +23,17 @@ const getSharedSections = (t: TFunction): OverviewSectionConfig[] => [
   {
     Component: VirtualMachinesHealthWidget,
     id: SECTION_ID_VM_HEALTH,
-    title: t('Virtual machines health'),
+    title: t('Virtual machine health'),
   },
   {
     Component: MigrationStatusSection,
     id: SECTION_ID_MIGRATION_STATUS,
-    title: t('Migration status'),
+    title: t('Migration statuses'),
   },
   {
     Component: ResourceAllocationSection,
     id: SECTION_ID_RESOURCE_ALLOCATION,
-    title: t('Virtualization resource allocation & consumption'),
+    title: t('Virtualization resource allocation and consumption'),
   },
 ];
 

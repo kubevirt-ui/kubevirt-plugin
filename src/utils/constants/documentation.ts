@@ -26,6 +26,7 @@ export const documentationURL = {
   DATAVOLUME_PREALLOCATIONS: `${REDHAT_DOC_URL}/html/virtualization/storage#virt-using-preallocation-for-datavolumes`,
   DECLARATIVE_HOTPLUG_VOLUMES: `${KV_UG_URL}/user-guide/storage/hotplug_volumes/#enabling-hotplug-volume-support`,
   DESCHEDULER: `${KV_UG_URL}/user-guide/operations/node_assignment/#node-balancing-with-descheduler`,
+  DESCHEDULER_ENABLING: `${REDHAT_DOC_URL}/html/virtualization/managing-vms#virt-enabling-descheduler-evictions`,
   DEV_PREVIEW: `${RH_ACCESS_URL}/support/offerings/devpreview`,
   DYNAMIC_SSH_KEY_INJECTION: `${REDHAT_DOC_URL}/html/virtualization/managing-vms#virt-accessing-vm-ssh`,
   FREE_PAGE_REPORTING:

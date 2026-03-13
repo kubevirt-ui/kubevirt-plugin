@@ -5,6 +5,8 @@ export const FENCE_AGENTS_OPERATOR_NAME = 'fence-agents-remediation';
 export const DESCHEDULER_OPERATOR_NAME = 'cluster-kube-descheduler-operator';
 export const CLUSTER_OBSERVABILITY_OPERATOR_NAME = 'cluster-observability-operator';
 
+export const OPERATOR_HUB_PATH = '/operatorhub';
+
 export const operatorPackageNames = [
   NMSTATE_OPERATOR_NAME,
   NETOBSERV_OPERATOR_NAME,

@@ -26,7 +26,7 @@ const GuestAgentIssues: FC<GuestAgentIssuesProps> = ({ vmis, vms }) => {
       isCompact
     >
       <CardHeader className="health-card__header">
-        <CardTitle>{t('Guest agent issues')}</CardTitle>
+        <CardTitle>{t('Guest agent status')}</CardTitle>
       </CardHeader>
       <CardBody>
         <Grid hasGutter>

@@ -11,7 +11,7 @@ import useDeschedulerDisplay from './useDeschedulerDisplay';
 
 const NodeLoadDistributionCard: FC = () => {
   const { t } = useKubevirtTranslation();
-  const { buckets, deschedulerStatus, distributionScore, items, loaded } =
+  const { buckets, deschedulerLoaded, deschedulerStatus, distributionScore, items, loaded } =
     useNodeLoadDistributionData();
   const { icon, label } = useDeschedulerDisplay(deschedulerStatus);
 
@@ -20,7 +20,7 @@ const NodeLoadDistributionCard: FC = () => {
       bottomLeftContent={
         <div className="two-column-card__descheduler">
           <span className="two-column-card__descheduler-label">{t('Descheduler status')}</span>
-          {!loaded ? (
+          {!deschedulerLoaded ? (
             <Skeleton width="80px" />
           ) : (
             <>

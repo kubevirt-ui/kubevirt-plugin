@@ -6,12 +6,12 @@ type MigrationStatusCounts = {
   failed: number;
   other: number;
   running: number;
-  scheduling: number;
+  scheduled: number;
 };
 
 /**
  * Counts migration statuses from a list of VMIMs.
- * Phases that are not Failed, Running, or Scheduling are counted as "other".
+ * Phases that are not Failed, Running, Scheduled, or Scheduling are counted as "other".
  * @param vmims
  */
 export const getMigrationStatusCounts = (
@@ -24,13 +24,13 @@ export const getMigrationStatusCounts = (
         acc.failed++;
       } else if (phase === vmimStatuses.Running) {
         acc.running++;
-      } else if (phase === vmimStatuses.Scheduling) {
-        acc.scheduling++;
+      } else if ([vmimStatuses.Scheduled, vmimStatuses.Scheduling].includes(phase)) {
+        acc.scheduled++;
       } else if (phase) {
         acc.other++;
       }
       return acc;
     },
-    { failed: 0, other: 0, running: 0, scheduling: 0 },
+    { failed: 0, other: 0, running: 0, scheduled: 0 },
   );
 };
