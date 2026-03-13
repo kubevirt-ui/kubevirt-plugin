@@ -36,7 +36,7 @@ const VMStatuses: FC<VMStatusesProps> = ({ vms }) => {
   return (
     <Card className="vm-statuses-card health-card" data-test="vm-statuses-card" isCompact>
       <CardHeader className="health-card__header">
-        <CardTitle>{t('Virtual machines statuses')}</CardTitle>
+        <CardTitle>{t('Virtual machine statuses')}</CardTitle>
       </CardHeader>
       <CardBody>
         <Grid hasGutter>

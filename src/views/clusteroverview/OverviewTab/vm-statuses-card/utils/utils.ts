@@ -7,9 +7,9 @@ import { VM_ERROR_STATUSES, VM_STATUS } from '@kubevirt-utils/resources/vm/utils
 import { sumObjectValues } from '@kubevirt-utils/utils/utils';
 import { RedExclamationCircleIcon } from '@openshift-console/dynamic-plugin-sdk';
 import {
-  ClockIcon,
   InProgressIcon,
   OffIcon,
+  OutlinedClockIcon,
   PausedIcon,
   UnknownIcon,
 } from '@patternfly/react-icons';
@@ -26,7 +26,7 @@ export const vmStatusIcon = {
   Paused: PausedIcon,
   Provisioning: Fragment,
   Running: GreenRunningIcon,
-  Scheduling: ClockIcon,
+  Scheduled: OutlinedClockIcon,
   Starting: Fragment,
   Stopped: OffIcon,
   Stopping: Fragment,

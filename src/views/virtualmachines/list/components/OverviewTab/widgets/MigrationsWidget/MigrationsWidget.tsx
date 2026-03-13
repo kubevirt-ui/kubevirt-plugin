@@ -68,10 +68,10 @@ const MigrationsWidget: FC<MigrationsWidgetProps> = ({
             span={3}
           />
           <StatusCountItem
-            count={statusCounts.scheduling}
-            icon={<vmStatusIcon.Scheduling />}
+            count={statusCounts.scheduled}
+            icon={<vmStatusIcon.Scheduled />}
             isLoading={isLoading}
-            label={t('Scheduling')}
+            label={t('Scheduled')}
             span={3}
           />
           <StatusCountItem
