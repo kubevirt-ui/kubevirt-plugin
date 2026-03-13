@@ -6,7 +6,6 @@ const MEMORY_DENSITY_VALUE = '400';
 describe('Test Cluster General settings', () => {
   before(() => {
     cy.beforeSpec();
-    tab.navigateToOverview();
     tab.navigateToSettings();
   });
 

@@ -157,6 +157,22 @@ const virtualizationSection = [
   } as EncodedExtension<ResourceClusterNavItem>,
 
   {
+    properties: {
+      dataAttributes: {
+        'data-border': 'no-border',
+        'data-class': 'kv-plugin-virt-perspective-element',
+        'data-test-id': 'virtualization-settings-nav-item',
+      },
+      href: 'virtualization-settings',
+      id: 'virtualization-settings-virt-perspective',
+      insertAfter: 'migrationpolicies-virt-perspective',
+      name: '%plugin__kubevirt-plugin~Settings%',
+      perspective: 'virtualization-perspective',
+      prefixNamespaced: true,
+    },
+    type: 'console.navigation/href',
+  } as EncodedExtension<HrefNavItem>,
+  {
     flags: {
       required: ['KUBEVIRT_DYNAMIC'],
     },
@@ -168,7 +184,7 @@ const virtualizationSection = [
       },
       href: 'checkups',
       id: 'virtualization-checkups-virt-perspective',
-      insertAfter: 'migrationpolicies-virt-perspective',
+      insertAfter: 'virtualization-settings-virt-perspective',
       name: '%plugin__kubevirt-plugin~Checkups%',
       perspective: 'virtualization-perspective',
       prefixNamespaced: true,

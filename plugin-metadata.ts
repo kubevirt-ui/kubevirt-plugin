@@ -48,6 +48,7 @@ const metadata: ConsolePluginBuildMetadata = {
       './views/migrationpolicies/list/components/MigrationPolicyCreateForm/MigrationPolicyCreateForm.tsx',
     MigrationPolicyPage: './views/migrationpolicies/details/MigrationPolicyDetailsNav.tsx',
     PreferencePage: './views/preferences/list/PreferencePage.tsx',
+    SettingsPage: './views/settings/SettingsPage.tsx',
     TemplateNavPage: './views/templates/details/TemplateNavPage.tsx',
     useVirtualMachineInstanceActionsProvider:
       './views/virtualmachinesinstance/actions/hooks/useVirtualMachineInstanceActionsProvider.tsx',

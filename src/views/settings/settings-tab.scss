@@ -1,0 +1,31 @@
+.settings-tab {
+  &__layout {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+  }
+
+  &__tabs-wrapper {
+    flex-shrink: 0;
+  }
+
+  &__tabs {
+    margin-bottom: var(--pf-t--global--spacer--md);
+  }
+
+  &__scrollable {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  &__content {
+    max-width: 52.25rem;
+    padding: var(--pf-t--global--spacer--lg);
+  }
+}
+
+.settings-tab__section-divider {
+  margin: var(--pf-t--global--spacer--md) 0;
+}

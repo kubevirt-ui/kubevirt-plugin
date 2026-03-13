@@ -15,14 +15,17 @@ import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 
 import { RHELAutomaticSubscriptionFormProps } from './utils/types';
 
-type UseRHELAutomaticSubscription = () => RHELAutomaticSubscriptionFormProps;
+type UseRHELAutomaticSubscription = (
+  clusterOverride?: string,
+) => RHELAutomaticSubscriptionFormProps;
 
-const useRHELAutomaticSubscription: UseRHELAutomaticSubscription = () => {
-  const cluster = useClusterParam();
+const useRHELAutomaticSubscription: UseRHELAutomaticSubscription = (clusterOverride) => {
+  const clusterParam = useClusterParam();
+  const cluster = clusterOverride ?? clusterParam;
   const {
     featuresConfigMapData: [featureConfigMap, loaded, loadError],
     isAdmin,
-  } = useFeaturesConfigMap();
+  } = useFeaturesConfigMap(cluster);
 
   const [loading, setLoading] = useState(false);
 

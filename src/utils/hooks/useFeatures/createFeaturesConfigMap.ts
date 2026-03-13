@@ -6,7 +6,7 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { operatorNamespaceSignal } from '@kubevirt-utils/store/operatorNamespace';
 import { DEFAULT_OPERATOR_NAMESPACE } from '@kubevirt-utils/utils/utils';
-import { k8sCreate, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
+import { kubevirtK8sCreate, kubevirtK8sPatch } from '@multicluster/k8sRequests';
 
 import {
   FEATURES_CONFIG_MAP_INITIAL_DATA,
@@ -15,20 +15,23 @@ import {
   getFeaturesRoleBinding,
 } from './constants';
 
-export const createFeaturesConfigMap = async () => {
+export const createFeaturesConfigMap = async (cluster?: string) => {
   const namespace = operatorNamespaceSignal.value ?? DEFAULT_OPERATOR_NAMESPACE;
 
-  await k8sCreate<IoK8sApiCoreV1ConfigMap>({
+  await kubevirtK8sCreate<IoK8sApiCoreV1ConfigMap>({
+    cluster,
     data: getFeaturesConfigMapInitialState(namespace),
     model: ConfigMapModel,
   });
 
-  await k8sCreate<IoK8sApiRbacV1Role>({
+  await kubevirtK8sCreate<IoK8sApiRbacV1Role>({
+    cluster,
     data: getFeaturesRole(namespace),
     model: RoleModel,
   });
 
-  await k8sCreate<IoK8sApiRbacV1RoleBinding>({
+  await kubevirtK8sCreate<IoK8sApiRbacV1RoleBinding>({
+    cluster,
     data: getFeaturesRoleBinding(namespace),
     model: RoleBindingModel,
   });
@@ -37,8 +40,10 @@ export const createFeaturesConfigMap = async () => {
 export const applyMissingFeatures = async (
   featureName: string,
   featureConfigMap: IoK8sApiCoreV1ConfigMap,
+  cluster?: string,
 ) => {
-  await k8sPatch({
+  await kubevirtK8sPatch({
+    cluster,
     data: [
       {
         op: 'replace',

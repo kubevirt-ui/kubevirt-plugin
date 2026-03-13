@@ -14,6 +14,7 @@ import { SecretSelectionOption, SSHSecretDetails } from './utils/types';
 import { validateSecretName, validateSecretNameUnique } from './utils/utils';
 
 type SSHSecretModalProps = {
+  cluster?: string;
   initialSSHSecretDetails: SSHSecretDetails;
   isOpen: boolean;
   isTemplate?: boolean;
@@ -24,6 +25,7 @@ type SSHSecretModalProps = {
 };
 
 const SSHSecretModal: FC<SSHSecretModalProps> = ({
+  cluster: clusterOverride,
   initialSSHSecretDetails,
   isOpen,
   isTemplate = false,
@@ -33,7 +35,8 @@ const SSHSecretModal: FC<SSHSecretModalProps> = ({
   onSubmit,
 }) => {
   const { t } = useKubevirtTranslation();
-  const cluster = useClusterParam();
+  const clusterParam = useClusterParam();
+  const cluster = clusterOverride ?? clusterParam;
   const [sshDetails, setSSHDetails] = useState<SSHSecretDetails>(initialSSHSecretDetails);
   const [localNSProject, setLocalNSProject] = useState<string>(namespace);
   const secretsData = useSecretsData(localNSProject, namespace, cluster);

@@ -5,8 +5,8 @@ import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
 import { interfaceTypesProxy } from '@kubevirt-utils/resources/vm/utils/network/constants';
-import usePasstFeatureFlag from '@overview/SettingsTab/PreviewFeaturesTab/hooks/usePasstFeatureFlag';
 import { FormGroup, Select, SelectOption } from '@patternfly/react-core';
+import usePasstFeatureFlag from '@settings/tabs/PreviewFeaturesTab/hooks/usePasstFeatureFlag';
 
 import { getPASSTSelectableOptions, isPodNetworkName } from '../../utils/helpers';
 

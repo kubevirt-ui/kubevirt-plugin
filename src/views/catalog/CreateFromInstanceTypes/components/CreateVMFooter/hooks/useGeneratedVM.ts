@@ -15,7 +15,7 @@ import { addWinDriverVolume } from '@kubevirt-utils/resources/vm/utils/disk/driv
 import { useDriversImage } from '@kubevirt-utils/resources/vm/utils/disk/useDriversImage';
 import { getValidNamespace } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import { AUTOMATIC_UPDATE_FEATURE_NAME } from '@overview/SettingsTab/ClusterTab/components/GuestManagmentSection/AutomaticSubscriptionRHELGuests/utils/constants';
+import { AUTOMATIC_UPDATE_FEATURE_NAME } from '@settings/tabs/ClusterTab/components/GuestManagmentSection/AutomaticSubscriptionRHELGuests/utils/constants';
 
 export type UseGeneratedVMType = () => V1VirtualMachine;
 

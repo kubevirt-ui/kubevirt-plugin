@@ -28,10 +28,15 @@ import './configuration-search.scss';
 
 type ConfigurationSearchProps = {
   createSearchURL: (tab: string, elementId: string, pathname: string) => string;
+  placeholder?: string;
   searchItems: SearchItemWithTab[];
 };
 
-const ConfigurationSearch: FC<ConfigurationSearchProps> = ({ createSearchURL, searchItems }) => {
+const ConfigurationSearch: FC<ConfigurationSearchProps> = ({
+  createSearchURL,
+  placeholder,
+  searchItems,
+}) => {
   const { t } = useKubevirtTranslation();
   const [value, setValue] = useState<string>('');
   const navigate = useNavigate();
@@ -128,6 +133,7 @@ const ConfigurationSearch: FC<ConfigurationSearchProps> = ({ createSearchURL, se
           id="ConfigurationSearch-autocomplete-search"
           onChange={onChange}
           onClear={onClear}
+          placeholder={placeholder ?? t('Find settings')}
           value={value}
         />
       }
