@@ -10,21 +10,22 @@ import {
 import { MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
 import { STATUS_COMPLETED } from '@kubevirt-utils/resources/migrations/constants';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
-import { Timestamp } from '@openshift-console/dynamic-plugin-sdk';
 import {
-  ActionList,
-  ActionListItem,
   Button,
   ButtonVariant,
-  DescriptionList,
-  DescriptionListDescription,
-  DescriptionListGroup,
-  DescriptionListTerm,
+  Content,
+  ContentVariants,
+  EmptyState,
+  EmptyStateActions,
+  EmptyStateBody,
+  EmptyStateFooter,
+  EmptyStateVariant,
+  Spinner,
 } from '@patternfly/react-core';
 import { CloseIcon } from '@patternfly/react-icons';
 
 import useProgressMigration from './hooks/useProgressMigration';
-import { getStorageMigrationStatusLabel } from './utils/utils';
+import { getFailedMigrations, getMigrationStateConfig } from './utils/utils';
 
 type VirtualMachineMigrationStatusProps = {
   onClose: () => void;
@@ -38,14 +39,18 @@ const VirtualMachineMigrationStatus: FC<VirtualMachineMigrationStatusProps> = ({
   const { t } = useKubevirtTranslation();
 
   const {
-    completedMigrationTimestamp,
-    creationTimestamp,
     error: fetchingError,
     status,
     watchStorageMigrationPlan,
   } = useProgressMigration(storageMigrationPlan);
 
   const migrationCompleted = status === STATUS_COMPLETED;
+  const failedMigrations = getFailedMigrations(watchStorageMigrationPlan);
+  const hasFailed = failedMigrations.length > 0;
+  const { migrationHeading, migrationIcon, migrationStatus } = getMigrationStateConfig(
+    migrationCompleted,
+    hasFailed,
+  );
 
   return (
     <div className="pf-v6-c-wizard migration-status">
@@ -59,56 +64,54 @@ const VirtualMachineMigrationStatus: FC<VirtualMachineMigrationStatusProps> = ({
           />
         </div>
         <div className="pf-v6-c-wizard__title">
-          <h2 className="pf-v6-c-wizard__title-text">{t('Migrate VirtualMachines storage')}</h2>
+          <h2 className="pf-v6-c-wizard__title-text">{t('Migrate VirtualMachine storage')}</h2>
         </div>
         <div className="pf-v6-c-wizard__description">
           {t('Migrate VirtualMachine storage to a different StorageClass.')}
         </div>
       </div>
 
-      <DescriptionList className="migration-status__body">
-        <DescriptionListGroup>
-          <DescriptionListTerm>
-            {getStorageMigrationStatusLabel(watchStorageMigrationPlan)}
-          </DescriptionListTerm>
-        </DescriptionListGroup>
-
-        <DescriptionListGroup>
-          <DescriptionListTerm>{t('Started on')}</DescriptionListTerm>
-          <DescriptionListDescription>
-            {creationTimestamp ? <Timestamp timestamp={creationTimestamp} /> : t('Not started yet')}
-          </DescriptionListDescription>
-        </DescriptionListGroup>
-
-        <DescriptionListGroup>
-          <DescriptionListTerm>{t('Status')}</DescriptionListTerm>
-          <DescriptionListDescription>
-            {status || t('Requested')}
-
-            {migrationCompleted && (
-              <>
-                <br />
-                <Timestamp timestamp={completedMigrationTimestamp} />
-              </>
+      <div className="migration-status__body">
+        <EmptyState icon={migrationIcon} status={migrationStatus} variant={EmptyStateVariant.lg}>
+          <EmptyStateBody>
+            <Content component={ContentVariants.h3}>{migrationHeading}</Content>
+            {hasFailed && !migrationCompleted && (
+              <Content component={ContentVariants.p}>
+                {t('{{vmCount}} VirtualMachine storage migration(s) failed.', {
+                  vmCount: failedMigrations.length,
+                })}
+              </Content>
             )}
+            {!migrationCompleted && !hasFailed && <Spinner size="lg" />}
+          </EmptyStateBody>
 
-            <ErrorAlert error={fetchingError} />
-          </DescriptionListDescription>
-        </DescriptionListGroup>
-      </DescriptionList>
+          <ErrorAlert error={fetchingError} />
 
-      <ActionList>
-        <ActionListItem className="migration-status__view-report">
-          <Link
-            to={`/k8s/ns/${getNamespace(storageMigrationPlan)}/${modelToRef(
-              MultiNamespaceVirtualMachineStorageMigrationPlanModel,
-            )}`}
-            onClick={onClose}
-          >
-            {t('View storage migrations')}
-          </Link>
-        </ActionListItem>
-      </ActionList>
+          <EmptyStateFooter>
+            <EmptyStateActions>
+              {migrationCompleted || hasFailed ? (
+                <Button onClick={onClose} variant={ButtonVariant.primary}>
+                  {t('Close')}
+                </Button>
+              ) : (
+                <Button onClick={onClose} variant={ButtonVariant.link}>
+                  {t('Cancel')}
+                </Button>
+              )}
+            </EmptyStateActions>
+            <EmptyStateActions>
+              <Link
+                to={`/k8s/ns/${getNamespace(storageMigrationPlan)}/${modelToRef(
+                  MultiNamespaceVirtualMachineStorageMigrationPlanModel,
+                )}`}
+                onClick={onClose}
+              >
+                {t('View storage migrations')}
+              </Link>
+            </EmptyStateActions>
+          </EmptyStateFooter>
+        </EmptyState>
+      </div>
     </div>
   );
 };
