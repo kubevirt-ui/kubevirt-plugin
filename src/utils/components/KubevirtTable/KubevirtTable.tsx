@@ -1,36 +1,20 @@
 import React, { ReactElement, ReactNode, useMemo } from 'react';
 
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { useDataViewTableSort } from '@kubevirt-utils/hooks/useDataViewTableSort/useDataViewTableSort';
 import { generateRows } from '@kubevirt-utils/hooks/useDataViewTableSort/utils';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { EmptyState, EmptyStateVariant } from '@patternfly/react-core';
+import { Checkbox, EmptyState, EmptyStateVariant } from '@patternfly/react-core';
 import { DataViewTable, DataViewTr } from '@patternfly/react-data-view';
 
 import MutedTextSpan from '../MutedTextSpan/MutedTextSpan';
 import StateHandler from '../StateHandler/StateHandler';
 
+import { useTableSelection } from './hooks/useTableSelection';
+import { KubevirtTableProps } from './types';
+
 import './KubevirtTable.scss';
 
-export type KubevirtTableProps<TData, TCallbacks = undefined> = {
-  ariaLabel: string;
-  callbacks?: TCallbacks;
-  columns: ColumnConfig<TData, TCallbacks>[];
-  data: TData[];
-  dataTest?: string;
-  fixedLayout?: boolean;
-  getRowId?: (row: TData, index: number) => string;
-  initialSortColumnIndex?: number;
-  initialSortDirection?: 'asc' | 'desc';
-  initialSortKey?: string;
-  loaded?: boolean;
-  loadError?: unknown;
-  noDataMsg?: ReactNode;
-  noFilteredDataMsg?: ReactNode;
-  onSelect?: (selected: TData[]) => void;
-  selectedItems?: TData[];
-  unfilteredData?: TData[];
-};
+export type { KubevirtTableProps } from './types';
 
 const renderNoDataContent = (content: ReactNode): ReactNode => {
   if (typeof content === 'string') {
@@ -46,23 +30,31 @@ const renderNoFilteredDataContent = (content: ReactNode): ReactNode => {
   return content;
 };
 
-const KubevirtTable = <TData, TCallbacks = undefined>({
-  ariaLabel,
-  callbacks,
-  columns,
-  data,
-  dataTest,
-  fixedLayout = false,
-  getRowId,
-  initialSortColumnIndex,
-  initialSortDirection,
-  initialSortKey,
-  loaded = true,
-  loadError,
-  noDataMsg,
-  noFilteredDataMsg,
-  unfilteredData,
-}: KubevirtTableProps<TData, TCallbacks>): ReactElement => {
+const KubevirtTable = <TData, TCallbacks = undefined>(
+  props: KubevirtTableProps<TData, TCallbacks>,
+): ReactElement => {
+  const {
+    ariaLabel,
+    callbacks,
+    columns,
+    data,
+    dataTest,
+    fixedLayout = false,
+    getRowId,
+    initialSortColumnIndex,
+    initialSortDirection,
+    initialSortKey,
+    loaded = true,
+    loadError,
+    noDataMsg,
+    noFilteredDataMsg,
+    unfilteredData,
+  } = props;
+
+  const isSelectable = props.selectable === true;
+  const onSelect = isSelectable ? props.onSelect : undefined;
+  const selectedItems = isSelectable ? props.selectedItems : [];
+
   const effectiveInitialSortKey = useMemo(() => {
     if (initialSortKey) return initialSortKey;
     if (initialSortColumnIndex !== undefined && columns[initialSortColumnIndex]) {
@@ -78,15 +70,76 @@ const KubevirtTable = <TData, TCallbacks = undefined>({
     initialSortDirection,
   );
 
+  const {
+    allSelected,
+    handleRowSelect,
+    handleSelectAll,
+    isRowSelected,
+    someSelected,
+    validSelectedItems,
+  } = useTableSelection({
+    data: sortedData,
+    getRowId: getRowId ?? ((_, index) => String(index)),
+    onSelect: onSelect ?? (() => {}),
+    selectedItems,
+  });
+
+  // Sync valid selection back to parent when orphaned items are detected
+  React.useEffect(() => {
+    if (isSelectable && validSelectedItems.length !== selectedItems.length) {
+      onSelect?.(validSelectedItems);
+    }
+  }, [isSelectable, validSelectedItems, selectedItems.length, onSelect]);
+
   const rows: DataViewTr[] = useMemo(
-    () => generateRows(sortedData, visibleColumns, callbacks as TCallbacks, getRowId),
-    [sortedData, visibleColumns, callbacks, getRowId],
+    () =>
+      generateRows(
+        sortedData,
+        visibleColumns,
+        callbacks as TCallbacks,
+        getRowId,
+        isSelectable,
+        isRowSelected,
+        handleRowSelect,
+      ),
+    [sortedData, visibleColumns, callbacks, getRowId, isSelectable, isRowSelected, handleRowSelect],
   );
+
+  const selectAllId = dataTest ? `${dataTest}-select-all` : 'select-all-rows';
+
+  const selectionColumn = useMemo(() => {
+    if (!isSelectable) return null;
+
+    const getCheckboxState = (): boolean | null => {
+      if (allSelected) return true;
+      if (someSelected) return null;
+      return false;
+    };
+
+    return {
+      cell: (
+        <Checkbox
+          aria-label="Select all rows"
+          data-test={selectAllId}
+          id={selectAllId}
+          isChecked={getCheckboxState()}
+          onChange={handleSelectAll}
+        />
+      ),
+      props: { className: 'pf-v6-c-table__check' },
+    };
+  }, [isSelectable, allSelected, someSelected, selectAllId, handleSelectAll]);
+
+  const effectiveTableColumns = useMemo(() => {
+    if (!isSelectable || !selectionColumn) return tableColumns;
+    return [selectionColumn, ...tableColumns];
+  }, [isSelectable, selectionColumn, tableColumns]);
 
   const isUnfilteredDataEmpty = isEmpty(unfilteredData ?? data);
   const isDataEmpty = isEmpty(data);
 
   const effectiveNoFilteredDataMsg = renderNoFilteredDataContent(noFilteredDataMsg);
+  const effectiveColSpan = isSelectable ? visibleColumns.length + 1 : visibleColumns.length;
 
   const renderFilteredEmptyState = (): ReactNode => {
     if (!isDataEmpty || isUnfilteredDataEmpty || !effectiveNoFilteredDataMsg) {
@@ -95,7 +148,7 @@ const KubevirtTable = <TData, TCallbacks = undefined>({
 
     return (
       <tr>
-        <td className="pf-v6-u-text-align-center" colSpan={visibleColumns.length}>
+        <td className="pf-v6-u-text-align-center" colSpan={effectiveColSpan}>
           {effectiveNoFilteredDataMsg}
         </td>
       </tr>
@@ -108,7 +161,7 @@ const KubevirtTable = <TData, TCallbacks = undefined>({
     <DataViewTable
       aria-label={ariaLabel}
       bodyStates={filteredEmptyState ? { empty: filteredEmptyState } : undefined}
-      columns={tableColumns}
+      columns={effectiveTableColumns}
       rows={filteredEmptyState ? [] : rows}
     />
   );
