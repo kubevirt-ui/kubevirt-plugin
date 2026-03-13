@@ -3,10 +3,10 @@ import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
 import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
+import { VIRTUALIZATION_PATHS } from '@kubevirt-utils/constants/constants';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ALL_NAMESPACES_PATH } from '@virtualmachines/tree/hooks/constants';
-import { VIRTUALIZATION_PATHS } from '@virtualmachines/tree/utils/constants';
 
 import useProjects from './useProjects';
 

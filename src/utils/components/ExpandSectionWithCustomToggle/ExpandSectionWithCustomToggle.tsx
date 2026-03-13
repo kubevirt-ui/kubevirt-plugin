@@ -2,7 +2,6 @@ import { FC, ReactNode } from 'react';
 import React from 'react';
 import classNames from 'classnames';
 
-import useIsExpandedAndHighlighted from '@overview/SettingsTab/ExpandSection/hooks/useIsExpandedAndHighlighted';
 import {
   ExpandableSection,
   ExpandableSectionToggle,
@@ -12,6 +11,7 @@ import {
   Stack,
   StackItem,
 } from '@patternfly/react-core';
+import useIsExpandedAndHighlighted from '@settings/ExpandSection/hooks/useIsExpandedAndHighlighted';
 
 import HelpTextIcon from '../HelpTextIcon/HelpTextIcon';
 

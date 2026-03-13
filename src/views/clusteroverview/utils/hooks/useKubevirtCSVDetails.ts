@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { CatalogSourceModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { ClusterServiceVersionModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtClusterServiceVersion } from '@kubevirt-utils/hooks/useKubevirtClusterServiceVersion';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 import { OPENSHIFT_OPERATOR_LIFECYCLE_MANAGER_NAMESPACE, PACKAGESERVER } from '../constants';
 import { CatalogSourceKind, ClusterServiceVersionKind, SubscriptionKind } from '../types';
@@ -23,16 +23,17 @@ type UseKubevirtCSVDetails = {
   version: string;
 };
 
-export const useKubevirtCSVDetails = (): UseKubevirtCSVDetails => {
+export const useKubevirtCSVDetails = (cluster?: string): UseKubevirtCSVDetails => {
   const {
     installedCSV,
     loaded: loadedCSV,
     loadErrors: loadCSVError,
     subscription,
-  } = useKubevirtClusterServiceVersion();
+  } = useKubevirtClusterServiceVersion(cluster);
 
-  const [catalogSource, loadedSource, loadSourceError] = useK8sWatchResource<CatalogSourceKind>(
+  const [catalogSource, loadedSource, loadSourceError] = useK8sWatchData<CatalogSourceKind>(
     subscription && {
+      cluster,
       groupVersionKind: CatalogSourceModelGroupVersionKind,
       name: subscription?.spec?.source,
       namespace: subscription?.spec?.sourceNamespace,

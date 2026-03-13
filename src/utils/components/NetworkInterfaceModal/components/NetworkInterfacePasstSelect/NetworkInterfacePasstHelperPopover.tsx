@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 import { Link } from 'react-router-dom-v5-compat';
 
+import { VIRTUALIZATION_PATHS } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, ButtonVariant, Popover } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
@@ -22,7 +23,7 @@ const NetworkInterfacePasstHelperPopover: FC<NetworkInterfacePasstHelperPopoverP
             'To enable this feature, you need to enable the Passt feature flag in the cluster settings.',
           )}
 
-          <Link to={`/k8s/ns/${namespace}/virtualization-overview/settings`}>
+          <Link to={`/k8s/ns/${namespace}/${VIRTUALIZATION_PATHS.SETTINGS}`}>
             {t('Go to cluster settings')}
           </Link>
         </div>

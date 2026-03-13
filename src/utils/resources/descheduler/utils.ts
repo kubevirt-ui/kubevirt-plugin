@@ -6,7 +6,7 @@ import {
   KUBE_DESCHEDULER_NAMESPACE,
 } from '@kubevirt-utils/resources/descheduler/constants';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
+import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 
 import {
   ActualUtilizationProfile,
@@ -39,6 +39,7 @@ export const defaultDescheduler: KubeDescheduler = {
 export const updateDeviationThreshold = (
   descheduler: KubeDescheduler,
   newThreshold: DeviationThreshold,
+  cluster?: string,
 ) => {
   const updatedDescheduler = produce(descheduler, (tempDescheduler) => {
     tempDescheduler.spec.profileCustomizations = {
@@ -48,7 +49,8 @@ export const updateDeviationThreshold = (
     return tempDescheduler;
   });
 
-  return k8sUpdate({
+  return kubevirtK8sUpdate({
+    cluster,
     data: updatedDescheduler,
     model: { ...KubeDeschedulerModel, namespaced: true },
     name: getName(updatedDescheduler),

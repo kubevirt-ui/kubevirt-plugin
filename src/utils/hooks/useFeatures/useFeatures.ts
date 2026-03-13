@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { operatorNamespaceSignal } from '@kubevirt-utils/store/operatorNamespace';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import { k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
+import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 
 import {
   FEATURES_CONFIG_MAP_INITIAL_DATA,
@@ -14,25 +14,36 @@ import { applyMissingFeatures, createFeaturesConfigMap } from './createFeaturesC
 import { UseFeaturesValues } from './types';
 import useFeaturesConfigMap from './useFeaturesConfigMap';
 
-type UseFeatures = (featureName: string) => UseFeaturesValues;
+type UseFeatures = (featureName: string, clusterOverride?: string) => UseFeaturesValues;
 
-export const useFeatures: UseFeatures = (featureName) => {
+export const useFeatures: UseFeatures = (featureName, clusterOverride) => {
   const [createError, setCreateError] = useState(null);
   const [createInProgress, setCreateInProgress] = useState(false);
 
   const isUIFeature = UI_FEATURES.includes(featureName);
-  const cluster = useClusterParam();
+  const clusterParam = useClusterParam();
+  const configMapCluster = clusterOverride ?? (isUIFeature ? null : clusterParam);
+  const cluster = configMapCluster ?? undefined;
   const operatorNamespace = operatorNamespaceSignal.value;
 
-  const { featuresConfigMapData, isAdmin } = useFeaturesConfigMap(
-    isUIFeature ? null : cluster,
-    !createError,
-  );
+  const { featuresConfigMapData, isAdmin } = useFeaturesConfigMap(configMapCluster, !createError);
 
   const [featureConfigMap, loaded, loadError] = featuresConfigMapData;
   const [featureEnabled, setFeatureEnabled] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error>(null);
+
+  const prevClusterRef = useRef(cluster);
+  useEffect(() => {
+    if (prevClusterRef.current !== cluster) {
+      prevClusterRef.current = cluster;
+      setFeatureEnabled(null);
+      setLoading(true);
+      setError(null);
+      setCreateError(null);
+      setCreateInProgress(false);
+    }
+  }, [cluster]);
 
   useEffect(() => {
     if (createError || createInProgress || !operatorNamespace) {
@@ -45,7 +56,7 @@ export const useFeatures: UseFeatures = (featureName) => {
       setCreateInProgress(true);
       (async () => {
         try {
-          await createFeaturesConfigMap();
+          await createFeaturesConfigMap(cluster);
           setFeatureEnabled(FEATURES_CONFIG_MAP_INITIAL_DATA[featureName] === 'true');
           setError(null);
           // eslint-disable-next-line @typescript-eslint/no-shadow
@@ -78,7 +89,7 @@ export const useFeatures: UseFeatures = (featureName) => {
         case null: {
           (async () => {
             try {
-              await applyMissingFeatures(featureName, featureConfigMap);
+              await applyMissingFeatures(featureName, featureConfigMap, cluster);
               setFeatureEnabled(FEATURES_CONFIG_MAP_INITIAL_DATA[featureName] === 'true');
             } catch (updateError) {
               setError(updateError);
@@ -101,6 +112,7 @@ export const useFeatures: UseFeatures = (featureName) => {
     createError,
     createInProgress,
     operatorNamespace,
+    cluster,
   ]);
 
   const toggleFeature = useCallback(
@@ -109,7 +121,8 @@ export const useFeatures: UseFeatures = (featureName) => {
       setLoading(true);
 
       try {
-        const promise = await k8sPatch({
+        const promise = await kubevirtK8sPatch({
+          cluster,
           data: [{ op: 'replace', path: `/data/${featureName}`, value: value.toString() }],
           model: ConfigMapModel,
           resource: {
@@ -129,7 +142,7 @@ export const useFeatures: UseFeatures = (featureName) => {
         setError(updateError);
       }
     },
-    [featureName, operatorNamespace],
+    [cluster, featureName, operatorNamespace],
   );
 
   return {

@@ -1,0 +1,25 @@
+.preview-features-tab {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pf-t--global--spacer--md);
+
+  &__header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--pf-t--global--spacer--sm);
+  }
+
+  &__features {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pf-t--global--spacer--md);
+    max-width: 36.25rem;
+  }
+}
+
+.preview-features-popover {
+  &__icon {
+    margin-left: var(--pf-t--global--spacer--xs);
+  }
+}

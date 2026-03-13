@@ -61,3 +61,9 @@ export enum HTTP_METHODS {
   POST = 'POST',
   PUT = 'PUT',
 }
+
+export const VIRTUALIZATION_PATHS = {
+  BASE: '/virtualization',
+  OVERVIEW: 'virtualization-overview',
+  SETTINGS: 'virtualization-settings',
+} as const;

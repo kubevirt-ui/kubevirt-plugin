@@ -15,6 +15,7 @@ export const preferenceNav = '[data-test-id="virtualmachineclusterpreferences-na
 export const volumeNav = '[data-test-id="bootablevolumes-nav-item"]';
 export const mpNav = '[data-test-id="migrationpolicies-nav-item"]';
 export const checkupNav = '[data-test-id="virtualization-checkups-nav-item"]';
+export const settingsNav = '[data-test-id="virtualization-settings-nav-item"]';
 export const resourceTitle = '[data-test-id="resource-title"]';
 export const nameFilter = 'input[data-test="name-filter-input"]';
 export const breadcrumb = '[data-test-id="breadcrumb-link-0"]';

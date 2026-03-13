@@ -22,6 +22,8 @@ declare global {
       visitPreferences(): void;
       visitPreferencesVirt(): void;
       visitPVC(): void;
+      visitSettings(): void;
+      visitSettingsVirt(): void;
       visitStorageclass(): void;
       visitTemplates(): void;
       visitTemplatesVirt(): void;
@@ -118,6 +120,14 @@ Cypress.Commands.add('visitCheckups', () => {
 
 Cypress.Commands.add('visitCheckupsVirt', () => {
   cy.get(nav.checkupNav, { timeout: 5 * MINUTE }).click();
+});
+
+Cypress.Commands.add('visitSettings', () => {
+  cy.clickVirtLink(nav.settingsNav);
+});
+
+Cypress.Commands.add('visitSettingsVirt', () => {
+  cy.get(nav.settingsNav, { timeout: 5 * MINUTE }).click();
 });
 
 Cypress.Commands.add('visitPVC', () => {

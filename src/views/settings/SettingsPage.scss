@@ -1,0 +1,49 @@
+.settings-page {
+  &__layout {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - var(--pf-v6-c-page__main-section--PaddingTop, 0px));
+    overflow: hidden;
+  }
+
+  &__sticky-header {
+    flex-shrink: 0;
+  }
+
+  &__content {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__header {
+    padding-bottom: 0;
+    gap: var(--pf-t--global--spacer--sm);
+  }
+
+  &__toolbar {
+    padding-block: var(--pf-t--global--spacer--xs);
+    margin-top: var(--pf-t--global--spacer--md);
+    .ConfigurationSearch--main {
+      margin-bottom: 0;
+    }
+  }
+
+  &__cluster-selector {
+    display: flex;
+    gap: var(--pf-t--global--spacer--sm);
+    align-items: center;
+    align-self: center;
+
+    .co-cluster-dropdown {
+      flex: 1;
+      min-width: 0;
+
+      > button {
+        width: 100%;
+      }
+    }
+  }
+}
