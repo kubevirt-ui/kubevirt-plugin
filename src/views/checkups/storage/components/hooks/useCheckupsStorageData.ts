@@ -47,7 +47,7 @@ const useCheckupsStorageData = () => {
     configMaps,
     error: loadErrorConfigMaps || loadErrorJobs,
     jobs,
-    loaded: configMapsLoaded && jobsLoaded,
+    loaded: (configMapsLoaded || !!loadErrorConfigMaps) && (jobsLoaded || !!loadErrorJobs),
   };
 };
 
