@@ -9,12 +9,11 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getInterface, getInterfaces } from '@kubevirt-utils/resources/vm';
 import { DEFAULT_NETWORK_INTERFACE } from '@kubevirt-utils/resources/vm/utils/constants';
-import { interfaceTypesProxy } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import {
-  getNetworkInterface,
-  getNetworkInterfaceState,
-  getNetworkInterfaceType,
+  getConfigInterfaceState,
+  getConfigInterfaceStateFromVM,
   hasAutoAttachedPodNetwork,
+  isSRIOVNetworkByVM,
 } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
 import { getVMIInterfaces, getVMIStatusInterfaces } from '@kubevirt-utils/resources/vmi';
@@ -87,38 +86,9 @@ export const isPendingNICRemoval = (
   return interfaceNotFound(vm, nicName) && isActiveOnGuest(vmi, nicName, isVMRunning);
 };
 
-export const isSRIOVNetworkByVM = (vm: V1VirtualMachine, nicName: string) => {
-  const iface = getNetworkInterface(vm, nicName);
-  return interfaceTypesProxy[getNetworkInterfaceType(iface)] === interfaceTypesProxy.sriov;
-};
+export { getConfigInterfaceState, getConfigInterfaceStateFromVM, isSRIOVNetworkByVM };
 
 export const isSRIOVInterface = <T extends { sriov?: object }>(iface: T) => !!iface?.sriov;
-
-export const getConfigInterfaceStateFromVM = (
-  vm: V1VirtualMachine,
-  nicName: string,
-): NetworkInterfaceState =>
-  getConfigInterfaceState(
-    getNetworkInterface(vm, nicName),
-    getNetworkInterfaceState(vm, nicName),
-    isSRIOVNetworkByVM(vm, nicName),
-  );
-
-export const getConfigInterfaceState = (
-  iface?: unknown,
-  ifaceState?: string,
-  isSRIOV?: boolean,
-): NetworkInterfaceState => {
-  if (!iface) {
-    // no interface
-    return NetworkInterfaceState.NONE;
-  }
-  if (isSRIOV) {
-    return NetworkInterfaceState.UNSUPPORTED;
-  }
-
-  return isNetworkInterfaceState(ifaceState) ? ifaceState : NetworkInterfaceState.UP;
-};
 
 export const getRuntimeInterfaceState = (simpleIfaceState: string): NetworkInterfaceState => {
   return isNetworkInterfaceState(simpleIfaceState) ? simpleIfaceState : NetworkInterfaceState.NONE;

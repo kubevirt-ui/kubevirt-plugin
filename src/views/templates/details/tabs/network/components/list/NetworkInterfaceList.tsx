@@ -1,25 +1,27 @@
-import * as React from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
-import useNetworkColumns from '@kubevirt-utils/hooks/useNetworkColums';
+import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
 import { getNetworkInterfaceRowData } from '@kubevirt-utils/resources/vm/utils/network/rowData';
-import {
-  ListPageFilter,
-  useListPageFilter,
-  VirtualizedTable,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { ListPageFilter, useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
 
 import useNetworkRowFilters from '../../hooks/useNetworkRowFilters';
 
-import NetworkInterfaceRow from './NetworkInterfaceRow';
+import {
+  getTemplateNetworkColumns,
+  getTemplateNetworkRowId,
+  TemplateNetworkCallbacks,
+} from './templateNetworkInterfaceDefinition';
 
 type NetworkInterfaceListProps = {
   template: V1Template;
 };
 
-const NetworkInterfaceList: React.FC<NetworkInterfaceListProps> = ({ template }) => {
+const NetworkInterfaceList: FC<NetworkInterfaceListProps> = ({ template }) => {
+  const { t } = useKubevirtTranslation();
   const vm = getTemplateVirtualMachineObject(template);
   const networks = getNetworks(vm);
   const interfaces = getInterfaces(vm);
@@ -28,17 +30,28 @@ const NetworkInterfaceList: React.FC<NetworkInterfaceListProps> = ({ template })
   const networkInterfacesData = getNetworkInterfaceRowData(networks, interfaces);
   const [data, filteredData, onFilterChange] = useListPageFilter(networkInterfacesData, filters);
 
-  const columns = useNetworkColumns();
+  const columns = useMemo(() => getTemplateNetworkColumns(t), [t]);
+  const callbacks: TemplateNetworkCallbacks = useMemo(() => ({ template }), [template]);
+
   return (
     <>
-      <ListPageFilter data={data} loaded onFilterChange={onFilterChange} rowFilters={filters} />
-      <VirtualizedTable
+      <ListPageFilter
+        data={data}
+        loaded={true}
+        onFilterChange={onFilterChange}
+        rowFilters={filters}
+      />
+      <KubevirtTable
+        ariaLabel={t('Template network interfaces table')}
+        callbacks={callbacks}
         columns={columns}
         data={filteredData}
-        loaded
-        loadError={false}
-        Row={NetworkInterfaceRow}
-        rowData={{ template }}
+        dataTest="template-network-interfaces-table"
+        fixedLayout
+        getRowId={getTemplateNetworkRowId}
+        initialSortKey="name"
+        loaded={true}
+        noDataMsg={t('No network interfaces found')}
         unfilteredData={data}
       />
     </>

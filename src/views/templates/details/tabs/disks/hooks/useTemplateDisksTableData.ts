@@ -4,7 +4,7 @@ import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 
-type UseDisksTableDisks = (template: V1Template) => [DiskRowDataLayout[], boolean, any];
+type UseDisksTableDisks = (template: V1Template) => [DiskRowDataLayout[], boolean, Error | null];
 
 /**
  * A Hook for getting disks data for a VM template

@@ -10,12 +10,12 @@ import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
-import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
-import { ButtonVariant, Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
 import {
   getConfigInterfaceStateFromVM,
   isSRIOVNetworkByVM,
-} from '@virtualmachines/details/tabs/configuration/network/utils/utils';
+} from '@kubevirt-utils/resources/vm/utils/network/selectors';
+import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
+import { ButtonVariant, Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
 
 import WizardEditNetworkInterfaceModal from '../modal/WizardEditNetworkInterfaceModal';
 
@@ -97,26 +97,26 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
       popperProps={{ position: 'right' }}
       toggle={KebabToggle({ id: 'toggle-id-network', onClick: onToggle })}
     >
-      {interfaceState === NetworkInterfaceState.DOWN && (
-        <DropdownItem
-          isDisabled={isSRIOVIface}
-          key="network-interface-state-up"
-          onClick={() => onUpdate(setInterfaceLinkState(vm, nicName, NetworkInterfaceState.UP))}
-        >
-          {t('Set link up')}
-        </DropdownItem>
-      )}
-      {interfaceState === NetworkInterfaceState.UP && (
-        <DropdownItem
-          description={isSRIOVIface && t('Not available for SR-IOV interfaces')}
-          isDisabled={isSRIOVIface}
-          key="network-interface-state-down"
-          onClick={() => onUpdate(setInterfaceLinkState(vm, nicName, NetworkInterfaceState.DOWN))}
-        >
-          {t('Set link down')}
-        </DropdownItem>
-      )}
       <DropdownList>
+        {interfaceState === NetworkInterfaceState.DOWN && (
+          <DropdownItem
+            isDisabled={isSRIOVIface}
+            key="network-interface-state-up"
+            onClick={() => onUpdate(setInterfaceLinkState(vm, nicName, NetworkInterfaceState.UP))}
+          >
+            {t('Set link up')}
+          </DropdownItem>
+        )}
+        {interfaceState === NetworkInterfaceState.UP && (
+          <DropdownItem
+            description={isSRIOVIface && t('Not available for SR-IOV interfaces')}
+            isDisabled={isSRIOVIface}
+            key="network-interface-state-down"
+            onClick={() => onUpdate(setInterfaceLinkState(vm, nicName, NetworkInterfaceState.DOWN))}
+          >
+            {t('Set link down')}
+          </DropdownItem>
+        )}
         <DropdownItem key="network-interface-edit" onClick={onEditModalOpen}>
           {editBtnText}
         </DropdownItem>

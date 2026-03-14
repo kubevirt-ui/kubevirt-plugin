@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import useRegistryCredentials from '@catalog/utils/useRegistryCredentials/useRegistryCredentials';
 import { WizardTab } from '@catalog/wizard/tabs';
@@ -10,31 +10,32 @@ import {
   SourceTypes,
   V1DiskFormState,
 } from '@kubevirt-utils/components/DiskModal/utils/types';
+import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import WindowsDrivers from '@kubevirt-utils/components/WindowsDrivers/WindowsDrivers';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
 import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   ListPageBody,
   ListPageFilter,
   useListPageFilter,
-  VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Flex, FlexItem, PageSection } from '@patternfly/react-core';
 
-import DiskRow from './components/DiskRow';
-import useDiskColumns from './hooks/useDiskColumns';
 import useDisksFilters from './hooks/useDisksFilters';
 import useWizardDisksTableData from './hooks/useWizardDisksTableData';
+import { getWizardDiskColumns, getWizardDiskRowId } from './wizardDisksTableDefinition';
 
 const WizardDisksTab: WizardTab = ({ tabsData, updateTabsData, updateVM, vm }) => {
+  const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const columns = useDiskColumns();
-  const [disks, disksLoaded] = useWizardDisksTableData(vm);
+  const [disks, disksLoaded, loadError] = useWizardDisksTableData(vm);
   const filters = useDisksFilters();
   const [data, filteredData, onFilterChange] = useListPageFilter(disks, filters);
   const { decodedRegistryCredentials, updateRegistryCredentials } = useRegistryCredentials();
+  const columns = useMemo(() => getWizardDiskColumns(t), [t]);
 
   const handleSubmit = (newVM: V1VirtualMachine, diskFormState?: V1DiskFormState) => {
     const registryCredentials = diskFormState?.registryCredentials;
@@ -92,12 +93,17 @@ const WizardDisksTab: WizardTab = ({ tabsData, updateTabsData, updateVM, vm }) =
               <WindowsDrivers updateVM={updateVM} vm={vm} />
             </FlexItem>
           </Flex>
-          <VirtualizedTable
+          <KubevirtTable
+            ariaLabel={t('Wizard disks table')}
             columns={columns}
             data={filteredData}
+            dataTest="wizard-disks-table"
+            fixedLayout
+            getRowId={getWizardDiskRowId}
+            initialSortKey="name"
             loaded={disksLoaded}
-            loadError={undefined}
-            Row={DiskRow}
+            loadError={loadError}
+            noDataMsg={t('No disks found')}
             unfilteredData={data}
           />
         </SidebarEditor>
