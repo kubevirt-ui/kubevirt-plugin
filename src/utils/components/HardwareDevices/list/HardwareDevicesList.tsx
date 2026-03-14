@@ -11,6 +11,7 @@ import {
 } from './hardwareDevicesListDefinition';
 
 type HardwareDevicesListProps = {
+  className?: string;
   devices?: V1GPU[] | V1HostDevice[];
   handleRemoveDevice?: (device: V1GPU | V1HostDevice) => void;
   noDataMsg?: string;
@@ -18,6 +19,7 @@ type HardwareDevicesListProps = {
 };
 
 const HardwareDevicesList: FC<HardwareDevicesListProps> = ({
+  className,
   devices,
   handleRemoveDevice,
   noDataMsg,
@@ -35,6 +37,7 @@ const HardwareDevicesList: FC<HardwareDevicesListProps> = ({
     <KubevirtTable
       ariaLabel={t('Hardware devices table')}
       callbacks={showActions ? callbacks : undefined}
+      className={className}
       columns={columns}
       data={devices ?? []}
       dataTest="hardware-devices-list"
