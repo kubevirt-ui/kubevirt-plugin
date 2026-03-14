@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -7,25 +7,26 @@ import DiskListTitle from '@kubevirt-utils/components/DiskListTitle/DiskListTitl
 import DiskSourceSelect from '@kubevirt-utils/components/DiskModal/components/DiskSourceSelect/DiskSourceSelect';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
 import { SourceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
+import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import WindowsDrivers from '@kubevirt-utils/components/WindowsDrivers/WindowsDrivers';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import useDisksTableData from '@kubevirt-utils/resources/vm/hooks/disk/useDisksTableData';
 import useProvisioningPercentage from '@kubevirt-utils/resources/vm/hooks/useProvisioningPercentage';
-import { K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import {
+  K8sVerb,
   ListPageFilter,
+  useAccessReview,
   useListPageFilter,
-  VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Flex, FlexItem } from '@patternfly/react-core';
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 import { updateDisks } from '@virtualmachines/details/tabs/configuration/details/utils/utils';
 
-import useDiskColumns from '../../hooks/useDiskColumns';
 import useDisksFilters from '../../hooks/useDisksFilters';
 
-import DiskRow from './DiskRow';
+import { DiskListCallbacks, getDiskListColumns, getDiskRowId } from './diskListDefinition';
 
 import './disklist.scss';
 
@@ -44,15 +45,16 @@ const DiskList: FC<DiskListProps> = ({
   vm,
   vmi,
 }) => {
+  const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const columns = useDiskColumns();
+  const columns = useMemo(() => getDiskListColumns(t), [t]);
   const [disks, sourcesLoaded, loadError] = useDisksTableData(vm, vmi);
   const instanceTypeVMStore = useInstanceTypeVMStore();
   const filters = useDisksFilters();
   const [data, filteredData, onFilterChange] = useListPageFilter(disks, filters);
 
   const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
-  const [canUpdate] = useFleetAccessReview(accessReview || {});
+  const [canUpdate] = useFleetAccessReview(accessReview ?? {});
 
   const [canCreateDataVolume] = useAccessReview({
     group: VirtualMachineModel.apiGroup,
@@ -63,7 +65,19 @@ const DiskList: FC<DiskListProps> = ({
 
   const { percentages: provisioningPercentages } = useProvisioningPercentage(vm);
 
-  const onSubmit = onDiskUpdate || updateDisks;
+  const onSubmit = onDiskUpdate ?? updateDisks;
+
+  const callbacks: DiskListCallbacks = useMemo(
+    () => ({
+      customize,
+      onSubmit,
+      provisioningPercentages,
+      sourcesLoaded,
+      vm,
+      vmi,
+    }),
+    [customize, onSubmit, provisioningPercentages, sourcesLoaded, vm, vmi],
+  );
 
   return (
     <div className="kv-configuration-vm-disk-list">
@@ -89,7 +103,7 @@ const DiskList: FC<DiskListProps> = ({
           <ListPageFilter
             data={data}
             hideLabelFilter
-            loaded
+            loaded={sourcesLoaded}
             onFilterChange={onFilterChange}
             rowFilters={filters}
           />
@@ -99,13 +113,19 @@ const DiskList: FC<DiskListProps> = ({
           <WindowsDrivers updateVM={onSubmit} vm={vm} />
         </FlexItem>
       </Flex>
-      <VirtualizedTable
+      <KubevirtTable
+        ariaLabel={t('Disks table')}
+        callbacks={callbacks}
         columns={columns}
         data={filteredData}
-        loaded
+        dataTest="vm-disk-list"
+        fixedLayout
+        getRowId={getDiskRowId}
+        initialSortKey="name"
+        loaded={sourcesLoaded}
         loadError={loadError}
-        Row={DiskRow}
-        rowData={{ customize, onSubmit, provisioningPercentages, sourcesLoaded, vm, vmi }}
+        noDataMsg={t('No disks found')}
+        noFilteredDataMsg={t('No results match the current filters')}
         unfilteredData={data}
       />
     </div>

@@ -110,7 +110,7 @@ export const validateSSHPublicKey = (value: string): boolean => {
 };
 
 export const getContentScrollableElement = (): HTMLElement =>
-  document.getElementById('content-scrollable');
+  document.getElementById('content-scrollable') ?? document.body;
 
 export const findAllIndexes = <T>(
   array: T[],
