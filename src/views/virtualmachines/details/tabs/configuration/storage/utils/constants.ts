@@ -16,7 +16,7 @@ export const uploadAlertConfig: Record<UploadAlertStatus, UploadAlertConfig> = {
     variant: AlertVariant.success,
   },
   uploading: {
-    body: 'You may leave this screen while the upload completes in the background.',
+    body: 'You can navigate away. The upload will continue in the background.',
     title: 'Upload in progress',
     variant: AlertVariant.info,
   },
