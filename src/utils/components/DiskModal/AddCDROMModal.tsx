@@ -17,7 +17,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { FormGroup, Radio, Stack, StackItem } from '@patternfly/react-core';
+import { Content, ContentVariants, Radio, Stack, StackItem } from '@patternfly/react-core';
 import { DECLARATIVE_HOTPLUG_VOLUMES_FEATURE_GATE } from '@settings/tabs/ClusterTab/components/GeneralSettings/AdvancedCDROMFeatures/hooks/constants';
 import { useISOOptions } from '@virtualmachines/details/tabs/configuration/storage/components/modal/hooks/useISOOptions';
 import { useMountCDROMForm } from '@virtualmachines/details/tabs/configuration/storage/components/modal/hooks/useMountCDROMForm';
@@ -143,87 +143,87 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
         submitBtnText={t('Add')}
       >
         <Stack hasGutter>
-          <StackItem>{t('Add a CD-ROM to the VirtualMachine configuration')}</StackItem>
           {isVMRunning && !isHotPluggable && (
             <StackItem>
-              <PendingChangesAlert title={t('Adding CD-ROM drive')}>
-                {t(
-                  'CD-ROM drive will be added to the VirtualMachine when it is stopped and restarted.',
-                )}
+              <PendingChangesAlert title={t('Restart required')}>
+                {t('To finish adding the CD-ROM drive, restart the virtual machine.')}
               </PendingChangesAlert>
             </StackItem>
           )}
           <StackItem>
             <DiskNameInput isDisabled={isUploading} />
           </StackItem>
+          <StackItem className="pf-v6-u-mt-md">
+            <Content component={ContentVariants.p}>
+              {t('Select how you would like to set up the new drive')}
+            </Content>
+          </StackItem>
           <StackItem>
-            <FormGroup fieldId="cdrom-source" label={t('CD-ROM source')}>
-              <Stack hasGutter>
-                <StackItem>
-                  <Radio
-                    id="cdrom-source-existing"
-                    isChecked={existingISOSelected}
-                    isDisabled={isUploading}
-                    label={t('Mount existing ISO')}
-                    name="cdrom-source"
-                    onChange={() => handleISOSelection('')}
-                  />
-                  {existingISOSelected && (
-                    <div className="pf-v6-u-ml-lg pf-v6-u-mt-sm">
-                      <InlineFilterSelect
-                        setSelected={(e) => {
-                          handleISOSelection(e);
-                          setValue(UPLOAD_FILENAME_FIELD, '');
-                        }}
-                        toggleProps={{
-                          isDisabled: isUploading,
-                          isFullWidth: true,
-                          placeholder: t('Select ISO file'),
-                        }}
-                        options={isoOptions}
-                        selected={selectedISO}
-                      />
-                    </div>
-                  )}
-                </StackItem>
-                <StackItem>
-                  <Radio
-                    id="cdrom-source-upload"
-                    isChecked={uploadEnabled}
-                    isDisabled={isUploading}
-                    label={t('Upload new ISO')}
-                    name="cdrom-source"
-                    onChange={handleFileUpload}
-                  />
-                  {uploadEnabled && (
-                    <div className="pf-v6-u-ml-lg pf-v6-u-mt-sm">
-                      <DiskSourceUploadPVC
-                        acceptedFileTypes={{
-                          'application/*': ['.iso', '.img', '.qcow2', '.gz', '.xz'],
-                        }}
-                        label=""
-                        relevantUpload={isSubmitting ? undefined : upload}
-                      />
-                    </div>
-                  )}
-                </StackItem>
-                <StackItem>
-                  <Radio
-                    description={
-                      isEmptyDriveAllowed
-                        ? t('The drive will be attached without media. You can mount an ISO later.')
-                        : t('Requires enabling advanced CD-ROM features.')
-                    }
-                    id="cdrom-source-empty"
-                    isChecked={emptyDriveSelected}
-                    isDisabled={isUploading || !isEmptyDriveAllowed}
-                    label={t('Leave empty drive')}
-                    name="cdrom-source"
-                    onChange={handleEmptyDriveSelection}
-                  />
-                </StackItem>
-              </Stack>
-            </FormGroup>
+            <Stack hasGutter>
+              <StackItem>
+                <Radio
+                  id="cdrom-source-existing"
+                  isChecked={existingISOSelected}
+                  isDisabled={isUploading}
+                  label={t('Mount existing ISO')}
+                  name="cdrom-source"
+                  onChange={() => handleISOSelection('')}
+                />
+                {existingISOSelected && (
+                  <div className="pf-v6-u-ml-lg pf-v6-u-mt-sm">
+                    <InlineFilterSelect
+                      setSelected={(e) => {
+                        handleISOSelection(e);
+                        setValue(UPLOAD_FILENAME_FIELD, '');
+                      }}
+                      toggleProps={{
+                        isDisabled: isUploading,
+                        isFullWidth: true,
+                        placeholder: t('Select ISO file'),
+                      }}
+                      options={isoOptions}
+                      selected={selectedISO}
+                    />
+                  </div>
+                )}
+              </StackItem>
+              <StackItem>
+                <Radio
+                  id="cdrom-source-upload"
+                  isChecked={uploadEnabled}
+                  isDisabled={isUploading}
+                  label={t('Upload new ISO')}
+                  name="cdrom-source"
+                  onChange={handleFileUpload}
+                />
+                {uploadEnabled && (
+                  <div className="pf-v6-u-ml-lg pf-v6-u-mt-sm">
+                    <DiskSourceUploadPVC
+                      acceptedFileTypes={{
+                        'application/*': ['.iso', '.img', '.qcow2', '.gz', '.xz'],
+                      }}
+                      label=""
+                      relevantUpload={isSubmitting ? undefined : upload}
+                    />
+                  </div>
+                )}
+              </StackItem>
+              <StackItem>
+                <Radio
+                  description={
+                    isEmptyDriveAllowed
+                      ? t('The drive will be attached without media. You can mount an ISO later.')
+                      : t('Requires enabling advanced CD-ROM features.')
+                  }
+                  id="cdrom-source-empty"
+                  isChecked={emptyDriveSelected}
+                  isDisabled={isUploading || !isEmptyDriveAllowed}
+                  label={t('Leave empty drive')}
+                  name="cdrom-source"
+                  onChange={handleEmptyDriveSelection}
+                />
+              </StackItem>
+            </Stack>
           </StackItem>
         </Stack>
       </TabModal>
