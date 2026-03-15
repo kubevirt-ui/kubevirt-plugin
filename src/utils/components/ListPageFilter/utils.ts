@@ -153,6 +153,8 @@ export const getInitialSearchText = (
   searchFilterType: string,
 ) => (searchFilterType !== STATIC_SEARCH_FILTERS.labels ? searchText[searchFilterType] : '');
 
+type PlaceholderKey = keyof typeof STATIC_SEARCH_FILTERS_PLACEHOLDERS;
+
 export const getSearchTextPlaceholder = (
   t: TFunction,
   searchType: string,
@@ -160,14 +162,18 @@ export const getSearchTextPlaceholder = (
   nameFilterPlaceholder: string,
 ) => {
   if (searchType === STATIC_SEARCH_FILTERS.name)
-    return nameFilterPlaceholder || STATIC_SEARCH_FILTERS_PLACEHOLDERS.name;
+    return nameFilterPlaceholder
+      ? t(nameFilterPlaceholder)
+      : t(STATIC_SEARCH_FILTERS_PLACEHOLDERS.name);
 
-  return (
-    STATIC_SEARCH_FILTERS_PLACEHOLDERS[searchType] ||
-    t('Search by {{filterName}}...', {
-      filterName: selectedSearchFilter?.filterGroupName,
-    })
-  );
+  const isValidPlaceholderKey = (key: string): key is PlaceholderKey =>
+    key in STATIC_SEARCH_FILTERS_PLACEHOLDERS;
+
+  return isValidPlaceholderKey(searchType)
+    ? t(STATIC_SEARCH_FILTERS_PLACEHOLDERS[searchType])
+    : t('Search by {{filterName}}...', {
+        filterName: selectedSearchFilter?.filterGroupName,
+      });
 };
 
 export const getFilterLabels = (

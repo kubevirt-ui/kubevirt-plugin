@@ -66,7 +66,7 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
           isExpanded: isOpen,
           isFullWidth: true,
           onClick: onToggle,
-          selected: optionsValueLabelMapper[formSelection],
+          selected: t(optionsValueLabelMapper[formSelection]),
         })}
         isOpen={isOpen}
         onOpenChange={setIsOpen}
@@ -82,7 +82,7 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
             })}
             data-test-id="upload-volume"
           >
-            {optionsValueLabelMapper[DROPDOWN_FORM_SELECTION.UPLOAD_VOLUME]}
+            {t(optionsValueLabelMapper[DROPDOWN_FORM_SELECTION.UPLOAD_VOLUME])}
           </SelectOption>
         </SelectGroup>
         <Divider />
@@ -93,14 +93,14 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
             isDisabled={!canCreatePVC}
             value={DROPDOWN_FORM_SELECTION.USE_EXISTING_PVC}
           >
-            {optionsValueLabelMapper[DROPDOWN_FORM_SELECTION.USE_EXISTING_PVC]}
+            {t(optionsValueLabelMapper[DROPDOWN_FORM_SELECTION.USE_EXISTING_PVC])}
           </SelectOption>
           <SelectOption
             data-test-id="use-snapshot"
             isDisabled={!canCreateSnapshots}
             value={DROPDOWN_FORM_SELECTION.USE_SNAPSHOT}
           >
-            {optionsValueLabelMapper[DROPDOWN_FORM_SELECTION.USE_SNAPSHOT]}
+            {t(optionsValueLabelMapper[DROPDOWN_FORM_SELECTION.USE_SNAPSHOT])}
           </SelectOption>
         </SelectGroup>
         <Divider />
@@ -111,7 +111,7 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
             isDisabled={!canCreateDS}
             value={DROPDOWN_FORM_SELECTION.USE_REGISTRY}
           >
-            {optionsValueLabelMapper[DROPDOWN_FORM_SELECTION.USE_REGISTRY]}
+            {t(optionsValueLabelMapper[DROPDOWN_FORM_SELECTION.USE_REGISTRY])}
           </SelectOption>
           <SelectOption
             data-test-id="use-http"
@@ -119,7 +119,7 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
             isDisabled={!canCreateDS}
             value={DROPDOWN_FORM_SELECTION.USE_HTTP}
           >
-            {optionsValueLabelMapper[DROPDOWN_FORM_SELECTION.USE_HTTP]}
+            {t(optionsValueLabelMapper[DROPDOWN_FORM_SELECTION.USE_HTTP])}
           </SelectOption>
         </SelectGroup>
       </Select>

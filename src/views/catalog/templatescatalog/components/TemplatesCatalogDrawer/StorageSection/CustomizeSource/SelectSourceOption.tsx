@@ -8,6 +8,7 @@ import React, {
 } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, SelectOption } from '@patternfly/react-core';
 
 import { SOURCE_OPTIONS_IDS, sourceOptions } from '../constants';
@@ -29,6 +30,8 @@ const SelectSourceOption: FC<SelectSourceOptionProps> = ({
   popOver,
   selectedSource,
 }) => {
+  const { t } = useKubevirtTranslation();
+
   const onSelect = useCallback(
     (_, selection: SOURCE_OPTIONS_IDS) => {
       onSelectSource(selection);
@@ -42,12 +45,12 @@ const SelectSourceOption: FC<SelectSourceOptionProps> = ({
         const { description, label: optionLabel, type } = sourceOptions[option];
 
         return (
-          <SelectOption description={description} key={type} value={type}>
-            <span data-test-id={type}>{optionLabel}</span>
+          <SelectOption description={t(description)} key={type} value={type}>
+            <span data-test-id={type}>{t(optionLabel)}</span>
           </SelectOption>
         );
       }),
-    [options],
+    [options, t],
   );
 
   return (
@@ -64,7 +67,7 @@ const SelectSourceOption: FC<SelectSourceOptionProps> = ({
           id={testId}
           onSelect={onSelect}
           selected={selectedSource}
-          selectedLabel={sourceOptions[selectedSource].label}
+          selectedLabel={t(sourceOptions[selectedSource].label)}
           toggleProps={{ id: `${testId}-toggle`, isFullWidth: true }}
         >
           {optionComponents}

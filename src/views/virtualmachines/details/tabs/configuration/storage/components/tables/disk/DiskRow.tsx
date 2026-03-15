@@ -2,6 +2,11 @@ import React, { FC, useMemo } from 'react';
 
 import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  CONTAINER_EPHERMAL,
+  DYNAMIC,
+  OTHER,
+} from '@kubevirt-utils/components/DiskModal/components/utils/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, PersistentVolumeClaimModel } from '@kubevirt-utils/models';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
@@ -29,6 +34,12 @@ import ISOBadge from './ISOBadge';
 
 import '../tables.scss';
 import './disklist.scss';
+
+const getTranslatedSource = (source: string, t: (key: string) => string): string => {
+  if (source === OTHER) return t(OTHER);
+  if (source === CONTAINER_EPHERMAL) return t(CONTAINER_EPHERMAL);
+  return source;
+};
 
 const DiskRow: FC<
   RowProps<
@@ -74,7 +85,7 @@ const DiskRow: FC<
     return {
       displayName: cdrom ? cdromName : name,
     };
-  }, [vm, name]);
+  }, [vm, name, t]);
 
   return (
     <>
@@ -129,7 +140,7 @@ const DiskRow: FC<
 
         {!sourcesLoaded && (hasPVC || hasDataVolume) && <Skeleton width="200px" />}
 
-        {!hasPVC && source}
+        {!hasPVC && getTranslatedSource(source, t)}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="size">
         {readableSizeUnit(size)}
