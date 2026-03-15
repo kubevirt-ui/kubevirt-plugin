@@ -2,23 +2,25 @@ import React, { FC, useMemo } from 'react';
 
 import useClusterInstanceTypes from '@catalog/CreateFromInstanceTypes/state/hooks/useClusterInstanceTypes';
 import { VirtualMachineClusterInstancetypeModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
+import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { useClusterFilter } from '@kubevirt-utils/hooks/useClusterFilter';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
+import useKubevirtTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtTableColumns';
+import usePaginationWithFilters from '@kubevirt-utils/hooks/usePagination/usePaginationWithFilters';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import { ListPageProps } from '@kubevirt-utils/utils/types';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useIsACMPage from '@multicluster/useIsACMPage';
-import {
-  ListPageBody,
-  useListPageFilter,
-  VirtualizedTable,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { ListPageBody, useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination } from '@patternfly/react-core';
 
-import ClusterInstancetypeRow from './components/ClusterInstancetypeRow';
-import useClusterInstancetypeListColumns from './hooks/useClusterInstancetypeListColumns';
+import {
+  getClusterInstancetypeColumns,
+  getClusterInstancetypeRowId,
+} from './clusterInstancetypeDefinition';
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
 
@@ -33,83 +35,82 @@ const ClusterInstancetypeList: FC<ListPageProps> = ({
   const { t } = useKubevirtTranslation();
   const [instanceTypes, loaded, loadError] = useClusterInstanceTypes(fieldSelector, selector);
 
-  const { onPaginationChange, pagination } = usePagination();
-
   const clusterFilter = useClusterFilter();
   const isACMPage = useIsACMPage();
+  const cluster = useClusterParam();
+
+  const showClusterColumn = isACMPage && !cluster;
 
   const filtersWithSelect = useMemo(
     () => (isACMPage ? [clusterFilter] : []),
     [clusterFilter, isACMPage],
   );
-  const [unfilteredData, data, onFilterChange] = useListPageFilter(
+
+  const [unfilteredData, filteredData, onFilterChange] = useListPageFilter(
     instanceTypes,
     filtersWithSelect,
     {
       name: { selected: [nameFilter] },
     },
   );
-  const [columns, activeColumns, loadedColumns] = useClusterInstancetypeListColumns(
-    pagination,
-    data,
+
+  const { handleFilterChange, handlePerPageSelect, handleSetPage, pagination } =
+    usePaginationWithFilters(filteredData?.length ?? 0, onFilterChange);
+
+  const columns = useMemo(
+    () => getClusterInstancetypeColumns(t, showClusterColumn),
+    [t, showClusterColumn],
   );
+
+  const { activeColumnKeys, loaded: loadedColumns } = useKubevirtTableColumns({
+    columnManagementID: VirtualMachineClusterInstancetypeModelRef,
+    columns,
+  });
+
+  const columnLayout = useMemo(
+    () => buildColumnLayout(columns, activeColumnKeys, VirtualMachineClusterInstancetypeModelRef),
+    [columns, activeColumnKeys],
+  );
+
+  const isLoaded = loaded && loadedColumns;
 
   return (
     <ListPageBody>
       <div className="list-managment-group">
         <ListPageFilter
-          columnLayout={{
-            columns: columns?.map(({ additional, id, title }) => ({
-              additional,
-              id,
-              title,
-            })),
-            id: VirtualMachineClusterInstancetypeModelRef,
-            selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
-            type: '',
-          }}
-          onFilterChange={(...args) => {
-            onFilterChange(...args);
-            onPaginationChange({
-              endIndex: pagination?.perPage,
-              page: 1,
-              perPage: pagination?.perPage,
-              startIndex: 0,
-            });
-          }}
+          columnLayout={columnLayout}
           data={unfilteredData}
           filtersWithSelect={filtersWithSelect}
           hideColumnManagement={hideColumnManagement}
           hideLabelFilter={hideTextFilter}
           hideNameLabelFilters={hideNameLabelFilters}
-          loaded={loadedColumns}
+          loaded={isLoaded}
+          onFilterChange={handleFilterChange}
         />
-        <Pagination
-          onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
-            onPaginationChange({ endIndex, page, perPage, startIndex })
-          }
-          onSetPage={(_e, page, perPage, startIndex, endIndex) =>
-            onPaginationChange({ endIndex, page, perPage, startIndex })
-          }
-          className="list-managment-group__pagination"
-          isLastFullPageShown
-          itemCount={data?.length}
-          page={pagination?.page}
-          perPage={pagination?.perPage}
-          perPageOptions={paginationDefaultValues}
-        />
-      </div>
-      <VirtualizedTable<V1beta1VirtualMachineClusterInstancetype>
-        EmptyMsg={() => (
-          <div className="pf-v6-u-text-align-center" id="no-instancetype-msg">
-            {t('No VirtualMachineClusterInstanceType found')}
-          </div>
+        {!isEmpty(filteredData) && isLoaded && (
+          <Pagination
+            className="list-managment-group__pagination"
+            isLastFullPageShown
+            itemCount={filteredData?.length}
+            onPerPageSelect={handlePerPageSelect}
+            onSetPage={handleSetPage}
+            page={pagination?.page}
+            perPage={pagination?.perPage}
+            perPageOptions={paginationDefaultValues}
+          />
         )}
-        columns={activeColumns}
-        data={data}
-        loaded={loaded && loadedColumns}
+      </div>
+      <KubevirtTable
+        activeColumnKeys={activeColumnKeys}
+        ariaLabel={t('Cluster instance types table')}
+        columns={columns}
+        data={filteredData ?? []}
+        dataTest="cluster-instancetype-list"
+        getRowId={getClusterInstancetypeRowId}
+        loaded={isLoaded}
         loadError={loadError}
-        Row={ClusterInstancetypeRow}
+        noDataMsg={t('No VirtualMachineClusterInstanceType found')}
+        pagination={pagination}
         unfilteredData={unfilteredData}
       />
     </ListPageBody>

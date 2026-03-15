@@ -1,25 +1,24 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import { VirtualMachinePreferenceModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1VirtualMachinePreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
+import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
+import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
+import useKubevirtTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtTableColumns';
+import usePaginationWithFilters from '@kubevirt-utils/hooks/usePagination/usePaginationWithFilters';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import useUserPreferences from '@kubevirt-utils/hooks/useUserPreferences';
 import { ListPageProps } from '@kubevirt-utils/utils/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import {
-  ListPageBody,
-  useListPageFilter,
-  VirtualizedTable,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { ListPageBody, useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination } from '@patternfly/react-core';
 
-import UserPreferenceRow from './components/UserPreferenceRow';
 import UserPreferencesEmptyState from './components/UserPreferencesEmptyState';
-import useUserPreferenceListColumns from './hooks/useUserPreferenceListColumns';
+import { getUserPreferenceColumns, getUserPreferenceRowId } from './userPreferenceDefinition';
 
 const UserPreferenceList: FC<ListPageProps> = ({
   fieldSelector,
@@ -32,6 +31,9 @@ const UserPreferenceList: FC<ListPageProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const activeNamespace = namespace ?? ALL_NAMESPACES_SESSION_KEY;
+  const currentNamespace = useActiveNamespace();
+
+  const showNamespaceColumn = currentNamespace === ALL_NAMESPACES_SESSION_KEY;
 
   const [preferences, loaded, loadError] = useUserPreferences(
     activeNamespace,
@@ -39,16 +41,34 @@ const UserPreferenceList: FC<ListPageProps> = ({
     selector,
   );
 
-  const { onPaginationChange, pagination } = usePagination();
-  const [unfilteredData, data, onFilterChange] = useListPageFilter<
+  const [unfilteredData, filteredData, onFilterChange] = useListPageFilter<
     V1beta1VirtualMachinePreference,
     V1beta1VirtualMachinePreference
   >(preferences, null, {
     name: { selected: [nameFilter] },
   });
-  const [columns, activeColumns, loadedColumns] = useUserPreferenceListColumns(pagination, data);
 
-  if (loaded && isEmpty(unfilteredData)) {
+  const { handleFilterChange, handlePerPageSelect, handleSetPage, pagination } =
+    usePaginationWithFilters(filteredData?.length ?? 0, onFilterChange);
+
+  const columns = useMemo(
+    () => getUserPreferenceColumns(t, showNamespaceColumn),
+    [t, showNamespaceColumn],
+  );
+
+  const { activeColumnKeys, loaded: loadedColumns } = useKubevirtTableColumns({
+    columnManagementID: VirtualMachinePreferenceModelRef,
+    columns,
+  });
+
+  const columnLayout = useMemo(
+    () => buildColumnLayout(columns, activeColumnKeys, VirtualMachinePreferenceModelRef),
+    [columns, activeColumnKeys],
+  );
+
+  const isLoaded = loaded && loadedColumns;
+
+  if (isLoaded && isEmpty(unfilteredData)) {
     return <UserPreferencesEmptyState namespace={activeNamespace} />;
   }
 
@@ -56,59 +76,38 @@ const UserPreferenceList: FC<ListPageProps> = ({
     <ListPageBody>
       <div className="list-managment-group">
         <ListPageFilter
-          columnLayout={{
-            columns: columns?.map(({ additional, id, title }) => ({
-              additional,
-              id,
-              title,
-            })),
-            id: VirtualMachinePreferenceModelRef,
-            selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
-            type: t('preferences'),
-          }}
-          onFilterChange={(...args) => {
-            onFilterChange(...args);
-            onPaginationChange({
-              endIndex: pagination?.perPage,
-              page: 1,
-              perPage: pagination?.perPage,
-              startIndex: 0,
-            });
-          }}
+          columnLayout={columnLayout}
           data={unfilteredData}
           hideColumnManagement={hideColumnManagement}
           hideLabelFilter={hideTextFilter}
           hideNameLabelFilters={hideNameLabelFilters}
-          loaded={loaded && loadedColumns}
+          loaded={isLoaded}
+          onFilterChange={handleFilterChange}
         />
-        {!isEmpty(data) && (
+        {!isEmpty(filteredData) && isLoaded && (
           <Pagination
-            onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
-              onPaginationChange({ endIndex, page, perPage, startIndex })
-            }
-            onSetPage={(_e, page, perPage, startIndex, endIndex) =>
-              onPaginationChange({ endIndex, page, perPage, startIndex })
-            }
             className="list-managment-group__pagination"
             isLastFullPageShown
-            itemCount={data?.length}
+            itemCount={filteredData?.length}
+            onPerPageSelect={handlePerPageSelect}
+            onSetPage={handleSetPage}
             page={pagination?.page}
             perPage={pagination?.perPage}
             perPageOptions={paginationDefaultValues}
           />
         )}
       </div>
-      <VirtualizedTable<V1beta1VirtualMachinePreference>
-        EmptyMsg={() => (
-          <div className="pf-v6-u-text-align-center" id="no-preference-msg">
-            {t('No preferences found')}
-          </div>
-        )}
-        columns={activeColumns}
-        data={data}
-        loaded={loaded && loadedColumns}
+      <KubevirtTable
+        activeColumnKeys={activeColumnKeys}
+        ariaLabel={t('User preferences table')}
+        columns={columns}
+        data={filteredData ?? []}
+        dataTest="user-preference-list"
+        getRowId={getUserPreferenceRowId}
+        loaded={isLoaded}
         loadError={loadError}
-        Row={UserPreferenceRow}
+        noDataMsg={t('No preferences found')}
+        pagination={pagination}
         unfilteredData={unfilteredData}
       />
     </ListPageBody>
