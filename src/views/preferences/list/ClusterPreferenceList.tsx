@@ -1,22 +1,23 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 
 import useClusterPreferences from '@catalog/CreateFromInstanceTypes/state/hooks/useClusterPreferences';
-import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
+import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
+import useKubevirtTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtTableColumns';
+import usePaginationWithFilters from '@kubevirt-utils/hooks/usePagination/usePaginationWithFilters';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import { VirtualMachineClusterPreferenceModelRef } from '@kubevirt-utils/models';
 import { ListPageProps } from '@kubevirt-utils/utils/types';
-import {
-  ListPageBody,
-  useListPageFilter,
-  VirtualizedTable,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { ListPageBody, useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination } from '@patternfly/react-core';
 
-import ClusterPreferenceRow from './components/ClusterPreferenceRow';
-import useClusterPreferenceListColumns from './hooks/useClusterPreferenceListColumns';
+import {
+  getClusterPreferenceColumns,
+  getClusterPreferenceRowId,
+} from './clusterPreferenceDefinition';
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
 
@@ -31,67 +32,63 @@ const ClusterPreferenceList: FC<ListPageProps> = ({
   const { t } = useKubevirtTranslation();
   const [preferences, loaded, loadError] = useClusterPreferences(fieldSelector, selector);
 
-  const { onPaginationChange, pagination } = usePagination();
-  const [unfilteredData, data, onFilterChange] = useListPageFilter(preferences, null, {
+  const [unfilteredData, filteredData, onFilterChange] = useListPageFilter(preferences, null, {
     name: { selected: [nameFilter] },
   });
-  const [columns, activeColumns, loadedColumns] = useClusterPreferenceListColumns(pagination, data);
+
+  const { handleFilterChange, handlePerPageSelect, handleSetPage, pagination } =
+    usePaginationWithFilters(filteredData?.length ?? 0, onFilterChange);
+
+  const columns = useMemo(() => getClusterPreferenceColumns(t), [t]);
+
+  const { activeColumnKeys, loaded: loadedColumns } = useKubevirtTableColumns({
+    columnManagementID: VirtualMachineClusterPreferenceModelRef,
+    columns,
+  });
+
+  const columnLayout = useMemo(
+    () => buildColumnLayout(columns, activeColumnKeys, VirtualMachineClusterPreferenceModelRef),
+    [columns, activeColumnKeys],
+  );
+
+  const isLoaded = loaded && loadedColumns;
 
   return (
     <ListPageBody>
       <div className="list-managment-group">
         <ListPageFilter
-          columnLayout={{
-            columns: columns?.map(({ additional, id, title }) => ({
-              additional,
-              id,
-              title,
-            })),
-            id: VirtualMachineClusterPreferenceModelRef,
-            selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
-            type: '',
-          }}
-          onFilterChange={(...args) => {
-            onFilterChange(...args);
-            onPaginationChange({
-              endIndex: pagination?.perPage,
-              page: 1,
-              perPage: pagination?.perPage,
-              startIndex: 0,
-            });
-          }}
+          columnLayout={columnLayout}
           data={unfilteredData}
           hideColumnManagement={hideColumnManagement}
           hideLabelFilter={hideTextFilter}
           hideNameLabelFilters={hideNameLabelFilters}
-          loaded={loaded && loadedColumns}
+          loaded={isLoaded}
+          onFilterChange={handleFilterChange}
         />
-        <Pagination
-          onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
-            onPaginationChange({ endIndex, page, perPage, startIndex })
-          }
-          onSetPage={(_e, page, perPage, startIndex, endIndex) =>
-            onPaginationChange({ endIndex, page, perPage, startIndex })
-          }
-          className="list-managment-group__pagination"
-          isLastFullPageShown
-          itemCount={data?.length}
-          page={pagination?.page}
-          perPage={pagination?.perPage}
-          perPageOptions={paginationDefaultValues}
-        />
-      </div>
-      <VirtualizedTable<V1beta1VirtualMachineClusterPreference>
-        EmptyMsg={() => (
-          <div className="pf-v6-u-text-align-center" id="no-preference-msg">
-            {t('No preferences found')}
-          </div>
+        {!isEmpty(filteredData) && isLoaded && (
+          <Pagination
+            className="list-managment-group__pagination"
+            isLastFullPageShown
+            itemCount={filteredData?.length}
+            onPerPageSelect={handlePerPageSelect}
+            onSetPage={handleSetPage}
+            page={pagination?.page}
+            perPage={pagination?.perPage}
+            perPageOptions={paginationDefaultValues}
+          />
         )}
-        columns={activeColumns}
-        data={data}
-        loaded={loaded && loadedColumns}
+      </div>
+      <KubevirtTable
+        activeColumnKeys={activeColumnKeys}
+        ariaLabel={t('Cluster preferences table')}
+        columns={columns}
+        data={filteredData ?? []}
+        dataTest="cluster-preference-list"
+        getRowId={getClusterPreferenceRowId}
+        loaded={isLoaded}
         loadError={loadError}
-        Row={ClusterPreferenceRow}
+        noDataMsg={t('No preferences found')}
+        pagination={pagination}
         unfilteredData={unfilteredData}
       />
     </ListPageBody>

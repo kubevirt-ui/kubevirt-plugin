@@ -3,6 +3,7 @@ import React, { ReactElement, ReactNode, useMemo } from 'react';
 import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { useDataViewTableSort } from '@kubevirt-utils/hooks/useDataViewTableSort/useDataViewTableSort';
 import { generateRows } from '@kubevirt-utils/hooks/useDataViewTableSort/utils';
+import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { EmptyState, EmptyStateVariant } from '@patternfly/react-core';
 import { DataViewTable, DataViewTr } from '@patternfly/react-data-view';
@@ -13,6 +14,8 @@ import StateHandler from '../StateHandler/StateHandler';
 import './KubevirtTable.scss';
 
 export type KubevirtTableProps<TData, TCallbacks = undefined> = {
+  /** Column keys that should be visible (from user settings). If not provided, shows all non-additional columns */
+  activeColumnKeys?: string[];
   ariaLabel: string;
   callbacks?: TCallbacks;
   columns: ColumnConfig<TData, TCallbacks>[];
@@ -28,6 +31,8 @@ export type KubevirtTableProps<TData, TCallbacks = undefined> = {
   noDataMsg?: ReactNode;
   noFilteredDataMsg?: ReactNode;
   onSelect?: (selected: TData[]) => void;
+  /** Pagination state from usePagination hook. When provided, table will slice sorted data accordingly */
+  pagination?: PaginationState;
   selectedItems?: TData[];
   unfilteredData?: TData[];
 };
@@ -47,6 +52,7 @@ const renderNoFilteredDataContent = (content: ReactNode): ReactNode => {
 };
 
 const KubevirtTable = <TData, TCallbacks = undefined>({
+  activeColumnKeys,
   ariaLabel,
   callbacks,
   columns,
@@ -61,26 +67,42 @@ const KubevirtTable = <TData, TCallbacks = undefined>({
   loadError,
   noDataMsg,
   noFilteredDataMsg,
+  pagination,
   unfilteredData,
 }: KubevirtTableProps<TData, TCallbacks>): ReactElement => {
+  const activeColumns = useMemo(() => {
+    if (!activeColumnKeys) {
+      return columns.filter((col) => !col.additional);
+    }
+    return columns.filter((col) => activeColumnKeys.includes(col.key) || col.key === 'actions');
+  }, [columns, activeColumnKeys]);
+
   const effectiveInitialSortKey = useMemo(() => {
     if (initialSortKey) return initialSortKey;
-    if (initialSortColumnIndex !== undefined && columns[initialSortColumnIndex]) {
-      return columns[initialSortColumnIndex].key;
+    if (initialSortColumnIndex !== undefined && activeColumns[initialSortColumnIndex]) {
+      return activeColumns[initialSortColumnIndex].key;
     }
-    return columns[0]?.key;
-  }, [initialSortKey, initialSortColumnIndex, columns]);
+    return activeColumns[0]?.key;
+  }, [initialSortKey, initialSortColumnIndex, activeColumns]);
 
   const { sortedData, tableColumns, visibleColumns } = useDataViewTableSort(
     data,
-    columns,
+    activeColumns,
     effectiveInitialSortKey,
     initialSortDirection,
   );
 
+  const paginatedData = useMemo(() => {
+    if (!pagination) {
+      return sortedData;
+    }
+    const { endIndex, startIndex } = pagination;
+    return sortedData.slice(startIndex, endIndex);
+  }, [sortedData, pagination]);
+
   const rows: DataViewTr[] = useMemo(
-    () => generateRows(sortedData, visibleColumns, callbacks as TCallbacks, getRowId),
-    [sortedData, visibleColumns, callbacks, getRowId],
+    () => generateRows(paginatedData, visibleColumns, callbacks as TCallbacks, getRowId),
+    [paginatedData, visibleColumns, callbacks, getRowId],
   );
 
   const isUnfilteredDataEmpty = isEmpty(unfilteredData ?? data);
