@@ -10,5 +10,6 @@ export const LOCAL_CLUSTER = 'Local cluster';
 export const EVENT_LOCALSTORAGE = 'event_localstorage';
 
 export const DESCHEDULER_ENABLED = 'enabled' as const;
+export const DESCHEDULER_NOT_ENABLED = 'not-enabled' as const;
 export const DESCHEDULER_NOT_INSTALLED = 'not-installed' as const;
 export const DESCHEDULER_UNKNOWN = 'unknown' as const;

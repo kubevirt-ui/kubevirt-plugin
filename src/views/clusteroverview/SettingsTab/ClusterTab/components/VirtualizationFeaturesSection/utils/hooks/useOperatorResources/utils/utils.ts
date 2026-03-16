@@ -6,21 +6,24 @@ import {
 } from '@kubevirt-utils/models';
 import { getGroupVersionKindForModel, Operator } from '@openshift-console/dynamic-plugin-sdk';
 
-export const watchedOperatorResources = {
+export const getWatchedOperatorResources = (cluster?: string) => ({
   clusterServiceVersions: {
+    cluster,
     groupVersionKind: getGroupVersionKindForModel(ClusterServiceVersionModel),
     isList: true,
   },
   marketplacePackageManifests: {
+    cluster,
     groupVersionKind: getGroupVersionKindForModel(PackageManifestModel),
     isList: true,
-    // selector: { matchLabels: { 'openshift-marketplace': 'true' } },
   },
   operatorGroups: {
+    cluster,
     groupVersionKind: getGroupVersionKindForModel(OperatorGroupModel),
     isList: true,
   },
   packageManifests: {
+    cluster,
     groupVersionKind: getGroupVersionKindForModel(PackageManifestModel),
     isList: true,
     selector: {
@@ -34,7 +37,8 @@ export const watchedOperatorResources = {
     },
   },
   subscriptions: {
+    cluster,
     groupVersionKind: getGroupVersionKindForModel(SubscriptionModel),
     isList: true,
   },
-};
+});

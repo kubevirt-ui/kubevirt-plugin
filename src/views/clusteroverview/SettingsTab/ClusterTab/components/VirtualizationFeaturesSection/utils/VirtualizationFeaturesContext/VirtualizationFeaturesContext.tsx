@@ -7,8 +7,14 @@ import {
 
 export const VirtualizationFeaturesContext = createContext<VirtualizationFeaturesResources>({});
 
-export const VirtualizationFeaturesContextProvider: FC = ({ children }) => {
-  const context = useVirtualizationFeatures();
+type VirtualizationFeaturesContextProviderProps = {
+  cluster?: string;
+};
+
+export const VirtualizationFeaturesContextProvider: FC<
+  VirtualizationFeaturesContextProviderProps
+> = ({ children, cluster }) => {
+  const context = useVirtualizationFeatures(cluster);
   return (
     <VirtualizationFeaturesContext.Provider value={context}>
       {children}

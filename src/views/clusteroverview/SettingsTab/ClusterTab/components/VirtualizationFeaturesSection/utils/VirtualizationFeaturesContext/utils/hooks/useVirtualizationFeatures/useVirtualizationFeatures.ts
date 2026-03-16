@@ -25,9 +25,9 @@ export type VirtualizationFeaturesResources = {
   updateInstallRequests?: (updates: OperatorsToInstall) => void;
 };
 
-type UseVirtualizationFeatures = () => VirtualizationFeaturesResources;
+type UseVirtualizationFeatures = (cluster?: string) => VirtualizationFeaturesResources;
 
-export const useVirtualizationFeatures: UseVirtualizationFeatures = () => {
+export const useVirtualizationFeatures: UseVirtualizationFeatures = (cluster?) => {
   const [operatorsToInstall, setOperatorsToInstall] =
     useState<OperatorsToInstall>(defaultOperatorsToInstall);
   const [activeNamespace] = useActiveNamespace();
@@ -37,7 +37,7 @@ export const useVirtualizationFeatures: UseVirtualizationFeatures = () => {
     setOperatorsToInstall((prev) => ({ ...prev, ...updates }));
   }, []);
 
-  const operatorResources = useOperatorResources();
+  const operatorResources = useOperatorResources(cluster);
   const { clusterServiceVersions, operatorGroups, operatorResourcesLoaded, subscriptions } =
     operatorResources;
 

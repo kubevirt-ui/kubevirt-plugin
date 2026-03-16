@@ -1,11 +1,20 @@
 import { useMemo } from 'react';
 
 import {
-  DeschedulerStatus,
-  useDeschedulerInstalled,
-} from '@kubevirt-utils/hooks/useDeschedulerInstalled';
+  DESCHEDULER_ENABLED,
+  DESCHEDULER_NOT_ENABLED,
+  DESCHEDULER_NOT_INSTALLED,
+  DESCHEDULER_UNKNOWN,
+} from '@kubevirt-utils/hooks/constants';
+import { DeschedulerStatus } from '@kubevirt-utils/hooks/useDeschedulerInstalled';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useKubeDescheduler from '@kubevirt-utils/resources/descheduler/hooks/useKubeDescheduler';
+import useWorkerNodes from '@kubevirt-utils/resources/node/hooks/useWorkerNodes';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
+import { DESCHEDULER_OPERATOR_NAME } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/constants';
+import { InstallState } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/types';
+import { useVirtualizationFeaturesContext } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/VirtualizationFeaturesContext/VirtualizationFeaturesContext';
 
 import { DistributionBucket } from '../../shared/DistributionBarChart/DistributionBarChart';
 import { StatusScoreItem } from '../../shared/StatusScoreList/StatusScoreList';
@@ -13,7 +22,6 @@ import { StatusScoreItem } from '../../shared/StatusScoreList/StatusScoreList';
 import {
   buildLabelMap,
   computeDistributionScore,
-  getAllKeysFromMaps,
   getResourcePercentages,
 } from './clusterMetricUtils';
 import {
@@ -26,19 +34,53 @@ import useResourceUtilizationPolls from './useResourceUtilizationPolls';
 
 type NodeLoadDistributionData = {
   buckets: DistributionBucket[];
+  deschedulerLoaded: boolean;
   deschedulerStatus: DeschedulerStatus;
   distributionScore: number;
   items: StatusScoreItem[];
   loaded: boolean;
 };
 
+const installStateToDeschedulerStatus = (
+  installState: InstallState,
+  hasDeschedulerCR: boolean,
+): DeschedulerStatus => {
+  if (installState === InstallState.INSTALLED) {
+    return hasDeschedulerCR ? DESCHEDULER_ENABLED : DESCHEDULER_NOT_ENABLED;
+  }
+  if (installState === InstallState.NOT_INSTALLED) return DESCHEDULER_NOT_INSTALLED;
+  return DESCHEDULER_UNKNOWN;
+};
+
 export const useNodeLoadDistributionData = (): NodeLoadDistributionData => {
   const { t } = useKubevirtTranslation();
   const cluster = useClusterParam();
-  const { status: deschedulerStatus } = useDeschedulerInstalled(cluster);
+  const { operatorDetailsMap, operatorResourcesLoaded } = useVirtualizationFeaturesContext();
+  const [workerNodes, workerNodesLoaded] = useWorkerNodes(cluster);
+  const { descheduler: deschedulerCR, deschedulerLoaded: deschedulerCRLoaded } =
+    useKubeDescheduler(cluster);
 
-  const { loaded, totalCPU, totalMemory, totalStorage, usedCPU, usedMemory, usedStorage } =
-    useResourceUtilizationPolls({ cluster, groupBy: 'node' });
+  const deschedulerInstallState = operatorDetailsMap?.[DESCHEDULER_OPERATOR_NAME]?.installState;
+  const deschedulerLoaded = (operatorResourcesLoaded && deschedulerCRLoaded) ?? false;
+  const deschedulerStatus =
+    deschedulerLoaded && deschedulerInstallState !== undefined
+      ? installStateToDeschedulerStatus(deschedulerInstallState, !isEmpty(deschedulerCR))
+      : DESCHEDULER_UNKNOWN;
+
+  const {
+    loaded: metricsLoaded,
+    totalCPU,
+    totalMemory,
+    totalStorage,
+    usedCPU,
+    usedMemory,
+    usedStorage,
+  } = useResourceUtilizationPolls({ cluster, groupBy: 'node' });
+
+  const workerNodeNames = useMemo(
+    () => new Set((workerNodes ?? []).map((n) => n.metadata?.name).filter(Boolean)),
+    [workerNodes],
+  );
 
   const resourceLabels: ResourceLabels = useMemo(
     () => ({ cpu: t('CPU'), memory: t('Memory'), storage: t('Storage') }),
@@ -62,17 +104,8 @@ export const useNodeLoadDistributionData = (): NodeLoadDistributionData => {
       storage: buildLabelMap(totalStorage?.data?.result ?? []),
     };
 
-    const allNodes = getAllKeysFromMaps(
-      usedMaps.cpu,
-      totalMaps.cpu,
-      usedMaps.memory,
-      totalMaps.memory,
-      usedMaps.storage,
-      totalMaps.storage,
-    );
-
     const nodes: NodeUtilization[] = [];
-    for (const name of allNodes) {
+    for (const name of workerNodeNames) {
       const { cpu, memory, overall, storage } = getResourcePercentages(usedMaps, totalMaps, name);
       nodes.push({ cpu, memory, name, overall, storage });
     }
@@ -89,9 +122,17 @@ export const useNodeLoadDistributionData = (): NodeLoadDistributionData => {
     totalMemory,
     usedStorage,
     totalStorage,
+    workerNodeNames,
     resourceLabels,
     bucketLabels,
   ]);
 
-  return { buckets, deschedulerStatus, distributionScore, items, loaded };
+  return {
+    buckets,
+    deschedulerLoaded,
+    deschedulerStatus,
+    distributionScore,
+    items,
+    loaded: metricsLoaded && workerNodesLoaded,
+  };
 };
