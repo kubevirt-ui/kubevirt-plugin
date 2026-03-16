@@ -18,8 +18,10 @@ export const isACMPath = (pathname: string): boolean => {
   if (pathname.startsWith('/k8s/all-clusters')) return true;
 
   const clusterMatch = matchPath('/k8s/cluster/:cluster/*', pathname);
+  if (!clusterMatch || clusterMatch.params.cluster?.includes('~')) return false;
 
-  return clusterMatch !== null && !clusterMatch?.params?.cluster?.includes('~');
+  const rest = clusterMatch.params['*'] ?? '';
+  return rest.startsWith('ns/') || rest.startsWith('all-namespaces/') || rest.includes('~');
 };
 
 export const getACMVMURL = (cluster: string, namespace: string, name: string): string =>

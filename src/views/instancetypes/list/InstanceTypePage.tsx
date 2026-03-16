@@ -8,6 +8,7 @@ import {
   VirtualMachineClusterInstancetypeModelRef,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { PageTitles } from '@kubevirt-utils/constants/page-constants';
+import useIsCRDPage from '@kubevirt-utils/hooks/useIsCRDPage';
 import useIsSearchPage from '@kubevirt-utils/hooks/useIsSearchPage';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ListPageProps } from '@kubevirt-utils/utils/types';
@@ -37,6 +38,7 @@ const InstanceTypePage: FC<ListPageProps> = (props) => {
   const [activeNamespace] = useActiveNamespace();
 
   const isSearchPage = useIsSearchPage();
+  const isCRDPage = useIsCRDPage();
 
   const activeTabKey = useMemo(
     () =>
@@ -58,6 +60,19 @@ const InstanceTypePage: FC<ListPageProps> = (props) => {
 
     const kindSearched = searchParams.get('kind');
     return kindSearched === VirtualMachineClusterInstancetypeModelRef ? (
+      <ClusterInstancetypeList {...props} />
+    ) : (
+      <UserInstancetypeList
+        {...props}
+        instanceTypes={instanceTypes}
+        loaded={loaded}
+        loadError={loadError}
+      />
+    );
+  }
+
+  if (isCRDPage) {
+    return location?.pathname?.includes(VirtualMachineClusterInstancetypeModel.plural) ? (
       <ClusterInstancetypeList {...props} />
     ) : (
       <UserInstancetypeList
