@@ -34,13 +34,11 @@ export const tourSteps: Step[] = [
     title: t('Project selector'),
   },
   {
-    content: t(
-      'You can set the cluster and your individual preferences in the Settings tab on the Overview page.',
-    ),
-    data: { route: '/k8s/all-namespaces/virtualization-overview/settings' },
+    content: t('You can set the cluster and your individual preferences on the Settings page.'),
+    data: { route: '/k8s/all-namespaces/virtualization-settings' },
     disableBeacon: true,
     placement: 'bottom',
-    target: '[data-test-id="horizontal-link-Settings"]',
+    target: '[data-test-id="virtualization-settings-nav-item"]',
     title: t('Settings configurations'),
   },
   {

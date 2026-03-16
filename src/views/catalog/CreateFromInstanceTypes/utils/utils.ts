@@ -48,9 +48,9 @@ import {
 } from '@kubevirt-utils/utils/headless-service';
 import { generatePrettyName, getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
 import { K8sGroupVersionKind, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { AutomaticSubscriptionTypeEnum } from '@settings/tabs/ClusterTab/components/GuestManagmentSection/AutomaticSubscriptionRHELGuests/components/AutomaticSubscriptionType/utils/utils';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
-import { AutomaticSubscriptionTypeEnum } from '../../../../views/clusteroverview/SettingsTab/ClusterTab/components/GuestManagmentSection/AutomaticSubscriptionRHELGuests/components/AutomaticSubscriptionType/utils/utils';
 import { useInstanceTypeVMStore } from '../state/useInstanceTypeVMStore';
 import { InstanceTypeVMState } from '../state/utils/types';
 

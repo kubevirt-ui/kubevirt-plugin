@@ -18,7 +18,7 @@ export enum tabName {
   Parameters = 'Parameters',
   Scheduling = 'Scheduling',
   Scripts = 'Scripts',
-  Settings = 'Settings',
+  // Settings is now a standalone page - use cy.visitSettingsVirt() instead
   Snapshots = 'Snapshots',
   TopConsumers = 'Top consumers',
   YAML = 'YAML',
@@ -127,7 +127,7 @@ export const tab = {
     navigateToTab(tabName.Scripts);
   },
   navigateToSettings: () => {
-    navigateToTab(tabName.Settings);
+    cy.visitSettingsVirt();
   },
   navigateToSnapshots: () => {
     navigateToTab(tabName.Snapshots);

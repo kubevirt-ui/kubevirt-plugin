@@ -13,13 +13,13 @@ import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useManagedClusterConsoleURLs from '@multicluster/hooks/useManagedClusterConsoleURLs';
 import { GreenCheckCircleIcon } from '@openshift-console/dynamic-plugin-sdk';
 import { BlueInfoCircleIcon } from '@openshift-console/dynamic-plugin-sdk/lib/app/components/status/icons';
+import { Button, ButtonVariant, Popover } from '@patternfly/react-core';
+import { UnknownIcon } from '@patternfly/react-icons/dist/esm/icons';
 import {
   DESCHEDULER_OPERATOR_NAME,
   OPERATOR_HUB_PATH,
-} from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/constants';
-import { useVirtualizationFeaturesContext } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/VirtualizationFeaturesContext/VirtualizationFeaturesContext';
-import { Button, ButtonVariant, Popover } from '@patternfly/react-core';
-import { UnknownIcon } from '@patternfly/react-icons/dist/esm/icons';
+} from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/constants';
+import { useVirtualizationFeaturesContext } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/VirtualizationFeaturesContext/VirtualizationFeaturesContext';
 
 type DeschedulerStatusDisplay = { icon: ReactNode; label: string };
 

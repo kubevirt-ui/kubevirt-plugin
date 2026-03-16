@@ -1,0 +1,27 @@
+import React, { FC } from 'react';
+
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { PopoverPosition } from '@patternfly/react-core';
+import HelpTextTooltipContent from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/VirtualizationFeaturesWizard/components/HelpTextTooltipContent/HelpTextTooltipContent';
+
+const UseAlternativeOptionHelpIcon: FC = () => {
+  const { t } = useKubevirtTranslation();
+
+  return (
+    <HelpTextIcon
+      bodyContent={
+        <HelpTextTooltipContent
+          bodyText={t(
+            'Checking this will mark the feature as installed. Installation and configuration are the responsibility of the user.',
+          )}
+          titleText={t('Use an alternative')}
+        />
+      }
+      helpIconClassName="pf-v6-u-ml-md"
+      position={PopoverPosition.right}
+    />
+  );
+};
+
+export default UseAlternativeOptionHelpIcon;
