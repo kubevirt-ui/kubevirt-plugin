@@ -1,0 +1,12 @@
+.virtualization-features-section {
+  &__button-container {
+    align-items: center;
+    display: flex;
+    gap: var(--pf-t--global--spacer--md);
+    margin-inline-start: auto;
+  }
+
+  &__button-skeleton {
+    width: 150px;
+  }
+}

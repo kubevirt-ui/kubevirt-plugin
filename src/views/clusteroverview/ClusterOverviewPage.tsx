@@ -5,6 +5,7 @@ import ClusterProjectDropdown from '@kubevirt-utils/components/ClusterProjectDro
 import HorizontalNavbar from '@kubevirt-utils/components/HorizontalNavbar/HorizontalNavbar';
 import { NavPageKubevirt } from '@kubevirt-utils/components/HorizontalNavbar/utils/utils';
 import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';
+import { VIRTUALIZATION_PATHS } from '@kubevirt-utils/constants/constants';
 import { ALL_CLUSTERS_KEY } from '@kubevirt-utils/hooks/constants';
 import {
   getMCONotInstalledTooltip,
@@ -15,8 +16,8 @@ import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useActiveClusterParam from '@multicluster/hooks/useActiveClusterParam';
 import useIsACMPage from '@multicluster/useIsACMPage';
+import { DocumentTitle } from '@openshift-console/dynamic-plugin-sdk';
 import { useSignals } from '@preact/signals-react/runtime';
-import { VIRTUALIZATION_PATHS } from '@virtualmachines/tree/utils/constants';
 
 import GuidedTour from '../../utils/components/GuidedTour/GuidedTour';
 import usePreserveTabDisplay from '../../utils/hooks/usePreserveTabDisplay';
@@ -26,7 +27,6 @@ import ClusterOverviewPageHeader from './Header/ClusterOverviewPageHeader';
 import ObservabilityDisabledAlert from './Header/ObservabilityDisabledAlert';
 import MigrationsTab from './MigrationsTab/MigrationsTab';
 import OverviewTab from './OverviewTab/OverviewTab';
-import SettingsTab from './SettingsTab/SettingsTab';
 import TopConsumersTab from './TopConsumersTab/TopConsumersTab';
 
 import './ClusterOverviewPage.scss';
@@ -75,37 +75,6 @@ const ClusterOverviewPage: FC = () => {
       },
     ];
 
-    const settingsPages: NavPageKubevirt[] = [
-      {
-        component: SettingsTab,
-        href: 'settings',
-        name: t('Settings'),
-      },
-      {
-        component: SettingsTab,
-        href: 'settings/cluster',
-        isHidden: true,
-        name: 'settings/cluster',
-      },
-      {
-        component: SettingsTab,
-        href: 'settings/user',
-        isHidden: true,
-        name: 'settings/user',
-      },
-      {
-        component: SettingsTab,
-        href: 'settings/features',
-        isHidden: true,
-        name: 'settings/features',
-      },
-      {
-        component: SettingsTab,
-        href: 'settings/*',
-        isHidden: true,
-        name: 'settings/*',
-      },
-    ];
     return [
       {
         component: OverviewTab,
@@ -118,16 +87,13 @@ const ClusterOverviewPage: FC = () => {
         href: 'migrations',
         name: t('Migrations'),
       },
-      ...(!isACMPage ? [...settingsPages] : []),
     ];
-  }, [isAdmin, t, isACMPage]);
+  }, [isAdmin, t]);
 
   if (isLoadingMCOCheck) {
     return (
       <>
-        <Helmet>
-          <title>{t('Virtualization')}</title>
-        </Helmet>
+        <DocumentTitle>{t('Virtualization')}</DocumentTitle>
         <LoadingEmptyState />
       </>
     );

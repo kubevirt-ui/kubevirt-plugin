@@ -14,8 +14,8 @@ import { getNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/netw
 import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
 import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
-import usePasstFeatureFlag from '@overview/SettingsTab/PreviewFeaturesTab/hooks/usePasstFeatureFlag';
 import { ExpandableSection } from '@patternfly/react-core';
+import usePasstFeatureFlag from '@settings/tabs/PreviewFeaturesTab/hooks/usePasstFeatureFlag';
 import {
   getConfigInterfaceStateFromVM,
   isLinkStateEditable,

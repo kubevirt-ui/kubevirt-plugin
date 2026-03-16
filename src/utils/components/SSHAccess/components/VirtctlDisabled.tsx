@@ -8,9 +8,9 @@ import { NetworkAttachmentDefinitionModelGroupVersionKind } from '@kubevirt-util
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
 import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
-import usePasstFeatureFlag from '@overview/SettingsTab/PreviewFeaturesTab/hooks/usePasstFeatureFlag';
 import { Content, Popover } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
+import usePasstFeatureFlag from '@settings/tabs/PreviewFeaturesTab/hooks/usePasstFeatureFlag';
 
 type VirtctlDisabledProps = {
   cluster?: string;

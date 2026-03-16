@@ -6,9 +6,10 @@ import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
 import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
-import { VirtualizationFeaturesContextProvider } from '@overview/SettingsTab/ClusterTab/components/VirtualizationFeaturesSection/utils/VirtualizationFeaturesContext/VirtualizationFeaturesContext';
 import { Divider, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
+import { SettingsClusterProvider } from '@settings/context/SettingsClusterContext';
+import { VirtualizationFeaturesContextProvider } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/VirtualizationFeaturesContext/VirtualizationFeaturesContext';
 import VirtualMachineNavPage from '@virtualmachines/details/VirtualMachineNavPage';
 import VirtualMachinesListPageHeader from '@virtualmachines/list/components/VirtualMachinesListPageHeader';
 import VirtualMachinesList from '@virtualmachines/list/VirtualMachinesList';
@@ -55,42 +56,46 @@ const VirtualMachineNavigator: FC = () => {
     <>
       <VirtualMachinesListPageHeader namespace={namespace} />
       <Divider />
-      <VirtualizationFeaturesContextProvider cluster={cluster}>
-        <VirtualMachineTreeView onFilterChange={onFilterChange} {...treeProps}>
-          <GuidedTour />
-          {isVirtualMachineListPage ? (
-            <Tabs
-              activeKey={activeTabKey}
-              aria-label={t('Virtual machines tabs')}
-              className="co-horizontal-nav vm-navigator-tabs"
-              onSelect={handleTabSelect}
-              usePageInsets
-            >
-              <Tab
-                eventKey={OVERVIEW_TAB_INDEX}
-                title={<TabTitleText data-test="overview-tab">{t('Overview')}</TabTitleText>}
+      <SettingsClusterProvider cluster={cluster}>
+        <VirtualizationFeaturesContextProvider>
+          <VirtualMachineTreeView onFilterChange={onFilterChange} {...treeProps}>
+            <GuidedTour />
+            {isVirtualMachineListPage ? (
+              <Tabs
+                activeKey={activeTabKey}
+                aria-label={t('Virtual machines tabs')}
+                className="co-horizontal-nav vm-navigator-tabs"
+                onSelect={handleTabSelect}
+                usePageInsets
               >
-                <OverviewTab cluster={cluster} key="overview" namespace={namespace} />
-              </Tab>
-              <Tab
-                eventKey={VM_LIST_TAB_INDEX}
-                title={<TabTitleText data-test="vm-list-tab">{t('Virtual machines')}</TabTitleText>}
-              >
-                <VirtualMachinesList
-                  allVMsLoaded={treeProps.loaded}
-                  cluster={cluster}
-                  key={`vms-${activeTabKey}`}
-                  kind={VirtualMachineModelRef}
-                  namespace={namespace}
-                  ref={vmListRef}
-                />
-              </Tab>
-            </Tabs>
-          ) : (
-            <VirtualMachineNavPage />
-          )}
-        </VirtualMachineTreeView>
-      </VirtualizationFeaturesContextProvider>
+                <Tab
+                  eventKey={OVERVIEW_TAB_INDEX}
+                  title={<TabTitleText data-test="overview-tab">{t('Overview')}</TabTitleText>}
+                >
+                  <OverviewTab cluster={cluster} key="overview" namespace={namespace} />
+                </Tab>
+                <Tab
+                  title={
+                    <TabTitleText data-test="vm-list-tab">{t('Virtual machines')}</TabTitleText>
+                  }
+                  eventKey={VM_LIST_TAB_INDEX}
+                >
+                  <VirtualMachinesList
+                    allVMsLoaded={treeProps.loaded}
+                    cluster={cluster}
+                    key={`vms-${activeTabKey}`}
+                    kind={VirtualMachineModelRef}
+                    namespace={namespace}
+                    ref={vmListRef}
+                  />
+                </Tab>
+              </Tabs>
+            ) : (
+              <VirtualMachineNavPage />
+            )}
+          </VirtualMachineTreeView>
+        </VirtualizationFeaturesContextProvider>
+      </SettingsClusterProvider>
     </>
   );
 };

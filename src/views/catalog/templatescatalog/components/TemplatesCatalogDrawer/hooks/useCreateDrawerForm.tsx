@@ -1,7 +1,6 @@
 import { MouseEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 import produce from 'immer';
-import { AUTOMATIC_UPDATE_FEATURE_NAME } from 'src/views/clusteroverview/SettingsTab/ClusterTab/components/GuestManagmentSection/AutomaticSubscriptionRHELGuests/utils/constants';
 
 import { quickCreateVM } from '@catalog/utils/quick-create-vm';
 import { isRHELTemplate } from '@catalog/utils/utils';
@@ -69,6 +68,7 @@ import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 import { getCatalogURL, getVMURL } from '@multicluster/urls';
 import { useK8sModels } from '@openshift-console/dynamic-plugin-sdk';
 import { getLabels } from '@overview/OverviewTab/inventory-card/utils/flattenTemplates';
+import { AUTOMATIC_UPDATE_FEATURE_NAME } from '@settings/tabs/ClusterTab/components/GuestManagmentSection/AutomaticSubscriptionRHELGuests/utils/constants';
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 

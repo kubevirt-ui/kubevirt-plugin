@@ -506,6 +506,34 @@ const extensions: EncodedExtension[] = [
   },
   {
     properties: {
+      dataAttributes: {
+        'data-test-id': 'virtualization-settings-nav-item',
+      },
+      href: 'virtualization-settings',
+      id: 'virtualization-settings',
+      insertAfter: 'virtualmachines',
+      name: '%plugin__kubevirt-plugin~Settings%',
+      prefixNamespaced: true,
+      section: 'virtualization',
+    },
+    type: 'console.navigation/href',
+  },
+  {
+    properties: {
+      component: {
+        $codeRef: 'SettingsPage',
+      },
+      path: [
+        '/k8s/ns/:ns/virtualization-settings',
+        '/k8s/ns/:ns/virtualization-settings/*',
+        '/k8s/all-namespaces/virtualization-settings',
+        '/k8s/all-namespaces/virtualization-settings/*',
+      ],
+    },
+    type: 'console.page/route',
+  },
+  {
+    properties: {
       href: 'hardwaredevices',
       id: 'hardwaredevices',
       insertBefore: 'baremetalhosts',

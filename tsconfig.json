@@ -24,6 +24,7 @@
       "@multicluster/*": ["src/multicluster/*"],
       "@overview/*": ["src/views/clusteroverview/*"],
       "@search/*": ["src/views/search/*"],
+      "@settings/*": ["src/views/settings/*"],
       "@topology/*": ["src/views/topology/*"],
       "@virtualmachines/*": ["src/views/virtualmachines/*"]
     },

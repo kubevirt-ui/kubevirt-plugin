@@ -2,7 +2,6 @@ import { TEST_NS, TEST_SECRET_NAME } from '../../utils/const/index';
 import { authSSHKey, YAML } from '../../utils/const/string';
 import { itemCreateBtn, mastheadLogo, saveBtn } from '../../views/selector';
 import { manageKeysText, useExisting } from '../../views/selector-catalog';
-import { tab } from '../../views/tab';
 
 function configureSSHSecret() {
   cy.byLegacyTestID('select-project-toggle').click();
@@ -23,10 +22,7 @@ describe('Cluster Test Preparation', () => {
   });
 
   it('configure public ssh key', () => {
-    cy.visitVMsVirt();
-    cy.visitOverviewVirt();
-
-    tab.navigateToSettings();
+    cy.visitSettingsVirt();
     cy.byButtonText('User').click();
     cy.byButtonText(manageKeysText).click();
 
