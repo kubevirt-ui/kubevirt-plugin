@@ -1,28 +1,32 @@
-import React from 'react';
+import React, { FC, useMemo } from 'react';
 import { Link } from 'react-router-dom-v5-compat';
 
+import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useDisksTableData from '@kubevirt-utils/resources/vm/hooks/disk/useDisksTableData';
-import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
-import { VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
 import { Card, CardBody, CardTitle, Divider } from '@patternfly/react-core';
 
 import { createURL } from '../../utils/utils';
 
-import useVirtualMachinesOverviewTabDisksColumns from './hooks/useVirtualMachinesOverviewTabDisksColumns';
-import VirtualMachinesOverviewTabDisksRow from './VirtualMachinesOverviewTabDisksRow';
+import { getOverviewDiskRowId, getOverviewDisksColumns } from './overviewDisksDefinition';
 
 import './virtual-machines-overview-tab-disks.scss';
 
-const VirtualMachinesOverviewTabDisks = ({ vm, vmi }) => {
-  const [disks, loaded, loadedError] = useDisksTableData(vm, vmi);
+type VirtualMachinesOverviewTabDisksProps = {
+  vm: V1VirtualMachine;
+  vmi: V1VirtualMachineInstance;
+};
+
+const VirtualMachinesOverviewTabDisks: FC<VirtualMachinesOverviewTabDisksProps> = ({ vm, vmi }) => {
   const { t } = useKubevirtTranslation();
-  const columns = useVirtualMachinesOverviewTabDisksColumns();
+  const [disks, loaded, loadError] = useDisksTableData(vm, vmi);
+  const columns = useMemo(() => getOverviewDisksColumns(t), [t]);
 
   return (
     <div className="VirtualMachinesOverviewTabDisks--main">
-      <Card>
+      <Card data-test="overview-disks-card">
         <CardTitle className="pf-v6-u-text-color-subtle">
           <Link
             to={createURL(
@@ -30,18 +34,21 @@ const VirtualMachinesOverviewTabDisks = ({ vm, vmi }) => {
               location?.pathname,
             )}
           >
-            {t('Storage ({{disks}})', { disks: disks.length || 0 })}
+            {t('Storage ({{disks}})', { disks: disks?.length ?? 0 })}
           </Link>
         </CardTitle>
         <Divider />
         <CardBody isFilled>
-          <VirtualizedTable<DiskRowDataLayout>
+          <KubevirtTable
+            ariaLabel={t('Disks table')}
+            className="kubevirt-table--in-card"
             columns={columns}
             data={disks}
+            dataTest="overview-disks-table"
+            getRowId={getOverviewDiskRowId}
             loaded={loaded}
-            loadError={loadedError}
-            Row={VirtualMachinesOverviewTabDisksRow}
-            unfilteredData={disks}
+            loadError={loadError}
+            noDataMsg={t('No disks found')}
           />
         </CardBody>
       </Card>

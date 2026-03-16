@@ -15,6 +15,7 @@ import './KubevirtTable.scss';
 export type KubevirtTableProps<TData, TCallbacks = undefined> = {
   ariaLabel: string;
   callbacks?: TCallbacks;
+  className?: string;
   columns: ColumnConfig<TData, TCallbacks>[];
   data: TData[];
   dataTest?: string;
@@ -49,6 +50,7 @@ const renderNoFilteredDataContent = (content: ReactNode): ReactNode => {
 const KubevirtTable = <TData, TCallbacks = undefined>({
   ariaLabel,
   callbacks,
+  className,
   columns,
   data,
   dataTest,
@@ -122,7 +124,7 @@ const KubevirtTable = <TData, TCallbacks = undefined>({
   };
 
   return (
-    <div data-test={dataTest}>
+    <div className={className} data-test={dataTest}>
       <StateHandler error={loadError} hasData={!isUnfilteredDataEmpty} loaded={loaded}>
         {renderContent()}
       </StateHandler>
