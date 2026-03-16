@@ -91,7 +91,7 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
   return (
     <Dropdown
       toggle={KebabToggle({
-        id: 'toggle-id-6',
+        id: `nic-actions-${nicName}`,
         isDisabled: !isTemplateEditable,
         isExpanded: isDropdownOpen,
         onClick: onToggle,

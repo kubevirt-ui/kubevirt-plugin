@@ -3,6 +3,7 @@ import React, { ReactElement, ReactNode, useMemo } from 'react';
 import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { useDataViewTableSort } from '@kubevirt-utils/hooks/useDataViewTableSort/useDataViewTableSort';
 import { generateRows } from '@kubevirt-utils/hooks/useDataViewTableSort/utils';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { EmptyState, EmptyStateVariant } from '@patternfly/react-core';
 import { DataViewTable, DataViewTr } from '@patternfly/react-data-view';
@@ -65,6 +66,7 @@ const KubevirtTable = <TData, TCallbacks = undefined>({
   noFilteredDataMsg,
   unfilteredData,
 }: KubevirtTableProps<TData, TCallbacks>): ReactElement => {
+  const { t } = useKubevirtTranslation();
   const effectiveInitialSortKey = useMemo(() => {
     if (initialSortKey) return initialSortKey;
     if (initialSortColumnIndex !== undefined && columns[initialSortColumnIndex]) {
@@ -88,7 +90,12 @@ const KubevirtTable = <TData, TCallbacks = undefined>({
   const isUnfilteredDataEmpty = isEmpty(unfilteredData ?? data);
   const isDataEmpty = isEmpty(data);
 
-  const effectiveNoFilteredDataMsg = renderNoFilteredDataContent(noFilteredDataMsg);
+  // Only apply default message when unfilteredData is explicitly provided (table has filtering)
+  const hasFiltering = unfilteredData !== undefined;
+  const defaultFilteredMsg = hasFiltering ? t('No results match the current filters') : undefined;
+  const effectiveNoFilteredDataMsg = renderNoFilteredDataContent(
+    noFilteredDataMsg ?? defaultFilteredMsg,
+  );
 
   const renderFilteredEmptyState = (): ReactNode => {
     if (!isDataEmpty || isUnfilteredDataEmpty || !effectiveNoFilteredDataMsg) {
