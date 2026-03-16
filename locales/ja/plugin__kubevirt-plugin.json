@@ -1164,7 +1164,6 @@
   "Migrating {{migrationCount}} out of {{allCount}}": "移行中 {{migrationCount}} / {{allCount}}",
   "Migration": "移行",
   "Migration chart": "移行チャート",
-  "Migration completed successfully": "移行が正常に完了しました",
   "Migration details": "移行の詳細",
   "Migration failed": "移行に失敗しました",
   "Migration metrics": "移行メトリクス",

@@ -1183,7 +1183,6 @@
   "Migrating {{migrationCount}} out of {{allCount}}": "Migrando {{migrationCount}} de {{allCount}}",
   "Migration": "Migración",
   "Migration chart": "Gráfico de migración",
-  "Migration completed successfully": "La migración se completó correctamente.",
   "Migration details": "Detalles de la migración",
   "Migration failed": "La migración falló",
   "Migration metrics": "Métricas de la migración",

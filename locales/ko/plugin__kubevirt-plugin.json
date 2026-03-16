@@ -1164,7 +1164,6 @@
   "Migrating {{migrationCount}} out of {{allCount}}": "{{allCount}}개 중 {{migrationCount}}개를 마이그레이션",
   "Migration": "마이그레이션",
   "Migration chart": "마이그레이션 차트",
-  "Migration completed successfully": "마이그레이션이 성공적으로 완료되었습니다",
   "Migration details": "마이그레이션 세부 정보",
   "Migration failed": "마이그레이션 실패",
   "Migration metrics": "마이그레이션 메트릭",

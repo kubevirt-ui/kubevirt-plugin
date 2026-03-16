@@ -1169,7 +1169,6 @@
   "Migrating {{migrationCount}} out of {{allCount}}": "Migrating {{migrationCount}} out of {{allCount}}",
   "Migration": "Migration",
   "Migration chart": "Migration chart",
-  "Migration completed successfully": "Migration completed successfully",
   "Migration details": "Migration details",
   "Migration failed": "Migration failed",
   "Migration metrics": "Migration metrics",

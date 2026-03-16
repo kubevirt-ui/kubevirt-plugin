@@ -1,16 +1,16 @@
+import { TFunction } from 'react-i18next';
+
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
   V1VirtualMachine,
   V1VirtualMachineInstanceMigration,
   V1Volume,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   MigrationStatus,
   MultiNamespaceVirtualMachineStorageMigrationPlan,
   STORAGE_MIGRATION_PHASE,
 } from '@kubevirt-utils/resources/migrations/constants';
-import { isMigrationCompleted } from '@kubevirt-utils/resources/migrations/utils';
 import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
@@ -38,28 +38,6 @@ export const getMigrationSuccessTimestamp = (vmim: V1VirtualMachineInstanceMigra
   vmim?.status?.phaseTransitionTimestamps?.find(
     (phaseTransition) => phaseTransition.phase === vmimStatuses.Succeeded,
   )?.phaseTransitionTimestamp;
-
-export const getMigrationStatusLabel = (vmim: V1VirtualMachineInstanceMigration): string => {
-  if (vmim?.status?.phase === vmimStatuses.Failed) return t('Failed');
-  if (vmimStatuses.Succeeded === vmim?.status?.phase) return t('Migration completed successfully');
-
-  return t('In progress');
-};
-
-export const getStorageMigrationStatusLabel = (
-  storageMigrationPlan: MultiNamespaceVirtualMachineStorageMigrationPlan,
-): string => {
-  if (
-    storageMigrationPlan?.status?.namespaces?.some(
-      (namespaceStatus) => namespaceStatus?.[STORAGE_MIGRATION_PHASE.FAILED]?.length > 0,
-    )
-  )
-    return t('Failed');
-
-  if (isMigrationCompleted(storageMigrationPlan)) return t('Migration completed successfully');
-
-  return t('In progress');
-};
 
 export const getVolumePVC = (volume: V1Volume, pvcs: IoK8sApiCoreV1PersistentVolumeClaim[]) =>
   pvcs?.find(
@@ -103,11 +81,13 @@ export const getAllSelectedMigrations = (
 
 export const getFailedMigrations = (
   plan: MultiNamespaceVirtualMachineStorageMigrationPlan,
-): MigrationStatus[] => plan?.status?.namespaces?.flatMap((ns) => ns?.failedMigrations ?? []) ?? [];
+): MigrationStatus[] =>
+  plan?.status?.namespaces?.flatMap((ns) => ns?.[STORAGE_MIGRATION_PHASE.FAILED] ?? []) ?? [];
 
 export const getMigrationStateConfig = (
   migrationCompleted: boolean,
   hasFailed: boolean,
+  t: TFunction,
 ): {
   migrationHeading: string;
   migrationIcon: typeof CheckCircleIcon;

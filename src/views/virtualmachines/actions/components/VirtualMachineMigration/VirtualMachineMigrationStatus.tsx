@@ -50,6 +50,7 @@ const VirtualMachineMigrationStatus: FC<VirtualMachineMigrationStatusProps> = ({
   const { migrationHeading, migrationIcon, migrationStatus } = getMigrationStateConfig(
     migrationCompleted,
     hasFailed,
+    t,
   );
 
   return (

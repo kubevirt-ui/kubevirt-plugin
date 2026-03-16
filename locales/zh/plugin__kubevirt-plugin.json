@@ -1164,7 +1164,6 @@
   "Migrating {{migrationCount}} out of {{allCount}}": "从 {{allCount}} 中迁移 {{migrationCount}}",
   "Migration": "迁移",
   "Migration chart": "迁移图",
-  "Migration completed successfully": "迁移成功完成",
   "Migration details": "迁移详情",
   "Migration failed": "迁移失败",
   "Migration metrics": "迁移指标",
