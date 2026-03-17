@@ -69,6 +69,7 @@ const TemplatesCatalog: FC<TemplatesCatalogProps> = ({ currentTab }) => {
                     filters={filters}
                     loaded={loaded}
                     templates={filteredTemplates}
+                    unfilteredTemplates={templates}
                   />
                 ) : (
                   <TemplatesCatalogEmptyState

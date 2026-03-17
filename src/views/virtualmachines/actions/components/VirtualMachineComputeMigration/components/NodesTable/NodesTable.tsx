@@ -1,13 +1,14 @@
 import React, { FC, useMemo, useState } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { ListPageBody, TableColumn, VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
+import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 import { SearchInput } from '@patternfly/react-core';
-import NodeRow from '@virtualmachines/actions/components/VirtualMachineComputeMigration/components/NodesTable/components/NodeRow';
-import useNodesColumns from '@virtualmachines/actions/components/VirtualMachineComputeMigration/components/NodesTable/utils/hooks/useNodesColumns';
-import useNodesData from '@virtualmachines/actions/components/VirtualMachineComputeMigration/utils/hooks/useNodesData';
-import { NodeData } from '@virtualmachines/actions/components/VirtualMachineComputeMigration/utils/types';
+
+import useNodesData from '../../utils/hooks/useNodesData';
+
+import { getNodeRowId, getNodesTableColumns, NodesTableCallbacks } from './nodesTableDefinition';
 
 import './NodesTable.scss';
 
@@ -19,7 +20,7 @@ type NodesTableProps = {
 
 const NodesTable: FC<NodesTableProps> = ({ handleNodeSelection, selectedNode, vm }) => {
   const { t } = useKubevirtTranslation();
-  const columns: TableColumn<NodeData>[] = useNodesColumns();
+  const columns = useMemo(() => getNodesTableColumns(t), [t]);
   const { nodesData, nodesDataLoaded } = useNodesData(vm);
   const [searchValue, setSearchValue] = useState<string>('');
 
@@ -28,9 +29,15 @@ const NodesTable: FC<NodesTableProps> = ({ handleNodeSelection, selectedNode, vm
     [searchValue, nodesData],
   );
 
+  const callbacks: NodesTableCallbacks = useMemo(
+    () => ({ handleNodeSelection, selectedNode }),
+    [handleNodeSelection, selectedNode],
+  );
+
   return (
     <>
       <SearchInput
+        aria-label={t('Search node')}
         className="nodes-table-search-bar"
         onChange={(_event, value) => setSearchValue(value)}
         onClear={() => setSearchValue('')}
@@ -38,13 +45,18 @@ const NodesTable: FC<NodesTableProps> = ({ handleNodeSelection, selectedNode, vm
         value={searchValue}
       />
       <ListPageBody>
-        <VirtualizedTable
+        <KubevirtTable
+          ariaLabel={t('Nodes table')}
+          callbacks={callbacks}
           columns={columns}
           data={filteredData}
+          dataTest="nodes-table"
+          fixedLayout
+          getRowId={getNodeRowId}
+          initialSortKey="name"
           loaded={nodesDataLoaded}
-          loadError={undefined}
-          Row={NodeRow}
-          rowData={{ handleNodeSelection, selectedNode }}
+          noDataMsg={t('No nodes found')}
+          noFilteredDataMsg={t('No nodes match the search criteria')}
           unfilteredData={nodesData}
         />
       </ListPageBody>
