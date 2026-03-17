@@ -1572,6 +1572,7 @@
   "Storage mapping": "存储映射",
   "Storage migration": "存储迁移",
   "Storage Migration": "存储迁移",
+  "Storage migration is only available for running VirtualMachines": "Storage migration is only available for running VirtualMachines",
   "Storage MigrationPlans": "存储 MigrationPlans",
   "Storage migrations": "存储迁移",
   "Storage missing VolumeSnapshotClass": "存储缺少 VolumeSnapshotClass",

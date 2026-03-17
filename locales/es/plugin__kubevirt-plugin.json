@@ -1583,6 +1583,7 @@
   "Storage mapping": "Asociación de almacenamiento",
   "Storage migration": "Migración de almacenamiento",
   "Storage Migration": "Migración de almacenamiento",
+  "Storage migration is only available for running VirtualMachines": "Storage migration is only available for running VirtualMachines",
   "Storage MigrationPlans": "MigrationPlans de almacenamiento",
   "Storage migrations": "Migraciones de almacenamiento",
   "Storage missing VolumeSnapshotClass": "Almacenamiento al que le falta la VolumeSnapshotClass",

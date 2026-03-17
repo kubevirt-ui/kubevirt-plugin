@@ -1,7 +1,11 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 
-import ActionDropdownItem from '@kubevirt-utils/components/ActionDropdownItem/ActionDropdownItem';
 import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
+import ActionMenuContent from '@kubevirt-utils/components/LazyActionMenu/ActionMenuContent';
+import {
+  checkAccessForFleet,
+  createLocalMenuOptions,
+} from '@kubevirt-utils/components/LazyActionMenu/overrides';
 import { Menu, MenuContent, MenuList, Popper } from '@patternfly/react-core';
 
 import { BASE_MENU_MARGIN, MENU_DISTANCE, NESTED_LEVEL_MENU_MARGIN } from './constants';
@@ -19,6 +23,7 @@ const RightClickActionMenu: FC<RightClickActionMenuProps> = ({
   nestedLevel,
   triggerRef,
 }) => {
+  const localOptions = useMemo(() => createLocalMenuOptions(actions), [actions]);
   return (
     <Popper
       popper={
@@ -29,9 +34,11 @@ const RightClickActionMenu: FC<RightClickActionMenuProps> = ({
         >
           <MenuContent>
             <MenuList>
-              {actions?.map((action) => (
-                <ActionDropdownItem action={action} key={action?.id} setIsOpen={hideMenu} />
-              ))}
+              <ActionMenuContent
+                checkAccess={checkAccessForFleet}
+                onClick={hideMenu}
+                options={localOptions}
+              />
             </MenuList>
           </MenuContent>
         </Menu>

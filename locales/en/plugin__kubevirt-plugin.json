@@ -1572,6 +1572,7 @@
   "Storage mapping": "Storage mapping",
   "Storage migration": "Storage migration",
   "Storage Migration": "Storage Migration",
+  "Storage migration is only available for running VirtualMachines": "Storage migration is only available for running VirtualMachines",
   "Storage MigrationPlans": "Storage MigrationPlans",
   "Storage migrations": "Storage migrations",
   "Storage missing VolumeSnapshotClass": "Storage missing VolumeSnapshotClass",
