@@ -1813,6 +1813,7 @@
   "Standard ResourceQuota detected on project": "Standard ResourceQuota detected on project",
   "Start": "開始",
   "Start in pause mode": "一時停止モードで起動する",
+  "Start the step-by-step guidance while using the app": "Start the step-by-step guidance while using the app",
   "Start this VirtualMachine after creation": "作成後にこの VirtualMachine を起動する",
   "Start this VirtualMachine after creation ({{runStrategy}})": "作成後にこの VirtualMachine を起動する ({{runStrategy}})",
   "Start this VirtualMachine in pause mode": "この VirtualMachine を一時停止モードで起動する",

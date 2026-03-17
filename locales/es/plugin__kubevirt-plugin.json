@@ -1837,6 +1837,7 @@
   "Standard ResourceQuota detected on project": "Standard ResourceQuota detected on project",
   "Start": "Iniciar",
   "Start in pause mode": "Iniciar en modo pausa",
+  "Start the step-by-step guidance while using the app": "Start the step-by-step guidance while using the app",
   "Start this VirtualMachine after creation": "Inicie esta VirtualMachine después de su creación.",
   "Start this VirtualMachine after creation ({{runStrategy}})": "Inicie esta VirtualMachine después de su creación ({{runStrategy}}).",
   "Start this VirtualMachine in pause mode": "Inicie esta VirtualMachine en modo pausa.",

@@ -2,9 +2,10 @@ import React, { FC } from 'react';
 
 import useTour from '@kubevirt-utils/components/GuidedTour/hooks/useTour';
 import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
-import { Stack, Switch } from '@patternfly/react-core';
+import { Split, SplitItem, Stack, Switch } from '@patternfly/react-core';
 import ExpandSection from '@settings/ExpandSection/ExpandSection';
 import { USER_TAB_IDS } from '@settings/search/constants';
 
@@ -32,13 +33,20 @@ const GettingStartedSection: FC = () => {
           isChecked={!quickStarts?.dontShowWelcomeModal}
           label={t('Welcome information')}
         />
-        <Switch
-          className="GettingStartedSection__switch-text"
-          data-test-id="guided-tour"
-          isChecked={run}
-          label={t('Guided tour')}
-          onChange={run ? stopTour : startTour}
-        />
+        <Split>
+          <SplitItem>
+            <Switch
+              className="GettingStartedSection__switch-text"
+              data-test-id="guided-tour"
+              isChecked={run}
+              label={t('Guided tour')}
+              onChange={run ? stopTour : startTour}
+            />
+          </SplitItem>
+          <SplitItem className="pf-v6-u-pl-sm">
+            <HelpTextIcon bodyContent={t('Start the step-by-step guidance while using the app')} />
+          </SplitItem>
+        </Split>
       </Stack>
     </ExpandSection>
   );

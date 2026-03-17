@@ -1813,6 +1813,7 @@
   "Standard ResourceQuota detected on project": "Standard ResourceQuota detected on project",
   "Start": "시작",
   "Start in pause mode": "일시 정지 모드로 시작",
+  "Start the step-by-step guidance while using the app": "Start the step-by-step guidance while using the app",
   "Start this VirtualMachine after creation": "생성 후 VirtualMachine 시작",
   "Start this VirtualMachine after creation ({{runStrategy}})": "생성 후 VirtualMachine 시작 ({{runStrategy}})",
   "Start this VirtualMachine in pause mode": "일시 정지 모드로 VirtualMachine을 시작",
