@@ -130,6 +130,19 @@ export const getJobStatus = (job?: IoK8sApiBatchV1Job): CheckupsStatus => {
   return CheckupsStatus.Pending;
 };
 
+const STATUS_RANK: Record<CheckupsStatus, number> = {
+  [CheckupsStatus.Deleting]: 3,
+  [CheckupsStatus.Done]: 5,
+  [CheckupsStatus.Failed]: 4,
+  [CheckupsStatus.Pending]: 2,
+  [CheckupsStatus.Running]: 1,
+};
+
+export const getJobStatusRank = (job?: IoK8sApiBatchV1Job): number => {
+  const status = getJobStatus(job);
+  return STATUS_RANK[status];
+};
+
 export const getConfigMapStatus = (
   configMap: IoK8sApiCoreV1ConfigMap | undefined,
   jobStatus: CheckupsStatus,

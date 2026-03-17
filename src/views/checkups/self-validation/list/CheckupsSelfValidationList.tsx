@@ -1,29 +1,41 @@
-import React, { FC, useCallback, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 
-import {
-  IoK8sApiBatchV1Job,
-  IoK8sApiCoreV1ConfigMap,
-} from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
+import useKubevirtTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtTableColumns';
+import {
+  ACTIONS,
+  COLUMN_MANAGEMENT_IDS,
+} from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
+import usePaginationWithFilters from '@kubevirt-utils/hooks/usePagination/usePaginationWithFilters';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { ListPageBody, VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
+import useIsACMPage from '@multicluster/useIsACMPage';
+import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination } from '@patternfly/react-core';
-import { SortByDirection } from '@patternfly/react-table';
+import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
+import { CHECKUPS_COLUMN_KEYS } from '../../utils/constants';
 import { getJobByName } from '../../utils/utils';
 import useCheckupsSelfValidationData from '../components/hooks/useCheckupsSelfValidationData';
-import useCheckupsSelfValidationListColumns from '../components/hooks/useCheckupsSelfValidationListColumns';
 import useCheckupsSelfValidationListFilters from '../components/hooks/useCheckupsSelfValidationListFilters';
 import useCheckupsSelfValidationPermissions from '../components/hooks/useCheckupsSelfValidationPermissions';
 
+import {
+  CheckupsSelfValidationCallbacks,
+  getCheckupsSelfValidationColumns,
+  getCheckupsSelfValidationRowId,
+} from './checkupsSelfValidationListDefinition';
 import CheckupsSelfValidationListEmptyState from './CheckupsSelfValidationListEmptyState';
-import CheckupsSelfValidationListRow from './CheckupsSelfValidationListRow';
+
+import '@kubevirt-utils/styles/list-managment-group.scss';
 
 const CheckupsSelfValidationList: FC = () => {
   const { t } = useKubevirtTranslation();
+  const isACMPage = useIsACMPage();
+  const [hubClusterName] = useHubClusterName();
 
   const {
     clusterRoleBinding,
@@ -33,47 +45,45 @@ const CheckupsSelfValidationList: FC = () => {
   } = useCheckupsSelfValidationPermissions();
   const { configMaps, error, jobs, loaded } = useCheckupsSelfValidationData();
 
-  const { onPaginationChange, pagination } = usePagination();
   const [unfilteredData, filteredData, onFilterChange, filters] =
     useCheckupsSelfValidationListFilters(configMaps || []);
-  const [columns, activeColumns, loadedColumns] = useCheckupsSelfValidationListColumns(jobs);
 
-  const rowData = useMemo(
+  const { handleFilterChange, handlePerPageSelect, handleSetPage, pagination } =
+    usePaginationWithFilters(filteredData?.length ?? 0, onFilterChange);
+
+  const columns = useMemo(
+    () => getCheckupsSelfValidationColumns(t, isACMPage, jobs ?? [], hubClusterName),
+    [t, isACMPage, jobs, hubClusterName],
+  );
+
+  const { activeColumnKeys, loaded: loadedColumns } = useKubevirtTableColumns({
+    columnManagementID: COLUMN_MANAGEMENT_IDS.CHECKUPS_SELF_VALIDATION,
+    columns,
+  });
+
+  const callbacks: CheckupsSelfValidationCallbacks = useMemo(
     () => ({
-      getJobByName: (configMapName: string): IoK8sApiBatchV1Job[] =>
-        getJobByName(jobs, configMapName, false),
+      getJobByName: (configMapName: string, exactMatch: boolean): IoK8sApiBatchV1Job[] =>
+        getJobByName(jobs, configMapName, exactMatch),
     }),
     [jobs],
   );
 
   const columnLayout = useMemo(
     () => ({
-      columns: (columns || [])?.map(({ id, title }) => ({ id, title })),
-      id: 'checkups-self-validation',
-      selectedColumns: new Set((activeColumns || [])?.map((col) => col?.id)),
+      columns: columns
+        .filter((col) => col.key !== ACTIONS)
+        .map(({ additional, key, label }) => ({ additional, id: key, title: label })),
+      id: COLUMN_MANAGEMENT_IDS.CHECKUPS_SELF_VALIDATION,
+      selectedColumns: new Set(activeColumnKeys),
       type: t('Checkups'),
     }),
-    [columns, activeColumns, t],
+    [columns, activeColumnKeys, t],
   );
 
-  const EmptyMsg = useCallback(
-    () => <div className="pf-v6-u-text-align-center">{t('No self validation checkups found')}</div>,
-    [t],
-  );
+  const isLoaded = loaded && !loadingPermissions && loadedColumns;
 
-  const handlePerPageSelect = useCallback(
-    (_e, perPage, page, startIndex, endIndex) =>
-      onPaginationChange({ endIndex, page, perPage, startIndex }),
-    [onPaginationChange],
-  );
-
-  const handleSetPage = useCallback(
-    (_e, page, perPage, startIndex, endIndex) =>
-      onPaginationChange({ endIndex, page, perPage, startIndex }),
-    [onPaginationChange],
-  );
-
-  if (isEmpty(configMaps) && loaded && loadedColumns) {
+  if (isEmpty(configMaps) && isLoaded && !error) {
     return (
       <CheckupsSelfValidationListEmptyState
         clusterRoleBinding={clusterRoleBinding}
@@ -90,11 +100,11 @@ const CheckupsSelfValidationList: FC = () => {
         <ListPageFilter
           columnLayout={columnLayout}
           data={unfilteredData}
-          loaded={loaded && !!loadedColumns}
-          onFilterChange={onFilterChange}
+          loaded={isLoaded}
+          onFilterChange={handleFilterChange}
           rowFilters={filters}
         />
-        {!isEmpty(filteredData) && loaded && (
+        {!isEmpty(filteredData) && isLoaded && (
           <Pagination
             className="list-managment-group__pagination"
             isLastFullPageShown
@@ -107,16 +117,21 @@ const CheckupsSelfValidationList: FC = () => {
           />
         )}
       </div>
-      <VirtualizedTable<IoK8sApiCoreV1ConfigMap>
-        columns={activeColumns || []}
-        data={filteredData}
-        EmptyMsg={EmptyMsg}
-        loaded={loaded && !!loadedColumns}
+      <KubevirtTable
+        activeColumnKeys={activeColumnKeys}
+        ariaLabel={t('Self validation checkups table')}
+        callbacks={callbacks}
+        columns={columns}
+        data={filteredData ?? []}
+        dataTest="checkups-self-validation-table"
+        fixedLayout
+        getRowId={getCheckupsSelfValidationRowId}
+        initialSortDirection="desc"
+        initialSortKey={CHECKUPS_COLUMN_KEYS.START_TIME_CAMEL}
+        loaded={isLoaded}
         loadError={error}
-        Row={CheckupsSelfValidationListRow}
-        rowData={rowData}
-        sortColumnIndex={3}
-        sortDirection={SortByDirection.desc}
+        noDataMsg={t('No self validation checkups found')}
+        pagination={pagination}
         unfilteredData={unfilteredData}
       />
     </ListPageBody>
