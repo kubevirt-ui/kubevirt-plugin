@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePasstFeatureFlag from '@kubevirt-utils/hooks/usePasstFeatureFlag';
@@ -9,8 +10,7 @@ import { NetworkAttachmentDefinitionModelGroupVersionKind } from '@kubevirt-util
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
 import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
-import { Content, Popover } from '@patternfly/react-core';
-import { HelpIcon } from '@patternfly/react-icons';
+import { PopoverPosition } from '@patternfly/react-core';
 
 type VirtctlDisabledProps = {
   cluster?: string;
@@ -26,22 +26,20 @@ const VirtctlDisabled: FC<VirtctlDisabledProps> = ({ cluster, namespace }) => {
   if (passtEnabled) {
     return (
       <>
-        {t('Not available with l2bridge binding')}{' '}
-        <Popover
+        {t('Not available with l2bridge binding')}
+        <HelpTextIcon
           bodyContent={
-            <Content>
-              <Trans t={t}>
-                To open an SSH connection with the VirtualMachine using virtctl select the{' '}
-                <strong>Passt</strong> option in the network binding dropdown
-              </Trans>
-            </Content>
+            <Trans t={t}>
+              To open an SSH connection with the VirtualMachine using virtctl select the{' '}
+              <strong>Passt</strong> option in the network binding dropdown
+            </Trans>
           }
           footerContent={
             <ExternalLink href={documentationURL.PASST}>{t('Learn more')}</ExternalLink>
           }
-        >
-          <HelpIcon />
-        </Popover>
+          helpIconClassName="pf-v6-u-ml-sm"
+          position={PopoverPosition.right}
+        />
       </>
     );
   }

@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
@@ -9,11 +10,9 @@ import {
   InputGroup,
   InputGroupItem,
   InputGroupText,
-  Popover,
   StackItem,
   TextInput,
 } from '@patternfly/react-core';
-import { HelpIcon } from '@patternfly/react-icons';
 
 import './grace-period-input.scss';
 
@@ -37,7 +36,7 @@ export const GracePeriodInput: FC<GracePeriodInputProps> = ({
       <Flex
         alignItems={{ default: 'alignItemsCenter' }}
         className="grace-period-input"
-        spaceItems={{ default: 'spaceItemsXs' }}
+        spaceItems={{ default: 'spaceItemsSm' }}
       >
         <FlexItem>
           <Checkbox
@@ -48,17 +47,11 @@ export const GracePeriodInput: FC<GracePeriodInputProps> = ({
           />
         </FlexItem>
         <FlexItem>
-          <Popover
-            bodyContent={
-              <div>
-                {t(
-                  'The duration in seconds before the object should be deleted. Value must be non-negative integer. The value zero indicates delete immediately. If this value is nil, the default grace period for the specified type will be used. Defaults to a per object value if not specified. zero means delete immediately.',
-                )}
-              </div>
-            }
-          >
-            <HelpIcon />
-          </Popover>
+          <HelpTextIcon
+            bodyContent={t(
+              'The duration in seconds before the object should be deleted. Value must be non-negative integer. The value zero indicates delete immediately. If this value is nil, the default grace period for the specified type will be used. Defaults to a per object value if not specified. zero means delete immediately.',
+            )}
+          />
         </FlexItem>
 
         {isChecked && (

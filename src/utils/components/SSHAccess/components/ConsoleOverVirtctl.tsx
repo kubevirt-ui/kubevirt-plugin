@@ -3,6 +3,7 @@ import { Trans } from 'react-i18next';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { getConsoleVirtctlCommand } from '@kubevirt-utils/components/SSHAccess/utils';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -19,9 +20,8 @@ import {
   DescriptionListTerm,
   Grid,
   GridItem,
-  Popover,
+  PopoverPosition,
 } from '@patternfly/react-core';
-import { HelpIcon } from '@patternfly/react-icons';
 
 import VirtctlDisabled from './VirtctlDisabled';
 import VirtctlSSHCommandClipboardCopy from './VirtctlSSHCommandClipboardCopy';
@@ -41,14 +41,13 @@ const ConsoleOverVirtctl: FC<ConsoleOverVirtctlProps> = ({ vm }) => {
   return (
     <DescriptionListGroup>
       <DescriptionListTerm className="pf-v6-u-font-size-xs">
-        <Content className="pf-v6-u-disabled-color-100" component="p">
-          {t('SSH using virtctl')}{' '}
-          <Popover
+        <Content component="p">
+          {t('SSH using virtctl')}
+          <HelpTextIcon
             bodyContent={(hide) => (
               <PopoverContentWithLightspeedButton
                 content={
                   <>
-                    <br />
                     <Trans t={t}>
                       <div>
                         Open an SSH connection with the VM using the cluster API server. You must be
@@ -79,10 +78,9 @@ const ConsoleOverVirtctl: FC<ConsoleOverVirtctlProps> = ({ vm }) => {
             )}
             aria-label="Help"
             className="virtctl-popover"
-            position="right"
-          >
-            <HelpIcon />
-          </Popover>
+            helpIconClassName="pf-v6-u-ml-sm"
+            position={PopoverPosition.right}
+          />
         </Content>
       </DescriptionListTerm>
       <DescriptionListDescription>

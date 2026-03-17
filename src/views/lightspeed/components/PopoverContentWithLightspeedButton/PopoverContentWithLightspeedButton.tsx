@@ -23,14 +23,12 @@ const PopoverContentWithLightspeedButton: FC<PopoverContentWithLightspeedButtonP
 }) => (
   <Stack hasGutter>
     <StackItem>{content}</StackItem>
-    <StackItem>
-      <LightspeedPopoverContentFooter
-        breadcrumb={breadcrumb}
-        hide={hide}
-        obj={obj}
-        promptType={promptType}
-      />
-    </StackItem>
+    <LightspeedPopoverContentFooter
+      breadcrumb={breadcrumb}
+      hide={hide}
+      obj={obj}
+      promptType={promptType}
+    />
   </Stack>
 );
 

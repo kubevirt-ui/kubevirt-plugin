@@ -1,18 +1,10 @@
 import React, { FC } from 'react';
 
 import { V1PciHostDevice } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { HorizontalNav } from '@openshift-console/dynamic-plugin-sdk';
-import {
-  Bullseye,
-  Button,
-  ButtonVariant,
-  Flex,
-  PageSection,
-  Popover,
-  Title,
-} from '@patternfly/react-core';
-import { HelpIcon } from '@patternfly/react-icons';
+import { Bullseye, Flex, PageSection, PopoverPosition, Title } from '@patternfly/react-core';
 
 import useHCPermittedHostDevices from './hooks/useHCPermittedHostDevices';
 import HardwareDevicesPageTable from './HardwareDevicesPageTable';
@@ -69,18 +61,13 @@ const HardwareDevicesPage: FC<any> = (props) => {
       <PageSection>
         <Flex alignItems={{ default: 'alignItemsCenter' }} gap={{ default: 'gapSm' }}>
           <Title headingLevel="h1">{t('Hardware Devices')}</Title>
-          <Popover
+          <HelpTextIcon
             bodyContent={t(
               'Various types of hardware devices are assigned to virtual machines in the cluster',
             )}
-          >
-            <Button
-              aria-label="Action"
-              hasNoPadding
-              icon={<HelpIcon />}
-              variant={ButtonVariant.plain}
-            />
-          </Popover>
+            position={PopoverPosition.right}
+            size="headingXl"
+          />
         </Flex>
       </PageSection>
       <HorizontalNav {...props} match={props.match} pages={pages} />

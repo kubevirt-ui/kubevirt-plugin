@@ -18,8 +18,6 @@ import { ACTIVATION_KEYS_URL } from '../../utils/constants';
 import ActivationKeyHelpIcon from '../ActivationKeyHelpIcon/ActivationKeyHelpIcon';
 import OrganizationIDHelpIcon from '../OrganizationIDHelpIcon/OrganizationIDHelpIcon';
 
-import './AutomaticSubscriptionForm.scss';
-
 const AutomaticSubscriptionForm: FC<RHELAutomaticSubscriptionFormProps> = ({
   canEdit,
   loaded,

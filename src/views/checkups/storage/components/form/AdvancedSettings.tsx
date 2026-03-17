@@ -7,25 +7,22 @@ import {
   getSCSelectOptions,
 } from '@kubevirt-utils/components/DiskModal/components/StorageClassAndPreallocation/utils/helpers';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { StorageClassModel } from '@kubevirt-utils/models';
 import {
   Alert,
   AlertVariant,
-  Button,
-  ButtonVariant,
   ExpandableSection,
   FormGroup,
   FormHelperText,
   HelperText,
   HelperTextItem,
-  Popover,
   PopoverPosition,
   TextInput,
   ValidatedOptions,
 } from '@patternfly/react-core';
-import { HelpIcon } from '@patternfly/react-icons';
 import { SimpleSelect } from '@patternfly/react-templates';
 
 import {
@@ -102,17 +99,11 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({
 
       <FormGroup
         labelHelp={
-          <Popover
+          <HelpTextIcon
             bodyContent={t('Timeout for VMI operations (in minutes)')}
+            buttonAriaLabel={t('Help for VMI timeout')}
             position={PopoverPosition.right}
-          >
-            <Button
-              aria-label={t('Help for VMI timeout')}
-              hasNoPadding
-              icon={<HelpIcon />}
-              variant={ButtonVariant.plain}
-            />
-          </Popover>
+          />
         }
         className="form-group-spacing"
         fieldId="vmi-timeout"
@@ -132,17 +123,11 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({
 
       <FormGroup
         labelHelp={
-          <Popover
+          <HelpTextIcon
             bodyContent={t('Number of concurrent VMs to boot for testing')}
+            buttonAriaLabel={t('Help for number of VMs')}
             position={PopoverPosition.right}
-          >
-            <Button
-              aria-label={t('Help for number of VMs')}
-              hasNoPadding
-              icon={<HelpIcon />}
-              variant={ButtonVariant.plain}
-            />
-          </Popover>
+          />
         }
         className="form-group-spacing"
         fieldId="num-of-vms"
@@ -178,19 +163,13 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({
 
       <FormGroup
         labelHelp={
-          <Popover
+          <HelpTextIcon
             bodyContent={t(
               'Controls whether the teardown steps should be skipped after checkup completion',
             )}
+            buttonAriaLabel={t('Help for skip teardown')}
             position={PopoverPosition.right}
-          >
-            <Button
-              aria-label={t('Help for skip teardown')}
-              hasNoPadding
-              icon={<HelpIcon />}
-              variant={ButtonVariant.plain}
-            />
-          </Popover>
+          />
         }
         className="form-group-spacing"
         fieldId="skip-teardown"

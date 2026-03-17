@@ -3,6 +3,7 @@ import CheckupImageField from 'src/views/checkups/components/CheckupImageField';
 
 import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { getDefaultStorageClass } from '@kubevirt-utils/components/DiskModal/components/StorageClassAndPreallocation/utils/helpers';
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useRelatedImage from '@kubevirt-utils/hooks/useRelatedImage';
 import { modelToGroupVersionKind, StorageClassModel } from '@kubevirt-utils/models';
@@ -10,18 +11,14 @@ import { generatePrettyName, isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import {
-  Button,
-  ButtonVariant,
   Form,
   FormGroup,
   FormSection,
   Grid,
   GridItem,
-  Popover,
   PopoverPosition,
   TextInput,
 } from '@patternfly/react-core';
-import { HelpIcon } from '@patternfly/react-icons';
 
 import { storageCheckupImageSettings } from '../../utils/const';
 
@@ -86,12 +83,10 @@ const CheckupsStorageForm = () => {
             </FormGroup>
             <FormGroup
               labelHelp={
-                <Popover
+                <HelpTextIcon
                   bodyContent={t('How much time before the check will try to close itself')}
                   position={PopoverPosition.right}
-                >
-                  <Button icon={<HelpIcon />} variant={ButtonVariant.plain} />
-                </Popover>
+                />
               }
               fieldId="timeout"
               isRequired

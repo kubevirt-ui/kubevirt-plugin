@@ -2,22 +2,14 @@ import React, { useState } from 'react';
 import { Trans } from 'react-i18next';
 
 import { ProjectRequestModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
-import {
-  Button,
-  ButtonVariant,
-  Content,
-  Form,
-  FormGroup,
-  Popover,
-  TextInput,
-} from '@patternfly/react-core';
-import { HelpIcon } from '@patternfly/react-icons';
+import { Content, Form, FormGroup, TextInput } from '@patternfly/react-core';
 
 import ExternalLink from '../ExternalLink/ExternalLink';
 import TabModal from '../TabModal/TabModal';
@@ -73,7 +65,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
       <Form>
         <FormGroup
           labelHelp={
-            <Popover
+            <HelpTextIcon
               bodyContent={
                 <Trans ns="plugin__kubevirt-plugin" t={t}>
                   A Project name must consist of lower case alphanumeric characters or &apos;, and
@@ -83,9 +75,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
                   &apos;kube-&apos;.
                 </Trans>
               }
-            >
-              <Button icon={<HelpIcon />} variant={ButtonVariant.plain} />
-            </Popover>
+            />
           }
           fieldId="project-name"
           isRequired

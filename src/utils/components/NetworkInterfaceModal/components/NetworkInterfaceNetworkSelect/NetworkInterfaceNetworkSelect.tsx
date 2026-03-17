@@ -38,7 +38,7 @@ import {
 } from '../../utils/helpers';
 import useNADsData from '../hooks/useNADsData';
 
-import NetworkSelectHelperPopover from './components/NetworkSelectHelperPopover/NetworkSelectHelperPopover';
+import NetworkSelectHelperPopover from './components/NetworkSelectHelperPopover';
 import { createNewNetworkOption, getCreateNetworkOption, validateNADNamespace } from './utils';
 
 type NetworkInterfaceNetworkSelectProps = {

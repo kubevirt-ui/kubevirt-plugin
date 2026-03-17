@@ -8,9 +8,9 @@ import {
   formatVCPUsAsSockets,
   getInitialCPUInputType,
 } from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/utils/utils';
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Button, ButtonVariant, Popover, Radio, Title, TitleSizes } from '@patternfly/react-core';
-import { HelpIcon } from '@patternfly/react-icons';
+import { Radio, Title, TitleSizes } from '@patternfly/react-core';
 
 import CPUTopologyInput from './components/CPUTopologyInput/CPUTopologyInput';
 import CPUHelperText from './components/vCPUInput/components/CPUHelperText/CPUHelperText';
@@ -44,18 +44,12 @@ const CPUInput: FC<CPUInputProps> = ({
     <div className="cpu-input">
       <Title className="cpu-input__title" headingLevel="h6" size={TitleSizes.md}>
         {t('CPU')}
-        <Popover
+        <HelpTextIcon
           bodyContent={t(
             'As a default, the VirtualMachine CPU uses sockets to enable hotplug. You can also define the topology manually',
           )}
-        >
-          <Button
-            aria-label="Action"
-            className="cpu-input__title--help-text-button"
-            icon={<HelpIcon />}
-            variant={ButtonVariant.plain}
-          />
-        </Popover>
+          helpIconClassName="pf-v6-u-ml-sm"
+        />
       </Title>
       <Radio
         body={

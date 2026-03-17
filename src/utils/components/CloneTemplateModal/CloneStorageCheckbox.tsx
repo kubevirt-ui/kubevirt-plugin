@@ -1,8 +1,8 @@
 import React, { FC } from 'react';
 
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Checkbox, Flex, FlexItem, FormGroup, Popover } from '@patternfly/react-core';
-import { HelpIcon } from '@patternfly/react-icons';
+import { Checkbox, Flex, FlexItem, FormGroup } from '@patternfly/react-core';
 
 type CloneStorageCheckboxProps = {
   isChecked: boolean;
@@ -14,7 +14,7 @@ const CloneStorageCheckbox: FC<CloneStorageCheckboxProps> = ({ isChecked, onChan
 
   return (
     <FormGroup fieldId="clone-storage">
-      <Flex alignItems={{ default: 'alignItemsCenter' }}>
+      <Flex alignItems={{ default: 'alignItemsCenter' }} gap={{ default: 'gapSm' }}>
         <FlexItem>
           <Checkbox
             id="clone-storage"
@@ -24,18 +24,15 @@ const CloneStorageCheckbox: FC<CloneStorageCheckboxProps> = ({ isChecked, onChan
           />
         </FlexItem>
         <FlexItem>
-          <Popover
-            bodyContent={() => (
+          <HelpTextIcon
+            bodyContent={
               <div>
                 {t(
                   'Checking this option will create a new PVC of the bootsource for the new template',
                 )}
               </div>
-            )}
-            aria-label={'Help'}
-          >
-            <HelpIcon />
-          </Popover>
+            }
+          />
         </FlexItem>
       </Flex>
     </FormGroup>

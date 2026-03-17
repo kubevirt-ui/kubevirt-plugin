@@ -9,22 +9,19 @@ import {
   getSCSelectOptions,
 } from '@kubevirt-utils/components/DiskModal/components/StorageClassAndPreallocation/utils/helpers';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { StorageClassModel } from '@kubevirt-utils/models';
 import {
-  Button,
-  ButtonVariant,
   ExpandableSection,
   FormGroup,
-  Popover,
   PopoverPosition,
   SelectProps,
   Switch,
   TextInput,
 } from '@patternfly/react-core';
-import { HelpIcon } from '@patternfly/react-icons';
 
 import { STORAGE_CAPABILITY_OPTIONS } from '../../utils';
 
@@ -93,7 +90,7 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({
       </FormGroup>
       <FormGroup
         labelHelp={
-          <Popover
+          <HelpTextIcon
             bodyContent={
               <Trans ns="plugin__kubevirt-plugin" t={t}>
                 Select the storage capabilities your storage class supports. Check the{' '}
@@ -109,9 +106,7 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({
               </Trans>
             }
             position={PopoverPosition.right}
-          >
-            <Button hasNoPadding icon={<HelpIcon />} variant={ButtonVariant.plain} />
-          </Popover>
+          />
         }
         className="form-group-spacing storage-capabilities"
         fieldId="storage-capabilities"
@@ -132,14 +127,13 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({
         label={
           <>
             <span className="pf-v6-c-form__label-text">{t('Dry run')}</span>
-            <Popover
+            <HelpTextIcon
               bodyContent={t(
                 'Run the validation in dry run mode (no actual tests will be executed)',
               )}
+              helpIconClassName="pf-v6-u-ml-sm"
               position={PopoverPosition.right}
-            >
-              <Button icon={<HelpIcon />} variant={ButtonVariant.plain} />
-            </Popover>
+            />
           </>
         }
         id="dry-run"
