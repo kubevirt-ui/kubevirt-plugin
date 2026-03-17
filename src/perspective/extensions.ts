@@ -621,7 +621,7 @@ const computeSection = [
   } as EncodedExtension<ResourceClusterNavItem>,
   {
     properties: {
-      href: 'hardwaredevices',
+      href: '/hardwaredevices',
       id: 'hardwaredevices-virt-perspective',
       insertBefore: 'baremetalhosts',
       name: '%plugin__kubevirt-plugin~Hardware Devices%',
