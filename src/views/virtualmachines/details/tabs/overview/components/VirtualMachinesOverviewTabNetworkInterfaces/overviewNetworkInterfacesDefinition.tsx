@@ -10,6 +10,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getPrintableNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { removeLinkLocalIPV6 } from '@kubevirt-utils/utils/utils';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import {
   DescriptionList,
   DescriptionListDescription,
@@ -38,24 +40,32 @@ const NameCell: FC<{ row: InterfacesData }> = ({ row }) => {
     <div data-test={`network-interface-${row?.network?.name}`}>
       <DescriptionList>
         <Popover
-          bodyContent={
-            <DescriptionList isHorizontal>
-              {Object.entries(popoverFields).map(([key, value]) => (
-                <DescriptionListGroup key={key}>
-                  <DescriptionListTerm>{key}</DescriptionListTerm>
-                  <DescriptionListDescription>{value ?? NO_DATA_DASH}</DescriptionListDescription>
-                </DescriptionListGroup>
-              ))}
-              {isFQDNEnabled && fqdn && (
-                <DescriptionListGroup>
-                  <DescriptionListTerm>{t('FQDN')}</DescriptionListTerm>
-                  <DescriptionListDescription>
-                    <InlineCodeClipboardCopy clipboardText={fqdn} />
-                  </DescriptionListDescription>
-                </DescriptionListGroup>
-              )}
-            </DescriptionList>
-          }
+          bodyContent={(hide) => (
+            <PopoverContentWithLightspeedButton
+              content={
+                <DescriptionList isHorizontal>
+                  {Object.entries(popoverFields).map(([key, value]) => (
+                    <DescriptionListGroup key={key}>
+                      <DescriptionListTerm>{key}</DescriptionListTerm>
+                      <DescriptionListDescription>
+                        {value ?? NO_DATA_DASH}
+                      </DescriptionListDescription>
+                    </DescriptionListGroup>
+                  ))}
+                  {isFQDNEnabled && fqdn && (
+                    <DescriptionListGroup>
+                      <DescriptionListTerm>{t('FQDN')}</DescriptionListTerm>
+                      <DescriptionListDescription>
+                        <InlineCodeClipboardCopy clipboardText={fqdn} />
+                      </DescriptionListDescription>
+                    </DescriptionListGroup>
+                  )}
+                </DescriptionList>
+              }
+              hide={hide}
+              promptType={OLSPromptType.VM_NETWORKS}
+            />
+          )}
           className="VirtualMachinesOverviewTabInterfaces--popover"
           hasAutoWidth
           position={PopoverPosition.left}

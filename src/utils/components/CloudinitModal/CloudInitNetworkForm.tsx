@@ -5,6 +5,8 @@ import * as ipaddr from 'ipaddr.js';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Checkbox, Divider, FormGroup, TextInput, ValidatedOptions } from '@patternfly/react-core';
 import { isValidIPv4Substring, isValidIPv6Substring } from '@search/utils/validation';
 
@@ -81,15 +83,21 @@ export const CloudinitNetworkForm: React.FC<CloudinitNetworkFormProps> = ({
           <FormGroup
             labelHelp={
               <HelpTextIcon
-                bodyContent={
-                  <Trans ns="plugin__kubevirt-plugin">
-                    Enter one or more IP addresses and use commas to separate multiple addresses.
-                    Each address should include the subnet mask to properly configure the network
-                    interface.
-                    <br />
-                    Example: 192.168.6.25/22,2001:470:e091:6::25/64
-                  </Trans>
-                }
+                bodyContent={(hide) => (
+                  <PopoverContentWithLightspeedButton
+                    content={
+                      <Trans ns="plugin__kubevirt-plugin">
+                        Enter one or more IP addresses and use commas to separate multiple
+                        addresses. Each address should include the subnet mask to properly configure
+                        the network interface.
+                        <br />
+                        Example: 192.168.6.25/22,2001:470:e091:6::25/64
+                      </Trans>
+                    }
+                    hide={hide}
+                    promptType={OLSPromptType.CLOUDINIT_IP_ADDRESSES}
+                  />
+                )}
               />
             }
             className="kv-cloudint-advanced-tab--validation-text"

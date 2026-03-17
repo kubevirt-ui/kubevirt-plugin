@@ -9,6 +9,7 @@ import { getAAQCalculationMethod } from '@kubevirt-utils/resources/hyperconverge
 import { isAAQEnabled } from '@kubevirt-utils/resources/hyperconverged/utils';
 import { CalculationMethod } from '@kubevirt-utils/resources/quotas/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { Alert, AlertVariant, Flex } from '@patternfly/react-core';
 import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
@@ -78,6 +79,7 @@ const ApplicationAwareQuota: FC<ApplicationAwareQuotaProps> = ({
         isDisabled={!hyperLoaded}
         isLoading={isLoading}
         newBadge={newBadge}
+        olsPromptType={OLSPromptType.APPLICATION_AWARE_QUOTA}
         switchIsOn={isEnabled}
         title={t('Application Aware Quota (AAQ)')}
         turnOnSwitch={onFeatureChange}

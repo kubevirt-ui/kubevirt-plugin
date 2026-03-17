@@ -5,6 +5,8 @@ import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/g
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Split, SplitItem, Stack, Switch } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
 import ExpandSection from '@settings/ExpandSection/ExpandSection';
@@ -46,7 +48,15 @@ const GettingStartedSection: FC = () => {
             />
           </SplitItem>
           <SplitItem className="pf-v6-u-pl-sm">
-            <HelpTextIcon bodyContent={t('Start the step-by-step guidance while using the app')} />
+            <HelpTextIcon
+              bodyContent={(hide) => (
+                <PopoverContentWithLightspeedButton
+                  content={t('Start the step-by-step guidance while using the app')}
+                  hide={hide}
+                  promptType={OLSPromptType.GUIDED_TOUR}
+                />
+              )}
+            />
           </SplitItem>
         </Split>
       </Stack>

@@ -5,7 +5,6 @@ import { CONFIRM_VM_ACTIONS } from '@kubevirt-utils/hooks/useFeatures/constants'
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
 import ExpandSection from '@settings/ExpandSection/ExpandSection';
@@ -31,18 +30,13 @@ const VMActionsConfirmation: FC<VMActionsConfirmationProps> = ({ newBadge }) => 
       toggleText={t('VirtualMachine actions confirmation')}
     >
       <SectionWithSwitch
-        helpTextIconContent={(hide) => (
-          <PopoverContentWithLightspeedButton
-            content={t('Confirm requested VirtualMachine actions before executing them')}
-            hide={hide}
-            promptType={OLSPromptType.CONFIRM_VM_ACTIONS}
-          />
-        )}
         dataTestID="confirm-vm-actions"
+        helpTextIconContent={t('Confirm requested VirtualMachine actions before executing them')}
         id="confirm-vm-actions"
         isDisabled={!isAdmin}
         isLoading={loading}
         newBadge={newBadge}
+        olsPromptType={OLSPromptType.CONFIRM_VM_ACTIONS}
         switchIsOn={confirmVMActionsEnabled}
         title={t('Confirm VirtualMachine actions')}
         turnOnSwitch={toggleConfirmVMActionsEnabled}

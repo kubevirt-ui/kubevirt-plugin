@@ -2,6 +2,8 @@ import React, { FC } from 'react';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Checkbox, Flex, FlexItem, FormGroup } from '@patternfly/react-core';
 
 type BootCDCheckboxProps = {
@@ -26,13 +28,19 @@ const BootCDCheckbox: FC<BootCDCheckboxProps> = ({ hasCDSource, onChange }) => {
         </FlexItem>
         <FlexItem>
           <HelpTextIcon
-            bodyContent={
-              <div>
-                {t(
-                  'Boot from CD requires an image file i.e. ISO, qcow, etc. that will be mounted to the VirtualMachine as a CD',
-                )}
-              </div>
-            }
+            bodyContent={(hide) => (
+              <PopoverContentWithLightspeedButton
+                content={
+                  <div>
+                    {t(
+                      'Boot from CD requires an image file i.e. ISO, qcow, etc. that will be mounted to the VirtualMachine as a CD',
+                    )}
+                  </div>
+                }
+                hide={hide}
+                promptType={OLSPromptType.BOOT_FROM_CD}
+              />
+            )}
           />
         </FlexItem>
       </Flex>

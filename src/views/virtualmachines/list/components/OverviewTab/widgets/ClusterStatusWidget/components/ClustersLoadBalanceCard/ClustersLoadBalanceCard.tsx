@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 
 import { TOP_N } from '../../hooks/clusterMetricConstants';
 import useClustersLoadBalanceData from '../../hooks/useClustersLoadBalanceData';
@@ -21,6 +22,7 @@ const ClustersLoadBalanceCard: FC = () => {
       isLoading={!loaded}
       items={items}
       nameHeader={t('Cluster name')}
+      olsPromptType={OLSPromptType.LOAD_BALANCE}
       rightTitle={rightTitle}
       scoreHeader={t('Score')}
       severityCounts={severityCounts}

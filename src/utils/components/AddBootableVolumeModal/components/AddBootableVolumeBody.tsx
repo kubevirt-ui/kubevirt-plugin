@@ -10,6 +10,8 @@ import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getValidNamespace } from '@kubevirt-utils/utils/utils';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { Form, PopoverPosition, Title } from '@patternfly/react-core';
@@ -103,7 +105,13 @@ const AddBootableVolumeBody: FC<AddBootableVolumeBodyProps> = ({
       <Title className="pf-v6-u-mt-md" headingLevel="h5">
         {t('Volume metadata')}{' '}
         <HelpTextIcon
-          bodyContent={t('Set the volume metadata to use the volume as a bootable image.')}
+          bodyContent={(hide) => (
+            <PopoverContentWithLightspeedButton
+              content={t('Set the volume metadata to use the volume as a bootable image.')}
+              hide={hide}
+              promptType={OLSPromptType.BOOTABLE_VOLUME_METADATA}
+            />
+          )}
           helpIconClassName="pf-v6-u-ml-xs"
           position={PopoverPosition.right}
         />

@@ -16,6 +16,7 @@ import { useToggle } from '@kubevirt-utils/hooks/useToggle';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { getDisks, getInterfaces } from '@kubevirt-utils/resources/vm';
 import { updateCustomizeInstanceType } from '@kubevirt-utils/store/customizeInstanceType';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { ExpandableSection, Switch } from '@patternfly/react-core';
 import { printableVMStatus } from '@virtualmachines/utils';
 
@@ -147,6 +148,8 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
         className="DetailsSection-margin__bottom"
         data-test-id="start-pause-mode"
         isPopover
+        olsObj={vm}
+        promptType={OLSPromptType.START_IN_PAUSE_MODE}
       />
     </ExpandableSection>
   );

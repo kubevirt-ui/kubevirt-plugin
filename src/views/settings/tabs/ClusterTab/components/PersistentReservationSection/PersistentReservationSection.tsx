@@ -9,7 +9,6 @@ import {
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { Alert, AlertVariant } from '@patternfly/react-core';
@@ -70,19 +69,14 @@ const PersistentReservationSection: FC<PersistentReservationSectionProps> = ({
       toggleText={t('SCSI persistent reservation')}
     >
       <SectionWithSwitch
-        helpTextIconContent={(hide) => (
-          <PopoverContentWithLightspeedButton
-            content={t(
-              'The SCSI reservation for disk makes the disk attached to the VirtualMachine as a SCSI LUN. This option should only be used for cluster-aware applications',
-            )}
-            hide={hide}
-            obj={hyperConvergeConfiguration?.[0]}
-            promptType={OLSPromptType.ENABLE_PERSISTENT_RESERVATION}
-          />
+        helpTextIconContent={t(
+          'The SCSI reservation for disk makes the disk attached to the VirtualMachine as a SCSI LUN. This option should only be used for cluster-aware applications',
         )}
         dataTestID="persistent-reservation"
         isDisabled={!hyperLoaded || !hyperConverge}
         isLoading={isLoading}
+        olsObj={hyperConvergeConfiguration?.[0]}
+        olsPromptType={OLSPromptType.ENABLE_PERSISTENT_RESERVATION}
         switchIsOn={persistentReservation}
         title={t('Enable persistent reservation')}
         turnOnSwitch={onChange}

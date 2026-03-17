@@ -1,12 +1,15 @@
 import React, { ChangeEvent, Dispatch, FC, SetStateAction } from 'react';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { NumberInput, PopoverPosition, Skeleton, Title } from '@patternfly/react-core';
 
 type MigrationNumberInputProps = {
   inputName: string;
   labelHelp: string;
   minValue: number;
+  promptType: OLSPromptType;
   setValue: Dispatch<SetStateAction<number>>;
   title: string;
   updateValue: (value: number) => void;
@@ -17,6 +20,7 @@ const MigrationNumberInput: FC<MigrationNumberInputProps> = ({
   inputName,
   labelHelp,
   minValue,
+  promptType,
   setValue,
   title,
   updateValue,
@@ -28,7 +32,13 @@ const MigrationNumberInput: FC<MigrationNumberInputProps> = ({
         {title}
         {labelHelp && (
           <HelpTextIcon
-            bodyContent={labelHelp}
+            bodyContent={(hide) => (
+              <PopoverContentWithLightspeedButton
+                content={labelHelp}
+                hide={hide}
+                promptType={promptType}
+              />
+            )}
             helpIconClassName="pf-v6-u-ml-xs"
             position={PopoverPosition.right}
           />

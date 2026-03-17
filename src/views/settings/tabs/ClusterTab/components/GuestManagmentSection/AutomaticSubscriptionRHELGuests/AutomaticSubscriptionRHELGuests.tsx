@@ -6,6 +6,7 @@ import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/Sect
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useRHELAutomaticSubscription from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/useRHELAutomaticSubscription';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Stack, Title } from '@patternfly/react-core';
 import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
 import ExpandSection from '@settings/ExpandSection/ExpandSection';
@@ -91,6 +92,7 @@ const AutomaticSubscriptionRHELGuests: FC<AutomaticSubscriptionRHELGuestsProps> 
                   id={AUTOMATIC_UPDATE_FEATURE_NAME}
                   isDisabled={isInitialLoad}
                   isLoading={loading}
+                  olsPromptType={OLSPromptType.SUBSCRIPTIONS}
                   switchIsOn={featureEnabled}
                   title={t('Enable auto updates for RHEL VirtualMachines')}
                 />

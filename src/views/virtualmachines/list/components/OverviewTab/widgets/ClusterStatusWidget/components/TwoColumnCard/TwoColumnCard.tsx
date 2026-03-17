@@ -1,6 +1,8 @@
 import React, { CSSProperties, FC, ReactNode } from 'react';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Card, CardBody, CardHeader, CardTitle } from '@patternfly/react-core';
 
 import StatusScoreList, { StatusScoreItem } from '../../../shared/StatusScoreList/StatusScoreList';
@@ -28,6 +30,8 @@ type TwoColumnCardProps = {
   leftContent?: ReactNode;
   /** Header label for the name column in StatusScoreList */
   nameHeader: string;
+  /** Prompt type for lightspeed */
+  olsPromptType?: OLSPromptType;
   /** Optional title displayed above the right column */
   rightTitle?: string;
   /** Header label for the score column in StatusScoreList */
@@ -49,6 +53,7 @@ const TwoColumnCard: FC<TwoColumnCardProps> = ({
   items,
   leftContent,
   nameHeader,
+  olsPromptType,
   rightTitle,
   scoreHeader,
   severityCounts,
@@ -73,7 +78,21 @@ const TwoColumnCard: FC<TwoColumnCardProps> = ({
       >
         <CardTitle className={helpContent ? 'two-column-card__title' : undefined}>
           {title}
-          {helpContent && <HelpTextIcon bodyContent={helpContent} />}
+          {helpContent && (
+            <HelpTextIcon
+              bodyContent={(hide) => {
+                return olsPromptType ? (
+                  <PopoverContentWithLightspeedButton
+                    content={helpContent}
+                    hide={hide}
+                    promptType={olsPromptType}
+                  />
+                ) : (
+                  helpContent
+                );
+              }}
+            />
+          )}
         </CardTitle>
       </CardHeader>
       <CardBody>

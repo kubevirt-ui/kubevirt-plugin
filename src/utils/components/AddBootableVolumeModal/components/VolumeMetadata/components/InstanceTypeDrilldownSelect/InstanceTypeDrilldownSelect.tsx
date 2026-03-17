@@ -13,6 +13,8 @@ import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import useInstanceTypesAndPreferences from '@kubevirt-utils/hooks/useInstanceTypesAndPreferences';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { universalComparator } from '@kubevirt-utils/utils/utils';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { FormGroup, PopoverPosition } from '@patternfly/react-core';
 
 import ComposableDrilldownSelect from './components/ComposableDrilldownSelect/ComposableDrilldownSelect';
@@ -76,7 +78,13 @@ export const InstanceTypeDrilldownSelect: FC<InstanceTypeMenuItemsProps> = ({
         <>
           {t('Default InstanceType')}{' '}
           <HelpTextIcon
-            bodyContent={t('The default InstanceType for this volume.')}
+            bodyContent={(hide) => (
+              <PopoverContentWithLightspeedButton
+                content={t('The default InstanceType for this volume.')}
+                hide={hide}
+                promptType={OLSPromptType.DEFAULT_INSTANCETYPE}
+              />
+            )}
             position={PopoverPosition.right}
           />
         </>

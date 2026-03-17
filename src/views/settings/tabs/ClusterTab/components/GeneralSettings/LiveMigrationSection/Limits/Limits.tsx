@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { useDebounceCallback } from '@overview/utils/hooks/useDebounceCallback';
 import { Content, ContentVariants } from '@patternfly/react-core';
 import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
@@ -54,6 +55,7 @@ const Limits = ({ hyperConverge }) => {
             )}
             inputName={MIGRATION_PER_CLUSTER}
             minValue={0}
+            promptType={OLSPromptType.MAX_MIGRATIONS_PER_CLUSTER}
             setValue={setMigrationPerCluster}
             title={t('Max. migrations per cluster')}
             updateValue={updateValueCluster}
@@ -65,6 +67,7 @@ const Limits = ({ hyperConverge }) => {
             inputName={MIGRATION_PER_NODE}
             labelHelp={t('Maximum number of outbound migrations per node. The format is a number.')}
             minValue={0}
+            promptType={OLSPromptType.MAX_MIGRATIONS_PER_NODE}
             setValue={setMigrationPerNode}
             title={t('Max. migrations per node')}
             updateValue={updateValueNode}

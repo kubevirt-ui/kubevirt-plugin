@@ -4,6 +4,7 @@ import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/Sect
 import { HIDE_YAML_TAB } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Alert, AlertVariant } from '@patternfly/react-core';
 import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
 import ExpandSection from '@settings/ExpandSection/ExpandSection';
@@ -35,6 +36,7 @@ const HideYamlTab: FC<HideYamlTabProps> = ({ newBadge = false }) => {
         isDisabled={!canEdit}
         isLoading={loading}
         newBadge={newBadge}
+        olsPromptType={OLSPromptType.HIDE_YAML_TAB}
         switchIsOn={featureEnabled}
         title={t('Disable YAML tab for non-admins')}
         turnOnSwitch={onChange}

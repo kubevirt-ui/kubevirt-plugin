@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
 import ExpandSection from '@settings/ExpandSection/ExpandSection';
 import { CLUSTER_TAB_IDS } from '@settings/search/constants';
@@ -29,6 +30,7 @@ const AdvancedCDROMFeatures: FC<AdvancedCDROMFeaturesProps> = ({ newBadge }) => 
         isDisabled={!canEdit}
         isLoading={loading}
         newBadge={newBadge}
+        olsPromptType={OLSPromptType.ADVANCED_CDROM_FEATURES}
         switchIsOn={featureEnabled}
         title={t('Enable advanced CD-ROM features')}
         turnOnSwitch={toggleFeature}

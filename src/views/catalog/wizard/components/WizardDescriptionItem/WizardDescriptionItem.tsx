@@ -1,7 +1,9 @@
-import React, { FC, ReactNode } from 'react';
+import React, { FC, memo, ReactNode } from 'react';
 import classNames from 'classnames';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import {
   Button,
   ButtonVariant,
@@ -27,6 +29,8 @@ type WizardDescriptionItemProps = {
   helperPopover?: {
     content: ReactNode;
     header: ReactNode;
+    olsObj?: K8sResourceCommon;
+    olsPromptType?: OLSPromptType;
   };
   /** help text icon */
   helpTextIcon?: ReactNode;
@@ -49,7 +53,7 @@ type WizardDescriptionItemProps = {
   title: string;
 };
 
-export const WizardDescriptionItem: FC<WizardDescriptionItemProps> = React.memo(
+export const WizardDescriptionItem: FC<WizardDescriptionItemProps> = memo(
   ({
     className,
     count,
@@ -83,7 +87,20 @@ export const WizardDescriptionItem: FC<WizardDescriptionItemProps> = React.memo(
 
       if (helperPopover) {
         return (
-          <Popover bodyContent={helperPopover?.content} headerContent={helperPopover?.header}>
+          <Popover
+            bodyContent={(hide) => {
+              return helperPopover?.olsPromptType ? (
+                <PopoverContentWithLightspeedButton
+                  content={helperPopover?.content}
+                  hide={hide}
+                  promptType={helperPopover.olsPromptType}
+                />
+              ) : (
+                helperPopover?.content
+              );
+            }}
+            headerContent={helperPopover?.header}
+          >
             <DescriptionListTermHelpTextButton> {title} </DescriptionListTermHelpTextButton>
           </Popover>
         );

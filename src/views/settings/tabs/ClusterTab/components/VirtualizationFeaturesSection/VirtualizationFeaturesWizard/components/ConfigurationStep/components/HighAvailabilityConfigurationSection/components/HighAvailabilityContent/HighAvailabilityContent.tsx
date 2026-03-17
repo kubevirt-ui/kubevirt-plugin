@@ -1,6 +1,7 @@
 import React, { Dispatch, FC, SetStateAction } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Stack, StackItem } from '@patternfly/react-core';
 import {
   FENCE_AGENTS_OPERATOR_NAME,
@@ -37,6 +38,7 @@ const HighAvailabilityContent: FC<HighAvailabilitySectionProps> = ({
           )}
           alternativeChecked={alternativeCheckedMap?.[NODE_HEALTH_OPERATOR_NAME]}
           checkboxLabel={t('Node health check (NHC)')}
+          olsPromptType={OLSPromptType.NODE_HEALTH_CHECK_OPERATOR_ALTERNATIVES}
           operatorName={NODE_HEALTH_OPERATOR_NAME}
           setAlternativeChecked={handleAlternativeCheckedUpdate(NODE_HEALTH_OPERATOR_NAME)}
         />
@@ -49,6 +51,7 @@ const HighAvailabilityContent: FC<HighAvailabilitySectionProps> = ({
           )}
           alternativeChecked={alternativeCheckedMap?.[FENCE_AGENTS_OPERATOR_NAME]}
           checkboxLabel={t('Fence agents remediation (FAR)')}
+          olsPromptType={OLSPromptType.FENCE_AGENTS_REMEDIATION_OPERATOR_ALTERNATIVES}
           operatorName={FENCE_AGENTS_OPERATOR_NAME}
           setAlternativeChecked={handleAlternativeCheckedUpdate(FENCE_AGENTS_OPERATOR_NAME)}
         />

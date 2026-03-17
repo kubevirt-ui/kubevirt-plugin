@@ -6,7 +6,6 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import { columnSorting, isEmpty } from '@kubevirt-utils/utils/utils';
-import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { ListPageBody, useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { Bullseye, Flex, FlexItem, Pagination } from '@patternfly/react-core';
@@ -64,15 +63,10 @@ const VirtualMachineDiagnosticTabConditions: FC<VirtualMachineDiagnosticTabCondi
     <>
       <ListPageBody>
         <VirtualMachineDiagnosticTabTableTitle
-          helpContent={(hide) => (
-            <PopoverContentWithLightspeedButton
-              content={t(
-                'Conditions provide a standard mechanism for status reporting. Conditions are reported for all aspects of a VM.',
-              )}
-              hide={hide}
-              promptType={OLSPromptType.STATUS_CONDITIONS}
-            />
+          helpContent={t(
+            'Conditions provide a standard mechanism for status reporting. Conditions are reported for all aspects of a VM.',
           )}
+          olsPromptType={OLSPromptType.STATUS_CONDITIONS}
           title={t('Status conditions')}
         />
         <Flex justifyContent={{ default: 'justifyContentSpaceBetween' }}>

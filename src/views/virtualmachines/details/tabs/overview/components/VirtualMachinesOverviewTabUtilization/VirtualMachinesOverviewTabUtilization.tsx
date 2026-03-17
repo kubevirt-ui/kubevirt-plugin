@@ -5,6 +5,8 @@ import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kub
 import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/ComponentReady';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import {
   Card,
   CardBody,
@@ -44,12 +46,18 @@ const VirtualMachinesOverviewTabUtilization: FC<VirtualMachinesOverviewTabUtiliz
           <div>
             {t('Utilization')}
             <HelpTextIcon
-              bodyContent={
-                <Trans ns="plugin__kubevirt-plugin" t={t}>
-                  <div>Donuts chart represent current values.</div>
-                  <div>Sparkline charts represent data over time</div>
-                </Trans>
-              }
+              bodyContent={(hide) => (
+                <PopoverContentWithLightspeedButton
+                  content={
+                    <Trans ns="plugin__kubevirt-plugin" t={t}>
+                      <div>Donut charts represent current values.</div>
+                      <div>Sparkline charts represent data over time.</div>
+                    </Trans>
+                  }
+                  hide={hide}
+                  promptType={OLSPromptType.VM_RESOURCE_UTILIZATION}
+                />
+              )}
               helpIconClassName="pf-v6-u-ml-xs"
               position={PopoverPosition.right}
             />

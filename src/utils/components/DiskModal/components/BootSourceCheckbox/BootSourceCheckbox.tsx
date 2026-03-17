@@ -5,6 +5,8 @@ import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getBootDisk } from '@kubevirt-utils/resources/vm';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import {
   Alert,
   AlertVariant,
@@ -54,8 +56,15 @@ const BootSourceCheckbox: FC<BootSourceCheckboxProps> = ({ editDiskName, isDisab
             name={IS_BOOT_SOURCE_FIELD}
           />
           <HelpTextIcon
-            bodyContent={t(
-              'Only one disk can be bootable at a time, this option is disabled if the VirtualMachine is running or if this disk is the current boot source',
+            bodyContent={(hide) => (
+              <PopoverContentWithLightspeedButton
+                content={t(
+                  'Only one disk can be bootable at a time, this option is disabled if the VirtualMachine is running or if this disk is the current boot source',
+                )}
+                hide={hide}
+                obj={vm}
+                promptType={OLSPromptType.USE_DISK_AS_BOOT_SOURCE}
+              />
             )}
             position={PopoverPosition.right}
           />

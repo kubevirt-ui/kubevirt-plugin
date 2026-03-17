@@ -13,6 +13,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getName } from '@kubevirt-utils/resources/shared';
 import { addRandomSuffix } from '@kubevirt-utils/utils/utils';
 import { getDNS1123LabelError } from '@kubevirt-utils/utils/validation';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 import {
@@ -93,8 +95,14 @@ const BulkSnapshotModal: FC<BulkSnapshotModalProps> = ({ isOpen, onClose, vms })
       <FormGroup
         labelHelp={
           <HelpTextIcon
-            bodyContent={t(
-              'The resulting snapshot name will be formatted as {VM name}-{random 6 characters}-{suffix}.',
+            bodyContent={(hide) => (
+              <PopoverContentWithLightspeedButton
+                content={t(
+                  'The resulting snapshot name will be formatted as {VM name}-{random 6 characters}-{suffix}.',
+                )}
+                hide={hide}
+                promptType={OLSPromptType.SNAPSHOTS}
+              />
             )}
           />
         }

@@ -10,6 +10,8 @@ import useHcoWorkloadArchitectures from '@kubevirt-utils/hooks/useHcoWorkloadArc
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ARCHITECTURE_TITLE } from '@kubevirt-utils/utils/architecture';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { FormGroup, PopoverPosition, SelectOption } from '@patternfly/react-core';
 
 type ArchitectureSelectProps = {
@@ -35,8 +37,14 @@ const ArchitectureSelect: FC<ArchitectureSelectProps> = ({
       <FormGroup
         labelHelp={
           <HelpTextIcon
-            bodyContent={t(
-              'The architecture type will be added as a suffix to the bootable volume name.',
+            bodyContent={(hide) => (
+              <PopoverContentWithLightspeedButton
+                content={t(
+                  'The architecture type will be added as a suffix to the bootable volume name.',
+                )}
+                hide={hide}
+                promptType={OLSPromptType.BOOTABLE_VOLUME_ARCHITECTURES}
+              />
             )}
             position={PopoverPosition.right}
           />

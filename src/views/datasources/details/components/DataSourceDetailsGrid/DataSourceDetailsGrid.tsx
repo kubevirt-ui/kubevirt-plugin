@@ -70,6 +70,8 @@ export const DataSourceDetailsGrid: React.FC<DataSourceDetailsGridProps> = ({ da
             descriptionData={<DataSourceInstanceTypeLink dataSource={dataSource} />}
             descriptionHeader={t('Default InstanceType')}
             isPopover
+            olsObj={dataSource}
+            promptType={OLSPromptType.DEFAULT_INSTANCETYPE}
           />
           <DescriptionItem
             bodyContent={<PreferencePopoverContent />}

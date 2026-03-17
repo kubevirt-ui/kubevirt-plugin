@@ -4,6 +4,8 @@ import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import {
   Flex,
   pluralize,
@@ -50,15 +52,21 @@ export const TemplatesCatalogHeader: FC<{
           <>
             {t('Default templates')}{' '}
             <HelpTextIcon
-              bodyContent={
-                <>
-                  {t('Red Hat recommended configuration for each OS.')}{' '}
-                  <ExternalLink
-                    href={documentationURL.CREATING_VMS_FROM_TEMPLATES}
-                    text={t('Learn more')}
-                  />
-                </>
-              }
+              bodyContent={(hide) => (
+                <PopoverContentWithLightspeedButton
+                  content={
+                    <>
+                      {t('Red Hat recommended configuration for each OS.')}{' '}
+                      <ExternalLink
+                        href={documentationURL.CREATING_VMS_FROM_TEMPLATES}
+                        text={t('Learn more')}
+                      />
+                    </>
+                  }
+                  hide={hide}
+                  promptType={OLSPromptType.DEFAULT_TEMPLATES}
+                />
+              )}
               size="headingLg"
             />
           </>

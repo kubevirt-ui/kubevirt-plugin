@@ -5,6 +5,7 @@ import { PASST_UDN_NETWORK, TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useF
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePasstFeatureFlag from '@kubevirt-utils/hooks/usePasstFeatureFlag';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { PREVIEW_FEATURES_TAB_IDS } from '@settings/search/constants';
 
 import PasstPopoverContent from '../PasstPopoverContent';
@@ -14,10 +15,11 @@ type Feature = {
   error?: Error;
   externalLink: string;
   featureEnabled: boolean;
-  helpPopoverContent?: (hide) => ReactNode;
+  helpPopoverContent?: ReactNode;
   id: string;
   label: string;
   loading: boolean;
+  olsPromptType?: OLSPromptType;
   searchItemId: string;
   toggleFeature: (val: boolean) => Promise<IoK8sApiCoreV1ConfigMap>;
 };
@@ -45,9 +47,10 @@ const usePreviewFeaturesData: UsePreviewFeaturesData = (cluster) => {
     },
     {
       externalLink: null,
-      helpPopoverContent: (hide) => <PasstPopoverContent hide={hide} />,
+      helpPopoverContent: <PasstPopoverContent />,
       id: PASST_UDN_NETWORK,
       label: t('Enable Passt binding for primary user-defined networks'),
+      olsPromptType: OLSPromptType.ENABLE_PASST_BINDING,
       searchItemId: PREVIEW_FEATURES_TAB_IDS.passtUDNNetwork,
       ...passtFeatureFlag,
     },

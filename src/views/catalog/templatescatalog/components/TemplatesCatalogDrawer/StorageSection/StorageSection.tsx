@@ -2,6 +2,8 @@ import React, { FC, useState } from 'react';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import {
   ExpandableSection,
   ExpandableSectionToggle,
@@ -35,8 +37,14 @@ const StorageSection: FC = () => {
         </FlexItem>
         <FlexItem>
           <HelpTextIcon
-            bodyContent={t(
-              'You can customize the Templates storage by overriding the original parameters',
+            bodyContent={(hide) => (
+              <PopoverContentWithLightspeedButton
+                content={t(
+                  'You can customize the Templates storage by overriding the original parameters',
+                )}
+                hide={hide}
+                promptType={OLSPromptType.TEMPLATE_STORAGE_CUSTOMIZATION}
+              />
             )}
           />
         </FlexItem>

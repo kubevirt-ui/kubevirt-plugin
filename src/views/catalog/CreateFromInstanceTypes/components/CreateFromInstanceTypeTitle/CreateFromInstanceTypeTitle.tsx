@@ -7,6 +7,8 @@ import { WINDOWS_BOOTSOURCE_PIPELINE } from '@catalog/CreateFromInstanceTypes/co
 import { UseInstanceTypeAndPreferencesValues } from '@catalog/CreateFromInstanceTypes/state/utils/types';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { PopoverPosition } from '@patternfly/react-core';
 
 import AddBootableVolumeLink from '../AddBootableVolumeLink/AddBootableVolumeLink';
@@ -26,25 +28,33 @@ const CreateFromInstanceTypeTitle: FC<CreateFromInstanceTypeTitleProps> = ({
       {t('Select volume to boot from')}{' '}
       <HelpTextIcon
         bodyContent={(hide) => (
-          <Trans ns="plugin__kubevirt-plugin" t={t}>
-            <div>From the Volume table, select a bootable volume to boot your VirtualMachine.</div>
-            <div>
-              To add a bootable volume that is not listed, click{' '}
-              <AddBootableVolumeLink
-                hidePopover={hide}
-                loadError={instanceTypesAndPreferencesData.loadError}
-                text={t('Add volume.')}
-              />
-            </div>
-            <div>
-              Learn how to{' '}
-              <QuickStartLauncherLink
-                quickStart={windowsQS}
-                quickStartLoaded={windowsQSLoaded}
-                text={t('create a bootable volume automatically by using pipelines')}
-              />
-            </div>
-          </Trans>
+          <PopoverContentWithLightspeedButton
+            content={
+              <Trans ns="plugin__kubevirt-plugin" t={t}>
+                <div>
+                  From the Volume table, select a bootable volume to boot your VirtualMachine.
+                </div>
+                <div>
+                  To add a bootable volume that is not listed, click{' '}
+                  <AddBootableVolumeLink
+                    hidePopover={hide}
+                    loadError={instanceTypesAndPreferencesData.loadError}
+                    text={t('Add volume.')}
+                  />
+                </div>
+                <div>
+                  Learn how to{' '}
+                  <QuickStartLauncherLink
+                    quickStart={windowsQS}
+                    quickStartLoaded={windowsQSLoaded}
+                    text={t('create a bootable volume automatically by using pipelines')}
+                  />
+                </div>
+              </Trans>
+            }
+            hide={hide}
+            promptType={OLSPromptType.BOOT_VOLUME_FOR_INSTANCETYPE_VM}
+          />
         )}
         className="create-vm-instance-type-section__HelpTextIcon"
         position={PopoverPosition.right}

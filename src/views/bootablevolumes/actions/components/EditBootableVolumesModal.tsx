@@ -164,7 +164,13 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
               <>
                 {t('Default InstanceType')}{' '}
                 <HelpTextIcon
-                  bodyContent={t('The default InstanceType for this volume.')}
+                  bodyContent={(hide) => (
+                    <PopoverContentWithLightspeedButton
+                      content={t('The default InstanceType for this volume.')}
+                      hide={hide}
+                      promptType={OLSPromptType.DEFAULT_INSTANCETYPE}
+                    />
+                  )}
                   position={PopoverPosition.right}
                 />
               </>
