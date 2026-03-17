@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button } from '@patternfly/react-core';
 import { ExternalLinkAltIcon } from '@patternfly/react-icons';
@@ -59,7 +60,7 @@ const AlertStatusItemACM: React.FC<AlertStatusItemACMProps> = ({ alertDetails, a
           <div className="alert-item__title">
             {isVMAlert && (
               <span className="co-m-resource-icon co-m-resource-icon--md alert-item__resource-icon">
-                {t('VM')}
+                {VirtualMachineModel.abbr}
               </span>
             )}
             <span className="alert-name">{alertName}</span>

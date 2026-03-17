@@ -56,7 +56,7 @@ const VMsPerResourceChart: FC<VMsPerResourceChartProps> = ({ type }) => {
         height={150}
         labels={({ datum }) => `${getInstanceTypeSeriesLabel(datum.x)}: ${datum.y}%`}
         subTitle={t('VMs')}
-        subTitleComponent={<SubTitleChartLabel />}
+        subTitleComponent={<SubTitleChartLabel splitTitleText />}
         title={vmsPerResourcesCount?.toString()}
         titleComponent={<TitleChartLabel />}
         width={300}
