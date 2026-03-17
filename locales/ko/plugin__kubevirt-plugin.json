@@ -1572,6 +1572,7 @@
   "Storage mapping": "스토리지 매핑",
   "Storage migration": "스토리지 마이그레이션",
   "Storage Migration": "스토리지 마이그레이션",
+  "Storage migration is only available for running VirtualMachines": "Storage migration is only available for running VirtualMachines",
   "Storage MigrationPlans": "스토리지 MigrationPlans",
   "Storage migrations": "스토리지 마이그레이션",
   "Storage missing VolumeSnapshotClass": "VolumeSnapshotClass 스토리지 누락",

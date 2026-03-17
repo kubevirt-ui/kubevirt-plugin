@@ -160,6 +160,8 @@ export const BulkVirtualMachineActionFactory = {
     },
     cta: () => createModal((props) => <VirtualMachineMigrateModal vms={vms} {...props} />),
     description: t('Migrate VirtualMachine storage to a different StorageClass'),
+    disabled: vms.some((vm) => !isRunning(vm)),
+    disabledTooltip: t('Storage migration is only available for running VirtualMachines'),
     id: ACTIONS_ID.BULK_MIGRATE_STORAGE,
     label: t('Storage'),
   }),

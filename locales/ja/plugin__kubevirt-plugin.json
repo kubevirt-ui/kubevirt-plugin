@@ -1572,6 +1572,7 @@
   "Storage mapping": "ストレージマッピング",
   "Storage migration": "ストレージ移行",
   "Storage Migration": "ストレージ移行",
+  "Storage migration is only available for running VirtualMachines": "Storage migration is only available for running VirtualMachines",
   "Storage MigrationPlans": "ストレージ MigrationPlans",
   "Storage migrations": "ストレージ移行",
   "Storage missing VolumeSnapshotClass": "ストレージに VolumeSnapshotClass がありません",
