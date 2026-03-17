@@ -77,6 +77,7 @@ type CreateInterfaceOptions = {
   interfaceMACAddress: string;
   interfaceModel: string;
   interfaceType: string;
+  isLegacyPasst?: boolean;
   nicName: string;
 };
 
@@ -85,11 +86,12 @@ export const createInterface = ({
   interfaceMACAddress,
   interfaceModel,
   interfaceType = interfaceTypesProxy.bridge,
+  isLegacyPasst,
   nicName,
 }: CreateInterfaceOptions): V1Interface => {
   const resolvedInterfaceProp = interfaceLabelsProxy[interfaceType];
-  const isBinding =
-    resolvedInterfaceProp === UDN_BINDING_NAME || resolvedInterfaceProp === PASST_BINDING_NAME;
+  const isPasst = resolvedInterfaceProp === PASST_BINDING_NAME;
+  const isUDN = resolvedInterfaceProp === UDN_BINDING_NAME;
 
   const createdInterface: V1Interface = {
     macAddress: interfaceMACAddress,
@@ -97,7 +99,9 @@ export const createInterface = ({
     name: nicName,
   };
 
-  if (isBinding) {
+  if (isPasst && !isLegacyPasst) {
+    createdInterface.passtBinding = {};
+  } else if (isPasst || isUDN) {
     createdInterface.binding = { name: resolvedInterfaceProp };
   } else {
     createdInterface.state = interfaceLinkState;
