@@ -7,6 +7,8 @@ import {
   Button,
   ButtonProps,
   ButtonVariant,
+  Content,
+  ContentVariants,
   EmptyState,
   EmptyStateActions,
   EmptyStateBody,
@@ -60,16 +62,26 @@ const CheckupsEmptyState: FC<CheckupsEmptyState> = ({
       <EmptyStateFooter>
         {topFooterActions}
         {!isAllNamespaces && (
-          <EmptyStateActions>
-            <Button
-              isDisabled={isDisabled || isLoading}
-              isLoading={isLoading}
-              onClick={onClick}
-              variant={isLoading ? ButtonVariant.plain : ButtonVariant.secondary}
-            >
-              {!isLoading && isPermitted ? t('Remove permissions') : t('Install permissions')}
-            </Button>
-          </EmptyStateActions>
+          <>
+            <EmptyStateActions>
+              <Button
+                aria-describedby={
+                  isDisabled && !isLoading ? 'permissions-button-helper' : undefined
+                }
+                isDisabled={isDisabled || isLoading}
+                isLoading={isLoading}
+                onClick={onClick}
+                variant={isLoading ? ButtonVariant.plain : ButtonVariant.secondary}
+              >
+                {!isLoading && isPermitted ? t('Remove permissions') : t('Install permissions')}
+              </Button>
+            </EmptyStateActions>
+            {isDisabled && !isLoading && (
+              <Content component={ContentVariants.small} id="permissions-button-helper">
+                {t('Contact your cluster administrator to manage permissions.')}
+              </Content>
+            )}
+          </>
         )}
         {bottomFooterActions}
         <EmptyStateActions>

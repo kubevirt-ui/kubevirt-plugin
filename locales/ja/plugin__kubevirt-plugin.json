@@ -468,6 +468,7 @@
   "Connection did not close cleanly.": "Connection did not close cleanly.",
   "Console": "コンソール",
   "Console is disabled in headless mode": "ヘッドレスモードではコンソールが無効になります",
+  "Contact your cluster administrator to manage permissions.": "Contact your cluster administrator to manage permissions.",
   "Container": "コンテナー",
   "Container (Ephemeral)": "コンテナー (一時的)",
   "Container disk": "コンテナーディスク",

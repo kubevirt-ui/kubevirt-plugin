@@ -483,6 +483,7 @@
   "Connection did not close cleanly.": "Connection did not close cleanly.",
   "Console": "Console",
   "Console is disabled in headless mode": "La console est désactivée en mode sans tête",
+  "Contact your cluster administrator to manage permissions.": "Contact your cluster administrator to manage permissions.",
   "Container": "Conteneur",
   "Container (Ephemeral)": "Conteneur (éphémère)",
   "Container disk": "Disque conteneur",
