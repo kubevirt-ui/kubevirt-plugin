@@ -329,13 +329,42 @@ Sizes: `xs` (4px), `sm` (8px), `md` (16px), `lg` (24px), `xl` (32px), `2xl` (48p
 
 ---
 
-## 12. i18n Requirements
+## 12. Common components
+
+### HelpTextIcon
+- Use `HelpTextIcon` for a help icon (?) that opens a `Popover` with contextual information
+- Replaces manual `<Popover><Icon><HelpIcon /></Icon></Popover>` patterns
+- Supports `headerContent`, `bodyContent`, and `footerContent` for the popover
+
+```tsx
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
+
+<HelpTextIcon
+  bodyContent={t('Explanation of the feature...')}
+  headerContent={t('Feature name')}
+/>
+```
+
+### ExternalLink
+- Use `ExternalLink` for any link that opens in a new tab (`target="_blank"`) with an external link icon
+- Replaces manual `<Button component="a" href={...} icon={<ExternalLinkAltIcon />} target="_blank" variant="link">` patterns
+- Do NOT use for: internal navigation (`useNavigate`, `<Link>`), action menu icons, buttons with custom `onClick` logic
+
+```tsx
+import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
+
+<ExternalLink href={documentationURL.SOME_DOC} text={t('Learn more')} />
+```
+
+---
+
+## 13. i18n Requirements
 
 ### All User-Facing Strings
 ```tsx
 const { t } = useKubevirtTranslation();
 
-return <h1>{t('Virtual Machines')}</h1>;
+return <h1>{t('Virtual machines')}</h1>;
 ```
 
 ### Dynamic Values

@@ -1,9 +1,9 @@
 import React from 'react';
 
+import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Button, ButtonVariant, Stack, StackItem } from '@patternfly/react-core';
-import { ExternalLinkSquareAltIcon } from '@patternfly/react-icons';
+import { Stack, StackItem } from '@patternfly/react-core';
 
 const CloudInitInfoHelper = () => {
   const { t } = useKubevirtTranslation();
@@ -17,17 +17,7 @@ const CloudInitInfoHelper = () => {
       <StackItem>
         <div className="pf-v6-u-text-color-subtle">
           {t('The cloud-init service is enabled by default in Fedora and RHEL images.')}{' '}
-          <Button
-            icon={<ExternalLinkSquareAltIcon />}
-            iconPosition="right"
-            isInline
-            size="sm"
-            variant={ButtonVariant.link}
-          >
-            <a href={documentationURL.CLOUDINIT_INFO} rel="noopener noreferrer" target="_blank">
-              {t('Learn more')}
-            </a>
-          </Button>
+          <ExternalLink href={documentationURL.CLOUDINIT_INFO} text={t('Learn more')} />
         </div>
       </StackItem>
     </Stack>

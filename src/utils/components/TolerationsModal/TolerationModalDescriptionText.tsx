@@ -1,9 +1,9 @@
 import * as React from 'react';
 
+import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Content, ContentVariants } from '@patternfly/react-core';
-import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 
 const TolerationModalDescriptionText: React.FC = () => {
   const { t } = useKubevirtTranslation();
@@ -19,13 +19,10 @@ const TolerationModalDescriptionText: React.FC = () => {
           'Add tolerations to allow a VirtualMachine to schedule onto Nodes with matching taints.',
         )}
       </Content>
-      <Content
-        component={ContentVariants.a}
+      <ExternalLink
         href={documentationURL.TAINTS_TOLERATION}
-        target="_blank"
-      >
-        {t('Taints and Tolerations documentation')} <ExternalLinkAltIcon />
-      </Content>
+        text={t('Taints and Tolerations documentation')}
+      />
     </>
   );
 };

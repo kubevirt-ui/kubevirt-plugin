@@ -1,10 +1,11 @@
 import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 
+import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, ButtonVariant, Content, ContentVariants, Popover } from '@patternfly/react-core';
-import { ExternalLinkSquareAltIcon, OutlinedQuestionCircleIcon } from '@patternfly/react-icons';
+import { OutlinedQuestionCircleIcon } from '@patternfly/react-icons';
 
 const SysprepUnattendHelperPopup: FC = () => {
   const { t } = useKubevirtTranslation();
@@ -19,17 +20,7 @@ const SysprepUnattendHelperPopup: FC = () => {
               used with destructive actions such as disk formatting. Autounattend will only be used
               once during installation.
             </Content>
-            <Button
-              icon={<ExternalLinkSquareAltIcon />}
-              iconPosition="right"
-              isInline
-              size="sm"
-              variant={ButtonVariant.link}
-            >
-              <a href={documentationURL.SYSPREP} rel="noopener noreferrer" target="_blank">
-                {t('Learn more')}
-              </a>
-            </Button>
+            <ExternalLink href={documentationURL.SYSPREP} text={t('Learn more')} />
           </Trans>
         </div>
       }

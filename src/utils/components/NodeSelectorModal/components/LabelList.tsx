@@ -2,10 +2,11 @@ import * as React from 'react';
 import { FC, ReactNode } from 'react';
 import classNames from 'classnames';
 
+import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 import { Button, ButtonVariant, Grid, GridItem, Split, SplitItem } from '@patternfly/react-core';
-import { ExternalLinkAltIcon, PlusCircleIcon } from '@patternfly/react-icons';
+import { PlusCircleIcon } from '@patternfly/react-icons';
 
 type LabelsListProps = {
   addRowText?: string;
@@ -59,18 +60,11 @@ const LabelsList: FC<LabelsListProps> = ({
         <SplitItem isFilled />
         <SplitItem>
           {model && (
-            <Button
-              className="pf-m-link--align-right"
-              component="a"
+            <ExternalLink
+              dataTestID="explore-nodes-btn"
               href={`/k8s/cluster/${model.plural}`}
-              icon={<ExternalLinkAltIcon />}
-              iconPosition="right"
-              id="explore-nodes-btn"
-              target="_blank"
-              variant={ButtonVariant.link}
-            >
-              {t('Explore {{kind}} list', { kind: model.kind })}
-            </Button>
+              text={t('Explore {{kind}} list', { kind: model.kind })}
+            />
           )}
         </SplitItem>
       </Split>

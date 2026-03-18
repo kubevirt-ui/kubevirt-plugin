@@ -56,7 +56,7 @@ const CommonTemplateAlert: FC<CommonTemplateAlertProps> = ({ template }) => {
       {t('We suggest you to create a custom Template from this {{ providerName }} Template.', {
         providerName,
       })}
-      <div className="margin-top">
+      <div className="pf-v6-u-mt-md">
         <Button
           onClick={() =>
             createModal(({ isOpen, onClose }) => (
