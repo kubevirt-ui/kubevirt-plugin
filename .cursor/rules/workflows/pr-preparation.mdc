@@ -207,14 +207,24 @@ Fixes: CNV-XXXXX
 
 ---
 
-## 7. PR Description
+## 7. PR Format
 
-### Title
-- Clear, concise summary
-- Include ticket number if applicable
-- Use conventional format: `feat(scope): description`
+### Title Format
 
-### Template
+**Required format**: `[branch] JIRA-ID: short description`
+
+- **Branch prefix**: Add the target branch in square brackets when creating a PR against a non-main branch (e.g., `[release-4.21]`). Omit for PRs targeting `main`.
+- **Jira ticket prefix**: Every PR **must** include a Jira ticket ID as a prefix (e.g., `CNV-70906:`). If no Jira ticket exists for the work, **create one first** and use its ID before opening the PR.
+- **Description**: Clear, concise summary of the change.
+
+**Examples**:
+```
+CNV-70906: fix overlapping text in Overview VirtualMachines per resource chart
+[release-4.21] CNV-81597: disable storage migration action for stopped VirtualMachines
+CNV-76585: generate Red Hat InstanceType cards dynamically
+```
+
+### Description format
 
 Use the PR template defined in `coding-standards.mdc` (Section 8). The canonical format is:
 
