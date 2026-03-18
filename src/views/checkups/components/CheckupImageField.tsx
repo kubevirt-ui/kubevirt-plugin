@@ -1,17 +1,9 @@
 import React, { FC } from 'react';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  Button,
-  ButtonVariant,
-  FormGroup,
-  Popover,
-  PopoverPosition,
-  Skeleton,
-  Truncate,
-} from '@patternfly/react-core';
-import { HelpIcon } from '@patternfly/react-icons';
+import { FormGroup, PopoverPosition, Skeleton, Truncate } from '@patternfly/react-core';
 
 type CheckupImageFieldProps = {
   checkupImage?: string;
@@ -28,12 +20,10 @@ const CheckupImageField: FC<CheckupImageFieldProps> = ({
   return (
     <FormGroup
       labelHelp={
-        <Popover
+        <HelpTextIcon
           bodyContent={t('The image used by the checkup job.')}
           position={PopoverPosition.right}
-        >
-          <Button icon={<HelpIcon />} variant={ButtonVariant.plain} />
-        </Popover>
+        />
       }
       label={t('Checkup image')}
     >

@@ -9,6 +9,7 @@ import {
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { FormTextInput } from '@kubevirt-utils/components/FormTextInput/FormTextInput';
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
@@ -18,14 +19,11 @@ import {
   Divider,
   Form,
   FormGroup,
-  Icon,
   NumberInput,
-  Popover,
   Stack,
   StackItem,
   ValidatedOptions,
 } from '@patternfly/react-core';
-import { HelpIcon } from '@patternfly/react-icons';
 
 import { onDataImportCronManageSubmit } from './utils';
 
@@ -132,23 +130,12 @@ export const DataImportCronManageModal: FC<DataImportCronManageModalProps> = ({
               <>
                 <FormGroup
                   labelHelp={
-                    <Popover
+                    <HelpTextIcon
                       bodyContent={t(
                         'As new versions of a DataSource become available older versions will be replaced',
                       )}
-                    >
-                      <button
-                        aria-describedby="retain-revision-info"
-                        aria-label="More info for retain revisions field"
-                        className="pf-v6-c-form__group-label-help"
-                        onClick={(e) => e.preventDefault()}
-                        type="button"
-                      >
-                        <Icon>
-                          <HelpIcon />
-                        </Icon>
-                      </button>
-                    </Popover>
+                      buttonAriaLabel={t('More info for retain revisions field')}
+                    />
                   }
                   fieldId="retain-revision-info"
                   isRequired

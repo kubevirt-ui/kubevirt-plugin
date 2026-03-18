@@ -5,20 +5,18 @@ import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInpu
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { FormTextInput } from '@kubevirt-utils/components/FormTextInput/FormTextInput';
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Form,
   FormGroup,
-  Icon,
   NumberInput,
-  Popover,
   Stack,
   StackItem,
   ValidatedOptions,
 } from '@patternfly/react-core';
-import { HelpIcon } from '@patternfly/react-icons';
 
 import { CreateDataSourceModalFormType } from './CreateDataSourceModal';
 
@@ -88,23 +86,12 @@ export const CreateDataSourceForm: FC<CreateDataSourceFormProps> = ({
       />
       <FormGroup
         labelHelp={
-          <Popover
+          <HelpTextIcon
             bodyContent={t(
               'As new versions of a DataSource become available older versions will be replaced',
             )}
-          >
-            <button
-              aria-describedby="retain-revision-info"
-              aria-label="More info for retain revisions field"
-              className="pf-v6-c-form__group-label-help"
-              onClick={(e) => e.preventDefault()}
-              type="button"
-            >
-              <Icon>
-                <HelpIcon />
-              </Icon>
-            </button>
-          </Popover>
+            buttonAriaLabel={t('More info for retain revisions field')}
+          />
         }
         fieldId="retain-revision-info"
         isRequired

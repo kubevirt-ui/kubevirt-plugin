@@ -1,9 +1,9 @@
 import React, { FC } from 'react';
 
 import { V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Button, ButtonVariant, Popover, PopoverPosition } from '@patternfly/react-core';
-import { HelpIcon } from '@patternfly/react-icons';
+import { PopoverPosition } from '@patternfly/react-core';
 
 import './CPUTopologyHelperText.scss';
 
@@ -21,18 +21,12 @@ const CPUTopologyHelperText: FC<CPUTopologyHelperTextProps> = ({ cpu }) => {
   return (
     <div className="cpu-topology-helper-text">
       {t('Total vCPU is {{totalCPU}}', { totalCPU: totalCPU })}
-      <Popover
-        bodyContent={<>{t('CPUs = sockets x threads x cores.')}</>}
+      <HelpTextIcon
+        bodyContent={t('CPUs = sockets x threads x cores.')}
         hasAutoWidth
-        position={PopoverPosition.bottom}
-      >
-        <Button
-          className="cpu-topology-helper-text__button"
-          hasNoPadding
-          icon={<HelpIcon />}
-          variant={ButtonVariant.plain}
-        />
-      </Popover>
+        helpIconClassName="pf-v6-u-ml-sm"
+        position={PopoverPosition.right}
+      />
     </div>
   );
 };

@@ -1,15 +1,17 @@
-import * as React from 'react';
-import { FC, MouseEventHandler, ReactNode } from 'react';
+import React, { FC, MouseEventHandler, ReactNode } from 'react';
 
-import { Icon, IconSize, Popover, PopoverPosition } from '@patternfly/react-core';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { Button, Icon, IconSize, Popover, PopoverPosition } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
 
 import './HelpTextIcon.scss';
 
 type HelpTextIconProps = {
   bodyContent: ((hide: () => void) => ReactNode) | ReactNode;
+  buttonAriaLabel?: string;
   className?: string;
   footerContent?: ReactNode;
+  hasAutoWidth?: boolean;
   headerContent?: ReactNode;
   helpIconClassName?: string;
   onClick?: MouseEventHandler<HTMLSpanElement>;
@@ -19,26 +21,41 @@ type HelpTextIconProps = {
 
 const HelpTextIcon: FC<HelpTextIconProps> = ({
   bodyContent,
-  className = 'help-text-icon__popover',
+  buttonAriaLabel,
+  className,
   footerContent,
+  hasAutoWidth,
   headerContent,
   helpIconClassName = '',
   onClick,
   position = PopoverPosition.top,
   size,
-}) => (
-  <Popover
-    aria-label={'Help'}
-    bodyContent={bodyContent}
-    className={className}
-    footerContent={footerContent}
-    headerContent={headerContent}
-    position={position}
-  >
-    <Icon className={helpIconClassName} onClick={onClick} size={size}>
-      <HelpIcon className="help-icon" />
-    </Icon>
-  </Popover>
-);
+}) => {
+  const { t } = useKubevirtTranslation();
+
+  return (
+    <Popover
+      aria-label={t('Help')}
+      bodyContent={bodyContent}
+      className={className}
+      footerContent={footerContent}
+      hasAutoWidth={hasAutoWidth}
+      headerContent={headerContent}
+      position={position}
+    >
+      <Button
+        icon={
+          <Icon className={helpIconClassName} onClick={onClick} size={size}>
+            <HelpIcon className="help-icon" />
+          </Icon>
+        }
+        aria-label={buttonAriaLabel ?? t('Help')}
+        hasNoPadding
+        isInline
+        variant="plain"
+      />
+    </Popover>
+  );
+};
 
 export default HelpTextIcon;

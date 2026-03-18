@@ -1,19 +1,12 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { AUTOMATIC_SUBSCRIPTION_CUSTOM_URL } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { debounce } from '@kubevirt-utils/utils/debounce';
-import {
-  Checkbox,
-  Content,
-  Flex,
-  Popover,
-  PopoverPosition,
-  TextInput,
-} from '@patternfly/react-core';
-import { HelpIcon } from '@patternfly/react-icons';
+import { Checkbox, Content, Flex, PopoverPosition, TextInput } from '@patternfly/react-core';
 import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
 
 import './automatic-subscription-custom-url.scss';
@@ -47,8 +40,8 @@ const AutomaticSubscriptionCustomUrl: FC<AutomaticSubscriptionCustomUrlProps> = 
   );
 
   return (
-    <div className="AutomaticSubscriptionCustomUrl--main">
-      <Flex alignItems={{ default: 'alignItemsCenter' }}>
+    <div>
+      <Flex alignItems={{ default: 'alignItemsCenter' }} gap={{ default: 'gapSm' }}>
         <Checkbox
           onChange={() =>
             setIsChecked((prevIsChecked) => {
@@ -56,24 +49,20 @@ const AutomaticSubscriptionCustomUrl: FC<AutomaticSubscriptionCustomUrlProps> = 
               return !prevIsChecked;
             })
           }
-          className="AutomaticSubscriptionCustomUrl--checkbox"
           id="auto-register-rhel"
           isChecked={isChecked && !isDisabled}
           isDisabled={isDisabled}
           label={t('Use custom registration server url')}
         />
-        <Popover
-          aria-label={'Help'}
+        <HelpTextIcon
           bodyContent={t('Select this option if you use an on-premise subscription service')}
           position={PopoverPosition.right}
-        >
-          <HelpIcon />
-        </Popover>
+        />
       </Flex>
       {isChecked && !isDisabled && (
         <>
           <Flex>
-            <Content component="p">URL</Content>
+            <Content component="p">{t('URL')}</Content>
             <TextInput
               onChange={(_, value: string) => {
                 setInputValue(value);

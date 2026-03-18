@@ -1,8 +1,8 @@
 import React, { FC } from 'react';
 
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Checkbox, Flex, FlexItem, FormGroup, Popover } from '@patternfly/react-core';
-import { HelpIcon } from '@patternfly/react-icons';
+import { Checkbox, Flex, FlexItem, FormGroup } from '@patternfly/react-core';
 
 type BootCDCheckboxProps = {
   hasCDSource: boolean;
@@ -14,7 +14,7 @@ const BootCDCheckbox: FC<BootCDCheckboxProps> = ({ hasCDSource, onChange }) => {
 
   return (
     <FormGroup className="disk-source-form-group" fieldId="customize-boot-from-cd">
-      <Flex>
+      <Flex gap={{ default: 'gapSm' }}>
         <FlexItem>
           <Checkbox
             data-test-id="boot-cd"
@@ -25,18 +25,15 @@ const BootCDCheckbox: FC<BootCDCheckboxProps> = ({ hasCDSource, onChange }) => {
           />
         </FlexItem>
         <FlexItem>
-          <Popover
-            bodyContent={() => (
+          <HelpTextIcon
+            bodyContent={
               <div>
                 {t(
                   'Boot from CD requires an image file i.e. ISO, qcow, etc. that will be mounted to the VirtualMachine as a CD',
                 )}
               </div>
-            )}
-            aria-label={'Help'}
-          >
-            <HelpIcon />
-          </Popover>
+            }
+          />
         </FlexItem>
       </Flex>
     </FormGroup>
