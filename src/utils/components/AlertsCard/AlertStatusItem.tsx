@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom-v5-compat';
 
+import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { AlertType, SimplifiedAlert } from '@kubevirt-utils/components/AlertsCard/utils/types';
 import { alertIcon } from '@kubevirt-utils/components/AlertsCard/utils/utils';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
@@ -35,7 +36,7 @@ const AlertStatusItem: React.FC<AlertStatusItemProps> = ({ alertDetails, alertTy
             <span className="co-resource-item__resource-name">
               {isVMAlert && (
                 <span className="co-m-resource-icon co-m-resource-icon--md alert-item__resource-icon">
-                  {t('VM')}
+                  {VirtualMachineModel.abbr}
                 </span>
               )}
               <Timestamp className="alert-item__timestamp" hideIcon timestamp={time} />
