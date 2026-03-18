@@ -4,6 +4,8 @@ export type UploadAlertStatus = 'error' | 'success' | 'uploading';
 
 export type UploadAlertConfig = { body: string; title: string; variant: AlertVariant };
 
+// t('You can navigate away. The upload will continue in the background.')
+// t('Upload in progress')
 export const uploadAlertConfig: Record<UploadAlertStatus, UploadAlertConfig> = {
   error: {
     body: 'The ISO upload failed. Check the DataVolume status for details.',
@@ -16,7 +18,7 @@ export const uploadAlertConfig: Record<UploadAlertStatus, UploadAlertConfig> = {
     variant: AlertVariant.success,
   },
   uploading: {
-    body: 'You may leave this screen while the upload completes in the background.',
+    body: 'You can navigate away. The upload will continue in the background.',
     title: 'Upload in progress',
     variant: AlertVariant.info,
   },
