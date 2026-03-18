@@ -31,7 +31,7 @@ const TemplateDetailsPage: FC<TemplateDetailsPageProps> = ({ obj: template }) =>
         {(resource) => (
           <>
             <Title headingLevel="h2">{t('Template details')}</Title>
-            <Grid className="margin-top">
+            <Grid className="pf-v6-u-mt-md">
               <GridItem span={5}>
                 <TemplateDetailsLeftGrid template={resource} />
               </GridItem>

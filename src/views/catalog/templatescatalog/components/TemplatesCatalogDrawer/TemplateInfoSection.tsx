@@ -10,6 +10,7 @@ import { CpuMemHelperTextResources } from '@kubevirt-utils/components/CPUDescrip
 import CPUMemory from '@kubevirt-utils/components/CPUMemory/CPUMemory';
 import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CPUMemoryModal';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
+import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -25,8 +26,7 @@ import {
 } from '@kubevirt-utils/resources/template/utils/selectors';
 import { getCPU, getDisks } from '@kubevirt-utils/resources/vm';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
-import { Button, ButtonVariant, DescriptionList, ExpandableSection } from '@patternfly/react-core';
-import { ExternalLinkSquareAltIcon } from '@patternfly/react-icons';
+import { DescriptionList, ExpandableSection } from '@patternfly/react-core';
 
 import { useDrawerContext } from './hooks/useDrawerContext';
 import TemplateExpandableDescription from './TemplateExpandableDescription';
@@ -71,17 +71,7 @@ export const TemplateInfoSection: FC = memo(() => {
         <DescriptionItem
           descriptionData={
             documentationUrl ? (
-              <Button
-                icon={<ExternalLinkSquareAltIcon />}
-                iconPosition="right"
-                isInline
-                size="sm"
-                variant={ButtonVariant.link}
-              >
-                <a href={documentationUrl} rel="noopener noreferrer" target="_blank">
-                  {t('Refer to documentation')}
-                </a>
-              </Button>
+              <ExternalLink href={documentationUrl} text={t('Refer to documentation')} />
             ) : (
               notAvailable
             )

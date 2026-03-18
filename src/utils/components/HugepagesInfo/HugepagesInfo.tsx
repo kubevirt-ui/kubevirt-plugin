@@ -1,9 +1,9 @@
 import React, { FC, MouseEventHandler } from 'react';
 
+import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Button, Flex, Stack } from '@patternfly/react-core';
-import { ExternalLinkAltIcon } from '@patternfly/react-icons';
+import { Flex, Stack } from '@patternfly/react-core';
 
 import HelpTextIcon from '../HelpTextIcon/HelpTextIcon';
 
@@ -25,15 +25,7 @@ const HugepagesInfo: FC = ({}) => {
                 'Hugepages are a memory management technique that uses larger memory blocks than the default page size to improve performance. Hugepages series has hugepages set to 1 GiB, normal series has hugepages set to 2 MiB.',
               )}
             </div>
-            <Button
-              component="a"
-              href={documentationURL.HUGEPAGES}
-              isInline
-              target="_blank"
-              variant="link"
-            >
-              {t('View documentation')} <ExternalLinkAltIcon />
-            </Button>
+            <ExternalLink href={documentationURL.HUGEPAGES} text={t('View documentation')} />
           </Stack>
         }
         headerContent={t('Hugepages')}

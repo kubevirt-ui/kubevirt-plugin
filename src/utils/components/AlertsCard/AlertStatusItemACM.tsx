@@ -3,7 +3,8 @@ import React from 'react';
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button } from '@patternfly/react-core';
-import { ExternalLinkAltIcon } from '@patternfly/react-icons';
+
+import ExternalLink from '../ExternalLink/ExternalLink';
 
 import { AlertType, SimplifiedAlert } from './utils/types';
 import { alertIcon } from './utils/utils';
@@ -26,20 +27,7 @@ const AlertStatusItemACM: React.FC<AlertStatusItemACMProps> = ({ alertDetails, a
   const renderAlertLink = () => {
     // For spoke cluster alerts, open external link in new tab
     if (externalLink) {
-      return (
-        <Button
-          component="a"
-          href={externalLink}
-          icon={<ExternalLinkAltIcon />}
-          iconPosition="end"
-          isInline
-          rel="noopener noreferrer"
-          target="_blank"
-          variant="link"
-        >
-          {linkText}
-        </Button>
-      );
+      return <ExternalLink href={externalLink} text={linkText} />;
     }
 
     // For hub cluster alerts, use internal link

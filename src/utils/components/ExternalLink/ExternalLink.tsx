@@ -25,7 +25,7 @@ const ExternalLink: FC<ExternalLinkProps> = ({
     data-test-id={dataTestID}
     href={href}
     icon={<ExternalLinkAltIcon />}
-    iconPosition="right"
+    iconPosition="end"
     isInline
     rel="noopener noreferrer"
     target="_blank"

@@ -11,8 +11,6 @@ import useEditTemplateAccessReview from '../../hooks/useIsTemplateEditable';
 import TemplateSchedulingLeftGrid from './components/TemplateSchedulingLeftGrid';
 import TemplateSchedulingRightGrid from './components/TemplateSchedulingRightGrid';
 
-import './TemplateSchedulingTab.scss';
-
 type TemplateSchedulingTabProps = {
   obj?: V1Template;
 };
@@ -26,7 +24,7 @@ const TemplateSchedulingTab: FC<TemplateSchedulingTabProps> = ({ obj: template }
       <SidebarEditor<V1Template> onResourceUpdate={updateTemplate} resource={template}>
         <>
           <Title headingLevel="h2">{t('Scheduling and resource requirements')}</Title>
-          <Grid className="margin-top">
+          <Grid className="pf-v6-u-mt-md">
             <GridItem span={5}>
               <TemplateSchedulingLeftGrid editable={isTemplateEditable} template={template} />
             </GridItem>

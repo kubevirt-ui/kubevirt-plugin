@@ -1,16 +1,9 @@
 import React, { FC } from 'react';
 
+import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  Button,
-  ButtonVariant,
-  Content,
-  ContentVariants,
-  Stack,
-  StackItem,
-} from '@patternfly/react-core';
-import { ExternalLinkSquareAltIcon } from '@patternfly/react-icons';
+import { Content, ContentVariants, Stack, StackItem } from '@patternfly/react-core';
 
 const SysprepInfo: FC = () => {
   const { t } = useKubevirtTranslation();
@@ -29,17 +22,7 @@ const SysprepInfo: FC = () => {
           {t(
             'An answer file is an XML-based file that contains setting definitions and values to use during Windows Setup',
           )}{' '}
-          <Button
-            icon={<ExternalLinkSquareAltIcon />}
-            iconPosition="right"
-            isInline
-            size="sm"
-            variant={ButtonVariant.link}
-          >
-            <a href={documentationURL.SYSPREP} rel="noopener noreferrer" target="_blank">
-              {t('Learn more')}
-            </a>
-          </Button>
+          <ExternalLink href={documentationURL.SYSPREP} text={t('Learn more')} />
         </StackItem>
       </Stack>
     </div>
