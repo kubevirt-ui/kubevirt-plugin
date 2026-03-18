@@ -10,6 +10,7 @@ import { SourceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import WindowsDrivers from '@kubevirt-utils/components/WindowsDrivers/WindowsDrivers';
+import useIsWindowsSupportedArchitecture from '@kubevirt-utils/hooks/useIsWindowsSupportedArchitecture';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import useDisksTableData from '@kubevirt-utils/resources/vm/hooks/disk/useDisksTableData';
@@ -47,6 +48,7 @@ const DiskList: FC<DiskListProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+  const isWindowsSupported = useIsWindowsSupportedArchitecture();
   const columns = useMemo(() => getDiskListColumns(t), [t]);
   const [disks, sourcesLoaded, loadError] = useDisksTableData(vm, vmi);
   const instanceTypeVMStore = useInstanceTypeVMStore();
@@ -109,9 +111,11 @@ const DiskList: FC<DiskListProps> = ({
           />
         </FlexItem>
 
-        <FlexItem>
-          <WindowsDrivers updateVM={onSubmit} vm={vm} />
-        </FlexItem>
+        {isWindowsSupported && (
+          <FlexItem>
+            <WindowsDrivers updateVM={onSubmit} vm={vm} />
+          </FlexItem>
+        )}
       </Flex>
       <KubevirtTable
         ariaLabel={t('Disks table')}
