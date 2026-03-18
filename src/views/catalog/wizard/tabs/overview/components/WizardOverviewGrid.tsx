@@ -273,7 +273,7 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
                 />
               ))
             }
-            description={getBootloaderTitleFromVM(vm)}
+            description={getBootloaderTitleFromVM(vm, t)}
             isEdit
             testId="wizard-overview-boot-method"
             title={t('Boot mode')}

@@ -1,6 +1,5 @@
 import { V1Disk } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { InterfaceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 export const PVC_SOURCE_NAME = 'pvc-clone';
 export const HTTP_SOURCE_NAME = 'http';
@@ -53,44 +52,43 @@ export const createInstallationCdromDisk = (arch: string): V1Disk => {
   };
 };
 
-export const CUSTOMIZE_TEMPLATE_TITLE = t('Customize template parameters');
+export const CUSTOMIZE_TEMPLATE_TITLE = 'Customize template parameters';
 
 export const sourceOptions = {
   [BLANK_SOURCE_NAME]: {
-    description: t('Create a new blank PVC'),
-    label: t('Blank'),
+    description: 'Create a new blank PVC',
+    label: 'Blank',
     type: BLANK_SOURCE_NAME,
   },
   [CONTAINER_DISK_SOURCE_NAME]: {
-    description: t('Import content via container registry.'),
-    label: t('Registry (ContainerDisk)'),
+    description: 'Import content via container registry.',
+    label: 'Registry (ContainerDisk)',
     type: CONTAINER_DISK_SOURCE_NAME,
   },
   [DEFAULT_SOURCE]: {
-    description: t('Use the default Template disk source'),
-    label: t('Template default'),
+    description: 'Use the default Template disk source',
+    label: 'Template default',
     type: DEFAULT_SOURCE,
   },
   [HTTP_SOURCE_NAME]: {
-    description: t('Import content via URL (HTTP or HTTPS endpoint).'),
-    label: t('URL (creates PVC)'),
+    description: 'Import content via URL (HTTP or HTTPS endpoint).',
+    label: 'URL (creates PVC)',
     type: HTTP_SOURCE_NAME,
   },
   [PVC_SOURCE_NAME]: {
-    description: t(
+    description:
       'Select an existing persistent volume claim already available on the cluster and clone it.',
-    ),
-    label: t('PVC (clone PVC)'),
+    label: 'PVC (clone PVC)',
     type: PVC_SOURCE_NAME,
   },
   [REGISTRY_SOURCE_NAME]: {
-    description: t('Import content via container registry.'),
-    label: t('Registry (creates PVC)'),
+    description: 'Import content via container registry.',
+    label: 'Registry (creates PVC)',
     type: REGISTRY_SOURCE_NAME,
   },
   [UPLOAD_SOURCE_NAME]: {
-    description: t('Upload a new file to a PVC. A new PVC will be created.'),
-    label: t('Upload (Upload a new file to a PVC)'),
+    description: 'Upload a new file to a PVC. A new PVC will be created.',
+    label: 'Upload (Upload a new file to a PVC)',
     type: UPLOAD_SOURCE_NAME,
   },
 };

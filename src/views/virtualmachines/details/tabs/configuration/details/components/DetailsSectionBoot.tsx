@@ -61,7 +61,7 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
       <DescriptionItem
         descriptionData={
           <div className={classNames({ 'pf-v6-u-text-color-subtle': !canUpdateVM })}>
-            {getBootloaderTitleFromVM(instanceTypeVM || vm, preferredBootmode)}
+            {getBootloaderTitleFromVM(instanceTypeVM || vm, t, preferredBootmode)}
           </div>
         }
         onEditClick={() =>
