@@ -19,7 +19,7 @@ import {
   getVMURL,
   isACMPath,
 } from '@multicluster/urls';
-import { TreeViewDataItem } from '@patternfly/react-core';
+import { Tooltip, TreeViewDataItem } from '@patternfly/react-core';
 import {
   ClusterIcon,
   FolderIcon,
@@ -168,7 +168,11 @@ const createProjectTreeItem = (
     customBadgeContent: projectMap[project]?.count || '0',
     defaultExpanded: currentPageNamespace === project && clusterSelected,
     href: `${getVMListNamespacesURL(cluster, project)}${removeFolderLabelQuery(queryParams) || ''}`,
-    icon: <ProjectDiagramIcon />,
+    icon: (
+      <Tooltip content={t('Project')}>
+        <ProjectDiagramIcon />
+      </Tooltip>
+    ),
     id: projectTreeItemID,
     name: project,
   };
@@ -190,7 +194,7 @@ const createAllNamespacesTreeItem = (
     defaultExpanded: true,
     hasBadge: false,
     href: `${getVMListURL()}${removeFolderLabelQuery(queryParams) || ''}`,
-    icon: <ProjectDiagramIcon />,
+    icon: <ClusterIcon />,
     id: ALL_NAMESPACES_SESSION_KEY,
     name: t(LOCAL_CLUSTER),
   };
@@ -323,7 +327,11 @@ export const createMultiClusterTreeViewData = (
         defaultExpanded: clusterSelected,
         hasBadge: false,
         href: getACMVMListURL(clusterName),
-        icon: <ClusterIcon />,
+        icon: (
+          <Tooltip content={t('Cluster')}>
+            <ClusterIcon />
+          </Tooltip>
+        ),
         id: `${CLUSTER_SELECTOR_PREFIX}/${clusterName}`,
         name: clusterName,
       };
