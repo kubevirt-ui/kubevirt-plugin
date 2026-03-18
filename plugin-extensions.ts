@@ -534,7 +534,7 @@ const extensions: EncodedExtension[] = [
   },
   {
     properties: {
-      href: 'hardwaredevices',
+      href: '/hardwaredevices',
       id: 'hardwaredevices',
       insertBefore: 'baremetalhosts',
       name: '%plugin__kubevirt-plugin~Hardware Devices%',
