@@ -46,3 +46,5 @@ const labels2types: LabelMap = Object.fromEntries(
 
 export const interfaceTypesProxy = new Proxy<TypeMap>(types2labels, typeHandler);
 export const interfaceLabelsProxy = new Proxy<LabelMap>(labels2types, labelHandler);
+
+export const POD_NETWORK_SORT_KEY = 'pod-network';

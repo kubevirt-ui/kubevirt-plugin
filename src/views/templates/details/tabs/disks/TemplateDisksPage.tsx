@@ -1,4 +1,4 @@
-import React, { FC, useCallback } from 'react';
+import React, { FC, useCallback, useMemo } from 'react';
 
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -6,22 +6,23 @@ import DiskListTitle from '@kubevirt-utils/components/DiskListTitle/DiskListTitl
 import DiskSourceSelect from '@kubevirt-utils/components/DiskModal/components/DiskSourceSelect/DiskSourceSelect';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
 import { SourceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
+import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { replaceTemplateVM, updateTemplate } from '@kubevirt-utils/resources/template';
-import {
-  ListPageFilter,
-  useListPageFilter,
-  VirtualizedTable,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { ListPageFilter, useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { PageSection, Stack, StackItem } from '@patternfly/react-core';
 
 import useEditTemplateAccessReview from '../../hooks/useIsTemplateEditable';
 
-import DiskRow from './components/DiskRow';
-import useDiskColumns from './hooks/useDiskColumns';
 import useDisksFilters from './hooks/useDisksFilters';
 import useTemplateDisksTableData from './hooks/useTemplateDisksTableData';
+import {
+  getTemplateDiskColumns,
+  getTemplateDiskRowId,
+  TemplateDiskCallbacks,
+} from './templateDisksTableDefinition';
 import { getTemplateVMWithNamespace } from './utils';
 
 type TemplateDisksPageProps = {
@@ -29,12 +30,13 @@ type TemplateDisksPageProps = {
 };
 
 const TemplateDisksPage: FC<TemplateDisksPageProps> = ({ obj: template }) => {
+  const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const columns = useDiskColumns();
-  const [disks, disksLoaded] = useTemplateDisksTableData(template);
+  const [disks, disksLoaded, loadError] = useTemplateDisksTableData(template);
   const filters = useDisksFilters();
   const [data, filteredData, onFilterChange] = useListPageFilter(disks, filters);
   const vm = getTemplateVMWithNamespace(template);
+  const columns = useMemo(() => getTemplateDiskColumns(t), [t]);
 
   const { isTemplateEditable } = useEditTemplateAccessReview(template);
 
@@ -45,12 +47,17 @@ const TemplateDisksPage: FC<TemplateDisksPageProps> = ({ obj: template }) => {
     [template],
   );
 
+  const callbacks: TemplateDiskCallbacks = useMemo(
+    () => ({ actionsDisabled: !isTemplateEditable, onUpdate, vm }),
+    [isTemplateEditable, onUpdate, vm],
+  );
+
   return (
     <PageSection>
       <SidebarEditor<V1Template> onResourceUpdate={updateTemplate} resource={template}>
         <Stack hasGutter>
           <DiskListTitle />
-          {isTemplateEditable && (
+          {isTemplateEditable && vm && (
             <StackItem>
               <DiskSourceSelect
                 onSelect={(diskSource: SourceTypes) => {
@@ -75,13 +82,18 @@ const TemplateDisksPage: FC<TemplateDisksPageProps> = ({ obj: template }) => {
               onFilterChange={onFilterChange}
               rowFilters={filters}
             />
-            <VirtualizedTable
+            <KubevirtTable
+              ariaLabel={t('Template disks table')}
+              callbacks={callbacks}
               columns={columns}
               data={filteredData}
+              dataTest="template-disks-table"
+              fixedLayout
+              getRowId={getTemplateDiskRowId}
+              initialSortKey="name"
               loaded={disksLoaded}
-              loadError={undefined}
-              Row={DiskRow}
-              rowData={{ actionsDisabled: !isTemplateEditable, onUpdate, vm }}
+              loadError={loadError}
+              noDataMsg={t('No disks found')}
               unfilteredData={data}
             />
           </StackItem>
