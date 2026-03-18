@@ -36,14 +36,11 @@ export const getMigrationCompletedTimestamp = (
 export const getVolumeCountFromMigPlan = (
   migrationPlan: MultiNamespaceVirtualMachineStorageMigrationPlan,
 ) => {
-  return (migrationPlan?.spec?.namespaces || [])
-    .flatMap(
-      (namespaceMigration) =>
-        namespaceMigration?.virtualMachines?.flatMap((vm) =>
-          vm?.targetMigrationPVCs?.filter((pvc) => !isEmpty(pvc.destinationPVC)),
-        ).length,
-    )
-    .reduce((acc, curr) => acc + curr, 0);
+  return (migrationPlan?.spec?.namespaces ?? []).flatMap((namespaceMigration) =>
+    (namespaceMigration?.virtualMachines ?? []).flatMap((vm) =>
+      (vm?.targetMigrationPVCs ?? []).filter((pvc) => !isEmpty(pvc.destinationPVC)),
+    ),
+  ).length;
 };
 
 export const isMigrationCompleted = (

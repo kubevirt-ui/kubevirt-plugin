@@ -5,7 +5,7 @@ import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm';
 import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 
 type NodeLinkProps = {
-  cluster: string;
+  cluster?: string;
   nodeName: string;
 };
 

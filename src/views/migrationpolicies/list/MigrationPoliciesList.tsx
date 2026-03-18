@@ -1,25 +1,32 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 
-import { MigrationPolicyModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
+import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useKubevirtTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtTableColumns';
 import useMigrationPolicies from '@kubevirt-utils/hooks/useMigrationPolicies';
 import useSelectedRowFilterClusters from '@kubevirt-utils/hooks/useSelectedRowFilterClusters';
 import { ListPageProps } from '@kubevirt-utils/utils/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import {
   ListPageBody,
   ListPageHeader,
   useListPageFilter,
-  VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
+
+import { COLUMN_MANAGEMENT_ID_MIGRATION_POLICIES } from '../utils/constants';
 
 import MigrationPoliciesCreateButton from './components/MigrationPoliciesCreateButton/MigrationPoliciesCreateButton';
 import MigrationPoliciesEmptyState from './components/MigrationPoliciesEmptyState/MigrationPoliciesEmptyState';
-import MigrationPoliciesRow from './components/MigrationPoliciesRow/MigrationPoliciesRow';
 import useMigrationPoliciesFilters from './hooks/useMigrationPoliciesFilters';
-import useMigrationPoliciesListColumns from './hooks/useMigrationPoliciesListColumns';
+import {
+  getMigrationPoliciesColumns,
+  getMigrationPoliciesRowId,
+} from './migrationPoliciesDefinition';
 
 const MigrationPoliciesList: FC<ListPageProps> = ({
   fieldSelector,
@@ -32,18 +39,46 @@ const MigrationPoliciesList: FC<ListPageProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const filteredClusters = useSelectedRowFilterClusters();
+  const isACMPage = useIsACMPage();
+  const isAllClustersPage = useIsAllClustersPage();
 
   const [mps, loaded, loadError] = useMigrationPolicies(fieldSelector, selector);
 
-  const [columns, activeColumns, loadedColumns] = useMigrationPoliciesListColumns();
+  const showClusterColumn = isACMPage && isAllClustersPage;
+
+  const columns = useMemo(
+    () => getMigrationPoliciesColumns(t, showClusterColumn),
+    [t, showClusterColumn],
+  );
+
+  const { activeColumnKeys, loaded: loadedColumns } = useKubevirtTableColumns({
+    columnManagementID: COLUMN_MANAGEMENT_ID_MIGRATION_POLICIES,
+    columns,
+  });
 
   const filters = useMigrationPoliciesFilters();
 
-  const [unfilteredData, data, onFilterChange] = useListPageFilter(mps, filters, {
+  const [unfilteredData, data, onFilterChange] = useListPageFilter<
+    V1alpha1MigrationPolicy,
+    V1alpha1MigrationPolicy
+  >(mps, filters, {
     name: { selected: [nameFilter] },
   });
 
-  if (loaded && isEmpty(unfilteredData) && isEmpty(filteredClusters)) {
+  const columnLayout = useMemo(
+    () =>
+      buildColumnLayout(
+        columns,
+        activeColumnKeys,
+        COLUMN_MANAGEMENT_ID_MIGRATION_POLICIES,
+        t('MigrationPolicy'),
+      ),
+    [columns, activeColumnKeys, t],
+  );
+
+  const isLoaded = loaded && loadedColumns;
+
+  if (isLoaded && !loadError && isEmpty(unfilteredData) && isEmpty(filteredClusters)) {
     return <MigrationPoliciesEmptyState />;
   }
 
@@ -55,33 +90,25 @@ const MigrationPoliciesList: FC<ListPageProps> = ({
 
       <ListPageBody>
         <ListPageFilter
-          columnLayout={{
-            columns: columns?.map(({ additional, id, title }) => ({
-              additional,
-              id,
-              title,
-            })),
-            id: MigrationPolicyModelRef,
-            selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
-            type: t('MigrationPolicy'),
-          }}
+          columnLayout={columnLayout}
           data={unfilteredData}
           filtersWithSelect={filters}
           hideColumnManagement={hideColumnManagement}
           hideLabelFilter={hideTextFilter}
           hideNameLabelFilters={hideNameLabelFilters}
-          loaded={loadedColumns}
+          loaded={isLoaded}
           onFilterChange={onFilterChange}
         />
-        <VirtualizedTable<V1alpha1MigrationPolicy>
-          EmptyMsg={() => (
-            <div className="pf-v6-u-text-align-center">{t('No MigrationPolicies found')}</div>
-          )}
-          columns={activeColumns}
-          data={data}
-          loaded={loaded && loadedColumns}
+        <KubevirtTable
+          activeColumnKeys={activeColumnKeys}
+          ariaLabel={t('MigrationPolicies table')}
+          columns={columns}
+          data={data ?? []}
+          dataTest="migration-policies-list"
+          getRowId={getMigrationPoliciesRowId}
+          loaded={isLoaded}
           loadError={loadError}
-          Row={MigrationPoliciesRow}
+          noDataMsg={t('No MigrationPolicies found')}
           unfilteredData={unfilteredData}
         />
       </ListPageBody>

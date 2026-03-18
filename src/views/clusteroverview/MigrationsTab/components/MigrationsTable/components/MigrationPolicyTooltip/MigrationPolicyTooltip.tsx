@@ -54,6 +54,9 @@ const MigrationPolicyTooltip: React.FC<MigrationPolicyTooltipProps> = ({ obj }) 
     );
   }, [obj]);
 
+  const migrationPolicyName = obj?.vmiObj?.status?.migrationState?.migrationPolicyName;
+  const hasTooltipContent = !isEmpty(mpConfig) || !isEmpty(defaultConfig);
+
   return (
     <Tooltip
       content={
@@ -85,14 +88,16 @@ const MigrationPolicyTooltip: React.FC<MigrationPolicyTooltipProps> = ({ obj }) 
         </>
       }
     >
-      {obj?.vmiObj?.status?.migrationState?.migrationPolicyName ? (
+      {migrationPolicyName ? (
         <MulticlusterResourceLink
           cluster={getCluster(obj?.vmiObj)}
           groupVersionKind={MigrationPolicyModelGroupVersionKind}
-          name={obj?.vmiObj?.status?.migrationState?.migrationPolicyName}
+          name={migrationPolicyName}
         />
       ) : (
-        <MutedTextSpan text={t('No MigrationPolicy')} />
+        <span tabIndex={hasTooltipContent ? 0 : undefined}>
+          <MutedTextSpan text={t('No MigrationPolicy')} />
+        </span>
       )}
     </Tooltip>
   );

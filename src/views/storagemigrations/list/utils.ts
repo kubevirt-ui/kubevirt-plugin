@@ -11,11 +11,11 @@ export const getStorageClassesFromMigPlan = (
 ): string[] =>
   Array.from(
     new Set(
-      migrationPlan?.spec?.namespaces?.flatMap((namespace) =>
-        namespace.virtualMachines.flatMap((vm) =>
-          vm.targetMigrationPVCs
+      (migrationPlan?.spec?.namespaces ?? []).flatMap((namespace) =>
+        (namespace?.virtualMachines ?? []).flatMap((vm) =>
+          (vm?.targetMigrationPVCs ?? [])
             .map((pvc) => pvc.destinationPVC?.storageClassName)
-            ?.filter(Boolean),
+            .filter(Boolean),
         ),
       ),
     ),
