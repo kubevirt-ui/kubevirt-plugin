@@ -1821,6 +1821,7 @@
   "Standard ResourceQuota detected on project": "Standard ResourceQuota detected on project",
   "Start": "开始",
   "Start in pause mode": "以暂停模式启动",
+  "Start the step-by-step guidance while using the app": "Start the step-by-step guidance while using the app",
   "Start this VirtualMachine after creation": "创建后启动此虚拟机",
   "Start this VirtualMachine after creation ({{runStrategy}})": "创建后启动此虚拟机 ({{runStrategy}})",
   "Start this VirtualMachine in pause mode": "以暂停模式启动这个 VirtualMachine",
