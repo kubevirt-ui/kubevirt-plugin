@@ -7,13 +7,15 @@ import {
   Button,
   ButtonProps,
   ButtonVariant,
-  Content,
-  ContentVariants,
   EmptyState,
   EmptyStateActions,
   EmptyStateBody,
   EmptyStateFooter,
   EmptyStateVariant,
+  HelperText,
+  HelperTextItem,
+  Stack,
+  StackItem,
 } from '@patternfly/react-core';
 import { SearchIcon } from '@patternfly/react-icons';
 
@@ -62,26 +64,34 @@ const CheckupsEmptyState: FC<CheckupsEmptyState> = ({
       <EmptyStateFooter>
         {topFooterActions}
         {!isAllNamespaces && (
-          <>
-            <EmptyStateActions>
-              <Button
-                aria-describedby={
-                  isDisabled && !isLoading ? 'permissions-button-helper' : undefined
-                }
-                isDisabled={isDisabled || isLoading}
-                isLoading={isLoading}
-                onClick={onClick}
-                variant={isLoading ? ButtonVariant.plain : ButtonVariant.secondary}
-              >
-                {!isLoading && isPermitted ? t('Remove permissions') : t('Install permissions')}
-              </Button>
-            </EmptyStateActions>
-            {isDisabled && !isLoading && (
-              <Content component={ContentVariants.small} id="permissions-button-helper">
-                {t('Contact your cluster administrator to manage permissions.')}
-              </Content>
-            )}
-          </>
+          <EmptyStateActions>
+            <Stack hasGutter>
+              <StackItem>
+                <Button
+                  aria-describedby={
+                    isDisabled && !isLoading ? 'permissions-button-helper' : undefined
+                  }
+                  isDisabled={isDisabled || isLoading}
+                  isLoading={isLoading}
+                  onClick={onClick}
+                  variant={isLoading ? ButtonVariant.plain : ButtonVariant.secondary}
+                >
+                  {!isLoading && isPermitted ? t('Remove permissions') : t('Install permissions')}
+                </Button>
+              </StackItem>
+              {isDisabled && !isLoading && (
+                <StackItem>
+                  <HelperText id="permissions-button-helper">
+                    <HelperTextItem>
+                      {t(
+                        'Cluster-admin permissions required. Contact your cluster administrator for assistance.',
+                      )}
+                    </HelperTextItem>
+                  </HelperText>
+                </StackItem>
+              )}
+            </Stack>
+          </EmptyStateActions>
         )}
         {bottomFooterActions}
         <EmptyStateActions>
