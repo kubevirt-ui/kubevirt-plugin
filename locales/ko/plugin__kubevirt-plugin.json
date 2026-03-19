@@ -416,6 +416,7 @@
   "Cluster scope migrations": "클러스터 범위 마이그레이션",
   "Cluster status": "Cluster status",
   "Cluster utilization": "Cluster utilization",
+  "Cluster-admin permissions required. Contact your cluster administrator for assistance.": "Cluster-admin permissions required. Contact your cluster administrator for assistance.",
   "Cluster-scoped": "Cluster-scoped",
   "Cluster-wide UserDefinedNetworks": "Cluster-wide UserDefinedNetworks",
   "Cluster: {{clusterName}}": "클러스터: {{clusterName}}",

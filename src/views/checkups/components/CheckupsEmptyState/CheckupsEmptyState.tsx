@@ -12,6 +12,10 @@ import {
   EmptyStateBody,
   EmptyStateFooter,
   EmptyStateVariant,
+  HelperText,
+  HelperTextItem,
+  Stack,
+  StackItem,
 } from '@patternfly/react-core';
 import { SearchIcon } from '@patternfly/react-icons';
 
@@ -61,14 +65,32 @@ const CheckupsEmptyState: FC<CheckupsEmptyState> = ({
         {topFooterActions}
         {!isAllNamespaces && (
           <EmptyStateActions>
-            <Button
-              isDisabled={isDisabled || isLoading}
-              isLoading={isLoading}
-              onClick={onClick}
-              variant={isLoading ? ButtonVariant.plain : ButtonVariant.secondary}
-            >
-              {!isLoading && isPermitted ? t('Remove permissions') : t('Install permissions')}
-            </Button>
+            <Stack hasGutter>
+              <StackItem>
+                <Button
+                  aria-describedby={
+                    isDisabled && !isLoading ? 'permissions-button-helper' : undefined
+                  }
+                  isDisabled={isDisabled || isLoading}
+                  isLoading={isLoading}
+                  onClick={onClick}
+                  variant={isLoading ? ButtonVariant.plain : ButtonVariant.secondary}
+                >
+                  {!isLoading && isPermitted ? t('Remove permissions') : t('Install permissions')}
+                </Button>
+              </StackItem>
+              {isDisabled && !isLoading && (
+                <StackItem>
+                  <HelperText id="permissions-button-helper">
+                    <HelperTextItem>
+                      {t(
+                        'Cluster-admin permissions required. Contact your cluster administrator for assistance.',
+                      )}
+                    </HelperTextItem>
+                  </HelperText>
+                </StackItem>
+              )}
+            </Stack>
           </EmptyStateActions>
         )}
         {bottomFooterActions}
