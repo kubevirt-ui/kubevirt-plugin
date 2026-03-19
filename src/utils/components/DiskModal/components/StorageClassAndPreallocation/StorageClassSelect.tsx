@@ -5,6 +5,7 @@ import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFi
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import useDefaultStorageClass from '@kubevirt-utils/hooks/useDefaultStorage/useDefaultStorageClass';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useReadyStorageClasses from '@kubevirt-utils/hooks/useReadyStorageClasses/useReadyStorageClasses';
 import { StorageClassModel } from '@kubevirt-utils/models';
 import { convertResourceArrayToMap, getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -36,9 +37,10 @@ const StorageClassSelect: FC<StorageClassSelectProps> = ({ checkSC, setShowSCAle
     VM_CLUSTER_FIELD,
   ]);
 
-  const [{ clusterDefaultStorageClass, storageClasses }, loaded] =
-    useDefaultStorageClass(vmCluster);
+  const [{ clusterDefaultStorageClass }, defaultSCLoaded] = useDefaultStorageClass(vmCluster);
+  const [{ readyStorageClasses }, readySCLoaded] = useReadyStorageClasses(vmCluster);
 
+  const loaded = defaultSCLoaded && readySCLoaded;
   const defaultSC = useMemo(() => clusterDefaultStorageClass, [clusterDefaultStorageClass]);
 
   const checkAndShowAlerts = useCallback(
@@ -46,7 +48,10 @@ const StorageClassSelect: FC<StorageClassSelectProps> = ({ checkSC, setShowSCAle
     [blankSource, setShowSCAlert, checkSC],
   );
 
-  const scMapper = useMemo(() => convertResourceArrayToMap(storageClasses), [storageClasses]);
+  const scMapper = useMemo(
+    () => convertResourceArrayToMap(readyStorageClasses),
+    [readyStorageClasses],
+  );
   const onSelect = useCallback(
     (selection: string) => {
       checkAndShowAlerts(selection);
@@ -76,7 +81,7 @@ const StorageClassSelect: FC<StorageClassSelectProps> = ({ checkSC, setShowSCAle
                 isFullWidth: true,
                 placeholder: t('Select {{label}}', { label: StorageClassModel.label }),
               }}
-              options={getSCSelectOptions(storageClasses)}
+              options={getSCSelectOptions(readyStorageClasses)}
               popperProps={{ enableFlip: true }}
               selected={value}
               setSelected={onSelect}

@@ -13,12 +13,16 @@ const useStorageProfileClaimPropertySets = (
   storageClassName: string,
   cluster?: string,
 ): UseStorageProfileClaimPropertySetsValue => {
-  const [storageProfile, loaded, error] = useK8sWatchData<StorageProfile>({
-    cluster,
-    groupVersionKind: modelToGroupVersionKind(StorageProfileModel),
-    isList: false,
-    name: storageClassName,
-  });
+  const [storageProfile, loaded, error] = useK8sWatchData<StorageProfile>(
+    storageClassName
+      ? {
+          cluster,
+          groupVersionKind: modelToGroupVersionKind(StorageProfileModel),
+          isList: false,
+          name: storageClassName,
+        }
+      : null,
+  );
 
   const errorState = !storageClassName || !loaded || error;
 
