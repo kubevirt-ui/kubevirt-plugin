@@ -27,6 +27,7 @@ export const PVC_ACCESS_MODE = 'ReadWriteOnce';
 export const PVC_STORAGE_SIZE = '10Gi'; // Default/fallback size
 export const PVC_STORAGE_SIZE_PER_SUITE = '2Gi';
 export const PVC_STORAGE_SIZE_TIER2 = '10Gi';
+export const CDI_APPLY_STORAGE_PROFILE_LABEL = 'cdi.kubevirt.io/applyStorageProfile';
 
 // ===========================
 // Job API Constants

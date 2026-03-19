@@ -38,6 +38,7 @@ import {
 } from '../constants';
 
 import {
+  CDI_APPLY_STORAGE_PROFILE_LABEL,
   JOB_API_VERSION,
   JOB_BACKOFF_LIMIT,
   JOB_CONTAINER_NAME,
@@ -110,7 +111,10 @@ export const selfValidationPVC = (
     apiVersion: 'v1',
     kind: 'PersistentVolumeClaim',
     metadata: {
-      labels: { [KUBEVIRT_VM_LATENCY_LABEL]: SELF_VALIDATION_LABEL_VALUE },
+      labels: {
+        [CDI_APPLY_STORAGE_PROFILE_LABEL]: 'true',
+        [KUBEVIRT_VM_LATENCY_LABEL]: SELF_VALIDATION_LABEL_VALUE,
+      },
       name: jobName,
       namespace,
     },
