@@ -7,18 +7,17 @@ import classNames from 'classnames';
 import {
   modelToGroupVersionKind,
   PersistentVolumeClaimModel,
-  StorageClassModel,
   TemplateModel,
   V1Template,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { createUploadPVC } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
+import useReadyStorageClasses from '@kubevirt-utils/hooks/useReadyStorageClasses/useReadyStorageClasses';
 import {
   TEMPLATE_TYPE_BASE,
   TEMPLATE_TYPE_LABEL,
@@ -26,7 +25,6 @@ import {
 } from '@kubevirt-utils/resources/template';
 import {
   K8sVerb,
-  useAccessReview,
   useK8sWatchResource,
   WatchK8sResource,
 } from '@openshift-console/dynamic-plugin-sdk';
@@ -106,20 +104,8 @@ const UploadPVCPage: FC = () => {
 
   const [goldenPvcs, loadedPvcs, errorPvcs] = useBaseImages(allowedTemplates);
   const { uploadData, uploadProxyURL, uploads } = useContext(CDIUploadContext);
-  const [scAllowed, scAllowedLoading] = useAccessReview({
-    group: StorageClassModel.apiGroup,
-    resource: StorageClassModel.plural,
-    verb: 'list',
-  });
-  const [storageClasses, scLoaded] = useK8sWatchResource<IoK8sApiStorageV1StorageClass[]>(
-    scAllowed
-      ? {
-          groupVersionKind: modelToGroupVersionKind(StorageClassModel),
-          isList: true,
-          namespaced: false,
-        }
-      : null,
-  );
+
+  const [{ readyStorageClasses }, scLoaded] = useReadyStorageClasses();
 
   const namespaceParam = useNamespaceParam();
   const namespace = getNamespace(dvObj) || namespaceParam;
@@ -216,16 +202,11 @@ const UploadPVCPage: FC = () => {
             osParam={osParam}
             setDisableFormSubmit={setDisableFormSubmit}
             setIsFileRejected={setIsFileRejected}
-            storageClasses={storageClasses}
+            storageClasses={readyStorageClasses}
           />
           <UploadPVCButtonBar
             inProgress={
-              rbacLoading ||
-              scAllowedLoading ||
-              !scLoaded ||
-              !loadedTemplates ||
-              !loadedPvcs ||
-              isCheckingCertificate
+              rbacLoading || !scLoaded || !loadedTemplates || !loadedPvcs || isCheckingCertificate
             }
             errorMessage={error}
             uploadProxyURL={uploadProxyURL}

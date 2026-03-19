@@ -1,17 +1,14 @@
-import React, { Dispatch, FC, SetStateAction, useCallback, useEffect, useMemo } from 'react';
+import React, { Dispatch, FC, SetStateAction, useCallback, useEffect } from 'react';
 
-import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import {
-  getDefaultStorageClass,
-  getSCSelectOptions,
-} from '@kubevirt-utils/components/DiskModal/components/StorageClassAndPreallocation/utils/helpers';
+import { getSCSelectOptions } from '@kubevirt-utils/components/DiskModal/components/StorageClassAndPreallocation/utils/helpers';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
+import useDefaultStorageClass from '@kubevirt-utils/hooks/useDefaultStorage/useDefaultStorageClass';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { modelToGroupVersionKind, StorageClassModel } from '@kubevirt-utils/models';
+import useReadyStorageClasses from '@kubevirt-utils/hooks/useReadyStorageClasses/useReadyStorageClasses';
+import { StorageClassModel } from '@kubevirt-utils/models';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { FormGroup } from '@patternfly/react-core';
 
 type StorageClassSelectProps = {
@@ -33,32 +30,35 @@ const StorageClassSelect: FC<StorageClassSelectProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const [storageClasses, loaded] = useK8sWatchData<IoK8sApiStorageV1StorageClass[]>({
-    cluster,
-    groupVersionKind: modelToGroupVersionKind(StorageClassModel),
-    isList: true,
-  });
+  const [{ clusterDefaultStorageClass }, defaultSCLoaded] = useDefaultStorageClass(cluster);
+  const [{ readyStorageClasses }, readySCLoaded] = useReadyStorageClasses(cluster);
 
-  const defaultSC = useMemo(() => getDefaultStorageClass(storageClasses), [storageClasses]);
+  const loaded = defaultSCLoaded && readySCLoaded;
 
   const onSelect = useCallback(
     (selection: string) => {
       setShowSCAlert(checkSC ? checkSC(selection) : false);
       setStorageClassName(selection);
       setStorageClassProvisioner?.(
-        (storageClasses || []).find((sc) => getName(sc) === selection)?.provisioner,
+        (readyStorageClasses || []).find((sc) => getName(sc) === selection)?.provisioner,
       );
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [storageClasses],
+    [readyStorageClasses],
   );
 
   useEffect(() => {
-    if (!storageClass && loaded && !isEmpty(defaultSC)) {
-      setStorageClassName(defaultSC?.metadata?.name);
-      setStorageClassProvisioner?.(defaultSC?.provisioner);
+    if (!storageClass && loaded && !isEmpty(clusterDefaultStorageClass)) {
+      setStorageClassName(getName(clusterDefaultStorageClass));
+      setStorageClassProvisioner?.(clusterDefaultStorageClass?.provisioner);
     }
-  }, [defaultSC, setStorageClassName, setStorageClassProvisioner, storageClass, loaded]);
+  }, [
+    clusterDefaultStorageClass,
+    setStorageClassName,
+    setStorageClassProvisioner,
+    storageClass,
+    loaded,
+  ]);
 
   return (
     <FormGroup fieldId="storage-class" label={t('StorageClass')}>
@@ -69,9 +69,9 @@ const StorageClassSelect: FC<StorageClassSelectProps> = ({
               isFullWidth: true,
               placeholder: t('Select {{label}}', { label: StorageClassModel.label }),
             }}
-            options={getSCSelectOptions(storageClasses)}
+            options={getSCSelectOptions(readyStorageClasses)}
             popperProps={{ enableFlip: true }}
-            selected={storageClass || defaultSC?.metadata?.name}
+            selected={storageClass || getName(clusterDefaultStorageClass)}
             setSelected={onSelect}
           />
         ) : (

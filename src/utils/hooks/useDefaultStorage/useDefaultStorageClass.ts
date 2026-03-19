@@ -1,11 +1,8 @@
 import { useMemo } from 'react';
 
-import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { StorageClassModel } from '@kubevirt-utils/models';
-import { getName } from '@kubevirt-utils/resources/shared';
+import useStorageClasses from '@kubevirt-utils/hooks/useStorageClasses/useStorageClasses';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 import { isEmpty } from '../../utils/utils';
 
@@ -17,8 +14,6 @@ import {
 type UseDefaultStorageClass = (cluster?: string) => [
   {
     clusterDefaultStorageClass: IoK8sApiStorageV1StorageClass;
-    sortedStorageClasses: string[];
-    storageClasses: IoK8sApiStorageV1StorageClass[];
     virtDefaultStorageClass: IoK8sApiStorageV1StorageClass;
   },
   boolean,
@@ -26,12 +21,8 @@ type UseDefaultStorageClass = (cluster?: string) => [
 
 const useDefaultStorageClass: UseDefaultStorageClass = (cluster) => {
   const clusterParam = useClusterParam();
-
-  const [storageClasses, loaded] = useK8sWatchData<IoK8sApiStorageV1StorageClass[]>({
-    cluster: cluster || clusterParam,
-    groupVersionKind: modelToGroupVersionKind(StorageClassModel),
-    isList: true,
-  });
+  const resolvedCluster = cluster || clusterParam;
+  const [storageClasses, loaded] = useStorageClasses(resolvedCluster);
 
   const defaultStorageClass = useMemo(() => {
     const defaultSC = { clusterDefaultStorageClass: null, virtDefaultStorageClass: null };
@@ -50,12 +41,7 @@ const useDefaultStorageClass: UseDefaultStorageClass = (cluster) => {
     }, defaultSC);
   }, [storageClasses, loaded]);
 
-  const sortedStorageClasses = useMemo(
-    () => storageClasses?.map(getName)?.sort(),
-    [storageClasses],
-  );
-
-  return [{ ...defaultStorageClass, sortedStorageClasses, storageClasses }, loaded];
+  return [defaultStorageClass, loaded];
 };
 
 export default useDefaultStorageClass;

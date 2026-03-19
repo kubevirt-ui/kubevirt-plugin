@@ -12,6 +12,7 @@ import { initialSysprepData } from '@kubevirt-utils/components/SSHSecretModal/ut
 import { SSHSecretDetails } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import useDefaultStorageClass from '@kubevirt-utils/hooks/useDefaultStorage/useDefaultStorageClass';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useReadyStorageClasses from '@kubevirt-utils/hooks/useReadyStorageClasses/useReadyStorageClasses';
 import { getName } from '@kubevirt-utils/resources/shared';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useIsACMPage from '@multicluster/useIsACMPage';
@@ -28,8 +29,11 @@ const DetailsRightGrid: FC = () => {
   const isACMPage = useIsACMPage();
   const cluster = useClusterParam();
   const { createModal } = useModal();
-  const [{ clusterDefaultStorageClass, sortedStorageClasses, virtDefaultStorageClass }, loaded] =
+  const [{ clusterDefaultStorageClass, virtDefaultStorageClass }, defaultSCLoaded] =
     useDefaultStorageClass();
+  const [{ sortedStorageClasses }, readySCLoaded] = useReadyStorageClasses();
+
+  const loaded = defaultSCLoaded && readySCLoaded;
   const isWindowsOSVolume = useIsWindowsBootableVolume();
 
   const {

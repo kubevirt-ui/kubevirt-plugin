@@ -6,6 +6,7 @@ import Loading from '@kubevirt-utils/components/Loading/Loading';
 import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
 import useDefaultStorageClass from '@kubevirt-utils/hooks/useDefaultStorage/useDefaultStorageClass';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useReadyStorageClasses from '@kubevirt-utils/hooks/useReadyStorageClasses/useReadyStorageClasses';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { isDNS1123Label } from '@kubevirt-utils/utils/validation';
@@ -65,8 +66,10 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
     selectedMigrations,
   ]);
 
-  const [{ clusterDefaultStorageClass, sortedStorageClasses }, scLoaded] =
-    useDefaultStorageClass(cluster);
+  const [{ clusterDefaultStorageClass }, defaultSCLoaded] = useDefaultStorageClass(cluster);
+  const [{ sortedStorageClasses }, readySCLoaded] = useReadyStorageClasses(cluster);
+
+  const scLoaded = defaultSCLoaded && readySCLoaded;
 
   const defaultStorageClassName = useMemo(
     () => getName(clusterDefaultStorageClass),
