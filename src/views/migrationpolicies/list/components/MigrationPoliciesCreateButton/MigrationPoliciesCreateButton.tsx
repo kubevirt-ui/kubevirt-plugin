@@ -10,12 +10,15 @@ import { K8sVerb, ListPageCreateDropdown } from '@openshift-console/dynamic-plug
 import { Button, Tooltip } from '@patternfly/react-core';
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 
-import { createItems } from '../../utils/constants';
-
 const MigrationPoliciesCreateButton: FC = () => {
   const { t } = useKubevirtTranslation();
   const selectedCluster = useSelectedCluster();
   const navigate = useNavigate();
+
+  const createItems = {
+    form: t('From Form'),
+    yaml: t('With YAML'),
+  };
 
   const [canCreateMigrationPolicy] = useFleetAccessReview({
     cluster: selectedCluster,

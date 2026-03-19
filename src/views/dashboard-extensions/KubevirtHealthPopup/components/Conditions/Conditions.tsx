@@ -10,7 +10,7 @@ import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynami
 import { Skeleton, StackItem } from '@patternfly/react-core';
 
 import ConditionIcon from './ConditionIcon';
-import { HCO_HEALTH_METRIC, VALUE_TO_LABLE } from './constants';
+import { HCO_HEALTH_METRIC, VALUE_TO_LABEL } from './constants';
 
 const Conditions: FC = () => {
   const { t } = useKubevirtTranslation();
@@ -23,8 +23,6 @@ const Conditions: FC = () => {
 
   const condition = queryData?.data?.result?.[0]?.value?.[1];
 
-  const label = VALUE_TO_LABLE[condition];
-
   if (!loaded || !hyperLoaded)
     return (
       <StackItem>
@@ -33,6 +31,8 @@ const Conditions: FC = () => {
     );
 
   if (isEmpty(condition)) return null;
+
+  const label = VALUE_TO_LABEL[condition] ? t(VALUE_TO_LABEL[condition]) : condition;
 
   return (
     <>
