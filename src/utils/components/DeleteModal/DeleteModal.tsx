@@ -3,13 +3,13 @@ import { useNavigate } from 'react-router-dom-v5-compat';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import {
   getGroupVersionKindForResource,
   K8sResourceCommon,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { useK8sModel } from '@openshift-console/dynamic-plugin-sdk/lib/utils/k8s/hooks/useK8sModel';
-import { useLastNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { ButtonVariant } from '@patternfly/react-core';
 
 import ConfirmActionMessage from '../ConfirmActionMessage/ConfirmActionMessage';
@@ -40,8 +40,8 @@ const DeleteModal: FC<DeleteModalProps> = memo(
     const navigate = useNavigate();
 
     const [model] = useK8sModel(getGroupVersionKindForResource(obj));
-    const [lastNamespace] = useLastNamespace();
-    const url = redirectUrl || getResourceUrl({ activeNamespace: lastNamespace, model });
+    const namespace = useNamespaceParam();
+    const url = redirectUrl || getResourceUrl({ activeNamespace: namespace, model });
 
     return (
       <TabModal<K8sResourceCommon>

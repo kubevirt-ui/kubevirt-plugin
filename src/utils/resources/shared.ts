@@ -4,7 +4,6 @@ import {
   V1beta1DataSource,
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { V1beta1Condition, V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { TemplateModel } from '@kubevirt-utils/models';
 import { getCluster } from '@multicluster/helpers/selectors';
 import {
@@ -20,7 +19,7 @@ import { FleetAccessReviewResourceAttributes } from '@stolostron/multicluster-sd
 
 import { isDataSourceReady } from '../../views/datasources/utils';
 
-import { isEmpty } from './../utils/utils';
+import { getNamespacePathSegment, isEmpty } from './../utils/utils';
 import { getDataImportCronFromDataSource } from './bootableresources/helpers';
 import type {
   MultiNamespaceVirtualMachineStorageMigrationPlan,
@@ -35,7 +34,7 @@ import { TEMPLATE_TYPE_LABEL } from './template';
 
 /**
  * A selector for a resource's description
- * @param {K8sResourceCommon} entity
+ * @param {K8sResourceCommon} entity - entity to get description from
  * @returns {string} the description for the resource
  */
 export const getDescription = (entity: K8sResourceCommon): string =>
@@ -43,8 +42,8 @@ export const getDescription = (entity: K8sResourceCommon): string =>
 
 /**
  * A selector for a resource's labels
- * @param entity {K8sResourceCommon} - entity to get labels from
- * @param defaultValue {{ [key: string]: string }} - default value to return if no labels are found
+ * @param {K8sResourceCommon} entity - entity to get labels from
+ * @param { { [key: string]: string } } defaultValue - default value to return if no labels are found
  * @returns {{ [key: string]: string }} the labels for the resource
  */
 export const getLabels = (
@@ -54,8 +53,8 @@ export const getLabels = (
 
 /**
  * A selector for the resource's annotations
- * @param entity {K8sResourceCommon} - entity to get annotations from
- * @param defaultValue {{ [key: string]: string }} - default value to return if no annotations are found
+ * @param {K8sResourceCommon} entity - entity to get annotations from
+ * @param { { [key: string]: string } } defaultValue - default value to return if no annotations are found
  * @returns {{ [key: string]: string }} the annotations for the resource
  */
 export const getAnnotations = (
@@ -103,10 +102,8 @@ export const getResourceUrl = (urlProps: ResourceUrlProps): string => {
   if (!model) return null;
   const { crd, namespaced, plural } = model;
 
-  const namespace =
-    resource?.metadata?.namespace ||
-    (activeNamespace !== ALL_NAMESPACES_SESSION_KEY && activeNamespace);
-  const namespaceUrl = namespace ? `ns/${namespace}` : 'all-namespaces';
+  const namespace = getNamespace(resource) ?? activeNamespace;
+  const namespaceUrl = getNamespacePathSegment(namespace);
 
   const ref = crd ? `${model.apiGroup || 'core'}~${model.apiVersion}~${model.kind}` : plural || '';
   const name = resource?.metadata?.name || '';
