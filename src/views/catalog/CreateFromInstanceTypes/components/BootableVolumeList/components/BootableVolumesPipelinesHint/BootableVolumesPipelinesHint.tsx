@@ -8,6 +8,7 @@ import useQuickStart from '@catalog/CreateFromInstanceTypes/components/BootableV
 import { WINDOWS_BOOTSOURCE_PIPELINE } from '@catalog/CreateFromInstanceTypes/components/BootableVolumeList/utils/constants';
 import useInstanceTypesAndPreferences from '@catalog/CreateFromInstanceTypes/state/hooks/useInstanceTypesAndPreferences';
 import { getIconByOSName } from '@catalog/templatescatalog/utils/os-icons';
+import useIsWindowsSupportedArchitecture from '@kubevirt-utils/hooks/useIsWindowsSupportedArchitecture';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
@@ -24,11 +25,12 @@ const BootableVolumesPipelinesHint: FC<BootableVolumesPipelinesHintProps> = ({
 
   const [windowsQS, windowsQSLoaded] = useQuickStart(WINDOWS_BOOTSOURCE_PIPELINE);
 
+  const isWindowsSupported = useIsWindowsSupportedArchitecture();
   const { hasRHEL, hasWindows } = useBootableVolumeOSes(bootableVolumes);
   const windowsIcon = getIconByOSName(OS_NAME_TYPES.windows);
   const rhelIcon = getIconByOSName(OS_NAME_TYPES.rhel);
 
-  if (!hasWindows && !hasRHEL) {
+  if (!hasWindows && isWindowsSupported && !hasRHEL) {
     return (
       <div className="bootable-volumes-pipelines-hint">
         <img alt="os-icon" className="bootable-volumes-pipelines-hint__icon" src={rhelIcon} />
@@ -41,7 +43,7 @@ const BootableVolumesPipelinesHint: FC<BootableVolumesPipelinesHintProps> = ({
     );
   }
 
-  if (!hasWindows) {
+  if (!hasWindows && isWindowsSupported) {
     return (
       <div className="bootable-volumes-pipelines-hint">
         <img alt="os-icon" className="bootable-volumes-pipelines-hint__icon" src={windowsIcon} />

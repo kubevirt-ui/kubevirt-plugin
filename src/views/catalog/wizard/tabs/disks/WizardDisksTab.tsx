@@ -14,6 +14,7 @@ import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTabl
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import WindowsDrivers from '@kubevirt-utils/components/WindowsDrivers/WindowsDrivers';
+import useIsWindowsSupportedArchitecture from '@kubevirt-utils/hooks/useIsWindowsSupportedArchitecture';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
 import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
@@ -31,6 +32,7 @@ import { getWizardDiskColumns, getWizardDiskRowId } from './wizardDisksTableDefi
 const WizardDisksTab: WizardTab = ({ tabsData, updateTabsData, updateVM, vm }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+  const isWindowsSupported = useIsWindowsSupportedArchitecture();
   const [disks, disksLoaded, loadError] = useWizardDisksTableData(vm);
   const filters = useDisksFilters();
   const [data, filteredData, onFilterChange] = useListPageFilter(disks, filters);
@@ -89,9 +91,11 @@ const WizardDisksTab: WizardTab = ({ tabsData, updateTabsData, updateVM, vm }) =
                 rowFilters={filters}
               />
             </FlexItem>
-            <FlexItem>
-              <WindowsDrivers updateVM={updateVM} vm={vm} />
-            </FlexItem>
+            {isWindowsSupported && (
+              <FlexItem>
+                <WindowsDrivers updateVM={updateVM} vm={vm} />
+              </FlexItem>
+            )}
           </Flex>
           <KubevirtTable
             ariaLabel={t('Wizard disks table')}
