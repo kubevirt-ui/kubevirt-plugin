@@ -1,5 +1,4 @@
 import React, { FC } from 'react';
-import { Trans } from 'react-i18next';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -7,9 +6,11 @@ import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 
 import ConfirmVMActionBaseModal from '../ConfirmMultipleVMActionsModal/components/ConfirmVMActionBaseModal';
 
+import { VMAction, vmActionLabels, vmActionMessages, vmActionTitles } from './constants';
+
 type ConfirmVMActionModalProps = {
   action: (vm: V1VirtualMachine) => Promise<string>;
-  actionType: string;
+  actionType: VMAction;
   checkToConfirmMessage?: string;
   isOpen: boolean;
   onClose: () => void;
@@ -28,27 +29,19 @@ const ConfirmVMActionModal: FC<ConfirmVMActionModalProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const body = (
-    <Trans t={t}>
-      Are you sure you want to {{ actionName: actionType?.toLowerCase() }} [
-      <strong>{{ vmName: getName(vm) }}</strong>] in namespace [
-      <strong>{{ vmNamespace: getNamespace(vm) }}</strong>]?
-    </Trans>
-  );
-
+  const body = vmActionMessages[actionType]?.(t, getName(vm), getNamespace(vm));
   const actionOnVm = async () => action(vm);
 
   return (
     <ConfirmVMActionBaseModal
-      {...{
-        action: actionOnVm,
-        actionType,
-        checkToConfirmMessage,
-        isOpen,
-        onClose,
-        severityVariant,
-        title: t('{{actionType}} VirtualMachine?', { actionType }),
-      }}
+      action={actionOnVm}
+      actionLabel={vmActionLabels[actionType]?.(t)}
+      actionType={actionType}
+      checkToConfirmMessage={checkToConfirmMessage}
+      isOpen={isOpen}
+      onClose={onClose}
+      severityVariant={severityVariant}
+      title={vmActionTitles[actionType]?.(t)}
     >
       {body}
     </ConfirmVMActionBaseModal>

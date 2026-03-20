@@ -43,6 +43,7 @@ import {
 } from '../utils';
 
 import ConfirmVMActionModal from './components/ConfirmVMActionModal/ConfirmVMActionModal';
+import { VM_ACTIONS } from './components/ConfirmVMActionModal/constants';
 import DeleteVMModal from './components/DeleteVMModal/DeleteVMModal';
 import {
   cancelMigration,
@@ -296,7 +297,7 @@ export const createVirtualMachineActionFactory = (t: TFunction) => ({
           ? createModal(({ isOpen, onClose }) => (
               <ConfirmVMActionModal
                 action={pauseVM}
-                actionType="Pause"
+                actionType={VM_ACTIONS.pause}
                 isOpen={isOpen}
                 onClose={onClose}
                 vm={vm}
@@ -323,7 +324,7 @@ export const createVirtualMachineActionFactory = (t: TFunction) => ({
                   'A VM reset is a hard power cycle and might cause data loss or corruption. Only reset if the VM is completely unresponsive.',
                 )}
                 action={resetVM}
-                actionType="Reset"
+                actionType={VM_ACTIONS.reset}
                 isOpen={isOpen}
                 onClose={onClose}
                 severityVariant="warning"
@@ -349,7 +350,7 @@ export const createVirtualMachineActionFactory = (t: TFunction) => ({
           ? createModal(({ isOpen, onClose }) => (
               <ConfirmVMActionModal
                 action={restartVM}
-                actionType="Restart"
+                actionType={VM_ACTIONS.restart}
                 isOpen={isOpen}
                 onClose={onClose}
                 vm={vm}
@@ -411,7 +412,7 @@ export const createVirtualMachineActionFactory = (t: TFunction) => ({
           ? createModal(({ isOpen, onClose }) => (
               <ConfirmVMActionModal
                 action={stopVM}
-                actionType="Stop"
+                actionType={VM_ACTIONS.stop}
                 isOpen={isOpen}
                 onClose={onClose}
                 vm={vm}

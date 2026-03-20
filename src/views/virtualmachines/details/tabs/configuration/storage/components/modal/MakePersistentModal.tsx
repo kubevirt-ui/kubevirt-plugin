@@ -6,6 +6,7 @@ import {
   V1Volume,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
+import { CONFIRM_ACTIONS } from '@kubevirt-utils/components/ConfirmActionMessage/constants';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVMIVolumes } from '@kubevirt-utils/resources/vmi';
@@ -55,7 +56,7 @@ const MakePersistentModal: FC<MakePersistentModalProps> = ({
             obj={{
               metadata: { name: volume?.name },
             }}
-            action="make persistent"
+            action={CONFIRM_ACTIONS.makePersistent}
           />
         </StackItem>
       </Stack>

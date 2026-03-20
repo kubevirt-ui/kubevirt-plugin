@@ -83,15 +83,14 @@ const ConfirmMultipleVMActionsModal: FC<ConfirmMultipleVMActionsModalProps> = ({
 
   return (
     <ConfirmVMActionBaseModal
-      {...{
-        action: actionOnVms,
-        actionType,
-        checkToConfirmMessage,
-        isOpen,
-        onClose,
-        severityVariant,
-        title,
-      }}
+      action={actionOnVms}
+      actionLabel={t(actionType)}
+      actionType={actionType}
+      checkToConfirmMessage={checkToConfirmMessage}
+      isOpen={isOpen}
+      onClose={onClose}
+      severityVariant={severityVariant}
+      title={title}
     >
       {body}
     </ConfirmVMActionBaseModal>
