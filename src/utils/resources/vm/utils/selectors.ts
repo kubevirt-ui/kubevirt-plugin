@@ -1,3 +1,5 @@
+import xbytes from 'xbytes';
+
 import {
   V1AccessCredential,
   V1Bootloader,
@@ -364,3 +366,38 @@ export const getArchitecture = (vm: V1VirtualMachine): string =>
  */
 export const getVMTemplateAnnotations = (vm: V1VirtualMachine): { [key: string]: string } =>
   vm?.spec?.template?.metadata?.annotations;
+
+const parseMemoryToBytes = (value: string): null | number => {
+  if (!value) return null;
+  try {
+    return xbytes.parseSize(`${value}B`);
+  } catch {
+    return null;
+  }
+};
+
+/**
+ * Checks if a VM has memory requests >= memory limits without being a guaranteed QoS VM.
+ * This is risky because the virt-launcher pod can be OOM-killed during live migration
+ * when there's no headroom between limits and requests.
+ *
+ * Guaranteed VMs (dedicatedCpuPlacement) are exempt since limits == requests is expected.
+ *
+ * @param {V1VirtualMachine} vm the virtual machine
+ * @returns {boolean} true if memory requests >= limits and VM is not guaranteed
+ */
+export const hasRiskyMemoryLimits = (vm: V1VirtualMachine): boolean => {
+  const domain = getDomain(vm);
+  const memoryLimits = domain?.resources?.limits?.['memory'];
+  const memoryRequests = domain?.resources?.requests?.['memory'];
+
+  if (!memoryLimits || !memoryRequests) return false;
+  if (getCPU(vm)?.dedicatedCpuPlacement) return false;
+
+  const limitsBytes = parseMemoryToBytes(memoryLimits);
+  const requestsBytes = parseMemoryToBytes(memoryRequests);
+
+  if (limitsBytes === null || requestsBytes === null) return false;
+
+  return requestsBytes >= limitsBytes;
+};

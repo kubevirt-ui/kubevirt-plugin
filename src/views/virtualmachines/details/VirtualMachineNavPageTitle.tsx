@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom-v5-compat';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DetailsPageTitle from '@kubevirt-utils/components/DetailsPageTitle/DetailsPageTitle';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
+import MemoryLimitsWarning from '@kubevirt-utils/components/MemoryLimitsWarning/MemoryLimitsWarning';
 import PaneHeading from '@kubevirt-utils/components/PaneHeading/PaneHeading';
 import SidebarEditorSwitch from '@kubevirt-utils/components/SidebarEditor/SidebarEditorSwitch';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -85,6 +86,7 @@ const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({
           )}
         </Split>
       </PaneHeading>
+      <MemoryLimitsWarning vm={vm} />
       <VirtualMachinePendingChangesAlert
         instanceTypeExpandedSpec={instanceTypeExpandedSpec}
         vm={vm}

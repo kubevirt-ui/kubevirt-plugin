@@ -1167,6 +1167,7 @@
   "Memory density percentage": "Porcentaje de densidad de memoria",
   "Memory Dirty Rate": "Tasa sucia de memoria",
   "Memory limits": "Memory limits",
+  "Memory limits are equal to memory requests. This can cause the virt-launcher pod to be OOM-killed during live migration. Consider increasing memory limits or enabling auto-compute resource limits.": "Memory limits are equal to memory requests. This can cause the virt-launcher pod to be OOM-killed during live migration. Consider increasing memory limits or enabling auto-compute resource limits.",
   "Memory load": "Memory load",
   "Memory requests": "Memory requests",
   "Memory swap traffic": "Tráfico de intercambio de memoria",

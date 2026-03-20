@@ -5,6 +5,7 @@ import { V1CPU, V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt'
 import CPUInput from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/CPUInput';
 import { getCPULimitsFromVM } from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/utils/utils';
 import MemoryInput from '@kubevirt-utils/components/CPUMemoryModal/components/MemoryInput/MemoryInput';
+import MemoryLimitsWarning from '@kubevirt-utils/components/MemoryLimitsWarning/MemoryLimitsWarning';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getLabel } from '@kubevirt-utils/resources/shared';
@@ -121,6 +122,7 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
             setMemoryUnit={setMemoryUnit}
           />
         </div>
+        <MemoryLimitsWarning vm={vm} />
         {updateError && (
           <Alert isInline title={t('Error')} variant={AlertVariant.danger}>
             {updateError}
