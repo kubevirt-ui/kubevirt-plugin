@@ -1,7 +1,5 @@
-import React from 'react';
-import { Trans } from 'react-i18next';
-
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import React, { ReactElement } from 'react';
+import { TFunction, Trans } from 'react-i18next';
 
 export const CONFIRM_ACTIONS = {
   delete: 'delete',
@@ -11,12 +9,7 @@ export const CONFIRM_ACTIONS = {
 
 export type ConfirmAction = (typeof CONFIRM_ACTIONS)[keyof typeof CONFIRM_ACTIONS];
 
-export type TFunction = ReturnType<typeof useKubevirtTranslation>['t'];
-
-export const actionMessages: Record<
-  ConfirmAction,
-  (t: TFunction, name: string) => React.ReactElement
-> = {
+export const actionMessages: Record<ConfirmAction, (t: TFunction, name: string) => ReactElement> = {
   [CONFIRM_ACTIONS.delete]: (t, name) => (
     <Trans t={t}>
       Are you sure you want to delete <strong>{{ name }}</strong>?
@@ -29,14 +22,14 @@ export const actionMessages: Record<
   ),
   [CONFIRM_ACTIONS.makePersistent]: (t, name) => (
     <Trans t={t}>
-      Are you sure you want to make persistent <strong>{{ name }}</strong>?
+      Are you sure you want to make <strong>{{ name }}</strong> persistent?
     </Trans>
   ),
 };
 
 export const actionMessagesWithNamespace: Record<
   ConfirmAction,
-  (t: TFunction, name: string, namespace: string) => React.ReactElement
+  (t: TFunction, name: string, namespace: string) => ReactElement
 > = {
   [CONFIRM_ACTIONS.delete]: (t, name, namespace) => (
     <Trans t={t}>
@@ -52,7 +45,7 @@ export const actionMessagesWithNamespace: Record<
   ),
   [CONFIRM_ACTIONS.makePersistent]: (t, name, namespace) => (
     <Trans t={t}>
-      Are you sure you want to make persistent <strong>{{ name }}</strong> in namespace{' '}
+      Are you sure you want to make <strong>{{ name }}</strong> persistent in namespace{' '}
       <strong>{{ namespace }}</strong>?
     </Trans>
   ),

@@ -1,7 +1,5 @@
-import React from 'react';
-import { Trans } from 'react-i18next';
-
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import React, { ReactElement } from 'react';
+import { TFunction, Trans } from 'react-i18next';
 
 export const VM_ACTIONS = {
   pause: 'pause',
@@ -12,11 +10,9 @@ export const VM_ACTIONS = {
 
 export type VMAction = (typeof VM_ACTIONS)[keyof typeof VM_ACTIONS];
 
-type TFunction = ReturnType<typeof useKubevirtTranslation>['t'];
-
 export const vmActionMessages: Record<
   VMAction,
-  (t: TFunction, name: string, namespace: string) => React.ReactElement
+  (t: TFunction, name: string, namespace: string) => ReactElement
 > = {
   [VM_ACTIONS.pause]: (t, name, namespace) => (
     <Trans t={t}>

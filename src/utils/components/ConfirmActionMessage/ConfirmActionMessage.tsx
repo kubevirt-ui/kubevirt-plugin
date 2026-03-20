@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 import {
@@ -12,7 +13,7 @@ import {
 
 type ConfirmActionMessageProps = {
   action?: ConfirmAction;
-  obj: { metadata: { name: string; namespace?: string } } | K8sResourceCommon;
+  obj: K8sResourceCommon;
 };
 
 const ConfirmActionMessage: React.FC<ConfirmActionMessageProps> = ({
@@ -20,8 +21,8 @@ const ConfirmActionMessage: React.FC<ConfirmActionMessageProps> = ({
   obj,
 }) => {
   const { t } = useKubevirtTranslation();
-  const name = obj?.metadata?.name;
-  const namespace = obj?.metadata?.namespace;
+  const name = getName(obj);
+  const namespace = getNamespace(obj);
 
   return namespace
     ? actionMessagesWithNamespace[action]?.(t, name, namespace)
