@@ -45,6 +45,14 @@ export const getUserTabIds: SearchItemGetter = () => [
 
 export const getPreviewFeaturesTabIds: SearchItemGetter = () => [
   { id: PREVIEW_FEATURES_TAB_IDS.previewFeatures, title: t('Preview features') },
+  {
+    id: PREVIEW_FEATURES_TAB_IDS.treeViewFolders,
+    title: t('Enable folders in Virtual Machines tree view'),
+  },
+  {
+    id: PREVIEW_FEATURES_TAB_IDS.passtUDNNetwork,
+    title: t('Enable Passt binding for primary user-defined networks'),
+  },
 ];
 
 const tabsIds: { [key: string]: SearchItem[] } = {

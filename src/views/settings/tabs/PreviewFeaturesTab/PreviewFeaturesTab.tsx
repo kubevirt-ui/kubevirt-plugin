@@ -41,11 +41,12 @@ const PreviewFeaturesTab: FC = () => {
             dataTestID={feature.id}
             externalLink={feature.externalLink}
             helpTextIconContent={feature?.helpPopoverContent}
+            id={feature.searchItemId}
             isDisabled={!feature.canEdit}
             isLoading={feature.loading}
             key={feature.id}
             switchIsOn={feature.featureEnabled}
-            title={feature.label}
+            title={<SearchItem id={feature.searchItemId}>{feature.label}</SearchItem>}
             turnOnSwitch={feature.toggleFeature}
           />
         ))}

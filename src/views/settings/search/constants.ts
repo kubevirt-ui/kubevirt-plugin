@@ -25,7 +25,9 @@ export const USER_TAB_IDS = {
 };
 
 export const PREVIEW_FEATURES_TAB_IDS = {
+  passtUDNNetwork: 'passt-udn-network',
   previewFeatures: 'preview-features',
+  treeViewFolders: 'tree-view-folders',
 };
 
 export const SEARCH_ITEM_CHILDREN_TREE = {
@@ -45,4 +47,8 @@ export const SEARCH_ITEM_CHILDREN_TREE = {
     CLUSTER_TAB_IDS.templatesProject,
   ],
   [CLUSTER_TAB_IDS.virtualizationFeatures]: [CLUSTER_TAB_IDS.loadBalance],
+  [PREVIEW_FEATURES_TAB_IDS.previewFeatures]: [
+    PREVIEW_FEATURES_TAB_IDS.treeViewFolders,
+    PREVIEW_FEATURES_TAB_IDS.passtUDNNetwork,
+  ],
 };
