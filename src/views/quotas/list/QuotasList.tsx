@@ -1,10 +1,12 @@
 import React, { FC, useMemo } from 'react';
 
-import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
+import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
+import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useKubevirtTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtTableColumns';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
-import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
+import usePaginationWithFilters from '@kubevirt-utils/hooks/usePagination/usePaginationWithFilters';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import {
   ApplicationAwareClusterResourceQuotaModel,
@@ -12,6 +14,7 @@ import {
   modelToGroupVersionKind,
   modelToRef,
 } from '@kubevirt-utils/models';
+import { ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   K8sResourceKind,
@@ -19,17 +22,18 @@ import {
   ListPageHeader,
   useK8sWatchResource,
   useListPageFilter,
-  VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
+
+import useAAQCalculationMethod from '../hooks/useAAQCalculationMethod';
 
 import QuotasCreateButton from './components/QuotasCreateButton';
 import QuotasEmptyState from './components/QuotasEmptyState';
 import QuotasLearnMoreLink from './components/QuotasLearnMoreLink';
-import QuotasTableRow from './components/QuotasTableRow';
-import useQuotasColumns from './hooks/useQuotasColumns';
 import useQuotasListTab from './hooks/useQuotasListTab';
+import { QuotaCallbacks } from './utils/helpers';
 import { QuotaScope } from './constants';
+import { getQuotaColumns, getQuotaRowId } from './quotasDefinition';
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
 
@@ -37,6 +41,7 @@ const QuotasList: FC = () => {
   const { t } = useKubevirtTranslation();
   const namespace = useNamespaceParam();
   const { activeTab, handleTabSelect } = useQuotasListTab();
+  const calculationMethod = useAAQCalculationMethod();
 
   const [namespaceQuotas, namespaceQuotasLoaded, namespaceQuotasLoadError] = useK8sWatchResource<
     K8sResourceKind[]
@@ -53,25 +58,56 @@ const QuotasList: FC = () => {
     isList: true,
   });
 
-  const showTabs = clusterQuotasLoaded && !isEmpty(clusterQuotas);
+  const hasClusterQuotas = clusterQuotasLoaded && !isEmpty(clusterQuotas);
+  const showTabs = hasClusterQuotas || activeTab === QuotaScope.CLUSTER;
 
   const quotas = useMemo(
-    () => (activeTab === QuotaScope.CLUSTER ? clusterQuotas : namespaceQuotas),
+    () =>
+      (activeTab === QuotaScope.CLUSTER
+        ? clusterQuotas
+        : namespaceQuotas) as ApplicationAwareQuota[],
     [activeTab, clusterQuotas, namespaceQuotas],
   );
   const loaded = activeTab === QuotaScope.CLUSTER ? clusterQuotasLoaded : namespaceQuotasLoaded;
   const loadError =
     activeTab === QuotaScope.CLUSTER ? clusterQuotasLoadError : namespaceQuotasLoadError;
 
-  const showEmptyState = loaded && isEmpty(quotas);
+  const showEmptyState = loaded && !loadError && isEmpty(quotas);
 
-  const { onPaginationChange, pagination } = usePagination();
-  const [data, filteredData, onFilterChange] = useListPageFilter(quotas);
-  const [columns, activeColumns, isColumnsLoaded] = useQuotasColumns(namespace, activeTab);
+  const [unfilteredData, filteredData, onFilterChange] = useListPageFilter(quotas);
 
-  if (loadError) {
-    return <ErrorAlert error={loadError} />;
-  }
+  const { handleFilterChange, handlePerPageSelect, handleSetPage, pagination } =
+    usePaginationWithFilters(filteredData?.length ?? 0, onFilterChange);
+
+  const columns = useMemo(
+    () => getQuotaColumns(t, namespace, activeTab, calculationMethod),
+    [t, namespace, activeTab, calculationMethod],
+  );
+
+  const { activeColumnKeys, loaded: loadedColumns } = useKubevirtTableColumns({
+    columnManagementID: modelToRef(ApplicationAwareResourceQuotaModel),
+    columns,
+  });
+
+  const columnLayout = useMemo(
+    () =>
+      buildColumnLayout(
+        columns,
+        activeColumnKeys,
+        modelToRef(ApplicationAwareResourceQuotaModel),
+        t('Quota'),
+      ),
+    [columns, activeColumnKeys, t],
+  );
+
+  const callbacks: QuotaCallbacks = useMemo(
+    () => ({
+      calculationMethod,
+    }),
+    [calculationMethod],
+  );
+
+  const isLoaded = loaded && loadedColumns;
 
   return (
     <>
@@ -111,57 +147,38 @@ const QuotasList: FC = () => {
           <>
             <div className="list-managment-group">
               <ListPageFilter
-                columnLayout={{
-                  columns: columns?.map(({ additional, id, title }) => ({
-                    additional,
-                    id,
-                    title,
-                  })),
-                  id: modelToRef(ApplicationAwareResourceQuotaModel),
-                  selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
-                  type: t('Quota'),
-                }}
-                onFilterChange={(...args) => {
-                  onFilterChange(...args);
-                  onPaginationChange({
-                    endIndex: pagination?.perPage,
-                    page: 1,
-                    perPage: pagination?.perPage,
-                    startIndex: 0,
-                  });
-                }}
-                data={quotas}
-                loaded={isColumnsLoaded}
+                columnLayout={columnLayout}
+                data={unfilteredData}
+                loaded={isLoaded}
+                onFilterChange={handleFilterChange}
               />
-              {!isEmpty(filteredData) && (
+              {!isEmpty(filteredData) && isLoaded && (
                 <Pagination
-                  onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
-                    onPaginationChange({ endIndex, page, perPage, startIndex })
-                  }
-                  onSetPage={(_e, page, perPage, startIndex, endIndex) =>
-                    onPaginationChange({ endIndex, page, perPage, startIndex })
-                  }
                   className="list-managment-group__pagination"
                   isLastFullPageShown
                   itemCount={filteredData?.length}
+                  onPerPageSelect={handlePerPageSelect}
+                  onSetPage={handleSetPage}
                   page={pagination?.page}
                   perPage={pagination?.perPage}
                   perPageOptions={paginationDefaultValues}
                 />
               )}
             </div>
-            <VirtualizedTable
-              EmptyMsg={() => (
-                <div className="pf-v6-u-text-align-center">
-                  {t('No application-aware quotas found')}
-                </div>
-              )}
-              columns={activeColumns}
-              data={filteredData}
-              loaded={loaded && isColumnsLoaded}
+            <KubevirtTable<ApplicationAwareQuota, QuotaCallbacks>
+              activeColumnKeys={activeColumnKeys}
+              ariaLabel={t('Application-aware quotas table')}
+              callbacks={callbacks}
+              columns={columns}
+              data={filteredData ?? []}
+              dataTest="quotas-list"
+              getRowId={getQuotaRowId}
+              loaded={isLoaded}
               loadError={loadError}
-              Row={QuotasTableRow}
-              unfilteredData={data}
+              noDataMsg={t('No application-aware quotas found')}
+              noFilteredDataMsg={t('No application-aware quotas found')}
+              pagination={pagination}
+              unfilteredData={unfilteredData}
             />
           </>
         )}

@@ -6,6 +6,7 @@ export const COLUMNS = 'columns';
 export const ACTIONS = 'actions';
 
 export const COLUMN_MANAGEMENT_IDS = {
+  BOOTABLE_VOLUMES: 'bootable-volumes',
   CHECKUPS_SELF_VALIDATION: 'checkups-self-validation',
   CHECKUPS_STORAGE: 'checkups-storage',
 } as const;
