@@ -5,6 +5,7 @@ import { PASST_UDN_NETWORK, TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useF
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePasstFeatureFlag from '@kubevirt-utils/hooks/usePasstFeatureFlag';
+import { PREVIEW_FEATURES_TAB_IDS } from '@settings/search/constants';
 
 import PasstPopoverContent from '../PasstPopoverContent';
 
@@ -17,6 +18,7 @@ type Feature = {
   id: string;
   label: string;
   loading: boolean;
+  searchItemId: string;
   toggleFeature: (val: boolean) => Promise<IoK8sApiCoreV1ConfigMap>;
 };
 
@@ -38,6 +40,7 @@ const usePreviewFeaturesData: UsePreviewFeaturesData = (cluster) => {
       externalLink: null,
       id: TREE_VIEW_FOLDERS,
       label: t('Enable folders in Virtual Machines tree view'),
+      searchItemId: PREVIEW_FEATURES_TAB_IDS.treeViewFolders,
       ...treeViewFoldersFeature,
     },
     {
@@ -45,6 +48,7 @@ const usePreviewFeaturesData: UsePreviewFeaturesData = (cluster) => {
       helpPopoverContent: (hide) => <PasstPopoverContent hide={hide} />,
       id: PASST_UDN_NETWORK,
       label: t('Enable Passt binding for primary user-defined networks'),
+      searchItemId: PREVIEW_FEATURES_TAB_IDS.passtUDNNetwork,
       ...passtFeatureFlag,
     },
   ];
