@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom-v5-compat';
 
 import ClusterDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterDropdown';
 import ConfigurationSearch from '@kubevirt-utils/components/ConfigurationSearch/ConfigurationSearch';
+import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
 import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';
 import { VIRTUALIZATION_PATHS } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -18,6 +19,7 @@ import {
   PageSection,
   Title,
 } from '@patternfly/react-core';
+import { useSignals } from '@preact/signals-react/runtime';
 import { useFleetClusterNames, useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import { SettingsClusterProvider } from './context/SettingsClusterContext';
@@ -27,6 +29,8 @@ import SettingsTab from './SettingsTab';
 import './SettingsPage.scss';
 
 const SettingsPage: FC = () => {
+  useSignals();
+
   const { t } = useKubevirtTranslation();
   const [activeNamespace] = useActiveNamespace();
   const [clusterNames, clustersLoaded] = useFleetClusterNames();
@@ -65,7 +69,11 @@ const SettingsPage: FC = () => {
               </BreadcrumbItem>
               <BreadcrumbItem isActive>{t('Settings')}</BreadcrumbItem>
             </Breadcrumb>
-            <Title className="settings-page__title" headingLevel="h1">
+            <Title
+              className="settings-page__title"
+              data-test-id="settings-page-title"
+              headingLevel="h1"
+            >
               {t('Settings')}
             </Title>
             <Content component={ContentVariants.p}>
@@ -101,6 +109,7 @@ const SettingsPage: FC = () => {
             <SettingsTab />
           </SettingsClusterProvider>
         </PageSection>
+        <GuidedTour />
       </div>
     </>
   );

@@ -38,7 +38,7 @@ export const tourSteps: Step[] = [
     data: { route: '/k8s/all-namespaces/virtualization-settings' },
     disableBeacon: true,
     placement: 'bottom',
-    target: '[data-test-id="virtualization-settings-nav-item"]',
+    target: '[data-test-id="settings-page-title"]',
     title: t('Settings configurations'),
   },
   {
