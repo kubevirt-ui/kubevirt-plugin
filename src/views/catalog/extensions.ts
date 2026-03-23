@@ -1,0 +1,19 @@
+import { EncodedExtension } from '@openshift/dynamic-plugin-sdk-webpack';
+import { RoutePage } from '@openshift-console/dynamic-plugin-sdk';
+import type { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plugin-sdk-webpack';
+
+export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
+  Catalog: './views/catalog/Catalog.tsx',
+};
+
+export const extensions: EncodedExtension[] = [
+  {
+    properties: {
+      component: {
+        $codeRef: 'Catalog',
+      },
+      path: ['/k8s/ns/:ns/catalog', '/k8s/all-namespaces/catalog'],
+    },
+    type: 'console.page/route',
+  } as EncodedExtension<RoutePage>,
+];

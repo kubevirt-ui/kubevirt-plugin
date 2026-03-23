@@ -1,6 +1,6 @@
 import './selectors';
 
-import { MINUTE } from '../utils/const/index';
+import { MINUTE, TEST_NS } from '../utils/const/index';
 import * as nav from '../views/selector';
 import { vmListTab } from '../views/selector-common';
 
@@ -36,20 +36,22 @@ declare global {
 }
 
 Cypress.Commands.add('visitOverview', () => {
-  cy.clickVirtLink(nav.overviewNav);
+  cy.visit('/k8s/all-namespaces/virtualization-overview');
 });
 
 Cypress.Commands.add('visitOverviewVirt', () => {
-  cy.get(nav.overviewNav, { timeout: 5 * MINUTE }).click();
+  cy.visit('/k8s/all-namespaces/virtualization-overview');
 });
 
 Cypress.Commands.add('visitCatalog', () => {
-  cy.clickVirtLink(nav.catalogNav);
+  const nsPath = TEST_NS ? `ns/${TEST_NS}` : 'all-namespaces';
+  cy.visit(`/k8s/${nsPath}/catalog`);
   cy.contains('Create new VirtualMachine', { timeout: 3 * MINUTE }).scrollIntoView();
 });
 
 Cypress.Commands.add('visitCatalogVirt', () => {
-  cy.get(nav.catalogNav, { timeout: 5 * MINUTE }).click();
+  const nsPath = TEST_NS ? `ns/${TEST_NS}` : 'all-namespaces';
+  cy.visit(`/k8s/${nsPath}/catalog`);
   cy.contains('Select volume to boot from', { timeout: 3 * MINUTE }).should('be.visible');
 });
 

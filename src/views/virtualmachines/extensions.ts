@@ -1,7 +1,6 @@
 import { EncodedExtension } from '@openshift/dynamic-plugin-sdk-webpack';
 import {
   ResourceActionProvider,
-  ResourceNSNavItem,
   RoutePage,
   StandaloneRoutePage,
 } from '@openshift-console/dynamic-plugin-sdk';
@@ -61,22 +60,4 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
-
-  {
-    properties: {
-      dataAttributes: {
-        'data-quickstart-id': 'qs-nav-virtualmachines',
-        'data-test-id': 'virtualmachines-nav-item',
-      },
-      id: 'virtualmachines',
-      model: {
-        group: 'kubevirt.io',
-        kind: 'VirtualMachine',
-        version: 'v1',
-      },
-      name: '%plugin__kubevirt-plugin~VirtualMachines%',
-      section: 'virtualization',
-    },
-    type: 'console.navigation/resource-ns',
-  } as EncodedExtension<ResourceNSNavItem>,
 ];

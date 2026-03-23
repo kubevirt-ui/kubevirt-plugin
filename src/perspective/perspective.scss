@@ -1,14 +1,4 @@
 .pf-v6-c-page__sidebar .pf-v6-c-nav {
-  // navbar items with no border
-  a.pf-v6-c-nav__link[data-class='kv-plugin-virt-perspective-element'] {
-    padding-top: var(--pf-t--global--spacer--sm);
-    padding-bottom: var(--pf-t--global--spacer--sm);
-
-    &[data-border='no-border']::before {
-      border: none;
-    }
-  }
-
   // first level divider with some padding
   .oc-perspective-nav > li.pf-v6-c-nav__item + .pf-v6-c-divider {
     padding-inline-start: var(--pf-t--global--spacer--md);
