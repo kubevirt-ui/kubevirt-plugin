@@ -2,6 +2,7 @@ declare interface Window {
   SERVER_FLAGS: {
     authDisabled: boolean;
     branding: string;
+    nodeArchitectures?: string[];
 
     telemetry?: {
       DEVSANDBOX_SEGMENT_API_KEY: string;

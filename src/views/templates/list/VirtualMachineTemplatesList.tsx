@@ -58,7 +58,10 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
     selector,
   });
 
-  const { filters, filtersWithSelect } = useVirtualMachineTemplatesFilters(availableTemplatesUID);
+  const { filters, filtersWithSelect } = useVirtualMachineTemplatesFilters(
+    availableTemplatesUID,
+    templates,
+  );
 
   const allFilters = useMemo(
     () => [...filters, ...filtersWithSelect],

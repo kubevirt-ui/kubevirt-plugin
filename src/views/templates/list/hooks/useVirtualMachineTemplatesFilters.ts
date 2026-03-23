@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useClusterFilter } from '@kubevirt-utils/hooks/useClusterFilter';
-import useHcoWorkloadArchitectures from '@kubevirt-utils/hooks/useHcoWorkloadArchitectures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useProjectFilter } from '@kubevirt-utils/hooks/useProjectFilter';
 import {
@@ -17,7 +16,9 @@ import {
   ARCHITECTURE_ID,
   ARCHITECTURE_TITLE,
   getArchitecture,
+  getUniqueArchitectures,
 } from '@kubevirt-utils/utils/architecture';
+import { OTHER } from '@kubevirt-utils/utils/constants';
 import { ItemsToFilterProps } from '@kubevirt-utils/utils/types';
 import { getItemNameWithOther, includeFilter } from '@kubevirt-utils/utils/utils';
 import useIsACMPage from '@multicluster/useIsACMPage';
@@ -46,17 +47,17 @@ const useTemplateProviders = (): ItemsToFilterProps[] => {
 
 const useVirtualMachineTemplatesFilters = (
   availableTemplatesUID: Set<string>,
+  templates: V1Template[],
 ): { filters: RowFilter<V1Template>[]; filtersWithSelect: RowFilter<V1Template>[] } => {
   const { t } = useKubevirtTranslation();
   const providers = useTemplateProviders();
-  const workloadsArchitectures = useHcoWorkloadArchitectures();
   const workloadsArchitecturesItems = useMemo(
     () =>
-      workloadsArchitectures.map((arch) => ({
-        id: arch,
-        title: arch,
+      getUniqueArchitectures(templates).map((arch) => ({
+        id: arch ?? OTHER,
+        title: arch ?? t(OTHER),
       })),
-    [workloadsArchitectures],
+    [templates, t],
   );
 
   const isACMPage = useIsACMPage();

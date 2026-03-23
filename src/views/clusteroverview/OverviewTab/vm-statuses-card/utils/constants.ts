@@ -1,2 +1,2 @@
 export const ERROR = 'Error';
-export const OTHER = 'Other';
+export { OTHER } from '@kubevirt-utils/utils/constants';
