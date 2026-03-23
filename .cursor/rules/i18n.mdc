@@ -50,6 +50,57 @@ const MyComponent: React.FC = () => {
 
 ---
 
+## 2.5. Passing `t` to Utility Functions
+
+### In React Components
+Always use the hook:
+```tsx
+const { t } = useKubevirtTranslation();
+```
+
+### In Non-React Utility Functions
+Accept `t` as a parameter typed with `TFunction` from `react-i18next`:
+```tsx
+import { TFunction } from 'react-i18next';
+
+export const getColumns = (t: TFunction) => [
+  { label: t('Name'), key: 'name' },
+  { label: t('Status'), key: 'status' },
+];
+```
+
+### For Constants and Config Files
+Always accept `t` as a parameter -- never import `{ t }` directly:
+```tsx
+import { TFunction } from 'react-i18next';
+
+// CORRECT - t is passed in, caller provides it from the hook
+export const getPageTitle = (t: TFunction) => t('Virtual Machines');
+
+export const getStatusLabels = (t: TFunction) => ({
+  running: t('Running'),
+  stopped: t('Stopped'),
+});
+```
+
+### CRITICAL: Never Import `{ t }` Directly
+```tsx
+// WRONG - importing t directly bypasses the hook lifecycle
+import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+export const PAGE_TITLE = t('Virtual Machines');
+
+// WRONG - custom function type
+const getLabel = (t: (key: string) => string) => t('Name');
+
+// CORRECT - accept t: TFunction as a parameter
+import { TFunction } from 'react-i18next';
+export const getLabel = (t: TFunction) => t('Name');
+```
+
+Always import `TFunction` from `react-i18next`. Never import `{ t }` directly from `useKubevirtTranslation`. Never create inline function types like `(key: string) => string` or `(value: string, options?: any) => string` as a substitute.
+
+---
+
 ## 3. String Patterns
 
 ### Simple Strings
@@ -110,7 +161,7 @@ For labels in plugin extension files, use the special format:
 ```
 
 ### Register in i18n
-Add a comment in `utils/i18n.ts` for the parser:
+Add a comment in `src/utils/i18n.ts` for the parser. This is the **only** file where comment-only `// t('...')` patterns are valid -- they tell `i18next-parser` to extract strings that are referenced dynamically elsewhere and cannot be discovered by static analysis:
 
 ```typescript
 // Console extension strings - these are used in plugin-extensions.ts
@@ -118,6 +169,8 @@ Add a comment in `utils/i18n.ts` for the parser:
 // t('plugin__kubevirt-plugin~Templates')
 // t('plugin__kubevirt-plugin~Catalog')
 ```
+
+**Note**: This comment-only pattern is exclusively for `src/utils/i18n.ts`. In all other files, `t()` must be a real, executed call (see Section 12).
 
 ---
 
@@ -307,12 +360,56 @@ npm run memsource-download
 
 ---
 
-## 12. Checklist
+## 12. AI Agent Translation Rules
+
+These rules are mandatory for AI agents when generating or reviewing code:
+
+### When Generating Code
+- Wrap **every** user-facing string in `t()` -- labels, headings, buttons, errors, tooltips, table headers, empty states, placeholders, help text
+- In React components, always use `const { t } = useKubevirtTranslation()`
+- In utility functions and constants, accept `t: TFunction` from `react-i18next` as a parameter
+- **Never** import `{ t }` directly from `useKubevirtTranslation` -- always pass `t` as a parameter
+- Never invent custom types for the translation function
+- Use interpolation for dynamic values: `t('{{count}} items', { count })` -- never concatenate
+- After adding or changing any user-facing string, run `npm run i18n`
+
+### When Reviewing Code
+- Verify every user-facing string is wrapped in `t()`
+- Verify `TFunction` is imported from `react-i18next`, not defined inline
+- Flag any string concatenation with `t()` results as a **blocker**
+- Flag any `// t('...')` comment-only patterns as a **blocker** -- these do not wire up translations. **Exception**: `src/utils/i18n.ts` uses comment-only `// t('...')` intentionally for `i18next-parser` string extraction (see Section 4)
+- Flag any hardcoded user-facing strings (JSX text content, button labels, etc.) as a **blocker**
+- Verify locale diffs are present in the PR when user-facing strings change
+
+### Common Mistakes to Catch
+```tsx
+// BLOCKER: comment-only pattern does NOT translate (except in src/utils/i18n.ts for parser extraction)
+// t('Error')
+// t('Warning')
+
+// BLOCKER: concatenation breaks translation context
+{t('Delete') + ' ' + vmName}
+
+// BLOCKER: hardcoded string
+<Button>Delete</Button>
+
+// BLOCKER: custom type instead of TFunction
+const getLabel = (t: (key: string) => string) => t('Name');
+
+// BLOCKER: template literal with t()
+`${t('Make persistent disk')} - (${names.join(', ')})`
+```
+
+---
+
+## 13. Checklist
 
 - [ ] All user-facing strings use `t()` function
-- [ ] Using `useKubevirtTranslation` hook
+- [ ] Using `useKubevirtTranslation` hook (or `TFunction` for utility functions)
+- [ ] `TFunction` imported from `react-i18next` (no custom types)
 - [ ] Dynamic values use interpolation `{{variable}}`
 - [ ] No string concatenation for translated text
+- [ ] No comment-only `// t('...')` patterns
 - [ ] Console extensions use `%plugin__...%` format
 - [ ] Extension strings registered in `utils/i18n.ts`
 - [ ] `npm run i18n` run before commit

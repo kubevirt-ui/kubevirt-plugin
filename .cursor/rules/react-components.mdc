@@ -329,9 +329,17 @@ Sizes: `xs` (4px), `sm` (8px), `md` (16px), `lg` (24px), `xl` (32px), `2xl` (48p
 
 ---
 
-## 12. Common components
+## 12. Reuse Existing Components
 
-### HelpTextIcon
+**Always prefer reusing an existing project component over creating a new one.** Before writing a new component, search `src/utils/components/` and the current feature's `components/` directory for something that already does what you need.
+
+- If an existing component covers 80%+ of the use case, **propose a small modification** to it rather than creating a duplicate
+- If the modification is non-trivial, discuss the change with the team first
+- Never recreate PatternFly or project utility components from scratch
+
+### Common Shared Components
+
+#### HelpTextIcon
 - Use `HelpTextIcon` for a help icon (?) that opens a `Popover` with contextual information
 - Replaces manual `<Popover><Icon><HelpIcon /></Icon></Popover>` patterns
 - Supports `headerContent`, `bodyContent`, and `footerContent` for the popover
@@ -345,7 +353,7 @@ import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 />
 ```
 
-### ExternalLink
+#### ExternalLink
 - Use `ExternalLink` for any link that opens in a new tab (`target="_blank"`) with an external link icon
 - Replaces manual `<Button component="a" href={...} icon={<ExternalLinkAltIcon />} target="_blank" variant="link">` patterns
 - Do NOT use for: internal navigation (`useNavigate`, `<Link>`), action menu icons, buttons with custom `onClick` logic
@@ -358,7 +366,18 @@ import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 
 ---
 
-## 13. i18n Requirements
+## 13. PatternFly Token Verification
+
+When the **PatternFly MCP** is available, use it to verify that design tokens, component props, and layout patterns are correct and up to date. Specifically:
+
+- Verify token names (e.g. `--pf-t--global--spacer--*`) exist in the current PatternFly version
+- Confirm component prop APIs match the current PatternFly docs
+- Check that deprecated components or props are not being used
+- Validate utility class names (e.g. `pf-v6-u-*`) are current
+
+---
+
+## 14. i18n Requirements
 
 ### All User-Facing Strings
 ```tsx
