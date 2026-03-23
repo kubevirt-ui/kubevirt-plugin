@@ -6,7 +6,6 @@ import { exposedModules as utilsExposedModules } from './src/utils/extension';
 import { exposedModules as CDIUploadProviderExposedModules } from './src/views/cdi-upload-provider/extensions';
 import { exposedModules as CheckupsExposedModules } from './src/views/checkups/extensions';
 import { exposedModules as dashboardExtensionsExposedModules } from './src/views/dashboard-extensions/extensions';
-import { exposedModules as PhysicalNetworksExposedModules } from './src/views/physical-networks/extensions';
 import { exposedModules as QuotasExposedModules } from './src/views/quotas/extensions';
 import { exposedModules as StorageClassExposedModules } from './src/views/storageclasses/extensions';
 import { exposedModules as StorageMigrationExposedModules } from './src/views/storagemigrations/extensions';
@@ -33,7 +32,6 @@ const metadata: ConsolePluginBuildMetadata = {
     ...TopologyExposedModules,
     ...MulticlusterExposedModules,
     ...VirtualMachineInstanceMigrationsExposedModules,
-    ...PhysicalNetworksExposedModules,
     ...VMNetworksExposedModules,
     BootableVolumesList: './views/bootablevolumes/list/BootableVolumesList.tsx',
     BootableVolumeYAMLPage: './views/bootablevolumes/list/components/BootableVolumeYAMLPage.tsx',
