@@ -1,0 +1,21 @@
+.operating-system-tile {
+  height: 6.25rem; // 100px
+  width: 12.5rem; // 200px
+  cursor: pointer;
+  border: 2px solid var(--pf-t--global--border--color--default);
+  display: block;
+  align-content: center;
+
+  &:hover {
+    border-color: var(--pf-t--global--color--brand--default);
+  }
+
+  &--selected {
+    border-color: var(--pf-t--global--color--brand--default);
+  }
+
+  &__image {
+    height: 3.438rem; // 55px
+    width: 3.438rem; // 55px
+  }
+}

@@ -31,3 +31,11 @@ export const getVMCreationMethodsDetails = (t: TFunction) => {
 
 export const getVMCreationMethodDetails = (creationMethod: VMCreationMethod, t: TFunction) =>
   getVMCreationMethodsDetails(t)[creationMethod];
+
+export const getWizardFooterProps = (t: TFunction) => {
+  return {
+    backButtonText: t('Back'),
+    cancelButtonText: t('Cancel'),
+    nextButtonText: t('Next'),
+  };
+};

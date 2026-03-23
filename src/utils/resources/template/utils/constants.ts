@@ -20,6 +20,8 @@ export const CUSTOM_TEMPLATES = 'custom-templates';
 export const DATA_SOURCE_CRONJOB_LABEL = 'cdi.kubevirt.io/dataImportCron';
 
 export const LINUX = 'linux';
+export const RHEL = 'rhel';
+export const WINDOWS = 'windows';
 
 export enum OS_NAME_TYPES_NOT_SUPPORTED {
   debian = 'debian',

@@ -3,6 +3,9 @@ import React, { FC, useCallback, useEffect, useRef } from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Modal, ModalVariant, Wizard, WizardHeader, WizardStep } from '@patternfly/react-core';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
+import GuestOSStep from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/GuestOSStep/GuestOSStep';
+import { VMCreationMethod } from '@virtualmachines/creation-wizard/utils/constants';
+import { getWizardFooterProps } from '@virtualmachines/creation-wizard/utils/utils';
 
 import DeploymentDetailsStep from './steps/DeploymentDetailsStep/DeploymentDetailsStep';
 
@@ -15,7 +18,7 @@ type VMCreationWizardProps = {
 
 const VMCreationWizard: FC<VMCreationWizardProps> = ({ cluster, isOpen, namespace, onClose }) => {
   const { t } = useKubevirtTranslation();
-  const { resetWizardState, setCluster, setProject } = useVMWizardStore();
+  const { creationMethod, resetWizardState, setCluster, setProject } = useVMWizardStore();
   const wasOpenRef = useRef(false);
 
   useEffect(() => {
@@ -29,11 +32,9 @@ const VMCreationWizard: FC<VMCreationWizardProps> = ({ cluster, isOpen, namespac
     wasOpenRef.current = isOpen;
   }, [isOpen, cluster, namespace, resetWizardState, setCluster, setProject]);
 
-  const wizardFooterProps = {
-    backButtonText: t('Back'),
-    cancelButtonText: t('Cancel'),
-    nextButtonText: t('Next'),
-  };
+  const wizardFooterProps = getWizardFooterProps(t);
+
+  const isInstanceTypeMethod = creationMethod === VMCreationMethod.INSTANCE_TYPE;
 
   const handleClose = useCallback(() => {
     resetWizardState();
@@ -55,6 +56,14 @@ const VMCreationWizard: FC<VMCreationWizardProps> = ({ cluster, isOpen, namespac
           name={t('Deployment details')}
         >
           <DeploymentDetailsStep />
+        </WizardStep>
+        <WizardStep
+          footer={wizardFooterProps}
+          id="vm-creation-guest-os-step"
+          isHidden={!isInstanceTypeMethod}
+          name={t('Guest OS')}
+        >
+          <GuestOSStep />
         </WizardStep>
       </Wizard>
     </Modal>
