@@ -6,12 +6,14 @@ import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { Split, SplitItem, Stack, Switch } from '@patternfly/react-core';
+import { useSignals } from '@preact/signals-react/runtime';
 import ExpandSection from '@settings/ExpandSection/ExpandSection';
 import { USER_TAB_IDS } from '@settings/search/constants';
 
 import './GettingStartedSection.scss';
 
 const GettingStartedSection: FC = () => {
+  useSignals();
   const { t } = useKubevirtTranslation();
   const [quickStarts, setQuickStarts] = useKubevirtUserSettings('quickStart');
   const run = runningTourSignal.value;
