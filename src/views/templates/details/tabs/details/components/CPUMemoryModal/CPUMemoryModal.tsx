@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 import produce from 'immer';
 
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -38,7 +38,7 @@ type CPUMemoryModalProps = {
 
 const CPUMemoryModal: FC<CPUMemoryModalProps> = ({ isOpen, onClose, onSubmit, template }) => {
   const { t } = useKubevirtTranslation();
-  const vm = getTemplateVirtualMachineObject(template);
+  const vm = useMemo(() => getTemplateVirtualMachineObject(template), [template]);
 
   const { isTemplateEditable } = useEditTemplateAccessReview(template);
 
