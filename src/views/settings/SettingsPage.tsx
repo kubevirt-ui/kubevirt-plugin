@@ -69,11 +69,7 @@ const SettingsPage: FC = () => {
               </BreadcrumbItem>
               <BreadcrumbItem isActive>{t('Settings')}</BreadcrumbItem>
             </Breadcrumb>
-            <Title
-              className="settings-page__title"
-              data-test-id="settings-page-title"
-              headingLevel="h1"
-            >
+            <Title className="settings-page__title" headingLevel="h1">
               {t('Settings')}
             </Title>
             <Content component={ContentVariants.p}>
