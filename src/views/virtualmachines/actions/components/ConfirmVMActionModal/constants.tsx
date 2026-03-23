@@ -10,7 +10,7 @@ export const VM_ACTIONS = {
 
 export type VMAction = (typeof VM_ACTIONS)[keyof typeof VM_ACTIONS];
 
-export const vmActionMessages: Record<
+export const getVmActionMessages: Record<
   VMAction,
   (t: TFunction, name: string, namespace: string) => ReactElement
 > = {
@@ -40,14 +40,14 @@ export const vmActionMessages: Record<
   ),
 };
 
-export const vmActionTitles: Record<VMAction, (t: TFunction) => string> = {
+export const getVmActionTitles: Record<VMAction, (t: TFunction) => string> = {
   [VM_ACTIONS.pause]: (t) => t('Pause VirtualMachine?'),
   [VM_ACTIONS.reset]: (t) => t('Reset VirtualMachine?'),
   [VM_ACTIONS.restart]: (t) => t('Restart VirtualMachine?'),
   [VM_ACTIONS.stop]: (t) => t('Stop VirtualMachine?'),
 };
 
-export const vmActionLabels: Record<VMAction, (t: TFunction) => string> = {
+export const getVmActionLabels: Record<VMAction, (t: TFunction) => string> = {
   [VM_ACTIONS.pause]: (t) => t('Pause'),
   [VM_ACTIONS.reset]: (t) => t('Reset'),
   [VM_ACTIONS.restart]: (t) => t('Restart'),

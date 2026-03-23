@@ -5,10 +5,10 @@ import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 import {
-  actionMessages,
-  actionMessagesWithNamespace,
   CONFIRM_ACTIONS,
   ConfirmAction,
+  getActionMessages,
+  getActionMessagesWithNamespace,
 } from './constants';
 
 type ConfirmActionMessageProps = {
@@ -25,8 +25,8 @@ const ConfirmActionMessage: FC<ConfirmActionMessageProps> = ({
   const namespace = getNamespace(obj);
 
   return namespace
-    ? actionMessagesWithNamespace[action]?.(t, name, namespace)
-    : actionMessages[action]?.(t, name);
+    ? getActionMessagesWithNamespace[action](t, name, namespace)
+    : getActionMessages[action](t, name);
 };
 
 export default ConfirmActionMessage;

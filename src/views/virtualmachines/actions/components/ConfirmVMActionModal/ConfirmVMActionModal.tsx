@@ -6,7 +6,7 @@ import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 
 import ConfirmVMActionBaseModal from '../ConfirmMultipleVMActionsModal/components/ConfirmVMActionBaseModal';
 
-import { VMAction, vmActionLabels, vmActionMessages, vmActionTitles } from './constants';
+import { getVmActionLabels, getVmActionMessages, getVmActionTitles, VMAction } from './constants';
 
 type ConfirmVMActionModalProps = {
   action: (vm: V1VirtualMachine) => Promise<string>;
@@ -29,19 +29,19 @@ const ConfirmVMActionModal: FC<ConfirmVMActionModalProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const body = vmActionMessages[actionType]?.(t, getName(vm), getNamespace(vm));
+  const body = getVmActionMessages[actionType](t, getName(vm), getNamespace(vm));
   const actionOnVm = async () => action(vm);
 
   return (
     <ConfirmVMActionBaseModal
       action={actionOnVm}
-      actionLabel={vmActionLabels[actionType]?.(t)}
+      actionLabel={getVmActionLabels[actionType](t)}
       actionType={actionType}
       checkToConfirmMessage={checkToConfirmMessage}
       isOpen={isOpen}
       onClose={onClose}
       severityVariant={severityVariant}
-      title={vmActionTitles[actionType]?.(t)}
+      title={getVmActionTitles[actionType](t)}
     >
       {body}
     </ConfirmVMActionBaseModal>

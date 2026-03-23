@@ -9,7 +9,10 @@ export const CONFIRM_ACTIONS = {
 
 export type ConfirmAction = (typeof CONFIRM_ACTIONS)[keyof typeof CONFIRM_ACTIONS];
 
-export const actionMessages: Record<ConfirmAction, (t: TFunction, name: string) => ReactElement> = {
+export const getActionMessages: Record<
+  ConfirmAction,
+  (t: TFunction, name: string) => ReactElement
+> = {
   [CONFIRM_ACTIONS.delete]: (t, name) => (
     <Trans t={t}>
       Are you sure you want to delete <strong>{{ name }}</strong>?
@@ -27,7 +30,7 @@ export const actionMessages: Record<ConfirmAction, (t: TFunction, name: string) 
   ),
 };
 
-export const actionMessagesWithNamespace: Record<
+export const getActionMessagesWithNamespace: Record<
   ConfirmAction,
   (t: TFunction, name: string, namespace: string) => ReactElement
 > = {
