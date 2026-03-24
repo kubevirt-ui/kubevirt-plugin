@@ -102,8 +102,8 @@ export const useTreeViewData = (): UseTreeViewData => {
     () =>
       getLatestMigrationForEachVM(
         loadVMsPerNamespace
-          ? Object.values(allowedVMIMResources).flatMap((resource) => resource.data)
-          : allVMIM,
+          ? Object.values(allowedVMIMResources).flatMap((resource) => resource.data || [])
+          : allVMIM || [],
       ),
     [allVMIM, allowedVMIMResources, loadVMsPerNamespace],
   );
@@ -112,9 +112,9 @@ export const useTreeViewData = (): UseTreeViewData => {
 
   const sortedMemoizedVMs = useMemo(() => {
     const vms = loadVMsPerNamespace
-      ? Object.values(allowedResources).flatMap((resource) => resource.data)
+      ? Object.values(allowedResources).flatMap((resource) => resource.data || [])
       : allVMs;
-    return vms.sort((a, b) => universalComparator(getName(a), getName(b)));
+    return (vms || []).filter(Boolean).sort((a, b) => universalComparator(getName(a), getName(b)));
   }, [allVMs, allowedResources, loadVMsPerNamespace]);
 
   vmsSignal.value = sortedMemoizedVMs;

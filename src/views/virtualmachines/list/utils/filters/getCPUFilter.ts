@@ -6,7 +6,7 @@ import { getCPU } from '@kubevirt-utils/resources/vm';
 import { numberOperatorInfo } from '@kubevirt-utils/utils/constants';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
-import { VMIMapper } from '@virtualmachines/utils/mappers';
+import { getVMIFromMapper, VMIMapper } from '@virtualmachines/utils/mappers';
 
 export const getCPUFilter = (t: TFunction, vmiMapper: VMIMapper): RowFilter<V1VirtualMachine> => ({
   filter: (input, obj) => {
@@ -16,7 +16,7 @@ export const getCPUFilter = (t: TFunction, vmiMapper: VMIMapper): RowFilter<V1Vi
       return true;
     }
 
-    const vmi = vmiMapper.mapper?.[obj?.metadata?.namespace]?.[obj?.metadata?.name];
+    const vmi = getVMIFromMapper(vmiMapper, obj);
 
     const [operator, cpu] = cpuInfo.split(' ');
     const filterCPU = Number(cpu);

@@ -39,7 +39,7 @@ const useRedirectWatchHooks = <T extends K8sResourceCommon | K8sResourceCommon[]
     searchQueries,
   );
 
-  const kubevirtPodWatch = useKubevirtDataPod<T>(usePod ? watchOptions : {}, filterOptions);
+  const kubevirtPodWatch = useKubevirtDataPod<T>(usePod ? watchOptions : null, filterOptions);
 
   return useMemo(() => {
     const defaultData: T = watchOptions?.isList ? ([] as T) : undefined;

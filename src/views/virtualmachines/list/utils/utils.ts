@@ -7,7 +7,8 @@ export const filterVMsByClusterAndNamespace = (
   namespace: string,
   cluster?: string,
 ) =>
-  vms.filter((vm) => {
+  (vms ?? []).filter((vm) => {
+    if (!vm) return false;
     const vmNamespace = getNamespace(vm);
     const vmCluster = getCluster(vm);
 

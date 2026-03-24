@@ -87,6 +87,7 @@ const KubevirtTable = <TData, TCallbacks = undefined>(
     activeColumns,
     effectiveInitialSortKey,
     initialSortDirection,
+    callbacks,
   );
 
   const paginatedData = useMemo(() => {

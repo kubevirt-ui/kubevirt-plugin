@@ -13,6 +13,7 @@ export const useDataViewTableSort = <TData, TCallbacks = undefined>(
   columns: ColumnConfig<TData, TCallbacks>[],
   initialSortKey?: string,
   initialSortDirection: 'asc' | 'desc' = 'asc',
+  callbacks?: TCallbacks,
 ): {
   sortedData: TData[];
   tableColumns: DataViewTh[];
@@ -55,22 +56,22 @@ export const useDataViewTableSort = <TData, TCallbacks = undefined>(
     if (!direction) return data;
 
     if (column?.sort) {
-      return column.sort([...data], direction as SortByDirection);
+      return column.sort([...data], direction as SortByDirection, callbacks);
     }
 
     const getValue = column?.getValue;
     if (!getValue) return data;
 
     return [...data].sort((a, b) => {
-      const aVal = getValue(a);
-      const bVal = getValue(b);
+      const aVal = getValue(a, callbacks);
+      const bVal = getValue(b, callbacks);
       const cmp =
         typeof aVal === 'number' && typeof bVal === 'number'
           ? aVal - bVal
           : universalComparator(aVal, bVal);
       return direction === 'asc' ? cmp : -cmp;
     });
-  }, [data, sortBy, direction, columns]);
+  }, [data, sortBy, direction, columns, callbacks]);
 
   return { sortedData, tableColumns, visibleColumns };
 };

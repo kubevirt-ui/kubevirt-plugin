@@ -6,7 +6,7 @@ import { numberOperatorInfo } from '@kubevirt-utils/utils/constants';
 import { convertToBaseValue } from '@kubevirt-utils/utils/humanize.js';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
-import { VMIMapper } from '@virtualmachines/utils/mappers';
+import { getVMIFromMapper, VMIMapper } from '@virtualmachines/utils/mappers';
 
 export const getMemoryFilter = (
   t: TFunction,
@@ -19,7 +19,7 @@ export const getMemoryFilter = (
       return true;
     }
 
-    const vmi = vmiMapper.mapper?.[obj?.metadata?.namespace]?.[obj?.metadata?.name];
+    const vmi = getVMIFromMapper(vmiMapper, obj);
 
     const [operator, memoryFilterValue, memoryFilterUnit] = memoryInfo.split(' ');
 
