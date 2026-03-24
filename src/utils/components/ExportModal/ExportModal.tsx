@@ -25,6 +25,7 @@ import {
   createUploaderPod,
   exportInProgress,
   exportSucceeded,
+  isExportFormIncomplete,
 } from './utils';
 import ViewPodLogLink from './ViewPodLogLink';
 
@@ -69,6 +70,7 @@ const ExportModal: FC<ExportModalProps> = ({
 
   const uploadInProgress = exportInProgress(uploadPod || createdPod);
   const isUploadSucceeded = exportSucceeded(uploadPod || createdPod);
+  const isFormIncomplete = isExportFormIncomplete([destination, username, password, registryName]);
 
   return (
     <TabModal
@@ -100,12 +102,12 @@ const ExportModal: FC<ExportModalProps> = ({
       actionItemLink={<ViewPodLogLink pod={uploadPod} />}
       closeOnSubmit={false}
       headerText={t('Upload to registry')}
-      isDisabled={uploadInProgress}
+      isDisabled={uploadInProgress || isFormIncomplete}
       isLoading={uploadInProgress}
       isOpen={isOpen}
       onClose={onClose}
       shouldWrapInForm
-      submitBtnText={isUploadSucceeded ? t('Close') : t('Upload')}
+      submitBtnText={isUploadSucceeded ? t('Close') : t('Save')}
     >
       <Stack className="kv-exportmodal" hasGutter>
         <Alert
