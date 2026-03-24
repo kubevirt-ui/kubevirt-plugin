@@ -31,7 +31,7 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms,
   const { createModal } = useModal();
   const { featureEnabled: confirmVMActionsEnabled } = useFeatures(CONFIRM_VM_ACTIONS);
   const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
-  const mtvInstalled = useIsMTVInstalled();
+  const [mtvInstalled] = useIsMTVInstalled();
   const [hubClusterName] = useHubClusterName();
 
   const [provider, providerLoaded] = useProviderByClusterName(

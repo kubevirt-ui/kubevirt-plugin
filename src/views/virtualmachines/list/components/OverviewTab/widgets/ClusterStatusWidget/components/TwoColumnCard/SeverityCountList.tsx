@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
-import { getSeverityLabel, SeverityCount } from '../../hooks/clusterMetricConstants';
+import { getItemLabel, getSeverityLabel, SeverityCount } from '../../hooks/clusterMetricConstants';
 
 type SeverityCountListProps = {
   itemLabel?: string;
@@ -11,7 +11,6 @@ type SeverityCountListProps = {
 
 const SeverityCountList: FC<SeverityCountListProps> = ({ itemLabel, severityCounts }) => {
   const { t } = useKubevirtTranslation();
-  const label = itemLabel ?? t('clusters');
 
   return (
     <>
@@ -20,7 +19,9 @@ const SeverityCountList: FC<SeverityCountListProps> = ({ itemLabel, severityCoun
         .map(({ count, level }) => (
           <div className="two-column-card__severity-row" key={level}>
             <span className="two-column-card__severity-count">{count}</span>
-            <span className="two-column-card__severity-label">{label}</span>
+            <span className="two-column-card__severity-label">
+              {getItemLabel(count, t, itemLabel)}
+            </span>
             <span className="two-column-card__severity-value">{getSeverityLabel(level, t)}</span>
           </div>
         ))}

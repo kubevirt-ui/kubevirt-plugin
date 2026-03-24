@@ -16,6 +16,8 @@ type ResourceAllocationSubHeaderProps = {
   onDropdownChange?: (metric: string) => void;
   /** Currently selected METRICS value. */
   selectedMetric?: string;
+  /** Number of top cluster names returned (used to decide whether to show the count). */
+  topClusterCount?: number;
   /** Widget configs to populate the dropdown options. */
   widgetConfigs: WidgetConfig[];
 };
@@ -24,19 +26,25 @@ const ResourceAllocationSubHeader: FC<ResourceAllocationSubHeaderProps> = ({
   isAllClusters,
   onDropdownChange,
   selectedMetric,
+  topClusterCount = 0,
   widgetConfigs,
 }) => {
   const { t } = useKubevirtTranslation();
   const selectedLabel = widgetConfigs.find((w) => w.metric === selectedMetric)?.title ?? '';
+  const showCount = topClusterCount >= TOP_N;
 
   return (
-    <span className="resource-allocation-sub-header" onClick={(e) => e.stopPropagation()}>
+    <span className="resource-allocation-sub-header">
       {isAllClusters && (
-        <span className="resource-allocation-sub-header__all-clusters">
-          {/* TODO CNV-78882: Implement navigation to all clusters view and add ViewAllLink */}
+        <span
+          className="resource-allocation-sub-header__all-clusters"
+          onClick={(e) => e.stopPropagation()}
+        >
           <span className="resource-allocation-sub-header__top-clusters">
             <span className="resource-allocation-sub-header__top-clusters-label">
-              {t('Top {{clustersCount}} clusters by', { clustersCount: TOP_N })}
+              {showCount
+                ? t('Top {{clustersCount}} clusters by', { clustersCount: TOP_N })
+                : t('Top clusters by')}
             </span>
             <FormPFSelect
               onSelect={(_event, value) => onDropdownChange?.(value as string)}

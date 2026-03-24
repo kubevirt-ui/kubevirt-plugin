@@ -14,6 +14,7 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { DESCHEDULER_OPERATOR_NAME } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/constants';
 import { InstallState } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/types';
+import { isInstalled } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/utils';
 import { useVirtualizationFeaturesContext } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/VirtualizationFeaturesContext/VirtualizationFeaturesContext';
 
 import { DistributionBucket } from '../../shared/DistributionBarChart/DistributionBarChart';
@@ -39,6 +40,7 @@ type NodeLoadDistributionData = {
   distributionScore: number;
   items: StatusScoreItem[];
   loaded: boolean;
+  totalNodeCount: number;
 };
 
 const installStateToDeschedulerStatus = (
@@ -52,16 +54,23 @@ const installStateToDeschedulerStatus = (
   return DESCHEDULER_UNKNOWN;
 };
 
-export const useNodeLoadDistributionData = (): NodeLoadDistributionData => {
+export const useNodeLoadDistributionData = (clusterOverride?: string): NodeLoadDistributionData => {
   const { t } = useKubevirtTranslation();
-  const cluster = useClusterParam();
+  const clusterParam = useClusterParam();
+  const cluster = clusterOverride ?? clusterParam;
   const { operatorDetailsMap, operatorResourcesLoaded } = useVirtualizationFeaturesContext();
   const [workerNodes, workerNodesLoaded] = useWorkerNodes(cluster);
-  const { descheduler: deschedulerCR, deschedulerLoaded: deschedulerCRLoaded } =
-    useKubeDescheduler(cluster);
 
   const deschedulerInstallState = operatorDetailsMap?.[DESCHEDULER_OPERATOR_NAME]?.installState;
-  const deschedulerLoaded = (operatorResourcesLoaded && deschedulerCRLoaded) ?? false;
+  const isOperatorInstalled = isInstalled(deschedulerInstallState);
+
+  const { descheduler: deschedulerCR, deschedulerLoaded: deschedulerCRLoaded } = useKubeDescheduler(
+    { cluster, enabled: isOperatorInstalled },
+  );
+
+  const deschedulerLoaded = operatorResourcesLoaded
+    ? !isOperatorInstalled || deschedulerCRLoaded
+    : false;
   const deschedulerStatus =
     deschedulerLoaded && deschedulerInstallState !== undefined
       ? installStateToDeschedulerStatus(deschedulerInstallState, !isEmpty(deschedulerCR))
@@ -92,7 +101,7 @@ export const useNodeLoadDistributionData = (): NodeLoadDistributionData => {
     [t],
   );
 
-  const { buckets, distributionScore, items } = useMemo(() => {
+  const { buckets, distributionScore, items, totalNodeCount } = useMemo(() => {
     const usedMaps = {
       cpu: buildLabelMap(usedCPU?.data?.result ?? []),
       memory: buildLabelMap(usedMemory?.data?.result ?? []),
@@ -114,6 +123,7 @@ export const useNodeLoadDistributionData = (): NodeLoadDistributionData => {
       buckets: computeBuckets(nodes, bucketLabels),
       distributionScore: computeDistributionScore(nodes.map((n) => n.overall)),
       items: buildTopNodeItems(nodes, resourceLabels),
+      totalNodeCount: nodes.length,
     };
   }, [
     usedCPU,
@@ -134,5 +144,6 @@ export const useNodeLoadDistributionData = (): NodeLoadDistributionData => {
     distributionScore,
     items,
     loaded: metricsLoaded && workerNodesLoaded,
+    totalNodeCount,
   };
 };

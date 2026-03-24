@@ -65,7 +65,7 @@ const ClusterStatusWidget: FC<OverviewSectionData> = ({ cluster, title, vms }) =
             memoryLoad={memoryLoad}
             storageLoad={storageLoad}
           />
-          <NodeLoadDistributionCard />
+          <NodeLoadDistributionCard cluster={cluster} />
         </OverviewSectionRow>
       )}
     </OverviewSection>

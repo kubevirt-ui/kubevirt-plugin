@@ -17,13 +17,14 @@ type ClustersUtilizationData = {
   items: StatusScoreItem[];
   loaded: boolean;
   severityCounts: SeverityCount[];
+  totalCount: number;
 };
 
 const useClustersUtilizationData = (): ClustersUtilizationData => {
   const { loaded, totalCPU, totalMemory, totalStorage, usedCPU, usedMemory, usedStorage } =
     useResourceUtilizationPolls({ allClusters: true, groupBy: 'cluster' });
 
-  const { items, severityCounts } = useMemo(() => {
+  const { items, severityCounts, totalCount } = useMemo(() => {
     const usedMaps = {
       cpu: buildLabelMap(usedCPU?.data?.result ?? [], 'cluster'),
       memory: buildLabelMap(usedMemory?.data?.result ?? [], 'cluster'),
@@ -65,10 +66,14 @@ const useClustersUtilizationData = (): ClustersUtilizationData => {
       'ascending',
     );
 
-    return { items: computedItems, severityCounts: computedSeverity };
+    return {
+      items: computedItems,
+      severityCounts: computedSeverity,
+      totalCount: clusterUtils.length,
+    };
   }, [usedCPU, totalCPU, usedMemory, totalMemory, usedStorage, totalStorage]);
 
-  return { items, loaded, severityCounts };
+  return { items, loaded, severityCounts, totalCount };
 };
 
 export default useClustersUtilizationData;

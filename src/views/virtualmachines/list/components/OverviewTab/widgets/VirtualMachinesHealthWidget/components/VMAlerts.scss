@@ -2,5 +2,11 @@
   &__count {
     color: var(--pf-t--global--text--color--link--default);
     margin-inline-start: var(--pf-t--global--spacer--sm);
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+      text-decoration: underline;
+    }
   }
 }

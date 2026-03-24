@@ -30,6 +30,15 @@
     overflow: visible;
   }
 
+  &__chart-top-label {
+    position: absolute;
+    top: 4px;
+    left: 0;
+    font-size: var(--pf-t--chart--global--font-size--xs, 12px);
+    color: var(--pf-t--chart--global--fill--color--500);
+    pointer-events: none;
+  }
+
   &__quota {
     display: inline-flex;
     align-items: center;

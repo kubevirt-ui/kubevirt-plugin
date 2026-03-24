@@ -16,6 +16,8 @@ import {
 } from '../../../utils/VirtualizationFeaturesContext/VirtualizationFeaturesContext';
 import VirtualizationFeaturesWizard from '../../../VirtualizationFeaturesWizard/VirtualizationFeaturesWizard';
 
+import '../../VirtualizationFeaturesSection.scss';
+
 type ConfigureButtonProps = {
   spokeConsoleURL: string | undefined;
 };
@@ -31,10 +33,7 @@ const ConfigureButton: FC<ConfigureButtonProps> = ({ spokeConsoleURL }) => {
   return (
     <div className="virtualization-features-section__button-container">
       {isSpokeCluster && spokeConsoleURL && (
-        <ExternalLink
-          className="virtualization-features-section__catalog-link"
-          href={`${spokeConsoleURL}/operatorhub`}
-        >
+        <ExternalLink href={`${spokeConsoleURL}/operatorhub`}>
           {t('Install features from the Software Catalog')}
         </ExternalLink>
       )}

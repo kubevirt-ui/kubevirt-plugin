@@ -6,81 +6,118 @@ import { getMigrationStatusCounts } from '@kubevirt-utils/resources/vmim/utils';
 import { vmStatusIcon } from '@overview/OverviewTab/vm-statuses-card/utils/utils';
 import { Card, CardBody, CardHeader, CardTitle, Content, Grid } from '@patternfly/react-core';
 
-import StatusCountItem from '../shared/StatusCountItem';
+import StatusCountItem, { getLinkProps } from '../shared/StatusCountItem';
 import ViewAllLink from '../shared/ViewAllLink';
+
+import {
+  buildStatusFilterPath,
+  FAILED_STATUSES,
+  MigrationStatusCounts,
+  OTHER_STATUSES,
+  RUNNING_STATUSES,
+  SCHEDULED_STATUSES,
+} from './utils/migrationStatusConstants';
 
 import './MigrationsWidget.scss';
 
 type MigrationsWidgetProps = {
   cardTitle?: string;
-  isAllClustersPage: boolean;
   isLoading?: boolean;
-  onViewAll?: () => void;
-  vmims: V1VirtualMachineInstanceMigration[];
+  migrationsTabHref?: string;
+  migrationsTabPath?: string;
+  precomputedStatusCounts?: MigrationStatusCounts;
+  subHeader?: string;
+  vmims?: V1VirtualMachineInstanceMigration[];
 };
 
 const MigrationsWidget: FC<MigrationsWidgetProps> = ({
   cardTitle,
-  isAllClustersPage,
   isLoading,
-  onViewAll,
+  migrationsTabHref,
+  migrationsTabPath,
+  precomputedStatusCounts,
+  subHeader,
   vmims,
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const statusCounts = useMemo(() => getMigrationStatusCounts(vmims), [vmims]);
+  const isExternal = !!migrationsTabHref;
+  const basePath = migrationsTabPath || migrationsTabHref;
 
-  const title =
-    cardTitle ?? (isAllClustersPage ? t('Cross cluster migrations') : t('Compute migrations'));
+  const statusCounts = useMemo(
+    () => precomputedStatusCounts ?? getMigrationStatusCounts(vmims ?? []),
+    [precomputedStatusCounts, vmims],
+  );
+
+  const statusLinks = useMemo(() => {
+    if (!basePath) return {};
+    return {
+      failed: buildStatusFilterPath(basePath, FAILED_STATUSES),
+      other: buildStatusFilterPath(basePath, OTHER_STATUSES),
+      running: buildStatusFilterPath(basePath, RUNNING_STATUSES),
+      scheduled: buildStatusFilterPath(basePath, SCHEDULED_STATUSES),
+    };
+  }, [basePath]);
+
+  const hasNavigation = !!migrationsTabPath || !!migrationsTabHref;
 
   return (
     <Card className="migrations-widget" data-test="migrations-widget" isCompact>
-      {/* TODO CNV-78882: pass onViewAll once migrations navigation is implemented */}
       <CardHeader
         actions={
-          onViewAll
+          hasNavigation
             ? {
-                actions: <ViewAllLink onClick={onViewAll} />,
+                actions: <ViewAllLink href={migrationsTabHref} linkPath={migrationsTabPath} />,
                 hasNoOffset: false,
               }
             : undefined
         }
       >
-        <CardTitle>{title}</CardTitle>
+        <CardTitle>{cardTitle}</CardTitle>
       </CardHeader>
       <CardBody>
-        <Content className="migrations-widget__subheader" component="small">
-          {t('Last day')}
-        </Content>
-        <Grid className="migrations-widget__body-grid" hasGutter>
-          <StatusCountItem
-            count={statusCounts.failed}
-            icon={<vmStatusIcon.Error />}
-            isLoading={isLoading}
-            label={t('Failed')}
-            span={3}
-          />
-          <StatusCountItem
-            count={statusCounts.running}
-            icon={<vmStatusIcon.Running />}
-            isLoading={isLoading}
-            label={t('Running')}
-            span={3}
-          />
-          <StatusCountItem
-            count={statusCounts.scheduled}
-            icon={<vmStatusIcon.Scheduled />}
-            isLoading={isLoading}
-            label={t('Scheduled')}
-            span={3}
-          />
-          <StatusCountItem
-            count={statusCounts.other}
-            icon={<vmStatusIcon.Other />}
-            isLoading={isLoading}
-            label={t('Other')}
-            span={3}
-          />
+        {subHeader && (
+          <Content className="migrations-widget__subheader" component="small">
+            {subHeader}
+          </Content>
+        )}
+        <Grid className="status-count-grid" hasGutter>
+          {[
+            {
+              count: statusCounts.failed,
+              icon: <vmStatusIcon.Error />,
+              key: 'failed',
+              label: t('Failed'),
+            },
+            {
+              count: statusCounts.running,
+              icon: <vmStatusIcon.Running />,
+              key: 'running',
+              label: t('Running'),
+            },
+            {
+              count: statusCounts.scheduled,
+              icon: <vmStatusIcon.Scheduled />,
+              key: 'scheduled',
+              label: t('Scheduled'),
+            },
+            {
+              count: statusCounts.other,
+              icon: <vmStatusIcon.Other />,
+              key: 'other',
+              label: t('Other'),
+            },
+          ].map(({ count, icon, key, label }) => (
+            <StatusCountItem
+              {...getLinkProps(statusLinks[key], isExternal)}
+              count={count}
+              icon={icon}
+              isLoading={isLoading}
+              key={key}
+              label={label}
+              span={3}
+            />
+          ))}
         </Grid>
       </CardBody>
     </Card>

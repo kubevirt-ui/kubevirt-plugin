@@ -14,6 +14,7 @@ import {
   getResourcePercentages,
   getStatusDescending,
 } from './clusterMetricUtils';
+import useAllClustersWorkerNodes from './useAllClustersWorkerNodes';
 import useResourceUtilizationPolls from './useResourceUtilizationPolls';
 
 type NestedMap = Record<string, Record<string, number>>;
@@ -22,6 +23,7 @@ type ClustersLoadBalanceData = {
   items: StatusScoreItem[];
   loaded: boolean;
   severityCounts: SeverityCount[];
+  totalCount: number;
 };
 
 const computeClusterScores = (
@@ -31,6 +33,7 @@ const computeClusterScores = (
   totalMemMap: NestedMap,
   usedStorMap: NestedMap,
   totalStorMap: NestedMap,
+  workerNodesByCluster: Map<string, Set<string>>,
 ): { name: string; score: number }[] => {
   const allClusters = getAllKeysFromMaps(
     usedCPUMap,
@@ -44,7 +47,7 @@ const computeClusterScores = (
   const scores: { name: string; score: number }[] = [];
 
   for (const cluster of allClusters) {
-    const nodeNames = getAllKeysFromMaps(
+    const allNodeNames = getAllKeysFromMaps(
       usedCPUMap[cluster] ?? {},
       totalCPUMap[cluster] ?? {},
       usedMemMap[cluster] ?? {},
@@ -52,6 +55,11 @@ const computeClusterScores = (
       usedStorMap[cluster] ?? {},
       totalStorMap[cluster] ?? {},
     );
+
+    const workerNames = workerNodesByCluster.get(cluster);
+    const nodeNames = workerNames?.size
+      ? new Set([...allNodeNames].filter((n) => workerNames.has(n)))
+      : allNodeNames;
 
     const usedMaps = {
       cpu: usedCPUMap[cluster] ?? {},
@@ -79,10 +87,19 @@ const computeClusterScores = (
 const useClustersLoadBalanceData = (): ClustersLoadBalanceData => {
   const { t } = useKubevirtTranslation();
 
-  const { loaded, totalCPU, totalMemory, totalStorage, usedCPU, usedMemory, usedStorage } =
-    useResourceUtilizationPolls({ allClusters: true, groupBy: 'cluster, node' });
+  const {
+    loaded: metricsLoaded,
+    totalCPU,
+    totalMemory,
+    totalStorage,
+    usedCPU,
+    usedMemory,
+    usedStorage,
+  } = useResourceUtilizationPolls({ allClusters: true, groupBy: 'cluster, node' });
 
-  const { items, severityCounts } = useMemo(() => {
+  const { loaded: workerNodesLoaded, workerNodesByCluster } = useAllClustersWorkerNodes();
+
+  const { items, severityCounts, totalCount } = useMemo(() => {
     const usedCPUMap = buildNestedLabelMap(usedCPU?.data?.result ?? [], 'cluster', 'node');
     const totalCPUMap = buildNestedLabelMap(totalCPU?.data?.result ?? [], 'cluster', 'node');
     const usedMemMap = buildNestedLabelMap(usedMemory?.data?.result ?? [], 'cluster', 'node');
@@ -97,6 +114,7 @@ const useClustersLoadBalanceData = (): ClustersLoadBalanceData => {
       totalMemMap,
       usedStorMap,
       totalStorMap,
+      workerNodesByCluster,
     );
 
     const computedItems: StatusScoreItem[] = clusterScores.slice(0, TOP_N).map((c) => ({
@@ -113,10 +131,23 @@ const useClustersLoadBalanceData = (): ClustersLoadBalanceData => {
       'descending',
     );
 
-    return { items: computedItems, severityCounts: computedSeverity };
-  }, [usedCPU, totalCPU, usedMemory, totalMemory, usedStorage, totalStorage, t]);
+    return {
+      items: computedItems,
+      severityCounts: computedSeverity,
+      totalCount: clusterScores.length,
+    };
+  }, [
+    usedCPU,
+    totalCPU,
+    usedMemory,
+    totalMemory,
+    usedStorage,
+    totalStorage,
+    workerNodesByCluster,
+    t,
+  ]);
 
-  return { items, loaded, severityCounts };
+  return { items, loaded: metricsLoaded && workerNodesLoaded, severityCounts, totalCount };
 };
 
 export default useClustersLoadBalanceData;

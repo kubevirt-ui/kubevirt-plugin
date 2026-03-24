@@ -1,6 +1,6 @@
 import { FC, ReactNode } from 'react';
 
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
 export const OVERVIEW_LEVEL_PROJECT = 'project' as const;
 export const OVERVIEW_LEVEL_CLUSTER = 'cluster' as const;
@@ -27,7 +27,6 @@ export type OverviewSectionData = {
   namespace?: string;
   subHeader?: ReactNode;
   title: string;
-  vmis: V1VirtualMachineInstance[];
   vms: V1VirtualMachine[];
 };
 

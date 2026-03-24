@@ -57,7 +57,7 @@ const MultiClusterHealthStatus: FC<MultiClusterHealthStatusProps> = ({
           key={label}
           label={label}
           span={6}
-          tooltip={<ClusterNameTooltip clusters={clusters} />}
+          tooltip={clusters.length > 0 ? <ClusterNameTooltip clusters={clusters} /> : null}
         />
       ))}
     </>

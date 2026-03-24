@@ -39,33 +39,33 @@ const VMStatuses: FC<VMStatusesProps> = ({ vms }) => {
         <CardTitle>{t('Virtual machine statuses')}</CardTitle>
       </CardHeader>
       <CardBody>
-        <Grid hasGutter>
+        <Grid className="status-count-grid" hasGutter>
           <StatusCountItem
             count={primaryStatuses.Error}
+            href={errorPath}
             icon={<vmStatusIcon.Error />}
             label={t('Error')}
-            linkPath={errorPath}
             span={3}
           />
           <StatusCountItem
             count={primaryStatuses.Running}
+            href={runningPath}
             icon={<vmStatusIcon.Running />}
             label={t('Running')}
-            linkPath={runningPath}
             span={3}
           />
           <StatusCountItem
             count={primaryStatuses.Stopped}
+            href={stoppedPath}
             icon={<vmStatusIcon.Stopped />}
             label={t('Stopped')}
-            linkPath={stoppedPath}
             span={3}
           />
           <StatusCountItem
             count={otherStatusesCount}
+            href={otherPath}
             icon={<vmStatusIcon.Other />}
             label={t(OTHER)}
-            linkPath={otherPath}
             span={3}
           />
         </Grid>

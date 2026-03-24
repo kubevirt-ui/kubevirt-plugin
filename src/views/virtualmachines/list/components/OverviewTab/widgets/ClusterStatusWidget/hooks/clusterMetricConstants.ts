@@ -37,6 +37,11 @@ export const getSeverityLabel = (level: SeverityLevel, t: TFunction): string => 
   }
 };
 
+export const getItemLabel = (count: number, t: TFunction, itemLabel?: string): string => {
+  if (itemLabel) return itemLabel;
+  return count === 1 ? t('cluster') : t('clusters');
+};
+
 export const INSTANCE_TO_NODE = 'label_replace(%EXPR%, "node", "$1", "instance", "([^:]+).*")';
 
 export const STORAGE_FS_FILTER = '{fstype!~"tmpfs|ramfs|rootfs"}';

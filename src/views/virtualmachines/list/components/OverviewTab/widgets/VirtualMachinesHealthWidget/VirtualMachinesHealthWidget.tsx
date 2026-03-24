@@ -9,19 +9,20 @@ import OverviewSectionRow from '../OverviewSection/OverviewSectionRow';
 import GuestAgentIssues from './components/GuestAgentIssues';
 import VMAlerts from './components/VMAlerts';
 import VMStatuses from './components/VMStatuses';
+import useVMAlertsNavigation from './hooks/useVMAlertsNavigation';
 
-const VirtualMachinesHealthWidget: FC<OverviewSectionData> = ({ title, vmis, vms }) => {
+const VirtualMachinesHealthWidget: FC<OverviewSectionData> = ({ cluster, title, vms }) => {
   const isAllClustersPage = useIsAllClustersPage();
+  const { alertsBaseHref, alertsBasePath } = useVMAlertsNavigation(cluster);
 
   return (
     <OverviewSection dataTestId="vm-health-widget" title={title}>
-      {/* TODO CNV-78882: pass onViewAll to VMAlerts once alerts navigation is implemented */}
       <OverviewSectionRow gridColumns={GRID_VM_HEALTH}>
-        <VMAlerts />
+        <VMAlerts alertsBaseHref={alertsBaseHref} alertsBasePath={alertsBasePath} />
         {!isAllClustersPage && (
           <>
             <VMStatuses vms={vms} />
-            <GuestAgentIssues vmis={vmis} vms={vms} />
+            <GuestAgentIssues vms={vms} />
           </>
         )}
       </OverviewSectionRow>

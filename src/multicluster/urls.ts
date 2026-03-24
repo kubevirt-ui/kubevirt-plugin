@@ -14,6 +14,16 @@ import { VirtualMachineModel } from '../views/dashboard-extensions/utils';
 
 import { KUBEVIRT_VM_PATH } from './constants';
 
+/**
+ * Build a full URL for a spoke cluster console page by joining the spoke's
+ * base console URL with a path. Trailing slashes on the base are normalised.
+ */
+export const buildSpokeConsoleUrl = (spokeConsoleURL: string, path: string): string => {
+  const base = spokeConsoleURL.endsWith('/') ? spokeConsoleURL.slice(0, -1) : spokeConsoleURL;
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+  return `${base}${normalizedPath}`;
+};
+
 export const isACMPath = (pathname: string): boolean => {
   if (pathname.startsWith('/k8s/all-clusters')) return true;
 
