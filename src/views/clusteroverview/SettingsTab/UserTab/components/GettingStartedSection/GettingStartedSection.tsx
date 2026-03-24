@@ -1,9 +1,7 @@
 import React, { FC } from 'react';
 
-import {
-  runningTourSignal,
-  startTour,
-} from '@kubevirt-utils/components/GuidedTour/utils/constants';
+import useTour from '@kubevirt-utils/components/GuidedTour/hooks/useTour';
+import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { Stack, Switch } from '@patternfly/react-core';
@@ -16,6 +14,8 @@ const GettingStartedSection: FC = () => {
   const { t } = useKubevirtTranslation();
   const [quickStarts, setQuickStarts] = useKubevirtUserSettings('quickStart');
   const run = runningTourSignal.value;
+  const { startTour, stopTour } = useTour();
+
   return (
     <ExpandSection
       dataTestID="settings-user-getting-started"
@@ -36,7 +36,7 @@ const GettingStartedSection: FC = () => {
           data-test-id="guided-tour"
           isChecked={run}
           label={t('Guided tour')}
-          onChange={!run && startTour}
+          onChange={run ? stopTour : startTour}
         />
       </Stack>
     </ExpandSection>

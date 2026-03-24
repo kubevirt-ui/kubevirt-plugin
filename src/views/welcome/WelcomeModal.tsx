@@ -2,7 +2,7 @@ import React, { FC, useCallback, useState } from 'react';
 import { Trans } from 'react-i18next';
 import openCulture from 'images/openCulture.svg';
 
-import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/constants';
+import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import {

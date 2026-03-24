@@ -3,39 +3,38 @@ import Joyride, { ACTIONS, CallBackProps, EVENTS } from 'react-joyride';
 import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { useSignals } from '@preact/signals-react/runtime';
 
 import TourPopover from './components/TourPopover/TourPopover';
-import {
-  nextStep,
-  prevStep,
-  runningTourSignal,
-  stepIndexSignal,
-  stopTour,
-  tourSteps,
-} from './utils/constants';
+import useTour from './hooks/useTour';
+import { tourSteps } from './utils/constants';
+import { nextStep, prevStep, runningTourSignal, stepIndexSignal } from './utils/guidedTourSignals';
 
 const GuidedTour: FC = () => {
-  useSignals();
   const location = useLocation();
   const navigate = useNavigate();
+
+  const { stopTour } = useTour();
 
   return (
     <Joyride
       callback={(callbackProps: CallBackProps) => {
-        const { action, index, size, step, type } = callbackProps;
+        const { action, size, step, type } = callbackProps;
         const route = step?.data?.route;
 
         if (typeof step?.target === 'string') {
           document.querySelector(step.target)?.scrollIntoView();
         }
 
-        if (!isEmpty(route) && location.pathname !== route) {
+        if (!isEmpty(route) && location.pathname !== route && runningTourSignal.value) {
           navigate(route);
         }
 
         if (action === ACTIONS.CLOSE) {
+          if (stepIndexSignal.value === size - 1) {
+            nextStep();
+          }
           stopTour();
+
           return;
         }
 
@@ -46,12 +45,16 @@ const GuidedTour: FC = () => {
             return;
           }
           if (action === ACTIONS.NEXT) {
-            if (index === size - 1) {
+            if (stepIndexSignal.value < size - 1) {
+              nextStep();
+              return;
+            }
+
+            if (stepIndexSignal.value === size - 1) {
+              nextStep();
               stopTour();
               return;
             }
-            nextStep();
-            return;
           }
         }
       }}

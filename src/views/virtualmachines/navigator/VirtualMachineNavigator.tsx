@@ -1,13 +1,13 @@
 import React, { FC, useMemo, useRef } from 'react';
 import { useLocation } from 'react-router-dom-v5-compat';
 
+import { VirtualMachineModelRef } from '@kubevirt-ui/kubevirt-api/console';
 import CreateResourceDefaultPage from '@kubevirt-utils/components/CreateResourceDefaultPage/CreateResourceDefaultPage';
 import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { ADVANCED_SEARCH } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { VirtualMachineModelRef } from '@kubevirt-utils/models';
 import {
   ListPageHeader,
   OnFilterChange,
@@ -67,15 +67,13 @@ const VirtualMachineNavigator: FC = () => {
       </ListPageHeader>
       <Divider />
       <VirtualMachineTreeView onFilterChange={onFilterChange} {...treeProps}>
+        <GuidedTour />
         {isVirtualMachineListPage ? (
-          <>
-            <GuidedTour />
-            <VirtualMachinesList
-              kind={VirtualMachineModelRef}
-              namespace={namespace}
-              ref={vmListRef}
-            />
-          </>
+          <VirtualMachinesList
+            kind={VirtualMachineModelRef}
+            namespace={namespace}
+            ref={vmListRef}
+          />
         ) : (
           <VirtualMachineNavPage
             kind={VirtualMachineModelRef}

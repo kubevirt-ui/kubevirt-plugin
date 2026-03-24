@@ -24,10 +24,8 @@ import {
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import {
-  runningTourSignal,
-  tourGuideVM,
-} from '@kubevirt-utils/components/GuidedTour/utils/constants';
+import { tourGuideVM } from '@kubevirt-utils/components/GuidedTour/utils/constants';
+import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import {
   ExposedFilterFunctions,
