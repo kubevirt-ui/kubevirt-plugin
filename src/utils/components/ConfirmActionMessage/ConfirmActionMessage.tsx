@@ -1,32 +1,32 @@
-import * as React from 'react';
-import { Trans } from 'react-i18next';
+import { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
+import {
+  CONFIRM_ACTIONS,
+  ConfirmAction,
+  getActionMessages,
+  getActionMessagesWithNamespace,
+} from './constants';
+
 type ConfirmActionMessageProps = {
-  action?: string;
-  obj: { metadata: { name: string; namespace: string } } | K8sResourceCommon;
+  action?: ConfirmAction;
+  obj: K8sResourceCommon;
 };
 
-const ConfirmActionMessage: React.FC<ConfirmActionMessageProps> = ({ action = 'delete', obj }) => {
+const ConfirmActionMessage: FC<ConfirmActionMessageProps> = ({
+  action = CONFIRM_ACTIONS.delete,
+  obj,
+}) => {
   const { t } = useKubevirtTranslation();
-  const objNamespace = obj?.metadata?.namespace;
+  const name = getName(obj);
+  const namespace = getNamespace(obj);
 
-  return (
-    <>
-      <Trans t={t}>
-        Are you sure you want to {{ action }} <strong>{{ name: obj?.metadata?.name }}</strong>
-      </Trans>
-
-      {objNamespace && (
-        <Trans t={t}>
-          {' '}
-          in namespace <strong>{{ objNamespace }}</strong>?
-        </Trans>
-      )}
-    </>
-  );
+  return namespace
+    ? getActionMessagesWithNamespace[action](t, name, namespace)
+    : getActionMessages[action](t, name);
 };
 
 export default ConfirmActionMessage;

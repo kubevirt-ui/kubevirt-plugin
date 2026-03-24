@@ -15,6 +15,7 @@ import {
 
 type ConfirmVMActionBaseModalProps = {
   action: () => Promise<string | void>;
+  actionLabel: string;
   actionType: string;
   checkToConfirmMessage?: string;
   isOpen: boolean;
@@ -25,6 +26,7 @@ type ConfirmVMActionBaseModalProps = {
 
 const ConfirmVMActionBaseModal: FC<ConfirmVMActionBaseModalProps> = ({
   action,
+  actionLabel,
   actionType,
   checkToConfirmMessage,
   children,
@@ -72,7 +74,7 @@ const ConfirmVMActionBaseModal: FC<ConfirmVMActionBaseModalProps> = ({
           onClick={submitHandler}
           variant={severityVariant}
         >
-          {t(actionType)}
+          {actionLabel}
         </Button>
         <Button key="cancel" onClick={onClose} variant={ButtonVariant.link}>
           {t('Cancel')}

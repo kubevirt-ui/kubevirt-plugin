@@ -5,6 +5,7 @@ import { produceVMDisks, useWizardVMContext } from '@catalog/utils/WizardVMConte
 import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
+import { CONFIRM_ACTIONS } from '@kubevirt-utils/components/ConfirmActionMessage/constants';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
 import {
   DefaultFormValues,
@@ -78,7 +79,10 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({ diskName }) => {
         submitBtnText={deleteBtnText}
         submitBtnVariant={ButtonVariant.danger}
       >
-        <ConfirmActionMessage action="detach" obj={{ metadata: { name: diskName } }} />
+        <ConfirmActionMessage
+          action={CONFIRM_ACTIONS.detach}
+          obj={{ metadata: { name: diskName } }}
+        />
       </TabModal>
     ));
   };

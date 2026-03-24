@@ -3,6 +3,7 @@ import React, { FC, useMemo, useState } from 'react';
 import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine, V1Volume } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
+import { CONFIRM_ACTIONS } from '@kubevirt-utils/components/ConfirmActionMessage/constants';
 import {
   getRemoveHotplugPromise,
   produceVMDisks,
@@ -118,7 +119,7 @@ const DeleteDiskModal: FC<DeleteDiskModalProps> = ({
             obj={{
               metadata: { name: diskName },
             }}
-            action="detach"
+            action={CONFIRM_ACTIONS.detach}
           />
         </StackItem>
         {loaded && (

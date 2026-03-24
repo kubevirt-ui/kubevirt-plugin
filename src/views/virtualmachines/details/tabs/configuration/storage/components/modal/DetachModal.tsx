@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
+import { CONFIRM_ACTIONS } from '@kubevirt-utils/components/ConfirmActionMessage/constants';
 import TabModal, { TabModalProps } from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
@@ -10,7 +11,10 @@ const DetachModal: FC<DetachModalProps> = (props) => {
   const { t } = useKubevirtTranslation();
   return (
     <TabModal headerText={t('Detach disk?')} {...props}>
-      <ConfirmActionMessage action="detach" obj={{ metadata: { name: props.diskName } }} />
+      <ConfirmActionMessage
+        action={CONFIRM_ACTIONS.detach}
+        obj={{ metadata: { name: props.diskName } }}
+      />
     </TabModal>
   );
 };
