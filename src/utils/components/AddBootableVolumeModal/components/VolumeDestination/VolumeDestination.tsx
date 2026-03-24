@@ -2,8 +2,10 @@ import React, { FC, useState } from 'react';
 
 import ApplyStorageProfileSettings from '@kubevirt-utils/components/ApplyStorageProfileSettings/ApplyStorageProfileSettings';
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
+import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import ProjectDropdown from '@kubevirt-utils/components/ProjectDropdown/ProjectDropdown';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useRequiredFieldValidation } from '@kubevirt-utils/hooks/useRequiredFieldValidation';
 import { ExpandableSection, FormGroup, Grid, GridItem, TextInput } from '@patternfly/react-core';
 
 import { AddBootableVolumeState, SetBootableVolumeFieldType } from '../../utils/constants';
@@ -35,15 +37,28 @@ const VolumeDestination: FC<VolumeDestinationProps> = ({
     volumeMode,
   } = bootableVolume || {};
 
+  const {
+    isInvalid: isVolumeNameInvalid,
+    onBlur: onVolumeNameBlur,
+    validated: volumeNameValidated,
+  } = useRequiredFieldValidation(bootableVolumeName);
+
   return (
     <>
-      <FormGroup isRequired label={t('Volume name')}>
+      <FormGroup fieldId="volume-name" isRequired label={t('Volume name')}>
         <TextInput
-          id="name"
+          id="volume-name"
+          onBlur={onVolumeNameBlur}
           onChange={(_, value: string) => setBootableVolumeField('bootableVolumeName')(value)}
           type="text"
-          value={bootableVolumeName}
+          validated={volumeNameValidated}
+          value={bootableVolumeName ?? ''}
         />
+        {isVolumeNameInvalid && (
+          <FormGroupHelperText validated={volumeNameValidated}>
+            {t('This field is required')}
+          </FormGroupHelperText>
+        )}
       </FormGroup>
       <FormGroup label={t('Destination project')}>
         <ProjectDropdown

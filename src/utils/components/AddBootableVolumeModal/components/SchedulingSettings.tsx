@@ -4,6 +4,7 @@ import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useRequiredFieldValidation } from '@kubevirt-utils/hooks/useRequiredFieldValidation';
 import { Content, FormGroup, NumberInput, TextInput, Title } from '@patternfly/react-core';
 
 import { AddBootableVolumeState, SetBootableVolumeFieldType } from '../utils/constants';
@@ -20,6 +21,12 @@ const SchedulingSettings: FC<SchedulingSettingsProps> = ({
   const { t } = useKubevirtTranslation();
 
   const { cronExpression, retainRevisions } = bootableVolume || {};
+
+  const {
+    isInvalid: isCronInvalid,
+    onBlur: onCronBlur,
+    validated: cronValidated,
+  } = useRequiredFieldValidation(cronExpression);
 
   return (
     <>
@@ -63,11 +70,17 @@ const SchedulingSettings: FC<SchedulingSettingsProps> = ({
         <TextInput
           data-test-id="volume-registry-retain-cron-expression"
           id="volume-registry-retain-cron-expression"
+          onBlur={onCronBlur}
           onChange={(_, value: string) => setBootableVolumeField('cronExpression')(value)}
           type="text"
-          value={cronExpression}
+          validated={cronValidated}
+          value={cronExpression ?? ''}
         />
-        <FormGroupHelperText>{t('Example (At 00:00 on Tuesday): 0 0 * * 2.')}</FormGroupHelperText>
+        <FormGroupHelperText validated={cronValidated}>
+          {isCronInvalid
+            ? t('This field is required')
+            : t('Example (At 00:00 on Tuesday): 0 0 * * 2.')}
+        </FormGroupHelperText>
       </FormGroup>
     </>
   );
