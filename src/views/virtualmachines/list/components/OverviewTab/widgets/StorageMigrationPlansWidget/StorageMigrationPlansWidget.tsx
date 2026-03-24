@@ -6,9 +6,10 @@ import { vmStatusIcon } from '@overview/OverviewTab/vm-statuses-card/utils/utils
 import { Card, CardBody, CardHeader, CardTitle, Grid } from '@patternfly/react-core';
 import { PendingIcon } from '@patternfly/react-icons';
 
-import StatusCountItem from '../shared/StatusCountItem';
+import StatusCountItem, { getLinkProps } from '../shared/StatusCountItem';
 import ViewAllLink from '../shared/ViewAllLink';
 
+import useStorageMigrationNavigation from './useStorageMigrationNavigation';
 import useStorageMigrationOverviewData from './useStorageMigrationOverviewData';
 import { getStorageMigrationStatusCounts } from './utils';
 
@@ -16,15 +17,12 @@ import './StorageMigrationPlansWidget.scss';
 
 type StorageMigrationPlansWidgetProps = {
   cluster?: string;
-  onViewAll?: () => void;
 };
 
-const StorageMigrationPlansWidget: FC<StorageMigrationPlansWidgetProps> = ({
-  cluster,
-  onViewAll,
-}) => {
+const StorageMigrationPlansWidget: FC<StorageMigrationPlansWidgetProps> = ({ cluster }) => {
   const { t } = useKubevirtTranslation();
   const { loaded, loadError, storageMigPlans } = useStorageMigrationOverviewData(cluster);
+  const { basePath, isExternal, pendingUrl, runningUrl } = useStorageMigrationNavigation(cluster);
 
   const statusCounts = useMemo(
     () => getStorageMigrationStatusCounts(storageMigPlans),
@@ -37,16 +35,11 @@ const StorageMigrationPlansWidget: FC<StorageMigrationPlansWidgetProps> = ({
       data-test="storage-migration-plans-widget"
       isCompact
     >
-      {/* TODO CNV-78882: pass onViewAll once storage migrations navigation is implemented */}
       <CardHeader
-        actions={
-          onViewAll
-            ? {
-                actions: <ViewAllLink onClick={onViewAll} />,
-                hasNoOffset: false,
-              }
-            : undefined
-        }
+        actions={{
+          actions: <ViewAllLink {...getLinkProps(basePath, isExternal)} />,
+          hasNoOffset: false,
+        }}
       >
         <CardTitle>{t('Storage migration plans')}</CardTitle>
       </CardHeader>
@@ -56,6 +49,7 @@ const StorageMigrationPlansWidget: FC<StorageMigrationPlansWidgetProps> = ({
         ) : (
           <Grid className="storage-migration-plans-widget__body-grid" hasGutter>
             <StatusCountItem
+              {...getLinkProps(runningUrl, isExternal)}
               count={statusCounts.running}
               icon={<vmStatusIcon.Running />}
               isLoading={!loaded}
@@ -63,6 +57,7 @@ const StorageMigrationPlansWidget: FC<StorageMigrationPlansWidgetProps> = ({
               span={3}
             />
             <StatusCountItem
+              {...getLinkProps(pendingUrl, isExternal)}
               count={statusCounts.pending}
               icon={<PendingIcon />}
               isLoading={!loaded}

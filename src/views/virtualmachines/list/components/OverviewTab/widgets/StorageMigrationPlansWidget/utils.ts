@@ -4,6 +4,7 @@ import {
 } from '@kubevirt-utils/resources/migrations/constants';
 import { isMigrationCompleted } from '@kubevirt-utils/resources/migrations/utils';
 import { getStatusNamespaces } from '@kubevirt-utils/resources/shared';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 type StorageMigrationStatusCounts = {
   other: number;
@@ -19,11 +20,11 @@ export const getStorageMigrationStatusCounts = (
   let other = 0;
   for (const plan of plans || []) {
     const namespaces = getStatusNamespaces(plan);
-    const hasFailed = namespaces?.some((ns) => ns?.[STORAGE_MIGRATION_PHASE.FAILED]?.length > 0);
+    const hasFailed = namespaces?.some((ns) => !isEmpty(ns?.[STORAGE_MIGRATION_PHASE.FAILED]));
     const hasInProgress = namespaces?.some(
-      (ns) => ns?.[STORAGE_MIGRATION_PHASE.IN_PROGRESS]?.length > 0,
+      (ns) => !isEmpty(ns?.[STORAGE_MIGRATION_PHASE.IN_PROGRESS]),
     );
-    const hasInvalid = namespaces?.some((ns) => ns?.[STORAGE_MIGRATION_PHASE.INVALID]?.length > 0);
+    const hasInvalid = namespaces?.some((ns) => !isEmpty(ns?.[STORAGE_MIGRATION_PHASE.INVALID]));
     const completed = isMigrationCompleted(plan);
 
     if (hasFailed || hasInvalid) {

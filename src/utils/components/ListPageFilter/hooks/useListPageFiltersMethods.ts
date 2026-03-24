@@ -1,5 +1,7 @@
+import { useCallback, useEffect, useRef } from 'react';
 import { useDebounceCallback } from 'src/views/clusteroverview/utils/hooks/useDebounceCallback';
 
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { OnFilterChange, RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 
 import { STATIC_SEARCH_FILTERS } from '../constants';
@@ -33,13 +35,25 @@ const useListPageFiltersMethods: UseListPageFiltersMethods = ({
 
   const applyTextFiltersWithDebounce: ApplyTextFilters = useDebounceCallback(applyTextFilters, 250);
 
-  const applyRowFilter = (selected: string[]) => {
-    generatedRowFilters?.forEach?.(({ items, type }) => {
-      const all = items?.map?.(({ id }) => id) ?? [];
-      const recognized = intersection(selected, all);
-      applyFilters(type, { all, selected: [...new Set(recognized as string[])] });
-    });
-  };
+  const applyRowFilter = useCallback(
+    (selected: string[]) => {
+      generatedRowFilters?.forEach?.(({ items, type }) => {
+        const all = items?.map?.(({ id }) => id) ?? [];
+        const recognized = intersection(selected, all);
+        applyFilters(type, { all, selected: [...new Set(recognized as string[])] });
+      });
+    },
+    [generatedRowFilters, applyFilters],
+  );
+
+  const initialSyncDone = useRef(false);
+  useEffect(() => {
+    if (initialSyncDone.current || isEmpty(generatedRowFilters) || isEmpty(selectedRowFilters))
+      return;
+
+    initialSyncDone.current = true;
+    applyRowFilter(selectedRowFilters);
+  }, [applyRowFilter, generatedRowFilters, selectedRowFilters]);
 
   const updateRowFilterSelected = (id: string[]) => {
     const selectedNew = Array.from(

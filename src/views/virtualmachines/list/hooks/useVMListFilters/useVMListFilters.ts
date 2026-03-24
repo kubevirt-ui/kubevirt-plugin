@@ -12,6 +12,7 @@ import { getArchitectureFilter } from '../../utils/filters/getArchitectureFilter
 import { getCPUFilter } from '../../utils/filters/getCPUFilter';
 import { getDateFilter } from '../../utils/filters/getDateFilter';
 import { getDescriptionFilter } from '../../utils/filters/getDescriptionFilter';
+import { getGuestAgentFilter } from '../../utils/filters/getGuestAgentFilter';
 import { getHWDevicesFilter } from '../../utils/filters/getHWDevicesFilter';
 import { getIPFilter } from '../../utils/filters/getIPFilter';
 import { getMemoryFilter } from '../../utils/filters/getMemoryFilter';
@@ -46,6 +47,7 @@ export const useVMListFilters = (
   const schedulingFilter = getSchedulingFilter(t);
   const nodesFilter = useNodesFilter(vmiMapper);
 
+  const guestAgentFilter = getGuestAgentFilter(t);
   const descriptionFilter = getDescriptionFilter(t);
   const cpuFilter = getCPUFilter(t, vmiMapper);
   const memoryFilter = getMemoryFilter(t, vmiMapper);
@@ -63,6 +65,7 @@ export const useVMListFilters = (
     hwDevicesFilter,
     schedulingFilter,
     nodesFilter,
+    guestAgentFilter,
   ];
 
   if (isACMPage) filtersWithSelect.unshift(clusterFilter);

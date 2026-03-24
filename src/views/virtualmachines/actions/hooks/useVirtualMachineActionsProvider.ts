@@ -33,7 +33,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
 
   const virtctlCommand = getConsoleVirtctlCommand(vm);
 
-  const mtvInstalled = useIsMTVInstalled();
+  const [mtvInstalled] = useIsMTVInstalled();
 
   const acmActions = useACMExtensionActions(vm);
 

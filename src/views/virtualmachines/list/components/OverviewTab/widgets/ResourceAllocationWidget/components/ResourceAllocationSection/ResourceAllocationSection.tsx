@@ -93,6 +93,7 @@ const ResourceAllocationSection: FC<OverviewSectionData> = ({ namespace, title }
       isAllClusters={isAllClusters}
       onDropdownChange={setSelectedMetric}
       selectedMetric={selectedMetric}
+      topClusterCount={topClusterNames.length}
       widgetConfigs={widgetConfigs}
     />
   );

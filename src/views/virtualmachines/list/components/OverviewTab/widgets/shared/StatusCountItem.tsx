@@ -1,44 +1,56 @@
 import React, { FC, ReactNode } from 'react';
-import { Link } from 'react-router-dom-v5-compat';
 import classNames from 'classnames';
 
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { GridItem, Skeleton, Tooltip } from '@patternfly/react-core';
+
+import CountContent from './CountContent';
 
 import './StatusCountItem.scss';
 
 type StatusCountItemProps = {
   className?: string;
   count?: number | string;
+  helpContent?: ReactNode;
+  href?: string;
   icon?: ReactNode;
+  isExternal?: boolean;
   isLoading?: boolean;
   label: string;
-  linkPath?: string;
   span?: 3 | 4 | 6;
   statusMessage?: string;
   tooltip?: ReactNode;
 };
 
+export const getLinkProps = (
+  url: string | undefined,
+  isExternal: boolean,
+): Pick<StatusCountItemProps, 'href' | 'isExternal'> => ({ href: url, isExternal });
+
 const StatusCountItem: FC<StatusCountItemProps> = ({
   className,
   count,
+  helpContent,
+  href,
   icon,
+  isExternal,
   isLoading,
   label,
-  linkPath,
   span = 4,
   statusMessage,
   tooltip,
 }) => {
   const displayValue = count ?? statusMessage;
+  const linkAriaLabel = href ? `${label}: ${displayValue}` : undefined;
 
-  const countContent = linkPath ? (
-    <Link className="status-count-item__link" to={linkPath}>
-      {displayValue}
-    </Link>
-  ) : (
-    <span className={statusMessage ? 'status-count-item__text' : 'status-count-item__count'}>
-      {displayValue}
-    </span>
+  const countContent = (
+    <CountContent
+      ariaLabel={linkAriaLabel}
+      displayValue={displayValue}
+      href={href}
+      isExternal={isExternal}
+      statusMessage={statusMessage}
+    />
   );
 
   const wrappedCount = tooltip ? (
@@ -57,7 +69,15 @@ const StatusCountItem: FC<StatusCountItemProps> = ({
         className="status-count-item"
         data-test={`status-count-${label.toLowerCase().replace(/\s+/g, '-')}`}
       >
-        <div className="status-count-item__label">{label}</div>
+        <div className="status-count-item__label">
+          {label}
+          {helpContent && (
+            <HelpTextIcon
+              bodyContent={helpContent}
+              helpIconClassName="status-count-item__help-icon"
+            />
+          )}
+        </div>
         <div className="status-count-item__value">
           {isLoading ? (
             <Skeleton width="40px" />

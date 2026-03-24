@@ -1,6 +1,7 @@
-import React, { FC } from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import useResponsiveCharts from '@kubevirt-utils/components/Charts/hooks/useResponsiveCharts';
+import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { Chart, ChartAxis, ChartBar } from '@patternfly/react-charts/victory';
 import { Skeleton } from '@patternfly/react-core';
 import chart_color_black_200 from '@patternfly/react-tokens/dist/esm/chart_color_black_200';
@@ -17,11 +18,17 @@ export type DistributionBucket = {
 
 type DistributionBarChartProps = {
   buckets: DistributionBucket[];
+  helpContent?: ReactNode;
   isLoading?: boolean;
   title: string;
 };
 
-const DistributionBarChart: FC<DistributionBarChartProps> = ({ buckets, isLoading, title }) => {
+const DistributionBarChart: FC<DistributionBarChartProps> = ({
+  buckets,
+  helpContent,
+  isLoading,
+  title,
+}) => {
   const { height, ref, width } = useResponsiveCharts();
 
   const safeBuckets = buckets ?? [];
@@ -37,7 +44,10 @@ const DistributionBarChart: FC<DistributionBarChartProps> = ({ buckets, isLoadin
 
   return (
     <div className="distribution-bar-chart">
-      <div className="distribution-bar-chart__title">{title}</div>
+      <div className="distribution-bar-chart__title">
+        {title}
+        {helpContent && <HelpTextIcon bodyContent={helpContent} />}
+      </div>
       <div aria-label={title} className="distribution-bar-chart__chart" ref={ref} role="img">
         {isLoading ? (
           <Skeleton height="100%" width="100%" />

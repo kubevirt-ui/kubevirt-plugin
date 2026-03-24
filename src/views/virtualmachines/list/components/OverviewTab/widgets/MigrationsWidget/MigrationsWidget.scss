@@ -6,10 +6,4 @@
     color: var(--pf-t--global--text--color--subtle);
     min-height: var(--pf-t--global--font--line-height--body);
   }
-
-  &__body-grid {
-    .status-count-item__grid-item {
-      padding-inline-start: 0;
-    }
-  }
 }

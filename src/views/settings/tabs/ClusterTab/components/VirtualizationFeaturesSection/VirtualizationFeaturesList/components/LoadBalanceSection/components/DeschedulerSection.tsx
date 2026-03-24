@@ -27,7 +27,10 @@ type DeschedulerSectionProps = {
 const DeschedulerSection: FC<DeschedulerSectionProps> = ({ isOperatorInstalled }) => {
   const { t } = useKubevirtTranslation();
   const cluster = useSettingsCluster();
-  const { descheduler, deschedulerLoaded } = useKubeDescheduler(cluster);
+  const { descheduler, deschedulerLoaded } = useKubeDescheduler({
+    cluster,
+    enabled: isOperatorInstalled,
+  });
 
   const deviationThresholdSelectOptions = useDeviationThresholdSelectOptions(descheduler);
 

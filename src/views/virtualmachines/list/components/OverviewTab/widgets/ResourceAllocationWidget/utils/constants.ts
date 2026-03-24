@@ -1,4 +1,4 @@
-export const RESOURCE_CHART_PADDING = { bottom: 35, left: 60, right: 15, top: 10 };
+export const RESOURCE_CHART_PADDING = { bottom: 35, left: 25, right: 18, top: 30 };
 export const CHART_DAYS_WINDOW = 7;
 export const MIB_PER_GIB = 1024;
 

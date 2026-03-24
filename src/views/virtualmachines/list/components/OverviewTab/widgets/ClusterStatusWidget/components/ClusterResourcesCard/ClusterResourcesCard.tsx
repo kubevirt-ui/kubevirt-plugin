@@ -1,9 +1,7 @@
 import React, { FC } from 'react';
 
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useResourcesQuantities from '@overview/OverviewTab/resources-inventory-card/hooks/useResourcesQuantities';
-
-import ResourceTile from './ResourceTile';
+import AllClustersResourcesCard from './AllClustersResourcesCard';
+import SingleClusterResourcesCard from './SingleClusterResourcesCard';
 
 import './ClusterResourcesCard.scss';
 
@@ -20,23 +18,17 @@ const ClusterResourcesCard: FC<ClusterResourcesCardProps> = ({
   projectsCount,
   vmsCount,
 }) => {
-  const { t } = useKubevirtTranslation();
-  const { loaded: nodesLoaded, nodes: nodesCount } = useResourcesQuantities();
+  if (isAllClustersPage) {
+    return (
+      <AllClustersResourcesCard
+        clustersCount={clustersCount || 0}
+        projectsCount={projectsCount}
+        vmsCount={vmsCount}
+      />
+    );
+  }
 
-  return (
-    <div className="cluster-resources-card" data-test="cluster-resources-card">
-      {isAllClustersPage && <ResourceTile count={clustersCount || 0} label={t('Clusters')} />}
-      <ResourceTile count={nodesCount} isLoading={!nodesLoaded} label={t('Nodes')} />
-      {!isAllClustersPage && (
-        <div
-          aria-hidden="true"
-          className="cluster-resources-card__tile cluster-resources-card__tile--placeholder"
-        />
-      )}
-      <ResourceTile count={projectsCount} label={t('Projects')} />
-      <ResourceTile count={vmsCount} label={t('VMs')} />
-    </div>
-  );
+  return <SingleClusterResourcesCard projectsCount={projectsCount} vmsCount={vmsCount} />;
 };
 
 export default ClusterResourcesCard;

@@ -25,13 +25,15 @@ import { getClampedPagination } from '../../clusteroverview/MigrationsTab/compon
 import StorageMigrationRow from './components/StorageMigrationRow';
 import useStorageMigrationColumns from './hooks/useStorageMigrationColumns';
 import useStorageMigrationResources from './hooks/useStorageMigrationResources';
+import { getStorageMigrationStatusFilters } from './StorageMigrationListFilters';
 
 const StorageMigrationList: FC = () => {
   const { t } = useKubevirtTranslation();
 
   const { loaded, loadError, storageMigPlans } = useStorageMigrationResources();
 
-  const [data, filteredData, onFilterChange] = useListPageFilter(storageMigPlans);
+  const statusFilters = useMemo(() => getStorageMigrationStatusFilters(t), [t]);
+  const [data, filteredData, onFilterChange] = useListPageFilter(storageMigPlans, statusFilters);
   const [columns, activeColumns] = useStorageMigrationColumns();
   const [pagination, setPagination] = useState<PaginationState>(paginationInitialState);
 
@@ -87,6 +89,7 @@ const StorageMigrationList: FC = () => {
           data={data}
           loaded={loaded}
           onFilterChange={handleFilterChange}
+          rowFilters={statusFilters}
         />
         <Flex justifyContent={{ default: 'justifyContentFlexEnd' }}>
           <FlexItem>

@@ -15,18 +15,23 @@ type ManagedCluster = K8sResourceCommon & {
   };
 };
 
-type UseManagedClusterConsoleURLs = () => {
+type UseManagedClusterConsoleURLs = (cluster?: string) => {
   consoleURLs: Record<string, string>;
   error: unknown;
   getConsoleURL: (clusterName: string) => string | undefined;
+  isSpokeCluster: boolean;
   loaded: boolean;
+  spokeConsoleURL: string | undefined;
 };
 
 /**
  * Hook to get console URLs for all managed clusters.
  * Returns a map of cluster names to their console URLs and a helper function.
+ *
+ * When `cluster` is provided, also returns `spokeConsoleURL` and `isSpokeCluster`
+ * for that specific cluster so callers don't need to derive them manually.
  */
-const useManagedClusterConsoleURLs: UseManagedClusterConsoleURLs = () => {
+const useManagedClusterConsoleURLs: UseManagedClusterConsoleURLs = (cluster) => {
   const [hubClusterName] = useHubClusterName();
 
   const [managedClusters, loaded, error] = useFleetK8sWatchResource<ManagedCluster[]>({
@@ -39,9 +44,9 @@ const useManagedClusterConsoleURLs: UseManagedClusterConsoleURLs = () => {
       return {};
     }
 
-    return managedClusters.reduce<Record<string, string>>((acc, cluster) => {
-      const clusterName = cluster?.metadata?.name;
-      const consoleURLClaim = cluster?.status?.clusterClaims?.find(
+    return managedClusters.reduce<Record<string, string>>((acc, managedCluster) => {
+      const clusterName = managedCluster?.metadata?.name;
+      const consoleURLClaim = managedCluster?.status?.clusterClaims?.find(
         (claim) => claim.name === CONSOLE_URL_CLAIM,
       );
 
@@ -64,11 +69,15 @@ const useManagedClusterConsoleURLs: UseManagedClusterConsoleURLs = () => {
     [hubClusterName, consoleURLs],
   );
 
+  const spokeConsoleURL = cluster ? getConsoleURL(cluster) : undefined;
+
   return {
     consoleURLs,
     error,
     getConsoleURL,
+    isSpokeCluster: !!spokeConsoleURL,
     loaded,
+    spokeConsoleURL,
   };
 };
 

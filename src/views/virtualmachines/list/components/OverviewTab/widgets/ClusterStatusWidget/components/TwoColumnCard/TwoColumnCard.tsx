@@ -28,6 +28,8 @@ type TwoColumnCardProps = {
   leftContent?: ReactNode;
   /** Header label for the name column in StatusScoreList */
   nameHeader: string;
+  /** Optional title displayed above the right column */
+  rightTitle?: string;
   /** Header label for the score column in StatusScoreList */
   scoreHeader: string;
   /** Severity counts for the default left column */
@@ -47,6 +49,7 @@ const TwoColumnCard: FC<TwoColumnCardProps> = ({
   items,
   leftContent,
   nameHeader,
+  rightTitle,
   scoreHeader,
   severityCounts,
   severityItemLabel,
@@ -63,7 +66,7 @@ const TwoColumnCard: FC<TwoColumnCardProps> = ({
           headerActions
             ? {
                 actions: headerActions,
-                hasNoOffset: true,
+                hasNoOffset: false,
               }
             : undefined
         }
@@ -86,6 +89,7 @@ const TwoColumnCard: FC<TwoColumnCardProps> = ({
               {bottomLeftContent}
             </div>
             <div className="two-column-card__right">
+              {rightTitle && <div className="two-column-card__right-title">{rightTitle}</div>}
               <StatusScoreList items={items} nameHeader={nameHeader} scoreHeader={scoreHeader} />
             </div>
           </div>

@@ -3,42 +3,47 @@ import {
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceGuestAgentInfo,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { getName, getNamespace, getVMStatus } from '@kubevirt-utils/resources/shared';
+import { getVMStatus } from '@kubevirt-utils/resources/shared';
 import { VM_STATUS } from '@kubevirt-utils/resources/vm/utils/vmStatus';
-import { getCluster } from '@multicluster/helpers/selectors';
+
+const AGENT_CONNECTED = 'AgentConnected';
+
+const hasAgentConnectedCondition = (conditions?: { status?: string; type?: string }[]): boolean =>
+  conditions?.some((c) => c?.type === AGENT_CONNECTED && c?.status === 'True') ?? false;
 
 export const isGuestAgentConnected = (vmi: V1VirtualMachineInstance): boolean =>
-  vmi?.status?.conditions?.some(
-    (condition) => condition?.type === 'AgentConnected' && condition?.status === 'True',
-  );
+  hasAgentConnectedCondition(vmi?.status?.conditions);
+
+/**
+ * Check whether the guest agent is connected by looking at the VM's own conditions.
+ * VM conditions are always complete, unlike VMI conditions which may be
+ * incomplete when fetched from spoke clusters via the multicluster SDK.
+ * @param vm - the virtual machine to check
+ */
+export const isVMGuestAgentConnected = (vm: V1VirtualMachine): boolean =>
+  hasAgentConnectedCondition(vm?.status?.conditions);
 
 export const getOSNameFromGuestAgent = (
   guestAgentData: V1VirtualMachineInstanceGuestAgentInfo,
-): string =>
-  guestAgentData?.os?.name?.includes('Windows') && guestAgentData?.os?.version?.includes('Windows')
-    ? guestAgentData?.os?.version
-    : `${guestAgentData?.os?.name} ${guestAgentData?.os?.version}`;
+): string => {
+  const name = guestAgentData?.os?.name ?? '';
+  const version = guestAgentData?.os?.version ?? '';
+
+  if (name.includes('Windows') && version.includes('Windows')) {
+    return version;
+  }
+  return `${name} ${version}`.trim();
+};
 
 /**
- * Count running VMs whose corresponding VMI does not have the AgentConnected condition.
+ * Count running VMs without a connected guest agent.
+ * Reads AgentConnected from vm.status.conditions, which is reliable
+ * across single-cluster and multicluster (hub-spoke) setups.
  * @param vms - list of virtual machines
- * @param vmis - list of virtual machine instances to match against
  */
-export const countVMsWithoutGuestAgent = (
-  vms: V1VirtualMachine[],
-  vmis: V1VirtualMachineInstance[],
-): number => {
-  const runningVMs = vms?.filter((vm) => getVMStatus(vm) === VM_STATUS.Running);
-
-  const buildKey = (resource: V1VirtualMachine | V1VirtualMachineInstance): string =>
-    `${getCluster(resource) ?? ''}/${getNamespace(resource)}/${getName(resource)}`;
-
-  const vmiMap = new Map(vmis?.map((vmi) => [buildKey(vmi), vmi]) ?? []);
-
-  const vmsWithoutAgent = runningVMs?.filter((vm) => {
-    const vmi = vmiMap.get(buildKey(vm));
-    return vmi && !isGuestAgentConnected(vmi);
-  });
-
-  return vmsWithoutAgent?.length || 0;
+export const countVMsWithoutGuestAgent = (vms: V1VirtualMachine[]): number => {
+  const vmsWithoutAgent = vms.filter(
+    (vm) => getVMStatus(vm) === VM_STATUS.Running && !isVMGuestAgentConnected(vm),
+  );
+  return vmsWithoutAgent.length;
 };

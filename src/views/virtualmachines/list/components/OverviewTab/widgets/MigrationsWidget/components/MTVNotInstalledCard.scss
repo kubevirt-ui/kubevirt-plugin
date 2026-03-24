@@ -1,0 +1,13 @@
+.mtv-not-installed-card {
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: var(--pf-t--global--spacer--sm);
+  }
+
+  &__footer {
+    margin-block-start: var(--pf-t--global--spacer--md);
+    display: flex;
+    justify-content: space-between;
+  }
+}

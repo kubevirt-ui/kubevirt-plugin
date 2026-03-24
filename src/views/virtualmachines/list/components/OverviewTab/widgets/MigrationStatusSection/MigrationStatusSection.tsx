@@ -1,7 +1,12 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 
-import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
+import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useActiveClusterParam from '@multicluster/hooks/useActiveClusterParam';
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
+import useManagedClusterConsoleURLs from '@multicluster/hooks/useManagedClusterConsoleURLs';
+import { buildSpokeConsoleUrl } from '@multicluster/urls';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import useMigrationCardDataAndFilters from '@overview/MigrationsTab/hooks/useMigrationCardData';
 
 import { determineOverviewLevel } from '../../config';
@@ -16,24 +21,47 @@ import OverviewSection from '../OverviewSection/OverviewSection';
 import OverviewSectionRow from '../OverviewSection/OverviewSectionRow';
 import StorageMigrationPlansWidget from '../StorageMigrationPlansWidget/StorageMigrationPlansWidget';
 
-const MIGRATIONS_DURATION = DurationOption.ONE_DAY.toString();
+import MultiClusterMigrationStatusSection from './MultiClusterMigrationStatusSection';
+import { buildMigrationsSpokePath, getMigrationsTabPath, MIGRATIONS_DURATION } from './utils';
 
 const MigrationStatusSection: FC<OverviewSectionData> = ({ cluster, namespace, title }) => {
+  const { t } = useKubevirtTranslation();
   const isAllClustersPage = useIsAllClustersPage();
+  const isACMPage = useIsACMPage();
+  const activeCluster = useActiveClusterParam();
+  const activeNamespace = useActiveNamespace();
+  const { isSpokeCluster, spokeConsoleURL } = useManagedClusterConsoleURLs(cluster);
+
+  const overviewLevel = determineOverviewLevel(namespace, isAllClustersPage);
+  const isClusterLevel = overviewLevel === OVERVIEW_LEVEL_CLUSTER;
+  const isMultiClusterLevel = overviewLevel === OVERVIEW_LEVEL_MULTICLUSTER;
+
   const { filteredVMIMS, loaded: migrationsLoaded } =
     useMigrationCardDataAndFilters(MIGRATIONS_DURATION);
 
-  const overviewLevel = determineOverviewLevel(namespace, isAllClustersPage);
+  const migrationsTabPath = useMemo(() => {
+    if (isSpokeCluster) return undefined;
+    return getMigrationsTabPath(isACMPage, activeCluster, activeNamespace);
+  }, [isACMPage, activeCluster, activeNamespace, isSpokeCluster]);
 
-  const isClusterLevel = overviewLevel === OVERVIEW_LEVEL_CLUSTER;
-  const isMultiClusterLevel = overviewLevel === OVERVIEW_LEVEL_MULTICLUSTER;
+  const migrationsTabHref = useMemo(() => {
+    if (!isSpokeCluster) return undefined;
+    return buildSpokeConsoleUrl(spokeConsoleURL, buildMigrationsSpokePath(activeNamespace));
+  }, [isSpokeCluster, spokeConsoleURL, activeNamespace]);
+
+  if (isMultiClusterLevel) {
+    return <MultiClusterMigrationStatusSection title={title} />;
+  }
 
   return (
     <OverviewSection dataTestId="migration-status-section" title={title}>
       <OverviewSectionRow gridColumns={isClusterLevel ? GRID_THREE_EQUAL : undefined}>
         <MigrationsWidget
-          isAllClustersPage={isMultiClusterLevel}
+          cardTitle={t('Compute migrations')}
           isLoading={!migrationsLoaded}
+          migrationsTabHref={migrationsTabHref}
+          migrationsTabPath={migrationsTabPath}
+          subHeader={t('Last day')}
           vmims={filteredVMIMS}
         />
         {isClusterLevel && <StorageMigrationPlansWidget cluster={cluster} />}
