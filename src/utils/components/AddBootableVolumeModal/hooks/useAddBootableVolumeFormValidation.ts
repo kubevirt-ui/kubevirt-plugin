@@ -18,14 +18,14 @@ export const useAddBootableVolumeFormValidation = ({
   const isRegistryFormValid = useMemo(() => {
     if (sourceType !== DROPDOWN_FORM_SELECTION.USE_REGISTRY) return true;
 
-    const { registryCredentials, registryURL } = bootableVolume;
+    const { cronExpression, registryCredentials, registryURL } = bootableVolume;
     const { password, username } = registryCredentials || {};
 
     const areCredentialsEmpty = isEmpty(username) && isEmpty(password);
     const areCredentialsFilled = !isEmpty(username) && !isEmpty(password);
     const areCredentialsValid = areCredentialsFilled || areCredentialsEmpty;
 
-    return !!(registryURL && areCredentialsValid);
+    return !!(registryURL && areCredentialsValid && cronExpression?.trim());
   }, [sourceType, bootableVolume]);
 
   const isTlsCertValid = useMemo(() => {
@@ -39,10 +39,42 @@ export const useAddBootableVolumeFormValidation = ({
     return !!bootableVolume?.tlsCertificate?.trim();
   }, [sourceType, bootableVolume]);
 
+  const isSourceValid = useMemo(() => {
+    switch (sourceType) {
+      case DROPDOWN_FORM_SELECTION.UPLOAD_VOLUME:
+        return !!bootableVolume?.uploadFile;
+      case DROPDOWN_FORM_SELECTION.USE_EXISTING_PVC:
+        return !!bootableVolume?.pvcName?.trim() && !!bootableVolume?.pvcNamespace?.trim();
+      case DROPDOWN_FORM_SELECTION.USE_HTTP:
+        return !!bootableVolume?.url?.trim();
+      case DROPDOWN_FORM_SELECTION.USE_REGISTRY:
+        return true;
+      case DROPDOWN_FORM_SELECTION.USE_SNAPSHOT:
+        return (
+          !!bootableVolume?.snapshotName?.trim() && !!bootableVolume?.snapshotNamespace?.trim()
+        );
+      default:
+        return true;
+    }
+  }, [sourceType, bootableVolume]);
+
   const isFormValid = useMemo(() => {
     const hasRequiredPreference = !!bootableVolume?.labels?.[DEFAULT_PREFERENCE_LABEL];
-    return hasRequiredPreference && isRegistryFormValid && isTlsCertValid;
-  }, [bootableVolume?.labels, isRegistryFormValid, isTlsCertValid]);
+    const hasVolumeName = !!bootableVolume?.bootableVolumeName?.trim();
+    return (
+      hasRequiredPreference &&
+      hasVolumeName &&
+      isRegistryFormValid &&
+      isTlsCertValid &&
+      isSourceValid
+    );
+  }, [
+    bootableVolume?.labels,
+    bootableVolume?.bootableVolumeName,
+    isRegistryFormValid,
+    isTlsCertValid,
+    isSourceValid,
+  ]);
 
   return isFormValid;
 };

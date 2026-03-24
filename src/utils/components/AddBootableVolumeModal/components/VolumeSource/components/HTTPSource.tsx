@@ -9,6 +9,7 @@ import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/
 import { FormTextInput } from '@kubevirt-utils/components/FormTextInput/FormTextInput';
 import { TLSCertificateSection } from '@kubevirt-utils/components/TLSCertificateSection';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useRequiredFieldValidation } from '@kubevirt-utils/hooks/useRequiredFieldValidation';
 import { FormGroup } from '@patternfly/react-core';
 
 type HTTPSourceProps = {
@@ -22,22 +23,39 @@ const HTTPSource: FC<HTTPSourceProps> = ({ bootableVolume, setBootableVolumeFiel
   const httpSourceHelperURL =
     'https://cloud.centos.org/centos/9-stream/x86_64/images/CentOS-Stream-GenericCloud-9-latest.x86_64.qcow2';
 
+  const {
+    isInvalid: isUrlInvalid,
+    onBlur: onUrlBlur,
+    validated: urlValidated,
+  } = useRequiredFieldValidation(bootableVolume?.url);
+
   return (
     <>
-      <FormGroup className="disk-source-form-group" isRequired label={t('Image URL')}>
+      <FormGroup
+        className="disk-source-form-group"
+        fieldId="image-url"
+        isRequired
+        label={t('Image URL')}
+      >
         <FormTextInput
-          aria-label={t('Image URL')}
+          id="image-url"
+          onBlur={onUrlBlur}
           onChange={(event) => setBootableVolumeField('url')(event.currentTarget.value)}
           type="text"
+          validated={urlValidated}
           value={bootableVolume?.url || ''}
         />
-        <FormGroupHelperText>
-          <>
-            {t('Enter URL to download. For example:')}{' '}
-            <a href={httpSourceHelperURL} rel="noreferrer" target="_blank">
-              {httpSourceHelperURL}
-            </a>
-          </>
+        <FormGroupHelperText validated={urlValidated}>
+          {isUrlInvalid ? (
+            t('This field is required')
+          ) : (
+            <>
+              {t('Enter URL to download. For example:')}{' '}
+              <a href={httpSourceHelperURL} rel="noreferrer" target="_blank">
+                {httpSourceHelperURL}
+              </a>
+            </>
+          )}
         </FormGroupHelperText>
       </FormGroup>
 
