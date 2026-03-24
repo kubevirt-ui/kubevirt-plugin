@@ -91,7 +91,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
     !displayShowAllButton,
   );
 
-  const filters = useBootVolumeFilters(!displayShowAllButton);
+  const filters = useBootVolumeFilters(bootableVolumes, !displayShowAllButton);
 
   const [unfilteredData, data, onFilterChange] = useListPageFilter(bootableVolumes, filters);
 

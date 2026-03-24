@@ -1,4 +1,4 @@
-export const OTHER = 'Other';
+export { OTHER } from '@kubevirt-utils/utils/constants';
 export const CONTAINER_EPHERMAL = 'Container (Ephemeral)';
 export const DYNAMIC = 'Dynamic';
 

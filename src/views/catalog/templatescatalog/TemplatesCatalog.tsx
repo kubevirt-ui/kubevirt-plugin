@@ -48,7 +48,11 @@ const TemplatesCatalog: FC<TemplatesCatalogProps> = ({ currentTab }) => {
       {loaded ? (
         <Card className="pf-v6-u-pt-md">
           <Flex flexWrap={{ default: 'nowrap' }}>
-            <TemplatesCatalogFilters filters={filters} onFilterChange={onFilterChange} />
+            <TemplatesCatalogFilters
+              filters={filters}
+              onFilterChange={onFilterChange}
+              templates={templates}
+            />
             <FlexItem grow={{ default: 'grow' }}>
               <Stack className="co-catalog-page__content">
                 <TemplatesCatalogHeader

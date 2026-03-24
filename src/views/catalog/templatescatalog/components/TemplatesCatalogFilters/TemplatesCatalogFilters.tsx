@@ -3,7 +3,7 @@ import React, { FC, memo, useMemo } from 'react';
 import { CATALOG_FILTERS } from '@catalog/templatescatalog/utils/consts';
 import { hasNoDefaultUserAllFilters } from '@catalog/templatescatalog/utils/helpers';
 import { TemplateFilters } from '@catalog/templatescatalog/utils/types';
-import useHcoWorkloadArchitectures from '@kubevirt-utils/hooks/useHcoWorkloadArchitectures';
+import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   HIDE_DEPRECATED_TEMPLATES_KEY,
@@ -12,7 +12,8 @@ import {
   WORKLOADS,
   WORKLOADS_LABELS,
 } from '@kubevirt-utils/resources/template/utils/constants';
-import { ARCHITECTURE_TITLE } from '@kubevirt-utils/utils/architecture';
+import { ARCHITECTURE_TITLE, getUniqueArchitectures } from '@kubevirt-utils/utils/architecture';
+import { OTHER } from '@kubevirt-utils/utils/constants';
 import { VerticalTabs, VerticalTabsTab } from '@patternfly/react-catalog-view-extension';
 import { FilterSidePanel } from '@patternfly/react-catalog-view-extension/dist/esm/components/FilterSidePanel';
 
@@ -23,17 +24,17 @@ import { TemplatesCatalogFiltersGroup } from './TemplatesCatalogFiltersGroup';
 export const TemplatesCatalogFilters: FC<{
   filters: TemplateFilters;
   onFilterChange: (type: CATALOG_FILTERS, value: boolean | string) => void;
-}> = memo(({ filters, onFilterChange }) => {
+  templates: V1Template[];
+}> = memo(({ filters, onFilterChange, templates }) => {
   const { t } = useKubevirtTranslation();
 
-  const workloadsArchitectures = useHcoWorkloadArchitectures();
   const workloadsArchitecturesItems = useMemo(
     () =>
-      workloadsArchitectures.map((arch) => ({
-        label: arch,
-        value: arch,
+      getUniqueArchitectures(templates).map((arch) => ({
+        label: arch ?? t(OTHER),
+        value: arch ?? OTHER,
       })),
-    [workloadsArchitectures],
+    [templates, t],
   );
 
   return (

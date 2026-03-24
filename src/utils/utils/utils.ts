@@ -12,7 +12,7 @@ import {
 } from '@kubevirt-utils/constants/constants';
 import { ALL_NAMESPACES, ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { getLabels } from '@kubevirt-utils/resources/shared';
-import { MAX_K8S_NAME_LENGTH } from '@kubevirt-utils/utils/constants';
+import { MAX_K8S_NAME_LENGTH, OTHER } from '@kubevirt-utils/utils/constants';
 import {
   FilterValue,
   K8sResourceCommon,
@@ -123,8 +123,8 @@ export const findAllIndexes = <T>(
 
 // return the name or 'Other' if the name not included in the array of available items for filtering
 export const getItemNameWithOther = (itemName: string, items: ItemsToFilterProps[]): string => {
-  return !items?.find((item: ItemsToFilterProps) => item.id === itemName) || itemName === 'Other'
-    ? 'Other'
+  return !items?.find((item: ItemsToFilterProps) => item.id === itemName) || itemName === OTHER
+    ? OTHER
     : itemName;
 };
 
