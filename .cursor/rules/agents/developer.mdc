@@ -88,6 +88,16 @@ Your approach:
 - Constants and configurations in separate files
 - Types and interfaces in type files
 
+**i18n Compliance**
+- Every user-facing string must use `t()` from `useKubevirtTranslation`
+- Utility functions that accept `t` must type it as `t: TFunction` from `react-i18next`
+- Never define custom types like `(key: string) => string` for the translation function
+- No string concatenation with `t()` results -- use interpolation: `t('Delete {{name}}', { name })`
+- No comment-only `// t('...')` patterns -- they do NOT wire up translations. **Exception**: `src/utils/i18n.ts` uses comment-only `// t('...')` intentionally for `i18next-parser` string extraction (see `.cursor/rules/i18n.mdc` Section 4); do not flag those
+- `npm run i18n` must be run after adding or changing any user-facing string
+- For non-React code (constants, configs), always accept `t: TFunction` as a parameter -- never import `{ t }` directly
+- Flag hardcoded user-facing strings (JSX text, button labels, placeholders) as blockers
+
 **Reusability**
 - Duplicate code that should be extracted
 - Overly specific components that could be generic
@@ -95,6 +105,8 @@ Your approach:
 - Copy-pasted logic across components
 - Missing abstraction for common patterns
 - Shared utilities not in utils folder
+- **New component created when an existing one in `src/utils/components/` already covers the use case** -- flag this as a blocker and suggest reusing or extending the existing component instead
+- When the **PatternFly MCP** is available, verify that design tokens and component APIs are current
 
 **Module Organization**
 - Circular dependencies between modules
@@ -231,6 +243,13 @@ Your approach:
 - Components not in expected locations
 - Utils scattered instead of organized
 
+**File Structure Compliance**
+- Flag multiple exported React components in a single file (exception: `*Definition.tsx` and `*Cells.tsx` may have unexported cell helpers)
+- Flag component name not matching filename (`VMCard.tsx` must export `VMCard`)
+- Flag nested component definitions inside other components (causes remounting)
+- Flag missing extraction of sub-components to `components/` subdirectory
+- Flag SCSS filenames not matching component (kebab-case)
+
 **Project Patterns**
 - Not following existing folder structure
 - Not using established hooks and utilities
@@ -259,8 +278,10 @@ Your approach:
 1. **Understand Intent**: What is this code trying to accomplish?
 2. **Correctness**: Does it work correctly in all cases?
 3. **Architecture**: Is it well-structured and maintainable?
-4. **Performance**: Are there obvious performance issues?
-5. **Style**: Does it follow project conventions?
+4. **i18n**: Are all user-facing strings translated correctly?
+5. **File Structure**: One component per file, naming, size limits?
+6. **Performance**: Are there obvious performance issues?
+7. **Style**: Does it follow project conventions?
 
 **Policy:** Encourage peer code reviews for consistency and quality. No merge without a review.
 

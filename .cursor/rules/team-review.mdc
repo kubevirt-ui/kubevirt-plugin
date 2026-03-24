@@ -17,9 +17,13 @@ When reviewing code or implementing features, automatically consider all team pe
 
 Do NOT wait for user confirmation to start - begin immediately upon receiving a ticket.
 
+### /review Command
+Use *"/review"* to run **all five review agents in parallel** on the current changes. This follows the workflow defined in `.cursor/commands/review.md`. It detects changed files, launches all agents simultaneously, and returns a unified summary.
+
 ### Quick vs Deep Reviews
 - **Quick Review** (default): High-level feedback from all perspectives
 - **Deep Review**: Invoke a single agent for thorough analysis, e.g. *"review:dev"*, *"review:ux"*, *"review:qe"*, *"review:security"*, *"review:kubevirt"*
+- **Full Review**: Use *"/review"*, *"review all"*, or *"team review"* to run all agents in parallel (see `.cursor/commands/review.md`)
 - **Choose agents**: You can scope the team review, e.g. *"team-review:all"*, *"team-review:dev,qe"*, or *"review:dev"* for one perspective
 
 ---
@@ -50,6 +54,23 @@ Do NOT wait for user confirmation to start - begin immediately upon receiving a 
 - K8s resource patterns and GVK usage
 - VM lifecycle correctness
 - Console SDK integration
+
+### i18n Compliance
+- React components use `const { t } = useKubevirtTranslation()` from `@kubevirt-utils/hooks/useKubevirtTranslation`
+- Utility functions accept `t: TFunction` imported from `react-i18next` -- never custom types like `(key: string) => string`
+- Every user-facing string (labels, headings, buttons, errors, tooltips, table headers, empty states, placeholders) wrapped in `t()`
+- No string concatenation with `t()` results; use interpolation: `t('Delete {{name}}', { name })`
+- No comment-only `// t('...')` patterns -- they do NOT wire up translations. **Exception**: `src/utils/i18n.ts` uses comment-only `// t('...')` intentionally for `i18next-parser` string extraction
+- For non-React code (constants, configs), always accept `t: TFunction` as a parameter -- never import `{ t }` directly
+- `npm run i18n` must be run after adding or changing any user-facing string
+
+### Code Standards
+- One exported component per file (exception: unexported helpers in `*Definition.tsx` and `*Cells.tsx`)
+- Filename matches component name (`MyComponent.tsx` exports `MyComponent`)
+- Files under 150 lines
+- No nested component definitions inside other components
+- Sub-components extracted to `components/` subdirectory
+- Import order: external libs > Console SDK > PatternFly > internal utils > internal components > types > styles
 
 ---
 
@@ -84,6 +105,14 @@ Do NOT wait for user confirmation to start - begin immediately upon receiving a 
 
 ### 🔒 Security
 ✅ [Security looks good]
+
+### 🌐 i18n Compliance
+🔴 [Untranslated string / wrong TFunction type]
+✅ [All strings properly translated]
+
+### 📏 Code Standards
+🟡 [File structure / naming issue]
+✅ [Standards followed]
 ```
 
 ---
@@ -115,6 +144,8 @@ For thorough analysis from a single perspective, invoke a specific agent:
 - [ ] **UX**: Accessibility, states, consistency
 - [ ] **QE**: Edge cases, tests, async issues
 - [ ] **Security**: Input validation, auth, XSS
+- [ ] **i18n**: All strings translated, `TFunction` from `react-i18next`, no concatenation
+- [ ] **Standards**: One component per file, filename matches, files under 150 lines
 
 ### After Review
 - [ ] Address all blockers

@@ -39,7 +39,32 @@ These are the coding standards for the KubeVirt Plugin project. They apply to so
 ### File Size Limits
 - Maximum **150 lines** per file
 - If exceeding, split into smaller modules
-- One component per file, no nested component definitions
+
+### One Component Per File (Strictly Enforced)
+- Each `.tsx` file exports **at most one React component**
+- The exported component name **must match** the filename: `MyWidget.tsx` exports `MyWidget`
+- **No nested component definitions** inside other components (causes remounting on every render)
+- Extract sub-components into a `components/` subdirectory
+- **Exception**: Table definition files (`*Definition.tsx`, `*Cells.tsx`) may contain small unexported cell-renderer components that are only used within that file's column config
+- Helper functions (not components) are fine to co-locate in the same file
+
+```
+// WRONG: two exported components in one file
+// VMCard.tsx
+export const VMCard: FC = () => { ... };
+export const VMCardHeader: FC = () => { ... };  // extract to components/VMCardHeader.tsx
+
+// WRONG: nested component definition
+const ParentComponent: FC = () => {
+  const ChildComponent: FC = () => <div />;  // recreated every render
+  return <ChildComponent />;
+};
+
+// CORRECT: one component, filename matches
+// VMCard.tsx
+const VMCard: FC = () => { ... };
+export default VMCard;
+```
 
 ---
 
@@ -57,9 +82,9 @@ These are the coding standards for the KubeVirt Plugin project. They apply to so
 ```
 
 ### Component Rules
-- One component per file
+- One exported component per file (see "One Component Per File" above)
 - No nested component definitions inside other components
-- Filename must match component name
+- Filename must match the exported component name
 - Use functional components exclusively
 - Class components only for error boundaries (`componentDidCatch`)
 - Default export for components, named exports for utils/hooks/types
@@ -262,11 +287,41 @@ npm run lint:fix      # Auto-fix issues
 
 ### When Generating Code
 - Always check for existing similar components before creating new ones
+- If an existing component covers most of the use case, **suggest modifying it** rather than creating a duplicate
 - Reuse hooks from `src/utils/hooks/` and components from `src/utils/components/`
 - Match the patterns of neighboring files in the same directory
+- When the **PatternFly MCP** is available, use it to verify token names, component props, and utility classes are current
 - Run `npm run check-types` after making changes
 
 ### When Reviewing Code
 - Verify all user-facing strings use `useKubevirtTranslation`
 - Check that loading, error, and empty states are handled
 - Ensure no `console.log` or debug code is left in
+
+---
+
+## 11. AI Code Generation Checklist
+
+Before completing any code generation or review, verify **all** of the following:
+
+### File Structure
+- [ ] One exported React component per file
+- [ ] Component name matches filename
+- [ ] File is under 150 lines
+- [ ] No nested component definitions
+- [ ] Sub-components extracted to `components/` subdirectory
+- [ ] SCSS file named in kebab-case matching the component
+
+### i18n
+- [ ] Every user-facing string wrapped in `t()` from `useKubevirtTranslation`
+- [ ] Utility functions use `t: TFunction` from `react-i18next` (not custom types)
+- [ ] No string concatenation with `t()` results -- use interpolation
+- [ ] No comment-only `// t('...')` patterns
+- [ ] `npm run i18n` run after adding/changing strings
+
+### Code Quality
+- [ ] Check for existing similar components before creating new ones
+- [ ] Reuse hooks from `src/utils/hooks/` and components from `src/utils/components/`
+- [ ] Match patterns of neighboring files in the same directory
+- [ ] No `any` types -- use `unknown` and narrow
+- [ ] Run `npm run check-types` after changes
