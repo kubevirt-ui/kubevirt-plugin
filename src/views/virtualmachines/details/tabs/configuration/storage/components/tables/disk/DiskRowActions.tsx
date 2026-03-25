@@ -97,6 +97,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
         />
       ) : (
         <DeleteDiskModal
+          diskName={diskName}
           isHotPluginVolume={isHotplug}
           isOpen={isOpen}
           onClose={onClose}

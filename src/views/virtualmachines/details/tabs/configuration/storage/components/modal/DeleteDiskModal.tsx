@@ -20,6 +20,7 @@ import { updateDisks } from '../../../details/utils/utils';
 import useVolumeOwnedResource from './hooks/useVolumeOwnedResource';
 
 type DeleteDiskModalProps = {
+  diskName: string;
   isHotPluginVolume: boolean;
   isOpen: boolean;
   onClose: () => void;
@@ -28,6 +29,7 @@ type DeleteDiskModalProps = {
 };
 
 const DeleteDiskModal: FC<DeleteDiskModalProps> = ({
+  diskName,
   isHotPluginVolume,
   isOpen,
   onClose,
@@ -36,8 +38,6 @@ const DeleteDiskModal: FC<DeleteDiskModalProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const [deleteOwnedResource, setDeleteOwnedResource] = useState(false);
-
-  const diskName = volume?.name;
 
   const {
     error: loadingError,
