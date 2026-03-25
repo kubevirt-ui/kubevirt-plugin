@@ -9,6 +9,7 @@ import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
 import { isSystemNamespace } from '@kubevirt-utils/resources/namespace/helper';
 import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { ROW_FILTERS_PREFIX } from '@kubevirt-utils/utils/constants';
 import { universalComparator } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { UseMulticlusterNamespacesReturn } from '@multicluster/hooks/useMulticlusterNamespaces';
@@ -27,6 +28,7 @@ import {
   ProjectDiagramIcon,
 } from '@patternfly/react-icons';
 import { signal } from '@preact/signals-react';
+import { skipRowFilterPrefix } from '@search/utils/constants';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 import { statusIcon } from '../icons/utils';
@@ -167,7 +169,9 @@ const createProjectTreeItem = (
     children: projectChildren,
     customBadgeContent: projectMap[project]?.count || '0',
     defaultExpanded: currentPageNamespace === project && clusterSelected,
-    href: `${getVMListNamespacesURL(cluster, project)}${removeFolderLabelQuery(queryParams) || ''}`,
+    href: `${getVMListNamespacesURL(cluster, project)}${
+      removeFilterQueryParams(queryParams) || ''
+    }`,
     icon: (
       <Tooltip content={t('Project')}>
         <ProjectDiagramIcon />
@@ -193,7 +197,7 @@ const createAllNamespacesTreeItem = (
     children: treeViewData,
     defaultExpanded: true,
     hasBadge: false,
-    href: `${getVMListURL()}${removeFolderLabelQuery(queryParams) || ''}`,
+    href: `${getVMListURL()}${removeFilterQueryParams(queryParams) || ''}`,
     icon: <ClusterIcon />,
     id: ALL_NAMESPACES_SESSION_KEY,
     name: t(LOCAL_CLUSTER),
@@ -478,23 +482,17 @@ export const highlightMatchedTreeItems = (
   });
 };
 
-const removeFolderLabelQuery = (query: string) => {
-  const queryParams = new URLSearchParams(query);
+const removeFilterQueryParams = (query?: string): string => {
+  const params = new URLSearchParams(query ?? '');
 
-  const labelFilters = queryParams.get(VirtualMachineRowFilterType.Labels)?.split(',') ?? [];
-  if (!labelFilters.some((label) => label.startsWith(VM_FOLDER_LABEL))) {
-    return query;
-  }
+  [...params.keys()].forEach((key) => {
+    if (
+      key.startsWith(ROW_FILTERS_PREFIX) ||
+      skipRowFilterPrefix.has(key as VirtualMachineRowFilterType)
+    ) {
+      params.delete(key);
+    }
+  });
 
-  const labelFiltersWithoutFolder = labelFilters.filter(
-    (label) => !label.startsWith(VM_FOLDER_LABEL),
-  );
-
-  if (isEmpty(labelFiltersWithoutFolder)) {
-    queryParams.delete(VirtualMachineRowFilterType.Labels);
-  } else {
-    queryParams.set(VirtualMachineRowFilterType.Labels, labelFiltersWithoutFolder.join(','));
-  }
-
-  return queryParams.size > 0 ? `?${queryParams.toString()}` : '';
+  return params.size > 0 ? `?${params.toString()}` : '';
 };
