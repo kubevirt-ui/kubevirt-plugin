@@ -1,3 +1,16 @@
+// Default table layout for all KubevirtTables
+.kubevirt-table.pf-v6-c-table {
+  table-layout: fixed;
+  width: 100%;
+
+  // Actions column - fixed small width for kebab menu
+  .pf-v6-c-table__action {
+    width: 50px;
+    max-width: 50px;
+    min-width: 50px;
+  }
+}
+
 .kubevirt-table--fixed-layout .pf-v6-c-table {
   table-layout: fixed;
 }

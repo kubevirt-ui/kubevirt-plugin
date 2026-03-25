@@ -2256,6 +2256,7 @@
   "VirtualMachine statuses": "VirtualMachine のステータス",
   "VirtualMachine storage migration plan name": "VirtualMachine storage migration plan name",
   "VirtualMachine Templates": "VirtualMachine テンプレート",
+  "VirtualMachine Templates table": "VirtualMachine Templates table",
   "VirtualMachine updated successfully": "VirtualMachine が正常に更新されました",
   "VirtualMachine volume clone": "VirtualMachine ボリュームのクローン作成",
   "VirtualMachine will attempt to boot from disks by order of apearance in YAML file": "VirtualMachine は、YAML ファイル内の出現順でディスクからブートを試みます",
