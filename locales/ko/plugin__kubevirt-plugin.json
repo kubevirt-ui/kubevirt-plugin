@@ -2256,6 +2256,7 @@
   "VirtualMachine statuses": "VirtualMachine 상태",
   "VirtualMachine storage migration plan name": "VirtualMachine storage migration plan name",
   "VirtualMachine Templates": "VirtualMachine 템플릿",
+  "VirtualMachine Templates table": "VirtualMachine Templates table",
   "VirtualMachine updated successfully": "VirtualMachine이 성공적으로 업데이트됨",
   "VirtualMachine volume clone": "VirtualMachine 볼륨 복제",
   "VirtualMachine will attempt to boot from disks by order of apearance in YAML file": "VirtualMachine은 YAML 파일에 나타난 순서대로 디스크에서 부팅을 시도합니다.",

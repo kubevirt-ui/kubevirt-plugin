@@ -25,7 +25,7 @@ export const generateRows = <TData, TCallbacks = undefined>({
   onRowSelect,
   selectable,
 }: GenerateRowsParams<TData, TCallbacks>): DataViewTr[] =>
-  data.map((row, index) => {
+  (data ?? []).map((row, index) => {
     const rowId = getRowId?.(row, index) ?? String(index);
     const isSelected = selectable && isRowSelected ? isRowSelected(row, index) : false;
 

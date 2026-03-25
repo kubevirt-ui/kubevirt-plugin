@@ -2256,6 +2256,7 @@
   "VirtualMachine statuses": "VirtualMachine 状态",
   "VirtualMachine storage migration plan name": "VirtualMachine storage migration plan name",
   "VirtualMachine Templates": "VirtualMachine 模板",
+  "VirtualMachine Templates table": "VirtualMachine Templates table",
   "VirtualMachine updated successfully": "VirtualMachine 成功更新",
   "VirtualMachine volume clone": "VirtualMachine 卷克隆",
   "VirtualMachine will attempt to boot from disks by order of apearance in YAML file": "VirtualMachine 将根据在 YAML 文件中的顺序从磁盘引导",

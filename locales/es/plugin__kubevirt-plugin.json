@@ -2280,6 +2280,7 @@
   "VirtualMachine statuses": "Estados de VirtualMachine",
   "VirtualMachine storage migration plan name": "VirtualMachine storage migration plan name",
   "VirtualMachine Templates": "Plantillas de VirtualMachine",
+  "VirtualMachine Templates table": "VirtualMachine Templates table",
   "VirtualMachine updated successfully": "La VirtualMachine se actualizó correctamente.",
   "VirtualMachine volume clone": "Clon de volumen de VirtualMachine",
   "VirtualMachine will attempt to boot from disks by order of apearance in YAML file": "La VirtualMachine intentará arrancar desde los discos por orden de aparición en el archivo YAML.",

@@ -195,30 +195,15 @@ const KubevirtTable = <TData, TCallbacks = undefined>(
   const effectiveNoFilteredDataMsg = renderNoFilteredDataContent(
     noFilteredDataMsg ?? defaultFilteredMsg,
   );
-  const effectiveColSpan = isSelectable ? visibleColumns.length + 1 : visibleColumns.length;
 
-  const renderFilteredEmptyState = (): ReactNode => {
-    if (!isDataEmpty || isUnfilteredDataEmpty || !effectiveNoFilteredDataMsg) {
-      return null;
-    }
-
-    return (
-      <tr>
-        <td className="pf-v6-u-text-align-center" colSpan={effectiveColSpan}>
-          {effectiveNoFilteredDataMsg}
-        </td>
-      </tr>
-    );
-  };
-
-  const filteredEmptyState = renderFilteredEmptyState();
+  const showFilteredEmptyState = loaded && isDataEmpty && !isUnfilteredDataEmpty;
 
   const table = (
     <DataViewTable
       aria-label={ariaLabel}
-      bodyStates={filteredEmptyState ? { empty: filteredEmptyState } : undefined}
+      className="kubevirt-table"
       columns={effectiveTableColumns}
-      rows={filteredEmptyState ? [] : rows}
+      rows={rows}
     />
   );
 
@@ -227,12 +212,28 @@ const KubevirtTable = <TData, TCallbacks = undefined>(
       return renderNoDataContent(noDataMsg);
     }
 
+    if (showFilteredEmptyState) {
+      return (
+        <div className="pf-v6-u-text-align-center pf-v6-u-py-lg">{effectiveNoFilteredDataMsg}</div>
+      );
+    }
+
     return fixedLayout ? <div className="kubevirt-table--fixed-layout">{table}</div> : table;
   };
 
+  // Show loading when not loaded, regardless of stale data
+  // hasData is set to false during loading to ensure skeleton is shown
+  const showLoading = !loaded;
+  const hasDataForStateHandler = showLoading ? false : !isUnfilteredDataEmpty;
+
   return (
     <div className={className} data-test={dataTest}>
-      <StateHandler error={loadError} hasData={!isUnfilteredDataEmpty} loaded={loaded}>
+      <StateHandler
+        error={loadError}
+        hasData={hasDataForStateHandler}
+        loaded={loaded}
+        showSkeletonLoading
+      >
         {renderContent()}
       </StateHandler>
     </div>

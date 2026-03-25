@@ -1,32 +1,38 @@
 import React, { FC, useMemo } from 'react';
 
-import { modelToRef, TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { modelToRef, TemplateModel, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
+import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import useSelectedRowFilterClusters from '@kubevirt-utils/hooks/useSelectedRowFilterClusters';
 import useSelectedRowFilterProjects from '@kubevirt-utils/hooks/useSelectedRowFilterProjects';
-import { ClusterNamespacedResourceMap } from '@kubevirt-utils/resources/shared';
 import { ListPageProps } from '@kubevirt-utils/utils/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
 import {
-  K8sResourceCommon,
   ListPageBody,
   ListPageHeader,
   useListPageFilter,
-  VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Stack, StackItem } from '@patternfly/react-core';
 
 import VirtualMachineTemplatesCreateButton from './components/VirtualMachineTemplatesCreateButton/VirtualMachineTemplatesCreateButton';
 import VirtualMachineTemplatesEmptyState from './components/VirtualMachineTemplatesEmptyState/VirtualMachineTemplatesEmptyState';
-import VirtualMachineTemplatesRow from './components/VirtualMachineTemplatesRow';
 import VirtualMachineTemplateSupport from './components/VirtualMachineTemplateSupport/VirtualMachineTemplateSupport';
 import useHideDeprecatedTemplates from './hooks/useHideDeprecatedTemplates';
 import { useTemplatesWithAvailableSource } from './hooks/useTemplatesWithAvailableSource';
-import useVirtualMachineTemplatesColumns from './hooks/useVirtualMachineTemplatesColumns';
 import useVirtualMachineTemplatesFilters from './hooks/useVirtualMachineTemplatesFilters';
+import {
+  getTemplateColumns,
+  getTemplateRowId,
+  TEMPLATE_COLUMN_KEYS,
+  TemplateCallbacks,
+} from './virtualMachineTemplatesDefinition';
+
+import '@kubevirt-utils/styles/list-managment-group.scss';
 
 const VirtualMachineTemplatesList: FC<ListPageProps> = ({
   fieldSelector,
@@ -40,6 +46,7 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
   const selectedClusters = useSelectedRowFilterClusters();
   const selectedProjects = useSelectedRowFilterProjects();
   const namespaceParam = useNamespaceParam();
+  const isAllClustersPage = useIsAllClustersPage();
 
   const { t } = useKubevirtTranslation();
   const {
@@ -68,17 +75,56 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
     [filters, filtersWithSelect],
   );
 
-  const [data, filteredData, onFilterChange] = useListPageFilter(templates, allFilters, {
+  const [unfilteredData, filteredData, onFilterChange] = useListPageFilter(templates, allFilters, {
     name: { selected: [nameFilter] },
   });
 
-  const [columns, activeColumns, loadedColumns] = useVirtualMachineTemplatesColumns(namespaceParam);
+  const columns = useMemo(
+    () => getTemplateColumns(t, namespaceParam, isAllClustersPage),
+    [t, namespaceParam, isAllClustersPage],
+  );
+
+  const manageableColumns = useMemo(() => columns.filter((col) => col.label), [columns]);
+
+  const [activeColumns, , loadedColumns] = useKubevirtUserSettingsTableColumns<V1Template>({
+    columnManagementID: modelToRef(TemplateModel),
+    columns: manageableColumns.map((col) => ({
+      additional: col.additional,
+      id: col.key,
+      props: col.props,
+      title: col.label,
+    })),
+  });
+
+  const activeColumnKeys = useMemo(
+    () => activeColumns?.map((col) => col?.id) ?? manageableColumns.map((col) => col.key),
+    [activeColumns, manageableColumns],
+  );
+
+  const columnLayout = useMemo(
+    () => buildColumnLayout(manageableColumns, activeColumnKeys, modelToRef(TemplateModel)),
+    [manageableColumns, activeColumnKeys],
+  );
 
   const templatesLoaded = loaded && bootSourcesLoaded;
 
   useHideDeprecatedTemplates(onFilterChange);
 
-  if (templatesLoaded && isEmpty(data) && isEmpty(selectedClusters) && isEmpty(selectedProjects)) {
+  const callbacks: TemplateCallbacks = useMemo(
+    () => ({
+      availableDataSources,
+      availableTemplatesUID,
+      cloneInProgressDataSources,
+    }),
+    [availableDataSources, availableTemplatesUID, cloneInProgressDataSources],
+  );
+
+  if (
+    templatesLoaded &&
+    isEmpty(unfilteredData) &&
+    isEmpty(selectedClusters) &&
+    isEmpty(selectedProjects)
+  ) {
     return <VirtualMachineTemplatesEmptyState />;
   }
 
@@ -93,46 +139,31 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
             <VirtualMachineTemplateSupport />
           </StackItem>
           <StackItem>
-            <ListPageFilter
-              columnLayout={{
-                columns: columns?.map(({ additional, id, title }) => ({
-                  additional,
-                  id,
-                  title,
-                })),
-                id: modelToRef(TemplateModel),
-                selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
-                type: t('Template'),
-              }}
-              data={data}
-              filtersWithSelect={filtersWithSelect}
-              hideColumnManagement={hideColumnManagement}
-              hideLabelFilter={hideTextFilter}
-              hideNameLabelFilters={hideNameLabelFilters}
-              loaded={loadedColumns}
-              onFilterChange={onFilterChange}
-              rowFilters={filters}
-            />
-            <VirtualizedTable<
-              K8sResourceCommon,
-              {
-                availableDataSources: ClusterNamespacedResourceMap<V1beta1DataSource>;
-                availableTemplatesUID: Set<string>;
-                cloneInProgressDataSources: ClusterNamespacedResourceMap<V1beta1DataSource>;
-              }
-            >
-              EmptyMsg={() => (
-                <div className="pf-v6-u-text-align-center" id="no-templates-msg">
-                  {t('No templates found')}
-                </div>
-              )}
-              columns={activeColumns}
+            <div className="list-managment-group">
+              <ListPageFilter
+                columnLayout={columnLayout}
+                data={unfilteredData}
+                filtersWithSelect={filtersWithSelect}
+                hideColumnManagement={hideColumnManagement}
+                hideLabelFilter={hideTextFilter}
+                hideNameLabelFilters={hideNameLabelFilters}
+                loaded={loadedColumns}
+                onFilterChange={onFilterChange}
+                rowFilters={filters}
+              />
+            </div>
+            <KubevirtTable<V1Template, TemplateCallbacks>
+              activeColumnKeys={activeColumnKeys}
+              ariaLabel={t('VirtualMachine Templates table')}
+              callbacks={callbacks}
+              columns={columns}
               data={filteredData}
+              getRowId={getTemplateRowId}
+              initialSortKey={TEMPLATE_COLUMN_KEYS.name}
               loaded={templatesLoaded && loadedColumns}
               loadError={error}
-              Row={VirtualMachineTemplatesRow}
-              rowData={{ availableDataSources, availableTemplatesUID, cloneInProgressDataSources }}
-              unfilteredData={data}
+              noFilteredDataMsg={t('No templates found')}
+              unfilteredData={unfilteredData}
             />
           </StackItem>
         </Stack>
