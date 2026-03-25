@@ -90,6 +90,8 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
     );
 
   const nothingSelected = isEmpty(selectedPVCs);
+  const isDetailsStepInvalid =
+    nothingSelected || !migrationPlanName || !isDNS1123Label(migrationPlanName);
 
   const vmStorageClassNames = useMemo(
     () =>
@@ -130,8 +132,7 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
             >
               <WizardStep
                 footer={{
-                  isNextDisabled:
-                    nothingSelected || !migrationPlanName || !isDNS1123Label(migrationPlanName),
+                  isNextDisabled: isDetailsStepInvalid,
                 }}
                 id="wizard-migration-details"
                 name={t('Migration details')}
@@ -151,6 +152,7 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
               </WizardStep>
               <WizardStep
                 id="wizard-migrate-destination"
+                isDisabled={isDetailsStepInvalid}
                 name={t('Source and target StorageClass')}
               >
                 <VirtualMachineMigrationDestinationTab
@@ -170,6 +172,7 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
                   nextButtonText: t('Migrate VirtualMachine storage'),
                 }}
                 id="wizard-migrate-review"
+                isDisabled={isDetailsStepInvalid}
                 name={t('Review')}
               >
                 <VirtualMachineMigrationReviewTab
