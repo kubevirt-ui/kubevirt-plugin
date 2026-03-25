@@ -292,6 +292,23 @@ export const extensions: EncodedExtension[] = [
     },
     properties: {
       component: {
+        $codeRef: 'VMWizard',
+      },
+      path: [
+        '/k8s/all-clusters/all-namespaces/vmwizard',
+        '/k8s/cluster/:cluster/ns/:ns/vmwizard',
+        '/k8s/cluster/:cluster/all-namespaces/vmwizard',
+      ],
+      perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
+    },
+    type: 'console.page/route',
+  } as EncodedExtension<RoutePage>,
+  {
+    flags: {
+      required: ['KUBEVIRT_DYNAMIC_ACM'],
+    },
+    properties: {
+      component: {
         $codeRef: 'Catalog',
       },
       path: [

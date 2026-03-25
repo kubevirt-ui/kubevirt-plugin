@@ -1,0 +1,49 @@
+.bootable-volume-list {
+  height: 31.25rem; // 500px
+  display: flex;
+  flex-direction: column;
+
+  &__container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: auto;
+  }
+}
+
+.bootable-volume-list-bar {
+  margin-top: var(--pf-t--global--spacer--md);
+  &__filter {
+    margin-top: 1.25rem;
+  }
+
+  &__pagination {
+    margin-top: var(--pf-t--global--spacer--md);
+  }
+
+  &__show-all-btn {
+    margin-top: calc(var(--pf-t--global--spacer--md) + var(--pf-t--global--spacer--xs));
+  }
+
+  &__volume-namespace {
+    width: fit-content;
+    .pf-v6-c-form__label {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.bootable-volume-row-icon {
+  width: var(--pf-t--global--spacer--xl);
+  vertical-align: bottom;
+}
+
+.BootableVolumeList-table {
+  th {
+    .pf-v6-c-table__text {
+      overflow: visible;
+      text-overflow: clip;
+      white-space: normal;
+    }
+  }
+}

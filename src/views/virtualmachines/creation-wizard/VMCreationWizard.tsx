@@ -1,72 +1,76 @@
 import React, { FC, useCallback, useEffect, useRef } from 'react';
+import { useNavigate, useParams } from 'react-router-dom-v5-compat';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Modal, ModalVariant, Wizard, WizardHeader, WizardStep } from '@patternfly/react-core';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import { getVMListURL } from '@multicluster/urls';
+import { Wizard, WizardHeader, WizardStep } from '@patternfly/react-core';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
+import BootSourceStep from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/BootSourceStep/BootSourceStep';
 import GuestOSStep from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/GuestOSStep/GuestOSStep';
 import { VMCreationMethod } from '@virtualmachines/creation-wizard/utils/constants';
 import { getWizardFooterProps } from '@virtualmachines/creation-wizard/utils/utils';
 
 import DeploymentDetailsStep from './steps/DeploymentDetailsStep/DeploymentDetailsStep';
 
-type VMCreationWizardProps = {
-  cluster: string;
-  isOpen: boolean;
-  namespace: string;
-  onClose: () => void;
-};
-
-const VMCreationWizard: FC<VMCreationWizardProps> = ({ cluster, isOpen, namespace, onClose }) => {
+const VMCreationWizard: FC = () => {
   const { t } = useKubevirtTranslation();
+  const navigate = useNavigate();
   const { creationMethod, resetWizardState, setCluster, setProject } = useVMWizardStore();
-  const wasOpenRef = useRef(false);
+  const clusterParam = useClusterParam();
+  const { ns } = useParams<{ ns: string }>();
+  const hasInitialized = useRef(false);
 
   useEffect(() => {
-    if (isOpen && !wasOpenRef.current) {
-      resetWizardState();
+    if (!hasInitialized.current) {
+      setCluster(clusterParam);
+      setProject(ns);
+      hasInitialized.current = true;
     }
-    if (isOpen) {
-      setCluster(cluster);
-      setProject(namespace);
-    }
-    wasOpenRef.current = isOpen;
-  }, [isOpen, cluster, namespace, resetWizardState, setCluster, setProject]);
+  }, [clusterParam, ns, setCluster, setProject]);
 
   const wizardFooterProps = getWizardFooterProps(t);
 
   const isInstanceTypeMethod = creationMethod === VMCreationMethod.INSTANCE_TYPE;
 
+  const vmListURL = getVMListURL(clusterParam, ns);
+
   const handleClose = useCallback(() => {
     resetWizardState();
-    onClose();
-  }, [resetWizardState, onClose]);
+    navigate(vmListURL);
+  }, [resetWizardState, vmListURL, navigate]);
 
   return (
-    <Modal isOpen={isOpen} variant={ModalVariant.large} width="1500px">
-      <Wizard
-        className="vm-creation-wizard"
-        header={<WizardHeader onClose={handleClose} title={t('Create VirtualMachine')} />}
-        height="56.25rem" // 900px
-        onClose={handleClose}
-        title={t('Create VirtualMachine')}
+    <Wizard
+      className="vm-creation-wizard"
+      header={<WizardHeader title={t('Create VirtualMachine')} />}
+      onClose={handleClose}
+      title={t('Create VirtualMachine')}
+    >
+      <WizardStep
+        footer={wizardFooterProps}
+        id="vm-creation-deployment-details-step"
+        name={t('Deployment details')}
       >
-        <WizardStep
-          footer={wizardFooterProps}
-          id="vm-creation-deployment-details-step"
-          name={t('Deployment details')}
-        >
-          <DeploymentDetailsStep />
-        </WizardStep>
-        <WizardStep
-          footer={wizardFooterProps}
-          id="vm-creation-guest-os-step"
-          isHidden={!isInstanceTypeMethod}
-          name={t('Guest OS')}
-        >
-          <GuestOSStep />
-        </WizardStep>
-      </Wizard>
-    </Modal>
+        <DeploymentDetailsStep />
+      </WizardStep>
+      <WizardStep
+        footer={wizardFooterProps}
+        id="vm-creation-guest-os-step"
+        isHidden={!isInstanceTypeMethod}
+        name={t('Guest OS')}
+      >
+        <GuestOSStep />
+      </WizardStep>
+      <WizardStep
+        footer={wizardFooterProps}
+        id="vm-creation-boot-source-step"
+        isHidden={!isInstanceTypeMethod}
+        name={t('Boot source')}
+      >
+        <BootSourceStep />
+      </WizardStep>
+    </Wizard>
   );
 };
 

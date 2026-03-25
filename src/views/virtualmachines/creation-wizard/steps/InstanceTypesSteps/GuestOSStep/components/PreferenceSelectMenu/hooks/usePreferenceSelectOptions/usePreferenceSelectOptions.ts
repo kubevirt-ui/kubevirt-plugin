@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
-import useClusterPreferences from '@catalog/CreateFromInstanceTypes/state/hooks/useClusterPreferences';
 import useUserPreferences from '@kubevirt-utils/hooks/useUserPreferences';
+import useClusterPreferences from '@virtualmachines/creation-wizard/hooks/useClusterPreferences';
 import { getPreferenceNamesFilteredByOSType } from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/GuestOSStep/components/PreferenceSelectMenu/hooks/usePreferenceSelectOptions/utils/utils';
 import { OperatingSystemType } from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/GuestOSStep/utils/constants';
 

@@ -6,7 +6,8 @@ import OperatingSystemTile from '@virtualmachines/creation-wizard/steps/Instance
 import { OperatingSystemType } from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/GuestOSStep/utils/constants';
 
 const OperatingSystemTileGroup: FC = () => {
-  const { operatingSystemType, setOperatingSystemType } = useVMWizardStore();
+  const { instanceTypeFlowState, setOperatingSystemType } = useVMWizardStore();
+  const { operatingSystemType } = instanceTypeFlowState;
 
   return (
     <Split hasGutter>

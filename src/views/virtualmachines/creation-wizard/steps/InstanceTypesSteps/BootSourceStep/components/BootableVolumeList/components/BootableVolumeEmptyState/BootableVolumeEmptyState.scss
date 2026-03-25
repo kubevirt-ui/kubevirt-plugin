@@ -1,0 +1,18 @@
+.bootable-volume-empty-state {
+  &__icon-bar {
+    margin-top: var(--pf-t--global--spacer--xl);
+  }
+
+  &__icon-bar :nth-child(2) {
+    margin-left: var(--pf-t--global--spacer--2xl);
+    margin-right: var(--pf-t--global--spacer--2xl);
+  }
+
+  &__icon {
+    height: 3.125rem; // 50px
+  }
+
+  &__title {
+    margin-bottom: var(--pf-t--global--spacer--md);
+  }
+}

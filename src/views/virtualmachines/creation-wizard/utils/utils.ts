@@ -1,5 +1,13 @@
 import { TFunction } from 'react-i18next';
 
+import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
+import {
+  getDataVolumeSize,
+  getPVCSize,
+  getVolumeSnapshotSize,
+} from '@kubevirt-utils/resources/bootableresources/selectors';
 import CloneIcon from '@virtualmachines/creation-wizard/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/components/CreationMethodTile/components/CloneIcon';
 import { InstanceTypeIcon } from '@virtualmachines/creation-wizard/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/components/CreationMethodTile/components/InstanceTypeIcon';
 import TemplateIcon from '@virtualmachines/creation-wizard/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/components/CreationMethodTile/components/TemplateIcon';
@@ -39,3 +47,9 @@ export const getWizardFooterProps = (t: TFunction) => {
     nextButtonText: t('Next'),
   };
 };
+
+export const getDiskSize = (
+  dataVolume: V1beta1DataVolume,
+  pvc: IoK8sApiCoreV1PersistentVolumeClaim,
+  volumeSnapshot: VolumeSnapshotKind,
+) => getDataVolumeSize(dataVolume) || getPVCSize(pvc) || getVolumeSnapshotSize(volumeSnapshot);

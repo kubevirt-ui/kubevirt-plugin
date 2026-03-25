@@ -5,25 +5,26 @@ import NamespaceDropdown from '@kubevirt-utils/components/ClusterProjectDropdown
 import FolderSelect from '@kubevirt-utils/components/FolderSelect/FolderSelect';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { Form, FormGroup } from '@patternfly/react-core';
-import { useIsFleetAvailable } from '@stolostron/multicluster-sdk';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 
 import './VMCreationLocationForm.scss';
 
 const VMCreationLocationForm: FC = () => {
   const { t } = useKubevirtTranslation();
-  const fleetAvailable = useIsFleetAvailable();
+  const isACMPage = useIsACMPage();
   const { cluster, folder, project, setCluster, setFolder, setProject } = useVMWizardStore();
 
   return (
     <Form className="vm-creation-location-form">
-      {fleetAvailable && (
+      {isACMPage && (
         <FormGroup isRequired label={t('Cluster')}>
           <ClusterDropdown
             onChange={(selectedCluster) => {
               setCluster(selectedCluster);
               setFolder('');
+              if (selectedCluster !== cluster) setProject('');
             }}
             selectedCluster={cluster}
           />
@@ -33,7 +34,7 @@ const VMCreationLocationForm: FC = () => {
         <NamespaceDropdown
           onChange={(selectedProject) => {
             setProject(selectedProject);
-            setFolder(undefined);
+            setFolder('');
           }}
           cluster={cluster}
           selectedProject={project || DEFAULT_NAMESPACE}

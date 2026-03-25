@@ -70,6 +70,14 @@ export const getCatalogURL = (cluster: string, namespace?: string): string => {
     : `/k8s/${namespacePath}/catalog`;
 };
 
+export const getVMWizardURL = (cluster: string, namespace?: string): string => {
+  const namespacePath = isAllNamespaces(namespace) ? ALL_NAMESPACES : `ns/${namespace}`;
+
+  return cluster
+    ? `/k8s/cluster/${cluster}/${namespacePath}/vmwizard`
+    : `/k8s/${namespacePath}/vmwizard`;
+};
+
 export const getConsoleStandaloneURL = (
   namespace: string,
   name: string,
