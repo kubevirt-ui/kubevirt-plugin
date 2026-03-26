@@ -28,6 +28,8 @@ const CloningStatus: FC<CloningStatusProps> = ({ vmCloneRequest }) => {
     phase as CLONING_STATUSES,
   );
 
+  const isInProgress = phase && !isFailed && phase !== CLONING_STATUSES.SUCCEEDED;
+
   if (!Boolean(vmCloneRequest)) return null;
 
   return (
@@ -73,6 +75,16 @@ const CloningStatus: FC<CloningStatusProps> = ({ vmCloneRequest }) => {
           {vmCloneRequest?.status?.conditions?.find((c) => c.status === 'True')?.message ||
             'unknown'}
         </Alert>
+      )}
+
+      {isInProgress && (
+        <Alert
+          title={t(
+            'The cloning process will continue after you close the modal. The cloned VirtualMachine may take some time to appear.',
+          )}
+          isInline
+          variant={AlertVariant.info}
+        />
       )}
     </Stack>
   );
