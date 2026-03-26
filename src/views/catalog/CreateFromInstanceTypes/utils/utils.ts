@@ -147,6 +147,7 @@ export const generateVM: GenerateVMCallback = ({
   const isDynamic = instanceTypeState?.isDynamicSSHInjection;
   const isSysprep = !isEmpty(sysprepConfigMapData?.name);
   const isIso = isBootableVolumeISO(selectedBootableVolume);
+  const isWindowsVM = selectedPreference?.startsWith(OS_WINDOWS_PREFIX);
   const storageClassName =
     instanceTypeState.selectedStorageClass || pvcSource?.spec?.storageClassName;
 
@@ -230,17 +231,21 @@ export const generateVM: GenerateVMCallback = ({
               dataVolume: { name: `${virtualmachineName}-volume` },
               name: ROOTDISK,
             },
-            {
-              cloudInitNoCloud: {
-                userData: createPopulatedCloudInitYAML(
-                  selectedPreference,
-                  osLabel,
-                  subscriptionData,
-                  autoUpdateEnabled,
-                ),
-              },
-              name: 'cloudinitdisk',
-            },
+            ...(!isWindowsVM
+              ? [
+                  {
+                    cloudInitNoCloud: {
+                      userData: createPopulatedCloudInitYAML(
+                        selectedPreference,
+                        osLabel,
+                        subscriptionData,
+                        autoUpdateEnabled,
+                      ),
+                    },
+                    name: 'cloudinitdisk',
+                  },
+                ]
+              : []),
           ],
         },
       },
