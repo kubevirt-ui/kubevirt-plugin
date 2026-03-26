@@ -154,9 +154,7 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
             <DiskNameInput isDisabled={isUploading} />
           </StackItem>
           <StackItem className="pf-v6-u-mt-md">
-            <Content component={ContentVariants.p}>
-              {t('Select how you would like to set up the new drive')}
-            </Content>
+            <Content component={ContentVariants.p}>{t('Select mount option')}</Content>
           </StackItem>
           <StackItem>
             <Stack hasGutter>
@@ -165,7 +163,7 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = ({
                   id="cdrom-source-existing"
                   isChecked={existingISOSelected}
                   isDisabled={isUploading}
-                  label={t('Mount existing ISO')}
+                  label={t('Use existing ISO')}
                   name="cdrom-source"
                   onChange={() => handleISOSelection('')}
                 />

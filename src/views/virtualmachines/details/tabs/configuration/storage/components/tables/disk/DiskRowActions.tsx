@@ -42,6 +42,7 @@ type DiskRowActionsProps = {
   customize?: boolean;
   obj: DiskRowDataLayout;
   onDiskUpdate?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
+  onUploadStarted?: (promise: Promise<unknown>) => void;
   vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
@@ -50,6 +51,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
   customize = false,
   obj,
   onDiskUpdate,
+  onUploadStarted,
   vm,
   vmi,
 }) => {
@@ -170,6 +172,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
         onSubmit={onDiskUpdate || updateDisks}
         vm={vm}
         {...(isCDROMMountedState && { source: diskSource })}
+        {...(!isCDROMMountedState && { onUploadStarted })}
       />
     ));
   };

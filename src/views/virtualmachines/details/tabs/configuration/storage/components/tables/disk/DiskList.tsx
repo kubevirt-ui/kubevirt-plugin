@@ -73,12 +73,13 @@ const DiskList: FC<DiskListProps> = ({
     () => ({
       customize,
       onSubmit,
+      onUploadStarted,
       provisioningPercentages,
       sourcesLoaded,
       vm,
       vmi,
     }),
-    [customize, onSubmit, provisioningPercentages, sourcesLoaded, vm, vmi],
+    [customize, onSubmit, onUploadStarted, provisioningPercentages, sourcesLoaded, vm, vmi],
   );
 
   return (

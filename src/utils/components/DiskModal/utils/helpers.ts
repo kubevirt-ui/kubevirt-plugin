@@ -272,6 +272,16 @@ const getVolumeSourceForMount = (diskState: V1DiskFormState, isHotPluggable: boo
       },
     };
   }
+
+  if (diskState.volume?.dataVolume?.name) {
+    return {
+      dataVolume: {
+        name: diskState.volume.dataVolume.name,
+        ...(isHotPluggable && { hotpluggable: true }),
+      },
+    };
+  }
+
   return {
     persistentVolumeClaim: {
       claimName: diskState.volume.persistentVolumeClaim.claimName,
