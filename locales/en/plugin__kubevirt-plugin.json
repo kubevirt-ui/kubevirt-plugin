@@ -1947,6 +1947,7 @@
   "The AAQ quota calculation method, or resource type, controls how AAQ calculates resource usage for quotas.": "The AAQ quota calculation method, or resource type, controls how AAQ calculates resource usage for quotas.",
   "The architecture type will be added as a suffix to the bootable volume name.": "The architecture type will be added as a suffix to the bootable volume name.",
   "The channel to track and receive the updates from.": "The channel to track and receive the updates from.",
+  "The cloning process will continue after you close the modal. The cloned VirtualMachine may take some time to appear.": "The cloning process will continue after you close the modal. The cloned VirtualMachine may take some time to appear.",
   "The cloud-init service is enabled by default in Fedora and RHEL images.": "The cloud-init service is enabled by default in Fedora and RHEL images.",
   "The ConfigMap for this checkup could not be found.": "The ConfigMap for this checkup could not be found.",
   "The DataImportCron polls disk images and imports them as PersistentVolumeClaims. You can configure the image source and other settings on the DataImportCron details page.": "The DataImportCron polls disk images and imports them as PersistentVolumeClaims. You can configure the image source and other settings on the DataImportCron details page.",
