@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useCallback, useState } from 'react';
 import { Link } from 'react-router-dom-v5-compat';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
@@ -10,6 +10,7 @@ import {
 import { MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
 import { STATUS_COMPLETED } from '@kubevirt-utils/resources/migrations/constants';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
+import { kubevirtK8sDelete } from '@multicluster/k8sRequests';
 import {
   Button,
   ButtonVariant,
@@ -37,6 +38,7 @@ const VirtualMachineMigrationStatus: FC<VirtualMachineMigrationStatusProps> = ({
   storageMigrationPlan,
 }) => {
   const { t } = useKubevirtTranslation();
+  const [cancelError, setCancelError] = useState<Error>(null);
 
   const {
     error: fetchingError,
@@ -53,6 +55,19 @@ const VirtualMachineMigrationStatus: FC<VirtualMachineMigrationStatusProps> = ({
     t,
   );
 
+  const onCancel = useCallback(async () => {
+    try {
+      await kubevirtK8sDelete({
+        model: MultiNamespaceVirtualMachineStorageMigrationPlanModel,
+        resource: storageMigrationPlan,
+      });
+    } catch (error) {
+      setCancelError(error);
+      return;
+    }
+    onClose();
+  }, [onClose, storageMigrationPlan]);
+
   return (
     <div className="pf-v6-c-wizard migration-status">
       <div className="pf-v6-c-wizard__header">
@@ -60,7 +75,7 @@ const VirtualMachineMigrationStatus: FC<VirtualMachineMigrationStatusProps> = ({
           <Button
             aria-label={t('Close')}
             icon={<CloseIcon />}
-            onClick={onClose}
+            onClick={migrationCompleted || hasFailed ? onClose : onCancel}
             variant={ButtonVariant.plain}
           />
         </div>
@@ -86,7 +101,7 @@ const VirtualMachineMigrationStatus: FC<VirtualMachineMigrationStatusProps> = ({
             {!migrationCompleted && !hasFailed && <Spinner size="lg" />}
           </EmptyStateBody>
 
-          <ErrorAlert error={fetchingError} />
+          <ErrorAlert error={fetchingError || cancelError} />
 
           <EmptyStateFooter>
             <EmptyStateActions>
@@ -95,7 +110,7 @@ const VirtualMachineMigrationStatus: FC<VirtualMachineMigrationStatusProps> = ({
                   {t('Close')}
                 </Button>
               ) : (
-                <Button onClick={onClose} variant={ButtonVariant.link}>
+                <Button onClick={onCancel} variant={ButtonVariant.link}>
                   {t('Cancel')}
                 </Button>
               )}
