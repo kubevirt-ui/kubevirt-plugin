@@ -1,3 +1,6 @@
+FROM registry.redhat.io/ubi9/ubi:latest as policy
+
+RUN update-crypto-policies --set DEFAULT:PQ
 # NOTE: Since the `:latest` tag can have npm version changes, we are using
 #       a specific version tag. Container build errors have come up when
 #       the `:latest` is updated.
@@ -17,6 +20,8 @@ RUN npm run build
 # Image info: https://catalog.redhat.com/en/software/containers/ubi9/nginx-124/657b066b6c1bc124a1d7ff39
 FROM registry.access.redhat.com/ubi9/nginx-124:9.7-1772411964
 
+COPY --from=policy /etc/crypto-policies /etc/crypto-policies
 COPY --from=builder /opt/app-root/src/dist /usr/share/nginx/html
+COPY default.conf /opt/app-root/etc/nginx.d/default.conf
 USER 1001
 CMD /usr/libexec/s2i/run
