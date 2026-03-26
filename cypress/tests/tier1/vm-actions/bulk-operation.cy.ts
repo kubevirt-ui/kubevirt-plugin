@@ -37,7 +37,7 @@ describe('Test bulk actions', () => {
 
     // Verify VMs are stopped
     cy.wait(WAIT_TIME);
-    cy.clickVirtLink(nav.catalogNav);
+    cy.visit('/k8s/all-namespaces/catalog');
     cy.wait(WAIT_TIME);
     cy.clickVirtLink(nav.vmNav);
     cy.byTestID(vmListTab).should('be.visible').click();

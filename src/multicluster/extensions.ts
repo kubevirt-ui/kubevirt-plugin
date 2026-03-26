@@ -4,23 +4,23 @@ import {
   FeatureFlagHookProvider,
   HrefNavItem,
   RoutePage,
+  Separator,
   StandaloneRoutePage,
 } from '@openshift-console/dynamic-plugin-sdk';
 import type { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plugin-sdk-webpack';
 import { ResourceRoute } from '@stolostron/multicluster-sdk';
 
+import { PERSPECTIVES } from '../utils/constants/constants';
+
 import { CROSS_CLUSTER_MIGRATION_ACTION_ID, KUBEVIRT_VM_PATH } from './constants';
 
 export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
   acmFlags: './multicluster/flags.ts',
-  ConsoleStandAlone: './utils/components/Consoles/ConsoleStandAlone.tsx',
   CrossClusterMigration:
     './multicluster/components/CrossClusterMigration/CrossClusterMigration.tsx',
   MulticlusterYAMLCreation:
     './multicluster/components/MulticlusterYAMLCreation/MulticlusterYAMLCreation.tsx',
-  Navigator: './views/virtualmachines/navigator/VirtualMachineNavigator.tsx',
   urls: './multicluster/urls.ts',
-  VirtualMachineSearchResults: './views/virtualmachines/search/VirtualMachineSearchResults.tsx',
 };
 
 const DATA_VOLUME_PATH = 'cdi.kubevirt.io~v1beta1~DataVolume';
@@ -36,141 +36,122 @@ export const extensions: EncodedExtension[] = [
     },
     properties: {
       icon: { $codeRef: 'perspective.icon' },
-      id: 'fleet-virtualization-perspective',
+      id: PERSPECTIVES.FLEET_VIRTUALIZATION,
       importRedirectURL: { $codeRef: 'perspective.getACMLandingPageURL' },
       landingPageURL: { $codeRef: 'perspective.getACMLandingPageURL' },
       name: '%plugin__console-virt-perspective-plugin~Fleet Virtualization%',
     },
     type: 'console.perspective',
   },
+  // Navigation order:
+  // VirtualMachines
+  // Templates
+  // Bootable volumes
+  // --- separator 1 ---
+  // InstanceTypes
+  // --- separator 2 ---
+  // MigrationPolicies
+  // Checkups
   {
     properties: {
       dataAttributes: {
-        'data-border': 'no-border',
-        'data-class': 'kv-plugin-virt-perspective-element',
-        'data-quickstart-id': 'qs-nav-virtualization-overview',
-        'data-test-id': 'virtualization-overview-nav-item',
-      },
-      href: '/k8s/all-clusters/all-namespaces/virtualization-overview',
-      id: 'overview-virt-perspective',
-      insertBefore: 'virtualization-catalog-virt-perspective',
-      name: '%plugin__kubevirt-plugin~Overview%',
-      perspective: 'fleet-virtualization-perspective',
-    },
-    type: 'console.navigation/href',
-  } as EncodedExtension<HrefNavItem>,
-  {
-    properties: {
-      dataAttributes: {
-        'data-border': 'no-border',
-        'data-class': 'kv-plugin-virt-perspective-element',
-        'data-quickstart-id': 'qs-nav-virtualization-catalog',
-        'data-test-id': 'virtualization-catalog-nav-item',
-      },
-      href: '/k8s/all-clusters/all-namespaces/catalog',
-      id: 'virtualization-catalog-virt-perspective',
-      insertBefore: 'virtualmachines-virt-perspective',
-      name: '%plugin__kubevirt-plugin~Catalog%',
-      perspective: 'fleet-virtualization-perspective',
-    },
-    type: 'console.navigation/href',
-  } as EncodedExtension<HrefNavItem>,
-  {
-    properties: {
-      dataAttributes: {
-        'data-border': 'no-border',
-        'data-class': 'kv-plugin-virt-perspective-element',
         'data-quickstart-id': 'qs-nav-virtualmachines',
         'data-test-id': 'virtualmachines-nav-item',
       },
       href: `/k8s/all-clusters/all-namespaces/${KUBEVIRT_VM_PATH}`,
       id: 'virtualmachines-virt-perspective',
       name: '%plugin__kubevirt-plugin~VirtualMachines%',
-      perspective: 'fleet-virtualization-perspective',
+      perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
     type: 'console.navigation/href',
   } as EncodedExtension<HrefNavItem>,
-
   {
     properties: {
       dataAttributes: {
-        'data-border': 'no-border',
-        'data-class': 'kv-plugin-virt-perspective-element',
         'data-quickstart-id': 'qs-nav-templates',
         'data-test-id': 'templates-nav-item',
       },
       href: `/k8s/all-clusters/all-namespaces/templates`,
       id: 'templates-virt-perspective',
+      insertAfter: 'virtualmachines-virt-perspective',
       name: '%plugin__kubevirt-plugin~Templates%',
-      perspective: 'fleet-virtualization-perspective',
+      perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
     type: 'console.navigation/href',
   } as EncodedExtension<HrefNavItem>,
   {
     properties: {
       dataAttributes: {
-        'data-border': 'no-border',
-        'data-class': 'kv-plugin-virt-perspective-element',
-        'data-quickstart-id': 'qs-nav-instancetype',
-        'data-test-id': 'instancetype-nav-item',
-      },
-      href: `/k8s/all-clusters/${CLUSTER_INSTANCETYPE_PATH}`,
-      id: 'instancetype-virt-perspective',
-      name: '%plugin__kubevirt-plugin~InstanceTypes%',
-      perspective: 'fleet-virtualization-perspective',
-    },
-    type: 'console.navigation/href',
-  } as EncodedExtension<HrefNavItem>,
-  {
-    properties: {
-      id: 'VirtualizationSeparator',
-      insertAfter: 'instancetype-virt-perspective',
-      perspective: 'fleet-virtualization-perspective',
-    },
-    type: 'console.navigation/separator',
-  },
-  {
-    properties: {
-      dataAttributes: {
-        'data-border': 'no-border',
-        'data-class': 'kv-plugin-virt-perspective-element',
         'data-quickstart-id': 'qs-nav-bootablevolumes',
         'data-test-id': 'bootablevolumes-nav-item',
       },
       href: `/k8s/all-clusters/all-namespaces/bootablevolumes`,
       id: 'bootablevolumes-virt-perspective',
+      insertAfter: 'templates-virt-perspective',
       name: '%plugin__kubevirt-plugin~Bootable volumes%',
-      perspective: 'fleet-virtualization-perspective',
+      perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
     type: 'console.navigation/href',
   } as EncodedExtension<HrefNavItem>,
   {
     properties: {
+      id: 'acm-separator-1',
+      insertAfter: 'bootablevolumes-virt-perspective',
+      insertBefore: 'instancetype-virt-perspective',
+      perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
+      testID: 'acm-separator-1',
+    },
+    type: 'console.navigation/separator',
+  } as EncodedExtension<Separator>,
+  {
+    properties: {
       dataAttributes: {
-        'data-border': 'no-border',
-        'data-class': 'kv-plugin-virt-perspective-element',
+        'data-quickstart-id': 'qs-nav-instancetype',
+        'data-test-id': 'instancetype-nav-item',
+      },
+      href: `/k8s/all-clusters/${CLUSTER_INSTANCETYPE_PATH}`,
+      id: 'instancetype-virt-perspective',
+      insertAfter: 'acm-separator-1',
+      name: '%plugin__kubevirt-plugin~InstanceTypes%',
+      perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
+    },
+    type: 'console.navigation/href',
+  } as EncodedExtension<HrefNavItem>,
+  {
+    properties: {
+      id: 'acm-separator-2',
+      insertAfter: 'instancetype-virt-perspective',
+      insertBefore: 'migrationpolicies-virt-perspective',
+      perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
+      testID: 'acm-separator-2',
+    },
+    type: 'console.navigation/separator',
+  } as EncodedExtension<Separator>,
+  {
+    properties: {
+      dataAttributes: {
         'data-quickstart-id': 'qs-nav-migrationpolicies',
         'data-test-id': 'migrationpolicies-nav-item',
       },
       href: `/k8s/all-clusters/${MIGRATION_POLICY_PATH}`,
       id: 'migrationpolicies-virt-perspective',
+      insertAfter: 'acm-separator-2',
       name: '%plugin__kubevirt-plugin~MigrationPolicies%',
-      perspective: 'fleet-virtualization-perspective',
+      perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
     type: 'console.navigation/href',
   } as EncodedExtension<HrefNavItem>,
   {
     properties: {
       dataAttributes: {
-        'data-border': 'no-border',
-        'data-class': 'kv-plugin-virt-perspective-element',
         'data-quickstart-id': 'qs-nav-checkups',
         'data-test-id': 'checkups-nav-item',
       },
       href: `/k8s/all-clusters/all-namespaces/checkups/storage`,
       id: 'checkups-virt-perspective',
+      insertAfter: 'migrationpolicies-virt-perspective',
       name: '%plugin__kubevirt-plugin~Checkups%',
-      perspective: 'fleet-virtualization-perspective',
+      perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
     type: 'console.navigation/href',
   } as EncodedExtension<HrefNavItem>,
@@ -199,7 +180,7 @@ export const extensions: EncodedExtension[] = [
         `/k8s/cluster/:cluster/all-namespaces/${KUBEVIRT_VM_PATH}`,
         `/k8s/all-clusters/all-namespaces/${KUBEVIRT_VM_PATH}`,
       ],
-      perspective: 'fleet-virtualization-perspective',
+      perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
@@ -221,7 +202,7 @@ export const extensions: EncodedExtension[] = [
         `/k8s/cluster/:cluster/all-namespaces/${INSTANCETYPE_PATH}`,
         `/k8s/all-clusters/all-namespaces/${INSTANCETYPE_PATH}`,
       ],
-      perspective: 'fleet-virtualization-perspective',
+      perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
@@ -234,7 +215,7 @@ export const extensions: EncodedExtension[] = [
         $codeRef: 'BootableVolumeYAMLPage',
       },
       path: [`/k8s/cluster/:cluster/ns/:ns/bootablevolumes/~new`],
-      perspective: 'fleet-virtualization-perspective',
+      perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
@@ -251,7 +232,7 @@ export const extensions: EncodedExtension[] = [
         `/k8s/cluster/:cluster/all-namespaces/bootablevolumes`,
         `/k8s/all-clusters/all-namespaces/bootablevolumes`,
       ],
-      perspective: 'fleet-virtualization-perspective',
+      perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
@@ -262,7 +243,7 @@ export const extensions: EncodedExtension[] = [
     properties: {
       component: { $codeRef: 'VirtualMachineSearchResults' },
       path: [`/k8s/all-clusters/all-namespaces/${KUBEVIRT_VM_PATH}/search`],
-      perspective: 'fleet-virtualization-perspective',
+      perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
@@ -301,7 +282,7 @@ export const extensions: EncodedExtension[] = [
         '/k8s/cluster/:cluster/ns/:ns/virtualization-overview',
         '/k8s/cluster/:cluster/all-namespaces/virtualization-overview',
       ],
-      perspective: 'fleet-virtualization-perspective',
+      perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
@@ -318,7 +299,7 @@ export const extensions: EncodedExtension[] = [
         '/k8s/cluster/:cluster/ns/:ns/catalog',
         '/k8s/cluster/:cluster/all-namespaces/catalog',
       ],
-      perspective: 'fleet-virtualization-perspective',
+      perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
@@ -335,7 +316,7 @@ export const extensions: EncodedExtension[] = [
         `/k8s/cluster/:cluster/ns/:ns/templates`,
         `/k8s/cluster/:cluster/all-namespaces/templates`,
       ],
-      perspective: 'fleet-virtualization-perspective',
+      perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
@@ -348,7 +329,7 @@ export const extensions: EncodedExtension[] = [
         $codeRef: 'TemplateNavPage',
       },
       path: [`/k8s/cluster/:cluster/ns/:ns/templates/:name`],
-      perspective: 'fleet-virtualization-perspective',
+      perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
@@ -365,7 +346,7 @@ export const extensions: EncodedExtension[] = [
         `/k8s/cluster/:cluster/ns/:ns/${KUBEVIRT_VM_PATH}/~new`,
         `/k8s/cluster/:cluster/ns/:ns/templates/~new`,
       ],
-      perspective: 'fleet-virtualization-perspective',
+      perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
@@ -381,7 +362,7 @@ export const extensions: EncodedExtension[] = [
         `/k8s/all-clusters/${MIGRATION_POLICY_PATH}`,
         `/k8s/cluster/:cluster/${MIGRATION_POLICY_PATH}`,
       ],
-      perspective: 'fleet-virtualization-perspective',
+      perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
@@ -394,7 +375,7 @@ export const extensions: EncodedExtension[] = [
         $codeRef: 'MigrationPolicyPage',
       },
       path: [`/k8s/cluster/:cluster/${MIGRATION_POLICY_PATH}/:name`],
-      perspective: 'fleet-virtualization-perspective',
+      perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
@@ -407,7 +388,7 @@ export const extensions: EncodedExtension[] = [
         $codeRef: 'MigrationPolicyCreateForm',
       },
       path: [`/k8s/cluster/:cluster/${MIGRATION_POLICY_PATH}/form`],
-      perspective: 'fleet-virtualization-perspective',
+      perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
@@ -420,7 +401,7 @@ export const extensions: EncodedExtension[] = [
         $codeRef: 'MulticlusterYAMLCreation',
       },
       path: [`/k8s/cluster/:cluster/${MIGRATION_POLICY_PATH}/~new`],
-      perspective: 'fleet-virtualization-perspective',
+      perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
@@ -433,7 +414,7 @@ export const extensions: EncodedExtension[] = [
         $codeRef: 'MulticlusterYAMLCreation',
       },
       path: [`/k8s/cluster/:cluster/ns/:ns/${DATA_VOLUME_PATH}/~new`],
-      perspective: 'fleet-virtualization-perspective',
+      perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
@@ -462,7 +443,7 @@ export const extensions: EncodedExtension[] = [
         '/k8s/cluster/:cluster/all-namespaces/checkups',
         '/k8s/cluster/:cluster/ns/:ns/checkups',
       ],
-      perspective: 'fleet-virtualization-perspective',
+      perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
@@ -476,7 +457,7 @@ export const extensions: EncodedExtension[] = [
         $codeRef: 'CheckupsStorageForm',
       },
       path: ['/k8s/cluster/:cluster/ns/:ns/checkups/storage/form'],
-      perspective: 'fleet-virtualization-perspective',
+      perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
@@ -489,7 +470,7 @@ export const extensions: EncodedExtension[] = [
         $codeRef: 'CheckupsStorageDetailsPage',
       },
       path: ['/k8s/cluster/:cluster/ns/:ns/checkups/storage/:checkupName'],
-      perspective: 'fleet-virtualization-perspective',
+      perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
@@ -502,7 +483,7 @@ export const extensions: EncodedExtension[] = [
         $codeRef: 'CheckupsSelfValidationForm',
       },
       path: ['/k8s/cluster/:cluster/ns/:ns/checkups/self-validation/form'],
-      perspective: 'fleet-virtualization-perspective',
+      perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
@@ -515,7 +496,7 @@ export const extensions: EncodedExtension[] = [
         $codeRef: 'CheckupsSelfValidationDetailsPage',
       },
       path: ['/k8s/cluster/:cluster/ns/:ns/checkups/self-validation/:checkupName'],
-      perspective: 'fleet-virtualization-perspective',
+      perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,

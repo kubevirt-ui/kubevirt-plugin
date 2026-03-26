@@ -1,5 +1,5 @@
 import { EncodedExtension } from '@openshift/dynamic-plugin-sdk-webpack';
-import { HrefNavItem, RoutePage } from '@openshift-console/dynamic-plugin-sdk';
+import { RoutePage } from '@openshift-console/dynamic-plugin-sdk';
 import type { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plugin-sdk-webpack';
 
 export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
@@ -10,23 +10,6 @@ export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
 };
 
 export const extensions: EncodedExtension[] = [
-  {
-    flags: {
-      required: ['KUBEVIRT_QUOTAS'],
-    },
-    properties: {
-      dataAttributes: {
-        'data-quickstart-id': 'qs-nav-quotas',
-        'data-test-id': 'quotas-nav-item',
-      },
-      href: 'quotas',
-      id: 'quotas',
-      name: '%plugin__kubevirt-plugin~Quotas%',
-      prefixNamespaced: true,
-      section: 'virtualization',
-    },
-    type: 'console.navigation/href',
-  } as EncodedExtension<HrefNavItem>,
   {
     flags: {
       required: ['KUBEVIRT_QUOTAS'],
