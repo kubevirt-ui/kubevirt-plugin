@@ -5,8 +5,10 @@ import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { Alert, Bullseye, PageSection, Spinner, Stack } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
+import { AdvancedSearchFilter, useHubClusterName } from '@stolostron/multicluster-sdk';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 
 import { determineOverviewLevel, getOverviewConfig } from './config';
@@ -17,17 +19,32 @@ const OverviewTab: FC<OverviewTabProps> = ({ cluster, namespace }) => {
   const { t } = useKubevirtTranslation();
 
   const isMultiCluster = useIsAllClustersPage();
+  const isACMPage = useIsACMPage();
+  const [hubClusterName, hubClusterLoaded] = useHubClusterName();
+
+  const isManagedClusterFetch =
+    isACMPage && !!cluster && hubClusterLoaded && hubClusterName !== cluster;
+
+  const searchQueries = useMemo<AdvancedSearchFilter | undefined>(
+    () => (isManagedClusterFetch ? [{ property: 'cluster', values: [cluster] }] : undefined),
+    [isManagedClusterFetch, cluster],
+  );
+
+  const watchEnabled = !isACMPage || !cluster || hubClusterLoaded;
 
   const [vms, vmsLoaded, vmsError] = useKubevirtWatchResource<V1VirtualMachine[]>(
-    {
-      cluster,
-      groupVersionKind: VirtualMachineModelGroupVersionKind,
-      isList: true,
-      limit: OBJECTS_FETCHING_LIMIT,
-      namespace,
-      namespaced: !!namespace,
-    },
+    watchEnabled
+      ? {
+          cluster: isManagedClusterFetch ? undefined : cluster,
+          groupVersionKind: VirtualMachineModelGroupVersionKind,
+          isList: true,
+          limit: OBJECTS_FETCHING_LIMIT,
+          namespace,
+          namespaced: !!namespace,
+        }
+      : null,
     undefined,
+    searchQueries,
   );
 
   const overviewLevel = useMemo(
