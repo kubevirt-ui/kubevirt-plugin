@@ -1,6 +1,7 @@
 import { MouseEvent, useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom-v5-compat';
 
+import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
 import { useQueryParamsMethods } from '@kubevirt-utils/components/ListPageFilter/hooks/useQueryParamsMethods';
 import { ALL_NAMESPACES, ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -48,8 +49,9 @@ const useTreeViewSelect = (
     [navigate, onFilterChange, setOrRemoveQueryArgument],
   );
 
-  // Apply the selected item when reloading the page / creating project / creating VM / deleting VM
   useEffect(() => {
+    if (runningTourSignal.value) return;
+
     if (isEmpty(selected) || location.pathname !== selected.href) {
       if (!ns) {
         setSelected(dataMap?.[ALL_NAMESPACES_SESSION_KEY]);

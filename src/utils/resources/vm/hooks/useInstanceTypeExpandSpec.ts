@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
 import useDeepCompareMemoize from '@kubevirt-utils/hooks/useDeepCompareMemoize/useDeepCompareMemoize';
 import { isExpandableSpecVM } from '@kubevirt-utils/resources/instancetype/helper';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
@@ -42,7 +43,12 @@ const useInstanceTypeExpandSpec: UseInstanceTypeExpandSpec = (vm) => {
         setLoadingExpandedSpec(false);
       }
     };
-    !isEmpty(innerVM) && isExpandableSpec && fetch();
+    if (!isEmpty(innerVM) && isExpandableSpec && !runningTourSignal.value) {
+      fetch();
+    } else {
+      setInstanceTypeExpandedSpec(undefined);
+      setErrorExpandedSpec(undefined);
+    }
   }, [isExpandableSpec, innerVM]);
 
   return [instanceTypeExpandedSpec, loadingExpandedSpec, errorExpandedSpec];

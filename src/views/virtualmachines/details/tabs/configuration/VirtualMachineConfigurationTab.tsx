@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom-v5-compat';
 import { useLocation } from 'react-router-dom-v5-compat';
 
 import useInstanceTypesAndPreferences from '@catalog/CreateFromInstanceTypes/state/hooks/useInstanceTypesAndPreferences';
-import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { getName } from '@kubevirt-utils/resources/shared';
 import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
@@ -74,7 +73,6 @@ const VirtualMachineConfigurationTab: FC<NavPageComponentProps> = ({
           ))}
         </Tabs>
       </div>
-      <GuidedTour />
     </PageSection>
   );
 };
