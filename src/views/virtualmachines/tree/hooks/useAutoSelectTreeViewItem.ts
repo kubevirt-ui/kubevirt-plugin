@@ -7,15 +7,18 @@ import { ALL_NAMESPACES, ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hook
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
+import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import { useLastNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
+import { TEXT_FILTER_LABELS_ID } from '@virtualmachines/list/hooks/constants';
 
 import {
   ALL_CLUSTERS_ID,
   CLUSTER_SELECTOR_PREFIX,
+  FOLDER_SELECTOR_PREFIX,
   PROJECT_SELECTOR_PREFIX,
 } from '../utils/constants';
 import { getVMTreeViewItemID, TreeViewDataItemWithHref } from '../utils/utils';
@@ -62,6 +65,10 @@ const useAutoSelectTreeViewItem = ({ dataMap, onFilterChange }: UseAutoSelectTre
 
     // If filtering by a specific project, select the project tree item
     if (ns && cluster) {
+      const folderPrefix = `${FOLDER_SELECTOR_PREFIX}/${cluster}/${ns}/`;
+      const hasFolderFilter = searchParams.has(TEXT_FILTER_LABELS_ID);
+      if (selected?.id?.startsWith(folderPrefix) && hasFolderFilter) return;
+
       const projectTreeItemId = `${PROJECT_SELECTOR_PREFIX}/${cluster}/${ns}`;
       const projectTreeItem = dataMap?.[projectTreeItemId];
       if (projectTreeItem && selected?.id !== projectTreeItemId) {
@@ -77,11 +84,26 @@ const useAutoSelectTreeViewItem = ({ dataMap, onFilterChange }: UseAutoSelectTre
     if (clusterTreeItem && selected?.id !== clusterTreeItemId) {
       setSelected(clusterTreeItem);
     }
-  }, [cluster, dataMap, isACMPage, location.pathname, ns, selected?.id, setSelected]);
+  }, [cluster, dataMap, isACMPage, location.pathname, ns, searchParams, selected?.id, setSelected]);
 
   // Select namespace based on privileges
   useEffect(() => {
     if (isACMPage || runningTourSignal.value) return;
+
+    const hasFolderFilter = searchParams.has(TEXT_FILTER_LABELS_ID);
+    const isFolderSelected =
+      ns && selected?.id?.startsWith(`${FOLDER_SELECTOR_PREFIX}/${SINGLE_CLUSTER_KEY}/${ns}/`);
+
+    if (isFolderSelected && hasFolderFilter) return;
+
+    if (isFolderSelected && !hasFolderFilter && ns) {
+      const projectTreeItemId = `${PROJECT_SELECTOR_PREFIX}/${SINGLE_CLUSTER_KEY}/${ns}`;
+      const projectTreeItem = dataMap?.[projectTreeItemId];
+      if (projectTreeItem) {
+        setSelected(projectTreeItem);
+      }
+      return;
+    }
 
     const selectAllNamespaces = () => {
       setSelected(dataMap?.[ALL_NAMESPACES_SESSION_KEY]);
