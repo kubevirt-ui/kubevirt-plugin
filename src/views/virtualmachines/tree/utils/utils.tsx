@@ -330,7 +330,7 @@ export const createMultiClusterTreeViewData = (
         children: treeViewData,
         defaultExpanded: clusterSelected,
         hasBadge: false,
-        href: getACMVMListURL(clusterName),
+        href: `${getACMVMListURL(clusterName)}${removeFilterQueryParams(queryParams) || ''}`,
         icon: (
           <Tooltip content={t('Cluster')}>
             <ClusterIcon />
@@ -351,7 +351,7 @@ export const createMultiClusterTreeViewData = (
     children: treeWithClusters,
     defaultExpanded: true,
     hasBadge: false,
-    href: getACMVMListURL(),
+    href: `${getACMVMListURL()}${removeFilterQueryParams(queryParams) || ''}`,
     icon: <ClusterIcon />,
     id: ALL_CLUSTERS_ID,
     name: allClustersLabel,
