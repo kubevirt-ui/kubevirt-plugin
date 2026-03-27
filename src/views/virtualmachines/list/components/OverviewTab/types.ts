@@ -27,6 +27,7 @@ export type OverviewSectionData = {
   namespace?: string;
   subHeader?: ReactNode;
   title: string;
+  vmNames?: string[];
   vms: V1VirtualMachine[];
 };
 

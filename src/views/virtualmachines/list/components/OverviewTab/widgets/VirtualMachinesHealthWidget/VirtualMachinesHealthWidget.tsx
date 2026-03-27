@@ -11,14 +11,18 @@ import VMAlerts from './components/VMAlerts';
 import VMStatuses from './components/VMStatuses';
 import useVMAlertsNavigation from './hooks/useVMAlertsNavigation';
 
-const VirtualMachinesHealthWidget: FC<OverviewSectionData> = ({ cluster, title, vms }) => {
+const VirtualMachinesHealthWidget: FC<OverviewSectionData> = ({ cluster, title, vmNames, vms }) => {
   const isAllClustersPage = useIsAllClustersPage();
   const { alertsBaseHref, alertsBasePath } = useVMAlertsNavigation(cluster);
 
   return (
     <OverviewSection dataTestId="vm-health-widget" title={title}>
       <OverviewSectionRow gridColumns={GRID_VM_HEALTH}>
-        <VMAlerts alertsBaseHref={alertsBaseHref} alertsBasePath={alertsBasePath} />
+        <VMAlerts
+          alertsBaseHref={alertsBaseHref}
+          alertsBasePath={alertsBasePath}
+          vmNames={vmNames}
+        />
         {!isAllClustersPage && (
           <>
             <VMStatuses vms={vms} />

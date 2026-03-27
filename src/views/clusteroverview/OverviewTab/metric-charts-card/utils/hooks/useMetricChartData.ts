@@ -31,9 +31,9 @@ export type MetricChartData = {
   unit: string;
 };
 
-type UseMetricChartData = (metric: string) => MetricChartData;
+type UseMetricChartData = (metric: string, vmNames?: string[]) => MetricChartData;
 
-const useMetricChartData: UseMetricChartData = (metric) => {
+const useMetricChartData: UseMetricChartData = (metric, vmNames) => {
   const activeNamespace = useActiveNamespace();
   const cluster = useActiveClusterParam();
   const [hubClusterName] = useHubClusterName();
@@ -49,6 +49,7 @@ const useMetricChartData: UseMetricChartData = (metric) => {
       activeNamespace,
       cluster === ALL_CLUSTERS_KEY ? undefined : cluster,
       cluster === ALL_CLUSTERS_KEY ? undefined : hubClusterName,
+      vmNames,
     ),
     timespan,
     ...(cluster === ALL_CLUSTERS_KEY ? { allClusters: true } : { cluster }),

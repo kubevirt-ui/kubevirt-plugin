@@ -17,7 +17,7 @@ import ResourceAllocationSubHeader from '../ResourceAllocationSubHeader/Resource
 
 import { getWidgetConfigs, WidgetDataMap } from './resourceAllocationSectionConfig';
 
-const ResourceAllocationSection: FC<OverviewSectionData> = ({ namespace, title }) => {
+const ResourceAllocationSection: FC<OverviewSectionData> = ({ namespace, title, vmNames }) => {
   const { t } = useKubevirtTranslation();
   const isAllClusters = useIsAllClustersPage();
   const isProjectLevel =
@@ -25,10 +25,10 @@ const ResourceAllocationSection: FC<OverviewSectionData> = ({ namespace, title }
   const widgetConfigs = getWidgetConfigs(t);
   const [selectedMetric, setSelectedMetric] = useState<string>(widgetConfigs[0].metric);
 
-  const runningVmData = useMetricChartData(METRICS.RUNNING_VMS);
-  const cpuData = useMetricChartData(METRICS.VCPU_USAGE);
-  const memoryData = useMetricChartData(METRICS.MEMORY);
-  const storageData = useMetricChartData(METRICS.STORAGE);
+  const runningVmData = useMetricChartData(METRICS.RUNNING_VMS, vmNames);
+  const cpuData = useMetricChartData(METRICS.VCPU_USAGE, vmNames);
+  const memoryData = useMetricChartData(METRICS.MEMORY, vmNames);
+  const storageData = useMetricChartData(METRICS.STORAGE, vmNames);
 
   const { projectQuota } = useProjectResourceQuota(namespace);
 

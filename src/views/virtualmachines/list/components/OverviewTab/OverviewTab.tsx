@@ -11,6 +11,7 @@ import { useSignals } from '@preact/signals-react/runtime';
 import { AdvancedSearchFilter, useHubClusterName } from '@stolostron/multicluster-sdk';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 
+import useFolderFilter from './hooks/useFolderFilter';
 import { determineOverviewLevel, getOverviewConfig } from './config';
 import { OverviewTabProps } from './types';
 
@@ -47,6 +48,8 @@ const OverviewTab: FC<OverviewTabProps> = ({ cluster, namespace }) => {
     searchQueries,
   );
 
+  const { filteredVMs, vmNames } = useFolderFilter(vms);
+
   const overviewLevel = useMemo(
     () => determineOverviewLevel(namespace, isMultiCluster),
     [namespace, isMultiCluster],
@@ -58,9 +61,10 @@ const OverviewTab: FC<OverviewTabProps> = ({ cluster, namespace }) => {
     () => ({
       cluster,
       namespace,
-      vms: vms || [],
+      vmNames,
+      vms: filteredVMs,
     }),
-    [cluster, namespace, vms],
+    [cluster, namespace, filteredVMs, vmNames],
   );
 
   if (vmsError) {
