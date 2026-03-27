@@ -9,7 +9,7 @@ import {
   V1beta1DataVolumeSpec,
 } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1DataVolumeTemplateSpec } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { DEFAULT_NAMESPACE, ROOTDISK } from '@kubevirt-utils/constants/constants';
+import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   getTemplateVirtualMachineObject,
@@ -20,7 +20,7 @@ import {
   getDataVolume,
   getPVC,
 } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
-import { getVolumes } from '@kubevirt-utils/resources/vm';
+import { getRootDataVolumeTemplateSpec } from '@kubevirt-utils/resources/vm';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -62,11 +62,7 @@ const getRootDiskDataVolumeTemplate = (
 ): undefined | V1DataVolumeTemplateSpec => {
   const vm = getTemplateVirtualMachineObject(template);
 
-  const rootVolume = getVolumes(vm)?.find((volume) => volume.name === ROOTDISK);
-
-  return vm?.spec?.dataVolumeTemplates?.find(
-    (dataVolumeTemplate) => rootVolume?.dataVolume?.name === dataVolumeTemplate?.metadata?.name,
-  );
+  return getRootDataVolumeTemplateSpec(vm);
 };
 
 export const getBootDataSource = async (
