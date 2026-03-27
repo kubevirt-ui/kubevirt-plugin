@@ -5,15 +5,15 @@ import {
   V1beta1DataVolumeSpec,
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { V1beta1DataVolumeSourcePVC } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { ROOTDISK } from '@kubevirt-utils/constants/constants';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
-import { getDataVolumeTemplates, getVolumes } from '@kubevirt-utils/resources/vm';
+import { getBootDisk, getDataVolumeTemplates, getVolumes } from '@kubevirt-utils/resources/vm';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 
 const getBootSourceDataVolumeTemplate = (template: V1Template) => {
   const vm = getTemplateVirtualMachineObject(template);
-  const rootVolume = getVolumes(vm)?.find((volume) => volume.name === ROOTDISK);
+  const bootDisk = getBootDisk(vm);
+  const rootVolume = getVolumes(vm)?.find((volume) => volume.name === bootDisk?.name);
 
   if (rootVolume?.dataVolume?.name)
     return getDataVolumeTemplates(vm)?.find(
