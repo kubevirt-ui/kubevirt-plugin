@@ -1,27 +1,41 @@
 import React, { FC } from 'react';
 
-import { Button } from '@patternfly/react-core';
+import { Button, ButtonVariant } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
 
 type EditButtonProps = {
+  ariaLabel?: string;
+  className?: string;
   isDisabled?: boolean;
   isInline?: boolean;
   onClick?: () => void;
   testId?: string;
+  variant?: ButtonVariant;
 };
 
-const EditButton: FC<EditButtonProps> = ({ children, isDisabled, isInline, onClick, testId }) => (
+const EditButton: FC<EditButtonProps> = ({
+  ariaLabel,
+  children,
+  className,
+  isDisabled,
+  isInline,
+  onClick,
+  testId,
+  variant = ButtonVariant.link,
+}) => (
   <Button
     onClick={(e) => {
       e.stopPropagation();
       onClick?.();
     }}
+    aria-label={ariaLabel || undefined}
+    className={className}
     data-test-id={testId}
     icon={<PencilAltIcon />}
     iconPosition="end"
     isDisabled={isDisabled}
     isInline={isInline}
-    variant="link"
+    variant={variant}
   >
     {children}
   </Button>

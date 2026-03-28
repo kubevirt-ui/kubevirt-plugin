@@ -2,6 +2,7 @@ import React, { FC, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { VirtualMachineModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVMListPath } from '@kubevirt-utils/resources/vm';
@@ -10,6 +11,7 @@ import { getACMVMListURL, getCatalogURL } from '@multicluster/urls';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { ListPageCreateDropdown } from '@openshift-console/dynamic-plugin-sdk';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
+import VMCreationWizard from '@virtualmachines/creation-wizard/VMCreationWizard';
 
 type VirtualMachinesCreateButtonProps = {
   buttonText?: string;
@@ -22,6 +24,8 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
+  const { createModal } = useModal();
+
   const [hubClusterName] = useHubClusterName();
   const isACMPage = useIsACMPage();
   const clusterParam = useClusterParam();
@@ -29,9 +33,10 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
   const selectedNamespace = namespace || DEFAULT_NAMESPACE;
 
   const createItems = {
-    instanceType: t('From InstanceType'),
     //eslint-disable-next-line perfectionist/sort-objects
     catalog: t('From template'),
+    instanceType: t('From InstanceType'),
+    newWizard: t('From wizard'),
     yaml: t('With YAML'),
   };
 
@@ -47,6 +52,11 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
           return navigate(`${catalogURL}/template`);
         case 'instanceType':
           return navigate(catalogURL);
+        case 'newWizard':
+          createModal((props) => (
+            <VMCreationWizard {...props} cluster={cluster} namespace={selectedNamespace} />
+          ));
+          break;
         default:
           return navigate(
             isACMPage
