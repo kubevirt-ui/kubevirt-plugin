@@ -1,0 +1,11 @@
+.instance-type-size-dropdown {
+  &__menu {
+    min-width: 20rem; // 320px
+    max-width: 25rem; // 400px
+  }
+}
+
+.instance-type-series-menu-card__size-dropdown {
+  margin-top: var(--pf-t--global--spacer--sm);
+  width: 20rem; // 320px
+}

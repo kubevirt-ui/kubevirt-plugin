@@ -1,9 +1,8 @@
 .instance-type-series-menu-card {
   &__toggle-card {
     flex: 1 1 0;
-    max-width: min(20%, 320px);
-    min-height: 240px;
-    min-width: 160px;
+    max-height: 12.5rem; // 200px
+    min-width: 10rem; // 160px
     text-align: center;
     margin-top: var(--pf-t--global--spacer--lg);
 
@@ -13,12 +12,18 @@
     border-radius: var(--pf-t--global--border--radius--medium);
 
     .pf-v6-c-card__body {
-      padding-block-end: 0;
+      padding-block-end: var(--pf-t--global--spacer--md);
     }
 
     // Hover state
     &:hover {
       border-color: var(--pf-t--global--border--color--hover);
+    }
+
+    // Selected state - both classes on same element
+    &.selected {
+      border-width: var(--pf-t--global--border--width--box--clicked);
+      border-color: var(--pf-t--global--border--color--clicked);
     }
   }
 
@@ -27,50 +32,36 @@
     padding-top: var(--pf-t--global--spacer--md);
   }
 
-  &__card-title,
-  &__card-toggle-text {
-    font-size: var(--pf-t--global--font--size--lg);
-  }
-
-  &__card-selected-option {
-    margin-block: var(--pf-t--global--spacer--sm);
-  }
-
   &__card-title {
+    font-size: var(--pf-t--global--font--size--lg);
     margin: var(--pf-t--global--spacer--sm) 0;
   }
 
-  &__card-toggle-text {
-    color: var(--pf-t--global--text--color--link--default);
+  // Bold title when card is selected
+  &__toggle-card.selected &__card-title {
+    font-weight: var(--pf-t--global--font--weight--body--bold);
+  }
 
-    &:hover {
-      cursor: pointer;
-    }
+  &__series-label {
+    font-size: var(--pf-t--global--font--size--md);
+    color: var(--pf-t--global--text--color--regular);
+    margin-bottom: var(--pf-t--global--spacer--sm);
+  }
+
+  &__size-dropdown {
+    width: 20rem; // 320px
+    padding-inline: var(--pf-t--global--spacer--sm);
   }
 }
 
-.selected {
-  .instance-type-series-menu-card {
-    &__card-title,
-    &__card-selected-option {
-      font-weight: var(--pf-t--global--font--weight--body--bold);
-    }
-
-    &__toggle-card {
-      border-width: var(--pf-t--global--border--width--box--clicked);
-      border-color: var(--pf-t--global--border--color--clicked);
-    }
-  }
-}
-
-@media screen and (max-width: 1200px) {
+@media screen and (max-width: 75rem) {
+  // 1200px
   .instance-type-series-menu-card {
     &__card-icon {
       font-size: var(--pf-t--global--font--size--xl);
     }
 
-    &__card-title,
-    &__card-toggle-text {
+    &__card-title {
       font-size: var(--pf-t--global--font--size--md);
     }
   }

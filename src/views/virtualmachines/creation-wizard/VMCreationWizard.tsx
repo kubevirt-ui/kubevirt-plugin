@@ -7,6 +7,7 @@ import { getVMListURL } from '@multicluster/urls';
 import { Wizard, WizardHeader, WizardStep } from '@patternfly/react-core';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 import BootSourceStep from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/BootSourceStep/BootSourceStep';
+import ComputeResourcesStep from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/ComputeResourcesStep/ComputeResourcesStep';
 import GuestOSStep from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/GuestOSStep/GuestOSStep';
 import { VMCreationMethod } from '@virtualmachines/creation-wizard/utils/constants';
 import { getWizardFooterProps } from '@virtualmachines/creation-wizard/utils/utils';
@@ -69,6 +70,14 @@ const VMCreationWizard: FC = () => {
         name={t('Boot source')}
       >
         <BootSourceStep />
+      </WizardStep>
+      <WizardStep
+        footer={wizardFooterProps}
+        id="vm-creation-compute-resources-step"
+        isHidden={!isInstanceTypeMethod}
+        name={t('Compute resources')}
+      >
+        <ComputeResourcesStep />
       </WizardStep>
     </Wizard>
   );

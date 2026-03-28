@@ -3,18 +3,12 @@ import { create } from 'zustand';
 
 import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import {
-  AddBootableVolumeState,
-  DROPDOWN_FORM_SELECTION,
-} from '@kubevirt-utils/components/AddBootableVolumeModal/utils/constants';
 import { getInstanceTypeFromVolume } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/utils';
 import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
-import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { initialVMWizardState } from '@virtualmachines/creation-wizard/state/vm-wizard-store/utils/state';
 import {
   InstanceTypeFlowState,
-  UploadData,
   VMWizardStore,
 } from '@virtualmachines/creation-wizard/state/vm-wizard-store/utils/types';
 import { OperatingSystemType } from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/GuestOSStep/utils/constants';
@@ -32,6 +26,9 @@ const useVMWizardStore = create<VMWizardStore>()((set) => {
     ) =>
       set(
         produce<VMWizardStore>(({ instanceTypeFlowState }) => {
+          const instanceTypeName = getInstanceTypeFromVolume(selectedVolume);
+          const [series = '', size = ''] = instanceTypeName?.split('.') || [];
+
           instanceTypeFlowState.dvSource = dvSource;
           instanceTypeFlowState.selectedBootableVolume = selectedVolume;
           instanceTypeFlowState.pvcSource = pvcSource;
@@ -42,14 +39,14 @@ const useVMWizardStore = create<VMWizardStore>()((set) => {
             volumeSnapshotSource,
           );
           instanceTypeFlowState.selectedInstanceType = {
-            name: getInstanceTypeFromVolume(selectedVolume),
+            name: instanceTypeName,
             namespace: null,
           };
+          instanceTypeFlowState.selectedSeries = series;
+          instanceTypeFlowState.selectedSize = size;
         }),
       ),
     resetWizardState: () => set({ ...initialVMWizardState }),
-    setBootableVolume: (bootableVolume: AddBootableVolumeState) =>
-      set((state) => ({ addBootSourceState: { ...state.addBootSourceState, bootableVolume } })),
     setCluster: (cluster: string) => set({ cluster }),
     setCreationMethod: (creationMethod: VMCreationMethod) => set({ creationMethod }),
     setDvSource: (dvSource: V1beta1DataVolume) =>
@@ -92,12 +89,31 @@ const useVMWizardStore = create<VMWizardStore>()((set) => {
           selectedInstanceType: instanceType,
         },
       })),
-    setSourceType: (sourceType: DROPDOWN_FORM_SELECTION) =>
-      set((state) => ({ addBootSourceState: { ...state.addBootSourceState, sourceType } })),
-    setUpload: (upload: DataUpload) =>
-      set((state) => ({ addBootSourceState: { ...state.addBootSourceState, upload } })),
-    setUploadData: (uploadData: UploadData) =>
-      set((state) => ({ addBootSourceState: { ...state.addBootSourceState, uploadData } })),
+    setSelectedSeries: (series: string) =>
+      set((state) => ({
+        instanceTypeFlowState: {
+          ...state.instanceTypeFlowState,
+          selectedInstanceType: {
+            name: series,
+            namespace: null,
+          },
+          selectedSeries: series,
+          selectedSize: '',
+        },
+      })),
+    setSelectedSize: (size: string) =>
+      set((state) => ({
+        instanceTypeFlowState: {
+          ...state.instanceTypeFlowState,
+          selectedInstanceType: {
+            name: state.instanceTypeFlowState.selectedSeries
+              ? `${state.instanceTypeFlowState.selectedSeries}.${size}`
+              : size,
+            namespace: null,
+          },
+          selectedSize: size,
+        },
+      })),
     setVolumeListNamespace: (volumeListNamespace: string) =>
       set((state) => ({
         instanceTypeFlowState: { ...state.instanceTypeFlowState, volumeListNamespace },
