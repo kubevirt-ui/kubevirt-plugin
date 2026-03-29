@@ -9,6 +9,7 @@ import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-s
 import BootSourceStep from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/BootSourceStep/BootSourceStep';
 import ComputeResourcesStep from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/ComputeResourcesStep/ComputeResourcesStep';
 import GuestOSStep from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/GuestOSStep/GuestOSStep';
+import ReviewAndCreateStep from '@virtualmachines/creation-wizard/steps/ReviewAndCreateStep/ReviewAndCreateStep';
 import { VMCreationMethod } from '@virtualmachines/creation-wizard/utils/constants';
 import { getWizardFooterProps } from '@virtualmachines/creation-wizard/utils/utils';
 
@@ -78,6 +79,13 @@ const VMCreationWizard: FC = () => {
         name={t('Compute resources')}
       >
         <ComputeResourcesStep />
+      </WizardStep>
+      <WizardStep
+        footer={wizardFooterProps}
+        id="vm-creation-review-and-create-step"
+        name={t('Review and create')}
+      >
+        <ReviewAndCreateStep />
       </WizardStep>
     </Wizard>
   );

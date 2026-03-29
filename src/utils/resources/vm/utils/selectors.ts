@@ -18,12 +18,20 @@ import {
 import { DYNAMIC_CREDENTIALS_SUPPORT } from '@kubevirt-utils/components/DynamicSSHKeyInjection/constants/constants';
 import { ROOTDISK } from '@kubevirt-utils/constants/constants';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
-import { getAnnotation, getLabel } from '@kubevirt-utils/resources/shared';
+import { getAnnotation, getLabel, getLabels } from '@kubevirt-utils/resources/shared';
 import { WORKLOADS } from '@kubevirt-utils/resources/template';
 import { isVM } from '@kubevirt-utils/utils/typeGuards';
+import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
 import { VM_WORKLOAD_ANNOTATION } from './annotations';
 import { UPDATE_STRATEGIES, VirtualMachineStatusConditionTypes } from './constants';
+
+/**
+ * A selector for the virtual machine's folder
+ * @param {V1VirtualMachine} vm the virtual machine
+ * @returns the virtual machine's folder
+ */
+export const getFolder = (vm: V1VirtualMachine) => getLabels(vm)?.[VM_FOLDER_LABEL];
 
 /**
  * A selector for the virtual machine's networks
