@@ -1,11 +1,15 @@
 import React, { FC, useCallback, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom-v5-compat';
 
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { getVMListURL } from '@multicluster/urls';
 import { Wizard, WizardHeader, WizardStep } from '@patternfly/react-core';
+import { useSignals } from '@preact/signals-react/runtime';
+import { wizardVMSignal } from '@virtualmachines/creation-wizard/state/vm-signal/vmStore';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
+import CustomizationStep from '@virtualmachines/creation-wizard/steps/CustomizationStep/CustomizationStep';
 import BootSourceStep from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/BootSourceStep/BootSourceStep';
 import ComputeResourcesStep from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/ComputeResourcesStep/ComputeResourcesStep';
 import GuestOSStep from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/GuestOSStep/GuestOSStep';
@@ -15,8 +19,17 @@ import { getWizardFooterProps } from '@virtualmachines/creation-wizard/utils/uti
 
 import DeploymentDetailsStep from './steps/DeploymentDetailsStep/DeploymentDetailsStep';
 
+// TODO Replace with generated VM from IT and template flows
+const BASE_VM: V1VirtualMachine = {
+  apiVersion: 'kubevirt.io/v1',
+  kind: 'VirtualMachine',
+  metadata: { name: 'test-vm', namespace: 'default' },
+  spec: { template: {} },
+};
+
 const VMCreationWizard: FC = () => {
   const { t } = useKubevirtTranslation();
+  useSignals();
   const navigate = useNavigate();
   const { creationMethod, resetWizardState, setCluster, setProject } = useVMWizardStore();
   const clusterParam = useClusterParam();
@@ -27,6 +40,8 @@ const VMCreationWizard: FC = () => {
     if (!hasInitialized.current) {
       setCluster(clusterParam);
       setProject(ns);
+      // TODO Remove when replaced in wiring PR
+      wizardVMSignal.value = BASE_VM;
       hasInitialized.current = true;
     }
   }, [clusterParam, ns, setCluster, setProject]);
@@ -86,6 +101,13 @@ const VMCreationWizard: FC = () => {
         name={t('Review and create')}
       >
         <ReviewAndCreateStep />
+      </WizardStep>
+      <WizardStep
+        footer={wizardFooterProps}
+        id="vm-creation-customization-step"
+        name={t('Customization')}
+      >
+        <CustomizationStep />
       </WizardStep>
     </Wizard>
   );

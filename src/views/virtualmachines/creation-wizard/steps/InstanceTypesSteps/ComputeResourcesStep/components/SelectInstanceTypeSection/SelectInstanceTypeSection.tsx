@@ -24,10 +24,12 @@ const SelectInstanceTypeSection: FC = ({}) => {
   const menuItems = useMemo(() => getInstanceTypeMenuItems(allInstanceTypes), [allInstanceTypes]);
 
   useEffect(() => {
-    // This effect is meant to focus the tab an IT was defined as default by the selected volume
-    const tabToSwitch = menuItems.userProvided.items.includes(selectedInstanceType?.name)
-      ? TabKey.Users
-      : TabKey.RedHat;
+    const isUserProvidedSelection =
+      Boolean(selectedInstanceType?.namespace) ||
+      (!selectedInstanceType?.namespace &&
+        menuItems.userProvided.items.includes(selectedInstanceType?.name));
+
+    const tabToSwitch = isUserProvidedSelection ? TabKey.Users : TabKey.RedHat;
     setActiveTabKey(tabToSwitch);
   }, [menuItems.userProvided.items, selectedInstanceType]);
 

@@ -47,8 +47,17 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({ rhSeriesItem }) =
         'instance-type-series-menu-card__toggle-card',
         isSelectedSeries && 'selected',
       )}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleSeriesClick();
+        }
+      }}
+      aria-pressed={isSelectedSeries}
       isCompact
       onClick={handleSeriesClick}
+      role="button"
+      tabIndex={0}
     >
       <Flex alignItems={{ default: 'alignItemsCenter' }} direction={{ default: 'column' }}>
         <div className="instance-type-series-menu-card__card-icon">

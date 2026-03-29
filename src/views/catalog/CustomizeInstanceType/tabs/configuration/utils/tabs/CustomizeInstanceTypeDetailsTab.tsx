@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
+import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { DescriptionModal } from '@kubevirt-utils/components/DescriptionModal/DescriptionModal';
