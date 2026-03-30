@@ -1,11 +1,9 @@
 import { useMemo } from 'react';
 
 import useVirtualMachineInstanceTypes from '@catalog/CreateFromInstanceTypes/state/hooks/useVirtualMachineInstanceTypes';
-
-import { UseInstanceTypeAndPreferencesValues } from '../utils/types';
-
-import useClusterInstanceTypes from './useClusterInstanceTypes';
-import useClusterPreferences from './useClusterPreferences';
+import { UseInstanceTypeAndPreferencesValues } from '@catalog/CreateFromInstanceTypes/state/utils/types';
+import useClusterInstanceTypes from '@kubevirt-utils/hooks/useClusterInstanceTypes';
+import useClusterPreferences from '@kubevirt-utils/hooks/useClusterPreferences';
 
 type UseInstanceTypeAndPreferences = (
   namespace?: string,

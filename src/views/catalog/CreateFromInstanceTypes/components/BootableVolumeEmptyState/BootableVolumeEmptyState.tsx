@@ -3,7 +3,7 @@ import { Trans } from 'react-i18next';
 
 import AddBootableVolumeLink from '@catalog/CreateFromInstanceTypes/components/AddBootableVolumeLink/AddBootableVolumeLink';
 import BootableVolumeOSIcons from '@catalog/CreateFromInstanceTypes/components/BootableVolumeEmptyState/BootableVolumeOSIcons';
-import useInstanceTypesAndPreferences from '@catalog/CreateFromInstanceTypes/state/hooks/useInstanceTypesAndPreferences';
+import useInstanceTypesAndPreferences from '@kubevirt-utils/hooks/useInstanceTypesAndPreferences';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { EmptyState, Title } from '@patternfly/react-core';
 

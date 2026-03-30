@@ -1,0 +1,80 @@
+import React, { FC } from 'react';
+import { Trans } from 'react-i18next';
+
+import useInstanceTypesAndPreferences from '@kubevirt-utils/hooks/useInstanceTypesAndPreferences';
+import useIsWindowsSupportedArchitecture from '@kubevirt-utils/hooks/useIsWindowsSupportedArchitecture';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
+import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
+import QuickStartLauncherLink from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/components/BootableVolumesPipelinesHint/QuickStartLauncherLink/QuickStartLauncherLink';
+import useBootableVolumeOSes from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/hooks/useBootableVolumeOSes';
+import useQuickStart from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/hooks/useQuickStart';
+import { WINDOWS_BOOTSOURCE_PIPELINE } from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/utils/constants';
+import { getIconByOSName } from '@virtualmachines/creation-wizard/utils/os-icons/os-icons';
+
+import AddBootableVolumeLink from '../AddBootableVolumeLink/AddBootableVolumeLink';
+
+import './BootableVolumesPipelinesHint.scss';
+
+type BootableVolumesPipelinesHintProps = { bootableVolumes: BootableVolume[] };
+
+const BootableVolumesPipelinesHint: FC<BootableVolumesPipelinesHintProps> = ({
+  bootableVolumes,
+}) => {
+  const { t } = useKubevirtTranslation();
+  const { loadError } = useInstanceTypesAndPreferences();
+
+  const [windowsQS, windowsQSLoaded] = useQuickStart(WINDOWS_BOOTSOURCE_PIPELINE);
+
+  const isWindowsSupported = useIsWindowsSupportedArchitecture();
+  const { hasRHEL, hasWindows } = useBootableVolumeOSes(bootableVolumes);
+  const windowsIcon = getIconByOSName(OS_NAME_TYPES.windows);
+  const rhelIcon = getIconByOSName(OS_NAME_TYPES.rhel);
+
+  if (!hasWindows && isWindowsSupported && !hasRHEL) {
+    return (
+      <div className="bootable-volumes-pipelines-hint">
+        <img alt="os-icon" className="bootable-volumes-pipelines-hint__icon" src={rhelIcon} />
+        <img alt="os-icon" className="bootable-volumes-pipelines-hint__icon" src={windowsIcon} />
+        <Trans ns="plugin__kubevirt-plugin" t={t}>
+          Interested in other <b>Bootable Volumes</b>? Click{' '}
+          <AddBootableVolumeLink loadError={loadError} /> to get started.
+        </Trans>
+      </div>
+    );
+  }
+
+  if (!hasWindows && isWindowsSupported) {
+    return (
+      <div className="bootable-volumes-pipelines-hint">
+        <img alt="os-icon" className="bootable-volumes-pipelines-hint__icon" src={windowsIcon} />
+        <Trans ns="plugin__kubevirt-plugin" t={t}>
+          Interested in using a <b>Windows Bootable Volume</b>? Click{' '}
+          <AddBootableVolumeLink loadError={loadError} /> to get started. To learn more, follow the{' '}
+          <QuickStartLauncherLink
+            quickStart={windowsQS}
+            quickStartLoaded={windowsQSLoaded}
+            text={t('Create a Windows bootable volume')}
+          />{' '}
+          quick start.
+        </Trans>
+      </div>
+    );
+  }
+
+  if (!hasRHEL) {
+    return (
+      <div className="bootable-volumes-pipelines-hint">
+        <img alt="os-icon" className="bootable-volumes-pipelines-hint__icon" src={rhelIcon} />
+        <Trans ns="plugin__kubevirt-plugin" t={t}>
+          Interested in using a <b>RHEL Bootable Volume</b>? Click{' '}
+          <AddBootableVolumeLink loadError={loadError} /> to get started.
+        </Trans>
+      </div>
+    );
+  }
+
+  return null;
+};
+
+export default BootableVolumesPipelinesHint;

@@ -6,8 +6,8 @@ import QuickStartLauncherLink from '@catalog/CreateFromInstanceTypes/components/
 import useBootableVolumeOSes from '@catalog/CreateFromInstanceTypes/components/BootableVolumeList/hooks/useBootableVolumeOSes';
 import useQuickStart from '@catalog/CreateFromInstanceTypes/components/BootableVolumeList/hooks/useQuickStart';
 import { WINDOWS_BOOTSOURCE_PIPELINE } from '@catalog/CreateFromInstanceTypes/components/BootableVolumeList/utils/constants';
-import useInstanceTypesAndPreferences from '@catalog/CreateFromInstanceTypes/state/hooks/useInstanceTypesAndPreferences';
 import { getIconByOSName } from '@catalog/templatescatalog/utils/os-icons';
+import useInstanceTypesAndPreferences from '@kubevirt-utils/hooks/useInstanceTypesAndPreferences';
 import useIsWindowsSupportedArchitecture from '@kubevirt-utils/hooks/useIsWindowsSupportedArchitecture';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';

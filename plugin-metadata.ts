@@ -21,6 +21,7 @@ import { exposedModules as StorageMigrationExposedModules } from './src/views/st
 import { exposedModules as TemplatesExposedModules } from './src/views/templates/extensions';
 import { exposedModules as TopologyExposedModules } from './src/views/topology/extensions';
 import { exposedModules as VirtualMachineInstanceMigrationsExposedModules } from './src/views/virtualmachineinstancemigrations/extensions';
+import { exposedModules as VMWizardExposedModules } from './src/views/virtualmachines/creation-wizard/extensions';
 import { exposedModules as VirtualMachinesExposedModules } from './src/views/virtualmachines/extensions';
 import { exposedModules as VirtualMachinesInstanceExposedModules } from './src/views/virtualmachinesinstance/extensions';
 import { exposedModules as VMNetworksExposedModules } from './src/views/vmnetworks/extensions';
@@ -55,6 +56,7 @@ const metadata: ConsolePluginBuildMetadata = {
     ...DataSourcesExposedModules,
     ...VirtualMachinesInstanceExposedModules,
     ...YamlTemplatesExposedModules,
+    ...VMWizardExposedModules,
   },
   name: 'kubevirt-plugin',
   version: '4.22.0',

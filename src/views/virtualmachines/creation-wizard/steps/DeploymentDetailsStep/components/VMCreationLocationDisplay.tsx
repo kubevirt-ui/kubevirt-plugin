@@ -3,8 +3,8 @@ import React, { FC } from 'react';
 import EditButton from '@kubevirt-utils/components/EditButton/EditButton';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { ButtonVariant } from '@patternfly/react-core';
-import { useIsFleetAvailable } from '@stolostron/multicluster-sdk';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 
 type VMCreationLocationDisplayProps = {
@@ -15,12 +15,12 @@ const VMCreationLocationDisplay: FC<VMCreationLocationDisplayProps> = ({
   setEditCreationLocation,
 }) => {
   const { t } = useKubevirtTranslation();
-  const fleetAvailable = useIsFleetAvailable();
+  const isACMPage = useIsACMPage();
   const { cluster, folder, project } = useVMWizardStore();
 
   return (
     <>
-      {fleetAvailable && (
+      {isACMPage && (
         <span>
           <span className="pf-v6-u-font-weight-bold pf-v6-u-mr-xs">{t('Cluster')}</span>
           {cluster || NO_DATA_DASH}

@@ -10,7 +10,8 @@ import './PreferenceSelectMenu.scss';
 
 const PreferenceSelectMenu: FC = () => {
   const { t } = useKubevirtTranslation();
-  const { cluster, operatingSystemType, preference, project, setPreference } = useVMWizardStore();
+  const { cluster, instanceTypeFlowState, project, setPreference } = useVMWizardStore();
+  const { operatingSystemType, preference } = instanceTypeFlowState;
 
   const { preferenceNames } = usePreferenceSelectOptions(project, cluster, operatingSystemType);
 

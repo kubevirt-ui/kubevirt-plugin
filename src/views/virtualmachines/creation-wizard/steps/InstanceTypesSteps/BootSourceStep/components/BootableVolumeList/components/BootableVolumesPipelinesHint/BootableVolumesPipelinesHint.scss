@@ -1,0 +1,11 @@
+.bootable-volumes-pipelines-hint {
+  margin-top: var(--pf-t--global--spacer--lg);
+  margin-left: var(--pf-t--global--spacer--4xl);
+  padding-left: var(--pf-t--global--spacer--sm);
+
+  &__icon {
+    width: var(--pf-t--global--spacer--xl);
+    padding-right: var(--pf-t--global--spacer--sm);
+    vertical-align: middle;
+  }
+}

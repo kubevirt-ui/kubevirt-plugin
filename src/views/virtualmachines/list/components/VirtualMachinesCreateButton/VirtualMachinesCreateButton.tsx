@@ -2,16 +2,14 @@ import React, { FC, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { VirtualMachineModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVMListPath } from '@kubevirt-utils/resources/vm';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import { getACMVMListURL, getCatalogURL } from '@multicluster/urls';
+import { getACMVMListURL, getCatalogURL, getVMWizardURL } from '@multicluster/urls';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { ListPageCreateDropdown } from '@openshift-console/dynamic-plugin-sdk';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
-import VMCreationWizard from '@virtualmachines/creation-wizard/VMCreationWizard';
 
 type VirtualMachinesCreateButtonProps = {
   buttonText?: string;
@@ -24,7 +22,6 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
-  const { createModal } = useModal();
 
   const [hubClusterName] = useHubClusterName();
   const isACMPage = useIsACMPage();
@@ -45,6 +42,11 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
     [namespace, cluster],
   );
 
+  const vmWizardURL = useMemo(
+    () => getVMWizardURL(isACMPage ? cluster : null, selectedNamespace),
+    [namespace, cluster],
+  );
+
   const onCreate = useCallback(
     (type: string) => {
       switch (type) {
@@ -53,9 +55,7 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
         case 'instanceType':
           return navigate(catalogURL);
         case 'newWizard':
-          createModal((props) => (
-            <VMCreationWizard {...props} cluster={cluster} namespace={selectedNamespace} />
-          ));
+          return navigate(vmWizardURL);
           break;
         default:
           return navigate(

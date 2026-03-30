@@ -1,6 +1,6 @@
 import React, { FC, useMemo } from 'react';
 
-import useInstanceTypesAndPreferences from '@catalog/CreateFromInstanceTypes/state/hooks/useInstanceTypesAndPreferences';
+import useInstanceTypesAndPreferences from '@kubevirt-utils/hooks/useInstanceTypesAndPreferences';
 
 import ErrorAlert from '../ErrorAlert/ErrorAlert';
 import Loading from '../Loading/Loading';

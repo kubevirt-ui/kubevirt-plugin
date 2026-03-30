@@ -23,6 +23,7 @@ import { extensions as StorageMigrationExtensions } from './src/views/storagemig
 import { extensions as TemplatesExtensions } from './src/views/templates/extensions';
 import { extensions as TopologyExtensions } from './src/views/topology/extensions';
 import { extensions as VirtualMachineInstanceMigrationsExtensions } from './src/views/virtualmachineinstancemigrations/extensions';
+import { extensions as VMWizardExtensions } from './src/views/virtualmachines/creation-wizard/extensions';
 import { extensions as VirtualMachinesExtensions } from './src/views/virtualmachines/extensions';
 import { extensions as VirtualMachinesInstanceExtensions } from './src/views/virtualmachinesinstance/extensions';
 import { extensions as VMNetworksExtensions } from './src/views/vmnetworks/extensions';
@@ -53,6 +54,7 @@ const extensions: EncodedExtension[] = [
   ...DataSourcesExtensions,
   ...VirtualMachinesInstanceExtensions,
   ...YamlTemplatesExtensions,
+  ...VMWizardExtensions,
 
   {
     properties: {

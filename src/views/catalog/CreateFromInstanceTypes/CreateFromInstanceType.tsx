@@ -7,6 +7,7 @@ import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { ALL_NAMESPACES_SESSION_KEY, ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
+import useInstanceTypesAndPreferences from '@kubevirt-utils/hooks/useInstanceTypesAndPreferences';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import useUserPreferences from '@kubevirt-utils/hooks/useUserPreferences';
@@ -20,7 +21,6 @@ import BootableVolumeList from './components/BootableVolumeList/BootableVolumeLi
 import CreateFromInstanceTypeTitle from './components/CreateFromInstanceTypeTitle/CreateFromInstanceTypeTitle';
 import CreateVMFooter from './components/CreateVMFooter/CreateVMFooter';
 import SectionListItem from './components/SectionListItem/SectionListItem';
-import useInstanceTypesAndPreferences from './state/hooks/useInstanceTypesAndPreferences';
 import { useInstanceTypeVMStore } from './state/useInstanceTypeVMStore';
 import { INSTANCE_TYPES_SECTIONS } from './utils/constants';
 
