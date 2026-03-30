@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { getVMINodeName } from '@kubevirt-utils/resources/vmi';
 import { universalComparator } from '@kubevirt-utils/utils/utils';
 import { RowFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
@@ -13,12 +14,12 @@ export const useNodesFilter = (vmiMapper: VMIMapper): RowFilter<V1VirtualMachine
 
   return {
     filter: (selectedNodes, vm) => {
-      const nodeName = getVMIFromMapper(vmiMapper, vm)?.status?.nodeName;
+      const nodeName = getVMINodeName(getVMIFromMapper(vmiMapper, vm));
       return selectedNodes.selected?.length === 0 || selectedNodes.selected?.includes(nodeName);
     },
     filterGroupName: 'Node',
     items: sortedNodeNamesItems,
-    reducer: (vm) => getVMIFromMapper(vmiMapper, vm)?.status?.nodeName,
+    reducer: (vm) => getVMINodeName(getVMIFromMapper(vmiMapper, vm)),
     type: VirtualMachineRowFilterType.Node,
   };
 };
