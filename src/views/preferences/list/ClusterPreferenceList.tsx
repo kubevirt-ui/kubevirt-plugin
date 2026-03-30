@@ -1,9 +1,9 @@
 import React, { FC, useMemo } from 'react';
 
-import useClusterPreferences from '@catalog/CreateFromInstanceTypes/state/hooks/useClusterPreferences';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
+import useClusterPreferences from '@kubevirt-utils/hooks/useClusterPreferences';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtTableColumns';
 import usePaginationWithFilters from '@kubevirt-utils/hooks/usePagination/usePaginationWithFilters';

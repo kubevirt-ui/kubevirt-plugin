@@ -1,6 +1,5 @@
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 
-import useInstanceTypesAndPreferences from '@catalog/CreateFromInstanceTypes/state/hooks/useInstanceTypesAndPreferences';
 import {
   DEFAULT_INSTANCETYPE_KIND_LABEL,
   DEFAULT_INSTANCETYPE_LABEL,
@@ -11,6 +10,7 @@ import {
   SetBootableVolumeFieldType,
 } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/constants';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
+import useInstanceTypesAndPreferences from '@kubevirt-utils/hooks/useInstanceTypesAndPreferences';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { universalComparator } from '@kubevirt-utils/utils/utils';
 import { FormGroup, PopoverPosition } from '@patternfly/react-core';

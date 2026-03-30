@@ -1,11 +1,11 @@
 import React, { FC, useMemo } from 'react';
 
-import useClusterInstanceTypes from '@catalog/CreateFromInstanceTypes/state/hooks/useClusterInstanceTypes';
 import { VirtualMachineClusterInstancetypeModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { useClusterFilter } from '@kubevirt-utils/hooks/useClusterFilter';
+import useClusterInstanceTypes from '@kubevirt-utils/hooks/useClusterInstanceTypes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtTableColumns';
 import usePaginationWithFilters from '@kubevirt-utils/hooks/usePagination/usePaginationWithFilters';

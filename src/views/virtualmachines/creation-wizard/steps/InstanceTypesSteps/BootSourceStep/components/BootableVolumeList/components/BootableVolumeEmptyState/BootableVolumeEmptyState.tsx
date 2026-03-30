@@ -1,11 +1,11 @@
 import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 
+import useInstanceTypesAndPreferences from '@kubevirt-utils/hooks/useInstanceTypesAndPreferences';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { EmptyState, Title } from '@patternfly/react-core';
 import AddBootableVolumeLink from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/components/AddBootableVolumeLink/AddBootableVolumeLink';
 import BootableVolumeOSIcons from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/components/BootableVolumeEmptyState/BootableVolumeOSIcons';
-import useInstanceTypesAndPreferences from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/BootSourceStep/hooks/useInstanceTypesAndPreferences';
 
 import './BootableVolumeEmptyState.scss';
 

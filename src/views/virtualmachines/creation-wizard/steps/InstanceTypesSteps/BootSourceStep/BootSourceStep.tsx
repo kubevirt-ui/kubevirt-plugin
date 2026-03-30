@@ -1,5 +1,6 @@
 import React, { FC, useState } from 'react';
 
+import useInstanceTypesAndPreferences from '@kubevirt-utils/hooks/useInstanceTypesAndPreferences';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getValidNamespace } from '@kubevirt-utils/utils/utils';
 import {
@@ -13,7 +14,6 @@ import {
 } from '@patternfly/react-core';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 import BootableVolumeList from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/BootableVolumeList';
-import useInstanceTypesAndPreferences from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/BootSourceStep/hooks/useInstanceTypesAndPreferences';
 
 import AddBootableVolumeButton from './components/AddBootableVolumeButton';
 

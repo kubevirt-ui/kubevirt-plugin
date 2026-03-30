@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 
+import useInstanceTypesAndPreferences from '@kubevirt-utils/hooks/useInstanceTypesAndPreferences';
 import useIsWindowsSupportedArchitecture from '@kubevirt-utils/hooks/useIsWindowsSupportedArchitecture';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
@@ -11,7 +12,6 @@ import useQuickStart from '@virtualmachines/creation-wizard/steps/InstanceTypesS
 import { WINDOWS_BOOTSOURCE_PIPELINE } from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/utils/constants';
 import { getIconByOSName } from '@virtualmachines/creation-wizard/utils/os-icons/os-icons';
 
-import useInstanceTypesAndPreferences from '../../../../hooks/useInstanceTypesAndPreferences';
 import AddBootableVolumeLink from '../AddBootableVolumeLink/AddBootableVolumeLink';
 
 import './BootableVolumesPipelinesHint.scss';
