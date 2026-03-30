@@ -1,26 +1,32 @@
-import React from 'react';
+import React, { FC, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { DataSourceModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
+import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
+import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useKubevirtTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtTableColumns';
+import usePaginationWithFilters from '@kubevirt-utils/hooks/usePagination/usePaginationWithFilters';
+import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   ListPageBody,
   ListPageCreateDropdown,
-  ListPageFilter,
   ListPageHeader,
   useK8sWatchResource,
   useListPageFilter,
-  VirtualizedTable,
 } from '@openshift-console/dynamic-plugin-sdk';
+import { Pagination } from '@patternfly/react-core';
 
 import { CreateDataSourceModal } from './CreateDataSourceModal/CreateDataSourceModal';
-import { useDataSourcesColumns } from './hooks/useDataSourcesColumns';
+import { getDataSourceColumns, getDataSourceRowId } from './dataSourcesDefinition';
 import { getDataImportCronFilter } from './DataSourcesListFilters';
-import { DataSourcesListRow } from './DataSourcesListRow';
 
+import '@kubevirt-utils/styles/list-managment-group.scss';
 import './DataSourcesList.scss';
 
 type DataSourcesListProps = {
@@ -28,7 +34,7 @@ type DataSourcesListProps = {
   namespace: string;
 };
 
-const DataSourcesList: React.FC<DataSourcesListProps> = ({ kind, namespace }) => {
+const DataSourcesList: FC<DataSourcesListProps> = ({ kind, namespace }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const navigate = useNavigate();
@@ -39,9 +45,24 @@ const DataSourcesList: React.FC<DataSourcesListProps> = ({ kind, namespace }) =>
     namespace,
     namespaced: true,
   });
-  const [columns, activeColumns] = useDataSourcesColumns(namespace);
+
   const filters = getDataImportCronFilter(t);
-  const [unfilteredData, data, onFilterChange] = useListPageFilter(dataSources, filters);
+  const [unfilteredData, filteredData, onFilterChange] = useListPageFilter(dataSources, filters);
+
+  const { handleFilterChange, handlePerPageSelect, handleSetPage, pagination } =
+    usePaginationWithFilters(filteredData?.length ?? 0, onFilterChange);
+
+  const columns = useMemo(() => getDataSourceColumns(t, namespace), [t, namespace]);
+
+  const { activeColumnKeys, loaded: loadedColumns } = useKubevirtTableColumns({
+    columnManagementID: DataSourceModelRef,
+    columns,
+  });
+
+  const columnLayout = useMemo(
+    () => buildColumnLayout(columns, activeColumnKeys, DataSourceModelRef, t('DataSource')),
+    [columns, activeColumnKeys, t],
+  );
 
   const createItems = {
     form: t('With form'),
@@ -53,6 +74,9 @@ const DataSourcesList: React.FC<DataSourcesListProps> = ({ kind, namespace }) =>
       ? createModal((props) => <CreateDataSourceModal namespace={namespace} {...props} />)
       : navigate(`/k8s/ns/${namespace || DEFAULT_NAMESPACE}/${DataSourceModelRef}/~new`);
   };
+
+  const isLoaded = loaded && loadedColumns;
+
   return (
     <>
       <ListPageHeader title={t('DataSources')}>
@@ -65,28 +89,38 @@ const DataSourcesList: React.FC<DataSourcesListProps> = ({ kind, namespace }) =>
         </ListPageCreateDropdown>
       </ListPageHeader>
       <ListPageBody>
-        <ListPageFilter
-          columnLayout={{
-            columns: columns?.map(({ additional, id, title }) => ({
-              additional,
-              id,
-              title,
-            })),
-            id: DataSourceModelRef,
-            selectedColumns: new Set(activeColumns?.map((col) => col?.id)),
-            type: t('DataSource'),
-          }}
-          data={unfilteredData}
-          loaded={loaded}
-          onFilterChange={onFilterChange}
-          rowFilters={filters}
-        />
-        <VirtualizedTable<V1beta1DataSource>
-          columns={activeColumns}
-          data={data}
-          loaded={loaded}
+        <div className="list-managment-group">
+          <ListPageFilter
+            columnLayout={columnLayout}
+            data={unfilteredData}
+            loaded={isLoaded}
+            onFilterChange={handleFilterChange}
+            rowFilters={filters}
+          />
+          {!isEmpty(filteredData) && isLoaded && (
+            <Pagination
+              className="list-managment-group__pagination"
+              isLastFullPageShown
+              itemCount={filteredData?.length}
+              onPerPageSelect={handlePerPageSelect}
+              onSetPage={handleSetPage}
+              page={pagination?.page}
+              perPage={pagination?.perPage}
+              perPageOptions={paginationDefaultValues}
+            />
+          )}
+        </div>
+        <KubevirtTable
+          activeColumnKeys={activeColumnKeys}
+          ariaLabel={t('DataSources table')}
+          columns={columns}
+          data={filteredData ?? []}
+          dataTest="datasources-list"
+          getRowId={getDataSourceRowId}
+          loaded={isLoaded}
           loadError={loadError}
-          Row={DataSourcesListRow}
+          noDataMsg={t('No DataSources found')}
+          pagination={pagination}
           unfilteredData={unfilteredData}
         />
       </ListPageBody>
