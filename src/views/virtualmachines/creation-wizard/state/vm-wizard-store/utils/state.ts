@@ -21,4 +21,5 @@ export const initialVMWizardState: VMWizardState = {
     volumeSnapshotSource: null,
   },
   project: '',
+  startVM: false,
 };

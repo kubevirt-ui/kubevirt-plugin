@@ -1657,6 +1657,8 @@
   "Results available": "Résultats disponibles",
   "Retain revisions": "Conserver les révisions",
   "Review": "Vérifier",
+  "Review and click <1>Create VirtualMachine</1> to start creating {{vmName}}.": "Review and click <1>Create VirtualMachine</1> to start creating {{vmName}}.",
+  "Review and create": "Review and create",
   "Review the details to make sure everything looks right before starting the migration.": "Review the details to make sure everything looks right before starting the migration.",
   "RHEL": "RHEL",
   "RHEL download page ": "Page de téléchargement de RHEL ",

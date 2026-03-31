@@ -1,12 +1,9 @@
 import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
-import { UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { OperatingSystemType } from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/GuestOSStep/utils/constants';
 import { VMCreationMethod } from '@virtualmachines/creation-wizard/utils/constants';
-
-export type UploadData = ({ dataVolume, file }: UploadDataProps) => Promise<void>;
 
 export type InstanceTypeFlowState = {
   customDiskSize: string;
@@ -28,6 +25,7 @@ export type VMWizardState = {
   folder: string;
   instanceTypeFlowState: InstanceTypeFlowState;
   project: string;
+  startVM: boolean;
 };
 
 export type VMWizardActions = {
@@ -51,6 +49,8 @@ export type VMWizardActions = {
   setSelectedInstanceType: (instanceType: { name: string; namespace: string }) => void;
   setSelectedSeries: (series: string) => void;
   setSelectedSize: (size: string) => void;
+  setStartVM: (startVM: boolean) => void;
+  setVolumeListNamespace: (volumeListNamespace: string) => void;
 };
 
 export type VMWizardStore = VMWizardState & VMWizardActions;

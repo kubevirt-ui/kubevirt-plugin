@@ -114,6 +114,7 @@ const useVMWizardStore = create<VMWizardStore>()((set) => {
           selectedSize: size,
         },
       })),
+    setStartVM: (startVM: boolean) => set({ startVM }),
     setVolumeListNamespace: (volumeListNamespace: string) =>
       set((state) => ({
         instanceTypeFlowState: { ...state.instanceTypeFlowState, volumeListNamespace },
