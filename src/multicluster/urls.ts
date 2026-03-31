@@ -203,15 +203,8 @@ export const getClusterResourceRoute: GetClusterResourceRouteProps = ({ cluster,
     : `/k8s/cluster/${group}~${version}~${kind}/${name}`;
 };
 
-const getFleetPagePathForModel = (model: ExtensionK8sModel): string => {
-  if (model.group === 'kubevirt.io' && model.kind === 'VirtualMachine') {
-    return FLEET_VIRTUAL_MACHINES_PATH;
-  }
-  if (model.group === 'migrations.kubevirt.io' && model.kind === 'MigrationPolicy') {
-    return FLEET_MIGRATION_POLICIES_PATH;
-  }
-  return `${FLEET_BASE_PATH}/${model.group}~${model.version}~${model.kind}`;
-};
+const getFleetPagePathForModel = (model: ExtensionK8sModel): string =>
+  `${FLEET_BASE_PATH}/${model.group}~${model.version}~${model.kind}`;
 
 export const getFleetOverviewURL = (cluster?: string, namespace?: string): string => {
   if (!cluster || cluster === ALL_CLUSTERS_KEY) {

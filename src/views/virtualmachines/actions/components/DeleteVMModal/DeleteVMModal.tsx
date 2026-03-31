@@ -1,14 +1,15 @@
 import React, { FC, useMemo, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
+import { matchPath, useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import { GracePeriodInput } from '@kubevirt-utils/components/GracePeriodInput/GracePeriodInput';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { VirtualMachineModelRef } from '@kubevirt-utils/models';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getShareableVolumes } from '@kubevirt-utils/resources/vm';
-import { KUBEVIRT_VM_PATH } from '@multicluster/constants';
+import { FLEET_VIRTUAL_MACHINES_PATH } from '@multicluster/constants';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { getVMListURL, isACMPath } from '@multicluster/urls';
 import { ButtonVariant, Stack, StackItem } from '@patternfly/react-core';
@@ -55,7 +56,11 @@ const DeleteVMModal: FC<DeleteVMModalProps> = ({ isOpen, onClose, vm }) => {
 
     if (isVMSelected(updatedVM)) deselectVM(updatedVM);
 
-    if (!location.pathname.endsWith('/search') && !location.pathname.endsWith(KUBEVIRT_VM_PATH)) {
+    const vmDetailsPage =
+      matchPath(`${FLEET_VIRTUAL_MACHINES_PATH}/:cluster/ns/:ns/:name`, location.pathname) ||
+      matchPath(`/k8s/ns/:ns/${VirtualMachineModelRef}/:name`, location.pathname);
+
+    if (vmDetailsPage) {
       const cluster = getCluster(vm) ?? hubClusterName;
       const clusterParam = isACMPath(location.pathname) ? cluster : null;
       const vmListURL = getVMListURL(clusterParam, getNamespace(vm));

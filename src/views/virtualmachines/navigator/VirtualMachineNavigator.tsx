@@ -1,10 +1,11 @@
 import React, { FC, useCallback, useRef } from 'react';
-import { useLocation, useParams } from 'react-router-dom-v5-compat';
+import { matchPath, useLocation, useParams } from 'react-router-dom-v5-compat';
 
 import CreateResourceDefaultPage from '@kubevirt-utils/components/CreateResourceDefaultPage/CreateResourceDefaultPage';
 import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
+import { FLEET_VIRTUAL_MACHINES_PATH } from '@multicluster/constants';
 import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import { Divider, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
@@ -33,7 +34,16 @@ const VirtualMachineNavigator: FC = () => {
 
   const { cluster, ns: namespace } = useParams<{ cluster?: string; ns: string }>();
 
+  const isACMVMListPage =
+    matchPath(`${FLEET_VIRTUAL_MACHINES_PATH}/all-clusters/all-namespaces`, location.pathname) ||
+    matchPath(
+      `${FLEET_VIRTUAL_MACHINES_PATH}/cluster/:cluster/all-namespaces`,
+      location.pathname,
+    ) ||
+    matchPath(`${FLEET_VIRTUAL_MACHINES_PATH}/cluster/:cluster/ns/:ns`, location.pathname);
+
   const isVirtualMachineListPage =
+    isACMVMListPage ||
     location.pathname.endsWith(VirtualMachineModelRef) ||
     location.pathname.endsWith(`${VirtualMachineModelRef}/`);
 

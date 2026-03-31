@@ -6,12 +6,10 @@ import { K8sModel, useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 import { customModels } from './constants';
 
 const useModelFromParam = (): [model: K8sModel | null, loading: boolean] => {
-  const namespacedMatch = useMatch(`${FLEET_BASE_PATH}/:page/cluster/:cluster/ns/:ns/:modelRef/*`);
-  const clusterwideMatch = useMatch(`${FLEET_BASE_PATH}/:page/cluster/:cluster/:modelRef/*`);
+  const pageMatch = useMatch(`${FLEET_BASE_PATH}/:page/*`);
+  const modelRef = pageMatch?.params?.page || '';
 
-  const modelRef = namespacedMatch?.params?.modelRef || clusterwideMatch?.params?.modelRef || '';
-
-  const [group, version, kind] = modelRef?.split('~');
+  const [group, version, kind] = modelRef.split('~');
 
   const [model, inFlight] = useK8sModel({ group, kind, version });
   const customModel = customModels[modelRef];
