@@ -2,7 +2,6 @@ import React, { FC, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 import classNames from 'classnames';
 
-import useVirtualMachineInstanceTypes from '@catalog/CreateFromInstanceTypes/state/hooks/useVirtualMachineInstanceTypes';
 import {
   VirtualMachineClusterInstancetypeModel,
   VirtualMachineClusterInstancetypeModelRef,
@@ -11,6 +10,7 @@ import { PageTitles } from '@kubevirt-utils/constants/page-constants';
 import useIsCRDPage from '@kubevirt-utils/hooks/useIsCRDPage';
 import useIsSearchPage from '@kubevirt-utils/hooks/useIsSearchPage';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useVirtualMachineInstanceTypes from '@kubevirt-utils/hooks/useVirtualMachineInstanceTypes';
 import { ListPageProps } from '@kubevirt-utils/utils/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {

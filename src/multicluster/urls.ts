@@ -24,6 +24,8 @@ export const buildSpokeConsoleUrl = (spokeConsoleURL: string, path: string): str
   return `${base}${normalizedPath}`;
 };
 
+export const isAllClusters = (cluster: string) => cluster === ALL_CLUSTERS_KEY;
+
 export const isACMPath = (pathname: string): boolean => {
   if (pathname.startsWith('/k8s/all-clusters')) return true;
 
@@ -70,12 +72,17 @@ export const getCatalogURL = (cluster: string, namespace?: string): string => {
     : `/k8s/${namespacePath}/catalog`;
 };
 
-export const getVMWizardURL = (cluster: string, namespace?: string): string => {
-  const namespacePath = isAllNamespaces(namespace) ? ALL_NAMESPACES : `ns/${namespace}`;
+export const getVMWizardURL = (cluster?: string, namespace?: string): string => {
+  if (namespace && namespace !== ALL_NAMESPACES_SESSION_KEY) {
+    if (!cluster || cluster === ALL_CLUSTERS_KEY) {
+      return `/k8s/${ALL_CLUSTERS_KEY}/ns/${namespace}/vmwizard`;
+    }
+    return `/k8s/cluster/${cluster}/ns/${namespace}/vmwizard`;
+  }
 
-  return cluster
-    ? `/k8s/cluster/${cluster}/${namespacePath}/vmwizard`
-    : `/k8s/${namespacePath}/vmwizard`;
+  return cluster && cluster !== ALL_CLUSTERS_KEY
+    ? `/k8s/cluster/${cluster}/${ALL_NAMESPACES}/vmwizard`
+    : `/k8s/${ALL_CLUSTERS_KEY}/${ALL_NAMESPACES}/vmwizard`;
 };
 
 export const getConsoleStandaloneURL = (

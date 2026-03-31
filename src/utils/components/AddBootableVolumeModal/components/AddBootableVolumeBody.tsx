@@ -21,7 +21,7 @@ import VolumeMetadata from './VolumeMetadata/VolumeMetadata';
 import VolumeSource from './VolumeSource/VolumeSource';
 import SchedulingSettings from './SchedulingSettings';
 
-type AddBootableVolumeModalProps = {
+type AddBootableVolumeBodyProps = {
   bootableVolume: AddBootableVolumeState;
   setBootableVolume: Dispatch<SetStateAction<AddBootableVolumeState>>;
   setSourceType: Dispatch<SetStateAction<DROPDOWN_FORM_SELECTION>>;
@@ -29,7 +29,7 @@ type AddBootableVolumeModalProps = {
   upload: DataUpload;
 };
 
-const AddBootableVolumeBody: FC<AddBootableVolumeModalProps> = ({
+const AddBootableVolumeBody: FC<AddBootableVolumeBodyProps> = ({
   bootableVolume,
   setBootableVolume,
   setSourceType,

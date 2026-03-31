@@ -2,8 +2,9 @@ import React, { FC } from 'react';
 
 import { Split, SplitItem } from '@patternfly/react-core';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
-import OperatingSystemTile from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/GuestOSStep/components/OperatingSystemTileGroup/components/OperatingSystemTile/OperatingSystemTile';
 import { OperatingSystemType } from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/GuestOSStep/utils/constants';
+
+import OperatingSystemTile from './components/OperatingSystemTile/OperatingSystemTile';
 
 const OperatingSystemTileGroup: FC = () => {
   const { instanceTypeFlowState, setOperatingSystemType } = useVMWizardStore();

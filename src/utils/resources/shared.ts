@@ -8,6 +8,7 @@ import { TemplateModel } from '@kubevirt-utils/models';
 import { getCluster } from '@multicluster/helpers/selectors';
 import {
   K8sModel,
+  K8sResourceCommon,
   K8sResourceCondition,
   K8sResourceKind,
   K8sVerb,
