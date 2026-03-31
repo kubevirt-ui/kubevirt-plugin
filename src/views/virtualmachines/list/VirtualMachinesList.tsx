@@ -38,7 +38,6 @@ import useVirtualMachineInstanceMigrations from '@kubevirt-utils/resources/vmim/
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { getCatalogURL } from '@multicluster/urls';
-import useIsACMPage from '@multicluster/useIsACMPage';
 import {
   DocumentTitle,
   K8sResourceCommon,
@@ -48,7 +47,6 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Flex, PageSection, Pagination } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
-import { useHubClusterName } from '@stolostron/multicluster-sdk';
 import { useAccessibleResources } from '@virtualmachines/search/hooks/useAccessibleResources';
 import useVMSearchQueries from '@virtualmachines/search/hooks/useVMSearchQueries';
 import VirtualMachineFilterToolbar from '@virtualmachines/search/VirtualMachineFilterToolbar';
@@ -87,9 +85,6 @@ type VirtualMachinesListProps = {
 const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref) => {
   const { t } = useKubevirtTranslation();
   const { allVMsLoaded, cluster, isSearchResultsPage = false, kind, namespace } = props;
-
-  const isACMPage = useIsACMPage();
-  const [hubClusterName] = useHubClusterName();
 
   const searchQueries = useVMSearchQueries();
 
@@ -152,10 +147,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
   );
 
   const filteredVMIs = useMemo(
-    () =>
-      filteredVMs
-        ?.map((vm) => getVMIFromMapper(vmiMapper, vm, isACMPage ? hubClusterName : undefined))
-        .filter(Boolean),
+    () => filteredVMs?.map((vm) => getVMIFromMapper(vmiMapper, vm)).filter(Boolean),
     [filteredVMs, vmiMapper],
   );
 
@@ -287,8 +279,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
                   <div className="pf-v6-u-text-align-center">{t('No VirtualMachines found')}</div>
                 )}
                 rowData={{
-                  getVmi: (vm: V1VirtualMachine) =>
-                    getVMIFromMapper(vmiMapper, vm, isACMPage ? hubClusterName : undefined),
+                  getVmi: (vm: V1VirtualMachine) => getVMIFromMapper(vmiMapper, vm),
                   getVmim: (vm: V1VirtualMachine) =>
                     getVMIMFromMapper(vmimMapper, getName(vm), getNamespace(vm), getCluster(vm)),
                   kind,
