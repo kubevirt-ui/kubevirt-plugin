@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import CheckupImageField from 'src/views/checkups/components/CheckupImageField';
 
+import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { getDefaultStorageClass } from '@kubevirt-utils/components/DiskModal/components/StorageClassAndPreallocation/utils/helpers';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useRelatedImage from '@kubevirt-utils/hooks/useRelatedImage';
-import { generatePrettyName } from '@kubevirt-utils/utils/utils';
+import { modelToGroupVersionKind, StorageClassModel } from '@kubevirt-utils/models';
+import { generatePrettyName, isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import {
   Button,
   ButtonVariant,
@@ -21,6 +25,7 @@ import { HelpIcon } from '@patternfly/react-icons';
 
 import { storageCheckupImageSettings } from '../../utils/const';
 
+import AdvancedSettings, { StorageCheckupAdvancedSettings } from './AdvancedSettings';
 import CheckupsStorageFormActions from './CheckupsStorageFormActions';
 
 import './checkups-storage-form.scss';
@@ -34,6 +39,32 @@ const CheckupsStorageForm = () => {
     ...storageCheckupImageSettings,
     cluster,
   });
+
+  const [advancedSettings, setAdvancedSettings] = useState<StorageCheckupAdvancedSettings>({
+    numOfVMs: '',
+    skipTeardown: 'never',
+    storageClass: '',
+    vmiTimeout: '',
+  });
+
+  const [storageClasses, storageClassesLoaded, storageClassesError] = useK8sWatchData<
+    IoK8sApiStorageV1StorageClass[]
+  >({
+    cluster,
+    groupVersionKind: modelToGroupVersionKind(StorageClassModel),
+    isList: true,
+  });
+
+  const defaultSC = useMemo(() => getDefaultStorageClass(storageClasses ?? []), [storageClasses]);
+
+  const hasAppliedDefaultSC = useRef(false);
+
+  useEffect(() => {
+    if (!hasAppliedDefaultSC.current && storageClassesLoaded && !isEmpty(defaultSC)) {
+      setAdvancedSettings((prev) => ({ ...prev, storageClass: defaultSC?.metadata?.name }));
+      hasAppliedDefaultSC.current = true;
+    }
+  }, [defaultSC, storageClassesLoaded]);
 
   return (
     <Grid>
@@ -83,7 +114,23 @@ const CheckupsStorageForm = () => {
                 checkupImageLoadError={checkupImageLoadError}
               />
             )}
-            <CheckupsStorageFormActions checkupImage={checkupImage} name={name} timeOut={timeOut} />
+            <AdvancedSettings
+              defaultSC={defaultSC}
+              setSettings={setAdvancedSettings}
+              settings={advancedSettings}
+              storageClasses={storageClasses}
+              storageClassesError={storageClassesError}
+              storageClassesLoaded={storageClassesLoaded}
+            />
+            <CheckupsStorageFormActions
+              advancedSettings={{
+                ...advancedSettings,
+                storageClass: advancedSettings.storageClass || defaultSC?.metadata?.name,
+              }}
+              checkupImage={checkupImage}
+              name={name}
+              timeOut={timeOut}
+            />
           </FormSection>
         </Form>
       </GridItem>
