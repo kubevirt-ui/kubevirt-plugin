@@ -2,8 +2,6 @@ import React, { FC } from 'react';
 
 import { ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
 
-import './CreateResourceDefaultPage.scss';
-
 type CreateResourceDefaultPageProps = {
   header: string;
   initialResource: K8sResourceCommon;
