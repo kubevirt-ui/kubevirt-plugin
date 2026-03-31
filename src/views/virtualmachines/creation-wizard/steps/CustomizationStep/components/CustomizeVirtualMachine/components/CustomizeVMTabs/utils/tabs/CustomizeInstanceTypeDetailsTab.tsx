@@ -1,0 +1,280 @@
+import React, { useEffect, useState } from 'react';
+
+import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
+import { DescriptionModal } from '@kubevirt-utils/components/DescriptionModal/DescriptionModal';
+import { HARDWARE_DEVICE_TYPE } from '@kubevirt-utils/components/HardwareDevices/utils/constants';
+import HeadlessMode from '@kubevirt-utils/components/HeadlessMode/HeadlessMode';
+import HostnameModal from '@kubevirt-utils/components/HostnameModal/HostnameModal';
+import Loading from '@kubevirt-utils/components/Loading/Loading';
+import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import MoveVMToFolderModal from '@kubevirt-utils/components/MoveVMToFolderModal/MoveVMToFolderModal';
+import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
+import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
+import {
+  DISABLED_GUEST_SYSTEM_LOGS_ACCESS,
+  TREE_VIEW_FOLDERS,
+} from '@kubevirt-utils/hooks/useFeatures/constants';
+import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getPreferredBootmode } from '@kubevirt-utils/resources/preference/helper';
+import { asAccessReview, getAnnotation, getLabel, getName } from '@kubevirt-utils/resources/shared';
+import { DESCRIPTION_ANNOTATION, getDevices, getHostname } from '@kubevirt-utils/resources/vm';
+import { updateCustomizeInstanceType } from '@kubevirt-utils/store/customizeInstanceType';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
+import { K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
+import { DescriptionList, Grid, GridItem, Switch } from '@patternfly/react-core';
+import { wizardVMSignal } from '@virtualmachines/creation-wizard/state/vm-signal/vmStore';
+import DeletionProtectionModal from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/DeletionProtectionModal';
+import { VM_DELETION_PROTECTION_LABEL } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/constants';
+import { VMDeletionProtectionOptions } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/types';
+import { isDeletionProtectionEnabled } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
+import DetailsSectionBoot from '@virtualmachines/details/tabs/configuration/details/components/DetailsSectionBoot';
+import DetailsSectionHardware from '@virtualmachines/details/tabs/configuration/details/components/DetailsSectionHardware';
+import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
+
+import usePreference from '../../hooks/usePreference';
+
+const CustomizeInstanceTypeDetailsTab = () => {
+  const { t } = useKubevirtTranslation();
+  const { createModal } = useModal();
+  const vm = wizardVMSignal.value;
+
+  const [preference, preferenceLoading] = usePreference(vm);
+
+  const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
+  const [canUpdateVM] = useAccessReview(accessReview || {});
+
+  const { featureEnabled: isGuestSystemLogsDisabled } = useFeatures(
+    DISABLED_GUEST_SYSTEM_LOGS_ACCESS,
+  );
+  const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
+
+  const logSerialConsole = getDevices(vm)?.logSerialConsole;
+  const [isCheckedGuestSystemAccessLog, setIsCheckedGuestSystemAccessLog] = useState<boolean>();
+
+  const deletionProtectionEnabled = isDeletionProtectionEnabled(vm);
+
+  useEffect(
+    () =>
+      setIsCheckedGuestSystemAccessLog(
+        logSerialConsole || (logSerialConsole === undefined && !isGuestSystemLogsDisabled),
+      ),
+    [isGuestSystemLogsDisabled, logSerialConsole],
+  );
+
+  const vmName = getName(vm);
+
+  if (!vm || preferenceLoading) {
+    return <Loading />;
+  }
+
+  return (
+    <Grid>
+      <GridItem span={5}>
+        <DescriptionList>
+          <DescriptionItem
+            descriptionData={
+              getAnnotation(vm, DESCRIPTION_ANNOTATION) || <MutedTextSpan text={t('None')} />
+            }
+            onEditClick={() =>
+              createModal(({ isOpen, onClose }) => (
+                <DescriptionModal
+                  onSubmit={(description) =>
+                    Promise.resolve(
+                      updateCustomizeInstanceType([
+                        {
+                          data: description,
+                          path: `metadata.annotations.${DESCRIPTION_ANNOTATION}`,
+                        },
+                      ]),
+                    )
+                  }
+                  isOpen={isOpen}
+                  obj={vm}
+                  onClose={onClose}
+                />
+              ))
+            }
+            data-test-id={`${vmName}-description`}
+            descriptionHeader={<SearchItem id="description">{t('Description')}</SearchItem>}
+            isEdit
+          />
+          {treeViewFoldersEnabled && (
+            <DescriptionItem
+              onEditClick={() =>
+                createModal(({ isOpen, onClose }) => (
+                  <MoveVMToFolderModal
+                    onSubmit={(folderName) =>
+                      Promise.resolve(
+                        updateCustomizeInstanceType([
+                          {
+                            data: folderName,
+                            path: ['metadata', 'labels', VM_FOLDER_LABEL],
+                          },
+                        ]),
+                      )
+                    }
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    vm={vm}
+                  />
+                ))
+              }
+              data-test-id={`${vmName}-folder`}
+              descriptionData={getLabel(vm, VM_FOLDER_LABEL)}
+              descriptionHeader={<SearchItem id="folder">{t('Folder')}</SearchItem>}
+              isEdit
+            />
+          )}
+          <DescriptionItem
+            onEditClick={() =>
+              createModal(({ isOpen, onClose }) => (
+                <HostnameModal
+                  onSubmit={(updatedVM) =>
+                    Promise.resolve(
+                      updateCustomizeInstanceType([
+                        {
+                          data: getHostname(updatedVM),
+                          path: `spec.template.spec.hostname`,
+                        },
+                      ]),
+                    )
+                  }
+                  isOpen={isOpen}
+                  onClose={onClose}
+                  vm={vm}
+                />
+              ))
+            }
+            data-test-id={`${vmName}-hostname`}
+            descriptionData={getHostname(vm) || vmName}
+            descriptionHeader={<SearchItem id="hostname">{t('Hostname')}</SearchItem>}
+            isEdit
+          />
+          <DescriptionItem
+            bodyContent={t(
+              'Whether to attach the default graphics device or not. VNC will not be available if checked.',
+            )}
+            descriptionData={
+              <HeadlessMode
+                updateHeadlessMode={(checked) => {
+                  return Promise.resolve(
+                    updateCustomizeInstanceType([
+                      {
+                        data: checked ? false : null,
+                        path: `spec.template.spec.domain.devices.autoattachGraphicsDevice`,
+                      },
+                    ]),
+                  );
+                }}
+                vm={vm}
+              />
+            }
+            breadcrumb="VirtualMachine.spec.template.devices.autoattachGraphicsDevice"
+            data-test-id={`${vmName}-headless`}
+            descriptionHeader={<SearchItem id="headless-mode">{t('Headless mode')}</SearchItem>}
+            isPopover
+            olsObj={vm}
+            promptType={OLSPromptType.HEADLESS_MODE}
+          />
+          <DescriptionItem
+            bodyContent={t(
+              "Enables access to the VirtualMachine's guest system log. Wait a few seconds for logging to start before viewing the log.",
+            )}
+            descriptionData={
+              <Switch
+                onChange={(_event, checked) => {
+                  setIsCheckedGuestSystemAccessLog(checked);
+                  updateCustomizeInstanceType([
+                    {
+                      data: checked,
+                      path: `spec.template.spec.domain.devices.logSerialConsole`,
+                    },
+                  ]);
+                }}
+                id="guest-system-log-access"
+                isChecked={isCheckedGuestSystemAccessLog}
+                isDisabled={isGuestSystemLogsDisabled}
+              />
+            }
+            descriptionHeader={
+              <SearchItem id="guest-system-log-access">{t('Guest system log access')}</SearchItem>
+            }
+            data-test-id="guest-system-log-access"
+            isPopover
+            olsObj={vm}
+            promptType={OLSPromptType.GUEST_SYSTEM_LOG_ACCESS}
+          />
+          <DescriptionItem
+            bodyContent={t(
+              'Applying deletion protection to this VM will prevent deletion through the web console.',
+            )}
+            descriptionData={
+              <Switch
+                onChange={(_event, checked) =>
+                  createModal(({ isOpen, onClose }) => (
+                    <DeletionProtectionModal
+                      deletionProtectionOption={
+                        checked
+                          ? VMDeletionProtectionOptions.ENABLE
+                          : VMDeletionProtectionOptions.DISABLE
+                      }
+                      onConfirm={(enableDeletionProtection) => {
+                        updateCustomizeInstanceType([
+                          {
+                            data: enableDeletionProtection ? 'true' : 'false',
+                            path: ['metadata', 'labels', VM_DELETION_PROTECTION_LABEL],
+                          },
+                        ]);
+                        onClose();
+                      }}
+                      isOpen={isOpen}
+                      onCancel={onClose}
+                      vm={vm}
+                    />
+                  ))
+                }
+                id="deletion-protection"
+                isChecked={deletionProtectionEnabled}
+              />
+            }
+            descriptionHeader={
+              <SearchItem id="deletion-protection">{t('Deletion protection')}</SearchItem>
+            }
+            data-test-id="deletion-protection"
+            isPopover
+            olsObj={vm}
+            promptType={OLSPromptType.DELETION_PROTECTION}
+          />
+        </DescriptionList>
+      </GridItem>
+      <GridItem span={5}>
+        <DescriptionList>
+          <DetailsSectionHardware
+            onSubmit={(type: HARDWARE_DEVICE_TYPE, updatedVM: V1VirtualMachine) =>
+              Promise.resolve(
+                updateCustomizeInstanceType([
+                  {
+                    data: getDevices(updatedVM)?.[type],
+                    path: `spec.template.spec.domain.devices.${type}`,
+                  },
+                ]),
+              )
+            }
+            vm={vm}
+          />
+          <DetailsSectionBoot
+            canUpdateVM={canUpdateVM}
+            isCustomizeInstanceType
+            preferredBootmode={getPreferredBootmode(preference)}
+            vm={vm}
+          />
+        </DescriptionList>
+      </GridItem>
+    </Grid>
+  );
+};
+
+export default CustomizeInstanceTypeDetailsTab;

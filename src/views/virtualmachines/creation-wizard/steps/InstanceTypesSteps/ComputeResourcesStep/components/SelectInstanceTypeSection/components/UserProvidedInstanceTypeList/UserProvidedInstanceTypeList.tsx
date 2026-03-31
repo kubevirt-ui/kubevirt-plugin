@@ -88,9 +88,12 @@ const UserProvidedInstanceTypesList: FC<UserProvidedInstanceTypesListProps> = ({
         <ActionList className="instance-type-list__action-list">
           <ActionListItem>
             <SearchInput
+              onChange={(_, value) => {
+                setSearchInput(value);
+                setPagination(paginationInitialState);
+              }}
               aria-label={t('Filter menu items')}
               className="instance-type-list__search"
-              onChange={(_, value) => setSearchInput(value)}
               placeholder={t('Search by name...')}
               type="search"
               value={searchInput}

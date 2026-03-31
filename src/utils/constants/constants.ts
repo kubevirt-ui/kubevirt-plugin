@@ -67,3 +67,6 @@ export const VIRTUALIZATION_PATHS = {
   OVERVIEW: 'virtualization-overview',
   SETTINGS: 'virtualization-settings',
 } as const;
+
+export const COLON = ':';
+export const HASH = '#';

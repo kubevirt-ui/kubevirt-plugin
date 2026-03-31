@@ -106,7 +106,7 @@ const InstanceTypeSizeDropdown: FC<InstanceTypeSizeDropdownProps> = ({
           <Menu className="instance-type-size-dropdown__menu" containsFlyout ref={menuRef}>
             <MenuContent>
               <MenuList>
-                {!isEmpty(hugepagesSizes.length) && (
+                {!isEmpty(hugepagesSizes) && (
                   <>
                     <MenuItem flyoutMenu={renderHugepagesMenu()}>
                       <HugepagesInfo />
