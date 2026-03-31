@@ -12,7 +12,16 @@ import { ResourceRouteHandler } from '@stolostron/multicluster-sdk';
 
 import { VirtualMachineModel } from '../views/dashboard-extensions/utils';
 
-import { FLEET_BASE_PATH, KUBEVIRT_VM_PATH } from './constants';
+import {
+  FLEET_BASE_PATH,
+  FLEET_BOOTABLE_VOLUMES_PATH,
+  FLEET_CATALOG_PATH,
+  FLEET_CHECKUPS_PATH,
+  FLEET_MIGRATION_POLICIES_PATH,
+  FLEET_OVERVIEW_PATH,
+  FLEET_TEMPLATES_PATH,
+  FLEET_VIRTUAL_MACHINES_PATH,
+} from './constants';
 
 /**
  * Build a full URL for a spoke cluster console page by joining the spoke's
@@ -27,48 +36,44 @@ export const buildSpokeConsoleUrl = (spokeConsoleURL: string, path: string): str
 export const isAllClusters = (cluster: string) => cluster === ALL_CLUSTERS_KEY;
 
 export const isACMPath = (pathname: string): boolean => {
-  if (pathname.startsWith(`${FLEET_BASE_PATH}/all-clusters`)) return true;
-
-  const clusterMatch = matchPath(`${FLEET_BASE_PATH}/cluster/:cluster/*`, pathname);
-  if (!clusterMatch || clusterMatch.params.cluster?.includes('~')) return false;
-
-  const rest = clusterMatch.params['*'] ?? '';
-  return rest.startsWith('ns/') || rest.startsWith('all-namespaces/') || rest.includes('~');
+  return pathname.startsWith(FLEET_BASE_PATH);
 };
 
 export const getACMVMURL = (cluster: string, namespace: string, name: string): string =>
-  `${FLEET_BASE_PATH}/cluster/${cluster}/ns/${namespace}/${KUBEVIRT_VM_PATH}/${name}`;
+  `${FLEET_VIRTUAL_MACHINES_PATH}/cluster/${cluster}/ns/${namespace}/${name}`;
 
 export const getACMVMListURL = (cluster?: string, namespace?: string): string => {
   if (namespace && namespace !== ALL_NAMESPACES_SESSION_KEY) {
     if (!cluster || cluster === ALL_CLUSTERS_KEY) {
-      return `${FLEET_BASE_PATH}/${ALL_CLUSTERS_KEY}/ns/${namespace}/${KUBEVIRT_VM_PATH}`;
+      return `${FLEET_VIRTUAL_MACHINES_PATH}/${ALL_CLUSTERS_KEY}/ns/${namespace}`;
     }
     return getACMVMListNamespacesURL(cluster, namespace);
   }
 
   return cluster && cluster !== ALL_CLUSTERS_KEY
-    ? `${FLEET_BASE_PATH}/cluster/${cluster}/${ALL_NAMESPACES}/${KUBEVIRT_VM_PATH}`
-    : `${FLEET_BASE_PATH}/${ALL_CLUSTERS_KEY}/${ALL_NAMESPACES}/${KUBEVIRT_VM_PATH}`;
+    ? `${FLEET_VIRTUAL_MACHINES_PATH}/cluster/${cluster}/${ALL_NAMESPACES}`
+    : `${FLEET_VIRTUAL_MACHINES_PATH}/${ALL_CLUSTERS_KEY}/${ALL_NAMESPACES}`;
 };
 
 export const getACMVMSearchURL = (): string =>
-  `${FLEET_BASE_PATH}/${ALL_CLUSTERS_KEY}/${ALL_NAMESPACES}/${KUBEVIRT_VM_PATH}/search`;
+  `${FLEET_VIRTUAL_MACHINES_PATH}/${ALL_CLUSTERS_KEY}/${ALL_NAMESPACES}/search`;
 
 export const getACMVMListNamespacesURL = (cluster: string, namespace: string): string =>
-  `${FLEET_BASE_PATH}/cluster/${cluster}/ns/${namespace}/${KUBEVIRT_VM_PATH}`;
+  `${FLEET_VIRTUAL_MACHINES_PATH}/cluster/${cluster}/ns/${namespace}`;
 
 // based on dns1123LabelRegexp
-const catalogWithNs = new RegExp('/ns/[-a-z0-9]+/catalog');
+const catalogWithNs = new RegExp('/ns/[-a-z0-9]+$');
 
 export const isCatalogURL = (path: string = ''): boolean =>
-  path.includes(`${ALL_NAMESPACES}/catalog`) || catalogWithNs.test(path);
+  path.startsWith(FLEET_CATALOG_PATH) ||
+  path.includes(`${ALL_NAMESPACES}/catalog`) ||
+  catalogWithNs.test(path);
 
 export const getCatalogURL = (cluster: string, namespace?: string): string => {
   const namespacePath = isAllNamespaces(namespace) ? ALL_NAMESPACES : `ns/${namespace}`;
 
   return cluster
-    ? `${FLEET_BASE_PATH}/cluster/${cluster}/${namespacePath}/catalog`
+    ? `${FLEET_CATALOG_PATH}/cluster/${cluster}/${namespacePath}`
     : `/k8s/${namespacePath}/catalog`;
 };
 
@@ -88,10 +93,10 @@ export const getConsoleStandaloneURL = (
   name: string,
   cluster?: string,
 ): string => {
-  const commonPath = `/ns/${namespace}/${KUBEVIRT_VM_PATH}/${name}/console/standalone`;
   if (cluster) {
-    return `${FLEET_BASE_PATH}/cluster/${cluster}${commonPath}`;
+    return `${FLEET_VIRTUAL_MACHINES_PATH}/cluster/${cluster}/ns/${namespace}/${name}/console/standalone`;
   }
+  const commonPath = `/ns/${namespace}/kubevirt.io~v1~VirtualMachine/${name}/console/standalone`;
   return `/k8s${commonPath}`;
 };
 
@@ -171,9 +176,8 @@ export const getFleetNamespacedResourceRoute: ResourceRouteHandler = ({
   name,
   namespace,
 }) => {
-  const { group, kind, version } = model;
-
-  return `${FLEET_BASE_PATH}/cluster/${cluster}/ns/${namespace}/${group}~${version}~${kind}/${name}`;
+  const pagePath = getFleetPagePathForModel(model);
+  return `${pagePath}/cluster/${cluster}/ns/${namespace}/${name}`;
 };
 
 type GetClusterResourceRouteProps = (input: {
@@ -187,9 +191,8 @@ export const getFleetClusterResourceRoute: GetClusterResourceRouteProps = ({
   model,
   name,
 }) => {
-  const { group, kind, version } = model;
-
-  return `${FLEET_BASE_PATH}/cluster/${cluster}/${group}~${version}~${kind}/${name}`;
+  const pagePath = getFleetPagePathForModel(model);
+  return `${pagePath}/cluster/${cluster}/${name}`;
 };
 
 export const getClusterResourceRoute: GetClusterResourceRouteProps = ({ cluster, model, name }) => {
@@ -198,4 +201,55 @@ export const getClusterResourceRoute: GetClusterResourceRouteProps = ({ cluster,
   return cluster
     ? getFleetClusterResourceRoute({ cluster, model, name })
     : `/k8s/cluster/${group}~${version}~${kind}/${name}`;
+};
+
+const getFleetPagePathForModel = (model: ExtensionK8sModel): string => {
+  if (model.group === 'kubevirt.io' && model.kind === 'VirtualMachine') {
+    return FLEET_VIRTUAL_MACHINES_PATH;
+  }
+  if (model.group === 'migrations.kubevirt.io' && model.kind === 'MigrationPolicy') {
+    return FLEET_MIGRATION_POLICIES_PATH;
+  }
+  return `${FLEET_BASE_PATH}/${model.group}~${model.version}~${model.kind}`;
+};
+
+export const getFleetOverviewURL = (cluster?: string, namespace?: string): string => {
+  if (!cluster || cluster === ALL_CLUSTERS_KEY) {
+    return `${FLEET_OVERVIEW_PATH}/${ALL_CLUSTERS_KEY}/${ALL_NAMESPACES}`;
+  }
+  const namespacePath = isAllNamespaces(namespace) ? ALL_NAMESPACES : `ns/${namespace}`;
+  return `${FLEET_OVERVIEW_PATH}/cluster/${cluster}/${namespacePath}`;
+};
+
+export const getFleetCheckupsURL = (cluster: string, namespace: string): string =>
+  `${FLEET_CHECKUPS_PATH}/cluster/${cluster}/ns/${namespace}`;
+
+export const getFleetTemplatesURL = (cluster: string, namespace: string): string =>
+  `${FLEET_TEMPLATES_PATH}/cluster/${cluster}/ns/${namespace}`;
+
+export const getFleetBootableVolumesURL = (cluster: string, namespace: string): string =>
+  `${FLEET_BOOTABLE_VOLUMES_PATH}/cluster/${cluster}/ns/${namespace}`;
+
+export const getFleetMigrationPoliciesListURL = (cluster?: string): string => {
+  if (!cluster || cluster === ALL_CLUSTERS_KEY) {
+    return `${FLEET_MIGRATION_POLICIES_PATH}/${ALL_CLUSTERS_KEY}`;
+  }
+  return `${FLEET_MIGRATION_POLICIES_PATH}/cluster/${cluster}`;
+};
+
+export const getFleetMigrationsTabPath = (cluster: string, activeNamespace: string): string => {
+  const nsPath = isAllNamespaces(activeNamespace) ? ALL_NAMESPACES : `ns/${activeNamespace}`;
+  return `${FLEET_OVERVIEW_PATH}/cluster/${cluster}/${nsPath}/migrations`;
+};
+
+/**
+ * Extract the cluster param from a fleet-virtualization URL.
+ * Works across all page types since cluster always follows /:page/cluster/:cluster pattern.
+ */
+export const extractClusterFromPath = (pathname: string): null | string => {
+  const allClustersMatch = matchPath(`${FLEET_BASE_PATH}/:page/${ALL_CLUSTERS_KEY}/*`, pathname);
+  if (allClustersMatch) return ALL_CLUSTERS_KEY;
+
+  const clusterMatch = matchPath(`${FLEET_BASE_PATH}/:page/cluster/:cluster/*`, pathname);
+  return clusterMatch?.params?.cluster || null;
 };

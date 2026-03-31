@@ -12,7 +12,17 @@ import { ResourceRoute } from '@stolostron/multicluster-sdk';
 
 import { PERSPECTIVES } from '../utils/constants/constants';
 
-import { CROSS_CLUSTER_MIGRATION_ACTION_ID, FLEET_BASE_PATH, KUBEVIRT_VM_PATH } from './constants';
+import {
+  CROSS_CLUSTER_MIGRATION_ACTION_ID,
+  FLEET_BOOTABLE_VOLUMES_PATH,
+  FLEET_CATALOG_PATH,
+  FLEET_CHECKUPS_PATH,
+  FLEET_INSTANCETYPES_PATH,
+  FLEET_MIGRATION_POLICIES_PATH,
+  FLEET_OVERVIEW_PATH,
+  FLEET_TEMPLATES_PATH,
+  FLEET_VIRTUAL_MACHINES_PATH,
+} from './constants';
 
 export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
   acmFlags: './multicluster/flags.ts',
@@ -23,11 +33,9 @@ export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
   urls: './multicluster/urls.ts',
 };
 
-const DATA_VOLUME_PATH = 'cdi.kubevirt.io~v1beta1~DataVolume';
-const CLUSTER_INSTANCETYPE_PATH =
+const CLUSTER_INSTANCETYPE_GVK =
   'instancetype.kubevirt.io~v1beta1~VirtualMachineClusterInstancetype';
-const INSTANCETYPE_PATH = 'instancetype.kubevirt.io~v1beta1~VirtualMachineInstancetype';
-const MIGRATION_POLICY_PATH = 'migrations.kubevirt.io~v1alpha1~MigrationPolicy';
+const INSTANCETYPE_GVK = 'instancetype.kubevirt.io~v1beta1~VirtualMachineInstancetype';
 
 export const extensions: EncodedExtension[] = [
   {
@@ -58,7 +66,7 @@ export const extensions: EncodedExtension[] = [
         'data-quickstart-id': 'qs-nav-virtualmachines',
         'data-test-id': 'virtualmachines-nav-item',
       },
-      href: `${FLEET_BASE_PATH}/all-clusters/all-namespaces/${KUBEVIRT_VM_PATH}`,
+      href: FLEET_VIRTUAL_MACHINES_PATH,
       id: 'virtualmachines-virt-perspective',
       name: '%plugin__kubevirt-plugin~VirtualMachines%',
       perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
@@ -71,7 +79,7 @@ export const extensions: EncodedExtension[] = [
         'data-quickstart-id': 'qs-nav-templates',
         'data-test-id': 'templates-nav-item',
       },
-      href: `${FLEET_BASE_PATH}/all-clusters/all-namespaces/templates`,
+      href: FLEET_TEMPLATES_PATH,
       id: 'templates-virt-perspective',
       insertAfter: 'virtualmachines-virt-perspective',
       name: '%plugin__kubevirt-plugin~Templates%',
@@ -85,7 +93,7 @@ export const extensions: EncodedExtension[] = [
         'data-quickstart-id': 'qs-nav-bootablevolumes',
         'data-test-id': 'bootablevolumes-nav-item',
       },
-      href: `${FLEET_BASE_PATH}/all-clusters/all-namespaces/bootablevolumes`,
+      href: FLEET_BOOTABLE_VOLUMES_PATH,
       id: 'bootablevolumes-virt-perspective',
       insertAfter: 'templates-virt-perspective',
       name: '%plugin__kubevirt-plugin~Bootable volumes%',
@@ -109,7 +117,7 @@ export const extensions: EncodedExtension[] = [
         'data-quickstart-id': 'qs-nav-instancetype',
         'data-test-id': 'instancetype-nav-item',
       },
-      href: `${FLEET_BASE_PATH}/all-clusters/${CLUSTER_INSTANCETYPE_PATH}`,
+      href: FLEET_INSTANCETYPES_PATH,
       id: 'instancetype-virt-perspective',
       insertAfter: 'acm-separator-1',
       name: '%plugin__kubevirt-plugin~InstanceTypes%',
@@ -133,7 +141,7 @@ export const extensions: EncodedExtension[] = [
         'data-quickstart-id': 'qs-nav-migrationpolicies',
         'data-test-id': 'migrationpolicies-nav-item',
       },
-      href: `${FLEET_BASE_PATH}/all-clusters/${MIGRATION_POLICY_PATH}`,
+      href: FLEET_MIGRATION_POLICIES_PATH,
       id: 'migrationpolicies-virt-perspective',
       insertAfter: 'acm-separator-2',
       name: '%plugin__kubevirt-plugin~MigrationPolicies%',
@@ -147,7 +155,7 @@ export const extensions: EncodedExtension[] = [
         'data-quickstart-id': 'qs-nav-checkups',
         'data-test-id': 'checkups-nav-item',
       },
-      href: `${FLEET_BASE_PATH}/all-clusters/all-namespaces/checkups/storage`,
+      href: FLEET_CHECKUPS_PATH,
       id: 'checkups-virt-perspective',
       insertAfter: 'migrationpolicies-virt-perspective',
       name: '%plugin__kubevirt-plugin~Checkups%',
@@ -159,9 +167,7 @@ export const extensions: EncodedExtension[] = [
     properties: {
       component: { $codeRef: 'ConsoleStandAlone' },
       exact: false,
-      path: [
-        `${FLEET_BASE_PATH}/cluster/:cluster/ns/:ns/${KUBEVIRT_VM_PATH}/:name/console/standalone`,
-      ],
+      path: [`${FLEET_VIRTUAL_MACHINES_PATH}/cluster/:cluster/ns/:ns/:name/console/standalone`],
     },
     type: 'console.page/route/standalone',
   } as EncodedExtension<StandaloneRoutePage>,
@@ -171,10 +177,10 @@ export const extensions: EncodedExtension[] = [
         $codeRef: 'Navigator',
       },
       path: [
-        `${FLEET_BASE_PATH}/cluster/:cluster/ns/:ns/${KUBEVIRT_VM_PATH}/:name`,
-        `${FLEET_BASE_PATH}/cluster/:cluster/ns/:ns/${KUBEVIRT_VM_PATH}`,
-        `${FLEET_BASE_PATH}/cluster/:cluster/all-namespaces/${KUBEVIRT_VM_PATH}`,
-        `${FLEET_BASE_PATH}/all-clusters/all-namespaces/${KUBEVIRT_VM_PATH}`,
+        `${FLEET_VIRTUAL_MACHINES_PATH}/cluster/:cluster/ns/:ns/:name`,
+        `${FLEET_VIRTUAL_MACHINES_PATH}/cluster/:cluster/ns/:ns`,
+        `${FLEET_VIRTUAL_MACHINES_PATH}/cluster/:cluster/all-namespaces`,
+        `${FLEET_VIRTUAL_MACHINES_PATH}/all-clusters/all-namespaces`,
       ],
       perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
@@ -186,14 +192,13 @@ export const extensions: EncodedExtension[] = [
         $codeRef: 'InstanceTypePage',
       },
       path: [
-        `${FLEET_BASE_PATH}/cluster/:cluster/ns/:ns/${CLUSTER_INSTANCETYPE_PATH}/:name`,
-        `${FLEET_BASE_PATH}/cluster/:cluster/ns/:ns/${CLUSTER_INSTANCETYPE_PATH}`,
-        `${FLEET_BASE_PATH}/cluster/:cluster/${CLUSTER_INSTANCETYPE_PATH}`,
-        `${FLEET_BASE_PATH}/all-clusters/${CLUSTER_INSTANCETYPE_PATH}`,
-        `${FLEET_BASE_PATH}/cluster/:cluster/ns/:ns/${INSTANCETYPE_PATH}/:name`,
-        `${FLEET_BASE_PATH}/cluster/:cluster/ns/:ns/${INSTANCETYPE_PATH}`,
-        `${FLEET_BASE_PATH}/cluster/:cluster/all-namespaces/${INSTANCETYPE_PATH}`,
-        `${FLEET_BASE_PATH}/all-clusters/all-namespaces/${INSTANCETYPE_PATH}`,
+        `${FLEET_INSTANCETYPES_PATH}/cluster/:cluster/${CLUSTER_INSTANCETYPE_GVK}/:name`,
+        `${FLEET_INSTANCETYPES_PATH}/cluster/:cluster/${CLUSTER_INSTANCETYPE_GVK}`,
+        `${FLEET_INSTANCETYPES_PATH}/all-clusters/${CLUSTER_INSTANCETYPE_GVK}`,
+        `${FLEET_INSTANCETYPES_PATH}/cluster/:cluster/ns/:ns/${INSTANCETYPE_GVK}/:name`,
+        `${FLEET_INSTANCETYPES_PATH}/cluster/:cluster/ns/:ns/${INSTANCETYPE_GVK}`,
+        `${FLEET_INSTANCETYPES_PATH}/cluster/:cluster/all-namespaces/${INSTANCETYPE_GVK}`,
+        `${FLEET_INSTANCETYPES_PATH}/all-clusters/all-namespaces/${INSTANCETYPE_GVK}`,
       ],
       perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
@@ -204,7 +209,7 @@ export const extensions: EncodedExtension[] = [
       component: {
         $codeRef: 'BootableVolumeYAMLPage',
       },
-      path: [`${FLEET_BASE_PATH}/cluster/:cluster/ns/:ns/bootablevolumes/~new`],
+      path: [`${FLEET_BOOTABLE_VOLUMES_PATH}/cluster/:cluster/ns/:ns/~new`],
       perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
     type: 'console.page/route',
@@ -215,9 +220,9 @@ export const extensions: EncodedExtension[] = [
         $codeRef: 'BootableVolumesList',
       },
       path: [
-        `${FLEET_BASE_PATH}/cluster/:cluster/ns/:ns/bootablevolumes`,
-        `${FLEET_BASE_PATH}/cluster/:cluster/all-namespaces/bootablevolumes`,
-        `${FLEET_BASE_PATH}/all-clusters/all-namespaces/bootablevolumes`,
+        `${FLEET_BOOTABLE_VOLUMES_PATH}/cluster/:cluster/ns/:ns`,
+        `${FLEET_BOOTABLE_VOLUMES_PATH}/cluster/:cluster/all-namespaces`,
+        `${FLEET_BOOTABLE_VOLUMES_PATH}/all-clusters/all-namespaces`,
       ],
       perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
@@ -226,7 +231,7 @@ export const extensions: EncodedExtension[] = [
   {
     properties: {
       component: { $codeRef: 'VirtualMachineSearchResults' },
-      path: [`${FLEET_BASE_PATH}/all-clusters/all-namespaces/${KUBEVIRT_VM_PATH}/search`],
+      path: [`${FLEET_VIRTUAL_MACHINES_PATH}/all-clusters/all-namespaces/search`],
       perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
     type: 'console.page/route',
@@ -259,9 +264,9 @@ export const extensions: EncodedExtension[] = [
         $codeRef: 'ClusterOverviewPage',
       },
       path: [
-        `${FLEET_BASE_PATH}/all-clusters/all-namespaces/virtualization-overview`,
-        `${FLEET_BASE_PATH}/cluster/:cluster/ns/:ns/virtualization-overview`,
-        `${FLEET_BASE_PATH}/cluster/:cluster/all-namespaces/virtualization-overview`,
+        `${FLEET_OVERVIEW_PATH}/all-clusters/all-namespaces`,
+        `${FLEET_OVERVIEW_PATH}/cluster/:cluster/ns/:ns`,
+        `${FLEET_OVERVIEW_PATH}/cluster/:cluster/all-namespaces`,
       ],
       perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
@@ -290,9 +295,9 @@ export const extensions: EncodedExtension[] = [
         $codeRef: 'Catalog',
       },
       path: [
-        `${FLEET_BASE_PATH}/all-clusters/all-namespaces/catalog`,
-        `${FLEET_BASE_PATH}/cluster/:cluster/ns/:ns/catalog`,
-        `${FLEET_BASE_PATH}/cluster/:cluster/all-namespaces/catalog`,
+        `${FLEET_CATALOG_PATH}/all-clusters/all-namespaces`,
+        `${FLEET_CATALOG_PATH}/cluster/:cluster/ns/:ns`,
+        `${FLEET_CATALOG_PATH}/cluster/:cluster/all-namespaces`,
       ],
       perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
@@ -304,9 +309,9 @@ export const extensions: EncodedExtension[] = [
         $codeRef: 'VirtualMachineTemplatesList',
       },
       path: [
-        `${FLEET_BASE_PATH}/all-clusters/all-namespaces/templates`,
-        `${FLEET_BASE_PATH}/cluster/:cluster/ns/:ns/templates`,
-        `${FLEET_BASE_PATH}/cluster/:cluster/all-namespaces/templates`,
+        `${FLEET_TEMPLATES_PATH}/all-clusters/all-namespaces`,
+        `${FLEET_TEMPLATES_PATH}/cluster/:cluster/ns/:ns`,
+        `${FLEET_TEMPLATES_PATH}/cluster/:cluster/all-namespaces`,
       ],
       perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
@@ -317,7 +322,7 @@ export const extensions: EncodedExtension[] = [
       component: {
         $codeRef: 'TemplateNavPage',
       },
-      path: [`${FLEET_BASE_PATH}/cluster/:cluster/ns/:ns/templates/:name`],
+      path: [`${FLEET_TEMPLATES_PATH}/cluster/:cluster/ns/:ns/:name`],
       perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
     type: 'console.page/route',
@@ -329,8 +334,8 @@ export const extensions: EncodedExtension[] = [
         $codeRef: 'MulticlusterYAMLCreation',
       },
       path: [
-        `${FLEET_BASE_PATH}/cluster/:cluster/ns/:ns/${KUBEVIRT_VM_PATH}/~new`,
-        `${FLEET_BASE_PATH}/cluster/:cluster/ns/:ns/templates/~new`,
+        `${FLEET_VIRTUAL_MACHINES_PATH}/cluster/:cluster/ns/:ns/~new`,
+        `${FLEET_TEMPLATES_PATH}/cluster/:cluster/ns/:ns/~new`,
       ],
       perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
@@ -342,8 +347,8 @@ export const extensions: EncodedExtension[] = [
         $codeRef: 'MigrationPoliciesList',
       },
       path: [
-        `${FLEET_BASE_PATH}/all-clusters/${MIGRATION_POLICY_PATH}`,
-        `${FLEET_BASE_PATH}/cluster/:cluster/${MIGRATION_POLICY_PATH}`,
+        `${FLEET_MIGRATION_POLICIES_PATH}/all-clusters`,
+        `${FLEET_MIGRATION_POLICIES_PATH}/cluster/:cluster`,
       ],
       perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
@@ -354,7 +359,7 @@ export const extensions: EncodedExtension[] = [
       component: {
         $codeRef: 'MigrationPolicyPage',
       },
-      path: [`${FLEET_BASE_PATH}/cluster/:cluster/${MIGRATION_POLICY_PATH}/:name`],
+      path: [`${FLEET_MIGRATION_POLICIES_PATH}/cluster/:cluster/:name`],
       perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
     type: 'console.page/route',
@@ -364,7 +369,7 @@ export const extensions: EncodedExtension[] = [
       component: {
         $codeRef: 'MigrationPolicyCreateForm',
       },
-      path: [`${FLEET_BASE_PATH}/cluster/:cluster/${MIGRATION_POLICY_PATH}/form`],
+      path: [`${FLEET_MIGRATION_POLICIES_PATH}/cluster/:cluster/form`],
       perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
     type: 'console.page/route',
@@ -374,7 +379,7 @@ export const extensions: EncodedExtension[] = [
       component: {
         $codeRef: 'MulticlusterYAMLCreation',
       },
-      path: [`${FLEET_BASE_PATH}/cluster/:cluster/${MIGRATION_POLICY_PATH}/~new`],
+      path: [`${FLEET_MIGRATION_POLICIES_PATH}/cluster/:cluster/~new`],
       perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
     type: 'console.page/route',
@@ -384,7 +389,7 @@ export const extensions: EncodedExtension[] = [
       component: {
         $codeRef: 'MulticlusterYAMLCreation',
       },
-      path: [`${FLEET_BASE_PATH}/cluster/:cluster/ns/:ns/${DATA_VOLUME_PATH}/~new`],
+      path: [`${FLEET_BOOTABLE_VOLUMES_PATH}/cluster/:cluster/ns/:ns/datavolume/~new`],
       perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
     type: 'console.page/route',
@@ -407,9 +412,9 @@ export const extensions: EncodedExtension[] = [
         $codeRef: 'Checkups',
       },
       path: [
-        `${FLEET_BASE_PATH}/all-clusters/all-namespaces/checkups`,
-        `${FLEET_BASE_PATH}/cluster/:cluster/all-namespaces/checkups`,
-        `${FLEET_BASE_PATH}/cluster/:cluster/ns/:ns/checkups`,
+        `${FLEET_CHECKUPS_PATH}/all-clusters/all-namespaces`,
+        `${FLEET_CHECKUPS_PATH}/cluster/:cluster/all-namespaces`,
+        `${FLEET_CHECKUPS_PATH}/cluster/:cluster/ns/:ns`,
       ],
       perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
@@ -421,7 +426,7 @@ export const extensions: EncodedExtension[] = [
       component: {
         $codeRef: 'CheckupsStorageForm',
       },
-      path: [`${FLEET_BASE_PATH}/cluster/:cluster/ns/:ns/checkups/storage/form`],
+      path: [`${FLEET_CHECKUPS_PATH}/cluster/:cluster/ns/:ns/storage/form`],
       perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
     type: 'console.page/route',
@@ -431,7 +436,7 @@ export const extensions: EncodedExtension[] = [
       component: {
         $codeRef: 'CheckupsStorageDetailsPage',
       },
-      path: ['/k8s/cluster/:cluster/ns/:ns/checkups/storage/:checkupName'],
+      path: [`${FLEET_CHECKUPS_PATH}/cluster/:cluster/ns/:ns/storage/:checkupName`],
       perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
     type: 'console.page/route',
@@ -441,7 +446,7 @@ export const extensions: EncodedExtension[] = [
       component: {
         $codeRef: 'CheckupsSelfValidationForm',
       },
-      path: ['/k8s/cluster/:cluster/ns/:ns/checkups/self-validation/form'],
+      path: [`${FLEET_CHECKUPS_PATH}/cluster/:cluster/ns/:ns/self-validation/form`],
       perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
     type: 'console.page/route',
@@ -451,7 +456,7 @@ export const extensions: EncodedExtension[] = [
       component: {
         $codeRef: 'CheckupsSelfValidationDetailsPage',
       },
-      path: ['/k8s/cluster/:cluster/ns/:ns/checkups/self-validation/:checkupName'],
+      path: [`${FLEET_CHECKUPS_PATH}/cluster/:cluster/ns/:ns/self-validation/:checkupName`],
       perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
     },
     type: 'console.page/route',

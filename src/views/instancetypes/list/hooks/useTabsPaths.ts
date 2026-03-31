@@ -3,7 +3,7 @@ import {
   VirtualMachineInstancetypeModelRef,
 } from '@kubevirt-utils/models';
 import { isAllNamespaces } from '@kubevirt-utils/utils/utils';
-import { FLEET_BASE_PATH } from '@multicluster/constants';
+import { FLEET_INSTANCETYPES_PATH } from '@multicluster/constants';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
@@ -18,8 +18,8 @@ const useTabsPaths = (): { [tabIndex: number]: string } => {
   if (isACMPage) {
     const clusterPath = cluster ? `/cluster/${cluster}/` : '/all-clusters/';
     return {
-      [CLUSTER_INSTANCETYPE_TAB_INDEX]: `${FLEET_BASE_PATH}${clusterPath}${VirtualMachineClusterInstancetypeModelRef}`,
-      [USER_INSTANCETYPE_TAB_INDEX]: `${FLEET_BASE_PATH}${clusterPath}all-namespaces/${VirtualMachineInstancetypeModelRef}`,
+      [CLUSTER_INSTANCETYPE_TAB_INDEX]: `${FLEET_INSTANCETYPES_PATH}${clusterPath}${VirtualMachineClusterInstancetypeModelRef}`,
+      [USER_INSTANCETYPE_TAB_INDEX]: `${FLEET_INSTANCETYPES_PATH}${clusterPath}all-namespaces/${VirtualMachineInstancetypeModelRef}`,
     };
   }
 

@@ -5,7 +5,7 @@ import useIsACMPage from '@multicluster/useIsACMPage';
 
 const useClusterParam = () => {
   const isACMPage = useIsACMPage();
-  const pathMatch = useMatch(`${FLEET_BASE_PATH}/cluster/:cluster/*`);
+  const pathMatch = useMatch(`${FLEET_BASE_PATH}/:page/cluster/:cluster/*`);
 
   if (!isACMPage) return null;
 

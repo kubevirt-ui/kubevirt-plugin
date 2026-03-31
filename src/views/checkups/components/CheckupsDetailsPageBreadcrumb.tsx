@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
-import { FLEET_BASE_PATH } from '@multicluster/constants';
+import { FLEET_CHECKUPS_PATH } from '@multicluster/constants';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { Breadcrumb, BreadcrumbItem, Button, ButtonVariant } from '@patternfly/react-core';
 
@@ -30,7 +30,7 @@ const CheckupsDetailsPageBreadcrumb: FC<CheckupsDetailsPageBreadcrumbProps> = ({
           onClick={() =>
             navigate(
               cluster
-                ? `${FLEET_BASE_PATH}/cluster/${cluster}/ns/${namespace}/checkups/${checkupType}`
+                ? `${FLEET_CHECKUPS_PATH}/cluster/${cluster}/ns/${namespace}/${checkupType}`
                 : `/k8s/ns/${namespace}/checkups/${checkupType}`,
             )
           }

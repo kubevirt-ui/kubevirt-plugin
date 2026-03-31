@@ -5,7 +5,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useListClusters from '@kubevirt-utils/hooks/useListClusters';
 import useListNamespaces from '@kubevirt-utils/hooks/useListNamespaces';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { FLEET_BASE_PATH } from '@multicluster/constants';
+import { FLEET_CHECKUPS_PATH } from '@multicluster/constants';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { Button, ButtonVariant, Tooltip } from '@patternfly/react-core';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
@@ -66,7 +66,7 @@ const SelfValidationCheckupRunButton: FC = () => {
 
     if (isACMpage) {
       navigate(
-        `${FLEET_BASE_PATH}/cluster/${cluster}/ns/${namespace}/checkups/${CHECKUP_URLS.SELF_VALIDATION}/form`,
+        `${FLEET_CHECKUPS_PATH}/cluster/${cluster}/ns/${namespace}/${CHECKUP_URLS.SELF_VALIDATION}/form`,
       );
     } else {
       navigate(`/k8s/ns/${namespace}/checkups/${CHECKUP_URLS.SELF_VALIDATION}/form`);
