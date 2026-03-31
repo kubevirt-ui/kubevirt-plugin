@@ -20,7 +20,11 @@ import {
   getTemplateParameterValue,
   getTemplateVirtualMachineObject,
 } from '@kubevirt-utils/resources/template';
-import { getRootDataVolumeTemplateSpec, getVolumes } from '@kubevirt-utils/resources/vm';
+import {
+  getDataVolumeTemplates,
+  getRootDataVolumeTemplateSpec,
+  getVolumes,
+} from '@kubevirt-utils/resources/vm';
 import { convertToBaseValue } from '@kubevirt-utils/utils/humanize.js';
 import { ensurePath, isEmpty, removeDockerPrefix } from '@kubevirt-utils/utils/utils';
 
@@ -70,10 +74,15 @@ const hasValidDiskSizes = (vm: V1VirtualMachine, originalTemplate: V1Template): 
     originalTemplateRootDVSpec?.spec?.storage?.resources?.requests?.storage,
   );
 
-  const currentRootDVSpec = getRootDataVolumeTemplateSpec(vm);
+  const currentRootDVSpec = getDataVolumeTemplates(vm)?.find(
+    (dv) => dv?.metadata?.name === getName(originalTemplateRootDVSpec),
+  );
   const currentDiskSize = convertToBaseValue(
     currentRootDVSpec?.spec?.storage?.resources?.requests?.storage,
   );
+
+  if (isEmpty(currentDiskSize)) return true;
+  if (isEmpty(originalTemplateDiskSize)) return true;
 
   return currentDiskSize >= originalTemplateDiskSize;
 };

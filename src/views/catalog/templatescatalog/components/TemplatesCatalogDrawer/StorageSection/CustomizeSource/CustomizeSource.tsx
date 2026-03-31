@@ -1,10 +1,10 @@
-import React, { FC, useCallback } from 'react';
+import React, { FC, useCallback, useRef } from 'react';
 
 import { V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import { V1beta1DataVolumeSpec, V1ContainerDiskSource } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { ROOTDISK } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateImportURLs } from '@kubevirt-utils/resources/template';
+import { getBootDisk } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Divider } from '@patternfly/react-core';
 
@@ -50,7 +50,8 @@ export const CustomizeSource: FC<CustomizeSourceProps> = ({ template }) => {
     vm,
   } = useDrawerContext();
 
-  const diskSource = getDiskSource(vm, ROOTDISK);
+  const bootDisk = useRef(getBootDisk(vm));
+  const diskSource = getDiskSource(vm, bootDisk.current?.name);
 
   const cdSource = getDiskSource(vm, INSTALLATION_CDROM_NAME);
 
@@ -67,7 +68,11 @@ export const CustomizeSource: FC<CustomizeSourceProps> = ({ template }) => {
         getQuantityFromSource(diskSource as V1beta1DataVolumeSpec),
       );
 
-      const vmToUpdate = overrideVirtualMachineDataVolumeSpec(newVM, blankSource);
+      const vmToUpdate = overrideVirtualMachineDataVolumeSpec(
+        newVM,
+        bootDisk.current?.name,
+        blankSource,
+      );
       setVM(vmToUpdate);
     },
     [vm, diskSource, setVM],
@@ -82,7 +87,7 @@ export const CustomizeSource: FC<CustomizeSourceProps> = ({ template }) => {
 
   const onDiskSourceChange = useCallback(
     (customSource: V1beta1DataVolumeSpec) => {
-      const newVM = overrideVirtualMachineDataVolumeSpec(vm, customSource);
+      const newVM = overrideVirtualMachineDataVolumeSpec(vm, bootDisk.current?.name, customSource);
 
       setVM(newVM);
     },
