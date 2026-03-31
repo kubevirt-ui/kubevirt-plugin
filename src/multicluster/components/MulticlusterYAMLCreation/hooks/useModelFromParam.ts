@@ -1,12 +1,13 @@
 import { useMatch } from 'react-router-dom-v5-compat';
 
+import { FLEET_BASE_PATH } from '@multicluster/constants';
 import { K8sModel, useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 import { customModels } from './constants';
 
 const useModelFromParam = (): [model: K8sModel | null, loading: boolean] => {
-  const namespacedMatch = useMatch('/k8s/cluster/:cluster/ns/:ns/:modelRef/*');
-  const clusterwideMatch = useMatch('/k8s/cluster/:cluster/:modelRef/*');
+  const namespacedMatch = useMatch(`${FLEET_BASE_PATH}/cluster/:cluster/ns/:ns/:modelRef/*`);
+  const clusterwideMatch = useMatch(`${FLEET_BASE_PATH}/cluster/:cluster/:modelRef/*`);
 
   const modelRef = namespacedMatch?.params?.modelRef || clusterwideMatch?.params?.modelRef || '';
 

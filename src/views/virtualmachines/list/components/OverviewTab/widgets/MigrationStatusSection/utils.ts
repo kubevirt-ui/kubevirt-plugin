@@ -1,5 +1,6 @@
 import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
 import { getNamespacePathSegment } from '@kubevirt-utils/utils/utils';
+import { FLEET_BASE_PATH } from '@multicluster/constants';
 
 export const MIGRATIONS_DURATION = DurationOption.ONE_DAY.toString();
 
@@ -11,10 +12,15 @@ export const buildMigrationsSpokePath = (activeNamespace: string): string => {
 };
 
 export const getMigrationsTabPath = (
-  _isACMPage: boolean,
-  _cluster: string,
+  isACMPage: boolean,
+  cluster: string,
   activeNamespace: string,
 ): string => {
   const nsPath = getNamespacePathSegment(activeNamespace);
+
+  if (isACMPage) {
+    return `${FLEET_BASE_PATH}/cluster/${cluster}/${nsPath}/${MIGRATIONS_PAGE_PATH}`;
+  }
+
   return `/k8s/${nsPath}/${MIGRATIONS_PAGE_PATH}`;
 };

@@ -12,7 +12,7 @@ import { ResourceRouteHandler } from '@stolostron/multicluster-sdk';
 
 import { VirtualMachineModel } from '../views/dashboard-extensions/utils';
 
-import { KUBEVIRT_VM_PATH } from './constants';
+import { FLEET_BASE_PATH, KUBEVIRT_VM_PATH } from './constants';
 
 /**
  * Build a full URL for a spoke cluster console page by joining the spoke's
@@ -27,9 +27,9 @@ export const buildSpokeConsoleUrl = (spokeConsoleURL: string, path: string): str
 export const isAllClusters = (cluster: string) => cluster === ALL_CLUSTERS_KEY;
 
 export const isACMPath = (pathname: string): boolean => {
-  if (pathname.startsWith('/k8s/all-clusters')) return true;
+  if (pathname.startsWith(`${FLEET_BASE_PATH}/all-clusters`)) return true;
 
-  const clusterMatch = matchPath('/k8s/cluster/:cluster/*', pathname);
+  const clusterMatch = matchPath(`${FLEET_BASE_PATH}/cluster/:cluster/*`, pathname);
   if (!clusterMatch || clusterMatch.params.cluster?.includes('~')) return false;
 
   const rest = clusterMatch.params['*'] ?? '';
@@ -37,26 +37,26 @@ export const isACMPath = (pathname: string): boolean => {
 };
 
 export const getACMVMURL = (cluster: string, namespace: string, name: string): string =>
-  `/k8s/cluster/${cluster}/ns/${namespace}/${KUBEVIRT_VM_PATH}/${name}`;
+  `${FLEET_BASE_PATH}/cluster/${cluster}/ns/${namespace}/${KUBEVIRT_VM_PATH}/${name}`;
 
 export const getACMVMListURL = (cluster?: string, namespace?: string): string => {
   if (namespace && namespace !== ALL_NAMESPACES_SESSION_KEY) {
     if (!cluster || cluster === ALL_CLUSTERS_KEY) {
-      return `/k8s/${ALL_CLUSTERS_KEY}/ns/${namespace}/${KUBEVIRT_VM_PATH}`;
+      return `${FLEET_BASE_PATH}/${ALL_CLUSTERS_KEY}/ns/${namespace}/${KUBEVIRT_VM_PATH}`;
     }
     return getACMVMListNamespacesURL(cluster, namespace);
   }
 
   return cluster && cluster !== ALL_CLUSTERS_KEY
-    ? `/k8s/cluster/${cluster}/${ALL_NAMESPACES}/${KUBEVIRT_VM_PATH}`
-    : `/k8s/${ALL_CLUSTERS_KEY}/${ALL_NAMESPACES}/${KUBEVIRT_VM_PATH}`;
+    ? `${FLEET_BASE_PATH}/cluster/${cluster}/${ALL_NAMESPACES}/${KUBEVIRT_VM_PATH}`
+    : `${FLEET_BASE_PATH}/${ALL_CLUSTERS_KEY}/${ALL_NAMESPACES}/${KUBEVIRT_VM_PATH}`;
 };
 
 export const getACMVMSearchURL = (): string =>
-  `/k8s/${ALL_CLUSTERS_KEY}/${ALL_NAMESPACES}/${KUBEVIRT_VM_PATH}/search`;
+  `${FLEET_BASE_PATH}/${ALL_CLUSTERS_KEY}/${ALL_NAMESPACES}/${KUBEVIRT_VM_PATH}/search`;
 
 export const getACMVMListNamespacesURL = (cluster: string, namespace: string): string =>
-  `/k8s/cluster/${cluster}/ns/${namespace}/${KUBEVIRT_VM_PATH}`;
+  `${FLEET_BASE_PATH}/cluster/${cluster}/ns/${namespace}/${KUBEVIRT_VM_PATH}`;
 
 // based on dns1123LabelRegexp
 const catalogWithNs = new RegExp('/ns/[-a-z0-9]+/catalog');
@@ -68,7 +68,7 @@ export const getCatalogURL = (cluster: string, namespace?: string): string => {
   const namespacePath = isAllNamespaces(namespace) ? ALL_NAMESPACES : `ns/${namespace}`;
 
   return cluster
-    ? `/k8s/cluster/${cluster}/${namespacePath}/catalog`
+    ? `${FLEET_BASE_PATH}/cluster/${cluster}/${namespacePath}/catalog`
     : `/k8s/${namespacePath}/catalog`;
 };
 
@@ -89,8 +89,10 @@ export const getConsoleStandaloneURL = (
   cluster?: string,
 ): string => {
   const commonPath = `/ns/${namespace}/${KUBEVIRT_VM_PATH}/${name}/console/standalone`;
-  const clusterPath = cluster ? `/cluster/${cluster}` : '';
-  return `/k8s${clusterPath}${commonPath}`;
+  if (cluster) {
+    return `${FLEET_BASE_PATH}/cluster/${cluster}${commonPath}`;
+  }
+  return `/k8s${commonPath}`;
 };
 
 export const getVMURL = (cluster: string, namespace: string, name: string): string =>
@@ -171,7 +173,7 @@ export const getFleetNamespacedResourceRoute: ResourceRouteHandler = ({
 }) => {
   const { group, kind, version } = model;
 
-  return `/k8s/cluster/${cluster}/ns/${namespace}/${group}~${version}~${kind}/${name}`;
+  return `${FLEET_BASE_PATH}/cluster/${cluster}/ns/${namespace}/${group}~${version}~${kind}/${name}`;
 };
 
 type GetClusterResourceRouteProps = (input: {
@@ -187,7 +189,7 @@ export const getFleetClusterResourceRoute: GetClusterResourceRouteProps = ({
 }) => {
   const { group, kind, version } = model;
 
-  return `/k8s/cluster/${cluster}/${group}~${version}~${kind}/${name}`;
+  return `${FLEET_BASE_PATH}/cluster/${cluster}/${group}~${version}~${kind}/${name}`;
 };
 
 export const getClusterResourceRoute: GetClusterResourceRouteProps = ({ cluster, model, name }) => {

@@ -1,10 +1,11 @@
 import { useMatch } from 'react-router-dom-v5-compat';
 
+import { FLEET_BASE_PATH } from '@multicluster/constants';
 import useIsACMPage from '@multicluster/useIsACMPage';
 
 const useClusterParam = () => {
   const isACMPage = useIsACMPage();
-  const pathMatch = useMatch('/k8s/cluster/:cluster/*');
+  const pathMatch = useMatch(`${FLEET_BASE_PATH}/cluster/:cluster/*`);
 
   if (!isACMPage) return null;
 

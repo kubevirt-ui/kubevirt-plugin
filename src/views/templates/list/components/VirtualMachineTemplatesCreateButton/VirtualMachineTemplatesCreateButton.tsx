@@ -6,6 +6,7 @@ import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useListNamespaces from '@kubevirt-utils/hooks/useListNamespaces';
 import useSelectedCluster from '@kubevirt-utils/hooks/useSelectedCluster';
+import { FLEET_BASE_PATH } from '@multicluster/constants';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { Button } from '@patternfly/react-core';
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
@@ -32,7 +33,7 @@ const VirtualMachineTemplatesCreateButton: FC = () => {
       onClick={() => {
         navigate(
           isACMPage
-            ? `/k8s/cluster/${cluster}/ns/${namespace}/templates/~new`
+            ? `${FLEET_BASE_PATH}/cluster/${cluster}/ns/${namespace}/templates/~new`
             : `/k8s/ns/${namespace}/templates/~new`,
         );
       }}

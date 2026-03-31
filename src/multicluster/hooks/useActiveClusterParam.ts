@@ -1,12 +1,13 @@
 import { useMatch } from 'react-router-dom-v5-compat';
 
 import { ALL_CLUSTERS_KEY } from '@kubevirt-utils/hooks/constants';
+import { FLEET_BASE_PATH } from '@multicluster/constants';
 import useIsACMPage from '@multicluster/useIsACMPage';
 
 const useActiveClusterParam = (): null | string => {
   const isACMPage = useIsACMPage();
-  const allClustersMatch = useMatch(`/k8s/${ALL_CLUSTERS_KEY}/*`);
-  const pathMatch = useMatch('/k8s/cluster/:cluster/*');
+  const allClustersMatch = useMatch(`${FLEET_BASE_PATH}/${ALL_CLUSTERS_KEY}/*`);
+  const pathMatch = useMatch(`${FLEET_BASE_PATH}/cluster/:cluster/*`);
 
   if (!isACMPage) return null;
 

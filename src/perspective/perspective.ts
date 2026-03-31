@@ -1,5 +1,6 @@
 import { ALL_CLUSTERS_KEY, ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
+import { FLEET_BASE_PATH } from '@multicluster/constants';
 import { Perspective, ResolvedExtension } from '@openshift-console/dynamic-plugin-sdk';
 
 import virtualizationIcon from './virtualization-icon';
@@ -20,4 +21,4 @@ export const getImportRedirectURL: ResolvedExtension<Perspective>['properties'][
   (namespace: string) => `/k8s/ns/${namespace}/${VirtualMachineModelRef}`;
 
 export const getACMLandingPageURL: ResolvedExtension<Perspective>['properties']['landingPageURL'] =
-  () => `/k8s/${ALL_CLUSTERS_KEY}/${ALL_NAMESPACES}/${VirtualMachineModelRef}`;
+  () => `${FLEET_BASE_PATH}/${ALL_CLUSTERS_KEY}/${ALL_NAMESPACES}/virtualization-overview`;

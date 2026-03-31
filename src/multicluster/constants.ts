@@ -2,10 +2,13 @@ import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 export const BASE_K8S_API_PATH = '/api/kubernetes';
 
+export const FLEET_BASE_PATH = '/fleet-virtualization';
+
 export const KUBEVIRT_VM_PATH = 'kubevirt.io~v1~VirtualMachine';
 
 export const FLAG_KUBEVIRT_DYNAMIC_ACM = 'KUBEVIRT_DYNAMIC_ACM';
 
+export const FLAG_KUBEVIRT_DISALLOW_DYNAMIC_ACM = 'KUBEVIRT_DISALLOW_DYNAMIC_ACM';
 export const CROSS_CLUSTER_MIGRATION_ACTION_ID = 'cross-cluster-migration';
 
 export const CONSOLE_URL_CLAIM = 'consoleurl.cluster.open-cluster-management.io';
