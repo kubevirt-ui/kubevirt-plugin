@@ -54,28 +54,41 @@ const VirtualMachineNavPage: FC = () => {
   return useMemo(
     () => (
       <SidebarEditorProvider>
-        <DocumentTitle>
-          {getResourceDetailsTitle(getName(vmToShow), 'VirtualMachine')}
-        </DocumentTitle>
+        <div className="VirtualMachineNavPage">
+          <DocumentTitle>
+            {getResourceDetailsTitle(getName(vmToShow), 'VirtualMachine')}
+          </DocumentTitle>
 
-        <VirtualMachineNavPageTitle
-          instanceTypeExpandedSpec={instanceTypeExpandedSpec}
-          isLoaded={isLoaded || !isEmpty(loadError)}
-          vm={vmToShow}
-        />
-        <div className="VirtualMachineNavPage--tabs__main">
-          <HorizontalNavbar
-            basePath={getVMURL(cluster, namespace, name)}
-            error={loadError || expandedSpecError}
+          <VirtualMachineNavPageTitle
             instanceTypeExpandedSpec={instanceTypeExpandedSpec}
-            loaded={isLoaded && !expandedSpecLoading}
-            pages={pages}
+            isLoaded={isLoaded || !isEmpty(loadError)}
             vm={vmToShow}
           />
+          <div className="VirtualMachineNavPage--tabs__main">
+            <HorizontalNavbar
+              basePath={getVMURL(cluster, namespace, name)}
+              error={loadError || expandedSpecError}
+              instanceTypeExpandedSpec={instanceTypeExpandedSpec}
+              loaded={isLoaded && !expandedSpecLoading}
+              pages={pages}
+              vm={vmToShow}
+            />
+          </div>
         </div>
       </SidebarEditorProvider>
     ),
-    [expandedSpecLoading, instanceTypeExpandedSpec, isLoaded, loadError, pages, vmToShow],
+    [
+      cluster,
+      expandedSpecError,
+      expandedSpecLoading,
+      instanceTypeExpandedSpec,
+      isLoaded,
+      loadError,
+      name,
+      namespace,
+      pages,
+      vmToShow,
+    ],
   );
 };
 

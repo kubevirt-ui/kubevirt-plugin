@@ -111,7 +111,7 @@ const VirtualMachineTreeView: FC<VirtualMachineTreeViewProps> = ({
             </DrawerPanelContent>
           }
         >
-          <DrawerContentBody style={heightStyles}>
+          <DrawerContentBody className="vms-drawer-content-body" style={heightStyles}>
             {alertMessage && (
               <Alert
                 className="co-alert co-alert-space"

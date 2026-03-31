@@ -10,6 +10,8 @@ import CustomizeITVMFooter from './components/CustomizeITVMFooter';
 import CustomizeITVMHeader from './components/CustomizeITVMHeader';
 import { getPages } from './utils/constants';
 
+import './CustomizeInstanceTypeVirtualMachine.scss';
+
 const CustomizeInstanceTypeVirtualMachine: FC = () => {
   useSignals();
   const { t } = useKubevirtTranslation();
@@ -19,7 +21,7 @@ const CustomizeInstanceTypeVirtualMachine: FC = () => {
   return (
     <Stack>
       <CustomizeITVMHeader />
-      <StackItem isFilled>
+      <StackItem className="customize-it-body" isFilled>
         <HorizontalNavbar loaded pages={pages} vm={vm} />
       </StackItem>
       <CustomizeITVMFooter />

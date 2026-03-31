@@ -4,8 +4,17 @@
   line-height: var(--pf-t--global--icon--size--font--md);
 }
 
+.VirtualMachineNavPage {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
 .VirtualMachineNavPage--tabs__main {
-  height: 90%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
 
   .co-m-page__body {
     height: 100%;

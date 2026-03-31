@@ -1,4 +1,8 @@
 .vm-wizard-body {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+
   .co-m-page__body {
     height: 100%;
   }
