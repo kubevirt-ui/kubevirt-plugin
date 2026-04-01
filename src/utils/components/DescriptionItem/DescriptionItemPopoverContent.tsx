@@ -15,6 +15,13 @@ type DescriptionItemPopoverContentProps = {
   promptType?: OLSPromptType;
 };
 
+const renderBodyContent = (bodyContent: ReactNode, hide: () => void): ReactNode => {
+  if (isValidElement(bodyContent)) {
+    return cloneElement(bodyContent as ReactElement, { hide });
+  }
+  return bodyContent;
+};
+
 const DescriptionItemPopoverContent: FC<DescriptionItemPopoverContentProps> = ({
   bodyContent,
   breadcrumb,
@@ -29,7 +36,7 @@ const DescriptionItemPopoverContent: FC<DescriptionItemPopoverContentProps> = ({
     <PopoverContentWithLightspeedButton
       content={
         <>
-          {isValidElement(bodyContent) && cloneElement(bodyContent as ReactElement, { hide })}
+          {renderBodyContent(bodyContent, hide)}
           {moreInfoURL && (
             <>
               {SPACE_SYMBOL}

@@ -12,14 +12,13 @@ import { Updater, useImmer } from 'use-immer';
 
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1DataVolumeSpec, V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  getStartingRunStrategy,
+  migrateRunningFieldToRunStrategy,
+} from '@kubevirt-utils/components/RunStrategyModal/utils';
 import { SSHSecretDetails } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import { TLS_CERT_SOURCE_EXISTING } from '@kubevirt-utils/components/TLSCertificateSection';
-import {
-  ROOTDISK,
-  RUNSTRATEGY_HALTED,
-  RUNSTRATEGY_MANUAL,
-  RUNSTRATEGY_RERUNONFAILURE,
-} from '@kubevirt-utils/constants/constants';
+import { ROOTDISK } from '@kubevirt-utils/constants/constants';
 import {
   DataUpload,
   UploadDataProps,
@@ -33,6 +32,7 @@ import {
   useVMTemplateSource,
 } from '@kubevirt-utils/resources/template';
 import useVMTemplateGeneratedParams from '@kubevirt-utils/resources/template/hooks/useVMTemplateGeneratedParams';
+import { RunStrategy } from '@kubevirt-utils/resources/vm/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { getDiskSource } from '../StorageSection/utils';
@@ -128,11 +128,8 @@ const useDrawer = (template: V1Template) => {
     const templateWithRunning = produce(templateWithGeneratedParams, (draftTemplate) => {
       const draftVM = getTemplateVirtualMachineObject(draftTemplate);
 
-      if (
-        isEmpty(draftVM?.spec?.running) &&
-        [RUNSTRATEGY_HALTED, RUNSTRATEGY_MANUAL].includes(draftVM?.spec?.runStrategy)
-      )
-        draftVM.spec.runStrategy = RUNSTRATEGY_RERUNONFAILURE;
+      migrateRunningFieldToRunStrategy(draftVM.spec);
+      draftVM.spec.runStrategy = getStartingRunStrategy(draftVM.spec.runStrategy as RunStrategy);
     });
 
     setCustomizedTemplate(templateWithRunning);

@@ -3,6 +3,7 @@ import {
   initialSysprepData,
 } from '@kubevirt-utils/components/SSHSecretModal/utils/constants';
 import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
+import { getDefaultRunningStrategy } from '@kubevirt-utils/resources/vm/utils/constants';
 
 import { InstanceTypeVMState, InstanceTypeVMStoreState } from './types';
 
@@ -24,7 +25,7 @@ export const instanceTypeVMInitialState: InstanceTypeVMState = {
 export const instanceTypeVMStoreInitialState: InstanceTypeVMStoreState = {
   instanceTypeVMState: instanceTypeVMInitialState,
   isChangingNamespace: true,
-  startVM: true,
+  runStrategy: getDefaultRunningStrategy(),
   vm: null,
   vmNamespaceTarget: '',
   volumeListNamespace: ALL_PROJECTS,

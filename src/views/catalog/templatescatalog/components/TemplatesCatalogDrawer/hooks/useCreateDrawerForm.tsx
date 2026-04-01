@@ -12,6 +12,11 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { updateCloudInitRHELSubscription } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
+import { useRunStrategyToggle } from '@kubevirt-utils/components/RunStrategyModal/useRunStrategyToggle';
+import {
+  applyRunStrategyToSpec,
+  migrateRunningFieldToRunStrategy,
+} from '@kubevirt-utils/components/RunStrategyModal/utils';
 import { SecretSelectionOption } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import {
   addSecretToVM,
@@ -19,11 +24,6 @@ import {
 } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import { getOrCreateTLSCertConfigMapName } from '@kubevirt-utils/components/TLSCertificateSection';
 import { isValidVMName } from '@kubevirt-utils/components/VMNameValidationHelperText/utils/utils';
-import {
-  RUNSTRATEGY_ALWAYS,
-  RUNSTRATEGY_HALTED,
-  RUNSTRATEGY_RERUNONFAILURE,
-} from '@kubevirt-utils/constants/constants';
 import { logTemplateFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
 import {
   CREATE_VM_BUTTON_CLICKED,
@@ -191,12 +191,7 @@ const useCreateDrawerForm = (
             obj.kind === VirtualMachineModel.kind ? vmObject : obj,
           );
 
-          if ('running' in vmObject?.spec) {
-            vmObject.spec.runStrategy = vmObject.spec.running
-              ? RUNSTRATEGY_ALWAYS
-              : RUNSTRATEGY_HALTED;
-            delete vmObject.spec.running;
-          }
+          migrateRunningFieldToRunStrategy(vmObject.spec);
 
           draftTemplate.objects = modifiedTemplateObjects;
 
@@ -298,10 +293,7 @@ const useCreateDrawerForm = (
 
         applyCertConfigMapToCDRom(vmDraft, certConfigMapNameForCD);
 
-        if ('running' in vmDraft?.spec) {
-          vmDraft.spec.runStrategy = vmDraft.spec.running ? RUNSTRATEGY_ALWAYS : RUNSTRATEGY_HALTED;
-          delete vmDraft.spec.running;
-        }
+        migrateRunningFieldToRunStrategy(vmDraft.spec);
 
         const updatedVolumes = applyCloudDriveCloudInitVolume(vmObject);
         vmDraft.spec.template.spec.volumes = isRHELTemplate(processedTemplate)
@@ -364,13 +356,11 @@ const useCreateDrawerForm = (
     setIsCustomizing(false);
   };
 
+  const { isStartChecked, onToggle: onRunStrategyToggle } = useRunStrategyToggle(vm);
+
   const onChangeStartVM = (checked: boolean) => {
-    setVM(
-      produce(vm, (draftVM) => {
-        delete draftVM.spec.running;
-        draftVM.spec.runStrategy = checked ? RUNSTRATEGY_ALWAYS : RUNSTRATEGY_HALTED;
-      }),
-    );
+    const { newStrategy } = onRunStrategyToggle(checked);
+    setVM(produce(vm, (draftVM) => applyRunStrategyToSpec(draftVM.spec, newStrategy)));
   };
 
   const onChangeFolder = (folderName: string) => {
@@ -412,10 +402,7 @@ const useCreateDrawerForm = (
     onCustomize,
     onQuickCreate,
     onVMNameChange,
-    runStrategy: vm?.spec?.runStrategy,
-    startVM:
-      vm?.spec?.runStrategy === RUNSTRATEGY_ALWAYS ||
-      vm?.spec?.runStrategy === RUNSTRATEGY_RERUNONFAILURE,
+    startVM: isStartChecked,
   };
 };
 

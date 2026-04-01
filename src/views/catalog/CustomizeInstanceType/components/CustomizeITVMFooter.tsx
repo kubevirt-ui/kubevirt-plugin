@@ -4,8 +4,9 @@ import { useNavigate } from 'react-router-dom-v5-compat';
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
+import { useRunStrategyToggle } from '@kubevirt-utils/components/RunStrategyModal/useRunStrategyToggle';
+import { getStartAfterCreationLabel } from '@kubevirt-utils/components/RunStrategyModal/utils';
 import { SecretSelectionOption } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
-import { RUNSTRATEGY_ALWAYS, RUNSTRATEGY_HALTED } from '@kubevirt-utils/constants/constants';
 import { logITFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
 import {
   CANCEL_CUSTOMIZE_VM_BUTTON_CLICKED,
@@ -48,13 +49,14 @@ const CustomizeITVMFooter: FC = () => {
   const cluster = useClusterParam();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<any | Error>(null);
-  const { instanceTypeVMState, setStartVM, startVM, vm, vmNamespaceTarget } =
-    useInstanceTypeVMStore();
+  const { instanceTypeVMState, vm, vmNamespaceTarget } = useInstanceTypeVMStore();
 
   const [isUDNManagedNamespace] = useNamespaceUDN(namespace);
   const [authorizedSSHKeys, setAuthorizedSSHKeys] = useKubevirtUserSettings('ssh');
   const { sshSecretCredentials } = instanceTypeVMState;
   const { applyKeyToProject, secretOption, sshPubKey, sshSecretName } = sshSecretCredentials || {};
+
+  const { isStartChecked, onToggle } = useRunStrategyToggle(vmSignal.value);
 
   return (
     <footer className="customize-it-vm-footer">
@@ -65,17 +67,21 @@ const CustomizeITVMFooter: FC = () => {
         <StackItem>
           <Checkbox
             onChange={(_, checked: boolean) => {
-              setStartVM(checked);
+              const { newStrategy } = onToggle(checked);
               updateCustomizeInstanceType([
                 {
-                  data: checked ? RUNSTRATEGY_ALWAYS : RUNSTRATEGY_HALTED,
+                  data: undefined,
+                  path: 'spec.running',
+                },
+                {
+                  data: newStrategy,
                   path: 'spec.runStrategy',
                 },
               ]);
             }}
             id="start-after-create-checkbox"
-            isChecked={startVM}
-            label={t('Start this VirtualMachine after creation')}
+            isChecked={isStartChecked}
+            label={getStartAfterCreationLabel(t)}
           />
         </StackItem>
         <StackItem />

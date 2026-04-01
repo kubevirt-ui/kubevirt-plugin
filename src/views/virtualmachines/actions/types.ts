@@ -18,6 +18,10 @@ export type BulkVirtualMachineActionFactory = {
     vms: V1VirtualMachine[],
     createModal: (modal: ModalComponent) => void,
   ) => ActionDropdownItemType;
+  editRunStrategy: (
+    vms: V1VirtualMachine[],
+    createModal: (modal: ModalComponent) => void,
+  ) => ActionDropdownItemType;
   migrateCompute: (
     vms: V1VirtualMachine[],
     createModal: (modal: ModalComponent) => void,

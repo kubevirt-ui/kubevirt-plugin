@@ -8,7 +8,11 @@ import {
   V1beta1VirtualMachineSnapshot,
   V1VirtualMachine,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { RUNSTRATEGY_ALWAYS } from '@kubevirt-utils/constants/constants';
+import {
+  buildRunStrategyPatches,
+  getStartingRunStrategy,
+} from '@kubevirt-utils/components/RunStrategyModal/utils';
+import { getEffectiveRunStrategy } from '@kubevirt-utils/resources/vm/utils/selectors';
 import { isVM } from '@kubevirt-utils/utils/typeGuards';
 import { getRandomChars, truncateToK8sName } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sCreate, kubevirtK8sGet } from '@multicluster/k8sRequests';
@@ -53,23 +57,10 @@ export const cloneVM = (
     draftCloneData.metadata.name = truncateToK8sName(newVMName, `${getRandomChars(6)}-cr`);
 
     if (startVM) {
-      const vmUseRunning =
-        (source as V1VirtualMachine)?.spec?.running !== undefined &&
-        (source as V1VirtualMachine)?.spec?.running !== null;
-
-      const patchForRunning = vmUseRunning
-        ? {
-            op: 'replace',
-            path: '/spec/running',
-            value: true,
-          }
-        : {
-            op: 'replace',
-            path: '/spec/runStrategy',
-            value: RUNSTRATEGY_ALWAYS,
-          };
-
-      draftCloneData.spec.patches = [JSON.stringify(patchForRunning)];
+      const sourceVM = source as V1VirtualMachine;
+      const targetRunStrategy = getStartingRunStrategy(getEffectiveRunStrategy(sourceVM));
+      const patches = buildRunStrategyPatches(sourceVM, targetRunStrategy);
+      draftCloneData.spec.patches = patches.map((p) => JSON.stringify(p));
     }
   });
 

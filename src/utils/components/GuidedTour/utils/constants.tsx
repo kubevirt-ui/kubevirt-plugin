@@ -2,8 +2,8 @@ import React from 'react';
 import { Step } from 'react-joyride';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { RUNSTRATEGY_ALWAYS } from '@kubevirt-utils/constants/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { RUNSTRATEGY_ALWAYS } from '@kubevirt-utils/resources/vm/utils/constants';
 import { TREE_VIEW_PANEL_ID } from '@virtualmachines/tree/utils/constants';
 
 import AddVolumeContent from '../components/AddVolumeContent/AddVolumeContent';

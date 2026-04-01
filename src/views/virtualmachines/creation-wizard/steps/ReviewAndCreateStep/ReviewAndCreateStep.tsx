@@ -1,9 +1,13 @@
 import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
 
-import { RUNSTRATEGY_ALWAYS, RUNSTRATEGY_HALTED } from '@kubevirt-utils/constants/constants';
+import { getStartAfterCreationLabel } from '@kubevirt-utils/components/RunStrategyModal/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
+import {
+  getDefaultRunningStrategy,
+  RUNSTRATEGY_HALTED,
+} from '@kubevirt-utils/resources/vm/utils/constants';
 import { Checkbox, Stack, StackItem, Title, TitleSizes } from '@patternfly/react-core';
 import { updateWizardVM } from '@virtualmachines/creation-wizard/state/vm-signal/utils';
 import { wizardVMSignal } from '@virtualmachines/creation-wizard/state/vm-signal/vmStore';
@@ -46,14 +50,14 @@ const ReviewAndCreateStep: FC = () => {
             setStartVM(checked);
             updateWizardVM([
               {
-                data: checked ? RUNSTRATEGY_ALWAYS : RUNSTRATEGY_HALTED,
+                data: checked ? getDefaultRunningStrategy() : RUNSTRATEGY_HALTED,
                 path: 'spec.runStrategy',
               },
             ]);
           }}
           id="start-after-create-checkbox"
           isChecked={startVM}
-          label={t('Start this VirtualMachine after creation')}
+          label={getStartAfterCreationLabel(t)}
         />
       </StackItem>
     </Stack>

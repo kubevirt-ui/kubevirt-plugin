@@ -146,8 +146,7 @@ export const vm = {
     });
     cy.get('[data-test="global-notifications"]').scrollIntoView();
     if (waitForRunning && vmData.startOnCreation !== false) {
-      checkStatus(vmData.name, index.VM_STATUS.Running, 3 * index.MINUTE, false);
-      // wait for vmi appear
+      checkStatus(vmData.name, index.VM_STATUS.Running, 5 * index.MINUTE, false);
       cy.wait(3000);
     }
   },

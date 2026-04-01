@@ -4,12 +4,9 @@ import { DRAWER_FORM_ID } from '@catalog/templatescatalog/utils/consts';
 import { getNotSupportedVMError } from '@catalog/utils/constants';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import FolderSelect from '@kubevirt-utils/components/FolderSelect/FolderSelect';
+import { getStartAfterCreationLabel } from '@kubevirt-utils/components/RunStrategyModal/utils';
 import { validateVMName } from '@kubevirt-utils/components/VMNameValidationHelperText/utils/utils';
 import VMNameValidationHelperText from '@kubevirt-utils/components/VMNameValidationHelperText/VMNameValidationHelperText';
-import {
-  RUNSTRATEGY_ALWAYS,
-  RUNSTRATEGY_RERUNONFAILURE,
-} from '@kubevirt-utils/constants/constants';
 import { TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -70,7 +67,6 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
       onCustomize,
       onQuickCreate,
       onVMNameChange,
-      runStrategy,
       startVM,
     } = useCreateDrawerForm(namespace, subscriptionData, authorizedSSHKey);
 
@@ -82,77 +78,63 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
     return (
       <Form className="template-catalog-drawer-form" id="quick-create-form">
         <Stack hasGutter>
-          <>
-            <StackItem>
-              <Split hasGutter>
-                <SplitItem className="template-catalog-drawer-form-name" isFilled>
-                  <FormGroup fieldId="vm-name-field" isRequired label={t('VirtualMachine name')}>
-                    <TextInput
-                      aria-label="virtualmachine name"
-                      data-test-id="template-catalog-vm-name-input"
-                      form={DRAWER_FORM_ID}
-                      isDisabled={Boolean(templateLoadingError)}
-                      isRequired
-                      name="vmname"
-                      onBlur={() => setVmNameTouched(true)}
-                      onChange={(_, value: string) => onVMNameChange(value)}
-                      type="text"
-                      validated={vmNameTouched ? vmNameValidated : undefined}
-                      value={nameField}
+          <StackItem>
+            <Split hasGutter>
+              <SplitItem className="template-catalog-drawer-form__name" isFilled>
+                <FormGroup fieldId="vm-name-field" isRequired label={t('VirtualMachine name')}>
+                  <TextInput
+                    aria-label="virtualmachine name"
+                    data-test-id="template-catalog-vm-name-input"
+                    form={DRAWER_FORM_ID}
+                    isDisabled={Boolean(templateLoadingError)}
+                    isRequired
+                    name="vmname"
+                    onBlur={() => setVmNameTouched(true)}
+                    onChange={(_, value: string) => onVMNameChange(value)}
+                    type="text"
+                    validated={vmNameTouched ? vmNameValidated : undefined}
+                    value={nameField}
+                  />
+                </FormGroup>
+                <VMNameValidationHelperText touched={vmNameTouched} vmName={nameField} />
+              </SplitItem>
+              {treeViewFoldersEnabled && (
+                <SplitItem>
+                  <FormGroup fieldId="vm-folder-field" label={t('Folder')}>
+                    <FolderSelect
+                      setSelectedFolder={(newFolder) => {
+                        onChangeFolder(newFolder);
+                      }}
+                      cluster={cluster}
+                      namespace={namespace}
+                      selectedFolder={folder}
                     />
                   </FormGroup>
-                  <VMNameValidationHelperText touched={vmNameTouched} vmName={nameField} />
                 </SplitItem>
-                {treeViewFoldersEnabled && (
-                  <SplitItem>
-                    <FormGroup fieldId="vm-folder-field" label={t('Folder')}>
-                      <FolderSelect
-                        setSelectedFolder={(newFolder) => {
-                          onChangeFolder(newFolder);
-                        }}
-                        cluster={cluster}
-                        namespace={namespace}
-                        selectedFolder={folder}
-                      />
-                    </FormGroup>
-                  </SplitItem>
-                )}
+              )}
+              <SplitItem>
+                <DescriptionList>
+                  <DescriptionItem descriptionData={namespace} descriptionHeader={t('Project')} />
+                </DescriptionList>
+              </SplitItem>
+              {isACMPage && (
                 <SplitItem>
                   <DescriptionList>
-                    <DescriptionItem descriptionData={namespace} descriptionHeader={t('Project')} />
+                    <DescriptionItem descriptionData={cluster} descriptionHeader={t('Cluster')} />
                   </DescriptionList>
                 </SplitItem>
-                {isACMPage && (
-                  <SplitItem>
-                    <DescriptionList>
-                      <DescriptionItem descriptionData={cluster} descriptionHeader={t('Cluster')} />
-                    </DescriptionList>
-                  </SplitItem>
-                )}
-                <AuthorizedSSHKey authorizedSSHKey={authorizedSSHKey} namespace={namespace} />
-              </Split>
-            </StackItem>
-            <StackItem />
-            <StackItem>
-              <Checkbox
-                isChecked={
-                  startVM ||
-                  runStrategy === RUNSTRATEGY_ALWAYS ||
-                  runStrategy === RUNSTRATEGY_RERUNONFAILURE
-                }
-                label={
-                  runStrategy
-                    ? t('Start this VirtualMachine after creation ({{runStrategy}})', {
-                        runStrategy,
-                      })
-                    : t('Start this VirtualMachine after creation')
-                }
-                id="start-after-create-checkbox"
-                onChange={(_, checked: boolean) => onChangeStartVM(checked)}
-              />
-            </StackItem>
-          </>
-          <StackItem />
+              )}
+              <AuthorizedSSHKey authorizedSSHKey={authorizedSSHKey} namespace={namespace} />
+            </Split>
+          </StackItem>
+          <StackItem>
+            <Checkbox
+              id="start-after-create-checkbox"
+              isChecked={startVM}
+              label={getStartAfterCreationLabel(t)}
+              onChange={(_, checked: boolean) => onChangeStartVM(checked)}
+            />
+          </StackItem>
           {error && (
             <StackItem>
               <Alert isInline title={t('Quick create error')} variant={AlertVariant.danger}>

@@ -35,6 +35,7 @@ export const getDetailsTabHardwareIds: SearchItemGetter = (vm) => [
 ];
 
 export const getDetailsTabMainIds: SearchItemGetter = (vm) => [
+  { id: 'deletion-protection', title: t('Deletion protection') },
   { id: 'guest-system-log-access', title: t('Guest system log access') },
   { id: 'headless-mode', title: t('Headless mode') },
   { id: 'hostname', title: t('Hostname') },
@@ -63,6 +64,7 @@ export const getSchedulingTabIds: SearchItemGetter = () => [
   { id: 'descheduler', title: t('Descheduler') },
   { id: 'dedicated-resources', title: t('Dedicated resources') },
   { id: 'eviction-strategy', title: t('Eviction strategy') },
+  { id: 'run-strategy', title: t('Run strategy') },
 ];
 
 export const getSSHTabIds: SearchItemGetter = () => [

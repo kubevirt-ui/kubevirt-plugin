@@ -24,7 +24,7 @@ const useGeneratedVM = () => {
   const { featureEnabled: autoUpdateEnabled } = useFeatures(AUTOMATIC_UPDATE_FEATURE_NAME);
 
   const { subscriptionData } = useRHELAutomaticSubscription();
-  const { instanceTypeVMState, startVM, vmNamespaceTarget } = useInstanceTypeVMStore();
+  const { instanceTypeVMState, runStrategy, vmNamespaceTarget } = useInstanceTypeVMStore();
 
   const namespace = useActiveNamespace();
   const [isUDNManagedNamespace] = useNamespaceUDN(getValidNamespace(namespace));
@@ -39,7 +39,7 @@ const useGeneratedVM = () => {
         enableMultiArchBootImageImport,
         instanceTypeState: instanceTypeVMState,
         isUDNManagedNamespace,
-        startVM,
+        runStrategy,
         subscriptionData,
         targetNamespace: vmNamespaceTarget,
       }),
@@ -49,7 +49,7 @@ const useGeneratedVM = () => {
       enableMultiArchBootImageImport,
       instanceTypeVMState,
       isUDNManagedNamespace,
-      startVM,
+      runStrategy,
       subscriptionData,
       vmNamespaceTarget,
     ],

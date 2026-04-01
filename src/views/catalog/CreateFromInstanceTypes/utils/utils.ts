@@ -17,11 +17,7 @@ import { InterfaceTypes } from '@kubevirt-utils/components/DiskModal/utils/types
 import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
 import { addSecretToVM } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import { sysprepDisk, sysprepVolume } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
-import {
-  ROOTDISK,
-  RUNSTRATEGY_ALWAYS,
-  RUNSTRATEGY_HALTED,
-} from '@kubevirt-utils/constants/constants';
+import { ROOTDISK } from '@kubevirt-utils/constants/constants';
 import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
 import {
   isBootableVolumeISO,
@@ -38,6 +34,7 @@ import { OS_NAME_TYPES, OS_NAME_TYPES_NOT_SUPPORTED } from '@kubevirt-utils/reso
 import {
   DEFAULT_NETWORK,
   DEFAULT_NETWORK_INTERFACE,
+  RunStrategy,
   UDN_BINDING_NAME,
 } from '@kubevirt-utils/resources/vm/utils/constants';
 import { OS_WINDOWS_PREFIX } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
@@ -108,7 +105,7 @@ type GenerateVMArgs = {
   enableMultiArchBootImageImport?: boolean;
   instanceTypeState: InstanceTypeVMState;
   isUDNManagedNamespace: boolean;
-  startVM: boolean;
+  runStrategy: RunStrategy;
   subscriptionData: RHELAutomaticSubscriptionData;
   targetNamespace: string;
 };
@@ -120,7 +117,7 @@ export const generateVM: GenerateVMCallback = ({
   enableMultiArchBootImageImport,
   instanceTypeState,
   isUDNManagedNamespace,
-  startVM,
+  runStrategy,
   subscriptionData,
   targetNamespace,
 }) => {
@@ -207,7 +204,7 @@ export const generateVM: GenerateVMCallback = ({
         name: selectedPreference,
         ...(selectPreferenceKind && { kind: selectPreferenceKind }),
       },
-      runStrategy: startVM ? RUNSTRATEGY_ALWAYS : RUNSTRATEGY_HALTED,
+      runStrategy,
       template: {
         metadata: {
           labels: {},
