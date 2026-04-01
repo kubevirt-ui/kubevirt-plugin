@@ -10,6 +10,7 @@ import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalPr
 import MoveBulkVMToFolderModal from '@kubevirt-utils/components/MoveVMToFolderModal/MoveBulkVMsToFolderModal';
 import BulkSnapshotModal from '@kubevirt-utils/components/SnapshotModal/BulkSnapshotModal';
 import SnapshotModal from '@kubevirt-utils/components/SnapshotModal/SnapshotModal';
+import { MultiNamespaceVirtualMachineStorageMigrationPlanModel } from '@kubevirt-utils/models';
 import {
   getLabels,
   getNamespace,
@@ -173,10 +174,11 @@ export const createBulkVirtualMachineActionFactory = (
     createModal: (modal: ModalComponent) => void,
   ): ActionDropdownItemType => ({
     accessReview: {
-      group: VirtualMachineModel.apiGroup,
-      namespace: getNamespace(vms?.[0]),
-      resource: VirtualMachineModel.plural,
-      verb: 'patch',
+      cluster: getCluster(vms?.[0]),
+      group: MultiNamespaceVirtualMachineStorageMigrationPlanModel.apiGroup,
+      namespace: vms?.[0]?.metadata?.namespace,
+      resource: MultiNamespaceVirtualMachineStorageMigrationPlanModel.plural,
+      verb: 'create',
     },
     cta: () => createModal((props) => <VirtualMachineMigrateModal vms={vms} {...props} />),
     description: t('Migrate VirtualMachine storage to a different StorageClass'),

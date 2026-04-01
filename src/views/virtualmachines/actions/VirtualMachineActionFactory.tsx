@@ -224,11 +224,13 @@ export const createVirtualMachineActionFactory = (t: TFunction) => ({
     createModal: (modal: ModalComponent) => void,
   ): ActionDropdownItemType => {
     return {
-      accessReview: asAccessReview(
-        MultiNamespaceVirtualMachineStorageMigrationPlanModel,
-        vm,
-        'create',
-      ),
+      accessReview: {
+        cluster: getCluster(vm),
+        group: MultiNamespaceVirtualMachineStorageMigrationPlanModel.apiGroup,
+        namespace: vm?.metadata?.namespace,
+        resource: MultiNamespaceVirtualMachineStorageMigrationPlanModel.plural,
+        verb: 'create',
+      },
       cta: () => createModal((props) => <VirtualMachineMigrateModal vms={[vm]} {...props} />),
       description: t('Migrate VirtualMachine storage to a different StorageClass'),
       disabledTooltip: getNoPermissionTooltipContent(t),
