@@ -13,7 +13,7 @@ import { isVM } from '@kubevirt-utils/utils/typeGuards';
 import { truncateToK8sName } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { getVMURL } from '@multicluster/urls';
-import { ModalVariant } from '@patternfly/react-core';
+import { FormGroup, ModalVariant, Radio } from '@patternfly/react-core';
 
 import CloningStatus from './components/CloningStatus';
 import ConfigurationSummary from './components/ConfigurationSummary';
@@ -21,7 +21,7 @@ import NameInput from './components/NameInput';
 import SnapshotContentConfigurationSummary from './components/SnapshotContentConfigurationSummary';
 import StartClonedVMCheckbox from './components/StartClonedVMCheckbox/StartClonedVMCheckbox';
 import useCloneVMModal from './hooks/useCloneVMModal';
-import { CLONING_STATUSES } from './utils/constants';
+import { CLONING_STATUSES, VolumeNamePolicy } from './utils/constants';
 import { cloneVM, vmExists } from './utils/helpers';
 
 type CloneVMModalProps = {
@@ -44,6 +44,9 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
   const [startCloneVM, setStartCloneVM] = useState(false);
 
   const [initialCloneRequest, setInitialCloneRequest] = useState<V1beta1VirtualMachineClone>();
+  const [volumeNamePolicy, setVolumeNamePolicy] = useState<VolumeNamePolicy>(
+    VolumeNamePolicy.RandomizeNames,
+  );
 
   const sendCloneRequest = async () => {
     const vmSameName = await vmExists(cloneName, namespace, getCluster(source));
@@ -52,7 +55,7 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
       throw new Error(t('VirtualMachine with this name already exists'));
     }
 
-    const request = await cloneVM(source, cloneName, namespace, startCloneVM);
+    const request = await cloneVM(source, cloneName, namespace, startCloneVM, volumeNamePolicy);
 
     setInitialCloneRequest(request);
   };
@@ -87,6 +90,29 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
     >
       <NameInput autoFocus name={cloneName} setName={setCloneName} />
       <StartClonedVMCheckbox setStartCloneVM={setStartCloneVM} startCloneVM={startCloneVM} />
+      <FormGroup
+        fieldId="volume-name-policy"
+        isStack
+        label={t('Volume name policy')}
+        role="radiogroup"
+      >
+        <Radio
+          description={t('Cloned volumes will receive randomized PVC names.')}
+          id="randomize-names"
+          isChecked={volumeNamePolicy === VolumeNamePolicy.RandomizeNames}
+          label={t('Randomize names (default)')}
+          name="volume-name-policy"
+          onChange={() => setVolumeNamePolicy(VolumeNamePolicy.RandomizeNames)}
+        />
+        <Radio
+          description={t('Cloned volumes will use the target VM name as a prefix for PVC names.')}
+          id="prefix-target-name"
+          isChecked={volumeNamePolicy === VolumeNamePolicy.PrefixTargetName}
+          label={t('Prefix target name')}
+          name="volume-name-policy"
+          onChange={() => setVolumeNamePolicy(VolumeNamePolicy.PrefixTargetName)}
+        />
+      </FormGroup>
       {isVM(source) ? (
         <ConfigurationSummary vm={source} />
       ) : (

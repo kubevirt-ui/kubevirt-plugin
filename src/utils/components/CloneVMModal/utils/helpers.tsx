@@ -38,6 +38,7 @@ export const cloneVM = (
   newVMName: string,
   namespace: string,
   startVM?: boolean,
+  volumeNamePolicy?: string,
 ) => {
   const cloningRequest = produce(cloneVMToVM, (draftCloneData) => {
     draftCloneData.spec.source = {
@@ -51,6 +52,10 @@ export const cloneVM = (
     draftCloneData.metadata.namespace = namespace;
 
     draftCloneData.metadata.name = truncateToK8sName(newVMName, `${getRandomChars(6)}-cr`);
+
+    if (volumeNamePolicy) {
+      draftCloneData.spec.volumeNamePolicy = volumeNamePolicy;
+    }
 
     if (startVM) {
       const vmUseRunning =
