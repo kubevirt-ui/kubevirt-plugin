@@ -68,7 +68,7 @@ const TLSCertificateSection: FC<TLSCertificateSectionProps> = ({
           />
         </StackItem>
         {tlsRequired && (
-          <StackItem style={{ marginLeft: 'var(--pf-v5-global--spacer--md)' }}>
+          <StackItem style={{ marginInlineStart: 'var(--pf-t--global--spacer--md)' }}>
             <Stack hasGutter>
               <StackItem>
                 <Flex direction={{ default: 'row' }} gap={{ default: 'gapLg' }}>
