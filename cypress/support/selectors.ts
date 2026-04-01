@@ -59,7 +59,7 @@ Cypress.Commands.add('byTestOperatorRow', (selector: string, options?: object) =
 );
 Cypress.Commands.add('clickNavLink', (path: [string, string?]) => {
   cy.byTestID('nav', { timeout: 10 * SECOND })
-    .contains(path[0], { timeout: 10 * SECOND })
+    .containsExactMatch(path[0], { timeout: 10 * SECOND })
     .should(($el) => {
       if ($el.attr('aria-expanded') == 'false') {
         $el.click();

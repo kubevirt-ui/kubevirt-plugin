@@ -73,6 +73,7 @@ export const VirtualMachineSubresourcesModel: K8sModel = {
   kind: 'VirtualMachine',
   label: 'VirtualMachine',
   labelPlural: 'VirtualMachines',
+  namespaced: true,
   plural: 'virtualmachines',
 };
 
@@ -83,5 +84,54 @@ export const VirtualMachineInstanceSubresourcesModel: K8sModel = {
   kind: 'VirtualMachineInstance',
   label: 'VirtualMachineInstance',
   labelPlural: 'VirtualMachineInstances',
+  namespaced: true,
   plural: 'virtualmachineinstances',
+};
+
+export const VirtualMachineStorageMigrationPlanModel: K8sModel = {
+  abbr: 'VMSM',
+  apiGroup: 'migrations.kubevirt.io',
+  apiVersion: 'v1alpha1',
+  crd: true,
+  kind: 'VirtualMachineStorageMigrationPlan',
+  label: 'VirtualMachineStorageMigrationPlan',
+  labelPlural: 'VirtualMachineStorageMigrationPlans',
+  namespaced: true,
+  plural: 'virtualmachinestoragemigrationplans',
+};
+
+export const VirtualMachineStorageMigrationModel: K8sModel = {
+  abbr: 'VMSM',
+  apiGroup: 'migrations.kubevirt.io',
+  apiVersion: 'v1alpha1',
+  crd: true,
+  kind: 'VirtualMachineStorageMigration',
+  label: 'VirtualMachineStorageMigration',
+  labelPlural: 'VirtualMachineStorageMigrations',
+  namespaced: true,
+  plural: 'virtualmachinestoragemigrations',
+};
+
+export const MultiNamespaceVirtualMachineStorageMigrationPlanModel: K8sModel = {
+  abbr: 'MNSM',
+  apiGroup: 'migrations.kubevirt.io',
+  apiVersion: 'v1alpha1',
+  crd: true,
+  kind: 'MultiNamespaceVirtualMachineStorageMigrationPlan',
+  label: 'MultiNamespaceVirtualMachineStorageMigrationPlan',
+  labelPlural: 'MultiNamespaceVirtualMachineStorageMigrationPlans',
+  namespaced: true,
+  plural: 'multinamespacevirtualmachinestoragemigrationplans',
+};
+
+export const MultiNamespaceVirtualMachineStorageMigrationModel: K8sModel = {
+  abbr: 'MNSM',
+  apiGroup: 'migrations.kubevirt.io',
+  apiVersion: 'v1alpha1',
+  crd: true,
+  kind: 'MultiNamespaceVirtualMachineStorageMigration',
+  label: 'MultiNamespaceVirtualMachineStorageMigration',
+  labelPlural: 'MultiNamespaceVirtualMachineStorageMigrations',
+  namespaced: true,
+  plural: 'multinamespacevirtualmachinestoragemigrations',
 };

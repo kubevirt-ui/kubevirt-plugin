@@ -8,7 +8,7 @@ import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal'
 import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import MoveBulkVMToFolderModal from '@kubevirt-utils/components/MoveVMToFolderModal/MoveBulkVMsToFolderModal';
 import { getLabels, getNamespace } from '@kubevirt-utils/resources/shared';
-import { getNoPermissionTooltipContent, isEmpty } from '@kubevirt-utils/utils/utils';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import CrossClusterMigration from '@multicluster/components/CrossClusterMigration/CrossClusterMigration';
 import { CROSS_CLUSTER_MIGRATION_ACTION_ID } from '@multicluster/constants';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
@@ -19,7 +19,7 @@ import ConfirmMultipleVMActionsModal from './components/ConfirmMultipleVMActions
 import VirtualMachineMigrateModal from './components/VirtualMachineMigration/VirtualMachineMigrationModal';
 import { ACTIONS_ID } from './hooks/constants';
 import { deleteVM, pauseVM, restartVM, startVM, stopVM, unpauseVM } from './actions';
-import { getCommonLabels, getLabelsDiffPatch, isSameNamespace } from './utils';
+import { getCommonLabels, getLabelsDiffPatch, isSameCluster, isSameNamespace } from './utils';
 
 export const createBulkVirtualMachineActionFactory = (t: TFunction) => ({
   crossClusterMigration: (
@@ -96,7 +96,6 @@ export const createBulkVirtualMachineActionFactory = (t: TFunction) => ({
   migrateStorage: (
     vms: V1VirtualMachine[],
     createModal: (modal: ModalComponent) => void,
-    mtcInstalled: boolean,
   ): ActionDropdownItemType => ({
     accessReview: {
       group: VirtualMachineModel.apiGroup,
@@ -106,12 +105,6 @@ export const createBulkVirtualMachineActionFactory = (t: TFunction) => ({
     },
     cta: () => createModal((props) => <VirtualMachineMigrateModal vms={vms} {...props} />),
     description: t('Migrate VirtualMachine storage to a different StorageClass'),
-    disabled: !mtcInstalled,
-    disabledTooltip: mtcInstalled
-      ? getNoPermissionTooltipContent(t)
-      : t(
-          'MTC Operator must be installed and a MigrationController must be created to enable storage migration',
-        ),
     id: 'vms-bulk-migrate-storage',
     label: t('Migrate storage'),
   }),
@@ -147,7 +140,7 @@ export const createBulkVirtualMachineActionFactory = (t: TFunction) => ({
           vms={vms}
         />
       )),
-    disabled: !isSameNamespace(vms) || isEmpty(vms),
+    disabled: !isSameCluster(vms) || !isSameNamespace(vms) || isEmpty(vms),
     id: ACTIONS_ID.MOVE_TO_FOLDER,
     label: t('Move to folder'),
   }),

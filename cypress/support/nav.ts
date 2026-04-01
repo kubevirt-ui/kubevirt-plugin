@@ -119,12 +119,12 @@ Cypress.Commands.add('visitCheckupsVirt', () => {
 
 Cypress.Commands.add('visitPVC', () => {
   cy.get('[data-quickstart-id="qs-nav-storage"]', { timeout: MINUTE }).scrollIntoView();
-  cy.contains('Storage').should('be.visible');
+  cy.containsExactMatch('Storage').should('be.visible');
   cy.clickNavLink(['Storage', 'PersistentVolumeClaims']);
 });
 
 Cypress.Commands.add('visitStorageclass', () => {
   cy.get('[data-quickstart-id="qs-nav-storage"]', { timeout: MINUTE }).scrollIntoView();
-  cy.contains('Storage').should('be.visible');
+  cy.containsExactMatch('Storage').should('be.visible');
   cy.clickNavLink(['Storage', 'StorageClasses']);
 });
