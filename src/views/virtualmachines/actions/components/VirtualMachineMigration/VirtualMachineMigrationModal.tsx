@@ -7,6 +7,7 @@ import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
 import useDefaultStorageClass from '@kubevirt-utils/hooks/useDefaultStorage/useDefaultStorageClass';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useReadyStorageClasses from '@kubevirt-utils/hooks/useReadyStorageClasses/useReadyStorageClasses';
+import { getPVCStorageClassName } from '@kubevirt-utils/resources/bootableresources/selectors';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { isDNS1123Label } from '@kubevirt-utils/utils/validation';
@@ -98,7 +99,7 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
       Array.from(
         new Set(
           selectedMigrations?.map(
-            (migration) => migration.pvc?.spec?.storageClassName || defaultStorageClassName,
+            (migration) => getPVCStorageClassName(migration.pvc) || defaultStorageClassName,
           ),
         ),
       ),
@@ -108,10 +109,12 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
   const isSameStorageClass = useMemo(
     () =>
       !!destinationStorageClass &&
-      vmStorageClassNames.length > 0 &&
+      !isEmpty(vmStorageClassNames) &&
       vmStorageClassNames.every((sc) => sc === destinationStorageClass),
     [destinationStorageClass, vmStorageClassNames],
   );
+
+  const isDestinationStepInvalid = isDetailsStepInvalid || isSameStorageClass;
 
   return (
     <Modal
@@ -164,7 +167,7 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
               </WizardStep>
               <WizardStep
                 footer={{
-                  isNextDisabled: isSameStorageClass,
+                  isNextDisabled: isDestinationStepInvalid,
                 }}
                 id="wizard-migrate-destination"
                 isDisabled={isDetailsStepInvalid}
@@ -188,7 +191,7 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
                   nextButtonText: t('Migrate VirtualMachine storage'),
                 }}
                 id="wizard-migrate-review"
-                isDisabled={isDetailsStepInvalid || isSameStorageClass}
+                isDisabled={isDestinationStepInvalid}
                 name={t('Review')}
               >
                 <VirtualMachineMigrationReviewTab
