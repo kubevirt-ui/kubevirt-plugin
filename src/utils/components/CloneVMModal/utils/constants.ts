@@ -11,6 +11,11 @@ export enum CLONING_STATUSES {
   UNKNOWN = 'Unknown',
 }
 
+export enum VolumeNamePolicy {
+  PrefixTargetName = 'PrefixTargetName',
+  RandomizeNames = 'RandomizeNames',
+}
+
 export const STATUS_TO_PROGRESS_VARIANT = {
   CreatingTargetVM: ProgressStepVariant.info,
   Failed: ProgressStepVariant.danger,

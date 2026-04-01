@@ -86,6 +86,16 @@ const RestoreModal: FC<RestoreModalProps> = ({ isOpen, onClose, snapshot }) => {
               name="volume-restore-policy"
               onChange={() => setVolumeRestorePolicy(VolumeRestorePolicy.InPlace)}
             />
+            <Radio
+              description={t(
+                'Restored volumes will use the target VM name as a prefix for PVC names.',
+              )}
+              id="prefix-target-name"
+              isChecked={volumeRestorePolicy === VolumeRestorePolicy.PrefixTargetName}
+              label={t('Prefix target name')}
+              name="volume-restore-policy"
+              onChange={() => setVolumeRestorePolicy(VolumeRestorePolicy.PrefixTargetName)}
+            />
           </FormGroup>
         </StackItem>
       </Stack>
