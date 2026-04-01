@@ -9,6 +9,7 @@ import { Wizard, WizardHeader, WizardStep } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
 import { wizardVMSignal } from '@virtualmachines/creation-wizard/state/vm-signal/vmStore';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
+import CloneSourceStep from '@virtualmachines/creation-wizard/steps/CloneSourceStep/CloneSourceStep';
 import CustomizationStep from '@virtualmachines/creation-wizard/steps/CustomizationStep/CustomizationStep';
 import BootSourceStep from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/BootSourceStep/BootSourceStep';
 import ComputeResourcesStep from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/ComputeResourcesStep/ComputeResourcesStep';
@@ -49,6 +50,7 @@ const VMCreationWizard: FC = () => {
   const wizardFooterProps = getWizardFooterProps(t);
 
   const isInstanceTypeMethod = creationMethod === VMCreationMethod.INSTANCE_TYPE;
+  const isCloneMethod = creationMethod === VMCreationMethod.CLONE;
 
   const vmListURL = getVMListURL(clusterParam, ns);
 
@@ -94,6 +96,9 @@ const VMCreationWizard: FC = () => {
         name={t('Compute resources')}
       >
         <ComputeResourcesStep />
+      </WizardStep>
+      <WizardStep id="vm-creation-clone-step" isHidden={!isCloneMethod} name={t('Source')}>
+        <CloneSourceStep />
       </WizardStep>
       <WizardStep
         footer={wizardFooterProps}
