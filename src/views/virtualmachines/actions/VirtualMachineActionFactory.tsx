@@ -15,8 +15,8 @@ import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal'
 import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SnapshotModal from '@kubevirt-utils/components/SnapshotModal/SnapshotModal';
 import {
+  MultiNamespaceVirtualMachineStorageMigrationPlanModel,
   VirtualMachineInstanceSubresourcesModel,
-  VirtualMachineStorageMigrationPlanModel,
   VirtualMachineSubresourcesModel,
 } from '@kubevirt-utils/models';
 import { asAccessReview, getName, getNamespace } from '@kubevirt-utils/resources/shared';
@@ -224,7 +224,11 @@ export const createVirtualMachineActionFactory = (t: TFunction) => ({
     createModal: (modal: ModalComponent) => void,
   ): ActionDropdownItemType => {
     return {
-      accessReview: asAccessReview(VirtualMachineStorageMigrationPlanModel, vm, 'create'),
+      accessReview: asAccessReview(
+        MultiNamespaceVirtualMachineStorageMigrationPlanModel,
+        vm,
+        'create',
+      ),
       cta: () => createModal((props) => <VirtualMachineMigrateModal vms={[vm]} {...props} />),
       description: t('Migrate VirtualMachine storage to a different StorageClass'),
       disabledTooltip: getNoPermissionTooltipContent(t),
