@@ -7,7 +7,7 @@ import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useSelectedCluster from '@kubevirt-utils/hooks/useSelectedCluster';
 import useCanCreateBootableVolume from '@kubevirt-utils/resources/bootableresources/hooks/useCanCreateBootableVolume';
-import { FLEET_BOOTABLE_VOLUMES_PATH } from '@multicluster/constants';
+import { getFleetBootableVolumesURL } from '@multicluster/urls';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { ListPageCreateDropdown } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -37,7 +37,7 @@ const BootableVolumeAddButton: FC<BootableVolumeAddButtonProps> = ({ buttonText,
       ? createModal((props) => <AddBootableVolumeModal {...props} />)
       : navigate(
           isACMPage
-            ? `${FLEET_BOOTABLE_VOLUMES_PATH}/cluster/${selectedCluster}/ns/${selectedNamespace}/~new`
+            ? `${getFleetBootableVolumesURL(selectedCluster, selectedNamespace)}/~new`
             : `/k8s/ns/${selectedNamespace}/bootablevolumes/~new`,
         );
   };

@@ -36,6 +36,7 @@ const VirtualMachineNavigator: FC = () => {
 
   const isACMVMListPage =
     matchPath(`${FLEET_VIRTUAL_MACHINES_PATH}/all-clusters/all-namespaces`, location.pathname) ||
+    matchPath(`${FLEET_VIRTUAL_MACHINES_PATH}/all-clusters/ns/:ns`, location.pathname) ||
     matchPath(
       `${FLEET_VIRTUAL_MACHINES_PATH}/cluster/:cluster/all-namespaces`,
       location.pathname,

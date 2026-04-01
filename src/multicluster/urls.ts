@@ -1,5 +1,6 @@
 import { matchPath } from 'react-router-dom-v5-compat';
 
+import { VirtualMachineModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   ALL_CLUSTERS_KEY,
   ALL_NAMESPACES,
@@ -18,7 +19,6 @@ import {
   FLEET_CATALOG_PATH,
   FLEET_CHECKUPS_PATH,
   FLEET_MIGRATION_POLICIES_PATH,
-  FLEET_OVERVIEW_PATH,
   FLEET_TEMPLATES_PATH,
   FLEET_VIRTUAL_MACHINES_PATH,
 } from './constants';
@@ -206,14 +206,6 @@ export const getClusterResourceRoute: GetClusterResourceRouteProps = ({ cluster,
 const getFleetPagePathForModel = (model: ExtensionK8sModel): string =>
   `${FLEET_BASE_PATH}/${model.group}~${model.version}~${model.kind}`;
 
-export const getFleetOverviewURL = (cluster?: string, namespace?: string): string => {
-  if (!cluster || cluster === ALL_CLUSTERS_KEY) {
-    return `${FLEET_OVERVIEW_PATH}/${ALL_CLUSTERS_KEY}/${ALL_NAMESPACES}`;
-  }
-  const namespacePath = isAllNamespaces(namespace) ? ALL_NAMESPACES : `ns/${namespace}`;
-  return `${FLEET_OVERVIEW_PATH}/cluster/${cluster}/${namespacePath}`;
-};
-
 export const getFleetCheckupsURL = (cluster: string, namespace: string): string =>
   `${FLEET_CHECKUPS_PATH}/cluster/${cluster}/ns/${namespace}`;
 
@@ -230,10 +222,9 @@ export const getFleetMigrationPoliciesListURL = (cluster?: string): string => {
   return `${FLEET_MIGRATION_POLICIES_PATH}/cluster/${cluster}`;
 };
 
-export const getFleetMigrationsTabPath = (cluster: string, activeNamespace: string): string => {
-  const nsPath = isAllNamespaces(activeNamespace) ? ALL_NAMESPACES : `ns/${activeNamespace}`;
-  return `${FLEET_OVERVIEW_PATH}/cluster/${cluster}/${nsPath}/migrations`;
-};
+export const isVMDetailsPage = (pathname: string): boolean =>
+  !!matchPath(`${FLEET_VIRTUAL_MACHINES_PATH}/cluster/:cluster/ns/:ns/:name`, pathname) ||
+  !!matchPath(`/k8s/ns/:ns/${VirtualMachineModelRef}/:name`, pathname);
 
 /**
  * Extract the cluster param from a fleet-virtualization URL.

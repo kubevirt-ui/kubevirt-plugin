@@ -20,7 +20,6 @@ import {
   FLEET_INSTANCETYPES_PATH,
   FLEET_MIGRATION_POLICIES_PATH,
   FLEET_NS_INSTANCETYPES_PATH,
-  FLEET_OVERVIEW_PATH,
   FLEET_TEMPLATES_PATH,
   FLEET_VIRTUAL_MACHINES_PATH,
 } from './constants';
@@ -183,6 +182,7 @@ export const extensions: EncodedExtension[] = [
         `${FLEET_VIRTUAL_MACHINES_PATH}/cluster/:cluster/ns/:ns/:name`,
         `${FLEET_VIRTUAL_MACHINES_PATH}/cluster/:cluster/ns/:ns`,
         `${FLEET_VIRTUAL_MACHINES_PATH}/cluster/:cluster/all-namespaces`,
+        `${FLEET_VIRTUAL_MACHINES_PATH}/all-clusters/ns/:ns`,
         `${FLEET_VIRTUAL_MACHINES_PATH}/all-clusters/all-namespaces`,
       ],
       perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
@@ -261,20 +261,6 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'acm.virtualmachine/action',
   } as EncodedExtension<ACMVirtualMachineAction>,
-  {
-    properties: {
-      component: {
-        $codeRef: 'ClusterOverviewPage',
-      },
-      path: [
-        `${FLEET_OVERVIEW_PATH}/all-clusters/all-namespaces`,
-        `${FLEET_OVERVIEW_PATH}/cluster/:cluster/ns/:ns`,
-        `${FLEET_OVERVIEW_PATH}/cluster/:cluster/all-namespaces`,
-      ],
-      perspective: PERSPECTIVES.FLEET_VIRTUALIZATION,
-    },
-    type: 'console.page/route',
-  } as EncodedExtension<RoutePage>,
   {
     properties: {
       component: {

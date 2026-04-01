@@ -10,8 +10,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useSelectedCluster from '@kubevirt-utils/hooks/useSelectedCluster';
 import { getLabels, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import { FLEET_BOOTABLE_VOLUMES_PATH } from '@multicluster/constants';
 import { kubevirtK8sCreate, kubevirtK8sDelete } from '@multicluster/k8sRequests';
+import { getFleetBootableVolumesURL } from '@multicluster/urls';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { K8sResourceCommon, ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -58,7 +58,7 @@ const BootableVolumeYAMLPage: FC = () => {
   const cluster = isACMPage ? selectedCluster : undefined;
 
   const bootableVolumesListURL = isACMPage
-    ? `${FLEET_BOOTABLE_VOLUMES_PATH}/cluster/${selectedCluster}/ns/${selectedNamespace}`
+    ? getFleetBootableVolumesURL(selectedCluster, selectedNamespace)
     : `/k8s/ns/${selectedNamespace}/bootablevolumes`;
 
   const onSave = async (yaml: string) => {
