@@ -2040,6 +2040,7 @@
   "The RHACM Observability Operator is currently disabled on this cluster and is preventing this view from showing <1>[{disabledClusters[0]}]</1> data.": "The RHACM Observability Operator is currently disabled on this cluster and is preventing this view from showing <1>[{disabledClusters[0]}]</1> data.",
   "The SCSI reservation for disk makes the disk attached to the VirtualMachine as a SCSI LUN. This option should only be used for cluster-aware applications": "磁盘的 SCSI 保留使磁盘作为一个 SCSI LUN 附加到 VirtualMachine。这个选项只用于支持集群的应用程序",
   "The selected Node is unavailable. You can retry selecting a different one.": "所选节点不可用。您可以重新尝试一个不同的节点。",
+  "The selected target StorageClass is the same as the source. Select a different StorageClass to proceed with the migration.": "The selected target StorageClass is the same as the source. Select a different StorageClass to proceed with the migration.",
   "The selected VM will start immediately.": "The selected VM will start immediately.",
   "The self validation checkup requires cluster-admin access.": "自我验证检查需要 cluster-admin 访问权限。",
   "The system is configured to decommission the source volumes once the migration is verified healthy to prevent 'zombie storage'. Check this if you want to manually verify and remove the old disks later.": "The system is configured to decommission the source volumes once the migration is verified healthy to prevent 'zombie storage'. Check this if you want to manually verify and remove the old disks later.",
