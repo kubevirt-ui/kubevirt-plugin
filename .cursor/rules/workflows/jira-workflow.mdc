@@ -11,35 +11,83 @@ This workflow covers Jira MCP operations. For the full development workflow (tic
 
 ---
 
-## 1. Finding Tickets
+## 1. MCP Provider Detection
+
+Two MCP servers can interact with Jira. Detect which is available and use it:
+
+| Provider | Server ID | How to Detect |
+|----------|-----------|---------------|
+| **Atlassian Plugin** | `plugin-atlassian-atlassian` | Tools named `getJiraIssue`, `createJiraIssue`, etc. Requires `cloudId`. |
+| **Jira MCP** | (standalone Jira MCP) | Tools named `jira_get_issue`, `jira_create_issue`, etc. No `cloudId` needed. |
+
+### Atlassian Plugin: Getting the `cloudId`
+
+Most Atlassian Plugin tools require a `cloudId`. To obtain it:
+
+1. **From a URL** — If the user provides a link like `https://issues.redhat.com/browse/CNV-12345`, pass the site hostname (`issues.redhat.com`) as `cloudId`.
+2. **Fallback** — If that fails, call `getAccessibleAtlassianResources` (no parameters) to list available sites and their cloud IDs.
+
+### Tool Name Mapping
+
+| Operation | Jira MCP | Atlassian Plugin |
+|-----------|----------|------------------|
+| Search issues (JQL) | `jira_search` | `searchJiraIssuesUsingJql` |
+| Get issue details | `jira_get_issue` | `getJiraIssue` |
+| Create issue | `jira_create_issue` | `createJiraIssue` |
+| Add comment | `jira_add_comment` | `addCommentToJiraIssue` |
+| Transition status | `jira_transition_issue` | `transitionJiraIssue` |
+| Log work | `jira_add_worklog` | `addWorklogToJiraIssue` |
+| Update fields | `jira_update_issue` | `editJiraIssue` |
+| Get sprint issues | `jira_get_sprint_issues` | `searchJiraIssuesUsingJql` (with sprint JQL) |
+| Get transitions | — | `getTransitionsForJiraIssue` |
+| Search (natural language) | — | `searchAtlassian` |
+
+### Parameter Name Mapping
+
+| Concept | Jira MCP param | Atlassian Plugin param |
+|---------|----------------|------------------------|
+| Issue key | `issue_key` | `issueIdOrKey` |
+| Project | `project_key` | `projectKey` |
+| Issue type | `issue_type` | `issueTypeName` |
+| JQL query | `jql` | `jql` |
+| Description | `description` | `description` |
+| Extra fields | `additional_fields` | `additional_fields` |
+| Content format | — | `contentFormat` (`"markdown"` or `"adf"`) |
+| Response format | — | `responseContentFormat` (`"markdown"` or `"adf"`) |
+
+> **Tip**: When using Atlassian Plugin, always pass `contentFormat: "markdown"` and `responseContentFormat: "markdown"` for readable results.
+
+---
+
+## 2. Finding Tickets
 
 **Get My Assigned Tickets**
 ```
 "Show my assigned tickets"
 ```
-→ Uses `jira_search` with JQL: `assignee = currentUser() AND status != Done`
+→ JQL: `assignee = currentUser() AND status != Done`
 
 **Get Current Sprint Tickets**
 ```
 "Show current sprint tickets"
 ```
-→ Uses `jira_get_sprint_issues`
+→ JQL: `assignee = currentUser() AND sprint in openSprints()`
 
 **Search for Specific Tickets**
 ```
 "Find open bugs in CNV project"
 ```
-→ Uses `jira_search` with appropriate JQL
+→ JQL with appropriate filters
 
 **Get Ticket Details**
 ```
 "Get details for CNV-12345"
 ```
-→ Uses `jira_get_issue`
+→ Fetch single issue by key
 
 ---
 
-## 2. Common JQL Queries
+## 3. Common JQL Queries
 
 ### By Status
 ```jql
@@ -68,32 +116,36 @@ labels = ui AND project = CNV
 component = "Virtual Machines" AND status != Done
 ```
 
+### Sprint Queries
+```jql
+sprint in openSprints() AND project = CNV
+sprint in openSprints() AND assignee = currentUser()
+```
+
 ---
 
-## 3. Updating Tickets
+## 4. Updating Tickets
 
 **Add a Comment**
 ```
 "Add comment to CNV-12345: Started investigating the issue"
 ```
-→ Uses `jira_add_comment`
 
 **Update Status**
 ```
 "Move CNV-12345 to Code Review"
 "Mark CNV-12345 as blocked"
 ```
-→ Uses `jira_transition_issue`
+→ With Atlassian Plugin: call `getTransitionsForJiraIssue` first to get valid transition IDs, then `transitionJiraIssue` with the transition ID.
 
 **Log Work**
 ```
 "Log 2 hours on CNV-12345"
 ```
-→ Uses `jira_add_worklog`
 
 ---
 
-## 4. Ticket Analysis
+## 5. Ticket Analysis
 
 When fetching a ticket, analyze:
 
@@ -107,7 +159,7 @@ When fetching a ticket, analyze:
 
 ---
 
-## 5. Creating Bugs
+## 6. Creating Bugs
 
 Invoke with: *"create a bug"*, *"file a bug for ..."*, *"report a bug"*
 
@@ -117,12 +169,14 @@ All bugs in this project must be created in the **CNV** project with the **CNV U
 
 ### Required Fields
 
-| Field | Value |
-|-------|-------|
-| `project_key` | `CNV` |
-| `issue_type` | `Bug` |
-| `additional_fields.labels` | `["CNV User Interface"]` |
-| `additional_fields.fixVersions` | Always set to the **latest** CNV version |
+| Field | Jira MCP | Atlassian Plugin |
+|-------|----------|------------------|
+| Project | `project_key: "CNV"` | `projectKey: "CNV"` |
+| Type | `issue_type: "Bug"` | `issueTypeName: "Bug"` |
+| Labels | `additional_fields.labels: ["CNV User Interface"]` | `additional_fields.labels: [{"name": "CNV User Interface"}]` |
+| Fix version | `additional_fields.fixVersions` | `additional_fields.fixVersions` |
+
+Always set `fixVersions` to the **latest** CNV version.
 
 ### Description Template
 
@@ -160,7 +214,7 @@ Additional info:
 {additional}
 ```
 
-### Example MCP Call
+### Example: Jira MCP
 
 ```
 jira_create_issue:
@@ -174,64 +228,78 @@ jira_create_issue:
     Description of problem:
 
     The "Save" button on the settings page is not clickable after changing a value.
+    ...
+```
 
-    Version-Release number of selected component (if applicable):
+### Example: Atlassian Plugin
 
-    CNV 4.21.1-77
+```
+createJiraIssue:
+  cloudId: "issues.redhat.com"
+  projectKey: "CNV"
+  summary: "Button X is not clickable on the settings page"
+  issueTypeName: "Bug"
+  contentFormat: "markdown"
+  additional_fields:
+    labels: [{"name": "CNV User Interface"}]
+    fixVersions: [{"name": "CNV 4.22.0"}]
+  description: |
+    Description of problem:
 
-    How reproducible:
-
-    Always
-
-    Steps to Reproduce:
-
-    1. Go to Virtualization → Settings
-    2. Change any value
-    3. Click "Save"
-
-    Actual results:
-
-    Nothing happens when clicking the button.
-
-    Expected results:
-
-    The settings should be saved and a success notification should appear.
-
-    Additional info:
-
-    Console shows no errors. Tested on Chrome and Firefox.
+    The "Save" button on the settings page is not clickable after changing a value.
+    ...
 ```
 
 ### Workflow
 
 1. Ask the user for the bug summary and details (or extract from context)
 2. Fill in the template fields — leave sections as empty space if not provided
-3. Create the issue with `jira_create_issue` using project `CNV`, type `Bug`, and label `CNV User Interface`
+3. Create the issue using whichever MCP provider is available
 4. Return the created ticket key and URL to the user
 
 ---
 
-## 6. MCP Tool Reference
+## 7. MCP Tool Reference
+
+### Jira MCP Tools
 
 | Tool | Purpose |
 |------|---------|
 | `jira_search` | Find tickets with JQL |
 | `jira_get_issue` | Get ticket details |
-| `jira_create_issue` | Create new issues (bugs, stories, etc.) |
+| `jira_create_issue` | Create new issues |
 | `jira_add_comment` | Add comments |
 | `jira_transition_issue` | Change status |
 | `jira_add_worklog` | Log time |
 | `jira_update_issue` | Update fields |
 | `jira_get_sprint_issues` | Get sprint issues |
 
+### Atlassian Plugin Tools (Jira)
+
+| Tool | Purpose |
+|------|---------|
+| `searchJiraIssuesUsingJql` | Find tickets with JQL (requires `cloudId`, `jql`) |
+| `getJiraIssue` | Get ticket details (requires `cloudId`, `issueIdOrKey`) |
+| `createJiraIssue` | Create new issues (requires `cloudId`, `projectKey`, `issueTypeName`, `summary`) |
+| `addCommentToJiraIssue` | Add comments (requires `cloudId`, `issueIdOrKey`, `commentBody`) |
+| `transitionJiraIssue` | Change status (requires `cloudId`, `issueIdOrKey`, `transition.id`) |
+| `addWorklogToJiraIssue` | Log time (requires `cloudId`, `issueIdOrKey`, `timeSpent`) |
+| `editJiraIssue` | Update fields (requires `cloudId`, `issueIdOrKey`, `fields`) |
+| `getTransitionsForJiraIssue` | List available transitions (requires `cloudId`, `issueIdOrKey`) |
+| `searchAtlassian` | Natural-language search across Jira and Confluence |
+| `atlassianUserInfo` | Get current authenticated user info |
+| `getAccessibleAtlassianResources` | List accessible sites / get `cloudId` |
+
 Tools are called automatically when you make requests. Just describe what you want in natural language.
 
 ---
 
-## 7. Tips
+## 8. Tips
 
 - Be specific: "Show bugs assigned to me" vs "show issues"
 - Use project codes: "CNV-12345" not just "12345"
 - Check ticket comments before starting work
 - Add comments when starting/finishing work
 - Document blockers in ticket comments
+- When using Atlassian Plugin, prefer `contentFormat: "markdown"` for readable descriptions
+- When transitioning issues via Atlassian Plugin, always call `getTransitionsForJiraIssue` first to discover valid transition IDs
