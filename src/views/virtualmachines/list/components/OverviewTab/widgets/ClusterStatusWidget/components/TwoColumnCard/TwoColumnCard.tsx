@@ -1,48 +1,13 @@
-import React, { CSSProperties, FC, ReactNode } from 'react';
+import React, { CSSProperties, FC } from 'react';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
-import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Card, CardBody, CardHeader, CardTitle } from '@patternfly/react-core';
 
-import StatusScoreList, { StatusScoreItem } from '../../../shared/StatusScoreList/StatusScoreList';
-import { SeverityCount } from '../../hooks/clusterMetricConstants';
-
-import LoadingSkeleton from './LoadingSkeleton';
-import SeverityCountList from './SeverityCountList';
+import TwoColumnCardBody from './TwoColumnCardBody';
+import { TwoColumnCardProps } from './types';
 
 import './TwoColumnCard.scss';
-
-type TwoColumnCardProps = {
-  /** Additional content below the left column */
-  bottomLeftContent?: ReactNode;
-  /** Column ratio override (CSS grid-template-columns) */
-  gridColumns?: string;
-  /** Actions rendered in the card header (e.g. "View all" link) */
-  headerActions?: ReactNode;
-  /** Help popover body text */
-  helpContent?: string;
-  /** Whether the data is still loading */
-  isLoading?: boolean;
-  /** Items for the right-column StatusScoreList */
-  items: StatusScoreItem[];
-  /** Override the left column entirely (e.g. for a chart) */
-  leftContent?: ReactNode;
-  /** Header label for the name column in StatusScoreList */
-  nameHeader: string;
-  /** Prompt type for lightspeed */
-  olsPromptType?: OLSPromptType;
-  /** Optional title displayed above the right column */
-  rightTitle?: string;
-  /** Header label for the score column in StatusScoreList */
-  scoreHeader: string;
-  /** Severity counts for the default left column */
-  severityCounts?: SeverityCount[];
-  /** Label for severity count items (defaults to "clusters") */
-  severityItemLabel?: string;
-  /** Card title */
-  title: string;
-};
 
 const TwoColumnCard: FC<TwoColumnCardProps> = ({
   bottomLeftContent,
@@ -53,6 +18,7 @@ const TwoColumnCard: FC<TwoColumnCardProps> = ({
   items,
   leftContent,
   nameHeader,
+  noDataMessage,
   olsPromptType,
   rightTitle,
   scoreHeader,
@@ -96,25 +62,19 @@ const TwoColumnCard: FC<TwoColumnCardProps> = ({
         </CardTitle>
       </CardHeader>
       <CardBody>
-        {!isLoading ? (
-          <div className="two-column-card__layout" style={style}>
-            <div className="two-column-card__left">
-              {leftContent ?? (
-                <SeverityCountList
-                  itemLabel={severityItemLabel}
-                  severityCounts={severityCounts ?? []}
-                />
-              )}
-              {bottomLeftContent}
-            </div>
-            <div className="two-column-card__right">
-              {rightTitle && <div className="two-column-card__right-title">{rightTitle}</div>}
-              <StatusScoreList items={items} nameHeader={nameHeader} scoreHeader={scoreHeader} />
-            </div>
-          </div>
-        ) : (
-          <LoadingSkeleton />
-        )}
+        <TwoColumnCardBody
+          bottomLeftContent={bottomLeftContent}
+          isLoading={isLoading}
+          items={items}
+          leftContent={leftContent}
+          nameHeader={nameHeader}
+          noDataMessage={noDataMessage}
+          rightTitle={rightTitle}
+          scoreHeader={scoreHeader}
+          severityCounts={severityCounts}
+          severityItemLabel={severityItemLabel}
+          style={style}
+        />
       </CardBody>
     </Card>
   );

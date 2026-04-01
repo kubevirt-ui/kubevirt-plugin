@@ -1,17 +1,14 @@
 import React, { FC, useMemo } from 'react';
 
-import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import useInfrastructureAlerts from '@kubevirt-utils/hooks/useInfrastructureAlerts/useInfrastructureAlerts';
 import { useKubevirtClusterServiceVersion } from '@kubevirt-utils/hooks/useKubevirtClusterServiceVersion';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { HealthState } from '@openshift-console/dynamic-plugin-sdk';
 import { healthStateMapping } from '@overview/OverviewTab/status-card/utils/utils';
-import { Card, CardBody, CardHeader, CardTitle, Grid, Skeleton } from '@patternfly/react-core';
-
-import StatusCountItem from '../shared/StatusCountItem';
+import { Card, CardBody, CardHeader, CardTitle, Skeleton } from '@patternfly/react-core';
 
 import { getUpdateAvailableActions } from './getUpdateAvailableActions';
-import MultiClusterHealthStatus from './MultiClusterHealthStatus';
+import OpenShiftVirtualizationWidgetBody from './OpenShiftVirtualizationWidgetBody';
 import { useCNVHealth } from './useCNVHealth';
 import { useCNVUpdate } from './useCNVUpdate';
 import { getHealthStateToMessage, NBSP } from './utils';
@@ -21,11 +18,13 @@ import './OpenShiftVirtualizationWidget.scss';
 type OpenShiftVirtualizationWidgetProps = {
   cluster?: string;
   isAllClustersPage?: boolean;
+  metricsUnavailable?: boolean;
 };
 
 const OpenShiftVirtualizationWidget: FC<OpenShiftVirtualizationWidgetProps> = ({
   cluster,
   isAllClustersPage,
+  metricsUnavailable,
 }) => {
   const { t } = useKubevirtTranslation();
   const {
@@ -85,37 +84,20 @@ const OpenShiftVirtualizationWidget: FC<OpenShiftVirtualizationWidgetProps> = ({
       </CardHeader>
       <CardBody>
         <div className="openshift-virtualization-widget__subtitle">{subtitleContent}</div>
-        {(healthError || csvError) && <ErrorAlert error={healthError || csvError} />}
-        {!healthError && !csvError && (
-          <Grid className="openshift-virtualization-widget__body-grid" hasGutter>
-            {isAllClustersPage && (
-              <MultiClusterHealthStatus
-                criticalClusters={criticalClusters}
-                criticalCount={criticalCount}
-                degradedClusters={degradedClusters}
-                degradedCount={degradedCount}
-                isLoading={isLoading}
-              />
-            )}
-            {!isAllClustersPage && (
-              <>
-                <StatusCountItem
-                  icon={statusIcon}
-                  isLoading={isLoading}
-                  label={t('Status')}
-                  span={6}
-                  statusMessage={statusMessage}
-                />
-                <StatusCountItem
-                  count={numberOfAlerts}
-                  isLoading={isLoading}
-                  label={t('Alerts')}
-                  span={6}
-                />
-              </>
-            )}
-          </Grid>
-        )}
+        <OpenShiftVirtualizationWidgetBody
+          criticalClusters={criticalClusters}
+          criticalCount={criticalCount}
+          csvError={csvError}
+          degradedClusters={degradedClusters}
+          degradedCount={degradedCount}
+          healthError={healthError}
+          isAllClustersPage={isAllClustersPage}
+          isLoading={isLoading}
+          metricsUnavailable={metricsUnavailable}
+          numberOfAlerts={numberOfAlerts}
+          statusIcon={statusIcon}
+          statusMessage={statusMessage}
+        />
       </CardBody>
     </Card>
   );

@@ -2,6 +2,7 @@ import React, { FC, useMemo } from 'react';
 
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { useClusterObservabilityDisabled } from '@kubevirt-utils/hooks/useAlerts/utils/useClusterObservabilityDisabled';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
@@ -11,6 +12,7 @@ import { useSignals } from '@preact/signals-react/runtime';
 import { AdvancedSearchFilter, useHubClusterName } from '@stolostron/multicluster-sdk';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 
+import OverviewAlerts from './components/OverviewAlerts';
 import useFolderFilter from './hooks/useFolderFilter';
 import { determineOverviewLevel, getOverviewConfig } from './config';
 import { OverviewTabProps } from './types';
@@ -22,6 +24,13 @@ const OverviewTab: FC<OverviewTabProps> = ({ cluster, namespace }) => {
   const isMultiCluster = useIsAllClustersPage();
   const isACMPage = useIsACMPage();
   const [hubClusterName, hubClusterLoaded] = useHubClusterName();
+
+  const {
+    disabledClusters,
+    error: observabilityError,
+    loaded: observabilityLoaded,
+    mcoInstalled,
+  } = useClusterObservabilityDisabled(true);
 
   const isManagedClusterFetch =
     isACMPage && !!cluster && hubClusterLoaded && hubClusterName !== cluster;
@@ -57,14 +66,20 @@ const OverviewTab: FC<OverviewTabProps> = ({ cluster, namespace }) => {
 
   const config = useMemo(() => getOverviewConfig(overviewLevel, t), [overviewLevel, t]);
 
+  const isManagedClusterDisabled = isManagedClusterFetch && disabledClusters.includes(cluster);
+
+  const metricsUnavailable =
+    isACMPage && observabilityLoaded && (!mcoInstalled || isManagedClusterDisabled);
+
   const sectionData = useMemo(
     () => ({
       cluster,
+      metricsUnavailable,
       namespace,
       vmNames,
       vms: filteredVMs,
     }),
-    [cluster, namespace, filteredVMs, vmNames],
+    [cluster, metricsUnavailable, namespace, filteredVMs, vmNames],
   );
 
   if (vmsError) {
@@ -87,9 +102,21 @@ const OverviewTab: FC<OverviewTabProps> = ({ cluster, namespace }) => {
     );
   }
 
+  const hasNoVMs = vms?.length === 0;
+
   return (
     <PageSection>
       <Stack hasGutter>
+        <OverviewAlerts
+          cluster={cluster}
+          disabledClusters={disabledClusters}
+          hasNoVMs={hasNoVMs}
+          isAllClustersPage={isMultiCluster}
+          mcoInstalled={mcoInstalled}
+          namespace={namespace}
+          observabilityError={observabilityError}
+          observabilityLoaded={observabilityLoaded}
+        />
         {config.sections.map(({ Component, id, subHeader, title }) => (
           <Component key={id} {...sectionData} subHeader={subHeader} title={title} />
         ))}

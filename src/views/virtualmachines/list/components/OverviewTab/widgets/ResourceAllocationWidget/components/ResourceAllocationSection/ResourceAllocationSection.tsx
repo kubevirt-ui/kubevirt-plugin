@@ -1,9 +1,12 @@
 import React, { FC, useMemo, useState } from 'react';
 
+import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getNoDataAvailableMessage } from '@kubevirt-utils/utils/utils';
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
 import { METRICS } from '@overview/OverviewTab/metric-charts-card/utils/constants';
 import useMetricChartData from '@overview/OverviewTab/metric-charts-card/utils/hooks/useMetricChartData';
+import { Bullseye, Card, CardBody } from '@patternfly/react-core';
 
 import { determineOverviewLevel } from '../../../../config';
 import { GRID_FOUR_EQUAL, OVERVIEW_LEVEL_PROJECT, OverviewSectionData } from '../../../../types';
@@ -17,7 +20,12 @@ import ResourceAllocationSubHeader from '../ResourceAllocationSubHeader/Resource
 
 import { getWidgetConfigs, WidgetDataMap } from './resourceAllocationSectionConfig';
 
-const ResourceAllocationSection: FC<OverviewSectionData> = ({ namespace, title, vmNames }) => {
+const ResourceAllocationSection: FC<OverviewSectionData> = ({
+  metricsUnavailable,
+  namespace,
+  title,
+  vmNames,
+}) => {
   const { t } = useKubevirtTranslation();
   const isAllClusters = useIsAllClustersPage();
   const isProjectLevel =
@@ -97,6 +105,20 @@ const ResourceAllocationSection: FC<OverviewSectionData> = ({ namespace, title, 
       widgetConfigs={widgetConfigs}
     />
   );
+
+  if (metricsUnavailable) {
+    return (
+      <OverviewSection dataTestId="resource-allocation-section" title={title}>
+        <Card isCompact>
+          <CardBody className="pf-v6-u-pb-lg">
+            <Bullseye>
+              <MutedTextSpan text={getNoDataAvailableMessage(t)} />
+            </Bullseye>
+          </CardBody>
+        </Card>
+      </OverviewSection>
+    );
+  }
 
   return (
     <OverviewSection dataTestId="resource-allocation-section" subHeader={subHeader} title={title}>
