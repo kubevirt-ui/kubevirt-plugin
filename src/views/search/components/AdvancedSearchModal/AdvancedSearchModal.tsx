@@ -19,6 +19,7 @@ import {
 } from '@patternfly/react-core';
 import { buildContextSearchInputs } from '@search/utils/query';
 import { useAccessibleResources } from '@virtualmachines/search/hooks/useAccessibleResources';
+import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 import { AdvancedSearchInputs, AdvancedSearchQueryInputs } from '../../utils/types';
 
@@ -40,7 +41,11 @@ import ProjectField from './formFields/ProjectField';
 import SchedulingField from './formFields/SchedulingField';
 import StatusField from './formFields/StatusField';
 import StorageClassField from './formFields/StorageClassField';
-import { useAdvancedSearchActions, useIsSearchDisabled } from './store/useAdvancedSearchStore';
+import {
+  useAdvancedSearchActions,
+  useAdvancedSearchField,
+  useIsSearchDisabled,
+} from './store/useAdvancedSearchStore';
 
 import './advanced-search-modal.scss';
 
@@ -57,8 +62,12 @@ const AdvancedSearchModal: FC<AdvancedSearchModalProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
+  const { value: selectedClusters } = useAdvancedSearchField(VirtualMachineRowFilterType.Cluster);
+
   const { resources: vms } = useAccessibleResources<V1VirtualMachine>(
     VirtualMachineModelGroupVersionKind,
+    undefined,
+    selectedClusters,
   );
   const namespace = useNamespaceParam();
   const cluster = useClusterParam();
@@ -99,7 +108,7 @@ const AdvancedSearchModal: FC<AdvancedSearchModalProps> = ({
             <Form isHorizontal>
               <NameField />
               {isACMPage && <ClusterField />}
-              <ProjectField />
+              <ProjectField vms={vms} />
               <DescriptionField />
               <StatusField />
               <OperatingSystemField />

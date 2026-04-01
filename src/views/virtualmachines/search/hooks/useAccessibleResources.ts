@@ -8,24 +8,27 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { K8sGroupVersionKind, useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
-import { useHubClusterName } from '@stolostron/multicluster-sdk';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils/constants';
 
-type UseAccessibleResources<T> = {
+type UseAccessibleResources = <T extends K8sResourceCommon>(
+  groupVersionKind: K8sGroupVersionKind,
+  filterOptions?: KubevirtDataPodFilters,
+  /* Clusters to fetch resources from. If not provided, the cluster param will be used. */
+  clusters?: string[],
+) => {
   loaded: boolean;
   loadError?: any;
   resources: T[];
 };
 
-export const useAccessibleResources = <T>(
+export const useAccessibleResources: UseAccessibleResources = <T>(
   groupVersionKind: K8sGroupVersionKind,
   filterOptions?: KubevirtDataPodFilters,
-): UseAccessibleResources<T> => {
+  clusters?: string[],
+) => {
   const isAdmin = useIsAdmin();
   const isACMPage = useIsACMPage();
   const cluster = useClusterParam();
-  const [hubClusterName] = useHubClusterName();
-  const isManagedClusterFetch = isACMPage && cluster && hubClusterName !== cluster;
   const [projectNames, projectNamesLoaded, projectNamesError] = useProjects();
 
   const loadPerNamespace = !isACMPage && projectNamesLoaded && !isAdmin;
@@ -34,14 +37,14 @@ export const useAccessibleResources = <T>(
   const [allResources, allResourcesLoaded] = useKubevirtWatchResource<T[]>(
     shouldFetchClusterWide
       ? {
-          cluster: !isManagedClusterFetch ? cluster : undefined,
+          cluster: clusters ? undefined : cluster,
           groupVersionKind,
           isList: true,
           limit: OBJECTS_FETCHING_LIMIT,
         }
       : null,
     filterOptions,
-    isManagedClusterFetch ? [{ property: 'cluster', values: [cluster] }] : null,
+    clusters ? [{ property: 'cluster', values: clusters }] : null,
   );
 
   const allowedResources = useK8sWatchResources<{ [key: string]: T[] }>(
