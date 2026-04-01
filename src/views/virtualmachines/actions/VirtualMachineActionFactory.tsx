@@ -196,7 +196,9 @@ export const createVirtualMachineActionFactory = (t: TFunction) => ({
       accessReview: asAccessReview(VirtualMachineStorageMigrationPlanModel, vm, 'create'),
       cta: () => createModal((props) => <VirtualMachineMigrateModal vms={[vm]} {...props} />),
       description: t('Migrate VirtualMachine storage to a different StorageClass'),
-      id: 'vm-migrate-storage',
+      disabled: !isRunning(vm),
+      disabledTooltip: t('Storage migration is only available for running VirtualMachines'),
+      id: 'vm-action-migrate-storage',
       label: t('Storage'),
     };
   },
