@@ -8,6 +8,8 @@ import { MAX_MTU } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VLAN_MODE_ACCESS } from '@kubevirt-utils/resources/udn/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import {
   Alert,
   Checkbox,
@@ -99,8 +101,14 @@ const NetworkDefinition: FC = () => {
       <FormGroup
         labelHelp={
           <HelpTextIcon
-            bodyContent={t(
-              'The largest size of a data packet, in bytes, that can be transmitted across this network. It is critical that the entire underlying physical network infrastructure also supports the same or larger MTU size to avoid packet fragmentation and connectivity issues.',
+            bodyContent={(hide) => (
+              <PopoverContentWithLightspeedButton
+                content={t(
+                  'The largest size of a data packet, in bytes, that can be transmitted across this network. It is critical that the entire underlying physical network infrastructure also supports the same or larger MTU size to avoid packet fragmentation and connectivity issues.',
+                )}
+                hide={hide}
+                promptType={OLSPromptType.MTU}
+              />
             )}
             headerContent={t('Maximum Transmission Unit (MTU)')}
           />
@@ -146,8 +154,14 @@ const NetworkDefinition: FC = () => {
               />
               <SplitItem>
                 <HelpTextIcon
-                  bodyContent={t(
-                    "Tags the virtual machine's network traffic with a specific VLAN ID (IEEE 802.1Q) to isolate it within a designated virtual network on the physical LAN.",
+                  bodyContent={(hide) => (
+                    <PopoverContentWithLightspeedButton
+                      content={t(
+                        "Tags the virtual machine's network traffic with a specific VLAN ID (IEEE 802.1Q) to isolate it within a designated virtual network on the physical LAN.",
+                      )}
+                      hide={hide}
+                      promptType={OLSPromptType.VLAN_TAGGING}
+                    />
                   )}
                   headerContent={t('VLAN tagging')}
                 />

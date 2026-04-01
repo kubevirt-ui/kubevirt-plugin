@@ -7,6 +7,7 @@ import {
   CalculationMethod,
 } from '@kubevirt-utils/resources/quotas/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Flex, Stack } from '@patternfly/react-core';
 
 import useAAQCalculationMethod from '../../hooks/useAAQCalculationMethod';
@@ -51,6 +52,7 @@ const QuotaFormResourceLimitFields: FC<QuotaFormResourceLimitFieldsProps> = ({
                 )
           }
           placeholder={t('i.e., 8')}
+          promptType={hasPodOverhead ? OLSPromptType.CPU_ALLOCATION : OLSPromptType.VCPU_ALLOCATION}
           resourceKey={cpu}
           resourceLimitLabel={hasPodOverhead ? t('CPU allocation') : t('vCPU allocation')}
           setValue={(value) => updateHardValue(cpu, value)}
@@ -58,6 +60,11 @@ const QuotaFormResourceLimitFields: FC<QuotaFormResourceLimitFieldsProps> = ({
           value={cpuLimit}
         />
         <QuotaFormResourceLimitInput
+          promptType={
+            hasPodOverhead
+              ? OLSPromptType.MEMORY_ALLOCATION
+              : OLSPromptType.VIRTUAL_MEMORY_ALLOCATION
+          }
           resourceLimitLabel={
             hasPodOverhead ? t('Memory allocation') : t('Virtual memory allocation')
           }
@@ -81,6 +88,7 @@ const QuotaFormResourceLimitFields: FC<QuotaFormResourceLimitFieldsProps> = ({
             'The maximum number of actively running virtual machine instances permitted in this project.',
           )}
           placeholder={t('i.e., 4')}
+          promptType={OLSPromptType.VMI_LIMITS}
           resourceKey={vmiCount}
           resourceLimitLabel={t('VMI limits')}
           setValue={(value) => updateHardValue(vmiCount, value)}

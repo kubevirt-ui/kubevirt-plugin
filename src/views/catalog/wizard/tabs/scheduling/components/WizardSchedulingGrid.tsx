@@ -14,7 +14,6 @@ import NodeSelectorModal from '@kubevirt-utils/components/NodeSelectorModal/Node
 import TolerationsModal from '@kubevirt-utils/components/TolerationsModal/TolerationsModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getEvictionStrategy } from '@kubevirt-utils/resources/vm';
-import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
@@ -108,15 +107,10 @@ const WizardSchedulingGrid: FC<WizardSchedulingGridProps> = ({ updateVM, vm }) =
 
           <WizardDescriptionItem
             helperPopover={{
-              content: (hide) => (
-                <PopoverContentWithLightspeedButton
-                  content={<DeschedulerPopover />}
-                  hide={hide}
-                  obj={vm}
-                  promptType={OLSPromptType.DESCHEDULER}
-                />
-              ),
+              content: <DeschedulerPopover />,
               header: t('Descheduler'),
+              olsObj: vm,
+              olsPromptType: OLSPromptType.DESCHEDULER,
             }}
             description={<Descheduler vm={vm} />}
             testId="descheduler"

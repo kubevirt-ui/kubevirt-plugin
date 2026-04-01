@@ -4,6 +4,8 @@ import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useMigrationPercentage from '@kubevirt-utils/resources/vm/hooks/useMigrationPercentage';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Timestamp } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Card,
@@ -35,8 +37,15 @@ const MigrationProgressStatus: React.FC<MigrationProgressStatusProps> = ({ vmi }
         <CardTitle>
           {t('LiveMigration progress')}
           <HelpTextIcon
-            bodyContent={t(
-              'Indicates the current completion percentage of the ongoing live migration operation.',
+            bodyContent={(hide) => (
+              <PopoverContentWithLightspeedButton
+                content={t(
+                  'Indicates the current completion percentage of the ongoing live migration operation.',
+                )}
+                hide={hide}
+                obj={vmi}
+                promptType={OLSPromptType.LIVE_MIGRATION}
+              />
             )}
             helpIconClassName="pf-v6-u-ml-xs"
             position={PopoverPosition.right}

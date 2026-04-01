@@ -4,6 +4,7 @@ import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/Sect
 import { HIDE_CREDENTIALS_NON_PRIVILEGED } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Alert, AlertVariant } from '@patternfly/react-core';
 import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
 
@@ -33,6 +34,7 @@ const HideCredentials: FC<HideCredentialsProps> = ({ newBadge = false }) => {
         isDisabled={!canEdit}
         isLoading={loading}
         newBadge={newBadge}
+        olsPromptType={OLSPromptType.HIDE_GUEST_CREDENTIALS_FOR_NON_PRIV_USERS}
         switchIsOn={featureEnabled}
         title={t('Hide guest credentials for non-privileged users')}
         turnOnSwitch={onChange}

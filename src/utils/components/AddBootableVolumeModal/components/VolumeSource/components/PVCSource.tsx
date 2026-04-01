@@ -6,6 +6,8 @@ import {
 } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/constants';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Checkbox, PopoverPosition, Split, SplitItem } from '@patternfly/react-core';
 
 import DiskSourcePVCSelect from './DiskSourcePVCSelect';
@@ -40,8 +42,14 @@ const PVCSource: FC<PVCSourceProps> = ({ bootableVolume, setBootableVolumeField 
         </SplitItem>
         <SplitItem>
           <HelpTextIcon
-            bodyContent={t(
-              'This will create a cloned copy of the Volume in the destination project.',
+            bodyContent={(hide) => (
+              <PopoverContentWithLightspeedButton
+                content={t(
+                  'This will create a cloned copy of the Volume in the destination project.',
+                )}
+                hide={hide}
+                promptType={OLSPromptType.CLONE_VOLUME}
+              />
             )}
             position={PopoverPosition.right}
           />

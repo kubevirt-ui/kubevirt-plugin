@@ -4,6 +4,8 @@ import { Controller, useFormContext } from 'react-hook-form';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { FormGroup, TextInput } from '@patternfly/react-core';
 
 import { MAX_VLAN_ID, MIN_VLAN_ID, VMNetworkForm } from '../constants';
@@ -17,8 +19,14 @@ const VLANIDField: FC = () => {
     <FormGroup
       labelHelp={
         <HelpTextIcon
-          bodyContent={t(
-            'Your physical network switch must be configured with a VLAN trunk that is permitted to carry traffic for this specific ID.',
+          bodyContent={(hide) => (
+            <PopoverContentWithLightspeedButton
+              content={t(
+                'Your physical network switch must be configured with a VLAN trunk that is permitted to carry traffic for this specific ID.',
+              )}
+              hide={hide}
+              promptType={OLSPromptType.VLAN_IDS}
+            />
           )}
           headerContent={t('VLAN ID')}
         />

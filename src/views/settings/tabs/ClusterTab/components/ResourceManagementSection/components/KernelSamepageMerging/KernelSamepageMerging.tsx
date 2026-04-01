@@ -5,7 +5,6 @@ import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/Sect
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { Alert, AlertVariant } from '@patternfly/react-core';
@@ -65,20 +64,15 @@ const KernelSamepageMerging: FC<KernelSamepageMergingProps> = ({
   return (
     <>
       <SectionWithSwitch
-        helpTextIconContent={(hide) => (
-          <PopoverContentWithLightspeedButton
-            content={t(
-              'KSM is a memory-saving deduplication feature designed to fit more VirtualMachines into physical memory by sharing the data common between them. It is specifically effective for similar VirtualMachines. KSM should only be used with trusted workloads. Turning this feature on enables it for all nodes in the cluster.',
-            )}
-            hide={hide}
-            obj={hyperConvergeConfiguration?.[0]}
-            promptType={OLSPromptType.KERNEL_SAMEPAGE_MERGING}
-          />
+        helpTextIconContent={t(
+          'KSM is a memory-saving deduplication feature designed to fit more VirtualMachines into physical memory by sharing the data common between them. It is specifically effective for similar VirtualMachines. KSM should only be used with trusted workloads. Turning this feature on enables it for all nodes in the cluster.',
         )}
         dataTestID="kernel-samepage-merging"
         isDisabled={!hyperLoaded}
         isLoading={isLoading}
         newBadge={newBadge}
+        olsObj={hyperConvergeConfiguration?.[0]}
+        olsPromptType={OLSPromptType.KERNEL_SAMEPAGE_MERGING}
         popoverClassName="KernelSamepageMerging__HelpTextIcon"
         switchIsOn={isEnabled}
         title={t('Kernel Samepage Merging (KSM)')}

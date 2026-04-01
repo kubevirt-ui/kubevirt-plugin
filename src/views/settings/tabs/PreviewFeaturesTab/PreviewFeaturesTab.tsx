@@ -3,6 +3,7 @@ import React, { FC } from 'react';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Content, ContentVariants, Title } from '@patternfly/react-core';
 import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
 import { PREVIEW_FEATURES_TAB_IDS } from '@settings/search/constants';
@@ -45,6 +46,7 @@ const PreviewFeaturesTab: FC = () => {
             isDisabled={!feature.canEdit}
             isLoading={feature.loading}
             key={feature.id}
+            olsPromptType={OLSPromptType.PREVIEW_FEATURES}
             switchIsOn={feature.featureEnabled}
             title={<SearchItem id={feature.searchItemId}>{feature.label}</SearchItem>}
             turnOnSwitch={feature.toggleFeature}

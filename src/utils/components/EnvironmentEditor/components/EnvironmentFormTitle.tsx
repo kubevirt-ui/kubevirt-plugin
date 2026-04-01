@@ -4,6 +4,8 @@ import { useLocation } from 'react-router-dom-v5-compat';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Title } from '@patternfly/react-core';
 
 const EnvironmentFormTitle: FC = memo(() => {
@@ -19,8 +21,14 @@ const EnvironmentFormTitle: FC = memo(() => {
       )}
       {t('Include all values from existing config maps, secrets, or service accounts (as disk)')}{' '}
       <HelpTextIcon
-        bodyContent={t(
-          'Add new values by referencing an existing config map, secret, or service account. Using these values requires mounting them manually to the VM.',
+        bodyContent={(hide) => (
+          <PopoverContentWithLightspeedButton
+            content={t(
+              'Add new values by referencing an existing config map, secret, or service account. Using these values requires mounting them manually to the VM.',
+            )}
+            hide={hide}
+            promptType={OLSPromptType.ENVIRONMENT_VARS}
+          />
         )}
       />
     </>

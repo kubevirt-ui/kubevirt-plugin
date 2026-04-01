@@ -32,7 +32,6 @@ import {
   VM_WORKLOAD_ANNOTATION,
 } from '@kubevirt-utils/resources/vm';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
-import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { getCatalogURL } from '@multicluster/urls';
@@ -118,13 +117,18 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
       <GridItem rowSpan={4} span={6}>
         <DescriptionList>
           <WizardDescriptionItem
+            helperPopover={{
+              content: t('Name of the VirtualMachine'),
+              header: t('Name'),
+              olsObj: vm,
+              olsPromptType: OLSPromptType.NAME,
+            }}
             onEditClick={() =>
               createModal((modalProps) => (
                 <VMNameModal {...modalProps} onSubmit={updateVM} vm={vm} />
               ))
             }
             description={vm?.metadata?.name}
-            helperPopover={{ content: t('Name of the VirtualMachine'), header: t('Name') }}
             isEdit
             testId="wizard-overview-name"
             title={t('Name')}
@@ -132,15 +136,10 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
 
           <WizardDescriptionItem
             helperPopover={{
-              content: (hide) => (
-                <PopoverContentWithLightspeedButton
-                  content={t('Namespace of the VirtualMachine')}
-                  hide={hide}
-                  obj={vm}
-                  promptType={OLSPromptType.NAMESPACE}
-                />
-              ),
+              content: t('Namespace of the VirtualMachine'),
               header: t('Namespace'),
+              olsObj: vm,
+              olsPromptType: OLSPromptType.NAMESPACE,
             }}
             description={vm?.metadata?.namespace}
             testId="wizard-overview-namespace"
@@ -181,6 +180,8 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
             helperPopover={{
               content: t('Description of the VirtualMachine'),
               header: t('Description'),
+              olsObj: vm,
+              olsPromptType: OLSPromptType.DESCRIPTION,
             }}
             onEditClick={() =>
               createModal(({ isOpen, onClose }) => (
@@ -218,20 +219,15 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
               memory: readableSizeUnit(memory),
             })}
             helperPopover={{
-              content: (hide) => (
-                <PopoverContentWithLightspeedButton
-                  content={
-                    <CPUDescription
-                      cpu={getCPU(vm)}
-                      helperTextResource={CpuMemHelperTextResources.FutureVM}
-                    />
-                  }
-                  hide={hide}
-                  obj={vm}
-                  promptType={OLSPromptType.CPU_MEMORY}
+              content: (
+                <CPUDescription
+                  cpu={getCPU(vm)}
+                  helperTextResource={CpuMemHelperTextResources.FutureVM}
                 />
               ),
               header: t('CPU | Memory'),
+              olsObj: vm,
+              olsPromptType: OLSPromptType.CPU_MEMORY,
             }}
             onEditClick={() =>
               createModal(({ isOpen, onClose }) => (
@@ -246,15 +242,10 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
 
           <WizardDescriptionItem
             helperPopover={{
-              content: (hide) => (
-                <PopoverContentWithLightspeedButton
-                  content={t('The QEMU machine type.')}
-                  hide={hide}
-                  obj={vm}
-                  promptType={OLSPromptType.MACHINE_TYPE}
-                />
-              ),
+              content: t('The QEMU machine type.'),
               header: t('Machine type'),
+              olsObj: vm,
+              olsPromptType: OLSPromptType.MACHINE_TYPE,
             }}
             className="wizard-overview-description-left-column"
             description={getMachineType(vm)}
@@ -295,6 +286,8 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
                 'Applying the start/pause mode to this Virtual Machine will cause it to partially reboot and pause.',
               ),
               header: t('Start in pause mode'),
+              olsObj: vm,
+              olsPromptType: OLSPromptType.START_IN_PAUSE_MODE,
             }}
             testId="start-in-pause-mode"
             title={t('Start in pause mode')}
@@ -381,21 +374,14 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
               />
             }
             helperPopover={{
-              content: (hide) => (
-                <PopoverContentWithLightspeedButton
-                  content={
-                    isDisabledGuestSystemLogs
-                      ? t('Guest system logs disabled at cluster')
-                      : t(
-                          'Enables access to the VirtualMachine guest system log. Wait a few seconds for logging to start before viewing the log.',
-                        )
-                  }
-                  hide={hide}
-                  obj={vm}
-                  promptType={OLSPromptType.GUEST_SYSTEM_LOG_ACCESS}
-                />
-              ),
+              content: isDisabledGuestSystemLogs
+                ? t('Guest system logs disabled at cluster')
+                : t(
+                    'Enables access to the VirtualMachine guest system log. Wait a few seconds for logging to start before viewing the log.',
+                  ),
               header: t('Guest system log access'),
+              olsObj: vm,
+              olsPromptType: OLSPromptType.GUEST_SYSTEM_LOG_ACCESS,
             }}
             testId="guest-system-log-access"
             title={t('Guest system log access')}
@@ -431,17 +417,12 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
               />
             }
             helperPopover={{
-              content: (hide) => (
-                <PopoverContentWithLightspeedButton
-                  content={t(
-                    'Applying deletion protection to this VM will prevent deletion through the web console.',
-                  )}
-                  hide={hide}
-                  obj={vm}
-                  promptType={OLSPromptType.DELETION_PROTECTION}
-                />
+              content: t(
+                'Applying deletion protection to this VM will prevent deletion through the web console.',
               ),
               header: t('Deletion protection'),
+              olsObj: vm,
+              olsPromptType: OLSPromptType.DELETION_PROTECTION,
             }}
             data-test-id="deletion-protection"
             title={t('Deletion protection')}

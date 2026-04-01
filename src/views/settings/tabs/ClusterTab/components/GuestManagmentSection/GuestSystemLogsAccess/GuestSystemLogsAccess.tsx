@@ -6,6 +6,7 @@ import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeat
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { Alert, AlertVariant } from '@patternfly/react-core';
 import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
@@ -75,6 +76,7 @@ const GuestSystemLogsAccess: FC<GuestSystemLogsAccessProps> = ({
         isDisabled={!hyperLoaded}
         isLoading={isLoading}
         newBadge={newBadge}
+        olsPromptType={OLSPromptType.ENABLE_GUEST_SYSTEM_LOG_ACCESS}
         switchIsOn={isChecked}
         title={t('Enable guest system log access')}
         turnOnSwitch={onChange}

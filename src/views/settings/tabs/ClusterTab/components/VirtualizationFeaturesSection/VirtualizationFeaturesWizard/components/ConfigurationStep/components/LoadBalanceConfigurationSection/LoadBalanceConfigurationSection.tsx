@@ -51,6 +51,7 @@ const LoadBalanceConfigurationSection: FC = () => {
           <UseAlternativeOptionCheckbox
             id="load-balance-alternative-checkbox"
             isChecked={alternativeChecked}
+            olsPromptType={OLSPromptType.KUBE_DESCHEDULER_OPERATOR_ALTERNATIVES}
             onChange={setAlternativeChecked}
           />
         </StackItem>

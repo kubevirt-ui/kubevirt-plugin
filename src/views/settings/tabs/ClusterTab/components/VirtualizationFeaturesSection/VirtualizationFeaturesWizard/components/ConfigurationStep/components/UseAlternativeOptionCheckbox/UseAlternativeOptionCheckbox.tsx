@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Checkbox, Split, SplitItem } from '@patternfly/react-core';
 import UseAlternativeOptionHelpIcon from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/VirtualizationFeaturesWizard/components/ConfigurationStep/components/UseAlternativeOptionHelpIcon/UseAlternativeOptionHelpIcon';
 
@@ -11,6 +12,7 @@ type UseAlternativeOptionCheckboxProps = {
   id: string;
   isChecked: boolean;
   isDisabled?: boolean;
+  olsPromptType: OLSPromptType;
   onChange: (isChecked: boolean) => void;
 };
 
@@ -19,6 +21,7 @@ const UseAlternativeOptionCheckbox: FC<UseAlternativeOptionCheckboxProps> = ({
   id,
   isChecked,
   isDisabled,
+  olsPromptType,
   onChange,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -39,7 +42,7 @@ const UseAlternativeOptionCheckbox: FC<UseAlternativeOptionCheckboxProps> = ({
         />
       </SplitItem>
       <SplitItem>
-        <UseAlternativeOptionHelpIcon />
+        <UseAlternativeOptionHelpIcon olsPromptType={olsPromptType} />
       </SplitItem>
     </Split>
   );

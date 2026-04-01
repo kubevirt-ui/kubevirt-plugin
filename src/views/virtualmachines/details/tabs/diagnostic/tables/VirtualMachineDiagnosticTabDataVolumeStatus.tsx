@@ -4,6 +4,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import { columnSorting } from '@kubevirt-utils/utils/utils';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 import { Flex, FlexItem, Pagination } from '@patternfly/react-core';
 import { Table, Th, Thead, Tr } from '@patternfly/react-table';
@@ -50,7 +51,10 @@ const VirtualMachineDiagnosticTabDataVolumeStatus: FC<
         <Flex justifyContent={{ default: 'justifyContentSpaceBetween' }}>
           <FlexItem>
             <VirtualMachineDiagnosticTabTableTitle
-              helpContent={t('DataVolume Status is a mechanism for reporting if a volume succeed.')}
+              helpContent={t(
+                'DataVolume Status is a mechanism for reporting if a volume succeeds.',
+              )}
+              olsPromptType={OLSPromptType.DATAVOLUME_STATUS}
               title={t('DataVolume status')}
             />
           </FlexItem>

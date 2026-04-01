@@ -7,6 +7,8 @@ import {
   ClusterUserDefinedNetworkModelGroupVersionKind,
   NetworkAttachmentDefinitionModel,
 } from '@kubevirt-utils/models';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { ListPageCreateButton, ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
 import { Button, PopoverPosition, Stack, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 
@@ -55,25 +57,31 @@ const VMNetworksPage: FC = () => {
             <>
               <TabTitleText className="pf-v6-u-mr-sm">{t('Other VM network types')}</TabTitleText>
               <HelpTextIcon
-                bodyContent={
-                  <Stack hasGutter>
-                    <p>
-                      {t(
-                        'This list only shows network definitions that are compatible with virtual machines. To view the complete list of all available networks, refer to the full NetworkAttachmentDefinition list.',
-                      )}
-                    </p>
-                    <Button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(NADS_LIST_PATH);
-                      }}
-                      isInline
-                      variant="link"
-                    >
-                      {NetworkAttachmentDefinitionModel.kind}
-                    </Button>
-                  </Stack>
-                }
+                bodyContent={(hide) => (
+                  <PopoverContentWithLightspeedButton
+                    content={
+                      <Stack hasGutter>
+                        <p>
+                          {t(
+                            'This list only shows network definitions that are compatible with virtual machines. To view the complete list of all available networks, refer to the full NetworkAttachmentDefinition list.',
+                          )}
+                        </p>
+                        <Button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(NADS_LIST_PATH);
+                          }}
+                          isInline
+                          variant="link"
+                        >
+                          {NetworkAttachmentDefinitionModel.kind}
+                        </Button>
+                      </Stack>
+                    }
+                    hide={hide}
+                    promptType={OLSPromptType.VM_NETWORK_TYPES}
+                  />
+                )}
                 headerContent={t('Only VM-compatible networks displayed')}
                 position={PopoverPosition.right}
               />

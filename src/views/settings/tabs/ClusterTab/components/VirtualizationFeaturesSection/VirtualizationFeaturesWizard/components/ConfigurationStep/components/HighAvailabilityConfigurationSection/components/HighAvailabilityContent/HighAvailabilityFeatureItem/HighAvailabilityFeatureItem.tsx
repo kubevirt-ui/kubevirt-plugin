@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Checkbox, Split, SplitItem, Stack, StackItem } from '@patternfly/react-core';
 import SettingsLink from '@settings/context/SettingsLink';
 import { VirtualizationFeatureOperators } from '@settings/tabs/ClusterTab/components/VirtualizationFeaturesSection/utils/types';
@@ -16,6 +17,7 @@ type HighAvailabilityFeatureItemProps = {
   alternativeChecked: boolean;
   checkboxLabel: string;
   description: string;
+  olsPromptType: OLSPromptType;
   operatorName: VirtualizationFeatureOperators;
   setAlternativeChecked: (newCheckedState: boolean) => void;
 };
@@ -24,6 +26,7 @@ const HighAvailabilityFeatureItem: FC<HighAvailabilityFeatureItemProps> = ({
   alternativeChecked,
   checkboxLabel,
   description,
+  olsPromptType,
   operatorName,
   setAlternativeChecked,
 }) => {
@@ -71,6 +74,7 @@ const HighAvailabilityFeatureItem: FC<HighAvailabilityFeatureItemProps> = ({
           id={`${operatorName}-alternative-checkbox`}
           isChecked={alternativeChecked}
           isDisabled={installed}
+          olsPromptType={olsPromptType}
           onChange={handleAlternativeOptionUpdate}
         />
         <div className="high-availability-feature-item__description">{description}</div>

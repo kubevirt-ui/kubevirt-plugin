@@ -3,6 +3,8 @@ import classNames from 'classnames';
 
 import NewBadge from '@kubevirt-utils/components/badges/NewBadge/NewBadge';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { PopoverPosition, Split, SplitItem, Switch } from '@patternfly/react-core';
 
 import ExternalLink from '../ExternalLink/ExternalLink';
@@ -19,6 +21,8 @@ type SectionWithSwitchProps = {
   isLoading?: boolean;
   maxWidth?: string;
   newBadge?: boolean;
+  olsObj?: K8sResourceCommon;
+  olsPromptType?: OLSPromptType;
   popoverClassName?: string;
   switchIsOn: boolean;
   title?: ReactNode;
@@ -36,6 +40,8 @@ const SectionWithSwitch: FC<SectionWithSwitchProps> = ({
   isLoading,
   maxWidth,
   newBadge = false,
+  olsObj,
+  olsPromptType,
   popoverClassName,
   switchIsOn,
   title,
@@ -55,7 +61,18 @@ const SectionWithSwitch: FC<SectionWithSwitchProps> = ({
         {helpTextIconContent && (
           <SplitItem isFilled>
             <HelpTextIcon
-              bodyContent={helpTextIconContent}
+              bodyContent={(hide) => {
+                return olsPromptType ? (
+                  <PopoverContentWithLightspeedButton
+                    content={helpTextIconContent}
+                    hide={hide}
+                    obj={olsObj}
+                    promptType={olsPromptType}
+                  />
+                ) : (
+                  helpTextIconContent
+                );
+              }}
               className={popoverClassName}
               helpIconClassName="section-with-switch__help-text-popover"
               position={PopoverPosition.right}

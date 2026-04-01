@@ -4,6 +4,8 @@ import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 
 import './NoDataAvailableMessage.scss';
 
@@ -38,7 +40,13 @@ const NoDataAvailableMessage: React.FC<NoDataAvailableMessageProps> = ({ isVCPU 
     <div className="kv-top-consumers-card__chart-list-no-data-msg pf-v6-u-text-align-center">
       {t('No data available')}
       <HelpTextIcon
-        bodyContent={bodyContent}
+        bodyContent={(hide) => (
+          <PopoverContentWithLightspeedButton
+            content={bodyContent}
+            hide={hide}
+            promptType={OLSPromptType.MONITORING}
+          />
+        )}
         helpIconClassName="kv-top-consumers-card__chart-list-no-data-msg--icon"
       />
     </div>

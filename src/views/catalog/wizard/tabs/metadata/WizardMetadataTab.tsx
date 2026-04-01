@@ -9,7 +9,6 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
-import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { DescriptionList, PageSection, pluralize } from '@patternfly/react-core';
@@ -41,17 +40,12 @@ const WizardMetadataTab: WizardTab = ({ loaded, updateVM, vm }) => {
                   />
                 }
                 helperPopover={{
-                  content: (hide) => (
-                    <PopoverContentWithLightspeedButton
-                      content={t(
-                        'Map of string keys and values that can be used to organize and categorize (scope and select) objects',
-                      )}
-                      hide={hide}
-                      obj={vm}
-                      promptType={OLSPromptType.LABELS}
-                    />
+                  content: t(
+                    'Map of string keys and values that can be used to organize and categorize (scope and select) objects',
                   ),
                   header: t('Labels'),
+                  olsObj: vm,
+                  olsPromptType: OLSPromptType.LABELS,
                 }}
                 onEditClick={() =>
                   createModal(({ isOpen, onClose }) => (
@@ -81,17 +75,12 @@ const WizardMetadataTab: WizardTab = ({ loaded, updateVM, vm }) => {
                   'annotation',
                 )}
                 helperPopover={{
-                  content: (hide) => (
-                    <PopoverContentWithLightspeedButton
-                      content={t(
-                        'Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects.',
-                      )}
-                      hide={hide}
-                      obj={vm}
-                      promptType={OLSPromptType.ANNOTATIONS}
-                    />
+                  content: t(
+                    'Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects.',
                   ),
                   header: t('Annotations'),
+                  olsObj: vm,
+                  olsPromptType: OLSPromptType.ANNOTATIONS,
                 }}
                 onEditClick={() =>
                   createModal(({ isOpen, onClose }) => (

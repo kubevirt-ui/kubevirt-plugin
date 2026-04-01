@@ -6,7 +6,6 @@ import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfigurat
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
-import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { Divider, Stack } from '@patternfly/react-core';
@@ -100,19 +99,13 @@ const AutomaticImagesDownload: FC<AutomaticImagesDownloadProps> = ({
     >
       <Stack hasGutter>
         <SectionWithSwitch
-          helpTextIconContent={(hide) => (
-            <PopoverContentWithLightspeedButton
-              content={t('Enable automatic images download and update')}
-              hide={hide}
-              obj={hyperConvergeConfiguration?.[0]}
-              promptType={OLSPromptType.AUTO_IMAGE_DOWNLOADS}
-            />
-          )}
           dataTestID="auto-image-download"
+          helpTextIconContent={t('Enable automatic images download and update')}
           id="auto-image-download"
           isDisabled={!loaded || !isAdmin}
           isLoading={isLoading}
           newBadge={newBadge}
+          olsPromptType={OLSPromptType.AUTO_IMAGE_DOWNLOADS}
           switchIsOn={Boolean(isEnabledAutomaticImagesDownload)}
           title={t('Automatic images download')}
           turnOnSwitch={onChangeAutomaticImagesDownload}

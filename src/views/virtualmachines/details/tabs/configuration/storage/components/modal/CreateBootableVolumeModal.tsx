@@ -26,6 +26,8 @@ import { getInstanceTypeMatcher, getPreferenceMatcher } from '@kubevirt-utils/re
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { formatQuantityString } from '@kubevirt-utils/utils/units';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
+import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { PopoverPosition, Stack, Title } from '@patternfly/react-core';
@@ -126,7 +128,13 @@ const CreateBootableVolumeModal: FC<CreateBootableVolumeModalProps> = ({
         <Title className="pf-v6-u-mt-md" headingLevel="h5">
           {t('Volume metadata')}{' '}
           <HelpTextIcon
-            bodyContent={t('Set the volume metadata to use the volume as a bootable image.')}
+            bodyContent={(hide) => (
+              <PopoverContentWithLightspeedButton
+                content={t('Set the volume metadata to use the volume as a bootable image.')}
+                hide={hide}
+                promptType={OLSPromptType.BOOTABLE_VOLUME_METADATA}
+              />
+            )}
             helpIconClassName="pf-v6-u-ml-xs"
             position={PopoverPosition.right}
           />
