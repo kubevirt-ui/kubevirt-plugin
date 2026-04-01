@@ -176,7 +176,7 @@ export const createBulkVirtualMachineActionFactory = (
     accessReview: {
       cluster: getCluster(vms?.[0]),
       group: MultiNamespaceVirtualMachineStorageMigrationPlanModel.apiGroup,
-      namespace: vms?.[0]?.metadata?.namespace,
+      namespace: getNamespace(vms?.[0]),
       resource: MultiNamespaceVirtualMachineStorageMigrationPlanModel.plural,
       verb: 'create',
     },

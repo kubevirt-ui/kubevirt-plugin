@@ -207,7 +207,7 @@ export const createVirtualMachineActionFactory = (t: TFunction) => ({
       accessReview: {
         cluster: getCluster(vm),
         group: VirtualMachineInstanceMigrationModel.apiGroup,
-        namespace: vm?.metadata?.namespace,
+        namespace: getNamespace(vm),
         resource: VirtualMachineInstanceMigrationModel.plural,
         verb: 'create',
       },
@@ -227,7 +227,7 @@ export const createVirtualMachineActionFactory = (t: TFunction) => ({
       accessReview: {
         cluster: getCluster(vm),
         group: MultiNamespaceVirtualMachineStorageMigrationPlanModel.apiGroup,
-        namespace: vm?.metadata?.namespace,
+        namespace: getNamespace(vm),
         resource: MultiNamespaceVirtualMachineStorageMigrationPlanModel.plural,
         verb: 'create',
       },
