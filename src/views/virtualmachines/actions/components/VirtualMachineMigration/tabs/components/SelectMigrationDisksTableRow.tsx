@@ -1,27 +1,28 @@
-import React, { Dispatch, FC, SetStateAction, useState } from 'react';
+import React, { FC, useState } from 'react';
 
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { Table, TableGridBreakpoint, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 
+import { MigrationDisksTableData } from '../../utils/diskData';
+
 import { columnNames } from './constants';
-import { MigrationDisksTableData } from './utils';
 import VMDiskTableRow from './VMDiskTableRow';
 
 type SelectMigrationDisksTableRowProps = {
   diskData: MigrationDisksTableData;
   rowIndex: number;
+  selectDiskData: (diskData: MigrationDisksTableData, isSelected: boolean) => void;
   selectedPVCs: IoK8sApiCoreV1PersistentVolumeClaim[];
-  setSelectedPVCs: Dispatch<SetStateAction<IoK8sApiCoreV1PersistentVolumeClaim[]>>;
   singleVMView?: boolean;
 };
 
 const SelectMigrationDisksTableRow: FC<SelectMigrationDisksTableRowProps> = ({
   diskData,
   rowIndex,
+  selectDiskData,
   selectedPVCs,
-  setSelectedPVCs,
   singleVMView,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -31,8 +32,8 @@ const SelectMigrationDisksTableRow: FC<SelectMigrationDisksTableRowProps> = ({
       <VMDiskTableRow
         diskData={diskData}
         rowIndex={rowIndex}
+        selectDiskData={selectDiskData}
         selectedPVCs={selectedPVCs}
-        setSelectedPVCs={setSelectedPVCs}
       />
     );
 
@@ -51,12 +52,7 @@ const SelectMigrationDisksTableRow: FC<SelectMigrationDisksTableRowProps> = ({
           select={{
             isDisabled: !diskData.isSelectable,
             isSelected: Boolean(selectedPVCs.find((pvc) => getName(pvc) === getName(diskData.pvc))),
-            onSelect: (_event, isSelecting) =>
-              setSelectedPVCs((selection) =>
-                isSelecting
-                  ? [...selection, diskData.pvc]
-                  : selection.filter((pvc) => getName(pvc) !== getName(diskData.pvc)),
-              ),
+            onSelect: (_event, isSelecting) => selectDiskData(diskData, isSelecting),
             rowIndex,
           }}
         />

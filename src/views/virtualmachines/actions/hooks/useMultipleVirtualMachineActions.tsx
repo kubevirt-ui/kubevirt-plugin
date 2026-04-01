@@ -18,7 +18,6 @@ import { isPaused, isRunning, isStopped } from '@virtualmachines/utils';
 import { createBulkVirtualMachineActionFactory } from '../BulkVirtualMachineActionFactory';
 
 import { ACTIONS_ID } from './constants';
-import useIsMTCInstalled from './useIsMTCInstalled';
 import useIsMTVInstalled from './useIsMTVInstalled';
 
 type UseMultipleVirtualMachineActions = (vms: V1VirtualMachine[]) => ActionDropdownItemType[];
@@ -40,8 +39,6 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms)
     getCluster(vms?.[0]) ?? hubClusterName,
   );
 
-  const mtcInstalled = useIsMTCInstalled();
-
   const BulkVirtualMachineActionFactory = createBulkVirtualMachineActionFactory(t);
 
   return useMemo(() => {
@@ -61,9 +58,7 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms)
     }
 
     if (namespaces.size === 1) {
-      migrationActions.push(
-        BulkVirtualMachineActionFactory.migrateStorage(vms, createModal, mtcInstalled),
-      );
+      migrationActions.push(BulkVirtualMachineActionFactory.migrateStorage(vms, createModal));
     }
 
     const hasRunningVM = vms?.some(isRunning);
@@ -102,7 +97,6 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (vms)
   }, [
     confirmVMActionsEnabled,
     createModal,
-    mtcInstalled,
     crossClusterMigrationEnabled,
     provider,
     providerLoaded,
