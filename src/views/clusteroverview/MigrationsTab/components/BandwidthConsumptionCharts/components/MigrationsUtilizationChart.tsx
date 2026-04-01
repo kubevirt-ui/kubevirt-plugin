@@ -5,7 +5,7 @@ import useResponsiveCharts from '@kubevirt-utils/components/Charts/hooks/useResp
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Chart, ChartAxis, ChartLine, createContainer } from '@patternfly/react-charts/victory';
-import { GridItem, HelperText, HelperTextItem, Title } from '@patternfly/react-core';
+import { GridItem, HelperText, HelperTextItem } from '@patternfly/react-core';
 
 import { ChartDataObject } from '../constants';
 
@@ -35,9 +35,7 @@ const MigrationsUtilizationChart: FC<MigrationsUtilizationChartProps> = ({
 
   return (
     <GridItem className="co-utilization-card__item">
-      <div className="co-utilization-card__item-description">
-        <Title headingLevel="h4">{title}</Title>
-      </div>
+      <div className="co-utilization-card__item-description">{title}</div>
       {isEmpty(chartData) ? (
         <HelperText>
           <HelperTextItem variant="warning">{t('No Datapoints found')}</HelperTextItem>

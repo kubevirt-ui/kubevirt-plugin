@@ -20,7 +20,6 @@ export enum tabName {
   Scripts = 'Scripts',
   // Settings is now a standalone page - use cy.visitSettingsVirt() instead
   Snapshots = 'Snapshots',
-  TopConsumers = 'Top consumers',
   YAML = 'YAML',
 }
 
@@ -143,9 +142,6 @@ export const tab = {
   },
   navigateToTNetworks: () => {
     navigateToTab(tabName.NetworkInterfaces);
-  },
-  navigateToTopConsumers: () => {
-    navigateToTab(tabName.TopConsumers);
   },
   navigateToTScheduling: () => {
     navigateToTab(tabName.Scheduling);

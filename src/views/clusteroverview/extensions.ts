@@ -3,7 +3,7 @@ import { RoutePage } from '@openshift-console/dynamic-plugin-sdk';
 import type { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plugin-sdk-webpack';
 
 export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
-  ClusterOverviewPage: './views/clusteroverview/ClusterOverviewPage.tsx',
+  MigrationsPage: './views/clusteroverview/MigrationsTab/MigrationsPage.tsx',
   VirtualizationLandingPage: 'src/perspective/VirtualizationLandingPage.tsx',
 };
 
@@ -11,9 +11,12 @@ export const extensions: EncodedExtension[] = [
   {
     properties: {
       component: {
-        $codeRef: 'ClusterOverviewPage',
+        $codeRef: 'MigrationsPage',
       },
-      path: ['/k8s/ns/:ns/virtualization-overview', '/k8s/all-namespaces/virtualization-overview'],
+      path: [
+        '/k8s/ns/:ns/virtualization-migrations',
+        '/k8s/all-namespaces/virtualization-migrations',
+      ],
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,

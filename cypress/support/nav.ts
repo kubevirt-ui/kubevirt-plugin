@@ -17,8 +17,6 @@ declare global {
       visitMPs(): void;
       visitMPsVirt(): void;
       visitNAD(): void;
-      visitOverview(): void;
-      visitOverviewVirt(): void;
       visitPreferences(): void;
       visitPreferencesVirt(): void;
       visitPVC(): void;
@@ -35,14 +33,6 @@ declare global {
   }
 }
 
-Cypress.Commands.add('visitOverview', () => {
-  cy.visit('/k8s/all-namespaces/virtualization-overview');
-});
-
-Cypress.Commands.add('visitOverviewVirt', () => {
-  cy.visit('/k8s/all-namespaces/virtualization-overview');
-});
-
 Cypress.Commands.add('visitCatalog', () => {
   const nsPath = TEST_NS ? `ns/${TEST_NS}` : 'all-namespaces';
   cy.visit(`/k8s/${nsPath}/catalog`);
@@ -57,12 +47,16 @@ Cypress.Commands.add('visitCatalogVirt', () => {
 
 Cypress.Commands.add('visitVMs', () => {
   cy.clickVirtLink(nav.vmNav);
-  cy.byTestID(vmListTab).should('be.visible').click();
+  cy.byTestID(vmListTab).should('be.visible').closest('button').click();
+  cy.byTestID(vmListTab).closest('button').should('have.attr', 'aria-selected', 'true');
+  cy.get('.vm-listpagebody', { timeout: MINUTE }).should('be.visible');
 });
 
 Cypress.Commands.add('visitVMsVirt', () => {
   cy.get(nav.vmNav, { timeout: 5 * MINUTE }).click();
-  cy.byTestID(vmListTab).should('be.visible').click();
+  cy.byTestID(vmListTab).should('be.visible').closest('button').click();
+  cy.byTestID(vmListTab).closest('button').should('have.attr', 'aria-selected', 'true');
+  cy.get('.vm-listpagebody', { timeout: MINUTE }).should('be.visible');
 });
 
 Cypress.Commands.add('visitNAD', () => {

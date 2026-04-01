@@ -99,9 +99,10 @@ Cypress.Commands.add('beforeSpec', () => {
   cy.get('[data-test="username"]', { timeout: 180000 }).should('exist');
   cy.wait(15000); // wait here because page refresh might happen
   cy.switchToVirt();
-  cy.contains('[data-test-id="resource-title"]', 'Virtualization', { timeout: 180000 }).should(
-    'exist',
-  );
+  cy.get('[data-test-id="virtualmachines-nav-item"]', { timeout: 300000 })
+    .should('be.visible')
+    .click();
+  cy.byTestID('vm-list-tab', { timeout: 180000 }).should('be.visible');
 });
 
 Cypress.Commands.add('deleteVM', (vms: string[]) => {

@@ -5,8 +5,8 @@ import ClusterDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/C
 import ConfigurationSearch from '@kubevirt-utils/components/ConfigurationSearch/ConfigurationSearch';
 import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
 import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';
-import { VIRTUALIZATION_PATHS } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { VirtualMachineModelRef } from '@kubevirt-utils/models';
 import { getNamespacePathSegment } from '@kubevirt-utils/utils/utils';
 import { DocumentTitle, useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -60,9 +60,7 @@ const SettingsPage: FC = () => {
             <Breadcrumb>
               <BreadcrumbItem>
                 <Link
-                  to={`/k8s/${getNamespacePathSegment(activeNamespace)}/${
-                    VIRTUALIZATION_PATHS.OVERVIEW
-                  }`}
+                  to={`/k8s/${getNamespacePathSegment(activeNamespace)}/${VirtualMachineModelRef}`}
                 >
                   {t('Virtualization')}
                 </Link>

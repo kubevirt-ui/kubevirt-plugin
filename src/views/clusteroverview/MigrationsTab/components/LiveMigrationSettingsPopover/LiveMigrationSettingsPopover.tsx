@@ -1,12 +1,13 @@
-import * as React from 'react';
+import React, { FC } from 'react';
 
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Popover, Stack, StackItem, Title } from '@patternfly/react-core';
+import { Button, Popover, Stack, StackItem, Title } from '@patternfly/react-core';
+import { OutlinedQuestionCircleIcon } from '@patternfly/react-icons';
 
 import useHyperConvergedMigrations from './hooks/useHyperConvergedMigrations';
 
-const MigrationsLimitionsPopover: React.FC = () => {
+const LiveMigrationSettingsPopover: FC = () => {
   const { t } = useKubevirtTranslation();
   const migrations = useHyperConvergedMigrations();
   const isAdmin = useIsAdmin();
@@ -17,7 +18,7 @@ const MigrationsLimitionsPopover: React.FC = () => {
     <Popover
       bodyContent={
         <Stack hasGutter>
-          <Title headingLevel="h3">{t('Live migrations settings')}</Title>
+          <Title headingLevel="h3">{t('Live migration settings')}</Title>
           <StackItem>
             <b>{t('Max. running migrations per cluster')}</b>
             <div>{migrations?.parallelMigrationsPerCluster}</div>
@@ -29,9 +30,18 @@ const MigrationsLimitionsPopover: React.FC = () => {
         </Stack>
       }
     >
-      <a onClick={(e) => e.preventDefault()}>{t('Limitations')}</a>
+      <Button
+        aria-label={t('Live migration settings')}
+        className="kv-monitoring-card__live-settings"
+        icon={<OutlinedQuestionCircleIcon />}
+        iconPosition="end"
+        isInline
+        variant="link"
+      >
+        {t('Live migration settings')}
+      </Button>
     </Popover>
   );
 };
 
-export default MigrationsLimitionsPopover;
+export default LiveMigrationSettingsPopover;

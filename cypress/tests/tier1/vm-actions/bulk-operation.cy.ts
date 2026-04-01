@@ -40,7 +40,7 @@ describe('Test bulk actions', () => {
     cy.visit('/k8s/all-namespaces/catalog');
     cy.wait(WAIT_TIME);
     cy.clickVirtLink(nav.vmNav);
-    cy.byTestID(vmListTab).should('be.visible').click();
+    cy.byTestID(vmListTab).should('be.visible').closest('button').click();
 
     VM_NAMES.forEach((vmName) => waitForStatus(vmName, VM_STATUS.Stopped));
   });
