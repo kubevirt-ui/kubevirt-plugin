@@ -1,0 +1,20 @@
+.migrations-page {
+  &__layout {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - var(--pf-v6-c-page__main-section--PaddingTop, 0px));
+    overflow: hidden;
+  }
+
+  &__sticky-header {
+    flex-shrink: 0;
+    padding-bottom: var(--pf-t--global--spacer--md);
+    gap: var(--pf-t--global--spacer--sm);
+  }
+
+  &__content {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+  }
+}

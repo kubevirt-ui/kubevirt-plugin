@@ -6,7 +6,6 @@ import { ALL_NAMESPACES, ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hook
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { Button, ButtonVariant, Split, SplitItem } from '@patternfly/react-core';
-import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 
 type WelcomeButtonsProps = {
   onClose: () => Promise<void> | void;
@@ -48,20 +47,6 @@ const WelcomeButtons: FC<WelcomeButtonsProps> = ({ onClose }) => {
         </Button>
       </SplitItem>
       <SplitItem isFilled />
-      <SplitItem>
-        <Button
-          onClick={() => {
-            navigate(`/k8s/${namespace}/virtualization-overview`);
-            onClose();
-          }}
-          className="WelcomeModal__button"
-          icon={<ExternalLinkAltIcon />}
-          iconPosition="end"
-          variant={ButtonVariant.link}
-        >
-          {t('Getting started resources')}
-        </Button>
-      </SplitItem>
     </Split>
   );
 };

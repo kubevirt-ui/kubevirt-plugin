@@ -4,14 +4,43 @@ $BORDER: var(--pf-t--global--border--width--regular) solid
 .kv-monitoring-card {
   &__body {
     padding: 0;
+
+    &:first-child {
+      margin-bottom: var(--pf-t--global--spacer--lg);
+    }
   }
+
+  &__title {
+    font-size: var(--pf-t--global--font--size--heading--h3);
+  }
+
   &__header {
+    --pf-v6-c-card__header-toggle--MarginInlineEnd: 0;
+
+    .pf-v6-c-card:not(.pf-m-expanded) > & {
+      border-bottom: $BORDER;
+    }
+  }
+  &.pf-m-expanded > .pf-v6-c-card__expandable-content {
     border-bottom: $BORDER;
+    padding: 0 var(--pf-t--global--spacer--xl);
   }
   &__graph-separator {
     border-right: $BORDER;
   }
+  &__resources {
+    margin-left: var(--pf-t--global--spacer--xl);
+  }
+  .co-utilization-card__item-description {
+    font-weight: var(--pf-t--global--font--weight--body--bold);
+  }
   &__table-separator {
     border-top: $BORDER;
+  }
+  .pf-v6-c-card__footer {
+    padding-bottom: 0;
+  }
+  &__live-settings {
+    font-size: var(--pf-t--global--font--size--body--default);
   }
 }

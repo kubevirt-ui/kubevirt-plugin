@@ -13,21 +13,9 @@ import NewStepTitle from '../components/NewStepTitle/NewStepTitle';
 export const tourSteps: Step[] = [
   {
     content: t(
-      'Learn more about key areas to complete workflows, increase productivity, and familiarize yourself with Virtualization using our resources.',
-    ),
-    data: {
-      route: '/k8s/all-namespaces/virtualization-overview',
-    },
-    disableBeacon: true,
-    placement: 'bottom',
-    target: '#tour-step-resources',
-    title: t('Getting started resources'),
-  },
-  {
-    content: t(
       'To create VirtualMachines in a project, you must first create a new project and become the administrator.',
     ),
-    data: { route: '/k8s/all-namespaces/virtualization-overview' },
+    data: { route: '/k8s/all-namespaces/kubevirt.io~v1~VirtualMachine' },
     disableBeacon: true,
     placement: 'right',
     target: '.co-namespace-dropdown',

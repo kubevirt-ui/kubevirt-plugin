@@ -6,6 +6,9 @@ import TitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/Title
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { OnFilterChange } from '@openshift-console/dynamic-plugin-sdk';
 import { ChartDonut } from '@patternfly/react-charts/victory';
+import { CardFooter, Split, SplitItem } from '@patternfly/react-core';
+
+import LiveMigrationSettingsPopover from '../LiveMigrationSettingsPopover/LiveMigrationSettingsPopover';
 
 import { colorScale } from './constants';
 import MigrationChartLegend from './MigrationChartLegend';
@@ -58,7 +61,16 @@ const MigrationsChartDonut: FC<MigrationsChartDonutProps> = ({ onFilterChange, v
         titleComponent={<TitleChartLabel />}
         width={600}
       />
-      <MigrationChartLegend legendItems={chartData} onFilterChange={onFilterChange} />
+      <CardFooter>
+        <Split hasGutter>
+          <SplitItem isFilled>
+            <MigrationChartLegend legendItems={chartData} onFilterChange={onFilterChange} />
+          </SplitItem>
+          <SplitItem>
+            <LiveMigrationSettingsPopover />
+          </SplitItem>
+        </Split>
+      </CardFooter>
     </>
   );
 };

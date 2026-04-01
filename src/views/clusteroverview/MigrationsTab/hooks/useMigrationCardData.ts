@@ -22,7 +22,7 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { AdvancedSearchFilter } from '@stolostron/multicluster-sdk';
 
-import useHyperConvergedMigrations from '../components/MigrationsLimitionsPopover/hooks/useHyperConvergedMigrations';
+import useHyperConvergedMigrations from '../components/LiveMigrationSettingsPopover/hooks/useHyperConvergedMigrations';
 import {
   getSourceNodeFilter,
   getStatusFilter,
