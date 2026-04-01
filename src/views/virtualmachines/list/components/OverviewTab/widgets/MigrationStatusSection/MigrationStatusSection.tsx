@@ -24,7 +24,12 @@ import StorageMigrationPlansWidget from '../StorageMigrationPlansWidget/StorageM
 import MultiClusterMigrationStatusSection from './MultiClusterMigrationStatusSection';
 import { buildMigrationsSpokePath, getMigrationsTabPath, MIGRATIONS_DURATION } from './utils';
 
-const MigrationStatusSection: FC<OverviewSectionData> = ({ cluster, namespace, title }) => {
+const MigrationStatusSection: FC<OverviewSectionData> = ({
+  cluster,
+  namespace,
+  title,
+  vmNames,
+}) => {
   const { t } = useKubevirtTranslation();
   const isAllClustersPage = useIsAllClustersPage();
   const isACMPage = useIsACMPage();
@@ -38,6 +43,12 @@ const MigrationStatusSection: FC<OverviewSectionData> = ({ cluster, namespace, t
 
   const { filteredVMIMS, loaded: migrationsLoaded } =
     useMigrationCardDataAndFilters(MIGRATIONS_DURATION);
+
+  const folderFilteredVMIMS = useMemo(() => {
+    if (!vmNames) return filteredVMIMS;
+    const nameSet = new Set(vmNames);
+    return filteredVMIMS.filter((vmim) => nameSet.has(vmim?.spec?.vmiName));
+  }, [filteredVMIMS, vmNames]);
 
   const migrationsTabPath = useMemo(() => {
     if (isSpokeCluster) return undefined;
@@ -62,7 +73,7 @@ const MigrationStatusSection: FC<OverviewSectionData> = ({ cluster, namespace, t
           migrationsTabHref={migrationsTabHref}
           migrationsTabPath={migrationsTabPath}
           subHeader={t('Last day')}
-          vmims={filteredVMIMS}
+          vmims={folderFilteredVMIMS}
         />
         {isClusterLevel && <StorageMigrationPlansWidget cluster={cluster} />}
       </OverviewSectionRow>

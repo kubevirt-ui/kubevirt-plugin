@@ -37,7 +37,7 @@ const countBySeverity = (alerts: Alert[]): Record<AlertType, number> => {
   return counts;
 };
 
-const useVMAlerts = (): VMAlertCounts => {
+const useVMAlerts = (vmNames?: string[]): VMAlertCounts => {
   const { alerts, error, loaded } = useAlerts();
   const namespace = useNamespaceParam();
 
@@ -46,13 +46,19 @@ const useVMAlerts = (): VMAlertCounts => {
     [alerts, namespace],
   );
 
+  const folderFilteredAlerts = useMemo(() => {
+    if (!vmNames) return vmAlerts;
+    const nameSet = new Set(vmNames);
+    return vmAlerts?.filter((alert) => nameSet.has(alert.labels?.name || alert.labels?.vmName));
+  }, [vmAlerts, vmNames]);
+
   return useMemo(
     () => ({
-      ...countBySeverity(vmAlerts),
+      ...countBySeverity(folderFilteredAlerts),
       error,
       loaded,
     }),
-    [vmAlerts, loaded, error],
+    [folderFilteredAlerts, loaded, error],
   );
 };
 

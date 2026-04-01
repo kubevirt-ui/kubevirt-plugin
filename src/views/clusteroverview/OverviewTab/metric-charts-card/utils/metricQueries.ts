@@ -73,12 +73,20 @@ export const getFilteredPerClusterQuery = (
   return queryFn(`{cluster=~"${regex}"}`);
 };
 
+const buildVMNameFilter = (vmNames: string[]): string => {
+  const regex = vmNames.map(escapeRegex).join('|');
+  return `name=~"${regex}"`;
+};
+
 export const getMetricQuery = (
   metric: string,
   namespace: string,
   cluster?: string,
   hubClusterName?: string,
+  vmNames?: string[],
 ): string | undefined => {
+  if (vmNames && vmNames.length === 0) return undefined;
+
   const escapeLabelValue = (v: string): string => v.replaceAll('\\', '\\\\').replaceAll('"', '\\"');
 
   // Add cluster filter only for non-hub clusters (per useFleetPrometheusPoll documentation)
@@ -88,12 +96,14 @@ export const getMetricQuery = (
       : '';
   const namespaceFilter =
     namespace !== ALL_NAMESPACES_SESSION_KEY ? `namespace="${escapeLabelValue(namespace)}"` : '';
+  const vmNameFilter = vmNames?.length ? buildVMNameFilter(vmNames) : '';
 
   if (namespace === ALL_NAMESPACES_SESSION_KEY) {
-    return metricQueriesForAllNamespaces[metric]?.(clusterFilter);
+    const filters = [clusterFilter, vmNameFilter].filter(Boolean).join(',');
+    return metricQueriesForAllNamespaces[metric]?.(filters);
   }
 
-  const filters = [namespaceFilter, clusterFilter]
+  const filters = [namespaceFilter, clusterFilter, vmNameFilter]
     .filter((filter) => Boolean(filter?.trim()))
     .join(',');
   return metricQueriesForNamespace?.[metric]?.(filters);

@@ -21,4 +21,5 @@ export const getSeverityUrls = (baseUrl?: string): SeverityUrls => {
 export type VMAlertsProps = {
   alertsBaseHref?: string;
   alertsBasePath?: string;
+  vmNames?: string[];
 };

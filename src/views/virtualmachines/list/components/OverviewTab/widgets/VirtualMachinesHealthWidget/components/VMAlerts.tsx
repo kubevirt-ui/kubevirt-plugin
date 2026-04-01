@@ -18,9 +18,9 @@ import TotalAlertCount from './TotalAlertCount';
 import './health-card.scss';
 import './VMAlerts.scss';
 
-const VMAlerts: FC<VMAlertsProps> = ({ alertsBaseHref, alertsBasePath }) => {
+const VMAlerts: FC<VMAlertsProps> = ({ alertsBaseHref, alertsBasePath, vmNames }) => {
   const { t } = useKubevirtTranslation();
-  const { critical, error, info, loaded, warning } = useVMAlerts();
+  const { critical, error, info, loaded, warning } = useVMAlerts(vmNames);
   const totalAlerts = critical + warning + info;
   const isLoading = !loaded;
 
