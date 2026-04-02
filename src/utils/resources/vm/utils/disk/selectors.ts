@@ -1,5 +1,8 @@
 import {
+  V1CDRomTarget,
+  V1ContainerDiskSource,
   V1Disk,
+  V1EmptyDiskSource,
   V1VirtualMachine,
   V1VirtualMachineInstance,
   V1Volume,
@@ -104,3 +107,13 @@ export const hasContainerDisk = (volume: V1Volume): boolean => {
 export const getContainerDiskImage = (volume: V1Volume): null | string => {
   return volume?.containerDisk?.image?.toLowerCase() || null;
 };
+
+export const getPVCClaimName = (volume: V1Volume) => volume?.persistentVolumeClaim?.claimName;
+
+export const getContainerDisk = (volume: V1Volume): V1ContainerDiskSource => volume?.containerDisk;
+
+export const getDataVolumeName = (volume: V1Volume): string => volume?.dataVolume?.name;
+
+export const getEmptyDisk = (volume: V1Volume): V1EmptyDiskSource => volume?.emptyDisk;
+
+export const getCDRom = (disk: V1Disk): V1CDRomTarget => disk?.cdrom;

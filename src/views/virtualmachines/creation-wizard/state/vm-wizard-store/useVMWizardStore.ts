@@ -114,6 +114,7 @@ const useVMWizardStore = create<VMWizardStore>()((set) => {
           selectedSize: size,
         },
       })),
+    setSelectedTemplate: (selectedTemplate: V1Template) => set(() => ({ selectedTemplate })),
     setStartVM: (startVM: boolean) => set({ startVM }),
     setVolumeListNamespace: (volumeListNamespace: string) =>
       set((state) => ({

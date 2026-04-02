@@ -1,0 +1,33 @@
+.vm-catalog {
+  &-row-icon {
+    width: var(--pf-t--global--spacer--xl);
+    padding-right: var(--pf-t--global--spacer--sm);
+    vertical-align: bottom;
+  }
+
+  &-row-label {
+    margin-left: var(--pf-t--global--spacer--sm);
+  }
+
+  .vm-catalog-grid-container,
+  .vm-catalog-table-container {
+    flex: 1;
+
+    position: relative;
+    height: 100%;
+    overflow-y: auto;
+  }
+
+  .vm-catalog-grid-tile:hover {
+    --pf-v6-c-card--BorderColor: var(--pf-v6-c-card--m-selectable--hover--BorderColor);
+    cursor: pointer;
+  }
+
+  .badge-stack {
+    gap: var(--pf-t--global--spacer--xs);
+  }
+
+  .badgeload {
+    border-radius: var(--pf-t--global--border--radius--large);
+  }
+}

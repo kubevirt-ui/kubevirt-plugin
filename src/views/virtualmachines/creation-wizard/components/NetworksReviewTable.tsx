@@ -1,19 +1,22 @@
-import React, { FC, memo } from 'react';
+import * as React from 'react';
+import { FC, memo } from 'react';
 
-import { WizardDescriptionItem } from '@catalog/wizard/components/WizardDescriptionItem';
+import { V1Interface, V1Network } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getInterfaces, getNetworks, NO_DATA_DASH } from '@kubevirt-utils/resources/vm';
+import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getNetworkNameLabel } from '@kubevirt-utils/resources/vm/utils/network/network-columns';
 import { getNetworkInterfaceRowData } from '@kubevirt-utils/resources/vm/utils/network/rowData';
 import { getPrintableNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { DescriptionList, Stack, StackItem } from '@patternfly/react-core';
-import { wizardVMSignal } from '@virtualmachines/creation-wizard/state/vm-signal/vmStore';
+import { WizardDescriptionItem } from '@virtualmachines/creation-wizard/components/WizardDescriptionItem';
 
-const NetworksTable: FC = memo(() => {
+type NetworksReviewTableProps = {
+  interfaces: V1Interface[];
+  networks: V1Network[];
+};
+
+const NetworksReviewTable: FC<NetworksReviewTableProps> = memo(({ interfaces, networks }) => {
   const { t } = useKubevirtTranslation();
-  const vm = wizardVMSignal.value;
-  const networks = getNetworks(vm);
-  const interfaces = getInterfaces(vm);
   const networkData = getNetworkInterfaceRowData(networks, interfaces);
 
   return (
@@ -56,4 +59,4 @@ const NetworksTable: FC = memo(() => {
   );
 });
 
-export default NetworksTable;
+export default NetworksReviewTable;
