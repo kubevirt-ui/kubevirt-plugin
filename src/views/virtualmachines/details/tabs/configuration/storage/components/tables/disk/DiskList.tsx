@@ -12,6 +12,7 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import WindowsDrivers from '@kubevirt-utils/components/WindowsDrivers/WindowsDrivers';
 import useIsWindowsSupportedArchitecture from '@kubevirt-utils/hooks/useIsWindowsSupportedArchitecture';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { VirtualMachineSubresourcesModel } from '@kubevirt-utils/models';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import useDisksTableData from '@kubevirt-utils/resources/vm/hooks/disk/useDisksTableData';
 import useProvisioningPercentage from '@kubevirt-utils/resources/vm/hooks/useProvisioningPercentage';
@@ -24,6 +25,7 @@ import {
 import { Flex, FlexItem } from '@patternfly/react-core';
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 import { updateDisks } from '@virtualmachines/details/tabs/configuration/details/utils/utils';
+import { isRunning } from '@virtualmachines/utils';
 
 import useDisksFilters from '../../hooks/useDisksFilters';
 
@@ -55,8 +57,20 @@ const DiskList: FC<DiskListProps> = ({
   const filters = useDisksFilters();
   const [data, filteredData, onFilterChange] = useListPageFilter(disks, filters);
 
+  const addVolumeAccessReview = asAccessReview(
+    VirtualMachineSubresourcesModel,
+    vm,
+    'update' as K8sVerb,
+    'addvolume',
+  );
+  const [canAddVolume] = useFleetAccessReview(addVolumeAccessReview ?? {});
+  const vmIsRunning = isRunning(vm);
+
   const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
   const [canUpdate] = useFleetAccessReview(accessReview ?? {});
+
+  const canHotplug = vmIsRunning && canAddVolume;
+  const canAddDisk = canUpdate || canHotplug;
 
   const [canCreateDataVolume] = useAccessReview({
     group: VirtualMachineModel.apiGroup,
@@ -99,7 +113,7 @@ const DiskList: FC<DiskListProps> = ({
           ));
         }}
         canCreateDataVolume={canCreateDataVolume}
-        canUpdate={canUpdate}
+        canUpdate={canAddDisk}
       />
       <Flex>
         <FlexItem>
