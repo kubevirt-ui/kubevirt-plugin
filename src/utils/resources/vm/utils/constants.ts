@@ -22,6 +22,7 @@ export const PATHS_TO_HIGHLIGHT = {
     'spec.template.spec.tolerations',
     'spec.template.spec.nodeSelector',
     'spec.template.metadata.annotations',
+    'spec.runStrategy',
   ],
   SCRIPTS_TAB: ['spec.template.spec.volumes', 'spec.template.spec.accessCredentials'],
 };
@@ -45,6 +46,19 @@ export const NAD_TYPE_OVN_K8S_CNI_OVERLAY = 'ovn-k8s-cni-overlay';
 export const NAD_TYPE_CNV_BRIDGE = 'cnv-bridge';
 
 export const POD_NETWORK = 'POD_NETWORK';
+
+export const RUNSTRATEGY_ALWAYS = 'Always';
+export const RUNSTRATEGY_HALTED = 'Halted';
+export const RUNSTRATEGY_MANUAL = 'Manual';
+export const RUNSTRATEGY_RERUNONFAILURE = 'RerunOnFailure';
+
+export type RunStrategy =
+  | typeof RUNSTRATEGY_ALWAYS
+  | typeof RUNSTRATEGY_HALTED
+  | typeof RUNSTRATEGY_MANUAL
+  | typeof RUNSTRATEGY_RERUNONFAILURE;
+
+export const getDefaultRunningStrategy = (): RunStrategy => RUNSTRATEGY_RERUNONFAILURE;
 
 export enum UPDATE_STRATEGIES {
   Migration = 'Migration',

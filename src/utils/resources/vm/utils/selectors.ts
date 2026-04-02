@@ -24,7 +24,14 @@ import { isVM } from '@kubevirt-utils/utils/typeGuards';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
 import { VM_WORKLOAD_ANNOTATION } from './annotations';
-import { UPDATE_STRATEGIES, VirtualMachineStatusConditionTypes } from './constants';
+import {
+  RunStrategy,
+  RUNSTRATEGY_ALWAYS,
+  RUNSTRATEGY_HALTED,
+  UPDATE_STRATEGIES,
+  VirtualMachineStatusConditionTypes,
+} from './constants';
+import { VM_STATUS } from './vmStatus';
 
 /**
  * A selector for the virtual machine's folder
@@ -359,6 +366,33 @@ export const getStatusConditionByType = (
 
 export const getUpdateStrategy = (vm: V1VirtualMachine): UPDATE_STRATEGIES =>
   vm?.spec?.updateVolumesStrategy as UPDATE_STRATEGIES;
+
+export const getRunStrategy = (vm: V1VirtualMachine): RunStrategy | undefined =>
+  vm?.spec?.runStrategy as RunStrategy | undefined;
+
+export const getVMRunning = (vm: V1VirtualMachine): boolean | undefined => vm?.spec?.running;
+
+/**
+ * Returns the effective run strategy, resolving the deprecated spec.running field
+ * to its equivalent run strategy when spec.runStrategy is not set.
+ * @param vm
+ */
+export const getEffectiveRunStrategy = (
+  vm: undefined | V1VirtualMachine,
+): RunStrategy | undefined => {
+  if (vm?.spec?.runStrategy) return vm.spec.runStrategy as RunStrategy;
+  if (vm?.spec?.running === true) return RUNSTRATEGY_ALWAYS;
+  if (vm?.spec?.running === false) return RUNSTRATEGY_HALTED;
+  return undefined;
+};
+
+/**
+ * Returns true when the VM has a printable status that is NOT "Stopped".
+ * Covers Running, Starting, Provisioning, Paused, Migrating, etc.
+ * @param {V1VirtualMachine} vm the virtual machine
+ */
+export const isVMNotStopped = (vm: V1VirtualMachine): boolean =>
+  Boolean(vm?.status?.printableStatus) && vm.status.printableStatus !== VM_STATUS.Stopped;
 
 export const isHeadlessMode = (vm: V1VirtualMachine | V1VirtualMachineInstance) => {
   const devices = isVM(vm) ? vm?.spec?.template?.spec?.domain?.devices : vm?.spec?.domain?.devices;

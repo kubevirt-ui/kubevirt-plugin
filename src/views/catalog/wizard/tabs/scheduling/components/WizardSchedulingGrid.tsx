@@ -11,9 +11,16 @@ import ShowEvictionStrategy from '@kubevirt-utils/components/EvictionStrategy/Sh
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import NodeSelectorDetailItem from '@kubevirt-utils/components/NodeSelectorDetailItem/NodeSelectorDetailItem';
 import NodeSelectorModal from '@kubevirt-utils/components/NodeSelectorModal/NodeSelectorModal';
+import RunStrategyModal from '@kubevirt-utils/components/RunStrategyModal/RunStrategyModal';
+import {
+  applyRunStrategyToSpec,
+  getRunStrategyDisplayValue,
+  getRunStrategyHelpText,
+} from '@kubevirt-utils/components/RunStrategyModal/utils';
 import TolerationsModal from '@kubevirt-utils/components/TolerationsModal/TolerationsModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getEvictionStrategy } from '@kubevirt-utils/resources/vm';
+import { getEffectiveRunStrategy } from '@kubevirt-utils/resources/vm/utils/selectors';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
@@ -160,6 +167,31 @@ const WizardSchedulingGrid: FC<WizardSchedulingGridProps> = ({ updateVM, vm }) =
             isEdit
             testId="eviction-strategy"
             title={t('Eviction strategy')}
+          />
+
+          <WizardDescriptionItem
+            helperPopover={{
+              content: getRunStrategyHelpText(t),
+              header: t('Run strategy'),
+            }}
+            onEditClick={() =>
+              createModal(({ isOpen, onClose }) => (
+                <RunStrategyModal
+                  onSubmit={(runStrategy) =>
+                    updateVM((draftVM) => applyRunStrategyToSpec(draftVM.spec, runStrategy))
+                  }
+                  hasStoppedVMs={false}
+                  initialRunStrategy={getEffectiveRunStrategy(vm)}
+                  isOpen={isOpen}
+                  isVMRunning={false}
+                  onClose={onClose}
+                />
+              ))
+            }
+            description={getRunStrategyDisplayValue(t, vm) ?? t('Not available')}
+            isEdit
+            testId="wizard-scheduling-run-strategy"
+            title={t('Run strategy')}
           />
         </DescriptionList>
       </GridItem>

@@ -1,5 +1,5 @@
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { RUNSTRATEGY_HALTED } from '@kubevirt-utils/constants/constants';
+import { RUNSTRATEGY_HALTED } from '@kubevirt-utils/resources/vm/utils/constants';
 
 export const exampleVirtualMachineWithEnvironments: V1VirtualMachine = {
   apiVersion: 'kubevirt.io/v1',

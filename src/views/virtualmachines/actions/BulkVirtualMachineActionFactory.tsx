@@ -8,6 +8,8 @@ import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdo
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
 import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import MoveBulkVMToFolderModal from '@kubevirt-utils/components/MoveVMToFolderModal/MoveBulkVMsToFolderModal';
+import RunStrategyModal from '@kubevirt-utils/components/RunStrategyModal/RunStrategyModal';
+import { updateRunStrategy } from '@kubevirt-utils/components/RunStrategyModal/utils';
 import BulkSnapshotModal from '@kubevirt-utils/components/SnapshotModal/BulkSnapshotModal';
 import SnapshotModal from '@kubevirt-utils/components/SnapshotModal/SnapshotModal';
 import {
@@ -16,7 +18,11 @@ import {
   haveSameCluster,
   haveSameNamespace,
 } from '@kubevirt-utils/resources/shared';
-import { getNoPermissionTooltipContent } from '@kubevirt-utils/utils/utils';
+import {
+  getEffectiveRunStrategy,
+  isVMNotStopped,
+} from '@kubevirt-utils/resources/vm/utils/selectors';
+import { getNoPermissionTooltipContent, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import CrossClusterMigration from '@multicluster/components/CrossClusterMigration/CrossClusterMigration';
 import { CROSS_CLUSTER_MIGRATION_ACTION_ID } from '@multicluster/constants';
@@ -24,7 +30,7 @@ import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
-import { isLiveMigratable, isRunning, printableVMStatus } from '../utils';
+import { isLiveMigratable, isRunning, isStopped, printableVMStatus } from '../utils';
 
 import ConfirmMultipleVMActionsModal from './components/ConfirmMultipleVMActionsModal/ConfirmMultipleVMActionsModal';
 import VirtualMachineMigrateModal from './components/VirtualMachineMigration/VirtualMachineMigrationModal';
@@ -124,6 +130,52 @@ export const createBulkVirtualMachineActionFactory = (
     disabled: isEmpty(vms),
     id: ACTIONS_ID.EDIT_LABELS,
     label: t('Edit labels'),
+  }),
+  editRunStrategy: (
+    vms: V1VirtualMachine[],
+    createModal: (modal: ModalComponent) => void,
+  ): ActionDropdownItemType => ({
+    accessReview: {
+      cluster: getCluster(vms?.[0]),
+      group: VirtualMachineModel.apiGroup,
+      namespace: getNamespace(vms?.[0]),
+      resource: VirtualMachineModel.plural,
+      verb: 'patch',
+    },
+    cta: () => {
+      const effectiveStrategies = vms.map(getEffectiveRunStrategy);
+      const allSameStrategy = effectiveStrategies.every((s) => s === effectiveStrategies[0]);
+      createModal(({ isOpen, onClose }) => (
+        <RunStrategyModal
+          onSubmit={async (runStrategy) => {
+            const results = await Promise.allSettled(
+              vms.map((vm) => updateRunStrategy(vm, runStrategy)),
+            );
+            const failures = results.filter(
+              (r): r is PromiseRejectedResult => r.status === 'rejected',
+            );
+            if (failures.length > 0) {
+              failures.forEach((r) =>
+                kubevirtConsole.error('Failed to update run strategy:', r.reason),
+              );
+              throw new Error(
+                `Failed to update run strategy for ${failures.length} of ${vms.length} VirtualMachine(s)`,
+              );
+            }
+          }}
+          hasMixedStrategies={!allSameStrategy}
+          hasStoppedVMs={vms.some(isStopped)}
+          initialRunStrategy={allSameStrategy ? effectiveStrategies[0] : undefined}
+          isOpen={isOpen}
+          isVMRunning={vms.some(isVMNotStopped)}
+          onClose={onClose}
+          vmCount={vms.length}
+        />
+      ));
+    },
+    disabled: isEmpty(vms),
+    id: ACTIONS_ID.EDIT_RUN_STRATEGY,
+    label: t('Edit run strategy'),
   }),
   migrateCompute: (
     vms: V1VirtualMachine[],

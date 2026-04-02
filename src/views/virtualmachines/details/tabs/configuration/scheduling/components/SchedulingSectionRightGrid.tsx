@@ -1,4 +1,5 @@
 import React, { FC, useCallback, useMemo } from 'react';
+import produce from 'immer';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -7,11 +8,23 @@ import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/Descript
 import EvictionStrategyModal from '@kubevirt-utils/components/EvictionStrategy/EvictionStrategyModal';
 import ShowEvictionStrategy from '@kubevirt-utils/components/EvictionStrategy/ShowEvictionStrategy';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
+import RunStrategyModal from '@kubevirt-utils/components/RunStrategyModal/RunStrategyModal';
+import {
+  applyRunStrategyToSpec,
+  getRunStrategyDisplayValue,
+  getRunStrategyHelpText,
+  updateRunStrategy,
+} from '@kubevirt-utils/components/RunStrategyModal/utils';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isExpandableSpecVM } from '@kubevirt-utils/resources/instancetype/helper';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getEvictionStrategy } from '@kubevirt-utils/resources/vm';
+import {
+  getEffectiveRunStrategy,
+  isVMNotStopped,
+} from '@kubevirt-utils/resources/vm/utils/selectors';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
@@ -47,7 +60,7 @@ const SchedulingSectionRightGrid: FC<SchedulingSectionRightGridProps> = ({
             name: getName(updatedVM),
             ns: getNamespace(updatedVM),
           }),
-    [onUpdateVM],
+    [onUpdateVM, vm],
   );
 
   const onEditEvictionStrategy = useCallback(() => {
@@ -105,6 +118,33 @@ const SchedulingSectionRightGrid: FC<SchedulingSectionRightGridProps> = ({
           descriptionData={evictionStrategy}
           isEdit={canUpdateVM}
           onEditClick={onEditEvictionStrategy}
+        />
+        <DescriptionItem
+          descriptionData={
+            getRunStrategyDisplayValue(t, vm) || <MutedTextSpan text={t('Not available')} />
+          }
+          onEditClick={() =>
+            createModal(({ isOpen, onClose }) => (
+              <RunStrategyModal
+                onSubmit={(runStrategy) =>
+                  onUpdateVM
+                    ? onUpdateVM(
+                        produce(vm, (draft) => applyRunStrategyToSpec(draft.spec, runStrategy)),
+                      )
+                    : updateRunStrategy(vm, runStrategy)
+                }
+                initialRunStrategy={getEffectiveRunStrategy(vm)}
+                isOpen={isOpen}
+                isVMRunning={isVMNotStopped(vm)}
+                onClose={onClose}
+              />
+            ))
+          }
+          bodyContent={getRunStrategyHelpText(t)}
+          data-test-id="run-strategy"
+          descriptionHeader={<SearchItem id="run-strategy">{t('Run strategy')}</SearchItem>}
+          isEdit={canUpdateVM}
+          isPopover
         />
       </DescriptionList>
     </GridItem>

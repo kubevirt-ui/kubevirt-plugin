@@ -24,11 +24,6 @@ export const KUBEVIRT_HYPERCONVERGED = 'kubevirt-hyperconverged';
 export const OPENSHIFT_CNV = 'openshift-cnv';
 export const CNV_OBSERVABILITY = 'cnv-observability';
 
-export const RUNSTRATEGY_ALWAYS = 'Always';
-export const RUNSTRATEGY_HALTED = 'Halted';
-export const RUNSTRATEGY_MANUAL = 'Manual';
-export const RUNSTRATEGY_RERUNONFAILURE = 'RerunOnFailure';
-
 export const NONE = 'none';
 export const SPACE_SYMBOL = ' ';
 
