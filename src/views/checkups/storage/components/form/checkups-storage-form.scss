@@ -19,9 +19,9 @@
         margin-bottom: var(--pf-t--global--spacer--md);
       }
 
-      input[type='number']:where(:not([class*='pf-v5-c-'], [class*='pf-v6-c-'])) {
-        max-width: 180px;
-        min-width: 180px;
+      input[type='number']:where(:not([class*='pf-v6-c-'])) {
+        max-width: 11.25rem;
+        min-width: 11.25rem;
       }
     }
 

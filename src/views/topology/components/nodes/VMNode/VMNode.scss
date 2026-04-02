@@ -1,40 +1,31 @@
 .kubevirt-vm-node__bg {
-  fill: var(--pf-v5-global--BackgroundColor--light-100);
+  fill: var(--pf-t--global--background--color--100);
 }
 
 .kubevirt-vm-node__status {
   fill-opacity: 1;
-  fill: var(--pf-v5-color-purple-300);
+  fill: var(--pf-t--chart--color--purple--300);
   stroke-width: 0;
   .kubevirt-m-running & {
-    fill: var(--pf-v5-global--primary-color--100);
+    fill: var(--pf-t--global--color--brand--default);
   }
   .kubevirt-m-not-ready & {
-    fill: var(--pf-v5-chart-color-blue-200);
-  }
-  .kubevirt-m-warning & {
-    fill: var(--pf-v5-chart-color-gold-400);
+    fill: var(--pf-t--chart--color--blue--200);
   }
   .kubevirt-m-error & {
-    fill: var(--pf-v5-color-red-100);
+    fill: var(--pf-t--global--color--status--danger--100);
   }
   .kubevirt-m-pending & {
-    fill: var(--pf-v5-chart-color-blue-100);
-  }
-  .kubevirt-m-success & {
-    fill: var(--pf-v5-color-green-500);
+    fill: var(--pf-t--chart--color--blue--100);
   }
   .kubevirt-m-terminating & {
-    fill: var(--pf-v5-chart-color-blue-600);
+    fill: var(--pf-t--chart--color--blue--500);
   }
   .kubevirt-m-unknown & {
-    fill: var(--pf-v5-color-purple-300);
+    fill: var(--pf-t--chart--color--purple--300);
   }
   .kubevirt-m-off & {
-    fill: var(--pf-v5-global--Color--light-100);
-  }
-  .kubevirt-m-importing & {
-    fill: var(--pf-v5-color-black-400);
+    fill: var(--pf-t--global--background--color--100);
   }
 }
 
@@ -42,6 +33,6 @@
   .kubevirt-vm-node__bg,
   .kubevirt-vm-node__status {
     stroke-width: 1;
-    stroke: var(--pf-v5-global--BorderColor--100);
+    stroke: var(--pf-t--global--border--color--100);
   }
 }
