@@ -2,6 +2,7 @@ import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { getName } from '@kubevirt-utils/resources/shared';
 import {
   isCommonTemplate,
+  isDefaultVariantTemplate,
   isDeprecatedTemplate,
   OS_NAME_TYPES,
 } from '@kubevirt-utils/resources/template';
@@ -9,7 +10,6 @@ import {
   getTemplateName,
   getTemplateOS,
   getTemplateWorkload,
-  isDefaultVariantTemplate,
 } from '@kubevirt-utils/resources/template/utils/selectors';
 import { getArchitecture } from '@kubevirt-utils/utils/architecture';
 

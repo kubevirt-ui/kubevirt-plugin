@@ -1,3 +1,6 @@
+import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+
 import { CATALOG_FILTERS } from './consts';
 
 export type TemplateFilters = {
@@ -12,4 +15,10 @@ export type TemplateFilters = {
   [CATALOG_FILTERS.OS_NAME]: Set<string>;
   [CATALOG_FILTERS.QUERY]: string;
   [CATALOG_FILTERS.WORKLOAD]: Set<string>;
+};
+export type TemplatesCatalogCallbacks = {
+  availableDatasources: Record<string, V1beta1DataSource>;
+  availableTemplatesUID: Set<string>;
+  onTemplateClick: (template: V1Template) => void;
+  selectedTemplate?: V1Template;
 };

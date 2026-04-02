@@ -2,9 +2,9 @@ import React, { FC, memo, useCallback, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { Tab, Tabs, TabTitleText } from '@patternfly/react-core';
-import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
+import { Alert, AlertVariant, Spinner, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 import { TemplatesDrawerTabKey } from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/components/TemplatesCatalogDrawerPanel/utils/types';
+import { useDrawerContext } from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/hooks/useDrawerContext';
 import { getTemplateParametersSplit } from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/utils/utils';
 
 import ParametersSections from '../ParametersSections';
@@ -15,13 +15,25 @@ const TemplatesCatalogDrawerPanel: FC = memo(() => {
   const [activeTabKey, setActiveTabKey] = useState<TemplatesDrawerTabKey>(
     TemplatesDrawerTabKey.Details,
   );
-  const { selectedTemplate } = useVMWizardStore();
+  const { template, templateDataLoaded, templateLoadingError } = useDrawerContext();
 
-  const [requiredParameters] = getTemplateParametersSplit(selectedTemplate?.parameters ?? []);
+  const [requiredParameters] = getTemplateParametersSplit(template?.parameters ?? []);
 
   const handleTabKey = useCallback((_: unknown, tabKey: TemplatesDrawerTabKey): void => {
     setActiveTabKey(tabKey);
   }, []);
+
+  if (templateLoadingError) {
+    return (
+      <Alert isInline title={t('Error loading template')} variant={AlertVariant.danger}>
+        {templateLoadingError.message}
+      </Alert>
+    );
+  }
+
+  if (!templateDataLoaded) {
+    return <Spinner />;
+  }
 
   return (
     <Tabs activeKey={activeTabKey} onSelect={handleTabKey}>
@@ -33,8 +45,8 @@ const TemplatesCatalogDrawerPanel: FC = memo(() => {
       </Tab>
       {!isEmpty(requiredParameters) && (
         <Tab
-          eventKey={TemplatesDrawerTabKey.OptionalParams}
-          title={<TabTitleText>{t('Optional parameters')}</TabTitleText>}
+          eventKey={TemplatesDrawerTabKey.RequiredParams}
+          title={<TabTitleText>{t('Required parameters')}</TabTitleText>}
         >
           <ParametersSections requiredParameters={requiredParameters} />
         </Tab>

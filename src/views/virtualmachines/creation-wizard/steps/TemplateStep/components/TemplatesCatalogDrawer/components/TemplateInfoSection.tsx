@@ -10,7 +10,6 @@ import {
   getTemplateInterfaces,
   getTemplateName,
   getTemplateNetworks,
-  getTemplateVirtualMachineObject,
   getTemplateWorkload,
   isDefaultVariantTemplate,
 } from '@kubevirt-utils/resources/template/utils/selectors';
@@ -20,23 +19,22 @@ import { DescriptionList } from '@patternfly/react-core';
 import DisksReviewTable from '@virtualmachines/creation-wizard/components/DisksReviewTable/DisksReviewTable';
 import useWizardDisksTableData from '@virtualmachines/creation-wizard/components/DisksReviewTable/hooks/useWizardDisksTableData/useWizardDisksTableData';
 import NetworksReviewTable from '@virtualmachines/creation-wizard/components/NetworksReviewTable';
-import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
+import { useDrawerContext } from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/hooks/useDrawerContext';
 
 import TemplateExpandableDescription from './TemplateExpandableDescription';
 
 const TemplateInfoSection: FC = memo(() => {
   const { t } = useKubevirtTranslation();
-  const { selectedTemplate } = useVMWizardStore();
-  const vm = getTemplateVirtualMachineObject(selectedTemplate);
+  const { template, vm } = useDrawerContext();
 
   const notAvailable = t('N/A');
-  const displayName = getTemplateName(selectedTemplate);
-  const description = getTemplateDescription(selectedTemplate) || notAvailable;
-  const workload = getTemplateWorkload(selectedTemplate);
-  const networks = getTemplateNetworks(selectedTemplate);
-  const interfaces = getTemplateInterfaces(selectedTemplate);
+  const displayName = getTemplateName(template);
+  const description = getTemplateDescription(template) || notAvailable;
+  const workload = getTemplateWorkload(template);
+  const networks = getTemplateNetworks(template);
+  const interfaces = getTemplateInterfaces(template);
   const [disks] = useWizardDisksTableData(vm);
-  const isDefaultTemplate = isDefaultVariantTemplate(selectedTemplate);
+  const isDefaultTemplate = isDefaultVariantTemplate(template);
 
   return (
     <DescriptionList className="pf-v6-u-mt-lg">

@@ -1,14 +1,17 @@
-import React, { FC, useMemo } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom-v5-compat';
 
+import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { logTemplateFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
 import { TEMPLATE_SELECTED } from '@kubevirt-utils/extensions/telemetry/utils/constants';
+import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { PageSection, Stack } from '@patternfly/react-core';
+import { wizardVMSignal } from '@virtualmachines/creation-wizard/state/vm-signal/vmStore';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 import TemplatesCatalogEmptyState from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesCatalogEmptyState';
-import TemplatesCatalogItems from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesCatalogItems';
+import TemplatesCatalogItems from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesCatalogItems/TemplatesCatalogItems';
 import CatalogSkeleton from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesCatalogSkeleton';
 import TemplatesToolbar from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesToolbar/TemplatesToolbar';
 import useHideDeprecatedTemplateTiles from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/hooks/useHideDeprecatedTemplateTiles';
@@ -22,6 +25,7 @@ import './TemplateCatalog.scss';
 const TemplatesCatalog: FC = () => {
   const { ns: namespace } = useParams<{ ns: string }>();
   const { selectedTemplate, setSelectedTemplate } = useVMWizardStore();
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const [filters, onFilterChange, clearAll] = useTemplatesFilters();
   const { availableDataSources, availableTemplatesUID, bootSourcesLoaded, loaded, templates } =
@@ -38,6 +42,18 @@ const TemplatesCatalog: FC = () => {
 
   useHideDeprecatedTemplateTiles(onFilterChange);
 
+  const handleTemplateSelect = (template: V1Template) => {
+    setSelectedTemplate(template);
+    const vm = getTemplateVirtualMachineObject(template);
+    wizardVMSignal.value = vm;
+    logTemplateFlowEvent(TEMPLATE_SELECTED, template);
+    setIsDrawerOpen(true);
+  };
+
+  const handleDrawerClose = () => {
+    setIsDrawerOpen(false);
+  };
+
   return (
     <PageSection className="vm-catalog">
       {loaded ? (
@@ -46,15 +62,13 @@ const TemplatesCatalog: FC = () => {
           <Stack className="co-catalog-page__content">
             {!isEmpty(filteredTemplates) ? (
               <TemplatesCatalogItems
-                onTemplateClick={(template) => {
-                  setSelectedTemplate(template);
-                  logTemplateFlowEvent(TEMPLATE_SELECTED, template);
-                }}
                 availableDatasources={availableDataSources}
                 availableTemplatesUID={availableTemplatesUID}
                 bootSourcesLoaded={bootSourcesLoaded}
                 filters={filters}
                 loaded={loaded}
+                onTemplateClick={handleTemplateSelect}
+                selectedTemplate={selectedTemplate}
                 templates={filteredTemplates}
                 unfilteredTemplates={templates}
               />
@@ -70,9 +84,9 @@ const TemplatesCatalog: FC = () => {
         <CatalogSkeleton />
       )}
       <TemplatesCatalogDrawer
-        isOpen={!!selectedTemplate}
+        isOpen={isDrawerOpen && !!selectedTemplate}
         namespace={namespace ?? DEFAULT_NAMESPACE}
-        onClose={() => setSelectedTemplate(undefined)}
+        onClose={handleDrawerClose}
         template={selectedTemplate}
       />
     </PageSection>
