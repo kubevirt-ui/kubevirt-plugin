@@ -4,7 +4,7 @@ import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { getNoDataAvailableMessage, isEmpty } from '@kubevirt-utils/utils/utils';
 import { Bullseye, Card, CardBody, Grid, GridItem } from '@patternfly/react-core';
 
 import useMetricChartData from '../utils/hooks/useMetricChartData';
@@ -55,7 +55,7 @@ const ChartCard: React.FC<ChartCardProps> = ({ metric }) => {
               <MutedTextSpan
                 text={
                   isEmpty(chartData)
-                    ? t('No data available')
+                    ? getNoDataAvailableMessage(t)
                     : t(
                         'VMs in this namespace are new, therefore not enough data is collected to display a graph.',
                       )

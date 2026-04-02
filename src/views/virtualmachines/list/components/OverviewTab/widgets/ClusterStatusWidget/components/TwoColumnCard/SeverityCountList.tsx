@@ -2,12 +2,9 @@ import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
-import { getItemLabel, getSeverityLabel, SeverityCount } from '../../hooks/clusterMetricConstants';
+import { getItemLabel, getSeverityLabel } from '../../hooks/clusterMetricConstants';
 
-type SeverityCountListProps = {
-  itemLabel?: string;
-  severityCounts: SeverityCount[];
-};
+import { SeverityCountListProps } from './types';
 
 const SeverityCountList: FC<SeverityCountListProps> = ({ itemLabel, severityCounts }) => {
   const { t } = useKubevirtTranslation();

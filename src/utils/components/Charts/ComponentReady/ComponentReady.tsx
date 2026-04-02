@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom-v5-compat';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getNoDataAvailableMessage } from '@kubevirt-utils/utils/utils';
 import { Bullseye } from '@patternfly/react-core';
 
 type ComponentReadyProps = React.PropsWithChildren<{
@@ -24,7 +25,7 @@ const ComponentReady: React.FC<ComponentReadyProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const renderText = text || t('No data available');
+  const renderText = text || getNoDataAvailableMessage(t);
 
   return (
     <StateHandler error={error} hasData={isReady} loaded={!isLoading} withBullseye>

@@ -1,12 +1,17 @@
 import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getNoDataAvailableMessage } from '@kubevirt-utils/utils/utils';
 
 import { TOP_N } from '../../hooks/clusterMetricConstants';
 import useClustersUtilizationData from '../../hooks/useClustersUtilizationData';
 import TwoColumnCard from '../TwoColumnCard/TwoColumnCard';
 
-const ClustersUtilizationCard: FC = () => {
+type ClustersUtilizationCardProps = {
+  metricsUnavailable?: boolean;
+};
+
+const ClustersUtilizationCard: FC<ClustersUtilizationCardProps> = ({ metricsUnavailable }) => {
   const { t } = useKubevirtTranslation();
   const { items, loaded, severityCounts, totalCount } = useClustersUtilizationData();
 
@@ -20,6 +25,7 @@ const ClustersUtilizationCard: FC = () => {
       isLoading={!loaded}
       items={items}
       nameHeader={t('Cluster name')}
+      noDataMessage={metricsUnavailable ? getNoDataAvailableMessage(t) : undefined}
       rightTitle={rightTitle}
       scoreHeader={t('Score')}
       severityCounts={severityCounts}

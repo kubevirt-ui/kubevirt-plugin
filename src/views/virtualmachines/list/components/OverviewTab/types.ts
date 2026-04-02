@@ -24,6 +24,7 @@ export const GRID_VM_HEALTH = '2fr 3fr 1fr';
 
 export type OverviewSectionData = {
   cluster?: string;
+  metricsUnavailable?: boolean;
   namespace?: string;
   subHeader?: ReactNode;
   title: string;

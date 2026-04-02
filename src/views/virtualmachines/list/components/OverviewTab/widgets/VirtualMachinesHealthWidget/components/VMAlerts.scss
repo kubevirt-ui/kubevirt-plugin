@@ -1,4 +1,13 @@
 .vm-alerts {
+  &__body {
+    flex-grow: 1;
+  }
+
+  &__error {
+    height: 100%;
+    margin-bottom: var(--pf-t--global--spacer--md);
+  }
+
   &__count {
     color: var(--pf-t--global--text--color--link--default);
     margin-inline-start: var(--pf-t--global--spacer--sm);

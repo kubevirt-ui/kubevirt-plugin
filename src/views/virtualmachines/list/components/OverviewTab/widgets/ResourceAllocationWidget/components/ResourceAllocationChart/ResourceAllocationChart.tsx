@@ -6,6 +6,7 @@ import useResponsiveCharts from '@kubevirt-utils/components/Charts/hooks/useResp
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getNoDataAvailableMessage } from '@kubevirt-utils/utils/utils';
 import { MetricChartData } from '@overview/OverviewTab/metric-charts-card/utils/hooks/useMetricChartData';
 import useYAxisTicks from '@overview/OverviewTab/metric-charts-card/utils/hooks/useYAxisTicks';
 import { xTickFormat } from '@overview/OverviewTab/metric-charts-card/utils/hooks/utils';
@@ -111,7 +112,7 @@ const ResourceAllocationChart: FC<ResourceAllocationChartProps> = ({
     return (
       <div className="resource-allocation-widget__chart" ref={ref}>
         <Bullseye>
-          <MutedTextSpan text={t('No data available')} />
+          <MutedTextSpan text={getNoDataAvailableMessage(t)} />
         </Bullseye>
       </div>
     );

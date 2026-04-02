@@ -5,11 +5,10 @@ import { VirtualMachineModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVMListPath } from '@kubevirt-utils/resources/vm';
-import useClusterParam from '@multicluster/hooks/useClusterParam';
+import useCluster from '@multicluster/hooks/useCluster';
 import { getACMVMListURL, getCatalogURL, getVMWizardURL } from '@multicluster/urls';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { ListPageCreateDropdown } from '@openshift-console/dynamic-plugin-sdk';
-import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 type VirtualMachinesCreateButtonProps = {
   buttonText?: string;
@@ -23,10 +22,8 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
 
-  const [hubClusterName] = useHubClusterName();
   const isACMPage = useIsACMPage();
-  const clusterParam = useClusterParam();
-  const cluster = clusterParam || hubClusterName;
+  const cluster = useCluster();
   const selectedNamespace = namespace || DEFAULT_NAMESPACE;
 
   const createItems = {
@@ -38,13 +35,13 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
   };
 
   const catalogURL = useMemo(
-    () => getCatalogURL(isACMPage ? cluster : null, selectedNamespace),
-    [namespace, cluster],
+    () => getCatalogURL(isACMPage ? cluster || '' : '', selectedNamespace),
+    [isACMPage, selectedNamespace, cluster],
   );
 
   const vmWizardURL = useMemo(
-    () => getVMWizardURL(isACMPage ? cluster : null, selectedNamespace),
-    [namespace, cluster],
+    () => getVMWizardURL(isACMPage ? cluster || '' : '', selectedNamespace),
+    [isACMPage, selectedNamespace, cluster],
   );
 
   const onCreate = useCallback(
@@ -56,7 +53,6 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
           return navigate(catalogURL);
         case 'newWizard':
           return navigate(vmWizardURL);
-          break;
         default:
           return navigate(
             isACMPage
@@ -65,7 +61,7 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
           );
       }
     },
-    [catalogURL, navigate, namespace, cluster],
+    [catalogURL, navigate, vmWizardURL, isACMPage, cluster, selectedNamespace],
   );
 
   return (

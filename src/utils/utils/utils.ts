@@ -293,3 +293,5 @@ export const verifyMatchExpressions = (
         return false;
     }
   });
+
+export const getNoDataAvailableMessage = (t: TFunction): string => t('No data available');

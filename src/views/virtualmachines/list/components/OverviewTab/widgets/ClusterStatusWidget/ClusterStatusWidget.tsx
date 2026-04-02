@@ -23,7 +23,12 @@ import ClustersUtilizationCard from './components/ClustersUtilizationCard/Cluste
 import NodeLoadDistributionCard from './components/NodeLoadDistributionCard/NodeLoadDistributionCard';
 import useClusterUtilizationData from './hooks/useClusterUtilizationData';
 
-const ClusterStatusWidget: FC<OverviewSectionData> = ({ cluster, title, vms }) => {
+const ClusterStatusWidget: FC<OverviewSectionData> = ({
+  cluster,
+  metricsUnavailable,
+  title,
+  vms,
+}) => {
   const isAllClustersPage = useIsAllClustersPage();
   const {
     cpuLoad,
@@ -41,7 +46,11 @@ const ClusterStatusWidget: FC<OverviewSectionData> = ({ cluster, title, vms }) =
   return (
     <OverviewSection dataTestId="cluster-status-widget" title={title}>
       <OverviewSectionRow gridColumns={GRID_THREE_EQUAL}>
-        <OpenShiftVirtualizationWidget cluster={cluster} isAllClustersPage={isAllClustersPage} />
+        <OpenShiftVirtualizationWidget
+          cluster={cluster}
+          isAllClustersPage={isAllClustersPage}
+          metricsUnavailable={metricsUnavailable}
+        />
         <ClusterResourcesCard
           clustersCount={clustersWithVMsCount}
           isAllClustersPage={isAllClustersPage}
@@ -51,8 +60,8 @@ const ClusterStatusWidget: FC<OverviewSectionData> = ({ cluster, title, vms }) =
       </OverviewSectionRow>
       {isAllClustersPage ? (
         <OverviewSectionRow gridColumns={GRID_TWO_EQUAL}>
-          <ClustersUtilizationCard />
-          <ClustersLoadBalanceCard />
+          <ClustersUtilizationCard metricsUnavailable={metricsUnavailable} />
+          <ClustersLoadBalanceCard metricsUnavailable={metricsUnavailable} />
         </OverviewSectionRow>
       ) : (
         <OverviewSectionRow
@@ -63,9 +72,10 @@ const ClusterStatusWidget: FC<OverviewSectionData> = ({ cluster, title, vms }) =
             cpuLoad={cpuLoad}
             isLoading={!utilizationLoaded}
             memoryLoad={memoryLoad}
+            metricsUnavailable={metricsUnavailable}
             storageLoad={storageLoad}
           />
-          <NodeLoadDistributionCard cluster={cluster} />
+          <NodeLoadDistributionCard cluster={cluster} metricsUnavailable={metricsUnavailable} />
         </OverviewSectionRow>
       )}
     </OverviewSection>

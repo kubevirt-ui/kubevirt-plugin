@@ -1,0 +1,16 @@
+.observability-disabled-alert {
+  &--multiple {
+    .pf-v6-c-alert__icon {
+      margin-top: var(--pf-t--global--spacer--xs);
+    }
+  }
+
+  .pf-v6-c-label {
+    cursor: pointer;
+    margin-right: var(--pf-t--global--spacer--xs);
+  }
+
+  &__link {
+    margin-left: var(--pf-t--global--spacer--sm);
+  }
+}

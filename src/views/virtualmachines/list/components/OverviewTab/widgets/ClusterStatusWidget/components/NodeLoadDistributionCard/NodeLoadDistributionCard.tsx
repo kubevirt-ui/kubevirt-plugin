@@ -3,6 +3,7 @@ import React, { FC, useMemo } from 'react';
 import { NodeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
+import { getNoDataAvailableMessage } from '@kubevirt-utils/utils/utils';
 import useManagedClusterConsoleURLs from '@multicluster/hooks/useManagedClusterConsoleURLs';
 import { buildSpokeConsoleUrl } from '@multicluster/urls';
 import { Skeleton } from '@patternfly/react-core';
@@ -17,11 +18,15 @@ import useDeschedulerDisplay from './useDeschedulerDisplay';
 
 type NodeLoadDistributionCardProps = {
   cluster?: string;
+  metricsUnavailable?: boolean;
 };
 
 const NODES_PATH = `${getResourceUrl({ model: NodeModel })}?roles=worker`;
 
-const NodeLoadDistributionCard: FC<NodeLoadDistributionCardProps> = ({ cluster }) => {
+const NodeLoadDistributionCard: FC<NodeLoadDistributionCardProps> = ({
+  cluster,
+  metricsUnavailable,
+}) => {
   const { t } = useKubevirtTranslation();
   const {
     buckets,
@@ -79,6 +84,7 @@ const NodeLoadDistributionCard: FC<NodeLoadDistributionCardProps> = ({ cluster }
       isLoading={!loaded}
       items={items}
       nameHeader={t('Node name')}
+      noDataMessage={metricsUnavailable ? getNoDataAvailableMessage(t) : undefined}
       scoreHeader={t('Load')}
       title={t('Node load distribution')}
     />
