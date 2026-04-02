@@ -13,14 +13,17 @@ import { updateWizardVM } from '@virtualmachines/creation-wizard/state/vm-signal
 import { wizardVMSignal } from '@virtualmachines/creation-wizard/state/vm-signal/vmStore';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 import ReviewGrid from '@virtualmachines/creation-wizard/steps/ReviewAndCreateStep/components/ReviewGrid/ReviewGrid';
+import { isCloneCreationMethod } from '@virtualmachines/creation-wizard/utils/utils';
 
 import NameAndDescriptionForm from './components/NameAndDescriptionForm';
 
 const ReviewAndCreateStep: FC = () => {
   const { t } = useKubevirtTranslation();
-  const { setStartVM, startVM } = useVMWizardStore();
+  const { creationMethod, setStartVM, startVM } = useVMWizardStore();
   const vm = wizardVMSignal.value;
   const vmName = getName(vm);
+  const isCloneMethod = isCloneCreationMethod(creationMethod);
+  const cloneMethodLabel = isCloneMethod ? 'Clone' : 'Create';
 
   return (
     <Stack hasGutter>
@@ -31,7 +34,8 @@ const ReviewAndCreateStep: FC = () => {
       </StackItem>
       <StackItem>
         <Trans ns="plugin__kubevirt-plugin" t={t}>
-          Review and click <strong>Create VirtualMachine</strong> to start creating {{ vmName }}.
+          Review and click <strong>{{ cloneMethodLabel }} VirtualMachine</strong> to start creating{' '}
+          {{ vmName }}.
         </Trans>
       </StackItem>
       <StackItem>

@@ -21,6 +21,8 @@ export type InstanceTypeFlowState = {
 };
 
 export type VMWizardState = {
+  cloneVMDescription: string;
+  cloneVMName: string;
   cluster: string;
   creationMethod: VMCreationMethod;
   folder: string;
@@ -38,6 +40,8 @@ export type VMWizardActions = {
     dvSource?: V1beta1DataVolume,
   ) => void;
   resetWizardState: () => void;
+  setCloneVMDescription: (cloneVMDescription: string) => void;
+  setCloneVMName: (cloneVMName: string) => void;
   setCluster: (cluster: string) => void;
   setCreationMethod: (creationMethod: VMCreationMethod) => void;
   setDvSource: (dvSource: V1beta1DataVolume) => void;

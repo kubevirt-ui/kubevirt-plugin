@@ -47,6 +47,8 @@ const useVMWizardStore = create<VMWizardStore>()((set) => {
         }),
       ),
     resetWizardState: () => set({ ...initialVMWizardState }),
+    setCloneVMDescription: (cloneVMDescription: string) => set({ cloneVMDescription }),
+    setCloneVMName: (cloneVMName: string) => set({ cloneVMName }),
     setCluster: (cluster: string) => set({ cluster }),
     setCreationMethod: (creationMethod: VMCreationMethod) => set({ creationMethod }),
     setDvSource: (dvSource: V1beta1DataVolume) =>

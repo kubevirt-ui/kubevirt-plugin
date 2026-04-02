@@ -3,6 +3,8 @@ import { OperatingSystemType } from '@virtualmachines/creation-wizard/steps/Inst
 import { VMCreationMethod } from '@virtualmachines/creation-wizard/utils/constants';
 
 export const initialVMWizardState: VMWizardState = {
+  cloneVMDescription: '',
+  cloneVMName: '',
   cluster: '',
   creationMethod: VMCreationMethod.INSTANCE_TYPE,
   folder: '',

@@ -1,12 +1,14 @@
-import React, { FC, useCallback, useEffect, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router-dom-v5-compat';
+import React, { FC, useEffect, useRef } from 'react';
+import { useParams } from 'react-router-dom-v5-compat';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import { getVMListURL } from '@multicluster/urls';
 import { Wizard, WizardHeader, WizardStep } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
+import DefaultWizardFooter from '@virtualmachines/creation-wizard/components/DefaultWizardFooter';
+import useCloseWizard from '@virtualmachines/creation-wizard/hooks/useCloseWizard';
+import useCreateVM from '@virtualmachines/creation-wizard/hooks/useCreateVM';
 import { wizardVMSignal } from '@virtualmachines/creation-wizard/state/vm-signal/vmStore';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 import CloneSourceStep from '@virtualmachines/creation-wizard/steps/CloneSourceStep/CloneSourceStep';
@@ -16,8 +18,11 @@ import ComputeResourcesStep from '@virtualmachines/creation-wizard/steps/Instanc
 import GuestOSStep from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/GuestOSStep/GuestOSStep';
 import ReviewAndCreateStep from '@virtualmachines/creation-wizard/steps/ReviewAndCreateStep/ReviewAndCreateStep';
 import TemplateStep from '@virtualmachines/creation-wizard/steps/TemplateStep/TemplateStep';
-import { VMCreationMethod } from '@virtualmachines/creation-wizard/utils/constants';
-import { getWizardFooterProps } from '@virtualmachines/creation-wizard/utils/utils';
+import {
+  isCloneCreationMethod,
+  isInstanceTypeCreationMethod,
+  isTemplateCreationMethod,
+} from '@virtualmachines/creation-wizard/utils/utils';
 
 import DeploymentDetailsStep from './steps/DeploymentDetailsStep/DeploymentDetailsStep';
 
@@ -32,11 +37,12 @@ const BASE_VM: V1VirtualMachine = {
 const VMCreationWizard: FC = () => {
   const { t } = useKubevirtTranslation();
   useSignals();
-  const navigate = useNavigate();
-  const { creationMethod, resetWizardState, setCluster, setProject } = useVMWizardStore();
+  const { creationMethod, setCluster, setProject } = useVMWizardStore();
   const clusterParam = useClusterParam();
   const { ns } = useParams<{ ns: string }>();
   const hasInitialized = useRef(false);
+  const createVM = useCreateVM();
+  const closeWizard = useCloseWizard();
 
   useEffect(() => {
     if (!hasInitialized.current) {
@@ -48,35 +54,26 @@ const VMCreationWizard: FC = () => {
     }
   }, [clusterParam, ns, setCluster, setProject]);
 
-  const wizardFooterProps = getWizardFooterProps(t);
-
-  const isInstanceTypeMethod = creationMethod === VMCreationMethod.INSTANCE_TYPE;
-  const isCloneMethod = creationMethod === VMCreationMethod.CLONE;
-  const isTemplateMethod = creationMethod === VMCreationMethod.TEMPLATE;
-
-  const vmListURL = getVMListURL(clusterParam, ns);
-
-  const handleClose = useCallback(() => {
-    resetWizardState();
-    navigate(vmListURL);
-  }, [resetWizardState, vmListURL, navigate]);
+  const isInstanceTypeMethod = isInstanceTypeCreationMethod(creationMethod);
+  const isCloneMethod = isCloneCreationMethod(creationMethod);
+  const isTemplateMethod = isTemplateCreationMethod(creationMethod);
 
   return (
     <Wizard
       className="vm-creation-wizard"
       header={<WizardHeader isCloseHidden title={t('Create VirtualMachine')} />}
-      onClose={handleClose}
+      onClose={closeWizard}
       title={t('Create VirtualMachine')}
     >
       <WizardStep
-        footer={wizardFooterProps}
+        footer={<DefaultWizardFooter />}
         id="vm-creation-deployment-details-step"
         name={t('Deployment details')}
       >
         <DeploymentDetailsStep />
       </WizardStep>
       <WizardStep
-        footer={wizardFooterProps}
+        footer={<DefaultWizardFooter />}
         id="vm-creation-guest-os-step"
         isHidden={!isInstanceTypeMethod}
         name={t('Guest OS')}
@@ -84,7 +81,7 @@ const VMCreationWizard: FC = () => {
         <GuestOSStep />
       </WizardStep>
       <WizardStep
-        footer={wizardFooterProps}
+        footer={<DefaultWizardFooter />}
         id="vm-creation-boot-source-step"
         isHidden={!isInstanceTypeMethod}
         name={t('Boot source')}
@@ -99,9 +96,7 @@ const VMCreationWizard: FC = () => {
       >
         <ComputeResourcesStep />
       </WizardStep>
-      <WizardStep id="vm-creation-clone-step" isHidden={!isCloneMethod} name={t('Source')}>
-        <CloneSourceStep />
-      </WizardStep>
+
       <WizardStep
         footer={wizardFooterProps}
         id="vm-creation-template-step"
@@ -111,14 +106,26 @@ const VMCreationWizard: FC = () => {
         <TemplateStep />
       </WizardStep>
       <WizardStep
-        footer={wizardFooterProps}
+        footer={<DefaultWizardFooter />}
         id="vm-creation-customization-step"
+        isHidden={isCloneMethod}
         name={t('Customization')}
       >
         <CustomizationStep />
       </WizardStep>
       <WizardStep
-        footer={wizardFooterProps}
+        footer={<DefaultWizardFooter />}
+        id="vm-creation-clone-step"
+        isHidden={!isCloneMethod}
+        name={t('Source')}
+      >
+        <CloneSourceStep />
+      </WizardStep>
+      <WizardStep
+        footer={{
+          nextButtonText: isCloneMethod ? t('Clone VirtualMachine') : t('Create VirtualMachine'),
+          onNext: createVM,
+        }}
         id="vm-creation-review-and-create-step"
         name={t('Review and create')}
       >

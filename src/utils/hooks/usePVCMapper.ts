@@ -10,7 +10,7 @@ import { convertIntoPVCMapper } from '@virtualmachines/utils/mappers';
 
 import useKubevirtWatchResource from './useKubevirtWatchResource/useKubevirtWatchResource';
 
-export const usePVCMapper = (namespace: string, cluster?: string) => {
+export const usePVCMapper = (namespace: string | undefined, cluster?: string) => {
   const [pvcs] = useKubevirtWatchResource<IoK8sApiCoreV1PersistentVolumeClaim[]>({
     cluster,
     groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
