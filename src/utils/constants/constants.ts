@@ -26,6 +26,7 @@ export const CNV_OBSERVABILITY = 'cnv-observability';
 
 export const NONE = 'none';
 export const SPACE_SYMBOL = ' ';
+export const YAML = 'yaml';
 
 export const MAX_MTU = 65536;
 
