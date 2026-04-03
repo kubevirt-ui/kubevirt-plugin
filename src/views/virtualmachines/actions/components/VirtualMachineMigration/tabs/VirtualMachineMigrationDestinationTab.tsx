@@ -25,6 +25,7 @@ import { HelpIcon } from '@patternfly/react-icons';
 type VirtualMachineMigrationDestinationTabProps = {
   defaultStorageClassName: string;
   destinationStorageClass: string;
+  isSameStorageClass: boolean;
   keepOriginalVolumes: boolean;
   setKeepOriginalVolumes: Dispatch<SetStateAction<boolean>>;
   setSelectedStorageClass: Dispatch<SetStateAction<string>>;
@@ -37,6 +38,7 @@ const StorageClassModelGroupVersionKind = modelToGroupVersionKind(StorageClassMo
 const VirtualMachineMigrationDestinationTab: FC<VirtualMachineMigrationDestinationTabProps> = ({
   defaultStorageClassName,
   destinationStorageClass,
+  isSameStorageClass,
   keepOriginalVolumes,
   setKeepOriginalVolumes,
   setSelectedStorageClass,
@@ -92,6 +94,17 @@ const VirtualMachineMigrationDestinationTab: FC<VirtualMachineMigrationDestinati
           toggleProps={{ isFullWidth: true, placeholder: t('Select StorageClass') }}
         />
       </StackItem>
+      {isSameStorageClass && (
+        <StackItem>
+          <Alert
+            title={t(
+              'The selected target StorageClass is the same as the source. Select a different StorageClass to proceed with the migration.',
+            )}
+            isInline
+            variant={AlertVariant.warning}
+          />
+        </StackItem>
+      )}
       <StackItem>
         <Checkbox
           label={

@@ -7,6 +7,7 @@ import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
 import useDefaultStorageClass from '@kubevirt-utils/hooks/useDefaultStorage/useDefaultStorageClass';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useReadyStorageClasses from '@kubevirt-utils/hooks/useReadyStorageClasses/useReadyStorageClasses';
+import { getPVCStorageClassName } from '@kubevirt-utils/resources/bootableresources/selectors';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { isDNS1123Label } from '@kubevirt-utils/utils/validation';
@@ -96,10 +97,24 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
   const vmStorageClassNames = useMemo(
     () =>
       Array.from(
-        new Set(selectedMigrations?.map((migration) => migration.pvc?.spec?.storageClassName)),
+        new Set(
+          selectedMigrations?.map(
+            (migration) => getPVCStorageClassName(migration.pvc) || defaultStorageClassName,
+          ),
+        ),
       ),
-    [selectedMigrations],
+    [defaultStorageClassName, selectedMigrations],
   );
+
+  const isSameStorageClass = useMemo(
+    () =>
+      !!destinationStorageClass &&
+      !isEmpty(vmStorageClassNames) &&
+      vmStorageClassNames.every((sc) => sc === destinationStorageClass),
+    [destinationStorageClass, vmStorageClassNames],
+  );
+
+  const isDestinationStepInvalid = isDetailsStepInvalid || isSameStorageClass;
 
   return (
     <Modal
@@ -151,6 +166,9 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
                 {!scLoaded && <Loading />}
               </WizardStep>
               <WizardStep
+                footer={{
+                  isNextDisabled: isDestinationStepInvalid,
+                }}
                 id="wizard-migrate-destination"
                 isDisabled={isDetailsStepInvalid}
                 name={t('Source and target StorageClass')}
@@ -158,6 +176,7 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
                 <VirtualMachineMigrationDestinationTab
                   defaultStorageClassName={defaultStorageClassName}
                   destinationStorageClass={destinationStorageClass}
+                  isSameStorageClass={isSameStorageClass}
                   keepOriginalVolumes={keepOriginalVolumes}
                   setKeepOriginalVolumes={setKeepOriginalVolumes}
                   setSelectedStorageClass={setSelectedStorageClass}
@@ -172,7 +191,7 @@ const VirtualMachineMigrateModal: FC<VirtualMachineMigrateModalProps> = ({
                   nextButtonText: t('Migrate VirtualMachine storage'),
                 }}
                 id="wizard-migrate-review"
-                isDisabled={isDetailsStepInvalid}
+                isDisabled={isDestinationStepInvalid}
                 name={t('Review')}
               >
                 <VirtualMachineMigrationReviewTab
