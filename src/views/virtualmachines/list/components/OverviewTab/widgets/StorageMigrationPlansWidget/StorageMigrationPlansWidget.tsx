@@ -37,7 +37,12 @@ const StorageMigrationPlansWidget: FC<StorageMigrationPlansWidgetProps> = ({ clu
     >
       <CardHeader
         actions={{
-          actions: <ViewAllLink {...getLinkProps(basePath, isExternal)} />,
+          actions: (
+            <ViewAllLink
+              href={isExternal ? basePath : undefined}
+              linkPath={isExternal ? undefined : basePath}
+            />
+          ),
           hasNoOffset: false,
         }}
       >

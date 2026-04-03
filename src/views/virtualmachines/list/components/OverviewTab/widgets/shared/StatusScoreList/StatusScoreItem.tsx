@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Label, Tooltip } from '@patternfly/react-core';
+import { Label, Tooltip, Truncate } from '@patternfly/react-core';
 
 import { StatusScoreItem as StatusScoreItemType } from './types';
 
@@ -15,15 +15,11 @@ const StatusScoreItem: FC<StatusScoreItemProps> = ({ item }) => {
   const { description, status, value } = score;
   const hasExtras = (extraCount ?? 0) > 0 && extraItems;
 
-  const NAME_TOOLTIP_THRESHOLD = 25;
-  const isTruncated = name.length >= NAME_TOOLTIP_THRESHOLD;
-  const nameElement = (
-    <span className={`status-score-list__name${isTruncated ? '--truncated' : ''}`}>{name}</span>
-  );
-
   return (
     <div className="status-score-list__row" key={name}>
-      {isTruncated ? <Tooltip content={name}>{nameElement}</Tooltip> : nameElement}
+      <div className="status-score-list__name-cell">
+        <Truncate className="status-score-list__name" content={name} />
+      </div>
       {description ? (
         <Tooltip content={value}>
           <span tabIndex={0}>

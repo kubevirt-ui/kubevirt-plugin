@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { AnchorHTMLAttributes, FC, useMemo } from 'react';
 import { Link } from 'react-router-dom-v5-compat';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
@@ -9,8 +9,10 @@ import './ViewAllLink.scss';
 
 type ViewAllLinkProps = {
   'aria-label'?: string;
+  /** Full URL for spoke / external console; opens in a new tab. Omit on hub when using `linkPath`. */
   href?: string;
   label?: string;
+  /** In-console route; use without `href` for hub. When both were passed, `linkPath` wins (internal). */
   linkPath?: string;
   onClick?: () => void;
 };
@@ -28,22 +30,13 @@ const ViewAllLink: FC<ViewAllLinkProps> = ({
   const LinkComponent = useMemo(
     () =>
       linkPath
-        ? (props: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
-            <Link {...props} to={linkPath} />
-          )
+        ? (props: AnchorHTMLAttributes<HTMLAnchorElement>) => <Link {...props} to={linkPath} />
         : undefined,
     [linkPath],
   );
 
-  if (href) {
-    return (
-      <ExternalLink ariaLabel={ariaLabel} className="view-all-link" href={href}>
-        {text}
-      </ExternalLink>
-    );
-  }
-
-  if (LinkComponent) {
+  // Prefer in-console navigation when `linkPath` is set (hub). Use `href` only for external/spoke URLs.
+  if (linkPath) {
     return (
       <Button
         aria-label={ariaLabel}
@@ -54,6 +47,14 @@ const ViewAllLink: FC<ViewAllLinkProps> = ({
       >
         {text}
       </Button>
+    );
+  }
+
+  if (href) {
+    return (
+      <ExternalLink ariaLabel={ariaLabel} className="view-all-link" href={href}>
+        {text}
+      </ExternalLink>
     );
   }
 
