@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom-v5-compat';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useCluster from '@multicluster/hooks/useCluster';
-import { getCatalogURL } from '@multicluster/urls';
+import { getVMWizardURL } from '@multicluster/urls';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { Alert, AlertActionCloseButton, AlertVariant } from '@patternfly/react-core';
 
@@ -16,8 +16,8 @@ const NoVMsAlert: FC<NoVMsAlertProps> = ({ namespace }) => {
   const isACMPage = useIsACMPage();
   const cluster = useCluster();
 
-  const catalogURL = useMemo(
-    () => getCatalogURL(isACMPage ? cluster || '' : '', namespace || DEFAULT_NAMESPACE),
+  const vmWizardURL = useMemo(
+    () => getVMWizardURL(isACMPage ? cluster || '' : '', namespace || DEFAULT_NAMESPACE),
     [isACMPage, cluster, namespace],
   );
 
@@ -34,7 +34,7 @@ const NoVMsAlert: FC<NoVMsAlertProps> = ({ namespace }) => {
     >
       {t('Create your first virtual machine to begin monitoring health and performance metrics.')}
       <br />
-      <Link to={catalogURL}>{t('Create VM')}</Link>
+      <Link to={vmWizardURL}>{t('Create VM')}</Link>
     </Alert>
   );
 };

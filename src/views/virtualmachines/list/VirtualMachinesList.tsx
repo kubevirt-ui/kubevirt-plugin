@@ -21,7 +21,6 @@ import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/g
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
 import { ExposedFilterFunctions } from '@kubevirt-utils/components/ListPageFilter/types';
-import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { PageTitles } from '@kubevirt-utils/constants/page-constants';
 import useContainerWidth from '@kubevirt-utils/hooks/useContainerWidth';
 import { KUBEVIRT_APISERVER_PROXY } from '@kubevirt-utils/hooks/useFeatures/constants';
@@ -41,7 +40,6 @@ import useVirtualMachineInstanceMigrations from '@kubevirt-utils/resources/vmim/
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
-import { getCatalogURL } from '@multicluster/urls';
 import {
   DocumentTitle,
   K8sVerb,
@@ -92,7 +90,6 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
 
   const searchQueries = useVMSearchQueries();
 
-  const catalogURL = getCatalogURL(cluster, namespace || DEFAULT_NAMESPACE);
   const { loading: loadingFeatureProxy } = useFeatures(KUBEVIRT_APISERVER_PROXY);
 
   useSignals();
@@ -254,7 +251,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
         <div className="vm-listpagebody" ref={listPageBodyRef}>
           {isSearchResultsPage && <VirtualMachineSearchResultsHeader />}
           {!isSearchResultsPage && allVMsLoaded && hasNoVMs ? (
-            <VirtualMachineEmptyState catalogURL={catalogURL} namespace={namespace} />
+            <VirtualMachineEmptyState namespace={namespace} />
           ) : (
             <>
               <SearchBar

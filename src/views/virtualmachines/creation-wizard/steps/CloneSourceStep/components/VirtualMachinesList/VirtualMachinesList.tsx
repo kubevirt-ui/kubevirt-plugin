@@ -15,7 +15,6 @@ import {
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
-import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import useContainerWidth from '@kubevirt-utils/hooks/useContainerWidth';
 import { KUBEVIRT_APISERVER_PROXY } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
@@ -33,7 +32,6 @@ import useVirtualMachineInstanceMigrations from '@kubevirt-utils/resources/vmim/
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
-import { getCatalogURL } from '@multicluster/urls';
 import { K8sVerb, ListPageBody, useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination, Split, SplitItem } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
@@ -67,7 +65,6 @@ const VirtualMachinesList = forwardRef(({}, ref) => {
 
   const isAllClustersPage = useIsAllClustersPage();
   const searchQueries = useVMSearchQueries();
-  const catalogURL = getCatalogURL(cluster, namespace || DEFAULT_NAMESPACE);
   const { loading: loadingFeatureProxy } = useFeatures(KUBEVIRT_APISERVER_PROXY);
 
   useSignals();
@@ -231,7 +228,7 @@ const VirtualMachinesList = forwardRef(({}, ref) => {
       <ListPageBody>
         <div className="vm-listpagebody" ref={listPageBodyRef}>
           {vmsLoaded && hasNoVMs ? (
-            <VirtualMachineEmptyState catalogURL={catalogURL} namespace={namespace} />
+            <VirtualMachineEmptyState namespace={namespace} />
           ) : (
             <>
               <Split hasGutter>
