@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 
 import { ClusterServiceVersionModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtClusterServiceVersion } from '@kubevirt-utils/hooks/useKubevirtClusterServiceVersion';
+import { FLEET_BASE_PATH } from '@multicluster/constants';
 import useManagedClusterConsoleURLs from '@multicluster/hooks/useManagedClusterConsoleURLs';
 import { buildUrlForCSVSubscription } from '@overview/utils/utils';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
@@ -39,7 +40,7 @@ export const useCNVUpdate = (cluster?: string, isAllClustersPage = false): UseCN
     const isSpoke = Boolean(cluster && cluster !== hubClusterName);
     const spokeConsoleURL = isSpoke ? getConsoleURL(cluster) : undefined;
 
-    const link = isSpoke ? path.replace(/^\/k8s/, `/k8s/cluster/${cluster}`) : path;
+    const link = isSpoke ? path.replace(/^\/k8s/, `${FLEET_BASE_PATH}/cluster/${cluster}`) : path;
 
     return {
       isSpokeCluster: isSpoke && Boolean(spokeConsoleURL),

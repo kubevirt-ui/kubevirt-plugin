@@ -8,9 +8,8 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getShareableVolumes } from '@kubevirt-utils/resources/vm';
-import { KUBEVIRT_VM_PATH } from '@multicluster/constants';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { getVMListURL, isACMPath } from '@multicluster/urls';
+import { getVMListURL, isACMPath, isVMDetailsPage } from '@multicluster/urls';
 import { ButtonVariant, Stack, StackItem } from '@patternfly/react-core';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 import { deselectVM, isVMSelected } from '@virtualmachines/list/selectedVMs';
@@ -55,7 +54,7 @@ const DeleteVMModal: FC<DeleteVMModalProps> = ({ isOpen, onClose, vm }) => {
 
     if (isVMSelected(updatedVM)) deselectVM(updatedVM);
 
-    if (!location.pathname.endsWith('/search') && !location.pathname.endsWith(KUBEVIRT_VM_PATH)) {
+    if (isVMDetailsPage(location.pathname)) {
       const cluster = getCluster(vm) ?? hubClusterName;
       const clusterParam = isACMPath(location.pathname) ? cluster : null;
       const vmListURL = getVMListURL(clusterParam, getNamespace(vm));
