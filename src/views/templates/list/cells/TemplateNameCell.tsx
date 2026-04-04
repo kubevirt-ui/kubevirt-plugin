@@ -1,21 +1,22 @@
 import React, { FC } from 'react';
-import { Link } from 'react-router-dom-v5-compat';
 
-import {
-  modelToGroupVersionKind,
-  TemplateModel,
-  V1Template,
-} from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { getTemplateURL, isDeprecatedTemplate } from '@kubevirt-utils/resources/template';
+import {
+  isDeprecatedTemplate,
+  isVirtualMachineTemplateRequest,
+  TemplateOrRequest,
+} from '@kubevirt-utils/resources/template';
+import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import { ResourceIcon } from '@openshift-console/dynamic-plugin-sdk';
-import { Label } from '@patternfly/react-core';
+import { getGroupVersionKindForResource } from '@openshift-console/dynamic-plugin-sdk';
+import { Label, Split, Stack, StackItem } from '@patternfly/react-core';
+
+import VirtualMachineTemplateRequestStatusIcon from '../../components/VirtualMachineTemplateRequest/VirtualMachineTemplateRequestStatusIcon';
 
 type TemplateNameCellProps = {
-  row: V1Template;
+  row: TemplateOrRequest;
 };
 
 const TemplateNameCell: FC<TemplateNameCellProps> = ({ row }) => {
@@ -26,14 +27,29 @@ const TemplateNameCell: FC<TemplateNameCellProps> = ({ row }) => {
   const namespace = getNamespace(row);
   const cluster = getCluster(row) || clusterParam;
 
+  const isVMTR = isVirtualMachineTemplateRequest(row);
+
   return (
-    <>
-      <Link data-test={name} data-test-id={name} to={getTemplateURL(name, namespace, cluster)}>
-        <ResourceIcon groupVersionKind={modelToGroupVersionKind(TemplateModel)} />
-        {name}
-      </Link>
-      {isDeprecatedTemplate(row) && <Label isCompact>{t('Deprecated')}</Label>}
-    </>
+    <Stack>
+      <StackItem>
+        <Split hasGutter>
+          <MulticlusterResourceLink
+            cluster={cluster}
+            data-test={name}
+            data-test-id={name}
+            groupVersionKind={getGroupVersionKindForResource(row)}
+            name={name}
+            namespace={namespace}
+          />
+          {!isVMTR && isDeprecatedTemplate(row) && <Label isCompact>{t('Deprecated')}</Label>}
+        </Split>
+      </StackItem>
+      {isVMTR && (
+        <StackItem>
+          <VirtualMachineTemplateRequestStatusIcon vmtr={row} />
+        </StackItem>
+      )}
+    </Stack>
   );
 };
 

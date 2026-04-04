@@ -24,6 +24,7 @@ export const HIDE_YAML_TAB = 'hideYamlTab';
 export const ADVANCED_CDROM_FEATURES = 'advancedCDROMFeatures';
 export const TREE_VIEW_FOLDERS = 'treeViewFolders';
 export const PASST_UDN_NETWORK = 'passtUDNNetwork';
+export const VM_TEMPLATES = 'vmTemplates';
 
 export const FEATURES_CONFIG_MAP_NAME = 'kubevirt-ui-features';
 const FEATURES_ROLE_NAME = 'kubevirt-ui-features-reader';
@@ -47,6 +48,7 @@ export const FEATURES_CONFIG_MAP_INITIAL_DATA: Record<string, string> = {
   [NODE_PORT_ENABLED]: 'false',
   [PASST_UDN_NETWORK]: 'false',
   [TREE_VIEW_FOLDERS]: 'false',
+  [VM_TEMPLATES]: 'false',
 };
 
 export const getFeaturesConfigMapInitialState = (namespace: string): IoK8sApiCoreV1ConfigMap => ({

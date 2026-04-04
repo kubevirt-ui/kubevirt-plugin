@@ -1,13 +1,14 @@
 import React, { FC } from 'react';
 
-import { modelToGroupVersionKind, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { TemplateOrRequest } from '@kubevirt-utils/resources/template';
 import { ManagedClusterModel } from '@multicluster/constants';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 type TemplateClusterCellProps = {
-  row: V1Template;
+  row: TemplateOrRequest;
 };
 
 const TemplateClusterCell: FC<TemplateClusterCellProps> = ({ row }) => {

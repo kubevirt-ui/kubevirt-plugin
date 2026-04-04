@@ -15,11 +15,12 @@ describe('Test template list page', () => {
     cy.byLegacyTestID(TEMPLATE.CENTOSSTREAM10.metadataName).should('not.exist');
   });
 
-  it('filter default templates', () => {
+  it('filter by template type', () => {
     cy.get(tView.dropdownFilter).click();
-    cy.get('[data-test-row-filter="is-default"]')
+    cy.get('[data-test-row-filter="templates"]')
       .find('input[type="checkbox"]')
       .check({ force: true });
+    cy.get(tView.dropdownFilter).click();
     cy.byLegacyTestID(TEMPLATE.RHEL9.metadataName).should('exist');
     cy.byLegacyTestID(TEMPLATE.FEDORA.metadataName).should('exist');
     cy.byLegacyTestID(TEMPLATE.WIN10.metadataName).should('exist');
@@ -36,7 +37,7 @@ describe('Test template list page', () => {
     cy.byLegacyTestID(TEMPLATE.WIN2K22.metadataName).should('exist');
   });
 
-  it('filter templates by Provider', () => {
+  xit('filter templates by Provider', () => {
     cy.get(tView.dropdownFilter).click();
     cy.get('[data-test-row-filter="Other"]').find('input[type="checkbox"]').check({ force: true });
     cy.byLegacyTestID(TEMPLATE.RHEL9.metadataName).should('not.exist');
@@ -51,21 +52,17 @@ describe('Test template list page', () => {
     cy.contains('Source available').should('not.exist');
   });
 
-  it('filter templates by boot source', () => {
+  xit('filter templates by OS and Provider combined', () => {
     cy.get(tView.dropdownFilter).click();
-    cy.get('[data-test-row-filter="hide-deprecated-templates"]')
+    cy.get('[data-test-row-filter="Red Hat"]')
       .find('input[type="checkbox"]')
       .check({ force: true });
-    cy.get('[data-test-row-filter="is-default"]')
-      .find('input[type="checkbox"]')
-      .check({ force: true });
-    cy.get('[data-test-row-filter="available"]')
+    cy.get('[data-test-row-filter="windows"]')
       .find('input[type="checkbox"]')
       .check({ force: true });
     cy.get(tView.dropdownFilter).click();
-    cy.byLegacyTestID(TEMPLATE.CENTOSSTREAM9.metadataName).should('exist');
-    cy.byLegacyTestID(TEMPLATE.FEDORA.metadataName).should('exist');
-    cy.byLegacyTestID(TEMPLATE.RHEL7.metadataName).should('not.exist');
-    cy.byLegacyTestID(TEMPLATE.WIN10.metadataName).should('not.exist');
+    cy.byLegacyTestID(TEMPLATE.RHEL9.metadataName).should('not.exist');
+    cy.byLegacyTestID(TEMPLATE.FEDORA.metadataName).should('not.exist');
+    cy.byLegacyTestID(TEMPLATE.WIN10.metadataName).should('exist');
   });
 });

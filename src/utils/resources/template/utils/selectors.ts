@@ -1,5 +1,4 @@
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { V1Template, VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   V1Disk,
   V1Interface,
@@ -21,35 +20,39 @@ import {
   TEMPLATE_WORKLOAD_LABEL,
   WORKLOADS,
 } from './constants';
+import { isVirtualMachineTemplate, Template } from './types';
 
 /**
  * A selector that returns the VirtualMachine object of a given template
- * @param {V1Template} template - template
+ * @param {Template} template - OpenShift Template or VirtualMachineTemplate
  */
-export const getTemplateVirtualMachineObject = (template: V1Template): V1VirtualMachine => {
-  const vm = template?.objects?.find((obj) => obj.kind === VirtualMachineModel.kind);
+export const getTemplateVirtualMachineObject = (template: Template): V1VirtualMachine => {
+  const vm = isVirtualMachineTemplate(template)
+    ? template?.spec?.virtualMachine
+    : template?.objects?.find((obj) => obj.kind === VirtualMachineModel.kind);
+
   return { ...vm, cluster: getCluster(template) };
 };
 
 /**
  * returns true if the given template is a default variant
- * @param {V1Template} template - template
+ * @param {Template} template - template
  */
-export const isDefaultVariantTemplate = (template: V1Template): boolean =>
+export const isDefaultVariantTemplate = (template: Template): boolean =>
   template?.metadata?.labels?.[TEMPLATE_DEFAULT_VARIANT_LABEL] === 'true';
 
 /**
  * A selector that returns the os label name of a given template
- * @param {V1Template} template - template
+ * @param {Template} template - template
  */
-export const getTemplateOSLabelName = (template: V1Template): string =>
+export const getTemplateOSLabelName = (template: Template): string =>
   getAnnotation(getTemplateVirtualMachineObject(template)?.spec?.template, ANNOTATIONS.os);
 
 /**
  * A selector that returns the os label of a given template
- * @param {V1Template} template - template
+ * @param {Template} template - template
  */
-export const getTemplateOS = (template: V1Template): OS_NAME_TYPES => {
+export const getTemplateOS = (template: Template): OS_NAME_TYPES => {
   const templateOS = getTemplateOSLabelName(template);
   return (
     Object.values(OS_NAME_TYPES).find((osName) => templateOS?.includes(osName)) ??

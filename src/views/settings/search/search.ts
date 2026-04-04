@@ -37,13 +37,13 @@ export const getClusterTabIds: SearchItemGetter = () => [
   { id: CLUSTER_TAB_IDS.persistentReservation, title: t('Persistent reservation') },
 ];
 
-export const getUserTabIds: SearchItemGetter = () => [
+const getUserTabIds: SearchItemGetter = () => [
   { id: USER_TAB_IDS.sshKeys, title: t('SSH keys') },
   { id: USER_TAB_IDS.permissions, title: t('Permissions') },
   { id: USER_TAB_IDS.gettingStarted, title: t('Getting started') },
 ];
 
-export const getPreviewFeaturesTabIds: SearchItemGetter = () => [
+const getPreviewFeaturesTabIds: SearchItemGetter = () => [
   { id: PREVIEW_FEATURES_TAB_IDS.previewFeatures, title: t('Preview features') },
   {
     id: PREVIEW_FEATURES_TAB_IDS.treeViewFolders,
@@ -52,6 +52,10 @@ export const getPreviewFeaturesTabIds: SearchItemGetter = () => [
   {
     id: PREVIEW_FEATURES_TAB_IDS.passtUDNNetwork,
     title: t('Enable Passt binding for primary user-defined networks'),
+  },
+  {
+    id: PREVIEW_FEATURES_TAB_IDS.vmTemplates,
+    title: t('Enable native VirtualMachine templates'),
   },
 ];
 

@@ -1,24 +1,22 @@
 import React from 'react';
 import { TFunction } from 'react-i18next';
 
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import ArchitectureLabel from '@kubevirt-utils/components/ArchitectureLabel/ArchitectureLabel';
 import { getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
 import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import {
-  ClusterNamespacedResourceMap,
-  getName,
-  getNamespace,
-} from '@kubevirt-utils/resources/shared';
+  isVirtualMachineTemplateRequest,
+  TemplateOrRequest,
+} from '@kubevirt-utils/resources/template';
+import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm';
 import { ARCHITECTURE_ID, getArchitecture } from '@kubevirt-utils/utils/architecture';
 import { getCluster } from '@multicluster/helpers/selectors';
 
 import { getWorkloadProfile } from '../utils/selectors';
 
 import TemplateActionsCell from './cells/TemplateActionsCell';
-import TemplateBootSourceCell from './cells/TemplateBootSourceCell';
 import TemplateClusterCell from './cells/TemplateClusterCell';
 import TemplateCPUMemoryCell from './cells/TemplateCPUMemoryCell';
 import TemplateNameCell from './cells/TemplateNameCell';
@@ -27,7 +25,6 @@ import TemplateNamespaceCell from './cells/TemplateNamespaceCell';
 export const TEMPLATE_COLUMN_KEYS = {
   actions: ACTIONS,
   architecture: ARCHITECTURE_ID,
-  availability: 'availability',
   cluster: 'cluster',
   cpu: 'cpu',
   name: 'name',
@@ -35,18 +32,12 @@ export const TEMPLATE_COLUMN_KEYS = {
   workload: 'workload',
 } as const;
 
-export type TemplateCallbacks = {
-  availableDataSources: ClusterNamespacedResourceMap<V1beta1DataSource>;
-  availableTemplatesUID: Set<string>;
-  cloneInProgressDataSources: ClusterNamespacedResourceMap<V1beta1DataSource>;
-};
-
 export const getTemplateColumns = (
   t: TFunction,
   namespace: string,
   isAllClustersPage: boolean,
-): ColumnConfig<V1Template, TemplateCallbacks>[] => {
-  const columns: ColumnConfig<V1Template, TemplateCallbacks>[] = [
+): ColumnConfig<TemplateOrRequest>[] => {
+  const columns: ColumnConfig<TemplateOrRequest>[] = [
     {
       getValue: (row) => getName(row) ?? '',
       key: TEMPLATE_COLUMN_KEYS.name,
@@ -68,15 +59,6 @@ export const getTemplateColumns = (
     });
   }
 
-  columns.push({
-    getValue: (row) => getArchitecture(row) ?? '',
-    key: TEMPLATE_COLUMN_KEYS.architecture,
-    label: t('Architecture'),
-    props: { className: 'pf-m-width-10' },
-    renderCell: (row) => <ArchitectureLabel architecture={getArchitecture(row)} />,
-    sortable: true,
-  });
-
   if (!namespace) {
     columns.push({
       getValue: (row) => getNamespace(row) ?? '',
@@ -89,18 +71,27 @@ export const getTemplateColumns = (
 
   columns.push(
     {
-      getValue: (row) => t(getWorkloadProfile(row)) ?? '',
+      getValue: (row) =>
+        isVirtualMachineTemplateRequest(row) ? '' : t(getWorkloadProfile(row)) ?? '',
       key: TEMPLATE_COLUMN_KEYS.workload,
       label: t('Workload profile'),
       props: { className: 'pf-m-width-15' },
-      renderCell: (row) => <>{t(getWorkloadProfile(row))}</>,
+      renderCell: (row) =>
+        isVirtualMachineTemplateRequest(row) ? NO_DATA_DASH : <>{t(getWorkloadProfile(row))}</>,
       sortable: true,
     },
     {
-      key: TEMPLATE_COLUMN_KEYS.availability,
-      label: t('Boot source'),
-      props: { className: 'pf-m-width-30' },
-      renderCell: (row, callbacks) => <TemplateBootSourceCell callbacks={callbacks} row={row} />,
+      getValue: (row) => (isVirtualMachineTemplateRequest(row) ? '' : getArchitecture(row) ?? ''),
+      key: TEMPLATE_COLUMN_KEYS.architecture,
+      label: t('Architecture'),
+      props: { className: 'pf-m-width-10' },
+      renderCell: (row) =>
+        isVirtualMachineTemplateRequest(row) ? (
+          NO_DATA_DASH
+        ) : (
+          <ArchitectureLabel architecture={getArchitecture(row)} />
+        ),
+      sortable: true,
     },
     {
       additional: true,
@@ -119,5 +110,5 @@ export const getTemplateColumns = (
   return columns;
 };
 
-export const getTemplateRowId = (template: V1Template, index: number): string =>
-  getK8sRowId(template, index, 'template');
+export const getTemplateRowId = (resource: TemplateOrRequest, index: number): string =>
+  getK8sRowId(resource, index, 'template');

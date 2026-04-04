@@ -1,14 +1,28 @@
 import React, { FC } from 'react';
 
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import {
+  isVirtualMachineTemplate,
+  isVirtualMachineTemplateRequest,
+  TemplateOrRequest,
+} from '@kubevirt-utils/resources/template';
 
 import VirtualMachineTemplatesActions from '../../actions/VirtualMachineTemplatesActions';
+import VirtualMachineTemplateActions from '../../components/VirtualMachineTemplate/VirtualMachineTemplateActions';
+import VirtualMachineTemplateRequestActions from '../../components/VirtualMachineTemplateRequest/VirtualMachineTemplateRequestActions';
 
 type TemplateActionsCellProps = {
-  row: V1Template;
+  row: TemplateOrRequest;
 };
 
 const TemplateActionsCell: FC<TemplateActionsCellProps> = ({ row }) => {
+  if (isVirtualMachineTemplateRequest(row)) {
+    return <VirtualMachineTemplateRequestActions isKebabToggle request={row} />;
+  }
+
+  if (isVirtualMachineTemplate(row)) {
+    return <VirtualMachineTemplateActions isKebabToggle vmTemplate={row} />;
+  }
+
   return (
     <VirtualMachineTemplatesActions data-test="template-row-actions" isKebabToggle template={row} />
   );

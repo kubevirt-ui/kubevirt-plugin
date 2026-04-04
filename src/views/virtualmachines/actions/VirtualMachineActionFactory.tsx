@@ -1,7 +1,10 @@
 import React from 'react';
 import { TFunction } from 'react-i18next';
 
-import { VirtualMachineCloneModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import {
+  VirtualMachineCloneModel,
+  VirtualMachineTemplateRequestModel,
+} from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineInstanceMigrationModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineSnapshotModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -15,6 +18,7 @@ import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal'
 import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import RunStrategyModal from '@kubevirt-utils/components/RunStrategyModal/RunStrategyModal';
 import { updateRunStrategy } from '@kubevirt-utils/components/RunStrategyModal/utils';
+import SaveAsTemplateModal from '@kubevirt-utils/components/SaveAsTemplateModal/SaveAsTemplateModal';
 import SnapshotModal from '@kubevirt-utils/components/SnapshotModal/SnapshotModal';
 import {
   VirtualMachineInstanceSubresourcesModel,
@@ -393,6 +397,19 @@ export const createVirtualMachineActionFactory = (t: TFunction) => ({
       label: t('Restart'),
     };
   },
+  saveAsTemplate: (
+    vm: V1VirtualMachine,
+    createModal: (modal: ModalComponent) => void,
+  ): ActionDropdownItemType => ({
+    accessReview: asAccessReview(VirtualMachineTemplateRequestModel, vm, 'create'),
+    cta: () =>
+      createModal(({ isOpen, onClose }) => (
+        <SaveAsTemplateModal isOpen={isOpen} onClose={onClose} vm={vm} />
+      )),
+    disabledTooltip: getNoPermissionTooltipContent(t),
+    id: 'vm-action-save-as-template',
+    label: t('Save as template'),
+  }),
   snapshot: (
     vm: V1VirtualMachine,
     createModal: (modal: ModalComponent) => void,

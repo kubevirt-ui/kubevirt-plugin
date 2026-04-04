@@ -3,7 +3,7 @@ import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-d
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getAnnotation, getLabels, getName } from '@kubevirt-utils/resources/shared';
 import { getDataVolumeTemplates, getVolumes } from '@kubevirt-utils/resources/vm';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { escapeJsonPointerToken, isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sDelete, Patch } from '@openshift-console/dynamic-plugin-sdk';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
@@ -59,7 +59,7 @@ export const createRollbackPatchData = (vm: V1VirtualMachine): Patch[] => {
         ...[
           {
             op: 'remove',
-            path: `/metadata/annotations/${originalClaimAnnotation.replace('/', '~1')}`,
+            path: `/metadata/annotations/${escapeJsonPointerToken(originalClaimAnnotation)}`,
           },
           {
             op: 'replace',
@@ -90,7 +90,7 @@ export const createRollbackPatchData = (vm: V1VirtualMachine): Patch[] => {
         ...[
           {
             op: 'remove',
-            path: `/metadata/annotations/${originalClaimAnnotation.replace('/', '~1')}`,
+            path: `/metadata/annotations/${escapeJsonPointerToken(originalClaimAnnotation)}`,
           },
           {
             op: 'replace',
@@ -148,7 +148,7 @@ export const getLabelsDiffPatch = (
 
   const labelsPatchReplace = Object.entries(newCommonLabels || {}).map(([key, value]) => ({
     op: initialCommonLabels?.[key] ? 'replace' : 'add',
-    path: `/metadata/labels/${key?.replace('/', '~1')}`,
+    path: `/metadata/labels/${escapeJsonPointerToken(key)}`,
     value,
   }));
 
@@ -156,7 +156,7 @@ export const getLabelsDiffPatch = (
     if (!(key in newCommonLabels)) {
       acc.push({
         op: 'remove',
-        path: `/metadata/labels/${key?.replace('/', '~1')}`,
+        path: `/metadata/labels/${escapeJsonPointerToken(key)}`,
       });
     }
     return acc;

@@ -28,6 +28,7 @@ export const PREVIEW_FEATURES_TAB_IDS = {
   passtUDNNetwork: 'passt-udn-network',
   previewFeatures: 'preview-features',
   treeViewFolders: 'tree-view-folders',
+  vmTemplates: 'vm-templates',
 };
 
 export const SEARCH_ITEM_CHILDREN_TREE = {
@@ -50,5 +51,6 @@ export const SEARCH_ITEM_CHILDREN_TREE = {
   [PREVIEW_FEATURES_TAB_IDS.previewFeatures]: [
     PREVIEW_FEATURES_TAB_IDS.treeViewFolders,
     PREVIEW_FEATURES_TAB_IDS.passtUDNNetwork,
+    PREVIEW_FEATURES_TAB_IDS.vmTemplates,
   ],
 };

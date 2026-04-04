@@ -10,9 +10,11 @@ import { getConsoleVirtctlCommand } from '@kubevirt-utils/components/SSHAccess/u
 import { CONFIRM_VM_ACTIONS, TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useVMTemplateFeatureFlag from '@kubevirt-utils/hooks/useVMTemplateFeatureFlag/useVMTemplateFeatureFlag';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
 import { CROSS_CLUSTER_MIGRATION_ACTION_ID } from '@multicluster/constants';
+import { getCluster } from '@multicluster/helpers/selectors';
 import useACMExtensionActions from '@multicluster/hooks/useACMExtensionActions/useACMExtensionActions';
 import { useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -40,6 +42,8 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
   const [, inFlight] = useK8sModel(VirtualMachineModelRef);
 
   const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
+  const { featureEnabled: vmTemplatesEnabled, loading: vmTemplatesLoading } =
+    useVMTemplateFeatureFlag(getCluster(vm));
 
   const VirtualMachineActionFactory = useMemo(() => createVirtualMachineActionFactory(t), [t]);
 
@@ -103,6 +107,9 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
       VirtualMachineActionFactory.snapshot(vm, createModal),
       VirtualMachineActionFactory.migrationActions(migrationActions),
       VirtualMachineActionFactory.copySSHCommand(vm, virtctlCommand),
+      !vmTemplatesLoading &&
+        vmTemplatesEnabled &&
+        VirtualMachineActionFactory.saveAsTemplate(vm, createModal),
       treeViewFoldersEnabled && VirtualMachineActionFactory.moveToFolder(vm, createModal),
       VirtualMachineActionFactory.editLabels(vm, createModal),
       VirtualMachineActionFactory.delete(vm, createModal),
@@ -114,6 +121,8 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
     createModal,
     confirmVMActionsEnabled,
     virtctlCommand,
+    vmTemplatesEnabled,
+    vmTemplatesLoading,
     treeViewFoldersEnabled,
     acmActions,
     mtvInstalled,

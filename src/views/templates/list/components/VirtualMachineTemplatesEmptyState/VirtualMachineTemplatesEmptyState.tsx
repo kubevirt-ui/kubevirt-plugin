@@ -21,7 +21,7 @@ const VirtualMachineTemplatesEmptyState: FC = () => {
 
   return (
     <>
-      <ListPageHeader title={t('VirtualMachine Templates')} />
+      <ListPageHeader title={t('Templates')} />
       <ListPageBody>
         <EmptyState
           headingLevel="h4"

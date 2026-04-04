@@ -18,11 +18,15 @@ import {
   K8sResourceCommon,
   MatchExpression,
   Operator,
+  RowFilterItem,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { k8sBasePath } from '@openshift-console/dynamic-plugin-sdk/lib/utils/k8s/k8s';
 import { SortByDirection } from '@patternfly/react-table';
 
-import { IPAddress, ItemsToFilterProps } from './types';
+import { IPAddress } from './types';
+
+// JSON Pointer (RFC 6901) requires `/` in keys to be escaped as `~1`
+export const escapeJsonPointerToken = (token: string): string => token.replace(/\//g, '~1');
 
 export const kubevirtConsole = console;
 
@@ -122,15 +126,15 @@ export const findAllIndexes = <T>(
   );
 
 // return the name or 'Other' if the name not included in the array of available items for filtering
-export const getItemNameWithOther = (itemName: string, items: ItemsToFilterProps[]): string => {
-  return !items?.find((item: ItemsToFilterProps) => item.id === itemName) || itemName === OTHER
+export const getItemNameWithOther = (itemName: string, items: RowFilterItem[]): string => {
+  return !items?.find((item: RowFilterItem) => item.id === itemName) || itemName === OTHER
     ? OTHER
     : itemName;
 };
 
 export const includeFilter = (
   compareData: FilterValue,
-  items: ItemsToFilterProps[],
+  items: RowFilterItem[],
   itemName: string,
 ): boolean => {
   const compareString = getItemNameWithOther(itemName, items);
