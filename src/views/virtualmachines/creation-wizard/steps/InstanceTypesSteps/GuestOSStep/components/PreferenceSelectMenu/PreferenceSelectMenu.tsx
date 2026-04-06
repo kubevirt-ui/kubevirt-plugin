@@ -3,6 +3,7 @@ import React, { FC } from 'react';
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, SelectOption } from '@patternfly/react-core';
+import useInstanceTypeVMStore from '@virtualmachines/creation-wizard/state/instance-type-vm-store/useInstanceTypeVMStore';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 import usePreferenceSelectOptions from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/GuestOSStep/components/PreferenceSelectMenu/hooks/usePreferenceSelectOptions/usePreferenceSelectOptions';
 
@@ -10,8 +11,8 @@ import './PreferenceSelectMenu.scss';
 
 const PreferenceSelectMenu: FC = () => {
   const { t } = useKubevirtTranslation();
-  const { cluster, instanceTypeFlowState, project, setPreference } = useVMWizardStore();
-  const { operatingSystemType, preference } = instanceTypeFlowState;
+  const { cluster, project } = useVMWizardStore();
+  const { operatingSystemType, preference, setPreference } = useInstanceTypeVMStore();
 
   const { preferenceNames } = usePreferenceSelectOptions(project, cluster, operatingSystemType);
 

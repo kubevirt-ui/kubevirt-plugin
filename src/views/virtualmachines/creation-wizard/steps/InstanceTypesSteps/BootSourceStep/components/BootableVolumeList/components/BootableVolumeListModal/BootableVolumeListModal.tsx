@@ -6,7 +6,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { UserSettingFavorites } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/types';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { ModalVariant } from '@patternfly/react-core';
-import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
+import useInstanceTypeVMStore from '@virtualmachines/creation-wizard/state/instance-type-vm-store/useInstanceTypeVMStore';
 import {
   UseBootableVolumesValues,
   UseInstanceTypeAndPreferencesValues,
@@ -32,9 +32,7 @@ const BootableVolumeListModal: FC<BootableVolumeListModalProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const {
-    instanceTypeFlowState: { selectedBootableVolume },
-  } = useVMWizardStore();
+  const { selectedBootableVolume } = useInstanceTypeVMStore();
 
   const onSave = () => {
     if (!selectedBootableVolume) {

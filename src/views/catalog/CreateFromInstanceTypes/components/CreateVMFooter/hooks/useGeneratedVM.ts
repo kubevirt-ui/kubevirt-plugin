@@ -17,9 +17,9 @@ import { getValidNamespace } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { AUTOMATIC_UPDATE_FEATURE_NAME } from '@settings/tabs/ClusterTab/components/GuestManagmentSection/AutomaticSubscriptionRHELGuests/utils/constants';
 
-export type UseGeneratedVMType = () => V1VirtualMachine;
+export type UseGeneratedVM = () => V1VirtualMachine;
 
-const useGeneratedVM = () => {
+const useGeneratedVM: UseGeneratedVM = () => {
   const cluster = useClusterParam();
   const { featureEnabled: autoUpdateEnabled } = useFeatures(AUTOMATIC_UPDATE_FEATURE_NAME);
 

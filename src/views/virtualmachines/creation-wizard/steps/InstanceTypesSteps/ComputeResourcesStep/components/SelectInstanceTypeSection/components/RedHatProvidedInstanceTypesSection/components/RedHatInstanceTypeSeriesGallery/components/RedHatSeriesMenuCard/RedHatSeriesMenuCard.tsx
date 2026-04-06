@@ -9,7 +9,7 @@ import {
 } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Card, CardBody, CardHeader, Flex, Tooltip } from '@patternfly/react-core';
-import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
+import useInstanceTypeVMStore from '@virtualmachines/creation-wizard/state/instance-type-vm-store/useInstanceTypeVMStore';
 import MarkdownTooltipContent from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/ComputeResourcesStep/components/SelectInstanceTypeSection/components/RedHatProvidedInstanceTypesSection/components/RedHatInstanceTypeSeriesGallery/components/RedHatSeriesMenuCard/MarkdownTooltipContent';
 
 import './RedHatSeriesMenuCard.scss';
@@ -21,10 +21,7 @@ type RedHatSeriesMenuCardProps = {
 const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({ rhSeriesItem }) => {
   const { t } = useKubevirtTranslation();
 
-  const {
-    instanceTypeFlowState: { selectedSeries },
-    setSelectedSeries,
-  } = useVMWizardStore();
+  const { selectedSeries, setSelectedSeries } = useInstanceTypeVMStore();
 
   const { classDisplayNameAnnotation, descriptionAnnotation, seriesName } = rhSeriesItem;
 

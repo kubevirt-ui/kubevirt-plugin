@@ -3,7 +3,7 @@ import React, { FC } from 'react';
 import { InstanceTypeSize } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/types';
 import { logITFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
 import { INSTANCETYPE_SELECTED } from '@kubevirt-utils/extensions/telemetry/utils/constants';
-import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
+import useInstanceTypeVMStore from '@virtualmachines/creation-wizard/state/instance-type-vm-store/useInstanceTypeVMStore';
 import InstanceTypeSizeDropdown from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/ComputeResourcesStep/components/SelectInstanceTypeSection/components/RedHatProvidedInstanceTypesSection/components/InstanceTypeSizeMenu/InstanceTypeSizeDropdown/InstanceTypeSizeDropdown';
 
 type InstanceTypeSizeMenuProps = {
@@ -11,10 +11,7 @@ type InstanceTypeSizeMenuProps = {
 };
 
 const InstanceTypeSizeMenu: FC<InstanceTypeSizeMenuProps> = ({ instanceTypeSizes }) => {
-  const {
-    instanceTypeFlowState: { selectedSeries, selectedSize },
-    setSelectedSize,
-  } = useVMWizardStore();
+  const { selectedSeries, selectedSize, setSelectedSize } = useInstanceTypeVMStore();
 
   const handleSizeSelect = (size: string) => {
     setSelectedSize(size);

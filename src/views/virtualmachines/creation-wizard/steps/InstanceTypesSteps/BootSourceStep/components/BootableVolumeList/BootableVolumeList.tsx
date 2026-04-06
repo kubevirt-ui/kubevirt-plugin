@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect } from 'react';
 
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import ProjectDropdown from '@kubevirt-utils/components/ProjectDropdown/ProjectDropdown';
@@ -17,7 +17,7 @@ import { getName } from '@kubevirt-utils/resources/shared';
 import { operatorNamespaceSignal } from '@kubevirt-utils/store/operatorNamespace';
 import { isEmpty, OS_IMAGES_NS } from '@kubevirt-utils/utils/utils';
 import { Card, FormGroup, Skeleton, Split, SplitItem } from '@patternfly/react-core';
-import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
+import useInstanceTypeVMStore from '@virtualmachines/creation-wizard/state/instance-type-vm-store/useInstanceTypeVMStore';
 import usePreferencesData from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/hooks/usePreferencesData';
 import { UseInstanceTypeAndPreferencesValues } from '@virtualmachines/creation-wizard/utils/types';
 
@@ -38,11 +38,15 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({ instanceTypesAndPrefe
   const { t } = useKubevirtTranslation();
   const isAdmin = useIsAdmin();
   const operatorNamespace = operatorNamespaceSignal.value;
-  const { instanceTypeFlowState, onSelectCreatedVolume } = useVMWizardStore();
-  const { dvSource, pvcSource, selectedBootableVolume, volumeSnapshotSource } =
-    instanceTypeFlowState;
-  const [volumeListNamespace, setVolumeListNamespace] = useState<string>(ALL_PROJECTS);
-
+  const {
+    dvSource,
+    onSelectCreatedVolume,
+    pvcSource,
+    selectedBootableVolume,
+    setVolumeListNamespace,
+    volumeListNamespace,
+    volumeSnapshotSource,
+  } = useInstanceTypeVMStore();
   const { preferences: preferencesData } = instanceTypesAndPreferencesData;
   const { preferencesMap, userPreferencesData, userPreferencesLoaded, userPreferencesMap } =
     usePreferencesData(volumeListNamespace, preferencesData);

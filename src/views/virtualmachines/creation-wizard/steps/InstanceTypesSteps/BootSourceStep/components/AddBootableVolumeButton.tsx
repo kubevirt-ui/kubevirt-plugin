@@ -8,7 +8,7 @@ import useCanCreateBootableVolume from '@kubevirt-utils/resources/bootableresour
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Button, ButtonVariant } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
-import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
+import useInstanceTypeVMStore from '@virtualmachines/creation-wizard/state/instance-type-vm-store/useInstanceTypeVMStore';
 
 export type AddBootableVolumeButtonProps = {
   loadError: Error;
@@ -18,10 +18,7 @@ const AddBootableVolumeButton: FC<AddBootableVolumeButtonProps> = ({ loadError }
   const { t } = useKubevirtTranslation();
   useSignals();
   const { createModal } = useModal();
-  const {
-    instanceTypeFlowState: { volumeListNamespace },
-    onSelectCreatedVolume,
-  } = useVMWizardStore();
+  const { onSelectCreatedVolume, volumeListNamespace } = useInstanceTypeVMStore();
 
   const { canCreateDS, canCreatePVC } = useCanCreateBootableVolume(volumeListNamespace);
   const canCreate = canCreateDS || canCreatePVC;

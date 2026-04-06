@@ -1,7 +1,6 @@
 import React, { FC, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom-v5-compat';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { Wizard, WizardHeader, WizardStep } from '@patternfly/react-core';
@@ -9,11 +8,11 @@ import { useSignals } from '@preact/signals-react/runtime';
 import DefaultWizardFooter from '@virtualmachines/creation-wizard/components/DefaultWizardFooter';
 import useCloseWizard from '@virtualmachines/creation-wizard/hooks/useCloseWizard';
 import useCreateVM from '@virtualmachines/creation-wizard/hooks/useCreateVM';
-import { wizardVMSignal } from '@virtualmachines/creation-wizard/state/vm-signal/vmStore';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 import CloneSourceStep from '@virtualmachines/creation-wizard/steps/CloneSourceStep/CloneSourceStep';
 import CustomizationStep from '@virtualmachines/creation-wizard/steps/CustomizationStep/CustomizationStep';
 import BootSourceStep from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/BootSourceStep/BootSourceStep';
+import ComputeResourcesStepFooter from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/ComputeResourcesStep/components/ComputeResourcesStepFooter';
 import ComputeResourcesStep from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/ComputeResourcesStep/ComputeResourcesStep';
 import GuestOSStep from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/GuestOSStep/GuestOSStep';
 import ReviewAndCreateStep from '@virtualmachines/creation-wizard/steps/ReviewAndCreateStep/ReviewAndCreateStep';
@@ -26,14 +25,6 @@ import {
 } from '@virtualmachines/creation-wizard/utils/utils';
 
 import DeploymentDetailsStep from './steps/DeploymentDetailsStep/DeploymentDetailsStep';
-
-// TODO Replace with generated VM from IT and template flows
-const BASE_VM: V1VirtualMachine = {
-  apiVersion: 'kubevirt.io/v1',
-  kind: 'VirtualMachine',
-  metadata: { name: 'test-vm', namespace: 'default' },
-  spec: { template: {} },
-};
 
 const VMCreationWizard: FC = () => {
   const { t } = useKubevirtTranslation();
@@ -49,8 +40,6 @@ const VMCreationWizard: FC = () => {
     if (!hasInitialized.current) {
       setCluster(clusterParam);
       setProject(ns);
-      // TODO Remove when replaced in wiring PR
-      wizardVMSignal.value = BASE_VM;
       hasInitialized.current = true;
     }
   }, [clusterParam, ns, setCluster, setProject]);
@@ -90,7 +79,7 @@ const VMCreationWizard: FC = () => {
         <BootSourceStep />
       </WizardStep>
       <WizardStep
-        footer={wizardFooterProps}
+        footer={<ComputeResourcesStepFooter />}
         id="vm-creation-compute-resources-step"
         isHidden={!isInstanceTypeMethod}
         name={t('Compute resources')}
