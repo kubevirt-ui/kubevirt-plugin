@@ -1,5 +1,6 @@
 import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import {
+  V1beta1DataVolumeSourceHTTP,
   V1beta1DataVolumeSourceRef,
   V1DataVolumeTemplateSpec,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -23,6 +24,10 @@ export const getDataVolumePVCStorageRequest = (
 export const getDataVolumeSourceRef = (
   dataVolume: V1beta1DataVolume | V1DataVolumeTemplateSpec,
 ): V1beta1DataVolumeSourceRef => dataVolume?.spec?.sourceRef;
+
+export const getDataVolumeSourceHTTP = (
+  dataVolume: V1beta1DataVolume | V1DataVolumeTemplateSpec,
+): V1beta1DataVolumeSourceHTTP => dataVolume?.spec?.source?.http;
 
 export const getDataVolumeSourceURL = (
   dataVolume: V1beta1DataVolume | V1DataVolumeTemplateSpec,

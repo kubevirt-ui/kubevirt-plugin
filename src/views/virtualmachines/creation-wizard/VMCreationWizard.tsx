@@ -17,6 +17,7 @@ import BootSourceStep from '@virtualmachines/creation-wizard/steps/InstanceTypes
 import ComputeResourcesStep from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/ComputeResourcesStep/ComputeResourcesStep';
 import GuestOSStep from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/GuestOSStep/GuestOSStep';
 import ReviewAndCreateStep from '@virtualmachines/creation-wizard/steps/ReviewAndCreateStep/ReviewAndCreateStep';
+import TemplateStepFooter from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplateStepFooter';
 import TemplateStep from '@virtualmachines/creation-wizard/steps/TemplateStep/TemplateStep';
 import {
   isCloneCreationMethod,
@@ -98,7 +99,7 @@ const VMCreationWizard: FC = () => {
       </WizardStep>
 
       <WizardStep
-        footer={wizardFooterProps}
+        footer={<TemplateStepFooter />}
         id="vm-creation-template-step"
         isHidden={!isTemplateMethod}
         name={t('Template')}
