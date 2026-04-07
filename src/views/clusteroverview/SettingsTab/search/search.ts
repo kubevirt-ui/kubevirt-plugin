@@ -24,6 +24,7 @@ export const getClusterTabIds: SearchItemGetter = () => [
   { id: CLUSTER_TAB_IDS.bootableVolumesProject, title: t('Bootable volumes project') },
   { id: CLUSTER_TAB_IDS.templatesProject, title: t('Templates project') },
   { id: CLUSTER_TAB_IDS.vmActionsConfirmation, title: t('VirtualMachine actions confirmation') },
+  { id: CLUSTER_TAB_IDS.crossClusterMigration, title: t('Cross-cluster migration') },
   { id: CLUSTER_TAB_IDS.guestManagement, title: t('Guest management') },
   { id: CLUSTER_TAB_IDS.resourceManagement, title: t('Resource management') },
   { id: CLUSTER_TAB_IDS.persistentReservation, title: t('Persistent reservation') },

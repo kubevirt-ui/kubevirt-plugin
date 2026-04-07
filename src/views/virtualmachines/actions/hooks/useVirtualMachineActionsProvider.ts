@@ -11,7 +11,10 @@ import { CONFIRM_VM_ACTIONS, TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/use
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
-import { CROSS_CLUSTER_MIGRATION_ACTION_ID } from '@multicluster/constants';
+import {
+  CROSS_CLUSTER_MIGRATION_ACTION_ID,
+  FEATURE_KUBEVIRT_CROSS_CLUSTER_MIGRATION,
+} from '@multicluster/constants';
 import useACMExtensionActions from '@multicluster/hooks/useACMExtensionActions/useACMExtensionActions';
 import { useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -32,6 +35,9 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
   const virtctlCommand = getConsoleVirtctlCommand(vm);
 
   const mtvInstalled = useIsMTVInstalled();
+  const { featureEnabled: crossClusterMigrationFlagEnabled } = useFeatures(
+    FEATURE_KUBEVIRT_CROSS_CLUSTER_MIGRATION,
+  );
 
   const acmActions = useACMExtensionActions(vm);
 
@@ -73,7 +79,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
 
     const startMigrationActions = [migrateCompute, migrateStorage];
 
-    if (crossClusterMigration && mtvInstalled) {
+    if (crossClusterMigration && mtvInstalled && crossClusterMigrationFlagEnabled) {
       startMigrationActions.unshift(crossClusterMigration);
     }
 
@@ -113,7 +119,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
     treeViewFoldersEnabled,
     acmActions,
     mtvInstalled,
-    VirtualMachineActionFactory,
+    crossClusterMigrationFlagEnabled,
   ]);
 
   return useMemo(() => [actions, !inFlight, undefined], [actions, inFlight]);

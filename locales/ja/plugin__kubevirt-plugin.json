@@ -637,6 +637,7 @@
   "Enable auto updates for RHEL VirtualMachines": "RHEL VirtualMachine の自動更新を有効にする",
   "Enable automatic images download and update": "イメージの自動ダウンロードと更新を有効にします",
   "Enable automatic subscription for Red Hat Enterprise Linux VirtualMachines.\n": "Red Hat Enterprise Linux VirtualMachine の自動サブスクリプションを有効にします。\n",
+  "Enable cross-cluster migration": "Enable cross-cluster migration",
   "Enable deletion protection?": "削除保護を有効にしますか?",
   "Enable folders in Virtual Machines tree view": "仮想マシンのツリービューでフォルダーを有効にする",
   "Enable guest system log access": "ゲストシステムログへのアクセスを有効にする",

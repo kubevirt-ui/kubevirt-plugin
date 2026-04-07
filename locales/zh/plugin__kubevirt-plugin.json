@@ -637,6 +637,7 @@
   "Enable auto updates for RHEL VirtualMachines": "为 RHEL VirtualMachines 启用自动更新",
   "Enable automatic images download and update": "启用自动镜像下载和更新",
   "Enable automatic subscription for Red Hat Enterprise Linux VirtualMachines.\n": "为 Red Hat Enterprise Linux VirtualMachines 启用自动订阅。\n",
+  "Enable cross-cluster migration": "Enable cross-cluster migration",
   "Enable deletion protection?": "启用删除保护？",
   "Enable folders in Virtual Machines tree view": "在虚拟机树视图中启用文件夹",
   "Enable guest system log access": "启用客户机系统日志访问",

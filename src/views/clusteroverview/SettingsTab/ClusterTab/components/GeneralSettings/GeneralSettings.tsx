@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import CrossClusterMigrationSetting from '@overview/SettingsTab/ClusterTab/components/GeneralSettings/CrossClusterMigrationSetting/CrossClusterMigrationSetting';
 import TemplatesAndImagesManagement from '@overview/SettingsTab/ClusterTab/components/GeneralSettings/TemplatesAndImagesManagement/TemplatesAndImagesManagement';
 import VMActionsConfirmation from '@overview/SettingsTab/ClusterTab/components/GeneralSettings/VMActionsConfirmation/VMActionsConfirmation';
 import { CLUSTER_TAB_IDS } from '@overview/SettingsTab/search/constants';
@@ -47,6 +48,9 @@ const GeneralSettings: FC<GeneralSettingsProps> = ({ hyperConvergeConfiguration,
         </StackItem>
         <StackItem isFilled>
           <VMActionsConfirmation newBadge={newBadge} />
+        </StackItem>
+        <StackItem isFilled>
+          <CrossClusterMigrationSetting />
         </StackItem>
       </Stack>
     </ExpandSection>

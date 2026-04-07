@@ -1,6 +1,7 @@
 export const CLUSTER_TAB_IDS = {
   automaticImagesDownload: 'automatic-images-download',
   bootableVolumesProject: 'bootable-volumes-project',
+  crossClusterMigration: 'cross-cluster-migration',
   generalSettings: 'general-settings',
   guestManagement: 'guest-management',
   liveMigration: 'live-migration',
@@ -31,6 +32,7 @@ export const SEARCH_ITEM_CHILDREN_TREE = {
     CLUSTER_TAB_IDS.sshConfiguration,
     CLUSTER_TAB_IDS.templatesManagement,
     CLUSTER_TAB_IDS.vmActionsConfirmation,
+    CLUSTER_TAB_IDS.crossClusterMigration,
   ],
   [CLUSTER_TAB_IDS.templatesManagement]: [
     CLUSTER_TAB_IDS.automaticImagesDownload,
