@@ -17,6 +17,8 @@ import { isVM } from '@kubevirt-utils/utils/typeGuards';
 import { getRandomChars, truncateToK8sName } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sCreate, kubevirtK8sGet } from '@multicluster/k8sRequests';
 
+import { VolumeNamePolicy } from './constants';
+
 const cloneVMToVM: V1beta1VirtualMachineClone = {
   apiVersion: `${VirtualMachineCloneModel.apiGroup}/${VirtualMachineCloneModel.apiVersion}`,
   kind: VirtualMachineCloneModel.kind,
@@ -42,7 +44,6 @@ export const cloneVM = (
   newVMName: string,
   namespace: string,
   startVM?: boolean,
-  volumeNamePolicy?: string,
 ) => {
   const cloningRequest = produce(cloneVMToVM, (draftCloneData) => {
     draftCloneData.spec.source = {
@@ -57,9 +58,7 @@ export const cloneVM = (
 
     draftCloneData.metadata.name = truncateToK8sName(newVMName, `${getRandomChars(6)}-cr`);
 
-    if (volumeNamePolicy) {
-      draftCloneData.spec.volumeNamePolicy = volumeNamePolicy;
-    }
+    draftCloneData.spec.volumeNamePolicy = VolumeNamePolicy.PrefixTargetName;
 
     if (startVM) {
       const sourceVM = source as V1VirtualMachine;
