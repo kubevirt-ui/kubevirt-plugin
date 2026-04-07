@@ -44,7 +44,9 @@ export const getDiskRowDataLayout = (
       drive: isEmpty(disk) || !isDiskConfigured ? NO_DATA_DASH : getPrintableDiskDrive(disk),
       hasDataVolume: Boolean(dataVolume),
       interface:
-        isEmpty(disk) || !isDiskConfigured ? NO_DATA_DASH : getPrintableDiskInterface(disk),
+        isEmpty(disk) || !isDiskConfigured
+          ? NO_DATA_DASH
+          : getPrintableDiskInterface(disk) || NO_DATA_DASH,
       isBootDisk: disk?.name === bootDisk?.name,
       isEnvDisk: !!volume?.configMap || !!volume?.secret || !!volume?.serviceAccount,
       metadata: { name: volume?.name },
