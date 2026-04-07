@@ -1,4 +1,4 @@
-FROM registry.redhat.io/ubi9/ubi:latest as policy
+FROM registry.access.redhat.com/ubi9/ubi:latest AS policy
 
 RUN update-crypto-policies --set DEFAULT:PQ
 # NOTE: Since the `:latest` tag can have npm version changes, we are using
