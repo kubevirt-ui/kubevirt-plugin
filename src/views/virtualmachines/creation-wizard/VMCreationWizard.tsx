@@ -64,7 +64,7 @@ const VMCreationWizard: FC = () => {
   return (
     <Wizard
       className="vm-creation-wizard"
-      header={<WizardHeader title={t('Create VirtualMachine')} />}
+      header={<WizardHeader isCloseHidden title={t('Create VirtualMachine')} />}
       onClose={handleClose}
       title={t('Create VirtualMachine')}
     >
