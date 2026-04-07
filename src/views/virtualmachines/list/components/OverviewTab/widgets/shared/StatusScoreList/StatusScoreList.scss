@@ -27,18 +27,16 @@
     border-bottom: 1px solid var(--pf-t--global--border--color--default);
   }
 
-  &__name,
-  &__name--truncated {
-    font-size: var(--pf-t--global--font--size--body--default);
-    color: var(--pf-t--global--text--color--regular);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  &__name-cell {
     min-width: 0;
+    overflow: hidden;
   }
 
-  &__name--truncated {
-    cursor: pointer;
+  &__name {
+    font-size: var(--pf-t--global--font--size--body--default);
+    color: var(--pf-t--global--text--color--regular);
+    min-width: 0;
+    max-width: 100%;
   }
 
   &__label {
