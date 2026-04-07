@@ -8,7 +8,9 @@ import {
 } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { FEATURE_KUBEVIRT_CROSS_CLUSTER_MIGRATION } from '@multicluster/constants';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
+import { useIsFleetAvailable } from '@stolostron/multicluster-sdk';
 
 import AdvancedCDROMPopoverContent from '../AdvancedCDROMPopoverContent';
 import PasstPopoverContent from '../PasstPopoverContent';
@@ -40,8 +42,11 @@ const usePreviewFeaturesData: UsePreviewFeaturesData = () => {
   const { t } = useKubevirtTranslation();
   const cluster = useClusterParam();
   const treeViewFoldersFeature = useFeatures(TREE_VIEW_FOLDERS);
+  const kubevirtCrossClusterMigration = useFeatures(FEATURE_KUBEVIRT_CROSS_CLUSTER_MIGRATION);
   const passtFeatureFlag = usePasstFeatureFlag(cluster);
   const advancedCDROMFeature = useAdvancedCDROMFeatureFlag();
+
+  const isFleetAvailable = useIsFleetAvailable();
 
   const features = [
     {
@@ -49,6 +54,13 @@ const usePreviewFeaturesData: UsePreviewFeaturesData = () => {
       id: TREE_VIEW_FOLDERS,
       label: t('Enable folders in Virtual Machines tree view'),
       ...treeViewFoldersFeature,
+    },
+    {
+      externalLink: null,
+      id: FEATURE_KUBEVIRT_CROSS_CLUSTER_MIGRATION,
+      label: t('Enable Kubevirt cross cluster migration'),
+      ...kubevirtCrossClusterMigration,
+      canEdit: isFleetAvailable && kubevirtCrossClusterMigration?.canEdit,
     },
     {
       externalLink: null,
