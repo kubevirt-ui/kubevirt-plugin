@@ -19,16 +19,7 @@ import useQuery from '@kubevirt-utils/hooks/useQuery';
 import { ClusterUserDefinedNetworkModel } from '@kubevirt-utils/models';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sCreate } from '@openshift-console/dynamic-plugin-sdk';
-import {
-  Alert,
-  Button,
-  ButtonVariant,
-  Form,
-  FormGroup,
-  ValidatedOptions,
-  Wizard,
-  WizardStep,
-} from '@patternfly/react-core';
+import { Form, FormGroup, ValidatedOptions, Wizard, WizardStep } from '@patternfly/react-core';
 
 import { VM_NETWORKS_PATH } from '../constants';
 import { isValidProjectMapping } from '../utils';
@@ -67,7 +58,7 @@ const VMNetworkNewForm: FC = () => {
   });
 
   const {
-    formState: { isSubmitSuccessful, isSubmitting },
+    formState: { isSubmitting },
     handleSubmit,
     watch,
   } = methods;
@@ -97,6 +88,8 @@ const VMNetworkNewForm: FC = () => {
 
       completed.current = true;
       logVMNetworkCreated(data.network, data.projectMappingOption);
+
+      navigate(`${VM_NETWORKS_PATH}/${name}`);
     } catch (error) {
       completed.current = true;
       logCreationFailed(VM_NETWORK_CREATION_FAILED, error);
@@ -141,24 +134,6 @@ const VMNetworkNewForm: FC = () => {
             {apiError && (
               <FormGroup>
                 <ErrorAlert error={apiError} />
-              </FormGroup>
-            )}
-            {isSubmitSuccessful && isEmpty(apiError) && (
-              <FormGroup>
-                <Alert
-                  title={t("Network '{{name}}' has been created successfully.", { name })}
-                  variant="success"
-                >
-                  <Button
-                    onClick={() => {
-                      navigate(`${VM_NETWORKS_PATH}/${name}`);
-                    }}
-                    isInline
-                    variant={ButtonVariant.link}
-                  >
-                    {t('View network')}
-                  </Button>
-                </Alert>
               </FormGroup>
             )}
           </Form>

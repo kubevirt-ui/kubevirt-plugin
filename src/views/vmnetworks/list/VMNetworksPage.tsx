@@ -45,6 +45,7 @@ const VMNetworksPage: FC = () => {
         activeKey={locationTabKey}
         onSelect={(_, tabIndex: number | string) => navigate(PATH_BY_TAB_INDEX[tabIndex])}
         unmountOnExit
+        usePageInsets
       >
         <Tab
           eventKey={TAB_INDEXES.OVN_LOCALNET}
