@@ -43,6 +43,15 @@ export const getVolumeCountFromMigPlan = (
   ).length;
 };
 
+export const getCompletedVolumeCountFromMigPlan = (
+  migrationPlan: MultiNamespaceVirtualMachineStorageMigrationPlan,
+) =>
+  (migrationPlan?.status?.namespaces ?? []).flatMap((namespace) =>
+    (namespace?.[STORAGE_MIGRATION_PHASE.COMPLETED] ?? []).flatMap(
+      (migration) => migration?.sourcePVCs ?? [],
+    ),
+  ).length;
+
 export const isMigrationCompleted = (
   migrationPlan: MultiNamespaceVirtualMachineStorageMigrationPlan,
 ) => {
