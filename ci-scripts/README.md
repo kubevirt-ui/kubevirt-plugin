@@ -28,7 +28,7 @@ GitHub Actions
 **POC E2E (two variants)**
 
 ```
-poc-e2e-ci-test.yml   — "POC Hot ClusterE2E CI Test"
+poc-e2e-ci-test.yml   — "POC Hot Cluster E2E CI Test"
   ├── cluster-health-check (ubuntu-latest + IBM Cloud → kubeconfig)
   │     └── ci-scripts/check-cluster-health.sh  (+ optional GitHub runner API check / skip for forks)
   └── run-gating-tests (runs-on: kubevirt-plugin-ci)
@@ -46,8 +46,6 @@ poc-e2e-ci-test2.yml  — "POC Hot Cluster E2E CI Test 2"
         ├── BRIDGE_BASE_ADDRESS=http://localhost:9000
         └── Cypress against local bridge + plugin proxy
 ```
-
-Use **test** when you want the fastest path aligned with the cluster’s real console route. Use **test2** to validate the **local bridge + containerized plugin** pattern (closer to dev workflows and useful when debugging console/plugin versioning).
 
 ## Required GitHub Secrets
 
@@ -173,9 +171,7 @@ The **stable** chart still hardcodes **`docker:dind`** in templates; this repo k
 
 #### Dind image source
 
-The stable chart embeds **`docker:dind`** (Docker Hub). This repo **always mirrors** that image into the OpenShift internal registry via **`ci-scripts/arc/setup-dind-mirror.sh`** and rewrites rendered manifests with the Helm post-renderer so runner pods pull **arc-docker-dind** from the cluster registry.
-
-If **`oc import-image`** fails (rate limits or blocked egress to docker.io), add a **cluster-level** pull credential for docker.io or adjust **`DIND_SOURCE_IMAGE`** / mirroring—not GitHub Actions Docker Hub secrets. Use **`SKIP_DIND_MIRROR=1`** only when dind is satisfied by **`ImageContentSourcePolicy`** or another mirror.
+The stable chart embeds **`docker:dind`** (Docker Hub). This repo **always mirrors** that image into the OpenShift internal registry via **`ci-scripts/arc/setup-dind-mirror.sh`** and rewrites rendered manifests with the Helm post-renderer so runner pods pull **arc-docker-dind** from the cluster registry. The approach avoid docker hub pull throttling / rate limiting.
 
 ### Docker-in-Docker (default)
 
@@ -210,11 +206,12 @@ To turn off dind (no Docker daemon in the pod): `export CONTAINER_MODE=none` and
 
 ### Running POC E2E tests
 
-**Variant A — `poc-e2e-ci-test.yml` (in-cluster console)**
+**Variant A — `poc-e2e-ci-test.yml` (IBM Cloud cluster health checks then run `poc-e2e-ci-test2.yml`)**
 
 1. Actions → **POC Hot ClusterE2E CI Test**
 2. Inputs: Cypress spec (default `tests/gating.cy.ts`), cluster name, optional **skip ARC runner check** (forks without ARC)
-3. Health job passes `GITHUB_TOKEN` into `check-cluster-health.sh` when GitHub API checks are needed; test job uses `test-setup.sh`, then `npm run test-cypress-headless`
+3. Health job passes `GITHUB_TOKEN` into `check-cluster-health.sh` when GitHub API checks are needed
+4. Calls to `poc-e2e-ci-test2.yml` to run the tests
 
 **Variant B — `poc-e2e-ci-test2.yml` (off-cluster console + plugin containers)**
 

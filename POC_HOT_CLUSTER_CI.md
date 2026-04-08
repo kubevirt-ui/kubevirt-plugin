@@ -69,4 +69,4 @@ Orchestration lives in **`.github/workflows/poc-e2e-ci-test.yml`** (cluster heal
 
 ## Gaps
 
-- [] The ARC runner pods need to be able to run docker-in-docker (dind) and manage some cluster level resources. A namespace and some secretes need to be created before the e2e tests run. Since the runner pod rbac is constrained to a single SCC and RBAC, the workflow runs probably have too many permissions. Another approach to have a higher permissions pod run and create needed resources and then allow the ARC runner to run in a lower permission pod may work, but that is currently beyond the scope of the POC.
+- [] The ARC runner pods need to be able to run docker-in-docker (dind) and manage some cluster level resources. A namespace and some secrets need to be created before the e2e tests run. Since the runner pod rbac is constrained to a single SCC and RBAC, the workflow runs probably have too many permissions. Another approach to have a higher permissions pod run and create needed resources and then allow the ARC runner to run in a lower permission pod may work, but that is currently beyond the scope of the POC.
