@@ -4,6 +4,7 @@ import {
   STORAGE_MIGRATION_PHASE,
 } from '@kubevirt-utils/resources/migrations/constants';
 import {
+  getCompletedVolumeCountFromMigPlan,
   getVolumeCountFromMigPlan,
   isMigrationCompleted,
 } from '@kubevirt-utils/resources/migrations/utils';
@@ -36,15 +37,13 @@ export const getStatusMigration = (
 export const getMigrationPercentage = (
   storageMigrationPlan: MultiNamespaceVirtualMachineStorageMigrationPlan,
 ) => {
-  const successfulLiveMigration =
-    storageMigrationPlan?.status?.namespaces?.reduce(
-      (acc, namespace) => acc + (namespace?.[STORAGE_MIGRATION_PHASE.COMPLETED]?.length ?? 0),
-      0,
-    ) || 0;
+  if (isMigrationCompleted(storageMigrationPlan)) return 100;
 
-  const totalMigrations = getVolumeCountFromMigPlan(storageMigrationPlan);
+  const totalVolumeCount = getVolumeCountFromMigPlan(storageMigrationPlan);
 
-  if (totalMigrations === 0) return 0;
+  if (totalVolumeCount === 0) return 0;
 
-  return (successfulLiveMigration / totalMigrations) * 100;
+  const completedVolumeCount = getCompletedVolumeCountFromMigPlan(storageMigrationPlan);
+
+  return Math.min(100, (completedVolumeCount / totalVolumeCount) * 100);
 };
