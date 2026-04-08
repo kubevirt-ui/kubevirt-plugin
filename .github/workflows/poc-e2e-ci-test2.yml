@@ -27,8 +27,8 @@ env:
   CYPRESS_TEST_NS: kubevirt-plugin-ci-test-${{ github.run_id }}
   CYPRESS_TEST_SECRET_NAME: ci-test-secret
 
-  # KUBEVIRT_PLUGIN_IMAGE: 'ttl.sh/kubevirt-plugin-ci-${{ github.run_id }}-${{ github.run_number }}:2h'
-  KUBEVIRT_PLUGIN_IMAGE: ttl.sh/kubevirt-plugin-ci-1234:6h
+  KUBEVIRT_PLUGIN_IMAGE: 'ttl.sh/kubevirt-plugin-ci-${{ github.run_id }}-${{ github.run_number }}:2h'
+  #KUBEVIRT_PLUGIN_IMAGE: ttl.sh/kubevirt-plugin-ci-1234:6h
 
 jobs:
   check-runner:
