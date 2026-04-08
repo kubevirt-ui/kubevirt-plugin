@@ -18,6 +18,8 @@ on:
     secrets:
       IBM_CLOUD_API_KEY:
         required: true
+      BOT_PAT:
+        required: false
 
 permissions:
   contents: read
@@ -72,7 +74,7 @@ jobs:
           echo "Cluster deletion initiated"
 
           echo "Waiting for cluster to be fully removed..."
-          MAX_WAIT=1800  # 30 minutes
+          MAX_WAIT=7200  # 2 hours
           INTERVAL=30
           ELAPSED=0
 
@@ -85,6 +87,11 @@ jobs:
             sleep ${INTERVAL}
             ELAPSED=$((ELAPSED + INTERVAL))
           done
+
+          if ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" &>/dev/null; then
+            echo "::error::Timed out waiting for cluster deletion"
+            exit 1
+          fi
 
       # TODO: Followup about how to manually delete "Runner scale sets" from ARC
       - name: Clean up ghost runners
