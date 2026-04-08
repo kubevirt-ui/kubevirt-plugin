@@ -9,6 +9,7 @@ import {
   V1VirtualMachine,
   V1VolumeSnapshotStatus,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { VolumeRestorePolicy } from '@kubevirt-utils/components/SnapshotModal/utils/constants';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { getVolumeSnapshotStatuses } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -99,6 +100,7 @@ export const getVMRestoreSnapshotResource = (
         name: snapshot.spec.source.name,
       },
       virtualMachineSnapshotName: snapshot.metadata.name,
+      volumeRestorePolicy: VolumeRestorePolicy.InPlace,
     },
   };
   return restoreResource;
