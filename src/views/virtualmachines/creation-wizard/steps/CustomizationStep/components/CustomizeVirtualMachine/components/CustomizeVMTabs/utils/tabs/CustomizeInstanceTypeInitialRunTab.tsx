@@ -7,14 +7,14 @@ import {
   updateCustomizeInstanceType,
   updateVMCustomizeIT,
 } from '@kubevirt-utils/store/customizeInstanceType';
+import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { DescriptionList, Divider, PageSection, Title } from '@patternfly/react-core';
-import { wizardVMSignal } from '@virtualmachines/creation-wizard/state/vm-signal/vmStore';
 import InitialRunTabCloudinit from '@virtualmachines/details/tabs/configuration/initialrun/components/InitialRunTabCloudinit';
 import InitialRunTabSysprep from '@virtualmachines/details/tabs/configuration/initialrun/components/InitialRunTabSysprep';
 
 const CustomizeInstanceTypeInitialRunTab = () => {
   const { t } = useKubevirtTranslation();
-  const vm = wizardVMSignal.value;
+  const vm = vmSignal.value;
 
   if (!vm) {
     return <Loading />;

@@ -22,10 +22,10 @@ import { getPreferredBootmode } from '@kubevirt-utils/resources/preference/helpe
 import { asAccessReview, getAnnotation, getLabel, getName } from '@kubevirt-utils/resources/shared';
 import { DESCRIPTION_ANNOTATION, getDevices, getHostname } from '@kubevirt-utils/resources/vm';
 import { updateCustomizeInstanceType } from '@kubevirt-utils/store/customizeInstanceType';
+import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, Grid, GridItem, Switch } from '@patternfly/react-core';
-import { wizardVMSignal } from '@virtualmachines/creation-wizard/state/vm-signal/vmStore';
 import DeletionProtectionModal from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/DeletionProtectionModal';
 import { VM_DELETION_PROTECTION_LABEL } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/constants';
 import { VMDeletionProtectionOptions } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/types';
@@ -39,7 +39,7 @@ import usePreference from '../../hooks/usePreference';
 const CustomizeInstanceTypeDetailsTab = () => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const vm = wizardVMSignal.value;
+  const vm = vmSignal.value;
 
   const [preference, preferenceLoading] = usePreference(vm);
 

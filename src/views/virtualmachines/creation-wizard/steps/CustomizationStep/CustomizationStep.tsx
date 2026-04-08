@@ -2,13 +2,13 @@ import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
+import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { Stack, StackItem, Title, TitleSizes } from '@patternfly/react-core';
-import { wizardVMSignal } from '@virtualmachines/creation-wizard/state/vm-signal/vmStore';
 import CustomizeVirtualMachine from '@virtualmachines/creation-wizard/steps/CustomizationStep/components/CustomizeVirtualMachine/CustomizeVirtualMachine';
 
 const CustomizationStep: FC = () => {
   const { t } = useKubevirtTranslation();
-  const vm = wizardVMSignal.value;
+  const vm = vmSignal.value;
 
   return (
     <Stack hasGutter>

@@ -7,12 +7,12 @@ import Loading from '@kubevirt-utils/components/Loading/Loading';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { updateCustomizeInstanceType } from '@kubevirt-utils/store/customizeInstanceType';
+import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { DescriptionList, Grid, PageSection, Title } from '@patternfly/react-core';
-import { wizardVMSignal } from '@virtualmachines/creation-wizard/state/vm-signal/vmStore';
 
 const CustomizeInstanceTypeMetadataTab = () => {
   const { t } = useKubevirtTranslation();
-  const vm = wizardVMSignal.value;
+  const vm = vmSignal.value;
 
   if (!vm) {
     return <Loading />;

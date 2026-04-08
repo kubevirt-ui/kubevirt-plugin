@@ -7,9 +7,9 @@ import { CLONING_STATUSES } from '@kubevirt-utils/components/CloneVMModal/utils/
 import { cloneVM, vmExists } from '@kubevirt-utils/components/CloneVMModal/utils/helpers';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { getVMURL } from '@multicluster/urls';
-import { wizardVMSignal } from '@virtualmachines/creation-wizard/state/vm-signal/vmStore';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 
 type UseCloneVM = () => () => Promise<void>;
@@ -24,7 +24,7 @@ const useCloneVM: UseCloneVM = () => {
     startVM: startCloneVM,
   } = useVMWizardStore();
 
-  const source = wizardVMSignal.value;
+  const source = vmSignal.value;
 
   const [initialCloneRequest, setInitialCloneRequest] = useState<V1beta1VirtualMachineClone>();
 

@@ -2,10 +2,9 @@ import React, { FC, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getDescription, getName } from '@kubevirt-utils/resources/shared';
-import { updateCustomizeInstanceType } from '@kubevirt-utils/store/customizeInstanceType';
+import { updateCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { FormGroup, Stack, StackItem, TextInput, ValidatedOptions } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
-import { wizardVMSignal } from '@virtualmachines/creation-wizard/state/vm-signal/vmStore';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 import { isCloneCreationMethod } from '@virtualmachines/creation-wizard/utils/utils';
 
@@ -22,7 +21,7 @@ const NameAndDescriptionForm: FC = () => {
     ValidatedOptions.default,
   );
   useSignals();
-  const vm = wizardVMSignal.value;
+  const vm = vmSignal.value;
 
   const onNameChange = (name: string) => {
     if (isCloneMethod) setCloneVMName(name);
