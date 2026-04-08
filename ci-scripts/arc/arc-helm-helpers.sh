@@ -25,11 +25,18 @@ arc_github_config_secret_helm_auth() {
     _auth_arr+=(--values "${AUTH_VALUES_FILE}")
   elif [[ -n "${ARC_PAT:-}" ]]; then
     echo "Using Personal Access Token authentication"
-    _auth_arr+=(--set "githubConfigSecret.github_token=${ARC_PAT}")
+    AUTH_VALUES_FILE=$(mktemp)
+    {
+      echo 'githubConfigSecret:'
+      echo "  github_token: \"${ARC_PAT}\""
+    } > "${AUTH_VALUES_FILE}"
+    _auth_arr+=(--values "${AUTH_VALUES_FILE}")
   else
     echo "ERROR: Set ARC_APP_ID + ARC_APP_INSTALL_ID + ARC_APP_PRIVATE_KEY, or ARC_PAT"
     return 1
   fi
+
+  trap '[[ -n "${AUTH_VALUES_FILE:-}" && -f "${AUTH_VALUES_FILE}" ]] && rm -f "${AUTH_VALUES_FILE}"' EXIT
   return 0
 }
 
