@@ -1,22 +1,16 @@
 #!/bin/bash
 #
 # Check the health of the hot cluster: API server, nodes, HCO, KubeVirt pods,
-# ARC runners, storage, and console route.
+# ARC runner scale set, storage, and console route.
 #
 # Returns exit code 0 if all checks pass, non-zero otherwise.
 #
 # Optional environment variables:
-#   ARC_RUNNERS_NS         - Namespace for ARC runners (default: "arc-runners")
-#   GITHUB_REPOSITORY      - owner/repo for GitHub API runner check (legacy runners only)
-#   SKIP_ARC_GITHUB_CHECK  - Set to "true" to skip the GitHub API runner registration check
-#
-# Note: Runner scale sets (ARC) do not appear in GET /repos/.../actions/runners. When ARC
-# runner pods exist in ARC_RUNNERS_NS, the script skips the GitHub API check.
+#   ARC_RUNNERS_NS  - Namespace for ARC runner scale set (default: "arc-runners")
 
 set -uo pipefail
 
 ARC_RUNNERS_NS="${ARC_RUNNERS_NS:-arc-runners}"
-SKIP_ARC_GITHUB_CHECK="${SKIP_ARC_GITHUB_CHECK:-false}"
 FAILURES=0
 
 check() {
@@ -70,51 +64,37 @@ check "virt-handler pods" bash -c '
   [[ "${running}" -ge 1 ]]
 '
 
-# --- ARC runner pods ---
-check "ARC runner pods in ${ARC_RUNNERS_NS}" bash -c "
-  if oc get namespace ${ARC_RUNNERS_NS} &>/dev/null; then
-    pod_count=\$(oc get pods -n ${ARC_RUNNERS_NS} --no-headers 2>/dev/null | wc -l)
-    echo \"  \${pod_count} pod(s) found\"
+# --- ARC runner scale set ---
+# Scale sets scale to zero when idle; check the AutoscalingRunnerSet resource rather than
+# counting ephemeral runner pods (which may be 0 between jobs).
+check "ARC AutoscalingRunnerSet in ${ARC_RUNNERS_NS}" bash -c "
+  if ! oc get namespace '${ARC_RUNNERS_NS}' &>/dev/null; then
+    echo '  Namespace ${ARC_RUNNERS_NS} does not exist'
+    exit 1
+  fi
+  rs_count=\$(oc get autoscalingrunnersets -n '${ARC_RUNNERS_NS}' --no-headers 2>/dev/null | wc -l)
+  if [[ \"\${rs_count}\" -ge 1 ]]; then
+    echo \"  \${rs_count} AutoscalingRunnerSet(s) found\"
     exit 0
   else
-    echo \"  Namespace ${ARC_RUNNERS_NS} does not exist\"
+    echo '  No AutoscalingRunnerSets found in ${ARC_RUNNERS_NS}'
     exit 1
   fi
 "
 
-# --- Verify runners registered (scale set or legacy) ---
-# Runner scale sets (ARC) do not appear in GET /repos/.../actions/runners. If we have
-# ARC pods in the cluster, we treat that as "runners available". Otherwise we check the
-# legacy API for online runners with label "kubevirt-plugin-ci".
-HAS_ARC_PODS=0
-if oc get namespace "${ARC_RUNNERS_NS}" &>/dev/null; then
-  pod_count=$(oc get pods -n "${ARC_RUNNERS_NS}" --no-headers 2>/dev/null | wc -l)
-  [[ "${pod_count}" -ge 1 ]] && HAS_ARC_PODS=1
-fi
-
-if [[ "${SKIP_ARC_GITHUB_CHECK}" == "true" ]]; then
-  echo "Skipping runner registration check (SKIP_ARC_GITHUB_CHECK=true)"
-elif [[ "${HAS_ARC_PODS}" -eq 1 ]]; then
-  echo "Checking for runners (scale set or legacy)... ARC runner scale set present; no need to check legacy API."
-  echo "Runner check passed (scale set)."
-elif [[ -n "${GITHUB_REPOSITORY:-}" ]]; then
-  check "runners registered (scale set or legacy)" bash -c '
-    echo "Checking for runners (scale set or legacy)..."
-    # No ARC pods: fall back to legacy self-hosted runners API (online + kubevirt-plugin-ci label).
-    online_count=$(gh api "/repos/'"${GITHUB_REPOSITORY}"'/actions/runners" \
-      --jq "[.runners[] | select(.status == \"online\") | select(.labels[].name == \"kubevirt-plugin-ci\")] | length" 2>/dev/null || echo "0")
-    if [[ "${online_count}" -ge 1 ]]; then
-      echo "  ${online_count} online runner(s) with label kubevirt-plugin-ci"
-      exit 0
-    else
-      echo "::error::No runners found: no ARC pods in '"${ARC_RUNNERS_NS}"' and no online legacy runners with label kubevirt-plugin-ci."
-      echo "  The Run Gating Tests job uses runs-on: kubevirt-plugin-ci. Ensure ARC is installed and the scale set is registered."
-      exit 1
-    fi
-  '
-else
-  echo "Skipping runner registration check (no GITHUB_REPOSITORY)"
-fi
+# --- ARC listener pod ---
+# The listener pod stays Running even when the scale set is idle (no ephemeral runner pods).
+# A missing or non-Running listener means the scale set cannot pick up jobs.
+check "ARC listener pod in ${ARC_RUNNERS_NS}" bash -c "
+  running=\$(oc get pods -n '${ARC_RUNNERS_NS}' --no-headers 2>/dev/null | grep -c 'Running')
+  if [[ \"\${running}\" -ge 1 ]]; then
+    echo \"  \${running} Running pod(s) (listener/controller)\"
+    exit 0
+  else
+    echo '  No Running pods in ${ARC_RUNNERS_NS} — listener may be down'
+    exit 1
+  fi
+"
 
 # --- Default StorageClass ---
 check "default StorageClass" bash -c '
