@@ -4,6 +4,7 @@ import {
   IoK8sApiRbacV1Role,
   IoK8sApiRbacV1RoleBinding,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { FEATURE_KUBEVIRT_CROSS_CLUSTER_MIGRATION } from '@multicluster/constants';
 import { K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
 
 export const AUTOMATIC_SUBSCRIPTION_ACTIVATION_KEY = 'automaticSubscriptionActivationKey';
@@ -30,7 +31,11 @@ const FEATURES_ROLE_BINDING_NAME = 'kubevirt-ui-features-reader-binding';
 
 export const FEATURE_HCO_PERSISTENT_RESERVATION = 'persistentReservationHCO';
 
-export const UI_FEATURES = [CONFIRM_VM_ACTIONS, TREE_VIEW_FOLDERS];
+export const UI_FEATURES = [
+  FEATURE_KUBEVIRT_CROSS_CLUSTER_MIGRATION,
+  CONFIRM_VM_ACTIONS,
+  TREE_VIEW_FOLDERS,
+];
 
 export const FEATURES_CONFIG_MAP_INITIAL_DATA: Record<string, string> = {
   [AUTOMATIC_SUBSCRIPTION_ACTIVATION_KEY]: '',
