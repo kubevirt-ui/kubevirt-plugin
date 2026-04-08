@@ -112,6 +112,7 @@ const InstanceTypePage: FC<ListPageProps> = (props) => {
         activeKey={activeTabKey}
         className="co-horizontal-nav"
         style={{ flexShrink: 0 }}
+        usePageInsets
       >
         <Tab
           title={
