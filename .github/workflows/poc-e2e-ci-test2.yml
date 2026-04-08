@@ -251,8 +251,6 @@ jobs:
 
       # # TODO: Replace with the cypress action?
       # - name: Run Cypress gating tests
-      #   env:
-      #     BRIDGE_BASE_ADDRESS: 'http://localhost:9000'
       #   run: |
       #     npm run test-cypress-headless -- --spec="${{ inputs.test_spec }}"
 
