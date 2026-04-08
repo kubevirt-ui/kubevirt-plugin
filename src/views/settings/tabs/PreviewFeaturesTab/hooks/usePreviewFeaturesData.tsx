@@ -1,10 +1,15 @@
 import React, { ReactNode } from 'react';
 
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { PASST_UDN_NETWORK, TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
+import {
+  PASST_UDN_NETWORK,
+  TREE_VIEW_FOLDERS,
+  VM_TEMPLATES,
+} from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePasstFeatureFlag from '@kubevirt-utils/hooks/usePasstFeatureFlag';
+import useVMTemplateFeatureFlag from '@kubevirt-utils/hooks/useVMTemplateFeatureFlag/useVMTemplateFeatureFlag';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { PREVIEW_FEATURES_TAB_IDS } from '@settings/search/constants';
 
@@ -36,6 +41,7 @@ const usePreviewFeaturesData: UsePreviewFeaturesData = (cluster) => {
   const { t } = useKubevirtTranslation();
   const treeViewFoldersFeature = useFeatures(TREE_VIEW_FOLDERS, cluster);
   const passtFeatureFlag = usePasstFeatureFlag(cluster);
+  const templateFeatureFlag = useVMTemplateFeatureFlag(cluster);
 
   const features = [
     {
@@ -53,6 +59,13 @@ const usePreviewFeaturesData: UsePreviewFeaturesData = (cluster) => {
       olsPromptType: OLSPromptType.ENABLE_PASST_BINDING,
       searchItemId: PREVIEW_FEATURES_TAB_IDS.passtUDNNetwork,
       ...passtFeatureFlag,
+    },
+    {
+      externalLink: 'https://kubevirt.io/user-guide/user_workloads/vm_templates/',
+      id: VM_TEMPLATES,
+      label: t('Enable native VirtualMachine templates'),
+      searchItemId: PREVIEW_FEATURES_TAB_IDS.vmTemplates,
+      ...templateFeatureFlag,
     },
   ];
 

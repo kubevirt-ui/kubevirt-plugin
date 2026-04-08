@@ -10,9 +10,10 @@ import {
   PASST_ANNOTATION,
   PASST_BINDING_NAME,
 } from '@kubevirt-utils/resources/vm/utils/constants';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { escapeJsonPointerToken, isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import { k8sPatch, Patch } from '@openshift-console/dynamic-plugin-sdk';
+import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
+import { Patch } from '@openshift-console/dynamic-plugin-sdk';
 
 const usePasstFeatureFlag = (clusterOverride?: string) => {
   const clusterParam = useClusterParam();
@@ -43,12 +44,13 @@ const usePasstFeatureFlag = (clusterOverride?: string) => {
           : []),
         {
           op: 'replace',
-          path: `/metadata/annotations/${PASST_ANNOTATION.replace(/\//g, '~1')}`,
+          path: `/metadata/annotations/${escapeJsonPointerToken(PASST_ANNOTATION)}`,
           value: val.toString(),
         },
       ];
 
-      return k8sPatch({
+      return kubevirtK8sPatch({
+        cluster,
         data: patch,
         model: HyperConvergedModel,
         resource: hyperConvergeConfiguration,

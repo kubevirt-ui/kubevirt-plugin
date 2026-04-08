@@ -9,7 +9,7 @@ import {
   IoK8sApiCoreV1ServicePort,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
+import { escapeJsonPointerToken, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { k8sCreate, k8sPatch, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 import { buildOwnerReference } from '../../../../../resources/shared';
@@ -237,9 +237,8 @@ export const createRDPService = (
     data: [
       {
         op: 'add',
-        path: `/spec/template/metadata/labels/${VMI_LABEL_AS_RDP_SERVICE_SELECTOR.replaceAll(
-          '/',
-          '~1',
+        path: `/spec/template/metadata/labels/${escapeJsonPointerToken(
+          VMI_LABEL_AS_RDP_SERVICE_SELECTOR,
         )}`,
         value: labelSelector,
       },
@@ -252,7 +251,7 @@ export const createRDPService = (
     data: [
       {
         op: 'add',
-        path: `/metadata/labels/${VMI_LABEL_AS_RDP_SERVICE_SELECTOR.replaceAll('/', '~1')}`,
+        path: `/metadata/labels/${escapeJsonPointerToken(VMI_LABEL_AS_RDP_SERVICE_SELECTOR)}`,
         value: labelSelector,
       },
     ],

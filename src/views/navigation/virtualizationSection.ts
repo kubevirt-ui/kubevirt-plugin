@@ -60,18 +60,15 @@ export const extensions: EncodedExtension[] = [
         'data-quickstart-id': 'qs-nav-templates',
         'data-test-id': 'templates-nav-item',
       },
+      href: 'templates',
       id: NAV_ID.TEMPLATES,
       insertAfter: NAV_ID.VIRTUAL_MACHINES,
-      model: {
-        group: 'template.openshift.io',
-        kind: 'Template',
-        version: 'v1',
-      },
       name: '%plugin__kubevirt-plugin~Templates%',
+      prefixNamespaced: true,
       section: VIRT_SECTION_ID,
     },
-    type: 'console.navigation/resource-ns',
-  } as EncodedExtension<ResourceNSNavItem>,
+    type: 'console.navigation/href',
+  } as EncodedExtension<HrefNavItem>,
   {
     properties: {
       dataAttributes: {

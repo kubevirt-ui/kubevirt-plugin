@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { useVirtualMachineTemplatesCPUMemory } from 'src/views/templates/list/hooks/useVirtualMachineTemplatesCPUMemory';
+import { getVirtualMachineTemplatesCPUMemoryText } from 'src/views/templates/utils/utils';
 
 import CPUDescription from '@kubevirt-utils/components/CPUDescription/CPUDescription';
 import { CpuMemHelperTextResources } from '@kubevirt-utils/components/CPUDescription/utils/utils';
@@ -19,7 +19,7 @@ type CPUMemoryProps = {
 
 const CPUMemory: FC<CPUMemoryProps> = ({ editable, template }) => {
   const { t } = useKubevirtTranslation();
-  const CPUMemData = useVirtualMachineTemplatesCPUMemory(template);
+  const CPUMemData = getVirtualMachineTemplatesCPUMemoryText(template, t);
   const { createModal } = useModal();
 
   const onEditClick = () =>

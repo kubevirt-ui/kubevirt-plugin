@@ -4,7 +4,7 @@ import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { RemoveFolderQuery } from '@kubevirt-utils/components/MoveVMToFolderModal/hooks/useRemoveFolderQuery';
 import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
 import { getLabels, getNamespace } from '@kubevirt-utils/resources/shared';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { escapeJsonPointerToken, isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { TreeViewDataItem } from '@patternfly/react-core';
@@ -37,7 +37,7 @@ export const changeVMFolder = (newFolder: string) =>
         : []),
       {
         op: 'replace',
-        path: `/metadata/labels/${VM_FOLDER_LABEL?.replace('/', '~1')}`,
+        path: `/metadata/labels/${escapeJsonPointerToken(VM_FOLDER_LABEL)}`,
         value: newFolder,
       },
     ],

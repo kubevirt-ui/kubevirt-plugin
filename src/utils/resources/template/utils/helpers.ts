@@ -40,7 +40,7 @@ export const poorManProcess = (template: V1Template): V1Template => {
 export const isCommonTemplate = (template: V1Template): boolean =>
   template?.metadata?.labels?.[TEMPLATE_TYPE_LABEL] === TEMPLATE_TYPE_BASE;
 
-export const isDeprecatedTemplate = (template: V1Template): boolean =>
+export const isDeprecatedTemplate = (template: K8sResourceCommon): boolean =>
   getAnnotation(template, ANNOTATIONS.deprecated) === 'true';
 
 export const replaceTemplateVM = (template: V1Template, vm: V1VirtualMachine) => {

@@ -32,6 +32,8 @@ export const MAX_MTU = 65536;
 
 export enum K8S_OPS {
   ADD = 'add',
+  DELETE = 'delete',
+  PATCH = 'patch',
   REMOVE = 'remove',
   REPLACE = 'replace',
 }
