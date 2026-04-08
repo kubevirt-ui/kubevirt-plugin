@@ -69,7 +69,7 @@ if command -v jq &>/dev/null; then
       local url="${1}"
       local host path route_info ns svc svc_port
       host=$(echo "${url}" | sed -E 's|https://([^/]+).*|\1|')
-      path=$(echo "${url}" | sed -E 's|https://[^/]+(/.*)|\1|')
+      path=$(echo "${url}" | sed -E 's|https://[^/]+(/.*)?|\1|' || echo '/')
       route_info=$(echo "${_ALL_ROUTES_JSON}" \
         | jq -r --arg h "${host}" \
             '.items[] | select(.spec.host == $h) | "\(.metadata.namespace) \(.spec.to.name)"' \

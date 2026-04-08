@@ -88,6 +88,10 @@ echo "::add-mask::${BRIDGE_K8S_AUTH_BEARER_TOKEN}"
 # BRIDGE_K8S_MODE_OFF_CLUSTER_SKIP_VERIFY_TLS=true, so the CI self-signed cert is accepted.
 BRIDGE_PLUGINS="kubevirt-plugin=https://host.docker.internal:9001"
 
+# Default CONSOLE_IMAGE and CONSOLE_PORT if not set
+CONSOLE_IMAGE=${CONSOLE_IMAGE:-"quay.io/openshift/origin-console:latest"}
+CONSOLE_PORT=${CONSOLE_PORT:-9000}
+
 # ---------------------------------------------------------------------------
 # Job summary (no secrets)
 # ---------------------------------------------------------------------------
