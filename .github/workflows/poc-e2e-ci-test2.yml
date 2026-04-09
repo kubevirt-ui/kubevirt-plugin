@@ -317,5 +317,5 @@ jobs:
       - name: Cleanup cluster resources
         if: always()
         run: |
-          ./test-cleanup.sh || echo "::warning::Cleanup encountered errors (non-fatal)"
+          ./ci-scripts/test-cleanup.sh || echo "::warning::Cleanup encountered errors (non-fatal)"
           oc delete namespace "${CYPRESS_TEST_NS}" --wait=false || true

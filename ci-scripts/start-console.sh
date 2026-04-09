@@ -6,8 +6,6 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
-RUNTIME=$(command -v podman || command -v docker)
-
 # ---------------------------------------------------------------------------
 # Route + BRIDGE_PLUGIN_PROXY (same behavior as route-console.sh)
 # ---------------------------------------------------------------------------
@@ -15,6 +13,11 @@ ROUTE_NAME="kubevirt-apiserver-proxy"
 ROUTE_NS="openshift-cnv"
 APPS_DOMAIN="$(oc get ingress.config.openshift.io/cluster -o jsonpath='{.spec.domain}' 2>/dev/null || true)"
 HOSTNAME="kubevirt-apiserver-proxy.${APPS_DOMAIN}"
+
+if [[ -z "${APPS_DOMAIN:-}" ]]; then
+  echo "::error::Could not read ingress.config.openshift.io/cluster domain."
+  exit 1
+fi
 
 if oc get route "$ROUTE_NAME" -n "$ROUTE_NS" &>/dev/null; then
   echo "Route '${ROUTE_NAME}' already exists in namespace '${ROUTE_NS}'."

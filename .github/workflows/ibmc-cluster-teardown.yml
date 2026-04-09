@@ -12,7 +12,7 @@ on:
     inputs:
       cluster_name:
         description: 'Cluster name to tear down'
-        required: true
+        required: false
         default: 'kubevirt-plugin-ci'
         type: string
     secrets:
@@ -122,4 +122,3 @@ jobs:
           echo "| Cluster | \`${CLUSTER_NAME}\` |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Cluster Found | \`${{ steps.check_cluster.outputs.exists }}\` |" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "Teardown complete." >> "$GITHUB_STEP_SUMMARY"

@@ -76,12 +76,7 @@ $RUNTIME run -d \
   -p "${PLUGIN_PORT}:9443" \
   -v "${SCRIPT_DIR}/nginx-9443.conf:/etc/nginx/nginx.conf${VOL_SUFFIX}" \
   -v "${KUBEVIRT_PLUGIN_CERT_DIR}:/var/serving-cert${VOL_SUFFIX}" \
-  ${PLUGIN_IMAGE}
-
-  # --entrypoint nginx \
-  # "${PLUGIN_IMAGE}" \
-  # -g "daemon off;" \
-  # -c /etc/nginx/nginx.conf
+  "${PLUGIN_IMAGE}"
 
 #
 # Note: If this run with podman, the IPv6 port is captured but not mapped to nginx.  So,

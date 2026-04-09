@@ -13,11 +13,6 @@ on:
         required: true
         default: 'kubevirt-plugin-ci'
         type: string
-      skip_arc_runner_check:
-        description: 'Skip GitHub runner registration check (use when running from a fork without its own ARC runners)'
-        required: false
-        default: false
-        type: boolean
 
 permissions:
   contents: read
@@ -56,10 +51,6 @@ jobs:
           oc get nodes -o wide
 
       - name: Run health checks
-        env:
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SKIP_ARC_GITHUB_CHECK: ${{ inputs.skip_arc_runner_check && 'true' || 'false' }}
         run: |
           ./ci-scripts/check-cluster-health.sh
 
