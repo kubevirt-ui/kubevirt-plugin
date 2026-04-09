@@ -20,11 +20,11 @@ const useK8sWatchData = <T>(resource: FleetWatchK8sResource | null): WatchK8sRes
   const useFleet = resource?.cluster && resource?.cluster !== hubClusterName;
 
   const [fleetData, fleetLoaded, fleetError] = useFleetK8sWatchResource<T>(
-    useFleet ? requestWithNoLimit : null,
+    useFleet && !waitingForHubName ? requestWithNoLimit : null,
   );
 
   const [k8sWatchData, k8sWatchLoaded, k8sWatchError] = useK8sWatchResource<T>(
-    !waitingForHubName && !useFleet ? resource : null,
+    !useFleet ? resource : null,
   );
 
   const defaultData: T = useMemo(

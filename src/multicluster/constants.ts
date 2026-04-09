@@ -19,8 +19,9 @@ export const FLEET_MIGRATION_POLICIES_PATH = `${FLEET_BASE_PATH}/${MigrationPoli
 export const FLEET_CHECKUPS_PATH = `${FLEET_BASE_PATH}/checkups`;
 export const FLEET_CATALOG_PATH = `${FLEET_BASE_PATH}/catalog`;
 
-export const FLAG_KUBEVIRT_DISALLOW_DYNAMIC_ACM = 'KUBEVIRT_DISALLOW_DYNAMIC_ACM';
 export const FLAG_KUBEVIRT_DYNAMIC_ACM = 'KUBEVIRT_DYNAMIC_ACM';
+export const FLAG_DISALLOWED_KUBEVIRT_DYNAMIC_ACM = 'DISALLOWED_KUBEVIRT_DYNAMIC_ACM';
+
 export const CROSS_CLUSTER_MIGRATION_ACTION_ID = 'cross-cluster-migration';
 
 export const CONSOLE_URL_CLAIM = 'consoleurl.cluster.open-cluster-management.io';
