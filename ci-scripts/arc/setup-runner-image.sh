@@ -16,9 +16,9 @@
 # Binary URL resolution:
 #   When jq is available, this script queries ConsoleCLIDownload resources to find the
 #   exact binary download URLs for oc, kubectl, and virtctl that match the live cluster.
-#   These are passed to the Docker build as OC_URL, KUBECTL_URL, and VIRTCTL_URL build-args.
+#   These are passed to the Docker build as OC_URL and VIRTCTL_URL build-args.
 #   If resolution fails (CRD not found, jq absent, etc.), the Dockerfile falls back to
-#   mirror.openshift.com / dl.k8s.io / GitHub releases using OC_VERSION / VIRTCTL_VERSION.
+#   mirror.openshift.com / GitHub releases using OC_VERSION / VIRTCTL_VERSION.
 
 set -euo pipefail
 ARC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -41,16 +41,12 @@ VIRTCTL_VERSION="${VIRTCTL_VERSION:-v1.4.0}"
 # Resolve binary download URLs from ConsoleCLIDownload resources so the image binaries
 # match the live cluster exactly. Requires jq; silently skipped if unavailable.
 OC_URL=""
-KUBECTL_URL=""
 VIRTCTL_URL=""
 if command -v jq &>/dev/null; then
   CLI_DOWNLOAD_JSON=$(oc get consoleclidownload -o json 2>/dev/null || true)
   if [[ -n "${CLI_DOWNLOAD_JSON}" ]]; then
     OC_URL=$(echo "${CLI_DOWNLOAD_JSON}" \
       | jq -r '.items[].spec.links[] | select(.text | test("oc.*linux.*x86_64|oc.*linux.*amd64"; "i")) | .href' \
-      | head -1)
-    KUBECTL_URL=$(echo "${CLI_DOWNLOAD_JSON}" \
-      | jq -r '.items[].spec.links[] | select(.text | test("kubectl.*linux.*x86_64|kubectl.*linux.*amd64"; "i")) | .href' \
       | head -1)
     VIRTCTL_URL=$(echo "${CLI_DOWNLOAD_JSON}" \
       | jq -r '.items[].spec.links[] | select(.text | test("virtctl.*linux.*amd64|virtctl.*linux.*x86_64"; "i")) | .href' \
@@ -81,7 +77,6 @@ if command -v jq &>/dev/null; then
       fi
     }
     [[ -n "${OC_URL}" ]]      && OC_URL=$(_url_to_internal "${OC_URL}")
-    [[ -n "${KUBECTL_URL}" ]] && KUBECTL_URL=$(_url_to_internal "${KUBECTL_URL}")
     [[ -n "${VIRTCTL_URL}" ]] && VIRTCTL_URL=$(_url_to_internal "${VIRTCTL_URL}")
   fi
 fi
@@ -92,7 +87,6 @@ echo "  OC_VERSION:       ${OC_VERSION}"
 echo "  VIRTCTL_VERSION:  ${VIRTCTL_VERSION}"
 echo "  RUNNER_IMAGE_DIR: ${RUNNER_IMAGE_DIR}"
 echo "  OC_URL:           ${OC_URL:-(fallback to mirror.openshift.com)}"
-echo "  KUBECTL_URL:      ${KUBECTL_URL:-(fallback to dl.k8s.io)}"
 echo "  VIRTCTL_URL:      ${VIRTCTL_URL:-(fallback to GitHub releases)}"
 echo ""
 
@@ -134,8 +128,6 @@ spec:
           value: "${VIRTCTL_VERSION}"
         - name: OC_URL
           value: "${OC_URL}"
-        - name: KUBECTL_URL
-          value: "${KUBECTL_URL}"
         - name: VIRTCTL_URL
           value: "${VIRTCTL_URL}"
   output:

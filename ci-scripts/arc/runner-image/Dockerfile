@@ -1,6 +1,6 @@
 # Custom GitHub Actions runner image for kubevirt-plugin-ci CI.
 # Extends the official runner image with cli tools used in the CI pipeline (such as jq, curl,
-# envsubst, Node.js, kubectl, oc, and virtctl) and support for running Cypress tests.
+# envsubst, Node.js, oc, and virtctl) and support for running Cypress tests.
 
 #
 # https://github.com/actions/runner/blob/main/images/Dockerfile: the base image
@@ -12,32 +12,32 @@ FROM ${RUNNER_BASE}
 
 USER root
 
+# Go-based yq (mikefarah/yq) — matches the version on GitHub-hosted ubuntu-latest runners.
+# NOTE: apt's `yq` package is the Python-based yq (kislyuk), which has incompatible syntax.
+ARG YQ_VERSION=v4.52.5
 # Versions (override with build-args to match cluster)
 ARG NODE_VERSION=22
 # OpenShift client version to match cluster (e.g. 4.20)
 ARG OC_VERSION=4.20
 # KubeVirt CLI version to match HCO install (e.g. v1.4.0)
 ARG VIRTCTL_VERSION=v1.4.0
-# Go-based yq (mikefarah/yq) — matches the version on GitHub-hosted ubuntu-latest runners.
-# NOTE: apt's `yq` package is the Python-based yq (kislyuk), which has incompatible syntax.
-ARG YQ_VERSION=v4.52.5
+
 # Direct binary download URLs resolved from ConsoleCLIDownload by setup-runner-image.sh.
 # When set, these take precedence over the static mirror/GitHub URLs above and guarantee
 # the binaries match the live cluster. Left empty to use the static fallback URLs.
 ARG OC_URL=""
-ARG KUBECTL_URL=""
 ARG VIRTCTL_URL=""
 
-# Tools used: jq, curl, envsubst (gettext-base)
+# curl and wget2 are both installed:
+#   curl  — kept for CI workflow scripts at runtime
+#   wget2 — used for all build-time HTTPS downloads
+# On Ubuntu, apt and wget2 use GnuTLS; curl and wget (1.x) use OpenSSL. On OpenShift build pods
+# where the FIPS provider .so can't load (DSO error), all OpenSSL-based HTTPS fails. wget2/GnuTLS
+# is unaffected, so every build-time binary download goes through wget2 instead.
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends ca-certificates jq curl gettext-base \
+    && apt-get install -y --no-install-recommends ca-certificates jq curl wget2 gettext-base \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
-
-# yq (Go/mikefarah) — install from GitHub releases to get the same yq as GitHub-hosted runners
-RUN curl -fsSL "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64" \
-    -o /usr/local/bin/yq \
-    && chmod +x /usr/local/bin/yq
 
 # Cypress 14+ headless (bundled Electron) — Linux deps for Ubuntu 24.04+ (noble).
 # Official runner image is noble (see actions/runner images/Dockerfile: mcr.microsoft.com/dotnet/runtime-deps:8.0-noble).
@@ -61,44 +61,43 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Node.js (LTS)
-RUN apt-get update \
-    && curl -fsSL "https://deb.nodesource.com/setup_${NODE_VERSION}.x" | bash - \
-    && apt-get install -y --no-install-recommends nodejs \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+# yq (Go/mikefarah) — wget2/GnuTLS avoids the OpenSSL FIPS DSO loading failure on hardened clusters
+RUN wget2 -O /usr/local/bin/yq \
+    "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64" \
+    && chmod +x /usr/local/bin/yq
 
-# kubectl — use console download URL if resolved by setup-runner-image.sh, else dl.k8s.io stable
-RUN if [ -n "${KUBECTL_URL}" ]; then \
-      curl -fsSL "${KUBECTL_URL}" -o /usr/local/bin/kubectl; \
-    else \
-      curl -fsSL "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" \
-           -o /usr/local/bin/kubectl; \
-    fi \
-    && chmod +x /usr/local/bin/kubectl
+# Node.js — the nodesource setup script internally calls curl (OpenSSL), which fails on FIPS clusters.
+# Fetch the version list from nodejs.org with wget2 (GnuTLS), pick the latest v${NODE_VERSION}.x,
+# then download and extract the pre-built binary tarball directly.
+RUN NVER=$(wget2 -qO- "https://nodejs.org/dist/index.json" \
+        | jq -r --argjson maj "${NODE_VERSION}" \
+            '[.[] | select(.version | test("^v" + ($maj|tostring) + "\\."))] | .[0].version') \
+    && wget2 -qO /tmp/node.tar.gz \
+        "https://nodejs.org/dist/${NVER}/node-${NVER}-linux-x64.tar.gz" \
+    && tar -xzf /tmp/node.tar.gz -C /usr/local --strip-components=1 \
+    && rm /tmp/node.tar.gz
 
 # OpenShift client (oc) — use console download URL if resolved, else mirror.openshift.com stable-4.x.
-# The console route serves a plain .tar (not gzip); download to a temp file so GNU tar can
-# auto-detect the format (-xf, no -z) rather than piping stdin where detection is unavailable.
+# Console route serves a plain .tar; download to a temp file so GNU tar auto-detects the format.
+# Fallback uses wget2 (GnuTLS) for the external HTTPS download.
 RUN if [ -n "${OC_URL}" ]; then \
-      curl -fsSL "${OC_URL}" -o /tmp/oc-archive \
+      wget2 -qO /tmp/oc-archive "${OC_URL}" \
       && tar -xf /tmp/oc-archive -C /usr/local/bin oc \
       && rm /tmp/oc-archive; \
     else \
-      curl -fsSL "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-${OC_VERSION}/openshift-client-linux.tar.gz" \
+      wget2 -qO- "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-${OC_VERSION}/openshift-client-linux.tar.gz" \
            | tar -xzf - -C /usr/local/bin; \
     fi
 
-# virtctl (KubeVirt CLI) — use console download URL if resolved, else GitHub releases direct binary.
-# The console route serves a .tar.gz archive; download to a temp file so GNU tar can
-# auto-detect the format (-xf, no -z) for consistency with the oc block above.
+# virtctl (KubeVirt CLI) — use console download URL if resolved, else GitHub releases.
+# Console route serves a .tar.gz; fallback uses wget2 (GnuTLS) for the external HTTPS download.
 RUN if [ -n "${VIRTCTL_URL}" ]; then \
-      curl -fsSL "${VIRTCTL_URL}" -o /tmp/virtctl-archive \
+      wget2 -qO /tmp/virtctl-archive "${VIRTCTL_URL}" \
       && tar -xf /tmp/virtctl-archive -C /usr/local/bin virtctl \
       && rm /tmp/virtctl-archive; \
     else \
-      curl -fsSL "https://github.com/kubevirt/kubevirt/releases/download/${VIRTCTL_VERSION}/virtctl-${VIRTCTL_VERSION}-linux-amd64" \
-           -o /usr/local/bin/virtctl; \
+      wget2 -qO /usr/local/bin/virtctl \
+           "https://github.com/kubevirt/kubevirt/releases/download/${VIRTCTL_VERSION}/virtctl-${VIRTCTL_VERSION}-linux-amd64"; \
     fi \
     && chmod +x /usr/local/bin/virtctl
 

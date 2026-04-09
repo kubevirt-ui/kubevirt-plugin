@@ -109,7 +109,7 @@ Noted by @coderabbitai
 
 - **Pin the runner base image**: In `ci-scripts/arc/runner-image/Dockerfile`, the base image is using the `:latest` tag. It would be more stable and predictable if the the version is pined to a sha or a versioned tag.
 
-- **Harden the binary downloads**: Implement checksum verification for the unconditional downloads (yq at line 38–40) and for the fallback download paths (kubectl line 75–76, oc line 88–89, virtctl line 100–101). Conditional downloads from environment variables (KUBECTL_URL, OC_URL, VIRTCTL_URL) may use console URLs that lack published checksums; document this trade-off or require verification for those paths as well.
+- **Harden the binary downloads**: Implement checksum verification for the unconditional downloads (yq at line 38–40) and for the fallback download paths (kubectl line 75–76, oc line 88–89, virtctl line 100–101). Conditional downloads from environment variables (OC_URL, VIRTCTL_URL) may use console URLs that lack published checksums; document this trade-off or require verification for those paths as well.
 
 ### DIND Mirror
 
