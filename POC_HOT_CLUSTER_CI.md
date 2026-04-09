@@ -117,6 +117,6 @@ Noted by @coderabbitai
 
 The default `docker.io/library/docker:dind` uses a floating tag that advances with Docker releases. While the script allows overriding via `DIND_SOURCE_IMAGE` environment variable, the default floating tag means different CI runs—weeks or months apart—could pull and mirror different dind versions underneath identical source code. Given the repo's emphasis on aligned and pinned versions for reproducibility, the dind default should either be a specific version (e.g., `docker:26.0` or a sha256 digest) or the docs should explicitly document that `DIND_SOURCE_IMAGE=docker.io/library/docker:<version>` must be set in CI to achieve reproducible runner pods.
 
-### If adopted, hardening of the ROKS cluster handling, and cluster heath checks are needed
+### If adopted, hardening of the ROKS cluster handling, and cluster health checks are needed
 
 The workflows and scripts all function, but they should receive additional scrutiny before being adopted for real scenarios.

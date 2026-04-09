@@ -5,7 +5,7 @@
 
 #
 # GitHub auth for scale-set chart: arc_github_config_secret_helm_auth AUTH_ARGS
-# Sets global AUTH_VALUES_FILE when using GitHub App (caller must rm -f after helm).
+# Sets global AUTH_VALUES_FILE when authentication is used.
 #
 arc_github_config_secret_helm_auth() {
   local -n _auth_arr="${1:?auth args array name required}"
