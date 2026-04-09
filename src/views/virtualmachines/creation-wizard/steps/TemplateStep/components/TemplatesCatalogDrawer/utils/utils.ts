@@ -57,3 +57,9 @@ export const changeTemplateParameterValue = (
 
   return template;
 };
+
+export const allRequiredParametersAreFulfilled = (template: V1Template): boolean =>
+  template?.parameters?.every((param) => {
+    if (!param.required || param.name === NAME_INPUT_FIELD) return true;
+    return Boolean(param.value?.trim()) || Boolean(param.generate);
+  }) ?? true;

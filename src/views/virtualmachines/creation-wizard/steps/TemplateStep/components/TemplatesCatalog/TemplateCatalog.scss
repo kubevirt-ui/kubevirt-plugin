@@ -9,6 +9,11 @@
     margin-left: var(--pf-t--global--spacer--sm);
   }
 
+  &-row--selected {
+    font-weight: var(--pf-t--global--font--weight--body--bold);
+    color: var(--pf-t--global--color--brand--default);
+  }
+
   .vm-catalog-grid-container,
   .vm-catalog-table-container {
     flex: 1;

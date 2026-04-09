@@ -13,11 +13,11 @@ export const useTemplatesFilters = (): [
   const { appendParam, deleteParam, params, setParam } = useURLParams();
   const onlyDefaultParam = params.get(CATALOG_FILTERS.ONLY_DEFAULT);
   const onlyDefaultParamIsTrue = onlyDefaultParam === 'true';
-  const onlyUserParmIsTrue = params.get(CATALOG_FILTERS.ONLY_USER) === 'true';
+  const onlyUserParamIsTrue = params.get(CATALOG_FILTERS.ONLY_USER) === 'true';
 
   const hasNoDefaultUserAllParams =
     onlyDefaultParamIsTrue &&
-    onlyUserParmIsTrue &&
+    onlyUserParamIsTrue &&
     params.get(CATALOG_FILTERS.ALL_ITEMS) === 'true'; // has none of these params when accessing catalog for the first time
 
   const [filters, setFilters] = useState<TemplateFilters>({
@@ -29,7 +29,7 @@ export const useTemplatesFilters = (): [
     [CATALOG_FILTERS.NAMESPACE]: params.get(CATALOG_FILTERS.NAMESPACE) || '',
     [CATALOG_FILTERS.ONLY_AVAILABLE]: params.get(CATALOG_FILTERS.ONLY_AVAILABLE) === 'true',
     [CATALOG_FILTERS.ONLY_DEFAULT]: onlyDefaultParamIsTrue || hasNoDefaultUserAllParams,
-    [CATALOG_FILTERS.ONLY_USER]: onlyUserParmIsTrue,
+    [CATALOG_FILTERS.ONLY_USER]: onlyUserParamIsTrue,
     [CATALOG_FILTERS.OS_NAME]: new Set([...params.getAll(CATALOG_FILTERS.OS_NAME)]),
     [CATALOG_FILTERS.QUERY]: params.get(CATALOG_FILTERS.QUERY) || '',
     [CATALOG_FILTERS.WORKLOAD]: new Set([...params.getAll(CATALOG_FILTERS.WORKLOAD)]),

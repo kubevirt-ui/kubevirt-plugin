@@ -11,7 +11,10 @@ import {
 import { ARCHITECTURE_TITLE } from '@kubevirt-utils/utils/architecture';
 import { Icon, SelectGroup, SelectOption } from '@patternfly/react-core';
 import { FilterIcon } from '@patternfly/react-icons';
-import { ONLY_AVAILABLE } from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesToolbar/components/TemplatesCatalogFilters/utils/constants';
+import {
+  ONLY_AVAILABLE,
+  USER_TEMPLATES_KEY,
+} from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesToolbar/components/TemplatesCatalogFilters/utils/constants';
 import { CATALOG_FILTERS } from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/utils/consts';
 import { TemplateFilters } from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/utils/types';
 
@@ -38,6 +41,9 @@ export const TemplatesCatalogFilters: FC<{
     if (filters.hideDeprecatedTemplates) {
       selected.push(HIDE_DEPRECATED_TEMPLATES_KEY);
     }
+    if (filters.onlyUser) {
+      selected.push(USER_TEMPLATES_KEY);
+    }
     if (filters.onlyAvailable) {
       selected.push(ONLY_AVAILABLE);
     }
@@ -51,6 +57,12 @@ export const TemplatesCatalogFilters: FC<{
     // Handle deprecated filter
     if (value === HIDE_DEPRECATED_TEMPLATES_KEY) {
       onFilterChange(CATALOG_FILTERS.HIDE_DEPRECATED_TEMPLATES, !filters.hideDeprecatedTemplates);
+      return;
+    }
+
+    // Handle only user templates filter
+    if (value === USER_TEMPLATES_KEY) {
+      onFilterChange(CATALOG_FILTERS.ONLY_USER, !filters.onlyUser);
       return;
     }
 
@@ -94,6 +106,17 @@ export const TemplatesCatalogFilters: FC<{
       selected={selectedFilters}
       selectedLabel={t('Filter')}
     >
+      <SelectGroup label={t('User templates')}>
+        <SelectOption
+          data-test-row-filter={USER_TEMPLATES_KEY}
+          hasCheckbox
+          isSelected={filters.onlyUser}
+          value={USER_TEMPLATES_KEY}
+        >
+          {t('User templates')}
+        </SelectOption>
+      </SelectGroup>
+
       <SelectGroup label={t('Deprecated')}>
         <SelectOption
           data-test-row-filter={HIDE_DEPRECATED_TEMPLATES_KEY}

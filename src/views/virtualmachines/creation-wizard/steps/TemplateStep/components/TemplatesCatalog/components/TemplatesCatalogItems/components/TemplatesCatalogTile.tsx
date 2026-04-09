@@ -22,6 +22,8 @@ import { CatalogTile } from '@patternfly/react-catalog-view-extension';
 import { Badge, Skeleton, Stack, StackItem } from '@patternfly/react-core';
 import { getTemplateOSIcon } from '@virtualmachines/creation-wizard/utils/os-icons/os-icons';
 
+import './TemplatesCatalogTile.scss';
+
 export type TemplatesCatalogTileProps = {
   availableDatasources: Record<string, V1beta1DataSource>;
   availableTemplatesUID: Set<string>;
@@ -32,7 +34,14 @@ export type TemplatesCatalogTileProps = {
 };
 
 const TemplatesCatalogTile: FC<TemplatesCatalogTileProps> = memo(
-  ({ availableDatasources, availableTemplatesUID, bootSourcesLoaded, onClick, template }) => {
+  ({
+    availableDatasources,
+    availableTemplatesUID,
+    bootSourcesLoaded,
+    isSelected,
+    onClick,
+    template,
+  }) => {
     const { t } = useKubevirtTranslation();
 
     const isDeprecated = isDeprecatedTemplate(template);
@@ -53,6 +62,9 @@ const TemplatesCatalogTile: FC<TemplatesCatalogTileProps> = memo(
 
     return (
       <div
+        className={`template-catalog-tile-wrapper ${
+          isSelected ? 'template-catalog-tile-wrapper--selected' : ''
+        }`}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') onClick(template);
         }}
@@ -86,7 +98,7 @@ const TemplatesCatalogTile: FC<TemplatesCatalogTileProps> = memo(
               <StackItem className="pf-v6-u-text-color-subtle">{template.metadata.name}</StackItem>
             </Stack>
           }
-          className="vm-catalog-grid-tile"
+          className="template-catalog-tile"
           data-test-id={template.metadata.name}
           iconImg={icon}
         >

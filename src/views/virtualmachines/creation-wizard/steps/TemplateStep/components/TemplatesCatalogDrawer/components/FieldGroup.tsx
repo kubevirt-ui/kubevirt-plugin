@@ -9,11 +9,18 @@ import { FormGroup, TextInput, ValidatedOptions } from '@patternfly/react-core';
 type FieldGroupProps = {
   className?: string;
   field: TemplateParameter;
+  isDisabled?: boolean;
   onChange?: (name: string, value: string) => void;
   showError?: boolean;
 };
 
-const FieldGroup: FC<FieldGroupProps> = ({ className, field, onChange, showError }) => {
+const FieldGroup: FC<FieldGroupProps> = ({
+  className,
+  field,
+  isDisabled = false,
+  onChange,
+  showError,
+}) => {
   const { t } = useKubevirtTranslation();
   const { description, displayName, name, required, value } = field;
 
@@ -35,6 +42,7 @@ const FieldGroup: FC<FieldGroupProps> = ({ className, field, onChange, showError
       <TextInput
         data-test-id={fieldId}
         id={fieldId}
+        isDisabled={isDisabled}
         isRequired={required}
         name={name}
         onChange={(_event, newValue: string) => onFieldChange(newValue)}
