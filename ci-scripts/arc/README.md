@@ -67,6 +67,6 @@ Generated **`ci-scripts/generated/arc-dind-replace.env`** is gitignored; it is p
 
 ## Further reading
 
-- [HOT_CLUSTER_CI.md](../HOT_CLUSTER_CI.md) — secrets, dind mirror, multilabel, experimental chart notes.
+- [ci-scripts/README.md](../README.md) — secrets, dind mirror, multilabel, experimental chart notes.
 - [Red Hat: ARC on OpenShift](https://developers.redhat.com/articles/2025/02/17/how-securely-deploy-github-arc-openshift)
 - Upstream chart: `oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set`

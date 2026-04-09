@@ -30,11 +30,8 @@ GitHub Actions
 ```
 poc-e2e-ci-test.yml   — "POC Hot Cluster E2E CI Test"
   ├── cluster-health-check (ubuntu-latest + IBM Cloud → kubeconfig)
-  │     └── ci-scripts/check-cluster-health.sh  (+ optional GitHub runner API check / skip for forks)
-  └── run-gating-tests (runs-on: kubevirt-plugin-ci)
-        ├── kubeconfig from IBM Cloud CLI
-        ├── BRIDGE_BASE_ADDRESS = in-cluster console URL (from Cluster Console CR)
-        └── Cypress: npm ci, test-setup.sh, test-cypress-headless
+  │     └── ci-scripts/check-cluster-health.sh
+  └── run-e2e-tests (workflow_call → poc-e2e-ci-test2.yml)
 
 poc-e2e-ci-test2.yml  — "POC Hot Cluster E2E CI Test 2"
   ├── check-runner (optional diagnostics on ARC runner)
@@ -209,9 +206,9 @@ To turn off dind (no Docker daemon in the pod): `export CONTAINER_MODE=none` and
 **Variant A — `poc-e2e-ci-test.yml` (IBM Cloud cluster health checks then run `poc-e2e-ci-test2.yml`)**
 
 1. Actions → **POC Hot ClusterE2E CI Test**
-2. Inputs: Cypress spec (default `tests/gating.cy.ts`), cluster name, optional **skip ARC runner check** (forks without ARC)
-3. Health job passes `GITHUB_TOKEN` into `check-cluster-health.sh` when GitHub API checks are needed
-4. Calls to `poc-e2e-ci-test2.yml` to run the tests
+2. Inputs: Cypress spec (default `tests/gating.cy.ts`), cluster name
+3. Runs `check-cluster-health.sh` on `ubuntu-latest` with an IBM Cloud kubeconfig; fails fast if the cluster is unhealthy
+4. On success, calls `poc-e2e-ci-test2.yml` via `workflow_call` to run the tests
 
 **Variant B — `poc-e2e-ci-test2.yml` (off-cluster console + plugin containers)**
 
@@ -225,7 +222,7 @@ To turn off dind (no Docker daemon in the pod): `export CONTAINER_MODE=none` and
 
 **Manual:** Actions → **IBM Cloud Hot Cluster Teardown**
 
-**Automatic:** **IBM Cloud Hot Cluster Auto-Teardown** runs on a schedule (`*/30 * * * *`), uses `GITHUB_TOKEN` with `actions: write` to dispatch **IBM Cloud Hot Cluster Teardown** when idle thresholds are met. Idle detection excludes setup/teardown/auto-teardown workflow names and compares against recent completed runs (fallback: cluster creation time).
+**Automatic:** **IBM Cloud Hot Cluster Auto-Teardown** runs on a schedule (`*/30 * * * *`), uses `GITHUB_TOKEN` with `actions: write` to dispatch **IBM Cloud Hot Cluster Teardown** when idle thresholds are met. Idle detection monitors only the two E2E test workflows (`poc-e2e-ci-test.yml` and `poc-e2e-ci-test2.yml`) for in-progress, queued, or recently completed runs (fallback: cluster creation time).
 
 **Teardown implementation:** Uninstalls Helm releases `kubevirt-plugin-ci` (scale set) and `arc` (controller) when possible, deletes the ROKS cluster, then optionally removes offline GitHub runners labeled `kubevirt-plugin-ci` using `BOT_PAT`.
 
@@ -287,23 +284,23 @@ Key defaults:
 1. **Plugin image supply chain (`poc-e2e-ci-test2.yml`)** — Replace the hard-coded `KUBEVIRT_PLUGIN_IMAGE` (currently a fixed `ttl.sh/...` tag) with a per-run or per-SHA tag (e.g. uncomment the `github.run_id`-style pattern), or build on every run and push to a registry your cluster/runner can pull. Ensure the **skopeo inspect** skip path does not mask a broken or stale image.
 2. **Align Cypress coverage with stability** — `tests/poc-gating.cy.ts` is intentionally smaller than full `tests/gating.cy.ts`; expand only after the off-cluster stack is reliable. Fix flaky specs (VM start/status waits, tab navigation) using the same patterns as local CI.
 3. **Run variant A first for signal** — Use `poc-e2e-ci-test.yml` against a healthy cluster to separate **cluster/HCO** issues from **docker/console/plugin** issues in test2.
-4. **Fork / ARC** — Use `skip_arc_runner_check` on variant A when runners are not registered to the fork; variant B still requires a runner labeled `kubevirt-plugin-ci`.
-5. **Workflow hygiene** — Resolve open TODOs in `poc-e2e-ci-test2.yml` (dependency caching, optional `cypress-io/github-action`). Consider pinning `actions/checkout` major versions consistently across workflows.
+4. **Fork / ARC** — Variant A (`poc-e2e-ci-test.yml`) runs the health check on `ubuntu-latest` and is fork-safe; variant B (`poc-e2e-ci-test2.yml`) still requires a runner labeled `kubevirt-plugin-ci` and cannot run on forks without ARC registered.
+5. **Workflow hygiene** — Add dependency caching to `poc-e2e-ci-test2.yml` (open TODO: use `actions/setup-node` with caching or an explicit cache step). Consider pinning `actions/checkout` major versions consistently across workflows.
 6. **Verify auto-teardown** — Confirm scheduled **IBM Cloud Hot Cluster Auto-Teardown** successfully dispatches **IBM Cloud Hot Cluster Teardown** (`workflow_id` must match `ibmc-cluster-teardown.yml`).
 
 ## Production and hardening review (before treating POC patterns as prod)
 
-| Technique / choice                                           | Risk or limitation                                                                              | Hardening direction                                                                   |
-| ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| **Privileged dind + broad SCC (`github-arc`)**               | High blast radius on the node; runner compromise ≈ strong cluster access                        | Narrow SCC, dedicated nodes, separate scale sets per trust zone, audit images         |
-| **`oc whoami --show-token` in `start-console.sh`**           | Long-lived bearer token injected into console container env                                     | Short-lived tokens, dedicated read-only SA, rotate; never log unmasked                |
-| **Self-signed TLS for plugin (`start-plugin-container.sh`)** | MITM within pod network if mis-scoped                                                           | Match operator-style serving certs; trust only where `InsecureSkipVerify` is explicit |
-| **`ttl.sh` or ephemeral public registries**                  | Ephemeral tags, no provenance, rate/abuse limits                                                | Internal registry + image signing, digest pinning                                     |
-| **Skip `npm audit` / `--ignore-scripts`**                    | Supply-chain and lifecycle scripts not run                                                      | Revisit for production pipelines; use lockfile + audited base images                  |
-| **Cluster-scoped mutations in `test-setup.sh`**              | Variant A may patch shared ConfigMaps                                                           | Prefer namespaced fixtures or dedicated test clusters                                 |
-| **Ghost runner cleanup via `BOT_PAT`**                       | PAT scope and rotation                                                                          | GitHub App or org-level runner management; least privilege                            |
-| **Auto-teardown idle heuristic**                             | Uses last _any_ completed workflow run (excluding a few names)—may not reflect “cluster unused” | Tie to runner job queue or explicit “last test” workflow                              |
-| **Classic ROKS only in setup workflow**                      | Not IBM Cloud VPC Gen2 path                                                                     | Add a parallel path or doc if prod standardizes on VPC                                |
+| Technique / choice                                           | Risk or limitation                                                                                 | Hardening direction                                                                   |
+| ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| **Privileged dind + broad SCC (`github-arc`)**               | High blast radius on the node; runner compromise ≈ strong cluster access                           | Narrow SCC, dedicated nodes, separate scale sets per trust zone, audit images         |
+| **`oc whoami --show-token` in `start-console.sh`**           | Long-lived bearer token injected into console container env                                        | Short-lived tokens, dedicated read-only SA, rotate; never log unmasked                |
+| **Self-signed TLS for plugin (`start-plugin-container.sh`)** | MITM within pod network if mis-scoped                                                              | Match operator-style serving certs; trust only where `InsecureSkipVerify` is explicit |
+| **`ttl.sh` or ephemeral public registries**                  | Ephemeral tags, no provenance, rate/abuse limits                                                   | Internal registry + image signing, digest pinning                                     |
+| **Skip `npm audit` / `--ignore-scripts`**                    | Supply-chain and lifecycle scripts not run                                                         | Revisit for production pipelines; use lockfile + audited base images                  |
+| **Cluster-scoped mutations in `test-setup.sh`**              | Variant A may patch shared ConfigMaps                                                              | Prefer namespaced fixtures or dedicated test clusters                                 |
+| **Ghost runner cleanup via `BOT_PAT`**                       | PAT scope and rotation                                                                             | GitHub App or org-level runner management; least privilege                            |
+| **Auto-teardown idle heuristic**                             | Monitors only the two E2E test workflows; a cluster used by other workflows may be torn down early | Tie to runner job queue or explicit "last test" workflow                              |
+| **Classic ROKS only in setup workflow**                      | Not IBM Cloud VPC Gen2 path                                                                        | Add a parallel path or doc if prod standardizes on VPC                                |
 
 ## POC completion score
 
