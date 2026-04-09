@@ -69,4 +69,54 @@ Orchestration lives in **`.github/workflows/poc-e2e-ci-test.yml`** (cluster heal
 
 ## Gaps
 
-- [] The ARC runner pods need to be able to run docker-in-docker (dind) and manage some cluster level resources. A namespace and some secrets need to be created before the e2e tests run. Since the runner pod rbac is constrained to a single SCC and RBAC, the workflow runs probably have too many permissions. Another approach to have a higher permissions pod run and create needed resources and then allow the ARC runner to run in a lower permission pod may work, but that is currently beyond the scope of the POC.
+### Runner RBAC is overly broad
+
+The ARC runner pods need to run docker-in-docker (dind) and interact with cluster resources: they create/delete test namespaces, manage secrets and PVCs, and drive KubeVirt resources via Cypress. All of this is currently covered by a single `ClusterRole` (`arc-runner-ci`) bound cluster-wide via `ClusterRoleBinding`.
+
+The problem is that the `ClusterRole` grants full CRUD plus `deletecollection` on `namespaces` and `secrets` across the entire cluster. A compromised or malicious workflow running in the ARC runner pod could exfiltrate every secret on the cluster or tear down arbitrary namespaces—cluster-admin blast radius.
+
+The core constraint is that the `poc-e2e-ci-test2.yml` workflow uses a unique namespace per run (`kubevirt-plugin-ci-test-<run_id>`) and the ARC runner is the one that creates it (`oc create namespace`), injects a secret into it, and deletes it at the end. Namespace create/delete and secret write access are load-bearing for every run, so any RBAC improvement must account for them.
+
+Three options to address this, in order of increasing workflow restructuring required:
+
+**Option 1 — Drop `deletecollection` only (minimal, lowest effort)**
+
+The single most dangerous verb is `deletecollection` — it allows bulk-wiping all resources of a given type in a single API call. Removing it from the verbs list doesn't break any workflow step and immediately reduces the blast radius without touching the namespace or secret permissions that the runner needs.
+
+The cluster-wide write access to `namespaces` and `secrets` remains, so this is a partial improvement only.
+
+**Option 2 — Add an admission policy layer**
+
+Keep the RBAC structure as-is but deploy an OPA Gatekeeper or Kyverno policy that restricts the runner `ServiceAccount` to:
+
+- Creating namespaces whose name matches `kubevirt-plugin-ci-test-*` only.
+- Writing secrets only within namespaces that match that same pattern.
+
+This limits the blast radius at the admission layer rather than at the RBAC layer, without requiring any workflow changes. It does require Gatekeeper or Kyverno to be installed and maintained on the hot cluster.
+
+**Option 3 — Split namespace provisioning into a separate standard-runner job (most robust)**
+
+Restructure the `poc-e2e-ci-test2.yml` workflow by extracting the "Setup required namespaced resources" step into a dedicated job that runs on a standard GitHub-hosted runner (`ubuntu-latest`) using a kubeconfig with elevated rights:
+
+1. **Provisioning job** (standard runner) — Creates `kubevirt-plugin-ci-test-<run_id>`, injects the CI secret, and applies any other pre-test cluster resources. This job holds the elevated permissions and is short-lived.
+2. **Test-execution job** (ARC runner, `runs-on: kubevirt-plugin-ci`) — Receives the pre-created namespace name as a job input. Its `ClusterRole` no longer needs `namespaces` write verbs or cluster-wide `secrets` write access; it is replaced with a namespaced `Role`/`RoleBinding` bound to the test namespace, plus a minimal read-only `ClusterRole` for cluster-info queries (nodes, console URL, cluster version).
+
+This follows least-privilege most closely and is the recommended end-state before production use. It requires workflow restructuring and is beyond the scope of the current POC.
+
+### ARC runner Dockerfile
+
+Noted by @coderabbitai
+
+- **Pin the runner base image**: In `ci-scripts/arc/runner-image/Dockerfile`, the base image is using the `:latest` tag. It would be more stable and predictable if the the version is pined to a sha or a versioned tag.
+
+- **Harden the binary downloads**: Implement checksum verification for the unconditional downloads (yq at line 38–40) and for the fallback download paths (kubectl line 75–76, oc line 88–89, virtctl line 100–101). Conditional downloads from environment variables (KUBECTL_URL, OC_URL, VIRTCTL_URL) may use console URLs that lack published checksums; document this trade-off or require verification for those paths as well.
+
+### DIND Mirror
+
+Noted by @coderabbitai
+
+The default `docker.io/library/docker:dind` uses a floating tag that advances with Docker releases. While the script allows overriding via `DIND_SOURCE_IMAGE` environment variable, the default floating tag means different CI runs—weeks or months apart—could pull and mirror different dind versions underneath identical source code. Given the repo's emphasis on aligned and pinned versions for reproducibility, the dind default should either be a specific version (e.g., `docker:26.0` or a sha256 digest) or the docs should explicitly document that `DIND_SOURCE_IMAGE=docker.io/library/docker:<version>` must be set in CI to achieve reproducible runner pods.
+
+### If adopted, hardening of the ROKS cluster handling, and cluster heath checks are needed
+
+The workflows and scripts all function, but they should receive additional scrutiny before being adopted for real scenarios.
