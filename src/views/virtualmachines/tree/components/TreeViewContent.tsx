@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
+import CreateProjectOnboardingPopover from '@kubevirt-utils/components/OnboardingPopover/components/CreateProjectOnboardingPopover';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
@@ -16,6 +17,7 @@ import {
 import useFilteredTreeView from '../hooks/useFilteredTreeView';
 import useTreeViewItemActions from '../hooks/useTreeViewItemActions';
 import {
+  getClusterElement,
   getMatchedClusterItems,
   getMatchedProjectItems,
   highlightMatchedTreeItems,
@@ -113,6 +115,7 @@ const TreeViewContent: FC<TreeViewContentProps> = ({
         )}
         <TreeViewRightClickActionMenu hideMenu={hideMenu} triggerElement={triggerElement} />
       </DrawerPanelBody>
+      <CreateProjectOnboardingPopover triggerElement={getClusterElement(treeData)} />
     </>
   );
 };
