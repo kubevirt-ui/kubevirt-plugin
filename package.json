@@ -69,6 +69,7 @@
     "zustand": "^4.3.7"
   },
   "devDependencies": {
+    "@bahmutov/cypress-esbuild-preprocessor": "^2.2.8",
     "@cypress/webpack-preprocessor": "^6.0.2",
     "@openshift-console/dynamic-plugin-sdk": "4.21.0",
     "@openshift-console/dynamic-plugin-sdk-internal": "4.21.0",
@@ -87,7 +88,8 @@
     "css-loader": "^6.11.0",
     "cypress": "^14.3.x",
     "cypress-multi-reporters": "^1.5.0",
-    "esbuild-loader": "^4.4.1",
+    "esbuild": "^0.28.0",
+    "esbuild-loader": "^4.4.3",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^8.5.0",
     "eslint-import-resolver-typescript": "^3.10.1",
@@ -111,8 +113,8 @@
     "mocha": "^10.x",
     "mocha-junit-reporter": "^2.0.2",
     "mochawesome": "^7.0.1",
-    "mochawesome-report-generator": "^6.2.0",
     "mochawesome-merge": "^4.2.1",
+    "mochawesome-report-generator": "^6.2.0",
     "pluralize": "^8.0.0",
     "prettier": "^2.5.1",
     "process": "^0.11.10",

@@ -3,30 +3,14 @@
 // the project's config changing)
 const fs = require('fs');
 const path = require('path');
-const wp = require('@cypress/webpack-preprocessor');
+const { createBundler } = require('@bahmutov/cypress-esbuild-preprocessor');
 
 module.exports = (on, config) => {
   on(
     'file:preprocessor',
-    wp({
-      webpackOptions: {
-        module: {
-          rules: [
-            {
-              exclude: /node_modules/,
-              loader: 'esbuild-loader',
-              test: /\.ts$/,
-            },
-          ],
-        },
-        output: {
-          filename: 'bundle.js',
-          path: path.resolve(__dirname, 'cypress-dist'),
-        },
-        resolve: {
-          extensions: ['.ts', '.js'],
-        },
-      },
+    createBundler({
+      sourcemap: true,
+      sourcesContent: true,
     }),
   );
 
