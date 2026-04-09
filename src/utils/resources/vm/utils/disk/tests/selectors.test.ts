@@ -1,4 +1,5 @@
 import { V1Disk } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 
 import {
   getDiskDrive,
@@ -65,9 +66,9 @@ describe('disk selectors', () => {
     it.each([
       [{ disk: {} }, 'missing bus'],
       [null, 'null disk'],
-    ])('should return empty string for %s', (diskInput, _description) => {
+    ])('should return NO_DATA_DASH for %s', (diskInput, _description) => {
       const disk = diskInput ? createDisk(diskInput) : null;
-      expect(getPrintableDiskInterface(disk as V1Disk)).toBe('');
+      expect(getPrintableDiskInterface(disk as V1Disk)).toBe(NO_DATA_DASH);
     });
   });
 });

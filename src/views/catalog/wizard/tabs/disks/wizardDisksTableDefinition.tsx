@@ -44,10 +44,10 @@ export const getWizardDiskColumns = (t: TFunction): ColumnConfig<DiskRowDataLayo
     sortable: true,
   },
   {
-    getValue: (row) => row?.interface ?? '',
+    getValue: (row) => row?.interface || NO_DATA_DASH,
     key: 'interface',
     label: t('Interface'),
-    renderCell: (row) => <>{row?.interface ?? NO_DATA_DASH}</>,
+    renderCell: (row) => <>{row?.interface || NO_DATA_DASH}</>,
     sortable: true,
   },
   {

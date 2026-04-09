@@ -2,6 +2,7 @@ import {
   V1beta1DataVolumeSourcePVC,
   V1Disk,
   V1VirtualMachine,
+  V1VirtualMachineInstance,
   V1Volume,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
@@ -11,6 +12,8 @@ import {
 } from '@kubevirt-utils/models';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { DiskRawData } from '@kubevirt-utils/resources/vm/utils/disk/constants';
+import { getDiskDrive } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
+import { getVMIDisks } from '@kubevirt-utils/resources/vmi/utils/selectors';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 
@@ -84,4 +87,35 @@ export const isStorageVolume = (volume: V1Volume) => {
       volume.cloudInitNoCloud ||
       volume.cloudInitConfigDrive,
   );
+};
+
+/**
+ * KubeVirt may set the disk bus via admission webhooks or preferences,
+ * meaning the VMI has bus info that the VM template spec does not.
+ * This merges VMI bus info into VM disks that are missing it.
+ * @param vmDiskList disks from the VM template spec
+ * @param vmi optional running VMI; when null/undefined, disks are returned unchanged
+ */
+export const enrichDisksWithVMIBusInfo = (
+  vmDiskList: V1Disk[],
+  vmi?: null | V1VirtualMachineInstance,
+): V1Disk[] => {
+  const vmiDisks = getVMIDisks(vmi) || [];
+
+  return vmDiskList.map((vmDisk) => {
+    const driveType = getDiskDrive(vmDisk);
+    if (vmDisk[driveType]?.bus) return vmDisk;
+
+    const vmiDisk = vmiDisks.find(({ name }) => name === vmDisk.name);
+    if (!vmiDisk) return vmDisk;
+
+    const vmiDriveType = getDiskDrive(vmiDisk);
+    const vmiBus = vmiDisk[vmiDriveType]?.bus;
+    if (!vmiBus) return vmDisk;
+
+    return {
+      ...vmDisk,
+      [driveType]: { ...vmDisk[driveType], bus: vmiBus },
+    };
+  });
 };

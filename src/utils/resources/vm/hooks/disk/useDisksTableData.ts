@@ -13,7 +13,7 @@ import { getBootDisk, getDataVolumeTemplates, getDisks, getVolumes } from '../..
 import { getDiskRowDataLayout } from '../../utils/disk/rowData';
 
 import useDisksSources from './useDisksSources';
-import { getEjectedCDROMDrives, isStorageVolume } from './utils';
+import { enrichDisksWithVMIBusInfo, getEjectedCDROMDrives, isStorageVolume } from './utils';
 
 type UseDisksTableDisks = (
   vm: V1VirtualMachine,
@@ -30,13 +30,15 @@ const useDisksTableData: UseDisksTableDisks = (vm, vmi) => {
   const { dvs, loaded, loadingError, pvcs } = useDisksSources(vm);
   const isVMRunning = isRunning(vm);
 
-  const vmDisks = useMemo(
-    () =>
-      !isVMRunning
-        ? getDisks(vm)
-        : [...(getDisks(vm) || []), ...getRunningVMMissingDisksFromVMI(getDisks(vm) || [], vmi)],
-    [vm, vmi, isVMRunning],
-  );
+  const vmDisks = useMemo(() => {
+    const vmDiskList = getDisks(vm) || [];
+    if (!isVMRunning) return vmDiskList;
+
+    const enrichedDisks = vmi ? enrichDisksWithVMIBusInfo(vmDiskList, vmi) : vmDiskList;
+    const missingDisks = getRunningVMMissingDisksFromVMI(vmDiskList, vmi);
+
+    return [...enrichedDisks, ...missingDisks];
+  }, [vm, vmi, isVMRunning]);
 
   const vmVolumes = useMemo(() => {
     const detectedVolumes = !isVMRunning
