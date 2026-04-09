@@ -1,4 +1,4 @@
-name: POC Hot ClusterE2E CI Test
+name: POC Hot Cluster E2E CI Test
 
 on:
   workflow_dispatch:
