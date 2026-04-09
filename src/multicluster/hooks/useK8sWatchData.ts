@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { useK8sWatchResource, WatchK8sResult } from '@openshift-console/dynamic-plugin-sdk';
 import {
   FleetWatchK8sResource,
@@ -10,12 +11,13 @@ import {
 
 const useK8sWatchData = <T>(resource: FleetWatchK8sResource | null): WatchK8sResult<T> => {
   const [hubClusterName, hubClusterNameLoaded] = useHubClusterName();
+  const isACMPage = useIsACMPage();
 
   // multicluster sdk doesn't support limit as console sdk does
   const requestWithNoLimit = resource ? { ...resource, limit: undefined } : null;
 
-  const waitingForHubName = !!resource?.cluster && !hubClusterNameLoaded;
-  const useFleet = !waitingForHubName && resource?.cluster && resource?.cluster !== hubClusterName;
+  const waitingForHubName = isACMPage && !!resource?.cluster && !hubClusterNameLoaded;
+  const useFleet = resource?.cluster && resource?.cluster !== hubClusterName;
 
   const [fleetData, fleetLoaded, fleetError] = useFleetK8sWatchResource<T>(
     useFleet ? requestWithNoLimit : null,
