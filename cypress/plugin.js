@@ -3,7 +3,7 @@
 // the project's config changing)
 const fs = require('fs');
 const path = require('path');
-const { createBundler } = require('@bahmutov/cypress-esbuild-preprocessor');
+const createBundler = require('@bahmutov/cypress-esbuild-preprocessor');
 
 module.exports = (on, config) => {
   on(
