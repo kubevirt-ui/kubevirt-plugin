@@ -32,7 +32,6 @@
 set -euo pipefail
 ARC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CI_SCRIPTS_DIR="$(cd "${ARC_DIR}/.." && pwd)"
-source "${CI_SCRIPTS_DIR}/ci-tools.sh"
 source "${ARC_DIR}/arc-helm-helpers.sh"
 
 RUNNER_POD_VALUES="${ARC_DIR}/arc-runner-scale-set.pod.yaml"
@@ -64,9 +63,6 @@ echo "  ARC_VERSION:                 ${ARC_VERSION}"
 echo "  CONTAINER_MODE:              ${CONTAINER_MODE:-"(none — no dind)"}"
 echo "  Runner pod values:           ${RUNNER_POD_VALUES}"
 echo ""
-
-ensure_helm
-ensure_oc
 
 if ! oc get clusterversion version &>/dev/null; then
   echo "ERROR: This script targets OpenShift only."

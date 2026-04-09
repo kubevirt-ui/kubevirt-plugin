@@ -8,12 +8,11 @@
 #   ARC_CONTROLLER_INSTALL_NAME (default: arc → SA arc-gha-rs-controller)
 #   ARC_VERSION                 Helm chart version (default: 0.14.0); set to "latest" to omit --version
 #
-# Prerequisites: oc login to OpenShift; helm (ci-tools.sh).
+# Prerequisites: oc login to OpenShift; helm
 
 set -euo pipefail
 ARC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CI_SCRIPTS_DIR="$(cd "${ARC_DIR}/.." && pwd)"
-source "${CI_SCRIPTS_DIR}/ci-tools.sh"
 
 ARC_CONTROLLER_NS="${ARC_CONTROLLER_NS:-arc-systems}"
 ARC_CONTROLLER_INSTALL_NAME="${ARC_CONTROLLER_INSTALL_NAME:-arc}"
@@ -26,9 +25,6 @@ echo "  ARC_CONTROLLER_INSTALL_NAME: ${ARC_CONTROLLER_INSTALL_NAME}"
 echo "  ARC_VERSION:                 ${ARC_VERSION}"
 echo "  ARC_HELM_REPO:               ${ARC_HELM_REPO}"
 echo ""
-
-ensure_helm
-ensure_oc
 
 if ! oc get clusterversion version &>/dev/null; then
   echo "ERROR: This script targets OpenShift only."

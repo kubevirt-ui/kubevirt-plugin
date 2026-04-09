@@ -266,23 +266,6 @@ You do **not** need to re-apply `ci-scripts/arc/arc-openshift-scc.yaml`.
 | `start-console.sh`                | Runs `origin-console` off-cluster; `BRIDGE_PLUGIN_PROXY` + kubevirt API route     |
 | `nginx-9443.conf`                 | Nginx config for plugin HTTPS (mounted into plugin container in POC test2)        |
 
-### CI tools (helm, kubectl, oc, virtctl)
-
-Scripts that need **helm**, **kubectl**, **oc**, or **virtctl** can source `ci-scripts/ci-tools.sh` and call the appropriate `ensure_*` function. Downloads are installed into `CI_TOOLS_DIR` (default: `ci-scripts/_ci_tools`) and added to `PATH`.
-
-**Environment variables** (all optional; used when tools are downloaded):
-
-| Variable          | Default                      | Description                    |
-| ----------------- | ---------------------------- | ------------------------------ |
-| `CI_TOOLS_DIR`    | `_ci_tools` under script dir | Install directory for binaries |
-| `HELM_VERSION`    | v3.16.3                      | Helm version                   |
-| `KUBECTL_VERSION` | stable                       | kubectl version or "stable"    |
-| `OC_VERSION`      | 4.20                         | OpenShift client version       |
-| `VIRTCTL_VERSION` | v1.4.0                       | virtctl version                |
-| `CI_ARCH`         | amd64                        | Binary architecture            |
-
-**Functions:** `ensure_helm`, `ensure_kubectl`, `ensure_oc`, `ensure_virtctl`, `ensure_all_ci_tools`. Optional first argument overrides the corresponding env var (e.g. `ensure_helm v3.12.0`).
-
 ### Script Configuration
 
 All scripts accept configuration via environment variables. See the header comments in each script for details.

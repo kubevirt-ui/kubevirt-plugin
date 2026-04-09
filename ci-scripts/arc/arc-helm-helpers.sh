@@ -1,7 +1,6 @@
 #!/bin/bash
 #
 # Shared helpers for gha-runner-scale-set Helm installs.
-# Source from ci-scripts/arc/*.sh after ci-tools.sh.
 #
 
 #

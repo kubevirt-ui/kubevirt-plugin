@@ -23,12 +23,9 @@
 set -euo pipefail
 ARC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CI_SCRIPTS_DIR="$(cd "${ARC_DIR}/.." && pwd)"
-source "${CI_SCRIPTS_DIR}/ci-tools.sh"
 
 ARC_RUNNERS_NS="${ARC_RUNNERS_NS:-arc-runners}"
 RUNNER_IMAGE_DIR="${ARC_DIR}/runner-image"
-
-ensure_oc
 
 if ! oc get clusterversion version &>/dev/null; then
   echo "ERROR: OpenShift cluster required (clusterversion.version not found)."

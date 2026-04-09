@@ -15,15 +15,12 @@
 set -euo pipefail
 ARC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CI_SCRIPTS_DIR="$(cd "${ARC_DIR}/.." && pwd)"
-source "${CI_SCRIPTS_DIR}/ci-tools.sh"
 
 ARC_RUNNERS_NS="${ARC_RUNNERS_NS:-arc-runners}"
 GENERATED_DIR="${CI_SCRIPTS_DIR}/generated"
 SKIP_DIND_MIRROR="${SKIP_DIND_MIRROR:-0}"
 DIND_SOURCE_IMAGE="${DIND_SOURCE_IMAGE:-docker.io/library/docker:dind}"
 DIND_INTERNAL_REF="image-registry.openshift-image-registry.svc:5000/${ARC_RUNNERS_NS}/arc-docker-dind:dind"
-
-ensure_oc
 
 if ! oc get clusterversion version &>/dev/null; then
   echo "ERROR: OpenShift cluster required (clusterversion.version not found)."

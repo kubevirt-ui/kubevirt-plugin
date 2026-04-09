@@ -2,7 +2,7 @@
 
 Scripts in this directory install **Actions Runner Controller** with the **`gha-runner-scale-set`** chart on **OpenShift** (ROKS or other OCP clusters). They apply a custom **SecurityContextConstraints** (`github-arc`), bind it to the runner ServiceAccount, **mirror `docker:dind`** into the internal registry (the stable Helm chart hardcodes Docker Hub; we rewrite manifests to use the mirror), build a **custom runner image** in-cluster, and apply **ClusterRole** RBAC so jobs can use `oc` / KubeVirt APIs.
 
-All scripts expect **`oc login`** to an OpenShift cluster with permissions to create namespaces, SCC-related `ClusterRole`s, and Helm releases. They source [`../ci-tools.sh`](../ci-tools.sh) to install **helm** and **oc** locally when missing.
+All scripts expect **`oc login`** to an OpenShift cluster with permissions to create namespaces, SCC-related `ClusterRole`s, and Helm releases.
 
 ## Order of operations
 
