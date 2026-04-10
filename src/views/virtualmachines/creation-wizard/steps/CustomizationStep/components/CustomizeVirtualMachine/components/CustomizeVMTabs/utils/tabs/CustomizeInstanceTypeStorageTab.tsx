@@ -8,14 +8,14 @@ import {
   updateCustomizeInstanceType,
   updateVMCustomizeIT,
 } from '@kubevirt-utils/store/customizeInstanceType';
+import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { Divider, Grid, GridItem, PageSection } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
-import { wizardVMSignal } from '@virtualmachines/creation-wizard/state/vm-signal/vmStore';
 import DiskList from '@virtualmachines/details/tabs/configuration/storage/components/tables/disk/DiskList';
 
 const CustomizeInstanceTypeStorageTab = () => {
   useSignals();
-  const vm = wizardVMSignal.value;
+  const vm = vmSignal.value;
 
   if (!vm) {
     return <Loading />;

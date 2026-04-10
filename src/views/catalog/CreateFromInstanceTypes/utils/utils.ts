@@ -99,6 +99,7 @@ export const createPopulatedCloudInitYAML = (
 
   return convertUserDataObjectToYAML(cloudInitConfig, true);
 };
+
 type GenerateVMArgs = {
   autoUpdateEnabled?: boolean;
   cluster?: string;

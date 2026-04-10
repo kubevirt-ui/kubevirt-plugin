@@ -6,9 +6,9 @@ import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { logTemplateFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
 import { TEMPLATE_SELECTED } from '@kubevirt-utils/extensions/telemetry/utils/constants';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
+import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { PageSection, Stack } from '@patternfly/react-core';
-import { wizardVMSignal } from '@virtualmachines/creation-wizard/state/vm-signal/vmStore';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 import TemplatesCatalogEmptyState from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesCatalogEmptyState';
 import TemplatesCatalogItems from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesCatalogItems/TemplatesCatalogItems';
@@ -45,7 +45,7 @@ const TemplatesCatalog: FC = () => {
   const handleTemplateSelect = (template: V1Template) => {
     setSelectedTemplate(template);
     const vm = getTemplateVirtualMachineObject(template);
-    wizardVMSignal.value = vm;
+    vmSignal.value = vm;
     logTemplateFlowEvent(TEMPLATE_SELECTED, template);
     setIsDrawerOpen(true);
   };

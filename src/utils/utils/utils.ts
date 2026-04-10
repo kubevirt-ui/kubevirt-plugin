@@ -299,3 +299,6 @@ export const verifyMatchExpressions = (
   });
 
 export const getNoDataAvailableMessage = (t: TFunction): string => t('No data available');
+
+export const getErrorMessage = (error: any) =>
+  error instanceof Error ? error.message : String(error);

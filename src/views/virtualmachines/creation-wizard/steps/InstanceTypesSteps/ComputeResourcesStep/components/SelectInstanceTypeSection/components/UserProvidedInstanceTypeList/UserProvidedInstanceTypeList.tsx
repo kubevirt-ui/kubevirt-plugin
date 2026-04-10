@@ -18,7 +18,7 @@ import {
   SearchInput,
 } from '@patternfly/react-core';
 import { Table, TableVariant, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
-import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
+import useInstanceTypeVMStore from '@virtualmachines/creation-wizard/state/instance-type-vm-store/useInstanceTypeVMStore';
 import { InstanceTypes } from '@virtualmachines/creation-wizard/utils/types';
 
 import UserProvidedInstanceTypesEmptyState from './components/UserProvidedInstanceTypesEmptyState';
@@ -36,10 +36,8 @@ const UserProvidedInstanceTypesList: FC<UserProvidedInstanceTypesListProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const [activeNamespace] = useActiveNamespace();
-  const {
-    instanceTypeFlowState: { selectedInstanceType },
-    setInstanceTypeFlowState,
-  } = useVMWizardStore();
+  const { selectedInstanceType, setSelectedInstanceType, setSelectedSeries, setSelectedSize } =
+    useInstanceTypeVMStore();
 
   const [searchInput, setSearchInput] = useState('');
   const [pagination, setPagination] = useState(paginationInitialState);
@@ -75,11 +73,9 @@ const UserProvidedInstanceTypesList: FC<UserProvidedInstanceTypesListProps> = ({
   }
 
   const handleRowClick = (itName: string, itNamespace: string) => {
-    setInstanceTypeFlowState({
-      selectedInstanceType: { name: itName, namespace: itNamespace },
-      selectedSeries: '',
-      selectedSize: '',
-    });
+    setSelectedInstanceType({ name: itName, namespace: itNamespace });
+    setSelectedSeries('');
+    setSelectedSize('');
   };
 
   return (

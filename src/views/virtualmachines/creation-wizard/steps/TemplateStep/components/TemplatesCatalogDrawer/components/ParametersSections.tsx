@@ -4,8 +4,8 @@ import { cloneDeep } from 'lodash';
 import { TemplateParameter } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
+import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { Button, ButtonVariant, Stack, StackItem } from '@patternfly/react-core';
-import { wizardVMSignal } from '@virtualmachines/creation-wizard/state/vm-signal/vmStore';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 import { useDrawerContext } from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/hooks/useDrawerContext';
 import { changeTemplateParameterValue } from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/utils/utils';
@@ -33,7 +33,7 @@ const ParametersSections: FC<ParametersSectionProps> = ({ requiredParameters }) 
     if (isEdit) {
       setTemplate(workingTemplate);
       setSelectedTemplate(workingTemplate);
-      wizardVMSignal.value = getTemplateVirtualMachineObject(workingTemplate);
+      vmSignal.value = getTemplateVirtualMachineObject(workingTemplate);
       setIsEdit(false);
       return;
     }

@@ -3,6 +3,7 @@ import React, { FC } from 'react';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { Table, TableVariant, Tbody, Th, Thead, Tr } from '@patternfly/react-table';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 import LoadingSkeleton from '@virtualmachines/list/components/OverviewTab/widgets/ClusterStatusWidget/components/TwoColumnCard/LoadingSkeleton';
@@ -64,7 +65,7 @@ const VirtualMachineTable: FC<VirtualMachineTableProps> = ({
           <VirtualMachineRow
             callbacks={callbacks}
             columns={columns}
-            key={`${cluster}-${vm?.metadata?.namespace}-${vm?.metadata?.name}`}
+            key={`${cluster}-${getNamespace(vm)}-${getName(vm)}`}
             selectedVMState={selectedVMState}
             vm={vm}
           />

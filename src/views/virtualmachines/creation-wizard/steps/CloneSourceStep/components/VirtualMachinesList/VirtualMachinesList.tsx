@@ -14,6 +14,7 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
+import { useQueryParamsMethods } from '@kubevirt-utils/components/ListPageFilter/hooks/useQueryParamsMethods';
 import ListPageFilter from '@kubevirt-utils/components/ListPageFilter/ListPageFilter';
 import useContainerWidth from '@kubevirt-utils/hooks/useContainerWidth';
 import { KUBEVIRT_APISERVER_PROXY } from '@kubevirt-utils/hooks/useFeatures/constants';
@@ -26,20 +27,21 @@ import {
   paginationInitialState,
 } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import { usePVCMapper } from '@kubevirt-utils/hooks/usePVCMapper';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import useQuery from '@kubevirt-utils/hooks/useQuery';
+import { getDescription, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import useVirtualMachineInstanceMigrationMapper from '@kubevirt-utils/resources/vmim/hooks/useVirtualMachineInstanceMigrationMapper';
 import useVirtualMachineInstanceMigrations from '@kubevirt-utils/resources/vmim/hooks/useVirtualMachineInstanceMigrations';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { clearCustomizeInstanceType, vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
+import { PROJECT_LIST_FILTER_PARAM } from '@kubevirt-utils/utils/constants';
+import { isVM } from '@kubevirt-utils/utils/typeGuards';
+import { isEmpty, truncateToK8sName } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
 import { K8sVerb, ListPageBody, useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
-import { Pagination, Split, SplitItem } from '@patternfly/react-core';
+import { Bullseye, Pagination, Split, SplitItem } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
-import { clearWizardVM, setWizardVM } from '@virtualmachines/creation-wizard/state/vm-signal/utils';
-import { wizardVMSignal } from '@virtualmachines/creation-wizard/state/vm-signal/vmStore';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
-import VirtualMachineEmptyState from '@virtualmachines/list/components/VirtualMachineEmptyState/VirtualMachineEmptyState';
 import { useVirtualMachineInstanceMapper } from '@virtualmachines/list/hooks/useVirtualMachineInstanceMapper';
 import useVMMetrics from '@virtualmachines/list/hooks/useVMMetrics';
 import { getListPageBodySize, ListPageBodySize } from '@virtualmachines/list/listPageBodySize';
@@ -61,27 +63,45 @@ import { useCloneSourceVMFilters } from './hooks/useCloneSourceVMFilters';
 
 const VirtualMachinesList = forwardRef(({}, ref) => {
   const { t } = useKubevirtTranslation();
-  const { cluster, project: namespace } = useVMWizardStore();
-
-  const isAllClustersPage = useIsAllClustersPage();
-  const searchQueries = useVMSearchQueries();
-  const { loading: loadingFeatureProxy } = useFeatures(KUBEVIRT_APISERVER_PROXY);
-
   useSignals();
   useVMMetrics();
+  const {
+    cluster,
+    project: targetNamespace,
+    setCloneVMDescription,
+    setCloneVMName,
+  } = useVMWizardStore();
 
-  const selectedVM = wizardVMSignal.value;
+  // Initialize project dropdown filter to targetNamespace
+  const queryParams = useQuery();
+  const { setAllQueryArguments } = useQueryParamsMethods();
+  const hasInitializedFilter = useRef(false);
+
+  useEffect(() => {
+    if (hasInitializedFilter.current || !targetNamespace) return;
+
+    setAllQueryArguments({
+      [PROJECT_LIST_FILTER_PARAM]: targetNamespace,
+    });
+
+    hasInitializedFilter.current = true;
+  }, [targetNamespace, queryParams, setAllQueryArguments]);
+
+  const isAllClustersPage = useIsAllClustersPage();
+  const { loading: loadingFeatureProxy } = useFeatures(KUBEVIRT_APISERVER_PROXY);
+
+  const searchQueries = useVMSearchQueries();
 
   const [namespacedVMs, namespacedVMsLoaded, loadError] = useKubevirtWatchResource<
     V1VirtualMachine[]
   >(
-    namespace
+    targetNamespace
       ? {
           cluster,
           groupVersionKind: VirtualMachineModelGroupVersionKind,
           isList: true,
           limit: OBJECTS_FETCHING_LIMIT,
-          namespace,
+          namespace: targetNamespace,
           namespaced: true,
         }
       : null,
@@ -98,14 +118,14 @@ const VirtualMachinesList = forwardRef(({}, ref) => {
     VM_FILTER_OPTIONS,
   );
 
-  const vms = namespace ? namespacedVMs : accessibleVMs;
-  const vmsLoaded = namespace ? namespacedVMsLoaded : accessibleVMsLoaded;
-  const vmsLoadError = namespace ? loadError : accessibleVMsError;
+  const vms = targetNamespace ? namespacedVMs : accessibleVMs;
+  const vmsLoaded = targetNamespace ? namespacedVMsLoaded : accessibleVMsLoaded;
+  const vmsLoadError = targetNamespace ? loadError : accessibleVMsError;
 
-  const [vmims, vmimsLoaded] = useVirtualMachineInstanceMigrations(cluster, namespace);
+  const [vmims, vmimsLoaded] = useVirtualMachineInstanceMigrations(cluster, targetNamespace);
   const { vmiMapper, vmisLoaded } = useVirtualMachineInstanceMapper();
   const vmimMapper = useVirtualMachineInstanceMigrationMapper(vmims);
-  const pvcMapper = usePVCMapper(namespace, cluster);
+  const pvcMapper = usePVCMapper(targetNamespace, cluster);
 
   const { filtersWithSelect, rowFilters } = useCloneSourceVMFilters(vms, vmiMapper, pvcMapper);
 
@@ -118,8 +138,8 @@ const VirtualMachinesList = forwardRef(({}, ref) => {
 
   // Clear selection when namespace/cluster changes
   useEffect(() => {
-    clearWizardVM();
-  }, [namespace, cluster]);
+    clearCustomizeInstanceType();
+  }, [cluster, targetNamespace]);
 
   useImperativeHandle(
     ref,
@@ -143,14 +163,14 @@ const VirtualMachinesList = forwardRef(({}, ref) => {
 
   const [canGetNode] = useFleetAccessReview({
     cluster,
-    namespace,
+    namespace: undefined,
     resource: NodeModel.plural,
     verb: 'get' as K8sVerb,
   });
 
   const columns = useMemo(
-    () => getVMColumns(t, namespace, isAllClustersPage, canGetNode),
-    [t, namespace, isAllClustersPage, canGetNode],
+    () => getVMColumns(t, undefined, isAllClustersPage, canGetNode),
+    [t, isAllClustersPage, canGetNode],
   );
 
   // Filter out selection column
@@ -194,8 +214,8 @@ const VirtualMachinesList = forwardRef(({}, ref) => {
   const loaded = vmsLoaded && vmisLoaded && vmimsLoaded && !loadingFeatureProxy && loadedColumns;
 
   const allVMsInNamespace = useMemo(
-    () => filterVMsByClusterAndNamespace(vmsSignal.value, namespace, cluster),
-    [namespace, cluster],
+    () => filterVMsByClusterAndNamespace(vmsSignal.value, undefined, cluster),
+    [cluster],
   );
 
   const hasNoVMs = useMemo(() => isEmpty(allVMsInNamespace), [allVMsInNamespace]);
@@ -223,63 +243,70 @@ const VirtualMachinesList = forwardRef(({}, ref) => {
     return filteredVMs?.slice(startIndex, endIndex) || [];
   }, [filteredVMs, pagination]);
 
+  const setVM = (vm: V1VirtualMachine) => {
+    const sourceVMName = getName(vm);
+    const cloneVMName = truncateToK8sName(isVM(vm) ? `${sourceVMName}-clone` : sourceVMName);
+    setCloneVMName(cloneVMName);
+    setCloneVMDescription(getDescription(vm));
+    vmSignal.value = vm;
+  };
+
   return (
     <>
       <ListPageBody>
         <div className="vm-listpagebody" ref={listPageBodyRef}>
-          {vmsLoaded && hasNoVMs ? (
-            <VirtualMachineEmptyState namespace={namespace} />
-          ) : (
-            <>
-              <Split hasGutter>
-                <SplitItem>
-                  <ListPageFilter
-                    onFilterChange={(...args) => {
-                      onFilterChange(...args);
-                      setPagination((prevPagination) => ({
-                        ...prevPagination,
-                        endIndex: prevPagination?.perPage,
-                        page: 1,
-                        startIndex: 0,
-                      }));
-                    }}
-                    columnLayout={columnLayout}
-                    data={unfilteredData}
-                    filtersWithSelect={filtersWithSelect}
-                    loaded={loaded}
-                    rowFilters={rowFilters}
-                  />
-                </SplitItem>
-                <SplitItem isFilled />
-                <SplitItem>
-                  <Pagination
-                    onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
-                      onPageChange({ endIndex, page, perPage, startIndex })
-                    }
-                    onSetPage={(_e, page, perPage, startIndex, endIndex) =>
-                      onPageChange({ endIndex, page, perPage, startIndex })
-                    }
-                    className="list-managment-group__pagination"
-                    isCompact={listPageBodySize !== ListPageBodySize.lg}
-                    isLastFullPageShown
-                    itemCount={filteredVMs?.length}
-                    page={pagination?.page}
-                    perPage={pagination?.perPage}
-                    perPageOptions={paginationDefaultValues}
-                  />
-                </SplitItem>
-              </Split>
-
+          <>
+            <Split hasGutter>
+              <SplitItem>
+                <ListPageFilter
+                  onFilterChange={(...args) => {
+                    onFilterChange(...args);
+                    setPagination((prevPagination) => ({
+                      ...prevPagination,
+                      endIndex: prevPagination?.perPage,
+                      page: 1,
+                      startIndex: 0,
+                    }));
+                  }}
+                  columnLayout={columnLayout}
+                  data={unfilteredData}
+                  filtersWithSelect={filtersWithSelect}
+                  loaded={loaded}
+                  rowFilters={rowFilters}
+                />
+              </SplitItem>
+              <SplitItem isFilled />
+              <SplitItem>
+                <Pagination
+                  onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
+                    onPageChange({ endIndex, page, perPage, startIndex })
+                  }
+                  onSetPage={(_e, page, perPage, startIndex, endIndex) =>
+                    onPageChange({ endIndex, page, perPage, startIndex })
+                  }
+                  className="list-managment-group__pagination"
+                  isCompact={listPageBodySize !== ListPageBodySize.lg}
+                  isLastFullPageShown
+                  itemCount={filteredVMs?.length}
+                  page={pagination?.page}
+                  perPage={pagination?.perPage}
+                  perPageOptions={paginationDefaultValues}
+                />
+              </SplitItem>
+            </Split>
+            {vmsLoaded && hasNoVMs ? (
+              <Bullseye>{t('No VirtualMachines found')}</Bullseye>
+            ) : (
               <VirtualMachineTable
                 callbacks={callbacks}
                 columns={activeTableColumns}
                 data={paginatedData}
                 loaded={loaded}
                 loadError={vmsLoadError}
-                selectedVMState={[selectedVM, setWizardVM]}
+                selectedVMState={[vmSignal.value, setVM]}
               />
-            </>
-          )}
+            )}
+          </>
         </div>
       </ListPageBody>
     </>

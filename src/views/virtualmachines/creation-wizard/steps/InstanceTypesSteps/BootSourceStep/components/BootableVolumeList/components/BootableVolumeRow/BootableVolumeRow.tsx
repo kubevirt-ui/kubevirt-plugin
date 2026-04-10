@@ -34,8 +34,8 @@ import { ARCHITECTURE_ID, getArchitecture } from '@kubevirt-utils/utils/architec
 import { getHumanizedSize } from '@kubevirt-utils/utils/units';
 import { Content, ContentVariants, Flex, FlexItem, Label } from '@patternfly/react-core';
 import { TableText, Tr, WrapModifier } from '@patternfly/react-table';
-import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
-import { VMWizardStore } from '@virtualmachines/creation-wizard/state/vm-wizard-store/utils/types';
+import useInstanceTypeVMStore from '@virtualmachines/creation-wizard/state/instance-type-vm-store/useInstanceTypeVMStore';
+import { InstanceTypeVMStore } from '@virtualmachines/creation-wizard/state/instance-type-vm-store/utils/types';
 import {
   getTemplateOSIcon,
   getVolumeNameOSIcon,
@@ -50,7 +50,7 @@ type BootableVolumeRowProps = {
   activeColumnIDs: string[];
   bootableVolume: BootableVolume;
   rowData: {
-    bootableVolumeSelectedState: [BootableVolume, VMWizardStore['onSelectCreatedVolume']];
+    bootableVolumeSelectedState: [BootableVolume, InstanceTypeVMStore['onSelectCreatedVolume']];
     dataImportCron: V1beta1DataImportCron;
     dvSource: V1beta1DataVolume;
     favorites: [isFavorite: boolean, updaterFavorites: (val: boolean) => void];
@@ -74,6 +74,7 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
   },
 }) => {
   const { t } = useKubevirtTranslation();
+  const volumeListNamespace = useInstanceTypeVMStore((state) => state.volumeListNamespace);
   const bootVolumeName = getName(bootableVolume);
   const bootVolumeNamespace = getNamespace(bootableVolume);
   const sizeData = getHumanizedSize(getDiskSize(dvSource, pvcSource, volumeSnapshotSource)).string;
@@ -88,9 +89,6 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
     });
   };
 
-  const {
-    instanceTypeFlowState: { volumeListNamespace },
-  } = useVMWizardStore();
   const isCloning =
     isDataImportCronProgressing(dataImportCron) ||
     isDataSourceCloning(bootableVolume as V1beta1DataSource);

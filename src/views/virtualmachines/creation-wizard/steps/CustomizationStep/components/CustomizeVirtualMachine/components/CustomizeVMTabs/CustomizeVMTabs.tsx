@@ -6,8 +6,8 @@ import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { COLON, HASH } from '@kubevirt-utils/constants/constants';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { PageSection, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
-import { wizardVMSignal } from '@virtualmachines/creation-wizard/state/vm-signal/vmStore';
 import { getSearchItems } from '@virtualmachines/details/tabs/configuration/utils/search';
 
 import { getTabs } from './utils/constants';
@@ -22,7 +22,7 @@ const CustomizeVMTabs: FC = () => {
     VirtualMachineDetailsTab.Details,
   );
 
-  const vm = wizardVMSignal.value;
+  const vm = vmSignal.value;
   const tabs = useMemo(() => getTabs(t), [t]);
   const searchItems = useMemo(() => (vm ? getSearchItems(vm) : []), [vm]);
 

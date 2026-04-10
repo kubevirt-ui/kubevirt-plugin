@@ -1,14 +1,13 @@
 import React, { FC } from 'react';
 
 import { Split, SplitItem } from '@patternfly/react-core';
-import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
+import useInstanceTypeVMStore from '@virtualmachines/creation-wizard/state/instance-type-vm-store/useInstanceTypeVMStore';
 import { OperatingSystemType } from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/GuestOSStep/utils/constants';
 
 import OperatingSystemTile from './components/OperatingSystemTile/OperatingSystemTile';
 
 const OperatingSystemTileGroup: FC = () => {
-  const { instanceTypeFlowState, setOperatingSystemType } = useVMWizardStore();
-  const { operatingSystemType } = instanceTypeFlowState;
+  const { operatingSystemType, setOperatingSystemType } = useInstanceTypeVMStore();
 
   return (
     <Split hasGutter>

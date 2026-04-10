@@ -4,6 +4,7 @@ import { getInstanceTypeMenuItems } from '@kubevirt-utils/components/AddBootable
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import useInstanceTypesAndPreferences from '@kubevirt-utils/hooks/useInstanceTypesAndPreferences';
 import { Tab, Tabs } from '@patternfly/react-core';
+import useInstanceTypeVMStore from '@virtualmachines/creation-wizard/state/instance-type-vm-store/useInstanceTypeVMStore';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 import RedHatProvidedInstanceTypesSection from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/ComputeResourcesStep/components/SelectInstanceTypeSection/components/RedHatProvidedInstanceTypesSection/RedHatProvidedInstanceTypesSection';
 import UserProvidedInstanceTypesList from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/ComputeResourcesStep/components/SelectInstanceTypeSection/components/UserProvidedInstanceTypeList/UserProvidedInstanceTypeList';
@@ -14,11 +15,8 @@ import { TabKey } from './utils/constants';
 const SelectInstanceTypeSection: FC = ({}) => {
   const [activeTabKey, setActiveTabKey] = useState<TabKey>(TabKey.RedHat);
 
-  const {
-    cluster,
-    instanceTypeFlowState: { selectedInstanceType },
-    project,
-  } = useVMWizardStore();
+  const { cluster, project } = useVMWizardStore();
+  const { selectedInstanceType } = useInstanceTypeVMStore();
   const { allInstanceTypes, loaded } = useInstanceTypesAndPreferences(project, cluster);
 
   const menuItems = useMemo(() => getInstanceTypeMenuItems(allInstanceTypes), [allInstanceTypes]);

@@ -13,6 +13,13 @@ import { InstanceTypeIcon } from '@virtualmachines/creation-wizard/steps/Deploym
 import TemplateIcon from '@virtualmachines/creation-wizard/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/components/CreationMethodTile/components/TemplateIcon';
 import { VMCreationMethod } from '@virtualmachines/creation-wizard/utils/constants';
 
+export const isCloneCreationMethod = (creationMethod: VMCreationMethod) =>
+  creationMethod === VMCreationMethod.CLONE;
+export const isTemplateCreationMethod = (creationMethod: VMCreationMethod) =>
+  creationMethod === VMCreationMethod.TEMPLATE;
+export const isInstanceTypeCreationMethod = (creationMethod: VMCreationMethod) =>
+  creationMethod === VMCreationMethod.INSTANCE_TYPE;
+
 export const getVMCreationMethodsDetails = (t: TFunction) => {
   return {
     [VMCreationMethod.CLONE]: {
@@ -39,14 +46,6 @@ export const getVMCreationMethodsDetails = (t: TFunction) => {
 
 export const getVMCreationMethodDetails = (creationMethod: VMCreationMethod, t: TFunction) =>
   getVMCreationMethodsDetails(t)[creationMethod];
-
-export const getWizardFooterProps = (t: TFunction) => {
-  return {
-    backButtonText: t('Back'),
-    cancelButtonText: t('Cancel'),
-    nextButtonText: t('Next'),
-  };
-};
 
 export const getDiskSize = (
   dataVolume: V1beta1DataVolume,

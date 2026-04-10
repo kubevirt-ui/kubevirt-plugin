@@ -17,7 +17,7 @@ import { getName, NamespacedResourceMap, ResourceMap } from '@kubevirt-utils/res
 import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 import { Table, TableVariant, Tbody, Th, Thead, Tr } from '@patternfly/react-table';
 import { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
-import { VMWizardStore } from '@virtualmachines/creation-wizard/state/vm-wizard-store/utils/types';
+import { InstanceTypeVMStore } from '@virtualmachines/creation-wizard/state/instance-type-vm-store/utils/types';
 import { UseBootableVolumesValues } from '@virtualmachines/creation-wizard/utils/types';
 
 import { FAVORITES_COLUMN_ID } from '../../utils/constants';
@@ -29,7 +29,7 @@ type BootableVolumeTableProps = {
   favorites: UserSettingFavorites;
   getSortType: (columnIndex: number) => ThSortType;
   preferencesMap: ResourceMap<V1beta1VirtualMachineClusterPreference>;
-  selectedBootableVolumeState?: [BootableVolume, VMWizardStore['onSelectCreatedVolume']];
+  selectedBootableVolumeState?: [BootableVolume, InstanceTypeVMStore['onSelectCreatedVolume']];
   sortedPaginatedData: BootableVolume[];
   userPreferencesMap: NamespacedResourceMap<V1beta1VirtualMachinePreference>;
 };

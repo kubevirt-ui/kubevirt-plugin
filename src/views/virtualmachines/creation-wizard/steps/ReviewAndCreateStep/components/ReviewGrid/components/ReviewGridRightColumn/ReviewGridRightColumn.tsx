@@ -2,19 +2,19 @@ import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
+import { vmSignal } from '@kubevirt-utils/store/customizeInstanceType';
 import { ExpandableSection, Stack, StackItem } from '@patternfly/react-core';
 import DisksReviewTable from '@virtualmachines/creation-wizard/components/DisksReviewTable/DisksReviewTable';
 import useWizardDisksTableData from '@virtualmachines/creation-wizard/components/DisksReviewTable/hooks/useWizardDisksTableData/useWizardDisksTableData';
 import HardwareDevicesTable from '@virtualmachines/creation-wizard/components/HardwareDevicesTable';
 import NetworksReviewTable from '@virtualmachines/creation-wizard/components/NetworksReviewTable';
-import { wizardVMSignal } from '@virtualmachines/creation-wizard/state/vm-signal/vmStore';
 
 import './ReviewGridRightColumn.scss';
 
 const ReviewGridRightColumn: FC = () => {
   const { t } = useKubevirtTranslation();
 
-  const vm = wizardVMSignal.value;
+  const vm = vmSignal.value;
   const [disks] = useWizardDisksTableData(vm);
   const interfaces = getInterfaces(vm);
   const networks = getNetworks(vm);
