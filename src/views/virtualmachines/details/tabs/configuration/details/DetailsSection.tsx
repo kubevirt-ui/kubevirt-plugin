@@ -20,7 +20,7 @@ import WorkloadProfileModal from '@kubevirt-utils/components/WorkloadProfileModa
 import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { isExpandableSpecVM } from '@kubevirt-utils/resources/instancetype/helper';
+import { isInstanceTypeVM } from '@kubevirt-utils/resources/instancetype/helper';
 import { InstanceTypeUnion } from '@kubevirt-utils/resources/instancetype/types';
 import { asAccessReview, getAnnotation, getName } from '@kubevirt-utils/resources/shared';
 import { WORKLOADS_LABELS } from '@kubevirt-utils/resources/template';
@@ -93,7 +93,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
 
   const cpuMemoryVM = instanceTypeVM?.metadata?.uid === vm?.metadata?.uid ? instanceTypeVM : vm;
 
-  const isExpandableSpec = isExpandableSpecVM(vm);
+  const isInstanceType = isInstanceTypeVM(vm);
   const deletionProtectionEnabled = isDeletionProtectionEnabled(vm);
 
   if (!vm) {
@@ -158,12 +158,12 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
             <DescriptionItem
               descriptionHeader={
                 <SearchItem id="cpu-memory">
-                  {isExpandableSpec ? t('InstanceType') : t('CPU | Memory')}
+                  {isInstanceType ? t('InstanceType') : t('CPU | Memory')}
                 </SearchItem>
               }
               onEditClick={() =>
                 createModal(({ isOpen, onClose }) => {
-                  return isExpandableSpec ? (
+                  return isInstanceType ? (
                     <InstanceTypeModal
                       allInstanceTypes={allInstanceTypes}
                       instanceType={instanceType}
@@ -186,7 +186,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
                 instanceType && getAnnotation(instanceType, INSTANCETYPE_CLASS_DISPLAY_NAME)
               }
               additionalContent={hasNUMAConfiguration(cpuMemoryVM) && <NUMABadge />}
-              bodyContent={isExpandableSpec ? null : <CPUDescription cpu={getCPU(vm)} />}
+              bodyContent={isInstanceType ? null : <CPUDescription cpu={getCPU(vm)} />}
               data-test-id={`${vmName}-cpu-memory`}
               descriptionData={<CPUMemory vm={cpuMemoryVM || vm} vmi={vmi} />}
               isEdit={canUpdateVM}
