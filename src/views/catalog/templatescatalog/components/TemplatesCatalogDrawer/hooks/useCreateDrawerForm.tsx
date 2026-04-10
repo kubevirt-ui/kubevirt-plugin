@@ -167,8 +167,10 @@ const useCreateDrawerForm = (
 
         if (!getLabels(vmObject.spec.template)) vmObject.spec.template.metadata.labels = {};
 
-        if (!isUDNManagedNamespace)
+        if (!isUDNManagedNamespace) {
           vmObject.spec.template.metadata.labels[HEADLESS_SERVICE_LABEL] = HEADLESS_SERVICE_NAME;
+          vmObject.spec.template.spec.subdomain = HEADLESS_SERVICE_NAME;
+        }
 
         const modifiedTemplateObjects = template?.objects?.map((obj) =>
           obj.kind === VirtualMachineModel.kind ? vmObject : obj,
