@@ -18,8 +18,12 @@ import {
   UDN_BINDING_NAME,
 } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getArchitecture } from '@kubevirt-utils/utils/architecture';
-import { createHeadlessService } from '@kubevirt-utils/utils/headless-service';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import {
+  createHeadlessService,
+  HEADLESS_SERVICE_LABEL,
+  HEADLESS_SERVICE_NAME,
+} from '@kubevirt-utils/utils/headless-service';
+import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -103,6 +107,12 @@ export const quickCreateVM: QuickCreateVMType = async ({
     const bootDisk = getBootDisk(draftVM);
     if (bootDisk && !bootDisk.bootOrder) {
       bootDisk.bootOrder = 1;
+    }
+
+    if (!isUDNManagedNamespace) {
+      ensurePath(draftVM, 'spec.template.metadata.labels');
+      draftVM.spec.template.metadata.labels[HEADLESS_SERVICE_LABEL] = HEADLESS_SERVICE_NAME;
+      draftVM.spec.template.spec.subdomain = HEADLESS_SERVICE_NAME;
     }
   });
 
