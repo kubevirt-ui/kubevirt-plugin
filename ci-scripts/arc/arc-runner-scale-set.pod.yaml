@@ -38,6 +38,13 @@ template:
         image: ghcr.io/actions/actions-runner:latest
         command:
           - '/home/runner/run.sh'
+        env:
+          # Workaround for FIPS-enabled clusters (see POC_HOT_CLUSTER_CI.md).
+          - name: OPENSSL_FORCE_FIPS_MODE
+            value: '0'
+          # Workaround for FIPS-enabled clusters (see POC_HOT_CLUSTER_CI.md).
+          - name: GOLANG_FIPS
+            value: '0'
         securityContext:
           allowPrivilegeEscalation: true
           capabilities:
