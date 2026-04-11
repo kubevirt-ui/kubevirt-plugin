@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Card, Radio, Split, SplitItem, Stack, StackItem, Title } from '@patternfly/react-core';
+import { Card, CardBody, CardHeader, Stack, StackItem, Title } from '@patternfly/react-core';
 import { VMCreationMethod } from '@virtualmachines/creation-wizard/utils/constants';
 import { getVMCreationMethodDetails } from '@virtualmachines/creation-wizard/utils/utils';
 
@@ -27,38 +27,35 @@ const CreationMethodTile: FC<CreationMethodTileProps> = ({
 
   return (
     <Card
-      className="vm-creation-method-tile pf-v6-u-p-md"
+      className="vm-creation-method-tile"
+      id={creationMethod}
       isClickable
+      isSelectable
       isSelected={isChecked}
       onClick={handleClick}
     >
-      <Stack hasGutter>
-        <StackItem>
-          <Split hasGutter>
-            <SplitItem>
-              <div className="vm-creation-method-tile__icon">
-                <IconComponent />
-              </div>
-            </SplitItem>
-            <SplitItem isFilled />
-            <SplitItem>
-              <Radio
-                aria-label={creationMethod}
-                className="vm-creation-method-tile__radio"
-                id={`${creationMethod}-radio-button`}
-                isChecked={isChecked}
-                name="creation-method-tile"
-                onChange={handleClick}
-                tabIndex={-1}
-              />
-            </SplitItem>
-          </Split>
-        </StackItem>
-        <StackItem>
-          <Title headingLevel="h1">{label}</Title>
-        </StackItem>
-        <StackItem>{description}</StackItem>
-      </Stack>
+      <CardHeader
+        selectableActions={{
+          hasNoOffset: true,
+          name: 'vm-creation-method-group',
+          onChange: handleClick,
+          selectableActionAriaLabelledby: creationMethod,
+          selectableActionId: creationMethod,
+          variant: 'single',
+        }}
+      >
+        <div className="vm-creation-method-tile__icon">
+          <IconComponent />
+        </div>
+      </CardHeader>
+      <CardBody>
+        <Stack hasGutter>
+          <StackItem>
+            <Title headingLevel="h2">{label}</Title>
+          </StackItem>
+          <StackItem>{description}</StackItem>
+        </Stack>
+      </CardBody>
     </Card>
   );
 };
