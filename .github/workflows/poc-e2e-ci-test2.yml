@@ -259,6 +259,7 @@ jobs:
         with:
           summary-title: 'Cypress gating tests'
           install: false
+          browser: chrome
           working-directory: ./cypress
           env: openshift=true
           spec: '${{ inputs.test_spec }}'
