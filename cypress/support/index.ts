@@ -2,6 +2,8 @@
 /// <reference path="../../@types/console/index.d.ts" />
 
 /* eslint-disable @typescript-eslint/no-namespace */
+import { set } from 'lodash';
+
 import './login.ts';
 import './nav.ts';
 import './project.ts';
@@ -24,16 +26,30 @@ Cypress.on('uncaught:exception', () => {
 
 // Pre-seed console user settings so guided tours are already marked completed before
 // any page JavaScript runs. This prevents the tour popup from appearing on every test,
-// even after Cypress clears localStorage between it() blocks.
-const CONSOLE_USER_SETTINGS_TOURS_DISMISSED = JSON.stringify({
-  'console.guidedTour': {
-    admin: { completed: true },
-    'virtualization-perspective': { completed: true },
-  },
-});
+// even after Cypress clears localStorage between it() blocks. Merges into any existing
+// value so unrelated settings are not overwritten.
+const completeGuidedTours = (existing: Record<string, unknown>, perspectives: string[]) => {
+  perspectives.forEach((perspective) => {
+    set(existing, `'console.guidedTour'.${perspective}.completed`, true);
+  });
+  return existing;
+};
+
+// The key for the console user settings in localStorage, but only when console is running with auth disabled.
+const CONSOLE_USER_SETTINGS_KEY = 'console-user-settings';
 
 Cypress.on('window:before:load', (win) => {
-  win.localStorage.setItem('console-user-settings', CONSOLE_USER_SETTINGS_TOURS_DISMISSED);
+  let existing: Record<string, unknown>;
+
+  try {
+    const raw = win.localStorage.getItem(CONSOLE_USER_SETTINGS_KEY);
+    existing = raw ? JSON.parse(raw) : {};
+  } catch {
+    existing = {};
+  }
+
+  existing = completeGuidedTours(existing, ['admin', 'virtualization-perspective']);
+  win.localStorage.setItem(CONSOLE_USER_SETTINGS_KEY, JSON.stringify(existing));
 });
 
 Cypress.Cookies.debug(true);
