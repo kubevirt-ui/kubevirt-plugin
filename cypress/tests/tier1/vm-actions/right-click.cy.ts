@@ -3,17 +3,17 @@ import { VM_IT_CUST, VM_TMPL_CUST } from '../../../utils/const/testVM';
 import { projectActionStop } from '../../../views/selector-common';
 import { waitForStatus } from '../../../views/vm-flow';
 
-const VM_NAMES = [VM_IT_CUST.name, VM_TMPL_CUST.name];
+const VMS = [VM_IT_CUST, VM_TMPL_CUST];
 
 describe('Right-click of project/folder', () => {
   before(() => {
-    cy.startVM(VM_NAMES);
+    cy.startVM(VMS);
     cy.beforeSpec();
     cy.visitVMsVirt();
   });
 
   after(() => {
-    cy.stopVM(VM_NAMES);
+    cy.stopVM(VMS);
   });
 
   it('stop vms by right-click of project', () => {

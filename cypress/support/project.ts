@@ -31,7 +31,7 @@ Cypress.Commands.add('selectTestProject', () => {
 });
 
 Cypress.Commands.add('switchProjectUsingTreeView', (projectName: string) => {
-  cy.get(`li#projectSelector/${projectName}`).click();
+  cy.get(`li[id^="projectSelector"][id$="/${projectName}"]`).click();
 });
 
 Cypress.Commands.add('switchProject', (projectName: string) => {
