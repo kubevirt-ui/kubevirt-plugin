@@ -82,7 +82,7 @@ jobs:
             echo ""
             echo "| Tool | Client Version | Server Version |"
             echo "| --- | --- | --- |"
-            for cmd in kubectl oc virtctl; do
+            for cmd in oc virtctl; do
               if command -v "$cmd" &>/dev/null; then
                 client=""
                 server=""
