@@ -29,9 +29,11 @@ Cypress.on('uncaught:exception', () => {
 // even after Cypress clears localStorage between it() blocks. Merges into any existing
 // value so unrelated settings are not overwritten.
 const completeGuidedTours = (existing: Record<string, unknown>, perspectives: string[]) => {
+  const guidedTour = (existing['console.guidedTour'] ?? {}) as Record<string, unknown>;
   perspectives.forEach((perspective) => {
-    set(existing, `'console.guidedTour'.${perspective}.completed`, true);
+    set(guidedTour, perspective, { completed: true });
   });
+  existing['console.guidedTour'] = guidedTour;
   return existing;
 };
 
