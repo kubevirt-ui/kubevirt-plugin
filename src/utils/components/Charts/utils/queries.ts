@@ -55,7 +55,7 @@ export const getUtilizationQueries: GetUtilizationQueries = ({ duration, hubClus
     [VMQueries.MEMORY_USAGE]: `last_over_time(kubevirt_vmi_memory_used_bytes{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}])`,
     [VMQueries.MIGRATION_DATA_PROCESSED]: `sum(sum_over_time(kubevirt_vmi_migration_data_processed_bytes{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}]))  BY (name, namespace${sumByCluster})`,
     [VMQueries.MIGRATION_DATA_REMAINING]: `sum(sum_over_time(kubevirt_vmi_migration_data_remaining_bytes{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}]))  BY (name, namespace${sumByCluster})`,
-    [VMQueries.MIGRATION_DISK_TRANSFER_RATE]: `sum(sum_over_time(kubevirt_vmi_migration_disk_transfer_rate_bytes	{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}]))  BY (name, namespace${sumByCluster})`,
+    [VMQueries.MIGRATION_DISK_TRANSFER_RATE]: `sum(sum_over_time(kubevirt_vmi_migration_memory_transfer_rate_bytes	{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}]))  BY (name, namespace${sumByCluster})`,
     [VMQueries.MIGRATION_MEMORY_DIRTY_RATE]: `sum(sum_over_time(kubevirt_vmi_migration_dirty_memory_rate_bytes{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}]))  BY (name, namespace${sumByCluster})`,
     [VMQueries.NETWORK_IN_BY_INTERFACE_USAGE]: `sum(rate(kubevirt_vmi_network_receive_bytes_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}])) BY (name, namespace${sumByCluster}, interface)`,
     [VMQueries.NETWORK_IN_USAGE]: `sum(rate(kubevirt_vmi_network_receive_bytes_total{name='${name}',namespace='${namespace}'${clusterFilter}}[${duration}])) BY (name, namespace${sumByCluster})`,
