@@ -18,7 +18,11 @@ const TreeViewRightClickActionMenu: FC<TreeViewRightClickActionMenuProps> = ({
   return (
     <>
       <ActionMenu hideMenu={hideMenu} triggerElement={triggerElement} />
-      <div className="right-click-action-menu-background" onClick={hideMenu}></div>
+      <div
+        className="right-click-action-menu-background"
+        data-test="right-click-backdrop"
+        onClick={hideMenu}
+      />
     </>
   );
 };

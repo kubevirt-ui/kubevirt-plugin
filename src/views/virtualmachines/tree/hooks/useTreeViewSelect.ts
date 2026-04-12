@@ -22,7 +22,7 @@ const useTreeViewSelect = (
   const onSelect = useCallback(
     (_event: MouseEvent, treeViewItem: TreeViewDataItemWithHref) => {
       setSelected(treeViewItem);
-      navigate(treeViewItem.href);
+      if (treeViewItem.href) navigate(treeViewItem.href);
 
       if (treeViewItem.id.startsWith(FOLDER_SELECTOR_PREFIX)) {
         const treeItemName = treeViewItem.name as string;

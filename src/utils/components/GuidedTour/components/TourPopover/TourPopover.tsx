@@ -28,9 +28,11 @@ const TourPopover: FC<TooltipRenderProps> = ({
         <SplitItem isFilled />
         <SplitItem>
           <Button
-            {...closeProps}
+            aria-label={t('Close')}
             className="pf-v6-c-popover__close"
+            data-action="close"
             icon={<CloseIcon />}
+            onClick={closeProps.onClick as React.MouseEventHandler<HTMLButtonElement>}
             variant={ButtonVariant.plain}
           />
         </SplitItem>

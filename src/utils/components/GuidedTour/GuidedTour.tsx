@@ -1,22 +1,27 @@
-import React, { FC } from 'react';
-import Joyride, { ACTIONS, CallBackProps, EVENTS } from 'react-joyride';
+import React, { ComponentType, FC, useMemo } from 'react';
+import Joyride, { ACTIONS, CallBackProps, EVENTS, TooltipRenderProps } from 'react-joyride';
 import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useSignals } from '@preact/signals-react/runtime';
 
 import TourPopover from './components/TourPopover/TourPopover';
 import useTour from './hooks/useTour';
-import { tourSteps } from './utils/constants';
-import { nextStep, prevStep, runningTourSignal, stepIndexSignal } from './utils/guidedTourSignals';
+import { getTourSteps } from './utils/constants';
+import { runningTourSignal, stepIndexSignal } from './utils/guidedTourSignals';
+import { handleClose, handleNext, handlePrev } from './utils/utils';
 
 const GuidedTour: FC = () => {
   useSignals();
 
+  const { t } = useKubevirtTranslation();
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { stopTour } = useTour();
+  const { resetTour } = useTour();
+
+  const steps = useMemo(() => getTourSteps(t), [t]);
 
   return (
     <Joyride
@@ -25,7 +30,7 @@ const GuidedTour: FC = () => {
         const route = step?.data?.route;
 
         if (typeof step?.target === 'string') {
-          document.querySelector(step.target)?.scrollIntoView();
+          document.querySelector(step.target)?.scrollIntoView({ block: 'nearest' });
         }
 
         if (!isEmpty(route) && location.pathname !== route && runningTourSignal.value) {
@@ -33,37 +38,22 @@ const GuidedTour: FC = () => {
         }
 
         if (action === ACTIONS.CLOSE) {
-          stopTour();
-
-          if (stepIndexSignal.value === size - 1) {
-            nextStep();
-          }
-
+          handleClose(resetTour);
           return;
         }
 
         if (type === EVENTS.STEP_AFTER) {
-          if (index !== stepIndexSignal.value) {
-            return;
-          }
+          if (index !== stepIndexSignal.value) return;
+
+          const currentIndex = stepIndexSignal.value;
 
           if (action === ACTIONS.PREV) {
-            prevStep();
-
+            handlePrev(currentIndex);
             return;
           }
 
           if (action === ACTIONS.NEXT) {
-            if (stepIndexSignal.value < size - 1) {
-              nextStep();
-              return;
-            }
-
-            if (stepIndexSignal.value === size - 1) {
-              stopTour();
-              nextStep();
-              return;
-            }
+            handleNext(currentIndex, size, resetTour);
           }
         }
       }}
@@ -77,8 +67,8 @@ const GuidedTour: FC = () => {
       floaterProps={{ disableAnimation: true }}
       run={runningTourSignal.value}
       stepIndex={stepIndexSignal.value}
-      steps={tourSteps}
-      tooltipComponent={TourPopover as any}
+      steps={steps}
+      tooltipComponent={TourPopover as ComponentType<TooltipRenderProps>}
     />
   );
 };

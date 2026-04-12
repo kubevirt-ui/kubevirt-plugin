@@ -10,13 +10,11 @@ const EndTourFooter: FC = () => {
   return (
     <div className="kv-tour-popover__feedback-footer">
       <Trans t={t}>
-        We hope you found this tour helpful.
-        <br />
-        If you have any{' '}
+        Have thoughts on this tour? We&apos;d love to hear your{' '}
         <Link target="_blank" to={'mailto:uxdresearch@redhat.com'}>
           feedback
         </Link>
-        , we would appreciate hearing from you.
+        .
       </Trans>
     </div>
   );

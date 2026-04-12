@@ -23,6 +23,8 @@
 
   &__feedback-footer {
     background-color: var(--pf-t--global--background--color--secondary--default);
+    border-bottom-left-radius: var(--pf-v6-c-popover--BorderRadius);
+    border-bottom-right-radius: var(--pf-v6-c-popover--BorderRadius);
     padding: var(--pf-t--global--spacer--md);
   }
 }

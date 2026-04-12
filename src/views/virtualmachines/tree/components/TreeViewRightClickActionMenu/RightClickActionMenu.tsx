@@ -6,6 +6,9 @@ import { Menu, MenuContent, MenuList, Popper } from '@patternfly/react-core';
 
 import { BASE_MENU_MARGIN, MENU_DISTANCE, NESTED_LEVEL_MENU_MARGIN } from './constants';
 
+const JOYRIDE_OVERLAY_Z_INDEX = 10000;
+const RIGHT_CLICK_MENU_Z_INDEX = JOYRIDE_OVERLAY_Z_INDEX + 1;
+
 type RightClickActionMenuProps = {
   actions: ActionDropdownItemType[];
   hideMenu: () => void;
@@ -39,6 +42,7 @@ const RightClickActionMenu: FC<RightClickActionMenuProps> = ({
       distance={MENU_DISTANCE}
       isVisible
       triggerRef={triggerRef}
+      zIndex={RIGHT_CLICK_MENU_Z_INDEX}
     />
   );
 };

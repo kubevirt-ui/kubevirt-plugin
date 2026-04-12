@@ -3,7 +3,6 @@ import { isEmpty } from 'lodash';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { tourGuideVM } from '@kubevirt-utils/components/GuidedTour/utils/constants';
-import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
 import { ALL_NAMESPACES_SESSION_KEY, LOCAL_CLUSTER } from '@kubevirt-utils/hooks/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
@@ -55,6 +54,7 @@ const buildProjectMap = (
   currentVMTab: string,
   treeViewDataMap: Record<string, TreeViewDataItemWithHref>,
   foldersEnabled: boolean,
+  isTourRunning = false,
 ) => {
   if (isEmpty(vms)) return {};
 
@@ -77,7 +77,9 @@ const buildProjectMap = (
 
     const vmTreeItem: TreeViewDataItemWithHref = {
       defaultExpanded: currentPageVMName && currentPageVMName === vmName,
-      href: `${getVMURL(vmCluster, vmNamespace, vmName)}/${currentVMTab}`,
+      href: isTourRunning
+        ? undefined
+        : `${getVMURL(vmCluster, vmNamespace, vmName)}/${currentVMTab}`,
       icon: <VMStatusIcon />,
       id: vmTreeItemID,
       name: vmName,
@@ -146,6 +148,7 @@ const createProjectTreeItem = (
   queryParams?: string,
   cluster?: string,
   clusterSelected = true,
+  isTourRunning = false,
 ): TreeViewDataItemWithHref => {
   const projectFolders = createFolderTreeItems(
     projectMap[project]?.folders || {},
@@ -168,7 +171,7 @@ const createProjectTreeItem = (
   const projectTreeItem: TreeViewDataItemWithHref = {
     children: projectChildren,
     customBadgeContent: projectMap[project]?.count || '0',
-    defaultExpanded: currentPageNamespace === project && clusterSelected,
+    defaultExpanded: (currentPageNamespace === project && clusterSelected) || isTourRunning,
     href: `${getVMListNamespacesURL(cluster, project)}${
       removeFilterQueryParams(queryParams) || ''
     }`,
@@ -235,11 +238,12 @@ export const createSingleClusterTreeViewData = (
   pathname: string,
   foldersEnabled: boolean,
   queryParams: string,
+  isTourRunning = false,
 ): TreeViewDataItem[] => {
   const { currentVMTab, vmName, vmNamespace } = getVMInfoFromPathname(pathname);
 
-  const projectsToShow = runningTourSignal.value ? [getNamespace(tourGuideVM)] : projectNames;
-  const vmsToShow = runningTourSignal.value ? [tourGuideVM] : vms;
+  const projectsToShow = isTourRunning ? [getNamespace(tourGuideVM)] : projectNames;
+  const vmsToShow = isTourRunning ? [tourGuideVM] : vms;
 
   const treeViewDataMap: Record<string, TreeViewDataItem> = {};
   const projectMap = buildProjectMap(
@@ -248,10 +252,21 @@ export const createSingleClusterTreeViewData = (
     currentVMTab,
     treeViewDataMap,
     foldersEnabled,
+    isTourRunning,
   );
 
   const treeViewData = projectsToShow.map((project) =>
-    createProjectTreeItem(project, projectMap, vmName, vmNamespace, treeViewDataMap, queryParams),
+    createProjectTreeItem(
+      project,
+      projectMap,
+      vmName,
+      vmNamespace,
+      treeViewDataMap,
+      queryParams,
+      undefined,
+      true,
+      isTourRunning,
+    ),
   );
 
   const allNamespacesTreeItem = createAllNamespacesTreeItem(
