@@ -79,8 +79,10 @@ export const useWizardVMCreate = (): UseWizardVMCreateValues => {
 
         if (!getLabels(vmDraft.spec.template)) vmDraft.spec.template.metadata.labels = {};
 
-        if (!isUDNManagedNamespace)
+        if (!isUDNManagedNamespace) {
           vmDraft.spec.template.metadata.labels[HEADLESS_SERVICE_LABEL] = HEADLESS_SERVICE_NAME;
+          vmDraft.spec.template.spec.subdomain = HEADLESS_SERVICE_NAME;
+        }
 
         if (addRegistrySecret)
           vmDraft.spec.dataVolumeTemplates[0].spec.source.registry.secretRef = imageSecretName;
