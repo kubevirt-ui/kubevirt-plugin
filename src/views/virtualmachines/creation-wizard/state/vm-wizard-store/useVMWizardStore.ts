@@ -16,6 +16,8 @@ const useVMWizardStore = create<VMWizardStore>()((set) => {
     setProject: (project: string) => set({ project }),
     setSelectedTemplate: (selectedTemplate: V1Template) => set(() => ({ selectedTemplate })),
     setStartVM: (startVM: boolean) => set({ startVM }),
+    setTemplatesDrawerIsOpen: (templatesDrawerIsOpen: boolean) =>
+      set(() => ({ templatesDrawerIsOpen })),
   };
 });
 
