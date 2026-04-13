@@ -30,7 +30,7 @@ import {
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
-import { isExpandableSpecVM } from '@kubevirt-utils/resources/instancetype/helper';
+import { isInstanceTypeVM } from '@kubevirt-utils/resources/instancetype/helper';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCPU, getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -156,7 +156,7 @@ export const usePendingChanges = (
           <CPUMemoryModal isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vm={vm} />
         )),
       ),
-      hasPendingChange: !isExpandableSpecVM(vm) && cpuMemoryChanged && restartRequired(vm),
+      hasPendingChange: !isInstanceTypeVM(vm) && cpuMemoryChanged && restartRequired(vm),
       label: t('CPU | Memory'),
     },
     {
@@ -170,7 +170,7 @@ export const usePendingChanges = (
           />
         )),
       ),
-      hasPendingChange: isExpandableSpecVM(vm) && instanceTypeChanged && restartRequired(vm),
+      hasPendingChange: isInstanceTypeVM(vm) && instanceTypeChanged && restartRequired(vm),
       label: t('InstanceType'),
     },
     {
