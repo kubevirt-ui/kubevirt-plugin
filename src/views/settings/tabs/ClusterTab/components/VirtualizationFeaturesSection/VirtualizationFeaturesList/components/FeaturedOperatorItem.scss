@@ -1,6 +1,12 @@
 .featured-operator-item {
-  &__link-button {
+  &__title {
     margin-left: -0.5rem;
+  }
+
+  &__help-icon-container {
+    display: inline-flex;
+    align-items: center;
+    margin-left: var(--pf-t--global--spacer--sm);
   }
 
   &__icon-container {
