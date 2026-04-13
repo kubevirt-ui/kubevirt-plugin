@@ -31,6 +31,11 @@ Cypress.Commands.add('selectTestProject', () => {
 });
 
 Cypress.Commands.add('switchProjectUsingTreeView', (projectName: string) => {
+  cy.get('input[data-test-id="show-vms-only-switch"]').then(($switch) => {
+    if ($switch.is(':checked')) {
+      cy.wrap($switch).uncheck({ force: true });
+    }
+  });
   cy.get(`li[id^="projectSelector"][id$="/${projectName}"]`).click();
 });
 

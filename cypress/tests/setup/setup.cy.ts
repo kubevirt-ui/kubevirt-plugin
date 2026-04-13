@@ -5,7 +5,7 @@ import { manageKeysText, useExisting } from '../../views/selector-catalog';
 
 function configureSSHSecret() {
   cy.byLegacyTestID('select-project-toggle').click();
-  cy.byLegacyTestID(`select-option-${TEST_NS}`).scrollIntoView().click({ force: true });
+  cy.get(`[data-test-id="select-option-${TEST_NS}"] button`).click();
   cy.get('button.project-ssh-row__secret-name').click();
   cy.get(useExisting).click();
   cy.contains('Select secret').click();
@@ -18,6 +18,7 @@ describe('Cluster Test Preparation', () => {
     cy.login();
     cy.get(mastheadLogo).scrollIntoView();
     cy.switchToVirt();
+    cy.switchProject(TEST_NS);
   });
 
   it('configure public ssh key', () => {
