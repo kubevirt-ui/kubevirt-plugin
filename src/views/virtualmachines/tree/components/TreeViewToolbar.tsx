@@ -49,6 +49,7 @@ const TreeViewToolbar: FC<TreeViewToolbarProps> = ({ onSearch }) => {
               <Switch
                 checked={showEmptyProjects === HIDE}
                 className="vms-tree-view__toolbar-switch"
+                data-test-id="show-vms-only-switch"
                 isReversed
                 onChange={(_, checked) => setShowEmptyProjects(checked ? HIDE : SHOW)}
               />
