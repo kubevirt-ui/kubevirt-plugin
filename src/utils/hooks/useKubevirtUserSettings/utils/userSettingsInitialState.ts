@@ -1,8 +1,14 @@
+import { OnboardingPopoversHidden } from '@kubevirt-utils/components/OnboardingPopover/types';
+
 export type UserSettingsState = {
   cards: CardsUserSettings;
   columns: ColumnsUserSettings;
   favoriteBootableVolumes: string[];
+  onboardingPopoversHidden: OnboardingPopoversHidden;
   quickStart: QuickStartUserSettings;
+  savedSearches: {
+    [key: string]: any;
+  };
   ssh: SSHUserSettings;
 };
 

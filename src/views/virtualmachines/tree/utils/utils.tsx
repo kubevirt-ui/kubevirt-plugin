@@ -482,6 +482,12 @@ export const highlightMatchedTreeItems = (
   });
 };
 
+export const getClusterElement = (treeData: TreeViewDataItem[]): HTMLElement => {
+  const root = treeData?.[0];
+  const targetId = root?.id === ALL_CLUSTERS_ID ? root?.children?.[0]?.id : root?.id;
+  return document.getElementById(targetId)?.querySelector('.pf-v6-c-tree-view__node-text');
+};
+
 const removeFilterQueryParams = (query?: string): string => {
   const params = new URLSearchParams(query ?? '');
 
