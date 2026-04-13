@@ -2,7 +2,11 @@ import React, { FC, useMemo } from 'react';
 
 import { V1VirtualMachineInstanceMigration } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getMigrationStatusCounts } from '@kubevirt-utils/resources/vmim/utils';
+import {
+  type MigrationStatusCounts,
+  getMigrationStatusCounts,
+} from '@kubevirt-utils/resources/vmim/utils';
+import { GreenCheckCircleIcon } from '@openshift-console/dynamic-plugin-sdk';
 import { vmStatusIcon } from '@overview/OverviewTab/vm-statuses-card/utils/utils';
 import { Card, CardBody, CardHeader, CardTitle, Content, Grid } from '@patternfly/react-core';
 
@@ -12,10 +16,10 @@ import ViewAllLink from '../shared/ViewAllLink';
 import {
   buildStatusFilterPath,
   FAILED_STATUSES,
-  MigrationStatusCounts,
   OTHER_STATUSES,
   RUNNING_STATUSES,
   SCHEDULED_STATUSES,
+  SUCCEEDED_STATUSES,
 } from './utils/migrationStatusConstants';
 
 import './MigrationsWidget.scss';
@@ -56,6 +60,7 @@ const MigrationsWidget: FC<MigrationsWidgetProps> = ({
       other: buildStatusFilterPath(basePath, OTHER_STATUSES),
       running: buildStatusFilterPath(basePath, RUNNING_STATUSES),
       scheduled: buildStatusFilterPath(basePath, SCHEDULED_STATUSES),
+      succeeded: buildStatusFilterPath(basePath, SUCCEEDED_STATUSES),
     };
   }, [basePath]);
 
@@ -102,6 +107,12 @@ const MigrationsWidget: FC<MigrationsWidgetProps> = ({
               label: t('Scheduled'),
             },
             {
+              count: statusCounts.succeeded,
+              icon: <GreenCheckCircleIcon />,
+              key: 'succeeded',
+              label: t('Succeeded'),
+            },
+            {
               count: statusCounts.other,
               icon: <vmStatusIcon.Other />,
               key: 'other',
@@ -115,7 +126,6 @@ const MigrationsWidget: FC<MigrationsWidgetProps> = ({
               isLoading={isLoading}
               key={key}
               label={label}
-              span={3}
             />
           ))}
         </Grid>
