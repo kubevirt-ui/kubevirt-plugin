@@ -1,20 +1,6 @@
 .vm-creation-method-tile {
-  height: 15.625rem; /* 250px */
-  width: 18.75rem; /* 300px */
-  border: var(--pf-t--global--border--width--regular) solid
-    var(--pf-t--global--border--color--default);
-
-  // Ensure cursor changes to pointer on hover
-  &.pf-m-clickable:hover {
-    cursor: pointer;
-    border-color: var(--pf-t--global--border--color--hover);
-  }
-
-  // Selected state border
-  &.pf-m-selected {
-    border-color: var(--pf-t--global--border--color--clicked);
-    border-width: var(--pf-t--global--border--width--strong);
-  }
+  height: 14rem; /* 224px */
+  width: 22rem; /* 352px */
 
   // Icon wrapper - set color so SVG currentColor inherits it
   &__icon {
@@ -22,10 +8,5 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-  }
-
-  // Prevent radio button from being individually clickable
-  &__radio {
-    pointer-events: none;
   }
 }
