@@ -2,7 +2,6 @@ import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 import { useLocation } from 'react-router-dom-v5-compat';
 
-import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import useInstanceTypesAndPreferences from '@kubevirt-utils/hooks/useInstanceTypesAndPreferences';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -57,7 +56,7 @@ const VirtualMachineConfigurationTab: FC<NavPageComponentProps> = ({
   const searchItems = useMemo(() => getSearchItems(vm), [vm]);
 
   return (
-    <PageSection className="VirtualMachineConfigurationTab">
+    <PageSection className="VirtualMachineConfigurationTab" hasBodyWrapper={false}>
       <ConfigurationSearch
         createSearchURL={createConfigurationSearchURL}
         searchItems={searchItems}
@@ -85,7 +84,6 @@ const VirtualMachineConfigurationTab: FC<NavPageComponentProps> = ({
           ))}
         </Tabs>
       </div>
-      <GuidedTour />
     </PageSection>
   );
 };

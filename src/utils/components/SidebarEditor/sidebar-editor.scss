@@ -1,13 +1,17 @@
 .sidebar-editor {
-  min-height: 100%;
+  height: 100%;
 
   .pf-v6-c-sidebar__panel,
   .pf-v6-c-sidebar__main {
-    min-height: 100%;
+    height: 100%;
   }
 
   .pf-v6-c-sidebar__main {
     align-items: stretch;
+  }
+
+  .pf-v6-c-sidebar__content {
+    overflow-y: auto;
   }
 
   .pf-v6-c-sidebar__panel {
