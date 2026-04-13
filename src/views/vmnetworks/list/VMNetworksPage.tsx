@@ -3,16 +3,14 @@ import { useLocation, useNavigate } from 'react-router-dom-v5-compat';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  ClusterUserDefinedNetworkModelGroupVersionKind,
-  NetworkAttachmentDefinitionModel,
-} from '@kubevirt-utils/models';
+import { NetworkAttachmentDefinitionModel } from '@kubevirt-utils/models';
 import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { ListPageCreateButton, ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
 import { Button, PopoverPosition, Stack, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 
 import { VM_NETWORKS_PATH } from '../constants';
+import useCanCreateVMNetwork from '../hooks/useCanCreateVMNetwork';
 
 import { NADS_LIST_PATH, PATH_BY_TAB_INDEX, TAB_INDEX_BY_PATH, TAB_INDEXES } from './constants';
 import VMNetworkList from './VMNetworkList';
@@ -22,6 +20,7 @@ const VMNetworksPage: FC = () => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const location = useLocation();
+  const { canCreate } = useCanCreateVMNetwork();
 
   const locationTabKey = TAB_INDEX_BY_PATH[location?.pathname];
 
@@ -32,12 +31,7 @@ const VMNetworksPage: FC = () => {
   return (
     <>
       <ListPageHeader title={t('Virtual machine networks')}>
-        <ListPageCreateButton
-          createAccessReview={{
-            groupVersionKind: ClusterUserDefinedNetworkModelGroupVersionKind,
-          }}
-          onClick={onCreate}
-        >
+        <ListPageCreateButton isDisabled={!canCreate} onClick={onCreate}>
           {t('Create network')}
         </ListPageCreateButton>
       </ListPageHeader>

@@ -1,11 +1,10 @@
 import React, { FC } from 'react';
 import { Trans } from 'react-i18next';
-import usePhysicalNetworkOptions from 'src/views/vmnetworks/hooks/usePhysicalNetworkOptions';
+import useCanCreateVMNetwork from 'src/views/vmnetworks/hooks/useCanCreateVMNetwork';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   Button,
   EmptyState,
@@ -27,9 +26,7 @@ const LocalnetEmptyState: FC<LocalnetEmptyStateProps> = ({ onCreate }) => {
   const kind = t('OVN localnet network');
   const createButtonText = t('Create network');
 
-  const [physicalNetworkOptions] = usePhysicalNetworkOptions();
-
-  const canCreate = !isEmpty(physicalNetworkOptions);
+  const { canCreate, showNoPhysicalNetworkAlert } = useCanCreateVMNetwork();
 
   return (
     <EmptyState
@@ -38,12 +35,12 @@ const LocalnetEmptyState: FC<LocalnetEmptyStateProps> = ({ onCreate }) => {
       titleText={t('No {{kind}} found', { kind })}
     >
       <EmptyStateBody>
-        {canCreate ? (
+        {showNoPhysicalNetworkAlert ? (
+          <NoPhysicalNetworkAlert />
+        ) : (
           <Trans t={t}>
             Click <b>{{ createButtonText }}</b> to create your first {{ kind }}
           </Trans>
-        ) : (
-          <NoPhysicalNetworkAlert />
         )}
       </EmptyStateBody>
       <EmptyStateFooter>
