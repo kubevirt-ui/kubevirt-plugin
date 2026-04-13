@@ -10,8 +10,14 @@
 #   HPP_VERSION            - HostPath Provisioner release branch
 #   HCO_CR_PATH            - Path to HCO CR yaml (default: cypress/fixtures/hco.yaml)
 #   SKIP_HPP               - Set to "true" to skip HPP installation
-
+#
 set -euo pipefail
+
+#
+# TODO: We can query details about the cluster and use that to determine the HCO version,
+#       KVM_EMULATION, and HPP_VERSION to use for the installation.  For now, we're using
+#       defaults from the prow ci configuration.
+#
 
 export KVM_EMULATION="${KVM_EMULATION:-true}"
 export HCO_IMAGE_VER="${HCO_IMAGE_VER:-1.14.0-unstable}"
