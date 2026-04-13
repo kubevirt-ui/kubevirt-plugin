@@ -1,10 +1,7 @@
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
-import type { MigrationStatusCounts } from '@kubevirt-utils/resources/vmim/utils';
 import { STATUS_LIST_FILTER_PARAM } from '@virtualmachines/utils/constants';
 
 import { buildFilterPath } from '../../shared/urlUtils';
-
-export type { MigrationStatusCounts };
 
 export const FAILED_STATUSES = [vmimStatuses.Failed];
 export const RUNNING_STATUSES = [vmimStatuses.Running];

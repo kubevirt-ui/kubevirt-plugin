@@ -10,7 +10,7 @@ export type MigrationStatusCounts = {
   succeeded: number;
 };
 
-const emptyMigrationStatusCounts = (): MigrationStatusCounts => ({
+const getEmptyMigrationStatusCounts = (): MigrationStatusCounts => ({
   failed: 0,
   other: 0,
   running: 0,
@@ -21,7 +21,7 @@ const emptyMigrationStatusCounts = (): MigrationStatusCounts => ({
 /**
  * Counts migration statuses from a list of VMIMs.
  * Phases that are not Failed, Running, Scheduled, Scheduling, or Succeeded are counted as "other".
- * @param vmims
+ * @param vmims VMIM resources to aggregate by status phase.
  */
 export const getMigrationStatusCounts = (
   vmims: V1VirtualMachineInstanceMigration[],
@@ -40,5 +40,5 @@ export const getMigrationStatusCounts = (
       acc.other++;
     }
     return acc;
-  }, emptyMigrationStatusCounts());
+  }, getEmptyMigrationStatusCounts());
 };
