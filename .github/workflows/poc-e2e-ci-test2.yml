@@ -188,6 +188,7 @@ jobs:
       PLUGIN_IMAGE: ${{ needs.build-kubevirt-plugin-image.outputs.kubevirt-plugin-image }}
       PLUGIN_PORT: 9001
       PLUGIN_NAME: kubevirt-plugin-ci
+      PLUGIN_TRANSPORT: http
       CONSOLE_PORT: 9000
 
     steps:
@@ -205,18 +206,19 @@ jobs:
               cypress/fixtures/secret.yaml | oc apply -f -
 
       - name: Start kubevirt-plugin container (mimics operator deployment with a ConfigMap + Secret)
+        env:
+          PLUGIN_URL: '${{ env.PLUGIN_TRANSPORT }}://localhost:${{ env.PLUGIN_PORT }}/plugin-manifest.json'
         run: |
           ./ci-scripts/start-plugin-container.sh
 
-          # Root URL often 403/404 (no index.html in plugin dist); manifest is always served when the bundle is present.
-          echo "Waiting for plugin HTTPS on localhost:9001 (plugin-manifest.json) ..."
+          echo "Waiting for plugin at ${PLUGIN_URL}..."
           for i in $(seq 1 30); do
-            if curl -skSf "https://localhost:9001/plugin-manifest.json" -o /dev/null; then
-              echo "Plugin responded over HTTPS."
+            if curl -skSf "${PLUGIN_URL}" -o /dev/null; then
+              echo "Plugin is responding at ${PLUGIN_URL}."
               exit 0
             fi
             if [[ "$i" -eq 30 ]]; then
-              echo "::error::Plugin did not become ready on https://localhost:9001/plugin-manifest.json"
+              echo "::error::Plugin did not become ready on ${PLUGIN_URL}"
               docker ps -a --filter "name=${PLUGIN_NAME}" || true
               docker inspect "${PLUGIN_NAME}" --format 'status={{.State.Status}} exit={{.State.ExitCode}} err={{.State.Error}}' 2>/dev/null || true
               docker logs "${PLUGIN_NAME}" 2>&1 || true

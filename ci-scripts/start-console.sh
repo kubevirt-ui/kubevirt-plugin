@@ -85,11 +85,11 @@ if [[ -z "${BRIDGE_K8S_AUTH_BEARER_TOKEN}" ]]; then
 fi
 echo "::add-mask::${BRIDGE_K8S_AUTH_BEARER_TOKEN}"
 
-# Plugin listens on HTTPS :9443 (see default.conf), published as host :9001. Console runs
+# Plugin listens to protocol${PLUGIN_TRANSPORT}, published as host :${PLUGIN_PORT}. Console runs
 # in Docker; reach the host via host.docker.internal (Linux: --add-host below).
 # Off-cluster bridge uses InsecureSkipVerify for plugin proxy TLS when
 # BRIDGE_K8S_MODE_OFF_CLUSTER_SKIP_VERIFY_TLS=true, so the CI self-signed cert is accepted.
-BRIDGE_PLUGINS="kubevirt-plugin=https://host.docker.internal:9001"
+BRIDGE_PLUGINS="kubevirt-plugin=${PLUGIN_TRANSPORT}://host.docker.internal:${PLUGIN_PORT}"
 
 # Resolve CONSOLE_IMAGE from the cluster's OpenShift version when not already set.
 # Falls back to :latest if resolution fails (e.g. non-OCP cluster, oc not logged in).
