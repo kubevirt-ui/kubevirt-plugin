@@ -117,6 +117,26 @@ Noted by @coderabbitai
 
 The default `docker.io/library/docker:dind` uses a floating tag that advances with Docker releases. While the script allows overriding via `DIND_SOURCE_IMAGE` environment variable, the default floating tag means different CI runs—weeks or months apart—could pull and mirror different dind versions underneath identical source code. Given the repo's emphasis on aligned and pinned versions for reproducibility, the dind default should either be a specific version (e.g., `docker:26.0` or a sha256 digest) or the docs should explicitly document that `DIND_SOURCE_IMAGE=docker.io/library/docker:<version>` must be set in CI to achieve reproducible runner pods.
 
+### FIPS-enabled cluster support
+
+The upstream GitHub Actions runner image (`ghcr.io/actions/actions-runner:latest`) is Ubuntu 22.04-based. On FIPS-enabled OpenShift clusters, the kernel exposes `/proc/sys/crypto/fips_enabled = 1` to all containers. OpenSSL and the .NET runtime (which powers the runner's `Runner.Listener` binary) detect this flag and attempt to use FIPS-validated cryptographic providers. Since the Ubuntu image lacks the required FIPS provider module (`fips.so`), the runner segfaults during TLS handshake with GitHub — and `run.sh` masks the crash as exit code 0, making the failure invisible.
+
+The current workaround sets `OPENSSL_FORCE_FIPS_MODE=0` in the runner container environment (see `arc-runner-scale-set.pod.yaml`). This tells OpenSSL to ignore the kernel's FIPS flag. It is sufficient for CI runners that do not need to perform FIPS-validated cryptographic operations themselves.
+
+The proper long-term solution is to rebase the custom runner image onto a FIPS-compatible base such as `registry.access.redhat.com/ubi9/ubi` (or `ubi9/ubi-minimal`). This would involve:
+
+1. Starting from UBI instead of `ghcr.io/actions/actions-runner:latest`.
+2. Installing the .NET runtime (the runner requires .NET 8+).
+3. Downloading and extracting the GitHub Actions runner binaries from the [runner releases](https://github.com/actions/runner/releases).
+4. Installing the same additional tooling the current Dockerfile adds (node, jq, oc, virtctl, cypress dependencies, etc.).
+
+A UBI-based image carries FIPS-validated OpenSSL and crypto providers out of the box, so the runner's .NET TLS stack works correctly without any environment variable overrides. This also avoids the build-time `curl`/OpenSSL issues documented in the current Dockerfile (the `wget2`/GnuTLS workaround for FIPS DSO errors during `oc start-build`).
+
+References:
+
+- [actions/runner#4197](https://github.com/actions/runner/issues/4197) — Segfault on FIPS-enabled hosts
+- [dotnet/dotnet-docker#5849](https://github.com/dotnet/dotnet-docker/issues/5849) — .NET crypto fails in containers on FIPS kernels
+
 ### If adopted, hardening of the ROKS cluster handling, and cluster health checks are needed
 
 The workflows and scripts all function, but they should receive additional scrutiny before being adopted for real scenarios.
