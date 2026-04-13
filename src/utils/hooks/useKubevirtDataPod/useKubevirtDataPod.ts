@@ -19,14 +19,14 @@ import {
 import useKubevirtDataPodFilters from './useKubevirtDataPodFilters';
 
 type UseKubevirtDataPod = <T extends K8sResourceCommon | K8sResourceCommon[]>(
-  watchOptions: WatchK8sResource,
+  watchOptions: null | WatchK8sResource,
   filterOptions?: { [key: string]: string },
 ) => [T, boolean, Error];
 
 const nullResponse: [undefined, boolean, Error] = [undefined, false, null];
 
 const useKubevirtDataPod: UseKubevirtDataPod = <T extends K8sResourceCommon | K8sResourceCommon[]>(
-  watchOptions: WatchK8sResource,
+  watchOptions: null | WatchK8sResource,
   filterOptions?: { [key: string]: string },
 ) => {
   const [data, setData] = useState<T>((<unknown>[]) as T);
@@ -34,9 +34,10 @@ const useKubevirtDataPod: UseKubevirtDataPod = <T extends K8sResourceCommon | K8
   const [error, setError] = useState<Error>(null);
   const [resourceVersion, setResourceVersion] = useState<string>(null);
   const query = useKubevirtDataPodFilters(filterOptions);
-  const watchOptionsMemoized = useDeepCompareMemoize<WatchK8sResource>(watchOptions, true);
+  const watchOptionsMemoized = useDeepCompareMemoize<null | WatchK8sResource>(watchOptions, true);
   const url = useMemo(
-    () => constructURL(watchOptionsMemoized, query),
+    () =>
+      watchOptionsMemoized?.groupVersionKind?.kind ? constructURL(watchOptionsMemoized, query) : '',
     [query, watchOptionsMemoized],
   );
   const [shouldConnect, setShouldConnect] = useState<boolean>(false);
@@ -54,10 +55,14 @@ const useKubevirtDataPod: UseKubevirtDataPod = <T extends K8sResourceCommon | K8
       },
       share: true,
     },
-    shouldConnect && Boolean(resourceVersion),
+    shouldConnect &&
+      Boolean(resourceVersion) &&
+      Boolean(watchOptionsMemoized?.groupVersionKind?.kind),
   );
   useEffect(() => {
     const fetch = async () => {
+      if (!watchOptionsMemoized?.groupVersionKind?.kind) return;
+
       setLoaded(false);
       try {
         const response = await consoleFetch(url);

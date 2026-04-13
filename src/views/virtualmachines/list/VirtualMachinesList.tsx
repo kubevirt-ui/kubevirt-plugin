@@ -10,16 +10,10 @@ import React, {
 } from 'react';
 
 import {
-  VirtualMachineInstanceMigrationModelGroupVersionKind,
-  VirtualMachineInstanceModelGroupVersionKind,
   VirtualMachineModelGroupVersionKind,
   VirtualMachineModelRef,
 } from '@kubevirt-ui/kubevirt-api/console';
-import {
-  V1VirtualMachine,
-  V1VirtualMachineInstance,
-  V1VirtualMachineInstanceMigration,
-} from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import ColumnManagement from '@kubevirt-utils/components/ColumnManagementModal/ColumnManagement';
 import { tourGuideVM } from '@kubevirt-utils/components/GuidedTour/utils/constants';
 import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
@@ -39,6 +33,7 @@ import { usePVCMapper } from '@kubevirt-utils/hooks/usePVCMapper';
 import useQuery from '@kubevirt-utils/hooks/useQuery';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getName } from '@kubevirt-utils/resources/shared';
+import useVirtualMachineInstanceMigrations from '@kubevirt-utils/resources/vmim/hooks/useVirtualMachineInstanceMigrations';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { getCatalogURL } from '@multicluster/urls';
@@ -51,6 +46,7 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Flex, Pagination } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
+import { useAccessibleResources } from '@virtualmachines/search/hooks/useAccessibleResources';
 import { VMSearchQueries } from '@virtualmachines/search/hooks/useVMSearchQueries';
 import VirtualMachineFilterToolbar from '@virtualmachines/search/VirtualMachineFilterToolbar';
 import { vmsSignal } from '@virtualmachines/tree/utils/signals';
@@ -69,6 +65,7 @@ import useFiltersFromURL from './hooks/useFiltersFromURL';
 import useVirtualMachineColumns from './hooks/useVirtualMachineColumns';
 import { useVMListFilters } from './hooks/useVMListFilters/useVMListFilters';
 import useVMMetrics from './hooks/useVMMetrics';
+import { VM_FILTER_OPTIONS } from './utils/constants';
 import { filterVMsByClusterAndNamespace } from './utils/utils';
 import { getListPageBodySize, ListPageBodySize } from './listPageBodySize';
 import { deselectAllVMs } from './selectedVMs';
@@ -80,7 +77,7 @@ type VirtualMachinesListProps = {
   allVMsLoaded?: boolean;
   cluster?: string;
   kind: string;
-  namespace: string;
+  namespace: null | string;
   searchQueries?: VMSearchQueries;
 } & RefAttributes<ExposedFilterFunctions | null>;
 
@@ -97,56 +94,50 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
 
   const query = useQuery();
 
-  const [vms, vmsLoaded, loadError] = useKubevirtWatchResource<V1VirtualMachine[]>(
-    {
-      cluster,
-      groupVersionKind: VirtualMachineModelGroupVersionKind,
-      isList: true,
-      limit: OBJECTS_FETCHING_LIMIT,
-      namespace,
-      namespaced: true,
-    },
-    {
-      labels: 'metadata.labels',
-      name: 'metadata.name',
-      'rowFilter-os': 'spec.template.metadata.annotations.vm\\.kubevirt\\.io/os',
-      'rowFilter-status': 'status.printableStatus',
-    },
+  const [namespacedVMs, namespacedVMsLoaded, namespacedVMsLoadError] = useKubevirtWatchResource<
+    V1VirtualMachine[]
+  >(
+    namespace
+      ? {
+          cluster,
+          groupVersionKind: VirtualMachineModelGroupVersionKind,
+          isList: true,
+          limit: OBJECTS_FETCHING_LIMIT,
+          namespace,
+          namespaced: true,
+        }
+      : null,
+    VM_FILTER_OPTIONS,
     searchQueries?.vmQueries,
   );
 
-  const vmsToShow = useMemo(() => (runningTourSignal.value ? [tourGuideVM] : vms), [vms]);
-
-  const [vmis, vmisLoaded] = useKubevirtWatchResource<V1VirtualMachineInstance[]>(
-    {
-      cluster,
-      groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
-      isList: true,
-      limit: OBJECTS_FETCHING_LIMIT,
-      namespace,
-      namespaced: true,
-    },
-    {
-      ip: 'status.interfaces',
-      'rowFilter-node': 'status.nodeName',
-    },
-    searchQueries?.vmiQueries,
+  const {
+    loaded: accessibleVMsLoaded,
+    loadError: accessibleVMsLoadError,
+    resources: accessibleVMs,
+  } = useAccessibleResources<V1VirtualMachine>(
+    VirtualMachineModelGroupVersionKind,
+    VM_FILTER_OPTIONS,
   );
 
-  const pvcMapper = usePVCMapper(namespace, cluster);
+  const vms = namespace ? namespacedVMs : accessibleVMs;
+  const vmsLoaded = namespace ? namespacedVMsLoaded : accessibleVMsLoaded;
+  const vmsLoadError = namespace ? namespacedVMsLoadError : accessibleVMsLoadError;
 
-  const [vmims, vmimsLoaded] = useKubevirtWatchResource<V1VirtualMachineInstanceMigration[]>({
-    cluster,
-    groupVersionKind: VirtualMachineInstanceMigrationModelGroupVersionKind,
-    isList: true,
-    limit: OBJECTS_FETCHING_LIMIT,
-    namespace,
-    namespaced: true,
-  });
+  const vmsToShow = useMemo(() => (runningTourSignal.value ? [tourGuideVM] : vms), [vms]);
 
-  const { filtersWithSelect, hiddenFilters, vmiMapper, vmimMapper } = useVMListFilters(
+  const pvcMapper = usePVCMapper(namespace ?? undefined, cluster);
+
+  const [vmims, vmimsLoaded] = useVirtualMachineInstanceMigrations(cluster, namespace || undefined);
+
+  const { filtersWithSelect, hiddenFilters, vmiMapper, vmimMapper, vmisLoaded } = useVMListFilters(
     vmims,
     pvcMapper,
+  );
+
+  const vmisForSummary = useMemo(
+    () => (vmsToShow || []).map((vm) => getVMIFromMapper(vmiMapper, vm)).filter(Boolean),
+    [vmsToShow, vmiMapper],
   );
 
   const filtersFromURL = useFiltersFromURL([...filtersWithSelect, ...hiddenFilters]);
@@ -196,7 +187,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
   };
 
   const [columns, activeColumns, loadedColumns] = useVirtualMachineColumns(
-    namespace,
+    namespace ?? '',
     pagination,
     filteredVMs,
     vmiMapper,
@@ -222,9 +213,9 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
       <DocumentTitle>{PageTitles.VirtualMachines}</DocumentTitle>
       {!isSearchResultsPage && (
         <VirtualMachineListSummary
-          namespace={namespace}
+          namespace={namespace ?? ''}
           onFilterChange={onFilterChange}
-          vmis={vmis}
+          vmis={vmisForSummary}
           vms={allVMs}
         />
       )}
@@ -301,7 +292,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
                 columns={activeColumns}
                 data={paginatedVMs}
                 loaded={loaded}
-                loadError={loadError}
+                loadError={vmsLoadError}
                 Row={VirtualMachineRow}
                 unfilteredData={vmsToShow}
               />

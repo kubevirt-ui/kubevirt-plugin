@@ -36,8 +36,9 @@ export const useVMListFilters = (
   hiddenFilters: RowFilter<V1VirtualMachine>[];
   vmiMapper: VMIMapper;
   vmimMapper: VMIMMapper;
+  vmisLoaded: boolean;
 } => {
-  const vmiMapper = useVirtualMachineInstanceMapper();
+  const { vmiMapper, vmisLoaded } = useVirtualMachineInstanceMapper();
 
   const vmimMapper: VMIMMapper = useMemo(() => getLatestMigrationForEachVM(vmims), [vmims]);
 
@@ -86,5 +87,6 @@ export const useVMListFilters = (
     ],
     vmiMapper,
     vmimMapper,
+    vmisLoaded,
   };
 };
