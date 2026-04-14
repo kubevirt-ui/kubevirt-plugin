@@ -5,6 +5,7 @@ import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-d
 import ArchitectureLabel from '@kubevirt-utils/components/ArchitectureLabel/ArchitectureLabel';
 import DeprecatedBadge from '@kubevirt-utils/components/badges/DeprecatedBadge/DeprecatedBadge';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getAnnotations, getName, getNamespace, getUID } from '@kubevirt-utils/resources/shared';
 import {
   getTemplateFlavorData,
   isDeprecatedTemplate,
@@ -18,8 +19,17 @@ import {
 import { getVMBootSourceLabel } from '@kubevirt-utils/resources/vm/utils/source';
 import { ARCHITECTURE_TITLE, getArchitecture } from '@kubevirt-utils/utils/architecture';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
-import { CatalogTile } from '@patternfly/react-catalog-view-extension';
-import { Badge, Skeleton, Stack, StackItem } from '@patternfly/react-core';
+import {
+  Badge,
+  Card,
+  CardBody,
+  CardHeader,
+  Skeleton,
+  Split,
+  SplitItem,
+  Stack,
+  StackItem,
+} from '@patternfly/react-core';
 import { getTemplateOSIcon } from '@virtualmachines/creation-wizard/utils/os-icons/os-icons';
 
 import './TemplatesCatalogTile.scss';
@@ -46,6 +56,8 @@ const TemplatesCatalogTile: FC<TemplatesCatalogTileProps> = memo(
 
     const isDeprecated = isDeprecatedTemplate(template);
     const workload = getTemplateWorkload(template);
+    const templateID = getUID(template);
+    const templateName = getName(template);
     const displayName = getTemplateName(template);
     const bootSource = getTemplateBootSourceType(template);
     const isBootSourceAvailable = availableTemplatesUID.has(template.metadata.uid);
@@ -58,50 +70,62 @@ const TemplatesCatalogTile: FC<TemplatesCatalogTileProps> = memo(
     const icon = useMemo(() => {
       return getTemplateOSIcon(template);
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [template?.metadata?.annotations?.iconClass]);
+    }, [getAnnotations(template)?.iconClass]);
 
     return (
-      <div
-        className={`template-catalog-tile-wrapper ${
-          isSelected ? 'template-catalog-tile-wrapper--selected' : ''
-        }`}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') onClick(template);
-        }}
+      <Card
+        className="templates-catalog-tile"
+        data-test-id={templateName}
+        id={templateID}
+        isSelectable
+        isSelected={isSelected}
         onClick={() => onClick(template)}
-        role="button"
-        tabIndex={0}
       >
-        <CatalogTile
-          badges={[
-            <Stack className="badge-stack" key="badge-stack">
-              {bootSourcesLoaded
-                ? isBootSourceAvailable && [
-                    <Badge key="available-boot">{t('Source available')}</Badge>,
-                  ]
-                : [
-                    <Skeleton
-                      className="badgeload"
-                      height="18px"
-                      key="loading-sources"
-                      width="105px"
-                    />,
-                  ]}
-              {isDeprecated ? <DeprecatedBadge className="deprecated-template" /> : null}
-            </Stack>,
-          ]}
-          title={
-            <Stack>
-              <StackItem>
-                <b>{displayName}</b>
-              </StackItem>
-              <StackItem className="pf-v6-u-text-color-subtle">{template.metadata.name}</StackItem>
-            </Stack>
-          }
-          className="template-catalog-tile"
-          data-test-id={template.metadata.name}
-          iconImg={icon}
+        <CardHeader
+          selectableActions={{
+            isHidden: true,
+            name: 'template-catalog-tile',
+            onChange: () => onClick(template),
+            selectableActionAriaLabelledby: `template-catalog-tile-${templateName}`,
+            selectableActionId: templateID,
+            variant: 'single',
+          }}
         >
+          <Stack>
+            <StackItem>
+              <Split>
+                {icon && (
+                  <SplitItem>
+                    <img alt={`${templateName} icon`} className="catalog-tile-pf-icon" src={icon} />
+                  </SplitItem>
+                )}
+                <SplitItem isFilled />
+                <SplitItem>
+                  <Stack className="badge-stack" key="badge-stack">
+                    {bootSourcesLoaded
+                      ? isBootSourceAvailable && [
+                          <Badge key="available-boot">{t('Source available')}</Badge>,
+                        ]
+                      : [
+                          <Skeleton
+                            className="badgeload"
+                            height="1.125rem" // 18px
+                            key="loading-sources"
+                            width="6.563rem" // 105px
+                          />,
+                        ]}
+                    {isDeprecated ? <DeprecatedBadge className="deprecated-template" /> : null}
+                  </Stack>
+                </SplitItem>
+              </Split>
+            </StackItem>
+            <StackItem>
+              <b>{displayName}</b>
+            </StackItem>
+            <StackItem className="pf-v6-u-text-color-subtle">{templateName}</StackItem>
+          </Stack>
+        </CardHeader>
+        <CardBody>
           <Stack hasGutter>
             <StackItem>
               <Stack>
@@ -110,7 +134,7 @@ const TemplatesCatalogTile: FC<TemplatesCatalogTileProps> = memo(
                   <ArchitectureLabel architecture={getArchitecture(template)} />
                 </StackItem>
                 <StackItem>
-                  <b>{t('Project')}</b> {template.metadata.namespace}
+                  <b>{t('Project')}</b> {getNamespace(template)}
                 </StackItem>
                 <StackItem>
                   <b>{t('Boot source')}</b> {getVMBootSourceLabel(bootSource?.type, dataSource)}
@@ -131,8 +155,8 @@ const TemplatesCatalogTile: FC<TemplatesCatalogTileProps> = memo(
               </Stack>
             </StackItem>
           </Stack>
-        </CatalogTile>
-      </div>
+        </CardBody>
+      </Card>
     );
   },
 );

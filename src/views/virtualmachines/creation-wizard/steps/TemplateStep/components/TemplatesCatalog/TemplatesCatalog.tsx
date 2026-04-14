@@ -1,8 +1,6 @@
-import React, { FC, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom-v5-compat';
+import React, { FC, useMemo } from 'react';
 
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { logTemplateFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
 import { TEMPLATE_SELECTED } from '@kubevirt-utils/extensions/telemetry/utils/constants';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
@@ -18,14 +16,11 @@ import useHideDeprecatedTemplateTiles from '@virtualmachines/creation-wizard/ste
 import { useTemplatesWithAvailableSource } from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/hooks/useTemplatesWithAvailableSource/useTemplatesWithAvailableSource';
 import { useTemplatesFilters } from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/hooks/useVMTemplatesFilters';
 import { filterTemplates } from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/utils/utils';
-import { TemplatesCatalogDrawer } from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/TemplatesCatalogDrawer';
 
 import './TemplateCatalog.scss';
 
 const TemplatesCatalog: FC = () => {
-  const { ns: namespace } = useParams<{ ns: string }>();
-  const { selectedTemplate, setSelectedTemplate } = useVMWizardStore();
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const { selectedTemplate, setSelectedTemplate, setTemplatesDrawerIsOpen } = useVMWizardStore();
 
   const [filters, onFilterChange, clearAll] = useTemplatesFilters();
   const { availableDataSources, availableTemplatesUID, bootSourcesLoaded, loaded, templates } =
@@ -47,11 +42,7 @@ const TemplatesCatalog: FC = () => {
     const vm = getTemplateVirtualMachineObject(template);
     vmSignal.value = vm;
     logTemplateFlowEvent(TEMPLATE_SELECTED, template);
-    setIsDrawerOpen(true);
-  };
-
-  const handleDrawerClose = () => {
-    setIsDrawerOpen(false);
+    setTemplatesDrawerIsOpen(true);
   };
 
   return (
@@ -83,12 +74,6 @@ const TemplatesCatalog: FC = () => {
       ) : (
         <CatalogSkeleton />
       )}
-      <TemplatesCatalogDrawer
-        isOpen={isDrawerOpen && !!selectedTemplate}
-        namespace={namespace ?? DEFAULT_NAMESPACE}
-        onClose={handleDrawerClose}
-        template={selectedTemplate}
-      />
     </PageSection>
   );
 };

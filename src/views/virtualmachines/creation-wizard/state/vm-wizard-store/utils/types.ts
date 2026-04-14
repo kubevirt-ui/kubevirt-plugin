@@ -10,6 +10,7 @@ export type VMWizardState = {
   project: string;
   selectedTemplate: V1Template;
   startVM: boolean;
+  templatesDrawerIsOpen: boolean;
 };
 
 export type VMWizardActions = {
@@ -22,6 +23,7 @@ export type VMWizardActions = {
   setProject: (project: string) => void;
   setSelectedTemplate: (template: V1Template) => void;
   setStartVM: (startVM: boolean) => void;
+  setTemplatesDrawerIsOpen: (templatesDrawerIsOpen: boolean) => void;
 };
 
 export type VMWizardStore = VMWizardState & VMWizardActions;

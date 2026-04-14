@@ -18,18 +18,20 @@ import GuestOSStep from '@virtualmachines/creation-wizard/steps/InstanceTypesSte
 import ReviewAndCreateStep from '@virtualmachines/creation-wizard/steps/ReviewAndCreateStep/ReviewAndCreateStep';
 import TemplateStepFooter from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplateStepFooter';
 import TemplateStep from '@virtualmachines/creation-wizard/steps/TemplateStep/TemplateStep';
+import { VMWizardStep } from '@virtualmachines/creation-wizard/utils/constants';
 import {
   isCloneCreationMethod,
   isInstanceTypeCreationMethod,
   isTemplateCreationMethod,
 } from '@virtualmachines/creation-wizard/utils/utils';
 
+import TemplatesDrawerWrapper from './components/TemplatesDrawerWrapper';
 import DeploymentDetailsStep from './steps/DeploymentDetailsStep/DeploymentDetailsStep';
 
 const VMCreationWizard: FC = () => {
   const { t } = useKubevirtTranslation();
   useSignals();
-  const { creationMethod, setCluster, setProject } = useVMWizardStore();
+  const { creationMethod, setCluster, setProject, setTemplatesDrawerIsOpen } = useVMWizardStore();
   const clusterParam = useClusterParam();
   const { ns } = useParams<{ ns: string }>();
   const hasInitialized = useRef(false);
@@ -49,79 +51,84 @@ const VMCreationWizard: FC = () => {
   const isTemplateMethod = isTemplateCreationMethod(creationMethod);
 
   return (
-    <Wizard
-      className="vm-creation-wizard"
-      header={<WizardHeader isCloseHidden title={t('Create VirtualMachine')} />}
-      onClose={closeWizard}
-      title={t('Create VirtualMachine')}
-    >
-      <WizardStep
-        footer={<DefaultWizardFooter />}
-        id="vm-creation-deployment-details-step"
-        name={t('Deployment details')}
-      >
-        <DeploymentDetailsStep />
-      </WizardStep>
-      <WizardStep
-        footer={<DefaultWizardFooter />}
-        id="vm-creation-guest-os-step"
-        isHidden={!isInstanceTypeMethod}
-        name={t('Guest OS')}
-      >
-        <GuestOSStep />
-      </WizardStep>
-      <WizardStep
-        footer={<DefaultWizardFooter />}
-        id="vm-creation-boot-source-step"
-        isHidden={!isInstanceTypeMethod}
-        name={t('Boot source')}
-      >
-        <BootSourceStep />
-      </WizardStep>
-      <WizardStep
-        footer={<ComputeResourcesStepFooter />}
-        id="vm-creation-compute-resources-step"
-        isHidden={!isInstanceTypeMethod}
-        name={t('Compute resources')}
-      >
-        <ComputeResourcesStep />
-      </WizardStep>
-
-      <WizardStep
-        footer={<TemplateStepFooter />}
-        id="vm-creation-template-step"
-        isHidden={!isTemplateMethod}
-        name={t('Template')}
-      >
-        <TemplateStep />
-      </WizardStep>
-      <WizardStep
-        footer={<DefaultWizardFooter />}
-        id="vm-creation-customization-step"
-        isHidden={isCloneMethod}
-        name={t('Customization')}
-      >
-        <CustomizationStep />
-      </WizardStep>
-      <WizardStep
-        footer={<DefaultWizardFooter />}
-        id="vm-creation-clone-step"
-        isHidden={!isCloneMethod}
-        name={t('Source')}
-      >
-        <CloneSourceStep />
-      </WizardStep>
-      <WizardStep
-        footer={{
-          nextButtonText: isCloneMethod ? t('Clone VirtualMachine') : t('Create VirtualMachine'),
-          onNext: createVM,
+    <TemplatesDrawerWrapper>
+      <Wizard
+        onStepChange={(_, currentStep) => {
+          if (currentStep?.id !== VMWizardStep.TEMPLATE) setTemplatesDrawerIsOpen(false);
         }}
-        id="vm-creation-review-and-create-step"
-        name={t('Review and create')}
+        className="vm-creation-wizard"
+        header={<WizardHeader isCloseHidden title={t('Create VirtualMachine')} />}
+        onClose={closeWizard}
+        title={t('Create VirtualMachine')}
       >
-        <ReviewAndCreateStep />
-      </WizardStep>
-    </Wizard>
+        <WizardStep
+          footer={<DefaultWizardFooter />}
+          id={VMWizardStep.DEPLOYMENT_DETAILS}
+          name={t('Deployment details')}
+        >
+          <DeploymentDetailsStep />
+        </WizardStep>
+        <WizardStep
+          footer={<DefaultWizardFooter />}
+          id={VMWizardStep.GUEST_OS}
+          isHidden={!isInstanceTypeMethod}
+          name={t('Guest OS')}
+        >
+          <GuestOSStep />
+        </WizardStep>
+        <WizardStep
+          footer={<DefaultWizardFooter />}
+          id={VMWizardStep.BOOT_SOURCE}
+          isHidden={!isInstanceTypeMethod}
+          name={t('Boot source')}
+        >
+          <BootSourceStep />
+        </WizardStep>
+        <WizardStep
+          footer={<ComputeResourcesStepFooter />}
+          id={VMWizardStep.COMPUTE_RESOURCES}
+          isHidden={!isInstanceTypeMethod}
+          name={t('Compute resources')}
+        >
+          <ComputeResourcesStep />
+        </WizardStep>
+
+        <WizardStep
+          footer={<TemplateStepFooter />}
+          id={VMWizardStep.TEMPLATE}
+          isHidden={!isTemplateMethod}
+          name={t('Template')}
+        >
+          <TemplateStep />
+        </WizardStep>
+        <WizardStep
+          footer={<DefaultWizardFooter />}
+          id={VMWizardStep.CUSTOMIZATION}
+          isHidden={isCloneMethod}
+          name={t('Customization')}
+        >
+          <CustomizationStep />
+        </WizardStep>
+        <WizardStep
+          footer={<DefaultWizardFooter />}
+          id={VMWizardStep.CLONE}
+          isHidden={!isCloneMethod}
+          name={t('Source')}
+        >
+          <CloneSourceStep />
+        </WizardStep>
+        <WizardStep
+          footer={{
+            nextButtonText: isCloneMethod ? t('Clone VirtualMachine') : t('Create VirtualMachine'),
+            onNext: createVM,
+          }}
+          id={VMWizardStep.REVIEW_AND_CREATE}
+          name={t('Review and create')}
+        >
+          <ReviewAndCreateStep />
+        </WizardStep>
+      </Wizard>
+    </TemplatesDrawerWrapper>
   );
 };
 
